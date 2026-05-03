@@ -1189,6 +1189,135 @@ runTests=function(){
   console.assert(typeof sbRequestCenteredFullscreen==='function','V3.8.4.1 fullscreen helper retained');
 };
 
+
+
+/* Stream Bandit V3.8.6 Player Comfort Polish: resume/start choice, clearer now playing, bigger boost status, player up next */
+var V386_LABEL='V3.8.6 Player Comfort Polish';
+APP_VERSION='StreamBanditPrototype3.8.6';
+data.version=APP_VERSION;
+document.title='Stream Bandit V3.8.6 Player Comfort Polish';
+var v386StartMode='resume';
+(function(){
+  var css='\n.playerComfortGrid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:14px;margin-bottom:14px}.nowPlayingPanel,.upNextPanel,.resumeChoicePanel,.boostStatusBig{background:#11131e;border:1px solid var(--line);border-radius:20px;padding:14px}.nowPlayingPanel h2{margin:4px 0 8px;font-size:26px}.nowMeta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.resumeChoicePanel{margin:12px 0;background:#101827;border-color:#6aa6ff55;color:#d7e9ff}.resumeChoicePanel h3,.upNextPanel h3{margin:0 0 8px}.resumeBigTime{font-size:22px;font-weight:900;color:#fff}.boostStatusBig{margin:12px 0;background:#140f1f;border-color:#7c3cff77}.boostStatusBig b{font-size:18px}.boostStatusBig span{display:inline-block;font-size:26px;font-weight:900;margin-top:6px}.upNextItem{display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:center;background:#0d0e15;border:1px solid var(--line);border-radius:14px;padding:9px;margin-top:8px}.upNextItem img{width:86px;aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#050508}.upNextItem b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.upNextItem small{color:var(--muted);display:block;margin-top:2px}.playerComfortActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.resumeModeActive{outline:2px solid #fff}.videoWrap.comfortVideo{border-radius:24px;box-shadow:0 22px 55px #0008}.audioBoostPanel #boostMeter{font-size:18px;padding:8px 12px}.audioBoostPanel{border-radius:20px}.audioBoostPanel h3{font-size:22px}@media(max-width:900px){.playerComfortGrid{grid-template-columns:1fr}.upNextItem{grid-template-columns:1fr}.upNextItem img{width:100%}}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function v386SourceName(v){return v&&v.localVideoId?'Local browser video':(v&&v.url&&/\.m3u8(\?|$)/i.test(v.url)?'HLS stream':(v&&v.url?'URL stream':'No source'))}
+function v386CurrentBoost(){return Number((data.settings&&data.settings.playerAudioBoost)||1)}
+function v386BoostStatusPanel(){var b=v386CurrentBoost();return '<div class="boostStatusBig"><b>Current audio boost</b><br><span id="boostBigStatus">'+Math.round(b*100)+'%</span><p class="note">Use + / - or the boost buttons below. Best for quiet dialogue and accessibility.</p></div>'}
+function v386QueueNextMarkup(){
+  var next=null,prev=null;
+  if(playQueue&&playQueue.length){
+    if(queuePos<playQueue.length-1&&data.videos[playQueue[queuePos+1]])next=Object.assign({},data.videos[playQueue[queuePos+1]],{i:playQueue[queuePos+1]});
+    if(queuePos>0&&data.videos[playQueue[queuePos-1]])prev=Object.assign({},data.videos[playQueue[queuePos-1]],{i:playQueue[queuePos-1]});
+  }
+  var html='<div class="upNextPanel"><h3>Up Next</h3>';
+  if(playQueue&&playQueue.length)html+='<p class="note">Queue item '+(queuePos+1)+' of '+playQueue.length+'.</p>';else html+='<p class="note">Single video. Use Play All from rows to build a queue.</p>';
+  if(next)html+=v386MiniQueueCard(next,'Next');
+  else html+='<div class="empty" style="padding:16px">No next video in queue.</div>';
+  if(prev)html+=v386MiniQueueCard(prev,'Previous');
+  html+='<div class="playerComfortActions"><button id="prevQTop" class="secondary small">Previous</button><button id="nextQTop" class="secondary small">Next</button><button class="secondary small" data-view="library">Library</button></div></div>';
+  return html;
+}
+function v386MiniQueueCard(v,label){return '<div class="upNextItem"><div>'+(v.thumb?'<img src="'+esc(v.thumb)+'">':'<div style="width:86px;aspect-ratio:16/9;border-radius:10px;background:#050508"></div>')+'</div><div><small>'+esc(label)+'</small><b>'+esc(v.title||'Untitled')+'</b><small>'+esc(v386SourceName(v))+(progressFor(v.i)?' · Resume '+fmtTime(progressFor(v.i)):'')+'</small><div class="row" style="margin-top:6px"><button class="small play" data-i="'+v.i+'">Play</button><button class="secondary small details" data-i="'+v.i+'">Details</button></div></div></div>'}
+function v386NowPlayingPanel(v,pr){return '<div class="nowPlayingPanel"><span class="pill">Now Playing</span><h2>'+esc(v.title||'Untitled')+'</h2><p class="muted">'+esc(v.desc||'')+'</p><div class="nowMeta"><span class="pill">'+esc(v386SourceName(v))+'</span>'+videoGenres(v).slice(0,4).map(function(g){return '<span class="pill">'+esc(g)+'</span>'}).join('')+'<span class="pill">Saved '+fmtTime(pr.time||0)+'</span></div>'+v386BoostStatusPanel()+'</div>'}
+function v386ResumeChoice(v,pr){var saved=Number(pr.time)||0;return '<div class="resumeChoicePanel"><h3>Resume choice</h3><p class="note">Choose how this title should start. You can change it any time while watching.</p><div class="row"><span class="resumeBigTime">Saved time: '+fmtTime(saved)+'</span><button id="resumeSavedBtn" class="good '+(v386StartMode==='resume'?'resumeModeActive':'')+'">Resume saved time</button><button id="startBeginningBtn" class="secondary '+(v386StartMode==='start'?'resumeModeActive':'')+'">Start from beginning</button></div></div>'}
+var oldWatchPageV386=watchPage;
+watchPage=function(){
+  var v=data.videos[selected];
+  if(!v)return topBar('Watch')+'<div class="empty">No video selected.</div>';
+  var pr=progressEntry(selected);
+  var helper=(typeof v384ShortcutHint==='function'?v384ShortcutHint():'');
+  var audio=(typeof v383AudioBoostPanel==='function'?v383AudioBoostPanel():'');
+  return topBar('Watching')+'<div class="playerComfortGrid"><div>'+v386NowPlayingPanel(v,pr)+v386ResumeChoice(v,pr)+'</div>'+v386QueueNextMarkup()+'</div><div class="videoWrap comfortVideo"><video id="player" controls playsinline data-src="'+esc(v.url)+'" data-local="'+esc(v.localVideoId||'')+'" poster="'+esc(v.thumb)+'"></video></div>'+audio+'<div class="panel"><h2>'+esc(v.title)+'</h2>'+helper+'<div class="progressNote">Resume saved at <b id="rt">'+fmtTime(progressFor(selected))+'</b>. '+(pr.finished?'This movie is marked finished.':'This movie is part-watched until it reaches the end or you mark it finished.')+'</div><div class="bar"><div id="watchFill" class="fill" style="width:'+percentFor(selected)+'%"></div></div><p id="playStatus" class="note">Player ready.</p><div class="row"><button id="restart" class="secondary">Restart</button><button id="prevQ" class="secondary">Previous</button><button id="nextQ" class="secondary">Next</button><button id="full">Fullscreen</button><button id="markFinishedNow" class="good">Mark finished</button><button id="resetThisProgress" class="secondary">Reset progress</button><button class="secondary" data-view="detail">Details</button></div><div class="queueBox"><b>Queue:</b> '+(playQueue.length?(queuePos+1)+' of '+playQueue.length:'Single video')+'</div></div>';
+};
+function v386RefreshBigBoost(){var el=byId('boostBigStatus');if(el)el.textContent=Math.round(v386CurrentBoost()*100)+'%'}
+var oldSetBoostUIV386=typeof v383SetBoostUI==='function'?v383SetBoostUI:null;
+if(oldSetBoostUIV386){
+  v383SetBoostUI=function(level,msg,cls){oldSetBoostUIV386(level,msg,cls);var el=byId('boostBigStatus');if(el)el.textContent=Math.round(Number(level||1)*100)+'%'};
+}
+var oldBindWatchV386=bindWatch;
+bindWatch=function(){
+  oldBindWatchV386();
+  v386RefreshBigBoost();
+  var p=byId('player');
+  var saved=progressFor(selected);
+  var resumeBtn=byId('resumeSavedBtn'),startBtn=byId('startBeginningBtn');
+  function setMode(mode){v386StartMode=mode; if(resumeBtn)resumeBtn.classList.toggle('resumeModeActive',mode==='resume'); if(startBtn)startBtn.classList.toggle('resumeModeActive',mode==='start')}
+  if(resumeBtn)resumeBtn.onclick=function(){setMode('resume');try{if(saved>0)p.currentTime=saved}catch(e){};toast('Resume saved time selected')};
+  if(startBtn)startBtn.onclick=function(){setMode('start');try{p.currentTime=0}catch(e){};toast('Start from beginning selected')};
+  if(p){
+    p.addEventListener('loadedmetadata',function(){ if(v386StartMode==='start'){try{p.currentTime=0}catch(e){}} });
+    p.addEventListener('timeupdate',v386RefreshBigBoost);
+  }
+  var nq=byId('nextQTop'); if(nq)nq.onclick=function(){if(!queueNext())toast('No next video in queue')};
+  var pq=byId('prevQTop'); if(pq)pq.onclick=function(){if(!queuePrev())toast('No previous video in queue')};
+};
+var oldSidebarV386=sidebar;
+sidebar=function(){return oldSidebarV386().replace(/V3\.8\.5\.1 Menu Organizer|V3\.8\.5 Menu Organizer|V3\.8\.4\.1 Fullscreen Center Fix/g,'V3.8.6 Player Comfort')};
+var oldSettingsPageV386=settingsPage;
+settingsPage=function(){return oldSettingsPageV386().replace(/StreamBanditPrototype3\.8\.5\.1|StreamBanditPrototype3\.8\.5|StreamBanditPrototype3\.8\.4\.1/g,APP_VERSION).replace(/V3\.8\.5\.1 Version Tidy \+ Boot Order Fix|V3\.8\.5 Menu Organizer|V3\.8\.4\.1 Fullscreen Center Fix/g,V386_LABEL)};
+var oldBackupPageV386=backupPage;
+backupPage=function(){return oldBackupPageV386().replace(/V3\.8\.5\.1 safety centre|V3\.8\.5 safety centre|V3\.8\.4\.1 safety centre/g,'V3.8.6 safety centre').replace(/StreamBanditPrototype3\.8\.5\.1|StreamBanditPrototype3\.8\.5|StreamBanditPrototype3\.8\.4\.1/g,APP_VERSION)};
+var oldBackupSummaryV386=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV386(d)+'\nV3.8.6 note: includes player comfort polish, resume/start choice, clearer now-playing panel, larger audio boost status and player Up Next panel.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typeof v384EnsureSettings==='function')v384EnsureSettings();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v3-8-6-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('Backup download started and backup time saved')};
+var oldTestChecklistPageV386=typeof testChecklistPage==='function'?testChecklistPage:null;
+if(oldTestChecklistPageV386){testChecklistPage=function(){var html=oldTestChecklistPageV386();if(html.indexOf('Player Comfort')<0){html=html.replace(/<div class="checkStep"><b>11\. Backup<\/b>|<div class="checkStep"><b>10\. Backup<\/b>|<div class="checkStep"><b>9\. Backup<\/b>/,'<div class="checkStep"><b>Player Comfort</b><span class="muted">Open a movie, check Now Playing, choose Resume saved time and Start from beginning, test audio boost status, and check Up Next.</span></div>$&')}return html.replace(/V3\.8\.5\.1 Version Tidy \+ Boot Order Fix|V3\.8\.5 Menu Organizer|V3\.8\.4\.1 Fullscreen Center Fix/g,V386_LABEL)}};
+var oldRunTestsV386=runTests;
+runTests=function(){try{oldRunTestsV386()}catch(e){console.warn('Stream Bandit non-fatal startup self-test warning:',e)}console.assert(APP_VERSION==='StreamBanditPrototype3.8.6','V3.8.6 version set');console.assert(typeof v386ResumeChoice==='function','V3.8.6 resume choice helper exists');console.assert(typeof v386QueueNextMarkup==='function','V3.8.6 up next helper exists')};
+
+
+
+/* Stream Bandit V3.8.6.1 Player Comfort Layout Restore
+   Keeps the good V3.8.5.1 player-first layout while retaining the useful V3.8.6 comfort features. */
+var V3861_LABEL='V3.8.6.1 Player Comfort Layout Restore';
+APP_VERSION='StreamBanditPrototype3.8.6.1';
+data.version=APP_VERSION;
+document.title='Stream Bandit V3.8.6.1 Player Comfort Layout Restore';
+(function(){
+  var css='\n.playerComfortInline{background:#101827;border:1px solid #6aa6ff55;border-radius:16px;padding:12px;margin:12px 0;color:#d7e9ff}.playerComfortInline h3{margin:0 0 8px}.resumeBigTime{font-size:18px;font-weight:900;color:#fff}.resumeModeActive{outline:2px solid #fff}.nowPlayingCompact{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}.boostMiniStatus{display:inline-block;background:#0d0e15;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-weight:900}.playerUpNextCompact{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:10px;margin:10px 0}.playerUpNextCompact h3{margin:0 0 8px}.playerUpNextMini{display:grid;grid-template-columns:82px 1fr;gap:10px;align-items:center}.playerUpNextMini img{width:82px;aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#050508}.playerUpNextMini b{display:block}.playerUpNextMini small{display:block;color:var(--muted);margin-top:2px}@media(max-width:700px){.playerUpNextMini{grid-template-columns:1fr}.playerUpNextMini img{width:100%}}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function v3861SourceName(v){return typeof v386SourceName==='function'?v386SourceName(v):(v&&v.localVideoId?'Local browser video':(v&&v.url?'URL stream':'No source'))}
+function v3861BoostNow(){return Math.round(Number((data.settings&&data.settings.playerAudioBoost)||1)*100)+'%'}
+function v3861ResumeChoice(pr){var saved=Number(pr&&pr.time)||0;return '<div class="playerComfortInline"><h3>Resume choice</h3><p class="note">Choose only when needed. The normal player layout stays clean.</p><div class="row"><span class="resumeBigTime">Saved time: '+fmtTime(saved)+'</span><button id="resumeSavedBtn" class="good '+(v386StartMode==='resume'?'resumeModeActive':'')+'">Resume saved time</button><button id="startBeginningBtn" class="secondary '+(v386StartMode==='start'?'resumeModeActive':'')+'">Start from beginning</button><span class="boostMiniStatus">Boost: <span id="boostBigStatus">'+v3861BoostNow()+'</span></span></div></div>'}
+function v3861UpNextCompact(){
+  if(!playQueue||playQueue.length<2)return '';
+  var next=null;
+  if(queuePos<playQueue.length-1&&data.videos[playQueue[queuePos+1]])next=Object.assign({},data.videos[playQueue[queuePos+1]],{i:playQueue[queuePos+1]});
+  if(!next)return '<div class="playerUpNextCompact"><h3>Up Next</h3><p class="note">End of queue.</p></div>';
+  return '<div class="playerUpNextCompact"><h3>Up Next</h3><div class="playerUpNextMini"><div>'+(next.thumb?'<img src="'+esc(next.thumb)+'">':'<div style="width:82px;aspect-ratio:16/9;border-radius:10px;background:#050508"></div>')+'</div><div><b>'+esc(next.title||'Untitled')+'</b><small>'+esc(v3861SourceName(next))+(progressFor(next.i)?' · Resume '+fmtTime(progressFor(next.i)):'')+'</small><div class="row" style="margin-top:6px"><button id="nextQTop" class="secondary small">Play next</button><button class="secondary small details" data-i="'+next.i+'">Details</button></div></div></div></div>';
+}
+watchPage=function(){
+  var v=data.videos[selected];
+  if(!v)return topBar('Watch')+'<div class="empty">No video selected.</div>';
+  var pr=progressEntry(selected);
+  var helper=(typeof v384ShortcutHint==='function'?v384ShortcutHint():'');
+  var audio=(typeof v383AudioBoostPanel==='function'?v383AudioBoostPanel():'');
+  return topBar('Watching')+
+    '<div class="videoWrap"><video id="player" controls playsinline data-src="'+esc(v.url)+'" data-local="'+esc(v.localVideoId||'')+'" poster="'+esc(v.thumb)+'"></video></div>'+audio+
+    '<div class="panel"><div class="nowPlayingCompact"><span class="pill">Now Playing</span><span class="pill">'+esc(v3861SourceName(v))+'</span>'+videoGenres(v).slice(0,4).map(function(g){return '<span class="pill">'+esc(g)+'</span>'}).join('')+'<span class="pill">Saved '+fmtTime(pr.time||0)+'</span></div><h2>'+esc(v.title)+'</h2><p class="muted">'+esc(v.desc||'')+'</p>'+v3861ResumeChoice(pr)+'<div class="progressNote">Resume saved at <b id="rt">'+fmtTime(progressFor(selected))+'</b>. '+(pr.finished?'This movie is marked finished.':'This movie is part-watched until it reaches the end or you mark it finished.')+'</div><div class="bar"><div id="watchFill" class="fill" style="width:'+percentFor(selected)+'%"></div></div><p id="playStatus" class="note">Player ready.</p><div class="row"><button id="restart" class="secondary">Restart</button><button id="prevQ" class="secondary">Previous</button><button id="nextQ" class="secondary">Next</button><button id="full">Fullscreen</button><button id="markFinishedNow" class="good">Mark finished</button><button id="resetThisProgress" class="secondary">Reset progress</button><button class="secondary" data-view="detail">Details</button></div>'+helper+v3861UpNextCompact()+'<div class="queueBox"><b>Queue:</b> '+(playQueue.length?(queuePos+1)+' of '+playQueue.length:'Single video')+'</div></div>';
+};
+var oldBindWatchV3861=bindWatch;
+bindWatch=function(){
+  oldBindWatchV3861();
+  var p=byId('player'),saved=progressFor(selected),resumeBtn=byId('resumeSavedBtn'),startBtn=byId('startBeginningBtn');
+  function setMode(mode){v386StartMode=mode;if(resumeBtn)resumeBtn.classList.toggle('resumeModeActive',mode==='resume');if(startBtn)startBtn.classList.toggle('resumeModeActive',mode==='start')}
+  if(resumeBtn)resumeBtn.onclick=function(){setMode('resume');try{if(saved>0)p.currentTime=saved}catch(e){};toast('Resume saved time selected')};
+  if(startBtn)startBtn.onclick=function(){setMode('start');try{p.currentTime=0}catch(e){};toast('Start from beginning selected')};
+  var nq=byId('nextQTop');if(nq)nq.onclick=function(){if(!queueNext())toast('No next video in queue')};
+  if(typeof v386RefreshBigBoost==='function')v386RefreshBigBoost();
+};
+var oldSidebarV3861=sidebar;
+sidebar=function(){return oldSidebarV3861().replace(/V3\.8\.6 Player Comfort|V3\.8\.5\.1 Menu Organizer|V3\.8\.5 Menu Organizer|V3\.8\.4\.1 Fullscreen Center Fix/g,'V3.8.6.1 Player Comfort')};
+var oldSettingsPageV3861=settingsPage;
+settingsPage=function(){return oldSettingsPageV3861().replace(/StreamBanditPrototype3\.8\.6|StreamBanditPrototype3\.8\.5\.1/g,APP_VERSION).replace(/V3\.8\.6 Player Comfort Polish|V3\.8\.5\.1 Version Tidy \+ Boot Order Fix/g,V3861_LABEL)};
+var oldBackupSummaryV3861=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV3861(d)+'\nV3.8.6.1 note: keeps the cleaner player-first layout while retaining resume/start choice, audio boost status and compact Up Next.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typeof v384EnsureSettings==='function')v384EnsureSettings();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v3-8-6-1-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('Backup download started and backup time saved')};
+var oldRunTestsV3861=runTests;
+runTests=function(){try{oldRunTestsV3861()}catch(e){console.warn('Stream Bandit non-fatal startup self-test warning:',e)}console.assert(APP_VERSION==='StreamBanditPrototype3.8.6.1','V3.8.6.1 version set');console.assert(typeof v3861ResumeChoice==='function','V3.8.6.1 compact resume helper exists')};
+
 try{
   if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
