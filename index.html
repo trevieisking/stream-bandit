@@ -1318,6 +1318,133 @@ exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typ
 var oldRunTestsV3861=runTests;
 runTests=function(){try{oldRunTestsV3861()}catch(e){console.warn('Stream Bandit non-fatal startup self-test warning:',e)}console.assert(APP_VERSION==='StreamBanditPrototype3.8.6.1','V3.8.6.1 version set');console.assert(typeof v3861ResumeChoice==='function','V3.8.6.1 compact resume helper exists')};
 
+
+
+/* Stream Bandit V3.8.7 Stability Snapshot + Storage Prep
+   Small safe version before V4 storage work: no backend changes, no player layout changes. */
+var V387_LABEL='V3.8.7 Stability Snapshot + Storage Prep';
+APP_VERSION='StreamBanditPrototype3.8.7';
+data.version=APP_VERSION;
+document.title='Stream Bandit V3.8.7 Stability Snapshot + Storage Prep';
+(function(){
+  var css='\n.stableBanner{background:linear-gradient(135deg,#101827,#14101f);border:1px solid #6aa6ff55;border-radius:20px;padding:14px;margin-bottom:14px;color:#d7e9ff}.storagePrepGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:12px 0}.storagePrepCard{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:12px}.storagePrepCard b{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.storagePrepCard span{font-size:20px;font-weight:900}.prepStep{background:#11131e;border:1px solid var(--line);border-radius:16px;padding:12px;margin:10px 0}.prepStep h3{margin:0 0 6px}.prepBadge{display:inline-block;background:#123b2b;border:1px solid #3ddc9777;color:#baf7df;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:900}.prepWarn{display:inline-block;background:#3b2e12;border:1px solid #ffbf3c77;color:#ffe0a3;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:900}.storagePlanBox{background:#20180d;border:1px solid #ffbf3c77;border-radius:18px;padding:13px;margin:12px 0;color:#ffe0a3}.versionLock{background:#151724;border:1px solid var(--line);border-radius:18px;padding:12px;margin:12px 0}.storagePrepList{display:grid;gap:8px;margin-top:10px}.storagePrepItem{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#0d0e15;border:1px solid var(--line);border-radius:14px;padding:10px}.storagePrepItem span{color:var(--muted)}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function v387Stat(label,value){return '<div class="storagePrepCard"><b>'+esc(label)+'</b><span>'+esc(value)+'</span></div>'}
+function v387DataSnapshot(){
+  var videos=data.videos||[], submissions=data.submissions||[], watch=Object.keys(data.watchlist||{}).reduce(function(n,k){return n+((data.watchlist[k]||[]).length)},0);
+  var noSource=videos.filter(function(v){return !v.url&&!v.localVideoId}).length;
+  var localOnly=videos.filter(function(v){return v.localVideoId&&!v.url}).length;
+  var urlStreams=videos.filter(function(v){return !!v.url}).length;
+  var hls=videos.filter(function(v){return /\.m3u8(\?|$)/i.test(v.url||'')}).length;
+  var noThumb=videos.filter(function(v){return !v.thumb}).length;
+  var pending=submissions.filter(function(s){return s.status==='pending'}).length;
+  var img=(typeof imageStorageStats==='function')?imageStorageStats():{total:0};
+  return {videos:videos.length,channels:(data.channels||[]).length,playlists:(data.playlists||[]).length,collections:(data.collections||[]).length,submissions:submissions.length,pending:pending,watch:watch,noSource:noSource,localOnly:localOnly,urlStreams:urlStreams,hls:hls,noThumb:noThumb,imageKB:kb(img.total||0),dataKB:kb(dataSize())};
+}
+function v387SnapshotPanel(){
+  var s=v387DataSnapshot();
+  return '<div class="stableBanner"><h3 style="margin:0 0 6px">'+V387_LABEL+'</h3><p class="note">This is a safe freeze point before real storage/backend work. It does not change the player layout, storage method, uploads or database. It helps you prepare for V4.0 storage properly.</p><div class="storagePrepGrid">'+v387Stat('Stable version','V3.8.7')+v387Stat('Movies',s.videos)+v387Stat('Data size',s.dataKB+' KB')+v387Stat('Local only',s.localOnly)+v387Stat('URL/HLS streams',s.urlStreams+' / '+s.hls)+v387Stat('Pending review',s.pending)+'</div><div class="row"><button class="good" data-view="backup">Export backup now</button><button class="secondary" data-view="storageprep">Storage Prep</button><button class="secondary" data-view="health">Health Check</button><button class="secondary" data-view="quality">Quality Tools</button></div></div>';
+}
+function storagePrepPage(){
+  if(!isAdmin())return topBar('Storage Prep')+'<div class="empty">Admin only.</div>';
+  var s=v387DataSnapshot();
+  var localBadge=s.localOnly?'<span class="prepWarn">Needs planning</span>':'<span class="prepBadge">Ready</span>';
+  var sourceBadge=s.noSource?'<span class="prepWarn">Fix before V4</span>':'<span class="prepBadge">Good</span>';
+  var thumbBadge=s.noThumb?'<span class="prepWarn">Optional cleanup</span>':'<span class="prepBadge">Good</span>';
+  return topBar('Storage Prep')+v387SnapshotPanel()+
+    '<div class="storagePlanBox"><b>Recommended V4.0 direction:</b><br>Use Supabase for accounts/database/metadata, and later pair it with Mux for proper video streaming if you want a serious streaming-app setup. For now, keep V3.8.7 as the safe frontend-only stable version.</div>'+ 
+    '<div class="panel"><h3>Pre-storage readiness</h3><div class="storagePrepGrid">'+v387Stat('Movies',s.videos)+v387Stat('Channels',s.channels)+v387Stat('Playlists',s.playlists)+v387Stat('Collections',s.collections)+v387Stat('Watchlist saves',s.watch)+v387Stat('Image storage',s.imageKB+' KB')+'</div></div>'+ 
+    '<div class="prepStep"><h3>1. Export safety files '+localBadge+'</h3><p class="note">Before any storage/backend migration, keep the current GitHub <b>index.html</b>, a fresh backup JSON, and original local video files. JSON backups do not include large browser-only video files.</p><div class="row"><button class="good" data-view="backup">Open Backup</button><button class="secondary" data-view="storage">Open Storage</button></div></div>'+ 
+    '<div class="prepStep"><h3>2. Fix missing sources '+sourceBadge+'</h3><p class="note">Movies with no source cannot migrate cleanly. Add a URL/HLS stream, relink a local file, or remove test items before V4.</p><div class="storagePrepList"><div class="storagePrepItem"><b>No-source movies</b><span>'+s.noSource+'</span></div><div class="storagePrepItem"><b>Local browser-only movies</b><span>'+s.localOnly+'</span></div><div class="storagePrepItem"><b>URL stream movies</b><span>'+s.urlStreams+'</span></div><div class="storagePrepItem"><b>HLS/Mux style streams</b><span>'+s.hls+'</span></div></div><br><button class="secondary" data-view="quality">Open Quality Tools</button></div>'+ 
+    '<div class="prepStep"><h3>3. Thumbnail and metadata cleanup '+thumbBadge+'</h3><p class="note">Good thumbnails, descriptions and channels will make the eventual database migration cleaner.</p><div class="storagePrepList"><div class="storagePrepItem"><b>Missing thumbnails</b><span>'+s.noThumb+'</span></div><div class="storagePrepItem"><b>Pending review submissions</b><span>'+s.pending+'</span></div><div class="storagePrepItem"><b>Total submissions</b><span>'+s.submissions+'</span></div></div><br><button class="secondary" data-view="health">Open Health Check</button></div>'+ 
+    '<div class="prepStep"><h3>4. V4.0 storage decision</h3><p class="note">When ready, choose the backend path before adding more big frontend features. My recommendation is: <b>Supabase first</b> for data/users, then <b>Mux later</b> for professional video streaming.</p><div class="row"><span class="pill">Supabase: database/users/storage</span><span class="pill">Mux: proper video streaming</span><span class="pill">GitHub Pages: frontend only</span></div></div>';
+}
+var oldPageV387=page;
+page=function(){if(view==='storageprep')return storagePrepPage();return oldPageV387()};
+var oldRenderV387=render;
+render=function(){try{if(!currentUser||!me()){currentUser=null;saveSession();return renderLogin()}applySettings();if((view==='admin'||view==='backup'||view==='settings'||view==='storage'||view==='review'||view==='health'||view==='quality'||view==='checklist'||view==='storageprep')&&!isAdmin())view='home';byId('app').innerHTML='<div class="wrap"><aside class="side">'+sidebar()+'</aside><main class="main">'+page()+'</main></div>';bindCommon();if(view==='watch')bindWatch();if(view==='admin')bindAdmin();if(view==='backup')bindBackup();if(view==='settings')bindSettings();if(view==='storage')bindStorage();if(view==='accessibility')bindAccessibility();if(view==='quality')bindQuality()}catch(e){fatal(e)}};
+var oldSidebarV387=sidebar;
+sidebar=function(){
+  var html=oldSidebarV387().replace(/V3\.8\.6\.1 Player Comfort|V3\.8\.6 Player Comfort|V3\.8\.5\.1 Menu Organizer/g,'V3.8.7 Stable Prep');
+  if(html.indexOf('data-view="storageprep"')<0){
+    html=html.replace(nav('storage','🗄 Storage'),nav('storage','🗄 Storage')+nav('storageprep','🧭 Storage Prep'));
+    html=html.replace(nav('backup','💾 Backup'),nav('backup','💾 Backup')+nav('storageprep','🧭 Storage Prep'));
+  }
+  return html;
+};
+var oldHomePageV387=homePage;
+homePage=function(){return oldHomePageV387()};
+var oldAdminPageV387=adminPage;
+adminPage=function(){var html=oldAdminPageV387();var t=topBar('Admin');return html.replace(t,t+v387SnapshotPanel())};
+var oldHealthPageV387=typeof healthPage==='function'?healthPage:null;
+if(oldHealthPageV387){healthPage=function(){var html=oldHealthPageV387();return html.replace(topBar('Admin Health Check'),topBar('Admin Health Check')+v387SnapshotPanel()).replace('<button class="secondary" data-view="storage">Open Storage</button>','<button class="secondary" data-view="storage">Open Storage</button><button class="secondary" data-view="storageprep">Storage Prep</button>')}}
+var oldTestChecklistPageV387=typeof testChecklistPage==='function'?testChecklistPage:null;
+if(oldTestChecklistPageV387){testChecklistPage=function(){var html=oldTestChecklistPageV387();if(html.indexOf('Storage Prep')<0){html=html.replace(/<div class="checkStep"><b>11\. Backup<\/b>|<div class="checkStep"><b>10\. Backup<\/b>|<div class="checkStep"><b>9\. Backup<\/b>|<div class="checkStep"><b>7\. Backup<\/b>|<div class="checkStep"><b>6\. Backup<\/b>/,'<div class="checkStep"><b>Storage Prep</b><span class="muted">Open Storage Prep, check no-source/local-only counts, export backup, and keep original local video files safe before V4 storage work.</span></div>$&')}return html.replace(/V3\.8\.6\.1 Player Comfort Layout Restore|V3\.8\.6 Player Comfort Polish|V3\.8\.5\.1 Version Tidy \+ Boot Order Fix/g,V387_LABEL)}}
+var oldSettingsPageV387=settingsPage;
+settingsPage=function(){return oldSettingsPageV387().replace(/StreamBanditPrototype3\.8\.6\.1|StreamBanditPrototype3\.8\.6/g,APP_VERSION).replace(/V3\.8\.6\.1 Player Comfort Layout Restore|V3\.8\.6 Player Comfort Polish/g,V387_LABEL)};
+var oldBackupSummaryV387=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV387(d)+'\nV3.8.7 note: stability snapshot and storage prep added before V4.0 backend/storage planning. No storage method changed in this version.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typeof v384EnsureSettings==='function')v384EnsureSettings();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v3-8-7-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('Backup download started and backup time saved')};
+var oldRunTestsV387=runTests;
+runTests=function(){try{oldRunTestsV387()}catch(e){console.warn('Stream Bandit non-fatal startup self-test warning:',e)}console.assert(APP_VERSION==='StreamBanditPrototype3.8.7','V3.8.7 version set');console.assert(typeof storagePrepPage==='function','V3.8.7 storage prep page exists');console.assert(typeof v387SnapshotPanel==='function','V3.8.7 snapshot panel exists')};
+
+
+/* Stream Bandit V3.8.7.1 Storage Prep Menu + Quality Tools Hotfix
+   Fixes: duplicate Storage Prep in sidebar and Quality Tools opening fatal/reset screen. */
+var V3871_LABEL='V3.8.7.1 Storage Prep Menu Hotfix';
+APP_VERSION='StreamBanditPrototype3.8.7.1';
+data.version=APP_VERSION;
+document.title='Stream Bandit V3.8.7.1 Storage Prep Menu Hotfix';
+function bindQuality(){
+  /* Quality Tools uses normal bindCommon handlers; this no-op prevents the render fatal screen. */
+}
+function v3871WatchCount(){
+  if(!currentUser||!data.watchlist||!Array.isArray(data.watchlist[currentUser.username]))return 0;
+  return data.watchlist[currentUser.username].length;
+}
+function v3871PendingCount(){return typeof pendingSubmissions==='function'?pendingSubmissions().length:0}
+function v3871VersionTag(){return '<div class="menuVersion">V3.8.7.1 Stable Prep</div>'}
+function v3871Section(title,items){return '<div class="navSection"><div class="navHead">'+esc(title)+'</div>'+items+'</div>'}
+sidebar=function(){
+  var a=isAdmin(),st=data.settings||seed.settings,u=me()||{},watchCount=v3871WatchCount(),pending=v3871PendingCount();
+  var browse=''+
+    nav('home','🏠 Home')+
+    nav('continue','⏯️ Continue Watching')+
+    nav('library','🎬 Library')+
+    nav('watchlist','📌 Watchlist '+(watchCount?'<span class="navCount">'+watchCount+'</span>':''))+
+    nav('accessibility','♿ Accessibility');
+  var discover=''+
+    nav('genres','🏷 Genres')+
+    nav('history','🕘 Watch History')+
+    nav('channels','📺 Channels')+
+    nav('collections','🎞 Collections')+
+    nav('playlists','🧩 Playlists')+
+    nav('favourites','❤️ Favourites');
+  var creator=''+nav('mychannel','👤 My Channel')+nav('submit','⬆️ Submit Video');
+  if(typeof rulesPage==='function')creator+=nav('rules','📜 Rules');
+  var admin='';
+  if(a){
+    admin+=nav('review','🛡 Review Queue '+(pending?'<span class="navCount">'+pending+'</span>':''));
+    if(typeof healthPage==='function')admin+=nav('health','🩺 Health Check');
+    if(typeof qualityPage==='function')admin+=nav('quality','🧰 Quality Tools');
+    if(typeof testChecklistPage==='function')admin+=nav('checklist','✅ Test Checklist');
+    admin+=nav('admin','🛠 Admin')+nav('settings','⚙️ Settings')+nav('storage','🗄 Storage')+nav('storageprep','🧭 Storage Prep')+nav('backup','💾 Backup');
+  }
+  return '<div class="brand"><div class="logo">'+appLogo()+'</div><div><h1>'+esc(st.appName)+'</h1><p>'+esc(st.tagline)+'</p>'+v3871VersionTag()+'</div></div>'+
+    '<div class="nav">'+v3871Section('Watch',browse)+v3871Section('Browse',discover)+v3871Section('Creator',creator)+(a?v3871Section('Admin Tools',admin):'')+'</div>'+
+    '<div class="userbox"><div class="userMeta"><b>'+esc(currentUser.username)+'</b><span>'+esc(u.role||'user')+'</span><span class="mutedSmall">'+esc((u.channelName)||'My Channel')+'</span></div><div class="row"><button class="secondary small" id="logout">Logout</button></div><div class="sideNote">Menu grouped to keep Stream Bandit easier to browse as the app grows.</div></div>';
+};
+var oldV3871SnapshotPanel=v387SnapshotPanel;
+v387SnapshotPanel=function(){return oldV3871SnapshotPanel().replace(/V3\.8\.7/g,'V3.8.7.1')};
+var oldSettingsPageV3871=settingsPage;
+settingsPage=function(){return oldSettingsPageV3871().replace(/StreamBanditPrototype3\.8\.7|V3\.8\.7 Stability Snapshot \+ Storage Prep/g,V3871_LABEL)};
+var oldBackupSummaryV3871=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV3871(d)+'\nV3.8.7.1 note: fixed duplicate Storage Prep sidebar item and Quality Tools fatal reset issue.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typeof v384EnsureSettings==='function')v384EnsureSettings();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v3-8-7-1-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('Backup download started and backup time saved')};
+var oldRunTestsV3871=runTests;
+runTests=function(){try{oldRunTestsV3871()}catch(e){console.warn('Stream Bandit non-fatal startup self-test warning:',e)}console.assert(typeof bindQuality==='function','V3.8.7.1 bindQuality hotfix exists');console.assert(sidebar().split('data-view="storageprep"').length-1===1||!isAdmin(),'V3.8.7.1 Storage Prep appears once');};
+
 try{
   if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
