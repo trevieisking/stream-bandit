@@ -2190,6 +2190,89 @@ var oldRunTestsV43=runTests;
 runTests=function(){try{oldRunTestsV43()}catch(e){console.warn('V4.3 self-test warning:',e)}console.assert(typeof sb43EnsureDefault==='function','V4.3 default helper exists')};
 sb43EnsureDefault();
 
+
+
+/* Stream Bandit V4.3.1 Supabase Home Read Test */
+var V431_LABEL='V4.3.1 Supabase Home Read Test';
+(function(){
+  var st=document.createElement('style');
+  st.textContent='\n.sbHomeSourceBadge{display:inline-flex;align-items:center;gap:8px;background:#19c37d22;border:1px solid #19c37d88;color:#eafff5;border-radius:999px;padding:8px 12px;font-weight:900}.sbHomeFallbackBadge{display:inline-flex;align-items:center;gap:8px;background:#2a1d05;border:1px solid #ffd78266;color:#ffe4a3;border-radius:999px;padding:8px 12px;font-weight:900}.sbHomeHero{border:1px solid #19c37d66;background:linear-gradient(135deg,#082417,#101729);border-radius:22px;padding:18px;margin:0 0 18px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:center}.sbHomeHero h2{font-size:36px;margin:8px 0}.sbHomePoster{aspect-ratio:16/9;background:#050508;border:1px solid var(--line);border-radius:18px;overflow:hidden;display:grid;place-items:center;color:var(--muted)}.sbHomePoster img{width:100%;height:100%;object-fit:cover}.sbHomeStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}.sbHomeStats .homeStat{background:#10131f;border:1px solid var(--line);border-radius:16px;padding:12px}.sbHomeLoading{border:1px solid var(--line);background:#10131f;border-radius:18px;padding:18px;margin:12px 0}.sbHomeRow{margin:18px 0}.sbHomeGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:12px}@media(max-width:850px){.sbHomeHero{grid-template-columns:1fr}.sbHomeStats{grid-template-columns:repeat(2,minmax(0,1fr))}}';
+  document.head.appendChild(st);
+})();
+var sb431AutoHomeLoad=false;
+function sb431SourceActive(){data.settings=data.settings||{};return !!data.settings.useSupabaseLibrary}
+function sb431UniqueRemoteChannels(){var o={};(sbRemoteMovies||[]).forEach(function(m){o[sbMovieChannel(m)]=1});return Object.keys(o).filter(Boolean)}
+function sb431RemoteGenres(){var o={};(sbRemoteMovies||[]).forEach(function(m){sbMovieGenres(m).forEach(function(g){o[g]=(o[g]||0)+1})});return Object.keys(o).sort(function(a,b){return o[b]-o[a]||a.localeCompare(b)})}
+function sb431RemoteRow(title,arr,empty){return '<div class="sbHomeRow"><div class="sectionTitle"><h3>'+esc(title)+'</h3><div class="rowActions"><span class="pill">'+arr.length+' movie(s)</span></div></div>'+(arr.length?'<div class="sbHomeGrid">'+arr.slice(0,8).map(sbRemoteCard).join('')+'</div>':'<div class="empty">'+esc(empty||'Nothing here yet.')+'</div>')+'</div>'}
+function sb431RemoteHomeHero(){
+  var st=data.settings||seed.settings;
+  var movies=sbRemoteMovies||[];
+  var spot=movies.find(function(m){return !!m.featured})||movies[0]||null;
+  var featured=movies.filter(function(m){return !!m.featured}).length;
+  var hls=movies.filter(function(m){return /\.m3u8(\?|$)/i.test(sbMovieSource(m))}).length;
+  var channels=sb431UniqueRemoteChannels().length;
+  if(!spot){return topBar('Home')+'<div class="sbHomeLoading"><h3>Supabase Home</h3><p class="note">Supabase is selected, but no movies are loaded yet.</p><button class="good" id="sb431LoadHome">Load Supabase Home</button></div>'}
+  return topBar('Home')+'<section class="sbHomeHero"><div><span class="sbHomeSourceBadge">🟢 Home reading from Supabase</span><h2>'+esc(spot.title||'Stream Bandit')+'</h2><p class="muted">'+esc(spot.description||st.heroText||'Your Supabase-powered Stream Bandit library.')+'</p><div class="sbMiniMeta"><span>'+esc(sbMovieType(spot))+'</span><span>'+esc(sbMovieChannel(spot))+'</span>'+sbMovieGenres(spot).slice(0,3).map(function(g){return '<span>'+esc(g)+'</span>'}).join('')+'</div><div class="row"><button class="small sbPlayRemote" data-id="'+esc(spot.id)+'">Play from Supabase</button><button class="secondary small sbDetailRemote" data-id="'+esc(spot.id)+'">Details</button><button class="secondary small" data-view="library">Open Library</button></div><div class="sbHomeStats">'+homeStat('Supabase movies',movies.length)+homeStat('Channels',channels)+homeStat('Featured',featured)+homeStat('HLS/Mux links',hls)+'</div></div><div class="sbHomePoster">'+(spot.thumbnail_url?'<img src="'+esc(spot.thumbnail_url)+'">':'Supabase spotlight')+'</div></section>'
+}
+var oldHomePageV431=homePage;
+homePage=function(){
+  if(!sb431SourceActive()){
+    var html=oldHomePageV431();
+    return '<div class="sbDefaultHero"><div class="row" style="justify-content:space-between"><div><h3>Home source</h3><p>Browser/local Home is showing because Browser/local fallback mode is selected.</p></div><span class="sbHomeFallbackBadge">🟡 Browser fallback active</span></div></div>'+html;
+  }
+  if(!sbRemoteLoaded&&!sb431AutoHomeLoad&&typeof sbLoadRemoteLibrary==='function'){
+    sb431AutoHomeLoad=true;
+    setTimeout(function(){sbLoadRemoteLibrary()},150);
+  }
+  if(!sbRemoteLoaded){
+    return topBar('Home')+'<div class="sbHomeLoading"><h3>Loading Supabase Home...</h3><p class="note">V4.3.1 now starts connecting the Home page to Supabase. Wait a moment or press the button below.</p><div class="row"><button class="good" id="sb431LoadHome">Load Supabase Home</button><button class="secondary" data-view="library">Open Library</button><button class="secondary" data-view="liveready">Live Readiness</button></div></div>';
+  }
+  var movies=sbRemoteMovies||[];
+  var latest=movies.slice();
+  var featured=movies.filter(function(m){return !!m.featured});
+  var streams=movies.filter(function(m){return !!sbMovieSource(m)});
+  var html=sb431RemoteHomeHero();
+  html+=sb431RemoteRow('Recently Added from Supabase',latest,'No Supabase movies yet.');
+  html+=sb431RemoteRow('Admin Picks from Supabase',featured.length?featured:movies,'Tick Featured in Supabase/Admin later to control this row.');
+  html+=sb431RemoteRow('Stream Links from Supabase',streams,'No playable stream links found.');
+  sb431RemoteGenres().slice(0,3).forEach(function(g){html+=sb431RemoteRow(g+' Picks from Supabase',movies.filter(function(m){return sbMovieGenres(m).indexOf(g)>-1}), '')});
+  html+='<div class="sbDefaultHero"><h3>V4.3.1 Home connection note</h3><p>Home now reads its main movie rows from Supabase when Supabase Library mode is active. Browser/local fallback is still available from Library.</p><div class="row"><button class="secondary" data-view="library">Library source switch</button><button class="secondary" data-view="supabase">Supabase Test</button><button class="secondary" data-view="liveready">Live Readiness</button></div></div>';
+  return html;
+};
+var oldBindCommonV431=bindCommon;
+bindCommon=function(){
+  oldBindCommonV431();
+  var b=byId('sb431LoadHome');
+  if(b)b.onclick=function(){sb431AutoHomeLoad=true;sbLoadRemoteLibrary()};
+};
+var oldAdminPageV431=adminPage;
+adminPage=function(){
+  var html=oldAdminPageV431();
+  if(html.indexOf('V4.3.1 Supabase Home')<0){
+    html=html.replace('</div></div><div class="panel">','</div></div><div class="panel"><h3>V4.3.1 Supabase Home</h3><p class="note">Home now reads main rows from Supabase when Supabase mode is active. This is the next page connected after Library.</p><div class="row"><button class="secondary" data-view="home">Open Home</button><button class="secondary" data-view="library">Open Library</button><button class="secondary" data-view="liveready">Live Readiness</button></div></div><div class="panel">');
+  }
+  return html;
+};
+var oldSb421LiveReadinessPageV431=typeof sb421LiveReadinessPage==='function'?sb421LiveReadinessPage:null;
+if(oldSb421LiveReadinessPageV431){
+  sb421LiveReadinessPage=function(){
+    var html=oldSb421LiveReadinessPageV431();
+    if(html.indexOf('Home Supabase read')<0){
+      html=html.replace('<div class="sbDefaultHero"><h3>V4.3 default check</h3>','<div class="sbDefaultHero"><h3>Home Supabase read</h3><p>V4.3.1 connects Home rows to Supabase. Test Home, Details and Play after refreshing.</p></div><div class="sbDefaultHero"><h3>V4.3 default check</h3>');
+    }
+    return html.replace(/V4\.3 Live Readiness/g,'V4.3.1 Live Readiness');
+  };
+}
+var oldSidebarV431=sidebar;
+sidebar=function(){return oldSidebarV431().replace(/V4\.3 Supabase Default Library Mode|V4\.2\.1 Live Readiness Check|V4\.1\.3 Supabase Accessibility Binding Hotfix|V3\.8\.7\.1 Stable Prep/g,V431_LABEL)};
+var oldSettingsPageV431=settingsPage;
+settingsPage=function(){return oldSettingsPageV431().replace(/V4\.3 Supabase Default Library Mode|V4\.2\.1 Live Readiness Check|V4\.1\.3 Supabase Accessibility Binding Hotfix|V3\.8\.7\.1 Stable Prep/g,V431_LABEL)};
+var oldBackupSummaryV431=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV431(d)+'\nV4.3.1 note: Home page read-test added so Home rows can read from Supabase when Supabase Library mode is active.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typeof sb43EnsureDefault==='function')sb43EnsureDefault();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version='StreamBanditPrototype4.3.1-supabase-home-read-test';saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-3-1-supabase-home-read-test-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.3.1 backup download started')};
+var oldRunTestsV431=runTests;
+runTests=function(){try{oldRunTestsV431()}catch(e){console.warn('V4.3.1 self-test warning:',e)}console.assert(typeof sb431RemoteHomeHero==='function','V4.3.1 Supabase Home helper exists')};
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
