@@ -2096,6 +2096,100 @@ exportBackup=function(){data.settings=data.settings||clone(seed.settings);data.s
 var oldRunTestsV421=runTests;
 runTests=function(){try{oldRunTestsV421()}catch(e){console.warn('V4.2.1 self-test warning:',e)}console.assert(typeof sb421LiveReadinessPage==='function','V4.2.1 live readiness page exists')};
 
+
+
+/* Stream Bandit V4.3 Supabase Default Library Mode */
+var V43_LABEL='V4.3 Supabase Default Library Mode';
+(function(){
+  var st=document.createElement('style');
+  st.textContent='\n.sbDefaultHero{border:1px solid #19c37d77;background:linear-gradient(135deg,#082417,#101729);border-radius:18px;padding:14px;margin:12px 0}.sbDefaultHero h3{margin:0}.sbDefaultHero p{margin:6px 0 0;color:var(--muted)}.sbDefaultBadge{display:inline-flex;align-items:center;gap:8px;background:#19c37d22;border:1px solid #19c37d88;color:#eafff5;border-radius:999px;padding:8px 12px;font-weight:900}.sbFallbackBadge{display:inline-flex;align-items:center;gap:8px;background:#2a1d05;border:1px solid #ffd78266;color:#ffe4a3;border-radius:999px;padding:8px 12px;font-weight:900}.sbAutoLoad{border:1px solid var(--line);background:#0b0c14;border-radius:16px;padding:12px;margin:12px 0;color:var(--muted)}';
+  document.head.appendChild(st);
+})();
+function sb43EnsureDefault(){
+  data.settings=data.settings||{};
+  if(!data.settings.v43DefaultApplied){
+    data.settings.useSupabaseLibrary=true;
+    data.settings.v43DefaultApplied=true;
+    data.settings.supabaseDefaultSince='V4.3';
+    saveData(true);
+  }
+}
+function sb43ModeIntro(){
+  sb43EnsureDefault();
+  var use=!!data.settings.useSupabaseLibrary;
+  return '<div class="sbDefaultHero"><div class="row" style="justify-content:space-between"><div><h3>V4.3 library mode</h3><p>Supabase is now the default library for Stream Bandit. Browser/local mode is still kept as your emergency fallback.</p></div><span class="'+(use?'sbDefaultBadge':'sbFallbackBadge')+'">'+(use?'🟢 Supabase default active':'🟡 Browser fallback active')+'</span></div></div>';
+}
+var oldSbEnsureV42SettingsV43=sbEnsureV42Settings;
+sbEnsureV42Settings=function(){oldSbEnsureV42SettingsV43();sb43EnsureDefault()};
+var oldSbLibraryModePanelV43=sbLibraryModePanel;
+sbLibraryModePanel=function(){
+  sb43EnsureDefault();
+  var html=oldSbLibraryModePanelV43();
+  html=html.replace('V4.2 lets the normal Library page switch between your safe browser library and the new Supabase database library.','V4.3 uses Supabase as the normal default library, while Browser/local stays available as a safe fallback.');
+  html=html.replace('<h3>Library source</h3>','<h3>Library source</h3>');
+  return sb43ModeIntro()+html;
+};
+var sb43AutoLoadStarted=false;
+var oldLibraryPageV43=libraryPage;
+libraryPage=function(){
+  sb43EnsureDefault();
+  var html=oldLibraryPageV43();
+  if(data.settings.useSupabaseLibrary&&!sbRemoteLoaded&&!sb43AutoLoadStarted&&typeof sbLoadRemoteLibrary==='function'){
+    sb43AutoLoadStarted=true;
+    setTimeout(function(){sbLoadRemoteLibrary()},150);
+    html=html.replace('<div class="panel"><h3>Supabase Library selected</h3>','<div class="sbAutoLoad"><b>Loading Supabase library automatically...</b><br>V4.3 now opens the database library by default. If your connection is slow, wait a moment or press refresh.</div><div class="panel"><h3>Supabase Library selected</h3>');
+  }
+  return html;
+};
+var oldBindCommonV43=bindCommon;
+bindCommon=function(){
+  oldBindCommonV43();
+  var save=byId('sbSaveLibMode');
+  if(save){
+    var prev=save.onclick;
+    save.onclick=function(){
+      if(prev)prev();
+      setTimeout(function(){
+        data.settings=data.settings||{};
+        data.settings.v43DefaultApplied=true;
+        if(data.settings.useSupabaseLibrary)sb43AutoLoadStarted=false;
+        saveData(true);
+      },50);
+    };
+  }
+};
+var oldAdminPageV43=adminPage;
+adminPage=function(){
+  var html=oldAdminPageV43();
+  if(html.indexOf('V4.3 Supabase Default')<0){
+    html=html.replace('</div></div><div class="panel">','</div></div><div class="panel"><h3>V4.3 Supabase Default</h3><p class="note">Supabase is now the normal Library source. Browser/local fallback remains available from the Library page.</p><div class="row"><button class="secondary" data-view="library">Open Library</button><button class="secondary" data-view="liveready">Open Live Readiness</button><button class="secondary" data-view="supabase">Open Supabase Test</button></div></div><div class="panel">');
+  }
+  return html;
+};
+var oldSb421LiveReadinessPageV43=typeof sb421LiveReadinessPage==='function'?sb421LiveReadinessPage:null;
+if(oldSb421LiveReadinessPageV43){
+  sb421LiveReadinessPage=function(){
+    sb43EnsureDefault();
+    var html=oldSb421LiveReadinessPageV43();
+    html=html.replace('V4.2.1 Live Readiness','V4.3 Live Readiness');
+    html=html.replace('Browser/local library is still the safe fallback while you test Supabase as the main source.','Supabase is now the default Library source. Browser/local library remains available as the safety fallback.');
+    if(html.indexOf('V4.3 default check')<0){
+      html=html.replace('<div class="sbLiveGrid">','<div class="sbDefaultHero"><h3>V4.3 default check</h3><p>Live Readiness should show Supabase session/admin and Movies 4. Then test Library, Details and Play after a refresh.</p></div><div class="sbLiveGrid">');
+    }
+    return html;
+  };
+}
+var oldSidebarV43=sidebar;
+sidebar=function(){return oldSidebarV43().replace(/V4\.2\.1 Live Readiness Check|V4\.2 Supabase Main Library Switch Test|V4\.1\.3 Supabase Accessibility Binding Hotfix|V3\.8\.7\.1 Stable Prep/g,V43_LABEL)};
+var oldSettingsPageV43=settingsPage;
+settingsPage=function(){return oldSettingsPageV43().replace(/V4\.2\.1 Live Readiness Check|V4\.2 Supabase Main Library Switch Test|V4\.1\.3 Supabase Accessibility Binding Hotfix|V3\.8\.7\.1 Stable Prep/g,V43_LABEL)};
+var oldBackupSummaryV43=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV43(d)+'\nV4.3 note: Supabase is now the default Library mode, with Browser/local fallback still preserved.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);sb43EnsureDefault();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version='StreamBanditPrototype4.3-supabase-default-library-mode';saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-3-supabase-default-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.3 backup download started')};
+var oldRunTestsV43=runTests;
+runTests=function(){try{oldRunTestsV43()}catch(e){console.warn('V4.3 self-test warning:',e)}console.assert(typeof sb43EnsureDefault==='function','V4.3 default helper exists')};
+sb43EnsureDefault();
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
