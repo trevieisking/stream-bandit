@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Stream Bandit V3.8.3 Player Audio Boost</title>
+<title>Stream Bandit V3.8.4.1 Fullscreen Center Fix</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
 :root{--panel:#11131e;--text:#f6f7ff;--muted:#a9afc3;--line:#2b2e42;--a:#ff2d55;--b:#7c3cff;--good:#3ddc97;--bad:#ff5252}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top left,#21102f,#07070b 38%,#050508);color:var(--text);font-family:Arial,Helvetica,sans-serif}button,input,textarea,select{font:inherit}button{border:0;border-radius:14px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;padding:10px 13px;font-weight:800;cursor:pointer}button.secondary{background:#25283a;border:1px solid var(--line)}button.danger{background:linear-gradient(135deg,#ff3848,#8f1230)}button.good{background:linear-gradient(135deg,#20c997,#0b8f72)}button.small{padding:7px 9px;font-size:13px}.wrap{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{background:#080912;border-right:1px solid var(--line);padding:18px;position:sticky;top:0;height:100vh;overflow:auto}.main{padding:22px}.brand{display:flex;gap:12px;align-items:center;margin-bottom:20px}.logo{width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;font-size:23px;font-weight:900;overflow:hidden}.logo img{width:100%;height:100%;object-fit:cover}.settingsPreview{display:flex;gap:14px;align-items:center;background:#151724;border:1px solid var(--line);border-radius:18px;padding:12px;margin:12px 0}.colourGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.colourChip{height:42px;border-radius:14px;border:1px solid var(--line)}.brand h1{font-size:19px;margin:0}.brand p,.muted,.note{color:var(--muted)}.brand p{font-size:12px;margin:3px 0}.nav button{width:100%;text-align:left;margin:5px 0;background:transparent;color:var(--muted);border:1px solid transparent}.nav button.active,.nav button:hover{background:#191b2a;border-color:var(--line);color:#fff}.userbox,.panel,.card,.login{background:var(--panel);border:1px solid var(--line);border-radius:22px}.userbox{margin-top:18px;padding:13px;color:var(--muted);font-size:13px}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}.top h2{margin:0;font-size:26px}input,textarea,select{width:100%;background:#0d0e15;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:11px;outline:none}textarea{min-height:90px;resize:vertical}label{display:block;margin:10px 0 6px;color:var(--muted);font-size:13px;font-weight:800}.search{max-width:420px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}.card{overflow:hidden;box-shadow:0 16px 38px #0005}.thumb{aspect-ratio:16/9;background:#0b0c12;display:grid;place-items:center;color:var(--muted);position:relative;overflow:hidden}.thumb img{width:100%;height:100%;object-fit:cover}.badge,.duration{position:absolute;background:#000c;border-radius:999px;padding:4px 8px;font-size:12px}.badge{top:10px;left:10px}.duration{right:10px;bottom:10px}.body{padding:14px}.body h3{margin:0 0 6px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.pill{background:#282b3f;border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:12px}.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;padding:22px;margin-bottom:18px;background:linear-gradient(135deg,#20112e,#10121d 60%,#220b18);border:1px solid var(--line);border-radius:28px}.hero h2{font-size:34px;margin:0 0 8px}.panel{padding:16px;margin-bottom:16px}.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.login{max-width:460px;margin:8vh auto;padding:24px}.login .logo{margin:auto}.videoWrap{background:#000;border:1px solid var(--line);border-radius:22px;overflow:hidden}video{width:100%;max-height:68vh;display:block;background:#000}.toast{position:fixed;right:18px;bottom:18px;background:#10121d;border:1px solid var(--line);padding:12px 14px;border-radius:16px;box-shadow:0 20px 40px #0008;z-index:30;max-width:360px}.empty{border:1px dashed var(--line);border-radius:20px;padding:28px;text-align:center;color:var(--muted)}.adminList{display:grid;gap:10px}.adminItem{display:grid;grid-template-columns:80px 1fr auto;gap:12px;align-items:center;background:#151724;border:1px solid var(--line);padding:10px;border-radius:18px}.adminItem img{width:80px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#07070b}.bar{height:7px;background:#31354f;border-radius:999px;overflow:hidden;margin-top:8px}.fill{height:100%;background:linear-gradient(90deg,var(--a),var(--b))}.ok{color:var(--good)}.bad{color:var(--bad)}.warnBox{border:1px solid #ffbf3c77;background:#2b210f;border-radius:16px;padding:12px;margin-bottom:14px;color:#ffe0a3}.fatal{max-width:780px;margin:7vh auto;background:#160b10;border:1px solid #ff525277;border-radius:24px;padding:22px}.divider{border:0;border-top:1px solid var(--line);margin:18px 0}.checkList,.genreBox{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:16px;padding:10px;background:#0d0e15}.genreBox{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}.genreChoice{display:flex;gap:8px;align-items:center;padding:7px;border:1px solid #ffffff12;border-radius:12px;background:#11131e}.genreChoice input{width:auto}.checkRow{display:flex;gap:8px;align-items:center;padding:7px;border-bottom:1px solid #ffffff12}.checkRow input{width:auto}.detailHero{min-height:320px;border:1px solid var(--line);border-radius:28px;overflow:hidden;position:relative;background:#07070b;margin-bottom:18px}.detailHero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.38}.detailHero .inner{position:relative;z-index:1;padding:28px;max-width:780px}.detailHero h1{font-size:38px;margin:12px 0}.detailPoster{width:160px;aspect-ratio:16/9;border-radius:16px;object-fit:cover;border:1px solid var(--line);background:#07070b}.historyMeta{font-size:12px;color:var(--muted);line-height:1.45}.finishedPill{background:#123b2b;border:1px solid #3ddc9777;color:#baf7df;border-radius:999px;padding:5px 8px;font-size:12px}.watchingPill{background:#3b2e12;border:1px solid #ffbf3c77;color:#ffe0a3;border-radius:999px;padding:5px 8px;font-size:12px}.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 10px}.sectionTitle h3{margin:0}.miniRow{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}.miniRow .card{min-width:250px;max-width:250px}.queueBox{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#151724;border:1px solid var(--line);border-radius:16px;padding:10px;margin-top:10px}.toggleGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.toggleBox{display:flex;gap:10px;align-items:center;background:#0d0e15;border:1px solid var(--line);border-radius:14px;padding:10px}.toggleBox input{width:auto}.homeHeroMeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.movieInfoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0}.infoTile{background:#151724;border:1px solid var(--line);border-radius:16px;padding:11px}.infoTile b{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.infoTile span{font-weight:800}.castBox{background:#151724;border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:12px}.trailerBox{margin-top:14px}.trailerFrame{width:100%;aspect-ratio:16/9;border:0;border-radius:18px;background:#000}.adminHint{background:#101827;border:1px solid #6aa6ff55;border-radius:16px;padding:10px;margin:10px 0;color:#cfe5ff}.libraryToolbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;background:#151724;border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:14px}.toolbarGroup label{margin-top:0}.toolbarActions{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.noResults{border:1px dashed var(--line);border-radius:22px;padding:30px;text-align:center;background:#10121d;color:var(--muted)}.noResults h3{color:var(--text);margin-top:0}.spotlightCard{display:grid;grid-template-columns:1fr 1.1fr;gap:18px;align-items:center}.spotlightPoster{aspect-ratio:16/9;border-radius:22px;overflow:hidden;background:#07070b;border:1px solid var(--line);box-shadow:0 20px 50px #0007}.spotlightPoster img{width:100%;height:100%;object-fit:cover}.castGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}.castMember{background:#0d0e15;border:1px solid var(--line);border-radius:14px;padding:10px}.castMember b{display:block}.castMember span{display:block;color:var(--muted);font-size:13px;margin-top:3px}.castTools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.bigDetailActions{margin-top:14px}.collectionHero{display:grid;grid-template-columns:minmax(0,1fr) 1.2fr;gap:18px;align-items:center}.collectionImage{aspect-ratio:16/9;border-radius:22px;overflow:hidden;background:#07070b;border:1px solid var(--line)}.collectionImage img{width:100%;height:100%;object-fit:cover}.collectionMini{margin-top:10px}.collectionMini button{margin:3px 4px 3px 0}.safetyGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.safeStat{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:11px}.safeStat b{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.safeStat span{font-weight:900}.restorePreview{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:10px;white-space:pre-wrap;color:var(--muted)}.progressDash{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}.progressStat{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:12px}.progressStat b{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.progressStat span{font-size:20px;font-weight:900}.watchTools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.progressNote{background:#101827;border:1px solid #6aa6ff55;border-radius:16px;padding:10px;color:#cfe5ff;margin:10px 0}.finishBox{background:#123b2b;border:1px solid #3ddc9777;border-radius:16px;padding:10px;color:#baf7df;margin:10px 0}@media(max-width:850px){.wrap,.hero,.cols,.spotlightCard{grid-template-columns:1fr}.side{position:relative;height:auto}.top{display:block}.search{max-width:none;margin-top:12px}.adminItem{grid-template-columns:1fr}.adminItem img{width:100%}}
@@ -876,8 +876,174 @@ sidebar=function(){var html=oldSidebarV383();return html.replace(/V3\.8\.2 Admin
 var oldRunTestsV383=runTests;
 runTests=function(){oldRunTestsV383();console.assert(typeof v383ApplyAudioBoost==='function','V3.8.3 audio boost apply exists');console.assert(typeof v383AudioBoostPanel==='function','V3.8.3 audio panel exists')};
 
+
+/* Stream Bandit V3.8.4 Accessibility + Player Comfort: saved boost, keyboard shortcuts, larger player controls */
+var V384_LABEL='V3.8.4 Accessibility + Player Comfort';
+APP_VERSION='StreamBanditPrototype3.8.4';
+data.version=APP_VERSION;
+function v384EnsureSettings(){
+  data.settings=data.settings||clone(seed.settings);
+  if(data.settings.playerAudioBoost==null)data.settings.playerAudioBoost=1;
+  if(data.settings.playerJumpSeconds==null)data.settings.playerJumpSeconds=10;
+  if(data.settings.largePlayerControls==null)data.settings.largePlayerControls=false;
+  if(data.settings.highContrastText==null)data.settings.highContrastText=false;
+}
+v384EnsureSettings();
+(function(){
+  var css='.accessPanel{background:#101827;border:1px solid #6aa6ff55;border-radius:18px;padding:14px;margin-bottom:16px;color:#cfe5ff}.accessGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.accessCard{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:12px}.accessCard h3{margin:0 0 6px}.keyGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:8px}.keyTile{background:#151724;border:1px solid var(--line);border-radius:14px;padding:9px}.keyTile b{display:block}.accessBig .audioBoostPanel,.accessBig .progressNote,.accessBig .queueBox,.accessBig .panel h2{font-size:1.08em}.accessBig video{max-height:72vh}.accessBig .watchTools button,.accessBig .audioBoostBtn{font-size:15px;padding:11px 14px}.highContrastText{--muted:#d7dcf0;--line:#4b526d}.shortcutHint{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:12px;margin:12px 0}.shortcutHint kbd{background:#25283a;border:1px solid #ffffff33;border-radius:7px;padding:2px 6px;font-weight:900}.accessActive{outline:2px solid #fff}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function v384ApplyBodyClasses(){
+  v384EnsureSettings();
+  if(document.body){
+    document.body.classList.toggle('accessBig',!!data.settings.largePlayerControls);
+    document.body.classList.toggle('highContrastText',!!data.settings.highContrastText);
+  }
+}
+var oldApplySettingsV384=applySettings;
+applySettings=function(){oldApplySettingsV384();v384ApplyBodyClasses()};
+function v384AccessibilityPage(){
+  v384EnsureSettings();
+  var boost=Number(data.settings.playerAudioBoost)||1;
+  var jump=Number(data.settings.playerJumpSeconds)||10;
+  return topBar('Accessibility')+'<div class="accessPanel"><h3>Accessibility + Player Comfort</h3><p class="note">This page keeps Stream Bandit easier to use if you need louder dialogue, bigger player controls, clearer text, or keyboard shortcuts.</p><div class="row"><span class="pill">Default boost '+Math.round(boost*100)+'%</span><span class="pill">Jump '+jump+' seconds</span><span class="pill">'+(data.settings.largePlayerControls?'Large controls on':'Large controls off')+'</span></div></div><div class="accessGrid"><div class="accessCard"><h3>Default audio boost</h3><p class="note">This is the boost level the player remembers for quiet videos.</p><select id="accBoost"><option value="1" '+(boost===1?'selected':'')+'>Normal 100%</option><option value="1.5" '+(boost===1.5?'selected':'')+'>Boost 150%</option><option value="2" '+(boost===2?'selected':'')+'>Boost 200%</option><option value="2.5" '+(boost===2.5?'selected':'')+'>Max 250%</option></select></div><div class="accessCard"><h3>Skip/jump size</h3><p class="note">Used by keyboard arrows on the player.</p><select id="accJump"><option value="5" '+(jump===5?'selected':'')+'>5 seconds</option><option value="10" '+(jump===10?'selected':'')+'>10 seconds</option><option value="15" '+(jump===15?'selected':'')+'>15 seconds</option><option value="30" '+(jump===30?'selected':'')+'>30 seconds</option></select></div><div class="accessCard"><h3>Display comfort</h3><label class="toggleBox"><input id="accLarge" type="checkbox" '+(data.settings.largePlayerControls?'checked':'')+'> Larger player panels/buttons</label><label class="toggleBox"><input id="accContrast" type="checkbox" '+(data.settings.highContrastText?'checked':'')+'> Clearer high-contrast text</label></div></div><div class="panel"><h3>Keyboard shortcuts on Watch page</h3><div class="keyGrid"><div class="keyTile"><b>Space</b><span class="muted">Play / pause</span></div><div class="keyTile"><b>← / →</b><span class="muted">Back / forward jump</span></div><div class="keyTile"><b>F</b><span class="muted">Fullscreen</span></div><div class="keyTile"><b>M</b><span class="muted">Mute / unmute</span></div><div class="keyTile"><b>+ / -</b><span class="muted">Audio boost up / down</span></div></div></div><div class="panel"><h3>Save accessibility settings</h3><div class="row"><button id="saveAccess" class="good">Save accessibility settings</button><button class="secondary" data-view="watch">Back to player</button><button class="secondary" data-view="checklist">Open Test Checklist</button></div></div>';
+}
+function v384ShortcutHelp(){
+  v384EnsureSettings();
+  return '<div class="shortcutHint"><b>Player shortcuts:</b> <kbd>Space</kbd> play/pause · <kbd>←</kbd>/<kbd>→</kbd> jump '+esc(data.settings.playerJumpSeconds||10)+'s · <kbd>F</kbd> fullscreen · <kbd>M</kbd> mute · <kbd>+</kbd>/<kbd>-</kbd> audio boost</div>';
+}
+var oldWatchPageV384=watchPage;
+watchPage=function(){
+  var html=oldWatchPageV384();
+  if(html.indexOf('Player shortcuts:')<0){
+    html=html.replace('<div class="queueBox"><b>Queue:</b>',v384ShortcutHelp()+'<div class="queueBox"><b>Queue:</b>');
+  }
+  return html;
+};
+function v384BoostLevels(){return [1,1.5,2,2.5]}
+function v384StepBoost(dir){
+  var levels=v384BoostLevels();
+  var cur=Number((data.settings&&data.settings.playerAudioBoost)||1);
+  var idx=levels.indexOf(cur);if(idx<0)idx=0;
+  idx=Math.max(0,Math.min(levels.length-1,idx+dir));
+  v383ApplyAudioBoost(levels[idx]);
+}
+function v384InstallWatchKeys(){
+  if(window._sbWatchKeyHandler)document.removeEventListener('keydown',window._sbWatchKeyHandler);
+  window._sbWatchKeyHandler=function(e){
+    if(view!=='watch')return;
+    var tag=(e.target&&e.target.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea'||tag==='select')return;
+    var p=byId('player');if(!p)return;
+    var jump=Number((data.settings&&data.settings.playerJumpSeconds)||10);
+    if(e.key===' '){e.preventDefault();if(p.paused)p.play();else p.pause();}
+    else if(e.key==='ArrowRight'){e.preventDefault();try{p.currentTime=Math.min((p.duration||p.currentTime+jump),p.currentTime+jump)}catch(x){}}
+    else if(e.key==='ArrowLeft'){e.preventDefault();try{p.currentTime=Math.max(0,p.currentTime-jump)}catch(x){}}
+    else if(String(e.key).toLowerCase()==='m'){e.preventDefault();p.muted=!p.muted;toast(p.muted?'Muted':'Unmuted')}
+    else if(String(e.key).toLowerCase()==='f'){e.preventDefault();var box=document.querySelector('.videoWrap')||p;var fn=box.requestFullscreen||box.webkitRequestFullscreen||box.msRequestFullscreen;if(fn)fn.call(box)}
+    else if(e.key==='+'||e.key==='='){e.preventDefault();v384StepBoost(1)}
+    else if(e.key==='-'||e.key==='_'){e.preventDefault();v384StepBoost(-1)}
+  };
+  document.addEventListener('keydown',window._sbWatchKeyHandler);
+}
+var oldBindWatchV384=bindWatch;
+bindWatch=function(){oldBindWatchV384();v384InstallWatchKeys()};
+var oldBindCommonV384=bindCommon;
+bindCommon=function(){
+  oldBindCommonV384();
+  var save=byId('saveAccess');
+  if(save)save.onclick=function(){
+    v384EnsureSettings();
+    data.settings.playerAudioBoost=Number(byId('accBoost').value)||1;
+    data.settings.playerJumpSeconds=Number(byId('accJump').value)||10;
+    data.settings.largePlayerControls=!!byId('accLarge').checked;
+    data.settings.highContrastText=!!byId('accContrast').checked;
+    saveData();v384ApplyBodyClasses();render();toast('Accessibility settings saved')
+  };
+};
+var oldPageV384=page;
+page=function(){if(view==='accessibility')return v384AccessibilityPage();return oldPageV384()};
+var oldSidebarV384=sidebar;
+sidebar=function(){
+  var html=oldSidebarV384();
+  if(html.indexOf('♿ Accessibility')<0){
+    html=html.replace(nav('watchlist','📌 Watchlist '+(currentUser&&data.watchlist&&data.watchlist[currentUser.username]&&data.watchlist[currentUser.username].length?'<span class="navCount">'+data.watchlist[currentUser.username].length+'</span>':'')),nav('watchlist','📌 Watchlist '+(currentUser&&data.watchlist&&data.watchlist[currentUser.username]&&data.watchlist[currentUser.username].length?'<span class="navCount">'+data.watchlist[currentUser.username].length+'</span>':''))+nav('accessibility','♿ Accessibility'));
+  }
+  return html.replace(/V3\.8\.3 Player Audio Boost|V3\.8\.2 Admin Quality Tools|V3\.8\.1 Stability Polish/g,V384_LABEL);
+};
+var oldTestChecklistPageV384=testChecklistPage;
+testChecklistPage=function(){
+  var html=oldTestChecklistPageV384();
+  if(html.indexOf('Accessibility settings')<0){
+    html=html.replace('<div class="checkStep"><b>8. Backup</b>','<div class="checkStep"><b>8. Accessibility settings</b><span class="muted">Open Accessibility, save default boost/jump size, test Space, arrows, M, F, + and - on the player.</span></div><div class="checkStep"><b>9. Backup</b>');
+  }
+  return html;
+};
+var oldAdminPageV384=adminPage;
+adminPage=function(){
+  var html=oldAdminPageV384();
+  var t=topBar('Admin');
+  var panel='<div class="panel"><h3>V3.8.4 accessibility helper</h3><p class="note">Player comfort now has saved audio boost, larger player controls, clearer text and keyboard shortcuts for users who need easier playback.</p><div class="row"><button class="secondary" data-view="accessibility">Open Accessibility</button><button class="secondary" data-view="checklist">Test Checklist</button><button class="good" data-view="backup">Backup now</button></div></div>';
+  return html.replace(t,t+panel);
+};
+var oldBackupSummaryV384=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV384(d)+'\nV3.8.4 note: includes Accessibility + Player Comfort settings, saved audio boost and keyboard shortcuts.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);v384EnsureSettings();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version='StreamBanditPrototype3.8.4';saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v3-8-4-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('Backup download started and backup time saved')};
+var oldSettingsPageV384=settingsPage;
+settingsPage=function(){return oldSettingsPageV384().replace(/V3\.8\.3 Player Audio Boost|StreamBanditPrototype3\.8\.3/g,V384_LABEL)};
+var oldRunTestsV384=runTests;
+runTests=function(){oldRunTestsV384();console.assert(typeof v384AccessibilityPage==='function','V3.8.4 accessibility page exists');console.assert(typeof v384InstallWatchKeys==='function','V3.8.4 keyboard shortcut helper exists');console.assert(typeof v384ShortcutHelp==='function','V3.8.4 shortcut help exists')};
+
 if(typeof runTests==='function')runTests();
 if(typeof render==='function')render();
+
+
+/* V3.8.4.1 Fullscreen Center Fix: use native video fullscreen for centered playback, with wrapper fallback. */
+var V3841_LABEL='V3.8.4.1 Fullscreen Center Fix';
+(function(){
+  var css='.videoWrap:fullscreen{width:100vw;height:100vh;display:flex!important;align-items:center!important;justify-content:center!important;background:#000}.videoWrap:-webkit-full-screen{width:100vw;height:100vh;display:flex!important;align-items:center!important;justify-content:center!important;background:#000}.videoWrap:fullscreen video,.videoWrap:-webkit-full-screen video{width:100vw!important;height:100vh!important;max-height:100vh!important;object-fit:contain!important;background:#000}video:fullscreen{width:100vw!important;height:100vh!important;object-fit:contain!important;background:#000}video:-webkit-full-screen{width:100vw!important;height:100vh!important;object-fit:contain!important;background:#000}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function sbRequestCenteredFullscreen(){
+  var p=byId('player');
+  if(!p)return;
+  /* Native video fullscreen centres correctly in Chrome/Edge and keeps browser video controls available. */
+  var fn=p.requestFullscreen||p.webkitRequestFullscreen||p.msRequestFullscreen;
+  if(fn){try{fn.call(p);return}catch(e){}}
+  var box=document.querySelector('.videoWrap')||p;
+  fn=box.requestFullscreen||box.webkitRequestFullscreen||box.msRequestFullscreen;
+  if(fn){try{fn.call(box)}catch(e){toast('Fullscreen could not start in this browser')}}
+}
+var oldBindWatchV3841=bindWatch;
+bindWatch=function(){
+  oldBindWatchV3841();
+  var full=byId('full');
+  if(full)full.onclick=sbRequestCenteredFullscreen;
+  if(window._sbWatchKeyHandler)document.removeEventListener('keydown',window._sbWatchKeyHandler);
+  window._sbWatchKeyHandler=function(e){
+    if(view!=='watch')return;
+    var tag=(e.target&&e.target.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea'||tag==='select')return;
+    var p=byId('player');if(!p)return;
+    var jump=Number((data.settings&&data.settings.playerJumpSeconds)||10);
+    if(e.key===' '){e.preventDefault();if(p.paused)p.play();else p.pause();}
+    else if(e.key==='ArrowRight'){e.preventDefault();try{p.currentTime=Math.min((p.duration||p.currentTime+jump),p.currentTime+jump)}catch(x){}}
+    else if(e.key==='ArrowLeft'){e.preventDefault();try{p.currentTime=Math.max(0,p.currentTime-jump)}catch(x){}}
+    else if(String(e.key).toLowerCase()==='m'){e.preventDefault();p.muted=!p.muted;toast(p.muted?'Muted':'Unmuted')}
+    else if(String(e.key).toLowerCase()==='f'){e.preventDefault();sbRequestCenteredFullscreen()}
+    else if(e.key==='+'||e.key==='='){e.preventDefault();v384StepBoost(1)}
+    else if(e.key==='-'||e.key==='_'){e.preventDefault();v384StepBoost(-1)}
+  };
+  document.addEventListener('keydown',window._sbWatchKeyHandler);
+};
+var oldExportBackupV3841=exportBackup;
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version='StreamBanditPrototype3.8.4.1';saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v3-8-4-1-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('Backup download started and backup time saved')};
+var oldSettingsPageV3841=settingsPage;
+settingsPage=function(){return oldSettingsPageV3841().replace(/V3\.8\.4 Accessibility \+ Player Comfort|V3\.8\.4|Stream Bandit V3\.8\.4 Accessibility \+ Player Comfort/g,V3841_LABEL)};
+var oldBackupSummaryV3841=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV3841(d)+'\nV3.8.4.1 note: fullscreen button and F shortcut use centred native video fullscreen.'};
+var oldRunTestsV3841=runTests;
+runTests=function(){oldRunTestsV3841();console.assert(typeof sbRequestCenteredFullscreen==='function','V3.8.4.1 centered fullscreen helper exists')};
 
 })();
 </script>
