@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Stream Bandit V3.8.4.1 Fullscreen Center Fix</title>
+<title>Stream Bandit V3.8.5.1 Version Tidy + Boot Order Fix</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
 :root{--panel:#11131e;--text:#f6f7ff;--muted:#a9afc3;--line:#2b2e42;--a:#ff2d55;--b:#7c3cff;--good:#3ddc97;--bad:#ff5252}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top left,#21102f,#07070b 38%,#050508);color:var(--text);font-family:Arial,Helvetica,sans-serif}button,input,textarea,select{font:inherit}button{border:0;border-radius:14px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;padding:10px 13px;font-weight:800;cursor:pointer}button.secondary{background:#25283a;border:1px solid var(--line)}button.danger{background:linear-gradient(135deg,#ff3848,#8f1230)}button.good{background:linear-gradient(135deg,#20c997,#0b8f72)}button.small{padding:7px 9px;font-size:13px}.wrap{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{background:#080912;border-right:1px solid var(--line);padding:18px;position:sticky;top:0;height:100vh;overflow:auto}.main{padding:22px}.brand{display:flex;gap:12px;align-items:center;margin-bottom:20px}.logo{width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;font-size:23px;font-weight:900;overflow:hidden}.logo img{width:100%;height:100%;object-fit:cover}.settingsPreview{display:flex;gap:14px;align-items:center;background:#151724;border:1px solid var(--line);border-radius:18px;padding:12px;margin:12px 0}.colourGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.colourChip{height:42px;border-radius:14px;border:1px solid var(--line)}.brand h1{font-size:19px;margin:0}.brand p,.muted,.note{color:var(--muted)}.brand p{font-size:12px;margin:3px 0}.nav button{width:100%;text-align:left;margin:5px 0;background:transparent;color:var(--muted);border:1px solid transparent}.nav button.active,.nav button:hover{background:#191b2a;border-color:var(--line);color:#fff}.userbox,.panel,.card,.login{background:var(--panel);border:1px solid var(--line);border-radius:22px}.userbox{margin-top:18px;padding:13px;color:var(--muted);font-size:13px}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}.top h2{margin:0;font-size:26px}input,textarea,select{width:100%;background:#0d0e15;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:11px;outline:none}textarea{min-height:90px;resize:vertical}label{display:block;margin:10px 0 6px;color:var(--muted);font-size:13px;font-weight:800}.search{max-width:420px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}.card{overflow:hidden;box-shadow:0 16px 38px #0005}.thumb{aspect-ratio:16/9;background:#0b0c12;display:grid;place-items:center;color:var(--muted);position:relative;overflow:hidden}.thumb img{width:100%;height:100%;object-fit:cover}.badge,.duration{position:absolute;background:#000c;border-radius:999px;padding:4px 8px;font-size:12px}.badge{top:10px;left:10px}.duration{right:10px;bottom:10px}.body{padding:14px}.body h3{margin:0 0 6px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.pill{background:#282b3f;border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:12px}.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;padding:22px;margin-bottom:18px;background:linear-gradient(135deg,#20112e,#10121d 60%,#220b18);border:1px solid var(--line);border-radius:28px}.hero h2{font-size:34px;margin:0 0 8px}.panel{padding:16px;margin-bottom:16px}.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.login{max-width:460px;margin:8vh auto;padding:24px}.login .logo{margin:auto}.videoWrap{background:#000;border:1px solid var(--line);border-radius:22px;overflow:hidden}video{width:100%;max-height:68vh;display:block;background:#000}.toast{position:fixed;right:18px;bottom:18px;background:#10121d;border:1px solid var(--line);padding:12px 14px;border-radius:16px;box-shadow:0 20px 40px #0008;z-index:30;max-width:360px}.empty{border:1px dashed var(--line);border-radius:20px;padding:28px;text-align:center;color:var(--muted)}.adminList{display:grid;gap:10px}.adminItem{display:grid;grid-template-columns:80px 1fr auto;gap:12px;align-items:center;background:#151724;border:1px solid var(--line);padding:10px;border-radius:18px}.adminItem img{width:80px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#07070b}.bar{height:7px;background:#31354f;border-radius:999px;overflow:hidden;margin-top:8px}.fill{height:100%;background:linear-gradient(90deg,var(--a),var(--b))}.ok{color:var(--good)}.bad{color:var(--bad)}.warnBox{border:1px solid #ffbf3c77;background:#2b210f;border-radius:16px;padding:12px;margin-bottom:14px;color:#ffe0a3}.fatal{max-width:780px;margin:7vh auto;background:#160b10;border:1px solid #ff525277;border-radius:24px;padding:22px}.divider{border:0;border-top:1px solid var(--line);margin:18px 0}.checkList,.genreBox{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:16px;padding:10px;background:#0d0e15}.genreBox{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}.genreChoice{display:flex;gap:8px;align-items:center;padding:7px;border:1px solid #ffffff12;border-radius:12px;background:#11131e}.genreChoice input{width:auto}.checkRow{display:flex;gap:8px;align-items:center;padding:7px;border-bottom:1px solid #ffffff12}.checkRow input{width:auto}.detailHero{min-height:320px;border:1px solid var(--line);border-radius:28px;overflow:hidden;position:relative;background:#07070b;margin-bottom:18px}.detailHero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.38}.detailHero .inner{position:relative;z-index:1;padding:28px;max-width:780px}.detailHero h1{font-size:38px;margin:12px 0}.detailPoster{width:160px;aspect-ratio:16/9;border-radius:16px;object-fit:cover;border:1px solid var(--line);background:#07070b}.historyMeta{font-size:12px;color:var(--muted);line-height:1.45}.finishedPill{background:#123b2b;border:1px solid #3ddc9777;color:#baf7df;border-radius:999px;padding:5px 8px;font-size:12px}.watchingPill{background:#3b2e12;border:1px solid #ffbf3c77;color:#ffe0a3;border-radius:999px;padding:5px 8px;font-size:12px}.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 10px}.sectionTitle h3{margin:0}.miniRow{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}.miniRow .card{min-width:250px;max-width:250px}.queueBox{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#151724;border:1px solid var(--line);border-radius:16px;padding:10px;margin-top:10px}.toggleGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.toggleBox{display:flex;gap:10px;align-items:center;background:#0d0e15;border:1px solid var(--line);border-radius:14px;padding:10px}.toggleBox input{width:auto}.homeHeroMeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.movieInfoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0}.infoTile{background:#151724;border:1px solid var(--line);border-radius:16px;padding:11px}.infoTile b{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.infoTile span{font-weight:800}.castBox{background:#151724;border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:12px}.trailerBox{margin-top:14px}.trailerFrame{width:100%;aspect-ratio:16/9;border:0;border-radius:18px;background:#000}.adminHint{background:#101827;border:1px solid #6aa6ff55;border-radius:16px;padding:10px;margin:10px 0;color:#cfe5ff}.libraryToolbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;background:#151724;border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:14px}.toolbarGroup label{margin-top:0}.toolbarActions{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.noResults{border:1px dashed var(--line);border-radius:22px;padding:30px;text-align:center;background:#10121d;color:var(--muted)}.noResults h3{color:var(--text);margin-top:0}.spotlightCard{display:grid;grid-template-columns:1fr 1.1fr;gap:18px;align-items:center}.spotlightPoster{aspect-ratio:16/9;border-radius:22px;overflow:hidden;background:#07070b;border:1px solid var(--line);box-shadow:0 20px 50px #0007}.spotlightPoster img{width:100%;height:100%;object-fit:cover}.castGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}.castMember{background:#0d0e15;border:1px solid var(--line);border-radius:14px;padding:10px}.castMember b{display:block}.castMember span{display:block;color:var(--muted);font-size:13px;margin-top:3px}.castTools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.bigDetailActions{margin-top:14px}.collectionHero{display:grid;grid-template-columns:minmax(0,1fr) 1.2fr;gap:18px;align-items:center}.collectionImage{aspect-ratio:16/9;border-radius:22px;overflow:hidden;background:#07070b;border:1px solid var(--line)}.collectionImage img{width:100%;height:100%;object-fit:cover}.collectionMini{margin-top:10px}.collectionMini button{margin:3px 4px 3px 0}.safetyGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.safeStat{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:11px}.safeStat b{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.safeStat span{font-weight:900}.restorePreview{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:10px;white-space:pre-wrap;color:var(--muted)}.progressDash{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}.progressStat{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:12px}.progressStat b{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.progressStat span{font-size:20px;font-weight:900}.watchTools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.progressNote{background:#101827;border:1px solid #6aa6ff55;border-radius:16px;padding:10px;color:#cfe5ff;margin:10px 0}.finishBox{background:#123b2b;border:1px solid #3ddc9777;border-radius:16px;padding:10px;color:#baf7df;margin:10px 0}@media(max-width:850px){.wrap,.hero,.cols,.spotlightCard{grid-template-columns:1fr}.side{position:relative;height:auto}.top{display:block}.search{max-width:none;margin-top:12px}.adminItem{grid-template-columns:1fr}.adminItem img{width:100%}}
@@ -306,8 +306,6 @@ var oldBackupPage351=backupPage;backupPage=function(){return oldBackupPage351().
 exportBackup=function(){data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v3-5-2-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('Backup download started and backup time saved')};
 
 window.addEventListener('beforeunload',function(e){if(dirty){e.preventDefault();e.returnValue='Unsaved Stream Bandit changes. Export backup first.'}});
-try{runTests();render()}catch(e){fatal(e)}
-
 /* V3.5.2 submission storage patch: save real data first instead of blocking early at the soft warning limit. */
 saveData=function(force){
   data.exportedAt=new Date().toISOString();
@@ -1066,10 +1064,6 @@ if(oldTestChecklistPageV385){
 var oldRunTestsV385=runTests;
 runTests=function(){oldRunTestsV385();console.assert(typeof v385Section==='function','V3.8.5 menu section helper exists');console.assert(sidebar().indexOf('Admin Tools')>-1||!isAdmin(),'V3.8.5 grouped sidebar renders')};
 
-if(typeof runTests==='function')runTests();
-if(typeof render==='function')render();
-
-
 /* V3.8.4.1 Fullscreen Center Fix: use native video fullscreen for centered playback, with wrapper fallback. */
 var V3841_LABEL='V3.8.4.1 Fullscreen Center Fix';
 (function(){
@@ -1116,6 +1110,89 @@ var oldBackupSummaryV3841=backupSummary;
 backupSummary=function(d){return oldBackupSummaryV3841(d)+'\nV3.8.4.1 note: fullscreen button and F shortcut use centred native video fullscreen.'};
 var oldRunTestsV3841=runTests;
 runTests=function(){oldRunTestsV3841();console.assert(typeof sbRequestCenteredFullscreen==='function','V3.8.4.1 centered fullscreen helper exists')};
+
+
+/* Stream Bandit V3.8.5.1 Version Tidy + Boot Order Fix */
+var V3851_LABEL='V3.8.5.1 Version Tidy + Boot Order Fix';
+APP_VERSION='StreamBanditPrototype3.8.5.1';
+data.version=APP_VERSION;
+document.title='Stream Bandit V3.8.5.1 Version Tidy + Boot Order Fix';
+
+(function(){
+  var css='.menuVersion{background:#151724;border-color:#4b4f70}.bootNote{background:#101827;border:1px solid #6aa6ff55;border-radius:16px;padding:10px;color:#cfe5ff;margin:10px 0}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+
+var oldSidebarV3851=sidebar;
+sidebar=function(){
+  var html=oldSidebarV3851();
+  html=html.replace(/V3\.8\.5 Menu Organizer|V3\.8\.4\.1 Fullscreen Center Fix|V3\.8\.4 Accessibility \+ Player Comfort/g,'V3.8.5.1 Menu Organizer');
+  return html;
+};
+
+var oldSettingsPageV3851=settingsPage;
+settingsPage=function(){
+  var html=oldSettingsPageV3851();
+  html=html.replace(/StreamBanditPrototype3\.8\.5|StreamBanditPrototype3\.8\.4\.1|StreamBanditPrototype3\.8\.4/g,APP_VERSION);
+  html=html.replace(/V3\.8\.5 Menu Organizer|V3\.8\.4\.1 Fullscreen Center Fix|V3\.8\.4 Accessibility \+ Player Comfort/g,V3851_LABEL);
+  html=html.replace('<div class="panel"><h3>Version</h3>','<div class="panel"><h3>Version</h3><div class="bootNote"><b>Version tidy:</b> app title, sidebar badge, backup naming and startup order now agree. Fullscreen center fix and accessibility audio boost remain active.</div>');
+  return html;
+};
+
+var oldBackupPageV3851=backupPage;
+backupPage=function(){
+  var html=oldBackupPageV3851();
+  html=html.replace(/V3\.8\.5 safety centre|V3\.8\.4\.1 safety centre|V3\.8\.4 safety centre|V3\.6 safety centre/g,'V3.8.5.1 safety centre');
+  html=html.replace(/StreamBanditPrototype3\.8\.5|StreamBanditPrototype3\.8\.4\.1|StreamBanditPrototype3\.8\.4/g,APP_VERSION);
+  return html;
+};
+
+var oldBackupSummaryV3851=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV3851(d)+'\nV3.8.5.1 note: version labels and app boot order are tidied so the latest upgrade loads before the first render.'};
+
+exportBackup=function(){
+  data.settings=data.settings||clone(seed.settings);
+  if(typeof v384EnsureSettings==='function')v384EnsureSettings();
+  data.settings.lastBackupAt=new Date().toISOString();
+  data.settings.lastBackupSize=dataSize();
+  data.version=APP_VERSION;
+  saveData(true);
+  var j=JSON.stringify(data,null,2);
+  byId('backupBox').value=j;
+  var a=document.createElement('a');
+  var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));
+  a.href=url;
+  a.download='streambandit-v3-8-5-1-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url)},800);
+  toast('Backup download started and backup time saved')
+};
+
+var oldTestChecklistPageV3851=typeof testChecklistPage==='function'?testChecklistPage:null;
+if(oldTestChecklistPageV3851){
+  testChecklistPage=function(){
+    var html=oldTestChecklistPageV3851();
+    if(html.indexOf('Version tidy')<0){
+      html=html.replace(/<div class="checkStep"><b>10\. Backup<\/b>/,'<div class="checkStep"><b>10. Version tidy</b><span class="muted">Check the browser tab title, sidebar badge and Backup export name all show V3.8.5.1.</span></div><div class="checkStep"><b>11. Backup</b>');
+    }
+    return html.replace(/V3\.8\.5 Menu Organizer|V3\.8\.4\.1 Fullscreen Center Fix|V3\.8\.4 Accessibility \+ Player Comfort/g,V3851_LABEL);
+  };
+}
+
+var oldRunTestsV3851=runTests;
+runTests=function(){
+  try{oldRunTestsV3851()}catch(e){console.warn('Stream Bandit non-fatal startup self-test warning:',e)}
+  console.assert(APP_VERSION==='StreamBanditPrototype3.8.5.1','V3.8.5.1 version set');
+  console.assert(document.title.indexOf('V3.8.5.1')>-1,'V3.8.5.1 title set');
+  console.assert(typeof sbRequestCenteredFullscreen==='function','V3.8.4.1 fullscreen helper retained');
+};
+
+try{
+  if(typeof runTests==='function')runTests();
+  if(typeof render==='function')render();
+}catch(e){fatal(e)}
 
 })();
 </script>
