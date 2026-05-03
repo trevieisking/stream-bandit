@@ -610,7 +610,57 @@ settingsPage=function(){return oldSettingsPageV373().replace(/V3\.7\.2 Watch Lat
 var oldRunTestsV373=runTests;
 runTests=function(){oldRunTestsV373();console.assert(typeof compactStoredImages==='function','V3.7.3 compact storage exists');console.assert(topBar('Test').indexOf('compactImages')>-1||!(dirty||data.storageWarning),'V3.7.3 warning actions exist when warning visible')};
 
+
+
+/* Stream Bandit V3.8 UX Polish: Admin Health Check + Cleaner Home + Cast Layout */
+var V38_LABEL='V3.8 UX Polish + Admin Health Check';
+APP_VERSION='StreamBanditPrototype3.8';
+data.version=APP_VERSION;
+(function(){
+  var css='.versionBadge{display:inline-block;margin-top:8px;background:#101827;border:1px solid #6aa6ff55;color:#cfe5ff;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800}.healthGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:12px 0}.healthCard{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:12px}.healthCard b{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.healthCard span{font-size:22px;font-weight:900}.healthList{display:grid;gap:8px}.healthItem{display:grid;grid-template-columns:74px 1fr auto;gap:10px;align-items:center;background:#151724;border:1px solid var(--line);border-radius:16px;padding:9px}.healthItem img{width:74px;aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#050508}.homeDedupNote{font-size:12px;color:var(--muted);margin:-5px 0 10px}.castBox{max-width:100%;overflow:hidden}.castGrid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));max-height:360px;overflow:auto;padding-right:4px}.castMember{line-height:1.25}.card .body>.row:last-child{margin-top:8px}.card .body button.small{margin-top:2px}@media(max-width:850px){.wrap{display:block}.side{position:relative;height:auto;max-height:none}.healthItem{grid-template-columns:1fr}.healthItem img{width:100%}.top{gap:8px}.top h2{margin-bottom:10px}}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function v38HealthStat(label,value){return '<div class="healthCard"><b>'+esc(label)+'</b><span>'+esc(value)+'</span></div>'}
+function v38ImageBytes(){var total=0,count=0;function add(s){s=String(s||'');if(/^data:image\//i.test(s)){total+=s.length;count++}};(data.videos||[]).forEach(function(v){add(v.thumb)});(data.channels||[]).forEach(function(c){add(c.image)});(data.playlists||[]).forEach(function(p){add(p.image)});(data.collections||[]).forEach(function(c){add(c.image)});(data.submissions||[]).forEach(function(s){add(s.thumbnail)});if(data.settings)add(data.settings.logo);return {count:count,total:total}}
+function v38HealthRows(type,arr){if(!arr.length)return '<div class="empty">No '+esc(type)+' problems found.</div>';return '<div class="healthList">'+arr.map(function(v){var i=v.i;return '<div class="healthItem">'+(v.thumb?'<img src="'+esc(v.thumb)+'">':'<div style="width:74px;aspect-ratio:16/9;border-radius:10px;background:#050508;display:grid;place-items:center;color:var(--muted)">No image</div>')+'<div><b>'+esc(v.title||'Untitled')+'</b><br><span class="muted">'+esc(v.reason||'Needs attention')+'</span></div><div class="row"><button class="secondary small details" data-i="'+i+'">Details</button><button class="secondary small editHealthVideo" data-i="'+i+'">Admin edit</button></div></div>'}).join('')+'</div>'}
+function healthPage(){
+  if(!isAdmin())return topBar('Admin Health Check')+'<div class="empty">Admin only.</div>';
+  var vids=allVideos();
+  var missing=vids.filter(function(v){v.reason='No URL or local uploaded video source';return !v.url&&!v.localVideoId});
+  var noChannel=vids.filter(function(v){v.reason='No channel selected';return !v.channel||v.channel==='No channel'});
+  var img=v38ImageBytes();
+  var pending=(data.submissions||[]).filter(function(s){return s.status==='pending'});
+  var localRefs=vids.filter(function(v){return !!v.localVideoId});
+  var watchSaves=Object.keys(data.watchlist||{}).reduce(function(n,k){return n+((data.watchlist[k]||[]).length)},0);
+  return topBar('Admin Health Check')+'<div class="panel"><h3>'+V38_LABEL+'</h3><p class="note">Quick checks for the things that usually cause problems before uploading to GitHub: missing sources, no channel, large stored images, pending submissions, and local-browser-only videos.</p><div class="healthGrid">'+v38HealthStat('Movies',vids.length)+v38HealthStat('Missing source',missing.length)+v38HealthStat('No channel',noChannel.length)+v38HealthStat('Pending review',pending.length)+v38HealthStat('Watchlist saves',watchSaves)+v38HealthStat('Image storage',kb(img.total)+' KB')+'</div><div class="row"><button class="good compactImages">Compact images</button><button class="secondary" data-view="backup">Export backup</button><button class="secondary" data-view="admin">Open Admin</button><button class="secondary" data-view="storage">Open Storage</button></div></div><div class="panel"><h3>Missing video sources</h3>'+v38HealthRows('missing source',missing)+'</div><div class="panel"><h3>Videos with no channel</h3>'+v38HealthRows('channel',noChannel)+'</div><div class="panel"><h3>Local-browser-only videos</h3><p class="note">These work on this browser only. Keep original files safe or add a URL fallback if you want easier moving between devices.</p>'+(localRefs.length?'<div class="healthList">'+localRefs.map(function(v){return '<div class="healthItem">'+(v.thumb?'<img src="'+esc(v.thumb)+'">':'<div style="width:74px;aspect-ratio:16/9;border-radius:10px;background:#050508"></div>')+'<div><b>'+esc(v.title)+'</b><br><span class="muted">'+esc(v.localVideoName||'Stored local file')+' '+(v.localVideoSize?'• '+sizeMB(v.localVideoSize):'')+'</span></div><button class="secondary small play" data-i="'+v.i+'">Play</button></div>'}).join('')+'</div>':'<div class="empty">No local-browser-only videos found.</div>')+'</div><div class="panel"><h3>Pending review queue</h3>'+(pending.length?pending.map(submissionMini).join(''):'<div class="empty">No pending submissions.</div>')+'</div>';
+}
+var oldSidebarV38=sidebar;
+sidebar=function(){var html=oldSidebarV38();html=html.replace(nav('storage','🗄 Storage'),nav('storage','🗄 Storage')+nav('health','🩺 Health Check'));html=html.replace('</div><div class="userbox">','</div><div class="userbox"><span class="versionBadge">'+V38_LABEL+'</span><br>');return html}
+var oldPageV38=page;
+page=function(){if(view==='health')return healthPage();return oldPageV38()}
+var oldRenderV38=render;
+render=function(){try{if(!currentUser||!me()){currentUser=null;saveSession();return renderLogin()}applySettings();if((view==='admin'||view==='backup'||view==='settings'||view==='storage'||view==='review'||view==='health')&&!isAdmin())view='home';byId('app').innerHTML='<div class="wrap"><aside class="side">'+sidebar()+'</aside><main class="main">'+page()+'</main></div>';bindCommon();if(view==='watch')bindWatch();if(view==='admin')bindAdmin();if(view==='backup')bindBackup();if(view==='settings')bindSettings();if(view==='storage')bindStorage()}catch(e){fatal(e)}};
+var v38HomeUsed={};
+var oldHomePageV38=homePage;
+homePage=function(){v38HomeUsed={};var html=oldHomePageV38();return html.replace('<div class="sectionTitle"><h3>Video Sources</h3>','<p class="homeDedupNote">V3.8: homepage rows now reduce repeated movie cards where possible, so the page feels cleaner.</p><div class="sectionTitle"><h3>Video Sources</h3>')}
+var oldHomeRowV38=homeRow;
+homeRow=function(title,arr,empty,targetView){arr=(arr||[]).filter(function(v){if(!v||v.i==null)return false;if(v38HomeUsed[v.i])return false;v38HomeUsed[v.i]=true;return true});return oldHomeRowV38(title,arr,empty,targetView)}
+var oldCastEntriesV38=castEntries;
+castEntries=function(raw){raw=String(raw||'').trim();if(raw.indexOf(' as ')>-1&&raw.indexOf('\n')<0){var out=[],re=/\s*([^]+?)\s+as\s+([^]+?)(?=\s+[A-Z][A-Za-z'.’`-]+(?:\s+[A-Z][A-Za-z'.’`-]+){0,3}\s+as\s+|$)/g,m;while((m=re.exec(raw))){var actor=m[1].trim(),role=m[2].trim();if(actor&&role&&actor.length<80&&role.length<120)out.push({actor:actor,role:role})}if(out.length>1)return out}return oldCastEntriesV38(raw)};
+var oldAdminPageV38=adminPage;
+adminPage=function(){var html=oldAdminPageV38();var t=topBar('Admin');var mini='<div class="panel"><h3>V3.8 quick health check</h3><p class="note">Open this before each GitHub upload to catch missing sources, no-channel movies, pending reviews and storage pressure.</p><div class="row"><button class="good" data-view="health">Open Health Check</button><button class="secondary" data-view="backup">Backup first</button></div></div>';return html.replace(t,t+mini)};
+var oldBindCommonV38=bindCommon;
+bindCommon=function(){oldBindCommonV38();document.querySelectorAll('.editHealthVideo').forEach(function(b){b.onclick=function(){var i=Number(b.dataset.i);view='admin';render();setTimeout(function(){loadVideo(i)},30)}})};
+var oldBackupSummaryV38=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV38(d)+'\nV3.8 note: includes UX polish, cleaner home rows, and admin health check.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version='StreamBanditPrototype3.8';saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v3-8-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('Backup download started and backup time saved')};
+var oldSettingsPageV38=settingsPage;
+settingsPage=function(){return oldSettingsPageV38().replace(/V3\.7\.3 Storage Rescue \+ URL\/Upload Reliability Fix|V3\.7\.3|V3\.7\.2|V3\.7\.1|V3\.7/g,V38_LABEL)};
+var oldRunTestsV38=runTests;
+runTests=function(){oldRunTestsV38();console.assert(typeof healthPage==='function','V3.8 health page exists');console.assert(typeof v38ImageBytes==='function','V3.8 image byte helper exists');console.assert(castEntries('Actor One as Hero Actor Two as Villain').length>=2,'V3.8 cast parser handles inline as format')};
+
 if(typeof runTests==='function')runTests();
+if(typeof render==='function')render();
 
 })();
 </script>
