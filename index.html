@@ -994,6 +994,78 @@ settingsPage=function(){return oldSettingsPageV384().replace(/V3\.8\.3 Player Au
 var oldRunTestsV384=runTests;
 runTests=function(){oldRunTestsV384();console.assert(typeof v384AccessibilityPage==='function','V3.8.4 accessibility page exists');console.assert(typeof v384InstallWatchKeys==='function','V3.8.4 keyboard shortcut helper exists');console.assert(typeof v384ShortcutHelp==='function','V3.8.4 shortcut help exists')};
 
+
+
+/* Stream Bandit V3.8.5 Menu Organizer: grouped sidebar + clearer navigation */
+var V385_LABEL='V3.8.5 Menu Organizer';
+APP_VERSION='StreamBanditPrototype3.8.5';
+data.version=APP_VERSION;
+(function(){
+  var css='\n.menuVersion{display:inline-block;margin-top:8px;background:#151724;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;color:#fff}.navSection{margin:14px 0 6px}.navHead{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8e94ab;font-weight:900;padding:6px 8px 2px}.navDivider{height:1px;background:#1d2030;border-radius:999px;margin:10px 0}.side .nav button{margin:4px 0}.userMeta{display:grid;gap:5px}.userMeta .mutedSmall{color:var(--muted);font-size:12px}.userbox .row{margin-top:10px}.sideNote{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.45}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function v385WatchCount(){
+  if(!currentUser||!data.watchlist||!Array.isArray(data.watchlist[currentUser.username]))return 0;
+  return data.watchlist[currentUser.username].length;
+}
+function v385PendingCount(){return typeof pendingSubmissions==='function'?pendingSubmissions().length:0}
+function v385Section(title,items){return '<div class="navSection"><div class="navHead">'+esc(title)+'</div>'+items+'</div>'}
+function v385VersionTag(){return '<div class="menuVersion">'+V385_LABEL+'</div>'}
+var oldSidebarV385=sidebar;
+sidebar=function(){
+  var a=isAdmin(),st=data.settings||seed.settings,u=me()||{},watchCount=v385WatchCount(),pending=v385PendingCount();
+  var browse=''+
+    nav('home','🏠 Home')+
+    nav('continue','⏯️ Continue Watching')+
+    nav('library','🎬 Library')+
+    nav('watchlist','📌 Watchlist '+(watchCount?'<span class="navCount">'+watchCount+'</span>':''))+
+    nav('accessibility','♿ Accessibility');
+  var discover=''+
+    nav('genres','🏷 Genres')+
+    nav('history','🕘 Watch History')+
+    nav('channels','📺 Channels')+
+    nav('collections','🎞 Collections')+
+    nav('playlists','🧩 Playlists')+
+    nav('favourites','❤️ Favourites');
+  var creator=''+nav('mychannel','👤 My Channel')+nav('submit','⬆️ Submit Video');
+  if(typeof rulesPage==='function')creator+=nav('rules','📜 Rules');
+  var admin='';
+  if(a){
+    admin+=nav('review','🛡 Review Queue '+(pending?'<span class="navCount">'+pending+'</span>':''));
+    if(typeof healthPage==='function')admin+=nav('health','🩺 Health Check');
+    if(typeof qualityPage==='function')admin+=nav('quality','🧰 Quality Tools');
+    if(typeof testChecklistPage==='function')admin+=nav('checklist','✅ Test Checklist');
+    admin+=nav('admin','🛠 Admin')+nav('settings','⚙️ Settings')+nav('storage','🗄 Storage')+nav('backup','💾 Backup');
+  }
+  return '<div class="brand"><div class="logo">'+appLogo()+'</div><div><h1>'+esc(st.appName)+'</h1><p>'+esc(st.tagline)+'</p>'+v385VersionTag()+'</div></div>'+
+    '<div class="nav">'+
+      v385Section('Watch',browse)+
+      v385Section('Browse',discover)+
+      v385Section('Creator',creator)+
+      (a?v385Section('Admin Tools',admin):'')+
+    '</div>'+
+    '<div class="userbox"><div class="userMeta"><b>'+esc(currentUser.username)+'</b><span>'+esc(u.role||'user')+'</span><span class="mutedSmall">'+esc((u.channelName)||'My Channel')+'</span></div><div class="row"><button class="secondary small" id="logout">Logout</button></div><div class="sideNote">Menu grouped to keep Stream Bandit easier to browse as the app grows.</div></div>';
+};
+var oldSettingsPageV385=settingsPage;
+settingsPage=function(){
+  return oldSettingsPageV385().replace(/V3\.8\.4 Accessibility \+ Player Comfort|V3\.8\.3 Player Audio Boost|V3\.8\.2 Admin Quality Tools|V3\.8\.1 Stability Polish|V3\.8 UX Polish \+ Admin Health Check/g,V385_LABEL).replace(/StreamBanditPrototype3\.8\.4|StreamBanditPrototype3\.8\.3|StreamBanditPrototype3\.8\.2/g,V385_LABEL);
+};
+var oldBackupSummaryV385=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV385(d)+'\nV3.8.5 note: includes grouped menu organizer for easier navigation.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typeof v384EnsureSettings==='function')v384EnsureSettings();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version='StreamBanditPrototype3.8.5';saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v3-8-5-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('Backup download started and backup time saved')};
+var oldTestChecklistPageV385=typeof testChecklistPage==='function'?testChecklistPage:null;
+if(oldTestChecklistPageV385){
+  testChecklistPage=function(){
+    var html=oldTestChecklistPageV385();
+    if(html.indexOf('Menu organizer')<0){
+      html=html.replace(/<div class="checkStep"><b>9\. Backup<\/b>/,'<div class="checkStep"><b>9. Menu organizer</b><span class="muted">Check the sidebar now shows grouped sections for Watch, Browse, Creator and Admin Tools, and that every page still opens.</span></div><div class="checkStep"><b>10. Backup</b>');
+    }
+    return html.replace(/V3\.8\.4 Accessibility \+ Player Comfort|V3\.8\.3 Player Audio Boost|V3\.8\.2 Admin Quality Tools|V3\.8\.1 Stability Polish|V3\.8 UX Polish \+ Admin Health Check/g,V385_LABEL);
+  };
+}
+var oldRunTestsV385=runTests;
+runTests=function(){oldRunTestsV385();console.assert(typeof v385Section==='function','V3.8.5 menu section helper exists');console.assert(sidebar().indexOf('Admin Tools')>-1||!isAdmin(),'V3.8.5 grouped sidebar renders')};
+
 if(typeof runTests==='function')runTests();
 if(typeof render==='function')render();
 
