@@ -2451,6 +2451,86 @@ exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typ
 var oldRunTestsV442=runTests;
 runTests=function(){try{oldRunTestsV442()}catch(e){console.warn('V4.4.2 self-test warning:',e)}console.assert(typeof sb442CountBadge==='function','V4.4.2 menu count helper exists')};
 
+
+/* Stream Bandit V4.4.3 UI Tidy + Version Text Cleanup */
+var V443_LABEL='V4.4.3 UI Tidy + Version Cleanup';
+document.title='Stream Bandit V4.4.3 UI Tidy + Version Cleanup';
+function sb443Label(){return V443_LABEL}
+function sb443AppVersionText(){return 'StreamBanditPrototype4.4.3-ui-tidy'}
+function sb443ReplaceOldText(html){
+  return String(html||'')
+    .replace(/V3\.8\.6 safety centre safety centre|V3\.8\.6 safety centre|V3\.8\.7 Stability Snapshot \+ Storage Prep/g,'V4.4.3 Live Safety Centre')
+    .replace(/StreamBanditPrototype4\.0-connection-test|StreamBanditPrototype4\.0\.1-migration-hotfix|StreamBanditPrototype4\.3\.1-supabase-home-read-test|StreamBanditPrototype4\.4\.2-supabase-menu-count-hotfix/g,sb443AppVersionText())
+    .replace(/V4\.4\.2 Supabase Menu Count Hotfix|V4\.4\.1 Supabase Saves Page Hotfix|V4\.4 Supabase Watchlist \+ Favourites \+ Likes Test|V4\.3\.1 Supabase Home Read Test|V4\.3 Supabase Default Library Mode|V4\.2\.1 Live Readiness Check|V3\.8\.7\.1 Stable Prep/g,V443_LABEL)
+    .replace(/V3\.3 makes this page clearer: part-watched videos stay here, finished films move out of the way, and you can reset progress on test items\./g,'Continue Watching now shows your in-progress titles clearly. Finished films move out of the way, and you can reset test progress when needed.')
+    .replace(/V4\.3\.1 Home connection note/g,'V4.4.3 Home + Saves note')
+    .replace(/Home now reads its main movie rows from Supabase when Supabase Library mode is active\. Browser\/local fallback is still available from Library\./g,'Home reads its main movie rows from Supabase when Supabase Library mode is active. Watchlist, Favourites and Likes also save to Supabase, with Browser/local fallback still available from Library.')
+    .replace(/V4\.3 library mode/g,'V4.4.3 library mode')
+    .replace(/V4\.3 uses Supabase as the normal default library, while Browser\/local stays available as a safe fallback\./g,'Supabase is the normal default library. Browser/local stays available as a safe emergency fallback.')
+    .replace(/V4\.3 default check/g,'V4.4.3 default check');
+}
+var oldTopBarV443=topBar;
+topBar=function(title){return sb443ReplaceOldText(oldTopBarV443(title))};
+var oldHomePageV443=homePage;
+homePage=function(){return sb443ReplaceOldText(oldHomePageV443())};
+var oldContinuePageV443=continuePage;
+continuePage=function(){return sb443ReplaceOldText(oldContinuePageV443())};
+var oldLibraryPageV443=libraryPage;
+libraryPage=function(){return sb443ReplaceOldText(oldLibraryPageV443())};
+var oldChannelsPageV443=channelsPage;
+channelsPage=function(){return sb443ReplaceOldText(oldChannelsPageV443())};
+function sb443PlaylistCard(p,pi){
+  var vids=(p.videos||[]).map(function(i){return data.videos[i]?Object.assign({},data.videos[i],{i:i}):null}).filter(Boolean);
+  return '<div class="card"><div class="thumb">'+(p.image?'<img src="'+esc(p.image)+'">':'<span>No playlist image</span>')+'</div><div class="body"><h3>🧩 '+esc(p.name||'Playlist')+'</h3><p class="muted">'+vids.length+' video(s)</p><div class="row">'+(vids.length?'<button class="small playRow" data-ids="'+esc(vids.map(function(v){return v.i}).join(','))+'">Play All</button>':'<span class="pill">Empty playlist</span>')+'</div></div></div>';
+}
+var oldPlaylistsPageV443=playlistsPage;
+playlistsPage=function(){
+  var pls=data.playlists||[];
+  return topBar('Playlists')+'<div class="panel"><h3>Playlists</h3><p class="note">Your saved playlists are shown as tidy cards. Empty playlists are kept, but they do not stretch the page with a large image.</p></div><div class="grid">'+(pls.length?pls.map(sb443PlaylistCard).join(''):'<div class="empty">No playlists yet.</div>')+'</div>';
+};
+var oldCollectionsPageV443=collectionsPage;
+collectionsPage=function(){
+  var html=oldCollectionsPageV443();
+  html=html.replace('Group films together like Scream Collection, Marvel Collection, Horror Classics, Christmas Movies or Kids Movies. Admin can build these from the Admin tab.','Collections group related films together, such as franchises or themed rows. Admin can manage these from the Admin tab.');
+  return sb443ReplaceOldText(html);
+};
+var oldSettingsPageV443=settingsPage;
+settingsPage=function(){return sb443ReplaceOldText(oldSettingsPageV443())};
+var oldSidebarV443=sidebar;
+sidebar=function(){return sb443ReplaceOldText(oldSidebarV443())};
+backupPage=function(){
+  var st=data.settings||{};
+  var last=st.lastBackupAt?new Date(st.lastBackupAt).toLocaleString():'No backup downloaded from this version yet';
+  var warn=!st.lastBackupAt||new Date(data.exportedAt||0)>new Date(st.lastBackupAt||0);
+  return topBar('Backup & Restore')+
+    '<div class="panel"><h3>V4.4.3 Live Safety Centre</h3><p class="note">This page protects your live GitHub app before bigger upgrades. JSON backups save titles, images, links, settings, playlists, collections and browser fallback data. Supabase data remains in Supabase.</p><div class="safetyGrid">'+
+      safeStat('App version',V443_LABEL)+safeStat('Movies',(data.videos||[]).length)+safeStat('Channels',(data.channels||[]).length)+safeStat('Playlists',(data.playlists||[]).length)+safeStat('Collections',(data.collections||[]).length)+safeStat('Submissions',((data.submissions||[]).length))+safeStat('Data size',kb(dataSize())+' KB')+safeStat('Last backup',last)+
+    '</div>'+(warn?'<div class="warnBox"><b>Backup recommended.</b><br>You have made changes since the last backup download, or no backup has been recorded yet.</div>':'<div class="adminHint"><b>Backup looks current.</b><br>Your last backup time is newer than the latest saved app change.</div>')+'</div>'+ 
+    '<div class="cols"><div class="panel"><h3>Export backup</h3><p class="note">Use this before editing videos, restoring data, or uploading a new GitHub version.</p><div class="row"><button id="export" class="good">Download backup JSON</button><button id="copy" class="secondary">Show / Copy backup JSON</button></div><label>Backup JSON preview</label><textarea id="backupBox" readonly></textarea></div>'+ 
+    '<div class="panel"><h3>Restore backup with preview</h3><label>Upload backup JSON file</label><input id="restoreFile" type="file" accept="application/json,.json"><label>Or paste backup JSON</label><textarea id="restoreBox" placeholder="Backup JSON here"></textarea><div class="row"><button id="previewRestore" class="secondary">Preview restore</button><button id="restore" class="danger">Restore after preview</button></div><div id="restorePreview" class="restorePreview">No restore file loaded yet.</div></div></div>'+ 
+    '<div class="panel"><h3>Storage repair</h3><p class="note">Danger buttons require typed confirmation so you do not wipe your app by accident.</p><div class="row"><button id="clearHistory" class="secondary">Clear watch history</button><button id="reset" class="danger">Reset Stream Bandit local storage</button></div></div>';
+};
+var oldBackupSummaryV443=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV443(d)+'\nV4.4.3 note: UI/version wording tidy for Backup, Continue Watching, Home, Library, Playlists and old V3 labels.'};
+exportBackup=function(){
+  data.settings=data.settings||clone(seed.settings);
+  if(typeof sb43EnsureDefault==='function')sb43EnsureDefault();
+  data.settings.lastBackupAt=new Date().toISOString();
+  data.settings.lastBackupSize=dataSize();
+  data.version=sb443AppVersionText();
+  saveData(true);
+  var j=JSON.stringify(data,null,2);
+  byId('backupBox').value=j;
+  var a=document.createElement('a');
+  var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));
+  a.href=url;
+  a.download='streambandit-v4-4-3-ui-tidy-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);
+  toast('V4.4.3 backup download started');
+};
+var oldRunTestsV443=runTests;
+runTests=function(){try{oldRunTestsV443()}catch(e){console.warn('V4.4.3 self-test warning:',e)}console.assert(typeof sb443ReplaceOldText==='function','V4.4.3 text tidy helper exists')};
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
