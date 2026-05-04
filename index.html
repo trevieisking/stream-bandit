@@ -2823,6 +2823,320 @@ var oldRunTestsV46=typeof runTests==='function'?runTests:null;
 runTests=function(){try{if(oldRunTestsV46)oldRunTestsV46()}catch(e){console.warn('V4.6 inherited self-test warning:',e)}console.assert(typeof sb46LoadProgress==='function','V4.6 Supabase progress loader exists');console.assert(typeof sb46SaveProgress==='function','V4.6 Supabase progress saver exists')};
 
 
+/* Stream Bandit V4.7 — Supabase Movie Manager + Poster URL Polish
+   Adds a safer admin manager for Supabase movie rows: load all rows, edit metadata, update stream links, and archive/unarchive without touching local/browser fallback data. */
+var SB47_LABEL='V4.7 Supabase Movie Manager + Poster Polish';
+try{APP_VERSION='StreamBanditPrototype4.7-supabase-movie-manager-poster-polish';if(data)data.version=APP_VERSION;document.title='Stream Bandit V4.7 Supabase Movie Manager + Poster Polish';}catch(e){}
+var sb47Rows=[];
+var sb47Loaded=false;
+var sb47Status='Press Load Supabase manager to read movie rows.';
+var sb47SelectedId='';
+(function(){
+  var css='\n.sb47Hero{background:linear-gradient(135deg,#071f21,#11131e);border:1px solid #19c37d55;border-radius:22px;padding:16px;margin-bottom:16px}.sb47ManagerGrid{display:grid;grid-template-columns:minmax(320px,.9fr) minmax(360px,1.1fr);gap:16px}.sb47List{display:grid;gap:10px;max-height:720px;overflow:auto;padding-right:4px}.sb47Row{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:10px;display:grid;grid-template-columns:92px 1fr;gap:10px}.sb47Row img{width:92px;aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#07070b}.sb47Placeholder{width:92px;aspect-ratio:16/9;border-radius:10px;background:#07070b;display:grid;place-items:center;color:var(--muted);font-size:11px;text-align:center}.sb47Row h4{margin:0 0 4px}.sb47Row small{color:var(--muted)}.sb47Form{background:#11131e;border:1px solid var(--line);border-radius:20px;padding:14px}.sb47Status{background:#101827;border:1px solid #6aa6ff55;border-radius:16px;padding:10px;color:#cfe5ff;margin:10px 0}.sb47Danger{background:#2b1018;border:1px solid #ff525277;border-radius:14px;padding:10px;margin-top:10px}.sb47Badge{display:inline-block;border-radius:999px;padding:4px 8px;background:#2a2d42;font-size:12px;font-weight:800;margin:2px}.sb47Badge.pub{background:#123b2b;color:#baf7df}.sb47Badge.arch{background:#3b2e12;color:#ffe0a3}.sb47Mini{font-size:12px;color:var(--muted);line-height:1.4}.sb47Form textarea{min-height:74px}.sb47Two{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:900px){.sb47ManagerGrid,.sb47Two{grid-template-columns:1fr}}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function sb47Err(e){return (typeof sb453ErrText==='function'?sb453ErrText(e):(e&&(e.message||e.details||e.hint)||e||'Unknown error'))}
+function sb47Csv(v){return Array.isArray(v)?v.join(', '):String(v||'')}
+function sb47Split(s){return String(s||'').split(',').map(function(x){return x.trim()}).filter(Boolean)}
+function sb47Val(id){var el=byId(id);return el?el.value.trim():''}
+function sb47Checked(id){var el=byId(id);return !!(el&&el.checked)}
+function sb47SetStatus(msg){sb47Status=msg;var el=byId('sb47Status');if(el)el.textContent=msg;}
+function sb47MovieById(id){return sb47Rows.find(function(m){return String(m.id)===String(id)})||null}
+function sb47MovieThumb(m){return (m&&(m.thumbnail_url||m.poster_url||m.image_url||''))||''}
+function sb47Source(m){return (m&&((m.mux_playback_url||'').trim()||(m.video_url||'').trim()))||''}
+function sb47ChannelName(m){return (m&&m.sb_channels&&m.sb_channels.name)||m.channel_name||'Stream Bandit'}
+function sb47StatusBadge(m){var s=String((m&&m.status)||'published');return '<span class="sb47Badge '+(s==='published'?'pub':(s==='archived'?'arch':''))+'">'+esc(s)+'</span>'}
+async function sb47EnsureAdmin(){
+  var c=sbInit(); if(!c)throw new Error('Supabase SDK not loaded.');
+  var ses=await c.auth.getSession(); sbSession=ses&&ses.data?ses.data.session:null;
+  if(!sbSession||!sbSession.user)throw new Error('Please log into Supabase first.');
+  try{var prof=await c.from('sb_profiles').select('role,display_name').eq('id',sbSession.user.id).maybeSingle(); if(prof&&!prof.error)sbProfile=prof.data||sbProfile;}catch(e){}
+  if(sbProfile&&sbProfile.role&&sbProfile.role!=='admin')throw new Error('Supabase profile is not admin.');
+  return c;
+}
+async function sb47LoadRows(noRender){
+  try{
+    var c=await sb47EnsureAdmin();
+    sb47SetStatus('Loading Supabase movie manager rows...');
+    var res=await c.from('sb_movies').select('id,title,description,mux_playback_url,video_url,thumbnail_url,trailer_url,year,rating,runtime_text,age_rating,director,cast_text,genres,tags,featured,duration_seconds,source_type,status,channel_id,created_at,sb_channels(name)').order('created_at',{ascending:false});
+    if(res.error)throw res.error;
+    sb47Rows=res.data||[];sb47Loaded=true;sb47SetStatus('Loaded '+sb47Rows.length+' Supabase movie row(s).');
+    if(!noRender)render();
+    return sb47Rows;
+  }catch(e){sb47Loaded=false;sb47SetStatus('Supabase manager load failed: '+sb47Err(e));if(!noRender)render();return []}
+}
+async function sb47EnsureChannel(c,name){
+  name=String(name||'Stream Bandit').trim()||'Stream Bandit';
+  try{
+    var existing=await c.from('sb_channels').select('id,name').eq('name',name).limit(1);
+    if(existing&&!existing.error&&existing.data&&existing.data[0])return existing.data[0].id;
+  }catch(e){}
+  var row={name:name,description:'',owner_id:(sbSession&&sbSession.user?sbSession.user.id:null),image_url:'',is_official:name.toLowerCase().indexOf('stream bandit')>-1};
+  var ins=await c.from('sb_channels').insert(row).select('id').single();
+  if(ins.error)throw ins.error;
+  return ins.data.id;
+}
+function sb47EmptyMovie(){return {title:'',description:'',mux_playback_url:'',video_url:'',thumbnail_url:'',trailer_url:'',year:'',rating:'',runtime_text:'',age_rating:'',director:'',cast_text:'',genres:[],tags:[],featured:false,duration_seconds:0,status:'published',sb_channels:{name:'Stream Bandit'}}}
+function sb47FormMovie(){return sb47MovieById(sb47SelectedId)||sb47EmptyMovie()}
+function sb47ManagerCard(m){
+  var thumb=sb47MovieThumb(m), src=sb47Source(m);
+  return '<div class="sb47Row"><div>'+(thumb?'<img src="'+esc(thumb)+'">':'<div class="sb47Placeholder">No poster</div>')+'</div><div><h4>'+esc(m.title||'Untitled')+'</h4><div>'+sb47StatusBadge(m)+'<span class="sb47Badge">'+esc(sbMovieType?sbMovieType(m):(src?'URL':'No source'))+'</span></div><small>'+esc(sb47ChannelName(m))+(src?' · stream link set':' · no stream link')+'</small><div class="row" style="margin-top:8px"><button class="secondary small sb47Edit" data-id="'+esc(m.id)+'">Edit</button><button class="secondary small sbPlayRemote" data-id="'+esc(m.id)+'" '+(!src||String(m.status)==='archived'?'disabled':'')+'>Play</button></div></div></div>'
+}
+function sb47ManagerForm(){
+  var m=sb47FormMovie(), isEdit=!!(m&&m.id), src=sb47Source(m), thumb=sb47MovieThumb(m);
+  return '<div class="sb47Form"><h3>'+(isEdit?'Edit Supabase movie':'Add Supabase movie')+'</h3><p class="sb47Mini">This writes metadata and stream URLs to Supabase only. It does not upload large local video files.</p>'+ 
+    '<label>Title</label><input id="sb47Title" value="'+esc(m.title||'')+'">'+
+    '<label>Channel</label><input id="sb47Channel" value="'+esc(sb47ChannelName(m))+'">'+
+    '<label>Description</label><textarea id="sb47Desc">'+esc(m.description||'')+'</textarea>'+
+    '<label>Video URL / Mux / HLS stream link</label><input id="sb47Url" value="'+esc(src)+'">'+
+    '<div class="sb47Two"><div><label>Genres, comma separated</label><input id="sb47Genres" value="'+esc(sb47Csv(m.genres))+'"></div><div><label>Tags, comma separated</label><input id="sb47Tags" value="'+esc(sb47Csv(m.tags))+'"></div></div>'+
+    '<div class="sb47Two"><div><label>Year</label><input id="sb47Year" value="'+esc(m.year||'')+'"></div><div><label>Runtime text</label><input id="sb47Runtime" value="'+esc(m.runtime_text||'')+'"></div></div>'+ 
+    '<div class="sb47Two"><div><label>Age rating</label><input id="sb47Age" value="'+esc(m.age_rating||'')+'"></div><div><label>Rating / score</label><input id="sb47Rating" value="'+esc(m.rating||'')+'"></div></div>'+ 
+    '<label>Thumbnail / poster URL</label><input id="sb47Thumb" value="'+esc(thumb)+'" placeholder="https://...jpg or png">'+
+    '<label>Trailer / extra link</label><input id="sb47Trailer" value="'+esc(m.trailer_url||'')+'">'+
+    '<div class="sb47Two"><div><label>Status</label><select id="sb47StatusSel"><option value="published" '+(String(m.status||'published')==='published'?'selected':'')+'>published</option><option value="draft" '+(String(m.status)==='draft'?'selected':'')+'>draft</option><option value="archived" '+(String(m.status)==='archived'?'selected':'')+'>archived</option></select></div><div><label>Duration seconds</label><input id="sb47Duration" type="number" value="'+esc(m.duration_seconds||0)+'"></div></div>'+ 
+    '<label><input id="sb47Featured" type="checkbox" style="width:auto" '+(m.featured?'checked':'')+'> Featured</label>'+ 
+    '<div class="row" style="margin-top:12px"><button class="good" id="sb47SaveMovie">'+(isEdit?'Update Supabase movie':'Add Supabase movie')+'</button><button class="secondary" id="sb47NewMovie">New blank movie</button>'+(isEdit?'<button class="secondary" id="sb47ArchiveMovie">'+(String(m.status)==='archived'?'Unarchive':'Archive / hide')+'</button>':'')+'</div>'+ 
+    '<div class="sb47Danger"><b>Safe rule:</b> Archive hides a movie from the public Supabase Library without deleting its database row. Use archive instead of hard delete while testing.</div></div>'
+}
+function supabaseManagerPage(){
+  var rows=sb47Rows||[], published=rows.filter(function(m){return String(m.status||'published')==='published'}).length, archived=rows.filter(function(m){return String(m.status)==='archived'}).length, noThumb=rows.filter(function(m){return !sb47MovieThumb(m)}).length;
+  return topBar('Supabase Movie Manager')+
+    '<div class="sb47Hero"><h3>'+SB47_LABEL+'</h3><p class="note">Edit Supabase movie rows, fix poster URLs, update HLS/Mux links and archive test rows safely. Browser/local backup data is not changed.</p><div class="sbStatusGrid">'+sbTile('Rows loaded',rows.length)+sbTile('Published',published)+sbTile('Archived',archived)+sbTile('Missing posters',noThumb)+'</div><div class="row"><button class="good" id="sb47LoadRows">Load Supabase manager</button><button class="secondary" data-view="library">Open Library</button><button class="secondary" data-view="backup">Backup first</button></div></div>'+ 
+    '<div id="sb47Status" class="sb47Status">'+esc(sb47Status)+'</div>'+ 
+    '<div class="sb47ManagerGrid"><div class="panel"><h3>Supabase rows</h3>'+(sb47Loaded?'<div class="sb47List">'+(rows.length?rows.map(sb47ManagerCard).join(''):'<div class="empty">No Supabase rows found.</div>')+'</div>':'<div class="empty">Press Load Supabase manager to read all movie rows.</div>')+'</div>'+sb47ManagerForm()+'</div>';
+}
+async function sb47SaveMovie(){
+  try{
+    var c=await sb47EnsureAdmin();
+    var title=sb47Val('sb47Title'); if(!title)throw new Error('Title needed.');
+    var channelId=await sb47EnsureChannel(c,sb47Val('sb47Channel'));
+    var url=sb47Val('sb47Url');
+    var row={title:title,description:sb47Val('sb47Desc'),mux_playback_url:/stream\.mux\.com|\.m3u8(\?|$)/i.test(url)?url:'',video_url:url,thumbnail_url:sb47Val('sb47Thumb'),trailer_url:sb47Val('sb47Trailer'),year:sb47Val('sb47Year'),rating:sb47Val('sb47Rating'),runtime_text:sb47Val('sb47Runtime'),age_rating:sb47Val('sb47Age'),genres:sb47Split(sb47Val('sb47Genres')),tags:sb47Split(sb47Val('sb47Tags')),featured:sb47Checked('sb47Featured'),duration_seconds:Number(sb47Val('sb47Duration'))||0,source_type:(/stream\.mux\.com|\.m3u8(\?|$)/i.test(url)?'mux':(url?'url':'none')),status:sb47Val('sb47StatusSel')||'published',channel_id:channelId};
+    var res;
+    if(sb47SelectedId){res=await c.from('sb_movies').update(row).eq('id',sb47SelectedId).select('id,title').single();}
+    else{res=await c.from('sb_movies').insert(row).select('id,title').single();}
+    if(res.error)throw res.error;
+    sb47SelectedId=res.data.id;
+    sb47SetStatus('Saved Supabase movie: '+res.data.title+'.');
+    await sb47LoadRows(true);
+    if(typeof sbLoadRemoteLibrary==='function'){try{await sbLoadRemoteLibrary()}catch(e){console.warn('V4.7 published refresh warning',e)}}
+    view='supabasemanager';render();
+  }catch(e){sb47SetStatus('Supabase movie save failed: '+sb47Err(e));}
+}
+async function sb47ArchiveMovie(){
+  try{
+    if(!sb47SelectedId)return;
+    var m=sb47MovieById(sb47SelectedId); if(!m)return;
+    var next=String(m.status)==='archived'?'published':'archived';
+    var c=await sb47EnsureAdmin();
+    var res=await c.from('sb_movies').update({status:next}).eq('id',sb47SelectedId).select('id,title,status').single();
+    if(res.error)throw res.error;
+    sb47SetStatus((next==='archived'?'Archived / hidden: ':'Unarchived: ')+(res.data.title||'movie'));
+    await sb47LoadRows(true);
+    view='supabasemanager';render();
+  }catch(e){sb47SetStatus('Archive change failed: '+sb47Err(e));}
+}
+var oldPageV47=typeof page==='function'?page:null;
+page=function(){if(view==='supabasemanager')return supabaseManagerPage();return oldPageV47?oldPageV47():''};
+var oldSidebarV47=typeof sidebar==='function'?sidebar:null;
+sidebar=function(){var html=oldSidebarV47?oldSidebarV47():'';if(isAdmin&&isAdmin()&&html.indexOf('data-view="supabasemanager"')<0){html=html.replace(nav('admin','🛠 Admin'),nav('admin','🛠 Admin')+nav('supabasemanager','📝 Supabase Manager'))}return String(html).replace(/V4\.6 Supabase Continue Watching \+ Watch History|V4\.5\.7 Quick Supabase Add Form Read Fix|V4\.4\.4 Final Supabase Page Cleanup/g,SB47_LABEL)};
+var oldSettingsPageV47=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){var html=oldSettingsPageV47?oldSettingsPageV47():'';return String(html).replace(/V4\.6 Supabase Continue Watching \+ Watch History|V4\.5\.7 Quick Supabase Add Form Read Fix|V4\.4\.4 Final Supabase Page Cleanup/g,SB47_LABEL)};
+var oldBackupPageV47=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){var html=oldBackupPageV47?oldBackupPageV47():'';return String(html).replace(/V4\.6 Supabase Continue Watching \+ Watch History|V4\.5\.7 Quick Supabase Add Form Read Fix|V4\.4\.4 Final Supabase Page Cleanup/g,SB47_LABEL)};
+var oldAdminPageV47=typeof adminPage==='function'?adminPage:null;
+adminPage=function(){var html=oldAdminPageV47?oldAdminPageV47():'';if(html.indexOf('V4.7 Supabase Movie Manager')<0){html=html.replace('</div></div><div class="panel"><h3>V4.6 Supabase Continue Watching</h3>','</div></div><div class="panel"><h3>V4.7 Supabase Movie Manager</h3><p class="note">Edit Supabase movie rows, poster URLs, stream links and archive test rows from a separate cleaner page.</p><div class="row"><button class="good" data-view="supabasemanager">Open Supabase Manager</button><button class="secondary" data-view="library">Open Library</button></div></div><div class="panel"><h3>V4.6 Supabase Continue Watching</h3>')}return String(html).replace(/V4\.6 Supabase Continue Watching \+ Watch History|V4\.5\.7 Quick Supabase Add Form Read Fix|V4\.4\.4 Final Supabase Page Cleanup/g,SB47_LABEL)};
+var oldBindCommonV47=typeof bindCommon==='function'?bindCommon:null;
+bindCommon=function(){
+  if(oldBindCommonV47)oldBindCommonV47();
+  var load=byId('sb47LoadRows');if(load)load.onclick=function(){sb47LoadRows(false)};
+  var save=byId('sb47SaveMovie');if(save)save.onclick=function(){sb47SaveMovie()};
+  var blank=byId('sb47NewMovie');if(blank)blank.onclick=function(){sb47SelectedId='';render()};
+  var arch=byId('sb47ArchiveMovie');if(arch)arch.onclick=function(){sb47ArchiveMovie()};
+  document.querySelectorAll('.sb47Edit').forEach(function(b){b.onclick=function(){sb47SelectedId=b.dataset.id;render()}});
+};
+var oldExportBackupV47=typeof exportBackup==='function'?exportBackup:null;
+exportBackup=function(){
+  data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);
+  var j=JSON.stringify(data,null,2);var box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));
+  a.href=url;a.download='streambandit-v4-7-supabase-movie-manager-poster-polish-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);if(typeof sb457LongToast==='function')sb457LongToast('V4.7 backup download started');else toast('V4.7 backup download started');
+};
+var oldBackupSummaryV47=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV47?oldBackupSummaryV47(d):'')+'\nV4.7 note: Supabase Movie Manager added for editing movie rows, poster URLs, stream links and safe archive/hide.'};
+var oldRunTestsV47=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV47)oldRunTestsV47()}catch(e){console.warn('V4.7 inherited self-test warning:',e)}console.assert(typeof supabaseManagerPage==='function','V4.7 Supabase manager page exists');console.assert(typeof sb47SaveMovie==='function','V4.7 Supabase save helper exists')};
+
+
+/* Stream Bandit V4.7.1 — Supabase Manager Button Binding Hotfix
+   Fixes Update / Archive buttons appearing inactive by adding delegated click binding,
+   immediate visible status messages, and button busy states. */
+var SB471_LABEL='V4.7.1 Supabase Manager Button Hotfix';
+try{APP_VERSION='StreamBanditPrototype4.7.1-supabase-manager-button-hotfix';if(data)data.version=APP_VERSION;document.title='Stream Bandit V4.7.1 Supabase Manager Button Hotfix';SB47_LABEL=SB471_LABEL;}catch(e){}
+function sb471Busy(id,on,text){var b=byId(id);if(!b)return; if(on){b.dataset.oldText=b.textContent;b.textContent=text||'Working...';b.disabled=true;}else{b.disabled=false;if(b.dataset.oldText)b.textContent=b.dataset.oldText;}}
+function sb471Notice(msg){sb47SetStatus(msg);if(typeof sb457LongToast==='function')sb457LongToast(msg);else toast(msg)}
+var oldSb47SaveMovie471=typeof sb47SaveMovie==='function'?sb47SaveMovie:null;
+sb47SaveMovie=async function(){
+  sb471Busy('sb47SaveMovie',true,'Saving to Supabase...');
+  try{
+    sb471Notice('Saving Supabase movie now...');
+    var c=await sb47EnsureAdmin();
+    var title=sb47Val('sb47Title'); if(!title)throw new Error('Title needed.');
+    var channelId=await sb47EnsureChannel(c,sb47Val('sb47Channel'));
+    var url=sb47Val('sb47Url');
+    var isMux=/stream\.mux\.com|\.m3u8(\?|$)/i.test(url);
+    var row={
+      title:title,
+      description:sb47Val('sb47Desc'),
+      mux_playback_url:isMux?url:'',
+      video_url:url,
+      thumbnail_url:sb47Val('sb47Thumb'),
+      trailer_url:sb47Val('sb47Trailer'),
+      year:sb47Val('sb47Year'),
+      rating:sb47Val('sb47Rating'),
+      runtime_text:sb47Val('sb47Runtime'),
+      age_rating:sb47Val('sb47Age'),
+      genres:sb47Split(sb47Val('sb47Genres')),
+      tags:sb47Split(sb47Val('sb47Tags')),
+      featured:sb47Checked('sb47Featured'),
+      duration_seconds:Number(sb47Val('sb47Duration'))||0,
+      source_type:(isMux?'mux':(url?'url':'none')),
+      status:sb47Val('sb47StatusSel')||'published',
+      channel_id:channelId
+    };
+    var res;
+    if(sb47SelectedId){res=await c.from('sb_movies').update(row).eq('id',sb47SelectedId).select('id,title').single();}
+    else{res=await c.from('sb_movies').insert(row).select('id,title').single();}
+    if(res.error)throw res.error;
+    sb47SelectedId=res.data.id;
+    sb471Notice('Saved Supabase movie: '+(res.data.title||title)+'. Refreshing rows...');
+    await sb47LoadRows(true);
+    if(typeof sbLoadRemoteLibrary==='function'){try{await sbLoadRemoteLibrary()}catch(e){console.warn('V4.7.1 published refresh warning',e)}}
+    view='supabasemanager';render();
+  }catch(e){
+    sb471Notice('Supabase movie save failed: '+sb47Err(e));
+    sb471Busy('sb47SaveMovie',false);
+  }
+};
+var oldSb47ArchiveMovie471=typeof sb47ArchiveMovie==='function'?sb47ArchiveMovie:null;
+sb47ArchiveMovie=async function(){
+  sb471Busy('sb47ArchiveMovie',true,'Updating archive...');
+  try{
+    if(!sb47SelectedId)throw new Error('Pick a movie row first.');
+    var m=sb47MovieById(sb47SelectedId); if(!m)throw new Error('Selected movie row was not found. Press Load Supabase manager and try again.');
+    var next=String(m.status)==='archived'?'published':'archived';
+    sb471Notice((next==='archived'?'Archiving / hiding ':'Unarchiving ')+(m.title||'movie')+'...');
+    var c=await sb47EnsureAdmin();
+    var res=await c.from('sb_movies').update({status:next}).eq('id',sb47SelectedId).select('id,title,status').single();
+    if(res.error)throw res.error;
+    sb471Notice((next==='archived'?'Archived / hidden: ':'Unarchived: ')+(res.data.title||m.title||'movie'));
+    await sb47LoadRows(true);
+    view='supabasemanager';render();
+  }catch(e){
+    sb471Notice('Archive change failed: '+sb47Err(e));
+    sb471Busy('sb47ArchiveMovie',false);
+  }
+};
+if(!window.__sb471DelegatedClicks){
+  window.__sb471DelegatedClicks=true;
+  document.addEventListener('click',function(ev){
+    var t=ev.target&&ev.target.closest?ev.target.closest('button'):null;
+    if(!t)return;
+    if(t.id==='sb47SaveMovie'){ev.preventDefault();ev.stopPropagation();sb47SaveMovie();}
+    if(t.id==='sb47ArchiveMovie'){ev.preventDefault();ev.stopPropagation();sb47ArchiveMovie();}
+    if(t.id==='sb47LoadRows'){ev.preventDefault();ev.stopPropagation();sb47LoadRows(false);}
+    if(t.id==='sb47NewMovie'){ev.preventDefault();ev.stopPropagation();sb47SelectedId='';render();}
+    if(t.classList&&t.classList.contains('sb47Edit')){ev.preventDefault();ev.stopPropagation();sb47SelectedId=t.dataset.id;sb471Notice('Editing selected Supabase movie row.');render();}
+  },true);
+}
+var oldSidebarV471=typeof sidebar==='function'?sidebar:null;
+sidebar=function(){var html=oldSidebarV471?oldSidebarV471():'';return String(html).replace(/V4\.7 Supabase Movie Manager \+ Poster Polish|V4\.6 Supabase Continue Watching \+ Watch History|V4\.5\.7 Quick Supabase Add Form Read Fix|V4\.4\.4 Final Supabase Page Cleanup/g,SB471_LABEL)};
+var oldBackupPageV471=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){var html=oldBackupPageV471?oldBackupPageV471():'';return String(html).replace(/V4\.7 Supabase Movie Manager \+ Poster Polish|V4\.6 Supabase Continue Watching \+ Watch History|V4\.5\.7 Quick Supabase Add Form Read Fix|V4\.4\.4 Final Supabase Page Cleanup/g,SB471_LABEL)};
+var oldExportBackupV471=typeof exportBackup==='function'?exportBackup:null;
+exportBackup=function(){
+  data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);
+  var j=JSON.stringify(data,null,2);var box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));
+  a.href=url;a.download='streambandit-v4-7-1-supabase-manager-button-hotfix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);sb471Notice('V4.7.1 backup download started');
+};
+var oldRunTestsV471=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV471)oldRunTestsV471()}catch(e){console.warn('V4.7.1 inherited self-test warning:',e)}console.assert(typeof sb47SaveMovie==='function','V4.7.1 save override exists');console.assert(window.__sb471DelegatedClicks===true,'V4.7.1 delegated click binding exists')};
+
+
+/* Stream Bandit V4.7.2 — Tag Display + Refresh Hotfix
+   The V4.7.1 manager could save tags, but Supabase Details/Library only showed genres.
+   This makes saved tags visible on cards and Details, and refreshes the selected movie row after saving. */
+var SB472_LABEL='V4.7.2 Supabase Manager Tag Display Hotfix';
+try{APP_VERSION='StreamBanditPrototype4.7.2-supabase-manager-tag-display-hotfix';if(data)data.version=APP_VERSION;document.title='Stream Bandit V4.7.2 Supabase Manager Tag Display Hotfix';SB47_LABEL=SB472_LABEL;}catch(e){}
+function sb472List(x){return Array.isArray(x)?x.map(function(v){return String(v||'').trim()}).filter(Boolean):[]}
+function sb472Uniq(a){var seen={};return (a||[]).filter(function(x){var k=String(x||'').toLowerCase();if(!k||seen[k])return false;seen[k]=true;return true})}
+function sb472PillHtml(arr,cls){return sb472Uniq(arr).map(function(g){return '<span class="'+(cls||'')+'">'+esc(g)+'</span>'}).join('')}
+function sb472MetaHtml(m,limit){
+  var genres=sb472List(m&&m.genres), tags=sb472List(m&&m.tags);
+  var html='<span>'+esc(sbMovieType(m))+'</span><span>'+esc(sbMovieChannel(m))+'</span>';
+  html+=sb472PillHtml(typeof limit==='number'?genres.slice(0,limit):genres,'');
+  if(tags.length){html+=sb472PillHtml(typeof limit==='number'?tags.slice(0,Math.max(1,limit)):tags,'sbTagPill')}
+  return html;
+}
+var oldSbRemoteCardV472=typeof sbRemoteCard==='function'?sbRemoteCard:null;
+sbRemoteCard=function(m){
+  var src=sbMovieSource(m), thumb=(m&&m.thumbnail_url)||'';
+  return '<div class="sbRemoteCard"><div class="sbRemoteThumb">'+(thumb?'<img src="'+esc(thumb)+'">':'<span>Supabase movie</span>')+((m&&m.featured)?'<span class="badge">Featured</span>':'')+'</div><div class="sbRemoteBody"><h3>'+esc((m&&m.title)||'Untitled')+'</h3><p class="muted">'+esc(((m&&m.description)||'').slice(0,150))+'</p><div class="sbMiniMeta">'+sb472MetaHtml(m,3)+'</div><div class="row"><button class="small sbPlayRemote" data-id="'+esc(m&&m.id)+'" '+(!src?'disabled':'')+'>Play</button><button class="secondary small sbDetailRemote" data-id="'+esc(m&&m.id)+'">Details</button></div>'+(typeof sb44RemoteActions==='function'?sb44RemoteActions(m.id):'')+'</div></div>';
+};
+var oldSbRemoteDetailPageV472=typeof sbRemoteDetailPage==='function'?sbRemoteDetailPage:null;
+sbRemoteDetailPage=function(){
+  var m=sbFindRemoteMovie(sbRemoteSelectedId);
+  if(!m&&oldSbRemoteDetailPageV472)return oldSbRemoteDetailPageV472();
+  if(!m)return topBar('Supabase Details')+'<div class="panel"><div class="empty">Movie not loaded. Go back to Supabase Library and refresh.</div><button class="secondary" data-view="supabaselibrary">Back to Supabase Library</button></div>';
+  var cast=(m.cast_text&&typeof cleanCastText==='function')?cleanCastText(m.cast_text):(m.cast_text||'');
+  var tags=sb472List(m.tags);
+  return topBar('Supabase Details')+'<div class="panel"><h2>'+esc(m.title||'Untitled')+'</h2><div class="sbMiniMeta">'+sb472MetaHtml(m)+'</div><p>'+esc(m.description||'')+'</p>'+ (tags.length?'<div class="panel" style="margin:14px 0"><h3>Tags</h3><div class="sbMiniMeta">'+sb472PillHtml(tags,'sbTagPill')+'</div></div>':'') +'<div class="sbDetailStats">'+cardStat('Year',m.year||'—')+cardStat('Rating',m.rating||'—')+cardStat('Runtime',m.runtime_text||'—')+cardStat('Age rating',m.age_rating||'—')+'</div>'+(m.director?'<p><b>Director:</b> '+esc(m.director)+'</p>':'')+(cast?'<div class="panel"><h3>Cast</h3><p class="sbDetailCast">'+esc(cast)+'</p></div>':'')+'<div class="row"><button class="small sbPlayRemote" data-id="'+esc(m.id)+'">Play from Supabase</button><button class="secondary" data-view="supabaselibrary">Back to Supabase Library</button></div>'+(typeof sb44RemoteActions==='function'?sb44RemoteActions(m.id):'')+'</div>';
+};
+var oldSb47SaveMovieV472=typeof sb47SaveMovie==='function'?sb47SaveMovie:null;
+sb47SaveMovie=async function(){
+  sb471Busy('sb47SaveMovie',true,'Saving to Supabase...');
+  try{
+    sb471Notice('Saving Supabase movie now...');
+    var c=await sb47EnsureAdmin();
+    var title=sb47Val('sb47Title'); if(!title)throw new Error('Title needed.');
+    var channelId=await sb47EnsureChannel(c,sb47Val('sb47Channel'));
+    var url=sb47Val('sb47Url');
+    var isMux=/stream\.mux\.com|\.m3u8(\?|$)/i.test(url);
+    var row={
+      title:title,description:sb47Val('sb47Desc'),mux_playback_url:isMux?url:'',video_url:url,
+      thumbnail_url:sb47Val('sb47Thumb'),trailer_url:sb47Val('sb47Trailer'),year:sb47Val('sb47Year'),rating:sb47Val('sb47Rating'),
+      runtime_text:sb47Val('sb47Runtime'),age_rating:sb47Val('sb47Age'),genres:sb47Split(sb47Val('sb47Genres')),tags:sb47Split(sb47Val('sb47Tags')),
+      featured:sb47Checked('sb47Featured'),duration_seconds:Number(sb47Val('sb47Duration'))||0,source_type:(isMux?'mux':(url?'url':'none')),
+      status:sb47Val('sb47StatusSel')||'published',channel_id:channelId
+    };
+    var selectCols='id,title,description,mux_playback_url,video_url,thumbnail_url,trailer_url,year,rating,runtime_text,age_rating,director,cast_text,genres,tags,featured,duration_seconds,source_type,status,channel_id,sb_channels(name)';
+    var res;
+    if(sb47SelectedId){res=await c.from('sb_movies').update(row).eq('id',sb47SelectedId).select(selectCols).single();}
+    else{res=await c.from('sb_movies').insert(row).select(selectCols).single();}
+    if(res.error)throw res.error;
+    sb47SelectedId=res.data.id;
+    if(Array.isArray(sb47Rows)){var i=sb47Rows.findIndex(function(x){return String(x.id)===String(res.data.id)});if(i>=0)sb47Rows[i]=res.data;else sb47Rows.unshift(res.data)}
+    if(Array.isArray(sbRemoteMovies)){var j=sbRemoteMovies.findIndex(function(x){return String(x.id)===String(res.data.id)});if(String(res.data.status)==='published'){if(j>=0)sbRemoteMovies[j]=res.data;else sbRemoteMovies.unshift(res.data)}else if(j>=0){sbRemoteMovies.splice(j,1)}}
+    sb471Notice('Saved Supabase movie: '+(res.data.title||title)+'. Tags now display on cards and Details.');
+    await sb47LoadRows(true);
+    if(typeof sbLoadRemoteLibrary==='function'){try{await sbLoadRemoteLibrary()}catch(e){console.warn('V4.7.2 published refresh warning',e)}}
+    view='supabasemanager';render();
+  }catch(e){sb471Notice('Supabase movie save failed: '+sb47Err(e));sb471Busy('sb47SaveMovie',false);}
+};
+var oldSidebarV472=typeof sidebar==='function'?sidebar:null;
+sidebar=function(){var html=oldSidebarV472?oldSidebarV472():'';return String(html).replace(/V4\.7\.1 Supabase Manager Button Hotfix|V4\.7 Supabase Movie Manager \+ Poster Polish|V4\.6 Supabase Continue Watching \+ Watch History|V4\.5\.7 Quick Supabase Add Form Read Fix|V4\.4\.4 Final Supabase Page Cleanup/g,SB472_LABEL)};
+var oldBackupPageV472=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){var html=oldBackupPageV472?oldBackupPageV472():'';return String(html).replace(/V4\.7\.1 Supabase Manager Button Hotfix|V4\.7 Supabase Movie Manager \+ Poster Polish|V4\.6 Supabase Continue Watching \+ Watch History|V4\.5\.7 Quick Supabase Add Form Read Fix|V4\.4\.4 Final Supabase Page Cleanup/g,SB472_LABEL)};
+var oldExportBackupV472=typeof exportBackup==='function'?exportBackup:null;
+exportBackup=function(){
+  data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);
+  var j=JSON.stringify(data,null,2);var box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));
+  a.href=url;a.download='streambandit-v4-7-2-supabase-manager-tag-display-hotfix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);sb471Notice('V4.7.2 backup download started');
+};
+var oldRunTestsV472=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV472)oldRunTestsV472()}catch(e){console.warn('V4.7.2 inherited self-test warning:',e)}console.assert(typeof sb472MetaHtml==='function','V4.7.2 tag meta helper exists');console.assert(typeof sb47SaveMovie==='function','V4.7.2 save override exists')};
+
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
