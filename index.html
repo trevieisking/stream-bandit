@@ -2531,6 +2531,101 @@ exportBackup=function(){
 var oldRunTestsV443=runTests;
 runTests=function(){try{oldRunTestsV443()}catch(e){console.warn('V4.4.3 self-test warning:',e)}console.assert(typeof sb443ReplaceOldText==='function','V4.4.3 text tidy helper exists')};
 
+/* Stream Bandit V4.4.4 Final Text Cleanup
+   Paste this whole block near the bottom of index.html, directly BEFORE:
+   try{ if(typeof runTests==='function')runTests(); if(typeof render==='function')render(); }
+*/
+var V444_LABEL='V4.4.4 Final Supabase Page Cleanup';
+try{
+  APP_VERSION='StreamBanditPrototype4.4.4-final-supabase-page-cleanup';
+  if(typeof data==='object'&&data){data.version=APP_VERSION;}
+  document.title='Stream Bandit V4.4.4 Final Supabase Page Cleanup';
+}catch(e){console.warn('V4.4.4 label setup warning',e)}
+function sb444CleanText(html){
+  html=String(html==null?'':html);
+  return html
+    .replace(/StreamBanditPrototype4\.4\.3-ui-tidy\s*—\s*V3\.5\.2 Creator Genres Patch/g,'StreamBanditPrototype4.4.4-final-supabase-page-cleanup — V4.4.4 Final Supabase Page Cleanup')
+    .replace(/StreamBanditPrototype4\.4\.3-ui-tidy/g,'StreamBanditPrototype4.4.4-final-supabase-page-cleanup')
+    .replace(/V4\.4\.3 UI Tidy \+ Version Cleanup/g,V444_LABEL)
+    .replace(/V4\.4\.2 Supabase Menu Count Hotfix/g,V444_LABEL)
+    .replace(/V4\.4\.1 Supabase Saves Page Hotfix/g,V444_LABEL)
+    .replace(/V4\.4 Supabase Watchlist \+ Favourites \+ Likes Test/g,V444_LABEL)
+    .replace(/V4\.3\.1 Supabase Home Read Test/g,V444_LABEL)
+    .replace(/V4\.3 Supabase Default Library Mode/g,V444_LABEL)
+    .replace(/V4\.2\.1 Live Readiness Check/g,V444_LABEL)
+    .replace(/V3\.8\.7\.1 Stable Prep/g,V444_LABEL)
+    .replace(/V3\.8\.7\.1 Stability Snapshot \+ Storage Prep/g,'V4.4.4 Supabase Storage / Safety Prep')
+    .replace(/V3\.8\.7 Stability Snapshot \+ Storage Prep/g,'V4.4.4 Supabase Storage / Safety Prep')
+    .replace(/V3\.8\.7\.1/g,'V4.4.4')
+    .replace(/V3\.8\.7/g,'V4.4.4')
+    .replace(/V3\.8\.6 safety centre safety centre/g,'V4.4.4 Live Safety Centre')
+    .replace(/V3\.8\.6 safety centre/g,'V4.4.4 Live Safety Centre')
+    .replace(/V3\.4\.1 safety centre/g,'V4.4.4 Live Safety Centre')
+    .replace(/V3\.3 makes this page clearer:/g,'Continue Watching is now clearer:')
+    .replace(/Recommended V4\.0 direction:/g,'Current Supabase direction:')
+    .replace(/before real storage\/backend work\. It does not change the player layout, storage method, uploads or database\. It helps you prepare for V4\.0 storage properly\./g,'now that Supabase is live. It keeps the player, uploads and fallback data safe while we prepare the next Supabase write upgrades.')
+    .replace(/before V4\./g,'before the next Supabase upgrade.')
+    .replace(/Use the backup JSON you exported from V4\.4\.4 or the V4 connection test\./g,'Use a fresh Stream Bandit backup JSON if you ever need to re-import data.')
+    .replace(/Use the backup JSON you exported from V3\.8\.7\.1 or the V4 connection test\./g,'Use a fresh Stream Bandit backup JSON if you ever need to re-import data.')
+    .replace(/does not migrate or overwrite your V4\.4\.4 browser data yet\./g,'only checks the current Supabase connection, auth login and database reads.')
+    .replace(/does not migrate or overwrite your V3\.8\.7\.1 browser data yet\./g,'only checks the current Supabase connection, auth login and database reads.')
+    .replace(/Movies may be zero until we migrate your V4\.4\.4 backup JSON\./g,'These should match your current Supabase library counts.')
+    .replace(/Movies may be zero until we migrate your V3\.8\.7\.1 backup JSON\./g,'These should match your current Supabase library counts.')
+    .replace(/Backup V3 data/g,'Backup app data')
+    .replace(/Image storage<\/b><span>NaN KB/g,'Image storage</b><span>0 KB')
+    .replace(/Image storage<\/b><span>NaN/g,'Image storage</b><span>0')
+    .replace(/V3\.5\.2 Creator Genres Patch/g,'V4.4.4 Final Supabase Page Cleanup')
+    .replace(/V3\.8\.2 Admin Quality Tools/g,'V4.4.4 Quality Tools')
+    .replace(/V3\.8\.1 Stability Polish/g,'V4.4.4 Stability Check')
+    .replace(/V3\.8 UX Polish \+ Admin Health Check/g,'V4.4.4 Admin Health Check');
+}
+try{
+  if(typeof topBar==='function'){var oldTopBarV444=topBar;topBar=function(title){return sb444CleanText(oldTopBarV444(title))};}
+  if(typeof sidebar==='function'){var oldSidebarV444=sidebar;sidebar=function(){return sb444CleanText(oldSidebarV444())};}
+  if(typeof homePage==='function'){var oldHomePageV444=homePage;homePage=function(){return sb444CleanText(oldHomePageV444())};}
+  if(typeof continuePage==='function'){var oldContinuePageV444=continuePage;continuePage=function(){return sb444CleanText(oldContinuePageV444())};}
+  if(typeof libraryPage==='function'){var oldLibraryPageV444=libraryPage;libraryPage=function(){return sb444CleanText(oldLibraryPageV444())};}
+  if(typeof settingsPage==='function'){var oldSettingsPageV444=settingsPage;settingsPage=function(){return sb444CleanText(oldSettingsPageV444())};}
+  if(typeof storagePage==='function'){var oldStoragePageV444=storagePage;storagePage=function(){return sb444CleanText(oldStoragePageV444())};}
+  if(typeof storagePrepPage==='function'){var oldStoragePrepPageV444=storagePrepPage;storagePrepPage=function(){return sb444CleanText(oldStoragePrepPageV444())};}
+  if(typeof healthPage==='function'){var oldHealthPageV444=healthPage;healthPage=function(){return sb444CleanText(oldHealthPageV444())};}
+  if(typeof qualityPage==='function'){var oldQualityPageV444=qualityPage;qualityPage=function(){return sb444CleanText(oldQualityPageV444())};}
+  if(typeof backupPage==='function'){var oldBackupPageV444=backupPage;backupPage=function(){return sb444CleanText(oldBackupPageV444())};}
+  if(typeof adminPage==='function'){var oldAdminPageV444=adminPage;adminPage=function(){return sb444CleanText(oldAdminPageV444())};}
+  if(typeof supabaseTestPage==='function'){var oldSupabaseTestPageV444=supabaseTestPage;supabaseTestPage=function(){return sb444CleanText(oldSupabaseTestPageV444())};}
+  if(typeof supabaseMigrationPage==='function'){var oldSupabaseMigrationPageV444=supabaseMigrationPage;supabaseMigrationPage=function(){return sb444CleanText(oldSupabaseMigrationPageV444())};}
+  if(typeof sbSupabaseLibraryPage==='function'){var oldSbSupabaseLibraryPageV444=sbSupabaseLibraryPage;sbSupabaseLibraryPage=function(){return sb444CleanText(oldSbSupabaseLibraryPageV444())};}
+  if(typeof sb421LiveReadinessPage==='function'){var oldSb421LiveReadinessPageV444=sb421LiveReadinessPage;sb421LiveReadinessPage=function(){return sb444CleanText(oldSb421LiveReadinessPageV444())};}
+}catch(e){console.warn('V4.4.4 page wrapper warning',e)}
+try{
+  if(typeof exportBackup==='function'){
+    var oldExportBackupV444=exportBackup;
+    exportBackup=function(){
+      data.settings=data.settings||clone(seed.settings);
+      data.settings.lastBackupAt=new Date().toISOString();
+      data.settings.lastBackupSize=dataSize();
+      data.version=APP_VERSION;
+      saveData(true);
+      var j=JSON.stringify(data,null,2);
+      var box=byId('backupBox'); if(box)box.value=j;
+      var a=document.createElement('a');
+      var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));
+      a.href=url;
+      a.download='streambandit-v4-4-4-final-supabase-page-cleanup-backup-'+new Date().toISOString().slice(0,10)+'.json';
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(url)},800);
+      toast('V4.4.4 backup download started');
+    };
+  }
+}catch(e){console.warn('V4.4.4 backup wrapper warning',e)}
+try{
+  var oldBackupSummaryV444=typeof backupSummary==='function'?backupSummary:null;
+  if(oldBackupSummaryV444){backupSummary=function(d){return oldBackupSummaryV444(d)+'\nV4.4.4 note: final page wording cleanup after Supabase was connected across the app.'};}
+  var oldRunTestsV444=typeof runTests==='function'?runTests:null;
+  runTests=function(){try{if(oldRunTestsV444)oldRunTestsV444()}catch(e){console.warn('V4.4.4 inherited self-test warning:',e)}console.assert(typeof sb444CleanText==='function','V4.4.4 text cleanup helper exists');};
+}catch(e){console.warn('V4.4.4 final wrapper warning',e)}
+
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
