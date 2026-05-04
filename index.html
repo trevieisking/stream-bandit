@@ -3230,6 +3230,76 @@ var oldBackupSummaryV49=backupSummary;backupSummary=function(d){return (oldBacku
 exportBackup=function(){data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version='StreamBanditPrototype4.9-supabase-submissions-review-queue';saveData(true);var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-9-supabase-submissions-review-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.9 backup download started')};
 var oldRunTestsV49=runTests;runTests=function(){try{if(oldRunTestsV49)oldRunTestsV49()}catch(e){console.warn('V4.9 inherited self-test warning:',e)}console.assert(typeof sb49LoadSubmissions==='function','V4.9 submissions loader exists');console.assert(typeof sb49SaveSubmission==='function','V4.9 submit save exists');console.assert(typeof sb49Approve==='function','V4.9 approve helper exists')};
 
+/* Stream Bandit V4.9.1 Admin Supabase Layout Restore
+   Fixes: after V4.9 submissions, Admin could look like the older browser/local admin page again.
+   This restores a clear Supabase-first Admin layout with tabs, while keeping the old local tools safely available as fallback. */
+APP_VERSION='StreamBanditPrototype4.9.1-admin-supabase-layout-restore';
+data.version=APP_VERSION;
+var SB491_LABEL='V4.9.1 Admin Supabase Layout Restore';
+var sb491Status='Ready. Supabase Admin is the recommended movie tool now; Browser/local tools remain in the Legacy tab.';
+(function(){
+  var css='\n.sb491Tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}.sb491TabBtn{background:#25283a;border:1px solid var(--line)}.sb491TabBtn.active{background:linear-gradient(135deg,var(--a),var(--b));color:#fff}.sb491Tab{display:none}.sb491Tab.active{display:block}.sb491Hero{border:1px solid #6aa6ff55;background:#101827;border-radius:20px;padding:14px;margin:0 0 14px;color:#d7e9ff}.sb491Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.sb491Status{white-space:pre-wrap;background:#0d0e15;border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:10px;color:var(--muted)}.sb491Warn{border:1px solid #ffbf3c77;background:#2b210f;border-radius:16px;padding:11px;color:#ffe0a3;margin:10px 0}.sb491Legacy{border:1px dashed var(--line);border-radius:20px;padding:10px;background:#0b0c14}.sb491SmallNote{font-size:12px;color:var(--muted);line-height:1.45}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function sb491SetStatus(msg){sb491Status=String(msg||'');var el=byId('sb491Status');if(el)el.textContent=sb491Status;}
+function sb491Val(id){var el=byId(id);return el?String(el.value||'').trim():''}
+function sb491SourceType(url){url=String(url||'');if(/stream\.mux\.com/i.test(url))return 'mux';if(/\.m3u8(\?|$)/i.test(url))return 'hls';if(url)return 'url';return 'none'}
+function sb491Split(id){return sb491Val(id).split(',').map(function(x){return x.trim()}).filter(Boolean).filter(function(x,i,a){return a.findIndex(function(y){return y.toLowerCase()===x.toLowerCase()})===i})}
+async function sb491EnsureAdmin(){var c=sbInit();if(!c)throw new Error('Supabase SDK is not loaded.');if(typeof sbRefresh==='function')await sbRefresh();else{var ses=await c.auth.getSession();sbSession=(ses&&ses.data&&ses.data.session)||null;}if(!sbSession||!sbSession.user)throw new Error('Log into Supabase first from Supabase Test.');if(sbProfile&&sbProfile.role&&sbProfile.role!=='admin')throw new Error('Supabase profile is not admin.');return c;}
+async function sb491EnsureChannel(c,name){name=(name||'Stream Bandit Channel').trim()||'Stream Bandit Channel';var q=await c.from('sb_channels').select('id,name').eq('name',name).limit(1);if(q.error)throw q.error;if(q.data&&q.data[0])return q.data[0].id;var row={name:name,description:'Created from Stream Bandit Admin',owner_id:(sbSession&&sbSession.user&&sbSession.user.id)||null,is_official:name.toLowerCase().indexOf('stream bandit')>-1};var ins=await c.from('sb_channels').insert(row).select('id').single();if(ins.error){var simple=await c.from('sb_channels').insert({name:name,description:'Created from Stream Bandit Admin'}).select('id').single();if(simple.error)throw simple.error;return simple.data.id;}return ins.data.id;}
+async function sb491QuickAdd(){
+  try{
+    var title=sb491Val('sb491Title'),url=sb491Val('sb491Url');
+    if(!title)throw new Error('Title needed.');
+    if(!url)throw new Error('Video URL / Mux / HLS link needed. Supabase does not use local file upload here.');
+    var c=await sb491EnsureAdmin();
+    var channelName=sb491Val('sb491Channel')||'Stream Bandit Channel';
+    var ch=await sb491EnsureChannel(c,channelName);
+    var genres=sb491Split('sb491Genres');if(!genres.length)genres=['Other'];
+    var tags=sb491Split('sb491Tags');
+    var movie={title:title,description:sb491Val('sb491Desc'),video_url:url,mux_playback_url:/stream\.mux\.com/i.test(url)?url:'',thumbnail_url:sb491Val('sb491Thumb'),trailer_url:sb491Val('sb491Trailer'),year:sb491Val('sb491Year'),rating:sb491Val('sb491Rating'),runtime_text:sb491Val('sb491Runtime'),age_rating:sb491Val('sb491Age'),genres:genres,tags:tags,channel_id:ch,owner_id:sbSession.user.id,featured:!!(byId('sb491Featured')&&byId('sb491Featured').checked),source_type:sb491SourceType(url),status:'published'};
+    sb491SetStatus('Saving movie to Supabase...');
+    var ins=await c.from('sb_movies').insert(movie).select('*').single();
+    if(ins.error){
+      var safe={title:movie.title,description:movie.description,video_url:movie.video_url,thumbnail_url:movie.thumbnail_url,genres:movie.genres,tags:movie.tags,channel_id:ch,owner_id:sbSession.user.id,status:'published'};
+      ins=await c.from('sb_movies').insert(safe).select('*').single();
+      if(ins.error)throw ins.error;
+    }
+    if(typeof sbLoadRemoteLibrary==='function')await sbLoadRemoteLibrary();
+    sb491SetStatus('Saved to Supabase: '+(ins.data&&ins.data.title?ins.data.title:title)+'\nLibrary refreshed.');
+    toast('Saved to Supabase Library');
+    view='library';render();
+  }catch(e){var msg='Supabase Admin save failed: '+(e&&(e.message||e.details||e.hint)||e||'Unknown error');sb491SetStatus(msg);toast(msg);}
+}
+function sb491SupabaseWritePanel(){
+  return '<div class="sb491Hero"><h3>'+SB491_LABEL+'</h3><p class="note">Admin is Supabase-first again. Use this quick form for URL / Mux / HLS movies. Browser/local upload tools are still kept in the Legacy tab for fallback only.</p><div class="sb491Grid">'+sbTile('Supabase mode',(data.settings&&data.settings.useSupabaseLibrary)?'ON':'OFF')+sbTile('Admin write',(data.settings&&data.settings.supabaseAdminWriteMode)?'ON':'OFF')+sbTile('Session',sbSession&&sbSession.user?'Logged in':'Check Supabase Test')+sbTile('Profile role',sbProfile?sbProfile.role:'Not checked')+'</div><div id="sb491Status" class="sb491Status">'+esc(sb491Status)+'</div></div>'+
+  '<div class="panel"><h3>Quick Supabase movie add</h3><div class="sb491Warn"><b>Recommended:</b> add movies here now. This saves directly to Supabase and opens Library when finished.</div>'+field('Title','sb491Title')+area('Description','sb491Desc')+field('Video URL / Mux / HLS link','sb491Url')+field('Thumbnail / poster URL optional','sb491Thumb')+field('Trailer URL optional','sb491Trailer')+'<div class="cols"><div>'+field('Channel','sb491Channel','Stream Bandit Channel')+'</div><div>'+field('Genres comma-separated','sb491Genres','Comedy, Animation')+'</div></div><div class="cols"><div>'+field('Tags comma-separated','sb491Tags','')+'</div><div>'+field('Age rating','sb491Age','')+'</div></div><div class="cols"><div>'+field('Year','sb491Year','')+'</div><div>'+field('Rating / score','sb491Rating','')+'</div></div>'+field('Runtime text','sb491Runtime','')+'<label class="genreChoice"><input id="sb491Featured" type="checkbox"> Featured / admin pick</label><br><div class="row"><button id="sb491Save" class="good">Save movie to Supabase</button><button class="secondary" data-view="supabasemanager">Open Supabase Manager</button><button class="secondary" data-view="library">Open Library</button></div></div>';
+}
+function sb491SupabaseToolsPanel(){return '<div class="panel"><h3>Supabase connected pages</h3><p class="note">These are the pages we have already connected to Supabase.</p><div class="row"><button class="secondary" data-view="supabase">Supabase Test</button><button class="secondary" data-view="library">Library</button><button class="secondary" data-view="supabasemanager">Movie Manager</button><button class="secondary" data-view="collections">Collections</button><button class="secondary" data-view="playlists">Playlists</button><button class="secondary" data-view="submit">Submit Video</button><button class="secondary" data-view="review">Review Queue</button><button class="secondary" data-view="continue">Continue Watching</button></div></div><div class="panel"><h3>What changed</h3><p class="note">V4.9 added Supabase submissions and review queue, but the Admin page still exposed the older browser/local form first. V4.9.1 puts Supabase tools first again and moves the older form into a clearly labelled Legacy tab.</p></div>'}
+var oldAdminPageV491=typeof adminPage==='function'?adminPage:null;
+adminPage=function(){
+  var legacy=oldAdminPageV491?String(oldAdminPageV491()):'';
+  var tb=topBar('Admin');
+  legacy=legacy.replace(tb,'');
+  return tb+'<div class="sb491Tabs"><button class="sb491TabBtn active" data-admin-tab="write">Supabase Write</button><button class="sb491TabBtn" data-admin-tab="tools">Supabase Tools</button><button class="sb491TabBtn" data-admin-tab="legacy">Browser / Local Legacy</button></div><div id="sb491tab_write" class="sb491Tab active">'+sb491SupabaseWritePanel()+'</div><div id="sb491tab_tools" class="sb491Tab">'+sb491SupabaseToolsPanel()+'</div><div id="sb491tab_legacy" class="sb491Tab"><div class="sb491Warn"><b>Legacy local tools:</b> these are the older browser/local Admin forms. They are kept so nothing is lost, but Supabase movie adding should use the Supabase Write tab.</div><div class="sb491Legacy">'+legacy+'</div></div>';
+};
+var oldBindAdminV491=typeof bindAdmin==='function'?bindAdmin:null;
+bindAdmin=function(){
+  if(oldBindAdminV491)oldBindAdminV491();
+  document.querySelectorAll('.sb491TabBtn').forEach(function(b){b.onclick=function(){var tab=b.dataset.adminTab;document.querySelectorAll('.sb491TabBtn').forEach(function(x){x.classList.toggle('active',x===b)});document.querySelectorAll('.sb491Tab').forEach(function(x){x.classList.remove('active')});var p=byId('sb491tab_'+tab);if(p)p.classList.add('active')}});
+  var save=byId('sb491Save');if(save)save.onclick=function(){sb491QuickAdd()};
+};
+var oldSettingsPageV491=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){var html=oldSettingsPageV491?oldSettingsPageV491():'';return String(html).replace(/V4\.9 Supabase Submit \+ Review Queue|V4\.8 Supabase Collections \+ Playlists|V4\.7\.2 Supabase Manager Tag Display Hotfix/g,SB491_LABEL)};
+var oldBackupPageV491=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){var html=oldBackupPageV491?oldBackupPageV491():'';return String(html).replace(/V4\.9 Supabase Submit \+ Review Queue|V4\.8 Supabase Collections \+ Playlists|V4\.7\.2 Supabase Manager Tag Display Hotfix/g,SB491_LABEL)};
+var oldBackupSummaryV491=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV491?oldBackupSummaryV491(d):'')+'\nV4.9.1 note: Admin page is Supabase-first again; legacy browser/local tools are moved behind a tab.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-9-1-admin-supabase-layout-restore-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.9.1 backup download started')};
+var oldRunTestsV491=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV491)oldRunTestsV491()}catch(e){console.warn('V4.9.1 inherited self-test warning:',e)}console.assert(typeof sb491QuickAdd==='function','V4.9.1 quick Supabase add exists');console.assert(typeof sb491SupabaseWritePanel==='function','V4.9.1 Supabase admin panel exists')};
+
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
