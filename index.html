@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Stream Bandit V3.8.5.1 Version Tidy + Boot Order Fix</title>
+<title>Stream Bandit V4.4 Supabase Watchlist + Favourites + Likes Test</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -2272,6 +2272,184 @@ backupSummary=function(d){return oldBackupSummaryV431(d)+'\nV4.3.1 note: Home pa
 exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typeof sb43EnsureDefault==='function')sb43EnsureDefault();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version='StreamBanditPrototype4.3.1-supabase-home-read-test';saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-3-1-supabase-home-read-test-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.3.1 backup download started')};
 var oldRunTestsV431=runTests;
 runTests=function(){try{oldRunTestsV431()}catch(e){console.warn('V4.3.1 self-test warning:',e)}console.assert(typeof sb431RemoteHomeHero==='function','V4.3.1 Supabase Home helper exists')};
+
+
+/* Stream Bandit V4.4 Supabase Watchlist / Favourites / Likes Test */
+var V44_LABEL='V4.4.1 Supabase Saves Page Hotfix';
+document.title='Stream Bandit V4.4 Supabase Watchlist + Favourites + Likes Test';
+var sb44StateLoaded=false;
+var sb44StateStatus='Not loaded yet';
+var sb44WatchlistIds=[];
+var sb44FavouriteIds=[];
+var sb44LikeIds=[];
+(function(){
+  var st=document.createElement('style');
+  st.textContent='\n.sb44Panel{border:1px solid #19c37d55;background:#08151e;border-radius:18px;padding:14px;margin:12px 0}.sb44Status{border:1px solid #6aa6ff55;background:#101827;border-radius:16px;padding:12px;margin:12px 0;color:#d7e9ff}.sb44Actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.sb44Actions button{white-space:nowrap}.sb44On{background:linear-gradient(135deg,#20c997,#0b8f72)!important}.sb44Off{background:#25283a!important;border:1px solid var(--line)!important}.sb44Tiny{font-size:12px;color:var(--muted);margin-top:8px}.sb44Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:10px 0}.sb44Tile{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:11px}.sb44Tile b{display:block;color:var(--muted);font-size:12px}.sb44Tile span{font-size:20px;font-weight:900}';
+  document.head.appendChild(st);
+})();
+function sb44ListHas(list,id){return (list||[]).map(String).indexOf(String(id))>-1}
+function sb44RemoveId(list,id){id=String(id);return (list||[]).filter(function(x){return String(x)!==id})}
+function sb44FindRemoteSet(ids){return (sbRemoteMovies||[]).filter(function(m){return sb44ListHas(ids,m.id)})}
+function sb44Tile(label,value){return '<div class="sb44Tile"><b>'+esc(label)+'</b><span>'+esc(value)+'</span></div>'}
+async function sb44LoadRemoteStates(repaint){
+  try{
+    var c=sbInit();
+    if(!c){sb44StateStatus='Supabase SDK not loaded';if(repaint)render();return false}
+    if(!sbSession||!sbSession.user){
+      var ses=await c.auth.getSession();
+      sbSession=ses&&ses.data?ses.data.session:null;
+    }
+    if(!sbSession||!sbSession.user){sb44StateLoaded=false;sb44StateStatus='Not logged into Supabase';if(repaint)render();return false}
+    var uid=sbSession.user.id;
+    var results=await Promise.all([
+      c.from('sb_watchlist').select('movie_id').eq('user_id',uid),
+      c.from('sb_favourites').select('movie_id').eq('user_id',uid),
+      c.from('sb_likes').select('movie_id').eq('user_id',uid)
+    ]);
+    for(var i=0;i<results.length;i++){if(results[i].error)throw results[i].error}
+    sb44WatchlistIds=(results[0].data||[]).map(function(r){return r.movie_id});
+    sb44FavouriteIds=(results[1].data||[]).map(function(r){return r.movie_id});
+    sb44LikeIds=(results[2].data||[]).map(function(r){return r.movie_id});
+    sb44StateLoaded=true;
+    sb44StateStatus='Loaded Supabase saves: Watchlist '+sb44WatchlistIds.length+', favourites '+sb44FavouriteIds.length+', likes '+sb44LikeIds.length;
+    if(repaint)render();
+    return true;
+  }catch(e){sb44StateLoaded=false;sb44StateStatus='Could not load Supabase saves: '+(e.message||e);if(repaint)render();return false}
+}
+async function sb44ToggleRemote(kind,id){
+  var c=sbInit();
+  if(!c)return toast('Supabase SDK not loaded');
+  if(!sbSession||!sbSession.user){await sb44LoadRemoteStates(false)}
+  if(!sbSession||!sbSession.user)return toast('Log into Supabase first');
+  var cfg={watchlist:{table:'sb_watchlist',list:'sb44WatchlistIds',on:'✓ In Watchlist',off:'+ Watch Later'},favourite:{table:'sb_favourites',list:'sb44FavouriteIds',on:'♥ Favourite Saved',off:'♡ Favourite'},like:{table:'sb_likes',list:'sb44LikeIds',on:'👍 Liked',off:'👍 Like'}}[kind];
+  if(!cfg||!id)return;
+  var uid=sbSession.user.id;
+  var arr=kind==='watchlist'?sb44WatchlistIds:(kind==='favourite'?sb44FavouriteIds:sb44LikeIds);
+  var exists=sb44ListHas(arr,id);
+  var res=exists?await c.from(cfg.table).delete().eq('user_id',uid).eq('movie_id',id):await c.from(cfg.table).upsert({user_id:uid,movie_id:id});
+  if(res.error)return toast('Supabase save failed: '+res.error.message);
+  await sb44LoadRemoteStates(false);
+  sb44StateLoaded=true;
+  sb44StateStatus='Updated Supabase saves. Open Watchlist/Favourites/Liked or press refresh to confirm.';
+  toast(exists?'Removed from Supabase '+kind:'Saved to Supabase '+kind);
+  render();
+}
+function sb44RemoteActions(id){
+  var w=sb44ListHas(sb44WatchlistIds,id),f=sb44ListHas(sb44FavouriteIds,id),l=sb44ListHas(sb44LikeIds,id);
+  return '<div class="sb44Actions"><button class="secondary small sbRemoteState '+(w?'sb44On':'sb44Off')+'" data-kind="watchlist" data-id="'+esc(id)+'">'+(w?'✓ In Watchlist':'+ Watch Later')+'</button><button class="secondary small sbRemoteState '+(f?'sb44On':'sb44Off')+'" data-kind="favourite" data-id="'+esc(id)+'">'+(f?'♥ Favourite Saved':'♡ Favourite')+'</button><button class="secondary small sbRemoteState '+(l?'sb44On':'sb44Off')+'" data-kind="like" data-id="'+esc(id)+'">'+(l?'👍 Liked':'👍 Like')+'</button></div>';
+}
+var oldSbLoadRemoteLibraryV44=sbLoadRemoteLibrary;
+sbLoadRemoteLibrary=async function(){
+  await oldSbLoadRemoteLibraryV44();
+  await sb44LoadRemoteStates(false);
+  render();
+};
+var oldSbRemoteCardV44=sbRemoteCard;
+sbRemoteCard=function(m){
+  var src=sbMovieSource(m), genres=sbMovieGenres(m), thumb=(m.thumbnail_url||'');
+  return '<div class="sbRemoteCard"><div class="sbRemoteThumb">'+(thumb?'<img src="'+esc(thumb)+'">':'<span>Supabase movie</span>')+(m.featured?'<span class="badge">Featured</span>':'')+'</div><div class="sbRemoteBody"><h3>'+esc(m.title||'Untitled')+'</h3><p class="muted">'+esc((m.description||'').slice(0,150))+'</p><div class="sbMiniMeta"><span>'+esc(sbMovieType(m))+'</span><span>'+esc(sbMovieChannel(m))+'</span>'+genres.slice(0,3).map(function(g){return '<span>'+esc(g)+'</span>'}).join('')+'</div><div class="row"><button class="small sbPlayRemote" data-id="'+esc(m.id)+'" '+(!src?'disabled':'')+'>Play</button><button class="secondary small sbDetailRemote" data-id="'+esc(m.id)+'">Details</button></div>'+sb44RemoteActions(m.id)+'</div></div>';
+};
+var oldSbRemoteDetailPageV44=sbRemoteDetailPage;
+sbRemoteDetailPage=function(){
+  var m=sbFindRemoteMovie(sbRemoteSelectedId);
+  if(!m)return oldSbRemoteDetailPageV44();
+  var genres=sbMovieGenres(m), cast=(m.cast_text&&typeof cleanCastText==='function')?cleanCastText(m.cast_text):(m.cast_text||'');
+  return topBar('Supabase Details')+'<div class="panel"><h2>'+esc(m.title||'Untitled')+'</h2><div class="sbMiniMeta"><span>'+esc(sbMovieType(m))+'</span><span>'+esc(sbMovieChannel(m))+'</span>'+genres.map(function(g){return '<span>'+esc(g)+'</span>'}).join('')+'</div><p>'+esc(m.description||'')+'</p><div class="sbDetailStats">'+cardStat('Year',m.year||'—')+cardStat('Rating',m.rating||'—')+cardStat('Runtime',m.runtime_text||'—')+cardStat('Age rating',m.age_rating||'—')+'</div>'+(m.director?'<p><b>Director:</b> '+esc(m.director)+'</p>':'')+(cast?'<div class="panel"><h3>Cast</h3><p class="sbDetailCast">'+esc(cast)+'</p></div>':'')+'<div class="row"><button class="small sbPlayRemote" data-id="'+esc(m.id)+'">Play from Supabase</button><button class="secondary" data-view="supabaselibrary">Back to Supabase Library</button></div>'+sb44RemoteActions(m.id)+'</div>';
+};
+var oldSbRemoteWatchPageV44=sbRemoteWatchPage;
+sbRemoteWatchPage=function(){
+  var html=oldSbRemoteWatchPageV44();
+  var m=sbFindRemoteMovie(sbRemoteSelectedId);
+  if(m&&html.indexOf('sb44Actions')<0){html=html.replace('<div class="sbRemoteNote">',sb44RemoteActions(m.id)+'<div class="sbRemoteNote">')}
+  return html;
+};
+
+function sb441EnsureSavesReady(){
+  if(!(data.settings&&data.settings.useSupabaseLibrary))return;
+  if(sb44StateLoaded && sbRemoteMovies && sbRemoteMovies.length)return;
+  setTimeout(async function(){
+    try{
+      if(!sbRemoteMovies || !sbRemoteMovies.length){
+        if(typeof sbLoadRemoteLibrary==='function') await sbLoadRemoteLibrary();
+      }else{
+        await sb44LoadRemoteStates(true);
+      }
+    }catch(e){
+      sb44StateStatus='Could not refresh Supabase save pages: '+(e.message||e);
+      render();
+    }
+  },50);
+}
+var oldWatchlistPageV44=watchlistPage;
+watchlistPage=function(){
+  if(!(data.settings&&data.settings.useSupabaseLibrary))return oldWatchlistPageV44();
+  sb441EnsureSavesReady();
+  var arr=sb44FindRemoteSet(sb44WatchlistIds);
+  return topBar('Watchlist')+'<div class="sb44Panel"><h3>Supabase Watchlist</h3><p class="note">V4.4 saves Watch Later to Supabase for your logged-in admin profile. Browser/local fallback is still available if you switch Library source.</p><div class="sb44Grid">'+sb44Tile('Session',sbSession&&sbSession.user?'Logged in':'Not logged in')+sb44Tile('Saved',sb44WatchlistIds.length)+sb44Tile('Loaded movies',sbRemoteMovies.length)+'</div><div class="row"><button class="good" id="sb44RefreshStates">Refresh Supabase saves</button><button class="secondary" data-view="library">Open Library</button></div></div><div class="sb44Status">'+esc(sb44StateStatus)+'</div>'+(arr.length?'<div class="sbRemoteGrid">'+arr.map(sbRemoteCard).join('')+'</div>':'<div class="empty">No Supabase Watchlist saves yet. Press Watch Later on a Supabase movie card.</div>');
+};
+var oldFavouritesPageV44=favouritesPage;
+favouritesPage=function(){
+  if(!(data.settings&&data.settings.useSupabaseLibrary))return oldFavouritesPageV44();
+  sb441EnsureSavesReady();
+  var arr=sb44FindRemoteSet(sb44FavouriteIds);
+  return topBar('Favourites')+'<div class="sb44Panel"><h3>Supabase Favourites</h3><p class="note">V4.4 saves favourites to Supabase and reads them back on refresh.</p><div class="sb44Grid">'+sb44Tile('Session',sbSession&&sbSession.user?'Logged in':'Not logged in')+sb44Tile('Favourites',sb44FavouriteIds.length)+sb44Tile('Loaded movies',sbRemoteMovies.length)+'</div><div class="row"><button class="good" id="sb44RefreshStates">Refresh Supabase saves</button><button class="secondary" data-view="library">Open Library</button></div></div><div class="sb44Status">'+esc(sb44StateStatus)+'</div>'+(arr.length?'<div class="sbRemoteGrid">'+arr.map(sbRemoteCard).join('')+'</div>':'<div class="empty">No Supabase favourites yet. Press Favourite on a Supabase movie card.</div>');
+};
+function sb44LikedPage(){
+  sb441EnsureSavesReady();
+  var arr=sb44FindRemoteSet(sb44LikeIds);
+  return topBar('Liked')+'<div class="sb44Panel"><h3>Supabase Liked Movies</h3><p class="note">Likes are now stored in Supabase too. This page is a simple check page for the liked rows.</p><div class="sb44Grid">'+sb44Tile('Session',sbSession&&sbSession.user?'Logged in':'Not logged in')+sb44Tile('Likes',sb44LikeIds.length)+sb44Tile('Loaded movies',sbRemoteMovies.length)+'</div><div class="row"><button class="good" id="sb44RefreshStates">Refresh Supabase saves</button><button class="secondary" data-view="library">Open Library</button></div></div><div class="sb44Status">'+esc(sb44StateStatus)+'</div>'+(arr.length?'<div class="sbRemoteGrid">'+arr.map(sbRemoteCard).join('')+'</div>':'<div class="empty">No Supabase likes yet. Press Like on a Supabase movie card.</div>');
+}
+var oldPageV44=page;
+page=function(){if(view==='liked')return sb44LikedPage();return oldPageV44()};
+var oldSidebarV44=sidebar;
+sidebar=function(){var html=oldSidebarV44();html=html.replace(/V4\.3\.1 Supabase Home Read Test|V4\.3 Supabase Default Library Mode|V4\.2\.1 Live Readiness Check|V3\.8\.7\.1 Stable Prep/g,V44_LABEL);if(html.indexOf('data-view="liked"')<0){html=html.replace(nav('favourites','❤️ Favourites'),nav('favourites','❤️ Favourites')+nav('liked','👍 Liked'))}return html};
+var oldBindCommonV44=bindCommon;
+bindCommon=function(){
+  oldBindCommonV44();
+  document.querySelectorAll('.sbRemoteState').forEach(function(b){b.onclick=function(){sb44ToggleRemote(b.dataset.kind,b.dataset.id)}});
+  var r=byId('sb44RefreshStates');if(r)r.onclick=function(){sb44LoadRemoteStates(true)};
+};
+var oldAdminPageV44=adminPage;
+adminPage=function(){var html=oldAdminPageV44();if(html.indexOf('V4.4 Supabase Saves')<0){html=html.replace('</div></div><div class="panel">','</div></div><div class="panel"><h3>V4.4 Supabase Saves</h3><p class="note">Watchlist, favourites and likes now save to Supabase when Supabase mode is active.</p><div class="row"><button class="secondary" data-view="watchlist">Open Watchlist</button><button class="secondary" data-view="favourites">Open Favourites</button><button class="secondary" data-view="liked">Open Liked</button></div></div><div class="panel">')}return html};
+var oldSb421LiveReadinessPageV44=typeof sb421LiveReadinessPage==='function'?sb421LiveReadinessPage:null;
+if(oldSb421LiveReadinessPageV44){sb421LiveReadinessPage=function(){var html=oldSb421LiveReadinessPageV44();if(html.indexOf('Supabase user saves')<0){html=html.replace('</div><div class="panel"><h3>Readiness checklist</h3>','</div><div class="sb44Panel"><h3>Supabase user saves</h3><p>V4.4 connects Watchlist, Favourites and Likes to Supabase. Test buttons from Home, Library and Details, then refresh the saves pages.</p><div class="sb44Grid">'+sb44Tile('Watchlist',sb44WatchlistIds.length)+sb44Tile('Favourites',sb44FavouriteIds.length)+sb44Tile('Likes',sb44LikeIds.length)+'</div></div><div class="panel"><h3>Readiness checklist</h3>')}return html.replace(/V4\.3\.1 Live Readiness|V4\.3 Live Readiness/g,'V4.4 Live Readiness')}}
+var oldSettingsPageV44=settingsPage;
+settingsPage=function(){return oldSettingsPageV44().replace(/V4\.3\.1 Supabase Home Read Test|V4\.3 Supabase Default Library Mode|V4\.2\.1 Live Readiness Check|V3\.8\.7\.1 Stable Prep/g,V44_LABEL)};
+var oldBackupSummaryV44=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV44(d)+'\nV4.4 note: Supabase Watchlist, Favourites and Likes button/state test added.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typeof sb43EnsureDefault==='function')sb43EnsureDefault();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version='StreamBanditPrototype4.4-supabase-user-saves-test';saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-4-supabase-user-saves-test-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.4 backup download started')};
+var oldRunTestsV44=runTests;
+runTests=function(){try{oldRunTestsV44()}catch(e){console.warn('V4.4 self-test warning:',e)}console.assert(typeof sb44ToggleRemote==='function','V4.4 remote toggle helper exists');console.assert(typeof sb44LikedPage==='function','V4.4 liked page exists')};
+
+
+/* Stream Bandit V4.4.2 Supabase Menu Count Hotfix */
+var V442_LABEL='V4.4.2 Supabase Menu Count Hotfix';
+document.title='Stream Bandit V4.4.2 Supabase Menu Count Hotfix';
+function sb442SupabaseCountsActive(){return !!(data&&data.settings&&data.settings.useSupabaseLibrary)}
+function sb442CountBadge(n){n=Number(n)||0;return n?'<span class="navCount">'+n+'</span>':''}
+var oldSidebarV442=sidebar;
+sidebar=function(){
+  var html=oldSidebarV442();
+  html=html.replace(/V4\.4\.1 Supabase Saves Page Hotfix|V4\.4 Supabase Watchlist \+ Favourites \+ Likes Test|V4\.3\.1 Supabase Home Read Test|V4\.3 Supabase Default Library Mode|V4\.2\.1 Live Readiness Check|V3\.8\.7\.1 Stable Prep/g,V442_LABEL);
+  if(sb442SupabaseCountsActive()){
+    var w=(sb44WatchlistIds||[]).length;
+    var f=(sb44FavouriteIds||[]).length;
+    var l=(sb44LikeIds||[]).length;
+    html=html.replace(/<button data-view="watchlist" class="[^"]*">[\s\S]*?<\/button>/,nav('watchlist','📌 Watchlist '+sb442CountBadge(w)));
+    html=html.replace(/<button data-view="favourites" class="[^"]*">[\s\S]*?<\/button>/,nav('favourites','❤️ Favourites '+sb442CountBadge(f)));
+    if(html.indexOf('data-view="liked"')>=0){
+      html=html.replace(/<button data-view="liked" class="[^"]*">[\s\S]*?<\/button>/,nav('liked','👍 Liked '+sb442CountBadge(l)));
+    }
+  }
+  return html;
+};
+var oldSettingsPageV442=settingsPage;
+settingsPage=function(){return oldSettingsPageV442().replace(/V4\.4\.1 Supabase Saves Page Hotfix|V4\.4 Supabase Watchlist \+ Favourites \+ Likes Test/g,V442_LABEL)};
+var oldBackupSummaryV442=backupSummary;
+backupSummary=function(d){return oldBackupSummaryV442(d)+'\nV4.4.2 note: Supabase menu counts now follow Supabase Watchlist, Favourites and Likes when Supabase mode is active.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);if(typeof sb43EnsureDefault==='function')sb43EnsureDefault();data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version='StreamBanditPrototype4.4.2-supabase-menu-count-hotfix';saveData(true);var j=JSON.stringify(data,null,2);byId('backupBox').value=j;var a=document.createElement('a');var url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-4-2-supabase-menu-count-hotfix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.4.2 backup download started')};
+var oldRunTestsV442=runTests;
+runTests=function(){try{oldRunTestsV442()}catch(e){console.warn('V4.4.2 self-test warning:',e)}console.assert(typeof sb442CountBadge==='function','V4.4.2 menu count helper exists')};
 
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
