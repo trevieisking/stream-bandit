@@ -4167,6 +4167,89 @@ backupSummary=function(d){return (oldBackupSummaryV4141?oldBackupSummaryV4141(d)
 exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-14-1-continue-watching-progress-trigger-hotfix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.14.1 emergency backup download started')};
 runTests=function(){console.assert(APP_VERSION==='StreamBanditPrototype4.14.1-continue-watching-progress-trigger-hotfix','V4.14.1 version set');console.assert(typeof sb4141BindRemoteProgress==='function','V4.14.1 progress binder exists');console.assert(typeof bindSbRemoteWatch==='function','V4.14.1 remote watch binder exists');};
 
+/* Stream Bandit V5.0 — Stable Supabase Release Cleanup + Page Tabs + Admin Upload Restore
+   This is the first stable Supabase-release tidy pass.
+   It keeps V4.14.1 progress saving, adds cleaner tabbed detail pages, and makes the admin browser-video uploader easy to find again. */
+var SB50_LABEL='V5.0 Stable Supabase Release Cleanup + Tabs + Admin Uploader';
+try{
+  APP_VERSION='StreamBanditPrototype5.0-stable-supabase-release-tabs-admin-uploader';
+  if(data)data.version=APP_VERSION;
+  document.title='Stream Bandit V5.0 Stable Supabase Release Cleanup';
+  if(typeof SB4141_LABEL!=='undefined')SB4141_LABEL=SB50_LABEL;
+  if(typeof SB414_LABEL!=='undefined')SB414_LABEL=SB50_LABEL;
+  if(typeof SB4132_LABEL!=='undefined')SB4132_LABEL=SB50_LABEL;
+  if(typeof SB4131_LABEL!=='undefined')SB4131_LABEL=SB50_LABEL;
+  if(typeof SB4121_LABEL!=='undefined')SB4121_LABEL=SB50_LABEL;
+  if(typeof SB412_LABEL!=='undefined')SB412_LABEL=SB50_LABEL;
+}catch(e){console.warn('V5.0 label warning',e)}
+(function(){
+  var css='\n.sb50Release{background:linear-gradient(135deg,#11131e,#071f21);border:1px solid #19c37d66;border-radius:22px;padding:16px;margin-bottom:16px}.sb50Tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.sb50TabBtn{background:#25283a;border:1px solid var(--line);padding:8px 11px;border-radius:999px}.sb50TabBtn.active{background:linear-gradient(135deg,var(--a),var(--b));color:#fff}.sb50TabPanel{display:none}.sb50TabPanel.active{display:block}.sb50HeroGrid{display:grid;grid-template-columns:minmax(240px,.85fr) minmax(280px,1.15fr);gap:16px;align-items:start}.sb50Poster{aspect-ratio:16/9;border-radius:22px;overflow:hidden;background:#07070b;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted)}.sb50Poster img{width:100%;height:100%;object-fit:cover}.sb50UploadCallout{border:1px solid #6aa6ff66;background:#101827;border-radius:18px;padding:13px;margin:10px 0;color:#d7e9ff}.sb50CleanTitle{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sb50CleanTitle h3{margin:0}.sb50SmallNote{font-size:12px;color:var(--muted);line-height:1.45}@media(max-width:900px){.sb50HeroGrid{grid-template-columns:1fr}}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function sb50TabShell(id,tabs){
+  var buttons=tabs.map(function(t,i){return '<button type="button" class="sb50TabBtn '+(i===0?'active':'')+'" data-sbtab="'+esc(id)+'" data-sbtarget="'+esc(t.key)+'">'+esc(t.label)+'</button>'}).join('');
+  var panels=tabs.map(function(t,i){return '<div class="sb50TabPanel '+(i===0?'active':'')+'" data-sbpanel="'+esc(id)+'" data-sbkey="'+esc(t.key)+'">'+t.html+'</div>'}).join('');
+  return '<div class="sb50Tabs">'+buttons+'</div>'+panels;
+}
+function sb50ReleasePanel(page){
+  return '<div class="sb50Release"><div class="sb50CleanTitle"><h3>'+esc(SB50_LABEL)+'</h3><span class="pill">Supabase-first</span><span class="pill">Stable checkpoint</span></div><p class="note">'+esc(page||'This page')+' is now part of the stable Supabase release tidy pass. Older browser/local tools remain available as emergency fallback, but connected app pages read from Supabase first.</p></div>';
+}
+function sb50MetaTile(label,value){return '<div class="infoTile"><b>'+esc(label)+'</b><span>'+esc(value||'—')+'</span></div>'}
+function sb50RemoteGenres(m){try{return typeof sbMovieGenres==='function'?sbMovieGenres(m):(Array.isArray(m.genres)?m.genres:[])}catch(e){return Array.isArray(m&&m.genres)?m.genres:[]}}
+function sb50RemoteSource(m){try{return typeof sbMovieSource==='function'?sbMovieSource(m):((m&&m.mux_playback_url)||(m&&m.video_url)||'')}catch(e){return (m&&m.mux_playback_url)||(m&&m.video_url)||''}}
+function sb50RemoteThumb(m){return (m&&(m.thumbnail_url||m.poster_url||m.image_url||''))||''}
+function sb50RemoteChannel(m){return (m&&m.sb_channels&&m.sb_channels.name)||m.channel_name||'Stream Bandit'}
+var oldDetailPageV50=typeof detailPage==='function'?detailPage:null;
+detailPage=function(){
+  var v=data&&data.videos?data.videos[selected]:null;
+  if(!v||!oldDetailPageV50)return oldDetailPageV50?oldDetailPageV50():'';
+  var genres=(typeof videoGenres==='function'?videoGenres(v):(v.genres||[v.genre||'General']));
+  var cast=(typeof castMarkup==='function'?castMarkup(v.cast):'');
+  var embed=(typeof trailerEmbedUrl==='function'?trailerEmbedUrl(v.trailerUrl):v.trailerUrl);
+  var poster=v.thumb||'';
+  var overview='<div class="panel"><div class="sb50HeroGrid"><div class="sb50Poster">'+(poster?'<img src="'+esc(poster)+'">':'No poster')+'</div><div><h2>'+esc(v.title||'Untitled')+'</h2><p class="muted">'+esc(v.desc||'No description yet.')+'</p><div class="row">'+genres.map(function(g){return '<span class="pill">'+esc(g)+'</span>'}).join('')+'<span class="pill">'+esc(v.channel||'No channel')+'</span>'+(typeof sourcePill==='function'?sourcePill(v):'')+'</div><div class="movieInfoGrid">'+sb50MetaTile('Year',v.year)+sb50MetaTile('Rating',v.rating)+sb50MetaTile('Runtime',v.runtimeText||(typeof fmtTime==='function'?fmtTime(v.duration):''))+sb50MetaTile('Age rating',v.ageRating)+sb50MetaTile('Director',v.director)+'</div><div class="row"><button class="play" data-i="'+selected+'">Play / Resume</button><button class="secondary" data-view="library">Back to Library</button></div></div></div></div>';
+  var people='<div class="panel"><h3>Cast & Crew</h3>'+(cast?cast:'<div class="empty">No cast added yet.</div>')+'</div>';
+  var media='<div class="panel"><h3>Trailer / Extras</h3>'+(embed?'<iframe class="trailerFrame" src="'+esc(embed)+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>':'<div class="empty">No trailer added yet.</div>')+'</div>';
+  var library='<div class="panel"><h3>Library details</h3><div class="movieInfoGrid">'+sb50MetaTile('Tags',(v.tags||[]).join(', '))+sb50MetaTile('Source',v.localVideoId?'Browser local upload':(v.url?'URL / stream link':'No source'))+sb50MetaTile('Resume',(typeof fmtTime==='function'?fmtTime(progressFor(selected)):'0:00'))+'</div>'+(typeof collectionLinks==='function'?collectionLinks(selected):'')+'<div class="row"><button class="secondary fav" data-i="'+selected+'">Favourite</button><button class="secondary like" data-i="'+selected+'">Like</button></div></div>';
+  return topBar('Movie Details')+sb50ReleasePanel('Movie details')+sb50TabShell('localDetail',[{key:'overview',label:'Overview',html:overview},{key:'cast',label:'Cast & Crew',html:people},{key:'media',label:'Trailer',html:media},{key:'library',label:'Library Info',html:library}]);
+};
+var oldSbRemoteDetailPageV50=typeof sbRemoteDetailPage==='function'?sbRemoteDetailPage:null;
+sbRemoteDetailPage=function(){
+  var m=(typeof sbFindRemoteMovie==='function')?sbFindRemoteMovie(sbRemoteSelectedId):null;
+  if(!m)return oldSbRemoteDetailPageV50?oldSbRemoteDetailPageV50():topBar('Supabase Details')+'<div class="empty">Movie not loaded.</div>';
+  var genres=sb50RemoteGenres(m), src=sb50RemoteSource(m), thumb=sb50RemoteThumb(m), cast=(m.cast_text&&typeof cleanCastText==='function')?cleanCastText(m.cast_text):(m.cast_text||'');
+  var overview='<div class="panel"><div class="sb50HeroGrid"><div class="sb50Poster">'+(thumb?'<img src="'+esc(thumb)+'">':'No poster')+'</div><div><h2>'+esc(m.title||'Untitled')+'</h2><p class="muted">'+esc(m.description||'No description yet.')+'</p><div class="row"><span class="pill">Supabase</span>'+genres.map(function(g){return '<span class="pill">'+esc(g)+'</span>'}).join('')+'<span class="pill">'+esc(sb50RemoteChannel(m))+'</span></div><div class="movieInfoGrid">'+sb50MetaTile('Year',m.year)+sb50MetaTile('Rating',m.rating)+sb50MetaTile('Runtime',m.runtime_text)+sb50MetaTile('Age rating',m.age_rating)+sb50MetaTile('Source',src?'Playable':'No playable source')+'</div><div class="row"><button class="small sbPlayRemote" data-id="'+esc(m.id)+'" '+(!src?'disabled':'')+'>Play / Resume</button><button class="secondary" data-view="library">Back to Library</button></div></div></div></div>';
+  var castTab='<div class="panel"><h3>Cast & Crew</h3>'+(cast?(typeof castMarkup==='function'?castMarkup(cast):'<pre>'+esc(cast)+'</pre>'):'<div class="empty">No cast added yet.</div>')+'</div>';
+  var extras='<div class="panel"><h3>Trailer / Extras</h3>'+(m.trailer_url?'<button class="secondary trailerOpen" data-url="'+esc(m.trailer_url)+'">Open Trailer</button>':'<div class="empty">No trailer added yet.</div>')+'</div>';
+  var dataTab='<div class="panel"><h3>Supabase row details</h3><div class="movieInfoGrid">'+sb50MetaTile('Movie ID',m.id)+sb50MetaTile('Status',m.status||'published')+sb50MetaTile('Tags',(Array.isArray(m.tags)?m.tags:[]).join(', '))+sb50MetaTile('Channel',sb50RemoteChannel(m))+'</div><div class="row">'+(typeof sb44RemoteActions==='function'?sb44RemoteActions(m.id):'')+(isAdmin()?'<button class="secondary" data-view="supabasemanager">Open Supabase Manager</button>':'')+'</div></div>';
+  return topBar('Supabase Details')+sb50ReleasePanel('Supabase movie details')+sb50TabShell('remoteDetail',[{key:'overview',label:'Overview',html:overview},{key:'cast',label:'Cast & Crew',html:castTab},{key:'media',label:'Trailer',html:extras},{key:'data',label:'Supabase Info',html:dataTab}]);
+};
+var oldSupabaseManagerPageV50=typeof supabaseManagerPage==='function'?supabaseManagerPage:null;
+supabaseManagerPage=function(){
+  var base=oldSupabaseManagerPageV50?oldSupabaseManagerPageV50():topBar('Supabase Movie Manager')+'<div class="empty">Manager unavailable.</div>';
+  var uploader='<div class="panel"><h3>Admin Video Uploader Restored</h3><div class="sb50UploadCallout"><b>Admin uploads are back and easy to find.</b><br>This is the browser/local admin uploader from the earlier Stream Bandit builds. It lets you choose an MP4/WebM/MOV file for testing on this computer. Supabase still uses URL/Mux/HLS links until we choose paid Supabase Storage or another proper storage backend.</div><div class="row"><button class="good" data-view="admin">Open Admin Upload Form</button><button class="secondary" data-view="storage">Check Browser Video Storage</button><button class="secondary" data-view="backup">Backup First</button></div><p class="sb50SmallNote">Best route now: use Supabase Manager for public Supabase movie rows, and use Admin Upload Form for local browser upload tests. Later, V5.x can connect true cloud video uploads when storage is ready.</p></div>';
+  return base.replace('<div id="sb47Status"',uploader+'<div id="sb47Status"');
+};
+var oldAdminPageV50=typeof adminPage==='function'?adminPage:null;
+adminPage=function(){
+  var base=oldAdminPageV50?oldAdminPageV50():'';
+  var panel=sb50ReleasePanel('Admin')+'<div class="panel"><h3>Admin upload centre</h3><div class="sb50Tabs"><button type="button" class="sb50TabBtn active" data-sbtab="adminUpload" data-sbtarget="local">Browser Video Uploads</button><button type="button" class="sb50TabBtn" data-sbtab="adminUpload" data-sbtarget="supabase">Supabase Movie Rows</button><button type="button" class="sb50TabBtn" data-sbtab="adminUpload" data-sbtarget="safety">Safety</button></div><div class="sb50TabPanel active" data-sbpanel="adminUpload" data-sbkey="local"><p class="note">Use the restored video-file uploader below for local MP4/WebM/MOV tests. This keeps your earlier admin upload workflow available.</p></div><div class="sb50TabPanel" data-sbpanel="adminUpload" data-sbkey="supabase"><p class="note">Use Supabase Manager for rows that should work from GitHub for everyone. Those rows should use a direct URL, Mux, HLS, or later Supabase Storage URL.</p><button class="secondary" data-view="supabasemanager">Open Supabase Manager</button></div><div class="sb50TabPanel" data-sbpanel="adminUpload" data-sbkey="safety"><p class="note">Before big uploads or edits, export Backup JSON and keep original video files safe. Browser-local uploads do not travel to other devices.</p><button class="secondary" data-view="backup">Open Backup</button></div></div>';
+  return String(base).replace(topBar('Admin'),topBar('Admin')+panel);
+};
+var oldSettingsPageV50=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){var html=oldSettingsPageV50?oldSettingsPageV50():'';return String(html).replace(/V4\.14\.1 Continue Watching Progress Trigger Hotfix|V4\.14 Backup \/ Health \/ Storage Supabase Cleanup|V4\.13\.2 Settings Page Standalone Render Fix|V4\.12\.1 Supabase Genres Button Binding Hotfix|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V3\.7\.3 Storage Rescue \+ URL\/Upload Reliability Fix|V3\.4\.1 Homepage Readability Patch/g,SB50_LABEL)};
+var oldSidebarV50=typeof sidebar==='function'?sidebar:null;
+sidebar=function(){var html=oldSidebarV50?oldSidebarV50():'';return String(html).replace(/V4\.14\.1 Continue Watching Progress Trigger Hotfix|V4\.14 Backup \/ Health \/ Storage Supabase Cleanup|V4\.13\.2 Settings Page Standalone Render Fix|V4\.12\.1 Supabase Genres Button Binding Hotfix|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V4\.9|V3\.7\.3 Storage Rescue \+ URL\/Upload Reliability Fix/g,SB50_LABEL)};
+var oldBindCommonV50=typeof bindCommon==='function'?bindCommon:null;
+bindCommon=function(){
+  if(oldBindCommonV50)oldBindCommonV50();
+  document.querySelectorAll('.sb50TabBtn').forEach(function(btn){btn.onclick=function(){var tab=btn.getAttribute('data-sbtab'),target=btn.getAttribute('data-sbtarget');document.querySelectorAll('.sb50TabBtn[data-sbtab="'+tab+'"]').forEach(function(b){b.classList.toggle('active',b===btn)});document.querySelectorAll('.sb50TabPanel[data-sbpanel="'+tab+'"]').forEach(function(p){p.classList.toggle('active',p.getAttribute('data-sbkey')===target)});};});
+};
+var oldBackupSummaryV50=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV50?oldBackupSummaryV50(d):'')+'\nV5.0 note: stable Supabase release cleanup added tabbed detail pages and restored quick access to the admin browser video uploader.';};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v5-0-stable-supabase-release-tabs-admin-uploader-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V5.0 backup download started')};
+runTests=function(){console.assert(APP_VERSION==='StreamBanditPrototype5.0-stable-supabase-release-tabs-admin-uploader','V5.0 version set');console.assert(typeof sb50TabShell==='function','V5.0 tabs helper exists');console.assert(typeof supabaseManagerPage==='function','V5.0 Supabase manager page exists');};
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
