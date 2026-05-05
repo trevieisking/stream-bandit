@@ -3766,6 +3766,217 @@ exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);da
 var oldRunTestsV4121=typeof runTests==='function'?runTests:null;
 runTests=function(){try{if(oldRunTestsV4121)oldRunTestsV4121();}catch(e){console.warn('V4.12.1 inherited self-test warning:',e)}console.assert(typeof sb4121RefreshRemote==='function','V4.12.1 refresh hotfix exists');console.assert(APP_VERSION==='StreamBanditPrototype4.12.1-supabase-genres-button-binding-hotfix','V4.12.1 version set')};
 
+
+/* Stream Bandit V4.13.1 — Supabase Settings Startup Safety Fix
+   Rebuilds the V4.13 Settings/Branding upgrade on the safe V4.12.1 base.
+   Important: all V4.13.1 wrapper variable names are unique, so old V4.1.3 helpers cannot recurse. */
+var SB4131_LABEL='V4.13.1 Supabase Settings Startup Safety Fix';
+var sb4131Status='Ready. Settings can be loaded from or saved to Supabase.';
+try{
+  APP_VERSION='StreamBanditPrototype4.13.1-supabase-settings-startup-safety-fix';
+  if(data)data.version=APP_VERSION;
+  document.title='Stream Bandit V4.13.1 Supabase Settings Startup Safety Fix';
+  if(typeof SB4121_LABEL!=='undefined')SB4121_LABEL=SB4131_LABEL;
+  if(typeof SB412_LABEL!=='undefined')SB412_LABEL=SB4131_LABEL;
+}catch(e){console.warn('V4.13.1 label warning',e)}
+function sb4131SetStatus(m,quiet){sb4131Status=m||'';try{if(!quiet)toast(m)}catch(e){}}
+function sb4131Err(e){return (e&&(e.message||e.details||e.hint))?String(e.message||e.details||e.hint):String(e||'Unknown error')}
+function sb4131CleanSettings(st){
+  st=st||{};
+  var old=data&&data.settings?data.settings:{};
+  var defaults=(typeof seed!=='undefined'&&seed&&seed.settings)?seed.settings:{};
+  var out={};
+  ['appName','tagline','loginText','heroTitle','heroText','homeShowHero','homeShowContinue','homeShowFeaturedPlaylist','homeShowNewUploads','homeShowCollections','homeShowLocalVideos','homeShowUrlVideos','homeShowAdminPicks','homeShowGenrePicks','homeFeaturedPlaylist','homeSpotlightVideo','accentA','accentB','playerAudioBoost','playerJumpSeconds','largePlayerControls','highContrastText','useSupabaseLibrary','supabaseDefaultSince','v43DefaultApplied'].forEach(function(k){
+    if(st[k]!==undefined)out[k]=st[k];
+    else if(old[k]!==undefined)out[k]=old[k];
+    else if(defaults[k]!==undefined)out[k]=defaults[k];
+  });
+  out.logo=(st.logo!==undefined)?st.logo:((old.logo!==undefined)?old.logo:(defaults.logo||''));
+  out.appName=out.appName||'Stream Bandit';
+  out.tagline=out.tagline||'Chatterfriends Movies';
+  out.loginText=out.loginText||'Login to your movie app prototype.';
+  out.heroTitle=out.heroTitle||'Welcome back';
+  out.heroText=out.heroText||'Your private front-end streaming library prototype.';
+  out.accentA=out.accentA||'#ff2d55';
+  out.accentB=out.accentB||'#7c3cff';
+  return out;
+}
+function sb4131ReadFormSettings(){
+  var old=data&&data.settings?data.settings:{};
+  function val(id,fb){var el=byId(id);return el?String(el.value||'').trim():fb;}
+  function chk(id,fb){var el=byId(id);return el?!!el.checked:fb;}
+  return sb4131CleanSettings(Object.assign({},old,{
+    appName:val('setName',old.appName)||'Stream Bandit',
+    tagline:val('setTagline',old.tagline)||'Chatterfriends Movies',
+    loginText:val('setLogin',old.loginText)||'Login to your movie app prototype.',
+    heroTitle:val('setHeroTitle',old.heroTitle)||'Welcome back',
+    heroText:val('setHero',old.heroText)||'Your private front-end streaming library prototype.',
+    homeShowHero:chk('showHero',old.homeShowHero!==false),
+    homeShowContinue:chk('showContinue',old.homeShowContinue!==false),
+    homeShowFeaturedPlaylist:chk('showFeaturedPlaylist',old.homeShowFeaturedPlaylist!==false),
+    homeShowNewUploads:chk('showNewUploads',old.homeShowNewUploads!==false),
+    homeShowCollections:chk('showCollections',old.homeShowCollections!==false),
+    homeShowLocalVideos:chk('showLocalVideos',old.homeShowLocalVideos!==false),
+    homeShowUrlVideos:chk('showUrlVideos',old.homeShowUrlVideos!==false),
+    homeShowAdminPicks:chk('showAdminPicks',old.homeShowAdminPicks!==false),
+    homeShowGenrePicks:chk('showGenrePicks',old.homeShowGenrePicks!==false),
+    homeFeaturedPlaylist:val('setFeaturedPlaylist',old.homeFeaturedPlaylist||''),
+    homeSpotlightVideo:val('setSpotlight',old.homeSpotlightVideo||''),
+    accentA:val('setA',old.accentA)||'#ff2d55',
+    accentB:val('setB',old.accentB)||'#7c3cff',
+    logo:old.logo||''
+  }));
+}
+function sb4131ApplySettings(st,source){
+  data.settings=sb4131CleanSettings(st);
+  data.settings.sb413LastSource=source||'Supabase/local';
+  data.version=APP_VERSION;
+  try{applySettings()}catch(e){}
+  try{saveData();}catch(e){dirty=true;data.storageWarning='Supabase settings loaded in memory. Browser storage is full, so Supabase remains source of truth.';}
+}
+function sb4131StatusPanel(){
+  var st=data&&data.settings?data.settings:{};
+  return '<div class="panel sb413Panel"><h3>'+esc(SB4131_LABEL)+'</h3><p class="note">Settings is now Supabase-first. Save the important branding and homepage controls to <b>sb_app_settings</b>. Browser/local settings remain as an emergency fallback.</p><div class="safetyGrid">'+cardStat('Source',st.sb413LastSource||'Browser/local fallback')+cardStat('Supabase Library',(st.useSupabaseLibrary?'ON':'OFF'))+cardStat('App name',st.appName||'Stream Bandit')+cardStat('Data size',kb(dataSize())+' KB')+'</div><div class="progressNote">'+esc(sb4131Status)+'</div><div class="row"><button id="sb4131LoadSettings" class="good">Load Supabase settings</button><button id="sb4131SaveSettings" class="good">Save settings to Supabase</button><button id="sb4131UseForm" class="secondary">Use typed settings on screen</button><button data-view="backup" class="secondary">Open Backup</button></div><p class="note">This startup-safe version avoids local storage for the Supabase save action. Image uploads/storage can come later with Supabase Storage.</p></div>';
+}
+async function sb4131GetClient(){
+  if(typeof sbInit!=='function')throw new Error('Supabase helper is not loaded.');
+  var c=sbInit();
+  if(!c)throw new Error('Supabase client is not connected.');
+  if(typeof sbRefresh==='function')await sbRefresh();
+  if(!sbSession||!sbSession.user)throw new Error('Please log into Supabase Test first.');
+  return c;
+}
+async function sb4131LoadSettings(){
+  try{
+    sb4131SetStatus('Loading Settings from Supabase...',true);
+    var c=await sb4131GetClient();
+    var res=await c.from('sb_app_settings').select('*').eq('id','stream_bandit').maybeSingle();
+    if(res.error)throw res.error;
+    if(!res.data||!res.data.settings){sb4131SetStatus('No Supabase settings row found yet. Press Save settings to Supabase to create it.');render();return;}
+    var remote=res.data.settings||{};
+    sb4131ApplySettings({
+      appName:remote.appName||remote.app_name,
+      tagline:remote.tagline,
+      loginText:remote.loginText||remote.login_text,
+      heroTitle:remote.heroTitle||remote.hero_title,
+      heroText:remote.heroText||remote.hero_text,
+      homeShowHero:remote.homeShowHero,
+      homeShowContinue:remote.homeShowContinue,
+      homeShowFeaturedPlaylist:remote.homeShowFeaturedPlaylist,
+      homeShowNewUploads:remote.homeShowNewUploads,
+      homeShowCollections:remote.homeShowCollections,
+      homeShowLocalVideos:remote.homeShowLocalVideos,
+      homeShowUrlVideos:remote.homeShowUrlVideos,
+      homeShowAdminPicks:remote.homeShowAdminPicks,
+      homeShowGenrePicks:remote.homeShowGenrePicks,
+      homeFeaturedPlaylist:remote.homeFeaturedPlaylist||remote.home_featured_playlist,
+      homeSpotlightVideo:remote.homeSpotlightVideo||remote.home_spotlight_video,
+      accentA:remote.accentA||remote.accent_a,
+      accentB:remote.accentB||remote.accent_b,
+      logo:(remote.logo!==undefined?remote.logo:(data.settings&&data.settings.logo)),
+      playerAudioBoost:remote.playerAudioBoost,
+      playerJumpSeconds:remote.playerJumpSeconds,
+      largePlayerControls:remote.largePlayerControls,
+      highContrastText:remote.highContrastText,
+      useSupabaseLibrary:remote.useSupabaseLibrary
+    },'Supabase sb_app_settings');
+    sb4131SetStatus('Loaded Settings from Supabase and rendered them on screen.');
+    render();
+  }catch(e){sb4131SetStatus('Supabase Settings load failed: '+sb4131Err(e));render();}
+}
+async function sb4131SaveSettings(){
+  try{
+    var next=sb4131ReadFormSettings();
+    data.settings=next;
+    data.settings.sb413LastSource='Typed form saved to Supabase';
+    try{applySettings()}catch(e){}
+    sb4131SetStatus('Saving Settings to Supabase...',true);
+    var c=await sb4131GetClient();
+    var payload=Object.assign({},next,{version:'V4.13.1',updatedAt:new Date().toISOString()});
+    var res=await c.from('sb_app_settings').upsert({id:'stream_bandit',settings:payload},{onConflict:'id'}).select('*').single();
+    if(res.error)throw res.error;
+    sb4131ApplySettings(payload,'Supabase sb_app_settings');
+    sb4131SetStatus('Supabase Settings saved and confirmed: '+(payload.appName||'Stream Bandit')+' / '+(payload.tagline||''));
+    render();
+  }catch(e){sb4131SetStatus('Supabase Settings save failed: '+sb4131Err(e));render();}
+}
+function sb4131UseForm(){
+  var next=sb4131ReadFormSettings();
+  sb4131ApplySettings(next,'Current screen form only');
+  sb4131SetStatus('Typed settings applied to the screen. Press Save settings to Supabase to make Supabase the source of truth.');
+  render();
+}
+var oldSettingsPageV4131=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){
+  var html=oldSettingsPageV4131?oldSettingsPageV4131():'';
+  html=String(html)
+    .replace(/V4\.12\.1 Supabase Genres Button Binding Hotfix|V4\.12 Supabase Genres \+ Search Polish|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V4\.9 Supabase Creator Submissions \+ Review Queue/g,SB4131_LABEL)
+    .replace(/StreamBanditPrototype4\.12\.1-supabase-genres-button-binding-hotfix|StreamBanditPrototype4\.12-supabase-genres-search-polish/g,APP_VERSION)
+    .replace('It is saved inside your browser backup JSON.','It can now be saved to Supabase first. Browser/local JSON remains as an emergency fallback.');
+  return html.replace('<div class="panel"><h3>Version</h3>',sb4131StatusPanel()+'<div class="panel"><h3>Version</h3>');
+};
+var oldBindSettingsV4131=typeof bindSettings==='function'?bindSettings:null;
+bindSettings=function(){
+  if(oldBindSettingsV4131)oldBindSettingsV4131();
+  var b=byId('sb4131LoadSettings');if(b)b.onclick=function(ev){if(ev)ev.preventDefault();sb4131LoadSettings();};
+  b=byId('sb4131SaveSettings');if(b)b.onclick=function(ev){if(ev)ev.preventDefault();sb4131SaveSettings();};
+  b=byId('sb4131UseForm');if(b)b.onclick=function(ev){if(ev)ev.preventDefault();sb4131UseForm();};
+};
+if(!window.__sb4131DelegatedClick){
+  window.__sb4131DelegatedClick=true;
+  document.addEventListener('click',function(ev){
+    var b=ev.target&&ev.target.closest?ev.target.closest('#sb4131LoadSettings,#sb4131SaveSettings,#sb4131UseForm'):null;
+    if(!b)return;
+    ev.preventDefault();ev.stopPropagation();
+    if(b.id==='sb4131LoadSettings')sb4131LoadSettings();
+    if(b.id==='sb4131SaveSettings')sb4131SaveSettings();
+    if(b.id==='sb4131UseForm')sb4131UseForm();
+  },true);
+}
+var oldSidebarV4131=typeof sidebar==='function'?sidebar:null;
+sidebar=function(){
+  var html=oldSidebarV4131?oldSidebarV4131():'';
+  return String(html).replace(/V4\.12\.1 Supabase Genres Button Binding Hotfix|V4\.12 Supabase Genres \+ Search Polish|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V4\.11\.6 My Channel Save Input Capture Fix|V4\.9 Supabase Creator Submissions \+ Review Queue|V4\.9\.1 Admin Supabase Layout Restore/g,SB4131_LABEL);
+};
+var oldBackupPageV4131=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){var html=oldBackupPageV4131?oldBackupPageV4131():'';return String(html).replace(/V4\.12\.1 Supabase Genres Button Binding Hotfix|V4\.12 Supabase Genres \+ Search Polish|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix/g,SB4131_LABEL)};
+var oldBackupSummaryV4131=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV4131?oldBackupSummaryV4131(d):'')+'\nV4.13.1 note: Settings/Branding can be saved to and loaded from Supabase sb_app_settings. This hotfix avoids the V4.13 startup recursion.';};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-13-1-supabase-settings-startup-safety-fix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.13.1 backup download started')};
+var oldRunTestsV4131=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV4131)oldRunTestsV4131();}catch(e){console.warn('V4.13.1 inherited self-test warning:',e)}console.assert(typeof sb4131LoadSettings==='function','V4.13.1 Supabase settings loader exists');console.assert(typeof sb4131SaveSettings==='function','V4.13.1 Supabase settings saver exists');console.assert(APP_VERSION==='StreamBanditPrototype4.13.1-supabase-settings-startup-safety-fix','V4.13.1 version set')};
+
+
+
+/* Stream Bandit V4.13.2 — Settings Page Standalone Render Fix
+   Fixes Settings-only maximum call stack by replacing the chained Settings wrappers with one direct Settings page renderer. */
+var SB4132_LABEL='V4.13.2 Settings Page Standalone Render Fix';
+try{
+  APP_VERSION='StreamBanditPrototype4.13.2-settings-page-standalone-render-fix';
+  if(data)data.version=APP_VERSION;
+  document.title='Stream Bandit V4.13.2 Settings Page Standalone Render Fix';
+  if(typeof SB4131_LABEL!=='undefined')SB4131_LABEL=SB4132_LABEL;
+  if(typeof SB4121_LABEL!=='undefined')SB4121_LABEL=SB4132_LABEL;
+  if(typeof SB412_LABEL!=='undefined')SB412_LABEL=SB4132_LABEL;
+}catch(e){console.warn('V4.13.2 label warning',e)}
+function sb4132Stat(label,value){return '<div class="safeStat"><b>'+esc(label)+'</b><span>'+esc(value)+'</span></div>'}
+function sb4132SectionToggle(id,label,on){return '<label class="toggleBox"><input type="checkbox" id="'+id+'" '+(on?'checked':'')+'> <span>'+esc(label)+'</span></label>'}
+settingsPage=function(){
+  var st=data.settings||seed.settings||{};
+  var plOptions='<option value="">Auto-pick first playlist with videos</option>'+(data.playlists||[]).map(function(p){return '<option value="'+esc(p.name)+'" '+(st.homeFeaturedPlaylist===p.name?'selected':'')+'>'+esc(p.name)+'</option>'}).join('');
+  var spotOptions='<option value="">Auto-pick featured/newest movie</option>'+(data.videos||[]).map(function(v,i){return '<option value="'+i+'" '+(String(st.homeSpotlightVideo)===String(i)?'selected':'')+'>'+esc(v.title)+'</option>'}).join('');
+  return topBar('Settings')+
+  '<div class="panel sb413Panel"><h3>'+esc(SB4132_LABEL)+'</h3><p class="note">Settings now uses a standalone renderer, so opening this page no longer calls the old chained Settings wrappers. Supabase save/load still uses <b>sb_app_settings</b>; browser/local remains the emergency fallback.</p><div class="safetyGrid">'+sb4132Stat('Source',st.sb413LastSource||'Browser/local fallback')+sb4132Stat('Supabase Library',(st.useSupabaseLibrary?'ON':'OFF'))+sb4132Stat('App name',st.appName||'Stream Bandit')+sb4132Stat('Data size',kb(dataSize())+' KB')+'</div><div class="progressNote">'+esc(sb4131Status||'Ready. Settings can be loaded from or saved to Supabase.')+'</div><div class="row"><button id="sb4131LoadSettings" class="good">Load Supabase settings</button><button id="sb4131SaveSettings" class="good">Save settings to Supabase</button><button id="sb4131UseForm" class="secondary">Use typed settings on screen</button><button data-view="backup" class="secondary">Open Backup</button></div></div>'+ 
+  '<div class="panel"><h3>Version</h3><p class="note"><b>'+esc(APP_VERSION)+'</b> — '+esc(SB4132_LABEL)+'. Current data size: '+kb(dataSize())+' KB.</p></div>'+ 
+  '<div class="panel"><h3>Branding</h3><p class="note">Customise the app name, sidebar text, login message, logo and colours. These can now be saved to Supabase first. Browser/local JSON remains as an emergency fallback.</p><div class="settingsPreview"><div class="logo">'+appLogo()+'</div><div><b>'+esc(st.appName||'Stream Bandit')+'</b><br><span class="muted">'+esc(st.tagline||'Chatterfriends Movies')+'</span></div></div>'+field('App name','setName',st.appName||'Stream Bandit')+field('Sidebar tagline','setTagline',st.tagline||'Chatterfriends Movies')+field('Login message','setLogin',st.loginText||'Login to your movie app prototype.')+'<label>Logo image PNG/JPEG</label><input id="setLogo" type="file" accept="image/png,image/jpeg"><p id="setLogoStat" class="note">Square image recommended. The app stores a small resized copy. Supabase Storage can be added later.</p><div class="cols"><div>'+field('Accent colour 1','setA',st.accentA||'#ff2d55')+'</div><div>'+field('Accent colour 2','setB',st.accentB||'#7c3cff')+'</div></div><div class="colourGrid"><button class="secondary preset" data-a="#ff2d55" data-b="#7c3cff">Stream pink / purple</button><button class="secondary preset" data-a="#00c2ff" data-b="#0066ff">Cinema blue</button><button class="secondary preset" data-a="#20c997" data-b="#0b8f72">Green neon</button><button class="secondary preset" data-a="#ff9f1c" data-b="#ff4040">Fire orange</button></div></div>'+ 
+  '<div class="panel"><h3>Homepage Builder</h3><p class="note">Turn homepage sections on or off and control the main hero wording.</p>'+field('Homepage hero title','setHeroTitle',st.heroTitle||'Welcome back')+area('Homepage hero subtitle','setHero')+'<label>Homepage spotlight movie</label><select id="setSpotlight">'+spotOptions+'</select><label>Featured playlist section</label><select id="setFeaturedPlaylist">'+plOptions+'</select><label>Homepage sections</label><div class="toggleGrid">'+sb4132SectionToggle('showHero','Hero banner',st.homeShowHero!==false)+sb4132SectionToggle('showContinue','Continue Watching',st.homeShowContinue!==false)+sb4132SectionToggle('showFeaturedPlaylist','Featured Playlist',st.homeShowFeaturedPlaylist!==false)+sb4132SectionToggle('showNewUploads','Recently Added',st.homeShowNewUploads!==false)+sb4132SectionToggle('showCollections','Collections / Franchises',st.homeShowCollections!==false)+sb4132SectionToggle('showLocalVideos','Local Videos row',st.homeShowLocalVideos!==false)+sb4132SectionToggle('showUrlVideos','URL / Stream Links row',st.homeShowUrlVideos!==false)+sb4132SectionToggle('showAdminPicks','Admin Picks / Featured videos',st.homeShowAdminPicks!==false)+sb4132SectionToggle('showGenrePicks','Genre Picks',st.homeShowGenrePicks!==false)+'</div><br><div class="row"><button id="saveSettings" class="good">Save browser fallback settings</button><button id="resetSettings" class="secondary">Reset branding/homepage settings</button></div></div>';
+};
+var oldSidebarV4132=typeof sidebar==='function'?sidebar:null;
+sidebar=function(){var html=oldSidebarV4132?oldSidebarV4132():'';return String(html).replace(/V4\.13\.1 Supabase Settings Startup Safety Fix|V4\.12\.1 Supabase Genres Button Binding Hotfix|V4\.12 Supabase Genres \+ Search Polish|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V4\.9 Supabase Creator Submissions \+ Review Queue/g,SB4132_LABEL)};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-13-2-settings-page-standalone-render-fix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.13.2 backup download started')};
+var oldRunTestsV4132=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV4132)oldRunTestsV4132();}catch(e){console.warn('V4.13.2 inherited self-test warning:',e)}console.assert(typeof settingsPage==='function','V4.13.2 standalone settings page exists');console.assert(APP_VERSION==='StreamBanditPrototype4.13.2-settings-page-standalone-render-fix','V4.13.2 version set')};
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
