@@ -4712,6 +4712,85 @@ var oldRunTests532=typeof runTests==='function'?runTests:null;
 runTests=function(){try{if(oldRunTests532)oldRunTests532();}catch(e){console.warn('V5.3.2 inherited self-test warning:',e)}console.assert(typeof sb532UploadFromButton==='function','V5.3.2 delegated submit poster upload exists');console.assert(APP_VERSION==='StreamBanditPrototype5.3.2-submit-poster-upload-button-binding-fix','V5.3.2 version set');};
 })();
 
+
+/* Stream Bandit V5.4 — Mux Video Manager + Playback ID Helper
+   Keeps the safe frontend-only route: no Mux secrets in GitHub Pages.
+   Admin can paste a public Mux Playback ID and Stream Bandit builds the HLS URL. */
+(function(){
+'use strict';
+var SB54_LABEL='V5.4 Mux Video Manager + Playback ID Helper';
+try{
+  APP_VERSION='StreamBanditPrototype5.4-mux-video-manager-playback-id-helper';
+  if(data){data.version=APP_VERSION;}
+  document.title='Stream Bandit V5.4 Mux Video Manager';
+}catch(e){}
+(function(){
+  var css='\n.sb54Hero{background:linear-gradient(135deg,#101827,#071f21);border:1px solid #3ddc9777;border-radius:22px;padding:16px;margin-bottom:16px}.sb54Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.sb54Card{background:#151724;border:1px solid var(--line);border-radius:18px;padding:13px}.sb54Card.good{background:#0d221b;border-color:#3ddc9777}.sb54Card.warn{background:#231b0c;border-color:#ffbf3c77}.sb54Mini{font-size:12px;color:var(--muted);line-height:1.45}.sb54Tools{background:#101827;border:1px solid #6aa6ff55;border-radius:16px;padding:12px;margin:10px 0}.sb54Tools h4{margin:0 0 8px}.sb54Two{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.sb54Code{font-family:monospace;background:#080912;border:1px solid var(--line);border-radius:12px;padding:8px;word-break:break-all}.sb54Ok{color:#baf7df}.sb54Badge{display:inline-block;border-radius:999px;background:#123b2b;border:1px solid #3ddc9777;color:#baf7df;padding:5px 9px;font-size:12px;font-weight:900;margin-bottom:8px}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function sb54CleanPlaybackId(v){
+  v=String(v||'').trim();
+  if(!v)return '';
+  try{
+    if(v.indexOf('player.mux.com/')>-1){v=v.split('player.mux.com/')[1].split(/[?#/]/)[0];}
+    if(v.indexOf('stream.mux.com/')>-1){v=v.split('stream.mux.com/')[1].replace(/\.m3u8.*/,'');}
+  }catch(e){}
+  return v.replace(/\.m3u8.*/,'').replace(/[^a-zA-Z0-9_-]/g,'');
+}
+function sb54MuxHls(id){id=sb54CleanPlaybackId(id);return id?'https://stream.mux.com/'+id+'.m3u8':'';}
+function sb54PlaybackFromUrl(url){
+  url=String(url||'').trim();
+  if(!url)return '';
+  if(url.indexOf('stream.mux.com/')>-1||url.indexOf('player.mux.com/')>-1)return sb54CleanPlaybackId(url);
+  return '';
+}
+function sb54MuxHelperHtml(){
+  return '<div class="sb54Tools" id="sb54MuxHelper"><h4>Mux playback helper</h4><p class="sb54Mini">Paste the public Mux Playback ID from Mux, or paste a Mux player/stream URL. Stream Bandit will build the HLS URL for the video field below. Do not paste Mux access tokens or secrets into GitHub Pages.</p><div class="sb54Two"><div><label>Mux Playback ID</label><input id="sb54PlaybackId" placeholder="Example: rR8P8m..." value=""></div><div><label>Generated HLS URL</label><input id="sb54HlsPreview" readonly placeholder="https://stream.mux.com/...m3u8"></div></div><div class="row" style="margin-top:8px"><button type="button" class="good small" id="sb54BuildMuxUrl">Build Mux HLS URL</button><button type="button" class="secondary small" id="sb54UseMuxUrl">Use this URL below</button><button type="button" class="secondary small" data-view="muxmanager">Open Mux Manager</button></div><p id="sb54MuxStatus" class="note">Mux test route: Playback ID → HLS URL → Supabase movie row → Stream Bandit player.</p></div>';
+}
+function sb54Panel(title){
+  return '<div class="sb54Hero"><span class="sb54Badge">'+esc(SB54_LABEL)+'</span><h3>'+esc(title||'Mux video route')+'</h3><p class="note">Mux is now the chosen video route for Stream Bandit. Supabase keeps movie rows, posters, profiles and progress. Mux stores/processes video and gives Stream Bandit a public playback stream.</p><div class="row"><button class="secondary small" data-view="muxmanager">Open Mux Manager</button><button class="secondary small" data-view="supabasemanager">Supabase Movie Manager</button><button class="secondary small" data-view="uploadplan">Upload Plan</button></div></div>';
+}
+function muxManagerPage(){
+  return topBar('Mux Manager')+sb54Panel('Mux Video Manager')+'<div class="panel"><h3>What we tested</h3><p class="note">You uploaded a video to Mux, copied the public playback ID, built the HLS URL, saved it into Supabase Movie Manager, and Stream Bandit played it. That confirms the correct route.</p><div class="sb54Grid"><div class="sb54Card good"><h3>1. Mux video</h3><p class="note">Upload/process the video inside Mux. Wait until it is ready, then use the public playback ID.</p></div><div class="sb54Card good"><h3>2. Supabase row</h3><p class="note">Save the generated HLS URL in the Supabase movie row. Posters stay in Supabase Storage.</p></div><div class="sb54Card good"><h3>3. Stream Bandit player</h3><p class="note">The app plays the saved HLS URL and still saves Continue Watching progress to Supabase.</p></div></div></div><div class="panel"><h3>Build a Mux HLS URL</h3>'+sb54MuxHelperHtml()+'<div class="sb54Code">Format: https://stream.mux.com/YOUR_PLAYBACK_ID.m3u8</div></div><div class="panel"><h3>Safety rule</h3><p class="note">Never put Mux access tokens, token secrets, signing keys or API secrets inside Stream Bandit while it is hosted on GitHub Pages. Frontend users can view page code. For now we only store public playback URLs. Later, if we add automatic Mux uploads from inside Stream Bandit, that should use a backend or serverless function.</p></div>';
+}
+function sb54PatchManagerHtml(html){
+  html=String(html||'').replace(/V5\.3\.2 Submit Poster Upload Button Binding Fix|V5\.3\.1 Submit Poster Upload Visibility Fix|V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB54_LABEL);
+  if(html.indexOf('sb54MuxHelper')<0){
+    var needle='<label>Video URL / Mux / HLS stream link</label><input id="sb47Url"';
+    if(html.indexOf(needle)>-1){html=html.replace(needle,sb54MuxHelperHtml()+needle);}
+    else if(html.indexOf('<input id="sb47Url"')>-1){html=html.replace('<input id="sb47Url"',sb54MuxHelperHtml()+'<input id="sb47Url"');}
+  }
+  if(html.indexOf('V5.4 Mux Video Manager')<0){html=html.replace('<div id="sb47Status"',sb54Panel('Mux-ready movie rows')+'<div id="sb47Status"');}
+  return html;
+}
+var oldSupabaseManagerPage54=typeof supabaseManagerPage==='function'?supabaseManagerPage:null;
+if(oldSupabaseManagerPage54){supabaseManagerPage=function(){return sb54PatchManagerHtml(oldSupabaseManagerPage54.apply(this,arguments));};}
+var oldAdminPage54=typeof adminPage==='function'?adminPage:null;
+if(oldAdminPage54){adminPage=function(){return String(oldAdminPage54.apply(this,arguments)).replace(topBar('Admin'),topBar('Admin')+sb54Panel('Admin video route')).replace(/V5\.3\.2 Submit Poster Upload Button Binding Fix|V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB54_LABEL);};}
+var oldUploadPlanPage54=typeof uploadPlanPage==='function'?uploadPlanPage:null;
+if(oldUploadPlanPage54){uploadPlanPage=function(){return String(oldUploadPlanPage54.apply(this,arguments)).replace(/V5\.3\.2 Submit Poster Upload Button Binding Fix|V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB54_LABEL).replace('Next: Mux video manager fields and workflow for real streaming videos.','Mux Manager is now active: paste Playback ID, build HLS URL, save it into Supabase Movie Manager.');};}
+var oldSettingsPage54=typeof settingsPage==='function'?settingsPage:null;
+if(oldSettingsPage54){settingsPage=function(){return String(oldSettingsPage54.apply(this,arguments)).replace(/V5\.3\.2 Submit Poster Upload Button Binding Fix|V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB54_LABEL);};}
+var oldSidebar54=typeof sidebar==='function'?sidebar:null;
+if(oldSidebar54){sidebar=function(){var html=String(oldSidebar54.apply(this,arguments)).replace(/V5\.3\.2 Submit Poster Upload Button Binding Fix|V5\.3\.1 Submit Poster Upload Visibility Fix|V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB54_LABEL);if(isAdmin&&isAdmin()&&html.indexOf('data-view="muxmanager"')<0){html=html.replace('<button data-view="uploadplan"','<button data-view="muxmanager" class="'+(view==='muxmanager'?'active':'')+'">🎥 Mux Manager</button><button data-view="uploadplan"');}return html;};}
+var oldPage54=typeof page==='function'?page:null;
+page=function(){if(view==='muxmanager')return muxManagerPage();return oldPage54?oldPage54.apply(this,arguments):'';};
+function sb54BindMuxHelper(){
+  var build=byId('sb54BuildMuxUrl'), use=byId('sb54UseMuxUrl'), id=byId('sb54PlaybackId'), prev=byId('sb54HlsPreview'), url=byId('sb47Url'), stat=byId('sb54MuxStatus');
+  if(id&&url&&!id.value){id.value=sb54PlaybackFromUrl(url.value||'');}
+  if(prev&&id&&id.value&&!prev.value){prev.value=sb54MuxHls(id.value);}
+  if(build&&!build.dataset.sb54Bound){build.dataset.sb54Bound='1';build.onclick=function(ev){ev.preventDefault();var h=sb54MuxHls(id&&id.value);if(!h){if(stat)stat.innerHTML='<span class="bad">Paste a Mux Playback ID first.</span>';return toast('Paste a Mux Playback ID first');}if(prev)prev.value=h;if(stat)stat.innerHTML='<span class="ok">Mux HLS URL built. Press Use this URL below.</span>';toast('Mux HLS URL built');};}
+  if(use&&!use.dataset.sb54Bound){use.dataset.sb54Bound='1';use.onclick=function(ev){ev.preventDefault();var h=(prev&&prev.value)||sb54MuxHls(id&&id.value);if(!h)return toast('Build the Mux HLS URL first');if(url)url.value=h;if(stat)stat.innerHTML='<span class="ok">Mux HLS URL placed into the movie stream field. Save/update the Supabase movie.</span>';toast('Mux URL placed into movie form');};}
+}
+var oldBindCommon54=typeof bindCommon==='function'?bindCommon:null;
+bindCommon=function(){if(oldBindCommon54)oldBindCommon54();sb54BindMuxHelper();};
+var oldBackupSummary54=typeof backupSummary==='function'?backupSummary:null;
+if(oldBackupSummary54){backupSummary=function(d){return oldBackupSummary54(d)+'\nV5.4 note: Mux Video Manager added. Public Mux playback IDs are converted to HLS URLs; no Mux secrets are stored in the frontend.';};}
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v5-4-mux-video-manager-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V5.4 backup download started');};
+var oldRunTests54=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTests54)oldRunTests54();}catch(e){console.warn('V5.4 inherited self-test warning:',e)}console.assert(sb54MuxHls('abc123')==='https://stream.mux.com/abc123.m3u8','V5.4 Mux HLS builder works');console.assert(typeof muxManagerPage==='function','V5.4 Mux Manager page exists');console.assert(APP_VERSION==='StreamBanditPrototype5.4-mux-video-manager-playback-id-helper','V5.4 version set');};
+})();
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
