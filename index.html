@@ -3628,6 +3628,144 @@ exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);da
 var oldRunTestsV4117=typeof runTests==='function'?runTests:null;
 runTests=function(){try{if(oldRunTestsV4117)oldRunTestsV4117();}catch(e){console.warn('V4.11.7 inherited self-test warning:',e)}console.assert(APP_VERSION==='StreamBanditPrototype4.11.7-version-badge-tidy-my-channel-save-fix','V4.11.7 version set');};
 
+
+
+/* Stream Bandit V4.12 — Supabase Genres + Search Polish
+   Supabase-first Genres page, cleaner Supabase Library filtering, and safe remote queue play. */
+var SB412_LABEL='V4.12 Supabase Genres + Search Polish';
+var sb412RatingFilter='';
+var sb412YearFilter='';
+var sb412Sort='newest';
+var sb412RemoteQueue=[];
+var sb412RemoteQueuePos=0;
+try{
+  APP_VERSION='StreamBanditPrototype4.12-supabase-genres-search-polish';
+  if(data)data.version=APP_VERSION;
+  document.title='Stream Bandit V4.12 Supabase Genres + Search Polish';
+  if(typeof SB4117_LABEL!=='undefined')SB4117_LABEL=SB412_LABEL;
+  if(typeof SB4116_LABEL!=='undefined')SB4116_LABEL=SB412_LABEL;
+  if(typeof SB4114_LABEL!=='undefined')SB4114_LABEL=SB412_LABEL;
+  if(typeof SB411_LABEL!=='undefined')SB411_LABEL=SB412_LABEL;
+}catch(e){}
+(function(){
+  var css='\n.sb412Hero{background:linear-gradient(135deg,#10112a,#082417);border:1px solid #19c37d66;border-radius:22px;padding:16px;margin-bottom:16px}.sb412Stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}.sb412Stat{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:12px}.sb412Stat b{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.sb412Stat span{font-size:21px;font-weight:900}.sb412Toolbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px;background:#151724;border:1px solid var(--line);border-radius:18px;padding:12px;margin:14px 0}.sb412Toolbar label{margin-top:0}.sb412GenreCard{background:#151724;border:1px solid var(--line);border-radius:20px;padding:14px}.sb412GenreCard h3{margin:0 0 8px}.sb412TopList{margin:10px 0;color:var(--muted);font-size:13px;line-height:1.45}.sb412Active{border-color:#19c37d!important;background:#082417!important}.sb412QueueBar{background:#101827;border:1px solid #6aa6ff55;border-radius:16px;padding:10px;margin:10px 0;color:#d7e9ff}.sb412NoSource{color:#ffb4bf;font-size:12px;margin-top:8px}.sb412MiniHint{font-size:12px;color:var(--muted);margin-top:6px}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function sb412UseSupabase(){return !!(data&&data.settings&&data.settings.useSupabaseLibrary)}
+function sb412Rows(){return Array.isArray(sbRemoteMovies)?sbRemoteMovies.slice():[]}
+function sb412Norm(x){return String(x==null?'':x).trim()}
+function sb412Low(x){return sb412Norm(x).toLowerCase()}
+function sb412Genres(m){return (typeof sbMovieGenres==='function'?sbMovieGenres(m):(Array.isArray(m&&m.genres)?m.genres:[])).filter(Boolean)}
+function sb412Channel(m){return typeof sbMovieChannel==='function'?sbMovieChannel(m):((m&&m.sb_channels&&m.sb_channels.name)||m.channel_name||'No channel')}
+function sb412Source(m){return typeof sbMovieSource==='function'?sbMovieSource(m):((m&&((m.mux_playback_url||'')||(m.video_url||'')))||'')}
+function sb412Type(m){return typeof sbMovieType==='function'?sbMovieType(m):(sb412Source(m)?'URL':'No source')}
+function sb412Text(m){return [m&&m.title,m&&m.description,sb412Channel(m),m&&m.year,m&&m.rating,m&&m.runtime_text,m&&m.age_rating,m&&m.director,m&&m.cast_text,sb412Genres(m).join(' '),Array.isArray(m&&m.tags)?m.tags.join(' '):''].join(' ').toLowerCase()}
+function sb412GenreCounts(rows){var out={};(rows||sb412Rows()).forEach(function(m){sb412Genres(m).forEach(function(g){g=sb412Norm(g);if(g)out[g]=(out[g]||0)+1})});return out}
+function sb412Channels(rows){var map={};(rows||sb412Rows()).forEach(function(m){var c=sb412Channel(m);if(c)map[c]=true});return Object.keys(map).sort(function(a,b){return a.localeCompare(b)})}
+function sb412Ratings(rows){var map={};(rows||sb412Rows()).forEach(function(m){var r=sb412Norm(m&&m.rating);if(r)map[r]=true});return Object.keys(map).sort()}
+function sb412Years(rows){var map={};(rows||sb412Rows()).forEach(function(m){var y=sb412Norm(m&&m.year);if(y)map[y]=true});return Object.keys(map).sort(function(a,b){return String(b).localeCompare(String(a))})}
+function sb412FilteredRows(){var q=sb412Low(searchTerm),g=sb412Norm(genreFilter),ch=sb412Norm(channelFilter),rt=sb412Norm(sb412RatingFilter),yr=sb412Norm(sb412YearFilter);var arr=sb412Rows().filter(function(m){var gs=sb412Genres(m);return (!q||sb412Text(m).indexOf(q)>-1)&&(!g||gs.indexOf(g)>-1)&&(!ch||sb412Channel(m)===ch)&&(!rt||sb412Norm(m&&m.rating)===rt)&&(!yr||sb412Norm(m&&m.year)===yr)});arr.sort(function(a,b){if(sb412Sort==='title')return sb412Norm(a.title).localeCompare(sb412Norm(b.title));if(sb412Sort==='genre')return sb412Norm(sb412Genres(a)[0]).localeCompare(sb412Norm(sb412Genres(b)[0]))||sb412Norm(a.title).localeCompare(sb412Norm(b.title));if(sb412Sort==='channel')return sb412Channel(a).localeCompare(sb412Channel(b))||sb412Norm(a.title).localeCompare(sb412Norm(b.title));if(sb412Sort==='year')return sb412Norm(b.year).localeCompare(sb412Norm(a.year))||sb412Norm(a.title).localeCompare(sb412Norm(b.title));return 0});return arr}
+function sb412Opts(arr,current,first){return '<option value="">'+esc(first||'All')+'</option>'+arr.map(function(x){return '<option value="'+esc(x)+'" '+(current===x?'selected':'')+'>'+esc(x)+'</option>'}).join('')}
+function sb412Toolbar(rows,filtered){var counts=sb412GenreCounts(rows),genres=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]||a.localeCompare(b)});return '<div class="sb412Toolbar"><div><label>Sort Supabase rows</label><select id="sb412Sort"><option value="newest" '+(sb412Sort==='newest'?'selected':'')+'>Newest / database order</option><option value="title" '+(sb412Sort==='title'?'selected':'')+'>Title A-Z</option><option value="genre" '+(sb412Sort==='genre'?'selected':'')+'>Genre</option><option value="channel" '+(sb412Sort==='channel'?'selected':'')+'>Channel</option><option value="year" '+(sb412Sort==='year'?'selected':'')+'>Year newest</option></select></div><div><label>Genre</label><select id="sb412Genre">'+sb412Opts(genres,genreFilter,'All genres')+'</select></div><div><label>Channel</label><select id="sb412Channel">'+sb412Opts(sb412Channels(rows),channelFilter,'All channels')+'</select></div><div><label>Rating</label><select id="sb412Rating">'+sb412Opts(sb412Ratings(rows),sb412RatingFilter,'All ratings')+'</select></div><div><label>Year</label><select id="sb412Year">'+sb412Opts(sb412Years(rows),sb412YearFilter,'All years')+'</select></div><div class="toolbarActions"><span class="pill">'+filtered.length+' result(s)</span>'+(filtered.length?'<button class="good small sb412PlayRemoteIds" data-ids="'+esc(filtered.map(function(m){return m.id}).join(','))+'">Play All Results</button>':'')+'<button class="secondary small" id="clear">Clear all</button></div></div>'}
+function sb412RemoteGrid(rows){return rows.length?'<div class="sbRemoteGrid" style="margin-top:14px">'+rows.map(sbRemoteCard).join('')+'</div>':'<div class="noResults"><h3>No Supabase results found</h3><p>Try Clear all, a different genre, channel, year, rating, or search text.</p></div>'}
+var oldSbRemoteLibraryInsideMainV412=typeof sbRemoteLibraryInsideMain==='function'?sbRemoteLibraryInsideMain:null;
+sbRemoteLibraryInsideMain=function(){var rows=sb412Rows(),filtered=sb412FilteredRows();var html=topBar('Library')+(typeof sbLibraryModePanel==='function'?sbLibraryModePanel():'');if(!sbRemoteLoaded){html+='<div class="panel"><h3>'+SB412_LABEL+'</h3><p class="note">Supabase Library mode is selected. Press Load / refresh Supabase movies to read movies, genres, channels, ratings and years from the database.</p><div class="row"><button class="good" id="sbLoadLibraryMain">Load / refresh Supabase movies</button><button class="secondary" data-view="genres">Open Genres</button></div><div class="empty">No Supabase rows loaded in this browser tab yet.</div></div>';return html}html+='<div class="sb412Hero"><h3>'+SB412_LABEL+'</h3><p class="note">Search now checks Supabase title, description, tags, genres, channel, rating and year. Filters below are built from the loaded Supabase movie rows.</p><div class="row"><button class="good" id="sbLoadLibraryMain">Load / refresh Supabase movies</button><button class="secondary" data-view="genres">Open Supabase Genres</button><button class="secondary" data-view="mychannel">My Channel</button></div><div class="sb412Stats">'+sb412Stat('Supabase movies',rows.length)+sb412Stat('Genres',Object.keys(sb412GenreCounts(rows)).length)+sb412Stat('Channels',sb412Channels(rows).length)+sb412Stat('Playable sources',rows.filter(function(m){return !!sb412Source(m)}).length)+'</div></div>'+sb412Toolbar(rows,filtered)+'<div class="panel"><div class="sbRemoteHero"><div><h3>Movies from Supabase</h3><p class="note">Filtered database rows only. Play uses your saved Mux/HLS/direct URL.</p></div><span class="sbSmallCount">'+filtered.length+' shown</span></div>'+sb412RemoteGrid(filtered)+'</div>';return html};
+function sb412Stat(a,b){return '<div class="sb412Stat"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>'}
+var oldGenresPageV412=typeof genresPage==='function'?genresPage:null;
+genresPage=function(){if(!sb412UseSupabase())return oldGenresPageV412?oldGenresPageV412():'';var rows=sb412Rows(),counts=sb412GenreCounts(rows),names=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]||a.localeCompare(b)});var playable=rows.filter(function(m){return !!sb412Source(m)}).length;var html=topBar('Genres')+'<div class="sb412Hero"><h3>'+SB412_LABEL+'</h3><p class="note">Genres are now Supabase-first when Supabase Library mode is on. Counts and rows come from published Supabase movie data.</p><div class="row"><button class="good" id="sb412LoadGenres">Load / refresh Supabase genres</button><button class="secondary" data-view="library">Open Supabase Library</button><button class="secondary" data-view="channels">Channels</button></div><div class="sb412Stats">'+sb412Stat('Movies loaded',rows.length)+sb412Stat('Genres found',names.length)+sb412Stat('Playable sources',playable)+sb412Stat('Current filter',genreFilter||'All')+'</div></div>';if(!sbRemoteLoaded){return html+'<div class="empty">Press Load / refresh Supabase genres to read your database rows first.</div>'}if(!names.length)return html+'<div class="empty">No Supabase genres found yet. Add genres on movies in Supabase Movie Manager or Admin Quick Add.</div>';html+='<div class="grid">'+names.map(function(g){var movies=rows.filter(function(m){return sb412Genres(m).indexOf(g)>-1});var ids=movies.map(function(m){return m.id}).join(',');var top=movies.slice(0,4).map(function(m){return m.title||'Untitled'}).join(' • ');return '<div class="sb412GenreCard"><h3>🏷 '+esc(g)+'</h3><p class="muted">'+movies.length+' Supabase movie(s)</p><div class="sb412TopList">'+esc(top||'No titles')+'</div><div class="row"><button class="small sb412GenreOpen" data-genre="'+esc(g)+'">Open genre</button>'+(ids?'<button class="secondary small sb412PlayRemoteIds" data-ids="'+esc(ids)+'">Play All</button>':'')+'</div></div>'}).join('')+'</div>';return html};
+function sb412StartRemoteQueue(ids){ids=String(ids||'').split(',').map(function(x){return x.trim()}).filter(Boolean);if(!ids.length){toast('No Supabase videos in this list');return}sb412RemoteQueue=ids;sb412RemoteQueuePos=0;sbRemoteSelectedId=ids[0];view='sbremotewatch';render();toast('Supabase queue started')}
+function sb412RemoteQueueBar(){if(!sb412RemoteQueue.length)return '';var current=sb412RemoteQueuePos+1,total=sb412RemoteQueue.length;return '<div class="sb412QueueBar"><b>Supabase queue:</b> '+current+' of '+total+'<div class="row" style="margin-top:8px"><button class="secondary small" id="sb412PrevRemote">Previous</button><button class="secondary small" id="sb412NextRemote">Next</button></div></div>'}
+var oldSbRemoteWatchPageV412=typeof sbRemoteWatchPage==='function'?sbRemoteWatchPage:null;
+sbRemoteWatchPage=function(){var html=oldSbRemoteWatchPageV412?oldSbRemoteWatchPageV412():'';if(sb412RemoteQueue.length){html=String(html).replace('<div class="sbRemoteNote">',sb412RemoteQueueBar()+'<div class="sbRemoteNote">')}return html};
+function sb412QueueMove(step){if(!sb412RemoteQueue.length)return false;sb412RemoteQueuePos=Math.max(0,Math.min(sb412RemoteQueue.length-1,sb412RemoteQueuePos+step));sbRemoteSelectedId=sb412RemoteQueue[sb412RemoteQueuePos];render();return true}
+var oldBindCommonV412=typeof bindCommon==='function'?bindCommon:null;
+bindCommon=function(){if(oldBindCommonV412)oldBindCommonV412();var lg=byId('sb412LoadGenres');if(lg)lg.onclick=function(){if(typeof sbLoadRemoteLibrary==='function')sbLoadRemoteLibrary()};['sb412Sort','sb412Genre','sb412Channel','sb412Rating','sb412Year'].forEach(function(id){var el=byId(id);if(!el)return;el.onchange=function(){if(id==='sb412Sort')sb412Sort=el.value;else if(id==='sb412Genre')genreFilter=el.value;else if(id==='sb412Channel')channelFilter=el.value;else if(id==='sb412Rating')sb412RatingFilter=el.value;else if(id==='sb412Year')sb412YearFilter=el.value;render()}});document.querySelectorAll('.sb412GenreOpen').forEach(function(b){b.onclick=function(){genreFilter=b.dataset.genre||'';view='library';render()}});document.querySelectorAll('.sb412PlayRemoteIds').forEach(function(b){b.onclick=function(){sb412StartRemoteQueue(b.dataset.ids||'')}});var clear=byId('clear');if(clear)clear.onclick=function(){searchTerm='';genreFilter='';channelFilter='';sourceFilter='all';librarySort='newest';sb412RatingFilter='';sb412YearFilter='';sb412Sort='newest';render()};var next=byId('sb412NextRemote');if(next)next.onclick=function(){if(!sb412QueueMove(1))toast('No next Supabase video')};var prev=byId('sb412PrevRemote');if(prev)prev.onclick=function(){if(!sb412QueueMove(-1))toast('No previous Supabase video')};if(view==='sbremotewatch'){var p=byId('sbRemotePlayer');if(p&&sb412RemoteQueue.length){p.onended=function(){if(sb412RemoteQueuePos<sb412RemoteQueue.length-1)sb412QueueMove(1);else toast('Supabase queue finished')}}}}
+var oldSettingsPageV412=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){var html=oldSettingsPageV412?oldSettingsPageV412():'';return String(html).replace(/V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V4\.11\.6 My Channel Save Input Capture Fix|V4\.11\.4 Supabase Profile Truth \+ Reset Warning|V4\.9 Supabase Creator Submissions \+ Review Queue/g,SB412_LABEL)};
+var oldBackupPageV412=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){var html=oldBackupPageV412?oldBackupPageV412():'';return String(html).replace(/V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V4\.11\.6 My Channel Save Input Capture Fix|V4\.11\.4 Supabase Profile Truth \+ Reset Warning|V4\.9 Supabase Creator Submissions \+ Review Queue/g,SB412_LABEL)};
+var oldBackupSummaryV412=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV412?oldBackupSummaryV412(d):'')+'\nV4.12 note: Genres and Library search/filter controls are Supabase-first when Supabase Library mode is on.'};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-12-supabase-genres-search-polish-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.12 backup download started')};
+var oldRunTestsV412=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV412)oldRunTestsV412();}catch(e){console.warn('V4.12 inherited self-test warning:',e)}console.assert(typeof sb412FilteredRows==='function','V4.12 filtered rows exists');console.assert(typeof genresPage==='function','V4.12 genres override exists');console.assert(APP_VERSION==='StreamBanditPrototype4.12-supabase-genres-search-polish','V4.12 version set')};
+
+
+/* Stream Bandit V4.12.1 — Supabase Genres Button Binding + Version Badge Hotfix
+   Fixes duplicate Load / refresh button ids by using delegated click binding, and tidies the visible sidebar badge. */
+var SB4121_LABEL='V4.12.1 Supabase Genres Button Binding Hotfix';
+var sb4121Status='Ready.';
+try{
+  APP_VERSION='StreamBanditPrototype4.12.1-supabase-genres-button-binding-hotfix';
+  if(data)data.version=APP_VERSION;
+  document.title='Stream Bandit V4.12.1 Supabase Genres Button Binding Hotfix';
+  if(typeof SB412_LABEL!=='undefined')SB412_LABEL=SB4121_LABEL;
+  if(typeof SB4117_LABEL!=='undefined')SB4117_LABEL=SB4121_LABEL;
+  if(typeof SB4116_LABEL!=='undefined')SB4116_LABEL=SB4121_LABEL;
+  if(typeof SB4114_LABEL!=='undefined')SB4114_LABEL=SB4121_LABEL;
+}catch(e){}
+function sb4121Msg(m){sb4121Status=m||'';try{toast(m)}catch(e){}}
+function sb4121StatusBox(){return '<div class="progressNote">'+esc(sb4121Status||'Ready.')+'</div>'}
+async function sb4121RefreshRemote(btn,goGenres){
+  try{
+    if(btn){btn.disabled=true;btn.dataset.oldText=btn.textContent;btn.textContent='Refreshing Supabase...'}
+    sb4121Status='Refreshing Supabase movies, genres and filters...';
+    if(typeof sbLoadRemoteLibrary!=='function')throw new Error('Supabase library loader is missing.');
+    await sbLoadRemoteLibrary();
+    sbRemoteLoaded=true;
+    sb4121Status='Loaded Supabase rows: '+((Array.isArray(sbRemoteMovies)?sbRemoteMovies.length:0))+' movie(s). Genres and filters refreshed.';
+    if(goGenres)view='genres';
+    render();
+  }catch(e){
+    sb4121Status='Supabase refresh failed: '+(e&&e.message?e.message:String(e));
+    try{toast(sb4121Status)}catch(x){}
+    if(btn){btn.disabled=false;if(btn.dataset.oldText)btn.textContent=btn.dataset.oldText;}
+    render();
+  }
+}
+var oldSbRemoteLibraryInsideMainV4121=typeof sbRemoteLibraryInsideMain==='function'?sbRemoteLibraryInsideMain:null;
+sbRemoteLibraryInsideMain=function(){
+  var html=oldSbRemoteLibraryInsideMainV4121?oldSbRemoteLibraryInsideMainV4121():'';
+  html=String(html).replace(/V4\.12 Supabase Genres \+ Search Polish/g,SB4121_LABEL).replace(/V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix/g,SB4121_LABEL);
+  return html.replace('<div class="sb412Stats">',sb4121StatusBox()+'<div class="sb412Stats">');
+};
+var oldGenresPageV4121=typeof genresPage==='function'?genresPage:null;
+genresPage=function(){
+  var html=oldGenresPageV4121?oldGenresPageV4121():'';
+  html=String(html).replace(/V4\.12 Supabase Genres \+ Search Polish/g,SB4121_LABEL).replace(/V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix/g,SB4121_LABEL);
+  return html.replace('<div class="sb412Stats">',sb4121StatusBox()+'<div class="sb412Stats">');
+};
+var oldSidebarV4121=typeof sidebar==='function'?sidebar:null;
+sidebar=function(){
+  var html=oldSidebarV4121?oldSidebarV4121():'';
+  return String(html).replace(/V4\.12 Supabase Genres \+ Search Polish|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V4\.11\.6 My Channel Save Input Capture Fix|V4\.11\.4 Supabase Profile Truth \+ Reset Warning|V4\.9 Supabase Creator Submissions \+ Review Queue|V4\.9\.1 Admin Supabase Layout Restore/g,SB4121_LABEL);
+};
+var oldSettingsPageV4121=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){var html=oldSettingsPageV4121?oldSettingsPageV4121():'';return String(html).replace(/StreamBanditPrototype4\.12-supabase-genres-search-polish|StreamBanditPrototype4\.11\.7-version-badge-tidy-my-channel-save-fix/g,APP_VERSION).replace(/V4\.12 Supabase Genres \+ Search Polish|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V4\.11\.6 My Channel Save Input Capture Fix|V4\.11\.4 Supabase Profile Truth \+ Reset Warning|V4\.9 Supabase Creator Submissions \+ Review Queue/g,SB4121_LABEL)};
+var oldBackupPageV4121=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){var html=oldBackupPageV4121?oldBackupPageV4121():'';return String(html).replace(/V4\.12 Supabase Genres \+ Search Polish|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V4\.11\.6 My Channel Save Input Capture Fix|V4\.11\.4 Supabase Profile Truth \+ Reset Warning|V4\.9 Supabase Creator Submissions \+ Review Queue/g,SB4121_LABEL)};
+var oldBindCommonV4121=typeof bindCommon==='function'?bindCommon:null;
+bindCommon=function(){
+  if(oldBindCommonV4121)oldBindCommonV4121();
+  document.querySelectorAll('#sbLoadLibraryMain,#sbLoadLibrary,#sb412LoadGenres').forEach(function(b){
+    b.onclick=function(ev){if(ev){ev.preventDefault();ev.stopPropagation();}sb4121RefreshRemote(b,b.id==='sb412LoadGenres')};
+  });
+};
+if(!window.__sb4121DelegatedClick){
+  window.__sb4121DelegatedClick=true;
+  document.addEventListener('click',function(ev){
+    var b=ev.target&&ev.target.closest?ev.target.closest('#sbLoadLibraryMain,#sbLoadLibrary,#sb412LoadGenres'):null;
+    if(!b)return;
+    ev.preventDefault();ev.stopPropagation();
+    sb4121RefreshRemote(b,b.id==='sb412LoadGenres');
+  },true);
+}
+var oldBackupSummaryV4121=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV4121?oldBackupSummaryV4121(d):'')+'\nV4.12.1 note: Supabase Library and Genres refresh buttons use delegated binding, so duplicate ids cannot leave visible buttons inactive.';};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-12-1-supabase-genres-button-hotfix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.12.1 backup download started')};
+var oldRunTestsV4121=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV4121)oldRunTestsV4121();}catch(e){console.warn('V4.12.1 inherited self-test warning:',e)}console.assert(typeof sb4121RefreshRemote==='function','V4.12.1 refresh hotfix exists');console.assert(APP_VERSION==='StreamBanditPrototype4.12.1-supabase-genres-button-binding-hotfix','V4.12.1 version set')};
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
