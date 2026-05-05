@@ -3977,6 +3977,196 @@ exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);da
 var oldRunTestsV4132=typeof runTests==='function'?runTests:null;
 runTests=function(){try{if(oldRunTestsV4132)oldRunTestsV4132();}catch(e){console.warn('V4.13.2 inherited self-test warning:',e)}console.assert(typeof settingsPage==='function','V4.13.2 standalone settings page exists');console.assert(APP_VERSION==='StreamBanditPrototype4.13.2-settings-page-standalone-render-fix','V4.13.2 version set')};
 
+
+/* Stream Bandit V4.14 — Backup / Health / Storage Supabase Cleanup
+   Cleans the remaining legacy browser/local wording and makes Backup/Storage read like a Supabase-first app.
+   No database, player or schema changes. */
+var SB414_LABEL='V4.14 Backup / Health / Storage Supabase Cleanup';
+try{
+  APP_VERSION='StreamBanditPrototype4.14-backup-health-storage-supabase-cleanup';
+  if(data)data.version=APP_VERSION;
+  document.title='Stream Bandit V4.14 Backup / Health / Storage Supabase Cleanup';
+  if(typeof SB4132_LABEL!=='undefined')SB4132_LABEL=SB414_LABEL;
+  if(typeof SB4131_LABEL!=='undefined')SB4131_LABEL=SB414_LABEL;
+  if(typeof SB4121_LABEL!=='undefined')SB4121_LABEL=SB414_LABEL;
+  if(typeof SB412_LABEL!=='undefined')SB412_LABEL=SB414_LABEL;
+}catch(e){console.warn('V4.14 label warning',e)}
+function sb414Stat(label,value){return '<div class="safeStat"><b>'+esc(label)+'</b><span>'+esc(value)+'</span></div>'}
+function sb414SupabaseMode(){return !!(data&&data.settings&&data.settings.useSupabaseLibrary)}
+function sb414Panel(kind){
+  var st=data&&data.settings?data.settings:{};
+  var profileName=(typeof sb411Profile!=='undefined'&&sb411Profile&&sb411Profile.channel_name)?sb411Profile.channel_name:((st.sb413LastSource)||'Not loaded on this page');
+  return '<div class="panel"><h3>'+esc(SB414_LABEL)+'</h3><p class="note">Stream Bandit is now Supabase-first for the real app pages. This cleanup keeps the older browser/local tools as labelled emergency tools instead of making the app feel half V3 and half V4.</p><div class="safetyGrid">'+
+    sb414Stat('This page',kind||'Safety cleanup')+
+    sb414Stat('Supabase Library',sb414SupabaseMode()?'Default active':'Browser fallback')+
+    sb414Stat('Settings source',st.sb413LastSource||'Browser/local fallback')+
+    sb414Stat('Browser JSON size',kb(dataSize())+' KB')+
+    sb414Stat('App version',APP_VERSION)+
+    sb414Stat('Profile/status',profileName)+
+  '</div><div class="progressNote"><b>Safe mode:</b> these tools do not change your Supabase movie tables unless you press a Supabase save button on the relevant page. Backup JSON is still useful as an emergency recovery file, but Supabase is the main source of truth for connected pages.</div><div class="row"><button class="secondary" data-view="supabase">Supabase Test</button><button class="secondary" data-view="settings">Supabase Settings</button><button class="secondary" data-view="library">Supabase Library</button><button class="secondary" data-view="storage">Local Storage Tools</button><button class="secondary" data-view="backup">Backup / Safety</button></div></div>';
+}
+var oldStoragePageV414=typeof storagePage==='function'?storagePage:null;
+storagePage=function(){
+  var html=oldStoragePageV414?oldStoragePageV414():'';
+  html=String(html)
+    .replace(topBar('Local Storage Manager'),'')
+    .replace(/Local Storage Manager/g,'Local Browser Video Storage')
+    .replace(/Local video storage health/g,'Legacy browser video file health')
+    .replace(/This checks the big uploaded video files stored inside this browser\. Your JSON backup saves titles, images, playlists, settings and video links\. Big uploaded browser video files stay on this device only, so keep the original video files safe as well\./g,'This checks old browser-only uploaded video files stored inside this device. Supabase movie metadata and stream URLs are separate. Browser video files are not uploaded to Supabase yet, so keep your original MP4/WebM/MOV files safe.')
+    .replace(/Scan local videos/g,'Scan browser video files')
+    .replace(/Delete orphan files/g,'Delete orphan browser files')
+    .replace(/Add \/ edit videos/g,'Open Admin movie tools')
+    .replace(/Press <b>Scan local videos<\/b> to check uploaded video files\./g,'Press <b>Scan browser video files</b> to check old browser-only uploaded files.');
+  return topBar('Storage / Legacy Browser Files')+sb414Panel('Storage cleanup')+html;
+};
+var oldBackupPageV414=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){
+  var html=oldBackupPageV414?oldBackupPageV414():'';
+  html=String(html)
+    .replace(topBar('Backup & Restore'),'')
+    .replace(/V3\.4\.1 safety centre|V3\.8\.7\.1 safety centre|V3\.8\.7 safety centre|V3\.8\.6\.1 safety centre|V3\.8\.6 safety centre/g,'Supabase safety centre')
+    .replace(/This page protects your live GitHub app data before bigger upgrades\. JSON backups save titles, images, links, settings, playlists and collections\. Big uploaded local videos still stay inside this browser\/device, so keep your original movie files safe too\./g,'This page now sits behind the Supabase-first app. Use JSON backups as an emergency fallback before uploading a new GitHub index.html. Connected Supabase pages read from the database; old browser-only video files still stay on this device.')
+    .replace(/Export backup/g,'Export emergency JSON backup')
+    .replace(/Restore backup with preview/g,'Restore browser fallback backup with preview')
+    .replace(/Storage repair/g,'Browser fallback repair')
+    .replace(/Reset Stream Bandit local storage/g,'Reset browser/local fallback data')
+    .replace(/Download backup JSON/g,'Download emergency backup JSON')
+    .replace(/Show \/ Copy backup JSON/g,'Show / copy emergency JSON');
+  return topBar('Backup / Supabase Safety')+sb414Panel('Backup cleanup')+html;
+};
+if(typeof storagePrepPage==='function'){
+  var oldStoragePrepPageV414=storagePrepPage;
+  storagePrepPage=function(){
+    var html=oldStoragePrepPageV414?oldStoragePrepPageV414():'';
+    return String(html).replace(/Storage Prep/g,'Storage Prep / Supabase Readiness').replace(/V3\.8\.7\.1|V3\.8\.7|V4\.13\.2 Settings Page Standalone Render Fix/g,SB414_LABEL);
+  };
+}
+if(typeof healthPage==='function'){
+  var oldHealthPageV414=healthPage;
+  healthPage=function(){
+    var html=oldHealthPageV414?oldHealthPageV414():'';
+    html=String(html).replace(/V4\.13\.2 Settings Page Standalone Render Fix|V4\.13\.1 Supabase Settings Startup Safety Fix|V4\.12\.1 Supabase Genres Button Binding Hotfix|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix/g,SB414_LABEL);
+    return html.replace(topBar('Admin Health Check'),topBar('Health / Supabase Safety')+sb414Panel('Health cleanup'));
+  };
+}
+var oldSettingsPageV414=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){var html=oldSettingsPageV414?oldSettingsPageV414():'';return String(html).replace(/V4\.13\.2 Settings Page Standalone Render Fix|V4\.13\.1 Supabase Settings Startup Safety Fix|V4\.12\.1 Supabase Genres Button Binding Hotfix|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix/g,SB414_LABEL).replace(/StreamBanditPrototype4\.13\.2-settings-page-standalone-render-fix/g,APP_VERSION)};
+var oldSidebarV414=typeof sidebar==='function'?sidebar:null;
+sidebar=function(){
+  var html=oldSidebarV414?oldSidebarV414():'';
+  html=String(html).replace(/V4\.13\.2 Settings Page Standalone Render Fix|V4\.13\.1 Supabase Settings Startup Safety Fix|V4\.12\.1 Supabase Genres Button Binding Hotfix|V4\.12 Supabase Genres \+ Search Polish|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix|V4\.9 Supabase Creator Submissions \+ Review Queue/g,SB414_LABEL);
+  html=html.replace('🗄 Storage</button>','🗄 Local Storage</button>').replace('💾 Backup</button>','💾 Backup / Safety</button>');
+  return html;
+};
+var oldBackupSummaryV414=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV414?oldBackupSummaryV414(d):'')+'\nV4.14 note: Backup, Health and Storage pages are relabelled as Supabase-first safety/fallback tools. No database schema, player, movie or storage method changed.';};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-14-backup-health-storage-supabase-cleanup-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.14 emergency backup download started')};
+runTests=function(){console.assert(APP_VERSION==='StreamBanditPrototype4.14-backup-health-storage-supabase-cleanup','V4.14 version set');console.assert(typeof storagePage==='function','V4.14 storage page exists');console.assert(typeof backupPage==='function','V4.14 backup page exists');console.assert(typeof settingsPage==='function','V4.14 settings page still exists');};
+
+
+/* Stream Bandit V4.14.1 — Continue Watching Progress Trigger Hotfix
+   Restores Supabase watch progress binding after the Backup/Storage cleanup checkpoint.
+   No schema, movie, storage or player-source changes. */
+var SB4141_LABEL='V4.14.1 Continue Watching Progress Trigger Hotfix';
+try{
+  APP_VERSION='StreamBanditPrototype4.14.1-continue-watching-progress-trigger-hotfix';
+  if(data)data.version=APP_VERSION;
+  document.title='Stream Bandit V4.14.1 Continue Watching Progress Trigger Hotfix';
+  if(typeof SB414_LABEL!=='undefined')SB414_LABEL=SB4141_LABEL;
+  if(typeof SB4132_LABEL!=='undefined')SB4132_LABEL=SB4141_LABEL;
+  if(typeof SB4131_LABEL!=='undefined')SB4131_LABEL=SB4141_LABEL;
+  if(typeof SB4121_LABEL!=='undefined')SB4121_LABEL=SB4141_LABEL;
+}catch(e){console.warn('V4.14.1 label warning',e)}
+function sb4141WatchStatusBox(){return '<div id="sb46WatchStatus" class="sb46WatchNote">V4.14.1 Continue Watching: ready to save Supabase progress once playback starts.</div>'}
+function sb4141EnsureWatchStatus(){
+  var s=byId('sb46WatchStatus');
+  if(s)return s;
+  var base=byId('sbRemoteStatus');
+  if(base&&base.insertAdjacentHTML){base.insertAdjacentHTML('afterend',sb4141WatchStatusBox());return byId('sb46WatchStatus')}
+  return null;
+}
+function sb4141SetWatchStatus(msg){var s=sb4141EnsureWatchStatus();if(s)s.textContent=msg;}
+var oldSbRemoteWatchPageV4141=typeof sbRemoteWatchPage==='function'?sbRemoteWatchPage:null;
+sbRemoteWatchPage=function(){
+  var html=oldSbRemoteWatchPageV4141?oldSbRemoteWatchPageV4141():'';
+  if(String(html).indexOf('id="sbRemotePlayer"')>-1&&String(html).indexOf('id="sb46WatchStatus"')<0){
+    html=String(html).replace('<div id="sbRemoteStatus" class="ok">Loading Supabase video source...</div>','<div id="sbRemoteStatus" class="ok">Loading Supabase video source...</div>'+sb4141WatchStatusBox());
+  }
+  return html;
+};
+async function sb4141SaveRemoteProgress(movieId,seconds,finished){
+  if(typeof sb46SaveProgress==='function')return sb46SaveProgress(movieId,seconds,finished);
+  try{
+    var c=typeof sb46EnsureUserNoRender==='function'?await sb46EnsureUserNoRender():(typeof sbInit==='function'?sbInit():null);
+    if(!c)throw new Error('Supabase SDK is not loaded.');
+    var ses=await c.auth.getSession();
+    var session=(ses&&ses.data&&ses.data.session)||null;
+    if(!session||!session.user)throw new Error('Not logged into Supabase.');
+    var row={user_id:session.user.id,movie_id:movieId,progress_seconds:Math.max(0,Math.floor(Number(seconds)||0)),finished:!!finished,last_watched_at:new Date().toISOString()};
+    var res=await c.from('sb_watch_progress').upsert(row);
+    if(res.error)throw res.error;
+    return true;
+  }catch(e){console.warn('V4.14.1 progress save failed',e);return false;}
+}
+function sb4141BindRemoteProgress(){
+  var p=byId('sbRemotePlayer');
+  if(!p||p._sb4141ProgressBound)return;
+  var movieId=typeof sbRemoteSelectedId!=='undefined'?sbRemoteSelectedId:(p.getAttribute('data-id')||'');
+  var m=(typeof sbFindRemoteMovie==='function')?sbFindRemoteMovie(movieId):null;
+  if(!movieId||!m)return;
+  p._sb4141ProgressBound=true;
+  var lastSave=0,resumeApplied=false;
+  function status(msg){sb4141SetWatchStatus(msg)}
+  function save(done,force){
+    var now=Date.now();
+    if(!force&&!done&&now-lastSave<5000)return;
+    var sec=Number(p.currentTime)||0;
+    if(sec<5&&!done)return;
+    lastSave=now;
+    sb4141SaveRemoteProgress(movieId,sec,!!done).then(function(ok){
+      if(ok){
+        if(typeof sb46ProgressLoaded!=='undefined')sb46ProgressLoaded=true;
+        status(done?'V4.14.1 saved to Supabase as finished.':'V4.14.1 saved Continue Watching: '+(typeof fmtTime==='function'?fmtTime(sec):Math.floor(sec)+'s')+'.');
+      }else{
+        status((typeof sb46ProgressStatus!=='undefined'&&sb46ProgressStatus)?sb46ProgressStatus:'V4.14.1 could not save progress. Check Supabase login.');
+      }
+    });
+  }
+  try{
+    if(typeof sb46LoadProgress==='function'){
+      sb46LoadProgress(true).then(function(){
+        var row=typeof sb46ProgressForMovie==='function'?sb46ProgressForMovie(movieId):null;
+        var sec=typeof sb46Seconds==='function'?sb46Seconds(row):0;
+        var finished=typeof sb46Finished==='function'?sb46Finished(row):false;
+        if(sec>5&&!finished){
+          var apply=function(){try{if(!resumeApplied&&p.duration&&sec<p.duration-3){p.currentTime=sec;resumeApplied=true;status('V4.14.1 resume loaded: '+(typeof fmtTime==='function'?fmtTime(sec):Math.floor(sec)+'s')+'. Press play.')}}catch(e){}};
+          p.addEventListener('loadedmetadata',apply,{once:true});
+          status('V4.14.1 found saved resume time: '+(typeof fmtTime==='function'?fmtTime(sec):Math.floor(sec)+'s')+'.');
+          apply();
+        }else{
+          status('V4.14.1 Continue Watching ready. Play for 5 seconds, then open Continue Watching and refresh progress.');
+        }
+      });
+    }else{status('V4.14.1 Continue Watching ready. Play for 5 seconds to save progress.');}
+  }catch(e){status('V4.14.1 progress ready, but resume check failed: '+(e.message||e));}
+  p.addEventListener('play',function(){status('V4.14.1 playback started. Progress will save after 5 seconds.');});
+  p.addEventListener('timeupdate',function(){save(false,false);});
+  p.addEventListener('pause',function(){save(false,true);});
+  p.addEventListener('seeking',function(){save(false,true);});
+  p.addEventListener('ended',function(){save(true,true);});
+  window.addEventListener('beforeunload',function(){save(false,true);});
+}
+var oldBindSbRemoteWatchV4141=typeof bindSbRemoteWatch==='function'?bindSbRemoteWatch:null;
+bindSbRemoteWatch=function(){if(oldBindSbRemoteWatchV4141)oldBindSbRemoteWatchV4141();sb4141BindRemoteProgress();};
+var oldBindCommonV4141=typeof bindCommon==='function'?bindCommon:null;
+bindCommon=function(){if(oldBindCommonV4141)oldBindCommonV4141();if(view==='sbremotewatch')setTimeout(sb4141BindRemoteProgress,50);};
+var oldSidebarV4141=typeof sidebar==='function'?sidebar:null;
+sidebar=function(){var html=oldSidebarV4141?oldSidebarV4141():'';return String(html).replace(/V4\.14 Backup \/ Health \/ Storage Supabase Cleanup|V4\.13\.2 Settings Page Standalone Render Fix|V4\.12\.1 Supabase Genres Button Binding Hotfix|V4\.11\.7 Version Badge Tidy \+ My Channel Save Fix/g,SB4141_LABEL)};
+var oldBackupSummaryV4141=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV4141?oldBackupSummaryV4141(d):'')+'\nV4.14.1 note: Supabase Continue Watching progress binding restored after V4.14 cleanup. Playback now saves progress again after 5 seconds, on pause and on ended.';};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-14-1-continue-watching-progress-trigger-hotfix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.14.1 emergency backup download started')};
+runTests=function(){console.assert(APP_VERSION==='StreamBanditPrototype4.14.1-continue-watching-progress-trigger-hotfix','V4.14.1 version set');console.assert(typeof sb4141BindRemoteProgress==='function','V4.14.1 progress binder exists');console.assert(typeof bindSbRemoteWatch==='function','V4.14.1 remote watch binder exists');};
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
