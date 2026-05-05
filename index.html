@@ -4430,6 +4430,288 @@ runTests=function(){try{if(oldRunTests52)oldRunTests52()}catch(e){console.warn('
 })();
 
 
+
+/* Stream Bandit V5.3 — Supabase Storage Image Polish
+   Extends the working V5.2.1 storage uploader beyond movie posters:
+   - Settings logo can upload to Supabase Storage.
+   - Submit Video poster can upload to Supabase Storage.
+   - Review Queue poster edit can upload to Supabase Storage.
+   - Keeps videos on Mux/HLS/URL and browser video upload as local test only. */
+(function(){
+'use strict';
+var SB53_LABEL='V5.3 Supabase Storage Image Polish';
+try{
+  APP_VERSION='StreamBanditPrototype5.3-supabase-storage-image-polish';
+  if(data){data.version=APP_VERSION;}
+  document.title='Stream Bandit V5.3 Supabase Storage Image Polish';
+}catch(e){}
+(function(){
+  var css='.sb53LogoTools{border:1px solid #2b6f61;background:#0b2a25;border-radius:16px;padding:12px;margin:10px 0}.sb53LogoTools b{display:block;margin-bottom:6px}.sb53LogoPreview{margin-top:8px;width:90px;height:90px;border-radius:20px;overflow:hidden;background:#07070b;border:1px solid var(--line);display:grid;place-items:center}.sb53LogoPreview img{width:100%;height:100%;object-fit:cover}.sb53Mini{font-size:12px;color:var(--muted);line-height:1.45}.sb53StorageBadge{display:inline-block;border:1px solid #3ddc9777;background:#123b2b;color:#baf7df;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;margin-bottom:8px}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+function sb53Panel(){
+  return '<div class="panel"><span class="sb53StorageBadge">'+esc(SB53_LABEL)+'</span><h3>Image uploads polished</h3><p class="note">Posters, submission images, review queue poster edits, channel avatar/banner images and the app logo can now use Supabase Storage file uploads. Video files still stay on Mux/HLS/URL, which is the professional streaming route.</p><div class="sb52Grid"><div class="sb52Box sb52Good"><b>Supabase Storage images</b><br>Choose a file, upload it, then Stream Bandit fills the public URL for you.</div><div class="sb52Box sb52Warn"><b>Mux video route</b><br>Keep real movie videos on Mux. Paste the Mux stream/HLS link into the video URL field.</div></div></div>';
+}
+function sb53LogoUploaderHtml(){
+  return '<div class="sb53LogoTools" id="sb53LogoTools"><b>Logo upload to Supabase Storage</b><p class="sb53Mini">Choose a logo image, upload it to Supabase Storage, then press <b>Save settings to Supabase</b>. This avoids storing the logo as giant browser backup text.</p><div class="sb52UploadLine"><input id="sb53LogoFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><button type="button" class="good small" id="sb53UploadLogo">Upload logo to Supabase Storage</button></div><p id="sb53LogoStatus" class="note">No logo uploaded yet.</p></div>';
+}
+async function sb53UploadLogo(){
+  var status=byId('sb53LogoStatus'), input=byId('sb53LogoFile');
+  try{
+    var file=input&&input.files&&input.files[0];
+    if(!file)throw new Error('Choose a logo image first.');
+    if(!/^image\//i.test(file.type||''))throw new Error('Please choose a PNG, JPG, WebP or GIF image.');
+    if(status)status.innerHTML='<span class="ok">Uploading logo to Supabase Storage...</span>';
+    var url=await sb52UploadImage(file,'logos',(file&&file.name)||'logo');
+    data.settings=data.settings||{};
+    data.settings.logo=url;
+    try{saveData();}catch(e){}
+    if(status)status.innerHTML='<span class="ok">Logo uploaded. Press Save settings to Supabase.</span><div class="sb53LogoPreview"><img src="'+esc(url)+'"></div>';
+    toast('Logo uploaded to Supabase Storage');
+  }catch(e){
+    var msg=(e&&(e.message||e.details||e.hint))||String(e);
+    if(status)status.innerHTML='<span class="bad">'+esc(msg)+'</span>';
+    toast('Logo upload failed: '+msg);
+  }
+}
+function sb53UploadForInputHtml(kind,fileId,urlId,statusId,folder){
+  return '<div class="sb52Box"><b>'+esc(kind)+' Supabase Storage upload</b><p class="sb52Small">Choose a file and upload it. Stream Bandit fills the URL box automatically.</p><div class="sb52UploadLine"><input id="'+esc(fileId)+'" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><button type="button" class="good small sb52UploadBtn" data-file="'+esc(fileId)+'" data-url="'+esc(urlId)+'" data-status="'+esc(statusId)+'" data-folder="'+esc(folder||'images')+'">Upload image</button></div><p id="'+esc(statusId)+'" class="note">No file uploaded yet.</p></div>';
+}
+var oldSubmitPage53=typeof submitPage==='function'?submitPage:null;
+if(oldSubmitPage53){
+  submitPage=function(){
+    var html=String(oldSubmitPage53());
+    html=html.replace(field('Thumbnail / poster image URL optional','subThumbUrl'),sb53UploadForInputHtml('Submission poster','sb53SubmitPosterFile','subThumbUrl','sb53SubmitPosterStatus','submission-posters')+field('Poster URL from Supabase Storage, or paste a public URL','subThumbUrl'));
+    html=html.replace('Creator submissions now save into Supabase.','Creator submissions now save into Supabase, and poster images can upload to Supabase Storage.');
+    return html;
+  };
+}
+var oldSb49SaveSubmission53=typeof sb49SaveSubmission==='function'?sb49SaveSubmission:null;
+if(oldSb49SaveSubmission53){
+  sb49SaveSubmission=async function(){
+    var f=byId('sb53SubmitPosterFile');
+    try{
+      if(f&&f.files&&f.files[0]&&byId('subThumbUrl')){
+        byId('subThumbUrl').value=await sb52UploadImage(f.files[0],'submission-posters',(byId('subTitle')&&byId('subTitle').value)||'submission-poster');
+      }
+    }catch(e){toast('Submission poster upload failed: '+((e&&e.message)||e));return;}
+    return oldSb49SaveSubmission53.apply(this,arguments);
+  };
+}
+function sb53InjectReviewPosterUploaders(){
+  Array.prototype.slice.call(document.querySelectorAll('input[id^="sb49Thumb_"]')).forEach(function(inp){
+    var id=inp.id;
+    var fileId='sb53ReviewPosterFile_'+id.replace(/[^a-zA-Z0-9_\-]/g,'_');
+    if(byId(fileId))return;
+    var statusId='sb53ReviewPosterStatus_'+id.replace(/[^a-zA-Z0-9_\-]/g,'_');
+    inp.insertAdjacentHTML('beforebegin',sb53UploadForInputHtml('Review poster edit',fileId,id,statusId,'review-posters'));
+  });
+}
+function sb53InjectSettingsLogoUploader(){
+  var logoInput=byId('setLogo');
+  if(logoInput&&!byId('sb53LogoTools')){
+    logoInput.insertAdjacentHTML('beforebegin',sb53LogoUploaderHtml());
+  }
+  var btn=byId('sb53UploadLogo');
+  if(btn&&!btn.dataset.bound){btn.dataset.bound='1';btn.onclick=function(ev){ev.preventDefault();ev.stopPropagation();sb53UploadLogo();};}
+}
+var oldSettingsPage53=typeof settingsPage==='function'?settingsPage:null;
+if(oldSettingsPage53){settingsPage=function(){var html=String(oldSettingsPage53()).replace(/V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan|V5\.0 Stable Supabase Release Cleanup \+ Tabs \+ Admin Uploader/g,SB53_LABEL);return html+sb53Panel();};}
+var oldUploadPlanPage53=typeof uploadPlanPage==='function'?uploadPlanPage:null;
+if(oldUploadPlanPage53){uploadPlanPage=function(){return String(oldUploadPlanPage53()).replace(/V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.2 Supabase Storage image uploaders|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB53_LABEL).replace('Move posters, avatars, banners and logos to Supabase Storage when you are ready.','Polish all image upload points: movie posters, submissions, review edits, channel images and app logo.').replace('Add proper Mux fields and admin workflow so Stream Bandit can manage video streams professionally.','Next: Mux video manager fields and workflow for real streaming videos.')+sb53Panel();};}
+var oldAdminPage53=typeof adminPage==='function'?adminPage:null;
+if(oldAdminPage53){adminPage=function(){var html=String(oldAdminPage53()).replace(/V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB53_LABEL);return html;};}
+var oldSupabaseManagerPage53=typeof supabaseManagerPage==='function'?supabaseManagerPage:null;
+if(oldSupabaseManagerPage53){supabaseManagerPage=function(){return String(oldSupabaseManagerPage53()).replace(/V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB53_LABEL);};}
+var oldSidebar53=typeof sidebar==='function'?sidebar:null;
+if(oldSidebar53){sidebar=function(){return String(oldSidebar53()).replace(/V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan|V5\.0 Stable Supabase Release Cleanup \+ Tabs \+ Admin Uploader/g,SB53_LABEL);};}
+var oldBackupSummary53=typeof backupSummary==='function'?backupSummary:null;
+if(oldBackupSummary53){backupSummary=function(d){return oldBackupSummary53(d)+'\nV5.3 note: Supabase Storage image polish added for logo, submission posters and review poster edits. Videos remain Mux/HLS/URL.';};}
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v5-3-supabase-storage-image-polish-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V5.3 backup download started');};
+var oldBindCommon53=typeof bindCommon==='function'?bindCommon:null;
+bindCommon=function(){
+  if(oldBindCommon53)oldBindCommon53();
+  sb53InjectSettingsLogoUploader();
+  sb53InjectReviewPosterUploaders();
+  document.querySelectorAll('.sb52UploadBtn').forEach(function(b){if(!b.dataset.sb53Bound){b.dataset.sb53Bound='1';b.onclick=function(ev){ev.preventDefault();ev.stopPropagation();sb52UploadFromButton(b);};}});
+};
+var oldRunTests53=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTests53)oldRunTests53();}catch(e){console.warn('V5.3 inherited self-test warning:',e)}console.assert(typeof sb53UploadLogo==='function','V5.3 logo uploader exists');console.assert(APP_VERSION==='StreamBanditPrototype5.3-supabase-storage-image-polish','V5.3 version set');};
+})();
+
+
+
+/* Stream Bandit V5.3.1 — Submit Poster Upload Visibility Fix
+   Fixes Submit Video showing only a poster URL box by injecting the Supabase Storage chooser
+   around whichever legacy/Supabase submission renderer is active. */
+(function(){
+'use strict';
+var SB531_LABEL='V5.3.1 Submit Poster Upload Visibility Fix';
+try{
+  APP_VERSION='StreamBanditPrototype5.3.1-submit-poster-upload-visibility-fix';
+  if(data){data.version=APP_VERSION;}
+  document.title='Stream Bandit V5.3.1 Submit Poster Upload Visibility Fix';
+}catch(e){}
+function sb531SubmitUploadHtml(){
+  if(typeof sb53UploadForInputHtml==='function'){
+    return sb53UploadForInputHtml('Submission poster','sb53SubmitPosterFile','subThumbUrl','sb53SubmitPosterStatus','submission-posters');
+  }
+  return '<div class="sb52Box"><b>Submission poster Supabase Storage upload</b><p class="sb52Small">Choose a poster file and upload it. Stream Bandit fills the URL box automatically.</p><div class="sb52UploadLine"><input id="sb53SubmitPosterFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><button type="button" class="good small sb52UploadBtn" data-file="sb53SubmitPosterFile" data-url="subThumbUrl" data-status="sb53SubmitPosterStatus" data-folder="submission-posters">Upload image</button></div><p id="sb53SubmitPosterStatus" class="note">No file uploaded yet.</p></div>';
+}
+function sb531AddSubmitPosterUploader(html){
+  html=String(html||'');
+  if(html.indexOf('sb53SubmitPosterFile')>-1)return html;
+  var upload=sb531SubmitUploadHtml();
+  var labels=['Thumbnail image URL, optional','Thumbnail / poster image URL optional','Thumbnail / poster image URL, optional','Poster URL from Supabase Storage, or paste a public URL'];
+  for(var i=0;i<labels.length;i++){
+    var needle='<label>'+labels[i]+'</label><input id="subThumbUrl"';
+    if(html.indexOf(needle)>-1){
+      return html.replace(needle,upload+'<label>Poster URL from Supabase Storage, or paste a public URL</label><input id="subThumbUrl"');
+    }
+  }
+  if(html.indexOf('id="subThumbUrl"')>-1){
+    return html.replace(/<label>[^<]*(?:Thumbnail|Poster)[^<]*<\/label><input id="subThumbUrl"[^>]*>/i,function(m){return upload+'<label>Poster URL from Supabase Storage, or paste a public URL</label>'+m.replace(/<label>[^<]*<\/label>/i,'');});
+  }
+  return html.replace('<button id="submitVideo"',upload+'<button id="submitVideo"');
+}
+var oldSubmitPage531=typeof submitPage==='function'?submitPage:null;
+if(oldSubmitPage531){
+  submitPage=function(){
+    var html=sb531AddSubmitPosterUploader(oldSubmitPage531.apply(this,arguments));
+    html=html.replace(/V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB531_LABEL);
+    html=html.replace('Creator submissions are URL/link based only for now. This avoids browser storage problems until proper backend storage is chosen.','Creator submissions use a video URL/Mux/HLS link, and poster images can now upload to Supabase Storage.');
+    return html;
+  };
+}
+async function sb531UploadSubmitPosterIfChosen(){
+  var f=byId('sb53SubmitPosterFile');
+  if(f&&f.files&&f.files[0]&&byId('subThumbUrl')){
+    byId('subThumbUrl').value=await sb52UploadImage(f.files[0],'submission-posters',(byId('subTitle')&&byId('subTitle').value)||'submission-poster');
+  }
+}
+var oldSaveSubmission531=typeof saveSubmission==='function'?saveSubmission:null;
+if(oldSaveSubmission531){
+  saveSubmission=async function(){
+    try{await sb531UploadSubmitPosterIfChosen();}
+    catch(e){toast('Submission poster upload failed: '+((e&&e.message)||e));return;}
+    return oldSaveSubmission531.apply(this,arguments);
+  };
+}
+var oldSb49SaveSubmission531=typeof sb49SaveSubmission==='function'?sb49SaveSubmission:null;
+if(oldSb49SaveSubmission531){
+  sb49SaveSubmission=async function(){
+    try{await sb531UploadSubmitPosterIfChosen();}
+    catch(e){toast('Submission poster upload failed: '+((e&&e.message)||e));return;}
+    return oldSb49SaveSubmission531.apply(this,arguments);
+  };
+}
+var oldSidebar531=typeof sidebar==='function'?sidebar:null;
+if(oldSidebar531){sidebar=function(){return String(oldSidebar531()).replace(/V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB531_LABEL);};}
+var oldSettingsPage531=typeof settingsPage==='function'?settingsPage:null;
+if(oldSettingsPage531){settingsPage=function(){return String(oldSettingsPage531()).replace(/V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix|V5\.1 Platform Polish \+ Mux\/Supabase Upload Plan/g,SB531_LABEL);};}
+var oldBackupSummary531=typeof backupSummary==='function'?backupSummary:null;
+if(oldBackupSummary531){backupSummary=function(d){return oldBackupSummary531(d)+'\nV5.3.1 note: Submit Video poster uploader is now visible and saves to Supabase Storage before the submission is sent.';};}
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v5-3-1-submit-poster-upload-fix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V5.3.1 backup download started');};
+var oldRunTests531=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTests531)oldRunTests531();}catch(e){console.warn('V5.3.1 inherited self-test warning:',e)}console.assert(typeof sb531AddSubmitPosterUploader==='function','V5.3.1 submit poster injector exists');console.assert(APP_VERSION==='StreamBanditPrototype5.3.1-submit-poster-upload-visibility-fix','V5.3.1 version set');};
+})();
+
+
+/* Stream Bandit V5.3.2 — Submit Poster Upload Button Binding Fix
+   Adds a document-level delegated click handler so the Submit Video poster upload button
+   responds even when older page wrappers rebuild the form after normal binding. */
+(function(){
+'use strict';
+var SB532_LABEL='V5.3.2 Submit Poster Upload Button Binding Fix';
+try{
+  APP_VERSION='StreamBanditPrototype5.3.2-submit-poster-upload-button-binding-fix';
+  if(data){data.version=APP_VERSION;}
+  document.title='Stream Bandit V5.3.2 Submit Poster Upload Button Binding Fix';
+}catch(e){}
+function sb532Status(id,msg,ok){
+  var el=byId(id);
+  if(el)el.innerHTML='<span class="'+(ok?'ok':'bad')+'">'+esc(msg)+'</span>';
+}
+async function sb532UploadFromButton(btn){
+  var fileId=btn.getAttribute('data-file')||'sb53SubmitPosterFile';
+  var urlId=btn.getAttribute('data-url')||'subThumbUrl';
+  var statusId=btn.getAttribute('data-status')||'sb53SubmitPosterStatus';
+  var folder=btn.getAttribute('data-folder')||'submission-posters';
+  var fileInput=byId(fileId), urlInput=byId(urlId);
+  try{
+    if(!fileInput)throw new Error('Image chooser was not found. Refresh the Submit Video page and try again.');
+    var file=fileInput.files&&fileInput.files[0];
+    if(!file)throw new Error('Choose a poster image first, then press Upload image.');
+    if(!/^image\//i.test(file.type||''))throw new Error('Please choose a PNG, JPG, WebP or GIF image.');
+    sb532Status(statusId,'Uploading poster to Supabase Storage...',true);
+    btn.disabled=true;
+    var label=(byId('subTitle')&&byId('subTitle').value)||file.name||'submission-poster';
+    var url=await window.sb52UploadImage(file,folder,label);
+    if(!url)throw new Error('Upload finished but no public URL came back. Check the bucket is public.');
+    if(urlInput)urlInput.value=url;
+    var st=byId(statusId);
+    if(st)st.innerHTML='<span class="ok">Uploaded. Poster URL filled in. You can now send the submission.</span><div class="sb52Preview"><img src="'+esc(url)+'"></div>';
+    toast('Submission poster uploaded');
+  }catch(e){
+    var msg=(e&&(e.message||e.details||e.hint))||String(e);
+    sb532Status(statusId,msg,false);
+    toast('Poster upload failed: '+msg);
+  }finally{
+    btn.disabled=false;
+  }
+}
+function sb532BindUploadButtons(){
+  document.querySelectorAll('.sb52UploadBtn').forEach(function(btn){
+    if(btn.dataset.sb532Bound)return;
+    btn.dataset.sb532Bound='1';
+    btn.onclick=function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
+      sb532UploadFromButton(btn);
+      return false;
+    };
+  });
+  var f=byId('sb53SubmitPosterFile'), st=byId('sb53SubmitPosterStatus');
+  if(f&&!f.dataset.sb532FileBound){
+    f.dataset.sb532FileBound='1';
+    f.onchange=function(){
+      var file=f.files&&f.files[0];
+      if(st)st.innerHTML=file?'<span class="ok">Poster selected: '+esc(file.name)+'. Now press Upload image.</span>':'No file uploaded yet.';
+    };
+  }
+}
+var oldBindCommon532=typeof bindCommon==='function'?bindCommon:null;
+bindCommon=function(){
+  if(oldBindCommon532)oldBindCommon532();
+  sb532BindUploadButtons();
+};
+document.addEventListener('click',function(ev){
+  var btn=ev.target&&ev.target.closest?ev.target.closest('.sb52UploadBtn'):null;
+  if(!btn)return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
+  sb532UploadFromButton(btn);
+  return false;
+},true);
+var oldSubmitPage532=typeof submitPage==='function'?submitPage:null;
+if(oldSubmitPage532){
+  submitPage=function(){
+    return String(oldSubmitPage532.apply(this,arguments)).replace(/V5\.3\.1 Submit Poster Upload Visibility Fix|V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix/g,SB532_LABEL);
+  };
+}
+var oldSidebar532=typeof sidebar==='function'?sidebar:null;
+if(oldSidebar532){sidebar=function(){return String(oldSidebar532()).replace(/V5\.3\.1 Submit Poster Upload Visibility Fix|V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix/g,SB532_LABEL);};}
+var oldSettingsPage532=typeof settingsPage==='function'?settingsPage:null;
+if(oldSettingsPage532){settingsPage=function(){return String(oldSettingsPage532()).replace(/V5\.3\.1 Submit Poster Upload Visibility Fix|V5\.3 Supabase Storage Image Polish|V5\.2\.1 Supabase Storage Image Uploader Visibility Fix/g,SB532_LABEL);};}
+var oldBackupSummary532=typeof backupSummary==='function'?backupSummary:null;
+if(oldBackupSummary532){backupSummary=function(d){return oldBackupSummary532(d)+'\nV5.3.2 note: Submit Video poster Upload image button now uses a stronger delegated binding.';};}
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v5-3-2-submit-poster-upload-button-fix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V5.3.2 backup download started');};
+var oldRunTests532=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTests532)oldRunTests532();}catch(e){console.warn('V5.3.2 inherited self-test warning:',e)}console.assert(typeof sb532UploadFromButton==='function','V5.3.2 delegated submit poster upload exists');console.assert(APP_VERSION==='StreamBanditPrototype5.3.2-submit-poster-upload-button-binding-fix','V5.3.2 version set');};
+})();
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
