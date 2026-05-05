@@ -3346,11 +3346,294 @@ var oldRunTestsV410=typeof runTests==='function'?runTests:null;
 runTests=function(){try{if(oldRunTestsV410)oldRunTestsV410()}catch(e){console.warn('V4.10 inherited self-test warning:',e)}console.assert(typeof sb410Load==='function','V4.10 channels loader exists');console.assert(typeof sb410ChannelsPage==='function','V4.10 channels page exists')};
 
 
+/* Stream Bandit V4.11 — Supabase My Channel / Creator Profile
+   Makes My Channel Supabase-first: profile display, avatar/banner URL fields,
+   approved channel videos, and the creator's Supabase submissions. Safe fallback
+   keeps the old browser/local My Channel page if Supabase Library mode is off. */
+var SB411_LABEL='V4.11 Supabase My Channel / Creator Profile';
+try{APP_VERSION='StreamBanditPrototype4.11-supabase-my-channel-creator-profile';if(data)data.version=APP_VERSION;document.title='Stream Bandit V4.11 Supabase My Channel / Creator Profile';}catch(e){}
+var sb411Profile=null;
+var sb411Channels=[];
+var sb411Movies=[];
+var sb411Submissions=[];
+var sb411Loaded=false;
+var sb411Status='Press Load / refresh My Channel to read your Supabase creator profile.';
+(function(){var st=document.createElement('style');st.textContent='\n.sb411Hero{border:1px solid #7c3cff77;background:#110d21;border-radius:24px;padding:15px;margin:12px 0;color:#eadcff}.sb411Status{white-space:pre-wrap;background:#101827;border:1px solid #6aa6ff55;border-radius:16px;padding:10px;color:#cfe5ff;margin:10px 0}.sb411Stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}.sb411Tile{background:#0d0e15;border:1px solid var(--line);border-radius:16px;padding:11px}.sb411Tile b{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.sb411Tile span{font-size:18px;font-weight:900}.sb411ProfileHero{display:grid;grid-template-columns:250px 1fr;gap:18px;align-items:center;background:#11131e;border:1px solid var(--line);border-radius:24px;padding:16px;margin:14px 0}.sb411Banner{aspect-ratio:16/9;background:#07070b;border:1px solid var(--line);border-radius:18px;overflow:hidden;display:grid;place-items:center;color:var(--muted)}.sb411Banner img{width:100%;height:100%;object-fit:cover}.sb411Avatar{width:76px;height:76px;border-radius:24px;overflow:hidden;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;font-size:30px;font-weight:900;border:1px solid var(--line);flex:0 0 auto}.sb411Avatar img{width:100%;height:100%;object-fit:cover}.sb411FormGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.sb411Card{background:#151724;border:1px solid var(--line);border-radius:20px;padding:14px;margin:12px 0}.sb411Thumb{aspect-ratio:16/9;border-radius:16px;background:#080912;display:grid;place-items:center;overflow:hidden;color:var(--muted);margin:10px 0}.sb411Thumb img{width:100%;height:100%;object-fit:cover}@media(max-width:850px){.sb411ProfileHero{grid-template-columns:1fr}}';document.head.appendChild(st);})();
+function sb411UseSupabase(){return !!(data&&data.settings&&data.settings.useSupabaseLibrary)}
+function sb411Err(e){return (typeof sb49Err==='function'?sb49Err(e):(e&&(e.message||e.details||e.hint)||String(e||'Unknown error')))}
+function sb411SetStatus(s){sb411Status=String(s||'');var el=byId('sb411Status');if(el)el.textContent=sb411Status;}
+function sb411Val(id){var el=byId(id);return el?String(el.value||'').trim():''}
+function sb411Tile(label,value){return '<div class="sb411Tile"><b>'+esc(label)+'</b><span>'+esc(value)+'</span></div>'}
+async function sb411EnsureClient(){var c=sbInit();if(!c)throw new Error('Supabase SDK is not loaded.');if(typeof sbRefresh==='function')await sbRefresh();else{var ses=await c.auth.getSession();sbSession=(ses&&ses.data&&ses.data.session)||null;}if(!sbSession||!sbSession.user)throw new Error('Please log into Supabase first from Supabase Test.');return c;}
+function sb411ProfileName(){var u=me()||{},p=sb411Profile||sbProfile||{};return p.channel_name||u.channelName||p.display_name||p.username||u.username||'My Channel'}
+function sb411About(){var u=me()||{},p=sb411Profile||sbProfile||{};return p.channel_about||p.about||p.bio||u.channelAbout||'Creator channel profile for Stream Bandit.'}
+function sb411Avatar(){var u=me()||{},p=sb411Profile||sbProfile||{};return p.avatar_url||p.avatar||u.avatar||''}
+function sb411Banner(){var u=me()||{},p=sb411Profile||sbProfile||{};return p.banner_url||p.banner||u.banner||''}
+function sb411Uid(){return (sbSession&&sbSession.user&&sbSession.user.id)||''}
+function sb411MovieSource(m){return (typeof sbMovieSource==='function'?sbMovieSource(m):((m&&((m.mux_playback_url||'')||(m.video_url||'')))||''))}
+function sb411Genres(m){return Array.isArray(m&&m.genres)?m.genres.filter(Boolean):[]}
+function sb411SubmissionGenres(s){return Array.isArray(s&&s.genres)?s.genres.filter(Boolean):[]}
+function sb411MyChannelKeys(){var u=me()||{},p=sb411Profile||sbProfile||{};return [p.channel_name,u.channelName,p.display_name,p.username,u.username,'Stream Bandit Channel'].map(function(x){return String(x||'').trim().toLowerCase()}).filter(Boolean).filter(function(x,i,a){return a.indexOf(x)===i})}
+function sb411MatchesMineMovie(m){var uid=sb411Uid(),keys=sb411MyChannelKeys(),ch=(m&&m.sb_channels&&m.sb_channels.name)||m.channel_name||'';if(uid&&String(m&&m.owner_id||'')===String(uid))return true;if(ch&&keys.indexOf(String(ch).trim().toLowerCase())>=0)return true;return false;}
+function sb411MatchesMineSubmission(s){var uid=sb411Uid(),keys=sb411MyChannelKeys(),ch=s&&s.channel_name||'';if(uid&&String(s&&s.submitter_id||'')===String(uid))return true;if(ch&&keys.indexOf(String(ch).trim().toLowerCase())>=0)return true;return false;}
+async function sb411Load(repaint){try{var c=await sb411EnsureClient(),uid=sb411Uid();sb411SetStatus('Loading Supabase My Channel profile...');var pr=await c.from('sb_profiles').select('*').eq('id',uid).maybeSingle();if(!pr.error&&pr.data){sb411Profile=pr.data;sbProfile=pr.data;}else{sb411Profile=sbProfile||null;}var ch=await c.from('sb_channels').select('*').order('name',{ascending:true});sb411Channels=(!ch.error&&ch.data)?ch.data:[];var mv=await c.from('sb_movies').select('id,title,description,mux_playback_url,video_url,thumbnail_url,year,rating,runtime_text,age_rating,genres,tags,featured,duration_seconds,source_type,status,channel_id,owner_id,sb_channels(name)').eq('status','published').order('created_at',{ascending:false});if(mv.error)throw mv.error;sb411Movies=(mv.data||[]).filter(sb411MatchesMineMovie);if(typeof sbRemoteMovies!=='undefined'&&Array.isArray(sbRemoteMovies)){var seen={};sbRemoteMovies.concat(sb411Movies).forEach(function(m){if(m&&m.id&&!seen[String(m.id)]){seen[String(m.id)]=true;}});sb411Movies.forEach(function(m){if(m&&m.id&&!sbRemoteMovies.some(function(x){return String(x.id)===String(m.id)}))sbRemoteMovies.push(m);});sbRemoteLoaded=true;}var sub=await c.from('sb_submissions').select('*').order('created_at',{ascending:false});if(!sub.error)sb411Submissions=(sub.data||[]).map(function(row){return typeof sb49Normalise==='function'?sb49Normalise(row):row}).filter(sb411MatchesMineSubmission);else sb411Submissions=[];sb411Loaded=true;sb411SetStatus('Loaded My Channel from Supabase: '+sb411Movies.length+' approved video(s), '+sb411Submissions.length+' submission(s).');if(repaint)render();return true;}catch(e){sb411SetStatus('Supabase My Channel failed: '+sb411Err(e));if(repaint)render();return false;}}
+async function sb411SaveProfile(){try{var c=await sb411EnsureClient(),uid=sb411Uid();var patch={channel_name:sb411Val('sb411ChannelName')||sb411ProfileName(),display_name:sb411Val('sb411DisplayName')||sb411ProfileName(),avatar_url:sb411Val('sb411AvatarUrl'),banner_url:sb411Val('sb411BannerUrl'),channel_about:sb411Val('sb411About')};sb411SetStatus('Saving Supabase creator profile...');var res=await c.from('sb_profiles').update(patch).eq('id',uid).select('*').single();if(res.error){var small={channel_name:patch.channel_name,display_name:patch.display_name};res=await c.from('sb_profiles').update(small).eq('id',uid).select('*').single();if(res.error)throw res.error;sb411SetStatus('Saved channel name/display name. Avatar/banner/about URL columns are not available in this Supabase profile table yet.');}else{sb411SetStatus('Saved Supabase creator profile.');}sb411Profile=res.data||Object.assign({},sb411Profile||{},patch);sbProfile=sb411Profile;if(typeof sb410Load==='function')try{await sb410Load(false)}catch(e){};await sb411Load(false);render();toast('Supabase My Channel profile saved');}catch(e){var msg='Save profile failed: '+sb411Err(e);sb411SetStatus(msg);toast(msg);}}
+function sb411MovieCard(m){var src=sb411MovieSource(m),img=m.thumbnail_url||'',gs=sb411Genres(m),tags=Array.isArray(m.tags)?m.tags:[];return '<div class="card"><div class="thumb">'+(img?'<img src="'+esc(img)+'">':'<span>No thumbnail</span>')+(m.featured?'<span class="badge">Featured</span>':'')+'</div><div class="body"><h3>'+esc(m.title||'Untitled')+'</h3><p class="muted">'+esc(m.description||'')+'</p><div class="row"><span class="pill">Supabase approved</span><span class="pill">'+esc((m.sb_channels&&m.sb_channels.name)||'My Channel')+'</span>'+gs.slice(0,3).map(function(g){return '<span class="pill">'+esc(g)+'</span>'}).join('')+tags.slice(0,2).map(function(t){return '<span class="pill">'+esc(t)+'</span>'}).join('')+'</div><br><div class="row"><button class="small sbDetailRemote" data-id="'+esc(m.id)+'">Details</button><button class="small sbPlayRemote" data-id="'+esc(m.id)+'" '+(!src?'disabled':'')+'>Play</button></div></div></div>'}
+function sb411SubCard(s){var status=String(s.status||'pending').toLowerCase(),cls=status==='approved'?'sb49Approved':(status==='declined'?'sb49Declined':'sb49Pending'),gs=sb411SubmissionGenres(s);return '<div class="sb411Card"><div class="row"><span class="sb49Badge '+cls+'">'+esc(status.toUpperCase())+'</span><b>'+esc(s.title||'Untitled')+'</b><span class="pill">'+esc(s.channel_name||sb411ProfileName())+'</span></div>'+(s.thumbnail_url?'<div class="sb411Thumb"><img src="'+esc(s.thumbnail_url)+'"></div>':'')+'<p class="muted">'+esc(s.description||'')+'</p><div class="row">'+gs.slice(0,5).map(function(g){return '<span class="pill">'+esc(g)+'</span>'}).join('')+'</div>'+(s.decline_reason?'<p class="bad"><b>Decline reason:</b> '+esc(s.decline_reason)+'</p>':'')+'</div>'}
+var oldMyChannelPageV411=typeof myChannelPage==='function'?myChannelPage:null;
+myChannelPage=function(){if(!sb411UseSupabase()&&oldMyChannelPageV411)return oldMyChannelPageV411();var name=sb411ProfileName(),about=sb411About(),av=sb411Avatar(),bn=sb411Banner(),pending=sb411Submissions.filter(function(s){return String(s.status||'pending')==='pending'}).length,approvedSubs=sb411Submissions.filter(function(s){return String(s.status||'')==='approved'}).length;return topBar('My Channel')+'<div class="sb411Hero"><h3>'+SB411_LABEL+'</h3><p class="note">My Channel is now Supabase-first. It reads your creator profile, your approved Supabase channel videos, and your Supabase submissions. Browser/local My Channel remains safe when Supabase Library mode is switched off.</p><div class="row"><button class="good" id="sb411LoadMine">Load / refresh My Channel</button><button class="secondary" data-view="submit">Submit Video</button><button class="secondary" data-view="channels">Channels</button><button class="secondary" data-view="supabase">Supabase Test</button></div><div id="sb411Status" class="sb411Status">'+esc(sb411Status)+'</div><div class="sb411Stats">'+sb411Tile('Approved videos',sb411Movies.length)+sb411Tile('My submissions',sb411Submissions.length)+sb411Tile('Pending review',pending)+sb411Tile('Approved submissions',approvedSubs)+'</div></div><div class="sb411ProfileHero"><div class="sb411Banner">'+(bn?'<img src="'+esc(bn)+'">':'Creator banner URL')+'</div><div><div class="row"><div class="sb411Avatar">'+(av?'<img src="'+esc(av)+'">':esc((name||'U').charAt(0).toUpperCase()))+'</div><div><span class="pill">Supabase creator profile</span><h2 style="margin:6px 0">'+esc(name)+'</h2><p class="muted">'+esc(about)+'</p></div></div><div class="row"><span class="pill">'+esc((sbProfile&&sbProfile.role)||((me()||{}).role)||'user')+'</span><span class="pill">'+(sb411UseSupabase()?'Supabase mode':'Browser/local mode')+'</span></div></div></div><div class="panel"><h3>Edit Supabase creator profile</h3><p class="note">Use image URLs for now, so this stays storage-safe and GitHub Pages friendly. If avatar/banner/about columns are not in Supabase yet, the app will still save your channel name and display name.</p><div class="sb411FormGrid"><div><label>Channel name</label><input id="sb411ChannelName" value="'+esc(name)+'"><label>Display name</label><input id="sb411DisplayName" value="'+esc((sb411Profile||sbProfile||{}).display_name||name)+'"></div><div><label>Avatar image URL</label><input id="sb411AvatarUrl" value="'+esc(av)+'" placeholder="https://...png"><label>Banner image URL</label><input id="sb411BannerUrl" value="'+esc(bn)+'" placeholder="https://...jpg"></div></div><label>Channel about</label><textarea id="sb411About">'+esc(about)+'</textarea><div class="row"><button class="good" id="sb411SaveProfile">Save Supabase profile</button><button class="secondary" id="sb411LoadMine2">Refresh</button></div></div><div class="panel"><div class="sectionTitle"><h3>Approved Supabase videos on my channel</h3>'+(sb411Movies.length?'<button class="secondary small" id="sb411PlayAllMine">Play All</button>':'')+'</div>'+(!sb411Loaded?'<div class="empty">Press Load / refresh My Channel.</div>':(sb411Movies.length?'<div class="grid">'+sb411Movies.map(sb411MovieCard).join('')+'</div>':'<div class="empty">No approved Supabase videos found for this channel yet.</div>'))+'</div><div class="panel"><h3>My Supabase submissions</h3>'+(!sb411Loaded?'<div class="empty">Press Load / refresh My Channel.</div>':(sb411Submissions.length?sb411Submissions.map(sb411SubCard).join(''):'<div class="empty">No Supabase submissions found for this login yet.</div>'))+'</div>'}
+var oldBindCommonV411=typeof bindCommon==='function'?bindCommon:null;
+bindCommon=function(){if(oldBindCommonV411)oldBindCommonV411();var l=byId('sb411LoadMine'),l2=byId('sb411LoadMine2');if(l)l.onclick=function(){sb411Load(true)};if(l2)l2.onclick=function(){sb411Load(true)};var s=byId('sb411SaveProfile');if(s)s.onclick=function(){sb411SaveProfile()};var p=byId('sb411PlayAllMine');if(p)p.onclick=function(){if(!sb411Movies.length)return toast('No approved videos on My Channel yet');if(typeof sb46StartRemoteQueue==='function')sb46StartRemoteQueue(sb411Movies.map(function(m){return m.id}));else{sbRemoteSelectedId=sb411Movies[0].id;view='sbremotewatch';render();}}};
+var oldSettingsPageV411=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){var html=oldSettingsPageV411?oldSettingsPageV411():'';return String(html).replace(/V4\.10\.1 Supabase Channels Page Create Fix|V4\.10 Supabase Channels Page|V4\.9\.1 Admin Supabase Layout Restore/g,SB411_LABEL)};
+var oldBackupPageV411=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){var html=oldBackupPageV411?oldBackupPageV411():'';return String(html).replace(/V4\.10\.1 Supabase Channels Page Create Fix|V4\.10 Supabase Channels Page|V4\.9\.1 Admin Supabase Layout Restore/g,SB411_LABEL)};
+var oldBackupSummaryV411=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV411?oldBackupSummaryV411(d):'')+'\nV4.11 note: My Channel / Creator Profile reads Supabase profile, approved channel videos and creator submissions.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-11-supabase-my-channel-creator-profile-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.11 backup download started')};
+var oldRunTestsV411=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV411)oldRunTestsV411()}catch(e){console.warn('V4.11 inherited self-test warning:',e)}console.assert(typeof sb411Load==='function','V4.11 My Channel loader exists');console.assert(typeof sb411SaveProfile==='function','V4.11 profile save helper exists');console.assert(typeof myChannelPage==='function','V4.11 My Channel page exists')};
+
+
+
+/* Stream Bandit V4.11.2 — My Channel Render Persistence Fix
+   Keeps the edited My Channel name visible immediately, even if Supabase returns
+   an older cached profile row, and keeps old/new channel names as matching aliases. */
+var SB4112_LABEL='V4.11.2 My Channel Render Persistence Fix';
+try{APP_VERSION='StreamBanditPrototype4.11.2-my-channel-render-persistence-fix';if(data)data.version=APP_VERSION;document.title='Stream Bandit V4.11.2 My Channel Render Persistence Fix';if(typeof SB411_LABEL!=='undefined')SB411_LABEL=SB4112_LABEL;}catch(e){}
+var sb4112Aliases=[];
+function sb4112Clean(x){return String(x||'').trim()}
+function sb4112Key(x){return sb4112Clean(x).toLowerCase()}
+function sb4112AddAlias(x){x=sb4112Key(x);if(x&&sb4112Aliases.indexOf(x)<0)sb4112Aliases.push(x)}
+function sb4112Store(){data.settings=data.settings||{};data.settings.sb411MyChannelProfile=data.settings.sb411MyChannelProfile||{};return data.settings.sb411MyChannelProfile}
+function sb4112ApplyLocal(p){try{var o=sb4112Store();Object.keys(p||{}).forEach(function(k){if(p[k]!=null)o[k]=p[k]});o.savedAt=new Date().toISOString();var u=me&&me();if(u){if(p.channel_name)u.channelName=p.channel_name;if(p.display_name)u.displayName=p.display_name;if(p.channel_about!=null)u.channelAbout=p.channel_about;if(p.avatar_url)u.avatar=p.avatar_url;if(p.banner_url)u.banner=p.banner_url;}saveData&&saveData(true);}catch(e){console.warn('V4.11.2 local profile apply warning',e)}}
+if(typeof sb411ProfileName==='function')try{sb4112AddAlias(sb411ProfileName())}catch(e){}
+try{var _o=sb4112Store();sb4112AddAlias(_o.channel_name);sb4112AddAlias(_o.display_name)}catch(e){}
+var oldSb411ProfileNameV4112=typeof sb411ProfileName==='function'?sb411ProfileName:null;
+sb411ProfileName=function(){var o=(data&&data.settings&&data.settings.sb411MyChannelProfile)||{},u=me()||{},p=sb411Profile||sbProfile||{};return o.channel_name||p.channel_name||u.channelName||o.display_name||p.display_name||p.username||u.username||'My Channel'};
+var oldSb411AboutV4112=typeof sb411About==='function'?sb411About:null;
+sb411About=function(){var o=(data&&data.settings&&data.settings.sb411MyChannelProfile)||{},u=me()||{},p=sb411Profile||sbProfile||{};return o.channel_about||p.channel_about||p.about||p.bio||u.channelAbout||'Creator channel profile for Stream Bandit.'};
+var oldSb411AvatarV4112=typeof sb411Avatar==='function'?sb411Avatar:null;
+sb411Avatar=function(){var o=(data&&data.settings&&data.settings.sb411MyChannelProfile)||{},u=me()||{},p=sb411Profile||sbProfile||{};return o.avatar_url||p.avatar_url||p.avatar||u.avatar||''};
+var oldSb411BannerV4112=typeof sb411Banner==='function'?sb411Banner:null;
+sb411Banner=function(){var o=(data&&data.settings&&data.settings.sb411MyChannelProfile)||{},u=me()||{},p=sb411Profile||sbProfile||{};return o.banner_url||p.banner_url||p.banner||u.banner||''};
+var oldSb411MyChannelKeysV4112=typeof sb411MyChannelKeys==='function'?sb411MyChannelKeys:null;
+sb411MyChannelKeys=function(){var keys=[];function add(x){x=sb4112Key(x);if(x&&keys.indexOf(x)<0)keys.push(x)};(oldSb411MyChannelKeysV4112?oldSb411MyChannelKeysV4112():[]).forEach(add);sb4112Aliases.forEach(add);var o=(data&&data.settings&&data.settings.sb411MyChannelProfile)||{},u=me()||{},p=sb411Profile||sbProfile||{};[o.channel_name,o.display_name,u.channelName,u.displayName,u.username,p.channel_name,p.display_name,p.username,'Stream Bandit Channel','Stream Bandit'].forEach(add);var uid=(typeof sb411Uid==='function'?sb411Uid():'');(sb411Channels||[]).forEach(function(c){if(!c)return;if(uid&&String(c.owner_id||c.user_id||c.profile_id||'')===String(uid))add(c.name);});return keys};
+async function sb4112TrySaveProfile(c,uid,patch){var full={channel_name:patch.channel_name,display_name:patch.display_name,avatar_url:patch.avatar_url,banner_url:patch.banner_url,channel_about:patch.channel_about};var res=await c.from('sb_profiles').update(full).eq('id',uid).select('*').maybeSingle();if(!res.error&&res.data)return {data:res.data,limited:false,method:'update'};var small={channel_name:patch.channel_name,display_name:patch.display_name};var res2=await c.from('sb_profiles').update(small).eq('id',uid).select('*').maybeSingle();if(!res2.error&&res2.data)return {data:res2.data,limited:true,method:'update-small'};var res3=await c.from('sb_profiles').upsert(Object.assign({id:uid},small),{onConflict:'id'}).select('*').maybeSingle();if(!res3.error&&res3.data)return {data:res3.data,limited:true,method:'upsert-small'};throw (res.error||res2.error||res3.error||new Error('Profile save did not return a row.'))}
+async function sb4112SyncChannel(c,uid,oldName,newName,about){var ok=false;var patch={name:newName,description:about||''};try{var owned=(sb411Channels||[]).find(function(x){return x&&(String(x.owner_id||x.user_id||x.profile_id||'')===String(uid))});if(owned&&owned.id){var r=await c.from('sb_channels').update(patch).eq('id',owned.id).select('*').maybeSingle();if(!r.error)ok=true;}}catch(e){}try{if(!ok&&uid){var r2=await c.from('sb_channels').update(patch).eq('owner_id',uid).select('*').maybeSingle();if(!r2.error)ok=true;}}catch(e){}try{if(!ok&&oldName){var r3=await c.from('sb_channels').update(patch).eq('name',oldName).select('*').maybeSingle();if(!r3.error)ok=true;}}catch(e){}try{var ch=await c.from('sb_channels').select('*').order('name',{ascending:true});if(!ch.error&&ch.data)sb411Channels=ch.data;}catch(e){}return ok}
+sb411SaveProfile=async function(){try{var c=await sb411EnsureClient(),uid=sb411Uid(),oldName=sb411ProfileName();sb4112AddAlias(oldName);var patch={channel_name:sb411Val('sb411ChannelName')||oldName,display_name:sb411Val('sb411DisplayName')||oldName,avatar_url:sb411Val('sb411AvatarUrl'),banner_url:sb411Val('sb411BannerUrl'),channel_about:sb411Val('sb411About')};sb4112AddAlias(patch.channel_name);sb4112AddAlias(patch.display_name);sb411SetStatus('Saving My Channel and refreshing the visible profile...');sb4112ApplyLocal(patch);sb411Profile=Object.assign({},sb411Profile||{},patch);sbProfile=Object.assign({},sbProfile||{},patch);var saved=await sb4112TrySaveProfile(c,uid,patch);sb411Profile=Object.assign({},sb411Profile||{},patch,saved.data||{});sbProfile=Object.assign({},sbProfile||{},patch,saved.data||{});var channelSynced=await sb4112SyncChannel(c,uid,oldName,patch.channel_name,patch.channel_about);try{await sb411Load(false)}catch(e){}sb4112ApplyLocal(patch);sb411Profile=Object.assign({},sb411Profile||{},patch);sbProfile=Object.assign({},sbProfile||{},patch);sb411SetStatus('Saved My Channel as "'+patch.channel_name+'". The visible profile now uses this saved name.'+(saved.limited?' Avatar/banner/about may be local-only until those columns are added to sb_profiles.':'')+(channelSynced?' Channel row synced too.':' Old and new channel names are both kept as video-matching aliases.'));render();toast('My Channel saved and refreshed');}catch(e){var msg='Save profile failed: '+sb411Err(e);sb411SetStatus(msg);toast(msg)}};
+var oldSbMovieSourceV4112=typeof sbMovieSource==='function'?sbMovieSource:null;
+sbMovieSource=function(m){var s=(m&&((m.mux_playback_url||'').trim()||(m.video_url||'').trim()||(m.stream_url||'').trim()||(m.playback_url||'').trim()||(m.file_url||'').trim()))||'';if(s)return s;return oldSbMovieSourceV4112?oldSbMovieSourceV4112(m):''};
+function sb4112NoSourceMessage(m){var title=String((m&&m.title)||'this movie');if(title.toLowerCase().indexOf('shelter')>=0)return 'Shelter has metadata in Supabase, but the backup shows it was stored as a browser-local file with no stream URL. GitHub Pages/Supabase cannot play that local browser file. Add a Mux/HLS/direct video URL for Shelter in Supabase Movie Manager, then reload Supabase Library.';return 'This Supabase movie has no playable mux_playback_url or video_url yet. Add a stream URL in Supabase Movie Manager, then reload Supabase Library.'}
+var oldSbRemoteCardV4112=typeof sbRemoteCard==='function'?sbRemoteCard:null;
+if(oldSbRemoteCardV4112){sbRemoteCard=function(m){var html=oldSbRemoteCardV4112(m),src=sbMovieSource(m);if(!src){html=html.replace('<button class="small sbPlayRemote"','<button class="small sbPlayRemote" title="No playable Supabase video URL"');html=html.replace('</div></div></div>','<p class="bad" style="font-size:12px;margin-top:8px">No playable Supabase source saved yet.</p></div></div>')}return html};}
+if(typeof sbRemoteWatchPage==='function'){sbRemoteWatchPage=function(){var m=sbFindRemoteMovie(sbRemoteSelectedId),src=sbMovieSource(m);if(!m||!src)return topBar('Supabase Watch')+'<div class="panel"><h2>'+esc((m&&m.title)||'Supabase movie')+'</h2><div class="empty">'+esc(m?sb4112NoSourceMessage(m):'Movie not loaded. Go back to Supabase Library and refresh.')+'</div><div class="row"><button class="secondary" data-view="supabaselibrary">Back to Supabase Library</button><button class="secondary" data-view="adminmovie">Supabase Movie Manager</button></div></div>';return topBar('Supabase Watch')+'<div class="panel"><h2>'+esc(m.title||'Untitled')+'</h2><p class="note">Read from Supabase. Stream source remains your URL/Mux/HLS link.</p></div><div class="sbRemotePlayer"><video id="sbRemotePlayer" controls playsinline data-src="'+esc(src)+'" poster="'+esc(m.thumbnail_url||'')+'"></video></div><div class="panel"><div id="sbRemoteStatus" class="ok">Loading Supabase video source...</div><div class="row"><button class="secondary" data-view="supabaselibrary">Back to Supabase Library</button><button class="secondary sbDetailRemote" data-id="'+esc(m.id)+'">Details</button></div><div class="sbRemoteNote">This confirms Supabase metadata plus the saved stream URL can play together.</div></div>';}}
+var oldSettingsPageV4112=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){var html=oldSettingsPageV4112?oldSettingsPageV4112():'';return String(html).replace(/V4\.11\.1 My Channel Save \+ Shelter Source Diagnostic Fix|V4\.11 Supabase My Channel \/ Creator Profile|V4\.10\.1 Supabase Channels Page Create Fix|V4\.10 Supabase Channels Page/g,SB4112_LABEL)};
+var oldBackupPageV4112=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){var html=oldBackupPageV4112?oldBackupPageV4112():'';return String(html).replace(/V4\.11\.1 My Channel Save \+ Shelter Source Diagnostic Fix|V4\.11 Supabase My Channel \/ Creator Profile|V4\.10\.1 Supabase Channels Page Create Fix|V4\.10 Supabase Channels Page/g,SB4112_LABEL)};
+var oldBackupSummaryV4112=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV4112?oldBackupSummaryV4112(d):'')+'\nV4.11.2 note: My Channel profile saves now persist the visible rendered channel name immediately and keep old/new channel aliases for approved videos.'};
+exportBackup=function(){data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;saveData(true);var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-11-2-my-channel-render-persistence-fix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.11.2 backup download started')};
+var oldRunTestsV4112=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV4112)oldRunTestsV4112()}catch(e){console.warn('V4.11.2 inherited self-test warning:',e)}console.assert(typeof sb411SaveProfile==='function','V4.11.2 profile save override exists');console.assert(typeof sb411ProfileName==='function','V4.11.2 profile name override exists');console.assert(typeof sbMovieSource==='function','V4.11.2 movie source checker exists')};
+
+
+/* Stream Bandit V4.11.3 — Supabase My Channel Read-Back Fix
+   Stops My Channel save from depending on full browser localStorage, then verifies
+   the value returned by Supabase after save so we know whether Supabase or local
+   storage is causing the render mismatch. */
+var SB4113_LABEL='V4.11.3 Supabase My Channel Read-Back Fix';
+try{APP_VERSION='StreamBanditPrototype4.11.3-supabase-my-channel-readback-fix';if(data)data.version=APP_VERSION;document.title='Stream Bandit V4.11.3 Supabase My Channel Read-Back Fix';if(typeof SB411_LABEL!=='undefined')SB411_LABEL=SB4113_LABEL;if(typeof SB4112_LABEL!=='undefined')SB4112_LABEL=SB4113_LABEL;}catch(e){}
+var sb4113MemoryProfile=null;
+var sb4113LastReadBack=null;
+function sb4113Clean(v){return String(v==null?'':v).trim()}
+function sb4113MergeProfile(p){p=p||{};sb4113MemoryProfile=Object.assign({},sb4113MemoryProfile||{},p);try{sb411Profile=Object.assign({},sb411Profile||{},p);sbProfile=Object.assign({},sbProfile||{},p);}catch(e){}try{var u=me&&me();if(u){if(p.channel_name)u.channelName=p.channel_name;if(p.display_name)u.displayName=p.display_name;if(p.channel_about!=null)u.channelAbout=p.channel_about;if(p.avatar_url)u.avatar=p.avatar_url;if(p.banner_url)u.banner=p.banner_url;}}catch(e){}return sb4113MemoryProfile}
+function sb4113ProfileSource(){return sb4113MemoryProfile||sb411Profile||sbProfile||{};}
+sb411ProfileName=function(){var p=sb4113ProfileSource(),u=me()||{};return p.channel_name||p.display_name||p.username||u.channelName||u.displayName||u.username||'My Channel'};
+sb411About=function(){var p=sb4113ProfileSource(),u=me()||{};return p.channel_about||p.about||p.bio||u.channelAbout||'Creator channel profile for Stream Bandit.'};
+sb411Avatar=function(){var p=sb4113ProfileSource(),u=me()||{};return p.avatar_url||p.avatar||u.avatar||''};
+sb411Banner=function(){var p=sb4113ProfileSource(),u=me()||{};return p.banner_url||p.banner||u.banner||''};
+async function sb4113SaveBasicProfile(c,uid,patch){
+  var basic={channel_name:patch.channel_name,display_name:patch.display_name};
+  var res=await c.from('sb_profiles').update(basic).eq('id',uid).select('*').maybeSingle();
+  if(!res.error&&res.data)return {data:res.data,method:'update-basic',warning:''};
+  var up=await c.from('sb_profiles').upsert(Object.assign({id:uid},basic),{onConflict:'id'}).select('*').maybeSingle();
+  if(!up.error&&up.data)return {data:up.data,method:'upsert-basic',warning:res.error?sb411Err(res.error):''};
+  throw (res.error||up.error||new Error('Supabase did not update or return a profile row. Check sb_profiles RLS UPDATE policy for this logged-in user.'));
+}
+async function sb4113TryOptionalProfileFields(c,uid,patch){
+  var warnings=[];
+  var optional=[['avatar_url',patch.avatar_url],['banner_url',patch.banner_url],['channel_about',patch.channel_about]];
+  for(var i=0;i<optional.length;i++){
+    var k=optional[i][0],v=optional[i][1];
+    if(v==null||v==='')continue;
+    try{
+      var obj={};obj[k]=v;
+      var r=await c.from('sb_profiles').update(obj).eq('id',uid).select('id').maybeSingle();
+      if(r.error)warnings.push(k+': '+sb411Err(r.error));
+    }catch(e){warnings.push(k+': '+sb411Err(e));}
+  }
+  return warnings;
+}
+async function sb4113ReadProfileBack(c,uid){
+  var r=await c.from('sb_profiles').select('*').eq('id',uid).maybeSingle();
+  if(r.error)throw r.error;
+  sb4113LastReadBack=r.data||null;
+  if(r.data)sb4113MergeProfile(r.data);
+  return r.data||null;
+}
+var oldSb411LoadV4113=typeof sb411Load==='function'?sb411Load:null;
+sb411Load=async function(repaint){
+  try{
+    var c=await sb411EnsureClient(),uid=sb411Uid();
+    sb411SetStatus('Reading My Channel directly from Supabase...');
+    var pr=await c.from('sb_profiles').select('*').eq('id',uid).maybeSingle();
+    if(!pr.error&&pr.data){sb4113LastReadBack=pr.data;sb4113MemoryProfile=null;sb411Profile=pr.data;sbProfile=pr.data;}
+    if(oldSb411LoadV4113)await oldSb411LoadV4113(false);
+    if(pr&&!pr.error&&pr.data){sb4113MemoryProfile=null;sb411Profile=pr.data;sbProfile=pr.data;sb411SetStatus('Loaded My Channel from Supabase. Supabase currently says: "'+sb411ProfileName()+'".');}
+    if(repaint)render();
+  }catch(e){sb411SetStatus('Load My Channel failed: '+sb411Err(e));if(repaint)render();}
+};
+sb411SaveProfile=async function(){
+  try{
+    var c=await sb411EnsureClient(),uid=sb411Uid(),oldName=sb411ProfileName();
+    var patch={channel_name:sb411Val('sb411ChannelName')||oldName,display_name:sb411Val('sb411DisplayName')||oldName,avatar_url:sb411Val('sb411AvatarUrl'),banner_url:sb411Val('sb411BannerUrl'),channel_about:sb411Val('sb411About')};
+    if(typeof sb4112AddAlias==='function'){sb4112AddAlias(oldName);sb4112AddAlias(patch.channel_name);sb4112AddAlias(patch.display_name);}
+    sb411SetStatus('Saving to Supabase without using browser localStorage...');
+    sb4113MergeProfile(patch);
+    var saved=await sb4113SaveBasicProfile(c,uid,patch);
+    sb4113MergeProfile(Object.assign({},patch,saved.data||{}));
+    var optionalWarnings=await sb4113TryOptionalProfileFields(c,uid,patch);
+    var channelSynced=false;try{if(typeof sb4112SyncChannel==='function')channelSynced=await sb4112SyncChannel(c,uid,oldName,patch.channel_name,patch.channel_about);}catch(e){}
+    var readBack=await sb4113ReadProfileBack(c,uid);
+    var supaName=readBack&&readBack.channel_name?readBack.channel_name:'';
+    var confirmed=sb4113Clean(supaName)===sb4113Clean(patch.channel_name);
+    if(!confirmed){
+      sb4113MergeProfile(patch);
+      sb411SetStatus('Saved request sent, but Supabase read-back still says "'+(supaName||'blank')+'" instead of "'+patch.channel_name+'". This points to Supabase RLS/policy/trigger or a column mismatch, not browser storage. I am showing your typed name in memory for this test session.');
+    }else{
+      sb411SetStatus('Supabase read-back confirmed: My Channel is now "'+patch.channel_name+'".'+(channelSynced?' Channel row synced too.':'')+(optionalWarnings.length?' Optional fields need table columns/policies: '+optionalWarnings.join(' | '):''));
+    }
+    render();toast(confirmed?'Supabase My Channel saved':'Save sent, but Supabase read-back did not match');
+  }catch(e){var msg='Save profile failed: '+sb411Err(e);sb411SetStatus(msg);toast(msg);}
+};
+var oldBackupSummaryV4113=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV4113?oldBackupSummaryV4113(d):'')+'\nV4.11.3 note: My Channel save no longer depends on full browser localStorage and checks Supabase read-back after save.'};
+var oldSettingsPageV4113=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){var html=oldSettingsPageV4113?oldSettingsPageV4113():'';return String(html).replace(/V4\.11\.2 My Channel Render Persistence Fix|V4\.11\.1 My Channel Save \+ Shelter Source Diagnostic Fix|V4\.11 Supabase My Channel \/ Creator Profile|V4\.10\.1 Supabase Channels Page Create Fix|V4\.10 Supabase Channels Page/g,SB4113_LABEL)};
+var oldBackupPageV4113=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){var html=oldBackupPageV4113?oldBackupPageV4113():'';return String(html).replace(/V4\.11\.2 My Channel Render Persistence Fix|V4\.11\.1 My Channel Save \+ Shelter Source Diagnostic Fix|V4\.11 Supabase My Channel \/ Creator Profile|V4\.10\.1 Supabase Channels Page Create Fix|V4\.10 Supabase Channels Page/g,SB4113_LABEL)};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-11-3-supabase-my-channel-readback-fix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.11.3 backup download started')};
+var oldRunTestsV4113=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV4113)oldRunTestsV4113()}catch(e){console.warn('V4.11.3 inherited self-test warning:',e)}console.assert(typeof sb411SaveProfile==='function','V4.11.3 profile save override exists');console.assert(typeof sb4113ReadProfileBack==='function','V4.11.3 Supabase read-back helper exists')};
+
+
+/* Stream Bandit V4.11.4 — Supabase Profile Truth + Reset Warning
+   Adds a stronger Supabase read-back diagnostic and warns when old seed SQL
+   appears to have reset the admin profile back to the original values. */
+var SB4114_LABEL='V4.11.4 Supabase Profile Truth + Reset Warning';
+try{APP_VERSION='StreamBanditPrototype4.11.4-supabase-profile-truth-reset-warning';if(data)data.version=APP_VERSION;document.title='Stream Bandit V4.11.4 Supabase Profile Truth + Reset Warning';if(typeof SB411_LABEL!=='undefined')SB411_LABEL=SB4114_LABEL;if(typeof SB4112_LABEL!=='undefined')SB4112_LABEL=SB4114_LABEL;if(typeof SB4113_LABEL!=='undefined')SB4113_LABEL=SB4114_LABEL;}catch(e){}
+function sb4114ProfileResetHint(row){var n=String((row&&row.channel_name)||'').trim(),d=String((row&&row.display_name)||'').trim();if(n==='Stream Bandit Channel'&&d==='Stream Bandit Admin')return ' Warning: Supabase is showing the original seed values. If the old V4.0 admin SQL is run again, it resets channel_name/display_name back to these values.';return ''}
+async function sb4114ReadExact(c,uid){var r=await c.from('sb_profiles').select('id,username,display_name,channel_name,channel_about,role,can_submit,updated_at').eq('id',uid).maybeSingle();if(r.error)throw r.error;if(r.data&&typeof sb4113MergeProfile==='function')sb4113MergeProfile(r.data);return r.data||null}
+var oldSb411LoadV4114=typeof sb411Load==='function'?sb411Load:null;
+sb411Load=async function(repaint){try{var c=await sb411EnsureClient(),uid=sb411Uid();sb411SetStatus('Reading exact My Channel profile from Supabase for user id '+uid+' ...');var row=await sb4114ReadExact(c,uid);try{if(oldSb411LoadV4114)await oldSb411LoadV4114(false)}catch(e){}if(row){if(typeof sb4113MergeProfile==='function')sb4113MergeProfile(row);sb411SetStatus('Supabase source of truth says: "'+(row.channel_name||row.display_name||row.username||'blank')+'". Updated: '+(row.updated_at||'not shown')+'.'+sb4114ProfileResetHint(row));}else sb411SetStatus('No sb_profiles row found for this Supabase user id: '+uid+'.');if(repaint)render();}catch(e){sb411SetStatus('Load My Channel failed: '+sb411Err(e));if(repaint)render();}};
+sb411SaveProfile=async function(){try{var c=await sb411EnsureClient(),uid=sb411Uid(),oldName=sb411ProfileName();var patch={channel_name:sb411Val('sb411ChannelName')||oldName,display_name:sb411Val('sb411DisplayName')||oldName,avatar_url:sb411Val('sb411AvatarUrl'),banner_url:sb411Val('sb411BannerUrl'),channel_about:sb411Val('sb411About')};if(typeof sb4112AddAlias==='function'){sb4112AddAlias(oldName);sb4112AddAlias(patch.channel_name);sb4112AddAlias(patch.display_name)}sb411SetStatus('Saving exact profile to Supabase user id '+uid+' ...');if(typeof sb4113MergeProfile==='function')sb4113MergeProfile(patch);var basic={channel_name:patch.channel_name,display_name:patch.display_name,channel_about:patch.channel_about};var res=await c.from('sb_profiles').update(basic).eq('id',uid).select('id,username,display_name,channel_name,channel_about,role,can_submit,updated_at').maybeSingle();if(res.error){var small={channel_name:patch.channel_name,display_name:patch.display_name};res=await c.from('sb_profiles').update(small).eq('id',uid).select('id,username,display_name,channel_name,channel_about,role,can_submit,updated_at').maybeSingle();if(res.error)throw res.error}if(res.data&&typeof sb4113MergeProfile==='function')sb4113MergeProfile(res.data);try{if(typeof sb4113TryOptionalProfileFields==='function')await sb4113TryOptionalProfileFields(c,uid,patch)}catch(e){}try{if(typeof sb4112SyncChannel==='function')await sb4112SyncChannel(c,uid,oldName,patch.channel_name,patch.channel_about)}catch(e){}var row=await sb4114ReadExact(c,uid);var got=String((row&&row.channel_name)||'').trim(),wanted=String(patch.channel_name||'').trim();if(got===wanted){sb411SetStatus('Confirmed from Supabase source of truth: My Channel is now "'+got+'". Refresh should keep this unless old seed SQL is run again.')}else{if(typeof sb4113MergeProfile==='function')sb4113MergeProfile(patch);sb411SetStatus('Save request finished, but Supabase source of truth still says "'+(got||'blank')+'" instead of "'+wanted+'".'+sb4114ProfileResetHint(row)+' Check RLS/update policy or old reset SQL. Showing typed name only for this browser session.')}render();toast(got===wanted?'Supabase profile confirmed':'Supabase read-back mismatch')}catch(e){var msg='Save profile failed: '+sb411Err(e);sb411SetStatus(msg);toast(msg)}};
+settingsPage=function(){var html=(oldSettingsPageV4113?oldSettingsPageV4113():'');return String(html).replace(/V4\.11\.3 Supabase My Channel Read-Back Fix|V4\.11\.2 My Channel Render Persistence Fix|V4\.11\.1 My Channel Save \+ Shelter Source Diagnostic Fix|V4\.11 Supabase My Channel \/ Creator Profile|V4\.10\.1 Supabase Channels Page Create Fix|V4\.10 Supabase Channels Page/g,SB4114_LABEL)};
+backupPage=function(){var html=(oldBackupPageV4113?oldBackupPageV4113():'');return String(html).replace(/V4\.11\.3 Supabase My Channel Read-Back Fix|V4\.11\.2 My Channel Render Persistence Fix|V4\.11\.1 My Channel Save \+ Shelter Source Diagnostic Fix|V4\.11 Supabase My Channel \/ Creator Profile|V4\.10\.1 Supabase Channels Page Create Fix|V4\.10 Supabase Channels Page/g,SB4114_LABEL)};
+backupSummary=function(d){return (oldBackupSummaryV4113?oldBackupSummaryV4113(d):'')+'\nV4.11.4 note: My Channel reports the exact Supabase source-of-truth profile row and warns if old admin seed SQL reset the channel name.'};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-11-4-supabase-profile-truth-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.11.4 backup download started')};
+var oldRunTestsV4114=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV4114)oldRunTestsV4114()}catch(e){console.warn('V4.11.4 inherited self-test warning:',e)}console.assert(typeof sb4114ProfileResetHint==='function','V4.11.4 reset warning helper exists');console.assert(typeof sb411SaveProfile==='function','V4.11.4 profile save override exists')};
+
+
+/* Stream Bandit V4.11.6 — My Channel Save Input Capture Fix
+   This patch is inside the main app scope. It captures the typed profile fields before any render,
+   writes them directly to Supabase, then renders from the confirmed row. */
+var SB4116_LABEL='V4.11.6 My Channel Save Input Capture Fix';
+try{APP_VERSION='StreamBanditPrototype4.11.6-my-channel-save-input-capture-fix';if(data)data.version=APP_VERSION;document.title='Stream Bandit V4.11.6 My Channel Save Input Capture Fix';if(typeof SB411_LABEL!=='undefined')SB411_LABEL=SB4116_LABEL;if(typeof SB4112_LABEL!=='undefined')SB4112_LABEL=SB4116_LABEL;if(typeof SB4113_LABEL!=='undefined')SB4113_LABEL=SB4116_LABEL;if(typeof SB4114_LABEL!=='undefined')SB4114_LABEL=SB4116_LABEL;}catch(e){}
+function sb4116Profile(){return (typeof sb4113MemoryProfile!=='undefined'&&sb4113MemoryProfile)||sb411Profile||sbProfile||{};}
+function sb4116Merge(p){if(typeof sb4113MergeProfile==='function')sb4113MergeProfile(p||{});else{try{sb411Profile=Object.assign({},sb411Profile||{},p||{});sbProfile=Object.assign({},sbProfile||{},p||{});}catch(e){}}return sb4116Profile();}
+function sb4116Name(){var p=sb4116Profile(),u=me()||{};return p.channel_name||u.channelName||p.display_name||u.displayName||p.username||u.username||'My Channel';}
+function sb4116Display(){var p=sb4116Profile(),u=me()||{};return p.display_name||u.displayName||sb4116Name();}
+function sb4116About(){var p=sb4116Profile(),u=me()||{};return p.channel_about||u.channelAbout||'Tell viewers about your channel.';}
+function sb4116Avatar(){var p=sb4116Profile(),u=me()||{};return p.avatar_url||p.avatar||u.avatar||'';}
+function sb4116Banner(){var p=sb4116Profile(),u=me()||{};return p.banner_url||p.banner||u.banner||'';}
+function sb4116PatchVisible(){try{var p=sb4116Profile(),name=sb4116Name(),display=sb4116Display(),about=sb4116About(),av=sb4116Avatar(),bn=sb4116Banner();var n=byId('sb411LiveName');if(n)n.textContent=name;var a=byId('sb411LiveAbout');if(a)a.textContent=about;var src=byId('sb411LiveProfileSource');if(src)src.textContent='Screen is rendering from confirmed Supabase profile: '+name;var cn=byId('sb411ChannelName');if(cn&&document.activeElement!==cn)cn.value=name;var dn=byId('sb411DisplayName');if(dn&&document.activeElement!==dn)dn.value=display;var ab=byId('sb411About');if(ab&&document.activeElement!==ab)ab.value=about;var au=byId('sb411AvatarUrl');if(au&&document.activeElement!==au)au.value=av||'';var bu=byId('sb411BannerUrl');if(bu&&document.activeElement!==bu)bu.value=bn||'';}catch(e){console.warn('V4.11.6 visible patch warning',e);}}
+var oldMyChannelPageV4116=typeof myChannelPage==='function'?myChannelPage:null;
+myChannelPage=function(){
+ if(!sb411UseSupabase()&&oldMyChannelPageV4116)return oldMyChannelPageV4116();
+ var p=sb4116Profile(),name=sb4116Name(),display=sb4116Display(),about=sb4116About(),av=sb4116Avatar(),bn=sb4116Banner();
+ var pending=sb411Submissions.filter(function(s){return String(s.status||'pending')==='pending'}).length;
+ var approvedSubs=sb411Submissions.filter(function(s){return String(s.status||'')==='approved'}).length;
+ return topBar('My Channel')+'<div class="sb411Hero"><h3>'+SB4116_LABEL+'</h3><p class="note">This version fixes the save button capturing/clearing issue by reading the typed fields first, then writing that exact text to Supabase.</p><div class="row"><button class="good" id="sb411LoadMine">Load / refresh My Channel</button><button class="secondary" data-view="submit">Submit Video</button><button class="secondary" data-view="channels">Channels</button><button class="secondary" data-view="supabase">Supabase Test</button></div><div id="sb411Status" class="sb411Status">'+esc(sb411Status)+'</div><div class="sb411Stats">'+sb411Tile('Approved videos',sb411Movies.length)+sb411Tile('My submissions',sb411Submissions.length)+sb411Tile('Pending review',pending)+sb411Tile('Approved submissions',approvedSubs)+'</div></div><div class="sb411ProfileHero"><div class="sb411Banner" id="sb411LiveBanner">'+(bn?'<img src="'+esc(bn)+'">':'Creator banner URL')+'</div><div><div class="row"><div class="sb411Avatar" id="sb411LiveAvatar">'+(av?'<img src="'+esc(av)+'">':esc((name||'U').charAt(0).toUpperCase()))+'</div><div><span class="pill">Supabase creator profile</span><h2 id="sb411LiveName" style="margin:6px 0">'+esc(name)+'</h2><p id="sb411LiveAbout" class="muted">'+esc(about)+'</p><p id="sb411LiveProfileSource" class="note">Screen is rendering from confirmed Supabase profile: '+esc(name)+'</p></div></div><div class="row"><span class="pill">'+esc((p&&p.role)||((me()||{}).role)||'user')+'</span><span class="pill">'+(sb411UseSupabase()?'Supabase mode':'Browser/local mode')+'</span></div></div></div><div class="panel"><h3>Edit Supabase creator profile</h3><p class="note">The save button now captures this typed text before any refresh/render. Browser local storage is not used for this save.</p><div class="sb411FormGrid"><div><label>Channel name</label><input id="sb411ChannelName" value="'+esc(name)+'"><label>Display name</label><input id="sb411DisplayName" value="'+esc(display)+'"></div><div><label>Avatar image URL</label><input id="sb411AvatarUrl" value="'+esc(av)+'" placeholder="https://...png"><label>Banner image URL</label><input id="sb411BannerUrl" value="'+esc(bn)+'" placeholder="https://...jpg"></div></div><label>Channel about</label><textarea id="sb411About">'+esc(about)+'</textarea><div class="row"><button class="good" id="sb411SaveProfile">Save Supabase profile</button><button class="secondary" id="sb411LoadMine2">Refresh</button></div></div><div class="panel"><div class="sectionTitle"><h3>Approved Supabase videos on my channel</h3>'+(sb411Movies.length?'<button class="secondary small" id="sb411PlayAllMine">Play All</button>':'')+'</div>'+(!sb411Loaded?'<div class="empty">Press Load / refresh My Channel.</div>':(sb411Movies.length?'<div class="grid">'+sb411Movies.map(sb411MovieCard).join('')+'</div>':'<div class="empty">No approved Supabase videos found for this channel yet.</div>'))+'</div><div class="panel"><h3>My Supabase submissions</h3>'+(!sb411Loaded?'<div class="empty">Press Load / refresh My Channel.</div>':(sb411Submissions.length?sb411Submissions.map(sb411SubCard).join(''):'<div class="empty">No Supabase submissions found for this login yet.</div>'))+'</div>';
+};
+var oldSb411LoadV4116=typeof sb411Load==='function'?sb411Load:null;
+sb411Load=async function(repaint){try{var c=await sb411EnsureClient(),uid=sb411Uid();sb411SetStatus('V4.11.6 reading My Channel from Supabase user id '+uid+' ...');var row=await sb4114ReadExact(c,uid);if(row)sb4116Merge(row);try{if(oldSb411LoadV4116)await oldSb411LoadV4116(false);}catch(e){}if(row){sb4116Merge(row);sb411SetStatus('Loaded from Supabase source of truth: "'+(row.channel_name||row.display_name||row.username||'blank')+'". Updated: '+(row.updated_at||'not shown')+'.');}else sb411SetStatus('No sb_profiles row found for this Supabase user id: '+uid+'.');if(repaint){render();setTimeout(sb4116PatchVisible,0);}else sb4116PatchVisible();}catch(e){sb411SetStatus('Load My Channel failed: '+sb411Err(e));if(repaint)render();}};
+sb411SaveProfile=async function(){try{var inputChannel=sb411Val('sb411ChannelName'),inputDisplay=sb411Val('sb411DisplayName'),inputAbout=sb411Val('sb411About'),inputAvatar=sb411Val('sb411AvatarUrl'),inputBanner=sb411Val('sb411BannerUrl');var c=await sb411EnsureClient(),uid=sb411Uid(),oldName=sb4116Name();var patch={channel_name:inputChannel||oldName,display_name:inputDisplay||sb4116Display()||oldName,channel_about:inputAbout,avatar_url:inputAvatar,banner_url:inputBanner};if(typeof sb4112AddAlias==='function'){sb4112AddAlias(oldName);sb4112AddAlias(patch.channel_name);sb4112AddAlias(patch.display_name);}sb411SetStatus('V4.11.6 saving typed channel name to Supabase: "'+patch.channel_name+'" ...');sb4116Merge(patch);sb4116PatchVisible();var basic={channel_name:patch.channel_name,display_name:patch.display_name,channel_about:patch.channel_about};var res=await c.from('sb_profiles').update(basic).eq('id',uid).select('id,username,display_name,channel_name,channel_about,role,can_submit,updated_at').maybeSingle();if(res.error)throw res.error;if(res.data)sb4116Merge(res.data);try{if(typeof sb4113TryOptionalProfileFields==='function')await sb4113TryOptionalProfileFields(c,uid,patch);}catch(e){}try{if(typeof sb4112SyncChannel==='function')await sb4112SyncChannel(c,uid,oldName,patch.channel_name,patch.channel_about);}catch(e){}var row=await sb4114ReadExact(c,uid);if(row)sb4116Merge(row);var got=String((row&&row.channel_name)||'').trim(),wanted=String(patch.channel_name||'').trim();if(got===wanted){sb411SetStatus('V4.11.6 confirmed and rendered: Supabase now says "'+got+'".');}else{sb4116Merge(patch);sb411SetStatus('V4.11.6 save attempted, but Supabase still returned "'+(got||'blank')+'" instead of "'+wanted+'". Showing typed name on screen for this session.');}render();setTimeout(sb4116PatchVisible,0);toast(got===wanted?'Supabase profile confirmed and rendered':'Supabase did not keep typed name');}catch(e){var msg='Save profile failed: '+sb411Err(e);sb411SetStatus(msg);toast(msg);}};
+settingsPage=function(){var html=(oldSettingsPageV4113?oldSettingsPageV4113():'');return String(html).replace(/V4\.11\.4 Supabase Profile Truth \+ Reset Warning|V4\.11\.3 Supabase My Channel Read-Back Fix|V4\.11\.2 My Channel Render Persistence Fix|V4\.11\.1 My Channel Save \+ Shelter Source Diagnostic Fix|V4\.11 Supabase My Channel \/ Creator Profile|V4\.10\.1 Supabase Channels Page Create Fix|V4\.10 Supabase Channels Page/g,SB4116_LABEL)};
+backupPage=function(){var html=(oldBackupPageV4113?oldBackupPageV4113():'');return String(html).replace(/V4\.11\.4 Supabase Profile Truth \+ Reset Warning|V4\.11\.3 Supabase My Channel Read-Back Fix|V4\.11\.2 My Channel Render Persistence Fix|V4\.11\.1 My Channel Save \+ Shelter Source Diagnostic Fix|V4\.11 Supabase My Channel \/ Creator Profile|V4\.10\.1 Supabase Channels Page Create Fix|V4\.10 Supabase Channels Page/g,SB4116_LABEL)};
+backupSummary=function(d){return (oldBackupSummaryV4113?oldBackupSummaryV4113(d):'')+'\nV4.11.6 note: My Channel save captures typed input before render, writes it directly to Supabase, then renders from the confirmed row.'};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-11-6-my-channel-save-input-capture-fix-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.11.6 backup download started')};
+var oldRunTestsV4116=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV4116)oldRunTestsV4116();}catch(e){console.warn('V4.11.6 inherited self-test warning:',e)}console.assert(typeof sb4116PatchVisible==='function','V4.11.6 visible patch exists');console.assert(typeof sb411SaveProfile==='function','V4.11.6 save override exists');};
+
+
+/* Stream Bandit V4.11.7 — Version Badge Tidy
+   No database/player logic changes. Keeps V4.11.6 My Channel save fix and updates visible version labels so the sidebar no longer shows the older V4.9 checkpoint. */
+var SB4117_LABEL='V4.11.7 Version Badge Tidy + My Channel Save Fix';
+try{
+  APP_VERSION='StreamBanditPrototype4.11.7-version-badge-tidy-my-channel-save-fix';
+  if(data)data.version=APP_VERSION;
+  document.title='Stream Bandit V4.11.7 Version Badge Tidy + My Channel Save Fix';
+  if(typeof SB49_LABEL!=='undefined')SB49_LABEL=SB4117_LABEL;
+  if(typeof SB491_LABEL!=='undefined')SB491_LABEL=SB4117_LABEL;
+  if(typeof SB410_LABEL!=='undefined')SB410_LABEL=SB4117_LABEL;
+  if(typeof SB411_LABEL!=='undefined')SB411_LABEL=SB4117_LABEL;
+  if(typeof SB4112_LABEL!=='undefined')SB4112_LABEL=SB4117_LABEL;
+  if(typeof SB4113_LABEL!=='undefined')SB4113_LABEL=SB4117_LABEL;
+  if(typeof SB4114_LABEL!=='undefined')SB4114_LABEL=SB4117_LABEL;
+  if(typeof SB4116_LABEL!=='undefined')SB4116_LABEL=SB4117_LABEL;
+}catch(e){}
+var oldSidebarV4117=typeof sidebar==='function'?sidebar:null;
+sidebar=function(){
+  var html=oldSidebarV4117?oldSidebarV4117():'';
+  return String(html)
+    .replace(/V4\.11\.6 My Channel Save Input Capture Fix/g,SB4117_LABEL)
+    .replace(/V4\.11\.4 Supabase Profile Truth \+ Reset Warning/g,SB4117_LABEL)
+    .replace(/V4\.9 Supabase Creator Submissions \+ Review Queue/g,SB4117_LABEL)
+    .replace(/V4\.9 Supabase Submit \+ Review Queue/g,SB4117_LABEL)
+    .replace(/V4\.9\.1 Admin Supabase Layout Restore/g,SB4117_LABEL);
+};
+var oldSettingsPageV4117=typeof settingsPage==='function'?settingsPage:null;
+settingsPage=function(){
+  var html=oldSettingsPageV4117?oldSettingsPageV4117():'';
+  return String(html)
+    .replace(/StreamBanditPrototype4\.11\.6-my-channel-save-input-capture-fix/g,APP_VERSION)
+    .replace(/V4\.11\.6 My Channel Save Input Capture Fix/g,SB4117_LABEL)
+    .replace(/V4\.11\.4 Supabase Profile Truth \+ Reset Warning/g,SB4117_LABEL)
+    .replace(/V4\.9 Supabase Creator Submissions \+ Review Queue/g,SB4117_LABEL);
+};
+var oldBackupPageV4117=typeof backupPage==='function'?backupPage:null;
+backupPage=function(){
+  var html=oldBackupPageV4117?oldBackupPageV4117():'';
+  return String(html)
+    .replace(/V4\.11\.6 My Channel Save Input Capture Fix/g,SB4117_LABEL)
+    .replace(/V4\.11\.4 Supabase Profile Truth \+ Reset Warning/g,SB4117_LABEL)
+    .replace(/V4\.9 Supabase Creator Submissions \+ Review Queue/g,SB4117_LABEL);
+};
+var oldBackupSummaryV4117=typeof backupSummary==='function'?backupSummary:null;
+backupSummary=function(d){return (oldBackupSummaryV4117?oldBackupSummaryV4117(d):'')+'\nV4.11.7 note: visible version badges now agree with the current My Channel Supabase save fix.';};
+exportBackup=function(){try{data.settings=data.settings||clone(seed.settings);data.settings.lastBackupAt=new Date().toISOString();data.settings.lastBackupSize=dataSize();data.version=APP_VERSION;}catch(e){}var j=JSON.stringify(data,null,2),box=byId('backupBox');if(box)box.value=j;var a=document.createElement('a'),url=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=url;a.download='streambandit-v4-11-7-version-badge-tidy-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},800);toast('V4.11.7 backup download started')};
+var oldRunTestsV4117=typeof runTests==='function'?runTests:null;
+runTests=function(){try{if(oldRunTestsV4117)oldRunTestsV4117();}catch(e){console.warn('V4.11.7 inherited self-test warning:',e)}console.assert(APP_VERSION==='StreamBanditPrototype4.11.7-version-badge-tidy-my-channel-save-fix','V4.11.7 version set');};
+
 if(typeof runTests==='function')runTests();
   if(typeof render==='function')render();
 }catch(e){fatal(e)}
 
 })();
+
 </script>
 </body>
 </html>
