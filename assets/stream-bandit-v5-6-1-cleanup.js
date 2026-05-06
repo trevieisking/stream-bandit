@@ -1,10 +1,10 @@
-/* Stream Bandit V5.8 — Cleanup & Stability Pass
+/* Stream Bandit V5.8.2 — Cleanup & Stability Pass
    Visual cleanup only. No Supabase, Mux, player, storage or database logic changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.8';
-var LABEL='Stream Bandit V5.8 Stable';
+var VERSION='V5.8.2';
+var LABEL='Stream Bandit V5.8.2 Stable';
 var LOCAL_KEY='streambandit_v25_data';
 
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
@@ -13,11 +13,12 @@ function fixStoredOldVersion(){
     var raw=localStorage.getItem(LOCAL_KEY);
     if(!raw)return;
     var next=raw
-      .replace(/V5\.4\.2 Details Tag Display Hotfix \+ Page Polish/g,'V5.8 Stable Settings + Tabs')
-      .replace(/V5\.6\.1 Stable checkpoint/g,'V5.8 Stable checkpoint')
-      .replace(/V5\.6\.3 Stable checkpoint/g,'V5.8 Stable checkpoint')
-      .replace(/V5\.7\.1 Stable checkpoint/g,'V5.8 Stable checkpoint')
-      .replace(/V5\.4\.2/g,'V5.8')
+      .replace(/V5\.4\.2 Details Tag Display Hotfix \+ Page Polish/g,'V5.8.2 Stable Settings + Tabs')
+      .replace(/V5\.6\.1 Stable checkpoint/g,'V5.8.2 Stable checkpoint')
+      .replace(/V5\.6\.3 Stable checkpoint/g,'V5.8.2 Stable checkpoint')
+      .replace(/V5\.7\.1 Stable checkpoint/g,'V5.8.2 Stable checkpoint')
+      .replace(/V5\.8 Stable checkpoint/g,'V5.8.2 Stable checkpoint')
+      .replace(/V5\.4\.2/g,'V5.8.2')
       .replace(/Details Tag Display Hotfix \+ Page Polish/g,'Stable Settings + Tabs');
     if(next!==raw)localStorage.setItem(LOCAL_KEY,next);
   }catch(e){}
@@ -62,9 +63,9 @@ function addSidebarBadge(){
 function checkpointHtml(kind){
   return '<div class="sb561Checkpoint" data-sb561-checkpoint="'+kind+'">'+
     '<h4>'+VERSION+' stable checkpoint</h4>'+
-    '<p><b>Current safe build:</b> Settings Tabs + Organised Menu + Supabase Cast Manager + Rating Calculator.</p>'+ 
+    '<p><b>Current safe build:</b> Settings Tabs Safe Restore + Organised Menu + Supabase Cast Manager + Rating Calculator.</p>'+ 
     '<p>This cleanup pass does not change database, Mux, player, storage or Supabase save logic.</p>'+ 
-    '<div><span class="sb561VersionPill">Settings tabs</span><span class="sb561VersionPill">Cast Manager passed</span><span class="sb561VersionPill">Rating Calculator guarded</span></div>'+ 
+    '<div><span class="sb561VersionPill">Settings tabs guarded</span><span class="sb561VersionPill">Cast Manager passed</span><span class="sb561VersionPill">Rating Calculator close button</span></div>'+ 
   '</div>';
 }
 function pageTitle(){return text(document.querySelector('.top h2,.main h2,h1'));}
