@@ -1,0 +1,116 @@
+/* Stream Bandit V5.7 — Admin Rating Calculator
+   Admin helper only. Manually enter public ratings and calculate a Stream Bandit Score.
+   No live scraping/API calls, no Supabase writes, no Mux, player, storage, movie save or database changes. */
+(function(){
+'use strict';
+
+var VERSION='V5.7';
+var lastResult='';
+
+function byId(id){return document.getElementById(id)}
+function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
+function isAdminPage(){
+  var main=document.querySelector('.main');
+  if(!main)return false;
+  var t=text(main).toLowerCase();
+  return t.indexOf('admin')>-1&&t.indexOf('add')>-1&&t.indexOf('video')>-1;
+}
+function addStyle(){
+  if(byId('sb57Style'))return;
+  var st=document.createElement('style');
+  st.id='sb57Style';
+  st.textContent='\n.sb57Calc{background:linear-gradient(180deg,rgba(16,24,39,.94),rgba(13,14,21,.90));border:1px solid rgba(182,140,255,.28);border-radius:24px;padding:15px;margin:14px 0;box-shadow:0 16px 42px rgba(0,0,0,.32)}.sb57Calc h3{margin:0 0 7px;font-size:20px}.sb57Calc p{color:var(--muted,#a9afc3);font-size:13px;line-height:1.45}.sb57Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.sb57Result{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(61,220,151,.16),rgba(124,60,255,.18));border:1px solid rgba(61,220,151,.25);border-radius:20px;padding:13px;margin-top:12px}.sb57Score{font-size:36px;font-weight:1000;letter-spacing:-.05em}.sb57Grade{font-size:13px;color:#baf7df;font-weight:900}.sb57Actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sb57Mini{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px}.sb57Breakdown{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px;line-height:1.45}.sb57WeightRow{display:grid;grid-template-columns:1fr 84px;gap:8px;align-items:end}.sb57WeightRow input{padding:9px}.sb57Warn{color:#ffe0a3}.sb57Ok{color:#baf7df}\n';
+  document.head.appendChild(st);
+}
+function panelHtml(){
+  return '<div class="sb57Calc" id="sb57Calc">'+
+    '<h3>Stream Bandit Rating Calculator</h3>'+ 
+    '<p>Manually enter ratings you looked up, then calculate your own overall score. Leave unknown sources blank. IMDb should be entered as 0–10; everything else as 0–100.</p>'+ 
+    '<div class="sb57Grid">'+
+      field('sb57Imdb','IMDb','Example: 7.2','0–10')+
+      field('sb57RtCritics','Rotten Tomatoes Critics','Example: 84','0–100')+
+      field('sb57RtAudience','Rotten Tomatoes Audience','Example: 79','0–100')+
+      field('sb57Meta','Metacritic','Example: 68','0–100')+
+      field('sb57Letter','Letterboxd','Example: 3.6','0–5')+
+      field('sb57Extra','Other / Your score','Example: 80','0–100')+
+    '</div>'+
+    '<div class="sb57Actions"><button type="button" id="sb57Calculate">Calculate Stream Bandit Score</button><button type="button" class="secondary" id="sb57Copy">Copy result</button><button type="button" class="secondary" id="sb57Clear">Clear</button></div>'+ 
+    '<div class="sb57Result"><div><b>Stream Bandit Score</b><div class="sb57Grade" id="sb57Grade">Enter at least one rating.</div></div><div class="sb57Score" id="sb57Score">--</div></div>'+ 
+    '<div class="sb57Breakdown" id="sb57Breakdown">Ready.</div>'+ 
+    '<p class="sb57Mini">Tip: this is a helper only. It does not save to the movie yet, so it cannot break movie data.</p>'+ 
+  '</div>';
+}
+function field(id,label,placeholder,help){
+  return '<div><label>'+label+'</label><input id="'+id+'" inputmode="decimal" placeholder="'+placeholder+'"><div class="sb57Mini">'+help+'</div></div>';
+}
+function value(id){
+  var el=byId(id);if(!el)return null;
+  var raw=String(el.value||'').replace('%','').trim();
+  if(!raw)return null;
+  var n=Number(raw);
+  return Number.isFinite(n)?n:null;
+}
+function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+function grade(score){
+  if(score>=90)return 'Elite / must-watch';
+  if(score>=80)return 'Excellent';
+  if(score>=70)return 'Good';
+  if(score>=60)return 'Mixed but watchable';
+  if(score>=50)return 'Weak / only if interested';
+  return 'Low score';
+}
+function calculate(){
+  var rows=[];
+  var imdb=value('sb57Imdb');
+  if(imdb!=null)rows.push(['IMDb',clamp(imdb,0,10)*10]);
+  var rtc=value('sb57RtCritics');
+  if(rtc!=null)rows.push(['Rotten Tomatoes Critics',clamp(rtc,0,100)]);
+  var rta=value('sb57RtAudience');
+  if(rta!=null)rows.push(['Rotten Tomatoes Audience',clamp(rta,0,100)]);
+  var meta=value('sb57Meta');
+  if(meta!=null)rows.push(['Metacritic',clamp(meta,0,100)]);
+  var letter=value('sb57Letter');
+  if(letter!=null)rows.push(['Letterboxd',clamp(letter,0,5)*20]);
+  var extra=value('sb57Extra');
+  if(extra!=null)rows.push(['Other / Your score',clamp(extra,0,100)]);
+  var scoreEl=byId('sb57Score'), gradeEl=byId('sb57Grade'), br=byId('sb57Breakdown');
+  if(!rows.length){scoreEl.textContent='--';gradeEl.textContent='Enter at least one rating.';br.textContent='Ready.';lastResult='';return;}
+  var avg=rows.reduce(function(a,r){return a+r[1];},0)/rows.length;
+  var score=Math.round(avg);
+  var g=grade(score);
+  scoreEl.textContent=score;
+  gradeEl.textContent=g;
+  br.innerHTML='<b>Used sources:</b> '+rows.map(function(r){return r[0]+': '+Math.round(r[1])+'/100';}).join(' · ');
+  lastResult='Stream Bandit Score: '+score+'/100 ('+g+') — '+rows.map(function(r){return r[0]+': '+Math.round(r[1])+'/100';}).join(', ');
+}
+function copyResult(){
+  if(!lastResult)calculate();
+  if(!lastResult)return;
+  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(lastResult).then(function(){toast('Rating result copied');}):toast(lastResult);
+}
+function clearAll(){
+  ['sb57Imdb','sb57RtCritics','sb57RtAudience','sb57Meta','sb57Letter','sb57Extra'].forEach(function(id){var el=byId(id);if(el)el.value='';});
+  lastResult='';
+  calculate();
+}
+function toast(msg){try{var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}catch(e){}}
+function inject(){
+  if(!isAdminPage())return;
+  addStyle();
+  if(byId('sb57Calc'))return;
+  var main=document.querySelector('.main');
+  var top=main&&main.querySelector('.top');
+  if(!main)return;
+  if(top)top.insertAdjacentHTML('afterend',panelHtml());
+  else main.insertAdjacentHTML('afterbegin',panelHtml());
+  byId('sb57Calculate').onclick=calculate;
+  byId('sb57Copy').onclick=copyResult;
+  byId('sb57Clear').onclick=clearAll;
+  ['sb57Imdb','sb57RtCritics','sb57RtAudience','sb57Meta','sb57Letter','sb57Extra'].forEach(function(id){var el=byId(id);if(el)el.addEventListener('input',calculate);});
+}
+var mo=new MutationObserver(function(){setTimeout(inject,160);});
+try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
+document.addEventListener('DOMContentLoaded',function(){setTimeout(inject,700);});
+setInterval(inject,1200);
+setTimeout(function(){inject();if(isAdminPage())toast(VERSION+' Rating Calculator loaded');},900);
+})();
