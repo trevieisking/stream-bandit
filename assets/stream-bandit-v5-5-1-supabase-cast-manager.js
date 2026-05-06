@@ -1,107 +1,126 @@
-/* Stream Bandit V5.5.1 Clean — Supabase Cast & Crew Manager
-   Clean add-on: adds Director + Cast & Crew editing to Supabase Movie Manager only.
-   No Details-page watcher, no render loop, no player/Mux/database schema changes. */
+/* Stream Bandit V5.5.1B — Supabase Cast & Crew Manager
+   Manager-only add-on. Adds a direct Save Cast & Crew button so saving does not depend on the main movie update flow.
+   No Details-page watcher, no menu changes, no Mux/player/database schema changes. */
 (function(){
 'use strict';
 
-var SB551_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
-var SB551_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
-var SB551_LABEL='V5.5.1 Supabase Cast & Crew Manager';
-var sb551Client=null;
-var sb551Injected=false;
-var sb551SaveBound=false;
-var sb551SelectedId='';
+var URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+var KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+var LABEL='V5.5.1B Supabase Cast & Crew Manager';
+var supa=null;
+var lastTitle='';
+var lastLoadedTitle='';
+var loading=false;
+var saving=false;
 
-function byId(id){return document.getElementById(id)}
+function $(id){return document.getElementById(id)}
+function val(id){var el=$(id);return el?String(el.value||'').trim():''}
+function setVal(id,v){var el=$(id);if(el)el.value=v||''}
 function esc(s){return String(s==null?'':s).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c})}
-function val(id){var el=byId(id);return el?String(el.value||'').trim():''}
-function setVal(id,v){var el=byId(id);if(el)el.value=v||''}
-function text(el){return String(el&&el.textContent||'').trim()}
-function client(){if(sb551Client)return sb551Client;if(!window.supabase||!window.supabase.createClient)return null;sb551Client=window.supabase.createClient(SB551_URL,SB551_KEY);return sb551Client}
+function client(){if(supa)return supa;if(!window.supabase||!window.supabase.createClient)return null;supa=window.supabase.createClient(URL,KEY);return supa}
 function toast(msg){try{var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove()},3500)}catch(e){}}
-function status(msg){var s=byId('sb47Status');if(s)s.textContent=msg;console.log('[Stream Bandit]',msg)}
-function isManager(){return !!byId('sb47Title')&&!!byId('sb47SaveMovie')&&/Supabase Movie Manager/i.test(document.body.textContent||'')}
-function remember(id,title){if(id){sb551SelectedId=String(id);sessionStorage.setItem('sb551CleanMovieId',sb551SelectedId);}if(title)sessionStorage.setItem('sb551CleanMovieTitle',String(title));}
-function selectedId(){return sb551SelectedId||sessionStorage.getItem('sb551CleanMovieId')||''}
-function selectedTitle(){return val('sb47Title')||sessionStorage.getItem('sb551CleanMovieTitle')||''}
-function titleFromRow(btn){
-  var row=btn&&btn.closest?btn.closest('div,article,section,.card,.adminItem'):null;
-  if(!row)return '';
-  var candidates=Array.prototype.slice.call(row.querySelectorAll('b,strong,h3,h4'));
-  for(var i=0;i<candidates.length;i++){
-    var t=text(candidates[i]);
-    if(t&&!/published|Mux|stream link set|No poster/i.test(t))return t;
-  }
-  return '';
-}
+function status(msg){var s=$('sb47Status');if(s)s.textContent=msg;console.log('[Stream Bandit]',msg)}
+function isManager(){return !!$('sb47Title')&&!!$('sb47SaveMovie')&&/Supabase Movie Manager/i.test(document.body.textContent||'')}
+function currentTitle(){return val('sb47Title')}
+function setPanelStatus(msg,ok){var st=$('sb551CastStatus');if(st){st.className='sb551CastMini '+(ok?'sb551CastOk':'sb551CastWarn');st.textContent=msg;}}
 function injectCss(){
-  if(byId('sb551CleanStyle'))return;
+  if($('sb551CastStyle'))return;
   var st=document.createElement('style');
-  st.id='sb551CleanStyle';
-  st.textContent='\n.sb551CleanPanel{background:linear-gradient(180deg,rgba(16,24,39,.94),rgba(13,14,21,.90));border:1px solid rgba(106,166,255,.28);border-radius:22px;padding:14px;margin:13px 0;box-shadow:0 14px 36px rgba(0,0,0,.32)}.sb551CleanPanel h4{margin:0 0 6px;font-size:16px}.sb551CleanTabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.sb551CleanTab{border-radius:999px;padding:7px 10px;background:#25283a;border:1px solid rgba(255,255,255,.10);font-weight:800;font-size:12px}.sb551CleanTab.active{background:linear-gradient(135deg,var(--a,#ff2d55),var(--b,#7c3cff))}.sb551CleanHelp{color:var(--muted,#a9afc3);font-size:12px;line-height:1.45}.sb551CleanPanel textarea{min-height:150px}.sb551CleanGrid{display:grid;grid-template-columns:1fr;gap:10px}.sb551CleanOk{color:#baf7df}.sb551CleanWarn{color:#ffe0a3}.sb551CleanMini{font-size:12px;margin-top:8px}\n';
+  st.id='sb551CastStyle';
+  st.textContent='\n.sb551CastPanel{background:linear-gradient(180deg,rgba(16,24,39,.94),rgba(13,14,21,.90));border:1px solid rgba(106,166,255,.28);border-radius:22px;padding:14px;margin:13px 0;box-shadow:0 14px 36px rgba(0,0,0,.32)}.sb551CastPanel h4{margin:0 0 6px;font-size:16px}.sb551CastHelp{color:var(--muted,#a9afc3);font-size:12px;line-height:1.45}.sb551CastTabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.sb551CastTab{border-radius:999px;padding:7px 10px;background:#25283a;border:1px solid rgba(255,255,255,.10);font-weight:800;font-size:12px}.sb551CastTab.active{background:linear-gradient(135deg,var(--a,#ff2d55),var(--b,#7c3cff))}.sb551CastPanel textarea{min-height:155px}.sb551CastActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sb551CastMini{font-size:12px;margin-top:8px;line-height:1.45}.sb551CastOk{color:#baf7df}.sb551CastWarn{color:#ffe0a3}\n';
   document.head.appendChild(st);
 }
-function panelHtml(){return '<div class="sb551CleanPanel" id="sb551CleanPanel">'+
+function panelHtml(){return '<div class="sb551CastPanel" id="sb551CastPanel">'+
   '<h4>Cast & Crew metadata</h4>'+ 
-  '<p class="sb551CleanHelp">Supabase now uses the same metadata idea as the local admin form. This saves into the existing <b>director</b> and <b>cast_text</b> columns so the Supabase Details Cast & Crew tab can display it.</p>'+ 
-  '<div class="sb551CleanTabs"><span class="sb551CleanTab active">Overview fields</span><span class="sb551CleanTab">Cast & Crew</span><span class="sb551CleanTab">Saves to Supabase</span></div>'+ 
-  '<div class="sb551CleanGrid">'+
-    '<div><label>Director</label><input id="sb551CleanDirector" placeholder="Director name"></div>'+ 
-    '<div><label>Cast & Crew</label><textarea id="sb551CleanCast" placeholder="Example: Actor Name as Character Name&#10;Actor Two as Role Two"></textarea></div>'+ 
-  '</div>'+ 
-  '<p id="sb551CleanStatus" class="sb551CleanMini sb551CleanWarn">Ready. Click Update Supabase movie to save these fields.</p>'+ 
+  '<p class="sb551CastHelp">This edits the existing Supabase <b>director</b> and <b>cast_text</b> columns. Supabase Details already displays this data when it exists.</p>'+ 
+  '<div class="sb551CastTabs"><span class="sb551CastTab active">Metadata</span><span class="sb551CastTab">Cast & Crew</span><span class="sb551CastTab">Supabase save</span></div>'+ 
+  '<label>Director</label><input id="sb551CastDirector" placeholder="Director name">'+
+  '<label>Cast & Crew</label><textarea id="sb551CastText" placeholder="Example: Actor Name as Character Name&#10;Actor Two as Role Two"></textarea>'+ 
+  '<div class="sb551CastActions"><button type="button" id="sb551CastSave">Save Cast & Crew</button><button type="button" class="secondary" id="sb551CastReload">Reload Cast</button></div>'+ 
+  '<p id="sb551CastStatus" class="sb551CastMini sb551CastWarn">Ready. Use Save Cast & Crew after selecting a Supabase movie row.</p>'+ 
 '</div>';}
-async function loadExisting(){
-  var c=client();if(!c)return;
-  var id=selectedId();
-  var title=selectedTitle();
-  var q=null;
-  if(id)q=await c.from('sb_movies').select('id,title,director,cast_text').eq('id',id).maybeSingle();
-  if((!q||q.error||!q.data)&&title)q=await c.from('sb_movies').select('id,title,director,cast_text').eq('title',title).limit(1).maybeSingle();
-  if(q&&q.data){remember(q.data.id,q.data.title);setVal('sb551CleanDirector',q.data.director||'');setVal('sb551CleanCast',q.data.cast_text||'');var st=byId('sb551CleanStatus');if(st){st.className='sb551CleanMini sb551CleanOk';st.textContent='Loaded existing Director / Cast & Crew metadata for '+q.data.title+'.';}}
-}
 function injectPanel(){
   if(!isManager())return;
   injectCss();
-  if(!byId('sb551CleanPanel')){
-    var anchor=byId('sb47Trailer')||byId('sb47Age')||byId('sb47Rating')||byId('sb47Title');
+  if(!$('sb551CastPanel')){
+    var anchor=$('sb47Trailer')||$('sb47Age')||$('sb47Rating')||$('sb47Title');
     if(anchor){
       var host=anchor.closest('div')||anchor.parentElement;
       host.insertAdjacentHTML('afterend',panelHtml());
     }
   }
-  if(!sb551SaveBound){bindSave();sb551SaveBound=true;}
-  if(!sb551Injected){sb551Injected=true;setTimeout(loadExisting,500);}
+  bindPanelButtons();
+  var t=currentTitle();
+  if(t&&t!==lastTitle){lastTitle=t;setTimeout(loadCastForTitle,250);}
 }
-async function saveCast(){
-  var c=client();if(!c)return;
-  var director=val('sb551CleanDirector');
-  var cast=val('sb551CleanCast');
-  if(!director&&!cast)return;
-  var id=selectedId();
-  var title=selectedTitle();
-  var target=null;
-  if(id){var q=await c.from('sb_movies').select('id,title').eq('id',id).maybeSingle();if(!q.error&&q.data)target=q.data;}
-  if(!target&&title){var r=await c.from('sb_movies').select('id,title').eq('title',title).limit(1).maybeSingle();if(!r.error&&r.data)target=r.data;}
-  if(!target){status('Cast & Crew save needs the selected Supabase movie row. Click Edit on the row first.');return;}
-  var res=await c.from('sb_movies').update({director:director,cast_text:cast}).eq('id',target.id).select('id,title,director,cast_text').maybeSingle();
-  var st=byId('sb551CleanStatus');
-  if(res.error){if(st){st.className='sb551CleanMini sb551CleanWarn';st.textContent='Cast & Crew save failed: '+res.error.message;}status('Cast & Crew save failed: '+res.error.message);return;}
-  remember(res.data.id,res.data.title);
-  if(st){st.className='sb551CleanMini sb551CleanOk';st.textContent='Saved Cast & Crew metadata for '+res.data.title+'. Open Supabase Details → Cast & Crew to view it.';}
-  status('V5.5.1 Cast & Crew saved for '+res.data.title+'.');
-  toast('Cast & Crew saved for '+res.data.title);
+function bindPanelButtons(){
+  var save=$('sb551CastSave');
+  if(save&&!save.dataset.bound){save.dataset.bound='1';save.addEventListener('click',saveCastForTitle);}
+  var reload=$('sb551CastReload');
+  if(reload&&!reload.dataset.bound){reload.dataset.bound='1';reload.addEventListener('click',function(){lastLoadedTitle='';loadCastForTitle();});}
 }
-function bindSave(){
-  document.addEventListener('click',function(ev){
-    var edit=ev.target&&ev.target.closest?ev.target.closest('.sb47Edit,[data-id]'):null;
-    if(edit&&edit.dataset&&edit.dataset.id){remember(edit.dataset.id,titleFromRow(edit));setTimeout(loadExisting,500);}
-    if(ev.target&&ev.target.closest&&ev.target.closest('#sb47SaveMovie'))setTimeout(saveCast,1200);
-  },true);
+async function findMovieByTitle(title){
+  var c=client();if(!c||!title)return null;
+  var q=await c.from('sb_movies').select('id,title,director,cast_text,updated_at,created_at').eq('title',title).limit(5);
+  if(q.error){throw q.error;}
+  if(!q.data||!q.data.length)return null;
+  q.data.sort(function(a,b){return String(b.updated_at||b.created_at||'').localeCompare(String(a.updated_at||a.created_at||''));});
+  return q.data[0];
 }
-function resetWhenLeaving(){if(!isManager()){sb551Injected=false;sb551SaveBound=false;}}
-var mo=new MutationObserver(function(){if(isManager())injectPanel();else resetWhenLeaving();});
-try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
+async function loadCastForTitle(){
+  if(loading)return;
+  var title=currentTitle();
+  if(!title)return;
+  if(title===lastLoadedTitle)return;
+  loading=true;
+  try{
+    var row=await findMovieByTitle(title);
+    if(!row){setPanelStatus('No Supabase row found yet for '+title+'.',false);return;}
+    lastLoadedTitle=title;
+    setVal('sb551CastDirector',row.director||'');
+    setVal('sb551CastText',row.cast_text||'');
+    setPanelStatus('Loaded Cast & Crew metadata for '+row.title+'.',true);
+  }catch(e){setPanelStatus('Could not load Cast & Crew: '+((e&&e.message)||e),false);}
+  finally{loading=false;}
+}
+async function saveCastForTitle(){
+  if(saving)return;
+  var title=currentTitle();
+  if(!title){setPanelStatus('No movie selected. Click Edit on a Supabase row first.',false);return;}
+  saving=true;
+  try{
+    var c=client();if(!c)throw new Error('Supabase SDK not loaded.');
+    var row=await findMovieByTitle(title);
+    if(!row)throw new Error('No Supabase row found for '+title+'.');
+    var director=val('sb551CastDirector');
+    var cast=val('sb551CastText');
+    var res=await c.from('sb_movies').update({director:director,cast_text:cast}).eq('id',row.id).select('id,title,director,cast_text').maybeSingle();
+    if(res.error)throw res.error;
+    lastLoadedTitle='';
+    setPanelStatus('Saved Cast & Crew for '+res.data.title+'. Open Supabase Details → Cast & Crew to view it.',true);
+    status('V5.5.1B Cast & Crew saved for '+res.data.title+'.');
+    toast('Cast & Crew saved for '+res.data.title);
+  }catch(e){
+    setPanelStatus('Cast & Crew save failed: '+((e&&e.message)||e),false);
+    status('Cast & Crew save failed: '+((e&&e.message)||e));
+  }finally{saving=false;}
+}
+
+document.addEventListener('click',function(ev){
+  if(ev.target&&ev.target.closest&&ev.target.closest('.sb47Edit,[data-id]')){
+    lastLoadedTitle='';
+    setTimeout(function(){lastTitle='';injectPanel();loadCastForTitle();},450);
+  }
+},true);
+
+document.addEventListener('input',function(ev){
+  if(ev.target&&ev.target.id==='sb47Title'){
+    lastLoadedTitle='';
+    setTimeout(loadCastForTitle,300);
+  }
+},true);
+
+setInterval(injectPanel,1000);
 document.addEventListener('DOMContentLoaded',function(){setTimeout(injectPanel,800);});
-setTimeout(function(){injectPanel();if(isManager())toast(SB551_LABEL+' loaded');},1000);
+setTimeout(function(){injectPanel();if(isManager())toast(LABEL+' loaded');},1000);
 })();
