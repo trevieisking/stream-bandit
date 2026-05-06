@@ -39,7 +39,8 @@ function panelHtml(){
     '<div class="sb57Breakdown" id="sb57Breakdown">Ready.</div>'+ 
     '<div class="sb57SafeNote">Manual helper only — copy the result and paste it into the movie rating field when you are happy. This calculator does not save or overwrite movie data.</div>'+ 
   '</div>';
-}\nfunction field(id,label,placeholder,help){return '<div><label>'+label+'</label><input id="'+id+'" inputmode="decimal" placeholder="'+placeholder+'"><div class="sb57Mini">'+help+'</div></div>';}
+}
+function field(id,label,placeholder,help){return '<div><label>'+label+'</label><input id="'+id+'" inputmode="decimal" placeholder="'+placeholder+'"><div class="sb57Mini">'+help+'</div></div>';}
 function value(id){var el=byId(id);if(!el)return null;var raw=String(el.value||'').replace('%','').trim();if(!raw)return null;var n=Number(raw);return Number.isFinite(n)?n:null;}
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
 function grade(score){if(score>=90)return 'Elite / must-watch';if(score>=80)return 'Excellent';if(score>=70)return 'Good';if(score>=60)return 'Mixed but watchable';if(score>=50)return 'Weak / only if interested';return 'Low score';}
