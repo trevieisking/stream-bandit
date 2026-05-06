@@ -1,10 +1,11 @@
-/* Stream Bandit V5.6.3B — Settings Label Cleanup
+/* Stream Bandit V5.6.3C — Settings Label Cleanup
    Visual text cleanup for the Settings page only.
+   Version title/badge is controlled by the main cleanup script as one source of truth.
    No Supabase saves, Mux, player, storage upload, logo upload, database or menu routing changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.6.3B';
+var VERSION='V5.6.3';
 var CLEAN_TITLE='V5.6.3 Stable Settings + Branding';
 var CLEAN_SHORT='V5.6.3 Stable';
 
@@ -20,6 +21,7 @@ function replaceOldText(s){
     .replace(/V5\.4\.2 Details Tag Display Hotfix \+ Page Polish/g,CLEAN_TITLE)
     .replace(/StreamBanditPrototypev5\.4\.2-details-tag-display-hotfix-page-polish/g,'StreamBanditPrototypev5.6.3-stable-settings-branding')
     .replace(/V5\.4\.2 Details Tag Display Hotfix/g,CLEAN_SHORT)
+    .replace(/V5\.6\.1 Stable checkpoint/g,'V5.6.3 Stable checkpoint')
     .replace(/V5\.4\.2/g,'V5.6.3');
 }
 function replaceTextNode(node){
@@ -38,7 +40,13 @@ function walkText(root){
 function addSettingsBadge(){
   if(!isSettingsPage())return;
   var m=main();
-  if(!m||m.querySelector('.sb563SettingsBadge'))return;
+  if(!m)return;
+  var existing=m.querySelector('.sb563SettingsBadge');
+  if(existing){
+    var b=existing.querySelector('b');
+    if(b)b.textContent=CLEAN_TITLE;
+    return;
+  }
   var top=m.querySelector('.top')||m.firstElementChild;
   if(!top)return;
   var badge=document.createElement('div');
@@ -58,7 +66,8 @@ function cleanLocalLabels(){
     for(var i=0;i<localStorage.length;i++){
       var key=localStorage.key(i);
       var raw=localStorage.getItem(key);
-      if(!raw||raw.indexOf('V5.4.2')<0&&raw.indexOf('details-tag-display-hotfix')<0)continue;
+      if(!raw)continue;
+      if(raw.indexOf('V5.4.2')<0&&raw.indexOf('details-tag-display-hotfix')<0&&raw.indexOf('V5.6.1 Stable checkpoint')<0)continue;
       var next=replaceOldText(raw);
       if(next!==raw)localStorage.setItem(key,next);
     }
@@ -70,12 +79,11 @@ function run(){
   if(!isSettingsPage())return;
   walkText(main());
   addSettingsBadge();
-  document.title='Stream Bandit V5.6.3 Settings';
 }
 cleanLocalLabels();
 var mo=new MutationObserver(function(){setTimeout(run,160);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 document.addEventListener('DOMContentLoaded',function(){setTimeout(run,700);});
-setInterval(run,800);
+setInterval(run,1000);
 setTimeout(function(){run();try{var t=document.createElement('div');t.className='toast';t.textContent=VERSION+' settings labels cleaned';document.body.appendChild(t);setTimeout(function(){t.remove()},2400)}catch(e){}},900);
 })();
