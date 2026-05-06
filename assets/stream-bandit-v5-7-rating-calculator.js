@@ -1,18 +1,19 @@
-/* Stream Bandit V5.8.1 — Admin Rating Calculator Guard + Close
-   Admin helper only. Manually enter public ratings and calculate a Stream Bandit Score.
+/* Stream Bandit V5.10.1 — Rating Calculator Duplicate Guard
+   Admin helper only. Opens only when the sidebar Rating Calculator button is clicked.
    No live scraping/API calls, no Supabase writes, no Mux, player, storage, movie save or database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.8.1';
+var VERSION='V5.10.1';
 var lastResult='';
 var openWanted=false;
+var lastOpenClick=0;
 
 function byId(id){return document.getElementById(id)}
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
-function pageTitle(){return text(document.querySelector('.main .top h2,.main h1,.main h2'));}
+function pageTitle(){return text(document.querySelector('.main .top h2,.main h1,.main h2')).toLowerCase();}
 function isRealAdminPage(){
-  var title=pageTitle().toLowerCase();
+  var title=pageTitle();
   return title==='admin'||title==='admin tools'||title.indexOf('admin ')===0;
 }
 function addStyle(){
@@ -23,7 +24,7 @@ function addStyle(){
   document.head.appendChild(st);
 }
 function panelHtml(){
-  return '<div class="sb57Calc" id="sb57Calc" tabindex="-1">'+
+  return '<div class="sb57Calc" data-sb57-calc="1" id="sb57Calc" tabindex="-1">'+
     '<div class="sb57CalcHead"><div><h3>Stream Bandit Rating Calculator</h3><p>Manually enter ratings you looked up, then calculate your own overall score. Leave unknown sources blank. IMDb should be entered as 0–10; everything else as 0–100.</p></div><button type="button" class="secondary sb57Close" id="sb57Close">Close calculator</button></div>'+ 
     '<div class="sb57Grid">'+
       field('sb57Imdb','IMDb','Example: 7.2','0–10')+
@@ -43,6 +44,13 @@ function field(id,label,placeholder,help){return '<div><label>'+label+'</label><
 function value(id){var el=byId(id);if(!el)return null;var raw=String(el.value||'').replace('%','').trim();if(!raw)return null;var n=Number(raw);return Number.isFinite(n)?n:null;}
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
 function grade(score){if(score>=90)return 'Elite / must-watch';if(score>=80)return 'Excellent';if(score>=70)return 'Good';if(score>=60)return 'Mixed but watchable';if(score>=50)return 'Weak / only if interested';return 'Low score';}
+function allPanels(){return Array.prototype.slice.call(document.querySelectorAll('#sb57Calc,[data-sb57-calc="1"'));}
+function removeDuplicatePanels(){
+  var panels=allPanels();
+  if(!panels.length)return;
+  panels.forEach(function(p,i){if(i>0){try{p.remove();}catch(e){}}});
+}
+function removeAllPanels(){allPanels().forEach(function(p){try{p.remove();}catch(e){}});}
 function calculate(){
   var rows=[];
   var imdb=value('sb57Imdb');if(imdb!=null)rows.push(['IMDb',clamp(imdb,0,10)*10]);
@@ -63,7 +71,7 @@ function calculate(){
 function toast(msg){try{var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}catch(e){}}
 function copyResult(){if(!lastResult)calculate();if(!lastResult)return;navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(lastResult).then(function(){toast('Rating result copied');}):toast(lastResult);}
 function clearAll(){['sb57Imdb','sb57RtCritics','sb57RtAudience','sb57Meta','sb57Letter','sb57Extra'].forEach(function(id){var el=byId(id);if(el)el.value='';});lastResult='';calculate();}
-function closePanel(){openWanted=false;var p=byId('sb57Calc');if(p)p.remove();}
+function closePanel(){openWanted=false;lastOpenClick=0;removeAllPanels();}
 function bindCalc(){
   var calc=byId('sb57Calculate'), copy=byId('sb57Copy'), clear=byId('sb57Clear'), close=byId('sb57Close');
   if(calc&&!calc.dataset.bound){calc.dataset.bound='1';calc.onclick=calculate;}
@@ -72,26 +80,25 @@ function bindCalc(){
   if(close&&!close.dataset.bound){close.dataset.bound='1';close.onclick=closePanel;}
   ['sb57Imdb','sb57RtCritics','sb57RtAudience','sb57Meta','sb57Letter','sb57Extra'].forEach(function(id){var el=byId(id);if(el&&!el.dataset.bound){el.dataset.bound='1';el.addEventListener('input',calculate);}});
 }
-function removePanelFromWrongPage(){
-  if(isRealAdminPage()&&openWanted)return;
-  var p=byId('sb57Calc');
-  if(p)p.remove();
-}
 function injectPanel(){
-  removePanelFromWrongPage();
-  if(!isRealAdminPage()||!openWanted)return false;
+  removeDuplicatePanels();
+  if(!isRealAdminPage()||!openWanted){removeAllPanels();return false;}
   addStyle();
-  if(!byId('sb57Calc')){
-    var main=document.querySelector('.main');
-    var top=main&&main.querySelector('.top');
-    if(!main)return false;
-    if(top)top.insertAdjacentHTML('afterend',panelHtml());else main.insertAdjacentHTML('afterbegin',panelHtml());
+  var panels=allPanels();
+  if(!panels.length){
+    var m=document.querySelector('.main');
+    var top=m&&m.querySelector('.top');
+    if(!m)return false;
+    if(top)top.insertAdjacentHTML('afterend',panelHtml());else m.insertAdjacentHTML('afterbegin',panelHtml());
   }
+  removeDuplicatePanels();
   bindCalc();
   return true;
 }
 function openAdminAndScroll(){
   openWanted=true;
+  lastOpenClick=Date.now();
+  removeAllPanels();
   var adminBtn=Array.prototype.slice.call(document.querySelectorAll('button')).find(function(b){return /^🛠?\s*admin$/i.test(text(b))||/^admin$/i.test(text(b));});
   if(adminBtn)adminBtn.click();
   setTimeout(function(){
@@ -105,7 +112,9 @@ function addMenuButton(){
   var groups=Array.prototype.slice.call(document.querySelectorAll('.sb56Group'));
   var adminGroup=groups.find(function(g){return /admin tools/i.test(text(g.querySelector('summary')));});
   var body=adminGroup&&adminGroup.querySelector('.sb56GroupBody');
-  if(!body||body.querySelector('#sb57MenuButton'))return;
+  if(!body)return;
+  var existing=body.querySelector('#sb57MenuButton');
+  if(existing){existing.onclick=openAdminAndScroll;return;}
   var btn=document.createElement('button');
   btn.type='button';
   btn.id='sb57MenuButton';
@@ -114,14 +123,24 @@ function addMenuButton(){
   btn.onclick=openAdminAndScroll;
   body.insertBefore(btn,body.firstChild);
 }
-function run(){addMenuButton();injectPanel();}
+function run(){
+  addMenuButton();
+  removeDuplicatePanels();
+  if(!openWanted||!isRealAdminPage())removeAllPanels();
+  else injectPanel();
+}
 document.addEventListener('click',function(ev){
-  var b=ev.target&&ev.target.closest&&ev.target.closest('button[data-view],button');
-  if(b&&b.id!=='sb57MenuButton'&&b.id!=='sb57Calculate'&&b.id!=='sb57Copy'&&b.id!=='sb57Clear'&&b.id!=='sb57Close')setTimeout(function(){openWanted=false;removePanelFromWrongPage();},250);
+  var target=ev.target;
+  var inCalc=target&&target.closest&&target.closest('#sb57Calc');
+  var menu=target&&target.closest&&target.closest('#sb57MenuButton');
+  if(menu)return;
+  if(inCalc)return;
+  var b=target&&target.closest&&target.closest('button[data-view],button,.nav button,.side button');
+  if(b){setTimeout(function(){openWanted=false;removeAllPanels();},80);}
 },true);
-var mo=new MutationObserver(function(){setTimeout(run,120);});
+var mo=new MutationObserver(function(){setTimeout(run,180);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 document.addEventListener('DOMContentLoaded',function(){setTimeout(run,700);});
-setInterval(run,700);
-setTimeout(function(){run();},900);
+setInterval(run,1000);
+setTimeout(run,900);
 })();
