@@ -1,18 +1,19 @@
-/* Stream Bandit V5.8 — Settings Tabs Pass 1
+/* Stream Bandit V5.8.1 — Settings Tabs Hotfix
    Organises existing Settings page sections into tabs.
    No Supabase save logic, Mux, player, storage, form field, upload or database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.8';
+var VERSION='V5.8.1';
 var active='overview';
 
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
 function main(){return document.querySelector('.main')||document.querySelector('main')||document.getElementById('app');}
+function pageTitle(){return text(document.querySelector('.main .top h2,.main h1,.main h2')).toLowerCase();}
 function isSettingsPage(){
   var m=main();
-  var title=text(document.querySelector('.main .top h2,.main h1,.main h2')).toLowerCase();
-  return title==='settings'||(m&&text(m).toLowerCase().indexOf('branding')>-1&&text(m).toLowerCase().indexOf('homepage builder')>-1);
+  var title=pageTitle();
+  return title==='settings'||(m&&text(m).toLowerCase().indexOf('homepage builder')>-1&&text(m).toLowerCase().indexOf('branding')>-1);
 }
 function addStyle(){
   if(document.getElementById('sb58TabsStyle'))return;
@@ -23,8 +24,8 @@ function addStyle(){
 }
 function classify(card){
   var t=text(card).toLowerCase();
-  if(t.indexOf('branding')>-1||t.indexOf('app name')>-1||t.indexOf('sidebar tagline')>-1||t.indexOf('logo image')>-1||t.indexOf('accent colour')>-1)return 'branding';
   if(t.indexOf('homepage builder')>-1||t.indexOf('homepage hero')>-1||t.indexOf('homepage sections')>-1)return 'homepage';
+  if(t.indexOf('branding')>-1||t.indexOf('app name')>-1||t.indexOf('sidebar tagline')>-1||t.indexOf('logo image')>-1||t.indexOf('accent colour')>-1)return 'branding';
   if(t.indexOf('image uploads')>-1||t.indexOf('storage')>-1||t.indexOf('supabase storage')>-1||t.indexOf('mux video route')>-1)return 'storage';
   return 'overview';
 }
@@ -39,9 +40,11 @@ function ensureTabs(){
   if(!m.querySelector('#sb58SettingsTabs')){
     var wrap=document.createElement('div');
     wrap.id='sb58SettingsTabsWrap';
-    wrap.innerHTML='<div class="sb58TabsNote">V5.8 Settings Tabs: same Settings controls, now grouped neatly into tabs. Nothing saves until you press the original save buttons.</div><div class="sb58Tabs" id="sb58SettingsTabs"></div>';
+    wrap.innerHTML='<div class="sb58TabsNote">V5.8.1 Settings Tabs: same Settings controls, now grouped neatly into tabs. Nothing saves until you press the original save buttons.</div><div class="sb58Tabs" id="sb58SettingsTabs"></div>';
     top.insertAdjacentElement('afterend',wrap);
   }
+  var note=m.querySelector('.sb58TabsNote');
+  if(note)note.textContent='V5.8.1 Settings Tabs: same Settings controls, now grouped neatly into tabs. Nothing saves until you press the original save buttons.';
   var tabs=m.querySelector('#sb58SettingsTabs');
   if(!tabs)return;
   tabs.innerHTML='';
@@ -53,19 +56,22 @@ function ensureTabs(){
     b.onclick=function(){active=k;applyTabs();};
     tabs.appendChild(b);
   });
-  applyPanels();
+}
+function settingsSections(){
+  var m=main(); if(!m)return [];
+  return Array.prototype.slice.call(m.children).filter(function(el){
+    if(!el||el.nodeType!==1)return false;
+    if(el.id==='sb58SettingsTabsWrap'||el.closest('#sb58SettingsTabsWrap'))return false;
+    if(el.classList.contains('top'))return false;
+    var t=text(el);
+    if(!t)return false;
+    if(el.querySelector('#sb58SettingsTabs'))return false;
+    return true;
+  });
 }
 function applyPanels(){
-  var m=main(); if(!m)return;
-  var cards=Array.prototype.slice.call(m.children).filter(function(el){
-    if(el.id==='sb58SettingsTabsWrap'||el.classList.contains('top'))return false;
-    if(el.classList.contains('sb58SettingsBadge')||el.classList.contains('sb561Checkpoint'))return true;
-    var t=text(el).toLowerCase();
-    return t&&el.offsetParent!==null&&t.indexOf('settings')>-1||/card|panel|box/.test(el.className||'')||el.querySelector('input,textarea,select,button');
-  });
-  cards.forEach(function(card){
-    if(card.id==='sb58SettingsTabsWrap')return;
-    if(card.closest('#sb58SettingsTabsWrap'))return;
+  if(!isSettingsPage())return;
+  settingsSections().forEach(function(card){
     var group=classify(card);
     card.dataset.sb58TabPanel=group;
     card.classList.add('sb58TabPanel');
@@ -78,9 +84,9 @@ function run(){
   ensureTabs();
   applyPanels();
 }
-var mo=new MutationObserver(function(){setTimeout(run,180);});
+var mo=new MutationObserver(function(){setTimeout(run,120);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 document.addEventListener('DOMContentLoaded',function(){setTimeout(run,700);});
-setInterval(run,1200);
+setInterval(run,900);
 setTimeout(run,900);
 })();
