@@ -1,10 +1,10 @@
-/* Stream Bandit V5.8.3 — Settings Tabs Safe Scroll
-   Keeps all existing Settings content visible and uses tabs as jump buttons.
+/* Stream Bandit V5.8.4 — Settings Tabs Anchor Scroll
+   Keeps all existing Settings content visible and uses real anchor tabs to jump down the page.
    No Supabase save logic, Mux, player, storage, form field, upload or database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.8.3';
+var VERSION='V5.8.4';
 var active='overview';
 
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
@@ -16,11 +16,10 @@ function isSettingsPage(){
   return pageTitle()==='settings'||(t.indexOf('branding')>-1&&t.indexOf('homepage builder')>-1);
 }
 function addStyle(){
-  var old=document.getElementById('sb58TabsStyle');
-  if(old)old.remove();
+  Array.prototype.slice.call(document.querySelectorAll('#sb58TabsStyle,#sb583TabsStyle,#sb584TabsStyle')).forEach(function(old){try{old.remove();}catch(e){}});
   var st=document.createElement('style');
-  st.id='sb583TabsStyle';
-  st.textContent='\n.sb58Tabs{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 14px}.sb58Tab{border:0;border-radius:999px;padding:11px 16px;background:rgba(48,52,78,.92);color:#f6f7ff;font-weight:950;box-shadow:0 10px 28px rgba(0,0,0,.20);cursor:pointer;pointer-events:auto!important;position:relative;z-index:5}.sb58Tab.active{background:linear-gradient(135deg,#ff2d85,#7c3cff);box-shadow:0 14px 36px rgba(124,60,255,.35)}.sb58TabsNote{margin:0 0 12px;padding:10px 12px;border-radius:16px;background:rgba(61,220,151,.10);border:1px solid rgba(61,220,151,.22);color:#baf7df;font-size:12px;line-height:1.45}.sb58Anchor{outline:2px solid rgba(255,45,133,.35);box-shadow:0 0 0 6px rgba(124,60,255,.12),0 20px 50px rgba(124,60,255,.18)!important}.sb58Recover{display:none!important}.sb58Hidden{display:block!important}\n';
+  st.id='sb584TabsStyle';
+  st.textContent='\n.sb58Tabs{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 14px;position:relative;z-index:50}.sb58Tab{display:inline-flex;text-decoration:none!important;border:0;border-radius:999px;padding:11px 16px;background:rgba(48,52,78,.92);color:#f6f7ff!important;font-weight:950;box-shadow:0 10px 28px rgba(0,0,0,.20);cursor:pointer;pointer-events:auto!important;position:relative;z-index:55}.sb58Tab.active{background:linear-gradient(135deg,#ff2d85,#7c3cff);box-shadow:0 14px 36px rgba(124,60,255,.35)}.sb58TabsNote{margin:0 0 12px;padding:10px 12px;border-radius:16px;background:rgba(61,220,151,.10);border:1px solid rgba(61,220,151,.22);color:#baf7df;font-size:12px;line-height:1.45}.sb58Anchor{outline:2px solid rgba(255,45,133,.35);box-shadow:0 0 0 6px rgba(124,60,255,.12),0 20px 50px rgba(124,60,255,.18)!important}.sb58Recover{display:none!important}.sb58Hidden{display:block!important}\n';
   document.head.appendChild(st);
 }
 function clearBadOldState(){
@@ -48,10 +47,22 @@ function sections(){
     return true;
   });
 }
+function assignAnchors(){
+  var found={};
+  sections().forEach(function(el){
+    var kind=classify(el);
+    if(!found[kind]){
+      found[kind]=el;
+      el.id='sb58-'+kind;
+      el.style.scrollMarginTop='22px';
+    }
+  });
+  var first=sections()[0];
+  if(first){first.id='sb58-overview';first.style.scrollMarginTop='22px';}
+}
 function findSection(kind){
-  var list=sections();
-  if(kind==='overview')return list[0]||null;
-  return list.find(function(el){return classify(el)===kind;})||list[0]||null;
+  assignAnchors();
+  return document.getElementById('sb58-'+kind)||sections()[0]||null;
 }
 function updateActiveTabs(){
   var m=main(); if(!m)return;
@@ -64,7 +75,7 @@ function jump(kind){
   var target=findSection(kind);
   if(target){
     target.classList.add('sb58Anchor');
-    target.scrollIntoView({behavior:'smooth',block:'start'});
+    try{target.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){location.hash='sb58-'+kind;}
     setTimeout(function(){target.classList.remove('sb58Anchor');},1700);
   }
 }
@@ -72,6 +83,7 @@ function ensureTabs(){
   if(!isSettingsPage())return;
   addStyle();
   clearBadOldState();
+  assignAnchors();
   var m=main(); if(!m)return;
   var top=m.querySelector('.top')||m.firstElementChild;
   if(!top)return;
@@ -79,23 +91,27 @@ function ensureTabs(){
   if(oldWrap)oldWrap.remove();
   var wrap=document.createElement('div');
   wrap.id='sb58SettingsTabsWrap';
-  wrap.innerHTML='<div class="sb58TabsNote">V5.8.3 Settings Tabs: same Settings controls stay visible. Tabs jump to each area safely.</div><div class="sb58Tabs" id="sb58SettingsTabs"></div>';
+  wrap.innerHTML='<div class="sb58TabsNote">V5.8.4 Settings Tabs: same Settings controls stay visible. Tabs jump to each area safely.</div><div class="sb58Tabs" id="sb58SettingsTabs"></div>';
   top.insertAdjacentElement('afterend',wrap);
   var tabs=wrap.querySelector('#sb58SettingsTabs');
   ['overview','branding','homepage','storage'].forEach(function(k){
-    var b=document.createElement('button');
-    b.type='button';
-    b.dataset.tab=k;
-    b.className='sb58Tab'+(active===k?' active':'');
-    b.textContent=tabTitle(k);
-    b.onclick=function(e){e.preventDefault();e.stopPropagation();jump(k);};
-    tabs.appendChild(b);
+    var a=document.createElement('a');
+    a.href='#sb58-'+k;
+    a.dataset.tab=k;
+    a.className='sb58Tab'+(active===k?' active':'');
+    a.textContent=tabTitle(k);
+    a.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();jump(k);},true);
+    tabs.appendChild(a);
   });
 }
-function run(){if(!isSettingsPage())return;ensureTabs();clearBadOldState();}
+document.addEventListener('click',function(e){
+  var a=e.target&&e.target.closest&&e.target.closest('.sb58Tab');
+  if(a){e.preventDefault();e.stopImmediatePropagation();jump(a.dataset.tab||'overview');}
+},true);
+function run(){if(!isSettingsPage())return;ensureTabs();clearBadOldState();assignAnchors();}
 var mo=new MutationObserver(function(){setTimeout(run,240);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 document.addEventListener('DOMContentLoaded',function(){setTimeout(run,700);});
-setInterval(function(){if(isSettingsPage())clearBadOldState();},600);
+setInterval(function(){if(isSettingsPage()){clearBadOldState();assignAnchors();}},600);
 setTimeout(run,900);
 })();
