@@ -1,19 +1,19 @@
-/* Stream Bandit V5.7.1 — Admin Rating Calculator
+/* Stream Bandit V5.7.2 — Admin Rating Calculator
    Admin helper only. Manually enter public ratings and calculate a Stream Bandit Score.
    No live scraping/API calls, no Supabase writes, no Mux, player, storage, movie save or database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.7.1';
+var VERSION='V5.7.2';
 var lastResult='';
+var forceOpen=false;
 
 function byId(id){return document.getElementById(id)}
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
-function isAdminPage(){
-  var main=document.querySelector('.main');
-  if(!main)return false;
-  var t=text(main).toLowerCase();
-  return t.indexOf('admin')>-1||t.indexOf('add video')>-1||t.indexOf('manage videos')>-1||t.indexOf('submit video')>-1;
+function pageTitle(){return text(document.querySelector('.main .top h2,.main h1,.main h2'));}
+function isRealAdminPage(){
+  var title=pageTitle().toLowerCase();
+  return title==='admin'||title.indexOf('admin')===0;
 }
 function addStyle(){
   if(byId('sb57Style'))return;
@@ -71,8 +71,14 @@ function bindCalc(){
   if(clear&&!clear.dataset.bound){clear.dataset.bound='1';clear.onclick=clearAll;}
   ['sb57Imdb','sb57RtCritics','sb57RtAudience','sb57Meta','sb57Letter','sb57Extra'].forEach(function(id){var el=byId(id);if(el&&!el.dataset.bound){el.dataset.bound='1';el.addEventListener('input',calculate);}});
 }
+function removePanelFromWrongPage(){
+  if(isRealAdminPage()||forceOpen)return;
+  var p=byId('sb57Calc');
+  if(p)p.remove();
+}
 function injectPanel(){
-  if(!isAdminPage())return false;
+  removePanelFromWrongPage();
+  if(!isRealAdminPage()&&!forceOpen)return false;
   addStyle();
   if(!byId('sb57Calc')){
     var main=document.querySelector('.main');
@@ -84,6 +90,7 @@ function injectPanel(){
   return true;
 }
 function openAdminAndScroll(){
+  forceOpen=true;
   var adminBtn=Array.prototype.slice.call(document.querySelectorAll('button')).find(function(b){return /admin/i.test(text(b))&&!/admin tools/i.test(text(b));});
   if(adminBtn)adminBtn.click();
   setTimeout(function(){
@@ -107,6 +114,10 @@ function addMenuButton(){
   body.insertBefore(btn,body.firstChild);
 }
 function run(){addMenuButton();injectPanel();}
+document.addEventListener('click',function(ev){
+  var b=ev.target&&ev.target.closest&&ev.target.closest('button[data-view],button');
+  if(b&&b.id!=='sb57MenuButton')setTimeout(function(){forceOpen=false;removePanelFromWrongPage();},250);
+},true);
 var mo=new MutationObserver(function(){setTimeout(run,160);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 document.addEventListener('DOMContentLoaded',function(){setTimeout(run,700);});
