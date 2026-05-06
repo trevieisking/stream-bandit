@@ -1,11 +1,12 @@
-/* Stream Bandit V5.7.3 — Admin Rating Calculator Guard
+/* Stream Bandit V5.8.1 — Admin Rating Calculator Guard + Close
    Admin helper only. Manually enter public ratings and calculate a Stream Bandit Score.
    No live scraping/API calls, no Supabase writes, no Mux, player, storage, movie save or database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.7.3';
+var VERSION='V5.8.1';
 var lastResult='';
+var openWanted=false;
 
 function byId(id){return document.getElementById(id)}
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
@@ -18,13 +19,12 @@ function addStyle(){
   if(byId('sb57Style'))return;
   var st=document.createElement('style');
   st.id='sb57Style';
-  st.textContent='\n.sb57Calc{background:linear-gradient(180deg,rgba(16,24,39,.94),rgba(13,14,21,.90));border:1px solid rgba(182,140,255,.28);border-radius:24px;padding:15px;margin:14px 0;box-shadow:0 16px 42px rgba(0,0,0,.32)}.sb57Calc h3{margin:0 0 7px;font-size:20px}.sb57Calc p{color:var(--muted,#a9afc3);font-size:13px;line-height:1.45}.sb57Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.sb57Result{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(61,220,151,.16),rgba(124,60,255,.18));border:1px solid rgba(61,220,151,.25);border-radius:20px;padding:13px;margin-top:12px}.sb57Score{font-size:36px;font-weight:1000;letter-spacing:-.05em}.sb57Grade{font-size:13px;color:#baf7df;font-weight:900}.sb57Actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sb57Mini{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px}.sb57Breakdown{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px;line-height:1.45}.sb57MenuButton{margin:0!important}.sb57SafeNote{margin-top:10px;padding:10px;border-radius:16px;background:rgba(61,220,151,.10);border:1px solid rgba(61,220,151,.20);color:#baf7df;font-size:12px;line-height:1.45}\n';
+  st.textContent='\n.sb57Calc{background:linear-gradient(180deg,rgba(16,24,39,.94),rgba(13,14,21,.90));border:1px solid rgba(182,140,255,.28);border-radius:24px;padding:15px;margin:14px 0;box-shadow:0 16px 42px rgba(0,0,0,.32)}.sb57CalcHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.sb57Calc h3{margin:0 0 7px;font-size:20px}.sb57Close{padding:8px 11px!important;border-radius:999px!important}.sb57Calc p{color:var(--muted,#a9afc3);font-size:13px;line-height:1.45}.sb57Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.sb57Result{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(61,220,151,.16),rgba(124,60,255,.18));border:1px solid rgba(61,220,151,.25);border-radius:20px;padding:13px;margin-top:12px}.sb57Score{font-size:36px;font-weight:1000;letter-spacing:-.05em}.sb57Grade{font-size:13px;color:#baf7df;font-weight:900}.sb57Actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sb57Mini{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px}.sb57Breakdown{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px;line-height:1.45}.sb57MenuButton{margin:0!important}.sb57SafeNote{margin-top:10px;padding:10px;border-radius:16px;background:rgba(61,220,151,.10);border:1px solid rgba(61,220,151,.20);color:#baf7df;font-size:12px;line-height:1.45}\n';
   document.head.appendChild(st);
 }
 function panelHtml(){
   return '<div class="sb57Calc" id="sb57Calc" tabindex="-1">'+
-    '<h3>Stream Bandit Rating Calculator</h3>'+ 
-    '<p>Manually enter ratings you looked up, then calculate your own overall score. Leave unknown sources blank. IMDb should be entered as 0–10; everything else as 0–100.</p>'+ 
+    '<div class="sb57CalcHead"><div><h3>Stream Bandit Rating Calculator</h3><p>Manually enter ratings you looked up, then calculate your own overall score. Leave unknown sources blank. IMDb should be entered as 0–10; everything else as 0–100.</p></div><button type="button" class="secondary sb57Close" id="sb57Close">Close calculator</button></div>'+ 
     '<div class="sb57Grid">'+
       field('sb57Imdb','IMDb','Example: 7.2','0–10')+
       field('sb57RtCritics','Rotten Tomatoes Critics','Example: 84','0–100')+
@@ -63,21 +63,23 @@ function calculate(){
 function toast(msg){try{var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}catch(e){}}
 function copyResult(){if(!lastResult)calculate();if(!lastResult)return;navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(lastResult).then(function(){toast('Rating result copied');}):toast(lastResult);}
 function clearAll(){['sb57Imdb','sb57RtCritics','sb57RtAudience','sb57Meta','sb57Letter','sb57Extra'].forEach(function(id){var el=byId(id);if(el)el.value='';});lastResult='';calculate();}
+function closePanel(){openWanted=false;var p=byId('sb57Calc');if(p)p.remove();}
 function bindCalc(){
-  var calc=byId('sb57Calculate'), copy=byId('sb57Copy'), clear=byId('sb57Clear');
+  var calc=byId('sb57Calculate'), copy=byId('sb57Copy'), clear=byId('sb57Clear'), close=byId('sb57Close');
   if(calc&&!calc.dataset.bound){calc.dataset.bound='1';calc.onclick=calculate;}
   if(copy&&!copy.dataset.bound){copy.dataset.bound='1';copy.onclick=copyResult;}
   if(clear&&!clear.dataset.bound){clear.dataset.bound='1';clear.onclick=clearAll;}
+  if(close&&!close.dataset.bound){close.dataset.bound='1';close.onclick=closePanel;}
   ['sb57Imdb','sb57RtCritics','sb57RtAudience','sb57Meta','sb57Letter','sb57Extra'].forEach(function(id){var el=byId(id);if(el&&!el.dataset.bound){el.dataset.bound='1';el.addEventListener('input',calculate);}});
 }
 function removePanelFromWrongPage(){
-  if(isRealAdminPage())return;
+  if(isRealAdminPage()&&openWanted)return;
   var p=byId('sb57Calc');
   if(p)p.remove();
 }
 function injectPanel(){
   removePanelFromWrongPage();
-  if(!isRealAdminPage())return false;
+  if(!isRealAdminPage()||!openWanted)return false;
   addStyle();
   if(!byId('sb57Calc')){
     var main=document.querySelector('.main');
@@ -89,6 +91,7 @@ function injectPanel(){
   return true;
 }
 function openAdminAndScroll(){
+  openWanted=true;
   var adminBtn=Array.prototype.slice.call(document.querySelectorAll('button')).find(function(b){return /^🛠?\s*admin$/i.test(text(b))||/^admin$/i.test(text(b));});
   if(adminBtn)adminBtn.click();
   setTimeout(function(){
@@ -114,7 +117,7 @@ function addMenuButton(){
 function run(){addMenuButton();injectPanel();}
 document.addEventListener('click',function(ev){
   var b=ev.target&&ev.target.closest&&ev.target.closest('button[data-view],button');
-  if(b&&b.id!=='sb57MenuButton')setTimeout(removePanelFromWrongPage,250);
+  if(b&&b.id!=='sb57MenuButton'&&b.id!=='sb57Calculate'&&b.id!=='sb57Copy'&&b.id!=='sb57Clear'&&b.id!=='sb57Close')setTimeout(function(){openWanted=false;removePanelFromWrongPage();},250);
 },true);
 var mo=new MutationObserver(function(){setTimeout(run,120);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
