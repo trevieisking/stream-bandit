@@ -1,10 +1,10 @@
-/* Stream Bandit V5.8.5 — Settings Tabs Stable Jump
+/* Stream Bandit V5.11.3 — Settings Tabs Stable Jump
    Keeps all existing Settings content visible and uses tabs as stable jump controls.
    No Supabase save logic, Mux, player, storage, form field, upload or database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.8.5';
+var VERSION='V5.11.3';
 var active='overview';
 var builtFor='';
 
@@ -90,7 +90,7 @@ function buildTabs(){
   if(oldWrap)oldWrap.remove();
   var wrap=document.createElement('div');
   wrap.id='sb58SettingsTabsWrap';
-  wrap.innerHTML='<div class="sb58TabsNote">V5.8.5 Settings Tabs: same Settings controls stay visible. Tabs jump to each area safely.</div><div class="sb58Tabs" id="sb58SettingsTabs"></div>';
+  wrap.innerHTML='<div class="sb58TabsNote">V5.11.3 Settings Tabs: same Settings controls stay visible. Tabs jump to each area safely.</div><div class="sb58Tabs" id="sb58SettingsTabs"></div>';
   top.insertAdjacentElement('afterend',wrap);
   var tabs=wrap.querySelector('#sb58SettingsTabs');
   ['overview','branding','homepage','storage'].forEach(function(k){
