@@ -1,10 +1,10 @@
-/* Stream Bandit V5.6.3 — Cleanup & Stability Pass
+/* Stream Bandit V5.7.1 — Cleanup & Stability Pass
    Visual cleanup only. No Supabase, Mux, player, storage or database logic changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.6.3';
-var LABEL='Stream Bandit V5.6.3 Stable';
+var VERSION='V5.7.1';
+var LABEL='Stream Bandit V5.7.1 Stable';
 var LOCAL_KEY='streambandit_v25_data';
 
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
@@ -13,9 +13,10 @@ function fixStoredOldVersion(){
     var raw=localStorage.getItem(LOCAL_KEY);
     if(!raw)return;
     var next=raw
-      .replace(/V5\.4\.2 Details Tag Display Hotfix \+ Page Polish/g,'V5.6.3 Stable Settings + Branding')
-      .replace(/V5\.6\.1 Stable checkpoint/g,'V5.6.3 Stable checkpoint')
-      .replace(/V5\.4\.2/g,'V5.6.3')
+      .replace(/V5\.4\.2 Details Tag Display Hotfix \+ Page Polish/g,'V5.7.1 Stable Settings + Branding')
+      .replace(/V5\.6\.1 Stable checkpoint/g,'V5.7.1 Stable checkpoint')
+      .replace(/V5\.6\.3 Stable checkpoint/g,'V5.7.1 Stable checkpoint')
+      .replace(/V5\.4\.2/g,'V5.7.1')
       .replace(/Details Tag Display Hotfix \+ Page Polish/g,'Stable Settings + Branding');
     if(next!==raw)localStorage.setItem(LOCAL_KEY,next);
   }catch(e){}
@@ -60,9 +61,9 @@ function addSidebarBadge(){
 function checkpointHtml(kind){
   return '<div class="sb561Checkpoint" data-sb561-checkpoint="'+kind+'">'+
     '<h4>'+VERSION+' stable checkpoint</h4>'+
-    '<p><b>Current safe build:</b> Organised Menu + Supabase Cast Manager + Page Polish.</p>'+ 
+    '<p><b>Current safe build:</b> Organised Menu + Supabase Cast Manager + Rating Calculator.</p>'+ 
     '<p>This cleanup pass does not change database, Mux, player, storage or Supabase save logic.</p>'+ 
-    '<div><span class="sb561VersionPill">GitHub source split</span><span class="sb561VersionPill">Cast Manager passed</span><span class="sb561VersionPill">Menu organiser passed</span></div>'+ 
+    '<div><span class="sb561VersionPill">GitHub source split</span><span class="sb561VersionPill">Cast Manager passed</span><span class="sb561VersionPill">Rating Calculator passed</span></div>'+ 
   '</div>';
 }
 function pageTitle(){return text(document.querySelector('.top h2,.main h2,h1'));}
