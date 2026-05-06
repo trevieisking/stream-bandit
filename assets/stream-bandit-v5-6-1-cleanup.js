@@ -14,10 +14,21 @@ function addStyle(){
   st.textContent='\n.sb56Badge{display:none!important}.sb561StableBadge{display:inline-flex;align-items:center;gap:7px;margin:8px 0 10px;padding:8px 11px;border-radius:999px;background:linear-gradient(135deg,rgba(61,220,151,.16),rgba(124,60,255,.20));border:1px solid rgba(61,220,151,.26);font-size:12px;font-weight:950;color:#f6f7ff}.sb561StableDot{width:8px;height:8px;border-radius:50%;background:#3ddc97;box-shadow:0 0 14px rgba(61,220,151,.8)}.sb561Checkpoint{background:linear-gradient(180deg,rgba(18,59,43,.35),rgba(13,14,21,.88));border:1px solid rgba(61,220,151,.28);border-radius:22px;padding:13px;margin:12px 0;box-shadow:0 14px 36px rgba(0,0,0,.28)}.sb561Checkpoint h4{margin:0 0 6px;font-size:16px}.sb561Checkpoint p{margin:5px 0;color:var(--muted,#a9afc3);font-size:13px;line-height:1.45}.sb561Checkpoint b{color:#baf7df}.sb561VersionPill{display:inline-block;margin:4px 6px 4px 0;padding:5px 8px;border-radius:999px;background:rgba(55,58,86,.88);border:1px solid rgba(255,255,255,.10);font-size:11px;font-weight:850}\n';
   document.head.appendChild(st);
 }
-function addSidebarBadge(){
+function removeOldVersionBadges(){
   var side=document.querySelector('.side');
   if(!side)return;
   Array.prototype.slice.call(side.querySelectorAll('.sb56Badge')).forEach(function(x){x.remove();});
+  Array.prototype.slice.call(side.querySelectorAll('div,span,p,b,strong')).forEach(function(el){
+    var t=text(el);
+    if(t.indexOf('V5.4.2')>-1||t.indexOf('Details Tag Display Hotfix')>-1){
+      el.remove();
+    }
+  });
+}
+function addSidebarBadge(){
+  var side=document.querySelector('.side');
+  if(!side)return;
+  removeOldVersionBadges();
   if(side.querySelector('.sb561StableBadge'))return;
   var brand=side.querySelector('.brand')||side.firstElementChild;
   if(!brand)return;
@@ -34,9 +45,7 @@ function checkpointHtml(kind){
     '<div><span class="sb561VersionPill">GitHub source split</span><span class="sb561VersionPill">Cast Manager passed</span><span class="sb561VersionPill">Menu organiser passed</span></div>'+ 
   '</div>';
 }
-function pageTitle(){
-  return text(document.querySelector('.top h2,.main h2,h1'));
-}
+function pageTitle(){return text(document.querySelector('.top h2,.main h2,h1'));}
 function addCheckpoint(){
   var main=document.querySelector('.main');
   if(!main)return;
