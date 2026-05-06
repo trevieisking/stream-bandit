@@ -1,0 +1,69 @@
+/* Stream Bandit V5.6.1 — Cleanup & Stability Pass
+   Visual cleanup only. No Supabase, Mux, player, storage or database logic changes. */
+(function(){
+'use strict';
+
+var VERSION='V5.6.1';
+var LABEL='Stream Bandit V5.6.1 Stable';
+
+function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
+function addStyle(){
+  if(document.getElementById('sb561Style'))return;
+  var st=document.createElement('style');
+  st.id='sb561Style';
+  st.textContent='\n.sb561StableBadge{display:inline-flex;align-items:center;gap:7px;margin:8px 0 10px;padding:8px 11px;border-radius:999px;background:linear-gradient(135deg,rgba(61,220,151,.16),rgba(124,60,255,.20));border:1px solid rgba(61,220,151,.26);font-size:12px;font-weight:950;color:#f6f7ff}.sb561StableDot{width:8px;height:8px;border-radius:50%;background:#3ddc97;box-shadow:0 0 14px rgba(61,220,151,.8)}.sb561Checkpoint{background:linear-gradient(180deg,rgba(18,59,43,.35),rgba(13,14,21,.88));border:1px solid rgba(61,220,151,.28);border-radius:22px;padding:13px;margin:12px 0;box-shadow:0 14px 36px rgba(0,0,0,.28)}.sb561Checkpoint h4{margin:0 0 6px;font-size:16px}.sb561Checkpoint p{margin:5px 0;color:var(--muted,#a9afc3);font-size:13px;line-height:1.45}.sb561Checkpoint b{color:#baf7df}.sb561VersionPill{display:inline-block;margin:4px 6px 4px 0;padding:5px 8px;border-radius:999px;background:rgba(55,58,86,.88);border:1px solid rgba(255,255,255,.10);font-size:11px;font-weight:850}\n';
+  document.head.appendChild(st);
+}
+function addSidebarBadge(){
+  var side=document.querySelector('.side');
+  if(!side||side.querySelector('.sb561StableBadge'))return;
+  var brand=side.querySelector('.brand')||side.firstElementChild;
+  if(!brand)return;
+  var badge=document.createElement('div');
+  badge.className='sb561StableBadge';
+  badge.innerHTML='<span class="sb561StableDot"></span><span>'+VERSION+' Stable checkpoint</span>';
+  brand.insertAdjacentElement('afterend',badge);
+}
+function checkpointHtml(kind){
+  return '<div class="sb561Checkpoint" data-sb561-checkpoint="'+kind+'">'+
+    '<h4>'+VERSION+' stable checkpoint</h4>'+
+    '<p><b>Current safe build:</b> Organised Menu + Supabase Cast Manager + Page Polish.</p>'+ 
+    '<p>This cleanup pass does not change database, Mux, player, storage or Supabase save logic.</p>'+ 
+    '<div><span class="sb561VersionPill">GitHub source split</span><span class="sb561VersionPill">Cast Manager passed</span><span class="sb561VersionPill">Menu organiser passed</span></div>'+ 
+  '</div>';
+}
+function pageTitle(){
+  return text(document.querySelector('.top h2,.main h2,h1'));
+}
+function addCheckpoint(){
+  var main=document.querySelector('.main');
+  if(!main)return;
+  var title=pageTitle().toLowerCase();
+  var kind='';
+  if(title.indexOf('backup')>-1)kind='backup';
+  if(title.indexOf('settings')>-1)kind='settings';
+  if(title.indexOf('supabase movie manager')>-1)kind='supabase-manager';
+  if(!kind||main.querySelector('[data-sb561-checkpoint="'+kind+'"]'))return;
+  var top=main.querySelector('.top')||main.firstElementChild;
+  if(top)top.insertAdjacentHTML('afterend',checkpointHtml(kind));
+}
+function tidyMenuNames(){
+  Array.prototype.slice.call(document.querySelectorAll('.sb56Group summary')).forEach(function(s){
+    var t=text(s);
+    t=t.replace('Mux / Video Links','Mux').replace('Storage & Backups','Storage');
+    if(s.textContent!==t)s.textContent=t;
+  });
+}
+function run(){
+  addStyle();
+  addSidebarBadge();
+  tidyMenuNames();
+  addCheckpoint();
+  document.title='Stream Bandit '+VERSION+' Stable';
+}
+var mo=new MutationObserver(function(){setTimeout(run,120);});
+try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
+document.addEventListener('DOMContentLoaded',function(){setTimeout(run,600);});
+setInterval(run,1800);
+setTimeout(function(){run();try{var t=document.createElement('div');t.className='toast';t.textContent=LABEL+' loaded';document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}catch(e){}},900);
+})();
