@@ -1,25 +1,24 @@
-/* Stream Bandit V5.7.2 — Admin Rating Calculator
+/* Stream Bandit V5.7.3 — Admin Rating Calculator Guard
    Admin helper only. Manually enter public ratings and calculate a Stream Bandit Score.
    No live scraping/API calls, no Supabase writes, no Mux, player, storage, movie save or database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.7.2';
+var VERSION='V5.7.3';
 var lastResult='';
-var forceOpen=false;
 
 function byId(id){return document.getElementById(id)}
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
 function pageTitle(){return text(document.querySelector('.main .top h2,.main h1,.main h2'));}
 function isRealAdminPage(){
   var title=pageTitle().toLowerCase();
-  return title==='admin'||title.indexOf('admin')===0;
+  return title==='admin'||title==='admin tools'||title.indexOf('admin ')===0;
 }
 function addStyle(){
   if(byId('sb57Style'))return;
   var st=document.createElement('style');
   st.id='sb57Style';
-  st.textContent='\n.sb57Calc{background:linear-gradient(180deg,rgba(16,24,39,.94),rgba(13,14,21,.90));border:1px solid rgba(182,140,255,.28);border-radius:24px;padding:15px;margin:14px 0;box-shadow:0 16px 42px rgba(0,0,0,.32)}.sb57Calc h3{margin:0 0 7px;font-size:20px}.sb57Calc p{color:var(--muted,#a9afc3);font-size:13px;line-height:1.45}.sb57Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.sb57Result{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(61,220,151,.16),rgba(124,60,255,.18));border:1px solid rgba(61,220,151,.25);border-radius:20px;padding:13px;margin-top:12px}.sb57Score{font-size:36px;font-weight:1000;letter-spacing:-.05em}.sb57Grade{font-size:13px;color:#baf7df;font-weight:900}.sb57Actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sb57Mini{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px}.sb57Breakdown{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px;line-height:1.45}.sb57MenuButton{margin:0!important}.sb57MenuButton.active{box-shadow:0 0 0 1px rgba(255,45,85,.26),0 10px 28px rgba(124,60,255,.18)}.sb57SafeNote{margin-top:10px;padding:10px;border-radius:16px;background:rgba(61,220,151,.10);border:1px solid rgba(61,220,151,.20);color:#baf7df;font-size:12px;line-height:1.45}\n';
+  st.textContent='\n.sb57Calc{background:linear-gradient(180deg,rgba(16,24,39,.94),rgba(13,14,21,.90));border:1px solid rgba(182,140,255,.28);border-radius:24px;padding:15px;margin:14px 0;box-shadow:0 16px 42px rgba(0,0,0,.32)}.sb57Calc h3{margin:0 0 7px;font-size:20px}.sb57Calc p{color:var(--muted,#a9afc3);font-size:13px;line-height:1.45}.sb57Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.sb57Result{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(61,220,151,.16),rgba(124,60,255,.18));border:1px solid rgba(61,220,151,.25);border-radius:20px;padding:13px;margin-top:12px}.sb57Score{font-size:36px;font-weight:1000;letter-spacing:-.05em}.sb57Grade{font-size:13px;color:#baf7df;font-weight:900}.sb57Actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sb57Mini{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px}.sb57Breakdown{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px;line-height:1.45}.sb57MenuButton{margin:0!important}.sb57SafeNote{margin-top:10px;padding:10px;border-radius:16px;background:rgba(61,220,151,.10);border:1px solid rgba(61,220,151,.20);color:#baf7df;font-size:12px;line-height:1.45}\n';
   document.head.appendChild(st);
 }
 function panelHtml(){
@@ -72,13 +71,13 @@ function bindCalc(){
   ['sb57Imdb','sb57RtCritics','sb57RtAudience','sb57Meta','sb57Letter','sb57Extra'].forEach(function(id){var el=byId(id);if(el&&!el.dataset.bound){el.dataset.bound='1';el.addEventListener('input',calculate);}});
 }
 function removePanelFromWrongPage(){
-  if(isRealAdminPage()||forceOpen)return;
+  if(isRealAdminPage())return;
   var p=byId('sb57Calc');
   if(p)p.remove();
 }
 function injectPanel(){
   removePanelFromWrongPage();
-  if(!isRealAdminPage()&&!forceOpen)return false;
+  if(!isRealAdminPage())return false;
   addStyle();
   if(!byId('sb57Calc')){
     var main=document.querySelector('.main');
@@ -90,8 +89,7 @@ function injectPanel(){
   return true;
 }
 function openAdminAndScroll(){
-  forceOpen=true;
-  var adminBtn=Array.prototype.slice.call(document.querySelectorAll('button')).find(function(b){return /admin/i.test(text(b))&&!/admin tools/i.test(text(b));});
+  var adminBtn=Array.prototype.slice.call(document.querySelectorAll('button')).find(function(b){return /^🛠?\s*admin$/i.test(text(b))||/^admin$/i.test(text(b));});
   if(adminBtn)adminBtn.click();
   setTimeout(function(){
     injectPanel();
@@ -116,11 +114,11 @@ function addMenuButton(){
 function run(){addMenuButton();injectPanel();}
 document.addEventListener('click',function(ev){
   var b=ev.target&&ev.target.closest&&ev.target.closest('button[data-view],button');
-  if(b&&b.id!=='sb57MenuButton')setTimeout(function(){forceOpen=false;removePanelFromWrongPage();},250);
+  if(b&&b.id!=='sb57MenuButton')setTimeout(removePanelFromWrongPage,250);
 },true);
-var mo=new MutationObserver(function(){setTimeout(run,160);});
+var mo=new MutationObserver(function(){setTimeout(run,120);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 document.addEventListener('DOMContentLoaded',function(){setTimeout(run,700);});
-setInterval(run,1200);
+setInterval(run,700);
 setTimeout(function(){run();},900);
 })();
