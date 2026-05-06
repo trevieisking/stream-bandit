@@ -1,21 +1,22 @@
-/* Stream Bandit V5.6.1 — Cleanup & Stability Pass
+/* Stream Bandit V5.6.3 — Cleanup & Stability Pass
    Visual cleanup only. No Supabase, Mux, player, storage or database logic changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.6.1';
-var LABEL='Stream Bandit V5.6.1 Stable';
+var VERSION='V5.6.3';
+var LABEL='Stream Bandit V5.6.3 Stable';
 var LOCAL_KEY='streambandit_v25_data';
 
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
 function fixStoredOldVersion(){
   try{
     var raw=localStorage.getItem(LOCAL_KEY);
-    if(!raw||raw.indexOf('V5.4.2')<0&&raw.indexOf('Details Tag Display Hotfix')<0)return;
+    if(!raw)return;
     var next=raw
-      .replace(/V5\.4\.2 Details Tag Display Hotfix \+ Page Polish/g,'V5.6.1 Stable checkpoint')
-      .replace(/V5\.4\.2/g,'V5.6.1')
-      .replace(/Details Tag Display Hotfix \+ Page Polish/g,'Stable checkpoint');
+      .replace(/V5\.4\.2 Details Tag Display Hotfix \+ Page Polish/g,'V5.6.3 Stable Settings + Branding')
+      .replace(/V5\.6\.1 Stable checkpoint/g,'V5.6.3 Stable checkpoint')
+      .replace(/V5\.4\.2/g,'V5.6.3')
+      .replace(/Details Tag Display Hotfix \+ Page Polish/g,'Stable Settings + Branding');
     if(next!==raw)localStorage.setItem(LOCAL_KEY,next);
   }catch(e){}
 }
@@ -44,7 +45,11 @@ function addSidebarBadge(){
   var side=document.querySelector('.side');
   if(!side)return;
   removeOldVersionBadges();
-  if(side.querySelector('.sb561StableBadge'))return;
+  var existing=side.querySelector('.sb561StableBadge');
+  if(existing){
+    existing.innerHTML='<span class="sb561StableDot"></span><span>'+VERSION+' Stable checkpoint</span>';
+    return;
+  }
   var brand=side.querySelector('.brand')||side.firstElementChild;
   if(!brand)return;
   var badge=document.createElement('div');
@@ -69,7 +74,13 @@ function addCheckpoint(){
   if(title.indexOf('backup')>-1)kind='backup';
   if(title.indexOf('settings')>-1)kind='settings';
   if(title.indexOf('supabase movie manager')>-1)kind='supabase-manager';
-  if(!kind||main.querySelector('[data-sb561-checkpoint="'+kind+'"]'))return;
+  if(!kind)return;
+  var existing=main.querySelector('[data-sb561-checkpoint="'+kind+'"]');
+  if(existing){
+    var h=existing.querySelector('h4');
+    if(h)h.textContent=VERSION+' stable checkpoint';
+    return;
+  }
   var top=main.querySelector('.top')||main.firstElementChild;
   if(top)top.insertAdjacentHTML('afterend',checkpointHtml(kind));
 }
@@ -91,6 +102,6 @@ fixStoredOldVersion();
 var mo=new MutationObserver(function(){setTimeout(run,120);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 document.addEventListener('DOMContentLoaded',function(){setTimeout(run,600);});
-setInterval(run,650);
+setInterval(run,900);
 setTimeout(function(){run();try{var t=document.createElement('div');t.className='toast';t.textContent=LABEL+' loaded';document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}catch(e){}},900);
 })();
