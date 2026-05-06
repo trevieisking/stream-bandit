@@ -1,25 +1,35 @@
-/* Stream Bandit V5.8.2 — Cleanup & Stability Pass
+/* Stream Bandit V5.11.1 — Cleanup & Stability Pass
    Visual cleanup only. No Supabase, Mux, player, storage or database logic changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.8.2';
-var LABEL='Stream Bandit V5.8.2 Stable';
+var VERSION='V5.11.1';
+var LABEL='Stream Bandit V5.11.1 Stable';
 var LOCAL_KEY='streambandit_v25_data';
 
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
+function replaceVersions(s){
+  return String(s||'')
+    .replace(/V5\.4\.2 Details Tag Display Hotfix \+ Page Polish/g,'V5.11.1 Stable Manager + Tabs')
+    .replace(/V5\.6\.1 Stable checkpoint/g,'V5.11.1 Stable checkpoint')
+    .replace(/V5\.6\.3 Stable checkpoint/g,'V5.11.1 Stable checkpoint')
+    .replace(/V5\.7\.1 Stable checkpoint/g,'V5.11.1 Stable checkpoint')
+    .replace(/V5\.8 Stable checkpoint/g,'V5.11.1 Stable checkpoint')
+    .replace(/V5\.8\.2 Stable checkpoint/g,'V5.11.1 Stable checkpoint')
+    .replace(/V5\.11 Stable checkpoint/g,'V5.11.1 Stable checkpoint')
+    .replace(/V5\.4\.2/g,'V5.11.1')
+    .replace(/V5\.6\.1/g,'V5.11.1')
+    .replace(/V5\.6\.3/g,'V5.11.1')
+    .replace(/V5\.7\.1/g,'V5.11.1')
+    .replace(/V5\.8\.2/g,'V5.11.1')
+    .replace(/V5\.11(?!\.1)/g,'V5.11.1')
+    .replace(/Details Tag Display Hotfix \+ Page Polish/g,'Stable Manager + Tabs');
+}
 function fixStoredOldVersion(){
   try{
     var raw=localStorage.getItem(LOCAL_KEY);
     if(!raw)return;
-    var next=raw
-      .replace(/V5\.4\.2 Details Tag Display Hotfix \+ Page Polish/g,'V5.8.2 Stable Settings + Tabs')
-      .replace(/V5\.6\.1 Stable checkpoint/g,'V5.8.2 Stable checkpoint')
-      .replace(/V5\.6\.3 Stable checkpoint/g,'V5.8.2 Stable checkpoint')
-      .replace(/V5\.7\.1 Stable checkpoint/g,'V5.8.2 Stable checkpoint')
-      .replace(/V5\.8 Stable checkpoint/g,'V5.8.2 Stable checkpoint')
-      .replace(/V5\.4\.2/g,'V5.8.2')
-      .replace(/Details Tag Display Hotfix \+ Page Polish/g,'Stable Settings + Tabs');
+    var next=replaceVersions(raw);
     if(next!==raw)localStorage.setItem(LOCAL_KEY,next);
   }catch(e){}
 }
@@ -48,7 +58,9 @@ function addSidebarBadge(){
   var side=document.querySelector('.side');
   if(!side)return;
   removeOldVersionBadges();
-  var existing=side.querySelector('.sb561StableBadge');
+  var badges=Array.prototype.slice.call(side.querySelectorAll('.sb561StableBadge'));
+  badges.slice(1).forEach(function(b){try{b.remove();}catch(e){}});
+  var existing=badges[0];
   if(existing){
     existing.innerHTML='<span class="sb561StableDot"></span><span>'+VERSION+' Stable checkpoint</span>';
     return;
@@ -63,9 +75,9 @@ function addSidebarBadge(){
 function checkpointHtml(kind){
   return '<div class="sb561Checkpoint" data-sb561-checkpoint="'+kind+'">'+
     '<h4>'+VERSION+' stable checkpoint</h4>'+
-    '<p><b>Current safe build:</b> Settings Tabs Safe Restore + Organised Menu + Supabase Cast Manager + Rating Calculator.</p>'+ 
+    '<p><b>Current safe build:</b> Manager polish + Settings tabs + Rating Calculator guard.</p>'+ 
     '<p>This cleanup pass does not change database, Mux, player, storage or Supabase save logic.</p>'+ 
-    '<div><span class="sb561VersionPill">Settings tabs guarded</span><span class="sb561VersionPill">Cast Manager passed</span><span class="sb561VersionPill">Rating Calculator close button</span></div>'+ 
+    '<div><span class="sb561VersionPill">Version peacekeeper</span><span class="sb561VersionPill">Manager tabs</span><span class="sb561VersionPill">Rating Calculator guarded</span></div>'+ 
   '</div>';
 }
 function pageTitle(){return text(document.querySelector('.top h2,.main h2,h1'));}
@@ -78,7 +90,9 @@ function addCheckpoint(){
   if(title.indexOf('settings')>-1)kind='settings';
   if(title.indexOf('supabase movie manager')>-1)kind='supabase-manager';
   if(!kind)return;
-  var existing=main.querySelector('[data-sb561-checkpoint="'+kind+'"]');
+  var all=Array.prototype.slice.call(main.querySelectorAll('[data-sb561-checkpoint="'+kind+'"]'));
+  all.slice(1).forEach(function(x){try{x.remove();}catch(e){}});
+  var existing=all[0];
   if(existing){
     var h=existing.querySelector('h4');
     if(h)h.textContent=VERSION+' stable checkpoint';
@@ -99,12 +113,12 @@ function run(){
   addSidebarBadge();
   tidyMenuNames();
   addCheckpoint();
-  document.title='Stream Bandit '+VERSION+' Stable';
+  document.title=LABEL;
 }
 fixStoredOldVersion();
 var mo=new MutationObserver(function(){setTimeout(run,120);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 document.addEventListener('DOMContentLoaded',function(){setTimeout(run,600);});
-setInterval(run,900);
-setTimeout(function(){run();try{var t=document.createElement('div');t.className='toast';t.textContent=LABEL+' loaded';document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}catch(e){}},900);
+setInterval(run,1000);
+setTimeout(function(){run();try{var t=document.createElement('div');t.className='toast';t.textContent=LABEL+' loaded';document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}catch(e){}},900);
 })();
