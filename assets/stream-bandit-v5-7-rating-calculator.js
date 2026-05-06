@@ -1,10 +1,10 @@
-/* Stream Bandit V5.7B — Admin Rating Calculator
+/* Stream Bandit V5.7.1 — Admin Rating Calculator
    Admin helper only. Manually enter public ratings and calculate a Stream Bandit Score.
    No live scraping/API calls, no Supabase writes, no Mux, player, storage, movie save or database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.7B';
+var VERSION='V5.7.1';
 var lastResult='';
 
 function byId(id){return document.getElementById(id)}
@@ -19,7 +19,7 @@ function addStyle(){
   if(byId('sb57Style'))return;
   var st=document.createElement('style');
   st.id='sb57Style';
-  st.textContent='\n.sb57Calc{background:linear-gradient(180deg,rgba(16,24,39,.94),rgba(13,14,21,.90));border:1px solid rgba(182,140,255,.28);border-radius:24px;padding:15px;margin:14px 0;box-shadow:0 16px 42px rgba(0,0,0,.32)}.sb57Calc h3{margin:0 0 7px;font-size:20px}.sb57Calc p{color:var(--muted,#a9afc3);font-size:13px;line-height:1.45}.sb57Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.sb57Result{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(61,220,151,.16),rgba(124,60,255,.18));border:1px solid rgba(61,220,151,.25);border-radius:20px;padding:13px;margin-top:12px}.sb57Score{font-size:36px;font-weight:1000;letter-spacing:-.05em}.sb57Grade{font-size:13px;color:#baf7df;font-weight:900}.sb57Actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sb57Mini{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px}.sb57Breakdown{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px;line-height:1.45}.sb57MenuButton{margin:0!important}.sb57MenuButton.active{box-shadow:0 0 0 1px rgba(255,45,85,.26),0 10px 28px rgba(124,60,255,.18)}\n';
+  st.textContent='\n.sb57Calc{background:linear-gradient(180deg,rgba(16,24,39,.94),rgba(13,14,21,.90));border:1px solid rgba(182,140,255,.28);border-radius:24px;padding:15px;margin:14px 0;box-shadow:0 16px 42px rgba(0,0,0,.32)}.sb57Calc h3{margin:0 0 7px;font-size:20px}.sb57Calc p{color:var(--muted,#a9afc3);font-size:13px;line-height:1.45}.sb57Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.sb57Result{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(61,220,151,.16),rgba(124,60,255,.18));border:1px solid rgba(61,220,151,.25);border-radius:20px;padding:13px;margin-top:12px}.sb57Score{font-size:36px;font-weight:1000;letter-spacing:-.05em}.sb57Grade{font-size:13px;color:#baf7df;font-weight:900}.sb57Actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sb57Mini{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px}.sb57Breakdown{font-size:12px;color:var(--muted,#a9afc3);margin-top:8px;line-height:1.45}.sb57MenuButton{margin:0!important}.sb57MenuButton.active{box-shadow:0 0 0 1px rgba(255,45,85,.26),0 10px 28px rgba(124,60,255,.18)}.sb57SafeNote{margin-top:10px;padding:10px;border-radius:16px;background:rgba(61,220,151,.10);border:1px solid rgba(61,220,151,.20);color:#baf7df;font-size:12px;line-height:1.45}\n';
   document.head.appendChild(st);
 }
 function panelHtml(){
@@ -37,10 +37,9 @@ function panelHtml(){
     '<div class="sb57Actions"><button type="button" id="sb57Calculate">Calculate Stream Bandit Score</button><button type="button" class="secondary" id="sb57Copy">Copy result</button><button type="button" class="secondary" id="sb57Clear">Clear</button></div>'+ 
     '<div class="sb57Result"><div><b>Stream Bandit Score</b><div class="sb57Grade" id="sb57Grade">Enter at least one rating.</div></div><div class="sb57Score" id="sb57Score">--</div></div>'+ 
     '<div class="sb57Breakdown" id="sb57Breakdown">Ready.</div>'+ 
-    '<p class="sb57Mini">Tip: this is a helper only. It does not save to the movie yet, so it cannot break movie data.</p>'+ 
+    '<div class="sb57SafeNote">Manual helper only — copy the result and paste it into the movie rating field when you are happy. This calculator does not save or overwrite movie data.</div>'+ 
   '</div>';
-}
-function field(id,label,placeholder,help){return '<div><label>'+label+'</label><input id="'+id+'" inputmode="decimal" placeholder="'+placeholder+'"><div class="sb57Mini">'+help+'</div></div>';}
+}\nfunction field(id,label,placeholder,help){return '<div><label>'+label+'</label><input id="'+id+'" inputmode="decimal" placeholder="'+placeholder+'"><div class="sb57Mini">'+help+'</div></div>';}
 function value(id){var el=byId(id);if(!el)return null;var raw=String(el.value||'').replace('%','').trim();if(!raw)return null;var n=Number(raw);return Number.isFinite(n)?n:null;}
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
 function grade(score){if(score>=90)return 'Elite / must-watch';if(score>=80)return 'Excellent';if(score>=70)return 'Good';if(score>=60)return 'Mixed but watchable';if(score>=50)return 'Weak / only if interested';return 'Low score';}
