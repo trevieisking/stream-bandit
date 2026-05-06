@@ -5,8 +5,20 @@
 
 var VERSION='V5.6.1';
 var LABEL='Stream Bandit V5.6.1 Stable';
+var LOCAL_KEY='streambandit_v25_data';
 
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
+function fixStoredOldVersion(){
+  try{
+    var raw=localStorage.getItem(LOCAL_KEY);
+    if(!raw||raw.indexOf('V5.4.2')<0&&raw.indexOf('Details Tag Display Hotfix')<0)return;
+    var next=raw
+      .replace(/V5\.4\.2 Details Tag Display Hotfix \+ Page Polish/g,'V5.6.1 Stable checkpoint')
+      .replace(/V5\.4\.2/g,'V5.6.1')
+      .replace(/Details Tag Display Hotfix \+ Page Polish/g,'Stable checkpoint');
+    if(next!==raw)localStorage.setItem(LOCAL_KEY,next);
+  }catch(e){}
+}
 function addStyle(){
   if(document.getElementById('sb561Style'))return;
   var st=document.createElement('style');
@@ -18,15 +30,13 @@ function removeOldVersionBadges(){
   var side=document.querySelector('.side');
   if(!side)return;
   Array.prototype.slice.call(side.querySelectorAll('.sb56Badge')).forEach(function(x){x.remove();});
-  Array.prototype.slice.call(side.querySelectorAll('div,span,p,b,strong,button,a')).forEach(function(el){
+  Array.prototype.slice.call(side.querySelectorAll('*')).forEach(function(el){
     var t=text(el);
     if(t.indexOf('V5.4.2')>-1||t.indexOf('Details Tag Display Hotfix')>-1){
-      var holder=el;
-      while(holder&&holder.parentElement&&holder.parentElement!==side){
-        var ht=text(holder.parentElement);
-        if(ht.indexOf('V5.4.2')>-1||ht.indexOf('Details Tag Display Hotfix')>-1){holder=holder.parentElement;}else{break;}
+      if(t.indexOf('Stream Bandit')===-1&&t.indexOf('Chatterfriends Movies')===-1){
+        el.classList.add('sb561OldVersionHidden');
+        try{el.remove();}catch(e){}
       }
-      if(holder&&holder!==side){holder.classList.add('sb561OldVersionHidden');holder.remove();}
     }
   });
 }
@@ -65,18 +75,19 @@ function addCheckpoint(){
 }
 function tidyMenuNames(){
   Array.prototype.slice.call(document.querySelectorAll('.sb56Group summary')).forEach(function(s){
-    var t=text(s);
-    t=t.replace('Mux / Video Links','Mux').replace('Storage & Backups','Storage');
+    var t=text(s).replace('Mux / Video Links','Mux').replace('Storage & Backups','Storage');
     if(s.textContent!==t)s.textContent=t;
   });
 }
 function run(){
+  fixStoredOldVersion();
   addStyle();
   addSidebarBadge();
   tidyMenuNames();
   addCheckpoint();
   document.title='Stream Bandit '+VERSION+' Stable';
 }
+fixStoredOldVersion();
 var mo=new MutationObserver(function(){setTimeout(run,120);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 document.addEventListener('DOMContentLoaded',function(){setTimeout(run,600);});
