@@ -1,10 +1,10 @@
-/* Stream Bandit V5.8.2 — Settings Tabs Safe Restore
-   Organises existing Settings page sections into tabs without risking a blank page.
+/* Stream Bandit V5.8.3 — Settings Tabs Safe Scroll
+   Keeps all existing Settings content visible and uses tabs as jump buttons.
    No Supabase save logic, Mux, player, storage, form field, upload or database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.8.2';
+var VERSION='V5.8.3';
 var active='overview';
 
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
@@ -19,8 +19,14 @@ function addStyle(){
   if(document.getElementById('sb58TabsStyle'))return;
   var st=document.createElement('style');
   st.id='sb58TabsStyle';
-  st.textContent='\n.sb58Tabs{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 14px}.sb58Tab{border:0;border-radius:999px;padding:11px 16px;background:rgba(48,52,78,.92);color:#f6f7ff;font-weight:950;box-shadow:0 10px 28px rgba(0,0,0,.20);cursor:pointer}.sb58Tab.active{background:linear-gradient(135deg,#ff2d85,#7c3cff);box-shadow:0 14px 36px rgba(124,60,255,.35)}.sb58TabPanel{display:block}.sb58TabPanel.sb58Hidden{display:none!important}.sb58TabsNote{margin:0 0 12px;padding:10px 12px;border-radius:16px;background:rgba(61,220,151,.10);border:1px solid rgba(61,220,151,.22);color:#baf7df;font-size:12px;line-height:1.45}.sb58Recover{padding:12px;border-radius:18px;background:rgba(255,190,80,.10);border:1px solid rgba(255,190,80,.25);color:#ffe0a3;margin:10px 0}\n';
+  st.textContent='\n.sb58Tabs{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 14px}.sb58Tab{border:0;border-radius:999px;padding:11px 16px;background:rgba(48,52,78,.92);color:#f6f7ff;font-weight:950;box-shadow:0 10px 28px rgba(0,0,0,.20);cursor:pointer}.sb58Tab.active{background:linear-gradient(135deg,#ff2d85,#7c3cff);box-shadow:0 14px 36px rgba(124,60,255,.35)}.sb58TabsNote{margin:0 0 12px;padding:10px 12px;border-radius:16px;background:rgba(61,220,151,.10);border:1px solid rgba(61,220,151,.22);color:#baf7df;font-size:12px;line-height:1.45}.sb58Anchor{outline:2px solid rgba(255,45,133,.35);box-shadow:0 0 0 6px rgba(124,60,255,.12),0 20px 50px rgba(124,60,255,.18)!important}.sb58Recover{display:none!important}.sb58Hidden{display:block!important}\n';
   document.head.appendChild(st);
+}
+function clearOldHidden(){
+  var m=main(); if(!m)return;
+  Array.prototype.slice.call(m.querySelectorAll('.sb58Hidden')).forEach(function(el){el.classList.remove('sb58Hidden');el.style.display='';});
+  Array.prototype.slice.call(m.children).forEach(function(el){if(el&&el.classList)el.classList.remove('sb58Hidden');});
+  Array.prototype.slice.call(m.querySelectorAll('.sb58Recover')).forEach(function(el){try{el.remove();}catch(e){}});
 }
 function classify(el){
   var t=text(el).toLowerCase();
@@ -30,37 +36,7 @@ function classify(el){
   return 'overview';
 }
 function tabTitle(k){return {overview:'Overview',branding:'Branding',homepage:'Homepage',storage:'Storage'}[k]||k;}
-function clearOldHidden(){
-  var m=main(); if(!m)return;
-  Array.prototype.slice.call(m.querySelectorAll('.sb58Hidden')).forEach(function(el){el.classList.remove('sb58Hidden');});
-}
-function ensureTabs(){
-  if(!isSettingsPage())return;
-  addStyle();
-  var m=main(); if(!m)return;
-  var top=m.querySelector('.top')||m.firstElementChild;
-  if(!top)return;
-  if(!m.querySelector('#sb58SettingsTabsWrap')){
-    var wrap=document.createElement('div');
-    wrap.id='sb58SettingsTabsWrap';
-    wrap.innerHTML='<div class="sb58TabsNote">V5.8.2 Settings Tabs: same Settings controls, grouped neatly. Nothing saves until you press the original save buttons.</div><div class="sb58Tabs" id="sb58SettingsTabs"></div>';
-    top.insertAdjacentElement('afterend',wrap);
-  }
-  var note=m.querySelector('.sb58TabsNote');
-  if(note)note.textContent='V5.8.2 Settings Tabs: same Settings controls, grouped neatly. Nothing saves until you press the original save buttons.';
-  var tabs=m.querySelector('#sb58SettingsTabs');
-  if(!tabs)return;
-  tabs.innerHTML='';
-  ['overview','branding','homepage','storage'].forEach(function(k){
-    var b=document.createElement('button');
-    b.type='button';
-    b.className='sb58Tab'+(active===k?' active':'');
-    b.textContent=tabTitle(k);
-    b.addEventListener('click',function(e){e.preventDefault();active=k;applyTabs();});
-    tabs.appendChild(b);
-  });
-}
-function directSections(){
+function sections(){
   var m=main(); if(!m)return [];
   return Array.prototype.slice.call(m.children).filter(function(el){
     if(!el||el.nodeType!==1)return false;
@@ -71,30 +47,57 @@ function directSections(){
     return true;
   });
 }
-function applyPanels(){
-  if(!isSettingsPage())return;
-  var sections=directSections();
-  sections.forEach(function(el){
-    var group=classify(el);
-    el.dataset.sb58TabPanel=group;
-    el.classList.add('sb58TabPanel');
-    el.classList.toggle('sb58Hidden',group!==active);
+function findSection(kind){
+  var list=sections();
+  if(kind==='overview')return list[0]||null;
+  return list.find(function(el){return classify(el)===kind;})||list[0]||null;
+}
+function updateActiveTabs(){
+  var m=main(); if(!m)return;
+  Array.prototype.slice.call(m.querySelectorAll('.sb58Tab')).forEach(function(b){
+    b.classList.toggle('active',b.dataset.tab===active);
   });
-  var visible=sections.filter(function(el){return !el.classList.contains('sb58Hidden')&&text(el);});
-  if(!visible.length){
-    clearOldHidden();
-    var m=main();
-    if(m&&!m.querySelector('.sb58Recover')){
-      var warn=document.createElement('div');
-      warn.className='sb58Recover';
-      warn.textContent='Tabs safe mode: content restored because this tab would have been empty.';
-      var wrap=m.querySelector('#sb58SettingsTabsWrap');
-      if(wrap)wrap.insertAdjacentElement('afterend',warn);
-    }
+}
+function jump(kind){
+  active=kind;
+  clearOldHidden();
+  updateActiveTabs();
+  var target=findSection(kind);
+  if(target){
+    target.classList.add('sb58Anchor');
+    target.scrollIntoView({behavior:'smooth',block:'start'});
+    setTimeout(function(){target.classList.remove('sb58Anchor');},1700);
   }
 }
-function applyTabs(){ensureTabs();applyPanels();}
-function run(){if(!isSettingsPage())return;ensureTabs();applyPanels();}
+function ensureTabs(){
+  if(!isSettingsPage())return;
+  addStyle();
+  clearOldHidden();
+  var m=main(); if(!m)return;
+  var top=m.querySelector('.top')||m.firstElementChild;
+  if(!top)return;
+  if(!m.querySelector('#sb58SettingsTabsWrap')){
+    var wrap=document.createElement('div');
+    wrap.id='sb58SettingsTabsWrap';
+    wrap.innerHTML='<div class="sb58TabsNote">V5.8.3 Settings Tabs: same Settings controls stay visible. Tabs jump to each area safely.</div><div class="sb58Tabs" id="sb58SettingsTabs"></div>';
+    top.insertAdjacentElement('afterend',wrap);
+  }
+  var note=m.querySelector('.sb58TabsNote');
+  if(note)note.textContent='V5.8.3 Settings Tabs: same Settings controls stay visible. Tabs jump to each area safely.';
+  var tabs=m.querySelector('#sb58SettingsTabs');
+  if(!tabs)return;
+  tabs.innerHTML='';
+  ['overview','branding','homepage','storage'].forEach(function(k){
+    var b=document.createElement('button');
+    b.type='button';
+    b.dataset.tab=k;
+    b.className='sb58Tab'+(active===k?' active':'');
+    b.textContent=tabTitle(k);
+    b.addEventListener('click',function(e){e.preventDefault();jump(k);});
+    tabs.appendChild(b);
+  });
+}
+function run(){if(!isSettingsPage())return;ensureTabs();clearOldHidden();}
 var mo=new MutationObserver(function(){setTimeout(run,140);});
 try{mo.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 document.addEventListener('DOMContentLoaded',function(){setTimeout(run,700);});
