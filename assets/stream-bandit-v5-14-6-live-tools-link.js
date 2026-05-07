@@ -1,13 +1,14 @@
-/* Stream Bandit V5.17 — Live Tools Link to V5.17 Tools Page
+/* Stream Bandit V5.18.1 — Live Tools Link to V5.18.1 Tools Page
    Keeps a safe Tools page link in the live menu only.
    Removes any repeated Tools cards from Admin/Supabase Manager.
-   Helper tools remain standalone on tools-v5-17.html.
+   Helper tools remain standalone on tools-v5-18-1.html.
+   V5.17 and V5.18 remain available as rollback fallback pages.
    No Supabase writes, no movie saves, no Mux, no player, no Sound Booster, no database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.17';
-var TOOLS_URL='tools-v5-17.html';
+var VERSION='V5.18.1';
+var TOOLS_URL='tools-v5-18-1.html';
 
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
 function side(){return document.querySelector('.side')||document.querySelector('aside')||null;}
