@@ -1,13 +1,13 @@
-/* Stream Bandit V5.14.9 — Live Tools Link Card Spawn Fix
+/* Stream Bandit V5.15 — Live Tools Link to V5.15 Tools Page
    Keeps a safe Tools page link in the live menu only.
    Removes any repeated Tools cards from Admin/Supabase Manager.
-   The Rating Calculator remains standalone on tools-v5-14.html.
+   The Rating Calculator and helper tools remain standalone on tools-v5-15.html.
    No Supabase writes, no movie saves, no Mux, no player, no Sound Booster, no database changes. */
 (function(){
 'use strict';
 
-var VERSION='V5.14.9';
-var TOOLS_URL='tools-v5-14.html';
+var VERSION='V5.15';
+var TOOLS_URL='tools-v5-15.html';
 
 function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
 function side(){return document.querySelector('.side')||document.querySelector('aside')||null;}
@@ -45,7 +45,7 @@ function removeSpawnedCards(){
   });
   Array.prototype.slice.call(document.querySelectorAll('section,div')).forEach(function(el){
     var t=text(el).toLowerCase();
-    if(t.indexOf('v5.14.6 tools page link')>-1 && t.indexOf('open tools page')>-1){
+    if((t.indexOf('tools page link')>-1 || t.indexOf('open tools page')>-1) && t.indexOf('helper tools such as rating calculator')>-1){
       try{el.remove();}catch(e){el.style.display='none';}
     }
   });
@@ -66,6 +66,7 @@ function addSidebarLink(){
     body.insertBefore(btn,body.firstChild);
   }
   btn.onclick=openTools;
+  btn.title=VERSION+' standalone Tools page';
 }
 function run(){removeSpawnedCards();addSidebarLink();}
 var mo=new MutationObserver(function(){setTimeout(run,120);});
