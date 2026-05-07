@@ -26,10 +26,25 @@ function adminGroupBody(){
   var admin=groups.find(function(g){return /admin tools/i.test(text(g.querySelector('summary')||g));});
   return admin&&(admin.querySelector('.sb56GroupBody')||admin);
 }
+function removeOldRatingMenu(){
+  var body=adminGroupBody();
+  if(!body)return;
+  Array.prototype.slice.call(body.querySelectorAll('button,a')).forEach(function(el){
+    var t=text(el).toLowerCase();
+    var id=String(el.id||'').toLowerCase();
+    var cls=String(el.className||'').toLowerCase();
+    if(id.indexOf('sb57')>-1 || cls.indexOf('sb57')>-1 || t==='⭐ rating calculator' || t==='rating calculator' || t.indexOf('rating calculator')>-1){
+      if(el.id!=='sb5146ToolsBtn'){
+        try{el.remove();}catch(e){el.style.display='none';}
+      }
+    }
+  });
+}
 function addSidebarLink(){
   addStyle();
   var body=adminGroupBody();
   if(!body)return;
+  removeOldRatingMenu();
   Array.prototype.slice.call(body.querySelectorAll('#sb5146ToolsBtn')).slice(1).forEach(function(old){try{old.remove();}catch(e){}});
   var btn=document.getElementById('sb5146ToolsBtn');
   if(!btn){
