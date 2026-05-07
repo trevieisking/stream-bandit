@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Stream Bandit Tools V5.14</title>
+<title>Stream Bandit Tools V5.14.8</title>
 <link rel="stylesheet" href="assets/stream-bandit.css">
 <link rel="stylesheet" href="assets/stream-bandit-v5-5-polish.css">
 <style>
 :root{--tool-card:#111522;--tool-border:rgba(182,140,255,.25);--tool-green:#22d3a6;--tool-pink:#ff2d85;--tool-purple:#7c3cff;--tool-muted:#a9afc3}
-body{min-height:100vh;margin:0;background:radial-gradient(circle at 20% 0%,rgba(124,60,255,.24),transparent 36%),radial-gradient(circle at 85% 15%,rgba(34,211,166,.16),transparent 35%),linear-gradient(180deg,#070914,#030408);color:#f6f7ff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.toolsShell{max-width:1120px;margin:0 auto;padding:28px 18px 60px}.toolsTop{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:18px}.brandMini{display:flex;align-items:center;gap:12px}.brandMini img{width:54px;height:54px;border-radius:14px;object-fit:cover}.brandMini h1{margin:0;font-size:34px;line-height:1.05}.brandMini p{margin:3px 0 0;color:var(--tool-muted);font-weight:700}.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 14px;background:linear-gradient(135deg,rgba(34,211,166,.15),rgba(124,60,255,.22));border:1px solid rgba(34,211,166,.28);font-weight:950}.dot{width:9px;height:9px;border-radius:50%;background:var(--tool-green);box-shadow:0 0 16px rgba(34,211,166,.85)}.card{background:linear-gradient(180deg,rgba(17,21,34,.96),rgba(10,12,21,.94));border:1px solid var(--tool-border);border-radius:26px;padding:20px;box-shadow:0 22px 62px rgba(0,0,0,.38);margin:16px 0}.hero{background:linear-gradient(135deg,rgba(34,211,166,.14),rgba(124,60,255,.16));border-color:rgba(34,211,166,.28)}.hero h2,.card h2{margin:0 0 8px;font-size:24px}.hero p,.card p{color:var(--tool-muted);line-height:1.55}.calcGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:15px}label{display:block;font-weight:950;margin-bottom:7px;color:#d9ddff}input{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.10);border-radius:14px;background:#050712;color:#fff;padding:13px 14px;font-size:17px;outline:none}input:focus{border-color:rgba(34,211,166,.78);box-shadow:0 0 0 4px rgba(34,211,166,.13)}.hint{font-size:12px;color:var(--tool-muted);margin-top:5px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}button,a.btn{border:0;border-radius:16px;padding:13px 16px;font-weight:1000;color:#fff;text-decoration:none;background:rgba(53,57,86,.96);box-shadow:0 12px 28px rgba(0,0,0,.24);cursor:pointer}button.primary{background:linear-gradient(135deg,var(--tool-pink),var(--tool-purple))}button.green{background:linear-gradient(135deg,#13c99d,#22d3a6)}.result{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-top:18px;padding:17px;border-radius:22px;background:linear-gradient(135deg,rgba(34,211,166,.18),rgba(124,60,255,.20));border:1px solid rgba(34,211,166,.28)}.score{font-size:48px;font-weight:1000;letter-spacing:-.06em}.grade{color:#baf7df;font-weight:950;margin-top:4px}.breakdown{margin-top:12px;color:var(--tool-muted);line-height:1.55}.safeNote{margin-top:14px;padding:13px;border-radius:18px;background:rgba(34,211,166,.10);border:1px solid rgba(34,211,166,.20);color:#baf7df;line-height:1.45}.toast{position:fixed;right:18px;bottom:18px;background:#12172a;color:#fff;border:1px solid rgba(182,140,255,.35);border-radius:16px;padding:13px 16px;box-shadow:0 16px 44px rgba(0,0,0,.35);font-weight:900;z-index:50}@media(max-width:640px){.brandMini h1{font-size:27px}.result{grid-template-columns:1fr}.score{font-size:40px}}
+body{min-height:100vh;margin:0;background:radial-gradient(circle at 20% 0%,rgba(124,60,255,.24),transparent 36%),radial-gradient(circle at 85% 15%,rgba(34,211,166,.16),transparent 35%),linear-gradient(180deg,#070914,#030408);color:#f6f7ff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.toolsShell{max-width:1160px;margin:0 auto;padding:28px 18px 60px}.toolsTop{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:18px}.brandMini{display:flex;align-items:center;gap:12px}.brandMini img{width:54px;height:54px;border-radius:14px;object-fit:cover}.brandMini h1{margin:0;font-size:34px;line-height:1.05}.brandMini p{margin:3px 0 0;color:var(--tool-muted);font-weight:700}.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 14px;background:linear-gradient(135deg,rgba(34,211,166,.15),rgba(124,60,255,.22));border:1px solid rgba(34,211,166,.28);font-weight:950}.dot{width:9px;height:9px;border-radius:50%;background:var(--tool-green);box-shadow:0 0 16px rgba(34,211,166,.85)}.card{background:linear-gradient(180deg,rgba(17,21,34,.96),rgba(10,12,21,.94));border:1px solid var(--tool-border);border-radius:26px;padding:20px;box-shadow:0 22px 62px rgba(0,0,0,.38);margin:16px 0}.hero{background:linear-gradient(135deg,rgba(34,211,166,.14),rgba(124,60,255,.16));border-color:rgba(34,211,166,.28)}.hero h2,.card h2{margin:0 0 8px;font-size:24px}.hero p,.card p{color:var(--tool-muted);line-height:1.55}.toolTabs{position:sticky;top:0;z-index:20;background:rgba(5,7,14,.76);backdrop-filter:blur(10px);border:1px solid rgba(182,140,255,.16);border-radius:24px;padding:9px;display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}.toolTab{border:0;border-radius:999px;padding:12px 15px;font-weight:1000;color:#fff;background:rgba(53,57,86,.96);box-shadow:0 12px 28px rgba(0,0,0,.22);cursor:pointer}.toolTab.active{background:linear-gradient(135deg,var(--tool-pink),var(--tool-purple));box-shadow:0 16px 36px rgba(124,60,255,.32)}.toolPanel{display:none}.toolPanel.active{display:block}.quickGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px;margin-top:14px}.miniCard{border:1px solid rgba(255,255,255,.08);border-radius:20px;background:rgba(255,255,255,.035);padding:14px}.miniCard b{display:block;margin-bottom:6px}.miniCard span{color:var(--tool-muted);line-height:1.45}.calcGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:15px}label{display:block;font-weight:950;margin-bottom:7px;color:#d9ddff}input,textarea{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.10);border-radius:14px;background:#050712;color:#fff;padding:13px 14px;font-size:17px;outline:none}textarea{min-height:110px;resize:vertical}input:focus,textarea:focus{border-color:rgba(34,211,166,.78);box-shadow:0 0 0 4px rgba(34,211,166,.13)}.hint{font-size:12px;color:var(--tool-muted);margin-top:5px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}button,a.btn{border:0;border-radius:16px;padding:13px 16px;font-weight:1000;color:#fff;text-decoration:none;background:rgba(53,57,86,.96);box-shadow:0 12px 28px rgba(0,0,0,.24);cursor:pointer}button.primary{background:linear-gradient(135deg,var(--tool-pink),var(--tool-purple))}button.green{background:linear-gradient(135deg,#13c99d,#22d3a6)}.result{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-top:18px;padding:17px;border-radius:22px;background:linear-gradient(135deg,rgba(34,211,166,.18),rgba(124,60,255,.20));border:1px solid rgba(34,211,166,.28)}.score{font-size:48px;font-weight:1000;letter-spacing:-.06em}.grade{color:#baf7df;font-weight:950;margin-top:4px}.breakdown{margin-top:12px;color:var(--tool-muted);line-height:1.55}.safeNote{margin-top:14px;padding:13px;border-radius:18px;background:rgba(34,211,166,.10);border:1px solid rgba(34,211,166,.20);color:#baf7df;line-height:1.45}.checklist label{display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);border-radius:16px;padding:12px;margin:8px 0}.checklist input{width:auto}.toast{position:fixed;right:18px;bottom:18px;background:#12172a;color:#fff;border:1px solid rgba(182,140,255,.35);border-radius:16px;padding:13px 16px;box-shadow:0 16px 44px rgba(0,0,0,.35);font-weight:900;z-index:50}@media(max-width:640px){.brandMini h1{font-size:27px}.result{grid-template-columns:1fr}.score{font-size:40px}.toolTabs{position:relative}}
 </style>
 </head>
 <body>
@@ -18,19 +18,31 @@ body{min-height:100vh;margin:0;background:radial-gradient(circle at 20% 0%,rgba(
       <img src="assets/stream-bandit-logo.png" alt="Stream Bandit logo" onerror="this.style.display='none'">
       <div><h1>Stream Bandit Tools</h1><p>Chatterfriends Movies</p></div>
     </div>
-    <div class="pill"><span class="dot"></span> V5.14 Tools test page</div>
+    <div class="pill"><span class="dot"></span> V5.14.8 Tools polish</div>
   </div>
 
   <section class="card hero">
     <h2>Standalone admin helper tools</h2>
-    <p>This page is separate from Admin, Supabase Manager, Settings tabs and app re-renders. It is designed so helper tools can run without being bothered by the main Stream Bandit page scripts.</p>
+    <p>This page is separate from Admin, Supabase Manager, Settings tabs and app re-renders. Helper tools live here so the main Stream Bandit app stays calm and does not fight with utility panels.</p>
+    <div class="quickGrid">
+      <div class="miniCard"><b>Clean rule</b><span>Tools stay on this page. Main app only links here.</span></div>
+      <div class="miniCard"><b>No render battles</b><span>No Supabase Manager tabs, Admin forms or app re-render loop touching these inputs.</span></div>
+      <div class="miniCard"><b>Manual helpers</b><span>These tools calculate/copy notes, but do not overwrite movie data.</span></div>
+    </div>
     <div class="actions">
       <a class="btn" href="index.html">Open live Stream Bandit</a>
       <a class="btn" href="test-v5-14.html">Open V5.14 test app</a>
     </div>
   </section>
 
-  <section class="card" id="ratingTool">
+  <nav class="toolTabs" aria-label="Tools tabs">
+    <button class="toolTab active" type="button" data-tool="rating">⭐ Rating Calculator</button>
+    <button class="toolTab" type="button" data-tool="mux">🎞 Mux / HLS Helper</button>
+    <button class="toolTab" type="button" data-tool="release">✅ Release Checklist</button>
+    <button class="toolTab" type="button" data-tool="future">🧰 Future Tools</button>
+  </nav>
+
+  <section class="card toolPanel active" id="tool-rating">
     <h2>Stream Bandit Rating Calculator</h2>
     <p>Manually enter ratings you looked up, then calculate your own overall score. Leave unknown sources blank. IMDb should be entered as 0–10; Letterboxd as 0–5; everything else as 0–100.</p>
     <div class="calcGrid">
@@ -53,6 +65,46 @@ body{min-height:100vh;margin:0;background:radial-gradient(circle at 20% 0%,rgba(
     <div class="breakdown" id="breakdown">Ready.</div>
     <div class="safeNote">Manual helper only — copy the result and paste it into the movie rating field when you are happy. This page does not save or overwrite Stream Bandit movie data.</div>
   </section>
+
+  <section class="card toolPanel" id="tool-mux">
+    <h2>Mux / HLS Helper</h2>
+    <p>Paste a Mux playback ID or stream URL below and copy a clean note for your movie row. This helper does not connect to Mux or Supabase; it only formats your text.</p>
+    <div class="calcGrid">
+      <div><label for="muxId">Mux Playback ID</label><input id="muxId" placeholder="Example: AbC123..."><div class="hint">Paste only the playback ID if you have it.</div></div>
+      <div><label for="hlsUrl">HLS / Stream URL</label><input id="hlsUrl" placeholder="https://stream.mux.com/...m3u8"><div class="hint">Paste public playback URL if already generated.</div></div>
+    </div>
+    <div class="actions"><button class="primary" type="button" id="buildMuxNote">Build note</button><button type="button" id="copyMuxNote">Copy note</button><button type="button" id="clearMuxNote">Clear</button></div>
+    <textarea id="muxNote" placeholder="Your Mux helper note will appear here..."></textarea>
+    <div class="safeNote">Use this as a copy/paste helper only. Real video files still stay on Mux/HLS; Stream Bandit stores the playback link in the movie row.</div>
+  </section>
+
+  <section class="card toolPanel" id="tool-release">
+    <h2>Release Checklist</h2>
+    <p>A small manual checklist before calling a Stream Bandit version stable.</p>
+    <div class="checklist">
+      <label><input type="checkbox"> Home opens and Supabase rows load</label>
+      <label><input type="checkbox"> Library opens and movie cards show</label>
+      <label><input type="checkbox"> Details opens for at least one movie</label>
+      <label><input type="checkbox"> Play opens and Sound Booster appears</label>
+      <label><input type="checkbox"> Admin / Supabase Movie Manager opens</label>
+      <label><input type="checkbox"> Cast & Crew reload/save still works</label>
+      <label><input type="checkbox"> Tools page calculator works</label>
+      <label><input type="checkbox"> Menu does not flash, duplicate or jump by itself</label>
+    </div>
+    <div class="actions"><button type="button" id="copyChecklist">Copy checklist result</button><button type="button" id="resetChecklist">Reset checklist</button></div>
+    <div class="safeNote">This checklist is stored only in this browser session visually. It does not change Stream Bandit data.</div>
+  </section>
+
+  <section class="card toolPanel" id="tool-future">
+    <h2>Future Tools parking area</h2>
+    <p>Good future tools can be added here without touching Admin or Supabase Manager.</p>
+    <div class="quickGrid">
+      <div class="miniCard"><b>Poster size checker</b><span>Check image dimensions before upload.</span></div>
+      <div class="miniCard"><b>Runtime converter</b><span>Convert minutes to 1h 39m text.</span></div>
+      <div class="miniCard"><b>Metadata helper</b><span>Prepare title, year, rating, genres and tags before pasting.</span></div>
+      <div class="miniCard"><b>Backup note builder</b><span>Write clean release notes before a GitHub checkpoint.</span></div>
+    </div>
+  </section>
 </div>
 <script>
 (function(){
@@ -62,6 +114,7 @@ function el(id){return document.getElementById(id)}
 function value(id){var raw=(el(id).value||'').replace('%','').trim();if(!raw)return null;var n=Number(raw);return Number.isFinite(n)?n:null}
 function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
 function grade(score){if(score>=90)return 'Elite / must-watch';if(score>=80)return 'Excellent';if(score>=70)return 'Good';if(score>=60)return 'Mixed but watchable';if(score>=50)return 'Weak / only if interested';return 'Low score'}
+function toast(msg){var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}
 function calculate(){
   var rows=[];
   var imdb=value('imdb'); if(imdb!==null) rows.push(['IMDb',clamp(imdb,0,10)*10]);
@@ -78,13 +131,18 @@ function calculate(){
   el('breakdown').innerHTML='<b>Used sources:</b> '+rows.map(function(r){return r[0]+': '+Math.round(r[1])+'/100'}).join(' · ');
   lastResult='Stream Bandit Score: '+score+'/100 ('+g+') — '+rows.map(function(r){return r[0]+': '+Math.round(r[1])+'/100'}).join(', ');
 }
-function toast(msg){var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}
 function copy(){if(!lastResult)calculate();if(!lastResult){toast('Enter at least one rating first');return;}if(navigator.clipboard){navigator.clipboard.writeText(lastResult).then(function(){toast('Rating result copied')});}else{toast(lastResult)}}
 function clear(){['imdb','rtCritics','rtAudience','meta','letter','extra'].forEach(function(id){el(id).value=''});lastResult='';calculate()}
+function showTool(name){document.querySelectorAll('.toolTab').forEach(function(b){b.classList.toggle('active',b.dataset.tool===name)});document.querySelectorAll('.toolPanel').forEach(function(p){p.classList.toggle('active',p.id==='tool-'+name)});try{history.replaceState(null,'','#'+name)}catch(e){}}
+document.querySelectorAll('.toolTab').forEach(function(b){b.addEventListener('click',function(){showTool(b.dataset.tool)})});
 ['imdb','rtCritics','rtAudience','meta','letter','extra'].forEach(function(id){el(id).addEventListener('input',calculate)});
-el('calcBtn').addEventListener('click',calculate);
-el('copyBtn').addEventListener('click',copy);
-el('clearBtn').addEventListener('click',clear);
+el('calcBtn').addEventListener('click',calculate);el('copyBtn').addEventListener('click',copy);el('clearBtn').addEventListener('click',clear);
+el('buildMuxNote').addEventListener('click',function(){var id=el('muxId').value.trim();var url=el('hlsUrl').value.trim();var note='';if(id)note+='Mux Playback ID: '+id+'\n';if(url)note+='HLS / Stream URL: '+url+'\n';if(!note)note='Paste a Mux playback ID or HLS URL first.';el('muxNote').value=note.trim();});
+el('copyMuxNote').addEventListener('click',function(){var v=el('muxNote').value.trim();if(!v){toast('Build a note first');return;}navigator.clipboard&&navigator.clipboard.writeText(v).then(function(){toast('Mux note copied')});});
+el('clearMuxNote').addEventListener('click',function(){el('muxId').value='';el('hlsUrl').value='';el('muxNote').value='';});
+el('copyChecklist').addEventListener('click',function(){var rows=Array.from(document.querySelectorAll('.checklist label')).map(function(label){return (label.querySelector('input').checked?'✅ ':'⬜ ')+label.textContent.trim()});var out='Stream Bandit release checklist\n'+rows.join('\n');navigator.clipboard&&navigator.clipboard.writeText(out).then(function(){toast('Checklist copied')});});
+el('resetChecklist').addEventListener('click',function(){document.querySelectorAll('.checklist input').forEach(function(c){c.checked=false});toast('Checklist reset')});
+if(location.hash){var h=location.hash.replace('#','');if(document.getElementById('tool-'+h))showTool(h)}
 })();
 </script>
 </body>
