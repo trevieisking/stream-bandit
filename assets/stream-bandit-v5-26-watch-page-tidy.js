@@ -1,67 +1,42 @@
-/* Stream Bandit V5.26 — Watch Page Tidy TEST
+/* Stream Bandit V5.26.1 — Watch Page Tidy TEST
    Test route only. Live is untouched.
-   Goal: tidy the Watch page beneath the player.
-   - Keep protected video/player logic intact.
-   - Keep the working Player Sound Booster card.
-   - Hide the older duplicate Player Audio Boost card.
-   - Group resume/actions/details into neat tabs below the player.
-   No Supabase writes, no movie saves, no player source changes, no volume logic changes. */
+   Keeps the real player and working Sound Booster. Hides the older duplicate audio card.
+   Places queue controls beside the Sound Booster where possible. */
 (function(){
 'use strict';
-function clean(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
-function main(){return document.querySelector('.main')||document.querySelector('main')||document.getElementById('app')||document.body;}
-function isWatch(){var s=clean(main()).toLowerCase();return (s.includes('watching')||s.includes('supabase watch'))&&s.includes('resume choice')&&s.includes('mark finished');}
-function addCss(){
+function t(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
+function root(){return document.querySelector('.main')||document.querySelector('main')||document.getElementById('app')||document.body;}
+function isWatch(){var s=t(root()).toLowerCase();return (s.indexOf('supabase watch')>-1||s.indexOf('watching')>-1)&&(s.indexOf('player sound booster')>-1||s.indexOf('supabase queue')>-1);}
+function css(){
  if(document.getElementById('sb526Css'))return;
  var st=document.createElement('style');st.id='sb526Css';
- st.textContent='\nbody.sb526Watch .sb526Hide{display:none!important}.sb526Tabs{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 12px;padding:10px;border-radius:22px;background:rgba(4,7,14,.76);border:1px solid rgba(255,255,255,.08);box-shadow:0 16px 40px rgba(0,0,0,.24)}.sb526Tab{border:0;border-radius:999px;padding:12px 17px;background:rgba(68,72,107,.94);color:#fff;font-weight:1000;cursor:pointer}.sb526Tab.active{background:linear-gradient(135deg,var(--sb-brand-accent-1,#ff2d55),var(--sb-brand-accent-2,#7c3cff))!important;box-shadow:0 14px 34px rgba(255,45,133,.22)}.sb526Panel{display:none;border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(17,21,34,.96),rgba(10,12,21,.96));border-radius:24px;padding:16px;margin:0 0 14px;box-shadow:0 22px 55px rgba(0,0,0,.26)}.sb526Panel.active{display:block}.sb526Panel h3{margin:0 0 10px;font-size:22px}.sb526Panel p{color:var(--muted,#a9afc3);line-height:1.45}.sb526ButtonRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}.sb526ButtonRow button,.sb526ButtonRow a{border-radius:16px!important;padding:13px 16px!important;font-weight:1000!important}.sb526Primary{background:linear-gradient(135deg,var(--sb-brand-accent-1,#ff2d55),var(--sb-brand-accent-2,#7c3cff))!important;color:#fff!important}.sb526Note{margin-top:12px;border-radius:16px;padding:12px 14px;background:rgba(34,211,166,.10);border:1px solid rgba(34,211,166,.20);color:#baf7df;line-height:1.45}.sb526Warn{margin-top:12px;border-radius:16px;padding:12px 14px;background:rgba(255,209,102,.10);border:1px solid rgba(255,209,102,.22);color:#ffe8a3;line-height:1.45}.sb526Meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.sb526Meta span{border-radius:999px;padding:8px 10px;background:rgba(68,72,107,.72);font-weight:900;color:#fff}@media(max-width:780px){.sb526ButtonRow button,.sb526ButtonRow a{width:100%}}\n';
+ st.textContent='body.sb526Watch .sb526Hide{display:none!important}.sb526Row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:14px;margin:14px 0;align-items:stretch}.sb526Row>*{margin:0!important;height:100%}.sb526Queue{border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(17,21,34,.96),rgba(10,12,21,.96));border-radius:24px;padding:16px;box-shadow:0 22px 55px rgba(0,0,0,.26)}.sb526Queue h3{margin:0 0 8px;font-size:21px}.sb526Queue p{margin:0 0 12px;color:var(--muted,#a9afc3);line-height:1.45}.sb526Btns{display:flex;gap:10px;flex-wrap:wrap}.sb526Btns button{border-radius:16px!important;padding:13px 16px!important;font-weight:1000!important}.sb526Main{background:linear-gradient(135deg,var(--sb-brand-accent-1,#ff2d55),var(--sb-brand-accent-2,#7c3cff))!important;color:#fff!important}.sb526Note{margin-top:12px;border-radius:16px;padding:11px 13px;background:rgba(34,211,166,.10);border:1px solid rgba(34,211,166,.20);color:#baf7df;line-height:1.45}.sb526Tabs{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 12px;padding:10px;border-radius:22px;background:rgba(4,7,14,.76);border:1px solid rgba(255,255,255,.08)}.sb526Tab{border:0;border-radius:999px;padding:12px 17px;background:rgba(68,72,107,.94);color:#fff;font-weight:1000;cursor:pointer}.sb526Tab.active{background:linear-gradient(135deg,var(--sb-brand-accent-1,#ff2d55),var(--sb-brand-accent-2,#7c3cff))!important}.sb526Panel{display:none;border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(17,21,34,.96),rgba(10,12,21,.96));border-radius:24px;padding:16px;margin:0 0 14px}.sb526Panel.active{display:block}@media(max-width:900px){.sb526Row{grid-template-columns:1fr}.sb526Btns button{width:100%}}';
  document.head.appendChild(st);
 }
-function cardContaining(re){
- return Array.from(main().querySelectorAll('.card,.panel,section,div')).filter(function(el){return !el.closest('#sb526Wrap')&&re.test(clean(el));}).sort(function(a,b){return a.getBoundingClientRect().height-b.getBoundingClientRect().height;})[0]||null;
+function card(re){return Array.from(root().querySelectorAll('.card,.panel,section,div')).filter(function(x){return !x.closest('#sb526Row')&&!x.closest('#sb526Tabs')&&re.test(t(x));}).sort(function(a,b){return a.getBoundingClientRect().height-b.getBoundingClientRect().height;})[0]||null;}
+function btn(re,scope){return Array.from((scope||root()).querySelectorAll('button,a')).find(function(b){return re.test(t(b));});}
+function proxy(old,label,main){var b=document.createElement('button');b.type='button';b.textContent=label;if(main)b.className='sb526Main';b.onclick=function(){if(old)old.click();};return b;}
+function hideOldAudio(){Array.from(root().querySelectorAll('.card,.panel,section,div')).forEach(function(x){var s=t(x).toLowerCase();if(s.indexOf('player audio boost')>-1&&s.indexOf('boost 150%')>-1)x.classList.add('sb526Hide');});}
+function makeRow(){
+ if(document.getElementById('sb526Row'))return;
+ var booster=card(/Player Sound Booster/i);var queue=card(/Supabase queue/i);if(!booster&&!queue)return;
+ var anchor=booster||queue;var row=document.createElement('div');row.id='sb526Row';row.className='sb526Row';
+ if(booster)row.appendChild(booster);
+ var q=document.createElement('div');q.className='sb526Queue';q.innerHTML='<h3>Supabase queue</h3><p>Previous and Next sit beside Sound Booster under the player.</p><div class="sb526Btns"></div><div class="sb526Note">Old duplicate audio boost is hidden. The working Sound Booster stays.</div>';
+ var holder=q.querySelector('.sb526Btns');var prev=btn(/^Previous$/i,queue)||btn(/^Previous$/i);var next=btn(/^Next$/i,queue)||btn(/^Next$/i);
+ if(prev)holder.appendChild(proxy(prev,'Previous',false));if(next)holder.appendChild(proxy(next,'Next',true));if(!prev&&!next)holder.textContent='No queue controls visible for this title.';
+ row.appendChild(q);anchor.parentElement.insertBefore(row,anchor);if(queue)queue.classList.add('sb526Hide');
 }
-function findButton(re,scope){return Array.from((scope||main()).querySelectorAll('button,a')).find(function(b){return re.test(clean(b));});}
-function buttons(re,scope){return Array.from((scope||main()).querySelectorAll('button,a')).filter(function(b){return re.test(clean(b));});}
-function hideDuplicateAudioBoost(){
- Array.from(main().querySelectorAll('.card,.panel,section,div')).forEach(function(el){
-   var s=clean(el).toLowerCase();
-   if(s.includes('player audio boost')&&s.includes('normal 100%')&&s.includes('boost 150%')) el.classList.add('sb526Hide');
- });
+function makeTabs(){
+ if(document.getElementById('sb526Tabs'))return;
+ var info=card(/HLS\/Mux stream loaded|Back to Supabase Library|resume loaded/i);if(!info)return;
+ var details=btn(/^Details$/i,info)||btn(/^Details$/i);var back=btn(/Back to Supabase Library|Back to Library/i,info)||btn(/Back to Supabase Library|Back to Library/i);
+ var wrap=document.createElement('div');wrap.id='sb526Tabs';wrap.innerHTML='<div class="sb526Tabs"><button class="sb526Tab active" data-p="info">Info</button><button class="sb526Tab" data-p="actions">Actions</button><button class="sb526Tab" data-p="safe">Safety</button></div><div class="sb526Panel active" data-panel="info"><b>Now watching</b><p>Player is protected. Sound Booster and queue controls are tidied below the player.</p></div><div class="sb526Panel" data-panel="actions"><div class="sb526Btns"></div></div><div class="sb526Panel" data-panel="safe"><p>No player, Sound Booster logic, progress, Supabase save, movie row, Mux/HLS or database logic changes.</p></div>';
+ var h=wrap.querySelector('.sb526Btns');if(back)h.appendChild(proxy(back,'Back to Supabase Library',false));if(details)h.appendChild(proxy(details,'Details',true));
+ info.parentElement.insertBefore(wrap,info.nextSibling);
+ wrap.onclick=function(e){var b=e.target.closest('.sb526Tab');if(!b)return;Array.from(wrap.querySelectorAll('.sb526Tab')).forEach(function(x){x.classList.remove('active')});b.classList.add('active');Array.from(wrap.querySelectorAll('.sb526Panel')).forEach(function(p){p.classList.toggle('active',p.dataset.panel===b.dataset.p)});};
 }
-function build(){
- if(document.getElementById('sb526Wrap'))return;
- addCss();
- hideDuplicateAudioBoost();
- var resumeCard=cardContaining(/Resume choice/i);
- if(!resumeCard)return;
- var statusCard=resumeCard;
- var restart=findButton(/^restart$/i,statusCard)||findButton(/^restart$/i);
- var prev=findButton(/^previous$/i,statusCard)||findButton(/^previous$/i);
- var next=findButton(/^next$/i,statusCard)||findButton(/^next$/i);
- var full=findButton(/^fullscreen$/i,statusCard)||findButton(/^fullscreen$/i);
- var finished=findButton(/^mark finished$/i,statusCard)||findButton(/^mark finished$/i);
- var reset=findButton(/^reset progress$/i,statusCard)||findButton(/^reset progress$/i);
- var details=findButton(/^details$/i,statusCard)||findButton(/^details$/i);
- var resume=findButton(/resume saved time/i,statusCard)||findButton(/resume saved time/i);
- var start=findButton(/start from beginning/i,statusCard)||findButton(/start from beginning/i);
- var wrap=document.createElement('div');wrap.id='sb526Wrap';
- wrap.innerHTML='<div class="sb526Tabs"><button class="sb526Tab active" data-p="resume">⏯️ Resume</button><button class="sb526Tab" data-p="actions">🎮 Controls</button><button class="sb526Tab" data-p="info">ℹ️ Info</button><button class="sb526Tab" data-p="safety">✅ Safety</button></div>';
- function proxy(old,label,cls){var b=document.createElement('button');b.type='button';b.textContent=label;b.className=cls||'';b.onclick=function(){if(old)old.click();};return b;}
- var pResume=document.createElement('div');pResume.className='sb526Panel active';pResume.dataset.panel='resume';pResume.innerHTML='<h3>Resume choice</h3><p>Choose how to start this title. These buttons reuse the existing working player actions.</p><div class="sb526ButtonRow"></div>';
- pResume.querySelector('.sb526ButtonRow').append(proxy(resume,'Resume saved time','sb526Primary'),proxy(start,'Start from beginning',''));
- var pActions=document.createElement('div');pActions.className='sb526Panel';pActions.dataset.panel='actions';pActions.innerHTML='<h3>Player controls</h3><p>Clean control area. The protected video player and fullscreen logic are not changed.</p><div class="sb526ButtonRow"></div>';
- var ar=pActions.querySelector('.sb526ButtonRow');
- [[restart,'Restart'],[prev,'Previous'],[next,'Next'],[full,'Fullscreen'],[finished,'Mark finished'],[reset,'Reset progress'],[details,'Details']].forEach(function(x){if(x[0])ar.append(proxy(x[0],x[1],x[1]==='Fullscreen'?'sb526Primary':''));});
- var pInfo=document.createElement('div');pInfo.className='sb526Panel';pInfo.dataset.panel='info';
- var title=clean(main().querySelector('h1,h2'))||'Watching';
- pInfo.innerHTML='<h3>Now watching</h3><div class="sb526Meta"><span>'+title+'</span><span>Player protected</span><span>Sound Booster kept</span></div><p>The duplicate older Player Audio Boost card is hidden. The working Sound Booster card stays as the active audio boost control.</p><div class="sb526Note">Use the custom volume overlay for normal volume and Sound Booster for accessibility gain.</div>';
- var pSafety=document.createElement('div');pSafety.className='sb526Panel';pSafety.dataset.panel='safety';pSafety.innerHTML='<h3>V5.26 tidy safety</h3><p>This is a layout tidy test only.</p><div class="sb526Warn">Protected: video player, volume overlay, Sound Booster behaviour, saved progress, Supabase saves, movie rows, Mux/HLS and database logic are not changed.</div>';
- wrap.append(pResume,pActions,pInfo,pSafety);
- resumeCard.parentElement.insertBefore(wrap,resumeCard);
- resumeCard.classList.add('sb526Hide');
- wrap.querySelector('.sb526Tabs').onclick=function(e){var b=e.target.closest('.sb526Tab');if(!b)return;Array.from(wrap.querySelectorAll('.sb526Tab')).forEach(function(x){x.classList.remove('active')});b.classList.add('active');Array.from(wrap.querySelectorAll('.sb526Panel')).forEach(function(p){p.classList.toggle('active',p.dataset.panel===b.dataset.p)});};
-}
-function apply(){if(!isWatch()){document.body.classList.remove('sb526Watch');return;}document.body.classList.add('sb526Watch');hideDuplicateAudioBoost();build();}
-new MutationObserver(function(){setTimeout(apply,250);}).observe(document.documentElement,{childList:true,subtree:true});
-document.addEventListener('DOMContentLoaded',function(){setTimeout(apply,900);});setInterval(apply,1500);
+function run(){if(!isWatch()){document.body.classList.remove('sb526Watch');return;}document.body.classList.add('sb526Watch');css();hideOldAudio();makeRow();makeTabs();}
+new MutationObserver(function(){setTimeout(run,250);}).observe(document.documentElement,{childList:true,subtree:true});
+document.addEventListener('DOMContentLoaded',function(){setTimeout(run,900);});setInterval(run,1500);
 })();
