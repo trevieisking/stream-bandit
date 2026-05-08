@@ -1,0 +1,16 @@
+/* Stream Bandit V5.34 — Home Credit Panel
+   Visual Home-page polish only. Adds a short Stream Bandit / Chatterfriends Movies / ChatGPT credit note.
+   No Supabase, player, movie rows, saves, search, Sound Booster or database logic changes. */
+(function(){
+'use strict';
+var done=false;
+function text(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
+function root(){return document.querySelector('.main')||document.querySelector('main')||document.getElementById('app')||document.body;}
+function isHome(){var r=root();var h=Array.from(r.querySelectorAll('h1,h2')).map(text).join(' ').toLowerCase();return /(^|\s)home(\s|$)/.test(h)||!!document.querySelector('button.active,[aria-current="page"]')&&/home/i.test(text(document.querySelector('button.active,[aria-current="page"]')));}
+function style(){if(document.getElementById('sb534HomeCreditStyle'))return;var st=document.createElement('style');st.id='sb534HomeCreditStyle';st.textContent='.sb534HomeCredit{margin:14px 0 18px;border:1px solid rgba(34,211,166,.22);background:linear-gradient(135deg,rgba(8,44,45,.82),rgba(28,20,55,.82));border-radius:24px;padding:18px 20px;box-shadow:0 20px 46px rgba(0,0,0,.26)}.sb534HomeCredit h2{margin:0 0 8px;font-size:clamp(22px,2.3vw,32px);line-height:1.05;color:#fff}.sb534HomeCredit p{margin:0;color:#cfd6ea;font-size:16px;line-height:1.45}.sb534HomeCredit .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.sb534HomeCredit .chip{display:inline-flex;align-items:center;border-radius:999px;padding:7px 10px;background:rgba(255,255,255,.10);color:#f5f7ff;font-weight:900;font-size:12px}.sb534HomeCredit .chip.brand{background:linear-gradient(135deg,var(--sb-brand-accent-1,#ff2d55),var(--sb-brand-accent-2,#7c3cff))}';document.head.appendChild(st);}
+function place(){if(done||!isHome())return;style();var r=root();if(document.getElementById('sb534HomeCredit')){done=true;return;}var h=Array.from(r.querySelectorAll('h1,h2')).find(function(x){return /^home$/i.test(text(x));})||r.querySelector('h1,h2');if(!h)return;var box=document.createElement('section');box.id='sb534HomeCredit';box.className='sb534HomeCredit';box.innerHTML='<h2>Stream Bandit by Chatterfriends Movies</h2><p>A custom front-end movie library built by Chatterfriends Movies with ChatGPT helping shape the code, layout and testing workflow. Browse, save, resume and play your Stream Bandit titles from one clean Supabase-powered home page.</p><div class="chips"><span class="chip brand">Chatterfriends Movies</span><span class="chip">Built with ChatGPT assistance</span><span class="chip">Supabase-first</span><span class="chip">Player comfort focused</span></div>';
+h.parentNode.insertBefore(box,h.nextSibling);done=true;}
+function resetIfLeftHome(){if(!isHome()){done=false;var b=document.getElementById('sb534HomeCredit');if(b)b.remove();}}
+function run(){resetIfLeftHome();place();}
+document.addEventListener('DOMContentLoaded',function(){setTimeout(run,700);});new MutationObserver(function(){setTimeout(run,250);}).observe(document.documentElement,{childList:true,subtree:true});setTimeout(run,900);setTimeout(run,1800);
+})();
