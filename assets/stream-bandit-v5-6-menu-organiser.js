@@ -18,7 +18,7 @@ function css(){
 }
 function groupFor(label){
   var s=norm(label);
-  if(/home|continue watching|library|watchlist|favourite|favorite|accessibility/.test(s))return 'main';
+  if(/home|continue watching|library|watchlist|favourite|favorite|liked|accessibility/.test(s))return 'main';
   if(/genre|history|channel|playlist|collection/.test(s))return 'browse';
   if(/supabase|migration|readiness|manager/.test(s)&&!/mux/.test(s))return 'supabase';
   if(/mux|upload plan|playback id|hls/.test(s))return 'mux';
