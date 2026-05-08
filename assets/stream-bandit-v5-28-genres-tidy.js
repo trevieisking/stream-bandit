@@ -1,12 +1,15 @@
 (function(){
 'use strict';
-function tx(e){return String(e&&e.textContent||'').replace(/\s+/g,' ').trim();}
-function main(){return document.querySelector('.main')||document.querySelector('main')||document.getElementById('app')||document.body;}
-function ok(){var r=main(),h=tx(r.querySelector('h1,h2')||'').toLowerCase(),s=tx(r).toLowerCase();return h.indexOf('genres')>-1||s.indexOf('genre picks')>-1||s.indexOf('choose a genre')>-1;}
-function style(){if(document.getElementById('sb528Style'))return;var st=document.createElement('style');st.id='sb528Style';st.textContent='.sb528Box{border:1px solid rgba(34,211,166,.24);background:linear-gradient(135deg,rgba(9,62,57,.72),rgba(28,22,65,.76));border-radius:26px;padding:20px;margin:12px 0 14px}.sb528Box h2{margin:0 0 8px;font-size:28px}.sb528Box p{margin:0;color:var(--muted,#a9afc3);line-height:1.45}.sb528Tabs{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 0}.sb528Tabs button{border:0;border-radius:999px;padding:11px 16px;background:rgba(68,72,107,.94);color:#fff;font-weight:1000;cursor:pointer}.sb528Tabs button.active{background:linear-gradient(135deg,var(--sb-brand-accent-1,#ff2d55),var(--sb-brand-accent-2,#7c3cff))!important}.sb528Panel{display:none;margin-top:12px;border-radius:18px;padding:13px;background:rgba(10,12,21,.68);border:1px solid rgba(255,255,255,.08);color:var(--muted,#a9afc3)}.sb528Panel.active{display:block}.sb528MiniGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:13px}.sb528Mini{border-radius:16px;padding:12px;background:rgba(18,22,38,.72);border:1px solid rgba(255,255,255,.08)}.sb528Mini b{display:block;color:#fff;margin-bottom:5px}@media(max-width:850px){.sb528MiniGrid{grid-template-columns:1fr}}';document.head.appendChild(st);}
-function heading(){return Array.from(main().querySelectorAll('h1,h2')).find(function(h){return /genres/i.test(tx(h));});}
-function build(){if(document.getElementById('sb528Box'))return;var h=heading();if(!h)return;style();var box=document.createElement('div');box.id='sb528Box';box.className='sb528Box';box.innerHTML='<h2>Genres</h2><p>Browse by genre in a cleaner way. The real genre list and movie cards below stay untouched.</p><div class="sb528MiniGrid"><div class="sb528Mini"><b>Browse</b><span>Use the existing genre filters below.</span></div><div class="sb528Mini"><b>Cards protected</b><span>Play, Details and posters are not replaced.</span></div><div class="sb528Mini"><b>No writes</b><span>This is a visual tidy test only.</span></div></div><div class="sb528Tabs"><button class="active" data-p="browse">Browse</button><button data-p="help">How it works</button><button data-p="safe">Safety</button></div><div class="sb528Panel active" data-panel="browse">Use the existing Genres page below. Pick a genre and open titles as normal.</div><div class="sb528Panel" data-panel="help">Genres come from existing movie tags/data. Edit missing genres later in the manager, not here.</div><div class="sb528Panel" data-panel="safe">Protected: player, Sound Booster, Supabase saves, movie rows, posters, Details and Play logic.</div>';h.parentNode.insertBefore(box,h.nextSibling);box.onclick=function(e){var b=e.target.closest('button[data-p]');if(!b)return;Array.from(box.querySelectorAll('button[data-p]')).forEach(function(x){x.classList.remove('active')});b.classList.add('active');Array.from(box.querySelectorAll('.sb528Panel')).forEach(function(p){p.classList.toggle('active',p.dataset.panel===b.dataset.p)});};}
-function run(){if(!ok())return;build();}
-new MutationObserver(function(){setTimeout(run,250);}).observe(document.documentElement,{childList:true,subtree:true});
-document.addEventListener('DOMContentLoaded',function(){setTimeout(run,800)});setInterval(run,1400);
+function clean(){
+  try{
+    var box=document.getElementById('sb528Box');
+    if(box)box.remove();
+    var st=document.getElementById('sb528Style');
+    if(st)st.remove();
+    document.body.classList.remove('sb528Genres');
+  }catch(e){}
+}
+clean();
+document.addEventListener('DOMContentLoaded',function(){setTimeout(clean,250);setTimeout(clean,1000);});
+setTimeout(clean,1500);
 })();
