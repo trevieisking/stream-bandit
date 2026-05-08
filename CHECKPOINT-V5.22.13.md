@@ -93,6 +93,16 @@ Confirmed result:
 - Trailer tab still works.
 - Player still works.
 
+### 5. Quality Tools move note added
+
+All Quality Tools should be moved out of active app/admin pages and into the standalone Tools Page route.
+
+Tomorrow rule:
+
+- Quality helper tools belong on the Tools Page unless they genuinely need active page logic.
+- Do not embed quality helpers back into Admin, Settings, Manager, Details, Player or other active pages.
+- Move one helper at a time, test on a Tools test route first, then promote only after checks pass.
+
 ## Current live scripts after V5.22.13
 
 Live `index.html` now loads:
@@ -119,6 +129,11 @@ Live Tools page remains:
 Live Tools link script remains:
 
 `assets/stream-bandit-v5-14-6-live-tools-link.js`
+
+Quality Tools move target:
+
+- Move all Quality Tools helpers to the standalone Tools Page flow.
+- Keep the active app pages lighter and safer.
 
 ## Full current menu page list
 
@@ -203,7 +218,17 @@ Reason:
 - It should be updated to match the current V5.21.12/V5.22.13 player setup.
 - It should explain that custom Stream Bandit volume overlay is the main volume control and Sound Booster controls accessibility boost.
 
-Suggested next targets after Accessibility:
+Important Tools target for tomorrow:
+
+`Quality Tools`
+
+Reason:
+
+- All quality helper tools should be moved to the standalone Tools Page.
+- This keeps active pages calmer and reduces code conflicts.
+- Treat this as a Tools-page move, not an active-app feature expansion.
+
+Suggested next targets after Accessibility / Quality Tools:
 
 1. Favourites / Watchlist / Liked count polish.
 2. Continue Watching and Watch History tidy.
@@ -221,6 +246,7 @@ The following are no longer recommended as the active approach:
 - Generated hard-coded info-card rows for Details Overview.
 - Old V5.11.9 Sound Booster live path.
 - Any approach that embeds many helper tools back into active pages instead of the standalone Tools page.
+- Any approach that leaves Quality Tools embedded in active pages when they can safely live on the Tools Page.
 
 ## Safe rollback notes
 
