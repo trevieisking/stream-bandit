@@ -36,6 +36,12 @@ Live player scripts:
 - `assets/stream-bandit-v5-21-5-player-comfort-fixed.js`
 - `assets/stream-bandit-v5-21-12-clean-player-controls.js`
 
+Future player polish note:
+
+- The custom Stream Bandit volume overlay works and should stay as the main control.
+- Later, when returning to player comfort, make the custom overlay a little smaller so it better matches the rest of the app UI.
+- Do not change this urgently because functionality matters more than size right now.
+
 ### 2. Supabase trailer display fixed and promoted
 
 V5.22.1 fixed the issue where a trailer/extra link saved through Supabase Movie Manager did not appear on the Supabase Details Trailer tab.
