@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Stream Bandit V5.39 Storage Centre</title>
+<link rel="stylesheet" href="assets/stream-bandit.css">
+<link rel="stylesheet" href="assets/stream-bandit-v5-5-polish.css">
+<style>
+:root{color-scheme:dark}body{min-height:100vh;margin:0;background:radial-gradient(circle at top left,#241049 0,#070b16 42%,#02040a 100%);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.sbWrap{max-width:1180px;margin:0 auto;padding:24px}.sbHero{border:1px solid rgba(34,211,166,.26);background:linear-gradient(135deg,rgba(34,211,166,.10),rgba(124,60,255,.10));border-radius:26px;padding:22px;margin-bottom:16px;box-shadow:0 22px 70px rgba(0,0,0,.35)}.sbHero h1{margin:0 0 8px;font-size:34px}.sbHero p{margin:0;color:#b8bfd6;line-height:1.5}.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.tabBtn{border:0;border-radius:999px;padding:11px 15px;background:rgba(255,255,255,.12);color:#fff;font-weight:950;cursor:pointer}.tabBtn.active{background:linear-gradient(135deg,#ff2d85,#7c3cff)}.panel{display:none;border:1px solid rgba(255,255,255,.12);background:rgba(10,14,28,.86);border-radius:24px;padding:18px;margin:12px 0;box-shadow:0 18px 60px rgba(0,0,0,.32)}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}.stat{padding:14px;border-radius:18px;background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.10)}.stat b{display:block;color:#baf7df;margin-bottom:7px}.stat span{font-size:24px;font-weight:950}.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.btn,a.btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;border:0;border-radius:999px;padding:11px 15px;background:linear-gradient(135deg,#22d3a6,#7c3cff);color:#fff;font-weight:950;cursor:pointer}.btn.secondary{background:rgba(255,255,255,.14)}.btn.warn{background:linear-gradient(135deg,#ffb142,#ff2d85)}.note{margin-top:12px;color:#baf7df;font-weight:850;white-space:pre-wrap}.muted{color:#a9afc3;line-height:1.5}.warnBox{padding:13px;border-radius:18px;background:rgba(255,177,66,.12);border:1px solid rgba(255,177,66,.32);color:#ffe7ad;margin-top:14px}.goodBox{padding:13px;border-radius:18px;background:rgba(34,211,166,.10);border:1px solid rgba(34,211,166,.30);color:#dfffee;margin-top:14px}.list{display:grid;gap:8px;margin-top:12px}.list div{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}pre{white-space:pre-wrap;max-height:260px;overflow:auto;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:12px;color:#cfd6ea;display:none}.topLinks{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.badge{display:inline-flex;padding:6px 9px;border-radius:999px;background:rgba(34,211,166,.16);border:1px solid rgba(34,211,166,.32);color:#baf7df;font-weight:950;font-size:12px}.danger{color:#ffc1cd}
+</style>
+</head>
+<body>
+<div class="sbWrap">
+  <section class="sbHero">
+    <span class="badge">V5.39 Standalone Storage Centre</span>
+    <h1>💾 Stream Bandit Storage Centre</h1>
+    <p>Standalone storage, backup and safety page. This avoids the old in-app Backup/Safety route that was freezing or ignoring clicks.</p>
+    <div class="topLinks"><a class="btn secondary" href="./">← Back to Stream Bandit</a><a class="btn secondary" href="backup-v5-37-8-lite.html" target="_blank" rel="noopener">Open Lite Backup Page</a></div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tabBtn active" data-tab="overview">Overview</button>
+    <button class="tabBtn" data-tab="backup">Lite Backup</button>
+    <button class="tabBtn" data-tab="prep">Storage Prep</button>
+    <button class="tabBtn" data-tab="safety">Safety</button>
+    <button class="tabBtn" data-tab="links">Links / Health</button>
+  </nav>
+
+  <section id="overview" class="panel active">
+    <h2>Overview</h2>
+    <p class="muted">This page reads browser storage only. It does not restore, delete, upload, insert, update, or write to Supabase.</p>
+    <div id="overviewStats" class="grid"></div>
+    <div class="goodBox"><b>Recommended route:</b> Use this standalone Storage Centre for backups and safety checks. Keep the old Backup/Safety in-app page as legacy until we rebuild the menu cleanly.</div>
+  </section>
+
+  <section id="backup" class="panel">
+    <h2>Lite Backup Export</h2>
+    <p class="muted">Exports your current browser library JSON without rendering a huge old backup preview.</p>
+    <div class="row">
+      <button id="downloadBackup" class="btn">Download Backup JSON</button>
+      <button id="copySummary" class="btn secondary">Copy Backup Summary</button>
+      <button id="showPreview" class="btn secondary">Show Small Preview</button>
+    </div>
+    <div id="backupMsg" class="note">Ready. Use Download Backup JSON.</div>
+    <pre id="backupPreview"></pre>
+    <div class="warnBox"><b>Safety:</b> This export does not copy actual local video files. Keep your original local MP4/WebM/MOV files safe separately.</div>
+  </section>
+
+  <section id="prep" class="panel">
+    <h2>Storage Prep</h2>
+    <p class="muted">Quick readiness checks for browser/local data before future storage or Supabase work.</p>
+    <div id="prepList" class="list"></div>
+  </section>
+
+  <section id="safety" class="panel">
+    <h2>Safety</h2>
+    <div class="warnBox"><b>Restore warning:</b> No restore controls are provided here on purpose. Today this page is export/safety only.</div>
+    <div class="list">
+      <div><b>No write actions</b><span>yes</span></div>
+      <div><b>No Supabase writes</b><span>yes</span></div>
+      <div><b>No player/HLS changes</b><span>yes</span></div>
+      <div><b>Standalone page</b><span>yes</span></div>
+      <div><b>Old Backup route bypassed</b><span>yes</span></div>
+    </div>
+  </section>
+
+  <section id="links" class="panel">
+    <h2>Links / Health</h2>
+    <p class="muted">Useful direct pages while we simplify the old menu.</p>
+    <div class="row">
+      <a class="btn" href="./">Open Stream Bandit</a>
+      <a class="btn secondary" href="backup-v5-37-8-lite.html" target="_blank" rel="noopener">Lite Backup</a>
+      <a class="btn secondary" href="tools-v5-24-1.html" target="_blank" rel="noopener">Standalone Tools</a>
+    </div>
+    <div id="healthList" class="list"></div>
+  </section>
+</div>
+<script>
+(function(){
+'use strict';
+var KEY='streambandit_v25_data';
+function $(id){return document.getElementById(id)}
+function safe(fn,fb){try{return fn()}catch(e){return fb}}
+function raw(){return localStorage.getItem(KEY)||''}
+function data(){return safe(function(){return JSON.parse(raw()||'{}')},{})}
+function size(n){n=Number(n)||0;return n>1024*1024?(n/1024/1024).toFixed(2)+' MB':Math.round(n/1024)+' KB'}
+function pad(n){return String(n).padStart(2,'0')}
+function fname(){var d=new Date();return 'stream-bandit-v5-39-storage-backup-'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes())+'.json'}
+function counts(){var d=data();var movies=d.videos||d.movies||[];var noSrc=movies.filter(function(m){return !(m.videoUrl||m.url||m.src||m.hls||m.muxPlaybackId||m.mux||m.fileUrl)}).length;var localOnly=movies.filter(function(m){return !!(m.file||m.localFile||m.blobUrl||String(m.videoUrl||'').indexOf('blob:')===0)}).length;var urlStreams=movies.filter(function(m){var u=String(m.videoUrl||m.url||m.src||'');return /^https?:/i.test(u)}).length;var hls=movies.filter(function(m){var u=String(m.videoUrl||m.url||m.src||'');return u.indexOf('.m3u8')>-1||u.indexOf('stream.mux.com')>-1}).length;return {rawSize:raw().length,size:size(raw().length),movies:movies.length,channels:(d.channels||[]).length,playlists:(d.playlists||[]).length,collections:(d.collections||[]).length,users:(d.users||[]).length,submissions:(d.submissions||[]).length,watchlist:d.watchlist?Object.keys(d.watchlist).length:((d.watchlistIds||[]).length||0),progress:d.progress?'yes':'no',noSrc:noSrc,localOnly:localOnly,urlStreams:urlStreams,hls:hls}}
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function statGrid(id,items){$(id).innerHTML=items.map(function(it){return '<div class="stat"><b>'+esc(it[0])+'</b><span>'+esc(it[1])+'</span></div>'}).join('')}
+function list(id,items){$(id).innerHTML=items.map(function(it){return '<div><b>'+esc(it[0])+'</b><span>'+esc(it[1])+'</span></div>'}).join('')}
+function backupObject(){return {backupType:'Stream Bandit Storage Centre Backup',backupVersion:'V5.39',exportedAt:new Date().toISOString(),source:'localStorage streambandit_v25_data',rawSize:raw().length,data:data()}}
+function download(){var txt=JSON.stringify(backupObject(),null,2);var blob=new Blob([txt],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname();document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);$('backupMsg').textContent='Backup download started: '+a.download+'\nSize: '+size(txt.length)}
+function summary(){var c=counts();var txt='Stream Bandit Storage Centre Summary\nVersion: V5.39\nTime: '+new Date().toString()+'\nData size: '+c.size+'\nMovies: '+c.movies+'\nChannels: '+c.channels+'\nPlaylists: '+c.playlists+'\nCollections: '+c.collections+'\nSubmissions: '+c.submissions+'\nNo-source movies: '+c.noSrc+'\nLocal-only movies: '+c.localOnly+'\nURL streams: '+c.urlStreams+'\nHLS/Mux streams: '+c.hls+'\nNo restore/write action used.';safe(function(){localStorage.setItem('sb539_storage_summary',txt)});try{navigator.clipboard.writeText(txt).then(function(){$('backupMsg').textContent='Backup summary copied.'},function(){$('backupMsg').textContent='Copy blocked. Summary saved in localStorage.'})}catch(e){$('backupMsg').textContent='Copy blocked. Summary saved in localStorage.'}}
+function preview(){var p=$('backupPreview');if(p.style.display==='block'){p.style.display='none';return}var txt=JSON.stringify(backupObject(),null,2);p.textContent=txt.slice(0,6000)+(txt.length>6000?'\n...preview shortened...':'');p.style.display='block';$('backupMsg').textContent='Small preview shown. Full file only downloads when you click Download Backup JSON.'}
+function render(){var c=counts();statGrid('overviewStats',[['Data size',c.size],['Movies',c.movies],['Channels',c.channels],['Playlists',c.playlists],['Collections',c.collections],['Submissions',c.submissions],['Watchlist saves',c.watchlist],['Progress saved',c.progress]]);list('prepList',[['No-source movies',c.noSrc],['Local browser-only movies',c.localOnly],['URL stream movies',c.urlStreams],['HLS/Mux style streams',c.hls],['Raw browser data size',c.size],['Backup route', 'standalone safe page']]);list('healthList',[['index.html','main app'],['storage-v5-39.html','this page'],['backup-v5-37-8-lite.html','safe lite backup'],['tools-v5-24-1.html','standalone tools'],['Write actions used','none']])}
+function tabs(){document.querySelectorAll('.tabBtn').forEach(function(b){b.onclick=function(){document.querySelectorAll('.tabBtn').forEach(function(x){x.classList.remove('active')});document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active')});b.classList.add('active');var p=$(b.dataset.tab);if(p)p.classList.add('active')}})}
+$('downloadBackup').onclick=download;$('copySummary').onclick=summary;$('showPreview').onclick=preview;tabs();render();
+})();
+</script>
+</body>
+</html>
