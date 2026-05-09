@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Stream Bandit V5.40 Admin Centre TEST</title>
+<link rel="stylesheet" href="assets/stream-bandit.css">
+<link rel="stylesheet" href="assets/stream-bandit-v5-5-polish.css">
+<style>
+body{min-height:100vh;padding:28px;background:radial-gradient(circle at top left,rgba(124,60,255,.28),transparent 34%),radial-gradient(circle at bottom left,rgba(255,45,85,.18),transparent 38%),#050711;color:#f6f7ff;font-family:system-ui,Arial,sans-serif}.sb40Wrap{max-width:1180px;margin:0 auto}.sb40Hero,.sb40Panel{border:1px solid rgba(61,220,151,.25);border-radius:28px;background:linear-gradient(135deg,rgba(12,43,45,.88),rgba(18,18,39,.90));box-shadow:0 18px 60px rgba(0,0,0,.38);padding:24px;margin-bottom:18px}.sb40Badge{display:inline-flex;margin-bottom:10px;padding:7px 12px;border-radius:999px;background:rgba(34,211,166,.14);border:1px solid rgba(34,211,166,.34);font-weight:950;color:#baf7df}.sb40Hero h1{font-size:44px;margin:0 0 10px}.sb40Hero p,.sb40Panel p{color:#b9c0d8;font-size:18px;line-height:1.45}.sb40Btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}.sb40Btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:0;border-radius:999px;padding:13px 18px;background:rgba(65,70,103,.95);color:#fff;font-weight:950;box-shadow:0 12px 34px rgba(0,0,0,.25);cursor:pointer}.sb40Btn.primary{background:linear-gradient(135deg,#22d3a6,#7c3cff)}.sb40Tabs{position:sticky;top:0;z-index:5;display:flex;gap:10px;flex-wrap:wrap;margin:18px 0;padding:10px;border-radius:24px;background:rgba(5,7,17,.82);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08)}.sb40Tab{border:0;border-radius:999px;padding:11px 15px;background:rgba(65,70,103,.95);color:#fff;font-weight:950;cursor:pointer}.sb40Tab.active{background:linear-gradient(135deg,#ff2d85,#7c3cff)}.sb40Grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.sb40Card{border:1px solid rgba(255,255,255,.10);border-radius:20px;background:rgba(9,12,25,.72);padding:16px}.sb40Card h3{margin:0 0 8px}.sb40Card p{font-size:14px;margin:0 0 12px}.sb40Pane{display:none}.sb40Pane.active{display:block}.sb40Warn{border-color:rgba(255,191,60,.35);background:rgba(80,50,0,.22)}.sb40Safe{border-color:rgba(34,211,166,.35);background:rgba(0,70,52,.20)}.sb40Note{font-size:13px;color:#b9c0d8}.sb40Footer{text-align:center;color:#8f98b8;margin:28px 0}
+</style>
+</head>
+<body>
+<div class="sb40Wrap">
+  <section class="sb40Hero">
+    <span class="sb40Badge">V5.40 Admin Centre TEST</span>
+    <h1>🛠 Stream Bandit Admin Centre</h1>
+    <p>Standalone admin route map for Stream Bandit. This avoids the old in-app Admin scroll-tabs that jump to the wrong places. Nothing here saves, uploads, deletes or edits by itself.</p>
+    <div class="sb40Btns">
+      <a class="sb40Btn primary" href="./">← Back to Stream Bandit Home</a>
+      <a class="sb40Btn" href="tools-v5-24-1.html">Open Tools Centre</a>
+      <a class="sb40Btn" href="storage-v5-39.html">Open Storage Centre</a>
+    </div>
+  </section>
+
+  <nav class="sb40Tabs" aria-label="Admin Centre Tabs">
+    <button class="sb40Tab active" data-pane="overview">Overview</button>
+    <button class="sb40Tab" data-pane="movies">Movies / Rows</button>
+    <button class="sb40Tab" data-pane="media">Media / Mux</button>
+    <button class="sb40Tab" data-pane="review">Review / Submit</button>
+    <button class="sb40Tab" data-pane="safety">Safety</button>
+  </nav>
+
+  <section id="overview" class="sb40Pane active">
+    <div class="sb40Panel sb40Safe">
+      <h2>Stable admin direction</h2>
+      <p>Keep the live app stable. Use standalone centres for heavy tools, storage, backup and manager routes. The old in-app Admin page still works, but its top scroll-tabs are marked for replacement.</p>
+      <div class="sb40Grid">
+        <div class="sb40Card"><h3>Live Admin</h3><p>Use the live Admin page only when you need existing upload/edit controls.</p><a class="sb40Btn" href="./">Open live app</a></div>
+        <div class="sb40Card"><h3>Tools</h3><p>Quality tools and audits stay standalone to avoid app conflicts.</p><a class="sb40Btn" href="tools-v5-24-1.html">Open Tools</a></div>
+        <div class="sb40Card"><h3>Storage</h3><p>Backup, Storage Prep and Safety stay standalone for now.</p><a class="sb40Btn" href="storage-v5-39.html">Open Storage</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="movies" class="sb40Pane">
+    <div class="sb40Panel">
+      <h2>Movies / Rows</h2>
+      <p>Current movie adding and row editing still lives inside the main app Admin page. Plan 2 will later split this into proper standalone tab panels.</p>
+      <div class="sb40Grid">
+        <div class="sb40Card"><h3>Quick Supabase movie add</h3><p>Add title, description, stream URL, poster, genres and metadata from live Admin.</p><a class="sb40Btn" href="./">Open live Admin</a></div>
+        <div class="sb40Card"><h3>Supabase Movie Manager</h3><p>Existing row manager route. Use carefully until converted to standalone.</p><a class="sb40Btn" href="./">Open live app</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="media" class="sb40Pane">
+    <div class="sb40Panel">
+      <h2>Media / Mux</h2>
+      <p>Mux is the chosen video route. Supabase stores movie rows and images. Keep access tokens and secrets out of GitHub Pages.</p>
+      <div class="sb40Grid">
+        <div class="sb40Card"><h3>Mux Manager</h3><p>Build HLS URLs from public playback IDs and keep videos on Mux.</p><a class="sb40Btn" href="./">Open live Mux Manager route</a></div>
+        <div class="sb40Card"><h3>Upload Plan</h3><p>Current planning page for upload workflow and safe route reminders.</p><a class="sb40Btn" href="./">Open live app</a></div>
+        <div class="sb40Card"><h3>Images</h3><p>Posters/logos use Supabase Storage. Videos should use Mux/HLS links.</p><a class="sb40Btn" href="storage-v5-39.html">Open Storage Centre</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="review" class="sb40Pane">
+    <div class="sb40Panel">
+      <h2>Review / Submit</h2>
+      <p>Submission and review routes passed live testing. Later polish should add clearer Back to Home buttons and cleaner card layouts.</p>
+      <div class="sb40Grid">
+        <div class="sb40Card"><h3>Submit Video</h3><p>Public/user submission route. No write action unless you press submit.</p><a class="sb40Btn" href="./">Open live Submit route</a></div>
+        <div class="sb40Card"><h3>Review Queue</h3><p>Admin review queue for pending, approved and declined submissions.</p><a class="sb40Btn" href="./">Open live Review Queue</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="safety" class="sb40Pane">
+    <div class="sb40Panel sb40Warn">
+      <h2>Safety / Rules</h2>
+      <p>Safety and diagnostic pages passed, but destructive buttons should not be used unless we intentionally test them.</p>
+      <div class="sb40Grid">
+        <div class="sb40Card"><h3>Health Check</h3><p>Shows missing sources, local-only videos, pending review and health counters.</p><a class="sb40Btn" href="./">Open live Health Check</a></div>
+        <div class="sb40Card"><h3>Test Checklist</h3><p>Checklist page passed. Use for manual confirmation, not automatic fixes.</p><a class="sb40Btn" href="./">Open live app</a></div>
+        <div class="sb40Card"><h3>Rules</h3><p>Rules page has no buttons and passed testing.</p><a class="sb40Btn" href="./">Open live app</a></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="sb40Footer">V5.40 Admin Centre TEST — standalone planning/route page only. Live app unchanged.</p>
+</div>
+<script>
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.sb40Tab'));
+  var panes=[].slice.call(document.querySelectorAll('.sb40Pane'));
+  tabs.forEach(function(tab){tab.addEventListener('click',function(){
+    tabs.forEach(function(t){t.classList.remove('active')});
+    panes.forEach(function(p){p.classList.remove('active')});
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.pane).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  })});
+})();
+</script>
+</body>
+</html>
