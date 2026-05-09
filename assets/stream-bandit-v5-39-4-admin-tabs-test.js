@@ -1,0 +1,15 @@
+/* Stream Bandit V5.39.4 TEST — Admin Tab Scroll Fix
+   Test page only. Improves Admin tab scroll targets. No save/upload/delete/player changes. */
+(function(){
+'use strict';
+var VERSION='V5.39.4 Admin Tab Scroll Fix TEST';
+var OFFSET=110;
+function norm(s){return String(s||'').toLowerCase().replace(/\s+/g,' ').trim()}
+function main(){return document.querySelector('.main')||document.querySelector('main')||document.body}
+function adminPage(){var m=main();return norm(m.textContent).indexOf('quick supabase movie add')>-1&&!!Array.from(m.querySelectorAll('button')).find(function(b){return norm(b.textContent)==='overview'})}
+function findTarget(words){var m=main();var nodes=Array.from(m.querySelectorAll('h1,h2,h3,h4,b,strong,label,p,div,section'));for(var w=0;w<words.length;w++){var want=norm(words[w]);for(var i=0;i<nodes.length;i++){var t=norm(nodes[i].textContent);if(t&&t.length<700&&t.indexOf(want)>-1){return nodes[i].closest('.panel,section,article,div')||nodes[i]}}}return null}
+function target(label){var l=norm(label);if(l==='overview')return findTarget(['V5.11.8 stable checkpoint','Admin video route'])||main();if(l==='rows')return findTarget(['Quick Supabase movie add','Supabase movie rows']);if(l==='edit movie')return findTarget(['Quick Supabase movie add','Save movie to Supabase']);if(l==='media / mux')return findTarget(['Admin video route','Mux video manager','Video URL / Mux / HLS link']);if(l==='genres / tags')return findTarget(['Genres comma-separated','Choose genres','Selected:']);if(l==='cast & crew')return findTarget(['Cast & Crew','Director','Cast']);if(l==='safety')return findTarget(['Safety','Player is protected','safe local layer']);return null}
+function jump(el){if(!el)return;var y=el.getBoundingClientRect().top+window.scrollY-OFFSET;window.scrollTo({top:Math.max(0,y),behavior:'smooth'});try{el.style.outline='2px solid rgba(34,211,166,.7)';setTimeout(function(){el.style.outline=''},1400)}catch(e){}}
+function patch(){if(!adminPage())return;var m=main();if(m.dataset.sb5394==='1')return;var labels=['Overview','Rows','Edit Movie','Media / Mux','Genres / Tags','Cast & Crew','Safety'];Array.from(m.querySelectorAll('button')).forEach(function(b){var label=labels.find(function(x){return norm(x)===norm(b.textContent)});if(!label)return;b.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();setTimeout(function(){jump(target(label))},40)},true);});m.dataset.sb5394='1';var note=document.createElement('div');note.textContent=VERSION+' active.';note.style.cssText='margin:8px 0;padding:9px 12px;border-radius:14px;background:rgba(34,211,166,.12);border:1px solid rgba(34,211,166,.3);color:#baf7df;font-weight:850';var top=m.querySelector('.top')||m.firstElementChild;if(top&&top.parentNode)top.parentNode.insertBefore(note,top.nextSibling);console.log('[Stream Bandit]',VERSION+' patched');}
+document.addEventListener('click',function(){setTimeout(patch,150)},true);new MutationObserver(function(){setTimeout(patch,150)}).observe(document.documentElement,{childList:true,subtree:true});setInterval(patch,1500);setTimeout(patch,900);
+})();
