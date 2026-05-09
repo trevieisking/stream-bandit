@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Stream Bandit V5.41 Control Centre TEST</title>
+<link rel="stylesheet" href="assets/stream-bandit.css">
+<link rel="stylesheet" href="assets/stream-bandit-v5-5-polish.css">
+<style>
+body{min-height:100vh;margin:0;padding:28px;background:radial-gradient(circle at top left,rgba(34,211,166,.22),transparent 34%),radial-gradient(circle at top right,rgba(124,60,255,.25),transparent 38%),#050711;color:#f6f7ff;font-family:system-ui,Arial,sans-serif}.ccWrap{max-width:1180px;margin:0 auto}.ccHero,.ccPanel{border:1px solid rgba(255,255,255,.12);border-radius:30px;background:linear-gradient(135deg,rgba(9,18,30,.92),rgba(21,16,42,.92));box-shadow:0 20px 70px rgba(0,0,0,.42);padding:24px;margin-bottom:18px}.ccBadge{display:inline-flex;margin-bottom:10px;padding:7px 12px;border-radius:999px;background:rgba(34,211,166,.14);border:1px solid rgba(34,211,166,.34);font-weight:950;color:#baf7df}.ccHero h1{font-size:46px;margin:0 0 10px}.ccHero p,.ccPanel p{color:#b9c0d8;font-size:18px;line-height:1.45}.ccBtns{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}.ccBtn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:0;border-radius:999px;padding:13px 18px;background:rgba(65,70,103,.95);color:#fff;font-weight:950;box-shadow:0 12px 34px rgba(0,0,0,.25);cursor:pointer}.ccBtn.primary{background:linear-gradient(135deg,#22d3a6,#7c3cff)}.ccGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}.ccCard{border:1px solid rgba(255,255,255,.10);border-radius:22px;background:rgba(8,12,25,.76);padding:18px}.ccCard.good{border-color:rgba(34,211,166,.32);background:rgba(0,70,52,.18)}.ccCard.warn{border-color:rgba(255,191,60,.32);background:rgba(80,50,0,.18)}.ccCard h3{margin:0 0 8px}.ccCard p{font-size:14px;margin:0 0 13px}.ccList{display:grid;gap:9px}.ccList div{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:15px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}.ccFooter{text-align:center;color:#8f98b8;margin:28px 0}.ccMini{font-size:12px;color:#b9c0d8;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="ccWrap">
+  <section class="ccHero">
+    <span class="ccBadge">V5.41 Control Centre TEST</span>
+    <h1>🎛 Stream Bandit Control Centre</h1>
+    <p>One clean standalone route map for the heavy traffic areas. This keeps the live app stable while Admin, Storage, Tools and future Mux cleanup move into safer standalone centres.</p>
+    <div class="ccBtns">
+      <a class="ccBtn primary" href="./">← Back to Stream Bandit Home</a>
+      <a class="ccBtn" href="admin-centre-v5-40-test.html">Admin Centre</a>
+      <a class="ccBtn" href="storage-v5-39.html">Storage Centre</a>
+      <a class="ccBtn" href="tools-v5-24-1.html">Tools Centre</a>
+    </div>
+  </section>
+
+  <section class="ccPanel">
+    <h2>Clean Centres</h2>
+    <div class="ccGrid">
+      <div class="ccCard good"><h3>🛠 Admin Centre</h3><p>Standalone admin tabs passed. This is the correct replacement direction for the old in-app Admin scroll-tabs.</p><a class="ccBtn primary" href="admin-centre-v5-40-test.html">Open Admin Centre</a></div>
+      <div class="ccCard good"><h3>💾 Storage Centre</h3><p>Backup, Storage Prep and Safety live here safely instead of fighting the old in-app Backup/Safety route.</p><a class="ccBtn primary" href="storage-v5-39.html">Open Storage Centre</a></div>
+      <div class="ccCard good"><h3>🧰 Tools Centre</h3><p>Quality Tools and audits stay standalone to avoid live app conflicts.</p><a class="ccBtn primary" href="tools-v5-24-1.html">Open Tools Centre</a></div>
+      <div class="ccCard warn"><h3>🎞 Mux Centre</h3><p>Mux route currently opens from live and passed. A standalone Mux Centre can come later if that section becomes messy.</p><a class="ccBtn" href="./">Open live app</a></div>
+    </div>
+  </section>
+
+  <section class="ccPanel">
+    <h2>Plan 2 Status</h2>
+    <div class="ccList">
+      <div><b>Live stable checkpoint</b><span>V5.39.3</span></div>
+      <div><b>Admin Centre</b><span>V5.40.1 passed</span></div>
+      <div><b>Storage Centre</b><span>passed</span></div>
+      <div><b>Tools Centre</b><span>passed</span></div>
+      <div><b>Known live issue</b><span>sidebar scroll focus</span></div>
+      <div><b>Rule</b><span>test page first</span></div>
+    </div>
+  </section>
+
+  <section class="ccPanel">
+    <h2>Known Fix Queue</h2>
+    <div class="ccGrid">
+      <div class="ccCard"><h3>Sidebar menu focus</h3><p>Live menu opens pages but can focus/scroll to the menu area. Fix later on a separate menu-navigation test page.</p></div>
+      <div class="ccCard"><h3>Collections polish</h3><p>Collections passed, but one tab/route and Supabase Manager routing need cleanup.</p></div>
+      <div class="ccCard"><h3>Submit Back button</h3><p>Submit Video route passed, but needs a clearer Back to Home button.</p></div>
+      <div class="ccCard"><h3>Settings tabs</h3><p>Settings passed, but current buttons are scroll anchors, not true tab panels.</p></div>
+    </div>
+  </section>
+
+  <p class="ccFooter">V5.41 Control Centre TEST — standalone route map only. Live app unchanged.</p>
+</div>
+</body>
+</html>
