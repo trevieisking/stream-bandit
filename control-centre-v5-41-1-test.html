@@ -1,94 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Stream Bandit V5.41.2 Control Centre TEST</title>
-<link rel="stylesheet" href="assets/stream-bandit.css">
-<link rel="stylesheet" href="assets/stream-bandit-v5-5-polish.css">
-<style>
-:root{color-scheme:dark}*{box-sizing:border-box}body{min-height:100vh;margin:0;padding:26px;background:radial-gradient(circle at top left,rgba(34,211,166,.22),transparent 34%),radial-gradient(circle at top right,rgba(124,60,255,.25),transparent 38%),radial-gradient(circle at bottom left,rgba(255,45,133,.14),transparent 44%),#050711;color:#f6f7ff;font-family:Inter,system-ui,Arial,sans-serif}.ccWrap{max-width:1220px;margin:0 auto}.ccHero,.ccPanel{border:1px solid rgba(255,255,255,.12);border-radius:30px;background:linear-gradient(135deg,rgba(9,18,30,.94),rgba(21,16,42,.92));box-shadow:0 20px 70px rgba(0,0,0,.42);padding:24px;margin-bottom:18px}.ccHero{position:relative;overflow:hidden}.ccHero:before{content:"";position:absolute;inset:-60px -70px auto auto;width:260px;height:260px;border-radius:50%;background:rgba(34,211,166,.16);filter:blur(4px)}.ccBadge{display:inline-flex;margin-bottom:10px;padding:7px 12px;border-radius:999px;background:rgba(34,211,166,.14);border:1px solid rgba(34,211,166,.34);font-weight:950;color:#baf7df}.ccHero h1{font-size:clamp(34px,5vw,52px);margin:0 0 10px;letter-spacing:-.04em}.ccHero p,.ccPanel p{color:#b9c0d8;font-size:18px;line-height:1.45;max-width:900px}.ccBtns{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}.ccBtn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:0;border-radius:999px;padding:13px 18px;background:rgba(65,70,103,.95);color:#fff;font-weight:950;box-shadow:0 12px 34px rgba(0,0,0,.25);cursor:pointer;transition:transform .14s ease,filter .14s ease}.ccBtn:hover{transform:translateY(-1px);filter:brightness(1.08)}.ccBtn.primary{background:linear-gradient(135deg,#22d3a6,#7c3cff)}.ccBtn.hot{background:linear-gradient(135deg,#ff2d85,#7c3cff)}.ccGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:16px}.ccCard{border:1px solid rgba(255,255,255,.10);border-radius:22px;background:rgba(8,12,25,.76);padding:18px;min-height:190px;display:flex;flex-direction:column;justify-content:space-between}.ccCard.good{border-color:rgba(34,211,166,.32);background:rgba(0,70,52,.18)}.ccCard.warn{border-color:rgba(255,191,60,.32);background:rgba(80,50,0,.18)}.ccCard.info{border-color:rgba(124,60,255,.34);background:rgba(47,24,92,.22)}.ccCard h3{margin:0 0 8px;font-size:21px}.ccCard p{font-size:14px;margin:0 0 13px}.ccList{display:grid;gap:9px}.ccList div{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:15px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}.ccList span{color:#baf7df;font-weight:900;text-align:right}.ccFooter{text-align:center;color:#8f98b8;margin:28px 0}.ccMini{font-size:12px;color:#b9c0d8;margin-top:10px}.ccRule{padding:14px;border-radius:20px;background:rgba(34,211,166,.10);border:1px solid rgba(34,211,166,.28);color:#dfffee;font-weight:850;line-height:1.45}.ccRoute{display:flex;align-items:center;gap:12px}.ccRouteIcon{font-size:28px}.ccTopRow{display:grid;grid-template-columns:2fr 1fr;gap:16px}@media(max-width:800px){body{padding:16px}.ccTopRow{grid-template-columns:1fr}.ccHero,.ccPanel{padding:18px;border-radius:24px}.ccList div{display:block}.ccList span{display:block;margin-top:4px;text-align:left}}
-</style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Stream Bandit V5.41.3 Control Centre TEST</title>
+<link rel="stylesheet" href="assets/stream-bandit.css"><link rel="stylesheet" href="assets/stream-bandit-v5-5-polish.css">
+<style>:root{color-scheme:dark}*{box-sizing:border-box}body{min-height:100vh;margin:0;padding:26px;background:radial-gradient(circle at top left,rgba(34,211,166,.22),transparent 34%),radial-gradient(circle at top right,rgba(124,60,255,.25),transparent 38%),radial-gradient(circle at bottom left,rgba(255,45,133,.14),transparent 44%),#050711;color:#f6f7ff;font-family:Inter,system-ui,Arial,sans-serif}.ccWrap{max-width:1220px;margin:0 auto}.ccHero,.ccPanel{border:1px solid rgba(255,255,255,.12);border-radius:30px;background:linear-gradient(135deg,rgba(9,18,30,.94),rgba(21,16,42,.92));box-shadow:0 20px 70px rgba(0,0,0,.42);padding:24px;margin-bottom:18px}.ccBadge{display:inline-flex;margin-bottom:10px;padding:7px 12px;border-radius:999px;background:rgba(34,211,166,.14);border:1px solid rgba(34,211,166,.34);font-weight:950;color:#baf7df}.ccHero h1{font-size:clamp(34px,5vw,52px);margin:0 0 10px;letter-spacing:-.04em}.ccHero p,.ccPanel p{color:#b9c0d8;font-size:18px;line-height:1.45;max-width:900px}.ccBtns{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}.ccBtn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:0;border-radius:999px;padding:13px 18px;background:rgba(65,70,103,.95);color:#fff;font-weight:950;box-shadow:0 12px 34px rgba(0,0,0,.25);cursor:pointer}.ccBtn.primary{background:linear-gradient(135deg,#22d3a6,#7c3cff)}.ccBtn.hot{background:linear-gradient(135deg,#ff2d85,#7c3cff)}.ccGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:16px}.ccCard{border:1px solid rgba(255,255,255,.10);border-radius:22px;background:rgba(8,12,25,.76);padding:18px;min-height:190px;display:flex;flex-direction:column;justify-content:space-between}.ccCard.good{border-color:rgba(34,211,166,.32);background:rgba(0,70,52,.18)}.ccCard.warn{border-color:rgba(255,191,60,.32);background:rgba(80,50,0,.18)}.ccCard.info{border-color:rgba(124,60,255,.34);background:rgba(47,24,92,.22)}.ccCard h3{margin:0 0 8px;font-size:21px}.ccCard p{font-size:14px;margin:0 0 13px}.ccList{display:grid;gap:9px}.ccList div{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:15px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}.ccList span{color:#baf7df;font-weight:900;text-align:right}.ccRule{padding:14px;border-radius:20px;background:rgba(34,211,166,.10);border:1px solid rgba(34,211,166,.28);color:#dfffee;font-weight:850;line-height:1.45}.ccRoute{display:flex;align-items:center;gap:12px}.ccRouteIcon{font-size:28px}.ccTopRow{display:grid;grid-template-columns:2fr 1fr;gap:16px}.ccFooter{text-align:center;color:#8f98b8;margin:28px 0}@media(max-width:800px){body{padding:16px}.ccTopRow{grid-template-columns:1fr}.ccHero,.ccPanel{padding:18px;border-radius:24px}.ccList div{display:block}.ccList span{display:block;margin-top:4px;text-align:left}}</style>
 </head>
-<body>
-<div class="ccWrap">
-  <section class="ccHero">
-    <span class="ccBadge">V5.41.2 Control Centre TEST</span>
-    <h1>🎛 Stream Bandit Control Centre</h1>
-    <p>Clean route map for the heavy traffic areas. This page now points to the latest polished Admin, Storage and Tools centres while the live app stays stable.</p>
-    <div class="ccBtns">
-      <a class="ccBtn primary" href="./">← Back to Stream Bandit Home</a>
-      <a class="ccBtn hot" href="admin-centre-v5-40-3-test.html">Open Admin Centre</a>
-      <a class="ccBtn" href="storage-centre-v5-39-1-test.html">Open Storage Centre</a>
-      <a class="ccBtn" href="tools-centre-v5-24-2-test.html">Open Tools Centre</a>
-    </div>
-  </section>
-
-  <section class="ccPanel">
-    <div class="ccTopRow">
-      <div>
-        <h2>Current safe route</h2>
-        <p>We are not fighting the old live sidebar yet. We are building safe standalone centres first, then we will rebuild navigation cleanly on a test page.</p>
-        <div class="ccRule">Project rule: stabilise first, move heavy areas into standalone centres, then rebuild the menu and polish pages one at a time.</div>
-      </div>
-      <div class="ccList">
-        <div><b>Live baseline</b><span>V5.39.3 stable</span></div>
-        <div><b>Control Centre</b><span>V5.41.2 test</span></div>
-        <div><b>Admin Centre</b><span>V5.40.3 passed</span></div>
-        <div><b>Storage Centre</b><span>V5.39.1 passed</span></div>
-        <div><b>Tools Centre</b><span>V5.24.2 passed</span></div>
-        <div><b>Live changed?</b><span>No</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="ccPanel">
-    <h2>Clean Centres</h2>
-    <div class="ccGrid">
-      <div class="ccCard good">
-        <div><h3 class="ccRoute"><span class="ccRouteIcon">🛠</span><span>Admin Centre</span></h3><p>Latest clash-proof Admin route hub. Replaces the old in-app Admin scroll-tabs direction.</p></div>
-        <a class="ccBtn primary" href="admin-centre-v5-40-3-test.html">Open Admin Centre</a>
-      </div>
-      <div class="ccCard good">
-        <div><h3 class="ccRoute"><span class="ccRouteIcon">💾</span><span>Storage Centre</span></h3><p>Polished backup, Storage Prep and Safety centre. Keeps Lite Backup safe and standalone.</p></div>
-        <a class="ccBtn primary" href="storage-centre-v5-39-1-test.html">Open Storage Centre</a>
-      </div>
-      <div class="ccCard good">
-        <div><h3 class="ccRoute"><span class="ccRouteIcon">🧰</span><span>Tools Centre</span></h3><p>Polished route hub for Quality Tools, audits and the existing Mux/HLS helper.</p></div>
-        <a class="ccBtn primary" href="tools-centre-v5-24-2-test.html">Open Tools Centre</a>
-      </div>
-      <div class="ccCard warn">
-        <div><h3 class="ccRoute"><span class="ccRouteIcon">🎞</span><span>Mux / HLS Helper</span></h3><p>Mux helper already exists inside Tools Centre, so no separate Mux Centre is urgent yet.</p></div>
-        <a class="ccBtn" href="tools-v5-24-1.html#mux">Open Mux Helper</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="ccPanel">
-    <h2>Known Fix Queue</h2>
-    <div class="ccGrid">
-      <div class="ccCard info"><h3>Sidebar menu focus</h3><p>Live menu opens pages but can jump to the top/menu area. Direct live patch was rolled back. Future fix needs a deeper menu rebuild test.</p></div>
-      <div class="ccCard info"><h3>Old Admin tabs</h3><p>Old in-app Admin tabs scroll wrong. Standalone Admin Centre is the safer replacement path.</p></div>
-      <div class="ccCard info"><h3>Collections polish</h3><p>Collections passed, but one tab/route and Supabase Manager routing need cleanup later.</p></div>
-      <div class="ccCard info"><h3>Submit Back button</h3><p>Submit Video route passed, but needs a clearer Back to Home button in Plan 2 polish.</p></div>
-      <div class="ccCard info"><h3>Settings tabs</h3><p>Settings passed, but current buttons are scroll anchors rather than true tab panels.</p></div>
-      <div class="ccCard info"><h3>Player recovery speed</h3><p>Player recovers from buffer starvation but can be slow. Do not patch HLS internals directly.</p></div>
-    </div>
-  </section>
-
-  <section class="ccPanel">
-    <h2>Next build order</h2>
-    <div class="ccList">
-      <div><b>1</b><span>Test this updated Control Centre</span></div>
-      <div><b>2</b><span>Begin menu rebuild test page</span></div>
-      <div><b>3</b><span>Add Control Centre safely to navigation test</span></div>
-      <div><b>4</b><span>Polish Collections route</span></div>
-      <div><b>5</b><span>Polish Submit Back button</span></div>
-      <div><b>6</b><span>Page-by-page polish</span></div>
-    </div>
-  </section>
-
-  <p class="ccFooter">V5.41.2 Control Centre TEST — points to latest polished centres. Live app unchanged.</p>
-</div>
-</body>
-</html>
+<body><div class="ccWrap">
+<section class="ccHero"><span class="ccBadge">V5.41.3 Control Centre TEST</span><h1>🎛 Stream Bandit Control Centre</h1><p>Clean Plan 3 route map. It now includes the first passed user-facing standalone page: Library V5.43.1 with 1920 × 1080 / 16:9 artwork.</p><div class="ccBtns"><a class="ccBtn primary" href="./">← Back to Stream Bandit Home</a><a class="ccBtn hot" href="library-standalone-v5-43-1-test.html">Open Standalone Library</a><a class="ccBtn" href="admin-centre-v5-40-3-test.html">Admin Centre</a><a class="ccBtn" href="storage-centre-v5-39-1-test.html">Storage Centre</a><a class="ccBtn" href="tools-centre-v5-24-2-test.html">Tools Centre</a></div></section>
+<section class="ccPanel"><div class="ccTopRow"><div><h2>Current safe route</h2><p>We are no longer trying to fix the old sidebar directly. We are building standalone pages first, then a new menu shell will link to tested pages.</p><div class="ccRule">Project rule: standalone page → test → link into Control Centre → build new menu later.</div></div><div class="ccList"><div><b>Live baseline</b><span>V5.39.3 stable</span></div><div><b>Control Centre</b><span>V5.41.3 test</span></div><div><b>Standalone Library</b><span>V5.43.1 passed</span></div><div><b>Admin Centre</b><span>V5.40.3 passed</span></div><div><b>Storage Centre</b><span>V5.39.1 passed</span></div><div><b>Tools Centre</b><span>V5.24.2 passed</span></div><div><b>Live changed?</b><span>No</span></div></div></div></section>
+<section class="ccPanel"><h2>User-facing standalone pages</h2><div class="ccGrid"><div class="ccCard good"><div><h3 class="ccRoute"><span class="ccRouteIcon">🎬</span><span>Standalone Library</span></h3><p>Passed read-only Supabase Library with 16:9 1920 × 1080 artwork, search, genre filter and sort.</p></div><a class="ccBtn primary" href="library-standalone-v5-43-1-test.html">Open Library</a></div><div class="ccCard info"><div><h3 class="ccRoute"><span class="ccRouteIcon">🏠</span><span>Standalone Home</span></h3><p>Next page to build and test. It will read Supabase and point into standalone Library/Details later.</p></div><a class="ccBtn" href="#next">Next build</a></div><div class="ccCard info"><div><h3 class="ccRoute"><span class="ccRouteIcon">🎥</span><span>Details / Watch</span></h3><p>Future standalone pages. Player/accessibility will be protected before any Watch page replacement.</p></div><a class="ccBtn" href="#next">Later</a></div></div></section>
+<section class="ccPanel"><h2>Clean Centres</h2><div class="ccGrid"><div class="ccCard good"><div><h3 class="ccRoute"><span class="ccRouteIcon">🛠</span><span>Admin Centre</span></h3><p>Latest clash-proof Admin route hub.</p></div><a class="ccBtn primary" href="admin-centre-v5-40-3-test.html">Open Admin</a></div><div class="ccCard good"><div><h3 class="ccRoute"><span class="ccRouteIcon">💾</span><span>Storage Centre</span></h3><p>Polished backup, Storage Prep and Safety centre.</p></div><a class="ccBtn primary" href="storage-centre-v5-39-1-test.html">Open Storage</a></div><div class="ccCard good"><div><h3 class="ccRoute"><span class="ccRouteIcon">🧰</span><span>Tools Centre</span></h3><p>Quality Tools, audits and Mux/HLS helper route hub.</p></div><a class="ccBtn primary" href="tools-centre-v5-24-2-test.html">Open Tools</a></div><div class="ccCard warn"><div><h3 class="ccRoute"><span class="ccRouteIcon">🎞</span><span>Mux / HLS Helper</span></h3><p>Mux helper already exists inside Tools.</p></div><a class="ccBtn" href="tools-v5-24-1.html#mux">Open Mux Helper</a></div></div></section>
+<section class="ccPanel" id="next"><h2>Next build order</h2><div class="ccList"><div><b>1</b><span>Test updated Control Centre</span></div><div><b>2</b><span>Build Standalone Home V5.44</span></div><div><b>3</b><span>Build Details page</span></div><div><b>4</b><span>Build Watch / Player page</span></div><div><b>5</b><span>Build new menu shell</span></div></div></section>
+<p class="ccFooter">V5.41.3 Control Centre TEST — Plan 3 standalone route map. Live app unchanged.</p>
+</div></body></html>
