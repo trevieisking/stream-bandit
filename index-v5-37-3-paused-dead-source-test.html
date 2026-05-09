@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Stream Bandit V5.37.5 Fast Report Bubble Dead Source TEST</title>
+<title>Stream Bandit V5.37.6 Persistent Dead Source TEST</title>
 <link rel="stylesheet" href="assets/stream-bandit.css">
 <link rel="stylesheet" href="assets/stream-bandit-v5-5-polish.css">
 </head>
@@ -39,7 +39,8 @@ var scripts=[
 'assets/stream-bandit-v5-31-playlists-tidy.js?v=5.31',
 'assets/stream-bandit-v5-34-about-page.js?v=5.34.1-about-live',
 'assets/stream-bandit-v5-37-3-paused-dead-source-test.js?v=5.37.3-test',
-'assets/stream-bandit-v5-37-4-report-paused-logs-supplement-test.js?v=5.37.4-test'
+'assets/stream-bandit-v5-37-4-report-paused-logs-supplement-test.js?v=5.37.4-test',
+'assets/stream-bandit-v5-37-6-persistent-dead-source-test.js?v=5.37.6-test'
 ];
 function load(i){if(i>=scripts.length)return;var s=document.createElement('script');s.src=scripts[i];s.onload=function(){load(i+1);};s.onerror=function(){console.error('Failed to load',scripts[i]);load(i+1);};document.body.appendChild(s);}load(0);
 })();
