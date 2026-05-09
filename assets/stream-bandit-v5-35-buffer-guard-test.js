@@ -1,10 +1,10 @@
-/* Stream Bandit V5.35.3 — Buffer Guard + Separate Monitor TEST
+/* Stream Bandit V5.35.4 — Buffer Guard TEST
    Test-only HLS/player stability patch.
-   The separate monitor window survives Supabase login/app redraw better than an in-page panel.
+   Fixes V5.35.3 crash by preserving Hls.Events / Hls.ErrorTypes through a Proxy.
    No player design change, no button change, no source URL change, no Supabase writes. */
 (function(){
 'use strict';
-var VERSION='V5.35.3 Buffer Guard Monitor TEST';
+var VERSION='V5.35.4 Buffer Guard TEST';
 var OriginalHls=window.Hls;
 var hlsInstances=[];
 var log=[];
@@ -15,9 +15,45 @@ var stalledSince=0;
 function now(){return new Date().toLocaleTimeString();}
 function saveLog(){try{localStorage.setItem('sb535_buffer_log',JSON.stringify(log.slice(0,30)));}catch(e){}}
 function add(msg){log.unshift(now()+' — '+msg);log=log.slice(0,30);saveLog();paint();try{console.log('[Stream Bandit Buffer Guard]',msg);}catch(e){}}
-function extend(to,from){Object.keys(from).forEach(function(k){try{to[k]=from[k];}catch(e){}});return to;}
+function extend(to,from){Object.keys(from||{}).forEach(function(k){try{to[k]=from[k];}catch(e){}});return to;}
 function safeConfig(config){return extend({enableWorker:true,lowLatencyMode:false,backBufferLength:90,maxBufferLength:120,maxMaxBufferLength:300,startFragPrefetch:true,manifestLoadingTimeOut:20000,manifestLoadingMaxRetry:8,manifestLoadingRetryDelay:800,manifestLoadingMaxRetryTimeout:12000,levelLoadingTimeOut:20000,levelLoadingMaxRetry:8,levelLoadingRetryDelay:800,fragLoadingTimeOut:30000,fragLoadingMaxRetry:10,fragLoadingRetryDelay:800,fragLoadingMaxRetryTimeout:16000},config||{});}
-function patchHls(){if(!OriginalHls||OriginalHls.__sb535Patched){add('HLS patch skipped: Hls missing or already patched.');return false;}function StreamBanditHls(config){var hls=new OriginalHls(safeConfig(config));hlsInstances.push(hls);add('HLS created with safer long-buffer settings.');try{if(OriginalHls.Events&&OriginalHls.Events.ERROR){hls.on(OriginalHls.Events.ERROR,function(ev,data){var type=data&&data.type||'unknown';var details=data&&data.details||'unknown';var fatal=!!(data&&data.fatal);add('HLS '+(fatal?'fatal ':'')+'error: '+type+' / '+details);if(fatal){try{if(type===OriginalHls.ErrorTypes.MEDIA_ERROR){hls.recoverMediaError();add('HLS media recovery attempted.');}else{hls.startLoad();add('HLS startLoad recovery attempted.');}}catch(e){add('HLS recovery failed: '+(e&&e.message?e.message:e));}}});}}catch(e){}return hls;}try{Object.keys(OriginalHls).forEach(function(k){StreamBanditHls[k]=OriginalHls[k];});}catch(e){}StreamBanditHls.prototype=OriginalHls.prototype;StreamBanditHls.__sb535Patched=true;window.Hls=StreamBanditHls;add('HLS constructor patched before player setup.');return true;}
+function patchHls(){
+  if(!OriginalHls||OriginalHls.__sb535Patched){add('HLS patch skipped: Hls missing or already patched.');return false;}
+  try{
+    var ProxiedHls=new Proxy(OriginalHls,{
+      construct:function(target,args){
+        args=args||[];
+        args[0]=safeConfig(args[0]||{});
+        var hls=new target(args[0]);
+        hlsInstances.push(hls);
+        add('HLS created with safer long-buffer settings.');
+        try{
+          if(target.Events&&target.Events.ERROR){
+            hls.on(target.Events.ERROR,function(ev,data){
+              var type=data&&data.type||'unknown';
+              var details=data&&data.details||'unknown';
+              var fatal=!!(data&&data.fatal);
+              add('HLS '+(fatal?'fatal ':'')+'error: '+type+' / '+details);
+              if(fatal){
+                try{
+                  if(type===target.ErrorTypes.MEDIA_ERROR){hls.recoverMediaError();add('HLS media recovery attempted.');}
+                  else{hls.startLoad();add('HLS startLoad recovery attempted.');}
+                }catch(e){add('HLS recovery failed: '+(e&&e.message?e.message:e));}
+              }
+            });
+          }
+        }catch(e){}
+        return hls;
+      },
+      get:function(target,prop,receiver){return Reflect.get(target,prop,receiver);},
+      set:function(target,prop,value,receiver){return Reflect.set(target,prop,value,receiver);}
+    });
+    ProxiedHls.__sb535Patched=true;
+    window.Hls=ProxiedHls;
+    add('HLS Proxy patched. Static events preserved: '+(!!(window.Hls&&window.Hls.Events&&window.Hls.Events.MANIFEST_PARSED)));
+    return true;
+  }catch(e){add('HLS Proxy patch failed: '+(e&&e.message?e.message:e));return false;}
+}
 function visibleVideo(){var vids=Array.prototype.slice.call(document.querySelectorAll('video'));return vids.filter(function(v){return v&&v.offsetParent!==null;})[0]||vids[0]||null;}
 function bufferAhead(v){try{for(var i=0;i<v.buffered.length;i++){if(v.currentTime>=v.buffered.start(i)&&v.currentTime<=v.buffered.end(i))return Math.max(0,v.buffered.end(i)-v.currentTime);}}catch(e){}return 0;}
 function ensureVideo(v){if(!v||v.dataset.sb535Bound)return;v.dataset.sb535Bound='1';v.preload='auto';try{v.setAttribute('preload','auto');v.setAttribute('playsinline','playsinline');}catch(e){}['waiting','stalled','suspend','emptied'].forEach(function(ev){v.addEventListener(ev,function(){stalledSince=Date.now();add('Video '+ev+' at '+Math.round(v.currentTime)+'s, buffer ahead '+Math.round(bufferAhead(v))+'s.');paint();});});['playing','canplay','canplaythrough','progress'].forEach(function(ev){v.addEventListener(ev,function(){if(ev==='playing'){stalledSince=0;add('Video playing. Buffer ahead '+Math.round(bufferAhead(v))+'s.');}paint();});});v.addEventListener('timeupdate',function(){if(!v.paused&&!v.ended&&v.currentTime>lastGoodTime+0.2){lastGoodTime=v.currentTime;lastGoodStamp=Date.now();}});v.addEventListener('error',function(){add('Video element error code '+(v.error&&v.error.code||'unknown'));});add('Video guard attached.');}
