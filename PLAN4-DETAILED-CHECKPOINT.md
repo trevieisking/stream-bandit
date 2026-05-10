@@ -1,14 +1,14 @@
 # Stream Bandit Plan 4 Detailed Checkpoint
 
-Status after Supabase Library audit passed.
+Status at the end of tonight's work: Genres passed after the V5.57.3 button fix.
 
 ## Current state
 
 Plan 4 is a link + layout audit. Nothing is promoted live yet.
 
-Passed: 9 / 32.
+Passed: 10 / 32.
 
-Current next page: Genres.
+Current next page: Watch History.
 
 Live promotion: No. Do not edit live index.html until the release candidate passes and Trevor explicitly says promote live.
 
@@ -23,36 +23,36 @@ Live promotion: No. Do not edit live index.html until the release candidate pass
 7. Favourites — passed.
 8. Liked — passed.
 9. Supabase Library — passed.
+10. Genres — passed after V5.57.3. Open Genre and Filter Movies intentionally use the same safe in-page filter behaviour for this audit.
 
 ## Next audit order
 
-Next page: Genres.
+Next page: Watch History.
 
 Then continue in this order:
 
-1. Genres
-2. Watch History
-3. Channels
-4. Collections
-5. Playlists
-6. My Channel
-7. Supabase Manager
-8. Supabase Test
-9. Live Readiness
-10. Supabase Migration
-11. Mux Manager
-12. Upload Plan
-13. Local Storage
-14. Storage Prep
-15. Backup / Safety
-16. Tools Page
-17. Submit Video
-18. Rules
-19. Review Queue
-20. Health Check
-21. Test Checklist
-22. Admin
-23. Settings
+1. Watch History
+2. Channels
+3. Collections
+4. Playlists
+5. My Channel
+6. Supabase Manager
+7. Supabase Test
+8. Live Readiness
+9. Supabase Migration
+10. Mux Manager
+11. Upload Plan
+12. Local Storage
+13. Storage Prep
+14. Backup / Safety
+15. Tools Page
+16. Submit Video
+17. Rules
+18. Review Queue
+19. Health Check
+20. Test Checklist
+21. Admin
+22. Settings
 
 ## Locked Plan 4 rules
 
@@ -109,3 +109,7 @@ Fix missing 1920 x 1080 images after page logic passes. Keep image fixes separat
 6. Artwork cleanup.
 7. Release candidate test file.
 8. Promote live only after Trevor says all RC checks passed and says promote live.
+
+## Restart note for tomorrow
+
+Start with Watch History Plan 4 Link + Layout Audit. Do not promote live. Keep the page read-only and test-only.
