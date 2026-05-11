@@ -1,6 +1,6 @@
 # Stream Bandit Plan 4 Detailed Checkpoint
 
-Status after Collections V5.59.4 passed.
+Status after Collections V5.59.4 passed and Playlists V5.60.3 retest started.
 
 ## Current state
 
@@ -38,6 +38,11 @@ Live promotion: No. Do not edit live index.html until the release candidate pass
 - Channels current audit page does what it promised, but final channel behaviour must restore live-app controls: Open Channel and Play All.
 - Collections passed after removing fake Library previews and fixing layout.
 - Trailer buttons should not open external YouTube/IMDb directly from collection/channel/playlist cards in the final app. Trailers should open from the Details page/player flow.
+- Supabase screenshot for Playlists shows key tables: sb_playlists, sb_playlist_movies and sb_movies. V5.60.3 already checks sb_playlist_movies first. If the 3 titles still do not show, inspect sb_playlist_movies column names and mapping values next.
+
+## Playlists current retest note
+
+Playlists is not passed yet until the test playlist shows its expected 3 titles. V5.60.3 checks playlist item/link tables first, including sb_playlist_movies, and should show Link rows in the page summary if the table is readable.
 
 ## Queue / playback navigation requirement for later
 
@@ -47,6 +52,7 @@ Trevor confirmed this live-app behaviour must be restored later, not necessarily
 - Channel cards need Play All.
 - Collection cards need Open Collection.
 - Collection cards need Play All.
+- Playlist pages need Open Playlist.
 - Playlist pages need Play All / queue behaviour.
 - Watchlist pages need queue-style playback behaviour where appropriate.
 - Channel / Collection / Playlist / Watchlist queued playback should show Next and Previous.
@@ -143,7 +149,7 @@ Fix missing 1920 x 1080 images after page logic passes. Keep image fixes separat
 4. Shell smoke test, including global search.
 5. Core playback smoke test.
 6. Safe action wiring.
-7. Queue/player route wiring for Open Channel, Open Collection, Play All, queued Next/Previous and single-title no Next/Previous.
+7. Queue/player route wiring for Open Channel, Open Collection, Open Playlist, Play All, queued Next/Previous and single-title no Next/Previous.
 8. Trailer routing through Details page/player flow.
 9. Artwork cleanup.
 10. Release candidate test file.
@@ -151,4 +157,4 @@ Fix missing 1920 x 1080 images after page logic passes. Keep image fixes separat
 
 ## Restart note
 
-Continue with Playlists Plan 4 Link + Layout Audit. Do not promote live. Keep the page read-only and test-only.
+Continue Playlists V5.60.3 retest. Do not mark passed until the expected 3 playlist titles show, or until sb_playlist_movies mapping columns are inspected and fixed. Do not promote live.
