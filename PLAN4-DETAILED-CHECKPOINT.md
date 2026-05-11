@@ -1,16 +1,16 @@
 # Stream Bandit Plan 4 Detailed Checkpoint
 
-Status after Collections V5.59.4 passed and Playlists V5.60.3 retest started.
+Status after Playlists V5.60.4 passed.
 
 ## Current state
 
 Plan 4 is a link + layout audit. Nothing is promoted live yet.
 
-Passed functionally: 13 / 32.
+Passed functionally: 14 / 32.
 
-Clean layout pass: 12 / 32, because Genres works but needs Tools Page-style layout polish before RC.
+Clean layout pass: 13 / 32, because Genres works but needs Tools Page-style layout polish before RC.
 
-Current next page: Playlists.
+Current next page: My Channel.
 
 Live promotion: No. Do not edit live index.html until the release candidate passes and Trevor explicitly says promote live.
 
@@ -27,8 +27,9 @@ Live promotion: No. Do not edit live index.html until the release candidate pass
 9. Supabase Library — passed.
 10. Genres — functional pass after V5.57.3. Open Genre and Filter Movies intentionally use the same safe in-page filter behaviour for this audit. Important: Trevor flagged that the page no longer visually matches the Tools Page-style layout well enough. Mark as layout polish needed before release candidate.
 11. Watch History — passed as safe read-only audit. Screenshots show 0 matched history/progress rows and Read Audit rows for inspected local/browser keys. This is a valid safe empty-state/read-audit pass.
-12. Channels — passed for the current read-only Plan 4 link/layout audit. Important: Trevor noted the final/live behaviour must restore Open Channel and Play All on channel cards.
-13. Collections — passed after V5.59.4 layout fix. Scream Collection now shows Scream 7 only when matched, no fake Library preview rows. Important: final/live behaviour should restore Open Collection and Play All.
+12. Channels — passed for the current read-only Plan 4 link/layout audit. Important: final/live behaviour must restore Open Channel and Play All on channel cards.
+13. Collections — passed after V5.59.4 layout fix. Scream Collection shows Scream 7 only when matched, no fake Library preview rows. Important: final/live behaviour should restore Open Collection and Play All.
+14. Playlists — passed after V5.60.4. The test playlist starts closed, Open Playlist reveals the 3 real matched titles from sb_playlist_movies, and no fake Library preview rows are shown.
 
 ## Current notes from Trevor screenshots and review
 
@@ -36,13 +37,20 @@ Live promotion: No. Do not edit live index.html until the release candidate pass
 - Genres page works but must be visually polished back toward Tools Page-style layout before RC.
 - Watch History Read Audit is acceptable: it inspected local/browser keys and found no current history/progress data in this browser.
 - Channels current audit page does what it promised, but final channel behaviour must restore live-app controls: Open Channel and Play All.
-- Collections passed after removing fake Library previews and fixing layout.
+- Collections passed after removing fake Library previews and fixing layout, but Trevor noted it needs the same exact starts-closed / open-reveals-real-items behaviour later.
+- Library also needs this exact safe open/filter review later: no fake rows, no random titles in real groups, and open/filter controls should visibly do something useful.
 - Trailer buttons should not open external YouTube/IMDb directly from collection/channel/playlist cards in the final app. Trailers should open from the Details page/player flow.
-- Supabase screenshot for Playlists shows key tables: sb_playlists, sb_playlist_movies and sb_movies. V5.60.3 already checks sb_playlist_movies first. If the 3 titles still do not show, inspect sb_playlist_movies column names and mapping values next.
+- Supabase screenshot for Playlists showed key tables: sb_playlists, sb_playlist_movies and sb_movies. V5.60.4 successfully mapped the 3 titles from sb_playlist_movies.
 
-## Playlists current retest note
+## Open-state / real-items cleanup requirement for later
 
-Playlists is not passed yet until the test playlist shows its expected 3 titles. V5.60.3 checks playlist item/link tables first, including sb_playlist_movies, and should show Link rows in the page summary if the table is readable.
+Trevor confirmed this needs to be applied later where relevant:
+
+- Collection cards/pages should start closed where an Open Collection button exists.
+- Open Collection should reveal only real matched collection titles.
+- Library groups/filters should be reviewed for the same safe behaviour: no fake rows, no random titles inside real groups, and buttons must visibly change/open/filter something.
+- Playlist cards/pages now have the correct model: start closed, Open Playlist reveals real matched titles only.
+- Do not use fake Library preview rows inside a real Collection or Playlist.
 
 ## Queue / playback navigation requirement for later
 
@@ -67,29 +75,28 @@ Trevor confirmed this live-app behaviour must be restored later, not necessarily
 
 ## Next audit order
 
-Next page: Playlists.
+Next page: My Channel.
 
 Then continue in this order:
 
-1. Playlists
-2. My Channel
-3. Supabase Manager
-4. Supabase Test
-5. Live Readiness
-6. Supabase Migration
-7. Mux Manager
-8. Upload Plan
-9. Local Storage
-10. Storage Prep
-11. Backup / Safety
-12. Tools Page
-13. Submit Video
-14. Rules
-15. Review Queue
-16. Health Check
-17. Test Checklist
-18. Admin
-19. Settings
+1. My Channel
+2. Supabase Manager
+3. Supabase Test
+4. Live Readiness
+5. Supabase Migration
+6. Mux Manager
+7. Upload Plan
+8. Local Storage
+9. Storage Prep
+10. Backup / Safety
+11. Tools Page
+12. Submit Video
+13. Rules
+14. Review Queue
+15. Health Check
+16. Test Checklist
+17. Admin
+18. Settings
 
 ## Locked Plan 4 rules
 
@@ -140,6 +147,7 @@ Fix missing 1920 x 1080 images after page logic passes. Keep image fixes separat
 
 - Genres needs visual layout polish to match the Tools Page-style layout again.
 - Consider making PLAN4-DETAILED-CHECKPOINT.md into a styled HTML checkpoint page, because the Markdown page looks like plain text when opened from GitHub Pages.
+- Collections and Library need later open-state / real-items cleanup based on the V5.60.4 Playlist model.
 
 ## Final phase order
 
@@ -149,12 +157,13 @@ Fix missing 1920 x 1080 images after page logic passes. Keep image fixes separat
 4. Shell smoke test, including global search.
 5. Core playback smoke test.
 6. Safe action wiring.
-7. Queue/player route wiring for Open Channel, Open Collection, Open Playlist, Play All, queued Next/Previous and single-title no Next/Previous.
-8. Trailer routing through Details page/player flow.
-9. Artwork cleanup.
-10. Release candidate test file.
-11. Promote live only after Trevor says all RC checks passed and says promote live.
+7. Open-state / real-items cleanup for Collections and Library using the V5.60.4 Playlist model.
+8. Queue/player route wiring for Open Channel, Open Collection, Open Playlist, Play All, queued Next/Previous and single-title no Next/Previous.
+9. Trailer routing through Details page/player flow.
+10. Artwork cleanup.
+11. Release candidate test file.
+12. Promote live only after Trevor says all RC checks passed and says promote live.
 
 ## Restart note
 
-Continue Playlists V5.60.3 retest. Do not mark passed until the expected 3 playlist titles show, or until sb_playlist_movies mapping columns are inspected and fixed. Do not promote live.
+Continue with My Channel Plan 4 Link + Layout Audit. Do not promote live. Keep the page read-only and test-only.
