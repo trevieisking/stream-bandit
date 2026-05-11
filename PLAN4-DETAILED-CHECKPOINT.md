@@ -1,16 +1,16 @@
 # Stream Bandit Plan 4 Detailed Checkpoint
 
-Status after Channels audit review and Trevor's channel / collection playback note.
+Status after Collections V5.59.4 passed.
 
 ## Current state
 
 Plan 4 is a link + layout audit. Nothing is promoted live yet.
 
-Passed functionally: 12 / 32.
+Passed functionally: 13 / 32.
 
-Clean layout pass: 11 / 32, because Genres works but needs Tools Page-style layout polish before RC.
+Clean layout pass: 12 / 32, because Genres works but needs Tools Page-style layout polish before RC.
 
-Current next page: Collections.
+Current next page: Playlists.
 
 Live promotion: No. Do not edit live index.html until the release candidate passes and Trevor explicitly says promote live.
 
@@ -28,6 +28,7 @@ Live promotion: No. Do not edit live index.html until the release candidate pass
 10. Genres — functional pass after V5.57.3. Open Genre and Filter Movies intentionally use the same safe in-page filter behaviour for this audit. Important: Trevor flagged that the page no longer visually matches the Tools Page-style layout well enough. Mark as layout polish needed before release candidate.
 11. Watch History — passed as safe read-only audit. Screenshots show 0 matched history/progress rows and Read Audit rows for inspected local/browser keys. This is a valid safe empty-state/read-audit pass.
 12. Channels — passed for the current read-only Plan 4 link/layout audit. Important: Trevor noted the final/live behaviour must restore Open Channel and Play All on channel cards.
+13. Collections — passed after V5.59.4 layout fix. Scream Collection now shows Scream 7 only when matched, no fake Library preview rows. Important: final/live behaviour should restore Open Collection and Play All.
 
 ## Current notes from Trevor screenshots and review
 
@@ -35,7 +36,8 @@ Live promotion: No. Do not edit live index.html until the release candidate pass
 - Genres page works but must be visually polished back toward Tools Page-style layout before RC.
 - Watch History Read Audit is acceptable: it inspected local/browser keys and found no current history/progress data in this browser.
 - Channels current audit page does what it promised, but final channel behaviour must restore live-app controls: Open Channel and Play All.
-- Collections likely need the same final/live behaviour: Open Collection and Play All.
+- Collections passed after removing fake Library previews and fixing layout.
+- Trailer buttons should not open external YouTube/IMDb directly from collection/channel/playlist cards in the final app. Trailers should open from the Details page/player flow.
 
 ## Queue / playback navigation requirement for later
 
@@ -51,32 +53,37 @@ Trevor confirmed this live-app behaviour must be restored later, not necessarily
 - Single-title playback should not show Next and Previous.
 - This belongs in later safe route/player/queue wiring, after link/layout audits or when the relevant page intentionally receives action/route wiring.
 
+## Trailer routing requirement for later
+
+- Trailer access should route through the Details page/player flow.
+- Avoid sending users straight out to YouTube/IMDb from cards on Collections, Channels, Playlists or similar pages.
+- Details page should be the place to show the trailer option cleanly.
+
 ## Next audit order
 
-Next page: Collections.
+Next page: Playlists.
 
 Then continue in this order:
 
-1. Collections
-2. Playlists
-3. My Channel
-4. Supabase Manager
-5. Supabase Test
-6. Live Readiness
-7. Supabase Migration
-8. Mux Manager
-9. Upload Plan
-10. Local Storage
-11. Storage Prep
-12. Backup / Safety
-13. Tools Page
-14. Submit Video
-15. Rules
-16. Review Queue
-17. Health Check
-18. Test Checklist
-19. Admin
-20. Settings
+1. Playlists
+2. My Channel
+3. Supabase Manager
+4. Supabase Test
+5. Live Readiness
+6. Supabase Migration
+7. Mux Manager
+8. Upload Plan
+9. Local Storage
+10. Storage Prep
+11. Backup / Safety
+12. Tools Page
+13. Submit Video
+14. Rules
+15. Review Queue
+16. Health Check
+17. Test Checklist
+18. Admin
+19. Settings
 
 ## Locked Plan 4 rules
 
@@ -137,10 +144,11 @@ Fix missing 1920 x 1080 images after page logic passes. Keep image fixes separat
 5. Core playback smoke test.
 6. Safe action wiring.
 7. Queue/player route wiring for Open Channel, Open Collection, Play All, queued Next/Previous and single-title no Next/Previous.
-8. Artwork cleanup.
-9. Release candidate test file.
-10. Promote live only after Trevor says all RC checks passed and says promote live.
+8. Trailer routing through Details page/player flow.
+9. Artwork cleanup.
+10. Release candidate test file.
+11. Promote live only after Trevor says all RC checks passed and says promote live.
 
 ## Restart note
 
-Continue with Collections Plan 4 Link + Layout Audit. Do not promote live. Keep the page read-only and test-only.
+Continue with Playlists Plan 4 Link + Layout Audit. Do not promote live. Keep the page read-only and test-only.
