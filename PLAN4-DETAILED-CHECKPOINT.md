@@ -1,18 +1,20 @@
 # Stream Bandit Plan 4 Detailed Checkpoint
 
-Status at the end of tonight's work: Genres passed after the V5.57.3 button fix.
+Status after Watch History review and screenshots.
 
 ## Current state
 
 Plan 4 is a link + layout audit. Nothing is promoted live yet.
 
-Passed: 10 / 32.
+Passed functionally: 11 / 32.
 
-Current next page: Watch History.
+Clean layout pass: 10 / 32, because Genres works but needs Tools Page-style layout polish before RC.
+
+Current next page: Channels.
 
 Live promotion: No. Do not edit live index.html until the release candidate passes and Trevor explicitly says promote live.
 
-## Passed pages
+## Passed / reviewed pages
 
 1. Home — passed.
 2. About — passed.
@@ -23,36 +25,42 @@ Live promotion: No. Do not edit live index.html until the release candidate pass
 7. Favourites — passed.
 8. Liked — passed.
 9. Supabase Library — passed.
-10. Genres — passed after V5.57.3. Open Genre and Filter Movies intentionally use the same safe in-page filter behaviour for this audit.
+10. Genres — functional pass after V5.57.3. Open Genre and Filter Movies intentionally use the same safe in-page filter behaviour for this audit. Important: Trevor flagged that the page no longer visually matches the Tools Page-style layout well enough. Mark as layout polish needed before release candidate.
+11. Watch History — passed as safe read-only audit. Screenshots show 0 matched history/progress rows and Read Audit rows for inspected local/browser keys. This is a valid safe empty-state/read-audit pass.
+
+## Current notes from Trevor screenshots
+
+- Detailed Checkpoint button opens the Markdown file correctly, but it appears as plain text on GitHub Pages. Later make a styled HTML checkpoint page if we want it to look like the app.
+- Genres page works but must be visually polished back toward Tools Page-style layout before RC.
+- Watch History Read Audit is acceptable: it inspected local/browser keys and found no current history/progress data in this browser.
 
 ## Next audit order
 
-Next page: Watch History.
+Next page: Channels.
 
 Then continue in this order:
 
-1. Watch History
-2. Channels
-3. Collections
-4. Playlists
-5. My Channel
-6. Supabase Manager
-7. Supabase Test
-8. Live Readiness
-9. Supabase Migration
-10. Mux Manager
-11. Upload Plan
-12. Local Storage
-13. Storage Prep
-14. Backup / Safety
-15. Tools Page
-16. Submit Video
-17. Rules
-18. Review Queue
-19. Health Check
-20. Test Checklist
-21. Admin
-22. Settings
+1. Channels
+2. Collections
+3. Playlists
+4. My Channel
+5. Supabase Manager
+6. Supabase Test
+7. Live Readiness
+8. Supabase Migration
+9. Mux Manager
+10. Upload Plan
+11. Local Storage
+12. Storage Prep
+13. Backup / Safety
+14. Tools Page
+15. Submit Video
+16. Rules
+17. Review Queue
+18. Health Check
+19. Test Checklist
+20. Admin
+21. Settings
 
 ## Locked Plan 4 rules
 
@@ -99,17 +107,23 @@ Accessibility page passed as a checklist/comfort page. Later build real saved se
 
 Fix missing 1920 x 1080 images after page logic passes. Keep image fixes separate from page wiring.
 
+### Layout polish before RC
+
+- Genres needs visual layout polish to match the Tools Page-style layout again.
+- Consider making PLAN4-DETAILED-CHECKPOINT.md into a styled HTML checkpoint page, because the Markdown page looks like plain text when opened from GitHub Pages.
+
 ## Final phase order
 
 1. Finish link + layout audit.
-2. Build app-shell-plan3-test.html with WATCH, BROWSE, SUPABASE, MUX, STORAGE and ADMIN TOOLS.
-3. Shell smoke test, including global search.
-4. Core playback smoke test.
-5. Safe action wiring.
-6. Artwork cleanup.
-7. Release candidate test file.
-8. Promote live only after Trevor says all RC checks passed and says promote live.
+2. Fix any layout-polish holds such as Genres.
+3. Build app-shell-plan3-test.html with WATCH, BROWSE, SUPABASE, MUX, STORAGE and ADMIN TOOLS.
+4. Shell smoke test, including global search.
+5. Core playback smoke test.
+6. Safe action wiring.
+7. Artwork cleanup.
+8. Release candidate test file.
+9. Promote live only after Trevor says all RC checks passed and says promote live.
 
-## Restart note for tomorrow
+## Restart note
 
-Start with Watch History Plan 4 Link + Layout Audit. Do not promote live. Keep the page read-only and test-only.
+Continue with Channels Plan 4 Link + Layout Audit. Do not promote live. Keep the page read-only and test-only.
