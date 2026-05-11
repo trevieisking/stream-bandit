@@ -1,16 +1,16 @@
 # Stream Bandit Plan 4 Detailed Checkpoint
 
-Status after Watch History review and screenshots.
+Status after Channels audit review and Trevor's channel playback note.
 
 ## Current state
 
 Plan 4 is a link + layout audit. Nothing is promoted live yet.
 
-Passed functionally: 11 / 32.
+Passed functionally: 12 / 32.
 
-Clean layout pass: 10 / 32, because Genres works but needs Tools Page-style layout polish before RC.
+Clean layout pass: 11 / 32, because Genres works but needs Tools Page-style layout polish before RC.
 
-Current next page: Channels.
+Current next page: Collections.
 
 Live promotion: No. Do not edit live index.html until the release candidate passes and Trevor explicitly says promote live.
 
@@ -27,40 +27,53 @@ Live promotion: No. Do not edit live index.html until the release candidate pass
 9. Supabase Library — passed.
 10. Genres — functional pass after V5.57.3. Open Genre and Filter Movies intentionally use the same safe in-page filter behaviour for this audit. Important: Trevor flagged that the page no longer visually matches the Tools Page-style layout well enough. Mark as layout polish needed before release candidate.
 11. Watch History — passed as safe read-only audit. Screenshots show 0 matched history/progress rows and Read Audit rows for inspected local/browser keys. This is a valid safe empty-state/read-audit pass.
+12. Channels — passed for the current read-only Plan 4 link/layout audit. Important: Trevor noted the final/live behaviour must restore Open Channel and Play All on channel cards.
 
-## Current notes from Trevor screenshots
+## Current notes from Trevor screenshots and review
 
 - Detailed Checkpoint button opens the Markdown file correctly, but it appears as plain text on GitHub Pages. Later make a styled HTML checkpoint page if we want it to look like the app.
 - Genres page works but must be visually polished back toward Tools Page-style layout before RC.
 - Watch History Read Audit is acceptable: it inspected local/browser keys and found no current history/progress data in this browser.
+- Channels current audit page does what it promised, but final channel behaviour must restore live-app controls: Open Channel and Play All.
+
+## Queue / playback navigation requirement for later
+
+Trevor confirmed this live-app behaviour must be restored later, not necessarily during the read-only page audit:
+
+- Channel cards need Open Channel.
+- Channel cards need Play All.
+- Playlist pages need Play All / queue behaviour.
+- Watchlist pages need queue-style playback behaviour where appropriate.
+- Channel / Playlist / Watchlist queued playback should show Next and Previous.
+- Single-title playback should not show Next and Previous.
+- This belongs in later safe route/player/queue wiring, after link/layout audits or when the relevant page intentionally receives action/route wiring.
 
 ## Next audit order
 
-Next page: Channels.
+Next page: Collections.
 
 Then continue in this order:
 
-1. Channels
-2. Collections
-3. Playlists
-4. My Channel
-5. Supabase Manager
-6. Supabase Test
-7. Live Readiness
-8. Supabase Migration
-9. Mux Manager
-10. Upload Plan
-11. Local Storage
-12. Storage Prep
-13. Backup / Safety
-14. Tools Page
-15. Submit Video
-16. Rules
-17. Review Queue
-18. Health Check
-19. Test Checklist
-20. Admin
-21. Settings
+1. Collections
+2. Playlists
+3. My Channel
+4. Supabase Manager
+5. Supabase Test
+6. Live Readiness
+7. Supabase Migration
+8. Mux Manager
+9. Upload Plan
+10. Local Storage
+11. Storage Prep
+12. Backup / Safety
+13. Tools Page
+14. Submit Video
+15. Rules
+16. Review Queue
+17. Health Check
+18. Test Checklist
+19. Admin
+20. Settings
 
 ## Locked Plan 4 rules
 
@@ -120,10 +133,11 @@ Fix missing 1920 x 1080 images after page logic passes. Keep image fixes separat
 4. Shell smoke test, including global search.
 5. Core playback smoke test.
 6. Safe action wiring.
-7. Artwork cleanup.
-8. Release candidate test file.
-9. Promote live only after Trevor says all RC checks passed and says promote live.
+7. Queue/player route wiring for Open Channel, Play All, queued Next/Previous and single-title no Next/Previous.
+8. Artwork cleanup.
+9. Release candidate test file.
+10. Promote live only after Trevor says all RC checks passed and says promote live.
 
 ## Restart note
 
-Continue with Channels Plan 4 Link + Layout Audit. Do not promote live. Keep the page read-only and test-only.
+Continue with Collections Plan 4 Link + Layout Audit. Do not promote live. Keep the page read-only and test-only.
