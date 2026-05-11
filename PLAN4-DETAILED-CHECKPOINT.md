@@ -1,6 +1,6 @@
 # Stream Bandit Plan 4 Detailed Checkpoint
 
-Status after Channels audit review and Trevor's channel playback note.
+Status after Channels audit review and Trevor's channel / collection playback note.
 
 ## Current state
 
@@ -35,6 +35,7 @@ Live promotion: No. Do not edit live index.html until the release candidate pass
 - Genres page works but must be visually polished back toward Tools Page-style layout before RC.
 - Watch History Read Audit is acceptable: it inspected local/browser keys and found no current history/progress data in this browser.
 - Channels current audit page does what it promised, but final channel behaviour must restore live-app controls: Open Channel and Play All.
+- Collections likely need the same final/live behaviour: Open Collection and Play All.
 
 ## Queue / playback navigation requirement for later
 
@@ -42,9 +43,11 @@ Trevor confirmed this live-app behaviour must be restored later, not necessarily
 
 - Channel cards need Open Channel.
 - Channel cards need Play All.
+- Collection cards need Open Collection.
+- Collection cards need Play All.
 - Playlist pages need Play All / queue behaviour.
 - Watchlist pages need queue-style playback behaviour where appropriate.
-- Channel / Playlist / Watchlist queued playback should show Next and Previous.
+- Channel / Collection / Playlist / Watchlist queued playback should show Next and Previous.
 - Single-title playback should not show Next and Previous.
 - This belongs in later safe route/player/queue wiring, after link/layout audits or when the relevant page intentionally receives action/route wiring.
 
@@ -133,7 +136,7 @@ Fix missing 1920 x 1080 images after page logic passes. Keep image fixes separat
 4. Shell smoke test, including global search.
 5. Core playback smoke test.
 6. Safe action wiring.
-7. Queue/player route wiring for Open Channel, Play All, queued Next/Previous and single-title no Next/Previous.
+7. Queue/player route wiring for Open Channel, Open Collection, Play All, queued Next/Previous and single-title no Next/Previous.
 8. Artwork cleanup.
 9. Release candidate test file.
 10. Promote live only after Trevor says all RC checks passed and says promote live.
