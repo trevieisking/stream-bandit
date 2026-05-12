@@ -1,0 +1,110 @@
+/* Stream Bandit V6.24 Shared Shell / Menu / Search
+   Purpose: one shared drawer + movie-aware search overlay for reconciled standalone pages.
+   Safe: injects UI only. No saves, no uploads, no deletes, no live promotion. */
+(function(){
+  'use strict';
+  const VERSION='V6.24 Shared Shell';
+  const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+  const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+  let movies=[];
+  const pages=[
+    ['🏠','Home','home-menu-upgrade-v5-87-1-test.html','Watch home start'],
+    ['🎞️','Library','library-menu-upgrade-v5-86-test.html','Browse library movies'],
+    ['🎬','Details','details-menu-upgrade-v5-88-1-test.html','Watch details movie'],
+    ['▶️','Player','watch-player-upgrade-v5-89-1-test.html','Watch player video custom audio'],
+    ['⏯️','Continue Watching','continue-watching-menu-upgrade-v5-90-test.html','Watch resume progress'],
+    ['🕘','Watch History','watch-history-menu-upgrade-v5-91-1-test.html','Watch history'],
+    ['🔖','Watchlist','watchlist-menu-upgrade-v5-92-test.html','Watch later'],
+    ['⭐','Favourites','favourites-menu-upgrade-v5-93-test.html','Watch favourites'],
+    ['👍','Liked','liked-menu-upgrade-v5-94-test.html','Watch liked'],
+    ['♿','Accessibility','accessibility-search-overlay-v5-95-1-test.html','Watch accessibility audio boost'],
+    ['ℹ️','About','about-menu-upgrade-v5-96-test.html','Browse about'],
+    ['🟢','Supabase Library','supabase-library-menu-upgrade-v5-97-test.html','Browse supabase library movies'],
+    ['🏷️','Genres','genres-menu-upgrade-v5-98-1-test.html','Browse genres horror drama comedy action thriller sci-fi'],
+    ['📺','Channels','channels-menu-upgrade-v5-99-2-test.html','Browse channels'],
+    ['🧺','Collections','collections-menu-upgrade-v6-00-test.html','Browse collections'],
+    ['📃','Playlists','playlists-menu-upgrade-v6-01-test.html','Browse playlists'],
+    ['📡','My Channel','my-channel-menu-upgrade-v6-02-test.html','Creator channel profile'],
+    ['⬆️','Submit Video','submit-video-menu-upgrade-v6-13-test.html','Creator submit upload video'],
+    ['📜','Rules','rules-menu-upgrade-v6-14-test.html','Creator rules'],
+    ['🧾','Review Queue','review-queue-menu-upgrade-v6-15-test.html','Creator review queue'],
+    ['🛠️','Admin Centre','admin-centre-menu-upgrade-v6-18-3-test.html','Admin settings'],
+    ['⚙️','Settings','settings-menu-upgrade-v6-19-test.html','Admin settings theme player branding favicon logo'],
+    ['👤','Profile Settings','profile-settings-menu-upgrade-v6-20-test.html','Admin profile settings avatar banner privacy auth'],
+    ['🏗️','Web Builder','web-builder-menu-upgrade-v6-21-test.html','Admin web builder favicon logo navigation home player seo help ai'],
+    ['🧱','Platform Builder','platform-builder-menu-upgrade-v6-22-test.html','Admin platform builder modules shell performance security'],
+    ['🧭','Final Shell Navigation','final-shell-navigation-menu-upgrade-v6-23-test.html','Admin final shell navigation rc release candidate'],
+    ['🧪','Test Checklist','test-checklist-menu-upgrade-v6-17-test.html','Admin checklist'],
+    ['🧰','Tools Page','tools-page-menu-upgrade-v6-12-test.html','Admin tools favourite tools'],
+    ['✅','Health Check','health-check-menu-upgrade-v6-16-test.html','Admin health readiness'],
+    ['🎥','Mux Manager','mux-manager-menu-upgrade-v6-07-test.html','Admin mux video hls'],
+    ['🪣','Storage Prep','storage-prep-menu-upgrade-v6-10-test.html','Admin storage images supabase'],
+    ['🛡️','Backup / Safety','backup-safety-menu-upgrade-v6-11-test.html','Admin backup safety'],
+    ['🎨','Settings Studio','settings-controls-v5-81-test.html','Admin settings studio controls branding player'],
+    ['🧭','Original Final Shell','final-shell-navigation-v5-79-test.html','Admin original final shell navigation']
+  ];
+  function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+  function arr(v){if(Array.isArray(v))return v;if(typeof v==='string'&&v.trim()){try{const j=JSON.parse(v);if(Array.isArray(j))return j}catch(e){}return v.split(',').map(x=>x.trim()).filter(Boolean)}return []}
+  function poster(m){return m.thumbnail_url||m.poster_url||m.image_url||m.backdrop_url||''}
+  function groupFor(p){const name=p[1];if(['Home','Details','Player','Continue','Watchlist','Favourites','Liked','Accessibility','History'].some(x=>name.includes(x)))return 'Watch';if(['About','Library','Supabase','Genres','Channels','Collections','Playlists'].some(x=>name.includes(x)))return 'Browse';if(['My Channel','Submit','Rules','Review'].some(x=>name.includes(x)))return 'Creator';return 'Admin / Settings'}
+  function addStyle(){
+    if(document.getElementById('sbSharedShellStyle'))return;
+    const s=document.createElement('style');s.id='sbSharedShellStyle';
+    s.textContent=`.sb-shell-menu-toggle{position:fixed;left:18px;top:96px;z-index:10002;width:54px;height:54px;border-radius:18px;border:1px solid #22d3a65c;background:linear-gradient(135deg,#22d3a6,#7c3cff);color:#fff;font-size:24px;font-weight:950;box-shadow:0 14px 40px #0007;cursor:pointer}.sb-shell-scrim{position:fixed;inset:0;background:#0008;opacity:0;pointer-events:none;z-index:10000;transition:.2s}.sb-shell-scrim.show{opacity:1;pointer-events:auto}.sb-shell-drawer{position:fixed;left:0;top:0;bottom:0;width:min(430px,92vw);background:linear-gradient(180deg,#08101cfc,#120c26fc);border-right:1px solid #ffffff24;box-shadow:30px 0 90px #000a;transform:translateX(-104%);transition:.24s;z-index:10001;padding:18px;overflow-y:auto;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.sb-shell-drawer.open{transform:translateX(0)}.sb-shell-top{display:flex;justify-content:space-between;gap:12px}.sb-shell-top h2{margin:0 0 6px}.sb-shell-muted{color:#b9c0d8;font-size:14px;line-height:1.45}.sb-shell-close{width:42px;height:42px;border-radius:14px;border:1px solid #ffffff24;background:#ffffff14;color:#fff;font-size:20px;cursor:pointer}.sb-shell-filter{display:flex;gap:8px;border:1px solid #ffffff24;border-radius:16px;background:#0004;padding:10px;margin:12px 0}.sb-shell-filter input{flex:1;background:transparent;border:0;color:#fff;outline:0}.sb-shell-group{border:1px solid #ffffff1a;border-radius:18px;background:#ffffff0e;margin-bottom:10px;overflow:hidden}.sb-shell-group-btn{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;border-radius:0;background:transparent;color:#fff;font-weight:950;padding:12px 14px;cursor:pointer}.sb-shell-items{display:none;padding:0 12px 12px}.sb-shell-group.open .sb-shell-items{display:grid;gap:8px}.sb-shell-link{display:flex;align-items:center;gap:8px;justify-content:flex-start;border-radius:14px;background:#414667b8;color:#fff;text-decoration:none;font-size:13px;font-weight:950;padding:11px 15px}.sb-shell-pill{display:inline-flex;width:max-content;border-radius:999px;padding:5px 8px;background:#ffffff18;border:1px solid #ffffff1a;color:#dfffee;font-size:11px;font-weight:900}.sb-shell-hidden{display:none!important}.sb-search-overlay{position:absolute;right:0;top:56px;width:min(560px,92vw);max-height:70vh;overflow:auto;border:1px solid #22d3a657;border-radius:22px;background:linear-gradient(180deg,#08101cfa,#120c26fa);box-shadow:0 30px 90px #000c;padding:12px;display:none;z-index:9999;color:#fff}.sb-search-overlay.open{display:block}.sb-search-result{display:grid;grid-template-columns:64px 1fr;gap:10px;text-decoration:none;color:#fff;border:1px solid #ffffff14;border-radius:16px;background:#ffffff0d;padding:9px;margin:8px 0}.sb-search-result:hover{outline:3px solid #22d3a6}.sb-search-thumb{aspect-ratio:16/9;border-radius:10px;background:#ffffff14;overflow:hidden;display:grid;place-items:center;color:#dfffee;font-size:20px}.sb-search-thumb img{width:100%;height:100%;object-fit:cover}.sb-search-note{padding:12px 14px;border-radius:18px;background:#ffb1421f;border:1px solid #ffb14252;color:#ffe7ad;font-weight:850;margin-top:10px}.sb-search-close{border:0;border-radius:999px;padding:9px 12px;background:#414667;color:#fff;font-weight:950;cursor:pointer}`;
+    document.head.appendChild(s);
+  }
+  function injectDrawer(){
+    ['menuToggle','drawer','scrim','sbShellMenuToggle','sbShellDrawer','sbShellScrim'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();});
+    const btn=document.createElement('button');btn.id='sbShellMenuToggle';btn.className='sb-shell-menu-toggle';btn.textContent='☰';btn.setAttribute('aria-label','Open Stream Bandit menu');
+    const scrim=document.createElement('div');scrim.id='sbShellScrim';scrim.className='sb-shell-scrim';
+    const drawer=document.createElement('nav');drawer.id='sbShellDrawer';drawer.className='sb-shell-drawer';drawer.setAttribute('aria-label','Stream Bandit menu');
+    const groups={};pages.forEach(p=>{const g=groupFor(p);(groups[g]||(groups[g]=[])).push(p)});
+    drawer.innerHTML=`<div class="sb-shell-top"><div><h2>🎬 Stream Bandit</h2><div class="sb-shell-muted">${VERSION}. Full shared menu + search overlay.</div></div><button id="sbShellClose" class="sb-shell-close">×</button></div><div class="sb-shell-filter"><span>🔎</span><input id="sbShellFilter" placeholder="Filter menu..."></div><div id="sbShellGroups">${Object.keys(groups).map((g,i)=>`<section class="sb-shell-group ${i<2?'open':''}" data-sb-wrap><button class="sb-shell-group-btn" data-sb-group><span>${esc(g)}</span><span class="sb-shell-pill">${groups[g].length}</span></button><div class="sb-shell-items">${groups[g].map(p=>`<a class="sb-shell-link" href="${p[2]}" data-sb-text="${esc((p[1]+' '+p[3]).toLowerCase())}"><span style="width:24px">${p[0]}</span>${esc(p[1])}</a>`).join('')}</div></section>`).join('')}</div>`;
+    document.body.append(scrim,drawer,btn);
+    function open(){drawer.classList.add('open');scrim.classList.add('show')}
+    function close(){drawer.classList.remove('open');scrim.classList.remove('show')}
+    btn.onclick=open;scrim.onclick=close;drawer.querySelector('#sbShellClose').onclick=close;
+    drawer.querySelector('#sbShellFilter').oninput=function(){const q=this.value.toLowerCase();drawer.querySelectorAll('[data-sb-wrap]').forEach(w=>{let any=false;w.querySelectorAll('.sb-shell-link').forEach(a=>{const hit=!q||a.dataset.sbText.includes(q);a.classList.toggle('sb-shell-hidden',!hit);if(hit)any=true});w.classList.toggle('sb-shell-hidden',!any);if(q&&any)w.classList.add('open')})};
+    drawer.addEventListener('click',e=>{const g=e.target.closest('[data-sb-group]');if(g)g.closest('.sb-shell-group').classList.toggle('open')});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+  }
+  function ensureSearchOverlay(){
+    let wrap=document.querySelector('.searchWrap')||document.querySelector('.search-wrap')||document.getElementById('searchWrap');
+    const input=document.getElementById('globalSearch')||document.querySelector('input[placeholder*="Search Stream Bandit"]');
+    if(!input)return null;
+    if(!wrap){wrap=input.parentElement; if(wrap)wrap.style.position='relative'}
+    if(!wrap)return null;
+    wrap.style.position='relative';wrap.style.zIndex='50';
+    let overlay=document.getElementById('searchOverlay'); if(overlay)overlay.remove();
+    overlay=document.createElement('div');overlay.id='searchOverlay';overlay.className='sb-search-overlay';
+    overlay.innerHTML='<div style="display:flex;justify-content:space-between;gap:10px"><b id="searchTitle">Search results</b><button id="closeSearch" class="sb-search-close">Close</button></div><div id="searchResults"></div><div class="sb-search-note">Press Enter for full Global Search in this tab. Click a result for its page/details.</div>';
+    wrap.appendChild(overlay);
+    return {wrap,input,overlay,button:document.getElementById('globalSearchBtn')||document.querySelector('.search button,button.search')};
+  }
+  function fullSearch(input){const q=(input&&input.value||'').trim();location.href='global-search-v5-80-test.html'+(q?'?q='+encodeURIComponent(q):'')}
+  function renderSearch(input,overlay){
+    const q=(input.value||'').trim().toLowerCase(); if(q.length<2){overlay.classList.remove('open');return;}
+    const title=overlay.querySelector('#searchTitle'), results=overlay.querySelector('#searchResults');
+    const pageHits=pages.filter(p=>(p[1]+' '+p[3]).toLowerCase().includes(q)).slice(0,4);
+    const movieHits=movies.filter(m=>(m.title+' '+(m.description||'')+' '+arr(m.genres).join(' ')+' '+arr(m.tags).join(' ')).toLowerCase().includes(q)).slice(0,6);
+    let html='';
+    movieHits.forEach(m=>{const im=poster(m),id=encodeURIComponent(m.id||'');html+=`<a class="sb-search-result" href="details-menu-upgrade-v5-88-1-test.html?id=${id}"><span class="sb-search-thumb">${im?`<img src="${esc(im)}" alt="">`:'🎬'}</span><span><b>${esc(m.title||'Untitled')}</b><small>Movie result</small></span></a>`});
+    pageHits.forEach(p=>{html+=`<a class="sb-search-result" href="${p[2]}"><span class="sb-search-thumb">${p[0]}</span><span><b>${esc(p[1])}</b><small>Page result</small></span></a>`});
+    const total=movieHits.length+pageHits.length; title.textContent=total?`Results for “${q}”`:`No quick results for “${q}”`; results.innerHTML=html||'<div class="sb-search-note">No overlay results. Press Enter for full Global Search.</div>'; overlay.classList.add('open');
+  }
+  async function loadMovies(){
+    try{ if(!window.supabase){return;} const c=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); const r=await c.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(100); if(!r.error)movies=(r.data||[]).filter(m=>String(m.status||'published')!=='archived'); }catch(e){}
+  }
+  async function init(){
+    addStyle(); injectDrawer(); await loadMovies();
+    const search=ensureSearchOverlay(); if(search){
+      search.input.oninput=()=>renderSearch(search.input,search.overlay);
+      search.input.onkeydown=e=>{if(e.key==='Enter')fullSearch(search.input); if(e.key==='Escape')search.overlay.classList.remove('open')};
+      if(search.button)search.button.onclick=()=>fullSearch(search.input);
+      const close=search.overlay.querySelector('#closeSearch'); if(close)close.onclick=()=>search.overlay.classList.remove('open');
+      document.addEventListener('click',e=>{if(!e.target.closest('.searchWrap')&&!e.target.closest('.search-wrap')&&!e.target.closest('#searchWrap'))search.overlay.classList.remove('open')});
+    }
+    document.documentElement.dataset.streamBanditShell='v6-24';
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
