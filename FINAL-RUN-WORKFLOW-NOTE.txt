@@ -1,5 +1,6 @@
 Stream Bandit final run workflow note:
 
+RULE 1 - master working rule:
 Use the existing working pages. Do not create duplicate settings or menu pages.
 
 Use web-builder-theme-studio-controls-v7-8-9-test.html as the main global theme/settings path and improve that page family.
@@ -11,5 +12,19 @@ Profile, theme, logo, app name, tagline, accessibility, menu, search and account
 Use the menu overlay as the master checklist. Once a page passes, keep it passed unless a later global change breaks it.
 
 Keep only genuinely high-risk actions locked. Safe app functions should work during this final run.
+
+RULE 2 - scan and plan rule:
+Before continuing page fixes, scan the actual menu overlay/page list and make an important dependency plan that covers every page in that menu.
+
+The plan must put global-control pages first: Account/Login, Profile Settings, Web Builder/Theme Studio, Settings/Settings Studio, Accessibility, Menu/Shell/Search, Policy/Agreement, Supabase Library and any other page that affects other pages.
+
+While scanning, record which global settings each page needs, then wire those settings globally so other pages inherit them.
+
+RULE 3 - execution rule:
+Stick to the plan. The assistant decides the next page, scans before changing it, builds/fixes what is needed, checks for errors before and after, and then Trevor tests it.
+
+Trevor should not have to keep repeating the rules. Trevor tests; the assistant does the planning, scanning, fixing, route promotion and next-step decisions.
+
+Keep what already works in the global shell. Do not throw away working shell/menu/search/account behaviour.
 
 Goal: working app, not another read-only audit.
