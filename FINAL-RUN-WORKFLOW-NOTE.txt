@@ -27,4 +27,11 @@ Trevor should not have to keep repeating the rules. Trevor tests; the assistant 
 
 Keep what already works in the global shell. Do not throw away working shell/menu/search/account behaviour.
 
+RULE 4 - media handling rule:
+Images are uploads. Videos are URLs.
+
+Image fields should use upload-first workflows where safe: posters, backdrops, logos, favicons, avatars, banners, collection art, playlist art and channel art should use existing safe Supabase Storage image upload paths when available.
+
+Video fields should use URL-first workflows: Mux playback URLs, HLS URLs, public stream URLs, embed URLs or direct video URLs. Do not try to upload full video files into the frontend/GitHub Pages flow.
+
 Goal: working app, not another read-only audit.
