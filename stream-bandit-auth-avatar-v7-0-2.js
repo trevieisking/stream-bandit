@@ -1,0 +1,12 @@
+(function(){
+'use strict';
+const VERSION='V7.0.2 Auth Avatar Display Helper';
+let sb=null,lastUrl='';
+function readCfg(){return fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text()).then(txt=>({url:(txt.match(/SUPABASE_URL\s*=\s*'([^']+)'/)||[])[1]||'',key:(txt.match(/SUPABASE_KEY\s*=\s*'([^']+)'/)||[])[1]||''})).catch(()=>({url:'',key:''}));}
+async function client(){if(sb)return sb; if(!window.supabase||!window.supabase.createClient)return null; const c=await readCfg(); if(c.url&&c.key)sb=window.supabase.createClient(c.url,c.key); return sb;}
+function installStyle(){if(document.getElementById('sbAuthAvatarStyle'))return; const s=document.createElement('style'); s.id='sbAuthAvatarStyle'; s.textContent='.brand.sb-auth-host .logo.sb-auth-avatar-logo{background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;overflow:hidden!important;border:1px solid #22d3a657!important}.brand.sb-auth-host .logo.sb-auth-avatar-logo img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}.brand.sb-auth-host .logo.sb-auth-avatar-logo[data-empty="true"]{color:inherit!important}'; document.head.appendChild(s);}
+function setLogo(url){const logo=document.querySelector('.brand.sb-auth-host .logo')||document.querySelector('.brand .logo'); if(!logo)return; installStyle(); if(url){lastUrl=url; logo.classList.add('sb-auth-avatar-logo'); logo.dataset.empty='false'; logo.innerHTML='<img alt="Profile avatar" src="'+String(url).replace(/"/g,'')+'">';}else if(!lastUrl){logo.classList.remove('sb-auth-avatar-logo'); logo.dataset.empty='true';}}
+async function refresh(){try{const c=await client(); if(!c)return; const s=await c.auth.getSession(); const user=s.data&&s.data.session?s.data.session.user:null; if(!user){setLogo(''); return;} const r=await c.from('sb_profiles').select('avatar_url').eq('id',user.id).maybeSingle(); if(r.error)throw r.error; setLogo(r.data&&r.data.avatar_url?r.data.avatar_url:'');}catch(e){/* silent: never break the shell */}}
+function init(){installStyle(); setTimeout(refresh,500); setTimeout(refresh,1600); document.addEventListener('streambandit:auth-state',()=>setTimeout(refresh,150)); window.StreamBanditAuthAvatar={version:VERSION,refresh};}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
