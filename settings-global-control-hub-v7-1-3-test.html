@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.1.3 Settings Hub Loader</title></head><body><script>
+(async function(){
+  const src='settings-global-control-hub-v7-1-2-test.html';
+  let html=await fetch(src,{cache:'no-store'}).then(r=>r.text());
+  html=html.replaceAll('V7.1.2 Settings Global Control Hub TEST','V7.1.3 Settings Global Control Hub TEST');
+  html=html.replaceAll('V7.1.2 Settings Hub Checklist','V7.1.3 Settings Hub Checklist');
+  html=html.replaceAll('V7.1.2 Settings Global Control Hub TEST — no live/index promotion.','V7.1.3 Settings Global Control Hub TEST — feedback polish only, no live/index promotion.');
+  html=html.replace('</body>','<script src="settings-global-control-hub-feedback-v7-1-3.js"><\\/script></body>');
+  document.open();
+  document.write(html);
+  document.close();
+})();
+</script></body></html>
