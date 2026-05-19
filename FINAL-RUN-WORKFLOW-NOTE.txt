@@ -1,0 +1,15 @@
+Stream Bandit final run workflow note:
+
+Use the existing working pages. Do not create duplicate settings or menu pages.
+
+Use web-builder-theme-studio-controls-v7-8-9-test.html as the main global theme/settings path and improve that page family.
+
+Pages that control global app behaviour must save and load globally where safe. Do not leave safe functions as preview-only.
+
+Profile, theme, logo, app name, tagline, accessibility, menu, search and account state must affect the shared shell and other pages.
+
+Use the menu overlay as the master checklist. Once a page passes, keep it passed unless a later global change breaks it.
+
+Keep only genuinely high-risk actions locked. Safe app functions should work during this final run.
+
+Goal: working app, not another read-only audit.
