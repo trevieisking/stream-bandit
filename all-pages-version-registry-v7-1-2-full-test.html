@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.1.2 Full Registry</title></head><body><script>
+(async function(){
+  const source='all-pages-version-registry-v7-1-1-full-test.html';
+  let html=await fetch(source,{cache:'no-store'}).then(r=>r.text());
+  html=html.replaceAll('Stream Bandit V7.1.1 Full All Pages Registry','Stream Bandit V7.1.2 Full All Pages Registry');
+  html=html.replaceAll('V7.1.1 FULL Registry TEST','V7.1.2 FULL Registry TEST');
+  html=html.replaceAll('Settings Global Save V7.1.0','Settings Platform Control Hub V7.1.5');
+  html=html.replaceAll('Settings Global</b><p><span class="pill warn">TEST NOW</span><br>V7.1.0 saves global identity, theme and logo to sb_app_settings.','Settings Platform Control Hub</b><p><span class="pill hot">PROMOTED</span><br>V7.1.5 broad feature-control map passed and old Settings route now forwards to it.');
+  html=html.replaceAll('Promote Settings route only after passed, then continue global pages and menu overlay pages.','Settings route is promoted. Next: Theme / Global Studio ownership check, then continue global pages and menu overlay pages.');
+  html=html.replaceAll('Current Settings test: settings-global-save-v7-1-0-test.html. Do not forward old Settings route until Trevor passes the tests.','Current Settings route: settings-admin-shell-v6-54-test.html now safely forwards to settings-platform-control-hub-v7-1-5-test.html.');
+  html=html.replaceAll("['Admin / Settings','Settings','settings-global-save-v7-1-0-test.html','CURRENT TEST functional global settings; old route not forwarded yet']","['Admin / Settings','Settings','settings-platform-control-hub-v7-1-5-test.html','CURRENT PASSED platform feature-control map; old route forwards']");
+  html=html.replaceAll("['Admin / Settings','Settings old route','settings-admin-shell-v6-54-test.html','Old read-only/map page; do not keep final if V7.1 passes']","['Admin / Settings','Settings old route','settings-admin-shell-v6-54-test.html','Forwarded to V7.1.5']");
+  html=html.replaceAll('Functional global identity/theme/logo save helper.','Settings platform control hub local feature-control map.');
+  html=html.replaceAll('settings-global-save-v7-1-0.js','settings-platform-control-hub-v7-1-5-test.html');
+  html=html.replaceAll('<span class="pill warn">testing</span>','<span class="pill hot">passed</span>');
+  html=html.replaceAll('Next: finish testing Settings Global Save V7.1.0.','Settings V7.1.5 passed and is promoted.');
+  html=html.replaceAll('If Settings V7.1.0 passes, forward old Settings route to the passed V7.1.x candidate.','Next: Theme / Global Studio ownership check, then continue key global pages.');
+  html=html.replaceAll('V7.1.1 Full Registry TEST — full old route list preserved, live app unchanged.','V7.1.2 Full Registry TEST — Settings V7.1.5 passed/promoted, live app unchanged.');
+  document.open();document.write(html);document.close();
+})();
+</script></body></html>
