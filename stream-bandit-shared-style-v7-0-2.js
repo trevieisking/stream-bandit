@@ -1,0 +1,12 @@
+(function(){
+'use strict';
+const VERSION='V7.0.2 Shared Style Borrow Helper';
+const STYLE_KEY='web_builder_shared_style_v7_8_8';
+let sb=null;
+function readCfg(){return fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text()).then(txt=>({url:(txt.match(/SUPABASE_URL\s*=\s*'([^']+)'/)||[])[1]||'',key:(txt.match(/SUPABASE_KEY\s*=\s*'([^']+)'/)||[])[1]||''})).catch(()=>({url:'',key:''}));}
+async function client(){if(sb)return sb;if(!window.supabase||!window.supabase.createClient)return null;const c=await readCfg();if(c.url&&c.key)sb=window.supabase.createClient(c.url,c.key);return sb;}
+function applyStyle(s){s=s||{};const root=document.documentElement;root.style.setProperty('--accent',s.accent||'#22d3a6');root.style.setProperty('--good',s.accent||'#22d3a6');root.style.setProperty('--accent2',s.accent2||'#7c3cff');root.style.setProperty('--purple',s.accent2||'#7c3cff');root.style.setProperty('--bg',s.bg||'#050711');root.style.setProperty('--card',s.card||'#101529');root.style.setProperty('--p',s.card||'#101529');root.style.setProperty('--p2',s.card||'#17122d');root.style.setProperty('--title',s.titleColor||'#ffffff');root.style.setProperty('--muted',s.textColor||'#b9c0d8');root.style.setProperty('--btnText',s.buttonText||'#ffffff');root.style.setProperty('--fontScale',s.largeText?'1.12':'1');root.style.setProperty('--line',s.highContrast?'#ffffff66':'#ffffff22');if(s.font)document.body.style.fontFamily=s.font;document.documentElement.dataset.streamBanditSharedStyle='loaded';}
+async function load(){try{const c=await client();if(!c)return null;const r=await c.from('sb_app_settings').select('settings').eq('id','stream_bandit').maybeSingle();if(r.error)throw r.error;const settings=(r.data&&r.data.settings)||{};const style=settings[STYLE_KEY]||settings.web_builder_style||settings.builderStyle||{};applyStyle(style);document.dispatchEvent(new CustomEvent('streambandit:shared-style-loaded',{detail:{version:VERSION,style}}));return style;}catch(e){document.dispatchEvent(new CustomEvent('streambandit:shared-style-error',{detail:{version:VERSION,error:e.message||String(e)}}));return null;}}
+window.StreamBanditSharedStyle={version:VERSION,load,applyStyle};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(load,100));else setTimeout(load,100);
+})();
