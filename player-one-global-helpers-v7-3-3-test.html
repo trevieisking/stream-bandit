@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.3.3 Player 1 TEST</title><style>body{margin:0;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}.box{max-width:900px;margin:auto;border:1px solid #ffffff24;border-radius:24px;background:#11162d;padding:24px}.ok{color:#baf7df}</style></head><body><div class="box"><h1>Loading V7.3.3 Player 1...</h1><p class="ok">Loading passed V7.3.2 Player 1 and removing the Queue / Up Next tab.</p></div><script>
+(async function(){
+  try{
+    let html=await fetch('player-one-global-helpers-v7-3-2-test.html',{cache:'no-store'}).then(r=>r.text());
+    html=html.replaceAll('Stream Bandit V7.3.2 Player 1 TEST','Stream Bandit V7.3.3 Player 1 TEST');
+    html=html.replaceAll('V7.3.2 Player 1 Global Helpers TEST','V7.3.3 Player 1 Global Helpers TEST');
+    html=html.replaceAll('V7.3.2 Player 1 Checklist','V7.3.3 Player 1 Checklist');
+    html=html.replaceAll('Loads as V7.3.2 Player 1 Global Helpers TEST.','Loads as V7.3.3 Player 1 Global Helpers TEST.');
+    html=html.replaceAll('No Player 2, queue rewrite, progress rewrite or live/index action.','No Player 2, no queue tab, no progress rewrite or live/index action.');
+    html=html.replaceAll('V7.3.2 Player 1 Global Helpers TEST — no live/index promotion.','V7.3.3 Player 1 Global Helpers TEST — Queue tab removed, no live/index promotion.');
+    html=html.replaceAll('No Continue Watching rewrite in V7.3.2.','No Continue Watching rewrite in V7.3.3.');
+    html=html.replace('<button class="tab" data-tab="queue">Queue / Up Next</button>','');
+    html=html.replace('<section id="queue" class="box section"><h2>Queue / Up Next</h2><div class="note">Player 1 is for single-title playback. Group queue belongs to Player 2.</div></section>','');
+    html=html.replace('</body>','<script>(function(){function clean(){document.title=\'Stream Bandit V7.3.3 Player 1 TEST\';document.querySelectorAll(\'[data-tab="queue"],#queue\').forEach(function(el){el.remove();});var badge=document.querySelector(\'.badge\');if(badge)badge.textContent=\'V7.3.3 Player 1 Global Helpers TEST\';var foot=document.querySelector(\'.footer\');if(foot)foot.textContent=\'V7.3.3 Player 1 Global Helpers TEST — Queue tab removed, no live/index promotion.\';document.querySelectorAll(\'h2,p,li,.check p,#progressState\').forEach(function(el){if(el.textContent&&el.textContent.indexOf(\'V7.3.2\')>-1)el.textContent=el.textContent.replaceAll(\'V7.3.2\',\'V7.3.3\');});}clean();setTimeout(clean,800);setTimeout(clean,1600);})();<\/script></body>');
+    document.open();document.write(html);document.close();
+  }catch(e){document.body.innerHTML='<div class="box"><h1>V7.3.3 Player 1 load failed</h1><p>'+String(e.message||e)+'</p></div>';}
+})();
+</script></body></html>
