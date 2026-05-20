@@ -1,0 +1,11 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.1.8 Settings Platform Control Hub TEST</title></head><body><script>
+(async function(){
+  const src='settings-platform-control-hub-v7-1-6-test.html';
+  let html=await fetch(src,{cache:'no-store'}).then(r=>r.text());
+  html=html.replaceAll('V7.1.6 Settings Platform Control Hub TEST','V7.1.8 Settings Platform Control Hub TEST');
+  html=html.replaceAll('V7.1.6 Settings Platform Control Hub TEST — favicon/app icon controls added, local only, no live/index promotion.','V7.1.8 Settings Platform Control Hub TEST — favicon/app icon upload preview fixed, local only, no live/index promotion.');
+  html=html.replaceAll("version:'V7.1.6 local settings map only'","version:'V7.1.8 local settings map only'");
+  html=html.replace('</body>','<script src="settings-favicon-upload-panel-v7-1-8.js"></'+'script></body>');
+  document.open();document.write(html);document.close();
+})();
+</script></body></html>
