@@ -1,1 +1,25 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V6.81.1 Watch History Route Migration TEST</title><style>body{margin:0;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}.box{max-width:900px;margin:auto;border:1px solid #ffffff24;border-radius:24px;background:#11162d;padding:24px}.ok{color:#baf7df}</style></head><body><div class="box"><h1>Loading V6.81.1 Watch History Route Migration TEST...</h1><p class="ok">Loading the passed V6.81 Watch History full rebuild into the actual Watch History route. Old V6.74 render helper is not loaded.</p></div><script>(async function(){try{let html=await fetch('watch-history-full-rebuild-v6-81-test.html',{cache:'no-store'}).then(r=>r.text());html=html.replaceAll('V6.81 Watch History Full Rebuild No V6.74 Helper TEST','V6.81.1 Watch History Route Migration TEST');html=html.replaceAll('watch-history-full-rebuild-v6-81-test.html','watch-history-watch-shell-v6-36-test.html');html=html.replace('Full rebuilt Watch History candidate. No V6.74 render helper is loaded, so labels and V6.75 save buttons should stay stable.','Actual Watch History route migrated from the passed V6.81 rebuild. No old V6.74 render helper is loaded, so labels and V6.75 save buttons stay stable.');html=html.replace('V6.81 Watch History full rebuild ready. No V6.74 render helper loaded.','V6.81.1 Watch History actual route ready. No old V6.74 render helper loaded.');document.open();document.write(html);document.close();}catch(e){document.body.innerHTML='<div class="box"><h1>V6.81.1 load failed</h1><p>'+String(e.message||e)+'</p></div>';}})();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Stream Bandit Watch History Route</title>
+  <meta http-equiv="refresh" content="0; url=watch-history-global-helpers-v7-4-0-test.html">
+  <style>
+    body{margin:0;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}
+    .box{max-width:850px;margin:40px auto;border:1px solid #ffffff24;border-radius:24px;background:#11162d;padding:24px}
+    .ok{color:#baf7df}
+    a{color:#baf7df;font-weight:900}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Loading Watch History V7.4.0...</h1>
+    <p class="ok">Promoted route: safe local history/progress global-helper page, no history rewrite.</p>
+    <p><a href="watch-history-global-helpers-v7-4-0-test.html">Open Watch History V7.4.0</a></p>
+  </div>
+  <script>
+    window.location.href = "watch-history-global-helpers-v7-4-0-test.html" + window.location.search + window.location.hash;
+  </script>
+</body>
+</html>
