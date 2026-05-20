@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.2.1 Account Landing TEST</title></head><body><script>
+(async function(){
+  const src='account-landing-sync-v6-72-2-test.html';
+  let html=await fetch(src,{cache:'no-store'}).then(r=>r.text());
+  html=html.replaceAll('Stream Bandit V6.72.2 Account Sync TEST','Stream Bandit V7.2.1 Account Landing Global Helpers TEST');
+  html=html.replaceAll('V6.72.2 Account Landing Sync TEST','V7.2.1 Account Landing Global Helpers TEST');
+  html=html.replaceAll('This is the account landing route. When signed out, it shows the landing screen. When signed in, it shows the account dashboard. Header sync helper is loaded.','This is the account landing route with the current global helper stack: auth sync, avatar, shared style and Settings bridge. When signed out, it shows the landing screen. When signed in, it shows the account dashboard.');
+  html=html.replaceAll('V6.72.2 Account Landing Sync TEST — no app data writes.','V7.2.1 Account Landing Global Helpers TEST — no app data writes, no live/index promotion.');
+  html=html.replace('<section class="box"><h2>Account tabs</h2>', '<section class="box"><h2>Global helper status</h2><div class="grid"><div class="card"><b>Avatar helper</b><p id="avatarHelperStatus">Checking...</p></div><div class="card"><b>Shared style</b><p id="styleHelperStatus">Checking...</p></div><div class="card"><b>Settings bridge</b><p id="settingsBridgeStatus">Checking...</p></div></div></section><section class="box"><h2>Account tabs</h2>');
+  html=html.replace('</body>','<script src="stream-bandit-auth-avatar-v7-0-2.js"></'+'script><script src="stream-bandit-shared-style-v7-0-2.js"></'+'script><script src="stream-bandit-settings-global-v7-1-8.js"></'+'script><script>setTimeout(function(){try{var a=document.getElementById("avatarHelperStatus");if(a)a.textContent=window.StreamBanditAuthAvatar?"Loaded":"Not loaded";var s=document.getElementById("styleHelperStatus");if(s)s.textContent=window.StreamBanditSharedStyle?"Loaded":"Not loaded";var g=document.getElementById("settingsBridgeStatus");if(g&&window.StreamBanditSettingsGlobal){var st=window.StreamBanditSettingsGlobal.getState&&window.StreamBanditSettingsGlobal.getState();g.textContent="Loaded safely: "+(st&&st.source?st.source:"ready");}else if(g){g.textContent="Not loaded";}if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh)window.StreamBanditShellAuth.refresh();}catch(e){var g2=document.getElementById("settingsBridgeStatus");if(g2)g2.textContent="Helper check error: "+(e.message||e);}},1100);</'+'script></body>');
+  document.open();document.write(html);document.close();
+})();
+</script></body></html>
