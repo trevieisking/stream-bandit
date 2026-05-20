@@ -1,0 +1,14 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.2.0 Final Shell Navigation TEST</title></head><body><script>
+(async function(){
+  const src='final-shell-navigation-style-borrow-v6-59-3-test.html';
+  let html=await fetch(src,{cache:'no-store'}).then(r=>r.text());
+  html=html.replaceAll('Stream Bandit V6.59.3 Final Shell Navigation Style Borrow TEST','Stream Bandit V7.2.0 Final Shell Navigation Global Helpers TEST');
+  html=html.replaceAll('V6.59.3 Final Shell Navigation Style Borrow TEST','V7.2.0 Final Shell Navigation Global Helpers TEST');
+  html=html.replaceAll('This promotable check version keeps the V6.59.2 master menu guide and borrows the saved Web Builder/Theme Studio style.','This check version keeps the V6.59.3 master menu guide and adds the current global helper stack: account sync, avatar, shared style and Settings bridge.');
+  html=html.replaceAll('Shared shell, search, account/menu scripts, route counts, and style borrow must pass before this replaces the old route.','Shared shell, search overlay, account sync, avatar, shared style, Settings bridge, route counts and tabs must pass before this replaces the old route.');
+  html=html.replaceAll('V6.59.3 Final Shell Navigation Style Borrow TEST.','V7.2.0 Final Shell Navigation Global Helpers TEST — no live/index promotion.');
+  html=html.replaceAll('<div class="card"><b>Style source</b><p id="styleSource">Checking saved style...</p></div><div class="card"><b>Menu guide</b>', '<div class="card"><b>Style source</b><p id="styleSource">Checking saved style...</p></div><div class="card"><b>Settings bridge</b><p id="settingsBridgeStatus">Checking Settings bridge...</p></div><div class="card"><b>Menu guide</b>');
+  html=html.replace('</body>','<script src="stream-bandit-auth-sync-v6-31-7.js"></'+'script><script src="stream-bandit-auth-avatar-v7-0-2.js"></'+'script><script src="stream-bandit-shared-style-v7-0-2.js"></'+'script><script src="stream-bandit-settings-global-v7-1-8.js"></'+'script><script>setTimeout(function(){try{var el=document.getElementById("settingsBridgeStatus");if(el&&window.StreamBanditSettingsGlobal){var st=window.StreamBanditSettingsGlobal.getState&&window.StreamBanditSettingsGlobal.getState();el.textContent="Loaded safely: "+(st&&st.source?st.source:"ready");}else if(el){el.textContent="Not loaded yet."}if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh)window.StreamBanditShellAuth.refresh();}catch(e){var el2=document.getElementById("settingsBridgeStatus");if(el2)el2.textContent="Bridge check error: "+(e.message||e);}},1000);</'+'script></body>');
+  document.open();document.write(html);document.close();
+})();
+</script></body></html>
