@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.1.6 Settings Platform Control Hub TEST</title></head><body><script>
+(async function(){
+  const src='settings-platform-control-hub-v7-1-5-test.html';
+  let html=await fetch(src,{cache:'no-store'}).then(r=>r.text());
+  html=html.replaceAll('V7.1.5 Settings Platform Control Hub TEST','V7.1.6 Settings Platform Control Hub TEST');
+  html=html.replaceAll('V7.1.5 Settings Platform Control Hub TEST — local controls only, no live/index promotion.','V7.1.6 Settings Platform Control Hub TEST — favicon/app icon controls added, local only, no live/index promotion.');
+  html=html.replaceAll("Branding:{desc:'Branding/Global Studio owns editing. Settings shows status and route controls.',owners:[['Theme / Global Studio','web-builder-theme-studio-controls-v7-8-9-test.html']],items:['Header logo status','Favicon status','Apple touch icon status','Android/PWA icons status','Browser tab title status','App name status','Tagline status','Login text status','Open Global Studio link','Open Branding Studio link later']}","Branding:{desc:'Branding and app icon Settings controls. Theme Studio still owns theme editing; Settings owns favicon/app icon on/off/status and routing.',owners:[['Theme Studio','web-builder-theme-studio-controls-v7-8-9-test.html'],['Settings Control Hub','settings-admin-shell-v6-54-test.html']],items:['Header logo enabled','Header logo status','Favicon enabled','Favicon status','Show favicon in browser tab','Apple touch icon enabled','Apple touch icon status','Android/PWA icons enabled','Android/PWA icons status','Browser tab title enabled','Browser tab title status','App name status','Tagline status','Login text status','Open Theme Studio link','Open Branding owner later']}");
+  html=html.replace("<p>Big Settings map for Stream Bandit: feature on/off, private/paid/public visibility, menu/home/profile/card display, and owner page links. This does not edit the property itself.</p>","<p>Big Settings map for Stream Bandit: feature on/off, private/paid/public visibility, menu/home/profile/card display, favicon/app icon status, and owner page links. This does not duplicate Studio editors.</p>");
+  html=html.replace("version:'V7.1.5 local settings map only'","version:'V7.1.6 local settings map only'");
+  document.open();document.write(html);document.close();
+})();
+</script></body></html>
