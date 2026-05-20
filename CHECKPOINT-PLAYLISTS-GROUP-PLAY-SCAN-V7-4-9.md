@@ -2,6 +2,17 @@
 
 Date: 2026-05-20
 
+## Important correction from Trevor
+
+The Play All / Player 2 property first came from Genres, not Playlists.
+
+Correct history:
+
+- Genres is where Play All -> Player 2 first properly worked.
+- Playlists later uses/borrows that group-play pattern because playlists are also a real group owner.
+- Therefore Genres remains the main origin/clue page for Player 2 queue behaviour.
+- Playlists is a valid Group Play owner, but not the original source of the feature.
+
 ## Current route
 
 - `playlists-browse-shell-v6-47-test.html` forwards to `playlists-feed-canonical-v6-96-0-test.html`.
@@ -33,9 +44,10 @@ The current canonical page:
 - Playlist Play All -> Player 2 route.
 - Details -> Details route.
 
-This confirms the locked route rule:
+This confirms the locked route rule while preserving the feature history:
 
-- Playlists / Channels / My Channel / Collections = Group Play owners.
+- Genres originated the working Play All / Player 2 property.
+- Playlists / Channels / My Channel / Collections can also be Group Play owners.
 - Watchlist / Favourites / Likes / Continue Watching / Watch History = no Play All.
 - Supabase Library = no Play All unless a deliberate real queue payload feature is designed.
 
