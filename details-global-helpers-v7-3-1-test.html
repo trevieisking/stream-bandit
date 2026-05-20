@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.3.1 Details TEST</title><style>body{margin:0;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}.box{max-width:900px;margin:auto;border:1px solid #ffffff24;border-radius:24px;background:#11162d;padding:24px}.ok{color:#baf7df}</style></head><body><div class="box"><h1>Loading V7.3.1 Details Global Helpers TEST...</h1><p class="ok">Loading V7.3.0 Details and correcting Player 1 route labels.</p></div><script>
+(async function(){
+  try{
+    let html=await fetch('details-global-helpers-v7-3-0-test.html',{cache:'no-store'}).then(r=>r.text());
+    html=html.replaceAll('Stream Bandit V7.3.0 Details TEST','Stream Bandit V7.3.1 Details TEST');
+    html=html.replaceAll('V7.3.0 Details Global Helpers TEST','V7.3.1 Details Global Helpers TEST');
+    html=html.replaceAll('player-watch-shell-v6-34-test.html</p>','Player 1 V6.78.4<br><small>player-watch-shell-v6-34-test.html</small></p>');
+    html=html.replaceAll('Play opens Player V6.34','Play opens Player 1 V6.78.4');
+    html=html.replaceAll('Opens player-watch-shell-v6-34-test.html?id=movie_id.','Opens Player 1 V6.78.4 through player-watch-shell-v6-34-test.html?id=movie_id.');
+    html=html.replaceAll('V7.3.0 Details ready.','V7.3.1 Details ready. Player 1 route label fixed.');
+    html=html.replaceAll('V7.3.0 loaded. Sign in to use saves.','V7.3.1 loaded. Sign in to use saves.');
+    html=html.replaceAll('V7.3.0 Details Global Helpers TEST — no live/index promotion.','V7.3.1 Details Global Helpers TEST — Player 1 route label fixed, no live/index promotion.');
+    html=html.replace('</body>','<script>(function(){function fixPlayerLabels(){document.querySelectorAll(\'.card p,.check p,.footer,#status\').forEach(function(el){var t=el.innerHTML||el.textContent||\'\';if(/Player V6\\.34/i.test(t)){el.innerHTML=t.replace(/Player V6\\.34/g,\'Player 1 V6.78.4\');}if(/player-watch-shell-v6-34-test\\.html/i.test(t)&&!/Player 1 V6\\.78\\.4/i.test(t)&&el.closest&&el.closest(\'.card\')){el.innerHTML=\'Player 1 V6.78.4<br><small>player-watch-shell-v6-34-test.html</small>\';}});document.title=\'Stream Bandit V7.3.1 Details TEST\';var badge=document.querySelector(\'.badge\');if(badge)badge.textContent=\'V7.3.1 Details Global Helpers TEST\';}fixPlayerLabels();setTimeout(fixPlayerLabels,800);setTimeout(fixPlayerLabels,1600);})();<\/script></body>');
+    document.open();document.write(html);document.close();
+  }catch(e){
+    document.body.innerHTML='<div class="box"><h1>V7.3.1 Details load failed</h1><p>'+String(e.message||e)+'</p></div>';
+  }
+})();
+</script></body></html>
