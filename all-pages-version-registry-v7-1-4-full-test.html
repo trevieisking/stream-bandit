@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.1.4 Full Registry</title></head><body><script>
+(async function(){
+  const source='all-pages-version-registry-v7-1-1-full-test.html';
+  let html=await fetch(source,{cache:'no-store'}).then(r=>r.text());
+  html=html.replaceAll('Stream Bandit V7.1.1 Full All Pages Registry','Stream Bandit V7.1.4 Full All Pages Registry');
+  html=html.replaceAll('V7.1.1 FULL Registry TEST','V7.1.4 FULL Registry TEST');
+  html=html.replaceAll('updates the top-level checkpoint for Profile Settings V7.0.4 and Settings Global Save V7.1.0','updates the top-level checkpoint for Profile Settings V7.0.4, Settings Platform Control Hub V7.1.8, Settings Global Bridge V7.1.8.2, and full global helper sync');
+  html=html.replaceAll('Settings Global</b><p><span class="pill warn">TEST NOW</span><br>V7.1.0 saves global identity, theme and logo to sb_app_settings.','Settings Platform</b><p><span class="pill hot">PROMOTED</span><br>V7.1.8 platform feature-control hub passed. Old Settings route forwards to it.');
+  html=html.replaceAll('Global helpers</b><p>Avatar helper, shared style helper, auth/profile, auth sync and menu count must be used across final pages.','Global helpers</b><p>Shell, auth/profile, auth sync, menu count, avatar, shared style and Settings bridge are loaded on this registry.');
+  html=html.replaceAll('Next after Settings</b><p>Promote Settings route only after passed, then continue global pages and menu overlay pages.','Next after Settings</b><p>Settings is passed/promoted. Next: wire Settings bridge into real pages one at a time, no enforcement until approved.');
+  html=html.replaceAll('Full V7.1.1 registry ready. Live app unchanged.','Full V7.1.4 registry ready. Global helpers synced. Live app unchanged.');
+  html=html.replaceAll('Current Settings test: settings-global-save-v7-1-0-test.html. Do not forward old Settings route until Trevor passes the tests.','Current Settings route: settings-admin-shell-v6-54-test.html forwards to settings-platform-control-hub-v7-1-8-test.html. Settings Bridge check passed at settings-global-bridge-check-v7-1-8-2-test.html.');
+  html=html.replaceAll('Functional global identity/theme/logo save helper.','Safe global settings bridge. Reads future settings JSON only; no enforcement yet.');
+  html=html.replaceAll('settings-global-save-v7-1-0.js','stream-bandit-settings-global-v7-1-8.js');
+  html=html.replaceAll('settings-global-save-v7-1-0-test.html','settings-platform-control-hub-v7-1-8-test.html');
+  html=html.replaceAll('settings-admin-shell-v6-54-test.html\',\'Old read-only/map page; do not keep final if V7.1 passes','settings-admin-shell-v6-54-test.html\',\'Forwarded to Settings Platform Control Hub V7.1.8');
+  html=html.replaceAll('settings-global-save-v7-1-0-test.html\',\'CURRENT TEST functional global settings; old route not forwarded yet','settings-platform-control-hub-v7-1-8-test.html\',\'CURRENT PASSED Settings Platform Control Hub; old route forwards');
+  html=html.replaceAll('all-pages-version-registry-v7-1-1-full-test.html','all-pages-version-registry-v7-1-4-full-test.html');
+  html=html.replaceAll('Next: finish testing Settings Global Save V7.1.0.','Settings Platform Control Hub V7.1.8 passed and is promoted.');
+  html=html.replaceAll('If Settings V7.1.0 passes, forward old Settings route to the passed V7.1.x candidate.','Settings Global Bridge V7.1.8.2 passed. Next wire bridge carefully into pages one at a time after each test.');
+  html=html.replaceAll('V7.1.1 Full Registry TEST — full old route list preserved, live app unchanged.','V7.1.4 Full Registry TEST — full global helpers synced, live app unchanged.');
+  html=html.replace('</body>','<script src="stream-bandit-auth-sync-v6-31-7.js"></'+'script><script src="stream-bandit-settings-global-v7-1-8.js"></'+'script><script>setTimeout(function(){try{if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh)window.StreamBanditShellAuth.refresh();if(window.StreamBanditAuthSync&&window.StreamBanditShellAuth){var st=window.StreamBanditShellAuth.getState&&window.StreamBanditShellAuth.getState();if(st&&st.user)window.StreamBanditAuthSync.inn(st);}}catch(e){}},900);</'+'script></body>');
+  document.open();document.write(html);document.close();
+})();
+</script></body></html>
