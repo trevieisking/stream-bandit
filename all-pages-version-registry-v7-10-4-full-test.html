@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.10.4 Registry Correction</title></head><body><script>
+(async function(){
+  const source='all-pages-version-registry-v7-10-3-full-test.html';
+  let html=await fetch(source,{cache:'no-store'}).then(r=>r.text());
+  html=html.replaceAll('V7.10.3 Full All Pages Version Registry TEST','V7.10.4 Full All Pages Version Registry TEST');
+  html=html.replaceAll('V7.10.3 FULL Registry TEST','V7.10.4 FULL Registry TEST');
+  html=html.replaceAll('V7.10.3 Full All Pages Version Registry TEST — full current map, no live/index promotion.','V7.10.4 Full All Pages Version Registry TEST — Admin Centre route correction, full current map, no live/index promotion.');
+  html=html.replaceAll('all-pages-version-registry-v7-10-3-full-test.html','all-pages-version-registry-v7-10-4-full-test.html');
+  html=html.replaceAll("['Admin','Admin Centre','admin-centre-admin-shell-v6-53-test.html','Admin Centre V7.10.0 passed; route promotion still optional/check']","['Admin','Admin Centre','admin-centre-admin-shell-v6-53-test.html','Passed/promoted; wrapper now opens Admin Centre Command Deck V7.10.0']");
+  html=html.replaceAll("['Admin','All Pages Version Registry','all-pages-version-registry-v7-10-3-full-test.html','Current full registry test page']","['Admin','All Pages Version Registry','all-pages-version-registry-v7-10-4-full-test.html','Current full registry test page with Admin Centre route correction']");
+  html=html.replaceAll("const VERSION='V7.10.3 Full All Pages Version Registry TEST';","const VERSION='V7.10.4 Full All Pages Version Registry TEST';");
+  html=html.replaceAll('Registry loaded. Read-only. Live app unchanged.','Registry V7.10.4 loaded. Admin Centre wrapper corrected. Read-only. Live app unchanged.');
+  document.open();document.write(html);document.close();
+})();
+</script></body></html>
