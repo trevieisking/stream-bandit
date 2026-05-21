@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit V7.11.2 User Management Layout Polish TEST</title>
+<style>
+body{margin:0;min-height:100vh;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif;display:grid;place-items:center}.box{max-width:850px;margin:24px;border:1px solid #ffffff24;border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 20px 70px #0008;padding:24px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}.muted{color:#b9c0d8;line-height:1.5}.ok{color:#baf7df;font-weight:950}.btn{display:inline-flex;text-decoration:none;border-radius:999px;padding:11px 15px;background:linear-gradient(135deg,#22d3a6,#7c3cff);color:white;font-weight:950}
+</style>
+</head>
+<body>
+<div class="box">
+<span class="badge">V7.11.2 User Management Layout Polish TEST</span>
+<h1>Opening polished User Management</h1>
+<p class="ok">This version keeps the V7.11.1 working privilege controls and fixes the Future Plans / Feature JSON card text overflow.</p>
+<p class="muted">Target base: user-management-dashboard-v7-11-1-test.html</p>
+<p><a class="btn" href="user-management-dashboard-v7-11-1-test.html">Fallback V7.11.1</a></p>
+</div>
+<script>
+(async function(){
+  const base='user-management-dashboard-v7-11-1-test.html';
+  let html=await fetch(base,{cache:'no-store'}).then(r=>r.text());
+  html=html.replaceAll('V7.11.1 User Management Dashboard Current Schema TEST','V7.11.2 User Management Dashboard Layout Polish TEST');
+  html=html.replaceAll('V7.11.1 User Management Current Schema TEST','V7.11.2 User Management Layout Polish TEST');
+  html=html.replaceAll('V7.11.1 User Management Dashboard TEST — current schema safe.','V7.11.2 User Management Dashboard TEST — current schema safe, feature-card layout polished.');
+  html=html.replaceAll("version:'V7.11.1'","version:'V7.11.2'");
+  html=html.replace('</style>', `
+/* V7.11.2 layout polish: stop Future Plans feature cards spilling out */
+#futureSec .flags{
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  align-items:stretch;
+}
+#futureSec .check{
+  min-height:76px;
+  overflow:hidden;
+  align-items:flex-start;
+}
+#futureSec .check span{
+  display:grid;
+  gap:4px;
+  min-width:0;
+  max-width:100%;
+}
+#futureSec .check b,
+#futureSec .check small{
+  display:block;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  line-height:1.25;
+}
+#futureSec .source{
+  clear:both;
+  margin-top:14px;
+}
+#futureSec .grid .card{
+  min-height:150px;
+}
+@media(max-width:700px){#futureSec .flags{grid-template-columns:1fr}}
+</style>`);
+  document.open();document.write(html);document.close();
+})();
+</script>
+</body>
+</html>
