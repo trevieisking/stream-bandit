@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit V7.5.8 Profile Settings Global Helpers TEST</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#050711;
+  --card:#17122d;
+  --p:#101529;
+  --p2:#17122d;
+  --line:#ffffff22;
+  --muted:#b9c0d8;
+  --accent:#22d3a6;
+  --accent2:#7c3cff;
+  --pink:#ff2d85;
+  --warn:#ffb142;
+  --bad:#ff4d6d;
+  --cyan:#41e8ff;
+  --btnText:#fff;
+  --fontScale:1;
+}
+*{box-sizing:border-box;min-width:0}
+body{
+  margin:0;
+  padding:22px;
+  background:
+    radial-gradient(circle at top left,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),
+    radial-gradient(circle at top right,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),
+    radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 38%),
+    var(--bg);
+  color:white;
+  font-family:Inter,system-ui,Arial,sans-serif;
+  font-size:calc(16px * var(--fontScale));
+}
+.wrap{max-width:1500px;margin:auto}
+.box,.head,.hero{
+  border:1px solid var(--line);
+  border-radius:28px;
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  padding:22px;
+  margin:0 0 18px;
+  box-shadow:0 20px 70px #0007;
+}
+.head{
+  display:grid;
+  grid-template-columns:minmax(250px,320px) 1fr minmax(290px,390px);
+  gap:14px;
+  align-items:start;
+  overflow:visible;
+}
+.brand{display:flex;gap:12px;align-items:center;font-size:22px;font-weight:950}
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:grid;
+  place-items:center;
+}
+.search{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  background:#0004;
+  padding:9px 10px 9px 14px;
+}
+.search input{
+  flex:1;
+  background:transparent;
+  border:0;
+  color:#fff;
+  outline:0;
+  font:inherit;
+}
+.badge,.pill{
+  display:inline-flex;
+  border-radius:999px;
+  background:#22d3a624;
+  border:1px solid #22d3a657;
+  color:#baf7df;
+  font-weight:950;
+}
+.badge{padding:7px 12px}
+.pill{font-size:12px;padding:5px 8px;margin:2px}
+h1{
+  font-size:clamp(42px,6vw,78px);
+  line-height:.95;
+  margin:10px 0;
+  letter-spacing:-.06em;
+}
+h2{margin:0 0 14px}
+h3{margin:0 0 8px}
+.muted,p,label,li{color:var(--muted);line-height:1.5}
+.btn,.tab,.locked{
+  border:0;
+  border-radius:999px;
+  padding:12px 16px;
+  background:#414667;
+  color:var(--btnText);
+  font-weight:950;
+  cursor:pointer;
+  margin:4px;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}
+.warn{background:linear-gradient(135deg,var(--warn),var(--accent2))}
+.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2))}
+.locked{opacity:.65;cursor:not-allowed}
+.grid,.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:14px;
+}
+.field,.card,.check{
+  border:1px solid #ffffff1a;
+  border-radius:20px;
+  background:#ffffff0d;
+  padding:16px;
+  overflow-wrap:anywhere;
+}
+.field label,.card b,.check b{
+  display:block;
+  color:#baf7df;
+  font-weight:950;
+  margin-bottom:8px;
+}
+.field input,.field textarea{
+  width:100%;
+  border:1px solid #ffffff24;
+  border-radius:14px;
+  background:#0005;
+  color:white;
+  padding:11px;
+  margin:8px 0;
+  font:inherit;
+}
+.field textarea{min-height:108px}
+.status,.note{
+  padding:12px 14px;
+  border-radius:18px;
+  background:#22d3a61a;
+  border:1px solid #22d3a647;
+  color:#dfffee;
+  font-weight:850;
+  margin-top:14px;
+}
+.bad{
+  background:#ff2d851f;
+  border-color:#ff2d8552;
+  color:#ffd6e8;
+}
+.note{
+  background:#ffb1421f;
+  border-color:#ffb14252;
+  color:#ffe7ad;
+}
+.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap}
+.section{display:none}
+.section.active{display:block}
+.preview{
+  height:145px;
+  border-radius:20px;
+  background:#0005;
+  border:1px solid #ffffff24;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+.avatar{
+  width:114px;
+  height:114px;
+  border-radius:28px;
+}
+.preview img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.previewRow{
+  display:grid;
+  grid-template-columns:140px 1fr;
+  gap:18px;
+  align-items:center;
+}
+.heroLayout{
+  display:grid;
+  grid-template-columns:minmax(320px,1fr) minmax(320px,460px);
+  gap:18px;
+  align-items:stretch;
+}
+.profileHero{
+  border:1px solid #ffffff1a;
+  border-radius:30px;
+  background:#0004;
+  overflow:hidden;
+  min-height:350px;
+  display:grid;
+  grid-template-rows:1fr auto;
+}
+.bannerHero{
+  min-height:230px;
+  background:linear-gradient(135deg,#22d3a620,#7c3cff35);
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+.bannerHero img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.profileInfo{
+  padding:18px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
+.profileInfo .avatar{flex:0 0 auto}
+.src{
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:#0006;
+  border-radius:16px;
+  padding:12px;
+  color:#dfffee;
+  max-height:280px;
+  overflow:auto;
+}
+.footer{text-align:center;color:#8f98b8;margin:28px 0}
+@media(max-width:980px){
+  .head,.heroLayout,.previewRow{grid-template-columns:1fr}
+  .search{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="head">
+  <div class="brand">
+    <div class="logo">👤</div>
+    <span>Stream Bandit</span>
+  </div>
+  <div class="muted">
+    <b>Profile Settings Global Helpers TEST. Preserves V7.0.4 save/upload logic while adding current global helper status and Settings-group polish.</b>
+  </div>
+  <div>
+    <div class="search">
+      <span>🔎</span>
+      <input id="globalSearch" placeholder="Search Stream Bandit">
+      <button id="globalSearchBtn" class="btn primary" type="button">Search</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="heroLayout">
+    <div>
+      <span class="badge">V7.5.8 Profile Settings Global Helpers TEST</span>
+      <h1>Profile Settings</h1>
+      <p>Manage your profile text, creator channel name, avatar and banner from the existing <code>sb_profiles</code> row. This page updates only your existing profile row and never inserts a new profile.</p>
+      <div class="actions">
+        <button id="loadProfile" class="btn primary" type="button">Load profile</button>
+        <button id="saveText" class="btn hot" type="button">Save profile text</button>
+        <button id="syncHeader" class="btn cyan" type="button">Sync header</button>
+        <button id="reloadStyle" class="btn warn" type="button">Reload shared style</button>
+      </div>
+      <div id="helperStatus" class="status">Checking global helpers...</div>
+      <div id="status" class="status">Loading...</div>
+    </div>
+
+    <div class="profileHero">
+      <div id="bannerHero" class="bannerHero">Banner preview</div>
+      <div class="profileInfo">
+        <div id="avatarHero" class="preview avatar">👤</div>
+        <div>
+          <h2 id="heroName">Profile name</h2>
+          <p id="heroUser">@username</p>
+          <span id="heroRole" class="pill">Role</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="box">
+  <div class="tabs">
+    <button class="tab active" data-tab="profile">Profile text</button>
+    <button class="tab" data-tab="images">Images</button>
+    <button class="tab" data-tab="previewSec">Preview</button>
+    <button class="tab" data-tab="safety">Safety</button>
+    <button class="tab" data-tab="checklist">Checklist</button>
+    <button class="tab" data-tab="debugSec">Debug</button>
+  </div>
+</section>
+
+<section id="profile" class="box section active">
+  <h2>Profile text</h2>
+  <div class="grid">
+    <div class="field">
+      <label>Display name</label>
+      <input id="displayName" maxlength="80">
+    </div>
+    <div class="field">
+      <label>Username</label>
+      <input id="username" maxlength="60">
+    </div>
+    <div class="field">
+      <label>Channel name</label>
+      <input id="channelName" maxlength="90">
+    </div>
+    <div class="field">
+      <label>Channel about / bio</label>
+      <textarea id="channelAbout" maxlength="500"></textarea>
+    </div>
+  </div>
+  <div class="note">Save text updates only the existing signed-in user row in <code>sb_profiles</code>.</div>
+</section>
+
+<section id="images" class="box section">
+  <h2>Avatar / Banner</h2>
+  <div class="grid">
+    <div class="field">
+      <h3>Avatar</h3>
+      <div id="avatarPreview" class="preview avatar">👤</div>
+      <input id="avatarFile" type="file" accept="image/*">
+      <button id="uploadAvatar" class="btn primary" type="button">Upload + save avatar_url</button>
+      <input id="avatarUrl" readonly placeholder="avatar_url">
+    </div>
+
+    <div class="field">
+      <h3>Banner</h3>
+      <div id="bannerPreview" class="preview">Banner</div>
+      <input id="bannerFile" type="file" accept="image/*">
+      <button id="uploadBanner" class="btn primary" type="button">Upload + save banner_url</button>
+      <input id="bannerUrl" readonly placeholder="banner_url">
+    </div>
+  </div>
+</section>
+
+<section id="previewSec" class="box section">
+  <h2>Profile preview</h2>
+  <div class="previewRow">
+    <div id="avatarMini" class="preview avatar">👤</div>
+    <div>
+      <h2 id="previewName">Profile name</h2>
+      <p id="previewUser">@username</p>
+      <p id="previewBio">Bio preview</p>
+      <span id="previewRole" class="pill">Role</span>
+    </div>
+  </div>
+</section>
+
+<section id="safety" class="box section">
+  <h2>Safety</h2>
+  <div class="cards">
+    <div class="check">
+      <b>Existing row only</b>
+      <p>No insert/upsert. If the profile row is missing, the page stops and warns.</p>
+    </div>
+    <div class="check">
+      <b>Safe fields</b>
+      <p>Only display/profile text, avatar_url and banner_url are saved.</p>
+    </div>
+    <div class="check">
+      <b>Storage path</b>
+      <p>Uploads go to <code>stream-bandit-images/profiles/user-id/...</code>.</p>
+    </div>
+    <div class="check">
+      <b>Global refresh</b>
+      <p>After saves, shell account/avatar helpers are refreshed.</p>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="locked" disabled>Delete profile - protected</button>
+    <button class="locked" disabled>Change role - protected</button>
+    <button class="locked" disabled>Promote live - protected</button>
+  </div>
+</section>
+
+<section id="checklist" class="box section">
+  <h2>V7.5.8 test checklist</h2>
+  <div class="cards">
+    <div class="check">
+      <b>1. Global</b>
+      <p>Theme, menu, account, avatar, search and helper status load.</p>
+    </div>
+    <div class="check">
+      <b>2. Profile</b>
+      <p>Profile loads from existing <code>sb_profiles</code> row.</p>
+    </div>
+    <div class="check">
+      <b>3. Text save</b>
+      <p>Safe text field edit saves and reloads.</p>
+    </div>
+    <div class="check">
+      <b>4. Avatar/banner</b>
+      <p>Upload/save persists and refreshes shell avatar/account.</p>
+    </div>
+    <div class="check">
+      <b>5. Safety</b>
+      <p>No role/delete/live action is available.</p>
+    </div>
+  </div>
+</section>
+
+<section id="debugSec" class="box section">
+  <h2>Debug</h2>
+  <div id="debug" class="src">Waiting...</div>
+</section>
+
+<p class="footer">V7.5.8 Profile Settings Global Helpers TEST — no live/index promotion.</p>
+</div>
+
+<script src="stream-bandit-shell-v6-24.js"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js"></script>
+<script src="stream-bandit-auth-profile-v6-31.js"></script>
+<script src="stream-bandit-auth-sync-v6-31-7.js"></script>
+<script src="stream-bandit-auth-avatar-v7-0-2.js"></script>
+<script src="stream-bandit-shared-style-v7-0-2.js"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js"></script>
+<script src="profile-settings-complete-v7-0-3.js"></script>
+
+<script>
+(function(){
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function show(id,url,fallback){
+  const el=$(id);
+  if(!el)return;
+  el.innerHTML=url?'<img src="'+esc(url)+'" alt="">':fallback;
+}
+function renderHero(){
+  const av=($('avatarUrl')&&$('avatarUrl').value)||'';
+  const bn=($('bannerUrl')&&$('bannerUrl').value)||'';
+  const name=($('displayName')&&$('displayName').value)||($('channelName')&&$('channelName').value)||'Profile name';
+  const user=($('username')&&$('username').value)||'username';
+
+  show('avatarHero',av,'👤');
+  show('avatarMini',av,'👤');
+  show('bannerHero',bn,'Banner preview');
+
+  $('heroName').textContent=name;
+  $('heroUser').textContent='@'+user;
+
+  if($('heroRole')&&$('previewRole')){
+    $('heroRole').textContent=$('previewRole').textContent||'Role';
+  }
+}
+function updateHelperStatus(){
+  let bridge=null;
+
+  try{
+    bridge=window.StreamBanditSettingsGlobal&&window.StreamBanditSettingsGlobal.getState&&window.StreamBanditSettingsGlobal.getState();
+  }catch(e){}
+
+  $('helperStatus').innerHTML=
+    '<b>Global helpers:</b> '+
+    'Account sync '+(window.StreamBanditAuthSync?'✅':'❌')+' · '+
+    'Avatar '+(window.StreamBanditAuthAvatar?'✅':'❌')+' · '+
+    'Shared style '+(window.StreamBanditSharedStyle?'✅':'❌')+' · '+
+    'Settings bridge '+(window.StreamBanditSettingsGlobal?'✅':'❌')+
+    (bridge&&bridge.source?' · source: '+esc(bridge.source):'');
+
+  try{
+    if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh){
+      window.StreamBanditShellAuth.refresh();
+    }
+  }catch(e){}
+}
+
+['displayName','username','channelName','channelAbout','avatarUrl','bannerUrl'].forEach(id=>{
+  document.addEventListener('input',e=>{
+    if(e.target&&e.target.id===id)setTimeout(renderHero,80);
+  },true);
+
+  document.addEventListener('change',e=>{
+    if(e.target&&e.target.id===id)setTimeout(renderHero,120);
+  },true);
+});
+
+setInterval(renderHero,900);
+
+setTimeout(updateHelperStatus,600);
+setTimeout(updateHelperStatus,1500);
+setTimeout(updateHelperStatus,3000);
+setInterval(updateHelperStatus,5000);
+
+renderHero();
+updateHelperStatus();
+})();
+</script>
+</body>
+</html>
