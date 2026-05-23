@@ -1,22 +1,21 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.4.2 Accessibility TEST</title><style>body{margin:0;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}.box{max-width:900px;margin:auto;border:1px solid #ffffff24;border-radius:24px;background:#11162d;padding:24px}.ok{color:#baf7df}</style></head><body><div class="box"><h1>Loading V7.4.2 Accessibility...</h1><p class="ok">Removing duplicate Settings Studio controls from the passed V7.4.1 page.</p></div><script>
-(async function(){
-  try{
-    let html=await fetch('accessibility-global-helpers-v7-4-1-test.html',{cache:'no-store'}).then(r=>r.text());
-    html=html.replaceAll('Stream Bandit V7.4.1 Accessibility TEST','Stream Bandit V7.4.2 Accessibility TEST');
-    html=html.replaceAll('V7.4.1 Accessibility Global Helpers TEST','V7.4.2 Accessibility Global Helpers TEST');
-    html=html.replaceAll('V7.4.1 Accessibility Checklist','V7.4.2 Accessibility Checklist');
-    html=html.replaceAll('version:\'V7.4.1 Accessibility Global Helpers TEST\'','version:\'V7.4.2 Accessibility Global Helpers TEST\'');
-    html=html.replaceAll('Opens as V7.4.1 with no code printed.','Opens as V7.4.2 with no code printed.');
-    html=html.replaceAll('Controls here are preview-only. Real saved settings stay in the correct Settings/Studio property later.','Controls here are preview-only. Real global accessibility save belongs to Settings Studio / global settings later.');
-    html=html.replaceAll('<button class="tab" data-tab="settings">Settings / Branding</button>','');
-    html=html.replace(/<section id="settings" class="box section">[\s\S]*?<\/section><section id="state"/,'<section id="state"');
-    html=html.replaceAll('oldSettingsStudioRoute:false,','oldSettingsStudioRoute:false,duplicateSettingsControlsRemoved:true,');
-    html=html.replaceAll('Settings Studio — locked for Watch comfort test','');
-    html=html.replaceAll('No old Settings Studio route from this Watch comfort page. Real saved accessibility/global settings belong to Settings Hub / Settings Studio later.','Real saved accessibility/global settings belong to Settings Hub / Settings Studio later. No duplicate Settings controls live on this Accessibility page.');
-    html=html.replaceAll('Do not open old Settings Studio route from this Watch page.','No Settings Studio button/tab is duplicated on this Watch page.');
-    html=html.replaceAll('V7.4.1 Accessibility Global Helpers TEST — no live/index promotion.','V7.4.2 Accessibility Global Helpers TEST — duplicate Settings controls removed, no live/index promotion.');
-    html=html.replace('</body>','<script>(function(){function clean(){document.title=\'Stream Bandit V7.4.2 Accessibility TEST\';document.querySelectorAll(\'[data-tab="settings"],#settings\').forEach(function(el){el.remove();});var badge=document.querySelector(\'.badge\');if(badge)badge.textContent=\'V7.4.2 Accessibility Global Helpers TEST\';var foot=document.querySelector(\'.footer\');if(foot)foot.textContent=\'V7.4.2 Accessibility Global Helpers TEST — duplicate Settings controls removed, no live/index promotion.\';document.querySelectorAll(\'h2,p,li,.check p,#status,#stateBox\').forEach(function(el){if(el.textContent&&el.textContent.indexOf(\'V7.4.1\')>-1)el.textContent=el.textContent.replaceAll(\'V7.4.1\',\'V7.4.2\');});var hero=document.querySelector(\'.hero p\');if(hero)hero.textContent=\'Accessibility / Player Comfort protects louder audio, readable layout, focus visibility and fullscreen comfort. Controls here are preview-only. Real global accessibility save belongs to Settings Studio / global settings later.\';}clean();setTimeout(clean,800);setTimeout(clean,1600);setTimeout(clean,2800);})();<\/script></body>');
-    document.open();document.write(html);document.close();
-  }catch(e){document.body.innerHTML='<div class="box"><h1>V7.4.2 Accessibility load failed</h1><p>'+String(e.message||e)+'</p></div>';}
-})();
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="0; url=accessibility-clean-machine-v7-12-44-test.html">
+<title>Stream Bandit Accessibility route retired</title>
+<style>
+body{margin:0;min-height:100vh;background:#050711;color:#fff;font-family:system-ui,Arial,sans-serif;display:grid;place-items:center;padding:24px}.box{max-width:720px;border:1px solid #ffffff22;border-radius:24px;background:#17122d;padding:28px}a{display:inline-block;background:#7c3cff;color:#fff;border-radius:999px;padding:12px 16px;text-decoration:none;font-weight:900}.muted{color:#d7ccff;line-height:1.5}code{color:#baf7df}
+</style>
+</head>
+<body>
+<main class="box">
+<h1>Opening Clean Accessibility…</h1>
+<p class="muted">This retired Accessibility route now points to the passed clean page.</p>
+<p><code>accessibility-clean-machine-v7-12-44-test.html</code></p>
+<a href="accessibility-clean-machine-v7-12-44-test.html">Open Clean Accessibility</a>
+<p class="muted">No live/index promotion.</p>
+</main>
+</body>
+</html>
