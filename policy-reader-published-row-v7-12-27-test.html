@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit V7.12.27 Policy Published Row Proof TEST</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#090014;--panel:#241044;--panel2:#32165f;--line:#ffffff22;--muted:#d8ccff;--good:#22d3a6;--pink:#ff2d85;--purple:#7c3cff;--warn:#ffb142;--bad:#ff4d6d}*{box-sizing:border-box}body{margin:0;padding:22px;background:radial-gradient(circle at top left,#ff2d8540,transparent 32%),radial-gradient(circle at top right,#7c3cff55,transparent 40%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.wrap{max-width:1180px;margin:auto}.shell,.hero,.card,.doc,.debug{border:1px solid var(--line);border-radius:26px;background:linear-gradient(135deg,var(--panel),var(--panel2));box-shadow:0 24px 80px #0008;padding:22px;margin-bottom:18px}.shell{display:grid;grid-template-columns:1fr minmax(260px,420px);gap:16px;align-items:center}.brand{font-size:24px;font-weight:950}.muted,p{color:var(--muted);line-height:1.6}h1{font-size:clamp(42px,7vw,78px);line-height:.92;margin:12px 0;letter-spacing:-.06em}h2{font-size:clamp(24px,3vw,42px);margin:0 0 12px}.badge,.pill{display:inline-flex;align-items:center;border-radius:999px;padding:7px 12px;background:#ffffff16;border:1px solid #ffffff24;font-weight:950}.ok{background:#22d3a625;border-color:#22d3a670;color:#cffff0}.warn{background:#ffb14225;border-color:#ffb14270;color:#ffe7ad}.bad{background:#ff4d6d25;border-color:#ff4d6d70;color:#ffd7df}.btn{border:0;border-radius:999px;padding:12px 16px;background:#414667;color:#fff;font-weight:950;text-decoration:none;display:inline-flex;cursor:pointer}.primary{background:linear-gradient(135deg,var(--pink),var(--purple))}.safe{background:linear-gradient(135deg,var(--good),var(--purple))}.actions,.meta{display:flex;gap:9px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.docBody{border:1px solid #ffffff18;border-radius:20px;background:#0004;padding:18px}.docBody p{font-size:18px;color:#fff}.status{padding:13px 15px;border-radius:18px;background:#22d3a61c;border:1px solid #22d3a655;color:#dfffee;font-weight:900;margin-top:14px}.note{padding:13px 15px;border-radius:18px;background:#ffb1421f;border:1px solid #ffb14255;color:#ffe7ad;font-weight:900;margin-top:14px}.danger{padding:13px 15px;border-radius:18px;background:#ff4d6d20;border:1px solid #ff4d6d66;color:#ffd7df;font-weight:900;margin-top:14px}.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0006;border-radius:18px;padding:14px;color:#dfffee}.search{display:flex;gap:8px;border:1px solid #ffffff24;border-radius:999px;background:#0004;padding:8px}.search input{flex:1;min-width:0;background:transparent;border:0;color:#fff;outline:0}.pageFoot{text-align:center;color:#b8a8e9;margin:28px 0}@media(max-width:800px){.shell{grid-template-columns:1fr}.btn{width:100%;justify-content:center}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="shell">
+ <div><div class="brand">Stream Bandit</div><p class="muted"><b>V7.12.27 Policy Published Row Proof TEST.</b><br>Purpose: prove one safe public Supabase row loads as <b>source: supabase-published</b>. No global footer promotion.</p></div>
+ <div class="search"><input id="globalSearch" placeholder="Search Stream Bandit"><button class="btn primary" id="searchBtn" type="button">Search</button></div>
+</header>
+<section class="hero">
+ <span class="badge ok">Protected public-reader proof</span>
+ <h1>Published Policy Row</h1>
+ <p>This test page reads from <b>sb_policy_documents</b> using the public published-only rule. It defaults to Accessibility because that is the safe row selected for the first published proof.</p>
+ <div class="actions">
+  <button id="reloadBtn" class="btn safe" type="button">Reload proof</button>
+  <a class="btn" href="policy-public-reader-proof-v7-12-26-test.html?policy=accessibility">V7.12.26 Reader</a>
+  <a class="btn" href="policy-admin-save-editor-v7-12-25-test.html">Admin Save Editor</a>
+  <a class="btn" href="policy-agreements-centre-v7-11-6-test.html">Policy Centre</a>
+ </div>
+ <div id="statusBox" class="status">Loading published Accessibility row...</div>
+ <div id="helperBox" class="status">Checking helpers...</div>
+ <div class="note">Locked rule: this page has no edit fields, no save button, no delete button, no upload button, no admin controls and no global footer promotion.</div>
+</section>
+<section class="grid">
+ <div class="card"><h2>Expected pass</h2><p>Accessibility should show <b>source: supabase-published</b> after the V7.12.27 SQL seed/editor save has published it.</p></div>
+ <div class="card"><h2>Expected fallback</h2><p>Other policy slugs can still stay fallback/draft until they are cleaned and reviewed later.</p></div>
+ <div class="card"><h2>Safety</h2><p>Visitor read only. Admin editing remains on the protected save editor with Supabase Auth, profile role and RLS.</p></div>
+</section>
+<article class="doc">
+ <div id="docHead"><h2>Loading...</h2></div>
+ <div id="docMeta" class="meta"></div>
+ <div id="docBody" class="docBody"><p>Loading policy...</p></div>
+</article>
+<section class="debug">
+ <h2>Debug proof</h2>
+ <div id="debugBox" class="source">Waiting...</div>
+</section>
+<p class="pageFoot">V7.12.27 Policy Published Row Proof TEST — test page only, no live/index promotion.</p>
+</div>
+<script src="stream-bandit-auth-sync-v6-31-7.js"></script>
+<script src="stream-bandit-auth-avatar-v7-0-2.js"></script>
+<script src="stream-bandit-shared-style-v7-0-2.js"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js"></script>
+<script>
+(function(){
+'use strict';
+const VERSION='V7.12.27 Policy Published Row Proof TEST';
+const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+const SUPABASE_KEY=['sb','publishable','1wHhSq2xo0XBwsKXO','64HQ','xyVY9xRN'].join('_');
+const FALLBACK={
+ accessibility:{title:'Accessibility Statement',label:'Accessibility',body:'STREAM BANDIT ACCESSIBILITY STATEMENT\n\nContact: info@chatterfriendsstreambandit.co.uk\n\nFallback text is showing. This means no published Accessibility row was returned by Supabase yet.\n\nClean the Accessibility body, set status to published, save in the protected admin editor, then reload this proof page.'},
+ terms:{title:'Terms of Use / End User Agreement',label:'Terms',body:'Fallback Terms text. Keep draft until reviewed and separately published.'},
+ privacy:{title:'Privacy Policy',label:'Privacy',body:'Fallback Privacy text. Keep draft until reviewed and separately published.'},
+ cookies:{title:'Cookie Policy',label:'Cookies',body:'Fallback Cookie text. Keep draft until reviewed and separately published.'},
+ 'family-watch':{title:'Children / Family Watch Policy',label:'Family Watch',body:'Fallback Family Watch text. Keep draft until reviewed and separately published.'},
+ cancellation:{title:'Cancellation / Refunds Policy',label:'Cancellation',body:'Fallback Cancellation text. Keep draft until reviewed and separately published.'},
+ 'creator-content':{title:'Creator / Content Rules',label:'Creator Rules',body:'Fallback Creator Rules text. Keep draft until reviewed and separately published.'}
+};
+let sb=null,last={};
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s??'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
+function client(){if(!sb)sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return sb}
+function slug(){const p=new URLSearchParams(location.search).get('policy')||'accessibility';return FALLBACK[p]?p:'accessibility'}
+function updateHelpers(){let bridge=null;try{bridge=window.StreamBanditSettingsGlobal&&window.StreamBanditSettingsGlobal.getState&&window.StreamBanditSettingsGlobal.getState()}catch(e){}$('helperBox').innerHTML='<b>Helpers:</b> Account sync '+(window.StreamBanditAuthSync?'✅':'❌')+' · Avatar '+(window.StreamBanditAuthAvatar?'✅':'❌')+' · Shared style '+(window.StreamBanditSharedStyle?'✅':'❌')+' · Brand logo '+(window.StreamBanditBrandLogo?'✅':'❌')+' · Settings bridge '+(window.StreamBanditSettingsGlobal?'✅':'❌')+(bridge&&bridge.source?' · bridge source: '+esc(bridge.source):'')}
+function render(row,source){const s=slug();const f=FALLBACK[s];const title=row&&row.title?row.title:f.title;const body=row&&row.body?row.body:f.body;const status=row&&row.status?row.status:(source==='fallback'?'fallback':'unknown');const email=row&&row.contact_email?row.contact_email:'info@chatterfriendsstreambandit.co.uk';const version=row&&row.version_label?row.version_label:'fallback';$('docHead').innerHTML='<h2>'+esc(title)+'</h2><p class="muted">Selected slug: <b>'+esc(s)+'</b></p>';$('docMeta').innerHTML='<span class="pill '+(source==='supabase-published'?'ok':'warn')+'">source: '+esc(source)+'</span><span class="pill">status: '+esc(status)+'</span><span class="pill">version: '+esc(version)+'</span><span class="pill">contact: '+esc(email)+'</span>';$('docBody').innerHTML=String(body).split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')+'<div class="note">Legal wording can still be reviewed before final launch. This page proves the public reader path only.</div>';}
+function debug(){ $('debugBox').textContent=JSON.stringify({version:VERSION,selectedPolicy:slug(),expectedPublishedSlug:'accessibility',source:last.source||null,supabaseStatus:last.supabaseStatus||null,usedFallback:!!last.usedFallback,error:last.error||null,publicReaderOnly:true,noEditFields:true,noSaveButtons:true,globalFooterPromotion:false},null,2) }
+async function load(){const s=slug();const f=FALLBACK[s];last={source:'fallback',usedFallback:true,supabaseStatus:'checking'};$('statusBox').className='status';$('statusBox').textContent='Checking Supabase for published '+f.label+' row...';render(null,'fallback');debug();try{const r=await client().from('sb_policy_documents').select('slug,title,body,status,contact_email,version_label,legal_review_required,updated_at').eq('slug',s).eq('status','published').maybeSingle();if(r.error)throw r.error;if(r.data){last={source:'supabase-published',usedFallback:false,supabaseStatus:'published row found'};render(r.data,'supabase-published');$('statusBox').className='status';$('statusBox').innerHTML='PASS TARGET HIT: Loaded published '+esc(f.label)+' policy from Supabase. Look for <b>source: supabase-published</b> above.';}else{last={source:'fallback',usedFallback:true,supabaseStatus:'no published row'};render(null,'fallback');$('statusBox').className='note';$('statusBox').textContent='No published '+f.label+' row returned. Safe fallback is showing.';}}catch(e){last={source:'fallback',usedFallback:true,supabaseStatus:'error',error:e.message||String(e)};render(null,'fallback');$('statusBox').className='danger';$('statusBox').textContent='Supabase public read failed safely. Fallback is showing: '+(e.message||String(e));}debug();}
+$('reloadBtn').onclick=load;
+$('searchBtn').onclick=()=>{const q=$('globalSearch').value.trim();if(q)location.href='global-search-global-helpers-v7-4-9-test.html?q='+encodeURIComponent(q)};
+$('globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('searchBtn').click()});
+updateHelpers();setTimeout(updateHelpers,800);setInterval(updateHelpers,6000);load();
+})();
+</script>
+</body>
+</html>
