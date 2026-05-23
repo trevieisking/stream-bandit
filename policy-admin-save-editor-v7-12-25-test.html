@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit V7.12.25 Policy Admin Save Editor TEST</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--fontScale:1}*{box-sizing:border-box;min-width:0}body{margin:0;padding:22px;background:radial-gradient(circle at top left,color-mix(in srgb,var(--good),transparent 72%),transparent 34%),radial-gradient(circle at top right,color-mix(in srgb,var(--purple),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 86%),transparent 40%),var(--bg);color:white;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(16px * var(--fontScale))}.wrap{max-width:1500px;margin:auto}.head,.hero,.box{border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 20px 70px #0007;padding:22px;margin-bottom:18px}.head{display:grid;grid-template-columns:minmax(250px,320px) 1fr minmax(280px,390px);gap:14px;align-items:start}.brand{display:flex;gap:12px;align-items:center;font-size:22px;font-weight:950}.logo{width:44px;height:44px;border-radius:14px;background:#000;overflow:hidden;border:1px solid #22d3a657;display:grid;place-items:center}.logo img{width:100%;height:100%;object-fit:cover}.search,.actions,.miniActions{display:flex;gap:9px;flex-wrap:wrap}.search{border:1px solid #ffffff24;border-radius:999px;background:#0004;padding:9px 10px 9px 14px}.search input{flex:1;background:transparent;border:0;color:white;outline:0}.badge,.pill{display:inline-flex;border-radius:999px;padding:7px 12px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950}.pill{font-size:12px;padding:5px 8px}.ok{background:#22d3a624;border-color:#22d3a666;color:#baf7df}.warnP{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.bad{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}h1{font-size:clamp(42px,6vw,76px);line-height:.95;margin:10px 0;letter-spacing:-.06em}h2{margin:0 0 14px}.muted,p,li{color:var(--muted);line-height:1.55}.btn{border:0;border-radius:999px;padding:11px 15px;background:#414667;color:white;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.btn:disabled{opacity:.55;cursor:not-allowed}.primary{background:linear-gradient(135deg,var(--good),var(--purple))}.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}.warn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#111}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--pink))}.status,.note,.danger{padding:12px 14px;border-radius:18px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:14px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.card{border:1px solid #ffffff1a;border-radius:18px;background:#ffffff0f;padding:14px;overflow-wrap:anywhere}.card b{display:block;color:#baf7df;margin-bottom:8px}.editorGrid{display:grid;grid-template-columns:minmax(260px,380px) minmax(0,1fr);gap:14px}.docList{display:grid;gap:8px}.docBtn{width:100%;border:1px solid #ffffff1a;border-radius:16px;background:#ffffff10;color:#fff;padding:12px;text-align:left;cursor:pointer;font-weight:950}.docBtn.active{outline:3px solid #22d3a6;background:#22d3a61d}.docBtn small{display:block;color:#b9c0d8;margin-top:4px;line-height:1.35}.field{display:grid;gap:7px;margin-bottom:12px}.field label{font-weight:950;color:#baf7df}.field input,.field select,.field textarea{width:100%;border:1px solid #ffffff24;border-radius:16px;background:#0005;color:#fff;padding:12px;font:inherit}.field textarea{min-height:470px;resize:vertical;line-height:1.55}.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0005;border-radius:16px;padding:12px;color:#dfffee;max-height:520px;overflow:auto}.adminOnly{display:none}.lockedOnly{display:none}.previewBox{border:1px solid #ffffff1a;border-radius:20px;background:#ffffff0c;padding:18px;max-height:560px;overflow:auto}.previewBox h2{margin:20px 0 8px}.previewBox p{font-size:17px;color:#e8ecff}.footer{text-align:center;color:#8f98b8;margin:28px 0}@media(max-width:980px){.head,.editorGrid{grid-template-columns:1fr}.search{width:100%}.btn{width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="head"><div class="brand"><div class="logo"><img data-sb-brand-logo alt="Stream Bandit logo"></div><span>Stream Bandit</span></div><div class="muted"><b>V7.12.25 Policy Admin Save Editor TEST.</b><br>Admin-only editor for sb_policy_documents. Saves to Supabase only. No footer/global promotion.</div><div><div class="search"><span>🔎</span><input id="globalSearch" placeholder="Search Stream Bandit"><button id="globalSearchBtn" class="btn primary" type="button">Search</button></div></div></header>
+<section class="hero"><span class="badge">Protected policy editor</span><h1>Policy Save Editor</h1><p>This page unlocks the real policy save workflow only after the V7.12.24 protection chain passes: Supabase session, sb_profiles row, admin role and policy table access.</p><div class="actions"><button id="runBtn" class="btn primary" type="button">Run admin check</button><button id="reloadBtnTop" class="btn" type="button">Reload policy rows</button><a class="btn hot" href="policy-admin-save-diagnostic-v7-12-24-test.html">Diagnostic V7.12.24</a><a class="btn" href="policy-agreements-centre-v7-11-6-test.html">Policy Centre</a><a class="btn" href="policy-preview-terms-v7-12-22-test.html">Public Terms Preview</a></div><div id="mainStatus" class="status">Waiting to run admin check...</div><div id="helperStatus" class="status">Checking global helpers...</div><div class="note">Footer/global promotion is still locked. This page only proves admin save to Supabase.</div></section>
+<section class="box"><h2>Protection readout</h2><div class="grid"><div class="card"><b>Session</b><p id="sessionText">Waiting...</p><span id="sessionPill" class="pill warnP">waiting</span></div><div class="card"><b>User</b><p id="userText">Waiting...</p><span id="userPill" class="pill warnP">waiting</span></div><div class="card"><b>Profile row</b><p id="profileText">Waiting...</p><span id="profilePill" class="pill warnP">waiting</span></div><div class="card"><b>Admin access</b><p id="adminText">Waiting...</p><span id="adminPill" class="pill warnP">waiting</span></div><div class="card"><b>Policy table</b><p id="tableText">Waiting...</p><span id="tablePill" class="pill warnP">waiting</span></div></div></section>
+<section id="lockedOnly" class="box lockedOnly"><h2>Editor locked</h2><div id="lockReason" class="danger">Editor remains locked until admin access is confirmed.</div><div class="grid"><div class="card"><b>Public users</b><p>Use the read-only preview policy pages.</p></div><div class="card"><b>Admin users</b><p>Must have Supabase session and sb_profiles.role = admin.</p></div><div class="card"><b>RLS</b><p>Supabase still blocks non-admin writes at the table level.</p></div></div></section>
+<section id="adminOnly" class="box adminOnly"><h2>Admin editor</h2><div class="editorGrid"><div><div id="docList" class="docList"></div><div class="note">Choose one document. Save writes selected document only.</div><div class="actions" style="margin-top:12px"><button id="reloadBtn" class="btn" type="button">Reload rows</button><button id="copyBodyBtn" class="btn" type="button">Copy body</button></div></div><div><div class="field"><label>Slug</label><input id="slug" readonly></div><div class="field"><label>Title</label><input id="title"></div><div class="field"><label>Status</label><select id="statusSel"><option value="draft">draft</option><option value="published">published</option><option value="archived">archived</option></select></div><div class="field"><label>Contact email</label><input id="contact" value="info@chatterfriendsstreambandit.co.uk"></div><div class="field"><label>Policy body</label><textarea id="body" placeholder="Policy text loads here..."></textarea></div><div class="actions"><button id="saveBtn" class="btn primary" type="button">Save selected policy</button><button id="previewBtn" class="btn" type="button">Preview text below</button><button class="btn warn" disabled>Global footer promotion locked</button></div><div id="saveStatus" class="status">Waiting for a selected policy...</div></div></div></section>
+<section class="box"><h2>Preview selected text</h2><div id="previewBox" class="previewBox"><p class="muted">Preview appears here after selecting a document or pressing Preview.</p></div></section>
+<section class="box"><h2>Safety rules</h2><div class="grid"><div class="card"><b>Admin-only editing</b><p>Editor is hidden until role admin is confirmed.</p></div><div class="card"><b>Supabase save only</b><p>Save updates sb_policy_documents only.</p></div><div class="card"><b>Public pages stay read-only</b><p>The footer preview pages remain normal visitor pages.</p></div><div class="card"><b>No global promotion</b><p>Footer/About wiring comes after this editor passes.</p></div><div class="card"><b>No frontend password</b><p>Protection is based on Supabase Auth + profile role + RLS.</p></div><div class="card"><b>Draft legal status</b><p>Legal review warning stays until final review.</p></div></div></section>
+<section class="box"><h2>Debug</h2><div id="debug" class="source">Waiting...</div></section>
+<p class="footer">V7.12.25 Policy Admin Save Editor TEST — admin save only, no global footer promotion.</p>
+</div>
+<script src="stream-bandit-shell-v6-24.js"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js"></script>
+<script src="stream-bandit-auth-profile-v6-31.js"></script>
+<script src="stream-bandit-auth-sync-v6-31-7.js"></script>
+<script src="stream-bandit-auth-avatar-v7-0-2.js"></script>
+<script src="stream-bandit-shared-style-v7-0-2.js"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js"></script>
+<script>
+(function(){
+'use strict';
+const VERSION='V7.12.25 Policy Admin Save Editor TEST';
+const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+const SLUGS=['terms','privacy','cookies','family-watch','cancellation','creator-content','accessibility'];
+let sb,user=null,profile=null,rows=[],selected=null,last={};
+function $(id){return document.getElementById(id)}
+function c(){if(!sb)sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return sb}
+function esc(s){return String(s??'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
+function pill(id,text,type){const el=$(id);el.textContent=text;el.className='pill '+(type==='ok'?'ok':type==='bad'?'bad':'warnP')}
+function isAdmin(){return !!(user&&profile&&String(profile.role||'').toLowerCase()==='admin')}
+function debug(extra){$('debug').textContent=JSON.stringify({version:VERSION,user:user?{id:user.id,email:user.email}:null,profile,admin:isAdmin(),rows:rows.length,selected:selected?selected.slug:null,last,extra:extra||null,globalFooterPromotion:false},null,2)}
+function timeout(p,ms,label){let t;return Promise.race([p,new Promise((_,rej)=>{t=setTimeout(()=>rej(new Error(label+' timed out after '+ms+'ms')),ms)})]).finally(()=>clearTimeout(t))}
+function helper(){let bridge=null;try{bridge=window.StreamBanditSettingsGlobal&&window.StreamBanditSettingsGlobal.getState&&window.StreamBanditSettingsGlobal.getState()}catch(e){}$('helperStatus').innerHTML='<b>Global helpers:</b> Account sync '+(window.StreamBanditAuthSync?'✅':'❌')+' · Avatar '+(window.StreamBanditAuthAvatar?'✅':'❌')+' · Shared style '+(window.StreamBanditSharedStyle?'✅':'❌')+' · Brand logo '+(window.StreamBanditBrandLogo?'✅':'❌')+' · Settings bridge '+(window.StreamBanditSettingsGlobal?'✅':'❌')+(bridge&&bridge.source?' · source: '+esc(bridge.source):'')}
+function lock(reason){$('adminOnly').style.display='none';$('lockedOnly').style.display='block';$('lockReason').textContent=reason;$('mainStatus').className='danger';$('mainStatus').textContent=reason;debug(reason)}
+function unlock(){ $('adminOnly').style.display='block';$('lockedOnly').style.display='none';$('mainStatus').className='status';$('mainStatus').textContent='Admin editor unlocked. Saves go to Supabase only.';debug('unlocked')}
+async function runCheck(){
+ user=null;profile=null;rows=[];selected=null;last={started:new Date().toISOString()};
+ $('mainStatus').className='status';$('mainStatus').textContent='Running admin protection check...';
+ ['session','user','profile','admin','table'].forEach(x=>{const map={session:'Session',user:'User',profile:'Profile row',admin:'Admin access',table:'Policy table'};$(x+'Text').textContent='Checking '+map[x]+'...';pill(x+'Pill','checking','warn')});
+ $('docList').innerHTML='';$('previewBox').innerHTML='<p class="muted">Waiting for rows...</p>';
+ try{
+  const sess=await timeout(c().auth.getSession(),6000,'Session check');
+  const session=sess.data&&sess.data.session;
+  if(!session||!session.user){$('sessionText').textContent='No Supabase session found.';pill('sessionPill','no session','bad');$('userText').textContent='No signed-in user.';pill('userPill','none','bad');$('profileText').textContent='Blocked by no session.';pill('profilePill','blocked','bad');$('adminText').textContent='Blocked.';pill('adminPill','blocked','bad');$('tableText').textContent='Blocked.';pill('tablePill','blocked','bad');return lock('Locked: no Supabase session. Log in, return here, then press Run admin check.');}
+  user=session.user;$('sessionText').textContent='Session found.';pill('sessionPill','found','ok');$('userText').textContent=(user.email||'no email')+' / '+user.id;pill('userPill','loaded','ok');
+  const pr=await timeout(c().from('sb_profiles').select('id,username,display_name,role').eq('id',user.id).maybeSingle(),7000,'Profile lookup');
+  if(pr.error)throw pr.error;profile=pr.data||null;
+  if(!profile){$('profileText').textContent='No sb_profiles row found.';pill('profilePill','missing','bad');$('adminText').textContent='Blocked: no profile row.';pill('adminPill','blocked','bad');$('tableText').textContent='Blocked.';pill('tablePill','blocked','bad');return lock('Locked: signed in, but no sb_profiles row found for this user.');}
+  const role=String(profile.role||'').toLowerCase();$('profileText').textContent=(profile.display_name||profile.username||'profile')+' / role: '+(profile.role||'blank');pill('profilePill','role '+(profile.role||'blank'),role==='admin'?'ok':'bad');
+  if(role!=='admin'){$('adminText').textContent='Role is '+(profile.role||'blank')+', not admin.';pill('adminPill','not admin','bad');$('tableText').textContent='Blocked.';pill('tablePill','blocked','bad');return lock('Locked: signed in, but sb_profiles.role is not admin.');}
+  $('adminText').textContent='Admin role confirmed.';pill('adminPill','admin','ok');
+  await loadRows(true); unlock();
+ }catch(e){$('tableText').textContent=e.message||String(e);pill('tablePill','error','bad');lock('Admin check failed safely: '+(e.message||String(e)))}
+}
+async function loadRows(fromCheck){
+ try{
+  if(!isAdmin()){return lock('Locked: admin role required before loading policy rows.');}
+  $('tableText').textContent='Loading policy rows...';pill('tablePill','loading','warn');
+  const rr=await timeout(c().from('sb_policy_documents').select('*').in('slug',SLUGS).order('slug',{ascending:true}),8000,'Policy table load');
+  if(rr.error)throw rr.error;rows=rr.data||[];last.loadedAt=new Date().toISOString();last.rows=rows.length;
+  $('tableText').textContent='Loaded '+rows.length+' policy rows.';pill('tablePill',rows.length?'loaded':'empty',rows.length?'ok':'bad');
+  renderList(); if(rows.length){selectDoc((selected&&selected.slug)||rows[0].slug)}
+  if(!fromCheck){$('mainStatus').className='status';$('mainStatus').textContent='Reloaded '+rows.length+' policy rows.'}
+  debug('rows loaded');
+ }catch(e){$('tableText').textContent='Load failed: '+(e.message||String(e));pill('tablePill','error','bad');$('docList').innerHTML='<div class="danger">Load failed: '+esc(e.message||String(e))+'</div>';debug(e.message||String(e))}
+}
+function renderList(){
+ const el=$('docList');
+ el.innerHTML=rows.map(r=>'<button class="docBtn '+(selected&&selected.slug===r.slug?'active':'')+'" data-slug="'+esc(r.slug)+'"><b>'+esc(r.title||r.slug)+'</b><small>'+esc(r.slug)+' · '+esc(r.status||'draft')+' · '+esc(r.contact_email||'')+'</small></button>').join('')||'<div class="danger">No policy rows loaded.</div>';
+ el.querySelectorAll('.docBtn').forEach(btn=>btn.onclick=()=>selectDoc(btn.dataset.slug));
+}
+function selectDoc(slug){
+ selected=rows.find(r=>r.slug===slug)||null; renderList();
+ if(!selected)return;
+ $('slug').value=selected.slug||''; $('title').value=selected.title||''; $('statusSel').value=selected.status||'draft'; $('contact').value=selected.contact_email||'info@chatterfriendsstreambandit.co.uk'; $('body').value=selected.body||'';
+ $('saveStatus').className='status'; $('saveStatus').textContent='Selected '+selected.slug+'. Admin-only save ready.';
+ renderPreview(); debug('selected '+selected.slug);
+}
+function renderPreview(){
+ const title=$('title').value||'Untitled policy'; const body=$('body').value||''; const email=$('contact').value||'info@chatterfriendsstreambandit.co.uk';
+ const paras=body.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+ $('previewBox').innerHTML='<h2>'+esc(title)+'</h2><p><b>Contact:</b> '+esc(email)+'</p>'+paras.map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')+'<div class="note">Preview only. Global footer/public pages are not promoted by this editor test.</div>';
+}
+async function saveDoc(){
+ try{
+  if(!isAdmin())return lock('Blocked: admin role required before saving.');
+  if(!selected){$('saveStatus').className='danger';$('saveStatus').textContent='Select a policy first.';return;}
+  const patch={title:$('title').value.trim()||selected.title,status:$('statusSel').value,contact_email:$('contact').value.trim()||'info@chatterfriendsstreambandit.co.uk',body:$('body').value,version_label:'V7.12.25',legal_review_required:true,updated_by:user.id};
+  $('saveStatus').className='status';$('saveStatus').textContent='Saving '+selected.slug+' to Supabase...';
+  const sr=await timeout(c().from('sb_policy_documents').update(patch).eq('slug',selected.slug).select('*').single(),9000,'Policy save');
+  if(sr.error)throw sr.error;
+  selected=sr.data; rows=rows.map(r=>r.slug===selected.slug?selected:r); last.saved={slug:selected.slug,at:new Date().toISOString(),status:selected.status};
+  renderList(); selectDoc(selected.slug); $('saveStatus').className='status';$('saveStatus').textContent='Saved '+selected.slug+' to Supabase. Footer/global promotion still locked.'; debug('saved '+selected.slug);
+ }catch(e){$('saveStatus').className='danger';$('saveStatus').textContent='Save failed: '+(e.message||String(e));debug(e.message||String(e))}
+}
+$('runBtn').onclick=runCheck; $('reloadBtn').onclick=()=>loadRows(false); $('reloadBtnTop').onclick=()=>loadRows(false); $('saveBtn').onclick=saveDoc; $('previewBtn').onclick=renderPreview;
+$('copyBodyBtn').onclick=async()=>{try{await navigator.clipboard.writeText($('body').value||'');$('saveStatus').className='status';$('saveStatus').textContent='Copied selected policy body.'}catch(e){$('saveStatus').className='danger';$('saveStatus').textContent='Copy failed: '+(e.message||String(e))}};
+['title','statusSel','contact','body'].forEach(id=>$(id).addEventListener('input',renderPreview));
+$('globalSearchBtn').onclick=()=>{const q=$('globalSearch').value.trim();if(q)location.href='global-search-global-helpers-v7-4-9-test.html?q='+encodeURIComponent(q)};
+$('globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('globalSearchBtn').click()});
+helper(); setTimeout(helper,800); setInterval(helper,6000); setTimeout(runCheck,1000);
+try{c().auth.onAuthStateChange(()=>setTimeout(runCheck,700))}catch(e){}
+})();
+</script>
+</body>
+</html>
