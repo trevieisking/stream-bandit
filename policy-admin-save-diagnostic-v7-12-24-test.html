@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit V7.12.24 Policy Admin Diagnostic TEST</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--fontScale:1}*{box-sizing:border-box;min-width:0}body{margin:0;padding:22px;background:radial-gradient(circle at top left,color-mix(in srgb,var(--good),transparent 72%),transparent 34%),radial-gradient(circle at top right,color-mix(in srgb,var(--purple),transparent 66%),transparent 38%),var(--bg);color:white;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(16px * var(--fontScale))}.wrap{max-width:1400px;margin:auto}.head,.hero,.box{border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 20px 70px #0007;padding:22px;margin-bottom:18px}.head{display:grid;grid-template-columns:minmax(250px,320px) 1fr minmax(280px,390px);gap:14px;align-items:start}.brand{display:flex;gap:12px;align-items:center;font-size:22px;font-weight:950}.logo{width:44px;height:44px;border-radius:14px;background:#000;overflow:hidden;border:1px solid #22d3a657}.logo img{width:100%;height:100%;object-fit:cover}.search,.actions{display:flex;gap:9px;flex-wrap:wrap}.search{border:1px solid #ffffff24;border-radius:999px;background:#0004;padding:9px 10px 9px 14px}.search input{flex:1;background:transparent;border:0;color:white;outline:0}.badge,.pill{display:inline-flex;border-radius:999px;padding:7px 12px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950}.pill{font-size:12px;padding:5px 8px}.ok{background:#22d3a624;border-color:#22d3a666}.warnP{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.bad{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}h1{font-size:clamp(42px,6vw,76px);line-height:.95;margin:10px 0;letter-spacing:-.06em}h2{margin:0 0 14px}.muted,p{color:var(--muted);line-height:1.55}.btn{border:0;border-radius:999px;padding:11px 15px;background:#414667;color:white;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.primary{background:linear-gradient(135deg,var(--good),var(--purple))}.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}.status,.note,.danger{padding:12px 14px;border-radius:18px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:14px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.card{border:1px solid #ffffff1a;border-radius:18px;background:#ffffff0f;padding:14px;overflow-wrap:anywhere}.card b{display:block;color:#baf7df;margin-bottom:8px}.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0005;border-radius:16px;padding:12px;color:#dfffee;max-height:520px;overflow:auto}.footer{text-align:center;color:#8f98b8;margin:28px 0}@media(max-width:980px){.head{grid-template-columns:1fr}.search{width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="head"><div class="brand"><div class="logo"><img data-sb-brand-logo alt="Stream Bandit logo"></div><span>Stream Bandit</span></div><div class="muted"><b>V7.12.24 Policy Admin Diagnostic TEST.</b><br>Clear admin/session/profile/table diagnostics. No save buttons yet.</div><div><div class="search"><span>🔎</span><input id="globalSearch" placeholder="Search Stream Bandit"><button id="globalSearchBtn" class="btn primary" type="button">Search</button></div></div></header>
+<section class="hero"><span class="badge">Diagnostic replacement for stuck V7.12.23</span><h1>Policy Admin Lock</h1><p>This page does not hang. It tells us exactly whether Supabase Auth, sb_profiles, admin role and sb_policy_documents are working.</p><div class="actions"><button id="runBtn" class="btn primary" type="button">Run admin check</button><a class="btn hot" href="policy-admin-save-proof-v7-12-23-test.html">Old V7.12.23 page</a><a class="btn" href="policy-agreements-centre-v7-11-6-test.html">Policy Centre</a><a class="btn" href="supabase-policy-documents-v7-12-23.sql">SQL setup</a></div><div id="mainStatus" class="status">Waiting to run admin check...</div><div id="helperStatus" class="status">Checking global helpers...</div><div class="note">If it says no session, log in from Account, return here, press Run admin check. If it says role is not admin, your sb_profiles row needs the role fixed.</div></section>
+<section class="box"><h2>Admin diagnostic</h2><div class="grid"><div class="card"><b>Session</b><p id="sessionText">Waiting...</p><span id="sessionPill" class="pill warnP">waiting</span></div><div class="card"><b>User</b><p id="userText">Waiting...</p><span id="userPill" class="pill warnP">waiting</span></div><div class="card"><b>Profile row</b><p id="profileText">Waiting...</p><span id="profilePill" class="pill warnP">waiting</span></div><div class="card"><b>Admin access</b><p id="adminText">Waiting...</p><span id="adminPill" class="pill warnP">waiting</span></div><div class="card"><b>Policy table</b><p id="tableText">Waiting...</p><span id="tablePill" class="pill warnP">waiting</span></div></div></section>
+<section class="box"><h2>Policy rows</h2><div id="rowsBox" class="source">Waiting...</div></section>
+<section class="box"><h2>Debug</h2><div id="debug" class="source">Waiting...</div></section>
+<p class="footer">V7.12.24 Policy Admin Diagnostic TEST — no save/global footer promotion.</p>
+</div>
+<script src="stream-bandit-shell-v6-24.js"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js"></script>
+<script src="stream-bandit-auth-profile-v6-31.js"></script>
+<script src="stream-bandit-auth-sync-v6-31-7.js"></script>
+<script src="stream-bandit-auth-avatar-v7-0-2.js"></script>
+<script src="stream-bandit-shared-style-v7-0-2.js"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js"></script>
+<script>
+(function(){
+'use strict';
+const VERSION='V7.12.24 Policy Admin Diagnostic TEST';
+const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+let sb,user=null,profile=null,rows=[];
+function $(id){return document.getElementById(id)}
+function c(){if(!sb)sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return sb}
+function esc(s){return String(s??'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
+function pill(id,text,type){const el=$(id);el.textContent=text;el.className='pill '+(type==='ok'?'ok':type==='bad'?'bad':'warnP')}
+function debug(extra){$('debug').textContent=JSON.stringify({version:VERSION,user:user?{id:user.id,email:user.email}:null,profile,admin:!!(profile&&String(profile.role||'').toLowerCase()==='admin'),rows:rows.length,extra:extra||null},null,2)}
+function timeout(p,ms,label){let t;return Promise.race([p,new Promise((_,rej)=>{t=setTimeout(()=>rej(new Error(label+' timed out after '+ms+'ms')),ms)})]).finally(()=>clearTimeout(t))}
+function helper(){let bridge=null;try{bridge=window.StreamBanditSettingsGlobal&&window.StreamBanditSettingsGlobal.getState&&window.StreamBanditSettingsGlobal.getState()}catch(e){}$('helperStatus').innerHTML='<b>Global helpers:</b> Account sync '+(window.StreamBanditAuthSync?'✅':'❌')+' · Avatar '+(window.StreamBanditAuthAvatar?'✅':'❌')+' · Shared style '+(window.StreamBanditSharedStyle?'✅':'❌')+' · Brand logo '+(window.StreamBanditBrandLogo?'✅':'❌')+' · Settings bridge '+(window.StreamBanditSettingsGlobal?'✅':'❌')+(bridge&&bridge.source?' · source: '+esc(bridge.source):'')}
+async function run(){
+ user=null;profile=null;rows=[];
+ $('mainStatus').className='status';$('mainStatus').textContent='Running admin diagnostic...';
+ $('rowsBox').textContent='Waiting for admin check...';
+ ['session','user','profile','admin','table'].forEach(x=>{const map={session:'Session',user:'User',profile:'Profile row',admin:'Admin access',table:'Policy table'};$(x+'Text').textContent='Checking '+map[x]+'...';pill(x+'Pill','checking','warn')});
+ try{
+  const sess=await timeout(c().auth.getSession(),6000,'Session check');
+  const session=sess.data&&sess.data.session;
+  if(!session||!session.user){
+   $('sessionText').textContent='No Supabase session found on this page.';pill('sessionPill','no session','bad');
+   $('userText').textContent='No signed-in user.';pill('userPill','none','bad');
+   $('profileText').textContent='Profile cannot load without a user.';pill('profilePill','blocked','bad');
+   $('adminText').textContent='Admin blocked because there is no session.';pill('adminPill','blocked','bad');
+   $('tableText').textContent='Table not checked because user is not admin.';pill('tablePill','blocked','bad');
+   $('mainStatus').className='danger';$('mainStatus').textContent='Locked: no session found. Log in, return here, press Run admin check.';
+   debug('no session');return;
+  }
+  user=session.user;
+  $('sessionText').textContent='Session found.';pill('sessionPill','found','ok');
+  $('userText').textContent=(user.email||'no email')+' / '+user.id;pill('userPill','loaded','ok');
+  const pr=await timeout(c().from('sb_profiles').select('id,username,display_name,role').eq('id',user.id).maybeSingle(),7000,'Profile lookup');
+  if(pr.error)throw pr.error;
+  profile=pr.data||null;
+  if(!profile){
+   $('profileText').textContent='No sb_profiles row found for this user id.';pill('profilePill','missing','bad');
+   $('adminText').textContent='Admin blocked: no profile row.';pill('adminPill','blocked','bad');
+   $('tableText').textContent='Table not checked because admin role is missing.';pill('tablePill','blocked','bad');
+   $('mainStatus').className='danger';$('mainStatus').textContent='Locked: signed in, but no sb_profiles row found.';
+   debug('missing profile');return;
+  }
+  $('profileText').textContent=(profile.display_name||profile.username||'profile')+' / role: '+(profile.role||'blank');
+  const admin=String(profile.role||'').toLowerCase()==='admin';
+  pill('profilePill','role '+(profile.role||'blank'),admin?'ok':'bad');
+  if(!admin){
+   $('adminText').textContent='Profile role is '+(profile.role||'blank')+', not admin.';pill('adminPill','not admin','bad');
+   $('tableText').textContent='Table not checked because role is not admin.';pill('tablePill','blocked','bad');
+   $('mainStatus').className='danger';$('mainStatus').textContent='Locked: signed in, but sb_profiles.role is not admin.';
+   debug('not admin');return;
+  }
+  $('adminText').textContent='Admin role confirmed.';pill('adminPill','admin','ok');
+  const rr=await timeout(c().from('sb_policy_documents').select('slug,title,status,contact_email,updated_at').order('slug',{ascending:true}),8000,'Policy table load');
+  if(rr.error)throw rr.error;
+  rows=rr.data||[];
+  $('tableText').textContent='Loaded '+rows.length+' policy rows.';pill('tablePill',rows.length?'loaded':'empty',rows.length?'ok':'bad');
+  $('rowsBox').innerHTML=rows.map(r=>'• '+esc(r.slug)+' — '+esc(r.title)+' — '+esc(r.status)+' — '+esc(r.contact_email)).join('\n')||'No rows found.';
+  $('mainStatus').className='status';$('mainStatus').textContent='Admin diagnostic passed. Next page can safely unlock the editor.';
+  debug('passed');
+ }catch(e){
+  $('mainStatus').className='danger';$('mainStatus').textContent='Diagnostic failed safely: '+(e.message||String(e));
+  $('rowsBox').textContent='Error: '+(e.message||String(e));
+  pill('tablePill','error','bad');$('tableText').textContent=e.message||String(e);
+  debug(e.message||String(e));
+ }
+}
+$('runBtn').onclick=run;
+$('globalSearchBtn').onclick=()=>{const q=$('globalSearch').value.trim();if(q)location.href='global-search-global-helpers-v7-4-9-test.html?q='+encodeURIComponent(q)};
+$('globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('globalSearchBtn').click()});
+helper();setTimeout(helper,800);setInterval(helper,6000);setTimeout(run,1000);
+try{c().auth.onAuthStateChange(()=>setTimeout(run,700))}catch(e){}
+})();
+</script>
+</body></html>
