@@ -43,7 +43,7 @@ const pages=[
 ['⬆️','Submit Video','submit-video-creator-shell-v6-49-test.html','Creator submit video current'],
 ['📜','Rules','rules-creator-shell-v6-50-test.html','Creator rules current'],
 ['🧾','Review Queue','review-queue-creator-shell-v6-51-test.html','Creator review queue current'],
-['⚙️','Settings','settings-admin-shell-v6-54-test.html','Settings hub / control hub'],
+['⚙️','Settings','settings-brand-icons-promoted-v7-12-21-test.html','Settings owner launcher with Brand/App Icons tab'],
 ['🎨','Settings Studio','settings-studio-admin-shell-v6-55-test.html','Settings Studio preview/current route'],
 ['👤','Profile Settings','profile-settings-admin-shell-v6-56-test.html','Profile settings V7.5.8 route'],
 ['🏗️','Web Builder','web-builder-admin-shell-v6-57-test.html','Web builder current; owns global display/theme and page/form layout'],
