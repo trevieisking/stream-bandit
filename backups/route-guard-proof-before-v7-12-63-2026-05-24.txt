@@ -1,0 +1,13 @@
+Backup marker before replacing platform-control-tower-route-guard-proof-v7-12-33-test.html for V7.12.63 Bad Route List Cleanup.
+
+Original file path:
+platform-control-tower-route-guard-proof-v7-12-33-test.html
+
+Original blob SHA:
+fd9260b8e2a6412011a65e4761c9bc542a79e1ba
+
+Reason:
+Clean Route Guard Proof classification so current clean-machine V7.12 pages are no longer reported as BAD, and keep the Settings bad-route pass focused on real old routes only.
+
+Restore method:
+Use GitHub file history for the original blob SHA above if a full restore is needed.
