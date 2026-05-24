@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit V7.12.58 Platform Control Centre Admin TEST</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--fontScale:1}*{box-sizing:border-box;min-width:0}body{margin:0;padding:22px;background:radial-gradient(circle at top left,#22d3a633,transparent 34%),radial-gradient(circle at top right,#7c3cff3d,transparent 38%),radial-gradient(circle at bottom,#ff2d8522,transparent 36%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(16px * var(--fontScale))}.wrap{max-width:1540px;margin:auto}.head,.hero,.box{border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 20px 70px #0007;padding:22px;margin-bottom:18px}.head{display:grid;grid-template-columns:minmax(250px,320px) minmax(0,1fr) minmax(300px,430px);gap:14px;align-items:start}.brand{display:flex;gap:12px;align-items:center;font-size:22px;font-weight:950}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--good),var(--purple));display:grid;place-items:center;overflow:hidden;border:1px solid #41e8ff55}.logo img{width:100%;height:100%;object-fit:cover;display:block}.search{display:flex;gap:8px;border:1px solid #ffffff24;border-radius:999px;background:#0004;padding:9px 10px 9px 14px}.search input{flex:1;background:transparent;border:0;color:#fff;outline:0;font:inherit}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950}.badge{padding:7px 12px}.pill{padding:5px 8px;font-size:11px;margin:2px}.pill.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.pill.stop{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}.pill.info{background:#41e8ff22;border-color:#41e8ff60;color:#cef9ff}h1{font-size:clamp(42px,6vw,78px);margin:10px 0;letter-spacing:-.065em;line-height:.95}h2{margin:0 0 14px}h3{margin:0 0 8px}.muted,p,label,li{color:var(--muted);font-size:16px;line-height:1.55}.btn,.tab{display:inline-flex;align-items:center;justify-content:center;border:0;text-decoration:none;border-radius:999px;padding:11px 15px;background:#414667;color:#fff;font-weight:950;cursor:pointer}.primary,.tab.active{background:linear-gradient(135deg,var(--good),var(--purple))}.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#111}.cyan{background:linear-gradient(135deg,var(--cyan),var(--purple))}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--purple))}.status,.note,.danger{padding:12px 14px;border-radius:18px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:14px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}.actions,.tabs{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.heroLayout{display:grid;grid-template-columns:minmax(330px,1fr) minmax(300px,440px);gap:18px}.heroArt{border:1px solid #ffffff1a;border-radius:30px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:340px;display:grid;place-items:center;position:relative;overflow:hidden}.heroArt:before{content:"";position:absolute;inset:30px;border-radius:32px;border:1px dashed #ffffff32}.heroIcon{font-size:96px;position:relative;z-index:1}.grid,.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.card,.stat,.control{border:1px solid #ffffff1a;border-radius:18px;background:#ffffff0f;padding:14px;overflow-wrap:anywhere}.card b,.stat b,.control b{display:block;color:#baf7df;margin-bottom:8px}.stat span{font-size:26px;font-weight:950}.section{display:none}.section.active{display:block}.control{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}.control small{display:block;color:var(--muted);line-height:1.4}.switch{min-width:74px;border:1px solid #ffffff24;border-radius:999px;background:#0007;color:#fff;padding:9px 12px;font-weight:950;cursor:pointer}.switch.on{background:linear-gradient(135deg,var(--good),var(--purple))}.select,.input,.textarea{border:1px solid #ffffff24;border-radius:18px;background:#0004;color:#fff;padding:12px 14px;font-weight:850;width:100%}.textarea{min-height:110px;resize:vertical}.code{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0006;border:1px solid #ffffff1a;border-radius:16px;padding:14px;color:#dfffee;max-height:420px;overflow:auto}.ownerMap{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}.footer{text-align:center;color:#8f98b8;margin:28px 0}@media(max-width:980px){.head,.heroLayout,.control{grid-template-columns:1fr}.search{width:100%}.heroArt{min-height:230px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="head">
+  <div class="brand"><div class="logo"><img id="brandLogo" data-sb-brand-logo src="stream_bandit_original_logo_square_256.png" alt="Stream Bandit"></div><span>Stream Bandit</span></div>
+  <div class="muted"><b>V7.12.58 Platform Control Centre Admin TEST.</b><br>New owner page for global platform controls. Safe first build: admin-aware, read-only/draft controls only, no magic link, no sign-out, no database writes.</div>
+  <div><div class="search"><span>🔎</span><input id="topSearch" placeholder="Search Stream Bandit"><button id="topSearchBtn" class="btn primary" type="button">Search</button></div></div>
+</header>
+
+<section class="hero">
+  <div class="heroLayout">
+    <div>
+      <span class="badge">V7.12.58 Platform Control Centre Admin TEST</span>
+      <h1>🎛️ Platform Control Centre</h1>
+      <p>This is the new control room for global Stream Bandit switches: platform mode, access, paywalls, creator rules, safety, media, navigation and global display. This first version is safe: it builds the control map and export JSON but does not change live behaviour yet.</p>
+      <div class="actions">
+        <a class="btn hot" href="settings-platform-control-hub-v7-1-8-test.html">⚙️ Settings Hub</a>
+        <a class="btn cyan" href="settings-studio-admin-shell-v6-55-test.html">🎨 Settings Studio</a>
+        <a class="btn warnBtn" href="admin-centre-command-deck-v7-10-0-test.html">🛠️ Admin Centre</a>
+        <a class="btn" href="stream-bandit-route-pointer-machine-v7-12-36-test.html">🎯 Route Pointer</a>
+      </div>
+      <div id="helperStatus" class="status">Checking global helpers...</div>
+      <div id="adminStatus" class="status">Checking current session safely...</div>
+      <div class="note">No magic-link emails are sent from this page. It only reads an existing session. If your session is missing it shows Admin required and stops.</div>
+    </div>
+    <div class="heroArt"><div class="heroIcon">🎛️🔐</div></div>
+  </div>
+</section>
+
+<section class="box">
+  <div class="stats">
+    <div class="stat"><b>Auth behaviour</b><span>Read</span><p>No sign-in, no sign-out, no magic link.</p></div>
+    <div class="stat"><b>Database writes</b><span>0</span><p>This V7.12.58 build is draft/export only.</p></div>
+    <div class="stat"><b>Global controls</b><span>8</span><p>Eight major control groups rebuilt.</p></div>
+    <div class="stat"><b>Live effect</b><span>Later</span><p>Wiring happens only after this page passes.</p></div>
+  </div>
+</section>
+
+<section class="box">
+  <div id="tabs" class="tabs"></div>
+</section>
+
+<section id="mainPanel" class="box">
+  <h2 id="panelTitle">Platform Mode</h2>
+  <p id="panelDesc">Control section.</p>
+  <div id="controls" class="grid"></div>
+</section>
+
+<section class="box">
+  <h2>Draft control actions</h2>
+  <p>These actions are safe. They only update the preview below. A real Supabase save table can be added later after you approve the shape.</p>
+  <div class="actions">
+    <button id="buildJson" class="btn primary" type="button">Build Draft JSON</button>
+    <button id="copyJson" class="btn cyan" type="button">Copy Draft JSON</button>
+    <button id="resetDraft" class="btn warnBtn" type="button">Reset Draft</button>
+  </div>
+  <div id="draftJson" class="code" style="margin-top:12px">Draft JSON not built yet.</div>
+</section>
+
+<section class="box">
+  <h2>Owner map — keep page ownership clean</h2>
+  <div class="ownerMap">
+    <div class="card"><b>Settings Hub</b><p>Launcher only. Does not own controls.</p><span class="pill">settings-platform-control-hub-v7-1-8-test.html</span></div>
+    <div class="card"><b>Platform Control Centre</b><p>Owns global platform switches and future save shape.</p><span class="pill info">this page</span></div>
+    <div class="card"><b>Settings Studio</b><p>Owns brand/source styling controls.</p><span class="pill">settings-studio-admin-shell-v6-55-test.html</span></div>
+    <div class="card"><b>Profile Settings</b><p>Owns profile/avatar/banner controls.</p><span class="pill">profile-settings-global-helpers-v7-5-8-test.html</span></div>
+    <div class="card"><b>Web Builder</b><p>Owns page builder and layout editing.</p><span class="pill">web-builder-full-edit-lock-v7-8-6-test.html</span></div>
+    <div class="card"><b>Policy/Admin</b><p>Owns policy text and legal proof pages.</p><span class="pill">policy-admin-save-editor-v7-12-25-test.html</span></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Pass checklist</h2>
+  <div class="grid">
+    <div class="card"><b>1. Account safe</b><p>Does not lock you out. Does not send magic links. Keeps current session if already signed in.</p></div>
+    <div class="card"><b>2. Admin aware</b><p>Shows session/admin state. If not admin, shows locked mode but page still opens safely.</p></div>
+    <div class="card"><b>3. Controls rebuilt</b><p>Platform, access, paywall, creator, safety, media, navigation and branding tabs exist.</p></div>
+    <div class="card"><b>4. No real writes</b><p>Build/copy/reset only. No Supabase insert/update/delete in this first attempt.</p></div>
+    <div class="card"><b>5. Routes current</b><p>Links back to Settings Hub, Settings Studio, Admin Centre and Route Pointer.</p></div>
+    <div class="card"><b>6. No index promotion</b><p>Only add to menu after this page passes.</p></div>
+  </div>
+</section>
+
+<p class="footer">V7.12.58 Platform Control Centre Admin TEST — no live/index promotion.</p>
+</div>
+
+<script src="stream-bandit-shell-v6-24.js"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js"></script>
+<script src="stream-bandit-auth-profile-v6-31.js"></script>
+<script src="stream-bandit-auth-sync-v6-31-7.js"></script>
+<script src="stream-bandit-auth-avatar-v7-0-2.js"></script>
+<script src="stream-bandit-shared-style-v7-0-2.js"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=7-12-58"></script>
+<script>
+(function(){
+'use strict';
+const VERSION='V7.12.58 Platform Control Centre Admin TEST';
+const SEARCH='global-search-global-helpers-v7-4-9-test.html';
+let cfg=null,sb=null,session=null,user=null,adminState={checked:false,isAdmin:false,role:'unknown',source:'not checked'};
+const sections={
+  'Platform Mode':{desc:'Whole-site mode controls. Draft only until saved table/wiring exists.',items:[['platform_open','Platform open','Normal public operation.'],['maintenance_mode','Maintenance mode','Show maintenance message / restrict public use.'],['admin_only_mode','Admin-only mode','Only admin users should use the platform.'],['coming_soon_mode','Coming soon mode','Landing/demo mode before public launch.']]},
+  'Access & Permissions':{desc:'Global access rules for browsing, playback and personal features.',items:[['public_browsing','Allow public browsing','Visitors can browse public pages.'],['signin_to_play','Require sign-in to play','Playback requires a signed-in account.'],['signin_to_save','Require sign-in for likes/favourites/watchlist','Personal library features require account.'],['creator_tools_enabled','Creator tools enabled','Submit Video / Creator tools available.'],['review_required','Review required before publish','Creator submissions must pass Review Queue.']]},
+  'Paywall & Plans':{desc:'Commercial switches for future paid/free plan behaviour.',items:[['free_plan_enabled','Free plan enabled','Free plan can access public content.'],['paid_plan_enabled','Paid plan enabled','Paid plan logic can be switched on later.'],['premium_lock_enabled','Premium content lock','Premium-only rows can be hidden/locked.'],['trial_mode_enabled','Trial mode','Trial access mode for testing.'],['pricing_page_visible','Pricing page visible','Show Pricing / plan page in menu.']]},
+  'Creator Controls':{desc:'Creator upload and review safety controls.',items:[['allow_submit_video','Allow Submit Video','Submit Video page can be used.'],['allow_poster_upload','Allow poster upload','Creator/admin poster uploads allowed.'],['allow_trailer_url','Allow trailer URL','Trailer URL field allowed.'],['block_direct_publish','Block direct public publish','Submissions cannot jump straight to sb_movies.'],['allow_review_delete','Allow review queue delete','Review Queue can delete test submissions.']]},
+  'Safety & Policy':{desc:'Age/safety/policy defaults.',items:[['kids_filter_enabled','Kids / age filter enabled','Age filtering controls active later.'],['hide_adult_public','Hide adult content from public','Adult rows hidden unless allowed.'],['policy_required','Policy required before upload','Creators must accept policy before submit.'],['report_contact_visible','Report/contact visible','Contact/report route visible.'],['legal_review_lock','Legal review lock','Policy/legal updates require review.']]},
+  'Media Controls':{desc:'Video/image provider toggles.',items:[['mux_enabled','Mux playback enabled','Mux/HLS playback allowed.'],['supabase_images_enabled','Supabase images enabled','Supabase Storage image URLs allowed.'],['public_url_video_enabled','Public URL video allowed','Public video URL fallback allowed.'],['player1_enabled','Player 1 route enabled','Single-title player allowed.'],['player2_enabled','Player 2 route enabled','Group player allowed.']]},
+  'Navigation Controls':{desc:'Global menu and route safety controls.',items:[['watch_group_visible','Watch group visible','Watch menu group shown.'],['browse_group_visible','Browse group visible','Browse menu group shown.'],['creator_group_visible','Creator group visible','Creator menu group shown.'],['settings_group_visible','Settings group visible','Settings menu group shown.'],['admin_group_visible','Admin group visible','Admin tools visible.'],['old_route_guard_enabled','Old route guard enabled','Shell fixes old/museum routes.']]},
+  'Branding & Accessibility':{desc:'Global display and accessibility defaults.',items:[['theme_enabled','Theme enabled','Shared theme active.'],['brand_logo_enabled','Brand logo enabled','Global logo helper active.'],['favicon_enabled','Favicon enabled','Global favicon active.'],['accessibility_defaults_enabled','Accessibility defaults enabled','Comfort settings load by default.'],['loud_audio_default','Loud audio default','Player comfort audio boost preference.']]}
+};
+const defaults={platform_open:true,maintenance_mode:false,admin_only_mode:false,coming_soon_mode:false,public_browsing:true,signin_to_play:false,signin_to_save:true,creator_tools_enabled:true,review_required:true,free_plan_enabled:true,paid_plan_enabled:false,premium_lock_enabled:false,trial_mode_enabled:false,pricing_page_visible:true,allow_submit_video:true,allow_poster_upload:true,allow_trailer_url:true,block_direct_publish:true,allow_review_delete:true,kids_filter_enabled:false,hide_adult_public:true,policy_required:true,report_contact_visible:true,legal_review_lock:true,mux_enabled:true,supabase_images_enabled:true,public_url_video_enabled:true,player1_enabled:true,player2_enabled:true,watch_group_visible:true,browse_group_visible:true,creator_group_visible:true,settings_group_visible:true,admin_group_visible:true,old_route_guard_enabled:true,theme_enabled:true,brand_logo_enabled:true,favicon_enabled:true,accessibility_defaults_enabled:true,loud_audio_default:true};
+let active='Platform Mode';
+let state=Object.assign({},defaults);
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+async function readConfig(){const txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text());return{url:(txt.match(/SUPABASE_URL\s*=\s*'([^']+)'/)||[])[1],key:(txt.match(/SUPABASE_KEY\s*=\s*'([^']+)'/)||[])[1]}}
+async function checkAdminSafe(){
+  try{
+    cfg=await readConfig();
+    sb=supabase.createClient(cfg.url,cfg.key);
+    const s=await sb.auth.getSession();
+    session=s.data.session;
+    const u=await sb.auth.getUser();
+    user=u.data.user;
+    if(!user){adminState={checked:true,isAdmin:false,role:'signed-out',source:'no existing session'};$('adminStatus').className='danger';$('adminStatus').textContent='Admin required: no existing session found. This page will not send a magic link.';return;}
+    let role='unknown',source='auth user only';
+    const attempts=[['profiles','id'],['sb_profiles','id'],['sb_user_profiles','user_id']];
+    for(const a of attempts){
+      try{
+        const r=await sb.from(a[0]).select('role,is_admin,email').eq(a[1],user.id).maybeSingle();
+        if(!r.error&&r.data){role=r.data.role||String(r.data.is_admin?'admin':'user');source=a[0];break;}
+      }catch(e){}
+    }
+    const isAdmin=/admin|owner|super/i.test(String(role||'')) || String(user.email||'').toLowerCase().includes('trevieisking');
+    adminState={checked:true,isAdmin,role,source,email:user.email||''};
+    $('adminStatus').className=isAdmin?'status':'note';
+    $('adminStatus').textContent=isAdmin?'Admin session detected safely: '+(user.email||user.id)+' · role: '+role+' · source: '+source:'Signed in but admin role not proven. Safe read-only mode. role: '+role+' · source: '+source;
+  }catch(e){adminState={checked:true,isAdmin:false,role:'error',source:e.message||String(e)};$('adminStatus').className='danger';$('adminStatus').textContent='Admin check failed safely: '+(e.message||e);}
+}
+function ensureBrandLogo(){const img=$('brandLogo');if(img&&!img.getAttribute('src'))img.src='stream_bandit_original_logo_square_256.png';try{if(window.StreamBanditBrandLogo&&window.StreamBanditBrandLogo.refresh)window.StreamBanditBrandLogo.refresh()}catch(e){}if(!window.StreamBanditBrandLogo){window.StreamBanditBrandLogo={version:'V7.12.58 inline brand fallback',refresh:function(){const i=$('brandLogo');if(i&&!i.getAttribute('src'))i.src='stream_bandit_original_logo_square_256.png';document.documentElement.dataset.streamBanditBrandLogo='loaded';return i?i.src:''},getUrl:function(){const i=$('brandLogo');return i?i.src:''}};window.StreamBanditBrandLogo.refresh();}}
+function helperStatus(){ensureBrandLogo();let bridge=null;try{bridge=window.StreamBanditSettingsGlobal&&window.StreamBanditSettingsGlobal.getState&&window.StreamBanditSettingsGlobal.getState()}catch(e){}const brandOk=!!(window.StreamBanditBrandLogo||document.documentElement.dataset.streamBanditBrandLogo==='loaded'||$('brandLogo'));$('helperStatus').innerHTML='<b>Global helpers:</b> Account sync '+(window.StreamBanditAuthSync?'✅':'❌')+' · Avatar '+(window.StreamBanditAuthAvatar?'✅':'❌')+' · Shared style '+(window.StreamBanditSharedStyle?'✅':'❌')+' · Brand logo '+(brandOk?'✅':'❌')+' · Settings bridge '+(window.StreamBanditSettingsGlobal?'✅':'❌')+(bridge&&bridge.source?' · source: '+esc(bridge.source):'');try{if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh)window.StreamBanditShellAuth.refresh()}catch(e){}}
+function control(item){const v=!!state[item[0]];return '<div class="control"><div><b>'+esc(item[1])+'</b><small>'+esc(item[2])+'</small><span class="pill '+(v?'':'warn')+'">'+(v?'enabled':'disabled')+'</span></div><button class="switch '+(v?'on':'')+'" data-key="'+esc(item[0])+'" type="button">'+(v?'On':'Off')+'</button></div>'}
+function render(){const s=sections[active];$('tabs').innerHTML=Object.keys(sections).map(k=>'<button class="tab '+(k===active?'active':'')+'" data-tab="'+esc(k)+'" type="button">'+esc(k)+'</button>').join('');$('panelTitle').textContent=active;$('panelDesc').textContent=s.desc;$('controls').innerHTML=s.items.map(control).join('');document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{active=b.dataset.tab;render()});document.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>{state[b.dataset.key]=!state[b.dataset.key];render();buildJson(false)});}
+function payload(){return{version:VERSION,status:'draft-not-saved',admin:adminState,updated_at:new Date().toISOString(),controls:state,notes:'V7.12.58 builds the platform control shape only. It does not write to Supabase or affect live pages yet.'}}
+function buildJson(show){$('draftJson').textContent=JSON.stringify(payload(),null,2);if(show)$('adminStatus').textContent='Draft JSON built locally. No Supabase save happened.';}
+async function copyJson(){buildJson(false);try{await navigator.clipboard.writeText($('draftJson').textContent);$('adminStatus').textContent='Draft JSON copied. No Supabase save happened.';}catch(e){$('adminStatus').textContent='Copy failed, but draft is visible below.';}}
+function resetDraft(){state=Object.assign({},defaults);render();buildJson(false);$('adminStatus').textContent='Draft reset to defaults. No Supabase save happened.';}
+$('buildJson').onclick=()=>buildJson(true);$('copyJson').onclick=copyJson;$('resetDraft').onclick=resetDraft;$('topSearchBtn').onclick=()=>{const q=$('topSearch').value.trim();if(q)location.href=SEARCH+'?q='+encodeURIComponent(q)};$('topSearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('topSearchBtn').click()});
+render();buildJson(false);setTimeout(helperStatus,200);setTimeout(helperStatus,700);setTimeout(helperStatus,1500);setTimeout(helperStatus,3000);setInterval(helperStatus,7000);helperStatus();checkAdminSafe();
+})();
+</script>
+</body>
+</html>
