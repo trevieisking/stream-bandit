@@ -1,0 +1,13 @@
+Backup marker before replacing stream-bandit-route-pointer-machine-v7-12-36-test.html for V7.12.64 Route Pointer Clean Current Rules.
+
+Original file path:
+stream-bandit-route-pointer-machine-v7-12-36-test.html
+
+Original blob SHA:
+6e3e60b2538e7defb3c4687bd49751ed596fe93b
+
+Reason:
+Route Pointer was still using old source pages such as watchlist-global-helpers-v7-3-5-test.html and treating current clean-machine pages as BAD. V7.12.64 updates the machine pass rules so current clean-machine pages are OK, old routes are GUARDED, and Route Pointer remains the selected-page source of truth.
+
+Restore method:
+Use GitHub file history for the original blob SHA above if a full restore is needed.
