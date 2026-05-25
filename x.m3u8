@@ -1,0 +1,5 @@
+#EXTM3U
+#EXT-X-VERSION:3
+# Stream Bandit legacy placeholder playlist.
+# This exists only to prevent old/demo HLS references from 404ing during focused scope repair.
+#EXT-X-ENDLIST
