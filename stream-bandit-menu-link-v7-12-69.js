@@ -1,11 +1,13 @@
-/* Stream Bandit V7.12.71 Owner Menu Link Fix
-   Safe UI-only navigation fix. No Supabase writes. No deletes. No payment unlocks.
-   Fix: if this owner scanner page loads before the shell shows Owner, create the Owner group here. */
+/* Stream Bandit V7.12.72 Stable Owner Menu Link
+   Emergency stabiliser: one-shot only. No MutationObserver. No interval loop.
+   Adds/restores the Owner group on the Global Whatnots scanner page only.
+   Safe UI-only navigation helper: no Supabase writes, no deletes, no live promotion, no payment unlocks. */
 (function(){
   'use strict';
 
-  var VERSION = 'v7-12-71-owner-group-fix';
+  var VERSION = 'v7-12-72-stable-one-shot';
   var OWNER_PAGE_NAME = 'global-helper-property-owner-scan-v7-12-67-test.html';
+  var done = false;
 
   var OWNER_PAGES = [
     ['🧠','One Machine','stream-bandit-one-machine-v7-12-72-test.html'],
@@ -30,11 +32,9 @@
   }
 
   function findOwnerGroup(drawer){
-    var direct = drawer.querySelector('.sb-shell-group.owner');
-    if(direct && groupName(direct) === 'owner') return direct;
     var groups = drawer.querySelectorAll('.sb-shell-group');
     for(var i=0;i<groups.length;i++){
-      if(groupName(groups[i]) === 'owner') return groups[i];
+      if(groups[i].classList.contains('owner') || groupName(groups[i]) === 'owner') return groups[i];
     }
     return null;
   }
@@ -52,62 +52,50 @@
     return section;
   }
 
-  function addLinks(ownerGroup){
+  function addOwnerLinks(ownerGroup){
     var box = ownerGroup && ownerGroup.querySelector('.sb-shell-items');
     if(!box) return false;
 
-    OWNER_PAGES.forEach(function(p,index){
+    OWNER_PAGES.forEach(function(p){
       if(box.querySelector('a[href="' + p[2] + '"]')) return;
       var a = document.createElement('a');
       a.className = 'sb-shell-link owner';
       a.href = p[2];
-      a.setAttribute('data-sb-text',(p[1] + ' owner global whatnots property helper settings bucket supabase role gate').toLowerCase());
+      a.setAttribute('data-sb-text',(p[1] + ' owner global whatnots settings bucket supabase role gate').toLowerCase());
       a.innerHTML = '<span style="width:24px">' + esc(p[0]) + '</span>' + esc(p[1]);
-      box.insertBefore(a, box.children[index] || null);
+      box.appendChild(a);
     });
 
     var pill = ownerGroup.querySelector('.sb-shell-pill');
     if(pill) pill.textContent = String(box.querySelectorAll('a').length);
-    ownerGroup.classList.add('open','owner');
+    ownerGroup.classList.add('owner','open');
     return true;
   }
 
-  function make(){
+  function runOnce(){
+    if(done) return;
     var drawer = document.getElementById('sbShellDrawer');
-    if(!drawer) return false;
+    if(!drawer) return;
 
     var ownerGroup = findOwnerGroup(drawer);
-
-    var wrong = drawer.querySelectorAll('a[href="' + OWNER_PAGE_NAME + '"]');
-    wrong.forEach(function(a){
-      if(!ownerGroup || !ownerGroup.contains(a)) a.remove();
-    });
-
+    if(!ownerGroup && isOwnerScannerPage()) ownerGroup = buildOwnerGroup(drawer);
     if(!ownerGroup){
-      if(!isOwnerScannerPage()){
-        document.documentElement.dataset.streamBanditMenuExtraLink = VERSION + '-waiting-owner';
-        return false;
-      }
-      ownerGroup = buildOwnerGroup(drawer);
+      document.documentElement.dataset.streamBanditMenuExtraLink = VERSION + '-no-owner-visible';
+      done = true;
+      return;
     }
 
-    addLinks(ownerGroup);
+    addOwnerLinks(ownerGroup);
     document.documentElement.dataset.streamBanditMenuExtraLink = VERSION;
-    return true;
+    done = true;
   }
 
   function start(){
-    var n = 0;
-    var timer = setInterval(function(){
-      n++;
-      if(make() || n > 60) clearInterval(timer);
-    },250);
+    // Give the shared shell a moment to build its drawer, then do exactly one pass.
+    setTimeout(runOnce, 900);
+    setTimeout(runOnce, 1800);
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
-
-  try{
-    new MutationObserver(function(){ make(); }).observe(document.documentElement,{childList:true,subtree:true});
-  }catch(e){}
 })();
