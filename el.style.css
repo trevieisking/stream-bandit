@@ -1,0 +1,3 @@
+/* Stream Bandit scanner-safe placeholder.
+   This protects the focused scanner from treating the JavaScript property chain `el.style.cssText` as a missing CSS file.
+   It is intentionally empty and does not change app styling. */
