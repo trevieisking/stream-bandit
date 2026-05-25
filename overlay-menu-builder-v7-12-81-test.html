@@ -51,7 +51,7 @@ h1{font-size:clamp(44px,6vw,78px);line-height:.92;margin:10px 0;letter-spacing:-
 <section id="export" class="box section"><h2>Import / Export</h2><div class="grid"><div class="card"><b>Import JSON</b><textarea id="importBox" placeholder="Paste exported JSON here..."></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" data-omb-action="import" type="button">Import JSON</button><button class="btn" data-omb-action="download" type="button">Download JSON</button></div></div><div class="card"><b>Current export</b><pre id="exportBox" class="code"></pre></div></div></section>
 <section id="notes" class="box section"><h2>Safe instruction</h2><pre id="notesBox" class="code"></pre></section>
 <section id="debug" class="box section"><h2>Debug</h2><pre id="debugBox" class="code"></pre></section>
-<p class="footer">V7.12.81 Overlay Menu Builder TEST — header + live Add/Edit/Remove overlay fix, read-only.</p>
+<p class="footer">V7.12.81 Overlay Menu Builder TEST — header + Add/Edit/Remove button fix, read-only.</p>
 </div>
 <div class="modalScrim" id="scrim"></div>
 <div class="modal" id="editModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -168,44 +168,12 @@ function duplicateModal(){if(!menu[selected])return;menu.splice(selected+1,0,cle
 function deleteModal(){removeItem(selected);closeModal();}
 function exportData(){return{version:VERSION,updatedAt:new Date().toISOString(),groups:uniqueGroups(),menu:menu};}
 function shellBlock(){var pub=menu.filter(function(x){return x.group!=='Owner';}).map(function(x){return[x.group,x.icon,x.label,x.href,x.note||''];});var own=menu.filter(function(x){return x.group==='Owner'||x.owner;}).map(function(x){return['Owner',x.icon,x.label,x.href,x.note||''];});return 'const PUBLIC_PAGES = '+JSON.stringify(pub,null,2)+';\n\nconst OWNER_PAGES = '+JSON.stringify(own,null,2)+';\n\nconst GROUPS = '+JSON.stringify(uniqueGroups(),null,2)+';';}
-function renderExport(){var data=exportData();$('exportBox').textContent=JSON.stringify(data,null,2);$('notesBox').textContent='Safe instruction\n\nPage: overlay-menu-builder-v7-12-81-test.html\n\nFixed in this build:\n- Home-style account logo/card restored.\n- Add/Edit/Remove now use pointerdown + click capture handling so other helpers cannot steal the button press.\n- Remove button added beside Edit and inside the modal.\n- Drag is only on the handle, not the whole row.\n\nRules:\n- No Supabase writes.\n- No live/index promotion.\n- Policy pages stay in Policy.\n- Owner pages stay in Owner.\n\nNext after pass:\nWire the shared shell to read the exported menu manifest.\n\nShell block:\n\n'+shellBlock();$('debugBox').textContent=JSON.stringify(data,null,2);}
+function renderExport(){var data=exportData();$('exportBox').textContent=JSON.stringify(data,null,2);$('notesBox').textContent='Safe instruction\n\nPage: overlay-menu-builder-v7-12-81-test.html\n\nFixed in this build:\n- V7.12.81 small live-click fix: removed script typo that stopped tabs/Add/Edit from running.\n- Home-style account logo/card restored.\n- Add/Edit buttons use delegated click handling so redraws cannot kill them.\n- Remove button added beside Edit and inside the modal.\n- Drag is only on the handle, not the whole row.\n\nRules:\n- No Supabase writes.\n- No live/index promotion.\n- Policy pages stay in Policy.\n- Owner pages stay in Owner.\n\nNext after pass:\nWire the shared shell to read the exported menu manifest.\n\nShell block:\n\n'+shellBlock();$('debugBox').textContent=JSON.stringify(data,null,2);}
 function renderAll(){renderCards();renderRows();renderPreview();renderGroups();renderExport();}
 function showTab(id){document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('active',b.dataset.ombTab===id);});document.querySelectorAll('.section').forEach(function(s){s.classList.toggle('active',s.id===id);});}
 function helpers(){var bridge=null;try{bridge=window.StreamBanditSettingsGlobal&&window.StreamBanditSettingsGlobal.getState&&window.StreamBanditSettingsGlobal.getState();}catch(e){}$('helperStatus').innerHTML='<b>Global helpers:</b> Account sync '+(window.StreamBanditAuthSync?'✅':'❌')+' · Avatar '+(window.StreamBanditAuthAvatar?'✅':'❌')+' · Shared style '+(window.StreamBanditSharedStyle?'✅':'❌')+' · Brand logo '+(window.StreamBanditBrandLogo?'✅':'❌')+' · Settings bridge '+(window.StreamBanditSettingsGlobal?'✅':'❌')+(bridge&&bridge.source?' · source: '+esc(bridge.source):'');}
 function runAction(action,el){if(action==='add'){showTab('edit');openModal('new');}else if(action==='save'){save();}else if(action==='copy-json'){navigator.clipboard&&navigator.clipboard.writeText(JSON.stringify(exportData(),null,2));toast('JSON copied.');}else if(action==='copy-shell'){navigator.clipboard&&navigator.clipboard.writeText(shellBlock());toast('Shell block copied.');}else if(action==='reset'){if(confirm('Reset menu draft to default?')){localStorage.removeItem(STORE);load();renderAll();toast('Default menu restored.');}}else if(action==='sort'){sortByGroupOrder();renderAll(false);}else if(action==='edit'){openModal(+el.dataset.i);}else if(action==='remove'){removeItem(+el.dataset.i);}else if(action==='up'){move(+el.dataset.i,-1);}else if(action==='down'){move(+el.dataset.i,1);}else if(action==='add-group'){var g=prompt('New menu group name');if(g){groups=uniqueGroups().concat([g.trim()]);renderAll(false);}}else if(action==='group-up'){moveGroup(+el.dataset.gi,-1);}else if(action==='group-down'){moveGroup(+el.dataset.gi,1);}else if(action==='group-remove'){deleteGroup(+el.dataset.gi);}else if(action==='modal-close'){closeModal();}else if(action==='modal-save'){saveModal();}else if(action==='modal-duplicate'){duplicateModal();}else if(action==='modal-up'){move(selected,-1);openModal(selected);}else if(action==='modal-down'){move(selected,1);openModal(selected);}else if(action==='modal-delete'){deleteModal();}else if(action==='import'){try{var d=JSON.parse($('importBox').value);if(!Array.isArray(d.menu))throw Error('JSON needs menu array');menu=d.menu.map(clean);groups=Array.isArray(d.groups)?d.groups:uniqueGroups();selected=0;renderAll();alert('Imported to editor. Save Browser Draft when ready.');}catch(e){alert('Import failed: '+e.message);}}else if(action==='download'){var blob=new Blob([JSON.stringify(exportData(),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='stream-bandit-overlay-menu-v7-12-81.json';a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},1000);}}
-function handleBuilderEvent(e){
-  var target=e.target&&e.target.closest?e.target:null;
-  if(!target)return;
-  var t=target.closest('[data-omb-tab]');
-  if(t){
-    e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();
-    if(e.type==='click'&&t.__ombPointerDone&&Date.now()-t.__ombPointerDone<650)return;
-    if(e.type==='pointerdown')t.__ombPointerDone=Date.now();
-    showTab(t.dataset.ombTab);
-    return;
-  }
-  var b=target.closest('[data-omb-action]');
-  if(!b)return;
-  var action=b.dataset.ombAction;
-  if(action==='group-name')return;
-  e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();
-  if(e.type==='click'&&b.__ombPointerDone&&Date.now()-b.__ombPointerDone<650)return;
-  if(e.type==='pointerdown')b.__ombPointerDone=Date.now();
-  runAction(action,b);
-}
-function init(){load();migrateSelfLinks();renderAll();helpers();setInterval(helpers,2500);
-  document.addEventListener('pointerdown',handleBuilderEvent,true);
-  document.addEventListener('click',handleBuilderEvent,true);
-  window.StreamBanditOverlayMenuBuilder={add:function(){openModal('new');},edit:function(i){openModal(+i);},remove:function(i){removeItem(+i);},tab:showTab,save:save};
-  document.addEventListener('change',function(e){if(e.target&&e.target.dataset.ombAction==='group-name')renameGroup(+e.target.dataset.gi,e.target.value);},true);
-  if($('filterBox'))$('filterBox').addEventListener('input',renderRows);
-  $('scrim').addEventListener('pointerdown',function(e){e.preventDefault();e.stopPropagation();closeModal();},true);
-  $('scrim').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();closeModal();},true);
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
-  var searchBtn=$('globalSearchBtn'),search=$('globalSearch');
-  if(searchBtn)searchBtn.addEventListener('pointerdown',function(e){e.preventDefault();e.stopPropagation();var q=encodeURIComponent((search&&search.value)||'');location.href='global-search-global-helpers-v7-4-9-test.html'+(q?'?q='+q:'');},true);
-  if(search)search.addEventListener('keydown',function(e){if(e.key==='Enter'){var q=encodeURIComponent(search.value||'');location.href='global-search-global-helpers-v7-4-9-test.html'+(q?'?q='+q:'');}});
-}
+function init(){load();migrateSelfLinks();renderAll();helpers();setInterval(helpers,2500);document.addEventListener('click',function(e){var t=e.target.closest('[data-omb-tab]');if(t){e.preventDefault();e.stopPropagation();showTab(t.dataset.ombTab);return;}var b=e.target.closest('[data-omb-action]');if(!b)return;e.preventDefault();e.stopPropagation();runAction(b.dataset.ombAction,b);},true);document.addEventListener('change',function(e){if(e.target&&e.target.dataset.ombAction==='group-name')renameGroup(+e.target.dataset.gi,e.target.value);},true);if($('filterBox'))$('filterBox').addEventListener('input',renderRows);$('scrim').addEventListener('click',closeModal);document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});var searchBtn=$('globalSearchBtn'),search=$('globalSearch');if(searchBtn)searchBtn.onclick=function(){var q=encodeURIComponent((search&&search.value)||'');location.href='global-search-global-helpers-v7-4-9-test.html'+(q?'?q='+q:'');};if(search)search.addEventListener('keydown',function(e){if(e.key==='Enter')searchBtn.click();});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
