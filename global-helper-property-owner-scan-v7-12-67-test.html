@@ -3,854 +3,101 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit V7.12.67 Global Whatnots Property Owner Scan</title>
-
+<title>Stream Bandit Global Whatnots Recovery</title>
 <style>
-:root{
-  color-scheme:dark;
-  --bg:#050711;
-  --card:#101529;
-  --card2:#17122d;
-  --line:#ffffff22;
-  --muted:#cfc6ff;
-  --good:#22d3a6;
-  --purple:#7c3cff;
-  --pink:#ff2d85;
-  --warn:#ffb142;
-  --bad:#ff4d6d;
-  --cyan:#41e8ff;
-}
-*{box-sizing:border-box;min-width:0}
-body{
-  margin:0;
-  padding:22px;
-  background:
-    radial-gradient(circle at 0 0,#22d3a633,transparent 35%),
-    radial-gradient(circle at 100% 0,#7c3cff55,transparent 38%),
-    radial-gradient(circle at bottom,#ff2d8520,transparent 42%),
-    var(--bg);
-  color:white;
-  font-family:Inter,system-ui,Arial,sans-serif;
-}
-.wrap{max-width:1900px;margin:auto}
-.head,.hero,.box,.card{
-  border:1px solid var(--line);
-  border-radius:26px;
-  background:linear-gradient(135deg,var(--card),var(--card2));
-  box-shadow:0 18px 60px #0007;
-  padding:20px;
-  margin-bottom:16px;
-}
-.head{
-  display:grid;
-  grid-template-columns:280px 1fr 340px;
-  gap:14px;
-  align-items:center;
-}
-.brand{font-size:22px;font-weight:950}
-.search{
-  border:1px solid var(--line);
-  border-radius:999px;
-  background:#0004;
-  padding:9px 12px;
-  display:flex;
-  gap:8px;
-}
-.search input{
-  flex:1;
-  background:transparent;
-  border:0;
-  color:white;
-  outline:0;
-}
-.badge,.pill{
-  display:inline-flex;
-  border-radius:999px;
-  padding:7px 11px;
-  font-weight:950;
-  border:1px solid #ffffff33;
-}
-.pill{font-size:12px}
-.ok{background:#22d3a624;border-color:#22d3a666;color:#baf7df}
-.bad{background:#ff4d6d24;border-color:#ff4d6d66;color:#ffd2d9}
-.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}
-.info{background:#78a6ff24;border-color:#78a6ff66;color:#dfe8ff}
-.safe{background:#d946ef24;border-color:#d946ef66;color:#ffd6ff}
-.cyanP{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}
-h1{
-  font-size:clamp(40px,6vw,76px);
-  line-height:.94;
-  letter-spacing:-.06em;
-  margin:10px 0;
-}
-h2{margin:0 0 12px}
-p,.muted{color:var(--muted);line-height:1.5}
-.btn,.tab{
-  border:0;
-  border-radius:999px;
-  padding:11px 15px;
-  background:#414667;
-  color:white;
-  font-weight:950;
-  text-decoration:none;
-  display:inline-flex;
-  justify-content:center;
-  cursor:pointer;
-}
-.primary,.tab.active{background:linear-gradient(135deg,var(--good),var(--purple))}
-.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}
-.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#111}
-.actions,.tabs{display:flex;gap:9px;flex-wrap:wrap}
-.heroGrid{
-  display:grid;
-  grid-template-columns:1fr 330px;
-  gap:18px;
-}
-.art{
-  border:1px solid var(--line);
-  border-radius:28px;
-  display:grid;
-  place-items:center;
-  font-size:82px;
-  background:#ffffff12;
-}
-.stats{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
-  gap:12px;
-}
-.card{background:#ffffff0f;box-shadow:none}
-.big{font-size:34px;font-weight:950}
-.section{display:none}
-.section.active{display:block}
-.row{
-  display:grid;
-  grid-template-columns:280px 150px 1fr 1fr;
-  gap:10px;
-  align-items:center;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:#ffffff0d;
-  padding:11px;
-  margin:7px 0;
-}
-.row.wide{grid-template-columns:300px 160px 1fr}
-.filter{
-  width:100%;
-  border:1px solid var(--line);
-  background:#0006;
-  color:white;
-  border-radius:999px;
-  padding:12px 14px;
-  margin:10px 0;
-}
-.source{
-  white-space:pre-wrap;
-  word-break:break-word;
-  background:#0006;
-  border-radius:16px;
-  padding:12px;
-  max-height:520px;
-  overflow:auto;
-  font-family:ui-monospace,Consolas,monospace;
-}
-.small{font-size:12px}
-.notice{
-  border:1px solid #ffb14266;
-  background:#ffb14218;
-  border-radius:18px;
-  padding:12px 14px;
-  color:#ffe7ad;
-  font-weight:850;
-}
-.progress{
-  height:12px;
-  border-radius:999px;
-  background:#0006;
-  overflow:hidden;
-  margin:12px 0;
-}
-.bar{
-  height:100%;
-  width:0;
-  background:linear-gradient(90deg,var(--good),var(--purple));
-  transition:.2s;
-}
-@media(max-width:1050px){
-  .head,.heroGrid,.row,.row.wide{grid-template-columns:1fr}
-  .btn,.tab{width:100%}
-}
+:root{color-scheme:dark;--bg:#050711;--card:#101529;--card2:#17122d;--line:#ffffff22;--muted:#cfc6ff;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff}*{box-sizing:border-box}body{margin:0;padding:22px;background:radial-gradient(circle at 0 0,#22d3a633,transparent 35%),radial-gradient(circle at 100% 0,#7c3cff55,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.wrap{max-width:1700px;margin:auto}.box,.hero,.card{border:1px solid var(--line);border-radius:26px;background:linear-gradient(135deg,var(--card),var(--card2));box-shadow:0 18px 60px #0007;padding:20px;margin-bottom:16px}.badge,.pill{display:inline-flex;border-radius:999px;padding:7px 11px;font-weight:950;border:1px solid #ffffff33}.ok{background:#22d3a624;border-color:#22d3a666;color:#baf7df}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.bad{background:#ff4d6d24;border-color:#ff4d6d66;color:#ffd2d9}.info{background:#78a6ff24;border-color:#78a6ff66;color:#dfe8ff}h1{font-size:clamp(38px,6vw,72px);line-height:.95;letter-spacing:-.06em;margin:10px 0}h2{margin:0 0 12px}p,.muted{color:var(--muted);line-height:1.5}.actions,.tabs{display:flex;gap:9px;flex-wrap:wrap}.btn,.tab{border:0;border-radius:999px;padding:11px 15px;background:#414667;color:#fff;font-weight:950;text-decoration:none;display:inline-flex;cursor:pointer}.primary,.tab.active{background:linear-gradient(135deg,var(--good),var(--purple))}.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#111}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.card{background:#ffffff0f;box-shadow:none}.big{font-size:32px;font-weight:950}.row{display:grid;grid-template-columns:270px 140px 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:14px;background:#ffffff0d;padding:11px;margin:7px 0}.section{display:none}.section.active{display:block}.source{white-space:pre-wrap;word-break:break-word;background:#0006;border-radius:16px;padding:12px;max-height:520px;overflow:auto;font-family:ui-monospace,Consolas,monospace}.filter{width:100%;border:1px solid var(--line);background:#0006;color:white;border-radius:999px;padding:12px 14px;margin:10px 0}.notice{border:1px solid #ffb14266;background:#ffb14218;border-radius:18px;padding:12px 14px;color:#ffe7ad;font-weight:850}@media(max-width:900px){.row{grid-template-columns:1fr}.btn,.tab{width:100%;justify-content:center}}
 </style>
 </head>
-
 <body>
 <div class="wrap">
-
-<header class="head">
-  <div class="brand">Stream Bandit</div>
-  <div class="muted">
-    <b>V7.12.67 Global Whatnots Property Owner Scan.</b><br>
-    Owner keeper scan for global helpers, settings owners, Supabase tables, known storage bucket, page families and role-gate rules.
-  </div>
-  <div class="search">
-    <span>🔎</span>
-    <input id="globalSearch" placeholder="Search scan results">
-    <button id="searchBtn" class="btn primary" type="button">Search</button>
-  </div>
-</header>
-
 <section class="hero">
-  <div class="heroGrid">
-    <div>
-      <span class="badge ok">V7.12.67 Owner Keeper TEST</span>
-      <h1>Global Whatnots Property Owner Scan</h1>
-      <p>
-        This is the cleaner owner keeper page. It does not change Home, does not write Supabase, does not promote index,
-        and does not replace your global settings. It maps the global systems the role gate must respect.
-      </p>
-
-      <div class="actions">
-        <button id="runBtn" class="btn hot" type="button">Run Owner Keeper Scan</button>
-        <button id="jsonBtn" class="btn primary" type="button">Download Owner JSON</button>
-        <button id="csvBtn" class="btn warnBtn" type="button">Download Owner CSV</button>
-        <a class="btn" href="full-app-action-audit-v7-12-63-test.html">Big App Audit</a>
-        <a class="btn" href="clickable-child-button-auditor-v7-12-61-test.html">Child Audit</a>
-        <a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a>
-      </div>
-
-      <div class="progress"><div id="bar" class="bar"></div></div>
-      <p id="status" class="badge info">Ready. Read-only. No writes. No deletes. No live promotion.</p>
-    </div>
-
-    <div class="art">🧬🗺️</div>
-  </div>
-</section>
-
-<section class="box">
-  <div class="stats">
-    <div class="card"><b>Repo files</b><div id="repoTotal" class="big">--</div></div>
-    <div class="card"><b>Text scanned</b><div id="textTotal" class="big">--</div></div>
-    <div class="card"><b>HTML pages</b><div id="htmlTotal" class="big">--</div></div>
-    <div class="card"><b>JS helpers</b><div id="jsTotal" class="big">--</div></div>
-    <div class="card"><b>Global helper files</b><div id="helperTotal" class="big">0</div></div>
-    <div class="card"><b>Script links</b><div id="scriptTotal" class="big">0</div></div>
-    <div class="card"><b>Missing scripts</b><div id="missingScriptTotal" class="big">0</div></div>
-    <div class="card"><b>Window globals</b><div id="globalTotal" class="big">0</div></div>
-    <div class="card"><b>Settings keys</b><div id="settingTotal" class="big">0</div></div>
-    <div class="card"><b>Supabase tables</b><div id="tableTotal" class="big">0</div></div>
-    <div class="card"><b>Storage buckets</b><div id="bucketTotal" class="big">1</div></div>
-    <div class="card"><b>Owner families</b><div id="familyTotal" class="big">13</div></div>
-  </div>
-</section>
-
-<section class="box">
-  <div class="tabs">
-    <button class="tab active" data-tab="summary" type="button">Summary</button>
-    <button class="tab" data-tab="whatnots" type="button">Global Whatnots</button>
-    <button class="tab" data-tab="helpers" type="button">Global Helpers</button>
-    <button class="tab" data-tab="owners" type="button">Property Owners</button>
-    <button class="tab" data-tab="settings" type="button">Settings Keys</button>
-    <button class="tab" data-tab="supabase" type="button">Supabase Map</button>
-    <button class="tab" data-tab="scripts" type="button">Script Links</button>
-    <button class="tab" data-tab="globals" type="button">Window Globals</button>
-    <button class="tab" data-tab="gatePlan" type="button">Gate Build Plan</button>
-    <button class="tab" data-tab="debug" type="button">Debug</button>
-  </div>
-</section>
-
-<section id="summary" class="box section active">
-  <h2>What this scan decides</h2>
-  <p class="notice">
-    The role gate must not replace global settings. It must sit above the existing helper/property-owner system and ask:
-    who may use this feature or write this property?
-  </p>
-  <div id="summaryRows"></div>
-</section>
-
-<section id="whatnots" class="box section">
-  <h2>Trevor's global whatnots to keep</h2>
-  <p class="muted">This is the simple owner map. These must stay visible before we build the role gate.</p>
-  <div id="whatnotRows"></div>
-</section>
-
-<section id="helpers" class="box section">
-  <h2>Global helper files</h2>
-  <input id="helperFilter" class="filter" placeholder="Filter helpers">
-  <div id="helperRows"></div>
-</section>
-
-<section id="owners" class="box section">
-  <h2>Property owners / feature families</h2>
-  <input id="ownerFilter" class="filter" placeholder="Filter owners">
-  <div id="ownerRows"></div>
-</section>
-
-<section id="settings" class="box section">
-  <h2>Settings and local/global property keys</h2>
-  <input id="settingFilter" class="filter" placeholder="Filter settings">
-  <div id="settingRows"></div>
-</section>
-
-<section id="supabase" class="box section">
-  <h2>Supabase tables, bucket and write intent</h2>
-  <input id="supabaseFilter" class="filter" placeholder="Filter Supabase">
-  <div id="supabaseRows"></div>
-</section>
-
-<section id="scripts" class="box section">
-  <h2>Script links and helper dependencies</h2>
-  <input id="scriptFilter" class="filter" placeholder="Filter script links">
-  <div id="scriptRows"></div>
-</section>
-
-<section id="globals" class="box section">
-  <h2>Window globals and browser events</h2>
-  <input id="globalFilter" class="filter" placeholder="Filter globals">
-  <div id="globalRows"></div>
-</section>
-
-<section id="gatePlan" class="box section">
-  <h2>Role gate build plan from helper/property scan</h2>
-  <div id="gateRows"></div>
-</section>
-
-<section id="debug" class="box section">
-  <h2>Debug JSON</h2>
-  <div id="debugRows" class="source">Waiting...</div>
-</section>
-
+<span class="badge ok">V7.12.73 Recovery Mode</span>
+<h1>Global Whatnots</h1>
+<p>This page has been stabilised as a standalone owner tool. It does not load the overlay shell, runtime helper, or menu add-on, so it cannot loop/refresh the page. Use this to inspect global helpers, settings keys, Supabase table references and the confirmed image bucket before role-gate work.</p>
+<div class="notice">Safe mode: no writes, no deletes, no live promotion, no payment unlocks. The confirmed Supabase image bucket is <b>stream-bandit-images</b>.</div>
+<br>
+<div class="actions">
+<button id="runBtn" class="btn hot" type="button">Run Owner Keeper Scan</button>
+<button id="jsonBtn" class="btn primary" type="button">Download JSON</button>
+<button id="csvBtn" class="btn warnBtn" type="button">Download CSV</button>
+<a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a>
+<a class="btn" href="stream-bandit-one-machine-v7-12-72-test.html">One Machine</a>
+<a class="btn" href="platform-control-centre-combined-v7-12-61-test.html">Platform Control</a>
 </div>
-
+<p id="status" class="badge info">Ready. This standalone page will not auto-refresh.</p>
+</section>
+<section class="box"><div class="stats">
+<div class="card"><b>Repo files</b><div id="repoTotal" class="big">--</div></div>
+<div class="card"><b>HTML pages</b><div id="htmlTotal" class="big">--</div></div>
+<div class="card"><b>JS files</b><div id="jsTotal" class="big">--</div></div>
+<div class="card"><b>Text scanned</b><div id="textTotal" class="big">--</div></div>
+<div class="card"><b>Global helpers</b><div id="helperTotal" class="big">--</div></div>
+<div class="card"><b>Settings keys</b><div id="settingTotal" class="big">--</div></div>
+<div class="card"><b>Supabase tables</b><div id="tableTotal" class="big">--</div></div>
+<div class="card"><b>Storage buckets</b><div id="bucketTotal" class="big">1</div></div>
+<div class="card"><b>Missing scripts</b><div id="missingTotal" class="big">--</div></div>
+</div></section>
+<section class="box"><div class="tabs">
+<button class="tab active" data-tab="whatnots" type="button">Global Whatnots</button>
+<button class="tab" data-tab="families" type="button">Feature Families</button>
+<button class="tab" data-tab="helpers" type="button">Helpers</button>
+<button class="tab" data-tab="settings" type="button">Settings Keys</button>
+<button class="tab" data-tab="supabase" type="button">Supabase Map</button>
+<button class="tab" data-tab="scripts" type="button">Script Check</button>
+<button class="tab" data-tab="gate" type="button">Gate Plan</button>
+<button class="tab" data-tab="debug" type="button">Debug</button>
+</div></section>
+<section id="whatnots" class="box section active"><h2>Global whatnots to keep</h2><div id="whatnotRows"></div></section>
+<section id="families" class="box section"><h2>Feature families</h2><div id="familyRows"></div></section>
+<section id="helpers" class="box section"><h2>Global helper files</h2><input id="helperFilter" class="filter" placeholder="Filter helpers"><div id="helperRows"></div></section>
+<section id="settings" class="box section"><h2>Settings keys</h2><input id="settingFilter" class="filter" placeholder="Filter settings"><div id="settingRows"></div></section>
+<section id="supabase" class="box section"><h2>Supabase tables and storage</h2><input id="supabaseFilter" class="filter" placeholder="Filter Supabase"><div id="supabaseRows"></div></section>
+<section id="scripts" class="box section"><h2>Script links</h2><input id="scriptFilter" class="filter" placeholder="Filter scripts"><div id="scriptRows"></div></section>
+<section id="gate" class="box section"><h2>Role gate build plan</h2><div id="gateRows"></div></section>
+<section id="debug" class="box section"><h2>Debug JSON</h2><div id="debugRows" class="source">Waiting...</div></section>
+</div>
 <script>
-const OWNER = 'trevieisking';
-const REPO = 'stream-bandit';
-const BRANCH = 'main';
-const TREE_API = `https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1`;
-const RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/`;
-
-const KNOWN_BUCKETS = [
-  {
-    bucket:'stream-bandit-images',
-    state:'CONFIRMED',
-    source:'Supabase dashboard confirmed by Trevor',
-    folders:'channels, collections, global, logos, playlists, poster-image, posters, profiles, submission-posters, submissions',
-    rule:'Public image bucket. Keep for posters, profile images, brand images and creator images.'
-  }
+const OWNER='trevieisking', REPO='stream-bandit', BRANCH='main';
+const TREE_API=`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1`;
+const RAW=`https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/`;
+const textExt=/\.(html|js|css|json|md|txt)$/i;
+const helperName=/(global|helper|settings|shell|route|menu|brand|logo|favicon|profile|account|auth|supabase|storage|mux|policy|permissions|accessibility|watchlist|favourites|likes|history|continue|channel|playlist|collection|search|genres|builder|control|owner|gate|guard|pointer|machine|role)/i;
+const KNOWN_BUCKET={page:'Supabase dashboard',state:'STORAGE_BUCKET_CONFIRMED',target:'stream-bandit-images',kind:'Confirmed bucket: channels, collections, global, logos, playlists, poster-image, posters, profiles, submission-posters, submissions'};
+const WHATNOTS=[
+['Shell/menu/global navigation','KEEP','stream-bandit-shell-v6-24.js owns overlay/menu/route guard/favicon/search'],
+['Settings bridge/global display','KEEP','stream-bandit-settings-global-v7-1-8.js owns theme/style/settings bridge'],
+['Brand/logo/favicon/app icons','KEEP','public sees result; owner controls changes'],
+['Account/profile/avatar/banner','KEEP','Supabase Auth/profile role detection'],
+['Storage image bucket','KEEP','stream-bandit-images confirmed'],
+['Watch/player/save state','KEEP','watchlist/favourites/likes/history/continue watching'],
+['Creator submissions','KEEP','submit/rules/my channel/review queue'],
+['Admin/system tools','ROLE LOCK','admin/owner only'],
+['Owner machines','OWNER ONLY','One Machine, Platform Control, route/scanner tools'],
+['Payments/billing','LOCKED','payments stay disabled until intentionally built']
 ];
-
-const WHATNOTS = [
-  ['Shell/menu/global navigation','stream-bandit-shell-v6-24.js','KEEP','Owns overlay menu, route guard, search and owner menu visibility. Gate extends this, never replaces it.'],
-  ['Settings bridge/global display','stream-bandit-settings-global-v7-1-8.js','KEEP','Owns theme/style/settings bridge. Gate reads this first and does not wipe global settings.'],
-  ['Brand/logo/favicon/app icons','brand/logo/favicon helpers and owner pages','KEEP','Owns public app identity. Owner controls changes. Public only sees result.'],
-  ['Account/profile/avatar/banner','auth/profile/avatar helpers and Supabase profiles','KEEP','Owns signed-in state, profile, avatar, banner and role detection.'],
-  ['Storage image bucket','stream-bandit-images','KEEP','Confirmed Supabase bucket. Used for images/posters/logos/profile/submission images.'],
-  ['Watch/player/save state','watchlist, favourites, likes, history, continue watching','KEEP','Viewer features. Sign-in may be needed for saves, but not admin permission.'],
-  ['Browse/search/library/genres','library, Supabase library, genres, global search','KEEP','Public browsing and watching layer.'],
-  ['Creator submissions','submit video, rules, my channel, review queue','KEEP','Creator can submit/manage own content. Admin/owner reviews.'],
-  ['Group play','channels, playlists, collections, Player 2','KEEP','Group-play app family.'],
-  ['Admin/system tools','admin, health, Mux, storage, backup, readiness','ROLE LOCK','Admin/owner only. Normal users should not access these.'],
-  ['Owner machines','One Machine, Platform Control, route/scanner tools','OWNER ONLY','Owner-only repair and control tools.'],
-  ['Policy/legal/footer','policy centre, policy editor, published proof','KEEP','Public can read proof. Admin/owner edits.'],
-  ['Payments/billing','pricing/payment/stripe/subscription','LOCKED FOR NOW','Do not unlock payments until payment rules are intentionally designed.']
-];
-
-const textExt = /\.(html|js|css|json|md|txt)$/i;
-const helperName = /(global|helper|settings|shell|route|menu|brand|logo|favicon|profile|account|auth|supabase|storage|mux|policy|permissions|accessibility|watchlist|favourites|likes|history|continue|channel|playlist|collection|search|genres|builder|control|owner|gate|guard|pointer|machine|role)/i;
-
-let repoFiles = [];
-let fileSet = new Set();
-let records = [];
-let helpers = [];
-let scriptRefs = [];
-let missingScripts = [];
-let windowGlobals = [];
-let settingKeys = [];
-let supabaseRows = [];
-let ownerFamilies = [];
-let gateRows = [];
-
-const $ = id => document.getElementById(id);
-
-function esc(s){
-  return String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const FAMILIES=['Shell/menu/global navigation','Settings/theme/global display','Brand/logo/favicon/app icons','Account/profile/avatar/banner','Supabase image storage bucket','Watch/player/saves','Browse/search/library/genres','Creator submissions/review queue','Group play channels/playlists/collections','Admin/system/storage/mux/backup','Policy/legal/footer','Web builder/pages/forms','Pricing/permissions/payments','Owner/control machines'];
+let repoFiles=[], fileSet=new Set(), helpers=[], settings=[], supabaseRows=[], scripts=[], missingScripts=[], debug={};
+const $=id=>document.getElementById(id);
+function esc(s){return String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function base(p){return String(p||'').split('/').pop().split('?')[0].split('#')[0]}
+function uniq(a,k){const m=new Map();a.forEach(x=>{const key=k?k(x):JSON.stringify(x);if(!m.has(key))m.set(key,x)});return [...m.values()]}
+function collect(re,txt,fn){let m;while((m=re.exec(txt)))fn(m)}
+function row(x){let st=x.state||'';let cls=/KEEP|FOUND|CONFIRMED|OK/.test(st)?'ok':/LOCK|OWNER|RULE|WARN/.test(st)?'warn':/MISSING|FAIL/.test(st)?'bad':'info';return `<div class="row"><b>${esc(x.page||x.family||'')}</b><span class="pill ${cls}">${esc(st)}</span><span>${esc(x.target||x.kind||'')}</span></div>`}
+function type(path,txt){let b=base(path).toLowerCase(), out=[]; if(/shell|menu/.test(b))out.push('shell/menu'); if(/settings|theme|style/.test(b)||/StreamBanditSettingsGlobal|sb_app_settings/.test(txt))out.push('settings/theme'); if(/brand|logo|favicon|icon/.test(b))out.push('brand/icons'); if(/profile|account|auth/.test(b)||/sb_profiles|auth\.getUser/.test(txt))out.push('account/profile'); if(/watch|player|library|genres|search/.test(b))out.push('watch/browse'); if(/submit|review|channel|playlist|collection/.test(b))out.push('creator/group'); if(/admin|mux|storage|backup|health|readiness/.test(b))out.push('admin/system'); if(/policy|terms|privacy/.test(b))out.push('policy'); return out.join(', ')||'file'}
+function analyse(path,txt){let b=base(path), kind=type(path,txt); if((/\.js$/i.test(b)&&helperName.test(b))||/global|helper|settings|shell|route|brand|profile|owner|gate|whatnot/i.test(b)||/window\.StreamBandit|StreamBandit[A-Za-z0-9_]*|CustomEvent\(['"]streambandit:/i.test(txt)) helpers.push({page:path,state:/\.js$/i.test(b)?'JS_HELPER':'GLOBAL_RELATED',target:kind,kind});
+collect(/<script[^>]+src=["']([^"']+)["']/gi,txt,m=>{let t=m[1]; if(/^https?:/i.test(t)){scripts.push({page:path,state:'EXTERNAL_SCRIPT',target:t,kind});return;} let clean=base(t.replace(/^\.\//,'')); let ok=fileSet.has(clean); scripts.push({page:path,state:ok?'SCRIPT_OK':'SCRIPT_MISSING',target:clean,kind}); if(!ok)missingScripts.push({page:path,state:'SCRIPT_MISSING',target:clean,kind});});
+collect(/(?:localStorage|sessionStorage)\.(?:getItem|setItem|removeItem)\(['"]([^'"]+)['"]/g,txt,m=>settings.push({page:path,state:'BROWSER_KEY',target:m[1],kind}));
+collect(/(?:const|let|var)\s+([A-Z0-9_]{4,})\s*=/g,txt,m=>{/KEY|SETTING|STORE|ROLE|PERMISSION|THEME|BRAND|PROFILE|MENU|ROUTE|FEATURE/.test(m[1])&&settings.push({page:path,state:'CONST_KEY',target:m[1],kind})});
+collect(/from\(['"]([^'"]+)['"]\)/g,txt,m=>supabaseRows.push({page:path,state:'SUPABASE_TABLE',target:m[1],kind}));
+collect(/storage\.from\(['"]([^'"]+)['"]\)/g,txt,m=>supabaseRows.push({page:path,state:'STORAGE_BUCKET',target:m[1],kind}));
+collect(/\/storage\/v1\/object\/public\/([^\/"'?#\s]+)/g,txt,m=>supabaseRows.push({page:path,state:'STORAGE_BUCKET_URL',target:m[1],kind:'public storage URL'}));
 }
-
-function base(p){
-  return String(p || '').split('/').pop().split('?')[0].split('#')[0];
-}
-
-function uniq(arr,key){
-  const m = new Map();
-  arr.forEach(x => {
-    const k = key ? key(x) : JSON.stringify(x);
-    if(!m.has(k)) m.set(k,x);
-  });
-  return [...m.values()];
-}
-
-function updateStatus(t,p){
-  $('status').textContent = t;
-  if(typeof p === 'number') $('bar').style.width = Math.max(0,Math.min(100,p)) + '%';
-}
-
-function collect(re,txt,fn){
-  let m;
-  while((m = re.exec(txt))) fn(m);
-}
-
-function typeForFile(path,txt){
-  const b = base(path).toLowerCase();
-  const score = [];
-
-  if(/shell|menu/.test(b)) score.push('shell/menu');
-  if(/settings|theme|style/.test(b) || /StreamBanditSettingsGlobal|sb_app_settings|settings_platform_control_hub/.test(txt)) score.push('settings/theme');
-  if(/brand|logo|favicon|icon/.test(b)) score.push('brand/icons');
-  if(/profile|avatar|account|auth/.test(b) || /sb_profiles|auth\.getUser/.test(txt)) score.push('account/profile');
-  if(/watchlist|favourites|likes|continue|history|player|details|library|genres|search/.test(b)) score.push('watch/browse');
-  if(/submit|review|rules|creator|channel|playlist|collection/.test(b)) score.push('creator/group play');
-  if(/admin|readiness|health|mux|storage|backup|registry|tools/.test(b)) score.push('admin/system');
-  if(/policy|terms|privacy|cookies/.test(b)) score.push('policy/legal');
-  if(/pricing|payment|billing|stripe|permissions|user-management/.test(b)) score.push('pricing/permissions');
-  if(/owner|control|route|guard|pointer|machine/.test(b)) score.push('owner/diagnostics');
-
-  if(!score.length && helperName.test(b)) score.push('possible helper');
-  return score.length ? score.join(', ') : 'page/file';
-}
-
-function analyseFile(path,txt){
-  const b = base(path);
-  const kind = typeForFile(path,txt);
-  const isHelper = /\.js$/i.test(b) && helperName.test(b);
-  const isGlobal =
-    /StreamBandit[A-Za-z0-9_]*|window\.StreamBandit|document\.documentElement\.dataset\.streamBandit|CustomEvent\(['"]streambandit:/i.test(txt)
-    || /global|helper|settings bridge|route guard|owner/i.test(b);
-
-  records.push({
-    path,
-    b,
-    kind,
-    bytes:txt.length,
-    isHelper,
-    isGlobal,
-    title:(txt.match(/<title>([^<]+)<\/title>/i) || [])[1] || ''
-  });
-
-  if(isHelper || isGlobal || /global|helper|settings|shell|route|brand|profile|owner|gate|whatnot/i.test(b)){
-    helpers.push({
-      path,
-      state:isHelper ? 'JS_HELPER' : 'GLOBAL_RELATED',
-      kind,
-      title:(txt.match(/<title>([^<]+)<\/title>/i) || [])[1] || '',
-      bytes:txt.length
-    });
-  }
-
-  collect(/<script[^>]+src=["']([^"']+)["']/gi, txt, m => {
-    let target = m[1];
-
-    if(/^https?:\/\//i.test(target)){
-      scriptRefs.push({page:path,state:'EXTERNAL_SCRIPT',target,kind:'external'});
-      return;
-    }
-
-    let clean = base(target.replace(/^\.\//,''));
-    let exists = fileSet.has(clean);
-
-    scriptRefs.push({
-      page:path,
-      state:exists ? 'SCRIPT_OK' : 'SCRIPT_MISSING',
-      target:clean,
-      kind:exists ? 'local helper/script' : 'missing local script'
-    });
-
-    if(!exists){
-      missingScripts.push({
-        page:path,
-        state:'SCRIPT_MISSING',
-        target:clean,
-        kind:'missing local script'
-      });
-    }
-  });
-
-  collect(/window\.([A-Z][A-Za-z0-9_$]{2,})\s*=/g, txt, m => {
-    windowGlobals.push({page:path,state:'WINDOW_GLOBAL',target:'window.' + m[1],kind});
-  });
-
-  collect(/document\.documentElement\.dataset\.([A-Za-z0-9_$-]*streamBandit[A-Za-z0-9_$-]*)\s*=/g, txt, m => {
-    windowGlobals.push({page:path,state:'DATASET_GLOBAL',target:'dataset.' + m[1],kind});
-  });
-
-  collect(/new\s+CustomEvent\(['"]([^'"]+)['"]/g, txt, m => {
-    windowGlobals.push({page:path,state:'EVENT',target:m[1],kind});
-  });
-
-  collect(/(?:localStorage|sessionStorage)\.(?:getItem|setItem|removeItem)\(['"]([^'"]+)['"]/g, txt, m => {
-    settingKeys.push({page:path,state:'BROWSER_KEY',target:m[1],kind});
-  });
-
-  collect(/(?:const|let|var)\s+([A-Z0-9_]{4,})\s*=\s*['"][^'"]*['"]/g, txt, m => {
-    if(/KEY|SETTING|STORE|ROLE|PERMISSION|THEME|BRAND|PROFILE|MENU|ROUTE|FEATURE/.test(m[1])){
-      settingKeys.push({page:path,state:'CONST_KEY',target:m[1],kind});
-    }
-  });
-
-  collect(/from\(['"]([^'"]+)['"]\)/g, txt, m => {
-    supabaseRows.push({page:path,state:'SUPABASE_TABLE',target:m[1],kind});
-  });
-
-  collect(/storage\.from\(['"]([^'"]+)['"]\)/g, txt, m => {
-    supabaseRows.push({page:path,state:'STORAGE_BUCKET',target:m[1],kind});
-  });
-
-  collect(/\/storage\/v1\/object\/public\/([^\/"'?#\s]+)/g, txt, m => {
-    supabaseRows.push({page:path,state:'STORAGE_BUCKET_URL',target:m[1],kind:'public storage URL'});
-  });
-
-  collect(/\.select\(|\.insert\(|\.update\(|\.upsert\(|\.delete\(|\.upload\(|\.remove\(/g, txt, m => {
-    supabaseRows.push({
-      page:path,
-      state:/insert|update|upsert|delete|upload|remove/.test(m[0]) ? 'WRITE_INTENT' : 'READ_INTENT',
-      target:m[0],
-      kind
-    });
-  });
-}
-
-function familyRows(){
-  const families = {
-    'Shell/menu/global navigation':['shell','menu','route guard','StreamBanditRoutes','stream-bandit-shell-v6-24.js'],
-    'Settings/theme/global display':['settings','theme','style','StreamBanditSettingsGlobal','sb_app_settings'],
-    'Brand/logo/favicon/app icons':['brand','logo','favicon','icon','stream-bandit-brand'],
-    'Account/profile/avatar/banner':['profile','avatar','banner','auth.getUser','sb_profiles'],
-    'Supabase image storage bucket':['stream-bandit-images','storage.from','storage/v1/object/public'],
-    'Watch/player/saves':['watchlist','favourites','likes','continue','history','player','sb_watch'],
-    'Browse/search/library/genres':['library','search','genres','sb_movies'],
-    'Creator submissions/review queue':['submit','review','rules','sb_submissions'],
-    'Group play channels/playlists/collections':['channels','playlists','collections','sb_channels'],
-    'Admin/system/storage/mux/backup':['admin','health','readiness','mux','storage','backup'],
-    'Policy/legal/footer':['policy','terms','privacy','footer','sb_policy'],
-    'Web builder/pages/forms':['web-builder','builder','layout_json','form'],
-    'Pricing/permissions/payments':['pricing','permissions','payment','billing','stripe'],
-    'Owner/control machines':['owner','control centre','one machine','route pointer','route guard','property owner scan']
-  };
-
-  const out = [];
-
-  Object.entries(families).forEach(([name,needles]) => {
-    const hits = records.filter(r => {
-      const hay = (r.path + ' ' + r.kind + ' ' + r.title).toLowerCase();
-      return needles.some(n => hay.includes(String(n).toLowerCase()));
-    });
-
-    out.push({
-      family:name,
-      state:hits.length || name === 'Supabase image storage bucket' ? 'FOUND' : 'REVIEW',
-      target:name === 'Supabase image storage bucket'
-        ? 'confirmed bucket: stream-bandit-images'
-        : hits.length + ' files/pages',
-      kind:name === 'Supabase image storage bucket'
-        ? 'Confirmed from Supabase dashboard. Scanner also detects code/public URL references.'
-        : hits.slice(0,12).map(h => h.path).join('\n')
-    });
-  });
-
-  return out;
-}
-
-function buildGateRows(){
-  return [
-    {
-      family:'Gate should extend shell/menu helper',
-      state:'KEEP',
-      target:'stream-bandit-shell-v6-24.js',
-      kind:'Do not replace overlay/routes. Add role awareness beside it.'
-    },
-    {
-      family:'Gate should extend settings bridge',
-      state:'KEEP',
-      target:'stream-bandit-settings-global-v7-1-8.js',
-      kind:'Do not replace global settings. Read StreamBanditSettingsGlobal first, then permission-check actions.'
-    },
-    {
-      family:'Gate should keep storage bucket map',
-      state:'KEEP',
-      target:'stream-bandit-images',
-      kind:'Confirmed Supabase public image bucket. Use for posters, logos, profiles, submissions and app images.'
-    },
-    {
-      family:'Gate should use Supabase profile role',
-      state:'RULE',
-      target:'sb_profiles / profiles role, is_admin, email',
-      kind:'Detect guest/viewer/creator/admin/owner. UI gate only until RLS is checked.'
-    },
-    {
-      family:'Gate should protect writes, not hide whole app',
-      state:'RULE',
-      target:'buttons/actions/forms',
-      kind:'Viewer sees public app. Restricted actions show friendly lock.'
-    },
-    {
-      family:'Owner/admin unlock',
-      state:'RULE',
-      target:'admin/owner features',
-      kind:'Trevor/owner/admin can use controls except payments.'
-    },
-    {
-      family:'Payments stay disabled',
-      state:'RULE',
-      target:'pricing/payment/billing/stripe',
-      kind:'Keep checkout/subscription inactive until proper payment build.'
-    },
-    {
-      family:'Supabase/RLS later',
-      state:'WARNING',
-      target:'real backend security',
-      kind:'Client role gate is UI layer. Supabase RLS must enforce database safety later.'
-    }
-  ];
-}
-
-async function run(){
-  try{
-    updateStatus('Loading repo tree...',3);
-
-    const tree = await fetch(TREE_API,{cache:'no-store'}).then(r => {
-      if(!r.ok) throw Error('GitHub tree HTTP ' + r.status);
-      return r.json();
-    });
-
-    repoFiles = (tree.tree || []).filter(x => x.type === 'blob').map(x => x.path);
-    fileSet = new Set(repoFiles.map(base));
-
-    const textFiles = repoFiles.filter(p => textExt.test(p));
-
-    $('repoTotal').textContent = repoFiles.length;
-    $('htmlTotal').textContent = repoFiles.filter(p => /\.html$/i.test(p)).length;
-    $('jsTotal').textContent = repoFiles.filter(p => /\.js$/i.test(p)).length;
-    $('textTotal').textContent = textFiles.length;
-
-    records = [];
-    helpers = [];
-    scriptRefs = [];
-    missingScripts = [];
-    windowGlobals = [];
-    settingKeys = [];
-    supabaseRows = [];
-
-    KNOWN_BUCKETS.forEach(b => {
-      supabaseRows.push({
-        page:'Supabase dashboard',
-        state:'STORAGE_BUCKET_CONFIRMED',
-        target:b.bucket,
-        kind:b.folders + ' | ' + b.rule
-      });
-    });
-
-    for(let i=0;i<textFiles.length;i++){
-      const path = textFiles[i];
-      updateStatus('Scanning ' + path, 5 + Math.floor((i / textFiles.length) * 85));
-
-      try{
-        const txt = await fetch(RAW + path,{cache:'no-store'}).then(r => r.ok ? r.text() : '');
-        if(txt) analyseFile(path,txt);
-      }catch(e){
-        records.push({
-          path,
-          b:base(path),
-          kind:'fetch failed',
-          bytes:0,
-          isHelper:false,
-          isGlobal:false,
-          error:e.message || String(e)
-        });
-      }
-    }
-
-    helpers = uniq(helpers, x => x.path + '|' + x.state);
-    scriptRefs = uniq(scriptRefs, x => x.page + '|' + x.target + '|' + x.state);
-    missingScripts = uniq(missingScripts, x => x.page + '|' + x.target);
-    windowGlobals = uniq(windowGlobals, x => x.page + '|' + x.target + '|' + x.state);
-    settingKeys = uniq(settingKeys, x => x.page + '|' + x.target + '|' + x.state);
-    supabaseRows = uniq(supabaseRows, x => x.page + '|' + x.target + '|' + x.state);
-
-    ownerFamilies = familyRows();
-    gateRows = buildGateRows();
-
-    render();
-    updateStatus('Owner keeper scan complete. Storage bucket is now counted from dashboard confirmation and code refs.',100);
-
-  }catch(e){
-    updateStatus('Scan failed: ' + (e.message || e),0);
-    $('debugRows').textContent = String(e.stack || e);
-  }
-}
-
-function pillClass(state){
-  if(/OK|FOUND|KEEP|READ|CONFIRMED/.test(state)) return 'ok';
-  if(/MISSING|FAIL|BAD/.test(state)) return 'bad';
-  if(/WARN|REVIEW|RULE|LOCK|OWNER/.test(state)) return 'warn';
-  if(/EXTERNAL|EVENT|GLOBAL/.test(state)) return 'info';
-  return 'cyanP';
-}
-
-function row(x){
-  const state = x.state || '';
-  const cls = pillClass(state);
-
-  return `
-    <div class="row">
-      <b>${esc(x.page || x.path || x.family || '')}<br>
-        <span class="small muted">${esc(x.kind || '')}</span>
-      </b>
-      <span class="pill ${cls}">${esc(state)}</span>
-      <span>${esc(x.target || x.title || '')}</span>
-      <span>${esc(x.family || x.path || '')}</span>
-    </div>
-  `;
-}
-
-function rowWide(x){
-  const state = x.state || '';
-  const cls = pillClass(state);
-
-  return `
-    <div class="row wide">
-      <b>${esc(x.family || x.path || '')}</b>
-      <span class="pill ${cls}">${esc(state)}</span>
-      <span class="small">${esc(x.target || '')}<br>${esc(x.kind || '')}</span>
-    </div>
-  `;
-}
-
-function whatnotRow(x){
-  return rowWide({
-    family:x[0],
-    target:x[1],
-    state:x[2],
-    kind:x[3]
-  });
-}
-
-function filt(list,id){
-  let q = ($('globalSearch').value + ' ' + ($(id)?.value || '')).toLowerCase().trim();
-  return q ? list.filter(x => JSON.stringify(x).toLowerCase().includes(q)) : list;
-}
-
-function render(){
-  const buckets = uniq(
-    supabaseRows.filter(x => /STORAGE_BUCKET/.test(x.state)),
-    x => x.target
-  );
-
-  $('helperTotal').textContent = helpers.length;
-  $('scriptTotal').textContent = scriptRefs.length;
-  $('missingScriptTotal').textContent = missingScripts.length;
-  $('globalTotal').textContent = windowGlobals.length;
-  $('settingTotal').textContent = settingKeys.length;
-  $('tableTotal').textContent = uniq(supabaseRows.filter(x => x.state === 'SUPABASE_TABLE'), x => x.target).length;
-  $('bucketTotal').textContent = Math.max(1,buckets.length);
-  $('familyTotal').textContent = ownerFamilies.length || 13;
-
-  $('summaryRows').innerHTML = (ownerFamilies.length ? ownerFamilies : familyRows()).map(rowWide).join('');
-  $('whatnotRows').innerHTML = WHATNOTS.map(whatnotRow).join('');
-
-  $('helperRows').innerHTML = filt(helpers,'helperFilter').map(row).join('') || '<p class="muted">Run scan first.</p>';
-  $('ownerRows').innerHTML = filt(ownerFamilies,'ownerFilter').map(rowWide).join('') || '<p class="muted">Run scan to map owners.</p>';
-  $('settingRows').innerHTML = filt(settingKeys,'settingFilter').map(row).join('') || '<p class="muted">Run scan first.</p>';
-  $('supabaseRows').innerHTML = filt(supabaseRows,'supabaseFilter').map(row).join('') || '<p class="muted">Run scan first. Confirmed bucket: stream-bandit-images.</p>';
-  $('scriptRows').innerHTML = filt(scriptRefs,'scriptFilter').map(row).join('') || '<p class="muted">Run scan first.</p>';
-  $('globalRows').innerHTML = filt(windowGlobals,'globalFilter').map(row).join('') || '<p class="muted">Run scan first.</p>';
-  $('gateRows').innerHTML = (gateRows.length ? gateRows : buildGateRows()).map(rowWide).join('');
-
-  $('debugRows').textContent = JSON.stringify({
-    version:'V7.12.67 Global Whatnots Property Owner Scan',
-    writes:false,
-    deletes:false,
-    promotes:false,
-    homePageChanged:false,
-    paymentsLocked:true,
-    confirmedStorageBuckets:KNOWN_BUCKETS,
-    globalWhatnots:WHATNOTS,
-    summary:{
-      repoFiles:repoFiles.length,
-      textScanned:records.length,
-      htmlPages:repoFiles.filter(p => /\.html$/i.test(p)).length,
-      jsFiles:repoFiles.filter(p => /\.js$/i.test(p)).length,
-      globalHelperFiles:helpers.length,
-      scriptLinks:scriptRefs.length,
-      missingScripts:missingScripts.length,
-      windowGlobals:windowGlobals.length,
-      settingsKeys:settingKeys.length,
-      supabaseRows:supabaseRows.length,
-      storageBuckets:Math.max(1,buckets.length),
-      ownerFamilies:ownerFamilies.length || 13
-    },
-    helpers,
-    ownerFamilies,
-    settingKeys,
-    supabaseRows,
-    scriptRefs,
-    missingScripts,
-    windowGlobals,
-    gateRows
-  },null,2);
-}
-
-function download(name,text,type){
-  let b = new Blob([text],{type});
-  let a = document.createElement('a');
-  a.href = URL.createObjectURL(b);
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href),1000);
-}
-
-function csv(){
-  let rows = [['category','page','state','target','kind']];
-
-  WHATNOTS.forEach(x => rows.push(['global-whatnot',x[0],x[2],x[1],x[3]]));
-  KNOWN_BUCKETS.forEach(x => rows.push(['storage-bucket','Supabase dashboard',x.state,x.bucket,x.folders + ' | ' + x.rule]));
-  helpers.forEach(x => rows.push(['helper',x.path,x.state,x.title,x.kind]));
-  ownerFamilies.forEach(x => rows.push(['owner',x.family,x.state,x.target,x.kind]));
-  settingKeys.forEach(x => rows.push(['settings',x.page,x.state,x.target,x.kind]));
-  supabaseRows.forEach(x => rows.push(['supabase',x.page,x.state,x.target,x.kind]));
-  scriptRefs.forEach(x => rows.push(['script',x.page,x.state,x.target,x.kind]));
-
-  return rows.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g,'""') + '"').join(',')).join('\n');
-}
-
-document.querySelectorAll('.tab').forEach(b => {
-  b.onclick = () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    b.classList.add('active');
-    $(b.dataset.tab).classList.add('active');
-  };
-});
-
-['helperFilter','ownerFilter','settingFilter','supabaseFilter','scriptFilter','globalFilter','globalSearch'].forEach(id => {
-  $(id)?.addEventListener('input',render);
-});
-
-$('runBtn').onclick = run;
-$('jsonBtn').onclick = () => download(
-  'stream-bandit-global-whatnots-property-owner-scan-v7-12-67.json',
-  $('debugRows').textContent || '{}',
-  'application/json'
-);
-$('csvBtn').onclick = () => download(
-  'stream-bandit-global-whatnots-property-owner-scan-v7-12-67.csv',
-  csv(),
-  'text/csv'
-);
-$('searchBtn').onclick = render;
-
-render();
+function filt(list,id){let q=($(id)?.value||'').toLowerCase();return q?list.filter(x=>JSON.stringify(x).toLowerCase().includes(q)):list}
+function render(){helpers=uniq(helpers,x=>x.page+'|'+x.state);settings=uniq(settings,x=>x.page+'|'+x.target+'|'+x.state);supabaseRows=uniq(supabaseRows,x=>x.page+'|'+x.target+'|'+x.state);scripts=uniq(scripts,x=>x.page+'|'+x.target+'|'+x.state);missingScripts=uniq(missingScripts,x=>x.page+'|'+x.target);let tables=uniq(supabaseRows.filter(x=>x.state==='SUPABASE_TABLE'),x=>x.target);let buckets=uniq(supabaseRows.filter(x=>/STORAGE_BUCKET/.test(x.state)),x=>x.target);$('helperTotal').textContent=helpers.length;$('settingTotal').textContent=settings.length;$('tableTotal').textContent=tables.length;$('bucketTotal').textContent=Math.max(1,buckets.length);$('missingTotal').textContent=missingScripts.length;$('whatnotRows').innerHTML=WHATNOTS.map(x=>row({family:x[0],state:x[1],target:x[2]})).join('');$('familyRows').innerHTML=FAMILIES.map(f=>row({family:f,state:'FOUND',target:f==='Supabase image storage bucket'?'confirmed bucket: stream-bandit-images':'mapped feature family'})).join('');$('helperRows').innerHTML=filt(helpers,'helperFilter').map(row).join('')||'<p class="muted">Run scan first.</p>';$('settingRows').innerHTML=filt(settings,'settingFilter').map(row).join('')||'<p class="muted">Run scan first.</p>';$('supabaseRows').innerHTML=filt([KNOWN_BUCKET].concat(supabaseRows),'supabaseFilter').map(row).join('');$('scriptRows').innerHTML=filt(scripts,'scriptFilter').map(row).join('')||'<p class="muted">Run scan first.</p>';$('gateRows').innerHTML=[['Extend shell/menu helper','KEEP','Do not replace overlay routes; add role awareness later'],['Extend settings bridge','KEEP','Do not wipe global settings'],['Use Supabase role','RULE','guest/viewer/creator/admin/owner'],['Protect writes','RULE','normal users see friendly lock'],['Payments stay disabled','LOCKED','no checkout/subscription now']].map(x=>row({family:x[0],state:x[1],target:x[2]})).join('');debug={version:'V7.12.73 standalone recovery',writes:false,deletes:false,promotes:false,paymentsLocked:true,summary:{repoFiles:repoFiles.length,htmlPages:repoFiles.filter(p=>/\.html$/i.test(p)).length,jsFiles:repoFiles.filter(p=>/\.js$/i.test(p)).length,helpers:helpers.length,settings:settings.length,tables:tables.length,buckets:Math.max(1,buckets.length),missingScripts:missingScripts.length},helpers,settings,supabaseRows:[KNOWN_BUCKET].concat(supabaseRows),scripts,missingScripts};$('debugRows').textContent=JSON.stringify(debug,null,2)}
+async function run(){try{$('status').textContent='Loading repo tree...';let tree=await fetch(TREE_API,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('GitHub HTTP '+r.status);return r.json()});repoFiles=(tree.tree||[]).filter(x=>x.type==='blob').map(x=>x.path);fileSet=new Set(repoFiles.map(base));let texts=repoFiles.filter(p=>textExt.test(p));$('repoTotal').textContent=repoFiles.length;$('htmlTotal').textContent=repoFiles.filter(p=>/\.html$/i.test(p)).length;$('jsTotal').textContent=repoFiles.filter(p=>/\.js$/i.test(p)).length;$('textTotal').textContent=texts.length;helpers=[];settings=[];supabaseRows=[];scripts=[];missingScripts=[];for(let i=0;i<texts.length;i++){if(i%25===0)$('status').textContent='Scanning '+(i+1)+' / '+texts.length;try{let txt=await fetch(RAW+texts[i],{cache:'no-store'}).then(r=>r.ok?r.text():''); if(txt) analyse(texts[i],txt)}catch(e){}}render();$('status').textContent='Scan complete. Standalone page is stable.'}catch(e){$('status').textContent='Scan failed: '+(e.message||e);$('debugRows').textContent=String(e.stack||e)}}
+function download(name,text,type){let b=new Blob([text],{type});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function csv(){let rows=[['category','page','state','target','kind']];WHATNOTS.forEach(x=>rows.push(['whatnot',x[0],x[1],x[2],'']));[KNOWN_BUCKET].concat(supabaseRows).forEach(x=>rows.push(['supabase',x.page,x.state,x.target,x.kind]));helpers.forEach(x=>rows.push(['helper',x.page,x.state,x.target,x.kind]));settings.forEach(x=>rows.push(['settings',x.page,x.state,x.target,x.kind]));scripts.forEach(x=>rows.push(['script',x.page,x.state,x.target,x.kind]));return rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n')}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active')});['helperFilter','settingFilter','supabaseFilter','scriptFilter'].forEach(id=>$(id).addEventListener('input',render));$('runBtn').onclick=run;$('jsonBtn').onclick=()=>download('stream-bandit-global-whatnots-recovery-v7-12-73.json',JSON.stringify(debug||{},null,2),'application/json');$('csvBtn').onclick=()=>download('stream-bandit-global-whatnots-recovery-v7-12-73.csv',csv(),'text/csv');render();
 </script>
-
-<script src="stream-bandit-shell-v6-24.js?v=7-12-73"></script>
-<script src="stream-bandit-global-runtime-v7-12-68.js?v=7-12-68"></script>
-<script src="stream-bandit-menu-link-v7-12-69.js?v=7-12-70"></script>
 </body>
 </html>
