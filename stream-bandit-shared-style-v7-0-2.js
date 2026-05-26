@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='V7.12.93 Shared Style + Mobile + Playlists Footer Helper';
+const VERSION='V7.12.94 Shared Style + Mobile + Group Play Footer Helper';
 const STYLE_KEY='web_builder_shared_style_v7_8_8';
 let sb=null;
 function readCfg(){return fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text()).then(txt=>({url:(txt.match(/SUPABASE_URL\s*=\s*'([^']+)'/)||[])[1]||'',key:(txt.match(/SUPABASE_KEY\s*=\s*'([^']+)'/)||[])[1]||''})).catch(()=>({url:'',key:''}));}
@@ -28,6 +28,7 @@ function clampWideElements(){
   }catch(e){}
 }
 function isPlaylistsPage(){return /playlists-global-helpers-v7-5-2-test\.html$/i.test(location.pathname)||document.title.includes('Playlists Global Helpers');}
+function isChannelsPage(){return /channels-global-helpers-v7-5-3-test\.html$/i.test(location.pathname)||document.title.includes('Channels Global Helpers');}
 function installGlobalFooter(config){
   if(!config||!config.enabled)return;
   if(document.getElementById('sbGlobalFooter'))return;
@@ -46,22 +47,24 @@ function installGlobalFooter(config){
   wrap.appendChild(footer);
   document.documentElement.dataset.streamBanditGlobalFooter=config.key;
 }
-function playlistFooterConfig(){
-  if(!isPlaylistsPage())return {enabled:false};
-  return {enabled:true,key:'playlists-v7-12-93',note:'Playlists live-polish pass V7.12.93. Playlist create/edit/upload/add/remove preserved. Payments disabled until billing is designed.',lastTitle:'Group Play',lastLinks:'<a href="playlists-global-helpers-v7-5-2-test.html">Playlists</a><a href="channels-global-helpers-v7-5-3-test.html">Channels</a><a href="my-channel-clean-machine-v7-12-47-test.html">My Channel</a><a href="collections-clean-machine-v7-12-48-test.html">Collections</a><a href="player-2-progress-helper-v6-78-9-4-test.html">Player 2</a>'};
+function groupPlayFooterConfig(){
+  const links='<a href="playlists-global-helpers-v7-5-2-test.html">Playlists</a><a href="channels-global-helpers-v7-5-3-test.html">Channels</a><a href="my-channel-clean-machine-v7-12-47-test.html">My Channel</a><a href="collections-clean-machine-v7-12-48-test.html">Collections</a><a href="player-2-progress-helper-v6-78-9-4-test.html">Player 2</a>';
+  if(isPlaylistsPage())return {enabled:true,key:'playlists-v7-12-93',note:'Playlists live-polish pass V7.12.93. Playlist create/edit/upload/add/remove preserved. Payments disabled until billing is designed.',lastTitle:'Group Play',lastLinks:links};
+  if(isChannelsPage())return {enabled:true,key:'channels-v7-12-94',note:'Channels live-polish pass V7.12.94. Channel create/edit/banner/avatar/add/remove preserved. Payments disabled until billing is designed.',lastTitle:'Group Play',lastLinks:links};
+  return {enabled:false};
 }
-function polishPlaylistsPage(){
-  if(!isPlaylistsPage())return;
+function polishGroupPlayPage(){
+  if(!(isPlaylistsPage()||isChannelsPage()))return;
   try{
     document.querySelectorAll('a[href*="details-global-helpers-v7-3-1-test.html"]').forEach(a=>{a.setAttribute('href',a.getAttribute('href').replace('details-global-helpers-v7-3-1-test.html','details-clean-machine-v7-12-38-test.html'));});
     document.querySelectorAll('.check p,.card p,.muted,.source').forEach(el=>{
       if(el.textContent&&el.textContent.includes('details-global-helpers-v7-3-1-test.html'))el.textContent=el.textContent.replaceAll('details-global-helpers-v7-3-1-test.html','details-clean-machine-v7-12-38-test.html');
       if(el.textContent&&el.textContent.includes('Details V7.3.1'))el.textContent=el.textContent.replaceAll('Details V7.3.1','Clean Details V7.12.76');
     });
-    document.documentElement.dataset.streamBanditPlaylistsPolish='v7-12-93';
+    document.documentElement.dataset.streamBanditGroupPlayPolish='v7-12-94';
   }catch(e){}
 }
-function installPagePolish(){installGlobalFooter(playlistFooterConfig());polishPlaylistsPage();}
+function installPagePolish(){installGlobalFooter(groupPlayFooterConfig());polishGroupPlayPage();}
 function applyStyle(s){s=s||{};const root=document.documentElement;root.style.setProperty('--accent',s.accent||'#22d3a6');root.style.setProperty('--good',s.accent||'#22d3a6');root.style.setProperty('--accent2',s.accent2||'#7c3cff');root.style.setProperty('--purple',s.accent2||'#7c3cff');root.style.setProperty('--bg',s.bg||'#050711');root.style.setProperty('--card',s.card||'#101529');root.style.setProperty('--p',s.card||'#101529');root.style.setProperty('--p2',s.card||'#17122d');root.style.setProperty('--title',s.titleColor||'#ffffff');root.style.setProperty('--muted',s.textColor||'#b9c0d8');root.style.setProperty('--btnText',s.buttonText||'#ffffff');root.style.setProperty('--fontScale',s.largeText?'1.12':'1');root.style.setProperty('--line',s.highContrast?'#ffffff66':'#ffffff22');if(s.font)document.body.style.fontFamily=s.font;installMobileNoSideScroll();installPagePolish();document.documentElement.dataset.streamBanditSharedStyle='loaded';}
 async function load(){try{installMobileNoSideScroll();installPagePolish();const c=await client();if(!c)return null;const r=await c.from('sb_app_settings').select('settings').eq('id','stream_bandit').maybeSingle();if(r.error)throw r.error;const settings=(r.data&&r.data.settings)||{};const style=settings[STYLE_KEY]||settings.web_builder_style||settings.builderStyle||{};applyStyle(style);document.dispatchEvent(new CustomEvent('streambandit:shared-style-loaded',{detail:{version:VERSION,style}}));return style;}catch(e){installMobileNoSideScroll();installPagePolish();document.dispatchEvent(new CustomEvent('streambandit:shared-style-error',{detail:{version:VERSION,error:e.message||String(e)}}));return null;}}
 window.StreamBanditSharedStyle={version:VERSION,load,applyStyle,installMobileNoSideScroll,clampWideElements,installPagePolish};
