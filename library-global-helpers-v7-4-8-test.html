@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit V7.12.84 Library Footer Fix TEST</title>
+<title>Stream Bandit V7.12.85 Library Footer Lock Fix TEST</title>
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050711'/%3E%3Cpath d='M12 18h40a6 6 0 0 1 6 6v24a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6z' fill='%23101529' stroke='%2322d3a6' stroke-width='3'/%3E%3Cpath d='M22 26v20l18-10z' fill='%23ff2d85'/%3E%3Cpath d='M12 14h40v8H12z' fill='%237c3cff'/%3E%3C/svg%3E">
 
@@ -38,7 +38,7 @@ body{
   font-size:calc(16px * var(--fontScale));
 }
 .wrap{max-width:1450px;margin:auto}
-.head,.hero,.box,.sbFooter{
+.head,.hero,.box,.sbFooterLock{
   border:1px solid var(--line);
   border-radius:28px;
   background:linear-gradient(135deg,var(--p),var(--p2));
@@ -108,13 +108,13 @@ p,.muted,li{color:var(--muted);line-height:1.5}
 }
 .note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
 .danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffc4cf}
-.grid,.movieGrid,.stats,.checks{
+.grid,.movieGrid,.stats,.checks,.sbFooterGrid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
   gap:12px;
 }
 .movieGrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
-.card,.stat,.movie,.check{
+.card,.stat,.movie,.check,.sbFooterCol{
   border:1px solid #ffffff1a;
   border-radius:18px;
   background:#ffffff0f;
@@ -122,7 +122,7 @@ p,.muted,li{color:var(--muted);line-height:1.5}
   overflow-wrap:anywhere;
 }
 .movie{padding:0;overflow:hidden}
-.card b,.stat b,.check b{display:block;color:#baf7df;margin-bottom:8px}
+.card b,.stat b,.check b,.sbFooterCol b{display:block;color:#baf7df;margin-bottom:8px}
 .stat span{font-size:24px;font-weight:950}
 .input,.select{
   border:1px solid #ffffff24;
@@ -222,23 +222,43 @@ p,.muted,li{color:var(--muted);line-height:1.5}
 .searchThumb img{width:100%;height:100%;object-fit:cover}
 .searchResult small,.searchDesc{display:block;color:#b9c0d8;margin-top:4px}
 
-/* Footer deliberately not called .footer so old/global CSS cannot hide it */
-.sbFooter{
-  display:grid !important;
-  grid-template-columns:1.3fr repeat(3,1fr);
-  gap:14px;
-  color:#cfc6ff;
+/* Strong visible footer lock. Not a footer tag and not called .footer. */
+.sbFooterLock,
+#sbLibraryFooter,
+#sbLibraryFooterBottom{
+  display:block !important;
   visibility:visible !important;
   opacity:1 !important;
+  height:auto !important;
+  max-height:none !important;
+  overflow:visible !important;
   position:relative !important;
-  z-index:3 !important;
+  z-index:5 !important;
 }
-.sbFooter b{display:block;color:#fff;margin-bottom:8px}
-.sbFooter a{display:block;color:#baf7df;text-decoration:none;margin:6px 0;font-weight:850}
-.sbFooter small{color:#8f98b8}
+.sbFooterGrid{
+  grid-template-columns:1.3fr repeat(3,minmax(180px,1fr));
+}
+.sbFooterCol a{
+  display:block;
+  color:#baf7df;
+  text-decoration:none;
+  margin:7px 0;
+  font-weight:850;
+}
+.sbFooterCol small{color:#8f98b8}
+.footerMarker{
+  display:inline-flex;
+  margin-bottom:12px;
+  border-radius:999px;
+  padding:7px 12px;
+  background:#7c3cff33;
+  border:1px solid #7c3cff66;
+  color:#fff;
+  font-weight:950;
+}
 
 @media(max-width:980px){
-  .head,.sbFooter{grid-template-columns:1fr}
+  .head,.sbFooterGrid{grid-template-columns:1fr}
   .searchWrap{width:100%}
   .btn,.tab{width:100%}
 }
@@ -254,8 +274,8 @@ p,.muted,li{color:var(--muted);line-height:1.5}
     <span>Stream Bandit</span>
   </div>
   <div class="muted">
-    <b>V7.12.84 Library Footer Fix.</b><br>
-    Library-only fix. Supabase rows, clean Details, Player 1, global search and visible footer.
+    <b>V7.12.85 Library Footer Lock Fix.</b><br>
+    Library-only fix. Supabase rows, clean Details, Player 1, global search and locked visible footer.
   </div>
   <div class="searchWrap">
     <div class="search">
@@ -275,7 +295,7 @@ p,.muted,li{color:var(--muted);line-height:1.5}
 </header>
 
 <section class="hero">
-  <span class="badge">V7.12.84 Library Footer Fix TEST</span>
+  <span class="badge">V7.12.85 Library Footer Lock Fix TEST</span>
   <h1>🎞️ Library</h1>
   <p>Browse all published Stream Bandit titles. Cards open Clean Details or Player 1. Watchlist, Favourite and Like use the shared user save helper only.</p>
 
@@ -301,11 +321,42 @@ p,.muted,li{color:var(--muted);line-height:1.5}
 
 <section class="box">
   <div class="good">
-    Expected: Library opens, cards load, local filter works, top search overlay works, save buttons work, Details opens Clean Details, Play opens Player 1, and footer is visible.
+    Expected: Library opens, cards load, local filter works, top search overlay works, save buttons work, Details opens Clean Details, Play opens Player 1, and the visible Global Footer section appears.
   </div>
   <div class="actions">
-    <a class="btn primary" href="#sbLibraryFooter">Jump to Footer</a>
+    <a class="btn primary" href="#sbLibraryFooter">Jump to Global Footer</a>
     <button id="reload" class="btn hot" type="button">Reload Library</button>
+  </div>
+</section>
+
+<section id="sbLibraryFooter" class="sbFooterLock" aria-label="Stream Bandit Global Footer">
+  <span class="footerMarker">✅ Global Footer Visible Test</span>
+  <h2>Stream Bandit Global Footer</h2>
+  <p>This visible footer section is locked into the Library page so old/global CSS cannot hide it. This is the footer test for Library.</p>
+
+  <div class="sbFooterGrid">
+    <div class="sbFooterCol">
+      <b>Stream Bandit</b>
+      <small>Library live-polish pass V7.12.85. Payments disabled until billing is designed.</small>
+    </div>
+    <div class="sbFooterCol">
+      <b>Watch</b>
+      <a href="home-global-helpers-v7-4-4-test.html">Home</a>
+      <a href="details-clean-machine-v7-12-38-test.html">Details</a>
+      <a href="player-one-global-helpers-v7-3-3-test.html">Player 1</a>
+    </div>
+    <div class="sbFooterCol">
+      <b>Browse</b>
+      <a href="global-search-global-helpers-v7-4-9-test.html">Search</a>
+      <a href="genres-clean-machine-v7-12-45-test.html">Genres</a>
+      <a href="about-global-helpers-v7-4-7-test.html">About</a>
+    </div>
+    <div class="sbFooterCol">
+      <b>Account</b>
+      <a href="watchlist-clean-machine-v7-12-43-test.html">Watchlist</a>
+      <a href="favourites-clean-machine-v7-12-41-test.html">Favourites</a>
+      <a href="likes-clean-machine-v7-12-42-test.html">Liked</a>
+    </div>
   </div>
 </section>
 
@@ -344,7 +395,7 @@ p,.muted,li{color:var(--muted);line-height:1.5}
     <div class="check"><b>3. Filters/search</b><p>Local filter and top search overlay work.</p></div>
     <div class="check"><b>4. Saves</b><p>Add/remove Watchlist, Favourite and Like.</p></div>
     <div class="check"><b>5. Routes</b><p>Details opens Clean Details. Play opens Player 1.</p></div>
-    <div class="check"><b>6. Footer</b><p>Jump to Footer and bottom footer are visible.</p></div>
+    <div class="check"><b>6. Footer</b><p>Jump to Global Footer works and footer section is visible.</p></div>
     <div class="check"><b>7. Safety</b><p>No admin, storage, billing, publish, upload, delete or live action.</p></div>
   </div>
 </section>
@@ -365,30 +416,33 @@ p,.muted,li{color:var(--muted);line-height:1.5}
   </ul>
 </section>
 
-<footer id="sbLibraryFooter" class="sbFooter">
-  <div>
-    <b>Stream Bandit</b>
-    <small>Library live-polish pass V7.12.84. Payments disabled until billing is designed.</small>
+<section id="sbLibraryFooterBottom" class="sbFooterLock" aria-label="Stream Bandit Bottom Footer">
+  <span class="footerMarker">✅ Bottom Footer Copy</span>
+  <div class="sbFooterGrid">
+    <div class="sbFooterCol">
+      <b>Stream Bandit</b>
+      <small>Library page passed once this top/bottom footer is visible. Payments disabled until billing is designed.</small>
+    </div>
+    <div class="sbFooterCol">
+      <b>Watch</b>
+      <a href="home-global-helpers-v7-4-4-test.html">Home</a>
+      <a href="details-clean-machine-v7-12-38-test.html">Details</a>
+      <a href="player-one-global-helpers-v7-3-3-test.html">Player 1</a>
+    </div>
+    <div class="sbFooterCol">
+      <b>Browse</b>
+      <a href="global-search-global-helpers-v7-4-9-test.html">Search</a>
+      <a href="genres-clean-machine-v7-12-45-test.html">Genres</a>
+      <a href="about-global-helpers-v7-4-7-test.html">About</a>
+    </div>
+    <div class="sbFooterCol">
+      <b>Account</b>
+      <a href="watchlist-clean-machine-v7-12-43-test.html">Watchlist</a>
+      <a href="favourites-clean-machine-v7-12-41-test.html">Favourites</a>
+      <a href="likes-clean-machine-v7-12-42-test.html">Liked</a>
+    </div>
   </div>
-  <div>
-    <b>Watch</b>
-    <a href="home-global-helpers-v7-4-4-test.html">Home</a>
-    <a href="details-clean-machine-v7-12-38-test.html">Details</a>
-    <a href="player-one-global-helpers-v7-3-3-test.html">Player 1</a>
-  </div>
-  <div>
-    <b>Browse</b>
-    <a href="global-search-global-helpers-v7-4-9-test.html">Search</a>
-    <a href="genres-clean-machine-v7-12-45-test.html">Genres</a>
-    <a href="about-global-helpers-v7-4-7-test.html">About</a>
-  </div>
-  <div>
-    <b>Account</b>
-    <a href="watchlist-clean-machine-v7-12-43-test.html">Watchlist</a>
-    <a href="favourites-clean-machine-v7-12-41-test.html">Favourites</a>
-    <a href="likes-clean-machine-v7-12-42-test.html">Liked</a>
-  </div>
-</footer>
+</section>
 
 </div>
 
@@ -405,7 +459,7 @@ p,.muted,li{color:var(--muted);line-height:1.5}
 (function(){
 'use strict';
 
-const VERSION = 'V7.12.84 Library Footer Fix TEST';
+const VERSION = 'V7.12.85 Library Footer Lock Fix TEST';
 const DETAILS = 'details-clean-machine-v7-12-38-test.html';
 const PLAYER = 'player-one-global-helpers-v7-3-3-test.html';
 const SEARCH = 'global-search-global-helpers-v7-4-9-test.html';
@@ -575,9 +629,11 @@ function applyFilters(){
 async function refreshSaves(){
   if(core && core.refresh) await core.refresh();
   applyFilters();
+
   if(window.StreamBanditMenuSavesCount && window.StreamBanditMenuSavesCount.refresh){
     window.StreamBanditMenuSavesCount.refresh();
   }
+
   setStatus('Saves refreshed. Library remains Browse only.');
 }
 
@@ -622,7 +678,8 @@ function updateState(){
     supabaseMovieWrite: false,
     detailsRoute: DETAILS,
     playerRoute: PLAYER,
-    footerVisible: !!document.getElementById('sbLibraryFooter'),
+    footerTopVisible: !!document.getElementById('sbLibraryFooter'),
+    footerBottomVisible: !!document.getElementById('sbLibraryFooterBottom'),
     rows: rows.length,
     filtered: filtered.length,
     core: st,
