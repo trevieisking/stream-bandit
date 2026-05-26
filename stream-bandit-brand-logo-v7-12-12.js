@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='V7.12.88 Global Brand Logo Helper + Browse Footers';
+const VERSION='V7.12.94 Global Brand Logo Helper + Browse and Group Play Footers';
 const PARTS=['https://xzxqfrvqdgkzwujbkdbk.supabase','.co/storage/v1/object/public/','stream-bandit-images/global/','logo-1779203548544.png'];
 let currentUrl='';
 function logoUrl(){return PARTS.join('');}
@@ -34,6 +34,9 @@ function isSupabaseLibraryPage(){
 function isGenresPage(){
   return /genres-clean-machine-v7-12-45-test\.html$/i.test(location.pathname) || document.title.includes('Clean Genres');
 }
+function isChannelsPage(){
+  return /channels-global-helpers-v7-5-3-test\.html$/i.test(location.pathname) || document.title.includes('Channels Global Helpers');
+}
 function installFooter(config){
   if(!config || !config.enabled)return;
   if(document.getElementById('sbGlobalFooter'))return;
@@ -58,6 +61,9 @@ function currentFooterConfig(){
   }
   if(isGenresPage()){
     return {enabled:true,key:'genres-v7-12-88',note:'Genres live-polish pass V7.12.88. Read-only genre browsing. Payments disabled until billing is designed.',lastTitle:'Browse More',lastLinks:'<a href="supabase-library-home-header-form-fix-v7-12-34-test.html">Supabase Library</a><a href="about-global-helpers-v7-4-7-test.html">About</a><a href="global-search-global-helpers-v7-4-9-test.html">Global Search</a>'};
+  }
+  if(isChannelsPage()){
+    return {enabled:true,key:'channels-v7-12-94',note:'Channels live-polish pass V7.12.94. Channel create/edit/banner/avatar/add/remove preserved. Payments disabled until billing is designed.',lastTitle:'Group Play',lastLinks:'<a href="playlists-global-helpers-v7-5-2-test.html">Playlists</a><a href="channels-global-helpers-v7-5-3-test.html">Channels</a><a href="my-channel-clean-machine-v7-12-47-test.html">My Channel</a><a href="collections-clean-machine-v7-12-48-test.html">Collections</a><a href="player-2-progress-helper-v6-78-9-4-test.html">Player 2</a>'};
   }
   return {enabled:false};
 }
