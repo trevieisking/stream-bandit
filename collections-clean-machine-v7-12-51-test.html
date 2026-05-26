@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit V7.12.51 Collections Remove Verify TEST</title>
+<style>
+:root{color-scheme:dark}body{margin:0;padding:24px;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.loader{max-width:900px;margin:8vh auto;border:1px solid #ffffff22;border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 20px 70px #0007;padding:24px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,68px);letter-spacing:-.055em;margin:12px 0}.muted{color:#b9c0d8;line-height:1.5}.note{padding:12px 14px;border-radius:18px;background:#ffb1421f;border:1px solid #ffb14252;color:#ffe7ad;font-weight:850;margin-top:14px}.bad{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div id="loader" class="loader"><span class="badge">V7.12.51 Remove Verify TEST</span><h1>🧺 Loading Collections…</h1><p class="muted">Keeping the working V7.12.50 page and upgrading only Remove Collection so it verifies Supabase before saying removed.</p><div class="note">No live/index promotion.</div></div>
+<script>
+(async function(){
+  const source='collections-clean-machine-v7-12-50-test.html?v=7-12-51-remove-verify';
+  const replacement = String.raw`async function removeCollection(){
+    try{
+      requireWrite();
+      if(!selected)throw Error('Select a collection first.');
+      const id=collId(selected), title=nameOf(selected);
+      if(!id)throw Error('Selected collection has no id.');
+      const typed=prompt('Type DELETE COLLECTION to permanently remove: '+title);
+      if(typed!=='DELETE COLLECTION'){
+        setStatus('Remove collection cancelled.');
+        return;
+      }
+      setStatus('Deleting collection and verifying Supabase...');
+      dbg('remove collection start',{id,title});
+      try{
+        await rest('DELETE','sb_collection_movies?collection_id=eq.'+encodeURIComponent(id),null,'Delete collection movie links',false);
+      }catch(linkErr){
+        dbg('delete collection links warning',{message:linkErr.message||String(linkErr)});
+      }
+      const del=await rest('DELETE','sb_collections?id=eq.'+encodeURIComponent(id),null,'Delete collection',true);
+      dbg('delete collection response',{id,del});
+      const verify=await rest('GET','sb_collections?id=eq.'+encodeURIComponent(id)+'&select=id,name',null,'Verify collection delete',true);
+      if(Array.isArray(verify)&&verify.length){
+        throw Error('Supabase did not remove the collection. Check that your signed-in profile role is admin and RLS allows DELETE.');
+      }
+      selected=null;
+      await load(false);
+      setStatus('Collection permanently removed and verified: '+title);
+    }catch(e){
+      dbg('remove collection error',{message:e.message||String(e)});
+      setStatus('Remove collection failed: '+(e.message||e),true);
+    }
+  }
+  function playAll()`;
+  try{
+    const res=await fetch(source,{cache:'no-store'});
+    if(!res.ok)throw new Error('Could not load V7.12.50 source: '+res.status);
+    let html=await res.text();
+    html=html
+      .replace(/V7\.12\.50 Collections Owner Controls TEST/g,'V7.12.51 Collections Remove Verify TEST')
+      .replace(/collections-clean-machine-v7-12-50-test\.html/g,'collections-clean-machine-v7-12-51-test.html')
+      .replace(/Collections owner-control correction V7\.12\.50/g,'Collections remove-verify correction V7.12.51')
+      .replace(/<span class="badge">V7\.12\.50 Collections Owner Controls TEST<\/span>/,'<span class="badge">V7.12.51 Collections Remove Verify TEST</span>')
+      .replace(/<p class="microFooter">V7\.12\.50 Collections Owner Controls TEST — no live\/index promotion\.<\/p>/,'<p class="microFooter">V7.12.51 Collections Remove Verify TEST — no live/index promotion.</p>');
+    const removeRegex=/async function removeCollection\(\)\{[\s\S]*?\}\nfunction playAll\(\)/;
+    if(!removeRegex.test(html)){
+      throw new Error('Could not find removeCollection block to replace. V7.12.50 source changed.');
+    }
+    html=html.replace(removeRegex,replacement);
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(e){
+    document.getElementById('loader').innerHTML='<span class="badge">V7.12.51 failed to load</span><h1>Could not prepare Collections</h1><div class="note bad">'+String(e.message||e).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})+'</div>';
+  }
+})();
+</script>
+</body>
+</html>
