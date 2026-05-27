@@ -1,0 +1,12 @@
+/* Stream Bandit V7.12.98 Custom Code Fit Helper
+   Prevents custom-code iframes from creating sideways scroll or huge black/scroll windows. */
+(function(){
+'use strict';
+const VERSION='V7.12.98 Custom Code Fit Helper';
+function css(){if(document.getElementById('sbCustomCodeFitStyle'))return;const s=document.createElement('style');s.id='sbCustomCodeFitStyle';s.textContent=`
+.wbCustomCode,.customWrap{max-width:100%!important;overflow:hidden!important;border-radius:18px!important;background:#000!important}.wbCustomCode iframe,.customWrap iframe{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;aspect-ratio:16/9!important;border:0!important;overflow:hidden!important}.wbCustomCode>iframe,.customWrap>iframe{border-radius:18px!important}.wbCustomCode [style*="min-width"],.customWrap [style*="min-width"]{min-width:0!important;max-width:100%!important}.wbCustomCode [style*="min-height"],.customWrap [style*="min-height"]{min-height:0!important}.wbVideo iframe,.video iframe{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;height:100%!important;min-height:0!important;border:0!important}.responsiveEmbed,.sbResponsiveEmbed{position:relative!important;width:100%!important;aspect-ratio:16/9!important;overflow:hidden!important;border-radius:18px!important;background:#000!important}.responsiveEmbed iframe,.sbResponsiveEmbed iframe{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;border:0!important}
+`;document.head.appendChild(s)}
+function fit(){document.querySelectorAll('.wbCustomCode iframe,.customWrap iframe,.wbVideo iframe,.video iframe').forEach(f=>{f.removeAttribute('width');f.removeAttribute('height');f.setAttribute('scrolling','no');f.style.width='100%';f.style.maxWidth='100%';f.style.minWidth='0';f.style.minHeight='0';f.style.border='0';if(!f.closest('.responsiveEmbed,.sbResponsiveEmbed,.wbVideo,.video')){f.style.height='auto';f.style.aspectRatio='16 / 9';}});document.querySelectorAll('.wbCustomCode,.customWrap').forEach(w=>{w.style.maxWidth='100%';w.style.overflow='hidden';});document.documentElement.dataset.sbCustomCodeFit='v7-12-98'}
+function boot(){css();fit();setTimeout(fit,300);setTimeout(fit,900);setTimeout(fit,1800);setInterval(fit,3000);window.StreamBanditCustomCodeFit={version:VERSION,fit}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
