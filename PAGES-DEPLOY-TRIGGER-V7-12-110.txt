@@ -1,0 +1,9 @@
+Stream Bandit Pages deploy trigger for V7.12.110
+
+Purpose: harmless GitHub Pages rebuild trigger only.
+Target test file: web-builder-pages-manager-v7-12-110-test.html
+No app code changed.
+No protected shell changed.
+No Settings page changed.
+No index promotion.
+Created because the file exists in GitHub but GitHub Pages returned 404 for the hosted URL.
