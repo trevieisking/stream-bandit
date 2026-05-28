@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit V7.12.125 Global Helper Shell Test</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#050711;
+  --p:#101529;
+  --p2:#17122d;
+  --line:#ffffff22;
+  --muted:#b9c0d8;
+  --good:#22d3a6;
+  --purple:#7c3cff;
+  --pink:#ff2d85;
+  --warn:#ffb142;
+  --bad:#ff4d6d;
+  --cyan:#41e8ff;
+  --fontScale:1;
+}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
+body{
+  margin:0;
+  padding:22px;
+  background:
+    radial-gradient(circle at 8% 0,#22d3a638,transparent 35%),
+    radial-gradient(circle at 92% 0,#7c3cff44,transparent 38%),
+    radial-gradient(circle at bottom,#ff2d8524,transparent 42%),
+    var(--bg);
+  color:#fff;
+  font-family:Inter,system-ui,Arial,sans-serif;
+  font-size:calc(16px * var(--fontScale));
+}
+.wrap{max-width:1500px;margin:auto}
+.head,.hero,.box,.footerPanel{
+  border:1px solid var(--line);
+  border-radius:28px;
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  box-shadow:0 20px 70px #0007;
+  padding:22px;
+  margin-bottom:18px;
+}
+.head{
+  display:grid;
+  grid-template-columns:minmax(250px,320px) minmax(0,1fr) minmax(300px,430px);
+  gap:14px;
+  align-items:start;
+  position:relative;
+  z-index:20;
+  overflow:visible;
+}
+.brand{display:flex;gap:12px;align-items:center;font-size:22px;font-weight:950}
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+.logo img{width:100%;height:100%;object-fit:cover}
+.searchWrap{position:relative;z-index:50}
+.search{
+  width:100%;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  background:#0004;
+  padding:9px 10px 9px 14px;
+  position:relative;
+  z-index:40;
+}
+.search input{flex:1;background:transparent;border:0;color:#fff;outline:0;font:inherit}
+.badge,.pill{
+  display:inline-flex;
+  border-radius:999px;
+  background:#22d3a624;
+  border:1px solid #22d3a657;
+  color:#baf7df;
+  font-weight:950;
+}
+.badge{padding:7px 12px}
+.pill{padding:5px 8px;font-size:12px;margin:2px}
+.pill.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}
+.pill.bad{background:#ff4d6d24;border-color:#ff4d6d66;color:#ffd2d9}
+.pill.cyan{background:#41e8ff22;border-color:#41e8ff66;color:#c7fbff}
+h1{font-size:clamp(42px,6vw,78px);line-height:.95;margin:10px 0;letter-spacing:-.06em}
+h2,h3{margin:0 0 12px}
+p,.muted,li,small{color:var(--muted);line-height:1.55}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:0;
+  text-decoration:none;
+  border-radius:999px;
+  padding:11px 15px;
+  background:#414667;
+  color:#fff;
+  font-weight:950;
+  cursor:pointer;
+}
+.primary{background:linear-gradient(135deg,var(--good),var(--purple))}
+.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}
+.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#111}
+.cyanBtn{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#061017}
+.actions,.tabs{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.status,.note,.danger,.goodBox{
+  padding:12px 14px;
+  border-radius:18px;
+  background:#22d3a61a;
+  border:1px solid #22d3a647;
+  color:#dfffee;
+  font-weight:850;
+  margin-top:14px;
+}
+.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
+.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}
+.goodBox{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}
+.heroGrid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(320px,460px);gap:18px;align-items:stretch}
+.art{
+  border:1px solid #ffffff1a;
+  border-radius:30px;
+  background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);
+  min-height:310px;
+  display:grid;
+  place-items:center;
+  position:relative;
+  overflow:hidden;
+}
+.art:before{content:"";position:absolute;inset:28px;border-radius:28px;border:1px dashed #ffffff32}
+.artIcon{font-size:96px;position:relative;z-index:1;filter:drop-shadow(0 18px 40px #0009)}
+.grid,.checks,.routeGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:12px;
+}
+.routeGrid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card,.route{
+  border:1px solid #ffffff1a;
+  border-radius:18px;
+  background:#ffffff0f;
+  padding:14px;
+  overflow-wrap:anywhere;
+}
+.card b,.route b{display:block;color:#baf7df;margin-bottom:8px}
+.route{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:start}
+.routeIcon{
+  width:44px;
+  height:44px;
+  border-radius:15px;
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  display:grid;
+  place-items:center;
+  font-size:21px;
+}
+.route code{
+  display:block;
+  color:#dfffee;
+  background:#0005;
+  border-radius:12px;
+  padding:8px;
+  margin:7px 0;
+  word-break:break-all;
+}
+.source{
+  font-family:ui-monospace,Consolas,monospace;
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:#0006;
+  border-radius:16px;
+  padding:14px;
+  color:#dfffee;
+  max-height:420px;
+  overflow:auto;
+}
+.footerGrid{display:grid;grid-template-columns:1.25fr repeat(4,minmax(170px,1fr));gap:12px}
+.footerCol{
+  border:1px solid #ffffff1a;
+  border-radius:18px;
+  background:#ffffff0f;
+  padding:14px;
+}
+.footerCol b{display:block;color:#baf7df;margin-bottom:8px}
+.footerCol a{display:block;color:#baf7df;text-decoration:none;margin:7px 0;font-weight:850}
+.micro{text-align:center;color:#8f98b8;margin:28px 0}
+@media(max-width:980px){
+  .head,.heroGrid,.footerGrid,.route{grid-template-columns:1fr}
+  .btn{width:100%;white-space:normal}
+  .searchWrap{width:100%}
+  .art{min-height:220px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="head">
+  <div class="brand">
+    <div class="logo"><img data-sb-brand-logo src="stream_bandit_original_logo_square_256.png" alt="Stream Bandit"></div>
+    <span>Stream Bandit</span>
+  </div>
+  <div class="muted">
+    <b>V7.12.125 Global Helper Shell TEST.</b><br>
+    This keeps the real helper files and tests them as one joined system: menu, search, auth, account, avatar, favicon, theme, footer, brand logo, route guard and owner shortcuts.
+  </div>
+  <div class="searchWrap">
+    <div class="search">
+      <span>🔎</span>
+      <input id="globalSearch" placeholder="Search Stream Bandit">
+      <button id="globalSearchBtn" class="btn primary" type="button">Search</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="heroGrid">
+    <div>
+      <span class="badge">TEST FIRST — KEEP EXISTING HELPERS</span>
+      <h1>Global Helper Shell</h1>
+      <p>This is the corrected test. It does not replace your helper shells. It loads the existing helper files in the correct order, then patches the mismatched routes and adds the extra owner icons beside the search area.</p>
+
+      <div class="actions">
+        <button class="btn primary" type="button" data-sb-open-menu>Open overlay menu</button>
+        <a class="btn hot" href="home-global-helpers-v7-4-4-test.html">Home</a>
+        <a class="btn warnBtn" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Builder V7.12.116</a>
+        <a class="btn cyanBtn" href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Preview V7.12.117</a>
+      </div>
+
+      <div id="helperStatus" class="status">Loading global helper system...</div>
+      <div id="securityStatus" class="note">Security note: no Supabase writes from this test page. No payment system. No index promotion.</div>
+      <div class="danger">This page is not live promotion. It is the test page for joining the existing helpers properly.</div>
+    </div>
+    <div class="art"><div class="artIcon">🎬🧩</div></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Helper stack checks</h2>
+  <div id="checksGrid" class="routeGrid">
+    <div class="card"><b>Waiting...</b><p>Helper checks will appear after scripts load.</p></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Route mismatch checks</h2>
+  <div id="routesGrid" class="routeGrid">
+    <div class="card"><b>Waiting...</b><p>Route checks will appear after shell loads.</p></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>What this test is allowed to fix</h2>
+  <div class="grid">
+    <div class="card"><b>Keep existing helper files</b><p>Uses your current menu/search shell, auth/profile shell, auth sync, avatar, shared style, settings bridge, brand logo, favicon and saves helpers.</p></div>
+    <div class="card"><b>Fix route mismatches</b><p>Repairs old Builder/Admin/Registry/Policy/Profile/Preview links in the DOM without replacing the shell.</p></div>
+    <div class="card"><b>Extra search-bar icons</b><p>Adds Pages Manager, Preview, Inbox, Form and Builder icons beside the search bar for owner/admin only.</p></div>
+    <div class="card"><b>Avatar direction</b><p>Keeps the current avatar helper and prepares the overlay/header to use the signed-in profile avatar.</p></div>
+    <div class="card"><b>No payment system</b><p>Payments remain off. Pricing can be informational only.</p></div>
+    <div class="card"><b>No live/index promotion</b><p>This page is only a standalone test.</p></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Manual checks for you</h2>
+  <div class="checks">
+    <div class="card"><b>1. Page opens</b><p>No blank screen. The badge says V7.12.125 Global Helper Shell TEST.</p></div>
+    <div class="card"><b>2. Header</b><p>Brand/account block stays left. Search stays right. Page hero has its own icon.</p></div>
+    <div class="card"><b>3. Account</b><p>Account button opens and shows signed-out or signed-in role.</p></div>
+    <div class="card"><b>4. Avatar</b><p>If signed in and profile has avatar_url, avatar appears in the brand/account area.</p></div>
+    <div class="card"><b>5. Overlay menu</b><p>Menu opens. Same Stream Bandit layout. Current page marker works.</p></div>
+    <div class="card"><b>6. Search overlay</b><p>Search input still gives overlay/full-search behaviour.</p></div>
+    <div class="card"><b>7. Extra icons</b><p>Owner/admin sees Pages Manager, Preview, Inbox, Form and Builder icons by search.</p></div>
+    <div class="card"><b>8. Routes</b><p>Builder goes to V7.12.116, Preview to V7.12.117, Registry to V7.12.122, Admin to V7.12.121.</p></div>
+    <div class="card"><b>9. Footer</b><p>Footer appears once. No old/back-version buttons.</p></div>
+    <div class="card"><b>10. No payments</b><p>No checkout/subscription/Stripe action appears.</p></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Debug</h2>
+  <div id="debug" class="source">Waiting...</div>
+</section>
+
+<section class="footerPanel">
+  <div class="footerGrid">
+    <div class="footerCol">
+      <b>Stream Bandit</b>
+      <small>Global Helper Shell V7.12.125 TEST. Existing helpers preserved.</small>
+    </div>
+    <div class="footerCol">
+      <b>Watch</b>
+      <a href="home-global-helpers-v7-4-4-test.html">Home</a>
+      <a href="details-clean-machine-v7-12-38-test.html">Details</a>
+      <a href="player-one-global-helpers-v7-3-3-test.html">Player 1</a>
+    </div>
+    <div class="footerCol">
+      <b>Builder</b>
+      <a href="web-builder-pages-manager-v7-12-111-test.html">Pages Manager</a>
+      <a href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Builder Studio</a>
+      <a href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Published Preview</a>
+    </div>
+    <div class="footerCol">
+      <b>Admin</b>
+      <a href="admin-centre-command-deck-v7-12-121-test.html">Admin Centre</a>
+      <a href="all-pages-version-registry-v7-12-122-current-routes-test.html">Current Routes Registry</a>
+      <a href="live-readiness-global-helpers-v7-10-2-test.html">Live Readiness</a>
+    </div>
+    <div class="footerCol">
+      <b>Policy</b>
+      <a href="policy-documents-centre-v7-12-119-test.html">Policy Centre</a>
+      <a href="policy-reader-v7-12-119-test.html?policy=terms">Published Terms</a>
+      <a href="policy-admin-documents-v7-12-120-test.html?policy=terms">Policy Admin</a>
+    </div>
+  </div>
+</section>
+
+<p class="micro">V7.12.125 Global Helper Shell TEST — no index promotion.</p>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+const VERSION='V7.12.125 Global Helper Shell Test Loader';
+
+const ROUTE_FIXES={
+  'profile-settings-global-helpers-v7-5-8-test.html':'profile-settings-live-ready-v7-12-90-test.html',
+  'profile-settings-admin-shell-v6-56-test.html':'profile-settings-live-ready-v7-12-90-test.html',
+
+  'web-builder-live-studio-v7-12-97-test.html':'web-builder-live-studio-v7-12-116-test.html?page=test-page',
+  'web-builder-global-helpers-v7-9-3-test.html':'web-builder-live-studio-v7-12-116-test.html?page=test-page',
+  'web-builder-admin-shell-v6-57-test.html':'web-builder-live-studio-v7-12-116-test.html?page=test-page',
+  'web-builder-full-edit-lock-v7-8-6-test.html':'web-builder-live-studio-v7-12-116-test.html?page=test-page',
+
+  'web-builder-shared-style-preview-v7-9-0-test.html':'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
+  'web-builder-shared-style-preview-v7-9-2-test.html':'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
+
+  'admin-centre-command-deck-v7-10-0-test.html':'admin-centre-command-deck-v7-12-121-test.html',
+  'all-pages-version-registry-v7-1-4-full-test.html':'all-pages-version-registry-v7-12-122-current-routes-test.html',
+
+  'policy-agreements-centre-v7-11-6-test.html':'policy-documents-centre-v7-12-119-test.html',
+  'policy-reader-published-row-v7-12-27-test.html':'policy-reader-v7-12-119-test.html?policy=terms',
+  'policy-admin-save-editor-v7-12-25-test.html':'policy-admin-documents-v7-12-120-test.html?policy=terms',
+
+  'watchlist-watch-shell-v6-37-test.html':'watchlist-clean-machine-v7-12-43-test.html',
+  'favourites-watch-shell-v6-38-test.html':'favourites-clean-machine-v7-12-41-test.html',
+  'liked-watch-shell-v6-39-test.html':'likes-clean-machine-v7-12-42-test.html'
+};
+
+const EXTRA_OWNER_LINKS=[
+  ['🧭','Pages Manager','web-builder-pages-manager-v7-12-111-test.html'],
+  ['👁️','Published Preview','web-builder-shared-style-preview-v7-12-117-test.html?page=test-page'],
+  ['📬','Form Inbox','web-builder-form-submissions-v7-12-94-test.html?page=test-page'],
+  ['🧾','Advanced Form','web-builder-form-save-v7-12-94-test.html?page=test-page'],
+  ['🏗️','Builder','web-builder-live-studio-v7-12-116-test.html?page=test-page']
+];
+
+const HELPER_SCRIPTS=[
+  ['shell','stream-bandit-shell-v6-24.js?v=7-12-125-test'],
+  ['favicon','stream-bandit-favicon-v7-12-16.js?v=7-12-125-test'],
+  ['menuCounts','stream-bandit-menu-saves-count-v6-72-1.js?v=7-12-125-test'],
+  ['authProfile','stream-bandit-auth-profile-v6-31.js?v=7-12-125-test'],
+  ['authSync','stream-bandit-auth-sync-v6-31-7.js?v=7-12-125-test'],
+  ['authAvatar','stream-bandit-auth-avatar-v7-0-2.js?v=7-12-125-test'],
+  ['sharedStyle','stream-bandit-shared-style-v7-0-2.js?v=7-12-125-test'],
+  ['settingsBridge','stream-bandit-settings-global-v7-1-8.js?v=7-12-125-test'],
+  ['brandLogo','stream-bandit-brand-logo-v7-12-12.js?v=7-12-125-test'],
+  ['coreSaves','stream-bandit-core-saves-v6-75.js?v=7-12-125-test']
+];
+
+let state={
+  loaded:{},
+  role:'checking',
+  signedIn:false,
+  email:'',
+  avatar:'',
+  issues:[]
+};
+
+function $(id){return document.getElementById(id)}
+
+function esc(s){
+  return String(s??'').replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function pageParam(){
+  try{
+    return new URL(location.href).searchParams.get('page')||'test-page';
+  }catch(e){
+    return 'test-page';
+  }
+}
+
+function fileFrom(raw){
+  return String(raw||'').split('/').pop().split('?')[0].split('#')[0];
+}
+
+function routeWithPage(target,oldValue){
+  if(!String(target).includes('page=test-page')) return target;
+
+  let p=pageParam();
+  try{
+    const u=new URL(String(oldValue||''),location.href);
+    p=u.searchParams.get('page')||p;
+  }catch(e){}
+
+  return String(target).replace('page=test-page','page='+encodeURIComponent(p));
+}
+
+function fixedUrl(raw){
+  if(!raw || !String(raw).includes('.html')) return raw;
+
+  let value=String(raw);
+  let file=fileFrom(value);
+  let target=ROUTE_FIXES[file];
+
+  if(!target) return raw;
+
+  return routeWithPage(target,value);
+}
+
+function loadScript(key,src){
+  return new Promise(function(resolve){
+    if(document.querySelector('script[data-sb-helper-key="'+key+'"]')){
+      state.loaded[key]='already';
+      resolve();
+      return;
+    }
+
+    const s=document.createElement('script');
+    s.src=src;
+    s.async=false;
+    s.dataset.sbHelperKey=key;
+    s.onload=function(){
+      state.loaded[key]='loaded';
+      resolve();
+    };
+    s.onerror=function(){
+      state.loaded[key]='error';
+      state.issues.push('Failed to load '+key+': '+src);
+      resolve();
+    };
+    document.body.appendChild(s);
+  });
+}
+
+async function loadHelpers(){
+  for(const item of HELPER_SCRIPTS){
+    await loadScript(item[0],item[1]);
+  }
+}
+
+function patchRoutes(root){
+  root=root||document;
+
+  try{
+    root.querySelectorAll('a[href],form[action],[data-href],[data-target],[data-route],[data-url]').forEach(function(el){
+      ['href','action','data-href','data-target','data-route','data-url'].forEach(function(attr){
+        const old=el.getAttribute(attr);
+        const fixed=fixedUrl(old);
+        if(old && fixed && fixed!==old){
+          el.setAttribute(attr,fixed);
+          el.dataset.sbGlobalRouteFix='v7-12-125';
+        }
+      });
+    });
+
+    if(window.StreamBanditRoutes){
+      Object.keys(window.StreamBanditRoutes).forEach(function(k){
+        const old=window.StreamBanditRoutes[k];
+        const fixed=fixedUrl(old);
+        if(old && fixed && fixed!==old){
+          window.StreamBanditRoutes[k]=fixed;
+        }
+      });
+
+      if(!window.StreamBanditRoutes.pagesManager){
+        window.StreamBanditRoutes.pagesManager='web-builder-pages-manager-v7-12-111-test.html';
+      }
+      if(!window.StreamBanditRoutes.publishedPreview){
+        window.StreamBanditRoutes.publishedPreview='web-builder-shared-style-preview-v7-12-117-test.html?page=test-page';
+      }
+    }
+
+    document.documentElement.dataset.streamBanditGlobalRouteFix='v7-12-125';
+  }catch(e){
+    state.issues.push('Route patch failed: '+(e.message||e));
+  }
+}
+
+function isOwnerLike(){
+  const role=String(state.role||document.documentElement.dataset.streamBanditRole||'').toLowerCase();
+  const email=String(state.email||'').toLowerCase();
+  return /admin|owner/.test(role) || email.includes('trevieisking');
+}
+
+function addTopIcons(){
+  try{
+    const header=document.querySelector('.head')||document.querySelector('header');
+    const search=document.querySelector('.searchWrap')||document.querySelector('.search');
+    if(!header || !search) return;
+
+    let zone=document.getElementById('sbGlobalHelperQuickIcons');
+    if(!zone){
+      zone=document.createElement('nav');
+      zone.id='sbGlobalHelperQuickIcons';
+      zone.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 8px;justify-content:flex-end';
+      search.parentNode.insertBefore(zone,search);
+    }
+
+    zone.style.display=isOwnerLike()?'flex':'none';
+    zone.innerHTML=EXTRA_OWNER_LINKS.map(function(x){
+      return '<a href="'+esc(routeWithPage(x[2],x[2]))+'" title="'+esc(x[1])+'" style="width:34px;height:34px;border-radius:13px;border:1px solid #ffffff2b;background:linear-gradient(135deg,#101529,#17122d);display:grid;place-items:center;text-decoration:none;font-size:16px;box-shadow:0 10px 26px #0007">'+x[0]+'</a>';
+    }).join('');
+
+    patchRoutes(zone);
+  }catch(e){}
+}
+
+function addOverlayAvatar(){
+  try{
+    const drawer=document.getElementById('sbShellDrawer');
+    if(!drawer) return;
+
+    const brand=drawer.querySelector('.sb-shell-brand');
+    if(!brand) return;
+
+    let img=brand.querySelector('.sb-shell-logo');
+    if(img && state.avatar){
+      img.src=state.avatar;
+      img.alt='Profile avatar';
+      img.title='Signed-in avatar';
+      img.style.objectFit='cover';
+    }
+  }catch(e){}
+}
+
+async function readAuthState(){
+  try{
+    if(window.StreamBanditShellAuth && window.StreamBanditShellAuth.refresh){
+      const st=await window.StreamBanditShellAuth.refresh();
+      const user=st&&st.user;
+      const profile=st&&st.profile;
+      state.signedIn=!!user;
+      state.email=user&&user.email||'';
+      state.role=profile&&profile.role||st&&st.role||'signed-out';
+      state.avatar=profile&&profile.avatar_url||'';
+    }
+
+    if(!state.avatar && window.supabase && window.supabase.createClient){
+      const cfg=await readShellConfig();
+      if(cfg.url&&cfg.key){
+        const c=window.supabase.createClient(cfg.url,cfg.key);
+        const u=await c.auth.getUser();
+        const user=u&&u.data&&u.data.user;
+        if(user){
+          state.signedIn=true;
+          state.email=user.email||state.email;
+          const r=await c.from('sb_profiles').select('role,avatar_url').eq('id',user.id).maybeSingle();
+          if(r.data){
+            state.role=r.data.role||state.role||'user';
+            state.avatar=r.data.avatar_url||state.avatar;
+          }
+        }
+      }
+    }
+  }catch(e){
+    state.issues.push('Auth read warning: '+(e.message||e));
+  }
+}
+
+async function readShellConfig(){
+  try{
+    const txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(function(r){return r.text();});
+    return {
+      url:(txt.match(/SUPABASE_URL\s*=\s*'([^']+)'/)||[])[1]||'',
+      key:(txt.match(/SUPABASE_KEY\s*=\s*'([^']+)'/)||[])[1]||''
+    };
+  }catch(e){
+    return {url:'',key:''};
+  }
+}
+
+function fixMenuCountsCurrentRoutes(){
+  try{
+    const drawer=document.getElementById('sbShellDrawer');
+    if(!drawer) return;
+
+    const map=[
+      ['Watchlist','watchlist'],
+      ['Favourites','favourites'],
+      ['Liked','likes']
+    ];
+
+    let counts={};
+    if(window.StreamBanditCoreSavesV675 && window.StreamBanditCoreSavesV675.counts){
+      counts=window.StreamBanditCoreSavesV675.counts()||{};
+    }
+
+    map.forEach(function(pair){
+      const label=pair[0];
+      const key=pair[1];
+      const links=[].slice.call(drawer.querySelectorAll('a.sb-shell-link'));
+      const link=links.find(function(a){
+        return String(a.textContent||'').toLowerCase().includes(label.toLowerCase());
+      });
+      if(!link) return;
+
+      let badge=link.querySelector('[data-sb-v125-save-count="'+key+'"]');
+      if(!badge){
+        badge=document.createElement('span');
+        badge.dataset.sbV125SaveCount=key;
+        badge.style.cssText='margin-left:auto;display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#22d3a62b;border:1px solid #22d3a66b;color:#dfffee;font-size:12px;font-weight:950';
+        link.appendChild(badge);
+      }
+      badge.textContent=String(counts[key]||counts.liked||0);
+    });
+  }catch(e){}
+}
+
+function renderChecks(){
+  const checks=[
+    ['Supabase SDK',!!(window.supabase&&window.supabase.createClient),'Needed for auth/profile/settings reads'],
+    ['Overlay shell',!!window.StreamBanditShell,'stream-bandit-shell-v6-24.js'],
+    ['Menu save counts',!!window.StreamBanditMenuSavesCount,'stream-bandit-menu-saves-count-v6-72-1.js'],
+    ['Auth/profile shell',!!window.StreamBanditShellAuth,'stream-bandit-auth-profile-v6-31.js'],
+    ['Auth sync',!!window.StreamBanditAuthSync,'stream-bandit-auth-sync-v6-31-7.js'],
+    ['Avatar helper',!!window.StreamBanditAuthAvatar,'stream-bandit-auth-avatar-v7-0-2.js'],
+    ['Shared style',!!window.StreamBanditSharedStyle,'stream-bandit-shared-style-v7-0-2.js'],
+    ['Settings bridge',!!window.StreamBanditSettingsGlobal,'stream-bandit-settings-global-v7-1-8.js'],
+    ['Brand logo',!!window.StreamBanditBrandLogo,'stream-bandit-brand-logo-v7-12-12.js'],
+    ['Favicon helper',!!window.StreamBanditFavicon,'stream-bandit-favicon-v7-12-16.js'],
+    ['Core saves helper',!!window.StreamBanditCoreSavesV675,'stream-bandit-core-saves-v6-75.js']
+  ];
+
+  $('checksGrid').innerHTML=checks.map(function(x){
+    return '<div class="route">'+
+      '<div class="routeIcon">'+(x[1]?'✅':'⚠️')+'</div>'+
+      '<div><b>'+esc(x[0])+'</b><span class="pill '+(x[1]?'':'bad')+'">'+(x[1]?'loaded':'missing')+'</span><p>'+esc(x[2])+'</p></div>'+
+    '</div>';
+  }).join('');
+
+  const routes=[
+    ['Profile Settings','profile-settings-live-ready-v7-12-90-test.html'],
+    ['Builder Studio','web-builder-live-studio-v7-12-116-test.html?page=test-page'],
+    ['Pages Manager','web-builder-pages-manager-v7-12-111-test.html'],
+    ['Published Preview','web-builder-shared-style-preview-v7-12-117-test.html?page=test-page'],
+    ['Admin Centre','admin-centre-command-deck-v7-12-121-test.html'],
+    ['Current Routes Registry','all-pages-version-registry-v7-12-122-current-routes-test.html'],
+    ['Policy Centre','policy-documents-centre-v7-12-119-test.html'],
+    ['Policy Reader','policy-reader-v7-12-119-test.html?policy=terms'],
+    ['Policy Admin','policy-admin-documents-v7-12-120-test.html?policy=terms']
+  ];
+
+  $('routesGrid').innerHTML=routes.map(function(x){
+    return '<div class="route">'+
+      '<div class="routeIcon">🔗</div>'+
+      '<div><b>'+esc(x[0])+'</b><code>'+esc(x[1])+'</code><a class="btn primary" href="'+esc(x[1])+'">Open</a></div>'+
+    '</div>';
+  }).join('');
+
+  const helperStatus=[
+    'Version: '+VERSION,
+    'Signed in: '+(state.signedIn?'yes':'no'),
+    'Role: '+(state.role||'unknown'),
+    'Email: '+(state.email||''),
+    'Avatar: '+(state.avatar?'found':'not found / signed out'),
+    'Owner/admin icons: '+(isOwnerLike()?'visible':'hidden'),
+    'Loaded helpers: '+JSON.stringify(state.loaded,null,2),
+    'Issues: '+(state.issues.length?state.issues.join(' | '):'none')
+  ].join('\n');
+
+  $('helperStatus').innerHTML=
+    '<b>Global helper system:</b> '+
+    'Shell '+(window.StreamBanditShell?'✅':'⚠️')+
+    ' · Account '+(window.StreamBanditShellAuth?'✅':'⚠️')+
+    ' · Avatar '+(window.StreamBanditAuthAvatar?'✅':'⚠️')+
+    ' · Theme '+(window.StreamBanditSharedStyle?'✅':'⚠️')+
+    ' · Settings bridge '+(window.StreamBanditSettingsGlobal?'✅':'⚠️')+
+    ' · Favicon '+(window.StreamBanditFavicon?'✅':'⚠️')+
+    ' · Role: '+esc(state.role||'checking');
+
+  $('debug').textContent=helperStatus;
+}
+
+function bindSearch(){
+  const input=$('globalSearch');
+  const btn=$('globalSearchBtn');
+  if(!input || !btn) return;
+
+  btn.onclick=function(){
+    const q=input.value.trim();
+    location.href='global-search-global-helpers-v7-4-9-test.html'+(q?'?q='+encodeURIComponent(q):'');
+  };
+
+  input.addEventListener('keydown',function(e){
+    if(e.key==='Enter') btn.click();
+  });
+}
+
+function loopFixes(){
+  patchRoutes(document);
+  addTopIcons();
+  addOverlayAvatar();
+  fixMenuCountsCurrentRoutes();
+  renderChecks();
+}
+
+async function boot(){
+  bindSearch();
+
+  await loadHelpers();
+
+  setTimeout(async function(){
+    await readAuthState();
+    loopFixes();
+  },700);
+
+  setTimeout(async function(){
+    await readAuthState();
+    loopFixes();
+  },1700);
+
+  setInterval(function(){
+    loopFixes();
+  },3000);
+
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#sbShellMenuToggle') || e.target.closest('[data-sb-open-menu]')){
+      setTimeout(function(){
+        patchRoutes(document);
+        addOverlayAvatar();
+        fixMenuCountsCurrentRoutes();
+      },450);
+    }
+  },true);
+
+  document.addEventListener('streambandit:auth-state',function(e){
+    const d=e.detail||{};
+    state.signedIn=!!d.user;
+    state.email=d.user&&d.user.email||state.email||'';
+    state.role=d.profile&&d.profile.role||d.role||state.role||'signed-out';
+    state.avatar=d.profile&&d.profile.avatar_url||state.avatar||'';
+    setTimeout(loopFixes,150);
+  });
+
+  window.StreamBanditGlobalHelperShellV712125={
+    version:VERSION,
+    routeFixes:ROUTE_FIXES,
+    refresh:loopFixes,
+    state:function(){return JSON.parse(JSON.stringify(state));}
+  };
+
+  document.documentElement.dataset.streamBanditGlobalHelperShell='v7-12-125-test';
+
+  loopFixes();
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
+
+})();
+</script>
+</body>
+</html>
