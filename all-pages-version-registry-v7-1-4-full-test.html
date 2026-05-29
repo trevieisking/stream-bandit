@@ -21,22 +21,28 @@
 (async function(){
   'use strict';
   const menuUrl='all-pages-version-registry-v7-1-4-full-test.html';
-  const source='all-pages-version-registry-v7-12-122-current-routes-test.html';
-  const avatarRehydrate='<script>(function(){\n'+
+  const currentUrl='all-pages-version-registry-v7-12-122-current-routes-test.html';
+  const source=currentUrl;
+  const pageShim='<script>(function(){\n'+
     "'use strict';\n"+
-    "function load(src){return new Promise(function(resolve){if(document.querySelector('script[src^=\\\"'+src+'\\\"]'))return resolve();var s=document.createElement('script');s.src=src+(src.indexOf('?')>-1?'&':'?')+'v=registry-menu-url-avatar';s.onload=resolve;s.onerror=resolve;document.head.appendChild(s);});}\n"+
-    "function refresh(){try{if(window.StreamBanditAuthAvatar&&window.StreamBanditAuthAvatar.refresh)window.StreamBanditAuthAvatar.refresh();if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh)window.StreamBanditShellAuth.refresh();if(window.StreamBanditBrandLogo&&window.StreamBanditBrandLogo.refresh)window.StreamBanditBrandLogo.refresh();}catch(e){}}\n"+
-    "async function boot(){await load('stream-bandit-auth-profile-v6-31.js');await load('stream-bandit-auth-sync-v6-31-7.js');await load('stream-bandit-auth-avatar-v7-0-2.js');refresh();setTimeout(refresh,500);setTimeout(refresh,1400);setTimeout(refresh,2800);setTimeout(refresh,5200);document.addEventListener('streambandit:auth-state',function(){setTimeout(refresh,150);setTimeout(refresh,900);});}\n"+
+    "var menuUrl='all-pages-version-registry-v7-1-4-full-test.html';var currentUrl='all-pages-version-registry-v7-12-122-current-routes-test.html';\n"+
+    "function pinRegistry(){try{if(window.StreamBanditRoutes){window.StreamBanditRoutes.registry=menuUrl;window.StreamBanditRoutes.oldRegistry=menuUrl;}if(window.StreamBanditShell&&window.StreamBanditShell.routes){window.StreamBanditShell.routes.registry=menuUrl;window.StreamBanditShell.routes.oldRegistry=menuUrl;}document.querySelectorAll('a[href],form[action],[data-href],[data-target],[data-route],[data-url]').forEach(function(el){['href','action','data-href','data-target','data-route','data-url'].forEach(function(a){var v=el.getAttribute(a)||'';if(v.indexOf(currentUrl)>-1){el.setAttribute(a,v.replaceAll(currentUrl,menuUrl));el.dataset.sbRegistryPinnedToMenuUrl='true';}});});document.documentElement.setAttribute('data-sb-registry-menu-url',menuUrl);}catch(e){}}\n"+
+    "async function cfg(){try{var txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(function(r){return r.text();});return {url:(txt.match(/SUPABASE_URL\\s*=\\s*'([^']+)'/)||[])[1]||'',key:(txt.match(/SUPABASE_KEY\\s*=\\s*'([^']+)'/)||[])[1]||''};}catch(e){return {url:'',key:''};}}\n"+
+    "async function profileAvatar(){try{if(!window.supabase||!window.supabase.createClient)return '';var c=await cfg();if(!c.url||!c.key)return '';var sb=window.supabase.createClient(c.url,c.key);var s=await sb.auth.getSession();var user=s.data&&s.data.session&&s.data.session.user;if(!user)return '';var r=await sb.from('sb_profiles').select('avatar_url').eq('id',user.id).maybeSingle();return r.data&&r.data.avatar_url||'';}catch(e){return '';}}\n"+
+    "function applyAvatar(url){try{if(!url)return;var targets=[];document.querySelectorAll('.brand .logo,.brand.sb-auth-host .logo,.sb-shell-logo').forEach(function(x){targets.push(x);});targets.forEach(function(el){if(el.tagName&&el.tagName.toLowerCase()==='img'){el.src=url;el.alt='Profile avatar';el.style.objectFit='cover';return;}el.classList.add('sb-auth-avatar-logo');el.dataset.empty='false';el.style.backgroundImage='none';el.style.overflow='hidden';el.innerHTML='<img alt=\\\"Profile avatar\\\" src=\\\"'+String(url).replace(/\\\"/g,'')+'\\\" style=\\\"width:100%;height:100%;object-fit:cover;display:block\\\">';});}catch(e){}}\n"+
+    "async function avatarLast(){pinRegistry();try{if(window.StreamBanditBrandLogo&&window.StreamBanditBrandLogo.refresh)window.StreamBanditBrandLogo.refresh();if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh)window.StreamBanditShellAuth.refresh();if(window.StreamBanditAuthAvatar&&window.StreamBanditAuthAvatar.refresh)window.StreamBanditAuthAvatar.refresh();}catch(e){}var u=await profileAvatar();applyAvatar(u);pinRegistry();}\n"+
+    "function boot(){pinRegistry();avatarLast();[250,700,1300,2400,4200,7000].forEach(function(t){setTimeout(avatarLast,t);});setInterval(function(){pinRegistry();avatarLast();},2200);document.addEventListener('streambandit:auth-state',function(){setTimeout(avatarLast,120);setTimeout(avatarLast,900);});document.addEventListener('click',function(e){if(e.target.closest('#sbShellMenuToggle')||e.target.closest('[data-sb-open-menu]')){setTimeout(avatarLast,180);setTimeout(avatarLast,700);setTimeout(pinRegistry,1200);}},true);}\n"+
     "if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();\n"+
-    "try{document.documentElement.setAttribute('data-sb-menu-url-preserved','all-pages-version-registry-v7-1-4-full-test.html');document.documentElement.setAttribute('data-sb-avatar-rehydrate','true');}catch(e){}\n"+
     "})();<\\/script>";
   try{
     let html=await fetch(source,{cache:'no-store'}).then(r=>r.text());
-    html=html.replaceAll('all-pages-version-registry-v7-12-122-current-routes-test.html',menuUrl);
+    html=html.replace(/<script src="stream-bandit-global-helper-loader-v7-12-126[^"]*"><\/script>/g,'');
+    html=html.replaceAll(currentUrl,menuUrl);
     html=html.replaceAll('Stream Bandit V7.12.122 Current Routes Registry TEST','Stream Bandit V7.12.122 Current Routes Registry TEST on V7.1.4 Menu URL');
-    html=html.replaceAll('V7.12.122 Current Routes Registry TEST.</b><br>Scans current menu routes, index links and one layer only. Legacy registry routes are normalised to the current registry before display.','V7.12.122 Current Routes Registry TEST on V7.1.4 menu URL.</b><br>Current registry code loaded here so the protected overlay menu still recognises this page.');
+    html=html.replaceAll('Known old registry routes are promoted to this current registry so stale overlay routes cannot keep dragging the scan backward.','Registry URL is pinned to the old menu-recognised route so the overlay can recognise this page as current.');
     html=html.replaceAll('Promoted from legacy registry route','Pinned to menu-recognised registry route');
-    html=html.replace('</body>',avatarRehydrate+'</body>');
+    html=html.replaceAll('promoted from','pinned from');
+    html=html.replace('</body>',pageShim+'</body>');
     document.open();
     document.write(html);
     document.close();
