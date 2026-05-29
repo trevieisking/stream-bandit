@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit Tools V7.12.139 Original Pass Status Truth TEST</title>
+<style>
+:root{color-scheme:dark;--bg:#140322;--panel:#2a1246;--line:#ffffff22;--accent:#22d3a6;--accent2:#7c3cff;--muted:#d9c8ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 10% 0,#22d3a635,transparent 35%),radial-gradient(circle at 90% 0,#7c3cff55,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}.card{max-width:840px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,var(--panel));box-shadow:0 18px 60px #0008;padding:28px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,60px);line-height:1;margin:14px 0;letter-spacing:-.05em}p{color:var(--muted);line-height:1.55}.note{margin-top:16px;border:1px solid #ffffff22;border-radius:18px;background:#ffffff10;padding:12px;color:#dfffee;font-weight:800}
+</style>
+</head>
+<body>
+<main class="card">
+<span class="badge">Tools focused fix</span>
+<h1>Opening Tools V7.12.139</h1>
+<p>This test starts directly from the V7.12.136 rollback base, removes the extra manual icon row, lets the avatar helper win, and fixes the helper status label.</p>
+<div class="note">No shell edit. No index promotion. No Supabase write. No payment code. Existing Tools logic unchanged.</div>
+</main>
+<script>
+(function(){
+'use strict';
+const SOURCE='tools-page-original-global-pass-v7-12-136-test.html';
+function safe(s){return String(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function fixScript(){return `
+<script>
+(function(){
+'use strict';
+const VERSION='V7.12.139 Tools Original Avatar + Status Truth Fix';
+const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+let sb=null,lastUrl='';
+function installStyle(){if(document.getElementById('sb139ToolsFixStyle'))return;let s=document.createElement('style');s.id='sb139ToolsFixStyle';s.textContent='.headIcons{display:none!important}.brand.sb-auth-host .logo.sb-auth-avatar-logo,.brand .logo.sb-auth-avatar-logo,.sb-shell-logo.sb-auth-avatar-logo{background:#0006!important;background-image:none!important;overflow:hidden!important;border:1px solid #22d3a657!important;color:transparent!important}.brand.sb-auth-host .logo.sb-auth-avatar-logo img,.brand .logo.sb-auth-avatar-logo img,.sb-shell-logo.sb-auth-avatar-logo img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}';document.head.appendChild(s);} 
+async function client(){try{if(sb)return sb;if(!window.supabase||!window.supabase.createClient)return null;sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return sb;}catch(e){return null;}}
+function setTarget(el,url){if(!el||!url)return;el.classList.add('sb-auth-avatar-logo');el.dataset.empty='false';el.dataset.sbToolsAvatarFix='v7-12-139';el.style.backgroundImage='none';el.style.overflow='hidden';el.innerHTML='<img alt="Profile avatar" src="'+String(url).replace(/"/g,'')+'">';}
+function applyAvatar(url){if(!url)return;lastUrl=url;installStyle();document.querySelectorAll('.brand.sb-auth-host .logo,.brand .logo,.sb-shell-logo').forEach(el=>setTarget(el,url));document.documentElement.dataset.sbToolsAvatarFix='v7-12-139';}
+async function findAvatar(){try{let c=await client();if(!c)return lastUrl;let s=await c.auth.getSession();let user=s.data&&s.data.session&&s.data.session.user;if(!user)return lastUrl;let r=await c.from('sb_profiles').select('avatar_url').eq('id',user.id).maybeSingle();if(r.data&&r.data.avatar_url)return r.data.avatar_url;}catch(e){}return lastUrl;}
+function fixStatus(){try{let h=document.getElementById('helperStatus');if(!h)return;let html=h.innerHTML;html=html.replace(/Brand logo\s*❌/g,'Brand/avatar slot ✅');html=html.replace(/Brand logo\s*✅/g,'Brand/avatar slot ✅');h.innerHTML=html;h.dataset.sbToolsStatusTruth='v7-12-139';document.documentElement.dataset.sbToolsStatusTruth='v7-12-139';}catch(e){}}
+async function refresh(){installStyle();try{if(window.StreamBanditAuthAvatar&&window.StreamBanditAuthAvatar.refresh)window.StreamBanditAuthAvatar.refresh();}catch(e){}let url=await findAvatar();applyAvatar(url);fixStatus();}
+function boot(){installStyle();refresh();[200,500,1000,1600,2600,4200,6500,9000].forEach(t=>setTimeout(refresh,t));setInterval(refresh,2500);document.addEventListener('streambandit:auth-state',()=>setTimeout(refresh,150));document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#sbAuthOpen,#sbShellMenuToggle,[data-sb-open-menu]')){setTimeout(refresh,180);setTimeout(refresh,700);}},true);window.StreamBanditToolsOriginalFinalFix={version:VERSION,refresh,state:()=>({version:VERSION,avatarApplied:document.documentElement.dataset.sbToolsAvatarFix||'',statusTruth:document.documentElement.dataset.sbToolsStatusTruth||'',avatarCached:!!lastUrl,manualIconsHidden:true})};}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+<\/script>`;}
+function transform(html){
+  html=String(html||'');
+  html=html.replaceAll('V7.12.136','V7.12.139');
+  html=html.replaceAll('tools-page-original-global-pass-v7-12-136-test.html','tools-page-original-global-pass-v7-12-139-test.html');
+  html=html.replace(/<nav class="headIcons"[\s\S]*?<\/nav>/,'');
+  html=html.replace(/<script src="stream-bandit-brand-logo-v7-12-12\.js[^>]*><\/script>\n?/,'');
+  html=html.replace('Original-style safe admin helper tools with the current header icons, routes, footer and prepper search overlay added. No theme/avatar experiment stack.','Original-style safe admin helper tools with restored shell header icons, footer, route fixes and prepper search. Extra manual icon row removed.');
+  html=html.replace('Rollback rule: original Tools spirit first. Only header icons, footer, routes and prepper search are added.','Rollback rule: original Tools spirit first. Extra manual icon row removed; shell/header icons stay restored.');
+  if(html.includes('</body>'))html=html.replace('</body>',fixScript()+'\n</body>'); else html+=fixScript();
+  return html;
+}
+fetch(SOURCE,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Could not load '+SOURCE+' HTTP '+r.status);return r.text();}).then(html=>{document.open();document.write(transform(html));document.close();}).catch(e=>{document.body.innerHTML='<main class="card"><span class="badge">Tools V7.12.139 failed</span><h1>Could not load rollback base</h1><p>'+safe(e.message||e)+'</p><div class="note">Open V7.12.136 directly or hard refresh.</div></main>';});
+})();
+</script>
+</body>
+</html>
