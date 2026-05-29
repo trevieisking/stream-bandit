@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const VERSION = 'V7.12.144 Auth Avatar Visible-State Helper';
+const VERSION = 'V7.12.145 Auth Avatar No Duplicate Helper';
 
 let sb = null;
 let lastUrl = '';
@@ -60,32 +60,7 @@ function installStyle(){
 }
 
 .sb-auth-chip-avatar{
-  width:34px!important;
-  height:34px!important;
-  border-radius:12px!important;
-  overflow:hidden!important;
-  border:1px solid var(--accent,#22d3a6)!important;
-  background:#0006!important;
-  flex:0 0 34px!important;
-  display:block!important;
-}
-
-.sb-auth-chip-avatar img{
-  width:100%!important;
-  height:100%!important;
-  object-fit:cover!important;
-  display:block!important;
-}
-
-#sbAuthChip.has-sb-auth-avatar{
-  display:grid!important;
-  grid-template-columns:34px minmax(0,1fr) auto!important;
-  gap:8px!important;
-  align-items:center!important;
-}
-
-.brand.sb-auth-host .logo.sb-auth-avatar-logo[data-empty="true"]{
-  color:inherit!important;
+  display:none!important;
 }
 `;
 
@@ -96,38 +71,30 @@ function imgHtml(url){
   return '<img alt="Profile avatar" src="' + String(url).replace(/"/g, '') + '">';
 }
 
+function removeDuplicateChipAvatar(){
+  document.querySelectorAll('.sb-auth-chip-avatar').forEach(el => el.remove());
+
+  const chip = document.getElementById('sbAuthChip');
+  if(chip){
+    chip.classList.remove('has-sb-auth-avatar');
+    delete chip.dataset.sbAuthAvatarVisible;
+  }
+}
+
 function setLogoBox(el, url){
   if(!el || !url) return;
 
   el.classList.add('sb-auth-avatar-logo');
   el.dataset.empty = 'false';
-  el.dataset.sbAuthAvatarVisible = 'v7-12-144';
+  el.dataset.sbAuthAvatarVisible = 'v7-12-145';
   el.style.backgroundImage = 'none';
   el.style.overflow = 'hidden';
   el.innerHTML = imgHtml(url);
 }
 
-function setAccountChip(url){
-  try{
-    const chip = document.getElementById('sbAuthChip');
-    if(!chip || !url) return;
-
-    let avatar = chip.querySelector('.sb-auth-chip-avatar');
-
-    if(!avatar){
-      avatar = document.createElement('span');
-      avatar.className = 'sb-auth-chip-avatar';
-      chip.insertBefore(avatar, chip.firstChild);
-    }
-
-    chip.classList.add('has-sb-auth-avatar');
-    chip.dataset.sbAuthAvatarVisible = 'v7-12-144';
-    avatar.innerHTML = imgHtml(url);
-  }catch(e){}
-}
-
 function applyAvatar(url){
   installStyle();
+  removeDuplicateChipAvatar();
 
   if(!url){
     if(!lastUrl){
@@ -145,9 +112,7 @@ function applyAvatar(url){
     setLogoBox(el, url);
   });
 
-  setAccountChip(url);
-
-  document.documentElement.dataset.streamBanditAuthAvatarVisible = 'v7-12-144';
+  document.documentElement.dataset.streamBanditAuthAvatarVisible = 'v7-12-145';
 }
 
 async function findAvatarUrl(){
@@ -213,6 +178,7 @@ function startObserver(){
 
 function init(){
   installStyle();
+  removeDuplicateChipAvatar();
   startObserver();
 
   refresh();
@@ -265,7 +231,7 @@ function init(){
       version: VERSION,
       avatarApplied: document.documentElement.dataset.streamBanditAuthAvatarVisible || '',
       avatarCached: !!lastUrl,
-      chipApplied: !!document.querySelector('#sbAuthChip .sb-auth-chip-avatar')
+      duplicateChipAvatarRemoved: !document.querySelector('.sb-auth-chip-avatar')
     })
   };
 }
