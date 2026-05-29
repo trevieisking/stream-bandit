@@ -1,25 +1,30 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.1.4 Full Registry</title></head><body><script>
-(async function(){
-  const source='all-pages-version-registry-v7-1-1-full-test.html';
-  let html=await fetch(source,{cache:'no-store'}).then(r=>r.text());
-  html=html.replaceAll('Stream Bandit V7.1.1 Full All Pages Registry','Stream Bandit V7.1.4 Full All Pages Registry');
-  html=html.replaceAll('V7.1.1 FULL Registry TEST','V7.1.4 FULL Registry TEST');
-  html=html.replaceAll('updates the top-level checkpoint for Profile Settings V7.0.4 and Settings Global Save V7.1.0','updates the top-level checkpoint for Profile Settings V7.0.4, Settings Platform Control Hub V7.1.8, Settings Global Bridge V7.1.8.2, and full global helper sync');
-  html=html.replaceAll('Settings Global</b><p><span class="pill warn">TEST NOW</span><br>V7.1.0 saves global identity, theme and logo to sb_app_settings.','Settings Platform</b><p><span class="pill hot">PROMOTED</span><br>V7.1.8 platform feature-control hub passed. Old Settings route forwards to it.');
-  html=html.replaceAll('Global helpers</b><p>Avatar helper, shared style helper, auth/profile, auth sync and menu count must be used across final pages.','Global helpers</b><p>Shell, auth/profile, auth sync, menu count, avatar, shared style and Settings bridge are loaded on this registry.');
-  html=html.replaceAll('Next after Settings</b><p>Promote Settings route only after passed, then continue global pages and menu overlay pages.','Next after Settings</b><p>Settings is passed/promoted. Next: wire Settings bridge into real pages one at a time, no enforcement until approved.');
-  html=html.replaceAll('Full V7.1.1 registry ready. Live app unchanged.','Full V7.1.4 registry ready. Global helpers synced. Live app unchanged.');
-  html=html.replaceAll('Current Settings test: settings-global-save-v7-1-0-test.html. Do not forward old Settings route until Trevor passes the tests.','Current Settings route: settings-admin-shell-v6-54-test.html forwards to settings-platform-control-hub-v7-1-8-test.html. Settings Bridge check passed at settings-global-bridge-check-v7-1-8-2-test.html.');
-  html=html.replaceAll('Functional global identity/theme/logo save helper.','Safe global settings bridge. Reads future settings JSON only; no enforcement yet.');
-  html=html.replaceAll('settings-global-save-v7-1-0.js','stream-bandit-settings-global-v7-1-8.js');
-  html=html.replaceAll('settings-global-save-v7-1-0-test.html','settings-platform-control-hub-v7-1-8-test.html');
-  html=html.replaceAll('settings-admin-shell-v6-54-test.html\',\'Old read-only/map page; do not keep final if V7.1 passes','settings-admin-shell-v6-54-test.html\',\'Forwarded to Settings Platform Control Hub V7.1.8');
-  html=html.replaceAll('settings-global-save-v7-1-0-test.html\',\'CURRENT TEST functional global settings; old route not forwarded yet','settings-platform-control-hub-v7-1-8-test.html\',\'CURRENT PASSED Settings Platform Control Hub; old route forwards');
-  html=html.replaceAll('all-pages-version-registry-v7-1-1-full-test.html','all-pages-version-registry-v7-1-4-full-test.html');
-  html=html.replaceAll('Next: finish testing Settings Global Save V7.1.0.','Settings Platform Control Hub V7.1.8 passed and is promoted.');
-  html=html.replaceAll('If Settings V7.1.0 passes, forward old Settings route to the passed V7.1.x candidate.','Settings Global Bridge V7.1.8.2 passed. Next wire bridge carefully into pages one at a time after each test.');
-  html=html.replaceAll('V7.1.1 Full Registry TEST — full old route list preserved, live app unchanged.','V7.1.4 Full Registry TEST — full global helpers synced, live app unchanged.');
-  html=html.replace('</body>','<script src="stream-bandit-auth-sync-v6-31-7.js"></'+'script><script src="stream-bandit-settings-global-v7-1-8.js"></'+'script><script>setTimeout(function(){try{if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh)window.StreamBanditShellAuth.refresh();if(window.StreamBanditAuthSync&&window.StreamBanditShellAuth){var st=window.StreamBanditShellAuth.getState&&window.StreamBanditShellAuth.getState();if(st&&st.user)window.StreamBanditAuthSync.inn(st);}}catch(e){}},900);</'+'script></body>');
-  document.open();document.write(html);document.close();
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="0; url=all-pages-version-registry-v7-12-122-current-routes-test.html">
+<title>Stream Bandit Registry Bridge V7.1.4 to V7.12.122</title>
+<style>
+:root{color-scheme:dark;--bg:#050711;--panel:#17122d;--line:#ffffff22;--accent:#22d3a6;--accent2:#7c3cff;--muted:#b9c0d8}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 10% 0,#22d3a644,transparent 35%),radial-gradient(circle at 90% 0,#7c3cff55,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}.card{max-width:760px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,var(--panel));box-shadow:0 18px 60px #0008;padding:28px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,60px);line-height:1;margin:14px 0;letter-spacing:-.05em}.muted,p{color:var(--muted);line-height:1.55}.btn{display:inline-flex;align-items:center;justify-content:center;margin-top:14px;border-radius:999px;padding:12px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;text-decoration:none;font-weight:950}.note{margin-top:16px;border:1px solid #ffffff22;border-radius:18px;background:#ffffff10;padding:12px;color:#dfffee;font-weight:800}
+</style>
+</head>
+<body>
+<main class="card">
+<span class="badge">Registry bridge only</span>
+<h1>Opening current Version Registry</h1>
+<p>This old V7.1.4 registry URL has been retired as a direct working registry and now forwards to the current one-page route scanner.</p>
+<p><b>Current registry:</b> all-pages-version-registry-v7-12-122-current-routes-test.html</p>
+<a class="btn" href="all-pages-version-registry-v7-12-122-current-routes-test.html">Open Current Routes Registry</a>
+<div class="note">No shell change. No Supabase write. No payment code. This bridge only protects old overlay/Admin links from landing on the stale registry.</div>
+</main>
+<script>
+(function(){
+  'use strict';
+  var target='all-pages-version-registry-v7-12-122-current-routes-test.html';
+  try{window.location.replace(target);}catch(e){window.location.href=target;}
 })();
-</script></body></html>
+</script>
+</body>
+</html>
