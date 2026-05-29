@@ -1,17 +1,15 @@
-/* Stream Bandit V7.12.127 Global Helper Loader / Stabiliser
-   Fix after V7.12.126 test:
-   - Keep existing helper shells.
-   - Remove duplicate/right-side search icons.
-   - Keep one clean owner icon row only.
-   - Restore movie overlay search from sb_movies.
-   - Promote Registry/Admin/Builder/Policy/Profile routes inside overlay after drawer render.
-   - No Supabase writes. No payments. No index promotion.
+/* Stream Bandit V7.12.128 Global Helper Loader / Stabiliser
+   Keep existing helper shells.
+   Make movie search overlay global.
+   Promote old menu route values at runtime.
+   Keep one clean owner icon row, no duplicates.
+   No Supabase writes. No payments. No index promotion.
 */
 
 (function(){
 'use strict';
 
-const VERSION='V7.12.127 Global Helper Loader / Stabiliser';
+const VERSION='V7.12.128 Global Helper Loader / Stabiliser';
 
 const SITE={
   domain:'https://chatterfriendsstreambandit.co.uk',
@@ -38,6 +36,7 @@ const ROUTES={
 
   admin:'admin-centre-command-deck-v7-12-121-test.html',
   registry:'all-pages-version-registry-v7-12-122-current-routes-test.html',
+  oldRegistry:'all-pages-version-registry-v7-1-4-full-test.html',
 
   policyCentre:'policy-documents-centre-v7-12-119-test.html',
   policyReader:'policy-reader-v7-12-119-test.html?policy=terms',
@@ -77,11 +76,12 @@ const ROUTE_FIXES={
   'liked-watch-shell-v6-39-test.html':ROUTES.liked
 };
 
-/* Keep this small. Screenshot showed too many icons. */
 const OWNER_ICONS=[
   ['🧭','Pages Manager',ROUTES.pagesManager],
   ['👁️','Published Preview',ROUTES.publishedPreview],
   ['📋','Current Routes Registry',ROUTES.registry],
+  ['📬','Form Inbox',ROUTES.formInbox],
+  ['🧾','Advanced Form',ROUTES.formAdvanced],
   ['🏗️','Builder Studio',ROUTES.builderStudio]
 ];
 
@@ -152,7 +152,10 @@ async function readShellConfig(){
   if(cfg) return cfg;
 
   try{
-    const txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(function(r){return r.text();});
+    const txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(function(r){
+      return r.text();
+    });
+
     cfg={
       url:(txt.match(/SUPABASE_URL\s*=\s*'([^']+)'/)||[])[1]||'',
       key:(txt.match(/SUPABASE_KEY\s*=\s*'([^']+)'/)||[])[1]||''
@@ -177,15 +180,15 @@ async function client(){
 }
 
 function installStyle(){
-  if(document.getElementById('sbGlobalHelperLoader127Style')) return;
+  if(document.getElementById('sbGlobalHelperLoader128Style')) return;
 
   const s=document.createElement('style');
-  s.id='sbGlobalHelperLoader127Style';
+  s.id='sbGlobalHelperLoader128Style';
   s.textContent=`
-/* Hide duplicate icon strips made by earlier shell/helper experiments */
 #sb104Icons,
 #sb124Icons,
 #sb126OwnerIcons,
+#sb127OwnerIcons,
 #sbShellHeaderIcons,
 .sb-shell-header-icons{
   display:none!important;
@@ -193,8 +196,7 @@ function installStyle(){
   pointer-events:none!important;
 }
 
-/* One clean icon strip only */
-#sb127OwnerIcons{
+#sb128OwnerIcons{
   display:flex!important;
   gap:6px!important;
   align-items:center!important;
@@ -202,7 +204,8 @@ function installStyle(){
   justify-content:flex-end!important;
   margin:0 0 8px!important;
 }
-#sb127OwnerIcons a{
+
+#sb128OwnerIcons a{
   width:34px!important;
   height:34px!important;
   border-radius:13px!important;
@@ -222,7 +225,7 @@ function installStyle(){
   pointer-events:none!important;
 }
 
-.sb127-movie-overlay{
+.sb128-movie-overlay{
   position:absolute;
   right:0;
   top:56px;
@@ -239,15 +242,20 @@ function installStyle(){
   color:#fff;
   font-family:Inter,system-ui,Arial,sans-serif;
 }
-.sb127-movie-overlay.open{display:block}
-.sb127-search-head{
+
+.sb128-movie-overlay.open{
+  display:block;
+}
+
+.sb128-search-head{
   display:flex;
   justify-content:space-between;
   gap:10px;
   align-items:center;
   margin-bottom:8px;
 }
-.sb127-close{
+
+.sb128-close{
   border:0;
   border-radius:999px;
   background:#414667;
@@ -256,7 +264,8 @@ function installStyle(){
   padding:8px 11px;
   cursor:pointer;
 }
-.sb127-search-result{
+
+.sb128-search-result{
   display:grid;
   grid-template-columns:86px 1fr;
   gap:10px;
@@ -268,7 +277,8 @@ function installStyle(){
   padding:9px;
   margin:8px 0;
 }
-.sb127-thumb{
+
+.sb128-thumb{
   aspect-ratio:16/9;
   border-radius:10px;
   background:#ffffff14;
@@ -278,24 +288,28 @@ function installStyle(){
   color:#dfffee;
   font-size:20px;
 }
-.sb127-thumb img{
+
+.sb128-thumb img{
   width:100%;
   height:100%;
   object-fit:cover;
 }
-.sb127-search-result small,
-.sb127-desc{
+
+.sb128-search-result small,
+.sb128-desc{
   display:block;
   color:#b9c0d8;
   margin-top:4px;
 }
-.sb127-row-actions{
+
+.sb128-row-actions{
   display:flex;
   gap:7px;
   flex-wrap:wrap;
   margin-top:8px;
 }
-.sb127-mini-btn{
+
+.sb128-mini-btn{
   display:inline-flex;
   border-radius:999px;
   padding:7px 10px;
@@ -305,10 +319,12 @@ function installStyle(){
   font-weight:950;
   font-size:12px;
 }
-.sb127-mini-btn.hot{
+
+.sb128-mini-btn.hot{
   background:linear-gradient(135deg,#ff2d85,#7c3cff);
 }
-.sb127-note{
+
+.sb128-note{
   padding:12px 14px;
   border-radius:18px;
   background:#ffb1421f;
@@ -317,21 +333,25 @@ function installStyle(){
   font-weight:850;
   margin-top:8px;
 }
-.sb127-owner-added{
+
+.sb128-owner-added{
   outline:1px solid #22d3a650;
 }
+
 @media(max-width:980px){
-  #sb127OwnerIcons{
+  #sb128OwnerIcons{
     justify-content:flex-start!important;
     width:100%!important;
   }
-  .sb127-movie-overlay{
+
+  .sb128-movie-overlay{
     left:0!important;
     right:auto!important;
     width:calc(100vw - 24px)!important;
     max-width:calc(100vw - 24px)!important;
   }
-  .sb127-search-result{
+
+  .sb128-search-result{
     grid-template-columns:1fr;
   }
 }
@@ -350,7 +370,7 @@ function patchRoutes(root){
 
         if(old && fixed && fixed!==old){
           el.setAttribute(attr,fixed);
-          el.dataset.sbRouteFixedBy='v7-12-127';
+          el.dataset.sbRouteFixedBy='v7-12-128';
         }
       });
     });
@@ -361,7 +381,10 @@ function patchRoutes(root){
       Object.keys(window.StreamBanditRoutes).forEach(function(k){
         const old=window.StreamBanditRoutes[k];
         const fixed=fixedUrl(old);
-        if(old && fixed && fixed!==old) window.StreamBanditRoutes[k]=fixed;
+
+        if(old && fixed && fixed!==old){
+          window.StreamBanditRoutes[k]=fixed;
+        }
       });
 
       window.StreamBanditRoutes.builder=ROUTES.builder;
@@ -370,6 +393,7 @@ function patchRoutes(root){
       window.StreamBanditRoutes.publishedPreview=ROUTES.publishedPreview;
       window.StreamBanditRoutes.admin=ROUTES.admin;
       window.StreamBanditRoutes.registry=ROUTES.registry;
+      window.StreamBanditRoutes.oldRegistry=ROUTES.oldRegistry;
       window.StreamBanditRoutes.policyCentre=ROUTES.policyCentre;
       window.StreamBanditRoutes.policyProof=ROUTES.policyReader;
       window.StreamBanditRoutes.policyAdmin=ROUTES.policyAdmin;
@@ -379,7 +403,10 @@ function patchRoutes(root){
       Object.keys(window.StreamBanditShell.routes).forEach(function(k){
         const old=window.StreamBanditShell.routes[k];
         const fixed=fixedUrl(old);
-        if(old && fixed && fixed!==old) window.StreamBanditShell.routes[k]=fixed;
+
+        if(old && fixed && fixed!==old){
+          window.StreamBanditShell.routes[k]=fixed;
+        }
       });
 
       window.StreamBanditShell.routes.builder=ROUTES.builder;
@@ -388,13 +415,14 @@ function patchRoutes(root){
       window.StreamBanditShell.routes.publishedPreview=ROUTES.publishedPreview;
       window.StreamBanditShell.routes.admin=ROUTES.admin;
       window.StreamBanditShell.routes.registry=ROUTES.registry;
+      window.StreamBanditShell.routes.oldRegistry=ROUTES.oldRegistry;
       window.StreamBanditShell.routes.policyCentre=ROUTES.policyCentre;
       window.StreamBanditShell.routes.policyProof=ROUTES.policyReader;
       window.StreamBanditShell.routes.policyAdmin=ROUTES.policyAdmin;
     }
   }catch(e){}
 
-  document.documentElement.dataset.streamBanditGlobalRouteFix='v7-12-127';
+  document.documentElement.dataset.streamBanditGlobalRouteFix='v7-12-128';
 }
 
 async function readAuth(){
@@ -411,6 +439,7 @@ async function readAuth(){
     }
 
     const c=await client();
+
     if(!c) return lastAuth;
 
     const got=await c.auth.getUser();
@@ -426,6 +455,7 @@ async function readAuth(){
     lastAuth.email=user.email||lastAuth.email||'';
 
     const r=await c.from('sb_profiles').select('role,avatar_url').eq('id',user.id).maybeSingle();
+
     if(r.error) throw r.error;
 
     if(r.data){
@@ -445,8 +475,15 @@ function isOwner(){
 }
 
 function removeDuplicateIconStrips(){
-  ['sb126OwnerIcons','sb124Icons','sb104Icons'].forEach(function(id){
+  [
+    'sb126OwnerIcons',
+    'sb127OwnerIcons',
+    'sb124Icons',
+    'sb104Icons',
+    'sbShellHeaderIcons'
+  ].forEach(function(id){
     const el=document.getElementById(id);
+
     if(el){
       el.style.display='none';
       el.style.visibility='hidden';
@@ -454,7 +491,7 @@ function removeDuplicateIconStrips(){
     }
   });
 
-  document.querySelectorAll('.sb-shell-header-icons,#sbShellHeaderIcons').forEach(function(el){
+  document.querySelectorAll('.sb-shell-header-icons').forEach(function(el){
     el.style.display='none';
     el.style.visibility='hidden';
     el.style.pointerEvents='none';
@@ -466,13 +503,14 @@ function installOwnerIcons(){
     removeDuplicateIconStrips();
 
     const searchWrap=document.querySelector('.searchWrap')||document.querySelector('.search');
+
     if(!searchWrap) return;
 
-    let zone=document.getElementById('sb127OwnerIcons');
+    let zone=document.getElementById('sb128OwnerIcons');
 
     if(!zone){
       zone=document.createElement('nav');
-      zone.id='sb127OwnerIcons';
+      zone.id='sb128OwnerIcons';
       searchWrap.parentNode.insertBefore(zone,searchWrap);
     }
 
@@ -488,11 +526,13 @@ function installOwnerIcons(){
 
 function groupName(section){
   const h=section&&section.querySelector('h3');
+
   return String(h&&h.textContent||'').replace(/\d+$/,'').trim().toLowerCase();
 }
 
 function findMenuGroup(name){
   const drawer=document.getElementById('sbShellDrawer');
+
   if(!drawer) return null;
 
   const wanted=String(name||'').toLowerCase();
@@ -510,7 +550,10 @@ function updateGroupCount(section){
   if(!section) return;
 
   const c=section.querySelector('.sb-shell-count');
-  if(c) c.textContent=String(countLinks(section));
+
+  if(c){
+    c.textContent=String(countLinks(section));
+  }
 }
 
 function linkExists(section,title,href){
@@ -522,6 +565,7 @@ function linkExists(section,title,href){
   return Array.from(section.querySelectorAll('a.sb-shell-link')).some(function(a){
     const ah=fileOf(a.getAttribute('href')||'');
     const txt=String(a.textContent||'').toLowerCase();
+
     return ah===f || txt.includes(titleText);
   });
 }
@@ -538,7 +582,7 @@ function appendMenuLink(section,row){
   if(linkExists(section,title,href)) return;
 
   const a=document.createElement('a');
-  a.className='sb-shell-link sb127-owner-added';
+  a.className='sb-shell-link sb128-owner-added';
   a.href=href;
   a.dataset.search=(group+' '+title+' '+desc).toLowerCase();
   a.innerHTML=
@@ -550,24 +594,27 @@ function appendMenuLink(section,row){
   updateGroupCount(section);
 }
 
-function promoteExistingRegistryLink(){
+function promoteRegistryLinks(){
   const drawer=document.getElementById('sbShellDrawer');
+
   if(!drawer) return;
 
-  Array.from(drawer.querySelectorAll('a.sb-shell-link')).forEach(function(a){
+  Array.from(drawer.querySelectorAll('a.sb-shell-link,a[href]')).forEach(function(a){
     const href=a.getAttribute('href')||'';
     const txt=String(a.textContent||'');
 
     if(
       fileOf(href)==='all-pages-version-registry-v7-1-4-full-test.html' ||
       fileOf(href)==='all-pages-version-registry-v7-10-3-full-test.html' ||
+      fileOf(href)==='all-pages-version-registry-v7-12-122-current-routes-test.html' ||
       /Version Registry/i.test(txt) ||
       /Current Routes Registry/i.test(txt)
     ){
       a.href=ROUTES.registry;
-      a.dataset.sbRouteFixedBy='v7-12-127-registry';
+      a.dataset.sbRouteFixedBy='v7-12-128-registry';
 
       const title=a.querySelector('.sb-shell-title');
+
       if(title){
         const pill=title.querySelector('.sb-shell-pill');
         title.textContent='Current Routes Registry';
@@ -575,17 +622,21 @@ function promoteExistingRegistryLink(){
       }
 
       const desc=a.querySelector('.sb-shell-desc');
-      if(desc) desc.textContent='Current route scanner';
+
+      if(desc){
+        desc.textContent='Current route scanner';
+      }
     }
   });
 }
 
 function promoteOverlayMenu(){
   const drawer=document.getElementById('sbShellDrawer');
+
   if(!drawer) return;
 
   patchRoutes(drawer);
-  promoteExistingRegistryLink();
+  promoteRegistryLinks();
 
   if(isOwner()){
     const owner=findMenuGroup('owner');
@@ -608,9 +659,11 @@ function promoteOverlayMenu(){
 function applyOverlayAvatar(){
   try{
     const drawer=document.getElementById('sbShellDrawer');
+
     if(!drawer || !lastAuth.avatar) return;
 
     const img=drawer.querySelector('.sb-shell-logo');
+
     if(img){
       img.src=lastAuth.avatar;
       img.alt='Profile avatar';
@@ -629,7 +682,9 @@ function arr(v){
       if(Array.isArray(j)) return j;
     }catch(e){}
 
-    return v.split(',').map(function(x){return x.trim();}).filter(Boolean);
+    return v.split(',').map(function(x){
+      return x.trim();
+    }).filter(Boolean);
   }
 
   return [];
@@ -646,6 +701,7 @@ function firstVideo(m){
 function snippet(s,n){
   n=n||120;
   s=String(s||'').replace(/\s+/g,' ').trim();
+
   return s.length>n?s.slice(0,n-1).trim()+'…':s;
 }
 
@@ -698,26 +754,29 @@ function ensureMovieOverlay(input){
 
   if(!wrap) return null;
 
-  let overlay=document.getElementById('sb127MovieSearchOverlay');
+  let overlay=document.getElementById('sb128MovieSearchOverlay');
 
   if(!overlay){
     overlay=document.createElement('div');
-    overlay.id='sb127MovieSearchOverlay';
-    overlay.className='sb127-movie-overlay';
+    overlay.id='sb128MovieSearchOverlay';
+    overlay.className='sb128-movie-overlay';
     overlay.innerHTML=
-      '<div class="sb127-search-head">'+
-        '<b id="sb127SearchTitle">Movie search</b>'+
-        '<button id="sb127CloseSearch" class="sb127-close" type="button">Close</button>'+
+      '<div class="sb128-search-head">'+
+        '<b id="sb128SearchTitle">Movie search</b>'+
+        '<button id="sb128CloseSearch" class="sb128-close" type="button">Close</button>'+
       '</div>'+
-      '<div id="sb127SearchResults"></div>'+
-      '<div class="sb127-note">Typing searches Stream Bandit movies from <b>sb_movies</b>. Press Enter for the full Global Search page.</div>';
+      '<div id="sb128SearchResults"></div>'+
+      '<div class="sb128-note">Typing searches Stream Bandit movies from <b>sb_movies</b>. Press Enter for the full Global Search page.</div>';
 
     wrap.appendChild(overlay);
 
-    const close=document.getElementById('sb127CloseSearch');
-    if(close) close.onclick=function(){
-      overlay.classList.remove('open');
-    };
+    const close=document.getElementById('sb128CloseSearch');
+
+    if(close){
+      close.onclick=function(){
+        overlay.classList.remove('open');
+      };
+    }
   }
 
   return overlay;
@@ -735,8 +794,8 @@ function searchText(m){
 }
 
 function renderMovieResults(q){
-  const title=document.getElementById('sb127SearchTitle');
-  const results=document.getElementById('sb127SearchResults');
+  const title=document.getElementById('sb128SearchTitle');
+  const results=document.getElementById('sb128SearchResults');
 
   if(!results) return;
 
@@ -757,12 +816,12 @@ function renderMovieResults(q){
   }
 
   if(moviesError){
-    results.innerHTML='<div class="sb127-note">Movie search error: '+esc(moviesError)+'</div>';
+    results.innerHTML='<div class="sb128-note">Movie search error: '+esc(moviesError)+'</div>';
     return;
   }
 
   if(!hits.length){
-    results.innerHTML='<div class="sb127-note">No matching movies yet. Press Enter for full Global Search.</div>';
+    results.innerHTML='<div class="sb128-note">No matching movies yet. Press Enter for full Global Search.</div>';
     return;
   }
 
@@ -771,17 +830,17 @@ function renderMovieResults(q){
     const img=poster(m);
     const play=firstVideo(m);
 
-    return '<div class="sb127-search-result">'+
-      '<a class="sb127-thumb" href="'+esc(ROUTES.details+'?id='+id)+'">'+
+    return '<div class="sb128-search-result">'+
+      '<a class="sb128-thumb" href="'+esc(ROUTES.details+'?id='+id)+'">'+
         (img?'<img src="'+esc(img)+'" alt="">':'🎬')+
       '</a>'+
       '<div>'+
         '<a href="'+esc(ROUTES.details+'?id='+id)+'" style="color:#fff;text-decoration:none"><b>'+esc(m.title||'Untitled')+'</b></a>'+
         '<small>Movie result · '+esc([m.year,m.age_rating,m.runtime_text].filter(Boolean).join(' · ')||'Stream Bandit')+'</small>'+
-        '<span class="sb127-desc">'+esc(snippet(m.description||'No description yet.'))+'</span>'+
-        '<div class="sb127-row-actions">'+
-          '<a class="sb127-mini-btn" href="'+esc(ROUTES.details+'?id='+id)+'">Details</a>'+
-          (play?'<a class="sb127-mini-btn hot" href="'+esc(ROUTES.player1+'?id='+id)+'">Play</a>':'')+
+        '<span class="sb128-desc">'+esc(snippet(m.description||'No description yet.'))+'</span>'+
+        '<div class="sb128-row-actions">'+
+          '<a class="sb128-mini-btn" href="'+esc(ROUTES.details+'?id='+id)+'">Details</a>'+
+          (play?'<a class="sb128-mini-btn hot" href="'+esc(ROUTES.player1+'?id='+id)+'">Play</a>':'')+
         '</div>'+
       '</div>'+
     '</div>';
@@ -802,13 +861,15 @@ async function openMovieOverlay(input,q){
 
   overlay.classList.add('open');
 
-  const results=document.getElementById('sb127SearchResults');
-  const title=document.getElementById('sb127SearchTitle');
+  const results=document.getElementById('sb128SearchResults');
+  const title=document.getElementById('sb128SearchTitle');
 
-  if(title) title.textContent='Searching movies for “'+value+'”';
+  if(title){
+    title.textContent='Searching movies for “'+value+'”';
+  }
 
   if(results){
-    results.innerHTML='<div class="sb127-note">Loading movies from Supabase <b>sb_movies</b>...</div>';
+    results.innerHTML='<div class="sb128-note">Loading movies from Supabase <b>sb_movies</b>...</div>';
   }
 
   await loadMovies();
@@ -841,7 +902,9 @@ function installMovieSearch(){
       e.preventDefault();
       e.stopPropagation();
     }
+
     openMovieOverlay(input,input.value);
+
     return false;
   };
 
@@ -868,14 +931,18 @@ function installMovieSearch(){
     }
 
     if(e.key==='Escape'){
-      const overlay=document.getElementById('sb127MovieSearchOverlay');
-      if(overlay) overlay.classList.remove('open');
+      const overlay=document.getElementById('sb128MovieSearchOverlay');
+
+      if(overlay){
+        overlay.classList.remove('open');
+      }
     }
   };
 
   input.addEventListener('input',function(e){
     e.preventDefault();
     e.stopImmediatePropagation();
+
     openMovieOverlay(input,input.value);
   },true);
 
@@ -899,14 +966,14 @@ function installMovieSearch(){
   }
 
   document.addEventListener('click',function(e){
-    const overlay=document.getElementById('sb127MovieSearchOverlay');
+    const overlay=document.getElementById('sb128MovieSearchOverlay');
 
-    if(overlay && !e.target.closest('.searchWrap') && !e.target.closest('#sb127MovieSearchOverlay')){
+    if(overlay && !e.target.closest('.searchWrap') && !e.target.closest('#sb128MovieSearchOverlay')){
       overlay.classList.remove('open');
     }
   },true);
 
-  document.documentElement.dataset.streamBanditMovieOverlaySearch='v7-12-127';
+  document.documentElement.dataset.streamBanditMovieOverlaySearch='v7-12-128';
 }
 
 function fixMenuSaveCounts(){
@@ -934,11 +1001,11 @@ function fixMenuSaveCounts(){
 
       if(!link) return;
 
-      let badge=link.querySelector('[data-sb127-save-count="'+key+'"]');
+      let badge=link.querySelector('[data-sb128-save-count="'+key+'"]');
 
       if(!badge){
         badge=document.createElement('span');
-        badge.dataset.sb127SaveCount=key;
+        badge.dataset.sb128SaveCount=key;
         badge.style.cssText='margin-left:auto;display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#22d3a62b;border:1px solid #22d3a66b;color:#dfffee;font-size:12px;font-weight:950';
         link.appendChild(badge);
       }
@@ -1035,7 +1102,7 @@ function boot(){
   setTimeout(refreshAuthThenAll,1700);
   setTimeout(refreshAuthThenAll,3200);
 
-  setInterval(refreshAll,1200);
+  setInterval(refreshAll,1500);
 
   window.StreamBanditGlobalHelperLoader={
     version:VERSION,
@@ -1054,12 +1121,14 @@ function boot(){
         movieCount:movies.length,
         moviesLoaded:moviesLoaded,
         movieError:moviesError,
-        owner:isOwner()
+        owner:isOwner(),
+        oldRegistryRoute:ROUTES.oldRegistry,
+        promotedRegistryRoute:ROUTES.registry
       };
     }
   };
 
-  document.documentElement.dataset.streamBanditGlobalHelperLoader='v7-12-127';
+  document.documentElement.dataset.streamBanditGlobalHelperLoader='v7-12-128';
 }
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
