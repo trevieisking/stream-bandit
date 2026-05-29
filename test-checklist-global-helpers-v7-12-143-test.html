@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit Test Checklist V7.12.143 Visible Avatar TEST</title>
+<style>
+:root{color-scheme:dark;--bg:#050711;--panel:#17122d;--line:#ffffff22;--accent:#22d3a6;--accent2:#7c3cff;--muted:#b9c0d8}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 10% 0,#22d3a644,transparent 35%),radial-gradient(circle at 90% 0,#7c3cff55,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}.card{max-width:820px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,var(--panel));box-shadow:0 18px 60px #0008;padding:28px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,60px);line-height:1;margin:14px 0;letter-spacing:-.05em}p{color:var(--muted);line-height:1.55}.note{margin-top:16px;border:1px solid #ffffff22;border-radius:18px;background:#ffffff10;padding:12px;color:#dfffee;font-weight:800}
+</style>
+</head>
+<body>
+<main class="card">
+<span class="badge">Checklist visible avatar fix</span>
+<h1>Opening Test Checklist V7.12.143</h1>
+<p>This keeps the V7.12.142 checklist and adds the avatar-only visible-slot fix last.</p>
+<div class="note">Useful actions remain copy, open and build helpers.</div>
+</main>
+<script>
+(function(){
+'use strict';
+const SOURCE='test-checklist-global-helpers-v7-12-142-test.html';
+const FIX='test-checklist-avatar-visible-fix-v7-12-143.js';
+function safe(s){return String(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function transform(html){
+  html=String(html||'');
+  html=html.replaceAll('V7.12.142','V7.12.143');
+  html=html.replaceAll('test-checklist-global-helpers-v7-12-142-test.html','test-checklist-global-helpers-v7-12-143-test.html');
+  let script='\n<script src="'+FIX+'?v=7-12-143-visible-avatar"><\\/script>\n<script>try{document.documentElement.dataset.sbChecklist143="loaded";setTimeout(function(){if(window.StreamBanditChecklistVisibleAvatarFix&&window.StreamBanditChecklistVisibleAvatarFix.refresh)window.StreamBanditChecklistVisibleAvatarFix.refresh();},250);setTimeout(function(){if(window.StreamBanditChecklistVisibleAvatarFix&&window.StreamBanditChecklistVisibleAvatarFix.refresh)window.StreamBanditChecklistVisibleAvatarFix.refresh();},1200);setTimeout(function(){if(window.StreamBanditChecklistVisibleAvatarFix&&window.StreamBanditChecklistVisibleAvatarFix.refresh)window.StreamBanditChecklistVisibleAvatarFix.refresh();},3000);}catch(e){}<\\/script>\n';
+  if(html.includes('</body>'))html=html.replace('</body>',script+'</body>'); else html+=script;
+  return html;
+}
+fetch(SOURCE,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Could not load '+SOURCE+' HTTP '+r.status);return r.text();}).then(html=>{document.open();document.write(transform(html));document.close();}).catch(e=>{document.body.innerHTML='<main class="card"><span class="badge">Checklist load failed</span><h1>Could not load checklist base</h1><p>'+safe(e.message||e)+'</p><div class="note">Hard refresh and try again.</div></main>';});
+})();
+</script>
+</body>
+</html>
