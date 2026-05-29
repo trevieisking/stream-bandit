@@ -22,14 +22,21 @@
   'use strict';
   const menuUrl='all-pages-version-registry-v7-1-4-full-test.html';
   const source='all-pages-version-registry-v7-12-122-current-routes-test.html';
+  const avatarRehydrate='<script>(function(){\n'+
+    "'use strict';\n"+
+    "function load(src){return new Promise(function(resolve){if(document.querySelector('script[src^=\\\"'+src+'\\\"]'))return resolve();var s=document.createElement('script');s.src=src+(src.indexOf('?')>-1?'&':'?')+'v=registry-menu-url-avatar';s.onload=resolve;s.onerror=resolve;document.head.appendChild(s);});}\n"+
+    "function refresh(){try{if(window.StreamBanditAuthAvatar&&window.StreamBanditAuthAvatar.refresh)window.StreamBanditAuthAvatar.refresh();if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh)window.StreamBanditShellAuth.refresh();if(window.StreamBanditBrandLogo&&window.StreamBanditBrandLogo.refresh)window.StreamBanditBrandLogo.refresh();}catch(e){}}\n"+
+    "async function boot(){await load('stream-bandit-auth-profile-v6-31.js');await load('stream-bandit-auth-sync-v6-31-7.js');await load('stream-bandit-auth-avatar-v7-0-2.js');refresh();setTimeout(refresh,500);setTimeout(refresh,1400);setTimeout(refresh,2800);setTimeout(refresh,5200);document.addEventListener('streambandit:auth-state',function(){setTimeout(refresh,150);setTimeout(refresh,900);});}\n"+
+    "if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();\n"+
+    "try{document.documentElement.setAttribute('data-sb-menu-url-preserved','all-pages-version-registry-v7-1-4-full-test.html');document.documentElement.setAttribute('data-sb-avatar-rehydrate','true');}catch(e){}\n"+
+    "})();<\\/script>";
   try{
     let html=await fetch(source,{cache:'no-store'}).then(r=>r.text());
     html=html.replaceAll('all-pages-version-registry-v7-12-122-current-routes-test.html',menuUrl);
     html=html.replaceAll('Stream Bandit V7.12.122 Current Routes Registry TEST','Stream Bandit V7.12.122 Current Routes Registry TEST on V7.1.4 Menu URL');
     html=html.replaceAll('V7.12.122 Current Routes Registry TEST.</b><br>Scans current menu routes, index links and one layer only. Legacy registry routes are normalised to the current registry before display.','V7.12.122 Current Routes Registry TEST on V7.1.4 menu URL.</b><br>Current registry code loaded here so the protected overlay menu still recognises this page.');
-    html=html.replaceAll('const CURRENT_REGISTRY=\'all-pages-version-registry-v7-1-4-full-test.html\';','const CURRENT_REGISTRY=\'all-pages-version-registry-v7-1-4-full-test.html\';');
     html=html.replaceAll('Promoted from legacy registry route','Pinned to menu-recognised registry route');
-    html=html.replace('</body>','<script>try{document.documentElement.setAttribute("data-sb-menu-url-preserved","all-pages-version-registry-v7-1-4-full-test.html");}catch(e){}<\/script></body>');
+    html=html.replace('</body>',avatarRehydrate+'</body>');
     document.open();
     document.write(html);
     document.close();
