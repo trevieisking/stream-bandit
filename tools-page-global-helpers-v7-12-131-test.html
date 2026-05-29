@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit Tools V7.12.131 Helper Pass TEST</title>
+<style>
+:root{color-scheme:dark;--bg:#050711;--panel:#17122d;--line:#ffffff22;--accent:#22d3a6;--accent2:#7c3cff;--muted:#b9c0d8}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.frame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#050711}.loading{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 10% 0,#22d3a644,transparent 35%),radial-gradient(circle at 90% 0,#7c3cff55,transparent 38%),var(--bg);z-index:2}.card{max-width:760px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,var(--panel));box-shadow:0 18px 60px #0008;padding:28px;margin:20px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,60px);line-height:1;margin:14px 0;letter-spacing:-.05em}p{color:var(--muted);line-height:1.55}.note{margin-top:16px;border:1px solid #ffffff22;border-radius:18px;background:#ffffff10;padding:12px;color:#dfffee;font-weight:800}.fallback{position:fixed;left:16px;right:16px;bottom:16px;z-index:3;border:1px solid #ffffff22;border-radius:18px;background:#101529ee;padding:10px 12px;color:#b9c0d8;font-size:13px}.fallback a{color:#baf7df;font-weight:900}
+</style>
+</head>
+<body data-sb-tools-helper-pass="v7-12-131">
+<div id="loading" class="loading">
+  <main class="card">
+    <span class="badge">Tools helper pass</span>
+    <h1>Opening Tools Page</h1>
+    <p>This page preserves the existing V7.10.1 Tools page and injects the V7.12.131 helper pass inside it for testing.</p>
+    <div class="note">No shell edit. No index promotion. No Supabase write. No payment code. Existing tools stay intact.</div>
+  </main>
+</div>
+<iframe id="toolsFrame" class="frame" title="Stream Bandit Tools" src="tools-page-global-helpers-v7-10-1-test.html?helperPass=v7-12-131"></iframe>
+<div class="fallback">Tools V7.12.131 test wrapper. <a href="tools-page-global-helpers-v7-10-1-test.html">Open original Tools page</a></div>
+<script>
+(function(){
+  'use strict';
+  const frame=document.getElementById('toolsFrame');
+  const loading=document.getElementById('loading');
+  const helper='tools-page-fix-v7-12-131.js';
+  function inject(){
+    try{
+      const doc=frame.contentDocument||frame.contentWindow.document;
+      if(!doc)return;
+      if(doc.querySelector('script[src^="'+helper+'"]'))return;
+      const s=doc.createElement('script');
+      s.src=helper+'?v=wrapper-tools-pass';
+      s.dataset.sbToolsWrapperInjected='v7-12-131';
+      doc.head.appendChild(s);
+      doc.documentElement.dataset.sbToolsWrapper='v7-12-131';
+      setTimeout(function(){try{if(frame.contentWindow.StreamBanditToolsPageFix&&frame.contentWindow.StreamBanditToolsPageFix.refresh)frame.contentWindow.StreamBanditToolsPageFix.refresh();}catch(e){}},900);
+      if(loading)loading.style.display='none';
+    }catch(e){
+      if(loading){
+        loading.innerHTML='<main class="card"><span class="badge">Injection blocked</span><h1>Tools helper did not inject</h1><p>'+String(e.message||e).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];})+'</p><div class="note">Open the original Tools page or hard refresh this test wrapper.</div></main>';
+      }
+    }
+  }
+  frame.addEventListener('load',function(){setTimeout(inject,200);setTimeout(inject,800);setTimeout(inject,1800);});
+  setTimeout(inject,2400);
+})();
+</script>
+</body>
+</html>
