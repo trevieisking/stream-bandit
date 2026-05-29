@@ -3,23 +3,376 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Global Whatnots Disabled</title>
+<title>Stream Bandit V7.12.128 Global Helper Shell Passed</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#050711;--card:#101529;--card2:#17122d;--line:#ffffff22;--muted:#cfc6ff;--good:#22d3a6;--purple:#7c3cff;--warn:#ffb142;--bad:#ff4d6d}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(circle at 0 0,#22d3a633,transparent 35%),radial-gradient(circle at 100% 0,#7c3cff55,transparent 38%),var(--bg);color:white;font-family:Inter,system-ui,Arial,sans-serif}.card{width:min(920px,100%);border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,var(--card),var(--card2));box-shadow:0 24px 80px #0008;padding:26px}.badge{display:inline-flex;border-radius:999px;padding:8px 12px;font-weight:950;border:1px solid #ffb14266;background:#ffb14220;color:#ffe7ad}h1{font-size:clamp(36px,6vw,70px);line-height:.95;letter-spacing:-.055em;margin:14px 0}p{color:var(--muted);line-height:1.55;font-size:17px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.btn{border:0;border-radius:999px;padding:12px 16px;background:#414667;color:white;font-weight:950;text-decoration:none;display:inline-flex}.primary{background:linear-gradient(135deg,var(--good),var(--purple))}.warn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#111}.danger{background:#ff4d6d33;border:1px solid #ff4d6d66}.note{border:1px solid #ffffff22;border-radius:18px;background:#ffffff0d;padding:14px;margin-top:16px;color:#dfffee}</style>
+:root{
+  color-scheme:dark;
+  --bg:#050711;
+  --p:#101529;
+  --p2:#17122d;
+  --line:#ffffff22;
+  --muted:#b9c0d8;
+  --good:#22d3a6;
+  --purple:#7c3cff;
+  --pink:#ff2d85;
+  --warn:#ffb142;
+  --bad:#ff4d6d;
+  --cyan:#41e8ff;
+  --fontScale:1;
+}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
+body{
+  margin:0;
+  padding:22px;
+  background:
+    radial-gradient(circle at 8% 0,#22d3a638,transparent 35%),
+    radial-gradient(circle at 92% 0,#7c3cff44,transparent 38%),
+    radial-gradient(circle at bottom,#ff2d8524,transparent 42%),
+    var(--bg);
+  color:#fff;
+  font-family:Inter,system-ui,Arial,sans-serif;
+  font-size:calc(16px * var(--fontScale));
+}
+.wrap{max-width:1500px;margin:auto}
+.head,.hero,.box,.footerPanel{
+  border:1px solid var(--line);
+  border-radius:28px;
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  box-shadow:0 20px 70px #0007;
+  padding:22px;
+  margin-bottom:18px;
+}
+.head{
+  display:grid;
+  grid-template-columns:minmax(250px,320px) minmax(0,1fr) minmax(300px,430px);
+  gap:14px;
+  align-items:start;
+  position:relative;
+  z-index:20;
+  overflow:visible;
+}
+.brand{display:flex;gap:12px;align-items:center;font-size:22px;font-weight:950}
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+.logo img{width:100%;height:100%;object-fit:cover}
+.searchWrap{position:relative;z-index:50}
+.search{
+  width:100%;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  background:#0004;
+  padding:9px 10px 9px 14px;
+  position:relative;
+  z-index:40;
+}
+.search input{flex:1;background:transparent;border:0;color:#fff;outline:0;font:inherit}
+.badge,.pill{
+  display:inline-flex;
+  border-radius:999px;
+  background:#22d3a624;
+  border:1px solid #22d3a657;
+  color:#baf7df;
+  font-weight:950;
+}
+.badge{padding:7px 12px}
+.pill{padding:5px 8px;font-size:12px;margin:2px}
+h1{font-size:clamp(42px,6vw,78px);line-height:.95;margin:10px 0;letter-spacing:-.06em}
+h2,h3{margin:0 0 12px}
+p,.muted,li,small{color:var(--muted);line-height:1.55}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:0;
+  text-decoration:none;
+  border-radius:999px;
+  padding:11px 15px;
+  background:#414667;
+  color:#fff;
+  font-weight:950;
+  cursor:pointer;
+}
+.primary{background:linear-gradient(135deg,var(--good),var(--purple))}
+.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}
+.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#111}
+.cyanBtn{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#061017}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.status,.note,.danger,.goodBox{
+  padding:12px 14px;
+  border-radius:18px;
+  background:#22d3a61a;
+  border:1px solid #22d3a647;
+  color:#dfffee;
+  font-weight:850;
+  margin-top:14px;
+}
+.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
+.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}
+.goodBox{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}
+.heroGrid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(320px,460px);gap:18px;align-items:stretch}
+.art{
+  border:1px solid #ffffff1a;
+  border-radius:30px;
+  background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);
+  min-height:310px;
+  display:grid;
+  place-items:center;
+  position:relative;
+  overflow:hidden;
+}
+.art:before{content:"";position:absolute;inset:28px;border-radius:28px;border:1px dashed #ffffff32}
+.artIcon{font-size:96px;position:relative;z-index:1;filter:drop-shadow(0 18px 40px #0009)}
+.grid,.checks,.routeGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:12px;
+}
+.routeGrid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card,.route{
+  border:1px solid #ffffff1a;
+  border-radius:18px;
+  background:#ffffff0f;
+  padding:14px;
+  overflow-wrap:anywhere;
+}
+.card b,.route b{display:block;color:#baf7df;margin-bottom:8px}
+.route{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:start}
+.routeIcon{
+  width:44px;
+  height:44px;
+  border-radius:15px;
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  display:grid;
+  place-items:center;
+  font-size:21px;
+}
+.route code{
+  display:block;
+  color:#dfffee;
+  background:#0005;
+  border-radius:12px;
+  padding:8px;
+  margin:7px 0;
+  word-break:break-all;
+}
+.source{
+  font-family:ui-monospace,Consolas,monospace;
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:#0006;
+  border-radius:16px;
+  padding:14px;
+  color:#dfffee;
+  max-height:420px;
+  overflow:auto;
+}
+.footerGrid{display:grid;grid-template-columns:1.25fr repeat(4,minmax(170px,1fr));gap:12px}
+.footerCol{
+  border:1px solid #ffffff1a;
+  border-radius:18px;
+  background:#ffffff0f;
+  padding:14px;
+}
+.footerCol b{display:block;color:#baf7df;margin-bottom:8px}
+.footerCol a{display:block;color:#baf7df;text-decoration:none;margin:7px 0;font-weight:850}
+.micro{text-align:center;color:#8f98b8;margin:28px 0}
+@media(max-width:980px){
+  .head,.heroGrid,.footerGrid,.route{grid-template-columns:1fr}
+  .btn{width:100%;white-space:normal}
+  .searchWrap{width:100%}
+  .art{min-height:220px}
+}
+</style>
 </head>
 <body>
-<main class="card">
-<span class="badge">Global Whatnots scanner disabled safely</span>
-<h1>This page is parked.</h1>
-<p>The Global Whatnots scanner caused browser instability, so it has been disabled. This page now contains no JavaScript, no menu add-ons, no shell helper, no scanner loop, and no refresh code.</p>
-<p>The project is not lost. The actual app pages, menu routes, Home page, Supabase content, favicon, and existing owner/admin pages are separate from this parked scanner.</p>
-<div class="note"><b>Next build direction:</b> stop this scanner work, keep the main menu routes, and move back to fixing the real live app with one page/test at a time.</div>
-<div class="actions">
-<a class="btn primary" href="home-global-helpers-v7-4-4-test.html">Open Home</a>
-<a class="btn" href="stream-bandit-one-machine-v7-12-72-test.html">Open One Machine</a>
-<a class="btn" href="platform-control-centre-combined-v7-12-61-test.html">Open Platform Control</a>
-<a class="btn warn" href="index.html">Open Live Index</a>
+<div class="wrap">
+
+<header class="head">
+  <div class="brand">
+    <div class="logo"><img data-sb-brand-logo src="stream_bandit_original_logo_square_256.png" alt="Stream Bandit"></div>
+    <span>Stream Bandit</span>
+  </div>
+  <div class="muted">
+    <b>V7.12.128 Global Helper Shell Passed.</b><br>
+    This replaces the parked Global Whatnots scanner with the passed global helper shell and current route stabiliser.
+  </div>
+  <div class="searchWrap">
+    <div class="search">
+      <span>🔎</span>
+      <input id="globalSearch" placeholder="Search Stream Bandit movies">
+      <button id="globalSearchBtn" class="btn primary" type="button">Search</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="heroGrid">
+    <div>
+      <span class="badge">GLOBAL WHATNOTS SWAPPED — PASSED HELPER SHELL</span>
+      <h1>Global Helper Shell Passed</h1>
+      <p>The old Global Whatnots scanner is replaced with the passed global helper shell. The existing helper shells stay. This page proves account, avatar, overlay menu, movie overlay search, Registry route promotion, footer, favicon, brand logo and global settings work together.</p>
+
+      <div class="actions">
+        <button class="btn primary" type="button" data-sb-open-menu>Open overlay menu</button>
+        <a class="btn hot" href="home-global-helpers-v7-4-4-test.html">Home</a>
+        <a class="btn warnBtn" href="all-pages-version-registry-v7-12-122-current-routes-test.html">Current Routes Registry</a>
+        <a class="btn cyanBtn" href="stream-bandit-global-helper-shell-v7-12-126-test.html">Passed Test Page</a>
+      </div>
+
+      <div id="helperStatus" class="status">Loading global helper pass...</div>
+      <div class="note">Domain: <b>https://chatterfriendsstreambandit.co.uk</b> · Website email: <b>info@chatterfriendsstreambandit.co.uk</b></div>
+      <div class="danger">No payment system. No Supabase writes from this page. No index replacement action from this page.</div>
+    </div>
+    <div class="art"><div class="artIcon">🎬✅</div></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Passed items</h2>
+  <div class="grid">
+    <div class="card"><b>Account/auth</b><p>Account button opens and role state appears.</p></div>
+    <div class="card"><b>Avatar</b><p>Signed-in avatar appears where the profile has <code>avatar_url</code>.</p></div>
+    <div class="card"><b>Overlay menu</b><p>Menu opens and route stabiliser fixes old route values.</p></div>
+    <div class="card"><b>Movie search overlay</b><p>Search overlay reads <code>sb_movies</code> and shows movie results.</p></div>
+    <div class="card"><b>Registry route</b><p>Old registry route promotes to V7.12.122 Current Routes Registry.</p></div>
+    <div class="card"><b>Settings / Policy</b><p>Builder, Preview, Admin and Policy routes passed together.</p></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Current route group</h2>
+  <div class="routeGrid">
+    <div class="route"><div class="routeIcon">📋</div><div><b>Current Routes Registry</b><code>all-pages-version-registry-v7-12-122-current-routes-test.html</code><a class="btn primary" href="all-pages-version-registry-v7-12-122-current-routes-test.html">Open</a></div></div>
+    <div class="route"><div class="routeIcon">🏗️</div><div><b>Builder Studio</b><code>web-builder-live-studio-v7-12-116-test.html?page=test-page</code><a class="btn primary" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Open</a></div></div>
+    <div class="route"><div class="routeIcon">👁️</div><div><b>Published Preview</b><code>web-builder-shared-style-preview-v7-12-117-test.html?page=test-page</code><a class="btn primary" href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Open</a></div></div>
+    <div class="route"><div class="routeIcon">📚</div><div><b>Policy Centre</b><code>policy-documents-centre-v7-12-119-test.html</code><a class="btn primary" href="policy-documents-centre-v7-12-119-test.html">Open</a></div></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Next workflow</h2>
+  <div class="checks">
+    <div class="card"><b>1. Mark Global Helper + Registry pass</b><p>This page is the replacement for the parked Global Whatnots scanner.</p></div>
+    <div class="card"><b>2. Promote index checkpoint</b><p>Index records the global helper and current registry pass.</p></div>
+    <div class="card"><b>3. Continue Settings group</b><p>Resume from Settings/Policy because that is where this pass belongs.</p></div>
+    <div class="card"><b>4. Then continue next menu group</b><p>Follow the page-by-page workflow after Settings/Policy.</p></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Debug</h2>
+  <div id="debug" class="source">Waiting...</div>
+</section>
+
+<section class="footerPanel">
+  <div class="footerGrid">
+    <div class="footerCol">
+      <b>Stream Bandit</b>
+      <small>Global Helper Shell + Registry Pass V7.12.128. Existing helper shells preserved.</small>
+    </div>
+    <div class="footerCol">
+      <b>Watch</b>
+      <a href="home-global-helpers-v7-4-4-test.html">Home</a>
+      <a href="details-clean-machine-v7-12-38-test.html">Details</a>
+      <a href="player-one-global-helpers-v7-3-3-test.html">Player 1</a>
+    </div>
+    <div class="footerCol">
+      <b>Builder</b>
+      <a href="web-builder-pages-manager-v7-12-111-test.html">Pages Manager</a>
+      <a href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Builder Studio</a>
+      <a href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Published Preview</a>
+    </div>
+    <div class="footerCol">
+      <b>Admin</b>
+      <a href="admin-centre-command-deck-v7-12-121-test.html">Admin Centre</a>
+      <a href="all-pages-version-registry-v7-12-122-current-routes-test.html">Current Routes Registry</a>
+      <a href="live-readiness-global-helpers-v7-10-2-test.html">Live Readiness</a>
+    </div>
+    <div class="footerCol">
+      <b>Policy</b>
+      <a href="policy-documents-centre-v7-12-119-test.html">Policy Centre</a>
+      <a href="policy-reader-v7-12-119-test.html?policy=terms">Published Terms</a>
+      <a href="policy-admin-documents-v7-12-120-test.html?policy=terms">Policy Admin</a>
+    </div>
+  </div>
+</section>
+
+<p class="micro">V7.12.128 Global Helper Shell + Registry Pass — no payment system.</p>
+
 </div>
-</main>
+
+<script src="stream-bandit-shell-v6-24.js?v=7-12-128"></script>
+<script src="stream-bandit-favicon-v7-12-16.js?v=7-12-128"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=7-12-128"></script>
+<script src="stream-bandit-auth-profile-v6-31.js?v=7-12-128"></script>
+<script src="stream-bandit-auth-sync-v6-31-7.js?v=7-12-128"></script>
+<script src="stream-bandit-auth-avatar-v7-0-2.js?v=7-12-128"></script>
+<script src="stream-bandit-shared-style-v7-0-2.js?v=7-12-128"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=7-12-128"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=7-12-128"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=7-12-128"></script>
+<script src="stream-bandit-global-helper-loader-v7-12-126.js?v=7-12-128"></script>
+
+<script>
+(function(){
+'use strict';
+
+function $(id){return document.getElementById(id)}
+
+function render(){
+  let st=null;
+
+  try{
+    st=window.StreamBanditGlobalHelperLoader && window.StreamBanditGlobalHelperLoader.state ? window.StreamBanditGlobalHelperLoader.state() : null;
+  }catch(e){}
+
+  $('helperStatus').innerHTML=
+    '<b>Global helper pass:</b> '+
+    'Shell '+(window.StreamBanditShell?'✅':'⚠️')+
+    ' · Account '+(window.StreamBanditShellAuth?'✅':'⚠️')+
+    ' · Avatar '+(window.StreamBanditAuthAvatar?'✅':'⚠️')+
+    ' · Movie overlay '+(document.documentElement.dataset.streamBanditMovieOverlaySearch?'✅':'⚠️')+
+    ' · Route fix '+(document.documentElement.dataset.streamBanditGlobalRouteFix?'✅':'⚠️')+
+    ' · Loader '+(window.StreamBanditGlobalHelperLoader?'✅':'⚠️');
+
+  $('debug').textContent=JSON.stringify({
+    version:'V7.12.128 Global Helper Shell + Registry Pass',
+    replaced:'global-helper-property-owner-scan-v7-12-67-test.html',
+    oldStatus:'Global Whatnots parked scanner',
+    newStatus:'Passed global helper shell and current routes registry stabiliser',
+    domain:'https://chatterfriendsstreambandit.co.uk',
+    contactEmail:'info@chatterfriendsstreambandit.co.uk',
+    helperLoader:st,
+    rules:{
+      noPayments:true,
+      noSupabaseWritesFromThisPage:true,
+      noIndexPromotionActionFromThisPage:true,
+      existingHelpersPreserved:true
+    }
+  },null,2);
+}
+
+document.addEventListener('streambandit:global-helper-loader-refresh',render);
+
+setTimeout(render,300);
+setTimeout(render,900);
+setTimeout(render,1800);
+setTimeout(render,3200);
+setInterval(render,5000);
+})();
+</script>
+
 </body>
 </html>
