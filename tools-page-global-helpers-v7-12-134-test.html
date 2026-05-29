@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit Tools V7.12.134 Theme + Avatar Fix TEST</title>
+<style>
+:root{color-scheme:dark;--bg:#050711;--panel:#17122d;--line:#ffffff22;--accent:#22d3a6;--accent2:#7c3cff;--muted:#b9c0d8}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.frame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#050711}.loading{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 10% 0,#22d3a644,transparent 35%),radial-gradient(circle at 90% 0,#7c3cff55,transparent 38%),var(--bg);z-index:2}.card{max-width:760px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,var(--panel));box-shadow:0 18px 60px #0008;padding:28px;margin:20px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,60px);line-height:1;margin:14px 0;letter-spacing:-.05em}p{color:var(--muted);line-height:1.55}.note{margin-top:16px;border:1px solid #ffffff22;border-radius:18px;background:#ffffff10;padding:12px;color:#dfffee;font-weight:800}.fallback{position:fixed;left:16px;right:16px;bottom:16px;z-index:3;border:1px solid #ffffff22;border-radius:18px;background:#101529ee;padding:10px 12px;color:#b9c0d8;font-size:13px}.fallback a{color:#baf7df;font-weight:900}
+</style>
+</head>
+<body data-sb-tools-theme-avatar-test="v7-12-134">
+<div id="loading" class="loading">
+  <main class="card">
+    <span class="badge">Tools theme + avatar fix</span>
+    <h1>Opening Tools V7.12.134</h1>
+    <p>This test keeps the near-passed V7.12.132 Tools page and adds the V7.12.134 global theme + account-chip avatar helper.</p>
+    <div class="note">No shell edit. No index promotion. No Supabase write. No payment code. Existing Tools logic unchanged.</div>
+  </main>
+</div>
+<iframe id="toolsFrame" class="frame" title="Stream Bandit Tools V7.12.134" src="tools-page-global-helpers-v7-12-132-test.html?themeAvatarFix=v7-12-134"></iframe>
+<div class="fallback">Tools V7.12.134 theme/avatar test. <a href="tools-page-global-helpers-v7-12-132-test.html">Open V7.12.132 page</a></div>
+<script>
+(function(){
+  'use strict';
+  const frame=document.getElementById('toolsFrame');
+  const loading=document.getElementById('loading');
+  const helper='tools-global-theme-avatar-fix-v7-12-134.js';
+  function inject(){
+    try{
+      const win=frame.contentWindow;
+      const doc=frame.contentDocument||win.document;
+      if(!doc)return;
+      if(!doc.querySelector('script[src^="'+helper+'"]')){
+        const s=doc.createElement('script');
+        s.src=helper+'?v=tools-theme-avatar-fix-test';
+        s.dataset.sbToolsThemeAvatarFixInjected='v7-12-134';
+        doc.head.appendChild(s);
+      }
+      doc.documentElement.dataset.sbToolsThemeAvatarFixTest='v7-12-134';
+      [300,900,1800,3600,6200].forEach(function(t){setTimeout(function(){try{if(win.StreamBanditToolsThemeAvatarFix&&win.StreamBanditToolsThemeAvatarFix.refresh)win.StreamBanditToolsThemeAvatarFix.refresh();}catch(e){}},t);});
+      if(loading)loading.style.display='none';
+    }catch(e){
+      if(loading){
+        loading.innerHTML='<main class="card"><span class="badge">Theme/avatar helper injection blocked</span><h1>Could not inject helper</h1><p>'+String(e.message||e).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];})+'</p><div class="note">Open V7.12.132 or hard refresh this theme/avatar test.</div></main>';
+      }
+    }
+  }
+  frame.addEventListener('load',function(){setTimeout(inject,160);setTimeout(inject,700);setTimeout(inject,1800);setTimeout(inject,3600);});
+  setTimeout(inject,2600);
+})();
+</script>
+</body>
+</html>
