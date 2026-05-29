@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit Tools V7.12.135 Direct Theme Avatar TEST</title>
+<style>
+:root{color-scheme:dark;--bg:#050711;--panel:#17122d;--line:#ffffff22;--accent:#22d3a6;--accent2:#7c3cff;--muted:#b9c0d8}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 10% 0,#22d3a644,transparent 35%),radial-gradient(circle at 90% 0,#7c3cff55,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}.card{max-width:820px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,var(--panel));box-shadow:0 18px 60px #0008;padding:28px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,60px);line-height:1;margin:14px 0;letter-spacing:-.05em}p{color:var(--muted);line-height:1.55}.note{margin-top:16px;border:1px solid #ffffff22;border-radius:18px;background:#ffffff10;padding:12px;color:#dfffee;font-weight:800}
+</style>
+</head>
+<body>
+<main class="card">
+<span class="badge">Tools direct page loader</span>
+<h1>Opening Tools V7.12.135</h1>
+<p>This is not an iframe wrapper. It loads the V7.12.132 full Tools page into this document and injects the V7.12.134 global theme/account-avatar helper directly.</p>
+<div class="note">No shell edit. No index promotion. No Supabase write. No payment code. Existing Tools logic unchanged.</div>
+</main>
+<script>
+(function(){
+'use strict';
+const SOURCE='tools-page-global-helpers-v7-12-132-test.html';
+const HELPER='tools-global-theme-avatar-fix-v7-12-134.js';
+function escapeText(s){return String(s||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+function inject(html){
+  html=String(html||'');
+  html=html.replaceAll('V7.12.132','V7.12.135');
+  html=html.replaceAll('tools-page-global-helpers-v7-12-132-test.html','tools-page-global-helpers-v7-12-135-test.html');
+  html=html.replace('Real full-page Tools build: no wrapper, current globals, preserved browser-only tools, current routes, prepper search and footer.','Direct full-page Tools build: theme/avatar helper loaded inside this page, no iframe wrapper, preserved browser-only tools.');
+  const helperScript='\n<script src="'+HELPER+'?v=tools-direct-v7-12-135"><\\/script>\n<script>try{document.documentElement.dataset.sbToolsDirectPage="v7-12-135";setTimeout(function(){if(window.StreamBanditToolsThemeAvatarFix&&window.StreamBanditToolsThemeAvatarFix.refresh)window.StreamBanditToolsThemeAvatarFix.refresh();},250);setTimeout(function(){if(window.StreamBanditToolsThemeAvatarFix&&window.StreamBanditToolsThemeAvatarFix.refresh)window.StreamBanditToolsThemeAvatarFix.refresh();},1200);setTimeout(function(){if(window.StreamBanditToolsThemeAvatarFix&&window.StreamBanditToolsThemeAvatarFix.refresh)window.StreamBanditToolsThemeAvatarFix.refresh();},3000);}catch(e){}<\\/script>\n';
+  if(html.includes('</body>')) html=html.replace('</body>',helperScript+'</body>');
+  else html+=helperScript;
+  return html;
+}
+fetch(SOURCE,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('Could not load '+SOURCE+' HTTP '+r.status);return r.text();}).then(function(html){document.open();document.write(inject(html));document.close();}).catch(function(e){document.body.innerHTML='<main class="card"><span class="badge">Tools direct loader failed</span><h1>Could not open Tools V7.12.135</h1><p>'+escapeText(e.message||e)+'</p><div class="note">Open V7.12.132 directly or hard refresh this page.</div></main>';});
+})();
+</script>
+</body>
+</html>
