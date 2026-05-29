@@ -3,27 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="0; url=all-pages-version-registry-v7-12-122-current-routes-test.html">
-<title>Stream Bandit Registry Bridge V7.1.4 to V7.12.122</title>
+<title>Stream Bandit Current Routes Registry on V7.1.4 Menu URL</title>
 <style>
 :root{color-scheme:dark;--bg:#050711;--panel:#17122d;--line:#ffffff22;--accent:#22d3a6;--accent2:#7c3cff;--muted:#b9c0d8}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 10% 0,#22d3a644,transparent 35%),radial-gradient(circle at 90% 0,#7c3cff55,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}.card{max-width:760px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,var(--panel));box-shadow:0 18px 60px #0008;padding:28px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,60px);line-height:1;margin:14px 0;letter-spacing:-.05em}.muted,p{color:var(--muted);line-height:1.55}.btn{display:inline-flex;align-items:center;justify-content:center;margin-top:14px;border-radius:999px;padding:12px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;text-decoration:none;font-weight:950}.note{margin-top:16px;border:1px solid #ffffff22;border-radius:18px;background:#ffffff10;padding:12px;color:#dfffee;font-weight:800}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 10% 0,#22d3a644,transparent 35%),radial-gradient(circle at 90% 0,#7c3cff55,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;padding:24px}.card{max-width:820px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,var(--panel));box-shadow:0 18px 60px #0008;padding:28px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,60px);line-height:1;margin:14px 0;letter-spacing:-.05em}p{color:var(--muted);line-height:1.55}.note{margin-top:16px;border:1px solid #ffffff22;border-radius:18px;background:#ffffff10;padding:12px;color:#dfffee;font-weight:800}
 </style>
 </head>
 <body>
 <main class="card">
-<span class="badge">Registry bridge only</span>
-<h1>Opening current Version Registry</h1>
-<p>This old V7.1.4 registry URL has been retired as a direct working registry and now forwards to the current one-page route scanner.</p>
-<p><b>Current registry:</b> all-pages-version-registry-v7-12-122-current-routes-test.html</p>
-<a class="btn" href="all-pages-version-registry-v7-12-122-current-routes-test.html">Open Current Routes Registry</a>
-<div class="note">No shell change. No Supabase write. No payment code. This bridge only protects old overlay/Admin links from landing on the stale registry.</div>
+<span class="badge">Loading current registry on menu URL</span>
+<h1>Opening Current Routes Registry</h1>
+<p>This page keeps the old V7.1.4 URL because the protected overlay menu recognises it as the Version Registry route.</p>
+<p>It loads the current V7.12.122 registry code in-place, without redirecting away from this URL.</p>
+<div class="note">No shell change. No Supabase write. No payment code. URL preserved for menu recognition.</div>
 </main>
 <script>
-(function(){
+(async function(){
   'use strict';
-  var target='all-pages-version-registry-v7-12-122-current-routes-test.html';
-  try{window.location.replace(target);}catch(e){window.location.href=target;}
+  const menuUrl='all-pages-version-registry-v7-1-4-full-test.html';
+  const source='all-pages-version-registry-v7-12-122-current-routes-test.html';
+  try{
+    let html=await fetch(source,{cache:'no-store'}).then(r=>r.text());
+    html=html.replaceAll('all-pages-version-registry-v7-12-122-current-routes-test.html',menuUrl);
+    html=html.replaceAll('Stream Bandit V7.12.122 Current Routes Registry TEST','Stream Bandit V7.12.122 Current Routes Registry TEST on V7.1.4 Menu URL');
+    html=html.replaceAll('V7.12.122 Current Routes Registry TEST.</b><br>Scans current menu routes, index links and one layer only. Legacy registry routes are normalised to the current registry before display.','V7.12.122 Current Routes Registry TEST on V7.1.4 menu URL.</b><br>Current registry code loaded here so the protected overlay menu still recognises this page.');
+    html=html.replaceAll('const CURRENT_REGISTRY=\'all-pages-version-registry-v7-1-4-full-test.html\';','const CURRENT_REGISTRY=\'all-pages-version-registry-v7-1-4-full-test.html\';');
+    html=html.replaceAll('Promoted from legacy registry route','Pinned to menu-recognised registry route');
+    html=html.replace('</body>','<script>try{document.documentElement.setAttribute("data-sb-menu-url-preserved","all-pages-version-registry-v7-1-4-full-test.html");}catch(e){}<\/script></body>');
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(e){
+    document.body.innerHTML='<main class="card"><span class="badge">Registry load failed</span><h1>Could not load current registry</h1><p>'+String(e.message||e).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];})+'</p><div class="note">Shell untouched. Try a hard refresh.</div></main>';
+  }
 })();
 </script>
 </body>
