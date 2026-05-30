@@ -1,1137 +1,172 @@
-/* Stream Bandit V7.12.128 Global Helper Loader / Stabiliser
-   Keep existing helper shells.
-   Make movie search overlay global.
-   Promote old menu route values at runtime.
-   Keep one clean owner icon row, no duplicates.
-   No Supabase writes. No payments. No index promotion.
-*/
-
+/* Stream Bandit V7.12.156 Global Helper Loader / Menu Route Stabiliser
+   Filename kept for old pages. No writes, no payments, no live promotion.
+   Repairs stale menu/routes and loads the full Live Readiness search fallback. */
 (function(){
 'use strict';
-
-const VERSION='V7.12.128 Global Helper Loader / Stabiliser';
-
-const SITE={
-  domain:'https://chatterfriendsstreambandit.co.uk',
-  contactEmail:'info@chatterfriendsstreambandit.co.uk',
-  githubPages:'https://trevieisking.github.io/stream-bandit/'
-};
-
-window.StreamBanditSite=Object.assign(window.StreamBanditSite||{},SITE);
-
+const VERSION='V7.12.156 Global Helper Loader / Menu Route Stabiliser';
+const DEF='test-page';
 const ROUTES={
   home:'home-global-helpers-v7-4-4-test.html',
+  library:'library-global-helpers-v7-4-8-test.html',
   details:'details-clean-machine-v7-12-38-test.html',
   player1:'player-one-global-helpers-v7-3-3-test.html',
   search:'global-search-global-helpers-v7-4-9-test.html',
-
+  genres:'genres-clean-machine-v7-12-45-test.html',
+  channels:'channels-global-helpers-v7-5-3-test.html',
+  playlists:'playlists-global-helpers-v7-5-2-test.html',
+  collections:'collections-clean-machine-v7-12-48-test.html',
+  watchlist:'watchlist-clean-machine-v7-12-43-test.html',
+  favourites:'favourites-clean-machine-v7-12-41-test.html',
+  liked:'likes-clean-machine-v7-12-42-test.html',
   profile:'profile-settings-live-ready-v7-12-90-test.html',
-
+  admin:'admin-centre-command-deck-v7-12-121-test.html',
+  readiness:'live-readiness-global-helpers-v7-10-2-test.html',
+  registry:'all-pages-version-registry-v7-12-122-current-routes-test.html',
+  checklist:'test-checklist-global-helpers-v7-10-5-test.html',
+  tools:'tools-page-original-global-pass-v7-12-136-test.html',
+  health:'health-check-global-helpers-v7-10-6-test.html',
+  mux:'mux-manager-global-helpers-v7-10-7-test.html',
+  storage:'storage-prep-global-helpers-v7-10-8-test.html',
+  backup:'backup-safety-global-helpers-v7-10-9-test.html',
   builder:'web-builder-live-studio-v7-12-116-test.html?page=test-page',
-  builderStudio:'web-builder-live-studio-v7-12-116-test.html?page=test-page',
+  theme:'web-builder-theme-studio-controls-v7-8-9-test.html',
   pagesManager:'web-builder-pages-manager-v7-12-111-test.html',
-  publishedPreview:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
+  preview:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
   formAdvanced:'web-builder-form-save-v7-12-94-test.html?page=test-page',
   formInbox:'web-builder-form-submissions-v7-12-94-test.html?page=test-page',
-
-  admin:'admin-centre-command-deck-v7-12-121-test.html',
-  registry:'all-pages-version-registry-v7-12-122-current-routes-test.html',
-  oldRegistry:'all-pages-version-registry-v7-1-4-full-test.html',
-
   policyCentre:'policy-documents-centre-v7-12-119-test.html',
   policyReader:'policy-reader-v7-12-119-test.html?policy=terms',
   policyAdmin:'policy-admin-documents-v7-12-120-test.html?policy=terms',
-
-  watchlist:'watchlist-clean-machine-v7-12-43-test.html',
-  favourites:'favourites-clean-machine-v7-12-41-test.html',
-  liked:'likes-clean-machine-v7-12-42-test.html'
+  brandIcons:'settings-brand-icons-promoted-v7-12-21-test.html',
+  helperShell:'stream-bandit-global-helper-shell-v7-12-126-test.html',
+  oneMachine:'stream-bandit-one-machine-v7-12-73-test.html',
+  platformControl:'settings-platform-control-hub-v7-12-85-test.html',
+  myChannel:'my-channel-clean-machine-v7-12-47-test.html',
+  submit:'submit-video-clean-machine-v7-12-79-test.html',
+  rules:'rules-clean-machine-v7-12-82-test.html',
+  review:'review-queue-clean-machine-v7-12-80-publish-test.html',
+  about:'about-global-helpers-v7-4-7-test.html',
+  supabaseLibrary:'supabase-library-home-header-form-fix-v7-12-34-test.html',
+  player2:'player-2-progress-helper-v6-78-9-4-test.html',
+  continueWatching:'continue-watching-global-helpers-v7-3-9-test.html',
+  watchHistory:'watch-history-global-helpers-v7-4-0-test.html',
+  accessibility:'accessibility-clean-machine-v7-12-44-test.html'
 };
-
 const ROUTE_FIXES={
   'profile-settings-global-helpers-v7-5-8-test.html':ROUTES.profile,
   'profile-settings-admin-shell-v6-56-test.html':ROUTES.profile,
-
-  'web-builder-live-studio-v7-12-97-test.html':ROUTES.builder,
-  'web-builder-global-helpers-v7-9-3-test.html':ROUTES.builder,
-  'web-builder-admin-shell-v6-57-test.html':ROUTES.builder,
+  'settings-studio-admin-shell-v6-55-test.html':ROUTES.theme,
+  'settings-sources-owner-launcher-v7-6-6-test.html':ROUTES.theme,
+  'settings-platform-control-hub-v7-1-8-test.html':ROUTES.platformControl,
+  'settings-platform-control-hub-v7-1-6-test.html':ROUTES.platformControl,
+  'settings-admin-shell-v6-54-test.html':ROUTES.platformControl,
   'web-builder-full-edit-lock-v7-8-6-test.html':ROUTES.builder,
+  'web-builder-admin-shell-v6-57-test.html':ROUTES.builder,
+  'web-builder-global-helpers-v7-9-3-test.html':ROUTES.builder,
+  'web-builder-live-studio-v7-12-97-test.html':ROUTES.builder,
   'web-builder-live-studio-v7-12-93-test.html':ROUTES.builder,
-
-  'web-builder-shared-style-preview-v7-9-0-test.html':ROUTES.publishedPreview,
-  'web-builder-shared-style-preview-v7-9-2-test.html':ROUTES.publishedPreview,
-
+  'web-builder-form-save-v7-6-5-test.html':ROUTES.formAdvanced,
+  'web-builder-form-save-v7-6-7-test.html':ROUTES.formAdvanced,
+  'web-builder-shared-style-preview-v7-9-0-test.html':ROUTES.preview,
+  'web-builder-shared-style-preview-v7-9-2-test.html':ROUTES.preview,
+  'submit-video-clean-machine-v7-12-53-test.html':ROUTES.submit,
+  'submit-video-clean-machine-v7-12-75-test.html':ROUTES.submit,
+  'submit-video-clean-machine-v7-12-78-test.html':ROUTES.submit,
+  'submit-video-creator-shell-v6-49-test.html':ROUTES.submit,
+  'submit-video-global-helpers-v7-5-6-test.html':ROUTES.submit,
+  'rules-clean-machine-v7-12-54-test.html':ROUTES.rules,
+  'rules-clean-machine-v7-12-81-test.html':ROUTES.rules,
+  'rules-creator-shell-v6-50-test.html':ROUTES.rules,
+  'rules-global-helpers-v7-5-5-test.html':ROUTES.rules,
+  'review-queue-clean-machine-v7-12-55-test.html':ROUTES.review,
+  'review-queue-global-helpers-v7-5-7-test.html':ROUTES.review,
+  'review-queue-approved-to-movies-v7-0-0-test.html':ROUTES.review,
+  'review-queue-creator-shell-v6-51-test.html':ROUTES.review,
+  'my-channel-global-helpers-v7-5-0-test.html':ROUTES.myChannel,
+  'collections-clean-machine-v7-12-51-test.html':ROUTES.collections,
+  'player-2-clean-machine-v7-12-58-test.html':ROUTES.player2,
+  'global-search-admin-shell-v6-52-test.html':ROUTES.search,
+  'global-search-v5-90-test.html':ROUTES.search,
+  'home-watch-shell-v6-32-test.html':ROUTES.home,
   'admin-centre-command-deck-v7-10-0-test.html':ROUTES.admin,
-
   'all-pages-version-registry-v7-1-4-full-test.html':ROUTES.registry,
   'all-pages-version-registry-v7-10-3-full-test.html':ROUTES.registry,
   'all-pages-version-registry-v6-29-test.html':ROUTES.registry,
   'all-pages-version-registry-admin-shell-v6-61-test.html':ROUTES.registry,
-
+  'tools-page-global-helpers-v7-10-1-test.html':ROUTES.tools,
   'policy-agreements-centre-v7-11-6-test.html':ROUTES.policyCentre,
   'policy-reader-published-row-v7-12-27-test.html':ROUTES.policyReader,
   'policy-admin-save-editor-v7-12-25-test.html':ROUTES.policyAdmin,
-
+  'stream-bandit-clean-machine-menu-v7-12-40-test.html':ROUTES.registry,
+  'platform-control-tower-route-guard-proof-v7-12-33-test.html':ROUTES.health,
+  'stream-bandit-route-pointer-machine-v7-12-36-test.html':ROUTES.registry,
+  'final-shell-navigation-global-helpers-v7-5-9-test.html':ROUTES.helperShell,
+  'stream-bandit-one-machine-v7-12-72-test.html':ROUTES.oneMachine,
+  'platform-control-centre-combined-v7-12-61-test.html':ROUTES.platformControl,
+  'platform-control-centre-admin-v7-12-59-test.html':ROUTES.platformControl,
+  'brand-logo-helper-responsive-v7-12-20-test.html':ROUTES.brandIcons,
+  'brand-image-helper-v7-12-20-test.html':ROUTES.brandIcons,
+  'favicon-app-icon-builder-v7-12-15-test.html':ROUTES.brandIcons,
   'watchlist-watch-shell-v6-37-test.html':ROUTES.watchlist,
   'favourites-watch-shell-v6-38-test.html':ROUTES.favourites,
   'liked-watch-shell-v6-39-test.html':ROUTES.liked
 };
-
-const OWNER_ICONS=[
-  ['🧭','Pages Manager',ROUTES.pagesManager],
-  ['👁️','Published Preview',ROUTES.publishedPreview],
-  ['📋','Current Routes Registry',ROUTES.registry],
-  ['📬','Form Inbox',ROUTES.formInbox],
-  ['🧾','Advanced Form',ROUTES.formAdvanced],
-  ['🏗️','Builder Studio',ROUTES.builderStudio]
-];
-
-const OWNER_MENU_LINKS=[
-  ['Owner','🧭','Pages Manager',ROUTES.pagesManager,'Create, edit, hide, restore and guarded-delete Web Builder pages'],
-  ['Owner','👁️','Published Preview',ROUTES.publishedPreview,'Interactive published Web Builder preview'],
-  ['Owner','📬','Form Inbox',ROUTES.formInbox,'Builder form submissions inbox'],
-  ['Owner','🧾','Advanced Form',ROUTES.formAdvanced,'Advanced builder form route'],
-  ['Owner','🏗️','Web Builder Studio',ROUTES.builderStudio,'Current Builder Studio route']
-];
-
-const ADMIN_MENU_LINKS=[
-  ['Admin','📋','Current Routes Registry',ROUTES.registry,'Current route scanner'],
-  ['Admin','🛠️','Admin Centre',ROUTES.admin,'Admin command deck']
-];
-
-let sb=null;
-let cfg=null;
-let movies=[];
-let moviesLoaded=false;
-let moviesError='';
-let lastAuth={signedIn:false,email:'',role:'signed-out',avatar:''};
-let observerStarted=false;
-
-function esc(s){
-  return String(s??'').replace(/[&<>"']/g,function(c){
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-  });
-}
-
-function fileOf(v){
-  return String(v||'').split('/').pop().split('?')[0].split('#')[0];
-}
-
-function pageParam(){
-  try{
-    return new URL(location.href).searchParams.get('page')||'test-page';
-  }catch(e){
-    return 'test-page';
-  }
-}
-
-function pageRoute(route,oldValue){
-  if(!String(route||'').includes('page=test-page')) return route;
-
-  let p=pageParam();
-
-  try{
-    const u=new URL(String(oldValue||''),location.href);
-    p=u.searchParams.get('page')||p;
-  }catch(e){}
-
-  return String(route).replace('page=test-page','page='+encodeURIComponent(p));
-}
-
-function fixedUrl(raw){
-  if(!raw || !String(raw).includes('.html')) return raw;
-
-  const f=fileOf(raw);
-  const target=ROUTE_FIXES[f];
-
-  if(!target) return raw;
-
-  return pageRoute(target,raw);
-}
-
-async function readShellConfig(){
-  if(cfg) return cfg;
-
-  try{
-    const txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(function(r){
-      return r.text();
-    });
-
-    cfg={
-      url:(txt.match(/SUPABASE_URL\s*=\s*'([^']+)'/)||[])[1]||'',
-      key:(txt.match(/SUPABASE_KEY\s*=\s*'([^']+)'/)||[])[1]||''
-    };
-  }catch(e){
-    cfg={url:'',key:''};
-  }
-
-  return cfg;
-}
-
-async function client(){
-  if(sb) return sb;
-
-  const c=await readShellConfig();
-
-  if(!window.supabase || !window.supabase.createClient || !c.url || !c.key) return null;
-
-  sb=window.supabase.createClient(c.url,c.key);
-
-  return sb;
-}
-
-function installStyle(){
-  if(document.getElementById('sbGlobalHelperLoader128Style')) return;
-
-  const s=document.createElement('style');
-  s.id='sbGlobalHelperLoader128Style';
-  s.textContent=`
-#sb104Icons,
-#sb124Icons,
-#sb126OwnerIcons,
-#sb127OwnerIcons,
-#sbShellHeaderIcons,
-.sb-shell-header-icons{
-  display:none!important;
-  visibility:hidden!important;
-  pointer-events:none!important;
-}
-
-#sb128OwnerIcons{
-  display:flex!important;
-  gap:6px!important;
-  align-items:center!important;
-  flex-wrap:wrap!important;
-  justify-content:flex-end!important;
-  margin:0 0 8px!important;
-}
-
-#sb128OwnerIcons a{
-  width:34px!important;
-  height:34px!important;
-  border-radius:13px!important;
-  border:1px solid #ffffff2b!important;
-  background:linear-gradient(135deg,#101529,#17122d)!important;
-  display:grid!important;
-  place-items:center!important;
-  text-decoration:none!important;
-  font-size:16px!important;
-  box-shadow:0 10px 26px #0007!important;
-  color:#fff!important;
-}
-
-#sbGlobalShellSearchOverlay{
-  display:none!important;
-  visibility:hidden!important;
-  pointer-events:none!important;
-}
-
-.sb128-movie-overlay{
-  position:absolute;
-  right:0;
-  top:56px;
-  width:min(720px,92vw);
-  max-height:74vh;
-  overflow:auto;
-  border:1px solid #22d3a657;
-  border-radius:22px;
-  background:linear-gradient(180deg,#08101cfa,#120c26fa);
-  box-shadow:0 30px 90px #000c;
-  padding:12px;
-  display:none;
-  z-index:999999;
-  color:#fff;
-  font-family:Inter,system-ui,Arial,sans-serif;
-}
-
-.sb128-movie-overlay.open{
-  display:block;
-}
-
-.sb128-search-head{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  align-items:center;
-  margin-bottom:8px;
-}
-
-.sb128-close{
-  border:0;
-  border-radius:999px;
-  background:#414667;
-  color:#fff;
-  font-weight:950;
-  padding:8px 11px;
-  cursor:pointer;
-}
-
-.sb128-search-result{
-  display:grid;
-  grid-template-columns:86px 1fr;
-  gap:10px;
-  text-decoration:none;
-  color:#fff;
-  border:1px solid #ffffff14;
-  border-radius:16px;
-  background:#ffffff0d;
-  padding:9px;
-  margin:8px 0;
-}
-
-.sb128-thumb{
-  aspect-ratio:16/9;
-  border-radius:10px;
-  background:#ffffff14;
-  overflow:hidden;
-  display:grid;
-  place-items:center;
-  color:#dfffee;
-  font-size:20px;
-}
-
-.sb128-thumb img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.sb128-search-result small,
-.sb128-desc{
-  display:block;
-  color:#b9c0d8;
-  margin-top:4px;
-}
-
-.sb128-row-actions{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-  margin-top:8px;
-}
-
-.sb128-mini-btn{
-  display:inline-flex;
-  border-radius:999px;
-  padding:7px 10px;
-  background:linear-gradient(135deg,#22d3a6,#7c3cff);
-  color:white;
-  text-decoration:none;
-  font-weight:950;
-  font-size:12px;
-}
-
-.sb128-mini-btn.hot{
-  background:linear-gradient(135deg,#ff2d85,#7c3cff);
-}
-
-.sb128-note{
-  padding:12px 14px;
-  border-radius:18px;
-  background:#ffb1421f;
-  border:1px solid #ffb14252;
-  color:#ffe7ad;
-  font-weight:850;
-  margin-top:8px;
-}
-
-.sb128-owner-added{
-  outline:1px solid #22d3a650;
-}
-
-@media(max-width:980px){
-  #sb128OwnerIcons{
-    justify-content:flex-start!important;
-    width:100%!important;
-  }
-
-  .sb128-movie-overlay{
-    left:0!important;
-    right:auto!important;
-    width:calc(100vw - 24px)!important;
-    max-width:calc(100vw - 24px)!important;
-  }
-
-  .sb128-search-result{
-    grid-template-columns:1fr;
-  }
-}
-`;
-  document.head.appendChild(s);
-}
-
-function patchRoutes(root){
-  root=root||document;
-
-  try{
-    root.querySelectorAll('a[href],form[action],[data-href],[data-target],[data-route],[data-url]').forEach(function(el){
-      ['href','action','data-href','data-target','data-route','data-url'].forEach(function(attr){
-        const old=el.getAttribute(attr);
-        const fixed=fixedUrl(old);
-
-        if(old && fixed && fixed!==old){
-          el.setAttribute(attr,fixed);
-          el.dataset.sbRouteFixedBy='v7-12-128';
-        }
-      });
-    });
-  }catch(e){}
-
-  try{
-    if(window.StreamBanditRoutes){
-      Object.keys(window.StreamBanditRoutes).forEach(function(k){
-        const old=window.StreamBanditRoutes[k];
-        const fixed=fixedUrl(old);
-
-        if(old && fixed && fixed!==old){
-          window.StreamBanditRoutes[k]=fixed;
-        }
-      });
-
-      window.StreamBanditRoutes.builder=ROUTES.builder;
-      window.StreamBanditRoutes.builderStudio=ROUTES.builderStudio;
-      window.StreamBanditRoutes.pagesManager=ROUTES.pagesManager;
-      window.StreamBanditRoutes.publishedPreview=ROUTES.publishedPreview;
-      window.StreamBanditRoutes.admin=ROUTES.admin;
-      window.StreamBanditRoutes.registry=ROUTES.registry;
-      window.StreamBanditRoutes.oldRegistry=ROUTES.oldRegistry;
-      window.StreamBanditRoutes.policyCentre=ROUTES.policyCentre;
-      window.StreamBanditRoutes.policyProof=ROUTES.policyReader;
-      window.StreamBanditRoutes.policyAdmin=ROUTES.policyAdmin;
-    }
-
-    if(window.StreamBanditShell && window.StreamBanditShell.routes){
-      Object.keys(window.StreamBanditShell.routes).forEach(function(k){
-        const old=window.StreamBanditShell.routes[k];
-        const fixed=fixedUrl(old);
-
-        if(old && fixed && fixed!==old){
-          window.StreamBanditShell.routes[k]=fixed;
-        }
-      });
-
-      window.StreamBanditShell.routes.builder=ROUTES.builder;
-      window.StreamBanditShell.routes.builderStudio=ROUTES.builderStudio;
-      window.StreamBanditShell.routes.pagesManager=ROUTES.pagesManager;
-      window.StreamBanditShell.routes.publishedPreview=ROUTES.publishedPreview;
-      window.StreamBanditShell.routes.admin=ROUTES.admin;
-      window.StreamBanditShell.routes.registry=ROUTES.registry;
-      window.StreamBanditShell.routes.oldRegistry=ROUTES.oldRegistry;
-      window.StreamBanditShell.routes.policyCentre=ROUTES.policyCentre;
-      window.StreamBanditShell.routes.policyProof=ROUTES.policyReader;
-      window.StreamBanditShell.routes.policyAdmin=ROUTES.policyAdmin;
-    }
-  }catch(e){}
-
-  document.documentElement.dataset.streamBanditGlobalRouteFix='v7-12-128';
-}
-
-async function readAuth(){
-  try{
-    if(window.StreamBanditShellAuth && window.StreamBanditShellAuth.getState){
-      const st=window.StreamBanditShellAuth.getState()||{};
-      const user=st.user||null;
-      const profile=st.profile||null;
-
-      lastAuth.signedIn=!!user;
-      lastAuth.email=user&&user.email||lastAuth.email||'';
-      lastAuth.role=profile&&profile.role||st.role||lastAuth.role||'signed-out';
-      lastAuth.avatar=profile&&profile.avatar_url||lastAuth.avatar||'';
-    }
-
-    const c=await client();
-
-    if(!c) return lastAuth;
-
-    const got=await c.auth.getUser();
-    const user=got&&got.data&&got.data.user?got.data.user:null;
-
-    if(!user){
-      lastAuth.signedIn=false;
-      lastAuth.role='signed-out';
-      return lastAuth;
-    }
-
-    lastAuth.signedIn=true;
-    lastAuth.email=user.email||lastAuth.email||'';
-
-    const r=await c.from('sb_profiles').select('role,avatar_url').eq('id',user.id).maybeSingle();
-
-    if(r.error) throw r.error;
-
-    if(r.data){
-      lastAuth.role=r.data.role||lastAuth.role||'user';
-      lastAuth.avatar=r.data.avatar_url||lastAuth.avatar||'';
-    }
-  }catch(e){}
-
-  return lastAuth;
-}
-
-function isOwner(){
-  const role=String(lastAuth.role||document.documentElement.dataset.streamBanditRole||'').toLowerCase();
-  const email=String(lastAuth.email||'').toLowerCase();
-
-  return /admin|owner/.test(role) || email.includes('trevieisking');
-}
-
-function removeDuplicateIconStrips(){
-  [
-    'sb126OwnerIcons',
-    'sb127OwnerIcons',
-    'sb124Icons',
-    'sb104Icons',
-    'sbShellHeaderIcons'
-  ].forEach(function(id){
-    const el=document.getElementById(id);
-
-    if(el){
-      el.style.display='none';
-      el.style.visibility='hidden';
-      el.style.pointerEvents='none';
-    }
-  });
-
-  document.querySelectorAll('.sb-shell-header-icons').forEach(function(el){
-    el.style.display='none';
-    el.style.visibility='hidden';
-    el.style.pointerEvents='none';
-  });
-}
-
-function installOwnerIcons(){
-  try{
-    removeDuplicateIconStrips();
-
-    const searchWrap=document.querySelector('.searchWrap')||document.querySelector('.search');
-
-    if(!searchWrap) return;
-
-    let zone=document.getElementById('sb128OwnerIcons');
-
-    if(!zone){
-      zone=document.createElement('nav');
-      zone.id='sb128OwnerIcons';
-      searchWrap.parentNode.insertBefore(zone,searchWrap);
-    }
-
-    zone.style.display=isOwner()?'flex':'none';
-
-    zone.innerHTML=OWNER_ICONS.map(function(x){
-      return '<a href="'+esc(pageRoute(x[2],x[2]))+'" title="'+esc(x[1])+'" aria-label="'+esc(x[1])+'">'+x[0]+'</a>';
-    }).join('');
-
-    patchRoutes(zone);
-  }catch(e){}
-}
-
-function groupName(section){
-  const h=section&&section.querySelector('h3');
-
-  return String(h&&h.textContent||'').replace(/\d+$/,'').trim().toLowerCase();
-}
-
-function findMenuGroup(name){
-  const drawer=document.getElementById('sbShellDrawer');
-
-  if(!drawer) return null;
-
-  const wanted=String(name||'').toLowerCase();
-
-  return Array.from(drawer.querySelectorAll('.sb-shell-group')).find(function(sec){
-    return groupName(sec).includes(wanted);
-  })||null;
-}
-
-function countLinks(section){
-  return section?section.querySelectorAll('a.sb-shell-link').length:0;
-}
-
-function updateGroupCount(section){
-  if(!section) return;
-
-  const c=section.querySelector('.sb-shell-count');
-
-  if(c){
-    c.textContent=String(countLinks(section));
-  }
-}
-
-function linkExists(section,title,href){
-  if(!section) return true;
-
-  const f=fileOf(href);
-  const titleText=String(title||'').toLowerCase();
-
-  return Array.from(section.querySelectorAll('a.sb-shell-link')).some(function(a){
-    const ah=fileOf(a.getAttribute('href')||'');
-    const txt=String(a.textContent||'').toLowerCase();
-
-    return ah===f || txt.includes(titleText);
-  });
-}
-
-function appendMenuLink(section,row){
-  if(!section) return;
-
-  const group=row[0];
-  const icon=row[1];
-  const title=row[2];
-  const href=pageRoute(row[3],row[3]);
-  const desc=row[4];
-
-  if(linkExists(section,title,href)) return;
-
-  const a=document.createElement('a');
-  a.className='sb-shell-link sb128-owner-added';
-  a.href=href;
-  a.dataset.search=(group+' '+title+' '+desc).toLowerCase();
-  a.innerHTML=
-    '<span class="sb-shell-icon">'+icon+'</span>'+
-    '<span><span class="sb-shell-title">'+esc(title)+'</span>'+
-    '<span class="sb-shell-desc">'+esc(desc)+'</span></span>';
-
-  section.appendChild(a);
-  updateGroupCount(section);
-}
-
-function promoteRegistryLinks(){
-  const drawer=document.getElementById('sbShellDrawer');
-
-  if(!drawer) return;
-
-  Array.from(drawer.querySelectorAll('a.sb-shell-link,a[href]')).forEach(function(a){
-    const href=a.getAttribute('href')||'';
-    const txt=String(a.textContent||'');
-
-    if(
-      fileOf(href)==='all-pages-version-registry-v7-1-4-full-test.html' ||
-      fileOf(href)==='all-pages-version-registry-v7-10-3-full-test.html' ||
-      fileOf(href)==='all-pages-version-registry-v7-12-122-current-routes-test.html' ||
-      /Version Registry/i.test(txt) ||
-      /Current Routes Registry/i.test(txt)
-    ){
-      a.href=ROUTES.registry;
-      a.dataset.sbRouteFixedBy='v7-12-128-registry';
-
-      const title=a.querySelector('.sb-shell-title');
-
-      if(title){
-        const pill=title.querySelector('.sb-shell-pill');
-        title.textContent='Current Routes Registry';
-        if(pill) title.appendChild(pill);
-      }
-
-      const desc=a.querySelector('.sb-shell-desc');
-
-      if(desc){
-        desc.textContent='Current route scanner';
-      }
-    }
-  });
-}
-
-function promoteOverlayMenu(){
-  const drawer=document.getElementById('sbShellDrawer');
-
-  if(!drawer) return;
-
-  patchRoutes(drawer);
-  promoteRegistryLinks();
-
-  if(isOwner()){
-    const owner=findMenuGroup('owner');
-    const admin=findMenuGroup('admin');
-
-    OWNER_MENU_LINKS.forEach(function(row){
-      appendMenuLink(owner,row);
-    });
-
-    ADMIN_MENU_LINKS.forEach(function(row){
-      appendMenuLink(admin,row);
-    });
-  }
-
-  patchRoutes(drawer);
-  applyOverlayAvatar();
-  fixMenuSaveCounts();
-}
-
-function applyOverlayAvatar(){
-  try{
-    const drawer=document.getElementById('sbShellDrawer');
-
-    if(!drawer || !lastAuth.avatar) return;
-
-    const img=drawer.querySelector('.sb-shell-logo');
-
-    if(img){
-      img.src=lastAuth.avatar;
-      img.alt='Profile avatar';
-      img.title='Signed-in profile avatar';
-      img.style.objectFit='cover';
-    }
-  }catch(e){}
-}
-
-function arr(v){
-  if(Array.isArray(v)) return v;
-
-  if(typeof v==='string' && v.trim()){
-    try{
-      const j=JSON.parse(v);
-      if(Array.isArray(j)) return j;
-    }catch(e){}
-
-    return v.split(',').map(function(x){
-      return x.trim();
-    }).filter(Boolean);
-  }
-
-  return [];
-}
-
-function poster(m){
-  return m.thumbnail_url||m.poster_url||m.poster||m.thumb||m.backdrop_url||m.image_url||'';
-}
-
-function firstVideo(m){
-  return m.video_url||m.mux_playback_url||m.stream_url||m.url||'';
-}
-
-function snippet(s,n){
-  n=n||120;
-  s=String(s||'').replace(/\s+/g,' ').trim();
-
-  return s.length>n?s.slice(0,n-1).trim()+'…':s;
-}
-
-async function loadMovies(){
-  if(moviesLoaded) return movies;
-
-  moviesLoaded=true;
-  moviesError='';
-
-  try{
-    const c=await client();
-
-    if(!c) throw new Error('Supabase client not ready');
-
-    const r=await c.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(160);
-
-    if(r.error) throw r.error;
-
-    movies=(r.data||[]).filter(function(m){
-      return String(m.status||'published')!=='archived';
-    });
-  }catch(e){
-    movies=[];
-    moviesLoaded=false;
-    moviesError=e.message||String(e);
-  }
-
-  return movies;
-}
-
-function ensureSearchWrap(input){
-  const search=input.closest('.search')||input.parentElement;
-
-  if(!search) return null;
-
-  let wrap=search.closest('.searchWrap');
-
-  if(!wrap){
-    wrap=document.createElement('div');
-    wrap.className='searchWrap';
-    search.parentNode.insertBefore(wrap,search);
-    wrap.appendChild(search);
-  }
-
-  return wrap;
-}
-
-function ensureMovieOverlay(input){
-  const wrap=ensureSearchWrap(input);
-
-  if(!wrap) return null;
-
-  let overlay=document.getElementById('sb128MovieSearchOverlay');
-
-  if(!overlay){
-    overlay=document.createElement('div');
-    overlay.id='sb128MovieSearchOverlay';
-    overlay.className='sb128-movie-overlay';
-    overlay.innerHTML=
-      '<div class="sb128-search-head">'+
-        '<b id="sb128SearchTitle">Movie search</b>'+
-        '<button id="sb128CloseSearch" class="sb128-close" type="button">Close</button>'+
-      '</div>'+
-      '<div id="sb128SearchResults"></div>'+
-      '<div class="sb128-note">Typing searches Stream Bandit movies from <b>sb_movies</b>. Press Enter for the full Global Search page.</div>';
-
-    wrap.appendChild(overlay);
-
-    const close=document.getElementById('sb128CloseSearch');
-
-    if(close){
-      close.onclick=function(){
-        overlay.classList.remove('open');
-      };
-    }
-  }
-
-  return overlay;
-}
-
-function searchText(m){
-  return (
-    String(m.title||'')+' '+
-    String(m.description||'')+' '+
-    String(m.director||'')+' '+
-    String(m.cast_text||'')+' '+
-    arr(m.genres).join(' ')+' '+
-    arr(m.tags).join(' ')
-  ).toLowerCase();
-}
-
-function renderMovieResults(q){
-  const title=document.getElementById('sb128SearchTitle');
-  const results=document.getElementById('sb128SearchResults');
-
-  if(!results) return;
-
-  const needle=String(q||'').trim().toLowerCase();
-
-  if(!needle || needle.length<2){
-    results.innerHTML='';
-    if(title) title.textContent='Movie search';
-    return;
-  }
-
-  const hits=movies.filter(function(m){
-    return searchText(m).includes(needle);
-  }).slice(0,10);
-
-  if(title){
-    title.textContent=hits.length?'Movie results for “'+needle+'”':'No movie results for “'+needle+'”';
-  }
-
-  if(moviesError){
-    results.innerHTML='<div class="sb128-note">Movie search error: '+esc(moviesError)+'</div>';
-    return;
-  }
-
-  if(!hits.length){
-    results.innerHTML='<div class="sb128-note">No matching movies yet. Press Enter for full Global Search.</div>';
-    return;
-  }
-
-  results.innerHTML=hits.map(function(m){
-    const id=encodeURIComponent(m.id||'');
-    const img=poster(m);
-    const play=firstVideo(m);
-
-    return '<div class="sb128-search-result">'+
-      '<a class="sb128-thumb" href="'+esc(ROUTES.details+'?id='+id)+'">'+
-        (img?'<img src="'+esc(img)+'" alt="">':'🎬')+
-      '</a>'+
-      '<div>'+
-        '<a href="'+esc(ROUTES.details+'?id='+id)+'" style="color:#fff;text-decoration:none"><b>'+esc(m.title||'Untitled')+'</b></a>'+
-        '<small>Movie result · '+esc([m.year,m.age_rating,m.runtime_text].filter(Boolean).join(' · ')||'Stream Bandit')+'</small>'+
-        '<span class="sb128-desc">'+esc(snippet(m.description||'No description yet.'))+'</span>'+
-        '<div class="sb128-row-actions">'+
-          '<a class="sb128-mini-btn" href="'+esc(ROUTES.details+'?id='+id)+'">Details</a>'+
-          (play?'<a class="sb128-mini-btn hot" href="'+esc(ROUTES.player1+'?id='+id)+'">Play</a>':'')+
-        '</div>'+
-      '</div>'+
-    '</div>';
-  }).join('');
-}
-
-async function openMovieOverlay(input,q){
-  const overlay=ensureMovieOverlay(input);
-
-  if(!overlay) return;
-
-  const value=String(q||input.value||'').trim();
-
-  if(value.length<2){
-    overlay.classList.remove('open');
-    return;
-  }
-
-  overlay.classList.add('open');
-
-  const results=document.getElementById('sb128SearchResults');
-  const title=document.getElementById('sb128SearchTitle');
-
-  if(title){
-    title.textContent='Searching movies for “'+value+'”';
-  }
-
-  if(results){
-    results.innerHTML='<div class="sb128-note">Loading movies from Supabase <b>sb_movies</b>...</div>';
-  }
-
-  await loadMovies();
-
-  renderMovieResults(value);
-}
-
-function disableOldShellSearchOverlay(){
-  const old=document.getElementById('sbGlobalShellSearchOverlay');
-
-  if(old){
-    old.classList.remove('open');
-    old.style.display='none';
-    old.style.visibility='hidden';
-    old.style.pointerEvents='none';
-  }
-}
-
-function installMovieSearch(){
-  const input=document.getElementById('globalSearch')||document.getElementById('topSearch');
-  const btn=document.getElementById('globalSearchBtn')||document.getElementById('topSearchBtn');
-
-  if(!input) return;
-
-  ensureMovieOverlay(input);
-  disableOldShellSearchOverlay();
-
-  input.oninput=function(e){
-    if(e){
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    openMovieOverlay(input,input.value);
-
-    return false;
-  };
-
-  input.onfocus=function(e){
-    if(e) e.stopPropagation();
-
-    if(String(input.value||'').trim().length>1){
-      openMovieOverlay(input,input.value);
-    }
-
-    return false;
-  };
-
-  input.onkeydown=function(e){
-    if(e.key==='Enter'){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-
-      const q=String(input.value||'').trim();
-
-      location.href=ROUTES.search+(q?'?q='+encodeURIComponent(q):'');
-
-      return false;
-    }
-
-    if(e.key==='Escape'){
-      const overlay=document.getElementById('sb128MovieSearchOverlay');
-
-      if(overlay){
-        overlay.classList.remove('open');
-      }
-    }
-  };
-
-  input.addEventListener('input',function(e){
-    e.preventDefault();
-    e.stopImmediatePropagation();
-
-    openMovieOverlay(input,input.value);
-  },true);
-
-  if(btn){
-    btn.onclick=function(e){
-      if(e){
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      }
-
-      const q=String(input.value||'').trim();
-
-      if(q.length>1){
-        openMovieOverlay(input,q);
-      }else{
-        location.href=ROUTES.search;
-      }
-
-      return false;
-    };
-  }
-
-  document.addEventListener('click',function(e){
-    const overlay=document.getElementById('sb128MovieSearchOverlay');
-
-    if(overlay && !e.target.closest('.searchWrap') && !e.target.closest('#sb128MovieSearchOverlay')){
-      overlay.classList.remove('open');
-    }
-  },true);
-
-  document.documentElement.dataset.streamBanditMovieOverlaySearch='v7-12-128';
-}
-
-function fixMenuSaveCounts(){
-  try{
-    const drawer=document.getElementById('sbShellDrawer');
-
-    if(!drawer || !window.StreamBanditCoreSavesV675 || !window.StreamBanditCoreSavesV675.counts) return;
-
-    const counts=window.StreamBanditCoreSavesV675.counts()||{};
-
-    const targets=[
-      ['watchlist','Watchlist',counts.watchlist||0],
-      ['favourites','Favourites',counts.favourites||0],
-      ['liked','Liked',counts.likes||counts.liked||0]
-    ];
-
-    targets.forEach(function(t){
-      const key=t[0];
-      const label=t[1];
-      const value=t[2];
-
-      const link=Array.from(drawer.querySelectorAll('a.sb-shell-link')).find(function(a){
-        return String(a.textContent||'').toLowerCase().includes(label.toLowerCase());
-      });
-
-      if(!link) return;
-
-      let badge=link.querySelector('[data-sb128-save-count="'+key+'"]');
-
-      if(!badge){
-        badge=document.createElement('span');
-        badge.dataset.sb128SaveCount=key;
-        badge.style.cssText='margin-left:auto;display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#22d3a62b;border:1px solid #22d3a66b;color:#dfffee;font-size:12px;font-weight:950';
-        link.appendChild(badge);
-      }
-
-      badge.textContent=String(value);
-    });
-  }catch(e){}
-}
-
-function refreshAll(){
-  patchRoutes(document);
-  removeDuplicateIconStrips();
-  installOwnerIcons();
-  installMovieSearch();
-  promoteOverlayMenu();
-  fixMenuSaveCounts();
-  applyOverlayAvatar();
-
-  document.dispatchEvent(new CustomEvent('streambandit:global-helper-loader-refresh',{
-    detail:{
-      version:VERSION,
-      site:SITE,
-      routes:ROUTES,
-      auth:lastAuth,
-      movieCount:movies.length,
-      moviesLoaded:moviesLoaded,
-      movieError:moviesError
-    }
-  }));
-}
-
-async function refreshAuthThenAll(){
-  await readAuth();
-  refreshAll();
-}
-
-function hookMenuButton(){
-  document.addEventListener('click',function(e){
-    if(e.target.closest('#sbShellMenuToggle') || e.target.closest('[data-sb-open-menu]')){
-      setTimeout(refreshAuthThenAll,80);
-      setTimeout(refreshAuthThenAll,180);
-      setTimeout(refreshAuthThenAll,450);
-      setTimeout(refreshAuthThenAll,900);
-      setTimeout(refreshAuthThenAll,1400);
-    }
-  },true);
-}
-
-function hookAuthEvents(){
-  document.addEventListener('streambandit:auth-state',function(e){
-    const d=e.detail||{};
-    const user=d.user||null;
-    const profile=d.profile||null;
-
-    lastAuth.signedIn=!!user;
-    lastAuth.email=user&&user.email||lastAuth.email||'';
-    lastAuth.role=profile&&profile.role||d.role||lastAuth.role||'signed-out';
-    lastAuth.avatar=profile&&profile.avatar_url||lastAuth.avatar||'';
-
-    setTimeout(refreshAuthThenAll,120);
-  });
-}
-
-function startDrawerObserver(){
-  if(observerStarted) return;
-
-  observerStarted=true;
-
-  try{
-    const obs=new MutationObserver(function(){
-      const drawer=document.getElementById('sbShellDrawer');
-
-      if(drawer){
-        setTimeout(refreshAuthThenAll,50);
-        setTimeout(refreshAuthThenAll,220);
-      }
-    });
-
-    obs.observe(document.body,{childList:true,subtree:true});
-  }catch(e){}
-}
-
-function boot(){
-  installStyle();
-  patchRoutes(document);
-  installMovieSearch();
-  hookMenuButton();
-  hookAuthEvents();
-  startDrawerObserver();
-
-  setTimeout(refreshAuthThenAll,150);
-  setTimeout(refreshAuthThenAll,450);
-  setTimeout(refreshAuthThenAll,900);
-  setTimeout(refreshAuthThenAll,1700);
-  setTimeout(refreshAuthThenAll,3200);
-
-  setInterval(refreshAll,1500);
-
-  window.StreamBanditGlobalHelperLoader={
-    version:VERSION,
-    site:SITE,
-    routes:ROUTES,
-    routeFixes:ROUTE_FIXES,
-    refresh:refreshAuthThenAll,
-    patchRoutes:patchRoutes,
-    installMovieSearch:installMovieSearch,
-    promoteOverlayMenu:promoteOverlayMenu,
-    state:function(){
-      return {
-        version:VERSION,
-        site:SITE,
-        auth:Object.assign({},lastAuth),
-        movieCount:movies.length,
-        moviesLoaded:moviesLoaded,
-        movieError:moviesError,
-        owner:isOwner(),
-        oldRegistryRoute:ROUTES.oldRegistry,
-        promotedRegistryRoute:ROUTES.registry
-      };
-    }
-  };
-
-  document.documentElement.dataset.streamBanditGlobalHelperLoader='v7-12-128';
-}
-
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
-else boot();
-
+const LABEL_FIXES={
+  'Admin Centre':[ROUTES.admin,'Admin command deck'],
+  'Live Readiness':[ROUTES.readiness,'Release smoke test'],
+  'Version Registry':[ROUTES.registry,'Current route scanner','Current Routes Registry'],
+  'Current Routes Registry':[ROUTES.registry,'Current route scanner'],
+  'Test Checklist':[ROUTES.checklist,'Testing'],
+  'Tools':[ROUTES.tools,'Tools'],
+  'Health Check':[ROUTES.health,'Health'],
+  'Mux Manager':[ROUTES.mux,'Mux'],
+  'Storage Prep':[ROUTES.storage,'Storage'],
+  'Backup / Safety':[ROUTES.backup,'Backup'],
+  'Web Builder Studio':[ROUTES.builder,'Builder rebuild route'],
+  'Pages Manager':[ROUTES.pagesManager,'Create, edit, hide, restore and guarded-delete Web Builder pages'],
+  'Published Preview':[ROUTES.preview,'Interactive published Web Builder preview'],
+  'Policy & FAQ Centre':[ROUTES.policyCentre,'Policy'],
+  'Published Policy Proof':[ROUTES.policyReader,'Read-only proof'],
+  'Policy Admin Editor':[ROUTES.policyAdmin,'Policy admin'],
+  'Platform Control Centre':[ROUTES.platformControl,'Owner controls hub'],
+  'Clean Machine Menu':[ROUTES.registry,'Owner diagnostic routed to current registry'],
+  'Route Guard Proof':[ROUTES.health,'Owner diagnostic routed to health check'],
+  'Route Pointer Machine':[ROUTES.registry,'Owner diagnostic routed to current registry'],
+  'Final Shell Navigation':[ROUTES.helperShell,'Owner diagnostic routed to helper shell'],
+  'Brand / App Icons':[ROUTES.brandIcons,'Brand tools'],
+  'Brand Image Helper':[ROUTES.brandIcons,'Brand helper routed to brand tools'],
+  'Favicon / App Icon Builder':[ROUTES.brandIcons,'Icon builder routed to brand tools'],
+  'Settings Studio':[ROUTES.theme,'Theme Studio owner'],
+  'Settings':[ROUTES.platformControl,'Clean useful Settings Hub'],
+  'Web Builder':[ROUTES.builder,'Builder Studio route'],
+  'Profile Settings':[ROUTES.profile,'Profile image overlay'],
+  'Supabase Library Editor':[ROUTES.supabaseLibrary,'Supabase editor'],
+  'Library':[ROUTES.library,'Supabase Library'],
+  'Genres':[ROUTES.genres,'Genres'],
+  'Global Search':[ROUTES.search,'Full search'],
+  'About':[ROUTES.about,'About'],
+  'Playlists':[ROUTES.playlists,'Playlists'],
+  'Channels':[ROUTES.channels,'Channels'],
+  'My Channel':[ROUTES.myChannel,'My Channel'],
+  'Collections':[ROUTES.collections,'Collections'],
+  'Player 2':[ROUTES.player2,'Group Player'],
+  'Submit Video':[ROUTES.submit,'Passed direct poster upload + direct submission'],
+  'Rules':[ROUTES.rules,'Passed workflow checkpoint'],
+  'Review Queue':[ROUTES.review,'Passed publish to Library']
+};
+function fileOf(v){return String(v||'').split('/').pop().split('?')[0].split('#')[0];}
+function pageParam(){try{return new URL(location.href).searchParams.get('page')||DEF;}catch(e){return DEF;}}
+function pageRoute(route,oldValue){if(!String(route||'').includes('page=test-page'))return route;let p=pageParam();try{let u=new URL(String(oldValue||''),location.href);p=u.searchParams.get('page')||p;}catch(e){}return String(route).replace('page=test-page','page='+encodeURIComponent(p));}
+function fixedUrl(raw){if(!raw||!String(raw).includes('.html'))return raw;let target=ROUTE_FIXES[fileOf(raw)];return target?pageRoute(target,raw):raw;}
+function clean(s){return String(s||'').replace(/\s+/g,' ').trim();}
+function labelOf(a){let b=a.querySelector&&a.querySelector('b,.sb-shell-title');return clean(b?b.textContent:a.textContent).replace(/ Current$/,'');}
+function patchLabelLink(a){if(!a||!a.getAttribute)return 0;let label=labelOf(a),fix=LABEL_FIXES[label];if(!fix)return 0;let changed=0,old=a.getAttribute('href')||'';if(old!==fix[0]){a.setAttribute('href',pageRoute(fix[0],old));changed++;}let b=a.querySelector('b,.sb-shell-title');if(fix[2]&&b&&clean(b.textContent)!==fix[2]){b.textContent=fix[2];changed++;}let sm=a.querySelector('small,.sb-shell-desc');if(sm&&fix[1]&&clean(sm.textContent)!==fix[1]){sm.textContent=fix[1];changed++;}a.dataset.sbRouteFixedBy='v7-12-156-loader';return changed;}
+function patchRoutes(root){root=root||document;let changed=0;try{root.querySelectorAll('a[href],form[action],[data-href],[data-target],[data-route],[data-url]').forEach(function(el){['href','action','data-href','data-target','data-route','data-url'].forEach(function(attr){let old=el.getAttribute(attr),fixed=fixedUrl(old);if(old&&fixed&&fixed!==old){el.setAttribute(attr,fixed);el.dataset.sbRouteFixedBy='v7-12-156-loader';changed++;}});if(el.matches&&el.matches('a'))changed+=patchLabelLink(el);});}catch(e){}try{document.documentElement.dataset.sb156LoaderRoutesFixed=String((Number(document.documentElement.dataset.sb156LoaderRoutesFixed)||0)+changed);}catch(e){}return changed;}
+function patchRouteGlobals(){try{window.StreamBanditRoutes=Object.assign(window.StreamBanditRoutes||{},ROUTES,{oldRegistry:ROUTES.registry,builderStudio:ROUTES.builder,policyProof:ROUTES.policyReader,policyAdmin:ROUTES.policyAdmin,platformControl:ROUTES.platformControl,cleanMenu:ROUTES.registry,guard:ROUTES.health,pointer:ROUTES.registry,finalShell:ROUTES.helperShell,brandLogoHelper:ROUTES.brandIcons,faviconBuilder:ROUTES.brandIcons});}catch(e){}}
+function hideOldSearchOverlays(){['sbGlobalShellSearchOverlay','sb128MovieSearchOverlay','sb129SiteSearchOverlay','searchOverlay'].forEach(function(id){let el=document.getElementById(id);if(el){el.classList.remove('open');el.style.display='none';el.style.visibility='hidden';el.style.pointerEvents='none';}});}
+function loadScript(src){try{if(Array.from(document.scripts||[]).some(s=>String(s.src||'').includes(src.split('?')[0])))return;let s=document.createElement('script');s.src=src;s.defer=true;s.dataset.sbLoadedBy='v7-12-156-loader';document.head.appendChild(s);}catch(e){}}
+function ensureFallback(){loadScript('live-readiness-search-supabase-fallback-v7-12-130.js?v=7-12-156-loader');}
+function refresh(){patchRouteGlobals();patchRoutes(document);hideOldSearchOverlays();ensureFallback();try{if(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.sanitizeMenu)window.StreamBanditLiveReadinessSearchFallback.sanitizeMenu();}catch(e){}document.dispatchEvent(new CustomEvent('streambandit:global-helper-loader-refresh',{detail:{version:VERSION,routes:ROUTES}}));return {version:VERSION,routes:ROUTES};}
+function boot(){patchRouteGlobals();refresh();setTimeout(refresh,250);setTimeout(refresh,900);setTimeout(refresh,1800);setTimeout(refresh,3200);setInterval(function(){patchRouteGlobals();patchRoutes(document);},2500);try{let obs=new MutationObserver(function(){patchRoutes(document);});obs.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['href','action','data-href','data-target','data-route','data-url']});}catch(e){}window.StreamBanditGlobalHelperLoader={version:VERSION,refresh:refresh,patchRoutes:patchRoutes,routes:ROUTES,state:()=>({version:VERSION,routes:ROUTES})};document.documentElement.dataset.streamBanditGlobalHelperLoader='v7-12-156';}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
