@@ -1,1 +1,465 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit V7.8.9 Theme Studio Controls TEST</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>:root{--bg:#050711;--card:#101529;--card2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--title:#fff;--accent:#22d3a6;--accent2:#7c3cff;--btnText:#fff;--fontScale:1}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 70%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 68%),transparent 38%),var(--bg);color:var(--title);font-family:system-ui,Arial;padding:22px;font-size:calc(16px * var(--fontScale))}.wrap{max-width:1220px;margin:auto}.box,.card,.field,.preview{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--card),var(--card2));padding:20px;margin:0 0 16px;box-shadow:0 18px 60px #0007}.pill,.badge{display:inline-block;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:900;padding:6px 10px;font-size:12px}.btn{border:0;border-radius:999px;padding:11px 15px;background:#414667;color:white;font-weight:900;text-decoration:none;display:inline-block;margin:4px;cursor:pointer}.primary,.active{background:linear-gradient(135deg,var(--accent),var(--accent2))}.warn{background:linear-gradient(135deg,#ffb142,var(--accent2))}.hot{background:linear-gradient(135deg,#ff2d85,var(--accent2))}h1{font-size:clamp(38px,7vw,72px);line-height:.95;margin:8px 0}p,label{color:var(--muted);line-height:1.5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.field{padding:14px}.field b,.card b{color:#baf7df;display:block;margin-bottom:8px}input,select{width:100%;border:1px solid #ffffff24;border-radius:14px;background:#0006;color:white;padding:11px;font:inherit}.checkBox input{width:auto;margin-right:8px}.note{background:#ffb1421f;border:1px solid #ffb14252;color:#ffe7ad;border-radius:16px;padding:12px;font-weight:800}.good{background:#22d3a61f;border-color:#22d3a652;color:#baf7df}.src{white-space:pre-wrap;word-break:break-word;background:#0006;border-radius:14px;padding:12px;color:#dfffee;max-height:260px;overflow:auto}.previewTop{display:grid;grid-template-columns:80px 1fr 200px;gap:16px;align-items:center}.logoPreview{width:70px;height:70px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:30px}.shelves{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:14px}.shelf{border:1px solid #ffffff1a;border-radius:16px;padding:14px;background:#0005;font-weight:900;color:var(--title)}.swatch{height:54px;border-radius:16px;border:1px solid #ffffff33;margin:8px 0}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{border:0;border-radius:999px;padding:10px 14px;background:#414667;color:white;font-weight:900;cursor:pointer}.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2))}@media(max-width:850px){.previewTop{grid-template-columns:1fr}}</style></head><body><div class="wrap"><section class="box"><span class="badge">V7.8.9 Theme Studio Controls TEST</span><h1>🎨 Theme Studio</h1><p>Borrowed Theme Studio controls for Web Builder: presets, large text, high contrast and JSON preview, plus the V7.8.8 shared style controls.</p><p id="status" class="note">Ready.</p></section><section class="preview"><div class="previewTop"><div class="logoPreview">🎬</div><div><h2>Stream Bandit Builder</h2><p>Theme preview for future Web Builder pages.</p><span class="pill">Shared Studio style</span></div><div><span class="pill">Preview only</span></div></div><div class="note"><b>Welcome to the Web Builder Theme Studio</b><p>These controls are ready to feed Builder, Preview and Block Pages after sync.</p><div class="shelves"><div class="shelf">Hero</div><div class="shelf">FAQ</div><div class="shelf">Pricing</div><div class="shelf">Forms</div><div class="shelf">Gallery</div><div class="shelf">Reviews</div></div></div></section><section class="box"><h2>Theme Studio borrowed controls</h2><div class="tabs"><button class="tab active" data-preset="bandit">Dark Bandit</button><button class="tab" data-preset="purple">Neon Purple</button><button class="tab" data-preset="ocean">Ocean</button><button class="tab" data-preset="cinema">Cinema Red</button></div><div class="grid" style="margin-top:14px"><label class="card checkBox"><b><input id="largeText" type="checkbox"> Large text</b><p>Borrowed from Settings Studio open tab.</p></label><label class="card checkBox"><b><input id="highContrast" type="checkbox"> High contrast</b><p>Borrowed from Settings Studio open tab.</p></label><article class="card"><b>Theme JSON</b><p>Preview the exact shared style object.</p><button id="showJson" class="btn primary">Show theme JSON</button></article></div></section><section class="box"><h2>Shared style controls</h2><div class="grid"><label class="field"><b>Accent 1</b><input id="accent" type="color" value="#22d3a6"></label><label class="field"><b>Accent 2</b><input id="accent2" type="color" value="#7c3cff"></label><label class="field"><b>Background</b><input id="bg" type="color" value="#050711"></label><label class="field"><b>Card colour</b><input id="card" type="color" value="#101529"></label><label class="field"><b>Title colour</b><input id="titleColor" type="color" value="#ffffff"></label><label class="field"><b>Text colour</b><input id="textColor" type="color" value="#b9c0d8"></label><label class="field"><b>Button text colour</b><input id="buttonText" type="color" value="#ffffff"></label><label class="field"><b>Font</b><select id="font"><option value="system-ui,Arial">System</option><option value="Inter,system-ui,Arial">Inter</option><option value="Arial,sans-serif">Arial</option><option value="Verdana,sans-serif">Verdana</option><option value="Georgia,serif">Georgia</option></select></label></div><button id="apply" class="btn primary">Apply Preview</button><button id="save" class="btn hot">Save Shared Style</button><button id="load" class="btn">Load Shared Style</button></section><section class="box"><h2>Open current Web Builder pages</h2><div class="grid"><article class="card"><b>Current Full Builder</b><p>Passed V7.8.5 builder.</p><a class="btn hot" href="web-builder-full-edit-lock-v7-8-5-test.html?page=test-page">Open Builder</a></article><article class="card"><b>Current Preview</b><p>Passed V7.8.1 preview.</p><a class="btn" href="web-builder-preview-block-pages-v7-8-1-test.html?page=test-page">Open Preview</a></article><article class="card"><b>Current Workflow</b><p>Passed V7.8.6 workflow hub.</p><a class="btn warn" href="web-builder-workflow-current-v7-8-6-test.html">Open Workflow</a></article></div></section><section class="box"><h2>Theme JSON / Debug</h2><div id="debug" class="src">Waiting...</div></section></div><script src="stream-bandit-shell-v6-24.js"></script><script>let sb;const STORE_ID='stream_bandit';const STYLE_KEY='web_builder_shared_style_v7_8_8';const $=i=>document.getElementById(i);const presets={bandit:{accent:'#22d3a6',accent2:'#7c3cff',bg:'#050711',card:'#101529',titleColor:'#ffffff',textColor:'#b9c0d8',buttonText:'#ffffff'},purple:{accent:'#ff2d85',accent2:'#7c3cff',bg:'#11051f',card:'#26114a',titleColor:'#ffffff',textColor:'#e2d7ff',buttonText:'#ffffff'},ocean:{accent:'#22d3a6',accent2:'#1d8cf8',bg:'#03131d',card:'#092c3a',titleColor:'#ffffff',textColor:'#c7ecff',buttonText:'#ffffff'},cinema:{accent:'#ff3b3b',accent2:'#ffb142',bg:'#120406',card:'#321013',titleColor:'#fff3e0',textColor:'#ffd6c6',buttonText:'#ffffff'}};async function init(){if(sb)return;let t=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text());sb=supabase.createClient((t.match(/SUPABASE_URL\s*=\s*'([^']+)'/)||[])[1],(t.match(/SUPABASE_KEY\s*=\s*'([^']+)'/)||[])[1])}function styleObj(){return{accent:$('accent').value,accent2:$('accent2').value,bg:$('bg').value,card:$('card').value,titleColor:$('titleColor').value,textColor:$('textColor').value,buttonText:$('buttonText').value,font:$('font').value,largeText:$('largeText').checked,highContrast:$('highContrast').checked,source:'theme-studio-borrowed-controls',version:'V7.8.9'}}function setFields(s){s=s||{};$('accent').value=s.accent||'#22d3a6';$('accent2').value=s.accent2||'#7c3cff';$('bg').value=s.bg||'#050711';$('card').value=s.card||'#101529';$('titleColor').value=s.titleColor||'#ffffff';$('textColor').value=s.textColor||'#b9c0d8';$('buttonText').value=s.buttonText||'#ffffff';$('font').value=s.font||'system-ui,Arial';$('largeText').checked=!!s.largeText;$('highContrast').checked=!!s.highContrast}function apply(){let s=styleObj();document.documentElement.style.setProperty('--accent',s.accent);document.documentElement.style.setProperty('--accent2',s.accent2);document.documentElement.style.setProperty('--bg',s.bg);document.documentElement.style.setProperty('--card',s.card);document.documentElement.style.setProperty('--card2',s.card);document.documentElement.style.setProperty('--title',s.titleColor);document.documentElement.style.setProperty('--muted',s.textColor);document.documentElement.style.setProperty('--btnText',s.buttonText);document.documentElement.style.setProperty('--fontScale',s.largeText?'1.12':'1');document.documentElement.style.setProperty('--line',s.highContrast?'#ffffff66':'#ffffff22');document.body.style.fontFamily=s.font;$('debug').textContent=JSON.stringify(s,null,2);$('status').className='note good';$('status').textContent='Preview updated. Borrowed Theme Studio controls included.'}async function load(){try{await init();let r=await sb.from('sb_app_settings').select('settings').eq('id',STORE_ID).maybeSingle();if(r.error)throw r.error;let settings=(r.data&&r.data.settings)||{};let saved=settings[STYLE_KEY]||settings.web_builder_style||settings.builderStyle||{};setFields(saved);apply();$('status').textContent=saved.version?'Loaded saved shared style.':'No saved shared style yet; using defaults.'}catch(e){$('status').className='note';$('status').textContent='Load failed or table unavailable: '+(e.message||e)}}async function save(){try{await init();let old=await sb.from('sb_app_settings').select('settings').eq('id',STORE_ID).maybeSingle();if(old.error)throw old.error;let settings=(old.data&&old.data.settings)||{};settings[STYLE_KEY]=styleObj();settings.web_builder_style=styleObj();let r=await sb.from('sb_app_settings').upsert({id:STORE_ID,settings,updated_at:new Date().toISOString()},{onConflict:'id'}).select('*').single();if(r.error)throw r.error;$('status').className='note good';$('status').textContent='Saved shared Theme Studio style to sb_app_settings.';$('debug').textContent=JSON.stringify(r.data.settings[STYLE_KEY],null,2)}catch(e){$('status').className='note';$('status').textContent='Save failed: '+(e.message||e);$('debug').textContent=JSON.stringify(e,null,2)}}document.querySelectorAll('input,select').forEach(el=>el.oninput=apply);document.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-preset]').forEach(x=>x.classList.remove('active'));b.classList.add('active');setFields({...styleObj(),...presets[b.dataset.preset]});apply()});$('showJson').onclick=apply;$('apply').onclick=apply;$('load').onclick=load;$('save').onclick=save;load();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit V7.8.9 Theme Studio Controls TEST</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#050711;
+  --p:#101529;
+  --p2:#17122d;
+  --card:#101529;
+  --card2:#17122d;
+  --line:#ffffff22;
+  --muted:#b9c0d8;
+  --title:#ffffff;
+  --accent:#22d3a6;
+  --accent2:#7c3cff;
+  --pink:#ff2d85;
+  --warn:#ffb142;
+  --btnText:#ffffff;
+  --fontScale:1;
+}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
+body{
+  margin:0;
+  padding:22px;
+  background:
+    radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 70%),transparent 34%),
+    radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 68%),transparent 38%),
+    var(--bg);
+  color:var(--title);
+  font-family:Inter,system-ui,Arial,sans-serif;
+  font-size:calc(16px * var(--fontScale));
+}
+.wrap{max-width:1500px;margin:auto}
+.box,.card,.field,.preview,.swatchCard{
+  border:1px solid var(--line);
+  border-radius:24px;
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  padding:20px;
+  margin:0 0 16px;
+  box-shadow:0 18px 60px #0007;
+}
+.badge,.pill{
+  display:inline-flex;
+  border-radius:999px;
+  background:#22d3a624;
+  border:1px solid #22d3a657;
+  color:#baf7df;
+  font-weight:950;
+  padding:6px 10px;
+  font-size:12px;
+}
+.btn,.tab{
+  border:0;
+  border-radius:999px;
+  padding:11px 15px;
+  background:#414667;
+  color:var(--btnText);
+  font-weight:950;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin:4px;
+  cursor:pointer;
+}
+.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}
+.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}
+h1{font-size:clamp(42px,6vw,78px);line-height:.95;margin:8px 0;letter-spacing:-.06em}
+h2{margin:0 0 12px}
+p,label,small{color:var(--muted);line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.field{padding:14px}
+.field b,.card b,.swatchCard b{color:#baf7df;display:block;margin-bottom:8px}
+input,select{
+  width:100%;
+  border:1px solid #ffffff24;
+  border-radius:14px;
+  background:#0006;
+  color:white;
+  padding:11px;
+  font:inherit;
+}
+.checkBox input{width:auto;margin-right:8px}
+.note,.status{
+  background:#ffb1421f;
+  border:1px solid #ffb14252;
+  color:#ffe7ad;
+  border-radius:16px;
+  padding:12px;
+  font-weight:850;
+  margin-top:12px;
+}
+.good{background:#22d3a61f;border-color:#22d3a652;color:#baf7df}
+.src{
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:#0006;
+  border-radius:14px;
+  padding:12px;
+  color:#dfffee;
+  max-height:360px;
+  overflow:auto;
+  font-family:ui-monospace,Consolas,monospace;
+}
+.previewTop{display:grid;grid-template-columns:90px 1fr minmax(180px,260px);gap:16px;align-items:center}
+.logoPreview{width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:34px}
+.shelves{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:14px}
+.shelf{border:1px solid #ffffff1a;border-radius:16px;padding:14px;background:#0005;font-weight:950;color:var(--title)}
+.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{height:58px;border-radius:16px;border:1px solid #ffffff33;margin:8px 0}
+.micro{text-align:center;color:#8f98b8;margin:26px 0}
+@media(max-width:850px){.previewTop{grid-template-columns:1fr}.btn,.tab{width:100%}}
+</style>
+</head>
+<body data-sb-theme-owner="web-builder-theme-studio-controls-v7-8-9-test.html">
+<div class="wrap">
+
+<section class="box">
+  <span class="badge">V7.8.9 Theme Studio Controls TEST · Global Theme Owner</span>
+  <h1>🎨 Theme Studio</h1>
+  <p>This is the single owner of the Stream Bandit global theme. Header Shell and Footer Shell only read/project this saved theme across pages.</p>
+  <div class="actions">
+    <button id="apply" class="btn primary" type="button">Apply Preview</button>
+    <button id="save" class="btn hot" type="button">Save Global Theme</button>
+    <button id="load" class="btn" type="button">Load Saved Theme</button>
+    <button id="reset" class="btn warn" type="button">Reset Bandit Default</button>
+    <a class="btn" href="live-readiness-global-helpers-v7-10-2-test.html">Back to Readiness</a>
+  </div>
+  <p id="status" class="status">Ready. Theme Studio is the owner.</p>
+</section>
+
+<section class="preview">
+  <div class="previewTop">
+    <div class="logoPreview">🎬</div>
+    <div>
+      <h2>Stream Bandit Global Theme Preview</h2>
+      <p>These colours are projected into the two-shell system using shared CSS variables.</p>
+      <span class="pill">Header + page + footer theme bridge</span>
+    </div>
+    <div>
+      <span class="pill">Owner: Theme Studio</span>
+      <p><small>Save once, refresh any shell page to see it.</small></p>
+    </div>
+  </div>
+  <div class="note good">
+    <b>Projection target:</b>
+    <p>Saved theme writes to Supabase <code>sb_app_settings</code> and local browser keys so the new shells can read it quickly.</p>
+    <div class="shelves">
+      <div class="shelf">Header</div>
+      <div class="shelf">Footer</div>
+      <div class="shelf">Cards</div>
+      <div class="shelf">Buttons</div>
+      <div class="shelf">Text</div>
+      <div class="shelf">Accessibility</div>
+    </div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Presets</h2>
+  <div class="tabs">
+    <button class="tab active" data-preset="bandit" type="button">Dark Bandit</button>
+    <button class="tab" data-preset="purple" type="button">Neon Purple</button>
+    <button class="tab" data-preset="ocean" type="button">Ocean</button>
+    <button class="tab" data-preset="cinema" type="button">Cinema Red</button>
+    <button class="tab" data-preset="forest" type="button">Forest</button>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Shared theme controls</h2>
+  <div class="grid">
+    <label class="field"><b>Accent 1</b><input id="accent" type="color" value="#22d3a6"></label>
+    <label class="field"><b>Accent 2</b><input id="accent2" type="color" value="#7c3cff"></label>
+    <label class="field"><b>Background</b><input id="bg" type="color" value="#050711"></label>
+    <label class="field"><b>Panel 1 / Card</b><input id="card" type="color" value="#101529"></label>
+    <label class="field"><b>Panel 2 / Card 2</b><input id="card2" type="color" value="#17122d"></label>
+    <label class="field"><b>Title colour</b><input id="titleColor" type="color" value="#ffffff"></label>
+    <label class="field"><b>Text colour</b><input id="textColor" type="color" value="#b9c0d8"></label>
+    <label class="field"><b>Button text colour</b><input id="buttonText" type="color" value="#ffffff"></label>
+    <label class="field"><b>Font</b><select id="font"><option value="Inter,system-ui,Arial,sans-serif">Inter / System</option><option value="system-ui,Arial,sans-serif">System</option><option value="Arial,sans-serif">Arial</option><option value="Verdana,sans-serif">Verdana</option><option value="Georgia,serif">Georgia</option></select></label>
+    <label class="card checkBox"><b><input id="largeText" type="checkbox"> Large text</b><p>Projects larger text through <code>--fontScale</code>.</p></label>
+    <label class="card checkBox"><b><input id="highContrast" type="checkbox"> High contrast</b><p>Projects stronger border lines through <code>--line</code>.</p></label>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Swatches</h2>
+  <div class="grid">
+    <article class="swatchCard"><b>Accent</b><div id="swAccent" class="swatch"></div><small id="swAccentText"></small></article>
+    <article class="swatchCard"><b>Accent 2</b><div id="swAccent2" class="swatch"></div><small id="swAccent2Text"></small></article>
+    <article class="swatchCard"><b>Background</b><div id="swBg" class="swatch"></div><small id="swBgText"></small></article>
+    <article class="swatchCard"><b>Panel</b><div id="swCard" class="swatch"></div><small id="swCardText"></small></article>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Current shell pages</h2>
+  <div class="grid">
+    <article class="card"><b>Live Readiness</b><p>Proof page using header/footer shells.</p><a class="btn primary" href="live-readiness-global-helpers-v7-10-2-test.html">Open Readiness</a></article>
+    <article class="card"><b>Web Builder Studio</b><p>Current builder route.</p><a class="btn hot" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Open Builder</a></article>
+    <article class="card"><b>Published Preview</b><p>Current preview route.</p><a class="btn" href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Open Preview</a></article>
+    <article class="card"><b>Current Registry</b><p>Route scanner.</p><a class="btn warn" href="all-pages-version-registry-v7-12-122-current-routes-test.html">Open Registry</a></article>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Theme JSON / Debug</h2>
+  <div id="debug" class="src">Waiting...</div>
+</section>
+
+<p class="micro">Theme Studio owns the theme. Header and Footer Shells read and project it.</p>
+</div>
+
+<script src="stream-bandit-header-shell-v7-12-156.js?v=theme-owner-1"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=theme-owner-1"></script>
+<script>
+(function(){
+'use strict';
+
+const STORE_ID = 'stream_bandit';
+const STYLE_KEY = 'web_builder_shared_style_v7_8_8';
+const GLOBAL_KEYS = [
+  'streamBanditTheme',
+  'stream-bandit-theme',
+  'sbTheme',
+  'sb_theme',
+  'web_builder_shared_style_v7_8_8',
+  'web_builder_style'
+];
+const VERSION = 'V7.8.9 Theme Studio Global Owner';
+let sb = null;
+
+const $ = id => document.getElementById(id);
+
+const presets = {
+  bandit:{accent:'#22d3a6',accent2:'#7c3cff',bg:'#050711',card:'#101529',card2:'#17122d',titleColor:'#ffffff',textColor:'#b9c0d8',buttonText:'#ffffff'},
+  purple:{accent:'#ff2d85',accent2:'#7c3cff',bg:'#11051f',card:'#21103a',card2:'#321a58',titleColor:'#ffffff',textColor:'#e2d7ff',buttonText:'#ffffff'},
+  ocean:{accent:'#22d3a6',accent2:'#1d8cf8',bg:'#03131d',card:'#092c3a',card2:'#0d3b52',titleColor:'#ffffff',textColor:'#c7ecff',buttonText:'#ffffff'},
+  cinema:{accent:'#ff3b3b',accent2:'#ffb142',bg:'#120406',card:'#321013',card2:'#45151a',titleColor:'#fff3e0',textColor:'#ffd6c6',buttonText:'#ffffff'},
+  forest:{accent:'#22d3a6',accent2:'#38b000',bg:'#03140b',card:'#0b2618',card2:'#123822',titleColor:'#f0fff4',textColor:'#c8f7d4',buttonText:'#ffffff'}
+};
+
+function status(msg, good){
+  $('status').className = good ? 'status good' : 'status';
+  $('status').textContent = msg;
+}
+
+async function initSupabase(){
+  if(sb) return sb;
+  const txt = await fetch('stream-bandit-shell-v6-24.js', {cache:'no-store'}).then(r => r.text());
+  const url = (txt.match(/SUPABASE_URL\s*=\s*['\"]([^'\"]+)/) || [])[1];
+  const key = (txt.match(/SUPABASE_KEY\s*=\s*['\"]([^'\"]+)/) || [])[1];
+  if(!url || !key) throw new Error('Supabase public config not found');
+  sb = supabase.createClient(url, key);
+  return sb;
+}
+
+function styleObj(){
+  const large = $('largeText').checked;
+  const contrast = $('highContrast').checked;
+  const panel = $('card').value;
+  const panel2 = $('card2').value || panel;
+  return {
+    version: VERSION,
+    source: 'web-builder-theme-studio-controls-v7-8-9-test.html',
+    owner: 'Theme Studio',
+    savedAt: new Date().toISOString(),
+    accent: $('accent').value,
+    accent2: $('accent2').value,
+    bg: $('bg').value,
+    background: $('bg').value,
+    card: panel,
+    card2: panel2,
+    p: panel,
+    p2: panel2,
+    title: $('titleColor').value,
+    titleColor: $('titleColor').value,
+    muted: $('textColor').value,
+    textColor: $('textColor').value,
+    btnText: $('buttonText').value,
+    buttonText: $('buttonText').value,
+    font: $('font').value,
+    largeText: large,
+    highContrast: contrast,
+    fontScale: large ? '1.12' : '1',
+    line: contrast ? '#ffffff66' : '#ffffff22'
+  };
+}
+
+function setFields(s){
+  s = s || {};
+  $('accent').value = s.accent || '#22d3a6';
+  $('accent2').value = s.accent2 || '#7c3cff';
+  $('bg').value = s.bg || s.background || '#050711';
+  $('card').value = s.card || s.p || '#101529';
+  $('card2').value = s.card2 || s.p2 || s.card || s.p || '#17122d';
+  $('titleColor').value = s.titleColor || s.title || '#ffffff';
+  $('textColor').value = s.textColor || s.muted || '#b9c0d8';
+  $('buttonText').value = s.buttonText || s.btnText || '#ffffff';
+  $('font').value = s.font || 'Inter,system-ui,Arial,sans-serif';
+  $('largeText').checked = !!s.largeText || String(s.fontScale || '') === '1.12';
+  $('highContrast').checked = !!s.highContrast || String(s.line || '') === '#ffffff66';
+}
+
+function applyTheme(s){
+  s = s || styleObj();
+  const root = document.documentElement;
+  root.style.setProperty('--accent', s.accent);
+  root.style.setProperty('--accent2', s.accent2);
+  root.style.setProperty('--bg', s.bg || s.background);
+  root.style.setProperty('--p', s.p || s.card);
+  root.style.setProperty('--p2', s.p2 || s.card2 || s.card);
+  root.style.setProperty('--card', s.card || s.p);
+  root.style.setProperty('--card2', s.card2 || s.p2 || s.card || s.p);
+  root.style.setProperty('--title', s.title || s.titleColor);
+  root.style.setProperty('--muted', s.muted || s.textColor);
+  root.style.setProperty('--btnText', s.btnText || s.buttonText);
+  root.style.setProperty('--fontScale', s.fontScale || (s.largeText ? '1.12' : '1'));
+  root.style.setProperty('--line', s.line || (s.highContrast ? '#ffffff66' : '#ffffff22'));
+  document.body.style.fontFamily = s.font || 'Inter,system-ui,Arial,sans-serif';
+  updateSwatches(s);
+  $('debug').textContent = JSON.stringify(s, null, 2);
+  try{
+    if(window.StreamBanditHeaderShell && window.StreamBanditHeaderShell.refresh) window.StreamBanditHeaderShell.refresh();
+    if(window.StreamBanditFooterShell && window.StreamBanditFooterShell.refresh) window.StreamBanditFooterShell.refresh();
+  }catch(e){}
+}
+
+function updateSwatches(s){
+  const map = [
+    ['swAccent', 'swAccentText', s.accent],
+    ['swAccent2', 'swAccent2Text', s.accent2],
+    ['swBg', 'swBgText', s.bg || s.background],
+    ['swCard', 'swCardText', s.card || s.p]
+  ];
+  map.forEach(row => {
+    const box = $(row[0]);
+    const txt = $(row[1]);
+    if(box) box.style.background = row[2];
+    if(txt) txt.textContent = row[2];
+  });
+}
+
+function saveLocal(s){
+  GLOBAL_KEYS.forEach(k => {
+    try{ localStorage.setItem(k, JSON.stringify(s)); }catch(e){}
+  });
+  try{
+    localStorage.setItem('streamBanditThemeUpdatedAt', new Date().toISOString());
+  }catch(e){}
+  window.dispatchEvent(new CustomEvent('streambandit:theme-updated', {detail:s}));
+  window.dispatchEvent(new StorageEvent('storage', {key:'streamBanditTheme', newValue:JSON.stringify(s)}));
+}
+
+function readLocal(){
+  for(const k of GLOBAL_KEYS){
+    try{
+      const raw = localStorage.getItem(k);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+  }
+  return null;
+}
+
+async function loadSaved(){
+  let saved = readLocal();
+  try{
+    const client = await initSupabase();
+    const r = await client.from('sb_app_settings').select('settings').eq('id', STORE_ID).maybeSingle();
+    if(r.error) throw r.error;
+    const settings = (r.data && r.data.settings) || {};
+    saved = settings.streamBanditTheme || settings[STYLE_KEY] || settings.web_builder_style || settings.builderStyle || saved;
+    if(saved) saveLocal(saved);
+  }catch(e){
+    if(!saved){
+      status('Load note: Supabase unavailable and no local theme found. Using defaults. ' + (e.message || e), false);
+    }
+  }
+  if(saved){
+    setFields(saved);
+    applyTheme({...styleObj(), ...saved});
+    status('Loaded saved global theme.', true);
+  }else{
+    setFields(presets.bandit);
+    applyTheme(styleObj());
+    status('No saved global theme yet; using Dark Bandit defaults.', false);
+  }
+}
+
+async function saveTheme(){
+  const s = styleObj();
+  saveLocal(s);
+  applyTheme(s);
+  try{
+    const client = await initSupabase();
+    const old = await client.from('sb_app_settings').select('settings').eq('id', STORE_ID).maybeSingle();
+    if(old.error) throw old.error;
+    const settings = (old.data && old.data.settings) || {};
+    settings.streamBanditTheme = s;
+    settings[STYLE_KEY] = s;
+    settings.web_builder_style = s;
+    settings.builderStyle = s;
+    const r = await client.from('sb_app_settings').upsert({
+      id: STORE_ID,
+      settings,
+      updated_at: new Date().toISOString()
+    }, {onConflict:'id'}).select('*').single();
+    if(r.error) throw r.error;
+    status('Saved global theme to Supabase and local browser storage.', true);
+  }catch(e){
+    status('Saved locally. Supabase save note: ' + (e.message || e), false);
+  }
+}
+
+function wire(){
+  document.querySelectorAll('input,select').forEach(el => el.oninput = () => {
+    const s = styleObj();
+    saveLocal(s);
+    applyTheme(s);
+    status('Preview updated. Save Global Theme when ready.', true);
+  });
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('[data-preset]').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+      setFields({...styleObj(), ...presets[btn.dataset.preset]});
+      const s = styleObj();
+      saveLocal(s);
+      applyTheme(s);
+      status(btn.textContent + ' preset preview applied.', true);
+    };
+  });
+  $('apply').onclick = () => {
+    const s = styleObj();
+    saveLocal(s);
+    applyTheme(s);
+    status('Preview applied and broadcast locally.', true);
+  };
+  $('save').onclick = saveTheme;
+  $('load').onclick = loadSaved;
+  $('reset').onclick = () => {
+    document.querySelectorAll('[data-preset]').forEach(x => x.classList.remove('active'));
+    document.querySelector('[data-preset="bandit"]').classList.add('active');
+    setFields(presets.bandit);
+    const s = styleObj();
+    saveLocal(s);
+    applyTheme(s);
+    status('Reset to Dark Bandit default preview.', true);
+  };
+}
+
+wire();
+loadSaved();
+})();
+</script>
+</body>
+</html>
