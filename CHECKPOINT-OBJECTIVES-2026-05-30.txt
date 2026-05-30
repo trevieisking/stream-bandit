@@ -1,0 +1,3 @@
+Project checkpoint created 2026-05-30.
+
+Goal: align the app pages with the approved reference page.
