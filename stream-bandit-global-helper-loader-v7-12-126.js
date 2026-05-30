@@ -1,10 +1,12 @@
-/* Stream Bandit V7.12.156 Global Helper Loader / Menu Route Stabiliser
+/* Stream Bandit V7.12.156 Global Helper Loader / Two-Shell Foundation Bridge
    Filename kept for old pages. No writes, no payments, no live promotion.
-   Repairs stale menu/routes and loads the full Live Readiness search fallback. */
+   Repairs stale menu/routes and loads the approved foundation:
+   Theme Projector + Header Shell + Footer Shell + Full Search fallback. */
 (function(){
 'use strict';
-const VERSION='V7.12.156 Global Helper Loader / Menu Route Stabiliser';
+const VERSION='V7.12.156 Global Helper Loader / Two-Shell Foundation Bridge';
 const DEF='test-page';
+const FOUNDATION_VERSION='foundation-7-12-156';
 const ROUTES={
   home:'home-global-helpers-v7-4-4-test.html',
   library:'library-global-helpers-v7-4-8-test.html',
@@ -18,6 +20,7 @@ const ROUTES={
   watchlist:'watchlist-clean-machine-v7-12-43-test.html',
   favourites:'favourites-clean-machine-v7-12-41-test.html',
   liked:'likes-clean-machine-v7-12-42-test.html',
+  likes:'likes-clean-machine-v7-12-42-test.html',
   profile:'profile-settings-live-ready-v7-12-90-test.html',
   admin:'admin-centre-command-deck-v7-12-121-test.html',
   readiness:'live-readiness-global-helpers-v7-10-2-test.html',
@@ -137,6 +140,7 @@ const LABEL_FIXES={
   'Brand Image Helper':[ROUTES.brandIcons,'Brand helper routed to brand tools'],
   'Favicon / App Icon Builder':[ROUTES.brandIcons,'Icon builder routed to brand tools'],
   'Settings Studio':[ROUTES.theme,'Theme Studio owner'],
+  'Theme Studio':[ROUTES.theme,'Theme Studio owner'],
   'Settings':[ROUTES.platformControl,'Clean useful Settings Hub'],
   'Web Builder':[ROUTES.builder,'Builder Studio route'],
   'Profile Settings':[ROUTES.profile,'Profile image overlay'],
@@ -164,9 +168,14 @@ function patchLabelLink(a){if(!a||!a.getAttribute)return 0;let label=labelOf(a),
 function patchRoutes(root){root=root||document;let changed=0;try{root.querySelectorAll('a[href],form[action],[data-href],[data-target],[data-route],[data-url]').forEach(function(el){['href','action','data-href','data-target','data-route','data-url'].forEach(function(attr){let old=el.getAttribute(attr),fixed=fixedUrl(old);if(old&&fixed&&fixed!==old){el.setAttribute(attr,fixed);el.dataset.sbRouteFixedBy='v7-12-156-loader';changed++;}});if(el.matches&&el.matches('a'))changed+=patchLabelLink(el);});}catch(e){}try{document.documentElement.dataset.sb156LoaderRoutesFixed=String((Number(document.documentElement.dataset.sb156LoaderRoutesFixed)||0)+changed);}catch(e){}return changed;}
 function patchRouteGlobals(){try{window.StreamBanditRoutes=Object.assign(window.StreamBanditRoutes||{},ROUTES,{oldRegistry:ROUTES.registry,builderStudio:ROUTES.builder,policyProof:ROUTES.policyReader,policyAdmin:ROUTES.policyAdmin,platformControl:ROUTES.platformControl,cleanMenu:ROUTES.registry,guard:ROUTES.health,pointer:ROUTES.registry,finalShell:ROUTES.helperShell,brandLogoHelper:ROUTES.brandIcons,faviconBuilder:ROUTES.brandIcons});}catch(e){}}
 function hideOldSearchOverlays(){['sbGlobalShellSearchOverlay','sb128MovieSearchOverlay','sb129SiteSearchOverlay','searchOverlay'].forEach(function(id){let el=document.getElementById(id);if(el){el.classList.remove('open');el.style.display='none';el.style.visibility='hidden';el.style.pointerEvents='none';}});}
-function loadScript(src){try{if(Array.from(document.scripts||[]).some(s=>String(s.src||'').includes(src.split('?')[0])))return;let s=document.createElement('script');s.src=src;s.defer=true;s.dataset.sbLoadedBy='v7-12-156-loader';document.head.appendChild(s);}catch(e){}}
-function ensureFallback(){loadScript('live-readiness-search-supabase-fallback-v7-12-130.js?v=7-12-156-loader');}
-function refresh(){patchRouteGlobals();patchRoutes(document);hideOldSearchOverlays();ensureFallback();try{if(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.sanitizeMenu)window.StreamBanditLiveReadinessSearchFallback.sanitizeMenu();}catch(e){}document.dispatchEvent(new CustomEvent('streambandit:global-helper-loader-refresh',{detail:{version:VERSION,routes:ROUTES}}));return {version:VERSION,routes:ROUTES};}
-function boot(){patchRouteGlobals();refresh();setTimeout(refresh,250);setTimeout(refresh,900);setTimeout(refresh,1800);setTimeout(refresh,3200);setInterval(function(){patchRouteGlobals();patchRoutes(document);},2500);try{let obs=new MutationObserver(function(){patchRoutes(document);});obs.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['href','action','data-href','data-target','data-route','data-url']});}catch(e){}window.StreamBanditGlobalHelperLoader={version:VERSION,refresh:refresh,patchRoutes:patchRoutes,routes:ROUTES,state:()=>({version:VERSION,routes:ROUTES})};document.documentElement.dataset.streamBanditGlobalHelperLoader='v7-12-156';}
+function loadScript(src){try{let base=src.split('?')[0];if(Array.from(document.scripts||[]).some(s=>String(s.src||'').includes(base)))return;let s=document.createElement('script');s.src=src;s.defer=true;s.dataset.sbLoadedBy='v7-12-156-loader';document.head.appendChild(s);}catch(e){}}
+function ensureFoundation(){
+  loadScript('stream-bandit-theme-projector-v7-12-156.js?v='+FOUNDATION_VERSION);
+  loadScript('stream-bandit-header-shell-v7-12-156.js?v='+FOUNDATION_VERSION);
+  loadScript('stream-bandit-footer-shell-v7-12-156.js?v='+FOUNDATION_VERSION);
+  loadScript('live-readiness-search-supabase-fallback-v7-12-130.js?v='+FOUNDATION_VERSION);
+}
+function refresh(){patchRouteGlobals();patchRoutes(document);hideOldSearchOverlays();ensureFoundation();try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}try{if(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.sanitizeMenu)window.StreamBanditLiveReadinessSearchFallback.sanitizeMenu();}catch(e){}document.dispatchEvent(new CustomEvent('streambandit:global-helper-loader-refresh',{detail:{version:VERSION,routes:ROUTES,foundation:true}}));return {version:VERSION,routes:ROUTES,foundation:true};}
+function boot(){patchRouteGlobals();refresh();setTimeout(refresh,250);setTimeout(refresh,900);setTimeout(refresh,1800);setTimeout(refresh,3200);setInterval(function(){patchRouteGlobals();patchRoutes(document);ensureFoundation();},2500);try{let obs=new MutationObserver(function(){patchRoutes(document);});obs.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['href','action','data-href','data-target','data-route','data-url']});}catch(e){}window.StreamBanditGlobalHelperLoader={version:VERSION,refresh:refresh,patchRoutes:patchRoutes,routes:ROUTES,state:()=>({version:VERSION,routes:ROUTES,foundation:true,foundationVersion:FOUNDATION_VERSION})};document.documentElement.dataset.streamBanditGlobalHelperLoader='v7-12-156-foundation';}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
