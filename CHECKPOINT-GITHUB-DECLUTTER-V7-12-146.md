@@ -15,6 +15,7 @@ This checkpoint records the safe GitHub repository declutter pass. The cleanup g
 - Do not delete backup-folder files during this pass.
 - Skip any file if the connector blocks or times out.
 - Prefer old V5/V6/V7 temporary test pages, wrapper experiments, route auditors, and superseded version-chain pages.
+- Protect accessibility/audio comfort work until the real all-in-one Accessibility page is rebuilt and promoted.
 
 ## Confirmed deleted groups
 
@@ -104,6 +105,27 @@ Deleted:
 - liked-standalone-v5-51-test.html
 - genres-standalone-v5-57-test.html
 
+### Old V5 admin/control/storage/search/genre tests
+
+- admin-centre-v5-40-2-test.html
+- admin-centre-v5-40-3-test.html
+- control-centre-v5-41-test.html
+- control-centre-v5-41-1-test.html
+- storage-centre-v5-39-1-test.html
+- genre-tools-v5-83-test.html
+
+### Old V5 menu-upgrade tests
+
+- home-menu-upgrade-v5-87-test.html
+- library-menu-upgrade-v5-86-test.html
+- details-menu-upgrade-v5-88-test.html
+- watch-player-upgrade-v5-89-test.html
+- continue-watching-menu-upgrade-v5-90-test.html
+- watch-history-menu-upgrade-v5-91-test.html
+- watchlist-menu-upgrade-v5-92-test.html
+- favourites-menu-upgrade-v5-93-test.html
+- liked-menu-upgrade-v5-94-test.html
+
 ## Known blocked/skipped files
 
 These were skipped because the connector blocked, timed out, or they need manual review later:
@@ -125,6 +147,8 @@ These were skipped because the connector blocked, timed out, or they need manual
 - stream-bandit-route-pointer-machine-v7-12-36-test.html
 - platform-control-tower-machine-gated-route-doctor-v7-12-31-test.html
 - stream-bandit-route-pointer-machine-v7-12-36-test.html
+- global-search-v5-80-test.html
+- home-menu-upgrade-v5-87-1-test.html
 
 ## Protected files / families
 
@@ -142,17 +166,19 @@ Do not delete during this pass:
 - checkpoints
 - backups folder
 - current keepers including submit-video-clean-machine-v7-12-78-test.html, rules-clean-machine-v7-12-82-test.html, and stream-bandit-one-machine-v7-12-73-test.html
+- accessibility-menu-upgrade-v5-95-test.html until a real all-in-one Accessibility page is rebuilt, tested, and promoted
+
+## Accessibility protection note
+
+The old V5 Accessibility menu-upgrade test is not to be deleted blindly. It may still contain useful accessibility/audio comfort/player comfort logic. Stream Bandit needs one rebuilt Accessibility page that combines player 1 / player 2 comfort needs, louder audio, captions, readability, focus mode, and global settings behaviour before the old V5 accessibility test can be retired.
 
 ## Next cleanup targets
 
 Continue with old V5 pages only, such as:
 
-- admin-centre-v5-* test pages
-- control-centre-v5-* test pages
-- storage-centre-v5-* test pages
-- global-search-v5-* test pages
-- genre-tools-v5-* test pages
-- menu-upgrade-v5-* test pages
 - old Supabase standalone V5 test pages
+- old upload-url V5 test pages
+- old admin form/editor V5 test pages
+- blocked old V5 pages only if the connector later allows deletion
 
 Do not touch V7 current route work until a route scan confirms what is safe.
