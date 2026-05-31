@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Details V7.12.156</title>
+<title>Stream Bandit Details V7.12.157</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--btnText:#fff;--fontScale:1}
@@ -20,7 +20,7 @@ h1{font-size:clamp(38px,5.2vw,66px);line-height:.95;margin:9px 0;letter-spacing:
 <body data-sb-details-menu-url="details-clean-machine-v7-12-38-test.html">
 <div class="wrap">
 <section class="hero">
-  <span class="badge">V7.12.156 Details · Two-Shell Foundation</span>
+  <span class="badge">V7.12.157 Details · Header Likes Counter Fix</span>
   <h1 id="title">Stream Bandit Details</h1>
   <p>Clean Details page with movie metadata, save actions, related movies and current Player 1 route.</p>
   <div id="status" class="status">Loading Details...</div>
@@ -60,11 +60,12 @@ h1{font-size:clamp(38px,5.2vw,66px);line-height:.95;margin:9px 0;letter-spacing:
 <p class="micro">Details page refit: Header Shell + Page Content + Footer Shell. No old visual shell.</p>
 </div>
 
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=details-foundation-2"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=details-foundation-2"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=details-foundation-2"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=details-foundation-2"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=details-foundation-2"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=details-foundation-3"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=details-foundation-3"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=details-foundation-3"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=details-foundation-3"></script>
+<script src="stream-bandit-header-likes-counter-fix-v7-12-157.js?v=details-foundation-3"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=details-foundation-3"></script>
 <script>
 (function(){
 'use strict';
@@ -92,15 +93,15 @@ function saveButton(kind,id,label,icon){let core=window.StreamBanditCoreSavesV67
 function saveButtons(id){return saveButton('watchlist',id,'Watchlist','🔖')+saveButton('favourites',id,'Favourite','⭐')+saveButton('likes',id,'Like','👍');}
 function setSaveStatus(msg,warn){let el=$('saveStatus');if(el){el.textContent=msg||'';el.classList.toggle('warn',!!warn);}}
 function refreshSaveButtons(){if(!row)return;$('mainActions').innerHTML='<a class="btn primary" href="'+PLAYER+'?id='+encodeURIComponent(String(row.id||''))+(firstUrl(row)?'&src='+encodeURIComponent(firstUrl(row)):'')+'">Play</a><a class="btn" href="library-global-helpers-v7-4-8-test.html">Library</a>'+saveButtons(String(row.id||''));}
-async function initSaves(){try{if(!window.StreamBanditCoreSavesV675)return false;await window.StreamBanditCoreSavesV675.init();savesReady=true;refreshSaveButtons();return true;}catch(e){savesReady=false;setSaveStatus(e.message||String(e),true);return false;}}
-async function toggleSave(btn){let core=window.StreamBanditCoreSavesV675;if(!core){setSaveStatus('Save helper not ready yet.',true);return;}try{btn.disabled=true;setSaveStatus('Updating '+(btn.textContent||'save')+'...',false);let res=await core.toggle(btn.dataset.sbCoreSave,btn.dataset.movieId);await core.refresh();refreshSaveButtons();setSaveStatus('Saved pages and counts updated.',false);try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}window.dispatchEvent(new CustomEvent('streambandit:details-saves-changed',{detail:res}));}catch(e){setSaveStatus(e.message||String(e),true);}finally{btn.disabled=false;}}
+async function initSaves(){try{if(!window.StreamBanditCoreSavesV675)return false;await window.StreamBanditCoreSavesV675.init();savesReady=true;refreshSaveButtons();try{if(window.StreamBanditHeaderLikesCounterFix)window.StreamBanditHeaderLikesCounterFix.refresh();}catch(e){}return true;}catch(e){savesReady=false;setSaveStatus(e.message||String(e),true);return false;}}
+async function toggleSave(btn){let core=window.StreamBanditCoreSavesV675;if(!core){setSaveStatus('Save helper not ready yet.',true);return;}try{btn.disabled=true;setSaveStatus('Updating '+(btn.textContent||'save')+'...',false);let res=await core.toggle(btn.dataset.sbCoreSave,btn.dataset.movieId);await core.refresh();refreshSaveButtons();setSaveStatus('Saved pages and counts updated.',false);try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}try{if(window.StreamBanditHeaderLikesCounterFix)window.StreamBanditHeaderLikesCounterFix.refresh();}catch(e){}window.dispatchEvent(new CustomEvent('streambandit:details-saves-changed',{detail:res}));}catch(e){setSaveStatus(e.message||String(e),true);}finally{btn.disabled=false;}}
 function relatedCard(m){
   let img=poster(m),id=encodeURIComponent(String(m.id||''));
   return '<article class="related" data-movie-id="'+esc(m.id||'')+'"><a href="'+SELF+'?id='+id+'" style="text-decoration:none;color:inherit"><div class="relatedArt">'+(img?'<img src="'+esc(img)+'" loading="lazy" alt="">':'No artwork')+'</div><div class="relatedBody"><h3>'+esc(m.title||'Untitled')+'</h3><p>'+esc(m.description||m.summary||'No description yet.')+'</p></div></a></article>';
 }
 function render(){
   if(!row) return;
-  let img=poster(row),play=firstUrl(row),id=encodeURIComponent(String(row.id||'')),genres=arr(row.genres);
+  let img=poster(row),play=firstUrl(row),genres=arr(row.genres);
   $('title').textContent=row.title||'Untitled';
   $('description').textContent=row.description||row.summary||'No description yet.';
   $('artwork').innerHTML=img?'<img src="'+esc(img)+'" alt="">':'No artwork';
@@ -113,7 +114,7 @@ function render(){
   $('muxUrl').textContent=row.mux_playback_url||'—';
   let rel=allRows.filter(m=>String(m.id)!==String(row.id)&&arr(m.genres).some(g=>genres.includes(g))).slice(0,8);
   $('relatedGrid').innerHTML=rel.map(relatedCard).join('')||'<div class="note">No related movies found.</div>';
-  $('debug').textContent=JSON.stringify({id:row.id,title:row.title,route:SELF,player:PLAYER,foundation:'two-shell',savesReady:savesReady},null,2);
+  $('debug').textContent=JSON.stringify({id:row.id,title:row.title,route:SELF,player:PLAYER,foundation:'two-shell',savesReady:savesReady,likesCounterFix:!!window.StreamBanditHeaderLikesCounterFix},null,2);
   setTimeout(initSaves,250);
 }
 async function load(){
@@ -133,8 +134,8 @@ async function load(){
   }
 }
 function helper(){
-  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
-  $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+' · Click wire '+(saveWireDone?'✅':'⚠️');
+  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();if(window.StreamBanditHeaderLikesCounterFix)window.StreamBanditHeaderLikesCounterFix.refresh();}catch(e){}
+  $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+' · Likes counter fix '+(window.StreamBanditHeaderLikesCounterFix?'✅':'⚠️')+' · Click wire '+(saveWireDone?'✅':'⚠️');
 }
 function wire(){
   document.querySelectorAll('[data-tab]').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$(btn.dataset.tab).classList.add('active');});
