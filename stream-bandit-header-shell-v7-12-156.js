@@ -8,6 +8,10 @@
    Header now reads the signed-in Supabase Auth user and matching sb_profiles row.
    This fixes Role: guest showing on every page when the real profile is admin.
    No layout, route, icon, footer, theme or menu behaviour changed.
+
+   Browse cleanup:
+   - Library stays in Watch only.
+   - Browse now contains Supabase Library Editor, Genres, Global Search and About.
 */
 (function(){
 'use strict';
@@ -89,14 +93,65 @@ const OLD={
 };
 
 const MENU=[
- ['Watch','🏠','Home',ROUTES.home,'Home'],['Watch','🎞️','Library',ROUTES.library,'Library'],['Watch','🎬','Details',ROUTES.details,'Details'],['Watch','▶️','Player 1',ROUTES.player1,'Single-title player'],['Watch','⏯️','Continue Watching',ROUTES.continueWatching,'Resume'],['Watch','🕘','Watch History',ROUTES.watchHistory,'History'],['Watch','🔖','Watchlist',ROUTES.watchlist,'Watchlist'],['Watch','⭐','Favourites',ROUTES.favourites,'Favourites'],['Watch','👍','Likes',ROUTES.likes,'Likes'],['Watch','♿','Accessibility',ROUTES.accessibility,'Player comfort'],
- ['Browse','🎞️','Library',ROUTES.library,'Library'],['Browse','🟢','Supabase Library Editor',ROUTES.supabaseLibrary,'Library editor'],['Browse','🏷️','Genres',ROUTES.genres,'Genres'],['Browse','🔎','Global Search',ROUTES.search,'Full search'],['Browse','ℹ️','About',ROUTES.about,'About'],
- ['Creator','⬆️','Submit Video',ROUTES.submit,'Submit'],['Creator','📜','Rules',ROUTES.rules,'Rules'],['Creator','🧾','Review Queue',ROUTES.review,'Review'],
- ['Group Play','📃','Playlists',ROUTES.playlists,'Playlists'],['Group Play','📺','Channels',ROUTES.channels,'Channels'],['Group Play','📡','My Channel',ROUTES.myChannel,'My Channel'],['Group Play','🧺','Collections',ROUTES.collections,'Collections'],['Group Play','▶️▶️','Player 2',ROUTES.player2,'Group player'],
- ['Settings','⚙️','Settings Hub',ROUTES.settings,'Settings'],['Settings','🎨','Theme Studio',ROUTES.theme,'Theme owner'],['Settings','👤','Profile Settings',ROUTES.profile,'Profile'],['Settings','🏗️','Web Builder',ROUTES.builder,'Builder'],
- ['Policy','📚','Policy Documents',ROUTES.policyCentre,'Policy centre'],['Policy','📖','Policy Proof',ROUTES.policyReader,'Published policy'],['Policy','🧾','Policy Admin Editor',ROUTES.policyAdmin,'Policy admin'],
- ['Admin','🛠️','Admin Centre',ROUTES.admin,'Admin'],['Admin','🚦','Live Readiness',ROUTES.readiness,'Readiness'],['Admin','📋','Current Routes Registry',ROUTES.registry,'Registry'],['Admin','🧪','Test Checklist',ROUTES.checklist,'Testing'],['Admin','🧰','Tools',ROUTES.tools,'Tools'],['Admin','✅','Health Check',ROUTES.health,'Health'],['Admin','🎥','Mux Manager',ROUTES.mux,'Mux'],['Admin','🪣','Storage Prep',ROUTES.storage,'Storage'],['Admin','🛡️','Backup / Safety',ROUTES.backup,'Backup'],
- ['Owner','📬','Form Inbox',ROUTES.formInbox,'Form inbox'],['Owner','🧾','Advanced Form',ROUTES.formAdvanced,'Advanced form'],['Owner','🏗️','Web Builder Studio',ROUTES.builder,'Builder studio'],['Owner','🧠','One Machine',ROUTES.oneMachine,'Diagnostics'],['Owner','🎛️','Platform Control Centre',ROUTES.platformControl,'Controls'],['Owner','🧱','Clean Machine Menu',ROUTES.registry,'Routed to registry'],['Owner','🛡️','Route Guard Proof',ROUTES.health,'Routed to health'],['Owner','🎯','Route Pointer Machine',ROUTES.registry,'Routed to registry'],['Owner','🧭','Final Shell Navigation',ROUTES.helperShell,'Helper shell'],['Owner','🗂️','Brand / App Icons',ROUTES.brandIcons,'Brand'],['Owner','🖼️','Brand Image Helper',ROUTES.brandIcons,'Brand helper'],['Owner','🦌','Favicon / App Icon Builder',ROUTES.brandIcons,'Icons'],['Owner','🧭','Pages Manager',ROUTES.pagesManager,'Pages'],['Owner','👁️','Published Preview',ROUTES.preview,'Preview']
+ ['Watch','🏠','Home',ROUTES.home,'Home'],
+ ['Watch','🎞️','Library',ROUTES.library,'Library'],
+ ['Watch','🎬','Details',ROUTES.details,'Details'],
+ ['Watch','▶️','Player 1',ROUTES.player1,'Single-title player'],
+ ['Watch','⏯️','Continue Watching',ROUTES.continueWatching,'Resume'],
+ ['Watch','🕘','Watch History',ROUTES.watchHistory,'History'],
+ ['Watch','🔖','Watchlist',ROUTES.watchlist,'Watchlist'],
+ ['Watch','⭐','Favourites',ROUTES.favourites,'Favourites'],
+ ['Watch','👍','Likes',ROUTES.likes,'Likes'],
+ ['Watch','♿','Accessibility',ROUTES.accessibility,'Player comfort'],
+
+ ['Browse','🟢','Supabase Library Editor',ROUTES.supabaseLibrary,'Library editor'],
+ ['Browse','🏷️','Genres',ROUTES.genres,'Genres'],
+ ['Browse','🔎','Global Search',ROUTES.search,'Full search'],
+ ['Browse','ℹ️','About',ROUTES.about,'About'],
+
+ ['Creator','⬆️','Submit Video',ROUTES.submit,'Submit'],
+ ['Creator','📜','Rules',ROUTES.rules,'Rules'],
+ ['Creator','🧾','Review Queue',ROUTES.review,'Review'],
+
+ ['Group Play','📃','Playlists',ROUTES.playlists,'Playlists'],
+ ['Group Play','📺','Channels',ROUTES.channels,'Channels'],
+ ['Group Play','📡','My Channel',ROUTES.myChannel,'My Channel'],
+ ['Group Play','🧺','Collections',ROUTES.collections,'Collections'],
+ ['Group Play','▶️▶️','Player 2',ROUTES.player2,'Group player'],
+
+ ['Settings','⚙️','Settings Hub',ROUTES.settings,'Settings'],
+ ['Settings','🎨','Theme Studio',ROUTES.theme,'Theme owner'],
+ ['Settings','👤','Profile Settings',ROUTES.profile,'Profile'],
+ ['Settings','🏗️','Web Builder',ROUTES.builder,'Builder'],
+
+ ['Policy','📚','Policy Documents',ROUTES.policyCentre,'Policy centre'],
+ ['Policy','📖','Policy Proof',ROUTES.policyReader,'Published policy'],
+ ['Policy','🧾','Policy Admin Editor',ROUTES.policyAdmin,'Policy admin'],
+
+ ['Admin','🛠️','Admin Centre',ROUTES.admin,'Admin'],
+ ['Admin','🚦','Live Readiness',ROUTES.readiness,'Readiness'],
+ ['Admin','📋','Current Routes Registry',ROUTES.registry,'Registry'],
+ ['Admin','🧪','Test Checklist',ROUTES.checklist,'Testing'],
+ ['Admin','🧰','Tools',ROUTES.tools,'Tools'],
+ ['Admin','✅','Health Check',ROUTES.health,'Health'],
+ ['Admin','🎥','Mux Manager',ROUTES.mux,'Mux'],
+ ['Admin','🪣','Storage Prep',ROUTES.storage,'Storage'],
+ ['Admin','🛡️','Backup / Safety',ROUTES.backup,'Backup'],
+
+ ['Owner','📬','Form Inbox',ROUTES.formInbox,'Form inbox'],
+ ['Owner','🧾','Advanced Form',ROUTES.formAdvanced,'Advanced form'],
+ ['Owner','🏗️','Web Builder Studio',ROUTES.builder,'Builder studio'],
+ ['Owner','🧠','One Machine',ROUTES.oneMachine,'Diagnostics'],
+ ['Owner','🎛️','Platform Control Centre',ROUTES.platformControl,'Controls'],
+ ['Owner','🧱','Clean Machine Menu',ROUTES.registry,'Routed to registry'],
+ ['Owner','🛡️','Route Guard Proof',ROUTES.health,'Routed to health'],
+ ['Owner','🎯','Route Pointer Machine',ROUTES.registry,'Routed to registry'],
+ ['Owner','🧭','Final Shell Navigation',ROUTES.helperShell,'Helper shell'],
+ ['Owner','🗂️','Brand / App Icons',ROUTES.brandIcons,'Brand'],
+ ['Owner','🖼️','Brand Image Helper',ROUTES.brandIcons,'Brand helper'],
+ ['Owner','🦌','Favicon / App Icon Builder',ROUTES.brandIcons,'Icons'],
+ ['Owner','🧭','Pages Manager',ROUTES.pagesManager,'Pages'],
+ ['Owner','👁️','Published Preview',ROUTES.preview,'Preview']
 ];
 
 let sbProfileClient=null;
@@ -105,20 +160,99 @@ let sbProfileLoading=false;
 let sbProfileLastRead=0;
 let sbProfileAuthWatch=false;
 
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function file(v){return String(v||'').split('/').pop().split('?')[0].split('#')[0];}
-function page(){try{return new URL(location.href).searchParams.get('page')||'test-page';}catch(e){return'test-page';}}
-function route(u){let r=OLD[file(u)]||String(u||'');return r.replace('page=test-page','page='+encodeURIComponent(page()));}
-function cur(){return file(location.pathname)||'index.html';}
-function same(a,b){return file(route(a))===file(route(b));}
-function short(s,n){s=String(s||'').trim();return s.length>n?s.slice(0,n-1).trim()+'…':s;}
-function firstNonEmpty(){for(let i=0;i<arguments.length;i++){let v=arguments[i];if(v!==undefined&&v!==null&&String(v).trim()!=='')return String(v).trim();}return'';}
+function esc(s){
+ return String(s??'').replace(/[&<>"']/g,c=>({
+  '&':'&amp;',
+  '<':'&lt;',
+  '>':'&gt;',
+  '"':'&quot;',
+  "'":'&#39;'
+ }[c]));
+}
+
+function file(v){
+ return String(v||'').split('/').pop().split('?')[0].split('#')[0];
+}
+
+function page(){
+ try{
+  return new URL(location.href).searchParams.get('page')||'test-page';
+ }catch(e){
+  return 'test-page';
+ }
+}
+
+function route(u){
+ let r=OLD[file(u)]||String(u||'');
+ return r.replace('page=test-page','page='+encodeURIComponent(page()));
+}
+
+function cur(){
+ return file(location.pathname)||'index.html';
+}
+
+function same(a,b){
+ return file(route(a))===file(route(b));
+}
+
+function short(s,n){
+ s=String(s||'').trim();
+ return s.length>n?s.slice(0,n-1).trim()+'…':s;
+}
+
+function firstNonEmpty(){
+ for(let i=0;i<arguments.length;i++){
+  let v=arguments[i];
+  if(v!==undefined&&v!==null&&String(v).trim()!=='')return String(v).trim();
+ }
+ return '';
+}
 
 function addCss(){
  if(document.getElementById('sbHeaderShellCss'))return;
+
  let s=document.createElement('style');
  s.id='sbHeaderShellCss';
- s.textContent=`:root{--sbLine:var(--line,#ffffff22);--sbP:var(--p,#101529);--sbP2:var(--p2,#17122d);--sbA:var(--accent,#22d3a6);--sbA2:var(--accent2,#7c3cff);--sbM:var(--muted,#b9c0d8)}.sb-old-page-header-hidden{display:none!important}#sbHeaderShell>.sb-h-extra-strip,#sbHeaderShell>*:not(.sb-h-identity):not(.sb-h-icons):not(.sb-h-search-wrap){display:none!important}.sb-header-shell{border:1px solid var(--sbLine);border-radius:28px;background:linear-gradient(135deg,var(--sbP),var(--sbP2));box-shadow:0 18px 60px #0007;padding:14px 16px;margin:0 0 16px;display:grid;grid-template-columns:minmax(330px,410px) minmax(360px,1fr) minmax(300px,520px);gap:14px;align-items:center;color:#fff;position:relative;z-index:9998}.sb-h-identity{border:1px solid #22d3a65c;border-radius:24px;padding:10px 12px;background:linear-gradient(135deg,#08101c88,#17122daa);display:grid;grid-template-columns:56px 1fr auto;grid-template-rows:auto auto;gap:8px 12px;align-items:center;min-height:86px}.sb-h-logo{grid-row:1/3;width:56px;height:56px;border-radius:17px;overflow:hidden;background:linear-gradient(135deg,var(--sbA),var(--sbA2));display:grid;place-items:center;border:1px solid #ff2d8580}.sb-h-logo img{width:100%;height:100%;object-fit:cover}.sb-h-title{font-size:25px;font-weight:950;line-height:1;letter-spacing:-.03em}.sb-h-meta{grid-column:2/3;display:grid;gap:2px;border-top:1px solid #ffffff22;padding-top:8px}.sb-h-profile{font-size:13px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sb-h-role{font-size:12px;color:#b9c0d8;font-weight:850}.sb-h-account{grid-column:3/4;grid-row:2/3;border-radius:999px;background:#535a7c;color:#fff;text-decoration:none;font-weight:950;padding:12px 17px;align-self:center}.sb-h-icons{display:flex;gap:7px;align-items:center;justify-content:center;flex-wrap:wrap}.sb-h-ico,.sb-h-menu,.sb-h-search-btn{border:1px solid #ffffff24;border-radius:14px;background:#ffffff12;color:#fff;text-decoration:none;font-weight:950;min-width:38px;height:38px;display:grid;place-items:center;cursor:pointer;position:relative}.sb-h-menu,.sb-h-search-btn{background:linear-gradient(135deg,var(--sbA),var(--sbA2));color:#061017}.sb-h-ico.current{outline:2px solid var(--sbA);background:#22d3a626}.sb-h-count{position:absolute;right:-6px;top:-7px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ff2d85;border:1px solid #ffffff85;color:#fff;font-size:10px;font-weight:950;display:none;align-items:center;justify-content:center;line-height:18px}.sb-h-ico.has-count .sb-h-count{display:flex}.sb-h-search{display:flex;gap:8px;border:1px solid #ffffff24;border-radius:999px;background:#0004;padding:8px 9px 8px 14px}.sb-h-search input{flex:1;background:transparent;border:0;color:#fff;outline:0;font:inherit}.sb-h-search-wrap{position:relative}.sb-menu-scrim{position:fixed;inset:0;background:#0008;opacity:0;pointer-events:none;z-index:2147483600}.sb-menu-scrim.open{opacity:1;pointer-events:auto}.sb-menu-drawer{position:fixed;left:0;top:0;bottom:0;width:min(460px,94vw);background:linear-gradient(180deg,#101529,#17122d);border-right:1px solid #ffffff22;box-shadow:30px 0 90px #000c;z-index:2147483601;transform:translateX(-106%);transition:.22s;padding:18px;overflow:auto;color:#fff}.sb-menu-drawer.open{transform:translateX(0)}.sb-menu-head,.sb-search-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.sb-menu-close,.sb-search-close{border:0;border-radius:999px;background:#414667;color:#fff;padding:9px 13px;font-weight:950;cursor:pointer}.sb-menu-filter{width:100%;border:1px solid #ffffff24;border-radius:999px;background:#0004;color:#fff;outline:0;padding:12px 14px;margin:8px 0 12px}.sb-menu-group{border:1px solid #ffffff18;border-radius:20px;background:#ffffff08;padding:12px;margin:12px 0}.sb-menu-group.current{border-color:#22d3a670;box-shadow:0 0 0 2px #22d3a618}.sb-menu-group h3{margin:0 0 9px;font-size:16px;display:flex;justify-content:space-between}.sb-menu-link{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;text-decoration:none;color:#fff;border-radius:14px;background:#ffffff11;margin:8px 0;padding:11px}.sb-menu-link.current{outline:2px solid var(--sbA);background:linear-gradient(135deg,#22d3a628,#7c3cff38)}.sb-menu-link.current b:after{content:' Current';font-size:10px;margin-left:8px;border:1px solid #22d3a67a;border-radius:999px;padding:3px 7px;color:#baf7df}.sb-menu-link small{display:block;color:var(--sbM);font-size:11px;margin-top:2px}.sb-search-overlay{position:absolute;right:0;top:52px;width:min(920px,94vw);max-height:76vh;overflow:auto;border:1px solid #22d3a657;border-radius:22px;background:linear-gradient(180deg,#08101cfa,#120c26fa);box-shadow:0 30px 90px #000c;padding:12px;display:none;z-index:2147483599;color:#fff}.sb-search-overlay.open{display:block}.sb-note{padding:12px 14px;border-radius:18px;background:#ffb1421f;border:1px solid #ffb14252;color:#ffe7ad;font-weight:850;margin-top:8px}@media(max-width:1180px){.sb-header-shell{grid-template-columns:1fr}.sb-h-icons{justify-content:flex-start}.sb-search-overlay{left:0;right:auto;width:94vw}}@media(max-width:520px){.sb-h-identity{grid-template-columns:48px 1fr;grid-template-rows:auto auto auto}.sb-h-logo{width:48px;height:48px}.sb-h-title{font-size:22px}.sb-h-meta{grid-column:1/3}.sb-h-account{grid-column:1/3;grid-row:3;width:max-content}}`;
+ s.textContent=`:root{--sbLine:var(--line,#ffffff22);--sbP:var(--p,#101529);--sbP2:var(--p2,#17122d);--sbA:var(--accent,#22d3a6);--sbA2:var(--accent2,#7c3cff);--sbM:var(--muted,#b9c0d8)}
+.sb-old-page-header-hidden{display:none!important}
+#sbHeaderShell>.sb-h-extra-strip,#sbHeaderShell>*:not(.sb-h-identity):not(.sb-h-icons):not(.sb-h-search-wrap){display:none!important}
+.sb-header-shell{border:1px solid var(--sbLine);border-radius:28px;background:linear-gradient(135deg,var(--sbP),var(--sbP2));box-shadow:0 18px 60px #0007;padding:14px 16px;margin:0 0 16px;display:grid;grid-template-columns:minmax(330px,410px) minmax(360px,1fr) minmax(300px,520px);gap:14px;align-items:center;color:#fff;position:relative;z-index:9998}
+.sb-h-identity{border:1px solid #22d3a65c;border-radius:24px;padding:10px 12px;background:linear-gradient(135deg,#08101c88,#17122daa);display:grid;grid-template-columns:56px 1fr auto;grid-template-rows:auto auto;gap:8px 12px;align-items:center;min-height:86px}
+.sb-h-logo{grid-row:1/3;width:56px;height:56px;border-radius:17px;overflow:hidden;background:linear-gradient(135deg,var(--sbA),var(--sbA2));display:grid;place-items:center;border:1px solid #ff2d8580}
+.sb-h-logo img{width:100%;height:100%;object-fit:cover}
+.sb-h-title{font-size:25px;font-weight:950;line-height:1;letter-spacing:-.03em}
+.sb-h-meta{grid-column:2/3;display:grid;gap:2px;border-top:1px solid #ffffff22;padding-top:8px}
+.sb-h-profile{font-size:13px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-h-role{font-size:12px;color:#b9c0d8;font-weight:850}
+.sb-h-account{grid-column:3/4;grid-row:2/3;border-radius:999px;background:#535a7c;color:#fff;text-decoration:none;font-weight:950;padding:12px 17px;align-self:center}
+.sb-h-icons{display:flex;gap:7px;align-items:center;justify-content:center;flex-wrap:wrap}
+.sb-h-ico,.sb-h-menu,.sb-h-search-btn{border:1px solid #ffffff24;border-radius:14px;background:#ffffff12;color:#fff;text-decoration:none;font-weight:950;min-width:38px;height:38px;display:grid;place-items:center;cursor:pointer;position:relative}
+.sb-h-menu,.sb-h-search-btn{background:linear-gradient(135deg,var(--sbA),var(--sbA2));color:#061017}
+.sb-h-ico.current{outline:2px solid var(--sbA);background:#22d3a626}
+.sb-h-count{position:absolute;right:-6px;top:-7px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ff2d85;border:1px solid #ffffff85;color:#fff;font-size:10px;font-weight:950;display:none;align-items:center;justify-content:center;line-height:18px}
+.sb-h-ico.has-count .sb-h-count{display:flex}
+.sb-h-search{display:flex;gap:8px;border:1px solid #ffffff24;border-radius:999px;background:#0004;padding:8px 9px 8px 14px}
+.sb-h-search input{flex:1;background:transparent;border:0;color:#fff;outline:0;font:inherit}
+.sb-h-search-wrap{position:relative}
+.sb-menu-scrim{position:fixed;inset:0;background:#0008;opacity:0;pointer-events:none;z-index:2147483600}
+.sb-menu-scrim.open{opacity:1;pointer-events:auto}
+.sb-menu-drawer{position:fixed;left:0;top:0;bottom:0;width:min(460px,94vw);background:linear-gradient(180deg,#101529,#17122d);border-right:1px solid #ffffff22;box-shadow:30px 0 90px #000c;z-index:2147483601;transform:translateX(-106%);transition:.22s;padding:18px;overflow:auto;color:#fff}
+.sb-menu-drawer.open{transform:translateX(0)}
+.sb-menu-head,.sb-search-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.sb-menu-close,.sb-search-close{border:0;border-radius:999px;background:#414667;color:#fff;padding:9px 13px;font-weight:950;cursor:pointer}
+.sb-menu-filter{width:100%;border:1px solid #ffffff24;border-radius:999px;background:#0004;color:#fff;outline:0;padding:12px 14px;margin:8px 0 12px}
+.sb-menu-group{border:1px solid #ffffff18;border-radius:20px;background:#ffffff08;padding:12px;margin:12px 0}
+.sb-menu-group.current{border-color:#22d3a670;box-shadow:0 0 0 2px #22d3a618}
+.sb-menu-group h3{margin:0 0 9px;font-size:16px;display:flex;justify-content:space-between}
+.sb-menu-link{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;text-decoration:none;color:#fff;border-radius:14px;background:#ffffff11;margin:8px 0;padding:11px}
+.sb-menu-link.current{outline:2px solid var(--sbA);background:linear-gradient(135deg,#22d3a628,#7c3cff38)}
+.sb-menu-link.current b:after{content:' Current';font-size:10px;margin-left:8px;border:1px solid #22d3a67a;border-radius:999px;padding:3px 7px;color:#baf7df}
+.sb-menu-link small{display:block;color:var(--sbM);font-size:11px;margin-top:2px}
+.sb-search-overlay{position:absolute;right:0;top:52px;width:min(920px,94vw);max-height:76vh;overflow:auto;border:1px solid #22d3a657;border-radius:22px;background:linear-gradient(180deg,#08101cfa,#120c26fa);box-shadow:0 30px 90px #000c;padding:12px;display:none;z-index:2147483599;color:#fff}
+.sb-search-overlay.open{display:block}
+.sb-note{padding:12px 14px;border-radius:18px;background:#ffb1421f;border:1px solid #ffb14252;color:#ffe7ad;font-weight:850;margin-top:8px}
+@media(max-width:1180px){.sb-header-shell{grid-template-columns:1fr}.sb-h-icons{justify-content:flex-start}.sb-search-overlay{left:0;right:auto;width:94vw}}
+@media(max-width:520px){.sb-h-identity{grid-template-columns:48px 1fr;grid-template-rows:auto auto auto}.sb-h-logo{width:48px;height:48px}.sb-h-title{font-size:22px}.sb-h-meta{grid-column:1/3}.sb-h-account{grid-column:1/3;grid-row:3;width:max-content}}`;
  document.head.appendChild(s);
 }
 
@@ -141,6 +275,7 @@ function helpers(){
   'stream-bandit-core-saves-v6-75.js',
   'live-readiness-search-supabase-fallback-v7-12-130.js'
  ].forEach(load);
+
  if(cur()===file(PROFILE))load('stream-bandit-profile-signin-v7-12-156.js');
 }
 
@@ -154,7 +289,9 @@ function applyTheme(){
 
 function hideOld(){
  document.querySelectorAll('header.head,.head').forEach(el=>{
-  if(el.id!=='sbHeaderShell'&&!el.closest('#sbHeaderShell')&&!el.closest('#sbMenuDrawer'))el.classList.add('sb-old-page-header-hidden');
+  if(el.id!=='sbHeaderShell'&&!el.closest('#sbHeaderShell')&&!el.closest('#sbMenuDrawer')){
+   el.classList.add('sb-old-page-header-hidden');
+  }
  });
 }
 
@@ -162,10 +299,12 @@ async function readProfileConfig(){
  if(window.StreamBanditSupabaseConfig&&window.StreamBanditSupabaseConfig.url&&window.StreamBanditSupabaseConfig.key){
   return {url:window.StreamBanditSupabaseConfig.url,key:window.StreamBanditSupabaseConfig.key};
  }
+
  if(window.StreamBanditShell&&typeof window.StreamBanditShell.config==='function'){
   let c=window.StreamBanditShell.config();
   if(c&&c.url&&c.key)return {url:c.url,key:c.key};
  }
+
  let txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text());
  return {
   url:(txt.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)/)||[])[1]||'',
@@ -177,21 +316,31 @@ function profileFromRow(row,user,source){
  row=row||{};
  let meta=(user&&user.user_metadata)||{};
  let app=(user&&user.app_metadata)||{};
- let name=firstNonEmpty(row.display_name,row.displayName,row.channel_name,row.channelName,row.full_name,row.name,row.username,meta.display_name,meta.full_name,meta.name,meta.username,user&&user.email,'Stream Bandit Account');
+
+ let name=firstNonEmpty(
+  row.display_name,row.displayName,row.channel_name,row.channelName,row.full_name,row.name,row.username,
+  meta.display_name,meta.full_name,meta.name,meta.username,
+  user&&user.email,
+  'Stream Bandit Account'
+ );
+
  let role=firstNonEmpty(row.role,row.account_role,row.user_role,row.permission,app.role,meta.role,'user');
  let username=firstNonEmpty(row.username,row.handle,meta.username,'');
  let avatar=firstNonEmpty(row.avatar_url,row.avatar,row.profile_image_url,row.image_url,row.channel_avatar_url,meta.avatar_url,'');
  let email=firstNonEmpty(row.email,user&&user.email,'');
+
  return {name:name,role:role,avatar:avatar,username:username,email:email,source:source||'sb_profiles'};
 }
 
 async function queryProfileRow(client,user){
  if(!client||!user)return null;
+
  let tries=[
   ['user_id',user.id],
   ['id',user.id],
   ['auth_user_id',user.id]
  ];
+
  if(user.email)tries.push(['email',user.email]);
 
  for(const t of tries){
@@ -200,18 +349,22 @@ async function queryProfileRow(client,user){
    if(!r.error&&r.data)return r.data;
   }catch(e){}
  }
+
  return null;
 }
 
 async function loadSupabaseProfile(force){
  if(sbProfileLoading)return;
+
  let now=Date.now();
  if(!force&&sbProfileLastRead&&now-sbProfileLastRead<12000)return;
+
  sbProfileLoading=true;
  sbProfileLastRead=now;
 
  try{
   if(!window.supabase)throw new Error('Supabase SDK not ready');
+
   let cfg=await readProfileConfig();
   if(!cfg.url||!cfg.key)throw new Error('Missing Supabase config');
 
@@ -323,15 +476,22 @@ function header(){
   ['⚙️',ROUTES.settings,'Settings'],
   ['🚦',ROUTES.readiness,'Readiness']
  ];
+
  let a=accountState();
+
  return '<header id="sbHeaderShell" class="sb-header-shell"><div class="sb-h-identity"><div class="sb-h-logo"><img id="sbHeaderAvatar" data-sb-brand-logo src="'+esc(a.avatar||LOGO)+'" alt="Stream Bandit"></div><div class="sb-h-title">Stream Bandit</div><div class="sb-h-meta"><span id="sbHeaderProfileText" class="sb-h-profile">'+esc(short(a.name,26))+'</span><span id="sbHeaderRoleText" class="sb-h-role">Role: '+esc(short(a.role,24))+'</span></div><a id="sbHeaderAccountChip" class="sb-h-account" href="'+esc(route(PROFILE))+'">Account</a></div><nav class="sb-h-icons">'+icons.map(x=>x[3]==='menu'?'<button id="sbHeaderMenuBtn" class="sb-h-menu" type="button" title="Open menu">☰</button>':'<a class="sb-h-ico '+(same(x[1],cur())?'current':'')+'" href="'+esc(route(x[1]))+'" title="'+esc(x[2])+'" '+(x[3]?'data-sb-count-link="'+esc(x[3])+'"':'')+'>'+x[0]+(x[3]?'<span class="sb-h-count" data-sb-count="'+esc(x[3])+'">0</span>':'')+'</a>').join('')+'</nav><div class="sb-h-search-wrap"><div class="sb-h-search"><span>🔎</span><input id="sbHeaderSearchInput" placeholder="Search Stream Bandit"><button id="sbHeaderSearchBtn" class="sb-h-search-btn" type="button">Search</button></div><div id="sbSearchOverlay" class="sb-search-overlay"><div class="sb-search-top"><b>Search Stream Bandit</b><button id="sbSearchClose" class="sb-search-close" type="button">Close</button></div><div id="sbSearchResults"><div class="sb-note">Type to search everything.</div></div><div class="sb-note">Search includes movies, genres, channels, playlists, pages and policy agreements.</div></div></div></header>';
 }
 
 function ensure(){
  addCss();
  hideOld();
+
  let w=document.querySelector('.wrap')||document.body;
- if(!document.getElementById('sbHeaderShell'))w.insertAdjacentHTML('afterbegin',header());
+
+ if(!document.getElementById('sbHeaderShell')){
+  w.insertAdjacentHTML('afterbegin',header());
+ }
+
  cleanupExtraStrip();
  wire();
  updateAccount();
@@ -341,36 +501,58 @@ function ensure(){
 function cleanupExtraStrip(){
  let h=document.getElementById('sbHeaderShell');
  if(!h)return;
+
  Array.from(h.children).forEach(ch=>{
-  if(!ch.classList.contains('sb-h-identity')&&!ch.classList.contains('sb-h-icons')&&!ch.classList.contains('sb-h-search-wrap'))ch.classList.add('sb-h-extra-strip');
+  if(!ch.classList.contains('sb-h-identity')&&!ch.classList.contains('sb-h-icons')&&!ch.classList.contains('sb-h-search-wrap')){
+   ch.classList.add('sb-h-extra-strip');
+  }
  });
+
  h.querySelectorAll('a,button,div,span,small,b').forEach(el=>{
   if(el.closest('.sb-h-identity')||el.closest('.sb-h-icons')||el.closest('.sb-h-search-wrap'))return;
   let t=(el.textContent||'').trim();
-  if(t==='Account'||/Role:\s*/i.test(t)||/Stream Bandit Admin/i.test(t))el.classList.add('sb-h-extra-strip');
+  if(t==='Account'||/Role:\s*/i.test(t)||/Stream Bandit Admin/i.test(t)){
+   el.classList.add('sb-h-extra-strip');
+  }
  });
 }
 
 function drawer(){
- if(!document.getElementById('sbMenuDrawer'))document.body.insertAdjacentHTML('beforeend','<div id="sbMenuScrim" class="sb-menu-scrim"></div><aside id="sbMenuDrawer" class="sb-menu-drawer"></aside>');
+ if(!document.getElementById('sbMenuDrawer')){
+  document.body.insertAdjacentHTML('beforeend','<div id="sbMenuScrim" class="sb-menu-scrim"></div><aside id="sbMenuDrawer" class="sb-menu-drawer"></aside>');
+ }
+
  document.getElementById('sbMenuScrim').onclick=closeMenu;
  return document.getElementById('sbMenuDrawer');
 }
 
 function buildMenu(){
- let d=drawer(),q=(document.getElementById('sbMenuFilter')||{}).value||'',n=q.toLowerCase(),rows=MENU.filter(r=>!n||(r.join(' ').toLowerCase().includes(n))),groups=[...new Set(MENU.map(x=>x[0]))],ci=MENU.find(r=>same(r[3],cur())),cg=ci?ci[0]:'';
+ let d=drawer();
+ let q=(document.getElementById('sbMenuFilter')||{}).value||'';
+ let n=q.toLowerCase();
+ let rows=MENU.filter(r=>!n||(r.join(' ').toLowerCase().includes(n)));
+ let groups=[...new Set(MENU.map(x=>x[0]))];
+ let ci=MENU.find(r=>same(r[3],cur()));
+ let cg=ci?ci[0]:'';
+
  let html='<div class="sb-menu-head"><b>Stream Bandit Menu</b><button id="sbMenuClose" class="sb-menu-close" type="button">Close</button></div><input id="sbMenuFilter" class="sb-menu-filter" placeholder="Filter menu" value="'+esc(q)+'">';
+
  groups.forEach(g=>{
   let list=rows.filter(r=>r[0]===g);
   if(!list.length)return;
+
   html+='<section class="sb-menu-group '+(g===cg?'current':'')+'"><h3>'+esc(g)+' <span>'+list.length+'</span></h3>';
+
   list.forEach(r=>{
    let is=same(r[3],cur());
    html+='<a class="sb-menu-link '+(is?'current':'')+'" href="'+esc(route(r[3]))+'"><span>'+r[1]+'</span><span><b>'+esc(r[2])+'</b><small>'+esc(r[4])+'</small></span></a>';
   });
+
   html+='</section>';
  });
+
  d.innerHTML=html;
+
  document.getElementById('sbMenuClose').onclick=closeMenu;
  document.getElementById('sbMenuFilter').oninput=buildMenu;
 }
@@ -379,6 +561,7 @@ function openMenu(){
  buildMenu();
  drawer().classList.add('open');
  document.getElementById('sbMenuScrim').classList.add('open');
+
  setTimeout(()=>{
   let c=document.querySelector('#sbMenuDrawer .sb-menu-link.current');
   if(c)c.scrollIntoView({block:'center'});
@@ -386,24 +569,37 @@ function openMenu(){
 }
 
 function closeMenu(){
- let d=document.getElementById('sbMenuDrawer'),s=document.getElementById('sbMenuScrim');
+ let d=document.getElementById('sbMenuDrawer');
+ let s=document.getElementById('sbMenuScrim');
+
  if(d)d.classList.remove('open');
  if(s)s.classList.remove('open');
 }
 
 function search(q,force){
  q=String(q||'').trim();
- let ov=document.getElementById('sbSearchOverlay'),box=document.getElementById('sbSearchResults');
- if(q.length<2){ov.classList.remove('open');return;}
+
+ let ov=document.getElementById('sbSearchOverlay');
+ let box=document.getElementById('sbSearchResults');
+
+ if(q.length<2){
+  ov.classList.remove('open');
+  return;
+ }
+
  ov.classList.add('open');
  box.innerHTML='<div class="sb-note">Loading full search...</div>';
+
  let fb=window.StreamBanditLiveReadinessSearchFallback;
+
  if(fb&&fb.search){
   fb.search(q,!!force);
   box.innerHTML='<div class="sb-note">Full search opened.</div>';
   return;
  }
+
  load('live-readiness-search-supabase-fallback-v7-12-130.js');
+
  setTimeout(()=>{
   if(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.search){
    window.StreamBanditLiveReadinessSearchFallback.search(q,true);
@@ -416,7 +612,11 @@ function search(q,force){
 
 function updateAccount(allowRead){
  let a=accountState();
- let n=document.getElementById('sbHeaderProfileText'),r=document.getElementById('sbHeaderRoleText'),img=document.getElementById('sbHeaderAvatar'),chip=document.getElementById('sbHeaderAccountChip');
+
+ let n=document.getElementById('sbHeaderProfileText');
+ let r=document.getElementById('sbHeaderRoleText');
+ let img=document.getElementById('sbHeaderAvatar');
+ let chip=document.getElementById('sbHeaderAccountChip');
 
  if(n)n.textContent=short(a.name,26);
  if(r)r.textContent='Role: '+short(a.role,24);
@@ -431,20 +631,25 @@ function updateAccount(allowRead){
 
 function localCount(keys){
  let best=0;
+
  keys.forEach(k=>{
   try{
    let v=localStorage.getItem(k);
    if(!v)return;
+
    let j=JSON.parse(v);
+
    if(Array.isArray(j))best=Math.max(best,j.length);
    else if(j&&typeof j==='object')best=Math.max(best,Object.keys(j).length);
   }catch(e){}
  });
+
  return best;
 }
 
 function helperCount(key){
  let candidates=[];
+
  try{
   let m=window.StreamBanditMenuSavesCount;
   if(m){
@@ -453,6 +658,7 @@ function helperCount(key){
    if(m.getCounts)candidates.push(m.getCounts());
   }
  }catch(e){}
+
  try{
   let c=window.StreamBanditCoreSaves||window.StreamBanditCoreSavesV675;
   if(c){
@@ -463,13 +669,17 @@ function helperCount(key){
 
  for(const obj of candidates){
   if(!obj||typeof obj!=='object')continue;
+
   let source=obj.counts&&typeof obj.counts==='object'?obj.counts:obj;
   let v=source[key]??source[key+'Count']??source[key+'_count'];
+
   if(key==='likes')v=v??source.liked??source.likedCount??source.liked_count;
+
   if(typeof v==='number')return v;
   if(Array.isArray(v))return v.length;
   if(v&&typeof v==='object')return Object.keys(v).length;
  }
+
  return null;
 }
 
@@ -479,9 +689,12 @@ function updateCounts(){
   favourites:['streamBanditFavourites','stream-bandit-favourites','sb_favourites','favourites','favorites'],
   likes:['streamBanditLikes','stream-bandit-likes','sb_likes','likes','liked']
  };
+
  Object.keys(map).forEach(k=>{
   let v=helperCount(k);
+
   if(v==null)v=localCount(map[k]);
+
   document.querySelectorAll('[data-sb-count="'+k+'"]').forEach(el=>{
    el.textContent=String(v||0);
    let a=el.closest('.sb-h-ico');
@@ -491,11 +704,27 @@ function updateCounts(){
 }
 
 function wire(){
- let m=document.getElementById('sbHeaderMenuBtn'),i=document.getElementById('sbHeaderSearchInput'),b=document.getElementById('sbHeaderSearchBtn'),c=document.getElementById('sbSearchClose'),chip=document.getElementById('sbHeaderAccountChip');
+ let m=document.getElementById('sbHeaderMenuBtn');
+ let i=document.getElementById('sbHeaderSearchInput');
+ let b=document.getElementById('sbHeaderSearchBtn');
+ let c=document.getElementById('sbSearchClose');
+ let chip=document.getElementById('sbHeaderAccountChip');
 
- if(m&&!m.dataset.w){m.onclick=openMenu;m.dataset.w=1;}
- if(chip){chip.onclick=null;chip.href=route(PROFILE);}
- if(c&&!c.dataset.w){c.onclick=()=>document.getElementById('sbSearchOverlay').classList.remove('open');c.dataset.w=1;}
+ if(m&&!m.dataset.w){
+  m.onclick=openMenu;
+  m.dataset.w=1;
+ }
+
+ if(chip){
+  chip.onclick=null;
+  chip.href=route(PROFILE);
+ }
+
+ if(c&&!c.dataset.w){
+  c.onclick=()=>document.getElementById('sbSearchOverlay').classList.remove('open');
+  c.dataset.w=1;
+ }
+
  if(i&&!i.dataset.w){
   i.oninput=()=>search(i.value,false);
   i.onkeydown=e=>{
@@ -507,7 +736,14 @@ function wire(){
   };
   i.dataset.w=1;
  }
- if(b&&!b.dataset.w){b.onclick=e=>{e.preventDefault();search(i.value,true);};b.dataset.w=1;}
+
+ if(b&&!b.dataset.w){
+  b.onclick=e=>{
+   e.preventDefault();
+   search(i.value,true);
+  };
+  b.dataset.w=1;
+ }
 }
 
 function patch(){
@@ -515,6 +751,7 @@ function patch(){
   let m=OLD[file(a.getAttribute('href'))];
   if(m)a.setAttribute('href',route(m));
  });
+
  let chip=document.getElementById('sbHeaderAccountChip');
  if(chip)chip.href=route(PROFILE);
 }
@@ -546,7 +783,13 @@ function boot(){
   updateAccount,
   refresh,
   reloadProfile:function(){return loadSupabaseProfile(true);},
-  state:()=>({version:VERSION,current:cur(),themeOwner:THEME_OWNER,account:accountState(),accountDestination:PROFILE})
+  state:()=>({
+   version:VERSION,
+   current:cur(),
+   themeOwner:THEME_OWNER,
+   account:accountState(),
+   accountDestination:PROFILE
+  })
  };
 
  document.documentElement.dataset.sbHeaderShell='v7-12-156-account-profile-fix';
@@ -566,6 +809,7 @@ function boot(){
  });
 }
 
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
 
 })();
