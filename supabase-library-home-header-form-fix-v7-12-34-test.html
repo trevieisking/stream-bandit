@@ -3,51 +3,954 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit V7.12.34 Supabase Library Form Fix TEST</title>
+<title>Stream Bandit Supabase Library Editor V7.12.160</title>
+<link rel="icon" href="stream_bandit_stag_icon_32.png">
+<link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff1f;--muted:#b9c0d8;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--bad:#ff4d6d;--warn:#ffb142;--fontScale:1}*{box-sizing:border-box;min-width:0}body{margin:0;padding:24px;background:radial-gradient(circle at top left,color-mix(in srgb,var(--good),transparent 72%),transparent 34%),radial-gradient(circle at top right,color-mix(in srgb,var(--purple),transparent 66%),transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(16px * var(--fontScale))}.wrap{max-width:1450px;margin:auto}.head,.hero,.box{border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 20px 70px #0007;padding:22px;margin-bottom:18px}.head{display:grid;grid-template-columns:minmax(250px,320px) minmax(0,1fr) minmax(300px,430px);gap:14px;align-items:start;position:relative;z-index:20;overflow:visible}.brand{display:flex;gap:12px;align-items:center;font-size:22px;font-weight:950}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--good),var(--purple));display:grid;place-items:center;overflow:hidden}.logo img{width:100%;height:100%;object-fit:cover}.searchWrap{position:relative;z-index:50}.search{width:100%;display:flex;gap:8px;align-items:center;border:1px solid #ffffff24;border-radius:999px;background:#0004;padding:9px 10px 9px 14px;position:relative;z-index:40}.search input{flex:1;background:transparent;border:0;color:#fff;outline:0;font:inherit}.badge,.pill{display:inline-flex;padding:7px 12px;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950}.pill{padding:5px 8px;font-size:11px;margin:2px}.badPill{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}h1{font-size:clamp(36px,5vw,68px);margin:10px 0;letter-spacing:-.05em;line-height:.95}h2{margin:0 0 14px}h3{margin:0 0 8px}.muted,p,label,li{color:var(--muted);font-size:17px;line-height:1.5}.btn,.tab{display:inline-flex;align-items:center;justify-content:center;border:0;text-decoration:none;border-radius:999px;padding:11px 15px;background:#414667;color:#fff;font-weight:950;cursor:pointer}.btn:disabled{opacity:.55;cursor:not-allowed}.small{padding:8px 10px;font-size:12px}.primary,.tab.active{background:linear-gradient(135deg,var(--good),var(--purple))}.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}.warn{background:linear-gradient(135deg,var(--warn),var(--purple))}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--purple))}.tabs,.actions,.controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.status,.good,.note,.danger{padding:12px 14px;border-radius:18px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:14px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff2d851f;border-color:#ff2d8552;color:#ffd6e8}.section{display:none}.section.active{display:block}.grid,.stats,.movieGrid,.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.movieGrid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}.card,.stat,.movie,.check{border:1px solid #ffffff1a;border-radius:18px;background:#ffffff0f;padding:14px;overflow-wrap:anywhere}.movie{padding:0;overflow:hidden}.card b,.stat b,.check b{display:block;color:#baf7df;margin-bottom:8px}.stat span{font-size:26px;font-weight:950}.thumb{aspect-ratio:16/9;background:#ffffff10;display:grid;place-items:center;color:#b9c0d8;overflow:hidden;text-align:center}.thumb img{width:100%;height:100%;object-fit:cover}.body{padding:14px}.body h3{margin:0 0 8px}.body p{font-size:13px;margin:0 0 10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.input,.select,.textarea{border:1px solid #ffffff24;border-radius:18px;background:#0004;color:#fff;padding:12px 14px;font-weight:850;width:100%}.select{border-radius:999px}.textarea{min-height:96px;resize:vertical}.textarea.medium{min-height:145px}.textarea.big{min-height:210px}.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.wide{grid-column:1/-1}.source,.code{font-family:ui-monospace,Consolas,monospace;background:#0004;border-radius:16px;padding:14px;white-space:pre-wrap;color:#dfffee;max-height:420px;overflow:auto;word-break:break-word}.modal{position:fixed;inset:0;z-index:999;display:none;align-items:flex-start;justify-content:center;background:#000b;padding:26px;overflow:auto}.modal.open{display:flex}.modalCard{width:min(1120px,100%);border:1px solid #ffffff2b;border-radius:28px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 24px 90px #000;padding:22px}.modalHead{display:flex;gap:12px;justify-content:space-between;align-items:start;border-bottom:1px solid #ffffff1c;padding-bottom:14px;margin-bottom:14px}.preview{border:1px solid #ffffff1f;border-radius:20px;background:#0005;overflow:hidden}.preview img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}.footer{text-align:center;color:#8f98b8;margin:28px 0}.search+*,.searchResults,.searchOverlay,#searchOverlay,#globalSearchOverlay{z-index:99999!important}@media(max-width:980px){.head,.formGrid{grid-template-columns:1fr}.searchWrap,.search{width:100%}}
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
+*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}
+body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}
+.wrap{max-width:1480px;margin:auto}.hero,.box,.card,.stat,.movie,.check{border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 12px 38px #0006;padding:14px;margin-bottom:12px}.card,.stat,.movie,.check{background:#ffffff0f;box-shadow:none;margin-bottom:0}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:5px 9px;font-size:11px}.pill{padding:4px 7px;font-size:10px;margin:2px}.badPill{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}.warnPill{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}h1{font-size:clamp(34px,4.3vw,56px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 9px;font-size:22px}h3{margin:0 0 6px}.muted,p,small,label,li{color:var(--muted);line-height:1.42}.hero p,.card p,.movie p,.stat p{margin-top:5px;margin-bottom:7px}.btn,.tab{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.btn:disabled{opacity:.55;cursor:not-allowed}.small{padding:7px 10px;font-size:11px}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.status,.note,.danger,.good{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff2d851f;border-color:#ff2d8552;color:#ffd6e8}.good{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}.grid,.stats,.movieGrid,.checks{display:grid;gap:10px}.grid,.stats,.checks{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.movieGrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.stat b,.card b,.check b{display:block;color:#baf7df;margin-bottom:6px}.stat span{font-size:24px;font-weight:950}.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(280px,400px);gap:14px}.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:210px;display:grid;place-items:center}.artIcon{font-size:62px}.controls,.actions,.tabs{display:flex;gap:7px;flex-wrap:wrap}.controls{align-items:center}.input,.select,.textarea{border:1px solid #ffffff24;border-radius:16px;background:#0004;color:#fff;padding:10px 12px;font-weight:850;width:100%;font:inherit;font-size:13px}.select{border-radius:999px}.textarea{min-height:96px;resize:vertical}.textarea.medium{min-height:140px}.textarea.big{min-height:205px}.controls .input{width:260px;max-width:100%}.controls .select{width:auto;min-width:150px}.thumb{height:130px;background:#ffffff10;display:grid;place-items:center;color:#b9c0d8;overflow:hidden;text-align:center}.thumb img{width:100%;height:100%;object-fit:cover}.body{padding:11px}.body h3{font-size:15px;line-height:1.12}.body p{font-size:11px;margin:0 0 7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.source,.code{font-family:ui-monospace,Consolas,monospace;background:#0004;border-radius:14px;padding:12px;white-space:pre-wrap;color:#dfffee;max-height:360px;overflow:auto;word-break:break-word}.modal{position:fixed;inset:0;z-index:2147483605;display:none;align-items:flex-start;justify-content:center;background:#000b;padding:18px;overflow:auto}.modal.open{display:flex}.modalCard{width:min(1120px,100%);border:1px solid #ffffff2b;border-radius:26px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 24px 90px #000;padding:18px}.modalHead{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #ffffff1c;padding-bottom:12px;margin-bottom:12px}.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wide{grid-column:1/-1}.preview{border:1px solid #ffffff1f;border-radius:18px;background:#0005;overflow:hidden}.preview img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}.section{display:none}.section.active{display:block}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
+@media(max-width:980px){body{padding:10px}.heroGrid,.formGrid{grid-template-columns:1fr}.btn,.tab{width:100%;white-space:normal}.art{min-height:180px}.controls .input,.controls .select{width:100%}.movieGrid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}}
+@media(max-width:560px){.movieGrid{grid-template-columns:1fr}.thumb{height:150px}.modal{padding:10px}.modalHead{display:block}.modalHead .btn{margin-top:10px}}
 </style>
 </head>
-<body>
+<body data-sb-supabase-library-menu-url="supabase-library-home-header-form-fix-v7-12-34-test.html">
 <div class="wrap">
-<header class="head"><div class="brand"><div class="logo"><img data-sb-brand-logo alt="Stream Bandit"></div><span>Stream Bandit</span></div><div class="muted"><b>V7.12.34 Supabase Library Form Fix TEST.</b><br>Home-matched header, current routes, full-field save and verify-read.</div><div class="searchWrap"><div class="search"><span>🔎</span><input id="globalSearch" placeholder="Search Stream Bandit"><button id="globalSearchBtn" class="btn primary" type="button">Search</button></div></div></header>
-<section class="hero"><span class="badge">V7.12.34 Supabase Library Form Fix TEST</span><h1>🎬 Supabase Library</h1><p>This page keeps the Supabase Library editor but fixes the pass requirements: exact Home-style header, correct current routes, and one full editable movie form save instead of a one-field-style patch.</p><div class="grid"><div class="card"><b>Header</b><p>Matched to Home page grid/searchWrap/header structure.</p></div><div class="card"><b>Form save</b><p>Saves the full editable object in one PATCH, then verifies by fresh read.</p></div><div class="card"><b>Routes</b><p>Details V7.3.1, Player 1 V7.3.3, Player 2 queue route retained.</p></div><div class="card"><b>Safety</b><p>No live/index promotion. Supabase writes only when admin clicks Save/Create/Hide.</p></div></div><div id="helperStatus" class="status">Checking global helpers...</div><div id="status" class="status">Loading Supabase Library...</div><div id="debug" class="code">Debug: waiting...</div></section>
-<section class="box"><h2>Library controls</h2><div class="controls"><input id="searchBox" class="input" placeholder="Search title, description, genres, tags, cast, director"><select id="statusFilter" class="select"><option value="active">Active / not hidden</option><option value="all">All status</option><option value="published">Published</option><option value="draft">Draft</option><option value="pending">Pending</option><option value="hidden">Hidden</option></select><select id="sourceFilter" class="select"><option value="all">All sources</option><option value="mux">Mux</option><option value="hls">HLS</option><option value="url">URL</option><option value="missing">Missing source</option></select><select id="genreFilter" class="select"><option value="all">All genres</option></select><select id="sortBy" class="select"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="title">Title A-Z</option><option value="missing">Missing data first</option></select><button id="reload" class="btn hot" type="button">Reload</button><button id="clearFilters" class="btn" type="button">Clear filters</button><button id="openAdd" class="btn primary" type="button">Create Video</button><button id="playAll" class="btn primary" type="button">Play All Visible in Player 2</button></div><div id="stats" class="stats" style="margin-top:14px"></div></section>
-<section class="box"><h2>Videos</h2><div id="movieGrid" class="movieGrid"></div></section>
-<p class="footer">V7.12.34 Supabase Library Form Fix TEST — no live/index promotion.</p>
+
+<section class="hero">
+  <div class="heroGrid">
+    <div>
+      <span class="badge">V7.12.160 Supabase Library Editor · Real Admin Delete</span>
+      <h1>Supabase Library Editor</h1>
+      <p>This is the admin/test workbench for <b>sb_movies</b>. It can create, edit, upload poster URLs and permanently delete movie rows after confirmation.</p>
+      <div class="actions">
+        <button id="reload" class="btn primary" type="button">Reload sb_movies</button>
+        <button id="openAdd" class="btn hot" type="button">Create Video</button>
+        <a class="btn cyan" href="library-global-helpers-v7-4-8-test.html">Public Library</a>
+        <a class="btn" href="genres-clean-machine-v7-12-45-test.html">Genres</a>
+      </div>
+      <div id="status" class="status">Loading Supabase Library Editor...</div>
+      <div id="helperStatus" class="note">Checking admin foundation...</div>
+    </div>
+    <div class="art"><div class="artIcon">🟢🎬</div></div>
+  </div>
+</section>
+
+<section class="box">
+  <h2>Safety summary</h2>
+  <div class="grid">
+    <div class="card"><b>Reads</b><p>Loads rows from <code>sb_movies</code>.</p></div>
+    <div class="card"><b>Creates</b><p>Create Video inserts a new <code>sb_movies</code> row.</p></div>
+    <div class="card"><b>Edits</b><p>Save updates the full editable movie form and verifies readback.</p></div>
+    <div class="card"><b>Deletes</b><p>Delete permanently removes the selected <code>sb_movies</code> row after typed confirmation.</p></div>
+  </div>
+  <div class="note">Poster upload sends a resized 1920×1080 image to <b>stream-bandit-images</b>. Deleting a movie row does not delete storage files in this pass.</div>
+</section>
+
+<section class="box">
+  <h2>Library controls</h2>
+  <div class="controls">
+    <input id="searchBox" class="input" placeholder="Search title, description, genres, tags, cast, director">
+    <select id="statusFilter" class="select">
+      <option value="active">Active / not hidden</option>
+      <option value="all">All status</option>
+      <option value="published">Published</option>
+      <option value="draft">Draft</option>
+      <option value="pending">Pending</option>
+      <option value="hidden">Hidden</option>
+    </select>
+    <select id="sourceFilter" class="select">
+      <option value="all">All sources</option>
+      <option value="mux">Mux</option>
+      <option value="hls">HLS</option>
+      <option value="url">URL</option>
+      <option value="missing">Missing source</option>
+    </select>
+    <select id="genreFilter" class="select"><option value="all">All genres</option></select>
+    <select id="sortBy" class="select">
+      <option value="newest">Newest</option>
+      <option value="oldest">Oldest</option>
+      <option value="title">Title A-Z</option>
+      <option value="missing">Missing data first</option>
+    </select>
+    <button id="clearFilters" class="btn" type="button">Clear Filters</button>
+    <button id="playAll" class="btn warn" type="button">Play All Visible in Player 2</button>
+  </div>
+  <div id="stats" class="stats" style="margin-top:12px"></div>
+</section>
+
+<section class="box">
+  <h2>Videos</h2>
+  <div id="movieGrid" class="movieGrid"></div>
+</section>
+
+<section class="box">
+  <h2>Checks</h2>
+  <div class="tabs">
+    <button class="tab active" data-tab="rulesSec" type="button">Rules</button>
+    <button class="tab" data-tab="stateSec" type="button">State</button>
+    <button class="tab" data-tab="routesSec" type="button">Routes</button>
+  </div>
+</section>
+
+<section id="rulesSec" class="box section active">
+  <h2>Protected rules</h2>
+  <div class="checks">
+    <div class="check"><b>Admin workbench</b><p>This page is allowed to create, edit and delete <code>sb_movies</code> rows for testing.</p></div>
+    <div class="check"><b>No public delete</b><p>The public Library page keeps browse/watch behavior only.</p></div>
+    <div class="check"><b>Typed confirmation</b><p>Permanent delete requires <b>DELETE FROM SUPABASE</b>.</p></div>
+    <div class="check"><b>Verify after write</b><p>Create/edit/delete are verified with fresh Supabase reads.</p></div>
+  </div>
+</section>
+
+<section id="stateSec" class="box section">
+  <h2>Debug state</h2>
+  <div id="debug" class="code">Waiting...</div>
+</section>
+
+<section id="routesSec" class="box section">
+  <h2>Current routes</h2>
+  <div class="grid">
+    <div class="card"><b>Public Library</b><p>library-global-helpers-v7-4-8-test.html</p><a class="btn primary" href="library-global-helpers-v7-4-8-test.html">Open</a></div>
+    <div class="card"><b>Details</b><p>details-clean-machine-v7-12-38-test.html</p><a class="btn primary" href="details-clean-machine-v7-12-38-test.html">Open</a></div>
+    <div class="card"><b>Player 1</b><p>player-one-global-helpers-v7-3-3-test.html</p><a class="btn primary" href="player-one-global-helpers-v7-3-3-test.html">Open</a></div>
+    <div class="card"><b>Player 2</b><p>player-2-progress-helper-v6-78-9-4-test.html</p><a class="btn primary" href="player-2-progress-helper-v6-78-9-4-test.html">Open</a></div>
+  </div>
+</section>
+
+<p class="micro">Supabase Library Editor refit: Header Shell + Editor Content + Footer Shell. Real create/edit/delete for sb_movies.</p>
 </div>
-<div id="editModal" class="modal"><div class="modalCard"><div class="modalHead"><div><span class="badge" id="modalBadge">Edit Video Overlay</span><h2 id="editTitle">Edit video</h2><p class="muted">Full-field save: the editable form is saved together and verified after Supabase readback.</p></div><button class="btn" data-close="editModal" type="button">Close</button></div><div class="formGrid"><div class="wide"><label>Read-only ID</label><div id="editId" class="source"></div></div><div><label>Title</label><input id="f_title" class="input"></div><div><label>Status</label><select id="f_status" class="select"><option value="published">published</option><option value="draft">draft</option><option value="pending">pending</option><option value="hidden">hidden</option></select></div><div class="wide"><label>Description</label><textarea id="f_description" class="textarea medium"></textarea></div><div><label>Mux playback URL</label><input id="f_mux_playback_url" class="input"></div><div><label>Video URL</label><input id="f_video_url" class="input"></div><div><label>Thumbnail URL</label><input id="f_thumbnail_url" class="input"></div><div><label>Poster / thumbnail from device</label><input id="posterUpload" class="input" type="file" accept="image/*"><button id="uploadPoster" class="btn primary" type="button" style="margin-top:8px">Upload Poster 1920×1080</button></div><div class="wide preview"><img id="posterPreview" alt="Poster preview"></div><div><label>Trailer URL</label><input id="f_trailer_url" class="input"></div><div><label>Year</label><input id="f_year" class="input"></div><div><label>Rating</label><input id="f_rating" class="input"></div><div><label>Runtime</label><input id="f_runtime_text" class="input"></div><div><label>Age rating</label><input id="f_age_rating" class="input"></div><div><label>Director</label><input id="f_director" class="input"></div><div class="wide"><label>Cast organiser</label><textarea id="f_cast_text" class="textarea big"></textarea></div><div><label>Genres organiser</label><textarea id="f_genres" class="textarea medium"></textarea></div><div><label>Tags organiser</label><textarea id="f_tags" class="textarea medium"></textarea></div><div><label>Channel ID</label><input id="f_channel_id" class="input"></div><div><label>Owner ID</label><input id="f_owner_id" class="input"></div><div><label>Featured</label><select id="f_featured" class="select"><option value="false">false</option><option value="true">true</option></select></div><div><label>Duration seconds</label><input id="f_duration_seconds" class="input" type="number" min="0" step="1"></div><div><label>Source type</label><select id="f_source_type" class="select"><option value="mux">mux</option><option value="hls">hls</option><option value="url">url</option><option value="local">local</option><option value="missing">missing</option></select></div><div><label>Created at</label><div id="f_created_at" class="source"></div></div><div><label>Updated at</label><div id="f_updated_at" class="source"></div></div><div class="wide actions"><button id="saveVideo" class="btn hot" type="button">Save Full Video Form</button><button class="btn" data-close="editModal" type="button">Cancel</button></div></div></div></div>
-<div id="hideModal" class="modal"><div class="modalCard"><div class="modalHead"><div><span class="badge">Delete From Library Overlay</span><h2 id="hideTitle">Delete from library</h2><p class="muted">This sets status to hidden so it can be recovered.</p></div><button class="btn" data-close="hideModal" type="button">Close</button></div><div class="danger">Type <b>DELETE FROM LIBRARY</b> to confirm.</div><div class="formGrid"><div class="wide"><label>Video</label><div id="hideInfo" class="source"></div></div><div class="wide"><label>Confirmation</label><input id="hideConfirm" class="input" placeholder="Type DELETE FROM LIBRARY"></div><div class="wide actions"><button id="confirmHide" class="btn dangerBtn" type="button">Delete From Supabase Library</button><button class="btn" data-close="hideModal" type="button">Cancel</button></div></div></div></div>
-<script src="stream-bandit-shell-v6-24.js"></script><script src="stream-bandit-menu-saves-count-v6-72-1.js"></script><script src="stream-bandit-auth-profile-v6-31.js"></script><script src="stream-bandit-auth-sync-v6-31-7.js"></script><script src="stream-bandit-auth-avatar-v7-0-2.js"></script><script src="stream-bandit-shared-style-v7-0-2.js"></script><script src="stream-bandit-settings-global-v7-1-8.js"></script><script src="stream-bandit-brand-logo-v7-12-12.js"></script>
+
+<div id="editModal" class="modal">
+  <div class="modalCard">
+    <div class="modalHead">
+      <div>
+        <span class="badge" id="modalBadge">Edit Video Overlay</span>
+        <h2 id="editTitle">Edit video</h2>
+        <p class="muted">Full-field save: editable form saves together and verifies after Supabase readback.</p>
+      </div>
+      <button class="btn" data-close="editModal" type="button">Close</button>
+    </div>
+
+    <div class="formGrid">
+      <div class="wide"><label>Read-only ID</label><div id="editId" class="source"></div></div>
+
+      <div><label>Title</label><input id="f_title" class="input"></div>
+      <div><label>Status</label><select id="f_status" class="select"><option value="published">published</option><option value="draft">draft</option><option value="pending">pending</option><option value="hidden">hidden</option></select></div>
+
+      <div class="wide"><label>Description</label><textarea id="f_description" class="textarea medium"></textarea></div>
+
+      <div><label>Mux playback URL</label><input id="f_mux_playback_url" class="input"></div>
+      <div><label>Video URL</label><input id="f_video_url" class="input"></div>
+
+      <div><label>Thumbnail URL</label><input id="f_thumbnail_url" class="input"></div>
+      <div><label>Poster / thumbnail from device</label><input id="posterUpload" class="input" type="file" accept="image/*"><button id="uploadPoster" class="btn primary" type="button" style="margin-top:8px">Upload Poster 1920×1080</button></div>
+
+      <div class="wide preview"><img id="posterPreview" alt="Poster preview"></div>
+
+      <div><label>Trailer URL</label><input id="f_trailer_url" class="input"></div>
+      <div><label>Year</label><input id="f_year" class="input"></div>
+      <div><label>Rating</label><input id="f_rating" class="input"></div>
+      <div><label>Runtime</label><input id="f_runtime_text" class="input"></div>
+      <div><label>Age rating</label><input id="f_age_rating" class="input"></div>
+      <div><label>Director</label><input id="f_director" class="input"></div>
+
+      <div class="wide"><label>Cast organiser</label><textarea id="f_cast_text" class="textarea big"></textarea></div>
+      <div><label>Genres organiser</label><textarea id="f_genres" class="textarea medium"></textarea></div>
+      <div><label>Tags organiser</label><textarea id="f_tags" class="textarea medium"></textarea></div>
+
+      <div><label>Channel ID</label><input id="f_channel_id" class="input"></div>
+      <div><label>Owner ID</label><input id="f_owner_id" class="input"></div>
+
+      <div><label>Featured</label><select id="f_featured" class="select"><option value="false">false</option><option value="true">true</option></select></div>
+      <div><label>Duration seconds</label><input id="f_duration_seconds" class="input" type="number" min="0" step="1"></div>
+
+      <div><label>Source type</label><select id="f_source_type" class="select"><option value="mux">mux</option><option value="hls">hls</option><option value="url">url</option><option value="local">local</option><option value="missing">missing</option></select></div>
+      <div><label>Created at</label><div id="f_created_at" class="source"></div></div>
+      <div><label>Updated at</label><div id="f_updated_at" class="source"></div></div>
+
+      <div class="wide actions">
+        <button id="saveVideo" class="btn hot" type="button">Save Full Video Form</button>
+        <button class="btn" data-close="editModal" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="deleteModal" class="modal">
+  <div class="modalCard">
+    <div class="modalHead">
+      <div>
+        <span class="badge">Permanent Delete Overlay</span>
+        <h2 id="deleteTitle">Delete row from sb_movies</h2>
+        <p class="muted">This permanently deletes the selected movie row from Supabase. Storage poster files are not deleted here.</p>
+      </div>
+      <button class="btn" data-close="deleteModal" type="button">Close</button>
+    </div>
+
+    <div class="danger">Permanent delete. Type <b>DELETE FROM SUPABASE</b> to confirm.</div>
+
+    <div class="formGrid">
+      <div class="wide"><label>Selected row</label><div id="deleteInfo" class="source"></div></div>
+      <div class="wide"><label>Confirmation</label><input id="deleteConfirm" class="input" placeholder="Type DELETE FROM SUPABASE"></div>
+      <div class="wide actions">
+        <button id="confirmDelete" class="btn dangerBtn" type="button">Delete Row From sb_movies</button>
+        <button class="btn" data-close="deleteModal" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="stream-bandit-shell-v6-24.js?v=supabase-editor-real-delete-1"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=supabase-editor-real-delete-1"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=supabase-editor-real-delete-1"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=supabase-editor-real-delete-1"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=supabase-editor-real-delete-1"></script>
+
 <script>
-(function(){'use strict';
-const VERSION='V7.12.34 Supabase Library Home Header Form Fix TEST';
-const PLAYER1='player-one-global-helpers-v7-3-3-test.html',PLAYER2='player-2-progress-helper-v6-78-9-4-test.html',DETAILS='details-global-helpers-v7-3-1-test.html',BUCKET='stream-bandit-images';
-let sb=null,cfg=null,user=null,session=null,movies=[],editing=null,hiding=null,busy=false,mode='edit';
-const $=id=>document.getElementById(id);function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}function dbg(step,obj){$('debug').textContent='Debug '+new Date().toLocaleTimeString()+': '+step+'\n'+(obj?JSON.stringify(obj,null,2):'')}function setStatus(t,bad){$('status').textContent=t;$('status').style.background=bad?'rgba(255,45,85,.12)':'rgba(34,211,166,.10)'}function arr(v){if(Array.isArray(v))return v;if(typeof v==='string'&&v.trim()){try{const j=JSON.parse(v);if(Array.isArray(j))return j}catch(e){}return v.split(/[\n,]+/).map(x=>x.trim()).filter(Boolean)}return[]}function csv(v){return arr(v).join('\n')}function list(v){return String(v||'').split(/[\n,]+/).map(x=>x.trim()).filter(Boolean)}function cleanCast(v){return String(v||'').replace(/\r/g,'\n').split(/\n+/).map(x=>x.trim()).filter(Boolean).join('\n')}function poster(m){return m.thumbnail_url||m.poster_url||m.image_url||m.backdrop_url||''}function firstUrl(m){return m.video_url||m.mux_playback_url||m.stream_url||m.url||''}function sourceType(m){const u=firstUrl(m);if(m.source_type)return m.source_type;if(/stream\.mux\.com/i.test(u))return'mux';if(/\.m3u8(\?|$)/i.test(u))return'hls';if(u)return'url';return'missing'}function stat(a,b){return'<div class="stat"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>'}
-async function readConfig(){const txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text());return{url:(txt.match(/SUPABASE_URL\s*=\s*'([^']+)'/)||[])[1],key:(txt.match(/SUPABASE_KEY\s*=\s*'([^']+)'/)||[])[1]}}
-function authHeaders(extra){const token=session&&session.access_token;return Object.assign({apikey:cfg.key,Authorization:'Bearer '+(token||cfg.key),'Content-Type':'application/json',Prefer:'return=representation'},extra||{})}
-async function restPatchFull(id,payload,label){const ac=new AbortController();const timer=setTimeout(()=>ac.abort(),25000);try{const res=await fetch(cfg.url+'/rest/v1/sb_movies?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:authHeaders(),body:JSON.stringify(payload),signal:ac.signal});const txt=await res.text();if(!res.ok)throw Error(label+' failed '+res.status+': '+txt);let data=txt?JSON.parse(txt):[];return Array.isArray(data)?data[0]:data}catch(e){if(e.name==='AbortError')throw Error(label+' aborted after 25000ms');throw e}finally{clearTimeout(timer)}}
-async function restPost(row,label){const ac=new AbortController();const timer=setTimeout(()=>ac.abort(),25000);try{const res=await fetch(cfg.url+'/rest/v1/sb_movies',{method:'POST',headers:authHeaders(),body:JSON.stringify(row),signal:ac.signal});const txt=await res.text();if(!res.ok)throw Error(label+' failed '+res.status+': '+txt);const data=JSON.parse(txt);return Array.isArray(data)?data[0]:data}catch(e){if(e.name==='AbortError')throw Error(label+' aborted after 25000ms');throw e}finally{clearTimeout(timer)}}
-function missingFlags(m){const flags=[];if(!poster(m))flags.push('missing poster');if(!firstUrl(m))flags.push('missing video');if(!arr(m.genres).length)flags.push('missing genre');if(sourceType(m)==='missing')flags.push('missing source');return flags}
-function filtered(){const q=$('searchBox').value.trim().toLowerCase(),st=$('statusFilter').value,src=$('sourceFilter').value,g=$('genreFilter').value,sort=$('sortBy').value;let rows=movies.filter(m=>{const blob=[m.title,m.description,m.director,m.cast_text,arr(m.genres).join(' '),arr(m.tags).join(' ')].join(' ').toLowerCase();if(q&&!blob.includes(q))return false;if(st==='active'&&String(m.status||'published')==='hidden')return false;if(st!=='all'&&st!=='active'&&String(m.status||'')!==st)return false;if(src!=='all'){const s=sourceType(m);if(src==='missing'?s!=='missing':s!==src)return false}if(g!=='all'&&!arr(m.genres).some(x=>String(x).toLowerCase()===g.toLowerCase()))return false;return true});rows.sort((a,b)=>{if(sort==='oldest')return String(a.created_at||'').localeCompare(String(b.created_at||''));if(sort==='title')return String(a.title||'').localeCompare(String(b.title||''));if(sort==='missing')return missingFlags(b).length-missingFlags(a).length;return String(b.created_at||'').localeCompare(String(a.created_at||''))});return rows}
-function fillGenres(){const old=$('genreFilter').value,set=new Set();movies.forEach(m=>arr(m.genres).forEach(g=>set.add(g)));const all=Array.from(set).sort();$('genreFilter').innerHTML='<option value="all">All genres</option>'+all.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('');if(old&&all.includes(old))$('genreFilter').value=old}
-function render(){fillGenres();const rows=filtered();$('stats').innerHTML=stat('Loaded',movies.length)+stat('Visible',rows.length)+stat('Missing posters',movies.filter(m=>!poster(m)).length)+stat('Missing videos',movies.filter(m=>!firstUrl(m)).length)+stat('Hidden',movies.filter(m=>String(m.status||'')==='hidden').length);$('movieGrid').innerHTML=rows.length?rows.map(card).join(''):'<div class="note">No videos match the current filters.</div>'}
-function card(m){const id=String(m.id),img=poster(m),u=firstUrl(m),flags=missingFlags(m);return'<article class="movie"><div class="thumb">'+(img?'<img src="'+esc(img)+'" alt="'+esc(m.title||'Poster')+'">':'No poster / thumbnail')+'</div><div class="body"><h3>'+esc(m.title||'Untitled')+'</h3><p>'+esc(m.description||'No description yet.')+'</p><div><span class="pill">'+esc(String(m.status||'no status'))+'</span><span class="pill">'+esc(sourceType(m).toUpperCase())+'</span>'+arr(m.genres).map(g=>'<span class="pill">'+esc(g)+'</span>').join('')+flags.map(f=>'<span class="pill badPill">'+esc(f)+'</span>').join('')+'</div><div class="actions"><a class="btn small primary" href="'+DETAILS+'?id='+encodeURIComponent(id)+'">Details</a>'+(u?'<a class="btn small hot" href="'+PLAYER1+'?id='+encodeURIComponent(id)+'">Play</a>':'')+'<button class="btn small warn" type="button" data-edit="'+esc(id)+'">Edit</button><button class="btn small dangerBtn" type="button" data-hide="'+esc(id)+'">Delete From Library</button><button class="btn small" type="button" data-copy="'+esc(id)+'">Copy ID</button></div></div></article>'}
-function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open')}function blankMovie(){return{title:'',description:'',mux_playback_url:'',video_url:'',thumbnail_url:'',trailer_url:'',year:'',rating:'',runtime_text:'',age_rating:'',director:null,cast_text:null,genres:[],tags:[],channel_id:null,owner_id:user&&user.id||null,featured:false,duration_seconds:0,source_type:'mux',status:'published'}}
-function fillForm(m,isNew){editing=m;mode=isNew?'add':'edit';$('modalBadge').textContent=isNew?'Create Video Overlay':'Edit Video Overlay';$('editTitle').textContent=isNew?'Create Video':'Edit: '+(m.title||'Untitled');$('editId').textContent=isNew?'New video row will be created':m.id;['title','description','mux_playback_url','video_url','thumbnail_url','trailer_url','year','rating','runtime_text','age_rating','director','cast_text','channel_id','owner_id'].forEach(k=>{$('f_'+k).value=m[k]||''});$('f_genres').value=csv(m.genres);$('f_tags').value=csv(m.tags);$('f_featured').value=String(!!m.featured);$('f_duration_seconds').value=Number(m.duration_seconds||0);$('f_source_type').value=m.source_type||sourceType(m)||'missing';$('f_status').value=m.status||'published';$('f_created_at').textContent=m.created_at||'';$('f_updated_at').textContent=m.updated_at||'';$('posterPreview').src=poster(m)||'';$('posterUpload').value='';$('saveVideo').textContent=isNew?'Create Video':'Save Full Video Form';openModal('editModal')}
-function syncSource(){const mux=$('f_mux_playback_url').value.trim(),vid=$('f_video_url').value.trim();if(mux&&!vid)$('f_video_url').value=mux;const finalUrl=$('f_video_url').value.trim()||mux;if(/stream\.mux\.com/i.test(finalUrl))$('f_source_type').value='mux';else if(/\.m3u8(\?|$)/i.test(finalUrl))$('f_source_type').value='hls';else if(finalUrl)$('f_source_type').value='url';else $('f_source_type').value='missing'}
-function cleanObj(){syncSource();const cast=cleanCast($('f_cast_text').value);return{title:$('f_title').value.trim(),description:$('f_description').value.trim(),mux_playback_url:$('f_mux_playback_url').value.trim(),video_url:$('f_video_url').value.trim(),thumbnail_url:$('f_thumbnail_url').value.trim(),trailer_url:$('f_trailer_url').value.trim(),year:$('f_year').value.trim(),rating:$('f_rating').value.trim(),runtime_text:$('f_runtime_text').value.trim(),age_rating:$('f_age_rating').value.trim(),director:$('f_director').value.trim()||null,cast_text:cast||null,genres:list($('f_genres').value),tags:list($('f_tags').value),channel_id:$('f_channel_id').value.trim()||null,owner_id:$('f_owner_id').value.trim()||user&&user.id||null,featured:$('f_featured').value==='true',duration_seconds:Number($('f_duration_seconds').value||0),source_type:$('f_source_type').value,status:$('f_status').value,updated_at:new Date().toISOString()}}
-async function saveVideo(){if(busy)return;busy=true;$('saveVideo').disabled=true;try{const data=cleanObj();if(!data.title)throw Error('Title is required');if(mode==='add'){dbg('create full row start',data);const row=Object.assign({},data);delete row.updated_at;const inserted=await restPost(row,'Create video');movies.unshift(inserted);dbg('create verified',inserted);setStatus('Video created and verified: '+inserted.title);closeModal('editModal');render();return}const id=editing&&editing.id;if(!id)throw Error('No video ID');dbg('FULL FORM PATCH start',{id,fields:Object.keys(data),payloadPreview:Object.assign({},data,{cast_text:data.cast_text?data.cast_text.slice(0,220)+'... length='+data.cast_text.length:null})});const returned=await restPatchFull(id,data,'Full video form save');const verify=await sb.from('sb_movies').select('*').eq('id',id).maybeSingle();if(verify.error)throw verify.error;if(!verify.data)throw Error('Verify read returned no row');movies=movies.map(m=>String(m.id)===String(id)?verify.data:m);editing=verify.data;dbg('FULL FORM SAVE verified',{returnedRow:!!returned,id:verify.data.id,title:verify.data.title,savedFields:Object.keys(data),rating:verify.data.rating,trailer_url:verify.data.trailer_url,runtime_text:verify.data.runtime_text,director:verify.data.director,genres:verify.data.genres,tags:verify.data.tags,updated_at:verify.data.updated_at});setStatus('Full video form saved and verified: '+verify.data.title);closeModal('editModal');render()}catch(e){dbg('save error',{message:e.message||String(e),name:e.name||null});setStatus('Save failed: '+(e.message||e),true)}finally{busy=false;$('saveVideo').disabled=false}}
-function imageTo1920(file){return new Promise((resolve,reject)=>{const img=new Image();img.onload=function(){try{const c=document.createElement('canvas'),w=1920,h=1080;c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#050711';x.fillRect(0,0,w,h);const scale=Math.max(w/img.width,h/img.height),sw=w/scale,sh=h/scale,sx=(img.width-sw)/2,sy=(img.height-sh)/2;x.drawImage(img,sx,sy,sw,sh,0,0,w,h);c.toBlob(b=>b?resolve(b):reject(Error('Image resize failed')),'image/jpeg',0.9)}catch(e){reject(e)}};img.onerror=()=>reject(Error('Could not read image'));img.src=URL.createObjectURL(file)})}
-async function uploadPoster(){try{const file=$('posterUpload').files&&$('posterUpload').files[0];if(!file)throw Error('Choose an image first');if(!user)throw Error('Sign in first before uploading posters');$('posterPreview').src=URL.createObjectURL(file);const blob=await imageTo1920(file);const safe=($('f_title').value||'poster').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50)||'poster';const owner=$('f_owner_id').value||user.id||'library';const path='posters/'+owner+'/'+Date.now()+'-'+safe+'-1920x1080.jpg';const up=await sb.storage.from(BUCKET).upload(path,blob,{cacheControl:'3600',upsert:false,contentType:'image/jpeg'});if(up.error)throw up.error;const url=sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;$('f_thumbnail_url').value=url;$('posterPreview').src=url;setStatus('Poster uploaded. Click Save/Create to store URL.')}catch(e){setStatus('Poster upload failed: '+(e.message||e),true)}}
-function openHide(m){hiding=m;$('hideTitle').textContent='Delete from library: '+(m.title||'Untitled');$('hideInfo').textContent=JSON.stringify({id:m.id,title:m.title,status:m.status},null,2);$('hideConfirm').value='';openModal('hideModal')}async function confirmHide(){try{if(!hiding)throw Error('No video selected');if($('hideConfirm').value.trim()!=='DELETE FROM LIBRARY')throw Error('Type DELETE FROM LIBRARY to confirm');await restPatchFull(hiding.id,{status:'hidden',updated_at:new Date().toISOString()},'Hide video');const verify=await sb.from('sb_movies').select('*').eq('id',hiding.id).maybeSingle();if(verify.error)throw verify.error;movies=movies.map(m=>String(m.id)===String(hiding.id)?verify.data:m);setStatus('Video hidden and verified: '+(verify.data.title||verify.data.id));hiding=null;closeModal('hideModal');render()}catch(e){setStatus('Delete from Library failed: '+(e.message||e),true);dbg('hide error',{message:e.message||String(e)})}}
-function playAll(){const rows=filtered().filter(firstUrl);if(!rows.length){setStatus('No playable visible videos.',true);return}const payload={type:'library',version:'V7.12.34',label:'Supabase Library',genre:'Supabase Library',createdAt:new Date().toISOString(),currentIndex:0,items:rows.map((m,i)=>({id:String(m.id),title:m.title||'Untitled',source:firstUrl(m),poster:poster(m),genres:arr(m.genres),index:i}))};try{sessionStorage.setItem('streamBanditQueueV1',JSON.stringify(payload));sessionStorage.setItem('streamBanditUpNextV1',JSON.stringify(payload));sessionStorage.setItem('streamBanditPlayer2Queue',JSON.stringify(payload));localStorage.setItem('streamBanditQueueV1',JSON.stringify(payload));localStorage.setItem('streamBanditUpNextV1',JSON.stringify(payload));localStorage.setItem('streamBanditPlayer2Queue',JSON.stringify(payload))}catch(e){}location.href=PLAYER2+'?id='+encodeURIComponent(String(rows[0].id))+'&queue=library&genre=Supabase%20Library&qi=0&tab=queue'}
-function updateHelperStatus(){let bridge=null;try{bridge=window.StreamBanditSettingsGlobal&&window.StreamBanditSettingsGlobal.getState&&window.StreamBanditSettingsGlobal.getState()}catch(e){}$('helperStatus').innerHTML='<b>Global helpers:</b> Account sync '+(window.StreamBanditAuthSync?'✅':'❌')+' · Avatar '+(window.StreamBanditAuthAvatar?'✅':'❌')+' · Shared style '+(window.StreamBanditSharedStyle?'✅':'❌')+' · Brand logo '+(window.StreamBanditBrandLogo?'✅':'❌')+' · Settings bridge '+(window.StreamBanditSettingsGlobal?'✅':'❌')+(bridge&&bridge.source?' · source: '+esc(bridge.source):'');try{if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh)window.StreamBanditShellAuth.refresh()}catch(e){}}
-async function load(showStatus=true){try{if(!window.supabase)throw Error('Supabase SDK did not load');cfg=cfg||await readConfig();if(!cfg.url||!cfg.key)throw Error('Supabase config not found from shell file');sb=sb||supabase.createClient(cfg.url,cfg.key);const s=await sb.auth.getSession();session=s&&s.data&&s.data.session;const u=await sb.auth.getUser();user=u&&u.data&&u.data.user;const r=await sb.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(500);if(r.error)throw r.error;movies=r.data||[];render();updateHelperStatus();dbg('load ok',{version:VERSION,count:movies.length,signedIn:!!user,userEmail:user&&user.email||null,restAuth:!!session,headerMatch:'home-global-helpers-v7-4-4-test.html',routes:{details:DETAILS,player1:PLAYER1,player2:PLAYER2},saveMode:'full editable form object in one PATCH + verify read'});if(showStatus)setStatus(user?'Library loaded. Full form editor ready.':'Library loaded. Sign in before admin saves/uploads.')}catch(e){dbg('load error',{message:e.message||String(e)});setStatus('Library failed: '+(e.message||e),true)}}
-document.addEventListener('click',e=>{const ed=e.target.closest('[data-edit]'),hi=e.target.closest('[data-hide]'),cp=e.target.closest('[data-copy]'),cl=e.target.closest('[data-close]');if(ed){const m=movies.find(x=>String(x.id)===String(ed.dataset.edit));if(m)fillForm(m,false)}if(hi){const m=movies.find(x=>String(x.id)===String(hi.dataset.hide));if(m)openHide(m)}if(cp){navigator.clipboard&&navigator.clipboard.writeText(cp.dataset.copy);setStatus('Video ID copied.')}if(cl)closeModal(cl.dataset.close)});
-['searchBox','statusFilter','sourceFilter','genreFilter','sortBy'].forEach(id=>{$(id).addEventListener('input',render);$(id).addEventListener('change',render)});$('reload').onclick=()=>load(true);$('clearFilters').onclick=()=>{$('searchBox').value='';$('statusFilter').value='active';$('sourceFilter').value='all';$('genreFilter').value='all';$('sortBy').value='newest';render()};$('openAdd').onclick=()=>fillForm(blankMovie(),true);$('saveVideo').onclick=saveVideo;$('uploadPoster').onclick=uploadPoster;$('confirmHide').onclick=confirmHide;$('playAll').onclick=playAll;$('f_mux_playback_url').addEventListener('input',syncSource);$('f_video_url').addEventListener('input',syncSource);$('globalSearchBtn').onclick=()=>{const q=$('globalSearch').value.trim();location.href='global-search-global-helpers-v7-4-9-test.html'+(q?'?q='+encodeURIComponent(q):'')};$('globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('globalSearchBtn').click()});setTimeout(updateHelperStatus,600);setTimeout(updateHelperStatus,1500);setTimeout(updateHelperStatus,3000);load(true);
+(function(){
+'use strict';
+
+const VERSION='V7.12.160 Supabase Library Editor / Safe Real Delete';
+const LIBRARY='library-global-helpers-v7-4-8-test.html';
+const DETAILS='details-clean-machine-v7-12-38-test.html';
+const PLAYER1='player-one-global-helpers-v7-3-3-test.html';
+const PLAYER2='player-2-progress-helper-v6-78-9-4-test.html';
+const BUCKET='stream-bandit-images';
+const DELETE_PHRASE='DELETE FROM SUPABASE';
+
+let sb=null;
+let cfg=null;
+let session=null;
+let user=null;
+let profile=null;
+let isAdmin=false;
+let movies=[];
+let editing=null;
+let deleting=null;
+let busy=false;
+let mode='edit';
+
+const $=id=>document.getElementById(id);
+
+function esc(s){
+ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c));
+}
+
+function setStatus(t,bad){
+ let el=$('status');
+ el.textContent=t;
+ el.className=bad?'danger':'status';
+}
+
+function dbg(step,obj){
+ $('debug').textContent='Debug '+new Date().toLocaleTimeString()+': '+step+'\n'+(obj?JSON.stringify(obj,null,2):'');
+}
+
+function arr(v){
+ if(Array.isArray(v))return v;
+ if(typeof v==='string'&&v.trim()){
+  try{
+   const j=JSON.parse(v);
+   if(Array.isArray(j))return j;
+  }catch(e){}
+  return v.split(/[\n,]+/).map(x=>x.trim()).filter(Boolean);
+ }
+ return [];
+}
+
+function csv(v){
+ return arr(v).join('\n');
+}
+
+function list(v){
+ return String(v||'').split(/[\n,]+/).map(x=>x.trim()).filter(Boolean);
+}
+
+function cleanCast(v){
+ return String(v||'').replace(/\r/g,'\n').split(/\n+/).map(x=>x.trim()).filter(Boolean).join('\n');
+}
+
+function poster(m){
+ return m.thumbnail_url||m.poster_url||m.poster||m.thumb||m.image_url||m.backdrop_url||'';
+}
+
+function firstUrl(m){
+ return m.video_url||m.mux_playback_url||m.stream_url||m.url||'';
+}
+
+function sourceType(m){
+ const u=firstUrl(m);
+ if(m.source_type)return m.source_type;
+ if(/stream\.mux\.com/i.test(u))return 'mux';
+ if(/\.m3u8(\?|$)/i.test(u))return 'hls';
+ if(u)return 'url';
+ return 'missing';
+}
+
+function stat(a,b){
+ return '<div class="stat"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>';
+}
+
+function firstNonEmpty(){
+ for(let i=0;i<arguments.length;i++){
+  let v=arguments[i];
+  if(v!==undefined&&v!==null&&String(v).trim()!=='')return String(v).trim();
+ }
+ return '';
+}
+
+async function readConfig(){
+ if(cfg)return cfg;
+
+ if(window.StreamBanditSupabaseConfig&&window.StreamBanditSupabaseConfig.url&&window.StreamBanditSupabaseConfig.key){
+  cfg={url:window.StreamBanditSupabaseConfig.url,key:window.StreamBanditSupabaseConfig.key,source:'StreamBanditSupabaseConfig'};
+  return cfg;
+ }
+
+ if(window.StreamBanditShell&&typeof window.StreamBanditShell.config==='function'){
+  let c=window.StreamBanditShell.config();
+  if(c&&c.url&&c.key){
+   cfg={url:c.url,key:c.key,source:'StreamBanditShell.config'};
+   return cfg;
+  }
+ }
+
+ throw new Error('Supabase config bridge not ready. Refresh once, then test again.');
+}
+
+async function getClient(){
+ if(sb)return sb;
+ let c=await readConfig();
+ sb=supabase.createClient(c.url,c.key);
+ return sb;
+}
+
+function roleFromLocal(){
+ try{
+  let raw=localStorage.getItem('streamBanditProfile')||localStorage.getItem('sb_profile')||localStorage.getItem('sb_header_profile_cache_v7_12_156')||'';
+  if(!raw)return '';
+  let p=JSON.parse(raw);
+  return firstNonEmpty(p.role,p.account_role,p.user_role,p.permission,'').toLowerCase();
+ }catch(e){
+  return '';
+ }
+}
+
+async function readProfile(){
+ profile=null;
+ isAdmin=false;
+
+ let client=await getClient();
+ let s=await client.auth.getSession();
+ session=s&&s.data&&s.data.session? s.data.session:null;
+
+ let u=await client.auth.getUser();
+ user=u&&u.data&&u.data.user?u.data.user:null;
+
+ if(!user){
+  return {signedIn:false,role:'guest',admin:false};
+ }
+
+ let tries=[
+  ['user_id',user.id],
+  ['id',user.id],
+  ['auth_user_id',user.id]
+ ];
+ if(user.email)tries.push(['email',user.email]);
+
+ for(const t of tries){
+  try{
+   let r=await client.from('sb_profiles').select('*').eq(t[0],t[1]).maybeSingle();
+   if(!r.error&&r.data){
+    profile=r.data;
+    break;
+   }
+  }catch(e){}
+ }
+
+ let role=firstNonEmpty(profile&&profile.role,profile&&profile.account_role,profile&&profile.user_role,roleFromLocal(),user&&user.app_metadata&&user.app_metadata.role,user&&user.user_metadata&&user.user_metadata.role,'user').toLowerCase();
+ isAdmin=['admin','owner','superadmin','super_admin'].includes(role);
+
+ return {signedIn:true,role:role,admin:isAdmin,email:user.email||''};
+}
+
+function requireSignedAdmin(action){
+ if(!user)throw new Error('Sign in before '+action+'.');
+ if(!isAdmin)throw new Error('Admin/owner role required before '+action+'. Current role is not admin.');
+}
+
+function authNote(){
+ if(!user)return 'Signed out';
+ return (isAdmin?'Admin':'Signed in, not admin')+(user.email?' · '+user.email:'');
+}
+
+function missingFlags(m){
+ const flags=[];
+ if(!poster(m))flags.push('missing poster');
+ if(!firstUrl(m))flags.push('missing video');
+ if(!arr(m.genres).length)flags.push('missing genre');
+ if(sourceType(m)==='missing')flags.push('missing source');
+ return flags;
+}
+
+function filtered(){
+ const q=$('searchBox').value.trim().toLowerCase();
+ const st=$('statusFilter').value;
+ const src=$('sourceFilter').value;
+ const g=$('genreFilter').value;
+ const sort=$('sortBy').value;
+
+ let rows=movies.filter(m=>{
+  const blob=[m.title,m.description,m.director,m.cast_text,arr(m.genres).join(' '),arr(m.tags).join(' ')].join(' ').toLowerCase();
+
+  if(q&&!blob.includes(q))return false;
+  if(st==='active'&&String(m.status||'published')==='hidden')return false;
+  if(st!=='all'&&st!=='active'&&String(m.status||'')!==st)return false;
+
+  if(src!=='all'){
+   const s=sourceType(m);
+   if(src==='missing'?s!=='missing':s!==src)return false;
+  }
+
+  if(g!=='all'&&!arr(m.genres).some(x=>String(x).toLowerCase()===g.toLowerCase()))return false;
+
+  return true;
+ });
+
+ rows.sort((a,b)=>{
+  if(sort==='oldest')return String(a.created_at||'').localeCompare(String(b.created_at||''));
+  if(sort==='title')return String(a.title||'').localeCompare(String(b.title||''));
+  if(sort==='missing')return missingFlags(b).length-missingFlags(a).length;
+  return String(b.created_at||'').localeCompare(String(a.created_at||''));
+ });
+
+ return rows;
+}
+
+function fillGenres(){
+ const old=$('genreFilter').value;
+ const set=new Set();
+
+ movies.forEach(m=>arr(m.genres).forEach(g=>set.add(g)));
+
+ const all=Array.from(set).sort();
+ $('genreFilter').innerHTML='<option value="all">All genres</option>'+all.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('');
+
+ if(old&&all.includes(old))$('genreFilter').value=old;
+}
+
+function render(){
+ fillGenres();
+
+ const rows=filtered();
+
+ $('stats').innerHTML=
+  stat('Loaded',movies.length)+
+  stat('Visible',rows.length)+
+  stat('Missing posters',movies.filter(m=>!poster(m)).length)+
+  stat('Missing videos',movies.filter(m=>!firstUrl(m)).length)+
+  stat('Hidden',movies.filter(m=>String(m.status||'')==='hidden').length)+
+  stat('Admin',isAdmin?'Yes':'No');
+
+ $('movieGrid').innerHTML=rows.length?rows.map(card).join(''):'<div class="note">No videos match the current filters.</div>';
+}
+
+function card(m){
+ const id=String(m.id);
+ const img=poster(m);
+ const u=firstUrl(m);
+ const flags=missingFlags(m);
+
+ return '<article class="movie">'+
+  '<div class="thumb">'+(img?'<img src="'+esc(img)+'" alt="'+esc(m.title||'Poster')+'" loading="lazy">':'No poster / thumbnail')+'</div>'+
+  '<div class="body">'+
+    '<h3>'+esc(m.title||'Untitled')+'</h3>'+
+    '<p>'+esc(m.description||'No description yet.')+'</p>'+
+    '<div>'+
+      '<span class="pill">'+esc(String(m.status||'no status'))+'</span>'+
+      '<span class="pill">'+esc(sourceType(m).toUpperCase())+'</span>'+
+      arr(m.genres).slice(0,3).map(g=>'<span class="pill">'+esc(g)+'</span>').join('')+
+      flags.map(f=>'<span class="pill badPill">'+esc(f)+'</span>').join('')+
+    '</div>'+
+    '<div class="actions">'+
+      '<a class="btn small primary" href="'+DETAILS+'?id='+encodeURIComponent(id)+'">Details</a>'+
+      (u?'<a class="btn small hot" href="'+PLAYER1+'?id='+encodeURIComponent(id)+'">Play</a>':'')+
+      '<button class="btn small warn" type="button" data-edit="'+esc(id)+'">Edit</button>'+
+      '<button class="btn small dangerBtn" type="button" data-delete="'+esc(id)+'">Delete Row</button>'+
+      '<button class="btn small" type="button" data-copy="'+esc(id)+'">Copy ID</button>'+
+    '</div>'+
+  '</div>'+
+ '</article>';
+}
+
+function openModal(id){
+ $(id).classList.add('open');
+}
+
+function closeModal(id){
+ $(id).classList.remove('open');
+}
+
+function blankMovie(){
+ return {
+  title:'',
+  description:'',
+  mux_playback_url:'',
+  video_url:'',
+  thumbnail_url:'',
+  trailer_url:'',
+  year:'',
+  rating:'',
+  runtime_text:'',
+  age_rating:'',
+  director:null,
+  cast_text:null,
+  genres:[],
+  tags:[],
+  channel_id:null,
+  owner_id:user&&user.id||null,
+  featured:false,
+  duration_seconds:0,
+  source_type:'mux',
+  status:'published'
+ };
+}
+
+function fillForm(m,isNew){
+ editing=m;
+ mode=isNew?'add':'edit';
+
+ $('modalBadge').textContent=isNew?'Create Video Overlay':'Edit Video Overlay';
+ $('editTitle').textContent=isNew?'Create Video':'Edit: '+(m.title||'Untitled');
+ $('editId').textContent=isNew?'New video row will be created':m.id;
+
+ ['title','description','mux_playback_url','video_url','thumbnail_url','trailer_url','year','rating','runtime_text','age_rating','director','cast_text','channel_id','owner_id'].forEach(k=>{
+  $('f_'+k).value=m[k]||'';
+ });
+
+ $('f_genres').value=csv(m.genres);
+ $('f_tags').value=csv(m.tags);
+ $('f_featured').value=String(!!m.featured);
+ $('f_duration_seconds').value=Number(m.duration_seconds||0);
+ $('f_source_type').value=m.source_type||sourceType(m)||'missing';
+ $('f_status').value=m.status||'published';
+ $('f_created_at').textContent=m.created_at||'';
+ $('f_updated_at').textContent=m.updated_at||'';
+ $('posterPreview').src=poster(m)||'';
+ $('posterUpload').value='';
+ $('saveVideo').textContent=isNew?'Create Video':'Save Full Video Form';
+
+ openModal('editModal');
+}
+
+function syncSource(){
+ const mux=$('f_mux_playback_url').value.trim();
+ const vid=$('f_video_url').value.trim();
+
+ if(mux&&!vid)$('f_video_url').value=mux;
+
+ const finalUrl=$('f_video_url').value.trim()||mux;
+
+ if(/stream\.mux\.com/i.test(finalUrl))$('f_source_type').value='mux';
+ else if(/\.m3u8(\?|$)/i.test(finalUrl))$('f_source_type').value='hls';
+ else if(finalUrl)$('f_source_type').value='url';
+ else $('f_source_type').value='missing';
+}
+
+function cleanObj(){
+ syncSource();
+
+ const cast=cleanCast($('f_cast_text').value);
+
+ return {
+  title:$('f_title').value.trim(),
+  description:$('f_description').value.trim(),
+  mux_playback_url:$('f_mux_playback_url').value.trim(),
+  video_url:$('f_video_url').value.trim(),
+  thumbnail_url:$('f_thumbnail_url').value.trim(),
+  trailer_url:$('f_trailer_url').value.trim(),
+  year:$('f_year').value.trim(),
+  rating:$('f_rating').value.trim(),
+  runtime_text:$('f_runtime_text').value.trim(),
+  age_rating:$('f_age_rating').value.trim(),
+  director:$('f_director').value.trim()||null,
+  cast_text:cast||null,
+  genres:list($('f_genres').value),
+  tags:list($('f_tags').value),
+  channel_id:$('f_channel_id').value.trim()||null,
+  owner_id:$('f_owner_id').value.trim()||user&&user.id||null,
+  featured:$('f_featured').value==='true',
+  duration_seconds:Number($('f_duration_seconds').value||0),
+  source_type:$('f_source_type').value,
+  status:$('f_status').value,
+  updated_at:new Date().toISOString()
+ };
+}
+
+async function saveVideo(){
+ if(busy)return;
+
+ busy=true;
+ $('saveVideo').disabled=true;
+
+ try{
+  requireSignedAdmin(mode==='add'?'creating a video':'saving a video');
+
+  const data=cleanObj();
+
+  if(!data.title)throw new Error('Title is required');
+
+  const client=await getClient();
+
+  if(mode==='add'){
+   dbg('create full row start',data);
+
+   const row=Object.assign({},data);
+   delete row.updated_at;
+
+   const inserted=await client.from('sb_movies').insert(row).select('*').single();
+
+   if(inserted.error)throw inserted.error;
+   if(!inserted.data)throw new Error('Create returned no row');
+
+   const verify=await client.from('sb_movies').select('*').eq('id',inserted.data.id).maybeSingle();
+
+   if(verify.error)throw verify.error;
+   if(!verify.data)throw new Error('Create verify read returned no row');
+
+   movies.unshift(verify.data);
+   editing=verify.data;
+
+   dbg('create verified',{id:verify.data.id,title:verify.data.title});
+   setStatus('Video created and verified: '+verify.data.title);
+   closeModal('editModal');
+   render();
+   return;
+  }
+
+  const id=editing&&editing.id;
+
+  if(!id)throw new Error('No video ID');
+
+  dbg('full form update start',{id:id,fields:Object.keys(data)});
+
+  const updated=await client.from('sb_movies').update(data).eq('id',id).select('*').maybeSingle();
+
+  if(updated.error)throw updated.error;
+
+  const verify=await client.from('sb_movies').select('*').eq('id',id).maybeSingle();
+
+  if(verify.error)throw verify.error;
+  if(!verify.data)throw new Error('Verify read returned no row');
+
+  movies=movies.map(m=>String(m.id)===String(id)?verify.data:m);
+  editing=verify.data;
+
+  dbg('full form save verified',{
+   id:verify.data.id,
+   title:verify.data.title,
+   rating:verify.data.rating,
+   trailer_url:verify.data.trailer_url,
+   runtime_text:verify.data.runtime_text,
+   director:verify.data.director,
+   genres:verify.data.genres,
+   tags:verify.data.tags,
+   updated_at:verify.data.updated_at
+  });
+
+  setStatus('Full video form saved and verified: '+verify.data.title);
+  closeModal('editModal');
+  render();
+ }catch(e){
+  dbg('save error',{message:e.message||String(e),name:e.name||null});
+  setStatus('Save failed: '+(e.message||e),true);
+ }finally{
+  busy=false;
+  $('saveVideo').disabled=false;
+ }
+}
+
+function imageTo1920(file){
+ return new Promise((resolve,reject)=>{
+  const img=new Image();
+
+  img.onload=function(){
+   try{
+    const c=document.createElement('canvas');
+    const w=1920;
+    const h=1080;
+    c.width=w;
+    c.height=h;
+
+    const x=c.getContext('2d');
+    x.fillStyle='#050711';
+    x.fillRect(0,0,w,h);
+
+    const scale=Math.max(w/img.width,h/img.height);
+    const sw=w/scale;
+    const sh=h/scale;
+    const sx=(img.width-sw)/2;
+    const sy=(img.height-sh)/2;
+
+    x.drawImage(img,sx,sy,sw,sh,0,0,w,h);
+    c.toBlob(b=>b?resolve(b):reject(new Error('Image resize failed')),'image/jpeg',0.9);
+   }catch(e){
+    reject(e);
+   }
+  };
+
+  img.onerror=()=>reject(new Error('Could not read image'));
+  img.src=URL.createObjectURL(file);
+ });
+}
+
+async function uploadPoster(){
+ try{
+  requireSignedAdmin('uploading posters');
+
+  const file=$('posterUpload').files&&$('posterUpload').files[0];
+
+  if(!file)throw new Error('Choose an image first');
+
+  $('posterPreview').src=URL.createObjectURL(file);
+
+  const client=await getClient();
+  const blob=await imageTo1920(file);
+  const safe=($('f_title').value||'poster').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50)||'poster';
+  const owner=$('f_owner_id').value||user.id||'library';
+  const path='posters/'+owner+'/'+Date.now()+'-'+safe+'-1920x1080.jpg';
+
+  const up=await client.storage.from(BUCKET).upload(path,blob,{cacheControl:'3600',upsert:false,contentType:'image/jpeg'});
+
+  if(up.error)throw up.error;
+
+  const url=client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+
+  $('f_thumbnail_url').value=url;
+  $('posterPreview').src=url;
+
+  setStatus('Poster uploaded. Click Save/Create to store URL.');
+ }catch(e){
+  setStatus('Poster upload failed: '+(e.message||e),true);
+  dbg('poster upload error',{message:e.message||String(e)});
+ }
+}
+
+function openDelete(m){
+ deleting=m;
+ $('deleteTitle').textContent='Delete row from sb_movies: '+(m.title||'Untitled');
+ $('deleteInfo').textContent=JSON.stringify({
+  id:m.id,
+  title:m.title,
+  status:m.status,
+  thumbnail_url:poster(m)||null,
+  note:'This deletes the sb_movies row only. Storage files remain.'
+ },null,2);
+ $('deleteConfirm').value='';
+ openModal('deleteModal');
+}
+
+async function confirmDelete(){
+ if(busy)return;
+
+ busy=true;
+ $('confirmDelete').disabled=true;
+
+ try{
+  requireSignedAdmin('deleting a video row');
+
+  if(!deleting)throw new Error('No video selected');
+
+  if($('deleteConfirm').value.trim()!==DELETE_PHRASE){
+   throw new Error('Type DELETE FROM SUPABASE to confirm permanent delete.');
+  }
+
+  const id=deleting.id;
+  const title=deleting.title||id;
+  const client=await getClient();
+
+  dbg('delete start',{id:id,title:title});
+
+  const del=await client.from('sb_movies').delete().eq('id',id).select('id,title');
+
+  if(del.error)throw del.error;
+
+  const verify=await client.from('sb_movies').select('id,title').eq('id',id).maybeSingle();
+
+  if(verify.error)throw verify.error;
+  if(verify.data)throw new Error('Delete verify failed: row still exists.');
+
+  movies=movies.filter(m=>String(m.id)!==String(id));
+  deleting=null;
+
+  closeModal('deleteModal');
+  render();
+
+  dbg('delete verified',{id:id,title:title,deletedRows:del.data||[]});
+  setStatus('Deleted from sb_movies and verified gone: '+title);
+ }catch(e){
+  dbg('delete error',{message:e.message||String(e),name:e.name||null});
+  setStatus('Delete failed: '+(e.message||e),true);
+ }finally{
+  busy=false;
+  $('confirmDelete').disabled=false;
+ }
+}
+
+function playAll(){
+ const rows=filtered().filter(firstUrl);
+
+ if(!rows.length){
+  setStatus('No playable visible videos.',true);
+  return;
+ }
+
+ const payload={
+  type:'library',
+  version:VERSION,
+  label:'Supabase Library',
+  genre:'Supabase Library',
+  createdAt:new Date().toISOString(),
+  currentIndex:0,
+  items:rows.map((m,i)=>({
+   id:String(m.id),
+   title:m.title||'Untitled',
+   source:firstUrl(m),
+   poster:poster(m),
+   genres:arr(m.genres),
+   index:i
+  }))
+ };
+
+ try{
+  sessionStorage.setItem('streamBanditQueueV1',JSON.stringify(payload));
+  sessionStorage.setItem('streamBanditUpNextV1',JSON.stringify(payload));
+  sessionStorage.setItem('streamBanditPlayer2Queue',JSON.stringify(payload));
+  localStorage.setItem('streamBanditQueueV1',JSON.stringify(payload));
+  localStorage.setItem('streamBanditUpNextV1',JSON.stringify(payload));
+  localStorage.setItem('streamBanditPlayer2Queue',JSON.stringify(payload));
+ }catch(e){}
+
+ location.href=PLAYER2+'?id='+encodeURIComponent(String(rows[0].id))+'&queue=library&genre=Supabase%20Library';
+}
+
+function helper(){
+ try{
+  if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();
+  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();
+  if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();
+ }catch(e){}
+
+ $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
+  ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
+  ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
+  ' · Auth '+(user?'✅':'⚠️')+
+  ' · Admin '+(isAdmin?'✅':'⚠️')+
+  ' · '+esc(authNote());
+}
+
+async function load(showStatus){
+ try{
+  if(showStatus)setStatus('Loading sb_movies...');
+
+  await getClient();
+  let prof=await readProfile();
+
+  const r=await sb.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(500);
+
+  if(r.error)throw r.error;
+
+  movies=r.data||[];
+
+  render();
+  helper();
+
+  dbg('load ok',{
+   version:VERSION,
+   count:movies.length,
+   signedIn:!!user,
+   admin:isAdmin,
+   profile:prof,
+   configSource:cfg&&cfg.source,
+   routes:{library:LIBRARY,details:DETAILS,player1:PLAYER1,player2:PLAYER2},
+   writes:{create:true,update:true,delete:true,storageUpload:true},
+   storageDelete:false
+  });
+
+  if(showStatus)setStatus(user?(isAdmin?'Library editor ready. Admin writes enabled.':'Library loaded. Admin role required before writes.'):'Library loaded. Sign in before admin writes.');
+ }catch(e){
+  dbg('load error',{message:e.message||String(e),name:e.name||null});
+  setStatus('Library editor failed: '+(e.message||e),true);
+  helper();
+ }
+}
+
+function wire(){
+ document.addEventListener('click',e=>{
+  const ed=e.target.closest('[data-edit]');
+  const del=e.target.closest('[data-delete]');
+  const cp=e.target.closest('[data-copy]');
+  const cl=e.target.closest('[data-close]');
+
+  if(ed){
+   const m=movies.find(x=>String(x.id)===String(ed.dataset.edit));
+   if(m)fillForm(m,false);
+  }
+
+  if(del){
+   const m=movies.find(x=>String(x.id)===String(del.dataset.delete));
+   if(m)openDelete(m);
+  }
+
+  if(cp){
+   navigator.clipboard&&navigator.clipboard.writeText(cp.dataset.copy);
+   setStatus('Video ID copied.');
+  }
+
+  if(cl)closeModal(cl.dataset.close);
+ });
+
+ ['searchBox','statusFilter','sourceFilter','genreFilter','sortBy'].forEach(id=>{
+  $(id).addEventListener('input',render);
+  $(id).addEventListener('change',render);
+ });
+
+ document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  $(btn.dataset.tab).classList.add('active');
+ }));
+
+ $('reload').onclick=()=>load(true);
+ $('clearFilters').onclick=()=>{
+  $('searchBox').value='';
+  $('statusFilter').value='active';
+  $('sourceFilter').value='all';
+  $('genreFilter').value='all';
+  $('sortBy').value='newest';
+  render();
+ };
+
+ $('openAdd').onclick=()=>fillForm(blankMovie(),true);
+ $('saveVideo').onclick=saveVideo;
+ $('uploadPoster').onclick=uploadPoster;
+ $('confirmDelete').onclick=confirmDelete;
+ $('playAll').onclick=playAll;
+ $('f_mux_playback_url').addEventListener('input',syncSource);
+ $('f_video_url').addEventListener('input',syncSource);
+}
+
+wire();
+helper();
+load(true);
+setTimeout(helper,700);
+setTimeout(helper,1800);
+setInterval(helper,5000);
+
 })();
 </script>
 </body>
