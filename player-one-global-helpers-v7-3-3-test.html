@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Stream Bandit Player 1 V7.12.157</title>
+<link rel="icon" type="image/png" sizes="16x16" href="stream_bandit_stag_icon_16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple_touch_icon_180.png">
+<meta name="theme-color" content="#050711">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -25,14 +29,15 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
 <section id="progress" class="box section"><h2>Progress helpers</h2><div id="progressState" class="source">Checking helpers...</div></section>
 <p class="micro">Player 1 refit: Header Shell + Player Content + Footer Shell. Old Player 1 URL preserved.</p>
 </div>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=player1-polish-1"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=player1-polish-1"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=player1-polish-1"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=player1-polish-1"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=player1-polish-1"></script>
-<script src="continue-resume-player-v6-73.js?v=player1-polish-1"></script>
-<script src="watch-history-player-v6-74.js?v=player1-polish-1"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=player1-polish-1"></script>
+<script src="stream-bandit-shell-v6-24.js?v=player1-favicon-1"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=player1-favicon-1"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=player1-favicon-1"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=player1-favicon-1"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=player1-favicon-1"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=player1-favicon-1"></script>
+<script src="continue-resume-player-v6-73.js?v=player1-favicon-1"></script>
+<script src="watch-history-player-v6-74.js?v=player1-favicon-1"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=player1-favicon-1"></script>
 <script>
 (function(){'use strict';
 const DETAILS='details-clean-machine-v7-12-38-test.html';let row=null,video=null,hls=null,mon=null,audioCtx=null,sourceNode=null,gainNode=null,core=null;const $=id=>document.getElementById(id);
@@ -43,7 +48,7 @@ function firstUrl(m){return param('src')||m.video_url||m.mux_playback_url||m.str
 function sourceType(m){let u=firstUrl(m);if(m.source_type)return m.source_type;if(/stream\.mux\.com/i.test(u))return'mux';if(/\.m3u8(\?|$)/i.test(u))return'hls';if(u)return'url';return'none';}
 function setStatus(m,b){$('status').textContent=m;$('status').className=b?'note':'status';}
 function tile(a,b){return'<div class="card"><b>'+esc(a)+'</b><p>'+esc((b===undefined||b===null||b==='')?'—':b)+'</p></div>';}
-async function readConfig(){let txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text());return{url:(txt.match(/SUPABASE_URL\s*=\s*["']([^"']+)/)||[])[1],key:(txt.match(/SUPABASE_KEY\s*=\s*["']([^"']+)/)||[])[1]};}
+async function readConfig(){let c=window.StreamBanditSupabaseConfig||(window.StreamBanditShell&&window.StreamBanditShell.config&&window.StreamBanditShell.config());if(c&&c.url&&c.key)return c;for(let i=0;i<20;i++){await new Promise(r=>setTimeout(r,100));c=window.StreamBanditSupabaseConfig||(window.StreamBanditShell&&window.StreamBanditShell.config&&window.StreamBanditShell.config());if(c&&c.url&&c.key)return c;}throw Error('Supabase config bridge not ready');}
 function destroy(){if(mon)clearInterval(mon);try{if(hls)hls.destroy();}catch(e){}hls=null;video=null;sourceNode=null;gainNode=null;}
 function monitor(){if(!video)return;let ahead=0;try{if(video.buffered.length)ahead=Math.max(0,video.buffered.end(video.buffered.length-1)-video.currentTime);}catch(e){}$('monitor').innerHTML=tile('readyState',video.readyState)+tile('currentTime',Math.round(video.currentTime)+'s')+tile('duration',isFinite(video.duration)?Math.round(video.duration)+'s':'unknown')+tile('buffer ahead',Math.round(ahead)+'s')+tile('paused',video.paused?'Yes':'No');}
 function build(url){destroy();let f=$('frame');if(!url){f.innerHTML='<div style="color:#b9c0d8">No playable source found.</div>';return;}video=document.createElement('video');video.controls=true;video.playsInline=true;video.preload='metadata';video.crossOrigin='anonymous';video.volume=Number($('volume').value)||1;f.innerHTML='';f.appendChild(video);if(/\.m3u8(\?|$)/i.test(url)||/stream\.mux\.com/i.test(url)){if(video.canPlayType('application/vnd.apple.mpegurl'))video.src=url;else if(window.Hls&&Hls.isSupported()){hls=new Hls({maxBufferLength:60,backBufferLength:30});hls.loadSource(url);hls.attachMedia(video);}else video.src=url;}else video.src=url;video.addEventListener('loadedmetadata',()=>setStatus('Player loaded for '+(row.title||row.id)+'.'));video.addEventListener('error',()=>setStatus('Video source could not play in this browser.',true));mon=setInterval(monitor,1000);}
