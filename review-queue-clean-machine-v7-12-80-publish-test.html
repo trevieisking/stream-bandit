@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Review Queue V7.12.167</title>
+<title>Stream Bandit Review Queue V7.12.168</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -30,14 +30,14 @@ h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.167 Review Queue · Archive Queue Action</span>
+      <span class="badge">V7.12.168 Review Queue · Archive Constraint Fix</span>
       <h1>Review Queue</h1>
       <p>Admin review gate for creator submissions. Pending rows are read from <code>sb_submissions</code>. Approve + Publish creates or updates <code>sb_movies</code> for Library, Search, Details and Player 1.</p>
       <div class="routeStrip">
         <span>Read → sb_submissions</span>
         <span>Approve / Decline → sb_submissions</span>
         <span>Publish → sb_movies</span>
-        <span>Archive → hidden from active queue</span>
+        <span>Archive → declined + archive marker</span>
       </div>
       <div class="actions">
         <a class="btn hot" href="submit-video-clean-machine-v7-12-79-test.html">Submit Video</a>
@@ -56,7 +56,7 @@ h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.
 <section class="box">
   <h2>Queue status</h2>
   <div class="grid" id="stats"></div>
-  <div class="safe">Review Queue publishes pending submissions into public <code>sb_movies</code>. Archive From Queue marks the selected <code>sb_submissions</code> row as archived and hides it from the active queue. Published movies stay safe.</div>
+  <div class="safe">Archive From Queue uses the allowed Supabase status <code>declined</code> with an <code>[ARCHIVED_FROM_QUEUE]</code> marker in <code>decline_reason</code>. It hides the row from Active queue and keeps published movies safe.</div>
 </section>
 
 <section class="layout">
@@ -100,21 +100,21 @@ h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.
   </section>
 </section>
 
-<p class="micro">Review Queue refit: Header Shell + Queue Content + Footer Shell. Publishes approved submissions to sb_movies. Archived rows are hidden from the active queue.</p>
+<p class="micro">Review Queue refit: Header Shell + Queue Content + Footer Shell. Publishes approved submissions to sb_movies. Archived rows are hidden from the active queue without violating Supabase status constraints.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=review-queue-archive-1"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=review-queue-archive-1"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=review-queue-archive-1"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=review-queue-archive-1"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=review-queue-archive-1"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=review-queue-archive-1"></script>
+<script src="stream-bandit-shell-v6-24.js?v=review-queue-archive-constraint-1"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=review-queue-archive-constraint-1"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=review-queue-archive-constraint-1"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=review-queue-archive-constraint-1"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=review-queue-archive-constraint-1"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=review-queue-archive-constraint-1"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.167 Review Queue Archive Action';
+const VERSION='V7.12.168 Review Queue Archive Constraint Fix';
 let cfg=null,sb=null,user=null,profile=null,rows=[],channels=[],selected=null,busy=false,countBusy=false,countReady=false,lastCountRead=0;
 const $=id=>document.getElementById(id);
 
@@ -129,15 +129,19 @@ function descOf(x){return firstNonEmpty(x&&x.description,x&&x.reason,'No descrip
 function imgOf(x){return firstNonEmpty(x&&x.thumbnail_url,x&&x.poster_url,'');}
 function urlOf(x){return firstNonEmpty(x&&x.video_url,x&&x.mux_playback_url,'');}
 function statusOf(x){return String(x&&x.status||'pending').toLowerCase();}
+function isArchived(x){return String(x&&x.decline_reason||'').includes('[ARCHIVED_FROM_QUEUE]');}
+function displayStatusOf(x){return isArchived(x)?'archived':statusOf(x);}
 function channelName(x){return firstNonEmpty(x&&x.channel_name,'No channel');}
 function yearFromTitle(t){let m=String(t||'').match(/(19|20)\d{2}/);return m?m[0]:null;}
 
 async function readConfig(){
   if(cfg)return cfg;
+
   if(window.StreamBanditSupabaseConfig&&window.StreamBanditSupabaseConfig.url&&window.StreamBanditSupabaseConfig.key){
     cfg={url:window.StreamBanditSupabaseConfig.url,key:window.StreamBanditSupabaseConfig.key,source:'StreamBanditSupabaseConfig'};
     return cfg;
   }
+
   if(window.StreamBanditShell&&typeof window.StreamBanditShell.config==='function'){
     let c=window.StreamBanditShell.config();
     if(c&&c.url&&c.key){
@@ -145,12 +149,14 @@ async function readConfig(){
       return cfg;
     }
   }
+
   let txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text());
   cfg={
     url:(txt.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)/)||[])[1],
     key:(txt.match(/SUPABASE_KEY\s*=\s*['"]([^'"]+)/)||[])[1],
     source:'shell file'
   };
+
   if(!cfg.url||!cfg.key)throw Error('Supabase config not found');
   return cfg;
 }
@@ -167,9 +173,11 @@ async function getProfile(){
   let u=await client.auth.getUser();
   user=u&&u.data&&u.data.user?u.data.user:null;
   profile=null;
+
   if(user){
     let tries=[['user_id',user.id],['id',user.id],['auth_user_id',user.id]];
     if(user.email)tries.push(['email',user.email]);
+
     for(const t of tries){
       try{
         let r=await client.from('sb_profiles').select('*').eq(t[0],t[1]).maybeSingle();
@@ -177,10 +185,14 @@ async function getProfile(){
       }catch(e){}
     }
   }
+
   return profile;
 }
 
-function profileId(){return profile&&profile.id?profile.id:(user&&user.id?user.id:null);}
+function profileId(){
+  return profile&&profile.id?profile.id:(user&&user.id?user.id:null);
+}
+
 function isAdmin(){
   let role=String(firstNonEmpty(
     profile&&profile.role,
@@ -190,8 +202,10 @@ function isAdmin(){
     user&&user.user_metadata&&user.user_metadata.role,
     ''
   )).toLowerCase();
+
   return ['admin','owner','superadmin','super_admin'].includes(role);
 }
+
 function requireAdmin(){
   if(!user)throw Error('Please sign in first.');
   if(!isAdmin())throw Error('Admin/owner role required for Review Queue actions.');
@@ -200,6 +214,7 @@ function requireAdmin(){
 function fillChannels(row){
   let opts=channels.map(c=>'<option value="'+esc(c.id||c.name||c.title)+'">'+esc(firstNonEmpty(c.name,c.title,c.channel_name,c.id))+'</option>').join('');
   $('channelSelect').innerHTML='<option value="">No channel</option>'+opts;
+
   let found=channels.find(c=>String(firstNonEmpty(c.name,c.title,c.channel_name)).toLowerCase()===String(channelName(row)).toLowerCase())||channels[0];
   if(found)$('channelSelect').value=found.id||found.name||found.title;
 }
@@ -212,15 +227,17 @@ function selectedChannel(){
 
 function renderStats(){
   let p=0,a=0,d=0,ar=0;
+
   rows.forEach(x=>{
     let s=statusOf(x);
-    if(s==='pending')p++;
+    if(isArchived(x))ar++;
+    else if(s==='pending')p++;
     else if(s==='approved')a++;
     else if(s==='declined')d++;
-    else if(s==='archived')ar++;
   });
+
   $('stats').innerHTML=
-    '<div class="stat"><b>Active</b><span>'+rows.filter(x=>statusOf(x)!=='archived').length+'</span></div>'+
+    '<div class="stat"><b>Active</b><span>'+rows.filter(x=>!isArchived(x)).length+'</span></div>'+
     '<div class="stat"><b>Pending</b><span>'+p+'</span></div>'+
     '<div class="stat"><b>Approved</b><span>'+a+'</span></div>'+
     '<div class="stat"><b>Declined</b><span>'+d+'</span></div>'+
@@ -230,11 +247,13 @@ function renderStats(){
 
 function card(x){
   let im=imgOf(x);
+  let ds=displayStatusOf(x);
+
   return '<article class="sub '+(selected&&String(selected.id)===String(x.id)?'active':'')+'" data-id="'+esc(x.id)+'">'+
     (im?'<div class="thumb"><img src="'+esc(im)+'" alt="poster"></div>':'<div class="thumb">No poster</div>')+
     '<h3>'+esc(titleOf(x))+'</h3>'+
     '<p>'+esc(descOf(x)).slice(0,180)+'</p>'+
-    '<span class="pill '+esc(statusOf(x))+'">'+esc(statusOf(x))+'</span>'+
+    '<span class="pill '+esc(ds)+'">'+esc(ds)+'</span>'+
     '<span class="pill">'+esc(channelName(x))+'</span>'+
     '<span class="pill">'+(urlOf(x)?'has URL':'no URL')+'</span>'+
     '</article>';
@@ -243,9 +262,25 @@ function card(x){
 function renderList(){
   let q=$('filterText').value.trim().toLowerCase();
   let st=$('statusFilter').value;
-  let rs=rows.filter(x=>st==='all'||(st==='active'?statusOf(x)!=='archived':statusOf(x)===st));
-  if(q)rs=rs.filter(x=>[titleOf(x),descOf(x),channelName(x),urlOf(x),statusOf(x)].join(' ').toLowerCase().includes(q));
+
+  let rs=rows.filter(x=>{
+    if(st==='all')return true;
+    if(st==='active')return !isArchived(x);
+    if(st==='archived')return isArchived(x);
+    if(st==='declined')return statusOf(x)==='declined'&&!isArchived(x);
+    return statusOf(x)===st;
+  });
+
+  if(q)rs=rs.filter(x=>[
+    titleOf(x),
+    descOf(x),
+    channelName(x),
+    urlOf(x),
+    displayStatusOf(x)
+  ].join(' ').toLowerCase().includes(q));
+
   $('queueList').innerHTML=rs.length?rs.map(card).join(''):'<div class="note">No submissions found.</div>';
+
   document.querySelectorAll('[data-id]').forEach(el=>{
     el.onclick=()=>{
       selected=rows.find(x=>String(x.id)===String(el.dataset.id));
@@ -259,42 +294,63 @@ function renderSelected(){
     $('selectedBox').innerHTML='Select a submission.';
     return;
   }
+
   fillChannels(selected);
   let im=imgOf(selected);
+
   $('selectedBox').innerHTML=
     '<h3>'+esc(titleOf(selected))+'</h3>'+
     '<p>'+esc(descOf(selected))+'</p>'+
-    '<p><b>Status:</b> '+esc(statusOf(selected))+
+    '<p><b>Status:</b> '+esc(displayStatusOf(selected))+
     '<br><b>Submission channel:</b> '+esc(channelName(selected))+
     '<br><b>Video:</b> '+esc(urlOf(selected)||'No video URL')+'</p>'+
     (im?'<div class="thumb"><img src="'+esc(im)+'" alt="poster"></div>':'<div class="thumb">No poster</div>');
 }
 
-function render(){renderStats();renderList();renderSelected();}
+function render(){
+  renderStats();
+  renderList();
+  renderSelected();
+}
 
 async function refreshSavedCounters(force){
   let now=Date.now();
+
   if(countBusy)return;
+
   if(!force&&lastCountRead&&now-lastCountRead<12000){
-    try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}
+    try{
+      if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();
+    }catch(e){}
     return;
   }
+
   countBusy=true;
+
   try{
     let core=window.StreamBanditCoreSavesV675;
+
     if(core){
-      if(!countReady&&core.init){await core.init();countReady=true;}
-      else if(core.refresh)await core.refresh();
+      if(!countReady&&core.init){
+        await core.init();
+        countReady=true;
+      }else if(core.refresh){
+        await core.refresh();
+      }
     }
+
     if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();
     lastCountRead=Date.now();
   }catch(e){}
-  finally{countBusy=false;}
+  finally{
+    countBusy=false;
+  }
 }
 
 async function load(){
   try{
     setStatus('Loading Review Queue...');
+
     let client=await getClient();
     await getProfile();
 
@@ -303,6 +359,7 @@ async function load(){
 
     let rr=await withTimeout(client.from('sb_submissions').select('*').order('created_at',{ascending:false}).limit(300),15000,'Load submissions');
     if(rr.error)throw rr.error;
+
     rows=rr.data||[];
 
     if(selected){
@@ -312,8 +369,17 @@ async function load(){
 
     render();
     helper();
+
     setStatus('Review Queue ready. Active queue hides archived submissions.');
-    dbg('load ok',{version:VERSION,configSource:cfg&&cfg.source,user:user&&user.email,admin:isAdmin(),profileId:profileId(),rows:rows.length,channels:channels.length});
+    dbg('load ok',{
+      version:VERSION,
+      configSource:cfg&&cfg.source,
+      user:user&&user.email,
+      admin:isAdmin(),
+      profileId:profileId(),
+      rows:rows.length,
+      channels:channels.length
+    });
   }catch(e){
     setStatus('Review Queue load failed: '+(e.message||e),true);
     dbg('load error',{message:e.message||String(e)});
@@ -322,7 +388,9 @@ async function load(){
 
 async function markSubmission(status,extra){
   let client=await getClient();
+
   requireAdmin();
+
   if(!selected)throw Error('Select a submission first.');
 
   let patch=Object.assign({
@@ -332,9 +400,15 @@ async function markSubmission(status,extra){
     updated_at:new Date().toISOString()
   },extra||{});
 
-  let r=await withTimeout(client.from('sb_submissions').update(patch).eq('id',selected.id).select('*').maybeSingle(),20000,'Update submission');
+  let r=await withTimeout(
+    client.from('sb_submissions').update(patch).eq('id',selected.id).select('*').maybeSingle(),
+    20000,
+    'Update submission'
+  );
+
   if(r.error)throw r.error;
   if(!r.data)throw Error('Submission update returned no row.');
+
   selected=r.data;
   return r.data;
 }
@@ -342,7 +416,9 @@ async function markSubmission(status,extra){
 function movieFromSubmission(){
   let ch=selectedChannel();
   let video=urlOf(selected);
+
   if(!video)throw Error('Submission has no video URL.');
+
   return{
     title:titleOf(selected),
     description:descOf(selected),
@@ -366,20 +442,31 @@ function movieFromSubmission(){
 
 async function findMovie(video){
   let client=await getClient();
-  let r=await withTimeout(client.from('sb_movies').select('*').or('video_url.eq.'+video+',mux_playback_url.eq.'+video).limit(1),15000,'Find movie');
+
+  let r=await withTimeout(
+    client.from('sb_movies').select('*').or('video_url.eq.'+video+',mux_playback_url.eq.'+video).limit(1),
+    15000,
+    'Find movie'
+  );
+
   if(r.error)throw r.error;
+
   return r.data&&r.data[0]||null;
 }
 
 async function publish(){
   if(busy)return;
+
   busy=true;
   $('publishBtn').disabled=true;
+
   try{
     requireAdmin();
+
     if(!selected)throw Error('Select a submission first.');
 
     let movie=movieFromSubmission();
+
     dbg('publish start',{submission:selected.id,movie});
 
     let client=await getClient();
@@ -387,20 +474,34 @@ async function publish(){
     let saved;
 
     if(existing){
-      let up=await withTimeout(client.from('sb_movies').update(movie).eq('id',existing.id).select('*').maybeSingle(),25000,'Update movie');
+      let up=await withTimeout(
+        client.from('sb_movies').update(movie).eq('id',existing.id).select('*').maybeSingle(),
+        25000,
+        'Update movie'
+      );
+
       if(up.error)throw up.error;
+
       saved=up.data;
     }else{
-      let ins=await withTimeout(client.from('sb_movies').insert(movie).select('*').single(),25000,'Insert movie');
+      let ins=await withTimeout(
+        client.from('sb_movies').insert(movie).select('*').single(),
+        25000,
+        'Insert movie'
+      );
+
       if(ins.error)throw ins.error;
+
       saved=ins.data;
     }
 
     if(!saved)throw Error('Movie publish returned no row.');
 
     let marked=await markSubmission('approved',{});
+
     dbg('publish verified',{submission:marked,movie:saved});
     setStatus('Approved and published to Public Library: '+saved.title);
+
     await load();
   }catch(e){
     setStatus('Publish failed: '+(e.message||e),true);
@@ -413,13 +514,18 @@ async function publish(){
 
 async function approveOnly(){
   if(busy)return;
+
   busy=true;
   $('approveOnlyBtn').disabled=true;
+
   try{
     requireAdmin();
+
     let marked=await markSubmission('approved',{});
+
     dbg('approve only verified',marked);
     setStatus('Submission approved without publishing.');
+
     await load();
   }catch(e){
     setStatus('Approve failed: '+(e.message||e),true);
@@ -432,14 +538,19 @@ async function approveOnly(){
 
 async function decline(){
   if(busy)return;
+
   busy=true;
   $('declineBtn').disabled=true;
+
   try{
     requireAdmin();
+
     let reason=$('reviewNote').value.trim()||'Not suitable for Stream Bandit at this time.';
     let marked=await markSubmission('declined',{decline_reason:reason});
+
     dbg('decline verified',marked);
     setStatus('Submission declined.');
+
     await load();
   }catch(e){
     setStatus('Decline failed: '+(e.message||e),true);
@@ -452,20 +563,30 @@ async function decline(){
 
 async function archiveQueueRow(){
   if(busy)return;
+
   busy=true;
   $('archiveBtn').disabled=true;
+
   try{
     requireAdmin();
+
     if(!selected)throw Error('Select a submission first.');
 
     let title=titleOf(selected);
+
     if(!confirm('Archive "'+title+'" from the active Review Queue? Published movies stay safe.'))return;
 
-    let marked=await markSubmission('archived',{decline_reason:$('reviewNote').value.trim()||'Archived from active queue.'});
+    let note=$('reviewNote').value.trim()||'Archived from active queue.';
+
+    let marked=await markSubmission('declined',{
+      decline_reason:'[ARCHIVED_FROM_QUEUE] '+note
+    });
+
     dbg('archived queue row',marked);
 
     selected=null;
     setStatus('Archived from active Review Queue. Published movies stay safe.');
+
     await load();
   }catch(e){
     setStatus('Archive failed: '+(e.message||e),true);
@@ -508,6 +629,7 @@ function wire(){
 wire();
 helper();
 load();
+
 setTimeout(()=>refreshSavedCounters(true),600);
 setTimeout(helper,700);
 setTimeout(()=>refreshSavedCounters(true),1600);
