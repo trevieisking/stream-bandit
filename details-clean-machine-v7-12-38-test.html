@@ -12,8 +12,8 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
 .wrap{max-width:1480px;margin:auto}.hero,.box,.card,.related{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 48px #0007;padding:16px;margin-bottom:14px}
 .badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:6px 10px;font-size:12px}.pill{padding:5px 8px;font-size:12px;margin:2px}
 h1{font-size:clamp(38px,5.2vw,66px);line-height:.95;margin:9px 0;letter-spacing:-.055em}h2{margin:0 0 10px}.muted,p,small{color:var(--muted);line-height:1.45}.hero p,.card p,.related p{margin-top:6px;margin-bottom:8px}
-.btn,.tab{border:0;border-radius:999px;padding:10px 14px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}
-.status,.note{padding:10px 12px;border-radius:16px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:10px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.layout{display:grid;grid-template-columns:minmax(300px,.95fr) minmax(320px,1.05fr);gap:16px}.grid,.relatedGrid{display:grid;gap:12px}.grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.relatedGrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.card{background:#ffffff0f;box-shadow:none;margin:0}.card b,.related b{display:block;color:#baf7df;margin-bottom:6px}.art,.relatedArt{aspect-ratio:16/9;border-radius:22px;background:#ffffff10;display:grid;place-items:center;color:#b9c0d8;overflow:hidden;text-align:center}.art img,.relatedArt img{width:100%;height:100%;object-fit:cover}.related{padding:0;overflow:hidden;text-decoration:none;color:white}.relatedBody{padding:14px}.relatedBody h3{margin:0 0 6px}.relatedBody p{font-size:13px;margin:0 0 10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap}.section{display:none}.section.active{display:block}.source{font-family:ui-monospace,Consolas,monospace;background:#0004;border-radius:14px;padding:12px;color:#dfffee;word-break:break-all;white-space:pre-wrap;max-height:360px;overflow:auto}.micro{text-align:center;color:#8f98b8;margin:22px 0}
+.btn,.tab{border:0;border-radius:999px;padding:10px 14px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.btn.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.btn[disabled]{opacity:.65;cursor:wait}
+.status,.note{padding:10px 12px;border-radius:16px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:10px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.saveStatus{font-size:12px;color:#baf7df;margin-top:8px;min-height:16px}.saveStatus.warn{color:#ffe7ad}.layout{display:grid;grid-template-columns:minmax(300px,.95fr) minmax(320px,1.05fr);gap:16px}.grid,.relatedGrid{display:grid;gap:12px}.grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.relatedGrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.card{background:#ffffff0f;box-shadow:none;margin:0}.card b,.related b{display:block;color:#baf7df;margin-bottom:6px}.art,.relatedArt{aspect-ratio:16/9;border-radius:22px;background:#ffffff10;display:grid;place-items:center;color:#b9c0d8;overflow:hidden;text-align:center}.art img,.relatedArt img{width:100%;height:100%;object-fit:cover}.related{padding:0;overflow:hidden;text-decoration:none;color:white}.relatedBody{padding:14px}.relatedBody h3{margin:0 0 6px}.relatedBody p{font-size:13px;margin:0 0 10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap}.section{display:none}.section.active{display:block}.source{font-family:ui-monospace,Consolas,monospace;background:#0004;border-radius:14px;padding:12px;color:#dfffee;word-break:break-all;white-space:pre-wrap;max-height:360px;overflow:auto}.micro{text-align:center;color:#8f98b8;margin:22px 0}
 @media(max-width:900px){body{padding:10px}.layout{grid-template-columns:1fr}.btn,.tab{width:100%}}
 </style>
 </head>
@@ -36,6 +36,7 @@ h1{font-size:clamp(38px,5.2vw,66px);line-height:.95;margin:9px 0;letter-spacing:
     <aside>
       <h2>Movie actions</h2>
       <div id="mainActions" class="actions"><span class="btn">Loading...</span></div>
+      <div id="saveStatus" class="saveStatus"></div>
       <div id="quickMeta" class="grid" style="margin-top:12px"></div>
     </aside>
   </div>
@@ -59,18 +60,17 @@ h1{font-size:clamp(38px,5.2vw,66px);line-height:.95;margin:9px 0;letter-spacing:
 <p class="micro">Details page refit: Header Shell + Page Content + Footer Shell. No old visual shell.</p>
 </div>
 
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=details-foundation-1"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=details-foundation-1"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=details-foundation-1"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=details-foundation-1"></script>
-<script src="stream-bandit-movie-card-saves-v7-12-156.js?v=details-foundation-1"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=details-foundation-1"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=details-foundation-2"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=details-foundation-2"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=details-foundation-2"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=details-foundation-2"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=details-foundation-2"></script>
 <script>
 (function(){
 'use strict';
 const SELF='details-clean-machine-v7-12-38-test.html';
 const PLAYER='player-one-global-helpers-v7-3-3-test.html';
-let row=null,allRows=[],cfg=null;
+let row=null,allRows=[],cfg=null,savesReady=false,saveWireDone=false;
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c));}
 function param(k){return new URLSearchParams(location.search).get(k)||'';}
@@ -88,9 +88,15 @@ async function readConfig(){
 }
 function pill(v){return v?'<span class="pill">'+esc(v)+'</span>':'';}
 function cardKV(k,v){return '<div class="card"><b>'+esc(k)+'</b><p>'+esc(show(v))+'</p></div>';}
+function saveButton(kind,id,label,icon){let core=window.StreamBanditCoreSavesV675,on=core&&core.isSaved&&core.isSaved(kind,id);return '<button class="btn sb-core-save-btn '+(on?'on':'')+'" type="button" data-sb-core-save="'+esc(kind)+'" data-movie-id="'+esc(id)+'">'+esc(icon)+' '+esc((on?'Remove ':'Add ')+label)+'</button>';}
+function saveButtons(id){return saveButton('watchlist',id,'Watchlist','🔖')+saveButton('favourites',id,'Favourite','⭐')+saveButton('likes',id,'Like','👍');}
+function setSaveStatus(msg,warn){let el=$('saveStatus');if(el){el.textContent=msg||'';el.classList.toggle('warn',!!warn);}}
+function refreshSaveButtons(){if(!row)return;$('mainActions').innerHTML='<a class="btn primary" href="'+PLAYER+'?id='+encodeURIComponent(String(row.id||''))+(firstUrl(row)?'&src='+encodeURIComponent(firstUrl(row)):'')+'">Play</a><a class="btn" href="library-global-helpers-v7-4-8-test.html">Library</a>'+saveButtons(String(row.id||''));}
+async function initSaves(){try{if(!window.StreamBanditCoreSavesV675)return false;await window.StreamBanditCoreSavesV675.init();savesReady=true;refreshSaveButtons();return true;}catch(e){savesReady=false;setSaveStatus(e.message||String(e),true);return false;}}
+async function toggleSave(btn){let core=window.StreamBanditCoreSavesV675;if(!core){setSaveStatus('Save helper not ready yet.',true);return;}try{btn.disabled=true;setSaveStatus('Updating '+(btn.textContent||'save')+'...',false);let res=await core.toggle(btn.dataset.sbCoreSave,btn.dataset.movieId);await core.refresh();refreshSaveButtons();setSaveStatus('Saved pages and counts updated.',false);try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}window.dispatchEvent(new CustomEvent('streambandit:details-saves-changed',{detail:res}));}catch(e){setSaveStatus(e.message||String(e),true);}finally{btn.disabled=false;}}
 function relatedCard(m){
   let img=poster(m),id=encodeURIComponent(String(m.id||''));
-  return '<article class="related" data-sb-movie-card="1" data-movie-id="'+esc(m.id||'')+'"><a href="'+SELF+'?id='+id+'" style="text-decoration:none;color:inherit"><div class="relatedArt">'+(img?'<img src="'+esc(img)+'" loading="lazy" alt="">':'No artwork')+'</div><div class="relatedBody"><h3>'+esc(m.title||'Untitled')+'</h3><p>'+esc(m.description||m.summary||'No description yet.')+'</p></div></a></article>';
+  return '<article class="related" data-movie-id="'+esc(m.id||'')+'"><a href="'+SELF+'?id='+id+'" style="text-decoration:none;color:inherit"><div class="relatedArt">'+(img?'<img src="'+esc(img)+'" loading="lazy" alt="">':'No artwork')+'</div><div class="relatedBody"><h3>'+esc(m.title||'Untitled')+'</h3><p>'+esc(m.description||m.summary||'No description yet.')+'</p></div></a></article>';
 }
 function render(){
   if(!row) return;
@@ -99,7 +105,7 @@ function render(){
   $('description').textContent=row.description||row.summary||'No description yet.';
   $('artwork').innerHTML=img?'<img src="'+esc(img)+'" alt="">':'No artwork';
   $('pills').innerHTML=[yearVal(row),row.rating,row.age_rating].map(pill).join('')+genres.slice(0,5).map(pill).join('');
-  $('mainActions').innerHTML='<a class="btn primary" href="'+PLAYER+'?id='+id+(play?'&src='+encodeURIComponent(play):'')+'">Play</a><a class="btn" href="library-global-helpers-v7-4-8-test.html">Library</a><button class="btn sb-core-save-btn" data-sb-core-save="watchlist" data-movie-id="'+esc(row.id)+'">Watchlist</button><button class="btn sb-core-save-btn" data-sb-core-save="favourites" data-movie-id="'+esc(row.id)+'">Favourite</button><button class="btn sb-core-save-btn" data-sb-core-save="likes" data-movie-id="'+esc(row.id)+'">Like</button>';
+  refreshSaveButtons();
   $('quickMeta').innerHTML=cardKV('Year',yearVal(row))+cardKV('Runtime',row.runtime||row.runtime_text)+cardKV('Source',play?'Playable':'No source');
   $('fullMeta').innerHTML=['title','year','release_year','rating','age_rating','runtime','director','channel_id','created_at'].map(k=>cardKV(k,row[k])).join('');
   $('sourceMeta').innerHTML=cardKV('Video source',play?'available':'missing')+cardKV('Mux',row.mux_playback_url||'—');
@@ -107,8 +113,8 @@ function render(){
   $('muxUrl').textContent=row.mux_playback_url||'—';
   let rel=allRows.filter(m=>String(m.id)!==String(row.id)&&arr(m.genres).some(g=>genres.includes(g))).slice(0,8);
   $('relatedGrid').innerHTML=rel.map(relatedCard).join('')||'<div class="note">No related movies found.</div>';
-  $('debug').textContent=JSON.stringify({id:row.id,title:row.title,route:SELF,player:PLAYER,foundation:'two-shell'},null,2);
-  setTimeout(()=>{try{if(window.StreamBanditCoreSavesV675&&window.StreamBanditCoreSavesV675.refresh)window.StreamBanditCoreSavesV675.refresh();if(window.StreamBanditMovieCardSaves&&window.StreamBanditMovieCardSaves.refresh)window.StreamBanditMovieCardSaves.refresh();}catch(e){}},250);
+  $('debug').textContent=JSON.stringify({id:row.id,title:row.title,route:SELF,player:PLAYER,foundation:'two-shell',savesReady:savesReady},null,2);
+  setTimeout(initSaves,250);
 }
 async function load(){
   try{
@@ -127,13 +133,14 @@ async function load(){
   }
 }
 function helper(){
-  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();if(window.StreamBanditMovieCardSaves&&window.StreamBanditMovieCardSaves.refresh)window.StreamBanditMovieCardSaves.refresh();}catch(e){}
-  $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+' · Movie card saves '+(window.StreamBanditMovieCardSaves?'✅':'⚠️');
+  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
+  $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+' · Click wire '+(saveWireDone?'✅':'⚠️');
 }
 function wire(){
   document.querySelectorAll('[data-tab]').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$(btn.dataset.tab).classList.add('active');});
+  if(!saveWireDone){document.addEventListener('click',e=>{let b=e.target.closest('[data-sb-core-save][data-movie-id]');if(!b)return;e.preventDefault();toggleSave(b);});saveWireDone=true;}
 }
-wire();load();helper();setTimeout(helper,700);setTimeout(helper,1800);setInterval(helper,5000);
+wire();load();initSaves();helper();setTimeout(initSaves,700);setTimeout(helper,700);setTimeout(helper,1800);setInterval(helper,5000);
 })();
 </script>
 </body>
