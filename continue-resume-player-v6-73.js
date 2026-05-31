@@ -1,13 +1,14 @@
 /* Stream Bandit Continue Watching Player Helper
-   V7.12.159 Player self-resume fix.
+   V7.12.160 saved timestamp precedence fix.
    Shared by Player 1 and Player 2.
    Saves local browser progress per movie for Continue Watching.
    Player 1 self-resumes on refresh/direct open from the same per-movie progress key.
+   If a stale URL timestamp exists, the newer/higher saved movie timestamp wins.
    Player 2 may read the same movie resume keys but does not replace Player 1's per-movie rows with playlist-only keys.
    No Supabase progress writes, no movie/admin/storage/billing/live actions. */
 (function(){
 'use strict';
-const VERSION='V7.12.159 Player Self Resume';
+const VERSION='V7.12.160 Saved Resume Wins';
 const STORE='stream-bandit-progress-v6-73';
 const attached=new WeakSet();
 const lastSavedByVideo=new WeakMap();
@@ -24,7 +25,7 @@ function progressFor(id){const s=readStore();id=String(id||'');return s[id]||s['
 function currentVideo(){return document.querySelector('#frame video, video');}
 function safeDuration(video){return video&&isFinite(video.duration)?sec(video.duration):0;}
 function saveProgress(video,force){const id=movieId();if(!id||id==='latest'||!video||!isFinite(video.currentTime))return null;const now=Date.now();const last=lastSavedByVideo.get(video)||0;if(!force&&now-last<2500&&video.currentTime>0)return null;lastSavedByVideo.set(video,now);const current=sec(video.currentTime);const duration=safeDuration(video);if(current<5)return null;const slot=playerSlot();const row={id:String(id),movie_id:String(id),movieId:String(id),currentTime:current,current:current,time:current,seconds:current,position:current,resume:current,duration:duration,durationSeconds:duration,total:duration,totalSeconds:duration,updatedAt:new Date().toISOString(),source:slot+'-progress-helper',playerSlot:slot,helperVersion:VERSION};const s=readStore();s[String(id)]=row;s['movie:'+String(id)]=row;s[slot+':latest']=row;s.latest=row;writeStore(s);try{window.dispatchEvent(new CustomEvent('stream-bandit-progress-saved',{detail:row}));}catch(e){}return row;}
-function targetForCurrentMovie(){const direct=sec(param('t')||param('time')||param('resume')||0);if(direct)return direct;const id=movieId();const saved=progressFor(id);if(saved)return sec(saved.currentTime||saved.current||saved.time||saved.seconds||saved.resume||saved.position||0);return 0;}
+function targetForCurrentMovie(){const direct=sec(param('t')||param('time')||param('resume')||0);const id=movieId();const saved=progressFor(id);const savedTime=saved?sec(saved.currentTime||saved.current||saved.time||saved.seconds||saved.resume||saved.position||0):0;if(savedTime&&direct)return Math.max(savedTime,direct);if(savedTime)return savedTime;if(direct)return direct;return 0;}
 function seekWhenReady(video){if(!video)return;const target=targetForCurrentMovie();if(!target)return;function doSeek(){if(video.readyState<1)return;const last=lastSeekByVideo.get(video)||0;if(last&&Math.abs(last-target)<2)return;try{const dur=isFinite(video.duration)?video.duration:0;const safeMax=dur?Math.max(0,dur-3):target;const finalTarget=Math.min(target,safeMax);if(finalTarget>4&&Math.abs((video.currentTime||0)-finalTarget)>2){video.currentTime=finalTarget;lastSeekByVideo.set(video,finalTarget);setStatus('Resumed near '+sec(finalTarget)+'s.');setTimeout(()=>saveProgress(video,true),800);}}catch(e){}}
 video.addEventListener('loadedmetadata',doSeek,{once:false});video.addEventListener('canplay',doSeek,{once:false});video.addEventListener('durationchange',doSeek,{once:false});setTimeout(doSeek,300);setTimeout(doSeek,900);setTimeout(doSeek,1800);setTimeout(doSeek,3200);}
 function attach(video){if(!video||attached.has(video))return false;attached.add(video);seekWhenReady(video);['timeupdate','pause','seeking','seeked','loadedmetadata','durationchange','ended'].forEach(ev=>video.addEventListener(ev,()=>saveProgress(video,ev!=='timeupdate')));setInterval(()=>saveProgress(video,false),4000);window.StreamBanditProgressV673.video=video;return true;}
