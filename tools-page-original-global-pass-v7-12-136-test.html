@@ -1,162 +1,29 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Favourite Tools V7.12.169</title>
-<link rel="icon" href="stream_bandit_stag_icon_32.png">
-<link rel="apple-touch-icon" href="apple_touch_icon_180.png">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--cyan:#41e8ff;--bad:#ff4d6d;--btnText:#fff;--fontScale:1}
-*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 40%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(13.5px * var(--fontScale))}.wrap{max-width:1440px;margin:auto}.hero,.box,.card,.tool,.stat{border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 12px 38px #0006;padding:14px;margin-bottom:12px}.hero{padding:18px}.box{padding:15px}.card,.tool,.stat{background:#ffffff0f;box-shadow:none;margin-bottom:0}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:5px 9px;font-size:11px}.pill{padding:4px 7px;font-size:10px;margin:2px}h1{font-size:clamp(32px,4vw,58px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 9px;font-size:21px}h3{margin:0 0 6px;font-size:16px}.muted,p,small,label,textarea,input{color:var(--muted);line-height:1.42}.hero p,.card p,.tool p,.stat p{margin-top:5px;margin-bottom:7px}.btn,.tab{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.btn:disabled{opacity:.55;cursor:not-allowed}.small{padding:7px 10px;font-size:11px}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}.status,.note,.danger,.safe{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}.grid,.toolGrid,.stats{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}.toolGrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(250px,360px);gap:14px}.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:180px;display:grid;place-items:center;position:relative;overflow:hidden}.art:before{content:"";position:absolute;inset:20px;border-radius:22px;border:1px dashed #ffffff32}.artIcon{font-size:56px;z-index:1}.actions,.tabs,.routeStrip{display:flex;gap:7px;flex-wrap:wrap}.actions{margin-top:8px}.routeStrip{margin-top:10px}.routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}.card b,.tool b,.stat b{display:block;color:#baf7df;margin-bottom:5px}.stat span{font-size:22px;font-weight:950}.section{display:none}.section.active{display:block}.field{display:grid;gap:6px;margin:8px 0}.input,textarea{width:100%;border:1px solid #ffffff25;border-radius:16px;background:#080316;color:white;padding:10px 12px;font:inherit;font-weight:850}textarea{min-height:170px;resize:vertical}.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:14px;padding:12px;color:#dfffee;max-height:360px;overflow:auto}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}@media(max-width:980px){body{padding:10px}.heroGrid{grid-template-columns:1fr}.btn,.tab{width:100%;white-space:normal}.art{min-height:160px}}
-</style>
-</head>
-<body data-sb-tools-menu-url="tools-page-original-global-pass-v7-12-136-test.html">
-<div class="wrap">
-<section class="hero">
-  <div class="heroGrid">
-    <div>
-      <span class="badge">V7.12.169 Favourite Tools Restored</span>
-      <h1>Favourite Tools</h1>
-      <p>Your useful browser-only helper board is restored on the current Tools route. It keeps route checks, note building, text cleanup, Mux/HLS formatting and quick admin/owner links. No Supabase writes, no payments and no live promotion.</p>
-      <div class="routeStrip"><span>Browser-only</span><span>No writes</span><span>Current Tools route</span><span>Owner/Admin useful links</span></div>
-      <div class="actions">
-        <button class="btn primary" data-tab-open="routes" type="button">Route Check</button>
-        <button class="btn hot" data-tab-open="notes" type="button">Build Note</button>
-        <button class="btn cyan" data-tab-open="mux" type="button">Mux / HLS Helper</button>
-        <button class="btn warn" data-tab-open="quick" type="button">Favourite Links</button>
-      </div>
-      <div id="helperStatus" class="note">Checking foundation...</div>
-      <div id="status" class="status">Favourite Tools loaded.</div>
-    </div>
-    <div class="art"><div class="artIcon">🧰⭐</div></div>
-  </div>
-</section>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stream Bandit Favourite Tools V7.12.170</title><link rel="icon" href="stream_bandit_stag_icon_32.png"><link rel="apple-touch-icon" href="apple_touch_icon_180.png"><style>
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--cyan:#41e8ff;--bad:#ff4d6d;--fontScale:1}*{box-sizing:border-box;min-width:0}body{margin:0;padding:16px;background:radial-gradient(circle at 8% 0,#22d3a633,transparent 34%),radial-gradient(circle at 92% 0,#7c3cff55,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}.wrap{max-width:1450px;margin:auto}.hero,.box,.card,.out{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 42px #0007;padding:16px;margin-bottom:14px}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:5px 9px;font-size:11px}.pill{margin:2px}.heroGrid{display:grid;grid-template-columns:1fr minmax(230px,340px);gap:14px}.art{border:1px solid #ffffff1a;border-radius:22px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);display:grid;place-items:center;min-height:170px;font-size:56px}h1{font-size:clamp(34px,5vw,64px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 10px}h3{margin:0 0 8px}.muted,p,label{color:var(--muted);line-height:1.45}.tabs,.actions,.grid{display:flex;gap:8px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.btn,.tab{border:0;border-radius:999px;padding:9px 12px;background:#414667;color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.section{display:none}.section.active{display:block}.field{display:grid;gap:6px;margin:8px 0}.input,textarea,select{width:100%;border:1px solid #ffffff24;border-radius:16px;background:#050711;color:#fff;padding:11px 12px;font:inherit}textarea{min-height:145px;resize:vertical}.small{font-size:12px;padding:7px 9px}.out{background:#0005;box-shadow:none;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,Consolas,monospace;color:#dfffee;max-height:360px;overflow:auto}.preview{border:1px solid #ffffff1a;border-radius:18px;background:#0004;padding:12px}.poster{aspect-ratio:16/9;border-radius:16px;background:#0006;display:grid;place-items:center;overflow:hidden;color:#b9c0d8}.poster img{width:100%;height:100%;object-fit:cover}.castGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.cast{border:1px solid #ffffff1a;border-radius:16px;background:#0005;padding:10px}.cast b{color:#baf7df}.role{color:#b9c0d8;font-size:12px;margin-top:4px}.status{padding:10px 12px;border-radius:16px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:10px}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}@media(max-width:850px){.heroGrid{grid-template-columns:1fr}.btn,.tab{width:100%}}
+</style></head><body data-sb-tools-menu-url="tools-page-original-global-pass-v7-12-136-test.html"><div class="wrap">
+<section class="hero"><div class="heroGrid"><div><span class="badge">V7.12.170 Favourite Tools · Full Set Restored</span><h1>Favourite Tools</h1><p>Restored useful tools: Stream Bandit rating, Details-style cast writer, text formatter, Mux/HLS formulator, movie metadata builder, preview builder, route checker, checkpoint note builder and favourite route links. Browser-only: no Supabase writes, no uploads, no payments, no live promotion.</p><div class="actions"><button class="btn primary" data-open="rating">Rating</button><button class="btn hot" data-open="cast">Cast Writer</button><button class="btn cyan" data-open="mux">Mux</button><button class="btn warn" data-open="quick">Favourite Links</button></div><div id="status" class="status">Favourite Tools ready.</div></div><div class="art">🧰⭐</div></div></section>
+<section class="box"><div class="tabs"><button class="tab active" data-tab="quick">Favourite Links</button><button class="tab" data-tab="rating">Rating</button><button class="tab" data-tab="cast">Cast Writer</button><button class="tab" data-tab="text">Text Formatter</button><button class="tab" data-tab="mux">Mux / HLS</button><button class="tab" data-tab="meta">Movie Metadata</button><button class="tab" data-tab="preview">Preview</button><button class="tab" data-tab="routes">Route Check</button><button class="tab" data-tab="notes">Checkpoint Note</button><button class="tab" data-tab="debug">Debug</button></div></section>
+<section id="quick" class="box section active"><h2>Favourite route links</h2><div id="quickGrid" class="grid"></div></section>
+<section id="rating" class="box section"><h2>Overall Stream Bandit rating</h2><div id="scoreGrid" class="grid"></div><div class="actions"><button id="calcRating" class="btn primary">Calculate</button><button class="btn" data-copy="ratingOut">Copy</button></div><div id="ratingOut" class="out">Waiting...</div></section>
+<section id="cast" class="box section"><h2>Cast writer / Details cast chip builder</h2><div class="field"><label>Paste one per line: Actor as Role</label><textarea id="castIn">Mason Thames as Hiccup
+Nico Parker as Astrid</textarea></div><div class="actions"><button id="buildCast" class="btn hot">Build Cast</button><button class="btn" data-copy="castOut">Copy</button></div><textarea id="castOut" readonly></textarea><h3>Preview</h3><div id="castPreview" class="castGrid"></div></section>
+<section id="text" class="box section"><h2>Text formatter</h2><div class="field"><textarea id="textIn" placeholder="Paste messy text..."></textarea></div><div class="actions"><button id="cleanLines" class="btn primary">Clean Lines</button><button id="paragraph" class="btn hot">Paragraph</button><button id="bullets" class="btn cyan">Bullets</button><button class="btn" data-copy="textOut">Copy</button></div><textarea id="textOut" readonly></textarea></section>
+<section id="mux" class="box section"><h2>Mux / HLS formulator</h2><div class="field"><input id="muxIn" class="input" placeholder="Mux playback ID or stream/player URL"></div><div class="actions"><button id="formatMux" class="btn primary">Format Mux URLs</button><button class="btn" data-copy="muxOut">Copy</button></div><textarea id="muxOut" readonly></textarea></section>
+<section id="meta" class="box section"><h2>Movie metadata builder</h2><div class="grid"><div class="field"><label>Title</label><input id="mTitle" class="input"></div><div class="field"><label>Year</label><input id="mYear" class="input"></div><div class="field"><label>Rating</label><input id="mRating" class="input"></div><div class="field"><label>Runtime</label><input id="mRuntime" class="input"></div></div><div class="field"><label>Genres</label><input id="mGenres" class="input" placeholder="Action, Drama"></div><div class="field"><label>Tags</label><input id="mTags" class="input"></div><div class="field"><label>Director</label><input id="mDirector" class="input"></div><div class="field"><label>Description</label><textarea id="mDesc"></textarea></div><div class="actions"><button id="buildMeta" class="btn primary">Build Metadata JSON</button><button class="btn" data-copy="metaOut">Copy</button></div><textarea id="metaOut" readonly></textarea></section>
+<section id="preview" class="box section"><h2>Details-style preview</h2><div class="grid"><div><div id="posterPrev" class="poster">Poster preview</div><div class="field"><input id="pPoster" class="input" placeholder="Poster URL"></div></div><div><div class="field"><input id="pTitle" class="input" value="Stream Bandit Preview"></div><div class="field"><textarea id="pDesc">Quick Details-style card preview.</textarea></div><div class="field"><input id="pChips" class="input" value="Action, Mux, Featured"></div><button id="buildPreview" class="btn primary">Build Preview</button><div id="previewCard" class="preview"></div></div></div></section>
+<section id="routes" class="box section"><h2>Route checker</h2><div class="actions"><button id="runRoutes" class="btn primary">Run Route Check</button><button class="btn" data-copy="routeOut">Copy</button></div><div id="routeOut" class="out">Ready.</div></section>
+<section id="notes" class="box section"><h2>Checkpoint note builder</h2><div class="field"><input id="noteTitle" class="input" value="Stream Bandit checkpoint"></div><div class="field"><textarea id="noteBody">Passed:
+- Header shell
+- Footer shell
+- Page-owned content
 
-<section class="box">
-  <h2>Tools tabs</h2>
-  <div class="tabs">
-    <button class="tab active" data-tab="quick" type="button">Favourite Links</button>
-    <button class="tab" data-tab="routes" type="button">Route Check</button>
-    <button class="tab" data-tab="notes" type="button">Checkpoint Note</button>
-    <button class="tab" data-tab="text" type="button">Text Cleanup</button>
-    <button class="tab" data-tab="mux" type="button">Mux / HLS</button>
-    <button class="tab" data-tab="debugTab" type="button">Debug</button>
-  </div>
-</section>
-
-<section id="quick" class="box section active">
-  <h2>Favourite useful links</h2>
-  <div id="quickGrid" class="toolGrid"></div>
-</section>
-
-<section id="routes" class="box section">
-  <h2>Current route check</h2>
-  <p>Checks the most-used Stream Bandit routes without writing anything.</p>
-  <div class="actions"><button id="runRoutes" class="btn primary" type="button">Run Route Check</button><button id="copyRoutes" class="btn" type="button">Copy Report</button></div>
-  <textarea id="routeReport" readonly>Ready.</textarea>
-  <div id="routeCards" class="grid" style="margin-top:10px"></div>
-</section>
-
-<section id="notes" class="box section">
-  <h2>Checkpoint note builder</h2>
-  <div class="field"><label>Title</label><input id="noteTitle" class="input" value="Stream Bandit checkpoint note"></div>
-  <div class="field"><label>Body</label><textarea id="noteBody">What passed:\n- Header shell\n- Footer shell\n- Current route\n\nWhat not to touch:\n- Passed groups\n- Player 1 resume owner\n- Player 2 queue rule</textarea></div>
-  <div class="actions"><button id="buildNote" class="btn primary" type="button">Build Note</button><button id="copyNote" class="btn" type="button">Copy Note</button></div>
-  <textarea id="noteOut" readonly></textarea>
-</section>
-
-<section id="text" class="box section">
-  <h2>Text cleanup</h2>
-  <p>Trim lines, remove blanks and remove duplicate lines while keeping the first copy.</p>
-  <div class="field"><label>Input</label><textarea id="textIn" placeholder="Paste text..."></textarea></div>
-  <div class="actions"><button id="cleanText" class="btn primary" type="button">Clean Lines</button><button id="copyText" class="btn" type="button">Copy Clean Text</button></div>
-  <textarea id="textOut" readonly></textarea>
-</section>
-
-<section id="mux" class="box section">
-  <h2>Mux / HLS helper</h2>
-  <p>Paste a Mux playback ID, stream URL or player URL and get the useful public URLs.</p>
-  <div class="field"><label>Mux input</label><input id="muxIn" class="input" placeholder="Mux playback ID or public stream/player URL"></div>
-  <div class="actions"><button id="formatMux" class="btn primary" type="button">Format URL</button><button id="copyMux" class="btn" type="button">Copy Output</button></div>
-  <textarea id="muxOut" readonly></textarea>
-  <div class="note">This formats public playback text only. It does not upload, delete or alter Mux assets.</div>
-</section>
-
-<section id="debugTab" class="box section">
-  <h2>Debug</h2>
-  <div id="debugOut" class="source">Waiting...</div>
-</section>
-
-<p class="micro">Favourite Tools restored: Header Shell + Useful Tools Content + Footer Shell. Browser-only helper board.</p>
-</div>
-
-<script src="stream-bandit-shell-v6-24.js?v=favourite-tools-7-12-169"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=favourite-tools-7-12-169"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=favourite-tools-7-12-169"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=favourite-tools-7-12-169"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=favourite-tools-7-12-169"></script>
-<script src="stream-bandit-global-helper-loader-v7-12-126.js?v=favourite-tools-7-12-169"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=favourite-tools-7-12-169"></script>
+Protected:
+- Player 1 resume owner
+- Player 2 queue owner</textarea></div><div class="actions"><button id="buildNote" class="btn primary">Build Note</button><button class="btn" data-copy="noteOut">Copy</button></div><textarea id="noteOut" readonly></textarea></section>
+<section id="debug" class="box section"><h2>Debug</h2><div id="debugOut" class="out"></div></section>
+<p class="micro">Favourite Tools restored as protected browser-only page.</p></div>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=tools-full-170"></script><script src="stream-bandit-header-shell-v7-12-156.js?v=tools-full-170"></script><script src="stream-bandit-footer-shell-v7-12-156.js?v=tools-full-170"></script>
 <script>
-(function(){
-'use strict';
-const VERSION='V7.12.169 Favourite Tools Restored';
-let last='',countReady=false;
-const ROUTES=[
- ['Home','home-global-helpers-v7-4-4-test.html','Watch'],
- ['Library','library-global-helpers-v7-4-8-test.html','Watch'],
- ['Details','details-clean-machine-v7-12-38-test.html','Watch'],
- ['Player 1','player-one-global-helpers-v7-3-3-test.html','Watch'],
- ['Player 2','player-2-progress-helper-v6-78-9-4-test.html','Group Play'],
- ['Continue Watching','continue-watching-global-helpers-v7-3-9-test.html','Saved'],
- ['Watch History','watch-history-global-helpers-v7-4-0-test.html','Saved'],
- ['Supabase Library Editor','supabase-library-home-header-form-fix-v7-12-34-test.html','Browse'],
- ['Genres','genres-clean-machine-v7-12-45-test.html','Browse'],
- ['Global Search','global-search-global-helpers-v7-4-9-test.html','Browse'],
- ['About','about-global-helpers-v7-4-7-test.html','Browse'],
- ['Submit Video','submit-video-clean-machine-v7-12-79-test.html','Creator'],
- ['Review Queue','review-queue-clean-machine-v7-12-80-publish-test.html','Creator'],
- ['Creator Rules','rules-clean-machine-v7-12-82-test.html','Creator'],
- ['Channels','channels-global-helpers-v7-5-3-test.html','Group Play'],
- ['Playlists','playlists-global-helpers-v7-5-2-test.html','Group Play'],
- ['Collections','collections-clean-machine-v7-12-48-test.html','Group Play'],
- ['My Channel','my-channel-clean-machine-v7-12-47-test.html','Group Play'],
- ['Admin Centre','admin-centre-command-deck-v7-12-121-test.html','Admin'],
- ['Live Readiness','live-readiness-global-helpers-v7-10-2-test.html','Admin'],
- ['Current Routes Registry','all-pages-version-registry-v7-12-122-current-routes-test.html','Admin'],
- ['Test Checklist','test-checklist-global-helpers-v7-10-5-test.html','Admin'],
- ['Health Check','health-check-global-helpers-v7-10-6-test.html','Admin'],
- ['Mux Manager','mux-manager-global-helpers-v7-10-7-test.html','Admin'],
- ['Storage Prep','storage-prep-global-helpers-v7-10-8-test.html','Admin'],
- ['Backup / Safety','backup-safety-global-helpers-v7-10-9-test.html','Admin'],
- ['Settings Hub','settings-platform-control-hub-v7-12-85-test.html','Settings'],
- ['Theme Studio','web-builder-theme-studio-controls-v7-8-9-test.html','Settings'],
- ['Profile Settings','profile-settings-live-ready-v7-12-90-test.html','Settings'],
- ['Web Builder Studio','web-builder-live-studio-v7-12-116-test.html?page=test-page','Builder'],
- ['Pages Manager','web-builder-pages-manager-v7-12-111-test.html','Builder'],
- ['Form Inbox','web-builder-form-submissions-v7-12-94-test.html?page=test-page','Owner'],
- ['Advanced Form','web-builder-form-save-v7-12-94-test.html?page=test-page','Owner'],
- ['One Machine','stream-bandit-one-machine-v7-12-73-test.html','Owner'],
- ['Platform Control Centre','settings-platform-control-hub-v7-12-85-test.html','Owner'],
- ['Brand / App Icons','settings-brand-icons-promoted-v7-12-21-test.html','Owner']
-];
-const $=id=>document.getElementById(id);
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function setStatus(t){$('status').textContent=t;}
-function tab(id){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.section').forEach(x=>x.classList.toggle('active',x.id===id));setStatus('Favourite Tools tab open: '+id+'.');}
-function renderQuick(){let fav=['Admin','Owner','Group Play','Creator','Browse','Builder','Settings'];let list=ROUTES.filter(r=>fav.includes(r[2]));$('quickGrid').innerHTML=list.map(r=>'<article class="tool"><b>'+esc(r[0])+'</b><p>'+esc(r[2])+'</p><a class="btn small primary" href="'+esc(r[1])+'">Open</a></article>').join('');}
-async function runRoutes(){let rows=[];$('routeReport').value='Checking routes...';for(const r of ROUTES){try{let x=await fetch(r[1],{cache:'no-store'});rows.push({name:r[0],group:r[2],url:r[1],ok:x.ok,status:x.status});}catch(e){rows.push({name:r[0],group:r[2],url:r[1],ok:false,status:'review'});}}last=rows.map(r=>(r.ok?'PASS ':'CHECK ')+r.name+' — '+r.url+' ['+r.status+']').join('\n');$('routeReport').value=last;$('routeCards').innerHTML=rows.map(r=>'<div class="card"><b>'+(r.ok?'✅ ':'⚠️ ')+esc(r.name)+'</b><p>'+esc(r.group)+'<br>'+esc(r.url)+'<br>'+esc(String(r.status))+'</p></div>').join('');setStatus('Route check complete.');}
-function buildNote(){last=$('noteTitle').value.trim()+'\n\n'+$('noteBody').value.trim()+'\n\nGenerated: '+new Date().toISOString();$('noteOut').value=last;setStatus('Checkpoint note built.');}
-function cleanText(){let rows=$('textIn').value.split(/\n+/).map(x=>x.trim()).filter(Boolean);let seen=new Set(),out=[];rows.forEach(x=>{let k=x.toLowerCase();if(!seen.has(k)){seen.add(k);out.push(x);}});last=out.join('\n');$('textOut').value=last;setStatus('Text cleaned.');}
-function mux(){let raw=$('muxIn').value.trim();let id='';let m=raw.match(/stream\.mux\.com\/([A-Za-z0-9._-]+)\.m3u8/i)||raw.match(/player\.mux\.com\/([A-Za-z0-9._-]+)/i);if(m)id=m[1];else if(/^[A-Za-z0-9._-]{8,}$/.test(raw))id=raw;last=id?'Public HLS URL:\nhttps://stream.mux.com/'+id+'.m3u8\n\nPlayer URL:\nhttps://player.mux.com/'+id:'No playback ID found.';$('muxOut').value=last;setStatus('Mux/HLS text formatted.');}
-function copyText(v){try{navigator.clipboard&&navigator.clipboard.writeText(v||last||'');setStatus('Copied.');}catch(e){setStatus('Copy blocked by browser.');}}
-async function refreshCounts(force){try{let core=window.StreamBanditCoreSavesV675;if(core){if(!countReady&&core.init){await core.init();countReady=true;}else if(core.refresh){await core.refresh();}}if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}}
-function helper(){try{if(window.StreamBanditGlobalHelperLoader&&window.StreamBanditGlobalHelperLoader.refresh)window.StreamBanditGlobalHelperLoader.refresh();}catch(e){}try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}$('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Loader '+(window.StreamBanditGlobalHelperLoader?'✅':'⚠️')+' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️');$('debugOut').textContent=JSON.stringify({version:VERSION,browserOnly:true,supabaseWrites:false,payments:false,livePromotion:false,routeCount:ROUTES.length,toolsRoute:'tools-page-original-global-pass-v7-12-136-test.html'},null,2);}
-function wire(){document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>tab(b.dataset.tab));document.querySelectorAll('[data-tab-open]').forEach(b=>b.onclick=()=>tab(b.dataset.tabOpen));$('runRoutes').onclick=runRoutes;$('copyRoutes').onclick=()=>copyText($('routeReport').value);$('buildNote').onclick=buildNote;$('copyNote').onclick=()=>copyText($('noteOut').value);$('cleanText').onclick=cleanText;$('copyText').onclick=()=>copyText($('textOut').value);$('formatMux').onclick=mux;$('copyMux').onclick=()=>copyText($('muxOut').value);window.addEventListener('streambandit-core-saves-changed',()=>refreshCounts(true));window.addEventListener('streambandit-core-saves-v6-75-changed',()=>refreshCounts(true));}
-renderQuick();wire();helper();refreshCounts(true);setTimeout(helper,700);setTimeout(helper,1800);setInterval(helper,6000);
-})();
-</script>
-</body>
-</html>
+(function(){const VERSION='V7.12.170 Favourite Tools Full Set';let last='';const $=id=>document.getElementById(id);const ROUTES=[['Home','home-global-helpers-v7-4-4-test.html'],['Library','library-global-helpers-v7-4-8-test.html'],['Details','details-clean-machine-v7-12-38-test.html?v=171'],['Player 1','player-one-global-helpers-v7-3-3-test.html'],['Player 2','player-2-progress-helper-v6-78-9-4-test.html'],['Supabase Library Editor','supabase-library-home-header-form-fix-v7-12-34-test.html'],['Global Search','global-search-global-helpers-v7-4-9-test.html'],['Submit Video','submit-video-clean-machine-v7-12-79-test.html'],['Review Queue','review-queue-clean-machine-v7-12-80-publish-test.html'],['Channels','channels-global-helpers-v7-5-3-test.html'],['Playlists','playlists-global-helpers-v7-5-2-test.html'],['Collections','collections-clean-machine-v7-12-48-test.html'],['My Channel','my-channel-clean-machine-v7-12-47-test.html'],['Live Readiness','live-readiness-global-helpers-v7-10-2-test.html'],['Registry','all-pages-version-registry-v7-12-122-current-routes-test.html'],['Mux Manager','mux-manager-global-helpers-v7-10-7-test.html'],['Health Check','health-check-global-helpers-v7-10-6-test.html'],['Settings Hub','settings-platform-control-hub-v7-12-85-test.html'],['Web Builder','web-builder-live-studio-v7-12-116-test.html?page=test-page']];const SCORES=['Home','Library','Details','Player comfort','Accessibility','Search','Supabase','Creator flow','Group Play','Polish'];function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function arr(v){return String(v||'').split(/,|\n/).map(x=>x.trim()).filter(Boolean)}function setStatus(t){$('status').textContent=t}function openTab(id){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.section').forEach(x=>x.classList.toggle('active',x.id===id));setStatus('Open: '+id)}function renderQuick(){$('quickGrid').innerHTML=ROUTES.map(r=>'<div class="card"><h3>'+esc(r[0])+'</h3><a class="btn small primary" href="'+esc(r[1])+'">Open</a></div>').join('')}function renderScores(){$('scoreGrid').innerHTML=SCORES.map(s=>'<div class="field"><label>'+esc(s)+'</label><input class="input score" type="number" min="0" max="10" step="0.5" value="8" data-name="'+esc(s)+'"></div>').join('')}function calcRating(){let inputs=[...document.querySelectorAll('.score')],sum=0,lines=[];inputs.forEach(i=>{let v=Math.max(0,Math.min(10,Number(i.value)||0));sum+=v;lines.push(i.dataset.name+': '+v+'/10')});let avg=sum/inputs.length;let label=avg>=9?'Excellent':avg>=8?'Strong pass':avg>=7?'Good, polish needed':avg>=6?'Functional, needs work':'Repair needed';last='Overall Stream Bandit rating: '+avg.toFixed(1)+'/10\n'+label+'\n\n'+lines.join('\n');$('ratingOut').textContent=last}function parseCast(s){return String(s||'').split(/\n+|;|\|/).map(x=>x.trim()).filter(Boolean).map(x=>{let m=x.match(/^(.+?)\s+as\s+(.+)$/i);return{name:m?m[1].trim():x,role:m?m[2].trim():''}})}function buildCast(){let rows=parseCast($('castIn').value);last=rows.map(c=>c.role?c.name+' as '+c.role:c.name).join('\n');$('castOut').value=last;$('castPreview').innerHTML=rows.map(c=>'<div class="cast"><b>'+esc(c.name)+'</b>'+(c.role?'<div class="role">as '+esc(c.role)+'</div>':'')+'</div>').join('')||'<div class="cast">No cast</div>'}function formatText(mode){let rows=$('textIn').value.split(/\n+/).map(x=>x.trim()).filter(Boolean),seen=new Set(),out=[];rows.forEach(x=>{let k=x.toLowerCase();if(!seen.has(k)){seen.add(k);out.push(x)}});last=mode==='paragraph'?out.join(' '):mode==='bullets'?out.map(x=>'- '+x).join('\n'):out.join('\n');$('textOut').value=last}function mux(){let raw=$('muxIn').value.trim(),id='',m=raw.match(/stream\.mux\.com\/([A-Za-z0-9._-]+)\.m3u8/i)||raw.match(/player\.mux\.com\/([A-Za-z0-9._-]+)/i);if(m)id=m[1];else if(/^[A-Za-z0-9._-]{8,}$/.test(raw))id=raw;last=id?'mux_playback_url: https://stream.mux.com/'+id+'.m3u8\nvideo_url: https://stream.mux.com/'+id+'.m3u8\nplayer_url: https://player.mux.com/'+id+'\nsource_type: mux':'No Mux playback ID found';$('muxOut').value=last}function meta(){let obj={title:$('mTitle').value.trim(),year:$('mYear').value.trim(),rating:$('mRating').value.trim(),runtime_text:$('mRuntime').value.trim(),genres:arr($('mGenres').value),tags:arr($('mTags').value),director:$('mDirector').value.trim(),description:$('mDesc').value.trim(),status:'published'};last=JSON.stringify(obj,null,2);$('metaOut').value=last}function preview(){let img=$('pPoster').value.trim(),chips=arr($('pChips').value);$('posterPrev').innerHTML=img?'<img src="'+esc(img)+'" alt="">':'Poster preview';$('previewCard').innerHTML='<h3>'+esc($('pTitle').value)+'</h3><p>'+esc($('pDesc').value)+'</p>'+chips.map(c=>'<span class="pill">'+esc(c)+'</span>').join('')}async function routes(){let out=[];for(const r of ROUTES){try{let res=await fetch(r[1],{cache:'no-store'});out.push((res.ok?'PASS ':'CHECK ')+r[0]+' — '+r[1]+' ['+res.status+']')}catch(e){out.push('CHECK '+r[0]+' — '+r[1])}}last=out.join('\n');$('routeOut').textContent=last}function note(){last=$('noteTitle').value.trim()+'\n\n'+$('noteBody').value.trim()+'\n\nGenerated: '+new Date().toISOString();$('noteOut').value=last}function copy(id){let el=$(id);let v=el.value||el.textContent||last||'';navigator.clipboard&&navigator.clipboard.writeText(v);setStatus('Copied')}document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openTab(b.dataset.open));document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>copy(b.dataset.copy));$('calcRating').onclick=calcRating;$('buildCast').onclick=buildCast;$('cleanLines').onclick=()=>formatText('lines');$('paragraph').onclick=()=>formatText('paragraph');$('bullets').onclick=()=>formatText('bullets');$('formatMux').onclick=mux;$('buildMeta').onclick=meta;$('buildPreview').onclick=preview;$('runRoutes').onclick=routes;$('buildNote').onclick=note;renderQuick();renderScores();buildCast();preview();$('debugOut').textContent=JSON.stringify({version:VERSION,tools:['rating','cast writer','text formatter','mux formulator','metadata builder','preview builder','route check','checkpoint note','favourite links'],writes:false},null,2);})();
+</script></body></html>
