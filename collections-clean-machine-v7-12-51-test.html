@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit V7.12.178 Collections Page Polish TEST</title>
+<title>Stream Bandit V7.12.179 Collections Page Polish TEST</title>
 <style>
 :root{color-scheme:dark}body{margin:0;padding:24px;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.loader{max-width:900px;margin:8vh auto;border:1px solid #ffffff22;border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 20px 70px #0007;padding:24px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,68px);letter-spacing:-.055em;margin:12px 0}.muted{color:#b9c0d8;line-height:1.5}.note{padding:12px 14px;border-radius:18px;background:#ffb1421f;border:1px solid #ffb14252;color:#ffe7ad;font-weight:850;margin-top:14px}.bad{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9;white-space:pre-wrap}
 </style>
 </head>
 <body>
-<div id="loader" class="loader"><span class="badge">V7.12.178 Collections Page Polish TEST</span><h1>🧺 Loading Collections…</h1><p class="muted">Keeping the working Collections page and polishing the layout only. The global footer shell remains the only footer.</p><div class="note">One-page polish: Collections only.</div></div>
+<div id="loader" class="loader"><span class="badge">V7.12.179 Collections Page Polish TEST</span><h1>🧺 Loading Collections…</h1><p class="muted">Keeping the working Collections page and polishing the layout only. The global footer shell remains the only footer.</p><div class="note">One-page polish: Collections only.</div></div>
 <script>
 (async function(){
-  const source='collections-clean-machine-v7-12-50-test.html?v=7-12-178-collections-page-polish';
-  const polishStyle = String.raw`<style id="sbCollectionsPagePolish178">
+  const source='collections-clean-machine-v7-12-50-test.html?v=7-12-179-collections-current-menu';
+  const polishStyle = String.raw`<style id="sbCollectionsPagePolish179">
 :root{--sbHomeCardGap:12px}
 body[data-sb-collections-menu-url],body{padding:14px!important}
 .wrap{max-width:1480px!important}
@@ -54,22 +54,46 @@ h3{font-size:17px!important;line-height:1.1!important}
 @media(max-width:980px){body{padding:10px!important}.heroGrid,.layout{grid-template-columns:1fr!important}.hero .art{min-height:140px!important}.btn,.tab{width:100%;white-space:normal}.sb-compact-foundation .grid,.sb-compact-foundation #globalGrid{grid-template-columns:1fr 1fr!important}}
 @media(max-width:560px){.sb-compact-foundation .grid,.sb-compact-foundation #globalGrid{grid-template-columns:1fr!important}.hero h1{font-size:38px!important}}
 </style>`;
-  const polishScript = String.raw`<script id="sbCollectionsPagePolish178Script">
+  const polishScript = String.raw`<script id="sbCollectionsPagePolish179Script">
 (function(){
 'use strict';
 function cleanText(el,from,to){try{if(el&&el.innerHTML&&el.innerHTML.indexOf(from)>-1)el.innerHTML=el.innerHTML.replaceAll(from,to);}catch(e){}}
+function patchCollectionsMenuCurrent(){
+  try{
+    const currentFile='collections-clean-machine-v7-12-51-test.html';
+    const oldFiles=['collections-clean-machine-v7-12-48-test.html','collections-clean-machine-v7-12-49-test.html','collections-clean-machine-v7-12-50-test.html'];
+    const drawer=document.getElementById('sbMenuDrawer');
+    if(!drawer)return;
+    drawer.querySelectorAll('a[href]').forEach(a=>{
+      let href=a.getAttribute('href')||'';
+      oldFiles.forEach(old=>{href=href.replace(old,currentFile);});
+      a.setAttribute('href',href);
+    });
+    const links=Array.from(drawer.querySelectorAll('.sb-menu-link'));
+    const collections=links.find(a=>/\bCollections\b/i.test((a.textContent||'')));
+    if(collections){
+      links.forEach(a=>a.classList.remove('current'));
+      drawer.querySelectorAll('.sb-menu-group').forEach(g=>g.classList.remove('current'));
+      collections.classList.add('current');
+      const group=collections.closest('.sb-menu-group');
+      if(group)group.classList.add('current');
+      try{collections.scrollIntoView({block:'center'});}catch(e){}
+    }
+  }catch(e){}
+}
 function applyCollectionsPolish(){
-  try{document.title='Stream Bandit V7.12.178 Collections Page Polish TEST';}catch(e){}
-  try{document.documentElement.dataset.sbCollectionsPagePolish='v7-12-178';}catch(e){}
+  try{document.title='Stream Bandit V7.12.179 Collections Page Polish TEST';}catch(e){}
+  try{document.documentElement.dataset.sbCollectionsPagePolish='v7-12-179';}catch(e){}
   try{
     document.querySelectorAll('.badge').forEach(el=>{
-      if((el.textContent||'').includes('V7.12.50 Collections Owner Controls TEST')||(el.textContent||'').includes('V7.12.177 Collections Footer Polish TEST'))el.textContent='V7.12.178 Collections Page Polish TEST';
+      if((el.textContent||'').includes('V7.12.50 Collections Owner Controls TEST')||(el.textContent||'').includes('V7.12.177 Collections Footer Polish TEST')||(el.textContent||'').includes('V7.12.178 Collections Page Polish TEST'))el.textContent='V7.12.179 Collections Page Polish TEST';
     });
   }catch(e){}
   try{
     document.querySelectorAll('p,.muted,li,.note,.status,.card').forEach(el=>{
-      cleanText(el,'Collections owner-control correction V7.12.50','Collections page polish V7.12.178');
-      cleanText(el,'Collections footer polish V7.12.177','Collections page polish V7.12.178');
+      cleanText(el,'Collections owner-control correction V7.12.50','Collections page polish V7.12.179');
+      cleanText(el,'Collections footer polish V7.12.177','Collections page polish V7.12.179');
+      cleanText(el,'Collections page polish V7.12.178','Collections page polish V7.12.179');
       cleanText(el,'Full bottom footer appears once at the bottom.','The global footer shell is the only footer.');
       cleanText(el,'The duplicate page footer is removed; the shell footer owns the bottom footer.','The global footer shell owns the bottom footer.');
       cleanText(el,'player-2-progress-helper-v6-78-9-4-test.html','player-2-clean-machine-v7-12-58-test.html');
@@ -87,11 +111,12 @@ function applyCollectionsPolish(){
   try{
     document.querySelectorAll('a[href]').forEach(a=>{
       let href=a.getAttribute('href')||'';
-      href=href.replace('collections-clean-machine-v7-12-48-test.html','collections-clean-machine-v7-12-51-test.html').replace('collections-clean-machine-v7-12-50-test.html','collections-clean-machine-v7-12-51-test.html').replace('player-2-progress-helper-v6-78-9-4-test.html','player-2-clean-machine-v7-12-58-test.html').replace('about-clean-machine-v7-12-46-test.html','about-global-helpers-v7-4-7-test.html');
+      href=href.replace('collections-clean-machine-v7-12-48-test.html','collections-clean-machine-v7-12-51-test.html').replace('collections-clean-machine-v7-12-49-test.html','collections-clean-machine-v7-12-51-test.html').replace('collections-clean-machine-v7-12-50-test.html','collections-clean-machine-v7-12-51-test.html').replace('player-2-progress-helper-v6-78-9-4-test.html','player-2-clean-machine-v7-12-58-test.html').replace('about-clean-machine-v7-12-46-test.html','about-global-helpers-v7-4-7-test.html');
       a.setAttribute('href',href);
     });
   }catch(e){}
   try{document.querySelectorAll('#sbCollectionsFooter,.microFooter').forEach(el=>el.remove());}catch(e){}
+  patchCollectionsMenuCurrent();
   try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyCollectionsPolish);else applyCollectionsPolish();
@@ -99,6 +124,10 @@ setTimeout(applyCollectionsPolish,250);
 setTimeout(applyCollectionsPolish,900);
 setTimeout(applyCollectionsPolish,1800);
 setInterval(applyCollectionsPolish,5000);
+document.addEventListener('click',function(e){
+  if(e.target&&e.target.closest&&e.target.closest('#sbHeaderMenuBtn,.sb-h-menu'))setTimeout(patchCollectionsMenuCurrent,120);
+},true);
+try{new MutationObserver(patchCollectionsMenuCurrent).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','href']});}catch(e){}
 })();
 <\/script>`;
   const replacement = String.raw`async function removeCollection(){
@@ -139,10 +168,10 @@ setInterval(applyCollectionsPolish,5000);
     if(!res.ok)throw new Error('Could not load Collections source: '+res.status);
     let html=await res.text();
     html=html
-      .replace(/V7\.12\.50 Collections Owner Controls TEST/g,'V7.12.178 Collections Page Polish TEST')
+      .replace(/V7\.12\.50 Collections Owner Controls TEST/g,'V7.12.179 Collections Page Polish TEST')
       .replace(/collections-clean-machine-v7-12-50-test\.html/g,'collections-clean-machine-v7-12-51-test.html')
-      .replace(/Collections owner-control correction V7\.12\.50/g,'Collections page polish V7.12.178')
-      .replace(/<span class="badge">V7\.12\.50 Collections Owner Controls TEST<\/span>/,'<span class="badge">V7.12.178 Collections Page Polish TEST</span>')
+      .replace(/Collections owner-control correction V7\.12\.50/g,'Collections page polish V7.12.179')
+      .replace(/<span class="badge">V7\.12\.50 Collections Owner Controls TEST<\/span>/,'<span class="badge">V7.12.179 Collections Page Polish TEST</span>')
       .replace(/<section id="sbCollectionsFooter"[\s\S]*?<\/section>\s*/,'')
       .replace(/<p class="microFooter">[\s\S]*?<\/p>\s*/,'')
       .replace(/<div class="card"><b>Footer fix<\/b><p>Full bottom footer appears once at the bottom\.<\/p><\/div>/,'<div class="card"><b>Global footer only</b><p>The global footer shell owns the bottom footer.</p></div>')
@@ -159,7 +188,7 @@ setInterval(applyCollectionsPolish,5000);
     document.write(html);
     document.close();
   }catch(e){
-    document.getElementById('loader').innerHTML='<span class="badge">V7.12.178 failed to load</span><h1>Could not prepare Collections</h1><div class="note bad">'+String(e.message||e).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})+'</div>';
+    document.getElementById('loader').innerHTML='<span class="badge">V7.12.179 failed to load</span><h1>Could not prepare Collections</h1><div class="note bad">'+String(e.message||e).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})+'</div>';
   }
 })();
 </script>
