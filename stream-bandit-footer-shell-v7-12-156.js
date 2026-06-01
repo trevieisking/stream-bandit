@@ -1,92 +1,26 @@
-/* Stream Bandit Footer Shell V7.12.177
+/* Stream Bandit Footer Shell V7.12.181
    Compact tabbed global footer. Reads global theme variables; theme owner remains Theme Studio.
-   V7.12.177: Group Play polish route truth and duplicate page-footer cleanup. */
+   V7.12.181: removed deleted Owner machine routes: Clean Machine Menu and Route Pointer Machine.
+*/
 (function(){
 'use strict';
-const VERSION='V7.12.177 Footer Shell / Group Play Polish';
+const VERSION='V7.12.181 Footer Shell / Deleted Owner Machines Removed';
 const THEME_OWNER='web-builder-theme-studio-controls-v7-8-9-test.html';
 const ROUTES={
- home:'home-global-helpers-v7-4-4-test.html',
- library:'library-global-helpers-v7-4-8-test.html',
- supabaseLibrary:'supabase-library-home-header-form-fix-v7-12-34-test.html',
- genres:'genres-clean-machine-v7-12-45-test.html',
- search:'global-search-global-helpers-v7-4-9-test.html',
- about:'about-global-helpers-v7-4-7-test.html',
- details:'details-clean-machine-v7-12-38-test.html',
- player1:'player-one-global-helpers-v7-3-3-test.html',
- player2:'player-2-clean-machine-v7-12-58-test.html',
- continueWatching:'continue-watching-global-helpers-v7-3-9-test.html',
- watchHistory:'watch-history-global-helpers-v7-4-0-test.html',
- watchlist:'watchlist-clean-machine-v7-12-43-test.html',
- favourites:'favourites-clean-machine-v7-12-41-test.html',
- likes:'likes-clean-machine-v7-12-42-test.html',
- accessibility:'accessibility-clean-machine-v7-12-44-test.html',
- playlists:'playlists-global-helpers-v7-5-2-test.html',
- channels:'channels-global-helpers-v7-5-3-test.html',
- myChannel:'my-channel-clean-machine-v7-12-47-test.html',
- collections:'collections-clean-machine-v7-12-51-test.html',
- submit:'submit-video-clean-machine-v7-12-79-test.html',
- rules:'rules-clean-machine-v7-12-82-test.html',
- review:'review-queue-clean-machine-v7-12-80-publish-test.html',
- settings:'settings-platform-control-hub-v7-12-85-test.html',
- theme:THEME_OWNER,
- profile:'profile-settings-live-ready-v7-12-90-test.html',
- builder:'web-builder-live-studio-v7-12-116-test.html?page=test-page',
- pagesManager:'web-builder-pages-manager-v7-12-111-test.html',
- preview:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
- formAdvanced:'web-builder-form-save-v7-12-94-test.html?page=test-page',
- formInbox:'web-builder-form-submissions-v7-12-94-test.html?page=test-page',
- policyCentre:'policy-documents-centre-v7-12-119-test.html',
- policyReader:'policy-reader-v7-12-119-test.html?policy=terms',
- policyAdmin:'policy-admin-documents-v7-12-120-test.html?policy=terms',
- admin:'admin-centre-command-deck-v7-12-121-test.html',
- readiness:'live-readiness-global-helpers-v7-10-2-test.html',
- registry:'all-pages-version-registry-v7-12-122-current-routes-test.html',
- checklist:'test-checklist-global-helpers-v7-10-5-test.html',
- tools:'tools-page-original-global-pass-v7-12-136-test.html',
- health:'health-check-global-helpers-v7-10-6-test.html',
- mux:'mux-manager-global-helpers-v7-10-7-test.html',
- storage:'storage-prep-global-helpers-v7-10-8-test.html',
- backup:'backup-safety-global-helpers-v7-10-9-test.html',
- brandIcons:'settings-brand-icons-promoted-v7-12-21-test.html',
- helperShell:'stream-bandit-global-helper-shell-v7-12-126-test.html',
- oneMachine:'stream-bandit-one-machine-v7-12-73-test.html',
- platformControl:'settings-platform-control-hub-v7-12-85-test.html'
+ home:'home-global-helpers-v7-4-4-test.html',library:'library-global-helpers-v7-4-8-test.html',supabaseLibrary:'supabase-library-home-header-form-fix-v7-12-34-test.html',genres:'genres-clean-machine-v7-12-45-test.html',search:'global-search-global-helpers-v7-4-9-test.html',about:'about-global-helpers-v7-4-7-test.html',details:'details-clean-machine-v7-12-38-test.html',player1:'player-one-global-helpers-v7-3-3-test.html',player2:'player-2-clean-machine-v7-12-58-test.html',continueWatching:'continue-watching-global-helpers-v7-3-9-test.html',watchHistory:'watch-history-global-helpers-v7-4-0-test.html',watchlist:'watchlist-clean-machine-v7-12-43-test.html',favourites:'favourites-clean-machine-v7-12-41-test.html',likes:'likes-clean-machine-v7-12-42-test.html',accessibility:'accessibility-clean-machine-v7-12-44-test.html',playlists:'playlists-global-helpers-v7-5-2-test.html',channels:'channels-global-helpers-v7-5-3-test.html',myChannel:'my-channel-clean-machine-v7-12-47-test.html',collections:'collections-clean-machine-v7-12-51-test.html',submit:'submit-video-clean-machine-v7-12-79-test.html',rules:'rules-clean-machine-v7-12-82-test.html',review:'review-queue-clean-machine-v7-12-80-publish-test.html',settings:'settings-platform-control-hub-v7-12-85-test.html',theme:THEME_OWNER,profile:'profile-settings-live-ready-v7-12-90-test.html',builder:'web-builder-live-studio-v7-12-116-test.html?page=test-page',pagesManager:'web-builder-pages-manager-v7-12-111-test.html',preview:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',formAdvanced:'web-builder-form-save-v7-12-94-test.html?page=test-page',formInbox:'web-builder-form-submissions-v7-12-94-test.html?page=test-page',policyCentre:'policy-documents-centre-v7-12-119-test.html',policyReader:'policy-reader-v7-12-119-test.html?policy=terms',policyAdmin:'policy-admin-documents-v7-12-120-test.html?policy=terms',admin:'admin-centre-command-deck-v7-12-121-test.html',readiness:'live-readiness-global-helpers-v7-10-2-test.html',registry:'all-pages-version-registry-v7-12-122-current-routes-test.html',checklist:'test-checklist-global-helpers-v7-10-5-test.html',tools:'tools-page-original-global-pass-v7-12-136-test.html',health:'health-check-global-helpers-v7-10-6-test.html',mux:'mux-manager-global-helpers-v7-10-7-test.html',storage:'storage-prep-global-helpers-v7-10-8-test.html',backup:'backup-safety-global-helpers-v7-10-9-test.html',brandIcons:'settings-brand-icons-promoted-v7-12-21-test.html',helperShell:'stream-bandit-global-helper-shell-v7-12-126-test.html',oneMachine:'stream-bandit-one-machine-v7-12-73-test.html',platformControl:'settings-platform-control-hub-v7-12-85-test.html'
 };
 const OLD={
- 'all-pages-version-registry-v7-1-4-full-test.html':ROUTES.registry,
- 'admin-centre-command-deck-v7-10-0-test.html':ROUTES.admin,
- 'tools-page-global-helpers-v7-10-1-test.html':ROUTES.tools,
- 'web-builder-live-studio-v7-12-97-test.html':ROUTES.builder,
- 'policy-agreements-centre-v7-11-6-test.html':ROUTES.policyCentre,
- 'policy-reader-published-row-v7-12-27-test.html':ROUTES.policyReader,
- 'policy-admin-save-editor-v7-12-25-test.html':ROUTES.policyAdmin,
- 'stream-bandit-clean-machine-menu-v7-12-40-test.html':ROUTES.registry,
- 'platform-control-tower-route-guard-proof-v7-12-33-test.html':ROUTES.health,
- 'stream-bandit-route-pointer-machine-v7-12-36-test.html':ROUTES.registry,
- 'final-shell-navigation-global-helpers-v7-5-9-test.html':ROUTES.helperShell,
- 'stream-bandit-one-machine-v7-12-72-test.html':ROUTES.oneMachine,
- 'platform-control-centre-combined-v7-12-61-test.html':ROUTES.platformControl,
- 'platform-control-centre-admin-v7-12-59-test.html':ROUTES.platformControl,
- 'brand-logo-helper-responsive-v7-12-20-test.html':ROUTES.brandIcons,
- 'brand-image-helper-v7-12-20-test.html':ROUTES.brandIcons,
- 'favicon-app-icon-builder-v7-12-15-test.html':ROUTES.brandIcons,
- 'collections-clean-machine-v7-12-48-test.html':ROUTES.collections,
- 'collections-clean-machine-v7-12-49-test.html':ROUTES.collections,
- 'collections-clean-machine-v7-12-50-test.html':ROUTES.collections,
- 'player-2-progress-helper-v6-78-9-4-test.html':ROUTES.player2,
- 'player-two-global-helpers-v7-3-4-test.html':ROUTES.player2,
- 'about-clean-machine-v7-12-46-test.html':ROUTES.about
+ 'all-pages-version-registry-v7-1-4-full-test.html':ROUTES.registry,'all-pages-version-registry-v7-10-3-full-test.html':ROUTES.registry,'admin-centre-command-deck-v7-10-0-test.html':ROUTES.admin,'tools-page-global-helpers-v7-10-1-test.html':ROUTES.tools,'web-builder-live-studio-v7-12-97-test.html':ROUTES.builder,'policy-agreements-centre-v7-11-6-test.html':ROUTES.policyCentre,'policy-reader-published-row-v7-12-27-test.html':ROUTES.policyReader,'policy-admin-save-editor-v7-12-25-test.html':ROUTES.policyAdmin,'platform-control-tower-route-guard-proof-v7-12-33-test.html':ROUTES.health,'final-shell-navigation-global-helpers-v7-5-9-test.html':ROUTES.helperShell,'stream-bandit-one-machine-v7-12-72-test.html':ROUTES.oneMachine,'platform-control-centre-combined-v7-12-61-test.html':ROUTES.platformControl,'platform-control-centre-admin-v7-12-59-test.html':ROUTES.platformControl,'brand-logo-helper-responsive-v7-12-20-test.html':ROUTES.brandIcons,'brand-image-helper-v7-12-20-test.html':ROUTES.brandIcons,'favicon-app-icon-builder-v7-12-15-test.html':ROUTES.brandIcons,'collections-clean-machine-v7-12-48-test.html':ROUTES.collections,'collections-clean-machine-v7-12-49-test.html':ROUTES.collections,'collections-clean-machine-v7-12-50-test.html':ROUTES.collections,'player-2-progress-helper-v6-78-9-4-test.html':ROUTES.player2,'player-two-global-helpers-v7-3-4-test.html':ROUTES.player2,'about-clean-machine-v7-12-46-test.html':ROUTES.about
 };
 const GROUPS=[
- ['Watch', [['Home',ROUTES.home],['Library',ROUTES.library],['Details',ROUTES.details],['Player 1',ROUTES.player1],['Continue Watching',ROUTES.continueWatching],['Watch History',ROUTES.watchHistory]]],
- ['Saved', [['Watchlist',ROUTES.watchlist],['Favourites',ROUTES.favourites],['Likes',ROUTES.likes],['Accessibility',ROUTES.accessibility],['Profile',ROUTES.profile]]],
- ['Browse', [['Supabase Library Editor',ROUTES.supabaseLibrary],['Genres',ROUTES.genres],['Global Search',ROUTES.search],['About',ROUTES.about]]],
- ['Creator', [['Submit Video',ROUTES.submit],['Rules',ROUTES.rules],['Review Queue',ROUTES.review],['My Channel',ROUTES.myChannel],['Player 2',ROUTES.player2]]],
- ['Builder', [['Web Builder Studio',ROUTES.builder],['Pages Manager',ROUTES.pagesManager],['Published Preview',ROUTES.preview],['Form Inbox',ROUTES.formInbox],['Advanced Form',ROUTES.formAdvanced],['Theme Studio',ROUTES.theme]]],
- ['Policy', [['Policy Documents',ROUTES.policyCentre],['Policy Proof',ROUTES.policyReader],['Policy Admin Editor',ROUTES.policyAdmin]]],
- ['Admin', [['Admin Centre',ROUTES.admin],['Live Readiness',ROUTES.readiness],['Current Routes Registry',ROUTES.registry],['Test Checklist',ROUTES.checklist],['Tools',ROUTES.tools],['Health Check',ROUTES.health],['Mux Manager',ROUTES.mux],['Storage Prep',ROUTES.storage],['Backup / Safety',ROUTES.backup]]],
- ['Owner', [['One Machine',ROUTES.oneMachine],['Platform Control Centre',ROUTES.platformControl],['Clean Machine Menu',ROUTES.registry],['Route Guard Proof',ROUTES.health],['Route Pointer Machine',ROUTES.registry],['Final Shell Navigation',ROUTES.helperShell],['Brand / App Icons',ROUTES.brandIcons],['Brand Image Helper',ROUTES.brandIcons],['Favicon / App Icon Builder',ROUTES.brandIcons]]]
+ ['Watch',[['Home',ROUTES.home],['Library',ROUTES.library],['Details',ROUTES.details],['Player 1',ROUTES.player1],['Continue Watching',ROUTES.continueWatching],['Watch History',ROUTES.watchHistory]]],
+ ['Saved',[['Watchlist',ROUTES.watchlist],['Favourites',ROUTES.favourites],['Likes',ROUTES.likes],['Accessibility',ROUTES.accessibility],['Profile',ROUTES.profile]]],
+ ['Browse',[['Supabase Library Editor',ROUTES.supabaseLibrary],['Genres',ROUTES.genres],['Global Search',ROUTES.search],['About',ROUTES.about]]],
+ ['Creator',[['Submit Video',ROUTES.submit],['Rules',ROUTES.rules],['Review Queue',ROUTES.review],['My Channel',ROUTES.myChannel],['Player 2',ROUTES.player2]]],
+ ['Builder',[['Web Builder Studio',ROUTES.builder],['Pages Manager',ROUTES.pagesManager],['Published Preview',ROUTES.preview],['Form Inbox',ROUTES.formInbox],['Advanced Form',ROUTES.formAdvanced],['Theme Studio',ROUTES.theme]]],
+ ['Policy',[['Policy Documents',ROUTES.policyCentre],['Policy Proof',ROUTES.policyReader],['Policy Admin Editor',ROUTES.policyAdmin]]],
+ ['Admin',[['Admin Centre',ROUTES.admin],['Live Readiness',ROUTES.readiness],['Current Routes Registry',ROUTES.registry],['Test Checklist',ROUTES.checklist],['Tools',ROUTES.tools],['Health Check',ROUTES.health],['Mux Manager',ROUTES.mux],['Storage Prep',ROUTES.storage],['Backup / Safety',ROUTES.backup]]],
+ ['Owner',[['One Machine',ROUTES.oneMachine],['Platform Control Centre',ROUTES.platformControl],['Route Guard Proof',ROUTES.health],['Final Shell Navigation',ROUTES.helperShell],['Brand / App Icons',ROUTES.brandIcons],['Brand Image Helper',ROUTES.brandIcons],['Favicon / App Icon Builder',ROUTES.brandIcons]]]
 ];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function file(v){return String(v||'').split('/').pop().split('?')[0].split('#')[0];}
@@ -101,9 +35,9 @@ function applyTheme(){try{if(window.StreamBanditThemeProjector&&window.StreamBan
 function panel(name){let c=cur();let g=GROUPS.find(x=>x[0]===name)||GROUPS[0];return '<div class="sb-footer-panel-head"><b>'+esc(g[0])+'</b><small>'+g[1].length+' links</small></div><div class="sb-footer-links">'+g[1].map(x=>'<a class="'+(same(x[1],c)?'current':'')+'" href="'+esc(route(x[1]))+'">'+esc(x[0])+'</a>').join('')+'</div>';}
 function html(){let ag=activeGroup();return '<footer id="sbFooterShell" class="sb-footer-shell" data-version="'+esc(VERSION)+'" data-active-group="'+esc(ag)+'"><div class="sb-footer-top"><div class="sb-footer-brand"><h2>Stream Bandit</h2><p>Global footer shell. Compact route tabs, current links, theme read from Theme Studio.</p><small>'+esc(VERSION)+'</small></div><div><div class="sb-footer-tabs" role="tablist" aria-label="Footer navigation groups">'+GROUPS.map(g=>'<button class="sb-footer-tab '+(g[0]===ag?'current':'')+'" type="button" data-sb-footer-tab="'+esc(g[0])+'">'+esc(g[0])+'</button>').join('')+'</div><div id="sbFooterPanel" class="sb-footer-panel">'+panel(ag)+'</div></div></div><div class="sb-footer-note">Header + page + compact footer tabs. Theme read globally, owned by Theme Studio.</div></footer>';}
 function wire(){let f=document.getElementById('sbFooterShell');if(!f)return;f.querySelectorAll('[data-sb-footer-tab]').forEach(btn=>{if(btn.dataset.w)return;btn.dataset.w=1;btn.onclick=()=>{let name=btn.getAttribute('data-sb-footer-tab');f.setAttribute('data-active-group',name);f.querySelectorAll('.sb-footer-tab').forEach(x=>x.classList.toggle('current',x===btn));let p=document.getElementById('sbFooterPanel');if(p)p.innerHTML=panel(name);patch();};});}
-function ensure(){css();hideOld();let w=document.querySelector('.wrap')||document.body;if(!document.getElementById('sbFooterShell'))w.insertAdjacentHTML('beforeend',html());wire();}
-function patch(){document.querySelectorAll('a[href]').forEach(a=>{let m=OLD[file(a.getAttribute('href'))];if(m)a.setAttribute('href',route(m));});try{window.StreamBanditRoutes=Object.assign(window.StreamBanditRoutes||{},ROUTES,{groupPlayer:ROUTES.player2});}catch(e){}}
-function refresh(){applyTheme();ensure();patch();hideOld();wire();}
-function boot(){refresh();window.StreamBanditFooterShell={version:VERSION,routes:ROUTES,refresh,showGroup:function(name){let f=document.getElementById('sbFooterShell');let b=f&&f.querySelector('[data-sb-footer-tab="'+name+'"]');if(b)b.click();},state:()=>({version:VERSION,current:cur(),activeGroup:(document.getElementById('sbFooterShell')||{}).dataset&&document.getElementById('sbFooterShell').dataset.activeGroup,themeOwner:THEME_OWNER})};document.documentElement.dataset.sbFooterShell='v7-12-177-group-play-polish';setTimeout(refresh,700);setTimeout(refresh,1800);setInterval(()=>{applyTheme();patch();hideOld();},5000);}
+function ensure(){css();hideOld();let w=document.querySelector('.wrap')||document.body;if(!document.getElementById('sbFooterShell'))w.insertAdjacentHTML('beforeend',html());wire();patch();}
+function patch(){document.querySelectorAll('a[href]').forEach(a=>{let m=OLD[file(a.getAttribute('href'))];if(m)a.setAttribute('href',route(m));});}
+function refresh(){applyTheme();ensure();hideOld();}
+function boot(){applyTheme();ensure();setTimeout(refresh,400);setTimeout(refresh,1400);setInterval(refresh,6000);window.StreamBanditFooterShell={version:VERSION,routes:ROUTES,groups:GROUPS,refresh:refresh};document.documentElement.dataset.sbFooterShell='v7-12-181-deleted-owner-machines-removed';}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
