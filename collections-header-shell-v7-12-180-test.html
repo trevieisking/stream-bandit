@@ -18,13 +18,13 @@
     <div>
       <span class="badge">V7.12.180 Browse Clean Audit TEST</span>
       <h1>Browse Group Clean Audit</h1>
-      <p>This reusable test slot checks the Browse group against the Watch/Home rule: Header Shell + clean page body + Footer Shell. It does not replace any protected Browse page.</p>
+      <p>This reusable test slot checks the Browse group against the Watch/Home rule: Header Shell + clean page body + Footer Shell. It does not replace any protected Browse page. Library is Watch only.</p>
       <div class="actions">
-        <a class="btn hot" href="library-global-helpers-v7-4-8-test.html">Library</a>
         <a class="btn primary" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Supabase Editor</a>
         <a class="btn warn" href="genres-clean-machine-v7-12-45-test.html">Genres</a>
         <a class="btn cyan" href="global-search-global-helpers-v7-4-9-test.html">Global Search</a>
         <a class="btn" href="about-global-helpers-v7-4-7-test.html">About</a>
+        <a class="btn hot" href="library-global-helpers-v7-4-8-test.html">Library is Watch</a>
       </div>
       <div id="status" class="status">Browse audit loaded in reusable test slot. Protected pages untouched.</div>
       <div id="helperStatus" class="note">Checking foundation...</div>
@@ -35,12 +35,12 @@
 <section class="box">
   <h2>Browse protected route truth</h2>
   <div class="grid">
-    <div class="card"><b>Library</b><p>Public Supabase movie browse page.</p><a href="library-global-helpers-v7-4-8-test.html">library-global-helpers-v7-4-8-test.html</a></div>
     <div class="card"><b>Supabase Library Editor</b><p>Admin/test workbench for sb_movies.</p><a href="supabase-library-home-header-form-fix-v7-12-34-test.html">supabase-library-home-header-form-fix-v7-12-34-test.html</a></div>
     <div class="card"><b>Genres</b><p>Genre browse page. Read-only movie grouping.</p><a href="genres-clean-machine-v7-12-45-test.html">genres-clean-machine-v7-12-45-test.html</a></div>
     <div class="card"><b>Global Search</b><p>Searches movies, genres, channels, playlists, pages and policies.</p><a href="global-search-global-helpers-v7-4-9-test.html">global-search-global-helpers-v7-4-9-test.html</a></div>
     <div class="card"><b>About</b><p>Public help/about/contact email forms. No Supabase writes.</p><a href="about-global-helpers-v7-4-7-test.html">about-global-helpers-v7-4-7-test.html</a></div>
   </div>
+  <div class="note">Library is protected under Watch: <code>library-global-helpers-v7-4-8-test.html</code>.</div>
 </section>
 <section class="box">
   <h2>Clean ownership checks</h2>
@@ -54,7 +54,6 @@
 <section class="box">
   <h2>Browse scan result</h2>
   <div class="checks">
-    <div class="check"><b>Library</b><p>Already follows Watch-style shell loading and compact layout. Needs visual smoke test only before declaring no-change.</p></div>
     <div class="check"><b>Supabase Editor</b><p>Protected admin page. Do not rewrite until scan finds a real owner issue.</p></div>
     <div class="check"><b>Genres</b><p>Already follows Watch-style shell loading and has no obvious old footer/header in the scanned top section.</p></div>
     <div class="check"><b>Global Search</b><p>Best first Browse polish candidate if user sees clutter. Otherwise likely no full replacement needed.</p></div>
@@ -74,25 +73,14 @@
 </section>
 <p class="micro">Reusable test slot: collections-header-shell-v7-12-180-test.html. Protected Browse pages were not modified.</p>
 </div>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=browse-audit-180"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=browse-audit-180"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=browse-audit-180"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=browse-audit-180"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=browse-audit-180"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=browse-audit-180"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=browse-audit-180b"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=browse-audit-180b"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=browse-audit-180b"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=browse-audit-180b"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=browse-audit-180b"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=browse-audit-180b"></script>
 <script>
-(function(){
-'use strict';
-function ready(){
-  var status=document.getElementById('helperStatus');
-  var parts=[];
-  parts.push(window.StreamBanditHeaderShell?'Header shell ready':'Header shell pending');
-  parts.push(window.StreamBanditFooterShell?'Footer shell ready':'Footer shell pending');
-  parts.push(window.StreamBanditThemeProjector?'Theme projector ready':'Theme projector pending');
-  if(status)status.textContent=parts.join(' · ');
-}
-setTimeout(ready,250);setTimeout(ready,900);setTimeout(ready,1800);setInterval(ready,5000);
-})();
+(function(){'use strict';function ready(){var status=document.getElementById('helperStatus');var parts=[];parts.push(window.StreamBanditHeaderShell?'Header shell ready':'Header shell pending');parts.push(window.StreamBanditFooterShell?'Footer shell ready':'Footer shell pending');parts.push(window.StreamBanditThemeProjector?'Theme projector ready':'Theme projector pending');if(status)status.textContent=parts.join(' · ');}setTimeout(ready,250);setTimeout(ready,900);setTimeout(ready,1800);setInterval(ready,5000);})();
 </script>
 </body>
 </html>
