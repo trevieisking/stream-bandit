@@ -1,22 +1,19 @@
-/* Stream Bandit Header Shell V7.12.156
+/* Stream Bandit Header Shell V7.12.180
    Restored full global header shell.
    Account chip is a normal Profile link. Profile page owns sign-in.
    Shell owns header, icons, menu/current scroll, search bridge and saved count badges.
    Theme owner remains web-builder-theme-studio-controls-v7-8-9-test.html.
 
-   V7.12.156-account-profile-fix:
-   Header now reads the signed-in Supabase Auth user and matching sb_profiles row.
-   This fixes Role: guest showing on every page when the real profile is admin.
-   No layout, route, icon, footer, theme or menu behaviour changed.
-
-   Browse cleanup:
-   - Library stays in Watch only.
-   - Browse now contains Supabase Library Editor, Genres, Global Search and About.
+   V7.12.180-group-play-route-truth:
+   - Collections route now points to collections-clean-machine-v7-12-51-test.html.
+   - Player 2 route now points to player-2-clean-machine-v7-12-58-test.html.
+   - Old Group Play URLs resolve inside the shell OLD route map.
+   - No layout, icon, account, footer, theme, search or counter behaviour changed.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.12.156 Header Shell / Account Profile Fix';
+const VERSION='V7.12.180 Header Shell / Group Play Route Truth';
 const THEME_OWNER='web-builder-theme-studio-controls-v7-8-9-test.html';
 const LOGO='stream_bandit_original_logo_square_256.png';
 const PROFILE='profile-settings-live-ready-v7-12-90-test.html';
@@ -30,7 +27,7 @@ const ROUTES={
  about:'about-global-helpers-v7-4-7-test.html',
  details:'details-clean-machine-v7-12-38-test.html',
  player1:'player-one-global-helpers-v7-3-3-test.html',
- player2:'player-2-progress-helper-v6-78-9-4-test.html',
+ player2:'player-2-clean-machine-v7-12-58-test.html',
  continueWatching:'continue-watching-global-helpers-v7-3-9-test.html',
  watchHistory:'watch-history-global-helpers-v7-4-0-test.html',
  watchlist:'watchlist-clean-machine-v7-12-43-test.html',
@@ -40,7 +37,7 @@ const ROUTES={
  playlists:'playlists-global-helpers-v7-5-2-test.html',
  channels:'channels-global-helpers-v7-5-3-test.html',
  myChannel:'my-channel-clean-machine-v7-12-47-test.html',
- collections:'collections-clean-machine-v7-12-48-test.html',
+ collections:'collections-clean-machine-v7-12-51-test.html',
  submit:'submit-video-clean-machine-v7-12-79-test.html',
  rules:'rules-clean-machine-v7-12-82-test.html',
  review:'review-queue-clean-machine-v7-12-80-publish-test.html',
@@ -71,6 +68,14 @@ const ROUTES={
 };
 
 const OLD={
+ 'collections-clean-machine-v7-12-48-test.html':ROUTES.collections,
+ 'collections-clean-machine-v7-12-49-test.html':ROUTES.collections,
+ 'collections-clean-machine-v7-12-50-test.html':ROUTES.collections,
+ 'collections-global-helpers-v7-5-1-test.html':ROUTES.collections,
+ 'collections-browse-shell-v6-46-1-test.html':ROUTES.collections,
+ 'player-2-progress-helper-v6-78-9-4-test.html':ROUTES.player2,
+ 'player-two-global-helpers-v7-3-4-test.html':ROUTES.player2,
+ 'player-2-clean-machine-v7-12-57-test.html':ROUTES.player2,
  'all-pages-version-registry-v7-1-4-full-test.html':ROUTES.registry,
  'all-pages-version-registry-v7-10-3-full-test.html':ROUTES.registry,
  'admin-centre-command-deck-v7-10-0-test.html':ROUTES.admin,
@@ -260,7 +265,7 @@ function load(src){
  try{
   if(Array.from(document.scripts||[]).some(x=>String(x.src||'').includes(src)))return;
   let s=document.createElement('script');
-  s.src=src+(src.includes('?')?'&':'?')+'v=7-12-156-header-profile-fix';
+  s.src=src+(src.includes('?')?'&':'?')+'v=7-12-180-header-route-truth';
   s.defer=true;
   document.head.appendChild(s);
  }catch(e){}
@@ -788,11 +793,15 @@ function boot(){
    current:cur(),
    themeOwner:THEME_OWNER,
    account:accountState(),
-   accountDestination:PROFILE
+   accountDestination:PROFILE,
+   groupPlayRouteTruth:{
+    collections:ROUTES.collections,
+    player2:ROUTES.player2
+   }
   })
  };
 
- document.documentElement.dataset.sbHeaderShell='v7-12-156-account-profile-fix';
+ document.documentElement.dataset.sbHeaderShell='v7-12-180-group-play-route-truth';
 
  setTimeout(()=>loadSupabaseProfile(true),150);
  setTimeout(refresh,300);
