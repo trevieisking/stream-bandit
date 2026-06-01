@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit V7.12.172 Details Route Bridge Pass</title>
+<title>Stream Bandit V7.12.173 Details Favicon Pass</title>
 <link rel="icon" type="image/png" sizes="16x16" href="stream_bandit_stag_icon_16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple_touch_icon_180.png">
@@ -16,26 +16,34 @@ body{margin:0;min-height:100vh;padding:18px;background:radial-gradient(circle at
 </head>
 <body>
 <main class="box">
-<span class="badge">Stream Bandit V7.12.172 Details Route Bridge Pass</span>
+<span class="badge">Stream Bandit V7.12.173 Details Favicon + Route Bridge Pass</span>
 <h1>Stream Bandit</h1>
-<p class="muted">Promoted checkpoint for the Details route fix after the global shell pass. Home remains the app route, while Details links are now protected by the global route bridge so clicked movie identity is carried from Library, Supabase Library, Genres, Search, saved pages and related cards.</p>
+<p class="muted">Promoted checkpoint for the Details favicon pass and the Details route bridge after the global shell pass. Home remains the app route. Details links keep clicked movie identity, and Details tabs now show the Stream Bandit favicon on both plain and movie-id URLs after normal browser reload/cache catch-up.</p>
 <div class="grid">
+<div class="card"><b>Details favicon passed</b><p>Details shows the Stream Bandit favicon on the plain Details URL and on Details opened with a movie id query.</p></div>
 <div class="card"><b>Details route bridge passed</b><p>Old or bare Details buttons are intercepted and rewritten to include the clicked movie id/title before navigation.</p></div>
-<div class="card"><b>Working Details URL shape</b><p><code>details-clean-machine-v7-12-38-test.html?id=MOVIE_ID&amp;title=MOVIE_TITLE&amp;v=172</code></p></div>
+<div class="card"><b>Working Details URL shape</b><p><code>details-clean-machine-v7-12-38-test.html?id=MOVIE_ID&amp;title=MOVIE_TITLE&amp;v=173</code></p></div>
 <div class="card"><b>Regression explained</b><p>Bare Details links could only open the default/fallback row, which made multiple pages appear to open the same movie.</p></div>
-<div class="card"><b>Watch/Saved group remains protected</b><p>Home, Library, Details, Player 1, Continue Watching, Watch History, Watchlist, Favourites, Likes and Accessibility remain the active Watch/Saved route set.</p></div>
-<div class="card"><b>Browse group remains protected</b><p>Supabase Library Editor, Genres, Global Search and About remain the active Browse route set.</p></div>
-<div class="card"><b>Creator group remains protected</b><p>Creator Rules, Submit Video and Review Queue remain the connected Supabase workflow.</p></div>
-<div class="card"><b>Tools status</b><p>The standalone Favourite Tools page restored today is useful but still needs its own polish/final pass before being treated as fully cleared.</p></div>
+<div class="card"><b>Watch/Saved group protected</b><p>Home, Library, Details, Player 1, Continue Watching, Watch History, Watchlist, Favourites, Likes and Accessibility remain the active Watch/Saved route set.</p></div>
+<div class="card"><b>Browse group protected</b><p>Supabase Library Editor, Genres, Global Search and About remain the active Browse route set.</p></div>
+<div class="card"><b>Creator group protected</b><p>Creator Rules, Submit Video and Review Queue remain the connected Supabase workflow.</p></div>
+<div class="card"><b>Tools next</b><p>Favourite Tools is the next target for scan and proper page pass. It is not promoted as fully cleared by this Details checkpoint.</p></div>
 <div class="card"><b>Safety</b><p>No billing system, no schema change, no storage delete, no public destructive action and no blind live/index promotion tools were added.</p></div>
 </div>
-<div class="note">Checkpoint: Details route bridge pass promoted to index after the global Details link issue was identified and fixed.</div>
+<div class="note">Checkpoint: Details favicon and Details route bridge pass promoted to index with the active Watch/Saved group links preserved.</div>
 <div class="safe">Root still redirects to the passed Home route: home-global-helpers-v7-4-4-test.html.</div>
 <div class="danger">Do not replace preserved old/current page URLs unless the global overlay route map is updated and retested.</div>
 <div class="row">
-<a class="btn hot" href="home-global-helpers-v7-4-4-test.html">Open Home</a>
+<a class="btn hot" href="home-global-helpers-v7-4-4-test.html">Home</a>
 <a class="btn" href="library-global-helpers-v7-4-8-test.html">Library</a>
-<a class="btn cyan" href="details-clean-machine-v7-12-38-test.html?v=172">Details</a>
+<a class="btn cyan" href="details-clean-machine-v7-12-38-test.html?v=173">Details</a>
+<a class="btn hot" href="player-one-global-helpers-v7-3-3-test.html">Player 1</a>
+<a class="btn" href="continue-watching-global-helpers-v7-3-9-test.html">Continue Watching</a>
+<a class="btn" href="watch-history-global-helpers-v7-4-0-test.html">Watch History</a>
+<a class="btn" href="watchlist-clean-machine-v7-12-43-test.html">Watchlist</a>
+<a class="btn" href="favourites-clean-machine-v7-12-41-test.html">Favourites</a>
+<a class="btn" href="likes-clean-machine-v7-12-42-test.html">Likes</a>
+<a class="btn warn" href="accessibility-clean-machine-v7-12-44-test.html">Accessibility</a>
 <a class="btn cyan" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Supabase Library Editor</a>
 <a class="btn" href="genres-clean-machine-v7-12-45-test.html">Genres</a>
 <a class="btn" href="global-search-global-helpers-v7-4-9-test.html">Global Search</a>
@@ -46,7 +54,7 @@ body{margin:0;min-height:100vh;padding:18px;background:radial-gradient(circle at
 <a class="btn" href="tools-page-original-global-pass-v7-12-136-test.html">Favourite Tools</a>
 <a class="btn warn" href="all-pages-version-registry-v7-12-122-current-routes-test.html">Current Routes Registry</a>
 </div>
-<p class="small">V7.12.172 index checkpoint. Header + footer shells preserved. Details route bridge recorded. Home remains the app route. Root redirects safely after a short pause.</p>
+<p class="small">V7.12.173 index checkpoint. Header + footer shells preserved. Details favicon and route bridge recorded. Home remains the app route. Root redirects safely after a short pause.</p>
 </main>
 <script>
 (function(){
