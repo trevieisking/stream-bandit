@@ -3,44 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Collections Header Shell V7.12.180 TEST</title>
-<link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
+<title>Stream Bandit V7.12.50 Collections Source Restore</title>
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff}
-*{box-sizing:border-box}
-body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,#22d3a633,transparent 34%),radial-gradient(circle at 92% 0,#7c3cff55,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}
-.wrap{max-width:1480px;margin:auto}
-.hero,.box{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 42px #0007;padding:18px;margin-bottom:14px}
-.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:6px 10px;font-size:12px}
-h1{font-size:clamp(38px,5vw,62px);line-height:.95;margin:8px 0;letter-spacing:-.055em}
-p{color:var(--muted);line-height:1.45}
-.check{border:1px solid #ffffff1a;border-radius:18px;background:#ffffff0f;padding:12px;margin-top:10px}
-.good{color:#baf7df;font-weight:950}
-.warn{color:#ffe7ad;font-weight:950}
-</style>
+:root{color-scheme:dark}body{margin:0;min-height:100vh;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif;display:grid;place-items:center;padding:24px}.box{width:min(980px,100%);border:1px solid #ffffff24;border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 20px 70px #0008;padding:24px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,72px);line-height:.95;letter-spacing:-.055em;margin:14px 0}.muted{color:#b9c0d8;line-height:1.5}.note{padding:12px 14px;border-radius:18px;background:#ffb1421f;border:1px solid #ffb14252;color:#ffe7ad;font-weight:850;margin-top:14px}.bad{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9;white-space:pre-wrap}</style>
 </head>
-<body data-sb-collections-menu-url="collections-clean-machine-v7-12-51-test.html">
-<div class="wrap">
-<section class="hero">
-<span class="badge">V7.12.180 Header Shell TEST</span>
-<h1>Collections Current Marker Test</h1>
-<p>This page tests only the header shell route truth. Open the overlay menu. Collections should be marked Current naturally by the header shell.</p>
-<div class="check">
-<p><span class="good">Expected:</span> Group Play → Collections shows Current.</p>
-<p><span class="good">Expected:</span> Group Play → Player 2 points to <code>player-2-clean-machine-v7-12-58-test.html</code>.</p>
-<p><span class="warn">Not allowed:</span> no page script forcing the menu current state.</p>
-</div>
-</section>
-
-<section class="box">
-<h2>Test links</h2>
-<p><a href="collections-clean-machine-v7-12-51-test.html" style="color:#baf7df;font-weight:950">Open real Collections V7.12.51</a></p>
-<p><a href="player-2-clean-machine-v7-12-58-test.html" style="color:#baf7df;font-weight:950">Open Player 2 V7.12.58</a></p>
-</section>
-</div>
-
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=header-shell-test-180"></script>
-<script src="stream-bandit-header-shell-v7-12-180-test.js?v=header-shell-test-180"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=header-shell-test-180"></script>
+<body>
+<div id="restoreBox" class="box"><span class="badge">V7.12.50 source restore</span><h1>Loading Collections source...</h1><p class="muted">Restoring the Collections V7.12.50 source used by the V7.12.51 wrapper.</p><div class="note">Only this source page was restored.</div></div>
+<script>
+async function removeCollection(){
+}
+function playAll(){}
+(function(){
+  var ref='2926e09b6ded1b47692c438cdaebac60a2195aa5';
+  var file='collections-clean-machine-v7-12-'+'50-test.html';
+  var host=['https:','','raw.githubusercontent.com','trevieisking','stream-bandit',ref,file].join('/');
+  function clean(s){return String(s||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  fetch(host,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('Could not restore source: '+r.status);return r.text();}).then(function(html){document.open();document.write(html);document.close();}).catch(function(e){var box=document.getElementById('restoreBox');if(box)box.innerHTML='<span class="badge">Restore failed</span><h1>Collections source restore failed</h1><div class="note bad">'+clean(e.message||e)+'</div>';});
+})();
+</script>
 </body>
 </html>
