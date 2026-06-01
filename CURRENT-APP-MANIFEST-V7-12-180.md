@@ -63,11 +63,12 @@ The footer shell owns the compact footer only.
 
 ### Browse
 
-1. Library / Supabase Library — `library-global-helpers-v7-4-8-test.html`
-2. Supabase Library Editor — `supabase-library-home-header-form-fix-v7-12-34-test.html`
-3. Genres — `genres-clean-machine-v7-12-45-test.html`
-4. Global Search — `global-search-global-helpers-v7-4-9-test.html`
-5. About — `about-global-helpers-v7-4-7-test.html`
+1. Supabase Library Editor — `supabase-library-home-header-form-fix-v7-12-34-test.html`
+2. Genres — `genres-clean-machine-v7-12-45-test.html`
+3. Global Search — `global-search-global-helpers-v7-4-9-test.html`
+4. About — `about-global-helpers-v7-4-7-test.html`
+
+Important: Library belongs to Watch only, not Browse.
 
 ### Creator
 
@@ -157,7 +158,11 @@ Fix later as full clean shell code only, tested first in a reusable shell test s
 
 Before making a new test page, first identify one old inventory file that is not in this manifest, not referenced by a protected shell/page, and not fetched by another protected page.
 
-Preferred future test slots after cleanup approval:
+Current HTML test slot:
+
+- `collections-header-shell-v7-12-180-test.html`
+
+Preferred future renamed slots after cleanup approval:
 
 - HTML test slot: `stream-bandit-test-slot.html`
 - JS test slot: `stream-bandit-shell-test-slot.js`
