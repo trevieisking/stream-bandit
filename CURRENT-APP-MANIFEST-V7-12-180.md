@@ -1,19 +1,19 @@
-# Stream Bandit Current App Manifest V7.12.182
+# Stream Bandit Current App Manifest V7.12.189
 
 Date: 2026-06-02
 
-Purpose: this is the protected current-app map. It is based on the visible overlay menu, current index route list, passed checkpoints, and the current shell ownership rule.
+Purpose: this is the protected current-app map after the Owner Brand Route Truth full pass and the start of the clean group shell refit.
 
-## V7.12.182 route / ownership alignment
+## V7.12.189 route / ownership alignment
 
-- Active overlay entries are now 53.
-- Unique current URLs remain 48.
-- Deleted Owner machine entries are not active routes:
-  - Clean Machine Menu
-  - Route Pointer Machine
-- Those deleted Owner entries may remain as historical support/witness files only when referenced by a current owner page.
-- Header shell route truth has already been corrected for Collections V7.12.51 and Player 2 V7.12.58.
-- Root page-level icon checks are not current route checks. Header Shell owns the app header icon/logo behaviour.
+- Active overlay entries: 53.
+- Unique current URLs: 50.
+- Home remains the safe app route.
+- Every active page should move toward the clean pattern: Header Shell + Page Content + Footer Shell + Theme Projector.
+- Brand / App Icons, Brand Image Helper and Favicon / App Icon Builder are separate owner routes.
+- Collections route truth remains V7.12.51.
+- Player 2 route truth remains V7.12.58.
+- Deleted Owner machine entries are not active routes and may remain only as historical support or witness files when referenced by current pages.
 
 ## Hard rule
 
@@ -21,19 +21,35 @@ The overlay menu is the master protected list. If a page appears in the overlay 
 
 ## Build method from this point
 
-- No broad patching.
+- No broad blind patching.
 - No helper patch files for page cleanup.
 - No page-level scripts forcing shell-owned state.
-- No mutation-observer fixes for menu current markers.
+- No stale route sanitizers sending current pages backward.
 - Test pages must use a reusable test slot or a page proven to be unused.
 - A page is not unused just because its version number is old.
-- Before creating a new test page, delete or reuse one confirmed old inventory page.
 - Real promoted pages must be clean full page code.
 - Header problems belong in the header shell.
 - Footer problems belong in the footer shell.
 - Page layout/content belongs in the page code.
+- Theme/global visual settings belong in the Theme Studio / theme projector path.
 
-## Protected shell files
+## Clean target pattern
+
+Reference page:
+
+- `home-global-helpers-v7-4-4-test.html`
+
+Clean pattern:
+
+- Header Shell
+- Page-owned content/body
+- Footer Shell
+- Theme Projector / theme bridge
+- Current search fallback when needed
+- Current saves/count helpers where needed
+- No old visual shell fighting the current shell
+
+## Protected shell and helper files
 
 These filenames are protected because current pages load or depend on them:
 
@@ -47,12 +63,24 @@ These filenames are protected because current pages load or depend on them:
 - `live-readiness-search-supabase-fallback-v7-12-130.js`
 - `stream-bandit-profile-signin-v7-12-156.js`
 - `stream-bandit-shell-v6-24.js`
+- `stream-bandit-global-helper-loader-v7-12-126.js`
 
-The header shell currently owns header, icons, overlay menu/current scroll, search bridge, profile/account display and saved count badges.
+## Route truth sanitizer full pass
 
-The footer shell owns the compact footer only.
+Do not revert these route-truth fixes:
 
-## Protected source/dependency notes
+- `stream-bandit-global-helper-loader-v7-12-126.js` — V7.12.186 Owner Brand route truth.
+- `stream-bandit-shell-v6-24.js` — V7.12.187 Owner Brand route truth.
+- `live-readiness-search-supabase-fallback-v7-12-130.js` — V7.12.188 Owner Brand route truth.
+- `index.html` — V7.12.188 current app map.
+
+Final Owner Brand route truth:
+
+- Brand / App Icons -> `settings-brand-icons-promoted-v7-12-21-test.html`
+- Brand Image Helper -> `brand-logo-helper-responsive-v7-12-20-test.html`
+- Favicon / App Icon Builder -> `favicon-app-icon-builder-v7-12-15-test.html`
+
+## Protected source / dependency notes
 
 - `collections-clean-machine-v7-12-50-test.html` is protected. It is a source/dependency for `collections-clean-machine-v7-12-51-test.html`. Do not use it as a test page.
 - Any page loaded with `fetch()` by a protected page is protected until the dependency is removed in clean full page code.
@@ -136,8 +164,8 @@ Protected ownership rule:
 6. Route Guard Proof — `health-check-global-helpers-v7-10-6-test.html`
 7. Final Shell Navigation — `stream-bandit-global-helper-shell-v7-12-126-test.html`
 8. Brand / App Icons — `settings-brand-icons-promoted-v7-12-21-test.html`
-9. Brand Image Helper — `settings-brand-icons-promoted-v7-12-21-test.html`
-10. Favicon / App Icon Builder — `settings-brand-icons-promoted-v7-12-21-test.html`
+9. Brand Image Helper — `brand-logo-helper-responsive-v7-12-20-test.html`
+10. Favicon / App Icon Builder — `favicon-app-icon-builder-v7-12-15-test.html`
 11. Pages Manager — `web-builder-pages-manager-v7-12-111-test.html`
 12. Published Preview — `web-builder-shared-style-preview-v7-12-117-test.html?page=test-page`
 
@@ -158,8 +186,7 @@ Legacy promoted aliases remain protected too:
 Expected current scanner results after this manifest alignment:
 
 - Active overlay entries: 53
-- Unique URLs: 48
-- Protected files: 13
+- Unique URLs: 50
 - Deleted Owner machines in active menu: 0
 - Supabase writes from scanners: 0
 - Live/index promotion from scanners: 0
@@ -186,4 +213,4 @@ Do not create unlimited new test files. Keep repo file count stable by recycling
 - Any current shell file.
 - Any current source/dependency page.
 - Any asset/icon/logo used by protected pages.
-- Any Supabase config or key source file used by current frontend.
+- Any config source file used by current frontend.
