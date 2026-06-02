@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit V7.12.185 Current App Map</title>
+<title>Stream Bandit V7.12.188 Current App Map</title>
 <meta name="theme-color" content="#050711">
 <style>
 :root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--cyan:#41e8ff;--card:#ffffff0f}
@@ -44,20 +44,21 @@ body{padding:10px}
 <div class="wrap">
 
 <section class="hero">
-<span class="badge">Stream Bandit V7.12.185 Current App Map</span>
+<span class="badge">Stream Bandit V7.12.188 Current App Map</span>
 <h1>Current App Manifest</h1>
-<p class="muted">This index is the protected current-app map: 53 active overlay entries and 50 unique URLs. Deleted Owner machine entries are no longer active menu pages. Home remains the safe app route.</p>
+<p class="muted">This index is the protected current-app map after the Owner Brand Route Truth full pass. Brand / App Icons, Brand Image Helper and Favicon / App Icon Builder now remain separate from Home, from normal app pages, and from the Brand / App Icons overlay itself.</p>
 <div class="row">
 <a class="btn hot" href="home-global-helpers-v7-4-4-test.html">Open Home</a>
 <a class="btn" href="CURRENT-APP-MANIFEST-V7-12-180.md">Open Manifest</a>
 <a class="btn cyan" href="live-readiness-global-helpers-v7-10-2-test.html">Live Readiness</a>
 <a class="btn" href="all-pages-version-registry-v7-12-122-current-routes-test.html">Current Registry</a>
+<a class="btn" href="CHECKPOINT-OWNER-BRAND-ROUTE-TRUTH-FULL-PASS-V7-12-188.md">Owner Brand Full Pass</a>
 </div>
 </section>
 
-<section class="notice ok"><b>Hard rule:</b> if a file appears in this map, in the overlay menu, or is loaded/fetched by a protected page, it is not a blank test page.</section>
+<section class="notice ok"><b>Full pass:</b> Owner Brand route truth is fixed across the shell, legacy bridge and Live Readiness search/menu sanitizer. The Brand helper routes must stay separate.</section>
 
-<section class="notice warn"><b>Route truth fixed:</b> Brand / App Icons, Brand Image Helper, and Favicon / App Icon Builder now keep their own standalone routes. Collections points to V7.12.51, Player 2 points to V7.12.58, and deleted Owner machines are inactive witnesses only.</section>
+<section class="notice warn"><b>Do not regress:</b> never route Brand Image Helper or Favicon / App Icon Builder back to Brand / App Icons. Collections stays on V7.12.51, Player 2 stays on V7.12.58, and Home remains the safe app route.</section>
 
 <section class="group">
 <h2>Watch <span class="tag">10 routes</span></h2>
@@ -170,15 +171,16 @@ body{padding:10px}
 <section class="group">
 <h2>Protected JS and dependency files</h2>
 <div class="grid">
-<div class="notice"><b>Header shell:</b><br><code>stream-bandit-header-shell-v7-12-156.js</code></div>
-<div class="notice"><b>Footer shell:</b><br><code>stream-bandit-footer-shell-v7-12-156.js</code></div>
+<div class="notice"><b>Header shell:</b><br><code>stream-bandit-header-shell-v7-12-156.js</code><br><small>Current route truth includes separate Brand owner routes.</small></div>
+<div class="notice"><b>Footer shell:</b><br><code>stream-bandit-footer-shell-v7-12-156.js</code><br><small>Compact footer tabs keep Owner brand routes separate.</small></div>
 <div class="notice"><b>Theme owner/reader:</b><br><code>stream-bandit-theme-projector-v7-12-156.js</code><br><code>web-builder-theme-studio-controls-v7-8-9-test.html</code></div>
-<div class="notice"><b>Saves/search/profile helpers:</b><br><code>stream-bandit-menu-saves-count-v6-72-1.js</code><br><code>stream-bandit-core-saves-v6-75.js</code><br><code>live-readiness-search-supabase-fallback-v7-12-130.js</code><br><code>stream-bandit-profile-signin-v7-12-156.js</code></div>
+<div class="notice"><b>Route truth sanitizers:</b><br><code>stream-bandit-global-helper-loader-v7-12-126.js</code><br><code>stream-bandit-shell-v6-24.js</code><br><code>live-readiness-search-supabase-fallback-v7-12-130.js</code><br><small>All three must preserve Brand / App Icons, Brand Image Helper and Favicon Builder as separate routes.</small></div>
+<div class="notice"><b>Saves/search/profile helpers:</b><br><code>stream-bandit-menu-saves-count-v6-72-1.js</code><br><code>stream-bandit-core-saves-v6-75.js</code><br><code>stream-bandit-profile-signin-v7-12-156.js</code></div>
 <div class="notice"><b>Protected source dependency:</b><br><code>collections-clean-machine-v7-12-50-test.html</code> feeds Collections V7.12.51 and is not a test slot.</div>
 </div>
 </section>
 
-<p class="mini">V7.12.185 corrected index Owner route truth. Root redirects to Home after a short pause. Continue only with one-page, full-code, test-first passes.</p>
+<p class="mini">V7.12.188 corrected index map after Owner Brand Route Truth full pass. Root redirects to Home after a short pause. Continue only with one-page, full-code, test-first passes.</p>
 
 </div>
 
