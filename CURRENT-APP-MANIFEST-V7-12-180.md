@@ -1,8 +1,19 @@
-# Stream Bandit Current App Manifest V7.12.180
+# Stream Bandit Current App Manifest V7.12.182
 
-Date: 2026-06-01
+Date: 2026-06-02
 
 Purpose: this is the protected current-app map. It is based on the visible overlay menu, current index route list, passed checkpoints, and the current shell ownership rule.
+
+## V7.12.182 route / ownership alignment
+
+- Active overlay entries are now 53.
+- Unique current URLs remain 48.
+- Deleted Owner machine entries are not active routes:
+  - Clean Machine Menu
+  - Route Pointer Machine
+- Those deleted Owner entries may remain as historical support/witness files only when referenced by a current owner page.
+- Header shell route truth has already been corrected for Collections V7.12.51 and Player 2 V7.12.58.
+- Root page-level icon checks are not current route checks. Header Shell owns the app header icon/logo behaviour.
 
 ## Hard rule
 
@@ -122,15 +133,13 @@ Protected ownership rule:
 3. Web Builder Studio — `web-builder-live-studio-v7-12-116-test.html?page=test-page`
 4. One Machine — `stream-bandit-one-machine-v7-12-73-test.html`
 5. Platform Control Centre — `settings-platform-control-hub-v7-12-85-test.html`
-6. Clean Machine Menu — `all-pages-version-registry-v7-12-122-current-routes-test.html`
-7. Route Guard Proof — `health-check-global-helpers-v7-10-6-test.html`
-8. Route Pointer Machine — `all-pages-version-registry-v7-12-122-current-routes-test.html`
-9. Final Shell Navigation — `stream-bandit-global-helper-shell-v7-12-126-test.html`
-10. Brand / App Icons — `settings-brand-icons-promoted-v7-12-21-test.html`
-11. Brand Image Helper — `settings-brand-icons-promoted-v7-12-21-test.html`
-12. Favicon / App Icon Builder — `settings-brand-icons-promoted-v7-12-21-test.html`
-13. Pages Manager — `web-builder-pages-manager-v7-12-111-test.html`
-14. Published Preview — `web-builder-shared-style-preview-v7-12-117-test.html?page=test-page`
+6. Route Guard Proof — `health-check-global-helpers-v7-10-6-test.html`
+7. Final Shell Navigation — `stream-bandit-global-helper-shell-v7-12-126-test.html`
+8. Brand / App Icons — `settings-brand-icons-promoted-v7-12-21-test.html`
+9. Brand Image Helper — `settings-brand-icons-promoted-v7-12-21-test.html`
+10. Favicon / App Icon Builder — `settings-brand-icons-promoted-v7-12-21-test.html`
+11. Pages Manager — `web-builder-pages-manager-v7-12-111-test.html`
+12. Published Preview — `web-builder-shared-style-preview-v7-12-117-test.html?page=test-page`
 
 ### User Management
 
@@ -144,15 +153,16 @@ Legacy promoted aliases remain protected too:
 - Pricing alias: `plans-pricing-matrix-v6-69-test.html`
 - Permissions alias: `permissions-matrix-v6-70-test.html`
 
-## Current mismatch to fix later
+## Current scanner expectations
 
-The current header shell filename is protected and used by Watch group, but its route map is stale for Group Play:
+Expected current scanner results after this manifest alignment:
 
-- Header shell currently points Collections to `collections-clean-machine-v7-12-48-test.html`.
-- Header shell currently points Player 2 to `player-2-progress-helper-v6-78-9-4-test.html`.
-- Correct route truth is Collections V7.12.51 and Player 2 V7.12.58.
-
-Fix later as full clean shell code only, tested first in a reusable shell test slot.
+- Active overlay entries: 53
+- Unique URLs: 48
+- Protected files: 13
+- Deleted Owner machines in active menu: 0
+- Supabase writes from scanners: 0
+- Live/index promotion from scanners: 0
 
 ## Test slot rule
 
