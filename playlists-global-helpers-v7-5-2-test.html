@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Playlists V7.12.190</title>
+<title>Stream Bandit Playlists V7.12.191</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
@@ -12,42 +12,50 @@
 </head>
 <body data-sb-playlists-menu-url="playlists-global-helpers-v7-5-2-test.html">
 <div class="wrap">
-<section class="hero"><div class="heroGrid"><div><span class="badge">V7.12.190 Playlists · Clean Shell</span><h1>Playlists</h1><p>Browse playlists and playlist movies with the current Header Shell, Footer Shell, Theme Projector and Player 2 queue route truth.</p><div class="actions"><button id="openMenu" class="btn primary" type="button">Open overlay menu</button><button id="reload" class="btn cyan" type="button">Reload Playlists</button><button id="playSelected" class="btn warn" type="button">Play Selected In Player 2</button><a class="btn hot" href="channels-global-helpers-v7-5-3-test.html">Channels</a><a class="btn" href="collections-clean-machine-v7-12-51-test.html">Collections</a></div><div id="status" class="status">Loading Playlists...</div><div id="helperStatus" class="note">Checking foundation...</div></div><div class="art"><div class="artIcon">📃▶️</div></div></div></section>
+<section class="hero"><div class="heroGrid"><div><span class="badge">V7.12.191 Playlists · Join Table Fix</span><h1>Playlists</h1><p>Browse playlists and playlist movies using the real <code>sb_playlist_movies</code> join table, with the current Header Shell, Footer Shell, Theme Projector and Player 2 queue route truth.</p><div class="actions"><button id="openMenu" class="btn primary" type="button">Open overlay menu</button><button id="reload" class="btn cyan" type="button">Reload Playlists</button><button id="playSelected" class="btn warn" type="button">Play Selected In Player 2</button><a class="btn hot" href="channels-global-helpers-v7-5-3-test.html">Channels</a><a class="btn" href="collections-clean-machine-v7-12-51-test.html">Collections</a></div><div id="status" class="status">Loading Playlists...</div><div id="helperStatus" class="note">Checking foundation...</div></div><div class="art"><div class="artIcon">📃▶️</div></div></div></section>
 <section class="box"><h2>Playlists</h2><div class="filters"><input id="filter" class="input" placeholder="Filter playlists"></div><div id="playlistGrid" class="playlistGrid" style="margin-top:10px"></div></section>
 <section class="box"><h2 id="movieTitle">Playlist movies</h2><div id="stats" class="stats"></div><div id="movieGrid" class="movieGrid" style="margin-top:10px"></div></section>
-<p class="micro">Playlists refit: Header Shell + Playlists Content + Footer Shell + Theme Projector. No old local header or local footer.</p>
+<p class="micro">Playlists refit: Header Shell + Playlists Content + Footer Shell + Theme Projector. Movie membership reads from sb_playlist_movies.</p>
 </div>
-<script src="stream-bandit-shell-v6-24.js?v=playlists-7-12-190-config-bridge"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=playlists-7-12-190"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=playlists-7-12-190"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=playlists-7-12-190"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=playlists-7-12-190"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=playlists-7-12-190"></script>
+<script src="stream-bandit-shell-v6-24.js?v=playlists-7-12-191-config-bridge"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=playlists-7-12-191"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=playlists-7-12-191"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=playlists-7-12-191"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=playlists-7-12-191"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=playlists-7-12-191"></script>
 <script>
 (function(){'use strict';
-const VERSION='V7.12.190 Playlists Clean Shell';
+const VERSION='V7.12.191 Playlists Clean Shell / sb_playlist_movies Fix';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER1='player-one-global-helpers-v7-3-3-test.html';
 const PLAYER2='player-2-clean-machine-v7-12-58-test.html';
-let playlists=[],movies=[],active='',sb=null,cfg=null;const $=id=>document.getElementById(id);
+let playlists=[],movies=[],links=[],active='',sb=null,cfg=null;const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c));}
 function first(){for(let i=0;i<arguments.length;i++){let x=arguments[i];if(x!==undefined&&x!==null&&String(x).trim()!=='')return String(x).trim();}return '';}
 function img(x){return first(x&&x.poster_url,x&&x.cover_url,x&&x.image_url,x&&x.thumbnail_url,x&&x.banner_url);}
 function poster(m){return first(m&&m.thumbnail_url,m&&m.poster_url,m&&m.poster,m&&m.thumb,m&&m.image_url,m&&m.backdrop_url);}
 function videoOf(m){return first(m&&m.video_url,m&&m.mux_playback_url,m&&m.stream_url,m&&m.url,m&&m.source);}
 function keyOf(p){return String(first(p&&p.id,p&&p.playlist_id,p&&p.slug,p&&p.name,p&&p.title));}
+function movieId(m){return String(first(m&&m.id,m&&m.movie_id,m&&m.uuid));}
 function playlistName(p){return first(p&&p.name,p&&p.title,'Playlist');}
 function moviePlaylistKey(m){return String(first(m&&m.playlist_id,m&&m.playlist,m&&m.playlist_slug,m&&m.playlist_name));}
 function setStatus(t,bad){$('status').textContent=t;$('status').className=bad?'note':'status';}
 function config(){cfg=cfg||window.StreamBanditSupabaseConfig||null;return cfg;}
 function client(){let c=config();if(!c||!c.url||!c.key)throw Error('Supabase config bridge not ready.');if(!sb)sb=supabase.createClient(c.url,c.key);return sb;}
-function plCard(p){let id=keyOf(p),im=img(p);return '<article class="playlist '+(id===active?'active':'')+'" data-id="'+esc(id)+'"><div class="poster">'+(im?'<img src="'+esc(im)+'" loading="lazy" alt="">':'Playlist')+'</div><div class="body"><h3>'+esc(playlistName(p))+'</h3><p>'+esc(p.description||'No description yet.')+'</p><span class="pill">'+esc(id||'playlist')+'</span></div></article>';}
-function movieCard(m){let id=encodeURIComponent(String(m.id||'')),im=poster(m),play=videoOf(m);return '<article class="movie"><div class="thumb">'+(im?'<img src="'+esc(im)+'" loading="lazy" alt="">':'No artwork')+'</div><div class="body"><h3>'+esc(m.title||'Untitled')+'</h3><p>'+esc(m.description||m.summary||'No description yet.')+'</p><div class="actions"><a class="btn primary" href="'+DETAILS+'?id='+id+'">Details</a><a class="btn hot" href="'+PLAYER1+'?id='+id+(play?'&src='+encodeURIComponent(play):'')+'">Play</a></div></div></article>';}
-function selectedMovies(){if(!active)return movies;let list=movies.filter(m=>moviePlaylistKey(m)===active||String(m.playlist_id||'')===active);return list.length?list:movies.slice(0,24);}
-function queuePayload(items,label){return{source:'playlists',queueName:label||'Playlist',name:label||'Playlist',currentIndex:0,createdAt:new Date().toISOString(),items:items.filter(videoOf).map(m=>({id:String(m.id||m.movie_id||m.uuid||''),title:m.title||m.name||'Untitled',description:m.description||m.summary||'',thumbnail_url:poster(m),poster_url:poster(m),video_url:videoOf(m),mux_playback_url:m.mux_playback_url||videoOf(m),source_type:m.source_type||'',genres:m.genres||m.genre||[]}))};}
+function linkCount(pid){return links.filter(x=>String(x.playlist_id)===String(pid)).length;}
+function playlistLinks(pid){return links.filter(x=>String(x.playlist_id)===String(pid)).sort((a,b)=>(Number(a.sort_order)||0)-(Number(b.sort_order)||0));}
+function plCard(p){let id=keyOf(p),im=img(p),count=linkCount(id);return '<article class="playlist '+(id===active?'active':'')+'" data-id="'+esc(id)+'"><div class="poster">'+(im?'<img src="'+esc(im)+'" loading="lazy" alt="">':'Playlist')+'</div><div class="body"><h3>'+esc(playlistName(p))+'</h3><p>'+esc(p.description||'No description yet.')+'</p><span class="pill">'+count+' linked movie(s)</span><span class="pill">'+(p.is_public?'public':'private')+'</span></div></article>';}
+function movieCard(m){let id=encodeURIComponent(movieId(m)),im=poster(m),play=videoOf(m);return '<article class="movie"><div class="thumb">'+(im?'<img src="'+esc(im)+'" loading="lazy" alt="">':'No artwork')+'</div><div class="body"><h3>'+esc(m.title||'Untitled')+'</h3><p>'+esc(m.description||m.summary||'No description yet.')+'</p><div class="actions"><a class="btn primary" href="'+DETAILS+'?id='+id+'">Details</a><a class="btn hot" href="'+PLAYER1+'?id='+id+(play?'&src='+encodeURIComponent(play):'')+'">Play</a></div></div></article>';}
+function selectedMovies(){
+  if(!active)return movies;
+  let rel=playlistLinks(active);
+  if(rel.length){let byId={};movies.forEach(m=>{byId[movieId(m)]=m;});return rel.map(r=>byId[String(r.movie_id)]).filter(Boolean);}
+  return movies.filter(m=>moviePlaylistKey(m)===active||String(m.playlist_id||'')===active);
+}
+function queuePayload(items,label){return{source:'playlists',queueName:label||'Playlist',name:label||'Playlist',currentIndex:0,createdAt:new Date().toISOString(),items:items.filter(videoOf).map(m=>({id:movieId(m),title:m.title||m.name||'Untitled',description:m.description||m.summary||'',thumbnail_url:poster(m),poster_url:poster(m),video_url:videoOf(m),mux_playback_url:m.mux_playback_url||videoOf(m),source_type:m.source_type||'',genres:m.genres||m.genre||[]}))};}
 function playSelected(){let p=playlists.find(x=>keyOf(x)===active)||{};let q=queuePayload(selectedMovies(),playlistName(p));if(!q.items.length){setStatus('No playable videos found for the selected playlist.',true);return;}try{['streamBanditQueueV1','streamBanditUpNextV1','streamBanditPlayer2Queue'].forEach(k=>{sessionStorage.setItem(k,JSON.stringify(q));localStorage.setItem(k,JSON.stringify(q));});}catch(e){}location.href=PLAYER2+'?queue=playlist';}
-function render(){let q=($('filter').value||'').toLowerCase();let list=playlists.filter(p=>!q||[playlistName(p),p.description,keyOf(p)].join(' ').toLowerCase().includes(q));$('playlistGrid').innerHTML=list.map(plCard).join('')||'<div class="note">No playlists found.</div>';document.querySelectorAll('.playlist').forEach(x=>x.onclick=()=>{active=x.dataset.id;render();});let pm=selectedMovies();let p=playlists.find(x=>keyOf(x)===active)||{};$('movieTitle').textContent='Movies — '+(playlistName(p)||'All playlists');$('stats').innerHTML='<div class="stat"><b>Playlists</b><span>'+playlists.length+'</span></div><div class="stat"><b>Showing</b><span>'+pm.length+'</span></div><div class="stat"><b>Playable</b><span>'+pm.filter(videoOf).length+'</span></div>';$('movieGrid').innerHTML=pm.map(movieCard).join('')||'<div class="note">No movies for this playlist yet.</div>';}
-async function load(){try{setStatus('Loading Playlists...');let c=client();playlists=(await c.from('sb_playlists').select('*').order('created_at',{ascending:false}).limit(160)).data||[];movies=(await c.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(300)).data||[];active=playlists[0]?keyOf(playlists[0]):'';render();setStatus('Playlists loaded: '+playlists.length+' playlists, '+movies.length+' movies.');helper();}catch(e){setStatus('Playlists read note: '+(e.message||e),true);$('playlistGrid').innerHTML='<div class="note">Playlists could not load yet. Routes and search still work.</div>';}}
+function render(){let q=($('filter').value||'').toLowerCase();let list=playlists.filter(p=>!q||[playlistName(p),p.description,keyOf(p)].join(' ').toLowerCase().includes(q));$('playlistGrid').innerHTML=list.map(plCard).join('')||'<div class="note">No playlists found.</div>';document.querySelectorAll('.playlist').forEach(x=>x.onclick=()=>{active=x.dataset.id;render();});let pm=selectedMovies();let p=playlists.find(x=>keyOf(x)===active)||{};let relCount=active?playlistLinks(active).length:links.length;$('movieTitle').textContent='Movies — '+(playlistName(p)||'All playlists');$('stats').innerHTML='<div class="stat"><b>Playlists</b><span>'+playlists.length+'</span></div><div class="stat"><b>Join rows</b><span>'+links.length+'</span></div><div class="stat"><b>Selected links</b><span>'+relCount+'</span></div><div class="stat"><b>Showing</b><span>'+pm.length+'</span></div><div class="stat"><b>Playable</b><span>'+pm.filter(videoOf).length+'</span></div>';$('movieGrid').innerHTML=pm.map(movieCard).join('')||'<div class="note">No movies linked to this playlist yet.</div>';}
+async function load(){try{setStatus('Loading Playlists...');let c=client();let pl=await c.from('sb_playlists').select('*').order('created_at',{ascending:false}).limit(160);let ln=await c.from('sb_playlist_movies').select('playlist_id,movie_id,sort_order').order('sort_order',{ascending:true}).limit(1000);let mv=await c.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(500);if(pl.error)throw pl.error;if(ln.error)throw ln.error;if(mv.error)throw mv.error;playlists=pl.data||[];links=ln.data||[];movies=mv.data||[];active=playlists[0]?keyOf(playlists[0]):'';render();setStatus('Playlists loaded: '+playlists.length+' playlists, '+links.length+' playlist/movie links, '+movies.length+' movies.');helper();}catch(e){setStatus('Playlists read note: '+(e.message||e),true);$('playlistGrid').innerHTML='<div class="note">Playlists could not load yet. Routes and search still work.</div>';}}
 function helper(){try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();}catch(e){}$('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Config bridge '+(window.StreamBanditSupabaseConfig?'✅':'⚠️');}
 function wire(){$('openMenu').onclick=()=>{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.openMenu)window.StreamBanditHeaderShell.openMenu();};$('reload').onclick=load;$('filter').oninput=render;$('playSelected').onclick=playSelected;}
 wire();helper();setTimeout(load,250);setTimeout(helper,900);setTimeout(helper,1800);setInterval(helper,6000);
