@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Final Shell Navigation V7.12.199</title>
+<title>Stream Bandit Final Shell Navigation V7.12.200</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <style>
@@ -16,7 +16,7 @@
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.199 Final Shell Navigation</span>
+      <span class="badge">V7.12.200 Final Shell Navigation</span>
       <h1>Final Shell Navigation</h1>
       <p>This page proves the final navigation foundation without old local header/footer code. It uses Header Shell + Page Content + Footer Shell + Theme Projector, with search and saved-count helpers wired like Live Readiness and One Machine.</p>
       <div class="actions">
@@ -27,7 +27,7 @@
         <a class="btn" href="stream-bandit-one-machine-v7-12-73-test.html">One Machine</a>
       </div>
       <div id="helperStatus" class="status">Checking helpers...</div>
-      <div class="note">No Supabase writes. No live/index promotion. This page is a shell/navigation proof only.</div>
+      <div class="note">No Supabase writes. No live/index promotion. This page is a shell/navigation proof only. V7.12.200 restores Supabase-backed saved counters.</div>
     </div>
     <div class="art">🧭✅</div>
   </div>
@@ -59,6 +59,7 @@
     <div class="card"><b>Footer Shell</b><p>Owns the compact footer tabs and current route groups. Footer should appear once.</p></div>
     <div class="card"><b>Theme Projector</b><p>Reads Theme Studio settings and projects the global theme variables.</p></div>
     <div class="card"><b>Search Fallback</b><p>Search covers movies, genres, channels, playlists, pages and policy agreements.</p></div>
+    <div class="card"><b>Saved counters</b><p>Supabase SDK + Menu Saves Count helper read Watchlist, Favourites and Likes into the Header Shell badges.</p></div>
     <div class="card"><b>Owner brand routes</b><p>Brand / App Icons, Brand Image Helper and Favicon Builder remain three separate Owner routes.</p></div>
     <div class="card"><b>Danger rule</b><p>Writer pages stay preservation-first: Web Builder, Pages Manager, Form Inbox, Movie Row Editor, Player 2.</p></div>
   </div>
@@ -68,19 +69,20 @@
   <h2>Debug report</h2>
   <pre class="code" id="debugText">Waiting...</pre>
 </section>
-<p class="micro">V7.12.199 Final Shell Navigation — clean shell/page/footer proof, read-only.</p>
+<p class="micro">V7.12.200 Final Shell Navigation — clean shell/page/footer proof, read-only.</p>
 </div>
 
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=final-shell-7-12-199"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=final-shell-7-12-199"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=final-shell-7-12-199"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=final-shell-7-12-199"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=final-shell-7-12-199"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=final-shell-7-12-199"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=final-shell-7-12-200"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=final-shell-7-12-200"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=final-shell-7-12-200"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=final-shell-7-12-200"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=final-shell-7-12-200"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=final-shell-7-12-200"></script>
 <script>
 (function(){
 'use strict';
-const VERSION='V7.12.199 Final Shell Navigation';
+const VERSION='V7.12.200 Final Shell Navigation';
 const ROUTES=[
 ['Home','home-global-helpers-v7-4-4-test.html'],
 ['Live Readiness','live-readiness-global-helpers-v7-10-2-test.html'],
@@ -95,22 +97,22 @@ const ROUTES=[
 ['Admin Centre','admin-centre-command-deck-v7-12-121-test.html'],
 ['Published Preview','web-builder-shared-style-preview-v7-12-117-test.html?page=test-page']
 ];
-let R={version:VERSION,helper:{},routeOk:0,routeBad:[],writes:false,livePromotion:false,supabaseWrites:false};
+let R={version:VERSION,helper:{},counterCounts:null,routeOk:0,routeBad:[],writes:false,livePromotion:false,supabaseWrites:false};
 let busy=false;
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function card(t,n,d){return '<div class="card"><b>'+esc(t)+'</b><div class="big">'+esc(n)+'</div><p>'+esc(d)+'</p></div>';}
 function state(ok){return '<span class="state '+(ok?'ok':'bad')+'">'+(ok?'OK':'CHECK')+'</span>';}
-function helpers(){R.helper={header:!!window.StreamBanditHeaderShell,footer:!!window.StreamBanditFooterShell,theme:!!window.StreamBanditThemeProjector,coreSaves:!!(window.StreamBanditCoreSaves||window.StreamBanditCoreSavesV675),menuCounts:!!window.StreamBanditMenuSavesCount,search:!!window.StreamBanditLiveReadinessSearchFallback};try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}$('helperStatus').innerHTML='<b>Global helpers:</b> Header '+(R.helper.header?'✅':'⚠️')+' · Footer '+(R.helper.footer?'✅':'⚠️')+' · Theme '+(R.helper.theme?'✅':'⚠️')+' · Core saves '+(R.helper.coreSaves?'✅':'⚠️')+' · Menu counts '+(R.helper.menuCounts?'✅':'⚠️')+' · Search '+(R.helper.search?'✅':'⚠️');cards();debug();}
-function cards(){let pass=Object.values(R.helper).filter(Boolean).length,total=Object.keys(R.helper).length||6;$('cards').innerHTML=card('Helper stack',pass+'/'+total,'Header, footer, theme, counters and search')+card('Route proof',R.routeOk+'/'+ROUTES.length,'Focused shell route checks')+card('Route issues',R.routeBad.length,'Missing focused route checks')+card('Writes',0,'Read-only navigation proof')+card('Owner brand split','3/3','Brand routes remain separate')+card('Footer mode','Shell','Footer Shell owns page footer');}
-async function refreshCounts(){try{if(window.StreamBanditCoreSavesV675&&window.StreamBanditCoreSavesV675.init)await window.StreamBanditCoreSavesV675.init();if(window.StreamBanditCoreSavesV675&&window.StreamBanditCoreSavesV675.refresh)await window.StreamBanditCoreSavesV675.refresh();if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)await window.StreamBanditMenuSavesCount.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}}
+async function forceCounterRefresh(){try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)await window.StreamBanditMenuSavesCount.refresh();}catch(e){}try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.getCounts)R.counterCounts=window.StreamBanditMenuSavesCount.getCounts();else if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.counts)R.counterCounts=typeof window.StreamBanditMenuSavesCount.counts==='function'?window.StreamBanditMenuSavesCount.counts():window.StreamBanditMenuSavesCount.counts;}catch(e){}cards();debug();}
+function helpers(){R.helper={supabaseSdk:!!window.supabase,header:!!window.StreamBanditHeaderShell,footer:!!window.StreamBanditFooterShell,theme:!!window.StreamBanditThemeProjector,coreSaves:!!(window.StreamBanditCoreSaves||window.StreamBanditCoreSavesV675),menuCounts:!!window.StreamBanditMenuSavesCount,search:!!window.StreamBanditLiveReadinessSearchFallback};try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}$('helperStatus').innerHTML='<b>Global helpers:</b> Supabase SDK '+(R.helper.supabaseSdk?'✅':'⚠️')+' · Header '+(R.helper.header?'✅':'⚠️')+' · Footer '+(R.helper.footer?'✅':'⚠️')+' · Theme '+(R.helper.theme?'✅':'⚠️')+' · Core saves '+(R.helper.coreSaves?'✅':'⚠️')+' · Menu counts '+(R.helper.menuCounts?'✅':'⚠️')+' · Search '+(R.helper.search?'✅':'⚠️');forceCounterRefresh();cards();debug();}
+function cards(){let pass=Object.values(R.helper).filter(Boolean).length,total=Object.keys(R.helper).length||7;let counterText='Waiting';try{let c=R.counterCounts||{};if(typeof c==='object')counterText=[c.watchlist??0,c.favourites??0,c.likes??c.liked??0].join('/');}catch(e){}$('cards').innerHTML=card('Helper stack',pass+'/'+total,'Supabase SDK, header, footer, theme, counters and search')+card('Saved counters',counterText,'Watchlist / Favourites / Likes')+card('Route proof',R.routeOk+'/'+ROUTES.length,'Focused shell route checks')+card('Route issues',R.routeBad.length,'Missing focused route checks')+card('Writes',0,'Read-only navigation proof')+card('Owner brand split','3/3','Brand routes remain separate')+card('Footer mode','Shell','Footer Shell owns page footer');}
 async function runChecks(){if(busy)return;busy=true;let btn=$('runChecks');if(btn)btn.disabled=true;R.routeOk=0;R.routeBad=[];$('routeRows').innerHTML='<div class="note">Checking focused shell routes...</div>';for(const r of ROUTES){let ok=false,status=0;try{let x=await fetch(r[1],{cache:'no-store'});ok=x.ok;status=x.status;}catch(e){}if(ok)R.routeOk++;else R.routeBad.push({name:r[0],url:r[1],status});}busy=false;if(btn)btn.disabled=false;paintRoutes();cards();debug();}
 function paintRoutes(){if(!R.routeBad.length){$('routeRows').innerHTML='<div class="status">All focused shell routes loaded: '+R.routeOk+'/'+ROUTES.length+'.</div>'+ROUTES.map(r=>'<div class="route"><b>'+esc(r[0])+'</b><a href="'+esc(r[1])+'">'+esc(r[1])+'</a>'+state(true)+'</div>').join('');return;}$('routeRows').innerHTML=ROUTES.map(r=>{let bad=R.routeBad.find(x=>x.url===r[1]);return '<div class="route"><b>'+esc(r[0])+'</b><a href="'+esc(r[1])+'">'+esc(r[1])+'</a>'+state(!bad)+'</div>';}).join('');}
-function openMenu(){try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.openMenu){window.StreamBanditHeaderShell.openMenu();return;}}catch(e){}document.querySelector('[data-sb-open-menu],#sbShellMenuToggle,.sb-menu-toggle')?.click();}
+function openMenu(){try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.openMenu){window.StreamBanditHeaderShell.openMenu();setTimeout(forceCounterRefresh,400);return;}}catch(e){}document.querySelector('[data-sb-open-menu],#sbShellMenuToggle,.sb-menu-toggle')?.click();setTimeout(forceCounterRefresh,400);}
 function debug(){$('debugText').textContent=JSON.stringify(R,null,2);}
 function copy(){debug();navigator.clipboard.writeText(JSON.stringify(R,null,2)).catch(()=>{});}
-function tabs(){document.querySelectorAll('[data-tab]').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$(btn.dataset.tab).classList.add('active');helpers();refreshCounts();});}
-function boot(){tabs();helpers();refreshCounts();$('openMenu').onclick=openMenu;$('runChecks').onclick=runChecks;$('copyReport').onclick=copy;setTimeout(helpers,800);setTimeout(refreshCounts,1000);setInterval(helpers,5000);setInterval(refreshCounts,15000);}
+function tabs(){document.querySelectorAll('[data-tab]').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$(btn.dataset.tab).classList.add('active');helpers();forceCounterRefresh();});}
+function boot(){tabs();helpers();forceCounterRefresh();$('openMenu').onclick=openMenu;$('runChecks').onclick=runChecks;$('copyReport').onclick=copy;window.addEventListener('stream-bandit-menu-save-counts',()=>{forceCounterRefresh();});setTimeout(helpers,800);setTimeout(forceCounterRefresh,1200);setTimeout(forceCounterRefresh,2200);setTimeout(forceCounterRefresh,3600);setTimeout(forceCounterRefresh,5200);setInterval(helpers,5000);setInterval(forceCounterRefresh,12000);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
