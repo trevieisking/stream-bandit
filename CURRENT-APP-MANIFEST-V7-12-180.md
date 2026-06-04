@@ -1,32 +1,39 @@
-# Stream Bandit Current App Manifest V7.12.196
+# Stream Bandit Current App Manifest V7.12.217
 
-Date: 2026-06-02
+Date: 2026-06-04
 
-Purpose: this is the protected current-app map after the full route / shell preservation pass. The filename stays `CURRENT-APP-MANIFEST-V7-12-180.md` because current protected pages and registry checks already reference it. The contents now record the V7.12.196 state.
+Purpose: protected current-app map after the owner/admin utility, form pipeline and Supabase Library preservation passes. The filename stays `CURRENT-APP-MANIFEST-V7-12-180.md` because current protected pages and registry checks already reference it. The contents now record the V7.12.217 state.
 
 ## Current pass status
 
-Full group scan / preservation pass complete.
+Strong current pause point.
 
 Current route baseline remains:
 
 - `V7.12.189 Current Routes Registry / 53 Active Entries / 50 Unique URLs`
 - Active overlay entries: 53
 - Unique current URLs: 50
-- Latest known registry run: 50/50 routes loaded 200
-- Latest known protected-file run: 16/16 protected files loaded 200
 - Current registry route: `all-pages-version-registry-v7-12-122-current-routes-test.html`
+- Latest known full registry baseline: 50/50 routes loaded 200
+- Latest known protected-file baseline: 16/16 protected files loaded 200
 
 Important: many page URLs stay the same while the page internals move forward. That is intentional. Route truth is the stable URL the shell/menu expects.
 
-Examples:
+## New current page internals since V7.12.196
 
-- `settings-platform-control-hub-v7-12-85-test.html` now contains Settings Hub fixes through V7.12.194.
-- `live-readiness-global-helpers-v7-10-2-test.html` now contains V7.12.196 shell/search proof.
-- `policy-documents-centre-v7-12-119-test.html` now contains V7.12.195 public preview/read-only logic.
-- `policy-reader-v7-12-119-test.html?policy=terms` now contains V7.12.195 public read-only logic.
-- `admin-centre-command-deck-v7-12-121-test.html` now contains V7.12.195 current-registry route truth.
-- `index.html` now represents the V7.12.196 route/shell preservation map.
+These pages keep their old/current route URLs but now contain newer passed internal versions:
+
+- `stream-bandit-header-shell-v7-12-156.js` — V7.12.211 Global Account Panel.
+- `profile-settings-live-ready-v7-12-90-test.html` — V7.12.208 Profile Settings sign-out / existing-user flow.
+- `policy-admin-documents-v7-12-120-test.html?policy=terms` — V7.12.210 Policy Admin Editor Centre restored.
+- `storage-prep-global-helpers-v7-10-8-test.html` — V7.12.209 Storage Prep Image URL Workshop.
+- `web-builder-form-submissions-v7-12-94-test.html?page=test-page` — V7.12.212 Form Inbox + Private Messages.
+- `web-builder-form-save-v7-12-94-test.html?page=test-page` — V7.12.213 Advanced Form end-to-end submission page.
+- `backup-safety-global-helpers-v7-10-9-test.html` — V7.12.214 Backup / Safety Owner Utility.
+- `health-check-global-helpers-v7-10-6-test.html` — V7.12.215 Health Check Owner Diagnostic.
+- `test-checklist-global-helpers-v7-10-5-test.html` — V7.12.216 Test Checklist Owner QA Utility.
+- `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.217 Supabase Library Editor / Shell Route Preservation.
+- `admin-centre-command-deck-v7-12-121-test.html` — still V7.12.195; scanned only after the V7.12.217 pass. No code change completed.
 
 ## Hard rule
 
@@ -44,7 +51,7 @@ The overlay menu is the master protected list. If a page appears in the overlay 
 - Footer problems belong in the footer shell.
 - Page layout/content belongs in the page code.
 - Theme/global visual settings belong in the Theme Studio / Theme Projector path.
-- Dangerous database/player/builder pages are preservation-first and must not be rewritten just for visual polish.
+- Database/player/builder pages are preservation-first and must not be rewritten just for visual polish.
 
 ## Clean target pattern
 
@@ -58,20 +65,10 @@ Where safe, the target is:
 - Current core saves/menu-count helpers where header counters must match
 - No old visual shell fighting the current shell
 
-Current proof page:
+Current shell proof routes:
 
 - `live-readiness-global-helpers-v7-10-2-test.html`
-
-Live Readiness V7.12.196 confirmed:
-
-- Header Shell: pass
-- Footer Shell: pass
-- Full Search: pass
-- Theme Projector: pass
-- Save Counts: pass
-- Route check: 15/15 loaded
-- Brand Image Helper opens standalone route
-- Favicon / App Icon Builder opens standalone route
+- `stream-bandit-global-helper-shell-v7-12-126-test.html`
 
 ## Protected shell and helper files
 
@@ -128,6 +125,12 @@ Final Owner Brand route truth:
 
 Important: public Library belongs to Watch only. Browse's Supabase route is the Movie Row Editor, not the normal user Library.
 
+Current Browse notes:
+
+- Supabase Library Editor now contains V7.12.217 shell/route preservation.
+- Player 2 stale route was corrected inside the editor to `player-2-clean-machine-v7-12-58-test.html`.
+- `sb_movies` field keys, create/edit/delete overlays, poster preview and poster upload path were preserved.
+
 ### Creator
 
 1. Submit Video — `submit-video-clean-machine-v7-12-79-test.html`
@@ -160,7 +163,8 @@ Current Settings notes:
 - Settings Hub route truth and header counters passed through V7.12.194.
 - Theme Studio owns global theme writes.
 - Theme Projector reads and applies the same theme keys.
-- Profile Settings owns profile/avatar/banner logic and must not be casually rewritten.
+- Profile Settings owns profile/avatar/banner logic and now has clearer sign-out behaviour.
+- Public account opening remains deferred until deliberately planned.
 - Web Builder is protected and must not be casually rewritten.
 
 ### Policy
@@ -172,10 +176,10 @@ Current Settings notes:
 Current Policy notes:
 
 - Policy Centre is public preview/read-only.
-- Policy Reader is public read-only and reads only `status = 'published'` rows.
+- Policy Reader is public read-only and reads only published rows.
 - Missing/unpublished policies show safe fallback text.
-- Policy Admin publish logic is preserved.
-- Before real users arrive, Policy Admin must become owner/admin-only with Supabase/RLS-backed write protection.
+- Policy Admin Editor Centre V7.12.210 restored owner/admin editing, draft, publish, archive and reader links.
+- Policy document editing is separate from Storage Prep rule planning.
 
 ### Admin
 
@@ -191,9 +195,9 @@ Current Policy notes:
 
 Current Admin notes:
 
-- Admin Centre route truth corrected to the current registry route.
-- Live Readiness is the current shell/search proof page.
-- Admin support tools scanned stable: Test Checklist, Tools, Health Check, Mux Manager, Storage Prep, Backup / Safety.
+- Admin Centre remains V7.12.195 and was scan-only after the Supabase Library pass.
+- Backup / Safety V7.12.214, Health Check V7.12.215 and Test Checklist V7.12.216 form the passed safety utility chain.
+- Storage Prep V7.12.209 is now the image public-URL workshop.
 
 ### Owner
 
@@ -212,13 +216,11 @@ Current Admin notes:
 
 Current Owner notes:
 
-- Owner group scanned and preserved.
-- Form Inbox private-message/reply logic preserved.
-- Advanced Form submission/upload logic preserved.
-- Pages Manager create/hide/restore/permanent-delete logic preserved.
-- Published Preview rendering/rating/form flow preserved.
-- Brand/App Icons route separation passed.
-- Route-label polish remains deferred for risky owner tools.
+- Advanced Form V7.12.213 feeds Form Inbox end-to-end.
+- Form Inbox V7.12.212 loads submissions, answers, messages, status changes and private replies.
+- Form Inbox is functionally passed but still needs later layout/control-flow polish.
+- Pages Manager remains risky and must be scanned before any pass.
+- Web Builder remains risky and must not be touched casually.
 
 ### User Management
 
@@ -238,6 +240,63 @@ Current User Management notes:
 - Pricing Feature Shop is draft/planning only: no billing, checkout or entitlement writes.
 - Permissions Matrix is a rule map only: no permission writes.
 - Visible route-label polish remains deferred.
+
+## Confirmed working chains at V7.12.217
+
+### Header/profile chain
+
+- Global Account panel opens.
+- Current profile/account details show.
+- Profile Settings opens.
+- Sign Out button is available.
+- Menu, search and saved counters still work.
+
+### Policy chain
+
+- Policy Centre opens.
+- Policy Admin opens for the owner/admin account.
+- Policy rows can be edited, saved, published and archived.
+- Public Reader opens selected policy.
+
+### Storage image URL chain
+
+- Storage Prep previews images.
+- Storage Prep uploads allowed images when the current account state is active.
+- Storage Prep creates public image URLs.
+- URL can be copied and tested.
+
+### Form chain
+
+- Advanced Form loads form block from `sb_site_pages`.
+- Submission saves to `sb_form_submissions`.
+- Form Inbox loads the new submission.
+- Answers display correctly.
+- Private reply/message tools work.
+
+### Supabase Library chain
+
+- Supabase Library Editor loads rows from `sb_movies`.
+- Search, status filter, source filter, genre filter, sort and clear filters work.
+- Create overlay opens/closes.
+- Edit overlay opens and fields remain present.
+- Poster preview still shows.
+- Copy ID works.
+- Details opens.
+- Play opens Player 1.
+- Play All Visible opens current Player 2.
+- Debug proves config source, admin profile and field keys.
+
+## Checkpoints promoted into current truth
+
+- `CHECKPOINT-PAUSE-END-TO-END-FORMS-POLICY-STORAGE-AUTH-V7-12-213.md`
+- `CHECKPOINT-FORM-INBOX-PRIVATE-MESSAGES-PASS-V7-12-212.md`
+- `CHECKPOINT-ADVANCED-FORM-END-TO-END-PASS-V7-12-213.md`
+- `CHECKPOINT-BACKUP-SAFETY-OWNER-UTILITY-PASS-V7-12-214.md`
+- `CHECKPOINT-HEALTH-CHECK-OWNER-DIAGNOSTIC-PASS-V7-12-215.md`
+- `CHECKPOINT-TEST-CHECKLIST-OWNER-QA-UTILITY-PASS-V7-12-216.md`
+- `CHECKPOINT-SUPABASE-LIBRARY-EDITOR-HAZARD-MAP-V7-12-161.md`
+- `CHECKPOINT-SUPABASE-LIBRARY-EDITOR-SHELL-ROUTE-PASS-V7-12-217.md`
+- `CHECKPOINT-ADMIN-CENTRE-SCAN-ONLY-V7-12-195.md`
 
 ## Protected source / dependency notes
 
@@ -268,7 +327,6 @@ Expected current scanner results after this manifest alignment:
 
 - Active overlay entries: 53
 - Unique URLs: 50
-- Deleted Owner machines in active menu: 0
 - Supabase writes from scanners: 0
 - Live/index promotion from scanners: 0
 
@@ -289,11 +347,11 @@ Do not create unlimited new test files. Keep repo file count stable by recycling
 
 ## Next recommended moves
 
-1. Owner/admin security plan before real users.
-2. Supabase/RLS hardening for Policy Admin, owner tools and management routes.
-3. Route-label polish one risky owner/user-management tool at a time.
-4. Optional Global Helper Shell polish to match Live Readiness V7.12.196 more closely.
-5. Final live/index promotion only after explicit approval and a fresh route registry run.
+1. Update Google Drive from this V7.12.217 manifest and checkpoint truth.
+2. Fresh Current Registry / route scan when the user is ready.
+3. Admin Centre route command deck can be retried later with a smaller update.
+4. Pages Manager hazard-map scan before any code change.
+5. Web Builder remains protected until a dedicated preservation plan is ready.
 
 ## What not to delete
 
@@ -303,4 +361,4 @@ Do not create unlimited new test files. Keep repo file count stable by recycling
 - Any current source/dependency page.
 - Any asset/icon/logo used by protected pages.
 - Any config source file used by current frontend.
-- Any checkpoint file recording a pass from V7.12.188 through V7.12.196.
+- Any checkpoint file recording a pass from V7.12.188 through V7.12.217.
