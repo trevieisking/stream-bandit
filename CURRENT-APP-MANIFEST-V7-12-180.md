@@ -1,8 +1,8 @@
-# Stream Bandit Current App Manifest V7.12.217
+# Stream Bandit Current App Manifest V7.12.218
 
-Date: 2026-06-04
+Date: 2026-06-05
 
-Purpose: protected current-app map after the owner/admin utility, form pipeline and Supabase Library preservation passes. The filename stays `CURRENT-APP-MANIFEST-V7-12-180.md` because current protected pages and registry checks already reference it. The contents now record the V7.12.217 state.
+Purpose: protected current-app map after the owner/admin utility, form pipeline, Supabase Library preservation and Admin Centre route command deck passes. The filename stays `CURRENT-APP-MANIFEST-V7-12-180.md` because current protected pages and registry checks already reference it. The contents now record the V7.12.218 state.
 
 ## Current pass status
 
@@ -19,7 +19,7 @@ Current route baseline remains:
 
 Important: many page URLs stay the same while the page internals move forward. That is intentional. Route truth is the stable URL the shell/menu expects.
 
-## New current page internals since V7.12.196
+## Current page internals promoted since V7.12.196
 
 These pages keep their old/current route URLs but now contain newer passed internal versions:
 
@@ -33,7 +33,7 @@ These pages keep their old/current route URLs but now contain newer passed inter
 - `health-check-global-helpers-v7-10-6-test.html` — V7.12.215 Health Check Owner Diagnostic.
 - `test-checklist-global-helpers-v7-10-5-test.html` — V7.12.216 Test Checklist Owner QA Utility.
 - `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.217 Supabase Library Editor / Shell Route Preservation.
-- `admin-centre-command-deck-v7-12-121-test.html` — still V7.12.195; scanned only after the V7.12.217 pass. No code change completed.
+- `admin-centre-command-deck-v7-12-121-test.html` — V7.12.218 Admin Centre Route Command Deck.
 
 ## Hard rule
 
@@ -127,7 +127,7 @@ Important: public Library belongs to Watch only. Browse's Supabase route is the 
 
 Current Browse notes:
 
-- Supabase Library Editor now contains V7.12.217 shell/route preservation.
+- Supabase Library Editor contains V7.12.217 shell/route preservation.
 - Player 2 stale route was corrected inside the editor to `player-2-clean-machine-v7-12-58-test.html`.
 - `sb_movies` field keys, create/edit/delete overlays, poster preview and poster upload path were preserved.
 
@@ -195,9 +195,10 @@ Current Policy notes:
 
 Current Admin notes:
 
-- Admin Centre remains V7.12.195 and was scan-only after the Supabase Library pass.
+- Admin Centre V7.12.218 is now the passed route command deck / owner launcher.
 - Backup / Safety V7.12.214, Health Check V7.12.215 and Test Checklist V7.12.216 form the passed safety utility chain.
 - Storage Prep V7.12.209 is now the image public-URL workshop.
+- Admin Centre is link/report/check only. Working page engines stay in their own pages.
 
 ### Owner
 
@@ -241,7 +242,7 @@ Current User Management notes:
 - Permissions Matrix is a rule map only: no permission writes.
 - Visible route-label polish remains deferred.
 
-## Confirmed working chains at V7.12.217
+## Confirmed working chains at V7.12.218
 
 ### Header/profile chain
 
@@ -286,6 +287,17 @@ Current User Management notes:
 - Play All Visible opens current Player 2.
 - Debug proves config source, admin profile and field keys.
 
+### Admin Centre chain
+
+- Admin Centre opens.
+- Header, footer, saved counters and account panel work.
+- Tabs open: Admin, Safety Chain, Media / Library, Owner / Builder, Policy / Users, Actions and Debug.
+- Supabase Library Editor button opens current route.
+- Health Check, Test Checklist, Backup / Safety and Current Registry open.
+- Route check, Copy Admin Map, Download Admin Report and Refresh Helpers work.
+- Debug shows V7.12.218 and `linkOnly: true`.
+- Player 2 route shows `player-2-clean-machine-v7-12-58-test.html`.
+
 ## Checkpoints promoted into current truth
 
 - `CHECKPOINT-PAUSE-END-TO-END-FORMS-POLICY-STORAGE-AUTH-V7-12-213.md`
@@ -297,6 +309,7 @@ Current User Management notes:
 - `CHECKPOINT-SUPABASE-LIBRARY-EDITOR-HAZARD-MAP-V7-12-161.md`
 - `CHECKPOINT-SUPABASE-LIBRARY-EDITOR-SHELL-ROUTE-PASS-V7-12-217.md`
 - `CHECKPOINT-ADMIN-CENTRE-SCAN-ONLY-V7-12-195.md`
+- `CHECKPOINT-ADMIN-CENTRE-ROUTE-COMMAND-DECK-PASS-V7-12-218.md`
 
 ## Protected source / dependency notes
 
@@ -347,11 +360,10 @@ Do not create unlimited new test files. Keep repo file count stable by recycling
 
 ## Next recommended moves
 
-1. Update Google Drive from this V7.12.217 manifest and checkpoint truth.
-2. Fresh Current Registry / route scan when the user is ready.
-3. Admin Centre route command deck can be retried later with a smaller update.
-4. Pages Manager hazard-map scan before any code change.
-5. Web Builder remains protected until a dedicated preservation plan is ready.
+1. Fresh Current Registry / route scan when the user is ready.
+2. Pages Manager hazard-map scan before any code change.
+3. Web Builder remains protected until a dedicated preservation plan is ready.
+4. Google Drive can be topped up from this V7.12.218 manifest if needed.
 
 ## What not to delete
 
@@ -361,4 +373,4 @@ Do not create unlimited new test files. Keep repo file count stable by recycling
 - Any current source/dependency page.
 - Any asset/icon/logo used by protected pages.
 - Any config source file used by current frontend.
-- Any checkpoint file recording a pass from V7.12.188 through V7.12.217.
+- Any checkpoint file recording a pass from V7.12.188 through V7.12.218.
