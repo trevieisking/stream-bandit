@@ -1,19 +1,19 @@
-# Stream Bandit Current App Manifest V7.12.228
+# Stream Bandit Current App Manifest V7.12.229
 
 Date: 2026-06-06
 
-Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, and Continue Watching duplicate-row fix. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
+Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, Continue Watching duplicate-row fix, and Theme Studio shell/helper polish pass. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
 
 ## Current strongest pause point
 
 Current state:
 
-- V7.12.228 current app truth.
+- V7.12.229 current app truth.
 - Current registry baseline remains 53 active overlay entries / 50 unique URLs.
 - Latest known registry baseline: 50/50 routes loaded 200.
 - Latest known protected-file baseline: 16/16 protected files loaded 200.
 - Stable route URLs stay the same while page internals move forward.
-- No new active pages were created during the V7.12.224-V7.12.228 cleanup chain.
+- No new active pages were created during the V7.12.224-V7.12.229 cleanup chain.
 - Current rule: active URL stays active; replacement code is promoted onto the current URL only after scan and user test.
 
 ## Current promoted internal states
@@ -40,7 +40,7 @@ Current state:
 - `brand-logo-helper-responsive-v7-12-20-test.html` — V7.12.185 Brand Image Helper passed as global-logo preview/stage page.
 - `accessibility-clean-machine-v7-12-44-test.html` — V7.12.227 Accessibility global readability page with current Player 2 route fixed.
 - `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.228 Continue Watching duplicate-row fix; local progress remains read-only.
-- `web-builder-theme-studio-controls-v7-8-9-test.html` — V7.8.9 Theme Studio remains the global theme owner.
+- `web-builder-theme-studio-controls-v7-8-9-test.html` — V7.12.229 Theme Studio shell/helper polish; global theme ownership preserved.
 
 ## Current route truth by overlay group
 
@@ -227,9 +227,12 @@ Current state:
 
 ### Theme / Accessibility owner chain
 
-- Theme Studio V7.8.9 remains the single global theme owner.
+- Theme Studio V7.12.229 remains the single global theme owner.
 - Theme Studio saves global theme to `sb_app_settings` and local theme keys.
+- Theme Studio now explicitly loads Theme Projector, Header Shell, Footer Shell, menu saved-count helper, core saves helper and search fallback.
+- Theme Studio pass confirmed: header, footer, search, saved counters, load saved theme, apply preview, presets, colour pickers, large text, high contrast, save global theme and route links work.
 - Header and Footer Shell pages read/project saved theme variables.
+- Theme Studio note: add more safe font options later in a dedicated font-pack pass only.
 - Accessibility V7.12.227 controls readability comfort through local Theme Projector keys.
 - Accessibility can adjust font scale and contrast for projector pages.
 - Accessibility does not own colour theme; Theme Studio remains owner.
@@ -319,9 +322,9 @@ Do not casually rewrite these without a dedicated preservation plan:
 
 ## Next recommended moves
 
-1. Theme Studio final shell/helper scan and optional shell polish only if needed.
+1. Tools Cast Writer duplicate-removal polish.
 2. Brand / App Icons UI polish only; do not change working upload/save logic.
-3. Tools Cast Writer duplicate-removal polish.
+3. Theme Studio safe font-pack pass later; do not change save keys.
 4. Published Preview test-slot footer fix only, not live direct renderer rewrite.
 5. Fresh Current Registry / route scan when ready.
 
