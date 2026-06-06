@@ -1,22 +1,24 @@
-# Stream Bandit Current App Manifest V7.12.235
+# Stream Bandit Current App Manifest V7.12.237
 
 Date: 2026-06-06
 
-Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, Continue Watching duplicate-row fix, Theme Studio shell/helper polish pass, Tools Cast Writer exact Details-format pass, Published Preview full-page shell renderer promotion, and fresh post-promotion Current Routes Registry proof. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
+Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, Continue Watching duplicate-row fix, Theme Studio shell/helper polish pass, Tools Cast Writer exact Details-format pass, Published Preview full-page shell renderer promotion, Brand / App Icons drag/drop polish, Header Brand/Profile Ownership Split, and fresh post-promotion Current Routes Registry proof. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
 
 ## Current strongest pause point
 
 Current state:
 
-- V7.12.235 current app truth.
+- V7.12.237 current app truth.
 - Current registry baseline remains 53 active overlay entries / 50 unique URLs.
 - Latest known registry scan after Published Preview promotion: 50/50 active routes loaded 200 at `2026-06-06T16:48:55.848Z`.
 - Latest known protected-file scan after Published Preview promotion: 16/16 protected files loaded 200 at `2026-06-06T16:48:55.848Z`.
 - Latest known routeBad after Published Preview promotion: `[]`.
 - Latest known fileBad after Published Preview promotion: `[]`.
+- Header Shell was promoted to V7.12.237 after user test confirmed the app logo no longer flashes between brand logo and profile avatar.
+- Brand / App Icons was polished to V7.12.236 and user-tested as passed.
 - Stable route URLs stay the same while page internals move forward.
 - Published Preview was promoted onto the existing current URL after test-slot proof and then verified by registry scan.
-- No new active pages were created during the V7.12.224-V7.12.235 cleanup chain.
+- No new active pages were created during the V7.12.224-V7.12.237 cleanup chain.
 - Current rule: active URL stays active; replacement code is promoted onto the current URL only after scan and user test.
 
 ## Fresh Current Routes Registry proof
@@ -38,7 +40,7 @@ This post-promotion scan confirms the current overlay route map and protected he
 
 ## Current promoted internal states
 
-- `stream-bandit-header-shell-v7-12-156.js` — V7.12.211 Global Account Panel.
+- `stream-bandit-header-shell-v7-12-156.js` — V7.12.237 Header Shell / Brand Profile Ownership Split.
 - `profile-settings-live-ready-v7-12-90-test.html` — V7.12.208 Profile Settings sign-out / existing-user flow.
 - `policy-admin-documents-v7-12-120-test.html?policy=terms` — V7.12.210 Policy Admin Editor Centre restored.
 - `storage-prep-global-helpers-v7-10-8-test.html` — V7.12.209 Storage Prep Image URL Workshop.
@@ -55,7 +57,7 @@ This post-promotion scan confirms the current overlay route map and protected he
 - `mux-manager-global-helpers-v7-10-7-test.html` — V7.12.224 Mux Manager shell cleanup full-page replacement.
 - `favicon-app-icon-builder-v7-12-15-test.html` — V7.12.224 Favicon / App Icon Builder shell cleanup and preview generator pass.
 - `stream-bandit-brand-logo-v7-12-12.js` — V7.12.225 Global Brand Logo Helper / Settings Read.
-- `settings-brand-icons-promoted-v7-12-21-test.html` — V7.12.226 Brand / App Icons admin-profile fix and global logo upload/save owner.
+- `settings-brand-icons-promoted-v7-12-21-test.html` — V7.12.236 Brand / App Icons drag/drop polish with global logo upload/save owner preserved.
 - `brand-logo-helper-responsive-v7-12-20-test.html` — V7.12.185 Brand Image Helper passed as global-logo preview/stage page.
 - `accessibility-clean-machine-v7-12-44-test.html` — V7.12.227 Accessibility global readability page with current Player 2 route fixed.
 - `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.228 Continue Watching duplicate-row fix; local progress remains read-only.
@@ -154,6 +156,10 @@ This post-promotion scan confirms the current overlay route map and protected he
 - Profile Settings opens.
 - Sign Out is available.
 - Menu, search and saved counters still work.
+- Header Shell V7.12.237 separates app brand logo ownership from profile/account avatar ownership.
+- App/brand logo uses `data-sb-brand-logo` and is controlled by Brand / App Icons / Brand Logo helper.
+- Account/profile avatar uses profile/account data only and no longer overwrites the app logo slot.
+- User test confirmed the header logo no longer flashes between profile avatar and app logo after Brand / App Icons refresh/save.
 
 ### Policy chain
 
@@ -251,8 +257,15 @@ This post-promotion scan confirms the current overlay route map and protected he
 
 ### Batch 2 — Owner brand/icon tools
 
-- Brand / App Icons opens and reads global logo.
-- Brand Image Helper opens and stages the global logo with height / fit / position controls.
+- Brand / App Icons V7.12.236 opens and reads the global logo.
+- Brand / App Icons drag/drop is the main upload flow and file picker remains as fallback.
+- Local selected image preview works before upload.
+- Admin upload unlocks correctly and uploads to `stream-bandit-images/global/`.
+- Uploaded image previews.
+- Save Uploaded URL Globally unlocks after upload and preserves the working save target.
+- Brand / App Icons save target remains `sb_app_settings.settings.logoUrl` plus `settings.logo`.
+- Refresh Global Logo works and no longer fights profile avatar after Header V7.12.237 ownership split.
+- Brand Image Helper opens current route and stages the global logo with height / fit / position controls.
 - Favicon / App Icon Builder V7.12.224 opens.
 - Header appears and Footer Shell appears once.
 - Old manual favicon header/search removed.
@@ -262,12 +275,12 @@ This post-promotion scan confirms the current overlay route map and protected he
 ### Global brand owner chain
 
 - Global Brand Logo Helper V7.12.225 reads `sb_app_settings.settings.logoUrl` and safely falls back to the default Supabase Storage logo.
-- Brand / App Icons V7.12.226 confirms signed-in admin via `sb_profiles.role`.
+- Brand / App Icons V7.12.236 confirms signed-in admin via `sb_profiles.role`.
 - Brand / App Icons can upload a selected image to Supabase Storage bucket `stream-bandit-images` under `global/`.
 - Brand / App Icons can save the uploaded public URL into `sb_app_settings.settings.logoUrl` and `settings.logo`.
 - Saved global logo applies to Home/global pages after refresh and can be returned to the preferred original logo.
 - Storage delete remains false. Schema changes remain false.
-- Brand / App Icons note: functional pass complete; UI polish/tidying remains later.
+- Header brand/logo ownership is app-only. Profile/avatar ownership is account-only.
 
 ### Theme / Accessibility owner chain
 
@@ -373,10 +386,11 @@ Do not casually rewrite these without a dedicated preservation plan:
 - Brand / App Icons global upload/save logic.
 - Continue Watching progress/resume logic.
 - Tools Cast Writer Details-format logic.
+- Header Shell brand/profile ownership split.
 
 ## Next recommended moves
 
-1. Brand / App Icons UI polish only; do not change working upload/save logic.
+1. Fresh Current Registry / route scan after Header V7.12.237 promotion.
 2. Theme Studio safe font-pack pass later; do not change save keys.
 3. Published Preview future polish only: keep video better framed/visible when viewing the video block.
 4. Final polish pass later: remove or tuck Debug panels after every page is confirmed.
