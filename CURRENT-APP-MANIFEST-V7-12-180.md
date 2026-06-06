@@ -1,21 +1,22 @@
-# Stream Bandit Current App Manifest V7.12.231
+# Stream Bandit Current App Manifest V7.12.235
 
 Date: 2026-06-06
 
-Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, Continue Watching duplicate-row fix, Theme Studio shell/helper polish pass, Tools Cast Writer exact Details-format pass, and fresh Current Routes Registry proof. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
+Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, Continue Watching duplicate-row fix, Theme Studio shell/helper polish pass, Tools Cast Writer exact Details-format pass, fresh Current Routes Registry proof, and Published Preview full-page shell renderer promotion. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
 
 ## Current strongest pause point
 
 Current state:
 
-- V7.12.231 current app truth.
+- V7.12.235 current app truth.
 - Current registry baseline remains 53 active overlay entries / 50 unique URLs.
-- Latest known registry scan: 50/50 active routes loaded 200 at `2026-06-06T14:47:44.629Z`.
-- Latest known protected-file scan: 16/16 protected files loaded 200 at `2026-06-06T14:47:44.629Z`.
-- Latest known routeBad: `[]`.
-- Latest known fileBad: `[]`.
+- Latest known registry scan before Published Preview promotion: 50/50 active routes loaded 200 at `2026-06-06T14:47:44.629Z`.
+- Latest known protected-file scan before Published Preview promotion: 16/16 protected files loaded 200 at `2026-06-06T14:47:44.629Z`.
+- Latest known routeBad before Published Preview promotion: `[]`.
+- Latest known fileBad before Published Preview promotion: `[]`.
 - Stable route URLs stay the same while page internals move forward.
-- No new active pages were created during the V7.12.224-V7.12.231 cleanup chain.
+- Published Preview was promoted onto the existing current URL after test-slot proof.
+- No new active pages were created during the V7.12.224-V7.12.235 cleanup chain.
 - Current rule: active URL stays active; replacement code is promoted onto the current URL only after scan and user test.
 
 ## Fresh Current Routes Registry proof
@@ -33,7 +34,7 @@ Scan result supplied by owner/admin on 2026-06-06:
 - Protected file bad list: `[]`.
 - Timestamp: `2026-06-06T14:47:44.629Z`.
 
-This fresh scan confirms the current overlay route map and protected helper/file list still load after the V7.12.224 through V7.12.231 work.
+This fresh scan confirmed the route map and protected helper/file list before the final Published Preview promotion.
 
 ## Current promoted internal states
 
@@ -60,6 +61,7 @@ This fresh scan confirms the current overlay route map and protected helper/file
 - `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.228 Continue Watching duplicate-row fix; local progress remains read-only.
 - `web-builder-theme-studio-controls-v7-8-9-test.html` — V7.12.229 Theme Studio shell/helper polish; global theme ownership preserved.
 - `tools-page-original-global-pass-v7-12-136-test.html` — V7.12.231 Tools useful toy page; Cast Writer outputs exact Details format.
+- `web-builder-shared-style-preview-v7-12-117-test.html?page=test-page` — V7.12.235 Published Preview full-page shell renderer; manual header/footer removed and builder image fields supported.
 
 ## Current route truth by overlay group
 
@@ -208,6 +210,27 @@ This fresh scan confirms the current overlay route map and protected helper/file
 - Clear form works.
 - Duplicate footer hotfix passed with `duplicateFooterHotfix: true`.
 
+### Web Builder / Published Preview chain
+
+- Web Builder wrapper V7.12.223 opens and preserves the existing builder engine.
+- Builder edits/publishes page blocks to `sb_site_pages`.
+- Published Preview V7.12.235 opens on the current active URL.
+- Published Preview uses Header Shell, page content, Theme Projector helpers and Footer Shell.
+- Old manual preview header removed.
+- Old manual preview footer panel removed.
+- Old Settings Studio route removed; current Theme Studio route is used.
+- Blocks render inline as a full page preview.
+- Normal preview no longer uses broken block/action preview buttons.
+- Builder image fields render: `imageUrl`, `posterUrl`, `videoUrl`, plus underscore/lowercase variants.
+- Hero image renders.
+- Video poster/cover renders.
+- Builder / Advanced Form / Form Inbox links keep the selected slug.
+- Rating remains local-browser only.
+- Supabase writes remain false from Published Preview.
+- User confirmed this is the best working Published Preview state so far.
+- Future polish note: keep the video better framed/visible within the screen when viewing the video block.
+- Future final polish note: remove or tuck away Debug after all pages are polished.
+
 ### Batch 1 — Watch/Admin useful tools
 
 - Watch History V7.12.224 opens.
@@ -276,8 +299,8 @@ This fresh scan confirms the current overlay route map and protected helper/file
 ### Fresh registry chain
 
 - Current Routes Registry still reports 53 active overlay entries and 50 unique URLs.
-- Fresh owner/admin scan confirmed all 50 active routes load 200.
-- Fresh owner/admin scan confirmed all 16 protected files load 200.
+- Fresh owner/admin scan confirmed all 50 active routes load 200 before Published Preview promotion.
+- Fresh owner/admin scan confirmed all 16 protected files load 200 before Published Preview promotion.
 - `routeBad` remained empty.
 - `fileBad` remained empty.
 
@@ -351,10 +374,11 @@ Do not casually rewrite these without a dedicated preservation plan:
 
 ## Next recommended moves
 
-1. Brand / App Icons UI polish only; do not change working upload/save logic.
-2. Theme Studio safe font-pack pass later; do not change save keys.
-3. Published Preview test-slot footer fix only, not live direct renderer rewrite.
-4. Keep fresh registry scans after any further live/current route changes.
+1. Fresh Current Registry / route scan after Published Preview promotion.
+2. Brand / App Icons UI polish only; do not change working upload/save logic.
+3. Theme Studio safe font-pack pass later; do not change save keys.
+4. Published Preview future polish only: keep video better framed/visible when viewing the video block.
+5. Final polish pass later: remove or tuck Debug panels after every page is confirmed.
 
 ## What not to delete
 
