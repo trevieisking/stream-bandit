@@ -1,18 +1,20 @@
-# Stream Bandit Current App Manifest V7.12.221
+# Stream Bandit Current App Manifest V7.12.226
 
-Date: 2026-06-05
+Date: 2026-06-06
 
-Purpose: current protected route and recovery truth for Stream Bandit after the owner/admin utility chain, Supabase Library preservation, Admin Centre route deck, and Pages Manager preservation/hotfix passes. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
+Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, and Brand / App Icons admin-profile fix. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
 
 ## Current strongest pause point
 
 Current state:
 
-- V7.12.221 current app truth.
+- V7.12.226 current app truth.
 - Current registry baseline remains 53 active overlay entries / 50 unique URLs.
 - Latest known registry baseline: 50/50 routes loaded 200.
 - Latest known protected-file baseline: 16/16 protected files loaded 200.
 - Stable route URLs stay the same while page internals move forward.
+- No new active pages were created during the V7.12.224-V7.12.226 cleanup chain.
+- Current rule: active URL stays active; replacement code is promoted onto the current URL only after scan and user test.
 
 ## Current promoted internal states
 
@@ -28,6 +30,16 @@ Current state:
 - `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.217 Supabase Library Editor / Shell Route Preservation.
 - `admin-centre-command-deck-v7-12-121-test.html` — V7.12.218 Admin Centre Route Command Deck.
 - `web-builder-pages-manager-v7-12-111-test.html` — V7.12.221 Pages Manager Duplicate Footer Hotfix.
+- `web-builder-live-studio-v7-12-116-test.html?page=test-page` — V7.12.223 Web Builder wrapper shell/route pass.
+- `watch-history-global-helpers-v7-4-0-test.html` — V7.12.224 Watch History title cleanup full-page replacement.
+- `tools-page-original-global-pass-v7-12-136-test.html` — V7.12.224 Tools useful toy full-page replacement.
+- `mux-manager-global-helpers-v7-10-7-test.html` — V7.12.224 Mux Manager shell cleanup full-page replacement.
+- `favicon-app-icon-builder-v7-12-15-test.html` — V7.12.224 Favicon / App Icon Builder shell cleanup and preview generator pass.
+- `stream-bandit-brand-logo-v7-12-12.js` — V7.12.225 Global Brand Logo Helper / Settings Read.
+- `settings-brand-icons-promoted-v7-12-21-test.html` — V7.12.226 Brand / App Icons admin-profile fix and global logo upload/save owner.
+- `brand-logo-helper-responsive-v7-12-20-test.html` — V7.12.185 Brand Image Helper passed as global-logo preview/stage page.
+- `web-builder-theme-studio-controls-v7-8-9-test.html` — V7.8.9 Theme Studio remains the global theme owner.
+- `accessibility-clean-machine-v7-12-44-test.html` — V7.12.157 Accessibility global readability page; local Theme Projector keys control font scale / contrast across projector pages.
 
 ## Current route truth by overlay group
 
@@ -176,6 +188,53 @@ Current state:
 - Clear form works.
 - Duplicate footer hotfix passed with `duplicateFooterHotfix: true`.
 
+### Batch 1 — Watch/Admin useful tools
+
+- Watch History V7.12.224 opens.
+- Header appears and Footer Shell appears once.
+- Duplicate title/heading fixed.
+- Reload, tabs, Details, Play/Resume and save buttons work.
+- Debug shows `duplicateTitleFixed: true`.
+- Tools V7.12.224 opens.
+- Rating, runtime, link checker, route checker, slug/version helper, Mux formatter, cast writer, metadata JSON, text formatter and checkpoint note work.
+- Tools stale Details `?v=173` route removed.
+- Tools note: Cast Writer works but duplicate-removal polish remains a later small improvement.
+- Mux Manager V7.12.224 opens.
+- Old manual header/footer removed.
+- Public playback formatter, copy, open HLS, Storage Prep / Tools / Health Check links and debug work.
+- Mux Manager remains no secrets, no Mux API calls, no writes.
+
+### Batch 2 — Owner brand/icon tools
+
+- Brand / App Icons opens and reads global logo.
+- Brand Image Helper opens and stages the global logo with height / fit / position controls.
+- Favicon / App Icon Builder V7.12.224 opens.
+- Header appears and Footer Shell appears once.
+- Old manual favicon header/search removed.
+- Use Global Logo, local image choose, drag/drop, fit/background/radius/padding controls and generated icon previews work.
+- Favicon Builder remains preview-only with no upload/save/Supabase write.
+
+### Global brand owner chain
+
+- Global Brand Logo Helper V7.12.225 reads `sb_app_settings.settings.logoUrl` and safely falls back to the default Supabase Storage logo.
+- Brand / App Icons V7.12.226 confirms signed-in admin via `sb_profiles.role`.
+- Brand / App Icons can upload a selected image to Supabase Storage bucket `stream-bandit-images` under `global/`.
+- Brand / App Icons can save the uploaded public URL into `sb_app_settings.settings.logoUrl` and `settings.logo`.
+- Saved global logo applies to Home/global pages after refresh and can be returned to the preferred original logo.
+- Storage delete remains false. Schema changes remain false.
+- Brand / App Icons note: functional pass complete; UI polish/tidying remains later.
+
+### Theme / Accessibility owner chain
+
+- Theme Studio V7.8.9 remains the single global theme owner.
+- Theme Studio saves global theme to `sb_app_settings` and local theme keys.
+- Header and Footer Shell pages read/project saved theme variables.
+- Accessibility V7.12.157 controls readability comfort through local Theme Projector keys.
+- Accessibility can adjust font scale and contrast for projector pages.
+- Accessibility does not own colour theme; Theme Studio remains owner.
+- Accessibility does not write to Supabase.
+- Accessibility note: scan found stale Player 2 route `player-two-global-helpers-v7-3-4-test.html`; replace with `player-2-clean-machine-v7-12-58-test.html` next.
+
 ## Protected shell/helper files
 
 - `stream-bandit-header-shell-v7-12-156.js`
@@ -239,13 +298,17 @@ Do not casually rewrite these without a dedicated preservation plan:
 - Pages Manager page-row workflow.
 - Published Preview renderer.
 - User Management live `role + can_submit` controls.
+- Global Brand Logo helper.
+- Brand / App Icons global upload/save logic.
 
 ## Next recommended moves
 
-1. Published Preview hazard-map scan.
-2. Published Preview shell/route preservation only if the scan proves it safe.
-3. Web Builder Studio hazard-map scan after Preview.
-4. Fresh Current Registry / route scan when ready.
+1. Accessibility tiny route correction: replace stale Player 2 link with `player-2-clean-machine-v7-12-58-test.html`.
+2. Theme Studio final shell/helper scan and optional shell polish only if needed.
+3. Brand / App Icons UI polish only; do not change working upload/save logic.
+4. Tools Cast Writer duplicate-removal polish.
+5. Published Preview test-slot footer fix only, not live direct renderer rewrite.
+6. Fresh Current Registry / route scan when ready.
 
 ## What not to delete
 
@@ -256,3 +319,4 @@ Do not casually rewrite these without a dedicated preservation plan:
 - Any asset/icon/logo used by protected pages.
 - Any config source file used by current frontend.
 - Any checkpoint file recording a pass from V7.12.188 through V7.12.221.
+- Do not delete the working current logo/storage assets without a dedicated asset cleanup pass.
