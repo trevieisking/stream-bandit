@@ -1,19 +1,19 @@
-# Stream Bandit Current App Manifest V7.12.226
+# Stream Bandit Current App Manifest V7.12.228
 
 Date: 2026-06-06
 
-Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, and Brand / App Icons admin-profile fix. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
+Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, and Continue Watching duplicate-row fix. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
 
 ## Current strongest pause point
 
 Current state:
 
-- V7.12.226 current app truth.
+- V7.12.228 current app truth.
 - Current registry baseline remains 53 active overlay entries / 50 unique URLs.
 - Latest known registry baseline: 50/50 routes loaded 200.
 - Latest known protected-file baseline: 16/16 protected files loaded 200.
 - Stable route URLs stay the same while page internals move forward.
-- No new active pages were created during the V7.12.224-V7.12.226 cleanup chain.
+- No new active pages were created during the V7.12.224-V7.12.228 cleanup chain.
 - Current rule: active URL stays active; replacement code is promoted onto the current URL only after scan and user test.
 
 ## Current promoted internal states
@@ -38,8 +38,9 @@ Current state:
 - `stream-bandit-brand-logo-v7-12-12.js` — V7.12.225 Global Brand Logo Helper / Settings Read.
 - `settings-brand-icons-promoted-v7-12-21-test.html` — V7.12.226 Brand / App Icons admin-profile fix and global logo upload/save owner.
 - `brand-logo-helper-responsive-v7-12-20-test.html` — V7.12.185 Brand Image Helper passed as global-logo preview/stage page.
+- `accessibility-clean-machine-v7-12-44-test.html` — V7.12.227 Accessibility global readability page with current Player 2 route fixed.
+- `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.228 Continue Watching duplicate-row fix; local progress remains read-only.
 - `web-builder-theme-studio-controls-v7-8-9-test.html` — V7.8.9 Theme Studio remains the global theme owner.
-- `accessibility-clean-machine-v7-12-44-test.html` — V7.12.157 Accessibility global readability page; local Theme Projector keys control font scale / contrast across projector pages.
 
 ## Current route truth by overlay group
 
@@ -229,11 +230,25 @@ Current state:
 - Theme Studio V7.8.9 remains the single global theme owner.
 - Theme Studio saves global theme to `sb_app_settings` and local theme keys.
 - Header and Footer Shell pages read/project saved theme variables.
-- Accessibility V7.12.157 controls readability comfort through local Theme Projector keys.
+- Accessibility V7.12.227 controls readability comfort through local Theme Projector keys.
 - Accessibility can adjust font scale and contrast for projector pages.
 - Accessibility does not own colour theme; Theme Studio remains owner.
 - Accessibility does not write to Supabase.
-- Accessibility note: scan found stale Player 2 route `player-two-global-helpers-v7-3-4-test.html`; replace with `player-2-clean-machine-v7-12-58-test.html` next.
+- Accessibility current Player 2 route is fixed to `player-2-clean-machine-v7-12-58-test.html`.
+- Accessibility pass confirmed: header, footer, preview, save, reset, tabs, Player 1, Player 2, Details, Continue Watching, Watch History and Theme Studio routes work.
+
+### Continue Watching chain
+
+- Continue Watching V7.12.228 opens.
+- Header appears and Footer Shell appears once.
+- Duplicate movie cards are fixed.
+- Local progress remains read-only.
+- Raw local progress rows are deduped by movie ID before rendering.
+- User test confirmed `rawProgressRows: 13`, `uniqueProgressRows: 8`, `duplicatesRemoved: 5`.
+- Details opens current Details.
+- Resume opens current Player 1 with `t`, `time` and `resume` timestamp aliases.
+- Save buttons still update counts.
+- Debug shows `dedupeByMovieId: true`, `progressRewrite: false`, and `supabaseProgressWrite: false`.
 
 ## Protected shell/helper files
 
@@ -300,15 +315,15 @@ Do not casually rewrite these without a dedicated preservation plan:
 - User Management live `role + can_submit` controls.
 - Global Brand Logo helper.
 - Brand / App Icons global upload/save logic.
+- Continue Watching progress/resume logic.
 
 ## Next recommended moves
 
-1. Accessibility tiny route correction: replace stale Player 2 link with `player-2-clean-machine-v7-12-58-test.html`.
-2. Theme Studio final shell/helper scan and optional shell polish only if needed.
-3. Brand / App Icons UI polish only; do not change working upload/save logic.
-4. Tools Cast Writer duplicate-removal polish.
-5. Published Preview test-slot footer fix only, not live direct renderer rewrite.
-6. Fresh Current Registry / route scan when ready.
+1. Theme Studio final shell/helper scan and optional shell polish only if needed.
+2. Brand / App Icons UI polish only; do not change working upload/save logic.
+3. Tools Cast Writer duplicate-removal polish.
+4. Published Preview test-slot footer fix only, not live direct renderer rewrite.
+5. Fresh Current Registry / route scan when ready.
 
 ## What not to delete
 
