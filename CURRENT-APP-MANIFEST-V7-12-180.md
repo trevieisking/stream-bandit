@@ -2,7 +2,7 @@
 
 Date: 2026-06-06
 
-Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, Continue Watching duplicate-row fix, Theme Studio shell/helper polish pass, Tools Cast Writer exact Details-format pass, fresh Current Routes Registry proof, and Published Preview full-page shell renderer promotion. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
+Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, Continue Watching duplicate-row fix, Theme Studio shell/helper polish pass, Tools Cast Writer exact Details-format pass, Published Preview full-page shell renderer promotion, and fresh post-promotion Current Routes Registry proof. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
 
 ## Current strongest pause point
 
@@ -10,12 +10,12 @@ Current state:
 
 - V7.12.235 current app truth.
 - Current registry baseline remains 53 active overlay entries / 50 unique URLs.
-- Latest known registry scan before Published Preview promotion: 50/50 active routes loaded 200 at `2026-06-06T14:47:44.629Z`.
-- Latest known protected-file scan before Published Preview promotion: 16/16 protected files loaded 200 at `2026-06-06T14:47:44.629Z`.
-- Latest known routeBad before Published Preview promotion: `[]`.
-- Latest known fileBad before Published Preview promotion: `[]`.
+- Latest known registry scan after Published Preview promotion: 50/50 active routes loaded 200 at `2026-06-06T16:48:55.848Z`.
+- Latest known protected-file scan after Published Preview promotion: 16/16 protected files loaded 200 at `2026-06-06T16:48:55.848Z`.
+- Latest known routeBad after Published Preview promotion: `[]`.
+- Latest known fileBad after Published Preview promotion: `[]`.
 - Stable route URLs stay the same while page internals move forward.
-- Published Preview was promoted onto the existing current URL after test-slot proof.
+- Published Preview was promoted onto the existing current URL after test-slot proof and then verified by registry scan.
 - No new active pages were created during the V7.12.224-V7.12.235 cleanup chain.
 - Current rule: active URL stays active; replacement code is promoted onto the current URL only after scan and user test.
 
@@ -23,7 +23,7 @@ Current state:
 
 Source page: `all-pages-version-registry-v7-12-122-current-routes-test.html`
 
-Scan result supplied by owner/admin on 2026-06-06:
+Post-promotion scan result supplied by owner/admin on 2026-06-06:
 
 - Registry page version reported: `V7.12.189 Current Routes Registry / 53 Active Entries / 50 Unique URLs`.
 - Overlay entries: `53`.
@@ -32,9 +32,9 @@ Scan result supplied by owner/admin on 2026-06-06:
 - Route bad list: `[]`.
 - Protected file OK count: `16`.
 - Protected file bad list: `[]`.
-- Timestamp: `2026-06-06T14:47:44.629Z`.
+- Timestamp: `2026-06-06T16:48:55.848Z`.
 
-This fresh scan confirmed the route map and protected helper/file list before the final Published Preview promotion.
+This post-promotion scan confirms the current overlay route map and protected helper/file list still load after Published Preview V7.12.235 was promoted onto the active Published Preview URL.
 
 ## Current promoted internal states
 
@@ -228,6 +228,7 @@ This fresh scan confirmed the route map and protected helper/file list before th
 - Rating remains local-browser only.
 - Supabase writes remain false from Published Preview.
 - User confirmed this is the best working Published Preview state so far.
+- Fresh post-promotion registry scan confirmed 50/50 routes and 16/16 protected files still load 200.
 - Future polish note: keep the video better framed/visible within the screen when viewing the video block.
 - Future final polish note: remove or tuck away Debug after all pages are polished.
 
@@ -299,10 +300,11 @@ This fresh scan confirmed the route map and protected helper/file list before th
 ### Fresh registry chain
 
 - Current Routes Registry still reports 53 active overlay entries and 50 unique URLs.
-- Fresh owner/admin scan confirmed all 50 active routes load 200 before Published Preview promotion.
-- Fresh owner/admin scan confirmed all 16 protected files load 200 before Published Preview promotion.
+- Fresh owner/admin scan confirmed all 50 active routes load 200 after Published Preview promotion.
+- Fresh owner/admin scan confirmed all 16 protected files load 200 after Published Preview promotion.
 - `routeBad` remained empty.
 - `fileBad` remained empty.
+- Latest scan timestamp: `2026-06-06T16:48:55.848Z`.
 
 ## Protected shell/helper files
 
@@ -374,11 +376,11 @@ Do not casually rewrite these without a dedicated preservation plan:
 
 ## Next recommended moves
 
-1. Fresh Current Registry / route scan after Published Preview promotion.
-2. Brand / App Icons UI polish only; do not change working upload/save logic.
-3. Theme Studio safe font-pack pass later; do not change save keys.
-4. Published Preview future polish only: keep video better framed/visible when viewing the video block.
-5. Final polish pass later: remove or tuck Debug panels after every page is confirmed.
+1. Brand / App Icons UI polish only; do not change working upload/save logic.
+2. Theme Studio safe font-pack pass later; do not change save keys.
+3. Published Preview future polish only: keep video better framed/visible when viewing the video block.
+4. Final polish pass later: remove or tuck Debug panels after every page is confirmed.
+5. Keep fresh registry scans after any further current-route promotion.
 
 ## What not to delete
 
