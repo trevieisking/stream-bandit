@@ -1,19 +1,19 @@
-# Stream Bandit Current App Manifest V7.12.229
+# Stream Bandit Current App Manifest V7.12.231
 
 Date: 2026-06-06
 
-Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, Continue Watching duplicate-row fix, and Theme Studio shell/helper polish pass. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
+Purpose: current protected route and recovery truth for Stream Bandit after Batch 1 admin/watch cleanup, Batch 2 owner-brand shell pass, global logo upload/save owner pass, Accessibility current Player 2 route correction, Continue Watching duplicate-row fix, Theme Studio shell/helper polish pass, and Tools Cast Writer exact Details-format pass. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
 
 ## Current strongest pause point
 
 Current state:
 
-- V7.12.229 current app truth.
+- V7.12.231 current app truth.
 - Current registry baseline remains 53 active overlay entries / 50 unique URLs.
 - Latest known registry baseline: 50/50 routes loaded 200.
 - Latest known protected-file baseline: 16/16 protected files loaded 200.
 - Stable route URLs stay the same while page internals move forward.
-- No new active pages were created during the V7.12.224-V7.12.229 cleanup chain.
+- No new active pages were created during the V7.12.224-V7.12.231 cleanup chain.
 - Current rule: active URL stays active; replacement code is promoted onto the current URL only after scan and user test.
 
 ## Current promoted internal states
@@ -32,7 +32,6 @@ Current state:
 - `web-builder-pages-manager-v7-12-111-test.html` — V7.12.221 Pages Manager Duplicate Footer Hotfix.
 - `web-builder-live-studio-v7-12-116-test.html?page=test-page` — V7.12.223 Web Builder wrapper shell/route pass.
 - `watch-history-global-helpers-v7-4-0-test.html` — V7.12.224 Watch History title cleanup full-page replacement.
-- `tools-page-original-global-pass-v7-12-136-test.html` — V7.12.224 Tools useful toy full-page replacement.
 - `mux-manager-global-helpers-v7-10-7-test.html` — V7.12.224 Mux Manager shell cleanup full-page replacement.
 - `favicon-app-icon-builder-v7-12-15-test.html` — V7.12.224 Favicon / App Icon Builder shell cleanup and preview generator pass.
 - `stream-bandit-brand-logo-v7-12-12.js` — V7.12.225 Global Brand Logo Helper / Settings Read.
@@ -41,6 +40,7 @@ Current state:
 - `accessibility-clean-machine-v7-12-44-test.html` — V7.12.227 Accessibility global readability page with current Player 2 route fixed.
 - `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.228 Continue Watching duplicate-row fix; local progress remains read-only.
 - `web-builder-theme-studio-controls-v7-8-9-test.html` — V7.12.229 Theme Studio shell/helper polish; global theme ownership preserved.
+- `tools-page-original-global-pass-v7-12-136-test.html` — V7.12.231 Tools useful toy page; Cast Writer outputs exact Details format.
 
 ## Current route truth by overlay group
 
@@ -196,10 +196,11 @@ Current state:
 - Duplicate title/heading fixed.
 - Reload, tabs, Details, Play/Resume and save buttons work.
 - Debug shows `duplicateTitleFixed: true`.
-- Tools V7.12.224 opens.
-- Rating, runtime, link checker, route checker, slug/version helper, Mux formatter, cast writer, metadata JSON, text formatter and checkpoint note work.
+- Tools V7.12.231 opens.
+- Rating, runtime, link checker, route checker, slug/version helper, Mux formatter, metadata JSON, text formatter and checkpoint note work.
 - Tools stale Details `?v=173` route removed.
-- Tools note: Cast Writer works but duplicate-removal polish remains a later small improvement.
+- Tools Cast Writer now dedupes and formats cast output exactly for Details as `Actor As Character`, one cast member per line.
+- Tools debug shows `browserOnly: true`, `writes: false`, `castDedupe: true`, `castDetailsFormat: true`, and `castFormat: Actor As Character`.
 - Mux Manager V7.12.224 opens.
 - Old manual header/footer removed.
 - Public playback formatter, copy, open HLS, Storage Prep / Tools / Health Check links and debug work.
@@ -319,14 +320,14 @@ Do not casually rewrite these without a dedicated preservation plan:
 - Global Brand Logo helper.
 - Brand / App Icons global upload/save logic.
 - Continue Watching progress/resume logic.
+- Tools Cast Writer Details-format logic.
 
 ## Next recommended moves
 
-1. Tools Cast Writer duplicate-removal polish.
-2. Brand / App Icons UI polish only; do not change working upload/save logic.
-3. Theme Studio safe font-pack pass later; do not change save keys.
-4. Published Preview test-slot footer fix only, not live direct renderer rewrite.
-5. Fresh Current Registry / route scan when ready.
+1. Brand / App Icons UI polish only; do not change working upload/save logic.
+2. Theme Studio safe font-pack pass later; do not change save keys.
+3. Published Preview test-slot footer fix only, not live direct renderer rewrite.
+4. Fresh Current Registry / route scan when ready.
 
 ## What not to delete
 
