@@ -10,19 +10,25 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 
 - `V7.12.250 Web Builder Studio Theme Brand Font Planner` — PASS
 - `V7.12.251 Web Builder Asset Media Planner` — PASS
-- `V7.12.252 Canonical Web Builder URLs` — PASS / live test in progress
+- `V7.12.252 Canonical Web Builder URLs` — PASS
+- `V7.12.253 Web Builder Control Map` — PASS
+- `V7.12.254.1 Web Builder Header/Footer Code Tool + Slug Launcher` — PASS
 
 ## Current canonical Web Builder test routes
 
 - Studio Shell canonical URL: `web-builder-studio-v7-12-252-test.html`
 - Asset / Media Planner canonical URL: `web-builder-assets-v7-12-252-test.html`
 - Route Map canonical URL: `web-builder-route-map-v7-12-252-test.html`
+- Control Map canonical URL: `web-builder-control-map-v7-12-253-test.html`
+- Header/Footer Code canonical URL: `web-builder-header-footer-code-v7-12-254-test.html`
 - Web Builder Manifest: `WEB-BUILDER-MANIFEST-V7-12-252.md`
 
 ## Current old support / fallback routes
 
 - Passed Studio Shell support route: `overlay-route-truth-machine-v7-12-66-test.html?page=test-page`
 - Old Asset / Media Planner fallback route: `stream-bandit-route-pointer-machine-v7-12-36-test.html`
+- Old Deep Route Graph fallback route: `repository-deep-route-graph-v7-12-38-test.html`
+- Old Global Dependency Graph fallback route: `repository-global-dependency-graph-v7-12-39-test.html`
 
 Canonical Web Builder URLs should be used first. Old routes are support/fallback only.
 
@@ -84,8 +90,46 @@ Current truth: these are working support routes. Future truth: Web Builder shoul
 - Canonical route map page created: `web-builder-route-map-v7-12-252-test.html`
 - Fix target: previous Route Map button 404
 - Route map is read-only
+- Header/Footer route is now listed in the route map
 - No storage writes
 - No schema changes
+- No active menu promotion
+- No index promotion
+- No registry promotion
+
+## Passed control map
+
+- Canonical control map page created: `web-builder-control-map-v7-12-253-test.html`
+- Active Stream Bandit registry boundary recorded
+- 53 active entries / 50 unique active URLs kept protected
+- 16 protected files kept protected
+- Future Web Builder systems mapped to old inactive page reuse
+- No storage writes
+- No schema changes
+- No active menu promotion
+- No index promotion
+- No registry promotion
+
+## Passed Header/Footer Code Tool
+
+- Canonical Header/Footer Code page created: `web-builder-header-footer-code-v7-12-254-test.html`
+- Old global dependency graph route converted to fallback
+- Builder-owned header HTML planner works
+- Builder-owned footer HTML planner works
+- Builder-owned CSS planner works
+- Sandboxed local preview works
+- Reset Defaults works
+- Copy Report works
+- Slug launcher added for non-coder use
+- Open Preview by slug works
+- Open Studio by slug works
+- Copy Slug Links works
+- Scripts and inline event handlers are stripped for preview
+- No storage writes
+- No schema changes
+- No builder table changes
+- No Stream Bandit header/footer shell changes
+- No Theme Projector changes
 - No active menu promotion
 - No index promotion
 - No registry promotion
@@ -153,10 +197,11 @@ Table plan only. Do not create these until approved.
 10. Asset/media planner
 11. Canonical route map fix
 12. Web Builder control map
-13. Controlled asset/media upload test on old inactive route
-14. Table proposal
-15. Test migrations only after approval
-16. Promotion only after route registry pass
+13. Header/Footer Code Tool + Slug Launcher
+14. Controlled asset/media upload test on old inactive route
+15. Table proposal
+16. Test migrations only after approval
+17. Promotion only after route registry pass
 
 ## Current promotion state
 
