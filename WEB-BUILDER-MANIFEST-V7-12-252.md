@@ -10,12 +10,21 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 
 - `V7.12.250 Web Builder Studio Theme Brand Font Planner` — PASS
 - `V7.12.251 Web Builder Asset Media Planner` — PASS
+- `V7.12.252 Canonical Web Builder URLs` — PASS / live test in progress
 
-## Current Web Builder test routes
+## Current canonical Web Builder test routes
 
-- Studio Shell: `overlay-route-truth-machine-v7-12-66-test.html?page=test-page`
-- Asset / Media Planner: `stream-bandit-route-pointer-machine-v7-12-36-test.html`
+- Studio Shell canonical URL: `web-builder-studio-v7-12-252-test.html`
+- Asset / Media Planner canonical URL: `web-builder-assets-v7-12-252-test.html`
+- Route Map canonical URL: `web-builder-route-map-v7-12-252-test.html`
 - Web Builder Manifest: `WEB-BUILDER-MANIFEST-V7-12-252.md`
+
+## Current old support / fallback routes
+
+- Passed Studio Shell support route: `overlay-route-truth-machine-v7-12-66-test.html?page=test-page`
+- Old Asset / Media Planner fallback route: `stream-bandit-route-pointer-machine-v7-12-36-test.html`
+
+Canonical Web Builder URLs should be used first. Old routes are support/fallback only.
 
 ## Current builder engine
 
@@ -53,7 +62,8 @@ Current truth: these are working support routes. Future truth: Web Builder shoul
 ## Passed asset/media planner systems
 
 - Old inactive route reused safely
-- Asset / Media Planner page
+- Canonical Asset / Media Planner page created
+- Old asset test route converted to fallback
 - Drag/drop local image preview
 - Choose file fallback
 - Image metadata report
@@ -68,6 +78,17 @@ Current truth: these are working support routes. Future truth: Web Builder shoul
 - No schema changes
 - No delete actions
 - Stream Bandit logo/favicon/theme untouched
+
+## Passed route map fix
+
+- Canonical route map page created: `web-builder-route-map-v7-12-252-test.html`
+- Fix target: previous Route Map button 404
+- Route map is read-only
+- No storage writes
+- No schema changes
+- No active menu promotion
+- No index promotion
+- No registry promotion
 
 ## Web Builder-owned systems planned
 
@@ -130,11 +151,12 @@ Table plan only. Do not create these until approved.
 8. Theme/brand/font planner
 9. Web Builder manifest
 10. Asset/media planner
-11. Web Builder control map
-12. Controlled asset/media upload test on old inactive route
-13. Table proposal
-14. Test migrations only after approval
-15. Promotion only after route registry pass
+11. Canonical route map fix
+12. Web Builder control map
+13. Controlled asset/media upload test on old inactive route
+14. Table proposal
+15. Test migrations only after approval
+16. Promotion only after route registry pass
 
 ## Current promotion state
 
