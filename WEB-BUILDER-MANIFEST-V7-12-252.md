@@ -13,6 +13,9 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 - `V7.12.252 Canonical Web Builder URLs` — PASS
 - `V7.12.253 Web Builder Control Map` — PASS
 - `V7.12.254.1 Web Builder Header/Footer Code Tool + Slug Launcher` — PASS
+- `V7.12.255 Web Builder Pages Source Map` — PASS
+- `V7.12.256 Web Builder-owned Pages Manager Planner` — PASS
+- `V7.12.257.3 Web Builder-owned Full Page Preview` — PASS
 
 ## Current canonical Web Builder test routes
 
@@ -21,6 +24,9 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 - Route Map canonical URL: `web-builder-route-map-v7-12-252-test.html`
 - Control Map canonical URL: `web-builder-control-map-v7-12-253-test.html`
 - Header/Footer Code canonical URL: `web-builder-header-footer-code-v7-12-254-test.html`
+- Pages Source Map canonical URL: `web-builder-pages-source-map-v7-12-255-test.html`
+- Owned Pages Manager Planner canonical URL: `web-builder-pages-manager-owned-v7-12-256-test.html`
+- Owned Full Page Preview canonical URL: `web-builder-preview-owned-v7-12-257-test.html?page=landing`
 - Web Builder Manifest: `WEB-BUILDER-MANIFEST-V7-12-252.md`
 
 ## Current old support / fallback routes
@@ -29,6 +35,9 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 - Old Asset / Media Planner fallback route: `stream-bandit-route-pointer-machine-v7-12-36-test.html`
 - Old Deep Route Graph fallback route: `repository-deep-route-graph-v7-12-38-test.html`
 - Old Global Dependency Graph fallback route: `repository-global-dependency-graph-v7-12-39-test.html`
+- Old Pages Manager 108 fallback route: `web-builder-pages-manager-v7-12-108-test.html`
+- Old Pages Manager 109 fallback route: `web-builder-pages-manager-v7-12-109-test.html`
+- Old Preview 9.2 fallback route: `web-builder-shared-style-preview-v7-9-2-test.html`
 
 Canonical Web Builder URLs should be used first. Old routes are support/fallback only.
 
@@ -43,11 +52,11 @@ Canonical Web Builder URLs should be used first. Old routes are support/fallback
 These routes currently work and must not be rewritten blindly:
 
 - Pages Manager: `web-builder-pages-manager-v7-12-111-test.html`
-- Published Preview: `web-builder-shared-style-preview-v7-12-117-test.html?page=test-page`
-- Advanced Form: `web-builder-form-save-v7-12-94-test.html?page=test-page`
-- Form Inbox: `web-builder-form-submissions-v7-12-94-test.html?page=test-page`
+- Published Preview: `web-builder-shared-style-preview-v7-12-117-test.html?page=landing`
+- Advanced Form: `web-builder-form-save-v7-12-94-test.html?page=landing`
+- Form Inbox: `web-builder-form-submissions-v7-12-94-test.html?page=landing`
 
-Current truth: these are working support routes. Future truth: Web Builder should own its own versions of these systems.
+Current truth: these are working support/reference routes. Future truth: Web Builder should own its own versions of these systems before any detachment.
 
 ## Passed independent studio shell systems
 
@@ -91,6 +100,9 @@ Current truth: these are working support routes. Future truth: Web Builder shoul
 - Fix target: previous Route Map button 404
 - Route map is read-only
 - Header/Footer route is now listed in the route map
+- Pages Source Map is listed in the route map
+- Owned Pages Manager Planner is listed in the route map
+- Owned Full Page Preview is listed in the route map
 - No storage writes
 - No schema changes
 - No active menu promotion
@@ -134,13 +146,69 @@ Current truth: these are working support routes. Future truth: Web Builder shoul
 - No index promotion
 - No registry promotion
 
+## Passed Pages Source Map
+
+- Canonical Pages Source Map page created: `web-builder-pages-source-map-v7-12-255-test.html`
+- Old Pages Manager 108 route converted to fallback
+- Current in-app Web Builder Studio remains preserved as working reference
+- Current Pages Manager remains preserved as working reference
+- Current Preview / Form / Inbox routes remain preserved as support/reference
+- Working functions mapped before copying/detaching
+- Detachment remains false
+- Read-only only
+- No storage writes
+- No schema changes
+- No active menu promotion
+- No index promotion
+- No registry promotion
+
+## Passed Web Builder-owned Pages Manager Planner
+
+- Canonical owned planner page created: `web-builder-pages-manager-owned-v7-12-256-test.html`
+- Old Pages Manager 109 route converted to fallback
+- Local page list works
+- Selecting pages fills the form
+- Apply Locally works locally only
+- New Local Draft works locally only
+- Reset Local List works
+- Open Builder / Preview / Form / Inbox preserve selected slug
+- Current Pages Manager v7-12-111 remains untouched
+- No Supabase reads
+- No Supabase writes
+- No storage writes
+- No schema changes
+- No detachment
+- No active menu promotion
+- No index promotion
+- No registry promotion
+
+## Passed Web Builder-owned Full Page Preview
+
+- Canonical owned preview page created: `web-builder-preview-owned-v7-12-257-test.html?page=landing`
+- Old Preview 9.2 route converted to fallback
+- Useful current preview renderer behaviour copied into Web Builder-owned route
+- Preview renders full-width across the page
+- Reads existing `sb_site_pages` rows by slug
+- Renders layout/content blocks
+- Supports image fields, video links and local-only rating controls
+- Uses Web Builder-owned preview shell only
+- Does not load Stream Bandit app header shell
+- Does not load Stream Bandit app footer shell
+- Does not load Stream Bandit route overlay/global app shell
+- Current app Published Preview v7-12-117 remains preserved as reference
+- No Supabase writes
+- No storage writes
+- No schema changes
+- No detachment
+- No active menu promotion
+- No index promotion
+- No registry promotion
+
 ## Web Builder-owned systems planned
 
 The Web Builder should own these systems later:
 
 - Builder account / profile / teams
-- Builder Pages Manager
-- Builder Preview / Publish workflow
 - Builder Form Designer
 - Builder Form Inbox
 - Builder Header Code tool
@@ -198,10 +266,14 @@ Table plan only. Do not create these until approved.
 11. Canonical route map fix
 12. Web Builder control map
 13. Header/Footer Code Tool + Slug Launcher
-14. Controlled asset/media upload test on old inactive route
-15. Table proposal
-16. Test migrations only after approval
-17. Promotion only after route registry pass
+14. Pages Source Map
+15. Web Builder-owned Pages Manager Planner
+16. Web Builder-owned Full Page Preview
+17. Web Builder-owned Form Designer / Form Inbox path
+18. Controlled asset/media upload test on old inactive route
+19. Table proposal
+20. Test migrations only after approval
+21. Promotion only after route registry pass
 
 ## Current promotion state
 
@@ -209,8 +281,9 @@ Table plan only. Do not create these until approved.
 - Index promotion: false
 - Registry promotion: false
 - Schema changes: false
-- Storage writes: false for planner passes
+- Storage writes: false for planner/owned preview passes
 - Builder engine changed: false
+- Detachment from current app routes: false
 
 ## Notes
 
