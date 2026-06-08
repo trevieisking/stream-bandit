@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.260
+# Web Builder Manifest V7.12.261.2
 
 ## Purpose
 
@@ -19,8 +19,40 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 - `V7.12.258.3 Advanced Form Builder Focus Fix` — PASS
 - `V7.12.259.1 Owned Form Inbox Routing View + Card Overflow Fix` — PASS
 - `V7.12.260 Web Builder Media / Asset Manager Upload + Delete Pair` — PASS
+- `V7.12.261.2 Form Destination Chooser + Mail Draft Prefill Fix` — PASS
 
-## Latest verified pass — V7.12.260
+## Latest verified pass — V7.12.261.2
+
+Route:
+
+- `web-builder-form-designer-owned-v7-12-258-test.html?page=landing`
+
+User-tested result:
+
+- Builder overlay / full-screen form preview layout works.
+- Full form preview is the main page view.
+- Builder tools open in overlay.
+- Destination chooser opens in overlay.
+- Form fields are clickable.
+- Custom field builder remains working.
+- Local Test works.
+- Real Submit works and saves to `sb_form_submissions` when Inbox is selected.
+- Email destination opens the user's own mailbox.
+- Mail draft helper now passes with the form content available for the email draft.
+- Mail body fallback is copied to clipboard if the mail app strips the prefilled body.
+- File/image locked field no longer blocks submit as required.
+
+Pass notes:
+
+- This is a functional pass for the current Web Builder form flow.
+- The app still does not silently send email.
+- Email opens through user-controlled mail app / mailbox behavior.
+- Private message remains recorded intent only until the real delivery route is built.
+- No schema changes.
+- No storage changes.
+- No Stream Bandit app shell loaded.
+
+## Latest verified asset pass — V7.12.260
 
 Route:
 
@@ -50,7 +82,7 @@ Pass notes:
 - No schema changes.
 - No Stream Bandit logo, favicon, app theme, or branding changes.
 
-## Latest verified form builder pass — V7.12.258.3
+## Latest verified form builder foundation pass — V7.12.258.3
 
 Route:
 
@@ -135,29 +167,36 @@ These remain preserved while Web Builder-owned replacements are being proven.
 - Web Builder pages remain separate from the Stream Bandit movie app shell unless explicitly preserved as reference/support routes.
 - No Stream Bandit logo/favicon/theme changes from Web Builder asset work.
 - Upload features must include matching delete/remove controls.
-- Form email destination uses recorded intent or later `mailto:` helper; no hidden external email send.
+- Form email destination uses a user-controlled mail draft helper; no hidden external email send.
 - Private message delivery must not claim delivered until the real route exists.
 - No schema changes unless specifically approved.
 - No cleanup delete batches without a keep list and explicit batch approval.
 
 ## Next planned work
 
-### V7.12.261 — Form Destination Chooser Polish
+### V7.12.262 — Web Builder Spec Polish + UI Tidy
 
 Goal:
 
-- Make Inbox / Email / Private Message destination choices clear at form creation time.
-- Add a prefilled `mailto:` helper when Email destination is selected.
-- Keep external email sending user-controlled through the user's own email app.
-- Keep private message as intent until the real owner/private message delivery route is approved.
+- Tidy the working Web Builder pages now that the form, inbox, media, preview and route map flows are functional.
+- Make headings, button labels, debug text and safety notes consistent.
+- Reduce visual clutter while preserving all working functions.
+- Keep builder tools in overlays where appropriate.
+- Keep full-screen visitor preview behavior for forms.
+- Do not change database schema.
+- Do not detach current app reference routes.
 
-Expected safe behavior:
+Target pages:
 
-- Inbox selected: save to `sb_form_submissions`.
-- Email selected: build/open prefilled `mailto:` with form answers; do not send silently.
-- Private Message selected: record intent only until the message route exists.
+- `web-builder-studio-v7-12-252-test.html`
+- `web-builder-assets-v7-12-252-test.html`
+- `web-builder-form-designer-owned-v7-12-258-test.html`
+- `web-builder-form-inbox-owned-v7-12-258-test.html`
+- `web-builder-preview-owned-v7-12-257-test.html`
+- `web-builder-pages-manager-owned-v7-12-256-test.html`
+- `web-builder-route-map-v7-12-252-test.html`
 
-### V7.12.262 — Media Picker Integration
+### V7.12.263 — Media Picker Integration
 
 Goal:
 
@@ -165,7 +204,7 @@ Goal:
 - Apply selected image to page blocks as hero image, poster, logo source, or social preview source.
 - Keep replace/remove controls beside every selected asset.
 
-### V7.12.263 — Responsive Preview / Device Modes
+### V7.12.264 — Responsive Preview / Device Modes
 
 Goal:
 
@@ -173,7 +212,7 @@ Goal:
 - No publish changes.
 - No app shell changes.
 
-### V7.12.264 — Save / Publish / Unsaved State Rail
+### V7.12.265 — Save / Publish / Unsaved State Rail
 
 Goal:
 
@@ -181,7 +220,7 @@ Goal:
 - No silent saves.
 - Clear rollback state.
 
-### V7.12.265 — Security / Ownership Guard
+### V7.12.266 — Security / Ownership Guard
 
 Goal:
 
