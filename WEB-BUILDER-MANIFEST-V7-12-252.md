@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.262.1
+# Web Builder Manifest V7.12.262.4
 
 ## Purpose
 
@@ -12,6 +12,13 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 - Outputs display on clean page views.
 - Builder/editor controls should not be scattered through visitor previews or output dashboards.
 - Page views should show results, previews, cards, route maps, reports, inbox output, and asset libraries.
+
+## Core add/remove rule
+
+- Anything that can be added/created must have a simple remove/delete path.
+- Delete/remove must be guarded and clearly scoped.
+- Landing/home guard remains protected until a real replacement-home flow exists.
+- No delete action may silently remove files, routes, rows, or current app pages.
 
 ## Current passed checkpoints
 
@@ -28,8 +35,46 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 - `V7.12.260 Web Builder Media / Asset Manager Upload + Delete Pair` — PASS
 - `V7.12.261.2 Form Destination Chooser + Mail Draft Prefill Fix` — PASS
 - `V7.12.262.1 Asset Manager Input Overlay / Output Page Polish` — PASS
+- `V7.12.262.3 Pages Manager Add/Remove Pair` — PASS
+- `V7.12.262.4 Owned Pages Manager Preview Route + Landing Guard` — PASS
 
-## Latest verified pass — V7.12.262.1
+## Latest verified pass — V7.12.262.4
+
+Route:
+
+- `web-builder-pages-manager-owned-v7-12-256-test.html`
+
+User-tested result:
+
+- Select `test-page` — PASS.
+- Click Published Preview — PASS.
+- Published Preview opens `web-builder-preview-owned-v7-12-257-test.html?page=test-page` — PASS.
+- Select `landing` — PASS.
+- Remove Page is blocked for `landing` — PASS.
+- Select any non-landing page — PASS.
+- Remove Page is allowed for non-landing pages — PASS.
+
+Pass notes:
+
+- Published Preview now points to the Web Builder-owned preview route, not the old in-app preview.
+- Open Form points to the Web Builder-owned advanced form builder.
+- Owned Inbox points to the Web Builder-owned inbox.
+- Old app preview/form/inbox routes remain preserved as references only.
+- Landing is the only protected planner page in this pass.
+- Every other local planner page is removable from the planner.
+- No Supabase writes.
+- No files deleted.
+- No routes deleted.
+- No current app Pages Manager touched.
+
+Known limitation / future fix:
+
+- Pages removed in this local planner reappear after refresh because this pass is still local-memory only.
+- This is acceptable for the current safe planner pass.
+- Later, real persistence needs an approved save/delete model using either local draft storage or the real builder page table.
+- Persistent delete must keep the same rule: landing protected, non-landing pages removable, no silent deletes.
+
+## Latest verified asset overlay polish pass — V7.12.262.1
 
 Route:
 
@@ -93,7 +138,7 @@ Future recommended path model:
 
 Future data model note:
 
-- Current pass uses Storage + `.metadata.json` sidecars only.
+- Current asset pass uses Storage + `.metadata.json` sidecars only.
 - A future `sb_builder_assets` table may be useful for searchable global/user/site asset library views, ownership checks, reuse, and safer cleanup.
 - Do not add that table until the no-schema sidecar version is fully stable and the ownership/security pass is agreed.
 
@@ -249,10 +294,11 @@ These remain preserved while Web Builder-owned replacements are being proven.
 - No cleanup delete batches without a keep list and explicit batch approval.
 - User-uploaded Web Builder assets should become reusable builder assets, not one-off orphan uploads.
 - System/global assets must be protected from accidental user deletion.
+- Pages Manager local remove is temporary until persistence exists; removed local planner pages reappear on refresh by design in the safe planner pass.
 
 ## Next planned work
 
-### V7.12.262.2 — Continue Web Builder Spec Polish + UI Tidy
+### V7.12.262.5 — Continue Web Builder Spec Polish + UI Tidy
 
 Goal:
 
@@ -268,10 +314,25 @@ Remaining target pages:
 - `web-builder-studio-v7-12-252-test.html`
 - `web-builder-form-inbox-owned-v7-12-258-test.html`
 - `web-builder-preview-owned-v7-12-257-test.html`
-- `web-builder-pages-manager-owned-v7-12-256-test.html`
 - `web-builder-route-map-v7-12-252-test.html`
 
-### V7.12.263 — Global/User Web Builder Asset Library
+### V7.12.263 — Persistent Web Builder Pages Manager
+
+Goal:
+
+- Replace the current local-memory planner behavior with a safe persistent planner/save model.
+- Removed pages should stay removed after refresh.
+- Landing remains protected until a real replacement-home flow exists.
+- Every add/create action keeps a matching remove/delete action.
+- No current app Pages Manager detachment until this owned version passes.
+
+Persistence options to decide later:
+
+- Local draft storage first, no Supabase writes.
+- Existing builder/site pages table after approval.
+- New dedicated builder pages table only after schema/security review.
+
+### V7.12.264 — Global/User Web Builder Asset Library
 
 Goal:
 
@@ -283,7 +344,7 @@ Goal:
 - Preserve metadata prompts for alt text and captions.
 - Keep protected system/global assets safe from user deletion.
 
-### V7.12.264 — Responsive Preview / Device Modes
+### V7.12.265 — Responsive Preview / Device Modes
 
 Goal:
 
@@ -291,7 +352,7 @@ Goal:
 - No publish changes.
 - No app shell changes.
 
-### V7.12.265 — Save / Publish / Unsaved State Rail
+### V7.12.266 — Save / Publish / Unsaved State Rail
 
 Goal:
 
@@ -299,7 +360,7 @@ Goal:
 - No silent saves.
 - Clear rollback state.
 
-### V7.12.266 — Security / Ownership Guard
+### V7.12.267 — Security / Ownership Guard
 
 Goal:
 
