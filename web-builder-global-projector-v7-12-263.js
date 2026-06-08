@@ -1,14 +1,15 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.12.263.2 Web Builder Global Projector';
+  var VERSION = 'V7.12.263.5 Web Builder Global Projector Save Status Fix';
   var STORAGE_KEY = 'sb.webBuilder.controlHub.v7.12.263';
+  var SUCCESS = 'Saved successfully to this browser. Web Builder only. Live app connection remains off.';
   var DEFAULTS = {
     account:{displayName:'Web Builder Owner',email:'builder@local.test',roleLabel:'Builder owner',mode:'Owner',bio:'Local Web Builder profile preview.'},
-    avatar:{mode:'emoji',emoji:'🦌',url:'',alt:'Web Builder avatar'},
+    avatar:{mode:'emoji',emoji:'WB',url:'',alt:'Web Builder avatar'},
     theme:{accent:'#22d3a6',accent2:'#7c3cff',bg:'#050711',panel1:'#101529',panel2:'#17122d',text:'#f7fbff',muted:'#aeb8d6',font:'Inter,system-ui,Arial,sans-serif',largeText:false,highContrast:false},
     brand:{name:'Web Builder Studio',tagline:'Build pages, forms and sites.',logoMode:'text',logoText:'WB',logoUrl:'',faviconNote:'Use Web Builder icon helper later.'},
-    shell:{railLabels:'Pages · Assets · Theme · Forms',inspectorNote:'Sticky inspector, save rail and preview controls.',canvasTitle:'Canvas',footerText:'Saved locally · not connected',backLabel:'Back to Stream Bandit',mode:'Studio'},
+    shell:{railLabels:'Pages · Assets · Theme · Forms',inspectorNote:'Sticky inspector, save rail and preview controls.',canvasTitle:'Canvas',footerText:'Web Builder only - local draft',backLabel:'Back to Stream Bandit',mode:'Studio'},
     meta:{localStorageOnly:true,connectedToLiveApp:false}
   };
 
@@ -25,7 +26,9 @@
     try{
       var raw = localStorage.getItem(STORAGE_KEY);
       if(!raw) return clone(DEFAULTS);
-      return merge(DEFAULTS, JSON.parse(raw));
+      var s = merge(DEFAULTS, JSON.parse(raw));
+      if(s.shell && s.shell.footerText === 'Saved locally · not connected') s.shell.footerText = 'Web Builder only - local draft';
+      return s;
     }catch(e){ return clone(DEFAULTS); }
   }
   function setVar(name,value){ document.documentElement.style.setProperty(name,value); }
@@ -41,8 +44,6 @@
     setVar('--wb-font', t.font || DEFAULTS.theme.font);
     setVar('--wb-line', t.highContrast ? '#ffffff55' : '#ffffff22');
     setVar('--wb-font-scale', t.largeText ? '1.13' : '1');
-
-    /* Compatibility names used by the current Web Builder pages. */
     setVar('--good', t.accent || DEFAULTS.theme.accent);
     setVar('--purple', t.accent2 || DEFAULTS.theme.accent2);
     setVar('--bg', t.bg || DEFAULTS.theme.bg);
@@ -61,16 +62,33 @@
     if(b.logoMode === 'image' && b.logoUrl){ return '<img src="'+escapeHtml(b.logoUrl)+'" alt="'+escapeHtml(b.name || 'Web Builder')+'">'; }
     return escapeHtml(b.logoText || 'WB');
   }
+  function railText(s){
+    var text = (s.shell && s.shell.footerText) || DEFAULTS.shell.footerText;
+    if(text === 'Saved locally · not connected') return 'Web Builder only - local draft';
+    return text;
+  }
+  function refreshChrome(s,textOverride){
+    var title = document.querySelector('.wb-projector-copy b');
+    var sub = document.querySelector('.wb-projector-copy small');
+    var logo = document.querySelector('.wb-projector-logo');
+    if(title) title.textContent = (s.brand && s.brand.name) || DEFAULTS.brand.name;
+    if(sub) sub.textContent = textOverride || railText(s);
+    if(logo) logo.innerHTML = renderLogo(s);
+  }
   function injectChrome(s){
-    if(document.querySelector('[data-web-builder-projector-rail]')) return;
+    if(document.querySelector('[data-web-builder-projector-rail]')){ refreshChrome(s); return; }
     var style = document.createElement('style');
     style.setAttribute('data-web-builder-projector-style','true');
-    style.textContent = '[data-web-builder-projector-rail]{position:fixed;right:12px;bottom:12px;z-index:90;display:flex;gap:8px;align-items:center;max-width:min(520px,calc(100vw - 24px));border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:rgba(7,9,16,.88);backdrop-filter:blur(14px);box-shadow:0 18px 60px #0008;padding:8px 10px;color:var(--wb-text,#f7fbff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);font-size:12px}.wb-projector-logo{width:32px;height:32px;min-width:32px;border-radius:12px;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));display:grid;place-items:center;color:#061017;font-weight:1000;overflow:hidden}.wb-projector-logo img{width:100%;height:100%;object-fit:cover}.wb-projector-copy{min-width:0}.wb-projector-copy b{display:block;color:var(--wb-text,#fff);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}.wb-projector-copy small{display:block;color:var(--wb-muted,#aeb8d6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}.wb-projector-btn{border:0;border-radius:999px;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#061017;text-decoration:none;font-weight:950;padding:8px 10px;white-space:nowrap}@media(max-width:720px){[data-web-builder-projector-rail]{left:10px;right:10px;bottom:10px;border-radius:22px}.wb-projector-copy b,.wb-projector-copy small{max-width:160px}}';
+    style.textContent = '[data-web-builder-projector-rail]{position:fixed;right:12px;bottom:12px;z-index:90;display:flex;gap:8px;align-items:center;max-width:min(520px,calc(100vw - 24px));border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:rgba(7,9,16,.88);backdrop-filter:blur(14px);box-shadow:0 18px 60px #0008;padding:8px 10px;color:var(--wb-text,#f7fbff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);font-size:12px}.wb-projector-logo{width:32px;height:32px;min-width:32px;border-radius:12px;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));display:grid;place-items:center;color:#061017;font-weight:1000;overflow:hidden}.wb-projector-logo img{width:100%;height:100%;object-fit:cover}.wb-projector-copy{min-width:0}.wb-projector-copy b{display:block;color:var(--wb-text,#fff);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}.wb-projector-copy small{display:block;color:var(--wb-muted,#aeb8d6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px}.wb-projector-btn{border:0;border-radius:999px;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#061017;text-decoration:none;font-weight:950;padding:8px 10px;white-space:nowrap}@media(max-width:720px){[data-web-builder-projector-rail]{left:10px;right:10px;bottom:10px;border-radius:22px}.wb-projector-copy b,.wb-projector-copy small{max-width:180px}}';
     document.head.appendChild(style);
     var rail = document.createElement('div');
     rail.setAttribute('data-web-builder-projector-rail','true');
-    rail.innerHTML = '<div class="wb-projector-logo">'+renderLogo(s)+'</div><div class="wb-projector-copy"><b>'+escapeHtml((s.brand && s.brand.name) || DEFAULTS.brand.name)+'</b><small>'+escapeHtml((s.shell && s.shell.footerText) || DEFAULTS.shell.footerText)+'</small></div><a class="wb-projector-btn" href="web-builder-account-control-hub-v7-12-263-test.html">Hub</a>';
+    rail.innerHTML = '<div class="wb-projector-logo">'+renderLogo(s)+'</div><div class="wb-projector-copy"><b>'+escapeHtml((s.brand && s.brand.name) || DEFAULTS.brand.name)+'</b><small>'+escapeHtml(railText(s))+'</small></div><a class="wb-projector-btn" href="web-builder-account-control-hub-v7-12-263-test.html">Hub</a>';
     document.body.appendChild(rail);
+  }
+  function expose(s){
+    window.StreamBanditWebBuilderProjector = {version:VERSION,storageKey:STORAGE_KEY,state:s,connectedToLiveApp:false,appliedAt:new Date().toISOString(),saveSuccessText:SUCCESS};
+    window.dispatchEvent(new CustomEvent('web-builder-projector-applied',{detail:window.StreamBanditWebBuilderProjector}));
   }
   function apply(){
     var s = load();
@@ -79,9 +97,29 @@
     document.documentElement.setAttribute('data-web-builder-live-app-connection','false');
     applyTheme(s);
     injectChrome(s);
-    window.StreamBanditWebBuilderProjector = {version:VERSION,storageKey:STORAGE_KEY,state:s,connectedToLiveApp:false,appliedAt:new Date().toISOString()};
-    window.dispatchEvent(new CustomEvent('web-builder-projector-applied',{detail:window.StreamBanditWebBuilderProjector}));
+    expose(s);
   }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',apply);
-  else apply();
+  function watchSaveButtons(){
+    document.addEventListener('click',function(e){
+      var el = e.target;
+      while(el && el !== document){
+        if(el.id === 'save' || el.id === 'saveBtn' || (el.textContent || '').trim() === 'Save Local'){
+          setTimeout(function(){
+            var s = load();
+            refreshChrome(s,SUCCESS);
+            var status = document.getElementById('status');
+            if(status) status.textContent = SUCCESS;
+            var report = window.StreamBanditWebBuilderProjector || {};
+            report.saveButtonObserved = true;
+            report.connectedToLiveApp = false;
+            window.StreamBanditWebBuilderProjector = report;
+          },180);
+          break;
+        }
+        el = el.parentNode;
+      }
+    },true);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',function(){apply();watchSaveButtons();});
+  else { apply(); watchSaveButtons(); }
 })();
