@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Web Builder Native Preview V7.12.263 TEST</title>
+<link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
+<link rel="apple-touch-icon" href="apple_touch_icon_180.png">
+<style>
+:root{color-scheme:dark;--bg:#050711;--line:#ffffff22;--text:#f7fbff;--muted:#aeb8d6;--good:#22d3a6;--purple:#7c3cff;--p:#101529;--p2:#17122d}*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;background:radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),linear-gradient(180deg,var(--bg),#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}.top{position:sticky;top:0;z-index:20;background:#0b1020f2;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}.topIn,.wrap{width:min(1480px,100%);margin:auto;padding:12px 14px}.topIn{display:flex;gap:10px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap}.brand{display:flex;gap:10px;align-items:center;font-weight:950}.mark{width:44px;height:44px;border-radius:15px;background:linear-gradient(135deg,var(--good),var(--purple));display:grid;place-items:center;color:#061017;font-weight:1000;overflow:hidden}.mark img{width:100%;height:100%;object-fit:cover}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:999px;background:#30384f;color:white;text-decoration:none;font-weight:950;padding:10px 13px;cursor:pointer}.primary{background:linear-gradient(135deg,var(--good),var(--purple));color:#061017}.hero{min-height:430px;border:1px solid #ffffff18;border-radius:30px;background:radial-gradient(circle at 12% 15%,#22d3a655,transparent 36%),linear-gradient(135deg,var(--p),var(--p2));padding:28px;display:grid;align-content:end;margin-bottom:14px}.badge,.pill{display:inline-flex;border:1px solid #ffffff24;border-radius:999px;padding:6px 9px;background:#ffffff0d;color:#dbe7ff;font-weight:900;font-size:12px}.badge{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.hero h1{font-size:clamp(44px,9vw,112px);line-height:.88;margin:10px 0;letter-spacing:-.07em}.hero p{font-size:clamp(18px,2vw,26px)}p,li,small{color:var(--muted);line-height:1.5}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.block,.debug,.missing{border:1px solid #ffffff18;border-radius:24px;background:#ffffff0b;padding:18px;margin:0 0 14px}.block h2{font-size:clamp(28px,4vw,54px);line-height:1;margin:0 0 10px}.debug{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;color:#dfffee;background:#0007;max-height:420px;overflow:auto}.missing{border-color:#ffb14266;background:#ffb14217}@media(max-width:850px){.grid{grid-template-columns:1fr}.actions .btn,.btn{flex:1 1 auto}.hero h1{font-size:clamp(42px,14vw,72px)}}
+</style>
+</head>
+<body>
+<header class="top"><div class="topIn"><div class="brand"><div class="mark">WB</div><div>Web Builder Native Preview<small>Local builder preview - V7.12.263</small></div></div><div class="actions"><a id="editLink" class="btn primary" href="#">Edit This Page</a><a class="btn" href="web-builder-pages-manager-projector-v7-12-263-test.html">Pages Manager</a></div></div></header>
+<main class="wrap">
+<section id="missing" class="missing" style="display:none"><h1>Page not found in local Web Builder drafts</h1><p>This preview reads local Web Builder drafts from this browser. Open the page in the native editor, save it, then publish it locally.</p><div class="actions"><a id="createLink" class="btn primary" href="#">Open Editor For This Slug</a><a class="btn" href="web-builder-pages-manager-projector-v7-12-263-test.html">Back To Pages Manager</a></div></section>
+<section id="pageView" style="display:none"><section class="hero"><span id="statusBadge" class="badge">Local Preview</span><h1 id="titleOut">Page title</h1><p id="subtitleOut">Subtitle</p></section><section class="grid"><article class="block"><h2 id="b1Title">Section one</h2><p id="b1Text">Section text.</p></article><article class="block"><h2 id="b2Title">Section two</h2><p id="b2Text">Section text.</p></article></section><section class="block"><h2>Builder publish state</h2><p id="publishText">Waiting...</p></section></section>
+<section class="block"><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></section>
+</main>
+<script src="web-builder-global-projector-v7-12-263.js?v=7-12-263-native-preview"></script>
+<script>
+(function(){'use strict';
+const BUILDER_STORE='sb.webBuilder.builderPages.v7.12.263';
+const PAGES_STORE='sb.webBuilder.nativePagesManager.v7.12.263';
+let slug='landing',page=null;
+const $=id=>document.getElementById(id);
+function slugify(v){return String(v||'landing').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'landing';}
+function loadJson(k,f){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f));}catch(e){return f;}}
+function getSlug(){try{return slugify(new URL(location.href).searchParams.get('page')||'landing');}catch(e){return 'landing';}}
+function seedFromManager(s){let pages=loadJson(PAGES_STORE,[]);let p=Array.isArray(pages)?pages.find(x=>x.slug===s):null;if(!p)return null;return Object.assign({},p,{builderContent:{subtitle:p.description||'Local Web Builder page.',blockOneTitle:'Welcome',blockOneText:'Edit this page in the Web Builder native editor.',blockTwoTitle:'Next section',blockTwoText:'Publish locally when ready.'},builderPublished:false});}
+function render(){slug=getSlug();let builder=loadJson(BUILDER_STORE,{});page=builder[slug]||seedFromManager(slug);$('editLink').href='web-builder-page-editor-native-v7-12-263-test.html?page='+encodeURIComponent(slug);$('createLink').href=$('editLink').href;if(!page){$('missing').style.display='block';$('pageView').style.display='none';debug('missing');return;}$('missing').style.display='none';$('pageView').style.display='block';let c=page.builderContent||{};$('statusBadge').textContent=(page.builderPublished?'Published local':'Draft local')+' · '+page.slug;$('titleOut').textContent=page.title||page.slug;$('subtitleOut').textContent=c.subtitle||page.description||'';$('b1Title').textContent=c.blockOneTitle||'Welcome';$('b1Text').textContent=c.blockOneText||'';$('b2Title').textContent=c.blockTwoTitle||'Next section';$('b2Text').textContent=c.blockTwoText||'';$('publishText').textContent=page.builderPublished?'This page is published to local Web Builder preview state.':'This page exists as a local draft. Publish it in the editor to mark it published.';debug('rendered');}
+function debug(step){$('debug').textContent=JSON.stringify({version:'V7.12.263 Native Preview',slug:slug,found:!!page,localPreview:true,readsBuilderStore:true,readsPagesManagerFallback:true,supabaseWrites:false,schemaChanges:false,projectorLoaded:!!window.StreamBanditWebBuilderProjector,page:page,lastStep:step},null,2);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();
+})();
+</script>
+</body>
+</html>
