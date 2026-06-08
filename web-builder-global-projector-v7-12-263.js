@@ -1,14 +1,15 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.12.263.6 Web Builder Projector Account Overlay Favourites';
+  var VERSION = 'V7.12.263.7 Web Builder Projector Favicon Avatar';
   var STORAGE_KEY = 'sb.webBuilder.controlHub.v7.12.263';
   var SUCCESS = 'Saved successfully to this browser. Web Builder only. Live app connection remains off.';
+  var DEFAULT_ICON = 'stream_bandit_stag_icon_32.png';
   var DEFAULTS = {
     account:{displayName:'Web Builder Owner',email:'builder@local.test',roleLabel:'Builder owner',mode:'Owner',bio:'Local Web Builder profile preview.'},
     avatar:{mode:'emoji',emoji:'WB',url:'',alt:'Web Builder avatar'},
     theme:{accent:'#22d3a6',accent2:'#7c3cff',bg:'#050711',panel1:'#101529',panel2:'#17122d',text:'#f7fbff',muted:'#aeb8d6',font:'Inter,system-ui,Arial,sans-serif',largeText:false,highContrast:false},
-    brand:{name:'Web Builder Studio',tagline:'Build pages, forms and sites.',logoMode:'text',logoText:'WB',logoUrl:'',faviconNote:'Use Web Builder icon helper later.'},
+    brand:{name:'Web Builder Studio',tagline:'Build pages, forms and sites.',logoMode:'text',logoText:'WB',logoUrl:'',faviconUrl:DEFAULT_ICON,faviconNote:'Use Web Builder icon helper later.'},
     shell:{railLabels:'Pages · Assets · Theme · Forms',inspectorNote:'Sticky inspector, save rail and preview controls.',canvasTitle:'Canvas',footerText:'Web Builder only - local draft',backLabel:'Back to Stream Bandit',mode:'Studio'},
     favourites:[
       {id:'studio',label:'Studio',url:'web-builder-studio-v7-12-252-test.html',type:'Tool',locked:true},
@@ -37,6 +38,9 @@
       if(!Array.isArray(s.favourites) || !s.favourites.length) s.favourites = clone(DEFAULTS.favourites);
       return s;
     }catch(e){ return clone(DEFAULTS); }
+  }
+  function saveState(s){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }catch(e){}
   }
   function setVar(name,value){ document.documentElement.style.setProperty(name,value); }
   function applyTheme(s){
@@ -70,6 +74,12 @@
     if(/^javascript:/i.test(v) || /^data:/i.test(v)) return '#';
     return v;
   }
+  function safeIcon(v){
+    v = String(v || '').trim();
+    if(!v) return '';
+    if(/^javascript:/i.test(v) || /^data:text/i.test(v)) return '';
+    return v;
+  }
   function avatarHtml(s){
     var a = s.avatar || DEFAULTS.avatar;
     if(a.mode === 'image' && a.url){ return '<img src="'+escapeHtml(a.url)+'" alt="'+escapeHtml(a.alt || 'Web Builder avatar')+'">'; }
@@ -79,6 +89,30 @@
     var b = s.brand || DEFAULTS.brand;
     if(b.logoMode === 'image' && b.logoUrl){ return '<img src="'+escapeHtml(b.logoUrl)+'" alt="'+escapeHtml(b.name || 'Web Builder')+'">'; }
     return escapeHtml(b.logoText || 'WB');
+  }
+  function iconUrl(s){
+    var b = s.brand || DEFAULTS.brand;
+    var a = s.avatar || DEFAULTS.avatar;
+    return safeIcon(b.faviconUrl) || safeIcon(a.url) || safeIcon(b.logoUrl) || DEFAULT_ICON;
+  }
+  function applyFavicon(s){
+    var href = iconUrl(s);
+    var link = document.querySelector('link[rel="icon"]') || document.querySelector('link[rel="shortcut icon"]');
+    if(!link){ link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
+    link.type = 'image/png';
+    link.sizes = '32x32';
+    link.href = href;
+    var apple = document.querySelector('link[rel="apple-touch-icon"]');
+    if(apple) apple.href = href;
+  }
+  function applyTopAvatar(s){
+    var marks = document.querySelectorAll('.mark');
+    if(!marks.length) return;
+    marks.forEach(function(mark){
+      mark.innerHTML = avatarHtml(s);
+      mark.setAttribute('title','Web Builder account avatar');
+      mark.style.overflow = 'hidden';
+    });
   }
   function railText(s){
     var text = (s.shell && s.shell.footerText) || DEFAULTS.shell.footerText;
@@ -97,13 +131,13 @@
     return '<div class="wb-account-panel" data-wb-account-panel aria-hidden="true">'
       + '<div class="wb-account-head"><div class="wb-account-avatar">'+avatarHtml(s)+'</div><div><b>'+escapeHtml(a.displayName || 'Web Builder Owner')+'</b><small>'+escapeHtml(a.email || '')+' · '+escapeHtml(a.roleLabel || a.mode || 'Builder')+'</small></div><button type="button" class="wb-panel-close" data-wb-panel-close>×</button></div>'
       + '<p>'+escapeHtml(a.bio || 'Local Web Builder profile preview.')+'</p>'
-      + '<div class="wb-brand-mini"><div class="wb-brand-logo">'+logoHtml(s)+'</div><div><b>'+escapeHtml(b.name || 'Web Builder Studio')+'</b><small>'+escapeHtml(b.tagline || 'Build pages, forms and sites.')+'</small></div></div>'
+      + '<div class="wb-brand-mini"><div class="wb-brand-logo">'+logoHtml(s)+'</div><div><b>'+escapeHtml(b.name || 'Web Builder Studio')+'</b><small>'+escapeHtml(b.tagline || 'Build pages, forms and sites.')+'</small><small>Favicon: '+escapeHtml(iconUrl(s))+'</small></div></div>'
       + '<h3>Saved builder pages</h3><div class="wb-account-favs">'+favouriteCards(s)+'</div>'
       + '<div class="wb-account-actions"><a class="wb-projector-btn" href="web-builder-account-control-hub-v7-12-263-test.html">Open Hub</a><button type="button" class="wb-secondary" data-wb-panel-close>Close</button></div>'
       + '</div>';
   }
   function styleText(){
-    return '[data-web-builder-projector-rail]{position:fixed;right:12px;bottom:12px;z-index:90;display:flex;gap:8px;align-items:center;max-width:min(560px,calc(100vw - 24px));border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:rgba(7,9,16,.9);backdrop-filter:blur(14px);box-shadow:0 18px 60px #0008;padding:8px 10px;color:var(--wb-text,#f7fbff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);font-size:12px}.wb-projector-logo,.wb-account-avatar,.wb-brand-logo{background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));display:grid;place-items:center;color:#061017;font-weight:1000;overflow:hidden}.wb-projector-logo{width:38px;height:38px;min-width:38px;border-radius:14px}.wb-projector-logo img,.wb-account-avatar img,.wb-brand-logo img{width:100%;height:100%;object-fit:cover}.wb-projector-copy{min-width:0}.wb-projector-copy b{display:block;color:var(--wb-text,#fff);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}.wb-projector-copy small{display:block;color:var(--wb-muted,#aeb8d6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}.wb-projector-btn,.wb-secondary{border:0;border-radius:999px;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#061017;text-decoration:none;font-weight:950;padding:8px 10px;white-space:nowrap;cursor:pointer}.wb-secondary{background:#30384f;color:#fff}.wb-account-panel{position:fixed;right:12px;bottom:72px;z-index:91;width:min(440px,calc(100vw - 24px));max-height:min(74vh,680px);overflow:auto;border:1px solid var(--wb-line,#ffffff22);border-radius:28px;background:radial-gradient(circle at 0 0,color-mix(in srgb,var(--wb-accent,#22d3a6),transparent 72%),transparent 32%),linear-gradient(135deg,var(--wb-panel,#101529),var(--wb-panel-2,#17122d));box-shadow:0 24px 90px #000c;padding:14px;color:var(--wb-text,#fff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);display:none}.wb-account-panel.open{display:block}.wb-account-head,.wb-brand-mini,.wb-account-actions{display:flex;gap:10px;align-items:center}.wb-account-head{justify-content:space-between}.wb-account-avatar{width:72px;height:72px;min-width:72px;border-radius:22px}.wb-brand-logo{width:48px;height:48px;min-width:48px;border-radius:16px}.wb-account-head b,.wb-brand-mini b{display:block;color:var(--wb-text,#fff)}.wb-account-head small,.wb-brand-mini small,.wb-account-panel p,.wb-account-fav small{display:block;color:var(--wb-muted,#aeb8d6);line-height:1.45}.wb-panel-close{border:0;border-radius:999px;background:#ffffff14;color:#fff;width:34px;height:34px;font-weight:1000;cursor:pointer}.wb-account-panel h3{margin:14px 0 8px}.wb-account-favs{display:grid;gap:8px}.wb-account-fav{display:block;border:1px solid var(--wb-line,#ffffff22);border-radius:16px;background:#ffffff0d;padding:10px;text-decoration:none;color:var(--wb-text,#fff)}.wb-account-actions{justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.wb-empty{border:1px solid var(--wb-line,#ffffff22);border-radius:16px;padding:10px}@media(max-width:720px){[data-web-builder-projector-rail]{left:10px;right:10px;bottom:10px;border-radius:22px}.wb-projector-copy b,.wb-projector-copy small{max-width:180px}.wb-account-panel{left:10px;right:10px;bottom:88px;width:auto}}';
+    return '[data-web-builder-projector-rail]{position:fixed;right:12px;bottom:12px;z-index:90;display:flex;gap:8px;align-items:center;max-width:min(560px,calc(100vw - 24px));border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:rgba(7,9,16,.9);backdrop-filter:blur(14px);box-shadow:0 18px 60px #0008;padding:8px 10px;color:var(--wb-text,#f7fbff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);font-size:12px}.mark img{width:100%;height:100%;object-fit:cover}.wb-projector-logo,.wb-account-avatar,.wb-brand-logo{background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));display:grid;place-items:center;color:#061017;font-weight:1000;overflow:hidden}.wb-projector-logo{width:38px;height:38px;min-width:38px;border-radius:14px}.wb-projector-logo img,.wb-account-avatar img,.wb-brand-logo img{width:100%;height:100%;object-fit:cover}.wb-projector-copy{min-width:0}.wb-projector-copy b{display:block;color:var(--wb-text,#fff);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}.wb-projector-copy small{display:block;color:var(--wb-muted,#aeb8d6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}.wb-projector-btn,.wb-secondary{border:0;border-radius:999px;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#061017;text-decoration:none;font-weight:950;padding:8px 10px;white-space:nowrap;cursor:pointer}.wb-secondary{background:#30384f;color:#fff}.wb-account-panel{position:fixed;right:12px;bottom:72px;z-index:91;width:min(440px,calc(100vw - 24px));max-height:min(74vh,680px);overflow:auto;border:1px solid var(--wb-line,#ffffff22);border-radius:28px;background:radial-gradient(circle at 0 0,color-mix(in srgb,var(--wb-accent,#22d3a6),transparent 72%),transparent 32%),linear-gradient(135deg,var(--wb-panel,#101529),var(--wb-panel-2,#17122d));box-shadow:0 24px 90px #000c;padding:14px;color:var(--wb-text,#fff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);display:none}.wb-account-panel.open{display:block}.wb-account-head,.wb-brand-mini,.wb-account-actions{display:flex;gap:10px;align-items:center}.wb-account-head{justify-content:space-between}.wb-account-avatar{width:72px;height:72px;min-width:72px;border-radius:22px}.wb-brand-logo{width:48px;height:48px;min-width:48px;border-radius:16px}.wb-account-head b,.wb-brand-mini b{display:block;color:var(--wb-text,#fff)}.wb-account-head small,.wb-brand-mini small,.wb-account-panel p,.wb-account-fav small{display:block;color:var(--wb-muted,#aeb8d6);line-height:1.45}.wb-panel-close{border:0;border-radius:999px;background:#ffffff14;color:#fff;width:34px;height:34px;font-weight:1000;cursor:pointer}.wb-account-panel h3{margin:14px 0 8px}.wb-account-favs{display:grid;gap:8px}.wb-account-fav{display:block;border:1px solid var(--wb-line,#ffffff22);border-radius:16px;background:#ffffff0d;padding:10px;text-decoration:none;color:var(--wb-text,#fff)}.wb-account-actions{justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.wb-empty{border:1px solid var(--wb-line,#ffffff22);border-radius:16px;padding:10px}.wb-favicon-helper{border-color:var(--wb-accent,#22d3a6)!important}@media(max-width:720px){[data-web-builder-projector-rail]{left:10px;right:10px;bottom:10px;border-radius:22px}.wb-projector-copy b,.wb-projector-copy small{max-width:180px}.wb-account-panel{left:10px;right:10px;bottom:88px;width:auto}}';
   }
   function bindPanel(){
     var rail = document.querySelector('[data-web-builder-projector-rail]');
@@ -124,6 +158,8 @@
     if(title) title.textContent = (s.account && s.account.displayName) || DEFAULTS.account.displayName;
     if(sub) sub.textContent = textOverride || railText(s);
     if(logo) logo.innerHTML = avatarHtml(s);
+    applyTopAvatar(s);
+    applyFavicon(s);
     if(panel){
       var wasOpen = panel.classList.contains('open');
       panel.outerHTML = panelHtml(s);
@@ -150,8 +186,35 @@
     bindPanel();
   }
   function expose(s){
-    window.StreamBanditWebBuilderProjector = {version:VERSION,storageKey:STORAGE_KEY,state:s,connectedToLiveApp:false,appliedAt:new Date().toISOString(),accountOverlay:true,favouritesOverlay:true,saveSuccessText:SUCCESS};
+    window.StreamBanditWebBuilderProjector = {version:VERSION,storageKey:STORAGE_KEY,state:s,connectedToLiveApp:false,appliedAt:new Date().toISOString(),accountOverlay:true,favouritesOverlay:true,faviconProjection:true,topAvatarProjection:true,saveSuccessText:SUCCESS};
     window.dispatchEvent(new CustomEvent('web-builder-projector-applied',{detail:window.StreamBanditWebBuilderProjector}));
+  }
+  function addFaviconField(s){
+    if(document.getElementById('faviconUrl')) return;
+    var iconNote = document.getElementById('iconNote');
+    var logoUrl = document.getElementById('logoUrl');
+    var target = iconNote || logoUrl;
+    if(!target || !target.parentNode) return;
+    var wrap = document.createElement('label');
+    wrap.className = 'field wb-favicon-helper';
+    wrap.innerHTML = '<b>Favicon URL</b><input id="faviconUrl" placeholder="https://... or local icon file">';
+    target.parentNode.parentNode.insertBefore(wrap, target.parentNode.nextSibling);
+    document.getElementById('faviconUrl').value = (s.brand && s.brand.faviconUrl) || '';
+  }
+  function readField(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function saveFaviconFromField(){
+    var fav = readField('faviconUrl');
+    if(!fav) return load();
+    var s = load();
+    s.brand = s.brand || {};
+    s.brand.faviconUrl = fav;
+    s.meta = s.meta || {};
+    s.meta.localStorageOnly = true;
+    s.meta.connectedToLiveApp = false;
+    saveState(s);
+    refreshChrome(s);
+    expose(s);
+    return s;
   }
   function apply(){
     var s = load();
@@ -160,30 +223,33 @@
     document.documentElement.setAttribute('data-web-builder-live-app-connection','false');
     applyTheme(s);
     injectChrome(s);
+    addFaviconField(s);
     expose(s);
   }
-  function watchSaveButtons(){
+  function watchButtons(){
     document.addEventListener('click',function(e){
       var el = e.target;
       while(el && el !== document){
-        if(el.id === 'save' || el.id === 'saveBtn' || (el.textContent || '').trim() === 'Save Local'){
+        if(el.id === 'applyBrand' || el.id === 'save' || el.id === 'saveBtn' || (el.textContent || '').trim() === 'Save Local'){
           setTimeout(function(){
-            var s = load();
-            refreshChrome(s,SUCCESS);
+            var s = saveFaviconFromField();
+            var text = (el.id === 'save' || el.id === 'saveBtn' || (el.textContent || '').trim() === 'Save Local') ? SUCCESS : railText(s);
+            refreshChrome(s,text);
             var status = document.getElementById('status');
-            if(status) status.textContent = SUCCESS;
+            if(status && text === SUCCESS) status.textContent = SUCCESS;
             if(window.StreamBanditWebBuilderProjector){
               window.StreamBanditWebBuilderProjector.state = s;
-              window.StreamBanditWebBuilderProjector.saveButtonObserved = true;
+              window.StreamBanditWebBuilderProjector.saveButtonObserved = text === SUCCESS;
               window.StreamBanditWebBuilderProjector.connectedToLiveApp = false;
             }
-          },200);
+          },220);
           break;
         }
         el = el.parentNode;
       }
     },true);
+    document.addEventListener('change',function(e){ if(e.target && e.target.id === 'faviconUrl') saveFaviconFromField(); },true);
   }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',function(){apply();watchSaveButtons();});
-  else { apply(); watchSaveButtons(); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',function(){apply();watchButtons();});
+  else { apply(); watchButtons(); }
 })();
