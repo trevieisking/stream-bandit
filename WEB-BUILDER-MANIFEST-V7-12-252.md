@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.262.4
+# Web Builder Manifest V7.12.262.6
 
 ## Purpose
 
@@ -19,6 +19,7 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 - Delete/remove must be guarded and clearly scoped.
 - Landing/home guard remains protected until a real replacement-home flow exists.
 - No delete action may silently remove files, routes, rows, or current app pages.
+- Soft remove/archive is acceptable where hard delete is not yet approved.
 
 ## Current passed checkpoints
 
@@ -37,8 +38,41 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 - `V7.12.262.1 Asset Manager Input Overlay / Output Page Polish` — PASS
 - `V7.12.262.3 Pages Manager Add/Remove Pair` — PASS
 - `V7.12.262.4 Owned Pages Manager Preview Route + Landing Guard` — PASS
+- `V7.12.262.6 Owned Form Inbox Soft Remove Action` — PASS
 
-## Latest verified pass — V7.12.262.4
+## Latest verified pass — V7.12.262.6
+
+Route:
+
+- `web-builder-form-inbox-owned-v7-12-258-test.html?page=landing`
+
+User-tested result:
+
+- Select a submission — PASS.
+- Open Status / Remove — PASS.
+- Click Remove From Inbox — PASS.
+- Confirm it disappears from Active output — PASS.
+- Open Filter Inbox — PASS.
+- Change Status to archived / removed — PASS.
+- Apply + Load — PASS.
+- Confirm the removed submission can still be seen there — PASS.
+
+Pass notes:
+
+- Inbox now has a remove path for every submission.
+- Remove From Inbox is a soft remove, not a hard delete.
+- Soft remove sets the submission status to `archived`.
+- Default filter is `active`, hiding archived submissions from the normal inbox output.
+- Archived filter lets the user recover/view removed submissions.
+- Filter controls remain in an overlay.
+- Status/remove controls remain in an overlay.
+- Submission cards, selected details, routing metadata and answer output stay on the page.
+- No hard delete.
+- No schema changes.
+- No email sending.
+- No private message delivery.
+
+## Previous verified pass — V7.12.262.4
 
 Route:
 
@@ -230,7 +264,7 @@ Pass notes:
 - External email is not sent by the app.
 - Private/owner message delivery is not marked delivered yet.
 
-## Latest verified inbox pass — V7.12.259.1
+## Latest verified inbox foundation pass — V7.12.259.1
 
 Route:
 
@@ -295,10 +329,11 @@ These remain preserved while Web Builder-owned replacements are being proven.
 - User-uploaded Web Builder assets should become reusable builder assets, not one-off orphan uploads.
 - System/global assets must be protected from accidental user deletion.
 - Pages Manager local remove is temporary until persistence exists; removed local planner pages reappear on refresh by design in the safe planner pass.
+- Inbox remove is a soft archive action until hard delete rules are explicitly approved.
 
 ## Next planned work
 
-### V7.12.262.5 — Continue Web Builder Spec Polish + UI Tidy
+### V7.12.262.7 — Continue Web Builder Spec Polish + UI Tidy
 
 Goal:
 
@@ -306,13 +341,13 @@ Goal:
 - Tidy remaining working Web Builder pages without changing core function.
 - Make headings, button labels, debug text and safety notes consistent.
 - Reduce visual clutter while preserving all working functions.
+- Keep remove/delete paired with anything users can add/create.
 - Do not change database schema.
 - Do not detach current app reference routes.
 
 Remaining target pages:
 
 - `web-builder-studio-v7-12-252-test.html`
-- `web-builder-form-inbox-owned-v7-12-258-test.html`
 - `web-builder-preview-owned-v7-12-257-test.html`
 - `web-builder-route-map-v7-12-252-test.html`
 
