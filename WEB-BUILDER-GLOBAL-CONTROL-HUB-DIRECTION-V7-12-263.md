@@ -13,6 +13,25 @@ The Web Builder control hub should behave like a builder-owned settings and iden
 - Do not let Web Builder theme/account/avatar/brand edits accidentally write into the live Stream Bandit movie app shell.
 - Do not let Stream Bandit app shell helpers own the Web Builder studio shell.
 
+## Connect-last rule
+
+The Web Builder global control hub must be built and proven inside Web Builder first.
+
+Do not connect it to the live app shell, app settings, index route, global registry, promoted menu, or Stream Bandit settings until the Web Builder-owned versions pass on their own.
+
+Connection to the wider app happens last, after:
+
+- Web Builder account works.
+- Web Builder avatar/profile works.
+- Web Builder favourites/saved builder pages work.
+- Web Builder theme editor works.
+- Web Builder brand/logo/favicon/app icon helper works.
+- Web Builder asset library works.
+- Web Builder shell projector works.
+- Web Builder page manager, preview, form builder and inbox links work together.
+- Remove/delete exists beside every add/create action.
+- No Stream Bandit app shell/settings regression is confirmed.
+
 ## Core UI rule
 
 - Inputs live in overlays.
@@ -76,6 +95,7 @@ First pass should be local-preview first:
 - No index promotion.
 - No registry promotion.
 - No current app shell helper edits.
+- No live app connection.
 
 Later write options should be decided after testing:
 
@@ -86,3 +106,5 @@ Later write options should be decided after testing:
 ## Why this direction is correct
 
 The Web Builder should feel like its own product/studio, not like a page inside the Stream Bandit movie app. The builder needs its own shell, account controls, theme controls, branding controls, asset controls and projection layer while preserving the working app and existing builder support routes until replacements pass.
+
+The wider Stream Bandit connection is the final step, not the starting step.
