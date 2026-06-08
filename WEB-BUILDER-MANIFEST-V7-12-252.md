@@ -1,10 +1,17 @@
-# Web Builder Manifest V7.12.261.2
+# Web Builder Manifest V7.12.262.1
 
 ## Purpose
 
 This manifest tracks the Web Builder as a separate mini app/product area inside Stream Bandit.
 
 The Stream Bandit manifest remains for the movie app. This file is for Web Builder only.
+
+## Core polish rule
+
+- Inputs live in clean overlays.
+- Outputs display on clean page views.
+- Builder/editor controls should not be scattered through visitor previews or output dashboards.
+- Page views should show results, previews, cards, route maps, reports, inbox output, and asset libraries.
 
 ## Current passed checkpoints
 
@@ -20,8 +27,77 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 - `V7.12.259.1 Owned Form Inbox Routing View + Card Overflow Fix` — PASS
 - `V7.12.260 Web Builder Media / Asset Manager Upload + Delete Pair` — PASS
 - `V7.12.261.2 Form Destination Chooser + Mail Draft Prefill Fix` — PASS
+- `V7.12.262.1 Asset Manager Input Overlay / Output Page Polish` — PASS
 
-## Latest verified pass — V7.12.261.2
+## Latest verified pass — V7.12.262.1
+
+Route:
+
+- `web-builder-assets-v7-12-252-test.html`
+
+User-tested result:
+
+- Main page shows asset library/output only — PASS.
+- Open Upload Overlay shows slug/type/alt/caption/dropzone inputs — PASS.
+- Upload still works — PASS.
+- Delete Selected opens a delete overlay — PASS.
+- Delete still removes asset + metadata — PASS.
+- Debug shows `assetManagerOverlayPolish: true` — PASS.
+- Debug shows `uploadInputOverlay: true` — PASS.
+- Debug shows `deleteInputOverlay: true` — PASS.
+- Debug shows `outputAssetLibraryPage: true` — PASS.
+
+Pass notes:
+
+- Asset Manager now follows the core polish rule: inputs in overlays, outputs on the page.
+- Upload controls are in the Upload Overlay.
+- Delete confirmation is in the Delete Overlay.
+- Main page is the stored asset library and selected asset output view.
+- Upload remains paired with delete/remove.
+- Metadata sidecar remains paired with each upload.
+- No schema changes.
+- No Stream Bandit logo, favicon, app theme, or branding changes.
+
+## Global Web Builder asset direction
+
+User direction:
+
+- The asset upload/delete system should become a global Web Builder function that users can use across Web Builder pages.
+- Users should be able to upload assets, preview them, add alt text/captions, reuse them, and delete/remove them safely.
+
+Working rule:
+
+- Upload is allowed only because delete/remove exists beside it.
+- No upload-only orphan asset system.
+- Every asset must have preview, metadata, replace/remove/delete, and a clear owner/page/global scope.
+
+Future asset scopes:
+
+- `user` — assets uploaded by a specific user.
+- `site` — assets available across one Web Builder site/project.
+- `page` — assets attached to one page/block.
+- `global` — shared Web Builder library assets available across the builder system.
+- `system` — protected Web Builder/Stream Bandit defaults that users can copy from but not delete.
+
+Current storage path remains:
+
+- `builder/{assetType}/{siteSlug}/...`
+
+Future recommended path model:
+
+- `builder/users/{userId}/{assetType}/...`
+- `builder/sites/{siteSlug}/{assetType}/...`
+- `builder/pages/{pageSlug}/{assetType}/...`
+- `builder/global/{assetType}/...`
+- `builder/system/{assetType}/...`
+
+Future data model note:
+
+- Current pass uses Storage + `.metadata.json` sidecars only.
+- A future `sb_builder_assets` table may be useful for searchable global/user/site asset library views, ownership checks, reuse, and safer cleanup.
+- Do not add that table until the no-schema sidecar version is fully stable and the ownership/security pass is agreed.
+
+## Latest verified form destination pass — V7.12.261.2
 
 Route:
 
@@ -52,7 +128,7 @@ Pass notes:
 - No storage changes.
 - No Stream Bandit app shell loaded.
 
-## Latest verified asset pass — V7.12.260
+## Latest verified asset upload/delete pass — V7.12.260
 
 Route:
 
@@ -171,38 +247,41 @@ These remain preserved while Web Builder-owned replacements are being proven.
 - Private message delivery must not claim delivered until the real route exists.
 - No schema changes unless specifically approved.
 - No cleanup delete batches without a keep list and explicit batch approval.
+- User-uploaded Web Builder assets should become reusable builder assets, not one-off orphan uploads.
+- System/global assets must be protected from accidental user deletion.
 
 ## Next planned work
 
-### V7.12.262 — Web Builder Spec Polish + UI Tidy
+### V7.12.262.2 — Continue Web Builder Spec Polish + UI Tidy
 
 Goal:
 
-- Tidy the working Web Builder pages now that the form, inbox, media, preview and route map flows are functional.
+- Continue applying the core polish rule: inputs in overlays, outputs on pages.
+- Tidy remaining working Web Builder pages without changing core function.
 - Make headings, button labels, debug text and safety notes consistent.
 - Reduce visual clutter while preserving all working functions.
-- Keep builder tools in overlays where appropriate.
-- Keep full-screen visitor preview behavior for forms.
 - Do not change database schema.
 - Do not detach current app reference routes.
 
-Target pages:
+Remaining target pages:
 
 - `web-builder-studio-v7-12-252-test.html`
-- `web-builder-assets-v7-12-252-test.html`
-- `web-builder-form-designer-owned-v7-12-258-test.html`
 - `web-builder-form-inbox-owned-v7-12-258-test.html`
 - `web-builder-preview-owned-v7-12-257-test.html`
 - `web-builder-pages-manager-owned-v7-12-256-test.html`
 - `web-builder-route-map-v7-12-252-test.html`
 
-### V7.12.263 — Media Picker Integration
+### V7.12.263 — Global/User Web Builder Asset Library
 
 Goal:
 
-- Let pages/forms/preview choose an uploaded Web Builder asset from `builder/{assetType}/{siteSlug}/...`.
+- Turn the working upload/delete flow into a reusable Web Builder asset library.
+- Add clear asset scopes: user, site, page, global, system.
+- Let pages/forms/preview choose an uploaded Web Builder asset.
 - Apply selected image to page blocks as hero image, poster, logo source, or social preview source.
-- Keep replace/remove controls beside every selected asset.
+- Keep replace/remove/delete controls beside every selected asset.
+- Preserve metadata prompts for alt text and captions.
+- Keep protected system/global assets safe from user deletion.
 
 ### V7.12.264 — Responsive Preview / Device Modes
 
