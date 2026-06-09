@@ -48,7 +48,7 @@ const ROUTES={
   storage:'storage-prep-global-helpers-v7-10-8-test.html',
   backup:'backup-safety-global-helpers-v7-10-9-test.html',
 
-  builder:'web-builder-live-studio-v7-12-116-test.html?page=test-page',
+  builder:'web-builder-account-control-hub-v7-12-263-test.html',
   theme:'web-builder-theme-studio-controls-v7-8-9-test.html',
   pagesManager:'web-builder-pages-manager-v7-12-111-test.html',
   preview:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
@@ -98,6 +98,7 @@ const ROUTE_FIXES={
   'web-builder-full-edit-lock-v7-8-6-test.html':ROUTES.builder,
   'web-builder-admin-shell-v6-57-test.html':ROUTES.builder,
   'web-builder-global-helpers-v7-9-3-test.html':ROUTES.builder,
+  'web-builder-live-studio-v7-12-116-test.html':ROUTES.builder,
   'web-builder-live-studio-v7-12-97-test.html':ROUTES.builder,
   'web-builder-live-studio-v7-12-93-test.html':ROUTES.builder,
 
@@ -189,6 +190,7 @@ const LABEL_FIXES={
   'Settings Studio':[ROUTES.theme,'Theme Studio owner'],
   'Profile Settings':[ROUTES.profile,'Profile image overlay'],
   'Supabase Library Editor':[ROUTES.supabaseLibrary,'Supabase editor'],
+  'Web Builder':[ROUTES.builder,'Web Builder hub'],
 
   'Brand / App Icons':[ROUTES.brandIcons,'Logos, favicons and app icons'],
   'Brand Image Helper':[ROUTES.brandHelper,'Brand helper'],
