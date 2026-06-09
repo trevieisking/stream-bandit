@@ -1,10 +1,35 @@
-# Web Builder Manifest V7.12.262.6
+# Web Builder Manifest V7.12.263
 
 ## Purpose
 
 This manifest tracks the Web Builder as a separate mini app/product area inside Stream Bandit.
 
 The Stream Bandit manifest remains for the movie app. This file is for Web Builder only.
+
+## Current doorway rule
+
+One thing at a time:
+
+- Web Builder is indexed and tracked here first, under the Web Builder manifest.
+- Web Builder is not promoted as the main app manifest.
+- Stream Bandit app branding remains Stream Bandit branding.
+- Web Builder branding/avatar/projector takes over only after entering Web Builder pages.
+- Main app promotion is limited to one clean doorway when approved.
+
+Approved doorway model:
+
+- One way in: Stream Bandit menu -> Web Builder -> `web-builder-account-control-hub-v7-12-263-test.html`.
+- One way out: Web Builder -> Back to Stream Bandit/home.
+- Inboxes remain available from both Stream Bandit and Web Builder.
+- Form Inbox and Advanced Form are not removed from the main app owner/tools routes.
+
+Not promoted yet:
+
+- `index.html`
+- current app registry
+- main app branding
+- footer shell
+- full app manifest
 
 ## Core polish rule
 
@@ -23,24 +48,71 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 
 ## Current passed checkpoints
 
-- `V7.12.250 Web Builder Studio Theme Brand Font Planner` — PASS
-- `V7.12.251 Web Builder Asset Media Planner` — PASS
-- `V7.12.252 Canonical Web Builder URLs` — PASS
-- `V7.12.253 Web Builder Control Map` — PASS
-- `V7.12.254.1 Web Builder Header/Footer Code Tool + Slug Launcher` — PASS
-- `V7.12.255 Web Builder Pages Source Map` — PASS
-- `V7.12.256 Web Builder-owned Pages Manager Planner` — PASS
-- `V7.12.257.3 Web Builder-owned Full Page Preview` — PASS
-- `V7.12.258.3 Advanced Form Builder Focus Fix` — PASS
-- `V7.12.259.1 Owned Form Inbox Routing View + Card Overflow Fix` — PASS
-- `V7.12.260 Web Builder Media / Asset Manager Upload + Delete Pair` — PASS
-- `V7.12.261.2 Form Destination Chooser + Mail Draft Prefill Fix` — PASS
-- `V7.12.262.1 Asset Manager Input Overlay / Output Page Polish` — PASS
-- `V7.12.262.3 Pages Manager Add/Remove Pair` — PASS
-- `V7.12.262.4 Owned Pages Manager Preview Route + Landing Guard` — PASS
-- `V7.12.262.6 Owned Form Inbox Soft Remove Action` — PASS
+- `V7.12.250 Web Builder Studio Theme Brand Font Planner` - PASS
+- `V7.12.251 Web Builder Asset Media Planner` - PASS
+- `V7.12.252 Canonical Web Builder URLs` - PASS
+- `V7.12.253 Web Builder Control Map` - PASS
+- `V7.12.254.1 Web Builder Header/Footer Code Tool + Slug Launcher` - PASS
+- `V7.12.255 Web Builder Pages Source Map` - PASS
+- `V7.12.256 Web Builder-owned Pages Manager Planner` - PASS
+- `V7.12.257.3 Web Builder-owned Full Page Preview` - PASS
+- `V7.12.258.3 Advanced Form Builder Focus Fix` - PASS
+- `V7.12.259.1 Owned Form Inbox Routing View + Card Overflow Fix` - PASS
+- `V7.12.260 Web Builder Media / Asset Manager Upload + Delete Pair` - PASS
+- `V7.12.261.2 Form Destination Chooser + Mail Draft Prefill Fix` - PASS
+- `V7.12.262.1 Asset Manager Input Overlay / Output Page Polish` - PASS
+- `V7.12.262.3 Pages Manager Add/Remove Pair` - PASS
+- `V7.12.262.4 Owned Pages Manager Preview Route + Landing Guard` - PASS
+- `V7.12.262.6 Owned Form Inbox Soft Remove Action` - PASS
+- `V7.12.263 Web Builder Projector Connection Rollout` - PASS
+- `V7.12.263 Real Studio Shell Projector Connection` - PASS
 
-## Latest verified pass — V7.12.262.6
+## Latest verified pass - V7.12.263 Web Builder Projector Connection Rollout
+
+### User-tested result
+
+- Form Designer projector connection - PASS.
+- Owned Form Inbox projector connection - PASS.
+- Assets Manager projector connection - PASS.
+- Owned Pages Manager projector connection - PASS.
+- Owned Preview projector connection - PASS.
+- Route Map projector connection - PASS.
+- Control Map projector connection - PASS.
+- Pages Source Map projector connection - PASS.
+- Header/Footer Code Tool projector connection - PASS.
+- Studio Canonical Route wrapper landed - LANDED.
+- Real visible Studio Shell projector connection - PASS.
+
+### Verified behavior
+
+- Hub rail appears on connected Web Builder pages.
+- Avatar projection works on pages with `.mark` avatar holder.
+- Favicon projection works from the Web Builder projector state.
+- Web Builder pages keep their own local account/avatar/theme/brand/shell/favourites state.
+- Projector remains Web Builder-only and does not connect to Stream Bandit app settings.
+- Stream Bandit app branding/logo/favicon remains untouched.
+- No `index.html` promotion.
+- No current app registry promotion.
+- No schema changes.
+- No storage schema changes.
+- No Stream Bandit header/footer/theme helper rewrite in this pass.
+
+### Projector-connected routes
+
+- `web-builder-account-control-hub-v7-12-263-test.html`
+- `overlay-route-truth-machine-v7-12-66-test.html?page=test-page`
+- `web-builder-studio-v7-12-252-test.html`
+- `web-builder-assets-v7-12-252-test.html`
+- `web-builder-pages-manager-owned-v7-12-256-test.html`
+- `web-builder-preview-owned-v7-12-257-test.html?page=landing`
+- `web-builder-form-designer-owned-v7-12-258-test.html?page=landing`
+- `web-builder-form-inbox-owned-v7-12-258-test.html?page=landing`
+- `web-builder-route-map-v7-12-252-test.html`
+- `web-builder-control-map-v7-12-253-test.html`
+- `web-builder-pages-source-map-v7-12-255-test.html`
+- `web-builder-header-footer-code-v7-12-254-test.html`
+
+## Latest verified pass - V7.12.262.6 Owned Form Inbox Soft Remove Action
 
 Route:
 
@@ -48,14 +120,14 @@ Route:
 
 User-tested result:
 
-- Select a submission — PASS.
-- Open Status / Remove — PASS.
-- Click Remove From Inbox — PASS.
-- Confirm it disappears from Active output — PASS.
-- Open Filter Inbox — PASS.
-- Change Status to archived / removed — PASS.
-- Apply + Load — PASS.
-- Confirm the removed submission can still be seen there — PASS.
+- Select a submission - PASS.
+- Open Status / Remove - PASS.
+- Click Remove From Inbox - PASS.
+- Confirm it disappears from Active output - PASS.
+- Open Filter Inbox - PASS.
+- Change Status to archived / removed - PASS.
+- Apply + Load - PASS.
+- Confirm the removed submission can still be seen there - PASS.
 
 Pass notes:
 
@@ -72,7 +144,7 @@ Pass notes:
 - No email sending.
 - No private message delivery.
 
-## Previous verified pass — V7.12.262.4
+## Previous verified pass - V7.12.262.4 Owned Pages Manager Preview Route + Landing Guard
 
 Route:
 
@@ -80,17 +152,17 @@ Route:
 
 User-tested result:
 
-- Select `test-page` — PASS.
-- Click Published Preview — PASS.
-- Published Preview opens `web-builder-preview-owned-v7-12-257-test.html?page=test-page` — PASS.
-- Select `landing` — PASS.
-- Remove Page is blocked for `landing` — PASS.
-- Select any non-landing page — PASS.
-- Remove Page is allowed for non-landing pages — PASS.
+- Select `test-page` - PASS.
+- Click Published Preview - PASS.
+- Published Preview opens `web-builder-preview-owned-v7-12-257-test.html?page=test-page` - PASS.
+- Select `landing` - PASS.
+- Remove Page is blocked for `landing` - PASS.
+- Select any non-landing page - PASS.
+- Remove Page is allowed for non-landing pages - PASS.
 
 Pass notes:
 
-- Published Preview now points to the Web Builder-owned preview route, not the old in-app preview.
+- Published Preview points to the Web Builder-owned preview route, not the old in-app preview.
 - Open Form points to the Web Builder-owned advanced form builder.
 - Owned Inbox points to the Web Builder-owned inbox.
 - Old app preview/form/inbox routes remain preserved as references only.
@@ -108,7 +180,7 @@ Known limitation / future fix:
 - Later, real persistence needs an approved save/delete model using either local draft storage or the real builder page table.
 - Persistent delete must keep the same rule: landing protected, non-landing pages removable, no silent deletes.
 
-## Latest verified asset overlay polish pass — V7.12.262.1
+## Latest verified asset overlay polish pass - V7.12.262.1
 
 Route:
 
@@ -116,24 +188,25 @@ Route:
 
 User-tested result:
 
-- Main page shows asset library/output only — PASS.
-- Open Upload Overlay shows slug/type/alt/caption/dropzone inputs — PASS.
-- Upload still works — PASS.
-- Delete Selected opens a delete overlay — PASS.
-- Delete still removes asset + metadata — PASS.
-- Debug shows `assetManagerOverlayPolish: true` — PASS.
-- Debug shows `uploadInputOverlay: true` — PASS.
-- Debug shows `deleteInputOverlay: true` — PASS.
-- Debug shows `outputAssetLibraryPage: true` — PASS.
+- Main page shows asset library/output only - PASS.
+- Open Upload Overlay shows slug/type/alt/caption/dropzone inputs - PASS.
+- Upload still works - PASS.
+- Delete Selected opens a delete overlay - PASS.
+- Delete still removes the uploaded asset - PASS.
+- Debug shows `assetManagerOverlayPolish: true` - PASS.
+- Debug shows `uploadInputOverlay: true` - PASS.
+- Debug shows `deleteInputOverlay: true` - PASS.
+- Debug shows `outputAssetLibraryPage: true` - PASS.
 
 Pass notes:
 
-- Asset Manager now follows the core polish rule: inputs in overlays, outputs on the page.
+- Asset Manager follows the core polish rule: inputs in overlays, outputs on the page.
 - Upload controls are in the Upload Overlay.
 - Delete confirmation is in the Delete Overlay.
 - Main page is the stored asset library and selected asset output view.
 - Upload remains paired with delete/remove.
-- Metadata sidecar remains paired with each upload.
+- Current image upload path is working.
+- JSON metadata sidecar upload is skipped while bucket MIME policy rejects `application/json`.
 - No schema changes.
 - No Stream Bandit logo, favicon, app theme, or branding changes.
 
@@ -152,11 +225,11 @@ Working rule:
 
 Future asset scopes:
 
-- `user` — assets uploaded by a specific user.
-- `site` — assets available across one Web Builder site/project.
-- `page` — assets attached to one page/block.
-- `global` — shared Web Builder library assets available across the builder system.
-- `system` — protected Web Builder/Stream Bandit defaults that users can copy from but not delete.
+- `user` - assets uploaded by a specific user.
+- `site` - assets available across one Web Builder site/project.
+- `page` - assets attached to one page/block.
+- `global` - shared Web Builder library assets available across the builder system.
+- `system` - protected Web Builder/Stream Bandit defaults that users can copy from but not delete.
 
 Current storage path remains:
 
@@ -172,11 +245,11 @@ Future recommended path model:
 
 Future data model note:
 
-- Current asset pass uses Storage + `.metadata.json` sidecars only.
+- Current asset pass uses Supabase Storage only.
 - A future `sb_builder_assets` table may be useful for searchable global/user/site asset library views, ownership checks, reuse, and safer cleanup.
-- Do not add that table until the no-schema sidecar version is fully stable and the ownership/security pass is agreed.
+- Do not add that table until the no-schema version is fully stable and the ownership/security pass is agreed.
 
-## Latest verified form destination pass — V7.12.261.2
+## Latest verified form destination pass - V7.12.261.2
 
 Route:
 
@@ -193,7 +266,7 @@ User-tested result:
 - Local Test works.
 - Real Submit works and saves to `sb_form_submissions` when Inbox is selected.
 - Email destination opens the user's own mailbox.
-- Mail draft helper now passes with the form content available for the email draft.
+- Mail draft helper passes with the form content available for the email draft.
 - Mail body fallback is copied to clipboard if the mail app strips the prefilled body.
 - File/image locked field no longer blocks submit as required.
 
@@ -207,37 +280,7 @@ Pass notes:
 - No storage changes.
 - No Stream Bandit app shell loaded.
 
-## Latest verified asset upload/delete pass — V7.12.260
-
-Route:
-
-- `web-builder-assets-v7-12-252-test.html`
-
-User-tested result:
-
-- Site slug `landing` tested.
-- Asset type `Page image / general asset` tested.
-- Drop / choose image tested.
-- Alt text tested.
-- Caption tested.
-- Upload Selected Asset tested.
-- Stored asset card appeared after upload.
-- Open Public URL tested.
-- Asset card selection tested.
-- Delete Selected Asset + Metadata tested.
-- Refresh Asset List tested.
-
-Pass notes:
-
-- Upload is allowed because delete/remove is built beside it.
-- Uploaded files use the existing `stream-bandit-images` bucket.
-- Builder asset path uses `builder/{assetType}/{siteSlug}/...`.
-- Metadata sidecar uses `<asset path>.metadata.json`.
-- Delete removes both the uploaded asset and metadata sidecar.
-- No schema changes.
-- No Stream Bandit logo, favicon, app theme, or branding changes.
-
-## Latest verified form builder foundation pass — V7.12.258.3
+## Latest verified form builder foundation pass - V7.12.258.3
 
 Route:
 
@@ -245,15 +288,15 @@ Route:
 
 User-tested result:
 
-- Add short text field — PASS
-- Add phone field — PASS
-- Add URL field — PASS
-- Add checkbox field — PASS
-- Edit labels/options — PASS
-- Local Test with no write — PASS
-- Save Local Draft with no write — PASS
-- Real Submit to owned inbox — PASS
-- Input focus while typing labels/options/title/email — PASS
+- Add short text field - PASS.
+- Add phone field - PASS.
+- Add URL field - PASS.
+- Add checkbox field - PASS.
+- Edit labels/options - PASS.
+- Local Test with no write - PASS.
+- Save Local Draft with no write - PASS.
+- Real Submit to owned inbox - PASS.
+- Input focus while typing labels/options/title/email - PASS.
 
 Pass notes:
 
@@ -264,7 +307,7 @@ Pass notes:
 - External email is not sent by the app.
 - Private/owner message delivery is not marked delivered yet.
 
-## Latest verified inbox foundation pass — V7.12.259.1
+## Latest verified inbox foundation pass - V7.12.259.1
 
 Route:
 
@@ -272,17 +315,17 @@ Route:
 
 User-tested result:
 
-- Routing metadata displayed — PASS
-- Owner email displayed — PASS
-- Owner name displayed — PASS
-- Save to inbox displayed — PASS
-- Notify owner intent displayed — PASS
-- Owner message-copy intent displayed — PASS
-- Email destination requested displayed — PASS
-- External email sent remains `no` — PASS
-- Message delivered remains `no` — PASS
-- Field answers display with field types — PASS
-- Card overflow / text invasion fixed — PASS
+- Routing metadata displayed - PASS.
+- Owner email displayed - PASS.
+- Owner name displayed - PASS.
+- Save to inbox displayed - PASS.
+- Notify owner intent displayed - PASS.
+- Owner message-copy intent displayed - PASS.
+- Email destination requested displayed - PASS.
+- External email sent remains `no` - PASS.
+- Message delivered remains `no` - PASS.
+- Field answers display with field types - PASS.
+- Card overflow / text invasion fixed - PASS.
 
 Pass notes:
 
@@ -293,9 +336,11 @@ Pass notes:
 - No external email sending.
 - No private message delivery yet.
 
-## Current canonical Web Builder test routes
+## Current canonical Web Builder routes
 
+- Web Builder Hub canonical URL: `web-builder-account-control-hub-v7-12-263-test.html`
 - Studio Shell canonical URL: `web-builder-studio-v7-12-252-test.html`
+- Real Studio Shell route: `overlay-route-truth-machine-v7-12-66-test.html?page=test-page`
 - Asset / Media Manager canonical URL: `web-builder-assets-v7-12-252-test.html`
 - Route Map canonical URL: `web-builder-route-map-v7-12-252-test.html`
 - Control Map canonical URL: `web-builder-control-map-v7-12-253-test.html`
@@ -330,44 +375,22 @@ These remain preserved while Web Builder-owned replacements are being proven.
 - System/global assets must be protected from accidental user deletion.
 - Pages Manager local remove is temporary until persistence exists; removed local planner pages reappear on refresh by design in the safe planner pass.
 - Inbox remove is a soft archive action until hard delete rules are explicitly approved.
+- Main app menu promotion must be one doorway only when approved.
+- Web Builder route changes belong in this manifest before touching the main app registry or app manifest.
 
 ## Next planned work
 
-### V7.12.262.7 — Continue Web Builder Spec Polish + UI Tidy
+### V7.12.263.8 - Web Builder doorway route alignment
 
 Goal:
 
-- Continue applying the core polish rule: inputs in overlays, outputs on pages.
-- Tidy remaining working Web Builder pages without changing core function.
-- Make headings, button labels, debug text and safety notes consistent.
-- Reduce visual clutter while preserving all working functions.
-- Keep remove/delete paired with anything users can add/create.
-- Do not change database schema.
-- Do not detach current app reference routes.
+- Update only the app header/menu route alias and global helper route alias when approved.
+- Main app `Web Builder` entry should point to `web-builder-account-control-hub-v7-12-263-test.html`.
+- Keep Form Inbox and Advanced Form linked from both the app and Web Builder.
+- Keep one clear way back to Stream Bandit from the Web Builder hub/rail.
+- Do not touch index, footer shell, app branding, current app registry, or Stream Bandit manifest in the first route alignment pass.
 
-Remaining target pages:
-
-- `web-builder-studio-v7-12-252-test.html`
-- `web-builder-preview-owned-v7-12-257-test.html`
-- `web-builder-route-map-v7-12-252-test.html`
-
-### V7.12.263 — Persistent Web Builder Pages Manager
-
-Goal:
-
-- Replace the current local-memory planner behavior with a safe persistent planner/save model.
-- Removed pages should stay removed after refresh.
-- Landing remains protected until a real replacement-home flow exists.
-- Every add/create action keeps a matching remove/delete action.
-- No current app Pages Manager detachment until this owned version passes.
-
-Persistence options to decide later:
-
-- Local draft storage first, no Supabase writes.
-- Existing builder/site pages table after approval.
-- New dedicated builder pages table only after schema/security review.
-
-### V7.12.264 — Global/User Web Builder Asset Library
+### V7.12.264 - Global/User Web Builder Asset Library
 
 Goal:
 
@@ -379,7 +402,7 @@ Goal:
 - Preserve metadata prompts for alt text and captions.
 - Keep protected system/global assets safe from user deletion.
 
-### V7.12.265 — Responsive Preview / Device Modes
+### V7.12.265 - Responsive Preview / Device Modes
 
 Goal:
 
@@ -387,7 +410,7 @@ Goal:
 - No publish changes.
 - No app shell changes.
 
-### V7.12.266 — Save / Publish / Unsaved State Rail
+### V7.12.266 - Save / Publish / Unsaved State Rail
 
 Goal:
 
@@ -395,7 +418,7 @@ Goal:
 - No silent saves.
 - Clear rollback state.
 
-### V7.12.267 — Security / Ownership Guard
+### V7.12.267 - Security / Ownership Guard
 
 Goal:
 
