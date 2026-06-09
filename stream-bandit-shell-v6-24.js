@@ -7,17 +7,18 @@
    Also preserves Group Play route truth:
    Collections -> collections-clean-machine-v7-12-51-test.html
    Player 2 -> player-2-clean-machine-v7-12-58-test.html
+   V7.12.264 points legacy Web Builder route aliases to the Web Builder Hub.
    No visual old shell. No movie-card save helper auto-load. No Supabase writes. No payments.
 */
 (function(){
 'use strict';
 
-const VERSION='V6.24 Legacy Shell Bridge -> V7.12.187 Owner Brand Route Truth';
+const VERSION='V6.24 Legacy Shell Bridge -> V7.12.264 Web Builder Hub Route Truth';
 const DEF='test-page';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const FAVICON_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co/storage/v1/object/public/stream-bandit-images/global/logo-1779203548544.png';
-const FOUNDATION='v7-12-187-owner-brand-route-truth';
+const FOUNDATION='v7-12-264-web-builder-hub-route-truth';
 
 const R={
  home:'home-global-helpers-v7-4-4-test.html',
@@ -54,8 +55,8 @@ const R={
  theme:'web-builder-theme-studio-controls-v7-8-9-test.html',
  profile:'profile-settings-live-ready-v7-12-90-test.html',
 
- builder:'web-builder-live-studio-v7-12-116-test.html?page=test-page',
- builderStudio:'web-builder-live-studio-v7-12-116-test.html?page=test-page',
+ builder:'web-builder-account-control-hub-v7-12-263-test.html',
+ builderStudio:'web-builder-account-control-hub-v7-12-263-test.html',
  pagesManager:'web-builder-pages-manager-v7-12-111-test.html',
  preview:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
  formAdvanced:'web-builder-form-save-v7-12-94-test.html?page=test-page',
@@ -112,6 +113,7 @@ const FIX={
  'web-builder-full-edit-lock-v7-8-6-test.html':R.builder,
  'web-builder-admin-shell-v6-57-test.html':R.builder,
  'web-builder-global-helpers-v7-9-3-test.html':R.builder,
+ 'web-builder-live-studio-v7-12-116-test.html':R.builder,
  'web-builder-live-studio-v7-12-97-test.html':R.builder,
  'web-builder-live-studio-v7-12-93-test.html':R.builder,
 
@@ -211,7 +213,7 @@ function loadScript(src){
   let s=document.createElement('script');
   s.src=src;
   s.defer=true;
-  s.dataset.sbLoadedBy='legacy-shell-bridge-safe-v7-12-187';
+  s.dataset.sbLoadedBy='legacy-shell-bridge-safe-v7-12-264';
   document.head.appendChild(s);
  }catch(e){}
 }
@@ -254,7 +256,7 @@ function patchRoutes(root){
 
     if(old&&fix&&fix!==old){
      el.setAttribute(attr,fix);
-     el.dataset.sbRouteFixedBy='legacy-shell-bridge-v7-12-187';
+     el.dataset.sbRouteFixedBy='legacy-shell-bridge-v7-12-264';
     }
    });
   });
@@ -357,7 +359,7 @@ function boot(){
  };
 
  window.StreamBanditLegacyShellBridge=window.StreamBanditShell;
- document.documentElement.dataset.sbLegacyShellBridge='v7-12-187-owner-brand-route-truth';
+ document.documentElement.dataset.sbLegacyShellBridge='v7-12-264-web-builder-hub-route-truth';
 }
 
 if(document.readyState==='loading'){
