@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.12.263.7 Web Builder Projector Favicon Avatar';
+  var VERSION = 'V7.12.264.5 Web Builder Projector Shared Header Tabs';
   var STORAGE_KEY = 'sb.webBuilder.controlHub.v7.12.263';
   var SUCCESS = 'Saved successfully to this browser. Web Builder only. Live app connection remains off.';
   var DEFAULT_ICON = 'stream_bandit_stag_icon_32.png';
@@ -10,12 +10,15 @@
     avatar:{mode:'emoji',emoji:'WB',url:'',alt:'Web Builder avatar'},
     theme:{accent:'#22d3a6',accent2:'#7c3cff',bg:'#050711',panel1:'#101529',panel2:'#17122d',text:'#f7fbff',muted:'#aeb8d6',font:'Inter,system-ui,Arial,sans-serif',largeText:false,highContrast:false},
     brand:{name:'Web Builder Studio',tagline:'Build pages, forms and sites.',logoMode:'text',logoText:'WB',logoUrl:'',faviconUrl:DEFAULT_ICON,faviconNote:'Use Web Builder icon helper later.'},
-    shell:{railLabels:'Pages · Assets · Theme · Forms',inspectorNote:'Sticky inspector, save rail and preview controls.',canvasTitle:'Canvas',footerText:'Web Builder only - local draft',backLabel:'Back to Stream Bandit',mode:'Studio'},
+    shell:{railLabels:'Pages · Web Builder · Preview · Menu · Form · Inbox',inspectorNote:'Sticky inspector, save rail and preview controls.',canvasTitle:'Canvas',footerText:'Web Builder only - local draft',backLabel:'Back to Stream Bandit',mode:'Studio'},
     favourites:[
-      {id:'studio',label:'Studio',url:'web-builder-studio-v7-12-252-test.html',type:'Tool',locked:true},
-      {id:'pages',label:'Owned Pages',url:'web-builder-pages-manager-owned-v7-12-256-test.html',type:'Page',locked:true},
-      {id:'preview',label:'Owned Preview',url:'web-builder-preview-owned-v7-12-257-test.html?page=landing',type:'Preview',locked:true},
-      {id:'assets',label:'Assets',url:'web-builder-assets-v7-12-252-test.html',type:'Asset',locked:true}
+      {id:'hub',label:'Hub',url:'web-builder-account-control-hub-v7-12-263-test.html',type:'Hub',locked:true},
+      {id:'pages',label:'Pages',url:'web-builder-pages-manager-owned-v7-12-256-test.html',type:'Page',locked:true},
+      {id:'builder',label:'Web Builder',url:'overlay-route-truth-machine-v7-12-66-test.html?page=landing',type:'Publish',locked:true},
+      {id:'preview',label:'Preview',url:'web-builder-preview-owned-v7-12-257-test.html?page=landing',type:'Preview',locked:true},
+      {id:'menu',label:'Menu',url:'web-builder-menu-builder-owned-v7-12-264-test.html',type:'Menu',locked:true},
+      {id:'form',label:'Form',url:'web-builder-form-designer-owned-v7-12-258-test.html?page=landing',type:'Form',locked:true},
+      {id:'inbox',label:'Inbox',url:'web-builder-form-inbox-owned-v7-12-258-test.html?page=landing',type:'Inbox',locked:true}
     ],
     meta:{localStorageOnly:true,connectedToLiveApp:false}
   };
@@ -80,6 +83,59 @@
     if(/^javascript:/i.test(v) || /^data:text/i.test(v)) return '';
     return v;
   }
+  function cleanSlug(v){
+    v = String(v || '').trim();
+    try{
+      if(v.indexOf('://') > -1){
+        var u = new URL(v);
+        v = u.searchParams.get('page') || u.hash.replace(/^#/,'') || u.pathname.split('/').pop() || 'landing';
+      }
+    }catch(e){}
+    return (v.replace(/\.html.*$/,'').replace(/[^a-zA-Z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase() || 'landing');
+  }
+  function currentSlug(){
+    try{
+      var url = new URL(location.href);
+      var fromUrl = url.searchParams.get('page');
+      if(fromUrl) return cleanSlug(fromUrl);
+    }catch(e){}
+    var ids = ['slug','pageSlug','studioSlug','wbSlug'];
+    for(var i=0;i<ids.length;i++){
+      var el = document.getElementById(ids[i]);
+      if(el && el.value) return cleanSlug(el.value);
+    }
+    return 'landing';
+  }
+  function routeMap(){
+    var s = encodeURIComponent(currentSlug());
+    return [
+      {id:'back',label:'Back',href:'settings-platform-control-hub-v7-12-85-test.html'},
+      {id:'hub',label:'Hub',href:'web-builder-account-control-hub-v7-12-263-test.html'},
+      {id:'pages',label:'Pages',href:'web-builder-pages-manager-owned-v7-12-256-test.html'},
+      {id:'builder',label:'Web Builder',href:'overlay-route-truth-machine-v7-12-66-test.html?page='+s},
+      {id:'preview',label:'Preview',href:'web-builder-preview-owned-v7-12-257-test.html?page='+s},
+      {id:'menu',label:'Menu',href:'web-builder-menu-builder-owned-v7-12-264-test.html'},
+      {id:'form',label:'Form',href:'web-builder-form-designer-owned-v7-12-258-test.html?page='+s},
+      {id:'inbox',label:'Inbox',href:'web-builder-form-inbox-owned-v7-12-258-test.html?page='+s}
+    ];
+  }
+  function activeTabId(){
+    var p = location.pathname.split('/').pop();
+    if(p.indexOf('account-control-hub') > -1) return 'hub';
+    if(p.indexOf('pages-manager') > -1) return 'pages';
+    if(p.indexOf('overlay-route-truth-machine') > -1 || p.indexOf('live-studio') > -1 || p.indexOf('studio') > -1) return 'builder';
+    if(p.indexOf('preview-owned') > -1) return 'preview';
+    if(p.indexOf('menu-builder') > -1) return 'menu';
+    if(p.indexOf('form-designer') > -1) return 'form';
+    if(p.indexOf('form-inbox') > -1) return 'inbox';
+    return '';
+  }
+  function tabsHtml(){
+    var active = activeTabId();
+    return routeMap().map(function(r){
+      return '<a class="wb-builder-tab '+(r.id === active ? 'active' : '')+'" data-wb-tab="'+escapeHtml(r.id)+'" href="'+escapeHtml(r.href)+'">'+escapeHtml(r.label)+'</a>';
+    }).join('');
+  }
   function avatarHtml(s){
     var a = s.avatar || DEFAULTS.avatar;
     if(a.mode === 'image' && a.url){ return '<img src="'+escapeHtml(a.url)+'" alt="'+escapeHtml(a.alt || 'Web Builder avatar')+'">'; }
@@ -137,7 +193,7 @@
       + '</div>';
   }
   function styleText(){
-    return '[data-web-builder-projector-rail]{position:fixed;right:12px;bottom:12px;z-index:90;display:flex;gap:8px;align-items:center;max-width:min(560px,calc(100vw - 24px));border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:rgba(7,9,16,.9);backdrop-filter:blur(14px);box-shadow:0 18px 60px #0008;padding:8px 10px;color:var(--wb-text,#f7fbff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);font-size:12px}.mark img{width:100%;height:100%;object-fit:cover}.wb-projector-logo,.wb-account-avatar,.wb-brand-logo{background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));display:grid;place-items:center;color:#061017;font-weight:1000;overflow:hidden}.wb-projector-logo{width:38px;height:38px;min-width:38px;border-radius:14px}.wb-projector-logo img,.wb-account-avatar img,.wb-brand-logo img{width:100%;height:100%;object-fit:cover}.wb-projector-copy{min-width:0}.wb-projector-copy b{display:block;color:var(--wb-text,#fff);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}.wb-projector-copy small{display:block;color:var(--wb-muted,#aeb8d6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}.wb-projector-btn,.wb-secondary{border:0;border-radius:999px;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#061017;text-decoration:none;font-weight:950;padding:8px 10px;white-space:nowrap;cursor:pointer}.wb-secondary{background:#30384f;color:#fff}.wb-account-panel{position:fixed;right:12px;bottom:72px;z-index:91;width:min(440px,calc(100vw - 24px));max-height:min(74vh,680px);overflow:auto;border:1px solid var(--wb-line,#ffffff22);border-radius:28px;background:radial-gradient(circle at 0 0,color-mix(in srgb,var(--wb-accent,#22d3a6),transparent 72%),transparent 32%),linear-gradient(135deg,var(--wb-panel,#101529),var(--wb-panel-2,#17122d));box-shadow:0 24px 90px #000c;padding:14px;color:var(--wb-text,#fff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);display:none}.wb-account-panel.open{display:block}.wb-account-head,.wb-brand-mini,.wb-account-actions{display:flex;gap:10px;align-items:center}.wb-account-head{justify-content:space-between}.wb-account-avatar{width:72px;height:72px;min-width:72px;border-radius:22px}.wb-brand-logo{width:48px;height:48px;min-width:48px;border-radius:16px}.wb-account-head b,.wb-brand-mini b{display:block;color:var(--wb-text,#fff)}.wb-account-head small,.wb-brand-mini small,.wb-account-panel p,.wb-account-fav small{display:block;color:var(--wb-muted,#aeb8d6);line-height:1.45}.wb-panel-close{border:0;border-radius:999px;background:#ffffff14;color:#fff;width:34px;height:34px;font-weight:1000;cursor:pointer}.wb-account-panel h3{margin:14px 0 8px}.wb-account-favs{display:grid;gap:8px}.wb-account-fav{display:block;border:1px solid var(--wb-line,#ffffff22);border-radius:16px;background:#ffffff0d;padding:10px;text-decoration:none;color:var(--wb-text,#fff)}.wb-account-actions{justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.wb-empty{border:1px solid var(--wb-line,#ffffff22);border-radius:16px;padding:10px}.wb-favicon-helper{border-color:var(--wb-accent,#22d3a6)!important}@media(max-width:720px){[data-web-builder-projector-rail]{left:10px;right:10px;bottom:10px;border-radius:22px}.wb-projector-copy b,.wb-projector-copy small{max-width:180px}.wb-account-panel{left:10px;right:10px;bottom:88px;width:auto}}';
+    return '[data-web-builder-projector-rail]{position:fixed;right:12px;bottom:12px;z-index:90;display:flex;gap:8px;align-items:center;max-width:min(560px,calc(100vw - 24px));border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:rgba(7,9,16,.9);backdrop-filter:blur(14px);box-shadow:0 18px 60px #0008;padding:8px 10px;color:var(--wb-text,#f7fbff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);font-size:12px}.wb-builder-tabs{position:sticky;top:0;z-index:89999;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid var(--wb-line,#ffffff22);background:rgba(7,9,16,.92);backdrop-filter:blur(14px);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif)}.wb-builder-tab{border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:#ffffff0d;color:var(--wb-text,#fff);text-decoration:none;font-weight:950;font-size:12px;padding:8px 10px}.wb-builder-tab.active{background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#061017}.mark img{width:100%;height:100%;object-fit:cover}.wb-projector-logo,.wb-account-avatar,.wb-brand-logo{background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));display:grid;place-items:center;color:#061017;font-weight:1000;overflow:hidden}.wb-projector-logo{width:38px;height:38px;min-width:38px;border-radius:14px}.wb-projector-logo img,.wb-account-avatar img,.wb-brand-logo img{width:100%;height:100%;object-fit:cover}.wb-projector-copy{min-width:0}.wb-projector-copy b{display:block;color:var(--wb-text,#fff);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}.wb-projector-copy small{display:block;color:var(--wb-muted,#aeb8d6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}.wb-projector-btn,.wb-secondary{border:0;border-radius:999px;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#061017;text-decoration:none;font-weight:950;padding:8px 10px;white-space:nowrap;cursor:pointer}.wb-secondary{background:#30384f;color:#fff}.wb-account-panel{position:fixed;right:12px;bottom:72px;z-index:91;width:min(440px,calc(100vw - 24px));max-height:min(74vh,680px);overflow:auto;border:1px solid var(--wb-line,#ffffff22);border-radius:28px;background:radial-gradient(circle at 0 0,color-mix(in srgb,var(--wb-accent,#22d3a6),transparent 72%),transparent 32%),linear-gradient(135deg,var(--wb-panel,#101529),var(--wb-panel-2,#17122d));box-shadow:0 24px 90px #000c;padding:14px;color:var(--wb-text,#fff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);display:none}.wb-account-panel.open{display:block}.wb-account-head,.wb-brand-mini,.wb-account-actions{display:flex;gap:10px;align-items:center}.wb-account-head{justify-content:space-between}.wb-account-avatar{width:72px;height:72px;min-width:72px;border-radius:22px}.wb-brand-logo{width:48px;height:48px;min-width:48px;border-radius:16px}.wb-account-head b,.wb-brand-mini b{display:block;color:var(--wb-text,#fff)}.wb-account-head small,.wb-brand-mini small,.wb-account-panel p,.wb-account-fav small{display:block;color:var(--wb-muted,#aeb8d6);line-height:1.45}.wb-panel-close{border:0;border-radius:999px;background:#ffffff14;color:#fff;width:34px;height:34px;font-weight:1000;cursor:pointer}.wb-account-panel h3{margin:14px 0 8px}.wb-account-favs{display:grid;gap:8px}.wb-account-fav{display:block;border:1px solid var(--wb-line,#ffffff22);border-radius:16px;background:#ffffff0d;padding:10px;text-decoration:none;color:var(--wb-text,#fff)}.wb-account-actions{justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.wb-empty{border:1px solid var(--wb-line,#ffffff22);border-radius:16px;padding:10px}.wb-favicon-helper{border-color:var(--wb-accent,#22d3a6)!important}@media(max-width:720px){[data-web-builder-projector-rail]{left:10px;right:10px;bottom:10px;border-radius:22px}.wb-projector-copy b,.wb-projector-copy small{max-width:180px}.wb-account-panel{left:10px;right:10px;bottom:88px;width:auto}.wb-builder-tabs{gap:6px;padding:8px 10px}.wb-builder-tab{flex:1 1 calc(25% - 6px);text-align:center;border-radius:16px;padding:9px 6px}}';
   }
   function bindPanel(){
     var rail = document.querySelector('[data-web-builder-projector-rail]');
@@ -150,6 +206,20 @@
     };
     document.querySelectorAll('[data-wb-panel-close]').forEach(function(btn){btn.onclick=function(){panel.classList.remove('open');panel.setAttribute('aria-hidden','true');};});
   }
+  function injectTabs(){
+    if(document.querySelector('[data-web-builder-tabs]')){
+      document.querySelector('[data-web-builder-tabs]').innerHTML = tabsHtml();
+      return;
+    }
+    var tabs = document.createElement('nav');
+    tabs.className = 'wb-builder-tabs';
+    tabs.setAttribute('data-web-builder-tabs','true');
+    tabs.setAttribute('aria-label','Web Builder navigation');
+    tabs.innerHTML = tabsHtml();
+    var header = document.querySelector('header.top') || document.querySelector('.top');
+    if(header && header.parentNode) header.parentNode.insertBefore(tabs, header.nextSibling);
+    else document.body.insertBefore(tabs, document.body.firstChild);
+  }
   function refreshChrome(s,textOverride){
     var title = document.querySelector('.wb-projector-copy b');
     var sub = document.querySelector('.wb-projector-copy small');
@@ -160,6 +230,7 @@
     if(logo) logo.innerHTML = avatarHtml(s);
     applyTopAvatar(s);
     applyFavicon(s);
+    injectTabs();
     if(panel){
       var wasOpen = panel.classList.contains('open');
       panel.outerHTML = panelHtml(s);
@@ -175,6 +246,7 @@
       style.textContent = styleText();
       document.head.appendChild(style);
     }
+    injectTabs();
     if(!document.querySelector('[data-web-builder-projector-rail]')){
       var rail = document.createElement('div');
       rail.setAttribute('data-web-builder-projector-rail','true');
@@ -186,7 +258,7 @@
     bindPanel();
   }
   function expose(s){
-    window.StreamBanditWebBuilderProjector = {version:VERSION,storageKey:STORAGE_KEY,state:s,connectedToLiveApp:false,appliedAt:new Date().toISOString(),accountOverlay:true,favouritesOverlay:true,faviconProjection:true,topAvatarProjection:true,saveSuccessText:SUCCESS};
+    window.StreamBanditWebBuilderProjector = {version:VERSION,storageKey:STORAGE_KEY,state:s,connectedToLiveApp:false,appliedAt:new Date().toISOString(),accountOverlay:true,favouritesOverlay:true,faviconProjection:true,topAvatarProjection:true,sharedHeaderTabs:true,saveSuccessText:SUCCESS};
     window.dispatchEvent(new CustomEvent('web-builder-projector-applied',{detail:window.StreamBanditWebBuilderProjector}));
   }
   function addFaviconField(s){
@@ -248,7 +320,8 @@
         el = el.parentNode;
       }
     },true);
-    document.addEventListener('change',function(e){ if(e.target && e.target.id === 'faviconUrl') saveFaviconFromField(); },true);
+    document.addEventListener('input',function(e){ if(e.target && ['slug','pageSlug','studioSlug','wbSlug'].indexOf(e.target.id) > -1) setTimeout(injectTabs,80); },true);
+    document.addEventListener('change',function(e){ if(e.target && e.target.id === 'faviconUrl') saveFaviconFromField(); if(e.target && ['slug','pageSlug','studioSlug','wbSlug'].indexOf(e.target.id) > -1) setTimeout(injectTabs,80); },true);
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',function(){apply();watchButtons();});
   else { apply(); watchButtons(); }
