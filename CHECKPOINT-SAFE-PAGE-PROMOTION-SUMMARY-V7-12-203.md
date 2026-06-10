@@ -1,127 +1,169 @@
-# Stream Bandit Checkpoint — Safe Page Promotion Summary V7.12.203
+# Stream Bandit / Web Builder Massive Checkpoint - V7.12.264.13
 
-Date: 2026-06-03
+Date: 2026-06-10
 
 ## Status
 
-RECORDED / SAFE PAGES PROMOTED BY CONTENT STATE.
+RECORDED / MASSIVE WEB BUILDER CORE CHECKPOINT PASSED.
 
-No route URLs were changed. The active menu/footer already point to these stable filenames. Promotion here means the current contents of these stable route files are now the accepted clean passed versions.
+This file overwrites the older safe page promotion checkpoint with the current truth after the Web Builder Supabase flow, owned preview, inline published forms, shared Web Builder tabs, Web Builder global search, Pages Manager jump search and Menu Builder jump search passes.
 
-## Current route baseline
+This is not a live `index.html` promotion. This is a checkpoint so we do not backtrack.
 
-- Registry baseline: `V7.12.189 Current Routes Registry / 53 Active Entries / 50 Unique URLs`
-- Active overlay entries: 53
-- Unique URLs: 50
-- Latest known route result: 50/50 routes loaded
-- Latest known protected-file result: 16/16 protected files loaded
+## Current stable rule
 
-## Passed safe pages in this run
+- Web Builder is now treated as its own builder area inside Stream Bandit.
+- Stream Bandit app shell, branding, favicon and movie pages remain separate.
+- Web Builder pages use Web Builder projector tabs/search.
+- Back is the only Stream Bandit route in the Web Builder shared tab group.
+- Inputs belong in overlays.
+- Outputs belong on clean page views.
+- Search should either globally find routes/pages or locally pinpoint/scroll to an item without hiding the list when the user asks for a jump search.
 
-### Live Readiness
+## Current Web Builder route flow
 
-- Route: `live-readiness-global-helpers-v7-10-2-test.html`
-- Current internal state: V7.12.196
-- Status: PASS
-- Purpose: shell/search/count foundation proof
+1. Hub: `web-builder-account-control-hub-v7-12-263-test.html`
+2. Pages: `web-builder-pages-manager-owned-v7-12-256-test.html`
+3. Web Builder / Publish: `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`
+4. Preview: `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`
+5. Menu: `web-builder-menu-builder-owned-v7-12-264-test.html`
+6. Form: `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>`
+7. Inbox: `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>`
+8. Back: `settings-platform-control-hub-v7-12-85-test.html`
 
-### Supabase saved-content routes
+## Passed Web Builder features in this checkpoint
 
-- Backup table created: `sb_site_pages_route_backup_v7_12_197`
-- Status: PASS
-- Purpose: corrected stale route strings inside `sb_site_pages.layout_json` and `settings_json`
-- Tested: Web Builder test-page, Published Preview, saved block buttons, Open Form, Form Inbox, home-page preview
+- Pages Manager reads `sb_site_pages`.
+- Pages Manager can save/create selected slug to `sb_site_pages`.
+- Pages Manager verifies saved row by readback.
+- Pages Manager has jump search that scrolls to a page card.
+- Web Builder / Publish route is the current builder path.
+- Published Preview reads the Supabase page slug.
+- Published Preview renders saved layout blocks.
+- Published Preview renders menu rows from `sb_site_pages.settings_json`.
+- Published Preview promotes hero block into the big top hero area.
+- Published Preview submits published forms inline.
+- Published Preview no longer needs a user-facing admin form route.
+- Published Preview hides empty left/right menu columns and expands content.
+- Shared Web Builder tabs are global for Web Builder pages that load the projector.
+- Global Web Builder search finds Web Builder tools/routes and Supabase pages.
+- Menu Builder uses single slim tabs.
+- Menu Builder inputs open in Edit overlay.
+- Menu Builder jump search scrolls to the target menu tab.
+- Menu Builder saves menu settings into `settings_json`.
+- Owned Inbox route is reachable from Web Builder shared tabs.
 
-### One Machine
+## User-tested passes recorded today
 
-- Route: `stream-bandit-one-machine-v7-12-73-test.html`
-- Current internal state: V7.12.198
-- Status: PASS
-- Purpose: read-only route/ownership truth page
-- Confirmed: 50/50 route scan, 16/16 protected-file witness list
+- Global Web Builder search - PASS.
+- Pages Manager jump search - PASS.
+- Menu Builder single slim tabs - PASS.
+- Menu Builder Edit overlay input rule - PASS.
+- Menu Builder jump search - PASS.
+- Published Preview hero promotion - PASS.
+- Published Preview inline forms - PASS.
+- Web Builder Inbox tab opens the owned inbox route - PASS.
 
-### Final Shell Navigation
+## Current Supabase tables in active use
 
-- Route: `stream-bandit-global-helper-shell-v7-12-126-test.html`
-- Current internal state: V7.12.200
-- Status: PASS
-- Purpose: final shell/navigation proof page
-- Confirmed: helper stack 7/7, saved counters restored, route proof 12/12, footer once
+- `sb_site_pages`
+- `sb_form_submissions`
+- `sb_profiles`
 
-### Permissions Matrix
+## Current Web Builder storage model
 
-- Route: `permissions-matrix-user-management-v7-11-4-test.html`
-- Current internal state: V7.12.202
-- Status: PASS
-- Purpose: researched role/plan/feature rule map
-- Important correction: V7.12.201 was too simplified; V7.12.202 restored the research/deep comparison content while preserving current shell/route/helper flow
-- Confirmed: no writes, no billing, no schema changes, no policy changes, no live promotion
+- Pages: `sb_site_pages`
+- Page blocks/layout: `sb_site_pages.layout_json`
+- Page/menu settings: `sb_site_pages.settings_json`
+- Form submissions: `sb_form_submissions`
+- Main account/admin profile: `sb_profiles`
 
-### Pricing Feature Shop
+## Seven-step live-promotion plan now locked
 
-- Route: `plans-pricing-feature-shop-v7-11-3-test.html`
-- Current internal state: V7.12.203
-- Status: PASS
-- Purpose: researched pricing/add-on/bundle strategy page
-- Preserved: 8-plan ladder, 24 add-ons, Bundle Builder, Feature Matrix, User Entitlements, safety/locked buttons
-- Confirmed: no checkout, no billing writes, no Supabase writes, no schema changes, no policy changes, no live promotion
+1. Finish Web Builder core blockers.
+   - Pages Manager real guarded delete.
+   - Verify empty preview blocks are hidden.
+   - Verify form submit -> owned inbox.
 
-## Stable route rule
+2. Build real Owner Admin Hub.
+   - Upgrade `user-management-dashboard-v7-11-2-test.html`.
+   - Owner can view users, restrict, limit, ban, unban, grant/remove admin.
+   - No toy wording in the live admin hub.
 
-Many routes keep older filenames while the internal page version moves forward. This is intentional. The overlay/footer route URL is the stable route truth. The page badge/version inside the file records the current content state.
+3. Add safe admin/account schema.
+   - `account_status`: active / limited / restricted / banned / review.
+   - admin level or role guard.
+   - `permissions_json`.
+   - `plan_key`.
+   - admin notes / managed by / managed at.
+   - audit log table or audit JSON trail.
 
-## What was not promoted
+4. Harden Supabase policies.
+   - Normal users cannot self-upgrade role.
+   - Normal users cannot unban/unlimit themselves.
+   - Owner/admin can manage users only through approved owner-safe rules.
+   - Public visitors can only do approved public actions.
 
-The following remain preservation-first and were not refit in this safe-page run:
+5. Connect Permissions Matrix to real controls.
+   - `permissions-matrix-user-management-v7-11-4-test.html` becomes the rulebook.
+   - Admin Hub applies the rulebook.
+   - Pricing page remains research/draft until billing exists.
 
-- Web Builder
-- Pages Manager
-- Form Inbox
-- Advanced Form
-- Movie Row Editor / Supabase Library Editor
-- Player 2
-- Profile Settings
-- Policy Admin publish logic
+6. Whole app polish scan.
+   - Stream Bandit pages, not just Web Builder.
+   - Headers, footers, search, routes, duplicate buttons, old stale wording.
+   - Mobile layout and deaf/accessibility/player-comfort checks.
 
-## Current next direction
+7. Final smoke test before promotion.
+   - Owner login.
+   - Normal user login.
+   - Banned/limited user test.
+   - Web Builder route flow.
+   - Public preview/form test.
+   - Main Stream Bandit watch/search/browse test.
+   - Backups/manifest/control map updated.
 
-Next target: `user-management-dashboard-v7-11-2-test.html`
+## Current next target
+
+Next target remains:
+
+- `web-builder-pages-manager-owned-v7-12-256-test.html`
 
 Reason:
 
-- It is the remaining User Management companion page.
-- It already has current live controls around `sb_profiles.role` and `sb_profiles.can_submit`.
-- It should become a functional testing dashboard, more like Pricing Feature Shop, while staying safe.
+- Pages Manager still needs a real guarded delete function.
+- The delete must be admin-only, confirmation-overlay based, and scoped to a selected `sb_site_pages` row only.
+- Landing/home protection remains locked.
+- No file delete.
+- No route delete.
+- No schema/storage change.
 
-## User Dashboard next requirements
+After Pages Manager delete passes, move to:
 
-Desired direction:
+- `user-management-dashboard-v7-11-2-test.html`
 
-- Keep Header Shell + Page Content + Footer Shell + Theme Projector.
-- Preserve current working profile/can_submit logic.
-- Make it more useful for testing.
-- Add a safe manual test-user/profile planning flow if possible.
-- Do not pretend the frontend can safely create real Supabase Auth users.
-- No service-role secrets in frontend.
-- No unsafe delete user action.
-- Remove/delete should remain disabled or become a local/archive-style test action only until backend/admin support exists.
+Reason:
 
-## Important Auth clarification
+- The Admin Hub must become the real owner control room before live promotion.
+- It must not remain a toy/planner page.
+- It must control user access safely with owner-only rules and Supabase policy hardening.
 
-A frontend page using the public Supabase anon key should not create real Supabase Auth users on behalf of admin. Real user creation by email requires one of these safe paths:
+## Safety locks
 
-1. the user signs up/logs in normally through Supabase Auth, then a profile row is created/managed;
-2. an owner/admin backend or Supabase Edge Function using service-role permissions creates/invites the user safely;
-3. a manual testing row is created as a planned/invite/profile placeholder, clearly not a real login account.
+- `index.html` promotion: false.
+- active app route registry promotion: false.
+- Stream Bandit app shell changes: false.
+- Stream Bandit app branding changes: false.
+- frontend service-role secrets: false.
+- unsafe user creation: false.
+- unsafe user delete: false.
+- schema change without approval: false.
+- storage change without approval: false.
 
-## Safety pledge for next page
+## Do not backtrack
 
-Before editing User Dashboard:
-
-- scan the current file,
-- identify actual Supabase writes,
-- preserve working role/can_submit logic,
-- do one page only,
-- no broad patching,
-- no real delete user unless backend/RLS is proven safe,
-- no billing/plan writes yet.
+Do not return Web Builder menu/page controls to large input-card rows.
+Do not put menu inputs back directly on the output list.
+Do not replace jump search with list filtering where the user asked for pinpoint scroll.
+Do not send published users to admin form routes.
+Do not mix Stream Bandit app theme projector with Web Builder projector.
