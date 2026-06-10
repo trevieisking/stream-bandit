@@ -1,24 +1,26 @@
-# Stream Bandit Current App Manifest V7.12.263.8
+# Stream Bandit Current App Manifest V7.12.264.20
 
-Date: 2026-06-09
+Date: 2026-06-11
 
-Purpose: current protected route and recovery truth for Stream Bandit after the Web Builder doorway alignment pass. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
+Purpose: current protected route and recovery truth for Stream Bandit after the Web Builder core pass, Owner Admin hard-lock pass and the next Supabase Library multi-stream URL target. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
 
 ## Current strongest pause point
 
 Current state:
 
-- V7.12.263.8 current app truth.
-- Web Builder is now one clean doorway from the Stream Bandit app into the Web Builder Hub.
-- Main app `Web Builder` route now points to `web-builder-account-control-hub-v7-12-263-test.html`.
-- Old live studio URL `web-builder-live-studio-v7-12-116-test.html?page=test-page` now redirects to the Web Builder Hub.
-- Form Inbox and Advanced Form remain linked from the main app and from Web Builder.
+- V7.12.264.20 current app truth.
+- Web Builder core blockers are user-tested complete for the current controlled candidate.
+- Owner/Admin backend protection is now the current safety pattern: only `trevieisking@gmail.com` should be able to perform owner/admin profile-management actions.
+- The reusable owner/admin lock pattern is: owner email check + owner/admin profile check + protected-field trigger + owner-only RPC check + audit log.
+- The emergency SQL reset passed for the non-owner account after temporarily disabling and re-enabling the profile protection trigger for manual SQL Editor repair.
+- The `sb_profiles` account-management fields now exist: `account_status`, `admin_level`, `permissions_json`, `plan_key`, `admin_notes`, `managed_by`, `managed_at`.
+- The `sb_admin_audit_log` table exists and is the owner/admin action audit target.
+- Main app `Web Builder` route points to `web-builder-account-control-hub-v7-12-263-test.html`.
 - Stream Bandit app branding remains app-owned and unchanged.
 - Web Builder branding/projector starts inside Web Builder pages only.
 - `index.html` was not touched.
 - Footer shell was not touched.
-- No schema changes.
-- No storage changes.
+- Next important repair target: Supabase Library playback/rendering must support YouTube, Vimeo and other safe stream URLs, not only Mux/HLS URLs.
 
 ## Fresh Current Routes Registry proof target
 
@@ -26,12 +28,12 @@ Source page: `all-pages-version-registry-v7-12-122-current-routes-test.html`
 
 Registry page has been aligned to the Web Builder doorway pass:
 
-- Registry version: `V7.12.263.8 Current Routes Registry / 51 Active Entries / 50 Unique URLs`.
+- Last known registry version: `V7.12.263.8 Current Routes Registry / 51 Active Entries / 50 Unique URLs`.
 - Active overlay entries: `51`.
 - Unique URLs: `50`.
 - Web Builder doorway route: `web-builder-account-control-hub-v7-12-263-test.html`.
 - Old Web Builder live studio route remains as a redirect/fallback route, not the active menu doorway.
-- Next required proof: owner/admin should run `Scan All` from the registry and confirm route/file bad lists are empty.
+- Next required proof: owner/admin should run `Scan All` from the registry and confirm route/file bad lists are empty after the Owner Admin and Supabase Library fixes.
 
 ## Current promoted internal states
 
@@ -39,8 +41,10 @@ Registry page has been aligned to the Web Builder doorway pass:
 - `stream-bandit-global-helper-loader-v7-12-126.js` - V7.12.186 Global Helper Loader / Owner Brand Route Truth, with global Web Builder alias aligned to the Web Builder Hub.
 - `web-builder-live-studio-v7-12-116-test.html?page=test-page` - old Web Builder live studio URL now redirects to `web-builder-account-control-hub-v7-12-263-test.html`.
 - `web-builder-account-control-hub-v7-12-263-test.html` - Web Builder Hub / doorway page.
-- `WEB-BUILDER-MANIFEST-V7-12-252.md` - Web Builder-only manifest updated to V7.12.263 with projector pass and doorway rule.
+- `WEB-BUILDER-MANIFEST-V7-12-252.md` - Web Builder-only manifest records the V7.12.264.16 Web Builder core blocker pass.
 - `all-pages-version-registry-v7-12-122-current-routes-test.html` - V7.12.263.8 registry aligned to the Web Builder doorway route.
+- `user-management-dashboard-v7-11-2-test.html` - Owner Admin Hub route; UI still needs the full owner-email gate page replacement, while backend owner/admin RPC and trigger protection are the current safety source of truth.
+- `permissions-matrix-user-management-v7-11-4-test.html` - permissions rulebook/reference page.
 - `profile-settings-live-ready-v7-12-90-test.html` - Profile Settings sign-out / existing-user flow.
 - `policy-admin-documents-v7-12-120-test.html?policy=terms` - Policy Admin Editor Centre restored.
 - `storage-prep-global-helpers-v7-10-8-test.html` - Storage Prep Image URL Workshop.
@@ -49,7 +53,7 @@ Registry page has been aligned to the Web Builder doorway pass:
 - `backup-safety-global-helpers-v7-10-9-test.html` - Backup / Safety Owner Utility.
 - `health-check-global-helpers-v7-10-6-test.html` - Health Check Owner Diagnostic.
 - `test-checklist-global-helpers-v7-10-5-test.html` - Test Checklist Owner QA Utility.
-- `supabase-library-home-header-form-fix-v7-12-34-test.html` - Supabase Library Editor / Shell Route Preservation.
+- `supabase-library-home-header-form-fix-v7-12-34-test.html` - Supabase Library Editor / Shell Route Preservation; next target for multi-provider stream URL rendering.
 - `admin-centre-command-deck-v7-12-121-test.html` - Admin Centre Route Command Deck.
 - `web-builder-pages-manager-v7-12-111-test.html` - current app Pages Manager reference route.
 - `watch-history-global-helpers-v7-4-0-test.html` - Watch History title cleanup full-page replacement.
@@ -140,7 +144,7 @@ Registry page has been aligned to the Web Builder doorway pass:
 
 ### User Management
 
-1. User Dashboard - `user-management-dashboard-v7-11-2-test.html`
+1. Owner Admin Hub - `user-management-dashboard-v7-11-2-test.html`
 2. Pricing Matrix / Pricing Feature Shop - `plans-pricing-feature-shop-v7-11-3-test.html`
 3. Permissions Matrix - `permissions-matrix-user-management-v7-11-4-test.html`
 
@@ -185,6 +189,16 @@ Registry page has been aligned to the Web Builder doorway pass:
 - Published Preview remains preserved at the current app reference URL.
 - Builder / Advanced Form / Form Inbox links keep the selected slug where those app reference routes use `page=test-page`.
 
+### Owner Admin hard-lock chain
+
+- `sb_profiles` protected account fields exist for account status, admin level, permissions JSON, plan key, admin notes, managed by and managed at.
+- `sb_admin_audit_log` exists for owner/admin action proof.
+- `sb_is_owner()` is now the reusable owner/admin gate pattern and should be reused on every future owner/admin route.
+- `sb_profiles_protect_admin_fields_trigger` prevents normal app users from self-changing protected account/admin fields.
+- `sb_owner_manage_profile()` is the intended owner-only profile-management RPC.
+- Manual SQL Editor repair passed by temporarily disabling the protection trigger, resetting the non-owner test account, and re-enabling the trigger.
+- This lock pattern is reusable for Owner Admin Hub, Admin Centre, policy admin, storage/admin tools and future billing/account pages.
+
 ### Supabase Library chain
 
 - Supabase Library Editor loads rows from `sb_movies`.
@@ -192,108 +206,33 @@ Registry page has been aligned to the Web Builder doorway pass:
 - Create/edit overlays remain present.
 - Poster preview still shows.
 - Copy ID, Details, Player 1 and Play All to current Player 2 work.
-- Player 2 route is `player-2-clean-machine-v7-12-58-test.html`.
+- Current problem to fix next: Supabase Library rendering/playback currently favors Mux/HLS stream URLs and must be upgraded to render YouTube, Vimeo and other safe stream URLs.
+- Clean target: keep one canonical source resolver that detects URL provider/type, stores provider metadata safely, and sends playable URLs to Details/Player without breaking existing Mux/HLS rows.
 
 ### Admin Centre chain
 
 - Admin Centre opens.
 - Header/footer/saved counters/account panel work.
-- Route check, Copy Admin Map, Download Admin Report and Refresh Helpers work.
-- Debug shows `linkOnly: true`.
 
-### Owner brand/icon chain
+## Current blocker and next target
 
-- Brand / App Icons opens and reads the global logo.
-- Brand / App Icons drag/drop is the main upload flow and file picker remains as fallback.
-- Global app branding remains app-owned.
-- Web Builder branding does not overwrite Stream Bandit app branding.
+Current blocker:
 
-### Theme / Accessibility owner chain
+- Supabase Library must support non-Mux stream URLs.
+- YouTube, Vimeo and other safe stream URLs must render/play correctly from Supabase Library rows.
+- Existing Mux/HLS behavior must not be broken.
 
-- Theme Studio remains the single global app theme owner.
-- Theme Studio saves global theme to `sb_app_settings` and local theme keys.
-- Header and Footer Shell pages read/project saved theme variables.
-- Accessibility controls readability comfort through local Theme Projector keys.
-- Accessibility current Player 2 route is fixed to `player-2-clean-machine-v7-12-58-test.html`.
+Next target:
 
-## Protected shell/helper files
+- `supabase-library-home-header-form-fix-v7-12-34-test.html`
 
-- `stream-bandit-header-shell-v7-12-156.js`
-- `stream-bandit-footer-shell-v7-12-156.js`
-- `stream-bandit-theme-projector-v7-12-156.js`
-- `stream-bandit-settings-global-v7-1-8.js`
-- `stream-bandit-brand-logo-v7-12-12.js`
-- `stream-bandit-menu-saves-count-v6-72-1.js`
-- `stream-bandit-core-saves-v6-75.js`
-- `live-readiness-search-supabase-fallback-v7-12-130.js`
-- `stream-bandit-profile-signin-v7-12-156.js`
-- `stream-bandit-shell-v6-24.js`
-- `stream-bandit-global-helper-loader-v7-12-126.js`
-- `CURRENT-APP-MANIFEST-V7-12-180.md`
-- `WEB-BUILDER-MANIFEST-V7-12-252.md`
-- `all-pages-version-registry-v7-12-122-current-routes-test.html`
-- `web-builder-account-control-hub-v7-12-263-test.html`
+Cleanest planned fix:
 
-## Web Builder future architecture note
-
-Current builder tools live inside Stream Bandit. Current safe direction is to make Web Builder its own Builder Studio workspace with one clear app doorway and one clear Back to Stream Bandit route.
-
-Do not split to a new repository yet. First make the in-app Builder Studio flow stable:
-
-- Web Builder Hub
-- Studio Shell
-- Pages Manager
-- Published Preview
-- Advanced Form
-- Form Inbox
-- Theme/Brand/Assets tools
-
-Later architecture can consider:
-
-- `builder.chatterfriendsstreambandit.co.uk`
-- `studio.chatterfriendsstreambandit.co.uk`
-- customer subdomains
-- custom domain publishing
-- deployment/publishing workflows
-
-## Do not casually rewrite
-
-Do not casually rewrite these without a dedicated preservation plan:
-
-- Player 2 engine.
-- Supabase Library / Movie Row Editor.
-- Theme Studio.
-- Profile Settings.
-- Web Builder Hub / Web Builder projector pages.
-- Policy Admin publish logic.
-- Form Inbox private-message logic.
-- Advanced Form submission/upload logic.
-- Pages Manager page-row workflow.
-- Published Preview renderer.
-- User Management live `role + can_submit` controls.
-- Global Brand Logo helper.
-- Brand / App Icons global upload/save logic.
-- Continue Watching progress/resume logic.
-- Tools Cast Writer Details-format logic.
-- Header Shell brand/profile ownership split.
-
-## Next recommended moves
-
-1. Owner/admin should run Current Routes Registry `Scan All` after this manifest and registry alignment.
-2. Confirm route bad list is empty.
-3. Confirm protected file bad list is empty.
-4. Confirm Stream Bandit menu -> Web Builder opens the Web Builder Hub.
-5. Confirm old live studio URL redirects to the Web Builder Hub.
-6. Confirm Form Inbox and Advanced Form still open from the main app.
-7. Only after these pass, prepare the final live promotion step.
-
-## What not to delete
-
-- Anything listed in this manifest.
-- Any page linked from the overlay menu.
-- Any current shell/helper file.
-- Any current source/dependency page.
-- Any asset/icon/logo used by protected pages.
-- Any config source file used by current frontend.
-- Any checkpoint file recording a pass from the current Web Builder projector/doorway chain.
-- Do not delete the working current logo/storage assets without a dedicated asset cleanup pass.
+1. Scan the Library editor row schema and current play/render helpers.
+2. Add a single provider/source resolver.
+3. Detect `mux`, `hls`, `youtube`, `vimeo`, direct video file, iframe/embed URL and generic external link.
+4. Keep direct `<video>` playback for Mux/HLS/MP4/WebM/MOV style URLs.
+5. Use safe embed conversion for YouTube/Vimeo preview/player routes.
+6. Preserve all existing Supabase fields and avoid a schema change unless the page already has provider/source fields.
+7. If schema is missing provider fields, use derived provider detection first and only propose optional columns after the page works.
+8. Test old Mux rows and new YouTube/Vimeo rows before manifesting pass.
