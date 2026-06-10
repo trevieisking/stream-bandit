@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.264.13
+# Web Builder Manifest V7.12.264.16
 
 ## Purpose
 
@@ -8,11 +8,11 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 
 ## Massive checkpoint status
 
-Status: RECORDED / PASSED FOR CURRENT WEB BUILDER CORE FLOW.
+Status: RECORDED / WEB BUILDER CORE BLOCKERS COMPLETE FOR CURRENT CONTROLLED PROMOTION CANDIDATE.
 
-This checkpoint records the work completed across the Web Builder Supabase page flow, owned preview, inline published forms, shared Web Builder tabs, global Web Builder search, Pages Manager jump search, Menu Builder slim tabs, Menu Builder edit overlay, and Menu Builder jump search.
+This checkpoint records the work completed across the Web Builder Supabase page flow, owned preview, inline published forms, shared Web Builder tabs, global Web Builder search, Pages Manager jump search, Menu Builder slim tabs, Menu Builder edit overlay, Menu Builder jump search, guarded Supabase page delete, image upload form fields and empty published preview block guards.
 
-No live `index.html` promotion was done. No main Stream Bandit shell rewrite was done. No storage schema was changed in these page passes.
+No live `index.html` promotion was done. No main Stream Bandit shell rewrite was done. No schema/storage table change was done in these page passes.
 
 ## Current doorway rule
 
@@ -47,6 +47,7 @@ Not promoted yet:
 - Builder/editor controls should not be scattered through visitor previews or output dashboards.
 - Page views should show results, previews, cards, route maps, reports, inbox output, menus and asset libraries.
 - Page-specific searches should pinpoint and scroll to the target item rather than hiding the rest of the list when the user wants a jump search.
+- Public/published preview hides empty placeholder blocks and only shows real configured content.
 
 ## Core add/remove rule
 
@@ -54,13 +55,13 @@ Not promoted yet:
 - Delete/remove must be guarded and clearly scoped.
 - Landing/home guard remains protected until a real replacement-home flow exists.
 - No delete action may silently remove files, routes, rows, or current app pages.
-- Soft remove/archive is acceptable where hard delete is not yet approved.
+- Pages Manager can delete a selected non-protected `sb_site_pages` row only after admin check, exact slug confirmation and readback verification.
 
 ## Current verified Web Builder flow
 
 Normal route flow:
 
-1. Pages Manager creates or saves a slug.
+1. Pages Manager creates, saves, finds and deletes page rows.
 2. Web Builder / Publish opens `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`.
 3. Published Preview opens `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`.
 4. Menu Builder controls the published menu via `sb_site_pages.settings_json`.
@@ -105,24 +106,26 @@ Current Web Builder shared tabs:
 - `V7.12.264.4 Published Preview inline form submissions` - PASS.
 - `V7.12.264.5 Shared Web Builder header tabs` - PASS.
 - `V7.12.264.9 Menu Builder single slim tabs + edit overlay inputs` - PASS.
-- `V7.12.264.10 Published Preview empty side menus auto-expand` - PASS/PENDING USER FINAL VISUAL CHECK.
+- `V7.12.264.10 Published Preview empty side menus auto-expand` - PASS.
 - `V7.12.264.11 Global Web Builder search in shared header` - PASS.
 - `V7.12.264.12 Pages Manager jump search` - PASS.
 - `V7.12.264.13 Menu Builder jump search` - PASS.
+- `V7.12.264.14 Pages Manager guarded Supabase delete` - PASS.
+- `V7.12.264.15 Form Designer image uploads + compact overlay` - PASS.
+- `V7.12.264.16 Published Preview empty block guard + form submit to owned inbox verification` - PASS.
 
-## Latest verified pass - V7.12.264.13 Search + Findability
+## Latest verified pass - V7.12.264.16 Web Builder core blockers
 
 User-tested result:
 
-- Global Web Builder search appears in the shared header - PASS.
-- Global Web Builder search can find tools/routes/pages - PASS.
-- Pages Manager jump search finds a page by title or slug - PASS.
-- Pages Manager jump search scrolls to the page card without hiding the list - PASS.
-- Menu Builder shows single slim tabs - PASS.
-- Menu Builder edit controls open in overlay - PASS.
-- Menu Builder inputs are not displayed directly on the output row - PASS.
-- Menu Builder jump search finds a menu page by title or slug - PASS.
-- Menu Builder jump search scrolls to the matching slim tab without hiding the list - PASS.
+- Pages Manager guarded delete removes test creations and keeps pages organized - PASS.
+- Pages Manager landing/home guard remains protected - PASS.
+- Menu Builder rows stay single slim tabs with Edit overlay - PASS.
+- Form Designer image/file upload field works with the existing `stream-bandit-images` bucket - PASS.
+- Form Builder overlay is compact and no longer shows giant field input blocks - PASS.
+- Published Preview hides empty blocks and shows them when configured - PASS.
+- Published Preview form submit reaches the owned inbox route - PASS.
+- Email/inbox/private destination selection is visible and usable - PASS.
 
 ## Current route set
 
@@ -163,15 +166,16 @@ Current page/menu/form storage:
 - Page layout lives in `layout_json`.
 - Menu settings live in `settings_json`.
 - Form submissions live in `sb_form_submissions`.
+- Form upload images use Storage bucket `stream-bandit-images`.
 
 Do not claim public anonymous production readiness until the RLS/policy pass is verified after deploy.
 
 ## Seven-step live-promotion plan now locked
 
-1. Finish Web Builder core blockers.
-   - Pages Manager real guarded delete.
-   - Verify empty preview blocks are hidden.
-   - Verify form submit -> owned inbox.
+1. Finish Web Builder core blockers - COMPLETE FOR CURRENT CONTROLLED CANDIDATE.
+   - Pages Manager real guarded delete - PASS.
+   - Empty preview blocks hidden - PASS.
+   - Form submit -> owned inbox - PASS.
 2. Build real Owner Admin Hub.
    - Upgrade `user-management-dashboard-v7-11-2-test.html`.
    - Owner can view users, restrict, limit, ban, unban, grant/remove admin.
@@ -205,14 +209,15 @@ Do not claim public anonymous production readiness until the RLS/policy pass is 
    - Main Stream Bandit watch/search/browse test.
    - Backups/manifest/control map updated.
 
-## Pending final visible fixes
+## Current next target
 
-- Add a guarded real delete function to `web-builder-pages-manager-owned-v7-12-256-test.html`.
-- Verify empty preview blocks are hidden, not just side-menu boxes.
-- Verify published form submission appears in owned inbox.
-- Build real owner-only admin/account control hub.
-- Harden Supabase account/public policies.
-- Clean any remaining duplicate local route buttons where the shared Web Builder tabs are now present.
+- `user-management-dashboard-v7-11-2-test.html`
+
+Reason:
+
+- The Admin Hub must become the real owner control room before live promotion.
+- It must not remain a toy/planner page.
+- It must control user access safely with owner-only rules and Supabase policy hardening.
 
 ## Safety locks
 
@@ -220,7 +225,10 @@ Do not claim public anonymous production readiness until the RLS/policy pass is 
 - current app registry promotion: false.
 - Stream Bandit app branding changes: false.
 - Stream Bandit app shell changes: false.
-- schema changes in page files: false.
-- storage changes in these page-route passes: false.
 - separate Web Builder account system: false for now.
 - main Stream Bandit Auth/admin session remains the Web Builder admin owner for now.
+- frontend service-role secrets: false.
+- unsafe user creation: false.
+- unsafe user delete: false.
+- schema change without approval: false.
+- storage change without approval: false.
