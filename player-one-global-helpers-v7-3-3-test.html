@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Player 1 V7.12.157</title>
+<title>Stream Bandit Player 1 V7.12.266</title>
 <link rel="icon" type="image/png" sizes="16x16" href="stream_bandit_stag_icon_16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple_touch_icon_180.png">
@@ -11,58 +11,1056 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
-*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}
-body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}
-.wrap{max-width:1480px;margin:auto}.hero,.box,.card{border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 12px 38px #0006;padding:14px;margin-bottom:12px}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:5px 9px;font-size:11px}.pill{padding:4px 7px;font-size:10px;margin:2px}h1{font-size:clamp(34px,4.3vw,56px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 9px;font-size:22px}.muted,p,small,label{color:var(--muted);line-height:1.42}.hero p,.card p{margin-top:5px;margin-bottom:7px}.btn,.tab{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.btn.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.btn[disabled]{opacity:.65;cursor:wait}.status,.note{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.grid,.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.card{background:#ffffff0f;box-shadow:none;margin:0}.card b{display:block;color:#baf7df;margin-bottom:6px}.card p{margin:0;font-size:12px}.player{border:1px solid #ffffff1f;border-radius:22px;background:#02040d;overflow:hidden;box-shadow:0 14px 46px #0008}.frame{aspect-ratio:16/9;background:#000;display:grid;place-items:center;min-height:260px}.frame video,.frame iframe{width:100%;height:100%;border:0;background:#000}.bar{display:grid;gap:9px;padding:11px;border-top:1px solid #ffffff1a;background:#090c19eb}.controls,.actions,.tabs{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.select,.range{border:1px solid #ffffff24;border-radius:999px;background:#050711c7;color:#fff;padding:8px 10px;font-weight:850;font-size:13px}.range{padding:0;width:140px}.layout{display:grid;grid-template-columns:minmax(300px,1fr) minmax(300px,.95fr);gap:14px}.section{display:none}.section.active{display:block}.source{font-family:ui-monospace,Consolas,monospace;word-break:break-all;background:#0004;border-radius:14px;padding:11px;color:#dfffee;white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px}.saveStatus{font-size:11px;color:#baf7df;margin-top:7px;min-height:14px}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}@media(max-width:980px){body{padding:10px}.layout{grid-template-columns:1fr}.btn,.tab{width:100%;white-space:normal}.frame{min-height:190px}.range{width:100%}}
+:root{
+  color-scheme:dark;
+  --bg:#050711;
+  --p:#101529;
+  --p2:#17122d;
+  --line:#ffffff22;
+  --muted:#b9c0d8;
+  --accent:#22d3a6;
+  --accent2:#7c3cff;
+  --pink:#ff2d85;
+  --warn:#ffb142;
+  --bad:#ff4d6d;
+  --cyan:#41e8ff;
+  --btnText:#fff;
+  --fontScale:1;
+}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
+body{
+  margin:0;
+  padding:14px;
+  background:
+    radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),
+    radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),
+    var(--bg);
+  color:#fff;
+  font-family:Inter,system-ui,Arial,sans-serif;
+  font-size:calc(14px * var(--fontScale));
+}
+.wrap{max-width:1480px;margin:auto}
+.hero,.box,.card{
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  box-shadow:0 12px 38px #0006;
+  padding:14px;
+  margin-bottom:12px;
+}
+.badge,.pill{
+  display:inline-flex;
+  border-radius:999px;
+  background:#22d3a624;
+  border:1px solid #22d3a657;
+  color:#baf7df;
+  font-weight:950;
+  align-items:center;
+  gap:6px;
+}
+.badge{padding:5px 9px;font-size:11px}
+.pill{padding:4px 7px;font-size:10px;margin:2px}
+.warnPill{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}
+.badPill{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}
+.cyanPill{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}
+h1{font-size:clamp(34px,4.3vw,56px);line-height:.95;margin:8px 0;letter-spacing:-.055em}
+h2{margin:0 0 9px;font-size:22px}
+.muted,p,small,label{color:var(--muted);line-height:1.42}
+.hero p,.card p{margin-top:5px;margin-bottom:7px}
+.btn,.tab{
+  border:0;
+  border-radius:999px;
+  padding:8px 12px;
+  background:#414667;
+  color:var(--btnText);
+  font-weight:950;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:13px;
+}
+.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}
+.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}
+.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}
+.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}
+.btn[disabled],input[disabled],select[disabled]{opacity:.55;cursor:not-allowed}
+.status,.note,.danger,.good{
+  padding:9px 11px;
+  border-radius:15px;
+  background:#22d3a61a;
+  border:1px solid #22d3a647;
+  color:#dfffee;
+  font-weight:850;
+  margin-top:9px;
+}
+.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
+.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}
+.good{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}
+.grid,.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.card{background:#ffffff0f;box-shadow:none;margin:0}
+.card b{display:block;color:#baf7df;margin-bottom:6px}
+.card p{margin:0;font-size:12px}
+.player{
+  border:1px solid #ffffff1f;
+  border-radius:22px;
+  background:#02040d;
+  overflow:hidden;
+  box-shadow:0 14px 46px #0008;
+}
+.frame{
+  aspect-ratio:16/9;
+  background:#000;
+  display:grid;
+  place-items:center;
+  min-height:260px;
+}
+.frame video,.frame iframe{
+  width:100%;
+  height:100%;
+  border:0;
+  background:#000;
+}
+.bar{
+  display:grid;
+  gap:9px;
+  padding:11px;
+  border-top:1px solid #ffffff1a;
+  background:#090c19eb;
+}
+.controls,.actions,.tabs{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.select,.range{
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  background:#050711c7;
+  color:#fff;
+  padding:8px 10px;
+  font-weight:850;
+  font-size:13px;
+}
+.range{padding:0;width:140px}
+.layout{display:grid;grid-template-columns:minmax(300px,1fr) minmax(300px,.95fr);gap:14px}
+.section{display:none}
+.section.active{display:block}
+.source{
+  font-family:ui-monospace,Consolas,monospace;
+  word-break:break-all;
+  background:#0004;
+  border-radius:14px;
+  padding:11px;
+  color:#dfffee;
+  white-space:pre-wrap;
+  max-height:320px;
+  overflow:auto;
+  font-size:12px;
+}
+.saveStatus{font-size:11px;color:#baf7df;margin-top:7px;min-height:14px}
+.providerNote{margin-top:8px}
+.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
+@media(max-width:980px){
+  body{padding:10px}
+  .layout{grid-template-columns:1fr}
+  .btn,.tab{width:100%;white-space:normal}
+  .frame{min-height:190px}
+  .range{width:100%}
+}
 </style>
 </head>
 <body data-sb-player-menu-url="player-one-global-helpers-v7-3-3-test.html">
 <div class="wrap">
-<section class="hero"><span class="badge">V7.12.157 Player 1 · Polished</span><h1 id="title">Stream Bandit Player 1</h1><p>Compact single-title player with comfort controls, louder audio, fullscreen, resume/history helpers and save buttons.</p><div id="status" class="status">Loading Player 1...</div><div id="helperStatus" class="note">Checking foundation...</div></section>
-<section class="box"><div class="player"><div id="frame" class="frame"><div style="color:#b9c0d8">Loading player...</div></div><div class="bar"><div class="controls"><button id="playPause" class="btn hot" type="button">Play / Pause</button><button id="rewind" class="btn" type="button">↩ 10s</button><button id="forward" class="btn" type="button">10s ↪</button><button id="fullscreen" class="btn primary" type="button">Fullscreen</button><button id="pip" class="btn" type="button">Picture-in-picture</button></div><div class="controls"><label>Volume</label><input id="volume" class="range" type="range" min="0" max="1" step="0.01" value="1"><label>Audio boost</label><select id="boost" class="select"><option value="1">Normal 100%</option><option value="1.5">150%</option><option value="2">200%</option><option value="3">300%</option><option value="4">400%</option></select><a class="btn" href="accessibility-clean-machine-v7-12-44-test.html">Player Comfort</a></div></div></div></section>
-<section class="box"><div class="layout"><div><h2 id="movieTitle">Movie info</h2><div id="pills"></div><p id="description">Loading...</p><div class="actions"><a id="detailsLink" class="btn primary" href="details-clean-machine-v7-12-38-test.html">Details</a><span id="saveButtons" class="actions"></span></div><div id="saveStatus" class="saveStatus"></div></div><aside><h2>Playback monitor</h2><div id="monitor" class="meta"></div><h2 style="margin-top:14px">Source URL</h2><div id="sourceUrl" class="source">Loading...</div></aside></div></section>
-<section class="box"><div class="tabs"><button class="tab active" data-tab="comfort" type="button">Comfort</button><button class="tab" data-tab="source" type="button">Source</button><button class="tab" data-tab="saves" type="button">Saves</button><button class="tab" data-tab="progress" type="button">Progress</button></div></section>
-<section id="comfort" class="box section active"><h2>Comfort controls</h2><div class="grid"><div class="card"><b>Louder audio</b><p>Volume and audio boost stay visible.</p></div><div class="card"><b>Fullscreen</b><p>Fullscreen targets the player frame.</p></div><div class="card"><b>PiP</b><p>Picture-in-picture works when the browser/source allows it.</p></div></div></section>
-<section id="source" class="box section"><h2>Source Info</h2><div id="sourceInfo" class="meta"></div></section>
-<section id="saves" class="box section"><h2>Save State</h2><div id="saveState" class="source">Waiting for saves...</div></section>
-<section id="progress" class="box section"><h2>Progress helpers</h2><div id="progressState" class="source">Checking helpers...</div></section>
-<p class="micro">Player 1 refit: Header Shell + Player Content + Footer Shell. Old Player 1 URL preserved.</p>
+
+<section class="hero">
+  <span class="badge">V7.12.266 Player 1 Multi-provider Promoted</span>
+  <h1 id="title">Stream Bandit Player 1</h1>
+  <p>Compact single-title player with Mux/HLS/direct video boost preserved, plus YouTube/Vimeo iframe support.</p>
+  <div class="actions">
+    <a id="detailsTop" class="btn primary" href="details-clean-machine-v7-12-38-test.html">Details</a>
+    <a class="btn cyan" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Supabase Library Editor</a>
+    <a class="btn" href="accessibility-clean-machine-v7-12-44-test.html">Player Comfort</a>
+  </div>
+  <div id="status" class="status">Loading Player 1...</div>
+  <div id="helperStatus" class="note">Checking foundation...</div>
+</section>
+
+<section class="box">
+  <div class="player">
+    <div id="frame" class="frame"><div style="color:#b9c0d8">Loading player...</div></div>
+    <div class="bar">
+      <div class="controls">
+        <button id="playPause" class="btn hot" type="button">Play / Pause</button>
+        <button id="rewind" class="btn" type="button">Back 10s</button>
+        <button id="forward" class="btn" type="button">Forward 10s</button>
+        <button id="fullscreen" class="btn primary" type="button">Fullscreen</button>
+        <button id="pip" class="btn" type="button">Picture-in-picture</button>
+      </div>
+      <div class="controls">
+        <label>Volume</label>
+        <input id="volume" class="range" type="range" min="0" max="1" step="0.01" value="1">
+        <label>Audio boost</label>
+        <select id="boost" class="select">
+          <option value="1">Normal 100%</option>
+          <option value="1.5">150%</option>
+          <option value="2">200%</option>
+          <option value="3">300%</option>
+          <option value="4">400%</option>
+        </select>
+      </div>
+      <div id="providerNote" class="providerNote note">Provider check waiting...</div>
+    </div>
+  </div>
+</section>
+
+<section class="box">
+  <div class="layout">
+    <div>
+      <h2 id="movieTitle">Movie info</h2>
+      <div id="pills"></div>
+      <p id="description">Loading...</p>
+      <div class="actions">
+        <a id="detailsLink" class="btn primary" href="details-clean-machine-v7-12-38-test.html">Details</a>
+        <a id="openSource" class="btn" href="#" target="_blank" rel="noopener">Open source</a>
+        <span id="saveButtons" class="actions"></span>
+      </div>
+      <div id="saveStatus" class="saveStatus"></div>
+    </div>
+    <aside>
+      <h2>Playback monitor</h2>
+      <div id="monitor" class="meta"></div>
+      <h2 style="margin-top:14px">Source URL</h2>
+      <div id="sourceUrl" class="source">Loading...</div>
+    </aside>
+  </div>
+</section>
+
+<section class="box">
+  <div class="tabs">
+    <button class="tab active" data-tab="comfort" type="button">Comfort</button>
+    <button class="tab" data-tab="source" type="button">Source</button>
+    <button class="tab" data-tab="saves" type="button">Saves</button>
+    <button class="tab" data-tab="progress" type="button">Progress</button>
+    <button class="tab" data-tab="debugSec" type="button">Debug</button>
+  </div>
+</section>
+
+<section id="comfort" class="box section active">
+  <h2>Comfort controls</h2>
+  <div class="grid">
+    <div class="card"><b>Mux/HLS/direct video</b><p>Uses real HTML video, so volume, boost, seek, fullscreen and PiP stay available.</p></div>
+    <div class="card"><b>YouTube/Vimeo</b><p>Uses iframe embed. Provider controls own their audio, so app-level boost is disabled only for those providers.</p></div>
+    <div class="card"><b>Old route preserved</b><p>This page keeps the existing Player 1 filename and URL.</p></div>
+  </div>
+</section>
+
+<section id="source" class="box section">
+  <h2>Source Info</h2>
+  <div id="sourceInfo" class="meta"></div>
+</section>
+
+<section id="saves" class="box section">
+  <h2>Save State</h2>
+  <div id="saveState" class="source">Waiting for saves...</div>
+</section>
+
+<section id="progress" class="box section">
+  <h2>Progress helpers</h2>
+  <div id="progressState" class="source">Checking helpers...</div>
+</section>
+
+<section id="debugSec" class="box section">
+  <h2>Debug</h2>
+  <div id="debug" class="source">Waiting...</div>
+</section>
+
+<p class="micro">Player 1 V7.12.266 multi-provider promotion. Existing Player 1 URL preserved.</p>
 </div>
-<script src="stream-bandit-shell-v6-24.js?v=player1-favicon-1"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=player1-favicon-1"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=player1-favicon-1"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=player1-favicon-1"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=player1-favicon-1"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=player1-favicon-1"></script>
-<script src="continue-resume-player-v6-73.js?v=player1-favicon-1"></script>
-<script src="watch-history-player-v6-74.js?v=player1-favicon-1"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=player1-favicon-1"></script>
+
+<script src="stream-bandit-shell-v6-24.js?v=player1-provider-promote-v7-12-266"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=player1-provider-promote-v7-12-266"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=player1-provider-promote-v7-12-266"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=player1-provider-promote-v7-12-266"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=player1-provider-promote-v7-12-266"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=player1-provider-promote-v7-12-266"></script>
+<script src="continue-resume-player-v6-73.js?v=player1-provider-promote-v7-12-266"></script>
+<script src="watch-history-player-v6-74.js?v=player1-provider-promote-v7-12-266"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=player1-provider-promote-v7-12-266"></script>
+
 <script>
-(function(){'use strict';
-const DETAILS='details-clean-machine-v7-12-38-test.html';let row=null,video=null,hls=null,mon=null,audioCtx=null,sourceNode=null,gainNode=null,core=null;const $=id=>document.getElementById(id);
-function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c));}
-function param(k){return new URLSearchParams(location.search).get(k)||'';}
-function arr(v){if(Array.isArray(v))return v;if(typeof v==='string'&&v.trim()){try{let j=JSON.parse(v);if(Array.isArray(j))return j;}catch(e){}return v.split(',').map(x=>x.trim()).filter(Boolean);}return[];}
-function firstUrl(m){return param('src')||m.video_url||m.mux_playback_url||m.stream_url||m.url||'';}
-function sourceType(m){let u=firstUrl(m);if(m.source_type)return m.source_type;if(/stream\.mux\.com/i.test(u))return'mux';if(/\.m3u8(\?|$)/i.test(u))return'hls';if(u)return'url';return'none';}
-function setStatus(m,b){$('status').textContent=m;$('status').className=b?'note':'status';}
-function tile(a,b){return'<div class="card"><b>'+esc(a)+'</b><p>'+esc((b===undefined||b===null||b==='')?'—':b)+'</p></div>';}
-async function readConfig(){let c=window.StreamBanditSupabaseConfig||(window.StreamBanditShell&&window.StreamBanditShell.config&&window.StreamBanditShell.config());if(c&&c.url&&c.key)return c;for(let i=0;i<20;i++){await new Promise(r=>setTimeout(r,100));c=window.StreamBanditSupabaseConfig||(window.StreamBanditShell&&window.StreamBanditShell.config&&window.StreamBanditShell.config());if(c&&c.url&&c.key)return c;}throw Error('Supabase config bridge not ready');}
-function destroy(){if(mon)clearInterval(mon);try{if(hls)hls.destroy();}catch(e){}hls=null;video=null;sourceNode=null;gainNode=null;}
-function monitor(){if(!video)return;let ahead=0;try{if(video.buffered.length)ahead=Math.max(0,video.buffered.end(video.buffered.length-1)-video.currentTime);}catch(e){}$('monitor').innerHTML=tile('readyState',video.readyState)+tile('currentTime',Math.round(video.currentTime)+'s')+tile('duration',isFinite(video.duration)?Math.round(video.duration)+'s':'unknown')+tile('buffer ahead',Math.round(ahead)+'s')+tile('paused',video.paused?'Yes':'No');}
-function build(url){destroy();let f=$('frame');if(!url){f.innerHTML='<div style="color:#b9c0d8">No playable source found.</div>';return;}video=document.createElement('video');video.controls=true;video.playsInline=true;video.preload='metadata';video.crossOrigin='anonymous';video.volume=Number($('volume').value)||1;f.innerHTML='';f.appendChild(video);if(/\.m3u8(\?|$)/i.test(url)||/stream\.mux\.com/i.test(url)){if(video.canPlayType('application/vnd.apple.mpegurl'))video.src=url;else if(window.Hls&&Hls.isSupported()){hls=new Hls({maxBufferLength:60,backBufferLength:30});hls.loadSource(url);hls.attachMedia(video);}else video.src=url;}else video.src=url;video.addEventListener('loadedmetadata',()=>setStatus('Player loaded for '+(row.title||row.id)+'.'));video.addEventListener('error',()=>setStatus('Video source could not play in this browser.',true));mon=setInterval(monitor,1000);}
-function boost(){if(!video)return;try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(!sourceNode){sourceNode=audioCtx.createMediaElementSource(video);gainNode=audioCtx.createGain();sourceNode.connect(gainNode);gainNode.connect(audioCtx.destination);}gainNode.gain.value=Number($('boost').value)||1;setStatus('Audio boost preview: '+Math.round(gainNode.gain.value*100)+'%.');}catch(e){setStatus('Normal volume works. Browser blocked boost: '+e.message,true);}}
-function paintSaves(){if(!core||!row)return;let id=String(row.id||'');$('saveButtons').innerHTML=core.buttons?core.buttons(id,{className:'btn sb-core-save-btn'}):'<span class="pill">Saves helper unavailable</span>';$('saveState').textContent=core.state?JSON.stringify(core.state(id),null,2):'No save state available';}
-function updateProgress(){let state={resumeHelper:!!window.StreamBanditProgressV673,historyHelper:!!window.StreamBanditHistoryV674,playerMode:'Player 1 single title',detailsRoute:DETAILS,version:'V7.12.157'};$('progressState').textContent=JSON.stringify(state,null,2);}
-function render(){let u=firstUrl(row),st=sourceType(row),id=encodeURIComponent(row.id||'');$('title').textContent=row.title||'Stream Bandit Player 1';$('movieTitle').textContent=row.title||'Untitled';$('description').textContent=row.description||row.summary||'No description yet.';$('pills').innerHTML=['Player 1','Source: '+st.toUpperCase()].concat(arr(row.genres).slice(0,5)).map(x=>'<span class="pill">'+esc(x)+'</span>').join('');$('detailsLink').href=DETAILS+'?id='+id;$('sourceUrl').textContent=u||'No source URL yet.';$('sourceInfo').innerHTML=tile('Player mode','Player 1 single title')+tile('Source type',st.toUpperCase())+tile('Has source',u?'Yes':'No')+tile('Movie ID',row.id||'');paintSaves();build(u);setStatus('Loaded Player 1 for '+(row.title||row.id)+'.');updateProgress();}
-async function refreshSaves(){if(core&&core.refresh)await core.refresh();paintSaves();try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}setStatus('Player 1 saves refreshed.');}
-async function load(){try{core=window.StreamBanditCoreSavesV675;if(core&&core.init)await core.init();let cfg=await readConfig();if(!cfg.url||!cfg.key)throw Error('Supabase config not found');let c=supabase.createClient(cfg.url,cfg.key);let id=param('id');let list=await c.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(120);if(list.error)throw list.error;let rows=(list.data||[]).filter(m=>String(m.status||'published')!=='archived');row=id?(rows.find(m=>String(m.id)===String(id))||null):rows[0];if(id&&!row){let one=await c.from('sb_movies').select('*').eq('id',id).maybeSingle();if(one.error)throw one.error;row=one.data||rows[0];}if(!row)throw Error('No movie row found');if(core&&core.refresh)await core.refresh();render();}catch(e){setStatus('Player 1 load failed: '+(e.message||e),true);}}
-function helper(){try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();if(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.refresh)window.StreamBanditLiveReadinessSearchFallback.refresh();}catch(e){}$('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+' · Resume '+(window.StreamBanditProgressV673?'✅':'⚠️')+' · History '+(window.StreamBanditHistoryV674?'✅':'⚠️');}
-document.addEventListener('click',async e=>{let b=e.target.closest('[data-sb-core-save]');if(!b||!core)return;e.preventDefault();try{b.disabled=true;if(core.toggle){await core.toggle(b.dataset.sbCoreSave,b.dataset.movieId);await refreshSaves();}}catch(err){setStatus(err.message||String(err),true);}finally{b.disabled=false;}});
-document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));btn.classList.add('active');$(btn.dataset.tab).classList.add('active');paintSaves();updateProgress();});
-$('playPause').onclick=()=>{if(!video)return;video.paused?video.play().catch(e=>setStatus('Play blocked: '+e.message,true)):video.pause();};$('rewind').onclick=()=>{if(video)video.currentTime=Math.max(0,video.currentTime-10);};$('forward').onclick=()=>{if(video&&isFinite(video.duration))video.currentTime=Math.min(video.duration,video.currentTime+10);};$('volume').oninput=function(){if(video)video.volume=Number(this.value)||0;};$('boost').onchange=boost;$('fullscreen').onclick=()=>{let f=$('frame');if(f.requestFullscreen)f.requestFullscreen();};$('pip').onclick=()=>{if(video&&document.pictureInPictureEnabled)video.requestPictureInPicture().catch(()=>{});};
-helper();load();setTimeout(helper,700);setTimeout(helper,1800);setTimeout(updateProgress,1200);setInterval(helper,6000);
+(function(){
+'use strict';
+
+const VERSION = 'V7.12.266 Player 1 Multi-provider Promoted';
+const DETAILS = 'details-clean-machine-v7-12-38-test.html';
+const FALLBACK_SUPABASE_URL = 'https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+const FALLBACK_SUPABASE_KEY = 'sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+
+let row = null;
+let resolved = null;
+let video = null;
+let hls = null;
+let monitorTimer = null;
+let audioCtx = null;
+let sourceNode = null;
+let gainNode = null;
+let sb = null;
+let core = null;
+
+const $ = id => document.getElementById(id);
+
+function esc(value){
+  return String(value ?? '').replace(/[&<>"]/g, c => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;'
+  }[c] || c));
+}
+
+function param(key){
+  return new URLSearchParams(location.search).get(key) || '';
+}
+
+function arr(value){
+  if(Array.isArray(value)) return value;
+  if(typeof value === 'string' && value.trim()){
+    try{
+      const parsed = JSON.parse(value);
+      if(Array.isArray(parsed)) return parsed;
+    }catch(e){}
+    return value.split(/[\n,]+/).map(x => x.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+function setStatus(message, bad){
+  const el = $('status');
+  el.textContent = message;
+  el.className = bad ? 'danger' : 'status';
+}
+
+function setProviderNote(message, kind){
+  const el = $('providerNote');
+  el.textContent = message;
+  el.className = kind === 'bad' ? 'providerNote danger' : kind === 'warn' ? 'providerNote note' : 'providerNote good';
+}
+
+function tile(label, value){
+  return '<div class="card"><b>' + esc(label) + '</b><p>' + esc((value === undefined || value === null || value === '') ? '—' : value) + '</p></div>';
+}
+
+function firstNonEmpty(){
+  for(let i = 0; i < arguments.length; i++){
+    const value = arguments[i];
+    if(value !== undefined && value !== null && String(value).trim() !== ''){
+      return String(value).trim();
+    }
+  }
+  return '';
+}
+
+function firstUrl(movie){
+  return firstNonEmpty(
+    param('src'),
+    movie && movie.video_url,
+    movie && movie.mux_playback_url,
+    movie && movie.stream_url,
+    movie && movie.url,
+    movie && movie.source
+  );
+}
+
+function poster(movie){
+  return firstNonEmpty(
+    movie && movie.poster,
+    movie && movie.poster_url,
+    movie && movie.thumbnail_url,
+    movie && movie.image_url,
+    movie && movie.backdrop_url
+  );
+}
+
+function parseUrl(url){
+  try{
+    return new URL(url);
+  }catch(e){
+    return null;
+  }
+}
+
+function youtubeId(url){
+  const u = parseUrl(url);
+  if(!u) return '';
+  const host = u.hostname.replace(/^www\./,'').toLowerCase();
+
+  if(host === 'youtu.be'){
+    return u.pathname.split('/').filter(Boolean)[0] || '';
+  }
+
+  if(host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')){
+    if(u.searchParams.get('v')) return u.searchParams.get('v');
+
+    const parts = u.pathname.split('/').filter(Boolean);
+    const embedIndex = parts.indexOf('embed');
+    const shortsIndex = parts.indexOf('shorts');
+    const liveIndex = parts.indexOf('live');
+
+    if(embedIndex >= 0 && parts[embedIndex + 1]) return parts[embedIndex + 1];
+    if(shortsIndex >= 0 && parts[shortsIndex + 1]) return parts[shortsIndex + 1];
+    if(liveIndex >= 0 && parts[liveIndex + 1]) return parts[liveIndex + 1];
+  }
+
+  return '';
+}
+
+function vimeoId(url){
+  const u = parseUrl(url);
+  if(!u) return '';
+  const host = u.hostname.replace(/^www\./,'').toLowerCase();
+
+  if(host === 'player.vimeo.com'){
+    const parts = u.pathname.split('/').filter(Boolean);
+    const videoIndex = parts.indexOf('video');
+    if(videoIndex >= 0 && parts[videoIndex + 1]) return parts[videoIndex + 1];
+  }
+
+  if(host.endsWith('vimeo.com')){
+    const parts = u.pathname.split('/').filter(Boolean);
+    const numeric = parts.find(part => /^\d+$/.test(part));
+    return numeric || '';
+  }
+
+  return '';
+}
+
+function hasDirectVideoExtension(url){
+  return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url);
+}
+
+function isHls(url){
+  return /\.m3u8(\?|#|$)/i.test(url) || /stream\.mux\.com/i.test(url);
+}
+
+function resolveSource(movie){
+  const url = firstUrl(movie);
+
+  if(!url){
+    return {
+      provider:'missing',
+      mode:'missing',
+      label:'Missing source',
+      url:'',
+      playable:'',
+      embed:'',
+      canBoost:false,
+      canPip:false,
+      note:'No playable URL found on this row.'
+    };
+  }
+
+  const yid = youtubeId(url);
+  if(yid){
+    return {
+      provider:'youtube',
+      mode:'iframe',
+      label:'YouTube',
+      url:url,
+      playable:url,
+      embed:'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(yid) + '?rel=0&modestbranding=1&playsinline=1',
+      canBoost:false,
+      canPip:false,
+      note:'YouTube uses iframe controls. Stream Bandit audio boost is not available for iframe providers.'
+    };
+  }
+
+  const vid = vimeoId(url);
+  if(vid){
+    return {
+      provider:'vimeo',
+      mode:'iframe',
+      label:'Vimeo',
+      url:url,
+      playable:url,
+      embed:'https://player.vimeo.com/video/' + encodeURIComponent(vid),
+      canBoost:false,
+      canPip:false,
+      note:'Vimeo uses iframe controls. Stream Bandit audio boost is not available for iframe providers.'
+    };
+  }
+
+  if(isHls(url)){
+    return {
+      provider:/stream\.mux\.com/i.test(url) ? 'mux' : 'hls',
+      mode:'video',
+      label:/stream\.mux\.com/i.test(url) ? 'Mux/HLS' : 'HLS',
+      url:url,
+      playable:url,
+      embed:'',
+      canBoost:true,
+      canPip:true,
+      note:'HTML video stream detected. Audio boost remains enabled.'
+    };
+  }
+
+  if(hasDirectVideoExtension(url)){
+    return {
+      provider:'direct-video',
+      mode:'video',
+      label:'Direct video',
+      url:url,
+      playable:url,
+      embed:'',
+      canBoost:true,
+      canPip:true,
+      note:'Direct video file detected. Audio boost remains enabled.'
+    };
+  }
+
+  return {
+    provider:'generic-url',
+    mode:'external',
+    label:'External URL',
+    url:url,
+    playable:url,
+    embed:'',
+    canBoost:false,
+    canPip:false,
+    note:'Generic URL detected. It may not allow direct playback. Open source is available.'
+  };
+}
+
+async function readConfig(){
+  let cfg = window.StreamBanditSupabaseConfig ||
+    (window.StreamBanditShell && window.StreamBanditShell.config && window.StreamBanditShell.config());
+
+  if(cfg && cfg.url && cfg.key) return cfg;
+
+  for(let i = 0; i < 20; i++){
+    await new Promise(resolve => setTimeout(resolve, 100));
+    cfg = window.StreamBanditSupabaseConfig ||
+      (window.StreamBanditShell && window.StreamBanditShell.config && window.StreamBanditShell.config());
+
+    if(cfg && cfg.url && cfg.key) return cfg;
+  }
+
+  return {
+    url:FALLBACK_SUPABASE_URL,
+    key:FALLBACK_SUPABASE_KEY,
+    source:'fallback publishable key'
+  };
+}
+
+async function getClient(){
+  if(sb) return sb;
+  const cfg = await readConfig();
+  sb = supabase.createClient(cfg.url, cfg.key);
+  return sb;
+}
+
+function destroy(){
+  if(monitorTimer) clearInterval(monitorTimer);
+  monitorTimer = null;
+
+  try{
+    if(hls) hls.destroy();
+  }catch(e){}
+
+  try{
+    if(video) video.pause();
+  }catch(e){}
+
+  hls = null;
+  video = null;
+  audioCtx = null;
+  sourceNode = null;
+  gainNode = null;
+}
+
+function setVideoControlsEnabled(enabled){
+  $('playPause').disabled = !enabled;
+  $('rewind').disabled = !enabled;
+  $('forward').disabled = !enabled;
+  $('volume').disabled = !enabled;
+  $('boost').disabled = !enabled;
+  $('pip').disabled = !enabled;
+}
+
+function monitor(){
+  if(!video){
+    $('monitor').innerHTML = tile('State','No HTML video active');
+    return;
+  }
+
+  let ahead = 0;
+  try{
+    if(video.buffered.length){
+      ahead = Math.max(0, video.buffered.end(video.buffered.length - 1) - video.currentTime);
+    }
+  }catch(e){}
+
+  $('monitor').innerHTML =
+    tile('readyState', video.readyState) +
+    tile('currentTime', Math.round(video.currentTime || 0) + 's') +
+    tile('duration', isFinite(video.duration) ? Math.round(video.duration) + 's' : 'unknown') +
+    tile('buffer ahead', Math.round(ahead) + 's') +
+    tile('paused', video.paused ? 'Yes' : 'No') +
+    tile('volume', Math.round((video.volume || 0) * 100) + '%') +
+    tile('boost available', resolved && resolved.canBoost ? 'Yes' : 'No');
+}
+
+function buildVideoPlayer(){
+  destroy();
+
+  const frame = $('frame');
+  const url = resolved.playable;
+
+  video = document.createElement('video');
+  video.controls = true;
+  video.playsInline = true;
+  video.preload = 'metadata';
+  video.crossOrigin = 'anonymous';
+  video.volume = Number($('volume').value) || 1;
+
+  const img = poster(row);
+  if(img) video.poster = img;
+
+  frame.innerHTML = '';
+  frame.appendChild(video);
+
+  if(isHls(url)){
+    if(video.canPlayType('application/vnd.apple.mpegurl')){
+      video.src = url;
+    }else if(window.Hls && Hls.isSupported()){
+      hls = new Hls({maxBufferLength:60,backBufferLength:30});
+      hls.loadSource(url);
+      hls.attachMedia(video);
+    }else{
+      video.src = url;
+    }
+  }else{
+    video.src = url;
+  }
+
+  video.addEventListener('loadedmetadata', function(){
+    setStatus('Player loaded for ' + (row.title || row.id || 'video') + '.');
+    monitor();
+  });
+
+  video.addEventListener('error', function(){
+    setStatus('Video source could not play in this browser.', true);
+    monitor();
+  });
+
+  monitorTimer = setInterval(monitor, 1000);
+  setVideoControlsEnabled(true);
+  setProviderNote(resolved.note, 'good');
+}
+
+function buildIframePlayer(){
+  destroy();
+
+  const iframe = document.createElement('iframe');
+  iframe.src = resolved.embed;
+  iframe.title = row && row.title ? row.title : resolved.label + ' player';
+  iframe.loading = 'lazy';
+  iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen';
+  iframe.allowFullscreen = true;
+
+  $('frame').innerHTML = '';
+  $('frame').appendChild(iframe);
+
+  setVideoControlsEnabled(false);
+  $('fullscreen').disabled = false;
+
+  $('monitor').innerHTML =
+    tile('Provider', resolved.label) +
+    tile('Mode', 'iframe embed') +
+    tile('Audio boost', 'Not available for iframe providers') +
+    tile('App controls', 'Provider player controls are used');
+
+  setProviderNote(resolved.note, 'warn');
+  setStatus(resolved.label + ' iframe player loaded.');
+}
+
+function buildExternalPanel(){
+  destroy();
+
+  $('frame').innerHTML =
+    '<div class="note" style="max-width:680px;margin:16px">' +
+      '<b>External stream URL</b><br>' +
+      'This URL is not recognised as Mux, HLS, direct video, YouTube or Vimeo. It may need a provider-specific embed rule later.' +
+      '<div class="actions">' +
+        '<a class="btn primary" target="_blank" rel="noopener" href="' + esc(resolved.url) + '">Open source in new tab</a>' +
+      '</div>' +
+    '</div>';
+
+  setVideoControlsEnabled(false);
+  $('fullscreen').disabled = false;
+
+  $('monitor').innerHTML =
+    tile('Provider', resolved.label) +
+    tile('Mode', 'external link') +
+    tile('Audio boost', 'Not available') +
+    tile('Next step', 'Add provider rule if this source should embed');
+
+  setProviderNote(resolved.note, 'warn');
+  setStatus('External URL detected. Open source is available.', true);
+}
+
+function buildMissingPanel(){
+  destroy();
+
+  $('frame').innerHTML = '<div class="danger">No playable source found for this row.</div>';
+  setVideoControlsEnabled(false);
+  $('fullscreen').disabled = false;
+  $('monitor').innerHTML = tile('State','Missing source');
+  setProviderNote(resolved.note, 'bad');
+  setStatus('No playable source found.', true);
+}
+
+function buildPlayer(){
+  resolved = resolveSource(row);
+
+  if(resolved.mode === 'video'){
+    buildVideoPlayer();
+    return;
+  }
+
+  if(resolved.mode === 'iframe'){
+    buildIframePlayer();
+    return;
+  }
+
+  if(resolved.mode === 'external'){
+    buildExternalPanel();
+    return;
+  }
+
+  buildMissingPanel();
+}
+
+async function refreshSaves(){
+  try{
+    if(!core) core = window.StreamBanditCoreSavesV675 || null;
+    if(core && core.refresh) await core.refresh();
+  }catch(e){}
+  paintSaves();
+}
+
+function paintSaves(){
+  if(!row){
+    $('saveButtons').innerHTML = '';
+    $('saveState').textContent = 'No row loaded.';
+    return;
+  }
+
+  if(!core){
+    $('saveButtons').innerHTML = '<span class="pill warnPill">Saves helper unavailable</span>';
+    $('saveState').textContent = 'No save state available.';
+    return;
+  }
+
+  const id = String(row.id || '');
+
+  if(core.buttons){
+    $('saveButtons').innerHTML = core.buttons(id,{className:'btn sb-core-save-btn'});
+  }else{
+    $('saveButtons').innerHTML = '<span class="pill warnPill">Save buttons unavailable</span>';
+  }
+
+  if(core.state){
+    try{
+      $('saveState').textContent = JSON.stringify(core.state(id), null, 2);
+    }catch(e){
+      $('saveState').textContent = 'Save state read failed: ' + (e.message || e);
+    }
+  }else{
+    $('saveState').textContent = 'No save state available.';
+  }
+}
+
+function updateProgress(){
+  const state = {
+    resumeHelper: !!window.StreamBanditProgressV673,
+    historyHelper: !!window.StreamBanditHistoryV674,
+    playerMode: 'Player 1 single title',
+    detailsRoute: DETAILS,
+    version: VERSION,
+    provider: resolved ? resolved.provider : null,
+    mode: resolved ? resolved.mode : null,
+    boostAvailable: resolved ? resolved.canBoost : false
+  };
+
+  $('progressState').textContent = JSON.stringify(state, null, 2);
+}
+
+function render(){
+  const id = encodeURIComponent(row.id || '');
+  const genres = arr(row.genres);
+  const sourceUrl = firstUrl(row);
+
+  $('title').textContent = row.title || 'Stream Bandit Player 1';
+  $('movieTitle').textContent = row.title || 'Untitled';
+  $('description').textContent = row.description || row.summary || 'No description yet.';
+
+  $('pills').innerHTML = [
+    'Player 1',
+    'Provider: ' + resolved.label,
+    'Mode: ' + resolved.mode
+  ].concat(genres.slice(0,5)).map(function(x){
+    let cls = 'pill';
+    const lower = String(x).toLowerCase();
+
+    if(lower.includes('youtube') || lower.includes('vimeo')) cls += ' warnPill';
+    if(lower.includes('mux') || lower.includes('hls') || lower.includes('direct')) cls += ' cyanPill';
+
+    return '<span class="' + cls + '">' + esc(x) + '</span>';
+  }).join('');
+
+  $('detailsLink').href = DETAILS + '?id=' + id;
+  $('detailsTop').href = DETAILS + '?id=' + id;
+  $('openSource').href = sourceUrl || '#';
+  $('sourceUrl').textContent = sourceUrl || 'No source URL found.';
+
+  $('sourceInfo').innerHTML =
+    tile('Provider', resolved.provider) +
+    tile('Label', resolved.label) +
+    tile('Mode', resolved.mode) +
+    tile('Can audio boost', resolved.canBoost ? 'Yes' : 'No') +
+    tile('Can PiP', resolved.canPip ? 'Yes' : 'No') +
+    tile('Movie id', row.id || '—') +
+    tile('source_type field', row.source_type || '—') +
+    tile('video_url', row.video_url || '—') +
+    tile('mux_playback_url', row.mux_playback_url || '—');
+
+  $('debug').textContent = JSON.stringify({
+    version: VERSION,
+    route: 'player-one-global-helpers-v7-3-3-test.html',
+    oldUrlPreserved: true,
+    row: row,
+    resolved: resolved,
+    controls: {
+      audioBoostKeptForMuxHlsDirect: resolved.canBoost,
+      iframeBoostDisabledOnlyForIframeProviders: resolved.mode === 'iframe'
+    }
+  }, null, 2);
+
+  paintSaves();
+  updateProgress();
+}
+
+function boost(){
+  if(!video || !resolved || !resolved.canBoost){
+    setStatus('Audio boost only works for Mux, HLS and direct video streams.', true);
+    return;
+  }
+
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    if(!sourceNode){
+      sourceNode = audioCtx.createMediaElementSource(video);
+      gainNode = audioCtx.createGain();
+      sourceNode.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+    }
+
+    gainNode.gain.value = Number($('boost').value) || 1;
+
+    if(audioCtx.state === 'suspended'){
+      audioCtx.resume();
+    }
+
+    setStatus('Audio boost active: ' + Math.round(gainNode.gain.value * 100) + '%.');
+  }catch(e){
+    setStatus('Normal volume works. Browser blocked boost: ' + (e.message || e), true);
+  }
+}
+
+async function load(){
+  try{
+    if(!core) core = window.StreamBanditCoreSavesV675 || null;
+    if(core && core.init) await core.init();
+
+    setStatus('Loading sb_movies row...');
+
+    const client = await getClient();
+    const id = param('id');
+    const directSrc = param('src');
+
+    if(directSrc){
+      row = {
+        id:'direct-src-test',
+        title:param('title') || 'Direct source test',
+        description:'Loaded from ?src= parameter.',
+        video_url:directSrc,
+        mux_playback_url:'',
+        source_type:'url',
+        genres:['Provider Test']
+      };
+    }else{
+      let result;
+
+      if(id){
+        result = await client.from('sb_movies').select('*').eq('id', id).maybeSingle();
+        if(result.error) throw result.error;
+        row = result.data || null;
+      }
+
+      if(!row){
+        const latest = await client
+          .from('sb_movies')
+          .select('*')
+          .order('created_at', {ascending:false})
+          .limit(120);
+
+        if(latest.error) throw latest.error;
+
+        const rows = (latest.data || []).filter(function(movie){
+          return String(movie.status || 'published') !== 'archived';
+        });
+
+        row = rows[0] || null;
+      }
+
+      if(!row){
+        throw new Error(id ? 'No sb_movies row found for id ' + id : 'No sb_movies row found.');
+      }
+    }
+
+    resolved = resolveSource(row);
+    buildPlayer();
+    render();
+    await refreshSaves();
+  }catch(e){
+    setStatus('Player 1 load failed: ' + (e.message || e), true);
+    $('frame').innerHTML = '<div class="danger">Player 1 load failed. Check Debug tab.</div>';
+    $('debug').textContent = JSON.stringify({
+      version: VERSION,
+      route: 'player-one-global-helpers-v7-3-3-test.html',
+      error: e.message || String(e)
+    }, null, 2);
+  }
+}
+
+function helper(){
+  try{
+    if(window.StreamBanditThemeProjector && window.StreamBanditThemeProjector.refresh) window.StreamBanditThemeProjector.refresh();
+    if(window.StreamBanditHeaderShell && window.StreamBanditHeaderShell.refresh) window.StreamBanditHeaderShell.refresh();
+    if(window.StreamBanditFooterShell && window.StreamBanditFooterShell.refresh) window.StreamBanditFooterShell.refresh();
+    if(window.StreamBanditLiveReadinessSearchFallback && window.StreamBanditLiveReadinessSearchFallback.refresh) window.StreamBanditLiveReadinessSearchFallback.refresh();
+    if(window.StreamBanditMenuSavesCount && window.StreamBanditMenuSavesCount.refresh) window.StreamBanditMenuSavesCount.refresh();
+  }catch(e){}
+
+  $('helperStatus').innerHTML =
+    '<b>Foundation:</b> Header ' + (window.StreamBanditHeaderShell ? 'OK' : 'checking') +
+    ' · Footer ' + (window.StreamBanditFooterShell ? 'OK' : 'checking') +
+    ' · Full search ' + (window.StreamBanditLiveReadinessSearchFallback ? 'OK' : 'checking') +
+    ' · Saves ' + (window.StreamBanditCoreSavesV675 ? 'OK' : 'checking') +
+    ' · Resume ' + (window.StreamBanditProgressV673 ? 'OK' : 'checking') +
+    ' · History ' + (window.StreamBanditHistoryV674 ? 'OK' : 'checking');
+}
+
+function wire(){
+  document.querySelectorAll('.tab').forEach(function(btn){
+    btn.onclick = function(){
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+
+      const target = $(btn.dataset.tab);
+      if(target) target.classList.add('active');
+
+      paintSaves();
+      updateProgress();
+    };
+  });
+
+  $('playPause').onclick = function(){
+    if(!video) return;
+
+    if(video.paused){
+      video.play().catch(e => setStatus('Play blocked: ' + e.message, true));
+    }else{
+      video.pause();
+    }
+  };
+
+  $('rewind').onclick = function(){
+    if(video) video.currentTime = Math.max(0, video.currentTime - 10);
+  };
+
+  $('forward').onclick = function(){
+    if(video && isFinite(video.duration)){
+      video.currentTime = Math.min(video.duration, video.currentTime + 10);
+    }
+  };
+
+  $('volume').oninput = function(){
+    if(video) video.volume = Number(this.value) || 0;
+  };
+
+  $('boost').onchange = boost;
+
+  $('fullscreen').onclick = function(){
+    const frame = $('frame');
+    if(frame.requestFullscreen) frame.requestFullscreen();
+  };
+
+  $('pip').onclick = function(){
+    if(video && document.pictureInPictureEnabled){
+      video.requestPictureInPicture().catch(function(){});
+    }
+  };
+
+  document.addEventListener('click', async function(e){
+    const b = e.target.closest('[data-sb-core-save]');
+    if(!b || !core) return;
+
+    e.preventDefault();
+
+    try{
+      b.disabled = true;
+
+      if(core.toggle){
+        await core.toggle(b.dataset.sbCoreSave, b.dataset.movieId);
+        await refreshSaves();
+      }
+    }catch(err){
+      setStatus(err.message || String(err), true);
+    }finally{
+      b.disabled = false;
+    }
+  });
+}
+
+function boot(){
+  wire();
+  helper();
+  load();
+  setTimeout(helper, 700);
+  setTimeout(helper, 1800);
+  setTimeout(updateProgress, 1200);
+  setInterval(helper, 6000);
+
+  document.documentElement.dataset.sbPlayer1ProviderPromoted = 'v7-12-266';
+
+  window.StreamBanditPlayer1ProviderPromotedV712266 = {
+    version: VERSION,
+    route: 'player-one-global-helpers-v7-3-3-test.html',
+    resolveSource: resolveSource,
+    current: function(){
+      return {row: row, resolved: resolved};
+    }
+  };
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', boot);
+}else{
+  boot();
+}
+
 })();
 </script>
 </body>
