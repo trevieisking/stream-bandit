@@ -1,10 +1,18 @@
-# Web Builder Manifest V7.12.264.9
+# Web Builder Manifest V7.12.264.13
 
 ## Purpose
 
 This manifest tracks the Web Builder as a separate mini app/product area inside Stream Bandit.
 
 The Stream Bandit manifest remains for the movie app. This file is for Web Builder only.
+
+## Massive checkpoint status
+
+Status: RECORDED / PASSED FOR CURRENT WEB BUILDER CORE FLOW.
+
+This checkpoint records the work completed across the Web Builder Supabase page flow, owned preview, inline published forms, shared Web Builder tabs, global Web Builder search, Pages Manager jump search, Menu Builder slim tabs, Menu Builder edit overlay, and Menu Builder jump search.
+
+No live `index.html` promotion was done. No main Stream Bandit shell rewrite was done. No storage schema was changed in these page passes.
 
 ## Current doorway rule
 
@@ -13,7 +21,7 @@ One thing at a time:
 - Web Builder is tracked here first, under the Web Builder manifest.
 - Web Builder is not promoted as the main app manifest yet.
 - Stream Bandit app branding remains Stream Bandit branding.
-- Web Builder branding/avatar/projector/tabs take over only after entering Web Builder pages.
+- Web Builder branding/avatar/projector/tabs/search take over only after entering Web Builder pages.
 - Main app promotion is limited to one clean doorway when approved.
 
 Approved doorway model:
@@ -21,12 +29,13 @@ Approved doorway model:
 - One way in: Stream Bandit menu -> Web Builder -> `web-builder-account-control-hub-v7-12-263-test.html`.
 - One way out: Web Builder -> `Back` to Stream Bandit.
 - Every Web Builder page that loads the projector should show the same Web Builder tabs.
+- Every Web Builder page that loads the projector should get Web Builder-only global search.
 - Old per-page duplicate route buttons should be removed or hidden as pages are cleaned.
 
 Not promoted yet:
 
 - `index.html`
-- current app registry
+- current app registry menu structure
 - main app branding
 - footer shell
 - full Stream Bandit app manifest
@@ -37,6 +46,7 @@ Not promoted yet:
 - Outputs display on clean page views.
 - Builder/editor controls should not be scattered through visitor previews or output dashboards.
 - Page views should show results, previews, cards, route maps, reports, inbox output, menus and asset libraries.
+- Page-specific searches should pinpoint and scroll to the target item rather than hiding the rest of the list when the user wants a jump search.
 
 ## Core add/remove rule
 
@@ -55,6 +65,8 @@ Normal route flow:
 3. Published Preview opens `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`.
 4. Menu Builder controls the published menu via `sb_site_pages.settings_json`.
 5. Published forms submit inline on the published page and are read from the Web Builder-owned inbox.
+6. Web Builder shared tabs keep the owned page group connected.
+7. Web Builder global search searches owned tools/routes and Supabase `sb_site_pages` by title, slug and status.
 
 Current Web Builder shared tabs:
 
@@ -92,62 +104,25 @@ Current Web Builder shared tabs:
 - `V7.12.264.3 Published Preview hero block promotion` - PASS.
 - `V7.12.264.4 Published Preview inline form submissions` - PASS.
 - `V7.12.264.5 Shared Web Builder header tabs` - PASS.
-- `V7.12.264.9 Menu Builder single slim tabs + edit overlay inputs` - LANDED / DEPLOY WAIT.
+- `V7.12.264.9 Menu Builder single slim tabs + edit overlay inputs` - PASS.
+- `V7.12.264.10 Published Preview empty side menus auto-expand` - PASS/PENDING USER FINAL VISUAL CHECK.
+- `V7.12.264.11 Global Web Builder search in shared header` - PASS.
+- `V7.12.264.12 Pages Manager jump search` - PASS.
+- `V7.12.264.13 Menu Builder jump search` - PASS.
 
-## Latest verified pass - V7.12.264 Preview, Forms, Tabs, Menu
+## Latest verified pass - V7.12.264.13 Search + Findability
 
-### User-tested result
+User-tested result:
 
-- Published Preview opens from the owned preview route - PASS.
-- Top route buttons are now Web Builder-only plus Back - PASS.
-- Web Builder / Publish opens `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>` - PASS.
-- Published menu appears in preview - PASS.
-- Hero block moves into the big top hero area - PASS.
-- Hero block is no longer duplicated below as a card - PASS.
-- Form fields can be filled directly on the published page - PASS.
-- Submit form appears inline - PASS.
-- No user-facing admin form route is needed for published forms - PASS.
-- Shared Web Builder tabs appear under the header - PASS.
-- Inbox tab opens `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>` - PASS.
-
-### Menu Builder latest direction
-
-Route:
-
-- `web-builder-menu-builder-owned-v7-12-264-test.html`
-
-Latest landed version:
-
-- `V7.12.264.9 Single Slim Tabs`
-
-Rules:
-
-- The main menu list must show single slim page tabs only.
-- Each tab shows page title and slug.
-- Inputs are not allowed directly on the page list.
-- Add to menu, label, icon and position open in the Edit overlay.
-- Placement controls are available in the overlay: move up, move down, sub-tab left, sub-tab right.
-- Drag/drop reorders slim tabs.
-- Save writes `show_in_menu`, `menu_label`, `menu_icon`, `menu_position`, `menu_order` and `menu_indent` to `sb_site_pages.settings_json`.
-- No schema changes.
-- No storage changes.
-
-### Supabase state used by Web Builder
-
-Existing tables in active use:
-
-- `sb_site_pages`
-- `sb_form_submissions`
-- `sb_profiles`
-
-Current page/menu storage:
-
-- Page rows live in `sb_site_pages`.
-- Page layout lives in `layout_json`.
-- Menu settings live in `settings_json`.
-- Form submissions live in `sb_form_submissions`.
-
-Do not claim public anonymous production readiness until the RLS/policy pass is verified after deploy.
+- Global Web Builder search appears in the shared header - PASS.
+- Global Web Builder search can find tools/routes/pages - PASS.
+- Pages Manager jump search finds a page by title or slug - PASS.
+- Pages Manager jump search scrolls to the page card without hiding the list - PASS.
+- Menu Builder shows single slim tabs - PASS.
+- Menu Builder edit controls open in overlay - PASS.
+- Menu Builder inputs are not displayed directly on the output row - PASS.
+- Menu Builder jump search finds a menu page by title or slug - PASS.
+- Menu Builder jump search scrolls to the matching slim tab without hiding the list - PASS.
 
 ## Current route set
 
@@ -174,12 +149,70 @@ Old support/reference routes preserved, not current primary flow:
 - `web-builder-form-save-v7-12-94-test.html?page=test-page`
 - `web-builder-form-submissions-v7-12-94-test.html?page=test-page`
 
+## Supabase state used by Web Builder
+
+Existing tables in active use:
+
+- `sb_site_pages`
+- `sb_form_submissions`
+- `sb_profiles`
+
+Current page/menu/form storage:
+
+- Page rows live in `sb_site_pages`.
+- Page layout lives in `layout_json`.
+- Menu settings live in `settings_json`.
+- Form submissions live in `sb_form_submissions`.
+
+Do not claim public anonymous production readiness until the RLS/policy pass is verified after deploy.
+
+## Seven-step live-promotion plan now locked
+
+1. Finish Web Builder core blockers.
+   - Pages Manager real guarded delete.
+   - Verify empty preview blocks are hidden.
+   - Verify form submit -> owned inbox.
+2. Build real Owner Admin Hub.
+   - Upgrade `user-management-dashboard-v7-11-2-test.html`.
+   - Owner can view users, restrict, limit, ban, unban, grant/remove admin.
+   - No toy wording in the live admin hub.
+3. Add safe admin/account schema.
+   - `account_status`: active / limited / restricted / banned / review.
+   - admin level or role guard.
+   - `permissions_json`.
+   - `plan_key`.
+   - admin notes / managed by / managed at.
+   - audit log table or audit JSON trail.
+4. Harden Supabase policies.
+   - Normal users cannot self-upgrade role.
+   - Normal users cannot unban/unlimit themselves.
+   - Owner/admin can manage users only through approved owner-safe rules.
+   - Public visitors can only do approved public actions.
+5. Connect Permissions Matrix to real controls.
+   - `permissions-matrix-user-management-v7-11-4-test.html` becomes the rulebook.
+   - Admin Hub applies the rulebook.
+   - Pricing page remains research/draft until billing exists.
+6. Whole app polish scan.
+   - Stream Bandit pages, not just Web Builder.
+   - Headers, footers, search, routes, duplicate buttons, old stale wording.
+   - Mobile layout and deaf/accessibility/player-comfort checks.
+7. Final smoke test before promotion.
+   - Owner login.
+   - Normal user login.
+   - Banned/limited user test.
+   - Web Builder route flow.
+   - Public preview/form test.
+   - Main Stream Bandit watch/search/browse test.
+   - Backups/manifest/control map updated.
+
 ## Pending final visible fixes
 
-- Verify GitHub Pages deployment for `web-builder-menu-builder-owned-v7-12-264-test.html?v=2649`.
 - Add a guarded real delete function to `web-builder-pages-manager-owned-v7-12-256-test.html`.
+- Verify empty preview blocks are hidden, not just side-menu boxes.
+- Verify published form submission appears in owned inbox.
+- Build real owner-only admin/account control hub.
+- Harden Supabase account/public policies.
 - Clean any remaining duplicate local route buttons where the shared Web Builder tabs are now present.
-- Verify Supabase public read/submit policy if the published Web Builder pages are intended for logged-out visitors.
 
 ## Safety locks
 
