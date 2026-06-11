@@ -3,124 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit My Channel V7.12.190</title>
-<link rel="icon" href="stream_bandit_stag_icon_32.png">
-<link rel="apple-touch-icon" href="apple_touch_icon_180.png">
+<title>Stream Bandit My Channel V7.12.269</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
-*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}
-body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 40%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(13.5px * var(--fontScale))}
-.wrap{max-width:1440px;margin:auto}.hero,.box,.card,.stat,.movie,.channel,.submission,.step{border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 12px 38px #0006;padding:14px;margin-bottom:12px}.hero{padding:18px}.box{padding:15px}.card,.stat,.movie,.channel,.submission,.step{background:#ffffff0f;box-shadow:none;margin-bottom:0}
-.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:5px 9px;font-size:11px}.pill{padding:4px 7px;font-size:10px;margin:2px}.pending{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.approved,.published{background:#22d3a624}.declined,.rejected{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}
-h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 9px;font-size:21px}h3{margin:0 0 6px;font-size:16px}.muted,p,small,label,li{color:var(--muted);line-height:1.42}.hero p,.card p,.movie p,.channel p,.submission p,.stat p,.step p{margin-top:5px;margin-bottom:7px}
-.btn,.tab{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.btn:disabled{opacity:.55;cursor:not-allowed}.small{padding:7px 10px;font-size:11px}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}
-.status,.note,.danger,.safe{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}.safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}
-.grid,.stats,.movieGrid,.channelGrid,.subGrid,.steps{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}.movieGrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.channelGrid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(250px,360px);gap:14px}.layout{display:grid;grid-template-columns:minmax(280px,420px) 1fr;gap:14px}.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:180px;display:grid;place-items:center;position:relative;overflow:hidden}.art:before{content:"";position:absolute;inset:20px;border-radius:22px;border:1px dashed #ffffff32}.artIcon{font-size:56px;z-index:1}.actions,.tabs,.routeStrip,.filters{display:flex;gap:7px;flex-wrap:wrap}.actions{margin-top:8px}.routeStrip{margin-top:10px}.routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}.card b,.stat b,.step b{display:block;color:#baf7df;margin-bottom:5px}.stat span{font-size:22px;font-weight:950}.section{display:none}.section.active{display:block}.input,.select{width:100%;border:1px solid #ffffff25;border-radius:999px;background:#080316;color:white;padding:10px 12px;font:inherit;font-weight:850}.thumb,.banner{aspect-ratio:16/9;border-radius:16px;background:#0005;display:grid;place-items:center;overflow:hidden;color:var(--muted);margin-bottom:9px;text-align:center}.thumb img,.banner img{width:100%;height:100%;object-fit:cover}.body{padding:12px}.movie,.channel,.submission{padding:0;overflow:hidden}.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:14px;padding:12px;color:#dfffee;max-height:360px;overflow:auto}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
-@media(max-width:980px){body{padding:10px}.heroGrid,.layout{grid-template-columns:1fr}.btn,.tab{width:100%;white-space:normal}.art{min-height:160px}}
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--card:#ffffff0f;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
+*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,#22d3a633,transparent 34%),radial-gradient(circle at 92% 0,#7c3cff3d,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}.wrap{max-width:1480px;margin:auto}.hero,.box,.card,.movie,.submission,.channel,.stat,.field,.perm{border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 42px #0007;padding:14px;margin-bottom:12px}.card,.movie,.submission,.channel,.stat,.field,.perm{background:var(--card);box-shadow:none;margin-bottom:0}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:5px 9px;font-size:11px}.pill{padding:4px 7px;font-size:10px;margin:2px}.badPill{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}.warnPill{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.cyanPill{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}h1{font-size:clamp(36px,5vw,66px);line-height:.94;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 10px;font-size:22px}h3{margin:0 0 7px;font-size:16px}.muted,p,small,label,li{color:var(--muted);line-height:1.45}.btn,.tab{border:0;border-radius:999px;padding:9px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.btn:disabled{opacity:.5;cursor:not-allowed}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2));color:#fff}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}.status,.note,.danger,.safe{padding:10px 12px;border-radius:16px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}.safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(260px,380px);gap:14px}.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:190px;display:grid;place-items:center;overflow:hidden}.art img{width:100%;height:100%;object-fit:cover}.artIcon{font-size:58px}.grid,.stats,.movieGrid,.subGrid,.channelGrid,.formGrid,.permGrid{display:grid;gap:10px}.grid,.stats{grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}.formGrid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}.movieGrid,.subGrid,.channelGrid,.permGrid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}.actions,.tabs,.filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.input,.textarea{width:100%;border:1px solid #ffffff25;border-radius:16px;background:#080316;color:white;padding:10px 12px;font:inherit;font-weight:850}.textarea{min-height:92px;resize:vertical}.section{display:none}.section.active{display:block}.movie,.submission,.channel{padding:0;overflow:hidden}.thumb,.banner{aspect-ratio:16/9;background:#0005;display:grid;place-items:center;overflow:hidden;color:var(--muted);text-align:center}.thumb img,.banner img{width:100%;height:100%;object-fit:cover}.body{padding:12px}.body p{font-size:12px;margin:0 0 8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.stat b,.card b,.field b,.perm b{display:block;color:#baf7df;margin-bottom:6px}.stat span{font-size:24px;font-weight:950}.routeStrip{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0}.routeStrip span{border:1px solid #ffffff1c;border-radius:999px;background:#0004;padding:6px 9px;color:#dfffee;font-weight:850;font-size:12px}.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:14px;padding:12px;color:#dfffee;max-height:420px;overflow:auto}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}@media(max-width:980px){body{padding:10px}.heroGrid{grid-template-columns:1fr}.btn,.tab{width:100%;white-space:normal}.movieGrid,.subGrid,.channelGrid,.permGrid{grid-template-columns:1fr}.art{min-height:160px}}
 </style>
 </head>
-<body data-sb-my-channel-menu-url="my-channel-clean-machine-v7-12-47-test.html">
+<body data-sb-my-channel-route="my-channel-clean-machine-v7-12-47-test.html">
 <div class="wrap">
-<section class="hero">
-  <div class="heroGrid">
-    <div>
-      <span class="badge">V7.12.190 My Channel · Clean Shell Route Truth</span>
-      <h1>My Channel</h1>
-      <p>Creator/channel dashboard for submitted rows, published channel videos and Group Play routes. This page is read-only: Submit Video owns intake, Review Queue owns approval, and Player 2 owns Play All queues.</p>
-      <div class="routeStrip"><span>Submit → sb_submissions</span><span>Review → sb_movies</span><span>Videos → sb_movies</span><span>Play All → Player 2</span></div>
-      <div class="actions">
-        <a class="btn hot" href="submit-video-clean-machine-v7-12-79-test.html">Submit Video</a>
-        <a class="btn cyan" href="review-queue-clean-machine-v7-12-80-publish-test.html">Review Queue</a>
-        <a class="btn primary" href="channels-global-helpers-v7-5-3-test.html">Channels</a>
-        <a class="btn" href="playlists-global-helpers-v7-5-2-test.html">Playlists</a>
-        <a class="btn" href="collections-clean-machine-v7-12-51-test.html">Collections</a>
-        <button id="heroPlayAll" class="btn warn" type="button">Play My Videos In Player 2</button>
-      </div>
-      <div id="status" class="status">Loading My Channel...</div>
-      <div id="helperStatus" class="note">Checking foundation...</div>
-    </div>
-    <div class="art"><div class="artIcon">📡✅</div></div>
-  </div>
-</section>
-
-<section class="box">
-  <h2>My Channel tabs</h2>
-  <div class="tabs">
-    <button class="tab active" data-tab="dashboard" type="button">Dashboard</button>
-    <button class="tab" data-tab="videos" type="button">My Videos</button>
-    <button class="tab" data-tab="submissions" type="button">Submissions</button>
-    <button class="tab" data-tab="channels" type="button">Channels</button>
-    <button class="tab" data-tab="rules" type="button">Rules</button>
-    <button class="tab" data-tab="debugTab" type="button">Debug</button>
-  </div>
-</section>
-
-<section id="dashboard" class="box section active">
-  <h2>Creator dashboard</h2>
-  <div id="stats" class="stats"></div>
-  <div class="steps" style="margin-top:10px">
-    <div class="step"><b>1. Submit</b><p>Use the passed Submit Video overlay. It writes pending rows to <code>sb_submissions</code>.</p><a class="btn small hot" href="submit-video-clean-machine-v7-12-79-test.html">Open Submit</a></div>
-    <div class="step"><b>2. Review</b><p>Use the passed Review Queue to approve, decline or publish.</p><a class="btn small cyan" href="review-queue-clean-machine-v7-12-80-publish-test.html">Open Review</a></div>
-    <div class="step"><b>3. Publish</b><p>Approved rows render as public movies from <code>sb_movies</code>.</p><a class="btn small primary" href="library-global-helpers-v7-4-8-test.html">Open Library</a></div>
-    <div class="step"><b>4. Group Play</b><p>Use Player 2 for Play All queues. Single video play stays on Player 1.</p><button id="dashPlayAll" class="btn small warn" type="button">Play All</button></div>
-  </div>
-</section>
-
-<section id="videos" class="box section">
-  <h2>My / Channel videos</h2>
-  <div class="filters"><input id="videoFilter" class="input" placeholder="Filter videos"><button id="videosPlayAll" class="btn hot" type="button">Play Visible In Player 2</button></div>
-  <div id="movieGrid" class="movieGrid" style="margin-top:10px"></div>
-</section>
-
-<section id="submissions" class="box section">
-  <h2>Submission activity</h2>
-  <div class="actions"><a class="btn hot" href="submit-video-clean-machine-v7-12-79-test.html">Submit Video</a><a class="btn cyan" href="review-queue-clean-machine-v7-12-80-publish-test.html">Review Queue</a></div>
-  <div id="submissionGrid" class="subGrid" style="margin-top:10px"></div>
-</section>
-
-<section id="channels" class="box section">
-  <h2>Channels</h2>
-  <div class="filters"><input id="channelFilter" class="input" placeholder="Filter channels"><a class="btn primary" href="channels-global-helpers-v7-5-3-test.html">Open Channels Page</a></div>
-  <div id="channelGrid" class="channelGrid" style="margin-top:10px"></div>
-</section>
-
-<section id="rules" class="box section">
-  <h2>Protected Group Play rules</h2>
-  <ul>
-    <li>My Channel is read-only in this pass.</li>
-    <li>No old Submit Video or old Review Queue routes remain.</li>
-    <li>Collections route truth is <code>collections-clean-machine-v7-12-51-test.html</code>.</li>
-    <li>Single movie Play opens Player 1.</li>
-    <li>Play All opens Player 2 with a stored queue.</li>
-    <li>Player 2 route truth is <code>player-2-clean-machine-v7-12-58-test.html</code>.</li>
-    <li>Player 1 remains the exact resume owner; Player 2 must not steal that role.</li>
-    <li>No create/edit/delete/admin/billing/publish buttons appear on this page.</li>
-  </ul>
-</section>
-
-<section id="debugTab" class="box section">
-  <h2>Debug</h2>
-  <div id="debug" class="source">Waiting...</div>
-</section>
-
-<p class="micro">My Channel refit: Header Shell + My Channel Content + Footer Shell + Theme Projector. Current Group Play routes only.</p>
+<section class="hero"><div class="heroGrid"><div><span class="badge">V7.12.269 My Channel · Profile + Entitlements</span><h1>My Channel</h1><p>Creator dashboard for the signed-in profile. Profile channel identity is read from <code>sb_profiles</code>. Movies are read from <code>sb_movies.owner_id</code>. No fallback to other users' channels or movies.</p><div class="routeStrip"><span>Profile → sb_profiles</span><span>Videos → sb_movies.owner_id</span><span>Submissions → sb_submissions.submitter_id</span><span>Rules → entitlements</span></div><div class="actions"><button id="reload" class="btn cyan" type="button">Reload My Channel</button><a class="btn hot" href="submit-video-clean-machine-v7-12-79-test.html">Submit Video</a><a class="btn primary" href="channels-global-helpers-v7-5-3-test.html">Channels</a><a class="btn" href="playlists-global-helpers-v7-5-2-test.html">Playlists</a><a class="btn" href="collections-clean-machine-v7-12-51-test.html">Collections</a><button id="heroPlayAll" class="btn warn" type="button">Play My Videos In Player 2</button></div><div id="status" class="status">Loading My Channel...</div><div id="helperStatus" class="note">Checking foundation...</div></div><div id="heroArt" class="art"><div class="artIcon">📡✅</div></div></div></section>
+<section class="box"><h2>My Channel tabs</h2><div class="tabs"><button class="tab active" data-tab="dashboard" type="button">Dashboard</button><button class="tab" data-tab="profileEdit" type="button">Edit Profile Channel</button><button class="tab" data-tab="videos" type="button">My Videos</button><button class="tab" data-tab="submissions" type="button">Submissions</button><button class="tab" data-tab="entitlementTab" type="button">Permissions</button><button class="tab" data-tab="rules" type="button">Rules</button><button class="tab" data-tab="debugTab" type="button">Debug</button></div></section>
+<section id="dashboard" class="box section active"><h2>Creator dashboard</h2><div id="stats" class="stats"></div><div id="profileCard" style="margin-top:10px"></div><div class="grid" style="margin-top:10px"><div class="card"><b>Submit</b><p>Submit new video rows to the Review Queue.</p><a class="btn hot" href="submit-video-clean-machine-v7-12-79-test.html">Open Submit</a></div><div class="card"><b>Group Play</b><p>Create and manage channels, playlists and collections according to your plan.</p><div class="actions"><a class="btn primary" href="channels-global-helpers-v7-5-3-test.html">Channels</a><a class="btn" href="playlists-global-helpers-v7-5-2-test.html">Playlists</a><a class="btn" href="collections-clean-machine-v7-12-51-test.html">Collections</a></div></div><div class="card"><b>Play All</b><p>Send your visible published videos to Player 2 as a queue.</p><button id="dashPlayAll" class="btn warn" type="button">Play All</button></div></div></section>
+<section id="profileEdit" class="box section"><h2>Edit profile channel</h2><p class="muted">This edits your profile channel identity only. It writes <code>sb_profiles.channel_name</code>, <code>channel_about</code>, <code>avatar_url</code> and <code>banner_url</code>. It does not create duplicate <code>sb_channels</code> rows.</p><div class="formGrid"><div class="field"><label>Channel name</label><input id="channelName" class="input" placeholder="My channel"></div><div class="field"><label>Avatar URL</label><input id="avatarUrl" class="input" placeholder="https://..."></div><div class="field"><label>Banner URL</label><input id="bannerUrl" class="input" placeholder="https://..."></div><div class="field"><label>About</label><textarea id="channelAbout" class="textarea" placeholder="About my channel"></textarea></div></div><div class="actions"><button id="saveProfileChannel" class="btn primary" type="button">Save profile channel</button><button id="clearProfileChannel" class="btn dangerBtn" type="button">Clear profile channel</button></div><div id="writeStatus" class="note">Waiting for entitlements...</div></section>
+<section id="videos" class="box section"><h2>My videos</h2><div class="filters"><input id="videoFilter" class="input" placeholder="Filter my videos"><button id="videosPlayAll" class="btn hot" type="button">Play Visible In Player 2</button></div><div id="movieGrid" class="movieGrid" style="margin-top:10px"></div></section>
+<section id="submissions" class="box section"><h2>Submission activity</h2><div class="actions"><a class="btn hot" href="submit-video-clean-machine-v7-12-79-test.html">Submit Video</a></div><div id="submissionGrid" class="subGrid" style="margin-top:10px"></div></section>
+<section id="entitlementTab" class="box section"><h2>My permissions</h2><div id="permSummary" class="safe">Waiting...</div><div id="permGrid" class="permGrid" style="margin-top:10px"></div></section>
+<section id="rules" class="box section"><h2>Protected Group Play rules</h2><ul><li>Default channel identity lives in <code>sb_profiles</code>.</li><li>My Channel never falls back to showing other users' content.</li><li>Movies are owned by <code>sb_movies.owner_id</code>.</li><li>Creator Growth can create/manage own channels, playlists and collections but cannot see Admin or Owner pages.</li><li>Owner/Admin page visibility is separate from creator permissions.</li><li>Backend RLS remains the real write protection.</li></ul></section>
+<section id="debugTab" class="box section"><h2>Debug</h2><div id="debug" class="source">Waiting...</div></section>
+<p class="micro">My Channel V7.12.269. Old URL preserved. Header + page + footer only. No index promotion.</p>
 </div>
-
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=my-channel-7-12-190"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=my-channel-7-12-190"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=my-channel-7-12-190"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=my-channel-7-12-190"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=my-channel-7-12-190"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=my-channel-7-12-190"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=my-channel-v7-12-269"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=my-channel-v7-12-269"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=my-channel-v7-12-269"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=my-channel-v7-12-269"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=my-channel-v7-12-269"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=my-channel-v7-12-269"></script>
+<script src="stream-bandit-entitlements-v7-12-269.js?v=my-channel-v7-12-269"></script>
 <script>
 (function(){
 'use strict';
-const VERSION='V7.12.190 My Channel Clean Shell Route Truth';
+const VERSION='V7.12.269 My Channel Profile + Entitlements';
+const FALLBACK_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+const FALLBACK_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER1='player-one-global-helpers-v7-3-3-test.html';
 const PLAYER2='player-2-clean-machine-v7-12-58-test.html';
-let cfg=null,sb=null,user=null,profile=null,channels=[],movies=[],subs=[],countReady=false;
+let sb=null,user=null,profile=null,movies=[],subs=[],channels=[],playlists=[],collections=[],entitlements=null,debugState={};
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c));}
 function first(){for(let i=0;i<arguments.length;i++){let x=arguments[i];if(x!==undefined&&x!==null&&String(x).trim()!=='')return String(x).trim();}return '';}
@@ -128,107 +47,37 @@ function arr(v){if(Array.isArray(v))return v;if(typeof v==='string'&&v.trim()){t
 function idOf(x){return String(first(x&&x.id,x&&x.movie_id,x&&x.uuid));}
 function titleOf(x){return first(x&&x.title,x&&x.name,'Untitled');}
 function descOf(x){return first(x&&x.description,x&&x.summary,x&&x.reason,'No description yet.');}
-function posterOf(x){return first(x&&x.thumbnail_url,x&&x.poster_url,x&&x.image_url,x&&x.backdrop_url,x&&x.banner_url,x&&x.cover_url,x&&x.logo_url,x&&x.avatar_url);}
+function posterOf(x){return first(x&&x.thumbnail_url,x&&x.banner_url,x&&x.avatar_url,x&&x.image_url);}
 function videoOf(x){return first(x&&x.video_url,x&&x.mux_playback_url,x&&x.stream_url,x&&x.url,x&&x.source);}
 function statusOf(x){return String(x&&x.status||'published').toLowerCase();}
-function profileId(){return first(profile&&profile.id,user&&user.id);}
-function userEmail(){return first(user&&user.email,profile&&profile.email);}
-function isAdmin(){let r=String(first(profile&&profile.role,profile&&profile.account_role,user&&user.app_metadata&&user.app_metadata.role,user&&user.user_metadata&&user.user_metadata.role)).toLowerCase();return ['admin','owner','superadmin','super_admin'].includes(r);}
-function ownish(x){let pid=profileId(),email=userEmail().toLowerCase();if(!x)return false;let vals=[x.owner_id,x.user_id,x.profile_id,x.created_by,x.creator_id,x.submitter_id,x.author_id,x.email,x.submitter_email,x.creator_email].map(v=>String(v||'').toLowerCase());return vals.includes(String(pid).toLowerCase())||(email&&vals.includes(email));}
-function channelKey(c){return String(first(c&&c.id,c&&c.channel_id,c&&c.slug,c&&c.name,c&&c.title));}
-function channelName(c){return first(c&&c.name,c&&c.title,c&&c.channel_name,c&&c.display_name,'Channel');}
-function movieChannelKey(m){return String(first(m&&m.channel_id,m&&m.channel,m&&m.channel_slug,m&&m.channel_name));}
 function setStatus(t,bad){$('status').textContent=t;$('status').className=bad?'danger':'status';}
-function dbg(step,obj){$('debug').textContent='Debug '+new Date().toLocaleTimeString()+': '+step+'\n'+(obj?JSON.stringify(obj,null,2):'');}
-async function readConfig(){
-  if(cfg)return cfg;
-  if(window.StreamBanditSupabaseConfig&&window.StreamBanditSupabaseConfig.url&&window.StreamBanditSupabaseConfig.key){cfg={url:window.StreamBanditSupabaseConfig.url,key:window.StreamBanditSupabaseConfig.key,source:'StreamBanditSupabaseConfig'};return cfg;}
-  let txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text());
-  cfg={url:(txt.match(/SUPABASE_URL\s*=\s*["']([^"']+)/)||[])[1]||'',key:(txt.match(/SUPABASE_KEY\s*=\s*["']([^"']+)/)||[])[1]||'',source:'config-source-fetch'};
-  return cfg;
-}
-async function getClient(){let c=await readConfig();if(!c.url||!c.key)throw Error('Supabase config not found.');if(!sb)sb=supabase.createClient(c.url,c.key);return sb;}
-async function getProfile(){
-  let client=await getClient();
-  try{let au=await client.auth.getUser();user=au&&au.data&&au.data.user||null;}catch(e){user=null;}
-  profile=null;
-  if(user){
-    let tries=[['id',user.id],['user_id',user.id],['email',user.email]].filter(x=>x[1]);
-    for(const t of tries){try{let r=await client.from('sb_profiles').select('*').eq(t[0],t[1]).maybeSingle();if(!r.error&&r.data){profile=r.data;break;}}catch(e){}}
-  }
-}
-async function refreshCounts(){
-  try{
-    let core=window.StreamBanditCoreSavesV675;
-    if(core){if(!countReady&&core.init){await core.init();countReady=true;}else if(core.refresh){await core.refresh();}}
-    if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();
-    if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();
-  }catch(e){}
-}
-function myChannels(){let owned=channels.filter(ownish);return owned.length?owned:channels;}
-function myMovies(){
-  let chKeys={};myChannels().forEach(c=>{let k=channelKey(c);if(k)chKeys[k]=true;});
-  let owned=movies.filter(m=>ownish(m)||chKeys[movieChannelKey(m)]||chKeys[String(m.channel_id||'')]);
-  return owned.length?owned:movies.slice(0,24);
-}
-function mySubs(){let owned=subs.filter(s=>ownish(s));return (owned.length||!isAdmin())?owned:subs.slice(0,30);}
+function setWrite(t,bad){$('writeStatus').textContent=t;$('writeStatus').className=bad?'danger':'note';}
+function dbg(step,obj){debugState={version:VERSION,step:step,user:user&&{id:user.id,email:user.email},profile:profile,entitlements:entitlements,counts:{movies:movies.length,subs:subs.length,channels:channels.length,playlists:playlists.length,collections:collections.length},extra:obj||{}};$('debug').textContent=JSON.stringify(debugState,null,2);}
+async function client(){if(sb)return sb;let cfg=window.StreamBanditSupabaseConfig||{};sb=supabase.createClient(cfg.url||FALLBACK_URL,cfg.key||FALLBACK_KEY);return sb;}
+async function loadProfile(){const c=await client();const au=await c.auth.getUser();user=au&&au.data&&au.data.user||null;profile=null;if(user){const pr=await c.from('sb_profiles').select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,created_at,updated_at,account_status,admin_level,permissions_json,plan_key').eq('id',user.id).maybeSingle();if(pr.error)throw pr.error;profile=pr.data||null;}}
+async function loadData(){const c=await client();movies=[];subs=[];channels=[];playlists=[];collections=[];if(!profile)return;let mv=await c.from('sb_movies').select('id,title,description,thumbnail_url,video_url,mux_playback_url,trailer_url,genres,tags,channel_id,owner_id,source_type,status,created_at,updated_at').eq('owner_id',profile.id).order('created_at',{ascending:false}).limit(600);if(mv.error)throw mv.error;movies=mv.data||[];let su=await c.from('sb_submissions').select('id,title,description,video_url,thumbnail_url,genres,reason,status,submitter_id,channel_name,created_at,updated_at,reviewed_at').eq('submitter_id',profile.id).order('created_at',{ascending:false}).limit(200);if(!su.error)subs=su.data||[];let ch=await c.from('sb_channels').select('id,name,description,owner_id,image_url,avatar_url,is_official,created_at,updated_at').eq('owner_id',profile.id).order('created_at',{ascending:false}).limit(200);if(!ch.error)channels=ch.data||[];let pl=await c.from('sb_playlists').select('id,name,description,image_url,owner_id,is_public,created_at,updated_at').eq('owner_id',profile.id).order('created_at',{ascending:false}).limit(200);if(!pl.error)playlists=pl.data||[];let co=await c.from('sb_collections').select('id,name,description,image_url,created_by,created_at,updated_at').eq('created_by',profile.id).order('created_at',{ascending:false}).limit(200);if(!co.error)collections=co.data||[];}
+function resolveEntitlements(){const resolver=window.StreamBanditEntitlementsV712269;if(!resolver)throw Error('Entitlements helper did not load.');entitlements=resolver.resolve(profile||{}, {channels:channels.length, playlists:playlists.length, collections:collections.length, channelMovies:movies.length, movies:movies.length});}
+function channelName(){return first(profile&&profile.channel_name,profile&&profile.display_name,profile&&profile.username,'My Channel');}
+function channelAbout(){return first(profile&&profile.channel_about,'No channel about text yet.');}
+function fillForm(){if(!profile)return;$('channelName').value=first(profile.channel_name,profile.display_name,profile.username,'');$('channelAbout').value=first(profile.channel_about,'');$('avatarUrl').value=first(profile.avatar_url,'');$('bannerUrl').value=first(profile.banner_url,'');}
 function stat(label,value){return '<div class="stat"><b>'+esc(label)+'</b><span>'+esc(value)+'</span></div>';}
-function movieCard(m){let id=encodeURIComponent(idOf(m)),im=posterOf(m),url=videoOf(m);return '<article class="movie"><div class="thumb">'+(im?'<img src="'+esc(im)+'" alt="">':'No artwork')+'</div><div class="body"><h3>'+esc(titleOf(m))+'</h3><p>'+esc(descOf(m))+'</p><div><span class="pill">'+esc(statusOf(m))+'</span><span class="pill">'+esc(first(m.source_type,url?'url':'no source'))+'</span>'+arr(m.genres).slice(0,2).map(g=>'<span class="pill">'+esc(g)+'</span>').join('')+'</div><div class="actions"><a class="btn small primary" href="'+DETAILS+'?id='+id+'">Details</a><a class="btn small hot" href="'+PLAYER1+'?id='+id+'">Play</a></div></div></article>';}
-function channelCard(c){let k=channelKey(c),im=posterOf(c);let count=movies.filter(m=>movieChannelKey(m)===k||String(m.channel_id||'')===k).length;return '<article class="channel"><div class="banner">'+(im?'<img src="'+esc(im)+'" alt="">':'Channel')+'</div><div class="body"><h3>'+esc(channelName(c))+'</h3><p>'+esc(descOf(c))+'</p><span class="pill">'+count+' video(s)</span><span class="pill">'+esc(statusOf(c))+'</span></div></article>';}
-function submissionCard(s){let im=posterOf(s),st=statusOf(s);return '<article class="submission"><div class="thumb">'+(im?'<img src="'+esc(im)+'" alt="">':'Submission')+'</div><div class="body"><h3>'+esc(titleOf(s))+'</h3><p>'+esc(descOf(s))+'</p><span class="pill '+esc(st)+'">'+esc(st)+'</span><span class="pill">'+esc(first(s.channel_name,s.channel,'No channel'))+'</span></div></article>';}
-function visibleVideos(){let q=($('videoFilter').value||'').trim().toLowerCase();let list=myMovies().filter(m=>String(statusOf(m))!=='hidden'&&String(statusOf(m))!=='archived');if(q)list=list.filter(m=>[titleOf(m),descOf(m),movieChannelKey(m),arr(m.genres).join(' '),arr(m.tags).join(' ')].join(' ').toLowerCase().includes(q));return list;}
-function render(){
-  let m=myMovies(), c=myChannels(), s=mySubs();
-  $('stats').innerHTML=stat('Signed in',user?'Yes':'No')+stat('Admin',isAdmin()?'Yes':'No')+stat('Channels',c.length)+stat('Videos',m.length)+stat('Submissions',s.length)+stat('Published',m.filter(x=>statusOf(x)==='published').length);
-  $('movieGrid').innerHTML=visibleVideos().map(movieCard).join('')||'<div class="note">No channel videos found yet.</div>';
-  let cq=($('channelFilter').value||'').trim().toLowerCase();let cl=cq?c.filter(x=>[channelName(x),descOf(x)].join(' ').toLowerCase().includes(cq)):c;
-  $('channelGrid').innerHTML=cl.map(channelCard).join('')||'<div class="note">No channels found yet.</div>';
-  $('submissionGrid').innerHTML=s.map(submissionCard).join('')||'<div class="note">No submissions found for this account yet.</div>';
-}
-function queuePayload(items,label){return{source:'my-channel',queueName:label||'My Channel',name:label||'My Channel',currentIndex:0,createdAt:new Date().toISOString(),items:items.filter(videoOf).map(m=>({id:idOf(m),title:titleOf(m),description:descOf(m),thumbnail_url:posterOf(m),poster_url:posterOf(m),video_url:videoOf(m),mux_playback_url:m.mux_playback_url||videoOf(m),source_type:m.source_type||'',genres:arr(m.genres),duration_seconds:m.duration_seconds||m.duration||0}))};}
-function playAll(items,label){let q=queuePayload(items,label);if(!q.items.length){setStatus('No playable videos found for Player 2.',true);return;}try{sessionStorage.setItem('streamBanditQueueV1',JSON.stringify(q));sessionStorage.setItem('streamBanditUpNextV1',JSON.stringify(q));sessionStorage.setItem('streamBanditPlayer2Queue',JSON.stringify(q));localStorage.setItem('streamBanditQueueV1',JSON.stringify(q));localStorage.setItem('streamBanditUpNextV1',JSON.stringify(q));localStorage.setItem('streamBanditPlayer2Queue',JSON.stringify(q));}catch(e){}location.href=PLAYER2+'?queue=my-channel';}
-async function safeSelect(table,order){try{let client=await getClient();let q=client.from(table).select('*').limit(300);if(order)q=q.order(order,{ascending:false});let r=await q;if(r.error)return[];return r.data||[];}catch(e){return[];}}
-async function load(){
-  try{
-    setStatus('Loading My Channel...');
-    await getProfile();
-    channels=await safeSelect('sb_channels','created_at');
-    movies=(await safeSelect('sb_movies','created_at')).filter(m=>!['hidden','archived'].includes(statusOf(m)));
-    subs=await safeSelect('sb_submissions','created_at');
-    render();
-    helper();
-    await refreshCounts();
-    setStatus('My Channel ready. Current Creator and Group Play routes only.');
-    dbg('load ok',{version:VERSION,configSource:cfg&&cfg.source,user:user&&user.email,admin:isAdmin(),channels:channels.length,movies:movies.length,submissions:subs.length,myChannels:myChannels().length,myMovies:myMovies().length,mySubmissions:mySubs().length,routes:{submit:'submit-video-clean-machine-v7-12-79-test.html',review:'review-queue-clean-machine-v7-12-80-publish-test.html',collections:'collections-clean-machine-v7-12-51-test.html',player2:PLAYER2,details:DETAILS,player1:PLAYER1}});
-  }catch(e){
-    setStatus('My Channel load failed: '+(e.message||e),true);
-    dbg('load error',{message:e.message||String(e)});
-  }
-}
-function helper(){
-  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}
-  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
-  try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
-  try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();}catch(e){}
-  $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Save counts '+(window.StreamBanditMenuSavesCount?'✅':'⚠️');
-}
-function wire(){
-  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active');helper();});
-  $('videoFilter').oninput=render;
-  $('channelFilter').oninput=render;
-  $('heroPlayAll').onclick=()=>playAll(myMovies(),'My Channel');
-  $('dashPlayAll').onclick=()=>playAll(myMovies(),'My Channel');
-  $('videosPlayAll').onclick=()=>playAll(visibleVideos(),'Visible My Channel Videos');
-  window.addEventListener('streambandit-core-saves-changed',()=>refreshCounts());
-  window.addEventListener('streambandit-core-saves-v6-75-changed',()=>refreshCounts());
-}
-wire();
-helper();
-load();
-setTimeout(()=>refreshCounts(),700);
-setTimeout(helper,900);
-setTimeout(helper,1800);
-setInterval(helper,6000);
+function yes(v){return v?'<span class="pill cyanPill">YES</span>':'<span class="pill badPill">NO</span>';}
+function perm(label,key,help){let v=entitlements&&entitlements.can&&entitlements.can[key];return '<div class="perm"><b>'+esc(label)+'</b><p>'+yes(v)+'</p><small>'+esc(help||key)+'</small></div>';}
+function profileCard(){let im=first(profile&&profile.banner_url,profile&&profile.avatar_url);return '<article class="channel"><div class="banner">'+(im?'<img src="'+esc(im)+'" alt="">':'Profile Channel')+'</div><div class="body"><h3>'+esc(channelName())+'</h3><p>'+esc(channelAbout())+'</p><span class="pill cyanPill">profile channel</span><span class="pill">'+movies.length+' owned movie(s)</span><span class="pill">'+esc(first(profile&&profile.plan_key,'free_viewer'))+'</span></div></article>';}
+function movieCard(m){let id=encodeURIComponent(idOf(m)),im=posterOf(m),url=videoOf(m);return '<article class="movie"><div class="thumb">'+(im?'<img src="'+esc(im)+'" alt="">':'No artwork')+'</div><div class="body"><h3>'+esc(titleOf(m))+'</h3><p>'+esc(descOf(m))+'</p><div><span class="pill">'+esc(statusOf(m))+'</span><span class="pill">'+esc(first(m.source_type,url?'url':'no source'))+'</span>'+arr(m.genres).slice(0,2).map(g=>'<span class="pill">'+esc(g)+'</span>').join('')+'</div><div class="actions"><a class="btn primary" href="'+DETAILS+'?id='+id+'">Details</a><a class="btn hot" href="'+PLAYER1+'?id='+id+(url?'&src='+encodeURIComponent(url):'')+'">Play</a></div></div></article>';}
+function submissionCard(s){let im=posterOf(s),st=statusOf(s);return '<article class="submission"><div class="thumb">'+(im?'<img src="'+esc(im)+'" alt="">':'Submission')+'</div><div class="body"><h3>'+esc(titleOf(s))+'</h3><p>'+esc(descOf(s))+'</p><span class="pill '+(st==='approved'||st==='published'?'cyanPill':st==='declined'?'badPill':'warnPill')+'">'+esc(st)+'</span><span class="pill">'+esc(first(s.channel_name,channelName()))+'</span></div></article>';}
+function visibleVideos(){let q=($('videoFilter').value||'').trim().toLowerCase();return movies.filter(m=>statusOf(m)!=='hidden').filter(m=>!q||[titleOf(m),descOf(m),arr(m.genres).join(' ')].join(' ').toLowerCase().includes(q));}
+function queuePayload(items){return{source:'my-channel',queueName:channelName(),name:channelName(),currentIndex:0,createdAt:new Date().toISOString(),items:items.filter(videoOf).map(m=>({id:idOf(m),title:titleOf(m),description:descOf(m),thumbnail_url:posterOf(m),poster_url:posterOf(m),video_url:videoOf(m),mux_playback_url:m.mux_playback_url||videoOf(m),source_type:m.source_type||'',genres:m.genres||[]}))};}
+function playVisible(){let q=queuePayload(visibleVideos());if(!q.items.length){setStatus('No playable videos found for My Channel.',true);return;}try{['streamBanditQueueV1','streamBanditUpNextV1','streamBanditPlayer2Queue'].forEach(k=>{sessionStorage.setItem(k,JSON.stringify(q));localStorage.setItem(k,JSON.stringify(q));});}catch(e){}location.href=PLAYER2+'?queue=my-channel';}
+function render(){let vv=visibleVideos();$('stats').innerHTML=stat('Signed in',user?'Yes':'No')+stat('Plan',entitlements?entitlements.plan_key:'none')+stat('Status',profile?profile.account_status||'active':'none')+stat('Can submit',profile&&profile.can_submit?'Yes':'No')+stat('My videos',movies.length)+stat('Submissions',subs.length)+stat('Channels',channels.length+' / '+(entitlements?entitlements.limits.channels_limit:'0'))+stat('Playlists',playlists.length+' / '+(entitlements?entitlements.limits.playlists_limit:'0'))+stat('Collections',collections.length+' / '+(entitlements?entitlements.limits.collections_limit:'0'));$('profileCard').innerHTML=profile?profileCard():'<div class="note">No profile loaded. Sign in first.</div>';$('movieGrid').innerHTML=vv.map(movieCard).join('')||'<div class="note">No movies owned by this profile yet.</div>';$('submissionGrid').innerHTML=subs.map(submissionCard).join('')||'<div class="note">No submissions for this profile yet.</div>';$('permSummary').textContent=entitlements?window.StreamBanditEntitlementsV712269.describe(entitlements):'No entitlements loaded.';$('permGrid').innerHTML=[perm('Edit profile channel','editProfileChannel','Profile channel name/about/avatar/banner'),perm('Create channel','createChannel','Extra channel allowance'),perm('Edit own channel','editOwnChannel','Own extra channels'),perm('Delete own channel','deleteOwnChannel','Own extra channels'),perm('Create playlist','createPlaylist','Plan playlist allowance'),perm('Create collection','createCollection','Plan collection allowance'),perm('Admin pages visible','adminPages','Should be NO for Creator Growth'),perm('Owner pages visible','ownerPages','Should be NO for Creator Growth')].join('');$('saveProfileChannel').disabled=!(entitlements&&entitlements.can.editProfileChannel);$('clearProfileChannel').disabled=!(entitlements&&entitlements.can.editProfileChannel)||movies.length>0;if(!profile)setWrite('No signed-in profile loaded.',true);else if(!(entitlements&&entitlements.can.editProfileChannel))setWrite('Your plan does not allow profile channel editing.',true);else setWrite('Ready to save profile channel fields.');let im=first(profile&&profile.banner_url,profile&&profile.avatar_url);$('heroArt').innerHTML=im?'<img src="'+esc(im)+'" alt="">':'<div class="artIcon">📡✅</div>';dbg('render');}
+async function saveProfileChannel(){try{if(!profile)throw Error('No profile loaded.');if(!(entitlements&&entitlements.can.editProfileChannel))throw Error('Profile channel editing is not allowed by this plan.');let name=$('channelName').value.trim();if(!name)throw Error('Channel name is required.');let data={channel_name:name,channel_about:$('channelAbout').value.trim(),avatar_url:$('avatarUrl').value.trim(),banner_url:$('bannerUrl').value.trim(),updated_at:new Date().toISOString()};setWrite('Saving profile channel...');let c=await client();let r=await c.from('sb_profiles').update(data).eq('id',profile.id).select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,account_status,admin_level,permissions_json,plan_key,updated_at').maybeSingle();if(r.error)throw r.error;profile=r.data;fillForm();render();setWrite('Profile channel saved successfully.');}catch(e){setWrite('Save failed: '+(e.message||e),true);dbg('save error',{message:e.message||String(e)});}}
+async function clearProfileChannel(){try{if(movies.length)throw Error('Clear blocked because this profile owns '+movies.length+' movie(s). Keep the channel visible for those movies.');let typed=prompt('Type CLEAR CHANNEL to clear your profile channel name/about.');if(typed!=='CLEAR CHANNEL'){setWrite('Clear cancelled.');return;}let c=await client();let r=await c.from('sb_profiles').update({channel_name:null,channel_about:null,updated_at:new Date().toISOString()}).eq('id',profile.id).select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,account_status,admin_level,permissions_json,plan_key,updated_at').maybeSingle();if(r.error)throw r.error;profile=r.data;fillForm();render();setWrite('Profile channel cleared.');}catch(e){setWrite('Clear failed: '+(e.message||e),true);dbg('clear error',{message:e.message||String(e)});}}
+async function load(){try{setStatus('Loading My Channel...');await loadProfile();await loadData();resolveEntitlements();fillForm();render();helper();setStatus('My Channel loaded for '+(profile?channelName():'signed-out user')+'.');}catch(e){setStatus('My Channel load failed: '+(e.message||e),true);dbg('load error',{message:e.message||String(e)});}}
+function tabs(){document.querySelectorAll('[data-tab]').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));btn.classList.add('active');let el=$(btn.dataset.tab);if(el)el.classList.add('active');});}
+function helper(){try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();}catch(e){}$('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'OK':'checking')+' · Footer '+(window.StreamBanditFooterShell?'OK':'checking')+' · Theme '+(window.StreamBanditThemeProjector?'OK':'checking')+' · Entitlements '+(window.StreamBanditEntitlementsV712269?'OK':'checking');}
+function wire(){tabs();$('reload').onclick=load;$('heroPlayAll').onclick=playVisible;$('dashPlayAll').onclick=playVisible;$('videosPlayAll').onclick=playVisible;$('videoFilter').oninput=render;$('saveProfileChannel').onclick=saveProfileChannel;$('clearProfileChannel').onclick=clearProfileChannel;}
+function boot(){wire();helper();load();setTimeout(helper,900);setTimeout(helper,1800);setInterval(helper,6000);document.documentElement.dataset.sbMyChannel='v7-12-269';window.StreamBanditMyChannelV712269={version:VERSION,reload:load,current:function(){return debugState;}};}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
 </body>
