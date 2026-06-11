@@ -1,26 +1,29 @@
-# Stream Bandit Current App Manifest V7.12.264.20
+# Stream Bandit Current App Manifest V7.12.267
 
 Date: 2026-06-11
 
-Purpose: current protected route and recovery truth for Stream Bandit after the Web Builder core pass, Owner Admin hard-lock pass and the next Supabase Library multi-stream URL target. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
+Purpose: current protected route and recovery truth for Stream Bandit after the Web Builder core pass, Owner Admin hard-lock pass, and the Player 1 / Player 2 multi-provider stream playback pass. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
 
 ## Current strongest pause point
 
 Current state:
 
-- V7.12.264.20 current app truth.
+- V7.12.267 current app truth.
 - Web Builder core blockers are user-tested complete for the current controlled candidate.
 - Owner/Admin backend protection is now the current safety pattern: only `trevieisking@gmail.com` should be able to perform owner/admin profile-management actions.
 - The reusable owner/admin lock pattern is: owner email check + owner/admin profile check + protected-field trigger + owner-only RPC check + audit log.
 - The emergency SQL reset passed for the non-owner account after temporarily disabling and re-enabling the profile protection trigger for manual SQL Editor repair.
-- The `sb_profiles` account-management fields now exist: `account_status`, `admin_level`, `permissions_json`, `plan_key`, `admin_notes`, `managed_by`, `managed_at`.
-- The `sb_admin_audit_log` table exists and is the owner/admin action audit target.
-- Main app `Web Builder` route points to `web-builder-account-control-hub-v7-12-263-test.html`.
-- Stream Bandit app branding remains app-owned and unchanged.
-- Web Builder branding/projector starts inside Web Builder pages only.
+- Player 1 old route `player-one-global-helpers-v7-3-3-test.html` now supports multi-provider playback and passed user testing.
+- Player 2 old route `player-2-clean-machine-v7-12-58-test.html` now supports mixed-provider queues and passed user testing.
+- Mux/HLS/direct video keeps HTML video playback and audio boost.
+- YouTube/Vimeo use safe iframe playback and provider controls; audio boost is disabled only for iframe provider items.
+- Play from Supabase Library to Player 1 works.
+- Play All from Supabase Library to Player 2 works with mixed Mux and YouTube streams.
+- Supabase Library Editor itself does not need a playback rewrite tonight because the players now consume the URLs correctly.
 - `index.html` was not touched.
 - Footer shell was not touched.
-- Next important repair target: Supabase Library playback/rendering must support YouTube, Vimeo and other safe stream URLs, not only Mux/HLS URLs.
+- No Supabase schema change was done for provider playback.
+- Next important repair target: restore create/edit/delete for channels, playlists and collections, and align user roles/permissions so signed-in users see and manage their own channel correctly.
 
 ## Fresh Current Routes Registry proof target
 
@@ -33,7 +36,7 @@ Registry page has been aligned to the Web Builder doorway pass:
 - Unique URLs: `50`.
 - Web Builder doorway route: `web-builder-account-control-hub-v7-12-263-test.html`.
 - Old Web Builder live studio route remains as a redirect/fallback route, not the active menu doorway.
-- Next required proof: owner/admin should run `Scan All` from the registry and confirm route/file bad lists are empty after the Owner Admin and Supabase Library fixes.
+- Next required proof: owner/admin should run `Scan All` from the registry and confirm route/file bad lists are empty after the Owner Admin, provider-player, and Group Play permission fixes.
 
 ## Current promoted internal states
 
@@ -43,7 +46,7 @@ Registry page has been aligned to the Web Builder doorway pass:
 - `web-builder-account-control-hub-v7-12-263-test.html` - Web Builder Hub / doorway page.
 - `WEB-BUILDER-MANIFEST-V7-12-252.md` - Web Builder-only manifest records the V7.12.264.16 Web Builder core blocker pass.
 - `all-pages-version-registry-v7-12-122-current-routes-test.html` - V7.12.263.8 registry aligned to the Web Builder doorway route.
-- `user-management-dashboard-v7-11-2-test.html` - Owner Admin Hub route; UI still needs the full owner-email gate page replacement, while backend owner/admin RPC and trigger protection are the current safety source of truth.
+- `user-management-dashboard-v7-11-2-test.html` - Owner Admin Hub route; backend owner/admin RPC and trigger protection are the current safety source of truth.
 - `permissions-matrix-user-management-v7-11-4-test.html` - permissions rulebook/reference page.
 - `profile-settings-live-ready-v7-12-90-test.html` - Profile Settings sign-out / existing-user flow.
 - `policy-admin-documents-v7-12-120-test.html?policy=terms` - Policy Admin Editor Centre restored.
@@ -53,7 +56,10 @@ Registry page has been aligned to the Web Builder doorway pass:
 - `backup-safety-global-helpers-v7-10-9-test.html` - Backup / Safety Owner Utility.
 - `health-check-global-helpers-v7-10-6-test.html` - Health Check Owner Diagnostic.
 - `test-checklist-global-helpers-v7-10-5-test.html` - Test Checklist Owner QA Utility.
-- `supabase-library-home-header-form-fix-v7-12-34-test.html` - Supabase Library Editor / Shell Route Preservation; next target for multi-provider stream URL rendering.
+- `supabase-library-home-header-form-fix-v7-12-34-test.html` - Supabase Library Editor / Shell Route Preservation. It can pass URLs to Player 1 and Play All queues to Player 2. No rewrite tonight.
+- `player-one-global-helpers-v7-3-3-test.html` - V7.12.266 multi-provider promoted. Existing Player 1 URL preserved. Mux/HLS/direct boost preserved. YouTube/Vimeo iframe support passed.
+- `player-2-clean-machine-v7-12-58-test.html` - V7.12.267 multi-provider queue promoted. Existing Player 2 URL preserved. Mixed Mux and YouTube queue support passed.
+- `player-one-provider-test-v7-12-265-test.html` - temporary Player 1 provider test page; keep as backup until next cleanup pass.
 - `admin-centre-command-deck-v7-12-121-test.html` - Admin Centre Route Command Deck.
 - `web-builder-pages-manager-v7-12-111-test.html` - current app Pages Manager reference route.
 - `watch-history-global-helpers-v7-4-0-test.html` - Watch History title cleanup full-page replacement.
@@ -62,7 +68,7 @@ Registry page has been aligned to the Web Builder doorway pass:
 - `stream-bandit-brand-logo-v7-12-12.js` - Global Brand Logo Helper / Settings Read.
 - `settings-brand-icons-promoted-v7-12-21-test.html` - Brand / App Icons drag/drop polish with global logo upload/save owner preserved.
 - `brand-logo-helper-responsive-v7-12-20-test.html` - Brand Image Helper passed as global-logo preview/stage page.
-- `accessibility-clean-machine-v7-12-44-test.html` - Accessibility global readability page with current Player 2 route fixed.
+- `accessibility-clean-machine-v7-12-44-test.html` - Accessibility global readability page with Player Comfort route preserved.
 - `continue-watching-global-helpers-v7-3-9-test.html` - Continue Watching duplicate-row fix; local progress remains read-only.
 - `web-builder-theme-studio-controls-v7-8-9-test.html` - Theme Studio shell/helper polish; global theme ownership preserved.
 - `tools-page-original-global-pass-v7-12-136-test.html` - Tools useful toy page; Cast Writer outputs exact Details format.
@@ -199,6 +205,18 @@ Registry page has been aligned to the Web Builder doorway pass:
 - Manual SQL Editor repair passed by temporarily disabling the protection trigger, resetting the non-owner test account, and re-enabling the trigger.
 - This lock pattern is reusable for Owner Admin Hub, Admin Centre, policy admin, storage/admin tools and future billing/account pages.
 
+### Player provider chain
+
+- Player 1 existing route `player-one-global-helpers-v7-3-3-test.html` passed as V7.12.266 multi-provider promoted.
+- Player 2 existing route `player-2-clean-machine-v7-12-58-test.html` passed as V7.12.267 multi-provider queue promoted.
+- Mux/HLS/direct video use HTML video and retain audio boost.
+- YouTube/Vimeo use iframe providers and provider controls.
+- YouTube/Vimeo iframe playback deliberately disables Stream Bandit audio boost only for iframe provider items.
+- Mixed Player 2 queues can switch between Mux and YouTube and rebuild the correct player mode on Next / Previous.
+- Existing Player 1 and Player 2 URLs were preserved.
+- No Supabase schema change was required.
+- No Library Editor rewrite was required tonight.
+
 ### Supabase Library chain
 
 - Supabase Library Editor loads rows from `sb_movies`.
@@ -206,8 +224,9 @@ Registry page has been aligned to the Web Builder doorway pass:
 - Create/edit overlays remain present.
 - Poster preview still shows.
 - Copy ID, Details, Player 1 and Play All to current Player 2 work.
-- Current problem to fix next: Supabase Library rendering/playback currently favors Mux/HLS stream URLs and must be upgraded to render YouTube, Vimeo and other safe stream URLs.
-- Clean target: keep one canonical source resolver that detects URL provider/type, stores provider metadata safely, and sends playable URLs to Details/Player without breaking existing Mux/HLS rows.
+- Play from Supabase Library to Player 1 works for Mux and YouTube after the player promotion.
+- Play All from Supabase Library to Player 2 works with mixed Mux and YouTube streams after the player promotion.
+- Current decision: do not touch the Supabase Library Editor tonight because player-side provider handling solved the playback blocker.
 
 ### Admin Centre chain
 
@@ -216,23 +235,29 @@ Registry page has been aligned to the Web Builder doorway pass:
 
 ## Current blocker and next target
 
-Current blocker:
+Current blocker for next session:
 
-- Supabase Library must support non-Mux stream URLs.
-- YouTube, Vimeo and other safe stream URLs must render/play correctly from Supabase Library rows.
-- Existing Mux/HLS behavior must not be broken.
+- Group Play create/edit/delete needs restoration and permission alignment.
+- Channels, Playlists and Collections must regain create/edit/delete paths.
+- Signed-in users need their own channel/profile channel to show correctly after sign-up/sign-in.
+- Normal users must not self-upgrade role or protected permissions.
+- Creator permissions must be read consistently across Group Play pages from `sb_profiles.can_submit`, `sb_profiles.account_status`, `sb_profiles.admin_level`, `sb_profiles.role`, and `sb_profiles.permissions_json`.
+- Expect more role/permission fixes across pages.
 
 Next target:
 
-- `supabase-library-home-header-form-fix-v7-12-34-test.html`
+- `channels-global-helpers-v7-5-3-test.html`
+- `playlists-global-helpers-v7-5-2-test.html`
+- `collections-clean-machine-v7-12-51-test.html`
+- `my-channel-clean-machine-v7-12-47-test.html`
 
-Cleanest planned fix:
+Cleanest planned fix for next session:
 
-1. Scan the Library editor row schema and current play/render helpers.
-2. Add a single provider/source resolver.
-3. Detect `mux`, `hls`, `youtube`, `vimeo`, direct video file, iframe/embed URL and generic external link.
-4. Keep direct `<video>` playback for Mux/HLS/MP4/WebM/MOV style URLs.
-5. Use safe embed conversion for YouTube/Vimeo preview/player routes.
-6. Preserve all existing Supabase fields and avoid a schema change unless the page already has provider/source fields.
-7. If schema is missing provider fields, use derived provider detection first and only propose optional columns after the page works.
-8. Test old Mux rows and new YouTube/Vimeo rows before manifesting pass.
+1. Inspect current channel, playlist, collection and My Channel pages before coding.
+2. Inspect current Supabase tables and policies if page code references columns that are unclear.
+3. Restore create/edit/delete as guarded full-page replacements or test pages first.
+4. Use owner/admin hard-lock pattern only for owner/admin pages, not normal creator pages.
+5. Use creator/user permission pattern for Group Play: signed-in, active account, allowed by `can_submit` or explicit `permissions_json` keys.
+6. Ensure users can see/manage their own channel after sign-up/sign-in.
+7. Ensure delete/remove actions are scoped and confirmed.
+8. Test normal user, creator user and owner/admin separately before manifesting pass.
