@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit V7.12.263.8 Current App Map</title>
+<title>Stream Bandit V7.12.270 Current App Map</title>
 <meta name="theme-color" content="#050711">
 <style>
 :root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--cyan:#41e8ff;--card:#ffffff0f}*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;min-height:100vh;padding:16px;background:radial-gradient(circle at 8% 0,#22d3a633,transparent 34%),radial-gradient(circle at 92% 0,#7c3cff3d,transparent 38%),radial-gradient(circle at bottom,#ff2d8520,transparent 35%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.wrap{width:min(1480px,100%);margin:auto}.hero,.group,.notice{border:1px solid var(--line);border-radius:26px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 18px 58px #0007;padding:18px;margin-bottom:14px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px;font-size:13px}h1{font-size:clamp(38px,5.5vw,72px);margin:12px 0 8px;letter-spacing:-.055em;line-height:.95}h2{margin:0 0 10px;font-size:23px}.muted,p,li{color:var(--muted);line-height:1.48}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.routeGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:9px}.route{display:block;text-decoration:none;color:#fff;border:1px solid #ffffff18;border-radius:16px;background:var(--card);padding:12px;min-height:78px}.route b{display:block;color:#baf7df;margin-bottom:5px}.route small{display:block;color:#9aa6cb;font-size:12px;line-height:1.25;overflow-wrap:anywhere}.tag{display:inline-flex;border-radius:999px;background:#ffb14222;border:1px solid #ffb14255;color:#ffe7ad;font-weight:900;padding:4px 8px;font-size:11px;margin-left:7px}.ok{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}.warn{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.btn{display:inline-flex;align-items:center;justify-content:center;text-align:center;border:0;text-decoration:none;border-radius:999px;padding:10px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017;font-weight:950}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2));color:#fff}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.mini{font-size:12px;color:#8f98b8}.notice{padding:14px}.notice b{color:#baf7df}code{color:#baf7df;overflow-wrap:anywhere}@media(max-width:720px){body{padding:10px}.hero,.group,.notice{padding:14px}.routeGrid{grid-template-columns:1fr}.btn{width:100%}}
@@ -12,9 +12,9 @@
 <body>
 <div class="wrap">
 <section class="hero">
-<span class="badge">Stream Bandit V7.12.263.8 Current App Map</span>
+<span class="badge">Stream Bandit V7.12.270 Current App Map</span>
 <h1>Current App Manifest</h1>
-<p class="muted">Protected current-app map after the Web Builder doorway alignment pass. Root still redirects to Home after a short pause. Web Builder now enters through the Web Builder Hub while Stream Bandit app branding remains app-owned.</p>
+<p class="muted">Protected current-app map after the Group Play entitlement passes. Root still redirects to Home after a short pause. My Channel, Channels and Playlists have passed the current entitlement tests; Collections is the next target.</p>
 <div class="row">
 <a class="btn hot" href="home-global-helpers-v7-4-4-test.html">Open Home</a>
 <a class="btn" href="CURRENT-APP-MANIFEST-V7-12-180.md">Open Manifest</a>
@@ -24,9 +24,9 @@
 <a class="btn" href="admin-centre-command-deck-v7-12-121-test.html">Admin Centre</a>
 </div>
 </section>
-<section class="notice ok"><b>Current app truth:</b> this index lists the 51 active overlay entries / 50 unique app URLs. Old backups, old tests and checkpoint files are historical and must not be treated as active routes.</section>
-<section class="notice warn"><b>Current Web Builder doorway:</b> app menu Web Builder points to <code>web-builder-account-control-hub-v7-12-263-test.html</code>. The old live studio URL redirects to that hub.</section>
-<section class="notice warn"><b>Do not regress:</b> Player 2 stays on V7.12.58, Collections stays on V7.12.51, Theme Studio stays on V7.8.9, Published Preview current route is V7.12.117, and Form Inbox / Advanced Form remain preserved from the main app and Web Builder.</section>
+<section class="notice ok"><b>Current app truth:</b> this index lists the active app URLs and current pass state. Old backups, old tests and checkpoint files are historical and must not be treated as active routes.</section>
+<section class="notice ok"><b>Group Play pass:</b> My Channel is profile-canonical, Channels passed after removing the old one-channel clamp, and Playlists passed with V7.12.270 Creator Plan Controls. Creator Starter can use allowed channels/playlists but remains blocked from Collections and Supabase Library editing.</section>
+<section class="notice warn"><b>Do not regress:</b> Supabase Library global editing stays admin/chosen-only, Player 2 stays on V7.12.58, Collections stays on V7.12.51 until the next test pass, Theme Studio stays on V7.8.9, and Web Builder enters through <code>web-builder-account-control-hub-v7-12-263-test.html</code>.</section>
 <section class="group"><h2>Watch <span class="tag">10 routes</span></h2><div class="routeGrid">
 <a class="route" href="home-global-helpers-v7-4-4-test.html"><b>Home</b><small>home-global-helpers-v7-4-4-test.html</small></a>
 <a class="route" href="library-global-helpers-v7-4-8-test.html"><b>Library</b><small>library-global-helpers-v7-4-8-test.html</small></a>
@@ -51,10 +51,10 @@
 <a class="route" href="review-queue-clean-machine-v7-12-80-publish-test.html"><b>Review Queue</b><small>review-queue-clean-machine-v7-12-80-publish-test.html</small></a>
 </div></section>
 <section class="group"><h2>Group Play <span class="tag">5 routes</span></h2><div class="routeGrid">
-<a class="route" href="playlists-global-helpers-v7-5-2-test.html"><b>Playlists</b><small>playlists-global-helpers-v7-5-2-test.html</small></a>
-<a class="route" href="channels-global-helpers-v7-5-3-test.html"><b>Channels</b><small>channels-global-helpers-v7-5-3-test.html</small></a>
-<a class="route" href="my-channel-clean-machine-v7-12-47-test.html"><b>My Channel</b><small>my-channel-clean-machine-v7-12-47-test.html</small></a>
-<a class="route" href="collections-clean-machine-v7-12-51-test.html"><b>Collections</b><small>collections-clean-machine-v7-12-51-test.html</small></a>
+<a class="route" href="playlists-global-helpers-v7-5-2-test.html"><b>Playlists</b><small>V7.12.270 creator-plan controls passed</small></a>
+<a class="route" href="channels-global-helpers-v7-5-3-test.html"><b>Channels</b><small>Entitlement flow passed; old one-channel clamp removed</small></a>
+<a class="route" href="my-channel-clean-machine-v7-12-47-test.html"><b>My Channel</b><small>Profile-canonical entitlement pass</small></a>
+<a class="route" href="collections-clean-machine-v7-12-51-test.html"><b>Collections</b><small>Next entitlement alignment target</small></a>
 <a class="route" href="player-2-clean-machine-v7-12-58-test.html"><b>Player 2</b><small>player-2-clean-machine-v7-12-58-test.html</small></a>
 </div></section>
 <section class="group"><h2>Settings <span class="tag">4 routes</span></h2><div class="routeGrid">
@@ -92,7 +92,7 @@
 <a class="route" href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page"><b>Published Preview</b><small>web-builder-shared-style-preview-v7-12-117-test.html?page=test-page</small></a>
 </div></section>
 <section class="group"><h2>User Management <span class="tag">3 routes</span></h2><div class="routeGrid">
-<a class="route" href="user-management-dashboard-v7-11-2-test.html"><b>User Dashboard</b><small>user-management-dashboard-v7-11-2-test.html</small></a>
+<a class="route" href="user-management-dashboard-v7-11-2-test.html"><b>Owner Admin Hub</b><small>user-management-dashboard-v7-11-2-test.html</small></a>
 <a class="route" href="plans-pricing-feature-shop-v7-11-3-test.html"><b>Pricing Matrix / Feature Shop</b><small>plans-pricing-feature-shop-v7-11-3-test.html</small></a>
 <a class="route" href="permissions-matrix-user-management-v7-11-4-test.html"><b>Permissions Matrix</b><small>permissions-matrix-user-management-v7-11-4-test.html</small></a>
 </div></section>
@@ -104,7 +104,7 @@
 <div class="notice"><b>Saves/search/profile helpers:</b><br><code>stream-bandit-menu-saves-count-v6-72-1.js</code><br><code>stream-bandit-core-saves-v6-75.js</code><br><code>stream-bandit-profile-signin-v7-12-156.js</code></div>
 <div class="notice"><b>Manifests:</b><br><code>CURRENT-APP-MANIFEST-V7-12-180.md</code><br><code>WEB-BUILDER-MANIFEST-V7-12-252.md</code></div>
 </div></section>
-<p class="mini">V7.12.263.8 current index map. Web Builder doorway aligned to Hub. Root still redirects to Home. No new page files.</p>
+<p class="mini">V7.12.270 current index map. Group Play entitlement passes recorded. Root still redirects to Home. No new page files.</p>
 </div>
 <script>(function(){try{setTimeout(function(){location.replace('home-global-helpers-v7-4-4-test.html');},1600);}catch(e){}})();</script>
 </body>
