@@ -1,76 +1,133 @@
-# Stream Bandit V5.29 — Live Channels Tidy Passed
+# Stream Bandit V7.12.269 - Channels Entitlement + Extra Channels Success
 
 Checkpoint name:
 
-`Stream Bandit V5.29 Stable - Channels Tidy Live Passed`
+`Stream Bandit V7.12.269 Stable - Channels Entitlement and Extra Channels Passed`
 
 ## Status
 
-V5.29 Channels tidy has been promoted to live and user smoke checks passed.
+PASS. The Channels flow now works after removing the old Supabase one-channel-per-owner index.
 
-Live app:
+Working page:
 
-`index.html`
+`channels-global-helpers-v7-5-3-test.html`
 
-Live title:
+Locked working commit:
 
-`Stream Bandit V5.29 Stable`
-
-Live promotion commit:
-
-`e0403c4f7d653e7595b7e949812df85d1edfc366`
+`11af31a58714e068e0a1dee564bd9af3fc4a4174`
 
 ## User confirmation
 
-User ran many checks and confirmed:
+Owner/admin smoke test passed:
 
-- checks seem to pass,
-- Channels is neat in tabs,
-- the layout should be kept as the base stack,
-- do not keep losing this layout direction.
+- page loads
+- Add / Remove Videos opens
+- dropdown shows owned videos plus Stream Bandit main/library videos
+- other normal users' personal/private videos do not appear in the attach dropdown
+- creating an extra channel works after the old index removal
+- adding videos to the extra channel works
+- removing videos works
+- deleting the extra channel works
+- no Web Builder, Library Editor, Owner Admin Hub, registry, or index promotion was needed
 
-## Layout base to preserve
+Girlfriend / creator-plan smoke test passed:
 
-For future page tidy work, use this layout style as the base:
+- her plan still allows the expected creator actions
+- she can add channels
+- she can add videos to her channels
+- she can remove her own videos
+- she can delete her channel
 
-1. Page title
-2. Main intro/status card
-3. Neat horizontal tabs underneath
-4. Selected tab panel if needed
-5. Main cards/content below
+## Supabase fix that made it pass
 
-Avoid floating helper boxes beside the title/search area.
-Avoid duplicate top guide cards when the real page is already good.
-Avoid overlay patches that fight core controllers.
+Removed old retired index:
+
+`sb_channels_one_channel_per_owner_uidx`
+
+Reason:
+
+The old index forced one channel per owner. That was an old V5/V6-style rule and conflicted with the V7 entitlement model. Current channels should be controlled by plan/permission limits, not by a hard one-channel database clamp.
+
+Verification query returned no rows:
+
+```sql
+select indexname, indexdef
+from pg_indexes
+where schemaname = 'public'
+  and tablename = 'sb_channels'
+  and indexname = 'sb_channels_one_channel_per_owner_uidx';
+```
+
+Expected result:
+
+`0 rows`
+
+## Important rollback truth
+
+Do not reintroduce:
+
+- `sb_channels_one_channel_per_owner_uidx`
+- `sb_channel_movies` for this current Channels fix
+- a hard one-channel-per-owner clamp
+- new page rewrites for this passed flow
+
+Keep:
+
+- `sb_profiles` for profile/default channel identity
+- `sb_channels` for extra/group channels
+- `sb_movies.owner_id` for owned/profile-channel videos
+- `sb_movies.channel_id` for current extra-channel assignment
+- `stream-bandit-entitlements-v7-12-269.js` for frontend plan/permission checks
+
+## Privacy and future curation notes
+
+Current safe interim rule:
+
+- users can use their own videos
+- users can use Stream Bandit main/library videos
+- users cannot attach another normal user's personal/private videos unless future explicit curation permission allows it
+
+Future privacy model should include:
+
+- public
+- private
+- unlisted
+- invite-only
+- followers/subscribers-only
+- paywalled
+- age restricted
+- scheduled/embargoed
+- owner approval for other users adding videos to channels/playlists/collections
+
+## Cleanup rule learned
+
+When a new V7 page or system replaces old V5/V6 behavior, old rules must not silently remain active.
+
+Old page/file/rule options:
+
+1. delete it if safely obsolete
+2. replace it with the new checkpoint/page
+3. park it clearly as inactive/reference-only
+4. preserve it only if it still holds protected useful logic
 
 ## Protected areas
 
 Do not casually change:
 
-- player core,
-- Sound Booster / custom volume overlay,
-- Supabase save/write logic,
-- movie rows,
-- channel card actions,
-- Open Channel,
-- Play All,
-- Final Boss Admin controller.
-
-## Current known stable tidy wins
-
-- Supabase Details / Movie Details tidy
-- Watch / Supabase Watch tidy
-- Accessibility tidy
-- Settings tabs and branding controls
-- Tools Page with Quality Tools moved in
-- Channels tidy in neat tabs
+- Player 1
+- Player 2
+- audio boost / accessibility
+- Supabase Library Editor
+- Owner Admin Hub
+- Web Builder routes
+- global shell helpers
+- route registry
+- `index.html`
 
 ## Next recommended page
 
-Continue page tidy only.
+Continue the planned Group Play pass only after this checkpoint stays stable:
 
-Recommended next page:
-
-`Collections`
-
-Reason: it is a browse/display page and should be safer than Admin or Manager.
+1. Playlists
+2. Collections
+3. Admin/Owner no-flash visibility gates
