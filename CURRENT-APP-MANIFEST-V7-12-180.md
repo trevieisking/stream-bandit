@@ -29,6 +29,52 @@ Current state:
 - Overlay URLs remain preserved.
 - Next page target: `channels-global-helpers-v7-5-3-test.html` with profile-channel + entitlement rules.
 
+## V7.12.269.1 scan-first checkpoint
+
+Recorded after the Channels rollback recovery and deeper scan of the permission, Web Builder and Supabase Library foundations.
+
+Rollback truth:
+
+- `channels-global-helpers-v7-5-3-test.html` was restored to commit `298c243dd87bf1f12080c7949e14972633bf21d5` / V7.12.269.
+- The broken V7.12.270 commit introduced public curation-link logic that expected `public.sb_channel_movies` and two new RPCs that were not present in Supabase.
+- Do not reintroduce `sb_channel_movies` for the current Channels fix.
+- Do not add schema, storage, registry, Web Builder, shell or `index.html` changes for the current Channels fix.
+
+Main app key facts learned:
+
+- `supabase-library-home-header-form-fix-v7-12-34-test.html` is the real admin/test workbench for `sb_movies` and is a key source of truth for the streaming app.
+- `sb_movies` remains the backbone for Library, Details, Player 1, Player 2, Home, Genres, Search, My Channel, Channels and saved lists.
+- `sb_movies.owner_id` controls owned/profile-channel movie identity.
+- `sb_movies.channel_id` controls extra-channel assignment in the current working Group Play model.
+- The public Library should stay read/watch/save only; the Supabase Library Editor owns create/edit/delete/upload behavior behind admin checks and Supabase policies.
+- Current Supabase movie policies are shaped as public read for published movies and admin management for writes.
+
+User management key facts learned:
+
+- `user-management-dashboard-v7-11-2-test.html` is the real owner/admin write surface.
+- `plans-pricing-feature-shop-v7-11-3-test.html` is a read-only pricing/add-on rulebook and must not be treated as billing live.
+- `permissions-matrix-user-management-v7-11-4-test.html` is a read-only permissions rulebook and must not directly apply access changes.
+- Dangerous account/profile writes must flow through the intended owner/admin RPC/audit path, not through hidden frontend buttons alone.
+
+Web Builder key facts learned:
+
+- Web Builder is a separate mini app/product area inside Stream Bandit, not the main movie app shell.
+- Web Builder has one approved doorway: Stream Bandit menu -> `web-builder-account-control-hub-v7-12-263-test.html`.
+- Web Builder's projector, tabs, local branding, avatar, theme and global search are Web Builder-only and must not take over Stream Bandit global branding or shell.
+- Web Builder canonical flow uses `sb_site_pages`, `layout_json`, `settings_json`, `sb_form_submissions` and the existing `stream-bandit-images` bucket.
+- Web Builder support/reference routes must be preserved and not rewritten during Group Play work.
+
+Next exact fix target:
+
+- Page: `channels-global-helpers-v7-5-3-test.html`.
+- Preserve V7.12.269 working structure.
+- Keep existing tables only: `sb_profiles`, `sb_channels`, `sb_movies`.
+- Keep the existing `sb_group_play_set_movie_channel` path.
+- Adjust only the Add / Remove Videos selection rule so users can add their own movies plus Stream Bandit main/library movies to their own extra channels.
+- Block adding another normal user's own/private videos.
+- Use `stream-bandit-entitlements-v7-12-269.js` for creator plan limits and write buttons.
+- Do not touch Web Builder, Library Editor, Owner Admin Hub, manifest promotion, registry promotion or `index.html` in the Channels page fix.
+
 ## Fresh Current Routes Registry proof target
 
 Source page: `all-pages-version-registry-v7-12-122-current-routes-test.html`
