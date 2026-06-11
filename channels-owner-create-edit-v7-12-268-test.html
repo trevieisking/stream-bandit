@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Channels Owner Tools V7.12.268 TEST</title>
+<title>Stream Bandit Channels Owner Tools V7.12.268.1 TEST</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,92 +14,26 @@
 </head>
 <body data-sb-channels-owner-test-url="channels-owner-create-edit-v7-12-268-test.html">
 <div class="wrap">
-<section class="hero">
-  <div class="heroGrid">
-    <div>
-      <span class="badge">V7.12.268 Channels Owner Create/Edit/Delete TEST</span>
-      <h1>Channels Owner Tools</h1>
-      <p>This is a test page only. It keeps the old Channels URL safe while testing creator-owned channel create, edit and delete against the real <code>sb_channels</code> table.</p>
-      <div class="actions">
-        <button id="reload" class="btn cyan" type="button">Reload</button>
-        <button id="fillProfile" class="btn primary" type="button">Fill from my profile</button>
-        <a class="btn" href="channels-global-helpers-v7-5-3-test.html">Current Channels page</a>
-        <a class="btn" href="my-channel-clean-machine-v7-12-47-test.html">My Channel</a>
-        <a class="btn hot" href="player-2-clean-machine-v7-12-58-test.html">Player 2</a>
-      </div>
-      <div id="status" class="status">Loading channel test...</div>
-      <div id="helperStatus" class="note">Checking foundation...</div>
-    </div>
-    <div class="art"><div class="artIcon">CH</div></div>
-  </div>
-</section>
-
-<section class="box">
-  <h2>Signed-in account</h2>
-  <div id="accountGrid" class="stats"></div>
-</section>
-
-<section class="box">
-  <h2>My channel editor</h2>
-  <p class="muted">This form creates or edits only the signed-in user's own channel. Delete is blocked when the channel still has movies attached.</p>
-  <div class="formGrid">
-    <div class="field"><label>Channel name</label><input id="name" class="input" placeholder="My channel name"></div>
-    <div class="field"><label>Banner image URL</label><input id="image_url" class="input" placeholder="https://..."></div>
-    <div class="field"><label>Avatar URL</label><input id="avatar_url" class="input" placeholder="https://..."></div>
-    <div class="field"><label>Description</label><textarea id="description" class="textarea" placeholder="About this channel"></textarea></div>
-  </div>
-  <div class="actions">
-    <button id="saveChannel" class="btn primary" type="button">Save my channel</button>
-    <button id="deleteChannel" class="btn dangerBtn" type="button">Delete my channel</button>
-  </div>
-  <div id="writeStatus" class="note">Waiting for sign-in and permissions...</div>
-</section>
-
-<section class="box">
-  <h2>My channel</h2>
-  <div id="myChannelBox"></div>
-</section>
-
-<section class="box">
-  <h2>My channel movies</h2>
-  <div id="myMovieGrid" class="movieGrid"></div>
-</section>
-
-<section class="box">
-  <h2>Public channels</h2>
-  <div class="filters"><input id="filter" class="input" placeholder="Filter all channels"></div>
-  <div id="channelGrid" class="channelGrid" style="margin-top:10px"></div>
-</section>
-
-<section class="box">
-  <h2>Test checklist</h2>
-  <div class="grid">
-    <div class="card"><b>Old URL preserved</b><p>This page is only a test. The menu route stays <code>channels-global-helpers-v7-5-3-test.html</code>.</p></div>
-    <div class="card"><b>Own row only</b><p>Writes use <code>owner_id = auth.uid()</code>. Other users' channels are read-only.</p></div>
-    <div class="card"><b>No blind fallback</b><p>If the user has no channel, it says no channel and shows the create form.</p></div>
-    <div class="card"><b>Delete guard</b><p>Delete refuses while movies are attached to the selected channel.</p></div>
-  </div>
-</section>
-
-<section class="box">
-  <h2>Debug</h2>
-  <div id="debug" class="source">Waiting...</div>
-</section>
-
-<p class="micro">Channels Owner Tools V7.12.268 TEST. No index promotion. No old route replacement yet.</p>
+<section class="hero"><div class="heroGrid"><div><span class="badge">V7.12.268.1 Channels Owner Create/Edit/Delete TEST</span><h1>Channels Owner Tools</h1><p>This is a test page only. It keeps the old Channels URL safe while testing creator-owned channel create, edit and delete against the real <code>sb_channels</code> table.</p><div class="actions"><button id="reload" class="btn cyan" type="button">Reload</button><button id="fillProfile" class="btn primary" type="button">Fill from my profile</button><a class="btn" href="channels-global-helpers-v7-5-3-test.html">Current Channels page</a><a class="btn" href="my-channel-clean-machine-v7-12-47-test.html">My Channel</a><a class="btn hot" href="player-2-clean-machine-v7-12-58-test.html">Player 2</a></div><div id="status" class="status">Loading channel test...</div><div id="helperStatus" class="note">Checking foundation...</div></div><div class="art"><div class="artIcon">CH</div></div></div></section>
+<section class="box"><h2>Signed-in account</h2><div id="accountGrid" class="stats"></div></section>
+<section class="box"><h2>My channel editor</h2><p class="muted">This form creates or edits only the signed-in user's own channel. Delete is blocked when the channel still has movies attached.</p><div class="formGrid"><div class="field"><label>Channel name</label><input id="name" class="input" placeholder="My channel name"></div><div class="field"><label>Banner image URL</label><input id="image_url" class="input" placeholder="https://..."></div><div class="field"><label>Avatar URL</label><input id="avatar_url" class="input" placeholder="https://..."></div><div class="field"><label>Description</label><textarea id="description" class="textarea" placeholder="About this channel"></textarea></div></div><div class="actions"><button id="saveChannel" class="btn primary" type="button">Save my channel</button><button id="deleteChannel" class="btn dangerBtn" type="button">Delete my channel</button></div><div id="writeStatus" class="note">Waiting for sign-in and permissions...</div></section>
+<section class="box"><h2>My channel</h2><div id="myChannelBox"></div></section>
+<section class="box"><h2>My channel movies</h2><div id="myMovieGrid" class="movieGrid"></div></section>
+<section class="box"><h2>Public channels</h2><div class="filters"><input id="filter" class="input" placeholder="Filter all channels"></div><div id="channelGrid" class="channelGrid" style="margin-top:10px"></div></section>
+<section class="box"><h2>Test checklist</h2><div class="grid"><div class="card"><b>Old URL preserved</b><p>This page is only a test. The menu route stays <code>channels-global-helpers-v7-5-3-test.html</code>.</p></div><div class="card"><b>Fresh save guard</b><p>Save re-checks the current owner's channel before writing, so stale state cannot insert a duplicate.</p></div><div class="card"><b>No blind fallback</b><p>If the user has no channel, it says no channel and shows the create form.</p></div><div class="card"><b>Delete guard</b><p>Delete refuses while movies are attached to the selected channel.</p></div></div></section>
+<section class="box"><h2>Debug</h2><div id="debug" class="source">Waiting...</div></section>
+<p class="micro">Channels Owner Tools V7.12.268.1 TEST. No index promotion. No old route replacement yet.</p>
 </div>
-
-<script src="stream-bandit-shell-v6-24.js?v=channels-owner-test-v7-12-268"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=channels-owner-test-v7-12-268"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=channels-owner-test-v7-12-268"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=channels-owner-test-v7-12-268"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=channels-owner-test-v7-12-268"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=channels-owner-test-v7-12-268"></script>
-
+<script src="stream-bandit-shell-v6-24.js?v=channels-owner-test-v7-12-268-1"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=channels-owner-test-v7-12-268-1"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=channels-owner-test-v7-12-268-1"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=channels-owner-test-v7-12-268-1"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=channels-owner-test-v7-12-268-1"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=channels-owner-test-v7-12-268-1"></script>
 <script>
 (function(){
 'use strict';
-const VERSION='V7.12.268 Channels Owner Create/Edit/Delete TEST';
+const VERSION='V7.12.268.1 Channels Owner Create/Edit/Delete TEST';
 const FALLBACK_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const FALLBACK_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
@@ -111,131 +45,31 @@ function first(){for(let i=0;i<arguments.length;i++){let x=arguments[i];if(x!==u
 function setStatus(t,bad){$('status').textContent=t;$('status').className=bad?'danger':'status';}
 function setWrite(t,bad){$('writeStatus').textContent=t;$('writeStatus').className=bad?'danger':'note';}
 function dbg(step,obj){$('debug').textContent='Debug '+new Date().toLocaleTimeString()+': '+step+'\n'+(obj?JSON.stringify(obj,null,2):'');}
-function poster(x){return first(x&&x.thumbnail_url,x&&x.poster_url,x&&x.image_url,x&&x.banner_url,x&&x.avatar_url);}
+function poster(x){return first(x&&x.thumbnail_url,x&&x.image_url,x&&x.banner_url,x&&x.avatar_url);}
 function videoOf(x){return first(x&&x.video_url,x&&x.mux_playback_url,x&&x.stream_url,x&&x.url,x&&x.source);}
 function channelName(c){return first(c&&c.name,c&&c.title,'Channel');}
 function statusOf(x){return String(first(x&&x.status,'published')).toLowerCase();}
 function isAdmin(){return !!profile && (profile.role==='admin' || profile.admin_level==='admin' || profile.admin_level==='owner');}
 function permissions(){try{return profile&&profile.permissions_json&&typeof profile.permissions_json==='object'?profile.permissions_json:{};}catch(e){return {};}}
-function canManage(){
-  if(!user||!profile)return false;
-  if(String(profile.account_status||'active')!=='active')return false;
-  const p=permissions();
-  return isAdmin() || profile.can_submit===true || ['creator_starter','creator_growth','creator_pro','studio_business','platform_owner'].includes(String(profile.plan_key||'')) || p.group_play_manage===true || p.channels_create===true;
-}
+function canManage(){if(!user||!profile)return false;if(String(profile.account_status||'active')!=='active')return false;const p=permissions();return isAdmin()||profile.can_submit===true||['creator_starter','creator_growth','creator_pro','studio_business','platform_owner'].includes(String(profile.plan_key||''))||p.group_play_manage===true||p.channels_create===true;}
 function myMovies(){return myChannel?movies.filter(m=>String(m.channel_id||'')===String(myChannel.id)):[];}
-async function readConfig(){
-  let cfg=window.StreamBanditSupabaseConfig||null;
-  if(cfg&&cfg.url&&cfg.key)return cfg;
-  return {url:FALLBACK_URL,key:FALLBACK_KEY,source:'fallback'};
-}
+async function readConfig(){let cfg=window.StreamBanditSupabaseConfig||null;if(cfg&&cfg.url&&cfg.key)return cfg;return{url:FALLBACK_URL,key:FALLBACK_KEY,source:'fallback'};}
 async function client(){if(sb)return sb;let cfg=await readConfig();sb=supabase.createClient(cfg.url,cfg.key);return sb;}
-async function loadAccount(){
-  const c=await client();
-  const au=await c.auth.getUser();
-  user=au&&au.data&&au.data.user||null;
-  profile=null;
-  if(user){
-    const pr=await c.from('sb_profiles').select('*').eq('id',user.id).maybeSingle();
-    if(!pr.error)profile=pr.data||null;
-  }
-}
-async function loadData(){
-  const c=await client();
-  const ch=await c.from('sb_channels').select('*').order('created_at',{ascending:false}).limit(200);
-  const mv=await c.from('sb_movies').select('id,title,description,thumbnail_url,poster_url,image_url,video_url,mux_playback_url,source_type,status,channel_id,owner_id,created_at').order('created_at',{ascending:false}).limit(600);
-  if(ch.error)throw ch.error;
-  if(mv.error)throw mv.error;
-  channels=ch.data||[];
-  movies=mv.data||[];
-  myChannel=user?channels.find(c=>String(c.owner_id||'')===String(user.id))||null:null;
-}
-function fillForm(c){
-  $('name').value=first(c&&c.name,profile&&profile.channel_name,profile&&profile.display_name,profile&&profile.username,'');
-  $('description').value=first(c&&c.description,profile&&profile.channel_about,'');
-  $('image_url').value=first(c&&c.image_url,profile&&profile.banner_url,'');
-  $('avatar_url').value=first(c&&c.avatar_url,profile&&profile.avatar_url,'');
-}
+async function loadAccount(){const c=await client();const au=await c.auth.getUser();user=au&&au.data&&au.data.user||null;profile=null;if(user){const pr=await c.from('sb_profiles').select('*').eq('id',user.id).maybeSingle();if(!pr.error)profile=pr.data||null;}}
+async function loadData(){const c=await client();const ch=await c.from('sb_channels').select('*').order('created_at',{ascending:false}).limit(200);const mv=await c.from('sb_movies').select('id,title,description,thumbnail_url,image_url,video_url,mux_playback_url,source_type,status,channel_id,owner_id,created_at').order('created_at',{ascending:false}).limit(600);if(ch.error)throw ch.error;if(mv.error)throw mv.error;channels=ch.data||[];movies=mv.data||[];myChannel=user?channels.find(c=>String(c.owner_id||'')===String(user.id))||null:null;}
+async function freshOwnChannel(){if(!user)return null;const c=await client();const res=await c.from('sb_channels').select('*').eq('owner_id',user.id).maybeSingle();if(res.error)throw res.error;return res.data||null;}
+function fillForm(c){$('name').value=first(c&&c.name,profile&&profile.channel_name,profile&&profile.display_name,profile&&profile.username,'');$('description').value=first(c&&c.description,profile&&profile.channel_about,'');$('image_url').value=first(c&&c.image_url,profile&&profile.banner_url,'');$('avatar_url').value=first(c&&c.avatar_url,profile&&profile.avatar_url,'');}
 function stat(label,value){return '<div class="stat"><b>'+esc(label)+'</b><span>'+esc(value)+'</span></div>';}
-function channelCard(c,own){
-  const im=first(c.image_url,c.avatar_url);
-  const count=movies.filter(m=>String(m.channel_id||'')===String(c.id)).length;
-  return '<article class="channel"><div class="banner">'+(im?'<img src="'+esc(im)+'" loading="lazy" alt="">':'Channel')+'</div><div class="body"><h3>'+esc(channelName(c))+'</h3><p>'+esc(c.description||'No description yet.')+'</p><span class="pill '+(own?'cyanPill':'')+'">'+(own?'mine':'public')+'</span><span class="pill">'+count+' movie(s)</span><span class="pill">'+(c.is_official?'official':'creator')+'</span></div></article>';
-}
-function movieCard(m){
-  const id=encodeURIComponent(String(m.id||''));
-  const im=poster(m);
-  const play=videoOf(m);
-  return '<article class="movie"><div class="thumb">'+(im?'<img src="'+esc(im)+'" loading="lazy" alt="">':'No artwork')+'</div><div class="body"><h3>'+esc(m.title||'Untitled')+'</h3><p>'+esc(m.description||'No description yet.')+'</p><span class="pill">'+esc(statusOf(m))+'</span><span class="pill">'+esc(first(m.source_type,play?'url':'no source'))+'</span><div class="actions"><a class="btn primary" href="'+DETAILS+'?id='+id+'">Details</a><a class="btn hot" href="'+PLAYER1+'?id='+id+(play?'&src='+encodeURIComponent(play):'')+'">Play</a></div></div></article>';
-}
-function render(){
-  const mine=myMovies();
-  $('accountGrid').innerHTML=stat('Signed in',user?'Yes':'No')+stat('Profile',profile?'Yes':'No')+stat('Can manage',canManage()?'Yes':'No')+stat('Role',profile?first(profile.role,'user'):'none')+stat('Plan',profile?first(profile.plan_key,'none'):'none')+stat('My channel',myChannel?'Yes':'No');
-  $('myChannelBox').innerHTML=myChannel?channelCard(myChannel,true):'<div class="note">No channel row exists for this signed-in user yet. Use Save my channel to create it.</div>';
-  $('myMovieGrid').innerHTML=mine.map(movieCard).join('')||'<div class="note">No movies attached to your channel yet.</div>';
-  const q=($('filter').value||'').toLowerCase();
-  const all=channels.filter(c=>!q||[channelName(c),c.description,c.owner_id,c.id].join(' ').toLowerCase().includes(q));
-  $('channelGrid').innerHTML=all.map(c=>channelCard(c,user&&String(c.owner_id)===String(user.id))).join('')||'<div class="note">No channels found.</div>';
-  $('saveChannel').disabled=!canManage();
-  $('deleteChannel').disabled=!canManage()||!myChannel;
-  if(!user)setWrite('Sign in first. This test page will not write while signed out.',true);
-  else if(!profile)setWrite('Signed in, but no sb_profiles row was found.',true);
-  else if(!canManage())setWrite('Profile is active but not allowed to manage Group Play yet.',true);
-  else setWrite(myChannel?'Ready to edit your own channel.':'Ready to create your own channel.');
-  dbg('render',{version:VERSION,user:user&&user.email,profile:profile&&{id:profile.id,role:profile.role,can_submit:profile.can_submit,plan_key:profile.plan_key,account_status:profile.account_status},myChannel:myChannel,channels:channels.length,myMovies:mine.length,canManage:canManage()});
-}
-async function reload(){
-  try{setStatus('Loading account and channels...');await loadAccount();await loadData();fillForm(myChannel);render();helper();setStatus('Channels owner test ready.');}
-  catch(e){setStatus('Load failed: '+(e.message||e),true);dbg('load error',{message:e.message||String(e)});}
-}
-function channelPayload(){
-  if(!user)throw Error('Sign in required.');
-  if(!canManage())throw Error('Your profile is not allowed to manage Group Play.');
-  const name=$('name').value.trim();
-  if(!name)throw Error('Channel name is required.');
-  return {name:name,description:$('description').value.trim(),image_url:$('image_url').value.trim(),avatar_url:$('avatar_url').value.trim(),owner_id:user.id,is_official:myChannel?!!myChannel.is_official:false,updated_at:new Date().toISOString()};
-}
-async function saveChannel(){
-  try{
-    const c=await client();
-    const data=channelPayload();
-    let res;
-    setWrite(myChannel?'Updating your channel...':'Creating your channel...');
-    if(myChannel){res=await c.from('sb_channels').update(data).eq('id',myChannel.id).eq('owner_id',user.id).select('*').maybeSingle();}
-    else{data.created_at=new Date().toISOString();res=await c.from('sb_channels').insert(data).select('*').maybeSingle();}
-    if(res.error)throw res.error;
-    await reload();
-    setWrite('Channel saved successfully.');
-  }catch(e){setWrite('Save failed: '+(e.message||e),true);dbg('save error',{message:e.message||String(e)});}
-}
-async function deleteChannel(){
-  try{
-    if(!myChannel)throw Error('No owned channel selected.');
-    if(myMovies().length)throw Error('Delete blocked because this channel has '+myMovies().length+' movie(s) attached. Move or remove those movies first.');
-    const typed=prompt('Type DELETE CHANNEL to remove your channel.');
-    if(typed!=='DELETE CHANNEL'){setWrite('Delete cancelled.');return;}
-    const c=await client();
-    const res=await c.from('sb_channels').delete().eq('id',myChannel.id).eq('owner_id',user.id).select('id');
-    if(res.error)throw res.error;
-    await reload();
-    setWrite('Channel deleted.');
-  }catch(e){setWrite('Delete failed: '+(e.message||e),true);dbg('delete error',{message:e.message||String(e)});}
-}
-function helper(){
-  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}
-  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
-  try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
-  try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();}catch(e){}
-  $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'OK':'checking')+' · Footer '+(window.StreamBanditFooterShell?'OK':'checking')+' · Theme '+(window.StreamBanditThemeProjector?'OK':'checking')+' · Search '+(window.StreamBanditLiveReadinessSearchFallback?'OK':'checking');
-}
-function wire(){
-  $('reload').onclick=reload;
-  $('filter').oninput=render;
-  $('fillProfile').onclick=function(){fillForm(null);setWrite('Profile channel fields copied into the editor. Press Save my channel to write.');};
-  $('saveChannel').onclick=saveChannel;
-  $('deleteChannel').onclick=deleteChannel;
-}
-function boot(){wire();helper();reload();setTimeout(helper,800);setTimeout(helper,1800);setInterval(helper,6000);document.documentElement.dataset.sbChannelsOwnerTest='v7-12-268';window.StreamBanditChannelsOwnerTestV712268={version:VERSION,reload:reload,current:function(){return{user:user,profile:profile,myChannel:myChannel,channels:channels,movies:movies,canManage:canManage()};}};}
+function channelCard(c,own){const im=first(c.image_url,c.avatar_url);const count=movies.filter(m=>String(m.channel_id||'')===String(c.id)).length;return '<article class="channel"><div class="banner">'+(im?'<img src="'+esc(im)+'" loading="lazy" alt="">':'Channel')+'</div><div class="body"><h3>'+esc(channelName(c))+'</h3><p>'+esc(c.description||'No description yet.')+'</p><span class="pill '+(own?'cyanPill':'')+'">'+(own?'mine':'public')+'</span><span class="pill">'+count+' movie(s)</span><span class="pill">'+(c.is_official?'official':'creator')+'</span></div></article>';}
+function movieCard(m){const id=encodeURIComponent(String(m.id||''));const im=poster(m);const play=videoOf(m);return '<article class="movie"><div class="thumb">'+(im?'<img src="'+esc(im)+'" loading="lazy" alt="">':'No artwork')+'</div><div class="body"><h3>'+esc(m.title||'Untitled')+'</h3><p>'+esc(m.description||'No description yet.')+'</p><span class="pill">'+esc(statusOf(m))+'</span><span class="pill">'+esc(first(m.source_type,play?'url':'no source'))+'</span><div class="actions"><a class="btn primary" href="'+DETAILS+'?id='+id+'">Details</a><a class="btn hot" href="'+PLAYER1+'?id='+id+(play?'&src='+encodeURIComponent(play):'')+'">Play</a></div></div></article>';}
+function render(){const mine=myMovies();$('accountGrid').innerHTML=stat('Signed in',user?'Yes':'No')+stat('Profile',profile?'Yes':'No')+stat('Can manage',canManage()?'Yes':'No')+stat('Role',profile?first(profile.role,'user'):'none')+stat('Plan',profile?first(profile.plan_key,'none'):'none')+stat('My channel',myChannel?'Yes':'No');$('myChannelBox').innerHTML=myChannel?channelCard(myChannel,true):'<div class="note">No channel row exists for this signed-in user yet. Use Save my channel to create it.</div>';$('myMovieGrid').innerHTML=mine.map(movieCard).join('')||'<div class="note">No movies attached to your channel yet.</div>';const q=($('filter').value||'').toLowerCase();const all=channels.filter(c=>!q||[channelName(c),c.description,c.owner_id,c.id].join(' ').toLowerCase().includes(q));$('channelGrid').innerHTML=all.map(c=>channelCard(c,user&&String(c.owner_id)===String(user.id))).join('')||'<div class="note">No channels found.</div>';$('saveChannel').disabled=!canManage();$('deleteChannel').disabled=!canManage()||!myChannel;if(!user)setWrite('Sign in first. This test page will not write while signed out.',true);else if(!profile)setWrite('Signed in, but no sb_profiles row was found.',true);else if(!canManage())setWrite('Profile is active but not allowed to manage Group Play yet.',true);else setWrite(myChannel?'Ready to edit your own channel.':'Ready to create your own channel.');dbg('render',{version:VERSION,user:user&&user.email,profile:profile&&{id:profile.id,role:profile.role,can_submit:profile.can_submit,plan_key:profile.plan_key,account_status:profile.account_status},myChannel:myChannel,channels:channels.length,myMovies:mine.length,canManage:canManage()});}
+async function reload(){try{setStatus('Loading account and channels...');await loadAccount();await loadData();fillForm(myChannel);render();helper();setStatus('Channels owner test ready.');}catch(e){setStatus('Load failed: '+(e.message||e),true);dbg('load error',{message:e.message||String(e)});}}
+function channelPayload(){if(!user)throw Error('Sign in required.');if(!canManage())throw Error('Your profile is not allowed to manage Group Play.');const name=$('name').value.trim();if(!name)throw Error('Channel name is required.');return{name:name,description:$('description').value.trim(),image_url:$('image_url').value.trim(),avatar_url:$('avatar_url').value.trim(),owner_id:user.id,updated_at:new Date().toISOString()};}
+async function saveChannel(){try{const c=await client();const data=channelPayload();setWrite('Checking your current channel row...');const fresh=await freshOwnChannel();let res;if(fresh){data.is_official=!!fresh.is_official;setWrite('Updating your existing channel...');res=await c.from('sb_channels').update(data).eq('id',fresh.id).eq('owner_id',user.id).select('*').maybeSingle();}else{data.created_at=new Date().toISOString();data.is_official=false;setWrite('Creating your first channel...');res=await c.from('sb_channels').insert(data).select('*').maybeSingle();}if(res.error)throw res.error;await reload();setWrite('Channel saved successfully.');}catch(e){const msg=e.message||String(e);if(msg.includes('sb_channels_one_channel_per_owner_uidx')){setWrite('Duplicate channel guard caught stale state. Reloading your real channel now, then press Save again.',true);await reload();return;}setWrite('Save failed: '+msg,true);dbg('save error',{message:msg});}}
+async function deleteChannel(){try{if(!myChannel)throw Error('No owned channel selected.');if(myMovies().length)throw Error('Delete blocked because this channel has '+myMovies().length+' movie(s) attached. Move or remove those movies first.');const typed=prompt('Type DELETE CHANNEL to remove your channel.');if(typed!=='DELETE CHANNEL'){setWrite('Delete cancelled.');return;}const c=await client();const res=await c.from('sb_channels').delete().eq('id',myChannel.id).eq('owner_id',user.id).select('id');if(res.error)throw res.error;await reload();setWrite('Channel deleted.');}catch(e){setWrite('Delete failed: '+(e.message||e),true);dbg('delete error',{message:e.message||String(e)});}}
+function helper(){try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();}catch(e){}$('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'OK':'checking')+' · Footer '+(window.StreamBanditFooterShell?'OK':'checking')+' · Theme '+(window.StreamBanditThemeProjector?'OK':'checking')+' · Search '+(window.StreamBanditLiveReadinessSearchFallback?'OK':'checking');}
+function wire(){$('reload').onclick=reload;$('filter').oninput=render;$('fillProfile').onclick=function(){fillForm(null);setWrite('Profile channel fields copied into the editor. Press Save my channel to write.');};$('saveChannel').onclick=saveChannel;$('deleteChannel').onclick=deleteChannel;}
+function boot(){wire();helper();reload();setTimeout(helper,800);setTimeout(helper,1800);setInterval(helper,6000);document.documentElement.dataset.sbChannelsOwnerTest='v7-12-268-1';window.StreamBanditChannelsOwnerTestV7122681={version:VERSION,reload:reload,current:function(){return{user:user,profile:profile,myChannel:myChannel,channels:channels,movies:movies,canManage:canManage()};}};}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
