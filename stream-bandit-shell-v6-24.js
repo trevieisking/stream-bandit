@@ -8,17 +8,18 @@
    Collections -> collections-clean-machine-v7-12-51-test.html
    Player 2 -> player-2-clean-machine-v7-12-58-test.html
    V7.12.264 points legacy Web Builder route aliases to the Web Builder Hub.
+   V7.12.271 loads the read-only Access Projector and protected-route Access Gate.
    No visual old shell. No movie-card save helper auto-load. No Supabase writes. No payments.
 */
 (function(){
 'use strict';
 
-const VERSION='V6.24 Legacy Shell Bridge -> V7.12.264 Web Builder Hub Route Truth';
+const VERSION='V6.24 Legacy Shell Bridge -> V7.12.271 Access Projector Gate Loader';
 const DEF='test-page';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const FAVICON_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co/storage/v1/object/public/stream-bandit-images/global/logo-1779203548544.png';
-const FOUNDATION='v7-12-264-web-builder-hub-route-truth';
+const FOUNDATION='v7-12-271-access-projector-gate-loader';
 
 const R={
  home:'home-global-helpers-v7-4-4-test.html',
@@ -213,7 +214,7 @@ function loadScript(src){
   let s=document.createElement('script');
   s.src=src;
   s.defer=true;
-  s.dataset.sbLoadedBy='legacy-shell-bridge-safe-v7-12-264';
+  s.dataset.sbLoadedBy='legacy-shell-bridge-safe-v7-12-271';
   document.head.appendChild(s);
  }catch(e){}
 }
@@ -256,7 +257,7 @@ function patchRoutes(root){
 
     if(old&&fix&&fix!==old){
      el.setAttribute(attr,fix);
-     el.dataset.sbRouteFixedBy='legacy-shell-bridge-v7-12-264';
+     el.dataset.sbRouteFixedBy='legacy-shell-bridge-v7-12-271';
     }
    });
   });
@@ -289,6 +290,9 @@ function expose(){
 
 function ensureFoundation(){
  loadScript('stream-bandit-theme-projector-v7-12-156.js?v='+FOUNDATION);
+ loadScript('stream-bandit-route-access-map-v7-12-271.js?v='+FOUNDATION);
+ loadScript('stream-bandit-access-projector-v7-12-271.js?v='+FOUNDATION);
+ loadScript('stream-bandit-access-gate-v7-12-271.js?v='+FOUNDATION);
  loadScript('stream-bandit-header-shell-v7-12-156.js?v='+FOUNDATION);
  loadScript('stream-bandit-footer-shell-v7-12-156.js?v='+FOUNDATION);
  loadScript('stream-bandit-global-helper-loader-v7-12-126.js?v='+FOUNDATION);
@@ -320,6 +324,8 @@ function state(){
   movieCardHelperAutoLoad:false,
   routes:R,
   ownerBrandRouteTruth:true,
+  accessProjectorLoaded:!!window.StreamBanditAccessProjector,
+  accessGateLoaded:!!window.StreamBanditAccessGate,
   fixedOwnerRoutes:{
    brandIcons:R.brandIcons,
    brandHelper:R.brandHelper,
@@ -359,7 +365,7 @@ function boot(){
  };
 
  window.StreamBanditLegacyShellBridge=window.StreamBanditShell;
- document.documentElement.dataset.sbLegacyShellBridge='v7-12-264-web-builder-hub-route-truth';
+ document.documentElement.dataset.sbLegacyShellBridge='v7-12-271-access-projector-gate-loader';
 }
 
 if(document.readyState==='loading'){
