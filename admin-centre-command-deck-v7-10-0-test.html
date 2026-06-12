@@ -3,105 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Route Test</title>
+<title>Stream Bandit Authority Route Test</title>
 <style>
-body{margin:0;padding:18px;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}
-.box{max-width:900px;margin:20px auto;border:1px solid #ffffff24;border-radius:28px;background:#101529;padding:22px}
-.good{color:#baf7df;font-weight:950}
-.bad{color:#ffd2d9;font-weight:950}
-.source{white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:16px;padding:12px;color:#dfffee;font-family:ui-monospace,Consolas,monospace}
-.btn{display:inline-flex;margin:4px;border-radius:999px;padding:11px 15px;background:#414667;color:#fff;text-decoration:none;font-weight:950}
+body{margin:0;padding:18px;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.box{max-width:920px;margin:20px auto;border:1px solid #ffffff24;border-radius:28px;background:#101529;padding:22px}.good{color:#baf7df;font-weight:950}.bad{color:#ffd2d9;font-weight:950}.warn{color:#ffe7ad;font-weight:950}.source{white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:16px;padding:12px;color:#dfffee;font-family:ui-monospace,Consolas,monospace}.btn{display:inline-flex;margin:4px;border-radius:999px;padding:11px 15px;background:#414667;color:#fff;text-decoration:none;font-weight:950}.badge{display:inline-flex;border-radius:999px;border:1px solid #22d3a657;background:#22d3a624;color:#baf7df;font-weight:950;padding:7px 12px}
 </style>
 </head>
 <body>
 <div class="box">
+<span class="badge">V7.12.273 account authority test</span>
 <h1>Route decision test</h1>
-<p>This old page checks the Admin Centre route decision before we touch the current Admin Centre page. It runs once only.</p>
-<div id="out" class="source">Loading...</div>
-<p>
-  <a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a>
-  <a class="btn" href="collections-clean-machine-v7-12-51-test.html">Collections</a>
-</p>
+<p>This old page now reads the live Supabase user, then reads the matching sb_profiles row before deciding the Admin Centre route.</p>
+<div id="out" class="source">Loading authority helper...</div>
+<p><a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a><a class="btn" href="collections-clean-machine-v7-12-51-test.html">Collections</a></p>
 </div>
-
-<script src="stream-bandit-shell-v6-24.js?v=route-test-272-2"></script>
-<script src="stream-bandit-entitlements-v7-12-269.js?v=route-test-272-2"></script>
-<script src="stream-bandit-route-access-map-v7-12-271.js?v=route-test-272-2"></script>
-<script src="stream-bandit-access-projector-v7-12-271.js?v=route-test-272-2"></script>
-
+<script src="stream-bandit-shell-v6-24.js?v=authority-route-test-273"></script>
+<script src="stream-bandit-account-authority-v7-12-273.js?v=authority-route-test-273"></script>
+<script src="stream-bandit-route-access-map-v7-12-271.js?v=authority-route-test-273"></script>
 <script>
 (function(){
 var TARGET='admin-centre-command-deck-v7-12-121-test.html';
-var count=0;
+var tries=0;
 var done=false;
-
 function out(){return document.getElementById('out')}
-
-function emailMask(e){
-  e=String(e||'');
-  if(!e.includes('@'))return '';
-  var p=e.split('@');
-  return p[0].slice(0,2)+'***@'+p[1];
+function yes(v){return v?'yes':'no'}
+function show(s){done=true;out().innerHTML=s}
+function routeInfo(){var m=window.StreamBanditRouteAccessMapV712271;return m&&m.lookup?m.lookup(TARGET):null}
+function allowedByAuthority(a,info){var rule=(info&&info.routeClass)||'owner_admin';if(rule==='owner_admin'||rule==='admin_owner'||rule==='editor_admin_owner')return !!(a.is_owner||a.is_admin);if(rule==='owner_only'||rule==='owner_reference')return !!a.is_owner;return false}
+async function run(){
+ if(done)return;
+ tries++;
+ try{
+  var auth=window.StreamBanditAccountAuthority;
+  if(!auth){if(tries<8){out().textContent='Waiting for authority helper... '+tries;setTimeout(run,800);return}show('<span class="bad">Authority helper not ready.</span>');return}
+  out().textContent='Reading live account and sb_profiles row...';
+  var a=await auth.read({force:true});
+  var info=routeInfo();
+  var ok=allowedByAuthority(a,info);
+  var p=a.profile||{};
+  show((ok?'<span class="good">Decision: yes</span>':'<span class="bad">Decision: no</span>')+'\nRoute: '+TARGET+'\nRule: '+((info&&info.routeClass)||'owner_admin')+'\n\nLive signed in: '+yes(a.signed_in)+'\nProfile match: '+yes(a.profile_match)+'\nMasked email: '+(a.masked_email||'')+'\nProfile id: '+(p.id||'')+'\nUsername: '+(p.username||'')+'\nDisplay name: '+(p.display_name||'')+'\nRole: '+(p.role||'')+'\nAdmin level: '+(p.admin_level||'')+'\nPlan: '+(p.plan_key||'')+'\nAccount status: '+(p.account_status||'')+'\nAuthority owner: '+yes(a.is_owner)+'\nAuthority admin: '+yes(a.is_admin));
+ }catch(e){
+  if(tries<6){out().textContent='Retrying authority check... '+(e.message||e);setTimeout(run,1000);return}
+  show('<span class="bad">Authority check stopped.</span>\n'+(e.message||e));
+ }
 }
-
-function show(s){
-  done=true;
-  out().innerHTML=s;
-}
-
-async function check(){
-  if(done)return;
-  count++;
-
-  var helper=window.StreamBanditEntitlementsV712269;
-  var projector=window.StreamBanditAccessProjector;
-
-  if(!helper||!projector){
-    if(count<8){
-      out().textContent='Waiting for helpers... '+count;
-      setTimeout(check,900);
-      return;
-    }
-    show('<span class="bad">Helpers not ready.</span>');
-    return;
-  }
-
-  try{
-    out().textContent='Reading account...';
-
-    var state=await projector.refresh({force:true});
-    var d=projector.routeDecision(TARGET);
-    var ent=state.entitlements||{};
-    var prof=state.profile||{};
-    var ok=!!(d&&d.allowed);
-
-    show(
-      (ok?'<span class="good">Decision: yes</span>':'<span class="bad">Decision: no</span>')+
-      '\nRoute: '+TARGET+
-      '\nRule: '+(d&&d.rule||'')+
-      '\nPlan: '+(ent.plan_key||'')+
-      '\nOwner: '+(ent.can&&ent.can.ownerPages?'yes':'no')+
-      '\nAdmin: '+(ent.can&&ent.can.adminPages?'yes':'no')+
-      '\nRole: '+(prof.role||'')+
-      '\nLevel: '+(prof.admin_level||'')+
-      '\nAccount: '+emailMask(state.user&&state.user.email)
-    );
-  }catch(e){
-    if(count<6){
-      out().textContent='Retrying... '+count;
-      setTimeout(check,1000);
-      return;
-    }
-    show('<span class="bad">Check stopped.</span>\n'+(e.message||e));
-  }
-}
-
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',check);
-}else{
-  check();
-}
-setTimeout(check,1500);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+setTimeout(run,1400);
 })();
 </script>
 </body>
