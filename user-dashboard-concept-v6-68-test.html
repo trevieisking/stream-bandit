@@ -3,20 +3,74 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="0; url=user-management-dashboard-v7-11-2-test.html">
-<title>Stream Bandit User Management Route</title>
+<title>Stream Bandit Access Projector Proof V7.12.271</title>
 <style>
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.box{max-width:820px;margin:24px;border:1px solid #ffffff24;border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 20px 70px #0007;padding:24px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}.btn{display:inline-flex;text-decoration:none;border-radius:999px;padding:11px 15px;background:linear-gradient(135deg,#22d3a6,#7c3cff);color:#fff;font-weight:950}.muted{color:#b9c0d8;line-height:1.5}.ok{color:#baf7df;font-weight:900}
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--card:#ffffff0f;--line:#ffffff22;--muted:#b9c0d8;--good:#22d3a6;--purple:#7c3cff;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff}*{box-sizing:border-box;min-width:0}body{margin:0;padding:14px;background:radial-gradient(circle at 10% 0,#22d3a633,transparent 34%),radial-gradient(circle at 90% 0,#7c3cff38,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.wrap{max-width:1280px;margin:auto}.hero,.box,.card{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 45px #0006;padding:16px;margin-bottom:12px}.card{background:var(--card);box-shadow:none}.badge,.pill{display:inline-flex;border-radius:999px;border:1px solid #22d3a657;background:#22d3a624;color:#baf7df;font-weight:950}.badge{padding:6px 10px;font-size:12px}.pill{padding:5px 8px;font-size:12px;margin:2px}.bad{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.cyan{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}h1{font-size:clamp(34px,5vw,64px);line-height:.95;letter-spacing:-.055em;margin:8px 0}h2{margin:0 0 10px}.muted,p,small,label{color:var(--muted);line-height:1.45}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}.btn{border:0;border-radius:999px;padding:10px 13px;background:linear-gradient(135deg,var(--good),var(--purple));color:#061017;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.btn.hot{background:linear-gradient(135deg,var(--warn),var(--purple));color:#fff}.btn.dark{background:#414667;color:#fff}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.select{width:100%;border:1px solid #ffffff25;border-radius:16px;background:#080316;color:#fff;padding:10px 12px;font:inherit;font-weight:850}.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:16px;padding:12px;color:#dfffee;max-height:420px;overflow:auto}.okText{color:#baf7df;font-weight:950}.badText{color:#ffd2d9;font-weight:950}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}@media(max-width:760px){body{padding:10px}.grid{grid-template-columns:1fr}.btn{width:100%}}
 </style>
 </head>
 <body>
-<div class="box">
-<span class="badge">User Management Route</span>
-<h1>Opening User Management V7.11.2</h1>
-<p class="ok">Menu route connected to the passed current-schema User Management dashboard.</p>
-<p class="muted">Target: user-management-dashboard-v7-11-2-test.html</p>
-<p><a class="btn" href="user-management-dashboard-v7-11-2-test.html">Open User Management</a></p>
+<div class="wrap">
+<section class="hero">
+<span class="badge">V7.12.271 Access Projector Proof · old V6 route reused</span>
+<h1>Access Projector Proof</h1>
+<p class="muted">This page is a visible tester, so no browser console is needed. It reads the global Access Projector and shows whether the signed-in account should see each route group.</p>
+<div class="actions"><button id="reload" class="btn" type="button">Refresh Access Test</button><a class="btn hot" href="collections-clean-machine-v7-12-51-test.html">Back to Collections</a><a class="btn dark" href="user-management-dashboard-v7-11-2-test.html">Open Real User Dashboard</a></div>
+<div id="status" class="card">Loading access projector...</div>
+</section>
+<section class="box"><h2>Signed-in access</h2><div id="summary" class="grid"></div></section>
+<section class="box"><h2>Route group test</h2><div id="groups" class="grid"></div></section>
+<section class="box"><h2>Single route test</h2><p class="muted">Pick a route to check what the projector thinks before we connect gates to real pages.</p><select id="routePick" class="select"></select><div id="routeResult" class="card" style="margin-top:10px">Waiting...</div></section>
+<section class="box"><h2>Debug snapshot</h2><div id="debug" class="source">Waiting...</div></section>
+<p class="micro">Access Projector Proof V7.12.271. No writes. No redirects. No billing. This reused old V6 route user-dashboard-concept-v6-68-test.html.</p>
 </div>
-<script>window.location.href="user-management-dashboard-v7-11-2-test.html";</script>
+<script src="stream-bandit-shell-v6-24.js?v=access-proof-7-12-271"></script>
+<script src="stream-bandit-route-access-map-v7-12-271.js?v=access-proof-7-12-271"></script>
+<script src="stream-bandit-access-projector-v7-12-271.js?v=access-proof-7-12-271"></script>
+<script>
+(function(){'use strict';
+const $=id=>document.getElementById(id);
+function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c));}
+function pill(v,yes,no){return '<span class="pill '+(v?'cyan':'bad')+'">'+esc(v?(yes||'YES'):(no||'NO'))+'</span>';}
+function card(label,value,help,bad){return '<div class="card"><b>'+esc(label)+'</b><p class="'+(bad?'badText':'okText')+'">'+esc(value)+'</p><small>'+esc(help||'')+'</small></div>';}
+function safeEmail(email){email=String(email||'');if(!email||!email.includes('@'))return '';let parts=email.split('@');return parts[0].slice(0,2)+'***@'+parts[1];}
+function routeAllowed(route){try{return window.StreamBanditAccessProjector.allowed(route);}catch(e){return false;}}
+function routeInfo(route){let p=window.StreamBanditAccessProjector;if(p&&p.routeDecision)return p.routeDecision(route);return null;}
+function render(){let p=window.StreamBanditAccessProjector;if(!p){$('status').className='card';$('status').innerHTML='<b>Waiting</b><p>Access Projector not ready yet.</p>';return;}let s=p.state();if(!s||!s.ready){$('status').className='card';$('status').innerHTML='<b>Waiting</b><p>Access Projector is loading...</p>';return;}
+let ent=s.entitlements||{},profile=s.profile||{},can=ent.can||{},limits=ent.limits||{},counts=ent.counts||{};
+$('status').className='card';$('status').innerHTML='<b>Status</b><p class="okText">Access projector ready.</p><small>Current rule: '+esc(s.route&&s.route.rule||'unknown')+' · current route allowed: '+esc(s.route&&s.route.allowed?'YES':'NO')+'</small>';
+$('summary').innerHTML=[
+ card('Signed in',s.user?'YES':'NO',s.user?safeEmail(s.user.email):'No account session detected.',!s.user),
+ card('Display name',profile.display_name||profile.channel_name||profile.username||'Guest','Profile identity used by global access.'),
+ card('Plan',ent.plan_key||'guest','Projected from sb_profiles.plan_key.'),
+ card('Account status',ent.account_status||'unknown','Inactive accounts lose creator write flags.',ent.account_status&&ent.account_status!=='active'),
+ card('Admin pages',can.adminPages?'YES':'NO','Admin/Owner backend still remains the real safety layer.',!can.adminPages),
+ card('Owner pages',can.ownerPages?'YES':'NO','Owner-only route visibility.',!can.ownerPages),
+ card('Channels limit',(counts.channels||0)+' / '+(limits.channels_limit||0),'Group Play channel allowance.'),
+ card('Playlists limit',(counts.playlists||0)+' / '+(limits.playlists_limit||0),'Group Play playlist allowance.'),
+ card('Collections limit',(counts.collections||0)+' / '+(limits.collections_limit||0),'Group Play collection allowance.'),
+ card('Create Collection',can.createCollection?'YES':'NO','True for Creator Growth+ or owner-granted permission with available limit.',!can.createCollection)
+].join('');
+let tests=[
+ ['Watch public','home-global-helpers-v7-4-4-test.html'],
+ ['Library editor','supabase-library-home-header-form-fix-v7-12-34-test.html'],
+ ['Submit Video','submit-video-clean-machine-v7-12-79-test.html'],
+ ['Review Queue','review-queue-clean-machine-v7-12-80-publish-test.html'],
+ ['Playlists','playlists-global-helpers-v7-5-2-test.html'],
+ ['Channels','channels-global-helpers-v7-5-3-test.html'],
+ ['Collections','collections-clean-machine-v7-12-51-test.html'],
+ ['Web Builder','web-builder-account-control-hub-v7-12-263-test.html'],
+ ['Admin Centre','admin-centre-command-deck-v7-12-121-test.html'],
+ ['User Dashboard','user-management-dashboard-v7-11-2-test.html']
+];
+$('groups').innerHTML=tests.map(t=>{let d=routeInfo(t[1])||{};return '<div class="card"><b>'+esc(t[0])+'</b><p>'+pill(!!d.allowed,'ALLOWED','LOCKED')+'</p><small>'+esc(t[1])+' · rule: '+esc(d.rule||'unknown')+'</small></div>';}).join('');
+$('debug').textContent=JSON.stringify({version:s.version,user:s.user?{id:s.user.id,email:safeEmail(s.user.email)}:null,profile:{id:profile.id,display_name:profile.display_name,channel_name:profile.channel_name,role:profile.role,admin_level:profile.admin_level,plan_key:profile.plan_key,account_status:profile.account_status,can_submit:profile.can_submit},entitlements:{plan_key:ent.plan_key,account_status:ent.account_status,role:ent.role,admin_level:ent.admin_level,is_admin:ent.is_admin,is_owner:ent.is_owner,can:ent.can,limits:ent.limits,counts:ent.counts},route:s.route},null,2);
+renderRoute();}
+function fillRoutes(){let map=window.StreamBanditRouteAccessMapV712271;if(!map||!map.routes)return;let routes=Object.keys(map.routes).sort();$('routePick').innerHTML=routes.map(r=>'<option value="'+esc(r)+'">'+esc((map.routes[r].group||'')+' · '+(map.routes[r].label||r))+'</option>').join('');$('routePick').value='collections-clean-machine-v7-12-51-test.html';}
+function renderRoute(){let v=$('routePick').value;if(!v)return;let d=routeInfo(v)||{};$('routeResult').innerHTML='<b>'+esc(d.label||v)+'</b><p>'+pill(!!d.allowed,'ALLOWED','LOCKED')+'</p><small>Route: '+esc(v)+' · group: '+esc(d.group||'')+' · rule: '+esc(d.rule||'')+' · mode: '+esc(d.mode||'')+'</small>';}
+function refresh(){let p=window.StreamBanditAccessProjector;if(p&&p.refresh){$('status').innerHTML='Refreshing access projector...';p.refresh({force:true}).then(render).catch(e=>{$('status').innerHTML='<b class="badText">Access test failed:</b> '+esc(e.message||e);});}else render();}
+function boot(){fillRoutes();$('reload').onclick=refresh;$('routePick').onchange=renderRoute;document.addEventListener('sb:access-ready',render);setTimeout(refresh,400);setTimeout(refresh,1400);setTimeout(refresh,2600);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
 </body>
 </html>
