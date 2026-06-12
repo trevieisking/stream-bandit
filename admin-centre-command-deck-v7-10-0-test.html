@@ -3,42 +3,105 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Admin Route Decision Test</title>
+<title>Stream Bandit Route Test</title>
 <style>
-body{margin:0;padding:18px;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.box{max-width:980px;margin:20px auto;border:1px solid #ffffff24;border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 20px 70px #0007;padding:22px}.badge{display:inline-flex;border:1px solid #22d3a657;background:#22d3a624;color:#baf7df;border-radius:999px;padding:7px 12px;font-weight:950}h1{font-size:clamp(36px,6vw,72px);line-height:.95;margin:12px 0}.muted{color:#b9c0d8;line-height:1.5}.good{color:#baf7df;font-weight:950}.bad{color:#ffd2d9;font-weight:950}.btn{display:inline-flex;margin:4px;border-radius:999px;padding:11px 15px;background:linear-gradient(135deg,#22d3a6,#7c3cff);color:#061017;text-decoration:none;font-weight:950}.dark{background:#414667;color:#fff}.source{white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:16px;padding:12px;color:#dfffee;font-family:ui-monospace,Consolas,monospace}
+body{margin:0;padding:18px;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}
+.box{max-width:900px;margin:20px auto;border:1px solid #ffffff24;border-radius:28px;background:#101529;padding:22px}
+.good{color:#baf7df;font-weight:950}
+.bad{color:#ffd2d9;font-weight:950}
+.source{white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:16px;padding:12px;color:#dfffee;font-family:ui-monospace,Consolas,monospace}
+.btn{display:inline-flex;margin:4px;border-radius:999px;padding:11px 15px;background:#414667;color:#fff;text-decoration:none;font-weight:950}
 </style>
 </head>
 <body>
 <div class="box">
-<span class="badge">V7.12.272 old page route decision test</span>
-<h1>Admin route test</h1>
-<p class="muted">This old V7.10.0 page checks the real Admin Centre route decision before the current Admin Centre page is changed.</p>
-<div id="out" class="source">Loading access projector...</div>
-<p><a class="btn dark" href="home-global-helpers-v7-4-4-test.html">Home</a><a class="btn dark" href="collections-clean-machine-v7-12-51-test.html">Collections</a></p>
+<h1>Route decision test</h1>
+<p>This old page checks the Admin Centre route decision before we touch the current Admin Centre page. It runs once only.</p>
+<div id="out" class="source">Loading...</div>
+<p>
+  <a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a>
+  <a class="btn" href="collections-clean-machine-v7-12-51-test.html">Collections</a>
+</p>
 </div>
-<script src="stream-bandit-shell-v6-24.js?v=admin-route-decision-272"></script>
-<script src="stream-bandit-route-access-map-v7-12-271.js?v=admin-route-decision-272"></script>
-<script src="stream-bandit-access-projector-v7-12-271.js?v=admin-route-decision-272"></script>
+
+<script src="stream-bandit-shell-v6-24.js?v=route-test-272-2"></script>
+<script src="stream-bandit-entitlements-v7-12-269.js?v=route-test-272-2"></script>
+<script src="stream-bandit-route-access-map-v7-12-271.js?v=route-test-272-2"></script>
+<script src="stream-bandit-access-projector-v7-12-271.js?v=route-test-272-2"></script>
+
 <script>
 (function(){
 var TARGET='admin-centre-command-deck-v7-12-121-test.html';
-function el(){return document.getElementById('out')}
-function safe(email){email=String(email||'');if(!email.includes('@'))return '';var p=email.split('@');return p[0].slice(0,2)+'***@'+p[1]}
-async function run(){
- try{
-  var p=window.StreamBanditAccessProjector;
-  if(!p){el().textContent='Waiting for Access Projector...';setTimeout(run,800);return}
-  var state=await p.refresh({force:true});
-  var decision=p.routeDecision(TARGET);
-  var ent=state.entitlements||{};
-  var profile=state.profile||{};
-  var ok=!!(decision&&decision.allowed);
-  el().innerHTML=(ok?'<span class="good">DECISION: ALLOWED</span>':'<span class="bad">DECISION: NOT ALLOWED</span>')+'\n\nTarget: '+TARGET+'\nRequired: '+(decision&&decision.rule||'owner_admin')+'\nPlan: '+(ent.plan_key||'guest')+'\nOwner pages: '+(ent.can&&ent.can.ownerPages?'YES':'NO')+'\nAdmin pages: '+(ent.can&&ent.can.adminPages?'YES':'NO')+'\nRole: '+(profile.role||'')+'\nAdmin level: '+(profile.admin_level||'')+'\nAccount: '+safe(state.user&&state.user.email);
- }catch(e){el().textContent='Test failed: '+(e.message||e);setTimeout(run,1000)}
+var count=0;
+var done=false;
+
+function out(){return document.getElementById('out')}
+
+function emailMask(e){
+  e=String(e||'');
+  if(!e.includes('@'))return '';
+  var p=e.split('@');
+  return p[0].slice(0,2)+'***@'+p[1];
 }
-document.addEventListener('sb:access-ready',run);
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
-setTimeout(run,1400);
+
+function show(s){
+  done=true;
+  out().innerHTML=s;
+}
+
+async function check(){
+  if(done)return;
+  count++;
+
+  var helper=window.StreamBanditEntitlementsV712269;
+  var projector=window.StreamBanditAccessProjector;
+
+  if(!helper||!projector){
+    if(count<8){
+      out().textContent='Waiting for helpers... '+count;
+      setTimeout(check,900);
+      return;
+    }
+    show('<span class="bad">Helpers not ready.</span>');
+    return;
+  }
+
+  try{
+    out().textContent='Reading account...';
+
+    var state=await projector.refresh({force:true});
+    var d=projector.routeDecision(TARGET);
+    var ent=state.entitlements||{};
+    var prof=state.profile||{};
+    var ok=!!(d&&d.allowed);
+
+    show(
+      (ok?'<span class="good">Decision: yes</span>':'<span class="bad">Decision: no</span>')+
+      '\nRoute: '+TARGET+
+      '\nRule: '+(d&&d.rule||'')+
+      '\nPlan: '+(ent.plan_key||'')+
+      '\nOwner: '+(ent.can&&ent.can.ownerPages?'yes':'no')+
+      '\nAdmin: '+(ent.can&&ent.can.adminPages?'yes':'no')+
+      '\nRole: '+(prof.role||'')+
+      '\nLevel: '+(prof.admin_level||'')+
+      '\nAccount: '+emailMask(state.user&&state.user.email)
+    );
+  }catch(e){
+    if(count<6){
+      out().textContent='Retrying... '+count;
+      setTimeout(check,1000);
+      return;
+    }
+    show('<span class="bad">Check stopped.</span>\n'+(e.message||e));
+  }
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',check);
+}else{
+  check();
+}
+setTimeout(check,1500);
 })();
 </script>
 </body>
