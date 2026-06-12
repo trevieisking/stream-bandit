@@ -1,172 +1,457 @@
-# Stream Bandit Current App Manifest V7.12.270
+# Stream Bandit Current App Manifest V7.12.276
 
-Date: 2026-06-11
+Date: 2026-06-12
 
-Purpose: current protected route, rollback, recovery, and pass truth after the Web Builder core pass, Owner/Admin hard-lock pass, Player 1 / Player 2 multi-provider playback pass, and the Group Play entitlement passes for My Channel, Channels, and Playlists. The filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages already reference it.
+Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages and One Machine already reference this file.
 
 ## Current strongest pause point
 
-Current state:
+`V7.12.276 Access / Owner Invisible / Admin Utility Lockdown / Page Polish Rails Stable Pass`
 
-- V7.12.270 current app truth.
-- Web Builder core blockers are user-tested complete for the current controlled candidate.
-- Owner/Admin backend protection is the current safety pattern: only chosen owner/admin users should perform owner/admin profile-management actions.
-- Player 1 old route `player-one-global-helpers-v7-3-3-test.html` supports multi-provider playback and passed user testing.
-- Player 2 old route `player-2-clean-machine-v7-12-58-test.html` supports mixed-provider queues and passed user testing.
-- Mux/HLS/direct video keeps HTML video playback and audio boost.
-- YouTube/Vimeo use iframe provider playback and provider controls.
-- Supabase Library Play to Player 1 works.
-- Supabase Library Play All to Player 2 works with mixed Mux and YouTube streams.
-- Shared entitlement helper is active: `stream-bandit-entitlements-v7-12-269.js`.
-- Supabase Group Play entitlement-backed RLS migration is active: `group_play_entitlements_rls_v7_12_269`.
-- My Channel old route `my-channel-clean-machine-v7-12-47-test.html` is entitlement-connected and profile-canonical.
-- My Channel reads default channel identity from `sb_profiles.channel_name`, `sb_profiles.channel_about`, `sb_profiles.avatar_url`, and `sb_profiles.banner_url`.
-- My Channel reads owned videos from `sb_movies.owner_id` only.
-- My Channel no longer falls back to all channels or random/latest movies when the signed-in user has no owned content.
-- Channels flow passed after removing the old Supabase one-channel-per-owner index.
-- Playlists flow passed after adding V7.12.270 creator plan controls.
-- Both owner/admin and Creator Starter account tests passed for the current Channels + Playlists flows.
-- Supabase Library editing remains admin/chosen-only by policy; Creator Starter does not gain global Library editor access.
-- Overlay URLs remain preserved.
-- No registry promotion was done.
-- Root `index.html` was updated only as a current app map/pass summary, not as a route promotion.
-- Next page target: `collections-clean-machine-v7-12-51-test.html` entitlement alignment, then Admin/Owner no-flash visibility gates.
+This is the exact carry-on point after the access/security pass and the first page-polish pass.
 
-## V7.12.270 Group Play pass checkpoint
+Do not promote `index.html` from this checkpoint. This manifest records access rules, page-layout rules, and the next work order before any live promotion discussion.
 
-Recorded after user testing on owner/admin account and Creator Starter account.
+## New checkpoint file
 
-### Channels pass
+The detailed checkpoint for this pass is:
 
-Working page:
+`CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
-- `channels-global-helpers-v7-5-3-test.html`
+That checkpoint was created from the old checkpoint pattern and records the tests, role rules, layout rules, and next page order.
 
-Pass results:
+## Current confirmed state
 
-- Page loads.
-- Add / Remove Videos opens.
-- Creator can create allowed channels by plan.
-- Creator can add allowed videos to their own channel.
-- Creator can remove their videos from their channel.
-- Creator can delete their channel.
-- Other normal users' private/personal videos are not exposed in the attach dropdown.
-- Stream Bandit main/library videos are allowed as source videos.
-- Supabase Library global editing is not granted.
+### Route and file health
 
-Important database truth:
+User ran Registry and Health after the access pass.
 
-- Removed old retired index: `sb_channels_one_channel_per_owner_uidx`.
-- Do not reintroduce a hard one-channel-per-owner clamp.
-- Final channel counts are controlled by plan/permission limits, not by old V5/V6 database clamps.
-- Do not introduce `sb_channel_movies` for the current Channels flow.
+Confirmed:
 
-### Playlists pass
+- Registry: `V7.12.263.8 Current Routes Registry / 51 Active Entries / 50 Unique URLs`
+- Overlay entries: `51`
+- Unique URLs: `50`
+- Routes OK: `50 / 50`
+- Route bad list: empty
+- Protected files OK: `16 / 16`
+- Protected files bad list: empty
+- Web Builder doorway: `web-builder-account-control-hub-v7-12-263-test.html`
+- Old Web Builder live studio route remains fallback/redirect truth: `web-builder-live-studio-v7-12-116-test.html`
+- Index promotion: `false`
+- Registry promotion: `true`
+- Schema changes: `false`
+- Storage actions: `false`
 
-Working page:
+Health confirmed:
 
-- `playlists-global-helpers-v7-5-2-test.html`
+- Main pages and admin/owner/user-management route checks loaded 200.
+- Header Shell loaded.
+- Footer Shell loaded.
+- Theme Projector loaded.
+- Settings Global loaded.
+- Brand Logo loaded.
+- Core Saves loaded.
+- Menu Counts loaded.
+- Search Fallback loaded.
+- Access Gate loaded.
+- Supabase SDK loaded.
+- Session signed in.
+- Profile row visible.
+- `sb_movies` readable, count 24.
+- `sb_channels` readable, count 3.
+- `sb_policy_documents` readable, count 7.
+- `sb_site_pages` readable, count 9.
+- `sb_form_submissions` readable, count 26.
 
-Current version:
+## Current access / visibility model
 
-- `V7.12.270 Playlists · Creator Plan Controls`
+### Owner
 
-Pass results:
+Owner means the platform owner account only.
 
-- Page loads on owner/admin account.
-- Page loads on Creator Starter account.
-- Creator Starter can create playlists up to the plan limit.
-- Creator Starter can edit/delete only their own playlists.
-- Creator Starter can add/remove videos only on their own playlists.
-- Video choices are limited to own videos plus Stream Bandit main/library videos.
-- Creator Starter does not get Collections access.
-- Creator Starter does not get Supabase Library Editor access.
-- Supabase Library/global movie editing remains separate and admin/chosen-only.
+Owner can see and open:
 
-### Creator Starter current expected rules
+- Owner group
+- User Management group
+- One Machine
+- Final Shell Navigation
+- Brand / App Icons
+- Brand Image Helper
+- Favicon / App Icon Builder
+- User Dashboard
+- Permissions Matrix
+- platform-core owner tools
 
-For the current test account sitting in the middle of the product ladder:
+Owner pages are visible in the overlay for the owner and hidden for everyone else.
 
-Allowed:
+### Admin
 
-- Edit profile/default channel.
-- Create up to 1 extra channel.
-- Edit/delete own extra channel.
-- Add videos to own channel.
-- Create up to 5 playlists.
-- Edit/delete own playlists.
-- Add/remove videos on own playlists.
-- Use own uploaded videos.
-- Use allowed Stream Bandit main/library videos.
+Admin pages are operational pages for admin/owner users. Admin users may later receive controlled access to selected admin tools, but owner pages remain separate.
 
-Blocked:
+Current admin-locked group:
 
-- Collections.
-- Supabase Library global editing.
-- Other users' private/personal videos.
-- Owner/Admin Hub.
-- Owner/admin pages.
-- Bypassing plan limits.
+- Admin Centre
+- Live Readiness
+- Current Routes Registry
+- Test Checklist
+- Tools
+- Health Check
+- Mux Manager
+- Storage Prep
+- Backup / Safety
+- Policy Admin Editor
 
-## Scan-first foundation facts
+### Creator / Builder
 
-Main app key facts learned:
+Creators and builders receive only plan-allowed creator, group-play, and Web Builder areas.
 
-- `supabase-library-home-header-form-fix-v7-12-34-test.html` is the real admin/test workbench for `sb_movies` and is a key source of truth for the streaming app.
-- `sb_movies` remains the backbone for Library, Details, Player 1, Player 2, Home, Genres, Search, My Channel, Channels, Playlists, Collections and saved lists.
-- `sb_movies.owner_id` controls owned/profile-channel movie identity.
-- `sb_movies.channel_id` controls extra-channel assignment in the current working Group Play model.
-- The public Library should stay read/watch/save only; the Supabase Library Editor owns create/edit/delete/upload behavior behind admin checks and Supabase policies.
-- Current Supabase movie policies are shaped as public read for published movies and admin management for writes.
+They should not see or open owner pages.
 
-User management key facts learned:
+Web Builder does not own or steal Policy Admin. Web Builder sites should later show public policy links in published site footers under Policy Agreement. Policy editing/publishing remains in Policy Admin.
 
-- `user-management-dashboard-v7-11-2-test.html` is the real owner/admin write surface.
-- `plans-pricing-feature-shop-v7-11-3-test.html` is a read-only pricing/add-on rulebook and must not be treated as billing live.
-- `permissions-matrix-user-management-v7-11-4-test.html` is a read-only permissions rulebook and must not directly apply access changes.
-- Dangerous account/profile writes must flow through the intended owner/admin RPC/audit path, not through hidden frontend buttons alone.
+### Viewer / normal user
 
-Web Builder key facts learned:
+Viewers can use watch, saved, profile, and public/read pages as allowed.
 
-- Web Builder is a separate mini app/product area inside Stream Bandit, not the main movie app shell.
-- Web Builder has one approved doorway: Stream Bandit menu -> `web-builder-account-control-hub-v7-12-263-test.html`.
-- Web Builder's projector, tabs, local branding, avatar, theme and global search are Web Builder-only and must not take over Stream Bandit global branding or shell.
-- Web Builder canonical flow uses `sb_site_pages`, `layout_json`, `settings_json`, `sb_form_submissions` and the existing `stream-bandit-images` bucket.
-- Web Builder support/reference routes must be preserved and not rewritten during Group Play work.
+Viewers do not see Owner or User Management groups.
 
-## Fresh Current Routes Registry proof target
+### Signed out
 
-Source page: `all-pages-version-registry-v7-12-122-current-routes-test.html`
+Signed-out users do not see Owner or User Management groups.
 
-Registry page has been aligned to the Web Builder doorway pass:
+Protected direct URLs should show a clear locked/not-allowed page. The rule is: the page exists, but this account does not have permission.
 
-- Last known registry version: `V7.12.263.8 Current Routes Registry / 51 Active Entries / 50 Unique URLs`.
-- Active overlay entries: `51`.
-- Unique URLs: `50`.
-- Web Builder doorway route: `web-builder-account-control-hub-v7-12-263-test.html`.
-- Old Web Builder live studio route remains as a redirect/fallback route, not the active menu doorway.
-- Next required proof: owner/admin should run `Scan All` after tomorrow's next passes and confirm route/file bad lists are empty.
+## Current passed access tests
 
-## Current promoted internal states
+Confirmed in live user testing:
 
-- `stream-bandit-entitlements-v7-12-269.js` - shared frontend Group Play entitlement resolver for plan limits, permissions JSON, account status, role, admin level and admin/owner visibility.
-- Supabase migration `group_play_entitlements_rls_v7_12_269` - entitlement-backed RLS helper functions and policies for channels, playlists, playlist links, collections and collection links.
-- `my-channel-clean-machine-v7-12-47-test.html` - V7.12.269 My Channel / Profile + Entitlements pass. Old URL preserved.
-- `channels-global-helpers-v7-5-3-test.html` - Channels entitlement flow passed after old one-channel clamp removal. Old URL preserved.
-- `playlists-global-helpers-v7-5-2-test.html` - V7.12.270 Playlists creator-plan controls passed. Old URL preserved.
-- `stream-bandit-header-shell-v7-12-156.js` - V7.12.237 Header Shell / Brand Profile Ownership Split.
-- `stream-bandit-global-helper-loader-v7-12-126.js` - V7.12.186 Global Helper Loader / Owner Brand Route Truth.
-- `web-builder-account-control-hub-v7-12-263-test.html` - Web Builder Hub / active doorway page.
-- `WEB-BUILDER-MANIFEST-V7-12-252.md` - Web Builder-only manifest records the V7.12.264.16 Web Builder core blocker pass.
-- `all-pages-version-registry-v7-12-122-current-routes-test.html` - V7.12.263.8 registry aligned to the Web Builder doorway route.
-- `user-management-dashboard-v7-11-2-test.html` - Owner Admin Hub route; backend owner/admin RPC and trigger protection are the current safety source of truth.
-- `permissions-matrix-user-management-v7-11-4-test.html` - permissions rulebook/reference page.
-- `plans-pricing-feature-shop-v7-11-3-test.html` - pricing/feature shop reference page; plan/add-on UI still not billing-live.
-- `profile-settings-live-ready-v7-12-90-test.html` - Profile Settings sign-out / existing-user flow and profile channel source.
-- `supabase-library-home-header-form-fix-v7-12-34-test.html` - Supabase Library Editor / Shell Route Preservation.
-- `player-one-global-helpers-v7-3-3-test.html` - V7.12.266 multi-provider promoted.
-- `player-2-clean-machine-v7-12-58-test.html` - V7.12.267 multi-provider queue promoted.
-- `collections-clean-machine-v7-12-51-test.html` - next Group Play target after the Playlist pass.
+- Owner can open One Machine consistently.
+- Owner false-lock bug is fixed.
+- Kayleigh cannot see Owner group.
+- Kayleigh cannot see User Management group.
+- Signed-out users cannot see Owner group.
+- Signed-out users cannot see User Management group.
+- Policy Admin is editable by owner/admin and locked for Kayleigh.
+- Admin utilities are locked for non-admin/non-owner users.
+- One Machine direct fallback lock works for non-owner users.
+
+## Important current helpers
+
+### `stream-bandit-menu-saves-count-v6-72-1.js`
+
+Current role:
+
+- Save counts for Watchlist, Favourites, and Likes.
+- Owner and User Management overlay visibility filtering.
+- Owner direct URL fallback lock.
+- Stable owner authority retry so the owner does not false-lock while Supabase Auth/profile wakes up.
+
+Known stable direct-lock timing commit:
+
+`1fdab4cefabb5b5bfd6758b1d48a9f671900fc62`
+
+### `stream-bandit-protected-page-v7-12-273.js`
+
+Current role:
+
+- Shared protected-page presenter for admin/owner/protected pages that opt in.
+
+### `stream-bandit-authority-gate-v7-12-273.js`
+
+Current role:
+
+- Shared route/access decision engine.
+
+### `stream-bandit-account-authority-v7-12-273.js`
+
+Current role:
+
+- Reads Supabase user and `sb_profiles` authority from the live profile row.
+
+## Current page polish standard
+
+Every page in the final polish pass should follow this pattern where possible:
+
+1. Header shell
+2. Page navigation pill rail directly under the header
+3. Hero / main page summary
+4. Internal section tabs only when the page needs them
+5. Page output/content underneath the internal tabs
+6. Footer shell
+
+## Exact page navigation rail rules
+
+The page navigation rail is for movement between related pages.
+
+Placement:
+
+- Directly under the header shell.
+- Above the hero.
+
+It should use Web Builder-style pill buttons, but colours must be controlled by the global Theme Projector variables.
+
+Common shape:
+
+- Back
+- Hub
+- related group pages
+- current page marked active
+
+Examples passed:
+
+- Home V7.12.158
+- Watch History V7.12.226
+
+## Exact internal tab rules
+
+Internal tabs are for switching content inside the current page.
+
+Placement:
+
+- Below the hero or intro content.
+- Above the content they control.
+
+Content/output appears underneath the tabs.
+
+Examples:
+
+- Overview
+- Watched Titles
+- Progress Rows
+- Debug
+- Rules
+
+Do not move internal content tabs above the hero. The top rail is for page navigation only.
+
+## Theme rules for tabs and rails
+
+No hard-coded random tab colours.
+
+All page rails and tabs must use the global theme variables:
+
+- `--accent`
+- `--accent2`
+- `--p`
+- `--p2`
+- `--line`
+- `--muted`
+- `--btnText`
+- `--fontScale`
+
+Preferred active pill style:
+
+`linear-gradient(135deg,var(--accent),var(--accent2))`
+
+Preferred inactive pill style:
+
+- background based on `--p`
+- border based on `--line` mixed with `--accent`
+- text readable against the current theme
+
+## Inputs / outputs rule
+
+- Inputs and controls belong in controlled overlays, forms, or page rails depending on risk.
+- Outputs/results belong on the page under the correct tab/section.
+- Dangerous inputs/actions must stay behind admin/owner/protected pages.
+- Public pages must not show admin/readiness/test buttons.
+- Remove stale buttons, stale links, and old visual shell leftovers during each page pass.
+
+## Current page polish references
+
+### Home
+
+File:
+
+`home-global-helpers-v7-4-4-test.html`
+
+Current pushed state:
+
+`V7.12.158 Home`
+
+Commit:
+
+`0b7b141af1f3a2d9253974ab50239dc857275b71`
+
+Rules proven:
+
+- Header shell.
+- Theme-controlled page rail under header.
+- Hero underneath page rail.
+- Movie output on page.
+- Saved/account quick cards.
+- Footer shell.
+- Stale Live Readiness button removed from public Home.
+
+### Watch History
+
+File:
+
+`watch-history-global-helpers-v7-4-0-test.html`
+
+Current pushed state:
+
+`V7.12.226 Watch History`
+
+Commit:
+
+`c7dec988747a9ac40ea0481f01e9775a34436ae3`
+
+Rules proven:
+
+- Header shell.
+- Theme-controlled page rail under header.
+- Hero underneath page rail.
+- Internal tabs below hero.
+- Overview/history/progress/debug/rules output underneath internal tabs.
+- Footer shell.
+- Read-only history/progress behavior preserved.
+
+## Page-type rules for remaining polish
+
+### Public Watch pages
+
+Examples:
+
+- Home
+- Library
+- Details
+- Player 1
+- Continue Watching
+- Watch History
+- Watchlist
+- Favourites
+- Likes
+- Accessibility
+
+Rules:
+
+- Use page rail under header.
+- No admin/readiness/test buttons.
+- Outputs stay on page.
+- Save buttons use Core Saves and Menu Saves Count.
+- Do not break Player Comfort, audio boost, fullscreen, accessibility, or playback.
+
+### Browse/search pages
+
+Examples:
+
+- Library
+- Genres
+- Global Search
+- About
+
+Rules:
+
+- Use page rail under header.
+- Results/output stay on page.
+- Search/filter inputs can be inline if safe.
+- Remove stale route links.
+
+### Creator and Group Play pages
+
+Examples:
+
+- Submit Video
+- Rules
+- Review Queue
+- Playlists
+- Channels
+- My Channel
+- Collections
+- Player 2
+
+Rules:
+
+- Use page rail under header.
+- Internal tabs only where useful.
+- Respect entitlements and RLS.
+- No fallback to all users' content.
+- No old one-channel clamp.
+- No V5/V6 hard limits.
+
+### Web Builder pages
+
+Rules:
+
+- Web Builder remains its own product area.
+- Use the same pill rail style where appropriate.
+- Do not let Web Builder take over global Stream Bandit branding or shell.
+- Published Web Builder sites should later show published policy links in footer under Policy Agreement.
+- Policy Admin remains separate and admin-only.
+
+### Admin pages
+
+Rules:
+
+- Admin pages can be visible to admin/owner users.
+- Normal users and creators are blocked.
+- Operational/debug tabs may remain if useful, but use theme-controlled pill style.
+- Writes must be intentional and described.
+
+### Owner pages
+
+Rules:
+
+- Owner group visible only to platform owner.
+- Owner direct URLs locked for everyone else.
+- Owner pages are not normal admin pages.
+- Owner tooling protects brand, route, user-management and platform-core assets.
+
+### User Management pages
+
+Rules:
+
+- User Management group visible only to owner for now.
+- User Dashboard and Permissions Matrix are owner-only for now.
+- Pricing Matrix may remain a public/reference route only if product policy says so, but the overlay group is currently hidden from non-owner users.
+- Future support/admin roles may get read-only diagnostics, not unchecked write access.
+
+## Future official role plan
+
+Later official product roles should become more granular:
+
+### Owner
+
+Everything, including owner pages, permissions, route tools, brand systems, and user management.
+
+### Admin
+
+Review queue, policy admin, library editor, live readiness, safe moderation/editing tools.
+
+### Support
+
+Read-only profile/channel/user diagnostics only.
+
+Support must not change roles, plans, protected account fields, owner routes, or destructive data.
+
+### Creator
+
+Own channels, playlists, collections, submissions, and Web Builder where plan allows.
+
+### Viewer
+
+Watch, save, and profile basics.
+
+## Backend authority warning
+
+Frontend locks are not final authority for official user/profile/plan changes.
+
+For official release, serious permission changes should flow through:
+
+- Supabase RLS
+- safe RPC functions
+- audit logs
+- later Edge Functions where needed
+
+## Stale route cleanup rule
+
+During every page polish pass:
+
+1. Remove stale buttons from visible pages.
+2. Remove stale active links from page rails and quick cards.
+3. Keep old route filenames unless deliberately retired.
+4. Do not delete protected reference pages casually.
+5. Registry should stay 50/50 and protected files 16/16 unless a deliberate route update is made.
 
 ## Current route truth by overlay group
 
@@ -185,7 +470,7 @@ Registry page has been aligned to the Web Builder doorway pass:
 
 ### Browse
 
-1. Movie Row Editor / Supabase Library Editor - `supabase-library-home-header-form-fix-v7-12-34-test.html`
+1. Supabase Library Editor - `supabase-library-home-header-form-fix-v7-12-34-test.html`
 2. Genres - `genres-clean-machine-v7-12-45-test.html`
 3. Global Search - `global-search-global-helpers-v7-4-9-test.html`
 4. About - `about-global-helpers-v7-4-7-test.html`
@@ -244,61 +529,44 @@ Registry page has been aligned to the Web Builder doorway pass:
 
 ### User Management
 
-1. Owner Admin Hub - `user-management-dashboard-v7-11-2-test.html`
-2. Pricing Matrix / Pricing Feature Shop - `plans-pricing-feature-shop-v7-11-3-test.html`
+1. User Dashboard - `user-management-dashboard-v7-11-2-test.html`
+2. Pricing Matrix / Feature Shop - `plans-pricing-feature-shop-v7-11-3-test.html`
 3. Permissions Matrix - `permissions-matrix-user-management-v7-11-4-test.html`
 
-## Passed chains
+## Next exact work order
 
-### Owner/Admin hard-lock chain
+Continue from here:
 
-- `sb_profiles` protected account fields exist for account status, admin level, permissions JSON, plan key, admin notes, managed by and managed at.
-- `sb_admin_audit_log` exists for owner/admin action proof.
-- `sb_is_owner()` is the reusable owner/admin gate pattern.
-- `sb_profiles_protect_admin_fields_trigger` prevents normal app users from self-changing protected account/admin fields.
-- `sb_owner_manage_profile()` is the intended owner-only profile-management RPC.
+1. Library — `library-global-helpers-v7-4-8-test.html`
+2. Details — `details-clean-machine-v7-12-38-test.html`
+3. Player 1 — `player-one-global-helpers-v7-3-3-test.html`
+4. Continue Watching — `continue-watching-global-helpers-v7-3-9-test.html`
+5. Watchlist — `watchlist-clean-machine-v7-12-43-test.html`
+6. Favourites — `favourites-clean-machine-v7-12-41-test.html`
+7. Likes — `likes-clean-machine-v7-12-42-test.html`
+8. Accessibility — `accessibility-clean-machine-v7-12-44-test.html`
+9. Genres — `genres-clean-machine-v7-12-45-test.html`
+10. Global Search — `global-search-global-helpers-v7-4-9-test.html`
+11. About — `about-global-helpers-v7-4-7-test.html`
 
-### Player provider chain
+After public/watch polish:
 
-- Player 1 existing route `player-one-global-helpers-v7-3-3-test.html` passed as V7.12.266 multi-provider promoted.
-- Player 2 existing route `player-2-clean-machine-v7-12-58-test.html` passed as V7.12.267 multi-provider queue promoted.
-- Mux/HLS/direct video use HTML video and retain audio boost.
-- YouTube/Vimeo use iframe providers and provider controls.
-- Existing Player 1 and Player 2 URLs were preserved.
+1. Accessibility global effect proof
+2. Theme / Settings final scan
+3. Brand tools final pass
+4. Web Builder footer / Policy Agreement plan
+5. Published Preview footer cleanup
+6. Final Registry + Health
+7. Only then discuss `index.html` / live promotion
 
-### Group Play entitlement chain
+## Do not forget
 
-- Shared frontend resolver `stream-bandit-entitlements-v7-12-269.js` landed.
-- Supabase RLS migration `group_play_entitlements_rls_v7_12_269` landed.
-- Plan keys and permissions JSON now have a common meaning for frontend and backend.
-- My Channel now reads profile channel identity from `sb_profiles` and owned videos from `sb_movies.owner_id`.
-- My Channel no longer falls back to all channels or all movies.
-- The default channel is profile-owned; extra channels are controlled by `sb_channels` and plan limits.
-- Channels passed after the old `sb_channels_one_channel_per_owner_uidx` clamp was removed.
-- Playlists passed with V7.12.270 creator-plan controls.
-- Creator Starter is the current middle-plan test: channels and playlists allowed by limits; collections and Supabase Library editing blocked.
-- Supabase Library editing remains guarded by admin/chosen-only movie policies.
+- GitHub Pages live domain may cache pages; use cache-busting query strings during test.
+- If GitHub update is blocked, user sends full page code and assistant returns full replacement code.
+- Do not use snippets for dangerous pages.
+- Do not delete old files unless confirmed dead and non-protected.
+- This pass is page polish and access hardening, not database schema work.
 
-## Current blocker and next target
+## Result
 
-Current blocker:
-
-- Collections still need full page connection to the shared entitlement resolver and backend policies.
-- Normal creator users should only see and write their own permitted Group Play objects.
-- Admin and Owner pages still need no-flash frontend gates so normal creator users cannot browse admin/owner pages even if backend functions are blocked.
-
-Next target order:
-
-1. `collections-clean-machine-v7-12-51-test.html`
-2. Admin/Owner frontend visibility gates
-
-Clean rules for next pass:
-
-1. Keep old overlay URLs intact.
-2. Do not promote registry without user test and scan proof.
-3. Use header/page/footer only.
-4. Read profile/default channel from `sb_profiles`.
-5. Read owned movies from `sb_movies.owner_id`.
-6. Use `stream-bandit-entitlements-v7-12-269.js` on every Group Play page.
-7. Use `sb_group_play_limit(feature)` and `sb_group_play_flag(flag)` as backend truth.
-8. Do not reintroduce duplicate channel creation bugs or old V5/V6 hard clamps.
+The app now has stable access rails and a clear page-layout standard for the final live-promotion readiness pass.
