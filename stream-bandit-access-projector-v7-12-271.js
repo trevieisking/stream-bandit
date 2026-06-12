@@ -1,12 +1,13 @@
 /* Stream Bandit Access Projector V7.12.271
    Global read-only access state projector.
    Reads Supabase session/profile, uses shared entitlement resolver, projects safe route access flags.
+   V7.12.271.1 also checks backend admin/owner RPC truth so real owner/admin accounts are not falsely locked.
    No Supabase writes. No redirects. No billing. Old URLs preserved.
 */
 (function(){
   'use strict';
 
-  const VERSION = 'V7.12.271 Access Projector';
+  const VERSION = 'V7.12.271.1 Access Projector / Backend Admin Truth';
   const CONFIG_SOURCE = 'stream-bandit-access-projector-v7-12-271.js';
   let client = null;
   let state = null;
@@ -60,14 +61,14 @@
 
   async function ensureEntitlements(){
     if(window.StreamBanditEntitlementsV712269) return window.StreamBanditEntitlementsV712269;
-    await loadScript('stream-bandit-entitlements-v7-12-269.js?v=access-projector-7-12-271');
+    await loadScript('stream-bandit-entitlements-v7-12-269.js?v=access-projector-7-12-271-1');
     if(!window.StreamBanditEntitlementsV712269) throw new Error('Entitlements helper did not load.');
     return window.StreamBanditEntitlementsV712269;
   }
 
   async function ensureRouteMap(){
     if(window.StreamBanditRouteAccessMapV712271) return window.StreamBanditRouteAccessMapV712271;
-    await loadScript('stream-bandit-route-access-map-v7-12-271.js?v=access-projector-7-12-271');
+    await loadScript('stream-bandit-route-access-map-v7-12-271.js?v=access-projector-7-12-271-1');
     return window.StreamBanditRouteAccessMapV712271 || null;
   }
 
@@ -101,6 +102,97 @@
     const pr = await c.from('sb_profiles').select('id,username,display_name,channel_name,avatar_url,role,can_submit,account_status,admin_level,permissions_json,plan_key').eq('id', user.id).maybeSingle();
     if(pr.error) throw pr.error;
     return { user:user, profile:pr.data || null };
+  }
+
+  function boolValue(value){
+    if(value === true) return true;
+    if(value === false) return false;
+    if(value === 1) return true;
+    if(value === 0) return false;
+    if(typeof value === 'string') return ['true','1','yes','y','on'].includes(value.trim().toLowerCase());
+    return false;
+  }
+
+  async function readBackendAccess(user){
+    const out = { admin:false, owner:false, checked:false, admin_error:null, owner_error:null };
+    if(!user) return out;
+    const c = await sb();
+    out.checked = true;
+    try{
+      const r = await c.rpc('sb_is_admin');
+      if(r && r.error) out.admin_error = r.error.message || String(r.error);
+      else out.admin = boolValue(r && r.data);
+    }catch(e){
+      out.admin_error = e.message || String(e);
+    }
+    try{
+      const r = await c.rpc('sb_is_owner');
+      if(r && r.error) out.owner_error = r.error.message || String(r.error);
+      else out.owner = boolValue(r && r.data);
+    }catch(e){
+      out.owner_error = e.message || String(e);
+    }
+    if(out.owner) out.admin = true;
+    return out;
+  }
+
+  function elevateWithBackend(ent, backend){
+    ent = ent || {};
+    backend = backend || {};
+    ent.backend_admin = !!backend.admin;
+    ent.backend_owner = !!backend.owner;
+    ent.backend_checked = !!backend.checked;
+    ent.backend_admin_error = backend.admin_error || null;
+    ent.backend_owner_error = backend.owner_error || null;
+
+    ent.flags = ent.flags || {};
+    ent.can = ent.can || {};
+    ent.limits = ent.limits || {};
+
+    if(backend.admin || backend.owner){
+      ent.is_admin = true;
+      ent.flags.admin_pages = true;
+      ent.can.adminPages = true;
+      ent.flags.profile_channel_edit = true;
+      ent.flags.channels_create = true;
+      ent.flags.channels_edit_own = true;
+      ent.flags.channels_delete_own = true;
+      ent.flags.channels_add_videos = true;
+      ent.flags.playlists_create = true;
+      ent.flags.playlists_edit_own = true;
+      ent.flags.playlists_delete_own = true;
+      ent.flags.playlists_add_videos = true;
+      ent.flags.collections_create = true;
+      ent.flags.collections_edit_own = true;
+      ent.flags.collections_delete_own = true;
+      ent.flags.collections_add_videos = true;
+      ent.flags.group_play_manage = true;
+      ent.can.editProfileChannel = true;
+      ent.can.createChannel = true;
+      ent.can.editOwnChannel = true;
+      ent.can.deleteOwnChannel = true;
+      ent.can.addVideosToChannel = true;
+      ent.can.createPlaylist = true;
+      ent.can.editOwnPlaylist = true;
+      ent.can.deleteOwnPlaylist = true;
+      ent.can.addVideosToPlaylist = true;
+      ent.can.createCollection = true;
+      ent.can.editOwnCollection = true;
+      ent.can.deleteOwnCollection = true;
+      ent.can.addVideosToCollection = true;
+      ent.limits.channels_limit = Math.max(Number(ent.limits.channels_limit)||0, 9999);
+      ent.limits.playlists_limit = Math.max(Number(ent.limits.playlists_limit)||0, 9999);
+      ent.limits.collections_limit = Math.max(Number(ent.limits.collections_limit)||0, 9999);
+      ent.limits.channel_movies_limit = Math.max(Number(ent.limits.channel_movies_limit)||0, 999999);
+    }
+
+    if(backend.owner){
+      ent.is_owner = true;
+      ent.flags.owner_pages = true;
+      ent.can.ownerPages = true;
+    }
+
+    return ent;
   }
 
   function canSubmit(profile, ent){
@@ -154,12 +246,14 @@
 
   function applyDataset(next){
     const root = document.documentElement;
-    root.dataset.sbAccessProjector = 'v7-12-271';
+    root.dataset.sbAccessProjector = 'v7-12-271-1';
     root.dataset.sbAccessReady = next.ready ? 'true' : 'false';
     root.dataset.sbAccessSignedIn = next.user ? 'true' : 'false';
     root.dataset.sbAccessPlan = next.entitlements ? next.entitlements.plan_key : 'guest';
     root.dataset.sbAccessAdmin = next.entitlements && next.entitlements.can && next.entitlements.can.adminPages ? 'true' : 'false';
     root.dataset.sbAccessOwner = next.entitlements && next.entitlements.can && next.entitlements.can.ownerPages ? 'true' : 'false';
+    root.dataset.sbAccessBackendAdmin = next.entitlements && next.entitlements.backend_admin ? 'true' : 'false';
+    root.dataset.sbAccessBackendOwner = next.entitlements && next.entitlements.backend_owner ? 'true' : 'false';
     root.dataset.sbAccessRouteAllowed = next.route && next.route.allowed ? 'true' : 'false';
     root.dataset.sbAccessRouteRule = next.route ? next.route.rule : 'public';
   }
@@ -178,8 +272,10 @@
       await ensureRouteMap();
       const helper = await ensureEntitlements();
       let payload = { user:null, profile:null };
+      let backend = { admin:false, owner:false, checked:false };
       try{
         payload = await readProfile();
+        backend = await readBackendAccess(payload.user);
       }catch(e){
         state = {
           version: VERSION,
@@ -196,7 +292,7 @@
         loading = null;
         return state;
       }
-      const ent = helper.resolve(payload.profile || {}, {});
+      const ent = elevateWithBackend(helper.resolve(payload.profile || {}, {}), backend);
       state = {
         version: VERSION,
         ready: true,
@@ -204,6 +300,7 @@
         user: payload.user ? { id: payload.user.id, email: payload.user.email || '' } : null,
         profile: payload.profile,
         entitlements: ent,
+        backend: backend,
         route: routeDecision(routeInfo(), payload.profile, ent),
         source: CONFIG_SOURCE
       };
