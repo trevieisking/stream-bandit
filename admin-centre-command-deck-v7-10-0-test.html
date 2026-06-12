@@ -3,49 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Authority Route Test</title>
+<title>Stream Bandit Admin Gate Proof</title>
 <style>
-body{margin:0;padding:18px;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.box{max-width:920px;margin:20px auto;border:1px solid #ffffff24;border-radius:28px;background:#101529;padding:22px}.good{color:#baf7df;font-weight:950}.bad{color:#ffd2d9;font-weight:950}.warn{color:#ffe7ad;font-weight:950}.source{white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:16px;padding:12px;color:#dfffee;font-family:ui-monospace,Consolas,monospace}.btn{display:inline-flex;margin:4px;border-radius:999px;padding:11px 15px;background:#414667;color:#fff;text-decoration:none;font-weight:950}.badge{display:inline-flex;border-radius:999px;border:1px solid #22d3a657;background:#22d3a624;color:#baf7df;font-weight:950;padding:7px 12px}
+body{margin:0;padding:18px;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.box{max-width:1100px;margin:20px auto;border:1px solid #ffffff24;border-radius:28px;background:#101529;padding:22px}.good{color:#baf7df;font-weight:950}.bad{color:#ffd2d9;font-weight:950}.source{white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:16px;padding:12px;color:#dfffee;font-family:ui-monospace,Consolas,monospace}.btn{display:inline-flex;margin:4px;border-radius:999px;padding:11px 15px;background:#414667;color:#fff;text-decoration:none;font-weight:950}.primary{background:linear-gradient(135deg,#22d3a6,#7c3cff);color:#061017}.badge{display:inline-flex;border-radius:999px;border:1px solid #22d3a657;background:#22d3a624;color:#baf7df;font-weight:950;padding:7px 12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.card{border:1px solid #ffffff18;border-radius:20px;background:#ffffff0c;padding:14px}h1{font-size:clamp(36px,6vw,72px);line-height:.95;margin:12px 0}.muted{color:#b9c0d8;line-height:1.5}
 </style>
 </head>
 <body>
-<div class="box">
-<span class="badge">V7.12.273 account authority test</span>
-<h1>Route decision test</h1>
-<p>This old page now reads the live Supabase user, then reads the matching sb_profiles row before deciding the Admin Centre route.</p>
-<div id="out" class="source">Loading authority helper...</div>
-<p><a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a><a class="btn" href="collections-clean-machine-v7-12-51-test.html">Collections</a></p>
+<div id="app" class="box">
+<span class="badge">V7.12.273 gated proof</span>
+<h1>Checking Admin Centre access</h1>
+<p class="muted">Old test page. It uses the reusable authority gate helper before we touch the current Admin Centre.</p>
+<div id="out" class="source">Loading gate helper...</div>
 </div>
-<script src="stream-bandit-shell-v6-24.js?v=authority-route-test-273"></script>
-<script src="stream-bandit-account-authority-v7-12-273.js?v=authority-route-test-273"></script>
-<script src="stream-bandit-route-access-map-v7-12-271.js?v=authority-route-test-273"></script>
+<script src="stream-bandit-shell-v6-24.js?v=admin-gate-proof-273"></script>
+<script src="stream-bandit-authority-gate-v7-12-273.js?v=admin-gate-proof-273"></script>
 <script>
 (function(){
 var TARGET='admin-centre-command-deck-v7-12-121-test.html';
 var tries=0;
-var done=false;
+function app(){return document.getElementById('app')}
 function out(){return document.getElementById('out')}
 function yes(v){return v?'yes':'no'}
-function show(s){done=true;out().innerHTML=s}
-function routeInfo(){var m=window.StreamBanditRouteAccessMapV712271;return m&&m.lookup?m.lookup(TARGET):null}
-function allowedByAuthority(a,info){var rule=(info&&info.routeClass)||'owner_admin';if(rule==='owner_admin'||rule==='admin_owner'||rule==='editor_admin_owner')return !!(a.is_owner||a.is_admin);if(rule==='owner_only'||rule==='owner_reference')return !!a.is_owner;return false}
-async function run(){
- if(done)return;
- tries++;
- try{
-  var auth=window.StreamBanditAccountAuthority;
-  if(!auth){if(tries<8){out().textContent='Waiting for authority helper... '+tries;setTimeout(run,800);return}show('<span class="bad">Authority helper not ready.</span>');return}
-  out().textContent='Reading live account and sb_profiles row...';
-  var a=await auth.read({force:true});
-  var info=routeInfo();
-  var ok=allowedByAuthority(a,info);
-  var p=a.profile||{};
-  show((ok?'<span class="good">Decision: yes</span>':'<span class="bad">Decision: no</span>')+'\nRoute: '+TARGET+'\nRule: '+((info&&info.routeClass)||'owner_admin')+'\n\nLive signed in: '+yes(a.signed_in)+'\nProfile match: '+yes(a.profile_match)+'\nMasked email: '+(a.masked_email||'')+'\nProfile id: '+(p.id||'')+'\nUsername: '+(p.username||'')+'\nDisplay name: '+(p.display_name||'')+'\nRole: '+(p.role||'')+'\nAdmin level: '+(p.admin_level||'')+'\nPlan: '+(p.plan_key||'')+'\nAccount status: '+(p.account_status||'')+'\nAuthority owner: '+yes(a.is_owner)+'\nAuthority admin: '+yes(a.is_admin));
- }catch(e){
-  if(tries<6){out().textContent='Retrying authority check... '+(e.message||e);setTimeout(run,1000);return}
-  show('<span class="bad">Authority check stopped.</span>\n'+(e.message||e));
- }
-}
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function card(name,file,note){return '<div class="card"><b>'+esc(name)+'</b><p class="muted">'+esc(note)+'</p><a class="btn" href="'+esc(file)+'">Open</a></div>'}
+function showAllowed(d){var a=d.authority||{};var p=a.profile||{};app().innerHTML='<span class="badge">V7.12.273 gated proof</span><h1>Admin Centre allowed</h1><p class="muted">This old page is showing the admin launch proof because this account passed the reusable authority gate.</p><p><a class="btn primary" href="'+TARGET+'">Open Current Admin Centre</a><a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a></p><div class="source"><span class="good">Decision: allowed</span>\nRoute: '+TARGET+'\nRule: '+esc(d.rule)+'\nProfile match: '+yes(a.profile_match)+'\nUsername: '+esc(p.username)+'\nRole: '+esc(p.role)+'\nAdmin level: '+esc(p.admin_level)+'\nPlan: '+esc(p.plan_key)+'\nOwner: '+yes(a.is_owner)+'\nAdmin: '+yes(a.is_admin)+'</div><h2>Admin launch proof</h2><div class="grid">'+card('Admin Centre',TARGET,'Current Admin route command deck')+card('Live Readiness','live-readiness-global-helpers-v7-10-2-test.html','Owner/admin utility')+card('Backup / Safety','backup-safety-global-helpers-v7-10-9-test.html','Owner/admin utility')+card('Collections','collections-clean-machine-v7-12-51-test.html','Creator Growth route stays available for Kayleigh')+'</div>'}
+function showLocked(d){var a=d.authority||{};var p=a.profile||{};app().innerHTML='<span class="badge">V7.12.273 gated proof</span><h1>Admin Centre locked</h1><p class="muted">This old page is proving the future lock state. This account does not have owner/admin authority.</p><div class="source"><span class="bad">Decision: locked</span>\nRoute: '+TARGET+'\nRule: '+esc(d.rule)+'\nProfile match: '+yes(a.profile_match)+'\nUsername: '+esc(p.username)+'\nRole: '+esc(p.role)+'\nAdmin level: '+esc(p.admin_level)+'\nPlan: '+esc(p.plan_key)+'\nOwner: '+yes(a.is_owner)+'\nAdmin: '+yes(a.is_admin)+'</div><p><a class="btn primary" href="home-global-helpers-v7-4-4-test.html">Home</a><a class="btn" href="collections-clean-machine-v7-12-51-test.html">Collections</a><a class="btn" href="profile-settings-live-ready-v7-12-90-test.html">Profile Settings</a></p>'}
+async function run(){tries++;try{var gate=window.StreamBanditAuthorityGate;if(!gate){if(tries<8){out().textContent='Waiting for gate helper... '+tries;setTimeout(run,800);return}out().innerHTML='<span class="bad">Gate helper not ready.</span>';return}out().textContent='Checking route authority...';var d=await gate.decide(TARGET);if(d.allowed)showAllowed(d);else showLocked(d)}catch(e){if(tries<6){out().textContent='Retrying gate check... '+(e.message||e);setTimeout(run,1000);return}out().innerHTML='<span class="bad">Gate check stopped.</span>\n'+esc(e.message||e)}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
 setTimeout(run,1400);
 })();
