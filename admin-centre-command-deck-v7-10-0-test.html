@@ -3,67 +3,42 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit V7.10.0 Admin Centre Command Deck TEST</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>Stream Bandit Admin Route Decision Test</title>
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}*{box-sizing:border-box;min-width:0}body{margin:0;padding:20px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(16px * var(--fontScale))}.wrap{max-width:1600px;margin:auto}.head,.hero,.box,.card,.route{border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 18px 60px #0007;padding:20px;margin-bottom:16px}.head{display:grid;grid-template-columns:minmax(250px,320px) 1fr minmax(290px,420px);gap:12px;align-items:start}.brand{display:flex;gap:12px;align-items:center;font-size:22px;font-weight:950}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center}.search,.actions,.tabs{display:flex;gap:9px;flex-wrap:wrap}.search{border:1px solid #ffffff24;border-radius:999px;background:#0004;padding:9px 10px 9px 14px}.search input{flex:1;background:transparent;border:0;color:white;outline:0}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950}.badge{padding:7px 12px}.pill{padding:5px 8px;font-size:12px;margin:2px}.warnPill{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.badPill{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}h1{font-size:clamp(42px,6vw,78px);line-height:.95;margin:10px 0;letter-spacing:-.06em}h2,h3{margin:0 0 12px}.muted,p,li{color:var(--muted);line-height:1.5}.btn,.tab,.locked{border:0;border-radius:999px;padding:11px 15px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.btn.small{padding:8px 11px;font-size:13px}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2))}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2))}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2))}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2))}.locked{opacity:.62;cursor:not-allowed}.status,.note,.danger{padding:12px 14px;border-radius:18px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:14px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}.heroGrid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(320px,470px);gap:18px}.art{border:1px solid #ffffff1a;border-radius:30px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:330px;display:grid;place-items:center;position:relative;overflow:hidden}.art:before{content:"";position:absolute;inset:28px;border-radius:28px;border:1px dashed #ffffff32}.artIcon{font-size:96px;filter:drop-shadow(0 18px 40px #0009)}.grid,.stats,.routeGrid{display:grid;gap:12px}.grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}.stats{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}.routeGrid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}.card,.route{background:#ffffff0f;box-shadow:none;margin-bottom:0;overflow-wrap:anywhere}.card b,.route b{display:block;color:#baf7df;margin-bottom:8px}.card span.big{font-size:30px;font-weight:950}.route{display:grid;grid-template-columns:52px 1fr;gap:12px}.routeIcon{width:48px;height:48px;border-radius:17px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:21px}.section{display:none}.section.active{display:block}.source{white-space:pre-wrap;word-break:break-word;background:#0006;border-radius:16px;padding:12px;color:#dfffee;max-height:420px;overflow:auto;font-family:ui-monospace,Consolas,monospace}.footer{text-align:center;color:#8f98b8;margin:28px 0}@media(max-width:980px){.head,.heroGrid,.route{grid-template-columns:1fr}.search{width:100%}.art{min-height:220px}}
+body{margin:0;padding:18px;background:#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.box{max-width:980px;margin:20px auto;border:1px solid #ffffff24;border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 20px 70px #0007;padding:22px}.badge{display:inline-flex;border:1px solid #22d3a657;background:#22d3a624;color:#baf7df;border-radius:999px;padding:7px 12px;font-weight:950}h1{font-size:clamp(36px,6vw,72px);line-height:.95;margin:12px 0}.muted{color:#b9c0d8;line-height:1.5}.good{color:#baf7df;font-weight:950}.bad{color:#ffd2d9;font-weight:950}.btn{display:inline-flex;margin:4px;border-radius:999px;padding:11px 15px;background:linear-gradient(135deg,#22d3a6,#7c3cff);color:#061017;text-decoration:none;font-weight:950}.dark{background:#414667;color:#fff}.source{white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:16px;padding:12px;color:#dfffee;font-family:ui-monospace,Consolas,monospace}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header class="head"><div class="brand"><div class="logo">🛠️</div><span>Stream Bandit</span></div><div class="muted"><b>Admin Centre Command Deck TEST. Current launch board for Admin, release, media and safety routes.</b></div><div><div class="search"><span>🔎</span><input id="globalSearch" placeholder="Search Stream Bandit"><button id="globalSearchBtn" class="btn primary" type="button">Search</button></div></div></header>
-<section class="hero"><div class="heroGrid"><div><span class="badge">V7.10.0 Admin Centre Command Deck TEST</span><h1>Admin Centre</h1><p>This is the Admin launch board. It should help you reach the current safe pages without remembering file names. This page is navigation/readiness only and does not change app data.</p><div class="actions"><button id="runScan" class="btn primary" type="button">Run Admin Route Scan</button><a class="btn hot" href="web-builder-admin-shell-v6-57-test.html">🏗️ Web Builder</a><a class="btn cyan" href="platform-builder-admin-shell-v6-58-test.html">🧱 Control Tower</a><a class="btn warn" href="backup-safety-admin-shell-v6-67-test.html">🛡️ Backup / Safety</a></div><div id="helperStatus" class="status">Checking global helpers...</div><div id="status" class="status">Admin Centre loaded. No writes. No live promotion.</div></div><div class="art"><div class="artIcon">🛠️👑</div></div></div></section>
-<section class="box"><div class="stats"><div class="card"><b>Admin routes</b><span class="big">9</span><p>Main Admin group entries.</p></div><div class="card"><b>User management</b><span class="big">4</span><p>Concept / policy routes.</p></div><div class="card"><b>Writes here</b><span class="big">0</span><p>Navigation only.</p></div><div class="card"><b>Route scan</b><span id="scanCount" class="big">0/0</span><p>Click scan to check links.</p></div></div></section>
-<section class="box"><div class="tabs"><button class="tab active" data-tab="adminRoutes">Admin Routes</button><button class="tab" data-tab="safetyRoutes">Release Safety</button><button class="tab" data-tab="mediaRoutes">Media / Storage</button><button class="tab" data-tab="userRoutes">User Management</button><button class="tab" data-tab="rulesSec">Rules</button><button class="tab" data-tab="checklistSec">Checklist</button><button class="tab" data-tab="debugSec">Debug</button></div></section>
-<section id="adminRoutes" class="box section active"><h2>Admin routes</h2><div id="adminGrid" class="routeGrid"></div></section>
-<section id="safetyRoutes" class="box section"><h2>Release safety routes</h2><div id="safetyGrid" class="routeGrid"></div><div class="danger">Live/index promotion remains locked until RC, backup, registry check, smoke test and Trevor approval.</div></section>
-<section id="mediaRoutes" class="box section"><h2>Media / storage routes</h2><div id="mediaGrid" class="routeGrid"></div><div class="note">Mux Manager must not contain Mux secrets. Storage Prep must not create buckets or edit policies from this page.</div></section>
-<section id="userRoutes" class="box section"><h2>User management routes</h2><div id="userGrid" class="routeGrid"></div><div class="note">These remain concept/policy pages until we deliberately build real user management workflows.</div></section>
-<section id="rulesSec" class="box section"><h2>Admin rules</h2><div class="grid"><div class="card"><b>No patch chaos</b><p>Use full test pages for important Admin fixes.</p></div><div class="card"><b>No secret keys</b><p>Mux/Facebook/API private keys never go in frontend HTML.</p></div><div class="card"><b>Backups first</b><p>Any live/index work requires backup first.</p></div><div class="card"><b>Registry matters</b><p>Route labels and current pages must match the Control Tower map.</p></div><div class="card"><b>Read-only hubs</b><p>Admin Centre should launch/scan/guide, not write.</p></div><div class="card"><b>Global helpers</b><p>Account, avatar, shared style and settings bridge must carry through.</p></div></div></section>
-<section id="checklistSec" class="box section"><h2>V7.10.0 test checklist</h2><div class="grid"><div class="card"><b>Page load</b><p>Page loads with current theme and account/avatar.</p></div><div class="card"><b>Helpers</b><p>Global helper status loads.</p></div><div class="card"><b>Tabs</b><p>All tabs switch properly.</p></div><div class="card"><b>Route cards</b><p>Admin/User/Media/Safety links open current pages.</p></div><div class="card"><b>Route scan</b><p>Run Admin Route Scan and confirm routes show OK or understandable warnings.</p></div><div class="card"><b>Safety</b><p>No save/upload/delete/publish/live controls exist.</p></div></div></section>
-<section id="debugSec" class="box section"><h2>Debug</h2><div id="debug" class="source">Waiting...</div></section>
-<p class="footer">V7.10.0 Admin Centre Command Deck TEST — read-only hub, no live/index promotion.</p>
+<div class="box">
+<span class="badge">V7.12.272 old page route decision test</span>
+<h1>Admin route test</h1>
+<p class="muted">This old V7.10.0 page checks the real Admin Centre route decision before the current Admin Centre page is changed.</p>
+<div id="out" class="source">Loading access projector...</div>
+<p><a class="btn dark" href="home-global-helpers-v7-4-4-test.html">Home</a><a class="btn dark" href="collections-clean-machine-v7-12-51-test.html">Collections</a></p>
 </div>
-<script src="stream-bandit-shell-v6-24.js"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js"></script>
-<script src="stream-bandit-auth-profile-v6-31.js"></script>
-<script src="stream-bandit-auth-sync-v6-31-7.js"></script>
-<script src="stream-bandit-auth-avatar-v7-0-2.js"></script>
-<script src="stream-bandit-shared-style-v7-0-2.js"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js"></script>
+<script src="stream-bandit-shell-v6-24.js?v=admin-route-decision-272"></script>
+<script src="stream-bandit-route-access-map-v7-12-271.js?v=admin-route-decision-272"></script>
+<script src="stream-bandit-access-projector-v7-12-271.js?v=admin-route-decision-272"></script>
 <script>
 (function(){
-'use strict';
-const VERSION='V7.10.0 Admin Centre Command Deck TEST';
-const routes=[
- {group:'admin',icon:'🛠️',name:'Admin Centre',file:'admin-centre-command-deck-v7-10-0-test.html',note:'This current command deck test page'},
- {group:'admin',icon:'📋',name:'All Pages Version Registry',file:'all-pages-version-registry-v7-1-4-full-test.html',note:'Latest full registry page found in repo'},
- {group:'admin',icon:'🧪',name:'Test Checklist',file:'test-checklist-admin-shell-v6-62-test.html',note:'Route forwards to V6.62.1 style-borrow checklist'},
- {group:'admin',icon:'🧰',name:'Tools Page',file:'tools-page-admin-shell-v6-63-test.html',note:'Route forwards to V6.63.2 style-borrow tools page'},
- {group:'admin',icon:'✅',name:'Health Check',file:'health-check-admin-shell-v6-64-test.html',note:'Route forwards to V6.64.2 style-borrow health check'},
- {group:'safety',icon:'🚦',name:'Live Readiness',file:'live-readiness-admin-shell-v6-60-test.html',note:'Route forwards to V6.60.5 readiness page'},
- {group:'safety',icon:'🧱',name:'Platform Control Tower',file:'platform-builder-admin-shell-v6-58-test.html',note:'48/48 full menu scanner and diagnostics'},
- {group:'safety',icon:'🧭',name:'Final Shell Navigation',file:'final-shell-navigation-admin-shell-v6-59-test.html',note:'Final shell/menu route map'},
- {group:'safety',icon:'🛡️',name:'Backup / Safety',file:'backup-safety-admin-shell-v6-67-test.html',note:'Route forwards to V6.67.2 safety page'},
- {group:'media',icon:'🎥',name:'Mux Manager',file:'mux-manager-admin-shell-v6-65-test.html',note:'Public-helper only, no Mux secrets'},
- {group:'media',icon:'🪣',name:'Storage Prep',file:'storage-prep-admin-shell-v6-66-test.html',note:'Read-only storage checklist'},
- {group:'media',icon:'🏗️',name:'Web Builder',file:'web-builder-admin-shell-v6-57-test.html',note:'Promoted to V7.9.3 exact route checkpoint'},
- {group:'media',icon:'🧾',name:'Standalone Form IDE',file:'form-ide-standalone-v7-7-0-test.html',note:'Recovered local copy/paste tool, not promoted as main owner'},
- {group:'user',icon:'👥',name:'User Dashboard Concept',file:'user-dashboard-concept-v6-68-test.html',note:'Concept/read-only user dashboard'},
- {group:'user',icon:'💳',name:'Fair Pricing Matrix',file:'plans-pricing-matrix-v6-69-test.html',note:'Plan/pricing matrix'},
- {group:'user',icon:'🔐',name:'Permissions Matrix',file:'permissions-matrix-v6-70-test.html',note:'Role/permission planning'},
- {group:'user',icon:'📚',name:'Policy & FAQ Centre',file:'policy-faq-centre-v6-71-test.html',note:'Policy and help planning'}
-];
-function $(id){return document.getElementById(id)}
-function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function card(r){return '<div class="route" data-file="'+esc(r.file)+'"><div class="routeIcon">'+esc(r.icon)+'</div><div><b>'+esc(r.name)+'</b><p>'+esc(r.note)+'</p><span class="pill" data-status>not scanned</span><div class="actions"><a class="btn small primary" href="'+esc(r.file)+'">Open</a></div></div></div>'}
-function render(){$('adminGrid').innerHTML=routes.filter(r=>r.group==='admin').map(card).join('');$('safetyGrid').innerHTML=routes.filter(r=>r.group==='safety').map(card).join('');$('mediaGrid').innerHTML=routes.filter(r=>r.group==='media').map(card).join('');$('userGrid').innerHTML=routes.filter(r=>r.group==='user').map(card).join('');debug({version:VERSION,routes});}
-function updateHelperStatus(){let bridge=null;try{bridge=window.StreamBanditSettingsGlobal&&window.StreamBanditSettingsGlobal.getState&&window.StreamBanditSettingsGlobal.getState()}catch(e){}$('helperStatus').innerHTML='<b>Global helpers:</b> Account sync '+(window.StreamBanditAuthSync?'✅':'❌')+' · Avatar '+(window.StreamBanditAuthAvatar?'✅':'❌')+' · Shared style '+(window.StreamBanditSharedStyle?'✅':'❌')+' · Settings bridge '+(window.StreamBanditSettingsGlobal?'✅':'❌')+(bridge&&bridge.source?' · source: '+esc(bridge.source):'');try{if(window.StreamBanditShellAuth&&window.StreamBanditShellAuth.refresh)window.StreamBanditShellAuth.refresh()}catch(e){}}
-function debug(obj){$('debug').textContent=JSON.stringify(obj,null,2)}
-async function scan(){let ok=0;let results=[];$('status').textContent='Scanning admin routes...';for(const r of routes){let res={name:r.name,file:r.file,ok:false,status:'not checked'};try{let response=await fetch(r.file,{cache:'no-store'});res.ok=response.ok;res.status=response.status;if(response.ok)ok++;}catch(e){res.status=e.message||'fetch failed'}results.push(res);document.querySelectorAll('[data-file="'+CSS.escape(r.file)+'"] [data-status]').forEach(el=>{el.textContent=res.ok?'OK':'review';el.className='pill '+(res.ok?'':'warnPill')});}$('scanCount').textContent=ok+'/'+routes.length;$('status').textContent='Admin route scan complete. '+ok+'/'+routes.length+' routes loaded.';debug({version:VERSION,scanResults:results,writeActions:0,livePromotion:false});}
-document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));btn.classList.add('active');$(btn.dataset.tab).classList.add('active');$('status').textContent='Admin Centre tab open: '+btn.textContent+'. Read-only.';}));
-$('runScan').onclick=scan;$('globalSearchBtn').onclick=()=>{const q=$('globalSearch').value.trim();if(q)location.href='global-search-global-helpers-v7-4-9-test.html?q='+encodeURIComponent(q)};$('globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('globalSearchBtn').click()});
-render();updateHelperStatus();setTimeout(updateHelperStatus,700);setTimeout(updateHelperStatus,1800);setTimeout(updateHelperStatus,3200);setInterval(updateHelperStatus,6000);
+var TARGET='admin-centre-command-deck-v7-12-121-test.html';
+function el(){return document.getElementById('out')}
+function safe(email){email=String(email||'');if(!email.includes('@'))return '';var p=email.split('@');return p[0].slice(0,2)+'***@'+p[1]}
+async function run(){
+ try{
+  var p=window.StreamBanditAccessProjector;
+  if(!p){el().textContent='Waiting for Access Projector...';setTimeout(run,800);return}
+  var state=await p.refresh({force:true});
+  var decision=p.routeDecision(TARGET);
+  var ent=state.entitlements||{};
+  var profile=state.profile||{};
+  var ok=!!(decision&&decision.allowed);
+  el().innerHTML=(ok?'<span class="good">DECISION: ALLOWED</span>':'<span class="bad">DECISION: NOT ALLOWED</span>')+'\n\nTarget: '+TARGET+'\nRequired: '+(decision&&decision.rule||'owner_admin')+'\nPlan: '+(ent.plan_key||'guest')+'\nOwner pages: '+(ent.can&&ent.can.ownerPages?'YES':'NO')+'\nAdmin pages: '+(ent.can&&ent.can.adminPages?'YES':'NO')+'\nRole: '+(profile.role||'')+'\nAdmin level: '+(profile.admin_level||'')+'\nAccount: '+safe(state.user&&state.user.email);
+ }catch(e){el().textContent='Test failed: '+(e.message||e);setTimeout(run,1000)}
+}
+document.addEventListener('sb:access-ready',run);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+setTimeout(run,1400);
 })();
 </script>
 </body>
