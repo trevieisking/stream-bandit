@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.287
+# Stream Bandit Current App Manifest V7.12.288
 
 Date: 2026-06-13
 
@@ -6,15 +6,15 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.287 Submit Video Passed / Review Queue Start`
+`V7.12.288 Review Queue Passed / Playlists Start`
 
-Public Browse group is passed as a full group. Creator group has started. Creator Rules passed. Submit Video clean rail/page-content pass has now passed. Review Queue is the next active page.
+Public Browse group is passed as a full group. Creator group has started. Creator Rules passed. Submit Video passed. Review Queue clean rail / page-content pass has now passed.
+
+User confirmed the best test result: a creator submission moved from Submit Video into Review Queue and then through to the Supabase Library / `sb_movies` publish path on the first pass.
 
 Current next target:
 
-`review-queue-clean-machine-v7-12-80-publish-test.html`
-
-The user uploaded the current full Review Queue page file as the source for the next full-page replacement pass.
+`playlists-global-helpers-v7-5-2-test.html`
 
 ## Current checkpoint files
 
@@ -24,7 +24,7 @@ Keep these current checkpoint files:
 - `CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`
 - `CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
-No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, or Submit Video. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
+No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, or Review Queue. These are recorded in this manifest only to avoid file-count clutter.
 
 ## File-count / cleanup rule
 
@@ -34,16 +34,16 @@ Normal rule:
 
 - Update this manifest for routine carry-on memory.
 - Create a new checkpoint only when the pass needs a separate record.
-- If a new checkpoint is created, delete one clearly obsolete old checkpoint in the same cleanup pass.
+- If a new checkpoint is created, clear one clearly obsolete old checkpoint in the same cleanup pass.
 - If a new page is needed, first look for a safe old inactive page to replace.
 - Do not create new page piles like `test-1`, `test-2`, `final`, `final-2`.
 - Do not overwrite protected reference pages or working fallback pages.
-- Do not delete accessibility, player comfort, Supabase migration/test, upload/Mux/storage, profile/auth/avatar, global shell/helper, registry, route, manifest, backup, or current checkpoint files unless the user explicitly approves the specific deletion.
+- Do not remove accessibility, player comfort, Supabase migration/test, upload/Mux/storage, profile/auth/avatar, global shell/helper, registry, route, manifest, backup, or current checkpoint files unless the user explicitly approves the specific cleanup.
 
 Cleanup already performed in this run:
 
 - Created `CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`.
-- Deleted obsolete old `CHECKPOINT-V5.24.md` to avoid file-count growth.
+- Cleared obsolete old `CHECKPOINT-V5.24.md` to avoid file-count growth.
 
 ## Last known route / health baseline
 
@@ -77,7 +77,7 @@ Health baseline confirmed:
 - Supabase SDK loaded.
 - Session signed in.
 - Profile row visible.
-- `sb_movies` readable, count 24.
+- `sb_movies` readable, count 24 before the latest Review Queue publish test.
 - `sb_channels` readable, count 3.
 - `sb_policy_documents` readable, count 7.
 - `sb_site_pages` readable, count 9.
@@ -123,13 +123,6 @@ Helper commit:
 
 `99b7c055ceeb5f90a47852efedd1921f8217ac0e`
 
-Confirmed:
-
-- Typing in the header search can still show the quick overlay preview.
-- Clicking the header Search button opens `global-search-global-helpers-v7-4-9-test.html?q=SEARCH_TEXT`.
-- Pressing Enter in the header search opens the same Global Search route with the `q` parameter.
-- Global Search receives the query and fills its main search input.
-
 ## Page polish standard
 
 Every page in the final polish pass should follow this pattern where possible:
@@ -167,15 +160,9 @@ Preferred active pill style:
 
 `linear-gradient(135deg,var(--accent),var(--accent2))`
 
-Inputs / outputs rule:
+## Passed groups
 
-- Inputs and controls belong in controlled overlays, forms, or page sections depending on risk.
-- Outputs/results belong on the page under the correct tab/section.
-- Dangerous inputs/actions must stay behind admin/owner/protected pages.
-- Public pages must not show admin/readiness/test buttons.
-- Remove stale buttons, stale links, and old visual shell leftovers during each page pass.
-
-## Current passed public Watch / Saved / Comfort group
+### Public Watch / Saved / Comfort group
 
 Passed pages:
 
@@ -198,7 +185,7 @@ Protected confirmations:
 - Details and Play routes work where relevant.
 - Player Comfort, audio boost, fullscreen, accessibility, saves, progress, and history remain protected.
 
-## Current passed public Browse group — FULL GROUP PASS
+### Public Browse group — FULL GROUP PASS
 
 Browse group is passed.
 
@@ -239,7 +226,7 @@ Confirmed:
 - It includes Permissions Matrix route: `permissions-matrix-user-management-v7-11-4-test.html`.
 - It includes Supabase table-family truth from visible table list and known app behaviour.
 - It clearly states Supabase connector/table columns/RLS need direct verification later when tools reconnect.
-- It keeps Rules as safe explanation: no submit, upload, approve, decline, publish, delete, migrate, schema, storage, policy or live/index controls.
+- It keeps Rules as safe explanation: no submit, upload, approve, decline, publish, queue cleanup, migrate, schema, storage, policy or live/index controls.
 
 ### Submit Video — PASSED
 
@@ -250,11 +237,6 @@ File:
 Current confirmed state:
 
 `V7.12.287 Submit Video · Clean Rail`
-
-Page update method:
-
-- Full ready copy/paste page code was supplied to the user.
-- User confirmed the page passed and a submission reached Review Queue.
 
 Confirmed:
 
@@ -270,61 +252,52 @@ Confirmed:
 - Pending submission insert remains to `sb_submissions` only.
 - Insert verification read remains from `sb_submissions`.
 - Review Queue remains the `sb_movies` publish gate.
-- No schema changes.
-- No storage policy changes.
-- No RLS changes.
-- No bucket name changes.
-- No table name changes.
-- No player engine changes.
-- No index promotion.
-- No global helper rewrites.
+- User confirmed a submission reached Review Queue.
+- No schema, storage policy, RLS, bucket, table-name, player, index, or global-helper changes.
+
+### Review Queue — PASSED
+
+File:
+
+`review-queue-clean-machine-v7-12-80-publish-test.html`
+
+Current confirmed state:
+
+`V7.12.288 Review Queue · Clean Rail`
+
+Confirmed:
+
+- Creator group top rail added directly under header.
+- Route links moved out of hero into the top rail.
+- No duplicate tabs were added.
+- Hero keeps only the real page action: Reload Queue.
+- Queue list filters and selected-submission action panel remain page content.
+- Menu Saves Count, Settings Global, and Brand Logo helpers are included.
+- Helper status shows Counts as well as Header/Footer/Theme/Saves/Search.
+- Admin/owner role gate is preserved.
+- Review Queue still reads `sb_submissions`.
+- Approve + Publish creates or updates `sb_movies`.
+- Approve Only updates `sb_submissions` to approved without publishing.
+- Decline updates `sb_submissions` to declined with reason.
+- Archive From Queue uses allowed status `declined` plus `[ARCHIVED_FROM_QUEUE]` marker in `decline_reason`.
+- Active queue hides archived submissions while keeping published movies safe.
+- Published movies are not removed.
+- Source type inference remains mux/hls/url.
+- User confirmed the submit-to-review-to-Supabase-Library path passed first time.
+- No schema, storage, RLS, table-name, player, index, or global-helper changes.
 
 ## Creator group — next work order
 
 Next page:
 
-`review-queue-clean-machine-v7-12-80-publish-test.html`
-
-The user uploaded the current full Review Queue file as source for the next pass.
-
-Current supplied Review Queue state:
-
-`V7.12.168 Review Queue · Archive Constraint Fix`
-
-Known behaviours from supplied file:
-
-- Reads pending/approved/declined/archived rows from `sb_submissions`.
-- Admin review gate for creator submissions.
-- Approve + Publish creates or updates a public movie row in `sb_movies`.
-- Approve Only updates the submission to approved without publishing.
-- Decline updates the submission to declined with reason.
-- Archive From Queue uses allowed status `declined` plus `[ARCHIVED_FROM_QUEUE]` marker in `decline_reason`.
-- Active queue hides archived submissions while keeping published movies safe.
-- It checks current user/profile and requires admin/owner role for queue actions.
-- It reads `sb_channels` for publish channel selection.
-- It infers source type for `sb_movies` as mux/hls/url.
-- It does not delete published movies.
-
-Needed next polish direction:
-
-- Add Creator group top rail directly under header.
-- Move route links out of hero into top rail.
-- Keep real page action in hero: Reload only.
-- Do not add duplicate tabs.
-- Preserve queue list filters and selected-submission action panel as page content.
-- Load Menu Saves Count, Settings Global, and Brand Logo helpers to match latest pattern.
-- Make helper status show Counts as well as Header/Footer/Theme/Saves/Search.
-- Preserve admin/owner role gate.
-- Preserve archive constraint fix.
-- Preserve publish/approve/decline/archive behaviours.
-- Do not change schema, storage, RLS, table names, player engine, index, or global helper logic.
+`playlists-global-helpers-v7-5-2-test.html`
 
 Creator group expected pages:
 
 - Rules — `rules-clean-machine-v7-12-82-test.html` — PASSED
 - Submit Video — `submit-video-clean-machine-v7-12-79-test.html` — PASSED
-- Review Queue — `review-queue-clean-machine-v7-12-80-publish-test.html` — NEXT
-- Playlists — `playlists-global-helpers-v7-5-2-test.html`
+- Review Queue — `review-queue-clean-machine-v7-12-80-publish-test.html` — PASSED
+- Playlists — `playlists-global-helpers-v7-5-2-test.html` — NEXT
 - Channels — `channels-global-helpers-v7-5-3-test.html`
 - My Channel — `my-channel-clean-machine-v7-12-47-test.html`
 - Collections — `collections-clean-machine-v7-12-51-test.html`
