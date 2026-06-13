@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Creator Rules V7.12.285</title>
+<title>Stream Bandit Creator Rules V7.12.286</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,10 +13,10 @@
 html,body{max-width:100vw;overflow-x:hidden}
 body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 40%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(13.5px * var(--fontScale))}
 .wrap{max-width:1440px;margin:auto}
-.hero,.box,.card,.rule,.step,.check,.truth,.ownerCard{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0007;padding:15px;margin-bottom:13px}
+.hero,.box,.card,.rule,.step,.check,.truth,.ownerCard,.tableCard{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0007;padding:15px;margin-bottom:13px}
 .hero{padding:18px}
 .box{padding:16px}
-.card,.rule,.step,.check,.truth,.ownerCard{background:#ffffff0f;box-shadow:none;margin-bottom:0}
+.card,.rule,.step,.check,.truth,.ownerCard,.tableCard{background:#ffffff0f;box-shadow:none;margin-bottom:0}
 .badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}
 .badge{padding:5px 9px;font-size:11px}
 .pill{padding:4px 7px;font-size:10px;margin:2px}
@@ -27,7 +27,7 @@ h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.
 h2{margin:0 0 9px;font-size:21px}
 h3{margin:0 0 6px;font-size:16px}
 .muted,p,small,label,li{color:var(--muted);line-height:1.42}
-.hero p,.card p,.rule p,.step p,.check p,.truth p,.ownerCard p{margin-top:5px;margin-bottom:7px}
+.hero p,.card p,.rule p,.step p,.check p,.truth p,.ownerCard p,.tableCard p{margin-top:5px;margin-bottom:7px}
 code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5px;color:#dfffee}
 .btn,.tab{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
 .btn:disabled{opacity:.55;cursor:not-allowed}
@@ -40,7 +40,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 .note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
 .danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}
 .safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}
-.grid,.pathGrid,.ruleGrid,.checks,.truthGrid,.ownerGrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}
+.grid,.pathGrid,.ruleGrid,.checks,.truthGrid,.ownerGrid,.tableGrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}
 .heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(250px,360px);gap:14px}
 .art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:180px;display:grid;place-items:center;position:relative;overflow:hidden}
 .art:before{content:"";position:absolute;inset:20px;border-radius:22px;border:1px dashed #ffffff32}
@@ -49,8 +49,8 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 .actions{margin-top:8px}
 .routeStrip{margin-top:10px}
 .routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}
-.card b,.rule b,.step b,.check b,.truth b,.ownerCard b{display:block;color:#baf7df;margin-bottom:5px}
-.card a,.ownerCard a{display:block;color:#baf7df;text-decoration:none;font-weight:900;margin:6px 0}
+.card b,.rule b,.step b,.check b,.truth b,.ownerCard b,.tableCard b{display:block;color:#baf7df;margin-bottom:5px}
+.card a,.ownerCard a,.tableCard a{display:block;color:#baf7df;text-decoration:none;font-weight:900;margin:6px 0}
 .step{position:relative;padding-left:44px}
 .step:before{content:attr(data-step);position:absolute;left:12px;top:14px;width:22px;height:22px;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017;display:grid;place-items:center;font-size:12px;font-weight:950}
 .bigRule{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:start;border:1px solid #ffffff1a;border-radius:18px;background:#ffffff0f;padding:12px}
@@ -58,7 +58,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 .ruleList{display:grid;gap:10px}
 .section{display:none}
 .section.active{display:block}
-.source{font-family:ui-monospace,Consolas,monospace;background:#0004;border-radius:14px;padding:12px;white-space:pre-wrap;color:#dfffee;max-height:300px;overflow:auto;word-break:break-word}
+.source{font-family:ui-monospace,Consolas,monospace;background:#0004;border-radius:14px;padding:12px;white-space:pre-wrap;color:#dfffee;max-height:320px;overflow:auto;word-break:break-word}
 .micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
 .pillTabs{padding:10px 12px;border-radius:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--p),#000 14%),color-mix(in srgb,var(--p2),#000 8%));border-color:var(--line);box-shadow:0 10px 30px #0007}
 .pillTabs.topRail{margin-top:-2px}
@@ -69,7 +69,9 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 .truth{border-color:#41e8ff55}
 .truth b{color:#cef9ff}
 .ownerCard{border-color:#22d3a640}
-.ownerCard ul{padding-left:18px;margin:6px 0}
+.ownerCard ul,.tableCard ul{padding-left:18px;margin:6px 0}
+.tableCard{border-color:#ffffff24}
+.tableCard b{font-family:ui-monospace,Consolas,monospace;color:#cef9ff}
 @media(max-width:980px){
  body{padding:10px}
  .heroGrid,.bigRule{grid-template-columns:1fr}
@@ -95,6 +97,8 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
     <a class="pagePill" href="my-channel-clean-machine-v7-12-47-test.html">My Channel</a>
     <a class="pagePill" href="collections-clean-machine-v7-12-51-test.html">Collections</a>
     <a class="pagePill" href="player-2-clean-machine-v7-12-58-test.html">Player 2</a>
+    <a class="pagePill" href="plans-pricing-feature-shop-v7-11-3-test.html">Pricing Matrix</a>
+    <a class="pagePill" href="user-management-dashboard-v7-11-2-test.html">User Dashboard</a>
     <a class="pagePill" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Library Editor</a>
   </div>
 </section>
@@ -102,17 +106,17 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.285 Creator Rules · Full Truth Map</span>
+      <span class="badge">V7.12.286 Creator Rules · Platform Truth Map</span>
       <h1>Creator Rulebook</h1>
-      <p>This page is the truth map for the Creator chain. It explains workflow, global rules, Theme Bridge rules, page-owned properties, tables, roles and handoff points before we touch Submit Video, Review Queue or group-play pages.</p>
-      <div class="routeStrip"><span>Submit → sb_submissions</span><span>Review → approve / decline</span><span>Publish → sb_movies</span><span>Cleanup → Library Editor</span></div>
+      <p>This page is the real map for Creator, Admin, Owner, Pricing, User Dashboard, Supabase tables, global helpers, Theme Bridge and page-owned jobs. It explains what everything is doing before we edit Submit Video, Review Queue or group-play pages.</p>
+      <div class="routeStrip"><span>Submit → sb_submissions</span><span>Review → approve / decline</span><span>Publish → sb_movies</span><span>Plans → Pricing Matrix</span><span>Roles → User Dashboard</span></div>
       <div class="actions">
-        <button class="btn primary" data-jump="global" type="button">Show Global Rules</button>
-        <button class="btn cyan" data-jump="theme" type="button">Show Theme Bridge</button>
-        <button class="btn hot" data-jump="ownership" type="button">Show Page Ownership</button>
-        <button class="btn warn" data-jump="workflow" type="button">Show Workflow</button>
+        <button class="btn primary" data-jump="platform" type="button">Platform Map</button>
+        <button class="btn cyan" data-jump="tables" type="button">Supabase Tables</button>
+        <button class="btn hot" data-jump="ownership" type="button">Page Ownership</button>
+        <button class="btn warn" data-jump="global" type="button">Global Rules</button>
       </div>
-      <div id="status" class="status">Creator Rules loaded. Truth-map page only. No Supabase writes, uploads, approvals, deletes, migrations or publishing actions.</div>
+      <div id="status" class="status">Creator Rules loaded. Truth-map page only. No Supabase writes, uploads, approvals, deletes, migrations, storage policy changes or publishing actions.</div>
       <div id="helperStatus" class="note">Checking foundation...</div>
     </div>
     <div class="art"><div class="artIcon">📜✅</div></div>
@@ -127,13 +131,17 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
     <div class="step" data-step="3"><b>Approve + Publish</b><p>Review Queue creates or updates the public movie row in <code>sb_movies</code> and marks the submission approved.</p></div>
     <div class="step" data-step="4"><b>Final cleanup</b><p>Supabase Library Editor is used for final title, poster, source, genre, age rating and channel cleanup.</p></div>
   </div>
-  <div class="safe">Rules is the command map, not the dangerous machine. It tells the full truth without performing submit, upload, approve, decline, publish, delete, migrate, schema, storage or live/index actions.</div>
+  <div class="safe">Rules is the platform map, not the dangerous machine. It tells the full truth without performing submit, upload, approve, decline, publish, delete, migrate, schema, storage or live/index actions.</div>
 </section>
 
 <section class="box">
-  <h2>Creator Rules tabs</h2>
+  <h2>Truth tabs</h2>
   <div class="tabs">
     <button class="tab active" data-tab="overview" type="button">Overview</button>
+    <button class="tab" data-tab="platform" type="button">Platform Map</button>
+    <button class="tab" data-tab="accounts" type="button">Accounts</button>
+    <button class="tab" data-tab="pricing" type="button">Pricing</button>
+    <button class="tab" data-tab="tables" type="button">Supabase Tables</button>
     <button class="tab" data-tab="workflow" type="button">Workflow</button>
     <button class="tab" data-tab="global" type="button">Global Rules</button>
     <button class="tab" data-tab="theme" type="button">Theme Bridge</button>
@@ -141,7 +149,6 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
     <button class="tab" data-tab="roles" type="button">Roles</button>
     <button class="tab" data-tab="submit" type="button">Submission</button>
     <button class="tab" data-tab="review" type="button">Review</button>
-    <button class="tab" data-tab="tables" type="button">Tables / RLS</button>
     <button class="tab" data-tab="dont" type="button">Do Not</button>
     <button class="tab" data-tab="checklist" type="button">Checklist</button>
     <button class="tab" data-tab="debug" type="button">Debug</button>
@@ -156,6 +163,70 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
     <div class="card"><b>Review Queue</b><p>Current route:</p><a href="review-queue-clean-machine-v7-12-80-publish-test.html">review-queue-clean-machine-v7-12-80-publish-test.html</a><p>Admin page that approves/declines and publishes to <code>sb_movies</code>.</p></div>
     <div class="card"><b>Final editor</b><p>Current route:</p><a href="supabase-library-home-header-form-fix-v7-12-34-test.html">Supabase Library Editor</a><p>Admin/test workbench for final <code>sb_movies</code> cleanup.</p></div>
   </div>
+</section>
+
+<section id="platform" class="box section">
+  <h2>Real platform map</h2>
+  <div class="truthGrid">
+    <div class="truth"><b>Public watch system</b><p>Home, Library, Details, Player 1, Continue Watching, Watch History, Watchlist, Favourites, Likes and Accessibility read public/movie/save/progress data.</p></div>
+    <div class="truth"><b>Browse system</b><p>Supabase Library, Genres, Global Search and About form the public browse/info group. This group has passed.</p></div>
+    <div class="truth"><b>Creator system</b><p>Rules, Submit Video, Review Queue, Playlists, Channels, My Channel, Collections and Player 2 are the active creator/group-play group.</p></div>
+    <div class="truth"><b>Owner/admin system</b><p>Owner pages, User Dashboard, Permissions Matrix, admin tools, audit, readiness and route scanners protect platform operation.</p></div>
+    <div class="truth"><b>Pricing/plan system</b><p>Pricing Matrix is the plan/feature reference. It helps explain what roles/features should unlock later, but it is not payment processing yet.</p></div>
+    <div class="truth"><b>Supabase system</b><p>Supabase tables hold movies, profiles, channels, submissions, saves, policy documents, site pages, settings and audit/import information.</p></div>
+  </div>
+</section>
+
+<section id="accounts" class="box section">
+  <h2>Owner / Admin / User account map</h2>
+  <div class="ownerGrid">
+    <div class="ownerCard"><b>User Dashboard</b><a href="user-management-dashboard-v7-11-2-test.html">Open User Dashboard</a><p>Account and role management truth lives here. It links users, roles, profile authority and future plan state.</p></div>
+    <div class="ownerCard"><b>Permissions Matrix</b><a href="permissions-matrix-user-management-v7-11-4-test.html">Open Permissions Matrix</a><p>Explains which role should see which page/tool. Owner-only by current overlay rules.</p></div>
+    <div class="ownerCard"><b>Profiles table</b><p><code>sb_profiles</code> is the account/profile/role authority table. It should not be guessed from page buttons alone.</p></div>
+    <div class="ownerCard"><b>Owner authority</b><p>Owner sees owner pages, user management, platform core, brand, routes and final safety tooling.</p></div>
+    <div class="ownerCard"><b>Admin authority</b><p>Admin gets operational review/editor/moderation tools, not automatic owner-only platform/user control.</p></div>
+    <div class="ownerCard"><b>Creator authority</b><p>Creator gets submit/channel/group-play tools only where role and future plan allow it.</p></div>
+  </div>
+</section>
+
+<section id="pricing" class="box section">
+  <h2>Pricing Matrix / plan truth</h2>
+  <div class="grid">
+    <div class="card"><b>Pricing Matrix route</b><a href="plans-pricing-feature-shop-v7-11-3-test.html">plans-pricing-feature-shop-v7-11-3-test.html</a><p>This is the plan/feature reference page, not a live payment processor.</p></div>
+    <div class="card"><b>Plan unlock map</b><p>Pricing should explain what features a user can eventually unlock: creator tools, channels, playlists, collections, forms, builder features and support levels.</p></div>
+    <div class="card"><b>Not payment yet</b><p>No billing, checkout, subscription charge or payment write should be invented from the Rules page.</p></div>
+    <div class="card"><b>Connects to User Dashboard</b><p>User Dashboard and profile authority decide what a specific account can see/use. Pricing Matrix explains the intended product plan.</p></div>
+    <div class="card"><b>Owner controls changes</b><p>Plan/permission changes should be owner/admin controlled, audited and never exposed as a public shortcut.</p></div>
+    <div class="card"><b>Future entitlement truth</b><p>Future entitlement work should connect roles, plans, profiles and RLS deliberately, not with scattered page-only checks.</p></div>
+  </div>
+</section>
+
+<section id="tables" class="box section">
+  <h2>Supabase table truth map</h2>
+  <p>This map is based on the visible Supabase table list and current app behaviour. The Supabase connector was not confirmed here, so columns/RLS still need direct verification later.</p>
+  <div class="tableGrid">
+    <div class="tableCard"><b>sb_admin_audit_log</b><p>Admin/owner audit history. Should record important operational actions later.</p><span class="pill info">Admin</span></div>
+    <div class="tableCard"><b>sb_app_settings</b><p>App-wide settings and platform state. Should be controlled, not edited from creator pages.</p><span class="pill care">Global</span></div>
+    <div class="tableCard"><b>sb_channels</b><p>Creator/channel identity and channel records used by channel/group pages.</p><span class="pill">Creator</span></div>
+    <div class="tableCard"><b>sb_collection_movies</b><p>Join table connecting collections to movies.</p><span class="pill">Join</span></div>
+    <div class="tableCard"><b>sb_collections</b><p>Collection records for browse/group organisation.</p><span class="pill">Group</span></div>
+    <div class="tableCard"><b>sb_favourites</b><p>Favourite saves for users. Owned by Core Saves/Menu Counts helpers.</p><span class="pill">Saves</span></div>
+    <div class="tableCard"><b>sb_form_submissions</b><p>Web Builder/contact form submissions, not Creator video intake.</p><span class="pill">Builder</span></div>
+    <div class="tableCard"><b>sb_genres</b><p>Managed genre labels. Deleting a genre label must not delete movies.</p><span class="pill">Browse</span></div>
+    <div class="tableCard"><b>sb_import_batches</b><p>Import/migration batch records. Should stay out of public/creator pages.</p><span class="pill care">Import</span></div>
+    <div class="tableCard"><b>sb_likes</b><p>Liked title saves for users. Owned by Core Saves/Menu Counts helpers.</p><span class="pill">Saves</span></div>
+    <div class="tableCard"><b>sb_movies</b><p>Public movie/library rows. Home, Library, Genres, Search, Details and Player 1 read this table.</p><span class="pill">Public</span></div>
+    <div class="tableCard"><b>sb_playlist_movies</b><p>Join table connecting playlists to movies.</p><span class="pill">Join</span></div>
+    <div class="tableCard"><b>sb_playlists</b><p>Playlist records for creator/group-play features.</p><span class="pill">Group</span></div>
+    <div class="tableCard"><b>sb_policy_documents</b><p>Policy/legal documents for Policy Centre and Policy Reader/Admin.</p><span class="pill">Policy</span></div>
+    <div class="tableCard"><b>sb_private_messages</b><p>Private/user messaging area. Must not be exposed accidentally through public pages.</p><span class="pill stop">Private</span></div>
+    <div class="tableCard"><b>sb_profiles</b><p>Account/profile/role authority. Owner/admin/creator/viewer truth depends on this table.</p><span class="pill info">Authority</span></div>
+    <div class="tableCard"><b>sb_site_pages</b><p>Web Builder/site pages and published preview content.</p><span class="pill">Builder</span></div>
+    <div class="tableCard"><b>sb_submissions</b><p>Creator submission intake and review queue source. Submit Video writes here.</p><span class="pill">Creator</span></div>
+    <div class="tableCard"><b>sb_watch_progress</b><p>Continue Watching and progress records.</p><span class="pill">Progress</span></div>
+    <div class="tableCard"><b>sb_watchlist</b><p>Watchlist saves for users. Owned by Core Saves/Menu Counts helpers.</p><span class="pill">Saves</span></div>
+  </div>
+  <div class="danger">Rules must not write any table. It explains ownership only. Table columns, RLS policies, row counts and relationships still need direct Supabase verification when tools reconnect.</div>
 </section>
 
 <section id="workflow" class="box section">
@@ -196,10 +267,12 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <h2>Page-owned properties</h2>
   <p>Each page gets to own its local job. Global helpers own cross-app jobs. This is how we avoid pages fighting each other.</p>
   <div class="ownerGrid">
-    <div class="ownerCard"><b>Rules owns</b><ul><li>Creator truth map</li><li>Workflow explanation</li><li>Do-not rules</li><li>Table responsibility notes</li><li>Group checklist</li></ul></div>
+    <div class="ownerCard"><b>Rules owns</b><ul><li>Creator truth map</li><li>Workflow explanation</li><li>Do-not rules</li><li>Supabase table family notes</li><li>Role/plan/platform explanation</li></ul></div>
     <div class="ownerCard"><b>Submit Video owns</b><ul><li>Creator intake form</li><li>Poster/artwork URL preparation</li><li>Pending <code>sb_submissions</code> write</li><li>Submission validation</li><li>No public publish</li></ul></div>
     <div class="ownerCard"><b>Review Queue owns</b><ul><li>Pending submission reading</li><li>Approve / approve-only / decline</li><li>Publish handoff to <code>sb_movies</code></li><li>Admin-only moderation actions</li></ul></div>
     <div class="ownerCard"><b>Library Editor owns</b><ul><li>Final published movie cleanup</li><li>Poster/source corrections</li><li>Genre/age/channel cleanup</li><li>Admin/owner editing only</li></ul></div>
+    <div class="ownerCard"><b>Pricing Matrix owns</b><ul><li>Plan/feature shop reference</li><li>Future entitlement guide</li><li>No live payment processing yet</li></ul><a href="plans-pricing-feature-shop-v7-11-3-test.html">Open Pricing Matrix</a></div>
+    <div class="ownerCard"><b>User Dashboard owns</b><ul><li>User/account view</li><li>Role/profile control direction</li><li>Owner/user-management diagnostics</li></ul><a href="user-management-dashboard-v7-11-2-test.html">Open User Dashboard</a></div>
     <div class="ownerCard"><b>Theme Projector owns</b><ul><li>Global colour variables</li><li>Font scale projection</li><li>Theme state application</li><li>Readable theme bridge</li></ul></div>
     <div class="ownerCard"><b>Core Saves owns</b><ul><li>Watchlist saves</li><li>Favourite saves</li><li>Like saves</li><li>Shared save refresh events</li></ul></div>
     <div class="ownerCard"><b>Menu Counts owns</b><ul><li>Header/menu save counts</li><li>Owner/User Management visibility</li><li>Direct owner fallback lock</li><li>Count refresh bridge</li></ul></div>
@@ -242,19 +315,6 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   </div>
 </section>
 
-<section id="tables" class="box section">
-  <h2>Tables / RLS truth</h2>
-  <div class="grid">
-    <div class="card"><b>sb_submissions</b><p>Creator intake and review status. Submit Video writes here. Review Queue reads and updates status here.</p></div>
-    <div class="card"><b>sb_movies</b><p>Public movie rows. Review Queue publishes here. Library, Details, Search, Genres and Player 1 read here.</p></div>
-    <div class="card"><b>sb_profiles</b><p>Account/profile/role information. Used to keep owner/admin/creator/viewer state clear.</p></div>
-    <div class="card"><b>sb_channels</b><p>Channel information. Creator/channel pages may read or write only through the correct page and role rules.</p></div>
-    <div class="card"><b>sb_playlists</b><p>Playlist information. Group-play pages must not fall back to all users’ content.</p></div>
-    <div class="card"><b>Storage images</b><p>Poster/artwork images can be stored as public URLs. Full video file upload is not part of this Rules page.</p></div>
-  </div>
-  <div class="danger">No schema, migration, RLS or storage policy changes belong on the Rules page. Any database structure change must be a separate deliberate database task.</div>
-</section>
-
 <section id="dont" class="box section">
   <h2>Do not</h2>
   <div class="ruleList">
@@ -274,9 +334,9 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
     <div class="check"><b>Footer</b><p>One compact footer shell only.</p></div>
     <div class="check"><b>Top rail</b><p>Creator group rail is directly under the header.</p></div>
     <div class="check"><b>Hero</b><p>Hero uses page actions only, not duplicate route buttons.</p></div>
-    <div class="check"><b>Routes</b><p>Submit Video and Review Queue links go to current files.</p></div>
+    <div class="check"><b>Routes</b><p>Submit Video, Review Queue, Pricing Matrix and User Dashboard links go to current files.</p></div>
     <div class="check"><b>Read-only safety</b><p>No submit, upload, approve, decline, publish, delete, migrate, schema, storage or live/index buttons appear on Rules.</p></div>
-    <div class="check"><b>Global truth</b><p>Theme Bridge, global helpers and page-owned properties are explained.</p></div>
+    <div class="check"><b>Global truth</b><p>Theme Bridge, global helpers, page-owned properties, account roles, pricing and Supabase table family are explained.</p></div>
     <div class="check"><b>Counters</b><p>Header Watchlist/Favourite/Like counters still count through shared saves helper.</p></div>
   </div>
 </section>
@@ -286,24 +346,24 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debugBox" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Creator Rules V7.12.285: full truth map + clean page rail + global rules + theme bridge + page-owned properties.</p>
+<p class="micro">Creator Rules V7.12.286: full platform truth map + Supabase table family + account/pricing links + clean Creator rail.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=creator-rules-truth-285"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=creator-rules-truth-285"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=creator-rules-truth-285"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=creator-rules-truth-285"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=creator-rules-truth-285"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=creator-rules-truth-285"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=creator-rules-truth-285"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=creator-rules-truth-285"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=creator-rules-truth-285"></script>
+<script src="stream-bandit-shell-v6-24.js?v=creator-rules-truth-286"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=creator-rules-truth-286"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=creator-rules-truth-286"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=creator-rules-truth-286"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=creator-rules-truth-286"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=creator-rules-truth-286"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=creator-rules-truth-286"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=creator-rules-truth-286"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=creator-rules-truth-286"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.285 Creator Rules Full Truth Map';
+const VERSION='V7.12.286 Creator Rules Platform Truth Map';
 let countBusy=false;
 let countReady=false;
 let lastCountRead=0;
@@ -357,7 +417,7 @@ function helper(){
   page:'Creator Rules',
   cleanNavigation:true,
   topRail:true,
-  fullTruthMap:true,
+  fullPlatformTruthMap:true,
   readOnly:true,
   supabaseWrite:false,
   upload:false,
@@ -368,16 +428,20 @@ function helper(){
   schemaChange:false,
   storagePolicyChange:false,
   livePromotion:false,
+  connectorNote:'Supabase connector not confirmed in this chat; table map is based on visible Supabase table list and known app behaviour.',
   explains:{
+   platformMap:true,
+   accountRoles:true,
+   pricingMatrix:true,
+   userDashboard:true,
+   supabaseTableFamily:true,
    workflow:true,
    globalRules:true,
    themeBridge:true,
    pageOwnedProperties:true,
-   roles:true,
-   tables:true,
    doNotRules:true
   },
-  shellModel:'Header Shell + Page Rail + Hero + Rules Content + Footer Shell',
+  shellModel:'Header Shell + Page Rail + Hero + Truth Content + Footer Shell',
   routeTruth:{
    rules:'rules-clean-machine-v7-12-82-test.html',
    submit:'submit-video-clean-machine-v7-12-79-test.html',
@@ -387,17 +451,15 @@ function helper(){
    myChannel:'my-channel-clean-machine-v7-12-47-test.html',
    collections:'collections-clean-machine-v7-12-51-test.html',
    player2:'player-2-clean-machine-v7-12-58-test.html',
+   pricing:'plans-pricing-feature-shop-v7-11-3-test.html',
+   userDashboard:'user-management-dashboard-v7-11-2-test.html',
+   permissions:'permissions-matrix-user-management-v7-11-4-test.html',
    library:'library-global-helpers-v7-4-8-test.html',
    editor:'supabase-library-home-header-form-fix-v7-12-34-test.html'
   },
-  tableTruth:{
-   submitVideoWrites:'sb_submissions',
-   reviewQueueReads:'sb_submissions',
-   reviewQueueUpdates:'sb_submissions',
-   reviewQueuePublishes:'sb_movies',
-   publicPagesRead:'sb_movies',
-   profileAuthority:'sb_profiles'
-  },
+  tableTruth:[
+   'sb_admin_audit_log','sb_app_settings','sb_channels','sb_collection_movies','sb_collections','sb_favourites','sb_form_submissions','sb_genres','sb_import_batches','sb_likes','sb_movies','sb_playlist_movies','sb_playlists','sb_policy_documents','sb_private_messages','sb_profiles','sb_site_pages','sb_submissions','sb_watch_progress','sb_watchlist'
+  ],
   helperOwnership:{
    theme:'stream-bandit-theme-projector-v7-12-156.js',
    header:'stream-bandit-header-shell-v7-12-156.js',
@@ -426,7 +488,7 @@ setTimeout(helper,700);
 setTimeout(()=>refreshSavedCounters(true),1600);
 setTimeout(helper,1800);
 setInterval(helper,6000);
-document.documentElement.dataset.sbCreatorRules='v7-12-285';
+document.documentElement.dataset.sbCreatorRules='v7-12-286';
 
 })();
 </script>
