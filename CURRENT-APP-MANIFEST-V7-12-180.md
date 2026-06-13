@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.286
+# Stream Bandit Current App Manifest V7.12.287
 
 Date: 2026-06-13
 
@@ -6,15 +6,15 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.286 Creator Rules Passed / Submit Video Start`
+`V7.12.287 Submit Video Passed / Review Queue Start`
 
-Public Browse group is passed as a full group. Creator group has started. Creator Rules has now passed and Submit Video is the next active page.
+Public Browse group is passed as a full group. Creator group has started. Creator Rules passed. Submit Video clean rail/page-content pass has now passed. Review Queue is the next active page.
 
 Current next target:
 
-`submit-video-clean-machine-v7-12-79-test.html`
+`review-queue-clean-machine-v7-12-80-publish-test.html`
 
-The user supplied the full current Submit Video page code in chat as the source for the next full-page replacement pass.
+The user uploaded the current full Review Queue page file as the source for the next full-page replacement pass.
 
 ## Current checkpoint files
 
@@ -24,7 +24,7 @@ Keep these current checkpoint files:
 - `CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`
 - `CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
-No new checkpoint was created for Global Search, About, Browse full-group pass, or Creator Rules. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
+No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, or Submit Video. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
 
 ## File-count / cleanup rule
 
@@ -85,35 +85,9 @@ Health baseline confirmed:
 
 ## Access / visibility model
 
-### Owner
+Owner pages are visible in the overlay for the platform owner and hidden for everyone else. Admin pages are operational pages for admin/owner users. Creator/builders receive only plan-allowed creator, group-play, and Web Builder areas. Viewers can use watch, saved, profile, and public/read pages as allowed. Signed-out users do not see Owner or User Management groups. Protected direct URLs should show a clear locked/not-allowed page, not blank crash.
 
-Owner means the platform owner account only.
-
-Owner can see and open Owner group, User Management group, One Machine, Final Shell Navigation, Brand / App Icons, Brand Image Helper, Favicon / App Icon Builder, User Dashboard, Permissions Matrix, and platform-core owner tools.
-
-Owner pages are visible in the overlay for the owner and hidden for everyone else.
-
-### Admin
-
-Admin pages are operational pages for admin/owner users. Owner pages remain separate.
-
-Admin-locked group includes Admin Centre, Live Readiness, Current Routes Registry, Test Checklist, Tools, Health Check, Mux Manager, Storage Prep, Backup / Safety, and Policy Admin Editor.
-
-### Creator / Builder
-
-Creators and builders receive only plan-allowed creator, group-play, and Web Builder areas. They should not see or open owner pages.
-
-Web Builder does not own or steal Policy Admin. Web Builder published sites should later show public policy links in published footers under Policy Agreement. Policy editing/publishing remains in Policy Admin.
-
-### Viewer / signed out
-
-Viewers can use watch, saved, profile, and public/read pages as allowed.
-
-Signed-out users do not see Owner or User Management groups.
-
-Protected direct URLs should show a clear locked/not-allowed page, not blank crash.
-
-## Confirmed access tests
+Confirmed access tests remain valid:
 
 - Owner can open One Machine consistently.
 - Owner false-lock bug is fixed.
@@ -127,40 +101,25 @@ Protected direct URLs should show a clear locked/not-allowed page, not blank cra
 
 ## Important helper states
 
-### `stream-bandit-menu-saves-count-v6-72-1.js`
-
-Current role:
-
-- Save counts for Watchlist, Favourites, and Likes.
-- Owner and User Management overlay visibility filtering.
-- Owner direct URL fallback lock.
-- Stable owner authority retry so owner does not false-lock while Supabase Auth/profile wakes up.
-
-Known stable direct-lock timing commit:
-
-`1fdab4cefabb5b5bfd6758b1d48a9f671900fc62`
-
-### Shared access / authority helpers
-
+- `stream-bandit-menu-saves-count-v6-72-1.js` owns save counts, Owner/User Management overlay filtering, owner direct URL fallback lock, and owner authority retry.
 - `stream-bandit-protected-page-v7-12-273.js` presents admin/owner/protected page locks.
 - `stream-bandit-authority-gate-v7-12-273.js` is the shared route/access decision engine.
 - `stream-bandit-account-authority-v7-12-273.js` reads Supabase user and `sb_profiles` authority from the live profile row.
-
-### Theme / search / shell helpers
-
 - `stream-bandit-theme-projector-v7-12-156.js` applies global theme variables and supports accessibility/readability projection.
 - `stream-bandit-header-shell-v7-12-156.js` owns the header shell.
 - `stream-bandit-footer-shell-v7-12-156.js` owns the footer shell.
 - `stream-bandit-core-saves-v6-75.js` owns Watchlist/Favourites/Likes save logic.
 - `live-readiness-search-supabase-fallback-v7-12-130.js` owns header search preview, menu route sanitizer, and Global Search handoff.
 
-### `live-readiness-search-supabase-fallback-v7-12-130.js`
+Known stable direct-lock timing commit:
 
-Current pushed state:
+`1fdab4cefabb5b5bfd6758b1d48a9f671900fc62`
+
+Current header search helper state:
 
 `V7.12.283 Header Search Opens Global Search`
 
-Commit:
+Helper commit:
 
 `99b7c055ceeb5f90a47852efedd1921f8217ac0e`
 
@@ -170,7 +129,6 @@ Confirmed:
 - Clicking the header Search button opens `global-search-global-helpers-v7-4-9-test.html?q=SEARCH_TEXT`.
 - Pressing Enter in the header search opens the same Global Search route with the `q` parameter.
 - Global Search receives the query and fills its main search input.
-- No Supabase writes, payments, player changes, new page file, or checkpoint file.
 
 ## Page polish standard
 
@@ -183,23 +141,18 @@ Every page in the final polish pass should follow this pattern where possible:
 5. Page output/content underneath the internal tabs
 6. Footer shell
 
-Page navigation rail rules:
-
-- Top rail is for movement between related pages.
-- Top rail sits directly under the header shell and above the hero.
-- Top rail uses Web Builder-style pill buttons using global Theme Projector variables.
-- Common shape: Back, Hub, related group pages, current page active.
-
-Clean-navigation rule:
+Clean-navigation rules:
 
 - Top rail owns page-to-page navigation.
+- Top rail sits directly under the header shell and above the hero.
 - Hero keeps only real page actions.
 - Do not duplicate route buttons inside hero when those routes already exist in the top rail.
 - Do not add duplicate route-card tabs when those routes already exist in the top rail.
 - Internal tabs are for current-page content only.
 - Outputs stay under the tabs or sections they belong to.
+- Rails and tabs must use global Theme Projector variables.
 
-Theme variables required for rails/tabs:
+Required variables:
 
 - `--accent`
 - `--accent2`
@@ -249,85 +202,19 @@ Protected confirmations:
 
 Browse group is passed.
 
-### Supabase Library
+- Supabase Library — `supabase-library-home-header-form-fix-v7-12-34-test.html` — PASS
+- Genres — `genres-clean-machine-v7-12-45-test.html` — `V7.12.282 Genres · Clean Navigation` — PASS
+- Global Search — `global-search-global-helpers-v7-4-9-test.html` — `V7.12.283 Global Search · Header Query Handoff` — PASS
+- About — `about-global-helpers-v7-4-7-test.html` — `V7.12.284 About · Clean Navigation` — PASS
 
-File:
+Browse confirmations:
 
-`supabase-library-home-header-form-fix-v7-12-34-test.html`
-
-Confirmed state:
-
-`V7.12.34 Supabase Library Home Header Form Fix TEST — PASS`
-
-### Genres
-
-File:
-
-`genres-clean-machine-v7-12-45-test.html`
-
-Current pushed state:
-
-`V7.12.282 Genres · Clean Navigation`
-
-Page commit:
-
-`b602fdb348d1b8346e988739e37a701a0896cd27`
-
-Checkpoint commit:
-
-`ede3343927b7a5339323a8783a1f53f22e04ebca`
-
-Confirmed:
-
-- Visual layout is neat and passed.
+- Top rail pattern is established.
 - Duplicate hero route buttons removed.
-- `Reload Genres` remains as real public page action.
-- `Supabase Editor` remains as admin/owner page action.
-- Genre cards, movie output, Details, Player 1, saves, and counts remain working.
-- Managed genre delete removes only the `sb_genres` label and does not delete/edit `sb_movies` rows.
-
-### Global Search
-
-File:
-
-`global-search-global-helpers-v7-4-9-test.html`
-
-Current confirmed state:
-
-`V7.12.283 Global Search · Header Query Handoff`
-
-Helper commit:
-
-`99b7c055ceeb5f90a47852efedd1921f8217ac0e`
-
-Confirmed:
-
-- Header search button and Enter open Global Search with `?q=`.
-- Query appears in the Global Search input automatically.
-- Global Search reads `q`, `search`, `query`, `term`, and `s` query parameters.
-- Top rail added under header.
-- Duplicate hero route buttons removed.
-- `Run Search` remains as real page action.
-- Search controls, result cards, type chips, source filter, sorting, Details, Play, saves, and counts remain preserved.
-
-### About
-
-File:
-
-`about-global-helpers-v7-4-7-test.html`
-
-Current confirmed state:
-
-`V7.12.284 About · Clean Navigation`
-
-Confirmed:
-
-- Top rail added under header.
-- Duplicate route action removed from hero; Policy Documents moved into top rail.
-- Hero keeps real page actions only: Request a Title, Contact Us, Report Playback.
-- About tabs stay below the hero and control on-page sections.
-- Email draft forms remain mailto-only.
-- No Supabase writes, ticket creation, upload action, billing/payment, live/index promotion, or policy editing from About.
+- Public Browse page outputs remain working.
+- No schema changes.
+- No storage actions.
+- No index promotion.
 
 ## Creator group status
 
@@ -343,41 +230,100 @@ Current confirmed state:
 
 `V7.12.286 Creator Rules · Platform Truth Map`
 
-Page update method:
-
-- Full ready copy/paste page code was supplied to the user.
-- User confirmed the page passed.
-
 Confirmed:
 
-- Page is no longer a boring read-only placeholder.
-- It is now a full Creator / Platform Truth Map.
+- Rules is now a full Creator / Platform Truth Map.
 - It explains Creator, Admin, Owner, Pricing Matrix, User Dashboard, Supabase table family, global helpers, Theme Bridge, page-owned properties, workflow, roles, and do-not rules.
 - It includes Pricing Matrix route: `plans-pricing-feature-shop-v7-11-3-test.html`.
 - It includes User Dashboard route: `user-management-dashboard-v7-11-2-test.html`.
 - It includes Permissions Matrix route: `permissions-matrix-user-management-v7-11-4-test.html`.
 - It includes Supabase table-family truth from visible table list and known app behaviour.
 - It clearly states Supabase connector/table columns/RLS need direct verification later when tools reconnect.
-- It keeps Rules as a safe explanation page: no submit, upload, approve, decline, publish, delete, migrate, schema, storage, policy or live/index controls.
-- Header, footer, theme, core saves, menu counts, search fallback, settings, and brand helper scripts are included.
+- It keeps Rules as safe explanation: no submit, upload, approve, decline, publish, delete, migrate, schema, storage, policy or live/index controls.
+
+### Submit Video — PASSED
+
+File:
+
+`submit-video-clean-machine-v7-12-79-test.html`
+
+Current confirmed state:
+
+`V7.12.287 Submit Video · Clean Rail`
+
+Page update method:
+
+- Full ready copy/paste page code was supplied to the user.
+- User confirmed the page passed and a submission reached Review Queue.
+
+Confirmed:
+
+- Creator group top rail added directly under header.
+- Route links moved out of hero into the top rail.
+- No duplicate route tabs/buttons in the hero.
+- Hero keeps real page actions only: Open Submit Form and Refresh Data.
+- Menu Saves Count, Settings Global, and Brand Logo helpers are included.
+- Helper status shows Counts as well as Header/Footer/Theme/Saves/Search.
+- Overlay scroll fix remains.
+- Poster upload remains to Supabase Storage bucket `stream-bandit-images` under `creator-submissions/<owner>/...`.
+- Poster/artwork resize remains 1920x1080 JPEG before upload.
+- Pending submission insert remains to `sb_submissions` only.
+- Insert verification read remains from `sb_submissions`.
+- Review Queue remains the `sb_movies` publish gate.
 - No schema changes.
-- No storage actions.
+- No storage policy changes.
+- No RLS changes.
+- No bucket name changes.
+- No table name changes.
+- No player engine changes.
 - No index promotion.
-- No new checkpoint file.
+- No global helper rewrites.
 
 ## Creator group — next work order
 
 Next page:
 
-`submit-video-clean-machine-v7-12-79-test.html`
+`review-queue-clean-machine-v7-12-80-publish-test.html`
 
-User supplied the current full Submit Video code in chat for the next pass.
+The user uploaded the current full Review Queue file as source for the next pass.
+
+Current supplied Review Queue state:
+
+`V7.12.168 Review Queue · Archive Constraint Fix`
+
+Known behaviours from supplied file:
+
+- Reads pending/approved/declined/archived rows from `sb_submissions`.
+- Admin review gate for creator submissions.
+- Approve + Publish creates or updates a public movie row in `sb_movies`.
+- Approve Only updates the submission to approved without publishing.
+- Decline updates the submission to declined with reason.
+- Archive From Queue uses allowed status `declined` plus `[ARCHIVED_FROM_QUEUE]` marker in `decline_reason`.
+- Active queue hides archived submissions while keeping published movies safe.
+- It checks current user/profile and requires admin/owner role for queue actions.
+- It reads `sb_channels` for publish channel selection.
+- It infers source type for `sb_movies` as mux/hls/url.
+- It does not delete published movies.
+
+Needed next polish direction:
+
+- Add Creator group top rail directly under header.
+- Move route links out of hero into top rail.
+- Keep real page action in hero: Reload only.
+- Do not add duplicate tabs.
+- Preserve queue list filters and selected-submission action panel as page content.
+- Load Menu Saves Count, Settings Global, and Brand Logo helpers to match latest pattern.
+- Make helper status show Counts as well as Header/Footer/Theme/Saves/Search.
+- Preserve admin/owner role gate.
+- Preserve archive constraint fix.
+- Preserve publish/approve/decline/archive behaviours.
+- Do not change schema, storage, RLS, table names, player engine, index, or global helper logic.
 
 Creator group expected pages:
 
 - Rules — `rules-clean-machine-v7-12-82-test.html` — PASSED
-- Submit Video — `submit-video-clean-machine-v7-12-79-test.html` — NEXT
-- Review Queue — `review-queue-clean-machine-v7-12-80-publish-test.html`
+- Submit Video — `submit-video-clean-machine-v7-12-79-test.html` — PASSED
+- Review Queue — `review-queue-clean-machine-v7-12-80-publish-test.html` — NEXT
 - Playlists — `playlists-global-helpers-v7-5-2-test.html`
 - Channels — `channels-global-helpers-v7-5-3-test.html`
 - My Channel — `my-channel-clean-machine-v7-12-47-test.html`
@@ -397,38 +343,6 @@ Creator group rules:
 - Review Queue is the gate that approves/declines and publishes to `sb_movies`.
 - Supabase Library Editor is final cleanup for published `sb_movies` rows.
 - Creator Rules is the platform truth map: safe explanation only, no dangerous action controls.
-
-## Submit Video current source notes
-
-Current supplied page state:
-
-`V7.12.167 Submit Video · Overlay Form Polish`
-
-Known behaviours from supplied code:
-
-- Uses route `submit-video-clean-machine-v7-12-79-test.html`.
-- Loads Header Shell, Footer Shell, Theme Projector, Core Saves, and Search Fallback.
-- Uses overlay form for creator submission.
-- Reads Supabase config from `StreamBanditSupabaseConfig`, `StreamBanditShell.config()`, or shell file fallback.
-- Reads current user and attempts profile lookup from `sb_profiles` using `user_id`, `id`, `auth_user_id`, or email.
-- Loads `sb_channels` for channel request list.
-- Loads recent `sb_submissions` rows.
-- Uploads poster image to Supabase Storage bucket `stream-bandit-images` under `creator-submissions/<owner>/...`.
-- Resizes poster/artwork to 1920x1080 JPEG before upload.
-- Submits one pending row to `sb_submissions`.
-- Verifies inserted row by reading it back from `sb_submissions`.
-- Does not write `sb_movies`; Review Queue remains the publish gate.
-
-Needed next polish direction:
-
-- Add Creator group top rail directly under header.
-- Move route links out of hero into top rail.
-- Keep real page actions in hero: Open Submit Form and Refresh Data.
-- Load Menu Saves Count, Settings Global, and Brand Logo helpers to match latest pattern.
-- Make helper status show Counts as well as Header/Footer/Theme/Saves/Search.
-- Keep overlay scroll fix.
-- Keep poster upload, pending submission insert, verification read, and Review Queue handoff intact.
-- Do not change schema, storage policy, RLS, bucket name, table names, player engine, index, or global helper logic.
 
 ## Later groups
 
