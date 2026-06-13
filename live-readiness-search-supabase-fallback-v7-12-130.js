@@ -1,16 +1,13 @@
-/* Stream Bandit V7.12.188 Live Readiness Supabase search fallback + menu route sanitizer
+/* Stream Bandit V7.12.283 Live Readiness Supabase search fallback + menu route sanitizer
    App-wide search overlay fallback for pages that load it.
+   Search button and Enter now open the full Global Search page with ?q= so the query appears in the Global Search input.
    Repairs visible shell/menu links to current working routes without replacing the protected shell.
-   Owner Brand Route Truth fix:
-   - Brand / App Icons remains settings-brand-icons-promoted-v7-12-21-test.html
-   - Brand Image Helper remains brand-logo-helper-responsive-v7-12-20-test.html
-   - Favicon / App Icon Builder remains favicon-app-icon-builder-v7-12-15-test.html
    No Supabase writes. No payments. No player engine changes.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.12.188 Live Readiness Search + Owner Brand Route Truth';
+const VERSION='V7.12.283 Header Search Opens Global Search';
 
 const ROUTES={
   home:'home-global-helpers-v7-4-4-test.html',
@@ -80,41 +77,34 @@ const BY_LABEL={
   'Liked':[ROUTES.likes,'Liked'],
   'Likes':[ROUTES.likes,'Liked'],
   'Accessibility':[ROUTES.accessibility,'Accessibility'],
-
   'Supabase Library Editor':[ROUTES.supabaseLibrary,'Supabase editor'],
   'Genres':[ROUTES.genres,'Genres'],
   'Global Search':[ROUTES.search,'Full search'],
   'About':[ROUTES.about,'About'],
-
   'Submit Video':[ROUTES.submit,'Passed direct poster upload + direct submission'],
   'Rules':[ROUTES.rules,'Passed workflow checkpoint'],
   'Review Queue':[ROUTES.review,'Passed publish to Library'],
-
   'Playlists':[ROUTES.playlists,'Playlists'],
   'Channels':[ROUTES.channels,'Channels'],
   'My Channel':[ROUTES.myChannel,'My Channel'],
   'Collections':[ROUTES.collections,'Collections'],
   'Player 2':[ROUTES.player2,'Group Player'],
-
   'Settings Hub':[ROUTES.settingsHub,'Settings hub'],
   'Settings':[ROUTES.settingsHub,'Settings hub'],
   'Settings Studio':[ROUTES.theme,'Theme Studio owner'],
   'Theme Studio':[ROUTES.theme,'Theme Studio owner'],
   'Web Builder':[ROUTES.builder,'Builder Studio route'],
   'Profile Settings':[ROUTES.profile,'Profile image overlay'],
-
   'Form Inbox':[ROUTES.formInbox,'Builder form submissions inbox'],
   'Advanced Form':[ROUTES.formAdvanced,'Passed advanced builder form route'],
   'Web Builder Studio':[ROUTES.builder,'Builder rebuild route'],
   'Pages Manager':[ROUTES.pagesManager,'Create, edit, hide, restore and guarded-delete Web Builder pages'],
   'Published Preview':[ROUTES.preview,'Interactive published Web Builder preview'],
-
   'Policy & FAQ Centre':[ROUTES.policyCentre,'Policy'],
   'Policy Documents':[ROUTES.policyCentre,'Policy'],
   'Published Policy Proof':[ROUTES.policyReader,'Read-only proof'],
   'Policy Proof':[ROUTES.policyReader,'Read-only proof'],
   'Policy Admin Editor':[ROUTES.policyAdmin,'Policy admin'],
-
   'Admin Centre':[ROUTES.admin,'Admin command deck'],
   'Live Readiness':[ROUTES.readiness,'Release smoke test'],
   'Current Routes Registry':[ROUTES.registry,'Current route scanner'],
@@ -125,21 +115,18 @@ const BY_LABEL={
   'Mux Manager':[ROUTES.mux,'Mux'],
   'Storage Prep':[ROUTES.storage,'Storage'],
   'Backup / Safety':[ROUTES.backup,'Backup'],
-
   'One Machine':[ROUTES.oneMachine,'Owner diagnostics'],
   'Platform Control Centre':[ROUTES.settingsHub,'Owner controls hub'],
   'Clean Machine Menu':[ROUTES.registry,'Owner diagnostic routed to current registry'],
   'Route Guard Proof':[ROUTES.health,'Owner diagnostic routed to health check'],
   'Route Pointer Machine':[ROUTES.registry,'Owner diagnostic routed to current registry'],
   'Final Shell Navigation':[ROUTES.helperShell,'Owner diagnostic routed to helper shell'],
-
   'Brand / App Icons':[ROUTES.brandIcons,'Brand tools'],
   'Brand Image Helper':[ROUTES.brandHelper,'Brand helper'],
   'Brand Logo Helper':[ROUTES.brandHelper,'Brand helper','Brand Image Helper'],
   'Favicon / App Icon Builder':[ROUTES.faviconBuilder,'Icon builder'],
   'Favicon Builder':[ROUTES.faviconBuilder,'Icon builder','Favicon / App Icon Builder'],
   'App Icon Builder':[ROUTES.faviconBuilder,'Icon builder','Favicon / App Icon Builder'],
-
   'User Dashboard':[ROUTES.userDashboard,'Users'],
   'Pricing Matrix':[ROUTES.pricing,'Pricing info only; no payments'],
   'Pricing Matrix / Feature Shop':[ROUTES.pricing,'Pricing info only; no payments'],
@@ -234,71 +221,25 @@ function file(v){return String(v||'').split('/').pop().split('?')[0].split('#')[
 function pageParam(){try{return new URL(location.href).searchParams.get('page')||'test-page';}catch(e){return 'test-page';}}
 function route(u){return String(u||'').replace('page=test-page','page='+encodeURIComponent(pageParam()));}
 function labelOf(a){let b=a.querySelector&&a.querySelector('b,.sb-shell-title');return clean(b?b.textContent:a.textContent).replace(/ Current$/,'').split('\n')[0].trim();}
+function globalSearchUrl(q){q=String(q||'').trim();return ROUTES.search+(q?'?q='+encodeURIComponent(q):'');}
+function goGlobalSearch(q){location.href=globalSearchUrl(q);}
 
 function applyRouteMap(){
   try{
     window.StreamBanditRoutes=Object.assign(window.StreamBanditRoutes||{},ROUTES,{
-      registry:ROUTES.registry,
-      admin:ROUTES.admin,
-      tools:ROUTES.tools,
-      builder:ROUTES.builder,
-      builderStudio:ROUTES.builder,
-      policyCentre:ROUTES.policyCentre,
-      policyAdmin:ROUTES.policyAdmin,
-      policyProof:ROUTES.policyReader,
-      platformControl:ROUTES.settingsHub,
-      cleanMenu:ROUTES.registry,
-      guard:ROUTES.health,
-      pointer:ROUTES.registry,
-      finalShell:ROUTES.helperShell,
-      brandIcons:ROUTES.brandIcons,
-      brandLogoHelper:ROUTES.brandHelper,
-      brandHelper:ROUTES.brandHelper,
-      faviconBuilder:ROUTES.faviconBuilder,
-      groupPlayer:ROUTES.player2
+      registry:ROUTES.registry,admin:ROUTES.admin,tools:ROUTES.tools,builder:ROUTES.builder,builderStudio:ROUTES.builder,policyCentre:ROUTES.policyCentre,policyAdmin:ROUTES.policyAdmin,policyProof:ROUTES.policyReader,platformControl:ROUTES.settingsHub,cleanMenu:ROUTES.registry,guard:ROUTES.health,pointer:ROUTES.registry,finalShell:ROUTES.helperShell,brandIcons:ROUTES.brandIcons,brandLogoHelper:ROUTES.brandHelper,brandHelper:ROUTES.brandHelper,faviconBuilder:ROUTES.faviconBuilder,groupPlayer:ROUTES.player2
     });
   }catch(e){}
 }
 
 function fixLink(a){
   if(!a||!a.getAttribute)return 0;
-  let changed=0;
-  let label=labelOf(a);
-  let byLabel=BY_LABEL[label]||null;
-  let href=a.getAttribute('href')||'';
-  let f=file(href);
-  let target=byLabel?byLabel[0]:(BY_FILE[f]||'');
-
-  if(target){
-    let next=route(target);
-    if(href!==next){
-      a.setAttribute('href',next);
-      changed++;
-    }
-  }
-
-  if(byLabel&&byLabel[2]){
-    let b=a.querySelector('b,.sb-shell-title');
-    if(b&&clean(b.textContent)!==byLabel[2]){
-      b.textContent=byLabel[2];
-      changed++;
-    }
-  }
-
-  if(label==='Version Registry'){
-    let b=a.querySelector('b,.sb-shell-title');
-    if(b){b.textContent='Current Routes Registry';changed++;}
-  }
-
-  if(byLabel&&byLabel[1]){
-    let sm=a.querySelector('small,.sb-shell-desc');
-    if(sm&&clean(sm.textContent)!==byLabel[1]){
-      sm.textContent=byLabel[1];
-      changed++;
-    }
-  }
-
-  if(target){a.dataset.sb188RouteFixed='true';}
+  let changed=0,label=labelOf(a),byLabel=BY_LABEL[label]||null,href=a.getAttribute('href')||'',f=file(href),target=byLabel?byLabel[0]:(BY_FILE[f]||'');
+  if(target){let next=route(target);if(href!==next){a.setAttribute('href',next);changed++;}}
+  if(byLabel&&byLabel[2]){let b=a.querySelector('b,.sb-shell-title');if(b&&clean(b.textContent)!==byLabel[2]){b.textContent=byLabel[2];changed++;}}
+  if(label==='Version Registry'){let b=a.querySelector('b,.sb-shell-title');if(b){b.textContent='Current Routes Registry';changed++;}}
+  if(byLabel&&byLabel[1]){let sm=a.querySelector('small,.sb-shell-desc');if(sm&&clean(sm.textContent)!==byLabel[1]){sm.textContent=byLabel[1];changed++;}}
+  if(target){a.dataset.sb283RouteFixed='true';a.dataset.sb188RouteFixed='true';}
   return changed;
 }
 
@@ -308,15 +249,12 @@ function sanitizeMenu(force){
   lastPatch=now;
   applyRouteMap();
   let changed=0;
-  try{
-    document.querySelectorAll('a.sb-shell-link,.sb-shell-drawer a[href],.sb-menu-drawer a[href],#sbMenuDrawer a[href],a[href]').forEach(function(a){
-      changed+=fixLink(a);
-    });
-  }catch(e){}
+  try{document.querySelectorAll('a.sb-shell-link,.sb-shell-drawer a[href],.sb-menu-drawer a[href],#sbMenuDrawer a[href],a[href]').forEach(function(a){changed+=fixLink(a);});}catch(e){}
   try{
     document.documentElement.dataset.sb188MenuRouteSanitizer='active';
     document.documentElement.dataset.sb188MenuRoutesFixed=String((Number(document.documentElement.dataset.sb188MenuRoutesFixed)||0)+changed);
     document.documentElement.dataset.sb188OwnerBrandRouteTruth='true';
+    document.documentElement.dataset.sb283HeaderSearchRoute='global-search-query';
   }catch(e){}
   return changed;
 }
@@ -325,50 +263,19 @@ async function readConfig(){
   if(cfg)return cfg;
   try{
     let txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(function(r){return r.text();});
-    cfg={
-      url:(txt.match(/SUPABASE_URL\s*=\s*['\"]([^'\"]+)/)||[])[1]||'',
-      key:(txt.match(/SUPABASE_KEY\s*=\s*['\"]([^'\"]+)/)||[])[1]||''
-    };
-  }catch(e){
-    cfg={url:'',key:''};
-  }
+    cfg={url:(txt.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)/)||[])[1]||'',key:(txt.match(/SUPABASE_KEY\s*=\s*['"]([^'"]+)/)||[])[1]||''};
+  }catch(e){cfg={url:'',key:''};}
   return cfg;
 }
 
-async function rest(table,params){
-  let c=await readConfig();
-  if(!c.url||!c.key)throw new Error('Supabase shell config unavailable');
-  let url=c.url+'/rest/v1/'+table+'?'+(params||'select=*&limit=200');
-  let r=await fetch(url,{headers:{apikey:c.key,Authorization:'Bearer '+c.key},cache:'no-store'});
-  if(!r.ok)throw new Error(table+' REST '+r.status);
-  return await r.json();
-}
-
-function add(out,seen,kind,title,url,body,icon,img,chips){
-  title=clean(title||url||kind);
-  url=url||'#';
-  body=clean(body||title);
-  let key=kind+'|'+title+'|'+url;
-  if(!title||seen.has(key))return;
-  seen.add(key);
-  out.push({kind:kind,title:title,url:url,body:body,icon:icon||'🔎',img:img||'',chips:(chips||[]).map(clean).filter(Boolean)});
-}
+async function rest(table,params){let c=await readConfig();if(!c.url||!c.key)throw new Error('Supabase shell config unavailable');let url=c.url+'/rest/v1/'+table+'?'+(params||'select=*&limit=200');let r=await fetch(url,{headers:{apikey:c.key,Authorization:'Bearer '+c.key},cache:'no-store'});if(!r.ok)throw new Error(table+' REST '+r.status);return await r.json();}
+function add(out,seen,kind,title,url,body,icon,img,chips){title=clean(title||url||kind);url=url||'#';body=clean(body||title);let key=kind+'|'+title+'|'+url;if(!title||seen.has(key))return;seen.add(key);out.push({kind:kind,title:title,url:url,body:body,icon:icon||'🔎',img:img||'',chips:(chips||[]).map(clean).filter(Boolean)});}
 
 function routeRows(out,seen){
   applyRouteMap();
-  Object.keys(ROUTES).forEach(function(k){
-    add(out,seen,'Route',k,route(ROUTES[k]),k+' '+ROUTES[k],'🧭','',[file(ROUTES[k])]);
-  });
-  try{
-    document.querySelectorAll('a[href],button,.tab,.card,.gate,.route,.footer a,h1,h2,h3').forEach(function(el){
-      let t=clean(el.innerText||el.textContent||'');
-      let u=el.getAttribute&&el.getAttribute('href')||location.pathname.split('/').pop();
-      if(t.length>2)add(out,seen,'This page',t.slice(0,90),u,t,'📄');
-    });
-  }catch(e){}
-  STATIC_POLICIES.forEach(function(p){
-    add(out,seen,'Policy agreement',p[1],ROUTES.policyReader.replace('policy=terms','policy='+encodeURIComponent(p[0])),p[0]+' '+p[1]+' '+p[2],'📜','',[p[0],'policy']);
-  });
+  Object.keys(ROUTES).forEach(function(k){add(out,seen,'Route',k,route(ROUTES[k]),k+' '+ROUTES[k],'🧭','',[file(ROUTES[k])]);});
+  try{document.querySelectorAll('a[href],button,.tab,.card,.gate,.route,.footer a,h1,h2,h3').forEach(function(el){let t=clean(el.innerText||el.textContent||'');let u=el.getAttribute&&el.getAttribute('href')||location.pathname.split('/').pop();if(t.length>2)add(out,seen,'This page',t.slice(0,90),u,t,'📄');});}catch(e){}
+  STATIC_POLICIES.forEach(function(p){add(out,seen,'Policy agreement',p[1],ROUTES.policyReader.replace('policy=terms','policy='+encodeURIComponent(p[0])),p[0]+' '+p[1]+' '+p[2],'📜','',[p[0],'policy']);});
 }
 
 async function loadData(force){
@@ -376,74 +283,16 @@ async function loadData(force){
   if(loading)return loading;
   loading=(async function(){
     let out=[],seen=new Set(),meta={movies:0,genres:0,channels:0,playlists:0,collections:0,sitePages:0,policies:0,routes:0,errors:[]};
-    routeRows(out,seen);
-    meta.routes=out.length;
-
+    routeRows(out,seen);meta.routes=out.length;
     let movies=[];
-    try{
-      movies=(await rest('sb_movies','select=*&order=created_at.desc&limit=350')).filter(function(m){return String(m.status||'published').toLowerCase()!=='archived';});
-      movies.forEach(function(m){
-        let gs=arr(m.genres).concat(arr(m.genre));
-        let ts=arr(m.tags).concat(arr(m.tag));
-        let title=m.title||m.name||'Untitled movie';
-        let body=[title,m.description,m.summary,m.channel,m.channel_name,m.creator,m.director,m.cast_text,m.rating,m.age_rating,m.year,m.release_year,m.release_date,m.runtime_text,gs.join(' '),ts.join(' ')].map(text).join(' ');
-        add(out,seen,'Movie',title,ROUTES.details+'?id='+encodeURIComponent(m.id||''),body,'🎬',poster(m),gs.concat(ts).slice(0,4));
-        meta.movies++;
-      });
-    }catch(e){meta.errors.push(e.message||String(e));}
-
-    try{
-      let gm={};
-      movies.forEach(function(m){arr(m.genres).concat(arr(m.genre)).forEach(function(g){gm[g]=gm[g]||[];gm[g].push(m.title||m.name||'Untitled movie');});});
-      Object.keys(gm).forEach(function(g){add(out,seen,'Genre',g,ROUTES.genres+'?genre='+encodeURIComponent(g),g+' '+gm[g].length+' movies '+gm[g].join(' '),'🏷️','',[gm[g].length+' movies']);meta.genres++;});
-    }catch(e){}
-
-    try{
-      (await rest('sb_channels','select=*&order=created_at.desc&limit=220')).forEach(function(x){
-        let title=x.name||x.title||'Channel';
-        add(out,seen,'Channel',title,ROUTES.channels+'?id='+encodeURIComponent(x.id||''),[title,x.description,x.is_official?'official channel':'',x.owner_id].map(text).join(' '),'📺',x.avatar_url||x.image_url||'',[x.is_official?'official':'channel']);
-        meta.channels++;
-      });
-    }catch(e){meta.errors.push(e.message||String(e));}
-
-    try{
-      (await rest('sb_playlists','select=*&order=created_at.desc&limit=220')).forEach(function(x){
-        let title=x.name||x.title||'Playlist';
-        add(out,seen,'Playlist',title,ROUTES.playlists+'?id='+encodeURIComponent(x.id||''),[title,x.description,x.is_public?'public playlist':'private playlist',x.owner_id].map(text).join(' '),'📃',x.image_url||'',[x.is_public?'public':'private']);
-        meta.playlists++;
-      });
-    }catch(e){meta.errors.push(e.message||String(e));}
-
-    try{
-      (await rest('sb_collections','select=*&order=created_at.desc&limit=220')).forEach(function(x){
-        let title=x.name||x.title||'Collection';
-        add(out,seen,'Collection',title,ROUTES.collections+'?id='+encodeURIComponent(x.id||''),[title,x.description,x.created_by].map(text).join(' '),'🧺',x.image_url||'',['collection']);
-        meta.collections++;
-      });
-    }catch(e){meta.errors.push(e.message||String(e));}
-
-    try{
-      (await rest('sb_site_pages','select=*&order=updated_at.desc&limit=220')).forEach(function(x){
-        let slug=x.slug||x.page_slug||'';
-        let title=x.title||x.name||x.page_title||slug||'Site page';
-        let body=[title,slug,x.status,x.description,x.excerpt,text(x.blocks||x.sections||x.content_json||x.body||x.html||x.markdown||x.text)].join(' ');
-        add(out,seen,'Site page',title,slug?ROUTES.preview.replace('page=test-page','page='+encodeURIComponent(slug)):ROUTES.pagesManager,body,'🏗️','',[x.status,slug]);
-        meta.sitePages++;
-      });
-    }catch(e){meta.errors.push(e.message||String(e));}
-
-    try{
-      (await rest('sb_policy_documents','select=slug,title,body,status,contact_email,version_label,updated_at&order=updated_at.desc&limit=120')).forEach(function(x){
-        let slug=x.slug||'';
-        let title=x.title||slug||'Policy document';
-        let body=[title,slug,x.status,x.version_label,x.contact_email,x.body].map(text).join(' ');
-        add(out,seen,'Policy agreement',title,'policy-reader-v7-12-119-test.html?policy='+encodeURIComponent(slug||'terms'),body,'📜','',[x.status||'policy',slug]);
-        meta.policies++;
-      });
-    }catch(e){meta.errors.push(e.message||String(e));}
-
-    cache={rows:out,meta:meta};
-    loading=null;
+    try{movies=(await rest('sb_movies','select=*&order=created_at.desc&limit=350')).filter(function(m){return String(m.status||'published').toLowerCase()!=='archived';});movies.forEach(function(m){let gs=arr(m.genres).concat(arr(m.genre)),ts=arr(m.tags).concat(arr(m.tag)),title=m.title||m.name||'Untitled movie',body=[title,m.description,m.summary,m.channel,m.channel_name,m.creator,m.director,m.cast_text,m.rating,m.age_rating,m.year,m.release_year,m.release_date,m.runtime_text,gs.join(' '),ts.join(' ')].map(text).join(' ');add(out,seen,'Movie',title,ROUTES.details+'?id='+encodeURIComponent(m.id||''),body,'🎬',poster(m),gs.concat(ts).slice(0,4));meta.movies++;});}catch(e){meta.errors.push(e.message||String(e));}
+    try{let gm={};movies.forEach(function(m){arr(m.genres).concat(arr(m.genre)).forEach(function(g){gm[g]=gm[g]||[];gm[g].push(m.title||m.name||'Untitled movie');});});Object.keys(gm).forEach(function(g){add(out,seen,'Genre',g,ROUTES.genres+'?genre='+encodeURIComponent(g),g+' '+gm[g].length+' movies '+gm[g].join(' '),'🏷️','',[gm[g].length+' movies']);meta.genres++;});}catch(e){}
+    try{(await rest('sb_channels','select=*&order=created_at.desc&limit=220')).forEach(function(x){let title=x.name||x.title||'Channel';add(out,seen,'Channel',title,ROUTES.channels+'?id='+encodeURIComponent(x.id||''),[title,x.description,x.is_official?'official channel':'',x.owner_id].map(text).join(' '),'📺',x.avatar_url||x.image_url||'',[x.is_official?'official':'channel']);meta.channels++;});}catch(e){meta.errors.push(e.message||String(e));}
+    try{(await rest('sb_playlists','select=*&order=created_at.desc&limit=220')).forEach(function(x){let title=x.name||x.title||'Playlist';add(out,seen,'Playlist',title,ROUTES.playlists+'?id='+encodeURIComponent(x.id||''),[title,x.description,x.is_public?'public playlist':'private playlist',x.owner_id].map(text).join(' '),'📃',x.image_url||'',[x.is_public?'public':'private']);meta.playlists++;});}catch(e){meta.errors.push(e.message||String(e));}
+    try{(await rest('sb_collections','select=*&order=created_at.desc&limit=220')).forEach(function(x){let title=x.name||x.title||'Collection';add(out,seen,'Collection',title,ROUTES.collections+'?id='+encodeURIComponent(x.id||''),[title,x.description,x.created_by].map(text).join(' '),'🧺',x.image_url||'',['collection']);meta.collections++;});}catch(e){meta.errors.push(e.message||String(e));}
+    try{(await rest('sb_site_pages','select=*&order=updated_at.desc&limit=220')).forEach(function(x){let slug=x.slug||x.page_slug||'',title=x.title||x.name||x.page_title||slug||'Site page',body=[title,slug,x.status,x.description,x.excerpt,text(x.blocks||x.sections||x.content_json||x.body||x.html||x.markdown||x.text)].join(' ');add(out,seen,'Site page',title,slug?ROUTES.preview.replace('page=test-page','page='+encodeURIComponent(slug)):ROUTES.pagesManager,body,'🏗️','',[x.status,slug]);meta.sitePages++;});}catch(e){meta.errors.push(e.message||String(e));}
+    try{(await rest('sb_policy_documents','select=slug,title,body,status,contact_email,version_label,updated_at&order=updated_at.desc&limit=120')).forEach(function(x){let slug=x.slug||'',title=x.title||slug||'Policy document',body=[title,slug,x.status,x.version_label,x.contact_email,x.body].map(text).join(' ');add(out,seen,'Policy agreement',title,'policy-reader-v7-12-119-test.html?policy='+encodeURIComponent(slug||'terms'),body,'📜','',[x.status||'policy',slug]);meta.policies++;});}catch(e){meta.errors.push(e.message||String(e));}
+    cache={rows:out,meta:meta};loading=null;
     document.documentElement.dataset.sb188SearchRows=String(out.length);
     document.documentElement.dataset.sb188MovieRows=String(meta.movies);
     document.documentElement.dataset.sb188PolicyRows=String(meta.policies);
@@ -467,7 +316,7 @@ function overlay(){
     ov=document.createElement('div');
     ov.id='sb156SiteSearchOverlay';
     ov.className='sb156-site-search';
-    ov.innerHTML='<div class="sb156-search-head"><b id="sb156SearchTitle">Stream Bandit search</b><button id="sb156CloseSearch" class="sb156-close" type="button">Close</button></div><div id="sb156SearchResults"></div><div class="sb156-note">Searches movies, genres, channels, playlists, collections, pages, policy agreements and current route/page text. Enter opens the full Global Search page.</div>';
+    ov.innerHTML='<div class="sb156-search-head"><b id="sb156SearchTitle">Stream Bandit search</b><button id="sb156CloseSearch" class="sb156-close" type="button">Close</button></div><div id="sb156SearchResults"></div><div class="sb156-note">Typing previews results here. Press Enter or click Search to open the full Global Search page with your query already filled in.</div>';
     document.body.appendChild(ov);
     let c=document.getElementById('sb156CloseSearch');
     if(c)c.onclick=function(){ov.classList.remove('open');};
@@ -475,11 +324,7 @@ function overlay(){
   return ov;
 }
 
-function htmlResult(h,q){
-  let chips=h.chips.slice(0,4).map(function(c){return '<span class="sb156-chip">'+esc(c)+'</span>';}).join('');
-  let thumb=h.img?'<img src="'+esc(h.img)+'" alt="">':esc(h.icon||'🔎');
-  return '<a class="sb156-result" href="'+esc(route(h.url))+'"><span class="sb156-kind">'+thumb+'</span><span><b>'+esc(h.title)+'</b><small>'+esc(h.kind)+' result</small><span class="sb156-desc">'+esc(short(h.body,q))+'</span>'+chips+'</span></a>';
-}
+function htmlResult(h,q){let chips=h.chips.slice(0,4).map(function(c){return '<span class="sb156-chip">'+esc(c)+'</span>';}).join('');let thumb=h.img?'<img src="'+esc(h.img)+'" alt="">':esc(h.icon||'🔎');return '<a class="sb156-result" href="'+esc(route(h.url))+'"><span class="sb156-kind">'+thumb+'</span><span><b>'+esc(h.title)+'</b><small>'+esc(h.kind)+' result</small><span class="sb156-desc">'+esc(short(h.body,q))+'</span>'+chips+'</span></a>';}
 
 async function search(q,force){
   q=String(q||'').trim();
@@ -489,77 +334,40 @@ async function search(q,force){
   let box=document.getElementById('sb156SearchResults'),title=document.getElementById('sb156SearchTitle');
   if(title)title.textContent='Searching Stream Bandit for "'+q+'"';
   if(box)box.innerHTML='<div class="sb156-note">Loading movies, genres, channels, playlists, pages and policy agreements...</div>';
-  let data=await loadData(force);
-  let n=q.toLowerCase();
+  let data=await loadData(force),n=q.toLowerCase();
   let hits=data.rows.filter(function(r){return (r.title+' '+r.kind+' '+r.url+' '+r.body+' '+r.chips.join(' ')).toLowerCase().includes(n);}).sort(function(a,b){let rank={Movie:0,Genre:1,Channel:2,Playlist:3,Collection:4,'Site page':5,'Policy agreement':6,Route:7,'This page':8};return (rank[a.kind]??20)-(rank[b.kind]??20);}).slice(0,34);
   if(title)title.textContent=hits.length?'Results for “'+q+'”':'No Stream Bandit results for “'+q+'”';
-  let meta=data.meta;
-  let metaHtml='<div class="sb156-search-meta">Indexed '+data.rows.length+' items · movies '+meta.movies+' · genres '+meta.genres+' · channels '+meta.channels+' · playlists '+meta.playlists+' · collections '+meta.collections+' · pages '+meta.sitePages+' · policy agreements '+meta.policies+' · routes/page text '+meta.routes+'</div>';
-  let err=meta.errors.length?'<div class="sb156-error">Read notes: '+esc(meta.errors.slice(0,5).join(' | '))+'</div>':'';
-  if(box)box.innerHTML=metaHtml+(hits.length?hits.map(function(h){return htmlResult(h,q);}).join(''):'<div class="sb156-note">No matching movies/pages/routes/policies found. Press Enter for the full Global Search page.</div>')+err;
+  let meta=data.meta,metaHtml='<div class="sb156-search-meta">Indexed '+data.rows.length+' items · movies '+meta.movies+' · genres '+meta.genres+' · channels '+meta.channels+' · playlists '+meta.playlists+' · collections '+meta.collections+' · pages '+meta.sitePages+' · policy agreements '+meta.policies+' · routes/page text '+meta.routes+'</div>',err=meta.errors.length?'<div class="sb156-error">Read notes: '+esc(meta.errors.slice(0,5).join(' | '))+'</div>':'';
+  if(box)box.innerHTML=metaHtml+(hits.length?hits.map(function(h){return htmlResult(h,q);}).join(''):'<div class="sb156-note">No matching movies/pages/routes/policies found. Click Search or press Enter for the full Global Search page.</div>')+err;
 }
 
 function input(){return document.getElementById('globalSearch')||document.getElementById('topSearch')||document.getElementById('sbHeaderSearchInput');}
 function btn(){return document.getElementById('globalSearchBtn')||document.getElementById('topSearchBtn')||document.getElementById('sbHeaderSearchBtn');}
 function val(){let i=input();return i?i.value:'';}
-
-function hideOld(){
-  ['sb129SiteSearchOverlay','sb128MovieSearchOverlay','sbGlobalShellSearchOverlay','searchOverlay'].forEach(function(id){
-    let x=document.getElementById(id);
-    if(x){x.classList.remove('open');x.style.display='none';x.style.visibility='hidden';x.style.pointerEvents='none';}
-  });
-}
+function hideOld(){['sb129SiteSearchOverlay','sb128MovieSearchOverlay','sbGlobalShellSearchOverlay','searchOverlay'].forEach(function(id){let x=document.getElementById(id);if(x){x.classList.remove('open');x.style.display='none';x.style.visibility='hidden';x.style.pointerEvents='none';}});}
 
 function capture(e){
   let i=input(),b=btn();
   if(!i)return;
-  if(e.type==='input'&&e.target===i){
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    hideOld();
-    setTimeout(function(){search(i.value,false);},0);
-    return;
-  }
-  if((e.type==='keyup'||e.type==='focusin')&&e.target===i){
-    hideOld();
-    setTimeout(function(){search(i.value,false);},0);
-    return;
-  }
+  if(e.type==='input'&&e.target===i){e.stopImmediatePropagation();e.stopPropagation();hideOld();setTimeout(function(){search(i.value,false);},0);return;}
+  if((e.type==='keyup'||e.type==='focusin')&&e.target===i){hideOld();setTimeout(function(){search(i.value,false);},0);return;}
   if(e.type==='click'&&(e.target===b||e.target.closest&&e.target.closest('#globalSearchBtn,#topSearchBtn,#sbHeaderSearchBtn'))){
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    hideOld();
-    search(i.value,true);
-    return;
+    e.preventDefault();e.stopImmediatePropagation();e.stopPropagation();hideOld();goGlobalSearch(i.value);return;
   }
   if(e.type==='keydown'&&e.target===i&&e.key==='Enter'){
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    location.href=ROUTES.search+(i.value.trim()?'?q='+encodeURIComponent(i.value.trim()):'');
+    e.preventDefault();e.stopImmediatePropagation();e.stopPropagation();goGlobalSearch(i.value);
   }
 }
 
 function wire(){
   if(wired)return;
   wired=true;
-  style();
-  overlay();
-  applyRouteMap();
-  sanitizeMenu(true);
+  style();overlay();applyRouteMap();sanitizeMenu(true);
   ['input','keyup','focusin','click','keydown'].forEach(function(t){document.addEventListener(t,capture,true);});
   let i=input(),b=btn();
-  if(i){
-    i.dataset.sb188Search='live-readiness-fallback-owner-brand-route-truth';
-    i.oninput=function(){search(i.value,false);return false;};
-    i.onfocus=function(){if(i.value.trim().length>1)search(i.value,false);return false;};
-  }
-  if(b)b.onclick=function(e){e.preventDefault();search(val(),true);return false;};
-  try{
-    observer=new MutationObserver(function(){sanitizeMenu(false);});
-    observer.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['href','class']});
-  }catch(e){}
+  if(i){i.dataset.sb188Search='live-readiness-fallback-owner-brand-route-truth';i.dataset.sb283HeaderSearch='opens-global-search-query';i.oninput=function(){search(i.value,false);return false;};i.onfocus=function(){if(i.value.trim().length>1)search(i.value,false);return false;};}
+  if(b)b.onclick=function(e){e.preventDefault();goGlobalSearch(val());return false;};
+  try{observer=new MutationObserver(function(){sanitizeMenu(false);});observer.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['href','class']});}catch(e){}
   setTimeout(function(){loadData(true);},800);
   setTimeout(function(){loadData(true);},2400);
   setTimeout(function(){sanitizeMenu(true);},250);
@@ -568,15 +376,8 @@ function wire(){
   setInterval(function(){sanitizeMenu(false);},2500);
   document.documentElement.dataset.sb188LiveReadinessSearch='active';
   document.documentElement.dataset.sb188OwnerBrandRouteTruth='true';
-  window.StreamBanditLiveReadinessSearchFallback={
-    version:VERSION,
-    refresh:function(){sanitizeMenu(true);return loadData(true);},
-    search:search,
-    sanitizeMenu:function(){return sanitizeMenu(true);},
-    routes:ROUTES,
-    state:function(){return cache;},
-    ownerBrandRouteTruth:true
-  };
+  document.documentElement.dataset.sb283HeaderSearchRoute='global-search-query';
+  window.StreamBanditLiveReadinessSearchFallback={version:VERSION,refresh:function(){sanitizeMenu(true);return loadData(true);},search:search,sanitizeMenu:function(){return sanitizeMenu(true);},routes:ROUTES,globalSearchUrl:globalSearchUrl,state:function(){return cache;},ownerBrandRouteTruth:true,headerSearchOpensGlobalSearch:true};
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();
