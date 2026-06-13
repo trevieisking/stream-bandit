@@ -3,35 +3,116 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Creator Rules V7.12.166</title>
+<title>Stream Bandit Creator Rules V7.12.285</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
-*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
 body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 40%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(13.5px * var(--fontScale))}
-.wrap{max-width:1440px;margin:auto}.hero,.box,.card,.rule,.step,.check{border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 12px 38px #0006;padding:14px;margin-bottom:12px}.hero{padding:18px}.box{padding:15px}.card,.rule,.step,.check{background:#ffffff0f;box-shadow:none;margin-bottom:0}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:5px 9px;font-size:11px}.pill{padding:4px 7px;font-size:10px;margin:2px}.stop{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}.care{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.info{background:#41e8ff22;border-color:#41e8ff60;color:#cef9ff}h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 9px;font-size:21px}h3{margin:0 0 6px;font-size:16px}.muted,p,small,label,li{color:var(--muted);line-height:1.42}.hero p,.card p,.rule p,.step p,.check p{margin-top:5px;margin-bottom:7px}.btn,.tab{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.btn:disabled{opacity:.55;cursor:not-allowed}.small{padding:7px 10px;font-size:11px}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.status,.note,.danger,.safe{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}.safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}.grid,.pathGrid,.ruleGrid,.checks{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(250px,360px);gap:14px}.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:180px;display:grid;place-items:center;position:relative;overflow:hidden}.art:before{content:"";position:absolute;inset:20px;border-radius:22px;border:1px dashed #ffffff32}.artIcon{font-size:56px;z-index:1}.actions,.tabs,.routeStrip{display:flex;gap:7px;flex-wrap:wrap}.actions{margin-top:8px}.routeStrip{margin-top:10px}.routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}.card b,.rule b,.step b,.check b{display:block;color:#baf7df;margin-bottom:5px}.card a{display:block;color:#baf7df;text-decoration:none;font-weight:900;margin:6px 0}.step{position:relative;padding-left:44px}.step:before{content:attr(data-step);position:absolute;left:12px;top:14px;width:22px;height:22px;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017;display:grid;place-items:center;font-size:12px;font-weight:950}.bigRule{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:start;border:1px solid #ffffff1a;border-radius:18px;background:#ffffff0f;padding:12px}.ruleEmoji{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:20px}.ruleList{display:grid;gap:10px}.section{display:none}.section.active{display:block}.source{font-family:ui-monospace,Consolas,monospace;background:#0004;border-radius:14px;padding:12px;white-space:pre-wrap;color:#dfffee;max-height:260px;overflow:auto;word-break:break-word}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
-@media(max-width:980px){body{padding:10px}.heroGrid,.bigRule{grid-template-columns:1fr}.btn,.tab{width:100%;white-space:normal}.art{min-height:160px}.step{padding-left:14px}.step:before{position:static;margin-bottom:8px}}
+.wrap{max-width:1440px;margin:auto}
+.hero,.box,.card,.rule,.step,.check,.truth,.ownerCard{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0007;padding:15px;margin-bottom:13px}
+.hero{padding:18px}
+.box{padding:16px}
+.card,.rule,.step,.check,.truth,.ownerCard{background:#ffffff0f;box-shadow:none;margin-bottom:0}
+.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}
+.badge{padding:5px 9px;font-size:11px}
+.pill{padding:4px 7px;font-size:10px;margin:2px}
+.stop{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}
+.care{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}
+.info{background:#41e8ff22;border-color:#41e8ff60;color:#cef9ff}
+h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.055em}
+h2{margin:0 0 9px;font-size:21px}
+h3{margin:0 0 6px;font-size:16px}
+.muted,p,small,label,li{color:var(--muted);line-height:1.42}
+.hero p,.card p,.rule p,.step p,.check p,.truth p,.ownerCard p{margin-top:5px;margin-bottom:7px}
+code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5px;color:#dfffee}
+.btn,.tab{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.small{padding:7px 10px;font-size:11px}
+.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}
+.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}
+.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}
+.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}
+.status,.note,.danger,.safe{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}
+.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
+.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}
+.safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}
+.grid,.pathGrid,.ruleGrid,.checks,.truthGrid,.ownerGrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}
+.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(250px,360px);gap:14px}
+.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:180px;display:grid;place-items:center;position:relative;overflow:hidden}
+.art:before{content:"";position:absolute;inset:20px;border-radius:22px;border:1px dashed #ffffff32}
+.artIcon{font-size:56px;z-index:1}
+.actions,.tabs,.routeStrip{display:flex;gap:7px;flex-wrap:wrap}
+.actions{margin-top:8px}
+.routeStrip{margin-top:10px}
+.routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}
+.card b,.rule b,.step b,.check b,.truth b,.ownerCard b{display:block;color:#baf7df;margin-bottom:5px}
+.card a,.ownerCard a{display:block;color:#baf7df;text-decoration:none;font-weight:900;margin:6px 0}
+.step{position:relative;padding-left:44px}
+.step:before{content:attr(data-step);position:absolute;left:12px;top:14px;width:22px;height:22px;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017;display:grid;place-items:center;font-size:12px;font-weight:950}
+.bigRule{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:start;border:1px solid #ffffff1a;border-radius:18px;background:#ffffff0f;padding:12px}
+.ruleEmoji{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:20px}
+.ruleList{display:grid;gap:10px}
+.section{display:none}
+.section.active{display:block}
+.source{font-family:ui-monospace,Consolas,monospace;background:#0004;border-radius:14px;padding:12px;white-space:pre-wrap;color:#dfffee;max-height:300px;overflow:auto;word-break:break-word}
+.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
+.pillTabs{padding:10px 12px;border-radius:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--p),#000 14%),color-mix(in srgb,var(--p2),#000 8%));border-color:var(--line);box-shadow:0 10px 30px #0007}
+.pillTabs.topRail{margin-top:-2px}
+.pillTabs .tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pagePill{border:1px solid color-mix(in srgb,var(--line),var(--accent) 22%);border-radius:999px;padding:11px 17px;background:color-mix(in srgb,var(--p),#000 18%);color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;box-shadow:inset 0 1px #ffffff12}
+.pagePill.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:color-mix(in srgb,var(--accent),#fff 18%);color:#061017}
+.pagePill.back{background:color-mix(in srgb,var(--p),#000 24%)}
+.truth{border-color:#41e8ff55}
+.truth b{color:#cef9ff}
+.ownerCard{border-color:#22d3a640}
+.ownerCard ul{padding-left:18px;margin:6px 0}
+@media(max-width:980px){
+ body{padding:10px}
+ .heroGrid,.bigRule{grid-template-columns:1fr}
+ .btn,.tab,.pagePill{width:100%;white-space:normal}
+ .art{min-height:160px}
+ .step{padding-left:14px}
+ .step:before{position:static;margin-bottom:8px}
+}
 </style>
 </head>
 <body data-sb-rules-menu-url="rules-clean-machine-v7-12-82-test.html">
 <div class="wrap">
 
+<section class="box pillTabs topRail">
+  <div class="tabs" aria-label="Creator group page links">
+    <button class="pagePill back" id="backBtn" type="button">Back</button>
+    <a class="pagePill" href="home-global-helpers-v7-4-4-test.html">Hub</a>
+    <a class="pagePill" href="submit-video-clean-machine-v7-12-79-test.html">Submit Video</a>
+    <a class="pagePill active" href="rules-clean-machine-v7-12-82-test.html">Rules</a>
+    <a class="pagePill" href="review-queue-clean-machine-v7-12-80-publish-test.html">Review Queue</a>
+    <a class="pagePill" href="playlists-global-helpers-v7-5-2-test.html">Playlists</a>
+    <a class="pagePill" href="channels-global-helpers-v7-5-3-test.html">Channels</a>
+    <a class="pagePill" href="my-channel-clean-machine-v7-12-47-test.html">My Channel</a>
+    <a class="pagePill" href="collections-clean-machine-v7-12-51-test.html">Collections</a>
+    <a class="pagePill" href="player-2-clean-machine-v7-12-58-test.html">Player 2</a>
+    <a class="pagePill" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Library Editor</a>
+  </div>
+</section>
+
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.166 Creator Rules · Polished Guide</span>
+      <span class="badge">V7.12.285 Creator Rules · Full Truth Map</span>
       <h1>Creator Rulebook</h1>
-      <p>Read-only guide for the Creator submission chain. Creators submit to <code>sb_submissions</code>, admin reviews in Review Queue, approval publishes to <code>sb_movies</code>, and Supabase Library Editor is the final cleanup point.</p>
+      <p>This page is the truth map for the Creator chain. It explains workflow, global rules, Theme Bridge rules, page-owned properties, tables, roles and handoff points before we touch Submit Video, Review Queue or group-play pages.</p>
       <div class="routeStrip"><span>Submit → sb_submissions</span><span>Review → approve / decline</span><span>Publish → sb_movies</span><span>Cleanup → Library Editor</span></div>
       <div class="actions">
-        <a class="btn hot" href="submit-video-clean-machine-v7-12-79-test.html">Submit Video</a>
-        <a class="btn cyan" href="review-queue-clean-machine-v7-12-80-publish-test.html">Review Queue</a>
-        <a class="btn primary" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Supabase Library Editor</a>
-        <a class="btn warn" href="library-global-helpers-v7-4-8-test.html">Public Library</a>
+        <button class="btn primary" data-jump="global" type="button">Show Global Rules</button>
+        <button class="btn cyan" data-jump="theme" type="button">Show Theme Bridge</button>
+        <button class="btn hot" data-jump="ownership" type="button">Show Page Ownership</button>
+        <button class="btn warn" data-jump="workflow" type="button">Show Workflow</button>
       </div>
-      <div id="status" class="status">Creator Rules loaded. Guide page only. No Supabase writes.</div>
+      <div id="status" class="status">Creator Rules loaded. Truth-map page only. No Supabase writes, uploads, approvals, deletes, migrations or publishing actions.</div>
       <div id="helperStatus" class="note">Checking foundation...</div>
     </div>
     <div class="art"><div class="artIcon">📜✅</div></div>
@@ -42,11 +123,11 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
   <h2>Creator flow</h2>
   <div class="pathGrid">
     <div class="step" data-step="1"><b>Submit Video</b><p>Creator fills the form. Poster/artwork URL is prepared first. Submission saves as pending in <code>sb_submissions</code>.</p></div>
-    <div class="step" data-step="2"><b>Review Queue</b><p>Admin reviews the pending row, checks the video URL, poster and metadata, then chooses the publish channel.</p></div>
+    <div class="step" data-step="2"><b>Review Queue</b><p>Admin reviews the pending row, checks the video URL, poster and metadata, then chooses approve, publish or decline.</p></div>
     <div class="step" data-step="3"><b>Approve + Publish</b><p>Review Queue creates or updates the public movie row in <code>sb_movies</code> and marks the submission approved.</p></div>
     <div class="step" data-step="4"><b>Final cleanup</b><p>Supabase Library Editor is used for final title, poster, source, genre, age rating and channel cleanup.</p></div>
   </div>
-  <div class="safe">Rules is the map, not the machine. This page must never submit, upload, approve, decline, publish, delete or migrate.</div>
+  <div class="safe">Rules is the command map, not the dangerous machine. It tells the full truth without performing submit, upload, approve, decline, publish, delete, migrate, schema, storage or live/index actions.</div>
 </section>
 
 <section class="box">
@@ -54,11 +135,14 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
   <div class="tabs">
     <button class="tab active" data-tab="overview" type="button">Overview</button>
     <button class="tab" data-tab="workflow" type="button">Workflow</button>
-    <button class="tab" data-tab="can" type="button">Can Do</button>
-    <button class="tab" data-tab="dont" type="button">Do Not</button>
+    <button class="tab" data-tab="global" type="button">Global Rules</button>
+    <button class="tab" data-tab="theme" type="button">Theme Bridge</button>
+    <button class="tab" data-tab="ownership" type="button">Page Ownership</button>
+    <button class="tab" data-tab="roles" type="button">Roles</button>
     <button class="tab" data-tab="submit" type="button">Submission</button>
     <button class="tab" data-tab="review" type="button">Review</button>
-    <button class="tab" data-tab="schema" type="button">Tables</button>
+    <button class="tab" data-tab="tables" type="button">Tables / RLS</button>
+    <button class="tab" data-tab="dont" type="button">Do Not</button>
     <button class="tab" data-tab="checklist" type="button">Checklist</button>
     <button class="tab" data-tab="debug" type="button">Debug</button>
   </div>
@@ -67,40 +151,70 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
 <section id="overview" class="box section active">
   <h2>Creator group status</h2>
   <div class="grid">
+    <div class="card"><b>Rules</b><p>Current route:</p><a href="rules-clean-machine-v7-12-82-test.html">rules-clean-machine-v7-12-82-test.html</a><p>Owns the creator group truth, rules, handoffs and restrictions.</p></div>
     <div class="card"><b>Submit Video</b><p>Current route:</p><a href="submit-video-clean-machine-v7-12-79-test.html">submit-video-clean-machine-v7-12-79-test.html</a><p>Writes pending creator rows to <code>sb_submissions</code>.</p></div>
     <div class="card"><b>Review Queue</b><p>Current route:</p><a href="review-queue-clean-machine-v7-12-80-publish-test.html">review-queue-clean-machine-v7-12-80-publish-test.html</a><p>Admin page that approves/declines and publishes to <code>sb_movies</code>.</p></div>
-    <div class="card"><b>Public Library</b><p>Current route:</p><a href="library-global-helpers-v7-4-8-test.html">library-global-helpers-v7-4-8-test.html</a><p>Displays the published rows from <code>sb_movies</code>.</p></div>
     <div class="card"><b>Final editor</b><p>Current route:</p><a href="supabase-library-home-header-form-fix-v7-12-34-test.html">Supabase Library Editor</a><p>Admin/test workbench for final <code>sb_movies</code> cleanup.</p></div>
   </div>
 </section>
 
 <section id="workflow" class="box section">
   <h2>Locked working workflow</h2>
-  <div class="grid">
-    <div class="card"><b>Submission table</b><p><code>sb_submissions</code> stores pending creator submissions and review history.</p></div>
-    <div class="card"><b>Publish table</b><p><code>sb_movies</code> is the public Library table used by Home, Library, Search, Details and Player 1.</p></div>
-    <div class="card"><b>Poster rule</b><p>Poster/artwork upload or URL is prepared before the row is submitted.</p></div>
-    <div class="card"><b>Review gate</b><p>Submit Video must not publish straight to <code>sb_movies</code>. Review Queue is the gate.</p></div>
+  <div class="truthGrid">
+    <div class="truth"><b>Intake</b><p><code>sb_submissions</code> stores pending creator submissions and review history. Creator pages must not skip the queue.</p></div>
+    <div class="truth"><b>Review gate</b><p>Review Queue decides approve, approve-only, publish, decline and selected channel. This is admin/owner controlled.</p></div>
+    <div class="truth"><b>Public publish</b><p><code>sb_movies</code> is the public Library table used by Home, Library, Search, Genres, Details and Player 1.</p></div>
+    <div class="truth"><b>Final cleanup</b><p>Supabase Library Editor is the final cleanup tool after publish. It is not the creator intake page.</p></div>
   </div>
 </section>
 
-<section id="can" class="box section">
-  <h2>Can do</h2>
+<section id="global" class="box section">
+  <h2>Global app rules</h2>
   <div class="ruleList">
-    <div class="bigRule"><div class="ruleEmoji">🎬</div><div><h3>Use Mux / HLS / hosted video URLs</h3><p>Creator submissions should point to a playable video URL. Do not paste private dashboard links.</p></div><span class="pill">Allowed</span></div>
-    <div class="bigRule"><div class="ruleEmoji">🖼️</div><div><h3>Use poster/artwork URLs</h3><p>Poster should be available as a public URL before the submission enters review.</p></div><span class="pill">Allowed</span></div>
-    <div class="bigRule"><div class="ruleEmoji">📡</div><div><h3>Select a channel on publish</h3><p>Review Queue should write the chosen channel to the public movie row.</p></div><span class="pill info">Channel</span></div>
-    <div class="bigRule"><div class="ruleEmoji">🧹</div><div><h3>Clean final movie rows after publish</h3><p>Use Supabase Library Editor to tidy published rows after the review action succeeds.</p></div><span class="pill">Allowed</span></div>
+    <div class="bigRule"><div class="ruleEmoji">🧭</div><div><h3>Top rail owns page navigation</h3><p>Creator pages must use a page rail under the header. Hero buttons are only for real current-page actions, not duplicated route links.</p></div><span class="pill">Navigation</span></div>
+    <div class="bigRule"><div class="ruleEmoji">🧱</div><div><h3>Header/page/footer shell stays simple</h3><p>The page flow stays Header Shell, page rail, hero, tabs/content, Footer Shell. Do not rebuild the protected shell from a page.</p></div><span class="pill info">Shell</span></div>
+    <div class="bigRule"><div class="ruleEmoji">🔎</div><div><h3>Header search is global</h3><p>The shared search helper owns header search preview and opens Global Search with <code>?q=</code>. Creator pages should load the helper, not invent a new global search.</p></div><span class="pill">Search</span></div>
+    <div class="bigRule"><div class="ruleEmoji">💾</div><div><h3>Save counters are global</h3><p>Watchlist, Favourites and Likes counts come from shared Core Saves and Menu Saves Count helpers. Creator pages should refresh them, not rewrite count logic.</p></div><span class="pill">Counts</span></div>
+    <div class="bigRule"><div class="ruleEmoji">🔐</div><div><h3>Access helpers own locks</h3><p>Owner/admin/creator/viewer visibility must follow shared authority rules. Creator pages should not expose owner tools or admin-only actions publicly.</p></div><span class="pill stop">Access</span></div>
+    <div class="bigRule"><div class="ruleEmoji">📦</div><div><h3>No new file piles</h3><p>Use current active files. If a new file is genuinely needed, replace a proven inactive old page first. Routine memory goes into the manifest, not endless checkpoints.</p></div><span class="pill care">Files</span></div>
   </div>
 </section>
 
-<section id="dont" class="box section">
-  <h2>Do not</h2>
-  <div class="ruleList">
-    <div class="bigRule"><div class="ruleEmoji">🔐</div><div><h3>Do not paste private credentials</h3><p>No private keys, account tokens, passwords or dashboard-only links in creator forms.</p></div><span class="pill stop">Never</span></div>
-    <div class="bigRule"><div class="ruleEmoji">⚠️</div><div><h3>Do not skip Review Queue</h3><p>Submit Video creates pending rows only. Review Queue is required before public Library publishing.</p></div><span class="pill stop">Never</span></div>
-    <div class="bigRule"><div class="ruleEmoji">🧱</div><div><h3>Do not merge upload and submit carelessly</h3><p>The working pattern separates poster URL preparation from submission save. Keep that separation unless fully retested.</p></div><span class="pill care">Avoid</span></div>
-    <div class="bigRule"><div class="ruleEmoji">🚦</div><div><h3>Do not release from Rules</h3><p>Rules is read-only. It must not include live/index/publish/delete controls.</p></div><span class="pill stop">Locked</span></div>
+<section id="theme" class="box section">
+  <h2>Theme Bridge rules</h2>
+  <div class="truthGrid">
+    <div class="truth"><b>Theme Projector owns global variables</b><p>Pages consume <code>--accent</code>, <code>--accent2</code>, <code>--p</code>, <code>--p2</code>, <code>--line</code>, <code>--muted</code>, <code>--btnText</code> and <code>--fontScale</code>.</p></div>
+    <div class="truth"><b>Pages may style locally, but must obey variables</b><p>Local cards, tabs and rails can have their own layout, but colours must be driven by the global theme variables.</p></div>
+    <div class="truth"><b>Theme Studio owns editing</b><p>Creator pages must not become Theme Studio. They can display the theme and refresh the projector, but they do not save global theme settings.</p></div>
+    <div class="truth"><b>Accessibility remains protected</b><p>Font scale, contrast comfort, readable layout and player comfort must not be broken by Creator page styling.</p></div>
+    <div class="truth"><b>Active pill standard</b><p>The active rail/tab style should use <code>linear-gradient(135deg,var(--accent),var(--accent2))</code>.</p></div>
+    <div class="truth"><b>No hard-coded random redesign</b><p>Do not add one-off colours that fight the current theme, brand, accessibility or header/footer shell.</p></div>
+  </div>
+</section>
+
+<section id="ownership" class="box section">
+  <h2>Page-owned properties</h2>
+  <p>Each page gets to own its local job. Global helpers own cross-app jobs. This is how we avoid pages fighting each other.</p>
+  <div class="ownerGrid">
+    <div class="ownerCard"><b>Rules owns</b><ul><li>Creator truth map</li><li>Workflow explanation</li><li>Do-not rules</li><li>Table responsibility notes</li><li>Group checklist</li></ul></div>
+    <div class="ownerCard"><b>Submit Video owns</b><ul><li>Creator intake form</li><li>Poster/artwork URL preparation</li><li>Pending <code>sb_submissions</code> write</li><li>Submission validation</li><li>No public publish</li></ul></div>
+    <div class="ownerCard"><b>Review Queue owns</b><ul><li>Pending submission reading</li><li>Approve / approve-only / decline</li><li>Publish handoff to <code>sb_movies</code></li><li>Admin-only moderation actions</li></ul></div>
+    <div class="ownerCard"><b>Library Editor owns</b><ul><li>Final published movie cleanup</li><li>Poster/source corrections</li><li>Genre/age/channel cleanup</li><li>Admin/owner editing only</li></ul></div>
+    <div class="ownerCard"><b>Theme Projector owns</b><ul><li>Global colour variables</li><li>Font scale projection</li><li>Theme state application</li><li>Readable theme bridge</li></ul></div>
+    <div class="ownerCard"><b>Core Saves owns</b><ul><li>Watchlist saves</li><li>Favourite saves</li><li>Like saves</li><li>Shared save refresh events</li></ul></div>
+    <div class="ownerCard"><b>Menu Counts owns</b><ul><li>Header/menu save counts</li><li>Owner/User Management visibility</li><li>Direct owner fallback lock</li><li>Count refresh bridge</li></ul></div>
+    <div class="ownerCard"><b>Search Fallback owns</b><ul><li>Header search preview</li><li>Global Search route handoff</li><li>Route sanitizer helper</li><li>Search cache read logic</li></ul></div>
+  </div>
+</section>
+
+<section id="roles" class="box section">
+  <h2>Role truth</h2>
+  <div class="ruleGrid">
+    <div class="rule"><b>Owner</b><p>Owns platform, users, owner tools, route/brand/user-management control, final safety decisions and protected admin areas.</p><span class="pill">Everything</span></div>
+    <div class="rule"><b>Admin</b><p>Can operate selected review/moderation/editor tools. Admin does not automatically own owner-only user management or platform-core pages.</p><span class="pill info">Operations</span></div>
+    <div class="rule"><b>Creator</b><p>Can submit and manage creator/group areas only as allowed. Creator must not get owner/admin powers by accident.</p><span class="pill care">Limited</span></div>
+    <div class="rule"><b>Viewer</b><p>Can browse/watch/save public content and use profile/accessibility pages as allowed.</p><span class="pill">Public</span></div>
+    <div class="rule"><b>Signed out</b><p>Should not see owner/user-management areas. Protected direct URLs should show a clear locked page, not a crash.</p><span class="pill stop">Locked</span></div>
   </div>
 </section>
 
@@ -108,7 +222,7 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
   <h2>Submission rules</h2>
   <div class="grid">
     <div class="card"><b>Title</b><p>Use a clear title. Year in the title is useful because publish tools can infer it.</p></div>
-    <div class="card"><b>Video URL</b><p>Use a public playable Mux/HLS/video URL.</p></div>
+    <div class="card"><b>Video URL</b><p>Use a public playable Mux/HLS/video URL. Do not paste private dashboard links.</p></div>
     <div class="card"><b>Poster</b><p>Poster/artwork should create or use a public URL before submission save.</p></div>
     <div class="card"><b>Reason</b><p>The reason/reviewer note explains why the item should be added.</p></div>
     <div class="card"><b>Status</b><p>New submissions start as <code>pending</code>.</p></div>
@@ -128,13 +242,28 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
   </div>
 </section>
 
-<section id="schema" class="box section">
-  <h2>Table rules</h2>
+<section id="tables" class="box section">
+  <h2>Tables / RLS truth</h2>
   <div class="grid">
-    <div class="card"><b>sb_submissions</b><p>Creator intake and review status. Submit Video writes here. Review Queue updates status here.</p></div>
-    <div class="card"><b>sb_movies</b><p>Public movie rows. Review Queue publishes here. Library, Details, Search and Player 1 read here.</p></div>
-    <div class="card"><b>sb_profiles</b><p>Account/profile/role information. Used to keep admin/creator state clear.</p></div>
+    <div class="card"><b>sb_submissions</b><p>Creator intake and review status. Submit Video writes here. Review Queue reads and updates status here.</p></div>
+    <div class="card"><b>sb_movies</b><p>Public movie rows. Review Queue publishes here. Library, Details, Search, Genres and Player 1 read here.</p></div>
+    <div class="card"><b>sb_profiles</b><p>Account/profile/role information. Used to keep owner/admin/creator/viewer state clear.</p></div>
+    <div class="card"><b>sb_channels</b><p>Channel information. Creator/channel pages may read or write only through the correct page and role rules.</p></div>
+    <div class="card"><b>sb_playlists</b><p>Playlist information. Group-play pages must not fall back to all users’ content.</p></div>
     <div class="card"><b>Storage images</b><p>Poster/artwork images can be stored as public URLs. Full video file upload is not part of this Rules page.</p></div>
+  </div>
+  <div class="danger">No schema, migration, RLS or storage policy changes belong on the Rules page. Any database structure change must be a separate deliberate database task.</div>
+</section>
+
+<section id="dont" class="box section">
+  <h2>Do not</h2>
+  <div class="ruleList">
+    <div class="bigRule"><div class="ruleEmoji">🔐</div><div><h3>Do not paste private credentials</h3><p>No private keys, account tokens, passwords, service role keys or dashboard-only links in creator forms.</p></div><span class="pill stop">Never</span></div>
+    <div class="bigRule"><div class="ruleEmoji">⚠️</div><div><h3>Do not skip Review Queue</h3><p>Submit Video creates pending rows only. Review Queue is required before public Library publishing.</p></div><span class="pill stop">Never</span></div>
+    <div class="bigRule"><div class="ruleEmoji">🧱</div><div><h3>Do not merge upload and submit carelessly</h3><p>The working pattern separates poster URL preparation from submission save. Keep that separation unless fully retested.</p></div><span class="pill care">Avoid</span></div>
+    <div class="bigRule"><div class="ruleEmoji">🚦</div><div><h3>Do not release from Rules</h3><p>Rules explains the release chain. It must not include live/index/publish/delete controls.</p></div><span class="pill stop">Locked</span></div>
+    <div class="bigRule"><div class="ruleEmoji">🎛️</div><div><h3>Do not steal global helper jobs</h3><p>Pages should not rewrite Theme Projector, Header Shell, Footer Shell, Core Saves, Search Fallback, Menu Counts or access gate logic.</p></div><span class="pill stop">Global</span></div>
+    <div class="bigRule"><div class="ruleEmoji">📡</div><div><h3>Do not show all users’ private content</h3><p>Creator/group-play pages must respect user ownership, role permissions, public/private fields and RLS.</p></div><span class="pill stop">RLS</span></div>
   </div>
 </section>
 
@@ -143,9 +272,11 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
   <div class="checks">
     <div class="check"><b>Header</b><p>Header shell loads and still shows admin/profile state.</p></div>
     <div class="check"><b>Footer</b><p>One compact footer shell only.</p></div>
-    <div class="check"><b>Menu current</b><p>Creator group marks Rules current.</p></div>
+    <div class="check"><b>Top rail</b><p>Creator group rail is directly under the header.</p></div>
+    <div class="check"><b>Hero</b><p>Hero uses page actions only, not duplicate route buttons.</p></div>
     <div class="check"><b>Routes</b><p>Submit Video and Review Queue links go to current files.</p></div>
-    <div class="check"><b>Read-only</b><p>No submit, upload, approve, decline, publish, delete, migrate or live/index buttons appear on Rules.</p></div>
+    <div class="check"><b>Read-only safety</b><p>No submit, upload, approve, decline, publish, delete, migrate, schema, storage or live/index buttons appear on Rules.</p></div>
+    <div class="check"><b>Global truth</b><p>Theme Bridge, global helpers and page-owned properties are explained.</p></div>
     <div class="check"><b>Counters</b><p>Header Watchlist/Favourite/Like counters still count through shared saves helper.</p></div>
   </div>
 </section>
@@ -155,21 +286,24 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
   <div id="debugBox" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Creator Rules refit: Header Shell + Rules Content + Footer Shell. Read-only guide page.</p>
+<p class="micro">Creator Rules V7.12.285: full truth map + clean page rail + global rules + theme bridge + page-owned properties.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=creator-rules-polish-1"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=creator-rules-polish-1"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=creator-rules-polish-1"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=creator-rules-polish-1"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=creator-rules-polish-1"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=creator-rules-polish-1"></script>
+<script src="stream-bandit-shell-v6-24.js?v=creator-rules-truth-285"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=creator-rules-truth-285"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=creator-rules-truth-285"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=creator-rules-truth-285"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=creator-rules-truth-285"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=creator-rules-truth-285"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=creator-rules-truth-285"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=creator-rules-truth-285"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=creator-rules-truth-285"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.166 Creator Rules Layout Polish';
+const VERSION='V7.12.285 Creator Rules Full Truth Map';
 let countBusy=false;
 let countReady=false;
 let lastCountRead=0;
@@ -196,6 +330,14 @@ async function refreshSavedCounters(force){
  finally{countBusy=false;}
 }
 
+function showTab(id){
+ if(!$(id))return;
+ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
+ document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));
+ try{$(id).scrollIntoView({behavior:'smooth',block:'start'});}catch(e){}
+ helper();
+}
+
 function helper(){
  try{
   if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();
@@ -207,10 +349,15 @@ function helper(){
   ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
   ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
   ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
+  ' · Counts '+(window.StreamBanditMenuSavesCount?'✅':'⚠️')+
   ' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️');
+
  $('debugBox').textContent=JSON.stringify({
   version:VERSION,
   page:'Creator Rules',
+  cleanNavigation:true,
+  topRail:true,
+  fullTruthMap:true,
   readOnly:true,
   supabaseWrite:false,
   upload:false,
@@ -218,24 +365,56 @@ function helper(){
   decline:false,
   publish:false,
   delete:false,
+  schemaChange:false,
+  storagePolicyChange:false,
   livePromotion:false,
-  polishOnly:true,
-  shellModel:'Header Shell + Rules Content + Footer Shell',
-  routes:{submit:'submit-video-clean-machine-v7-12-79-test.html',review:'review-queue-clean-machine-v7-12-80-publish-test.html',rules:'rules-clean-machine-v7-12-82-test.html',library:'library-global-helpers-v7-4-8-test.html',editor:'supabase-library-home-header-form-fix-v7-12-34-test.html'},
-  tables:{submitVideoWrites:'sb_submissions',reviewQueueReads:'sb_submissions',reviewQueuePublishes:'sb_movies'}
+  explains:{
+   workflow:true,
+   globalRules:true,
+   themeBridge:true,
+   pageOwnedProperties:true,
+   roles:true,
+   tables:true,
+   doNotRules:true
+  },
+  shellModel:'Header Shell + Page Rail + Hero + Rules Content + Footer Shell',
+  routeTruth:{
+   rules:'rules-clean-machine-v7-12-82-test.html',
+   submit:'submit-video-clean-machine-v7-12-79-test.html',
+   review:'review-queue-clean-machine-v7-12-80-publish-test.html',
+   playlists:'playlists-global-helpers-v7-5-2-test.html',
+   channels:'channels-global-helpers-v7-5-3-test.html',
+   myChannel:'my-channel-clean-machine-v7-12-47-test.html',
+   collections:'collections-clean-machine-v7-12-51-test.html',
+   player2:'player-2-clean-machine-v7-12-58-test.html',
+   library:'library-global-helpers-v7-4-8-test.html',
+   editor:'supabase-library-home-header-form-fix-v7-12-34-test.html'
+  },
+  tableTruth:{
+   submitVideoWrites:'sb_submissions',
+   reviewQueueReads:'sb_submissions',
+   reviewQueueUpdates:'sb_submissions',
+   reviewQueuePublishes:'sb_movies',
+   publicPagesRead:'sb_movies',
+   profileAuthority:'sb_profiles'
+  },
+  helperOwnership:{
+   theme:'stream-bandit-theme-projector-v7-12-156.js',
+   header:'stream-bandit-header-shell-v7-12-156.js',
+   footer:'stream-bandit-footer-shell-v7-12-156.js',
+   saves:'stream-bandit-core-saves-v6-75.js',
+   counts:'stream-bandit-menu-saves-count-v6-72-1.js',
+   search:'live-readiness-search-supabase-fallback-v7-12-130.js',
+   settings:'stream-bandit-settings-global-v7-1-8.js',
+   brand:'stream-bandit-brand-logo-v7-12-12.js'
+  }
  },null,2);
 }
 
 function wire(){
- document.querySelectorAll('.tab').forEach(btn=>{
-  btn.onclick=()=>{
-   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-   btn.classList.add('active');
-   $(btn.dataset.tab).classList.add('active');
-   helper();
-  };
- });
+ $('backBtn').onclick=()=>{if(history.length>1)history.back();else location.href='home-global-helpers-v7-4-4-test.html';};
+ document.querySelectorAll('.tab').forEach(btn=>{btn.onclick=()=>showTab(btn.dataset.tab);});
+ document.querySelectorAll('[data-jump]').forEach(btn=>{btn.onclick=()=>showTab(btn.dataset.jump);});
  window.addEventListener('streambandit-core-saves-changed',()=>refreshSavedCounters(true));
  window.addEventListener('streambandit-core-saves-v6-75-changed',()=>refreshSavedCounters(true));
 }
@@ -247,6 +426,7 @@ setTimeout(helper,700);
 setTimeout(()=>refreshSavedCounters(true),1600);
 setTimeout(helper,1800);
 setInterval(helper,6000);
+document.documentElement.dataset.sbCreatorRules='v7-12-285';
 
 })();
 </script>
