@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.277
+# Stream Bandit Current App Manifest V7.12.282
 
 Date: 2026-06-13
 
@@ -6,29 +6,48 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.277 Saved / Comfort Clean Navigation Group Pass`
+`V7.12.282 Genres · Clean Navigation / Browse Group Continue`
 
-This is the exact carry-on point after the access/security pass and the saved-page / Details / Continue Watching / Accessibility clean-navigation pass.
+This is the exact carry-on point after the access/security pass, saved-page / Details / Continue Watching / Accessibility clean-navigation pass, Supabase Library pass, and Genres clean-navigation / managed-delete-pill polish pass.
 
 Do not promote `index.html` from this checkpoint. This manifest records the current safe app state before any live promotion discussion.
 
-## Current checkpoint file
+## Current checkpoint files
 
-The detailed checkpoint for this pass is:
+Current detailed group checkpoint:
 
 `CHECKPOINT-SAVED-COMFORT-CLEAN-NAV-GROUP-PASS-V7-12-277.md`
 
-It was created from the older V6/V7 checkpoint pattern and replaces the smaller one-page checkpoint as the carry-on record for this full group pass.
+Current Genres page checkpoint:
+
+`CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`
 
 Previous strong access checkpoint remains valid and should not be deleted:
 
 `CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
-## Current confirmed state
+## File-count / cleanup rule now locked
 
-### Route and file health baseline
+Do not grow the repository with endless checkpoint or page files.
 
-Last full Registry / Health baseline before this group pass:
+Normal rule:
+
+- Update this manifest for routine carry-on memory.
+- Create a new checkpoint only when the pass needs a separate record.
+- If a new checkpoint is created, delete one clearly obsolete old checkpoint in the same cleanup pass.
+- If a new page is needed, first look for a safe old inactive page to replace.
+- Do not create new page piles like `test-1`, `test-2`, `final`, `final-2`.
+- Do not overwrite protected reference pages or working fallback pages.
+- Do not delete accessibility, player comfort, Supabase migration/test, upload/Mux/storage, profile/auth/avatar, global shell/helper, registry, route, manifest, backup, or current checkpoint files unless the user explicitly approves the specific deletion.
+
+Cleanup performed after the Genres checkpoint:
+
+- Created `CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`.
+- Deleted obsolete old `CHECKPOINT-V5.24.md` to avoid file-count growth.
+
+## Current confirmed route and file health baseline
+
+Last full Registry / Health baseline before this page-polish group:
 
 - Registry: `V7.12.263.8 Current Routes Registry / 51 Active Entries / 50 Unique URLs`
 - Overlay entries: `51`
@@ -206,16 +225,22 @@ Common shape:
 - related group pages
 - current page marked active
 
-## Clean-navigation rule locked by V7.12.277
+## Clean-navigation rule locked by V7.12.277 and carried into V7.12.282
 
-This rule is now confirmed across Details, Continue Watching, Watchlist, Favourites, Likes, and Accessibility:
+This rule is confirmed across Details, Continue Watching, Watchlist, Favourites, Likes, Accessibility, and Genres:
 
 - Top rail owns page-to-page navigation.
 - Hero keeps only the page's real actions.
-- Do not duplicate `Library`, `Watchlist`, `Favourites`, `Likes`, `Continue`, `History`, `Player 1`, or `Details` buttons inside the hero when those routes already exist in the top rail.
+- Do not duplicate route buttons inside the hero when those routes already exist in the top rail.
 - Do not add a duplicate route-card tab when those routes already exist in the top rail.
 - Internal tabs are for current-page content only.
-- Outputs stay under the tabs they belong to.
+- Outputs stay under the tabs or sections they belong to.
+
+Genres-specific confirmation:
+
+- `Public Library` and `Global Search` stay in the top rail only.
+- `Reload Genres` stays in the hero as the real public page action.
+- `Supabase Editor` stays as an admin/owner page action.
 
 ## Exact internal tab rules
 
@@ -504,6 +529,71 @@ Confirmed:
 - No shell rewrites.
 - Theme Studio remains colour owner.
 
+## Current passed public Browse group
+
+### Supabase Library
+
+File:
+
+`supabase-library-home-header-form-fix-v7-12-34-test.html`
+
+Confirmed state:
+
+`V7.12.34 Supabase Library Home Header Form Fix TEST — PASS`
+
+Confirmed:
+
+- Supabase Library passed for the current route-cleanup task.
+- Overlay menu route already points to this file.
+- No clean replacement page was needed for that batch.
+- No old model button should be reintroduced.
+- No live/index promotion.
+- No extra Supabase write action was introduced.
+
+### Genres
+
+File:
+
+`genres-clean-machine-v7-12-45-test.html`
+
+Current pushed state:
+
+`V7.12.282 Genres · Clean Navigation`
+
+Page commit:
+
+`b602fdb348d1b8346e988739e37a701a0896cd27`
+
+Checkpoint commit:
+
+`ede3343927b7a5339323a8783a1f53f22e04ebca`
+
+Confirmed by user:
+
+- Page can stay as-is.
+- Visual layout is neat.
+- Everything passed.
+
+Confirmed changes:
+
+- Header / footer / account chip preserved.
+- Top rail remains the page-navigation area.
+- Duplicate hero route buttons for `Public Library` and `Global Search` removed.
+- `Reload Genres` remains as the real public page action.
+- `Supabase Editor` remains as an admin/owner page action.
+- Genre cards and movie output remain working.
+- Details and Player 1 links remain working from movie cards.
+- Save buttons and counts remain working.
+- Admin/owner create managed genre remains working.
+- Managed genre delete control is now a small pill inside each managed genre card.
+- Delete confirmation modal remains protected and intact.
+- Deleting a managed genre removes only the `sb_genres` label and does not delete or edit `sb_movies` rows.
+- No schema changes.
+- No storage actions.
+- No index promotion.
+- No global access-gate change.
+- No header/footer/theme/core helper rewrites.
+
 ## Page-type rules for remaining polish
 
 ### Public Watch pages
@@ -620,10 +710,9 @@ Review queue, policy admin, library editor, live readiness, safe moderation/edit
 
 ## Next work order
 
-Continue the public browse-page polish group:
+Continue the public Browse group polish:
 
-1. Genres — `genres-clean-machine-v7-12-45-test.html`
-2. Global Search — `global-search-global-helpers-v7-4-9-test.html`
-3. About — `about-global-helpers-v7-4-7-test.html`
+1. Global Search — `global-search-global-helpers-v7-4-9-test.html`
+2. About — `about-global-helpers-v7-4-7-test.html`
 
-Then move into creator/group-play pages only after this browse group is clean.
+Then move into creator/group-play pages only after the public Browse group is clean.
