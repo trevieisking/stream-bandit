@@ -3,16 +3,92 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Genres V7.12.281</title>
+<title>Stream Bandit Genres V7.12.282</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--btnText:#fff;--fontScale:1}
-*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
 body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}
-.wrap{max-width:1480px;margin:auto}.hero,.box,.card,.stat,.movie,.genre{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0007;padding:15px;margin-bottom:13px}.card,.stat,.movie,.genre{background:#ffffff0f;box-shadow:none;margin-bottom:0}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:5px 9px;font-size:11px}.pill{padding:4px 7px;font-size:10px;margin:2px}.badPill{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}.warnPill{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}h1{font-size:clamp(34px,4.4vw,58px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 9px;font-size:22px}h3{margin:0 0 6px}.muted,p,small,label{color:var(--muted);line-height:1.42}.hero p,.card p,.movie p,.stat p,.genre p{margin-top:5px;margin-bottom:7px}.btn,.tab,.genre{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.genre{display:block;text-align:left;border:1px solid #ffffff1a;background:#ffffff0f;border-radius:18px;position:relative}.genre.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.genre.active b,.genre.active p{color:#061017}.genre b,.card b,.stat b{display:block;color:#baf7df;margin-bottom:5px}.btn:disabled{opacity:.55;cursor:not-allowed}.small{padding:7px 10px;font-size:11px}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}.status,.note,.danger,.good{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d20;border-color:#ff4d6d66;color:#ffd2d9}.grid,.stats,.movieGrid,.genreGrid{display:grid;gap:10px}.grid,.stats{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}.genreGrid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}.movieGrid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}.stat span{font-size:22px;font-weight:950}.heroGrid,.layout{display:grid;grid-template-columns:minmax(300px,1fr) minmax(260px,380px);gap:14px}.layout{grid-template-columns:minmax(260px,.82fr) minmax(320px,1.18fr)}.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:190px;display:grid;place-items:center}.artIcon{font-size:58px}.controls,.actions,.tabs{display:flex;gap:7px;flex-wrap:wrap}.actions{margin-top:8px}.controls{align-items:center}.input,.select,.textarea{border:1px solid #ffffff24;border-radius:18px;background:#0004;color:#fff;padding:10px 12px;font-weight:850;font:inherit;font-size:13px}.input{flex:1;min-width:190px}.select{min-width:140px}.textarea{min-height:90px;resize:vertical;width:100%}.thumb{height:122px;background:#ffffff10;display:grid;place-items:center;color:#b9c0d8;overflow:hidden;text-align:center}.thumb img{width:100%;height:100%;object-fit:cover}.body{padding:11px}.body h3{font-size:15px;line-height:1.12}.body p{font-size:11px;margin:0 0 7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.source{font-family:ui-monospace,Consolas,monospace;background:#0004;border-radius:14px;padding:12px;white-space:pre-wrap;color:#dfffee;max-height:260px;overflow:auto;word-break:break-word}.section{display:none}.section.active{display:block}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}.saveTitle{color:#baf7df;font-weight:950;font-size:11px;margin-top:9px}.pillTabs{padding:10px 12px;border-radius:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--p),#000 14%),color-mix(in srgb,var(--p2),#000 8%));border-color:var(--line);box-shadow:0 10px 30px #0007}.pillTabs.topRail{margin-top:-2px}.pillTabs .tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.pagePill{border:1px solid color-mix(in srgb,var(--line),var(--accent) 22%);border-radius:999px;padding:11px 17px;background:color-mix(in srgb,var(--p),#000 18%);color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;box-shadow:inset 0 1px #ffffff12}.pagePill.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:color-mix(in srgb,var(--accent),#fff 18%);color:#061017}.pagePill.back{background:color-mix(in srgb,var(--p),#000 24%)}.managedTools{display:none}.managedTools.adminVisible{display:block}.genreManage{margin-top:8px;display:none}.genreManage.adminVisible{display:flex;gap:6px;flex-wrap:wrap}.modal{position:fixed;inset:0;z-index:2147483605;display:none;align-items:flex-start;justify-content:center;background:#000b;padding:18px;overflow:auto}.modal.open{display:flex}.modalCard{width:min(760px,100%);border:1px solid #ffffff2b;border-radius:26px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 24px 90px #000;padding:18px}.modalHead{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #ffffff1c;padding-bottom:12px;margin-bottom:12px}.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wide{grid-column:1/-1}
-@media(max-width:980px){body{padding:10px}.heroGrid,.layout,.formGrid{grid-template-columns:1fr}.btn,.tab,.genre,.pagePill{width:100%;white-space:normal}.art{min-height:170px}.movieGrid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}}
+.wrap{max-width:1480px;margin:auto}
+.hero,.box,.card,.stat,.movie,.genreCard{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0007;padding:15px;margin-bottom:13px}
+.card,.stat,.movie,.genreCard{background:#ffffff0f;box-shadow:none;margin-bottom:0}
+.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}
+.badge{padding:5px 9px;font-size:11px}
+.pill{padding:4px 7px;font-size:10px;margin:2px}
+.badPill{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}
+.warnPill{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}
+h1{font-size:clamp(34px,4.4vw,58px);line-height:.95;margin:8px 0;letter-spacing:-.055em}
+h2{margin:0 0 9px;font-size:22px}
+h3{margin:0 0 6px}
+.muted,p,small,label{color:var(--muted);line-height:1.42}
+.hero p,.card p,.movie p,.stat p,.genreCard p{margin-top:5px;margin-bottom:7px}
+.btn,.tab{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.small{padding:7px 10px;font-size:11px}
+.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}
+.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}
+.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}
+.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}
+.status,.note,.danger,.good{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}
+.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
+.danger{background:#ff4d6d20;border-color:#ff4d6d66;color:#ffd2d9}
+.grid,.stats,.movieGrid,.genreGrid{display:grid;gap:10px}
+.grid,.stats{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.genreGrid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.movieGrid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.stat span{font-size:22px;font-weight:950}
+.heroGrid,.layout{display:grid;grid-template-columns:minmax(300px,1fr) minmax(260px,380px);gap:14px}
+.layout{grid-template-columns:minmax(260px,.82fr) minmax(320px,1.18fr)}
+.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:190px;display:grid;place-items:center}
+.artIcon{font-size:58px}
+.controls,.actions,.tabs{display:flex;gap:7px;flex-wrap:wrap}
+.actions{margin-top:8px}
+.controls{align-items:center}
+.input,.select,.textarea{border:1px solid #ffffff24;border-radius:18px;background:#0004;color:#fff;padding:10px 12px;font-weight:850;font:inherit;font-size:13px}
+.input{flex:1;min-width:190px}
+.select{min-width:140px}
+.textarea{min-height:90px;resize:vertical;width:100%}
+.thumb{height:122px;background:#ffffff10;display:grid;place-items:center;color:#b9c0d8;overflow:hidden;text-align:center}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.body{padding:11px}
+.body h3{font-size:15px;line-height:1.12}
+.body p{font-size:11px;margin:0 0 7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.source{font-family:ui-monospace,Consolas,monospace;background:#0004;border-radius:14px;padding:12px;white-space:pre-wrap;color:#dfffee;max-height:260px;overflow:auto;word-break:break-word}
+.section{display:none}
+.section.active{display:block}
+.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
+.saveTitle{color:#baf7df;font-weight:950;font-size:11px;margin-top:9px}
+.pillTabs{padding:10px 12px;border-radius:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--p),#000 14%),color-mix(in srgb,var(--p2),#000 8%));border-color:var(--line);box-shadow:0 10px 30px #0007}
+.pillTabs.topRail{margin-top:-2px}
+.pillTabs .tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pagePill{border:1px solid color-mix(in srgb,var(--line),var(--accent) 22%);border-radius:999px;padding:11px 17px;background:color-mix(in srgb,var(--p),#000 18%);color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;box-shadow:inset 0 1px #ffffff12}
+.pagePill.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:color-mix(in srgb,var(--accent),#fff 18%);color:#061017}
+.pagePill.back{background:color-mix(in srgb,var(--p),#000 24%)}
+.managedTools{display:none}
+.managedTools.adminVisible{display:block}
+.genreCard{padding:0;border-radius:18px;overflow:hidden;position:relative;transition:transform .12s ease,border-color .12s ease,background .12s ease}
+.genreCard:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--accent),#fff 15%)}
+.genreCard.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:color-mix(in srgb,var(--accent),#fff 22%);color:#061017}
+.genreCard.active .genrePick b,.genreCard.active .genrePick p{color:#061017}
+.genreCard.active .pill{background:#06101722;border-color:#06101755;color:#061017}
+.genrePick{width:100%;display:block;text-align:left;border:0;background:transparent;color:#fff;padding:12px;cursor:pointer;font:inherit;font-weight:900}
+.genrePick b,.card b,.stat b{display:block;color:#baf7df;margin-bottom:5px}
+.genrePick p{font-size:11px;margin:0 0 8px;color:var(--muted)}
+.genreMeta{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.genreManage{padding:0 12px 12px;display:none;gap:6px;flex-wrap:wrap}
+.genreManage.adminVisible{display:flex}
+.genreDeletePill{border:1px solid #ff4d6d66;border-radius:999px;background:#ff4d6d24;color:#ffd2d9;font-weight:950;font-size:10px;padding:5px 9px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;gap:5px;width:auto;max-width:max-content}
+.genreDeletePill:hover{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}
+.modal{position:fixed;inset:0;z-index:2147483605;display:none;align-items:flex-start;justify-content:center;background:#000b;padding:18px;overflow:auto}
+.modal.open{display:flex}
+.modalCard{width:min(760px,100%);border:1px solid #ffffff2b;border-radius:26px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 24px 90px #000;padding:18px}
+.modalHead{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #ffffff1c;padding-bottom:12px;margin-bottom:12px}
+.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wide{grid-column:1/-1}
+@media(max-width:980px){body{padding:10px}.heroGrid,.layout,.formGrid{grid-template-columns:1fr}.btn,.tab,.pagePill{width:100%;white-space:normal}.art{min-height:170px}.movieGrid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}}
 @media(max-width:560px){.movieGrid,.genreGrid{grid-template-columns:1fr}.thumb{height:150px}.modal{padding:10px}.modalHead{display:block}.modalHead .btn{margin-top:10px}}
 </style>
 </head>
@@ -23,13 +99,11 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.281 Genres · Managed Create/Delete</span>
+      <span class="badge">V7.12.282 Genres · Clean Navigation</span>
       <h1>Genres</h1>
       <p>Browse active Supabase movies by genre. Admin/owner accounts can create or delete managed genre labels. Deleting a genre never deletes movies.</p>
       <div class="actions">
         <button id="reload" class="btn primary" type="button">Reload Genres</button>
-        <a class="btn hot" href="library-global-helpers-v7-4-8-test.html">Public Library</a>
-        <a class="btn warn" href="global-search-global-helpers-v7-4-9-test.html">Global Search</a>
         <a id="supabaseEditorBtn" class="btn adminOnly" href="supabase-library-home-header-form-fix-v7-12-34-test.html" style="display:none">Supabase Editor</a>
       </div>
       <div id="status" class="status">Loading Genres...</div>
@@ -47,7 +121,7 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
     <input id="newGenreDescription" class="input" placeholder="Optional description">
     <button id="createGenre" class="btn primary" type="button">Create Genre</button>
   </div>
-  <div class="note">Delete appears on managed genre cards only. Type the genre name before delete.</div>
+  <div class="note">Delete appears as a small pill on managed genre cards only. Type the genre name before delete.</div>
 </section>
 
 <section class="box">
@@ -89,7 +163,7 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
   <h2>Debug</h2>
   <div id="debug" class="source">Waiting...</div>
 </section>
-<p class="micro">Genres V7.12.281: clean navigation + public browse + admin/owner managed genre create/delete.</p>
+<p class="micro">Genres V7.12.282: clean navigation + public browse + admin/owner managed genre create/delete.</p>
 </div>
 
 <div id="deleteGenreModal" class="modal"><div class="modalCard"><div class="modalHead"><div><span class="badge">Managed Genre Delete</span><h2 id="deleteGenreTitle">Delete genre</h2><p class="muted">This deletes the managed genre label from <code>sb_genres</code> only. It does not delete movies and does not edit movie genre arrays.</p></div><button class="btn" data-close="deleteGenreModal" type="button">Close</button></div><div class="danger">Type the genre name exactly to confirm delete.</div><div class="formGrid"><div class="wide"><label>Selected genre</label><div id="deleteGenreInfo" class="source"></div></div><div class="wide"><label>Confirmation</label><input id="deleteGenreConfirm" class="input" placeholder="Type genre name"></div><div class="wide actions"><button id="confirmDeleteGenre" class="btn dangerBtn" type="button">Delete Managed Genre</button><button class="btn" data-close="deleteGenreModal" type="button">Cancel</button></div></div></div></div>
@@ -107,7 +181,7 @@ body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(i
 <script>
 (function(){
 'use strict';
-const VERSION='V7.12.281 Genres Managed Create Delete';
+const VERSION='V7.12.282 Genres Clean Navigation';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER='player-one-global-helpers-v7-3-3-test.html';
 let rows=[],managedGenres=[],active='All',cfg=null,sb=null,core=null,auth=null,isAdmin=false,deletingGenre=null;
@@ -128,9 +202,9 @@ function requireAdmin(action){if(!isAdmin)throw new Error('Admin/owner required 
 function applyAdminUi(){document.documentElement.dataset.sbGenresAdmin=isAdmin?'yes':'no';$('adminGenrePanel').classList.toggle('adminVisible',!!isAdmin);$('supabaseEditorBtn').style.display=isAdmin?'inline-flex':'none';document.querySelectorAll('.genreManage').forEach(el=>el.classList.toggle('adminVisible',!!isAdmin))}
 function allGenreObjects(){let map={};rows.forEach(m=>arr(m.genres).forEach(g=>{let name=String(g||'').trim();if(!name)return;let s=slug(name);if(!map[s])map[s]={name:name,slug:s,count:0,managed:false,id:null,description:''};map[s].count++}));managedGenres.forEach(g=>{let name=String(g.name||'').trim();if(!name)return;let s=g.slug||slug(name);if(!map[s])map[s]={name:name,slug:s,count:0,managed:true,id:g.id,description:g.description||''};map[s].managed=true;map[s].id=g.id;map[s].description=g.description||map[s].description||'';map[s].is_active=g.is_active!==false});let list=Object.keys(map).map(k=>map[k]).filter(g=>g.is_active!==false);let q=($('genreSearch').value||'').toLowerCase();list=list.filter(g=>!q||g.name.toLowerCase().includes(q));let sort=$('genreSort').value;if(sort==='az')list.sort((a,b)=>a.name.localeCompare(b.name));else if(sort==='managed')list.sort((a,b)=>(b.managed?1:0)-(a.managed?1:0)||a.name.localeCompare(b.name));else list.sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name));return [{name:'All',slug:'all',count:rows.length,managed:false,id:null}].concat(list)}
 function filteredMovies(){let q=($('movieSearch').value||'').trim().toLowerCase();let list=active==='All'?rows.slice():rows.filter(m=>arr(m.genres).some(g=>String(g).toLowerCase()===active.toLowerCase()));if(q){list=list.filter(m=>[m.title,m.description,m.director,arr(m.genres).join(' '),arr(m.tags).join(' '),yearVal(m)].join(' ').toLowerCase().includes(q))}let sort=$('movieSort').value;if(sort==='title')list.sort((a,b)=>String(a.title||'').localeCompare(String(b.title||'')));else if(sort==='year')list.sort((a,b)=>String(yearVal(b)||'').localeCompare(String(yearVal(a)||'')));else list.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));return list}
-function genreCard(g){let managed=g.managed?'<span class="pill">managed</span>':'<span class="pill warnPill">from movies</span>';let del=(isAdmin&&g.managed&&g.id)?'<div class="genreManage adminVisible"><button class="btn small dangerBtn" type="button" data-delete-genre="'+esc(g.id)+'">Delete</button></div>':'';return '<button class="genre '+(g.name===active?'active':'')+'" type="button" data-g="'+esc(g.name)+'"><b>'+esc(g.name)+'</b><p>'+g.count+' movie(s)</p><div>'+managed+'</div>'+del+'</button>'}
+function genreCard(g){let managed=g.managed?'<span class="pill">managed</span>':'<span class="pill warnPill">from movies</span>';let del=(isAdmin&&g.managed&&g.id)?'<div class="genreManage adminVisible"><button class="genreDeletePill" type="button" data-delete-genre="'+esc(g.id)+'">Delete</button></div>':'';return '<article class="genreCard '+(g.name===active?'active':'')+'"><button class="genrePick" type="button" data-genre-pick="'+esc(g.name)+'"><b>'+esc(g.name)+'</b><p>'+g.count+' movie(s)</p><div class="genreMeta">'+managed+'</div></button>'+del+'</article>'}
 function movieCard(m){let id=String(m.id||''),enc=encodeURIComponent(id),img=poster(m),play=firstUrl(m),gs=arr(m.genres).slice(0,3);return '<article class="movie"><div class="thumb">'+(img?'<img src="'+esc(img)+'" loading="lazy" alt="'+esc(m.title||'Artwork')+'">':'No artwork')+'</div><div class="body"><h3>'+esc(m.title||'Untitled')+'</h3><p>'+esc(m.description||m.summary||'No description yet.')+'</p><div>'+(yearVal(m)?'<span class="pill">'+esc(yearVal(m))+'</span>':'')+gs.map(g=>'<span class="pill">'+esc(g)+'</span>').join('')+'</div><div class="actions"><a class="btn small primary" href="'+DETAILS+'?id='+enc+'">Details</a>'+(play?'<a class="btn small hot" href="'+PLAYER+'?id='+enc+'">Play</a>':'')+'</div><div class="saveTitle">Save this movie</div><div class="actions saveActions" data-movie-id="'+esc(id)+'">'+(core&&core.buttons?core.buttons(id,{className:'btn small sb-core-save-btn'}):'<span class="pill">Saves unavailable</span>')+'</div></div></article>'}
-function render(){let gs=allGenreObjects(),list=filteredMovies();$('genreGrid').innerHTML=gs.map(genreCard).join('');$('movieTitle').textContent=active==='All'?'Movies — All genres':'Movies — '+active;$('stats').innerHTML=stat('Movies',rows.length)+stat('Genres',Math.max(0,gs.length-1))+stat('Managed',managedGenres.length)+stat('Showing',list.length)+stat('Selected',active)+stat('Admin',isAdmin?'Yes':'No');$('movieGrid').innerHTML=list.map(movieCard).join('')||'<div class="note">No movies found.</div>';document.querySelectorAll('.genre').forEach(b=>b.onclick=e=>{if(e.target.closest('[data-delete-genre]'))return;active=b.dataset.g;render()});applyAdminUi();$('debug').textContent=JSON.stringify({version:VERSION,movies:rows.length,managedGenres:managedGenres.length,active,shown:list.length,admin:isAdmin,authority:auth&&{user:!!auth.user,profile:auth.profile,is_admin:auth.is_admin,is_owner:auth.is_owner},configSource:cfg&&cfg.source,detailsRoute:DETAILS,playerRoute:PLAYER,sbMoviesWrite:false,sbGenresWrite:isAdmin},null,2)}
+function render(){let gs=allGenreObjects(),list=filteredMovies();$('genreGrid').innerHTML=gs.map(genreCard).join('');$('movieTitle').textContent=active==='All'?'Movies — All genres':'Movies — '+active;$('stats').innerHTML=stat('Movies',rows.length)+stat('Genres',Math.max(0,gs.length-1))+stat('Managed',managedGenres.length)+stat('Showing',list.length)+stat('Selected',active)+stat('Admin',isAdmin?'Yes':'No');$('movieGrid').innerHTML=list.map(movieCard).join('')||'<div class="note">No movies found.</div>';document.querySelectorAll('[data-genre-pick]').forEach(b=>b.onclick=()=>{active=b.dataset.genrePick;render()});applyAdminUi();$('debug').textContent=JSON.stringify({version:VERSION,movies:rows.length,managedGenres:managedGenres.length,active,shown:list.length,admin:isAdmin,authority:auth&&{user:!!auth.user,profile:auth.profile,is_admin:auth.is_admin,is_owner:auth.is_owner},configSource:cfg&&cfg.source,detailsRoute:DETAILS,playerRoute:PLAYER,sbMoviesWrite:false,sbGenresWrite:isAdmin},null,2)}
 async function loadManagedGenres(){let client=await getClient();let r=await client.from('sb_genres').select('*').order('sort_order',{ascending:true}).order('name',{ascending:true});if(r.error)throw r.error;managedGenres=r.data||[]}
 async function refreshSaves(){if(core&&core.refresh)await core.refresh();render();try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts()}catch(e){}setStatus('Genres saves refreshed.')}
 async function load(){try{setStatus('Loading Genres from sb_movies and sb_genres...');core=window.StreamBanditCoreSavesV675;if(core&&core.init)await core.init();await readAuthority();let client=await getClient();let movieRes=await client.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(500);if(movieRes.error)throw movieRes.error;rows=(movieRes.data||[]).filter(publicRow);await loadManagedGenres();if(core&&core.refresh)await core.refresh();render();helper();setStatus('Genres loaded: '+rows.length+' active movies, '+managedGenres.length+' managed genres.')}catch(e){setStatus('Genres load failed: '+(e.message||e),true);$('movieGrid').innerHTML='<div class="note">Movies could not load yet. Routes and search still work.</div>';helper()}}
@@ -139,7 +213,7 @@ function openDeleteGenre(id){let g=managedGenres.find(x=>String(x.id)===String(i
 async function confirmDeleteGenre(){try{requireAdmin('deleting a genre');if(!deletingGenre)throw new Error('No genre selected');if($('deleteGenreConfirm').value.trim()!==String(deletingGenre.name||'').trim())throw new Error('Type the genre name exactly to confirm.');let client=await getClient();let r=await client.from('sb_genres').delete().eq('id',deletingGenre.id).select('id,name');if(r.error)throw r.error;let deletedName=deletingGenre.name;deletingGenre=null;$('deleteGenreModal').classList.remove('open');await loadManagedGenres();if(active===deletedName)active='All';render();setStatus('Managed genre deleted: '+deletedName+'. Movie rows were not changed.')}catch(e){setStatus('Delete genre failed: '+(e.message||e),true)}}
 function helper(){try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts()}catch(e){}$('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Authority '+(window.StreamBanditAccountAuthority?'✅':'⚠️')+' · Admin '+(isAdmin?'✅':'⚠️')}
 function wire(){$('backBtn').onclick=()=>{if(history.length>1)history.back();else location.href='library-global-helpers-v7-4-8-test.html'};$('reload').onclick=load;$('createGenre').onclick=createGenre;$('confirmDeleteGenre').onclick=confirmDeleteGenre;$('clearFilters').onclick=()=>{$('genreSearch').value='';$('movieSearch').value='';$('genreSort').value='count';$('movieSort').value='newest';active='All';render()};['genreSearch','movieSearch','genreSort','movieSort'].forEach(id=>{$(id).oninput=render;$(id).onchange=render});document.addEventListener('click',async e=>{let close=e.target.closest('[data-close]');if(close){$(close.dataset.close).classList.remove('open');return}let dg=e.target.closest('[data-delete-genre]');if(dg){e.preventDefault();openDeleteGenre(dg.dataset.deleteGenre);return}let b=e.target.closest('[data-sb-core-save]');if(!b||!core)return;e.preventDefault();try{b.disabled=true;if(core.toggle){await core.toggle(b.dataset.sbCoreSave,b.dataset.movieId);await refreshSaves()}}catch(err){setStatus(err.message||String(err),true)}finally{b.disabled=false}})}
-wire();helper();load();setTimeout(readAuthority,700);setTimeout(helper,900);setTimeout(helper,1800);setInterval(helper,6000);document.documentElement.dataset.sbGenresManaged='v7-12-281';
+wire();helper();load();setTimeout(readAuthority,700);setTimeout(helper,900);setTimeout(helper,1800);setInterval(helper,6000);document.documentElement.dataset.sbGenresManaged='v7-12-282';
 })();
 </script>
 </body>
