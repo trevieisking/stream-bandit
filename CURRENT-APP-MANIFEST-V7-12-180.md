@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.282
+# Stream Bandit Current App Manifest V7.12.283
 
 Date: 2026-06-13
 
@@ -6,9 +6,9 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.282 Genres · Clean Navigation / Browse Group Continue`
+`V7.12.283 Global Search Header Query Handoff / Browse Group Continue`
 
-This is the exact carry-on point after the access/security pass, saved-page / Details / Continue Watching / Accessibility clean-navigation pass, Supabase Library pass, and Genres clean-navigation / managed-delete-pill polish pass.
+This is the exact carry-on point after the access/security pass, saved-page / Details / Continue Watching / Accessibility clean-navigation pass, Supabase Library pass, Genres clean-navigation / managed-delete-pill polish pass, and Global Search header-query handoff pass.
 
 Do not promote `index.html` from this checkpoint. This manifest records the current safe app state before any live promotion discussion.
 
@@ -25,6 +25,8 @@ Current Genres page checkpoint:
 Previous strong access checkpoint remains valid and should not be deleted:
 
 `CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
+
+No new checkpoint was created for Global Search. This pass is recorded in this manifest only.
 
 ## File-count / cleanup rule now locked
 
@@ -196,6 +198,28 @@ Current role:
 - Applies global theme variables.
 - Accessibility now uses its local theme bridge for font scale and contrast comfort.
 
+### `live-readiness-search-supabase-fallback-v7-12-130.js`
+
+Current pushed state:
+
+`V7.12.283 Header Search Opens Global Search`
+
+Commit:
+
+`99b7c055ceeb5f90a47852efedd1921f8217ac0e`
+
+Confirmed:
+
+- Typing in the header search can still show the quick overlay preview.
+- Clicking the header Search button opens `global-search-global-helpers-v7-4-9-test.html?q=SEARCH_TEXT`.
+- Pressing Enter in the header search opens the same Global Search route with the `q` parameter.
+- Global Search receives the query and fills its main search input.
+- No Supabase writes.
+- No payments.
+- No player changes.
+- No new page file.
+- No new checkpoint file.
+
 ## Current page polish standard
 
 Every page in the final polish pass should follow this pattern where possible:
@@ -225,9 +249,9 @@ Common shape:
 - related group pages
 - current page marked active
 
-## Clean-navigation rule locked by V7.12.277 and carried into V7.12.282
+## Clean-navigation rule locked by V7.12.277 and carried into V7.12.283
 
-This rule is confirmed across Details, Continue Watching, Watchlist, Favourites, Likes, Accessibility, and Genres:
+This rule is confirmed across Details, Continue Watching, Watchlist, Favourites, Likes, Accessibility, Genres, and Global Search:
 
 - Top rail owns page-to-page navigation.
 - Hero keeps only the page's real actions.
@@ -241,6 +265,14 @@ Genres-specific confirmation:
 - `Public Library` and `Global Search` stay in the top rail only.
 - `Reload Genres` stays in the hero as the real public page action.
 - `Supabase Editor` stays as an admin/owner page action.
+
+Global Search-specific confirmation:
+
+- Header search hands the query into the Global Search page using the `q` URL parameter.
+- Global Search main input auto-fills from `q`, `search`, `query`, `term`, or `s` query parameters.
+- The page can use the same top-rail clean-navigation pattern as Library and Genres.
+- Hero keeps only `Run Search` as the real page action.
+- Public Library, Genres, About, Details, and Player links belong in the top rail, not duplicate hero buttons.
 
 ## Exact internal tab rules
 
@@ -594,6 +626,51 @@ Confirmed changes:
 - No global access-gate change.
 - No header/footer/theme/core helper rewrites.
 
+### Global Search
+
+File:
+
+`global-search-global-helpers-v7-4-9-test.html`
+
+Current confirmed state:
+
+`V7.12.283 Global Search · Header Query Handoff`
+
+Helper commit:
+
+`99b7c055ceeb5f90a47852efedd1921f8217ac0e`
+
+Page update method:
+
+- Full ready copy/paste page code was supplied to the user after the GitHub connector blocked the direct full-page replacement.
+- User confirmed the pass and asked for the manifest to be updated.
+
+Confirmed by user:
+
+- Header search handoff passed.
+- Global Search page polish/full replacement passed.
+- Another pass to record in manifest.
+
+Confirmed changes:
+
+- Header search button now opens the Global Search route with `?q=`.
+- Pressing Enter in the header search also opens the Global Search route with `?q=`.
+- Global Search page reads `q`, `search`, `query`, `term`, and `s` query parameters.
+- Query appears in the Global Search input automatically.
+- Results render from the query after data loads.
+- Top rail added under header.
+- Duplicate hero route buttons removed.
+- `Run Search` remains as the real page action.
+- Search controls, result cards, type chips, source filter, sorting, Details, Play, and save buttons remain preserved.
+- Header / footer / theme / core saves / menu counts / brand helper scripts remain loaded.
+- No Supabase writes.
+- No schema changes.
+- No storage actions.
+- No index promotion.
+- No global access-gate change.
+- No player changes.
+- No new checkpoint file.
+
 ## Page-type rules for remaining polish
 
 ### Public Watch pages
@@ -712,7 +789,6 @@ Review queue, policy admin, library editor, live readiness, safe moderation/edit
 
 Continue the public Browse group polish:
 
-1. Global Search — `global-search-global-helpers-v7-4-9-test.html`
-2. About — `about-global-helpers-v7-4-7-test.html`
+1. About — `about-global-helpers-v7-4-7-test.html`
 
 Then move into creator/group-play pages only after the public Browse group is clean.
