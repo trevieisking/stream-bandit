@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Player 1 V7.12.267</title>
+<title>Stream Bandit Player 1 V7.12.268</title>
 <link rel="icon" type="image/png" sizes="16x16" href="stream_bandit_stag_icon_16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple_touch_icon_180.png">
@@ -115,9 +115,9 @@ h2{margin:0 0 10px;font-size:22px}
 .danger{background:color-mix(in srgb,var(--bad),transparent 86%);border-color:color-mix(in srgb,var(--bad),transparent 68%);color:#ffd2d9}
 .good{background:color-mix(in srgb,var(--accent),transparent 84%);border-color:color-mix(in srgb,var(--accent),transparent 66%);color:#dfffee}
 .grid,.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
-.card{background:#ffffff0f;box-shadow:none;margin:0}
-.card b{display:block;color:color-mix(in srgb,var(--accent),#fff 62%);margin-bottom:6px}
-.card p{margin:0;font-size:12px}
+.card{background:#ffffff0f;box-shadow:none;margin:0;overflow:hidden}
+.card b{display:block;color:color-mix(in srgb,var(--accent),#fff 62%);margin-bottom:6px;overflow-wrap:anywhere;word-break:break-word}
+.card p{margin:0;font-size:12px;overflow-wrap:anywhere;word-break:break-word}
 .player{
   border:1px solid #ffffff1f;
   border-radius:22px;
@@ -199,9 +199,9 @@ h2{margin:0 0 10px;font-size:22px}
 </section>
 
 <section class="hero">
-  <span class="badge">V7.12.267 Player 1 · Page Polish</span>
+  <span class="badge">V7.12.268 Player 1 · Source Bridge Fix</span>
   <h1 id="title">Stream Bandit Player 1</h1>
-  <p>Compact single-title player with Mux/HLS/direct video boost preserved, plus YouTube/Vimeo iframe support. This pass only polishes navigation and tab styling.</p>
+  <p>Compact single-title player with Mux/HLS/direct video boost preserved, plus YouTube/Vimeo iframe support. Details and saves keep the real movie id when a source override is used.</p>
   <div class="actions">
     <a id="detailsTop" class="btn primary" href="details-clean-machine-v7-12-38-test.html">Details</a>
     <a class="btn" href="accessibility-clean-machine-v7-12-44-test.html">Player Comfort</a>
@@ -299,24 +299,24 @@ h2{margin:0 0 10px;font-size:22px}
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Player 1 V7.12.267 page polish. Existing Player 1 URL and playback logic preserved.</p>
+<p class="micro">Player 1 V7.12.268 source bridge fix. Existing Player 1 URL and playback logic preserved.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=player1-page-polish-v7-12-267"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=player1-page-polish-v7-12-267"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=player1-page-polish-v7-12-267"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=player1-page-polish-v7-12-267"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=player1-page-polish-v7-12-267"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=player1-page-polish-v7-12-267"></script>
-<script src="continue-resume-player-v6-73.js?v=player1-page-polish-v7-12-267"></script>
-<script src="watch-history-player-v6-74.js?v=player1-page-polish-v7-12-267"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=player1-page-polish-v7-12-267"></script>
+<script src="stream-bandit-shell-v6-24.js?v=player1-source-bridge-v7-12-268"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=player1-source-bridge-v7-12-268"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=player1-source-bridge-v7-12-268"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=player1-source-bridge-v7-12-268"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=player1-source-bridge-v7-12-268"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=player1-source-bridge-v7-12-268"></script>
+<script src="continue-resume-player-v6-73.js?v=player1-source-bridge-v7-12-268"></script>
+<script src="watch-history-player-v6-74.js?v=player1-source-bridge-v7-12-268"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=player1-source-bridge-v7-12-268"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION = 'V7.12.267 Player 1 Page Polish';
+const VERSION = 'V7.12.268 Player 1 Source Bridge Fix';
 const DETAILS = 'details-clean-machine-v7-12-38-test.html';
 const LIBRARY = 'library-global-helpers-v7-4-8-test.html';
 const FALLBACK_SUPABASE_URL = 'https://xzxqfrvqdgkzwujbkdbk.supabase.co';
@@ -865,7 +865,7 @@ function render(){
     version: VERSION,
     route: 'player-one-global-helpers-v7-3-3-test.html',
     oldUrlPreserved: true,
-    pagePolishOnly: true,
+    sourceOverrideKeptRealMovieId: !!param('id') && !!param('src'),
     row: row,
     resolved: resolved,
     controls: {
@@ -917,7 +917,7 @@ async function load(){
     const id = param('id');
     const directSrc = param('src');
 
-    if(directSrc){
+    if(directSrc && !id){
       row = {
         id:'direct-src-test',
         title:param('title') || 'Direct source test',
@@ -955,6 +955,13 @@ async function load(){
       if(!row){
         throw new Error(id ? 'No sb_movies row found for id ' + id : 'No sb_movies row found.');
       }
+
+      if(directSrc){
+        row = Object.assign({}, row, {
+          video_url: directSrc || row.video_url || '',
+          mux_playback_url: isHls(directSrc) ? directSrc : (row.mux_playback_url || '')
+        });
+      }
     }
 
     resolved = resolveSource(row);
@@ -988,7 +995,7 @@ function helper(){
     ' · Saves ' + (window.StreamBanditCoreSavesV675 ? '✅' : 'checking') +
     ' · Resume ' + (window.StreamBanditProgressV673 ? '✅' : 'checking') +
     ' · History ' + (window.StreamBanditHistoryV674 ? '✅' : 'checking') +
-    ' · Theme Rail ✅';
+    ' · Source Bridge ✅';
 }
 
 function wire(){
@@ -1078,7 +1085,7 @@ function boot(){
   setTimeout(updateProgress, 1200);
   setInterval(helper, 6000);
 
-  document.documentElement.dataset.sbPlayer1ProviderPromoted = 'v7-12-267';
+  document.documentElement.dataset.sbPlayer1ProviderPromoted = 'v7-12-268';
 
   window.StreamBanditPlayer1ProviderPromotedV712266 = {
     version: VERSION,
