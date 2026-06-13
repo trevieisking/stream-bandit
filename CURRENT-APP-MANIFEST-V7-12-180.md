@@ -1,32 +1,34 @@
-# Stream Bandit Current App Manifest V7.12.276
+# Stream Bandit Current App Manifest V7.12.277
 
-Date: 2026-06-12
+Date: 2026-06-13
 
 Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages and One Machine already reference this file.
 
 ## Current strongest pause point
 
-`V7.12.276 Access / Owner Invisible / Admin Utility Lockdown / Page Polish Rails Stable Pass`
+`V7.12.277 Saved / Comfort Clean Navigation Group Pass`
 
-This is the exact carry-on point after the access/security pass and the first page-polish pass.
+This is the exact carry-on point after the access/security pass and the saved-page / Details / Continue Watching / Accessibility clean-navigation pass.
 
-Do not promote `index.html` from this checkpoint. This manifest records access rules, page-layout rules, and the next work order before any live promotion discussion.
+Do not promote `index.html` from this checkpoint. This manifest records the current safe app state before any live promotion discussion.
 
-## New checkpoint file
+## Current checkpoint file
 
 The detailed checkpoint for this pass is:
 
-`CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
+`CHECKPOINT-SAVED-COMFORT-CLEAN-NAV-GROUP-PASS-V7-12-277.md`
 
-That checkpoint was created from the old checkpoint pattern and records the tests, role rules, layout rules, and next page order.
+It was created from the older V6/V7 checkpoint pattern and replaces the smaller one-page checkpoint as the carry-on record for this full group pass.
+
+Previous strong access checkpoint remains valid and should not be deleted:
+
+`CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
 ## Current confirmed state
 
-### Route and file health
+### Route and file health baseline
 
-User ran Registry and Health after the access pass.
-
-Confirmed:
+Last full Registry / Health baseline before this group pass:
 
 - Registry: `V7.12.263.8 Current Routes Registry / 51 Active Entries / 50 Unique URLs`
 - Overlay entries: `51`
@@ -42,7 +44,7 @@ Confirmed:
 - Schema changes: `false`
 - Storage actions: `false`
 
-Health confirmed:
+Health baseline confirmed:
 
 - Main pages and admin/owner/user-management route checks loaded 200.
 - Header Shell loaded.
@@ -168,6 +170,13 @@ Current role:
 
 - Reads Supabase user and `sb_profiles` authority from the live profile row.
 
+### `stream-bandit-theme-projector-v7-12-156.js`
+
+Current role:
+
+- Applies global theme variables.
+- Accessibility now uses its local theme bridge for font scale and contrast comfort.
+
 ## Current page polish standard
 
 Every page in the final polish pass should follow this pattern where possible:
@@ -197,10 +206,16 @@ Common shape:
 - related group pages
 - current page marked active
 
-Examples passed:
+## Clean-navigation rule locked by V7.12.277
 
-- Home V7.12.158
-- Watch History V7.12.226
+This rule is now confirmed across Details, Continue Watching, Watchlist, Favourites, Likes, and Accessibility:
+
+- Top rail owns page-to-page navigation.
+- Hero keeps only the page's real actions.
+- Do not duplicate `Library`, `Watchlist`, `Favourites`, `Likes`, `Continue`, `History`, `Player 1`, or `Details` buttons inside the hero when those routes already exist in the top rail.
+- Do not add a duplicate route-card tab when those routes already exist in the top rail.
+- Internal tabs are for current-page content only.
+- Outputs stay under the tabs they belong to.
 
 ## Exact internal tab rules
 
@@ -212,14 +227,6 @@ Placement:
 - Above the content they control.
 
 Content/output appears underneath the tabs.
-
-Examples:
-
-- Overview
-- Watched Titles
-- Progress Rows
-- Debug
-- Rules
 
 Do not move internal content tabs above the hero. The top rail is for page navigation only.
 
@@ -256,7 +263,7 @@ Preferred inactive pill style:
 - Public pages must not show admin/readiness/test buttons.
 - Remove stale buttons, stale links, and old visual shell leftovers during each page pass.
 
-## Current page polish references
+## Current passed public watch / saved / comfort group
 
 ### Home
 
@@ -272,7 +279,7 @@ Commit:
 
 `0b7b141af1f3a2d9253974ab50239dc857275b71`
 
-Rules proven:
+Confirmed:
 
 - Header shell.
 - Theme-controlled page rail under header.
@@ -281,6 +288,96 @@ Rules proven:
 - Saved/account quick cards.
 - Footer shell.
 - Stale Live Readiness button removed from public Home.
+
+### Library
+
+File:
+
+`library-global-helpers-v7-4-8-test.html`
+
+Confirmed state:
+
+`V7.12.173 Library — PASS`
+
+Confirmed:
+
+- Top pill rail under header.
+- Theme colours match Home / Watch History.
+- Library loads movies.
+- Search / genre / sort work.
+- Details opens the correct movie.
+- Play opens Player 1.
+- Save buttons update counts.
+- Header / footer / account chip work.
+
+### Details
+
+File:
+
+`details-clean-machine-v7-12-38-test.html`
+
+Current pushed state:
+
+`V7.12.173 Details · Clean Navigation`
+
+Commit:
+
+`db84d50d87a75147205ea6030bfc5eb9b83bce01`
+
+Confirmed:
+
+- Header / footer / account chip.
+- Top rail clean navigation.
+- Duplicate Library action removed from Movie actions.
+- Play remains.
+- Refresh Details remains as a real page action.
+- Save buttons work.
+- Full `sb_movies` Details output remains working.
+
+### Player 1
+
+File:
+
+`player-one-global-helpers-v7-3-3-test.html`
+
+Current confirmed state:
+
+`V7.12.268 Player 1 Source Bridge Fix — PASS`
+
+Confirmed:
+
+- `id + src` keeps the real movie row while source override only changes playback URL.
+- Details opens the real movie.
+- Watchlist / Favourite / Like use the real movie id.
+- Direct `src` test still works.
+- Mux / HLS / direct / YouTube / Vimeo playback preserved.
+- Audio boost, fullscreen, PiP, saves, progress, and history preserved.
+
+### Continue Watching
+
+File:
+
+`continue-watching-global-helpers-v7-3-9-test.html`
+
+Current pushed state:
+
+`V7.12.230 Continue Watching · Clean Navigation`
+
+Commit:
+
+`b74df0f98334cab44b081efa72cf0baa1590ffd0`
+
+Confirmed:
+
+- Header / footer / account chip.
+- Top rail clean navigation.
+- Duplicate hero route buttons removed.
+- Reload Continue Rows works.
+- Read-only local progress preserved.
+- Dedupe preserved.
+- Resume opens Player 1 correctly.
+- Details opens correct movie.
+- Save buttons and counts work.
 
 ### Watch History
 
@@ -296,7 +393,7 @@ Commit:
 
 `c7dec988747a9ac40ea0481f01e9775a34436ae3`
 
-Rules proven:
+Confirmed:
 
 - Header shell.
 - Theme-controlled page rail under header.
@@ -305,6 +402,107 @@ Rules proven:
 - Overview/history/progress/debug/rules output underneath internal tabs.
 - Footer shell.
 - Read-only history/progress behavior preserved.
+
+### Watchlist
+
+File:
+
+`watchlist-clean-machine-v7-12-43-test.html`
+
+Current pushed state:
+
+`V7.12.159 Watchlist · Clean Navigation`
+
+Commit:
+
+`0f785addcbb9d5666e8717d862cc45c43d648c64`
+
+Confirmed:
+
+- Header / footer / account chip.
+- Top rail only; no duplicate hero route buttons.
+- Reload Watchlist works.
+- Saved Titles, Summary, and Rules tabs passed.
+- Search and sort work.
+- Details opens the right movie.
+- Play opens Player 1 on the right movie.
+- Save buttons and counts work.
+
+### Favourites
+
+File:
+
+`favourites-clean-machine-v7-12-41-test.html`
+
+Current pushed state:
+
+`V7.12.159 Favourites · Clean Navigation`
+
+Commit:
+
+`92bf387ff63caac9803549c13c1688ca4e2255f4`
+
+Confirmed:
+
+- Header / footer / account chip.
+- Top rail only; no duplicate hero route buttons.
+- Reload Favourites works.
+- Favourite Titles, Summary, and Rules tabs passed.
+- Search and sort work.
+- Details opens the right movie.
+- Play opens Player 1 on the right movie.
+- Save buttons and counts work.
+
+### Likes
+
+File:
+
+`likes-clean-machine-v7-12-42-test.html`
+
+Current pushed state:
+
+`V7.12.158 Likes · Clean Navigation`
+
+Commit:
+
+`c7549319486a64c51bdd6ff0ff21f50e458b5d12`
+
+Confirmed:
+
+- Header / footer / account chip.
+- Top rail only; no duplicate hero route buttons.
+- Reload Likes works.
+- Liked Titles, Summary, and Rules tabs passed.
+- Search and sort work.
+- Details opens the right movie.
+- Play opens Player 1 on the right movie.
+- Save buttons and counts work.
+
+### Accessibility
+
+File:
+
+`accessibility-clean-machine-v7-12-44-test.html`
+
+Current pushed state:
+
+`V7.12.228 Accessibility · Clean Theme Bridge`
+
+Commit:
+
+`127af25e9c9d57d5e87fe67c6001d5b2d05fbcec`
+
+Confirmed:
+
+- Header / footer / account chip.
+- Top rail clean navigation.
+- No duplicate hero route buttons.
+- Apply Preview works.
+- Save Global Readability appears working.
+- Overview, Theme Bridge, Player Comfort, State, Rules, and Checklist tabs passed.
+- No Supabase writes.
+- No shell rewrites.
+- Theme Studio remains colour owner.
 
 ## Page-type rules for remaining polish
 
@@ -326,16 +524,17 @@ Examples:
 Rules:
 
 - Use page rail under header.
+- Top rail owns page navigation.
+- Hero only has real page actions.
 - No admin/readiness/test buttons.
 - Outputs stay on page.
-- Save buttons use Core Saves and Menu Saves Count.
+- Save buttons use Core Saves and Menu Saves Count where relevant.
 - Do not break Player Comfort, audio boost, fullscreen, accessibility, or playback.
 
 ### Browse/search pages
 
 Examples:
 
-- Library
 - Genres
 - Global Search
 - About
@@ -346,6 +545,7 @@ Rules:
 - Results/output stay on page.
 - Search/filter inputs can be inline if safe.
 - Remove stale route links.
+- Do not duplicate route links inside hero/cards when the top rail already has them.
 
 ### Creator and Group Play pages
 
@@ -418,155 +618,12 @@ Everything, including owner pages, permissions, route tools, brand systems, and 
 
 Review queue, policy admin, library editor, live readiness, safe moderation/editing tools.
 
-### Support
+## Next work order
 
-Read-only profile/channel/user diagnostics only.
+Continue the public browse-page polish group:
 
-Support must not change roles, plans, protected account fields, owner routes, or destructive data.
+1. Genres — `genres-clean-machine-v7-12-45-test.html`
+2. Global Search — `global-search-global-helpers-v7-4-9-test.html`
+3. About — `about-global-helpers-v7-4-7-test.html`
 
-### Creator
-
-Own channels, playlists, collections, submissions, and Web Builder where plan allows.
-
-### Viewer
-
-Watch, save, and profile basics.
-
-## Backend authority warning
-
-Frontend locks are not final authority for official user/profile/plan changes.
-
-For official release, serious permission changes should flow through:
-
-- Supabase RLS
-- safe RPC functions
-- audit logs
-- later Edge Functions where needed
-
-## Stale route cleanup rule
-
-During every page polish pass:
-
-1. Remove stale buttons from visible pages.
-2. Remove stale active links from page rails and quick cards.
-3. Keep old route filenames unless deliberately retired.
-4. Do not delete protected reference pages casually.
-5. Registry should stay 50/50 and protected files 16/16 unless a deliberate route update is made.
-
-## Current route truth by overlay group
-
-### Watch
-
-1. Home - `home-global-helpers-v7-4-4-test.html`
-2. Library - `library-global-helpers-v7-4-8-test.html`
-3. Details - `details-clean-machine-v7-12-38-test.html`
-4. Player 1 - `player-one-global-helpers-v7-3-3-test.html`
-5. Continue Watching - `continue-watching-global-helpers-v7-3-9-test.html`
-6. Watch History - `watch-history-global-helpers-v7-4-0-test.html`
-7. Watchlist - `watchlist-clean-machine-v7-12-43-test.html`
-8. Favourites - `favourites-clean-machine-v7-12-41-test.html`
-9. Likes / Liked - `likes-clean-machine-v7-12-42-test.html`
-10. Accessibility - `accessibility-clean-machine-v7-12-44-test.html`
-
-### Browse
-
-1. Supabase Library Editor - `supabase-library-home-header-form-fix-v7-12-34-test.html`
-2. Genres - `genres-clean-machine-v7-12-45-test.html`
-3. Global Search - `global-search-global-helpers-v7-4-9-test.html`
-4. About - `about-global-helpers-v7-4-7-test.html`
-
-### Creator
-
-1. Submit Video - `submit-video-clean-machine-v7-12-79-test.html`
-2. Rules - `rules-clean-machine-v7-12-82-test.html`
-3. Review Queue - `review-queue-clean-machine-v7-12-80-publish-test.html`
-
-### Group Play
-
-1. Playlists - `playlists-global-helpers-v7-5-2-test.html`
-2. Channels - `channels-global-helpers-v7-5-3-test.html`
-3. My Channel - `my-channel-clean-machine-v7-12-47-test.html`
-4. Collections - `collections-clean-machine-v7-12-51-test.html`
-5. Player 2 - `player-2-clean-machine-v7-12-58-test.html`
-
-### Settings
-
-1. Settings / Settings Hub - `settings-platform-control-hub-v7-12-85-test.html`
-2. Settings Studio / Theme Studio - `web-builder-theme-studio-controls-v7-8-9-test.html`
-3. Profile Settings - `profile-settings-live-ready-v7-12-90-test.html`
-4. Web Builder - `web-builder-account-control-hub-v7-12-263-test.html`
-
-### Policy
-
-1. Policy & FAQ Centre - `policy-documents-centre-v7-12-119-test.html`
-2. Published Policy Proof - `policy-reader-v7-12-119-test.html?policy=terms`
-3. Policy Admin Editor - `policy-admin-documents-v7-12-120-test.html?policy=terms`
-
-### Admin
-
-1. Admin Centre - `admin-centre-command-deck-v7-12-121-test.html`
-2. Live Readiness - `live-readiness-global-helpers-v7-10-2-test.html`
-3. Current Routes Registry - `all-pages-version-registry-v7-12-122-current-routes-test.html`
-4. Test Checklist - `test-checklist-global-helpers-v7-10-5-test.html`
-5. Tools - `tools-page-original-global-pass-v7-12-136-test.html`
-6. Health Check - `health-check-global-helpers-v7-10-6-test.html`
-7. Mux Manager - `mux-manager-global-helpers-v7-10-7-test.html`
-8. Storage Prep - `storage-prep-global-helpers-v7-10-8-test.html`
-9. Backup / Safety - `backup-safety-global-helpers-v7-10-9-test.html`
-
-### Owner
-
-1. Form Inbox - `web-builder-form-submissions-v7-12-94-test.html?page=test-page`
-2. Advanced Form - `web-builder-form-save-v7-12-94-test.html?page=test-page`
-3. One Machine - `stream-bandit-one-machine-v7-12-73-test.html`
-4. Platform Control Centre - `settings-platform-control-hub-v7-12-85-test.html`
-5. Final Shell Navigation - `stream-bandit-global-helper-shell-v7-12-126-test.html`
-6. Brand / App Icons - `settings-brand-icons-promoted-v7-12-21-test.html`
-7. Brand Image Helper - `brand-logo-helper-responsive-v7-12-20-test.html`
-8. Favicon / App Icon Builder - `favicon-app-icon-builder-v7-12-15-test.html`
-9. Pages Manager - `web-builder-pages-manager-v7-12-111-test.html`
-10. Published Preview - `web-builder-shared-style-preview-v7-12-117-test.html?page=test-page`
-
-### User Management
-
-1. User Dashboard - `user-management-dashboard-v7-11-2-test.html`
-2. Pricing Matrix / Feature Shop - `plans-pricing-feature-shop-v7-11-3-test.html`
-3. Permissions Matrix - `permissions-matrix-user-management-v7-11-4-test.html`
-
-## Next exact work order
-
-Continue from here:
-
-1. Library — `library-global-helpers-v7-4-8-test.html`
-2. Details — `details-clean-machine-v7-12-38-test.html`
-3. Player 1 — `player-one-global-helpers-v7-3-3-test.html`
-4. Continue Watching — `continue-watching-global-helpers-v7-3-9-test.html`
-5. Watchlist — `watchlist-clean-machine-v7-12-43-test.html`
-6. Favourites — `favourites-clean-machine-v7-12-41-test.html`
-7. Likes — `likes-clean-machine-v7-12-42-test.html`
-8. Accessibility — `accessibility-clean-machine-v7-12-44-test.html`
-9. Genres — `genres-clean-machine-v7-12-45-test.html`
-10. Global Search — `global-search-global-helpers-v7-4-9-test.html`
-11. About — `about-global-helpers-v7-4-7-test.html`
-
-After public/watch polish:
-
-1. Accessibility global effect proof
-2. Theme / Settings final scan
-3. Brand tools final pass
-4. Web Builder footer / Policy Agreement plan
-5. Published Preview footer cleanup
-6. Final Registry + Health
-7. Only then discuss `index.html` / live promotion
-
-## Do not forget
-
-- GitHub Pages live domain may cache pages; use cache-busting query strings during test.
-- If GitHub update is blocked, user sends full page code and assistant returns full replacement code.
-- Do not use snippets for dangerous pages.
-- Do not delete old files unless confirmed dead and non-protected.
-- This pass is page polish and access hardening, not database schema work.
-
-## Result
-
-The app now has stable access rails and a clear page-layout standard for the final live-promotion readiness pass.
+Then move into creator/group-play pages only after this browse group is clean.
