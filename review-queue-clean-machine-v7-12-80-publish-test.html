@@ -3,34 +3,104 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Review Queue V7.12.168</title>
+<title>Stream Bandit Review Queue V7.12.288</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
-*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
 body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 40%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(13.5px * var(--fontScale))}
-.wrap{max-width:1440px;margin:auto}.hero,.box,.card,.sub,.stat{border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 12px 38px #0006;padding:14px;margin-bottom:12px}.hero{padding:18px}.box{padding:15px}.card,.sub,.stat{background:#ffffff0f;box-shadow:none;margin-bottom:0}
-.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:5px 9px;font-size:11px}.pill{padding:4px 7px;font-size:10px;margin:2px}.pending{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.approved{background:#22d3a624}.declined,.archived{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}
-h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 9px;font-size:21px}h3{margin:0 0 6px;font-size:16px}.muted,p,small,label,li{color:var(--muted);line-height:1.42}.hero p,.card p,.sub p,.stat p{margin-top:5px;margin-bottom:7px}
-.btn{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.btn:disabled{opacity:.55;cursor:not-allowed}.small{padding:7px 10px;font-size:11px}.primary,.ok{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}
-.status,.note,.danger,.safe{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}.safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}
-.grid,.stats{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(175px,1fr))}.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(250px,360px);gap:14px}.layout{display:grid;grid-template-columns:minmax(280px,430px) 1fr;gap:14px}
-.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:180px;display:grid;place-items:center;position:relative;overflow:hidden}.art:before{content:"";position:absolute;inset:20px;border-radius:22px;border:1px dashed #ffffff32}.artIcon{font-size:56px;z-index:1}
-.actions,.routeStrip,.filters{display:flex;gap:7px;flex-wrap:wrap}.actions{margin-top:8px}.routeStrip{margin-top:10px}.routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}.card b,.stat b{display:block;color:#baf7df;margin-bottom:5px}.stat span{font-size:22px;font-weight:950}
-.input,.select,.textarea{width:100%;border:1px solid #ffffff25;border-radius:16px;background:#080316;color:white;padding:10px 12px;font:inherit;font-weight:850}.select{border-radius:999px}.textarea{min-height:95px;resize:vertical}.list{display:grid;gap:10px;margin-top:10px}.sub{cursor:pointer}.sub.active{outline:3px solid var(--accent)}.thumb{aspect-ratio:16/9;border-radius:16px;background:#0005;display:grid;place-items:center;overflow:hidden;margin-bottom:9px;color:var(--muted)}.thumb img{width:100%;height:100%;object-fit:cover}
-.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:14px;padding:12px;color:#dfffee;max-height:360px;overflow:auto}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
-@media(max-width:980px){body{padding:10px}.heroGrid,.layout{grid-template-columns:1fr}.btn{width:100%;white-space:normal}.art{min-height:160px}}
+.wrap{max-width:1440px;margin:auto}
+.hero,.box,.card,.sub,.stat{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0007;padding:15px;margin-bottom:13px}
+.hero{padding:18px}
+.box{padding:16px}
+.card,.sub,.stat{background:#ffffff0f;box-shadow:none;margin-bottom:0}
+.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}
+.badge{padding:5px 9px;font-size:11px}
+.pill{padding:4px 7px;font-size:10px;margin:2px}
+.pending{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}
+.approved{background:#22d3a624}
+.declined,.archived{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}
+h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.055em}
+h2{margin:0 0 9px;font-size:21px}
+h3{margin:0 0 6px;font-size:16px}
+.muted,p,small,label,li{color:var(--muted);line-height:1.42}
+.hero p,.card p,.sub p,.stat p{margin-top:5px;margin-bottom:7px}
+code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5px;color:#dfffee}
+.btn{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.small{padding:7px 10px;font-size:11px}
+.primary,.ok{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}
+.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}
+.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}
+.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}
+.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}
+.status,.note,.danger,.safe{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}
+.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
+.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}
+.safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}
+.grid,.stats{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(175px,1fr))}
+.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(250px,360px);gap:14px}
+.layout{display:grid;grid-template-columns:minmax(280px,430px) 1fr;gap:14px}
+.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:180px;display:grid;place-items:center;position:relative;overflow:hidden}
+.art:before{content:"";position:absolute;inset:20px;border-radius:22px;border:1px dashed #ffffff32}
+.artIcon{font-size:56px;z-index:1}
+.actions,.routeStrip,.filters,.tabs{display:flex;gap:7px;flex-wrap:wrap}
+.actions{margin-top:8px}
+.routeStrip{margin-top:10px}
+.routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}
+.card b,.stat b{display:block;color:#baf7df;margin-bottom:5px}
+.stat span{font-size:22px;font-weight:950}
+.input,.select,.textarea{width:100%;border:1px solid #ffffff25;border-radius:16px;background:#080316;color:white;padding:10px 12px;font:inherit;font-weight:850}
+.select{border-radius:999px}
+.textarea{min-height:95px;resize:vertical}
+.list{display:grid;gap:10px;margin-top:10px}
+.sub{cursor:pointer}
+.sub.active{outline:3px solid var(--accent)}
+.thumb{aspect-ratio:16/9;border-radius:16px;background:#0005;display:grid;place-items:center;overflow:hidden;margin-bottom:9px;color:var(--muted)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:14px;padding:12px;color:#dfffee;max-height:360px;overflow:auto}
+.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
+.pillTabs{padding:10px 12px;border-radius:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--p),#000 14%),color-mix(in srgb,var(--p2),#000 8%));border-color:var(--line);box-shadow:0 10px 30px #0007}
+.pillTabs.topRail{margin-top:-2px}
+.pillTabs .tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pagePill{border:1px solid color-mix(in srgb,var(--line),var(--accent) 22%);border-radius:999px;padding:11px 17px;background:color-mix(in srgb,var(--p),#000 18%);color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;box-shadow:inset 0 1px #ffffff12}
+.pagePill.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:color-mix(in srgb,var(--accent),#fff 18%);color:#061017}
+.pagePill.back{background:color-mix(in srgb,var(--p),#000 24%)}
+@media(max-width:980px){
+ body{padding:10px}
+ .heroGrid,.layout{grid-template-columns:1fr}
+ .btn,.pagePill{width:100%;white-space:normal}
+ .art{min-height:160px}
+}
 </style>
 </head>
 <body data-sb-review-queue-menu-url="review-queue-clean-machine-v7-12-80-publish-test.html">
 <div class="wrap">
 
+<section class="box pillTabs topRail">
+  <div class="tabs" aria-label="Creator group page links">
+    <button class="pagePill back" id="backBtn" type="button">Back</button>
+    <a class="pagePill" href="home-global-helpers-v7-4-4-test.html">Hub</a>
+    <a class="pagePill" href="submit-video-clean-machine-v7-12-79-test.html">Submit Video</a>
+    <a class="pagePill" href="rules-clean-machine-v7-12-82-test.html">Rules</a>
+    <a class="pagePill active" href="review-queue-clean-machine-v7-12-80-publish-test.html">Review Queue</a>
+    <a class="pagePill" href="playlists-global-helpers-v7-5-2-test.html">Playlists</a>
+    <a class="pagePill" href="channels-global-helpers-v7-5-3-test.html">Channels</a>
+    <a class="pagePill" href="my-channel-clean-machine-v7-12-47-test.html">My Channel</a>
+    <a class="pagePill" href="collections-clean-machine-v7-12-51-test.html">Collections</a>
+    <a class="pagePill" href="player-2-clean-machine-v7-12-58-test.html">Player 2</a>
+    <a class="pagePill" href="library-global-helpers-v7-4-8-test.html">Public Library</a>
+    <a class="pagePill" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Library Editor</a>
+  </div>
+</section>
+
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.168 Review Queue · Archive Constraint Fix</span>
+      <span class="badge">V7.12.288 Review Queue · Clean Rail</span>
       <h1>Review Queue</h1>
       <p>Admin review gate for creator submissions. Pending rows are read from <code>sb_submissions</code>. Approve + Publish creates or updates <code>sb_movies</code> for Library, Search, Details and Player 1.</p>
       <div class="routeStrip">
@@ -40,11 +110,7 @@ h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.
         <span>Archive → declined + archive marker</span>
       </div>
       <div class="actions">
-        <a class="btn hot" href="submit-video-clean-machine-v7-12-79-test.html">Submit Video</a>
-        <a class="btn warn" href="rules-clean-machine-v7-12-82-test.html">Creator Rules</a>
-        <a class="btn primary" href="library-global-helpers-v7-4-8-test.html">Public Library</a>
-        <a class="btn cyan" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Library Editor</a>
-        <button id="reload" class="btn" type="button">Reload</button>
+        <button id="reload" class="btn primary" type="button">Reload Queue</button>
       </div>
       <div id="status" class="status">Loading Review Queue...</div>
       <div id="helperStatus" class="note">Checking foundation...</div>
@@ -100,21 +166,24 @@ h1{font-size:clamp(32px,4vw,54px);line-height:.95;margin:8px 0;letter-spacing:-.
   </section>
 </section>
 
-<p class="micro">Review Queue refit: Header Shell + Queue Content + Footer Shell. Publishes approved submissions to sb_movies. Archived rows are hidden from the active queue without violating Supabase status constraints.</p>
+<p class="micro">Review Queue V7.12.288: clean Creator rail + queue content + protected publish gate. Publishes approved submissions to sb_movies and hides archived queue rows safely.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=review-queue-archive-constraint-1"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=review-queue-archive-constraint-1"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=review-queue-archive-constraint-1"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=review-queue-archive-constraint-1"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=review-queue-archive-constraint-1"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=review-queue-archive-constraint-1"></script>
+<script src="stream-bandit-shell-v6-24.js?v=review-queue-clean-rail-288"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=review-queue-clean-rail-288"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=review-queue-clean-rail-288"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=review-queue-clean-rail-288"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=review-queue-clean-rail-288"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=review-queue-clean-rail-288"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=review-queue-clean-rail-288"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=review-queue-clean-rail-288"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=review-queue-clean-rail-288"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.168 Review Queue Archive Constraint Fix';
+const VERSION='V7.12.288 Review Queue Clean Rail';
 let cfg=null,sb=null,user=null,profile=null,rows=[],channels=[],selected=null,busy=false,countBusy=false,countReady=false,lastCountRead=0;
 const $=id=>document.getElementById(id);
 
@@ -339,6 +408,7 @@ async function refreshSavedCounters(force){
       }
     }
 
+    if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();
     if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();
     lastCountRead=Date.now();
   }catch(e){}
@@ -610,10 +680,12 @@ function helper(){
     ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
     ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
     ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
+    ' · Counts '+(window.StreamBanditMenuSavesCount?'✅':'⚠️')+
     ' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️');
 }
 
 function wire(){
+  $('backBtn').onclick=()=>{if(history.length>1)history.back();else location.href='submit-video-clean-machine-v7-12-79-test.html';};
   $('reload').onclick=load;
   $('filterText').oninput=render;
   $('statusFilter').onchange=render;
@@ -635,6 +707,7 @@ setTimeout(helper,700);
 setTimeout(()=>refreshSavedCounters(true),1600);
 setTimeout(helper,1800);
 setInterval(helper,6000);
+document.documentElement.dataset.sbReviewQueue='v7-12-288';
 
 })();
 </script>
