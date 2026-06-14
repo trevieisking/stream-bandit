@@ -1,20 +1,20 @@
-# Stream Bandit Current App Manifest V7.12.295
+# Stream Bandit Current App Manifest V7.12.297.1
 
-Date: 2026-06-13
+Date: 2026-06-14
 
 Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages and One Machine already reference this file.
 
 ## Current strongest pause point
 
-`V7.12.295 Theme Studio Passed / Profile Settings Start`
+`V7.12.297.1 Profile Settings Passed / Web Builder Start`
 
-Public Browse group is passed as a full group. Creator group is passed as a full group. Settings group has started. Settings Hub and Theme Studio have now passed.
+Public Browse group is passed as a full group. Creator group is passed as a full group. Settings group has started. Settings Hub, Theme Studio, and Profile Settings have now passed.
 
 Current next target:
 
-`profile-settings-live-ready-v7-12-90-test.html`
+`web-builder-live-studio-v7-12-116-test.html?page=test-page`
 
-Next step is to scan or use the current full Profile Settings page source before producing the next full-page replacement.
+Next step is to scan or use the current full Web Builder page source before producing the next full-page replacement.
 
 ## Current checkpoint files
 
@@ -24,7 +24,7 @@ Keep these current checkpoint files:
 - `CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`
 - `CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
-No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, Playlists, Channels, My Channel, Collections, Player 2, the Creator full-group pass, Settings Hub, or Theme Studio. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
+No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, Playlists, Channels, My Channel, Collections, Player 2, the Creator full-group pass, Settings Hub, Theme Studio, or Profile Settings. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
 
 ## File-count / cleanup rule
 
@@ -75,12 +75,12 @@ Confirmed access tests remain valid: owner can open One Machine; owner false-loc
 - `stream-bandit-authority-gate-v7-12-273.js` is the shared route/access decision engine.
 - `stream-bandit-account-authority-v7-12-273.js` reads Supabase user and `sb_profiles` authority from the live profile row.
 - `stream-bandit-theme-projector-v7-12-156.js` applies global theme variables and supports accessibility/readability projection.
-- `stream-bandit-header-shell-v7-12-156.js` owns the header shell.
+- `stream-bandit-header-shell-v7-12-156.js` owns the header shell. Latest passed replacement: `V7.12.297.1 Header Shell / Profile Identity Image Owner`.
 - `stream-bandit-footer-shell-v7-12-156.js` owns the footer shell.
 - `stream-bandit-core-saves-v6-75.js` owns Watchlist/Favourites/Likes save logic.
 - `live-readiness-search-supabase-fallback-v7-12-130.js` owns header search preview, menu route sanitizer, and Global Search handoff.
 - `stream-bandit-settings-global-v7-1-8.js` is the protected global settings helper.
-- `stream-bandit-brand-logo-v7-12-12.js` is the protected brand/logo helper.
+- `stream-bandit-brand-logo-v7-12-12.js` is the protected brand/logo helper and remains the global brand owner when signed out or when no signed-in profile avatar exists.
 - Header search helper state: `V7.12.283 Header Search Opens Global Search`, commit `99b7c055ceeb5f90a47852efedd1921f8217ac0e`.
 - Stable direct-lock timing commit: `1fdab4cefabb5b5bfd6758b1d48a9f671900fc62`.
 
@@ -181,11 +181,6 @@ File: `web-builder-theme-studio-controls-v7-8-9-test.html`
 
 State: `V7.12.295 Theme Studio · Clean Rail Global Bridge`
 
-Page update method:
-
-- Full ready copy/paste page code was supplied to the user.
-- User confirmed the Theme Studio page passed.
-
 Confirmed:
 
 - Theme Studio remains the single owner of the Stream Bandit global colour theme.
@@ -203,39 +198,61 @@ Confirmed:
 - Theme Projector apply/refresh and theme-updated broadcast paths are preserved.
 - Accessibility comfort/readability relationship is preserved while Theme Studio owns colour theme, font, font scale and contrast line strength.
 - Brand logo and app icons remain separate and are not owned by Theme Studio.
+- No schema, storage, RLS, bucket, player, index, route registry, or global helper rewrites.
+
+### Profile Settings — PASSED
+
+File: `profile-settings-live-ready-v7-12-90-test.html`
+
+Passed state:
+
+- Profile Settings page uses the rollback base from `Fix Profile Settings avatar overlay using brand upload flow`.
+- Header Shell passed replacement: `stream-bandit-header-shell-v7-12-156.js` — `V7.12.297.1 Header Shell / Profile Identity Image Owner`.
+
+Confirmed by user:
+
+- Profile Settings is a full working pass.
+- Profile Settings changes the specific signed-in user's avatar/profile identity correctly.
+- Profile page and Header Shell no longer fight over the left identity image.
+- The left header identity image now follows the no-war rule:
+  - signed in and `sb_profiles.avatar_url` exists: show that signed-in user's profile avatar and do not expose the image as `data-sb-brand-logo`;
+  - signed in and no profile avatar exists: show safe account fallback;
+  - signed out: show global Stream Bandit brand logo and expose it as `data-sb-brand-logo`.
+- Brand Logo helper remains the global brand owner only when signed out or when no signed-in profile avatar exists.
+- Profile Settings owns profile/account visible settings, avatar upload, banner upload, Supabase Auth/profile reads, and `sb_profiles` writes.
+- Profile Settings should be considered ready for live promotion from this pass unless a later scan finds a new unrelated issue.
+- No further Profile Settings fixing is required from this pass.
 - No schema changes.
-- No storage changes.
+- No storage policy changes.
 - No RLS changes.
 - No bucket name changes.
 - No player logic changes.
 - No index promotion.
 - No route registry changes.
-- No global helper rewrites.
 
 ## Settings group — next work order
 
 Next page:
 
-`profile-settings-live-ready-v7-12-90-test.html`
+`web-builder-live-studio-v7-12-116-test.html?page=test-page`
 
 Needed next polish direction:
 
-- Fetch or use the current full Profile Settings source before editing.
-- Add Settings group top rail directly under header.
-- Keep Profile Settings as the owner of profile/account visible settings, not global colour theme or brand/app icons.
-- Preserve Supabase Auth/profile reads and writes already present in the page.
-- Preserve avatar/profile image behaviour and account-state behaviour.
-- Do not duplicate Settings route buttons in hero.
-- Load Shell config, Core Saves, Menu Saves Count, Settings Global, Brand Logo, Search Fallback, Header Shell and Footer Shell to match latest pattern.
-- Make helper status show Shell/Header/Footer/Theme/Saves/Counts/Search/Settings/Brand.
-- Do not change schema, storage policy, RLS, bucket names, player logic, index, route registry, or global helper logic.
+- Fetch or use the current full Web Builder source before editing.
+- Keep Web Builder as its own builder route family and do not merge builder chrome into the normal app shell unless the user explicitly asks.
+- Add or verify Settings group top rail directly under header where appropriate.
+- Keep Web Builder page actions real and avoid duplicate route buttons.
+- Preserve existing Web Builder page storage/read/write behaviour and preview/published route behaviour.
+- Preserve theme bridge, shared style preview, page manager, builder route handoff, and current test-page behaviour.
+- Preserve Supabase Auth/profile/account state and header identity image behaviour from `stream-bandit-header-shell-v7-12-156.js` `V7.12.297.1`.
+- Do not change schema, storage policy, RLS, bucket names, player logic, index, route registry, or global helper logic without explicit approval.
 
 Settings group expected pages:
 
 - Settings Hub — `settings-platform-control-hub-v7-12-85-test.html` — PASSED
 - Theme Studio — `web-builder-theme-studio-controls-v7-8-9-test.html` — PASSED
-- Profile Settings — `profile-settings-live-ready-v7-12-90-test.html` — NEXT
-- Web Builder — `web-builder-live-studio-v7-12-116-test.html?page=test-page`
+- Profile Settings — `profile-settings-live-ready-v7-12-90-test.html` — PASSED
+- Web Builder — `web-builder-live-studio-v7-12-116-test.html?page=test-page` — NEXT
 - Brand / App Icons — `settings-brand-icons-promoted-v7-12-21-test.html`
 - Brand Image Helper — `brand-logo-helper-responsive-v7-12-20-test.html`
 - Favicon / App Icon Builder — `favicon-app-icon-builder-v7-12-15-test.html`
