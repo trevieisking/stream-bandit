@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.293
+# Stream Bandit Current App Manifest V7.12.294
 
 Date: 2026-06-13
 
@@ -6,15 +6,15 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.293 Creator Group Full Pass / Settings Hub Start`
+`V7.12.294 Settings Hub Passed / Theme Studio Start`
 
-Public Browse group is passed as a full group. Creator group is now passed as a full group.
+Public Browse group is passed as a full group. Creator group is passed as a full group. Settings group has started. Settings Hub clean doorway pass has now passed.
 
 Current next target:
 
-`settings-platform-control-hub-v7-12-85-test.html`
+`web-builder-theme-studio-controls-v7-8-9-test.html`
 
-The user supplied the current full Settings Hub page file as the source for the next full-page replacement pass.
+The user uploaded the current full Theme Studio page file as the source for the next full-page replacement pass.
 
 ## Current checkpoint files
 
@@ -24,7 +24,7 @@ Keep these current checkpoint files:
 - `CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`
 - `CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
-No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, Playlists, Channels, My Channel, Collections, Player 2, or the Creator full-group pass. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
+No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, Playlists, Channels, My Channel, Collections, Player 2, the Creator full-group pass, or Settings Hub. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
 
 ## File-count / cleanup rule
 
@@ -79,6 +79,8 @@ Confirmed access tests remain valid: owner can open One Machine; owner false-loc
 - `stream-bandit-footer-shell-v7-12-156.js` owns the footer shell.
 - `stream-bandit-core-saves-v6-75.js` owns Watchlist/Favourites/Likes save logic.
 - `live-readiness-search-supabase-fallback-v7-12-130.js` owns header search preview, menu route sanitizer, and Global Search handoff.
+- `stream-bandit-settings-global-v7-1-8.js` is the protected global settings helper.
+- `stream-bandit-brand-logo-v7-12-12.js` is the protected brand/logo helper.
 - Header search helper state: `V7.12.283 Header Search Opens Global Search`, commit `99b7c055ceeb5f90a47852efedd1921f8217ac0e`.
 - Stable direct-lock timing commit: `1fdab4cefabb5b5bfd6758b1d48a9f671900fc62`.
 
@@ -146,59 +148,85 @@ Creator group confirmations:
 - Player 2 preserves queue storage keys, mixed-provider playback, HLS/Mux/direct video support, YouTube/Vimeo iframe support, audio boost rules for HTML video only, iframe provider control rules, HTML video progress saving to `stream-bandit-progress-v6-73`, Next/Previous queue switching, fallback reads from `sb_movies`, and queue handoffs from Playlists, Channels, My Channel, Collections, and Supabase Library Play All.
 - Player 2 custom local header/search/footer duplication was replaced with the standard helper shell pattern.
 - Accessibility/audio boost/player comfort protection remains active.
-- No schema changes.
-- No storage policy changes.
-- No RLS changes.
-- No bucket name changes.
-- No table-name changes.
-- No Player 1 route changes.
-- No Details route changes.
-- No index promotion.
-- No global helper rewrites.
+- No schema, storage policy, RLS, bucket, table, Player 1, Details, index, or global-helper changes.
+
+## Settings group status
+
+Settings group has started.
+
+### Settings Hub — PASSED
+
+File: `settings-platform-control-hub-v7-12-85-test.html`
+
+State: `V7.12.294 Settings Hub · Web Builder Doorway`
+
+Page update method:
+
+- Full ready copy/paste page code was supplied to the user.
+- User confirmed the Settings Hub page passed.
+
+Confirmed:
+
+- Settings Hub is a safe Web Builder doorway and Settings route map.
+- Web Builder remains the primary doorway target, but it is not the only route there.
+- Group top rail added directly under header.
+- Route links moved out of hero into the top rail and route cards.
+- Hero keeps only the real action: Refresh Foundation.
+- No duplicate route tabs/buttons were added.
+- Settings Hub does not write to Supabase.
+- Settings Hub does not save settings directly.
+- Settings Hub does not upload, delete, publish, migrate, change schema, change storage policy, change RLS, promote index, rewrite route registry, or rewrite global helpers.
+- Theme Studio, Profile Settings, Web Builder, Brand/App Icons, Brand Helper, Favicon Builder, Accessibility, Policy Centre, Policy Admin, Pricing Matrix, Pages Manager, Published Preview, and User Dashboard stay visible as route owners.
+- Helper status includes Shell/Header/Footer/Theme/Saves/Counts/Search/Settings/Brand.
+- It does not hide bugs inside downstream pages; each Settings page must still be tested individually.
 
 ## Settings group — next work order
 
 Next page:
 
-`settings-platform-control-hub-v7-12-85-test.html`
+`web-builder-theme-studio-controls-v7-8-9-test.html`
 
-The user uploaded the current full Settings Hub page as source for the next pass.
+The user uploaded the current full Theme Studio page as source for the next pass.
 
-Current supplied Settings Hub state:
+Current supplied Theme Studio state:
 
-`V7.12.194 Settings Hub · Header Count Fix`
+`V7.12.229 Theme Studio · Global Theme Owner`
 
-Known behaviours from supplied Settings source:
+Known behaviours from supplied Theme Studio source:
 
-- Settings Hub is a doorway page using current route truth only.
-- It states it does not write to Supabase.
-- It states it does not save settings directly.
-- It must not hide bugs inside Theme Studio, Profile Settings or Web Builder.
-- Current route buttons include Theme Studio, Profile Settings, Web Builder, and Brand / App Icons.
-- It uses global theme variables and existing shell/helper patterns but needs the next clean group pass.
+- Theme Studio is the single owner of the Stream Bandit global theme.
+- It writes preview to local browser theme keys.
+- Save Global Theme writes to Supabase `sb_app_settings.settings.streamBanditTheme` and related builder style keys.
+- It also writes local browser keys: `streamBanditTheme`, `stream-bandit-theme`, `sbTheme`, `sb_theme`, `web_builder_shared_style_v7_8_8`, `web_builder_style`.
+- It projects variables: `--accent`, `--accent2`, `--bg`, `--p`, `--p2`, `--card`, `--card2`, `--title`, `--muted`, `--btnText`, `--fontScale`, and `--line`.
+- It owns colour theme, font, font scale, and high-contrast line strength.
+- Accessibility can adjust comfort/readability, but this page owns the colour theme.
+- Brand logo and app icons are separate and not owned by Theme Studio.
+- Current supplied page includes presets, shared theme controls, swatches, current shell links, safety/ownership, and debug.
 
 Needed next polish direction:
 
-- Start Settings group from `settings-platform-control-hub-v7-12-85-test.html`.
-- Add or verify the group top rail directly under header.
-- Keep Settings Hub as a doorway only unless the user specifically asks to change a settings writer page.
-- Do not add direct Supabase writes to Settings Hub.
-- Do not hide bugs in Theme Studio, Profile Settings, Web Builder, Brand / App Icons, Brand Image Helper, or Favicon / App Icon Builder.
-- Keep real page actions in hero only.
-- Avoid duplicate route tabs/buttons.
-- Preserve global theme, branding, accessibility, saved counts, header search, footer, account/avatar, and helper status behaviour.
-- Treat Settings group as high-risk because global settings should affect other pages, not only Settings pages.
-- Do not change schema, storage, RLS, bucket names, player logic, index, route registry, or global helper logic without explicit approval.
+- Add Settings group top rail directly under header.
+- Move route links out of hero into top rail or current-page route cards.
+- Keep real page actions in hero: Apply Preview, Save Global Theme, Load Saved Theme, Reset Bandit Default.
+- Do not add duplicate route tabs/buttons.
+- Preserve presets, shared controls, swatches, preview, shell pages, safety/ownership, and debug as current-page content.
+- Load Shell config, Core Saves, Menu Saves Count, Settings Global, Brand Logo, Search Fallback, Header Shell and Footer Shell to match latest pattern.
+- Make helper status show Shell/Header/Footer/Theme/Saves/Counts/Search/Settings/Brand.
+- Preserve Supabase save target `sb_app_settings.settings.streamBanditTheme` and local browser theme keys.
+- Preserve Theme Projector apply/broadcast path.
+- Preserve global variables and Accessibility comfort relationship.
+- Do not change schema, storage, RLS, bucket names, player logic, index, route registry, or global helper logic.
 
-Settings group expected start:
+Settings group expected pages:
 
-- Settings Hub — `settings-platform-control-hub-v7-12-85-test.html` — NEXT
-- Theme Studio — `web-builder-theme-studio-controls-v7-8-9-test.html`
+- Settings Hub — `settings-platform-control-hub-v7-12-85-test.html` — PASSED
+- Theme Studio — `web-builder-theme-studio-controls-v7-8-9-test.html` — NEXT
 - Profile Settings — `profile-settings-live-ready-v7-12-90-test.html`
 - Web Builder — `web-builder-live-studio-v7-12-116-test.html?page=test-page`
 - Brand / App Icons — `settings-brand-icons-promoted-v7-12-21-test.html`
-- Brand Image Helper — route to verify in scanner/current page
-- Favicon / App Icon Builder — route to verify in scanner/current page
+- Brand Image Helper — `brand-logo-helper-responsive-v7-12-20-test.html`
+- Favicon / App Icon Builder — `favicon-app-icon-builder-v7-12-15-test.html`
 
 ## Later groups
 
