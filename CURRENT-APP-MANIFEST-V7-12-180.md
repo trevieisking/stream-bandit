@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.291.1
+# Stream Bandit Current App Manifest V7.12.292
 
 Date: 2026-06-13
 
@@ -6,15 +6,15 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.291.1 My Channel Passed / Collections Start`
+`V7.12.292 Collections Passed / Player 2 Start`
 
-Public Browse group is passed as a full group. Creator group has started. Creator Rules, Submit Video, Review Queue, Playlists, Channels, and My Channel have now passed.
+Public Browse group is passed as a full group. Creator group has started. Creator Rules, Submit Video, Review Queue, Playlists, Channels, My Channel, and Collections have now passed.
 
 Current next target:
 
-`collections-clean-machine-v7-12-51-test.html`
+`player-2-clean-machine-v7-12-58-test.html`
 
-The user supplied the current full Collections page file as the source for the next full-page replacement pass.
+The user supplied the current full Player 2 page file as the source for the next full-page replacement pass.
 
 ## Current checkpoint files
 
@@ -24,7 +24,7 @@ Keep these current checkpoint files:
 - `CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`
 - `CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
-No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, Playlists, Channels, or My Channel. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
+No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, Playlists, Channels, My Channel, or Collections. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
 
 ## File-count / cleanup rule
 
@@ -163,30 +163,40 @@ File: `my-channel-clean-machine-v7-12-47-test.html`
 
 State: `V7.12.291.1 My Channel · Plan Stat Wrap Fix`
 
+Confirmed: top rail added; route links moved out of hero; hero keeps Reload My Channel and Play My Videos In Player 2; current-page tabs only; helper status includes Counts and Entitlements; profile channel editing, clear guard, owner-only reads, entitlement rules, Player 2 handoff, and plan stat wrap fix preserved; user confirmed visually clean on user account and admin/owner account; no schema/storage/RLS/table/player/index/global-helper changes.
+
+### Collections — PASSED
+
+File: `collections-clean-machine-v7-12-51-test.html`
+
+State: `V7.12.292 Collections · Clean Rail`
+
 Page update method:
 
 - Full ready copy/paste page code was supplied to the user.
-- User confirmed the page passed on both user account and admin/owner account.
+- User confirmed the Collections page passed.
 
 Confirmed:
 
 - Creator group top rail added directly under header.
 - Route links moved out of hero into the top rail.
-- Duplicate route action buttons/cards were removed from hero and dashboard content.
-- Hero keeps real page actions only: Reload My Channel and Play My Videos In Player 2.
-- Dashboard, Edit Profile Channel, My Videos, Submissions, Permissions, Rules, and Debug remain current-page content tabs.
-- Shell config, Core Saves, Menu Saves Count, Settings Global, Brand Logo, Search Fallback, and Entitlements helpers are loaded.
+- Open overlay menu removed from hero.
+- Hero keeps real page actions only: Reload Collections and Play Selected In Player 2.
+- No duplicate route tabs/buttons were added.
+- Browse, Collection Studio, Add / Remove Videos, Permissions, and Debug remain current-page content tabs.
+- Core Saves, Menu Saves Count, Settings Global, Brand Logo, Search Fallback, and Entitlements helpers are loaded.
 - Helper status shows Counts as well as Header/Footer/Theme/Saves/Search/Entitlements.
-- Profile channel editing preserved.
-- Clear guard remains when movies exist.
-- Owner-only/signed-in user data reads preserved.
-- Entitlement rules preserved.
-- Player 2 handoff preserved.
-- Plan stat wrap fix prevents long plan names such as `platform_owner` from overflowing the dashboard card.
-- Confirmed visually clean for user account and admin/owner account.
+- Selected-card sync preserved.
+- Remove Collection fix preserved.
+- Artwork upload preserved to Supabase Storage bucket `stream-bandit-images` under `collections/<owner>/...`.
+- Collection create/edit/delete preserved according to owner/admin/entitlement/RLS rules.
+- Add/remove video joins still writes `sb_collection_movies` join rows only.
+- Main/library video attach logic preserved.
+- Player 2 queue handoff preserved.
 - No schema changes.
-- No storage changes.
+- No storage policy changes.
 - No RLS changes.
+- No bucket name changes.
 - No table-name changes.
 - No player engine changes.
 - No index promotion.
@@ -196,40 +206,37 @@ Confirmed:
 
 Next page:
 
-`collections-clean-machine-v7-12-51-test.html`
+`player-2-clean-machine-v7-12-58-test.html`
 
-The user uploaded the current full Collections page as source for the next pass.
+The user uploaded the current full Player 2 page as source for the next pass.
 
-Current supplied Collections state:
+Current supplied Player 2 state:
 
-`V7.12.270.1 Collections · Remove Fix`
+`V7.12.267 Player 2 Multi-provider Queue`
 
-Known behaviours from supplied Collections source:
+Known behaviours from supplied Player 2 source:
 
-- Reads collections from `sb_collections`.
-- Reads joins from `sb_collection_movies`.
-- Reads published videos from `sb_movies`.
-- Uses profile identity and entitlements.
-- Supports collection browse and Player 2 queue handoff.
-- Collection Studio can create/update collections according to owner/admin/entitlement rules.
-- Upload artwork uses Supabase Storage bucket `stream-bandit-images` under `collections/<owner>/...`.
-- Add/remove videos writes `sb_collection_movies` join rows only.
-- Remove Collection deletes join rows first, then removes the collection when role/plan/RLS allows it.
-- Main/library video attach logic allows own movies and Stream Bandit main/library videos for normal creators.
-- Selected-card sync and Remove Collection fix are already present in the supplied source.
+- Reads queue from `streamBanditQueueV1`, `streamBanditUpNextV1`, or `streamBanditPlayer2Queue` in session/local storage.
+- Accepts queue handoff from Playlists, Channels, My Channel, Collections, and Supabase Library Play All.
+- Supports mixed Mux/HLS/direct video plus YouTube/Vimeo iframe items.
+- Uses HLS.js for HLS/Mux where needed.
+- Keeps audio boost for HTML video sources only.
+- Disables audio boost/PIP controls for iframe providers.
+- Saves HTML video progress to `stream-bandit-progress-v6-73`.
+- Supports Next/Previous queue item switching.
+- Has fallback read from `sb_movies` when no queue exists or when an id is passed.
+- Current supplied page has a local custom header/footer shape that should be replaced with the standard header shell, top Creator rail, hero, content sections, and footer shell pattern.
 
 Needed next polish direction:
 
 - Add Creator group top rail directly under header.
-- Move route links out of hero into top rail.
-- Remove Open overlay menu from hero.
-- Keep real page actions in hero: Reload Collections and Play Selected In Player 2.
-- Do not add duplicate route tabs/buttons.
-- Preserve Browse, Collection Studio, Add / Remove Videos, Permissions, and Debug as current-page content tabs.
-- Load Core Saves, Menu Saves Count, Settings Global, Brand Logo, Search Fallback, and Entitlements helpers to match latest pattern.
-- Make helper status show Counts as well as Header/Footer/Theme/Saves/Search/Entitlements.
-- Preserve selected-card sync, remove fix, artwork upload, create/edit/delete, add/remove joins, main library attach logic, entitlement rules, and Player 2 handoff.
-- Do not change schema, storage policy, RLS, bucket name, table names, player engine, index, or global helper logic.
+- Remove custom local header/search/footer duplication and rely on standard helper shells.
+- Keep real page actions in hero: Reload Queue/Fallback, Previous, Next, Fullscreen where appropriate.
+- Preserve queue panel, Now Playing, player frame, comfort controls, progress monitor, source info, rules, checklist, and debug as current-page content.
+- Load Core Saves, Menu Saves Count, Settings Global, Brand Logo, Search Fallback, and footer/header helpers to match latest pattern.
+- Preserve mixed-provider playback, queue storage keys, HLS/Mux/direct support, YouTube/Vimeo iframe support, audio boost rules, progress saving, and Player 2 queue handoff.
+- Do not change schema, storage, RLS, table names, Player 1 route, Details route, index, or global helper logic.
+- Protect accessibility/audio boost/player comfort because louder audio is critical.
 
 Creator group expected pages:
 
@@ -239,8 +246,8 @@ Creator group expected pages:
 - Playlists — `playlists-global-helpers-v7-5-2-test.html` — PASSED
 - Channels — `channels-global-helpers-v7-5-3-test.html` — PASSED
 - My Channel — `my-channel-clean-machine-v7-12-47-test.html` — PASSED
-- Collections — `collections-clean-machine-v7-12-51-test.html` — NEXT
-- Player 2 — `player-2-clean-machine-v7-12-58-test.html`
+- Collections — `collections-clean-machine-v7-12-51-test.html` — PASSED
+- Player 2 — `player-2-clean-machine-v7-12-58-test.html` — NEXT
 
 Creator group rules:
 
