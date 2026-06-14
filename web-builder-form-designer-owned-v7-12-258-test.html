@@ -3,93 +3,1923 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Advanced Form Builder V7.12.264.15 TEST</title>
+<title>Web Builder Form Designer V7.12.263.14 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--line:#ffffff22;--text:#f7fbff;--muted:#aeb8d6;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff5d6c;--blue:#41e8ff;--panel:#101529;--panel2:#17122d}*{box-sizing:border-box}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;background:radial-gradient(circle at 0 0,#22d3a62b,transparent 36%),radial-gradient(circle at 100% 0,#7c3cff35,transparent 42%),linear-gradient(180deg,#070910,#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}.top{position:sticky;top:0;z-index:20;background:#0b1020f2;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}.topInner{width:min(1540px,100%);margin:0 auto;padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}.brand{display:flex;gap:10px;align-items:center;font-weight:950;flex:1 1 340px}.mark{width:44px;height:44px;min-width:44px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;font-weight:1000}.brand small{display:block;color:var(--muted);font-weight:800}.actions,.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.actions{justify-content:flex-end}.btn,.smallBtn{border:0;border-radius:999px;background:#30384f;color:white;text-decoration:none;font-weight:950;padding:10px 13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.smallBtn{padding:8px 10px;font-size:13px}.btn:disabled,.smallBtn:disabled{opacity:.5;cursor:not-allowed}.primary{background:linear-gradient(135deg,var(--good),var(--purple));color:#071015}.hot{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#071015}.blue{background:linear-gradient(135deg,var(--blue),var(--purple));color:#071015}.badBtn{background:linear-gradient(135deg,var(--bad),var(--purple));color:#fff}.wrap{width:min(1540px,100%);margin:0 auto;padding:14px}.hero,.panel,.card,.question,.overlayCard{border:1px solid #ffffff18;border-radius:24px;background:linear-gradient(135deg,#101529,#17122d);padding:16px;margin:0 0 14px}.hero h1{font-size:clamp(36px,5vw,78px);line-height:.94;margin:8px 0;letter-spacing:-.055em}.badge,.chip,.pill{display:inline-flex;border:1px solid #ffffff24;border-radius:999px;padding:6px 9px;background:#ffffff0d;color:#dbe7ff;font-weight:900;font-size:12px}.badge{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.bad{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}.good{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.controlGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{background:#ffffff08}.own{border-color:#22d3a655;background:#22d3a612}.keep{border-color:#ffb14255;background:#ffb14212}.later{border-color:#7c3cff66;background:#7c3cff14}p,li,label,small{color:var(--muted);line-height:1.5}.list{margin:6px 0 0;padding-left:18px}.control,.question,.overlayCard{border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px}.control b,.question b,.overlayCard b{display:block;color:#baf7df;margin-bottom:7px}.control input,.control select,.control textarea,.question input,.question select,.question textarea{width:100%;border:1px solid #ffffff24;border-radius:14px;background:#0007;color:#fff;padding:11px;font:inherit;margin-top:7px}.control textarea,.question textarea{min-height:90px;resize:vertical}.choice{display:block;border:1px solid #ffffff14;border-radius:14px;background:#ffffff0e;padding:12px;margin:8px 0;cursor:pointer}.choice input{width:auto;margin:0 8px 0 0}.checkline{display:flex;gap:8px;align-items:center;border:1px solid #ffffff14;border-radius:14px;background:#ffffff0e;padding:10px;margin:8px 0}.checkline input{width:auto;margin:0}.status,.notice{border:1px solid #ffb14266;background:#ffb14217;color:#ffe7ad;border-radius:16px;padding:12px;font-weight:850;margin:10px 0}.status.good2{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}.status.bad2{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}.debug,.out,.linkBox{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;border:1px solid #ffffff14;border-radius:16px;background:#0007;padding:12px;color:#dfffee;max-height:460px;overflow:auto}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.big{font-size:26px;font-weight:950;color:#fff;margin:0}.fieldList{display:grid;gap:8px}.fieldRow{border:1px solid #ffffff18;border-radius:18px;background:#ffffff09;padding:10px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}.fieldRow b{display:block;color:#baf7df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fieldRow small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fieldActions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.fullPreview{border:1px solid #ffffff24;border-radius:34px;background:radial-gradient(circle at 50% 0,#22d3a627,transparent 35%),linear-gradient(135deg,#0a1020,#17112d);box-shadow:0 28px 90px #0008;min-height:72vh;overflow:hidden}.previewHead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;padding:18px;border-bottom:1px solid #ffffff16;background:#0b1020aa}.previewBody{padding:clamp(16px,3vw,34px);display:grid;grid-template-columns:minmax(280px,.72fr) minmax(320px,1.28fr);gap:18px;align-items:start}.previewIntro h2{font-size:clamp(42px,7vw,96px);line-height:.9;margin:8px 0;letter-spacing:-.06em}.previewFormPanel{border:1px solid #22d3a644;border-radius:28px;background:#050711b8;padding:18px}.previewFoot{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding:16px;border-top:1px solid #ffffff16;background:#0b1020aa}.destinationGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;background:#02040ccc;backdrop-filter:blur(18px)}.overlay.open{display:flex}.modal{width:min(1040px,100%);max-height:92vh;overflow:auto;border:1px solid #ffffff24;border-radius:32px;background:radial-gradient(circle at 0 0,#22d3a62b,transparent 35%),linear-gradient(135deg,#0d1224,#18112d);box-shadow:0 30px 100px #000c}.modal.compact{width:min(720px,100%)}.modalHead{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;padding:16px;border-bottom:1px solid #ffffff18;background:#0b1020f2;backdrop-filter:blur(12px)}.modalBody{padding:14px}.modalFoot{position:sticky;bottom:0;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding:14px;border-top:1px solid #ffffff18;background:#0b1020f2;backdrop-filter:blur(12px)}.close{font-size:20px;width:44px;height:44px;border-radius:999px}.builderLayout{display:grid;grid-template-columns:minmax(280px,.78fr) minmax(380px,1.22fr);gap:12px}.addFieldRow{display:grid;grid-template-columns:minmax(170px,.7fr) minmax(170px,1fr) auto;gap:8px;align-items:end}.uploadPreview{display:grid;gap:8px}.uploadPreview a{color:#baf7df}@media(max-width:980px){.brand,.actions{flex:1 1 100%}.actions{justify-content:flex-start}.actions .btn,.btn{flex:1 1 auto}.grid,.controlGrid,.previewBody,.builderLayout,.addFieldRow{grid-template-columns:1fr}.hero h1{font-size:clamp(36px,12vw,58px)}.modal{max-height:96vh}.modalFoot .btn{flex:1 1 100%}.fieldRow{grid-template-columns:1fr}.fieldActions{justify-content:flex-start}}
+:root{
+  color-scheme:dark;
+  --line:#ffffff22;
+  --text:#f7fbff;
+  --muted:#aeb8d6;
+  --good:#22d3a6;
+  --purple:#7c3cff;
+  --pink:#ff2d85;
+  --warn:#ffb142;
+  --bad:#ff5d6c;
+  --blue:#41e8ff;
+  --panel:#101529;
+  --panel2:#17122d;
+}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 0 0,#22d3a62b,transparent 36%),
+    radial-gradient(circle at 100% 0,#7c3cff35,transparent 42%),
+    linear-gradient(180deg,#070910,#050711);
+  color:var(--text);
+  font-family:Inter,system-ui,Arial,sans-serif;
+}
+.top{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:#0b1020f2;
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(16px);
+}
+.topInner{
+  width:min(1540px,100%);
+  margin:0 auto;
+  padding:10px 14px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 16px;
+  align-items:center;
+  justify-content:space-between;
+}
+.brand{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  font-weight:950;
+  flex:1 1 340px;
+}
+.mark{
+  width:44px;
+  height:44px;
+  min-width:44px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  color:#071015;
+  font-weight:1000;
+}
+.brand small{
+  display:block;
+  color:var(--muted);
+  font-weight:800;
+}
+.actions,.row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.actions{
+  justify-content:flex-end;
+}
+.btn,.smallBtn{
+  border:0;
+  border-radius:999px;
+  background:#30384f;
+  color:white;
+  text-decoration:none;
+  font-weight:950;
+  padding:10px 13px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+}
+.smallBtn{
+  padding:8px 10px;
+  font-size:13px;
+}
+.btn:disabled,.smallBtn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+.primary{
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  color:#071015;
+}
+.hot{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;
+}
+.warnBtn{
+  background:linear-gradient(135deg,var(--warn),var(--purple));
+  color:#071015;
+}
+.blue{
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#071015;
+}
+.badBtn{
+  background:linear-gradient(135deg,var(--bad),var(--purple));
+  color:#fff;
+}
+.wrap{
+  width:min(1540px,100%);
+  margin:0 auto;
+  padding:14px;
+}
+.hero,.panel,.card,.question{
+  border:1px solid #ffffff18;
+  border-radius:24px;
+  background:linear-gradient(135deg,#101529,#17122d);
+  padding:16px;
+  margin:0 0 14px;
+  box-shadow:0 18px 55px #0006;
+}
+.card,.question{
+  background:#ffffff08;
+  box-shadow:none;
+}
+.hero h1{
+  font-size:clamp(36px,5vw,78px);
+  line-height:.94;
+  margin:8px 0;
+  letter-spacing:-.055em;
+}
+h2,h3{
+  margin:0 0 10px;
+}
+.badge,.chip,.pill{
+  display:inline-flex;
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  padding:6px 9px;
+  background:#ffffff0d;
+  color:#dbe7ff;
+  font-weight:900;
+  font-size:12px;
+  margin:2px;
+}
+.badge,.good{
+  background:#22d3a621;
+  border-color:#22d3a660;
+  color:#baf7df;
+}
+.warn{
+  background:#ffb14224;
+  border-color:#ffb14266;
+  color:#ffe7ad;
+}
+.bad{
+  background:#ff5d6c22;
+  border-color:#ff5d6c66;
+  color:#ffd0d5;
+}
+.cyan{
+  background:#41e8ff22;
+  border-color:#41e8ff66;
+  color:#cef9ff;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.controlGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.builderLayout{
+  display:grid;
+  grid-template-columns:minmax(300px,.82fr) minmax(420px,1.18fr);
+  gap:12px;
+}
+.card b,.control b,.question b{
+  display:block;
+  color:#baf7df;
+  margin-bottom:7px;
+}
+.own{
+  border-color:#22d3a655;
+  background:#22d3a612;
+}
+.keep{
+  border-color:#ffb14255;
+  background:#ffb14212;
+}
+.later{
+  border-color:#7c3cff66;
+  background:#7c3cff14;
+}
+p,li,label,small{
+  color:var(--muted);
+  line-height:1.5;
+}
+.list{
+  margin:6px 0 0;
+  padding-left:18px;
+}
+.control,.question{
+  border:1px solid #ffffff18;
+  border-radius:18px;
+  background:#ffffff0a;
+  padding:12px;
+  margin:0 0 10px;
+}
+.control input,.control select,.control textarea,.question input,.question select,.question textarea{
+  width:100%;
+  border:1px solid #ffffff24;
+  border-radius:14px;
+  background:#0007;
+  color:#fff;
+  padding:11px;
+  font:inherit;
+  margin-top:7px;
+}
+.control textarea,.question textarea{
+  min-height:90px;
+  resize:vertical;
+}
+.choice{
+  display:block;
+  border:1px solid #ffffff14;
+  border-radius:14px;
+  background:#ffffff0e;
+  padding:12px;
+  margin:8px 0;
+  cursor:pointer;
+}
+.choice input{
+  width:auto;
+  margin:0 8px 0 0;
+}
+.checkline{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  border:1px solid #ffffff14;
+  border-radius:14px;
+  background:#ffffff0e;
+  padding:10px;
+  margin:8px 0;
+}
+.checkline input{
+  width:auto;
+  margin:0;
+}
+.status,.notice{
+  border:1px solid #ffb14266;
+  background:#ffb14217;
+  color:#ffe7ad;
+  border-radius:16px;
+  padding:12px;
+  font-weight:850;
+  margin:10px 0;
+}
+.status.good2{
+  background:#22d3a61a;
+  border-color:#22d3a647;
+  color:#dfffee;
+}
+.status.bad2{
+  background:#ff5d6c22;
+  border-color:#ff5d6c66;
+  color:#ffd0d5;
+}
+.debug,.out,.linkBox{
+  font-family:ui-monospace,Consolas,monospace;
+  white-space:pre-wrap;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  border:1px solid #ffffff14;
+  border-radius:16px;
+  background:#0007;
+  padding:12px;
+  color:#dfffee;
+  max-height:460px;
+  overflow:auto;
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:10px;
+}
+.big{
+  font-size:26px;
+  font-weight:950;
+  color:#fff;
+  margin:0;
+}
+.fieldList{
+  display:grid;
+  gap:8px;
+}
+.fieldRow{
+  border:1px solid #ffffff18;
+  border-radius:18px;
+  background:#ffffff09;
+  padding:10px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+}
+.fieldRow b{
+  display:block;
+  color:#baf7df;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.fieldRow small{
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.fieldActions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.fullPreview{
+  border:1px solid #ffffff24;
+  border-radius:34px;
+  background:
+    radial-gradient(circle at 50% 0,#22d3a627,transparent 35%),
+    linear-gradient(135deg,#0a1020,#17112d);
+  box-shadow:0 28px 90px #0008;
+  min-height:72vh;
+  overflow:hidden;
+}
+.previewHead{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:center;
+  padding:18px;
+  border-bottom:1px solid #ffffff16;
+  background:#0b1020aa;
+}
+.previewBody{
+  padding:clamp(16px,3vw,34px);
+  display:grid;
+  grid-template-columns:minmax(280px,.72fr) minmax(320px,1.28fr);
+  gap:18px;
+  align-items:start;
+}
+.previewIntro h2{
+  font-size:clamp(42px,7vw,96px);
+  line-height:.9;
+  margin:8px 0;
+  letter-spacing:-.06em;
+}
+.previewFormPanel{
+  border:1px solid #22d3a644;
+  border-radius:28px;
+  background:#050711b8;
+  padding:18px;
+}
+.previewFoot{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  padding:16px;
+  border-top:1px solid #ffffff16;
+  background:#0b1020aa;
+}
+.addFieldRow{
+  display:grid;
+  grid-template-columns:minmax(170px,.7fr) minmax(170px,1fr) auto;
+  gap:8px;
+  align-items:end;
+}
+.lockedScreen{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:18px;
+}
+.lockedScreen .hero{
+  width:min(940px,100%);
+}
+.loading{
+  min-height:54vh;
+  display:grid;
+  place-items:center;
+  text-align:center;
+}
+@media(max-width:980px){
+  .brand,.actions{
+    flex:1 1 100%;
+  }
+  .actions{
+    justify-content:flex-start;
+  }
+  .actions .btn,.btn{
+    flex:1 1 auto;
+  }
+  .grid,.controlGrid,.previewBody,.builderLayout,.addFieldRow{
+    grid-template-columns:1fr;
+  }
+  .hero h1{
+    font-size:clamp(36px,12vw,58px);
+  }
+  .fieldRow{
+    grid-template-columns:1fr;
+  }
+  .fieldActions{
+    justify-content:flex-start;
+  }
+}
 </style>
 </head>
 <body>
-<header class="top"><div class="topInner"><div class="brand"><div class="mark">WB</div><div>Web Builder Advanced Form Builder<small>Compact overlay + image uploads - V7.12.264.15</small></div></div></div></header>
-<main class="wrap">
-<section class="hero"><span class="badge">V7.12.264.15 Image Upload + Overlay Polish</span><h1>Advanced forms can upload images to Supabase Storage</h1><p>The builder overlay now uses compact field rows. Field settings open in their own edit overlay, and image upload fields can upload PNG/JPEG/WebP files to the existing <code>stream-bandit-images</code> bucket during real submit.</p><div class="row"><span class="chip good">Compact field rows</span><span class="chip good">Edit field overlay</span><span class="chip good">Storage upload field</span><span class="chip good">Inbox save kept</span><span class="chip warn">Existing image bucket only</span><span class="chip warn">No schema change</span></div></section>
-<section class="grid"><div class="card own"><b>Now improved</b><ul class="list"><li>Field list is slim and readable</li><li>Field inputs are in edit overlay</li><li>Image upload fields are no longer locked</li></ul></div><div class="card keep"><b>Upload destination</b><ul class="list"><li>Bucket: <code>stream-bandit-images</code></li><li>Allowed: png, jpeg, webp</li><li>Uploads attach public URL to the form answer</li></ul></div><div class="card later"><b>Still locked</b><ul class="list"><li>No generic document bucket in this pass</li><li>No schema change</li><li>No hidden email sending</li></ul></div></section>
-<section class="fullPreview"><div class="previewHead"><div><span class="badge">Full-page form preview</span><b id="previewSlugLabel">landing</b></div><div class="row"><button id="openBuilderOverlay" class="btn primary" type="button">Open Builder Overlay</button><button id="openDestOverlay" class="btn blue" type="button">Destinations</button><button id="copyReport" class="btn" type="button">Copy Report</button></div></div><div class="previewBody"><aside class="previewIntro"><span class="pill good">Visitor preview</span><h2 id="previewTitle">Form / Contact</h2><p id="previewIntroText">Contact form preset.</p><div id="previewDestinationPills" class="row"></div><div class="notice">Use Builder Overlay to edit fields. Real Submit uploads selected images before saving the submission.</div></aside><section class="previewFormPanel"><div id="liveForm"></div></section></div><div class="previewFoot"><button id="localTest" class="btn primary" type="button">Run Local Test - No Write</button><button id="openEmailDraft" class="btn blue" type="button">Open Email Draft</button><button id="realSubmit" class="btn hot" type="button">Real Submit</button><button id="saveLocalQuick" class="btn warnBtn" type="button">Save Local Draft</button><button id="openInbox" class="btn" type="button">Open Owned Inbox</button></div></section>
-<section class="grid"><div class="panel"><h2>Result</h2><div id="answers" class="out">No test yet.</div></div><div class="panel"><h2>Stats</h2><div id="stats" class="stats"></div></div><div class="panel"><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></div></section>
+<header class="top">
+  <div class="topInner">
+    <div class="brand">
+      <div class="mark">WB</div>
+      <div>
+        Web Builder Form Designer
+        <small>Owner workspace form lock · V7.12.263.14</small>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Hub</a>
+      <a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Pages</a>
+      <a class="btn" href="web-builder-menu-builder-owned-v7-12-264-test.html">Menu</a>
+      <a id="previewTop" class="btn" href="web-builder-preview-owned-v7-12-257-test.html?page=landing">Preview</a>
+    </div>
+  </div>
+</header>
+
+<main id="app" class="wrap">
+  <section class="loading">
+    <div>
+      <span class="badge">Checking Web Builder form access</span>
+      <h1>Loading form designer</h1>
+      <p>The form designer stays hidden until the page owner workspace lock passes.</p>
+    </div>
+  </section>
 </main>
-<div id="builderOverlay" class="overlay" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="builderTitle"><div class="modalHead"><div><span class="badge">Builder overlay</span><h2 id="builderTitle">Edit form</h2></div><button id="closeBuilderOverlay" class="btn close" type="button">×</button></div><div class="modalBody"><div class="builderLayout"><aside class="panel"><h2>Form settings</h2><div class="controlGrid"><div class="control"><b>Page slug</b><input id="slug" value="landing"></div><div class="control"><b>Form title</b><input id="formTitleInput" value="Form / Contact"></div><div class="control"><b>Form key</b><input id="formKey" value="contact"></div><div class="control"><b>Submit button label</b><input id="submitLabel" value="Submit form"></div></div><div class="control"><b>Intro text</b><textarea id="introText">Contact form preset.</textarea></div><h3>Destinations</h3><label class="checkline"><input id="routeInbox" type="checkbox" checked> Save submission to Web Builder Inbox</label><label class="checkline"><input id="routeNotify" type="checkbox" checked> Record owner notification intent</label><label class="checkline"><input id="routeOwnerCopy" type="checkbox"> Record owner/private-message intent</label><label class="checkline"><input id="routeEmail" type="checkbox"> Open user mail app with filled form draft</label><div class="controlGrid"><div class="control"><b>Owner email destination</b><input id="ownerEmail" type="email" placeholder="owner@example.com"></div><div class="control"><b>Owner / recipient name</b><input id="ownerName" placeholder="Site owner"></div></div><div id="status" class="status">Ready.</div><div id="linkBox" class="linkBox">Waiting...</div></aside><section class="panel"><h2>Fields</h2><p>Rows stay compact. Use Edit to change label, type, placeholder, options or required state.</p><div class="addFieldRow"><div class="control"><b>Field type</b><select id="newType"><option value="short">Short text</option><option value="long">Long text</option><option value="email">Email</option><option value="phone">Phone</option><option value="url">URL</option><option value="multiple">Multiple choice</option><option value="checkboxes">Checkboxes</option><option value="dropdown">Dropdown</option><option value="date">Date picker</option><option value="number">Number</option><option value="file">Image upload</option></select></div><div class="control"><b>Label</b><input id="newLabel" placeholder="Question label"></div><button id="addField" class="btn primary" type="button">Add Field</button></div><div class="row" style="margin:10px 0"><button id="loadPage" class="btn blue" type="button">Load Saved Page Form</button><button id="contactPreset" class="btn" type="button">Contact Preset</button><button id="saveLocal" class="btn warnBtn" type="button">Save Local Draft</button><button id="savePage" class="btn hot" type="button">Save Form Block to Page</button></div><div id="fieldList" class="fieldList"></div></section></div></div><div class="modalFoot"><button id="builderDone" class="btn" type="button">Done</button></div></div></div>
-<div id="fieldOverlay" class="overlay" aria-hidden="true"><div class="modal compact" role="dialog" aria-modal="true" aria-labelledby="fieldTitle"><div class="modalHead"><div><span class="badge">Field edit overlay</span><h2 id="fieldTitle">Edit field</h2></div><button id="closeFieldOverlay" class="btn close" type="button">×</button></div><div class="modalBody"><div class="controlGrid"><div class="control"><b>Label</b><input id="editFieldLabel"></div><div class="control"><b>Type</b><select id="editFieldKind"><option value="short">Short text</option><option value="long">Long text</option><option value="email">Email</option><option value="phone">Phone</option><option value="url">URL</option><option value="multiple">Multiple choice</option><option value="checkboxes">Checkboxes</option><option value="dropdown">Dropdown</option><option value="date">Date picker</option><option value="number">Number</option><option value="file">Image upload</option></select></div><div class="control"><b>Placeholder</b><input id="editFieldPlaceholder"></div><div class="control"><b>Required</b><select id="editFieldRequired"><option value="false">No</option><option value="true">Yes</option></select></div></div><div class="control" id="editFieldOptionsWrap"><b>Options, one per line</b><textarea id="editFieldOptions"></textarea></div><div class="notice" id="editFieldNote">Image upload fields use the existing stream-bandit-images bucket and accept PNG, JPEG and WebP.</div></div><div class="modalFoot"><button id="applyFieldEdit" class="btn primary" type="button">Apply Field</button><button id="fieldEditDone" class="btn" type="button">Done</button></div></div></div>
-<div id="destOverlay" class="overlay" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="destTitle"><div class="modalHead"><div><span class="badge">Destinations</span><h2 id="destTitle">Submission destinations</h2></div><button id="closeDestOverlay" class="btn close" type="button">×</button></div><div class="modalBody"><div id="destSummary" class="destinationGrid"></div><div class="notice">Email opens the user's mail app only. Inbox save writes to Supabase when Real Submit is used.</div></div><div class="modalFoot"><button id="destClose2" class="btn" type="button">Done</button></div></div></div>
-<script src="web-builder-global-projector-v7-12-263.js?v=7-12-264-15-form-designer-upload-polish"></script>
+
 <script>
-(function(){'use strict';
-const VERSION='V7.12.264.15 Web Builder Form Builder Image Upload + Compact Overlay';
+(function(){
+'use strict';
+
+const VERSION='V7.12.263.14 Web Builder Form Designer Owner Workspace Lock';
 const URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
-const BUCKET='stream-bandit-images';
-const allowedTypes=['image/png','image/jpeg','image/webp'];
-const ownedInbox='web-builder-form-inbox-owned-v7-12-258-test.html';
-let sb=null,user=null,profile=null,isAdmin=false,page=null,fields=[],editIndex=-1,lastError='',lastSubmit=null,lastEmailDraft=null,lastMailtoHref='',lastUploads=[],readCount=0,pageWrites=0,submissionWrites=0,localTests=0,emailDraftOpens=0,storageUploads=0,builderOverlayOpen=false,destinationOverlayOpen=false,fieldOverlayOpen=false;
-const $=id=>document.getElementById(id);
-function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]||m));}
-function sl(v){return String(v||'landing').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'landing';}
-function uid(){return 'f_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);}
-function client(){if(sb)return sb;sb=window.supabase.createClient(URL,KEY);return sb;}
-async function auth(){try{let r=await client().auth.getUser();user=r.data&&r.data.user||null;profile=null;isAdmin=false;if(user){let p=await client().from('sb_profiles').select('id,role,display_name,username').eq('id',user.id).maybeSingle();profile=p.data||null;isAdmin=!!(profile&&String(profile.role).toLowerCase()==='admin');}}catch(e){user=null;profile=null;isAdmin=false;}}
-function currentSlug(){return sl($('slug').value);}
-function defaultOptions(){return 'Option 1\nOption 2\nOption 3';}
-function typeName(t){return ({short:'Short text',long:'Long text',email:'Email',phone:'Phone',url:'URL',multiple:'Multiple choice',checkboxes:'Checkboxes',dropdown:'Dropdown',date:'Date picker',number:'Number',file:'Image upload'}[t]||'Field');}
-function placeholder(t){return ({short:'Your answer',long:'Write your answer',email:'name@email.com',phone:'Phone number',url:'https://example.com',date:'',number:'0',file:''}[t]||'');}
-function needsOptions(t){return ['multiple','checkboxes','dropdown'].includes(t);}
-function contactFields(){return [{id:uid(),label:'Pick a mix',kind:'multiple',placeholder:'',options:'1\n2\n3\n4\n5',required:true},{id:uid(),label:'Your email',kind:'email',placeholder:'name@email.com',options:'',required:true},{id:uid(),label:'Long text',kind:'long',placeholder:'Whats one saying',options:'',required:true}];}
-function setContact(){fields=contactFields();$('formTitleInput').value='Form / Contact';$('formKey').value='contact';$('introText').value='Contact form preset.';$('submitLabel').value='Submit form';renderAll('Contact preset loaded.');}
-function fieldObj(type,label){return {id:uid(),label:label||typeName(type),kind:type,placeholder:placeholder(type),options:(needsOptions(type)?defaultOptions():''),required:false};}
-function routing(){return {save_to_inbox:$('routeInbox').checked,owner_notification_intent:$('routeNotify').checked,owner_message_copy_intent:$('routeOwnerCopy').checked,email_destination_requested:$('routeEmail').checked,owner_email:$('ownerEmail').value.trim()||null,owner_name:$('ownerName').value.trim()||null,external_email_sent:false,message_delivered:false,note:'Email opens user mail app with a draft. Image upload fields save to Supabase Storage during real submit.'};}
-function formBlock(){return {id:'owned-form-'+currentSlug(),type:'form',title:$('formTitleInput').value.trim()||'Form / Contact',text:$('introText').value.trim(),formKey:sl($('formKey').value||'contact'),submitButtonText:$('submitLabel').value.trim()||'Submit form',routing:routing(),storage:{bucket:BUCKET,allowed_mime_types:allowedTypes},items:fields.map(f=>({id:f.id,label:f.label,kind:f.kind,placeholder:f.placeholder,options:f.options,required:!!f.required,storage_bucket:f.kind==='file'?BUCKET:null,accept:f.kind==='file'?'image/png,image/jpeg,image/webp':''}))};}
-function renderFieldList(){
-  $('fieldList').innerHTML=fields.length?fields.map((f,i)=>'<article class="fieldRow" data-i="'+i+'"><div><b>'+esc(f.label||typeName(f.kind))+'</b><small>'+esc(typeName(f.kind))+' · '+(f.required?'required':'optional')+(f.kind==='file'?' · uploads to '+BUCKET:'')+'</small></div><div class="fieldActions"><button class="smallBtn primary" data-act="edit" type="button">Edit</button><button class="smallBtn" data-act="up" type="button">Up</button><button class="smallBtn" data-act="down" type="button">Down</button><button class="smallBtn badBtn" data-act="remove" type="button">Remove</button></div></article>').join(''):'<div class="notice">No fields yet. Add a field or load the Contact preset.</div>';
-  $('fieldList').querySelectorAll('.fieldRow').forEach(card=>{let i=Number(card.dataset.i);card.querySelectorAll('[data-act]').forEach(btn=>btn.onclick=()=>{let a=btn.dataset.act;if(a==='edit')openFieldOverlay(i);if(a==='remove')fields.splice(i,1);if(a==='up'&&i>0)[fields[i-1],fields[i]]=[fields[i],fields[i-1]];if(a==='down'&&i<fields.length-1)[fields[i+1],fields[i]]=[fields[i],fields[i+1]];if(a!=='edit')renderAll('Field list changed.');});});
+const OWNER_SLUGS=['landing','home','home-page'];
+
+const RANK={
+  free_viewer:0,
+  viewer_plus:1,
+  creator_starter:2,
+  creator_growth:3,
+  creator_pro:4,
+  studio_business:5,
+  platform_owner:6,
+  enterprise:7
+};
+
+let sb=null;
+let user=null;
+let profile=null;
+let page=null;
+let pageOwnerId='';
+let fields=[];
+let lastError='';
+let lastSubmit=null;
+let lastEmailDraft=null;
+let readCount=0;
+let pageWrites=0;
+let submissionWrites=0;
+let localTests=0;
+let emailDraftOpens=0;
+let storageUploads=0;
+let lastAction='boot';
+let redirectTo='';
+let redirectSlug='';
+
+let authState={
+  version:VERSION,
+  route:'web-builder-form-designer-owned-v7-12-258-test.html',
+  checked:false,
+  allowed:false,
+  signedIn:false,
+  email:'',
+  userId:'',
+  role:'',
+  adminLevel:'',
+  planKey:'',
+  accountStatus:'',
+  isPlatformOwner:false,
+  canUseBuilder:false,
+  workspace:'',
+  lockClass:'form-designer-page-owner-lock',
+  reason:'Checking...',
+  supabaseReads:false,
+  supabaseWrites:false,
+  storageWrites:false,
+  storageActions:false,
+  schemaChanges:false,
+  builderTableChanges:false,
+  streamBanditShellChanges:false,
+  activeMenuPromotion:false,
+  indexPromotion:false,
+  registryPromotion:true
+};
+
+const $=function(id){return document.getElementById(id);};
+
+function app(){
+  return $('app');
 }
-function openFieldOverlay(i){let f=fields[i];if(!f)return;editIndex=i;$('fieldTitle').textContent='Edit: '+(f.label||typeName(f.kind));$('editFieldLabel').value=f.label||'';$('editFieldKind').value=f.kind||'short';$('editFieldPlaceholder').value=f.placeholder||'';$('editFieldRequired').value=f.required?'true':'false';$('editFieldOptions').value=f.options||'';updateFieldOverlayUi();$('fieldOverlay').classList.add('open');$('fieldOverlay').setAttribute('aria-hidden','false');fieldOverlayOpen=true;setTimeout(()=>$('editFieldLabel').focus(),40);debug('field overlay opened');}
-function closeFieldOverlay(){$('fieldOverlay').classList.remove('open');$('fieldOverlay').setAttribute('aria-hidden','true');fieldOverlayOpen=false;editIndex=-1;debug('field overlay closed');}
-function updateFieldOverlayUi(){let k=$('editFieldKind').value;$('editFieldOptionsWrap').style.display=needsOptions(k)?'block':'none';$('editFieldNote').textContent=k==='file'?'Image upload fields use stream-bandit-images and accept PNG, JPEG and WebP. Real Submit uploads the image before saving to the inbox.':'Field settings are stored inside the form block.';}
-function applyFieldEdit(){if(editIndex<0||!fields[editIndex])return;let k=$('editFieldKind').value;fields[editIndex]={id:fields[editIndex].id||uid(),label:$('editFieldLabel').value.trim()||typeName(k),kind:k,placeholder:$('editFieldPlaceholder').value,options:needsOptions(k)?$('editFieldOptions').value:'',required:$('editFieldRequired').value==='true'};renderAll('Field updated.');closeFieldOverlay();}
-function optLines(f){return String(f.options||'').split(/\n|,/).map(x=>x.trim()).filter(Boolean);}
-function liveField(f,i){let n='q'+i,lab='<b>'+esc(f.label)+'</b> '+(f.required?'<span class="pill warn">required</span>':'');if(f.kind==='multiple')return '<div class="question">'+lab+optLines(f).map(o=>'<label class="choice"><input type="radio" name="'+n+'" value="'+esc(o)+'"> '+esc(o)+'</label>').join('')+'</div>';if(f.kind==='checkboxes')return '<div class="question">'+lab+optLines(f).map(o=>'<label class="choice"><input type="checkbox" name="'+n+'" value="'+esc(o)+'"> '+esc(o)+'</label>').join('')+'</div>';if(f.kind==='dropdown')return '<div class="question">'+lab+'<select name="'+n+'"><option value="">Choose...</option>'+optLines(f).map(o=>'<option value="'+esc(o)+'">'+esc(o)+'</option>').join('')+'</select></div>';if(f.kind==='long')return '<div class="question">'+lab+'<textarea name="'+n+'" placeholder="'+esc(f.placeholder||'')+'"></textarea></div>';if(f.kind==='file')return '<div class="question">'+lab+'<input name="'+n+'" type="file" accept="image/png,image/jpeg,image/webp"><small>Uploads PNG/JPEG/WebP to '+BUCKET+' on Real Submit.</small></div>';let type={email:'email',phone:'tel',url:'url',date:'date',number:'number'}[f.kind]||'text';return '<div class="question">'+lab+'<input name="'+n+'" type="'+type+'" placeholder="'+esc(f.placeholder||'')+'"></div>';}
-function renderLive(){let b=formBlock(),r=routing();$('previewTitle').textContent=b.title;$('previewIntroText').textContent=b.text||'Complete this form.';$('previewSlugLabel').textContent=currentSlug();$('previewDestinationPills').innerHTML=(r.save_to_inbox?'<span class="pill good">Inbox</span>':'')+(r.email_destination_requested?'<span class="pill good">Email draft</span>':'')+(r.owner_message_copy_intent?'<span class="pill warn">Private message intent</span>':'')+(fields.some(f=>f.kind==='file')?'<span class="pill good">Image upload</span>':'')+'<span class="pill">'+fields.length+' fields</span>';$('liveForm').innerHTML='<form id="previewTestForm">'+fields.map(liveField).join('')+'</form>';renderDestinationSummary();}
-function renderDestinationSummary(){let r=routing();$('destSummary').innerHTML='<article class="overlayCard"><b>Inbox</b><p>'+(r.save_to_inbox?'Submission saves to Web Builder Inbox.':'Inbox saving is off.')+'</p><span class="pill '+(r.save_to_inbox?'good':'warn')+'">'+(r.save_to_inbox?'selected':'off')+'</span></article><article class="overlayCard"><b>Email draft</b><p>'+(r.email_destination_requested?'Opens user mail app to '+esc(r.owner_email||'missing email')+'.':'Email draft is off.')+'</p><span class="pill '+(r.email_destination_requested?'good':'warn')+'">'+(r.email_destination_requested?'selected':'off')+'</span></article><article class="overlayCard"><b>Image uploads</b><p>'+(fields.some(f=>f.kind==='file')?'Real Submit uploads selected images to '+BUCKET+'.':'No image upload field currently.')+'</p><span class="pill '+(fields.some(f=>f.kind==='file')?'good':'warn')+'">'+(fields.some(f=>f.kind==='file')?'enabled':'off')+'</span></article><article class="overlayCard"><b>Owner</b><p>'+esc(r.owner_name||'No owner name')+'<br>'+esc(r.owner_email||'No owner email')+'</p></article>';}
-function safeFileName(name){return String(name||'upload').toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'')||'upload';}
-async function uploadFormFile(file,f,i){if(!file)return null;if(!allowedTypes.includes(file.type))throw new Error('Upload blocked: '+file.name+' is '+(file.type||'unknown')+'. Allowed: PNG, JPEG, WebP.');if(file.size>50*1024*1024)throw new Error('Upload blocked: '+file.name+' is over 50MB.');await auth();if(!user)throw new Error('Sign in required before uploading images.');let path='web-builder-forms/'+currentSlug()+'/'+Date.now()+'-'+i+'-'+safeFileName(file.name);let res=await client().storage.from(BUCKET).upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});if(res.error)throw res.error;let pub=client().storage.from(BUCKET).getPublicUrl(path);storageUploads++;let meta={bucket:BUCKET,path:path,publicUrl:pub&&pub.data&&pub.data.publicUrl||'',name:file.name,type:file.type,size:file.size,field:f.label,uploaded_at:new Date().toISOString()};lastUploads.push(meta);return meta;}
-async function collect(opts){opts=opts||{};let root=$('liveForm'),answers={},missing=[],email='';for(let i=0;i<fields.length;i++){let f=fields[i],n='q'+i,els=[...root.querySelectorAll('[name='+n+']')],value='',values=[],upload=null;if(f.kind==='file'){let input=els[0],file=input&&input.files&&input.files[0];if(file){if(opts.uploadFiles){upload=await uploadFormFile(file,f,i);value=upload.publicUrl||upload.path;}else{value=file.name;upload={name:file.name,type:file.type,size:file.size,not_uploaded:true};}}}else if(els.length&&els[0].type==='checkbox'){values=els.filter(e=>e.checked).map(e=>e.value);value=values.join(', ');}else if(els.length&&els[0].type==='radio'){let e=els.find(x=>x.checked);value=e?e.value:'';}else if(els[0])value=String(els[0].value||'').trim();if(f.required&&!value)missing.push(f.label);if(!email&&String(value).includes('@'))email=String(value).trim();answers[f.label]={type:f.kind,answer:value,values:values,required:!!f.required,upload:upload};}if(missing.length)throw new Error('Required answers missing: '+missing.join(', '));return {answers,email};}
-function payload(c){let b=formBlock();let answers=Object.assign({},c.answers,{__routing:b.routing,__uploads:lastUploads,__form:{page_slug:currentSlug(),form_key:b.formKey,preset_title:b.title,source:'advanced-owned-form-builder-v7-12-264-15-upload-polish'}});return {page_slug:currentSlug(),form_title:b.title,form_key:b.formKey,block_id:b.id,block_title:b.title,answers_json:answers,submitter_id:user?user.id:null,submitter_email:c.email||null,status:'new'};}
-function emailBody(p){let lines=['New form submission','','Form: '+p.form_title,'Page: '+p.page_slug,'Submitter email: '+(p.submitter_email||'not supplied'),'','Answers:'];Object.keys(p.answers_json).filter(k=>!k.startsWith('__')).forEach(k=>{let v=p.answers_json[k];lines.push('- '+k+': '+((v&&typeof v==='object')?v.answer:v));});return lines.join('\r\n');}
-function cleanMailToAddress(to){return String(to||'').split(/[;,]+/).map(x=>x.trim()).filter(Boolean).join(',');}
-function mailtoForPayload(p){let to=cleanMailToAddress(routing().owner_email||'');let subject='Form submission: '+p.form_title+' / '+p.page_slug;return 'mailto:'+to+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(emailBody(p));}
-function launchMailto(href){let a=document.createElement('a');a.href=href;a.target='_self';a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>{try{a.remove();}catch(e){}},1000);}
-async function copyEmailBody(text){try{if(navigator.clipboard)await navigator.clipboard.writeText(text);}catch(e){}}
-async function openEmailDraftFromPayload(p){let r=routing();if(!r.email_destination_requested)throw new Error('Email destination is not selected.');if(!cleanMailToAddress(r.owner_email))throw new Error('Owner email destination is missing.');let body=emailBody(p),mailto=mailtoForPayload(p);lastMailtoHref=mailto;lastEmailDraft={to:cleanMailToAddress(r.owner_email),subject:'Form submission: '+p.form_title+' / '+p.page_slug,bodyPreview:body,hrefPreview:mailto.slice(0,300),at:new Date().toISOString(),opened:true};emailDraftOpens++;$('answers').textContent='EMAIL DRAFT REQUESTED\n\nThe mail body was also copied as a fallback.\n\n'+body;await copyEmailBody(body);setStatus('Opening mail draft with subject/body. If your mail app blocks body text, paste from clipboard.','good2');renderStats();debug('email draft requested');launchMailto(mailto);}
-async function openEmailDraft(){try{lastUploads=[];let p=payload(await collect({uploadFiles:false}));await openEmailDraftFromPayload(p);}catch(e){lastError=e.message||String(e);$('answers').textContent='Email draft failed:\n'+lastError;setStatus(lastError,'bad2');debug('email draft failed');}}
-async function localTest(){try{lastUploads=[];let p=payload(await collect({uploadFiles:false}));localTests++;$('answers').textContent='LOCAL TEST ONLY - no Supabase or Storage write.\n\n'+JSON.stringify(p,null,2);setStatus('Local test passed from full preview.','good2');renderStats();debug('local test');}catch(e){lastError=e.message||String(e);$('answers').textContent='Local test failed:\n'+lastError;setStatus(lastError,'bad2');debug('local failed');}}
-async function realSubmit(){try{await auth();lastUploads=[];let p=payload(await collect({uploadFiles:true})),r=p.answers_json.__routing;if(!r.save_to_inbox&&!r.email_destination_requested&&!r.owner_message_copy_intent)throw new Error('Choose at least one destination.');if(r.save_to_inbox){let res=await client().from('sb_form_submissions').insert(p).select('*').maybeSingle();submissionWrites++;if(res.error)throw res.error;lastSubmit=res.data||p;}$('answers').textContent='REAL SUBMIT RESULT\n\n'+JSON.stringify({savedToInbox:!!r.save_to_inbox,submission:lastSubmit,emailDraftRequested:!!r.email_destination_requested,privateMessageIntent:!!r.owner_message_copy_intent,uploads:lastUploads},null,2);setStatus('Submit processed. Uploads and inbox saved if selected.','good2');renderStats();debug('real submit');if(r.email_destination_requested)await openEmailDraftFromPayload(p);}catch(e){lastError=e.message||String(e);$('answers').textContent='Real submit failed:\n'+lastError;setStatus('Real submit failed: '+lastError,'bad2');debug('real failed');}}
-async function loadPage(){try{await auth();let s=currentSlug();$('slug').value=s;setStatus('Loading '+s+' from sb_site_pages...');let r=await client().from('sb_site_pages').select('*').eq('slug',s).maybeSingle();readCount++;if(r.error)throw r.error;page=r.data||null;if(!page){setContact();setStatus('No page found. Contact preset loaded locally.','bad2');return;}let blocks=Array.isArray(page.layout_json)?page.layout_json:[];let fb=blocks.find(b=>String(b.type||b.kind||'').toLowerCase().includes('form'));if(!fb){setContact();setStatus('Page loaded, no form block. Contact preset loaded locally.','good2');return;}$('formTitleInput').value=fb.title||'Form / Contact';$('introText').value=fb.text||fb.body||'';$('formKey').value=fb.formKey||fb.form_key||'contact';$('submitLabel').value=fb.submitButtonText||fb.submit_button_text||'Submit form';let rt=fb.routing||{};$('routeInbox').checked=rt.save_to_inbox!==false;$('routeNotify').checked=rt.owner_notification_intent!==false;$('routeOwnerCopy').checked=!!rt.owner_message_copy_intent;$('routeEmail').checked=!!rt.email_destination_requested;$('ownerEmail').value=rt.owner_email||'';$('ownerName').value=rt.owner_name||'';fields=(Array.isArray(fb.items)?fb.items:[]).map(x=>({id:x.id||uid(),label:x.label||'Field',kind:x.kind||x.type||'short',placeholder:x.placeholder||'',options:x.options||'',required:!!x.required}));renderAll('Saved form loaded.');}catch(e){lastError=e.message||String(e);setContact();setStatus('Load failed, Contact preset loaded: '+lastError,'bad2');debug('load failed');}}
-async function savePage(){try{await auth();if(!user)throw new Error('You must be signed in first.');if(!isAdmin)throw new Error('Only admin accounts can save form blocks.');let s=currentSlug();setStatus('Saving form block to '+s+'...');let r=await client().from('sb_site_pages').select('*').eq('slug',s).maybeSingle();readCount++;if(r.error)throw r.error;if(!r.data)throw new Error('No sb_site_pages row exists for '+s+'. Create/save the page first.');page=r.data;let blocks=Array.isArray(page.layout_json)?page.layout_json.slice():[];let b=formBlock();let idx=blocks.findIndex(x=>String(x.type||x.kind||'').toLowerCase().includes('form'));if(idx>=0)blocks[idx]=b;else blocks.push(b);let ur=await client().from('sb_site_pages').update({layout_json:blocks}).eq('slug',s).select('*').maybeSingle();pageWrites++;if(ur.error)throw ur.error;page=ur.data||page;setStatus('Form block saved to page layout_json.','good2');debug('page saved');}catch(e){lastError=e.message||String(e);setStatus('Save failed: '+lastError,'bad2');debug('save failed');}}
-function saveLocal(){let data={slug:currentSlug(),formBlock:formBlock(),at:new Date().toISOString()};localStorage.setItem('wb_advanced_form_builder_v7_12_264_15_'+currentSlug(),JSON.stringify(data));$('answers').textContent='Local draft saved.\n\n'+JSON.stringify(data,null,2);setStatus('Local draft saved, no Supabase write.','good2');debug('local saved');}
-function openBuilderOverlay(){renderFieldList();$('builderOverlay').classList.add('open');$('builderOverlay').setAttribute('aria-hidden','false');builderOverlayOpen=true;setTimeout(()=>{$('formTitleInput').focus();},40);debug('builder overlay opened');}
-function closeBuilderOverlay(){$('builderOverlay').classList.remove('open');$('builderOverlay').setAttribute('aria-hidden','true');builderOverlayOpen=false;debug('builder overlay closed');}
-function openDestOverlay(){renderDestinationSummary();$('destOverlay').classList.add('open');$('destOverlay').setAttribute('aria-hidden','false');destinationOverlayOpen=true;debug('destination overlay opened');}
-function closeDestOverlay(){$('destOverlay').classList.remove('open');$('destOverlay').setAttribute('aria-hidden','true');destinationOverlayOpen=false;debug('destination overlay closed');}
-function setStatus(t,k){$('status').textContent=t;$('status').className='status '+(k||'');}
-function renderLinks(){let s=encodeURIComponent(currentSlug());$('linkBox').textContent='Owned Inbox: '+ownedInbox+'?page='+s+'\nOwned Preview: web-builder-preview-owned-v7-12-257-test.html?page='+s+'\nBucket: '+BUCKET+'\nAllowed uploads: PNG, JPEG, WebP';}
-function renderStats(){$('stats').innerHTML='<div class="card"><b>Fields</b><p class="big">'+fields.length+'</p></div><div class="card"><b>Local tests</b><p class="big">'+localTests+'</p></div><div class="card"><b>Page writes</b><p class="big">'+pageWrites+'</p></div><div class="card"><b>Submission writes</b><p class="big">'+submissionWrites+'</p></div><div class="card"><b>Storage uploads</b><p class="big">'+storageUploads+'</p></div>'}
-function state(step){return {version:VERSION,canonicalRoute:'web-builder-form-designer-owned-v7-12-258-test.html',builderOverlay:true,compactFieldRows:true,fieldEditOverlay:true,formPreviewFullScreen:true,destinationChooserOverlay:true,builderOverlayOpen,destinationOverlayOpen,fieldOverlayOpen,imageUploadEnabled:true,storageBucket:BUCKET,allowedMimeTypes:allowedTypes,storageUploads,storageWrites:storageUploads>0,lastUploads,mailtoDraftHelper:true,emailSendsSilently:false,advancedFormBuilderBuilt:true,inputFocusFix:true,customFieldBuilder:true,fieldTypes:['short','long','email','phone','url','multiple','checkboxes','dropdown','date','number','file_image_upload'],destinations:{inbox:true,emailMailtoDraft:true,ownerNotificationIntent:true,ownerMessageCopyIntent:true,externalEmailSend:false,messageDelivery:false},webBuilderShellOnly:true,readsSitePages:true,readCount,pageLayoutWrites:pageWrites,submissionWrites,emailDraftOpens,supabaseWrites:(pageWrites+submissionWrites)>0,schemaChanges:false,builderTableChanges:false,slug:currentSlug(),fields:fields.length,routing:routing(),authUser:user?{id:user.id,email:user.email}:null,profile:profile?{id:profile.id,role:profile.role}:null,isAdmin,lastSubmit:lastSubmit?{id:lastSubmit.id,page_slug:lastSubmit.page_slug,status:lastSubmit.status}:null,lastEmailDraft,lastMailtoHrefPreview:lastMailtoHref?lastMailtoHref.slice(0,300):'',lastError,lastStep:step||null};}
-function debug(step){$('debug').textContent=JSON.stringify(state(step),null,2);}
-function renderAll(msg){renderFieldList();renderLive();renderLinks();renderStats();if(msg)setStatus(msg,'good2');debug(msg||'render');}
-function renderSoft(step){renderLive();renderLinks();renderStats();debug(step||'soft render no editor rebuild');}
-function copy(){navigator.clipboard&&navigator.clipboard.writeText(JSON.stringify(state('copy report'),null,2)).catch(()=>{});}
-function boot(){try{let p=new URL(location.href).searchParams.get('page');if(p)$('slug').value=p;}catch(e){}$('addField').onclick=()=>{fields.push(fieldObj($('newType').value,$('newLabel').value.trim()));$('newLabel').value='';renderAll('Field added.');};$('loadPage').onclick=loadPage;$('contactPreset').onclick=()=>setContact();$('saveLocal').onclick=saveLocal;$('saveLocalQuick').onclick=saveLocal;$('savePage').onclick=savePage;$('copyReport').onclick=copy;$('openBuilderOverlay').onclick=openBuilderOverlay;$('openDestOverlay').onclick=openDestOverlay;$('openInbox').onclick=()=>{location.href=ownedInbox+'?page='+encodeURIComponent(currentSlug());};$('closeBuilderOverlay').onclick=closeBuilderOverlay;$('builderDone').onclick=closeBuilderOverlay;$('closeDestOverlay').onclick=closeDestOverlay;$('destClose2').onclick=closeDestOverlay;$('localTest').onclick=()=>localTest();$('realSubmit').onclick=()=>realSubmit();$('openEmailDraft').onclick=()=>openEmailDraft();$('closeFieldOverlay').onclick=closeFieldOverlay;$('fieldEditDone').onclick=closeFieldOverlay;$('applyFieldEdit').onclick=applyFieldEdit;$('editFieldKind').onchange=updateFieldOverlayUi;['formTitleInput','formKey','introText','submitLabel','ownerEmail','ownerName'].forEach(id=>$(id).addEventListener('input',()=>renderSoft('typed without focus loss')));['slug','routeInbox','routeNotify','routeOwnerCopy','routeEmail'].forEach(id=>$(id).addEventListener('input',()=>renderSoft('setting changed without editor rebuild')));document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeFieldOverlay();closeBuilderOverlay();closeDestOverlay();}});setContact();loadPage();}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+
+function esc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,function(m){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]||m;
+  });
+}
+
+function obj(v){
+  if(v&&typeof v==='object')return v;
+
+  if(typeof v==='string'&&v.trim()){
+    try{return JSON.parse(v)||{};}catch(e){}
+  }
+
+  return {};
+}
+
+function arr(v){
+  if(Array.isArray(v))return v;
+
+  if(v&&typeof v==='object'){
+    if(Array.isArray(v.blocks))return v.blocks;
+    if(Array.isArray(v.sections))return v.sections;
+    if(Array.isArray(v.items))return v.items;
+    return [];
+  }
+
+  if(typeof v==='string'&&v.trim()){
+    try{
+      let j=JSON.parse(v);
+
+      if(Array.isArray(j))return j;
+
+      if(j&&typeof j==='object'){
+        if(Array.isArray(j.blocks))return j.blocks;
+        if(Array.isArray(j.sections))return j.sections;
+        if(Array.isArray(j.items))return j.items;
+      }
+    }catch(e){}
+
+    return v.split(/\n|,/).map(function(x){return x.trim();}).filter(Boolean);
+  }
+
+  return [];
+}
+
+function truth(v){
+  if(v===true||v===1)return true;
+
+  if(typeof v==='string'){
+    return ['true','1','yes','on','enabled','allow','allowed'].indexOf(v.toLowerCase())>-1;
+  }
+
+  return false;
+}
+
+function rank(k){
+  return RANK[String(k||'free_viewer')]||0;
+}
+
+function client(){
+  if(sb)return sb;
+  if(!window.supabase||!window.supabase.createClient)throw new Error('Supabase SDK not loaded');
+  sb=window.supabase.createClient(URL,KEY);
+  return sb;
+}
+
+function timeout(ms,label){
+  return new Promise(function(resolve,reject){
+    setTimeout(function(){reject(new Error(label||'Timed out'));},ms);
+  });
+}
+
+async function withTimeout(promise,ms,label){
+  return Promise.race([promise,timeout(ms,label)]);
+}
+
+function isPlatformOwnerProfile(p){
+  return !!p&&(p.admin_level==='owner'||p.admin_level==='platform_owner'||p.plan_key==='platform_owner');
+}
+
+function statusAllowed(p){
+  let s=String(p&&p.account_status||'active').toLowerCase();
+  return isPlatformOwnerProfile(p)||s==='active';
+}
+
+function builderAllowed(p){
+  if(!p)return false;
+  if(isPlatformOwnerProfile(p))return true;
+  if(!statusAllowed(p))return false;
+
+  let ps=obj(p.permissions_json);
+
+  return rank(p.plan_key)>=rank('creator_growth')||
+    truth(ps.web_builder)||
+    truth(ps.web_builder_starter)||
+    truth(ps.pages_manager)||
+    truth(ps.web_builder_studio);
+}
+
+function sl(v){
+  return String(v||'landing')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9_-]+/g,'-')
+    .replace(/^-+|-+$/g,'')||'landing';
+}
+
+function requestedSlug(){
+  try{
+    let u=new URL(location.href);
+    return sl(u.searchParams.get('page')||'landing');
+  }catch(e){
+    return 'landing';
+  }
+}
+
+function currentSlug(){
+  let input=$('slug');
+
+  if(input)return sl(input.value);
+
+  return requestedSlug();
+}
+
+function isReservedSlug(slug){
+  return OWNER_SLUGS.indexOf(sl(slug))>-1;
+}
+
+function settings(row){
+  return obj(row&&row.settings_json);
+}
+
+function getBlocks(row){
+  row=row||{};
+
+  let candidates=[
+    row.layout_json,
+    row.blocks,
+    row.content_json,
+    row.page_json,
+    row.sections,
+    settings(row).blocks,
+    settings(row).sections,
+    settings(row).content_blocks,
+    settings(row).contentBlocks
+  ];
+
+  for(let i=0;i<candidates.length;i++){
+    let a=arr(candidates[i]);
+    if(a.length)return a;
+  }
+
+  return [];
+}
+
+function isFormBlock(b){
+  b=obj(b);
+
+  let t=String(b.type||b.block_type||b.kind||'').toLowerCase();
+  let title=String(b.title||b.heading||b.name||'').toLowerCase();
+
+  return t.indexOf('form')>-1||
+    t.indexOf('contact')>-1||
+    title.indexOf('form')>-1||
+    title.indexOf('contact')>-1||
+    b.formKey||
+    b.form_key||
+    b.submitButtonText||
+    b.submit_button_text;
+}
+
+function pageUrl(path,slug){
+  return path+'?page='+encodeURIComponent(sl(slug||currentSlug()));
+}
+
+function links(){
+  let s=currentSlug();
+
+  return {
+    slug:s,
+    hub:'web-builder-account-control-hub-v7-12-263-test.html',
+    pages:'web-builder-pages-manager-owned-v7-12-256-test.html',
+    studio:pageUrl('overlay-route-truth-machine-v7-12-66-test.html',s),
+    preview:pageUrl('web-builder-preview-owned-v7-12-257-test.html',s),
+    menu:'web-builder-menu-builder-owned-v7-12-264-test.html',
+    inbox:pageUrl('web-builder-form-inbox-owned-v7-12-258-test.html',s)
+  };
+}
+
+function uid(){
+  return 'f_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+}
+
+function defaultOptions(){
+  return 'Option 1\nOption 2\nOption 3';
+}
+
+function typeName(t){
+  return ({
+    short:'Short text',
+    long:'Long text',
+    email:'Email',
+    phone:'Phone',
+    url:'URL',
+    multiple:'Multiple choice',
+    checkboxes:'Checkboxes',
+    dropdown:'Dropdown',
+    date:'Date picker',
+    number:'Number',
+    file:'Image/file URL'
+  }[t]||'Field');
+}
+
+function placeholder(t){
+  return ({
+    short:'Your answer',
+    long:'Write your answer',
+    email:'name@email.com',
+    phone:'Phone number',
+    url:'https://example.com',
+    date:'',
+    number:'0',
+    file:'Paste public image URL or file note'
+  }[t]||'');
+}
+
+function needsOptions(t){
+  return ['multiple','checkboxes','dropdown'].indexOf(t)>-1;
+}
+
+function fieldObj(type,label){
+  return {
+    id:uid(),
+    label:label||typeName(type),
+    kind:type,
+    placeholder:placeholder(type),
+    options:needsOptions(type)?defaultOptions():'',
+    required:false
+  };
+}
+
+function contactFields(){
+  return [
+    {id:uid(),label:'Your email',kind:'email',placeholder:'name@email.com',options:'',required:true},
+    {id:uid(),label:'What can we help with?',kind:'multiple',placeholder:'',options:'General question\nBooking\nSupport\nOther',required:true},
+    {id:uid(),label:'Message',kind:'long',placeholder:'Write your message',options:'',required:true}
+  ];
+}
+
+function routing(){
+  return {
+    save_to_inbox:$('routeInbox').checked,
+    owner_notification_intent:$('routeNotify').checked,
+    owner_message_copy_intent:$('routeOwnerCopy').checked,
+    email_destination_requested:$('routeEmail').checked,
+    owner_email:$('ownerEmail').value.trim()||null,
+    owner_name:$('ownerName').value.trim()||null,
+    external_email_sent:false,
+    message_delivered:false,
+    note:'Email opens the user mail app only. Storage uploads are paused in this owner-lock pass.'
+  };
+}
+
+function formBlock(){
+  return {
+    id:'owned-form-'+currentSlug(),
+    type:'form',
+    title:$('formTitleInput').value.trim()||'Form / Contact',
+    text:$('introText').value.trim(),
+    formKey:sl($('formKey').value||'contact'),
+    submitButtonText:$('submitLabel').value.trim()||'Submit form',
+    routing:routing(),
+    storage:{
+      uploads_paused_for_lock_pass:true,
+      note:'No Supabase Storage upload is triggered by this locked form designer version.'
+    },
+    items:fields.map(function(f){
+      return {
+        id:f.id,
+        label:f.label,
+        kind:f.kind,
+        placeholder:f.placeholder,
+        options:f.options,
+        required:!!f.required,
+        storage_upload:false,
+        accept:f.kind==='file'?'public URL or note only':''
+      };
+    })
+  };
+}
+
+function setStatus(msg,kind){
+  let el=$('status');
+
+  if(!el)return;
+
+  el.textContent=msg;
+  el.className='status '+(kind||'');
+}
+
+async function readAuthority(){
+  let c=client();
+  let foundUser=null;
+
+  let gu=await withTimeout(c.auth.getUser(),8000,'Supabase auth check timed out');
+  if(gu&&gu.data&&gu.data.user)foundUser=gu.data.user;
+
+  if(!foundUser){
+    let gs=await withTimeout(c.auth.getSession(),8000,'Supabase session check timed out');
+    if(gs&&gs.data&&gs.data.session&&gs.data.session.user)foundUser=gs.data.session.user;
+  }
+
+  if(!foundUser){
+    return {signedIn:false,user:null,profile:null};
+  }
+
+  let pr=await withTimeout(
+    c.from('sb_profiles')
+      .select('id,username,display_name,role,admin_level,plan_key,permissions_json,account_status')
+      .eq('id',foundUser.id)
+      .maybeSingle(),
+    10000,
+    'Profile read timed out'
+  );
+
+  readCount++;
+  authState.supabaseReads=true;
+
+  if(pr.error)throw pr.error;
+
+  return {
+    signedIn:true,
+    user:foundUser,
+    profile:pr.data||null
+  };
+}
+
+function rowSort(row){
+  let s=settings(row);
+  let n=Number(s.sort_order!=null?s.sort_order:s.sortOrder!=null?s.sortOrder:s.menu_order!=null?s.menu_order:999);
+  return Number.isFinite(n)?n:999;
+}
+
+function rowIsHome(row){
+  let s=settings(row);
+  let slug=sl(row&&row.slug);
+
+  return truth(s.is_home_page)||truth(s.isHomePage)||slug==='home'||slug==='home-page';
+}
+
+async function firstOwnedSlug(){
+  let r=await withTimeout(
+    client()
+      .from('sb_site_pages')
+      .select('id,slug,title,status,owner_id,settings_json,updated_at')
+      .eq('owner_id',authState.userId)
+      .limit(50),
+    10000,
+    'Own page redirect lookup timed out'
+  );
+
+  readCount++;
+  authState.supabaseReads=true;
+
+  if(r.error)throw r.error;
+
+  let rows=(r.data||[]).filter(function(row){
+    return row&&row.slug&&!isReservedSlug(row.slug);
+  });
+
+  rows.sort(function(a,b){
+    let ah=rowIsHome(a)?0:1;
+    let bh=rowIsHome(b)?0:1;
+
+    if(ah!==bh)return ah-bh;
+
+    let as=rowSort(a);
+    let bs=rowSort(b);
+
+    if(as!==bs)return as-bs;
+
+    let au=String(a.updated_at||'');
+    let bu=String(b.updated_at||'');
+
+    if(au!==bu)return bu.localeCompare(au);
+
+    return sl(a.slug).localeCompare(sl(b.slug));
+  });
+
+  return rows[0]?sl(rows[0].slug):'';
+}
+
+async function applyReservedSlugRedirect(slug){
+  if(authState.isPlatformOwner)return false;
+  if(!isReservedSlug(slug))return false;
+
+  let own=await firstOwnedSlug();
+
+  if(!own){
+    renderLocked('This form designer slug is reserved for the platform owner workspace. Create your own page first.');
+    return true;
+  }
+
+  redirectSlug=own;
+  redirectTo=pageUrl('web-builder-form-designer-owned-v7-12-258-test.html',own);
+  location.replace(redirectTo);
+
+  return true;
+}
+
+async function readPage(slug){
+  let q=client()
+    .from('sb_site_pages')
+    .select('*')
+    .eq('slug',slug)
+    .limit(20);
+
+  if(!authState.isPlatformOwner){
+    q=q.eq('owner_id',authState.userId);
+  }
+
+  let r=await withTimeout(q,12000,'Form page read timed out');
+
+  readCount++;
+  authState.supabaseReads=true;
+
+  if(r.error)throw r.error;
+
+  let rows=r.data||[];
+
+  if(!authState.isPlatformOwner){
+    rows=rows.filter(function(row){
+      return String(row.owner_id||'')===String(authState.userId);
+    });
+  }
+
+  if(authState.isPlatformOwner&&rows.length>1){
+    let own=rows.find(function(row){
+      return String(row.owner_id||'')===String(authState.userId);
+    });
+
+    if(own)return own;
+  }
+
+  return rows[0]||null;
+}
+
+function loadFormFromPage(){
+  let blocks=getBlocks(page);
+  let fb=blocks.find(function(b){
+    return isFormBlock(obj(b));
+  });
+
+  if(!fb){
+    fields=contactFields();
+    $('formTitleInput').value='Form / Contact';
+    $('formKey').value='contact';
+    $('introText').value='Contact form preset.';
+    $('submitLabel').value='Submit form';
+    $('routeInbox').checked=true;
+    $('routeNotify').checked=true;
+    $('routeOwnerCopy').checked=false;
+    $('routeEmail').checked=false;
+    $('ownerEmail').value='';
+    $('ownerName').value='';
+    return false;
+  }
+
+  fb=obj(fb);
+
+  $('formTitleInput').value=fb.title||fb.heading||'Form / Contact';
+  $('introText').value=fb.text||fb.body||fb.description||'';
+  $('formKey').value=fb.formKey||fb.form_key||'contact';
+  $('submitLabel').value=fb.submitButtonText||fb.submit_button_text||'Submit form';
+
+  let rt=obj(fb.routing);
+
+  $('routeInbox').checked=rt.save_to_inbox!==false;
+  $('routeNotify').checked=rt.owner_notification_intent!==false;
+  $('routeOwnerCopy').checked=!!rt.owner_message_copy_intent;
+  $('routeEmail').checked=!!rt.email_destination_requested;
+  $('ownerEmail').value=rt.owner_email||'';
+  $('ownerName').value=rt.owner_name||'';
+
+  fields=(Array.isArray(fb.items)?fb.items:arr(fb.questions||fb.fields||fb.items_json)).map(function(x){
+    x=obj(x);
+
+    return {
+      id:x.id||uid(),
+      label:x.label||x.title||'Field',
+      kind:x.kind||x.type||'short',
+      placeholder:x.placeholder||'',
+      options:x.options||x.choices||'',
+      required:!!x.required
+    };
+  });
+
+  if(!fields.length)fields=contactFields();
+
+  return true;
+}
+
+async function loadPage(){
+  try{
+    let slug=currentSlug();
+
+    $('slug').value=slug;
+    setStatus('Loading '+slug+' from sb_site_pages...','');
+
+    page=await readPage(slug);
+
+    if(!page){
+      pageOwnerId='';
+      fields=contactFields();
+      renderAll('No page found in this workspace. Contact preset loaded locally.');
+      setStatus('No page found in this workspace: '+slug,'bad2');
+      return;
+    }
+
+    pageOwnerId=page.owner_id||'';
+
+    if(!authState.isPlatformOwner&&String(pageOwnerId)!==String(authState.userId)){
+      throw new Error('This page belongs to another owner workspace.');
+    }
+
+    $('slug').value=sl(page.slug);
+    $('previewTop').href=pageUrl('web-builder-preview-owned-v7-12-257-test.html',page.slug);
+
+    let found=loadFormFromPage();
+
+    lastAction=found?'load page form passed':'load page no form preset loaded';
+    lastError='';
+
+    renderAll(found?'Saved form loaded.':'Page loaded, no form block. Contact preset loaded locally.');
+    setStatus(found?'Saved form loaded.':'Page loaded, no form block. Contact preset loaded locally.','good2');
+  }catch(e){
+    lastError=e&&e.message?e.message:String(e);
+    lastAction='load page failed';
+    fields=contactFields();
+    renderAll('Load failed, Contact preset loaded locally.');
+    setStatus('Load failed: '+lastError,'bad2');
+  }
+}
+
+function optLines(f){
+  return String(f.options||'').split(/\n|,/).map(function(x){return x.trim();}).filter(Boolean);
+}
+
+function liveField(f,i){
+  let n='q'+i;
+  let lab='<b>'+esc(f.label)+'</b> '+(f.required?'<span class="pill warn">required</span>':'');
+
+  if(f.kind==='multiple'){
+    return '<div class="question">'+lab+optLines(f).map(function(o){
+      return '<label class="choice"><input type="radio" name="'+n+'" value="'+esc(o)+'"> '+esc(o)+'</label>';
+    }).join('')+'</div>';
+  }
+
+  if(f.kind==='checkboxes'){
+    return '<div class="question">'+lab+optLines(f).map(function(o){
+      return '<label class="choice"><input type="checkbox" name="'+n+'" value="'+esc(o)+'"> '+esc(o)+'</label>';
+    }).join('')+'</div>';
+  }
+
+  if(f.kind==='dropdown'){
+    return '<div class="question">'+lab+'<select name="'+n+'"><option value="">Choose...</option>'+optLines(f).map(function(o){
+      return '<option value="'+esc(o)+'">'+esc(o)+'</option>';
+    }).join('')+'</select></div>';
+  }
+
+  if(f.kind==='long'){
+    return '<div class="question">'+lab+'<textarea name="'+n+'" placeholder="'+esc(f.placeholder||'')+'"></textarea></div>';
+  }
+
+  if(f.kind==='file'){
+    return '<div class="question">'+lab+'<input name="'+n+'" type="url" placeholder="Paste public image/file URL or note"><small>Storage upload is paused in this owner-lock pass. The URL/note can still be saved into the inbox answer.</small></div>';
+  }
+
+  let type={
+    email:'email',
+    phone:'tel',
+    url:'url',
+    date:'date',
+    number:'number'
+  }[f.kind]||'text';
+
+  return '<div class="question">'+lab+'<input name="'+n+'" type="'+type+'" placeholder="'+esc(f.placeholder||'')+'"></div>';
+}
+
+function renderLive(){
+  let b=formBlock();
+  let r=routing();
+
+  $('previewTitle').textContent=b.title;
+  $('previewIntroText').textContent=b.text||'Complete this form.';
+  $('previewSlugLabel').textContent=currentSlug();
+
+  $('previewDestinationPills').innerHTML=
+    (r.save_to_inbox?'<span class="pill good">Inbox</span>':'')+
+    (r.email_destination_requested?'<span class="pill good">Email draft</span>':'')+
+    (r.owner_message_copy_intent?'<span class="pill warn">Private message intent</span>':'')+
+    '<span class="pill warn">No storage upload</span>'+
+    '<span class="pill">'+fields.length+' fields</span>';
+
+  $('liveForm').innerHTML='<form id="previewTestForm">'+fields.map(liveField).join('')+'</form>';
+}
+
+function renderFieldList(){
+  let box=$('fieldList');
+
+  if(!fields.length){
+    box.innerHTML='<div class="notice">No fields yet. Add a field or load the Contact preset.</div>';
+    return;
+  }
+
+  box.innerHTML=fields.map(function(f,i){
+    return '<article class="fieldRow" data-i="'+i+'">\
+<div><b>'+esc(f.label||typeName(f.kind))+'</b><small>'+esc(typeName(f.kind))+' · '+(f.required?'required':'optional')+(f.kind==='file'?' · URL only in lock pass':'')+'</small></div>\
+<div class="fieldActions">\
+<button class="smallBtn primary" data-act="edit" type="button">Edit</button>\
+<button class="smallBtn" data-act="up" type="button">Up</button>\
+<button class="smallBtn" data-act="down" type="button">Down</button>\
+<button class="smallBtn badBtn" data-act="remove" type="button">Remove</button>\
+</div>\
+</article>';
+  }).join('');
+
+  box.querySelectorAll('.fieldRow').forEach(function(card){
+    let i=Number(card.dataset.i);
+
+    card.querySelectorAll('[data-act]').forEach(function(btn){
+      btn.onclick=function(){
+        let a=btn.dataset.act;
+
+        if(a==='edit')loadFieldIntoEditor(i);
+
+        if(a==='remove'){
+          fields.splice(i,1);
+          renderAll('Field removed locally.');
+        }
+
+        if(a==='up'&&i>0){
+          let tmp=fields[i-1];
+          fields[i-1]=fields[i];
+          fields[i]=tmp;
+          renderAll('Field moved locally.');
+        }
+
+        if(a==='down'&&i<fields.length-1){
+          let tmp=fields[i+1];
+          fields[i+1]=fields[i];
+          fields[i]=tmp;
+          renderAll('Field moved locally.');
+        }
+      };
+    });
+  });
+}
+
+function loadFieldIntoEditor(i){
+  let f=fields[i];
+
+  if(!f)return;
+
+  $('fieldIndex').value=String(i);
+  $('fieldLabel').value=f.label||'';
+  $('fieldKind').value=f.kind||'short';
+  $('fieldPlaceholder').value=f.placeholder||'';
+  $('fieldOptions').value=f.options||'';
+  $('fieldRequired').checked=!!f.required;
+
+  updateOptionsNotice();
+
+  lastAction='field loaded for edit';
+  renderDebug();
+}
+
+function updateOptionsNotice(){
+  let kind=$('fieldKind').value;
+  $('fieldOptionsWrap').style.display=needsOptions(kind)?'block':'none';
+
+  if(kind==='file'){
+    $('fieldNote').textContent='File/image fields are URL or note fields in this lock pass. No Storage upload will run.';
+  }else{
+    $('fieldNote').textContent='Field settings are stored inside the form block.';
+  }
+}
+
+function applyFieldEdit(){
+  let i=Number($('fieldIndex').value);
+  let kind=$('fieldKind').value||'short';
+
+  let next={
+    id:(fields[i]&&fields[i].id)||uid(),
+    label:$('fieldLabel').value.trim()||typeName(kind),
+    kind:kind,
+    placeholder:$('fieldPlaceholder').value,
+    options:needsOptions(kind)?$('fieldOptions').value:'',
+    required:$('fieldRequired').checked
+  };
+
+  if(Number.isFinite(i)&&i>=0&&fields[i]){
+    fields[i]=next;
+  }else{
+    fields.push(next);
+  }
+
+  $('fieldIndex').value='-1';
+  $('fieldLabel').value='';
+  $('fieldPlaceholder').value='';
+  $('fieldOptions').value='';
+  $('fieldRequired').checked=false;
+
+  lastAction='field edited locally';
+
+  renderAll('Field saved locally. Save form design to persist.');
+}
+
+function addField(){
+  let kind=$('addKind').value||'short';
+  let label=$('addLabel').value.trim()||typeName(kind);
+
+  fields.push(fieldObj(kind,label));
+
+  $('addLabel').value='';
+
+  lastAction='field added locally';
+
+  renderAll('Field added locally. Save form design to persist.');
+}
+
+function setContact(){
+  fields=contactFields();
+  $('formTitleInput').value='Form / Contact';
+  $('formKey').value='contact';
+  $('introText').value='Contact form preset.';
+  $('submitLabel').value='Submit form';
+  $('routeInbox').checked=true;
+  $('routeNotify').checked=true;
+  $('routeOwnerCopy').checked=false;
+  $('routeEmail').checked=false;
+
+  lastAction='contact preset loaded';
+
+  renderAll('Contact preset loaded.');
+}
+
+function collect(){
+  let root=$('liveForm');
+  let answers={};
+  let missing=[];
+  let email='';
+
+  for(let i=0;i<fields.length;i++){
+    let f=fields[i];
+    let n='q'+i;
+    let els=[].slice.call(root.querySelectorAll('[name="'+n+'"]'));
+    let value='';
+    let values=[];
+
+    if(els.length&&els[0].type==='checkbox'){
+      values=els.filter(function(e){return e.checked;}).map(function(e){return e.value;});
+      value=values.join(', ');
+    }else if(els.length&&els[0].type==='radio'){
+      let picked=els.find(function(e){return e.checked;});
+      value=picked?picked.value:'';
+    }else if(els[0]){
+      value=String(els[0].value||'').trim();
+    }
+
+    if(f.required&&!value)missing.push(f.label);
+    if(!email&&String(value).indexOf('@')>-1)email=String(value).trim();
+
+    answers[f.label]={
+      type:f.kind,
+      answer:value,
+      values:values,
+      required:!!f.required,
+      storage_upload:false
+    };
+  }
+
+  if(missing.length)throw new Error('Required answers missing: '+missing.join(', '));
+
+  return {
+    answers:answers,
+    email:email
+  };
+}
+
+function submissionPayload(c){
+  let b=formBlock();
+
+  let answers=Object.assign({},c.answers,{
+    __routing:b.routing,
+    __form:{
+      page_slug:currentSlug(),
+      page_owner_id:pageOwnerId,
+      form_key:b.formKey,
+      preset_title:b.title,
+      source:'owned-form-designer-lock-v7-12-263-14',
+      storage_uploads_paused:true
+    }
+  });
+
+  return {
+    page_slug:currentSlug(),
+    form_title:b.title,
+    form_key:b.formKey,
+    block_id:b.id,
+    block_title:b.title,
+    answers_json:answers,
+    submitter_id:user?user.id:null,
+    submitter_email:c.email||null,
+    status:'new'
+  };
+}
+
+function localTest(){
+  try{
+    let p=submissionPayload(collect());
+
+    localTests++;
+    lastAction='local test passed';
+    lastError='';
+
+    $('answers').textContent='LOCAL TEST ONLY - no Supabase write and no Storage action.\n\n'+JSON.stringify(p,null,2);
+    setStatus('Local test passed.','good2');
+    renderStats();
+    renderDebug();
+  }catch(e){
+    lastError=e&&e.message?e.message:String(e);
+    lastAction='local test failed';
+    $('answers').textContent='Local test failed:\n'+lastError;
+    setStatus(lastError,'bad2');
+    renderDebug();
+  }
+}
+
+function emailBody(p){
+  let lines=[
+    'New form submission',
+    '',
+    'Form: '+p.form_title,
+    'Page: '+p.page_slug,
+    'Submitter email: '+(p.submitter_email||'not supplied'),
+    '',
+    'Answers:'
+  ];
+
+  Object.keys(p.answers_json).filter(function(k){
+    return k.indexOf('__')!==0;
+  }).forEach(function(k){
+    let v=p.answers_json[k];
+    lines.push('- '+k+': '+((v&&typeof v==='object')?v.answer:v));
+  });
+
+  return lines.join('\r\n');
+}
+
+function cleanMailToAddress(to){
+  return String(to||'').split(/[;,]+/).map(function(x){return x.trim();}).filter(Boolean).join(',');
+}
+
+function mailtoForPayload(p){
+  let to=cleanMailToAddress(routing().owner_email||'');
+  let subject='Form submission: '+p.form_title+' / '+p.page_slug;
+
+  return 'mailto:'+to+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(emailBody(p));
+}
+
+async function openEmailDraftFromPayload(p){
+  let r=routing();
+
+  if(!r.email_destination_requested)throw new Error('Email destination is not selected.');
+  if(!cleanMailToAddress(r.owner_email))throw new Error('Owner email destination is missing.');
+
+  let body=emailBody(p);
+  let href=mailtoForPayload(p);
+
+  lastEmailDraft={
+    to:cleanMailToAddress(r.owner_email),
+    subject:'Form submission: '+p.form_title+' / '+p.page_slug,
+    bodyPreview:body,
+    hrefPreview:href.slice(0,300),
+    at:new Date().toISOString(),
+    opened:true
+  };
+
+  emailDraftOpens++;
+
+  try{
+    if(navigator.clipboard)await navigator.clipboard.writeText(body);
+  }catch(e){}
+
+  let a=document.createElement('a');
+  a.href=href;
+  a.target='_self';
+  a.rel='noopener';
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+
+  setTimeout(function(){
+    try{a.remove();}catch(e){}
+  },1000);
+}
+
+async function openEmailDraft(){
+  try{
+    let p=submissionPayload(collect());
+
+    await openEmailDraftFromPayload(p);
+
+    lastAction='email draft requested';
+    lastError='';
+
+    $('answers').textContent='EMAIL DRAFT REQUESTED\n\nThe mail body was also copied as a fallback.\n\n'+emailBody(p);
+    setStatus('Opening mail draft. If the mail app blocks body text, paste from clipboard.','good2');
+    renderStats();
+    renderDebug();
+  }catch(e){
+    lastError=e&&e.message?e.message:String(e);
+    lastAction='email draft failed';
+    $('answers').textContent='Email draft failed:\n'+lastError;
+    setStatus(lastError,'bad2');
+    renderDebug();
+  }
+}
+
+async function realSubmit(){
+  try{
+    let p=submissionPayload(collect());
+    let r=p.answers_json.__routing;
+
+    if(!r.save_to_inbox&&!r.email_destination_requested&&!r.owner_message_copy_intent){
+      throw new Error('Choose at least one destination.');
+    }
+
+    if(r.save_to_inbox){
+      let res=await withTimeout(
+        client().from('sb_form_submissions').insert(p).select('*').maybeSingle(),
+        12000,
+        'Inbox submit timed out'
+      );
+
+      submissionWrites++;
+      authState.supabaseWrites=true;
+
+      if(res.error)throw res.error;
+
+      lastSubmit=res.data||p;
+    }
+
+    lastAction='real submit passed';
+    lastError='';
+
+    $('answers').textContent='REAL SUBMIT RESULT\n\n'+JSON.stringify({
+      savedToInbox:!!r.save_to_inbox,
+      submission:lastSubmit,
+      emailDraftRequested:!!r.email_destination_requested,
+      privateMessageIntent:!!r.owner_message_copy_intent,
+      storageUploads:0,
+      storageActions:false
+    },null,2);
+
+    setStatus('Submit processed. Inbox saved if selected. No Storage upload was run.','good2');
+
+    if(r.email_destination_requested){
+      await openEmailDraftFromPayload(p);
+    }
+
+    renderStats();
+    renderDebug();
+  }catch(e){
+    lastError=e&&e.message?e.message:String(e);
+    lastAction='real submit failed';
+    $('answers').textContent='Real submit failed:\n'+lastError;
+    setStatus('Real submit failed: '+lastError,'bad2');
+    renderDebug();
+  }
+}
+
+function replaceFormBlock(blocks,form){
+  let found=false;
+  let out=blocks.map(function(b){
+    if(!found&&isFormBlock(obj(b))){
+      found=true;
+      return form;
+    }
+
+    return b;
+  });
+
+  if(!found)out.push(form);
+
+  return out;
+}
+
+async function saveFormDesign(){
+  try{
+    if(!page)throw new Error('No saved page row loaded. Load a page first.');
+    if(!authState.allowed)throw new Error('Form Designer locked.');
+    if(!authState.isPlatformOwner&&String(page.owner_id||'')!==String(authState.userId)){
+      throw new Error('Creator users can save forms only to their own page rows.');
+    }
+
+    let form=formBlock();
+    let existingBlocks=getBlocks(page);
+    let nextBlocks=replaceFormBlock(existingBlocks,form);
+    let nextSettings=Object.assign({},settings(page),{
+      form_designer:{
+        form_block:form,
+        updated_by:'web-builder-form-designer-owned-v7-12-258-test.html',
+        updated_at:new Date().toISOString(),
+        storage_uploads_paused:true
+      },
+      content_blocks:nextBlocks,
+      blocks:nextBlocks
+    });
+
+    let payload={
+      settings_json:nextSettings
+    };
+
+    if(Object.prototype.hasOwnProperty.call(page,'layout_json')){
+      payload.layout_json=nextBlocks;
+    }else if(Object.prototype.hasOwnProperty.call(page,'content_json')){
+      payload.content_json=nextBlocks;
+    }else if(Object.prototype.hasOwnProperty.call(page,'page_json')){
+      payload.page_json=nextBlocks;
+    }else if(Object.prototype.hasOwnProperty.call(page,'sections')){
+      payload.sections=nextBlocks;
+    }
+
+    let q=client()
+      .from('sb_site_pages')
+      .update(payload)
+      .eq('id',page.id);
+
+    if(!authState.isPlatformOwner){
+      q=q.eq('owner_id',authState.userId);
+    }
+
+    let res=await withTimeout(
+      q.select('*').maybeSingle(),
+      12000,
+      'Form design save timed out'
+    );
+
+    pageWrites++;
+    authState.supabaseWrites=true;
+
+    if(res.error)throw res.error;
+
+    if(res.data)page=res.data;
+
+    pageOwnerId=page.owner_id||pageOwnerId;
+
+    lastAction='save form design passed';
+    lastError='';
+
+    setStatus('Saved form design to page row. No schema or Storage change.','good2');
+    $('answers').textContent='FORM DESIGN SAVED\n\n'+JSON.stringify({
+      page:page.slug,
+      page_owner_id:pageOwnerId,
+      fields:fields.length,
+      savedColumns:Object.keys(payload),
+      storageActions:false,
+      schemaChanges:false
+    },null,2);
+
+    renderAll('Form design saved.');
+  }catch(e){
+    lastError=e&&e.message?e.message:String(e);
+    lastAction='save form design failed';
+    setStatus('Save failed: '+lastError,'bad2');
+    $('answers').textContent='Save failed:\n'+lastError;
+    renderDebug();
+  }
+}
+
+function renderStats(){
+  $('stats').innerHTML='<article class="card"><b>Fields</b><p class="big">'+fields.length+'</p></article>\
+<article class="card"><b>Reads</b><p class="big">'+readCount+'</p></article>\
+<article class="card"><b>Page writes</b><p class="big">'+pageWrites+'</p></article>\
+<article class="card"><b>Inbox writes</b><p class="big">'+submissionWrites+'</p></article>\
+<article class="card"><b>Storage uploads</b><p class="big">'+storageUploads+'</p></article>\
+<article class="card"><b>Local tests</b><p class="big">'+localTests+'</p></article>';
+}
+
+function state(){
+  return Object.assign({},authState,{
+    canonicalRoute:'web-builder-form-designer-owned-v7-12-258-test.html',
+    checkpoint:'CHECKPOINT-WEB-BUILDER-DOORWAY-LOCK-ROLLPLAN-V7-12-263-8.md',
+    formDesignerOwnerLock:true,
+    requestedSlug:currentSlug(),
+    redirectTo:redirectTo,
+    redirectSlug:redirectSlug,
+    pageOwnerId:pageOwnerId,
+    ownerMatchesCurrentUser:String(pageOwnerId||'')===String(authState.userId||''),
+    platformOwnerCanEditAnyWorkspace:authState.isPlatformOwner,
+    creatorCanOnlyEditOwnPageForms:!authState.isPlatformOwner,
+    personalWorkspaceScoped:true,
+    adminRoleAloneDoesNotExposeWorkspaces:true,
+    readCount:readCount,
+    pageWrites:pageWrites,
+    submissionWrites:submissionWrites,
+    localTests:localTests,
+    emailDraftOpens:emailDraftOpens,
+    storageUploads:storageUploads,
+    storageWrites:false,
+    storageActions:false,
+    schemaChanges:false,
+    builderTableChanges:false,
+    fieldCount:fields.length,
+    formKey:$('formKey')?sl($('formKey').value):'',
+    formTitle:$('formTitleInput')?$('formTitleInput').value:'',
+    page:page?{
+      id:page.id,
+      slug:page.slug,
+      title:page.title,
+      status:page.status,
+      owner_id:page.owner_id,
+      hasLayoutJson:Object.prototype.hasOwnProperty.call(page,'layout_json'),
+      hasContentJson:Object.prototype.hasOwnProperty.call(page,'content_json'),
+      hasPageJson:Object.prototype.hasOwnProperty.call(page,'page_json'),
+      hasSections:Object.prototype.hasOwnProperty.call(page,'sections')
+    }:null,
+    lastSubmit:lastSubmit,
+    lastEmailDraft:lastEmailDraft,
+    lastAction:lastAction,
+    lastError:lastError,
+    activeMenuPromotion:false,
+    indexPromotion:false,
+    registryPromotion:true
+  });
+}
+
+function renderDebug(){
+  if($('debug'))$('debug').textContent=JSON.stringify(state(),null,2);
+}
+
+function renderLinks(){
+  if($('linkBox'))$('linkBox').textContent=JSON.stringify(links(),null,2);
+
+  if($('previewTop'))$('previewTop').href=links().preview;
+}
+
+function renderAll(message){
+  renderFieldList();
+  renderLive();
+  renderStats();
+  renderLinks();
+  renderDebug();
+
+  if(message&&$('status'))setStatus(message,'good2');
+}
+
+function bindPage(){
+  $('slug').addEventListener('change',function(){
+    $('slug').value=currentSlug();
+    loadPage();
+  });
+
+  $('loadPage').onclick=loadPage;
+  $('contactPreset').onclick=setContact;
+  $('addField').onclick=addField;
+  $('applyFieldEdit').onclick=applyFieldEdit;
+  $('fieldKind').onchange=updateOptionsNotice;
+  $('saveFormDesign').onclick=saveFormDesign;
+  $('localTest').onclick=localTest;
+  $('realSubmit').onclick=realSubmit;
+  $('openEmailDraft').onclick=openEmailDraft;
+  $('openInbox').onclick=function(){
+    location.href=links().inbox;
+  };
+  $('copyReport').onclick=async function(){
+    let text=JSON.stringify(state(),null,2);
+
+    try{
+      await navigator.clipboard.writeText(text);
+      setStatus('Copied form designer report.','good2');
+    }catch(e){
+      alert(text);
+    }
+  };
+
+  ['formTitleInput','formKey','submitLabel','introText','routeInbox','routeNotify','routeOwnerCopy','routeEmail','ownerEmail','ownerName'].forEach(function(id){
+    let el=$(id);
+
+    if(el){
+      el.addEventListener('input',function(){
+        renderAll('');
+      });
+
+      el.addEventListener('change',function(){
+        renderAll('');
+      });
+    }
+  });
+}
+
+function renderPage(){
+  authState.checked=true;
+  authState.allowed=true;
+  authState.reason='Allowed. Form Designer owner workspace lock passed.';
+
+  app().innerHTML='<section class="hero">\
+<span class="badge">V7.12.263.14 Form Designer Owner Lock</span>\
+<h1>Design forms only for the allowed page workspace</h1>\
+<p>Creator users can design forms only on their own page rows. Platform owner can edit any workspace. This pass saves form layout without schema changes and keeps Storage uploads paused.</p>\
+<div class="row">\
+<span class="chip good">Owner scoped page</span>\
+<span class="chip good">Inbox submit kept</span>\
+<span class="chip good">Form block save</span>\
+<span class="chip warn">Storage upload paused</span>\
+<span class="chip warn">No schema changes</span>\
+<span class="chip warn">No index promotion</span>\
+</div>\
+</section>\
+<section class="grid">\
+<div class="card own"><b>Personal scope</b><p>Creator users load and save forms only on rows where <code>owner_id</code> matches their profile id.</p></div>\
+<div class="card keep"><b>Schema-safe save</b><p>The form block is saved into the existing page row. No new table or column is created.</p></div>\
+<div class="card later"><b>Storage paused</b><p>Image/file fields are URL or note fields in this lock pass. No Storage upload runs from this page.</p></div>\
+</section>\
+<section class="fullPreview">\
+<div class="previewHead">\
+<div><span class="badge">Full-page form preview</span><b id="previewSlugLabel">'+esc(requestedSlug())+'</b></div>\
+<div class="row">\
+<button id="loadPage" class="btn primary" type="button">Load Page</button>\
+<button id="saveFormDesign" class="btn hot" type="button">Save Form Design</button>\
+<button id="contactPreset" class="btn blue" type="button">Contact Preset</button>\
+<button id="copyReport" class="btn" type="button">Copy Report</button>\
+</div>\
+</div>\
+<div class="previewBody">\
+<aside class="previewIntro">\
+<span class="pill good">Visitor preview</span>\
+<h2 id="previewTitle">Form / Contact</h2>\
+<p id="previewIntroText">Contact form preset.</p>\
+<div id="previewDestinationPills" class="row"></div>\
+<div class="notice">Real Submit can save to the Web Builder Inbox. Storage uploads are paused in this lock pass.</div>\
+</aside>\
+<section class="previewFormPanel"><div id="liveForm"></div></section>\
+</div>\
+<div class="previewFoot">\
+<button id="localTest" class="btn primary" type="button">Run Local Test - No Write</button>\
+<button id="openEmailDraft" class="btn blue" type="button">Open Email Draft</button>\
+<button id="realSubmit" class="btn hot" type="button">Real Submit</button>\
+<button id="openInbox" class="btn" type="button">Open Owned Inbox</button>\
+</div>\
+</section>\
+<section class="builderLayout">\
+<aside class="panel">\
+<h2>Form settings</h2>\
+<div class="controlGrid">\
+<div class="control"><b>Page slug</b><input id="slug" value="'+esc(requestedSlug())+'"></div>\
+<div class="control"><b>Form title</b><input id="formTitleInput" value="Form / Contact"></div>\
+<div class="control"><b>Form key</b><input id="formKey" value="contact"></div>\
+<div class="control"><b>Submit button label</b><input id="submitLabel" value="Submit form"></div>\
+</div>\
+<div class="control"><b>Intro text</b><textarea id="introText">Contact form preset.</textarea></div>\
+<h3>Destinations</h3>\
+<label class="checkline"><input id="routeInbox" type="checkbox" checked> Save submission to Web Builder Inbox</label>\
+<label class="checkline"><input id="routeNotify" type="checkbox" checked> Record owner notification intent</label>\
+<label class="checkline"><input id="routeOwnerCopy" type="checkbox"> Record owner/private-message intent</label>\
+<label class="checkline"><input id="routeEmail" type="checkbox"> Open user mail app with filled form draft</label>\
+<div class="controlGrid">\
+<div class="control"><b>Owner email destination</b><input id="ownerEmail" type="email" placeholder="owner@example.com"></div>\
+<div class="control"><b>Owner / recipient name</b><input id="ownerName" placeholder="Site owner"></div>\
+</div>\
+<div id="status" class="status">Ready.</div>\
+<div id="linkBox" class="linkBox">Waiting...</div>\
+</aside>\
+<section class="panel">\
+<h2>Fields</h2>\
+<div class="addFieldRow">\
+<div class="control"><b>Field type</b><select id="addKind"><option value="short">Short text</option><option value="long">Long text</option><option value="email">Email</option><option value="phone">Phone</option><option value="url">URL</option><option value="multiple">Multiple choice</option><option value="checkboxes">Checkboxes</option><option value="dropdown">Dropdown</option><option value="date">Date</option><option value="number">Number</option><option value="file">Image/file URL</option></select></div>\
+<div class="control"><b>Label</b><input id="addLabel" placeholder="Question label"></div>\
+<button id="addField" class="btn primary" type="button">Add Field</button>\
+</div>\
+<div id="fieldList" class="fieldList"></div>\
+<h3>Edit selected field</h3>\
+<input id="fieldIndex" type="hidden" value="-1">\
+<div class="controlGrid">\
+<div class="control"><b>Label</b><input id="fieldLabel" placeholder="Question label"></div>\
+<div class="control"><b>Type</b><select id="fieldKind"><option value="short">Short text</option><option value="long">Long text</option><option value="email">Email</option><option value="phone">Phone</option><option value="url">URL</option><option value="multiple">Multiple choice</option><option value="checkboxes">Checkboxes</option><option value="dropdown">Dropdown</option><option value="date">Date</option><option value="number">Number</option><option value="file">Image/file URL</option></select></div>\
+<div class="control"><b>Placeholder</b><input id="fieldPlaceholder" placeholder="Placeholder"></div>\
+<label class="checkline"><input id="fieldRequired" type="checkbox"> Required</label>\
+</div>\
+<div id="fieldOptionsWrap" class="control" style="display:none"><b>Options</b><textarea id="fieldOptions" placeholder="One option per line"></textarea></div>\
+<div id="fieldNote" class="notice">Field settings are stored inside the form block.</div>\
+<div class="row"><button id="applyFieldEdit" class="btn primary" type="button">Apply Field Edit</button></div>\
+</section>\
+</section>\
+<section class="grid">\
+<div class="panel"><h2>Result</h2><div id="answers" class="out">No test yet.</div></div>\
+<div class="panel"><h2>Stats</h2><div id="stats" class="stats"></div></div>\
+<div class="panel"><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></div>\
+</section>';
+
+  bindPage();
+  setContact();
+  loadPage();
+}
+
+function renderLocked(reason){
+  authState.checked=true;
+  authState.allowed=false;
+  authState.reason=reason||authState.reason;
+
+  document.body.innerHTML='<main class="lockedScreen">\
+<section class="hero">\
+<span class="badge bad">Form Designer locked</span>\
+<h1>Page owner access required</h1>\
+<p>This form designer opens only for platform owner and eligible Web Builder creator accounts. Creator users can only edit their own page rows.</p>\
+<div class="panel"><b>Reason</b><p>'+esc(authState.reason)+'</p></div>\
+<div class="actions">\
+<a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Web Builder Hub</a>\
+<a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Owned Pages</a>\
+<a class="btn" href="settings-platform-control-hub-v7-12-85-test.html">Back to Settings</a>\
+</div>\
+<h2>Debug</h2>\
+<pre class="debug">'+esc(JSON.stringify(Object.assign({},authState,{redirectTo:redirectTo,redirectSlug:redirectSlug,lastError:lastError}),null,2))+'</pre>\
+</section>\
+</main>';
+}
+
+async function boot(){
+  try{
+    let authority=await readAuthority();
+
+    authState.signedIn=authority.signedIn;
+
+    if(!authority.signedIn){
+      renderLocked('Sign in required before opening Form Designer.');
+      return;
+    }
+
+    user=authority.user;
+    profile=authority.profile||{};
+
+    authState.userId=user.id;
+    authState.email=user.email||'';
+    authState.role=profile.role||'';
+    authState.adminLevel=profile.admin_level||'';
+    authState.planKey=profile.plan_key||'';
+    authState.accountStatus=profile.account_status||'active';
+    authState.isPlatformOwner=isPlatformOwnerProfile(profile);
+    authState.canUseBuilder=builderAllowed(profile);
+    authState.workspace=authState.isPlatformOwner?'platform-owner-any-workspace':'personal-owner-id-only';
+
+    if(!authState.canUseBuilder){
+      renderLocked('Web Builder plan or permission required.');
+      return;
+    }
+
+    let initialSlug=requestedSlug();
+
+    if(await applyReservedSlugRedirect(initialSlug)){
+      return;
+    }
+
+    authState.allowed=true;
+    authState.reason='Allowed. Form Designer owner workspace lock passed.';
+
+    renderPage();
+  }catch(e){
+    authState.reason=e&&e.message?e.message:String(e);
+    lastError=authState.reason;
+    renderLocked('Form Designer lock check failed: '+authState.reason);
+  }
+}
+
+boot();
+
 })();
 </script>
 </body>
