@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.288
+# Stream Bandit Current App Manifest V7.12.289
 
 Date: 2026-06-13
 
@@ -6,15 +6,15 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.288 Review Queue Passed / Playlists Start`
+`V7.12.289 Playlists Passed / Channels Start`
 
-Public Browse group is passed as a full group. Creator group has started. Creator Rules passed. Submit Video passed. Review Queue clean rail / page-content pass has now passed.
-
-User confirmed the best test result: a creator submission moved from Submit Video into Review Queue and then through to the Supabase Library / `sb_movies` publish path on the first pass.
+Public Browse group is passed as a full group. Creator group has started. Creator Rules, Submit Video, Review Queue, and Playlists have now passed.
 
 Current next target:
 
-`playlists-global-helpers-v7-5-2-test.html`
+`channels-global-helpers-v7-5-3-test.html`
+
+The user supplied the current full Channels page file as the source for the next full-page replacement pass.
 
 ## Current checkpoint files
 
@@ -24,7 +24,7 @@ Keep these current checkpoint files:
 - `CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`
 - `CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
-No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, or Review Queue. These are recorded in this manifest only to avoid file-count clutter.
+No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, or Playlists. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
 
 ## File-count / cleanup rule
 
@@ -77,7 +77,7 @@ Health baseline confirmed:
 - Supabase SDK loaded.
 - Session signed in.
 - Profile row visible.
-- `sb_movies` readable, count 24 before the latest Review Queue publish test.
+- `sb_movies` readable, count 24 before latest creator publish tests.
 - `sb_channels` readable, count 3.
 - `sb_policy_documents` readable, count 7.
 - `sb_site_pages` readable, count 9.
@@ -209,34 +209,24 @@ Creator group has started.
 
 ### Rules — PASSED
 
-File:
+File: `rules-clean-machine-v7-12-82-test.html`
 
-`rules-clean-machine-v7-12-82-test.html`
-
-Current confirmed state:
-
-`V7.12.286 Creator Rules · Platform Truth Map`
+Current confirmed state: `V7.12.286 Creator Rules · Platform Truth Map`
 
 Confirmed:
 
-- Rules is now a full Creator / Platform Truth Map.
+- Rules is a full Creator / Platform Truth Map.
 - It explains Creator, Admin, Owner, Pricing Matrix, User Dashboard, Supabase table family, global helpers, Theme Bridge, page-owned properties, workflow, roles, and do-not rules.
 - It includes Pricing Matrix route: `plans-pricing-feature-shop-v7-11-3-test.html`.
 - It includes User Dashboard route: `user-management-dashboard-v7-11-2-test.html`.
 - It includes Permissions Matrix route: `permissions-matrix-user-management-v7-11-4-test.html`.
-- It includes Supabase table-family truth from visible table list and known app behaviour.
-- It clearly states Supabase connector/table columns/RLS need direct verification later when tools reconnect.
 - It keeps Rules as safe explanation: no submit, upload, approve, decline, publish, queue cleanup, migrate, schema, storage, policy or live/index controls.
 
 ### Submit Video — PASSED
 
-File:
+File: `submit-video-clean-machine-v7-12-79-test.html`
 
-`submit-video-clean-machine-v7-12-79-test.html`
-
-Current confirmed state:
-
-`V7.12.287 Submit Video · Clean Rail`
+Current confirmed state: `V7.12.287 Submit Video · Clean Rail`
 
 Confirmed:
 
@@ -244,11 +234,6 @@ Confirmed:
 - Route links moved out of hero into the top rail.
 - No duplicate route tabs/buttons in the hero.
 - Hero keeps real page actions only: Open Submit Form and Refresh Data.
-- Menu Saves Count, Settings Global, and Brand Logo helpers are included.
-- Helper status shows Counts as well as Header/Footer/Theme/Saves/Search.
-- Overlay scroll fix remains.
-- Poster upload remains to Supabase Storage bucket `stream-bandit-images` under `creator-submissions/<owner>/...`.
-- Poster/artwork resize remains 1920x1080 JPEG before upload.
 - Pending submission insert remains to `sb_submissions` only.
 - Insert verification read remains from `sb_submissions`.
 - Review Queue remains the `sb_movies` publish gate.
@@ -257,13 +242,9 @@ Confirmed:
 
 ### Review Queue — PASSED
 
-File:
+File: `review-queue-clean-machine-v7-12-80-publish-test.html`
 
-`review-queue-clean-machine-v7-12-80-publish-test.html`
-
-Current confirmed state:
-
-`V7.12.288 Review Queue · Clean Rail`
+Current confirmed state: `V7.12.288 Review Queue · Clean Rail`
 
 Confirmed:
 
@@ -272,33 +253,90 @@ Confirmed:
 - No duplicate tabs were added.
 - Hero keeps only the real page action: Reload Queue.
 - Queue list filters and selected-submission action panel remain page content.
-- Menu Saves Count, Settings Global, and Brand Logo helpers are included.
-- Helper status shows Counts as well as Header/Footer/Theme/Saves/Search.
 - Admin/owner role gate is preserved.
-- Review Queue still reads `sb_submissions`.
+- Review Queue reads `sb_submissions`.
 - Approve + Publish creates or updates `sb_movies`.
-- Approve Only updates `sb_submissions` to approved without publishing.
-- Decline updates `sb_submissions` to declined with reason.
 - Archive From Queue uses allowed status `declined` plus `[ARCHIVED_FROM_QUEUE]` marker in `decline_reason`.
-- Active queue hides archived submissions while keeping published movies safe.
 - Published movies are not removed.
-- Source type inference remains mux/hls/url.
 - User confirmed the submit-to-review-to-Supabase-Library path passed first time.
 - No schema, storage, RLS, table-name, player, index, or global-helper changes.
+
+### Playlists — PASSED
+
+File: `playlists-global-helpers-v7-5-2-test.html`
+
+Current confirmed state: `V7.12.289 Playlists · Clean Rail`
+
+Page update method:
+
+- Full ready copy/paste page code was supplied to the user.
+- User confirmed the Playlists page passed.
+
+Confirmed:
+
+- Creator group top rail added directly under header.
+- Route links moved out of the hero into the top rail.
+- Hero keeps real page actions only: Reload Playlists and Play Selected In Player 2.
+- Playlist page tabs remain current-page content only: Browse, Playlist Studio, Add / Remove Videos, Permissions, Debug.
+- No duplicate route tabs/buttons were added.
+- Reads `sb_playlists`, `sb_playlist_movies`, `sb_movies`, and `sb_profiles` through current app helpers.
+- Plan/entitlement controls remain through `stream-bandit-entitlements-v7-12-269.js`.
+- Own-playlist write rules remain preserved.
+- No Supabase Library editor access is granted from Playlists.
+- No fallback to all users' private content.
+- Player 2 queue handoff remains preserved.
+- No schema changes.
+- No storage changes.
+- No RLS changes.
+- No table-name changes.
+- No player engine changes.
+- No index promotion.
+- No global helper rewrites.
 
 ## Creator group — next work order
 
 Next page:
 
-`playlists-global-helpers-v7-5-2-test.html`
+`channels-global-helpers-v7-5-3-test.html`
+
+The user uploaded the current full Channels page as source for the next pass.
+
+Current supplied Channels state:
+
+`V7.12.269.2 Channels · Main Library Attach Fix`
+
+Known behaviours from supplied Channels source:
+
+- Reads profile identity from `sb_profiles`.
+- Reads extra/group channel rows from `sb_channels`.
+- Reads published videos from `sb_movies`.
+- Profile channel edits update the user's `sb_profiles` channel fields.
+- Extra channel create/edit/delete operates on owned `sb_channels` rows only.
+- Add/remove videos uses `sb_group_play_set_movie_channel` RPC.
+- Allows own movies and Stream Bandit main/library videos.
+- Blocks taking other normal users' private videos.
+- Uses entitlements through `stream-bandit-entitlements-v7-12-269.js`.
+- Handoff to Player 2 uses queue storage and route `player-2-clean-machine-v7-12-58-test.html`.
+
+Needed next polish direction:
+
+- Add Creator group top rail directly under header.
+- Move route links out of hero into top rail.
+- Keep real page actions in hero: Reload Channels and Play Selected In Player 2.
+- Do not add duplicate route tabs.
+- Preserve Browse, My Profile Channel, Create/Edit Channels, Add/Remove Videos, Permissions, and Debug as current-page content tabs.
+- Load Core Saves, Menu Saves Count, Settings Global, and Brand Logo helpers to match latest pattern.
+- Make helper status show Counts as well as Header/Footer/Theme/Saves/Search/Entitlements.
+- Preserve profile channel editing, owned extra-channel CRUD, attach/remove RPC, entitlement rules, main library attach fix, and Player 2 handoff.
+- Do not change schema, storage, RLS, RPC name, table names, player engine, index, or global helper logic.
 
 Creator group expected pages:
 
 - Rules — `rules-clean-machine-v7-12-82-test.html` — PASSED
 - Submit Video — `submit-video-clean-machine-v7-12-79-test.html` — PASSED
 - Review Queue — `review-queue-clean-machine-v7-12-80-publish-test.html` — PASSED
-- Playlists — `playlists-global-helpers-v7-5-2-test.html` — NEXT
-- Channels — `channels-global-helpers-v7-5-3-test.html`
+- Playlists — `playlists-global-helpers-v7-5-2-test.html` — PASSED
+- Channels — `channels-global-helpers-v7-5-3-test.html` — NEXT
 - My Channel — `my-channel-clean-machine-v7-12-47-test.html`
 - Collections — `collections-clean-machine-v7-12-51-test.html`
 - Player 2 — `player-2-clean-machine-v7-12-58-test.html`
