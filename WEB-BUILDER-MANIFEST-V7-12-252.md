@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.265.2
+# Web Builder Manifest V7.12.265.3
 
 ## Purpose
 
@@ -8,9 +8,9 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 
 ## Massive checkpoint status
 
-Status: RECORDED / WEB BUILDER CORE BLOCKERS COMPLETE FOR CURRENT CONTROLLED PROMOTION CANDIDATE / WEB BUILDER ACCESS GATE AND PERSONAL WORKSPACE SCOPE NOW PASSED.
+Status: RECORDED / WEB BUILDER CORE BLOCKERS COMPLETE FOR CURRENT CONTROLLED PROMOTION CANDIDATE / WEB BUILDER ACCESS GATE AND PERSONAL WORKSPACE SCOPE PASSED / STUDIO ENGINE ROLLBACK CHECKPOINT RECORDED.
 
-This checkpoint records the work completed across the Web Builder Supabase page flow, owned preview, inline published forms, shared Web Builder tabs, global Web Builder search, Pages Manager jump search, Menu Builder slim tabs, Menu Builder edit overlay, Menu Builder jump search, guarded Supabase page delete, image upload form fields, empty published preview block guards, Web Builder-only protected access gate, no-admin-bypass correction, and Pages Manager personal owner scope.
+This checkpoint records the work completed across the Web Builder Supabase page flow, owned preview, inline published forms, shared Web Builder tabs, global Web Builder search, Pages Manager jump search, Menu Builder slim tabs, Menu Builder edit overlay, Menu Builder jump search, guarded Supabase page delete, image upload form fields, empty published preview block guards, Web Builder-only protected access gate, no-admin-bypass correction, Pages Manager personal owner scope, and the Studio helper rollback/engine loader repair.
 
 No live `index.html` promotion was done. No main Stream Bandit shell rewrite was done. No schema/storage table change was done in these page passes.
 
@@ -119,8 +119,38 @@ Current Web Builder shared tabs:
 - `V7.12.265 Web Builder Protected Page Gate` - PASS.
 - `V7.12.265.1 Web Builder Protected Gate / No Admin Bypass` - PASS.
 - `V7.12.264.15 Pages Manager Personal Workspace Scope` - PASS.
+- `V7.12.116.4 Studio helper engine loader repair rollback checkpoint` - PASS.
 
-## Latest verified pass - V7.12.265.2 Web Builder access gate + Pages Manager owner scope
+## Latest verified pass - V7.12.265.3 Studio helper rollback checkpoint
+
+User-tested result:
+
+- The bad helper experiment was correctly identified as the cause of the broken Studio route - PASS.
+- `web-builder-live-studio-v7-12-116.js` was rebuilt as `V7.12.116.4 Web Builder Studio engine loader repair` - PASS.
+- The helper again loads the real `web-builder-live-studio-v7-12-106.js` engine - PASS.
+- The Studio page rebuilt and the Web Builder engine mounted again - PASS.
+- The helper no longer uses the unsafe Supabase `createClient` proxy/global query patch experiment - PASS.
+- The helper keeps only safe runtime repairs: same-window links, publish notice, save verification, and page selector - PASS.
+- No `index.html` promotion - PASS.
+- No current app registry promotion - PASS.
+- No Stream Bandit shell rewrite - PASS.
+- No schema change - PASS.
+- No storage change - PASS.
+- No RLS change - PASS.
+
+Files touched in this rollback checkpoint:
+
+- `web-builder-live-studio-v7-12-116.js`
+- `WEB-BUILDER-MANIFEST-V7-12-252.md`
+
+Important lesson locked:
+
+- Do not patch global Supabase client behavior from the Studio helper.
+- Do not force personal workspace scoping inside the Studio engine helper until the route is redesigned cleanly.
+- Keep the Studio helper as an engine loader/repair helper only.
+- Apply Web Builder access locks at the page level first, using the proven Pages Manager pattern.
+
+## Previous verified pass - V7.12.265.2 Web Builder access gate + Pages Manager owner scope
 
 User-tested result:
 
@@ -140,7 +170,7 @@ User-tested result:
 - No storage change - PASS.
 - No RLS change - PASS.
 
-Files touched in this pass:
+Files touched in this access/scope pass:
 
 - `web-builder-protected-page-v7-12-265.js`
 - `web-builder-account-control-hub-v7-12-263-test.html`
@@ -183,7 +213,7 @@ Existing tables in active use:
 Current page/menu/form storage:
 
 - Page rows live in `sb_site_pages`.
-- Page ownership is scoped by `owner_id`.
+- Page ownership is scoped by `owner_id` in the passed Pages Manager flow.
 - Platform owner can view/manage all rows in the Pages Manager.
 - Creator Growth / builder users can view/save only their own `owner_id` rows in the Pages Manager.
 - Page layout lives in `layout_json`.
@@ -201,6 +231,7 @@ Do not claim public anonymous production readiness until the RLS/policy pass is 
    - Form submit -> owned inbox - PASS.
    - Web Builder protected gate - PASS.
    - Pages Manager personal owner scope - PASS.
+   - Studio helper rollback / engine loader repair - PASS.
 2. Build real Owner Admin Hub - COMPLETE FOR CURRENT ACCESS CONTROL BASE.
    - `user-management-dashboard-v7-11-2-test.html` upgraded to real owner control room.
    - Owner can manage account status, role, admin level, plan, permissions JSON and notes through the approved RPC.
@@ -244,8 +275,9 @@ Do not claim public anonymous production readiness until the RLS/policy pass is 
 
 Reason:
 
-- Web Builder Hub and Pages Manager are now protected and scoped.
-- Next, apply the same Web Builder-only protected gate to the Studio / Publish route without adding the Stream Bandit app shell.
+- The Studio engine now mounts again after the helper rollback/repair.
+- Next, fix the actual Web Builder page lock on the Studio route using the proven old checkpoint pattern from Pages Manager.
+- Do not put ownership/proxy logic into `web-builder-live-studio-v7-12-116.js` again.
 - Continue one Web Builder page at a time.
 
 ## Safety locks
@@ -262,6 +294,8 @@ Reason:
 - schema change without approval: false.
 - storage change without approval: false.
 - admin role alone unlocks personal Web Builder: false.
-- personal Web Builder rows visible to other non-owner users: false.
+- personal Web Builder rows visible to other non-owner users through Pages Manager: false.
 - creator_growth personal Web Builder access: true.
 - Pages Manager personal `owner_id` scope: true.
+- Studio helper Supabase proxy patching: false.
+- Studio helper is engine loader only: true.
