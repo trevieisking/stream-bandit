@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.264.16
+# Web Builder Manifest V7.12.265.2
 
 ## Purpose
 
@@ -8,9 +8,9 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 
 ## Massive checkpoint status
 
-Status: RECORDED / WEB BUILDER CORE BLOCKERS COMPLETE FOR CURRENT CONTROLLED PROMOTION CANDIDATE.
+Status: RECORDED / WEB BUILDER CORE BLOCKERS COMPLETE FOR CURRENT CONTROLLED PROMOTION CANDIDATE / WEB BUILDER ACCESS GATE AND PERSONAL WORKSPACE SCOPE NOW PASSED.
 
-This checkpoint records the work completed across the Web Builder Supabase page flow, owned preview, inline published forms, shared Web Builder tabs, global Web Builder search, Pages Manager jump search, Menu Builder slim tabs, Menu Builder edit overlay, Menu Builder jump search, guarded Supabase page delete, image upload form fields and empty published preview block guards.
+This checkpoint records the work completed across the Web Builder Supabase page flow, owned preview, inline published forms, shared Web Builder tabs, global Web Builder search, Pages Manager jump search, Menu Builder slim tabs, Menu Builder edit overlay, Menu Builder jump search, guarded Supabase page delete, image upload form fields, empty published preview block guards, Web Builder-only protected access gate, no-admin-bypass correction, and Pages Manager personal owner scope.
 
 No live `index.html` promotion was done. No main Stream Bandit shell rewrite was done. No schema/storage table change was done in these page passes.
 
@@ -55,19 +55,22 @@ Not promoted yet:
 - Delete/remove must be guarded and clearly scoped.
 - Landing/home guard remains protected until a real replacement-home flow exists.
 - No delete action may silently remove files, routes, rows, or current app pages.
-- Pages Manager can delete a selected non-protected `sb_site_pages` row only after admin check, exact slug confirmation and readback verification.
+- Pages Manager can delete a selected non-protected `sb_site_pages` row only from the platform-owner flow, after exact slug confirmation and readback verification.
+- Creator Growth / Web Builder users can create and save their own `owner_id` rows only; they must not see or manage another user's personal Web Builder rows.
 
 ## Current verified Web Builder flow
 
 Normal route flow:
 
-1. Pages Manager creates, saves, finds and deletes page rows.
-2. Web Builder / Publish opens `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`.
-3. Published Preview opens `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`.
-4. Menu Builder controls the published menu via `sb_site_pages.settings_json`.
-5. Published forms submit inline on the published page and are read from the Web Builder-owned inbox.
-6. Web Builder shared tabs keep the owned page group connected.
-7. Web Builder global search searches owned tools/routes and Supabase `sb_site_pages` by title, slug and status.
+1. Web Builder Hub opens through the Web Builder-only protected gate.
+2. Pages Manager creates, saves and finds page rows inside the correct owner scope.
+3. Platform owner can see all `sb_site_pages` rows; creator/build users see only rows where `owner_id` matches their signed-in user id.
+4. Web Builder / Publish opens `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`.
+5. Published Preview opens `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`.
+6. Menu Builder controls the published menu via `sb_site_pages.settings_json`.
+7. Published forms submit inline on the published page and are read from the Web Builder-owned inbox.
+8. Web Builder shared tabs keep the owned page group connected.
+9. Web Builder global search searches owned tools/routes and Supabase `sb_site_pages` by title, slug and status.
 
 Current Web Builder shared tabs:
 
@@ -113,19 +116,36 @@ Current Web Builder shared tabs:
 - `V7.12.264.14 Pages Manager guarded Supabase delete` - PASS.
 - `V7.12.264.15 Form Designer image uploads + compact overlay` - PASS.
 - `V7.12.264.16 Published Preview empty block guard + form submit to owned inbox verification` - PASS.
+- `V7.12.265 Web Builder Protected Page Gate` - PASS.
+- `V7.12.265.1 Web Builder Protected Gate / No Admin Bypass` - PASS.
+- `V7.12.264.15 Pages Manager Personal Workspace Scope` - PASS.
 
-## Latest verified pass - V7.12.264.16 Web Builder core blockers
+## Latest verified pass - V7.12.265.2 Web Builder access gate + Pages Manager owner scope
 
 User-tested result:
 
-- Pages Manager guarded delete removes test creations and keeps pages organized - PASS.
-- Pages Manager landing/home guard remains protected - PASS.
-- Menu Builder rows stay single slim tabs with Edit overlay - PASS.
-- Form Designer image/file upload field works with the existing `stream-bandit-images` bucket - PASS.
-- Form Builder overlay is compact and no longer shows giant field input blocks - PASS.
-- Published Preview hides empty blocks and shows them when configured - PASS.
-- Published Preview form submit reaches the owned inbox route - PASS.
-- Email/inbox/private destination selection is visible and usable - PASS.
+- Web Builder Hub now loads the Web Builder-only protected gate and still keeps Web Builder chrome/projector isolated from the Stream Bandit app shell - PASS.
+- Pages Manager now loads the Web Builder-only protected gate before the Web Builder projector - PASS.
+- `web-builder-protected-page-v7-12-265.js` has been tightened so `role = admin` alone does not automatically unlock another user's personal Web Builder - PASS.
+- Creator Growth users remain allowed into Web Builder starter access when active and permitted by plan/permissions - PASS.
+- Pages Manager now scopes `sb_site_pages` reads by owner id for non-platform-owner users - PASS.
+- Platform owner can see all Web Builder page rows - PASS.
+- Creator Growth / non-platform-owner users see only rows where `owner_id` matches their own signed-in user id - PASS.
+- Save writes `owner_id` to the signed-in user's id for personal workspace users - PASS.
+- Delete remains locked to the platform-owner path and keeps landing/home protected - PASS.
+- No Stream Bandit app shell appears inside Web Builder - PASS.
+- No `index.html` promotion - PASS.
+- No current app registry promotion - PASS.
+- No schema change - PASS.
+- No storage change - PASS.
+- No RLS change - PASS.
+
+Files touched in this pass:
+
+- `web-builder-protected-page-v7-12-265.js`
+- `web-builder-account-control-hub-v7-12-263-test.html`
+- `web-builder-pages-manager-owned-v7-12-256-test.html`
+- `WEB-BUILDER-MANIFEST-V7-12-252.md`
 
 ## Current route set
 
@@ -163,6 +183,9 @@ Existing tables in active use:
 Current page/menu/form storage:
 
 - Page rows live in `sb_site_pages`.
+- Page ownership is scoped by `owner_id`.
+- Platform owner can view/manage all rows in the Pages Manager.
+- Creator Growth / builder users can view/save only their own `owner_id` rows in the Pages Manager.
 - Page layout lives in `layout_json`.
 - Menu settings live in `settings_json`.
 - Form submissions live in `sb_form_submissions`.
@@ -176,24 +199,28 @@ Do not claim public anonymous production readiness until the RLS/policy pass is 
    - Pages Manager real guarded delete - PASS.
    - Empty preview blocks hidden - PASS.
    - Form submit -> owned inbox - PASS.
-2. Build real Owner Admin Hub.
-   - Upgrade `user-management-dashboard-v7-11-2-test.html`.
-   - Owner can view users, restrict, limit, ban, unban, grant/remove admin.
+   - Web Builder protected gate - PASS.
+   - Pages Manager personal owner scope - PASS.
+2. Build real Owner Admin Hub - COMPLETE FOR CURRENT ACCESS CONTROL BASE.
+   - `user-management-dashboard-v7-11-2-test.html` upgraded to real owner control room.
+   - Owner can manage account status, role, admin level, plan, permissions JSON and notes through the approved RPC.
+   - User Management controls Web Builder access through `account_status`, `plan_key`, `permissions_json`, `admin_level` and `role`.
    - No toy wording in the live admin hub.
-3. Add safe admin/account schema.
+3. Add safe admin/account schema - COMPLETE FOR CURRENT ACCESS CONTROL BASE.
    - `account_status`: active / limited / restricted / banned / review.
    - admin level or role guard.
    - `permissions_json`.
    - `plan_key`.
    - admin notes / managed by / managed at.
-   - audit log table or audit JSON trail.
+   - audit log table / audit trail through the owner-safe RPC flow.
 4. Harden Supabase policies.
    - Normal users cannot self-upgrade role.
    - Normal users cannot unban/unlimit themselves.
    - Owner/admin can manage users only through approved owner-safe rules.
    - Public visitors can only do approved public actions.
+   - Web Builder `sb_site_pages` owner scope should be backed by RLS/policies before production claim.
 5. Connect Permissions Matrix to real controls.
-   - `permissions-matrix-user-management-v7-11-4-test.html` becomes the rulebook.
+   - `permissions-matrix-user-management-v7-11-4-test.html` remains the rulebook.
    - Admin Hub applies the rulebook.
    - Pricing page remains research/draft until billing exists.
 6. Whole app polish scan.
@@ -203,21 +230,23 @@ Do not claim public anonymous production readiness until the RLS/policy pass is 
 7. Final smoke test before promotion.
    - Owner login.
    - Normal user login.
+   - Creator Growth / Web Builder starter user test.
    - Banned/limited user test.
    - Web Builder route flow.
+   - Personal workspace owner-scope test.
    - Public preview/form test.
    - Main Stream Bandit watch/search/browse test.
    - Backups/manifest/control map updated.
 
 ## Current next target
 
-- `user-management-dashboard-v7-11-2-test.html`
+- `overlay-route-truth-machine-v7-12-66-test.html?page=landing`
 
 Reason:
 
-- The Admin Hub must become the real owner control room before live promotion.
-- It must not remain a toy/planner page.
-- It must control user access safely with owner-only rules and Supabase policy hardening.
+- Web Builder Hub and Pages Manager are now protected and scoped.
+- Next, apply the same Web Builder-only protected gate to the Studio / Publish route without adding the Stream Bandit app shell.
+- Continue one Web Builder page at a time.
 
 ## Safety locks
 
@@ -232,3 +261,7 @@ Reason:
 - unsafe user delete: false.
 - schema change without approval: false.
 - storage change without approval: false.
+- admin role alone unlocks personal Web Builder: false.
+- personal Web Builder rows visible to other non-owner users: false.
+- creator_growth personal Web Builder access: true.
+- Pages Manager personal `owner_id` scope: true.
