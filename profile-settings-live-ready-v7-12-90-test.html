@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Profile Settings V7.12.296.1</title>
+<title>Stream Bandit Profile Settings V7.12.296.2</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,8 +13,8 @@
 html,body{max-width:100vw;overflow-x:hidden}
 body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}
 .wrap{max-width:1500px;margin:auto}
-.hero,.box,.card,.modalCard,.stat,.check,.routeCard{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 48px #0007;padding:16px;margin-bottom:14px}
-.card,.stat,.check,.routeCard{background:var(--card);box-shadow:none;margin-bottom:0}
+.hero,.box,.card,.modalCard,.stat,.check,.routeCard,.drop,.fileMeta{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 48px #0007;padding:16px;margin-bottom:14px}
+.card,.stat,.check,.routeCard,.fileMeta{background:var(--card);box-shadow:none;margin-bottom:0}
 .badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950}
 .badge{padding:7px 12px}
 .pill{padding:5px 8px;font-size:12px;margin:2px}
@@ -28,7 +28,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 .heroGrid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(320px,480px);gap:18px}
 .profileArt{border:1px solid #ffffff1a;border-radius:30px;background:#0004;overflow:hidden;min-height:350px;display:grid;grid-template-rows:1fr auto}
 .banner{min-height:220px;background:linear-gradient(135deg,#22d3a620,#7c3cff35);display:grid;place-items:center;overflow:hidden}
-.banner img,.avatar img,.preview img{width:100%;height:100%;object-fit:cover}
+.banner img,.avatar img,.preview img,.modalPreview img{width:100%;height:100%;object-fit:cover}
 .profileInfo{padding:18px;display:flex;gap:14px;align-items:center}
 .avatar{width:112px;height:112px;border-radius:28px;background:#0005;border:1px solid #ffffff24;display:grid;place-items:center;overflow:hidden;flex:0 0 auto}
 .preview{height:180px;border-radius:20px;background:#0005;border:1px solid #ffffff24;display:grid;place-items:center;overflow:hidden}
@@ -44,10 +44,11 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 .note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
 .danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}
 .good,.safe{background:#22d3a61f}
-.grid,.stats,.checks,.routeGrid{display:grid;gap:12px}
+.grid,.stats,.checks,.routeGrid,.twoGrid{display:grid;gap:12px}
 .grid,.stats,.checks{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.twoGrid{grid-template-columns:minmax(280px,1fr) minmax(280px,1fr)}
 .routeGrid{grid-template-columns:repeat(auto-fill,minmax(245px,1fr))}
-.card b,.stat b,.check b,.routeCard b{display:block;color:#baf7df;margin-bottom:8px}
+.card b,.stat b,.check b,.routeCard b,.fileMeta b{display:block;color:#baf7df;margin-bottom:8px}
 .card span.big,.stat span{display:block;font-size:clamp(20px,2.2vw,30px);font-weight:950;line-height:1.05;overflow-wrap:anywhere}
 .field input,.field textarea,input,textarea{width:100%;border:1px solid #ffffff24;border-radius:14px;background:#0005;color:#fff;padding:12px;font:inherit;margin:7px 0}
 .field textarea,textarea{min-height:120px}
@@ -56,9 +57,16 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 .source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0006;border-radius:16px;padding:14px;color:#dfffee;max-height:420px;overflow:auto}
 .modal{position:fixed;inset:0;background:#000b;display:none;z-index:100000;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
 .modal.open{display:flex}
-.modalCard{width:min(900px,100%)}
+.modalCard{width:min(980px,100%)}
 .modalHead{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #ffffff18;padding-bottom:14px;margin-bottom:14px}
-.modalGrid{display:grid;grid-template-columns:minmax(240px,360px) 1fr;gap:14px}
+.modalGrid{display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:14px}
+.modalPreview{height:260px;border-radius:22px;background:#0005;border:1px solid #ffffff24;display:grid;place-items:center;overflow:hidden}
+.drop{position:relative;display:grid;place-items:center;border:2px dashed #ffffff38;background:linear-gradient(135deg,#22d3a612,#7c3cff18),#0005;padding:26px;text-align:center;cursor:pointer;min-height:210px;transition:transform .15s ease,border-color .15s ease,background .15s ease;box-shadow:none}
+.drop:hover,.drop.drag{border-color:var(--accent);background:linear-gradient(135deg,#22d3a622,#7c3cff28),#0006;transform:translateY(-1px)}
+.drop input{position:absolute;inset:0;opacity:0;pointer-events:none}
+.dropIcon{font-size:44px;margin-bottom:8px}
+.drop b{display:block;color:#fff;margin-bottom:8px;font-size:20px}
+.drop .fakeButton{display:inline-flex;margin-top:12px;border-radius:999px;padding:9px 13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017;font-weight:950}
 .toast{position:fixed;right:18px;bottom:18px;background:#12172a;color:#fff;border:1px solid #ffffff35;border-radius:16px;padding:13px 16px;box-shadow:0 16px 44px #0009;font-weight:900;z-index:100001}
 .routeStrip{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
 .routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}
@@ -69,16 +77,12 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 .pagePill{border:1px solid color-mix(in srgb,var(--line),var(--accent) 22%);border-radius:999px;padding:11px 17px;background:color-mix(in srgb,var(--p),#000 18%);color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;box-shadow:inset 0 1px #ffffff12}
 .pagePill.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:color-mix(in srgb,var(--accent),#fff 18%);color:#061017}
 .pagePill.back{background:color-mix(in srgb,var(--p),#000 24%)}
-.sb-h-account{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;white-space:nowrap!important}
-.sb-profile-chip-avatar{width:26px;height:26px;border-radius:999px;overflow:hidden;border:1px solid #ffffff66;background:#0005;display:inline-grid;place-items:center;flex:0 0 auto;font-size:15px;line-height:1}
-.sb-profile-chip-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .mini{text-align:center;color:#8f98b8;margin:28px 0;font-size:12px}
 @media(max-width:980px){
  body{padding:10px}
- .heroGrid,.modalGrid{grid-template-columns:1fr}
+ .heroGrid,.modalGrid,.twoGrid{grid-template-columns:1fr}
  .btn,.tab,.locked,.pagePill{width:100%;white-space:normal}
  .routeGrid{grid-template-columns:1fr}
- .sb-h-account{width:auto!important;min-width:0!important}
 }
 </style>
 </head>
@@ -104,15 +108,15 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.296.1 Profile Settings · Account Chip Avatar Fix</span>
+      <span class="badge">V7.12.296.2 Profile Settings · Profile Upload Bridge</span>
       <h1>Profile Settings</h1>
-      <p>Safe account/profile destination. Existing users can sign in with magic link, load their own profile row, update profile text, upload avatar/banner images, and sync the top header Account chip to the signed-in user’s own avatar.</p>
+      <p>Profile Settings owns each signed-in user’s profile text, avatar and banner. The image editor now uses the same safe select / preview / upload / public URL flow as the brand tools, but saves to <code>sb_profiles</code>, not the global brand logo.</p>
       <div class="routeStrip">
         <span>Auth → current session</span>
         <span>Avatar → sb_profiles.avatar_url</span>
-        <span>Header chip → current user only</span>
-        <span>Cache → cleared on user switch</span>
-        <span>Signup → locked</span>
+        <span>Banner → sb_profiles.banner_url</span>
+        <span>Upload → stream-bandit-images/profiles</span>
+        <span>Header → shell refresh event</span>
       </div>
 
       <div class="card">
@@ -131,15 +135,15 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
       <div class="actions">
         <button id="loadProfile" class="btn primary" type="button">Load Profile</button>
         <button id="createProfile" class="btn cyan" type="button">Create Missing Profile Row</button>
-        <button id="saveText" class="btn hot" type="button">Save Text + Sync Chip</button>
-        <button id="openAvatar" class="btn cyan" type="button">Edit Avatar</button>
-        <button id="openBanner" class="btn warn" type="button">Edit Banner</button>
-        <button id="syncHeader" class="btn" type="button">Sync Account Chip</button>
+        <button id="saveText" class="btn hot" type="button">Save Text</button>
+        <button id="openAvatar" class="btn cyan" type="button">Upload Avatar</button>
+        <button id="openBanner" class="btn warn" type="button">Upload Banner</button>
+        <button id="notifyHeader" class="btn" type="button">Refresh Header Shell</button>
       </div>
 
       <div id="helperStatus" class="status">Checking helpers...</div>
       <div id="status" class="status">Loading profile...</div>
-      <div class="note">Image files use Supabase Storage bucket <b>stream-bandit-images</b>. Allowed image types: PNG, JPEG, WEBP. No video uploads here.</div>
+      <div class="note">This page does not use <code>data-sb-brand-logo</code> for avatar previews and does not call the global Brand Logo apply/save path.</div>
     </div>
 
     <div class="profileArt">
@@ -160,9 +164,9 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div class="stats">
     <div class="stat"><b>Signed in</b><span id="statSigned">--</span><p>Supabase Auth state.</p></div>
     <div class="stat"><b>Profile row</b><span id="statProfile">--</span><p>Current signed-in user’s sb_profiles row.</p></div>
-    <div class="stat"><b>Account chip</b><span id="statHeader">--</span><p>Top header Account chip avatar state.</p></div>
+    <div class="stat"><b>Avatar URL</b><span id="statAvatar">--</span><p>Reads and writes sb_profiles.avatar_url.</p></div>
+    <div class="stat"><b>Header Shell</b><span id="statHeader">--</span><p>Shell refresh / profile-updated event state.</p></div>
     <div class="stat"><b>Signup mode</b><span>Locked</span><p>Existing users only.</p></div>
-    <div class="stat"><b>Storage</b><span>Images</span><p>Avatar/banner only.</p></div>
   </div>
 </section>
 
@@ -170,9 +174,8 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div class="tabs">
     <button class="tab active" data-tab="profile" type="button">Profile Text</button>
     <button class="tab" data-tab="images" type="button">Images</button>
-    <button class="tab" data-tab="previewSec" type="button">Preview</button>
-    <button class="tab" data-tab="headerBridgeSec" type="button">Account Chip Bridge</button>
-    <button class="tab" data-tab="testSec" type="button">Spare Test Guide</button>
+    <button class="tab" data-tab="bridgeSec" type="button">Header Bridge</button>
+    <button class="tab" data-tab="testSec" type="button">Test Guide</button>
     <button class="tab" data-tab="debugSec" type="button">Debug</button>
   </div>
 </section>
@@ -188,58 +191,43 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 </section>
 
 <section id="images" class="box section">
-  <h2>Avatar and banner</h2>
-  <div class="grid">
+  <h2>Profile image editors</h2>
+  <div class="twoGrid">
     <div class="card">
       <b>Avatar</b>
       <div id="avatarPreview" class="avatar">👤</div>
-      <p>Open editor to choose, preview, upload and save. Saving avatar updates <code>sb_profiles.avatar_url</code> and the top header Account chip.</p>
-      <button id="openAvatar2" class="btn cyan" type="button">Open Avatar Editor</button>
+      <p>This saves to <code>sb_profiles.avatar_url</code> for the current signed-in user.</p>
       <input id="avatarUrl" readonly placeholder="avatar_url">
+      <div class="actions"><button id="openAvatar2" class="btn cyan" type="button">Open Avatar Upload</button></div>
     </div>
     <div class="card">
       <b>Banner</b>
       <div id="bannerPreview" class="preview">Banner</div>
-      <p>Open editor to choose, preview, upload and save.</p>
-      <button id="openBanner2" class="btn warn" type="button">Open Banner Editor</button>
+      <p>This saves to <code>sb_profiles.banner_url</code> for the current signed-in user.</p>
       <input id="bannerUrl" readonly placeholder="banner_url">
+      <div class="actions"><button id="openBanner2" class="btn warn" type="button">Open Banner Upload</button></div>
     </div>
   </div>
 </section>
 
-<section id="previewSec" class="box section">
-  <h2>Profile preview</h2>
-  <div class="profileInfo">
-    <div id="avatarMini" class="avatar">👤</div>
-    <div>
-      <h2 id="previewName">Profile name</h2>
-      <p id="previewUser">@username</p>
-      <p id="previewBio">Bio preview</p>
-      <span id="previewRole" class="pill">Role</span>
-    </div>
-  </div>
-</section>
-
-<section id="headerBridgeSec" class="box section">
-  <h2>Top header Account chip bridge</h2>
+<section id="bridgeSec" class="box section">
+  <h2>Header shell bridge</h2>
   <div class="checks">
-    <div class="check"><b>Reads Auth + sb_profiles</b><p>The page reads the current Supabase Auth session, then loads <code>sb_profiles</code> where <code>id = auth.user.id</code>.</p></div>
-    <div class="check"><b>Current user only</b><p>The header cache is written only when the profile row belongs to the current Auth user.</p></div>
-    <div class="check"><b>No locked avatar</b><p>Trevor’s browser gets Trevor’s avatar. Kayleigh’s browser gets Kayleigh’s avatar. Switching accounts clears stale cached profile values.</p></div>
-    <div class="check"><b>Survives header refresh</b><p>This page patches the visible Account chip after header helper refresh/update calls so it does not revert to plain <code>Account ✓</code>.</p></div>
+    <div class="check"><b>Header owns chip</b><p>Profile Settings does not patch the Account chip. It saves the profile row and asks the shell to refresh.</p></div>
+    <div class="check"><b>Profile cache</b><p>After save, the current signed-in user’s profile is cached under the header profile keys for fast shell load.</p></div>
+    <div class="check"><b>Event</b><p>After save, Profile Settings dispatches <code>streambandit-profile-updated</code>, <code>streambandit-account-updated</code>, and <code>streambandit-header-profile-updated</code>.</p></div>
+    <div class="check"><b>No brand fallback</b><p>Avatar previews never use <code>data-sb-brand-logo</code> and never call the Brand Logo helper save/apply path.</p></div>
   </div>
-  <div id="bridgeStatus" class="safe">Waiting for profile sync...</div>
+  <div id="bridgeStatus" class="safe">Waiting for profile load...</div>
 </section>
 
 <section id="testSec" class="box section">
   <h2>Spare-account test guide</h2>
   <div class="grid">
-    <div class="card"><b>Existing-only login</b><p>This page sends magic links only to existing Auth users.</p></div>
-    <div class="card"><b>Admin/owner browser</b><p>Sign in as your account and upload your avatar. The top Account chip should show your image.</p></div>
-    <div class="card"><b>Kayleigh browser</b><p>Use another browser/private window for Kayleigh’s account and upload her avatar. The chip should show her image there.</p></div>
-    <div class="card"><b>Switch proof</b><p>Sign out, sign in as the other account, Load Profile, then Sync Account Chip. The old avatar should not remain.</p></div>
-    <div class="card"><b>No public signup</b><p>New unknown emails should not create Auth users from this page.</p></div>
-    <div class="card"><b>Missing profile row</b><p>Create Missing Profile Row is only for an already signed-in existing Auth user without a profile row.</p></div>
+    <div class="card"><b>Your account</b><p>Sign in as your admin/owner account, upload an avatar, then refresh the page. The header shell should show your avatar.</p></div>
+    <div class="card"><b>Kayleigh account</b><p>Use another browser/private window, sign in as Kayleigh, upload her avatar, then refresh. The header shell should show her avatar.</p></div>
+    <div class="card"><b>No logo fallback</b><p>If the global Stream Bandit logo appears in the account chip, check whether that URL was accidentally saved into <code>sb_profiles.avatar_url</code>.</p></div>
+    <div class="card"><b>Header proof</b><p>Use Header Shell state/debug to confirm it reads Auth user id, then <code>sb_profiles.id = auth.user.id</code>.</p></div>
   </div>
 </section>
 
@@ -248,30 +236,39 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="mini">V7.12.296.1 Profile Settings — own profile editing + sb_profiles avatar + top Account chip avatar bridge + stale account cache guard.</p>
+<p class="mini">V7.12.296.2 Profile Settings — profile-scoped image upload bridge. Saves avatar/banner to sb_profiles and lets Header Shell render the account chip site-wide.</p>
 </div>
 
 <div id="imageModal" class="modal">
   <div class="modalCard">
     <div class="modalHead">
       <div>
-        <span class="badge" id="modalBadge">Image Editor</span>
-        <h2 id="modalTitle">Edit image</h2>
-        <p class="muted">Choose PNG/JPEG/WEBP, preview it, upload, then save the public URL to your profile.</p>
+        <span class="badge" id="modalBadge">Profile Image Upload</span>
+        <h2 id="modalTitle">Upload profile image</h2>
+        <p class="muted">Same safe flow as Brand / App Icons: choose image, preview locally, upload to Supabase Storage, then save the public URL. Profile Settings saves to <code>sb_profiles</code>.</p>
       </div>
       <button id="closeImageModal" class="btn" type="button">Close</button>
     </div>
+
     <div class="modalGrid">
       <div>
-        <div id="modalPreview" class="preview">Preview</div>
-        <input id="modalFile" type="file" accept="image/png,image/jpeg,image/webp" style="margin-top:12px">
+        <label class="drop" id="dropZone">
+          <input id="modalFile" type="file" accept="image/png,image/jpeg,image/webp">
+          <span class="dropIcon">⬆️🖼️</span>
+          <b id="dropTitle">Drag & drop image here</b>
+          <span class="muted">or click this panel to choose PNG, JPEG or WEBP</span>
+          <span class="fakeButton">Choose image</span>
+        </label>
+        <div id="fileMeta" class="fileMeta"><b>No image selected.</b><br><span class="muted">Drop an image to preview it before upload.</span></div>
       </div>
       <div>
+        <h3>Selected / uploaded preview</h3>
+        <div id="modalPreview" class="modalPreview">Preview</div>
         <label class="muted">Public URL after upload</label>
         <input id="modalUrl" readonly placeholder="Public URL will appear here">
         <div class="actions">
-          <button id="uploadSaveImage" class="btn hot" type="button">Upload + Save + Sync Chip</button>
-          <button id="useExistingImage" class="btn cyan" type="button">Use Current URL</button>
+          <button id="uploadSaveImage" class="btn hot" type="button">Upload + Save To Profile</button>
+          <button id="clearSelection" class="btn" type="button">Clear Selection</button>
         </div>
         <div id="modalStatus" class="status">Waiting...</div>
       </div>
@@ -279,49 +276,44 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   </div>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=profile-chip-avatar-296-1"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=profile-chip-avatar-296-1"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=profile-chip-avatar-296-1"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=profile-chip-avatar-296-1"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=profile-chip-avatar-296-1"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=profile-chip-avatar-296-1"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=profile-chip-avatar-296-1"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=profile-chip-avatar-296-1"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=profile-chip-avatar-296-1"></script>
+<script src="stream-bandit-shell-v6-24.js?v=profile-upload-bridge-296-2"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=profile-upload-bridge-296-2"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=profile-upload-bridge-296-2"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=profile-upload-bridge-296-2"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=profile-upload-bridge-296-2"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=profile-upload-bridge-296-2"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=profile-upload-bridge-296-2"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=profile-upload-bridge-296-2"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=profile-upload-bridge-296-2"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.296.1 Profile Settings Account Chip Avatar Fix';
+const VERSION='V7.12.296.2 Profile Settings Profile Upload Bridge';
 const BUCKET='stream-bandit-images';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const PROFILE_CACHE_KEYS=['sb_header_profile_cache_v7_12_156','streamBanditProfile','sb_profile'];
-const PROFILE_ROUTE='profile-settings-live-ready-v7-12-90-test.html';
 
-let sb=null,user=null,profile=null,currentKind='avatar',selectedFile=null,countBusy=false,countReady=false,lastCountRead=0,headerPatchInstalled=false,chipPatchTimer=null;
+let sbClient=null;
+let user=null;
+let profile=null;
+let selectedFile=null;
+let localObjectUrl='';
+let currentKind='avatar';
+let countBusy=false;
+let countReady=false;
+let lastCountRead=0;
 
 const $=id=>document.getElementById(id);
 
-const R={
+const debugState={
  version:VERSION,
- signedIn:false,
- profileLoaded:false,
- writes:false,
- storageWrites:false,
- authSignOut:true,
- shouldCreateUser:false,
- publicSignup:false,
- authAdmin:false,
- realDelete:false,
- bucket:BUCKET,
- accountChipAvatar:true,
- headerAvatarBridge:true,
- readsAuth:true,
- readsSbProfiles:true,
- currentUserCacheOnly:true,
- staleCacheGuard:true,
+ page:'profile-settings-live-ready-v7-12-90-test.html',
+ profileScopedUpload:true,
+ brandLogoWrites:false,
+ dataSbBrandLogoUse:false,
  schemaChange:false,
  storagePolicyChange:false,
  rlsChange:false,
@@ -330,29 +322,27 @@ const R={
 
 function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c));}
 function clean(v,n){return String(v||'').trim().slice(0,n);}
+function formatSize(n){n=Number(n)||0;if(n>1024*1024)return (n/1024/1024).toFixed(2)+' MB';if(n>1024)return Math.round(n/1024)+' KB';return n+' B';}
 function toast(m){let t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2400);}
 function status(t,b){$('status').textContent=t;$('status').className=b?'danger':'status';}
 function acct(t,b){$('accountStatus').textContent=t;$('accountStatus').className=b?'note':'status';}
 function modal(t,b){$('modalStatus').textContent=t;$('modalStatus').className=b?'note':'status';}
-function client(){if(sb)return sb;sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return sb;}
+function client(){if(sbClient)return sbClient;sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return sbClient;}
 
 function settingsGlobalLoaded(){return !!(window.StreamBanditSettingsGlobal||window.StreamBanditSettingsGlobalV718||window.StreamBanditSettingsGlobalV718Ready);}
 function brandLoaded(){return !!(window.StreamBanditBrandLogo||window.StreamBanditBrandLogoV71212||window.StreamBanditBrandLogoHelper);}
 
+function roleOf(p){return p&&p.role?p.role:'user';}
+function nameOf(p){return clean((p&&p.display_name)||(p&&p.channel_name)||(p&&p.username)||(user&&user.email?user.email.split('@')[0]:'Profile name'),90);}
+function usernameOf(p){return clean((p&&p.username)||(user&&user.email?user.email.split('@')[0]:'username'),60);}
+function avatarOf(p){return clean((p&&p.avatar_url)||(p&&p.avatar)||(p&&p.profile_image_url)||(p&&p.image_url)||'',900);}
+function bannerOf(p){return clean((p&&p.banner_url)||(p&&p.banner)||(p&&p.cover_url)||'',900);}
+
 function showImg(id,url,fallback){
  let el=$(id);
- if(el)el.innerHTML=url?'<img src="'+esc(url)+'" alt="">':fallback;
+ if(!el)return;
+ el.innerHTML=url?'<img src="'+esc(url)+'" alt="">':fallback;
 }
-
-function roleOf(p){return p&&p.role?p.role:'user';}
-function nameOf(p){
- return clean((p&&p.display_name)||(p&&p.channel_name)||(p&&p.username)||(user&&user.email?user.email.split('@')[0]:'Profile name'),90);
-}
-function usernameOf(p){
- return clean((p&&p.username)||(user&&user.email?user.email.split('@')[0]:'username'),60);
-}
-function avatarOf(p){return clean((p&&p.avatar_url)||(p&&p.avatar)||(p&&p.profile_image_url)||(p&&p.image_url)||'',600);}
-function bannerOf(p){return clean((p&&p.banner_url)||(p&&p.banner)||(p&&p.cover_url)||'',600);}
 
 function payloadForHeader(p){
  if(!user||!p||!p.id||String(p.id)!==String(user.id))return null;
@@ -374,36 +364,13 @@ function payloadForHeader(p){
   role:p.role||'user',
   can_submit:!!p.can_submit,
   updated_at:p.updated_at||new Date().toISOString(),
-  cacheOwner:'profile-settings',
+  cacheOwner:'profile-settings-upload-bridge',
   cacheVersion:VERSION
  };
 }
 
-function readCachedProfile(key){
- try{
-  let raw=localStorage.getItem(key);
-  return raw?JSON.parse(raw):null;
- }catch(e){
-  return null;
- }
-}
-
-function clearHeaderProfileCache(){
- PROFILE_CACHE_KEYS.forEach(k=>{
-  try{localStorage.removeItem(k);}catch(e){}
- });
-}
-
-function clearForeignHeaderCache(){
- if(!user)return;
-
- PROFILE_CACHE_KEYS.forEach(k=>{
-  let cached=readCachedProfile(k);
-
-  if(cached&&cached.id&&String(cached.id)!==String(user.id)){
-   try{localStorage.removeItem(k);}catch(e){}
-  }
- });
+function clearProfileCache(){
+ PROFILE_CACHE_KEYS.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
 }
 
 function cacheProfileForHeader(p){
@@ -411,166 +378,46 @@ function cacheProfileForHeader(p){
 
  if(!payload)return false;
 
- PROFILE_CACHE_KEYS.forEach(k=>{
-  try{localStorage.setItem(k,JSON.stringify(payload));}catch(e){}
- });
-
+ PROFILE_CACHE_KEYS.forEach(k=>{try{localStorage.setItem(k,JSON.stringify(payload));}catch(e){}});
  try{localStorage.setItem('streamBanditProfileUpdatedAt',new Date().toISOString());}catch(e){}
 
  return true;
 }
 
-function accountChipAvatarHtml(p){
- let url=avatarOf(p);
- let img=url?'<img src="'+esc(url)+'" alt="">':'👤';
- return '<span class="sb-profile-chip-avatar" data-sb-chip-avatar-user-id="'+esc(p&&p.id||'')+'">'+img+'</span><span>Account ✓</span>';
-}
+function dispatchProfileUpdated(reason){
+ let payload=payloadForHeader(profile);
 
-function patchVisibleHeaderChip(){
- let p=payloadForHeader(profile);
- let chip=document.getElementById('sbHeaderAccountChip');
-
- if(!chip)return false;
-
- if(!p){
-  if(!user){
-   chip.textContent='Account';
-   chip.classList.remove('signed-in');
-   chip.removeAttribute('data-sb-account-user-id');
-  }
-  return false;
- }
-
- chip.innerHTML=accountChipAvatarHtml(p);
- chip.classList.add('signed-in');
- chip.setAttribute('data-sb-account-user-id',p.id);
- chip.setAttribute('data-sb-account-avatar-url',p.avatar_url||'');
- chip.setAttribute('title','Account: '+nameOf(p));
-
- let headerName=document.getElementById('sbHeaderProfileText');
- let headerRole=document.getElementById('sbHeaderRoleText');
-
- if(headerName)headerName.textContent=nameOf(p).slice(0,26);
- if(headerRole)headerRole.textContent='Role: '+roleOf(p).slice(0,24);
-
- let panelName=document.getElementById('sbAccountName');
- let panelRole=document.getElementById('sbAccountRole');
- let panelEmail=document.getElementById('sbAccountEmail');
- let panelInput=document.getElementById('sbAccountEmailInput');
- let panelAvatar=document.getElementById('sbAccountAvatar');
-
- if(panelName)panelName.textContent=nameOf(p);
- if(panelRole)panelRole.textContent='Role: '+roleOf(p);
- if(panelEmail)panelEmail.textContent=user&&user.email?user.email:'Not signed in';
- if(panelInput&&user&&user.email)panelInput.value=user.email;
-
- if(panelAvatar){
-  if(p.avatar_url){
-   panelAvatar.src=p.avatar_url;
-   panelAvatar.setAttribute('data-sb-profile-avatar-user-id',p.id);
-  }
- }
-
- $('statHeader').textContent='Synced';
- $('bridgeStatus').textContent='Top Account chip is synced to '+nameOf(profile)+'.';
- $('bridgeStatus').className='safe';
-
- return true;
-}
-
-function dispatchProfileEvents(p,reason){
- let payload=payloadForHeader(p);
-
- if(!payload)return;
+ if(!payload)return false;
 
  try{window.dispatchEvent(new CustomEvent('streambandit-profile-updated',{detail:{profile:payload,reason:reason||'profile-settings'}}));}catch(e){}
  try{window.dispatchEvent(new CustomEvent('streambandit-account-updated',{detail:{profile:payload,reason:reason||'profile-settings'}}));}catch(e){}
  try{window.dispatchEvent(new CustomEvent('streambandit-header-profile-updated',{detail:{profile:payload,reason:reason||'profile-settings'}}));}catch(e){}
- try{window.dispatchEvent(new StorageEvent('storage',{key:'sb_header_profile_cache_v7_12_156',newValue:JSON.stringify(payload)}));}catch(e){}
+
+ return true;
 }
 
-function installHeaderAvatarPatch(){
- if(headerPatchInstalled)return;
- if(!window.StreamBanditHeaderShell)return;
-
- let shell=window.StreamBanditHeaderShell;
- let names=['refresh','updateAccount','refreshAuth'];
-
- names.forEach(name=>{
-  if(typeof shell[name]!=='function'||shell[name].__sbProfileChipWrapped)return;
-
-  let original=shell[name];
-
-  shell[name]=function(){
-   let result=original.apply(shell,arguments);
-
-   try{
-    if(result&&typeof result.then==='function'){
-     result.then(()=>scheduleChipPatch(name+'-promise')).catch(()=>scheduleChipPatch(name+'-promise-error'));
-    }else{
-     scheduleChipPatch(name);
-    }
-   }catch(e){
-    scheduleChipPatch(name+'-catch');
-   }
-
-   return result;
-  };
-
-  shell[name].__sbProfileChipWrapped=true;
- });
-
- headerPatchInstalled=true;
-}
-
-function scheduleChipPatch(reason){
- setTimeout(()=>patchVisibleHeaderChip(),30);
- setTimeout(()=>patchVisibleHeaderChip(),160);
- setTimeout(()=>patchVisibleHeaderChip(),500);
- setTimeout(()=>patchVisibleHeaderChip(),1100);
- debug({chipPatchReason:reason||'scheduled'});
-}
-
-async function syncHeaderProfile(reason){
+async function refreshHeaderShell(reason){
  let cached=cacheProfileForHeader(profile);
-
- installHeaderAvatarPatch();
-
- try{
-  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refreshAuth)await window.StreamBanditHeaderShell.refreshAuth(false);
- }catch(e){}
+ let eventSent=dispatchProfileUpdated(reason);
 
  try{
-  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();
+  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refreshProfile){
+   await window.StreamBanditHeaderShell.refreshProfile(false);
+  }else if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refreshAuth){
+   await window.StreamBanditHeaderShell.refreshAuth(false,true);
+  }
  }catch(e){}
 
- try{
-  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateAccount)window.StreamBanditHeaderShell.updateAccount();
- }catch(e){}
+ try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
+ try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateAccount)window.StreamBanditHeaderShell.updateAccount();}catch(e){}
+ try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateAccountPanel)window.StreamBanditHeaderShell.updateAccountPanel();}catch(e){}
+ try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();}catch(e){}
 
- try{
-  if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();
- }catch(e){}
+ $('statHeader').textContent=cached||eventSent?'Notified':'--';
+ $('bridgeStatus').textContent=cached||eventSent?'Header Shell notified to re-read the current signed-in profile.':'Header Shell waiting for matching signed-in profile.';
+ $('bridgeStatus').className=cached||eventSent?'safe':'note';
 
- patchVisibleHeaderChip();
- scheduleChipPatch(reason||'manual-sync');
- dispatchProfileEvents(profile,reason||'manual-sync');
-
- $('statHeader').textContent=cached?'Synced':'--';
- $('bridgeStatus').textContent=cached?'Top Account chip synced for '+nameOf(profile)+'.':'Account chip sync waiting for signed-in matching profile.';
- $('bridgeStatus').className=cached?'safe':'note';
-
- debug({headerSyncReason:reason||'manual-sync',cached:cached});
- return cached;
-}
-
-function startChipPatchTimer(){
- if(chipPatchTimer)return;
-
- chipPatchTimer=setInterval(()=>{
-  installHeaderAvatarPatch();
-  patchVisibleHeaderChip();
- },1500);
+ debug({headerRefreshReason:reason||'manual',cached,eventSent});
 }
 
 function render(){
@@ -581,16 +428,11 @@ function render(){
 
  showImg('avatarHero',av,'👤');
  showImg('avatarPreview',av,'👤');
- showImg('avatarMini',av,'👤');
  showImg('bannerHero',bn,'Banner preview');
  showImg('bannerPreview',bn,'Banner');
 
  $('heroName').textContent=name;
- $('previewName').textContent=name;
  $('heroUser').textContent='@'+un;
- $('previewUser').textContent='@'+un;
- $('previewBio').textContent=$('channelAbout').value||'Bio preview';
- $('previewRole').textContent='Role: '+roleOf(profile);
  $('heroRole').textContent='Role: '+roleOf(profile);
 
  stats();
@@ -607,22 +449,15 @@ function fill(p){
  $('avatarUrl').value=profile.avatar_url||'';
  $('bannerUrl').value=profile.banner_url||'';
 
- R.profileLoaded=!!profile.id;
-
  render();
 
- if(profile.id&&user&&String(profile.id)===String(user.id)){
-  syncHeaderProfile('fill-profile');
- }
+ if(profile.id&&user&&String(profile.id)===String(user.id))refreshHeaderShell('fill-profile');
 }
 
 function stats(){
  $('statSigned').textContent=user?'Yes':'No';
  $('statProfile').textContent=profile&&profile.id?'Loaded':'--';
- $('statHeader').textContent=profile&&profile.id&&user&&String(profile.id)===String(user.id)?'Ready':'--';
-
- R.signedIn=!!user;
- R.profileLoaded=!!(profile&&profile.id);
+ $('statAvatar').textContent=avatarOf(profile)?'Set':'--';
 }
 
 async function refreshSession(){
@@ -635,11 +470,10 @@ async function refreshSession(){
   if(user){
    $('emailInput').value=user.email||$('emailInput').value;
    acct('Signed in as '+(user.email||user.id)+'.');
-   clearForeignHeaderCache();
   }else{
    acct('Signed out. Existing users can request a sign-in link.',true);
    profile=null;
-   clearHeaderProfileCache();
+   clearProfileCache();
    fill({});
   }
 
@@ -683,20 +517,14 @@ async function signOut(){
 
   user=null;
   profile=null;
-  clearHeaderProfileCache();
+  clearProfileCache();
 
-  try{
-   if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.signOut)await window.StreamBanditHeaderShell.signOut();
-  }catch(e){}
+  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.signOut)await window.StreamBanditHeaderShell.signOut();}catch(e){}
 
   fill({});
-  patchVisibleHeaderChip();
-
   acct('Signed out. Existing users can sign in again.',true);
   status('Signed out.');
   toast('Signed out');
-
-  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
 
   stats();
   debug({signedOut:true});
@@ -726,9 +554,8 @@ async function loadProfile(){
   }
 
   fill(r.data);
-  status('Profile loaded and top Account chip synced.');
-  await syncHeaderProfile('load-profile');
-  debug({loadedProfile:true});
+  status('Profile loaded from sb_profiles for current signed-in user.');
+  await refreshHeaderShell('load-profile');
  }catch(e){
   status('Profile load failed: '+(e.message||e),true);
   debug({loadProfileError:e.message||String(e)});
@@ -752,8 +579,8 @@ async function createProfile(){
    display_name:clean($('displayName').value||base,80),
    channel_name:clean($('channelName').value||base+' Channel',90),
    channel_about:clean($('channelAbout').value||'',500),
-   avatar_url:clean($('avatarUrl').value||'',600),
-   banner_url:clean($('bannerUrl').value||'',600),
+   avatar_url:clean($('avatarUrl').value||'',900),
+   banner_url:clean($('bannerUrl').value||'',900),
    role:'user',
    can_submit:false,
    updated_at:new Date().toISOString()
@@ -765,11 +592,9 @@ async function createProfile(){
 
   fill(r.data||row);
 
-  R.writes=true;
-
-  status('Missing profile row created for existing signed-in Auth user and synced to top Account chip.');
+  status('Missing profile row created for existing signed-in Auth user.');
   toast('Profile row created');
-  await syncHeaderProfile('create-profile');
+  await refreshHeaderShell('create-profile');
  }catch(e){
   status('Create profile row failed: '+(e.message||e)+'. If this is blocked, RLS needs a planned fix.',true);
   debug({createProfileError:e.message||String(e)});
@@ -799,31 +624,13 @@ async function saveText(){
 
   fill(r.data||Object.assign({},profile,patch));
 
-  R.writes=true;
-
-  status('Profile text saved and top Account chip synced.');
-  toast('Saved + chip synced');
-  await syncHeaderProfile('save-text');
+  status('Profile text saved to sb_profiles.');
+  toast('Profile text saved');
+  await refreshHeaderShell('save-text');
  }catch(e){
   status('Save failed: '+(e.message||e),true);
   debug({saveTextError:e.message||String(e)});
  }
-}
-
-function openModal(kind){
- currentKind=kind;
- selectedFile=null;
- $('modalFile').value='';
- $('modalUrl').value=kind==='avatar'?$('avatarUrl').value:$('bannerUrl').value;
- $('modalTitle').textContent=kind==='avatar'?'Edit Avatar':'Edit Banner';
- $('modalBadge').textContent=kind==='avatar'?'Avatar Upload':'Banner Upload';
- showImg('modalPreview',$('modalUrl').value,'Preview');
- modal('Choose PNG, JPEG or WEBP.');
- $('imageModal').classList.add('open');
-}
-
-function closeModal(){
- $('imageModal').classList.remove('open');
 }
 
 function fileExt(file){
@@ -837,31 +644,81 @@ function fileExt(file){
  return'jpeg';
 }
 
-function previewFile(){
- let f=$('modalFile').files&&$('modalFile').files[0];
+function clearSelection(){
+ selectedFile=null;
 
- selectedFile=f||null;
+ if(localObjectUrl){
+  try{URL.revokeObjectURL(localObjectUrl);}catch(e){}
+ }
 
- if(!f)return;
+ localObjectUrl='';
+ $('modalFile').value='';
+ $('modalUrl').value='';
+ $('modalPreview').innerHTML='Preview';
+ $('fileMeta').innerHTML='<b>No image selected.</b><br><span class="muted">Drop an image to preview it before upload.</span>';
+ modal('Selection cleared.');
+ debug({clearSelection:true});
+}
 
- let ok=['image/png','image/jpeg','image/webp'].includes(f.type);
+function selectFile(file){
+ if(!file){
+  clearSelection();
+  return;
+ }
 
- if(!ok){
+ if(!String(file.type||'').startsWith('image/')){
+  modal('Please select an image file.',true);
+  return;
+ }
+
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type)){
   modal('Only PNG, JPEG or WEBP are allowed.',true);
   return;
  }
 
- if(f.size>50*1024*1024){
+ if(file.size>50*1024*1024){
   modal('File too large. Supabase bucket limit is 50 MB.',true);
   return;
  }
 
- let reader=new FileReader();
+ selectedFile=file;
 
- reader.onload=()=>showImg('modalPreview',reader.result,'Preview');
- reader.readAsDataURL(f);
+ if(localObjectUrl){
+  try{URL.revokeObjectURL(localObjectUrl);}catch(e){}
+ }
 
- modal('Preview ready. Click Upload + Save + Sync Chip.');
+ localObjectUrl=URL.createObjectURL(file);
+
+ $('modalPreview').innerHTML='<img src="'+esc(localObjectUrl)+'" alt="Selected profile image preview">';
+ $('fileMeta').innerHTML='<b>'+esc(file.name)+'</b><br><span class="muted">'+esc(file.type||'image')+' · '+formatSize(file.size)+' · ready to upload.</span>';
+ modal('Selected '+file.name+'. Preview it here, then upload and save to profile.');
+
+ debug({selectedFile:{name:file.name,size:file.size,type:file.type},kind:currentKind});
+}
+
+function openModal(kind){
+ currentKind=kind;
+ clearSelection();
+
+ let current=kind==='avatar'?$('avatarUrl').value:$('bannerUrl').value;
+
+ $('modalTitle').textContent=kind==='avatar'?'Upload Avatar':'Upload Banner';
+ $('modalBadge').textContent=kind==='avatar'?'Avatar Upload To Profile':'Banner Upload To Profile';
+ $('dropTitle').textContent=kind==='avatar'?'Drag & drop avatar here':'Drag & drop banner here';
+
+ if(current){
+  $('modalUrl').value=current;
+  $('modalPreview').innerHTML='<img src="'+esc(current)+'" alt="Current profile image">';
+  modal('Current '+kind+' URL loaded. Choose a new file to replace it.');
+ }else{
+  modal('Choose PNG, JPEG or WEBP.');
+ }
+
+ $('imageModal').classList.add('open');
+}
+
+function closeModal(){
+ $('imageModal').classList.remove('open');
 }
 
 async function uploadSaveImage(){
@@ -878,71 +735,54 @@ async function uploadSaveImage(){
    return;
   }
 
-  let ok=['image/png','image/jpeg','image/webp'].includes(selectedFile.type);
-
-  if(!ok){
-   modal('Only PNG, JPEG or WEBP are allowed.',true);
-   return;
-  }
-
   let ext=fileExt(selectedFile);
-  let path='profiles/'+user.id+'/'+currentKind+'-'+Date.now()+'.'+ext;
+  let path='profiles/'+user.id+'/'+currentKind+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
 
-  modal('Uploading...');
+  modal('Uploading to '+BUCKET+'/'+path+' ...');
 
-  let up=await c.storage.from(BUCKET).upload(path,selectedFile,{cacheControl:'3600',upsert:true,contentType:selectedFile.type});
+  let up=await c.storage.from(BUCKET).upload(path,selectedFile,{cacheControl:'3600',upsert:true,contentType:selectedFile.type||'image/jpeg'});
 
   if(up.error)throw up.error;
 
   let pub=c.storage.from(BUCKET).getPublicUrl(path);
-  let url=pub.data.publicUrl;
+  let url=pub&&pub.data&&pub.data.publicUrl||'';
+
+  if(!url)throw new Error('Public URL was not returned after upload.');
 
   $('modalUrl').value=url;
 
-  if(currentKind==='avatar')$('avatarUrl').value=url;
-  else $('bannerUrl').value=url;
-
   let patch=currentKind==='avatar'?{avatar_url:url,updated_at:new Date().toISOString()}:{banner_url:url,updated_at:new Date().toISOString()};
+
+  modal('Upload complete. Saving URL to sb_profiles...');
 
   let r=await c.from('sb_profiles').update(patch).eq('id',user.id).select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,updated_at').maybeSingle();
 
   if(r.error)throw r.error;
 
-  fill(r.data||Object.assign({},profile,patch));
+  profile=r.data||Object.assign({},profile,patch);
 
-  R.writes=true;
-  R.storageWrites=true;
+  if(currentKind==='avatar')$('avatarUrl').value=url;
+  else $('bannerUrl').value=url;
 
-  modal('Uploaded, saved and synced to top Account chip.');
-  status((currentKind==='avatar'?'Avatar':'Banner')+' saved. Account chip bridge synced.');
-  toast('Image saved + chip synced');
+  fill(profile);
 
-  await syncHeaderProfile(currentKind==='avatar'?'avatar-upload':'banner-upload');
+  modal((currentKind==='avatar'?'Avatar':'Banner')+' uploaded and saved to sb_profiles.');
+  status((currentKind==='avatar'?'Avatar':'Banner')+' saved to profile. Header Shell notified.');
+  toast((currentKind==='avatar'?'Avatar':'Banner')+' saved');
+
+  await refreshHeaderShell(currentKind+'-upload');
+
+  debug({uploadSaved:true,kind:currentKind,path,url});
  }catch(e){
   modal('Upload/save failed: '+(e.message||e),true);
   debug({uploadError:e.message||String(e)});
  }
 }
 
-function useExisting(){
- let url=$('modalUrl').value;
-
- if(currentKind==='avatar')$('avatarUrl').value=url;
- else $('bannerUrl').value=url;
-
- render();
- modal('Current URL placed in preview. Use Upload + Save + Sync Chip for new files.');
-}
-
-async function syncHeader(){
- let ok=await syncHeaderProfile('manual-button');
-
- if(ok){
-  status('Top Account chip synced to current signed-in profile.');
-  toast('Account chip synced');
- }else{
-  status('Account chip sync waiting for a signed-in profile row that matches the current user.',true);
- }
+async function notifyHeader(){
+ await refreshHeaderShell('manual-button');
+ status('Header Shell refresh event sent.');
+  toast('Header refreshed');
 }
 
 async function refreshSavedCounters(force){
@@ -981,13 +821,11 @@ async function refreshSavedCounters(force){
 
 function helpers(){
  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}
- installHeaderAvatarPatch();
  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
  try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
  try{if(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.refresh)window.StreamBanditLiveReadinessSearchFallback.refresh();}catch(e){}
 
  refreshSavedCounters(false);
- scheduleChipPatch('helpers');
 
  $('helperStatus').innerHTML='<b>Helpers:</b> Supabase SDK '+(window.supabase?'✅':'❌')+
   ' · Shell '+(window.StreamBanditShell?'✅':'❌')+
@@ -998,26 +836,28 @@ function helpers(){
   ' · Counts '+(window.StreamBanditMenuSavesCount?'✅':'❌')+
   ' · Search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'❌')+
   ' · Settings '+(settingsGlobalLoaded()?'✅':'❌')+
-  ' · Brand '+(brandLoaded()?'✅':'❌');
+  ' · Brand Helper Loaded '+(brandLoaded()?'✅':'❌');
 }
 
 function debug(extra){
  let payload=profile&&user?payloadForHeader(profile):null;
+ let shellState=null;
 
- $('debug').textContent=JSON.stringify(Object.assign({},R,{
+ try{shellState=window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.state?window.StreamBanditHeaderShell.state():null;}catch(e){}
+
+ $('debug').textContent=JSON.stringify(Object.assign({},debugState,{
   user:user?{id:user.id,email:user.email}:null,
   profile:profile,
   headerPayload:payload,
-  accountChip:{
-   exists:!!document.getElementById('sbHeaderAccountChip'),
-   html:document.getElementById('sbHeaderAccountChip')?document.getElementById('sbHeaderAccountChip').innerHTML:'',
-   userId:document.getElementById('sbHeaderAccountChip')?document.getElementById('sbHeaderAccountChip').getAttribute('data-sb-account-user-id'):''
-  },
-  headerCacheKeys:PROFILE_CACHE_KEYS.map(k=>({key:k,hasValue:!!localStorage.getItem(k),id:(readCachedProfile(k)||{}).id||null,avatar:(readCachedProfile(k)||{}).avatar_url||''})),
+  shellState:shellState,
+  cacheKeys:PROFILE_CACHE_KEYS.map(k=>{
+   let value=null;
+   try{value=JSON.parse(localStorage.getItem(k)||'null');}catch(e){}
+   return {key:k,hasValue:!!value,id:value&&value.id||'',avatar_url:value&&value.avatar_url||''};
+  }),
   helperPresence:{
    shell:!!window.StreamBanditShell,
    header:!!window.StreamBanditHeaderShell,
-   headerPatchInstalled:headerPatchInstalled,
    footer:!!window.StreamBanditFooterShell,
    theme:!!window.StreamBanditThemeProjector,
    saves:!!window.StreamBanditCoreSavesV675,
@@ -1026,6 +866,9 @@ function debug(extra){
    settings:settingsGlobalLoaded(),
    brand:brandLoaded()
   },
+  currentKind:currentKind,
+  selectedFile:selectedFile?{name:selectedFile.name,size:selectedFile.size,type:selectedFile.type}:null,
+  localObjectUrlActive:!!localObjectUrl,
   extra:extra||null
  }),null,2);
 }
@@ -1035,6 +878,33 @@ function tab(id){
  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));
  helpers();
  debug({tab:id});
+}
+
+function wireDrop(){
+ let dz=$('dropZone');
+ let fi=$('modalFile');
+
+ dz.addEventListener('click',()=>fi.click());
+ fi.addEventListener('change',e=>selectFile(e.target.files&&e.target.files[0]));
+
+ ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  dz.classList.add('drag');
+ }));
+
+ ['dragleave','dragend'].forEach(ev=>dz.addEventListener(ev,e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  dz.classList.remove('drag');
+ }));
+
+ dz.addEventListener('drop',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  dz.classList.remove('drag');
+  selectFile(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]);
+ });
 }
 
 function wire(){
@@ -1055,13 +925,14 @@ function wire(){
  $('openBanner').onclick=()=>openModal('banner');
  $('openAvatar2').onclick=()=>openModal('avatar');
  $('openBanner2').onclick=()=>openModal('banner');
- $('syncHeader').onclick=syncHeader;
+ $('notifyHeader').onclick=notifyHeader;
  $('closeImageModal').onclick=closeModal;
- $('modalFile').onchange=previewFile;
  $('uploadSaveImage').onclick=uploadSaveImage;
- $('useExistingImage').onclick=useExisting;
+ $('clearSelection').onclick=clearSelection;
 
  ['displayName','username','channelName','channelAbout'].forEach(id=>$(id).addEventListener('input',render));
+
+ wireDrop();
 
  window.addEventListener('streambandit-core-saves-changed',()=>refreshSavedCounters(true));
  window.addEventListener('streambandit-core-saves-v6-75-changed',()=>refreshSavedCounters(true));
@@ -1069,7 +940,6 @@ function wire(){
 
 function boot(){
  wire();
- startChipPatchTimer();
  helpers();
 
  refreshSession().then(()=>loadProfile());
@@ -1077,18 +947,14 @@ function boot(){
  setTimeout(helpers,800);
  setTimeout(()=>refreshSavedCounters(true),1000);
  setTimeout(helpers,1800);
- setTimeout(()=>syncHeaderProfile('settled-boot'),2200);
- setTimeout(()=>scheduleChipPatch('late-boot'),3200);
  setInterval(helpers,7000);
 
- document.documentElement.dataset.sbProfileSettings='v7-12-296-1';
- window.StreamBanditProfileSettingsV7122961={
+ document.documentElement.dataset.sbProfileSettings='v7-12-296-2';
+ window.StreamBanditProfileSettingsV7122962={
   version:VERSION,
   reload:loadProfile,
-  syncHeader:syncHeaderProfile,
-  patchChip:patchVisibleHeaderChip,
-  clearHeaderProfileCache,
-  current:function(){return{user,profile,headerPayload:profile&&user?payloadForHeader(profile):null};}
+  refreshHeader:refreshHeaderShell,
+  current:function(){return{user,profile,payload:profile&&user?payloadForHeader(profile):null};}
  };
 }
 
