@@ -3,243 +3,135 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit V7.12.267 Player 2 Multi-provider Queue TEST</title>
+<title>Stream Bandit Player 2 V7.12.293</title>
+<link rel="icon" href="stream_bandit_stag_icon_32.png">
+<link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
-  color-scheme:dark;
-  --bg:#050711;
-  --p:#101529;
-  --p2:#17122d;
-  --card:#ffffff0f;
-  --line:#ffffff22;
-  --muted:#b9c0d8;
-  --good:#22d3a6;
-  --purple:#7c3cff;
-  --pink:#ff2d85;
-  --warn:#ffb142;
-  --bad:#ff4d6d;
-  --cyan:#41e8ff;
-  --fontScale:1;
-}
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--card:#ffffff0f;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--good:var(--accent);--purple:var(--accent2);--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
 *{box-sizing:border-box;min-width:0}
-body{
-  margin:0;
-  padding:24px;
-  background:
-    radial-gradient(circle at top left,#22d3a633,transparent 34%),
-    radial-gradient(circle at top right,#7c3cff3d,transparent 38%),
-    var(--bg);
-  color:#fff;
-  font-family:Inter,system-ui,Arial,sans-serif;
-  font-size:calc(16px * var(--fontScale));
-}
-.wrap{max-width:1450px;margin:auto}
-.head,.hero,.box,.footerPanel{
-  border:1px solid var(--line);
-  border-radius:28px;
-  background:linear-gradient(135deg,var(--p),var(--p2));
-  box-shadow:0 20px 70px #0007;
-  padding:22px;
-  margin-bottom:18px;
-}
-.head{
-  display:grid;
-  grid-template-columns:minmax(250px,320px) minmax(0,1fr) minmax(300px,430px);
-  gap:14px;
-  align-items:start;
-  position:relative;
-  z-index:20;
-}
-.brand{display:flex;gap:12px;align-items:center;font-size:22px;font-weight:950}
-.logo{
-  width:44px;
-  height:44px;
-  border-radius:14px;
-  background:linear-gradient(135deg,var(--good),var(--purple));
-  display:grid;
-  place-items:center;
-  overflow:hidden;
-}
-.logo img{width:100%;height:100%;object-fit:cover}
-.searchWrap{position:relative;z-index:50}
-.search{
-  display:flex;
-  gap:8px;
-  border:1px solid #ffffff24;
-  border-radius:999px;
-  background:#0004;
-  padding:9px 10px 9px 14px;
-}
-.search input{flex:1;background:transparent;border:0;color:#fff;outline:0;font:inherit}
-.badge,.pill{
-  display:inline-flex;
-  border-radius:999px;
-  background:#22d3a624;
-  border:1px solid #22d3a657;
-  color:#baf7df;
-  font-weight:950;
-}
-.badge{padding:7px 12px}
-.pill{padding:5px 8px;font-size:11px;margin:2px}
+html,body{max-width:100vw;overflow-x:hidden}
+body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 40%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}
+.wrap{max-width:1480px;margin:auto}
+.hero,.box,.card,.check,.tile,.queueItem,.stat{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0007;padding:15px;margin-bottom:13px}
+.hero{padding:18px}
+.card,.check,.tile,.queueItem,.stat{background:var(--card);box-shadow:none;margin-bottom:0}
+.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}
+.badge{padding:5px 9px;font-size:11px}
+.pill{padding:4px 7px;font-size:10px;margin:2px}
 .warnPill{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}
 .badPill{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}
 .cyanPill{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}
-h1{font-size:clamp(38px,6vw,72px);margin:10px 0;letter-spacing:-.055em;line-height:.95}
-h2{margin:0 0 14px}
-.muted,p,li,label,small{color:var(--muted);font-size:16px;line-height:1.5}
-.layout{display:grid;grid-template-columns:minmax(320px,1.15fr) minmax(300px,.85fr);gap:18px}
-.player{
-  border:1px solid #ffffff1f;
-  border-radius:28px;
-  background:#02040d;
-  overflow:hidden;
-  box-shadow:0 22px 70px #0009;
-}
-.frame{
-  aspect-ratio:16/9;
-  background:#000;
-  display:grid;
-  place-items:center;
-}
-.frame video,.frame iframe{
-  width:100%;
-  height:100%;
-  border:0;
-  background:#000;
-}
-.bar{padding:14px;border-top:1px solid #ffffff1a;background:#090c19eb}
-.btn,.tab{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border:0;
-  text-decoration:none;
-  border-radius:999px;
-  padding:11px 15px;
-  background:#414667;
-  color:#fff;
-  font-weight:950;
-  cursor:pointer;
-}
-.btn:disabled,.range:disabled,.select:disabled{opacity:.5;cursor:not-allowed}
-.small{padding:8px 10px;font-size:12px}
-.primary,.tab.active{background:linear-gradient(135deg,var(--good),var(--purple));color:#061017}
-.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}
-.warn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#111}
-.actions,.tabs,.controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
-.status,.good,.note,.danger{
-  padding:12px 14px;
-  border-radius:18px;
-  background:#22d3a61a;
-  border:1px solid #22d3a647;
-  color:#dfffee;
-  font-weight:850;
-  margin-top:14px;
-}
+h1{font-size:clamp(34px,5vw,66px);line-height:.94;margin:8px 0;letter-spacing:-.055em}
+h2{margin:0 0 10px;font-size:22px}
+h3{margin:0 0 7px;font-size:18px}
+.muted,p,small,label,li{color:var(--muted);line-height:1.45}
+code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5px;color:#dfffee}
+.btn,.tab{border:0;border-radius:999px;padding:9px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
+.btn:disabled,.select:disabled,.range:disabled{opacity:.5;cursor:not-allowed}
+.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}
+.hot{background:linear-gradient(135deg,var(--pink),var(--accent2));color:#fff}
+.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}
+.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}
+.status,.good,.note,.danger,.safe{padding:10px 12px;border-radius:16px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}
+.good{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}
 .note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
 .danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}
-.grid,.checks,.meta,.footerGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.card,.check,.tile,.queueItem,.footerCol{
-  border:1px solid #ffffff1a;
-  border-radius:18px;
-  background:var(--card);
-  padding:14px;
-  overflow-wrap:anywhere;
-}
-.card b,.check b,.tile b,.queueItem b,.footerCol b{display:block;color:#baf7df;margin-bottom:8px}
-.section{display:none}
-.section.active{display:block}
-.source{
-  font-family:ui-monospace,Consolas,monospace;
-  word-break:break-all;
-  background:#0004;
-  border-radius:14px;
-  padding:12px;
-  color:#dfffee;
-  white-space:pre-wrap;
-  max-height:360px;
-  overflow:auto;
-}
-.progressShell{
-  height:12px;
-  border-radius:999px;
-  background:#0006;
-  border:1px solid #ffffff22;
-  overflow:hidden;
-  margin:14px 0;
-}
-.progressBar{height:100%;width:0;background:linear-gradient(135deg,var(--good),var(--purple))}
-.select,.range{
-  border:1px solid #ffffff24;
-  border-radius:999px;
-  background:#050711c7;
-  color:#fff;
-  padding:10px 12px;
-  font-weight:850;
-}
+.safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}
+.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(260px,380px);gap:14px}
+.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:190px;display:grid;place-items:center;overflow:hidden}
+.artIcon{font-size:58px}
+.grid,.checks,.meta,.stats{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}
+.layout{display:grid;grid-template-columns:minmax(320px,1.15fr) minmax(300px,.85fr);gap:14px}
+.actions,.tabs,.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.routeStrip{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}
+.player{border:1px solid #ffffff1f;border-radius:28px;background:#02040d;overflow:hidden;box-shadow:0 22px 70px #0009}
+.frame{aspect-ratio:16/9;background:#000;display:grid;place-items:center;text-align:center}
+.frame video,.frame iframe{width:100%;height:100%;border:0;background:#000}
+.bar{padding:14px;border-top:1px solid #ffffff1a;background:#090c19eb}
+.select,.range{border:1px solid #ffffff24;border-radius:999px;background:#050711c7;color:#fff;padding:10px 12px;font-weight:850}
 .range{padding:0;width:150px}
-.queueHero{
-  border:1px solid #22d3a64d;
-  border-radius:24px;
-  background:linear-gradient(135deg,#22d3a61d,#7c3cff1d);
-  padding:16px;
-}
+.queueHero{border:1px solid #22d3a64d;border-radius:24px;background:linear-gradient(135deg,#22d3a61d,#7c3cff1d);padding:16px}
 .queueHero h3{font-size:26px;margin:4px 0}
 .queueItem{cursor:pointer;margin-bottom:10px}
-.queueItem.active{outline:3px solid var(--good)}
-.footerPanel{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:5!important}
-.footerGrid{grid-template-columns:1.25fr repeat(4,minmax(170px,1fr))}
-.footerCol a{display:block;color:#baf7df;text-decoration:none;margin:7px 0;font-weight:850}
-.footerCol small{display:block;color:#8f98b8;font-size:13px;line-height:1.45}
-.microFooter{text-align:center;color:#8f98b8;margin:20px 0 4px}
-.search+*,.searchResults,.searchOverlay,#searchOverlay,#globalSearchOverlay{z-index:99999!important}
+.queueItem.active{outline:3px solid var(--accent)}
+.card b,.check b,.tile b,.queueItem b,.stat b{display:block;color:#baf7df;margin-bottom:7px}
+.stat span{font-size:22px;font-weight:950}
+.section{display:none}
+.section.active{display:block}
+.source{font-family:ui-monospace,Consolas,monospace;word-break:break-word;background:#0007;border-radius:14px;padding:12px;color:#dfffee;white-space:pre-wrap;max-height:420px;overflow:auto}
+.progressShell{height:12px;border-radius:999px;background:#0006;border:1px solid #ffffff22;overflow:hidden;margin:14px 0}
+.progressBar{height:100%;width:0;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
+.pillTabs{padding:10px 12px;border-radius:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--p),#000 14%),color-mix(in srgb,var(--p2),#000 8%));border-color:var(--line);box-shadow:0 10px 30px #0007}
+.pillTabs.topRail{margin-top:-2px}
+.pillTabs .tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pagePill{border:1px solid color-mix(in srgb,var(--line),var(--accent) 22%);border-radius:999px;padding:11px 17px;background:color-mix(in srgb,var(--p),#000 18%);color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;box-shadow:inset 0 1px #ffffff12}
+.pagePill.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:color-mix(in srgb,var(--accent),#fff 18%);color:#061017}
+.pagePill.back{background:color-mix(in srgb,var(--p),#000 24%)}
 @media(max-width:980px){
-  .head,.layout,.footerGrid{grid-template-columns:1fr}
-  .search{width:100%}
-  .btn,.tab{width:100%}
+ body{padding:10px}
+ .heroGrid,.layout{grid-template-columns:1fr}
+ .btn,.tab,.pagePill{width:100%;white-space:normal}
+ .range{width:100%}
+ .art{min-height:160px}
 }
 </style>
 </head>
-<body>
+<body data-sb-player-two-route="player-2-clean-machine-v7-12-58-test.html">
 <div class="wrap">
 
-<header class="head">
-  <div class="brand"><div class="logo"><img data-sb-brand-logo alt="Stream Bandit"></div><span>Stream Bandit</span></div>
-  <div class="muted"><b>V7.12.267 Player 2 Multi-provider Queue TEST.</b><br>Player 2 keeps queue mode and now supports mixed Mux/HLS/direct video plus YouTube/Vimeo iframe items.</div>
-  <div class="searchWrap"><div class="search"><span>Search</span><input id="globalSearch" placeholder="Search Stream Bandit"><button id="globalSearchBtn" class="btn primary" type="button">Search</button></div></div>
-</header>
+<section class="box pillTabs topRail">
+  <div class="tabs" aria-label="Creator group page links">
+    <button class="pagePill back" id="backBtn" type="button">Back</button>
+    <a class="pagePill" href="home-global-helpers-v7-4-4-test.html">Hub</a>
+    <a class="pagePill" href="submit-video-clean-machine-v7-12-79-test.html">Submit Video</a>
+    <a class="pagePill" href="rules-clean-machine-v7-12-82-test.html">Rules</a>
+    <a class="pagePill" href="review-queue-clean-machine-v7-12-80-publish-test.html">Review Queue</a>
+    <a class="pagePill" href="playlists-global-helpers-v7-5-2-test.html">Playlists</a>
+    <a class="pagePill" href="channels-global-helpers-v7-5-3-test.html">Channels</a>
+    <a class="pagePill" href="my-channel-clean-machine-v7-12-47-test.html">My Channel</a>
+    <a class="pagePill" href="collections-clean-machine-v7-12-51-test.html">Collections</a>
+    <a class="pagePill active" href="player-2-clean-machine-v7-12-58-test.html">Player 2</a>
+    <a class="pagePill" href="library-global-helpers-v7-4-8-test.html">Public Library</a>
+    <a class="pagePill" href="plans-pricing-feature-shop-v7-11-3-test.html">Pricing Matrix</a>
+  </div>
+</section>
 
 <section class="hero">
-  <span class="badge">V7.12.267 Player 2 Multi-provider Queue</span>
-  <h1>Player 2 — Queue Mode</h1>
-  <p>Player 2 is for Play All queues from Playlists, Channels, My Channel, Collections and Supabase Library. Mixed Mux and YouTube queues are supported.</p>
-  <div class="grid">
-    <div class="card"><b>Mux / HLS / Direct</b><p>Uses real video player. Audio boost remains available.</p></div>
-    <div class="card"><b>YouTube / Vimeo</b><p>Uses iframe provider player. Audio boost is disabled only for those items.</p></div>
-    <div class="card"><b>Queue safe</b><p>Next / Previous rebuilds the correct player type for each item.</p></div>
-    <div class="card"><b>Existing URL</b><p>This keeps the existing Player 2 route.</p></div>
+  <div class="heroGrid">
+    <div>
+      <span class="badge">V7.12.293 Player 2 · Clean Rail</span>
+      <h1>Player 2 — Queue Mode</h1>
+      <p>Player 2 is the Play All queue player for Playlists, Channels, My Channel, Collections and Supabase Library. Mixed Mux/HLS/direct video and YouTube/Vimeo iframe queues are preserved.</p>
+      <div class="routeStrip">
+        <span>Queue → session/local storage</span>
+        <span>Mux/HLS/direct → HTML video</span>
+        <span>YouTube/Vimeo → iframe</span>
+        <span>Progress → stream-bandit-progress-v6-73</span>
+      </div>
+      <div class="actions">
+        <button id="reloadQueue" class="btn primary" type="button">Reload Queue / Fallback</button>
+      </div>
+      <div id="status" class="status">Loading Player 2...</div>
+      <div id="helperStatus" class="note">Checking foundation...</div>
+    </div>
+    <div class="art"><div class="artIcon">▶️🎧</div></div>
   </div>
-  <div id="status" class="status">Loading Player 2...</div>
 </section>
 
 <section class="box">
-  <h2>Global helper status</h2>
-  <div id="globalGrid" class="grid">
-    <div class="card"><b>Account sync</b><p>Checking...</p></div>
-    <div class="card"><b>Avatar helper</b><p>Checking...</p></div>
-    <div class="card"><b>Shared style</b><p>Checking...</p></div>
-    <div class="card"><b>Settings bridge</b><p>Checking...</p></div>
-    <div class="card"><b>Shell/menu</b><p>Checking...</p></div>
-    <div class="card"><b>Footer</b><p>Bottom footer present.</p></div>
-  </div>
-  <div class="note">Audio boost stays for Mux/HLS/direct video queue items. YouTube/Vimeo use provider controls.</div>
+  <h2>Player 2 status</h2>
+  <div id="stats" class="stats"></div>
+  <div class="safe">Audio boost stays protected for Mux/HLS/direct video queue items. YouTube and Vimeo use provider controls, so audio boost is disabled only for iframe providers.</div>
 </section>
 
 <section class="layout">
   <main>
     <section class="box">
+      <h2>Player</h2>
       <div class="player">
         <div id="frame" class="frame"><div class="muted">Loading video...</div></div>
         <div class="bar">
@@ -303,7 +195,7 @@ h2{margin:0 0 14px}
 </section>
 
 <section class="box">
-  <h2>Player 2 tabs</h2>
+  <h2>Player 2 tools</h2>
   <div class="tabs">
     <button class="tab active" data-tab="comfort" type="button">Comfort Controls</button>
     <button class="tab" data-tab="progress" type="button">Progress State</button>
@@ -320,6 +212,7 @@ h2{margin:0 0 14px}
     <div class="check"><b>Audio boost</b><p>Available for Mux, HLS, MP4, WebM and MOV queue items.</p></div>
     <div class="check"><b>Iframe providers</b><p>YouTube and Vimeo use provider controls. Boost is disabled only there.</p></div>
     <div class="check"><b>Queue mode</b><p>Queue panel and Next / Previous stay active for all provider types.</p></div>
+    <div class="check"><b>Fullscreen</b><p>Fullscreen remains attached to the current player frame.</p></div>
   </div>
 </section>
 
@@ -340,18 +233,19 @@ h2{margin:0 0 14px}
     <li>Single videos stay on Player 1.</li>
     <li>Mixed queues can contain Mux, HLS, direct video, YouTube and Vimeo.</li>
     <li>Audio boost is preserved for real HTML video sources.</li>
-    <li>No Supabase schema change is required for this player fix.</li>
+    <li>YouTube and Vimeo iframe players keep their own provider controls.</li>
+    <li>No Supabase schema change is required for this Player 2 pass.</li>
   </ul>
 </section>
 
 <section id="checklist" class="box section">
-  <h2>V7.12.267 Player 2 Checklist</h2>
+  <h2>Player 2 Checklist</h2>
   <div class="checks">
-    <div class="check"><b>1. Existing route</b><p>Page opens from <code>player-2-clean-machine-v7-12-58-test.html</code>.</p></div>
-    <div class="check"><b>2. Mux row</b><p>Mux/HLS queue item plays with audio boost enabled.</p></div>
-    <div class="check"><b>3. YouTube row</b><p>YouTube queue item embeds in iframe and Next / Previous still work.</p></div>
-    <div class="check"><b>4. Mixed queue</b><p>Switching between Mux and YouTube rebuilds the correct player type.</p></div>
-    <div class="check"><b>5. Safety</b><p>No Player 1 URL change, no index promotion, no schema change.</p></div>
+    <div class="check"><b>Existing route</b><p>Page opens from <code>player-2-clean-machine-v7-12-58-test.html</code>.</p></div>
+    <div class="check"><b>Mux / HLS row</b><p>HTML video queue item plays with audio boost enabled.</p></div>
+    <div class="check"><b>YouTube / Vimeo row</b><p>Iframe provider loads and Next / Previous still work.</p></div>
+    <div class="check"><b>Mixed queue</b><p>Switching between HTML video and iframe rebuilds the correct player type.</p></div>
+    <div class="check"><b>Safety</b><p>No Player 1 route change, no Details route change, no index promotion, no schema change.</p></div>
   </div>
 </section>
 
@@ -360,876 +254,715 @@ h2{margin:0 0 14px}
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<section id="sbPlayer2Footer" class="footerPanel" aria-label="Stream Bandit Footer">
-  <div class="footerGrid">
-    <div class="footerCol"><b>Stream Bandit</b><small>Player 2 direct queue pass V7.12.267. Payments disabled until billing is designed.</small></div>
-    <div class="footerCol"><b>Group Play</b><a href="playlists-global-helpers-v7-5-2-test.html">Playlists</a><a href="channels-global-helpers-v7-5-3-test.html">Channels</a><a href="my-channel-clean-machine-v7-12-47-test.html">My Channel</a><a href="collections-clean-machine-v7-12-51-test.html">Collections</a><a href="player-2-clean-machine-v7-12-58-test.html">Player 2</a></div>
-    <div class="footerCol"><b>Watch</b><a href="home-global-helpers-v7-4-4-test.html">Home</a><a href="details-clean-machine-v7-12-38-test.html">Details</a><a href="player-one-global-helpers-v7-3-3-test.html">Player 1</a><a href="continue-watching-global-helpers-v7-3-9-test.html">Continue Watching</a></div>
-    <div class="footerCol"><b>Browse</b><a href="library-global-helpers-v7-4-8-test.html">Library</a><a href="global-search-global-helpers-v7-4-9-test.html">Search</a><a href="genres-clean-machine-v7-12-45-test.html">Genres</a><a href="about-clean-machine-v7-12-46-test.html">About</a></div>
-    <div class="footerCol"><b>Account / Policy</b><a href="watchlist-clean-machine-v7-12-43-test.html">Watchlist</a><a href="favourites-clean-machine-v7-12-41-test.html">Favourites</a><a href="likes-clean-machine-v7-12-42-test.html">Liked</a><a href="policy-agreements-centre-v7-11-6-test.html">Policy & FAQ Centre</a></div>
-  </div>
-</section>
-
-<p class="microFooter">V7.12.267 Player 2 Multi-provider Queue TEST — existing Player 2 URL preserved.</p>
+<p class="micro">Player 2 V7.12.293: clean Creator rail + queue player content + audio boost protection. Old URL preserved. Header + page + footer shell only. No index promotion.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=player2-provider-promote-v7-12-267"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=player2-provider-promote-v7-12-267"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=player2-provider-promote-v7-12-267"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=player2-provider-promote-v7-12-267"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=player2-provider-promote-v7-12-267"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=player2-provider-promote-v7-12-267"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=player2-provider-promote-v7-12-267"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=player2-provider-promote-v7-12-267"></script>
+<script src="stream-bandit-shell-v6-24.js?v=player2-clean-rail-293"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=player2-clean-rail-293"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=player2-clean-rail-293"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=player2-clean-rail-293"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=player2-clean-rail-293"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=player2-clean-rail-293"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=player2-clean-rail-293"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=player2-clean-rail-293"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=player2-clean-rail-293"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION = 'V7.12.267 Player 2 Multi-provider Queue';
-const DETAILS = 'details-clean-machine-v7-12-38-test.html';
-const PROGRESS = 'stream-bandit-progress-v6-73';
-const SUPABASE_URL = 'https://xzxqfrvqdgkzwujbkdbk.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+const VERSION='V7.12.293 Player 2 Clean Rail';
+const DETAILS='details-clean-machine-v7-12-38-test.html';
+const PROGRESS='stream-bandit-progress-v6-73';
 
-let q = null;
-let row = null;
-let resolved = null;
-let index = 0;
-let video = null;
-let hls = null;
-let saveTimer = null;
-let lastSaved = 0;
-let audioCtx = null;
-let sourceNode = null;
-let gainNode = null;
-let sb = null;
+let q=null,row=null,resolved=null,index=0,video=null,hls=null,lastSaved=0,audioCtx=null,sourceNode=null,gainNode=null,sb=null;
+let countBusy=false,countReady=false,lastCountRead=0;
 
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
-function esc(value){
-  return String(value ?? '').replace(/[&<>"]/g, c => ({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;'
-  }[c] || c));
-}
-
-function arr(value){
-  if(Array.isArray(value)) return value;
-  if(typeof value === 'string' && value.trim()){
-    try{
-      const parsed = JSON.parse(value);
-      if(Array.isArray(parsed)) return parsed;
-    }catch(e){}
-    return value.split(/[\n,]+/).map(x => x.trim()).filter(Boolean);
-  }
-  return [];
-}
-
-function firstNonEmpty(){
-  for(let i = 0; i < arguments.length; i++){
-    const value = arguments[i];
-    if(value !== undefined && value !== null && String(value).trim() !== ''){
-      return String(value).trim();
-    }
-  }
-  return '';
-}
-
-function firstUrl(movie){
-  return firstNonEmpty(
-    movie && movie.source,
-    movie && movie.video_url,
-    movie && movie.mux_playback_url,
-    movie && movie.stream_url,
-    movie && movie.url
-  );
-}
-
-function itemUrl(movie){
-  return firstUrl(movie);
-}
-
-function itemPoster(movie){
-  return firstNonEmpty(
-    movie && movie.poster,
-    movie && movie.poster_url,
-    movie && movie.thumbnail_url,
-    movie && movie.image_url,
-    movie && movie.backdrop_url
-  );
-}
-
-function parseUrl(url){
-  try{
-    return new URL(url);
-  }catch(e){
-    return null;
-  }
-}
+function esc(value){return String(value??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c));}
+function arr(value){if(Array.isArray(value))return value;if(typeof value==='string'&&value.trim()){try{const parsed=JSON.parse(value);if(Array.isArray(parsed))return parsed;}catch(e){}return value.split(/[\n,]+/).map(x=>x.trim()).filter(Boolean);}return[];}
+function firstNonEmpty(){for(let i=0;i<arguments.length;i++){const value=arguments[i];if(value!==undefined&&value!==null&&String(value).trim()!=='')return String(value).trim();}return'';}
+function firstUrl(movie){return firstNonEmpty(movie&&movie.source,movie&&movie.video_url,movie&&movie.mux_playback_url,movie&&movie.stream_url,movie&&movie.url);}
+function itemUrl(movie){return firstUrl(movie);}
+function itemPoster(movie){return firstNonEmpty(movie&&movie.poster,movie&&movie.poster_url,movie&&movie.thumbnail_url,movie&&movie.image_url,movie&&movie.backdrop_url);}
+function parseUrl(url){try{return new URL(url);}catch(e){return null;}}
+function hasDirectVideoExtension(url){return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url);}
+function isHls(url){return /\.m3u8(\?|#|$)/i.test(url)||/stream\.mux\.com/i.test(url);}
+function setStatus(message,bad){$('status').textContent=message;$('status').className=bad?'danger':'status';}
+function tile(label,value){return '<div class="tile"><b>'+esc(label)+'</b><span>'+esc(value||'—')+'</span></div>';}
+function setProviderNote(message,kind){const el=$('providerNote');el.textContent=message;el.className=kind==='bad'?'danger':kind==='warn'?'note':'good';}
 
 function youtubeId(url){
-  const u = parseUrl(url);
-  if(!u) return '';
-  const host = u.hostname.replace(/^www\./,'').toLowerCase();
+ const u=parseUrl(url);
+ if(!u)return'';
+ const host=u.hostname.replace(/^www\./,'').toLowerCase();
 
-  if(host === 'youtu.be'){
-    return u.pathname.split('/').filter(Boolean)[0] || '';
-  }
+ if(host==='youtu.be')return u.pathname.split('/').filter(Boolean)[0]||'';
 
-  if(host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')){
-    if(u.searchParams.get('v')) return u.searchParams.get('v');
+ if(host.endsWith('youtube.com')||host.endsWith('youtube-nocookie.com')){
+  if(u.searchParams.get('v'))return u.searchParams.get('v');
 
-    const parts = u.pathname.split('/').filter(Boolean);
-    const embedIndex = parts.indexOf('embed');
-    const shortsIndex = parts.indexOf('shorts');
-    const liveIndex = parts.indexOf('live');
+  const parts=u.pathname.split('/').filter(Boolean);
+  const embedIndex=parts.indexOf('embed');
+  const shortsIndex=parts.indexOf('shorts');
+  const liveIndex=parts.indexOf('live');
 
-    if(embedIndex >= 0 && parts[embedIndex + 1]) return parts[embedIndex + 1];
-    if(shortsIndex >= 0 && parts[shortsIndex + 1]) return parts[shortsIndex + 1];
-    if(liveIndex >= 0 && parts[liveIndex + 1]) return parts[liveIndex + 1];
-  }
+  if(embedIndex>=0&&parts[embedIndex+1])return parts[embedIndex+1];
+  if(shortsIndex>=0&&parts[shortsIndex+1])return parts[shortsIndex+1];
+  if(liveIndex>=0&&parts[liveIndex+1])return parts[liveIndex+1];
+ }
 
-  return '';
+ return'';
 }
 
 function vimeoId(url){
-  const u = parseUrl(url);
-  if(!u) return '';
-  const host = u.hostname.replace(/^www\./,'').toLowerCase();
+ const u=parseUrl(url);
+ if(!u)return'';
+ const host=u.hostname.replace(/^www\./,'').toLowerCase();
 
-  if(host === 'player.vimeo.com'){
-    const parts = u.pathname.split('/').filter(Boolean);
-    const videoIndex = parts.indexOf('video');
-    if(videoIndex >= 0 && parts[videoIndex + 1]) return parts[videoIndex + 1];
-  }
+ if(host==='player.vimeo.com'){
+  const parts=u.pathname.split('/').filter(Boolean);
+  const videoIndex=parts.indexOf('video');
+  if(videoIndex>=0&&parts[videoIndex+1])return parts[videoIndex+1];
+ }
 
-  if(host.endsWith('vimeo.com')){
-    const parts = u.pathname.split('/').filter(Boolean);
-    const numeric = parts.find(part => /^\d+$/.test(part));
-    return numeric || '';
-  }
+ if(host.endsWith('vimeo.com')){
+  const parts=u.pathname.split('/').filter(Boolean);
+  const numeric=parts.find(part=>/^\d+$/.test(part));
+  return numeric||'';
+ }
 
-  return '';
-}
-
-function hasDirectVideoExtension(url){
-  return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url);
-}
-
-function isHls(url){
-  return /\.m3u8(\?|#|$)/i.test(url) || /stream\.mux\.com/i.test(url);
+ return'';
 }
 
 function resolveSource(movie){
-  const url = firstUrl(movie);
+ const url=firstUrl(movie);
 
-  if(!url){
-    return {
-      provider:'missing',
-      mode:'missing',
-      label:'Missing source',
-      url:'',
-      playable:'',
-      embed:'',
-      canBoost:false,
-      canPip:false,
-      note:'No playable URL found for this queue item.'
-    };
-  }
+ if(!url){
+  return{provider:'missing',mode:'missing',label:'Missing source',url:'',playable:'',embed:'',canBoost:false,canPip:false,note:'No playable URL found for this queue item.'};
+ }
 
-  const yid = youtubeId(url);
-  if(yid){
-    return {
-      provider:'youtube',
-      mode:'iframe',
-      label:'YouTube',
-      url:url,
-      playable:url,
-      embed:'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(yid) + '?rel=0&modestbranding=1&playsinline=1',
-      canBoost:false,
-      canPip:false,
-      note:'YouTube uses iframe controls. Stream Bandit audio boost is not available for iframe providers.'
-    };
-  }
+ const yid=youtubeId(url);
 
-  const vid = vimeoId(url);
-  if(vid){
-    return {
-      provider:'vimeo',
-      mode:'iframe',
-      label:'Vimeo',
-      url:url,
-      playable:url,
-      embed:'https://player.vimeo.com/video/' + encodeURIComponent(vid),
-      canBoost:false,
-      canPip:false,
-      note:'Vimeo uses iframe controls. Stream Bandit audio boost is not available for iframe providers.'
-    };
-  }
+ if(yid){
+  return{provider:'youtube',mode:'iframe',label:'YouTube',url:url,playable:url,embed:'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(yid)+'?rel=0&modestbranding=1&playsinline=1',canBoost:false,canPip:false,note:'YouTube uses iframe controls. Stream Bandit audio boost is not available for iframe providers.'};
+ }
 
-  if(isHls(url)){
-    return {
-      provider:/stream\.mux\.com/i.test(url) ? 'mux' : 'hls',
-      mode:'video',
-      label:/stream\.mux\.com/i.test(url) ? 'Mux/HLS' : 'HLS',
-      url:url,
-      playable:url,
-      embed:'',
-      canBoost:true,
-      canPip:true,
-      note:'HTML video stream detected. Audio boost remains enabled.'
-    };
-  }
+ const vid=vimeoId(url);
 
-  if(hasDirectVideoExtension(url)){
-    return {
-      provider:'direct-video',
-      mode:'video',
-      label:'Direct video',
-      url:url,
-      playable:url,
-      embed:'',
-      canBoost:true,
-      canPip:true,
-      note:'Direct video file detected. Audio boost remains enabled.'
-    };
-  }
+ if(vid){
+  return{provider:'vimeo',mode:'iframe',label:'Vimeo',url:url,playable:url,embed:'https://player.vimeo.com/video/'+encodeURIComponent(vid),canBoost:false,canPip:false,note:'Vimeo uses iframe controls. Stream Bandit audio boost is not available for iframe providers.'};
+ }
 
-  return {
-    provider:'generic-url',
-    mode:'external',
-    label:'External URL',
-    url:url,
-    playable:url,
-    embed:'',
-    canBoost:false,
-    canPip:false,
-    note:'Generic URL detected. It may not allow direct playback. Open source is available.'
-  };
+ if(isHls(url)){
+  return{provider:/stream\.mux\.com/i.test(url)?'mux':'hls',mode:'video',label:/stream\.mux\.com/i.test(url)?'Mux/HLS':'HLS',url:url,playable:url,embed:'',canBoost:true,canPip:true,note:'HTML video stream detected. Audio boost remains enabled.'};
+ }
+
+ if(hasDirectVideoExtension(url)){
+  return{provider:'direct-video',mode:'video',label:'Direct video',url:url,playable:url,embed:'',canBoost:true,canPip:true,note:'Direct video file detected. Audio boost remains enabled.'};
+ }
+
+ return{provider:'generic-url',mode:'external',label:'External URL',url:url,playable:url,embed:'',canBoost:false,canPip:false,note:'Generic URL detected. It may not allow direct playback. Open source is available.'};
 }
 
-function sourceType(movie){
-  const r = resolveSource(movie);
-  return r.provider || 'missing';
+async function readConfig(){
+ let cfg=window.StreamBanditSupabaseConfig||{};
+
+ if(cfg.url&&cfg.key)return cfg;
+
+ if(window.StreamBanditShell&&typeof window.StreamBanditShell.config==='function'){
+  let c=window.StreamBanditShell.config();
+  if(c&&c.url&&c.key)return c;
+ }
+
+ let txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text());
+
+ cfg={
+  url:(txt.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)/)||[])[1],
+  key:(txt.match(/SUPABASE_KEY\s*=\s*['"]([^'"]+)/)||[])[1]
+ };
+
+ if(!cfg.url||!cfg.key)throw Error('Supabase config bridge not ready. Refresh once, then test again.');
+
+ return cfg;
 }
 
-function tile(label, value){
-  return '<div class="tile"><b>' + esc(label) + '</b><span>' + esc(value || '—') + '</span></div>';
-}
-
-function setStatus(message, bad){
-  $('status').textContent = message;
-  $('status').className = bad ? 'danger' : 'status';
-}
-
-function setProviderNote(message, kind){
-  const el = $('providerNote');
-  el.textContent = message;
-  el.className = kind === 'bad' ? 'danger' : kind === 'warn' ? 'note' : 'good';
+async function client(){
+ if(sb)return sb;
+ const cfg=await readConfig();
+ sb=window.supabase.createClient(cfg.url,cfg.key);
+ return sb;
 }
 
 function readQueue(){
-  for(const key of ['streamBanditQueueV1','streamBanditUpNextV1','streamBanditPlayer2Queue']){
-    try{
-      const raw = sessionStorage.getItem(key) || localStorage.getItem(key);
-
-      if(!raw) continue;
-
-      const parsed = JSON.parse(raw);
-
-      if(parsed && Array.isArray(parsed.items) && parsed.items.length){
-        return parsed;
-      }
-    }catch(e){}
-  }
-
-  return null;
-}
-
-function persistQueue(){
+ for(const key of ['streamBanditQueueV1','streamBanditUpNextV1','streamBanditPlayer2Queue']){
   try{
-    if(!q) return;
-
-    q.currentIndex = index;
-
-    sessionStorage.setItem('streamBanditQueueV1', JSON.stringify(q));
-    sessionStorage.setItem('streamBanditUpNextV1', JSON.stringify(q));
-    sessionStorage.setItem('streamBanditPlayer2Queue', JSON.stringify(q));
-
-    localStorage.setItem('streamBanditQueueV1', JSON.stringify(q));
-    localStorage.setItem('streamBanditUpNextV1', JSON.stringify(q));
-    localStorage.setItem('streamBanditPlayer2Queue', JSON.stringify(q));
+   const raw=sessionStorage.getItem(key)||localStorage.getItem(key);
+   if(!raw)continue;
+   const parsed=JSON.parse(raw);
+   if(parsed&&Array.isArray(parsed.items)&&parsed.items.length)return parsed;
   }catch(e){}
+ }
+
+ return null;
 }
 
-function progressStore(){
-  try{
-    return JSON.parse(localStorage.getItem(PROGRESS) || '{}') || {};
-  }catch(e){
-    return {};
-  }
-}
-
-function writeStore(store){
-  try{
-    localStorage.setItem(PROGRESS, JSON.stringify(store));
-  }catch(e){}
-}
-
-function savedFor(id){
-  const store = progressStore();
-  return store[String(id)] || null;
-}
-
-function progressPayload(seconds, duration, finished){
-  return {
-    id:String(row.id),
-    title:row.title || row.name || 'Untitled',
-    currentTime:seconds || 0,
-    duration:duration || 0,
-    progress:duration ? Math.min(100, Math.round((seconds / duration) * 100)) : 0,
-    finished:!!finished,
-    updatedAt:new Date().toISOString(),
-    poster:itemPoster(row),
-    source:'player2',
-    player:'player2'
-  };
-}
-
-function saveProgress(force, finished){
-  if(!video || !row || !row.id) return;
-
-  const now = Date.now();
-
-  if(!force && now - lastSaved < 2500) return;
-
-  lastSaved = now;
-
-  const store = progressStore();
-  store[String(row.id)] = progressPayload(video.currentTime || 0, video.duration || 0, finished);
-
-  writeStore(store);
-  renderProgressState();
-}
-
-function normaliseItem(movie, i){
-  return {
-    id:String(movie.id || movie.movie_id || movie.video_id || movie.uuid || ('queue-' + i)),
-    title:movie.title || movie.name || 'Untitled',
-    description:movie.description || movie.summary || '',
-    source:firstNonEmpty(movie.source, movie.video_url, movie.mux_playback_url, movie.stream_url, movie.url),
-    video_url:firstNonEmpty(movie.video_url, movie.source, movie.mux_playback_url, movie.stream_url, movie.url),
-    mux_playback_url:movie.mux_playback_url || '',
-    poster:firstNonEmpty(movie.poster, movie.poster_url, movie.thumbnail_url, movie.image_url),
-    poster_url:movie.poster_url || '',
-    thumbnail_url:movie.thumbnail_url || '',
-    image_url:movie.image_url || '',
-    genres:movie.genres || movie.genre || [],
-    tags:movie.tags || [],
-    source_type:movie.source_type || '',
-    index:i
-  };
+function normaliseItem(movie,i){
+ return{
+  id:String(movie.id||movie.movie_id||movie.video_id||movie.uuid||('queue-'+i)),
+  title:movie.title||movie.name||'Untitled',
+  description:movie.description||movie.summary||'',
+  source:firstNonEmpty(movie.source,movie.video_url,movie.mux_playback_url,movie.stream_url,movie.url),
+  video_url:firstNonEmpty(movie.video_url,movie.source,movie.mux_playback_url,movie.stream_url,movie.url),
+  mux_playback_url:movie.mux_playback_url||'',
+  poster:firstNonEmpty(movie.poster,movie.poster_url,movie.thumbnail_url,movie.image_url),
+  poster_url:movie.poster_url||'',
+  thumbnail_url:movie.thumbnail_url||'',
+  image_url:movie.image_url||'',
+  genres:movie.genres||movie.genre||[],
+  tags:movie.tags||[],
+  source_type:movie.source_type||'',
+  index:i
+ };
 }
 
 async function loadFallback(){
-  try{
-    if(!sb) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+ try{
+  const c=await client();
+  const id=new URLSearchParams(location.search).get('id');
+  let query=id?c.from('sb_movies').select('*').eq('id',id).limit(1):c.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(20);
+  const result=await query;
 
-    const id = new URLSearchParams(location.search).get('id');
-    let query = sb.from('sb_movies').select('*').limit(20);
+  if(result.error)throw result.error;
 
-    if(id){
-      query = sb.from('sb_movies').select('*').eq('id', id).limit(1);
-    }
+  const items=(result.data||[]).map(normaliseItem);
 
-    const result = await query;
+  if(items.length){
+   return{type:'fallback',name:id?'Single fallback':'Latest movies fallback',label:id?'Single fallback':'Latest movies fallback',currentIndex:0,items:items};
+  }
+ }catch(e){}
 
-    if(result.error) throw result.error;
-
-    const items = (result.data || []).map(normaliseItem);
-
-    if(items.length){
-      return {
-        type:'fallback',
-        name:id ? 'Single fallback' : 'Latest movies fallback',
-        label:id ? 'Single fallback' : 'Latest movies fallback',
-        currentIndex:0,
-        items:items
-      };
-    }
-  }catch(e){}
-
-  return {
-    type:'empty',
-    name:'Empty Queue',
-    label:'Empty Queue',
-    currentIndex:0,
-    items:[{
-      id:'empty',
-      title:'No queue loaded',
-      description:'Open Player 2 from Collections, Playlists, Channels, My Channel or Supabase Library Play All.',
-      source:'',
-      video_url:'',
-      poster:'',
-      genres:[]
-    }]
-  };
+ return{type:'empty',name:'Empty Queue',label:'Empty Queue',currentIndex:0,items:[{id:'empty',title:'No queue loaded',description:'Open Player 2 from Collections, Playlists, Channels, My Channel or Supabase Library Play All.',source:'',video_url:'',poster:'',genres:[]}]};
 }
 
-function renderGlobalStatus(){
-  const data = document.documentElement.dataset;
+function persistQueue(){
+ try{
+  if(!q)return;
 
-  const checks = [
-    ['Account sync', data.streamBanditAuth || window.StreamBanditAuth ? 'Loaded / available' : 'Loaded by helper if signed in'],
-    ['Avatar helper', data.streamBanditAvatar || document.querySelector('[data-sb-avatar]') || document.querySelector('[data-sb-brand-logo]') ? 'Available' : 'Checking helper'],
-    ['Shared style', data.streamBanditSharedStyle || getComputedStyle(document.documentElement).getPropertyValue('--fontScale') ? 'Available' : 'Checking'],
-    ['Settings bridge', data.streamBanditSettings || window.StreamBanditSettings ? 'Available' : 'Checking'],
-    ['Shell/menu', document.getElementById('sbShellMenuToggle') ? 'Menu injected' : 'Waiting for shell'],
-    ['Footer','Full bottom footer present once']
-  ];
+  q.currentIndex=index;
 
-  $('globalGrid').innerHTML = checks.map(x =>
-    '<div class="card"><b>' + esc(x[0]) + '</b><p>' + esc(x[1]) + '</p></div>'
-  ).join('');
+  ['streamBanditQueueV1','streamBanditUpNextV1','streamBanditPlayer2Queue'].forEach(key=>{
+   sessionStorage.setItem(key,JSON.stringify(q));
+   localStorage.setItem(key,JSON.stringify(q));
+  });
+ }catch(e){}
+}
+
+function progressStore(){try{return JSON.parse(localStorage.getItem(PROGRESS)||'{}')||{};}catch(e){return{};}}
+function writeStore(store){try{localStorage.setItem(PROGRESS,JSON.stringify(store));}catch(e){}}
+function savedFor(id){const store=progressStore();return store[String(id)]||null;}
+
+function progressPayload(seconds,duration,finished){
+ return{id:String(row.id),title:row.title||row.name||'Untitled',currentTime:seconds||0,duration:duration||0,progress:duration?Math.min(100,Math.round((seconds/duration)*100)):0,finished:!!finished,updatedAt:new Date().toISOString(),poster:itemPoster(row),source:'player2',player:'player2'};
+}
+
+function saveProgress(force,finished){
+ if(!video||!row||!row.id)return;
+
+ const now=Date.now();
+
+ if(!force&&now-lastSaved<2500)return;
+
+ lastSaved=now;
+
+ const store=progressStore();
+
+ store[String(row.id)]=progressPayload(video.currentTime||0,video.duration||0,finished);
+
+ writeStore(store);
+ renderProgressState();
+}
+
+function renderStats(){
+ const provider=resolved?resolved.label:'Waiting';
+ const mode=resolved?resolved.mode:'Waiting';
+ const total=q&&q.items?q.items.length:0;
+
+ $('stats').innerHTML=
+  '<div class="stat"><b>Queue items</b><span>'+esc(total)+'</span></div>'+
+  '<div class="stat"><b>Current</b><span>'+esc(total?(index+1)+' / '+total:'0 / 0')+'</span></div>'+
+  '<div class="stat"><b>Provider</b><span>'+esc(provider)+'</span></div>'+
+  '<div class="stat"><b>Mode</b><span>'+esc(mode)+'</span></div>'+
+  '<div class="stat"><b>Audio boost</b><span>'+esc(resolved&&resolved.canBoost?'Enabled':'Provider only')+'</span></div>';
 }
 
 function renderQueue(){
-  if(!q || !q.items) return;
+ if(!q||!q.items)return;
 
-  $('queuePanel').innerHTML = q.items.map((movie, i) => {
-    const provider = resolveSource(movie);
-    let cls = 'pill';
+ $('queuePanel').innerHTML=q.items.map((movie,i)=>{
+  const provider=resolveSource(movie);
+  let cls='pill';
 
-    if(provider.mode === 'iframe') cls += ' warnPill';
-    if(provider.mode === 'video') cls += ' cyanPill';
-    if(provider.mode === 'missing' || provider.mode === 'external') cls += ' badPill';
+  if(provider.mode==='iframe')cls+=' warnPill';
+  if(provider.mode==='video')cls+=' cyanPill';
+  if(provider.mode==='missing'||provider.mode==='external')cls+=' badPill';
 
-    return '<div class="queueItem ' + (i === index ? 'active' : '') + '" data-index="' + i + '">' +
-      '<b>' + (i + 1) + '. ' + esc(movie.title || movie.name || 'Untitled') + '</b>' +
-      '<p>' + esc(movie.description || '') + '</p>' +
-      '<span class="' + cls + '">' + esc(provider.label) + '</span>' +
-    '</div>';
-  }).join('') || '<div class="note">Queue empty.</div>';
+  return'<div class="queueItem '+(i===index?'active':'')+'" data-index="'+i+'">'+
+   '<b>'+(i+1)+'. '+esc(movie.title||movie.name||'Untitled')+'</b>'+
+   '<p>'+esc(movie.description||'')+'</p>'+
+   '<span class="'+cls+'">'+esc(provider.label)+'</span>'+
+  '</div>';
+ }).join('')||'<div class="note">Queue empty.</div>';
 
-  $('queuePanel').querySelectorAll('[data-index]').forEach(el => {
-    el.onclick = function(){
-      index = Number(el.dataset.index) || 0;
-      loadCurrent(true);
-    };
-  });
+ $('queuePanel').querySelectorAll('[data-index]').forEach(el=>{
+  el.onclick=function(){
+   index=Number(el.dataset.index)||0;
+   loadCurrent(true);
+  };
+ });
 }
 
 function renderInfo(){
-  if(!row) return;
+ if(!row)return;
 
-  resolved = resolveSource(row);
+ resolved=resolveSource(row);
 
-  $('queueName').textContent = q && (q.name || q.label || q.genre || q.type) ? (q.name || q.label || q.genre || q.type) : 'Queue';
-  $('movieTitle').textContent = row.title || row.name || 'Untitled';
-  $('description').textContent = row.description || row.summary || 'No description yet.';
+ $('queueName').textContent=q&&(q.name||q.label||q.genre||q.type)?(q.name||q.label||q.genre||q.type):'Queue';
+ $('movieTitle').textContent=row.title||row.name||'Untitled';
+ $('description').textContent=row.description||row.summary||'No description yet.';
 
-  let providerCls = 'pill';
+ let providerCls='pill';
 
-  if(resolved.mode === 'iframe') providerCls += ' warnPill';
-  if(resolved.mode === 'video') providerCls += ' cyanPill';
-  if(resolved.mode === 'external' || resolved.mode === 'missing') providerCls += ' badPill';
+ if(resolved.mode==='iframe')providerCls+=' warnPill';
+ if(resolved.mode==='video')providerCls+=' cyanPill';
+ if(resolved.mode==='external'||resolved.mode==='missing')providerCls+=' badPill';
 
-  $('pills').innerHTML =
-    '<span class="' + providerCls + '">' + esc(resolved.label) + '</span>' +
-    arr(row.genres || row.genre).slice(0,4).map(g => '<span class="pill">' + esc(g) + '</span>').join('');
+ $('pills').innerHTML='<span class="'+providerCls+'">'+esc(resolved.label)+'</span>'+arr(row.genres||row.genre).slice(0,4).map(g=>'<span class="pill">'+esc(g)+'</span>').join('');
+ $('detailsLink').href=DETAILS+'?id='+encodeURIComponent(row.id||'');
+ $('openSource').href=itemUrl(row)||'#';
+ $('queuePosition').textContent='Item '+(index+1)+' of '+((q&&q.items&&q.items.length)||1);
+ $('queueProgress').style.width=q&&q.items&&q.items.length?(((index+1)/q.items.length)*100)+'%':'0%';
+ $('sourceUrl').textContent=itemUrl(row)||'No video source found.';
 
-  $('detailsLink').href = DETAILS + '?id=' + encodeURIComponent(row.id || '');
-  $('openSource').href = itemUrl(row) || '#';
+ $('sourceInfo').innerHTML=
+  tile('Title',row.title||row.name||'Untitled')+
+  tile('Provider',resolved.provider)+
+  tile('Mode',resolved.mode)+
+  tile('Source type',row.source_type||resolved.provider)+
+  tile('Audio boost available',resolved.canBoost?'Yes':'No')+
+  tile('Movie id',row.id||'—')+
+  tile('Queue type',(q&&(q.name||q.label||q.type))||'—');
 
-  $('queuePosition').textContent = 'Item ' + (index + 1) + ' of ' + ((q && q.items && q.items.length) || 1);
-  $('queueProgress').style.width = q && q.items && q.items.length ? (((index + 1) / q.items.length) * 100) + '%' : '0%';
+ $('debug').textContent=JSON.stringify({
+  version:VERSION,
+  route:'player-2-clean-machine-v7-12-58-test.html',
+  cleanRail:true,
+  currentIndex:index,
+  queue:q,
+  row:row,
+  resolved:resolved,
+  boostRule:'Boost remains enabled only for HTML video sources: mux/hls/direct.',
+  safeRules:{
+   noSchemaChange:true,
+   noStorageChange:true,
+   noRlsChange:true,
+   noPlayerOneRouteChange:true,
+   noDetailsRouteChange:true,
+   noIndexPromotion:true,
+   queueKeys:['streamBanditQueueV1','streamBanditUpNextV1','streamBanditPlayer2Queue']
+  }
+ },null,2);
 
-  $('sourceUrl').textContent = itemUrl(row) || 'No video source found.';
-
-  $('sourceInfo').innerHTML =
-    tile('Title', row.title || row.name || 'Untitled') +
-    tile('Provider', resolved.provider) +
-    tile('Mode', resolved.mode) +
-    tile('Source type', row.source_type || resolved.provider) +
-    tile('Audio boost available', resolved.canBoost ? 'Yes' : 'No') +
-    tile('Movie id', row.id || '—') +
-    tile('Queue type', (q && (q.name || q.label || q.type)) || '—');
-
-  $('debug').textContent = JSON.stringify({
-    version:VERSION,
-    route:'player-2-clean-machine-v7-12-58-test.html',
-    currentIndex:index,
-    queue:q,
-    row:row,
-    resolved:resolved,
-    boostRule:'Boost remains enabled only for HTML video sources: mux/hls/direct.'
-  }, null, 2);
+ renderStats();
 }
 
 function destroyVideo(){
-  try{
-    if(hls){
-      hls.destroy();
-      hls = null;
-    }
-  }catch(e){}
+ try{if(hls){hls.destroy();hls=null;}}catch(e){}
 
-  try{
-    if(video){
-      saveProgress(true, false);
-      video.pause();
-    }
-  }catch(e){}
+ try{
+  if(video){
+   saveProgress(true,false);
+   video.pause();
+  }
+ }catch(e){}
 
-  $('frame').innerHTML = '<div class="muted">Loading video...</div>';
+ $('frame').innerHTML='<div class="muted">Loading video...</div>';
 
-  video = null;
-  audioCtx = null;
-  sourceNode = null;
-  gainNode = null;
+ video=null;
+ audioCtx=null;
+ sourceNode=null;
+ gainNode=null;
 }
 
 function setVideoControlsEnabled(enabled){
-  $('playPause').disabled = !enabled;
-  $('rewind').disabled = !enabled;
-  $('forward').disabled = !enabled;
-  $('volume').disabled = !enabled;
-  $('boost').disabled = !enabled;
-  $('pip').disabled = !enabled;
+ $('playPause').disabled=!enabled;
+ $('rewind').disabled=!enabled;
+ $('forward').disabled=!enabled;
+ $('volume').disabled=!enabled;
+ $('boost').disabled=!enabled;
+ $('pip').disabled=!enabled;
 }
 
 function buildVideo(){
-  destroyVideo();
+ destroyVideo();
 
-  const url = resolved.playable;
+ const url=resolved.playable;
 
-  if(!url){
-    $('frame').innerHTML = '<div class="danger">No playable URL for this item.</div>';
-    setVideoControlsEnabled(false);
-    $('fullscreen').disabled = false;
-    return;
-  }
+ if(!url){
+  $('frame').innerHTML='<div class="danger">No playable URL for this item.</div>';
+  setVideoControlsEnabled(false);
+  $('fullscreen').disabled=false;
+  return;
+ }
 
-  video = document.createElement('video');
-  video.controls = true;
-  video.playsInline = true;
-  video.preload = 'metadata';
-  video.poster = itemPoster(row) || '';
+ video=document.createElement('video');
+ video.controls=true;
+ video.playsInline=true;
+ video.preload='metadata';
+ video.poster=itemPoster(row)||'';
 
-  $('frame').innerHTML = '';
-  $('frame').appendChild(video);
+ $('frame').innerHTML='';
+ $('frame').appendChild(video);
 
-  if(isHls(url) && window.Hls && Hls.isSupported() && !video.canPlayType('application/vnd.apple.mpegurl')){
-    hls = new Hls();
-    hls.loadSource(url);
-    hls.attachMedia(video);
-  }else{
-    video.src = url;
-  }
+ if(isHls(url)&&window.Hls&&Hls.isSupported()&&!video.canPlayType('application/vnd.apple.mpegurl')){
+  hls=new Hls();
+  hls.loadSource(url);
+  hls.attachMedia(video);
+ }else{
+  video.src=url;
+ }
 
-  const saved = savedFor(row.id);
+ const saved=savedFor(row.id);
 
-  if(saved && saved.currentTime){
-    video.addEventListener('loadedmetadata', function(){
-      try{
-        if(saved.currentTime < video.duration - 8){
-          video.currentTime = saved.currentTime;
-        }
-      }catch(e){}
-    }, {once:true});
-  }
+ if(saved&&saved.currentTime){
+  video.addEventListener('loadedmetadata',function(){
+   try{
+    if(saved.currentTime<video.duration-8)video.currentTime=saved.currentTime;
+   }catch(e){}
+  },{once:true});
+ }
 
-  ['play','pause','timeupdate','seeked','ended'].forEach(function(eventName){
-    video.addEventListener(eventName, function(){
-      saveProgress(eventName !== 'timeupdate', eventName === 'ended');
-    });
+ ['play','pause','timeupdate','seeked','ended'].forEach(eventName=>{
+  video.addEventListener(eventName,function(){
+   saveProgress(eventName!=='timeupdate',eventName==='ended');
   });
+ });
 
-  video.addEventListener('timeupdate', renderMonitor);
-  video.addEventListener('loadedmetadata', renderMonitor);
-  video.addEventListener('error', function(){
-    setStatus('Video error: source could not play.', true);
-  });
+ video.addEventListener('timeupdate',renderMonitor);
+ video.addEventListener('loadedmetadata',renderMonitor);
+ video.addEventListener('error',function(){setStatus('Video error: source could not play.',true);});
 
-  setVideoControlsEnabled(true);
-  setProviderNote(resolved.note, 'good');
-  setStatus('Player 2 loaded: ' + (row.title || 'Untitled'));
+ setVideoControlsEnabled(true);
+ setProviderNote(resolved.note,'good');
+ setStatus('Player 2 loaded: '+(row.title||'Untitled'));
+ renderMonitor();
 }
 
 function buildIframe(){
-  destroyVideo();
+ destroyVideo();
 
-  const iframe = document.createElement('iframe');
-  iframe.src = resolved.embed;
-  iframe.title = row && row.title ? row.title : resolved.label + ' player';
-  iframe.loading = 'lazy';
-  iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen';
-  iframe.allowFullscreen = true;
+ const iframe=document.createElement('iframe');
+ iframe.src=resolved.embed;
+ iframe.title=row&&row.title?row.title:resolved.label+' player';
+ iframe.loading='lazy';
+ iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen';
+ iframe.allowFullscreen=true;
 
-  $('frame').innerHTML = '';
-  $('frame').appendChild(iframe);
+ $('frame').innerHTML='';
+ $('frame').appendChild(iframe);
 
-  setVideoControlsEnabled(false);
-  $('fullscreen').disabled = false;
+ setVideoControlsEnabled(false);
+ $('fullscreen').disabled=false;
 
-  $('monitor').innerHTML =
-    tile('Provider', resolved.label) +
-    tile('Mode', 'iframe embed') +
-    tile('Audio boost', 'Not available for iframe providers') +
-    tile('Queue controls', 'Next / Previous remain active');
+ $('monitor').innerHTML=
+  tile('Provider',resolved.label)+
+  tile('Mode','iframe embed')+
+  tile('Audio boost','Not available for iframe providers')+
+  tile('Queue controls','Next / Previous remain active');
 
-  setProviderNote(resolved.note, 'warn');
-  setStatus(resolved.label + ' queue item loaded.');
+ setProviderNote(resolved.note,'warn');
+ setStatus(resolved.label+' queue item loaded.');
 }
 
 function buildExternal(){
-  destroyVideo();
+ destroyVideo();
 
-  $('frame').innerHTML =
-    '<div class="note" style="max-width:680px;margin:16px">' +
-      '<b>External stream URL</b><br>' +
-      'This URL is not recognised as Mux, HLS, direct video, YouTube or Vimeo. It may need a provider-specific rule later.' +
-      '<div class="actions"><a class="btn primary" target="_blank" rel="noopener" href="' + esc(resolved.url) + '">Open source in new tab</a></div>' +
-    '</div>';
+ $('frame').innerHTML='<div class="note" style="max-width:680px;margin:16px"><b>External stream URL</b><br>This URL is not recognised as Mux, HLS, direct video, YouTube or Vimeo. It may need a provider-specific rule later.<div class="actions"><a class="btn primary" target="_blank" rel="noopener" href="'+esc(resolved.url)+'">Open source in new tab</a></div></div>';
 
-  setVideoControlsEnabled(false);
-  $('fullscreen').disabled = false;
+ setVideoControlsEnabled(false);
+ $('fullscreen').disabled=false;
 
-  $('monitor').innerHTML =
-    tile('Provider', resolved.label) +
-    tile('Mode', 'external link') +
-    tile('Audio boost', 'Not available') +
-    tile('Queue controls', 'Next / Previous remain active');
+ $('monitor').innerHTML=
+  tile('Provider',resolved.label)+
+  tile('Mode','external link')+
+  tile('Audio boost','Not available')+
+  tile('Queue controls','Next / Previous remain active');
 
-  setProviderNote(resolved.note, 'warn');
-  setStatus('External URL queue item loaded.', true);
+ setProviderNote(resolved.note,'warn');
+ setStatus('External URL queue item loaded.',true);
 }
 
 function buildMissing(){
-  destroyVideo();
+ destroyVideo();
 
-  $('frame').innerHTML = '<div class="danger">No playable URL for this queue item.</div>';
-  setVideoControlsEnabled(false);
-  $('fullscreen').disabled = false;
+ $('frame').innerHTML='<div class="danger">No playable URL for this queue item.</div>';
+ setVideoControlsEnabled(false);
+ $('fullscreen').disabled=false;
 
-  $('monitor').innerHTML = tile('State','Missing source');
-  setProviderNote(resolved.note, 'bad');
-  setStatus('No playable source found.', true);
+ $('monitor').innerHTML=tile('State','Missing source');
+ setProviderNote(resolved.note,'bad');
+ setStatus('No playable source found.',true);
 }
 
 function buildPlayer(){
-  resolved = resolveSource(row);
+ resolved=resolveSource(row);
 
-  if(resolved.mode === 'video'){
-    buildVideo();
-    return;
-  }
+ if(resolved.mode==='video'){buildVideo();return;}
+ if(resolved.mode==='iframe'){buildIframe();return;}
+ if(resolved.mode==='external'){buildExternal();return;}
 
-  if(resolved.mode === 'iframe'){
-    buildIframe();
-    return;
-  }
-
-  if(resolved.mode === 'external'){
-    buildExternal();
-    return;
-  }
-
-  buildMissing();
+ buildMissing();
 }
 
-function loadCurrent(reset){
-  if(!q || !q.items || !q.items.length) return;
+function loadCurrent(){
+ if(!q||!q.items||!q.items.length)return;
 
-  index = Math.max(0, Math.min(index, q.items.length - 1));
-  row = q.items[index];
+ index=Math.max(0,Math.min(index,q.items.length-1));
+ row=q.items[index];
 
-  persistQueue();
-  renderQueue();
-  renderInfo();
-  buildPlayer();
-  renderProgressState();
+ persistQueue();
+ renderQueue();
+ renderInfo();
+ buildPlayer();
+ renderProgressState();
 }
 
 function next(){
-  if(!q || !q.items) return;
+ if(!q||!q.items)return;
 
-  if(index < q.items.length - 1){
-    index++;
-    loadCurrent(true);
-  }else{
-    setStatus('End of queue.');
-  }
+ if(index<q.items.length-1){
+  index++;
+  loadCurrent();
+ }else{
+  setStatus('End of queue.');
+ }
 }
 
 function prev(){
-  if(!q || !q.items) return;
+ if(!q||!q.items)return;
 
-  if(index > 0){
-    index--;
-    loadCurrent(true);
-  }else{
-    setStatus('Start of queue.');
-  }
+ if(index>0){
+  index--;
+  loadCurrent();
+ }else{
+  setStatus('Start of queue.');
+ }
 }
 
 function renderMonitor(){
-  if(!video){
-    $('monitor').innerHTML = tile('State','No HTML video active');
-    return;
-  }
+ if(!video){
+  $('monitor').innerHTML=tile('State','No HTML video active');
+  return;
+ }
 
-  $('monitor').innerHTML =
-    tile('Current time', Math.round(video.currentTime || 0) + 's') +
-    tile('Duration', Math.round(video.duration || 0) + 's') +
-    tile('Paused', String(video.paused)) +
-    tile('Volume', Math.round((video.volume || 0) * 100) + '%') +
-    tile('Boost available', resolved && resolved.canBoost ? 'Yes' : 'No');
+ $('monitor').innerHTML=
+  tile('Current time',Math.round(video.currentTime||0)+'s')+
+  tile('Duration',Math.round(video.duration||0)+'s')+
+  tile('Paused',String(video.paused))+
+  tile('Volume',Math.round((video.volume||0)*100)+'%')+
+  tile('Boost available',resolved&&resolved.canBoost?'Yes':'No');
 }
 
 function renderProgressState(){
-  const store = progressStore();
+ const store=progressStore();
 
-  $('progressState').textContent = JSON.stringify({
-    currentProvider:resolved ? resolved.provider : null,
-    currentMode:resolved ? resolved.mode : null,
-    progress:row && row.id ? store[String(row.id)] || {} : store,
-    note:resolved && resolved.mode === 'iframe' ? 'Iframe providers do not expose currentTime to Stream Bandit.' : 'HTML video progress saves normally.'
-  }, null, 2);
+ $('progressState').textContent=JSON.stringify({
+  currentProvider:resolved?resolved.provider:null,
+  currentMode:resolved?resolved.mode:null,
+  progress:row&&row.id?store[String(row.id)]||{}:store,
+  note:resolved&&resolved.mode==='iframe'?'Iframe providers do not expose currentTime to Stream Bandit.':'HTML video progress saves normally.'
+ },null,2);
 }
 
 function setupBoost(){
-  if(!video || !resolved || !resolved.canBoost){
-    setStatus('Audio boost only works for Mux, HLS and direct video streams.', true);
-    return;
+ if(!video||!resolved||!resolved.canBoost){
+  setStatus('Audio boost only works for Mux, HLS and direct video streams.',true);
+  return;
+ }
+
+ const amount=Number($('boost').value||1);
+
+ try{
+  if(amount<=1){
+   if(gainNode)gainNode.gain.value=1;
+   setStatus('Audio boost normal 100%.');
+   return;
   }
 
-  const amount = Number($('boost').value || 1);
-
-  try{
-    if(amount <= 1){
-      if(gainNode) gainNode.gain.value = 1;
-      setStatus('Audio boost normal 100%.');
-      return;
-    }
-
-    if(!audioCtx){
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      sourceNode = audioCtx.createMediaElementSource(video);
-      gainNode = audioCtx.createGain();
-      sourceNode.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-    }
-
-    gainNode.gain.value = amount;
-
-    if(audioCtx.state === 'suspended'){
-      audioCtx.resume();
-    }
-
-    setStatus('Audio boost active: ' + Math.round(amount * 100) + '%.');
-  }catch(e){
-    setStatus('Audio boost could not attach on this browser.', true);
+  if(!audioCtx){
+   audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+   sourceNode=audioCtx.createMediaElementSource(video);
+   gainNode=audioCtx.createGain();
+   sourceNode.connect(gainNode);
+   gainNode.connect(audioCtx.destination);
   }
+
+  gainNode.gain.value=amount;
+
+  if(audioCtx.state==='suspended')audioCtx.resume();
+
+  setStatus('Audio boost active: '+Math.round(amount*100)+'%.');
+ }catch(e){
+  setStatus('Audio boost could not attach on this browser.',true);
+ }
 }
 
 function tabs(){
-  document.querySelectorAll('[data-tab]').forEach(function(button){
-    button.addEventListener('click', function(){
-      document.querySelectorAll('[data-tab]').forEach(x => x.classList.remove('active'));
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+ document.querySelectorAll('[data-tab]').forEach(button=>{
+  button.addEventListener('click',function(){
+   document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));
+   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
 
-      button.classList.add('active');
+   button.classList.add('active');
 
-      const el = $(button.dataset.tab);
-      if(el) el.classList.add('active');
-    });
+   const el=$(button.dataset.tab);
+   if(el)el.classList.add('active');
   });
+ });
+}
+
+async function refreshSavedCounters(force){
+ const now=Date.now();
+
+ if(countBusy)return;
+
+ if(!force&&lastCountRead&&now-lastCountRead<12000){
+  try{
+   if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();
+  }catch(e){}
+  return;
+ }
+
+ countBusy=true;
+
+ try{
+  const core=window.StreamBanditCoreSavesV675;
+
+  if(core){
+   if(!countReady&&core.init){
+    await core.init();
+    countReady=true;
+   }else if(core.refresh){
+    await core.refresh();
+   }
+  }
+
+  if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();
+  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();
+
+  lastCountRead=Date.now();
+ }catch(e){}
+ finally{
+  countBusy=false;
+ }
+}
+
+function helper(){
+ try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}
+ try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
+ try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
+
+ refreshSavedCounters(false);
+
+ $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
+  ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
+  ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
+  ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
+  ' · Counts '+(window.StreamBanditMenuSavesCount?'✅':'⚠️')+
+  ' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️');
+}
+
+async function reloadQueue(){
+ try{
+  setStatus('Reloading Player 2 queue...');
+
+  destroyVideo();
+
+  q=readQueue()||await loadFallback();
+  index=Number(q.currentIndex||new URLSearchParams(location.search).get('qi')||0)||0;
+  q.items=(q.items||[]).map(normaliseItem);
+
+  loadCurrent();
+  helper();
+
+  setStatus('Player 2 queue reloaded.');
+ }catch(e){
+  setStatus('Player 2 reload failed: '+(e.message||e),true);
+ }
 }
 
 function wire(){
-  tabs();
+ tabs();
 
-  $('playPause').onclick = function(){
-    if(!video) return;
+ $('backBtn').onclick=()=>{if(history.length>1)history.back();else location.href='collections-clean-machine-v7-12-51-test.html';};
+ $('reloadQueue').onclick=reloadQueue;
 
-    if(video.paused){
-      video.play().catch(e => setStatus('Play blocked: ' + e.message, true));
-    }else{
-      video.pause();
-    }
-  };
+ $('playPause').onclick=function(){
+  if(!video)return;
 
-  $('rewind').onclick = function(){
-    if(video) video.currentTime = Math.max(0, video.currentTime - 10);
-  };
+  if(video.paused)video.play().catch(e=>setStatus('Play blocked: '+e.message,true));
+  else video.pause();
+ };
 
-  $('forward').onclick = function(){
-    if(video) video.currentTime = Math.min(video.duration || 999999, video.currentTime + 10);
-  };
+ $('rewind').onclick=function(){if(video)video.currentTime=Math.max(0,video.currentTime-10);};
+ $('forward').onclick=function(){if(video)video.currentTime=Math.min(video.duration||999999,video.currentTime+10);};
 
-  $('fullscreen').onclick = function(){
-    const el = $('frame');
-    if(el.requestFullscreen) el.requestFullscreen();
-  };
+ $('fullscreen').onclick=function(){
+  const el=$('frame');
+  if(el.requestFullscreen)el.requestFullscreen();
+ };
 
-  $('pip').onclick = async function(){
-    try{
-      if(video && document.pictureInPictureEnabled){
-        await video.requestPictureInPicture();
-      }
-    }catch(e){
-      setStatus('Picture-in-picture is unavailable here.', true);
-    }
-  };
+ $('pip').onclick=async function(){
+  try{
+   if(video&&document.pictureInPictureEnabled)await video.requestPictureInPicture();
+  }catch(e){
+   setStatus('Picture-in-picture is unavailable here.',true);
+  }
+ };
 
-  $('volume').oninput = function(){
-    if(video) video.volume = Number($('volume').value || 1);
-  };
+ $('volume').oninput=function(){if(video)video.volume=Number($('volume').value||1);};
+ $('boost').onchange=setupBoost;
+ $('nextBtn').onclick=next;
+ $('prevBtn').onclick=prev;
 
-  $('boost').onchange = setupBoost;
-  $('nextBtn').onclick = next;
-  $('prevBtn').onclick = prev;
-
-  window.addEventListener('beforeunload', function(){
-    saveProgress(true, false);
-  });
-
-  setTimeout(renderGlobalStatus, 700);
-  setTimeout(renderGlobalStatus, 1800);
+ window.addEventListener('beforeunload',function(){saveProgress(true,false);});
+ window.addEventListener('streambandit-core-saves-changed',()=>refreshSavedCounters(true));
+ window.addEventListener('streambandit-core-saves-v6-75-changed',()=>refreshSavedCounters(true));
 }
 
-async function init(){
-  wire();
+function boot(){
+ wire();
+ helper();
+ reloadQueue();
 
-  q = readQueue() || await loadFallback();
+ setTimeout(()=>refreshSavedCounters(true),600);
+ setTimeout(helper,900);
+ setTimeout(helper,1800);
+ setInterval(helper,6000);
 
-  index = Number(q.currentIndex || new URLSearchParams(location.search).get('qi') || 0) || 0;
-  q.items = (q.items || []).map(normaliseItem);
-
-  loadCurrent(true);
-  renderGlobalStatus();
-
-  document.documentElement.dataset.sbPlayer2ProviderQueue = 'v7-12-267';
-
-  window.StreamBanditPlayer2ProviderQueueV712267 = {
-    version:VERSION,
-    route:'player-2-clean-machine-v7-12-58-test.html',
-    resolveSource:resolveSource,
-    current:function(){
-      return {queue:q,index:index,row:row,resolved:resolved};
-    }
-  };
+ document.documentElement.dataset.sbPlayer2CleanRail='v7-12-293';
+ window.StreamBanditPlayer2CleanRailV712293={
+  version:VERSION,
+  route:'player-2-clean-machine-v7-12-58-test.html',
+  resolveSource:resolveSource,
+  reload:reloadQueue,
+  current:function(){return{queue:q,index:index,row:row,resolved:resolved};}
+ };
 }
 
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', init);
-}else{
-  init();
-}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
 
 })();
 </script>
