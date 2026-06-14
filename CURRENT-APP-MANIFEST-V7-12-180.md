@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.290
+# Stream Bandit Current App Manifest V7.12.291.1
 
 Date: 2026-06-13
 
@@ -6,15 +6,15 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.290 Channels Passed / My Channel Start`
+`V7.12.291.1 My Channel Passed / Collections Start`
 
-Public Browse group is passed as a full group. Creator group has started. Creator Rules, Submit Video, Review Queue, Playlists, and Channels have now passed.
+Public Browse group is passed as a full group. Creator group has started. Creator Rules, Submit Video, Review Queue, Playlists, Channels, and My Channel have now passed.
 
 Current next target:
 
-`my-channel-clean-machine-v7-12-47-test.html`
+`collections-clean-machine-v7-12-51-test.html`
 
-The user supplied the current full My Channel page file as the source for the next full-page replacement pass.
+The user supplied the current full Collections page file as the source for the next full-page replacement pass.
 
 ## Current checkpoint files
 
@@ -24,7 +24,7 @@ Keep these current checkpoint files:
 - `CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`
 - `CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
-No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, Playlists, or Channels. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
+No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, Playlists, Channels, or My Channel. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
 
 ## File-count / cleanup rule
 
@@ -53,9 +53,9 @@ Last full Registry / Health baseline before this page-polish group:
 - Schema changes: `false`
 - Storage actions: `false`
 
-Health baseline confirmed:
+Health baseline confirmed before this page-polish group:
 
-- Header Shell, Footer Shell, Theme Projector, Settings Global, Brand Logo, Core Saves, Menu Counts, Search Fallback, Access Gate, Supabase SDK, session/profile all loaded before this page-polish group.
+- Header Shell, Footer Shell, Theme Projector, Settings Global, Brand Logo, Core Saves, Menu Counts, Search Fallback, Access Gate, Supabase SDK, session/profile all loaded.
 - `sb_movies` readable, count 24 before latest creator publish tests.
 - `sb_channels` readable, count 3.
 - `sb_policy_documents` readable, count 7.
@@ -84,14 +84,7 @@ Confirmed access tests remain valid: owner can open One Machine; owner false-loc
 
 ## Page polish standard
 
-Every page in the final polish pass should follow:
-
-1. Header shell
-2. Page navigation pill rail directly under the header
-3. Hero / main page summary
-4. Internal section tabs only when needed
-5. Page output/content underneath the internal tabs
-6. Footer shell
+Every page in the final polish pass should follow: Header shell, page navigation pill rail directly under the header, hero/main summary, internal content tabs only when needed, page output/content underneath those tabs, Footer shell.
 
 Clean-navigation rules:
 
@@ -162,32 +155,38 @@ File: `channels-global-helpers-v7-5-3-test.html`
 
 State: `V7.12.290 Channels · Clean Rail`
 
+Confirmed: top rail added; route links moved out of hero; hero keeps Reload Channels and Play Selected In Player 2; current-page tabs only; reads `sb_profiles`, `sb_channels`, `sb_movies`; profile channel edits update `sb_profiles`; owned extra-channel CRUD preserved; attach/remove uses `sb_group_play_set_movie_channel` RPC; main/library attach fix preserved; no schema/storage/RLS/RPC/table/player/index/global-helper changes.
+
+### My Channel — PASSED
+
+File: `my-channel-clean-machine-v7-12-47-test.html`
+
+State: `V7.12.291.1 My Channel · Plan Stat Wrap Fix`
+
 Page update method:
 
 - Full ready copy/paste page code was supplied to the user.
-- User confirmed the Channels page passed.
+- User confirmed the page passed on both user account and admin/owner account.
 
 Confirmed:
 
 - Creator group top rail added directly under header.
 - Route links moved out of hero into the top rail.
-- Hero keeps real page actions only: Reload Channels and Play Selected In Player 2.
-- Channel page tabs remain current-page content only: Browse, My Profile Channel, Create/Edit Channels, Add/Remove Videos, Permissions, Debug.
-- No duplicate route tabs/buttons were added.
-- Reads profile identity from `sb_profiles`.
-- Reads extra/group channel rows from `sb_channels`.
-- Reads published videos from `sb_movies`.
-- Profile channel edits update the user's `sb_profiles` channel fields.
-- Extra channel create/edit/delete operates on owned `sb_channels` rows only.
-- Add/remove videos uses `sb_group_play_set_movie_channel` RPC.
-- Allows own movies and Stream Bandit library videos.
-- Blocks taking other normal users' private videos.
-- Uses entitlements through `stream-bandit-entitlements-v7-12-269.js`.
-- Player 2 queue handoff remains preserved.
+- Duplicate route action buttons/cards were removed from hero and dashboard content.
+- Hero keeps real page actions only: Reload My Channel and Play My Videos In Player 2.
+- Dashboard, Edit Profile Channel, My Videos, Submissions, Permissions, Rules, and Debug remain current-page content tabs.
+- Shell config, Core Saves, Menu Saves Count, Settings Global, Brand Logo, Search Fallback, and Entitlements helpers are loaded.
+- Helper status shows Counts as well as Header/Footer/Theme/Saves/Search/Entitlements.
+- Profile channel editing preserved.
+- Clear guard remains when movies exist.
+- Owner-only/signed-in user data reads preserved.
+- Entitlement rules preserved.
+- Player 2 handoff preserved.
+- Plan stat wrap fix prevents long plan names such as `platform_owner` from overflowing the dashboard card.
+- Confirmed visually clean for user account and admin/owner account.
 - No schema changes.
 - No storage changes.
 - No RLS changes.
-- No RPC name changes.
 - No table-name changes.
 - No player engine changes.
 - No index promotion.
@@ -197,39 +196,40 @@ Confirmed:
 
 Next page:
 
-`my-channel-clean-machine-v7-12-47-test.html`
+`collections-clean-machine-v7-12-51-test.html`
 
-The user uploaded the current full My Channel page as source for the next pass.
+The user uploaded the current full Collections page as source for the next pass.
 
-Current supplied My Channel state:
+Current supplied Collections state:
 
-`V7.12.269 My Channel · Profile + Entitlements`
+`V7.12.270.1 Collections · Remove Fix`
 
-Known behaviours from supplied My Channel source:
+Known behaviours from supplied Collections source:
 
-- Reads signed-in profile from `sb_profiles`.
-- Reads owned movies from `sb_movies.owner_id`.
-- Reads submissions from `sb_submissions.submitter_id`.
-- Reads owned extra channels from `sb_channels.owner_id`.
-- Reads owned playlists from `sb_playlists.owner_id`.
-- Reads owned collections from `sb_collections.created_by`.
-- Profile channel edits update `sb_profiles.channel_name`, `channel_about`, `avatar_url`, and `banner_url`.
-- Clear profile channel is blocked when owned movies exist.
-- Resolves entitlements through `stream-bandit-entitlements-v7-12-269.js`.
-- Handoff to Player 2 uses queue storage and route `player-2-clean-machine-v7-12-58-test.html`.
-- My Channel never falls back to showing other users' content.
+- Reads collections from `sb_collections`.
+- Reads joins from `sb_collection_movies`.
+- Reads published videos from `sb_movies`.
+- Uses profile identity and entitlements.
+- Supports collection browse and Player 2 queue handoff.
+- Collection Studio can create/update collections according to owner/admin/entitlement rules.
+- Upload artwork uses Supabase Storage bucket `stream-bandit-images` under `collections/<owner>/...`.
+- Add/remove videos writes `sb_collection_movies` join rows only.
+- Remove Collection deletes join rows first, then removes the collection when role/plan/RLS allows it.
+- Main/library video attach logic allows own movies and Stream Bandit main/library videos for normal creators.
+- Selected-card sync and Remove Collection fix are already present in the supplied source.
 
 Needed next polish direction:
 
 - Add Creator group top rail directly under header.
 - Move route links out of hero into top rail.
-- Remove duplicate route action buttons/cards from hero and dashboard content.
-- Keep real page actions in hero: Reload My Channel and Play My Videos In Player 2.
-- Keep Dashboard, Edit Profile Channel, My Videos, Submissions, Permissions, Rules, and Debug as current-page content tabs.
-- Load Shell config, Core Saves, Menu Saves Count, Settings Global, Brand Logo, Search Fallback, and Entitlements helpers to match latest pattern.
+- Remove Open overlay menu from hero.
+- Keep real page actions in hero: Reload Collections and Play Selected In Player 2.
+- Do not add duplicate route tabs/buttons.
+- Preserve Browse, Collection Studio, Add / Remove Videos, Permissions, and Debug as current-page content tabs.
+- Load Core Saves, Menu Saves Count, Settings Global, Brand Logo, Search Fallback, and Entitlements helpers to match latest pattern.
 - Make helper status show Counts as well as Header/Footer/Theme/Saves/Search/Entitlements.
-- Preserve profile channel editing, clear guard when movies exist, owner-only data reads, entitlement rules, and Player 2 handoff.
-- Do not change schema, storage, RLS, table names, player engine, index, or global helper logic.
+- Preserve selected-card sync, remove fix, artwork upload, create/edit/delete, add/remove joins, main library attach logic, entitlement rules, and Player 2 handoff.
+- Do not change schema, storage policy, RLS, bucket name, table names, player engine, index, or global helper logic.
 
 Creator group expected pages:
 
@@ -238,8 +238,8 @@ Creator group expected pages:
 - Review Queue — `review-queue-clean-machine-v7-12-80-publish-test.html` — PASSED
 - Playlists — `playlists-global-helpers-v7-5-2-test.html` — PASSED
 - Channels — `channels-global-helpers-v7-5-3-test.html` — PASSED
-- My Channel — `my-channel-clean-machine-v7-12-47-test.html` — NEXT
-- Collections — `collections-clean-machine-v7-12-51-test.html`
+- My Channel — `my-channel-clean-machine-v7-12-47-test.html` — PASSED
+- Collections — `collections-clean-machine-v7-12-51-test.html` — NEXT
 - Player 2 — `player-2-clean-machine-v7-12-58-test.html`
 
 Creator group rules:
