@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.297.1
+# Stream Bandit Current App Manifest V7.12.298.2
 
 Date: 2026-06-14
 
@@ -6,15 +6,15 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.297.1 Profile Settings Passed / Web Builder Start`
+`V7.12.298.2 Footer Messenger Passed / Web Builder Rail Check Start`
 
-Public Browse group is passed as a full group. Creator group is passed as a full group. Settings group has started. Settings Hub, Theme Studio, and Profile Settings have now passed.
+Public Browse group is passed as a full group. Creator group is passed as a full group. Settings group has started. Settings Hub, Theme Studio, Profile Settings, and the global Footer Messenger are now passed.
 
 Current next target:
 
 `web-builder-live-studio-v7-12-116-test.html?page=test-page`
 
-Next step is to scan or use the current full Web Builder page source before producing the next full-page replacement.
+Next step is to scan or use the current full Web Builder page source before doing the rail/live-ready check. Web Builder is expected to keep its own builder-specific shell behaviour where appropriate; this is a check pass, not a forced normal-app-shell merge.
 
 ## Current checkpoint files
 
@@ -24,7 +24,7 @@ Keep these current checkpoint files:
 - `CHECKPOINT-BROWSE-GROUP-GENRES-CLEAN-NAV-V7-12-282-PASSED.md`
 - `CHECKPOINT-ACCESS-OWNER-USER-MANAGEMENT-PAGE-POLISH-RAILS-V7-12-276.md`
 
-No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, Playlists, Channels, My Channel, Collections, Player 2, the Creator full-group pass, Settings Hub, Theme Studio, or Profile Settings. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
+No new checkpoint was created for Global Search, About, Browse full-group pass, Creator Rules, Submit Video, Review Queue, Playlists, Channels, My Channel, Collections, Player 2, the Creator full-group pass, Settings Hub, Theme Studio, Profile Settings, or Footer Messenger. These are recorded in this manifest only to avoid checkpoint/file-count clutter.
 
 ## File-count / cleanup rule
 
@@ -76,7 +76,7 @@ Confirmed access tests remain valid: owner can open One Machine; owner false-loc
 - `stream-bandit-account-authority-v7-12-273.js` reads Supabase user and `sb_profiles` authority from the live profile row.
 - `stream-bandit-theme-projector-v7-12-156.js` applies global theme variables and supports accessibility/readability projection.
 - `stream-bandit-header-shell-v7-12-156.js` owns the header shell. Latest passed replacement: `V7.12.297.1 Header Shell / Profile Identity Image Owner`.
-- `stream-bandit-footer-shell-v7-12-156.js` owns the footer shell.
+- `stream-bandit-footer-shell-v7-12-156.js` owns the footer shell. Latest passed replacement: `V7.12.298.2 Footer Shell / Inbox Reply Payload Fix`.
 - `stream-bandit-core-saves-v6-75.js` owns Watchlist/Favourites/Likes save logic.
 - `live-readiness-search-supabase-fallback-v7-12-130.js` owns header search preview, menu route sanitizer, and Global Search handoff.
 - `stream-bandit-settings-global-v7-1-8.js` is the protected global settings helper.
@@ -230,6 +230,41 @@ Confirmed by user:
 - No index promotion.
 - No route registry changes.
 
+### Footer Messenger — PASSED
+
+File: `stream-bandit-footer-shell-v7-12-156.js`
+
+Passed state:
+
+- `V7.12.298.2 Footer Shell / Inbox Reply Payload Fix`
+- Commit: `35d25eb4a2537c004cbc7fbb88f19c463da1edf5`
+- Global lightweight private-message overlay opens from the footer on pages using the global footer shell.
+- `sb_private_messages` remains the real message table.
+- `sb_profiles` remains the avatar/display-name source.
+- `sb_user_friends` and `sb_user_blocks` support friend/block UI.
+- Form Inbox remains the full management page for form submissions and private messages.
+
+Confirmed by user:
+
+- Footer messenger is a functional pass.
+- Kayleigh can send from phone and messages arrive.
+- Desktop hard refresh/cache clear confirmed the passed footer shell loaded.
+- Inbox reply now works after `V7.12.298.2` payload fix.
+- Friends-to-message path works.
+- Form Inbox / Inbox page remains working.
+- Profile Settings and Header Shell were not touched during this fix.
+- No schema changes after the friend/block tables were created.
+- No storage policy changes.
+- No RLS changes after the friend/block table setup.
+- No bucket name changes.
+- No player logic changes.
+- No index promotion.
+- No route registry changes.
+
+Optional future polish noted:
+
+- User would like the global messenger entry to become a small hover/floating bubble at the bottom right of the screen. Current pass is logged as functional before that visual polish.
+
 ## Settings group — next work order
 
 Next page:
@@ -239,12 +274,14 @@ Next page:
 Needed next polish direction:
 
 - Fetch or use the current full Web Builder source before editing.
-- Keep Web Builder as its own builder route family and do not merge builder chrome into the normal app shell unless the user explicitly asks.
-- Add or verify Settings group top rail directly under header where appropriate.
+- Web Builder is different from the rest of the app and is allowed to keep its own builder-specific shell/layout behaviour where it is intentional.
+- Treat the Web Builder pass as a live-ready check and rail check, not a forced merge into the regular app page pattern.
+- Verify any rails/navigation are intentional and not duplicated.
 - Keep Web Builder page actions real and avoid duplicate route buttons.
 - Preserve existing Web Builder page storage/read/write behaviour and preview/published route behaviour.
 - Preserve theme bridge, shared style preview, page manager, builder route handoff, and current test-page behaviour.
 - Preserve Supabase Auth/profile/account state and header identity image behaviour from `stream-bandit-header-shell-v7-12-156.js` `V7.12.297.1`.
+- Preserve Footer Messenger state from `stream-bandit-footer-shell-v7-12-156.js` `V7.12.298.2`.
 - Do not change schema, storage policy, RLS, bucket names, player logic, index, route registry, or global helper logic without explicit approval.
 
 Settings group expected pages:
@@ -252,6 +289,7 @@ Settings group expected pages:
 - Settings Hub — `settings-platform-control-hub-v7-12-85-test.html` — PASSED
 - Theme Studio — `web-builder-theme-studio-controls-v7-8-9-test.html` — PASSED
 - Profile Settings — `profile-settings-live-ready-v7-12-90-test.html` — PASSED
+- Footer Messenger — `stream-bandit-footer-shell-v7-12-156.js` — PASSED
 - Web Builder — `web-builder-live-studio-v7-12-116-test.html?page=test-page` — NEXT
 - Brand / App Icons — `settings-brand-icons-promoted-v7-12-21-test.html`
 - Brand Image Helper — `brand-logo-helper-responsive-v7-12-20-test.html`
