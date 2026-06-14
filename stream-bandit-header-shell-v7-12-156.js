@@ -1,15 +1,18 @@
-/* Stream Bandit Header Shell V7.12.297
+/* Stream Bandit Header Shell V7.12.297.1
    Global header, menu overlay, current route markers, search bridge, saved count badges and global account panel.
-   Header Shell owns the site-wide account chip/avatar render.
+   Header Shell owns the site-wide account chip/avatar render and the left identity image decision.
    Profile Settings owns profile edits only and should trigger header refresh after saving sb_profiles.
-   App/brand logo is separate from profile/account avatar.
+   App/brand logo is separate from profile/account avatar:
+   - signed in + sb_profiles.avatar_url = left identity image shows signed-in user avatar and is NOT data-sb-brand-logo
+   - signed in + no profile avatar = left identity image shows safe account fallback
+   - signed out = left identity image is the global brand logo and IS data-sb-brand-logo
    Account panel supports existing-user-only magic-link sign-in and sign-out.
    No public signup, no Auth Admin, no delete user actions.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.12.297 Header Shell / Account Chip Avatar Owner';
+const VERSION='V7.12.297.1 Header Shell / Profile Identity Image Owner';
 const THEME_OWNER='web-builder-theme-studio-controls-v7-8-9-test.html';
 const LOGO='stream_bandit_original_logo_square_256.png';
 const PROFILE='profile-settings-live-ready-v7-12-90-test.html';
@@ -69,7 +72,7 @@ function load(src){
  try{
   if(Array.from(document.scripts||[]).some(x=>String(x.src||'').includes(src)))return;
   let s=document.createElement('script');
-  s.src=src+(src.includes('?')?'&':'?')+'v=7-12-297';
+  s.src=src+(src.includes('?')?'&':'?')+'v=7-12-297-1';
   s.defer=true;
   document.head.appendChild(s);
  }catch(e){}
@@ -204,6 +207,89 @@ function accountChipInner(p,signed){
  return '<span class="sb-h-account-avatar" data-sb-account-avatar-user-id="'+esc(p&&p.id||'')+'">'+avatar+'</span><span>Account ✓</span>';
 }
 
+function brandLogoUrl(){
+ try{
+  if(window.StreamBanditBrandLogo&&window.StreamBanditBrandLogo.getUrl){
+   return window.StreamBanditBrandLogo.getUrl()||LOGO;
+  }
+ }catch(e){}
+ return LOGO;
+}
+
+function identityImageHtml(p){
+ if(p&&p.avatar){
+  return '<img id="sbHeaderBrandLogo" data-sb-profile-identity-avatar="true" data-sb-profile-avatar-user-id="'+esc(p.id||'')+'" src="'+esc(p.avatar)+'" alt="Signed-in profile avatar">';
+ }
+
+ return '<img id="sbHeaderBrandLogo" data-sb-brand-logo src="'+esc(brandLogoUrl())+'" alt="Stream Bandit app logo">';
+}
+
+function updateIdentityImage(){
+ let p=profile();
+ let img=document.getElementById('sbHeaderBrandLogo');
+ let box=img&&img.closest?img.closest('.sb-h-logo'):null;
+
+ if(!img)return;
+
+ if(authUser&&p.avatar){
+  img.removeAttribute('data-sb-brand-logo');
+  img.removeAttribute('data-sb-brand-logo-bg');
+  img.setAttribute('data-sb-profile-identity-avatar','true');
+  img.setAttribute('data-sb-profile-avatar-user-id',authUser.id||p.id||'');
+  img.src=p.avatar;
+  img.alt='Signed-in profile avatar';
+
+  if(box){
+   box.setAttribute('data-sb-profile-identity-avatar-box','true');
+   box.setAttribute('title','Signed-in profile avatar');
+  }
+
+  document.documentElement.dataset.sbHeaderIdentityImageOwner='profile-avatar';
+  return;
+ }
+
+ if(authUser&&!p.avatar){
+  img.removeAttribute('data-sb-brand-logo');
+  img.removeAttribute('data-sb-brand-logo-bg');
+  img.setAttribute('data-sb-profile-identity-avatar','fallback');
+  img.setAttribute('data-sb-profile-avatar-user-id',authUser.id||'');
+  img.removeAttribute('src');
+  img.alt='Signed-in account';
+  img.style.display='none';
+
+  if(box){
+   box.setAttribute('data-sb-profile-identity-avatar-box','fallback');
+   box.setAttribute('title','Signed-in account');
+   box.innerHTML='<span id="sbHeaderBrandLogo" data-sb-profile-identity-avatar="fallback" data-sb-profile-avatar-user-id="'+esc(authUser.id||'')+'" aria-label="Signed-in account" style="font-size:28px;line-height:1">👤</span>';
+  }
+
+  document.documentElement.dataset.sbHeaderIdentityImageOwner='profile-fallback';
+  return;
+ }
+
+ if(box&&!box.querySelector('img#sbHeaderBrandLogo')){
+  box.innerHTML='<img id="sbHeaderBrandLogo" data-sb-brand-logo src="'+esc(brandLogoUrl())+'" alt="Stream Bandit app logo">';
+  img=document.getElementById('sbHeaderBrandLogo');
+ }
+
+ if(img){
+  img.removeAttribute('data-sb-profile-identity-avatar');
+  img.removeAttribute('data-sb-profile-avatar-user-id');
+  img.setAttribute('data-sb-brand-logo','');
+  img.src=brandLogoUrl();
+  img.alt='Stream Bandit app logo';
+  img.style.display='';
+ }
+
+ if(box){
+  box.removeAttribute('data-sb-profile-identity-avatar-box');
+  box.setAttribute('title','Stream Bandit app logo');
+ }
+
+ document.documentElement.dataset.sbHeaderIdentityImageOwner='brand-logo';
+ try{if(window.StreamBanditBrandLogo&&window.StreamBanditBrandLogo.refresh)window.StreamBanditBrandLogo.refresh();}catch(e){}
+}
+
 function applyTheme(){
  try{
   let t=null;
@@ -235,7 +321,7 @@ function css(){
 .sb-header-shell{border:1px solid var(--sbLine);border-radius:28px;background:linear-gradient(135deg,var(--sbP),var(--sbP2));box-shadow:0 18px 60px #0007;padding:14px 16px;margin:0 0 16px;display:grid;grid-template-columns:minmax(330px,410px) minmax(360px,1fr) minmax(300px,520px);gap:14px;align-items:center;color:#fff;position:relative;z-index:9998}
 .sb-h-identity{border:1px solid #22d3a65c;border-radius:24px;padding:10px 12px;background:linear-gradient(135deg,#08101c88,#17122daa);display:grid;grid-template-columns:56px 1fr auto;grid-template-rows:auto auto;gap:8px 12px;align-items:center;min-height:86px}
 .sb-h-logo{grid-row:1/3;width:56px;height:56px;border-radius:17px;overflow:hidden;background:linear-gradient(135deg,var(--sbA),var(--sbA2));display:grid;place-items:center;border:1px solid #ff2d8580}
-.sb-h-logo img{width:100%;height:100%;object-fit:cover}
+.sb-h-logo img{width:100%;height:100%;object-fit:cover;display:block}
 .sb-h-title{font-size:25px;font-weight:950;line-height:1;letter-spacing:-.03em}
 .sb-h-meta{grid-column:2/3;display:grid;gap:2px;border-top:1px solid #ffffff22;padding-top:8px}
 .sb-h-profile{font-size:13px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -307,9 +393,9 @@ function header(){
   ['🚦',ROUTES.readiness,'Readiness']
  ];
 
- return '<header id="sbHeaderShell" class="sb-header-shell" data-sb-logo-ownership="brand-only" data-sb-profile-ownership="account-only">'+
+ return '<header id="sbHeaderShell" class="sb-header-shell" data-sb-logo-ownership="brand-when-signed-out" data-sb-profile-ownership="identity-and-account">'+
   '<div class="sb-h-identity">'+
-   '<div class="sb-h-logo"><img id="sbHeaderBrandLogo" data-sb-brand-logo src="'+esc(LOGO)+'" alt="Stream Bandit app logo"></div>'+
+   '<div class="sb-h-logo">'+identityImageHtml(p)+'</div>'+
    '<div class="sb-h-title">Stream Bandit</div>'+
    '<div class="sb-h-meta"><span id="sbHeaderProfileText" class="sb-h-profile">'+esc(short(p.name,26))+'</span><span id="sbHeaderRoleText" class="sb-h-role">Role: '+esc(short(p.role,24))+'</span></div>'+
    '<button id="sbHeaderAccountChip" class="sb-h-account" type="button">'+accountChipInner(p,!!authUser)+'</button>'+
@@ -328,7 +414,6 @@ function ensure(){
  updateAccount();
  updateCounts();
  patch();
- try{if(window.StreamBanditBrandLogo&&window.StreamBanditBrandLogo.refresh)window.StreamBanditBrandLogo.refresh();}catch(e){}
 }
 
 function drawer(){
@@ -420,7 +505,7 @@ function accountPanel(){
      '<button id="sbAccountSignOut" class="danger" type="button">Sign Out</button>'+
      '<a class="hot" href="'+esc(route(PROFILE))+'">Profile Settings</a>'+
     '</div>'+
-    '<div class="sb-account-note">Existing users only: sign-in links use shouldCreateUser false. The site-wide account avatar is read from the signed-in user’s sb_profiles.avatar_url. App branding is controlled by Brand / App Icons.</div>'+
+    '<div class="sb-account-note">Existing users only: sign-in links use shouldCreateUser false. The left identity image and account avatar are read from the signed-in user’s sb_profiles.avatar_url. Global branding is used when signed out or no profile avatar exists.</div>'+
    '</div>'+
   '</div>'+
  '</div>';
@@ -589,6 +674,8 @@ function updateAccount(){
  if(n)n.textContent=short(p.name,26);
  if(r)r.textContent='Role: '+short(p.role,24);
 
+ updateIdentityImage();
+
  if(chip){
   chip.innerHTML=accountChipInner(p,!!authUser);
   chip.classList.toggle('signed-in',!!authUser);
@@ -713,7 +800,10 @@ function refresh(){
  patch();
  updateAccount();
  updateCounts();
- try{if(window.StreamBanditBrandLogo&&window.StreamBanditBrandLogo.refresh)window.StreamBanditBrandLogo.refresh();}catch(e){}
+
+ if(!authUser||!profile().avatar){
+  try{if(window.StreamBanditBrandLogo&&window.StreamBanditBrandLogo.refresh)window.StreamBanditBrandLogo.refresh();}catch(e){}
+ }
 }
 
 function onProfileEvent(e){
@@ -772,6 +862,7 @@ function boot(){
   updateCounts,
   updateAccount,
   updateAccountPanel,
+  updateIdentityImage,
   refresh,
   refreshAuth,
   refreshProfile,
@@ -783,8 +874,9 @@ function boot(){
    current:cur(),
    themeOwner:THEME_OWNER,
    profileRoute:PROFILE,
-   brandLogoElement:'sbHeaderBrandLogo',
-   brandLogoOwner:'Brand / App Icons',
+   identityImageElement:'sbHeaderBrandLogo',
+   identityImageOwner:document.documentElement.dataset.sbHeaderIdentityImageOwner||'checking',
+   brandLogoOwner:'Brand / App Icons when signed out or no profile avatar',
    profileAvatarOwner:'Header Shell reads signed-in sb_profiles.avatar_url',
    brandProfileSplit:true,
    accountChipAvatarOwner:'Header Shell',
@@ -802,7 +894,7 @@ function boot(){
  setInterval(updateCounts,5000);
  setInterval(()=>refreshAuth(false,false),60000);
 
- document.documentElement.dataset.sbHeaderShell='v7-12-297';
+ document.documentElement.dataset.sbHeaderShell='v7-12-297-1';
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
