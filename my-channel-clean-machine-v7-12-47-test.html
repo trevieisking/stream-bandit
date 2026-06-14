@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit My Channel V7.12.291</title>
+<title>Stream Bandit My Channel V7.12.291.1</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -56,7 +56,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 .body{padding:12px}
 .body p{font-size:12px;margin:0 0 8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .stat b,.card b,.field b,.perm b{display:block;color:#baf7df;margin-bottom:6px}
-.stat span{font-size:24px;font-weight:950}
+.stat span{display:block;font-size:clamp(17px,2.1vw,24px);font-weight:950;line-height:1.05;overflow-wrap:anywhere;word-break:break-word}
 .routeStrip{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0}
 .routeStrip span{border:1px solid #ffffff1c;border-radius:999px;background:#0004;padding:6px 9px;color:#dfffee;font-weight:850;font-size:12px}
 .source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:14px;padding:12px;color:#dfffee;max-height:420px;overflow:auto}
@@ -99,7 +99,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.291 My Channel · Clean Rail</span>
+      <span class="badge">V7.12.291.1 My Channel · Plan Stat Wrap Fix</span>
       <h1>My Channel</h1>
       <p>Creator dashboard for the signed-in profile. Profile channel identity is read from <code>sb_profiles</code>. Movies are read from <code>sb_movies.owner_id</code>. No fallback to other users' channels or movies.</p>
       <div class="routeStrip">
@@ -197,25 +197,25 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">My Channel V7.12.291: clean Creator rail + profile content + owned data only. Old URL preserved. Header + page + footer only. No index promotion.</p>
+<p class="micro">My Channel V7.12.291.1: clean Creator rail + plan stat wrap fix + profile content + owned data only. Old URL preserved. Header + page + footer only. No index promotion.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=my-channel-clean-rail-291"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=my-channel-clean-rail-291"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=my-channel-clean-rail-291"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=my-channel-clean-rail-291"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=my-channel-clean-rail-291"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=my-channel-clean-rail-291"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=my-channel-clean-rail-291"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=my-channel-clean-rail-291"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=my-channel-clean-rail-291"></script>
-<script src="stream-bandit-entitlements-v7-12-269.js?v=my-channel-clean-rail-291"></script>
+<script src="stream-bandit-shell-v6-24.js?v=my-channel-plan-wrap-291-1"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=my-channel-plan-wrap-291-1"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=my-channel-plan-wrap-291-1"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=my-channel-plan-wrap-291-1"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=my-channel-plan-wrap-291-1"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=my-channel-plan-wrap-291-1"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=my-channel-plan-wrap-291-1"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=my-channel-plan-wrap-291-1"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=my-channel-plan-wrap-291-1"></script>
+<script src="stream-bandit-entitlements-v7-12-269.js?v=my-channel-plan-wrap-291-1"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.291 My Channel Clean Rail';
+const VERSION='V7.12.291.1 My Channel Plan Stat Wrap Fix';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER1='player-one-global-helpers-v7-3-3-test.html';
 const PLAYER2='player-2-clean-machine-v7-12-58-test.html';
@@ -234,6 +234,7 @@ function descOf(x){return first(x&&x.description,x&&x.summary,x&&x.reason,'No de
 function posterOf(x){return first(x&&x.thumbnail_url,x&&x.banner_url,x&&x.avatar_url,x&&x.image_url);}
 function videoOf(x){return first(x&&x.video_url,x&&x.mux_playback_url,x&&x.stream_url,x&&x.url,x&&x.source);}
 function statusOf(x){return String(x&&x.status||'published').toLowerCase();}
+function planLabel(v){return String(v||'none').replace(/_/g,' ');}
 function setStatus(t,bad){$('status').textContent=t;$('status').className=bad?'danger':'status';}
 function setWrite(t,bad){$('writeStatus').textContent=t;$('writeStatus').className=bad?'danger':'note';}
 
@@ -290,6 +291,7 @@ function dbg(step,obj){
    noOtherUsersFallback:true,
    profileChannelWritesSbProfiles:true,
    clearBlockedWhenMoviesExist:true,
+   planStatWrapFix:true,
    noSchemaChange:true,
    noStorageChange:true,
    noIndexPromotion:true
@@ -367,7 +369,7 @@ function perm(label,key,help){
 
 function profileCard(){
  let im=first(profile&&profile.banner_url,profile&&profile.avatar_url);
- return '<article class="channel"><div class="banner">'+(im?'<img src="'+esc(im)+'" alt="">':'Profile Channel')+'</div><div class="body"><h3>'+esc(channelName())+'</h3><p>'+esc(channelAbout())+'</p><span class="pill cyanPill">profile channel</span><span class="pill">'+movies.length+' owned movie(s)</span><span class="pill">'+esc(first(profile&&profile.plan_key,'free_viewer'))+'</span></div></article>';
+ return '<article class="channel"><div class="banner">'+(im?'<img src="'+esc(im)+'" alt="">':'Profile Channel')+'</div><div class="body"><h3>'+esc(channelName())+'</h3><p>'+esc(channelAbout())+'</p><span class="pill cyanPill">profile channel</span><span class="pill">'+movies.length+' owned movie(s)</span><span class="pill">'+esc(planLabel(first(profile&&profile.plan_key,'free_viewer')))+'</span></div></article>';
 }
 
 function movieCard(m){
@@ -429,7 +431,7 @@ function render(){
 
  $('stats').innerHTML=
   stat('Signed in',user?'Yes':'No')+
-  stat('Plan',entitlements?entitlements.plan_key:'none')+
+  stat('Plan',entitlements?planLabel(entitlements.plan_key):'none')+
   stat('Status',profile?profile.account_status||'active':'none')+
   stat('Can submit',profile&&profile.can_submit?'Yes':'No')+
   stat('My videos',movies.length)+
@@ -639,8 +641,8 @@ function boot(){
  setTimeout(helper,1800);
  setInterval(helper,6000);
 
- document.documentElement.dataset.sbMyChannel='v7-12-291';
- window.StreamBanditMyChannelV712291={version:VERSION,reload:load,current:function(){return debugState;}};
+ document.documentElement.dataset.sbMyChannel='v7-12-291-1';
+ window.StreamBanditMyChannelV7122911={version:VERSION,reload:load,current:function(){return debugState;}};
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
