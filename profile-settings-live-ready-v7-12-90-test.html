@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Profile Settings V7.12.296.2</title>
+<title>Stream Bandit Profile Settings V7.12.296.3</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -108,15 +108,15 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.296.2 Profile Settings · Profile Upload Bridge</span>
+      <span class="badge">V7.12.296.3 Profile Settings · Borrowed Brand Upload Overlay</span>
       <h1>Profile Settings</h1>
-      <p>Profile Settings owns each signed-in user’s profile text, avatar and banner. The image editor now uses the same safe select / preview / upload / public URL flow as the brand tools, but saves to <code>sb_profiles</code>, not the global brand logo.</p>
+      <p>Profile Settings now uses the same working select, preview, upload and save pattern from Brand / App Icons, but saves the uploaded URL to the signed-in user’s <code>sb_profiles.avatar_url</code> or <code>sb_profiles.banner_url</code>.</p>
       <div class="routeStrip">
         <span>Auth → current session</span>
         <span>Avatar → sb_profiles.avatar_url</span>
         <span>Banner → sb_profiles.banner_url</span>
         <span>Upload → stream-bandit-images/profiles</span>
-        <span>Header → shell refresh event</span>
+        <span>Header left image → profile avatar on this page</span>
       </div>
 
       <div class="card">
@@ -136,14 +136,14 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
         <button id="loadProfile" class="btn primary" type="button">Load Profile</button>
         <button id="createProfile" class="btn cyan" type="button">Create Missing Profile Row</button>
         <button id="saveText" class="btn hot" type="button">Save Text</button>
-        <button id="openAvatar" class="btn cyan" type="button">Upload Avatar</button>
-        <button id="openBanner" class="btn warn" type="button">Upload Banner</button>
-        <button id="notifyHeader" class="btn" type="button">Refresh Header Shell</button>
+        <button id="openAvatar" class="btn cyan" type="button">Avatar Overlay</button>
+        <button id="openBanner" class="btn warn" type="button">Banner Overlay</button>
+        <button id="applyAvatarHeader" class="btn" type="button">Apply Avatar To Header Image</button>
       </div>
 
       <div id="helperStatus" class="status">Checking helpers...</div>
       <div id="status" class="status">Loading profile...</div>
-      <div class="note">This page does not use <code>data-sb-brand-logo</code> for avatar previews and does not call the global Brand Logo apply/save path.</div>
+      <div class="note">This page borrows the Brand / App Icons upload flow, but it does not save to <code>sb_app_settings.logoUrl</code>. It saves to the current profile row.</div>
     </div>
 
     <div class="profileArt">
@@ -165,7 +165,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
     <div class="stat"><b>Signed in</b><span id="statSigned">--</span><p>Supabase Auth state.</p></div>
     <div class="stat"><b>Profile row</b><span id="statProfile">--</span><p>Current signed-in user’s sb_profiles row.</p></div>
     <div class="stat"><b>Avatar URL</b><span id="statAvatar">--</span><p>Reads and writes sb_profiles.avatar_url.</p></div>
-    <div class="stat"><b>Header Shell</b><span id="statHeader">--</span><p>Shell refresh / profile-updated event state.</p></div>
+    <div class="stat"><b>Header image</b><span id="statHeader">--</span><p>Current Profile page header image ownership.</p></div>
     <div class="stat"><b>Signup mode</b><span>Locked</span><p>Existing users only.</p></div>
   </div>
 </section>
@@ -174,7 +174,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div class="tabs">
     <button class="tab active" data-tab="profile" type="button">Profile Text</button>
     <button class="tab" data-tab="images" type="button">Images</button>
-    <button class="tab" data-tab="bridgeSec" type="button">Header Bridge</button>
+    <button class="tab" data-tab="bridgeSec" type="button">Header Image Bridge</button>
     <button class="tab" data-tab="testSec" type="button">Test Guide</button>
     <button class="tab" data-tab="debugSec" type="button">Debug</button>
   </div>
@@ -198,25 +198,25 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
       <div id="avatarPreview" class="avatar">👤</div>
       <p>This saves to <code>sb_profiles.avatar_url</code> for the current signed-in user.</p>
       <input id="avatarUrl" readonly placeholder="avatar_url">
-      <div class="actions"><button id="openAvatar2" class="btn cyan" type="button">Open Avatar Upload</button></div>
+      <div class="actions"><button id="openAvatar2" class="btn cyan" type="button">Open Avatar Overlay</button></div>
     </div>
     <div class="card">
       <b>Banner</b>
       <div id="bannerPreview" class="preview">Banner</div>
       <p>This saves to <code>sb_profiles.banner_url</code> for the current signed-in user.</p>
       <input id="bannerUrl" readonly placeholder="banner_url">
-      <div class="actions"><button id="openBanner2" class="btn warn" type="button">Open Banner Upload</button></div>
+      <div class="actions"><button id="openBanner2" class="btn warn" type="button">Open Banner Overlay</button></div>
     </div>
   </div>
 </section>
 
 <section id="bridgeSec" class="box section">
-  <h2>Header shell bridge</h2>
+  <h2>Header image bridge</h2>
   <div class="checks">
-    <div class="check"><b>Header owns chip</b><p>Profile Settings does not patch the Account chip. It saves the profile row and asks the shell to refresh.</p></div>
-    <div class="check"><b>Profile cache</b><p>After save, the current signed-in user’s profile is cached under the header profile keys for fast shell load.</p></div>
-    <div class="check"><b>Event</b><p>After save, Profile Settings dispatches <code>streambandit-profile-updated</code>, <code>streambandit-account-updated</code>, and <code>streambandit-header-profile-updated</code>.</p></div>
-    <div class="check"><b>No brand fallback</b><p>Avatar previews never use <code>data-sb-brand-logo</code> and never call the Brand Logo helper save/apply path.</p></div>
+    <div class="check"><b>Borrowed flow</b><p>The profile overlay uses the same select / local preview / upload / save-public-URL pattern as Brand / App Icons.</p></div>
+    <div class="check"><b>Different target</b><p>Brand / App Icons saves global logo to app settings. Profile Settings saves current user avatar to <code>sb_profiles.avatar_url</code>.</p></div>
+    <div class="check"><b>Profile page header image</b><p>After avatar save, this page changes the top left header image to the signed-in profile avatar and removes brand-logo helper ownership from that image on this page.</p></div>
+    <div class="check"><b>Shell future-proof</b><p>The profile-updated event and profile cache are still sent so Header Shell can read this avatar site-wide.</p></div>
   </div>
   <div id="bridgeStatus" class="safe">Waiting for profile load...</div>
 </section>
@@ -224,10 +224,10 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section id="testSec" class="box section">
   <h2>Spare-account test guide</h2>
   <div class="grid">
-    <div class="card"><b>Your account</b><p>Sign in as your admin/owner account, upload an avatar, then refresh the page. The header shell should show your avatar.</p></div>
-    <div class="card"><b>Kayleigh account</b><p>Use another browser/private window, sign in as Kayleigh, upload her avatar, then refresh. The header shell should show her avatar.</p></div>
-    <div class="card"><b>No logo fallback</b><p>If the global Stream Bandit logo appears in the account chip, check whether that URL was accidentally saved into <code>sb_profiles.avatar_url</code>.</p></div>
-    <div class="card"><b>Header proof</b><p>Use Header Shell state/debug to confirm it reads Auth user id, then <code>sb_profiles.id = auth.user.id</code>.</p></div>
+    <div class="card"><b>Your account</b><p>Sign in, upload avatar, and the top left image on this Profile Settings page should change to your profile avatar.</p></div>
+    <div class="card"><b>Kayleigh account</b><p>Use another browser/private window, sign in as Kayleigh, upload her avatar, and the top left image should change to her avatar there.</p></div>
+    <div class="card"><b>No global logo overwrite</b><p>This page must not write Kayleigh’s avatar into <code>sb_app_settings.logoUrl</code>.</p></div>
+    <div class="card"><b>Header proof</b><p>Debug shows the active Auth user, sb_profiles row, cached profile payload, and header image source.</p></div>
   </div>
 </section>
 
@@ -236,16 +236,16 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="mini">V7.12.296.2 Profile Settings — profile-scoped image upload bridge. Saves avatar/banner to sb_profiles and lets Header Shell render the account chip site-wide.</p>
+<p class="mini">V7.12.296.3 Profile Settings — borrowed Brand/App Icons upload overlay, profile-scoped save target, avatar applied to Profile page header image.</p>
 </div>
 
 <div id="imageModal" class="modal">
   <div class="modalCard">
     <div class="modalHead">
       <div>
-        <span class="badge" id="modalBadge">Profile Image Upload</span>
+        <span class="badge" id="modalBadge">Profile Image Overlay</span>
         <h2 id="modalTitle">Upload profile image</h2>
-        <p class="muted">Same safe flow as Brand / App Icons: choose image, preview locally, upload to Supabase Storage, then save the public URL. Profile Settings saves to <code>sb_profiles</code>.</p>
+        <p class="muted">This overlay borrows the Brand / App Icons flow: drop or choose image, preview, upload, then save the uploaded public URL. The save target is <code>sb_profiles</code>.</p>
       </div>
       <button id="closeImageModal" class="btn" type="button">Close</button>
     </div>
@@ -253,7 +253,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
     <div class="modalGrid">
       <div>
         <label class="drop" id="dropZone">
-          <input id="modalFile" type="file" accept="image/png,image/jpeg,image/webp">
+          <input id="modalFile" type="file" accept="image/png,image/jpeg,image/webp,image/*">
           <span class="dropIcon">⬆️🖼️</span>
           <b id="dropTitle">Drag & drop image here</b>
           <span class="muted">or click this panel to choose PNG, JPEG or WEBP</span>
@@ -267,7 +267,9 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
         <label class="muted">Public URL after upload</label>
         <input id="modalUrl" readonly placeholder="Public URL will appear here">
         <div class="actions">
-          <button id="uploadSaveImage" class="btn hot" type="button">Upload + Save To Profile</button>
+          <button id="uploadImage" class="btn primary" type="button">Upload Image</button>
+          <button id="saveUploaded" class="btn hot" type="button" disabled>Save Uploaded URL To Profile</button>
+          <button id="applyPreviewHeader" class="btn cyan" type="button">Apply Preview To Header Image</button>
           <button id="clearSelection" class="btn" type="button">Clear Selection</button>
         </div>
         <div id="modalStatus" class="status">Waiting...</div>
@@ -276,21 +278,21 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   </div>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=profile-upload-bridge-296-2"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=profile-upload-bridge-296-2"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=profile-upload-bridge-296-2"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=profile-upload-bridge-296-2"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=profile-upload-bridge-296-2"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=profile-upload-bridge-296-2"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=profile-upload-bridge-296-2"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=profile-upload-bridge-296-2"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=profile-upload-bridge-296-2"></script>
+<script src="stream-bandit-shell-v6-24.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=profile-brand-flow-296-3"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=profile-brand-flow-296-3"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.296.2 Profile Settings Profile Upload Bridge';
+const VERSION='V7.12.296.3 Profile Settings Borrowed Brand Upload Overlay';
 const BUCKET='stream-bandit-images';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
@@ -301,6 +303,8 @@ let user=null;
 let profile=null;
 let selectedFile=null;
 let localObjectUrl='';
+let uploadedUrl='';
+let previewUrl='';
 let currentKind='avatar';
 let countBusy=false;
 let countReady=false;
@@ -311,9 +315,11 @@ const $=id=>document.getElementById(id);
 const debugState={
  version:VERSION,
  page:'profile-settings-live-ready-v7-12-90-test.html',
+ borrowedBrandUploadFlow:true,
  profileScopedUpload:true,
  brandLogoWrites:false,
- dataSbBrandLogoUse:false,
+ writesAppSettingsLogoUrl:false,
+ writesSbProfilesAvatar:true,
  schemaChange:false,
  storagePolicyChange:false,
  rlsChange:false,
@@ -364,7 +370,7 @@ function payloadForHeader(p){
   role:p.role||'user',
   can_submit:!!p.can_submit,
   updated_at:p.updated_at||new Date().toISOString(),
-  cacheOwner:'profile-settings-upload-bridge',
+  cacheOwner:'profile-settings-borrowed-brand-overlay',
   cacheVersion:VERSION
  };
 }
@@ -396,6 +402,64 @@ function dispatchProfileUpdated(reason){
  return true;
 }
 
+function profileImageForKind(){
+ return currentKind==='avatar'?avatarOf(profile):bannerOf(profile);
+}
+
+function applyUrl(url,source){
+ url=String(url||'').trim();
+
+ if(!url)return '';
+
+ if(currentKind==='avatar'){
+  $('avatarUrl').value=url;
+  showImg('avatarHero',url,'👤');
+  showImg('avatarPreview',url,'👤');
+ }else{
+  $('bannerUrl').value=url;
+  showImg('bannerHero',url,'Banner preview');
+  showImg('bannerPreview',url,'Banner');
+ }
+
+ if(currentKind==='avatar'){
+  applyAvatarToHeaderImage(url,source||'profile-apply-url');
+ }
+
+ debug({applyUrl:true,source:source||'profile',kind:currentKind,url:url});
+ return url;
+}
+
+function applyAvatarToHeaderImage(url,source){
+ url=String(url||avatarOf(profile)||$('avatarUrl').value||'').trim();
+
+ if(!url)return false;
+
+ let img=document.getElementById('sbHeaderBrandLogo');
+
+ if(img&&img.tagName&&img.tagName.toLowerCase()==='img'){
+  img.removeAttribute('data-sb-brand-logo');
+  img.setAttribute('data-sb-profile-avatar','true');
+  img.setAttribute('data-sb-profile-avatar-source',source||'profile-settings');
+  img.setAttribute('data-sb-profile-avatar-user-id',user&&user.id?user.id:'');
+  img.src=url;
+  img.alt='Signed-in profile avatar';
+ }
+
+ let logoBox=img&&img.closest?img.closest('.sb-h-logo'):null;
+
+ if(logoBox){
+  logoBox.setAttribute('data-sb-profile-avatar-box','true');
+  logoBox.setAttribute('title','Signed-in profile avatar');
+ }
+
+ $('statHeader').textContent='Avatar';
+ $('bridgeStatus').textContent='Profile Settings applied the signed-in profile avatar to the header image on this page.';
+ $('bridgeStatus').className='safe';
+
+ debug({headerImageApplied:true,source:source||'profile-settings',url:url});
+ return true;
+}
+
 async function refreshHeaderShell(reason){
  let cached=cacheProfileForHeader(profile);
  let eventSent=dispatchProfileUpdated(reason);
@@ -411,11 +475,14 @@ async function refreshHeaderShell(reason){
  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateAccount)window.StreamBanditHeaderShell.updateAccount();}catch(e){}
  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateAccountPanel)window.StreamBanditHeaderShell.updateAccountPanel();}catch(e){}
- try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();}catch(e){}
+
+ if(avatarOf(profile)){
+  setTimeout(()=>applyAvatarToHeaderImage(avatarOf(profile),'header-shell-refresh-1'),120);
+  setTimeout(()=>applyAvatarToHeaderImage(avatarOf(profile),'header-shell-refresh-2'),500);
+  setTimeout(()=>applyAvatarToHeaderImage(avatarOf(profile),'header-shell-refresh-3'),1200);
+ }
 
  $('statHeader').textContent=cached||eventSent?'Notified':'--';
- $('bridgeStatus').textContent=cached||eventSent?'Header Shell notified to re-read the current signed-in profile.':'Header Shell waiting for matching signed-in profile.';
- $('bridgeStatus').className=cached||eventSent?'safe':'note';
 
  debug({headerRefreshReason:reason||'manual',cached,eventSent});
 }
@@ -436,6 +503,9 @@ function render(){
  $('heroRole').textContent='Role: '+roleOf(profile);
 
  stats();
+
+ if(av)applyAvatarToHeaderImage(av,'render');
+
  debug();
 }
 
@@ -646,6 +716,8 @@ function fileExt(file){
 
 function clearSelection(){
  selectedFile=null;
+ uploadedUrl='';
+ previewUrl='';
 
  if(localObjectUrl){
   try{URL.revokeObjectURL(localObjectUrl);}catch(e){}
@@ -656,6 +728,7 @@ function clearSelection(){
  $('modalUrl').value='';
  $('modalPreview').innerHTML='Preview';
  $('fileMeta').innerHTML='<b>No image selected.</b><br><span class="muted">Drop an image to preview it before upload.</span>';
+ $('saveUploaded').disabled=true;
  modal('Selection cleared.');
  debug({clearSelection:true});
 }
@@ -682,17 +755,23 @@ function selectFile(file){
  }
 
  selectedFile=file;
+ uploadedUrl='';
+ previewUrl='';
 
  if(localObjectUrl){
   try{URL.revokeObjectURL(localObjectUrl);}catch(e){}
  }
 
  localObjectUrl=URL.createObjectURL(file);
+ previewUrl=localObjectUrl;
 
  $('modalPreview').innerHTML='<img src="'+esc(localObjectUrl)+'" alt="Selected profile image preview">';
  $('fileMeta').innerHTML='<b>'+esc(file.name)+'</b><br><span class="muted">'+esc(file.type||'image')+' · '+formatSize(file.size)+' · ready to upload.</span>';
- modal('Selected '+file.name+'. Preview it here, then upload and save to profile.');
+ $('saveUploaded').disabled=true;
 
+ applyUrl(localObjectUrl,'local-selected-preview');
+
+ modal('Selected '+file.name+'. Preview it here, then upload.');
  debug({selectedFile:{name:file.name,size:file.size,type:file.type},kind:currentKind});
 }
 
@@ -702,13 +781,14 @@ function openModal(kind){
 
  let current=kind==='avatar'?$('avatarUrl').value:$('bannerUrl').value;
 
- $('modalTitle').textContent=kind==='avatar'?'Upload Avatar':'Upload Banner';
+ $('modalTitle').textContent=kind==='avatar'?'Avatar Overlay':'Banner Overlay';
  $('modalBadge').textContent=kind==='avatar'?'Avatar Upload To Profile':'Banner Upload To Profile';
  $('dropTitle').textContent=kind==='avatar'?'Drag & drop avatar here':'Drag & drop banner here';
 
  if(current){
   $('modalUrl').value=current;
   $('modalPreview').innerHTML='<img src="'+esc(current)+'" alt="Current profile image">';
+  applyUrl(current,'existing-profile-image');
   modal('Current '+kind+' URL loaded. Choose a new file to replace it.');
  }else{
   modal('Choose PNG, JPEG or WEBP.');
@@ -721,7 +801,7 @@ function closeModal(){
  $('imageModal').classList.remove('open');
 }
 
-async function uploadSaveImage(){
+async function uploadImage(){
  try{
   let c=client();
 
@@ -731,7 +811,7 @@ async function uploadSaveImage(){
   }
 
   if(!selectedFile){
-   modal('Choose an image file first.',true);
+   modal('Drop or choose an image first.',true);
    return;
   }
 
@@ -745,15 +825,40 @@ async function uploadSaveImage(){
   if(up.error)throw up.error;
 
   let pub=c.storage.from(BUCKET).getPublicUrl(path);
-  let url=pub&&pub.data&&pub.data.publicUrl||'';
+  uploadedUrl=pub&&pub.data&&pub.data.publicUrl||'';
 
-  if(!url)throw new Error('Public URL was not returned after upload.');
+  if(!uploadedUrl)throw new Error('Public URL was not returned after upload.');
 
-  $('modalUrl').value=url;
+  $('modalUrl').value=uploadedUrl;
+  $('saveUploaded').disabled=false;
 
-  let patch=currentKind==='avatar'?{avatar_url:url,updated_at:new Date().toISOString()}:{banner_url:url,updated_at:new Date().toISOString()};
+  applyUrl(uploadedUrl,'uploaded-preview');
 
-  modal('Upload complete. Saving URL to sb_profiles...');
+  modal('Uploaded. Review the preview, then Save Uploaded URL To Profile.');
+  debug({uploaded:true,kind:currentKind,path,url:uploadedUrl});
+ }catch(e){
+  modal('Upload failed: '+(e.message||e),true);
+  debug({uploadError:e.message||String(e)});
+ }
+}
+
+async function saveUploaded(){
+ try{
+  let c=client();
+
+  if(!await refreshSession()){
+   modal('Sign in first.',true);
+   return;
+  }
+
+  if(!uploadedUrl){
+   modal('Upload an image first.',true);
+   return;
+  }
+
+  let patch=currentKind==='avatar'?{avatar_url:uploadedUrl,updated_at:new Date().toISOString()}:{banner_url:uploadedUrl,updated_at:new Date().toISOString()};
+
+  modal('Saving uploaded URL to sb_profiles...');
 
   let r=await c.from('sb_profiles').update(patch).eq('id',user.id).select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,updated_at').maybeSingle();
 
@@ -761,28 +866,46 @@ async function uploadSaveImage(){
 
   profile=r.data||Object.assign({},profile,patch);
 
-  if(currentKind==='avatar')$('avatarUrl').value=url;
-  else $('bannerUrl').value=url;
-
   fill(profile);
 
-  modal((currentKind==='avatar'?'Avatar':'Banner')+' uploaded and saved to sb_profiles.');
-  status((currentKind==='avatar'?'Avatar':'Banner')+' saved to profile. Header Shell notified.');
+  if(currentKind==='avatar'){
+   applyAvatarToHeaderImage(uploadedUrl,'save-uploaded-profile-avatar');
+  }
+
+  modal((currentKind==='avatar'?'Avatar':'Banner')+' saved to sb_profiles.');
+  status((currentKind==='avatar'?'Avatar':'Banner')+' saved. Header profile bridge refreshed.');
   toast((currentKind==='avatar'?'Avatar':'Banner')+' saved');
 
-  await refreshHeaderShell(currentKind+'-upload');
+  await refreshHeaderShell(currentKind+'-save-uploaded');
 
-  debug({uploadSaved:true,kind:currentKind,path,url});
+  debug({savedUploaded:true,kind:currentKind,url:uploadedUrl});
  }catch(e){
-  modal('Upload/save failed: '+(e.message||e),true);
-  debug({uploadError:e.message||String(e)});
+  modal('Save failed: '+(e.message||e),true);
+  debug({saveUploadedError:e.message||String(e)});
  }
+}
+
+function applyPreviewHeader(){
+ let url=uploadedUrl||previewUrl||$('modalUrl').value||profileImageForKind();
+
+ if(currentKind!=='avatar'){
+  modal('Header image uses avatar only. Save banner to profile, but it will not replace the header image.',true);
+  return;
+ }
+
+ if(!url){
+  modal('No avatar preview URL available yet.',true);
+  return;
+ }
+
+ applyAvatarToHeaderImage(url,'modal-preview');
+ modal('Avatar preview applied to the Profile Settings header image.');
 }
 
 async function notifyHeader(){
  await refreshHeaderShell('manual-button');
- status('Header Shell refresh event sent.');
-  toast('Header refreshed');
+ status('Header profile bridge refresh sent.');
+ toast('Header refreshed');
 }
 
 async function refreshSavedCounters(force){
@@ -827,6 +950,11 @@ function helpers(){
 
  refreshSavedCounters(false);
 
+ if(avatarOf(profile)){
+  setTimeout(()=>applyAvatarToHeaderImage(avatarOf(profile),'helpers'),150);
+  setTimeout(()=>applyAvatarToHeaderImage(avatarOf(profile),'helpers-late'),700);
+ }
+
  $('helperStatus').innerHTML='<b>Helpers:</b> Supabase SDK '+(window.supabase?'✅':'❌')+
   ' · Shell '+(window.StreamBanditShell?'✅':'❌')+
   ' · Header '+(window.StreamBanditHeaderShell?'✅':'❌')+
@@ -842,6 +970,7 @@ function helpers(){
 function debug(extra){
  let payload=profile&&user?payloadForHeader(profile):null;
  let shellState=null;
+ let headerImg=document.getElementById('sbHeaderBrandLogo');
 
  try{shellState=window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.state?window.StreamBanditHeaderShell.state():null;}catch(e){}
 
@@ -850,6 +979,12 @@ function debug(extra){
   profile:profile,
   headerPayload:payload,
   shellState:shellState,
+  headerImage:{
+   exists:!!headerImg,
+   src:headerImg&&headerImg.src||'',
+   dataBrandLogo:headerImg&&headerImg.hasAttribute('data-sb-brand-logo'),
+   dataProfileAvatar:headerImg&&headerImg.getAttribute('data-sb-profile-avatar')||''
+  },
   cacheKeys:PROFILE_CACHE_KEYS.map(k=>{
    let value=null;
    try{value=JSON.parse(localStorage.getItem(k)||'null');}catch(e){}
@@ -868,7 +1003,8 @@ function debug(extra){
   },
   currentKind:currentKind,
   selectedFile:selectedFile?{name:selectedFile.name,size:selectedFile.size,type:selectedFile.type}:null,
-  localObjectUrlActive:!!localObjectUrl,
+  uploadedUrl:uploadedUrl,
+  previewUrl:previewUrl&&previewUrl.startsWith('blob:')?'blob-preview':previewUrl,
   extra:extra||null
  }),null,2);
 }
@@ -925,9 +1061,11 @@ function wire(){
  $('openBanner').onclick=()=>openModal('banner');
  $('openAvatar2').onclick=()=>openModal('avatar');
  $('openBanner2').onclick=()=>openModal('banner');
- $('notifyHeader').onclick=notifyHeader;
+ $('applyAvatarHeader').onclick=()=>applyAvatarToHeaderImage(avatarOf(profile)||$('avatarUrl').value,'manual-button');
  $('closeImageModal').onclick=closeModal;
- $('uploadSaveImage').onclick=uploadSaveImage;
+ $('uploadImage').onclick=uploadImage;
+ $('saveUploaded').onclick=saveUploaded;
+ $('applyPreviewHeader').onclick=applyPreviewHeader;
  $('clearSelection').onclick=clearSelection;
 
  ['displayName','username','channelName','channelAbout'].forEach(id=>$(id).addEventListener('input',render));
@@ -949,11 +1087,12 @@ function boot(){
  setTimeout(helpers,1800);
  setInterval(helpers,7000);
 
- document.documentElement.dataset.sbProfileSettings='v7-12-296-2';
- window.StreamBanditProfileSettingsV7122962={
+ document.documentElement.dataset.sbProfileSettings='v7-12-296-3';
+ window.StreamBanditProfileSettingsV7122963={
   version:VERSION,
   reload:loadProfile,
   refreshHeader:refreshHeaderShell,
+  applyAvatarToHeaderImage:applyAvatarToHeaderImage,
   current:function(){return{user,profile,payload:profile&&user?payloadForHeader(profile):null};}
  };
 }
