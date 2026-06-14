@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Stream Bandit Owner Admin Hub V7.12.264.18 TEST</title>
+<title>Stream Bandit Owner Admin Hub V7.12.264.19 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="stream-bandit-shell-v6-24.js?v=user-management-7-12-264-19"></script>
+<script src="stream-bandit-protected-page-v7-12-273.js?v=user-management-7-12-273"></script>
 <style>
 :root{color-scheme:dark;--bg:#050711;--panel:#101529;--panel2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--text:#f7fbff;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--blue:#41e8ff}
 *{box-sizing:border-box;min-width:0}
@@ -80,12 +82,12 @@ p,li,label,small{color:var(--muted);line-height:1.5}
 }
 </style>
 </head>
-<body data-sb-owner-admin-hub="v7-12-264-18">
+<body data-sb-owner-admin-hub="v7-12-264-19">
 <header class="top">
   <div class="topInner">
     <div class="brand">
       <div class="mark">SB</div>
-      <div>Stream Bandit Owner Admin Hub<small>Real schema-backed controls - V7.12.264.18</small></div>
+      <div>Stream Bandit Owner Admin Hub<small>Owner-only protected controls - V7.12.264.19</small></div>
     </div>
     <div class="actions">
       <button id="refreshMe" class="btn hot" type="button">Refresh Me</button>
@@ -98,10 +100,11 @@ p,li,label,small{color:var(--muted);line-height:1.5}
 
 <main class="wrap">
   <section class="hero">
-    <span class="badge">V7.12.264.18 Owner Admin Hub</span>
+    <span class="badge">V7.12.264.19 Owner-Only Protected Hub</span>
     <h1>Real owner control room</h1>
-    <p>This page uses the schema-backed RPC <code>sb_owner_manage_profile</code>. It manages role, submit privilege, account status, admin level, plan, permissions JSON and admin notes with exact-ID confirmation.</p>
+    <p>This page is now locked by the shared protected-page route gate and the internal owner guard. It uses the schema-backed RPC <code>sb_owner_manage_profile</code> to manage role, submit privilege, account status, admin level, plan, permissions JSON and admin notes with exact-ID confirmation.</p>
     <div class="row">
+      <span class="chip good">Owner-only route gate</span>
       <span class="chip good">Schema-backed</span>
       <span class="chip good">RPC controlled</span>
       <span class="chip good">Audit logged</span>
@@ -113,7 +116,7 @@ p,li,label,small{color:var(--muted);line-height:1.5}
 
   <section class="grid">
     <div class="card own"><b>Current account</b><span id="statMe" class="big">--</span><p id="meSmall">Checking...</p></div>
-    <div class="card"><b>Visible users</b><span id="statUsers" class="big">--</span><p>Rows RLS allows this owner/admin to see.</p></div>
+    <div class="card"><b>Visible users</b><span id="statUsers" class="big">--</span><p>Rows RLS allows this verified owner to see.</p></div>
     <div class="card"><b>Selected user</b><span id="statSelected" class="big">--</span><p>Current managed profile.</p></div>
     <div class="card keep"><b>Writes</b><span id="statWrites" class="big">0</span><p>Successful owner RPC changes.</p></div>
   </section>
@@ -144,11 +147,11 @@ p,li,label,small{color:var(--muted);line-height:1.5}
       </div>
       <div class="card danger">
         <b>Guarded</b>
-        <p>Every write requires exact selected user ID and reason. Supabase RPC/policies decide if the change is allowed.</p>
+        <p>The page is owner-only. Every write requires exact selected user ID and reason. Supabase RPC/policies still decide if the change is allowed.</p>
       </div>
       <div class="card keep">
         <b>No fake security</b>
-        <p>Ban/limit/restrict now write to <code>account_status</code> only after the SQL migration is applied.</p>
+        <p>Ban/limit/restrict write to <code>account_status</code> only through the owner RPC.</p>
       </div>
       <div class="card later">
         <b>Audit</b>
@@ -279,6 +282,8 @@ p,li,label,small{color:var(--muted);line-height:1.5}
     <div class="panel">
       <h2>Safety locks</h2>
       <div class="grid">
+        <div class="card"><b>Protected page lock</b><p>This page loads <code>stream-bandit-protected-page-v7-12-273.js</code> and uses the shared route map.</p></div>
+        <div class="card"><b>Owner-only internal guard</b><p>User reads and writes stop unless the signed-in profile is owner/platform_owner.</p></div>
         <div class="card"><b>No service role</b><p>This page uses the publishable client only.</p></div>
         <div class="card"><b>No Auth deletion</b><p>This page does not delete Supabase Auth users.</p></div>
         <div class="card"><b>RPC required</b><p>Writes go through <code>sb_owner_manage_profile</code>.</p></div>
@@ -332,7 +337,7 @@ p,li,label,small{color:var(--muted);line-height:1.5}
 <script>
 (function(){'use strict';
 
-const VERSION='V7.12.264.18 Stream Bandit Owner Admin Hub Real Schema Controls';
+const VERSION='V7.12.264.19 Stream Bandit Owner Admin Hub Protected Owner Lock';
 const URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 
@@ -398,6 +403,18 @@ function statusPill(v){
   return pill('status '+(v||'active'),k);
 }
 
+function ownerProfile(profile){
+  return !!profile&&(profile.admin_level==='owner'||profile.plan_key==='platform_owner');
+}
+
+function applyOwnerUiLock(){
+  let locked=!isOwner;
+  ['loadUsers','reloadUsers','selectMe','findUser','openConfirm','quickBan','quickLimit','quickActive'].forEach(id=>{
+    let el=$(id);
+    if(el)el.disabled=locked;
+  });
+}
+
 async function refreshMe(){
   try{
     lastError='';
@@ -409,7 +426,9 @@ async function refreshMe(){
     if(!me){
       myProfile=null;
       isOwner=false;
-      setStatus('Signed out.','bad2');
+      users=[];
+      selectedId='';
+      setStatus('Signed out. Owner access required.','bad2');
       render();
       return;
     }
@@ -420,12 +439,21 @@ async function refreshMe(){
     if(p.error)throw p.error;
 
     myProfile=p.data||null;
-    isOwner=!!(myProfile&&(myProfile.admin_level==='owner'||myProfile.role==='admin'));
+    isOwner=ownerProfile(myProfile);
 
-    setStatus(isOwner?'Owner/admin verified.':'Signed in but not owner/admin.',isOwner?'good2':'bad2');
+    if(!isOwner){
+      users=[];
+      selectedId='';
+    }
+
+    setStatus(isOwner?'Owner verified.':'Signed in but not owner. This page is owner-only.',isOwner?'good2':'bad2');
     render();
   }catch(e){
     lastError=e.message||String(e);
+    myProfile=null;
+    isOwner=false;
+    users=[];
+    selectedId='';
     setStatus('Refresh failed: '+lastError,'bad2');
     render();
   }
@@ -437,6 +465,14 @@ async function loadUsers(){
     lastAction='load users';
 
     await refreshMe();
+
+    if(!isOwner){
+      users=[];
+      selectedId='';
+      setStatus('Owner permission required. User list read blocked on this page.','bad2');
+      render();
+      return;
+    }
 
     let r=await client().from('sb_profiles').select('*').limit(1000);
     readCount++;
@@ -459,6 +495,11 @@ async function loadUsers(){
 }
 
 function renderUsers(){
+  if(!isOwner){
+    $('usersList').innerHTML='<div class="notice">Owner verification required before user rows are loaded.</div>';
+    return;
+  }
+
   let q=String($('userSearch').value||'').trim().toLowerCase();
 
   let list=users.filter(u=>!q||[
@@ -521,6 +562,7 @@ function renderSelected(){
 }
 
 function render(){
+  applyOwnerUiLock();
   renderUsers();
   renderSelected();
   $('debug').textContent=JSON.stringify(state(),null,2);
@@ -530,12 +572,15 @@ function state(){
   return {
     version:VERSION,
     route:'user-management-dashboard-v7-11-2-test.html',
+    routeAccess:'owner_only',
+    protectedPageScript:'stream-bandit-protected-page-v7-12-273.js',
     requiresMigration:'owner_admin_profile_controls_v7_12_264_17',
     rpc:'sb_owner_manage_profile',
     serviceRoleExposed:false,
     authUser:me?{id:me.id,email:me.email}:null,
     myProfile,
     isOwner,
+    ownerRule:'admin_level=owner OR plan_key=platform_owner',
     usersVisible:users.length,
     selected:selected(),
     readCount,
@@ -546,6 +591,11 @@ function state(){
 }
 
 function findUser(){
+  if(!isOwner){
+    $('findStatus').textContent='Owner verification required.';
+    return;
+  }
+
   let q=String($('userSearch').value||'').trim().toLowerCase();
 
   if(!q){
@@ -614,6 +664,8 @@ function quickStatus(v){
 
 function openConfirm(){
   try{
+    if(!isOwner)throw new Error('Owner permission required.');
+
     let u=selected();
 
     if(!u)throw new Error('Select a user first.');
@@ -629,7 +681,8 @@ function openConfirm(){
     $('confirmReport').textContent=JSON.stringify({
       target:u,
       patch:patch,
-      ownerGate:isOwner
+      ownerGate:isOwner,
+      routeAccess:'owner_only'
     },null,2);
 
     $('confirmId').value='';
@@ -661,7 +714,7 @@ async function applyConfirmed(){
 
     await refreshMe();
 
-    if(!isOwner)throw new Error('Owner/admin permission required.');
+    if(!isOwner)throw new Error('Owner permission required.');
 
     if($('confirmId').value.trim()!==u.id){
       throw new Error('Exact selected user ID confirmation does not match.');
@@ -700,6 +753,11 @@ async function applyConfirmed(){
 
 async function loadAudit(){
   try{
+    if(!isOwner){
+      $('auditLog').textContent='Owner verification required.';
+      return;
+    }
+
     let r=await client().from('sb_admin_audit_log').select('*').order('created_at',{ascending:false}).limit(50);
     readCount++;
 
@@ -730,7 +788,7 @@ function bind(){
   $('reloadUsers').onclick=loadUsers;
 
   $('selectMe').onclick=()=>{
-    if(me){
+    if(me&&isOwner){
       selectedId=me.id;
       render();
     }
@@ -762,7 +820,7 @@ function bind(){
 function boot(){
   bind();
   refreshMe().then(loadUsers);
-  window.StreamBanditOwnerAdminHubV71226418={
+  window.StreamBanditOwnerAdminHubV71226419={
     version:VERSION,
     state,
     loadUsers,
