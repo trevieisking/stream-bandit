@@ -3,47 +3,852 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Header Footer Code V7.12.254.1 TEST</title>
+<title>Web Builder Header Footer Code V7.12.263.9 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#070910;--panel:#101529;--panel2:#17122d;--line:#ffffff22;--text:#f7fbff;--muted:#aeb8d6;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff5d6c}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),linear-gradient(180deg,#070910,#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}.top{position:sticky;top:0;z-index:10;background:#0b1020f0;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}.topInner{width:min(1380px,100%);margin:0 auto;padding:10px 14px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.brand{display:flex;gap:10px;align-items:center;font-weight:950}.mark{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;font-weight:1000;box-shadow:0 10px 35px #0008}.brand small{display:block;color:var(--muted);font-weight:800}.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn{border:0;border-radius:999px;background:#30384f;color:white;text-decoration:none;font-weight:950;padding:10px 13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}.primary{background:linear-gradient(135deg,var(--good),var(--purple));color:#071015}.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}.wrap{width:min(1380px,100%);margin:0 auto;padding:14px}.hero{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,#101529,#17122d);padding:16px;margin:14px 0}.hero h1{font-size:clamp(34px,5vw,74px);line-height:.94;margin:8px 0;letter-spacing:-.05em}.badge,.chip{display:inline-flex;border:1px solid #ffffff24;border-radius:999px;padding:6px 9px;background:#ffffff0d;color:#dbe7ff;font-weight:900;font-size:12px}.badge{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,.72fr);gap:12px}.panel,.card{border:1px solid #ffffff18;border-radius:20px;background:#ffffff08;padding:13px;margin:0 0 12px}.card b{display:block;color:#baf7df;margin-bottom:7px}p,li,label{color:var(--muted);line-height:1.5}.pillRow{display:flex;gap:8px;flex-wrap:wrap}.list{margin:6px 0 0;padding-left:18px}.own{border-color:#22d3a655;background:#22d3a612}.keep{border-color:#ffb14255;background:#ffb14212}.later{border-color:#7c3cff66;background:#7c3cff14}.editorGrid{display:grid;grid-template-columns:1fr;gap:10px}.field label{font-weight:950;color:#dbe7ff;display:block;margin:0 0 6px}.field small{display:block;color:var(--muted);margin:0 0 8px}.code,.slugInput{width:100%;border:1px solid #ffffff1f;border-radius:18px;background:#0008;color:#dfffee;padding:12px;font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:1.45;outline:none}.code{min-height:150px;resize:vertical}.slugInput{min-height:48px}.code:focus,.slugInput:focus{border-color:#22d3a6;box-shadow:0 0 0 3px #22d3a622}.previewWrap{border:1px solid #ffffff18;border-radius:20px;background:#0006;padding:10px}.preview{width:100%;height:520px;border:1px solid #ffffff18;border-radius:18px;background:white}.debug{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;border:1px solid #ffffff14;border-radius:16px;background:#0007;padding:12px;color:#dfffee;max-height:420px;overflow:auto}.mini{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.notice{border:1px solid #ffb14266;background:#ffb14217;color:#ffe7ad;border-radius:16px;padding:12px;font-weight:850}.slugBox{border:1px solid #22d3a655;background:#22d3a612;border-radius:20px;padding:13px;margin:0 0 12px}.slugOut{font-family:ui-monospace,Consolas,monospace;word-break:break-all;color:#dfffee;border:1px solid #ffffff14;border-radius:14px;background:#0006;padding:10px;margin-top:10px}@media(max-width:980px){.topInner{grid-template-columns:1fr}.actions{justify-content:flex-start}.actions .btn{flex:1}.grid,.grid2,.mini{grid-template-columns:1fr}.hero h1{font-size:clamp(36px,12vw,58px)}}
+:root{
+  color-scheme:dark;
+  --bg:#070910;
+  --panel:#101529;
+  --panel2:#17122d;
+  --line:#ffffff22;
+  --text:#f7fbff;
+  --muted:#aeb8d6;
+  --good:#22d3a6;
+  --purple:#7c3cff;
+  --pink:#ff2d85;
+  --warn:#ffb142;
+  --bad:#ff5d6c;
+  --cyan:#41e8ff;
+}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),
+    radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),
+    linear-gradient(180deg,#070910,#050711);
+  color:var(--text);
+  font-family:Inter,system-ui,Arial,sans-serif;
+}
+.top{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#0b1020f0;
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(16px);
+}
+.topInner{
+  width:min(1380px,100%);
+  margin:0 auto;
+  padding:10px 14px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:12px;
+  align-items:center;
+}
+.brand{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  font-weight:950;
+}
+.mark{
+  width:44px;
+  height:44px;
+  min-width:44px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  color:#071015;
+  font-weight:1000;
+  box-shadow:0 10px 35px #0008;
+}
+.brand small{
+  display:block;
+  color:var(--muted);
+  font-weight:800;
+}
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.btn{
+  border:0;
+  border-radius:999px;
+  background:#30384f;
+  color:white;
+  text-decoration:none;
+  font-weight:950;
+  padding:10px 13px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+}
+.primary{
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  color:#071015;
+}
+.hot{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:white;
+}
+.warnBtn{
+  background:linear-gradient(135deg,var(--warn),var(--purple));
+  color:#071015;
+}
+.wrap{
+  width:min(1380px,100%);
+  margin:0 auto;
+  padding:14px;
+}
+.hero,.panel,.card{
+  border:1px solid #ffffff18;
+  border-radius:22px;
+  background:linear-gradient(135deg,var(--panel),var(--panel2));
+  padding:14px;
+  margin:0 0 12px;
+  box-shadow:0 18px 55px #0006;
+}
+.card{
+  background:#ffffff08;
+  box-shadow:none;
+}
+.hero h1{
+  font-size:clamp(36px,5vw,74px);
+  line-height:.92;
+  margin:8px 0;
+  letter-spacing:-.06em;
+}
+h2,h3{
+  margin:0 0 9px;
+}
+.badge,.chip,.pill{
+  display:inline-flex;
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  padding:6px 9px;
+  background:#ffffff0d;
+  color:#dbe7ff;
+  font-weight:900;
+  font-size:12px;
+  margin:2px;
+}
+.badge,.okBadge{
+  background:#22d3a621;
+  border-color:#22d3a660;
+  color:#baf7df;
+}
+.warn{
+  background:#ffb14224;
+  border-color:#ffb14266;
+  color:#ffe7ad;
+}
+.bad{
+  background:#ff5d6c22;
+  border-color:#ff5d6c66;
+  color:#ffd0d5;
+}
+.cyan{
+  background:#41e8ff22;
+  border-color:#41e8ff66;
+  color:#cef9ff;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.grid2{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(360px,.72fr);
+  gap:12px;
+}
+.mini{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.card b{
+  display:block;
+  color:#baf7df;
+  margin-bottom:7px;
+}
+p,li,label,small{
+  color:var(--muted);
+  line-height:1.5;
+}
+.pillRow{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.list{
+  margin:6px 0 0;
+  padding-left:18px;
+}
+.own{
+  border-color:#22d3a655;
+  background:#22d3a612;
+}
+.keep{
+  border-color:#ffb14255;
+  background:#ffb14212;
+}
+.later{
+  border-color:#7c3cff66;
+  background:#7c3cff14;
+}
+.field label{
+  font-weight:950;
+  color:#dbe7ff;
+  display:block;
+  margin:0 0 6px;
+}
+.field small{
+  display:block;
+  color:var(--muted);
+  margin:0 0 8px;
+}
+.editorGrid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+.code,.slugInput{
+  width:100%;
+  border:1px solid #ffffff1f;
+  border-radius:18px;
+  background:#0008;
+  color:#dfffee;
+  padding:12px;
+  font-family:ui-monospace,Consolas,monospace;
+  font-size:13px;
+  line-height:1.45;
+  outline:none;
+}
+.code{
+  min-height:150px;
+  resize:vertical;
+}
+.slugInput{
+  min-height:48px;
+}
+.code:focus,.slugInput:focus{
+  border-color:#22d3a6;
+  box-shadow:0 0 0 3px #22d3a622;
+}
+.previewWrap{
+  border:1px solid #ffffff18;
+  border-radius:20px;
+  background:#0006;
+  padding:10px;
+}
+.preview{
+  width:100%;
+  height:520px;
+  border:1px solid #ffffff18;
+  border-radius:18px;
+  background:white;
+}
+.debug{
+  font-family:ui-monospace,Consolas,monospace;
+  white-space:pre-wrap;
+  word-break:break-word;
+  border:1px solid #ffffff14;
+  border-radius:16px;
+  background:#0007;
+  padding:12px;
+  color:#dfffee;
+  max-height:420px;
+  overflow:auto;
+}
+.notice{
+  border:1px solid #ffb14266;
+  background:#ffb14217;
+  color:#ffe7ad;
+  border-radius:16px;
+  padding:12px;
+  font-weight:850;
+}
+.slugBox{
+  border:1px solid #22d3a655;
+  background:#22d3a612;
+  border-radius:20px;
+  padding:13px;
+  margin:0 0 12px;
+}
+.slugOut{
+  font-family:ui-monospace,Consolas,monospace;
+  white-space:pre-wrap;
+  word-break:break-all;
+  color:#dfffee;
+  border:1px solid #ffffff14;
+  border-radius:14px;
+  background:#0006;
+  padding:10px;
+  margin-top:10px;
+}
+.lockedScreen{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:18px;
+}
+.lockedScreen .hero{
+  width:min(940px,100%);
+}
+.loading{
+  min-height:54vh;
+  display:grid;
+  place-items:center;
+  text-align:center;
+}
+.footer{
+  border-top:1px solid var(--line);
+  background:#0b1020d8;
+  padding:10px 14px;
+  color:#aeb8d6;
+  font-size:12px;
+}
+@media(max-width:980px){
+  .topInner{
+    grid-template-columns:1fr;
+  }
+  .actions{
+    justify-content:flex-start;
+  }
+  .actions .btn,.btn{
+    flex:1 1 auto;
+  }
+  .grid,.grid2,.mini{
+    grid-template-columns:1fr;
+  }
+  .hero h1{
+    font-size:clamp(36px,12vw,58px);
+  }
+}
 </style>
 </head>
 <body>
-<header class="top"><div class="topInner"><div class="brand"><div class="mark" aria-hidden="true">WB</div><div>Web Builder Header/Footer Code<small>Builder-owned code planner - V7.12.254.1</small></div></div><div class="actions"><a class="btn primary" href="web-builder-studio-v7-12-252-test.html">Studio</a><a class="btn" href="web-builder-control-map-v7-12-253-test.html">Control Map</a><a class="btn" href="web-builder-route-map-v7-12-252-test.html">Route Map</a><a class="btn" href="web-builder-assets-v7-12-252-test.html">Assets</a><a class="btn" href="WEB-BUILDER-MANIFEST-V7-12-252.md">Manifest</a></div></div></header>
-<main class="wrap">
-<section class="hero"><span class="badge">V7.12.254.1 Web Builder Header/Footer Code Tool</span><h1>Build site header and footer code without touching Stream Bandit shell</h1><p>This is a builder-owned planner. It now includes a simple slug launcher so you can type a Web Builder page slug and open the right Builder Preview or Studio page without editing code.</p><div class="pillRow"><span class="chip">Slug launcher added</span><span class="chip">Sandboxed local preview</span><span class="chip warn">No script execution</span><span class="chip warn">No schema writes</span><span class="chip warn">No app shell changes</span></div></section>
-<section class="grid"><div class="card own"><b>Builder-owned</b><ul class="list"><li>Site header HTML plan</li><li>Site footer HTML plan</li><li>Page/site CSS plan</li><li>Slug launcher, local preview and copy report</li></ul></div><div class="card keep"><b>Keep separate</b><ul class="list"><li>No Stream Bandit header shell edits</li><li>No Stream Bandit footer shell edits</li><li>No Theme Projector edits</li><li>No brand/favicon replacement</li></ul></div><div class="card later"><b>Later only after approval</b><ul class="list"><li>Save into builder tables</li><li>Attach to builder pages</li><li>Publish to live custom domain</li><li>Revision/audit snapshots</li></ul></div></section>
-<section class="slugBox"><h2>Open Web Builder page by slug</h2><p>Type a page slug, for example <b>test-page</b>. This only opens existing Web Builder routes with that slug. It does not save or create anything.</p><div class="grid2"><div class="field"><label for="pageSlug">Web Builder slug</label><input id="pageSlug" class="slugInput" value="test-page" autocomplete="off" spellcheck="false"><small>Only letters, numbers and hyphens are kept. Spaces become hyphens.</small></div><div><div class="actions"><button id="openPreview" class="btn primary" type="button">Open Preview</button><button id="openStudio" class="btn hot" type="button">Open Studio</button><button id="copySlugLinks" class="btn" type="button">Copy Slug Links</button></div><div id="slugOut" class="slugOut">Waiting...</div></div></div></section>
-<section class="grid2"><div class="panel"><h2>Code planner</h2><div class="editorGrid"><div class="field"><label for="headerCode">Header HTML</label><small>Allowed for preview: normal HTML links/buttons/text/images. Scripts are stripped.</small><textarea id="headerCode" class="code"></textarea></div><div class="field"><label for="footerCode">Footer HTML</label><small>Use this for site footer layout, social links, policy links and copyright text.</small><textarea id="footerCode" class="code"></textarea></div><div class="field"><label for="cssCode">CSS</label><small>Scoped preview CSS. This is not written to Stream Bandit theme files.</small><textarea id="cssCode" class="code"></textarea></div><div class="actions"><button id="renderPreview" class="btn hot" type="button">Render Preview</button><button id="resetDefaults" class="btn" type="button">Reset Defaults</button><button id="copyReport" class="btn primary" type="button">Copy Report</button></div></div></div><aside class="panel"><h2>Preview rules</h2><div class="notice">This preview is intentionally local only. It strips scripts and inline event handlers before rendering.</div><div class="mini"><div class="card own"><b>Safe now</b><p>Plan, preview, copy and test the shape.</p></div><div class="card later"><b>Not yet</b><p>No save, publish, schema, storage, deploy or shell edit.</p></div></div><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></aside></section>
-<section class="panel"><h2>Sandbox preview</h2><div class="previewWrap"><iframe id="preview" class="preview" sandbox="" title="Header footer local preview"></iframe></div></section>
+<header class="top">
+  <div class="topInner">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">WB</div>
+      <div>
+        Web Builder Header/Footer Code
+        <small>Builder-access locked code planner · V7.12.263.9</small>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Hub</a>
+      <a class="btn" href="web-builder-studio-v7-12-252-test.html">Studio</a>
+      <a class="btn" href="web-builder-control-map-v7-12-253-test.html">Control Map</a>
+      <a class="btn" href="web-builder-route-map-v7-12-252-test.html">Route Map</a>
+      <a class="btn" href="web-builder-assets-v7-12-252-test.html">Assets</a>
+    </div>
+  </div>
+</header>
+
+<main id="app" class="wrap">
+  <section class="loading">
+    <div>
+      <span class="badge">Checking Web Builder access</span>
+      <h1>Loading header/footer tool</h1>
+      <p>This code planner stays hidden until the builder access lock passes.</p>
+    </div>
+  </section>
 </main>
-<script src="web-builder-global-projector-v7-12-263.js?v=7-12-263-header-footer-code"></script>
+
+<footer class="footer">
+  V7.12.263.9 Web Builder Header/Footer Code Lock · localPreviewOnly true · schemaChanges false · indexPromotion false
+</footer>
+
 <script>
-(function(){'use strict';
-const VERSION='V7.12.254.1 Web Builder Header/Footer Code Tool + Slug Launcher';
-const oldInactiveSource='repository-global-dependency-graph-v7-12-39-test.html';
-const defaults={
-header:'<header class="site-header">\n  <a class="site-logo" href="#home">Builder Site</a>\n  <nav aria-label="Main navigation">\n    <a href="#home">Home</a>\n    <a href="#work">Work</a>\n    <a href="#contact">Contact</a>\n  </nav>\n  <a class="site-cta" href="#contact">Start Project</a>\n</header>',
-footer:'<footer class="site-footer">\n  <div>\n    <strong>Builder Site</strong>\n    <p>Accessible, fast and editable site footer plan.</p>\n  </div>\n  <nav aria-label="Footer navigation">\n    <a href="#privacy">Privacy</a>\n    <a href="#terms">Terms</a>\n    <a href="#contact">Contact</a>\n  </nav>\n  <small>© 2026 Builder Site. All rights reserved.</small>\n</footer>',
-css:':root{font-family:Inter,system-ui,Arial,sans-serif;color:#f7fbff;background:#080b14}\nbody{margin:0;background:linear-gradient(180deg,#080b14,#11172b);min-height:100vh}\na{color:inherit}.site-header,.site-footer{display:flex;gap:18px;align-items:center;justify-content:space-between;padding:18px 24px;background:#0f1629;border:1px solid #ffffff18}.site-logo{font-weight:950;text-decoration:none}.site-header nav,.site-footer nav{display:flex;gap:12px;flex-wrap:wrap}.site-header a,.site-footer a{border-radius:999px;padding:8px 10px;text-decoration:none;background:#ffffff0e}.site-cta{background:linear-gradient(135deg,#22d3a6,#7c3cff)!important;color:#071015!important;font-weight:950}.preview-main{padding:50px 24px;display:grid;place-items:center;text-align:center}.preview-main h1{font-size:clamp(36px,8vw,82px);line-height:.92;margin:0 0 12px}.site-footer{align-items:flex-start;flex-wrap:wrap;color:#dbe7ff;margin-top:40px}'
+(function(){
+'use strict';
+
+const VERSION='V7.12.263.9 Web Builder Header/Footer Code Tool Builder Access Lock';
+const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+
+const RANK={
+  free_viewer:0,
+  viewer_plus:1,
+  creator_starter:2,
+  creator_growth:3,
+  creator_pro:4,
+  studio_business:5,
+  platform_owner:6,
+  enterprise:7
 };
+
+const defaults={
+  header:'<header class="site-header">\n  <a class="site-logo" href="#home">Builder Site</a>\n  <nav aria-label="Main navigation">\n    <a href="#home">Home</a>\n    <a href="#work">Work</a>\n    <a href="#contact">Contact</a>\n  </nav>\n  <a class="site-cta" href="#contact">Start Project</a>\n</header>',
+  footer:'<footer class="site-footer">\n  <div>\n    <strong>Builder Site</strong>\n    <p>Accessible, fast and editable site footer plan.</p>\n  </div>\n  <nav aria-label="Footer navigation">\n    <a href="#privacy">Privacy</a>\n    <a href="#terms">Terms</a>\n    <a href="#contact">Contact</a>\n  </nav>\n  <small>© 2026 Builder Site. All rights reserved.</small>\n</footer>',
+  css:':root{font-family:Inter,system-ui,Arial,sans-serif;color:#f7fbff;background:#080b14}\nbody{margin:0;background:linear-gradient(180deg,#080b14,#11172b);min-height:100vh}\na{color:inherit}.site-header,.site-footer{display:flex;gap:18px;align-items:center;justify-content:space-between;padding:18px 24px;background:#0f1629;border:1px solid #ffffff18}.site-logo{font-weight:950;text-decoration:none}.site-header nav,.site-footer nav{display:flex;gap:12px;flex-wrap:wrap}.site-header a,.site-footer a{border-radius:999px;padding:8px 10px;text-decoration:none;background:#ffffff0e}.site-cta{background:linear-gradient(135deg,#22d3a6,#7c3cff)!important;color:#071015!important;font-weight:950}.preview-main{padding:50px 24px;display:grid;place-items:center;text-align:center}.preview-main h1{font-size:clamp(36px,8vw,82px);line-height:.92;margin:0 0 12px}.site-footer{align-items:flex-start;flex-wrap:wrap;color:#dbe7ff;margin-top:40px}'
+};
+
+let sb=null;
+let user=null;
+let profile=null;
+let projectorLoaded=false;
+
+let authState={
+  version:VERSION,
+  route:'web-builder-header-footer-code-v7-12-254-test.html',
+  checked:false,
+  allowed:false,
+  signedIn:false,
+  email:'',
+  userId:'',
+  role:'',
+  adminLevel:'',
+  planKey:'',
+  accountStatus:'',
+  isPlatformOwner:false,
+  canUseBuilder:false,
+  workspace:'',
+  lockClass:'builder-owner-admin-planning-lock',
+  reason:'Checking...',
+  supabaseReads:false,
+  supabaseWrites:false,
+  storageWrites:false,
+  storageActions:false,
+  schemaChanges:false,
+  builderTableChanges:false,
+  localPreviewOnly:true,
+  sandboxedPreview:true,
+  scriptsStripped:true,
+  inlineEventHandlersStripped:true,
+  streamBanditHeaderShellChanges:false,
+  streamBanditFooterShellChanges:false,
+  streamBanditThemeProjectorChanges:false,
+  streamBanditBrandingChanges:false,
+  helperChanges:false,
+  activeMenuPromotion:false,
+  indexPromotion:false,
+  registryPromotion:true
+};
+
 const $=id=>document.getElementById(id);
-function cleanSlug(v){let s=String(v||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');return s||'test-page';}
-function slugLinks(){let slug=cleanSlug($('pageSlug').value);return {slug:slug,previewUrl:'web-builder-shared-style-preview-v7-12-117-test.html?page='+encodeURIComponent(slug),studioUrl:'overlay-route-truth-machine-v7-12-66-test.html?page='+encodeURIComponent(slug),canonicalStudioUrl:'web-builder-studio-v7-12-252-test.html?page='+encodeURIComponent(slug)};}
-function renderSlug(){let links=slugLinks();$('pageSlug').value=links.slug;$('slugOut').textContent='Preview: '+links.previewUrl+'\nStudio: '+links.studioUrl;return links;}
-function openPreview(){let links=renderSlug();location.href=links.previewUrl;}
-function openStudio(){let links=renderSlug();location.href=links.studioUrl;}
-function copySlugLinks(){let links=renderSlug();navigator.clipboard&&navigator.clipboard.writeText(JSON.stringify(links,null,2)).catch(()=>{});}
-function scrub(input){let out=String(input||'');out=out.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi,'');out=out.replace(/\son[a-z]+\s*=\s*"[^"]*"/gi,'');out=out.replace(/\son[a-z]+\s*=\s*'[^']*'/gi,'');out=out.replace(/\son[a-z]+\s*=\s*[^\s>]+/gi,'');out=out.replace(/javascript:/gi,'');return out;}
-function state(){let links=slugLinks();return {version:VERSION,canonicalRoute:'web-builder-header-footer-code-v7-12-254-test.html',headerFooterCodeToolCreated:true,slugLauncherCreated:true,slug:links.slug,previewUrl:links.previewUrl,studioUrl:links.studioUrl,oldInactivePageUsed:oldInactiveSource,oldInactiveRouteConvertedToFallback:true,builderOwnedHeaderFooter:true,localPreviewOnly:true,sandboxedPreview:true,scriptsStripped:true,inlineEventHandlersStripped:true,storageWrites:false,schemaChanges:false,builderTableChanges:false,streamBanditHeaderShellChanges:false,streamBanditFooterShellChanges:false,streamBanditThemeProjectorChanges:false,streamBanditBrandingChanges:false,activeMenuPromotion:false,indexPromotion:false,registryPromotion:false,headerLength:$('headerCode').value.length,footerLength:$('footerCode').value.length,cssLength:$('cssCode').value.length};}
-function previewDoc(){let h=scrub($('headerCode').value),f=scrub($('footerCode').value),css=scrub($('cssCode').value);return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+css+'</style></head><body>'+h+'<main class="preview-main"><div><p style="letter-spacing:.14em;text-transform:uppercase;color:#9fb0d8;font-weight:900">Local Preview</p><h1>Example page content</h1><p style="max-width:680px;color:#c9d5ee;line-height:1.6">This middle area represents the page blocks the Web Builder will render between the planned header and footer.</p></div></main>'+f+'</body></html>';}
-function render(){ renderSlug(); $('preview').srcdoc=previewDoc(); $('debug').textContent=JSON.stringify(state(),null,2); }
-function reset(){ $('headerCode').value=defaults.header; $('footerCode').value=defaults.footer; $('cssCode').value=defaults.css; render(); }
-function copy(){let report=state();report.headerHtml=scrub($('headerCode').value);report.footerHtml=scrub($('footerCode').value);report.css=scrub($('cssCode').value);navigator.clipboard&&navigator.clipboard.writeText(JSON.stringify(report,null,2)).catch(()=>{});}
-function boot(){ $('renderPreview').onclick=render; $('resetDefaults').onclick=reset; $('copyReport').onclick=copy; $('openPreview').onclick=openPreview; $('openStudio').onclick=openStudio; $('copySlugLinks').onclick=copySlugLinks; $('pageSlug').addEventListener('input',()=>{$('debug').textContent=JSON.stringify(state(),null,2);renderSlug();}); ['headerCode','footerCode','cssCode'].forEach(id=>$(id).addEventListener('input',()=>{$('debug').textContent=JSON.stringify(state(),null,2);})); reset(); }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+
+function client(){
+  if(sb)return sb;
+  if(!window.supabase||!window.supabase.createClient)throw new Error('Supabase SDK not loaded');
+  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  return sb;
+}
+
+function esc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,function(m){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]||m;
+  });
+}
+
+function obj(v){
+  if(v&&typeof v==='object')return v;
+  if(typeof v==='string'&&v.trim()){
+    try{return JSON.parse(v)||{};}catch(e){}
+  }
+  return {};
+}
+
+function truth(v){
+  if(v===true||v===1)return true;
+  if(typeof v==='string'){
+    return ['true','1','yes','on','enabled','allow','allowed'].includes(v.toLowerCase());
+  }
+  return false;
+}
+
+function rank(k){
+  return RANK[String(k||'free_viewer')]||0;
+}
+
+function isPlatformOwnerProfile(p){
+  return !!p&&(p.admin_level==='owner'||p.admin_level==='platform_owner'||p.plan_key==='platform_owner');
+}
+
+function statusAllowed(p){
+  let s=String(p&&p.account_status||'active').toLowerCase();
+  return isPlatformOwnerProfile(p)||s==='active';
+}
+
+function builderAllowed(p){
+  if(!p)return false;
+  if(isPlatformOwnerProfile(p))return true;
+  if(!statusAllowed(p))return false;
+  let ps=obj(p.permissions_json);
+  return rank(p.plan_key)>=rank('creator_growth')||
+    truth(ps.web_builder)||
+    truth(ps.web_builder_starter)||
+    truth(ps.pages_manager)||
+    truth(ps.web_builder_studio);
+}
+
+function cleanSlug(v){
+  let s=String(v||'')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g,'-')
+    .replace(/^-+|-+$/g,'');
+
+  return s||'test-page';
+}
+
+function slugLinks(){
+  let input=$('pageSlug');
+  let slug=cleanSlug(input&&input.value||'test-page');
+
+  return {
+    slug:slug,
+    previewUrl:'web-builder-preview-owned-v7-12-257-test.html?page='+encodeURIComponent(slug),
+    supportPreviewUrl:'web-builder-shared-style-preview-v7-12-117-test.html?page='+encodeURIComponent(slug),
+    studioUrl:'overlay-route-truth-machine-v7-12-66-test.html?page='+encodeURIComponent(slug),
+    canonicalStudioUrl:'web-builder-studio-v7-12-252-test.html?page='+encodeURIComponent(slug)
+  };
+}
+
+function renderSlug(){
+  let links=slugLinks();
+
+  $('pageSlug').value=links.slug;
+
+  $('slugOut').textContent=
+    'Owned Preview: '+links.previewUrl+'\n'+
+    'Guarded Studio: '+links.studioUrl+'\n'+
+    'Canonical Studio handoff: '+links.canonicalStudioUrl+'\n'+
+    'Preserved support preview: '+links.supportPreviewUrl;
+
+  renderDebug();
+
+  return links;
+}
+
+function openPreview(){
+  let links=renderSlug();
+  location.href=links.previewUrl;
+}
+
+function openStudio(){
+  let links=renderSlug();
+  location.href=links.studioUrl;
+}
+
+async function copySlugLinks(){
+  let links=renderSlug();
+  let text=JSON.stringify(links,null,2);
+
+  try{
+    await navigator.clipboard.writeText(text);
+    alert('Copied slug links.');
+  }catch(e){
+    alert(text);
+  }
+}
+
+function scrub(input){
+  let out=String(input||'');
+
+  out=out.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi,'');
+  out=out.replace(/\son[a-z]+\s*=\s*"[^"]*"/gi,'');
+  out=out.replace(/\son[a-z]+\s*=\s*'[^']*'/gi,'');
+  out=out.replace(/\son[a-z]+\s*=\s*[^\s>]+/gi,'');
+  out=out.replace(/javascript:/gi,'');
+
+  return out;
+}
+
+function previewDoc(){
+  let h=scrub($('headerCode').value);
+  let f=scrub($('footerCode').value);
+  let css=scrub($('cssCode').value);
+
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+css+'</style></head><body>'+h+'<main class="preview-main"><section><h1>Header/Footer Preview</h1><p>This is a sandboxed local preview only. It is not saved and does not touch the Stream Bandit shell.</p></section></main>'+f+'</body></html>';
+}
+
+function renderPreview(){
+  let frame=$('preview');
+
+  try{
+    frame.srcdoc=previewDoc();
+  }catch(e){
+    frame.contentWindow.document.open();
+    frame.contentWindow.document.write(previewDoc());
+    frame.contentWindow.document.close();
+  }
+
+  renderDebug();
+}
+
+function resetDefaults(){
+  $('headerCode').value=defaults.header;
+  $('footerCode').value=defaults.footer;
+  $('cssCode').value=defaults.css;
+  renderPreview();
+}
+
+function state(){
+  let links={slug:'test-page'};
+  try{links=slugLinks();}catch(e){}
+
+  return Object.assign({},authState,{
+    canonicalRoute:'web-builder-header-footer-code-v7-12-254-test.html',
+    checkpoint:'CHECKPOINT-WEB-BUILDER-DOORWAY-LOCK-ROLLPLAN-V7-12-263-8.md',
+    headerFooterCodeToolLocked:true,
+    headerFooterCodeToolCreated:true,
+    slugLauncherCreated:true,
+    slug:links.slug,
+    previewUrl:links.previewUrl,
+    studioUrl:links.studioUrl,
+    supportPreviewUrl:links.supportPreviewUrl,
+    oldInactivePageUsed:'repository-global-dependency-graph-v7-12-39-test.html',
+    oldInactiveRouteConvertedToFallback:true,
+    builderOwnedHeaderFooter:true,
+    localPreviewOnly:true,
+    sandboxedPreview:true,
+    scriptsStripped:true,
+    inlineEventHandlersStripped:true,
+    projectorLoaded:projectorLoaded,
+    storageWrites:false,
+    storageActions:false,
+    schemaChanges:false,
+    builderTableChanges:false,
+    streamBanditHeaderShellChanges:false,
+    streamBanditFooterShellChanges:false,
+    streamBanditThemeProjectorChanges:false,
+    streamBanditBrandingChanges:false,
+    activeMenuPromotion:false,
+    indexPromotion:false,
+    registryPromotion:true,
+    headerLength:$('headerCode')?$('headerCode').value.length:0,
+    footerLength:$('footerCode')?$('footerCode').value.length:0,
+    cssLength:$('cssCode')?$('cssCode').value.length:0
+  });
+}
+
+function renderDebug(){
+  if($('debug')){
+    $('debug').textContent=JSON.stringify(state(),null,2);
+  }
+}
+
+async function copyReport(){
+  let text=JSON.stringify(state(),null,2);
+
+  try{
+    await navigator.clipboard.writeText(text);
+    alert('Copied header/footer code report.');
+  }catch(e){
+    alert(text);
+  }
+}
+
+function loadProjector(){
+  if(projectorLoaded)return;
+
+  projectorLoaded=true;
+
+  let s=document.createElement('script');
+  s.src='web-builder-global-projector-v7-12-263.js?v=7-12-263-header-footer-code-locked';
+  s.async=true;
+  s.onerror=function(){
+    projectorLoaded=false;
+    renderDebug();
+  };
+
+  document.body.appendChild(s);
+}
+
+function renderLocked(reason){
+  authState.checked=true;
+  authState.allowed=false;
+  authState.reason=reason||authState.reason;
+
+  document.body.innerHTML='<main class="lockedScreen">\
+<section class="hero">\
+<span class="badge bad">Web Builder header/footer tool locked</span>\
+<h1>Builder access required</h1>\
+<p>This code planner opens only for platform owner and eligible Web Builder creator accounts.</p>\
+<div class="panel"><b>Reason</b><p>'+esc(authState.reason)+'</p></div>\
+<div class="actions">\
+<a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Web Builder Hub</a>\
+<a class="btn" href="settings-platform-control-hub-v7-12-85-test.html">Back to Settings</a>\
+<a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a>\
+</div>\
+<h2>Debug</h2>\
+<pre class="debug">'+esc(JSON.stringify(authState,null,2))+'</pre>\
+</section>\
+</main>';
+}
+
+function renderAllowed(){
+  authState.checked=true;
+  authState.allowed=true;
+  authState.reason='Allowed. Header/Footer Code Tool opened with builder planning lock.';
+
+  $('app').innerHTML='<section class="hero">\
+<span class="badge">V7.12.263.9 Web Builder Header/Footer Code Tool</span>\
+<h1>Build site header and footer code without touching Stream Bandit shell</h1>\
+<p>This is a builder-owned planner. It includes a slug launcher and sandboxed local preview. It does not save, publish, change schema, write storage, or alter the Stream Bandit header/footer shell.</p>\
+<div class="pillRow">\
+<span class="chip okBadge">Builder planning lock active</span>\
+<span class="chip">Workspace: '+esc(authState.workspace)+'</span>\
+<span class="chip">Plan: '+esc(authState.planKey||'none')+'</span>\
+<span class="chip warn">No script execution</span>\
+<span class="chip warn">No schema writes</span>\
+<span class="chip warn">No app shell changes</span>\
+</div>\
+</section>\
+<section class="grid">\
+<div class="card own"><b>Builder-owned</b><ul class="list"><li>Site header HTML plan</li><li>Site footer HTML plan</li><li>Page/site CSS plan</li><li>Slug launcher, local preview and copy report</li></ul></div>\
+<div class="card keep"><b>Keep separate</b><ul class="list"><li>No Stream Bandit header shell edits</li><li>No Stream Bandit footer shell edits</li><li>No Theme Projector edits</li><li>No brand/favicon replacement</li></ul></div>\
+<div class="card later"><b>Later only after approval</b><ul class="list"><li>Save into builder tables</li><li>Attach to builder pages</li><li>Publish to live custom domain</li><li>Revision/audit snapshots</li></ul></div>\
+</section>\
+<section class="slugBox">\
+<h2>Open Web Builder page by slug</h2>\
+<p>Type a page slug, for example <b>test-page</b>. This only opens existing Web Builder routes with that slug. It does not save or create anything.</p>\
+<div class="grid2">\
+<div class="field">\
+<label for="pageSlug">Web Builder slug</label>\
+<input id="pageSlug" class="slugInput" value="test-page" autocomplete="off" spellcheck="false">\
+<small>Only letters, numbers, underscores and hyphens are kept. Spaces become hyphens.</small>\
+</div>\
+<div>\
+<div class="actions">\
+<button id="openPreview" class="btn primary" type="button">Open Owned Preview</button>\
+<button id="openStudio" class="btn hot" type="button">Open Studio</button>\
+<button id="copySlugLinks" class="btn" type="button">Copy Slug Links</button>\
+</div>\
+<div id="slugOut" class="slugOut">Waiting...</div>\
+</div>\
+</div>\
+</section>\
+<section class="grid2">\
+<div class="panel">\
+<h2>Code planner</h2>\
+<div class="editorGrid">\
+<div class="field"><label for="headerCode">Header HTML</label><small>Allowed for preview: normal HTML links/buttons/text/images. Scripts are stripped.</small><textarea id="headerCode" class="code"></textarea></div>\
+<div class="field"><label for="footerCode">Footer HTML</label><small>Use this for site footer layout, social links, policy links and copyright text.</small><textarea id="footerCode" class="code"></textarea></div>\
+<div class="field"><label for="cssCode">CSS</label><small>Scoped preview CSS. This is not written to Stream Bandit theme files.</small><textarea id="cssCode" class="code"></textarea></div>\
+<div class="actions"><button id="renderPreview" class="btn hot" type="button">Render Preview</button><button id="resetDefaults" class="btn" type="button">Reset Defaults</button><button id="copyReport" class="btn primary" type="button">Copy Report</button></div>\
+</div>\
+</div>\
+<aside class="panel">\
+<h2>Preview rules</h2>\
+<div class="notice">This preview is intentionally local only. It strips scripts and inline event handlers before rendering.</div>\
+<div class="mini">\
+<div class="card own"><b>Safe now</b><p>Plan, preview, copy and test the shape.</p></div>\
+<div class="card later"><b>Not yet</b><p>No save, publish, schema, storage, deploy or shell edit.</p></div>\
+</div>\
+<h2>Debug</h2>\
+<div id="debug" class="debug">Waiting...</div>\
+</aside>\
+</section>\
+<section class="panel">\
+<h2>Sandbox preview</h2>\
+<div class="previewWrap"><iframe id="preview" class="preview" sandbox="" title="Header footer local preview"></iframe></div>\
+</section>';
+
+  $('headerCode').value=defaults.header;
+  $('footerCode').value=defaults.footer;
+  $('cssCode').value=defaults.css;
+
+  $('pageSlug').oninput=renderSlug;
+  $('pageSlug').onchange=renderSlug;
+  $('openPreview').onclick=openPreview;
+  $('openStudio').onclick=openStudio;
+  $('copySlugLinks').onclick=copySlugLinks;
+  $('renderPreview').onclick=renderPreview;
+  $('resetDefaults').onclick=resetDefaults;
+  $('copyReport').onclick=copyReport;
+
+  renderSlug();
+  renderPreview();
+  loadProjector();
+}
+
+async function readAuthority(){
+  let c=client();
+  let foundUser=null;
+
+  let gu=await c.auth.getUser();
+  if(gu&&gu.data&&gu.data.user)foundUser=gu.data.user;
+
+  if(!foundUser){
+    let gs=await c.auth.getSession();
+    if(gs&&gs.data&&gs.data.session&&gs.data.session.user)foundUser=gs.data.session.user;
+  }
+
+  if(!foundUser){
+    return {signedIn:false,user:null,profile:null};
+  }
+
+  let pr=await c
+    .from('sb_profiles')
+    .select('id,username,display_name,role,admin_level,plan_key,permissions_json,account_status')
+    .eq('id',foundUser.id)
+    .maybeSingle();
+
+  authState.supabaseReads=true;
+
+  if(pr.error)throw pr.error;
+
+  return {
+    signedIn:true,
+    user:foundUser,
+    profile:pr.data||null
+  };
+}
+
+async function boot(){
+  try{
+    let authority=await readAuthority();
+
+    authState.signedIn=authority.signedIn;
+
+    if(!authority.signedIn){
+      renderLocked('Sign in required before opening the Web Builder Header/Footer Code Tool.');
+      return;
+    }
+
+    user=authority.user;
+    profile=authority.profile||{};
+
+    authState.userId=user.id;
+    authState.email=user.email||'';
+    authState.role=profile.role||'';
+    authState.adminLevel=profile.admin_level||'';
+    authState.planKey=profile.plan_key||'';
+    authState.accountStatus=profile.account_status||'active';
+    authState.isPlatformOwner=isPlatformOwnerProfile(profile);
+    authState.canUseBuilder=builderAllowed(profile);
+    authState.workspace=authState.isPlatformOwner?'platform-owner':'eligible-builder';
+
+    if(!authState.canUseBuilder){
+      renderLocked('Web Builder plan or permission required.');
+      return;
+    }
+
+    renderAllowed();
+  }catch(e){
+    authState.reason=e&&e.message?e.message:String(e);
+    renderLocked('Header/Footer Code Tool lock check failed: '+authState.reason);
+  }
+}
+
+boot();
+
 })();
 </script>
 </body>
