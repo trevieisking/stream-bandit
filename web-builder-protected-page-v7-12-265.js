@@ -2,12 +2,13 @@
    Web Builder-only access gate.
    Reads Supabase Auth + public.sb_profiles.
    Uses User Management-controlled fields: account_status, plan_key, permissions_json, role, admin_level.
+   V7.12.265.1 removes the automatic admin bypass so admins do not enter another user's personal Web Builder just because role=admin.
    No Stream Bandit app shell. No header/footer injection. No writes. No redirects. No schema/storage/RLS changes.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.12.265 Web Builder Protected Page Gate';
+const VERSION='V7.12.265.1 Web Builder Protected Page Gate / No Admin Bypass';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const SDK='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
@@ -144,13 +145,13 @@ async function readAuthority(){
 function allowByProfile(profile,info){
  if(!profile)return{allowed:false,reason:'No matching profile row'};
  if(!statusAllowed(profile))return{allowed:false,reason:'Account status is '+String(profile.account_status||'unknown')};
- if(isOwner(profile))return{allowed:true,reason:'Owner access'};
- if(isAdmin(profile))return{allowed:true,reason:'Admin access'};
- if(planRank(profile.plan_key)>=planRank(info.minPlan||'creator_growth'))return{allowed:true,reason:'Plan allows Web Builder'};
- if(hasPerm(profile,'web_builder')||hasPerm(profile,'web_builder_starter'))return{allowed:true,reason:'Web Builder permission allows access'};
+ if(isOwner(profile))return{allowed:true,reason:'Owner/platform owner access'};
+ if(planRank(profile.plan_key)>=planRank(info.minPlan||'creator_growth'))return{allowed:true,reason:'Plan allows Web Builder personal workspace'};
+ if(hasPerm(profile,'web_builder')||hasPerm(profile,'web_builder_starter'))return{allowed:true,reason:'Web Builder permission allows personal workspace'};
  if(hasPerm(profile,info.feature))return{allowed:true,reason:'Feature permission allows '+info.feature};
  if(info.feature==='forms'&&(hasPerm(profile,'form_builder')||hasPerm(profile,'form_inbox')))return{allowed:true,reason:'Forms permission allows access'};
  if(info.feature==='assets'&&(hasPerm(profile,'uploads')||hasPerm(profile,'web_builder_assets')))return{allowed:true,reason:'Assets/uploads permission allows access'};
+ if(isAdmin(profile))return{allowed:false,reason:'Admin role alone does not unlock another user personal Web Builder'};
  return{allowed:false,reason:'Plan or permission does not allow Web Builder'};
 }
 
@@ -188,11 +189,11 @@ function renderLocked(decision){
 <section style="width:min(920px,100%);border:1px solid #ffffff24;border-radius:32px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 26px 90px #0009;padding:24px">\
  <span style="display:inline-flex;border:1px solid #ffb14266;border-radius:999px;background:#ffb14224;color:#ffe7ad;font-weight:950;padding:7px 11px">Web Builder locked</span>\
  <h1 style="font-size:clamp(38px,7vw,76px);line-height:.9;letter-spacing:-.06em;margin:12px 0">Web Builder access required</h1>\
- <p style="color:#b9c0d8;line-height:1.5;font-size:16px">This is a Web Builder-only gate. It does not load the Stream Bandit app shell. Access is controlled by User Management plan, permissions, owner/admin level and account status.</p>\
+ <p style="color:#b9c0d8;line-height:1.5;font-size:16px">This is a Web Builder-only gate. It does not load the Stream Bandit app shell. Access is controlled by User Management plan, permissions, owner level and account status. Admin role alone does not unlock another user personal builder.</p>\
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:14px 0">\
   <div style="border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px"><b style="color:#baf7df">Route</b><p style="color:#b9c0d8;word-break:break-word">'+esc(decision&&decision.route)+'</p></div>\
   <div style="border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px"><b style="color:#baf7df">Tool</b><p style="color:#b9c0d8">'+esc(info.label||'Web Builder')+'</p></div>\
-  <div style="border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px"><b style="color:#baf7df">Needed</b><p style="color:#b9c0d8">creator_growth plan or Web Builder permission</p></div>\
+  <div style="border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px"><b style="color:#baf7df">Needed</b><p style="color:#b9c0d8">creator_growth plan, Web Builder permission, or platform owner</p></div>\
   <div style="border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px"><b style="color:#baf7df">Reason</b><p style="color:#b9c0d8">'+esc(decision&&decision.reason)+'</p></div>\
  </div>\
  <pre style="white-space:pre-wrap;word-break:break-word;background:#0007;border:1px solid #ffffff14;border-radius:18px;padding:12px;color:#dfffee;max-height:260px;overflow:auto">'+esc(JSON.stringify({signed_in:!!a.signed_in,email:email,profile_id:p.id||'',role:p.role||'',admin_level:p.admin_level||'',account_status:p.account_status||'',plan_key:p.plan_key||'',feature:info.feature||'',version:VERSION},null,2))+'</pre>\
@@ -210,7 +211,7 @@ async function run(){
   let decision=await decide(location.pathname);
   lastDecision=decision;
   document.documentElement.dataset.webBuilderProtectedPage=decision.allowed?'allowed':'not-allowed';
-  document.documentElement.dataset.webBuilderProtectedVersion='v7-12-265';
+  document.documentElement.dataset.webBuilderProtectedVersion='v7-12-265-1';
   window.StreamBanditWebBuilderProtectedState=decision;
   window.dispatchEvent(new CustomEvent('web-builder-access-decision',{detail:decision}));
   if(!decision.allowed)renderLocked(decision);
