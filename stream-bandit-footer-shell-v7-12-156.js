@@ -1,14 +1,15 @@
-/* Stream Bandit Footer Shell V7.12.298
+/* Stream Bandit Footer Shell V7.12.298.1
    Compact tabbed global footer + global private messages overlay.
    Footer owns a lightweight messenger overlay on every page.
    Full Form Inbox remains the full admin/owner management page.
    Uses existing sb_private_messages, sb_profiles, sb_user_friends, sb_user_blocks.
+   Send/reply payload now matches the working Form Inbox insert pattern with page_slug and recipient_email.
    No schema/storage/RLS/index changes in this file.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.12.298 Footer Shell / Global Private Messages Overlay';
+const VERSION='V7.12.298.1 Footer Shell / Global Private Messages Send Fix';
 const THEME_OWNER='web-builder-theme-studio-controls-v7-8-9-test.html';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
@@ -151,6 +152,20 @@ function activeGroup(){
   if(g[1].some(x=>same(x[1],c)))return g[0];
  }
  return 'Watch';
+}
+
+function messagePageSlug(){
+ let p=page();
+
+ if(p&&p!=='test-page')return p;
+
+ let f=cur()
+  .replace(/\.html$/,'')
+  .replace(/[^a-z0-9]+/gi,'-')
+  .replace(/^-+|-+$/g,'')
+  .toLowerCase();
+
+ return f||'global-footer-messenger';
 }
 
 function date(v){
@@ -297,7 +312,7 @@ function ensureMessenger(){
   '<div id="sbGlobalMessagesScrim" class="sb-msg-scrim">'+
    '<div class="sb-msg-overlay" role="dialog" aria-modal="true" aria-label="Stream Bandit private messages">'+
     '<div class="sb-msg-head">'+
-     '<div><span class="sb-msg-pill">V7.12.298 Global Messenger</span><h2>💬 Private Messages</h2><p>Lightweight footer overlay. Full form-submission management stays in Form Inbox.</p></div>'+
+     '<div><span class="sb-msg-pill">V7.12.298.1 Global Messenger</span><h2>💬 Private Messages</h2><p>Lightweight footer overlay. Full form-submission management stays in Form Inbox.</p></div>'+
      '<button id="sbMsgClose" class="sb-msg-close" type="button">Close</button>'+
     '</div>'+
     '<div id="sbMsgStatus" class="sb-msg-status">Open messages to load your inbox.</div>'+
@@ -438,6 +453,12 @@ function otherUserId(m){
  if(!msgUser||!m)return '';
  if(m.sender_id===msgUser.id)return m.recipient_id||'';
  return m.sender_id||'';
+}
+
+function otherUserEmail(m){
+ if(!msgUser||!m)return '';
+ if(mineSender(m))return m.recipient_email||'';
+ return m.sender_email||'';
 }
 
 function participant(m,side){
@@ -690,14 +711,14 @@ function renderCompose(box){
   '<h2>New private message</h2>'+
   '<div class="sb-msg-form">'+
    '<div class="sb-msg-mini-grid">'+
-    '<label>Recipient profile ID, optional<input id="sbMsgToId" placeholder="Use a friend/profile id when known"></label>'+
-    '<label>Recipient email, optional<input id="sbMsgToEmail" placeholder="user@email.com"></label>'+
+    '<label>Recipient email, required<input id="sbMsgToEmail" placeholder="user@email.com"></label>'+
+    '<label>Recipient profile ID, optional<input id="sbMsgToId" placeholder="Optional profile id for avatars/friends/blocks"></label>'+
    '</div>'+
    '<label>Subject<input id="sbMsgSubject" value="Private message"></label>'+
    '<label>Message<textarea id="sbMsgBody" placeholder="Write your private message..."></textarea></label>'+
    '<div class="sb-msg-actions"><button id="sbMsgSend" class="sb-msg-btn primary" type="button">Send message</button><a class="sb-msg-btn" href="'+esc(route(ROUTES.formInbox))+'">Open full inbox</a></div>'+
   '</div>'+
-  '<p style="color:var(--sbM)">For friend messages, use the Friends tab and the recipient profile ID is filled automatically.</p>'+
+  '<p style="color:var(--sbM)">This global overlay sends through the same sb_private_messages table as Form Inbox. Recipient email is required; profile ID is optional for friends/blocks/avatar matching.</p>'+
  '</div>';
 
  document.getElementById('sbMsgSend').onclick=sendNewMessage;
@@ -720,7 +741,7 @@ function renderFriends(box){
   '</aside>'+
   '<main class="sb-msg-detail">'+
    '<h2>Add friend by profile ID</h2>'+
-   '<p>Use a profile/user id from an existing message or profile. Friend search can be added later without changing the message table.</p>'+
+   '<p>Use a profile/user id from an existing message or profile.</p>'+
    '<div class="sb-msg-form"><label>Profile ID<input id="sbFriendTarget" placeholder="target user uuid"></label><label>Note<input id="sbFriendNote" placeholder="Optional friend request note"></label><button id="sbFriendSend" class="sb-msg-btn primary" type="button">Send friend request</button></div>'+
   '</main>'+
  '</div>';
@@ -752,7 +773,6 @@ function friendOtherId(f){
 
 function friendRow(f){
  let other=friendOtherId(f);
- let p=profilesById[other];
  let incoming=f.status==='pending'&&f.addressee_id===msgUser.id;
 
  return '<div class="sb-msg-person">'+
@@ -818,15 +838,26 @@ async function canSendTo(targetId){
 async function sendNewMessage(){
  try{
   if(!msgUser)await refreshAuth();
-  if(!msgUser){setMsgStatus('Sign in first.',true);return;}
 
-  let toId=String(document.getElementById('sbMsgToId').value||'').trim();
+  if(!msgUser){
+   setMsgStatus('Sign in first.',true);
+   return;
+  }
+
   let toEmail=String(document.getElementById('sbMsgToEmail').value||'').trim();
+  let toId=String(document.getElementById('sbMsgToId').value||'').trim();
   let subject=String(document.getElementById('sbMsgSubject').value||'Private message').trim();
   let body=String(document.getElementById('sbMsgBody').value||'').trim();
 
-  if(!toId&&!toEmail){setMsgStatus('Recipient profile ID or email is required.',true);return;}
-  if(!body){setMsgStatus('Message body is required.',true);return;}
+  if(!toEmail){
+   setMsgStatus('Recipient email is required for sending. Profile ID is optional for avatar/friend/block matching.',true);
+   return;
+  }
+
+  if(!body){
+   setMsgStatus('Message body is required.',true);
+   return;
+  }
 
   if(toId&&!(await canSendTo(toId))){
    setMsgStatus('Message blocked by block/friend safety rules.',true);
@@ -836,17 +867,22 @@ async function sendNewMessage(){
   let c=await client();
 
   let payload={
+   page_slug:messagePageSlug(),
    sender_id:msgUser.id,
    sender_email:msgUser.email,
    sender_name:myName(),
    recipient_id:toId||null,
-   recipient_email:toEmail||null,
-   recipient_name:toEmail||toId,
+   recipient_email:toEmail,
+   recipient_name:toEmail,
    subject:subject,
    body:body,
    kind:'message',
    status:'sent',
-   meta:{source:'footer_shell_global_messenger'}
+   meta:{
+    source:'footer_shell_global_messenger',
+    page_url:location.href,
+    footer_version:VERSION
+   }
   };
 
   let r=await c.from('sb_private_messages').insert(payload).select('*').maybeSingle();
@@ -864,33 +900,59 @@ async function sendNewMessage(){
 
 async function sendMessageReply(){
  try{
-  if(!selectedMessage){setMsgStatus('Select a message first.',true);return;}
+  if(!selectedMessage){
+   setMsgStatus('Select a message first.',true);
+   return;
+  }
+
   if(!msgUser)await refreshAuth();
-  if(!msgUser){setMsgStatus('Sign in first.',true);return;}
+
+  if(!msgUser){
+   setMsgStatus('Sign in first.',true);
+   return;
+  }
 
   let body=String(document.getElementById('sbMsgReplyBody').value||'').trim();
-  if(!body){setMsgStatus('Reply body is required.',true);return;}
+
+  if(!body){
+   setMsgStatus('Reply body is required.',true);
+   return;
+  }
 
   let other=otherUserId(selectedMessage);
+  let recipientEmail=otherUserEmail(selectedMessage);
 
   if(other&&!(await canSendTo(other))){
    setMsgStatus('Reply blocked by block/friend safety rules.',true);
    return;
   }
 
+  if(!recipientEmail){
+   setMsgStatus('Reply needs a recipient email from the original message.',true);
+   return;
+  }
+
   let c=await client();
+
   let payload={
+   page_slug:selectedMessage.page_slug||messagePageSlug(),
+   form_submission_id:selectedMessage.form_submission_id||null,
    sender_id:msgUser.id,
    sender_email:msgUser.email,
    sender_name:myName(),
    recipient_id:other||null,
-   recipient_email:mineSender(selectedMessage)?selectedMessage.recipient_email:selectedMessage.sender_email,
+   recipient_email:recipientEmail,
    recipient_name:mineSender(selectedMessage)?participant(selectedMessage,'recipient'):participant(selectedMessage,'sender'),
    subject:'Re: '+(selectedMessage.subject||'Private message'),
    body:body,
    kind:'message_reply',
    status:'sent',
-   meta:{source:'footer_shell_global_messenger_reply',reply_to:selectedMessage.id}
+   meta:{
+    source:'footer_shell_global_messenger_reply',
+    reply_to:selectedMessage.id,
+    page_url:location.href,
+    footer_version:VERSION
+   }
   };
 
   let r=await c.from('sb_private_messages').insert(payload).select('*').maybeSingle();
@@ -1062,6 +1124,8 @@ function boot(){
     unreadCount:unreadCount(),
     friends:friends.length,
     blocks:blocks.length,
+    messagePageSlug:messagePageSlug(),
+    sendPayloadPattern:'form-inbox-compatible',
     tables:['sb_private_messages','sb_profiles','sb_user_friends','sb_user_blocks'],
     schemaChanges:false,
     storageChanges:false,
@@ -1070,7 +1134,7 @@ function boot(){
   }
  };
 
- document.documentElement.dataset.sbFooterShell='v7-12-298';
+ document.documentElement.dataset.sbFooterShell='v7-12-298-1';
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
