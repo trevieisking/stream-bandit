@@ -3,141 +3,524 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Settings Hub V7.12.194</title>
+<title>Stream Bandit Settings Hub V7.12.294</title>
+<link rel="icon" href="stream_bandit_stag_icon_32.png">
+<link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
-*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 40%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}.wrap{max-width:1480px;margin:auto}.hero,.box,.card,.stat{border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 12px 38px #0006;padding:14px;margin-bottom:12px}.hero{padding:18px}.card,.stat{background:#ffffff0f;box-shadow:none;margin-bottom:0}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:5px 9px;font-size:11px}.pill{padding:4px 7px;font-size:10px;margin:2px}h1{font-size:clamp(34px,4.4vw,58px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 9px;font-size:22px}h3{margin:0 0 6px}.muted,p,small,li{color:var(--muted);line-height:1.42}.btn,.tab{border:0;border-radius:999px;padding:8px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.status,.note,.safe{padding:9px 11px;border-radius:15px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(250px,360px);gap:14px}.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:180px;display:grid;place-items:center}.artIcon{font-size:56px}.grid,.stats{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}.actions,.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.card b,.stat b{display:block;color:#baf7df;margin-bottom:5px}.stat span{font-size:22px;font-weight:950}.section{display:none}.section.active{display:block}.card code{display:block;color:#dfffee;background:#0004;border-radius:12px;padding:8px;margin:8px 0;overflow-wrap:anywhere}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}@media(max-width:980px){body{padding:10px}.heroGrid{grid-template-columns:1fr}.btn,.tab{width:100%;white-space:normal}.art{min-height:160px}.grid,.stats{grid-template-columns:1fr}}
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--card:#ffffff0f;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
+body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 40%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}
+.wrap{max-width:1480px;margin:auto}
+.hero,.box,.card,.stat,.routeCard,.check{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0007;padding:15px;margin-bottom:13px}
+.hero{padding:18px}
+.card,.stat,.routeCard,.check{background:var(--card);box-shadow:none;margin-bottom:0}
+.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}
+.badge{padding:5px 9px;font-size:11px}
+.pill{padding:4px 7px;font-size:10px;margin:2px}
+.warnPill{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}
+.badPill{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}
+.cyanPill{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}
+h1{font-size:clamp(34px,4.7vw,62px);line-height:.95;margin:8px 0;letter-spacing:-.055em}
+h2{margin:0 0 10px;font-size:22px}
+h3{margin:0 0 7px;font-size:17px}
+.muted,p,small,label,li{color:var(--muted);line-height:1.45}
+code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5px;color:#dfffee;overflow-wrap:anywhere;word-break:break-word}
+.btn,.tab{border:0;border-radius:999px;padding:9px 12px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}
+.hot{background:linear-gradient(135deg,var(--pink),var(--accent2));color:#fff}
+.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}
+.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}
+.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}
+.status,.note,.danger,.safe{padding:10px 12px;border-radius:16px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:9px}
+.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
+.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}
+.safe{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}
+.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(260px,380px);gap:14px}
+.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:190px;display:grid;place-items:center;overflow:hidden}
+.artIcon{font-size:58px}
+.grid,.stats,.routeGrid,.checks{display:grid;gap:10px}
+.grid,.stats,.checks{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.routeGrid{grid-template-columns:repeat(auto-fill,minmax(235px,1fr))}
+.actions,.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.routeStrip{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}
+.card b,.stat b,.routeCard b,.check b{display:block;color:#baf7df;margin-bottom:6px}
+.stat span{display:block;font-size:clamp(18px,2.1vw,24px);font-weight:950;line-height:1.05;overflow-wrap:anywhere}
+.routeCard p,.card p,.check p{font-size:12px;margin:0 0 8px}
+.routeCard code{display:block;margin:8px 0;padding:9px;border-radius:12px;background:#0006}
+.routeCard a{margin-top:8px}
+.section{display:none}
+.section.active{display:block}
+.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0007;border-radius:14px;padding:12px;color:#dfffee;max-height:420px;overflow:auto}
+.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}
+.pillTabs{padding:10px 12px;border-radius:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--p),#000 14%),color-mix(in srgb,var(--p2),#000 8%));border-color:var(--line);box-shadow:0 10px 30px #0007}
+.pillTabs.topRail{margin-top:-2px}
+.pillTabs .tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pagePill{border:1px solid color-mix(in srgb,var(--line),var(--accent) 22%);border-radius:999px;padding:11px 17px;background:color-mix(in srgb,var(--p),#000 18%);color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;box-shadow:inset 0 1px #ffffff12}
+.pagePill.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:color-mix(in srgb,var(--accent),#fff 18%);color:#061017}
+.pagePill.back{background:color-mix(in srgb,var(--p),#000 24%)}
+.pagePill:hover,.btn:hover,.tab:hover{filter:brightness(1.08)}
+@media(max-width:980px){
+ body{padding:10px}
+ .heroGrid{grid-template-columns:1fr}
+ .btn,.tab,.pagePill{width:100%;white-space:normal}
+ .routeGrid{grid-template-columns:1fr}
+ .art{min-height:160px}
+}
 </style>
 </head>
 <body data-sb-settings-menu-url="settings-platform-control-hub-v7-12-85-test.html">
 <div class="wrap">
+
+<section class="box pillTabs topRail">
+  <div class="tabs" aria-label="Settings group page links">
+    <button class="pagePill back" id="backBtn" type="button">Back</button>
+    <a class="pagePill" href="home-global-helpers-v7-4-4-test.html">Hub</a>
+    <a class="pagePill active" href="settings-platform-control-hub-v7-12-85-test.html">Settings Hub</a>
+    <a class="pagePill" href="web-builder-theme-studio-controls-v7-8-9-test.html">Theme Studio</a>
+    <a class="pagePill" href="profile-settings-live-ready-v7-12-90-test.html">Profile Settings</a>
+    <a class="pagePill" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Web Builder</a>
+    <a class="pagePill" href="web-builder-pages-manager-v7-12-111-test.html">Pages Manager</a>
+    <a class="pagePill" href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Published Preview</a>
+    <a class="pagePill" href="settings-brand-icons-promoted-v7-12-21-test.html">Brand / App Icons</a>
+    <a class="pagePill" href="brand-logo-helper-responsive-v7-12-20-test.html">Brand Helper</a>
+    <a class="pagePill" href="favicon-app-icon-builder-v7-12-15-test.html">Favicon Builder</a>
+    <a class="pagePill" href="accessibility-clean-machine-v7-12-44-test.html">Accessibility</a>
+    <a class="pagePill" href="policy-documents-centre-v7-12-119-test.html">Policy Centre</a>
+  </div>
+</section>
+
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.194 Settings Hub · Header Count Fix</span>
+      <span class="badge">V7.12.294 Settings Hub · Web Builder Doorway</span>
       <h1>Settings Hub</h1>
-      <p>Clean Settings doorway using current route truth only. This hub does not write to Supabase, does not save settings directly, and does not hide bugs inside Theme Studio, Profile Settings or Web Builder.</p>
+      <p>Settings Hub is the safe doorway into Web Builder, Theme Studio, Profile Settings, Brand tools, Accessibility and Policy routes. This page is a map and health doorway only: it does not write to Supabase and does not save settings directly.</p>
+      <div class="routeStrip">
+        <span>Doorway → Web Builder</span>
+        <span>Global theme → Theme Studio</span>
+        <span>Profile → Profile Settings</span>
+        <span>Brand → App Icons / Helpers</span>
+        <span>Writes here → none</span>
+      </div>
       <div class="actions">
-        <a class="btn hot" href="web-builder-theme-studio-controls-v7-8-9-test.html">Theme Studio</a>
-        <a class="btn cyan" href="profile-settings-live-ready-v7-12-90-test.html">Profile Settings</a>
-        <a class="btn warn" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Web Builder</a>
-        <a class="btn primary" href="settings-brand-icons-promoted-v7-12-21-test.html">Brand / App Icons</a>
-        <a class="btn" href="policy-documents-centre-v7-12-119-test.html">Policy Documents</a>
-        <a class="btn" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Movie Row Editor</a>
+        <button id="refreshBtn" class="btn primary" type="button">Refresh Foundation</button>
       </div>
       <div id="status" class="status">Settings Hub ready. No direct writes from this page.</div>
       <div id="helperStatus" class="note">Checking foundation...</div>
     </div>
-    <div class="art"><div class="artIcon">⚙️✅</div></div>
+    <div class="art"><div class="artIcon">⚙️🏗️</div></div>
   </div>
 </section>
 
 <section class="box">
-  <h2>Settings tabs</h2>
+  <h2>Settings tools</h2>
   <div class="tabs">
     <button class="tab active" data-tab="overview" type="button">Overview</button>
-    <button class="tab" data-tab="global" type="button">Global settings</button>
+    <button class="tab" data-tab="builder" type="button">Web Builder Doorway</button>
+    <button class="tab" data-tab="global" type="button">Global Settings</button>
     <button class="tab" data-tab="account" type="button">Account</button>
-    <button class="tab" data-tab="builder" type="button">Web Builder</button>
     <button class="tab" data-tab="brandPolicy" type="button">Brand / Policy</button>
-    <button class="tab" data-tab="safety" type="button">Safety</button>
+    <button class="tab" data-tab="safety" type="button">Safety Rules</button>
+    <button class="tab" data-tab="debugTab" type="button">Debug</button>
   </div>
 </section>
 
 <section id="overview" class="box section active">
   <h2>Settings group status</h2>
-  <div class="stats">
-    <div class="stat"><b>Current useful routes</b><span>6</span><p>Theme, Profile, Builder, Brand, Policy and Movie Row Editor.</p></div>
-    <div class="stat"><b>Local visual shell</b><span>0</span><p>Header and footer are owned by the current shell files.</p></div>
-    <div class="stat"><b>Supabase writes here</b><span>0</span><p>This page is a route hub only.</p></div>
-    <div class="stat"><b>Header save counts</b><span>Restored</span><p>Supabase SDK and core saves helper are loaded for Watchlist/Favourites/Likes counters.</p></div>
+  <div id="stats" class="stats"></div>
+  <div class="grid" style="margin-top:10px">
+    <div class="card"><b>Main purpose</b><p>This page is a clean Settings doorway. Web Builder is the strongest doorway target, but Theme, Profile, Brand, Accessibility and Policy routes remain visible.</p></div>
+    <div class="card"><b>No direct writes</b><p>Settings Hub does not create, edit, delete, upload, publish, migrate, change schema, or save settings directly.</p></div>
+    <div class="card"><b>Bug visibility</b><p>Broken or unfinished downstream pages stay visible as route owners. This hub must not hide bugs inside Theme Studio, Profile Settings, Web Builder or Brand tools.</p></div>
+    <div class="card"><b>Global effect rule</b><p>A control only counts as global when it affects other pages through Theme Projector, Settings Global, Brand Logo or another protected helper path.</p></div>
+  </div>
+</section>
+
+<section id="builder" class="box section">
+  <h2>Web Builder Doorway</h2>
+  <p class="muted">This is the main doorway area. It points into the current builder route family without changing the builder engine, schema, RLS, storage or published routes.</p>
+  <div class="routeGrid">
+    <div class="routeCard">
+      <span class="pill cyanPill">Primary doorway</span>
+      <b>Web Builder Studio</b>
+      <p>Current builder work route. This hub opens it but does not rewrite it.</p>
+      <code>web-builder-live-studio-v7-12-116-test.html?page=test-page</code>
+      <a class="btn warn" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Open Web Builder</a>
+    </div>
+    <div class="routeCard">
+      <span class="pill">Support route</span>
+      <b>Pages Manager</b>
+      <p>Page list, page management, guarded page actions and builder route entry.</p>
+      <code>web-builder-pages-manager-v7-12-111-test.html</code>
+      <a class="btn primary" href="web-builder-pages-manager-v7-12-111-test.html">Open Pages Manager</a>
+    </div>
+    <div class="routeCard">
+      <span class="pill">Output route</span>
+      <b>Published Preview</b>
+      <p>Preview route for builder output and page blocks.</p>
+      <code>web-builder-shared-style-preview-v7-12-117-test.html?page=test-page</code>
+      <a class="btn" href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Open Published Preview</a>
+    </div>
+    <div class="routeCard">
+      <span class="pill warnPill">Future studio rule</span>
+      <b>Builder shell stays separate</b>
+      <p>Web Builder can become its own studio shell later. This Settings doorway does not merge builder chrome into the Stream Bandit app shell.</p>
+      <code>web-builder-live-studio-v7-12-116-test.html</code>
+    </div>
   </div>
 </section>
 
 <section id="global" class="box section">
   <h2>Global settings owners</h2>
-  <div class="grid">
-    <div class="card"><b>Theme Studio</b><p>Global theme controls and visual settings owner.</p><code>web-builder-theme-studio-controls-v7-8-9-test.html</code><a class="btn hot" href="web-builder-theme-studio-controls-v7-8-9-test.html">Open Theme Studio</a></div>
-    <div class="card"><b>Accessibility</b><p>Player comfort, readability and accessibility route.</p><code>accessibility-clean-machine-v7-12-44-test.html</code><a class="btn primary" href="accessibility-clean-machine-v7-12-44-test.html">Open Accessibility</a></div>
-    <div class="card"><b>Movie Row Editor</b><p>Admin/test workbench for movie rows. High-risk; do not rewrite casually.</p><code>supabase-library-home-header-form-fix-v7-12-34-test.html</code><a class="btn" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Open Movie Editor</a></div>
+  <div class="routeGrid">
+    <div class="routeCard">
+      <b>Theme Studio</b>
+      <p>Global visual theme controls and app styling owner.</p>
+      <code>web-builder-theme-studio-controls-v7-8-9-test.html</code>
+      <a class="btn hot" href="web-builder-theme-studio-controls-v7-8-9-test.html">Open Theme Studio</a>
+    </div>
+    <div class="routeCard">
+      <b>Accessibility</b>
+      <p>Readability, player comfort and accessibility controls. Critical because louder audio and comfort settings must remain protected.</p>
+      <code>accessibility-clean-machine-v7-12-44-test.html</code>
+      <a class="btn primary" href="accessibility-clean-machine-v7-12-44-test.html">Open Accessibility</a>
+    </div>
+    <div class="routeCard">
+      <b>Settings Global Helper</b>
+      <p>Protected helper path for settings projection. Do not rewrite it from this hub.</p>
+      <code>stream-bandit-settings-global-v7-1-8.js</code>
+    </div>
+    <div class="routeCard">
+      <b>Theme Projector</b>
+      <p>Protected helper path that applies theme variables across pages.</p>
+      <code>stream-bandit-theme-projector-v7-12-156.js</code>
+    </div>
   </div>
 </section>
 
 <section id="account" class="box section">
   <h2>Account and profile</h2>
-  <div class="grid">
-    <div class="card"><b>Profile Settings</b><p>Profile image, profile row and account display owner.</p><code>profile-settings-live-ready-v7-12-90-test.html</code><a class="btn cyan" href="profile-settings-live-ready-v7-12-90-test.html">Open Profile</a></div>
-    <div class="card"><b>Account rule</b><p>Signed-in state must remain consistent between Settings, Home, Submit Video, Review Queue and admin/editor pages.</p></div>
-    <div class="card"><b>User ownership later</b><p>One channel, user playlists and user collections can be planned later through manager pages, not forced into this hub.</p></div>
-  </div>
-</section>
-
-<section id="builder" class="box section">
-  <h2>Web Builder</h2>
-  <div class="grid">
-    <div class="card"><b>Web Builder Studio</b><p>Current app route for builder work.</p><code>web-builder-live-studio-v7-12-116-test.html?page=test-page</code><a class="btn warn" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Open Web Builder</a></div>
-    <div class="card"><b>Pages Manager</b><p>Page list, create/hide/restore and guarded page management.</p><code>web-builder-pages-manager-v7-12-111-test.html</code><a class="btn primary" href="web-builder-pages-manager-v7-12-111-test.html">Open Pages Manager</a></div>
-    <div class="card"><b>Published Preview</b><p>Preview route for builder output.</p><code>web-builder-shared-style-preview-v7-12-117-test.html?page=test-page</code><a class="btn" href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Open Preview</a></div>
+  <div class="routeGrid">
+    <div class="routeCard">
+      <b>Profile Settings</b>
+      <p>Profile image, account display and profile-row settings owner.</p>
+      <code>profile-settings-live-ready-v7-12-90-test.html</code>
+      <a class="btn cyan" href="profile-settings-live-ready-v7-12-90-test.html">Open Profile Settings</a>
+    </div>
+    <div class="routeCard">
+      <b>Account consistency rule</b>
+      <p>Signed-in state must remain consistent across Settings, Home, Submit Video, Review Queue, Web Builder and admin/editor pages.</p>
+      <code>sb_profiles + Supabase Auth</code>
+    </div>
+    <div class="routeCard">
+      <b>User Dashboard link</b>
+      <p>User/admin dashboards remain separate from Settings Hub. This hub does not grant owner/admin authority.</p>
+      <code>user-management-dashboard-v7-11-2-test.html</code>
+      <a class="btn" href="user-management-dashboard-v7-11-2-test.html">Open User Dashboard</a>
+    </div>
   </div>
 </section>
 
 <section id="brandPolicy" class="box section">
-  <h2>Brand and policy</h2>
-  <div class="grid">
-    <div class="card"><b>Brand / App Icons</b><p>Main brand/icon controls.</p><code>settings-brand-icons-promoted-v7-12-21-test.html</code><a class="btn primary" href="settings-brand-icons-promoted-v7-12-21-test.html">Open Brand Icons</a></div>
-    <div class="card"><b>Brand Image Helper</b><p>Standalone brand image helper.</p><code>brand-logo-helper-responsive-v7-12-20-test.html</code><a class="btn" href="brand-logo-helper-responsive-v7-12-20-test.html">Open Brand Helper</a></div>
-    <div class="card"><b>Favicon / App Icon Builder</b><p>Standalone favicon/app icon builder.</p><code>favicon-app-icon-builder-v7-12-15-test.html</code><a class="btn" href="favicon-app-icon-builder-v7-12-15-test.html">Open Favicon Builder</a></div>
-    <div class="card"><b>Policy Documents</b><p>Current policy and FAQ centre.</p><code>policy-documents-centre-v7-12-119-test.html</code><a class="btn" href="policy-documents-centre-v7-12-119-test.html">Open Policy Centre</a></div>
-    <div class="card"><b>Policy Admin</b><p>Current policy document editor.</p><code>policy-admin-documents-v7-12-120-test.html?policy=terms</code><a class="btn" href="policy-admin-documents-v7-12-120-test.html?policy=terms">Open Policy Admin</a></div>
+  <h2>Brand, icons and policy</h2>
+  <div class="routeGrid">
+    <div class="routeCard">
+      <b>Brand / App Icons</b>
+      <p>Main brand/icon controls and app icon route.</p>
+      <code>settings-brand-icons-promoted-v7-12-21-test.html</code>
+      <a class="btn primary" href="settings-brand-icons-promoted-v7-12-21-test.html">Open Brand / App Icons</a>
+    </div>
+    <div class="routeCard">
+      <b>Brand Image Helper</b>
+      <p>Standalone brand helper route. Keep it visible until the Settings group proves it clean.</p>
+      <code>brand-logo-helper-responsive-v7-12-20-test.html</code>
+      <a class="btn" href="brand-logo-helper-responsive-v7-12-20-test.html">Open Brand Helper</a>
+    </div>
+    <div class="routeCard">
+      <b>Favicon / App Icon Builder</b>
+      <p>Standalone favicon and app icon builder.</p>
+      <code>favicon-app-icon-builder-v7-12-15-test.html</code>
+      <a class="btn" href="favicon-app-icon-builder-v7-12-15-test.html">Open Favicon Builder</a>
+    </div>
+    <div class="routeCard">
+      <b>Policy Documents</b>
+      <p>Current policy and FAQ centre.</p>
+      <code>policy-documents-centre-v7-12-119-test.html</code>
+      <a class="btn" href="policy-documents-centre-v7-12-119-test.html">Open Policy Centre</a>
+    </div>
+    <div class="routeCard">
+      <b>Policy Admin</b>
+      <p>Policy document editor. Admin/owner locks should be handled by the route itself, not by this hub pretending to secure it.</p>
+      <code>policy-admin-documents-v7-12-120-test.html?policy=terms</code>
+      <a class="btn" href="policy-admin-documents-v7-12-120-test.html?policy=terms">Open Policy Admin</a>
+    </div>
+    <div class="routeCard">
+      <b>Pricing Matrix</b>
+      <p>Plans, pricing and feature matrix route. Important for admin/owner/user account rules.</p>
+      <code>plans-pricing-feature-shop-v7-11-3-test.html</code>
+      <a class="btn warn" href="plans-pricing-feature-shop-v7-11-3-test.html">Open Pricing Matrix</a>
+    </div>
   </div>
 </section>
 
 <section id="safety" class="box section">
   <h2>Settings safety rules</h2>
-  <div class="grid">
-    <div class="card"><b>No broad rewrites</b><p>Theme Studio, Profile Settings and Web Builder are high-risk. Scan first, rewrite only if proven broken.</p></div>
-    <div class="card"><b>No fake global controls</b><p>A setting only counts as global when it affects other pages through the theme/projector/helper path.</p></div>
-    <div class="card"><b>No machine clutter</b><p>Debug/machine pages stay in Owner/Admin routes, not inside this Settings doorway.</p></div>
-    <div class="card"><b>Current route truth</b><p>This hub uses the V7.12.189 manifest route truth and the Owner Brand full-pass routes.</p></div>
+  <div class="checks">
+    <div class="check"><b>No direct writer</b><p>Settings Hub does not write to Supabase, upload files, delete files, publish pages or save settings.</p></div>
+    <div class="check"><b>Do not hide bugs</b><p>Theme Studio, Profile Settings, Web Builder, Brand tools and Policy routes must stay visible until each page is tested.</p></div>
+    <div class="check"><b>Global proof needed</b><p>Settings only pass when the chosen controls affect other pages through global helper paths.</p></div>
+    <div class="check"><b>Protected helpers stay protected</b><p>Header Shell, Footer Shell, Theme Projector, Settings Global, Brand Logo, Core Saves, Menu Counts and Search Fallback are not rewritten here.</p></div>
+    <div class="check"><b>No schema/storage/RLS</b><p>This pass does not change schema, storage policies, RLS, table names, bucket names, route registry or index.</p></div>
+    <div class="check"><b>Web Builder doorway</b><p>This hub can point into Web Builder, but Builder itself remains its own route family and future studio shell work stays isolated.</p></div>
   </div>
-  <div class="safe">This hub is safe because it only routes to the current owner pages and reads save counts. It does not create, edit, delete, upload, publish, migrate or change schema.</div>
+  <div class="safe">Safe page role: route map, foundation check and Settings group starting point only.</div>
 </section>
 
-<p class="micro">Settings Hub refit: Header Shell + Settings Hub Content + Footer Shell + Theme Projector. Current routes and header save counts.</p>
+<section id="debugTab" class="box section">
+  <h2>Debug</h2>
+  <div id="debug" class="source">Waiting...</div>
+</section>
+
+<p class="micro">Settings Hub V7.12.294: Web Builder doorway + Settings route map + clean rail. No Supabase writes. No schema/storage/RLS/index/global-helper changes.</p>
 </div>
 
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=settings-hub-7-12-194"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=settings-hub-7-12-194"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=settings-hub-7-12-194"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=settings-hub-7-12-194"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=settings-hub-7-12-194"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=settings-hub-7-12-194"></script>
+<script src="stream-bandit-shell-v6-24.js?v=settings-web-builder-doorway-294"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=settings-web-builder-doorway-294"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=settings-web-builder-doorway-294"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=settings-web-builder-doorway-294"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=settings-web-builder-doorway-294"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=settings-web-builder-doorway-294"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=settings-web-builder-doorway-294"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=settings-web-builder-doorway-294"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=settings-web-builder-doorway-294"></script>
+
 <script>
 (function(){
 'use strict';
-const VERSION='V7.12.194 Settings Hub Header Count Fix';
+
+const VERSION='V7.12.294 Settings Hub Web Builder Doorway';
+let countBusy=false;
+let countReady=false;
+let lastCountRead=0;
+let debugState={};
+
 const $=id=>document.getElementById(id);
-async function refreshCounts(){
- try{
-  if(window.StreamBanditCoreSavesV675&&window.StreamBanditCoreSavesV675.init)await window.StreamBanditCoreSavesV675.init();
-  if(window.StreamBanditCoreSavesV675&&window.StreamBanditCoreSavesV675.refresh)await window.StreamBanditCoreSavesV675.refresh();
-  if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)await window.StreamBanditMenuSavesCount.refresh();
-  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();
- }catch(e){}
+
+const ROUTES=[
+ {group:'Web Builder',name:'Web Builder Studio',url:'web-builder-live-studio-v7-12-116-test.html?page=test-page',primary:true},
+ {group:'Web Builder',name:'Pages Manager',url:'web-builder-pages-manager-v7-12-111-test.html'},
+ {group:'Web Builder',name:'Published Preview',url:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page'},
+ {group:'Global',name:'Theme Studio',url:'web-builder-theme-studio-controls-v7-8-9-test.html'},
+ {group:'Global',name:'Accessibility',url:'accessibility-clean-machine-v7-12-44-test.html'},
+ {group:'Account',name:'Profile Settings',url:'profile-settings-live-ready-v7-12-90-test.html'},
+ {group:'Brand',name:'Brand / App Icons',url:'settings-brand-icons-promoted-v7-12-21-test.html'},
+ {group:'Brand',name:'Brand Image Helper',url:'brand-logo-helper-responsive-v7-12-20-test.html'},
+ {group:'Brand',name:'Favicon / App Icon Builder',url:'favicon-app-icon-builder-v7-12-15-test.html'},
+ {group:'Policy',name:'Policy Centre',url:'policy-documents-centre-v7-12-119-test.html'},
+ {group:'Policy',name:'Policy Admin',url:'policy-admin-documents-v7-12-120-test.html?policy=terms'},
+ {group:'Plans',name:'Pricing Matrix',url:'plans-pricing-feature-shop-v7-11-3-test.html'},
+ {group:'Users',name:'User Dashboard',url:'user-management-dashboard-v7-11-2-test.html'}
+];
+
+function routeCount(group){
+ return ROUTES.filter(r=>r.group===group).length;
 }
+
+function stat(label,value,body){
+ return '<div class="stat"><b>'+label+'</b><span>'+value+'</span><p>'+body+'</p></div>';
+}
+
+function renderStats(){
+ const el=$('stats');
+ if(!el)return;
+
+ el.innerHTML=
+  stat('Web Builder doorway','YES','Main doorway route is visible and preserved.')+
+  stat('Useful routes',String(ROUTES.length),'Settings, builder, brand, policy, account and plan routes are mapped.')+
+  stat('Direct Supabase writes','0','This hub does not insert, update, delete, upload or publish.')+
+  stat('Builder routes',String(routeCount('Web Builder')),'Studio, Pages Manager and Published Preview stay visible.')+
+  stat('Brand routes',String(routeCount('Brand')),'Brand/App Icons, Brand Helper and Favicon Builder stay visible.')+
+  stat('Global helpers','Protected','Theme, settings, brand, shell, counts and search helpers are loaded, not rewritten.');
+}
+
+function tabs(){
+ document.querySelectorAll('[data-tab]').forEach(btn=>{
+  btn.onclick=()=>{
+   document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));
+   document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+   btn.classList.add('active');
+   let section=$(btn.dataset.tab);
+   if(section)section.classList.add('active');
+   helper();
+   refreshSavedCounters(false);
+   renderDebug('tab '+btn.dataset.tab);
+  };
+ });
+}
+
+async function refreshSavedCounters(force){
+ const now=Date.now();
+
+ if(countBusy)return;
+
+ if(!force&&lastCountRead&&now-lastCountRead<12000){
+  try{
+   if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();
+  }catch(e){}
+  return;
+ }
+
+ countBusy=true;
+
+ try{
+  const core=window.StreamBanditCoreSavesV675;
+
+  if(core){
+   if(!countReady&&core.init){
+    await core.init();
+    countReady=true;
+   }else if(core.refresh){
+    await core.refresh();
+   }
+  }
+
+  if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();
+  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();
+
+  lastCountRead=Date.now();
+ }catch(e){}
+ finally{
+  countBusy=false;
+ }
+}
+
+function settingsGlobalLoaded(){
+ return !!(window.StreamBanditSettingsGlobal||window.StreamBanditSettingsGlobalV718||window.StreamBanditSettingsGlobalV718Ready);
+}
+
+function brandLoaded(){
+ return !!(window.StreamBanditBrandLogo||window.StreamBanditBrandLogoV71212||window.StreamBanditBrandLogoHelper);
+}
+
 function helper(){
  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}
  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
  try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
- try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();}catch(e){}
- let h=$('helperStatus');
- if(h)h.innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Supabase SDK '+(window.supabase?'✅':'⚠️')+' · Save counts '+(window.StreamBanditMenuSavesCount?'✅':'⚠️')+' · '+VERSION;
+
+ refreshSavedCounters(false);
+
+ const status=
+  '<b>Foundation:</b> Shell '+(window.StreamBanditShell?'✅':'⚠️')+
+  ' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
+  ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
+  ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
+  ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
+  ' · Counts '+(window.StreamBanditMenuSavesCount?'✅':'⚠️')+
+  ' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+
+  ' · Settings '+(settingsGlobalLoaded()?'✅':'⚠️')+
+  ' · Brand '+(brandLoaded()?'✅':'⚠️');
+
+ $('helperStatus').innerHTML=status;
 }
+
+function renderDebug(step){
+ debugState={
+  version:VERSION,
+  step:step||'render',
+  route:'settings-platform-control-hub-v7-12-85-test.html',
+  pageRole:'Settings Hub and Web Builder doorway',
+  directWrites:false,
+  supabaseWrites:false,
+  savesSettingsDirectly:false,
+  uploads:false,
+  deletes:false,
+  publishes:false,
+  migrates:false,
+  schemaChange:false,
+  storagePolicyChange:false,
+  rlsChange:false,
+  indexPromotion:false,
+  globalHelperRewrite:false,
+  routeGroups:{
+   webBuilder:ROUTES.filter(r=>r.group==='Web Builder'),
+   global:ROUTES.filter(r=>r.group==='Global'),
+   account:ROUTES.filter(r=>r.group==='Account'),
+   brand:ROUTES.filter(r=>r.group==='Brand'),
+   policy:ROUTES.filter(r=>r.group==='Policy'),
+   plans:ROUTES.filter(r=>r.group==='Plans'),
+   users:ROUTES.filter(r=>r.group==='Users')
+  },
+  helperPresence:{
+   shell:!!window.StreamBanditShell,
+   header:!!window.StreamBanditHeaderShell,
+   footer:!!window.StreamBanditFooterShell,
+   theme:!!window.StreamBanditThemeProjector,
+   saves:!!window.StreamBanditCoreSavesV675,
+   counts:!!window.StreamBanditMenuSavesCount,
+   search:!!window.StreamBanditLiveReadinessSearchFallback,
+   settings:settingsGlobalLoaded(),
+   brand:brandLoaded(),
+   supabaseSdk:!!window.supabase
+  },
+  safetyRules:{
+   webBuilderDoorway:true,
+   notOnlyRoute:true,
+   noBugHiding:true,
+   downstreamPagesMustBeTestedIndividually:true,
+   globalSettingsMustAffectOtherPages:true
+  }
+ };
+
+ $('debug').textContent=JSON.stringify(debugState,null,2);
+}
+
 function wire(){
- document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));btn.classList.add('active');let s=$(btn.dataset.tab);if(s)s.classList.add('active');helper();refreshCounts();});
+ tabs();
+
+ $('backBtn').onclick=()=>{
+  if(history.length>1)history.back();
+  else location.href='home-global-helpers-v7-4-4-test.html';
+ };
+
+ $('refreshBtn').onclick=()=>{
+  helper();
+  refreshSavedCounters(true);
+  renderStats();
+  renderDebug('manual refresh');
+  $('status').textContent='Foundation refreshed. Settings Hub remains doorway-only with no direct writes.';
+ };
 }
-wire();helper();refreshCounts();setTimeout(helper,700);setTimeout(refreshCounts,900);setTimeout(helper,1800);setTimeout(refreshCounts,2200);setInterval(helper,6000);setInterval(refreshCounts,15000);
+
+function boot(){
+ wire();
+ renderStats();
+ helper();
+ renderDebug('boot');
+ refreshSavedCounters(true);
+
+ setTimeout(helper,700);
+ setTimeout(()=>refreshSavedCounters(true),900);
+ setTimeout(()=>renderDebug('settled'),1200);
+ setTimeout(helper,1800);
+ setInterval(helper,6000);
+ setInterval(()=>refreshSavedCounters(false),15000);
+
+ document.documentElement.dataset.sbSettingsHub='v7-12-294';
+ window.StreamBanditSettingsHubV712294={
+  version:VERSION,
+  routes:ROUTES.slice(),
+  current:function(){return debugState;},
+  refresh:function(){helper();refreshSavedCounters(true);renderDebug('external refresh');}
+ };
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
+
 })();
 </script>
 </body>
