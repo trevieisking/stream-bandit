@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Profile Settings V7.12.296</title>
+<title>Stream Bandit Profile Settings V7.12.296.1</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -69,15 +69,16 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 .pagePill{border:1px solid color-mix(in srgb,var(--line),var(--accent) 22%);border-radius:999px;padding:11px 17px;background:color-mix(in srgb,var(--p),#000 18%);color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;box-shadow:inset 0 1px #ffffff12}
 .pagePill.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:color-mix(in srgb,var(--accent),#fff 18%);color:#061017}
 .pagePill.back{background:color-mix(in srgb,var(--p),#000 24%)}
-.sb-h-account{display:inline-flex!important;align-items:center!important;gap:8px!important}
-.sb-profile-chip-avatar{width:25px;height:25px;border-radius:999px;overflow:hidden;border:1px solid #ffffff55;background:#0005;display:inline-grid;place-items:center;flex:0 0 auto}
-.sb-profile-chip-avatar img{width:100%;height:100%;object-fit:cover}
+.sb-h-account{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;white-space:nowrap!important}
+.sb-profile-chip-avatar{width:26px;height:26px;border-radius:999px;overflow:hidden;border:1px solid #ffffff66;background:#0005;display:inline-grid;place-items:center;flex:0 0 auto;font-size:15px;line-height:1}
+.sb-profile-chip-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .mini{text-align:center;color:#8f98b8;margin:28px 0;font-size:12px}
 @media(max-width:980px){
  body{padding:10px}
  .heroGrid,.modalGrid{grid-template-columns:1fr}
  .btn,.tab,.locked,.pagePill{width:100%;white-space:normal}
  .routeGrid{grid-template-columns:1fr}
+ .sb-h-account{width:auto!important;min-width:0!important}
 }
 </style>
 </head>
@@ -103,14 +104,14 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.296 Profile Settings · Header Avatar Bridge</span>
+      <span class="badge">V7.12.296.1 Profile Settings · Account Chip Avatar Fix</span>
       <h1>Profile Settings</h1>
-      <p>Safe account/profile destination. Existing users can sign in with magic link, load their own profile row, update profile text, upload avatar/banner images, and sync the header account chip to the signed-in user.</p>
+      <p>Safe account/profile destination. Existing users can sign in with magic link, load their own profile row, update profile text, upload avatar/banner images, and sync the top header Account chip to the signed-in user’s own avatar.</p>
       <div class="routeStrip">
-        <span>Owner → Profile Settings</span>
-        <span>Profile row → sb_profiles</span>
-        <span>Images → stream-bandit-images</span>
-        <span>Header bridge → current user only</span>
+        <span>Auth → current session</span>
+        <span>Avatar → sb_profiles.avatar_url</span>
+        <span>Header chip → current user only</span>
+        <span>Cache → cleared on user switch</span>
         <span>Signup → locked</span>
       </div>
 
@@ -130,10 +131,10 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
       <div class="actions">
         <button id="loadProfile" class="btn primary" type="button">Load Profile</button>
         <button id="createProfile" class="btn cyan" type="button">Create Missing Profile Row</button>
-        <button id="saveText" class="btn hot" type="button">Save Text + Sync Header</button>
+        <button id="saveText" class="btn hot" type="button">Save Text + Sync Chip</button>
         <button id="openAvatar" class="btn cyan" type="button">Edit Avatar</button>
         <button id="openBanner" class="btn warn" type="button">Edit Banner</button>
-        <button id="syncHeader" class="btn" type="button">Sync Header Account Chip</button>
+        <button id="syncHeader" class="btn" type="button">Sync Account Chip</button>
       </div>
 
       <div id="helperStatus" class="status">Checking helpers...</div>
@@ -159,7 +160,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div class="stats">
     <div class="stat"><b>Signed in</b><span id="statSigned">--</span><p>Supabase Auth state.</p></div>
     <div class="stat"><b>Profile row</b><span id="statProfile">--</span><p>Current signed-in user’s sb_profiles row.</p></div>
-    <div class="stat"><b>Header avatar</b><span id="statHeader">--</span><p>Account chip bridge state.</p></div>
+    <div class="stat"><b>Account chip</b><span id="statHeader">--</span><p>Top header Account chip avatar state.</p></div>
     <div class="stat"><b>Signup mode</b><span>Locked</span><p>Existing users only.</p></div>
     <div class="stat"><b>Storage</b><span>Images</span><p>Avatar/banner only.</p></div>
   </div>
@@ -170,7 +171,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
     <button class="tab active" data-tab="profile" type="button">Profile Text</button>
     <button class="tab" data-tab="images" type="button">Images</button>
     <button class="tab" data-tab="previewSec" type="button">Preview</button>
-    <button class="tab" data-tab="headerBridgeSec" type="button">Header Bridge</button>
+    <button class="tab" data-tab="headerBridgeSec" type="button">Account Chip Bridge</button>
     <button class="tab" data-tab="testSec" type="button">Spare Test Guide</button>
     <button class="tab" data-tab="debugSec" type="button">Debug</button>
   </div>
@@ -192,7 +193,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
     <div class="card">
       <b>Avatar</b>
       <div id="avatarPreview" class="avatar">👤</div>
-      <p>Open editor to choose, preview, upload and save. Saving avatar also updates the header account chip for the current signed-in user.</p>
+      <p>Open editor to choose, preview, upload and save. Saving avatar updates <code>sb_profiles.avatar_url</code> and the top header Account chip.</p>
       <button id="openAvatar2" class="btn cyan" type="button">Open Avatar Editor</button>
       <input id="avatarUrl" readonly placeholder="avatar_url">
     </div>
@@ -220,12 +221,12 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 </section>
 
 <section id="headerBridgeSec" class="box section">
-  <h2>Header account chip bridge</h2>
+  <h2>Top header Account chip bridge</h2>
   <div class="checks">
-    <div class="check"><b>Current user only</b><p>The header cache is written only when <code>profile.id</code> matches the current Supabase Auth user id.</p></div>
-    <div class="check"><b>No locked avatar</b><p>If Trevor signs in, Trevor’s avatar is cached. If Kayleigh signs in, Kayleigh’s avatar replaces that cache after session refresh/load.</p></div>
-    <div class="check"><b>Immediate sync</b><p>Save Text, avatar upload, banner upload and Sync Header all refresh the header shell and patch the visible account chip.</p></div>
-    <div class="check"><b>Sign out cleanup</b><p>Sign out clears profile cache keys so the next account cannot inherit the previous account avatar.</p></div>
+    <div class="check"><b>Reads Auth + sb_profiles</b><p>The page reads the current Supabase Auth session, then loads <code>sb_profiles</code> where <code>id = auth.user.id</code>.</p></div>
+    <div class="check"><b>Current user only</b><p>The header cache is written only when the profile row belongs to the current Auth user.</p></div>
+    <div class="check"><b>No locked avatar</b><p>Trevor’s browser gets Trevor’s avatar. Kayleigh’s browser gets Kayleigh’s avatar. Switching accounts clears stale cached profile values.</p></div>
+    <div class="check"><b>Survives header refresh</b><p>This page patches the visible Account chip after header helper refresh/update calls so it does not revert to plain <code>Account ✓</code>.</p></div>
   </div>
   <div id="bridgeStatus" class="safe">Waiting for profile sync...</div>
 </section>
@@ -234,9 +235,9 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <h2>Spare-account test guide</h2>
   <div class="grid">
     <div class="card"><b>Existing-only login</b><p>This page sends magic links only to existing Auth users.</p></div>
-    <div class="card"><b>Admin browser</b><p>Keep your main admin/owner account signed in here and upload your avatar.</p></div>
-    <div class="card"><b>Kayleigh browser</b><p>Use another browser/private window for Kayleigh’s existing account and upload her avatar.</p></div>
-    <div class="card"><b>Header proof</b><p>After saving, the account chip should show that signed-in user’s avatar, not the other user’s avatar.</p></div>
+    <div class="card"><b>Admin/owner browser</b><p>Sign in as your account and upload your avatar. The top Account chip should show your image.</p></div>
+    <div class="card"><b>Kayleigh browser</b><p>Use another browser/private window for Kayleigh’s account and upload her avatar. The chip should show her image there.</p></div>
+    <div class="card"><b>Switch proof</b><p>Sign out, sign in as the other account, Load Profile, then Sync Account Chip. The old avatar should not remain.</p></div>
     <div class="card"><b>No public signup</b><p>New unknown emails should not create Auth users from this page.</p></div>
     <div class="card"><b>Missing profile row</b><p>Create Missing Profile Row is only for an already signed-in existing Auth user without a profile row.</p></div>
   </div>
@@ -247,7 +248,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="mini">V7.12.296 Profile Settings — existing-user-only magic link, own-profile editing, avatar/banner upload, current-user header avatar bridge.</p>
+<p class="mini">V7.12.296.1 Profile Settings — own profile editing + sb_profiles avatar + top Account chip avatar bridge + stale account cache guard.</p>
 </div>
 
 <div id="imageModal" class="modal">
@@ -269,7 +270,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
         <label class="muted">Public URL after upload</label>
         <input id="modalUrl" readonly placeholder="Public URL will appear here">
         <div class="actions">
-          <button id="uploadSaveImage" class="btn hot" type="button">Upload + Save + Sync Header</button>
+          <button id="uploadSaveImage" class="btn hot" type="button">Upload + Save + Sync Chip</button>
           <button id="useExistingImage" class="btn cyan" type="button">Use Current URL</button>
         </div>
         <div id="modalStatus" class="status">Waiting...</div>
@@ -278,28 +279,28 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   </div>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=profile-header-avatar-296"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=profile-header-avatar-296"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=profile-header-avatar-296"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=profile-header-avatar-296"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=profile-header-avatar-296"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=profile-header-avatar-296"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=profile-header-avatar-296"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=profile-header-avatar-296"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=profile-header-avatar-296"></script>
+<script src="stream-bandit-shell-v6-24.js?v=profile-chip-avatar-296-1"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=profile-chip-avatar-296-1"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=profile-chip-avatar-296-1"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=profile-chip-avatar-296-1"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=profile-chip-avatar-296-1"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=profile-chip-avatar-296-1"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=profile-chip-avatar-296-1"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=profile-chip-avatar-296-1"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=profile-chip-avatar-296-1"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.296 Profile Settings Header Avatar Bridge';
+const VERSION='V7.12.296.1 Profile Settings Account Chip Avatar Fix';
 const BUCKET='stream-bandit-images';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const PROFILE_CACHE_KEYS=['sb_header_profile_cache_v7_12_156','streamBanditProfile','sb_profile'];
 const PROFILE_ROUTE='profile-settings-live-ready-v7-12-90-test.html';
 
-let sb=null,user=null,profile=null,currentKind='avatar',selectedFile=null,countBusy=false,countReady=false,lastCountRead=0;
+let sb=null,user=null,profile=null,currentKind='avatar',selectedFile=null,countBusy=false,countReady=false,lastCountRead=0,headerPatchInstalled=false,chipPatchTimer=null;
 
 const $=id=>document.getElementById(id);
 
@@ -315,7 +316,10 @@ const R={
  authAdmin:false,
  realDelete:false,
  bucket:BUCKET,
+ accountChipAvatar:true,
  headerAvatarBridge:true,
+ readsAuth:true,
+ readsSbProfiles:true,
  currentUserCacheOnly:true,
  staleCacheGuard:true,
  schemaChange:false,
@@ -416,20 +420,32 @@ function cacheProfileForHeader(p){
  return true;
 }
 
+function accountChipAvatarHtml(p){
+ let url=avatarOf(p);
+ let img=url?'<img src="'+esc(url)+'" alt="">':'👤';
+ return '<span class="sb-profile-chip-avatar" data-sb-chip-avatar-user-id="'+esc(p&&p.id||'')+'">'+img+'</span><span>Account ✓</span>';
+}
+
 function patchVisibleHeaderChip(){
  let p=payloadForHeader(profile);
-
- if(!p)return false;
-
  let chip=document.getElementById('sbHeaderAccountChip');
 
- if(chip){
-  let av=p.avatar_url?'<span class="sb-profile-chip-avatar"><img src="'+esc(p.avatar_url)+'" alt=""></span>':'<span class="sb-profile-chip-avatar">👤</span>';
-  chip.innerHTML=av+'<span>Account ✓</span>';
-  chip.classList.add('signed-in');
-  chip.setAttribute('data-sb-account-user-id',p.id);
-  chip.setAttribute('title','Account: '+nameOf(p));
+ if(!chip)return false;
+
+ if(!p){
+  if(!user){
+   chip.textContent='Account';
+   chip.classList.remove('signed-in');
+   chip.removeAttribute('data-sb-account-user-id');
+  }
+  return false;
  }
+
+ chip.innerHTML=accountChipAvatarHtml(p);
+ chip.classList.add('signed-in');
+ chip.setAttribute('data-sb-account-user-id',p.id);
+ chip.setAttribute('data-sb-account-avatar-url',p.avatar_url||'');
+ chip.setAttribute('title','Account: '+nameOf(p));
 
  let headerName=document.getElementById('sbHeaderProfileText');
  let headerRole=document.getElementById('sbHeaderRoleText');
@@ -448,10 +464,16 @@ function patchVisibleHeaderChip(){
  if(panelEmail)panelEmail.textContent=user&&user.email?user.email:'Not signed in';
  if(panelInput&&user&&user.email)panelInput.value=user.email;
 
- if(panelAvatar&&p.avatar_url){
-  panelAvatar.src=p.avatar_url;
-  panelAvatar.setAttribute('data-sb-profile-avatar-user-id',p.id);
+ if(panelAvatar){
+  if(p.avatar_url){
+   panelAvatar.src=p.avatar_url;
+   panelAvatar.setAttribute('data-sb-profile-avatar-user-id',p.id);
+  }
  }
+
+ $('statHeader').textContent='Synced';
+ $('bridgeStatus').textContent='Top Account chip is synced to '+nameOf(profile)+'.';
+ $('bridgeStatus').className='safe';
 
  return true;
 }
@@ -467,8 +489,52 @@ function dispatchProfileEvents(p,reason){
  try{window.dispatchEvent(new StorageEvent('storage',{key:'sb_header_profile_cache_v7_12_156',newValue:JSON.stringify(payload)}));}catch(e){}
 }
 
+function installHeaderAvatarPatch(){
+ if(headerPatchInstalled)return;
+ if(!window.StreamBanditHeaderShell)return;
+
+ let shell=window.StreamBanditHeaderShell;
+ let names=['refresh','updateAccount','refreshAuth'];
+
+ names.forEach(name=>{
+  if(typeof shell[name]!=='function'||shell[name].__sbProfileChipWrapped)return;
+
+  let original=shell[name];
+
+  shell[name]=function(){
+   let result=original.apply(shell,arguments);
+
+   try{
+    if(result&&typeof result.then==='function'){
+     result.then(()=>scheduleChipPatch(name+'-promise')).catch(()=>scheduleChipPatch(name+'-promise-error'));
+    }else{
+     scheduleChipPatch(name);
+    }
+   }catch(e){
+    scheduleChipPatch(name+'-catch');
+   }
+
+   return result;
+  };
+
+  shell[name].__sbProfileChipWrapped=true;
+ });
+
+ headerPatchInstalled=true;
+}
+
+function scheduleChipPatch(reason){
+ setTimeout(()=>patchVisibleHeaderChip(),30);
+ setTimeout(()=>patchVisibleHeaderChip(),160);
+ setTimeout(()=>patchVisibleHeaderChip(),500);
+ setTimeout(()=>patchVisibleHeaderChip(),1100);
+ debug({chipPatchReason:reason||'scheduled'});
+}
+
 async function syncHeaderProfile(reason){
  let cached=cacheProfileForHeader(profile);
+
+ installHeaderAvatarPatch();
 
  try{
   if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refreshAuth)await window.StreamBanditHeaderShell.refreshAuth(false);
@@ -483,26 +549,28 @@ async function syncHeaderProfile(reason){
  }catch(e){}
 
  try{
-  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateAccountPanel)window.StreamBanditHeaderShell.updateAccountPanel();
- }catch(e){}
-
- try{
   if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();
  }catch(e){}
 
  patchVisibleHeaderChip();
+ scheduleChipPatch(reason||'manual-sync');
  dispatchProfileEvents(profile,reason||'manual-sync');
 
- setTimeout(patchVisibleHeaderChip,80);
- setTimeout(patchVisibleHeaderChip,350);
- setTimeout(patchVisibleHeaderChip,1000);
-
  $('statHeader').textContent=cached?'Synced':'--';
- $('bridgeStatus').textContent=cached?'Header account chip synced for '+nameOf(profile)+'.':'Header sync waiting for signed-in matching profile.';
+ $('bridgeStatus').textContent=cached?'Top Account chip synced for '+nameOf(profile)+'.':'Account chip sync waiting for signed-in matching profile.';
  $('bridgeStatus').className=cached?'safe':'note';
 
  debug({headerSyncReason:reason||'manual-sync',cached:cached});
  return cached;
+}
+
+function startChipPatchTimer(){
+ if(chipPatchTimer)return;
+
+ chipPatchTimer=setInterval(()=>{
+  installHeaderAvatarPatch();
+  patchVisibleHeaderChip();
+ },1500);
 }
 
 function render(){
@@ -616,13 +684,18 @@ async function signOut(){
   user=null;
   profile=null;
   clearHeaderProfileCache();
+
+  try{
+   if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.signOut)await window.StreamBanditHeaderShell.signOut();
+  }catch(e){}
+
   fill({});
+  patchVisibleHeaderChip();
 
   acct('Signed out. Existing users can sign in again.',true);
   status('Signed out.');
   toast('Signed out');
 
-  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.signOut)await window.StreamBanditHeaderShell.signOut();}catch(e){}
   try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
 
   stats();
@@ -653,7 +726,7 @@ async function loadProfile(){
   }
 
   fill(r.data);
-  status('Profile loaded and header bridge synced.');
+  status('Profile loaded and top Account chip synced.');
   await syncHeaderProfile('load-profile');
   debug({loadedProfile:true});
  }catch(e){
@@ -694,7 +767,7 @@ async function createProfile(){
 
   R.writes=true;
 
-  status('Missing profile row created for existing signed-in Auth user and synced to header.');
+  status('Missing profile row created for existing signed-in Auth user and synced to top Account chip.');
   toast('Profile row created');
   await syncHeaderProfile('create-profile');
  }catch(e){
@@ -728,8 +801,8 @@ async function saveText(){
 
   R.writes=true;
 
-  status('Profile text saved and header account chip synced.');
-  toast('Saved + header synced');
+  status('Profile text saved and top Account chip synced.');
+  toast('Saved + chip synced');
   await syncHeaderProfile('save-text');
  }catch(e){
   status('Save failed: '+(e.message||e),true);
@@ -788,7 +861,7 @@ function previewFile(){
  reader.onload=()=>showImg('modalPreview',reader.result,'Preview');
  reader.readAsDataURL(f);
 
- modal('Preview ready. Click Upload + Save + Sync Header.');
+ modal('Preview ready. Click Upload + Save + Sync Chip.');
 }
 
 async function uploadSaveImage(){
@@ -840,9 +913,9 @@ async function uploadSaveImage(){
   R.writes=true;
   R.storageWrites=true;
 
-  modal('Uploaded, saved and synced to header.');
-  status((currentKind==='avatar'?'Avatar':'Banner')+' saved. Header bridge synced.');
-  toast('Image saved + header synced');
+  modal('Uploaded, saved and synced to top Account chip.');
+  status((currentKind==='avatar'?'Avatar':'Banner')+' saved. Account chip bridge synced.');
+  toast('Image saved + chip synced');
 
   await syncHeaderProfile(currentKind==='avatar'?'avatar-upload':'banner-upload');
  }catch(e){
@@ -858,17 +931,17 @@ function useExisting(){
  else $('bannerUrl').value=url;
 
  render();
- modal('Current URL placed in preview. Use Upload + Save + Sync Header for new files.');
+ modal('Current URL placed in preview. Use Upload + Save + Sync Chip for new files.');
 }
 
 async function syncHeader(){
  let ok=await syncHeaderProfile('manual-button');
 
  if(ok){
-  status('Header account chip synced to current signed-in profile.');
-  toast('Header synced');
+  status('Top Account chip synced to current signed-in profile.');
+  toast('Account chip synced');
  }else{
-  status('Header sync waiting for a signed-in profile row that matches the current user.',true);
+  status('Account chip sync waiting for a signed-in profile row that matches the current user.',true);
  }
 }
 
@@ -908,12 +981,13 @@ async function refreshSavedCounters(force){
 
 function helpers(){
  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}
+ installHeaderAvatarPatch();
  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
  try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
  try{if(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.refresh)window.StreamBanditLiveReadinessSearchFallback.refresh();}catch(e){}
 
  refreshSavedCounters(false);
- patchVisibleHeaderChip();
+ scheduleChipPatch('helpers');
 
  $('helperStatus').innerHTML='<b>Helpers:</b> Supabase SDK '+(window.supabase?'✅':'❌')+
   ' · Shell '+(window.StreamBanditShell?'✅':'❌')+
@@ -934,10 +1008,16 @@ function debug(extra){
   user:user?{id:user.id,email:user.email}:null,
   profile:profile,
   headerPayload:payload,
-  headerCacheKeys:PROFILE_CACHE_KEYS.map(k=>({key:k,hasValue:!!localStorage.getItem(k),id:(readCachedProfile(k)||{}).id||null})),
+  accountChip:{
+   exists:!!document.getElementById('sbHeaderAccountChip'),
+   html:document.getElementById('sbHeaderAccountChip')?document.getElementById('sbHeaderAccountChip').innerHTML:'',
+   userId:document.getElementById('sbHeaderAccountChip')?document.getElementById('sbHeaderAccountChip').getAttribute('data-sb-account-user-id'):''
+  },
+  headerCacheKeys:PROFILE_CACHE_KEYS.map(k=>({key:k,hasValue:!!localStorage.getItem(k),id:(readCachedProfile(k)||{}).id||null,avatar:(readCachedProfile(k)||{}).avatar_url||''})),
   helperPresence:{
    shell:!!window.StreamBanditShell,
    header:!!window.StreamBanditHeaderShell,
+   headerPatchInstalled:headerPatchInstalled,
    footer:!!window.StreamBanditFooterShell,
    theme:!!window.StreamBanditThemeProjector,
    saves:!!window.StreamBanditCoreSavesV675,
@@ -989,6 +1069,7 @@ function wire(){
 
 function boot(){
  wire();
+ startChipPatchTimer();
  helpers();
 
  refreshSession().then(()=>loadProfile());
@@ -997,13 +1078,15 @@ function boot(){
  setTimeout(()=>refreshSavedCounters(true),1000);
  setTimeout(helpers,1800);
  setTimeout(()=>syncHeaderProfile('settled-boot'),2200);
+ setTimeout(()=>scheduleChipPatch('late-boot'),3200);
  setInterval(helpers,7000);
 
- document.documentElement.dataset.sbProfileSettings='v7-12-296';
- window.StreamBanditProfileSettingsV712296={
+ document.documentElement.dataset.sbProfileSettings='v7-12-296-1';
+ window.StreamBanditProfileSettingsV7122961={
   version:VERSION,
   reload:loadProfile,
   syncHeader:syncHeaderProfile,
+  patchChip:patchVisibleHeaderChip,
   clearHeaderProfileCache,
   current:function(){return{user,profile,headerPayload:profile&&user?payloadForHeader(profile):null};}
  };
