@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Owned Pages Manager V7.12.263.10 TEST</title>
+<title>Web Builder Owned Pages Manager V7.12.263.11 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -104,7 +104,7 @@ body{
 }
 .hot{
   background:linear-gradient(135deg,var(--pink),var(--purple));
-  color:#fff;
+  color:white;
 }
 .warnBtn{
   background:linear-gradient(135deg,var(--warn),var(--purple));
@@ -339,7 +339,7 @@ p,li,label,small,code{
       <div class="mark" aria-hidden="true">WB</div>
       <div>
         Web Builder Owned Pages Manager
-        <small>Shared workspace lock fix · V7.12.263.10</small>
+        <small>No sort_order column fix · V7.12.263.11</small>
       </div>
     </div>
     <div class="actions">
@@ -358,20 +358,19 @@ p,li,label,small,code{
       <span class="badge">Checking Web Builder access</span>
       <h1>Loading your pages workspace</h1>
       <p>Pages Manager stays hidden until the personal workspace lock passes.</p>
-      <p class="notice">If this takes more than a few seconds, the page will show a debug error instead of staying stuck.</p>
     </div>
   </section>
 </main>
 
 <footer class="footer">
-  V7.12.263.10 Owned Pages Manager Lock Fix · personal owner_id scope · schemaChanges false · storageActions false · indexPromotion false
+  V7.12.263.11 Owned Pages Manager · no sort_order column writes · personal owner_id scope · schemaChanges false
 </footer>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.263.10 Web Builder Owned Pages Manager Lock Loading Fix';
+const VERSION='V7.12.263.11 Owned Pages Manager No Sort Column Fix';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const OWNER_SLUGS=['landing','home','home-page'];
@@ -426,7 +425,9 @@ let authState={
   streamBanditShellChanges:false,
   activeMenuPromotion:false,
   indexPromotion:false,
-  registryPromotion:true
+  registryPromotion:true,
+  sortOrderColumnRequired:false,
+  sortOrderStoredInSettingsJson:true
 };
 
 const app=function(){return document.getElementById('app');};
@@ -509,8 +510,13 @@ function pageSettings(row){
 
 function pageSort(row){
   let s=pageSettings(row);
-  let n=Number(row&&row.sort_order!=null?row.sort_order:s.sort_order!=null?s.sort_order:100);
+  let n=Number(s.sort_order!=null?s.sort_order:s.sortOrder!=null?s.sortOrder:100);
   return Number.isFinite(n)?n:100;
+}
+
+function pageType(row){
+  let s=pageSettings(row);
+  return s.page_type||s.pageType||'custom';
 }
 
 function pageLabel(row){
@@ -531,12 +537,15 @@ function normalizeRow(row,sourceName){
     title:row.title||settings.title||slug.replace(/-/g,' ').replace(/\b\w/g,function(m){return m.toUpperCase();}),
     status:row.status||settings.status||'draft',
     owner_id:row.owner_id||authState.userId||'',
-    page_type:row.page_type||settings.page_type||settings.pageType||'custom',
-    sort_order:pageSort(row),
     settings_json:Object.assign({},settings,{
+      slug:slug,
+      title:row.title||settings.title||slug,
+      status:row.status||settings.status||'draft',
       menu_label:settings.menu_label||settings.menuLabel||row.title||slug,
       nav_visible:settings.nav_visible!=null?settings.nav_visible:settings.navVisible!=null?settings.navVisible:true,
-      is_home_page:settings.is_home_page!=null?settings.is_home_page:settings.isHomePage!=null?settings.isHomePage:false
+      is_home_page:settings.is_home_page!=null?settings.is_home_page:settings.isHomePage!=null?settings.isHomePage:false,
+      sort_order:settings.sort_order!=null?settings.sort_order:100,
+      page_type:settings.page_type||settings.pageType||'custom'
     }),
     updated_at:row.updated_at||new Date().toISOString()
   };
@@ -550,8 +559,8 @@ function visiblePages(){
   }
 
   list.sort(function(a,b){
-    let as=Number(a.sort_order||100);
-    let bs=Number(b.sort_order||100);
+    let as=pageSort(a);
+    let bs=pageSort(b);
 
     if(as!==bs)return as-bs;
 
@@ -640,8 +649,7 @@ async function loadSupabasePages(){
 
     let q=client()
       .from('sb_site_pages')
-      .select('id,slug,title,status,owner_id,settings_json,page_type,sort_order,updated_at')
-      .order('sort_order',{ascending:true})
+      .select('id,slug,title,status,owner_id,settings_json,updated_at')
       .order('slug',{ascending:true})
       .limit(200);
 
@@ -698,9 +706,13 @@ function makeLocalFallback(){
     title:'My First Web Builder Page',
     status:'draft',
     owner_id:authState.userId,
-    page_type:'custom',
-    sort_order:100,
-    settings_json:{menu_label:'My First Page',nav_visible:true,is_home_page:false}
+    settings_json:{
+      menu_label:'My First Page',
+      nav_visible:true,
+      is_home_page:false,
+      sort_order:100,
+      page_type:'custom'
+    }
   },'personal-local-draft');
 
   pages=[draft];
@@ -711,14 +723,19 @@ function makeLocalFallback(){
 
 function newDraft(){
   let n=pages.length+1;
+
   let draft=normalizeRow({
     slug:'new-page-draft-'+n,
     title:'New Page Draft '+n,
     status:'draft',
     owner_id:authState.userId,
-    page_type:'custom',
-    sort_order:100+n,
-    settings_json:{menu_label:'New Page '+n,nav_visible:true,is_home_page:false}
+    settings_json:{
+      menu_label:'New Page '+n,
+      nav_visible:true,
+      is_home_page:false,
+      sort_order:100+n,
+      page_type:'custom'
+    }
   },'personal-local-draft');
 
   pages.unshift(draft);
@@ -733,9 +750,14 @@ function newDraft(){
 
 function payloadFromPage(row){
   let settings=Object.assign({},pageSettings(row),{
+    slug:cleanSlug(row.slug),
+    title:String(row.title||row.slug||'Untitled page').trim()||'Untitled page',
+    status:String(row.status||'draft'),
     menu_label:pageLabel(row),
     nav_visible:truth(pageSettings(row).nav_visible),
     is_home_page:truth(pageSettings(row).is_home_page),
+    sort_order:pageSort(row),
+    page_type:pageType(row),
     updated_by:'web-builder-pages-manager-owned-v7-12-256-test.html',
     updated_at:new Date().toISOString()
   });
@@ -745,9 +767,7 @@ function payloadFromPage(row){
     title:String(row.title||row.slug||'Untitled page').trim()||'Untitled page',
     status:String(row.status||'draft'),
     owner_id:authState.isPlatformOwner?(row.owner_id||authState.userId):authState.userId,
-    settings_json:settings,
-    page_type:String(row.page_type||'custom'),
-    sort_order:Number(row.sort_order||100)
+    settings_json:settings
   };
 }
 
@@ -761,13 +781,16 @@ async function saveSelected(){
     row.slug=cleanSlug($('editSlug').value||row.slug);
     row.title=$('editTitle').value.trim()||row.title||row.slug;
     row.status=$('editStatus').value||row.status||'draft';
-    row.sort_order=Number($('editSort').value||row.sort_order||100);
-    row.page_type=$('editType').value||row.page_type||'custom';
-    row.settings_json=Object.assign({},pageSettings(row),{
+
+    let settings=Object.assign({},pageSettings(row),{
       menu_label:$('editMenuLabel').value.trim()||row.title,
       nav_visible:$('editNavVisible').checked,
-      is_home_page:$('editIsHome').checked
+      is_home_page:$('editIsHome').checked,
+      sort_order:Number($('editSort').value||pageSort(row)||100),
+      page_type:$('editType').value||pageType(row)||'custom'
     });
+
+    row.settings_json=settings;
 
     if(!authState.isPlatformOwner){
       if(isReserved(row.slug))throw new Error('Creator users cannot save reserved owner slugs: landing, home, home-page.');
@@ -788,7 +811,7 @@ async function saveSelected(){
         client().from('sb_site_pages')
           .update(payload)
           .eq('id',row.db_id)
-          .select('id,slug,title,status,owner_id,settings_json,page_type,sort_order,updated_at')
+          .select('id,slug,title,status,owner_id,settings_json,updated_at')
           .single(),
         12000,
         'Save update timed out'
@@ -797,7 +820,7 @@ async function saveSelected(){
       result=await withTimeout(
         client().from('sb_site_pages')
           .insert(payload)
-          .select('id,slug,title,status,owner_id,settings_json,page_type,sort_order,updated_at')
+          .select('id,slug,title,status,owner_id,settings_json,updated_at')
           .single(),
         12000,
         'Save insert timed out'
@@ -858,12 +881,12 @@ function applyEditorFields(){
   row.slug=cleanSlug($('editSlug').value||row.slug);
   row.title=$('editTitle').value.trim()||row.title||row.slug;
   row.status=$('editStatus').value||row.status||'draft';
-  row.sort_order=Number($('editSort').value||row.sort_order||100);
-  row.page_type=$('editType').value||row.page_type||'custom';
   row.settings_json=Object.assign({},pageSettings(row),{
     menu_label:$('editMenuLabel').value.trim()||row.title,
     nav_visible:$('editNavVisible').checked,
-    is_home_page:$('editIsHome').checked
+    is_home_page:$('editIsHome').checked,
+    sort_order:Number($('editSort').value||pageSort(row)||100),
+    page_type:$('editType').value||pageType(row)||'custom'
   });
 
   if(!authState.isPlatformOwner){
@@ -925,7 +948,7 @@ function badges(row){
 
   out.push('<span class="pill '+(row.source&&row.source.indexOf('supabase')>-1?'good':'warn')+'">'+esc(row.source||'local')+'</span>');
   out.push('<span class="pill">'+esc(row.status||'draft')+'</span>');
-  out.push('<span class="pill">sort '+esc(row.sort_order||100)+'</span>');
+  out.push('<span class="pill">sort '+esc(pageSort(row))+'</span>');
 
   if(isReserved(row.slug))out.push('<span class="pill warn">reserved</span>');
   if(ownerMatches(row))out.push('<span class="pill good">own row</span>');
@@ -970,14 +993,14 @@ function renderEditor(){
 <div class="control"><b>Title</b><input id="editTitle" value="'+esc(row.title||'')+'" autocomplete="off"></div>\
 <div class="control"><b>Status</b><select id="editStatus"><option value="draft">Draft</option><option value="published">Published</option><option value="hidden">Hidden</option></select></div>\
 <div class="control"><b>Menu label</b><input id="editMenuLabel" value="'+esc(pageLabel(row))+'" autocomplete="off"></div>\
-<div class="control"><b>Sort order</b><input id="editSort" type="number" value="'+esc(row.sort_order||100)+'"></div>\
-<div class="control"><b>Page type</b><select id="editType"><option value="custom">Custom</option><option value="landing">Landing</option><option value="contact">Contact</option><option value="pricing">Pricing</option><option value="gallery">Gallery</option></select></div>\
+<div class="control"><b>Sort order</b><input id="editSort" type="number" value="'+esc(pageSort(row))+'"><small>Stored inside settings_json.sort_order. No database sort_order column is used.</small></div>\
+<div class="control"><b>Page type</b><select id="editType"><option value="custom">Custom</option><option value="landing">Landing</option><option value="contact">Contact</option><option value="pricing">Pricing</option><option value="gallery">Gallery</option></select><small>Stored inside settings_json.page_type.</small></div>\
 <label class="control"><input id="editNavVisible" type="checkbox"> Show in builder navigation/menu later</label>\
 <label class="control"><input id="editIsHome" type="checkbox"> Mark as home page inside this owner workspace later</label>\
 <div class="actions"><button id="applyLocalEdit" class="btn primary" type="button">Apply Local Edit</button><button id="saveSelected" class="btn hot" type="button">Save Selected To sb_site_pages</button></div>';
 
   $('editStatus').value=row.status||'draft';
-  $('editType').value=row.page_type||'custom';
+  $('editType').value=pageType(row);
   $('editNavVisible').checked=truth(settings.nav_visible);
   $('editIsHome').checked=truth(settings.is_home_page);
 
@@ -1035,6 +1058,10 @@ function state(){
     source:source,
     pageCount:pages.length,
     visiblePageCount:visiblePages().length,
+    sortOrderColumnRequired:false,
+    sortOrderStoredInSettingsJson:true,
+    pageTypeColumnRequired:false,
+    pageTypeStoredInSettingsJson:true,
     selected:row?{
       id:row.id,
       db_id:row.db_id,
@@ -1043,7 +1070,9 @@ function state(){
       owner_id:row.owner_id,
       ownerMatchesCurrentUser:ownerMatches(row),
       reservedSlug:isReserved(row.slug),
-      source:row.source
+      source:row.source,
+      settingsSortOrder:pageSort(row),
+      settingsPageType:pageType(row)
     }:null,
     lastAction:lastAction,
     lastError:lastError
@@ -1094,23 +1123,22 @@ function renderPage(){
   authState.reason='Allowed. Owned Pages Manager opened with shared workspace lock.';
 
   app().innerHTML='<section class="hero">\
-<span class="badge">V7.12.263.10 Shared Workspace Lock Fix</span>\
+<span class="badge">V7.12.263.11 No sort_order column fix</span>\
 <h1>Create, find and save Web Builder pages</h1>\
-<p>Pages Manager scopes <code>sb_site_pages</code> by owner. Platform owner can see all rows. Creator users can only see and save their own workspace rows. Admin role alone does not expose another user workspace.</p>\
+<p>Pages Manager scopes <code>sb_site_pages</code> by owner. It now saves only real table columns and stores sort/page type inside <code>settings_json</code>, so no Supabase schema change is needed.</p>\
 <div class="row">\
 <span class="chip good">Supabase read</span>\
 <span class="chip good">Owner scoped rows</span>\
-<span class="chip good">Jump search</span>\
-<span class="chip good">Protected by plan</span>\
+<span class="chip good">No sort_order column write</span>\
+<span class="chip good">settings_json sort order</span>\
 <span class="chip warn">Landing/home protected</span>\
-<span class="chip warn">No file delete</span>\
 <span class="chip warn">No schema/storage change</span>\
 </div>\
 </section>\
 <section class="grid">\
 <div class="card own"><b>Personal scope</b><ul class="list"><li>Platform owner sees all rows.</li><li>Creator sees only own <code>owner_id</code> rows.</li><li>Admin role alone does not expose another user workspace.</li></ul></div>\
-<div class="card keep"><b>Findability</b><ul class="list"><li>Jump search by title or slug.</li><li>Enter or Search scrolls to the card.</li><li>The list stays visible.</li></ul></div>\
-<div class="card danger"><b>Delete paused</b><ul class="list"><li>This fix page does not delete Supabase rows.</li><li>No files or routes deleted.</li><li>Reserved owner slugs stay blocked for creators.</li></ul></div>\
+<div class="card keep"><b>Schema-safe save</b><ul class="list"><li>Writes only <code>slug</code>, <code>title</code>, <code>status</code>, <code>owner_id</code>, and <code>settings_json</code>.</li><li>Sort order is stored in <code>settings_json.sort_order</code>.</li><li>Page type is stored in <code>settings_json.page_type</code>.</li></ul></div>\
+<div class="card danger"><b>Delete paused</b><ul class="list"><li>This fix page does not delete Supabase rows.</li><li>No files or routes deleted.</li><li>No storage objects deleted.</li></ul></div>\
 </section>\
 <section class="panel">\
 <div class="row"><span class="badge">Pages output</span><span id="countText" class="pill">Waiting...</span><span id="sourceText" class="pill warn">source: loading</span><span id="authText" class="pill warn">auth: checking</span></div>\
@@ -1146,8 +1174,8 @@ function renderPage(){
 </aside>\
 </section>\
 <section class="grid">\
-<div class="panel"><h2>Safety rule</h2><div class="notice">This fix version can read pages and save selected pages. It never deletes HTML files, routes, assets, storage objects or app pages. Supabase row delete is paused for this checkpoint.</div></div>\
-<div class="panel"><h2>Pass condition</h2><p>Trevor/platform owner sees all pages. Creator users see only their own pages. Direct Studio access still uses the Web Builder protected gate.</p></div>\
+<div class="panel"><h2>Safety rule</h2><div class="notice">This version can read pages and save selected pages. It never deletes HTML files, routes, assets, storage objects or app pages. It does not require a sort_order column.</div></div>\
+<div class="panel"><h2>Pass condition</h2><p>Trevor/platform owner sees all pages. Creator users see only their own pages. Save works without schema changes.</p></div>\
 <div class="panel"><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></div>\
 </section>';
 
