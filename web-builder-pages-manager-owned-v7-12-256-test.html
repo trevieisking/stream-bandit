@@ -3,109 +3,1558 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Owned Pages Manager V7.12.264.15 TEST</title>
+<title>Web Builder Owned Pages Manager V7.12.263.9 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#070910;--line:#ffffff22;--text:#f7fbff;--muted:#aeb8d6;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff5d6c;--blue:#41e8ff}*{box-sizing:border-box}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;background:radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),linear-gradient(180deg,#070910,#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}.top{position:sticky;top:0;z-index:20;background:#0b1020f0;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}.topInner{width:min(1500px,100%);margin:0 auto;padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}.brand{display:flex;gap:10px;align-items:center;font-weight:950;flex:1 1 320px}.mark{width:44px;height:44px;min-width:44px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;font-weight:1000}.brand small{display:block;color:var(--muted);font-weight:800}.actions,.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.actions{justify-content:flex-end}.btn{border:0;border-radius:999px;background:#30384f;color:white;text-decoration:none;font-weight:950;padding:10px 13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.btn:disabled{opacity:.45;cursor:not-allowed}.primary{background:linear-gradient(135deg,var(--good),var(--purple));color:#071015}.hot{background:linear-gradient(135deg,var(--pink),var(--purple))}.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#071015}.badBtn{background:linear-gradient(135deg,var(--bad),var(--purple));color:#fff}.blue{background:linear-gradient(135deg,var(--blue),var(--purple));color:#071015}.wrap{width:min(1500px,100%);margin:0 auto;padding:14px}.hero,.panel,.card,.pageCard,.summaryCard{border:1px solid #ffffff18;border-radius:24px;background:linear-gradient(135deg,#101529,#17122d);padding:16px;margin:0 0 14px}.hero h1{font-size:clamp(34px,5vw,74px);line-height:.94;margin:8px 0;letter-spacing:-.05em}.badge,.chip,.pill{display:inline-flex;border:1px solid #ffffff24;border-radius:999px;padding:6px 9px;background:#ffffff0d;color:#dbe7ff;font-weight:900;font-size:12px}.badge{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.bad{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}.good{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.layout{display:grid;grid-template-columns:minmax(340px,.82fr) minmax(460px,1.18fr);gap:12px}.card,.summaryCard,.pageCard{background:#ffffff08}.card b,.summaryCard b{display:block;color:#baf7df;margin-bottom:7px}.own{border-color:#22d3a655;background:#22d3a612}.keep{border-color:#ffb14255;background:#ffb14212}.later{border-color:#7c3cff66;background:#7c3cff14}.danger{border-color:#ff5d6c66;background:#ff5d6c12}p,li,label,small{color:var(--muted);line-height:1.5}.list{margin:6px 0 0;padding-left:18px}.pageList{display:grid;gap:10px;max-height:760px;overflow:auto;padding-right:4px;scroll-behavior:smooth}.pageCard{cursor:pointer;min-width:0;transition:box-shadow .18s ease,background .18s ease,outline .18s ease}.pageCard.active{outline:3px solid #22d3a688;background:#22d3a618}.pageCard.jumpFound{outline:4px solid #41e8ffaa;background:#41e8ff18;box-shadow:0 0 0 8px #41e8ff22}.pageCard b{display:block;color:#baf7df}.pageCard code{display:block;color:#dfffee;word-break:break-all;margin:4px 0}.statusGood{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.statusWarn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.statusBad{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}.debug,.linkBox,.out{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;border:1px solid #ffffff14;border-radius:16px;background:#0007;padding:12px;color:#dfffee;max-height:460px;overflow:auto}.notice,.status{border:1px solid #ffb14266;background:#ffb14217;color:#ffe7ad;border-radius:16px;padding:12px;font-weight:850}.status.good{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}.status.bad{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}.summaryGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.control,.jumpBox{border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px;margin:0 0 10px}.control b,.jumpBox b{display:block;color:#baf7df;margin-bottom:7px}.control input,.control select,.control textarea,.jumpBox input{width:100%;border:1px solid #ffffff24;border-radius:14px;background:#0007;color:#fff;padding:11px;font:inherit;margin-top:7px}.control textarea{min-height:100px;resize:vertical}.jumpBox{position:sticky;top:64px;z-index:5;background:#0b1020f2;backdrop-filter:blur(14px)}.jumpGrid{display:grid;grid-template-columns:minmax(180px,1fr) auto;gap:8px;align-items:end}.checkLine{display:flex;gap:8px;align-items:center;border:1px solid #ffffff14;border-radius:14px;background:#ffffff0e;padding:10px;margin:8px 0}.checkLine input{width:auto;margin:0}.formGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;background:#02040ccc;backdrop-filter:blur(18px)}.overlay.open{display:flex}.modal{width:min(1080px,100%);max-height:92vh;overflow:auto;border:1px solid #ffffff24;border-radius:32px;background:radial-gradient(circle at 0 0,#22d3a62b,transparent 35%),linear-gradient(135deg,#0d1224,#18112d);box-shadow:0 30px 100px #000c}.modalHead{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;padding:16px;border-bottom:1px solid #ffffff18;background:#0b1020f2;backdrop-filter:blur(12px)}.modalBody{padding:16px}.modalFoot{position:sticky;bottom:0;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding:14px;border-top:1px solid #ffffff18;background:#0b1020f2;backdrop-filter:blur(12px)}.close{font-size:20px;width:44px;height:44px;border-radius:999px}.deleteWord{font-family:ui-monospace,Consolas,monospace;color:#ffd0d5}@media(max-width:980px){.brand,.actions{flex:1 1 100%}.actions{justify-content:flex-start}.actions .btn,.btn{flex:1 1 auto}.grid,.layout,.formGrid,.jumpGrid{grid-template-columns:1fr}.jumpBox{position:relative;top:auto}.hero h1{font-size:clamp(36px,12vw,58px)}.modal{max-height:96vh}.modalFoot .btn{flex:1 1 100%}}
+:root{
+  color-scheme:dark;
+  --bg:#070910;
+  --p:#101529;
+  --p2:#17122d;
+  --line:#ffffff22;
+  --text:#f7fbff;
+  --muted:#aeb8d6;
+  --good:#22d3a6;
+  --purple:#7c3cff;
+  --pink:#ff2d85;
+  --warn:#ffb142;
+  --bad:#ff5d6c;
+  --blue:#41e8ff;
+}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),
+    radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),
+    linear-gradient(180deg,#070910,#050711);
+  color:var(--text);
+  font-family:Inter,system-ui,Arial,sans-serif;
+}
+.top{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:#0b1020f0;
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(16px);
+}
+.topInner{
+  width:min(1500px,100%);
+  margin:0 auto;
+  padding:10px 14px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 16px;
+  align-items:center;
+  justify-content:space-between;
+}
+.brand{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  font-weight:950;
+  flex:1 1 320px;
+}
+.mark{
+  width:44px;
+  height:44px;
+  min-width:44px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  color:#071015;
+  font-weight:1000;
+}
+.brand small{
+  display:block;
+  color:var(--muted);
+  font-weight:800;
+}
+.actions,.row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.actions{
+  justify-content:flex-end;
+}
+.btn{
+  border:0;
+  border-radius:999px;
+  background:#30384f;
+  color:white;
+  text-decoration:none;
+  font-weight:950;
+  padding:10px 13px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+}
+.btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+.primary{
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  color:#071015;
+}
+.hot{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:white;
+}
+.warnBtn{
+  background:linear-gradient(135deg,var(--warn),var(--purple));
+  color:#071015;
+}
+.badBtn{
+  background:linear-gradient(135deg,var(--bad),var(--purple));
+  color:#fff;
+}
+.blue{
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#071015;
+}
+.wrap{
+  width:min(1500px,100%);
+  margin:0 auto;
+  padding:14px;
+}
+.hero,.panel,.card,.pageCard,.summaryCard{
+  border:1px solid #ffffff18;
+  border-radius:24px;
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  padding:16px;
+  margin:0 0 14px;
+  box-shadow:0 18px 55px #0006;
+}
+.card,.summaryCard,.pageCard{
+  background:#ffffff08;
+  box-shadow:none;
+}
+.hero h1{
+  font-size:clamp(34px,5vw,74px);
+  line-height:.94;
+  margin:8px 0;
+  letter-spacing:-.05em;
+}
+h2,h3{
+  margin:0 0 10px;
+}
+.badge,.chip,.pill{
+  display:inline-flex;
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  padding:6px 9px;
+  background:#ffffff0d;
+  color:#dbe7ff;
+  font-weight:900;
+  font-size:12px;
+  margin:2px;
+}
+.badge,.good{
+  background:#22d3a621;
+  border-color:#22d3a660;
+  color:#baf7df;
+}
+.warn{
+  background:#ffb14224;
+  border-color:#ffb14266;
+  color:#ffe7ad;
+}
+.bad{
+  background:#ff5d6c22;
+  border-color:#ff5d6c66;
+  color:#ffd0d5;
+}
+.cyan{
+  background:#41e8ff22;
+  border-color:#41e8ff66;
+  color:#cef9ff;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.layout{
+  display:grid;
+  grid-template-columns:minmax(340px,.82fr) minmax(460px,1.18fr);
+  gap:12px;
+}
+.card b,.summaryCard b{
+  display:block;
+  color:#baf7df;
+  margin-bottom:7px;
+}
+.own{
+  border-color:#22d3a655;
+  background:#22d3a612;
+}
+.keep{
+  border-color:#ffb14255;
+  background:#ffb14212;
+}
+.later{
+  border-color:#7c3cff66;
+  background:#7c3cff14;
+}
+.danger{
+  border-color:#ff5d6c66;
+  background:#ff5d6c12;
+}
+p,li,label,small,code{
+  color:var(--muted);
+  line-height:1.5;
+}
+.list{
+  margin:6px 0 0;
+  padding-left:18px;
+}
+.pageList{
+  display:grid;
+  gap:10px;
+  max-height:760px;
+  overflow:auto;
+  padding-right:4px;
+  scroll-behavior:smooth;
+}
+.pageCard{
+  cursor:pointer;
+  min-width:0;
+  transition:box-shadow .18s ease,background .18s ease,outline .18s ease;
+}
+.pageCard.active{
+  outline:3px solid #22d3a688;
+  background:#22d3a618;
+}
+.pageCard.jumpFound{
+  outline:4px solid #41e8ffaa;
+  background:#41e8ff18;
+  box-shadow:0 0 0 8px #41e8ff22;
+}
+.pageCard b{
+  display:block;
+  color:#baf7df;
+}
+.pageCard code{
+  display:block;
+  color:#dfffee;
+  word-break:break-all;
+  margin:4px 0;
+}
+.debug,.linkBox,.out{
+  font-family:ui-monospace,Consolas,monospace;
+  white-space:pre-wrap;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  border:1px solid #ffffff14;
+  border-radius:16px;
+  background:#0007;
+  padding:12px;
+  color:#dfffee;
+  max-height:460px;
+  overflow:auto;
+}
+.notice,.status{
+  border:1px solid #ffb14266;
+  background:#ffb14217;
+  color:#ffe7ad;
+  border-radius:16px;
+  padding:12px;
+  font-weight:850;
+}
+.status.good2{
+  background:#22d3a61a;
+  border-color:#22d3a647;
+  color:#dfffee;
+}
+.status.bad2{
+  background:#ff5d6c22;
+  border-color:#ff5d6c66;
+  color:#ffd0d5;
+}
+.summaryGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:10px;
+}
+.control,.jumpBox{
+  border:1px solid #ffffff18;
+  border-radius:18px;
+  background:#ffffff0a;
+  padding:12px;
+  margin:0 0 10px;
+}
+.control b,.jumpBox b{
+  display:block;
+  color:#baf7df;
+  margin-bottom:7px;
+}
+.control input,.control select,.control textarea,.jumpBox input{
+  width:100%;
+  border:1px solid #ffffff24;
+  border-radius:14px;
+  background:#0007;
+  color:#fff;
+  padding:11px;
+  font:inherit;
+  margin-top:7px;
+}
+.control textarea{
+  min-height:100px;
+  resize:vertical;
+}
+.jumpBox{
+  position:sticky;
+  top:64px;
+  z-index:5;
+  background:#0b1020f2;
+  backdrop-filter:blur(14px);
+}
+.jumpGrid{
+  display:grid;
+  grid-template-columns:minmax(180px,1fr) auto;
+  gap:8px;
+  align-items:end;
+}
+.checkLine{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  border:1px solid #ffffff14;
+  border-radius:14px;
+  background:#ffffff0e;
+  padding:10px;
+  margin:8px 0;
+}
+.checkLine input{
+  width:auto;
+  margin:0;
+}
+.formGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:#02040ccc;
+  backdrop-filter:blur(18px);
+}
+.overlay.open{
+  display:flex;
+}
+.modal{
+  width:min(1080px,100%);
+  max-height:92vh;
+  overflow:auto;
+  border:1px solid #ffffff24;
+  border-radius:32px;
+  background:
+    radial-gradient(circle at 0 0,#22d3a62b,transparent 35%),
+    linear-gradient(135deg,#0d1224,#18112d);
+  box-shadow:0 30px 100px #000c;
+}
+.modalHead{
+  position:sticky;
+  top:0;
+  z-index:3;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+  padding:16px;
+  border-bottom:1px solid #ffffff18;
+  background:#0b1020f2;
+  backdrop-filter:blur(12px);
+}
+.modalBody{
+  padding:16px;
+}
+.modalFoot{
+  position:sticky;
+  bottom:0;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  padding:14px;
+  border-top:1px solid #ffffff18;
+  background:#0b1020f2;
+  backdrop-filter:blur(12px);
+}
+.close{
+  font-size:20px;
+  width:44px;
+  height:44px;
+  border-radius:999px;
+}
+.deleteWord{
+  font-family:ui-monospace,Consolas,monospace;
+  color:#ffd0d5;
+}
+.lockedScreen{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:18px;
+}
+.lockedScreen .hero{
+  width:min(940px,100%);
+}
+.loading{
+  min-height:54vh;
+  display:grid;
+  place-items:center;
+  text-align:center;
+}
+.footer{
+  border-top:1px solid var(--line);
+  background:#0b1020d8;
+  padding:10px 14px;
+  color:#aeb8d6;
+  font-size:12px;
+}
+@media(max-width:980px){
+  .brand,.actions{
+    flex:1 1 100%;
+  }
+  .actions{
+    justify-content:flex-start;
+  }
+  .actions .btn,.btn{
+    flex:1 1 auto;
+  }
+  .grid,.layout,.formGrid,.jumpGrid{
+    grid-template-columns:1fr;
+  }
+  .jumpBox{
+    position:relative;
+    top:auto;
+  }
+  .hero h1{
+    font-size:clamp(36px,12vw,58px);
+  }
+  .modal{
+    max-height:96vh;
+  }
+  .modalFoot .btn{
+    flex:1 1 100%;
+  }
+}
 </style>
 </head>
 <body>
-<header class="top"><div class="topInner"><div class="brand"><div class="mark" aria-hidden="true">WB</div><div>Web Builder Owned Pages Manager<small>Personal workspace scope - V7.12.264.15</small></div></div></div></header>
-<main class="wrap">
-<section class="hero"><span class="badge">V7.12.264.15 Personal Workspace Scope</span><h1>Create, find, save and delete Web Builder pages</h1><p>Pages Manager now scopes <code>sb_site_pages</code> by owner. Platform owner can see all rows. Creator Growth users can enter Web Builder but only see and save their own workspace rows.</p><div class="row"><span class="chip good">Supabase read</span><span class="chip good">Owner scoped rows</span><span class="chip good">Jump search</span><span class="chip good">Protected by plan</span><span class="chip warn">Landing/home protected</span><span class="chip warn">No file delete</span><span class="chip warn">No schema/storage change</span></div></section>
-<section class="grid"><div class="card own"><b>Personal scope</b><ul class="list"><li>Platform owner sees all rows.</li><li>Creator sees only own <code>owner_id</code> rows.</li><li>Admin role alone does not expose another user workspace.</li></ul></div><div class="card keep"><b>Findability</b><ul class="list"><li>Jump search by title or slug</li><li>Enter or Search scrolls to the card</li><li>The list stays visible</li></ul></div><div class="card danger"><b>Delete guard</b><ul class="list"><li>Platform-owner only for Supabase deletes</li><li>Type exact slug to confirm</li><li>Landing/home rows blocked</li><li>No files or routes deleted</li></ul></div></section>
-<section class="panel"><div class="row"><span class="badge">Pages output</span><span id="filterSummary" class="pill">All statuses</span><span id="countText" class="pill">Waiting...</span><span id="sourceText" class="pill warn">source: local fallback</span><span id="authText" class="pill warn">auth: checking</span></div><h2>Page cards</h2><p>Use <b>New Local Draft</b>, edit its slug/title, then click <b>Save Selected To sb_site_pages</b>. Non-owner users save only into their own <code>owner_id</code> workspace.</p><div class="row"><button id="loadSupabase" class="btn primary" type="button">Load sb_site_pages</button><button id="saveSupabase" class="btn hot" type="button">Save Selected To sb_site_pages</button><button id="useLocal" class="btn" type="button">Use Local Fallback</button><button id="openFilterOverlay" class="btn blue" type="button">Filter Pages</button><button id="openEditorOverlay" class="btn primary" type="button">Edit Selected Local Copy</button><button id="openDraftOverlay" class="btn hot" type="button">New Local Draft</button><button id="openDeleteOverlay" class="btn badBtn" type="button">Delete Selected Page</button><button id="openResetOverlay" class="btn warnBtn" type="button">Reset Local List</button><button id="copyReport" class="btn" type="button">Copy Report</button></div><div id="statusBox" class="status">Ready. Loading Supabase pages...</div></section>
-<section class="layout"><section class="panel"><h2>Page cards</h2><div class="jumpBox"><b>Jump to page</b><div class="jumpGrid"><input id="pageJumpSearch" type="search" placeholder="Type page title or slug, then Enter"><button id="pageJumpBtn" class="btn primary" type="button">Search</button></div><small id="pageJumpStatus">Search pinpoints and scrolls to a page card. It does not filter the list.</small></div><div id="pageList" class="pageList"></div></section><aside class="panel"><h2>Selected page output</h2><div id="selectedSummary" class="summaryGrid"></div><h3>Open selected page through Web Builder-owned routes</h3><div class="actions"><button id="openBuilder" class="btn primary" type="button">Web Builder / Publish</button><button id="openPreview" class="btn warnBtn" type="button">Published Preview</button><button id="openForm" class="btn hot" type="button">Open Form Builder</button><button id="openInbox" class="btn blue" type="button">Owned Inbox</button></div><div id="linkBox" class="linkBox">Waiting...</div></aside></section>
-<section class="grid"><div class="panel"><h2>Safety rule</h2><div class="notice">Delete removes only the selected Supabase row from <code>sb_site_pages</code>, or a local draft from this page display. It never deletes HTML files, routes, assets, storage objects or app pages.</div></div><div class="panel"><h2>Pass condition</h2><p>Trevor/platform owner sees all pages. Kayleigh/Creator Growth sees only her own pages. Direct access still uses the Web Builder protected gate.</p></div><div class="panel"><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></div></section>
+<header class="top">
+  <div class="topInner">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">WB</div>
+      <div>
+        Web Builder Owned Pages Manager
+        <small>Shared workspace lock · V7.12.263.9</small>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Hub</a>
+      <a class="btn" href="web-builder-studio-v7-12-252-test.html">Studio</a>
+      <a class="btn" href="web-builder-preview-owned-v7-12-257-test.html?page=landing">Preview</a>
+      <a class="btn" href="web-builder-route-map-v7-12-252-test.html">Route Map</a>
+      <a class="btn" href="web-builder-control-map-v7-12-253-test.html">Control Map</a>
+    </div>
+  </div>
+</header>
+
+<main id="app" class="wrap">
+  <section class="loading">
+    <div>
+      <span class="badge">Checking Web Builder access</span>
+      <h1>Loading your pages workspace</h1>
+      <p>Pages Manager stays hidden until the personal workspace lock passes.</p>
+    </div>
+  </section>
 </main>
-<div id="editorOverlay" class="overlay" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="editorTitle"><div class="modalHead"><div><span class="badge">Page editor overlay</span><h2 id="editorTitle">Edit selected local copy</h2></div><button id="closeEditorOverlay" class="btn close" type="button">x</button></div><div class="modalBody"><div class="formGrid"><div class="control"><b>Slug / URL</b><input id="slug" autocomplete="off" spellcheck="false"><small>This is the Web Builder page slug and is saved to sb_site_pages.</small></div><div class="control"><b>Title</b><input id="title" autocomplete="off"></div><div class="control"><b>Status</b><select id="status"><option value="draft">Draft</option><option value="published">Published</option><option value="hidden">Hidden</option></select></div><div class="control"><b>Menu label</b><input id="menuLabel" autocomplete="off"></div><div class="control"><b>Sort order</b><input id="sortOrder" type="number" value="100"></div><div class="control"><b>Page type</b><select id="pageType"><option value="custom">Custom</option><option value="landing">Landing</option><option value="contact">Contact</option><option value="pricing">Pricing</option><option value="gallery">Gallery</option></select></div></div><div class="formGrid" style="margin-top:10px"><div class="control"><b>Navigation flags</b><label class="checkLine"><input id="showInMenu" type="checkbox"> Show in Web Builder menu later</label><label class="checkLine"><input id="isHomePage" type="checkbox"> Homepage candidate</label></div><div class="control"><b>Description / notes</b><textarea id="description" placeholder="Page purpose or internal notes"></textarea></div></div><div class="notice">Apply Local Copy changes the planner display. Save Selected To sb_site_pages stores it in Supabase.</div></div><div class="modalFoot"><button id="applyLocal" class="btn primary" type="button">Apply Local Copy</button><button id="editorDone" class="btn" type="button">Done</button></div></div></div>
-<div id="filterOverlay" class="overlay" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="filterTitle"><div class="modalHead"><div><span class="badge">Filter overlay</span><h2 id="filterTitle">Filter page output</h2></div><button id="closeFilterOverlay" class="btn close" type="button">x</button></div><div class="modalBody"><div class="formGrid"><div class="control"><b>Search text</b><input id="filterText" placeholder="Filter pages"></div><div class="control"><b>Status</b><select id="filterStatus"><option value="all">All statuses</option><option value="published">Published</option><option value="draft">Draft</option><option value="hidden">Hidden</option></select></div></div></div><div class="modalFoot"><button id="filterDone" class="btn primary" type="button">Done</button></div></div></div>
-<div id="draftOverlay" class="overlay" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="draftTitle"><div class="modalHead"><div><span class="badge">Draft overlay</span><h2 id="draftTitle">Create a local page draft?</h2></div><button id="closeDraftOverlay" class="btn close" type="button">x</button></div><div class="modalBody"><div class="notice">This creates a draft in this planner first. Click Save Selected To sb_site_pages after editing the slug/title.</div></div><div class="modalFoot"><button id="newDraft" class="btn hot" type="button">Create Local Draft</button><button id="draftCancel" class="btn" type="button">Cancel</button></div></div></div>
-<div id="deleteOverlay" class="overlay" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle"><div class="modalHead"><div><span class="badge bad">Delete overlay</span><h2 id="deleteTitle">Delete selected page?</h2></div><button id="closeDeleteOverlay" class="btn close" type="button">x</button></div><div class="modalBody"><div id="deleteSummary" class="out">No selected page.</div><div class="control"><b>Type the exact slug to confirm</b><input id="deleteConfirmSlug" autocomplete="off" spellcheck="false" placeholder="selected-page-slug"><small>Protected landing/home rows cannot be deleted here.</small></div><div class="notice"><b>Delete scope:</b> selected <code>sb_site_pages</code> row only. No files, routes, storage objects or app pages are deleted.</div></div><div class="modalFoot"><button id="deleteSelected" class="btn badBtn" type="button">Delete Selected Page</button><button id="deleteCancel" class="btn" type="button">Cancel</button></div></div></div>
-<div id="resetOverlay" class="overlay" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="resetTitle"><div class="modalHead"><div><span class="badge bad">Reset overlay</span><h2 id="resetTitle">Reset local planner list?</h2></div><button id="closeResetOverlay" class="btn close" type="button">x</button></div><div class="modalBody"><div class="notice">This resets only the displayed planner data back to the safe seed list. It does not delete pages, files, rows or routes.</div></div><div class="modalFoot"><button id="resetLocal" class="btn warnBtn" type="button">Reset Local List</button><button id="resetCancel" class="btn" type="button">Cancel</button></div></div></div>
-<script src="web-builder-protected-page-v7-12-265.js?v=wb-pages-manager-7-12-265-1"></script>
-<script src="web-builder-global-projector-v7-12-263.js?v=7-12-264-15-pages-manager-owner-scope"></script>
+
+<footer class="footer">
+  V7.12.263.9 Owned Pages Manager Lock · personal owner_id scope · schemaChanges false · storageActions false · indexPromotion false
+</footer>
+
 <script>
-(function(){'use strict';
-const VERSION='V7.12.264.15 Web Builder-owned Pages Manager Personal Workspace Scope';
+(function(){
+'use strict';
+
+const VERSION='V7.12.263.9 Web Builder Owned Pages Manager Shared Workspace Lock';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
-const preservedPagesManager='web-builder-pages-manager-v7-12-111-test.html';
-const hub='web-builder-account-control-hub-v7-12-263-test.html';
-const builder='overlay-route-truth-machine-v7-12-66-test.html';
-const ownedPreview='web-builder-preview-owned-v7-12-257-test.html';
-const ownedForm='web-builder-form-designer-owned-v7-12-258-test.html';
-const ownedInbox='web-builder-form-inbox-owned-v7-12-258-test.html';
-const appPreviewReference='web-builder-shared-style-preview-v7-12-117-test.html';
-const appFormReference='web-builder-form-save-v7-12-94-test.html';
-const appInboxReference='web-builder-form-submissions-v7-12-94-test.html';
-const PROTECTED_SLUGS=['landing','home','home-page'];
-const PLAN_RANK={free_viewer:0,viewer_plus:1,creator_starter:2,creator_growth:3,creator_pro:4,studio_business:5,platform_owner:6,enterprise:7};
-const seed=[{slug:'test-page',title:'Stream Bandit Test Page',status:'published',menuLabel:'Test Page',sortOrder:100,pageType:'custom',showInMenu:true,isHomePage:false,description:'Current test page reference.',source:'local-reference'},{slug:'landing',title:'Home Page',status:'published',menuLabel:'Home',sortOrder:1,pageType:'landing',showInMenu:true,isHomePage:true,description:'Landing page reference. Protected guard page.',source:'protected-landing'},{slug:'home-page',title:'Home Page',status:'published',menuLabel:'Homepage',sortOrder:2,pageType:'landing',showInMenu:false,isHomePage:true,description:'Current Pages Manager reference row.',source:'local-reference'},{slug:'web-builder-home-draft',title:'Web Builder Home Draft',status:'draft',menuLabel:'Builder Home',sortOrder:200,pageType:'custom',showInMenu:false,isHomePage:false,description:'Future Web Builder-owned draft placeholder.',source:'local-reference'}];
-let sb=null,user=null,profile=null,isAdmin=false,isPlatformOwner=false,canUseBuilder=false,pages=[],selected='my-first-page',source='local-fallback',supabaseReadCount=0,supabaseRows=0,pageWrites=0,pageDeletes=0,jumpSearches=0,jumpLast='',editorOverlayOpen=false,filterOverlayOpen=false,draftOverlayOpen=false,deleteOverlayOpen=false,resetOverlayOpen=false,lastAction='boot',lastError='';
+const OWNER_SLUGS=['landing','home','home-page'];
+
+const RANK={
+  free_viewer:0,
+  viewer_plus:1,
+  creator_starter:2,
+  creator_growth:3,
+  creator_pro:4,
+  studio_business:5,
+  platform_owner:6,
+  enterprise:7
+};
+
+let sb=null;
+let user=null;
+let profile=null;
+let pages=[];
+let selectedId='';
+let source='none';
+let filter='all';
+let lastAction='boot';
+let lastError='';
+let highlightedId='';
+let supabaseReads=false;
+let supabaseWrites=false;
+let supabaseDeletes=false;
+let localDraftCounter=1;
+
+let authState={
+  version:VERSION,
+  route:'web-builder-pages-manager-owned-v7-12-256-test.html',
+  checked:false,
+  allowed:false,
+  signedIn:false,
+  email:'',
+  userId:'',
+  role:'',
+  adminLevel:'',
+  planKey:'',
+  accountStatus:'',
+  isPlatformOwner:false,
+  canUseBuilder:false,
+  workspace:'',
+  lockClass:'creator-workspace-pages-manager-lock',
+  reason:'Checking...',
+  supabaseReads:false,
+  supabaseWrites:false,
+  storageWrites:false,
+  storageActions:false,
+  schemaChanges:false,
+  builderTableChanges:false,
+  fileDeletes:false,
+  htmlRouteDeletes:false,
+  streamBanditShellChanges:false,
+  activeMenuPromotion:false,
+  indexPromotion:false,
+  registryPromotion:true
+};
+
 const $=id=>document.getElementById(id);
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-function slugify(v){return String(v||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'test-page';}
-function obj(v){if(v&&typeof v==='object')return v;if(typeof v==='string'&&v.trim()){try{return JSON.parse(v)||{};}catch(e){}}return{};}
-function bool(v,d){if(v===true||v===false)return v;if(v===1||v==='1'||String(v).toLowerCase()==='true')return true;if(v===0||v==='0'||String(v).toLowerCase()==='false')return false;return !!d;}
-function truth(v){if(v===true||v===1)return true;if(typeof v==='string')return ['true','1','yes','on','enabled','allow','allowed'].includes(v.toLowerCase());return false;}
-function perms(p){return obj(p&&p.permissions_json);}
-function planRank(k){return PLAN_RANK[String(k||'free_viewer')]||0;}
-function ownerProfile(p){return !!p&&(p.admin_level==='owner'||p.plan_key==='platform_owner');}
-function builderAllowed(p){if(!p)return false;if(ownerProfile(p))return true;if(String(p.account_status||'active').toLowerCase()!=='active')return false;let ps=perms(p);return planRank(p.plan_key)>=planRank('creator_growth')||truth(ps.web_builder)||truth(ps.web_builder_starter)||truth(ps.pages_manager);}
-function cls(st){return st==='published'?'statusGood':st==='draft'?'statusWarn':'statusBad';}
-function setStatus(msg,kind){$('statusBox').textContent=msg;$('statusBox').className='status '+(kind||'');}
-function client(){if(sb)return sb;sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return sb;}
-function personalSeed(){return [{slug:'my-first-page',title:'My First Web Builder Page',status:'draft',menuLabel:'My First Page',sortOrder:100,pageType:'custom',showInMenu:false,isHomePage:false,description:'Personal local Web Builder draft. Save to create your own sb_site_pages row.',source:'personal-local-draft'}];}
-function fallbackSeed(){return JSON.parse(JSON.stringify(isPlatformOwner?seed:personalSeed()));}
-function firstSlug(){let p=pages.find(x=>x.slug==='landing')||pages[0];return p?p.slug:'';}
-async function auth(){try{let r=await client().auth.getUser();user=r.data&&r.data.user||null;profile=null;isAdmin=false;isPlatformOwner=false;canUseBuilder=false;if(user){let p=await client().from('sb_profiles').select('id,role,display_name,username,admin_level,plan_key,permissions_json,account_status').eq('id',user.id).maybeSingle();profile=p.data||null;isAdmin=!!(profile&&String(profile.role).toLowerCase()==='admin');isPlatformOwner=ownerProfile(profile);canUseBuilder=builderAllowed(profile);}}catch(e){user=null;profile=null;isAdmin=false;isPlatformOwner=false;canUseBuilder=false;}return user;}
-function mapRow(r,i){let settings=obj(r.settings_json),slug=slugify(r.slug||('supabase-page-'+(i+1)));return {slug:slug,title:r.title||settings.title||slug,status:String(r.status||'draft').toLowerCase(),menuLabel:settings.menu_label||settings.menuLabel||r.title||slug,sortOrder:Number(settings.sort_order??settings.sortOrder??settings.menu_order??(i+100)),pageType:r.page_type||settings.page_type||settings.pageType||(slug==='landing'?'landing':'custom'),showInMenu:bool(settings.show_in_menu??settings.showInMenu,false),isHomePage:bool(settings.is_home_page??settings.isHomePage,slug==='landing'||slug==='home'||slug==='home-page'),description:settings.description||r.description||'Supabase sb_site_pages row.',source:'supabase:sb_site_pages',supabaseId:r.id||'',ownerId:r.owner_id||'',updatedAt:r.updated_at||'',createdAt:r.created_at||'',raw:r,layoutJson:r.layout_json};}
-function isSupabaseRow(p){return !!(p&&p.supabaseId&&String(p.source||'').startsWith('supabase:'));}
-function ownsRow(p){return !!(p&&user&&p.ownerId===user.id);}
-function protectedReason(p){if(!p)return 'No selected page.';let s=slugify(p.slug);if(PROTECTED_SLUGS.includes(s))return 'Protected route: '+s;if(p.isHomePage)return 'Homepage candidate is protected. Unset homepage first if this is not the real home page.';return '';}
-function canDeletePage(p){return !!p&&!protectedReason(p);}
-function canDeleteCurrent(p){return !!p&&canDeletePage(p)&&isPlatformOwner;}
-function current(){return pages.find(p=>p.slug===selected)||pages[0];}
-function links(slug){let s=slugify(slug);return {slug:s,hub,builder:builder+'?page='+encodeURIComponent(s),preview:ownedPreview+'?page='+encodeURIComponent(s),form:ownedForm+'?page='+encodeURIComponent(s),inbox:ownedInbox+'?page='+encodeURIComponent(s),preservedPagesManager,appPreviewReference:appPreviewReference+'?page='+encodeURIComponent(s),appFormReference:appFormReference+'?page='+encodeURIComponent(s),appInboxReference:appInboxReference+'?page='+encodeURIComponent(s)};}
-function shownPages(){let q=String($('filterText').value||'').toLowerCase(),fs=$('filterStatus').value;return pages.filter(p=>(fs==='all'||p.status===fs)&&(!q||[p.slug,p.title,p.menuLabel,p.description,p.pageType,p.source,p.ownerId].join(' ').toLowerCase().includes(q))).sort((a,b)=>a.sortOrder-b.sortOrder||String(a.slug).localeCompare(String(b.slug)));}
-function deletableCount(){return pages.filter(canDeleteCurrent).length;}
-function state(){let p=current(),l=links(p&&p.slug);return {version:VERSION,canonicalRoute:'web-builder-pages-manager-owned-v7-12-256-test.html',personalWorkspaceScoped:true,scope:isPlatformOwner?'platform-owner-all-rows':'personal-owner-id-only',ownerScopeUserId:user&&user.id||'',pageJumpSearch:true,guardedSupabaseDelete:true,source,table:'sb_site_pages',supabaseReads:true,supabaseReadCount,supabaseRows,pageWrites,pageDeletes,supabaseWrites:pageWrites>0||pageDeletes>0,storageWrites:false,schemaChanges:false,debugVisible:true,localFallbackKept:true,authUser:user?{id:user.id,email:user.email}:null,profile:profile?{id:profile.id,role:profile.role,admin_level:profile.admin_level,plan_key:profile.plan_key,account_status:profile.account_status}:null,isAdmin,isPlatformOwner,canUseBuilder,selected:p,selectedCanDelete:canDeleteCurrent(p),selectedProtectedReason:protectedReason(p),selectedOwnerMatches:ownsRow(p),deletablePages:deletableCount(),protectedSlugs:PROTECTED_SLUGS,landingHomeProtected:true,fileDelete:false,routeDelete:false,jumpSearches,jumpLast,pages,shown:shownPages().length,links:l,overlays:{editor:editorOverlayOpen,filter:filterOverlayOpen,draft:draftOverlayOpen,delete:deleteOverlayOpen,reset:resetOverlayOpen},lastAction,lastError};}
-function loadForm(p){if(!p)return;$('slug').value=p.slug;$('title').value=p.title;$('status').value=['published','draft','hidden'].includes(p.status)?p.status:'draft';$('menuLabel').value=p.menuLabel;$('sortOrder').value=p.sortOrder;$('pageType').value=p.pageType;$('showInMenu').checked=!!p.showInMenu;$('isHomePage').checked=!!p.isHomePage;$('description').value=p.description||'';renderLinks();}
-function readForm(){let old=current();return {slug:slugify($('slug').value),title:$('title').value.trim()||'Untitled Page',status:$('status').value,menuLabel:$('menuLabel').value.trim()||$('title').value.trim()||'Untitled',sortOrder:Number($('sortOrder').value||100),pageType:$('pageType').value,showInMenu:$('showInMenu').checked,isHomePage:$('isHomePage').checked,description:$('description').value.trim(),source:old&&isSupabaseRow(old)?'local-copy-from-supabase':(old&&old.source?old.source:'user-added'),supabaseId:old&&old.slug===slugify($('slug').value)?old.supabaseId:'',ownerId:old&&old.ownerId||'',raw:old&&old.raw||null,layoutJson:old&&old.layoutJson||[]};}
-function payloadFor(p){let existingSettings=obj(p.raw&&p.raw.settings_json),layout=Array.isArray(p.layoutJson)?p.layoutJson:(p.raw&&Array.isArray(p.raw.layout_json)?p.raw.layout_json:[]);let settings=Object.assign({},existingSettings,{menu_label:p.menuLabel,show_in_menu:!!p.showInMenu,is_home_page:!!p.isHomePage,sort_order:Number(p.sortOrder||100),description:p.description||'',saved_by:'web-builder-pages-manager-owned-v7-12-264-15',saved_at:new Date().toISOString(),personal_workspace_scope:isPlatformOwner?'platform_owner_all_rows':'owner_id_only'});let out={slug:p.slug,title:p.title,page_type:p.pageType,status:p.status,layout_json:layout,settings_json:settings,updated_at:new Date().toISOString()};if(user&&user.id)out.owner_id=isPlatformOwner&&(p.ownerId||p.raw&&p.raw.owner_id)?(p.ownerId||p.raw.owner_id):user.id;return out;}
-function renderList(){let shown=shownPages();$('countText').textContent=shown.length+' / '+pages.length+' shown, '+deletableCount()+' deletable';$('sourceText').textContent='source: '+source+' · rows '+supabaseRows+' · writes '+pageWrites+' · deletes '+pageDeletes+' · scope '+(isPlatformOwner?'all':'own');$('authText').textContent='auth: '+(user?(user.email||user.id)+' · '+(profile&&profile.plan_key||'no plan')+' · '+(isPlatformOwner?'platform owner':canUseBuilder?'builder access':'no builder access'):'signed out');$('authText').className='pill '+(canUseBuilder?'good':'warn');$('filterSummary').textContent=($('filterStatus').value==='all'?'All statuses':$('filterStatus').value)+' '+($('filterText').value?'/ '+$('filterText').value:'');$('pageList').innerHTML=shown.length?shown.map(p=>'<article class="pageCard '+(p.slug===selected?'active':'')+'" data-slug="'+esc(p.slug)+'"><b>'+esc(p.title)+'</b><code>'+esc(p.slug)+'</code><span class="pill '+cls(p.status)+'">'+esc(p.status)+'</span><span class="pill">'+esc(p.pageType)+'</span><span class="pill">sort '+esc(p.sortOrder)+'</span><span class="pill '+(isSupabaseRow(p)?'good':'warn')+'">'+esc(p.source)+'</span>'+(p.ownerId?'<span class="pill">owner '+esc(String(p.ownerId).slice(0,8))+'</span>':'')+(p.showInMenu?'<span class="pill good">menu</span>':'')+(p.isHomePage?'<span class="pill warn">home protected</span>':'')+(canDeleteCurrent(p)?'<span class="pill bad">deletable</span>':'<span class="pill warn">delete locked</span>')+'<p>'+esc(p.description||'No description.')+'</p></article>').join(''):'<div class="notice">No pages match this filter or this personal workspace has no saved rows yet.</div>';document.querySelectorAll('.pageCard').forEach(el=>el.onclick=()=>{selected=el.getAttribute('data-slug');loadForm(current());lastAction='selected page';render();});}
-function renderSelected(){let p=current();if(!p){$('selectedSummary').innerHTML='<div class="notice">No selected page.</div>';return;}$('selectedSummary').innerHTML='<article class="summaryCard"><b>Title</b><p>'+esc(p.title)+'</p></article><article class="summaryCard"><b>Visible slug</b><p><code>'+esc(p.slug)+'</code></p></article><article class="summaryCard"><b>Status</b><p><span class="pill '+cls(p.status)+'">'+esc(p.status)+'</span></p></article><article class="summaryCard"><b>Source</b><p>'+esc(p.source||'local')+'</p></article><article class="summaryCard"><b>Owner scope</b><p>'+(isPlatformOwner?'Platform owner can view all.':isSupabaseRow(p)?'Visible because owner_id matches signed-in user.':'Local personal draft.')+'</p></article><article class="summaryCard"><b>Delete state</b><p>'+(canDeleteCurrent(p)?'Platform owner can delete with confirmation.':esc(protectedReason(p)||'Delete locked for non-platform owner.'))+'</p></article><article class="summaryCard"><b>Description</b><p>'+esc(p.description||'No description.')+'</p></article><article class="summaryCard"><b>Persistence</b><p>'+(isSupabaseRow(p)?'Saved in sb_site_pages.':'Local only until saved.')+'</p></article>';renderDeleteSummary();}
-function renderDeleteSummary(){let p=current(),btn=$('deleteSelected');if(!p){$('deleteSummary').textContent='No selected page.';if(btn)btn.disabled=true;return;}let report={selected:p.slug,title:p.title,status:p.status,source:p.source,supabaseId:p.supabaseId||'',ownerId:p.ownerId||'',isSupabaseRow:isSupabaseRow(p),isPlatformOwner:isPlatformOwner,canDelete:canDeleteCurrent(p),protectedReason:protectedReason(p)||'',deleteEffect:isSupabaseRow(p)?'Deletes this selected sb_site_pages row only.':'Removes this local draft from the displayed list only.',blockedIf:'landing/home/homepage candidate, non-platform owner, signed out, or confirm slug mismatch'};$('deleteSummary').textContent=JSON.stringify(report,null,2);if(btn)btn.disabled=!canDeleteCurrent(p);}
-function renderLinks(){let p=current()||readForm(),l=links((p&&p.slug)||$('slug').value);$('linkBox').textContent='Hub: '+l.hub+'\nWeb Builder / Publish: '+l.builder+'\nOwned Preview: '+l.preview+'\nOwned Form Builder: '+l.form+'\nOwned Inbox: '+l.inbox+'\n\nPreserved app references, not opened by these buttons:\nApp Preview Reference: '+l.appPreviewReference+'\nApp Form Reference: '+l.appFormReference+'\nApp Inbox Reference: '+l.appInboxReference+'\nCurrent Pages Manager: '+l.preservedPagesManager;}
-function render(){renderList();renderSelected();renderLinks();$('debug').textContent=JSON.stringify(state(),null,2);}
-function searchText(p){return [p.title,p.slug,p.menuLabel,p.status,p.pageType,p.description,p.ownerId].join(' ').toLowerCase();}
-function jumpToPage(){let q=String($('pageJumpSearch').value||'').trim().toLowerCase();if(!q){$('pageJumpStatus').textContent='Type a page title or slug first.';return;}let exact=pages.find(p=>p.slug.toLowerCase()===q||String(p.title||'').toLowerCase()===q);let found=exact||pages.find(p=>searchText(p).includes(q));jumpSearches++;jumpLast=q;if(!found){$('pageJumpStatus').textContent='No page matched in this workspace: '+q;lastAction='page jump search no match';render();return;}$('filterText').value='';$('filterStatus').value='all';selected=found.slug;loadForm(found);lastAction='page jump search matched '+found.slug;render();setTimeout(()=>{let el=document.querySelector('.pageCard[data-slug="'+found.slug+'"]');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('jumpFound');setTimeout(()=>el.classList.remove('jumpFound'),2400);}$('pageJumpStatus').textContent='Found and selected: '+found.title+' / '+found.slug;},60);}
-async function loadSupabasePages(){try{lastAction='load sb_site_pages start';lastError='';setStatus('Loading sb_site_pages with workspace scope...');await auth();if(!user)throw new Error('You must be signed in first.');if(!canUseBuilder)throw new Error('This account does not have Web Builder access.');let q=client().from('sb_site_pages').select('*');if(!isPlatformOwner)q=q.eq('owner_id',user.id);q=q.limit(500);const r=await q;supabaseReadCount++;if(r.error)throw r.error;let rows=r.data||[];supabaseRows=rows.length;if(rows.length){pages=rows.map(mapRow);source=isPlatformOwner?'supabase-read-all-platform-owner':'supabase-read-owner-id';selected=(pages.find(p=>p.slug==='landing')||pages[0]).slug;loadForm(current());setStatus('Loaded '+rows.length+' sb_site_pages row(s) for '+(isPlatformOwner?'platform owner all-row scope.':'this personal owner_id workspace.'), 'good');}else{pages=fallbackSeed();source=isPlatformOwner?'local-fallback-empty-supabase':'personal-local-fallback-empty-supabase';selected=firstSlug();loadForm(current());setStatus('No saved pages found for this workspace. Local personal draft shown.', 'good');}lastAction='load sb_site_pages complete';render();}catch(e){lastError=e.message||String(e);pages=fallbackSeed();source='local-fallback-error';selected=firstSlug();supabaseRows=0;loadForm(current());setStatus('Supabase read failed or blocked. Safe local fallback shown: '+lastError,'bad');render();}}
-async function saveSelectedSupabase(){try{lastAction='save selected start';lastError='';let p=readForm();if(!p.slug)throw new Error('Slug is required.');await auth();if(!user)throw new Error('You must be signed in first.');if(!canUseBuilder)throw new Error('This account does not have Web Builder save access.');setStatus('Saving '+p.slug+' to personal sb_site_pages workspace...');const c=client();let existingQ=c.from('sb_site_pages').select('*').eq('slug',p.slug);if(!isPlatformOwner)existingQ=existingQ.eq('owner_id',user.id);existingQ=existingQ.limit(1);const existing=await existingQ;supabaseReadCount++;if(existing.error)throw existing.error;let data=payloadFor(p),saved=null,existingRow=existing.data&&existing.data[0];if(existingRow){let upQ=c.from('sb_site_pages').update(data).eq('id',existingRow.id);if(!isPlatformOwner)upQ=upQ.eq('owner_id',user.id);let up=await upQ.select('*').maybeSingle();pageWrites++;if(up.error)throw up.error;saved=up.data||existingRow;}else{let ins=await c.from('sb_site_pages').insert(data).select('*').maybeSingle();pageWrites++;if(ins.error)throw ins.error;saved=ins.data;}let verifyQ=c.from('sb_site_pages').select('*').eq('id',saved.id);if(!isPlatformOwner)verifyQ=verifyQ.eq('owner_id',user.id);let verify=await verifyQ.maybeSingle();supabaseReadCount++;if(verify.error)throw verify.error;if(!verify.data)throw new Error('Save verification failed: row was not read back inside this workspace.');let mapped=mapRow(verify.data,0);let idx=pages.findIndex(x=>x.slug===mapped.slug);if(idx>=0)pages[idx]=mapped;else pages.push(mapped);selected=mapped.slug;source=isPlatformOwner?'supabase-read-after-save-platform-owner':'supabase-read-after-save-owner-id';supabaseRows=pages.filter(isSupabaseRow).length;loadForm(mapped);lastAction='saved and verified '+mapped.slug;setStatus('Saved and verified in sb_site_pages: '+mapped.slug,'good');render();}catch(e){lastError=e.message||String(e);lastAction='save selected failed';setStatus('Save failed: '+lastError,'bad');render();}}
-async function deleteSelectedPage(){try{lastAction='delete selected start';lastError='';let p=current();if(!p)throw new Error('No selected page.');let reason=protectedReason(p);if(reason)throw new Error(reason);if(!isPlatformOwner)throw new Error('Only platform owner can delete Web Builder page rows here.');let typed=slugify($('deleteConfirmSlug').value);if(typed!==p.slug)throw new Error('Confirmation slug does not match. Type: '+p.slug);if(isSupabaseRow(p)){await auth();if(!user)throw new Error('You must be signed in first.');if(!isPlatformOwner)throw new Error('Only platform owner can delete Web Builder page rows here.');setStatus('Deleting '+p.slug+' from sb_site_pages...');let del=await client().from('sb_site_pages').delete().eq('id',p.supabaseId).select('id,slug').maybeSingle();pageDeletes++;if(del.error)throw del.error;if(!del.data)throw new Error('Delete not confirmed. RLS may have blocked the delete.');let verify=await client().from('sb_site_pages').select('id,slug').eq('id',p.supabaseId).maybeSingle();supabaseReadCount++;if(verify.error)throw verify.error;if(verify.data)throw new Error('Delete verification failed: row still exists.');pages=pages.filter(x=>x.supabaseId!==p.supabaseId);source='supabase-read-after-delete';supabaseRows=pages.filter(isSupabaseRow).length;setStatus('Deleted and verified gone from sb_site_pages: '+p.slug,'good');}else{pages=pages.filter(x=>x.slug!==p.slug);setStatus('Removed local draft/copy: '+p.slug,'good');}
-selected=firstSlug();if(current())loadForm(current());closeDeleteOverlay();lastAction='deleted selected page '+p.slug;render();}catch(e){lastError=e.message||String(e);lastAction='delete selected failed';setStatus('Delete failed: '+lastError,'bad');render();}}
-function useLocal(){pages=fallbackSeed();source=isPlatformOwner?'local-fallback-manual':'personal-local-fallback-manual';selected=firstSlug();lastAction='manual local fallback';lastError='';loadForm(current());setStatus('Local fallback loaded. No Supabase read/write.');render();}
-function applyLocal(){let old=current();let p=readForm();let i=pages.findIndex(x=>x.slug===selected);let clash=pages.findIndex(x=>x.slug===p.slug);if(clash>-1&&pages[clash].slug!==selected){p.slug=p.slug+'-copy';p.source='user-added-copy';}if(i>-1)pages[i]=p;else pages.push(Object.assign(p,{source:'user-added'}));selected=p.slug;loadForm(p);lastAction='applied local copy only';lastError='';render();}
-function newDraft(){let n=pages.length+1,p={slug:'new-page-draft-'+n,title:'New Page Draft '+n,status:'draft',menuLabel:'New Page '+n,sortOrder:300+n,pageType:'custom',showInMenu:false,isHomePage:false,description:'Local personal planner draft only.',source:'user-added',ownerId:user&&user.id||''};pages.push(p);selected=p.slug;loadForm(p);closeDraftOverlay();lastAction='created local draft';lastError='';render();openEditorOverlay();}
-function reset(){useLocal();closeResetOverlay();lastAction='reset local list';render();}
-function nav(kind){let p=current()||readForm(),l=links(p.slug);location.href=l[kind];}
-function copy(){navigator.clipboard&&navigator.clipboard.writeText(JSON.stringify(state(),null,2)).catch(()=>{});lastAction='copied report';render();}
-function openEditorOverlay(){loadForm(current());editorOverlayOpen=true;$('editorOverlay').classList.add('open');$('editorOverlay').setAttribute('aria-hidden','false');setTimeout(()=>{$('slug').focus();},40);render();}
-function closeEditorOverlay(){editorOverlayOpen=false;$('editorOverlay').classList.remove('open');$('editorOverlay').setAttribute('aria-hidden','true');render();}
-function openFilterOverlay(){filterOverlayOpen=true;$('filterOverlay').classList.add('open');$('filterOverlay').setAttribute('aria-hidden','false');setTimeout(()=>{$('filterText').focus();},40);render();}
-function closeFilterOverlay(){filterOverlayOpen=false;$('filterOverlay').classList.remove('open');$('filterOverlay').setAttribute('aria-hidden','true');render();}
-function openDraftOverlay(){draftOverlayOpen=true;$('draftOverlay').classList.add('open');$('draftOverlay').setAttribute('aria-hidden','false');render();}
-function closeDraftOverlay(){draftOverlayOpen=false;$('draftOverlay').classList.remove('open');$('draftOverlay').setAttribute('aria-hidden','true');render();}
-function openDeleteOverlay(){deleteOverlayOpen=true;$('deleteOverlay').classList.add('open');$('deleteOverlay').setAttribute('aria-hidden','false');$('deleteConfirmSlug').value='';renderDeleteSummary();setTimeout(()=>{$('deleteConfirmSlug').focus();},40);render();}
-function closeDeleteOverlay(){deleteOverlayOpen=false;$('deleteOverlay').classList.remove('open');$('deleteOverlay').setAttribute('aria-hidden','true');render();}
-function openResetOverlay(){resetOverlayOpen=true;$('resetOverlay').classList.add('open');$('resetOverlay').setAttribute('aria-hidden','false');render();}
-function closeResetOverlay(){resetOverlayOpen=false;$('resetOverlay').classList.remove('open');$('resetOverlay').setAttribute('aria-hidden','true');render();}
-function bind(){$('loadSupabase').onclick=loadSupabasePages;$('saveSupabase').onclick=saveSelectedSupabase;$('useLocal').onclick=useLocal;$('openEditorOverlay').onclick=openEditorOverlay;$('closeEditorOverlay').onclick=closeEditorOverlay;$('editorDone').onclick=closeEditorOverlay;$('openFilterOverlay').onclick=openFilterOverlay;$('closeFilterOverlay').onclick=closeFilterOverlay;$('filterDone').onclick=closeFilterOverlay;$('openDraftOverlay').onclick=openDraftOverlay;$('closeDraftOverlay').onclick=closeDraftOverlay;$('draftCancel').onclick=closeDraftOverlay;$('openDeleteOverlay').onclick=openDeleteOverlay;$('closeDeleteOverlay').onclick=closeDeleteOverlay;$('deleteCancel').onclick=closeDeleteOverlay;$('deleteSelected').onclick=deleteSelectedPage;$('openResetOverlay').onclick=openResetOverlay;$('closeResetOverlay').onclick=closeResetOverlay;$('resetCancel').onclick=closeResetOverlay;$('applyLocal').onclick=applyLocal;$('newDraft').onclick=newDraft;$('resetLocal').onclick=reset;$('copyReport').onclick=copy;$('openBuilder').onclick=()=>nav('builder');$('openPreview').onclick=()=>nav('preview');$('openForm').onclick=()=>nav('form');$('openInbox').onclick=()=>nav('inbox');$('pageJumpBtn').onclick=jumpToPage;$('pageJumpSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();jumpToPage();}});$('filterText').addEventListener('input',()=>{lastAction='filter typed';render();});$('filterStatus').addEventListener('change',()=>{lastAction='filter status changed';render();});['slug','title','status','menuLabel','sortOrder','pageType','showInMenu','isHomePage','description'].forEach(id=>$(id).addEventListener('input',()=>{lastAction='editor typed';renderLinks();$('debug').textContent=JSON.stringify(state(),null,2);}));document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeEditorOverlay();closeFilterOverlay();closeDraftOverlay();closeDeleteOverlay();closeResetOverlay();}});}
-function boot(){pages=fallbackSeed();bind();selected=firstSlug();loadForm(current());render();auth().then(()=>loadSupabasePages());window.WebBuilderOwnedPagesManagerV71226415={version:VERSION,state,loadSupabasePages,saveSelectedSupabase,deleteSelectedPage,useLocal,jumpToPage};}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+
+function client(){
+  if(sb)return sb;
+  if(!window.supabase||!window.supabase.createClient)throw new Error('Supabase SDK not loaded');
+  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  return sb;
+}
+
+function esc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,function(m){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]||m;
+  });
+}
+
+function obj(v){
+  if(v&&typeof v==='object')return v;
+  if(typeof v==='string'&&v.trim()){
+    try{return JSON.parse(v)||{};}catch(e){}
+  }
+  return {};
+}
+
+function truth(v){
+  if(v===true||v===1)return true;
+  if(typeof v==='string'){
+    return ['true','1','yes','on','enabled','allow','allowed'].includes(v.toLowerCase());
+  }
+  return false;
+}
+
+function rank(k){
+  return RANK[String(k||'free_viewer')]||0;
+}
+
+function isPlatformOwnerProfile(p){
+  return !!p&&(p.admin_level==='owner'||p.admin_level==='platform_owner'||p.plan_key==='platform_owner');
+}
+
+function statusAllowed(p){
+  let s=String(p&&p.account_status||'active').toLowerCase();
+  return isPlatformOwnerProfile(p)||s==='active';
+}
+
+function builderAllowed(p){
+  if(!p)return false;
+  if(isPlatformOwnerProfile(p))return true;
+  if(!statusAllowed(p))return false;
+  let ps=obj(p.permissions_json);
+  return rank(p.plan_key)>=rank('creator_growth')||
+    truth(ps.web_builder)||
+    truth(ps.web_builder_starter)||
+    truth(ps.pages_manager)||
+    truth(ps.web_builder_studio);
+}
+
+function cleanSlug(v){
+  return String(v||'')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g,'-')
+    .replace(/^-+|-+$/g,'')||'untitled-page';
+}
+
+function ownerMatches(row){
+  return String(row&&row.owner_id||'')===String(authState.userId||'');
+}
+
+function isReserved(rowOrSlug){
+  let slug=typeof rowOrSlug==='string'?cleanSlug(rowOrSlug):cleanSlug(rowOrSlug&&rowOrSlug.slug);
+  return OWNER_SLUGS.includes(slug);
+}
+
+function pageSettings(row){
+  return obj(row&&row.settings_json);
+}
+
+function pageSort(row){
+  let s=pageSettings(row);
+  let n=Number(row&&row.sort_order!=null?row.sort_order:s.sort_order!=null?s.sort_order:100);
+  return Number.isFinite(n)?n:100;
+}
+
+function pageLabel(row){
+  let s=pageSettings(row);
+  return s.menu_label||s.menuLabel||row.title||row.slug||'Untitled page';
+}
+
+function normalizeRow(row,sourceName){
+  row=row||{};
+
+  let settings=pageSettings(row);
+  let slug=cleanSlug(row.slug||settings.slug||'untitled-page');
+
+  return {
+    id:row.id||'local-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),
+    db_id:row.id||'',
+    source:sourceName||row.source||'local',
+    slug:slug,
+    title:row.title||settings.title||slug.replace(/-/g,' ').replace(/\b\w/g,function(m){return m.toUpperCase();}),
+    status:row.status||settings.status||'draft',
+    owner_id:row.owner_id||authState.userId||'',
+    page_type:row.page_type||settings.page_type||settings.pageType||'custom',
+    sort_order:pageSort(row),
+    settings_json:Object.assign({},settings,{
+      menu_label:settings.menu_label||settings.menuLabel||row.title||slug,
+      nav_visible:settings.nav_visible!=null?settings.nav_visible:settings.navVisible!=null?settings.navVisible:true,
+      is_home_page:settings.is_home_page!=null?settings.is_home_page:settings.isHomePage!=null?settings.isHomePage:false
+    }),
+    updated_at:row.updated_at||new Date().toISOString(),
+    raw:row
+  };
+}
+
+function selected(){
+  return pages.find(function(p){
+    return p.id===selectedId;
+  })||pages[0]||null;
+}
+
+function visiblePages(){
+  let list=pages.slice();
+
+  if(!authState.isPlatformOwner){
+    list=list.filter(ownerMatches);
+  }
+
+  if(filter!=='all'){
+    list=list.filter(function(p){
+      return String(p.status||'draft')===filter;
+    });
+  }
+
+  list.sort(function(a,b){
+    let as=Number(a.sort_order||100);
+    let bs=Number(b.sort_order||100);
+
+    if(as!==bs)return as-bs;
+
+    return cleanSlug(a.slug).localeCompare(cleanSlug(b.slug));
+  });
+
+  return list;
+}
+
+function links(row){
+  let slug=cleanSlug(row&&row.slug||'untitled-page');
+
+  return {
+    slug:slug,
+    studio:'overlay-route-truth-machine-v7-12-66-test.html?page='+encodeURIComponent(slug),
+    canonicalStudio:'web-builder-studio-v7-12-252-test.html?page='+encodeURIComponent(slug),
+    preview:'web-builder-preview-owned-v7-12-257-test.html?page='+encodeURIComponent(slug),
+    form:'web-builder-form-designer-owned-v7-12-258-test.html?page='+encodeURIComponent(slug),
+    inbox:'web-builder-form-inbox-owned-v7-12-258-test.html?page='+encodeURIComponent(slug)
+  };
+}
+
+function setStatus(text,kind){
+  let el=$('statusBox');
+  if(!el)return;
+  el.textContent=text;
+  el.className='status '+(kind||'');
+}
+
+async function readAuthority(){
+  let c=client();
+  let foundUser=null;
+
+  let gu=await c.auth.getUser();
+  if(gu&&gu.data&&gu.data.user)foundUser=gu.data.user;
+
+  if(!foundUser){
+    let gs=await c.auth.getSession();
+    if(gs&&gs.data&&gs.data.session&&gs.data.session.user)foundUser=gs.data.session.user;
+  }
+
+  if(!foundUser){
+    return {signedIn:false,user:null,profile:null};
+  }
+
+  let pr=await c
+    .from('sb_profiles')
+    .select('id,username,display_name,role,admin_level,plan_key,permissions_json,account_status,managed_by')
+    .eq('id',foundUser.id)
+    .maybeSingle();
+
+  supabaseReads=true;
+  authState.supabaseReads=true;
+
+  if(pr.error)throw pr.error;
+
+  return {
+    signedIn:true,
+    user:foundUser,
+    profile:pr.data||null
+  };
+}
+
+async function loadSupabasePages(){
+  try{
+    if(!authState.allowed)throw new Error('Pages Manager locked.');
+
+    setStatus('Loading sb_site_pages...', '');
+
+    let q=client()
+      .from('sb_site_pages')
+      .select('id,slug,title,status,owner_id,settings_json,page_type,sort_order,updated_at')
+      .order('sort_order',{ascending:true})
+      .order('slug',{ascending:true})
+      .limit(200);
+
+    if(!authState.isPlatformOwner){
+      q=q.eq('owner_id',authState.userId);
+    }
+
+    let r=await q;
+
+    supabaseReads=true;
+    authState.supabaseReads=true;
+
+    if(r.error)throw r.error;
+
+    let rows=(r.data||[]).map(function(row){
+      return normalizeRow(row,'supabase:sb_site_pages');
+    });
+
+    if(!authState.isPlatformOwner){
+      rows=rows.filter(ownerMatches);
+    }
+
+    pages=rows;
+    source='supabase';
+
+    if(!selectedId&&pages.length)selectedId=pages[0].id;
+
+    if(selectedId&&!pages.some(function(p){return p.id===selectedId;})){
+      selectedId=pages[0]?pages[0].id:'';
+    }
+
+    lastAction='load sb_site_pages passed';
+    lastError='';
+
+    setStatus('Loaded '+pages.length+' page rows.', 'good2');
+
+    render();
+  }catch(e){
+    lastError=e&&e.message?e.message:String(e);
+    lastAction='load sb_site_pages failed';
+
+    if(!pages.length){
+      makeLocalFallback();
+    }
+
+    setStatus('Load failed: '+lastError, 'bad2');
+    render();
+  }
+}
+
+function makeLocalFallback(){
+  let draft=normalizeRow({
+    slug:'my-first-page',
+    title:'My First Web Builder Page',
+    status:'draft',
+    owner_id:authState.userId,
+    page_type:'custom',
+    sort_order:100,
+    settings_json:{menu_label:'My First Page',nav_visible:true,is_home_page:false}
+  },'personal-local-draft');
+
+  pages=[draft];
+  selectedId=draft.id;
+  source='local fallback';
+  lastAction='personal local fallback created';
+}
+
+function newDraft(){
+  let n=pages.length+localDraftCounter++;
+  let slug=cleanSlug('new-page-draft-'+n);
+
+  let draft=normalizeRow({
+    slug:slug,
+    title:'New Page Draft '+n,
+    status:'draft',
+    owner_id:authState.userId,
+    page_type:'custom',
+    sort_order:100+n,
+    settings_json:{menu_label:'New Page '+n,nav_visible:true,is_home_page:false}
+  },'personal-local-draft');
+
+  pages.unshift(draft);
+  selectedId=draft.id;
+
+  lastAction='new local draft created';
+  lastError='';
+
+  setStatus('New local draft created. Edit it, then save to sb_site_pages.', 'good2');
+  render();
+  openEditor();
+}
+
+function payloadFromPage(row){
+  let settings=Object.assign({},pageSettings(row),{
+    menu_label:pageLabel(row),
+    nav_visible:truth(pageSettings(row).nav_visible),
+    is_home_page:truth(pageSettings(row).is_home_page),
+    updated_by:'web-builder-pages-manager-owned-v7-12-256-test.html',
+    updated_at:new Date().toISOString()
+  });
+
+  return {
+    slug:cleanSlug(row.slug),
+    title:String(row.title||row.slug||'Untitled page').trim()||'Untitled page',
+    status:String(row.status||'draft'),
+    owner_id:authState.isPlatformOwner?(row.owner_id||authState.userId):authState.userId,
+    settings_json:settings,
+    page_type:String(row.page_type||'custom'),
+    sort_order:Number(row.sort_order||100)
+  };
+}
+
+async function saveSelected(){
+  try{
+    let row=selected();
+
+    if(!row)throw new Error('No selected page.');
+    if(!authState.allowed)throw new Error('Pages Manager locked.');
+
+    row.slug=cleanSlug(row.slug);
+
+    if(!authState.isPlatformOwner){
+      if(isReserved(row.slug))throw new Error('Creator users cannot save reserved owner slugs: landing, home, home-page.');
+      row.owner_id=authState.userId;
+    }
+
+    if(!authState.isPlatformOwner&&!ownerMatches(row)){
+      throw new Error('Creator users can save only their own owner_id rows.');
+    }
+
+    let payload=payloadFromPage(row);
+    let result;
+
+    setStatus('Saving selected page to sb_site_pages...', '');
+
+    if(row.db_id){
+      result=await client()
+        .from('sb_site_pages')
+        .update(payload)
+        .eq('id',row.db_id)
+        .select('id,slug,title,status,owner_id,settings_json,page_type,sort_order,updated_at')
+        .single();
+    }else{
+      result=await client()
+        .from('sb_site_pages')
+        .insert(payload)
+        .select('id,slug,title,status,owner_id,settings_json,page_type,sort_order,updated_at')
+        .single();
+    }
+
+    supabaseWrites=true;
+    authState.supabaseWrites=true;
+
+    if(result.error)throw result.error;
+
+    let saved=normalizeRow(result.data,'supabase:sb_site_pages');
+    let idx=pages.findIndex(function(p){return p.id===row.id;});
+
+    if(idx>=0){
+      pages[idx]=saved;
+    }else{
+      pages.unshift(saved);
+    }
+
+    selectedId=saved.id;
+    source='supabase';
+    lastAction='save selected passed';
+    lastError='';
+
+    setStatus('Saved selected page to sb_site_pages.', 'good2');
+    render();
+  }catch(e){
+    lastError=e&&e.message?e.message:String(e);
+    lastAction='save selected failed';
+    setStatus('Save failed: '+lastError, 'bad2');
+    render();
+  }
+}
+
+async function deleteSelected(){
+  try{
+    let row=selected();
+
+    if(!row)throw new Error('No selected page.');
+
+    let typed=cleanSlug($('deleteConfirm').value);
+
+    if(typed!==cleanSlug(row.slug)){
+      throw new Error('Type the exact slug to confirm delete.');
+    }
+
+    if(isReserved(row.slug)){
+      throw new Error('Reserved owner slugs cannot be deleted here.');
+    }
+
+    if(row.db_id&&!authState.isPlatformOwner){
+      throw new Error('Supabase page delete is platform-owner only in this pass.');
+    }
+
+    if(row.db_id){
+      setStatus('Deleting selected sb_site_pages row...', '');
+
+      let r=await client()
+        .from('sb_site_pages')
+        .delete()
+        .eq('id',row.db_id);
+
+      supabaseDeletes=true;
+      authState.supabaseWrites=true;
+
+      if(r.error)throw r.error;
+    }
+
+    pages=pages.filter(function(p){
+      return p.id!==row.id;
+    });
+
+    selectedId=pages[0]?pages[0].id:'';
+
+    closeDelete();
+    lastAction=row.db_id?'delete selected Supabase row passed':'delete selected local draft passed';
+    lastError='';
+
+    setStatus('Deleted selected page from this page manager view.', 'good2');
+    render();
+  }catch(e){
+    lastError=e&&e.message?e.message:String(e);
+    lastAction='delete selected failed';
+    setStatus('Delete failed: '+lastError, 'bad2');
+    render();
+  }
+}
+
+function useLocal(){
+  makeLocalFallback();
+  setStatus('Using local fallback list. No Supabase writes made.', 'good2');
+  render();
+}
+
+function applyEditor(){
+  let row=selected();
+
+  if(!row)return;
+
+  row.slug=cleanSlug($('slug').value);
+  row.title=$('title').value.trim()||row.slug;
+  row.status=$('status').value||'draft';
+  row.page_type=$('pageType').value||'custom';
+  row.sort_order=Number($('sortOrder').value||100);
+
+  let s=pageSettings(row);
+  s.menu_label=$('menuLabel').value.trim()||row.title;
+  s.nav_visible=$('navVisible').checked;
+  s.is_home_page=$('isHomePage').checked;
+
+  row.settings_json=s;
+  row.updated_at=new Date().toISOString();
+
+  if(!authState.isPlatformOwner){
+    row.owner_id=authState.userId;
+  }
+
+  lastAction='local selected copy edited';
+  lastError='';
+
+  closeEditor();
+  set let row=selected();
+
+  if(!row)return;
+
+  row.slug=cleanSlug($('slug').value);
+  row.title=$('title').value.trim()||row.slug;
+  row.status=$('status').value||'draft';
+  row.page_type=$('pageType').value||'custom';
+  row.sort_order=Number($('sortOrder').value||100);
+
+  let s=pageSettings(row);
+  s.menu_label=$('menuLabel').value.trim()||row.title;
+  s.nav_visible=$('navVisible').checked;
+  s.is_home_page=$('isHomePage').checked;
+
+  row.settings_json=s;
+  row.updated_at=new Date().toISOString();
+
+Status('Local selected copy updated. Save to sb_site_pages when ready.', 'good2');
+  render();
+}
+
+function openEditor(){
+  let row=selected();
+
+  if(!row){
+    setStatus('No selected page to edit.', 'bad2');
+    return;
+  }
+
+  $('slug').value=cleanSlug(row.slug);
+  $('title').value=row.title||'';
+  $('status').value=row.status||'draft';
+  $('menuLabel').value=pageLabel(row);
+  $('sortOrder').value=String(row.sort_order||100);
+  $('pageType').value=row.page_type||'custom';
+  $('navVisible').checked=truth(pageSettings(row).nav_visible);
+  $('isHomePage').checked=truth(pageSettings(row).is_home_page);
+
+  $('editorOverlay').classList.add('open');
+  $('editorOverlay').setAttribute('aria-hidden','false');
+}
+
+function closeEditor(){
+  $('editorOverlay').classList.remove('open');
+  $('editorOverlay').setAttribute('aria-hidden','true');
+}
+
+function openDraftOverlay(){
+  newDraft();
+}
+
+function openFilter(){
+  $('filter').value=filter;
+  $('filterOverlay').classList.add('open');
+  $('filterOverlay').setAttribute('aria-hidden','false');
+}
+
+function closeFilter(){
+  $('filterOverlay').classList.remove('open');
+  $('filterOverlay').setAttribute('aria-hidden','true');
+}
+
+function applyFilter(){
+  filter=$('filter').value||'all';
+  closeFilter();
+  render();
+}
+
+function openDelete(){
+  let row=selected();
+
+  if(!row){
+    setStatus('No selected page to delete.', 'bad2');
+    return;
+  }
+
+  $('deleteConfirm').value='';
+  $('deleteSummary').textContent=JSON.stringify({
+    selected:row.slug,
+    title:row.title,
+    source:row.source,
+    owner_id:row.owner_id,
+    deleteRule:row.db_id?'Supabase row delete is platform-owner only':'Local draft delete allowed',
+    reservedSlugBlocked:isReserved(row.slug),
+    filesDeleted:false,
+    storageDeleted:false
+  },null,2);
+
+  $('deleteOverlay').classList.add('open');
+  $('deleteOverlay').setAttribute('aria-hidden','false');
+}
+
+function closeDelete(){
+  $('deleteOverlay').classList.remove('open');
+  $('deleteOverlay').setAttribute('aria-hidden','true');
+}
+
+function openReset(){
+  $('resetOverlay').classList.add('open');
+  $('resetOverlay').setAttribute('aria-hidden','false');
+}
+
+function closeReset(){
+  $('resetOverlay').classList.remove('open');
+  $('resetOverlay').setAttribute('aria-hidden','true');
+}
+
+function resetLocal(){
+  makeLocalFallback();
+  closeReset();
+  setStatus('Local list reset. Supabase rows were not touched.', 'good2');
+  render();
+}
+
+function openRoute(kind){
+  let row=selected();
+
+  if(!row){
+    setStatus('No selected page to open.', 'bad2');
+    return;
+  }
+
+  let l=links(row);
+
+  location.href=l[kind]||l.studio;
+}
+
+function jumpSearch(){
+  let q=String($('pageJumpSearch').value||'').trim().toLowerCase();
+
+  if(!q){
+    $('pageJumpStatus').textContent='Type a page title or slug first.';
+    return;
+  }
+
+  highlightedId='';
+
+  let found=visiblePages().find(function(p){
+    return cleanSlug(p.slug).includes(q.replace(/\s+/g,'-'))||
+      String(p.title||'').toLowerCase().includes(q)||
+      pageLabel(p).toLowerCase().includes(q);
+  });
+
+  if(!found){
+    $('pageJumpStatus').textContent='No match found.';
+    renderPages();
+    return;
+  }
+
+  selectedId=found.id;
+  highlightedId=found.id;
+
+  render();
+
+  setTimeout(function(){
+    let el=document.querySelector('[data-page-id="'+CSS.escape(found.id)+'"]');
+    if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+  },50);
+
+  $('pageJumpStatus').textContent='Found '+found.title+' / '+found.slug;
+}
+
+async function copyReport(){
+  let text=JSON.stringify(state(),null,2);
+
+  try{
+    await navigator.clipboard.writeText(text);
+    setStatus('Copied report.', 'good2');
+  }catch(e){
+    alert(text);
+  }
+}
+
+function badges(row){
+  let out=[];
+
+  out.push('<span class="pill '+(row.source&&row.source.includes('supabase')?'good':'warn')+'">'+esc(row.source||'local')+'</span>');
+  out.push('<span class="pill">'+esc(row.status||'draft')+'</span>');
+  out.push('<span class="pill">sort '+esc(row.sort_order||100)+'</span>');
+
+  if(isReserved(row.slug))out.push('<span class="pill warn">reserved</span>');
+  if(ownerMatches(row))out.push('<span class="pill good">own row</span>');
+  if(!ownerMatches(row))out.push('<span class="pill cyan">owner '+esc(String(row.owner_id||'').slice(0,8))+'</span>');
+
+  return out.join('');
+}
+
+function renderPages(){
+  let list=visiblePages();
+  let box=$('pageList');
+
+  if(!list.length){
+    box.innerHTML='<div class="notice">No pages found for this workspace/filter.</div>';
+    return;
+  }
+
+  box.innerHTML=list.map(function(row){
+    let active=row.id===selectedId?'active':'';
+    let jump=row.id===highlightedId?'jumpFound':'';
+
+    return '<article class="pageCard '+active+' '+jump+'" data-page-id="'+esc(row.id)+'">\
+<b>'+esc(row.title||row.slug)+'</b>\
+<code>'+esc(row.slug)+'</code>\
+<div>'+badges(row)+'</div>\
+<p>Owner: '+esc(row.owner_id||'none')+'</p>\
+<p>Updated: '+esc(row.updated_at||'local')+'</p>\
+</article>';
+  }).join('');
+
+  box.querySelectorAll('.pageCard').forEach(function(el){
+    el.onclick=function(){
+      selectedId=el.getAttribute('data-page-id')||'';
+      highlightedId='';
+      render();
+    };
+  });
+}
+
+function renderSelected(){
+  let row=selected();
+
+  if(!row){
+    $('selectedSummary').innerHTML='<div class="summaryCard"><b>No selected page</b><p>Select or create a page.</p></div>';
+    $('linkBox').textContent='No selected page.';
+    return;
+  }
+
+  let l=links(row);
+
+  $('selectedSummary').innerHTML='<div class="summaryCard"><b>Title</b><p>'+esc(row.title)+'</p></div>\
+<div class="summaryCard"><b>Slug</b><p class="path">'+esc(row.slug)+'</p></div>\
+<div class="summaryCard"><b>Status</b><p>'+esc(row.status)+'</p></div>\
+<div class="summaryCard"><b>Owner</b><p class="path">'+esc(row.owner_id||'none')+'</p></div>\
+<div class="summaryCard"><b>Source</b><p>'+esc(row.source||'local')+'</p></div>\
+<div class="summaryCard"><b>Delete</b><p>'+esc(row.db_id?(authState.isPlatformOwner?'platform-owner allowed':'blocked for creator/admin'):'local draft allowed')+'</p></div>';
+
+  $('linkBox').textContent=JSON.stringify(l,null,2);
+}
+
+function renderTop(){
+  $('filterSummary').textContent=filter==='all'?'All statuses':'Status: '+filter;
+  $('countText').textContent=visiblePages().length+' visible / '+pages.length+' loaded';
+  $('sourceText').textContent='source: '+source;
+  $('authText').textContent=authState.isPlatformOwner?'platform-owner':'personal-owner-id-only';
+}
+
+function state(){
+  let row=selected();
+
+  return Object.assign({},authState,{
+    canonicalRoute:'web-builder-pages-manager-owned-v7-12-256-test.html',
+    checkpoint:'CHECKPOINT-WEB-BUILDER-DOORWAY-LOCK-ROLLPLAN-V7-12-263-8.md',
+    personalWorkspaceScoped:true,
+    scope:authState.isPlatformOwner?'platform-owner-all-rows':'personal-owner-id-only',
+    ownerScopeUserId:authState.userId,
+    platformOwnerCanSeeAll:authState.isPlatformOwner,
+    creatorCanOnlySeeOwnRows:!authState.isPlatformOwner,
+    adminRoleAloneDoesNotExposeWorkspaces:true,
+    reservedSlugsProtected:OWNER_SLUGS,
+    supabaseReads:supabaseReads,
+    supabaseWrites:supabaseWrites,
+    supabaseDeletes:supabaseDeletes,
+    storageWrites:false,
+    storageActions:false,
+    schemaChanges:false,
+    fileDeletes:false,
+    htmlRouteDeletes:false,
+    source:source,
+    filter:filter,
+    pageCount:pages.length,
+    visiblePageCount:visiblePages().length,
+    selected:selected()?{
+      id:row.id,
+      db_id:row.db_id,
+      slug:row.slug,
+      title:row.title,
+      owner_id:row.owner_id,
+      ownerMatchesCurrentUser:ownerMatches(row),
+      reservedSlug:isReserved(row.slug),
+      source:row.source
+    }:null,
+    lastAction:lastAction,
+    lastError:lastError
+  });
+}
+
+function renderDebug(){
+  $('debug').textContent=JSON.stringify(state(),null,2);
+}
+
+function render(){
+  if(!$('pageList'))return;
+  renderTop();
+  renderPages();
+  renderSelected();
+  renderDebug();
+}
+
+function bindPage(){
+  $('loadSupabase').onclick=loadSupabasePages;
+  $('saveSupabase').onclick=saveSelected;
+  $('useLocal').onclick=useLocal;
+  $('openFilterOverlay').onclick=openFilter;
+  $('openEditorOverlay').onclick=openEditor;
+  $('openDraftOverlay').onclick=openDraftOverlay;
+  $('openDeleteOverlay').onclick=openDelete;
+  $('openResetOverlay').onclick=openReset;
+  $('copyReport').onclick=copyReport;
+  $('pageJumpBtn').onclick=jumpSearch;
+  $('pageJumpSearch').addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      e.preventDefault();
+      jumpSearch();
+    }
+  });
+
+  $('openBuilder').onclick=function(){openRoute('studio');};
+  $('openPreview').onclick=function(){openRoute('preview');};
+  $('openForm').onclick=function(){openRoute('form');};
+  $('openInbox').onclick=function(){openRoute('inbox');};
+
+  $('closeEditorOverlay').onclick=closeEditor;
+  $('saveLocalEdit').onclick=applyEditor;
+
+  $('closeFilterOverlay').onclick=closeFilter;
+  $('applyFilter').onclick=applyFilter;
+
+  $('closeDeleteOverlay').onclick=closeDelete;
+  $('deleteCancel').onclick=closeDelete;
+  $('deletePage').onclick=deleteSelected;
+
+  $('closeResetOverlay').onclick=closeReset;
+  $('resetCancel').onclick=closeReset;
+  $('resetLocal').onclick=resetLocal;
+
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      closeEditor();
+      closeFilter();
+      closeDelete();
+      closeReset();
+    }
+  });
+}
+
+function renderPage(){
+  authState.checked=true;
+  authState.allowed=true;
+  authState.reason='Allowed. Owned Pages Manager opened with shared workspace lock.';
+
+  $('app').innerHTML='<section class="hero">\
+<span class="badge">V7.12.263.9 Shared Workspace Lock</span>\
+<h1>Create, find, save and delete Web Builder pages</h1>\
+<p>Pages Manager scopes <code>sb_site_pages</code> by owner. Platform owner can see all rows. Creator Growth users can enter Web Builder but only see and save their own workspace rows. Admin role alone does not expose another user workspace.</p>\
+<div class="row">\
+<span class="chip good">Supabase read</span>\
+<span class="chip good">Owner scoped rows</span>\
+<span class="chip good">Jump search</span>\
+<span class="chip good">Protected by plan</span>\
+<span class="chip warn">Landing/home protected</span>\
+<span class="chip warn">No file delete</span>\
+<span class="chip warn">No schema/storage change</span>\
+</div>\
+</section>\
+<section class="grid">\
+<div class="card own"><b>Personal scope</b><ul class="list"><li>Platform owner sees all rows.</li><li>Creator sees only own <code>owner_id</code> rows.</li><li>Admin role alone does not expose another user workspace.</li></ul></div>\
+<div class="card keep"><b>Findability</b><ul class="list"><li>Jump search by title or slug.</li><li>Enter or Search scrolls to the card.</li><li>The list stays visible.</li></ul></div>\
+<div class="card danger"><b>Delete guard</b><ul class="list"><li>Platform-owner only for Supabase deletes.</li><li>Type exact slug to confirm.</li><li>Landing/home rows blocked.</li><li>No files or routes deleted.</li></ul></div>\
+</section>\
+<section class="panel">\
+<div class="row"><span class="badge">Pages output</span><span id="filterSummary" class="pill">All statuses</span><span id="countText" class="pill">Waiting...</span><span id="sourceText" class="pill warn">source: loading</span><span id="authText" class="pill warn">auth: checking</span></div>\
+<h2>Page cards</h2>\
+<p>Use <b>New Local Draft</b>, edit its slug/title, then click <b>Save Selected To sb_site_pages</b>. Non-owner users save only into their own <code>owner_id</code> workspace.</p>\
+<div class="row">\
+<button id="loadSupabase" class="btn primary" type="button">Load sb_site_pages</button>\
+<button id="saveSupabase" class="btn hot" type="button">Save Selected To sb_site_pages</button>\
+<button id="useLocal" class="btn" type="button">Use Local Fallback</button>\
+<button id="openFilterOverlay" class="btn blue" type="button">Filter Pages</button>\
+<button id="openEditorOverlay" class="btn primary" type="button">Edit Selected Local Copy</button>\
+<button id="openDraftOverlay" class="btn hot" type="button">New Local Draft</button>\
+<button id="openDeleteOverlay" class="btn badBtn" type="button">Delete Selected Page</button>\
+<button id="openResetOverlay" class="btn warnBtn" type="button">Reset Local List</button>\
+<button id="copyReport" class="btn" type="button">Copy Report</button>\
+</div>\
+<div id="statusBox" class="status">Ready. Loading Supabase pages...</div>\
+</section>\
+<section class="layout">\
+<section class="panel">\
+<h2>Page cards</h2>\
+<div class="jumpBox"><b>Jump to page</b><div class="jumpGrid"><input id="pageJumpSearch" type="search" placeholder="Type page title or slug, then Enter"><button id="pageJumpBtn" class="btn primary" type="button">Search</button></div><small id="pageJumpStatus">Search pinpoints and scrolls to a page card. It does not filter the list.</small></div>\
+<div id="pageList" class="pageList"></div>\
+</section>\
+<aside class="panel">\
+<h2>Selected page output</h2>\
+<div id="selectedSummary" class="summaryGrid"></div>\
+<h3>Open selected page through Web Builder-owned routes</h3>\
+<div class="actions">\
+<button id="openBuilder" class="btn primary" type="button">Web Builder / Publish</button>\
+<button id="openPreview" class="btn warnBtn" type="button">Published Preview</button>\
+<button id="openForm" class="btn hot" type="button">Open Form Builder</button>\
+<button id="openInbox" class="btn blue" type="button">Owned Inbox</button>\
+</div>\
+<div id="linkBox" class="linkBox">Waiting...</div>\
+</aside>\
+</section>\
+<section class="grid">\
+<div class="panel"><h2>Safety rule</h2><div class="notice">Delete removes only the selected Supabase row from <code>sb_site_pages</code>, or a local draft from this page display. It never deletes HTML files, routes, assets, storage objects or app pages.</div></div>\
+<div class="panel"><h2>Pass condition</h2><p>Trevor/platform owner sees all pages. Creator Growth users see only their own pages. Direct access still uses the Web Builder protected gate.</p></div>\
+<div class="panel"><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></div>\
+</section>\
+<div id="editorOverlay" class="overlay" aria-hidden="true">\
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">\
+<div class="modalHead"><div><span class="badge">Page editor overlay</span><h2 id="editorTitle">Edit selected local copy</h2></div><button id="closeEditorOverlay" class="btn close" type="button">×</button></div>\
+<div class="modalBody">\
+<div class="formGrid">\
+<div class="control"><b>Slug / URL</b><input id="slug" autocomplete="off" spellcheck="false"><small>This is the Web Builder page slug and is saved to sb_site_pages.</small></div>\
+<div class="control"><b>Title</b><input id="title" autocomplete="off"></div>\
+<div class="control"><b>Status</b><select id="status"><option value="draft">Draft</option><option value="published">Published</option><option value="hidden">Hidden</option></select></div>\
+<div class="control"><b>Menu label</b><input id="menuLabel" autocomplete="off"></div>\
+<div class="control"><b>Sort order</b><input id="sortOrder" type="number" value="100"></div>\
+<div class="control"><b>Page type</b><select id="pageType"><option value="custom">Custom</option><option value="landing">Landing</option><option value="contact">Contact</option><option value="pricing">Pricing</option><option value="gallery">Gallery</option></select></div>\
+</div>\
+<div class="checkLine"><input id="navVisible" type="checkbox" checked><label for="navVisible">Show in builder navigation/menu later</label></div>\
+<div class="checkLine"><input id="isHomePage" type="checkbox"><label for="isHomePage">Mark as home page inside this owner workspace later</label></div>\
+<div class="notice">This overlay edits the selected local copy first. Use Save Selected To sb_site_pages after reviewing.</div>\
+</div>\
+<div class="modalFoot"><button id="saveLocalEdit" class="btn primary" type="button">Apply Local Edit</button></div>\
+</div>\
+</div>\
+<div id="filterOverlay" class="overlay" aria-hidden="true">\
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="filterTitle">\
+<div class="modalHead"><div><span class="badge">Filter overlay</span><h2 id="filterTitle">Filter visible pages</h2></div><button id="closeFilterOverlay" class="btn close" type="button">×</button></div>\
+<div class="modalBody"><div class="control"><b>Status filter</b><select id="filter"><option value="all">All statuses</option><option value="draft">Draft</option><option value="published">Published</option><option value="hidden">Hidden</option></select></div></div>\
+<div class="modalFoot"><button id="applyFilter" class="btn primary" type="button">Apply Filter</button></div>\
+</div>\
+</div>\
+<div id="deleteOverlay" class="overlay" aria-hidden="true">\
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">\
+<div class="modalHead"><div><span class="badge bad">Delete overlay</span><h2 id="deleteTitle">Delete selected page?</h2></div><button id="closeDeleteOverlay" class="btn close" type="button">×</button></div>\
+<div class="modalBody"><div id="deleteSummary" class="debug">No selected page.</div><div class="control"><b>Type exact slug to confirm</b><input id="deleteConfirm" autocomplete="off" spellcheck="false"></div><div class="notice">Supabase deletes are platform-owner only in this pass. Local drafts can be removed from this page display. No files, routes, storage objects or app pages are deleted.</div></div>\
+<div class="modalFoot"><button id="deletePage" class="btn badBtn" type="button">Delete Selected</button><button id="deleteCancel" class="btn" type="button">Cancel</button></div>\
+</div>\
+</div>\
+<div id="resetOverlay" class="overlay" aria-hidden="true">\
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="resetTitle">\
+<div class="modalHead"><div><span class="badge warn">Reset overlay</span><h2 id="resetTitle">Reset local list?</h2></div><button id="closeResetOverlay" class="btn close" type="button">×</button></div>\
+<div class="modalBody"><div class="notice">This resets only this page manager local list. It does not delete or change Supabase rows.</div></div>\
+<div class="modalFoot"><button id="resetLocal" class="btn warnBtn" type="button">Reset Local List</button><button id="resetCancel" class="btn" type="button">Cancel</button></div>\
+</div>\
+</div>';
+
+  bindPage();
+  makeLocalFallback();
+  render();
+  loadSupabasePages();
+}
+
+function renderLocked(reason){
+  authState.checked=true;
+  authState.allowed=false;
+  authState.reason=reason||authState.reason;
+
+  document.body.innerHTML='<main class="lockedScreen">\
+<section class="hero">\
+<span class="badge bad">Owned Pages Manager locked</span>\
+<h1>Builder access required</h1>\
+<p>This personal workspace manager opens only for platform owner and eligible Web Builder creator accounts.</p>\
+<div class="panel"><b>Reason</b><p>'+esc(authState.reason)+'</p></div>\
+<div class="actions">\
+<a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Web Builder Hub</a>\
+<a class="btn" href="settings-platform-control-hub-v7-12-85-test.html">Back to Settings</a>\
+<a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a>\
+</div>\
+<h2>Debug</h2>\
+<pre class="debug">'+esc(JSON.stringify(authState,null,2))+'</pre>\
+</section>\
+</main>';
+}
+
+async function boot(){
+  try{
+    let authority=await readAuthority();
+
+    authState.signedIn=authority.signedIn;
+
+    if(!authority.signedIn){
+      renderLocked('Sign in required before opening Owned Pages Manager.');
+      return;
+    }
+
+    user=authority.user;
+    profile=authority.profile||{};
+
+    authState.userId=user.id;
+    authState.email=user.email||'';
+    authState.role=profile.role||'';
+    authState.adminLevel=profile.admin_level||'';
+    authState.planKey=profile.plan_key||'';
+    authState.accountStatus=profile.account_status||'active';
+    authState.isPlatformOwner=isPlatformOwnerProfile(profile);
+    authState.canUseBuilder=builderAllowed(profile);
+    authState.workspace=authState.isPlatformOwner?'platform-owner-all-rows':'personal-owner-id-only';
+
+    if(!authState.canUseBuilder){
+      renderLocked('Web Builder plan or permission required.');
+      return;
+    }
+
+    authState.allowed=true;
+    authState.reason='Allowed. Shared workspace lock passed.';
+
+    renderPage();
+  }catch(e){
+    authState.reason=e&&e.message?e.message:String(e);
+    renderLocked('Owned Pages Manager lock check failed: '+authState.reason);
+  }
+}
+
+boot();
+
 })();
 </script>
 </body>
