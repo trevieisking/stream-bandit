@@ -1,15 +1,15 @@
-/* Stream Bandit Footer Shell V7.12.298.1
+/* Stream Bandit Footer Shell V7.12.298.2
    Compact tabbed global footer + global private messages overlay.
    Footer owns a lightweight messenger overlay on every page.
    Full Form Inbox remains the full admin/owner management page.
    Uses existing sb_private_messages, sb_profiles, sb_user_friends, sb_user_blocks.
-   Send/reply payload now matches the working Form Inbox insert pattern with page_slug and recipient_email.
+   Inbox reply now uses the same proven message payload shape as New Message.
    No schema/storage/RLS/index changes in this file.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.12.298.1 Footer Shell / Global Private Messages Send Fix';
+const VERSION='V7.12.298.2 Footer Shell / Inbox Reply Payload Fix';
 const THEME_OWNER='web-builder-theme-studio-controls-v7-8-9-test.html';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
@@ -312,7 +312,7 @@ function ensureMessenger(){
   '<div id="sbGlobalMessagesScrim" class="sb-msg-scrim">'+
    '<div class="sb-msg-overlay" role="dialog" aria-modal="true" aria-label="Stream Bandit private messages">'+
     '<div class="sb-msg-head">'+
-     '<div><span class="sb-msg-pill">V7.12.298.1 Global Messenger</span><h2>💬 Private Messages</h2><p>Lightweight footer overlay. Full form-submission management stays in Form Inbox.</p></div>'+
+     '<div><span class="sb-msg-pill">V7.12.298.2 Global Messenger</span><h2>💬 Private Messages</h2><p>Lightweight footer overlay. Full form-submission management stays in Form Inbox.</p></div>'+
      '<button id="sbMsgClose" class="sb-msg-close" type="button">Close</button>'+
     '</div>'+
     '<div id="sbMsgStatus" class="sb-msg-status">Open messages to load your inbox.</div>'+
@@ -912,23 +912,32 @@ async function sendMessageReply(){
    return;
   }
 
-  let body=String(document.getElementById('sbMsgReplyBody').value||'').trim();
+  let bodyBox=document.getElementById('sbMsgReplyBody');
+  let body=String(bodyBox&&bodyBox.value||'').trim();
 
   if(!body){
    setMsgStatus('Reply body is required.',true);
    return;
   }
 
-  let other=otherUserId(selectedMessage);
-  let recipientEmail=otherUserEmail(selectedMessage);
+  let replyingToInbox=mineRecipient(selectedMessage);
+  let recipientEmail=replyingToInbox
+   ? String(selectedMessage.sender_email||'').trim()
+   : String(selectedMessage.recipient_email||'').trim();
+  let recipientId=replyingToInbox
+   ? String(selectedMessage.sender_id||'').trim()
+   : String(selectedMessage.recipient_id||'').trim();
+  let recipientName=replyingToInbox
+   ? String(selectedMessage.sender_name||selectedMessage.sender_email||recipientId||'recipient').trim()
+   : String(selectedMessage.recipient_name||selectedMessage.recipient_email||recipientId||'recipient').trim();
 
-  if(other&&!(await canSendTo(other))){
-   setMsgStatus('Reply blocked by block/friend safety rules.',true);
+  if(!recipientEmail){
+   setMsgStatus('Reply needs the original sender email. Open full inbox for this older message if it has no sender_email saved.',true);
    return;
   }
 
-  if(!recipientEmail){
-   setMsgStatus('Reply needs a recipient email from the original message.',true);
+  if(recipientId&&!(await canSendTo(recipientId))){
+   setMsgStatus('Reply blocked by block/friend safety rules.',true);
    return;
   }
 
@@ -940,16 +949,17 @@ async function sendMessageReply(){
    sender_id:msgUser.id,
    sender_email:msgUser.email,
    sender_name:myName(),
-   recipient_id:other||null,
+   recipient_id:recipientId||null,
    recipient_email:recipientEmail,
-   recipient_name:mineSender(selectedMessage)?participant(selectedMessage,'recipient'):participant(selectedMessage,'sender'),
+   recipient_name:recipientName,
    subject:'Re: '+(selectedMessage.subject||'Private message'),
    body:body,
-   kind:'message_reply',
+   kind:'message',
    status:'sent',
    meta:{
-    source:'footer_shell_global_messenger_reply',
+    source:'footer_shell_inbox_reply',
     reply_to:selectedMessage.id,
+    original_kind:selectedMessage.kind||'',
     page_url:location.href,
     footer_version:VERSION
    }
@@ -960,8 +970,15 @@ async function sendMessageReply(){
   if(r.error)throw r.error;
 
   setMsgStatus('Reply sent.');
+  if(bodyBox)bodyBox.value='';
+
   msgTab='sent';
-  document.querySelectorAll('[data-msg-tab]').forEach(x=>x.classList.toggle('active',x.getAttribute('data-msg-tab')==='sent'));
+  selectedMessage=r.data||null;
+
+  document.querySelectorAll('[data-msg-tab]').forEach(x=>{
+   x.classList.toggle('active',x.getAttribute('data-msg-tab')==='sent');
+  });
+
   await loadMessages();
  }catch(e){
   setMsgStatus('Reply failed: '+(e.message||e),true);
@@ -1126,6 +1143,7 @@ function boot(){
     blocks:blocks.length,
     messagePageSlug:messagePageSlug(),
     sendPayloadPattern:'form-inbox-compatible',
+    inboxReplyPayload:'fixed-v7-12-298-2',
     tables:['sb_private_messages','sb_profiles','sb_user_friends','sb_user_blocks'],
     schemaChanges:false,
     storageChanges:false,
@@ -1134,7 +1152,7 @@ function boot(){
   }
  };
 
- document.documentElement.dataset.sbFooterShell='v7-12-298-1';
+ document.documentElement.dataset.sbFooterShell='v7-12-298-2';
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
