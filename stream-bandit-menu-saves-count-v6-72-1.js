@@ -1,18 +1,27 @@
-/* Stream Bandit V6.72.1 Menu Saves Count Add-on
-   V7.12.276 owner visibility + stable direct URL lock.
+/* Stream Bandit Menu Saves Count Add-on
+   V7.12.300 owner scanner menu plug-in.
    Owner-only menu/header links stay hidden unless the live profile is platform owner.
-   Owner-only direct URLs lock only after a stable user/profile authority check, avoiding owner false-lock while Supabase Auth wakes up.
-   Keeps save counts working without touching the passed header/footer/theme shells. */
+   Adds SB Table Route Scanner to the Owner overlay without touching index.html, Supabase schema, storage, RLS or the header shell.
+*/
 (function(){
 'use strict';
-const VERSION='V6.72.1 Menu Saves Count / V7.12.276 Owner Direct Lock Stable Authority';
-const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
-const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+
+const VERSION='V7.12.300 Menu Saves Count / Owner Scanner Overlay Link';
+const CONFIG_FILE='stream-bandit-shell-v6-24.js';
+
 const TARGETS=[
   {key:'watchlist',label:'Watchlist',href:'watchlist-watch-shell-v6-37-test.html',table:'sb_watchlist'},
   {key:'favourites',label:'Favourites',href:'favourites-watch-shell-v6-38-test.html',table:'sb_favourites'},
   {key:'likes',legacyKey:'liked',label:'Likes',href:'liked-watch-shell-v6-39-test.html',table:'sb_likes'}
 ];
+
+const SCANNER_LINK={
+  label:'SB Table Scanner',
+  href:'sb-table-route-scanner-v7-12-300-test.html',
+  desc:'Scan fixed routes for sb_ table usage',
+  icon:'🧾'
+};
+
 const OWNER_LINKS=[
   'all-pages-version-registry-v7-12-122-current-routes-test.html',
   'web-builder-form-submissions-v7-12-94-test.html',
@@ -25,31 +34,488 @@ const OWNER_LINKS=[
   'web-builder-pages-manager-v7-12-111-test.html',
   'web-builder-shared-style-preview-v7-12-117-test.html',
   'user-management-dashboard-v7-11-2-test.html',
-  'permissions-matrix-user-management-v7-11-4-test.html'
+  'permissions-matrix-user-management-v7-11-4-test.html',
+  SCANNER_LINK.href
 ];
-let sb=null,user=null,profile=null,isOwner=false,ownerChecked=false,ownerLocked=false,ownerAttempts=0,lastCounts={watchlist:0,favourites:0,likes:0,liked:0};
-function fileOf(v){return String(v||'').split('/').pop().split('?')[0].split('#')[0]}
-function currentFile(){return fileOf(location.pathname)}
-function isOwnerHref(href){return OWNER_LINKS.indexOf(fileOf(href))>-1}
-function isOwnerRoute(){return OWNER_LINKS.indexOf(currentFile())>-1}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c))}
-function ensureStyle(){if(document.getElementById('sbMenuSavesCountStyle'))return;const s=document.createElement('style');s.id='sbMenuSavesCountStyle';let ownerRules=OWNER_LINKS.map(h=>'html:not(.sb-owner-menu-visible) a[href*="'+h+'"]{display:none!important}').join('');s.textContent='.sb-menu-save-count{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#22d3a62b;border:1px solid #22d3a66b;color:#dfffee;font-size:12px;font-weight:950}.sb-menu-save-count.signed-out{background:#ffffff16;border-color:#ffffff24;color:#b9c0d8}.sb-menu-save-count.error{background:#ff4d6d22;border-color:#ff4d6d66;color:#ffc4cf}.sb-menu-count-note{font-size:11px;color:#b9c0d8;margin:8px 2px 0}.sb-owner-lock-page{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 10% 0,#22d3a633,transparent 35%),radial-gradient(circle at 90% 0,#7c3cff33,transparent 38%),#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.sb-owner-lock-card{max-width:760px;border:1px solid #ffffff24;border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 20px 70px #0008;padding:24px}.sb-owner-lock-card h1{font-size:clamp(34px,6vw,68px);line-height:.94;margin:0 0 12px;letter-spacing:-.055em}.sb-owner-lock-card p{color:#b9c0d8;line-height:1.55}.sb-owner-lock-card a{display:inline-flex;margin-top:10px;border-radius:999px;padding:11px 15px;text-decoration:none;background:linear-gradient(135deg,#22d3a6,#7c3cff);color:#061017;font-weight:950}'+ownerRules;document.head.appendChild(s)}
-function findDrawer(){return document.getElementById('sbShellDrawer')||document.getElementById('sbMenuDrawer')}
-function ownerSection(section){if(!section)return false;let h=(section.querySelector('h3')||{}).textContent||'';if(/\bOwner\b/i.test(h))return true;return !!section.querySelector('a[href*="stream-bandit-one-machine-v7-12-73-test.html"],a[href*="web-builder-form-submissions-v7-12-94-test.html"],a[href*="user-management-dashboard-v7-11-2-test.html"],a[href*="permissions-matrix-user-management-v7-11-4-test.html"]')}
-function renderOwnerLock(){if(ownerLocked)return;ownerLocked=true;document.documentElement.classList.remove('sb-owner-direct-pending');document.body.innerHTML='<main class="sb-owner-lock-page"><section class="sb-owner-lock-card"><div style="font-size:54px">🔒</div><h1>Not allowed</h1><p>This page is owner-only. It is not available to this account.</p><p>Signed-in admins and creator accounts can use their allowed admin or builder pages, but owner pages stay private to the platform owner.</p><a href="home-global-helpers-v7-4-4-test.html">Back to Home</a></section></main>'}
-function applyOwnerVisibility(){ensureStyle();document.documentElement.classList.toggle('sb-owner-menu-visible',!!isOwner);document.documentElement.dataset.sbOwnerMenuVisibility=isOwner?'owner-visible':'owner-hidden';document.documentElement.dataset.sbOwnerAuthority=ownerChecked?(isOwner?'owner':'not-owner'):'checking';document.querySelectorAll('a[href]').forEach(a=>{if(isOwnerHref(a.getAttribute('href')))a.style.display=isOwner?'':'none'});document.querySelectorAll('#sbShellDrawer .sb-shell-group,#sbMenuDrawer .sb-menu-group').forEach(section=>{if(ownerSection(section))section.style.display=isOwner?'':'none'});if(isOwnerRoute()&&ownerChecked&&!isOwner)renderOwnerLock();if(isOwnerRoute()&&ownerChecked&&isOwner)document.documentElement.classList.remove('sb-owner-direct-pending')}
-function findLink(href){const drawer=findDrawer();if(!drawer)return null;return Array.from(drawer.querySelectorAll('a.sb-shell-link,a.sb-menu-link,a[href]')).find(a=>(a.getAttribute('href')||'').includes(href))||null}
-function setBadge(target,value,mode){const a=findLink(target.href);if(!a)return false;let badge=a.querySelector('[data-save-count="'+target.key+'"],[data-save-count="'+(target.legacyKey||target.key)+'"]');if(!badge){badge=document.createElement('span');badge.dataset.saveCount=target.key;badge.className='sb-menu-save-count';a.appendChild(badge)}badge.dataset.saveCount=target.key;badge.className='sb-menu-save-count '+(mode||'');badge.textContent=String(value);badge.title=VERSION+' - '+target.label+' count';return true}
-function setHeaderBadge(key,value){const names=key==='likes'?['likes','liked']:[key];names.forEach(name=>{document.querySelectorAll('[data-sb-count="'+name+'"]').forEach(el=>{el.textContent=String(value);let a=el.closest&&el.closest('.sb-h-ico');if(a)a.classList.toggle('has-count',Number(value)>0);});});}
-function setAll(value,mode){TARGETS.forEach(t=>{setBadge(t,value,mode);lastCounts[t.key]=Number(value)||0;if(t.legacyKey)lastCounts[t.legacyKey]=Number(value)||0;setHeaderBadge(t.key,Number(value)||0);})}
-function addDrawerNote(){const drawer=findDrawer();if(!drawer||drawer.querySelector('#sbMenuCountNote'))return;const filter=drawer.querySelector('.sb-shell-filter,.sb-menu-filter');if(!filter)return;const n=document.createElement('div');n.id='sbMenuCountNote';n.className='sb-menu-count-note';n.textContent='Save counts: Watchlist / Favourites / Likes read-only.';filter.insertAdjacentElement('afterend',n)}
-async function initClient(){if(!window.supabase)throw new Error('Supabase SDK unavailable');if(!sb)sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let r=await sb.auth.getUser();user=r&&r.data&&r.data.user?r.data.user:null;if(!user){let s=await sb.auth.getSession();user=s&&s.data&&s.data.session?s.data.session.user:null}return user}
-function scheduleOwnerRetry(){if(!isOwnerRoute())return;if(ownerAttempts<8)setTimeout(readOwnerProfile,350+ownerAttempts*250)}
-async function readOwnerProfile(){ownerAttempts++;try{if(!sb)await initClient();else await initClient();if(!user){profile=null;isOwner=false;if(ownerAttempts>=8)ownerChecked=true;applyOwnerVisibility();scheduleOwnerRetry();return false}let r=await sb.from('sb_profiles').select('id,role,admin_level,plan_key,account_status').eq('id',user.id).maybeSingle();profile=r&&r.data?r.data:null;isOwner=!!(profile&&(profile.admin_level==='owner'||profile.plan_key==='platform_owner'));ownerChecked=true;applyOwnerVisibility();return isOwner}catch(e){profile=null;isOwner=false;if(ownerAttempts>=8)ownerChecked=true;applyOwnerVisibility();scheduleOwnerRetry();return false}}
-async function readCount(t){const r=await sb.from(t.table).select('movie_id',{count:'exact',head:true}).eq('user_id',user.id);if(r.error)throw r.error;return r.count||0}
-async function refreshCounts(){try{ensureStyle();addDrawerNote();applyOwnerVisibility();if(!sb)await initClient();await readOwnerProfile();if(!user){setAll(0,'signed-out');window.dispatchEvent(new CustomEvent('stream-bandit-menu-save-counts',{detail:{signedIn:false,owner:isOwner,counts:Object.assign({},lastCounts)}}));return}for(const t of TARGETS){const count=await readCount(t);lastCounts[t.key]=count;if(t.legacyKey)lastCounts[t.legacyKey]=count;setBadge(t,count,'');setHeaderBadge(t.key,count)}window.dispatchEvent(new CustomEvent('stream-bandit-menu-save-counts',{detail:{signedIn:true,owner:isOwner,counts:Object.assign({},lastCounts)}}));}catch(e){applyOwnerVisibility();TARGETS.forEach(t=>setBadge(t,'!','error'));window.dispatchEvent(new CustomEvent('stream-bandit-menu-save-counts-error',{detail:{message:e&&e.message?e.message:String(e)}}));}}
-function waitForDrawerThenRefresh(){let tries=0;const timer=setInterval(()=>{tries++;applyOwnerVisibility();if(findDrawer()){clearInterval(timer);refreshCounts()}else if(tries>40){clearInterval(timer)}},150)}
-function observeMenus(){try{new MutationObserver(()=>applyOwnerVisibility()).observe(document.documentElement,{childList:true,subtree:true});}catch(e){}}
-function init(){ensureStyle();if(isOwnerRoute())document.documentElement.classList.add('sb-owner-direct-pending');applyOwnerVisibility();observeMenus();waitForDrawerThenRefresh();window.StreamBanditMenuSavesCount={version:VERSION,refresh:refreshCounts,refreshOwner:readOwnerProfile,getCounts:()=>Object.assign({},lastCounts),counts:()=>Object.assign({},lastCounts),ownerState:()=>({owner:isOwner,checked:ownerChecked,attempts:ownerAttempts,profile:profile})};window.addEventListener('stream-bandit-core-saves-changed',refreshCounts);window.addEventListener('stream-bandit-core-saves-v6-75-changed',refreshCounts);document.addEventListener('click',e=>{if(e.target.closest('#sbShellMenuToggle,#sbHeaderMenuBtn'))setTimeout(refreshCounts,350)});setTimeout(refreshCounts,250);setTimeout(refreshCounts,900);setTimeout(refreshCounts,1800);setInterval(refreshCounts,9000)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+
+let sb=null;
+let user=null;
+let profile=null;
+let isOwner=false;
+let ownerChecked=false;
+let ownerLocked=false;
+let ownerAttempts=0;
+let cfg=null;
+
+let lastCounts={
+  watchlist:0,
+  favourites:0,
+  likes:0,
+  liked:0
+};
+
+function fileOf(v){
+  return String(v||'').split('/').pop().split('?')[0].split('#')[0];
+}
+
+function currentFile(){
+  return fileOf(location.pathname);
+}
+
+function isOwnerHref(href){
+  return OWNER_LINKS.indexOf(fileOf(href))>-1;
+}
+
+function isOwnerRoute(){
+  return OWNER_LINKS.indexOf(currentFile())>-1;
+}
+
+function esc(s){
+  return String(s??'').replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c;
+  });
+}
+
+function ensureStyle(){
+  if(document.getElementById('sbMenuSavesCountStyle'))return;
+
+  const s=document.createElement('style');
+  s.id='sbMenuSavesCountStyle';
+
+  let ownerRules=OWNER_LINKS.map(function(h){
+    return 'html:not(.sb-owner-menu-visible) a[href*="'+h+'"]{display:none!important}';
+  }).join('');
+
+  s.textContent=
+    '.sb-menu-save-count{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#22d3a62b;border:1px solid #22d3a66b;color:#dfffee;font-size:12px;font-weight:950}'+
+    '.sb-menu-save-count.signed-out{background:#ffffff16;border-color:#ffffff24;color:#b9c0d8}'+
+    '.sb-menu-save-count.error{background:#ff4d6d22;border-color:#ff4d6d66;color:#ffc4cf}'+
+    '.sb-menu-count-note{font-size:11px;color:#b9c0d8;margin:8px 2px 0}'+
+    '.sb-owner-lock-page{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 10% 0,#22d3a633,transparent 35%),radial-gradient(circle at 90% 0,#7c3cff33,transparent 38%),#050711;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}'+
+    '.sb-owner-lock-card{max-width:760px;border:1px solid #ffffff24;border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 20px 70px #0008;padding:24px}'+
+    '.sb-owner-lock-card h1{font-size:clamp(34px,6vw,68px);line-height:.94;margin:0 0 12px;letter-spacing:-.055em}'+
+    '.sb-owner-lock-card p{color:#b9c0d8;line-height:1.55}'+
+    '.sb-owner-lock-card a{display:inline-flex;margin-top:10px;border-radius:999px;padding:11px 15px;text-decoration:none;background:linear-gradient(135deg,#22d3a6,#7c3cff);color:#061017;font-weight:950}'+
+    '.sb-owner-scanner-link{outline:1px solid #41e8ff55}'+
+    ownerRules;
+
+  document.head.appendChild(s);
+}
+
+function findDrawer(){
+  return document.getElementById('sbShellDrawer')||document.getElementById('sbMenuDrawer');
+}
+
+function ownerSection(section){
+  if(!section)return false;
+
+  let h=(section.querySelector('h3')||{}).textContent||'';
+  if(/\bOwner\b/i.test(h))return true;
+
+  return !!section.querySelector(
+    'a[href*="stream-bandit-one-machine-v7-12-73-test.html"],'+
+    'a[href*="web-builder-form-submissions-v7-12-94-test.html"],'+
+    'a[href*="user-management-dashboard-v7-11-2-test.html"],'+
+    'a[href*="permissions-matrix-user-management-v7-11-4-test.html"]'
+  );
+}
+
+function renderOwnerLock(){
+  if(ownerLocked)return;
+
+  ownerLocked=true;
+  document.documentElement.classList.remove('sb-owner-direct-pending');
+
+  document.body.innerHTML=
+    '<main class="sb-owner-lock-page">'+
+      '<section class="sb-owner-lock-card">'+
+        '<div style="font-size:54px">🔒</div>'+
+        '<h1>Not allowed</h1>'+
+        '<p>This page is owner-only. It is not available to this account.</p>'+
+        '<p>Signed-in admins and creator accounts can use their allowed admin or builder pages, but owner pages stay private to the platform owner.</p>'+
+        '<a href="home-global-helpers-v7-4-4-test.html">Back to Home</a>'+
+      '</section>'+
+    '</main>';
+}
+
+function scannerLinkHtml(){
+  return ''+
+    '<a class="sb-shell-link sb-menu-link sb-owner-scanner-link" href="'+esc(SCANNER_LINK.href)+'" data-sb-owner-scanner="true">'+
+      '<span class="sb-shell-ico">'+esc(SCANNER_LINK.icon)+'</span>'+
+      '<span>'+
+        '<b class="sb-shell-title">'+esc(SCANNER_LINK.label)+'</b>'+
+        '<small class="sb-shell-desc">'+esc(SCANNER_LINK.desc)+'</small>'+
+      '</span>'+
+    '</a>';
+}
+
+function injectScannerLink(){
+  const drawer=findDrawer();
+
+  if(!drawer)return false;
+
+  if(drawer.querySelector('a[href*="'+SCANNER_LINK.href+'"],a[data-sb-owner-scanner="true"]')){
+    return false;
+  }
+
+  const sections=Array.from(drawer.querySelectorAll('.sb-shell-group,.sb-menu-group,section,div'));
+  const section=sections.find(ownerSection);
+
+  if(!section)return false;
+
+  const oneMachine=section.querySelector('a[href*="stream-bandit-one-machine-v7-12-73-test.html"]');
+
+  if(oneMachine){
+    oneMachine.insertAdjacentHTML('afterend',scannerLinkHtml());
+  }else{
+    section.insertAdjacentHTML('beforeend',scannerLinkHtml());
+  }
+
+  return true;
+}
+
+function applyOwnerVisibility(){
+  ensureStyle();
+  injectScannerLink();
+
+  document.documentElement.classList.toggle('sb-owner-menu-visible',!!isOwner);
+  document.documentElement.dataset.sbOwnerMenuVisibility=isOwner?'owner-visible':'owner-hidden';
+  document.documentElement.dataset.sbOwnerAuthority=ownerChecked?(isOwner?'owner':'not-owner'):'checking';
+  document.documentElement.dataset.sbOwnerScannerLink=SCANNER_LINK.href;
+
+  document.querySelectorAll('a[href]').forEach(function(a){
+    if(isOwnerHref(a.getAttribute('href'))){
+      a.style.display=isOwner?'':'none';
+    }
+  });
+
+  document.querySelectorAll('#sbShellDrawer .sb-shell-group,#sbMenuDrawer .sb-menu-group').forEach(function(section){
+    if(ownerSection(section)){
+      section.style.display=isOwner?'':'none';
+    }
+  });
+
+  if(isOwnerRoute()&&ownerChecked&&!isOwner)renderOwnerLock();
+
+  if(isOwnerRoute()&&ownerChecked&&isOwner){
+    document.documentElement.classList.remove('sb-owner-direct-pending');
+  }
+}
+
+function findLink(href){
+  const drawer=findDrawer();
+
+  if(!drawer)return null;
+
+  return Array.from(drawer.querySelectorAll('a.sb-shell-link,a.sb-menu-link,a[href]')).find(function(a){
+    return (a.getAttribute('href')||'').includes(href);
+  })||null;
+}
+
+function setBadge(target,value,mode){
+  const a=findLink(target.href);
+
+  if(!a)return false;
+
+  let badge=a.querySelector('[data-save-count="'+target.key+'"],[data-save-count="'+(target.legacyKey||target.key)+'"]');
+
+  if(!badge){
+    badge=document.createElement('span');
+    badge.dataset.saveCount=target.key;
+    badge.className='sb-menu-save-count';
+    a.appendChild(badge);
+  }
+
+  badge.dataset.saveCount=target.key;
+  badge.className='sb-menu-save-count '+(mode||'');
+  badge.textContent=String(value);
+  badge.title=VERSION+' - '+target.label+' count';
+
+  return true;
+}
+
+function setHeaderBadge(key,value){
+  const names=key==='likes'?['likes','liked']:[key];
+
+  names.forEach(function(name){
+    document.querySelectorAll('[data-sb-count="'+name+'"]').forEach(function(el){
+      el.textContent=String(value);
+
+      let a=el.closest&&el.closest('.sb-h-ico');
+
+      if(a)a.classList.toggle('has-count',Number(value)>0);
+    });
+  });
+}
+
+function setAll(value,mode){
+  TARGETS.forEach(function(t){
+    setBadge(t,value,mode);
+    lastCounts[t.key]=Number(value)||0;
+
+    if(t.legacyKey)lastCounts[t.legacyKey]=Number(value)||0;
+
+    setHeaderBadge(t.key,Number(value)||0);
+  });
+}
+
+function addDrawerNote(){
+  const drawer=findDrawer();
+
+  if(!drawer||drawer.querySelector('#sbMenuCountNote'))return;
+
+  const filter=drawer.querySelector('.sb-shell-filter,.sb-menu-filter');
+
+  if(!filter)return;
+
+  const n=document.createElement('div');
+  n.id='sbMenuCountNote';
+  n.className='sb-menu-count-note';
+  n.textContent='Save counts: Watchlist / Favourites / Likes read-only. Owner tools include SB Table Scanner.';
+  filter.insertAdjacentElement('afterend',n);
+}
+
+async function readConfig(){
+  if(cfg)return cfg;
+
+  try{
+    let txt=await fetch(CONFIG_FILE,{cache:'no-store'}).then(function(r){
+      return r.text();
+    });
+
+    cfg={
+      url:(txt.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)/)||[])[1]||'',
+      key:(txt.match(/SUPABASE_KEY\s*=\s*['"]([^'"]+)/)||[])[1]||''
+    };
+  }catch(e){
+    cfg={url:'',key:''};
+  }
+
+  return cfg;
+}
+
+async function initClient(){
+  if(!window.supabase)throw new Error('Supabase SDK unavailable');
+
+  let c=await readConfig();
+
+  if(!c.url||!c.key)throw new Error('Supabase shell config unavailable');
+
+  if(!sb)sb=window.supabase.createClient(c.url,c.key);
+
+  let r=await sb.auth.getUser();
+
+  user=r&&r.data&&r.data.user?r.data.user:null;
+
+  if(!user){
+    let s=await sb.auth.getSession();
+    user=s&&s.data&&s.data.session?s.data.session.user:null;
+  }
+
+  return user;
+}
+
+function scheduleOwnerRetry(){
+  if(!isOwnerRoute())return;
+
+  if(ownerAttempts<8){
+    setTimeout(readOwnerProfile,350+ownerAttempts*250);
+  }
+}
+
+async function readOwnerProfile(){
+  ownerAttempts++;
+
+  try{
+    if(!sb)await initClient();
+    else await initClient();
+
+    if(!user){
+      profile=null;
+      isOwner=false;
+
+      if(ownerAttempts>=8)ownerChecked=true;
+
+      applyOwnerVisibility();
+      scheduleOwnerRetry();
+
+      return false;
+    }
+
+    let r=await sb
+      .from('sb_profiles')
+      .select('id,role,admin_level,plan_key,account_status')
+      .eq('id',user.id)
+      .maybeSingle();
+
+    profile=r&&r.data?r.data:null;
+    isOwner=!!(profile&&(profile.admin_level==='owner'||profile.plan_key==='platform_owner'));
+    ownerChecked=true;
+
+    applyOwnerVisibility();
+
+    return isOwner;
+  }catch(e){
+    profile=null;
+    isOwner=false;
+
+    if(ownerAttempts>=8)ownerChecked=true;
+
+    applyOwnerVisibility();
+    scheduleOwnerRetry();
+
+    return false;
+  }
+}
+
+async function readCount(t){
+  const r=await sb
+    .from(t.table)
+    .select('movie_id',{count:'exact',head:true})
+    .eq('user_id',user.id);
+
+  if(r.error)throw r.error;
+
+  return r.count||0;
+}
+
+async function refreshCounts(){
+  try{
+    ensureStyle();
+    injectScannerLink();
+    addDrawerNote();
+    applyOwnerVisibility();
+
+    if(!sb)await initClient();
+
+    await readOwnerProfile();
+
+    if(!user){
+      setAll(0,'signed-out');
+
+      window.dispatchEvent(new CustomEvent('stream-bandit-menu-save-counts',{
+        detail:{
+          signedIn:false,
+          owner:isOwner,
+          counts:Object.assign({},lastCounts)
+        }
+      }));
+
+      return;
+    }
+
+    for(const t of TARGETS){
+      const count=await readCount(t);
+      lastCounts[t.key]=count;
+
+      if(t.legacyKey)lastCounts[t.legacyKey]=count;
+
+      setBadge(t,count,'');
+      setHeaderBadge(t.key,count);
+    }
+
+    window.dispatchEvent(new CustomEvent('stream-bandit-menu-save-counts',{
+      detail:{
+        signedIn:true,
+        owner:isOwner,
+        counts:Object.assign({},lastCounts)
+      }
+    }));
+  }catch(e){
+    applyOwnerVisibility();
+
+    TARGETS.forEach(function(t){
+      setBadge(t,'!','error');
+    });
+
+    window.dispatchEvent(new CustomEvent('stream-bandit-menu-saves-counts-error',{
+      detail:{
+        message:e&&e.message?e.message:String(e)
+      }
+    }));
+  }
+}
+
+function waitForDrawerThenRefresh(){
+  let tries=0;
+
+  const timer=setInterval(function(){
+    tries++;
+    injectScannerLink();
+    applyOwnerVisibility();
+
+    if(findDrawer()){
+      clearInterval(timer);
+      refreshCounts();
+    }else if(tries>40){
+      clearInterval(timer);
+    }
+  },150);
+}
+
+function observeMenus(){
+  try{
+    new MutationObserver(function(){
+      injectScannerLink();
+      applyOwnerVisibility();
+    }).observe(document.documentElement,{
+      childList:true,
+      subtree:true
+    });
+  }catch(e){}
+}
+
+function init(){
+  ensureStyle();
+
+  if(isOwnerRoute())document.documentElement.classList.add('sb-owner-direct-pending');
+
+  injectScannerLink();
+  applyOwnerVisibility();
+  observeMenus();
+  waitForDrawerThenRefresh();
+
+  window.StreamBanditMenuSavesCount={
+    version:VERSION,
+    refresh:refreshCounts,
+    refreshOwner:readOwnerProfile,
+    getCounts:function(){
+      return Object.assign({},lastCounts);
+    },
+    counts:function(){
+      return Object.assign({},lastCounts);
+    },
+    ownerState:function(){
+      return {
+        owner:isOwner,
+        checked:ownerChecked,
+        attempts:ownerAttempts,
+        profile:profile
+      };
+    },
+    injectScannerLink:injectScannerLink,
+    scannerRoute:SCANNER_LINK.href
+  };
+
+  window.addEventListener('stream-bandit-core-saves-changed',refreshCounts);
+  window.addEventListener('stream-bandit-core-saves-v6-75-changed',refreshCounts);
+
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#sbShellMenuToggle,#sbHeaderMenuBtn')){
+      setTimeout(refreshCounts,350);
+    }
+  });
+
+  setTimeout(refreshCounts,250);
+  setTimeout(refreshCounts,900);
+  setTimeout(refreshCounts,1800);
+  setInterval(refreshCounts,9000);
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+}else{
+  init();
+}
+
 })();
