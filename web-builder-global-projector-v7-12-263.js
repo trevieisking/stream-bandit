@@ -1,12 +1,13 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.12.299.2 Web Builder Shared Rail Navigation';
+  var VERSION = 'V7.12.299.4 Web Builder Shared Rail Asset Avatar';
   var STORAGE_KEY = 'sb.webBuilder.controlHub.v7.12.263';
   var SUCCESS = 'Saved successfully to this browser. Web Builder only. Live app connection remains off.';
   var DEFAULT_ICON = 'stream_bandit_stag_icon_32.png';
   var SUPABASE_URL = 'https://xzxqfrvqdgkzwujbkdbk.supabase.co';
   var SUPABASE_KEY = 'sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+  var BUCKET = 'stream-bandit-images';
 
   var DEFAULTS = {
     account:{displayName:'Web Builder Owner',email:'builder@local.test',roleLabel:'Builder owner',mode:'Owner',bio:'Local Web Builder profile preview.'},
@@ -14,12 +15,13 @@
     theme:{accent:'#22d3a6',accent2:'#7c3cff',bg:'#050711',panel1:'#101529',panel2:'#17122d',text:'#f7fbff',muted:'#aeb8d6',font:'Inter,system-ui,Arial,sans-serif',largeText:false,highContrast:false},
     brand:{name:'Web Builder Studio',tagline:'Build pages, forms and sites.',logoMode:'text',logoText:'WB',logoUrl:'',faviconUrl:DEFAULT_ICON,faviconNote:'Use Web Builder icon helper later.'},
     shell:{railLabels:'Back · Hub · Pages · Web Builder · Preview · Menu · Form · Inbox · Assets · Route Map · Control Map · Manifest',footerText:'Web Builder only - local draft',backLabel:'Back to Stream Bandit',mode:'Studio'},
-    meta:{localStorageOnly:true,connectedToLiveApp:false}
+    meta:{localStorageOnly:true,connectedToLiveApp:false,assetAvatarProjection:false,storageReads:false,storageWrites:false,schemaChanges:false,indexPromotion:false}
   };
 
   var cachedPages = null;
   var searchTimer = null;
   var bound = false;
+  var discoveringAsset = false;
 
   function clone(v){ return JSON.parse(JSON.stringify(v || {})); }
   function merge(a,b){
@@ -43,6 +45,11 @@
   function escapeHtml(v){ return String(v == null ? '' : v).replace(/[&<>"']/g,function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m] || m; }); }
   function safeHref(v){ v = String(v || '').trim(); if(!v) return '#'; if(/^javascript:/i.test(v) || /^data:/i.test(v)) return '#'; return v; }
   function safeIcon(v){ v = String(v || '').trim(); if(!v) return ''; if(/^javascript:/i.test(v) || /^data:text/i.test(v)) return ''; return v; }
+  function imageTag(src,alt,fallback){
+    src = safeIcon(src);
+    if(!src) return escapeHtml(fallback || 'WB');
+    return '<img src="'+escapeHtml(src)+'" alt="'+escapeHtml(alt || 'Web Builder avatar')+'" onerror="this.parentNode.textContent=\''+escapeHtml(fallback || 'WB').replace(/'/g,'')+'\';">';
+  }
 
   function cleanSlug(v){
     v = String(v || '').trim();
@@ -54,7 +61,7 @@
   }
   function currentSlug(){
     try{ var url = new URL(location.href); var fromUrl = url.searchParams.get('page'); if(fromUrl) return cleanSlug(fromUrl); }catch(e){}
-    var ids = ['slug','pageSlug','studioSlug','wbSlug'];
+    var ids = ['slug','pageSlug','studioSlug','wbSlug','siteSlug'];
     for(var i=0;i<ids.length;i++){ var el = document.getElementById(ids[i]); if(el && el.value) return cleanSlug(el.value); }
     return 'landing';
   }
@@ -71,7 +78,7 @@
       {id:'menu',label:'Menu',href:'web-builder-menu-builder-owned-v7-12-264-test.html?page='+s,type:'Menu',search:'menu builder navigation'},
       {id:'form',label:'Form',href:'web-builder-form-designer-owned-v7-12-258-test.html?page='+s,type:'Form',search:'form designer fields contact'},
       {id:'inbox',label:'Inbox',href:'web-builder-form-inbox-owned-v7-12-258-test.html?page='+s,type:'Inbox',search:'inbox messenger messages friends blocked form inbox'},
-      {id:'assets',label:'Assets',href:'web-builder-assets-v7-12-252-test.html?page='+s,type:'Assets',search:'assets media images upload library'},
+      {id:'assets',label:'Assets',href:'web-builder-assets-v7-12-252-test.html?page='+s,type:'Assets',search:'assets media images upload library avatar logo'},
       {id:'route',label:'Route Map',href:'web-builder-route-map-v7-12-252-test.html?page='+s,type:'Map',search:'route map routes'},
       {id:'control',label:'Control Map',href:'web-builder-control-map-v7-12-253-test.html?page='+s,type:'Map',search:'control map systems map'},
       {id:'source',label:'Source Map',href:'web-builder-pages-source-map-v7-12-255-test.html?page='+s,type:'Map',search:'pages source map route source'},
@@ -97,9 +104,15 @@
     return '';
   }
 
-  function avatarHtml(s){ var a = s.avatar || DEFAULTS.avatar; if(a.mode === 'image' && a.url){ return '<img src="'+escapeHtml(a.url)+'" alt="'+escapeHtml(a.alt || 'Web Builder avatar')+'">'; } return escapeHtml(a.emoji || 'WB'); }
-  function logoHtml(s){ var b = s.brand || DEFAULTS.brand; if(b.logoMode === 'image' && b.logoUrl){ return '<img src="'+escapeHtml(b.logoUrl)+'" alt="'+escapeHtml(b.name || 'Web Builder')+'">'; } return escapeHtml(b.logoText || 'WB'); }
-  function iconUrl(s){ var b = s.brand || DEFAULTS.brand; var a = s.avatar || DEFAULTS.avatar; return safeIcon(b.faviconUrl) || safeIcon(a.url) || safeIcon(b.logoUrl) || DEFAULT_ICON; }
+  function avatarUrl(s){
+    var a = s.avatar || DEFAULTS.avatar;
+    var b = s.brand || DEFAULTS.brand;
+    var m = s.meta || {};
+    return safeIcon(a.url) || safeIcon(m.projectedAssetUrl) || safeIcon(b.logoUrl) || '';
+  }
+  function avatarHtml(s){ var a = s.avatar || DEFAULTS.avatar; var u = avatarUrl(s); if((a.mode === 'image' || u) && u){ return imageTag(u, a.alt || 'Web Builder avatar','WB'); } return escapeHtml(a.emoji || 'WB'); }
+  function logoHtml(s){ var b = s.brand || DEFAULTS.brand; if(b.logoMode === 'image' && b.logoUrl){ return imageTag(b.logoUrl,b.name || 'Web Builder','WB'); } return escapeHtml(b.logoText || 'WB'); }
+  function iconUrl(s){ var b = s.brand || DEFAULTS.brand; var a = s.avatar || DEFAULTS.avatar; var m = s.meta || {}; return safeIcon(b.faviconUrl) || safeIcon(a.url) || safeIcon(m.projectedAssetUrl) || safeIcon(b.logoUrl) || DEFAULT_ICON; }
   function railText(s){ var text = (s.shell && s.shell.footerText) || DEFAULTS.shell.footerText; if(text === 'Saved locally · not connected') return 'Web Builder only - local draft'; return text; }
 
   function applyTheme(s){
@@ -142,17 +155,17 @@
     return '<div class="wb-builder-tab-scroll">'+tabs+'</div><div class="wb-builder-search" data-wb-search><input id="wbGlobalSearch" type="search" autocomplete="off" placeholder="Search Web Builder pages, tools..." aria-label="Search Web Builder"><div id="wbSearchResults" class="wb-search-results" role="listbox" hidden></div></div>';
   }
   function favouriteCards(s){
-    var favs = (Array.isArray(s.favourites) && s.favourites.length) ? s.favourites : routeMap().filter(function(r){ return ['hub','pages','builder','preview','menu','form','inbox'].indexOf(r.id) > -1; }).map(function(r){ return {label:r.label,type:r.type,url:r.href}; });
+    var favs = (Array.isArray(s.favourites) && s.favourites.length) ? s.favourites : routeMap().filter(function(r){ return ['hub','pages','builder','preview','menu','form','inbox','assets'].indexOf(r.id) > -1; }).map(function(r){ return {label:r.label,type:r.type,url:r.href}; });
     return favs.map(function(f){ return '<a class="wb-account-fav" href="'+escapeHtml(safeHref(f.url))+'"><b>'+escapeHtml(f.label || 'Saved page')+'</b><small>'+escapeHtml(f.type || 'Page')+' · '+escapeHtml(f.url || '')+'</small></a>'; }).join('') || '<p class="wb-empty">No saved builder pages yet.</p>';
   }
   function panelHtml(s){
-    var a = s.account || DEFAULTS.account; var b = s.brand || DEFAULTS.brand;
+    var a = s.account || DEFAULTS.account; var b = s.brand || DEFAULTS.brand; var m = s.meta || {};
     return '<div class="wb-account-panel" data-wb-account-panel aria-hidden="true">'
       + '<div class="wb-account-head"><div class="wb-account-avatar">'+avatarHtml(s)+'</div><div><b>'+escapeHtml(a.displayName || 'Web Builder Owner')+'</b><small>'+escapeHtml(a.email || '')+' · '+escapeHtml(a.roleLabel || a.mode || 'Builder')+'</small></div><button type="button" class="wb-panel-close" data-wb-panel-close>×</button></div>'
       + '<p>'+escapeHtml(a.bio || 'Local Web Builder profile preview.')+'</p>'
-      + '<div class="wb-brand-mini"><div class="wb-brand-logo">'+logoHtml(s)+'</div><div><b>'+escapeHtml(b.name || 'Web Builder Studio')+'</b><small>'+escapeHtml(b.tagline || 'Build pages, forms and sites.')+'</small><small>Favicon: '+escapeHtml(iconUrl(s))+'</small></div></div>'
+      + '<div class="wb-brand-mini"><div class="wb-brand-logo">'+logoHtml(s)+'</div><div><b>'+escapeHtml(b.name || 'Web Builder Studio')+'</b><small>'+escapeHtml(b.tagline || 'Build pages, forms and sites.')+'</small><small>Avatar source: '+escapeHtml(m.projectedAssetPath || avatarUrl(s) || 'WB fallback')+'</small></div></div>'
       + '<h3>Web Builder routes</h3><div class="wb-account-favs">'+favouriteCards(s)+'</div>'
-      + '<div class="wb-account-actions"><a class="wb-projector-btn" href="web-builder-account-control-hub-v7-12-263-test.html">Open Hub</a><button type="button" class="wb-secondary" data-wb-panel-close>Close</button></div>'
+      + '<div class="wb-account-actions"><a class="wb-projector-btn" href="web-builder-account-control-hub-v7-12-263-test.html">Open Hub</a><a class="wb-secondary" href="web-builder-assets-v7-12-252-test.html?page='+escapeHtml(q())+'">Open Assets</a><button type="button" class="wb-secondary" data-wb-panel-close>Close</button></div>'
       + '</div>';
   }
 
@@ -160,7 +173,7 @@
     return ''+
     '[data-web-builder-projector-rail]{position:fixed;right:12px;bottom:12px;z-index:90020;display:flex;gap:8px;align-items:center;max-width:min(560px,calc(100vw - 24px));border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:rgba(7,9,16,.9);backdrop-filter:blur(14px);box-shadow:0 18px 60px #0008;padding:8px 10px;color:var(--wb-text,#f7fbff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);font-size:12px}'+
     '.wb-projector-logo{width:42px;height:42px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#071015;font-weight:1000;overflow:hidden}.wb-projector-logo img{width:100%;height:100%;object-fit:cover}.wb-projector-copy{display:grid;gap:2px}.wb-projector-copy b{font-size:14px}.wb-projector-copy small{color:var(--wb-muted,#aeb8d6)}.wb-projector-btn,.wb-secondary{border:0;border-radius:999px;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#071015;text-decoration:none;font-weight:950;padding:9px 11px;cursor:pointer;white-space:nowrap}'+
-    '.wb-builder-tabs{position:sticky;top:0;z-index:90010;display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,420px);gap:10px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--wb-line,#ffffff22);background:rgba(7,9,16,.94);backdrop-filter:blur(14px);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif)}.wb-builder-tab-scroll{display:flex;gap:8px;align-items:center;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}.wb-builder-tab{flex:0 0 auto;border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:#ffffff0d;color:var(--wb-text,#fff);text-decoration:none;font-weight:950;font-size:13px;padding:9px 12px}.wb-builder-tab.active{background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#071015;border-color:transparent}.wb-builder-tab:hover{border-color:var(--wb-accent,#22d3a6)}'+
+    '.wb-secondary{background:#ffffff16;color:#fff;border:1px solid #ffffff22}.wb-builder-tabs{position:sticky;top:0;z-index:90010;display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,420px);gap:10px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--wb-line,#ffffff22);background:rgba(7,9,16,.94);backdrop-filter:blur(14px);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif)}.wb-builder-tab-scroll{display:flex;gap:8px;align-items:center;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}.wb-builder-tab{flex:0 0 auto;border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:#ffffff0d;color:var(--wb-text,#fff);text-decoration:none;font-weight:950;font-size:13px;padding:9px 12px}.wb-builder-tab.active{background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#071015;border-color:transparent}.wb-builder-tab:hover{border-color:var(--wb-accent,#22d3a6)}'+
     '.wb-builder-search{position:relative;min-width:0}.wb-builder-search input{width:100%;border:1px solid var(--wb-line,#ffffff22);border-radius:999px;background:#0007;color:var(--wb-text,#fff);padding:11px 14px;font:inherit;font-weight:850;outline:none}.wb-builder-search input:focus{border-color:var(--wb-accent,#22d3a6);box-shadow:0 0 0 3px #22d3a624}.wb-search-results{position:absolute;right:0;top:calc(100% + 8px);width:min(680px,calc(100vw - 28px));max-height:62vh;overflow:auto;border:1px solid var(--wb-line,#ffffff22);border-radius:22px;background:#080b16f8;box-shadow:0 24px 80px #000d;padding:8px;z-index:90100}.wb-search-hit{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;text-decoration:none;color:var(--wb-text,#fff);border:1px solid #ffffff14;border-radius:16px;background:#ffffff08;padding:11px;margin:0 0 8px}.wb-search-hit b{display:block}.wb-search-hit small{display:block;color:var(--wb-muted,#aeb8d6);margin-top:3px}.wb-search-type{border:1px solid #ffffff20;border-radius:999px;background:#ffffff10;color:#dfffee;padding:5px 8px;font-size:11px;font-weight:950}'+
     '.wb-account-panel{position:fixed;right:12px;bottom:76px;z-index:90030;width:min(440px,calc(100vw - 24px));max-height:72vh;overflow:auto;border:1px solid var(--wb-line,#ffffff22);border-radius:24px;background:linear-gradient(135deg,var(--wb-panel,#101529),var(--wb-panel-2,#17122d));box-shadow:0 24px 80px #000b;padding:14px;color:var(--wb-text,#fff);font-family:var(--wb-font,Inter,system-ui,Arial,sans-serif);display:none}.wb-account-panel.open{display:block}.wb-account-head{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center}.wb-account-avatar,.wb-brand-logo{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--wb-accent,#22d3a6),var(--wb-accent-2,#7c3cff));color:#071015;font-weight:1000;overflow:hidden}.wb-account-avatar img,.wb-brand-logo img{width:100%;height:100%;object-fit:cover}.wb-account-panel small{display:block;color:var(--wb-muted,#aeb8d6)}.wb-panel-close{border:0;border-radius:999px;background:#ffffff18;color:#fff;font-weight:950;width:38px;height:38px;cursor:pointer}.wb-brand-mini{display:grid;grid-template-columns:48px 1fr;gap:10px;border:1px solid #ffffff18;border-radius:18px;background:#ffffff08;padding:10px;margin:12px 0}.wb-account-favs{display:grid;gap:8px}.wb-account-fav{display:block;border:1px solid #ffffff18;border-radius:16px;background:#ffffff08;color:#fff;text-decoration:none;padding:10px}.wb-account-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}'+
     'body[data-wb-shell] header.top .topRight,body[data-wb-shell] .top>.topRight{display:none!important}body[data-wb-shell] header.top{grid-template-columns:1fr!important}body[data-wb-shell] .brand{max-width:100%!important}'+
@@ -173,7 +186,8 @@
       {title:'Open current page in Builder',subtitle:'Current slug: '+currentSlug(),type:'Action',href:'overlay-route-truth-machine-v7-12-66-test.html?page='+s,search:'edit builder publish current page'},
       {title:'Open current page Preview',subtitle:'Current slug: '+currentSlug(),type:'Action',href:'web-builder-preview-owned-v7-12-257-test.html?page='+s,search:'preview published current page'},
       {title:'Open Messenger Overlay',subtitle:'Current slug: '+currentSlug(),type:'Inbox',href:'web-builder-form-inbox-owned-v7-12-258-test.html?page='+s,search:'messages overlay inbox sent friends blocked'},
-      {title:'Open Full Form Inbox',subtitle:'Current slug: '+currentSlug(),type:'Inbox',href:'web-builder-form-submissions-v7-12-94-test.html?page='+s,search:'full form inbox submissions'}
+      {title:'Open Full Form Inbox',subtitle:'Current slug: '+currentSlug(),type:'Inbox',href:'web-builder-form-submissions-v7-12-94-test.html?page='+s,search:'full form inbox submissions'},
+      {title:'Open Assets / Set Avatar',subtitle:'Use uploaded builder asset as global Web Builder avatar',type:'Assets',href:'web-builder-assets-v7-12-252-test.html?page='+s,search:'assets avatar logo image'}
     ]);
   }
   function pageToResult(p){
@@ -269,8 +283,71 @@
     var s = load(); s.brand = s.brand || {}; s.brand.faviconUrl = fav; s.meta = s.meta || {}; s.meta.localStorageOnly = true; s.meta.connectedToLiveApp = false;
     saveState(s); refreshChrome(s); expose(s); return s;
   }
+
+  function supa(){ if(!window.supabase || !window.supabase.createClient) return null; try{return window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){return null;} }
+  function getUserId(c){
+    if(!c) return Promise.resolve('');
+    return c.auth.getUser().then(function(r){ if(r && r.data && r.data.user) return r.data.user.id || ''; return c.auth.getSession().then(function(s){ return s && s.data && s.data.session && s.data.session.user ? s.data.session.user.id || '' : ''; }); }).catch(function(){ return ''; });
+  }
+  function firstImageInPrefix(c,prefix){
+    return c.storage.from(BUCKET).list(prefix,{limit:100,offset:0,sortBy:{column:'name',order:'desc'}}).then(function(res){
+      if(res.error) return null;
+      var row = (res.data || []).filter(function(x){ return x && x.name && !/\.metadata\.json$/i.test(x.name) && /\.(png|jpe?g|webp|gif|avif)$/i.test(x.name); })[0];
+      if(!row) return null;
+      var path = prefix + '/' + row.name;
+      var pub = c.storage.from(BUCKET).getPublicUrl(path);
+      return {path:path,url:pub && pub.data && pub.data.publicUrl ? pub.data.publicUrl : ''};
+    }).catch(function(){ return null; });
+  }
+  function discoverAssetAvatar(){
+    if(discoveringAsset) return;
+    discoveringAsset = true;
+    var c = supa();
+    if(!c){ discoveringAsset = false; return; }
+    var slug = currentSlug();
+    getUserId(c).then(function(uid){
+      var prefixes = [];
+      if(uid){
+        prefixes.push('builder/logos/users/'+uid+'/'+slug);
+        prefixes.push('builder/assets/users/'+uid+'/'+slug);
+        prefixes.push('builder/favicons/users/'+uid+'/'+slug);
+      }
+      prefixes.push('builder/logos/'+slug);
+      prefixes.push('builder/assets/'+slug);
+      prefixes.push('builder/favicons/'+slug);
+      var chain = Promise.resolve(null);
+      prefixes.forEach(function(prefix){ chain = chain.then(function(found){ return found || firstImageInPrefix(c,prefix); }); });
+      return chain;
+    }).then(function(found){
+      discoveringAsset = false;
+      if(!found || !found.url) return;
+      var s = load();
+      s.avatar = s.avatar || {};
+      s.brand = s.brand || {};
+      s.meta = s.meta || {};
+      if(s.meta.projectedAssetUrl === found.url && s.avatar.url === found.url) return;
+      s.avatar.mode = 'image';
+      s.avatar.url = found.url;
+      s.avatar.alt = 'Web Builder uploaded asset avatar';
+      s.brand.logoMode = 'image';
+      s.brand.logoUrl = found.url;
+      s.brand.faviconUrl = found.url;
+      s.meta.projectedAssetUrl = found.url;
+      s.meta.projectedAssetPath = found.path;
+      s.meta.assetAvatarProjection = true;
+      s.meta.storageReads = true;
+      s.meta.storageWrites = false;
+      s.meta.schemaChanges = false;
+      s.meta.indexPromotion = false;
+      saveState(s);
+      applyTheme(s);
+      refreshChrome(s,'Uploaded builder asset projected globally');
+      expose(s);
+    }).catch(function(){ discoveringAsset = false; });
+  }
+
   function expose(s){
-    window.StreamBanditWebBuilderProjector = {version:VERSION,storageKey:STORAGE_KEY,state:s,connectedToLiveApp:false,appliedAt:new Date().toISOString(),accountOverlay:true,favouritesOverlay:true,faviconProjection:true,topAvatarProjection:true,sharedHeaderTabs:true,sharedRailAllRoutes:true,globalSearch:true,duplicateStudioTopNavHidden:true,saveSuccessText:SUCCESS};
+    window.StreamBanditWebBuilderProjector = {version:VERSION,storageKey:STORAGE_KEY,state:s,connectedToLiveApp:false,appliedAt:new Date().toISOString(),accountOverlay:true,favouritesOverlay:true,faviconProjection:true,topAvatarProjection:true,uploadedAssetAvatarProjection:!!(s.meta && s.meta.assetAvatarProjection),sharedHeaderTabs:true,sharedRailAllRoutes:true,globalSearch:true,duplicateStudioTopNavHidden:true,saveSuccessText:SUCCESS,storageReads:!!(s.meta && s.meta.storageReads),storageWrites:false,schemaChanges:false,indexPromotion:false};
     window.dispatchEvent(new CustomEvent('web-builder-projector-applied',{detail:window.StreamBanditWebBuilderProjector}));
   }
   function apply(){
@@ -279,6 +356,7 @@
     document.documentElement.setAttribute('data-web-builder-projector-version',VERSION);
     document.documentElement.setAttribute('data-web-builder-live-app-connection','false');
     applyTheme(s); injectChrome(s); addFaviconField(s); expose(s);
+    setTimeout(discoverAssetAvatar,350);
   }
   function watchButtons(){
     if(bound) return;
@@ -293,14 +371,15 @@
             refreshChrome(s,text);
             var status = document.getElementById('status'); if(status && text === SUCCESS) status.textContent = SUCCESS;
             if(window.StreamBanditWebBuilderProjector){ window.StreamBanditWebBuilderProjector.state = s; window.StreamBanditWebBuilderProjector.saveButtonObserved = text === SUCCESS; window.StreamBanditWebBuilderProjector.connectedToLiveApp = false; }
+            setTimeout(discoverAssetAvatar,250);
           },220);
           break;
         }
         el = el.parentNode;
       }
     },true);
-    document.addEventListener('input',function(e){ if(e.target && ['slug','pageSlug','studioSlug','wbSlug'].indexOf(e.target.id) > -1) setTimeout(injectTabs,80); },true);
-    document.addEventListener('change',function(e){ if(e.target && e.target.id === 'faviconUrl') saveFaviconFromField(); if(e.target && ['slug','pageSlug','studioSlug','wbSlug'].indexOf(e.target.id) > -1) setTimeout(injectTabs,80); },true);
+    document.addEventListener('input',function(e){ if(e.target && ['slug','pageSlug','studioSlug','wbSlug','siteSlug'].indexOf(e.target.id) > -1) setTimeout(function(){ injectTabs(); discoverAssetAvatar(); },100); },true);
+    document.addEventListener('change',function(e){ if(e.target && e.target.id === 'faviconUrl') saveFaviconFromField(); if(e.target && ['slug','pageSlug','studioSlug','wbSlug','siteSlug'].indexOf(e.target.id) > -1) setTimeout(function(){ injectTabs(); discoverAssetAvatar(); },100); },true);
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',function(){ apply(); watchButtons(); });
