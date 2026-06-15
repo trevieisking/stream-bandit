@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Owned Preview V7.12.263.12 TEST</title>
+<title>Web Builder Owned Preview V7.12.299.14 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -66,9 +66,19 @@ body{
   border-radius:15px;
   display:grid;
   place-items:center;
-  background:linear-gradient(135deg,var(--good),var(--purple));
+  background:#050711;
   color:#071015;
   font-weight:1000;
+  overflow:hidden;
+}
+.mark img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+  object-position:center;
+  border-radius:inherit;
+  background:#050711;
 }
 .brand small{
   display:block;
@@ -265,6 +275,15 @@ p,li,label,small{
   background:#ff5d6c22;
   border-color:#ff5d6c66;
   color:#ffd0d5;
+}
+.railNote{
+  border:1px solid #41e8ff66;
+  background:#41e8ff17;
+  color:#dffbff;
+  border-radius:18px;
+  padding:12px;
+  margin:10px 0;
+  font-weight:900;
 }
 .previewFull{
   border:1px solid #ffffff20;
@@ -514,21 +533,15 @@ p,li,label,small{
 }
 </style>
 </head>
-<body>
+<body data-wb-shell="preview-v7-12-299-14" data-web-builder-preview="global-rail">
 <header class="top">
   <div class="topInner">
     <div class="brand">
-      <div class="mark" aria-hidden="true">WB</div>
+      <div class="mark" aria-hidden="true"><img src="https://xzxqfrvqdgkzwujbkdbk.supabase.co/storage/v1/object/public/stream-bandit-images/builder/assets/landing/1781531792576-4bb8cb73-log_master_piece_15-6-2026_145453_xzxqfrvqdgkzwujbkdbk.supabase.co.jpeg" alt=""></div>
       <div>
         Web Builder Owned Preview
-        <small>Owner workspace preview lock · V7.12.263.12</small>
+        <small>shared rail preview lock · V7.12.299.14</small>
       </div>
-    </div>
-    <div class="actions">
-      <a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Hub</a>
-      <a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Pages</a>
-      <a class="btn" id="studioTop" href="web-builder-studio-v7-12-252-test.html?page=landing">Studio</a>
-      <a class="btn" href="web-builder-route-map-v7-12-252-test.html">Route Map</a>
     </div>
   </div>
 </header>
@@ -539,6 +552,7 @@ p,li,label,small{
       <span class="badge">Checking Web Builder preview access</span>
       <h1>Loading owned preview</h1>
       <p>The preview stays hidden until the page-owner workspace lock passes.</p>
+      <div class="railNote">Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see every Web Builder page.</div>
     </div>
   </section>
 </main>
@@ -547,7 +561,7 @@ p,li,label,small{
 (function(){
 'use strict';
 
-const VERSION='V7.12.263.12 Web Builder Owned Preview Owner Workspace Lock';
+const VERSION='V7.12.299.14 Web Builder Owned Preview Global Rail Lock';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const OWNER_SLUGS=['landing','home','home-page'];
@@ -627,7 +641,13 @@ let authState={
   streamBanditShellChanges:false,
   activeMenuPromotion:false,
   indexPromotion:false,
-  registryPromotion:true
+  registryPromotion:false,
+  sharedRail:true,
+  bodyActionsPreserved:true,
+  localTopButtonsHidden:true,
+  globalRailProjector:true,
+  webBuilderShell:true,
+  appGlobalFooterInjected:false
 };
 
 const $=function(id){return document.getElementById(id);};
@@ -779,7 +799,7 @@ function links(slug){
     builder:pageUrl(ROUTES.studio,s),
     studio:pageUrl(ROUTES.studio,s),
     canonicalStudio:pageUrl(ROUTES.canonicalStudio,s),
-    menu:ROUTES.menu,
+    menu:pageUrl(ROUTES.menu,s),
     form:pageUrl(ROUTES.form,s),
     inbox:pageUrl(ROUTES.inbox,s),
     preview:pageUrl(ROUTES.preview,s)
@@ -1359,7 +1379,7 @@ async function submitInlineForm(form){
       block_title:title,
       answers_json:Object.assign({},collected.answers,{
         __form:{
-          source:'owned-preview-lock-v7-12-263-12',
+          source:'owned-preview-global-rail-v7-12-299-14',
           page_slug:currentSlug(),
           page_owner_id:pageOwnerId,
           block_index:blockIndex
@@ -1735,7 +1755,8 @@ function updateLinks(){
   let l=links(currentSlug());
 
   $('linkBox').textContent=JSON.stringify(l,null,2);
-  $('studioTop').href=l.canonicalStudio;
+  let studioTop=$('studioTop');
+  if(studioTop)studioTop.href=l.canonicalStudio;
 }
 
 function debug(){
@@ -1755,6 +1776,14 @@ function debug(){
     redirectSlug:redirectSlug,
     mode:mode,
     pageSource:mode,
+    sharedRail:true,
+    bodyActionsPreserved:true,
+    localTopButtonsHidden:true,
+    globalRailProjector:true,
+    webBuilderShell:true,
+    fullPreviewPreserved:true,
+    formSubmissionsPreserved:true,
+    appGlobalFooterInjected:false,
     supabaseReadCount:supabaseReadCount,
     submissionWrites:submissionWrites,
     storageWrites:false,
@@ -1783,7 +1812,7 @@ function debug(){
     menuRows:menuRows.length,
     activeMenuPromotion:false,
     indexPromotion:false,
-    registryPromotion:true,
+    registryPromotion:false,
     builderTableChanges:false
   });
 
@@ -1803,17 +1832,19 @@ async function copyReport(){
 
 function renderShell(){
   app().innerHTML='<section class="hero">\
-<span class="badge">V7.12.263.12 Owned Preview Lock</span>\
+<span class="badge">V7.12.299.14 Owned Preview Global Rail</span>\
 <h1>Published Preview shows only the allowed workspace page</h1>\
 <p>This preview reads <code>sb_site_pages</code> after the owner lock passes. Creator users can preview only their own rows. Platform owner can preview any workspace.</p>\
 <div class="pillRow">\
 <span class="chip good">Page owner lock</span>\
 <span class="chip good">Reserved slug redirect</span>\
 <span class="chip good">Empty block guard</span>\
+<span class="chip good">Shared rail</span>\
 <span class="chip warn">No schema changes</span>\
 <span class="chip warn">No storage uploads from preview lock</span>\
 <span class="chip warn">No index promotion</span>\
 </div>\
+<div class="railNote">Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see every Web Builder page.</div>\
 </section>\
 <section class="panel">\
 <h2>Preview controls</h2>\
@@ -1832,7 +1863,7 @@ function renderShell(){
 </section>\
 <section class="previewFull"><div id="previewFrame"></div></section>\
 <section class="miniGrid">\
-<div class="panel"><h2>Safety rule</h2><div class="notice">Owned Preview reads owner-scoped pages/menu and can submit configured forms only. It does not change schema, storage, registry or index.</div></div>\
+<div class="panel"><h2>Safety rule</h2><div class="notice">Owned Preview reads owner-scoped pages/menu and can submit configured forms only. It does not change schema, storage, app shell or index.</div></div>\
 <div class="panel"><h2>Pass condition</h2><p>Trevor can preview all workspaces. Creator users preview only their own pages. Empty blocks are hidden.</p></div>\
 <div class="panel"><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></div>\
 </section>';
@@ -1927,5 +1958,6 @@ boot();
 
 })();
 </script>
+<script src="web-builder-global-projector-v7-12-263.js?v=7-12-299-14-preview-global-rail"></script>
 </body>
 </html>
