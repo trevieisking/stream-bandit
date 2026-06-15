@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Owned Pages Manager V7.12.263.11 TEST</title>
+<title>Web Builder Owned Pages Manager V7.12.299.11 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -69,6 +69,7 @@ body{
   background:linear-gradient(135deg,var(--good),var(--purple));
   color:#071015;
   font-weight:1000;
+  overflow:hidden;
 }
 .brand small{
   display:block;
@@ -258,6 +259,15 @@ p,li,label,small,code{
   border-color:#ff5d6c66;
   color:#ffd0d5;
 }
+.railNote{
+  border:1px solid #41e8ff66;
+  background:#41e8ff17;
+  color:#dffbff;
+  border-radius:18px;
+  padding:12px;
+  margin:10px 0;
+  font-weight:900;
+}
 .summaryGrid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -332,22 +342,15 @@ p,li,label,small,code{
 }
 </style>
 </head>
-<body>
+<body data-wb-shell="pages-manager-v7-12-299-11" data-web-builder-pages-manager="global-rail">
 <header class="top">
   <div class="topInner">
     <div class="brand">
       <div class="mark" aria-hidden="true">WB</div>
       <div>
         Web Builder Owned Pages Manager
-        <small>No sort_order column fix · V7.12.263.11</small>
+        <small>shared rail pages workspace · V7.12.299.11</small>
       </div>
-    </div>
-    <div class="actions">
-      <a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Hub</a>
-      <a class="btn" href="web-builder-studio-v7-12-252-test.html">Studio</a>
-      <a class="btn" href="web-builder-preview-owned-v7-12-257-test.html?page=landing">Preview</a>
-      <a class="btn" href="web-builder-route-map-v7-12-252-test.html">Route Map</a>
-      <a class="btn" href="web-builder-control-map-v7-12-253-test.html">Control Map</a>
     </div>
   </div>
 </header>
@@ -358,19 +361,20 @@ p,li,label,small,code{
       <span class="badge">Checking Web Builder access</span>
       <h1>Loading your pages workspace</h1>
       <p>Pages Manager stays hidden until the personal workspace lock passes.</p>
+      <div class="railNote">Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see every Web Builder page.</div>
     </div>
   </section>
 </main>
 
 <footer class="footer">
-  V7.12.263.11 Owned Pages Manager · no sort_order column writes · personal owner_id scope · schemaChanges false
+  V7.12.299.11 Owned Pages Manager Global Rail · no sort_order column writes · personal owner_id scope · schemaChanges false
 </footer>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.263.11 Owned Pages Manager No Sort Column Fix';
+const VERSION='V7.12.299.11 Owned Pages Manager Global Rail';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const OWNER_SLUGS=['landing','home','home-page'];
@@ -425,7 +429,11 @@ let authState={
   streamBanditShellChanges:false,
   activeMenuPromotion:false,
   indexPromotion:false,
-  registryPromotion:true,
+  registryPromotion:false,
+  sharedRail:true,
+  bodyActionsPreserved:true,
+  localTopButtonsHidden:true,
+  globalRailProjector:true,
   sortOrderColumnRequired:false,
   sortOrderStoredInSettingsJson:true
 };
@@ -1040,7 +1048,7 @@ function state(){
 
   return Object.assign({},authState,{
     canonicalRoute:'web-builder-pages-manager-owned-v7-12-256-test.html',
-    checkpoint:'CHECKPOINT-WEB-BUILDER-DOORWAY-LOCK-ROLLPLAN-V7-12-263-8.md',
+    checkpoint:'CHECKPOINT-WEB-BUILDER-GLOBAL-RAIL-LOGO-INBOX-PASS-V7-12-299-7.md',
     personalWorkspaceScoped:true,
     scope:authState.isPlatformOwner?'platform-owner-all-rows':'personal-owner-id-only',
     ownerScopeUserId:authState.userId,
@@ -1048,6 +1056,10 @@ function state(){
     creatorCanOnlySeeOwnRows:!authState.isPlatformOwner,
     adminRoleAloneDoesNotExposeWorkspaces:true,
     reservedSlugsProtected:OWNER_SLUGS,
+    sharedRail:true,
+    bodyActionsPreserved:true,
+    localTopButtonsHidden:true,
+    globalRailProjector:true,
     supabaseReads:supabaseReads,
     supabaseWrites:supabaseWrites,
     storageWrites:false,
@@ -1120,13 +1132,14 @@ function bindPage(){
 function renderPage(){
   authState.checked=true;
   authState.allowed=true;
-  authState.reason='Allowed. Owned Pages Manager opened with shared workspace lock.';
+  authState.reason='Allowed. Owned Pages Manager opened with shared global rail workspace lock.';
 
   app().innerHTML='<section class="hero">\
-<span class="badge">V7.12.263.11 No sort_order column fix</span>\
+<span class="badge">V7.12.299.11 Global Rail Pages Manager</span>\
 <h1>Create, find and save Web Builder pages</h1>\
-<p>Pages Manager scopes <code>sb_site_pages</code> by owner. It now saves only real table columns and stores sort/page type inside <code>settings_json</code>, so no Supabase schema change is needed.</p>\
+<p>Pages Manager now follows the Hub shared rail/header pattern while preserving the owner-scoped <code>sb_site_pages</code> logic. It saves only real table columns and stores sort/page type inside <code>settings_json</code>, so no Supabase schema change is needed.</p>\
 <div class="row">\
+<span class="chip good">Shared rail</span>\
 <span class="chip good">Supabase read</span>\
 <span class="chip good">Owner scoped rows</span>\
 <span class="chip good">No sort_order column write</span>\
@@ -1134,6 +1147,7 @@ function renderPage(){
 <span class="chip warn">Landing/home protected</span>\
 <span class="chip warn">No schema/storage change</span>\
 </div>\
+<div class="railNote">Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see every Web Builder page.</div>\
 </section>\
 <section class="grid">\
 <div class="card own"><b>Personal scope</b><ul class="list"><li>Platform owner sees all rows.</li><li>Creator sees only own <code>owner_id</code> rows.</li><li>Admin role alone does not expose another user workspace.</li></ul></div>\
@@ -1250,5 +1264,6 @@ boot();
 
 })();
 </script>
+<script src="web-builder-global-projector-v7-12-263.js?v=7-12-299-11-pages-manager-global-rail"></script>
 </body>
 </html>
