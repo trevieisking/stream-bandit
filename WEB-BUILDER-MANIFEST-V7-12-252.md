@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.265.3
+# Web Builder Manifest V7.12.299.1
 
 ## Purpose
 
@@ -6,13 +6,13 @@ This manifest tracks the Web Builder as a separate mini app/product area inside 
 
 The Stream Bandit manifest remains for the movie app. This file is for Web Builder only.
 
-## Massive checkpoint status
+## Current checkpoint status
 
-Status: RECORDED / WEB BUILDER CORE BLOCKERS COMPLETE FOR CURRENT CONTROLLED PROMOTION CANDIDATE / WEB BUILDER ACCESS GATE AND PERSONAL WORKSPACE SCOPE PASSED / STUDIO ENGINE ROLLBACK CHECKPOINT RECORDED.
+Status: RECORDED / WEB BUILDER OWNER WORKSPACE LOCK PASS MOSTLY COMPLETE / FORM DESIGNER SOLID STATE PASS / REAL APP INBOX BRIDGE PROBLEM RECORDED.
 
-This checkpoint records the work completed across the Web Builder Supabase page flow, owned preview, inline published forms, shared Web Builder tabs, global Web Builder search, Pages Manager jump search, Menu Builder slim tabs, Menu Builder edit overlay, Menu Builder jump search, guarded Supabase page delete, image upload form fields, empty published preview block guards, Web Builder-only protected access gate, no-admin-bypass correction, Pages Manager personal owner scope, and the Studio helper rollback/engine loader repair.
+This checkpoint records the late-night pass where the Web Builder owner workspace lock was rolled across the main builder pages and the Form Designer was repaired to a solid-state overlay page. It also records the exact blocker still open: the real app-synced inbox route must remain the single inbox, but Web Builder Studio needs a clean overlay bridge to it, and the creator/Kayleigh access rule must not treat the inbox as platform-owner-only.
 
-No live `index.html` promotion was done. No main Stream Bandit shell rewrite was done. No schema/storage table change was done in these page passes.
+No live `index.html` promotion was done. No main Stream Bandit shell rewrite was done. No schema/storage table change was done in this pass.
 
 ## Current doorway rule
 
@@ -28,9 +28,9 @@ Approved doorway model:
 
 - One way in: Stream Bandit menu -> Web Builder -> `web-builder-account-control-hub-v7-12-263-test.html`.
 - One way out: Web Builder -> `Back` to Stream Bandit.
-- Every Web Builder page that loads the projector should show the same Web Builder tabs.
-- Every Web Builder page that loads the projector should get Web Builder-only global search.
-- Old per-page duplicate route buttons should be removed or hidden as pages are cleaned.
+- Web Builder Studio uses its own clean builder shell.
+- The Stream Bandit app global footer/rail must not be injected into Web Builder Studio.
+- The only intentional bridge between Web Builder and the Stream Bandit app is the form inbox/submission system.
 
 Not promoted yet:
 
@@ -58,32 +58,267 @@ Not promoted yet:
 - Pages Manager can delete a selected non-protected `sb_site_pages` row only from the platform-owner flow, after exact slug confirmation and readback verification.
 - Creator Growth / Web Builder users can create and save their own `owner_id` rows only; they must not see or manage another user's personal Web Builder rows.
 
-## Current verified Web Builder flow
+## Verified owner-lock pass from current rollout
 
-Normal route flow:
+### Web Builder Hub
 
-1. Web Builder Hub opens through the Web Builder-only protected gate.
-2. Pages Manager creates, saves and finds page rows inside the correct owner scope.
-3. Platform owner can see all `sb_site_pages` rows; creator/build users see only rows where `owner_id` matches their signed-in user id.
-4. Web Builder / Publish opens `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`.
-5. Published Preview opens `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`.
-6. Menu Builder controls the published menu via `sb_site_pages.settings_json`.
-7. Published forms submit inline on the published page and are read from the Web Builder-owned inbox.
-8. Web Builder shared tabs keep the owned page group connected.
-9. Web Builder global search searches owned tools/routes and Supabase `sb_site_pages` by title, slug and status.
+Route: `web-builder-account-control-hub-v7-12-263-test.html`
 
-Current Web Builder shared tabs:
+Result: PASS.
 
-- `Back` -> `settings-platform-control-hub-v7-12-85-test.html`
-- `Hub` -> `web-builder-account-control-hub-v7-12-263-test.html`
-- `Pages` -> `web-builder-pages-manager-owned-v7-12-256-test.html`
-- `Web Builder` -> `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`
-- `Preview` -> `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`
-- `Menu` -> `web-builder-menu-builder-owned-v7-12-264-test.html`
-- `Form` -> `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>`
-- `Inbox` -> `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>`
+- Platform owner can enter and see the builder workspace.
+- Creator Growth user can enter builder workspace.
+- Creator users are directed to their own page rather than owner-only slugs.
+- No schema changes.
+- No storage changes.
+- No index promotion.
 
-## Current passed checkpoints
+### Canonical Studio handoff
+
+Route: `web-builder-studio-v7-12-252-test.html`
+
+Result: PASS.
+
+- Preserves `?page=<slug>` and hands off to `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`.
+- No engine rewrite.
+- No index promotion.
+
+### Route Map / Control Map / Pages Source Map / Header-Footer Code / Assets
+
+Routes:
+
+- `web-builder-route-map-v7-12-252-test.html`
+- `web-builder-control-map-v7-12-253-test.html`
+- `web-builder-pages-source-map-v7-12-255-test.html`
+- `web-builder-header-footer-code-v7-12-254-test.html`
+- `web-builder-assets-v7-12-252-test.html`
+
+Result: PASS for owner-lock doorway behavior.
+
+- Builder access gate added or preserved.
+- No global app shell injection.
+- No schema changes.
+- No index promotion.
+- Existing asset behavior remains existing-bucket-only.
+
+### Owned Pages Manager
+
+Route: `web-builder-pages-manager-owned-v7-12-256-test.html`
+
+Result: PASS after no-sort-column repair.
+
+Verified user debug:
+
+- Trevor / platform owner: `workspace = platform-owner-all-rows`; page count 11; can see all rows.
+- Kayleigh / Creator Growth: `workspace = personal-owner-id-only`; page count 2; can see and save only own rows.
+- `sort_order` column is not required; sort order is stored in `settings_json`.
+- `page_type` column is not required; page type is stored in `settings_json`.
+- Admin role alone does not expose other user workspaces.
+- Reserved slugs protected: `landing`, `home`, `home-page`.
+
+### Owned Preview
+
+Route: `web-builder-preview-owned-v7-12-257-test.html`
+
+Result: PASS.
+
+Verified user debug:
+
+- Kayleigh / Creator Growth: `workspace = personal-owner-id-only`, requested `my-first-page`, owner matches current user, real preview opens.
+- Trevor / platform owner: `workspace = platform-owner-any-workspace`, requested `landing`, can preview owner workspace.
+- Creator users can only preview own rows.
+- Platform owner can preview any workspace.
+- No schema changes.
+- No storage changes.
+
+### Menu Builder
+
+Route: `web-builder-menu-builder-owned-v7-12-264-test.html`
+
+Result: PASS.
+
+Verified user debug:
+
+- Kayleigh / Creator Growth: can edit only own menu rows stored in `settings_json`.
+- Trevor / platform owner: can edit all menu rows.
+- `sort_order` column is not required.
+- Menu data is stored in `settings_json`.
+- Admin role alone does not expose workspaces.
+- No schema changes.
+- No storage changes.
+
+### Form Designer
+
+Route: `web-builder-form-designer-owned-v7-12-258-test.html`
+
+Current version: `V7.12.263.17 Web Builder Form Designer Solid State Owner Lock`.
+
+Result: PASS after solid-state repair.
+
+Important repair history:
+
+- A flattened Form Designer build accidentally removed the overlay inputs and put the page behind a hidden loading gate.
+- That was corrected by restoring the overlay system and then changing the page to solid state.
+- Solid state means the Form Designer shell renders immediately, then auth/owner checks run in the background.
+- This prevents the permanent loading screen and mobile refresh-loop issue.
+
+Verified Kayleigh result:
+
+- `checked = true`
+- `allowed = true`
+- `signedIn = true`
+- `email = mummykay1986@gmail.com`
+- `workspace = personal-owner-id-only`
+- `softRedirectApplied = true`
+- `requestedSlug = my-first-page`
+- `pageOwnerId = f6f6b76a-2021-4a5a-91dd-7b5db1f62a5f`
+- `ownerMatchesCurrentUser = true`
+- `creatorCanOnlyEditOwnPageForms = true`
+- `overlaySystemRestored = true`
+- `builderOverlayPreserved = true`
+- `destinationOverlayPreserved = true`
+- `fieldEditOverlayPreserved = true`
+- `compactFieldRowsPreserved = true`
+- `imageUploadFieldPreserved = true`
+- `imageUploadExistingBucketOnly = true`
+- Real Submit passed and wrote a row to `sb_form_submissions` for `my-first-page`.
+
+Verified Trevor result:
+
+- `checked = true`
+- `allowed = true`
+- `signedIn = true`
+- `email = trevieisking@gmail.com`
+- `workspace = platform-owner-any-workspace`
+- `requestedSlug = landing`
+- `pageOwnerId = af380be8-d1e2-4154-a5ed-a113c8271afd`
+- `ownerMatchesCurrentUser = true`
+- `platformOwnerCanEditAnyWorkspace = true`
+- Real Submit passed and wrote a row to `sb_form_submissions` for `landing`.
+
+Hard rules preserved:
+
+- No schema changes.
+- No bucket policy changes.
+- Existing `stream-bandit-images` bucket only.
+- No index promotion.
+- No Stream Bandit shell rewrite.
+
+## Exact current blocker to resume after sleep
+
+### Blocker title
+
+Web Builder Studio needs an app-synced inbox overlay bridge, but the real app inbox must remain the only inbox.
+
+### User observation
+
+The route `web-builder-form-submissions-v7-12-94-test.html?page=test-page` is the working inbox and already has the options the user wants:
+
+- inbox/submissions
+- private replies/messages
+- sent/outbox
+- spam
+- trash
+- CSV/export
+- soft status actions
+- real Supabase flows for `sb_form_submissions` and `sb_private_messages`
+
+This route must not be replaced by a smaller owned inbox clone.
+
+### Correct rule
+
+- The real app inbox route is the single source of truth for inbox/submissions.
+- Web Builder forms can submit to the shared app inbox tables.
+- Web Builder Studio should open the real app inbox in an overlay or full page using the current slug.
+- Web Builder must not rebuild a second smaller inbox as the primary flow.
+- Web Builder must not inject the full Stream Bandit app footer/global rail into Studio.
+- The only app sync bridge is inbox/form submissions.
+
+### Exact stuck problem
+
+The last attempted Studio overlay bridge code was not verified as successful. User reported:
+
+- For Kayleigh, the decision/access on the inbox is not allowed because the inbox was treated as owner-only / placed in the owner group before the routes were organized.
+- No inbox overlay appeared on the Studio page.
+- The user wants this recorded before bed, not another risky code pass.
+
+### Resume target
+
+Scan and repair only these pieces next:
+
+1. `overlay-route-truth-machine-v7-12-66-test.html`
+   - Add/verify a safe builder-scoped Inbox button/overlay.
+   - Overlay target must be `web-builder-form-submissions-v7-12-94-test.html?page=<current builder slug>`.
+   - Do not touch `web-builder-live-studio-v7-12-116.js`.
+   - Do not inject Stream Bandit app global footer.
+
+2. `web-builder-form-submissions-v7-12-94-test.html`
+   - Keep as the real app-synced inbox.
+   - Do not replace it.
+   - Verify Creator Growth / Kayleigh can view submissions for her own page slug and cannot view owner-only/private rows.
+   - If it is owner-only, repair the gate/scope so Creator Growth with own `owner_id` page can access her own page inbox.
+   - Preserve all app inbox options: inbox, replies/private messages, sent/outbox, spam, trash, CSV/export, soft status actions.
+
+3. If `web-builder-form-inbox-owned-v7-12-258-test.html` exists or was added, treat it as non-primary or doorway only.
+   - It must not replace the real app inbox route.
+
+### Do not touch next time unless explicitly approved
+
+- `index.html`
+- app registry/menu promotion
+- Supabase schema/RLS/storage policies
+- `web-builder-live-studio-v7-12-116.js`
+- `web-builder-protected-page-v7-12-265.js` unless specifically scanning the access decision
+- Stream Bandit global footer shell as a direct Studio injection
+
+## Current route set
+
+Canonical/current Web Builder routes:
+
+- `web-builder-account-control-hub-v7-12-263-test.html`
+- `web-builder-pages-manager-owned-v7-12-256-test.html`
+- `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`
+- `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`
+- `web-builder-menu-builder-owned-v7-12-264-test.html`
+- `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>`
+- `web-builder-assets-v7-12-252-test.html`
+- `web-builder-route-map-v7-12-252-test.html`
+- `web-builder-control-map-v7-12-253-test.html`
+- `web-builder-pages-source-map-v7-12-255-test.html`
+- `web-builder-header-footer-code-v7-12-254-test.html`
+- `WEB-BUILDER-MANIFEST-V7-12-252.md`
+
+Real app-synced inbox route to preserve:
+
+- `web-builder-form-submissions-v7-12-94-test.html?page=<slug>`
+
+Old support/reference routes preserved, not current primary flow:
+
+- `web-builder-pages-manager-v7-12-111-test.html`
+- `web-builder-shared-style-preview-v7-12-117-test.html?page=test-page`
+- `web-builder-form-save-v7-12-94-test.html?page=test-page`
+
+## Supabase state used by Web Builder
+
+Existing tables in active use:
+
+- `sb_site_pages`
+- `sb_form_submissions`
+- `sb_private_messages`
+- `sb_profiles`
+
+Current page/menu/form storage:
+
+- Page rows live in `sb_site_pages`.
+- Page ownership is scoped by `owner_id`.
+- Platform owner can view/manage all rows in owner-approved flows.
+- Creator Growth / builder users can view/save only their own `owner_id` rows.
+- Page layout lives in `layout_json`.
+- Menu and form builder metadata live in `settings_json`.
+- Form submissions live in `sb_form_submissions`.
+- Private replies/messages live in `sb_private_messages`.
+
+## Current passed checkpoints retained from earlier manifest
 
 - `V7.12.250 Web Builder Studio Theme Brand Font Planner` - PASS.
 - `V7.12.251 Web Builder Asset Media Planner` - PASS.
@@ -121,181 +356,11 @@ Current Web Builder shared tabs:
 - `V7.12.264.15 Pages Manager Personal Workspace Scope` - PASS.
 - `V7.12.116.4 Studio helper engine loader repair rollback checkpoint` - PASS.
 
-## Latest verified pass - V7.12.265.3 Studio helper rollback checkpoint
-
-User-tested result:
-
-- The bad helper experiment was correctly identified as the cause of the broken Studio route - PASS.
-- `web-builder-live-studio-v7-12-116.js` was rebuilt as `V7.12.116.4 Web Builder Studio engine loader repair` - PASS.
-- The helper again loads the real `web-builder-live-studio-v7-12-106.js` engine - PASS.
-- The Studio page rebuilt and the Web Builder engine mounted again - PASS.
-- The helper no longer uses the unsafe Supabase `createClient` proxy/global query patch experiment - PASS.
-- The helper keeps only safe runtime repairs: same-window links, publish notice, save verification, and page selector - PASS.
-- No `index.html` promotion - PASS.
-- No current app registry promotion - PASS.
-- No Stream Bandit shell rewrite - PASS.
-- No schema change - PASS.
-- No storage change - PASS.
-- No RLS change - PASS.
-
-Files touched in this rollback checkpoint:
-
-- `web-builder-live-studio-v7-12-116.js`
-- `WEB-BUILDER-MANIFEST-V7-12-252.md`
-
-Important lesson locked:
+## Lessons locked
 
 - Do not patch global Supabase client behavior from the Studio helper.
 - Do not force personal workspace scoping inside the Studio engine helper until the route is redesigned cleanly.
 - Keep the Studio helper as an engine loader/repair helper only.
 - Apply Web Builder access locks at the page level first, using the proven Pages Manager pattern.
-
-## Previous verified pass - V7.12.265.2 Web Builder access gate + Pages Manager owner scope
-
-User-tested result:
-
-- Web Builder Hub now loads the Web Builder-only protected gate and still keeps Web Builder chrome/projector isolated from the Stream Bandit app shell - PASS.
-- Pages Manager now loads the Web Builder-only protected gate before the Web Builder projector - PASS.
-- `web-builder-protected-page-v7-12-265.js` has been tightened so `role = admin` alone does not automatically unlock another user's personal Web Builder - PASS.
-- Creator Growth users remain allowed into Web Builder starter access when active and permitted by plan/permissions - PASS.
-- Pages Manager now scopes `sb_site_pages` reads by owner id for non-platform-owner users - PASS.
-- Platform owner can see all Web Builder page rows - PASS.
-- Creator Growth / non-platform-owner users see only rows where `owner_id` matches their own signed-in user id - PASS.
-- Save writes `owner_id` to the signed-in user's id for personal workspace users - PASS.
-- Delete remains locked to the platform-owner path and keeps landing/home protected - PASS.
-- No Stream Bandit app shell appears inside Web Builder - PASS.
-- No `index.html` promotion - PASS.
-- No current app registry promotion - PASS.
-- No schema change - PASS.
-- No storage change - PASS.
-- No RLS change - PASS.
-
-Files touched in this access/scope pass:
-
-- `web-builder-protected-page-v7-12-265.js`
-- `web-builder-account-control-hub-v7-12-263-test.html`
-- `web-builder-pages-manager-owned-v7-12-256-test.html`
-- `WEB-BUILDER-MANIFEST-V7-12-252.md`
-
-## Current route set
-
-Canonical/current Web Builder routes:
-
-- `web-builder-account-control-hub-v7-12-263-test.html`
-- `web-builder-pages-manager-owned-v7-12-256-test.html`
-- `overlay-route-truth-machine-v7-12-66-test.html?page=landing`
-- `web-builder-preview-owned-v7-12-257-test.html?page=landing`
-- `web-builder-menu-builder-owned-v7-12-264-test.html`
-- `web-builder-form-designer-owned-v7-12-258-test.html?page=landing`
-- `web-builder-form-inbox-owned-v7-12-258-test.html?page=landing`
-- `web-builder-assets-v7-12-252-test.html`
-- `web-builder-route-map-v7-12-252-test.html`
-- `web-builder-control-map-v7-12-253-test.html`
-- `web-builder-pages-source-map-v7-12-255-test.html`
-- `web-builder-header-footer-code-v7-12-254-test.html`
-- `WEB-BUILDER-MANIFEST-V7-12-252.md`
-
-Old support/reference routes preserved, not current primary flow:
-
-- `web-builder-pages-manager-v7-12-111-test.html`
-- `web-builder-shared-style-preview-v7-12-117-test.html?page=test-page`
-- `web-builder-form-save-v7-12-94-test.html?page=test-page`
-- `web-builder-form-submissions-v7-12-94-test.html?page=test-page`
-
-## Supabase state used by Web Builder
-
-Existing tables in active use:
-
-- `sb_site_pages`
-- `sb_form_submissions`
-- `sb_profiles`
-
-Current page/menu/form storage:
-
-- Page rows live in `sb_site_pages`.
-- Page ownership is scoped by `owner_id` in the passed Pages Manager flow.
-- Platform owner can view/manage all rows in the Pages Manager.
-- Creator Growth / builder users can view/save only their own `owner_id` rows in the Pages Manager.
-- Page layout lives in `layout_json`.
-- Menu settings live in `settings_json`.
-- Form submissions live in `sb_form_submissions`.
-- Form upload images use Storage bucket `stream-bandit-images`.
-
-Do not claim public anonymous production readiness until the RLS/policy pass is verified after deploy.
-
-## Seven-step live-promotion plan now locked
-
-1. Finish Web Builder core blockers - COMPLETE FOR CURRENT CONTROLLED CANDIDATE.
-   - Pages Manager real guarded delete - PASS.
-   - Empty preview blocks hidden - PASS.
-   - Form submit -> owned inbox - PASS.
-   - Web Builder protected gate - PASS.
-   - Pages Manager personal owner scope - PASS.
-   - Studio helper rollback / engine loader repair - PASS.
-2. Build real Owner Admin Hub - COMPLETE FOR CURRENT ACCESS CONTROL BASE.
-   - `user-management-dashboard-v7-11-2-test.html` upgraded to real owner control room.
-   - Owner can manage account status, role, admin level, plan, permissions JSON and notes through the approved RPC.
-   - User Management controls Web Builder access through `account_status`, `plan_key`, `permissions_json`, `admin_level` and `role`.
-   - No toy wording in the live admin hub.
-3. Add safe admin/account schema - COMPLETE FOR CURRENT ACCESS CONTROL BASE.
-   - `account_status`: active / limited / restricted / banned / review.
-   - admin level or role guard.
-   - `permissions_json`.
-   - `plan_key`.
-   - admin notes / managed by / managed at.
-   - audit log table / audit trail through the owner-safe RPC flow.
-4. Harden Supabase policies.
-   - Normal users cannot self-upgrade role.
-   - Normal users cannot unban/unlimit themselves.
-   - Owner/admin can manage users only through approved owner-safe rules.
-   - Public visitors can only do approved public actions.
-   - Web Builder `sb_site_pages` owner scope should be backed by RLS/policies before production claim.
-5. Connect Permissions Matrix to real controls.
-   - `permissions-matrix-user-management-v7-11-4-test.html` remains the rulebook.
-   - Admin Hub applies the rulebook.
-   - Pricing page remains research/draft until billing exists.
-6. Whole app polish scan.
-   - Stream Bandit pages, not just Web Builder.
-   - Headers, footers, search, routes, duplicate buttons, old stale wording.
-   - Mobile layout and deaf/accessibility/player-comfort checks.
-7. Final smoke test before promotion.
-   - Owner login.
-   - Normal user login.
-   - Creator Growth / Web Builder starter user test.
-   - Banned/limited user test.
-   - Web Builder route flow.
-   - Personal workspace owner-scope test.
-   - Public preview/form test.
-   - Main Stream Bandit watch/search/browse test.
-   - Backups/manifest/control map updated.
-
-## Current next target
-
-- `overlay-route-truth-machine-v7-12-66-test.html?page=landing`
-
-Reason:
-
-- The Studio engine now mounts again after the helper rollback/repair.
-- Next, fix the actual Web Builder page lock on the Studio route using the proven old checkpoint pattern from Pages Manager.
-- Do not put ownership/proxy logic into `web-builder-live-studio-v7-12-116.js` again.
-- Continue one Web Builder page at a time.
-
-## Safety locks
-
-- `index.html` promotion: false.
-- current app registry promotion: false.
-- Stream Bandit app branding changes: false.
-- Stream Bandit app shell changes: false.
-- separate Web Builder account system: false for now.
-- main Stream Bandit Auth/admin session remains the Web Builder admin owner for now.
-- frontend service-role secrets: false.
-- unsafe user creation: false.
-- unsafe user delete: false.
-- schema change without approval: false.
-- storage change without approval: false.
-- admin role alone unlocks personal Web Builder: false.
-- personal Web Builder rows visible to other non-owner users through Pages Manager: false.
-- creator_growth personal Web Builder access: true.
-- Pages Manager personal `owner_id` scope: true.
-- Studio helper Supabase proxy patching: false.
-- Studio helper is engine loader only: true.
+- Do not rebuild a working app page just because it is being opened from Web Builder.
+- The real app inbox is working; preserve it and bridge to it.
