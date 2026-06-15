@@ -3,275 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Account Control Hub V7.12.263.9 TEST</title>
+<title>Web Builder Account Control Hub V7.12.299.3 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
-  color-scheme:dark;
-  --bg:#050711;
-  --p:#101529;
-  --p2:#17122d;
-  --card:#ffffff0f;
-  --line:#ffffff22;
-  --text:#f7fbff;
-  --muted:#aeb8d6;
-  --good:#22d3a6;
-  --purple:#7c3cff;
-  --pink:#ff2d85;
-  --warn:#ffb142;
-  --bad:#ff4d6d;
-  --cyan:#41e8ff;
-}
-*{box-sizing:border-box;min-width:0}
-html,body{max-width:100vw;overflow-x:hidden}
-body{
-  margin:0;
-  background:
-    radial-gradient(circle at 0 0,#22d3a633,transparent 34%),
-    radial-gradient(circle at 100% 0,#7c3cff3d,transparent 38%),
-    radial-gradient(circle at 50% 100%,#ff2d8522,transparent 38%),
-    var(--bg);
-  color:var(--text);
-  font-family:Inter,system-ui,Arial,sans-serif;
-}
-.top{
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:#0b1020f2;
-  border-bottom:1px solid var(--line);
-  backdrop-filter:blur(16px);
-}
-.topIn,.wrap{
-  width:min(1500px,100%);
-  margin:auto;
-  padding:12px 14px;
-}
-.topIn{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;
-}
-.brand{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  font-weight:950;
-}
-.mark,.avatar,.logo{
-  display:grid;
-  place-items:center;
-  background:linear-gradient(135deg,var(--good),var(--purple));
-  color:#061017;
-  font-weight:1000;
-  overflow:hidden;
-}
-.mark{
-  width:44px;
-  height:44px;
-  border-radius:15px;
-}
-.brand small{
-  display:block;
-  color:var(--muted);
-  font-weight:800;
-}
-.btn{
-  border:0;
-  border-radius:999px;
-  background:#30384f;
-  color:#fff;
-  font-weight:950;
-  padding:10px 13px;
-  text-decoration:none;
-  cursor:pointer;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-}
-.primary{
-  background:linear-gradient(135deg,var(--good),var(--purple));
-  color:#061017;
-}
-.hot{
-  background:linear-gradient(135deg,var(--pink),var(--purple));
-  color:#fff;
-}
-.warnBtn{
-  background:linear-gradient(135deg,var(--warn),var(--purple));
-  color:#111;
-}
-.blue{
-  background:linear-gradient(135deg,var(--cyan),var(--purple));
-  color:#061017;
-}
-.actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.hero,.panel,.card,.pageCard{
-  border:1px solid #ffffff18;
-  border-radius:24px;
-  background:linear-gradient(135deg,var(--p),var(--p2));
-  padding:16px;
-  margin:0 0 14px;
-  box-shadow:0 18px 55px #0006;
-}
-.card,.pageCard{
-  background:var(--card);
-  box-shadow:none;
-}
-.hero h1{
-  font-size:clamp(38px,5.4vw,78px);
-  line-height:.92;
-  letter-spacing:-.06em;
-  margin:9px 0;
-}
-h2,h3{margin:0 0 10px}
-p,li,small,label{
-  color:var(--muted);
-  line-height:1.5;
-}
-.badge,.pill{
-  display:inline-flex;
-  border:1px solid #ffffff24;
-  border-radius:999px;
-  background:#ffffff0d;
-  color:#dbe7ff;
-  font-weight:900;
-  font-size:12px;
-  padding:6px 9px;
-  margin:2px;
-}
-.ok{
-  background:#22d3a621;
-  border-color:#22d3a660;
-  color:#baf7df;
-}
-.warn{
-  background:#ffb14224;
-  border-color:#ffb14266;
-  color:#ffe7ad;
-}
-.bad{
-  background:#ff4d6d24;
-  border-color:#ff4d6d66;
-  color:#ffd2d9;
-}
-.cyan{
-  background:#41e8ff22;
-  border-color:#41e8ff66;
-  color:#cef9ff;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:12px;
-}
-.big{
-  display:grid;
-  grid-template-columns:minmax(300px,.85fr) minmax(420px,1.15fr);
-  gap:12px;
-}
-.note,.locked{
-  border:1px solid #ffb14266;
-  background:#ffb14217;
-  color:#ffe7ad;
-  border-radius:18px;
-  padding:12px;
-  margin:10px 0;
-  font-weight:850;
-}
-.goodBox{
-  border:1px solid #22d3a660;
-  background:#22d3a618;
-  color:#dfffee;
-  border-radius:18px;
-  padding:12px;
-  margin:10px 0;
-  font-weight:850;
-}
-.badBox{
-  border:1px solid #ff4d6d66;
-  background:#ff4d6d18;
-  color:#ffd2d9;
-  border-radius:18px;
-  padding:12px;
-  margin:10px 0;
-  font-weight:850;
-}
-.out{
-  font-family:ui-monospace,Consolas,monospace;
-  white-space:pre-wrap;
-  word-break:break-word;
-  border:1px solid #ffffff14;
-  border-radius:16px;
-  background:#0007;
-  color:#dfffee;
-  padding:12px;
-  max-height:420px;
-  overflow:auto;
-}
-.pageCard{
-  display:grid;
-  gap:8px;
-}
-.pageCard h3{
-  margin:0;
-}
-.pageCard .actions{
-  margin-top:4px;
-}
-.lockedScreen{
-  min-height:100vh;
-  display:grid;
-  place-items:center;
-  padding:18px;
-}
-.lockedScreen .hero{
-  width:min(940px,100%);
-}
-.loading{
-  min-height:52vh;
-  display:grid;
-  place-items:center;
-  text-align:center;
-}
-.footer{
-  border-top:1px solid var(--line);
-  background:#0b1020d8;
-  padding:10px 14px;
-  color:#aeb8d6;
-  font-size:12px;
-}
-@media(max-width:900px){
-  .big{grid-template-columns:1fr}
-  .actions .btn,.btn{flex:1 1 auto}
-  .topIn{align-items:stretch}
-  .topIn>.actions{width:100%}
-}
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--card:#ffffff0f;--line:#ffffff22;--text:#f7fbff;--muted:#aeb8d6;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff}
+*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;background:radial-gradient(circle at 0 0,#22d3a633,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff3d,transparent 38%),radial-gradient(circle at 50% 100%,#ff2d8522,transparent 38%),var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}.top{position:sticky;top:0;z-index:20;background:#0b1020f2;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}.topIn,.wrap{width:min(1500px,100%);margin:auto;padding:12px 14px}.topIn{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.brand{display:flex;gap:10px;align-items:center;font-weight:950}.mark,.avatar,.logo{display:grid;place-items:center;background:linear-gradient(135deg,var(--good),var(--purple));color:#061017;font-weight:1000;overflow:hidden}.mark{width:44px;height:44px;border-radius:15px}.brand small{display:block;color:var(--muted);font-weight:800}.btn{border:0;border-radius:999px;background:#30384f;color:#fff;font-weight:950;padding:10px 13px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px}.primary{background:linear-gradient(135deg,var(--good),var(--purple));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#111}.blue{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#061017}.actions{display:flex;gap:8px;flex-wrap:wrap}.hero,.panel,.card,.pageCard{border:1px solid #ffffff18;border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));padding:16px;margin:0 0 14px;box-shadow:0 18px 55px #0006}.card,.pageCard{background:var(--card);box-shadow:none}.hero h1{font-size:clamp(38px,5.4vw,78px);line-height:.92;letter-spacing:-.06em;margin:9px 0}h2,h3{margin:0 0 10px}p,li,small,label{color:var(--muted);line-height:1.5}.badge,.pill{display:inline-flex;border:1px solid #ffffff24;border-radius:999px;background:#ffffff0d;color:#dbe7ff;font-weight:900;font-size:12px;padding:6px 9px;margin:2px}.ok{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.bad{background:#ff4d6d24;border-color:#ff4d6d66;color:#ffd2d9}.cyan{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.big{display:grid;grid-template-columns:minmax(300px,.85fr) minmax(420px,1.15fr);gap:12px}.note,.locked{border:1px solid #ffb14266;background:#ffb14217;color:#ffe7ad;border-radius:18px;padding:12px;margin:10px 0;font-weight:850}.goodBox{border:1px solid #22d3a660;background:#22d3a618;color:#dfffee;border-radius:18px;padding:12px;margin:10px 0;font-weight:850}.badBox{border:1px solid #ff4d6d66;background:#ff4d6d18;color:#ffd2d9;border-radius:18px;padding:12px;margin:10px 0;font-weight:850}.out{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;border:1px solid #ffffff14;border-radius:16px;background:#0007;color:#dfffee;padding:12px;max-height:420px;overflow:auto}.pageCard{display:grid;gap:8px}.pageCard h3{margin:0}.pageCard .actions{margin-top:4px}.lockedScreen{min-height:100vh;display:grid;place-items:center;padding:18px}.lockedScreen .hero{width:min(940px,100%)}.loading{min-height:52vh;display:grid;place-items:center;text-align:center}.footer{border-top:1px solid var(--line);background:#0b1020d8;padding:10px 14px;color:#aeb8d6;font-size:12px}.railNote{border:1px solid #41e8ff66;background:#41e8ff17;color:#dffbff;border-radius:18px;padding:12px;margin:10px 0;font-weight:900}@media(max-width:900px){.big{grid-template-columns:1fr}.actions .btn,.btn{flex:1 1 auto}.topIn{align-items:stretch}}
 </style>
 </head>
-<body>
+<body data-wb-shell="hub-v7-12-299-3" data-web-builder-hub="shared-rail">
 <header class="top">
   <div class="topIn">
     <div class="brand">
       <div class="mark">WB</div>
       <div>
         Web Builder Account Control Hub
-        <small>Personal workspace lock · V7.12.263.9</small>
+        <small>Personal workspace lock + shared scrolling rail · V7.12.299.3</small>
       </div>
-    </div>
-    <div class="actions">
-      <a class="btn primary" id="studioTop" href="overlay-route-truth-machine-v7-12-66-test.html?page=landing">Studio</a>
-      <a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Owned Pages</a>
-      <a class="btn" href="settings-platform-control-hub-v7-12-85-test.html">Back</a>
     </div>
   </div>
 </header>
@@ -282,417 +31,56 @@ p,li,small,label{
       <span class="badge ok">Checking Web Builder access</span>
       <h1 style="font-size:clamp(38px,6vw,78px);line-height:.92;letter-spacing:-.06em;margin:10px 0">Opening your Web Builder workspace</h1>
       <p>Checking sign-in, plan, and personal workspace scope.</p>
+      <div class="railNote">Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see every Web Builder page.</div>
     </div>
   </section>
 </main>
 
 <footer class="footer">
-  V7.12.263.9 Web Builder Hub Lock · indexPromotion false · schemaChanges false · storageActions false
+  V7.12.299.3 Web Builder Hub Rail Lock · indexPromotion false · schemaChanges false · storageActions false
 </footer>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.263.9 Web Builder Account Control Hub Personal Workspace Lock';
+const VERSION='V7.12.299.3 Web Builder Account Control Hub Shared Rail Lock';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const OWNER_SLUGS=['landing','home','home-page'];
-const RANK={
-  free_viewer:0,
-  viewer_plus:1,
-  creator_starter:2,
-  creator_growth:3,
-  creator_pro:4,
-  studio_business:5,
-  platform_owner:6,
-  enterprise:7
-};
+const RANK={free_viewer:0,viewer_plus:1,creator_starter:2,creator_growth:3,creator_pro:4,studio_business:5,platform_owner:6,enterprise:7};
 
-let state={
-  version:VERSION,
-  route:'web-builder-account-control-hub-v7-12-263-test.html',
-  checked:false,
-  allowed:false,
-  signedIn:false,
-  userId:'',
-  email:'',
-  profile:null,
-  isPlatformOwner:false,
-  canUseBuilder:false,
-  accountStatus:'',
-  adminLevel:'',
-  role:'',
-  planKey:'',
-  workspace:'',
-  pages:[],
-  firstOwnedSlug:'',
-  reason:'Checking...',
-  indexPromotion:false,
-  registryPromotion:true,
-  schemaChanges:false,
-  storageActions:false,
-  supabaseReads:false,
-  supabaseWrites:false,
-  storageWrites:false,
-  appSettingsWrites:false,
-  streamBanditShellChanges:false,
-  helperChanges:false
-};
+let state={version:VERSION,route:'web-builder-account-control-hub-v7-12-263-test.html',checked:false,allowed:false,signedIn:false,userId:'',email:'',profile:null,isPlatformOwner:false,canUseBuilder:false,accountStatus:'',adminLevel:'',role:'',planKey:'',workspace:'',pages:[],firstOwnedSlug:'',reason:'Checking...',sharedRail:true,scrollingMenuTabsNote:true,sortOrderColumnRequired:false,pageTypeColumnRequired:false,indexPromotion:false,registryPromotion:false,schemaChanges:false,storageActions:false,supabaseReads:false,supabaseWrites:false,storageWrites:false,appSettingsWrites:false,streamBanditShellChanges:false,helperChanges:false};
 
-function app(){
-  return document.getElementById('app');
-}
+function app(){return document.getElementById('app');}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]||m;});}
+function obj(v){if(v&&typeof v==='object')return v;if(typeof v==='string'&&v.trim()){try{return JSON.parse(v)||{};}catch(e){}}return {};}
+function truth(v){if(v===true||v===1)return true;if(typeof v==='string')return ['true','1','yes','on','enabled','allow','allowed'].includes(v.toLowerCase());return false;}
+function rank(k){return RANK[String(k||'free_viewer')]||0;}
+function cleanSlug(v){v=String(v||'').trim();try{if(v.includes('://')){let u=new URL(v);v=u.searchParams.get('page')||u.hash.replace(/^#/,'')||u.pathname.split('/').pop()||'';}else if(v.includes('?')){let u=new URL(v,location.origin);v=u.searchParams.get('page')||v;}}catch(e){}return (v.replace(/\.html.*$/,'').replace(/[^a-zA-Z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase()||'');}
+function isPlatformOwnerProfile(p){return !!p&&(p.admin_level==='owner'||p.admin_level==='platform_owner'||p.plan_key==='platform_owner');}
+function statusAllowed(p){let s=String(p&&p.account_status||'active').toLowerCase();return isPlatformOwnerProfile(p)||s==='active';}
+function builderAllowed(p){if(!p)return false;if(isPlatformOwnerProfile(p))return true;if(!statusAllowed(p))return false;let ps=obj(p.permissions_json);return rank(p.plan_key)>=rank('creator_growth')||truth(ps.web_builder)||truth(ps.web_builder_starter)||truth(ps.pages_manager)||truth(ps.web_builder_studio);}
+function rowSettings(row){return obj(row&&row.settings_json);}
+function rowSort(row){let s=rowSettings(row);let n=Number(s.sort_order??s.sortOrder??s.menu_order??999);return Number.isFinite(n)?n:999;}
+function rowIsHome(row){let s=rowSettings(row);let slug=cleanSlug(row&&row.slug||'');return truth(s.is_home_page)||truth(s.isHomePage)||slug==='home'||slug==='home-page';}
+function pageLink(slug,route){slug=cleanSlug(slug||state.firstOwnedSlug||'landing')||'landing';route=route||'overlay-route-truth-machine-v7-12-66-test.html';return route+'?page='+encodeURIComponent(slug);}
+function pageBadge(row){let bits=[];let slug=cleanSlug(row&&row.slug||'');if(OWNER_SLUGS.includes(slug))bits.push('<span class="pill warn">owner slug</span>');if(row&&row.status)bits.push('<span class="pill">'+esc(row.status)+'</span>');if(row&&row.owner_id)bits.push('<span class="pill cyan">owner '+esc(String(row.owner_id).slice(0,8))+'</span>');if(rowIsHome(row))bits.push('<span class="pill ok">home</span>');return bits.join('');}
+function supabaseClient(){if(!window.supabase||!window.supabase.createClient)throw new Error('Supabase SDK not loaded');return window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}
 
-function esc(v){
-  return String(v==null?'':v).replace(/[&<>"']/g,function(m){
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]||m;
-  });
-}
+async function readAuthority(c){let user=null;let gu=await c.auth.getUser();if(gu&&gu.data&&gu.data.user)user=gu.data.user;if(!user){let gs=await c.auth.getSession();if(gs&&gs.data&&gs.data.session&&gs.data.session.user)user=gs.data.session.user;}if(!user)return {signedIn:false,user:null,profile:null};let pr=await c.from('sb_profiles').select('id,username,display_name,role,admin_level,plan_key,permissions_json,account_status,managed_by,avatar_url').eq('id',user.id).maybeSingle();state.supabaseReads=true;if(pr.error)throw pr.error;return {signedIn:true,user:user,profile:pr.data||null};}
+async function readPages(c,authority){let p=authority.profile;let user=authority.user;let q=c.from('sb_site_pages').select('id,slug,title,status,owner_id,settings_json,updated_at').order('updated_at',{ascending:false}).limit(80);if(!isPlatformOwnerProfile(p))q=q.eq('owner_id',user.id);let r=await q;state.supabaseReads=true;if(r.error)throw r.error;let rows=(r.data||[]).filter(Boolean);if(!isPlatformOwnerProfile(p))rows=rows.filter(function(row){return String(row.owner_id||'')===String(user.id);});rows.sort(function(a,b){let ah=rowIsHome(a)?0:1;let bh=rowIsHome(b)?0:1;if(ah!==bh)return ah-bh;let as=rowSort(a);let bs=rowSort(b);if(as!==bs)return as-bs;let au=String(a.updated_at||'');let bu=String(b.updated_at||'');if(au!==bu)return bu.localeCompare(au);return cleanSlug(a.slug).localeCompare(cleanSlug(b.slug));});return rows;}
+function chooseFirstOwnedSlug(rows){let usable=(rows||[]).filter(function(row){let slug=cleanSlug(row&&row.slug||'');return slug&&!OWNER_SLUGS.includes(slug);});return usable.length?cleanSlug(usable[0].slug):'';}
 
-function obj(v){
-  if(v&&typeof v==='object')return v;
-  if(typeof v==='string'&&v.trim()){
-    try{return JSON.parse(v)||{};}catch(e){}
-  }
-  return {};
-}
+function renderLocked(reason){state.reason=reason||state.reason;state.checked=true;state.allowed=false;app().className='lockedScreen';app().innerHTML='<section class="hero"><span class="badge bad">Web Builder locked</span><h1>Web Builder needs an eligible account</h1><p>This doorway is protected. It opens only for platform owner accounts and eligible Web Builder creator accounts.</p><div class="badBox">'+esc(state.reason)+'</div><div class="railNote">Scrolling Web Builder menu tabs: swipe or scroll the shared rail left/right to see every Web Builder page.</div><div class="actions"><a class="btn primary" href="settings-platform-control-hub-v7-12-85-test.html">Back to Settings</a><a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a></div><h2>Debug</h2><pre class="out">'+esc(JSON.stringify(state,null,2))+'</pre></section>';}
+function renderAllowed(){state.checked=true;state.allowed=true;let profile=state.profile||{};let display=profile.display_name||profile.username||state.email||'Web Builder user';let pages=state.pages||[];let first=state.firstOwnedSlug||'';let studioTarget=state.isPlatformOwner?'overlay-route-truth-machine-v7-12-66-test.html?page=landing':(first?pageLink(first):'web-builder-pages-manager-owned-v7-12-256-test.html');let pageHtml=pages.length?pages.map(function(row){let slug=cleanSlug(row.slug);let owned=String(row.owner_id||'')===String(state.userId);let isReserved=OWNER_SLUGS.includes(slug);let openLinks=isReserved&&!state.isPlatformOwner?'<a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Open My Pages</a>':'<a class="btn primary" href="'+esc(pageLink(slug))+'">Open Studio</a><a class="btn" href="'+esc(pageLink(slug,'web-builder-preview-owned-v7-12-257-test.html'))+'">Preview</a><a class="btn" href="'+esc(pageLink(slug,'web-builder-form-inbox-owned-v7-12-258-test.html'))+'">Inbox</a>';return '<article class="pageCard"><h3>'+esc(row.title||slug||'Untitled page')+'</h3><p><b>Slug:</b> '+esc(slug||'none')+'</p><div>'+pageBadge(row)+'</div><div class="actions">'+openLinks+'</div></article>';}).join(''):'<div class="note">No saved Web Builder pages were found for this account yet. Use Owned Pages to create or save a personal page first.</div>';
+app().className='wrap';app().innerHTML='<section class="hero"><span class="badge ok">V7.12.299.3 Web Builder shared rail hub</span><h1>Web Builder opens your workspace</h1><p>This hub now uses the shared scrolling Web Builder rail. Creator users see only their own Web Builder pages. Platform owner remains the only all-workspace override.</p><div><span class="pill ok">allowed</span><span class="pill">workspace '+esc(state.workspace)+'</span><span class="pill">plan '+esc(state.planKey||'none')+'</span><span class="pill">pages '+String(pages.length)+'</span><span class="pill warn">indexPromotion false</span></div><div class="railNote">Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see Back, Hub, Pages, Web Builder, Preview, Menu, Form, Inbox, Assets, Route Map, Control Map, Source Map, Header/Footer and Manifest.</div></section><section class="big"><div class="panel"><h2>Account</h2><div class="goodBox">Signed in as '+esc(display)+'<br><small>'+esc(state.email||state.userId)+'</small></div><p><b>Role:</b> '+esc(state.role||'')+'</p><p><b>Admin level:</b> '+esc(state.adminLevel||'')+'</p><p><b>Plan:</b> '+esc(state.planKey||'')+'</p><p><b>Status:</b> '+esc(state.accountStatus||'')+'</p></div><div class="panel"><h2>Open Web Builder</h2><div class="actions"><a class="btn primary" href="'+esc(studioTarget)+'">Open Studio</a><a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Owned Pages</a><a class="btn" href="web-builder-form-inbox-owned-v7-12-258-test.html?page='+encodeURIComponent(state.isPlatformOwner?'landing':(first||'test-page'))+'">Inbox</a><a class="btn" href="web-builder-assets-v7-12-252-test.html">Assets</a></div><div class="note">The shared rail above is now the main Web Builder navigation. These buttons are fallback quick actions only.</div></div></section><section class="panel"><h2>'+esc(state.isPlatformOwner?'Visible Web Builder pages':'My Web Builder pages')+'</h2><div class="grid">'+pageHtml+'</div></section><section class="grid"><div class="card"><h2>Lock rules</h2><ul><li>Creator users only see own owner_id rows.</li><li>Admins do not automatically see other workspaces.</li><li>Platform owner can see all Web Builder rows.</li><li>No Supabase writes happen on this hub.</li></ul></div><div class="card"><h2>Pass report</h2><pre class="out">'+esc(JSON.stringify({version:VERSION,allowed:state.allowed,workspace:state.workspace,signedIn:state.signedIn,email:state.email,userId:state.userId,isPlatformOwner:state.isPlatformOwner,canUseBuilder:state.canUseBuilder,visiblePageCount:pages.length,firstOwnedSlug:state.firstOwnedSlug,sharedRail:true,scrollingMenuTabsNote:true,sortOrderColumnRequired:false,pageTypeColumnRequired:false,indexPromotion:false,registryPromotion:false,schemaChanges:false,storageActions:false,supabaseWrites:false,storageWrites:false},null,2))+'</pre></div><div class="card"><h2>Full debug</h2><pre class="out">'+esc(JSON.stringify(state,null,2))+'</pre></div></section>';}
 
-function truth(v){
-  if(v===true||v===1)return true;
-  if(typeof v==='string'){
-    return ['true','1','yes','on','enabled','allow','allowed'].includes(v.toLowerCase());
-  }
-  return false;
-}
-
-function rank(k){
-  return RANK[String(k||'free_viewer')]||0;
-}
-
-function cleanSlug(v){
-  v=String(v||'').trim();
-  try{
-    if(v.includes('://')){
-      let u=new URL(v);
-      v=u.searchParams.get('page')||u.hash.replace(/^#/,'')||u.pathname.split('/').pop()||'';
-    }else if(v.includes('?')){
-      let u=new URL(v,location.origin);
-      v=u.searchParams.get('page')||v;
-    }
-  }catch(e){}
-  return (v.replace(/\.html.*$/,'').replace(/[^a-zA-Z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase()||'');
-}
-
-function isPlatformOwnerProfile(p){
-  return !!p&&(p.admin_level==='owner'||p.admin_level==='platform_owner'||p.plan_key==='platform_owner');
-}
-
-function statusAllowed(p){
-  let s=String(p&&p.account_status||'active').toLowerCase();
-  return isPlatformOwnerProfile(p)||s==='active';
-}
-
-function builderAllowed(p){
-  if(!p)return false;
-  if(isPlatformOwnerProfile(p))return true;
-  if(!statusAllowed(p))return false;
-  let ps=obj(p.permissions_json);
-  return rank(p.plan_key)>=rank('creator_growth')||
-    truth(ps.web_builder)||
-    truth(ps.web_builder_starter)||
-    truth(ps.pages_manager)||
-    truth(ps.web_builder_studio);
-}
-
-function rowSettings(row){
-  return obj(row&&row.settings_json);
-}
-
-function rowSort(row){
-  let s=rowSettings(row);
-  let n=Number(s.sort_order??s.sortOrder??s.menu_order??row&&row.sort_order??999);
-  return Number.isFinite(n)?n:999;
-}
-
-function rowIsHome(row){
-  let s=rowSettings(row);
-  let slug=cleanSlug(row&&row.slug||'');
-  return truth(s.is_home_page)||truth(s.isHomePage)||(row&&row.page_type==='landing')||slug==='home'||slug==='home-page';
-}
-
-function pageLink(slug,route){
-  slug=cleanSlug(slug||state.firstOwnedSlug||'landing')||'landing';
-  route=route||'overlay-route-truth-machine-v7-12-66-test.html';
-  return route+'?page='+encodeURIComponent(slug);
-}
-
-function pageBadge(row){
-  let bits=[];
-  let slug=cleanSlug(row&&row.slug||'');
-  if(OWNER_SLUGS.includes(slug))bits.push('<span class="pill warn">owner slug</span>');
-  if(row&&row.status)bits.push('<span class="pill">'+esc(row.status)+'</span>');
-  if(row&&row.owner_id)bits.push('<span class="pill cyan">owner '+esc(String(row.owner_id).slice(0,8))+'</span>');
-  if(rowIsHome(row))bits.push('<span class="pill ok">home</span>');
-  return bits.join('');
-}
-
-function supabaseClient(){
-  if(!window.supabase||!window.supabase.createClient)throw new Error('Supabase SDK not loaded');
-  return window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-}
-
-async function readAuthority(c){
-  let user=null;
-  let gu=await c.auth.getUser();
-
-  if(gu&&gu.data&&gu.data.user)user=gu.data.user;
-
-  if(!user){
-    let gs=await c.auth.getSession();
-    if(gs&&gs.data&&gs.data.session&&gs.data.session.user)user=gs.data.session.user;
-  }
-
-  if(!user){
-    return {signedIn:false,user:null,profile:null};
-  }
-
-  let pr=await c
-    .from('sb_profiles')
-    .select('id,username,display_name,role,admin_level,plan_key,permissions_json,account_status,managed_by,avatar_url')
-    .eq('id',user.id)
-    .maybeSingle();
-
-  state.supabaseReads=true;
-
-  if(pr.error)throw pr.error;
-
-  return {
-    signedIn:true,
-    user:user,
-    profile:pr.data||null
-  };
-}
-
-async function readPages(c,authority){
-  let p=authority.profile;
-  let user=authority.user;
-
-  let q=c
-    .from('sb_site_pages')
-    .select('id,slug,title,status,owner_id,settings_json,page_type,sort_order,updated_at')
-    .order('updated_at',{ascending:false})
-    .limit(50);
-
-  if(!isPlatformOwnerProfile(p)){
-    q=q.eq('owner_id',user.id);
-  }
-
-  let r=await q;
-
-  state.supabaseReads=true;
-
-  if(r.error)throw r.error;
-
-  let rows=(r.data||[]).filter(Boolean);
-
-  if(!isPlatformOwnerProfile(p)){
-    rows=rows.filter(function(row){
-      return String(row.owner_id||'')===String(user.id);
-    });
-  }
-
-  rows.sort(function(a,b){
-    let ah=rowIsHome(a)?0:1;
-    let bh=rowIsHome(b)?0:1;
-
-    if(ah!==bh)return ah-bh;
-
-    let as=rowSort(a);
-    let bs=rowSort(b);
-
-    if(as!==bs)return as-bs;
-
-    let au=String(a.updated_at||'');
-    let bu=String(b.updated_at||'');
-
-    if(au!==bu)return bu.localeCompare(au);
-
-    return cleanSlug(a.slug).localeCompare(cleanSlug(b.slug));
-  });
-
-  return rows;
-}
-
-function chooseFirstOwnedSlug(rows){
-  let usable=(rows||[]).filter(function(row){
-    let slug=cleanSlug(row&&row.slug||'');
-    return slug&&!OWNER_SLUGS.includes(slug);
-  });
-
-  return usable.length?cleanSlug(usable[0].slug):'';
-}
-
-function renderLocked(reason){
-  state.reason=reason||state.reason;
-  state.checked=true;
-  state.allowed=false;
-
-  app().className='lockedScreen';
-  app().innerHTML='<section class="hero">\
-<span class="badge bad">Web Builder locked</span>\
-<h1>Web Builder needs an eligible account</h1>\
-<p>This doorway is protected. It opens only for platform owner accounts and eligible Web Builder creator accounts.</p>\
-<div class="badBox">'+esc(state.reason)+'</div>\
-<div class="actions">\
-<a class="btn primary" href="settings-platform-control-hub-v7-12-85-test.html">Back to Settings</a>\
-<a class="btn" href="home-global-helpers-v7-4-4-test.html">Home</a>\
-</div>\
-<h2>Debug</h2>\
-<pre class="out">'+esc(JSON.stringify(state,null,2))+'</pre>\
-</section>';
-}
-
-function renderAllowed(){
-  state.checked=true;
-  state.allowed=true;
-
-  let profile=state.profile||{};
-  let display=profile.display_name||profile.username||state.email||'Web Builder user';
-  let pages=state.pages||[];
-  let first=state.firstOwnedSlug||'';
-  let studioTarget=state.isPlatformOwner?'overlay-route-truth-machine-v7-12-66-test.html?page=landing':(first?pageLink(first):'web-builder-pages-manager-owned-v7-12-256-test.html');
-
-  document.getElementById('studioTop').href=studioTarget;
-
-  let pageHtml=pages.length?pages.map(function(row){
-    let slug=cleanSlug(row.slug);
-    let owned=String(row.owner_id||'')===String(state.userId);
-    let isReserved=OWNER_SLUGS.includes(slug);
-    let canOpen=state.isPlatformOwner||owned;
-
-    let openLinks=isReserved&&!state.isPlatformOwner
-      ? '<a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Open My Pages</a>'
-      : '<a class="btn primary" href="'+esc(pageLink(slug))+'">Open Studio</a><a class="btn" href="'+esc(pageLink(slug,'web-builder-preview-owned-v7-12-257-test.html'))+'">Preview</a>';
-
-    return '<article class="pageCard">\
-<h3>'+esc(row.title||slug||'Untitled page')+'</h3>\
-<p><b>Slug:</b> '+esc(slug||'none')+'</p>\
-<div>'+pageBadge(row)+'</div>\
-<div class="actions">'+openLinks+'</div>\
-</article>';
-  }).join(''):'<div class="note">No saved Web Builder pages were found for this account yet. Use Owned Pages to create or save a personal page first.</div>';
-
-  app().className='wrap';
-  app().innerHTML='<section class="hero">\
-<span class="badge ok">V7.12.263.9 Web Builder doorway lock</span>\
-<h1>Web Builder opens your workspace</h1>\
-<p>This hub now uses the personal workspace rule: creator users see only their own Web Builder pages. Admin role alone does not expose another user workspace. Platform owner remains the only all-workspace override.</p>\
-<div>\
-<span class="pill ok">allowed</span>\
-<span class="pill">workspace '+esc(state.workspace)+'</span>\
-<span class="pill">plan '+esc(state.planKey||'none')+'</span>\
-<span class="pill">pages '+String(pages.length)+'</span>\
-<span class="pill warn">indexPromotion false</span>\
-</div>\
-</section>\
-<section class="big">\
-<div class="panel">\
-<h2>Account</h2>\
-<div class="goodBox">Signed in as '+esc(display)+'<br><small>'+esc(state.email||state.userId)+'</small></div>\
-<p><b>Role:</b> '+esc(state.role||'')+'</p>\
-<p><b>Admin level:</b> '+esc(state.adminLevel||'')+'</p>\
-<p><b>Plan:</b> '+esc(state.planKey||'')+'</p>\
-<p><b>Status:</b> '+esc(state.accountStatus||'')+'</p>\
-</div>\
-<div class="panel">\
-<h2>Open Web Builder</h2>\
-<div class="actions">\
-<a class="btn primary" href="'+esc(studioTarget)+'">Open Studio</a>\
-<a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Owned Pages</a>\
-<a class="btn" href="web-builder-assets-v7-12-252-test.html">Assets</a>\
-<a class="btn" href="web-builder-route-map-v7-12-252-test.html">Route Map</a>\
-<a class="btn" href="web-builder-control-map-v7-12-253-test.html">Control Map</a>\
-</div>\
-<div class="note">Studio uses the reserved-slug redirect guard. Creator users sent to landing/home are moved to their own first saved page.</div>\
-</div>\
-</section>\
-<section class="panel">\
-<h2>'+esc(state.isPlatformOwner?'Visible Web Builder pages':'My Web Builder pages')+'</h2>\
-<div class="grid">'+pageHtml+'</div>\
-</section>\
-<section class="grid">\
-<div class="card"><h2>Lock rules</h2><ul><li>Creator users only see own owner_id rows.</li><li>Admins do not automatically see other workspaces.</li><li>Platform owner can see all Web Builder rows.</li><li>No Supabase writes happen on this hub.</li></ul></div>\
-<div class="card"><h2>Pass report</h2><pre class="out">'+esc(JSON.stringify({
-version:VERSION,
-allowed:state.allowed,
-workspace:state.workspace,
-signedIn:state.signedIn,
-email:state.email,
-userId:state.userId,
-isPlatformOwner:state.isPlatformOwner,
-canUseBuilder:state.canUseBuilder,
-visiblePageCount:pages.length,
-firstOwnedSlug:state.firstOwnedSlug,
-indexPromotion:false,
-registryPromotion:true,
-schemaChanges:false,
-storageActions:false,
-supabaseWrites:false,
-storageWrites:false
-},null,2))+'</pre></div>\
-<div class="card"><h2>Full debug</h2><pre class="out">'+esc(JSON.stringify(state,null,2))+'</pre></div>\
-</section>';
-}
-
-async function boot(){
-  try{
-    let c=supabaseClient();
-    let authority=await readAuthority(c);
-
-    state.signedIn=authority.signedIn;
-
-    if(!authority.signedIn){
-      renderLocked('Sign in required before opening Web Builder.');
-      return;
-    }
-
-    state.userId=authority.user.id;
-    state.email=authority.user.email||'';
-    state.profile=authority.profile||null;
-
-    let p=state.profile||{};
-
-    state.role=p.role||'';
-    state.adminLevel=p.admin_level||'';
-    state.planKey=p.plan_key||'';
-    state.accountStatus=p.account_status||'active';
-    state.isPlatformOwner=isPlatformOwnerProfile(p);
-    state.canUseBuilder=builderAllowed(p);
-
-    if(!state.canUseBuilder){
-      renderLocked('Web Builder plan or permission required.');
-      return;
-    }
-
-    state.workspace=state.isPlatformOwner?'platform-owner':'personal-owner-id-only';
-
-    let rows=await readPages(c,authority);
-
-    state.pages=rows;
-    state.firstOwnedSlug=chooseFirstOwnedSlug(rows);
-    state.reason='Allowed. Web Builder hub opened with personal workspace scope.';
-
-    renderAllowed();
-  }catch(e){
-    state.reason=e&&e.message?e.message:String(e);
-    renderLocked('Web Builder hub check failed: '+state.reason);
-  }
-}
+async function boot(){try{let c=supabaseClient();let authority=await readAuthority(c);state.signedIn=authority.signedIn;if(!authority.signedIn){renderLocked('Sign in required before opening Web Builder.');return;}state.userId=authority.user.id;state.email=authority.user.email||'';state.profile=authority.profile||null;let p=state.profile||{};state.role=p.role||'';state.adminLevel=p.admin_level||'';state.planKey=p.plan_key||'';state.accountStatus=p.account_status||'active';state.isPlatformOwner=isPlatformOwnerProfile(p);state.canUseBuilder=builderAllowed(p);if(!state.canUseBuilder){renderLocked('Web Builder plan or permission required.');return;}state.workspace=state.isPlatformOwner?'platform-owner':'personal-owner-id-only';let rows=await readPages(c,authority);state.pages=rows;state.firstOwnedSlug=chooseFirstOwnedSlug(rows);state.reason='Allowed. Web Builder hub opened with personal workspace scope and shared scrolling rail.';renderAllowed();}catch(e){state.reason=e&&e.message?e.message:String(e);renderLocked('Web Builder hub check failed: '+state.reason);}}
 
 boot();
-
 })();
 </script>
+<script src="web-builder-global-projector-v7-12-263.js?v=7-12-299-3-hub-shared-rail"></script>
 </body>
 </html>
