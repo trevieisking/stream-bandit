@@ -3,51 +3,1202 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Form Inbox Bridge V7.12.263.19 TEST</title>
+<title>Web Builder Synced Form Inbox V7.12.263.20 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--line:#ffffff22;--text:#f7fbff;--muted:#aeb8d6;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff5d6c;--blue:#41e8ff;--panel:#101529;--panel2:#17122d}
-*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;min-height:100%;overflow-x:hidden}body{margin:0;background:radial-gradient(circle at 0 0,#22d3a62b,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff38,transparent 40%),linear-gradient(180deg,#070910,#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}.top{position:sticky;top:0;z-index:20;background:#0b1020f2;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}.topInner{width:min(1500px,100%);margin:0 auto;padding:10px 14px;display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;justify-content:space-between}.brand{display:flex;gap:10px;align-items:center;font-weight:950;flex:1 1 330px}.mark{width:44px;height:44px;min-width:44px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;font-weight:1000}.brand small{display:block;color:var(--muted);font-weight:800}.actions,.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.actions{justify-content:flex-end}.btn{border:0;border-radius:999px;background:#30384f;color:#fff;text-decoration:none;font-weight:950;padding:10px 13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.primary{background:linear-gradient(135deg,var(--good),var(--purple));color:#071015}.hot{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}.blue{background:linear-gradient(135deg,var(--blue),var(--purple));color:#061017}.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#071015}.wrap{width:min(1500px,100%);margin:0 auto;padding:14px}.hero,.panel,.card{border:1px solid #ffffff18;border-radius:24px;background:linear-gradient(135deg,var(--panel),var(--panel2));padding:16px;margin:0 0 14px}.card{background:#ffffff08}.hero h1{font-size:clamp(36px,5vw,76px);line-height:.94;margin:8px 0;letter-spacing:-.055em}h2,h3{margin:0 0 10px}.badge,.chip,.pill{display:inline-flex;border:1px solid #ffffff24;border-radius:999px;padding:6px 9px;background:#ffffff0d;color:#dbe7ff;font-weight:900;font-size:12px;margin:2px}.badge,.good{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.bad{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card b{display:block;color:#baf7df;margin-bottom:7px}.own{border-color:#22d3a655;background:#22d3a612}.keep{border-color:#ffb14255;background:#ffb14212}.later{border-color:#7c3cff66;background:#7c3cff14}p,li,label,small{color:var(--muted);line-height:1.5}.list{margin:6px 0 0;padding-left:18px}.control{border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px;margin:0 0 10px}.control b{display:block;color:#baf7df;margin-bottom:7px}.control input{width:100%;border:1px solid #ffffff24;border-radius:14px;background:#0007;color:#fff;padding:12px;font:inherit}.status,.notice{border:1px solid #ffb14266;background:#ffb14217;color:#ffe7ad;border-radius:16px;padding:12px;font-weight:850;margin:10px 0}.status.good2{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}.debug{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;border:1px solid #ffffff14;border-radius:16px;background:#0007;padding:12px;color:#dfffee;max-height:430px;overflow:auto}.inlineFrameBox{border:1px solid #ffffff1f;border-radius:24px;background:#050711;overflow:hidden;min-height:540px}.inlineFrameHead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;padding:12px;border-bottom:1px solid #ffffff18;background:#0b1020}.inlineFrame{width:100%;height:70vh;min-height:520px;border:0;background:#050711}.overlay{position:fixed;inset:0;z-index:1000005;display:none;background:#02040ce8;backdrop-filter:blur(18px);padding:14px}.overlay.open{display:grid;grid-template-rows:auto 1fr}.overlayHead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;border:1px solid #ffffff1f;border-radius:22px 22px 0 0;background:#0b1020f5;padding:12px}.frameWrap{border:1px solid #ffffff1f;border-top:0;border-radius:0 0 22px 22px;overflow:hidden;background:#050711}.overlayFrame{width:100%;height:100%;min-height:78vh;border:0;background:#050711}@media(max-width:980px){.brand,.actions{flex:1 1 100%}.actions{justify-content:flex-start}.actions .btn,.btn{flex:1 1 auto}.grid{grid-template-columns:1fr}.hero h1{font-size:clamp(36px,12vw,58px)}.overlay{padding:8px}.overlayFrame{min-height:76vh}.inlineFrame{height:74vh;min-height:500px}}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;min-height:100%;overflow-x:hidden}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 0 0,#22d3a62b,transparent 34%),
+    radial-gradient(circle at 100% 0,#7c3cff38,transparent 40%),
+    linear-gradient(180deg,#070910,#050711);
+  color:var(--text);
+  font-family:Inter,system-ui,Arial,sans-serif;
+}
+.top{position:sticky;top:0;z-index:20;background:#0b1020f2;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}
+.topInner{width:min(1540px,100%);margin:0 auto;padding:10px 14px;display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:10px;align-items:center;font-weight:950;flex:1 1 330px}
+.mark{width:44px;height:44px;min-width:44px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;font-weight:1000}
+.brand small{display:block;color:var(--muted);font-weight:800}
+.actions,.row,.tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.actions{justify-content:flex-end}
+.btn,.tabBtn{
+  border:0;
+  border-radius:999px;
+  background:#30384f;
+  color:#fff;
+  text-decoration:none;
+  font-weight:950;
+  padding:10px 13px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+}
+.primary,.tabBtn.active{background:linear-gradient(135deg,var(--good),var(--purple));color:#071015}
+.hot{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}
+.blue{background:linear-gradient(135deg,var(--blue),var(--purple));color:#061017}
+.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#071015}
+.badBtn{background:linear-gradient(135deg,var(--bad),var(--purple));color:#fff}
+.wrap{width:min(1540px,100%);margin:0 auto;padding:14px}
+.hero,.panel,.card,.item,.answer,.compose{
+  border:1px solid #ffffff18;
+  border-radius:24px;
+  background:linear-gradient(135deg,var(--panel),var(--panel2));
+  padding:16px;
+  margin:0 0 14px;
+}
+.card,.item,.answer,.compose{background:#ffffff08}
+.hero h1{font-size:clamp(36px,5vw,76px);line-height:.94;margin:8px 0;letter-spacing:-.055em}
+h2,h3{margin:0 0 10px}
+.badge,.chip,.pill{
+  display:inline-flex;
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  padding:6px 9px;
+  background:#ffffff0d;
+  color:#dbe7ff;
+  font-weight:900;
+  font-size:12px;
+  margin:2px;
+}
+.badge,.good{background:#22d3a621;border-color:#22d3a660;color:#baf7df}
+.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}
+.bad{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}
+.info{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.layout,.messageGrid{display:grid;grid-template-columns:minmax(300px,430px) minmax(0,1fr);gap:14px;align-items:start}
+.answerGrid,.stats,.miniGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.card b,.answer b{display:block;color:#baf7df;margin-bottom:7px}
+.own{border-color:#22d3a655;background:#22d3a612}
+.keep{border-color:#ffb14255;background:#ffb14212}
+.later{border-color:#7c3cff66;background:#7c3cff14}
+p,li,label,small{color:var(--muted);line-height:1.5}
+.list{margin:6px 0 0;padding-left:18px}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.control{border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px;margin:0 0 10px}
+.control b{display:block;color:#baf7df;margin-bottom:7px}
+input,select,textarea,.compose input,.compose textarea{
+  width:100%;
+  border:1px solid #ffffff24;
+  border-radius:14px;
+  background:#0007;
+  color:#fff;
+  padding:12px;
+  font:inherit;
+}
+.compose textarea{min-height:120px;resize:vertical}
+.status,.notice{
+  border:1px solid #ffb14266;
+  background:#ffb14217;
+  color:#ffe7ad;
+  border-radius:16px;
+  padding:12px;
+  font-weight:850;
+  margin:10px 0;
+}
+.status.good2{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}
+.status.bad2{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}
+.debug,.source{
+  font-family:ui-monospace,Consolas,monospace;
+  white-space:pre-wrap;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  border:1px solid #ffffff14;
+  border-radius:16px;
+  background:#0007;
+  padding:12px;
+  color:#dfffee;
+  max-height:430px;
+  overflow:auto;
+}
+.queue,.msgList{border:1px solid #ffffff1a;border-radius:22px;background:#ffffff08;padding:12px;max-height:650px;overflow:auto}
+.item{cursor:pointer}
+.item.active{outline:3px solid #22d3a688;background:#22d3a618}
+.detail{border:1px solid #ffffff1a;border-radius:22px;background:#ffffff08;padding:16px;min-height:420px}
+.big{font-size:30px;font-weight:950;color:#fff;margin:0}
+.msgBody{white-space:pre-wrap;line-height:1.55}
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:1000005;
+  display:none;
+  background:#02040ce8;
+  backdrop-filter:blur(18px);
+  padding:14px;
+}
+.overlay.open{display:grid;grid-template-rows:auto 1fr}
+.overlayHead{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  border:1px solid #ffffff1f;
+  border-radius:22px 22px 0 0;
+  background:#0b1020f5;
+  padding:12px;
+}
+.overlayBody{
+  border:1px solid #ffffff1f;
+  border-top:0;
+  border-radius:0 0 22px 22px;
+  overflow:auto;
+  background:#050711;
+  padding:14px;
+}
+.modal{
+  position:fixed;
+  inset:0;
+  background:#000b;
+  display:none;
+  z-index:1000010;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+.modal.open{display:flex}
+.modalCard{
+  width:min(960px,100%);
+  max-height:92vh;
+  overflow:auto;
+  border:1px solid #ffffff30;
+  border-radius:28px;
+  background:linear-gradient(135deg,#101529,#1b0a32);
+  box-shadow:0 30px 120px #000;
+  padding:18px;
+}
+.modalHead{display:grid;grid-template-columns:1fr auto;gap:12px;border-bottom:1px solid #ffffff18;padding-bottom:12px;margin-bottom:12px}
+.toast{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  background:#12172a;
+  color:#fff;
+  border:1px solid #ffffff35;
+  border-radius:16px;
+  padding:13px 16px;
+  box-shadow:0 16px 44px #0009;
+  font-weight:900;
+  z-index:1000020;
+}
+@media(max-width:980px){
+  .brand,.actions{flex:1 1 100%}
+  .actions{justify-content:flex-start}
+  .actions .btn,.btn,.tabBtn{flex:1 1 auto;white-space:normal}
+  .grid,.layout,.messageGrid{grid-template-columns:1fr}
+  .hero h1{font-size:clamp(36px,12vw,58px)}
+  .overlay{padding:8px}
+  .overlayBody{padding:10px}
+  .modalHead{grid-template-columns:1fr}
+}
 </style>
 </head>
-<body data-web-builder-inbox-bridge="v7-12-263-19">
-<header class="top"><div class="topInner"><div class="brand"><div class="mark" aria-hidden="true">WB</div><div>Web Builder Form Inbox Bridge<small>separate shell + one synced app inbox · V7.12.263.19</small></div></div><div class="actions"><a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Hub</a><a id="formLink" class="btn" href="web-builder-form-designer-owned-v7-12-258-test.html?page=test-page">Form Builder</a><a id="previewLink" class="btn" href="web-builder-preview-owned-v7-12-257-test.html?page=test-page">Preview</a><a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Pages</a></div></div></header>
+<body data-web-builder-synced-inbox="v7-12-263-20">
+<header class="top">
+  <div class="topInner">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">WB</div>
+      <div>
+        Web Builder Synced Inbox
+        <small>native overlay, no iframe · V7.12.263.20</small>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Hub</a>
+      <a id="formLink" class="btn" href="web-builder-form-designer-owned-v7-12-258-test.html?page=test-page">Form Builder</a>
+      <a id="previewLink" class="btn" href="web-builder-preview-owned-v7-12-257-test.html?page=test-page">Preview</a>
+      <a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Pages</a>
+    </div>
+  </div>
+</header>
+
 <main class="wrap">
-<section class="hero"><span class="badge">V7.12.263.19 Inbox Bridge</span><h1>One synced inbox, two separate shells</h1><p>This Web Builder page no longer rebuilds or replaces the real inbox. It opens the working Stream Bandit Form Inbox route inside a Web Builder overlay or full page, with the current builder slug.</p><div class="row"><span class="chip good">Real app inbox preserved</span><span class="chip good">Web Builder shell separate</span><span class="chip good">Overlay bridge</span><span class="chip warn">No owner-only gate here</span><span class="chip warn">No schema/storage/index changes</span></div></section>
-<section class="grid"><div class="card own"><b>Real inbox source</b><p><code>web-builder-form-submissions-v7-12-94-test.html</code> remains the inbox engine for submissions, private replies, sent/outbox, spam, trash and CSV.</p></div><div class="card keep"><b>Web Builder bridge</b><p>This route is now only a doorway/overlay bridge. It passes the current slug to the real inbox route.</p></div><div class="card later"><b>Access rule</b><p>This bridge does not block Creator Growth users. Any data visibility stays with the real app inbox session/RLS and current slug.</p></div></section>
-<section class="panel"><h2>Open synced Form Inbox</h2><p>Use the same page slug as the Web Builder page you are working on.</p><div class="control"><b>Current page slug</b><input id="pageSlug" value="test-page" autocomplete="off" spellcheck="false"></div><div class="actions"><button id="openOverlay" class="btn blue" type="button">Open Inbox Overlay</button><button id="reloadInline" class="btn primary" type="button">Load Inline Preview</button><a id="openFull" class="btn hot" href="web-builder-form-submissions-v7-12-94-test.html?page=test-page">Open Full Inbox</a><button id="copyReport" class="btn" type="button">Copy Report</button></div><div id="status" class="status good2">Bridge loaded. Real inbox target is ready.</div><div class="notice">If an iframe is blocked by the browser, use Open Full Inbox. The full page remains the same single synced inbox.</div></section>
-<section class="inlineFrameBox"><div class="inlineFrameHead"><div><span class="badge">Inline real inbox preview</span><b id="inlineTitle">Form Inbox · test-page</b></div><div class="actions"><button id="inlineOverlay" class="btn blue" type="button">Open Bigger Overlay</button><a id="inlineFull" class="btn primary" href="web-builder-form-submissions-v7-12-94-test.html?page=test-page">Full Page</a></div></div><iframe id="inlineFrame" class="inlineFrame" title="Synced Stream Bandit Form Inbox"></iframe></section>
-<section class="panel"><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></section>
+  <section class="hero">
+    <span class="badge">V7.12.263.20 Native Synced Inbox</span>
+    <h1>One inbox data system, no iframe</h1>
+    <p>This Web Builder inbox now reads and writes the same real tables as the Stream Bandit app inbox: <b>sb_form_submissions</b> and <b>sb_private_messages</b>. The shells stay separate, but the inbox data is synced.</p>
+    <div class="row">
+      <span class="chip good">No iframe</span>
+      <span class="chip good">Native overlay</span>
+      <span class="chip good">Same tables</span>
+      <span class="chip good">Replies/messages</span>
+      <span class="chip warn">No owner-only gate here</span>
+      <span class="chip warn">No schema/storage/index changes</span>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card own">
+      <b>Synced with app inbox</b>
+      <p>Submissions, replies, sent/outbox, spam, trash and CSV use the same tables as the main app inbox.</p>
+    </div>
+    <div class="card keep">
+      <b>Shells remain apart</b>
+      <p>This page uses a Web Builder shell. The Stream Bandit footer shell is not injected here.</p>
+    </div>
+    <div class="card later">
+      <b>Creator users</b>
+      <p>This route does not hide the inbox behind an owner-only menu group. Data visibility remains controlled by the signed-in session and existing policies.</p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Synced Form Inbox</h2>
+    <div class="filters">
+      <label>Page slug<br><input id="pageSlug" value="test-page"></label>
+      <label>Status<br>
+        <select id="statusFilter">
+          <option value="all">All statuses</option>
+          <option value="new">new</option>
+          <option value="read">read</option>
+          <option value="archived">archived</option>
+        </select>
+      </label>
+      <label>Search answers<br><input id="answerSearch" placeholder="email, answer text, form title"></label>
+      <label>Limit<br>
+        <select id="limit">
+          <option>25</option>
+          <option selected>50</option>
+          <option>100</option>
+        </select>
+      </label>
+    </div>
+    <div class="actions" style="margin-top:10px">
+      <button id="openOverlay" class="btn blue" type="button">Open Inbox Overlay</button>
+      <button id="refresh" class="btn primary" type="button">Refresh</button>
+      <button id="exportCsv" class="btn warnBtn" type="button">Export CSV</button>
+      <button id="copyReport" class="btn" type="button">Copy Report</button>
+    </div>
+    <div id="status" class="status good2">Ready. Load submissions.</div>
+    <div class="stats" id="stats"><div class="card"><b>Rows</b><p class="big">0</p></div></div>
+  </section>
+
+  <section class="panel" id="submissionsSec">
+    <h2>Submissions</h2>
+    <p>Select a submission to view answers, change status, copy answers, view raw JSON, or send a private reply.</p>
+    <div class="layout">
+      <aside class="queue" id="queue"><p>No submissions loaded yet.</p></aside>
+      <main class="detail" id="detail"><p>Select a submission.</p></main>
+    </div>
+  </section>
+
+  <section class="panel" id="messagesSec">
+    <h2>Messages</h2>
+    <div class="tabs">
+      <button class="tabBtn active" data-tab="inbox" type="button">Inbox</button>
+      <button class="tabBtn" data-tab="outbox" type="button">Sent / Outbox</button>
+      <button class="tabBtn" data-tab="spam" type="button">Spam</button>
+      <button class="tabBtn" data-tab="trash" type="button">Trash</button>
+      <button id="newMessageBtn" class="btn primary" type="button">New Message</button>
+      <button id="refreshMessages" class="btn warnBtn" type="button">Refresh Messages</button>
+    </div>
+    <div id="newComposer" class="compose" style="display:none;margin-top:12px">
+      <h3>New private message</h3>
+      <div class="miniGrid">
+        <label>Recipient email<br><input id="newTo" placeholder="user@email.com"></label>
+        <label>Subject<br><input id="newSubject" value="Private message"></label>
+      </div>
+      <label>Message<br><textarea id="newBody" placeholder="Write a short private message..."></textarea></label>
+      <div class="actions">
+        <button id="sendNew" class="btn primary" type="button">Send message</button>
+        <button id="cancelNew" class="btn" type="button">Cancel</button>
+      </div>
+    </div>
+    <div class="messageGrid" style="margin-top:12px">
+      <aside class="msgList" id="messageList"><p>No messages loaded yet.</p></aside>
+      <main class="detail" id="messageDetail"><p>Select a message.</p></main>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Debug</h2>
+    <div id="debug" class="debug">Waiting...</div>
+  </section>
 </main>
-<div id="inboxOverlay" class="overlay" aria-hidden="true"><div class="overlayHead"><div><span class="badge">Synced Form Inbox Overlay</span><b id="overlayTitle">Form Inbox · test-page</b><small id="overlayUrl" style="display:block;color:#aeb8d6">Waiting...</small></div><div class="actions"><a id="overlayFull" class="btn primary" href="web-builder-form-submissions-v7-12-94-test.html?page=test-page">Open Full Page</a><button id="overlayReload" class="btn" type="button">Reload</button><button id="overlayClose" class="btn hot" type="button">Close</button></div></div><div class="frameWrap"><iframe id="overlayFrame" class="overlayFrame" title="Synced Stream Bandit Form Inbox Overlay"></iframe></div></div>
+
+<div id="inboxOverlay" class="overlay" aria-hidden="true">
+  <div class="overlayHead">
+    <div>
+      <span class="badge">Native Synced Inbox Overlay</span>
+      <b id="overlayTitle">Form Inbox · test-page</b>
+      <small id="overlaySub" style="display:block;color:#aeb8d6">No iframe. Same data, overlay view.</small>
+    </div>
+    <div class="actions">
+      <button id="overlayRefresh" class="btn primary" type="button">Refresh</button>
+      <button id="overlayClose" class="btn hot" type="button">Close</button>
+    </div>
+  </div>
+  <div class="overlayBody">
+    <section class="panel"><div class="stats" id="overlayStats"></div></section>
+    <section class="layout">
+      <aside class="queue" id="overlayQueue"><p>No submissions loaded yet.</p></aside>
+      <main class="detail" id="overlayDetail"><p>Select a submission.</p></main>
+    </section>
+    <section class="panel">
+      <h2>Messages</h2>
+      <div class="messageGrid">
+        <aside class="msgList" id="overlayMessageList"><p>No messages loaded yet.</p></aside>
+        <main class="detail" id="overlayMessageDetail"><p>Select a message.</p></main>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="rawModal" class="modal">
+  <div class="modalCard">
+    <div class="modalHead">
+      <div><span class="badge">Raw Submission</span><h2>JSON view</h2></div>
+      <button id="closeRaw" class="btn" type="button">Close</button>
+    </div>
+    <div id="rawJson" class="source"></div>
+  </div>
+</div>
+
 <script>
 (function(){
 'use strict';
-const VERSION='V7.12.263.19 Web Builder Form Inbox Bridge To Real App Inbox';
-const REAL_INBOX='web-builder-form-submissions-v7-12-94-test.html';
-const FORM_BUILDER='web-builder-form-designer-owned-v7-12-258-test.html';
-const PREVIEW='web-builder-preview-owned-v7-12-257-test.html';
-let inlineLoaded=false,overlayLoaded=false,overlayOpen=false,lastAction='bridge shell rendered',lastError='';
+
+const VERSION='V7.12.263.20 Web Builder Native Synced Inbox No Iframe';
+const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+
+let sb=null;
+let user=null;
+let profile=null;
+let rows=[];
+let selected=null;
+let messages=[];
+let selectedMsg=null;
+let msgTab='inbox';
+let overlayOpen=false;
+let lastError='';
+let lastAction='boot';
+
+const R={
+  version:VERSION,
+  writesFormStatus:false,
+  writesMessages:false,
+  hardDelete:false,
+  accountActions:false,
+  billing:false,
+  schemaChanges:false,
+  storageActions:false,
+  iframe:false,
+  last:null
+};
+
 const $=id=>document.getElementById(id);
-function clean(v){v=String(v||'test-page').trim();try{if(v.includes('://')){let u=new URL(v);v=u.searchParams.get('page')||u.hash.replace(/^#/,'')||u.pathname.split('/').pop()||'test-page'}else if(v.includes('?')){let u=new URL(v,location.origin);v=u.searchParams.get('page')||v}}catch(e){}return v.toLowerCase().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'')||'test-page'}
-function urlSlug(){try{return clean(new URL(location.href).searchParams.get('page')||'test-page')}catch(e){return 'test-page'}}
-function slug(){return clean($('pageSlug').value||urlSlug())}
-function target(){return REAL_INBOX+'?page='+encodeURIComponent(slug())}
-function formTarget(){return FORM_BUILDER+'?page='+encodeURIComponent(slug())}
-function previewTarget(){return PREVIEW+'?page='+encodeURIComponent(slug())}
-function setStatus(msg,kind){$('status').textContent=msg;$('status').className='status '+(kind||'good2')}
-function updateLinks(){let s=slug(),t=target();$('pageSlug').value=s;try{let u=new URL(location.href);u.searchParams.set('page',s);history.replaceState(null,'',u.toString())}catch(e){}$('openFull').href=t;$('inlineFull').href=t;$('overlayFull').href=t;$('formLink').href=formTarget();$('previewLink').href=previewTarget();$('inlineTitle').textContent='Form Inbox · '+s;$('overlayTitle').textContent='Form Inbox · '+s;$('overlayUrl').textContent=t;debug()}
-function loadInline(){updateLinks();$('inlineFrame').src='about:blank';setTimeout(()=>{$('inlineFrame').src=target();inlineLoaded=true;lastAction='inline real inbox loaded';setStatus('Loaded real app inbox inline for '+slug()+'.','good2');debug()},80)}
-function openOverlay(){updateLinks();$('inboxOverlay').classList.add('open');$('inboxOverlay').setAttribute('aria-hidden','false');overlayOpen=true;if(!overlayLoaded||$('overlayFrame').src.indexOf(target())===-1){$('overlayFrame').src=target();overlayLoaded=true}lastAction='overlay real inbox opened';setStatus('Opened real app inbox overlay for '+slug()+'.','good2');debug()}
-function closeOverlay(){$('inboxOverlay').classList.remove('open');$('inboxOverlay').setAttribute('aria-hidden','true');overlayOpen=false;lastAction='overlay closed';debug()}
-function reloadOverlay(){updateLinks();$('overlayFrame').src='about:blank';setTimeout(()=>{$('overlayFrame').src=target();overlayLoaded=true;lastAction='overlay real inbox reloaded';debug()},80)}
-function state(){return {version:VERSION,route:'web-builder-form-inbox-owned-v7-12-258-test.html',mode:'bridge-only',currentSlug:slug(),realInboxRoute:target(),formBuilderRoute:formTarget(),previewRoute:previewTarget(),separateShells:true,mainAppInboxPreserved:true,webBuilderInboxIsDoorwayOnly:true,duplicateInboxLogic:false,ownerOnlyGate:false,creatorGrowthBlockedHere:false,dataVisibilityOwnedByRealInbox:true,realInboxKeepsGlobalShell:true,realInboxKeepsPrivateMessages:true,realInboxKeepsSentOutboxSpamTrashCsv:true,overlayBridge:true,inlinePreview:true,overlayOpen:overlayOpen,inlineLoaded:inlineLoaded,overlayLoaded:overlayLoaded,supabaseReads:false,supabaseWrites:false,privateMessageWrites:false,formStatusWrites:false,schemaChanges:false,storageActions:false,indexPromotion:false,registryPromotion:false,lastAction:lastAction,lastError:lastError};}
-function debug(){$('debug').textContent=JSON.stringify(state(),null,2)}
-async function copyReport(){let text=JSON.stringify(state(),null,2);try{await navigator.clipboard.writeText(text);setStatus('Bridge report copied.','good2')}catch(e){lastError=e.message||String(e);setStatus('Clipboard blocked. Report printed below.','');debug()}}
-function bind(){$('pageSlug').addEventListener('input',updateLinks);$('pageSlug').addEventListener('change',()=>{updateLinks();loadInline()});$('openOverlay').onclick=openOverlay;$('inlineOverlay').onclick=openOverlay;$('reloadInline').onclick=loadInline;$('overlayClose').onclick=closeOverlay;$('overlayReload').onclick=reloadOverlay;$('copyReport').onclick=copyReport;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay()})}
-function boot(){bind();$('pageSlug').value=urlSlug();updateLinks();setTimeout(loadInline,150)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+
+function esc(v){
+  return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function slug(v){
+  return String(v||'test-page').toLowerCase().trim().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'')||'test-page';
+}
+
+function date(v){
+  try{return v?new Date(v).toLocaleString():'No date';}
+  catch(e){return v||'No date';}
+}
+
+function email(){
+  return (user&&user.email||'').toLowerCase();
+}
+
+function name(){
+  return (profile&&profile.display_name)||(profile&&profile.username)||(profile&&profile.channel_name)||(user&&user.email)||'Stream Bandit user';
+}
+
+function toast(m){
+  let t=document.createElement('div');
+  t.className='toast';
+  t.textContent=m;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2300);
+}
+
+function client(){
+  if(sb)return sb;
+  sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  return sb;
+}
+
+async function refreshAuth(){
+  try{
+    let u=await client().auth.getUser();
+    user=u.data&&u.data.user||null;
+    profile=null;
+
+    if(user){
+      let p=await client().from('sb_profiles').select('*').eq('id',user.id).maybeSingle();
+      profile=p.data||null;
+    }
+  }catch(e){
+    user=null;
+    profile=null;
+    lastError=e.message||String(e);
+  }
+}
+
+function setStatus(t,bad){
+  $('status').textContent=t;
+  $('status').className=bad?'status bad2':'status good2';
+}
+
+function updateLinks(){
+  let s=slug($('pageSlug').value);
+  $('pageSlug').value=s;
+
+  try{
+    let u=new URL(location.href);
+    u.searchParams.set('page',s);
+    history.replaceState(null,'',u.toString());
+  }catch(e){}
+
+  $('formLink').href='web-builder-form-designer-owned-v7-12-258-test.html?page='+encodeURIComponent(s);
+  $('previewLink').href='web-builder-preview-owned-v7-12-257-test.html?page='+encodeURIComponent(s);
+  $('overlayTitle').textContent='Form Inbox · '+s;
+}
+
+function urlSlug(){
+  try{return slug(new URL(location.href).searchParams.get('page')||'test-page');}
+  catch(e){return 'test-page';}
+}
+
+function flatAnswers(a){
+  a=a||{};
+  return Object.keys(a).filter(k=>!k.startsWith('__')).map(k=>{
+    let v=a[k];
+    let ans=(v&&typeof v==='object')?v.answer:v;
+    return k+': '+(Array.isArray(ans)?ans.join(', '):(ans??''));
+  }).join('\n');
+}
+
+function answerCards(a){
+  a=a||{};
+  let ks=Object.keys(a).filter(k=>!k.startsWith('__'));
+
+  if(!ks.length)return '<p>No normal field answers found.</p>';
+
+  return '<div class="answerGrid">'+ks.map(k=>{
+    let v=a[k];
+    let ans=(v&&typeof v==='object')?v.answer:v;
+    let type=(v&&typeof v==='object')?v.type:'';
+    let text=Array.isArray(ans)?ans.join(', '):(ans??'');
+    let isUrl=String(text).startsWith('http');
+
+    return '<article class="answer"><b>'+esc(k)+'</b><p>'+(isUrl?'<a href="'+esc(text)+'" target="_blank" rel="noopener">'+esc(text)+'</a>':esc(text))+'</p>'+(type?'<span class="pill">'+esc(type)+'</span>':'')+'</article>';
+  }).join('')+'</div>';
+}
+
+function routingCards(a){
+  a=a||{};
+  let r=a.__routing||{};
+  let f=a.__form||{};
+  let u=Array.isArray(a.__uploads)?a.__uploads:[];
+
+  return '<div class="answerGrid">'+
+    '<article class="answer"><b>Owner email</b><p>'+esc(r.owner_email||'Not set')+'</p></article>'+
+    '<article class="answer"><b>Owner name</b><p>'+esc(r.owner_name||'Not set')+'</p></article>'+
+    '<article class="answer"><b>Source</b><p>'+esc(f.source||'unknown')+'</p></article>'+
+    '<article class="answer"><b>Page owner</b><p>'+esc(f.page_owner_id||'unknown')+'</p></article>'+
+    '<article class="answer"><b>Uploads</b><p>'+esc(String(u.length))+'</p></article>'+
+    '<article class="answer"><b>Email destination</b><p>'+esc(String(!!r.email_destination_requested))+'</p></article>'+
+    '</div>';
+}
+
+function statusPill(v){
+  v=v||'new';
+  return '<span class="pill '+(v==='archived'||v==='trashed'?'warn':v==='new'||v==='spam'?'bad':'good')+'">'+esc(v)+'</span>';
+}
+
+function selectedEmail(){
+  return selected&&(selected.submitter_email||(selected.answers_json&&Object.values(selected.answers_json).map(v=>v&&typeof v==='object'?v.answer:v).find(v=>String(v).includes('@')))||'');
+}
+
+function participant(m,side){
+  if(side==='sender')return m.sender_name||m.sender_email||m.sender_id||'sender';
+  return m.recipient_name||m.recipient_email||m.recipient_id||'recipient';
+}
+
+function mineSender(m){
+  return !!user&&(m.sender_id===user.id||String(m.sender_email||'').toLowerCase()===email());
+}
+
+function mineRecipient(m){
+  return !!user&&(m.recipient_id===user.id||String(m.recipient_email||'').toLowerCase()===email());
+}
+
+function deletedForMe(m){
+  return mineSender(m)?!!m.sender_deleted_at:mineRecipient(m)?!!m.recipient_deleted_at:false;
+}
+
+function trashedForMe(m){
+  return m.status==='trashed'||(mineSender(m)?!!m.sender_trashed_at:mineRecipient(m)?!!m.recipient_trashed_at:false);
+}
+
+async function load(){
+  try{
+    await refreshAuth();
+    updateLinks();
+
+    let s=slug($('pageSlug').value);
+    let lim=Number($('limit').value||50);
+    let st=$('statusFilter').value;
+    let q=String($('answerSearch').value||'').toLowerCase();
+
+    let query=client()
+      .from('sb_form_submissions')
+      .select('*')
+      .eq('page_slug',s)
+      .order('created_at',{ascending:false})
+      .limit(lim);
+
+    if(st!=='all')query=query.eq('status',st);
+
+    let r=await query;
+
+    if(r.error)throw r.error;
+
+    rows=(r.data||[]).filter(row=>
+      !q||
+      flatAnswers(row.answers_json).toLowerCase().includes(q)||
+      String(row.submitter_email||'').toLowerCase().includes(q)||
+      String(row.form_title||'').toLowerCase().includes(q)
+    );
+
+    selected=rows[0]||null;
+
+    renderRows();
+    renderDetail();
+    renderStats();
+
+    setStatus('Loaded '+rows.length+' submissions for '+s+'.');
+
+    await loadMessages();
+
+    lastAction='loaded';
+    lastError='';
+
+    dbg('loaded');
+  }catch(e){
+    lastError=e.message||String(e);
+    lastAction='load failed';
+    setStatus('Load failed: '+lastError,true);
+    dbg('load failed');
+  }
+}
+
+function renderStats(){
+  let total=rows.length;
+  let n=rows.filter(r=>(r.status||'new')==='new').length;
+  let read=rows.filter(r=>r.status==='read').length;
+  let arch=rows.filter(r=>r.status==='archived').length;
+  let msgCount=messages.length;
+
+  let html=
+    '<div class="card"><b>Rows</b><p class="big">'+total+'</p></div>'+
+    '<div class="card"><b>New</b><p class="big">'+n+'</p></div>'+
+    '<div class="card"><b>Read</b><p class="big">'+read+'</p></div>'+
+    '<div class="card"><b>Archived</b><p class="big">'+arch+'</p></div>'+
+    '<div class="card"><b>Private messages</b><p class="big">'+msgCount+'</p></div>'+
+    '<div class="card"><b>Signed in</b><p class="big">'+(user?'Yes':'No')+'</p></div>';
+
+  $('stats').innerHTML=html;
+  $('overlayStats').innerHTML=html;
+}
+
+function renderRows(){
+  let html=!rows.length
+    ? '<p>No submissions found.</p>'
+    : rows.map(r=>
+      '<article class="item '+(selected&&selected.id===r.id?'active':'')+'" data-id="'+esc(r.id)+'">'+
+      statusPill(r.status)+
+      '<h3>'+esc(r.form_title||r.block_title||'Form submission')+'</h3>'+
+      '<p>'+esc(r.submitter_email||'No email')+'</p>'+
+      '<small>'+esc(date(r.created_at))+'</small>'+
+      '</article>'
+    ).join('');
+
+  $('queue').innerHTML=html;
+  $('overlayQueue').innerHTML=html;
+
+  ['queue','overlayQueue'].forEach(id=>{
+    $(id).querySelectorAll('.item').forEach(el=>{
+      el.onclick=()=>{
+        selected=rows.find(r=>r.id===el.dataset.id);
+        renderRows();
+        renderDetail();
+      };
+    });
+  });
+}
+
+function renderDetail(){
+  let html;
+
+  if(!selected){
+    html='<p>Select a submission.</p>';
+  }else{
+    let to=selectedEmail();
+
+    html=
+      '<span class="badge">'+esc(selected.page_slug||'page')+'</span>'+
+      '<h2>'+esc(selected.form_title||selected.block_title||'Form submission')+'</h2>'+
+      '<p><b>Date:</b> '+esc(date(selected.created_at))+'</p>'+
+      '<p><b>Submitter:</b> '+esc(to||selected.submitter_id||'Unknown')+'</p>'+
+      '<p><b>Status:</b> '+statusPill(selected.status)+'</p>'+
+      '<div class="actions">'+
+      '<button class="btn hot" data-status="read">Mark read</button>'+
+      '<button class="btn" data-status="new">Mark new</button>'+
+      '<button class="btn warnBtn" data-status="archived">Archive</button>'+
+      '<button id="copyAnswers" class="btn primary" type="button">Copy answers</button>'+
+      '<button id="showRaw" class="btn" type="button">Raw JSON</button>'+
+      '</div>'+
+      '<h3>Routing / Form metadata</h3>'+
+      routingCards(selected.answers_json)+
+      '<h3>Answers</h3>'+
+      answerCards(selected.answers_json)+
+      '<div class="compose" style="margin-top:14px">'+
+      '<h3>Reply privately</h3>'+
+      '<p>This creates a private message connected to this form submission.</p>'+
+      '<div class="miniGrid">'+
+      '<label>To email<br><input id="replyTo" value="'+esc(to)+'" placeholder="submitter@email.com"></label>'+
+      '<label>Subject<br><input id="replySubject" value="Re: '+esc(selected.form_title||selected.block_title||'Form submission')+'"></label>'+
+      '</div>'+
+      '<label>Message<br><textarea id="replyBody" placeholder="Write your reply..."></textarea></label>'+
+      '<div class="actions">'+
+      '<button id="sendReply" class="btn primary" type="button">Send reply</button>'+
+      '<button id="replyTemplate" class="btn" type="button">Use quick template</button>'+
+      '</div>'+
+      '</div>';
+  }
+
+  $('detail').innerHTML=html;
+  $('overlayDetail').innerHTML=html;
+
+  bindDetail($('detail'));
+  bindDetail($('overlayDetail'));
+}
+
+function bindDetail(root){
+  if(!selected)return;
+
+  root.querySelectorAll('[data-status]').forEach(b=>{
+    b.onclick=()=>markStatus(b.dataset.status);
+  });
+
+  let c=root.querySelector('#copyAnswers');
+  if(c)c.onclick=async()=>{
+    try{
+      await navigator.clipboard.writeText(flatAnswers(selected.answers_json));
+      toast('Answers copied');
+    }catch(e){
+      toast('Copy blocked');
+    }
+  };
+
+  let raw=root.querySelector('#showRaw');
+  if(raw)raw.onclick=()=>{
+    $('rawJson').textContent=JSON.stringify(selected,null,2);
+    $('rawModal').classList.add('open');
+  };
+
+  let temp=root.querySelector('#replyTemplate');
+  if(temp)temp.onclick=()=>{
+    root.querySelector('#replyBody').value='Hi, thanks for your message. I have received your form submission and will get back to you soon.\n\nStream Bandit';
+  };
+
+  let send=root.querySelector('#sendReply');
+  if(send)send.onclick=()=>sendFormReply(root);
+}
+
+async function markStatus(st){
+  if(!selected)return;
+
+  let r=await client()
+    .from('sb_form_submissions')
+    .update({status:st})
+    .eq('id',selected.id)
+    .select('*')
+    .maybeSingle();
+
+  if(r.error){
+    setStatus('Status update failed: '+r.error.message,true);
+    return;
+  }
+
+  R.writesFormStatus=true;
+  selected=r.data;
+  rows=rows.map(x=>x.id===selected.id?selected:x);
+
+  renderRows();
+  renderDetail();
+  renderStats();
+
+  setStatus('Submission marked '+st+'.');
+  dbg('status updated');
+}
+
+async function sendFormReply(root){
+  if(!selected)return;
+
+  if(!user){
+    setStatus('You must be signed in to send a reply.',true);
+    return;
+  }
+
+  let to=root.querySelector('#replyTo').value.trim();
+  let body=root.querySelector('#replyBody').value.trim();
+  let subject=root.querySelector('#replySubject').value.trim()||'Private reply';
+
+  if(!to||!body){
+    setStatus('Recipient email and message are required.',true);
+    return;
+  }
+
+  let payload={
+    form_submission_id:selected.id,
+    page_slug:selected.page_slug,
+    sender_id:user.id,
+    sender_email:user.email,
+    sender_name:name(),
+    recipient_id:selected.submitter_id||null,
+    recipient_email:to,
+    recipient_name:to,
+    subject,
+    body,
+    kind:'form_reply',
+    status:'sent',
+    meta:{
+      source:'web_builder_synced_inbox_reply',
+      form_title:selected.form_title||selected.block_title||'',
+      answers_preview:flatAnswers(selected.answers_json).slice(0,600)
+    }
+  };
+
+  let r=await client()
+    .from('sb_private_messages')
+    .insert(payload)
+    .select('*')
+    .maybeSingle();
+
+  if(r.error){
+    setStatus('Reply failed: '+r.error.message,true);
+    dbg('reply error');
+    return;
+  }
+
+  R.writesMessages=true;
+  setStatus('Reply sent and saved to Outbox.');
+  root.querySelector('#replyBody').value='';
+
+  await markStatus('read');
+  await loadMessages('outbox');
+
+  dbg('reply sent');
+}
+
+async function sendNew(){
+  if(!user){
+    setStatus('You must be signed in to send a message.',true);
+    return;
+  }
+
+  let to=$('newTo').value.trim();
+  let subject=$('newSubject').value.trim()||'Private message';
+  let body=$('newBody').value.trim();
+
+  if(!to||!body){
+    setStatus('Recipient email and message are required.',true);
+    return;
+  }
+
+  let payload={
+    page_slug:slug($('pageSlug').value),
+    sender_id:user.id,
+    sender_email:user.email,
+    sender_name:name(),
+    recipient_email:to,
+    recipient_name:to,
+    subject,
+    body,
+    kind:'message',
+    status:'sent',
+    meta:{source:'web_builder_synced_inbox_new_message'}
+  };
+
+  let r=await client()
+    .from('sb_private_messages')
+    .insert(payload)
+    .select('*')
+    .maybeSingle();
+
+  if(r.error){
+    setStatus('Message failed: '+r.error.message,true);
+    dbg('message error');
+    return;
+  }
+
+  R.writesMessages=true;
+  $('newBody').value='';
+  $('newComposer').style.display='none';
+
+  setStatus('Private message sent.');
+
+  await loadMessages('outbox');
+
+  dbg('new message sent');
+}
+
+async function loadMessages(tab){
+  if(tab)msgTab=tab;
+
+  let r=await client()
+    .from('sb_private_messages')
+    .select('*')
+    .order('sent_at',{ascending:false})
+    .limit(150);
+
+  if(r.error){
+    $('messageList').innerHTML='<p>Message load failed: '+esc(r.error.message)+'</p>';
+    $('overlayMessageList').innerHTML=$('messageList').innerHTML;
+    dbg('message load error');
+    return;
+  }
+
+  messages=r.data||[];
+
+  renderMessageTabs();
+  renderMessageList();
+  renderMessageDetail();
+  renderStats();
+
+  dbg('loaded messages');
+}
+
+function visibleMessages(){
+  return messages.filter(m=>{
+    if(deletedForMe(m))return false;
+    if(msgTab==='spam')return m.status==='spam';
+    if(msgTab==='trash')return trashedForMe(m);
+    if(m.status==='spam'||trashedForMe(m))return false;
+    if(msgTab==='outbox')return mineSender(m);
+    return mineRecipient(m);
+  });
+}
+
+function renderMessageTabs(){
+  document.querySelectorAll('.tabBtn').forEach(b=>b.classList.toggle('active',b.dataset.tab===msgTab));
+}
+
+function renderMessageList(){
+  let list=visibleMessages();
+  let html;
+
+  if(!list.length){
+    html='<p>No '+esc(msgTab)+' messages yet.</p>';
+    selectedMsg=null;
+  }else{
+    if(!selectedMsg||!list.some(m=>m.id===selectedMsg.id))selectedMsg=list[0];
+
+    html=list.map(m=>
+      '<article class="item '+(selectedMsg&&selectedMsg.id===m.id?'active':'')+'" data-id="'+esc(m.id)+'">'+
+      statusPill(m.status)+
+      '<h3>'+esc(m.subject||'Private message')+'</h3>'+
+      '<p><b>From:</b> '+esc(participant(m,'sender'))+'</p>'+
+      '<p><b>To:</b> '+esc(participant(m,'recipient'))+'</p>'+
+      '<small>'+esc(date(m.sent_at||m.created_at))+'</small>'+
+      '</article>'
+    ).join('');
+  }
+
+  $('messageList').innerHTML=html;
+  $('overlayMessageList').innerHTML=html;
+
+  ['messageList','overlayMessageList'].forEach(id=>{
+    $(id).querySelectorAll('.item').forEach(el=>{
+      el.onclick=()=>{
+        selectedMsg=messages.find(m=>m.id===el.dataset.id);
+        renderMessageList();
+        renderMessageDetail();
+      };
+    });
+  });
+}
+
+function renderMessageDetail(){
+  let html;
+
+  if(!selectedMsg){
+    html='<p>Select a message.</p>';
+  }else{
+    let m=selectedMsg;
+
+    html=
+      '<span class="badge">'+esc(m.kind||'message')+'</span>'+
+      '<h2>'+esc(m.subject||'Private message')+'</h2>'+
+      '<p><b>From:</b> '+esc(participant(m,'sender'))+'</p>'+
+      '<p><b>To:</b> '+esc(participant(m,'recipient'))+'</p>'+
+      '<p><b>Date:</b> '+esc(date(m.sent_at||m.created_at))+'</p>'+
+      '<p><b>Status:</b> '+statusPill(m.status)+'</p>'+
+      '<div class="card"><div class="msgBody">'+esc(m.body||'No message body')+'</div></div>'+
+      '<div class="actions" style="margin-top:12px">'+
+      '<button id="replyMsg" class="btn primary" type="button">Reply</button>'+
+      '<button id="markSpam" class="btn badBtn" type="button">Spam</button>'+
+      '<button id="trashMsg" class="btn warnBtn" type="button">Trash</button>'+
+      '<button id="restoreMsg" class="btn" type="button">Restore</button>'+
+      '<button id="softDeleteMsg" class="btn badBtn" type="button">Delete for me</button>'+
+      '</div>'+
+      '<div id="msgReplyBox" class="compose" style="display:none;margin-top:12px">'+
+      '<h3>Reply to message</h3>'+
+      '<label>Message<br><textarea id="msgReplyBody" placeholder="Write a private reply..."></textarea></label>'+
+      '<button id="sendMsgReply" class="btn primary" type="button">Send reply</button>'+
+      '</div>';
+  }
+
+  $('messageDetail').innerHTML=html;
+  $('overlayMessageDetail').innerHTML=html;
+
+  bindMessageDetail($('messageDetail'));
+  bindMessageDetail($('overlayMessageDetail'));
+}
+
+function bindMessageDetail(root){
+  if(!selectedMsg)return;
+
+  let rep=root.querySelector('#replyMsg');
+  if(rep)rep.onclick=()=>{root.querySelector('#msgReplyBox').style.display='block';};
+
+  let send=root.querySelector('#sendMsgReply');
+  if(send)send.onclick=()=>sendMsgReply(root);
+
+  let spam=root.querySelector('#markSpam');
+  if(spam)spam.onclick=()=>updateMsg({status:'spam'});
+
+  let trash=root.querySelector('#trashMsg');
+  if(trash)trash.onclick=()=>updateMsg({
+    status:'trashed',
+    recipient_trashed_at:new Date().toISOString(),
+    sender_trashed_at:mineSender(selectedMsg)?new Date().toISOString():selectedMsg.sender_trashed_at
+  });
+
+  let restore=root.querySelector('#restoreMsg');
+  if(restore)restore.onclick=()=>updateMsg({
+    status:'sent',
+    recipient_trashed_at:null,
+    sender_trashed_at:null,
+    sender_deleted_at:null,
+    recipient_deleted_at:null
+  });
+
+  let del=root.querySelector('#softDeleteMsg');
+  if(del)del.onclick=()=>updateMsg(mineSender(selectedMsg)?{sender_deleted_at:new Date().toISOString()}:{recipient_deleted_at:new Date().toISOString()});
+}
+
+async function sendMsgReply(root){
+  if(!selectedMsg||!user)return;
+
+  let body=root.querySelector('#msgReplyBody').value.trim();
+
+  if(!body){
+    setStatus('Reply body required.',true);
+    return;
+  }
+
+  let to=mineSender(selectedMsg)?selectedMsg.recipient_email:selectedMsg.sender_email;
+
+  let payload={
+    page_slug:selectedMsg.page_slug||slug($('pageSlug').value),
+    sender_id:user.id,
+    sender_email:user.email,
+    sender_name:name(),
+    recipient_email:to,
+    recipient_name:to,
+    subject:'Re: '+(selectedMsg.subject||'Private message'),
+    body,
+    kind:'message_reply',
+    status:'sent',
+    parent_message_id:selectedMsg.id,
+    meta:{source:'web_builder_synced_inbox_message_reply'}
+  };
+
+  let r=await client()
+    .from('sb_private_messages')
+    .insert(payload)
+    .select('*')
+    .maybeSingle();
+
+  if(r.error){
+    setStatus('Reply failed: '+r.error.message,true);
+    return;
+  }
+
+  R.writesMessages=true;
+  setStatus('Message reply sent.');
+
+  await loadMessages('outbox');
+}
+
+async function updateMsg(patch){
+  if(!selectedMsg)return;
+
+  let r=await client()
+    .from('sb_private_messages')
+    .update(patch)
+    .eq('id',selectedMsg.id)
+    .select('*')
+    .maybeSingle();
+
+  if(r.error){
+    setStatus('Message update failed: '+r.error.message,true);
+    return;
+  }
+
+  R.writesMessages=true;
+  selectedMsg=r.data;
+  messages=messages.map(m=>m.id===selectedMsg.id?selectedMsg:m);
+
+  renderMessageList();
+  renderMessageDetail();
+
+  setStatus('Message updated.');
+  dbg('message updated');
+}
+
+function exportCsv(){
+  let header=['id','created_at','page_slug','form_title','submitter_email','status','answers'];
+
+  let lines=[header.join(',')].concat(rows.map(r=>
+    header.map(k=>JSON.stringify(k==='answers'?flatAnswers(r.answers_json):(r[k]??''))).join(',')
+  ));
+
+  let csv=lines.join('\n');
+
+  try{navigator.clipboard&&navigator.clipboard.writeText(csv);}
+  catch(e){}
+
+  $('debug').textContent=csv;
+  setStatus('CSV copied/printed below.','good2');
+}
+
+function openOverlay(){
+  overlayOpen=true;
+  $('inboxOverlay').classList.add('open');
+  $('inboxOverlay').setAttribute('aria-hidden','false');
+
+  renderRows();
+  renderDetail();
+  renderMessageList();
+  renderMessageDetail();
+
+  dbg('overlay opened');
+}
+
+function closeOverlay(){
+  overlayOpen=false;
+  $('inboxOverlay').classList.remove('open');
+  $('inboxOverlay').setAttribute('aria-hidden','true');
+  dbg('overlay closed');
+}
+
+function state(step){
+  return Object.assign({},R,{
+    step:step||null,
+    route:'web-builder-form-inbox-owned-v7-12-258-test.html',
+    mode:'native-synced-inbox-no-iframe',
+    currentSlug:slug($('pageSlug').value),
+    sameTablesAsAppInbox:true,
+    formSubmissionsTable:'sb_form_submissions',
+    privateMessagesTable:'sb_private_messages',
+    separateShells:true,
+    appGlobalFooterInjected:false,
+    iframe:false,
+    ownerOnlyGate:false,
+    creatorGrowthBlockedHere:false,
+    signedIn:!!user,
+    user:user?{id:user.id,email:user.email}:null,
+    profile:profile?{id:profile.id,role:profile.role,plan_key:profile.plan_key,admin_level:profile.admin_level}:null,
+    rows:rows.length,
+    messages:messages.length,
+    msgTab:msgTab,
+    selected:selected?selected.id:null,
+    selectedMsg:selectedMsg?selectedMsg.id:null,
+    overlayOpen:overlayOpen,
+    lastAction:lastAction,
+    lastError:lastError,
+    schemaChanges:false,
+    storageActions:false,
+    indexPromotion:false
+  });
+}
+
+function dbg(step){
+  R.last={step,at:new Date().toISOString()};
+  $('debug').textContent=JSON.stringify(state(step),null,2);
+}
+
+async function copyReport(){
+  try{
+    await navigator.clipboard.writeText(JSON.stringify(state('copy report'),null,2));
+    setStatus('Report copied.','good2');
+  }catch(e){
+    dbg('copy blocked');
+  }
+}
+
+function bind(){
+  $('pageSlug').value=urlSlug();
+  $('pageSlug').addEventListener('input',updateLinks);
+  $('pageSlug').addEventListener('change',load);
+
+  $('refresh').onclick=load;
+  $('exportCsv').onclick=exportCsv;
+  $('copyReport').onclick=copyReport;
+
+  $('openOverlay').onclick=openOverlay;
+  $('overlayClose').onclick=closeOverlay;
+  $('overlayRefresh').onclick=load;
+
+  $('closeRaw').onclick=()=>$('rawModal').classList.remove('open');
+  $('rawModal').onclick=e=>{
+    if(e.target.id==='rawModal')$('rawModal').classList.remove('open');
+  };
+
+  document.querySelectorAll('.tabBtn').forEach(b=>{
+    b.onclick=()=>loadMessages(b.dataset.tab);
+  });
+
+  $('newMessageBtn').onclick=()=>$('newComposer').style.display='block';
+  $('cancelNew').onclick=()=>$('newComposer').style.display='none';
+  $('sendNew').onclick=sendNew;
+  $('refreshMessages').onclick=()=>loadMessages();
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      closeOverlay();
+      $('rawModal').classList.remove('open');
+    }
+  });
+}
+
+async function boot(){
+  bind();
+  updateLinks();
+  await load();
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
+
 })();
 </script>
 </body>
