@@ -8,7 +8,7 @@ The Stream Bandit movie/app manifest remains separate. This file is Web Builder 
 
 ## Current checkpoint status
 
-Status: ACTIVE / WEB BUILDER GLOBAL RAIL ROLLOUT / PREVIEW BLOCKED UNTIL FULL CODE OR GITHUB UPDATE.
+Status: ACTIVE / WEB BUILDER GLOBAL RAIL ROLLOUT / PREVIEW FUNCTIONAL PASS / PREVIEW HERO-CARD VISUAL POLISH DEFERRED.
 
 Current checkpoint file:
 
@@ -18,9 +18,9 @@ Important note:
 
 The older doorway-lock checkpoint file has now been deliberately replaced with the current Web Builder global rail rollout checkpoint. That keeps old references alive while making the old checkpoint path point to the current state.
 
-Latest replaced checkpoint commit:
+Latest checkpoint update commit:
 
-`7773d117e42c1321561b39601d85b27ad3d03213`
+`42cbbbd829955acd776d5807dc393fdd490d0aa8`
 
 ## Current governing plan
 
@@ -102,17 +102,6 @@ Route:
 
 Status: PASS.
 
-Confirmed:
-
-- shared rail true
-- uploaded logo works after projector repair
-- platform owner workspace works
-- no Supabase writes on Hub
-- no storage writes on Hub
-- no schema changes
-- no index promotion
-- no Stream Bandit shell change
-
 ### Assets
 
 Route:
@@ -124,17 +113,6 @@ Current tested version:
 `V7.12.299.9 Web Builder Assets Global Rail Lock`
 
 Status: PASS.
-
-Confirmed:
-
-- shared rail/header works
-- body actions preserved
-- upload remains overlay/body action
-- asset list reads existing bucket
-- selected asset output remains on page
-- no schema change
-- no storage policy change
-- no index promotion
 
 ### Web Builder Inbox Bridge / Messenger Overlay
 
@@ -148,18 +126,6 @@ Current tested version:
 
 Status: PASS.
 
-Confirmed:
-
-- shared rail/header works
-- no iframe
-- no duplicate form-submission clone
-- no Stream Bandit footer shell injection
-- overlay tabs: Inbox, Sent, New Message, Friends, Blocked
-- full Form Inbox remains the real manager
-- no schema change
-- no storage action
-- no index promotion
-
 ### Pages Manager
 
 Route:
@@ -170,27 +136,49 @@ Current tested version:
 
 `V7.12.299.12 Owned Pages Manager Menu-Style Global Rail`
 
-Status: PASS after visual correction and global logo repair.
+Status: PASS.
 
-Confirmed:
+### Preview
 
-- compact Menu Builder-style page rows
-- tiny Edit/Delete buttons
-- Edit opens overlay
-- Delete opens guarded overlay
-- drag reorder
-- sub-tab left/right
-- save page order to Supabase
-- platform owner sees all rows
-- creator users remain owner scoped
-- no sort_order column required
-- no page_type column required
-- order stored in `settings_json.sort_order`
-- indent stored in `settings_json.page_indent`
-- type stored in `settings_json.page_type`
-- no schema change
-- no storage change
-- no index promotion
+Route:
+
+`web-builder-preview-owned-v7-12-257-test.html?page=landing`
+
+Current tested version:
+
+`V7.12.299.14 Web Builder Owned Preview Global Rail Lock`
+
+Status: FUNCTIONAL PASS / VISUAL POLISH PENDING.
+
+Confirmed from Trevor debug:
+
+- sharedRail true
+- bodyActionsPreserved true
+- localTopButtonsHidden true
+- globalRailProjector true
+- webBuilderShell true
+- appGlobalFooterInjected false
+- previewOwnerLock true
+- platformOwnerCanPreviewAnyWorkspace true
+- mode `supabase`
+- fullPreviewPreserved true
+- formSubmissionsPreserved true
+- supabaseWrites false
+- storageWrites false
+- storageActions false
+- schemaChanges false
+- builderTableChanges false
+- streamBanditShellChanges false
+- activeMenuPromotion false
+- indexPromotion false
+- registryPromotion false
+- lastError empty
+
+Known visual debt:
+
+- actual rendered website cards need a later visual tidy
+- hero card especially needs major visual cleanup
+- this is not a functional blocker
 
 ### Studio safety handoff
 
@@ -200,82 +188,7 @@ Route:
 
 Status: SAFETY PASS from debug.
 
-Confirmed:
-
-- engine remains `web-builder-live-studio-v7-12-116.js`
-- engineChanged false
-- builderSpecificShell true
-- fullCanvas true
-- appGlobalFooterLoaded false
-- streamBanditShellUntouched true
-- app inbox remains single source of truth
-- no inbox rebuild
-- no global footer injected
-- no schema/storage/index changes
-
-## Current blocker
-
-Blocked page:
-
-`web-builder-preview-owned-v7-12-257-test.html`
-
-Target version:
-
-`V7.12.299.14 Web Builder Owned Preview Global Rail Lock`
-
-Planned commit message:
-
-`Connect Web Builder preview to global rail`
-
-Block details:
-
-- The current working Preview file was uploaded and is the correct base.
-- Preview needs polish/treatment, not a rebuild.
-- The sandbox download handoff is not usable because Trevor cannot download ChatGPT-created files reliably.
-- The GitHub/tool path errored/blocked during this Preview replacement attempt.
-- The next assistant turn must either push Preview directly with GitHub using a fresh SHA, or paste the full replacement HTML directly in chat.
-- Do not leave Preview blocked behind a sandbox download link.
-
-## Preview treatment requirements
-
-Keep all working Preview behavior:
-
-- owner preview lock
-- platform owner can preview any workspace
-- creator users can preview only own rows
-- reserved `landing`, `home`, `home-page` creator redirect
-- Supabase page read
-- menu row read
-- published preview rendering
-- hero promotion
-- empty block guard
-- image/video rendering
-- inline form submit to `sb_form_submissions`
-- ratings localStorage behavior
-- debug report
-
-Only change shell/global flags:
-
-- add shared global projector script
-- make header match Hub
-- hide/remove old local top buttons: Hub, Pages, Studio, Route Map
-- add Hub rail note
-- update visible/debug version to V7.12.299.14
-- add debug flags:
-  - sharedRail true
-  - bodyActionsPreserved true
-  - localTopButtonsHidden true
-  - globalRailProjector true
-  - webBuilderShell true
-  - fullPreviewPreserved true
-  - formSubmissionsPreserved true
-  - appGlobalFooterInjected false
-  - registryPromotion false
-  - schemaChanges false
-  - storageActions false
-  - indexPromotion false
-
-## Remaining rollout order after Preview
+## Remaining rollout order
 
 1. Menu Builder - confirm global projector/rail and no duplicate local navigation.
 2. Form Designer - connect to rail while preserving solid-state auth and overlay inputs.
@@ -285,6 +198,20 @@ Only change shell/global flags:
 6. Header/Footer Code - confirm rail and remove duplicate local navigation.
 7. Studio overlay route - only light shell/rail treatment if safe; do not touch `web-builder-live-studio-v7-12-116.js`.
 8. Manifest/docs - documentation only, not a live app shell.
+
+## Deferred Preview visual polish
+
+Create a later visual polish pass for:
+
+`web-builder-preview-owned-v7-12-257-test.html`
+
+Scope:
+
+- tidy actual rendered website cards
+- tidy hero card layout
+- improve preview card spacing and hierarchy
+- preserve Preview logic and owner lock
+- do not mix this with the global rail rollout unless needed
 
 ## Explicit exclusion
 
@@ -342,14 +269,6 @@ A Web Builder page passes only when:
 
 ## Resume instruction
 
-Resume from Preview.
+Resume from Menu Builder or Form Designer.
 
-Preferred next action:
-
-- Try GitHub direct update to `web-builder-preview-owned-v7-12-257-test.html` with a fresh SHA.
-
-Fallback action:
-
-- Paste the full replacement Preview HTML directly in chat with file name and commit message.
-
-Do not provide a sandbox-only download link.
+Preview shell treatment is passed functionally. Preview hero/cards are a deferred visual polish pass.
