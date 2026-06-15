@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Form Designer V7.12.263.17 TEST</title>
+<title>Web Builder Form Designer V7.12.299.17 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -69,6 +69,16 @@ body{
   background:linear-gradient(135deg,var(--good),var(--purple));
   color:#071015;
   font-weight:1000;
+  overflow:hidden;
+}
+.mark img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+  object-position:center;
+  border-radius:inherit;
+  background:#050711;
 }
 .brand small{
   display:block;
@@ -94,6 +104,10 @@ body{
   align-items:center;
   justify-content:center;
   white-space:nowrap;
+}
+.btn:disabled,.smallBtn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
 }
 .smallBtn{
   padding:8px 10px;
@@ -388,10 +402,19 @@ p,li,label,small{
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:10px;
 }
+.railNote{
+  border:1px solid #41e8ff66;
+  background:#41e8ff17;
+  color:#dffbff;
+  border-radius:18px;
+  padding:12px;
+  margin:10px 0;
+  font-weight:900;
+}
 .overlay{
   position:fixed;
   inset:0;
-  z-index:100;
+  z-index:100000;
   display:none;
   align-items:center;
   justify-content:center;
@@ -457,6 +480,13 @@ p,li,label,small{
   gap:8px;
   align-items:end;
 }
+.footer{
+  border-top:1px solid var(--line);
+  background:#0b1020d8;
+  padding:10px 14px;
+  color:#aeb8d6;
+  font-size:12px;
+}
 @media(max-width:980px){
   .brand,.actions{
     flex:1 1 100%;
@@ -488,38 +518,34 @@ p,li,label,small{
 }
 </style>
 </head>
-<body>
+<body data-wb-shell="form-designer-v7-12-299-17" data-web-builder-form-designer="global-rail-preserve-overlays">
 <header class="top">
   <div class="topInner">
     <div class="brand">
-      <div class="mark">WB</div>
+      <div class="mark" aria-hidden="true">WB</div>
       <div>
         Web Builder Form Designer
-        <small>solid state owner lock · V7.12.263.17</small>
+        <small>global rail + preserved overlays + owner workspace lock · V7.12.299.17</small>
       </div>
-    </div>
-    <div class="actions">
-      <a class="btn primary" href="web-builder-account-control-hub-v7-12-263-test.html">Hub</a>
-      <a class="btn" href="web-builder-pages-manager-owned-v7-12-256-test.html">Pages</a>
-      <a class="btn" href="web-builder-menu-builder-owned-v7-12-264-test.html">Menu</a>
-      <a id="previewTop" class="btn" href="web-builder-preview-owned-v7-12-257-test.html?page=landing">Preview</a>
     </div>
   </div>
 </header>
 
 <main class="wrap">
   <section class="hero">
-    <span class="badge">V7.12.263.17 Solid State Form Designer</span>
+    <span class="badge">V7.12.299.17 Form Designer Global Rail Pass</span>
     <h1>Advanced forms open first, then owner lock checks run</h1>
-    <p>This version does not hide the whole page behind the auth check. The Form Designer shell appears immediately, then it loads the correct owner workspace page.</p>
+    <p>This keeps the working Form Designer body tools, moves navigation to the Web Builder global rail, and preserves the owner workspace lock.</p>
     <div class="row">
+      <span class="chip good">Global Web Builder rail</span>
       <span class="chip good">Builder overlay</span>
       <span class="chip good">Destinations overlay</span>
       <span class="chip good">Field edit overlay</span>
-      <span class="chip good">Soft redirect</span>
       <span class="chip good">Image upload kept</span>
       <span class="chip warn">No schema change</span>
+      <span class="chip warn">No index promotion</span>
     </div>
+    <div class="railNote">Old local top buttons are removed. Use the Web Builder rail across the top for Hub, Pages, Menu and Preview.</div>
   </section>
 
   <section class="grid">
@@ -536,6 +562,7 @@ p,li,label,small{
         <li>Builder Overlay</li>
         <li>Destinations Overlay</li>
         <li>Field Edit Overlay</li>
+        <li>Delete confirm overlay</li>
         <li>Compact field rows</li>
       </ul>
     </div>
@@ -597,6 +624,8 @@ p,li,label,small{
     </div>
   </section>
 </main>
+
+<footer class="footer">V7.12.299.17 Form Designer Global Rail Pass · overlays preserved · existing image bucket only · no schema changes · no index promotion</footer>
 
 <div id="builderOverlay" class="overlay" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="builderTitle">
@@ -744,6 +773,26 @@ p,li,label,small{
   </div>
 </div>
 
+<div id="fieldDeleteOverlay" class="overlay" aria-hidden="true">
+  <div class="modal compact" role="dialog" aria-modal="true" aria-labelledby="deleteFieldTitle">
+    <div class="modalHead">
+      <div>
+        <span class="badge bad">Delete confirm</span>
+        <h2 id="deleteFieldTitle">Remove field?</h2>
+      </div>
+      <button id="closeFieldDeleteOverlay" class="btn close" type="button">×</button>
+    </div>
+    <div class="modalBody">
+      <div id="deleteFieldSummary" class="overlayCard">No field selected.</div>
+      <div class="notice">This removes the field locally from the form design preview. It does not delete a database table, route, file, bucket or schema.</div>
+    </div>
+    <div class="modalFoot">
+      <button id="confirmFieldDelete" class="btn badBtn" type="button">Remove Field</button>
+      <button id="cancelFieldDelete" class="btn" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div id="destOverlay" class="overlay" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="destTitle">
     <div class="modalHead">
@@ -767,9 +816,8 @@ p,li,label,small{
 (function(){
 'use strict';
 
-const VERSION='V7.12.263.17 Web Builder Form Designer Solid State Owner Lock';
-const URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
-const KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+const VERSION='V7.12.299.17 Web Builder Form Designer Global Rail Overlay Pass';
+const CONFIG_FILE='stream-bandit-shell-v6-24.js';
 const BUCKET='stream-bandit-images';
 const ALLOWED_TYPES=['image/png','image/jpeg','image/webp'];
 const OWNED_INBOX='web-builder-form-inbox-owned-v7-12-258-test.html';
@@ -787,12 +835,14 @@ const RANK={
 };
 
 let sb=null;
+let cfg=null;
 let user=null;
 let profile=null;
 let page=null;
 let pageOwnerId='';
 let fields=[];
 let editIndex=-1;
+let deleteIndex=-1;
 let lastError='';
 let lastSubmit=null;
 let lastEmailDraft=null;
@@ -807,6 +857,7 @@ let storageUploads=0;
 let builderOverlayOpen=false;
 let destinationOverlayOpen=false;
 let fieldOverlayOpen=false;
+let fieldDeleteOverlayOpen=false;
 let lastAction='solid shell rendered';
 let redirectTo='';
 let redirectSlug='';
@@ -845,7 +896,16 @@ let authState={
   overlaysPreserved:true,
   builderOverlayPreserved:true,
   destinationOverlayPreserved:true,
-  fieldEditOverlayPreserved:true
+  fieldEditOverlayPreserved:true,
+  fieldDeleteOverlayPreserved:true,
+  sharedRail:true,
+  globalRailProjector:true,
+  webBuilderShell:true,
+  localTopButtonsHidden:true,
+  bodyActionsPreserved:true,
+  overlayInputs:true,
+  imageUploadExistingBucketOnly:true,
+  fullFormInboxTouched:false
 };
 
 const $=id=>document.getElementById(id);
@@ -905,10 +965,34 @@ function sl(v){
     .replace(/^-+|-+$/g,'')||'landing';
 }
 
-function client(){
+async function readConfig(){
+  if(cfg&&cfg.url&&cfg.key)return cfg;
+
+  let existing=window.StreamBanditSupabaseConfig||
+    (window.StreamBanditShell&&window.StreamBanditShell.config&&window.StreamBanditShell.config());
+
+  if(existing&&existing.url&&existing.key){
+    cfg=existing;
+    return cfg;
+  }
+
+  let txt=await fetch(CONFIG_FILE,{cache:'no-store'}).then(r=>r.text());
+
+  cfg={
+    url:(txt.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)/)||[])[1]||'',
+    key:(txt.match(/SUPABASE_KEY\s*=\s*['"]([^'"]+)/)||[])[1]||''
+  };
+
+  if(!cfg.url||!cfg.key)throw new Error('Supabase config bridge not ready');
+
+  return cfg;
+}
+
+async function client(){
   if(sb)return sb;
   if(!window.supabase||!window.supabase.createClient)throw new Error('Supabase SDK not loaded');
-  sb=window.supabase.createClient(URL,KEY);
+  let c=await readConfig();
+  sb=window.supabase.createClient(c.url,c.key);
   return sb;
 }
 
@@ -961,6 +1045,7 @@ function setCurrentSlug(next){
   let input=$('slug');
   if(input)input.value=activeSlug;
   $('previewSlugLabel').textContent=activeSlug;
+
   try{
     let u=new URL(location.href);
     u.searchParams.set('page',activeSlug);
@@ -980,6 +1065,7 @@ function getBlocks(row){
   row=row||{};
   let s=settings(row);
   let formFromSettings=s.form_designer&&s.form_designer.form_block?[s.form_designer.form_block]:[];
+
   let candidates=[
     row.layout_json,
     row.blocks,
@@ -992,10 +1078,12 @@ function getBlocks(row){
     s.contentBlocks,
     formFromSettings
   ];
+
   for(let i=0;i<candidates.length;i++){
     let a=arr(candidates[i]);
     if(a.length)return a;
   }
+
   return [];
 }
 
@@ -1003,6 +1091,7 @@ function isFormBlock(b){
   b=obj(b);
   let t=String(b.type||b.block_type||b.kind||'').toLowerCase();
   let title=String(b.title||b.heading||b.name||'').toLowerCase();
+
   return t.includes('form')||
     t.includes('contact')||
     title.includes('form')||
@@ -1019,6 +1108,7 @@ function pageUrl(path,slug){
 
 function links(){
   let s=currentSlug();
+
   return {
     slug:s,
     hub:'web-builder-account-control-hub-v7-12-263-test.html',
@@ -1105,7 +1195,7 @@ function requireAllowed(){
 }
 
 async function readAuthority(){
-  let c=client();
+  let c=await client();
   let foundUser=null;
 
   let gu=await withTimeout(c.auth.getUser(),8000,'Supabase auth check timed out');
@@ -1152,9 +1242,10 @@ function rowIsHome(row){
 }
 
 async function firstOwnedSlug(){
+  let c=await client();
+
   let r=await withTimeout(
-    client()
-      .from('sb_site_pages')
+    c.from('sb_site_pages')
       .select('id,slug,title,status,owner_id,settings_json,updated_at')
       .eq('owner_id',authState.userId)
       .limit(50),
@@ -1208,12 +1299,14 @@ async function applyReservedSlugSoftRedirect(slug){
   softRedirectApplied=true;
   setCurrentSlug(own);
   setStatus('Soft moved from reserved owner slug to your page: '+own,'good2');
+
   return false;
 }
 
 async function readPage(slug){
-  let q=client()
-    .from('sb_site_pages')
+  let c=await client();
+
+  let q=c.from('sb_site_pages')
     .select('*')
     .eq('slug',slug)
     .limit(20);
@@ -1345,6 +1438,7 @@ function loadFormFromPage(){
 async function loadPage(){
   try{
     let slug=currentSlug();
+
     setCurrentSlug(slug);
     setStatus('Loading '+slug+' from sb_site_pages...','');
 
@@ -1367,7 +1461,6 @@ async function loadPage(){
     }
 
     setCurrentSlug(page.slug);
-    $('previewTop').href=pageUrl('web-builder-preview-owned-v7-12-257-test.html',page.slug);
 
     let found=loadFormFromPage();
 
@@ -1480,11 +1573,7 @@ function renderFieldList(){
 
         if(a==='edit')openFieldOverlay(i);
 
-        if(a==='remove'){
-          fields.splice(i,1);
-          lastAction='field removed locally';
-          renderAll('Field list changed.');
-        }
+        if(a==='remove')openFieldDeleteOverlay(i);
 
         if(a==='up'&&i>0){
           [fields[i-1],fields[i]]=[fields[i],fields[i-1]];
@@ -1533,6 +1622,44 @@ function closeFieldOverlay(){
   editIndex=-1;
   lastAction='field overlay closed';
   renderDebug();
+}
+
+function openFieldDeleteOverlay(i){
+  let f=fields[i];
+
+  if(!f)return;
+
+  deleteIndex=i;
+  fieldDeleteOverlayOpen=true;
+
+  $('deleteFieldSummary').innerHTML='<b>'+esc(f.label||typeName(f.kind))+'</b><p>'+esc(typeName(f.kind))+' · '+(f.required?'required':'optional')+'</p>';
+
+  $('fieldDeleteOverlay').classList.add('open');
+  $('fieldDeleteOverlay').setAttribute('aria-hidden','false');
+
+  lastAction='field delete overlay opened';
+  renderDebug();
+}
+
+function closeFieldDeleteOverlay(){
+  $('fieldDeleteOverlay').classList.remove('open');
+  $('fieldDeleteOverlay').setAttribute('aria-hidden','true');
+  fieldDeleteOverlayOpen=false;
+  deleteIndex=-1;
+  lastAction='field delete overlay closed';
+  renderDebug();
+}
+
+function confirmFieldDelete(){
+  if(deleteIndex<0||!fields[deleteIndex]){
+    closeFieldDeleteOverlay();
+    return;
+  }
+
+  fields.splice(deleteIndex,1);
+  lastAction='field removed locally through delete confirm overlay';
+  closeFieldDeleteOverlay();
+  renderAll('Field removed locally. Save Form Design to persist.');
 }
 
 function updateFieldOverlayUi(){
@@ -1598,15 +1725,17 @@ async function uploadFormFile(file,f,i){
   let ownerPart=pageOwnerId||authState.userId||'unknown-owner';
   let path='web-builder-forms/'+ownerPart+'/'+currentSlug()+'/'+Date.now()+'-'+i+'-'+safeFileName(file.name);
 
+  let c=await client();
+
   let res=await withTimeout(
-    client().storage.from(BUCKET).upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type}),
+    c.storage.from(BUCKET).upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type}),
     20000,
     'Image upload timed out'
   );
 
   if(res.error)throw res.error;
 
-  let pub=client().storage.from(BUCKET).getPublicUrl(path);
+  let pub=c.storage.from(BUCKET).getPublicUrl(path);
 
   storageUploads++;
 
@@ -1695,7 +1824,7 @@ function submissionPayload(c){
       page_owner_id:pageOwnerId,
       form_key:b.formKey,
       preset_title:b.title,
-      source:'owned-form-designer-solid-state-v7-12-263-17',
+      source:'owned-form-designer-global-rail-v7-12-299-17',
       existing_bucket_only:true,
       bucket:BUCKET,
       bucketPolicyChanged:false
@@ -1746,10 +1875,12 @@ function mailtoForPayload(p){
 
 function launchMailto(href){
   let a=document.createElement('a');
+
   a.href=href;
   a.target='_self';
   a.rel='noopener';
   a.style.display='none';
+
   document.body.appendChild(a);
   a.click();
 
@@ -1850,8 +1981,10 @@ async function realSubmit(){
     }
 
     if(r.save_to_inbox){
+      let c=await client();
+
       let res=await withTimeout(
-        client().from('sb_form_submissions').insert(p).select('*').maybeSingle(),
+        c.from('sb_form_submissions').insert(p).select('*').maybeSingle(),
         12000,
         'Inbox submit timed out'
       );
@@ -1930,6 +2063,7 @@ async function saveFormDesign(){
         form_block:form,
         updated_by:'web-builder-form-designer-owned-v7-12-258-test.html',
         updated_at:new Date().toISOString(),
+        global_rail_pass:true,
         solid_state_shell:true,
         overlays_preserved:true,
         image_upload_existing_bucket:true,
@@ -1940,8 +2074,9 @@ async function saveFormDesign(){
       blocks:nextBlocks
     });
 
-    let q=client()
-      .from('sb_site_pages')
+    let c=await client();
+
+    let q=c.from('sb_site_pages')
       .update({settings_json:nextSettings})
       .eq('id',page.id);
 
@@ -1974,14 +2109,17 @@ async function saveFormDesign(){
       page_owner_id:pageOwnerId,
       fields:fields.length,
       savedColumns:['settings_json'],
+      globalRailPass:true,
       overlaysPreserved:true,
       builderOverlayPreserved:true,
       destinationOverlayPreserved:true,
       fieldEditOverlayPreserved:true,
+      fieldDeleteOverlayPreserved:true,
       imageUploadExistingBucket:true,
       bucket:BUCKET,
       bucketPolicyChanged:false,
-      schemaChanges:false
+      schemaChanges:false,
+      indexPromotion:false
     },null,2);
 
     renderAll('Form design saved.');
@@ -2032,7 +2170,8 @@ function renderStats(){
 function state(){
   return Object.assign({},authState,{
     canonicalRoute:'web-builder-form-designer-owned-v7-12-258-test.html',
-    checkpoint:'CHECKPOINT-WEB-BUILDER-DOORWAY-LOCK-ROLLPLAN-V7-12-263-8.md',
+    checkpoint:'CHECKPOINT: Web Builder Rail Pass + Live Promotion Guide / issue 47',
+    groupPromotionGate:'issue 48 - group pass before homepage candidate',
     formDesignerOwnerLock:true,
     requestedSlug:currentSlug(),
     activeSlug:activeSlug,
@@ -2049,9 +2188,11 @@ function state(){
     builderOverlayOpen:builderOverlayOpen,
     destinationOverlayOpen:destinationOverlayOpen,
     fieldOverlayOpen:fieldOverlayOpen,
+    fieldDeleteOverlayOpen:fieldDeleteOverlayOpen,
     builderOverlayPreserved:true,
     destinationOverlayPreserved:true,
     fieldEditOverlayPreserved:true,
+    fieldDeleteOverlayPreserved:true,
     compactFieldRowsPreserved:true,
     imageUploadFieldPreserved:true,
     imageUploadExistingBucketOnly:true,
@@ -2096,7 +2237,6 @@ function renderDebug(){
 
 function renderLinks(){
   $('linkBox').textContent=JSON.stringify(links(),null,2);
-  $('previewTop').href=links().preview;
 }
 
 function renderAll(message){
@@ -2142,6 +2282,13 @@ function closeDestOverlay(){
   renderDebug();
 }
 
+function closeAllOverlays(){
+  closeFieldOverlay();
+  closeFieldDeleteOverlay();
+  closeDestOverlay();
+  closeBuilderOverlay();
+}
+
 function bindPage(){
   $('openBuilderOverlay').onclick=openBuilderOverlay;
   $('closeBuilderOverlay').onclick=closeBuilderOverlay;
@@ -2155,6 +2302,10 @@ function bindPage(){
   $('cancelFieldEdit').onclick=closeFieldOverlay;
   $('applyFieldEdit').onclick=applyFieldEdit;
   $('editFieldKind').onchange=updateFieldOverlayUi;
+
+  $('closeFieldDeleteOverlay').onclick=closeFieldDeleteOverlay;
+  $('cancelFieldDelete').onclick=closeFieldDeleteOverlay;
+  $('confirmFieldDelete').onclick=confirmFieldDelete;
 
   $('addField').onclick=addField;
   $('contactPreset').onclick=setContact;
@@ -2205,10 +2356,19 @@ function bindPage(){
 
   document.addEventListener('keydown',e=>{
     if(e.key==='Escape'){
-      closeFieldOverlay();
-      closeDestOverlay();
-      closeBuilderOverlay();
+      closeAllOverlays();
     }
+  });
+
+  document.querySelectorAll('.overlay').forEach(el=>{
+    el.addEventListener('click',e=>{
+      if(e.target===el){
+        if(el.id==='fieldOverlay')closeFieldOverlay();
+        if(el.id==='fieldDeleteOverlay')closeFieldDeleteOverlay();
+        if(el.id==='destOverlay')closeDestOverlay();
+        if(el.id==='builderOverlay')closeBuilderOverlay();
+      }
+    });
   });
 }
 
@@ -2293,5 +2453,6 @@ boot();
 
 })();
 </script>
+<script src="web-builder-global-projector-v7-12-263.js?v=7-12-299-17-form-designer-global-rail"></script>
 </body>
 </html>
