@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.299.1
+# Web Builder Manifest V7.12.299.7
 
 ## Purpose
 
@@ -8,11 +8,15 @@ The Stream Bandit manifest remains for the movie app. This file is for Web Build
 
 ## Current checkpoint status
 
-Status: RECORDED / WEB BUILDER OWNER WORKSPACE LOCK PASS MOSTLY COMPLETE / FORM DESIGNER SOLID STATE PASS / REAL APP INBOX BRIDGE PROBLEM RECORDED.
+Status: RECORDED / WEB BUILDER GLOBAL RAIL PASS / WEB BUILDER-UPLOADED LOGO PASS / MESSENGER OVERLAY PASS / OWNER WORKSPACE LOCK PASS / FORM DESIGNER SOLID STATE PASS.
 
-This checkpoint records the late-night pass where the Web Builder owner workspace lock was rolled across the main builder pages and the Form Designer was repaired to a solid-state overlay page. It also records the exact blocker still open: the real app-synced inbox route must remain the single inbox, but Web Builder Studio needs a clean overlay bridge to it, and the creator/Kayleigh access rule must not treat the inbox as platform-owner-only.
+Current checkpoint file:
 
-No live `index.html` promotion was done. No main Stream Bandit shell rewrite was done. No schema/storage table change was done in this pass.
+`CHECKPOINT-WEB-BUILDER-GLOBAL-RAIL-LOGO-INBOX-PASS-V7-12-299-7.md`
+
+This manifest now records the successful pass where the accepted Web Builder rail, Web Builder-only uploaded logo/avatar projection, and footer-style messenger overlay were locked as the global Web Builder pattern.
+
+No live `index.html` promotion was done. No app registry promotion was done. No Stream Bandit global footer was injected into Web Builder. No Supabase schema/RLS/storage policy change was done.
 
 ## Current doorway rule
 
@@ -40,6 +44,95 @@ Not promoted yet:
 - footer shell
 - full Stream Bandit app manifest
 
+## Global Web Builder rail rule now locked
+
+The accepted Web Builder global navigation is the shared scrolling header rail owned by:
+
+`web-builder-global-projector-v7-12-263.js`
+
+Current projector version:
+
+`V7.12.299.7 Web Builder Centered Avatar Logo`
+
+This rail should appear across every active Web Builder page. It is the standard builder navigation and replaces scattered duplicate local top button rows.
+
+The rail includes:
+
+- Back
+- Hub
+- Pages
+- Web Builder
+- Preview
+- Menu
+- Form
+- Inbox
+- Assets
+- Route Map
+- Control Map
+- Source Map
+- Header/Footer
+- Manifest
+
+Required helper note on pages where helpful:
+
+`Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see every Web Builder page.`
+
+## Global Web Builder logo/avatar rule now locked
+
+The Web Builder-only uploaded logo/avatar source of truth for this pass is:
+
+`https://xzxqfrvqdgkzwujbkdbk.supabase.co/storage/v1/object/public/stream-bandit-images/builder/assets/landing/1781530205862-1e5978b2-android_chrome_192.png`
+
+This asset is projected only inside Web Builder surfaces:
+
+- top-left page header avatar `.mark`
+- shared Web Builder rail avatar
+- hover/account panel avatar
+- hover/account panel logo
+- Web Builder favicon/apple icon
+
+The final fit rule is `contain-centered`, not cropped `cover`.
+
+Reason for the final fit rule:
+
+- `cover` cropped the square uploaded logo and made the old stag antlers/background look like they were peeking from the bottom of the header avatar.
+- `contain` keeps the uploaded logo centered inside the frame.
+- The projector forces the header `.mark` to a fixed 44px x 44px frame so it matches the rail and does not stretch or fall low.
+
+Stream Bandit app branding is untouched.
+
+## Two global fixes to roll across every Web Builder page
+
+### Fix 1 - Every Web Builder page uses the shared scrolling rail
+
+Each current Web Builder page should load:
+
+`web-builder-global-projector-v7-12-263.js`
+
+The shared projector owns:
+
+- route rail
+- route search
+- active rail item
+- current slug preservation
+- hover/account panel
+- duplicate Studio top-button hiding
+
+A page should not rebuild its own permanent top navigation if the shared rail already provides that job.
+
+### Fix 2 - Every Web Builder page uses the same centered uploaded logo
+
+Every Web Builder page should let the shared projector project the Web Builder logo into:
+
+- header `.mark`
+- bottom-right rail logo
+- hover/account panel
+- favicon
+
+Do not hardcode the old Stream Bandit stag icon as Web Builder’s avatar once the shared projector is loaded.
+
+The Web Builder logo/avatar change is Web Builder-only. It must not overwrite the main Stream Bandit movie app logo or global app branding.
+
 ## Core polish rule
 
 - Inputs live in clean overlays.
@@ -64,13 +157,41 @@ Not promoted yet:
 
 Route: `web-builder-account-control-hub-v7-12-263-test.html`
 
+Current visible version after rail pass: `V7.12.299.3`.
+
 Result: PASS.
 
 - Platform owner can enter and see the builder workspace.
 - Creator Growth user can enter builder workspace.
 - Creator users are directed to their own page rather than owner-only slugs.
+- Hub now loads the shared Web Builder rail.
+- Hub now shows the scrolling menu tabs note.
+- Hub does not require `sort_order` column.
+- Hub does not require `page_type` column.
 - No schema changes.
 - No storage changes.
+- No index promotion.
+
+### Shared Web Builder projector / rail / avatar
+
+Route/script: `web-builder-global-projector-v7-12-263.js`
+
+Current version: `V7.12.299.7 Web Builder Centered Avatar Logo`.
+
+Result: PASS.
+
+- Shared Web Builder rail works on phone first.
+- Rail is horizontally scrollable.
+- Rail includes the full builder route set.
+- Search stays attached to the Web Builder rail.
+- Current slug is preserved in builder route links.
+- Header avatar uses the uploaded Web Builder logo.
+- Rail avatar uses the uploaded Web Builder logo.
+- Hover/account panel avatar and logo use the uploaded Web Builder logo.
+- Header avatar is centered and contained instead of cropped low.
+- Broken/stale local logo state is overridden by the uploaded Web Builder asset.
+- No storage writes.
+- No schema changes.
 - No index promotion.
 
 ### Canonical Studio handoff
@@ -100,6 +221,7 @@ Result: PASS for owner-lock doorway behavior.
 - No schema changes.
 - No index promotion.
 - Existing asset behavior remains existing-bucket-only.
+- Next rail pass must verify each route loads the shared projector/rail.
 
 ### Owned Pages Manager
 
@@ -151,7 +273,7 @@ Verified user debug:
 
 Route: `web-builder-form-designer-owned-v7-12-258-test.html`
 
-Current version: `V7.12.263.17 Web Builder Form Designer Solid State Owner Lock`.
+Current passed version: `V7.12.263.17 Web Builder Form Designer Solid State Owner Lock`.
 
 Result: PASS after solid-state repair.
 
@@ -204,72 +326,68 @@ Hard rules preserved:
 - No index promotion.
 - No Stream Bandit shell rewrite.
 
-## Exact current blocker to resume after sleep
+### Web Builder lightweight messenger overlay / inbox bridge
 
-### Blocker title
+Route: `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>`
 
-Web Builder Studio needs an app-synced inbox overlay bridge, but the real app inbox must remain the only inbox.
+Current passed version: `V7.12.263.21 Web Builder Footer Messenger Overlay Replica`.
 
-### User observation
+Result: PASS.
 
-The route `web-builder-form-submissions-v7-12-94-test.html?page=test-page` is the working inbox and already has the options the user wants:
+Verified Trevor debug:
 
-- inbox/submissions
-- private replies/messages
-- sent/outbox
-- spam
-- trash
-- CSV/export
-- soft status actions
-- real Supabase flows for `sb_form_submissions` and `sb_private_messages`
+- `iframe = false`
+- `formSubmissionClone = false`
+- `leakingSubmissionCards = false`
+- `appGlobalFooterInjected = false`
+- `webBuilderShell = true`
+- `shellsRemainSeparate = true`
+- `ownerOnlyGate = false`
+- `creatorGrowthBlockedHere = false`
+- `overlayTabs = Inbox, Sent, New Message, Friends, Blocked`
+- `tables = sb_private_messages, sb_profiles, sb_user_friends, sb_user_blocks`
+- `fullFormInboxStillOwnsSubmissions = true`
+- `messagesLoaded = 25`
+- `friendsLoaded = 1`
+- `blocksLoaded = 0`
+- `lastError = ""`
 
-This route must not be replaced by a smaller owned inbox clone.
+Correct rule:
 
-### Correct rule
+- This route is the lightweight footer-style messenger overlay rebuilt inside Web Builder.
+- It is not a duplicate form submissions inbox.
+- It is not an iframe.
+- It does not inject the main Stream Bandit footer shell into Web Builder.
+- The real full Form Inbox remains the proper form-submission management route.
 
-- The real app inbox route is the single source of truth for inbox/submissions.
-- Web Builder forms can submit to the shared app inbox tables.
-- Web Builder Studio should open the real app inbox in an overlay or full page using the current slug.
-- Web Builder must not rebuild a second smaller inbox as the primary flow.
-- Web Builder must not inject the full Stream Bandit app footer/global rail into Studio.
-- The only app sync bridge is inbox/form submissions.
+### Real full app-synced Form Inbox
 
-### Exact stuck problem
+Route: `web-builder-form-submissions-v7-12-94-test.html?page=<slug>`
 
-The last attempted Studio overlay bridge code was not verified as successful. User reported:
+Current rule: PRESERVE.
 
-- For Kayleigh, the decision/access on the inbox is not allowed because the inbox was treated as owner-only / placed in the owner group before the routes were organized.
-- No inbox overlay appeared on the Studio page.
-- The user wants this recorded before bed, not another risky code pass.
+- This is the full form-submission manager.
+- Do not replace it with a smaller owned inbox clone.
+- It remains the proper place for full submissions/inbox management.
+- It keeps full inbox options: submissions, private replies/messages, sent/outbox, spam, trash, CSV/export and soft status actions.
 
-### Resume target
+## Kayleigh / Creator Growth restriction state
 
-Scan and repair only these pieces next:
+The deeper Kayleigh restriction model is not finished in this checkpoint.
 
-1. `overlay-route-truth-machine-v7-12-66-test.html`
-   - Add/verify a safe builder-scoped Inbox button/overlay.
-   - Overlay target must be `web-builder-form-submissions-v7-12-94-test.html?page=<current builder slug>`.
-   - Do not touch `web-builder-live-studio-v7-12-116.js`.
-   - Do not inject Stream Bandit app global footer.
+Current pass only locks that:
 
-2. `web-builder-form-submissions-v7-12-94-test.html`
-   - Keep as the real app-synced inbox.
-   - Do not replace it.
-   - Verify Creator Growth / Kayleigh can view submissions for her own page slug and cannot view owner-only/private rows.
-   - If it is owner-only, repair the gate/scope so Creator Growth with own `owner_id` page can access her own page inbox.
-   - Preserve all app inbox options: inbox, replies/private messages, sent/outbox, spam, trash, CSV/export, soft status actions.
+- Kayleigh / Creator Growth successfully passed Form Designer solid-state flow earlier.
+- Kayleigh real submit passed earlier.
+- Kayleigh should not be blocked from the Web Builder-only messenger overlay just because a menu group was previously owner-only.
+- The correct later work is to organize Web Builder role/menu restrictions cleanly after the global rail and route pattern is stable.
 
-3. If `web-builder-form-inbox-owned-v7-12-258-test.html` exists or was added, treat it as non-primary or doorway only.
-   - It must not replace the real app inbox route.
+Next restriction pass must be separate and deliberate:
 
-### Do not touch next time unless explicitly approved
-
-- `index.html`
-- app registry/menu promotion
-- Supabase schema/RLS/storage policies
-- `web-builder-live-studio-v7-12-116.js`
-- `web-builder-protected-page-v7-12-265.js` unless specifically scanning the access decision
-- Stream Bandit global footer shell as a direct Studio injection
+- Creator Growth should see their own Web Builder workspace/pages/inbox tools.
+- Platform owner remains the all-workspace override.
+- Admin role alone must not expose other private Web Builder workspaces.
+- Route/menu grouping must not hide core Creator Growth Web Builder tools just because they originally lived under an Owner menu group.
 
 ## Current route set
 
@@ -279,13 +397,14 @@ Canonical/current Web Builder routes:
 - `web-builder-pages-manager-owned-v7-12-256-test.html`
 - `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`
 - `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`
-- `web-builder-menu-builder-owned-v7-12-264-test.html`
+- `web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>`
 - `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>`
-- `web-builder-assets-v7-12-252-test.html`
-- `web-builder-route-map-v7-12-252-test.html`
-- `web-builder-control-map-v7-12-253-test.html`
-- `web-builder-pages-source-map-v7-12-255-test.html`
-- `web-builder-header-footer-code-v7-12-254-test.html`
+- `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>`
+- `web-builder-assets-v7-12-252-test.html?page=<slug>`
+- `web-builder-route-map-v7-12-252-test.html?page=<slug>`
+- `web-builder-control-map-v7-12-253-test.html?page=<slug>`
+- `web-builder-pages-source-map-v7-12-255-test.html?page=<slug>`
+- `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>`
 - `WEB-BUILDER-MANIFEST-V7-12-252.md`
 
 Real app-synced inbox route to preserve:
@@ -306,6 +425,8 @@ Existing tables in active use:
 - `sb_form_submissions`
 - `sb_private_messages`
 - `sb_profiles`
+- `sb_user_friends`
+- `sb_user_blocks`
 
 Current page/menu/form storage:
 
@@ -317,6 +438,8 @@ Current page/menu/form storage:
 - Menu and form builder metadata live in `settings_json`.
 - Form submissions live in `sb_form_submissions`.
 - Private replies/messages live in `sb_private_messages`.
+- Friend state lives in `sb_user_friends`.
+- Block state lives in `sb_user_blocks`.
 
 ## Current passed checkpoints retained from earlier manifest
 
@@ -355,6 +478,7 @@ Current page/menu/form storage:
 - `V7.12.265.1 Web Builder Protected Gate / No Admin Bypass` - PASS.
 - `V7.12.264.15 Pages Manager Personal Workspace Scope` - PASS.
 - `V7.12.116.4 Studio helper engine loader repair rollback checkpoint` - PASS.
+- `V7.12.299.7 Web Builder global rail, uploaded logo and inbox bridge` - PASS.
 
 ## Lessons locked
 
@@ -364,3 +488,22 @@ Current page/menu/form storage:
 - Apply Web Builder access locks at the page level first, using the proven Pages Manager pattern.
 - Do not rebuild a working app page just because it is being opened from Web Builder.
 - The real app inbox is working; preserve it and bridge to it.
+- The shared Web Builder rail now owns Web Builder route navigation.
+- The shared Web Builder projector now owns the Web Builder-only logo/avatar projection.
+- The accepted Web Builder logo fit is centered/contained, not cropped.
+
+## Resume order after this checkpoint
+
+1. Verify the shared rail and centered Web Builder logo on every primary Web Builder page.
+2. Add the shared projector script to any Web Builder page that does not yet show the accepted rail.
+3. Remove/hide duplicate local top-page button rows where the shared rail makes them redundant.
+4. After global rail verification, begin the separate Kayleigh/Creator Growth role/menu restriction pass.
+
+## Do not touch without approval
+
+- `index.html`
+- app registry/menu promotion
+- Supabase schema/RLS/storage policies
+- `web-builder-live-studio-v7-12-116.js`
+- `web-builder-protected-page-v7-12-265.js` unless specifically scanning the access decision
+- Stream Bandit global footer shell as a direct Studio injection
