@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.300.14
+# Stream Bandit Current App Manifest V7.12.300.23
 
 Date: 2026-06-16
 
@@ -6,17 +6,65 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.300.14 Admin Group Promoted To Index Candidate Tracker / Owner Group Later`
+`V7.12.300.23 Account/Profile + User Management Candidate Promotion`
 
-The main app rail rollout has now recorded all previously passed groups plus the completed Admin group as live-ready candidates so they can be tracked clearly before final live/homepage promotion.
+The Profile Account Centre and User Management simple delete queue have now been owner-tested and promoted into the `index.html` live-candidate tracker.
 
-These are candidate records only. This manifest update does not promote `index.html` to a final live homepage and does not change production behaviour. Root still redirects to Home.
+This is still candidate tracking only. It does not promote the root homepage/final live release. Root still redirects to Home after a short pause.
 
-Current next target group:
+## Promoted in this checkpoint
 
-`Owner - later, PDF-guided rail and usefulness pass`
+### Profile / Account Centre
 
-Owner group is intentionally deferred because the rail needs a different pass and the owner/user-management/Web Builder completion work changes more page behaviour than the Admin utility rail pass.
+Live candidate route:
+
+- `profile-settings-live-ready-v7-12-90-test.html`
+
+Passed source/fallback route:
+
+- `profile-settings-complete-v7-0-4-test.html`
+
+Promotion detail:
+
+- The old Profile Settings URL now forwards to the passed Profile Account Centre candidate.
+- The passed Account Centre can sign in existing users, load/save profile text, handle avatar/banner URLs, export account data, and save real account deletion requests into `sb_account_deletion_requests`.
+- It does not delete Auth users from the browser.
+- Real Auth deletion remains server-side through the Edge Function and User Management.
+
+Profile promotion commit:
+
+- `baecc2a863af8706ec2faaffdcdd51d4687136c8`
+
+### User Management Dashboard
+
+Live candidate route:
+
+- `user-management-dashboard-v7-11-2-test.html`
+
+Promotion detail:
+
+- User Management now includes the integrated simple delete request queue.
+- The tested standalone helper route remains only as fallback/reference:
+  - `user-management-delete-simple-v7-12-300-19-test.html`
+- The integrated page keeps User Management on its old URL.
+- It keeps users, manage selected, audit, safety and debug.
+- It adds Delete Requests.
+- Protected/admin/owner/platform-owner targets are decline/cancel only.
+- Spare normal account targets can be deleted only through the server-side `sb-account-delete` Edge Function.
+- Confirmation is only `DELETE`; no request ID or email field is required in the overlay.
+- No service-role key is in browser code.
+
+User Management promotion commit:
+
+- `506f800021ee42678492eed734aa1f3ba4ab9394`
+
+Index candidate tracker commit:
+
+- `af4f72180fb9ba0e043416dd7a5945d3d37927ec`
+
+## Safety note
+
+Do not use a real liked/active account as a delete test target. Keep Kayleigh/girlfriend account intact. Use only spare normal accounts for destructive delete tests.
 
 ## Current scanner rule
 
@@ -37,13 +85,11 @@ Scanner checks to preserve before any page change:
 
 No page change should add schema, RLS, storage policy, bucket policy, service-role, live-home promotion, or OpenAI/API keys.
 
-## Current `sb_table 1` scan snapshot
-
-Latest scanner:
+Latest scanner supplied by owner:
 
 `V7.12.300 SB Table Route Scanner`
 
-Known table list:
+Known table list still includes:
 
 - `sb_admin_audit_log`
 - `sb_app_settings`
@@ -69,43 +115,17 @@ Known table list:
 
 Unknown table tokens remain scanner/reference signals and must not be treated as proof of new schema work without inspecting the page source.
 
-## File-count / cleanup rule
-
-Do not grow the repository with endless checkpoint or page files. Routine carry-on memory goes into this manifest. Create a checkpoint only when a pass needs a separate record, and clear one clearly obsolete old checkpoint in the same cleanup pass. Do not create new page piles like `test-1`, `test-2`, `final`, `final-2`. Do not overwrite protected reference pages or working fallback pages. Do not remove accessibility, player comfort, Supabase migration/test, upload/Mux/storage, profile/auth/avatar, global shell/helper, registry, route, manifest, backup, or current checkpoint files unless the owner explicitly approves the specific cleanup.
-
-## Access / visibility model
-
-Owner pages are visible in the overlay for the platform owner and hidden for everyone else. Admin pages are operational pages for admin/owner users. Creator/builders receive only plan-allowed creator, group-play, and Web Builder areas. Viewers can use watch, saved, profile, and public/read pages as allowed. Signed-out users do not see Owner or User Management groups. Protected direct URLs should show a clear locked/not-allowed page, not blank crash.
-
-Special Policy Admin rule:
-
-- `policy-admin-documents-v7-12-120-test.html?policy=terms` is visible as a page to everyone who can reach it.
-- Kayleigh/non-admin users may view the page shell and route links only.
-- Editor tools remain owner/admin only.
-- Owner/admin can edit, save draft, publish, archive, and create defaults.
-- Policy Admin reads `sb_policy_documents` and `sb_profiles` and writes only `sb_policy_documents`.
-
-## Page polish standard
-
-Every page in the final polish pass should follow:
-
-- Header shell
-- page navigation pill rail directly under the header
-- hero/main summary
-- internal content tabs only when needed
-- page output/content underneath those tabs
-- Footer shell
-
-Clean-navigation rules:
-
-- Top rail owns page-to-page navigation.
-- Top rail sits directly under the header shell and above the hero.
-- Hero keeps only real page actions.
-- Do not duplicate route buttons inside hero when those routes already exist in the top rail.
-- Do not add duplicate route-card tabs when those routes already exist in the top rail.
-- Internal tabs are for current-page content only.
-
 ## Live candidate groups so far
+
+### Account + User Management - 2 promoted routes
+
+- `profile-settings-live-ready-v7-12-90-test.html`
+- `user-management-dashboard-v7-11-2-test.html`
+
+Support/fallback:
+
+- `profile-settings-complete-v7-0-4-test.html`
+- `user-management-delete-simple-v7-12-300-19-test.html`
 
 ### Watch group - 10 candidates
 
@@ -166,31 +186,16 @@ Clean-navigation rules:
 - `storage-prep-global-helpers-v7-10-8-test.html`
 - `backup-safety-global-helpers-v7-10-9-test.html`
 
-## Completed Admin group pass
+## Remaining planned work
 
-Admin group is complete and promoted to the `index.html` candidate tracker after owner test pass.
-
-Admin page commits in this pass:
-
-- Admin Centre: `d77a2bc0ed27f0ec5dafa62135172708bcafd5b8`
-- Live Readiness: `a24a0592c153c6e36a0ad3783747844938dd7810`
-- Current Routes Registry: `27e79324493e469d0e4c67ab528a6e3b67c1b577`
-- Test Checklist: `df29a5b7899e3d18a92a5e127a4ada43a759c592`
-- Tools: `c9fe83d67979278d589d120e696e15b83d4cfd69`
-- Health Check: `946f2bafcd14cabb6c998c83cc3869d2bbd8871c`
-- Mux Manager: `f8da89b401b3947d736f16483728438ef5bdbda5`
-- Storage Prep: `2d2784c8e8301b29b3b0934dc2cc4c127d206046`
-- Backup / Safety: `4736e013bf60406f8f37b4cc81a930509d880139`
-
-## Owner group later / PDF direction
-
-Owner group is not being started in this manifest update. The owner plan says the next larger completion work should avoid treating the project as a routing rescue and instead complete usefulness, account ownership, Web Builder canonical pages, user-management utility pages, and shell consistency.
-
-Do not force Owner group through the simple Admin utility rail pattern. Owner group needs a separate rail and usefulness pass because it includes pages that can change account/profile/user-management/building behaviour.
+- Pricing / Entitlements: convert rulebook into useful live entitlement viewer.
+- Permissions Inspector: convert rulebook into useful lock reasoning page.
+- Web Builder canonical pages: separate future usefulness and shell-consistency pass.
+- Login/logout centre: likely needed later to avoid scattered magic-link flows.
 
 ## Promotion status
 
-`index.html` has been updated as a candidate tracker for Admin group only.
+`index.html` has been updated as a candidate tracker for Profile Account Centre and User Management.
 
 This is not final live-home promotion.
 
