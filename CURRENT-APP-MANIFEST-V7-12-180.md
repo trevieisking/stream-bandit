@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.300.23
+# Stream Bandit Current App Manifest V7.12.300.24
 
 Date: 2026-06-16
 
@@ -6,13 +6,13 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.300.23 Account/Profile + User Management Candidate Promotion`
+`V7.12.300.24 Account/Profile + User Management Live Candidate Pass Complete`
 
-The Profile Account Centre and User Management simple delete queue have now been owner-tested and promoted into the `index.html` live-candidate tracker.
+The Profile Account Centre and User Management simple delete queue have now been owner-tested, promoted into the `index.html` live-candidate tracker, and marked as passed in the working checklist.
 
 This is still candidate tracking only. It does not promote the root homepage/final live release. Root still redirects to Home after a short pause.
 
-## Promoted in this checkpoint
+## Passed / promoted in this checkpoint
 
 ### Profile / Account Centre
 
@@ -26,14 +26,15 @@ Passed source/fallback route:
 
 Promotion detail:
 
-- The old Profile Settings URL now forwards to the passed Profile Account Centre candidate.
+- The old Profile Settings URL now loads the passed Profile Account Centre on the live route without forwarding away.
 - The passed Account Centre can sign in existing users, load/save profile text, handle avatar/banner URLs, export account data, and save real account deletion requests into `sb_account_deletion_requests`.
+- The Account Centre delete-request overlay was confirmed visible/working on the live profile route.
 - It does not delete Auth users from the browser.
 - Real Auth deletion remains server-side through the Edge Function and User Management.
 
-Profile promotion commit:
+Profile route pass commit:
 
-- `baecc2a863af8706ec2faaffdcdd51d4687136c8`
+- `add8a8b2623a5c7037924d89158383e4d4c1142c`
 
 ### User Management Dashboard
 
@@ -58,9 +59,22 @@ User Management promotion commit:
 
 - `506f800021ee42678492eed734aa1f3ba4ab9394`
 
-Index candidate tracker commit:
+Index candidate tracker commits:
 
 - `af4f72180fb9ba0e043416dd7a5945d3d37927ec`
+- `54dba54b52da0fd9df32ef28d47bcf2bfa759550`
+
+## Chat checklist status
+
+- [x] Profile Account Centre request flow passed.
+- [x] Live Profile Settings URL now opens the Account Centre flow.
+- [x] Delete request overlay available on live profile route.
+- [x] User Management integrated delete queue passed.
+- [x] Spare normal account deletion passed through Edge Function.
+- [x] Supabase Auth user disappearance confirmed after Supabase refresh.
+- [x] Kayleigh/girlfriend account preserved and explicitly protected from testing.
+- [x] Account/Profile + User Management routes added to `index.html` as live candidates.
+- [x] Current manifest checkpoint updated.
 
 ## Safety note
 
@@ -186,12 +200,15 @@ Support/fallback:
 - `storage-prep-global-helpers-v7-10-8-test.html`
 - `backup-safety-global-helpers-v7-10-9-test.html`
 
-## Remaining planned work
+## Next plan target
 
-- Pricing / Entitlements: convert rulebook into useful live entitlement viewer.
-- Permissions Inspector: convert rulebook into useful lock reasoning page.
-- Web Builder canonical pages: separate future usefulness and shell-consistency pass.
-- Login/logout centre: likely needed later to avoid scattered magic-link flows.
+Next target is the remaining Owner usefulness rail:
+
+1. Pricing / Entitlements - convert the rulebook into a useful live entitlement viewer.
+2. Permissions Inspector - convert the rulebook into useful live lock reasoning.
+3. Then Web Builder canonical pages - route map, control map, source map, header/footer code, menu builder, pages manager, preview and form designer.
+
+Do not start destructive account-delete retests unless using a spare normal account.
 
 ## Promotion status
 
