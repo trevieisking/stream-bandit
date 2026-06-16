@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.300.24
+# Stream Bandit Current App Manifest V7.12.300.28
 
 Date: 2026-06-16
 
@@ -6,9 +6,9 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.300.24 Account/Profile + User Management Live Candidate Pass Complete`
+`V7.12.300.28 Feature Shop / Pricing Live Candidate Pass`
 
-The Profile Account Centre and User Management simple delete queue have now been owner-tested, promoted into the `index.html` live-candidate tracker, and marked as passed in the working checklist.
+The Profile Account Centre, User Management simple delete queue, and Feature Shop / Pricing placeholder have now been owner-tested, promoted into the `index.html` live-candidate tracker, and marked as passed in the working checklist.
 
 This is still candidate tracking only. It does not promote the root homepage/final live release. Root still redirects to Home after a short pause.
 
@@ -59,10 +59,38 @@ User Management promotion commit:
 
 - `506f800021ee42678492eed734aa1f3ba4ab9394`
 
+### Feature Shop / Pricing Placeholder
+
+Live candidate route:
+
+- `plans-pricing-feature-shop-v7-11-3-test.html`
+
+Promotion detail:
+
+- Passed as a realistic preview-only Feature Shop / Pricing page.
+- Preserves 8 plan ideas and 24 add-on ideas.
+- Package builder totals and bundle saving preview work.
+- Coming Soon preview overlay works.
+- Creator gate / verified access concept is preserved as a placeholder.
+- Global header/footer helpers are active.
+- Page search/search overlay is hidden on this page.
+- Rail follows theme variables and passed the theme injector check.
+- No payment provider is connected.
+- No card collection, account upgrade, entitlement write, or billing write exists.
+- Real launch/commercial setup is postponed until database scale, Mux plan, payment setup, support rules, entitlement locks, moderation, and owner launch approval are ready.
+
+Feature Shop pass commits:
+
+- `31498c211a04387aaddf0687eb19a8f31faa34bd` - initial no-payment placeholder shop.
+- `f9bb1bc6a1220e07c18d1bf201934ab33e1c7010` - full idea bank preserved.
+- `c5ea6332c1f2d8de6adaef38007953593d79504f` - global header/footer aligned.
+- `a97a4dfc0a5112030e8ce02822a4d8ac6d03f78b` - theme rail pass.
+
 Index candidate tracker commits:
 
 - `af4f72180fb9ba0e043416dd7a5945d3d37927ec`
 - `54dba54b52da0fd9df32ef28d47bcf2bfa759550`
+- `c3dd3b832e27003e9cd4f9b8b77a06a3e1790af0`
 
 ## Chat checklist status
 
@@ -73,10 +101,21 @@ Index candidate tracker commits:
 - [x] Spare normal account deletion passed through Edge Function.
 - [x] Supabase Auth user disappearance confirmed after Supabase refresh.
 - [x] Kayleigh/girlfriend account preserved and explicitly protected from testing.
-- [x] Account/Profile + User Management routes added to `index.html` as live candidates.
+- [x] Feature Shop/Pricing keeps all plan and add-on ideas visible.
+- [x] Feature Shop/Pricing checkout remains preview-only.
+- [x] Feature Shop/Pricing global header/footer alignment passed.
+- [x] Feature Shop/Pricing search overlay hidden on page passed.
+- [x] Feature Shop/Pricing theme-injected rail passed.
+- [x] Account/Profile + User Management + Feature Shop routes added to `index.html` as live candidates.
 - [x] Current manifest checkpoint updated.
 
-## Safety note
+## Payment / launch safety note
+
+Stream Bandit remains free/preview-only for payment-related features at this checkpoint. Real commercial launch is intentionally delayed until the platform is ready, the database plan is chosen, Mux/streaming costs are planned, payment setup is implemented correctly, and the official launch checklist is passed.
+
+No page should connect a payment provider, collect card details, create subscriptions, upgrade accounts, write paid entitlements, or promise paid creator gates before the formal launch/payment plan is approved.
+
+## Account deletion safety note
 
 Do not use a real liked/active account as a delete test target. Keep Kayleigh/girlfriend account intact. Use only spare normal accounts for destructive delete tests.
 
@@ -97,7 +136,7 @@ Scanner checks to preserve before any page change:
 - overlay flag
 - unknown table tokens
 
-No page change should add schema, RLS, storage policy, bucket policy, service-role, live-home promotion, or OpenAI/API keys.
+No page change should add schema, RLS, storage policy, bucket policy, service-role, live-home promotion, or API keys.
 
 Latest scanner supplied by owner:
 
@@ -131,10 +170,11 @@ Unknown table tokens remain scanner/reference signals and must not be treated as
 
 ## Live candidate groups so far
 
-### Account + User Management - 2 promoted routes
+### Account + User Management - 3 promoted routes
 
 - `profile-settings-live-ready-v7-12-90-test.html`
 - `user-management-dashboard-v7-11-2-test.html`
+- `plans-pricing-feature-shop-v7-11-3-test.html`
 
 Support/fallback:
 
@@ -204,15 +244,15 @@ Support/fallback:
 
 Next target is the remaining Owner usefulness rail:
 
-1. Pricing / Entitlements - convert the rulebook into a useful live entitlement viewer.
-2. Permissions Inspector - convert the rulebook into useful live lock reasoning.
-3. Then Web Builder canonical pages - route map, control map, source map, header/footer code, menu builder, pages manager, preview and form designer.
+1. Permissions Inspector - convert the rulebook into useful live lock reasoning.
+2. Web Builder canonical pages - route map, control map, source map, header/footer code, menu builder, pages manager, preview and form designer.
+3. Later official launch/payment plan - database capacity, Mux plan, payment setup, entitlements, support/refund rules, creator gate verification, and launch checklist.
 
 Do not start destructive account-delete retests unless using a spare normal account.
 
 ## Promotion status
 
-`index.html` has been updated as a candidate tracker for Profile Account Centre and User Management.
+`index.html` has been updated as a candidate tracker for Profile Account Centre, User Management and Feature Shop.
 
 This is not final live-home promotion.
 
