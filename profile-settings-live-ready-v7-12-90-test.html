@@ -3,23 +3,1104 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="0; url=profile-settings-complete-v7-0-4-test.html">
-<title>Stream Bandit Profile Account Centre V7.12.300.23 LIVE CANDIDATE</title>
+<title>Stream Bandit Profile Settings V7.12.296.3</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 8% 0,#22d3a633,transparent 34%),radial-gradient(circle at 92% 0,#7c3cff3d,transparent 38%),linear-gradient(180deg,#070910,#050711);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.card{width:min(900px,100%);border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 18px 58px #0008;padding:22px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,66px);line-height:.95;letter-spacing:-.055em;margin:12px 0}.muted,p{color:var(--muted);line-height:1.5}.btn{display:inline-flex;margin-top:12px;border-radius:999px;padding:12px 16px;background:linear-gradient(135deg,var(--good),var(--purple));color:#061017;font-weight:950;text-decoration:none}.hot{background:linear-gradient(135deg,var(--pink),var(--purple));color:white}code{color:#baf7df;overflow-wrap:anywhere}
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--card:#ffffff0f;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
+body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}
+.wrap{max-width:1500px;margin:auto}
+.hero,.box,.card,.modalCard,.stat,.check,.routeCard,.drop,.fileMeta{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 48px #0007;padding:16px;margin-bottom:14px}
+.card,.stat,.check,.routeCard,.fileMeta{background:var(--card);box-shadow:none;margin-bottom:0}
+.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950}
+.badge{padding:7px 12px}
+.pill{padding:5px 8px;font-size:12px;margin:2px}
+.warnPill{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}
+.badPill{background:#ff4d6d24;border-color:#ff4d6d57;color:#ffd2d9}
+.infoPill{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}
+h1{font-size:clamp(38px,5.6vw,74px);line-height:.95;margin:10px 0;letter-spacing:-.06em}
+h2,h3{margin:0 0 12px}
+.muted,p,label,small,li{color:var(--muted);line-height:1.5}
+code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5px;color:#dfffee;overflow-wrap:anywhere;word-break:break-word}
+.heroGrid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(320px,480px);gap:18px}
+.profileArt{border:1px solid #ffffff1a;border-radius:30px;background:#0004;overflow:hidden;min-height:350px;display:grid;grid-template-rows:1fr auto}
+.banner{min-height:220px;background:linear-gradient(135deg,#22d3a620,#7c3cff35);display:grid;place-items:center;overflow:hidden}
+.banner img,.avatar img,.preview img,.modalPreview img{width:100%;height:100%;object-fit:cover}
+.profileInfo{padding:18px;display:flex;gap:14px;align-items:center}
+.avatar{width:112px;height:112px;border-radius:28px;background:#0005;border:1px solid #ffffff24;display:grid;place-items:center;overflow:hidden;flex:0 0 auto}
+.preview{height:180px;border-radius:20px;background:#0005;border:1px solid #ffffff24;display:grid;place-items:center;overflow:hidden}
+.actions,.tabs{display:flex;gap:9px;flex-wrap:wrap;margin-top:9px}
+.btn,.tab,.locked{border:0;border-radius:999px;padding:11px 15px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.btn:disabled,.locked{opacity:.62;cursor:not-allowed}
+.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}
+.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}
+.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}
+.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}
+.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--pink))}
+.status,.note,.danger,.good,.safe{padding:12px 14px;border-radius:18px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:14px}
+.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}
+.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}
+.good,.safe{background:#22d3a61f}
+.grid,.stats,.checks,.routeGrid,.twoGrid{display:grid;gap:12px}
+.grid,.stats,.checks{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.twoGrid{grid-template-columns:minmax(280px,1fr) minmax(280px,1fr)}
+.routeGrid{grid-template-columns:repeat(auto-fill,minmax(245px,1fr))}
+.card b,.stat b,.check b,.routeCard b,.fileMeta b{display:block;color:#baf7df;margin-bottom:8px}
+.card span.big,.stat span{display:block;font-size:clamp(20px,2.2vw,30px);font-weight:950;line-height:1.05;overflow-wrap:anywhere}
+.field input,.field textarea,input,textarea{width:100%;border:1px solid #ffffff24;border-radius:14px;background:#0005;color:#fff;padding:12px;font:inherit;margin:7px 0}
+.field textarea,textarea{min-height:120px}
+.section{display:none}
+.section.active{display:block}
+.source{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#0006;border-radius:16px;padding:14px;color:#dfffee;max-height:420px;overflow:auto}
+.modal{position:fixed;inset:0;background:#000b;display:none;z-index:100000;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
+.modal.open{display:flex}
+.modalCard{width:min(980px,100%)}
+.modalHead{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #ffffff18;padding-bottom:14px;margin-bottom:14px}
+.modalGrid{display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:14px}
+.modalPreview{height:260px;border-radius:22px;background:#0005;border:1px solid #ffffff24;display:grid;place-items:center;overflow:hidden}
+.drop{position:relative;display:grid;place-items:center;border:2px dashed #ffffff38;background:linear-gradient(135deg,#22d3a612,#7c3cff18),#0005;padding:26px;text-align:center;cursor:pointer;min-height:210px;transition:transform .15s ease,border-color .15s ease,background .15s ease;box-shadow:none}
+.drop:hover,.drop.drag{border-color:var(--accent);background:linear-gradient(135deg,#22d3a622,#7c3cff28),#0006;transform:translateY(-1px)}
+.drop input{position:absolute;inset:0;opacity:0;pointer-events:none}
+.dropIcon{font-size:44px;margin-bottom:8px}
+.drop b{display:block;color:#fff;margin-bottom:8px;font-size:20px}
+.drop .fakeButton{display:inline-flex;margin-top:12px;border-radius:999px;padding:9px 13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017;font-weight:950}
+.toast{position:fixed;right:18px;bottom:18px;background:#12172a;color:#fff;border:1px solid #ffffff35;border-radius:16px;padding:13px 16px;box-shadow:0 16px 44px #0009;font-weight:900;z-index:100001}
+.routeStrip{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.routeStrip span{border:1px solid #ffffff1a;border-radius:999px;background:#0003;color:#dfffee;font-weight:900;padding:5px 8px;font-size:11px}
+.routeCard code{display:block;margin:8px 0;padding:9px;border-radius:12px;background:#0006}
+.pillTabs{padding:10px 12px;border-radius:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--p),#000 14%),color-mix(in srgb,var(--p2),#000 8%));border-color:var(--line);box-shadow:0 10px 30px #0007}
+.pillTabs.topRail{margin-top:-2px}
+.pillTabs .tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pagePill{border:1px solid color-mix(in srgb,var(--line),var(--accent) 22%);border-radius:999px;padding:11px 17px;background:color-mix(in srgb,var(--p),#000 18%);color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;box-shadow:inset 0 1px #ffffff12}
+.pagePill.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:color-mix(in srgb,var(--accent),#fff 18%);color:#061017}
+.pagePill.back{background:color-mix(in srgb,var(--p),#000 24%)}
+.mini{text-align:center;color:#8f98b8;margin:28px 0;font-size:12px}
+@media(max-width:980px){
+ body{padding:10px}
+ .heroGrid,.modalGrid,.twoGrid{grid-template-columns:1fr}
+ .btn,.tab,.locked,.pagePill{width:100%;white-space:normal}
+ .routeGrid{grid-template-columns:1fr}
+}
 </style>
 </head>
-<body>
-<main class="card">
-<span class="badge">V7.12.300.23 Profile Account Centre promoted</span>
-<h1>Opening Profile Account Centre</h1>
-<p>This old Profile Settings route now forwards to the passed Profile Account Centre candidate.</p>
-<p><code>profile-settings-live-ready-v7-12-90-test.html</code> → <code>profile-settings-complete-v7-0-4-test.html</code></p>
-<a class="btn hot" href="profile-settings-complete-v7-0-4-test.html">Open Profile Account Centre</a>
-<a class="btn" href="user-management-dashboard-v7-11-2-test.html">Open User Management</a>
-</main>
-<script>try{location.replace('profile-settings-complete-v7-0-4-test.html');}catch(e){}</script>
+<body data-sb-profile-menu-url="profile-settings-live-ready-v7-12-90-test.html">
+<div class="wrap">
+
+<section class="box pillTabs topRail">
+  <div class="tabs" aria-label="Settings group page links">
+    <button class="pagePill back" id="backBtn" type="button">Back</button>
+    <a class="pagePill" href="home-global-helpers-v7-4-4-test.html">Hub</a>
+    <a class="pagePill" href="settings-platform-control-hub-v7-12-85-test.html">Settings Hub</a>
+    <a class="pagePill" href="web-builder-theme-studio-controls-v7-8-9-test.html">Theme Studio</a>
+    <a class="pagePill active" href="profile-settings-live-ready-v7-12-90-test.html">Profile Settings</a>
+    <a class="pagePill" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Web Builder</a>
+    <a class="pagePill" href="web-builder-pages-manager-v7-12-111-test.html">Pages Manager</a>
+    <a class="pagePill" href="settings-brand-icons-promoted-v7-12-21-test.html">Brand / App Icons</a>
+    <a class="pagePill" href="brand-logo-helper-responsive-v7-12-20-test.html">Brand Helper</a>
+    <a class="pagePill" href="favicon-app-icon-builder-v7-12-15-test.html">Favicon Builder</a>
+    <a class="pagePill" href="accessibility-clean-machine-v7-12-44-test.html">Accessibility</a>
+  </div>
+</section>
+
+<section class="hero">
+  <div class="heroGrid">
+    <div>
+      <span class="badge">V7.12.296.3 Profile Settings · Borrowed Brand Upload Overlay</span>
+      <h1>Profile Settings</h1>
+      <p>Profile Settings now uses the same working select, preview, upload and save pattern from Brand / App Icons, but saves the uploaded URL to the signed-in user’s <code>sb_profiles.avatar_url</code> or <code>sb_profiles.banner_url</code>.</p>
+      <div class="routeStrip">
+        <span>Auth → current session</span>
+        <span>Avatar → sb_profiles.avatar_url</span>
+        <span>Banner → sb_profiles.banner_url</span>
+        <span>Upload → stream-bandit-images/profiles</span>
+        <span>Header left image → profile avatar on this page</span>
+      </div>
+
+      <div class="card">
+        <b>Account sign-in</b>
+        <label>Email address</label>
+        <input id="emailInput" type="email" placeholder="you@example.com" autocomplete="email">
+        <div class="actions">
+          <button id="sendMagic" class="btn hot" type="button">Send Sign-in Link</button>
+          <button id="refreshSession" class="btn" type="button">Refresh Sign-in</button>
+          <button id="signOutBtn" class="btn dangerBtn" type="button">Sign Out</button>
+        </div>
+        <div id="accountStatus" class="status">Checking sign-in...</div>
+        <div class="note">Existing users only: magic links use <b>shouldCreateUser: false</b>, so this page should not create new public Auth accounts.</div>
+      </div>
+
+      <div class="actions">
+        <button id="loadProfile" class="btn primary" type="button">Load Profile</button>
+        <button id="createProfile" class="btn cyan" type="button">Create Missing Profile Row</button>
+        <button id="saveText" class="btn hot" type="button">Save Text</button>
+        <button id="openAvatar" class="btn cyan" type="button">Avatar Overlay</button>
+        <button id="openBanner" class="btn warn" type="button">Banner Overlay</button>
+        <button id="applyAvatarHeader" class="btn" type="button">Apply Avatar To Header Image</button>
+      </div>
+
+      <div id="helperStatus" class="status">Checking helpers...</div>
+      <div id="status" class="status">Loading profile...</div>
+      <div class="note">This page borrows the Brand / App Icons upload flow, but it does not save to <code>sb_app_settings.logoUrl</code>. It saves to the current profile row.</div>
+    </div>
+
+    <div class="profileArt">
+      <div id="bannerHero" class="banner">Banner preview</div>
+      <div class="profileInfo">
+        <div id="avatarHero" class="avatar">👤</div>
+        <div>
+          <h2 id="heroName">Profile name</h2>
+          <p id="heroUser">@username</p>
+          <span id="heroRole" class="pill">Role</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="box">
+  <div class="stats">
+    <div class="stat"><b>Signed in</b><span id="statSigned">--</span><p>Supabase Auth state.</p></div>
+    <div class="stat"><b>Profile row</b><span id="statProfile">--</span><p>Current signed-in user’s sb_profiles row.</p></div>
+    <div class="stat"><b>Avatar URL</b><span id="statAvatar">--</span><p>Reads and writes sb_profiles.avatar_url.</p></div>
+    <div class="stat"><b>Header image</b><span id="statHeader">--</span><p>Current Profile page header image ownership.</p></div>
+    <div class="stat"><b>Signup mode</b><span>Locked</span><p>Existing users only.</p></div>
+  </div>
+</section>
+
+<section class="box">
+  <div class="tabs">
+    <button class="tab active" data-tab="profile" type="button">Profile Text</button>
+    <button class="tab" data-tab="images" type="button">Images</button>
+    <button class="tab" data-tab="bridgeSec" type="button">Header Image Bridge</button>
+    <button class="tab" data-tab="testSec" type="button">Test Guide</button>
+    <button class="tab" data-tab="debugSec" type="button">Debug</button>
+  </div>
+</section>
+
+<section id="profile" class="box section active">
+  <h2>Profile text</h2>
+  <div class="grid">
+    <div class="card field"><label>Display name</label><input id="displayName" maxlength="80"></div>
+    <div class="card field"><label>Username</label><input id="username" maxlength="60"></div>
+    <div class="card field"><label>Channel name</label><input id="channelName" maxlength="90"></div>
+    <div class="card field"><label>Channel about / bio</label><textarea id="channelAbout" maxlength="500"></textarea></div>
+  </div>
+</section>
+
+<section id="images" class="box section">
+  <h2>Profile image editors</h2>
+  <div class="twoGrid">
+    <div class="card">
+      <b>Avatar</b>
+      <div id="avatarPreview" class="avatar">👤</div>
+      <p>This saves to <code>sb_profiles.avatar_url</code> for the current signed-in user.</p>
+      <input id="avatarUrl" readonly placeholder="avatar_url">
+      <div class="actions"><button id="openAvatar2" class="btn cyan" type="button">Open Avatar Overlay</button></div>
+    </div>
+    <div class="card">
+      <b>Banner</b>
+      <div id="bannerPreview" class="preview">Banner</div>
+      <p>This saves to <code>sb_profiles.banner_url</code> for the current signed-in user.</p>
+      <input id="bannerUrl" readonly placeholder="banner_url">
+      <div class="actions"><button id="openBanner2" class="btn warn" type="button">Open Banner Overlay</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="bridgeSec" class="box section">
+  <h2>Header image bridge</h2>
+  <div class="checks">
+    <div class="check"><b>Borrowed flow</b><p>The profile overlay uses the same select / local preview / upload / save-public-URL pattern as Brand / App Icons.</p></div>
+    <div class="check"><b>Different target</b><p>Brand / App Icons saves global logo to app settings. Profile Settings saves current user avatar to <code>sb_profiles.avatar_url</code>.</p></div>
+    <div class="check"><b>Profile page header image</b><p>After avatar save, this page changes the top left header image to the signed-in profile avatar and removes brand-logo helper ownership from that image on this page.</p></div>
+    <div class="check"><b>Shell future-proof</b><p>The profile-updated event and profile cache are still sent so Header Shell can read this avatar site-wide.</p></div>
+  </div>
+  <div id="bridgeStatus" class="safe">Waiting for profile load...</div>
+</section>
+
+<section id="testSec" class="box section">
+  <h2>Spare-account test guide</h2>
+  <div class="grid">
+    <div class="card"><b>Your account</b><p>Sign in, upload avatar, and the top left image on this Profile Settings page should change to your profile avatar.</p></div>
+    <div class="card"><b>Kayleigh account</b><p>Use another browser/private window, sign in as Kayleigh, upload her avatar, and the top left image should change to her avatar there.</p></div>
+    <div class="card"><b>No global logo overwrite</b><p>This page must not write Kayleigh’s avatar into <code>sb_app_settings.logoUrl</code>.</p></div>
+    <div class="card"><b>Header proof</b><p>Debug shows the active Auth user, sb_profiles row, cached profile payload, and header image source.</p></div>
+  </div>
+</section>
+
+<section id="debugSec" class="box section">
+  <h2>Debug</h2>
+  <div id="debug" class="source">Waiting...</div>
+</section>
+
+<p class="mini">V7.12.296.3 Profile Settings — borrowed Brand/App Icons upload overlay, profile-scoped save target, avatar applied to Profile page header image.</p>
+</div>
+
+<div id="imageModal" class="modal">
+  <div class="modalCard">
+    <div class="modalHead">
+      <div>
+        <span class="badge" id="modalBadge">Profile Image Overlay</span>
+        <h2 id="modalTitle">Upload profile image</h2>
+        <p class="muted">This overlay borrows the Brand / App Icons flow: drop or choose image, preview, upload, then save the uploaded public URL. The save target is <code>sb_profiles</code>.</p>
+      </div>
+      <button id="closeImageModal" class="btn" type="button">Close</button>
+    </div>
+
+    <div class="modalGrid">
+      <div>
+        <label class="drop" id="dropZone">
+          <input id="modalFile" type="file" accept="image/png,image/jpeg,image/webp,image/*">
+          <span class="dropIcon">⬆️🖼️</span>
+          <b id="dropTitle">Drag & drop image here</b>
+          <span class="muted">or click this panel to choose PNG, JPEG or WEBP</span>
+          <span class="fakeButton">Choose image</span>
+        </label>
+        <div id="fileMeta" class="fileMeta"><b>No image selected.</b><br><span class="muted">Drop an image to preview it before upload.</span></div>
+      </div>
+      <div>
+        <h3>Selected / uploaded preview</h3>
+        <div id="modalPreview" class="modalPreview">Preview</div>
+        <label class="muted">Public URL after upload</label>
+        <input id="modalUrl" readonly placeholder="Public URL will appear here">
+        <div class="actions">
+          <button id="uploadImage" class="btn primary" type="button">Upload Image</button>
+          <button id="saveUploaded" class="btn hot" type="button" disabled>Save Uploaded URL To Profile</button>
+          <button id="applyPreviewHeader" class="btn cyan" type="button">Apply Preview To Header Image</button>
+          <button id="clearSelection" class="btn" type="button">Clear Selection</button>
+        </div>
+        <div id="modalStatus" class="status">Waiting...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="stream-bandit-shell-v6-24.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=profile-brand-flow-296-3"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=profile-brand-flow-296-3"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=profile-brand-flow-296-3"></script>
+
+<script>
+(function(){
+'use strict';
+
+const VERSION='V7.12.296.3 Profile Settings Borrowed Brand Upload Overlay';
+const BUCKET='stream-bandit-images';
+const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+const PROFILE_CACHE_KEYS=['sb_header_profile_cache_v7_12_156','streamBanditProfile','sb_profile'];
+
+let sbClient=null;
+let user=null;
+let profile=null;
+let selectedFile=null;
+let localObjectUrl='';
+let uploadedUrl='';
+let previewUrl='';
+let currentKind='avatar';
+let countBusy=false;
+let countReady=false;
+let lastCountRead=0;
+
+const $=id=>document.getElementById(id);
+
+const debugState={
+ version:VERSION,
+ page:'profile-settings-live-ready-v7-12-90-test.html',
+ borrowedBrandUploadFlow:true,
+ profileScopedUpload:true,
+ brandLogoWrites:false,
+ writesAppSettingsLogoUrl:false,
+ writesSbProfilesAvatar:true,
+ schemaChange:false,
+ storagePolicyChange:false,
+ rlsChange:false,
+ indexPromotion:false
+};
+
+function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c));}
+function clean(v,n){return String(v||'').trim().slice(0,n);}
+function formatSize(n){n=Number(n)||0;if(n>1024*1024)return (n/1024/1024).toFixed(2)+' MB';if(n>1024)return Math.round(n/1024)+' KB';return n+' B';}
+function toast(m){let t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2400);}
+function status(t,b){$('status').textContent=t;$('status').className=b?'danger':'status';}
+function acct(t,b){$('accountStatus').textContent=t;$('accountStatus').className=b?'note':'status';}
+function modal(t,b){$('modalStatus').textContent=t;$('modalStatus').className=b?'note':'status';}
+function client(){if(sbClient)return sbClient;sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return sbClient;}
+
+function settingsGlobalLoaded(){return !!(window.StreamBanditSettingsGlobal||window.StreamBanditSettingsGlobalV718||window.StreamBanditSettingsGlobalV718Ready);}
+function brandLoaded(){return !!(window.StreamBanditBrandLogo||window.StreamBanditBrandLogoV71212||window.StreamBanditBrandLogoHelper);}
+
+function roleOf(p){return p&&p.role?p.role:'user';}
+function nameOf(p){return clean((p&&p.display_name)||(p&&p.channel_name)||(p&&p.username)||(user&&user.email?user.email.split('@')[0]:'Profile name'),90);}
+function usernameOf(p){return clean((p&&p.username)||(user&&user.email?user.email.split('@')[0]:'username'),60);}
+function avatarOf(p){return clean((p&&p.avatar_url)||(p&&p.avatar)||(p&&p.profile_image_url)||(p&&p.image_url)||'',900);}
+function bannerOf(p){return clean((p&&p.banner_url)||(p&&p.banner)||(p&&p.cover_url)||'',900);}
+
+function showImg(id,url,fallback){
+ let el=$(id);
+ if(!el)return;
+ el.innerHTML=url?'<img src="'+esc(url)+'" alt="">':fallback;
+}
+
+function payloadForHeader(p){
+ if(!user||!p||!p.id||String(p.id)!==String(user.id))return null;
+
+ return {
+  id:p.id,
+  auth_user_id:user.id,
+  email:user.email||'',
+  username:p.username||'',
+  display_name:p.display_name||'',
+  displayName:p.display_name||'',
+  channel_name:p.channel_name||'',
+  channelName:p.channel_name||'',
+  channel_about:p.channel_about||'',
+  avatar_url:p.avatar_url||'',
+  avatar:p.avatar_url||'',
+  profile_image_url:p.avatar_url||'',
+  banner_url:p.banner_url||'',
+  role:p.role||'user',
+  can_submit:!!p.can_submit,
+  updated_at:p.updated_at||new Date().toISOString(),
+  cacheOwner:'profile-settings-borrowed-brand-overlay',
+  cacheVersion:VERSION
+ };
+}
+
+function clearProfileCache(){
+ PROFILE_CACHE_KEYS.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
+}
+
+function cacheProfileForHeader(p){
+ let payload=payloadForHeader(p);
+
+ if(!payload)return false;
+
+ PROFILE_CACHE_KEYS.forEach(k=>{try{localStorage.setItem(k,JSON.stringify(payload));}catch(e){}});
+ try{localStorage.setItem('streamBanditProfileUpdatedAt',new Date().toISOString());}catch(e){}
+
+ return true;
+}
+
+function dispatchProfileUpdated(reason){
+ let payload=payloadForHeader(profile);
+
+ if(!payload)return false;
+
+ try{window.dispatchEvent(new CustomEvent('streambandit-profile-updated',{detail:{profile:payload,reason:reason||'profile-settings'}}));}catch(e){}
+ try{window.dispatchEvent(new CustomEvent('streambandit-account-updated',{detail:{profile:payload,reason:reason||'profile-settings'}}));}catch(e){}
+ try{window.dispatchEvent(new CustomEvent('streambandit-header-profile-updated',{detail:{profile:payload,reason:reason||'profile-settings'}}));}catch(e){}
+
+ return true;
+}
+
+function profileImageForKind(){
+ return currentKind==='avatar'?avatarOf(profile):bannerOf(profile);
+}
+
+function applyUrl(url,source){
+ url=String(url||'').trim();
+
+ if(!url)return '';
+
+ if(currentKind==='avatar'){
+  $('avatarUrl').value=url;
+  showImg('avatarHero',url,'👤');
+  showImg('avatarPreview',url,'👤');
+ }else{
+  $('bannerUrl').value=url;
+  showImg('bannerHero',url,'Banner preview');
+  showImg('bannerPreview',url,'Banner');
+ }
+
+ if(currentKind==='avatar'){
+  applyAvatarToHeaderImage(url,source||'profile-apply-url');
+ }
+
+ debug({applyUrl:true,source:source||'profile',kind:currentKind,url:url});
+ return url;
+}
+
+function applyAvatarToHeaderImage(url,source){
+ url=String(url||avatarOf(profile)||$('avatarUrl').value||'').trim();
+
+ if(!url)return false;
+
+ let img=document.getElementById('sbHeaderBrandLogo');
+
+ if(img&&img.tagName&&img.tagName.toLowerCase()==='img'){
+  img.removeAttribute('data-sb-brand-logo');
+  img.setAttribute('data-sb-profile-avatar','true');
+  img.setAttribute('data-sb-profile-avatar-source',source||'profile-settings');
+  img.setAttribute('data-sb-profile-avatar-user-id',user&&user.id?user.id:'');
+  img.src=url;
+  img.alt='Signed-in profile avatar';
+ }
+
+ let logoBox=img&&img.closest?img.closest('.sb-h-logo'):null;
+
+ if(logoBox){
+  logoBox.setAttribute('data-sb-profile-avatar-box','true');
+  logoBox.setAttribute('title','Signed-in profile avatar');
+ }
+
+ $('statHeader').textContent='Avatar';
+ $('bridgeStatus').textContent='Profile Settings applied the signed-in profile avatar to the header image on this page.';
+ $('bridgeStatus').className='safe';
+
+ debug({headerImageApplied:true,source:source||'profile-settings',url:url});
+ return true;
+}
+
+async function refreshHeaderShell(reason){
+ let cached=cacheProfileForHeader(profile);
+ let eventSent=dispatchProfileUpdated(reason);
+
+ try{
+  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refreshProfile){
+   await window.StreamBanditHeaderShell.refreshProfile(false);
+  }else if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refreshAuth){
+   await window.StreamBanditHeaderShell.refreshAuth(false,true);
+  }
+ }catch(e){}
+
+ try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
+ try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateAccount)window.StreamBanditHeaderShell.updateAccount();}catch(e){}
+ try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateAccountPanel)window.StreamBanditHeaderShell.updateAccountPanel();}catch(e){}
+
+ if(avatarOf(profile)){
+  setTimeout(()=>applyAvatarToHeaderImage(avatarOf(profile),'header-shell-refresh-1'),120);
+  setTimeout(()=>applyAvatarToHeaderImage(avatarOf(profile),'header-shell-refresh-2'),500);
+  setTimeout(()=>applyAvatarToHeaderImage(avatarOf(profile),'header-shell-refresh-3'),1200);
+ }
+
+ $('statHeader').textContent=cached||eventSent?'Notified':'--';
+
+ debug({headerRefreshReason:reason||'manual',cached,eventSent});
+}
+
+function render(){
+ let av=$('avatarUrl').value||avatarOf(profile);
+ let bn=$('bannerUrl').value||bannerOf(profile);
+ let name=$('displayName').value||$('channelName').value||nameOf(profile);
+ let un=$('username').value||usernameOf(profile);
+
+ showImg('avatarHero',av,'👤');
+ showImg('avatarPreview',av,'👤');
+ showImg('bannerHero',bn,'Banner preview');
+ showImg('bannerPreview',bn,'Banner');
+
+ $('heroName').textContent=name;
+ $('heroUser').textContent='@'+un;
+ $('heroRole').textContent='Role: '+roleOf(profile);
+
+ stats();
+
+ if(av)applyAvatarToHeaderImage(av,'render');
+
+ debug();
+}
+
+function fill(p){
+ profile=p&&p.id?p:{};
+
+ $('displayName').value=profile.display_name||'';
+ $('username').value=profile.username||'';
+ $('channelName').value=profile.channel_name||'';
+ $('channelAbout').value=profile.channel_about||'';
+ $('avatarUrl').value=profile.avatar_url||'';
+ $('bannerUrl').value=profile.banner_url||'';
+
+ render();
+
+ if(profile.id&&user&&String(profile.id)===String(user.id))refreshHeaderShell('fill-profile');
+}
+
+function stats(){
+ $('statSigned').textContent=user?'Yes':'No';
+ $('statProfile').textContent=profile&&profile.id?'Loaded':'--';
+ $('statAvatar').textContent=avatarOf(profile)?'Set':'--';
+}
+
+async function refreshSession(){
+ try{
+  let c=client();
+  let sess=await c.auth.getSession();
+
+  user=sess.data&&sess.data.session?sess.data.session.user:null;
+
+  if(user){
+   $('emailInput').value=user.email||$('emailInput').value;
+   acct('Signed in as '+(user.email||user.id)+'.');
+  }else{
+   acct('Signed out. Existing users can request a sign-in link.',true);
+   profile=null;
+   clearProfileCache();
+   fill({});
+  }
+
+  stats();
+  debug();
+
+  return user;
+ }catch(e){
+  acct('Session check failed: '+(e.message||e),true);
+  debug({sessionError:e.message||String(e)});
+  return null;
+ }
+}
+
+async function sendMagic(){
+ let email=clean($('emailInput').value,120);
+
+ if(!email||!email.includes('@')){
+  acct('Enter a valid existing-user email first.',true);
+  return;
+ }
+
+ try{
+  let c=client();
+  let r=await c.auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:window.location.href}});
+
+  if(r.error)throw r.error;
+
+  acct('Sign-in link sent to existing user '+email+'. If this email is not already registered, Supabase should not create it.');
+  toast('Sign-in link sent');
+ }catch(e){
+  acct('Sign-in link failed: '+(e.message||e)+'. If the email is new, this is expected while public signup is locked.',true);
+ }
+}
+
+async function signOut(){
+ try{
+  let c=client();
+
+  await c.auth.signOut();
+
+  user=null;
+  profile=null;
+  clearProfileCache();
+
+  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.signOut)await window.StreamBanditHeaderShell.signOut();}catch(e){}
+
+  fill({});
+  acct('Signed out. Existing users can sign in again.',true);
+  status('Signed out.');
+  toast('Signed out');
+
+  stats();
+  debug({signedOut:true});
+ }catch(e){
+  acct('Sign out failed: '+(e.message||e),true);
+ }
+}
+
+async function loadProfile(){
+ try{
+  let c=client();
+
+  if(!await refreshSession()){
+   status('Signed out. Sign in first.',true);
+   return;
+  }
+
+  let r=await c.from('sb_profiles').select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,updated_at').eq('id',user.id).maybeSingle();
+
+  if(r.error)throw r.error;
+
+  if(!r.data){
+   profile=null;
+   fill({username:(user.email||'user').split('@')[0],display_name:(user.email||'User').split('@')[0]});
+   status('Profile row not found. Create Missing Profile Row only if this Auth user already exists and should have a profile.',true);
+   return;
+  }
+
+  fill(r.data);
+  status('Profile loaded from sb_profiles for current signed-in user.');
+  await refreshHeaderShell('load-profile');
+ }catch(e){
+  status('Profile load failed: '+(e.message||e),true);
+  debug({loadProfileError:e.message||String(e)});
+ }
+}
+
+async function createProfile(){
+ try{
+  let c=client();
+
+  if(!await refreshSession()){
+   status('Sign in first before creating a profile row.',true);
+   return;
+  }
+
+  let base=(user.email||'user').split('@')[0].replace(/[^a-z0-9_\-]/gi,'').slice(0,40)||'user';
+
+  let row={
+   id:user.id,
+   username:clean($('username').value||base,60),
+   display_name:clean($('displayName').value||base,80),
+   channel_name:clean($('channelName').value||base+' Channel',90),
+   channel_about:clean($('channelAbout').value||'',500),
+   avatar_url:clean($('avatarUrl').value||'',900),
+   banner_url:clean($('bannerUrl').value||'',900),
+   role:'user',
+   can_submit:false,
+   updated_at:new Date().toISOString()
+  };
+
+  let r=await c.from('sb_profiles').insert(row).select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,updated_at').maybeSingle();
+
+  if(r.error)throw r.error;
+
+  fill(r.data||row);
+
+  status('Missing profile row created for existing signed-in Auth user.');
+  toast('Profile row created');
+  await refreshHeaderShell('create-profile');
+ }catch(e){
+  status('Create profile row failed: '+(e.message||e)+'. If this is blocked, RLS needs a planned fix.',true);
+  debug({createProfileError:e.message||String(e)});
+ }
+}
+
+async function saveText(){
+ try{
+  let c=client();
+
+  if(!await refreshSession()){
+   status('Sign in first.',true);
+   return;
+  }
+
+  let patch={
+   display_name:clean($('displayName').value,80),
+   username:clean($('username').value,60),
+   channel_name:clean($('channelName').value,90),
+   channel_about:clean($('channelAbout').value,500),
+   updated_at:new Date().toISOString()
+  };
+
+  let r=await c.from('sb_profiles').update(patch).eq('id',user.id).select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,updated_at').maybeSingle();
+
+  if(r.error)throw r.error;
+
+  fill(r.data||Object.assign({},profile,patch));
+
+  status('Profile text saved to sb_profiles.');
+  toast('Profile text saved');
+  await refreshHeaderShell('save-text');
+ }catch(e){
+  status('Save failed: '+(e.message||e),true);
+  debug({saveTextError:e.message||String(e)});
+ }
+}
+
+function fileExt(file){
+ let n=file.name||'';
+ let ext=(n.split('.').pop()||'').toLowerCase();
+
+ if(['png','jpg','jpeg','webp'].includes(ext))return ext==='jpg'?'jpeg':ext;
+ if(file.type==='image/png')return'png';
+ if(file.type==='image/webp')return'webp';
+
+ return'jpeg';
+}
+
+function clearSelection(){
+ selectedFile=null;
+ uploadedUrl='';
+ previewUrl='';
+
+ if(localObjectUrl){
+  try{URL.revokeObjectURL(localObjectUrl);}catch(e){}
+ }
+
+ localObjectUrl='';
+ $('modalFile').value='';
+ $('modalUrl').value='';
+ $('modalPreview').innerHTML='Preview';
+ $('fileMeta').innerHTML='<b>No image selected.</b><br><span class="muted">Drop an image to preview it before upload.</span>';
+ $('saveUploaded').disabled=true;
+ modal('Selection cleared.');
+ debug({clearSelection:true});
+}
+
+function selectFile(file){
+ if(!file){
+  clearSelection();
+  return;
+ }
+
+ if(!String(file.type||'').startsWith('image/')){
+  modal('Please select an image file.',true);
+  return;
+ }
+
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type)){
+  modal('Only PNG, JPEG or WEBP are allowed.',true);
+  return;
+ }
+
+ if(file.size>50*1024*1024){
+  modal('File too large. Supabase bucket limit is 50 MB.',true);
+  return;
+ }
+
+ selectedFile=file;
+ uploadedUrl='';
+ previewUrl='';
+
+ if(localObjectUrl){
+  try{URL.revokeObjectURL(localObjectUrl);}catch(e){}
+ }
+
+ localObjectUrl=URL.createObjectURL(file);
+ previewUrl=localObjectUrl;
+
+ $('modalPreview').innerHTML='<img src="'+esc(localObjectUrl)+'" alt="Selected profile image preview">';
+ $('fileMeta').innerHTML='<b>'+esc(file.name)+'</b><br><span class="muted">'+esc(file.type||'image')+' · '+formatSize(file.size)+' · ready to upload.</span>';
+ $('saveUploaded').disabled=true;
+
+ applyUrl(localObjectUrl,'local-selected-preview');
+
+ modal('Selected '+file.name+'. Preview it here, then upload.');
+ debug({selectedFile:{name:file.name,size:file.size,type:file.type},kind:currentKind});
+}
+
+function openModal(kind){
+ currentKind=kind;
+ clearSelection();
+
+ let current=kind==='avatar'?$('avatarUrl').value:$('bannerUrl').value;
+
+ $('modalTitle').textContent=kind==='avatar'?'Avatar Overlay':'Banner Overlay';
+ $('modalBadge').textContent=kind==='avatar'?'Avatar Upload To Profile':'Banner Upload To Profile';
+ $('dropTitle').textContent=kind==='avatar'?'Drag & drop avatar here':'Drag & drop banner here';
+
+ if(current){
+  $('modalUrl').value=current;
+  $('modalPreview').innerHTML='<img src="'+esc(current)+'" alt="Current profile image">';
+  applyUrl(current,'existing-profile-image');
+  modal('Current '+kind+' URL loaded. Choose a new file to replace it.');
+ }else{
+  modal('Choose PNG, JPEG or WEBP.');
+ }
+
+ $('imageModal').classList.add('open');
+}
+
+function closeModal(){
+ $('imageModal').classList.remove('open');
+}
+
+async function uploadImage(){
+ try{
+  let c=client();
+
+  if(!await refreshSession()){
+   modal('Sign in first.',true);
+   return;
+  }
+
+  if(!selectedFile){
+   modal('Drop or choose an image first.',true);
+   return;
+  }
+
+  let ext=fileExt(selectedFile);
+  let path='profiles/'+user.id+'/'+currentKind+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
+
+  modal('Uploading to '+BUCKET+'/'+path+' ...');
+
+  let up=await c.storage.from(BUCKET).upload(path,selectedFile,{cacheControl:'3600',upsert:true,contentType:selectedFile.type||'image/jpeg'});
+
+  if(up.error)throw up.error;
+
+  let pub=c.storage.from(BUCKET).getPublicUrl(path);
+  uploadedUrl=pub&&pub.data&&pub.data.publicUrl||'';
+
+  if(!uploadedUrl)throw new Error('Public URL was not returned after upload.');
+
+  $('modalUrl').value=uploadedUrl;
+  $('saveUploaded').disabled=false;
+
+  applyUrl(uploadedUrl,'uploaded-preview');
+
+  modal('Uploaded. Review the preview, then Save Uploaded URL To Profile.');
+  debug({uploaded:true,kind:currentKind,path,url:uploadedUrl});
+ }catch(e){
+  modal('Upload failed: '+(e.message||e),true);
+  debug({uploadError:e.message||String(e)});
+ }
+}
+
+async function saveUploaded(){
+ try{
+  let c=client();
+
+  if(!await refreshSession()){
+   modal('Sign in first.',true);
+   return;
+  }
+
+  if(!uploadedUrl){
+   modal('Upload an image first.',true);
+   return;
+  }
+
+  let patch=currentKind==='avatar'?{avatar_url:uploadedUrl,updated_at:new Date().toISOString()}:{banner_url:uploadedUrl,updated_at:new Date().toISOString()};
+
+  modal('Saving uploaded URL to sb_profiles...');
+
+  let r=await c.from('sb_profiles').update(patch).eq('id',user.id).select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,updated_at').maybeSingle();
+
+  if(r.error)throw r.error;
+
+  profile=r.data||Object.assign({},profile,patch);
+
+  fill(profile);
+
+  if(currentKind==='avatar'){
+   applyAvatarToHeaderImage(uploadedUrl,'save-uploaded-profile-avatar');
+  }
+
+  modal((currentKind==='avatar'?'Avatar':'Banner')+' saved to sb_profiles.');
+  status((currentKind==='avatar'?'Avatar':'Banner')+' saved. Header profile bridge refreshed.');
+  toast((currentKind==='avatar'?'Avatar':'Banner')+' saved');
+
+  await refreshHeaderShell(currentKind+'-save-uploaded');
+
+  debug({savedUploaded:true,kind:currentKind,url:uploadedUrl});
+ }catch(e){
+  modal('Save failed: '+(e.message||e),true);
+  debug({saveUploadedError:e.message||String(e)});
+ }
+}
+
+function applyPreviewHeader(){
+ let url=uploadedUrl||previewUrl||$('modalUrl').value||profileImageForKind();
+
+ if(currentKind!=='avatar'){
+  modal('Header image uses avatar only. Save banner to profile, but it will not replace the header image.',true);
+  return;
+ }
+
+ if(!url){
+  modal('No avatar preview URL available yet.',true);
+  return;
+ }
+
+ applyAvatarToHeaderImage(url,'modal-preview');
+ modal('Avatar preview applied to the Profile Settings header image.');
+}
+
+async function notifyHeader(){
+ await refreshHeaderShell('manual-button');
+ status('Header profile bridge refresh sent.');
+ toast('Header refreshed');
+}
+
+async function refreshSavedCounters(force){
+ let now=Date.now();
+
+ if(countBusy)return;
+
+ if(!force&&lastCountRead&&now-lastCountRead<12000){
+  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}
+  return;
+ }
+
+ countBusy=true;
+
+ try{
+  let core=window.StreamBanditCoreSavesV675;
+
+  if(core){
+   if(!countReady&&core.init){
+    await core.init();
+    countReady=true;
+   }else if(core.refresh){
+    await core.refresh();
+   }
+  }
+
+  if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();
+  if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();
+
+  lastCountRead=Date.now();
+ }catch(e){}
+ finally{
+  countBusy=false;
+ }
+}
+
+function helpers(){
+ try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}
+ try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
+ try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
+ try{if(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.refresh)window.StreamBanditLiveReadinessSearchFallback.refresh();}catch(e){}
+
+ refreshSavedCounters(false);
+
+ if(avatarOf(profile)){
+  setTimeout(()=>applyAvatarToHeaderImage(avatarOf(profile),'helpers'),150);
+  setTimeout(()=>applyAvatarToHeaderImage(avatarOf(profile),'helpers-late'),700);
+ }
+
+ $('helperStatus').innerHTML='<b>Helpers:</b> Supabase SDK '+(window.supabase?'✅':'❌')+
+  ' · Shell '+(window.StreamBanditShell?'✅':'❌')+
+  ' · Header '+(window.StreamBanditHeaderShell?'✅':'❌')+
+  ' · Footer '+(window.StreamBanditFooterShell?'✅':'❌')+
+  ' · Theme '+(window.StreamBanditThemeProjector?'✅':'❌')+
+  ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'❌')+
+  ' · Counts '+(window.StreamBanditMenuSavesCount?'✅':'❌')+
+  ' · Search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'❌')+
+  ' · Settings '+(settingsGlobalLoaded()?'✅':'❌')+
+  ' · Brand Helper Loaded '+(brandLoaded()?'✅':'❌');
+}
+
+function debug(extra){
+ let payload=profile&&user?payloadForHeader(profile):null;
+ let shellState=null;
+ let headerImg=document.getElementById('sbHeaderBrandLogo');
+
+ try{shellState=window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.state?window.StreamBanditHeaderShell.state():null;}catch(e){}
+
+ $('debug').textContent=JSON.stringify(Object.assign({},debugState,{
+  user:user?{id:user.id,email:user.email}:null,
+  profile:profile,
+  headerPayload:payload,
+  shellState:shellState,
+  headerImage:{
+   exists:!!headerImg,
+   src:headerImg&&headerImg.src||'',
+   dataBrandLogo:headerImg&&headerImg.hasAttribute('data-sb-brand-logo'),
+   dataProfileAvatar:headerImg&&headerImg.getAttribute('data-sb-profile-avatar')||''
+  },
+  cacheKeys:PROFILE_CACHE_KEYS.map(k=>{
+   let value=null;
+   try{value=JSON.parse(localStorage.getItem(k)||'null');}catch(e){}
+   return {key:k,hasValue:!!value,id:value&&value.id||'',avatar_url:value&&value.avatar_url||''};
+  }),
+  helperPresence:{
+   shell:!!window.StreamBanditShell,
+   header:!!window.StreamBanditHeaderShell,
+   footer:!!window.StreamBanditFooterShell,
+   theme:!!window.StreamBanditThemeProjector,
+   saves:!!window.StreamBanditCoreSavesV675,
+   counts:!!window.StreamBanditMenuSavesCount,
+   search:!!window.StreamBanditLiveReadinessSearchFallback,
+   settings:settingsGlobalLoaded(),
+   brand:brandLoaded()
+  },
+  currentKind:currentKind,
+  selectedFile:selectedFile?{name:selectedFile.name,size:selectedFile.size,type:selectedFile.type}:null,
+  uploadedUrl:uploadedUrl,
+  previewUrl:previewUrl&&previewUrl.startsWith('blob:')?'blob-preview':previewUrl,
+  extra:extra||null
+ }),null,2);
+}
+
+function tab(id){
+ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
+ document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));
+ helpers();
+ debug({tab:id});
+}
+
+function wireDrop(){
+ let dz=$('dropZone');
+ let fi=$('modalFile');
+
+ dz.addEventListener('click',()=>fi.click());
+ fi.addEventListener('change',e=>selectFile(e.target.files&&e.target.files[0]));
+
+ ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  dz.classList.add('drag');
+ }));
+
+ ['dragleave','dragend'].forEach(ev=>dz.addEventListener(ev,e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  dz.classList.remove('drag');
+ }));
+
+ dz.addEventListener('drop',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  dz.classList.remove('drag');
+  selectFile(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]);
+ });
+}
+
+function wire(){
+ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>tab(t.dataset.tab));
+
+ $('backBtn').onclick=()=>{
+  if(history.length>1)history.back();
+  else location.href='web-builder-theme-studio-controls-v7-8-9-test.html';
+ };
+
+ $('sendMagic').onclick=sendMagic;
+ $('refreshSession').onclick=()=>{refreshSession().then(()=>loadProfile());};
+ $('signOutBtn').onclick=signOut;
+ $('loadProfile').onclick=loadProfile;
+ $('createProfile').onclick=createProfile;
+ $('saveText').onclick=saveText;
+ $('openAvatar').onclick=()=>openModal('avatar');
+ $('openBanner').onclick=()=>openModal('banner');
+ $('openAvatar2').onclick=()=>openModal('avatar');
+ $('openBanner2').onclick=()=>openModal('banner');
+ $('applyAvatarHeader').onclick=()=>applyAvatarToHeaderImage(avatarOf(profile)||$('avatarUrl').value,'manual-button');
+ $('closeImageModal').onclick=closeModal;
+ $('uploadImage').onclick=uploadImage;
+ $('saveUploaded').onclick=saveUploaded;
+ $('applyPreviewHeader').onclick=applyPreviewHeader;
+ $('clearSelection').onclick=clearSelection;
+
+ ['displayName','username','channelName','channelAbout'].forEach(id=>$(id).addEventListener('input',render));
+
+ wireDrop();
+
+ window.addEventListener('streambandit-core-saves-changed',()=>refreshSavedCounters(true));
+ window.addEventListener('streambandit-core-saves-v6-75-changed',()=>refreshSavedCounters(true));
+}
+
+function boot(){
+ wire();
+ helpers();
+
+ refreshSession().then(()=>loadProfile());
+
+ setTimeout(helpers,800);
+ setTimeout(()=>refreshSavedCounters(true),1000);
+ setTimeout(helpers,1800);
+ setInterval(helpers,7000);
+
+ document.documentElement.dataset.sbProfileSettings='v7-12-296-3';
+ window.StreamBanditProfileSettingsV7122963={
+  version:VERSION,
+  reload:loadProfile,
+  refreshHeader:refreshHeaderShell,
+  applyAvatarToHeaderImage:applyAvatarToHeaderImage,
+  current:function(){return{user,profile,payload:profile&&user?payloadForHeader(profile):null};}
+ };
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
+
+})();
+</script>
 </body>
 </html>
