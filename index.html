@@ -3,34 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit V7.12.299.22 Current App Map + Web Builder Candidates</title>
+<title>Stream Bandit V7.12.300.2 Current App Map + Live Candidate Tracker</title>
 <meta name="theme-color" content="#050711">
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--cyan:#41e8ff;--card:#ffffff0f}*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;min-height:100vh;padding:16px;background:radial-gradient(circle at 8% 0,#22d3a633,transparent 34%),radial-gradient(circle at 92% 0,#7c3cff3d,transparent 38%),radial-gradient(circle at bottom,#ff2d8520,transparent 35%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.wrap{width:min(1480px,100%);margin:auto}.hero,.group,.notice{border:1px solid var(--line);border-radius:26px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 18px 58px #0007;padding:18px;margin-bottom:14px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px;font-size:13px}h1{font-size:clamp(38px,5.5vw,72px);margin:12px 0 8px;letter-spacing:-.055em;line-height:.95}h2{margin:0 0 10px;font-size:23px}.muted,p,li{color:var(--muted);line-height:1.48}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.routeGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:9px}.route{display:block;text-decoration:none;color:#fff;border:1px solid #ffffff18;border-radius:16px;background:var(--card);padding:12px;min-height:78px}.route b{display:block;color:#baf7df;margin-bottom:5px}.route small{display:block;color:#9aa6cb;font-size:12px;line-height:1.25;overflow-wrap:anywhere}.candidate{border-color:#22d3a64f;background:#22d3a610}.support{border-color:#ffb14255;background:#ffb14212}.tag{display:inline-flex;border-radius:999px;background:#ffb14222;border:1px solid #ffb14255;color:#ffe7ad;font-weight:900;padding:4px 8px;font-size:11px;margin-left:7px}.ok{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}.warn{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.cyanBox{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.btn{display:inline-flex;align-items:center;justify-content:center;text-align:center;border:0;text-decoration:none;border-radius:999px;padding:10px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017;font-weight:950}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2));color:#fff}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.mini{font-size:12px;color:#8f98b8}.notice{padding:14px}.notice b{color:#baf7df}code{color:#baf7df;overflow-wrap:anywhere}@media(max-width:720px){body{padding:10px}.hero,.group,.notice{padding:14px}.routeGrid{grid-template-columns:1fr}.btn{width:100%}}
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--cyan:#41e8ff;--card:#ffffff0f}*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;min-height:100vh;padding:16px;background:radial-gradient(circle at 8% 0,#22d3a633,transparent 34%),radial-gradient(circle at 92% 0,#7c3cff3d,transparent 38%),radial-gradient(circle at bottom,#ff2d8520,transparent 35%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.wrap{width:min(1480px,100%);margin:auto}.hero,.group,.notice{border:1px solid var(--line);border-radius:26px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 18px 58px #0007;padding:18px;margin-bottom:14px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px;font-size:13px}h1{font-size:clamp(38px,5.5vw,72px);margin:12px 0 8px;letter-spacing:-.055em;line-height:.95}h2{margin:0 0 10px;font-size:23px}.muted,p,li{color:var(--muted);line-height:1.48}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.routeGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:9px}.route{display:block;text-decoration:none;color:#fff;border:1px solid #ffffff18;border-radius:16px;background:var(--card);padding:12px;min-height:78px}.route b{display:block;color:#baf7df;margin-bottom:5px}.route small{display:block;color:#9aa6cb;font-size:12px;line-height:1.25;overflow-wrap:anywhere}.candidate{border-color:#22d3a64f;background:#22d3a610}.support{border-color:#ffb14255;background:#ffb14212}.next{border-color:#41e8ff55;background:#41e8ff12}.tag{display:inline-flex;border-radius:999px;background:#ffb14222;border:1px solid #ffb14255;color:#ffe7ad;font-weight:900;padding:4px 8px;font-size:11px;margin-left:7px}.ok{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}.warn{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.cyanBox{background:#41e8ff18;border-color:#41e8ff55;color:#cef9ff}.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.btn{display:inline-flex;align-items:center;justify-content:center;text-align:center;border:0;text-decoration:none;border-radius:999px;padding:10px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017;font-weight:950}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2));color:#fff}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.mini{font-size:12px;color:#8f98b8}.notice{padding:14px}.notice b{color:#baf7df}code{color:#baf7df;overflow-wrap:anywhere}@media(max-width:720px){body{padding:10px}.hero,.group,.notice{padding:14px}.routeGrid{grid-template-columns:1fr}.btn{width:100%}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <section class="hero">
-<span class="badge">Stream Bandit V7.12.299.22 Current App Map + Web Builder Candidate Tracker</span>
+<span class="badge">Stream Bandit V7.12.300.2 Current App Map + Candidate Tracker</span>
 <h1>Current App Manifest</h1>
-<p class="muted">Protected current-app map plus Web Builder near-ready candidate tracking. Root still redirects to Home after a short pause, so this is not a live Web Builder promotion.</p>
+<p class="muted">Protected current-app map plus near-ready candidate tracking. Root still redirects to Home after a short pause, so this is not live-home promotion.</p>
 <div class="row">
 <a class="btn hot" href="home-global-helpers-v7-4-4-test.html">Open Home</a>
 <a class="btn" href="CURRENT-APP-MANIFEST-V7-12-180.md">Open Manifest</a>
-<a class="btn" href="WEB-BUILDER-MANIFEST-V7-12-252.md">Web Builder Manifest</a>
+<a class="btn cyan" href="policy-documents-centre-v7-12-119-test.html">Policy Candidate Group</a>
 <a class="btn cyan" href="web-builder-account-control-hub-v7-12-263-test.html">Web Builder Candidate Group</a>
-<a class="btn cyan" href="live-readiness-global-helpers-v7-10-2-test.html">Live Readiness</a>
+<a class="btn" href="admin-centre-command-deck-v7-12-121-test.html">Admin Next Group</a>
+<a class="btn" href="live-readiness-global-helpers-v7-10-2-test.html">Live Readiness</a>
 <a class="btn" href="all-pages-version-registry-v7-12-122-current-routes-test.html">Current Registry</a>
-<a class="btn" href="admin-centre-command-deck-v7-12-121-test.html">Admin Centre</a>
 </div>
 </section>
 <section class="notice ok"><b>Current app truth:</b> this index lists active app URLs and current pass state. Old backups, old tests and checkpoint files are historical and must not be treated as active routes.</section>
-<section class="notice cyanBox"><b>Web Builder promotion tracking:</b> the Web Builder group is now listed on this index as near-ready candidates only. This does not promote Web Builder to live, does not change root behavior, and does not approve a final <code>index.html</code> homepage replacement.</section>
-<section class="notice warn"><b>Promotion gate:</b> polish/tidy, temp/support classification, role-lock regression, and explicit owner approval are still required before any live/homepage promotion.</section>
+<section class="notice cyanBox"><b>Candidate tracking:</b> Profile Settings and the Policy group are now listed as main-app near-ready candidates. Web Builder remains candidate-tracking only. This does not promote the homepage/live root.</section>
+<section class="notice warn"><b>Promotion gate:</b> polish/tidy, role-lock verification, scanner review, full route smoke test, rollback note and explicit owner approval are still required before any live/homepage promotion.</section>
 <section class="notice warn"><b>Do not regress:</b> Supabase Library global editing stays admin/chosen-only, Player 2 stays on V7.12.58, Collections stays on V7.12.51 until the next test pass, Theme Studio stays on V7.8.9, and Web Builder enters through <code>web-builder-account-control-hub-v7-12-263-test.html</code>.</section>
 
-<section class="group"><h2>Web Builder Near-Ready Candidate Group <span class="tag">14 tracked entries</span></h2><p class="muted">These are the pages to keep tracking for polish/tidy and possible later promotion review. This is tracking only, not live promotion.</p><div class="routeGrid">
+<section class="group"><h2>Main App Near-Ready Candidates <span class="tag">4 tracked routes</span></h2><p class="muted">These passed the current main-app rail checks and are now candidate-tracked only. This is not live-home promotion.</p><div class="routeGrid">
+<a class="route candidate" href="profile-settings-live-ready-v7-12-90-test.html"><b>Profile Settings</b><small>passed; profile/avatar/header identity candidate</small></a>
+<a class="route candidate" href="policy-documents-centre-v7-12-119-test.html"><b>Policy Documents Centre</b><small>V7.12.296.4 public policy hub pass</small></a>
+<a class="route candidate" href="policy-reader-v7-12-119-test.html?policy=terms"><b>Published Policy Proof</b><small>V7.12.296.5 public published-only reader pass</small></a>
+<a class="route candidate" href="policy-admin-documents-v7-12-120-test.html?policy=terms"><b>Policy Admin Centre</b><small>V7.12.296.7 view-only page / owner-admin editor pass</small></a>
+</div></section>
+
+<section class="group"><h2>Admin Group Next Rail Pass <span class="tag">9 routes</span></h2><p class="muted">This is the next group to complete. Admin Centre is first because it is the group launcher/checker.</p><div class="routeGrid">
+<a class="route next" href="admin-centre-command-deck-v7-12-121-test.html"><b>Admin Centre</b><small>next target: V7.12.218 command deck source</small></a>
+<a class="route next" href="live-readiness-global-helpers-v7-10-2-test.html"><b>Live Readiness</b><small>release smoke test</small></a>
+<a class="route next" href="all-pages-version-registry-v7-12-122-current-routes-test.html"><b>Current Routes Registry</b><small>current route scanner</small></a>
+<a class="route next" href="test-checklist-global-helpers-v7-10-5-test.html"><b>Test Checklist</b><small>testing</small></a>
+<a class="route next" href="tools-page-original-global-pass-v7-12-136-test.html"><b>Tools</b><small>tools</small></a>
+<a class="route next" href="health-check-global-helpers-v7-10-6-test.html"><b>Health Check</b><small>health</small></a>
+<a class="route next" href="mux-manager-global-helpers-v7-10-7-test.html"><b>Mux Manager</b><small>Mux</small></a>
+<a class="route next" href="storage-prep-global-helpers-v7-10-8-test.html"><b>Storage Prep</b><small>storage</small></a>
+<a class="route next" href="backup-safety-global-helpers-v7-10-9-test.html"><b>Backup / Safety</b><small>backup</small></a>
+</div></section>
+
+<section class="group"><h2>Web Builder Near-Ready Candidate Group <span class="tag">14 tracked entries</span></h2><p class="muted">These are pages to keep tracking for polish/tidy and possible later promotion review. This is tracking only, not live promotion.</p><div class="routeGrid">
 <a class="route candidate" href="web-builder-account-control-hub-v7-12-263-test.html"><b>Web Builder Hub</b><small>golden shell / doorway candidate</small></a>
 <a class="route candidate" href="web-builder-pages-manager-owned-v7-12-256-test.html"><b>Owned Pages Manager</b><small>web-builder-pages-manager-owned-v7-12-256-test.html</small></a>
 <a class="route candidate" href="web-builder-studio-v7-12-252-test.html?page=test-page"><b>Studio Handoff</b><small>web-builder-studio-v7-12-252-test.html?page=test-page</small></a>
@@ -89,24 +108,13 @@
 <section class="group"><h2>Settings <span class="tag">4 routes</span></h2><div class="routeGrid">
 <a class="route" href="settings-platform-control-hub-v7-12-85-test.html"><b>Settings / Settings Hub</b><small>settings-platform-control-hub-v7-12-85-test.html</small></a>
 <a class="route" href="web-builder-theme-studio-controls-v7-8-9-test.html"><b>Settings Studio / Theme Studio</b><small>web-builder-theme-studio-controls-v7-8-9-test.html</small></a>
-<a class="route" href="profile-settings-live-ready-v7-12-90-test.html"><b>Profile Settings</b><small>profile-settings-live-ready-v7-12-90-test.html</small></a>
+<a class="route candidate" href="profile-settings-live-ready-v7-12-90-test.html"><b>Profile Settings</b><small>live candidate / passed</small></a>
 <a class="route" href="web-builder-account-control-hub-v7-12-263-test.html"><b>Web Builder</b><small>web-builder-account-control-hub-v7-12-263-test.html</small></a>
 </div></section>
-<section class="group"><h2>Policy <span class="tag">3 routes</span></h2><div class="routeGrid">
-<a class="route" href="policy-documents-centre-v7-12-119-test.html"><b>Policy & FAQ Centre</b><small>policy-documents-centre-v7-12-119-test.html</small></a>
-<a class="route" href="policy-reader-v7-12-119-test.html?policy=terms"><b>Published Policy Proof</b><small>policy-reader-v7-12-119-test.html?policy=terms</small></a>
-<a class="route" href="policy-admin-documents-v7-12-120-test.html?policy=terms"><b>Policy Admin Editor</b><small>policy-admin-documents-v7-12-120-test.html?policy=terms</small></a>
-</div></section>
-<section class="group"><h2>Admin <span class="tag">9 routes</span></h2><div class="routeGrid">
-<a class="route" href="admin-centre-command-deck-v7-12-121-test.html"><b>Admin Centre</b><small>admin-centre-command-deck-v7-12-121-test.html</small></a>
-<a class="route" href="live-readiness-global-helpers-v7-10-2-test.html"><b>Live Readiness</b><small>live-readiness-global-helpers-v7-10-2-test.html</small></a>
-<a class="route" href="all-pages-version-registry-v7-12-122-current-routes-test.html"><b>Current Routes Registry</b><small>all-pages-version-registry-v7-12-122-current-routes-test.html</small></a>
-<a class="route" href="test-checklist-global-helpers-v7-10-5-test.html"><b>Test Checklist</b><small>test-checklist-global-helpers-v7-10-5-test.html</small></a>
-<a class="route" href="tools-page-original-global-pass-v7-12-136-test.html"><b>Tools</b><small>tools-page-original-global-pass-v7-12-136-test.html</small></a>
-<a class="route" href="health-check-global-helpers-v7-10-6-test.html"><b>Health Check</b><small>health-check-global-helpers-v7-10-6-test.html</small></a>
-<a class="route" href="mux-manager-global-helpers-v7-10-7-test.html"><b>Mux Manager</b><small>mux-manager-global-helpers-v7-10-7-test.html</small></a>
-<a class="route" href="storage-prep-global-helpers-v7-10-8-test.html"><b>Storage Prep</b><small>storage-prep-global-helpers-v7-10-8-test.html</small></a>
-<a class="route" href="backup-safety-global-helpers-v7-10-9-test.html"><b>Backup / Safety</b><small>backup-safety-global-helpers-v7-10-9-test.html</small></a>
+<section class="group"><h2>Policy <span class="tag">3 live candidates</span></h2><div class="routeGrid">
+<a class="route candidate" href="policy-documents-centre-v7-12-119-test.html"><b>Policy & FAQ Centre</b><small>V7.12.296.4 pass / public hub</small></a>
+<a class="route candidate" href="policy-reader-v7-12-119-test.html?policy=terms"><b>Published Policy Proof</b><small>V7.12.296.5 pass / published-only reader</small></a>
+<a class="route candidate" href="policy-admin-documents-v7-12-120-test.html?policy=terms"><b>Policy Admin Centre</b><small>V7.12.296.7 pass / view-only public, owner-admin editor</small></a>
 </div></section>
 <section class="group"><h2>Owner <span class="tag">10 routes</span></h2><div class="routeGrid">
 <a class="route" href="web-builder-form-submissions-v7-12-94-test.html?page=test-page"><b>Form Inbox</b><small>support/reference manager, not clean Web Builder candidate</small></a>
@@ -133,7 +141,7 @@
 <div class="notice"><b>Saves/search/profile helpers:</b><br><code>stream-bandit-menu-saves-count-v6-72-1.js</code><br><code>stream-bandit-core-saves-v6-75.js</code><br><code>stream-bandit-profile-signin-v7-12-156.js</code></div>
 <div class="notice"><b>Manifests:</b><br><code>CURRENT-APP-MANIFEST-V7-12-180.md</code><br><code>WEB-BUILDER-MANIFEST-V7-12-252.md</code></div>
 </div></section>
-<p class="mini">V7.12.299.22 current index map. Web Builder group is tracked as near-ready candidates only. Root still redirects to Home. No live promotion.</p>
+<p class="mini">V7.12.300.2 current index map. Policy group and Profile Settings are tracked as main-app live candidates. Web Builder remains candidate tracking only. Root still redirects to Home. No live promotion.</p>
 </div>
 <script>(function(){try{setTimeout(function(){location.replace('home-global-helpers-v7-4-4-test.html');},1600);}catch(e){}})();</script>
 </body>
