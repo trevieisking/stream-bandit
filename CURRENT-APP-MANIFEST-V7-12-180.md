@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.300.28
+# Stream Bandit Current App Manifest V7.12.300.29
 
 Date: 2026-06-16
 
@@ -6,9 +6,14 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.300.28 Feature Shop / Pricing Live Candidate Pass`
+`V7.12.300.29 Permissions Inspector Live Candidate Pass`
 
-The Profile Account Centre, User Management simple delete queue, and Feature Shop / Pricing placeholder have now been owner-tested, promoted into the `index.html` live-candidate tracker, and marked as passed in the working checklist.
+The Account/Profile + User Management usefulness rail is now passed through four promoted routes:
+
+- `profile-settings-live-ready-v7-12-90-test.html`
+- `user-management-dashboard-v7-11-2-test.html`
+- `plans-pricing-feature-shop-v7-11-3-test.html`
+- `permissions-matrix-user-management-v7-11-4-test.html`
 
 This is still candidate tracking only. It does not promote the root homepage/final live release. Root still redirects to Home after a short pause.
 
@@ -32,10 +37,6 @@ Promotion detail:
 - It does not delete Auth users from the browser.
 - Real Auth deletion remains server-side through the Edge Function and User Management.
 
-Profile route pass commit:
-
-- `add8a8b2623a5c7037924d89158383e4d4c1142c`
-
 ### User Management Dashboard
 
 Live candidate route:
@@ -44,20 +45,12 @@ Live candidate route:
 
 Promotion detail:
 
-- User Management now includes the integrated simple delete request queue.
-- The tested standalone helper route remains only as fallback/reference:
-  - `user-management-delete-simple-v7-12-300-19-test.html`
-- The integrated page keeps User Management on its old URL.
+- User Management includes the integrated simple delete request queue.
 - It keeps users, manage selected, audit, safety and debug.
-- It adds Delete Requests.
 - Protected/admin/owner/platform-owner targets are decline/cancel only.
 - Spare normal account targets can be deleted only through the server-side `sb-account-delete` Edge Function.
 - Confirmation is only `DELETE`; no request ID or email field is required in the overlay.
 - No service-role key is in browser code.
-
-User Management promotion commit:
-
-- `506f800021ee42678492eed734aa1f3ba4ab9394`
 
 ### Feature Shop / Pricing Placeholder
 
@@ -79,18 +72,40 @@ Promotion detail:
 - No card collection, account upgrade, entitlement write, or billing write exists.
 - Real launch/commercial setup is postponed until database scale, Mux plan, payment setup, support rules, entitlement locks, moderation, and owner launch approval are ready.
 
-Feature Shop pass commits:
+### Permissions Inspector
 
-- `31498c211a04387aaddf0687eb19a8f31faa34bd` - initial no-payment placeholder shop.
-- `f9bb1bc6a1220e07c18d1bf201934ab33e1c7010` - full idea bank preserved.
-- `c5ea6332c1f2d8de6adaef38007953593d79504f` - global header/footer aligned.
-- `a97a4dfc0a5112030e8ce02822a4d8ac6d03f78b` - theme rail pass.
+Live candidate route:
 
-Index candidate tracker commits:
+- `permissions-matrix-user-management-v7-11-4-test.html`
 
-- `af4f72180fb9ba0e043416dd7a5945d3d37927ec`
-- `54dba54b52da0fd9df32ef28d47bcf2bfa759550`
-- `c3dd3b832e27003e9cd4f9b8b77a06a3e1790af0`
+Promotion detail:
+
+- Passed as the read-only bridge between Feature Shop, User Management, and future Supabase/RLS enforcement.
+- Global header appears.
+- Global footer appears.
+- Search icon/search overlay is hidden.
+- Rail appears and matches the Feature Shop style.
+- Rail changes with the theme injector.
+- User Management link opens correctly.
+- Pricing link opens correctly.
+- Refresh Inspector works.
+- Live Profiles tab does not crash.
+- Signed-out state stays safe.
+- Owner/admin signed-in state reads visible `sb_profiles` rows.
+- Feature dropdown changes the allow/lock reasoning.
+- Current Controls explains `role`, `can_submit`, `plan_key`, `permissions_json`, audit and RPC clearly.
+- Safety tab has no live action buttons except locked placeholders.
+- Debug reports global header/footer, hidden search overlay and no Supabase writes.
+- Reads `sb_profiles` and `sb_admin_audit_log` as support context only.
+- Does not write, does not call RPC, does not change billing, and does not write entitlements.
+
+## Relevant pass commits
+
+- `add8a8b2623a5c7037924d89158383e4d4c1142c` - Profile Account Centre live route copy.
+- `506f800021ee42678492eed734aa1f3ba4ab9394` - User Management integrated delete queue.
+- `a97a4dfc0a5112030e8ce02822a4d8ac6d03f78b` - Feature Shop theme rail pass.
+- `7b89a12fc793773eb0ee0d595923e399309c1a91` - Permissions Inspector aligned with User Management and Feature Shop.
+- `e914860cb3f03134399c69eab083cf7a55cbbaeb` - Index updated with Permissions Inspector candidate.
 
 ## Chat checklist status
 
@@ -106,12 +121,22 @@ Index candidate tracker commits:
 - [x] Feature Shop/Pricing global header/footer alignment passed.
 - [x] Feature Shop/Pricing search overlay hidden on page passed.
 - [x] Feature Shop/Pricing theme-injected rail passed.
-- [x] Account/Profile + User Management + Feature Shop routes added to `index.html` as live candidates.
+- [x] Permissions Inspector global header/footer passed.
+- [x] Permissions Inspector search overlay hidden passed.
+- [x] Permissions Inspector rail and theme injector passed.
+- [x] Permissions Inspector User Management and Pricing links passed.
+- [x] Permissions Inspector Refresh Inspector and Live Profiles passed.
+- [x] Permissions Inspector signed-out safe state passed.
+- [x] Permissions Inspector owner/admin visible `sb_profiles` read passed.
+- [x] Permissions Inspector feature dropdown allow/lock reasoning passed.
+- [x] Permissions Inspector Current Controls and Safety tabs passed.
+- [x] Permissions Inspector debug passed with no Supabase writes.
+- [x] Account/Profile + User Management + Feature Shop + Permissions Inspector routes added to `index.html` as live candidates.
 - [x] Current manifest checkpoint updated.
 
 ## Payment / launch safety note
 
-Stream Bandit remains free/preview-only for payment-related features at this checkpoint. Real commercial launch is intentionally delayed until the platform is ready, the database plan is chosen, Mux/streaming costs are planned, payment setup is implemented correctly, and the official launch checklist is passed.
+Stream Bandit remains free/preview-only for payment-related features at this checkpoint. Real commercial launch is intentionally delayed until the platform is ready, the database plan is chosen, Mux/streaming costs are planned, payment setup is implemented correctly, entitlement locks are enforced, support/refund rules exist, and the official launch checklist is passed.
 
 No page should connect a payment provider, collect card details, create subscriptions, upgrade accounts, write paid entitlements, or promise paid creator gates before the formal launch/payment plan is approved.
 
@@ -142,7 +167,7 @@ Latest scanner supplied by owner:
 
 `V7.12.300 SB Table Route Scanner`
 
-Known table list still includes:
+Known tables include:
 
 - `sb_admin_audit_log`
 - `sb_app_settings`
@@ -170,11 +195,12 @@ Unknown table tokens remain scanner/reference signals and must not be treated as
 
 ## Live candidate groups so far
 
-### Account + User Management - 3 promoted routes
+### Account + User Management - 4 promoted routes
 
 - `profile-settings-live-ready-v7-12-90-test.html`
 - `user-management-dashboard-v7-11-2-test.html`
 - `plans-pricing-feature-shop-v7-11-3-test.html`
+- `permissions-matrix-user-management-v7-11-4-test.html`
 
 Support/fallback:
 
@@ -242,17 +268,20 @@ Support/fallback:
 
 ## Next plan target
 
-Next target is the remaining Owner usefulness rail:
+Next target is the Web Builder canonical usefulness pass:
 
-1. Permissions Inspector - convert the rulebook into useful live lock reasoning.
-2. Web Builder canonical pages - route map, control map, source map, header/footer code, menu builder, pages manager, preview and form designer.
-3. Later official launch/payment plan - database capacity, Mux plan, payment setup, entitlements, support/refund rules, creator gate verification, and launch checklist.
+1. Route Map - make route health/status useful.
+2. Control Map - make ownership/control truth useful.
+3. Source Map - compare source/render/publish truth.
+4. Header/Footer Code - make revisioned shell code safer.
+5. Menu Builder, Pages Manager, Preview and Form Designer - continue after the maps are stable.
+6. Later official launch/payment plan - database capacity, Mux plan, payment setup, entitlements, support/refund rules, creator gate verification, and launch checklist.
 
 Do not start destructive account-delete retests unless using a spare normal account.
 
 ## Promotion status
 
-`index.html` has been updated as a candidate tracker for Profile Account Centre, User Management and Feature Shop.
+`index.html` has been updated as a candidate tracker for Profile Account Centre, User Management, Feature Shop and Permissions Inspector.
 
 This is not final live-home promotion.
 
