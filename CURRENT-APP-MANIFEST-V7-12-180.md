@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.300.3
+# Stream Bandit Current App Manifest V7.12.300.14
 
 Date: 2026-06-16
 
@@ -6,19 +6,17 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.300.3 Passed Groups Added As Live Candidates / Admin Group Rail Pass Next`
+`V7.12.300.14 Admin Group Promoted To Index Candidate Tracker / Owner Group Later`
 
-The main app rail rollout has now recorded all previously passed groups as live-ready candidates so they can be tracked clearly before final live/homepage promotion.
+The main app rail rollout has now recorded all previously passed groups plus the completed Admin group as live-ready candidates so they can be tracked clearly before final live/homepage promotion.
 
-These are candidate records only. This manifest update does not promote `index.html` to a final live homepage and does not change production behaviour.
+These are candidate records only. This manifest update does not promote `index.html` to a final live homepage and does not change production behaviour. Root still redirects to Home.
 
 Current next target group:
 
-`Admin`
+`Owner - later, PDF-guided rail and usefulness pass`
 
-First Admin page for the rail pass:
-
-`admin-centre-command-deck-v7-12-121-test.html`
+Owner group is intentionally deferred because the rail needs a different pass and the owner/user-management/Web Builder completion work changes more page behaviour than the Admin utility rail pass.
 
 ## Current scanner rule
 
@@ -37,25 +35,13 @@ Scanner checks to preserve before any page change:
 - overlay flag
 - unknown table tokens
 
-No page change should add schema, RLS, storage policy, bucket policy, service-role, index promotion, live-home promotion, or OpenAI/API keys.
+No page change should add schema, RLS, storage policy, bucket policy, service-role, live-home promotion, or OpenAI/API keys.
 
 ## Current `sb_table 1` scan snapshot
 
 Latest scanner:
 
 `V7.12.300 SB Table Route Scanner`
-
-Started:
-
-`2026-06-16T11:10:01.567Z`
-
-Finished:
-
-`2026-06-16T11:10:16.274Z`
-
-Failed routes:
-
-`[]`
 
 Known table list:
 
@@ -118,214 +104,96 @@ Clean-navigation rules:
 - Do not duplicate route buttons inside hero when those routes already exist in the top rail.
 - Do not add duplicate route-card tabs when those routes already exist in the top rail.
 - Internal tabs are for current-page content only.
-- Outputs stay under the tabs or sections they belong to.
-- Rails and tabs must use global Theme Projector variables: `--accent`, `--accent2`, `--p`, `--p2`, `--line`, `--muted`, `--btnText`, `--fontScale`.
-- Preferred active pill style: `linear-gradient(135deg,var(--accent),var(--accent2))`.
 
 ## Live candidate groups so far
 
-These groups have passed previous checks and are now live-ready candidate groups for tracking. Candidate tracking does not equal live-home promotion.
+### Watch group - 10 candidates
 
-### Watch group — 10 candidates
+- `home-global-helpers-v7-4-4-test.html`
+- `library-global-helpers-v7-4-8-test.html`
+- `details-clean-machine-v7-12-38-test.html`
+- `player-one-global-helpers-v7-3-3-test.html`
+- `continue-watching-global-helpers-v7-3-9-test.html`
+- `watch-history-global-helpers-v7-4-0-test.html`
+- `watchlist-clean-machine-v7-12-43-test.html`
+- `favourites-clean-machine-v7-12-41-test.html`
+- `likes-clean-machine-v7-12-42-test.html`
+- `accessibility-clean-machine-v7-12-44-test.html`
 
-- Home — `home-global-helpers-v7-4-4-test.html` — Clean Home current
-- Library — `library-global-helpers-v7-4-8-test.html` — Supabase Library
-- Details — `details-clean-machine-v7-12-38-test.html` — Clean Details
-- Player 1 — `player-one-global-helpers-v7-3-3-test.html` — Single-title Player
-- Continue Watching — `continue-watching-global-helpers-v7-3-9-test.html` — Resume
-- Watch History — `watch-history-global-helpers-v7-4-0-test.html` — Watch history
-- Watchlist — `watchlist-clean-machine-v7-12-43-test.html` — Watchlist
-- Favourites — `favourites-clean-machine-v7-12-41-test.html` — Favourites
-- Likes — `likes-clean-machine-v7-12-42-test.html` — Liked
-- Accessibility — `accessibility-clean-machine-v7-12-44-test.html` — Accessibility
+### Browse group - 4 candidates
 
-### Browse group — 4 candidates
+- `supabase-library-home-header-form-fix-v7-12-34-test.html`
+- `genres-clean-machine-v7-12-45-test.html`
+- `global-search-global-helpers-v7-4-9-test.html`
+- `about-global-helpers-v7-4-7-test.html`
 
-- Supabase Library Editor — `supabase-library-home-header-form-fix-v7-12-34-test.html` — Supabase editor
-- Genres — `genres-clean-machine-v7-12-45-test.html` — Genres
-- Global Search — `global-search-global-helpers-v7-4-9-test.html` — Full search
-- About — `about-global-helpers-v7-4-7-test.html` — About
+### Creator group - 3 candidates
 
-### Creator group — 3 candidates
+- `submit-video-clean-machine-v7-12-79-test.html`
+- `rules-clean-machine-v7-12-82-test.html`
+- `review-queue-clean-machine-v7-12-80-publish-test.html`
 
-- Submit Video — `submit-video-clean-machine-v7-12-79-test.html` — Passed direct poster upload and direct submission
-- Rules — `rules-clean-machine-v7-12-82-test.html` — Passed workflow checkpoint
-- Review Queue — `review-queue-clean-machine-v7-12-80-publish-test.html` — Passed publish to Library
+### Group Play group - 5 candidates
 
-### Group Play group — 5 candidates
+- `playlists-global-helpers-v7-5-2-test.html`
+- `channels-global-helpers-v7-5-3-test.html`
+- `my-channel-clean-machine-v7-12-47-test.html`
+- `collections-clean-machine-v7-12-51-test.html`
+- `player-2-clean-machine-v7-12-58-test.html`
 
-- Playlists — `playlists-global-helpers-v7-5-2-test.html` — Playlists
-- Channels — `channels-global-helpers-v7-5-3-test.html` — Channels
-- My Channel — `my-channel-clean-machine-v7-12-47-test.html` — My Channel
-- Collections — `collections-clean-machine-v7-12-51-test.html` — Collections
-- Player 2 — `player-2-clean-machine-v7-12-58-test.html` — Group Player
+### Settings group - 4 candidates
 
-### Settings group — 4 candidates
+- `settings-platform-control-hub-v7-12-85-test.html`
+- `web-builder-theme-studio-controls-v7-8-9-test.html`
+- `profile-settings-live-ready-v7-12-90-test.html`
+- `web-builder-account-control-hub-v7-12-263-test.html`
 
-- Settings Hub — `settings-platform-control-hub-v7-12-85-test.html` — Settings hub
-- Theme Studio — `web-builder-theme-studio-controls-v7-8-9-test.html` — Theme Studio owner
-- Profile Settings — `profile-settings-live-ready-v7-12-90-test.html` — Profile image overlay
-- Web Builder — `web-builder-account-control-hub-v7-12-263-test.html` — Web Builder hub
+### Policy group - 3 candidates
 
-### Policy group — 3 candidates
+- `policy-documents-centre-v7-12-119-test.html`
+- `policy-reader-v7-12-119-test.html?policy=terms`
+- `policy-admin-documents-v7-12-120-test.html?policy=terms`
 
-- Policy Documents — `policy-documents-centre-v7-12-119-test.html` — Policy
-- Policy Proof — `policy-reader-v7-12-119-test.html?policy=terms` — Read-only proof
-- Policy Admin Editor — `policy-admin-documents-v7-12-120-test.html?policy=terms` — Policy admin
+### Admin group - 9 candidates
 
-## Passed group confirmations
+- `admin-centre-command-deck-v7-12-121-test.html`
+- `live-readiness-global-helpers-v7-10-2-test.html`
+- `all-pages-version-registry-v7-12-122-current-routes-test.html`
+- `test-checklist-global-helpers-v7-10-5-test.html`
+- `tools-page-original-global-pass-v7-12-136-test.html`
+- `health-check-global-helpers-v7-10-6-test.html`
+- `mux-manager-global-helpers-v7-10-7-test.html`
+- `storage-prep-global-helpers-v7-10-8-test.html`
+- `backup-safety-global-helpers-v7-10-9-test.html`
 
-### Watch group — PASS
+## Completed Admin group pass
 
-Protected behaviours: Player Comfort, audio boost, fullscreen, accessibility, saves, progress, and history remain protected.
+Admin group is complete and promoted to the `index.html` candidate tracker after owner test pass.
 
-### Browse group — PASS
+Admin page commits in this pass:
 
-Top rail pattern established, duplicate hero route buttons removed where checked, public Browse outputs remain working, no schema/storage/index promotion.
+- Admin Centre: `d77a2bc0ed27f0ec5dafa62135172708bcafd5b8`
+- Live Readiness: `a24a0592c153c6e36a0ad3783747844938dd7810`
+- Current Routes Registry: `27e79324493e469d0e4c67ab528a6e3b67c1b577`
+- Test Checklist: `df29a5b7899e3d18a92a5e127a4ada43a759c592`
+- Tools: `c9fe83d67979278d589d120e696e15b83d4cfd69`
+- Health Check: `946f2bafcd14cabb6c998c83cc3869d2bbd8871c`
+- Mux Manager: `f8da89b401b3947d736f16483728438ef5bdbda5`
+- Storage Prep: `2d2784c8e8301b29b3b0934dc2cc4c127d206046`
+- Backup / Safety: `4736e013bf60406f8f37b4cc81a930509d880139`
 
-### Creator / Group Play groups — PASS
+## Owner group later / PDF direction
 
-Top rail pattern established. Route links moved out of heroes into top rails. No duplicate route tabs/buttons were added. Internal tabs remain current-page content only. Supabase writes stay on intended pages only. No schema, storage policy, RLS, bucket, Player 1, Details, index, or global-helper changes.
+Owner group is not being started in this manifest update. The owner plan says the next larger completion work should avoid treating the project as a routing rescue and instead complete usefulness, account ownership, Web Builder canonical pages, user-management utility pages, and shell consistency.
 
-### Settings/Profile group — PASS
+Do not force Owner group through the simple Admin utility rail pattern. Owner group needs a separate rail and usefulness pass because it includes pages that can change account/profile/user-management/building behaviour.
 
-Profile Settings changes the signed-in user's avatar/profile identity correctly. Header Shell and Profile Settings no longer fight over the left identity image. Signed-in profile avatar wins when present. Signed-out users see the global Stream Bandit brand logo. Profile Settings owns profile/account visible settings, avatar upload, banner upload, Supabase Auth/profile reads, and `sb_profiles` writes.
+## Promotion status
 
-### Web Builder group — GLOBAL RAIL PASS / CANDIDATE TRACKING ONLY
+`index.html` has been updated as a candidate tracker for Admin group only.
 
-Canonical doorway:
+This is not final live-home promotion.
 
-`web-builder-account-control-hub-v7-12-263-test.html`
+Root redirect remains:
 
-Web Builder group is tracked in:
-
-`WEB-BUILDER-MANIFEST-V7-12-252.md`
-
-Index tracking only:
-
-- Web Builder group is listed in `index.html` as near-ready candidate tracking.
-- This does not promote Web Builder live.
-- This does not approve final homepage replacement.
-- Web Builder still needs polish/tidy and temp/support classification before any live promotion.
-
-### Policy group — FULL GROUP PASS / LIVE CANDIDATES
-
-Passed pages:
-
-- Policy Documents Centre — `policy-documents-centre-v7-12-119-test.html` — `V7.12.296.4 Policy Documents Centre Main App Rail Pass`
-- Published Policy Proof / Reader — `policy-reader-v7-12-119-test.html?policy=terms` — `V7.12.296.5 Policy Reader Main App Rail Pass`
-- Policy Admin Centre — `policy-admin-documents-v7-12-120-test.html?policy=terms` — `V7.12.296.7 Policy Admin Editor Centre Main App Rail Pass`
-
-Policy group scanner truth:
-
-- Policy Centre: public hub, no intended writes.
-- Policy Reader: reads `sb_policy_documents`, no writes, public published-only proof page.
-- Policy Admin: reads `sb_policy_documents` and `sb_profiles`, writes only `sb_policy_documents`, owner/admin editor, view-only for non-admin users.
-
-Policy group owner-confirmed debug truth:
-
-- `policyGroupRail:true`
-- `mainAppRailPass:true`
-- `pageVisibleToAll:true`
-- `viewOnlyForNonAdmin:true`
-- `writesPolicyRowsOnly:true`
-- `readTables:[sb_policy_documents,sb_profiles]`
-- `writeTables:[sb_policy_documents]`
-- `storagePolicyEdits:false`
-- `storageWrites:false`
-- `storageActions:false`
-- `authAdmin:false`
-- `schemaChanges:false`
-- `rlsChange:false`
-- `serviceRole:false`
-- `indexPromotion:false`
-- `livePromotion:false`
-- `webBuilderRailInjection:false`
-- helper presence all true: shell, header, footer, theme, saves, counts, search, settings, brand.
-
-## Current Admin group — NEXT
-
-Screenshot group to complete next:
-
-- Admin Centre
-- Live Readiness
-- Current Routes Registry
-- Test Checklist
-- Tools
-- Health Check
-- Mux Manager
-- Storage Prep
-- Backup / Safety
-
-First target file:
-
-`admin-centre-command-deck-v7-12-121-test.html`
-
-Current uploaded/source state:
-
-- `V7.12.218 Admin Centre Route Command Deck`
-- Link/check/report command deck only.
-- Uses global helpers and protected page helper.
-- Contains tabs for Admin, Safety Chain, Media / Library, Owner / Builder, Policy / Users, Actions and Debug.
-
-Admin group scanner truth for first page:
-
-- Admin Centre route: `admin-centre-command-deck-v7-12-121-test.html`
-- route status: `200`
-- tables: none
-- read tables: none
-- write tables: none
-- auth: `false`
-- storage: `false`
-- write: `false`
-- rpc: `false`
-- overlay: `false`
-
-Admin group pass must preserve:
-
-- Admin Centre is a launcher/report/checker.
-- Working engines stay in their own pages.
-- No Supabase table writes are introduced to Admin Centre.
-- No schema, RLS, storage policy, bucket policy, service-role, OpenAI/API key, live promotion or index-home replacement.
-- Rail pass should remove stale routes and duplicate route buttons while keeping the Admin group complete.
-
-## Protected helper states
-
-- `stream-bandit-header-shell-v7-12-156.js` owns the header shell. Latest passed replacement: `V7.12.297.1 Header Shell / Profile Identity Image Owner`.
-- `stream-bandit-footer-shell-v7-12-156.js` owns the footer shell. Latest passed replacement: `V7.12.298.2 Footer Shell / Inbox Reply Payload Fix`.
-- `stream-bandit-theme-projector-v7-12-156.js` applies global theme variables and supports accessibility/readability projection.
-- `stream-bandit-settings-global-v7-1-8.js` is the protected global settings helper.
-- `stream-bandit-brand-logo-v7-12-12.js` is the protected brand/logo helper.
-- `stream-bandit-core-saves-v6-75.js` owns Watchlist/Favourites/Likes save logic.
-- `stream-bandit-menu-saves-count-v6-72-1.js` owns save counts and menu visibility.
-- `live-readiness-search-supabase-fallback-v7-12-130.js` owns header search preview, menu route sanitizer, and Global Search handoff.
-- `stream-bandit-protected-page-v7-12-273.js` presents admin/owner/protected page locks.
-- `stream-bandit-authority-gate-v7-12-273.js` is the shared route/access decision engine.
-- `stream-bandit-account-authority-v7-12-273.js` reads Supabase user and `sb_profiles` authority from the live profile row.
-
-## Current live candidate tracking
-
-Tracked as near-ready candidates in `index.html`:
-
-1. Watch group
-2. Browse group
-3. Creator group
-4. Group Play group
-5. Settings group
-6. Policy group
-7. Web Builder group candidate tracker
-
-Candidate tracking does not equal live-home promotion.
-
-## No-touch rules still active
-
-- No schema changes.
-- No RLS rewrites.
-- No storage policy changes.
-- No bucket policy changes.
-- No service-role key in browser code.
-- No OpenAI/API keys in browser code.
-- No live promotion.
-- No `index.html` live-home replacement.
-- No protected helper rewrites unless explicitly requested.
-- Use the `sb_table 1` scanner for every Supabase-touching page before editing.
+`home-global-helpers-v7-4-4-test.html`
