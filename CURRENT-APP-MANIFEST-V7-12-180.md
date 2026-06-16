@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.300.2
+# Stream Bandit Current App Manifest V7.12.300.3
 
 Date: 2026-06-16
 
@@ -6,16 +6,9 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.300.2 Policy Group Passed / Admin Group Rail Pass Next`
+`V7.12.300.3 Passed Groups Added As Live Candidates / Admin Group Rail Pass Next`
 
-The main app rail rollout has now completed the Profile and Policy run described in the latest owner test cycle.
-
-Current live-ready candidate tracking now includes:
-
-- Profile Settings — `profile-settings-live-ready-v7-12-90-test.html`
-- Policy Documents Centre — `policy-documents-centre-v7-12-119-test.html`
-- Published Policy Proof / Reader — `policy-reader-v7-12-119-test.html?policy=terms`
-- Policy Admin Centre — `policy-admin-documents-v7-12-120-test.html?policy=terms`
+The main app rail rollout has now recorded all previously passed groups as live-ready candidates so they can be tracked clearly before final live/homepage promotion.
 
 These are candidate records only. This manifest update does not promote `index.html` to a final live homepage and does not change production behaviour.
 
@@ -129,83 +122,74 @@ Clean-navigation rules:
 - Rails and tabs must use global Theme Projector variables: `--accent`, `--accent2`, `--p`, `--p2`, `--line`, `--muted`, `--btnText`, `--fontScale`.
 - Preferred active pill style: `linear-gradient(135deg,var(--accent),var(--accent2))`.
 
-## Passed groups
+## Live candidate groups so far
 
-### Public Watch / Saved / Comfort group — PASS
+These groups have passed previous checks and are now live-ready candidate groups for tracking. Candidate tracking does not equal live-home promotion.
 
-Passed pages:
+### Watch group — 10 candidates
 
-- Home — `home-global-helpers-v7-4-4-test.html`
-- Library — `library-global-helpers-v7-4-8-test.html`
-- Details — `details-clean-machine-v7-12-38-test.html`
-- Player 1 — `player-one-global-helpers-v7-3-3-test.html`
-- Continue Watching — `continue-watching-global-helpers-v7-3-9-test.html`
-- Watch History — `watch-history-global-helpers-v7-4-0-test.html`
-- Watchlist — `watchlist-clean-machine-v7-12-43-test.html`
-- Favourites — `favourites-clean-machine-v7-12-41-test.html`
-- Likes — `likes-clean-machine-v7-12-42-test.html`
-- Accessibility — `accessibility-clean-machine-v7-12-44-test.html`
+- Home — `home-global-helpers-v7-4-4-test.html` — Clean Home current
+- Library — `library-global-helpers-v7-4-8-test.html` — Supabase Library
+- Details — `details-clean-machine-v7-12-38-test.html` — Clean Details
+- Player 1 — `player-one-global-helpers-v7-3-3-test.html` — Single-title Player
+- Continue Watching — `continue-watching-global-helpers-v7-3-9-test.html` — Resume
+- Watch History — `watch-history-global-helpers-v7-4-0-test.html` — Watch history
+- Watchlist — `watchlist-clean-machine-v7-12-43-test.html` — Watchlist
+- Favourites — `favourites-clean-machine-v7-12-41-test.html` — Favourites
+- Likes — `likes-clean-machine-v7-12-42-test.html` — Liked
+- Accessibility — `accessibility-clean-machine-v7-12-44-test.html` — Accessibility
+
+### Browse group — 4 candidates
+
+- Supabase Library Editor — `supabase-library-home-header-form-fix-v7-12-34-test.html` — Supabase editor
+- Genres — `genres-clean-machine-v7-12-45-test.html` — Genres
+- Global Search — `global-search-global-helpers-v7-4-9-test.html` — Full search
+- About — `about-global-helpers-v7-4-7-test.html` — About
+
+### Creator group — 3 candidates
+
+- Submit Video — `submit-video-clean-machine-v7-12-79-test.html` — Passed direct poster upload and direct submission
+- Rules — `rules-clean-machine-v7-12-82-test.html` — Passed workflow checkpoint
+- Review Queue — `review-queue-clean-machine-v7-12-80-publish-test.html` — Passed publish to Library
+
+### Group Play group — 5 candidates
+
+- Playlists — `playlists-global-helpers-v7-5-2-test.html` — Playlists
+- Channels — `channels-global-helpers-v7-5-3-test.html` — Channels
+- My Channel — `my-channel-clean-machine-v7-12-47-test.html` — My Channel
+- Collections — `collections-clean-machine-v7-12-51-test.html` — Collections
+- Player 2 — `player-2-clean-machine-v7-12-58-test.html` — Group Player
+
+### Settings group — 4 candidates
+
+- Settings Hub — `settings-platform-control-hub-v7-12-85-test.html` — Settings hub
+- Theme Studio — `web-builder-theme-studio-controls-v7-8-9-test.html` — Theme Studio owner
+- Profile Settings — `profile-settings-live-ready-v7-12-90-test.html` — Profile image overlay
+- Web Builder — `web-builder-account-control-hub-v7-12-263-test.html` — Web Builder hub
+
+### Policy group — 3 candidates
+
+- Policy Documents — `policy-documents-centre-v7-12-119-test.html` — Policy
+- Policy Proof — `policy-reader-v7-12-119-test.html?policy=terms` — Read-only proof
+- Policy Admin Editor — `policy-admin-documents-v7-12-120-test.html?policy=terms` — Policy admin
+
+## Passed group confirmations
+
+### Watch group — PASS
 
 Protected behaviours: Player Comfort, audio boost, fullscreen, accessibility, saves, progress, and history remain protected.
 
-### Public Browse group — FULL GROUP PASS
+### Browse group — PASS
 
-Passed pages:
+Top rail pattern established, duplicate hero route buttons removed where checked, public Browse outputs remain working, no schema/storage/index promotion.
 
-- Supabase Library — `supabase-library-home-header-form-fix-v7-12-34-test.html`
-- Genres — `genres-clean-machine-v7-12-45-test.html` — `V7.12.282 Genres · Clean Navigation`
-- Global Search — `global-search-global-helpers-v7-4-9-test.html` — `V7.12.283 Global Search · Header Query Handoff`
-- About — `about-global-helpers-v7-4-7-test.html` — `V7.12.284 About · Clean Navigation`
+### Creator / Group Play groups — PASS
 
-Browse confirmations: top rail pattern established, duplicate hero route buttons removed, public Browse outputs remain working, no schema/storage/index promotion.
-
-### Creator / Group Play group — FULL GROUP PASS
-
-Passed pages:
-
-- Rules — `rules-clean-machine-v7-12-82-test.html` — `V7.12.286 Creator Rules · Platform Truth Map`
-- Submit Video — `submit-video-clean-machine-v7-12-79-test.html` — `V7.12.287 Submit Video · Clean Rail`
-- Review Queue — `review-queue-clean-machine-v7-12-80-publish-test.html` — `V7.12.288 Review Queue · Clean Rail`
-- Playlists — `playlists-global-helpers-v7-5-2-test.html` — `V7.12.289 Playlists · Clean Rail`
-- Channels — `channels-global-helpers-v7-5-3-test.html` — `V7.12.290 Channels · Clean Rail`
-- My Channel — `my-channel-clean-machine-v7-12-47-test.html` — `V7.12.291.1 My Channel · Plan Stat Wrap Fix`
-- Collections — `collections-clean-machine-v7-12-51-test.html` — `V7.12.292 Collections · Clean Rail`
-- Player 2 — `player-2-clean-machine-v7-12-58-test.html` — `V7.12.293 Player 2 · Clean Rail`
-
-Creator / Group Play confirmations:
-
-- Top rail pattern established.
-- Route links moved out of heroes into top rails.
-- No duplicate route tabs/buttons were added.
-- Internal tabs remain current-page content only.
-- Supabase writes stay on intended pages only.
-- No schema, storage policy, RLS, bucket, Player 1, Details, index, or global-helper changes.
+Top rail pattern established. Route links moved out of heroes into top rails. No duplicate route tabs/buttons were added. Internal tabs remain current-page content only. Supabase writes stay on intended pages only. No schema, storage policy, RLS, bucket, Player 1, Details, index, or global-helper changes.
 
 ### Settings/Profile group — PASS
 
-Passed pages/helpers:
-
-- Settings Hub — `settings-platform-control-hub-v7-12-85-test.html` — `V7.12.294 Settings Hub · Web Builder Doorway`
-- Theme Studio — `web-builder-theme-studio-controls-v7-8-9-test.html` — `V7.12.295 Theme Studio · Clean Rail Global Bridge`
-- Profile Settings — `profile-settings-live-ready-v7-12-90-test.html` — PASS / candidate
-- Footer Messenger — `stream-bandit-footer-shell-v7-12-156.js` — `V7.12.298.2 Footer Shell / Inbox Reply Payload Fix`
-
-Profile Settings confirmation:
-
-- Profile Settings changes the signed-in user's avatar/profile identity correctly.
-- Header Shell and Profile Settings no longer fight over the left identity image.
-- Signed-in profile avatar wins when present.
-- Signed-out users see the global Stream Bandit brand logo.
-- Profile Settings owns profile/account visible settings, avatar upload, banner upload, Supabase Auth/profile reads, and `sb_profiles` writes.
-- Profile Settings is a current live-ready candidate.
-
-Footer Messenger confirmation:
-
-- Global lightweight private-message overlay opens from the footer on pages using the global footer shell.
-- `sb_private_messages` remains the real message table.
-- `sb_profiles` remains the avatar/display-name source.
-- `sb_user_friends` and `sb_user_blocks` support friend/block UI.
-- Form Inbox remains the full management page for form submissions and private messages.
+Profile Settings changes the signed-in user's avatar/profile identity correctly. Header Shell and Profile Settings no longer fight over the left identity image. Signed-in profile avatar wins when present. Signed-out users see the global Stream Bandit brand logo. Profile Settings owns profile/account visible settings, avatar upload, banner upload, Supabase Auth/profile reads, and `sb_profiles` writes.
 
 ### Web Builder group — GLOBAL RAIL PASS / CANDIDATE TRACKING ONLY
 
@@ -258,10 +242,6 @@ Policy group owner-confirmed debug truth:
 - `livePromotion:false`
 - `webBuilderRailInjection:false`
 - helper presence all true: shell, header, footer, theme, saves, counts, search, settings, brand.
-
-Policy group live-candidate note:
-
-The Policy group has now been added to `index.html` candidate tracking. Candidate tracking is not live-home promotion.
 
 ## Current Admin group — NEXT
 
@@ -327,11 +307,13 @@ Admin group pass must preserve:
 
 Tracked as near-ready candidates in `index.html`:
 
-1. Profile Settings
-2. Policy Documents Centre
-3. Published Policy Proof / Reader
-4. Policy Admin Centre
-5. Web Builder group candidate tracker
+1. Watch group
+2. Browse group
+3. Creator group
+4. Group Play group
+5. Settings group
+6. Policy group
+7. Web Builder group candidate tracker
 
 Candidate tracking does not equal live-home promotion.
 
