@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.299.22
+# Web Builder Manifest V7.12.300.34
 
 ## Purpose
 
@@ -8,7 +8,7 @@ The Stream Bandit movie/app manifest remains separate. This file is Web Builder 
 
 ## Current checkpoint status
 
-Status: ACTIVE / WEB BUILDER GLOBAL RAIL GROUP PASS COMPLETE / INDEX.HTML PROMOTION NOT APPROVED.
+Status: ACTIVE / WEB BUILDER GLOBAL RAIL GROUP PASS COMPLETE / HEADER-FOOTER INTEGRATION HOLD / INDEX.HTML PROMOTION NOT APPROVED.
 
 Checkpoint issue:
 
@@ -39,6 +39,81 @@ Rail rollout principle:
 - Outputs stay visible on-page.
 - Full Form Inbox remains separate/protected.
 - No schema, RLS, storage policy, bucket policy, or live `index.html` promotion happens during this pass.
+
+## Product ownership correction V7.12.300.34
+
+This is the current Web Builder navigation/shell correction before the next Header/Footer rebuild.
+
+### Menu Builder classification
+
+Route:
+
+`web-builder-menu-builder-owned-v7-12-264-test.html`
+
+Correct product role:
+
+- This is an on-page custom menu builder.
+- It belongs in the same family as the advanced Form Designer: a builder-owned page feature tool.
+- It should let a Web Builder user build per-page or site page menus with top/left/right placement, visibility, ordering and sub-tab indentation.
+- It is not the canonical global header/footer shell builder.
+- It must keep add/edit/remove/reorder/sub-tab overlays and save real menu settings to `sb_site_pages.settings_json`.
+
+### Header/Footer Builder classification
+
+Route:
+
+`web-builder-header-footer-code-v7-12-254-test.html`
+
+Correct product role:
+
+- This is the builder-site shell tool.
+- It owns header text, header links, header buttons, rail-style subtabs, footer text, footer groups, footer links, footer buttons and optional trusted header/footer code.
+- Users must be able to use it as their own header/footer menu/rail if they want.
+- Every configurable item needs add, edit, delete and reorder controls where relevant.
+- Inputs must open in overlays and outputs must stay visible on-page.
+- Code must be an advanced option, not the default user experience.
+
+### Domain, subdomain and hosting requirement
+
+Web Builder also needs future domain/subdomain/hosting support as part of the builder-owned product area:
+
+- custom domain mapping
+- subdomain mapping
+- hosting/deploy readiness
+- SSL/DNS guidance
+- publish status and rollback status
+- owner-safe approval gates
+
+No domain table, DNS write, hosting automation, schema change, RLS change or `index.html` promotion is approved by this manifest note.
+
+### Header/Footer blocker found
+
+Current Header/Footer saves to a private page key that Preview does not consume:
+
+`settings_json.web_builder_header_footer_builder`
+
+Current Preview consumes simple shell fields and menu rows instead:
+
+- `settings_json.site_name`
+- `settings_json.footer_title`
+- `settings_json.footer_text`
+- `settings_json.menu_label`
+- `settings_json.menu_icon`
+- `settings_json.menu_position`
+- `settings_json.menu_order`
+- `settings_json.menu_indent`
+- `settings_json.show_in_menu`
+
+Therefore Header/Footer must not be promoted until the connected pass is complete.
+
+Required connected pass:
+
+1. Header/Footer Builder saves a shared builder shell model to `sb_site_pages.settings_json`.
+2. Header/Footer Builder mirrors basic compatible fields for current Preview where needed.
+3. Owned Preview renders the shared builder shell model when present.
+4. Source Map reports builder shell presence, counts and publish readiness.
+5. Studio/Form/Menu tools preserve unrelated `settings_json` keys when saving.
+6. No schema, storage policy, DNS, domain, hosting or index promotion is done in this pass.
 
 ## Golden Web Builder shell
 
@@ -152,7 +227,7 @@ Current tested version:
 
 `V7.12.299.14 Web Builder Owned Preview Global Rail Lock`
 
-Status: FUNCTIONAL PASS / VISUAL POLISH PENDING.
+Status: FUNCTIONAL PASS / VISUAL POLISH PENDING / HEADER-FOOTER SHELL READER NEEDED.
 
 Known polish debt:
 
@@ -160,6 +235,7 @@ Known polish debt:
 - hero/card hierarchy needs polish
 - card spacing and layout need cleanup
 - preserve preview logic and owner lock
+- read and render shared Header/Footer shell model when present
 - do not mix visual polish with live/index promotion
 
 ### Menu Builder
@@ -172,7 +248,7 @@ Current tested version:
 
 `V7.12.299.16 Web Builder Menu Builder Global Rail Overlay Pass`
 
-Status: PASS.
+Status: PASS / RECLASSIFIED AS ON-PAGE CUSTOM MENU BUILDER.
 
 Owner test confirmed:
 
@@ -184,6 +260,10 @@ Owner test confirmed:
 - remove-from-menu overlay works
 - menu output preserved
 - no schema/storage/index promotion
+
+Correction note:
+
+This page is not the global header/footer builder. It is the on-page custom menu builder, comparable to the advanced Form Designer category.
 
 ### Form Designer
 
@@ -252,7 +332,7 @@ Current tested version:
 
 `V7.12.299.20 Web Builder Pages Source Map Global Rail Pass`
 
-Status: PASS.
+Status: PASS / NEEDS BUILDER SHELL REPORTING.
 
 Owner rule from test:
 
@@ -268,11 +348,19 @@ Route:
 
 Current tested version:
 
-`V7.12.299.21 Web Builder Header/Footer Code Global Rail Pass`
+`V7.12.300.32 Web Builder Overlay Header/Footer Builder`
 
-Status: PASS.
+Status: HOLD / REWORK REQUIRED.
 
-Owner test confirmed:
+Owner test concern:
+
+- saves are not visible in Owned Preview
+- typed slugs do not feel connected enough to the publish flow
+- page currently behaves too much like a standalone builder settings toy
+- add/edit/delete/reorder is not complete for every item
+- code must be optional/advanced, not the main user path
+
+Previous owner test confirmed before rework:
 
 - global rail present
 - old local top buttons gone
@@ -304,7 +392,7 @@ Status: SAFETY PASS / HANDOFF PRESERVED.
 
 No-touch rule:
 
-Do not touch `web-builder-live-studio-v7-12-116.js` during this pass.
+Do not touch `web-builder-live-studio-v7-12-116.js` during this pass unless explicitly doing a Studio preservation fix. Studio must preserve unrelated `settings_json` keys when saving page content.
 
 ## Current index.html promotion gate
 
@@ -353,6 +441,7 @@ These routes are the current Web Builder group for polish/tidy and later promoti
   - tidy hero/card layout
   - tidy rendered website cards
   - preserve logic/locks
+  - render Header/Footer shell when present
 
 - `web-builder-account-control-hub-v7-12-263-test.html`
   - use as gold standard but still final-check visual spacing and route labels
@@ -362,118 +451,23 @@ These routes are the current Web Builder group for polish/tidy and later promoti
   - final owner-scope wording tidy
 
 - `web-builder-menu-builder-owned-v7-12-264-test.html`
-  - final menu wording tidy
+  - final wording must call it the on-page custom menu builder
   - final body button/route check
+  - later domain/subdomain/hosting links must point to the builder-owned hosting/domain area when that exists
 
 - `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>`
   - final form wording tidy
   - final button route check
 
 - `web-builder-header-footer-code-v7-12-254-test.html`
-  - final code planner wording tidy
-  - final body button route check
+  - rebuild as Header/Footer Builder, not code-first planner
+  - add/edit/delete/reorder everywhere
+  - advanced optional custom code overlay
+  - save shared builder shell model to `settings_json`
+  - connect Owned Preview and Source Map
 
 ### Light tidy only
 
 - `web-builder-assets-v7-12-252-test.html`
 - `web-builder-route-map-v7-12-252-test.html`
 - `web-builder-control-map-v7-12-253-test.html`
-- `web-builder-pages-source-map-v7-12-255-test.html`
-- `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>`
-
-### Docs/reference only
-
-- `WEB-BUILDER-MANIFEST-V7-12-252.md`
-
-The manifest is reference only and does not need user-facing button polish.
-
-## Temp / fallback / support routes not automatically part of Web Builder product
-
-These routes may be kept as fallback, history, testing, or support references. They must not be treated as the clean Web Builder user-facing group unless owner explicitly promotes them.
-
-- `web-builder-live-studio-v7-12-116-test.html`
-- `web-builder-live-studio-v7-12-116.js`
-- `web-builder-pages-manager-v7-12-108-test.html`
-- `web-builder-pages-manager-v7-12-109-test.html`
-- `web-builder-pages-manager-v7-12-111-test.html`
-- `web-builder-shared-style-preview-v7-9-2-test.html`
-- `web-builder-shared-style-preview-v7-12-117-test.html?page=<slug>`
-- `web-builder-form-save-v7-12-94-test.html?page=<slug>`
-- `web-builder-form-submissions-v7-12-94-test.html?page=<slug>`
-- `stream-bandit-route-pointer-machine-v7-12-36-test.html`
-- `repository-deep-route-graph-v7-12-38-test.html`
-- `repository-global-dependency-graph-v7-12-39-test.html`
-
-Rule:
-
-If one of these is still needed, label it as support/reference/fallback. Do not put it in the main Web Builder rail or index promotion group without a separate owner-approved cleanup task.
-
-## Explicit exclusions
-
-Do not visually merge these into the main Web Builder shell as product pages:
-
-- `web-builder-form-submissions-v7-12-94-test.html?page=<slug>`
-- `web-builder-shared-style-preview-v7-12-117-test.html?page=<slug>`
-- `web-builder-form-save-v7-12-94-test.html?page=<slug>`
-
-Reasons:
-
-- they are current support/reference routes
-- Web Builder-owned equivalents already exist or are being created separately
-- the full form-submission manager owns deeper submission/private-message flows
-- old support routes are useful for rollback and comparison, not clean user-facing builder navigation
-
-## Kayleigh / Creator Growth restrictions
-
-Restriction work is deliberately deferred until the shell rollout and polish/tidy pass are complete.
-
-Later restriction pass must:
-
-- centralise route visibility
-- centralise rail/tab visibility
-- show Creator Growth only allowed Web Builder tools
-- keep Creator Growth users scoped to own `owner_id` pages
-- keep platform owner as all-workspace override
-- prevent admin role alone from exposing other users' Web Builder rows
-- avoid storage path/schema/RLS changes
-- preserve full Form Inbox architecture
-
-## Acceptance test for every user-facing Web Builder page
-
-A user-facing Web Builder page passes only when:
-
-- header/rail matches Hub
-- uploaded Web Builder logo appears in header and rail
-- duplicate local top navigation is gone/hidden
-- body/page actions remain available below the rail
-- body buttons point to correct Web Builder-owned routes unless clearly labeled support/reference
-- page-specific owner/data protection still works
-- no schema change
-- no storage policy change
-- no index promotion
-- no Stream Bandit app-shell injection
-- debug confirms page-specific pass flags
-
-## Hard no-touch list
-
-- `index.html`
-- live route promotion
-- app registry promotion
-- Supabase schema/RLS/storage policies
-- bucket policies
-- `web-builder-live-studio-v7-12-116.js`
-- `web-builder-protected-page-v7-12-265.js` unless explicitly requested
-- Stream Bandit global footer shell injection into Web Builder
-
-## Current resume instruction
-
-The global rail group pass is complete.
-
-Next work should be one of these only:
-
-1. Web Builder polish/tidy pass on the tracked user-facing group.
-2. Temp/support/fallback route classification and cleanup plan.
-3. Owner/creator/admin/user/guest lock regression.
-4. `index.html` promotion plan only, with no promotion until explicit owner approval.
-
-Do not start live promotion from this manifest update.
