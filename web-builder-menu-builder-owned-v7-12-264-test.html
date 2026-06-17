@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Page Menu Builder V7.12.300.39 TEST</title>
+<title>Web Builder Page Menu Builder V7.12.300.40 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--bg:#070910;--panel:#101529;--panel2:#17122d;--line:#ffffff22;--text:#f7fbff;--muted:#aeb8d6;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff5d6c;--blue:#41e8ff}
-*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;background:radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),linear-gradient(180deg,#070910,#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}.top{position:sticky;top:0;z-index:20;background:#0b1020f0;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}.topInner{width:min(1500px,100%);margin:0 auto;padding:10px 14px;display:flex;gap:10px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap}.brand{display:flex;gap:10px;align-items:center;font-weight:950;flex:1 1 320px}.mark{width:44px;height:44px;min-width:44px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;font-weight:1000;overflow:hidden}.mark img{width:100%;height:100%;object-fit:contain;object-position:center;border-radius:inherit;background:#050711}.brand small{display:block;color:var(--muted);font-weight:800}.actions,.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.btn{border:0;border-radius:999px;background:#30384f;color:white;text-decoration:none;font-weight:950;padding:10px 13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.btn:disabled{opacity:.45;cursor:not-allowed}.primary{background:linear-gradient(135deg,var(--good),var(--purple));color:#071015}.hot{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#071015}.blue{background:linear-gradient(135deg,var(--blue),var(--purple));color:#071015}.badBtn{background:linear-gradient(135deg,var(--bad),var(--purple));color:#fff}.wrap{width:min(1500px,100%);margin:0 auto;padding:14px}.hero,.panel,.previewShell,.jumpBox,.card,.selectedBox{border:1px solid #ffffff18;border-radius:24px;background:linear-gradient(135deg,var(--panel),var(--panel2));padding:16px;margin:0 0 14px;box-shadow:0 18px 55px #0006}.card,.previewShell,.selectedBox{background:#ffffff08;box-shadow:none}.hero h1{font-size:clamp(34px,4.8vw,70px);line-height:.94;margin:8px 0;letter-spacing:-.055em}h2,h3{margin:0 0 10px}.badge,.chip,.pill{display:inline-flex;border:1px solid #ffffff24;border-radius:999px;padding:6px 9px;background:#ffffff0d;color:#dbe7ff;font-weight:900;font-size:12px;margin:2px}.badge,.good{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.bad{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}.cyan{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.layout{display:grid;grid-template-columns:minmax(430px,.9fr) minmax(420px,1.1fr);gap:12px}.card b,.selectedBox b,.jumpBox b,.field b{display:block;color:#baf7df;margin-bottom:7px}.menuRows{display:grid;gap:8px;max-height:760px;overflow:auto;padding-right:4px;scroll-behavior:smooth}.menuTab{border:1px solid #ffffff18;border-radius:20px;background:#ffffff09;padding:10px;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;min-height:58px;transition:outline .18s ease,background .18s ease,box-shadow .18s ease;text-align:left;color:var(--text);cursor:pointer}.menuTab.active{outline:3px solid #22d3a688;background:#22d3a618}.menuTab.jumpFound{outline:4px solid #41e8ffaa;background:#41e8ff18;box-shadow:0 0 0 8px #41e8ff22}.handle{width:36px;height:36px;border-radius:999px;border:1px solid #ffffff20;background:#ffffff10;color:#fff;font-size:17px;font-weight:1000;display:grid;place-items:center}.tabText{min-width:0}.tabText b{display:block;color:#baf7df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}.tabText code{display:block;color:#dfffee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}.tabMeta{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}.status,.notice{border:1px solid #ffb14266;background:#ffb14217;color:#ffe7ad;border-radius:16px;padding:12px;font-weight:850;margin:10px 0}.status.good{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}.status.bad{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}.debug{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;border:1px solid #ffffff14;border-radius:16px;background:#0007;padding:12px;color:#dfffee;max-height:420px;overflow:auto}.previewShell{background:#050711}.siteTop{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid #ffffff14;background:#101529;border-radius:18px;padding:12px;margin-bottom:12px}.siteBrand{font-weight:1000}.siteNav{display:flex;gap:8px;flex-wrap:wrap}.pageMenuTopRail{border:1px solid #ffffff14;background:#101529;border-radius:18px;padding:10px;margin-bottom:12px;overflow-x:auto;display:flex;gap:8px;scrollbar-width:thin}.pageMenuTopRail a{flex:0 0 auto}.siteNav a,.sideNav a,.pageMenuTopRail a{color:#fff;text-decoration:none;border-radius:999px;background:#ffffff12;padding:8px 11px;font-weight:900}.siteNav a.current,.sideNav a.current,.pageMenuTopRail a.current{background:linear-gradient(135deg,var(--good),var(--purple));color:#071015}.siteBody{display:grid;grid-template-columns:220px minmax(0,1fr) 220px;gap:12px;align-items:start}.siteBody.full{grid-template-columns:minmax(0,1fr)}.siteBody.noLeft{grid-template-columns:minmax(0,1fr) 220px}.siteBody.noRight{grid-template-columns:220px minmax(0,1fr)}.sideNav{border:1px solid #ffffff14;border-radius:18px;background:#101529;padding:12px;display:grid;gap:8px}.sideNav.right{grid-column:3}.pageMock{min-height:220px;border:1px solid #ffffff14;border-radius:18px;background:radial-gradient(circle at 50% 0,#22d3a628,transparent 42%),linear-gradient(135deg,#11172b,#17122d);padding:24px}.indent1{margin-left:18px}.indent2{margin-left:36px}.indent3{margin-left:54px}p,small,label,li{color:var(--muted);line-height:1.5}.jumpBox{position:sticky;top:118px;z-index:5;background:#0b1020f2;backdrop-filter:blur(14px)}.jumpGrid{display:grid;grid-template-columns:minmax(180px,1fr) auto;gap:8px;align-items:end}.jumpBox input,.field input,.field select{width:100%;border:1px solid #ffffff24;border-radius:14px;background:#0007;color:#fff;padding:11px;font:inherit}.field{border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px;margin:0 0 10px}.checkLine{display:flex;gap:8px;align-items:center;border:1px solid #ffffff14;border-radius:14px;background:#ffffff0e;padding:10px;margin:8px 0;color:#fff;font-weight:900}.checkLine input{width:auto;margin:0}.railNote{border:1px solid #41e8ff66;background:#41e8ff17;color:#dffbff;border-radius:18px;padding:12px;margin:10px 0;font-weight:900}.summaryGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.overlay{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:18px;background:#02040ccc;backdrop-filter:blur(18px)}.overlay.open{display:flex}.modal{width:min(880px,100%);max-height:92vh;overflow:auto;border:1px solid #ffffff24;border-radius:32px;background:radial-gradient(circle at 0 0,#22d3a62b,transparent 35%),linear-gradient(135deg,#0d1224,#18112d);box-shadow:0 30px 100px #000c}.modalHead{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;padding:16px;border-bottom:1px solid #ffffff18;background:#0b1020f2;backdrop-filter:blur(12px)}.modalBody{padding:16px}.modalFoot{position:sticky;bottom:0;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding:14px;border-top:1px solid #ffffff18;background:#0b1020f2;backdrop-filter:blur(12px)}.close{font-size:20px;width:44px;height:44px;border-radius:999px}.lockedScreen{min-height:100vh;display:grid;place-items:center;padding:18px}.lockedScreen .hero{width:min(940px,100%)}.loading{min-height:54vh;display:grid;place-items:center;text-align:center}.footer{border-top:1px solid var(--line);background:#0b1020d8;padding:10px 14px;color:#aeb8d6;font-size:12px}@media(max-width:980px){.layout,.siteBody,.siteBody.full,.siteBody.noLeft,.siteBody.noRight,.jumpGrid,.grid{grid-template-columns:1fr}.jumpBox{position:relative;top:auto}.sideNav.right{grid-column:auto}.hero h1{font-size:clamp(34px,11vw,52px)}.menuTab{grid-template-columns:40px minmax(0,1fr)}.tabMeta{grid-column:1/-1;justify-content:flex-start}.brand,.actions{flex:1 1 100%}.actions .btn,.btn{flex:1 1 auto}}
+*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;background:radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),linear-gradient(180deg,#070910,#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}.top{position:sticky;top:0;z-index:20;background:#0b1020f0;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}.topInner{width:min(1500px,100%);margin:0 auto;padding:10px 14px;display:flex;gap:10px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap}.brand{display:flex;gap:10px;align-items:center;font-weight:950;flex:1 1 320px}.mark{width:44px;height:44px;min-width:44px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;font-weight:1000;overflow:hidden}.mark img{width:100%;height:100%;object-fit:contain;object-position:center;border-radius:inherit;background:#050711}.brand small{display:block;color:var(--muted);font-weight:800}.actions,.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.btn{border:0;border-radius:999px;background:#30384f;color:white;text-decoration:none;font-weight:950;padding:10px 13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.btn:disabled{opacity:.45;cursor:not-allowed}.primary{background:linear-gradient(135deg,var(--good),var(--purple));color:#071015}.hot{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}.warnBtn{background:linear-gradient(135deg,var(--warn),var(--purple));color:#071015}.blue{background:linear-gradient(135deg,var(--blue),var(--purple));color:#071015}.badBtn{background:linear-gradient(135deg,var(--bad),var(--purple));color:#fff}.wrap{width:min(1500px,100%);margin:0 auto;padding:14px}.hero,.panel,.previewShell,.jumpBox,.card,.selectedBox{border:1px solid #ffffff18;border-radius:24px;background:linear-gradient(135deg,var(--panel),var(--panel2));padding:16px;margin:0 0 14px;box-shadow:0 18px 55px #0006}.card,.previewShell,.selectedBox{background:#ffffff08;box-shadow:none}.hero h1{font-size:clamp(34px,4.8vw,70px);line-height:.94;margin:8px 0;letter-spacing:-.055em}h2,h3{margin:0 0 10px}.badge,.chip,.pill{display:inline-flex;border:1px solid #ffffff24;border-radius:999px;padding:6px 9px;background:#ffffff0d;color:#dbe7ff;font-weight:900;font-size:12px;margin:2px}.badge,.good{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.bad{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}.cyan{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.layout{display:grid;grid-template-columns:minmax(430px,.9fr) minmax(420px,1.1fr);gap:12px}.card b,.selectedBox b,.jumpBox b,.field b{display:block;color:#baf7df;margin-bottom:7px}.menuRows{display:grid;gap:8px;max-height:760px;overflow:auto;padding-right:4px;scroll-behavior:smooth}.menuTab{border:1px solid #ffffff18;border-radius:20px;background:#ffffff09;padding:10px;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;min-height:58px;transition:outline .18s ease,background .18s ease,box-shadow .18s ease;text-align:left;color:var(--text);cursor:pointer}.menuTab.active{outline:3px solid #22d3a688;background:#22d3a618}.menuTab.jumpFound{outline:4px solid #41e8ffaa;background:#41e8ff18;box-shadow:0 0 0 8px #41e8ff22}.handle{width:36px;height:36px;border-radius:999px;border:1px solid #ffffff20;background:#ffffff10;color:#fff;font-size:21px;font-weight:1000;display:grid;place-items:center}.tabText{min-width:0}.tabText b{display:block;color:#baf7df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}.tabText code{display:block;color:#dfffee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}.tabMeta{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}.status,.notice{border:1px solid #ffb14266;background:#ffb14217;color:#ffe7ad;border-radius:16px;padding:12px;font-weight:850;margin:10px 0}.status.good{background:#22d3a61a;border-color:#22d3a647;color:#dfffee}.status.bad{background:#ff5d6c22;border-color:#ff5d6c66;color:#ffd0d5}.debug{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;border:1px solid #ffffff14;border-radius:16px;background:#0007;padding:12px;color:#dfffee;max-height:420px;overflow:auto}.previewShell{background:#050711}.siteTop{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid #ffffff14;background:#101529;border-radius:18px;padding:12px;margin-bottom:12px}.siteBrand{font-weight:1000}.siteNav{display:flex;gap:8px;flex-wrap:wrap}.pageMenuTopRail{border:1px solid #ffffff14;background:#101529;border-radius:18px;padding:10px;margin-bottom:12px;overflow-x:auto;display:flex;gap:8px;scrollbar-width:thin}.pageMenuTopRail a{flex:0 0 auto}.siteNav a,.sideNav a,.pageMenuTopRail a{color:#fff;text-decoration:none;border-radius:999px;background:#ffffff12;padding:8px 11px;font-weight:900}.siteNav a.current,.sideNav a.current,.pageMenuTopRail a.current{background:linear-gradient(135deg,var(--good),var(--purple));color:#071015}.siteBody{display:grid;grid-template-columns:220px minmax(0,1fr) 220px;gap:12px;align-items:start}.siteBody.full{grid-template-columns:minmax(0,1fr)}.siteBody.noLeft{grid-template-columns:minmax(0,1fr) 220px}.siteBody.noRight{grid-template-columns:220px minmax(0,1fr)}.sideNav{border:1px solid #ffffff14;border-radius:18px;background:#101529;padding:12px;display:grid;gap:8px}.sideNav.right{grid-column:3}.pageMock{min-height:220px;border:1px solid #ffffff14;border-radius:18px;background:radial-gradient(circle at 50% 0,#22d3a628,transparent 42%),linear-gradient(135deg,#11172b,#17122d);padding:24px}.indent1{margin-left:18px}.indent2{margin-left:36px}.indent3{margin-left:54px}p,small,label,li{color:var(--muted);line-height:1.5}.jumpBox{position:sticky;top:118px;z-index:5;background:#0b1020f2;backdrop-filter:blur(14px)}.jumpGrid{display:grid;grid-template-columns:minmax(180px,1fr) auto;gap:8px;align-items:end}.jumpBox input,.field input,.field select{width:100%;border:1px solid #ffffff24;border-radius:14px;background:#0007;color:#fff;padding:11px;font:inherit}.field{border:1px solid #ffffff18;border-radius:18px;background:#ffffff0a;padding:12px;margin:0 0 10px}.checkLine{display:flex;gap:8px;align-items:center;border:1px solid #ffffff14;border-radius:14px;background:#ffffff0e;padding:10px;margin:8px 0;color:#fff;font-weight:900}.checkLine input{width:auto;margin:0}.railNote{border:1px solid #41e8ff66;background:#41e8ff17;color:#dffbff;border-radius:18px;padding:12px;margin:10px 0;font-weight:900}.summaryGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.overlay{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:18px;background:#02040ccc;backdrop-filter:blur(18px)}.overlay.open{display:flex}.modal{width:min(880px,100%);max-height:92vh;overflow:auto;border:1px solid #ffffff24;border-radius:32px;background:radial-gradient(circle at 0 0,#22d3a62b,transparent 35%),linear-gradient(135deg,#0d1224,#18112d);box-shadow:0 30px 100px #000c}.modalHead{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;padding:16px;border-bottom:1px solid #ffffff18;background:#0b1020f2;backdrop-filter:blur(12px)}.modalBody{padding:16px}.modalFoot{position:sticky;bottom:0;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding:14px;border-top:1px solid #ffffff18;background:#0b1020f2;backdrop-filter:blur(12px)}.close{font-size:20px;width:44px;height:44px;border-radius:999px}.lockedScreen{min-height:100vh;display:grid;place-items:center;padding:18px}.lockedScreen .hero{width:min(940px,100%)}.loading{min-height:54vh;display:grid;place-items:center;text-align:center}.footer{border-top:1px solid var(--line);background:#0b1020d8;padding:10px 14px;color:#aeb8d6;font-size:12px}@media(max-width:980px){.layout,.siteBody,.siteBody.full,.siteBody.noLeft,.siteBody.noRight,.jumpGrid,.grid{grid-template-columns:1fr}.jumpBox{position:relative;top:auto}.sideNav.right{grid-column:auto}.hero h1{font-size:clamp(34px,11vw,52px)}.menuTab{grid-template-columns:40px minmax(0,1fr)}.tabMeta{grid-column:1/-1;justify-content:flex-start}.brand,.actions{flex:1 1 100%}.actions .btn,.btn{flex:1 1 auto}}
 </style>
 </head>
 <body data-wb-shell="menu-builder-v7-12-299-16" data-web-builder-menu-builder="overlay-first-global-rail">
-<header class="top"><div class="topInner"><div class="brand"><div class="mark" aria-hidden="true">WB</div><div>Web Builder Page Menu Builder<small>on-page custom menu builder + overlay inputs + owner workspace lock · V7.12.300.39</small></div></div></div></header>
+<header class="top"><div class="topInner"><div class="brand"><div class="mark" aria-hidden="true">WB</div><div>Web Builder Page Menu Builder<small>on-page custom menu builder + icon restore + owner workspace lock · V7.12.300.40</small></div></div></div></header>
 <main id="app" class="wrap"><section class="loading"><div><span class="badge">Checking Web Builder page menu access</span><h1>Loading page menu builder</h1><p>The page menu builder stays hidden until the owner workspace lock passes.</p><div class="railNote">Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see every Web Builder page.</div></div></section></main>
-<footer class="footer">V7.12.300.39 Page Menu Builder · settings_json saves · no schema changes · no storage actions · no index promotion</footer>
+<footer class="footer">V7.12.300.40 Page Menu Builder Icon Restore · settings_json saves · no schema changes · no storage actions · no index promotion</footer>
 
 <div id="editOverlay" class="overlay" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="editTitle"><div class="modalHead"><div><b id="editTitle">Edit selected menu item</b><small>Inputs stay in this overlay. Menu output remains on the page.</small></div><button id="closeEdit" class="btn close" type="button">×</button></div><div id="editBody" class="modalBody"></div><div class="modalFoot"><button id="applyEdit" class="btn primary" type="button">Apply Local Edit</button><button id="saveEdit" class="btn hot" type="button">Save To Supabase</button><button id="cancelEdit" class="btn" type="button">Cancel</button></div></div></div>
 <div id="reorderOverlay" class="overlay" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="reorderTitle"><div class="modalHead"><div><b id="reorderTitle">Reorder or indent selected item</b><small>Local ordering changes update the page output before you save.</small></div><button id="closeReorder" class="btn close" type="button">×</button></div><div id="reorderBody" class="modalBody"></div><div class="modalFoot"><button id="reorderUp" class="btn primary" type="button">Move Up</button><button id="reorderDown" class="btn primary" type="button">Move Down</button><button id="indentLeft" class="btn" type="button">Sub-tab Left</button><button id="indentRight" class="btn" type="button">Sub-tab Right</button><button id="cancelReorder" class="btn" type="button">Close</button></div></div></div>
@@ -25,13 +25,64 @@
 
 <script>
 (function(){'use strict';
-const VERSION='V7.12.300.39 Web Builder Page Menu Builder Top Rail Pass';
+const VERSION='V7.12.300.40 Web Builder Page Menu Builder Icon Restore + Published Menu Set Pass';
 const CONFIG_FILE='stream-bandit-shell-v6-24.js';
-const ICONS=['home','page','play','brand','star','heart','tv','form','contact','shop','settings','lock','help'];
+const ICONS=[
+  {key:'home',icon:'🏠',label:'Home'},
+  {key:'page',icon:'📄',label:'Page'},
+  {key:'landing',icon:'🛬',label:'Landing'},
+  {key:'about',icon:'ℹ️',label:'About'},
+  {key:'blog',icon:'📝',label:'Blog'},
+  {key:'news',icon:'📰',label:'News'},
+  {key:'book',icon:'📚',label:'Book'},
+  {key:'play',icon:'▶️',label:'Play'},
+  {key:'video',icon:'🎬',label:'Video'},
+  {key:'movie',icon:'🍿',label:'Movie'},
+  {key:'tv',icon:'📺',label:'TV'},
+  {key:'channel',icon:'📡',label:'Channel'},
+  {key:'music',icon:'🎵',label:'Music'},
+  {key:'audio',icon:'🔊',label:'Audio'},
+  {key:'podcast',icon:'🎙️',label:'Podcast'},
+  {key:'gallery',icon:'🖼️',label:'Gallery'},
+  {key:'image',icon:'🌄',label:'Image'},
+  {key:'camera',icon:'📷',label:'Camera'},
+  {key:'collection',icon:'🗂️',label:'Collection'},
+  {key:'playlist',icon:'📜',label:'Playlist'},
+  {key:'star',icon:'⭐',label:'Star'},
+  {key:'heart',icon:'❤️',label:'Heart'},
+  {key:'like',icon:'👍',label:'Like'},
+  {key:'bookmark',icon:'🔖',label:'Bookmark'},
+  {key:'fire',icon:'🔥',label:'Hot'},
+  {key:'rocket',icon:'🚀',label:'Launch'},
+  {key:'trophy',icon:'🏆',label:'Trophy'},
+  {key:'diamond',icon:'💎',label:'Premium'},
+  {key:'form',icon:'🧾',label:'Form'},
+  {key:'inbox',icon:'📥',label:'Inbox'},
+  {key:'mail',icon:'✉️',label:'Mail'},
+  {key:'contact',icon:'👤',label:'Contact'},
+  {key:'team',icon:'👥',label:'Team'},
+  {key:'calendar',icon:'📅',label:'Calendar'},
+  {key:'shop',icon:'🛒',label:'Shop'},
+  {key:'bag',icon:'🛍️',label:'Bag'},
+  {key:'card',icon:'💳',label:'Card'},
+  {key:'map',icon:'🗺️',label:'Map'},
+  {key:'location',icon:'📍',label:'Location'},
+  {key:'globe',icon:'🌐',label:'Globe'},
+  {key:'search',icon:'🔎',label:'Search'},
+  {key:'link',icon:'🔗',label:'Link'},
+  {key:'external',icon:'↗️',label:'External'},
+  {key:'download',icon:'⬇️',label:'Download'},
+  {key:'upload',icon:'⬆️',label:'Upload'},
+  {key:'settings',icon:'⚙️',label:'Settings'},
+  {key:'tools',icon:'🛠️',label:'Tools'},
+  {key:'lock',icon:'🔒',label:'Lock'},
+  {key:'help',icon:'❓',label:'Help'},
+  {key:'warning',icon:'⚠️',label:'Warning'}
+];
 const OWNER_SLUGS=['landing','home','home-page'];
 const RANK={free_viewer:0,viewer_plus:1,creator_starter:2,creator_growth:3,creator_pro:4,studio_business:5,platform_owner:6,enterprise:7};
 let sb=null,cfg=null,user=null,profile=null,pages=[],selectedId='',highlightedId='',readCount=0,writeCount=0,jumpSearches=0,jumpLast='',lastError='',lastAction='boot',bulkMode='';
-let authState={version:VERSION,route:'web-builder-menu-builder-owned-v7-12-264-test.html',checked:false,allowed:false,signedIn:false,email:'',userId:'',role:'',adminLevel:'',planKey:'',accountStatus:'',isPlatformOwner:false,canUseBuilder:false,workspace:'',lockClass:'menu-builder-owner-workspace-lock',reason:'Checking...',supabaseReads:false,supabaseWrites:false,storageWrites:false,storageActions:false,schemaChanges:false,builderTableChanges:false,streamBanditShellChanges:false,activeMenuPromotion:false,indexPromotion:false,registryPromotion:true,sortOrderColumnRequired:false,menuStoredInSettingsJson:true,sharedRail:true,globalRailProjector:true,webBuilderShell:true,localTopButtonsHidden:true,bodyActionsPreserved:true,overlayInputs:true,fullFormInboxTouched:false,onPageCustomMenuBuilder:true,topMenuRendersAsPageRail:true,headerFooterUntouched:true};
+let authState={version:VERSION,route:'web-builder-menu-builder-owned-v7-12-264-test.html',checked:false,allowed:false,signedIn:false,email:'',userId:'',role:'',adminLevel:'',planKey:'',accountStatus:'',isPlatformOwner:false,canUseBuilder:false,workspace:'',lockClass:'menu-builder-owner-workspace-lock',reason:'Checking...',supabaseReads:false,supabaseWrites:false,storageWrites:false,storageActions:false,schemaChanges:false,builderTableChanges:false,streamBanditShellChanges:false,activeMenuPromotion:false,indexPromotion:false,registryPromotion:true,sortOrderColumnRequired:false,menuStoredInSettingsJson:true,sharedRail:true,globalRailProjector:true,webBuilderShell:true,localTopButtonsHidden:true,bodyActionsPreserved:true,overlayInputs:true,fullFormInboxTouched:false,onPageCustomMenuBuilder:true,topMenuRendersAsPageRail:true,headerFooterUntouched:true,iconRestore:true,publishedMenuSetApply:false};
 const $=id=>document.getElementById(id); const app=()=>$('app');
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]||m));}
@@ -72,6 +123,47 @@ function menuPosition(row){let s=settings(row);return s.menu_position||s.menuPos
 function menuIndent(row){let s=settings(row);let n=Number(s.menu_indent!=null?s.menu_indent:s.menuIndent!=null?s.menuIndent:0);return Math.max(0,Math.min(3,Number.isFinite(n)?n:0));}
 function menuOrder(row){let s=settings(row);let n=Number(s.menu_order!=null?s.menu_order:(s.menuOrder!=null?s.menuOrder:(s.sort_order!=null?s.sort_order:999)));return Number.isFinite(n)?n:999;}
 function showInMenu(row){let s=settings(row);if(s.show_in_menu!=null)return truth(s.show_in_menu);if(s.showInMenu!=null)return truth(s.showInMenu);return String(row.status||'draft').toLowerCase()==='published';}
+function iconMeta(value){
+  let raw=String(value||'page').trim();
+  let found=ICONS.find(i=>i.key===raw);
+  if(found)return found;
+  let byLabel=ICONS.find(i=>String(i.label||'').toLowerCase()===raw.toLowerCase());
+  if(byLabel)return byLabel;
+  if(raw&&raw.length<=3&&!/^[a-z0-9_-]+$/i.test(raw))return {key:raw,icon:raw,label:'Custom'};
+  return {key:raw||'page',icon:'📄',label:raw||'Page'};
+}
+function menuIconSymbol(row){return iconMeta(menuIcon(row)).icon;}
+function menuIconDisplay(row){let m=iconMeta(menuIcon(row));return m.icon+' '+m.label;}
+function iconOptionsHtml(selectedKey){
+  return ICONS.map(i=>'<option value="'+esc(i.key)+'">'+esc(i.icon+' '+i.label)+'</option>').join('');
+}
+function buildMenuSet(){
+  return {
+    version:VERSION,
+    updated_by:'web-builder-menu-builder-owned-v7-12-264-test.html',
+    updated_at:new Date().toISOString(),
+    source:'page-menu-builder',
+    applies_to:'published-pages',
+    items:sortedPages().filter(showInMenu).map(function(p){
+      return {
+        id:p.id,
+        slug:p.slug,
+        title:p.title,
+        label:menuLabel(p),
+        icon:menuIcon(p),
+        iconSymbol:menuIconSymbol(p),
+        position:menuPosition(p),
+        order:menuOrder(p),
+        indent:menuIndent(p),
+        show_in_menu:showInMenu(p)
+      };
+    })
+  };
+}
+function applyMenuSetEverywhere(){
+  let el=$('applyMenuSetEverywhere');
+  return !!(el&&el.checked);
+}
 
 function normalizeRow(row){
   row=row||{};
@@ -245,7 +337,10 @@ async function saveMenu(){
     let rows=pages.slice();
     if(!authState.isPlatformOwner)rows=rows.filter(ownerMatches);
     if(!rows.length)throw new Error('No rows to save.');
-    setStatus('Saving page menu settings to settings_json...','');
+    let applySet=applyMenuSetEverywhere();
+    let sharedMenuSet=applySet?buildMenuSet():null;
+    authState.publishedMenuSetApply=applySet;
+    setStatus(applySet?'Saving menu settings and applying menu set to published pages...':'Saving menu settings to settings_json...','');
     let c=await client();
     let saved=0;
     for(let i=0;i<rows.length;i++){
@@ -261,6 +356,11 @@ async function saveMenu(){
         updated_by:'web-builder-menu-builder-owned-v7-12-264-test.html',
         updated_at:new Date().toISOString()
       });
+      if(applySet&&String(row.status||'draft').toLowerCase()==='published'){
+        s.page_menu_set=sharedMenuSet;
+        s.web_builder_page_menu_set=sharedMenuSet;
+        s.page_menu_set_applied_at=new Date().toISOString();
+      }
       let q=c.from('sb_site_pages').update({settings_json:s}).eq('id',row.id);
       if(!authState.isPlatformOwner)q=q.eq('owner_id',authState.userId);
       let r=await withTimeout(q,12000,'Menu save timed out');
@@ -271,7 +371,7 @@ async function saveMenu(){
     authState.supabaseWrites=true;
     lastAction='save page menu passed';
     lastError='';
-    setStatus('Saved page menu settings for '+saved+' page rows.','good');
+    setStatus('Saved menu settings for '+saved+' page rows'+(applySet?' and applied this menu set to published pages.':'.'),'good');
     render();
   }catch(e){
     lastError=e&&e.message?e.message:String(e);
@@ -320,7 +420,7 @@ function renderTabs(){
   }
   box.innerHTML=list.map(p=>{
     let active=p.id===selectedId?'active':'',jump=p.id===highlightedId?'jumpFound':'',show=showInMenu(p),reserved=isReserved(p.slug);
-    return '<button class="menuTab '+active+' '+jump+'" data-page-id="'+esc(p.id)+'" type="button" onclick="window.__sbMenuSelect(\''+esc(p.id)+'\')"><div class="handle">'+esc(menuIcon(p).slice(0,2))+'</div><div class="tabText"><b>'+esc(menuLabel(p))+'</b><code>'+esc(p.slug)+'</code></div><div class="tabMeta"><span class="pill '+(show?'good':'warn')+'">'+(show?'shown':'hidden')+'</span><span class="pill">'+esc(menuPosition(p))+'</span><span class="pill">order '+esc(menuOrder(p))+'</span><span class="pill">indent '+esc(menuIndent(p))+'</span>'+(ownerMatches(p)?'<span class="pill good">own</span>':'<span class="pill cyan">owner '+esc(String(p.owner_id||'').slice(0,8))+'</span>')+(reserved?'<span class="pill warn">reserved</span>':'')+'</div></button>';
+    return '<button class="menuTab '+active+' '+jump+'" data-page-id="'+esc(p.id)+'" type="button" onclick="window.__sbMenuSelect(\''+esc(p.id)+'\')"><div class="handle" title="'+esc(menuIconDisplay(p))+'">'+esc(menuIconSymbol(p))+'</div><div class="tabText"><b>'+esc(menuLabel(p))+'</b><code>'+esc(p.slug)+'</code></div><div class="tabMeta"><span class="pill '+(show?'good':'warn')+'">'+(show?'shown':'hidden')+'</span><span class="pill">'+esc(menuPosition(p))+'</span><span class="pill">order '+esc(menuOrder(p))+'</span><span class="pill">indent '+esc(menuIndent(p))+'</span>'+(ownerMatches(p)?'<span class="pill good">own</span>':'<span class="pill cyan">owner '+esc(String(p.owner_id||'').slice(0,8))+'</span>')+(reserved?'<span class="pill warn">reserved</span>':'')+'</div></button>';
   }).join('');
 }
 
@@ -330,7 +430,7 @@ function renderPreview(){
   function nav(pos){
     let items=menuItems(pos);
     if(!items.length)return '';
-    return items.map(p=>'<a class="'+(p.slug===currentSlug?'current':'')+' indent'+menuIndent(p)+'" href="web-builder-preview-owned-v7-12-257-test.html?page='+encodeURIComponent(p.slug)+'">'+esc(menuLabel(p))+'</a>').join('');
+    return items.map(p=>'<a class="'+(p.slug===currentSlug?'current':'')+' indent'+menuIndent(p)+'" href="web-builder-preview-owned-v7-12-257-test.html?page='+encodeURIComponent(p.slug)+'">'+esc(menuIconSymbol(p)+' '+menuLabel(p))+'</a>').join('');
   }
   let top=nav('top'),left=nav('left'),right=nav('right');
   let layout=left&&right?'':left?'noRight':right?'noLeft':'full';
@@ -345,7 +445,7 @@ function renderSelectedOutput(){
     el.innerHTML='<div class="notice">No selected page.</div>';
     return;
   }
-  el.innerHTML='<div><b>'+esc(menuLabel(row))+'</b><p><code>'+esc(row.slug)+'</code></p><div class="summaryGrid"><span class="pill '+(showInMenu(row)?'good':'warn')+'">'+(showInMenu(row)?'shown':'hidden')+'</span><span class="pill">'+esc(menuPosition(row))+'</span><span class="pill">order '+esc(menuOrder(row))+'</span><span class="pill">indent '+esc(menuIndent(row))+'</span><span class="pill">icon '+esc(menuIcon(row))+'</span></div><div class="actions"><button id="openEdit" class="btn primary" type="button">Edit Selected</button><button id="openReorder" class="btn blue" type="button">Reorder / Sub-tab</button><button id="openVisibility" class="btn warnBtn" type="button">Visibility</button><button id="openRemove" class="btn badBtn" type="button">Remove From Menu</button></div><small>All menu inputs open in overlays. This output card stays on the page.</small></div>';
+  el.innerHTML='<div><b>'+esc(menuLabel(row))+'</b><p><code>'+esc(row.slug)+'</code></p><div class="summaryGrid"><span class="pill '+(showInMenu(row)?'good':'warn')+'">'+(showInMenu(row)?'shown':'hidden')+'</span><span class="pill">'+esc(menuPosition(row))+'</span><span class="pill">order '+esc(menuOrder(row))+'</span><span class="pill">indent '+esc(menuIndent(row))+'</span><span class="pill">icon '+esc(menuIconDisplay(row))+'</span></div><div class="actions"><button id="openEdit" class="btn primary" type="button">Edit Selected</button><button id="openReorder" class="btn blue" type="button">Reorder / Sub-tab</button><button id="openVisibility" class="btn warnBtn" type="button">Visibility</button><button id="openRemove" class="btn badBtn" type="button">Remove From Menu</button></div><small>All menu inputs open in overlays. This output card stays on the page.</small></div>';
   $('openEdit').onclick=openEditOverlay;
   $('openReorder').onclick=openReorderOverlay;
   $('openVisibility').onclick=openVisibilityOverlay;
@@ -355,7 +455,7 @@ function renderSelectedOutput(){
 function renderEditOverlay(){
   let row=selected();
   if(!row){$('editBody').innerHTML='<div class="notice">No selected page.</div>';return;}
-  $('editBody').innerHTML='<div class="field"><b>Selected page</b><p>'+esc(row.title)+'<br><code>'+esc(row.slug)+'</code></p></div><label class="checkLine"><input id="editShow" type="checkbox"> Show this page in the on-page menu</label><div class="field"><b>Label</b><input id="editLabel" autocomplete="off" value="'+esc(menuLabel(row))+'"></div><div class="field"><b>Icon</b><select id="editIcon">'+ICONS.map(icon=>'<option value="'+esc(icon)+'">'+esc(icon)+'</option>').join('')+'</select></div><div class="field"><b>Position</b><select id="editPosition"><option value="top">top - on-page rail</option><option value="left">left side menu</option><option value="right">right side menu</option></select><small>Top renders inside the page body as a scroll rail, not inside Header/Footer.</small></div><div class="field"><b>Order</b><input id="editOrder" type="number" value="'+esc(menuOrder(row))+'"><small>Stored inside settings_json.menu_order. No sort_order database column is used.</small></div><div class="field"><b>Sub-tab indent</b><input id="editIndent" type="number" min="0" max="3" value="'+esc(menuIndent(row))+'"></div>';
+  $('editBody').innerHTML='<div class="field"><b>Selected page</b><p>'+esc(row.title)+'<br><code>'+esc(row.slug)+'</code></p></div><label class="checkLine"><input id="editShow" type="checkbox"> Show this page in the on-page menu</label><div class="field"><b>Icon</b><select id="editIcon">'+iconOptionsHtml(menuIcon(row))+'</select><small>Expanded icon set. Saved value remains inside settings_json.menu_icon.</small></div><div class="field"><b>Label</b><input id="editLabel" autocomplete="off" value="'+esc(menuLabel(row))+'"></div><div class="field"><b>Position</b><select id="editPosition"><option value="top">top - on-page rail</option><option value="left">left side menu</option><option value="right">right side menu</option></select><small>Top renders inside the page body as a scroll rail, not inside Header/Footer.</small></div><div class="field"><b>Order</b><input id="editOrder" type="number" value="'+esc(menuOrder(row))+'"><small>Stored inside settings_json.menu_order. No sort_order database column is used.</small></div><div class="field"><b>Sub-tab indent</b><input id="editIndent" type="number" min="0" max="3" value="'+esc(menuIndent(row))+'"></div>';
   $('editShow').checked=showInMenu(row);
   $('editIcon').value=menuIcon(row);
   $('editPosition').value=menuPosition(row);
@@ -440,7 +540,11 @@ function state(){
     registryPromotion:true,
     onPageCustomMenuBuilder:true,
     topMenuRendersAsPageRail:true,
-    headerFooterControls:false
+    headerFooterControls:false,
+    iconRestore:true,
+    expandedIconCount:ICONS.length,
+    applyMenuSetToPublishedPagesAvailable:true,
+    applyMenuSetToPublishedPages:applyMenuSetEverywhere()
   });
 }
 
@@ -485,7 +589,7 @@ function renderPage(){
   authState.checked=true;
   authState.allowed=true;
   authState.reason='Allowed. Page Menu Builder owner workspace lock passed.';
-  app().innerHTML='<section class="hero"><span class="badge">V7.12.300.39 Page Menu Builder Top Rail Pass</span><h1>Build on-page menus from overlays and keep output visible</h1><p>Page Menu Builder loads and saves on-page menu settings through <code>settings_json</code>. Creator users only load/save their own <code>owner_id</code> rows. Platform owner can manage all workspace rows.</p><div class="row"><span class="chip good">Global Web Builder rail untouched</span><span class="chip good">Overlay inputs</span><span class="chip good">Output on page</span><span class="chip good">Owner scoped rows</span><span class="chip good">Top menu = page rail</span><span class="chip warn">No Header/Footer controls</span><span class="chip warn">No schema changes</span><span class="chip warn">No index promotion</span></div><div class="railNote">This page builds the menu inside the page body. Header and footer menus are handled by the Header/Footer Builder.</div></section><section class="grid"><div class="card"><b>Personal scope</b><p>Creator users see only their own pages. Admin role alone does not expose another user workspace.</p></div><div class="card"><b>Overlay-first edit</b><p>Edit, reorder, visibility and remove-from-menu controls open in overlays.</p></div><div class="card"><b>Protected</b><p>No storage action, no schema change, no app shell change and no index promotion.</p></div></section><section class="panel"><div class="row"><button id="loadPages" class="btn primary" type="button">Load Pages</button><button id="saveMenu" class="btn hot" type="button">Save Menu To Supabase</button><button id="selectPublished" class="btn blue" type="button">Add Published Pages</button><button id="clearMenu" class="btn warnBtn" type="button">Clear Menu Selection</button><button id="copyReport" class="btn" type="button">Copy Report</button><span id="countText" class="pill">Waiting...</span></div><div id="status" class="status">Ready.</div></section><section class="layout"><section class="panel"><h2>Page menu tabs</h2><p>Click a row to select it. Use the overlay buttons to edit, reorder, show/hide, or remove it from the on-page menu output.</p><div class="jumpBox"><b>Jump to menu page</b><div class="jumpGrid"><input id="menuJumpSearch" type="search" placeholder="Type page title or slug, then Enter"><button id="menuJumpBtn" class="btn primary" type="button">Search</button></div><small id="menuJumpStatus">Search pinpoints and scrolls to a menu tab. It does not filter the list.</small></div><div id="pageList" class="menuRows"></div></section><aside class="panel"><h2>Selected menu output</h2><div id="selectedOutput" class="selectedBox"></div><h2>On-page menu preview</h2><div id="preview" class="previewShell"></div><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></aside></section>';
+  app().innerHTML='<section class="hero"><span class="badge">V7.12.300.40 Page Menu Builder Icon Restore</span><h1>Build on-page menus from overlays and keep output visible</h1><p>Page Menu Builder loads and saves on-page menu settings through <code>settings_json</code>. Creator users only load/save their own <code>owner_id</code> rows. Platform owner can manage all workspace rows.</p><div class="row"><span class="chip good">Icons restored</span><span class="chip good">Expanded icon set</span><span class="chip good">Top menu = page rail</span><span class="chip good">Left/right menus kept</span><span class="chip warn">No Header/Footer controls</span><span class="chip warn">No schema changes</span><span class="chip warn">No index promotion</span></div><div class="railNote">This page builds menus inside the page body. Header and footer menus are handled by the Header/Footer Builder.</div></section><section class="grid"><div class="card"><b>Personal scope</b><p>Creator users see only their own pages. Admin role alone does not expose another user workspace.</p></div><div class="card"><b>Overlay-first edit</b><p>Edit, reorder, visibility and remove-from-menu controls open in overlays.</p></div><div class="card"><b>Protected</b><p>No storage action, no schema change, no app shell change and no index promotion.</p></div></section><section class="panel"><div class="row"><button id="loadPages" class="btn primary" type="button">Load Pages</button><button id="saveMenu" class="btn hot" type="button">Save Menu To Supabase</button><button id="selectPublished" class="btn blue" type="button">Add Published Pages</button><button id="clearMenu" class="btn warnBtn" type="button">Clear Menu Selection</button><button id="copyReport" class="btn" type="button">Copy Report</button><span id="countText" class="pill">Waiting...</span></div><label class="checkLine"><input id="applyMenuSetEverywhere" type="checkbox"> Apply this complete menu set to every published page in this workspace when saving</label><small>Optional. Stores a page_menu_set snapshot inside each published page settings_json. No schema change.</small><div id="status" class="status">Ready.</div></section><section class="layout"><section class="panel"><h2>Page menu tabs</h2><p>Click a row to select it. Use the overlay buttons to edit, reorder, show/hide, or remove it from on-page menu output.</p><div class="jumpBox"><b>Jump to menu page</b><div class="jumpGrid"><input id="menuJumpSearch" type="search" placeholder="Type page title or slug, then Enter"><button id="menuJumpBtn" class="btn primary" type="button">Search</button></div><small id="menuJumpStatus">Search pinpoints and scrolls to a menu tab. It does not filter the list.</small></div><div id="pageList" class="menuRows"></div></section><aside class="panel"><h2>Selected menu output</h2><div id="selectedOutput" class="selectedBox"></div><h2>On-page menu preview</h2><div id="preview" class="previewShell"></div><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></aside></section>';
   bindPage();
   render();
   loadPages();
