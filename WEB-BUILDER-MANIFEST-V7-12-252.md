@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.300.44
+# Web Builder Manifest V7.12.300.45
 
 ## Purpose
 
@@ -8,13 +8,21 @@ The Stream Bandit movie/app manifest remains separate.
 
 ## Current checkpoint status
 
-Status: SOURCE MAP GLOBAL PROJECTOR RAIL SEARCH PASS / HEADER-FOOTER RAIL SEARCH WORKSPACE APPLY PASS / OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
+Status: ROUTE MAP NO-FIX PASS / SOURCE MAP GLOBAL PROJECTOR RAIL SEARCH PASS / HEADER-FOOTER RAIL SEARCH WORKSPACE APPLY PASS / OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
 
 Latest recorded Web Builder pass:
 
-`V7.12.300.44 Web Builder Source Map Global Projector Rail Search Pass`
+`V7.12.300.45 Web Builder Route Map No-Fix Stability Pass`
+
+Current Route Map code version confirmed passed:
+
+`V7.12.299.18 Web Builder Route Map Global Rail Pass`
 
 Previous recorded Web Builder pass:
+
+`V7.12.300.44 Web Builder Source Map Global Projector Rail Search Pass`
+
+Previous Header/Footer pass:
 
 `V7.12.300.42 Web Builder Header Footer Rail Search Workspace Apply Pass`
 
@@ -45,6 +53,72 @@ Previous checkpoint file:
 - No schema, RLS, storage policy, bucket policy, service-role, payment provider, DNS automation or final live-home replacement is approved by this checkpoint.
 - Web Builder passed pages are recorded here instead of replacing the main `index.html` until the full Web Builder group pass is approved.
 - The older Web Builder engine/global helper relationship may still be helping some global pages. Do not remove or bypass those helpers until Source Map, Route Map and global page scans confirm the dependency is safe to retire.
+- If a page already passes and nothing visible is broken, do not rewrite it just to increase a version number. Record the pass, preserve the working code, and move to the next planned page.
+
+## Route Map no-fix pass recorded
+
+Route:
+
+`web-builder-route-map-v7-12-252-test.html?page=<slug>`
+
+Code version confirmed passed:
+
+`V7.12.299.18 Web Builder Route Map Global Rail Pass`
+
+Manifest record pass:
+
+`V7.12.300.45 Web Builder Route Map No-Fix Stability Pass`
+
+Owner confirmed status:
+
+PASSED FULLY / NO PAGE CODE CHANGE NEEDED.
+
+Owner supplied live page debug result:
+
+- checked true
+- allowed true
+- signed in true
+- platform_owner profile confirmed
+- builder planning lock passed
+- global rail projector true
+- Web Builder shell true
+- local top buttons hidden true
+- body actions preserved true
+- overlay inputs true
+- read-only planning page true
+- route map builder lock true
+- route count 25
+- visible route count 25
+- Check Routes run completed
+- all 25 route checks returned OK 200
+
+Passed behavior:
+
+- route truth table works
+- route filter works
+- Check Routes works
+- Copy Report works
+- Detail overlay works
+- Open route links work
+- global Web Builder rail/search/projector is present
+- page already does what it needs to do
+- no edit/create/delete is required on Route Map because this page is a read-only route-health truth page, not an editor
+
+Safety:
+
+- reads `sb_profiles`
+- browser route checks only read same-origin files
+- no Supabase writes
+- no schema change
+- no storage action
+- no index promotion
+- no Stream Bandit shell promotion
+- no global helper rewrite
+- old Web Builder engine/helper behavior preserved
+
+Decision:
+
+Route Map should not be rewritten now. It is promoted by confirmation and manifest record only. Future route-health work must be additive and only if a concrete problem appears.
 
 ## Source Map pass recorded
 
@@ -316,8 +390,8 @@ No domain table, DNS write, hosting automation, schema change, RLS change or fin
 6. `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>` - PASS
 7. `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>` - PASS / protected inbox bridge
 8. `web-builder-assets-v7-12-252-test.html?page=<slug>` - PASS
-9. `web-builder-route-map-v7-12-252-test.html?page=<slug>` - PASS / route-health manager still planned
-10. `web-builder-control-map-v7-12-253-test.html?page=<slug>` - PASS / control truth page still planned
+9. `web-builder-route-map-v7-12-252-test.html?page=<slug>` - PASS / no-fix stability pass / route checks all OK 200
+10. `web-builder-control-map-v7-12-253-test.html?page=<slug>` - PASS / control truth page still planned for action ownership upgrade if needed
 11. `web-builder-pages-source-map-v7-12-255-test.html?page=<slug>` - PASS / global projector rail search + truth checker confirmed
 12. `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` - PASS / rail search + apply shell to workspace pages confirmed
 13. `WEB-BUILDER-MANIFEST-V7-12-252.md` - updated Web Builder record
@@ -339,9 +413,8 @@ This login gate is future work and is not part of this checkpoint.
 
 ## Remaining Web Builder work
 
-1. Route Map becomes a route-health manager.
-2. Control Map becomes an action/button ownership truth page.
-3. Pages Manager, Form Designer, Inbox and Assets smoke checks against Source Map.
-4. Web Builder engine/global helper dependency audit across global pages.
-5. Domain/subdomain/hosting readiness remains future builder-owned product work.
-6. Final `index.html` promotion happens only after full Web Builder group pass and owner approval.
+1. Control Map becomes an action/button ownership truth page if inspection shows a real gap.
+2. Pages Manager, Form Designer, Inbox and Assets smoke checks against Source Map.
+3. Web Builder engine/global helper dependency audit across global pages.
+4. Domain/subdomain/hosting readiness remains future builder-owned product work.
+5. Final `index.html` promotion happens only after full Web Builder group pass and owner approval.
