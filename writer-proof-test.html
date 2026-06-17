@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stream Bandit Writer Proof Test</title>
+<link rel="icon" href="stream_bandit_stag_icon_32.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--bad:#ff4d6d;--warn:#ffb142;--btnText:#fff}
+*{box-sizing:border-box;min-width:0}body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:14px}.wrap{max-width:1180px;margin:auto}.hero,.box,.card{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0007;padding:16px;margin-bottom:13px}.card{background:#ffffff0f;box-shadow:none}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px;padding:5px 9px;font-size:11px}h1{font-size:clamp(32px,5vw,56px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 9px}p,small,label,li{color:var(--muted);line-height:1.45}.btn{border:0;border-radius:999px;padding:10px 14px;background:#414667;color:var(--btnText);font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.btn:disabled{opacity:.55;cursor:not-allowed}.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.dangerBtn{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}.hot{background:linear-gradient(135deg,#ff2d85,var(--accent2));color:#fff}.status,.note,.danger{padding:10px 12px;border-radius:16px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:10px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff2d851f;border-color:#ff2d8552;color:#ffd6e8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.code{font-family:ui-monospace,Consolas,monospace;background:#0006;border-radius:16px;padding:12px;white-space:pre-wrap;color:#dfffee;max-height:560px;overflow:auto;word-break:break-word}.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}@media(max-width:700px){body{padding:10px}.btn{width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+  <div class="top">
+    <div>
+      <span class="badge">Plain Writer Proof Test</span>
+      <h1>Writer Proof Test</h1>
+      <p>This page checks whether the signed-in admin can create, read, update and delete one temporary row in <b>sb_movies</b>. It is intentionally not V7-versioned.</p>
+    </div>
+    <div class="actions"><a class="btn" href="all-pages-version-registry-v7-12-122-current-routes-test.html">Open Registry</a><a class="btn" href="supabase-library-home-header-form-fix-v7-12-34-test.html">Open Library Editor</a></div>
+  </div>
+  <div id="status" class="status">Ready. Click Run sb_movies Proof.</div>
+</section>
+<section class="box">
+  <h2>Test controls</h2>
+  <div class="grid">
+    <div class="card"><b>Manual click only</b><p>This page does not run writes automatically.</p></div>
+    <div class="card"><b>Temporary row only</b><p>Title starts with <code>SB WRITER PROOF TEST</code> and cleanup removes proof rows.</p></div>
+    <div class="card"><b>No schema changes</b><p>No SQL, no RLS, no storage policy, no service-role, no OpenAI key, no index/live promotion.</p></div>
+  </div>
+  <div class="actions" style="margin-top:12px">
+    <button id="runProof" class="btn primary" type="button">Run sb_movies Proof</button>
+    <button id="cleanup" class="btn dangerBtn" type="button">Cleanup Leftover Proof Rows</button>
+    <button id="copyReport" class="btn hot" type="button">Copy Proof Report</button>
+  </div>
+  <div class="note">Use this only while signed into the same admin/owner account used by the registry scanner.</div>
+</section>
+<section class="box">
+  <h2>Proof report</h2>
+  <div id="summary" class="grid"></div>
+  <div id="report" class="code">No proof run yet.</div>
+</section>
+</div>
+<script src="stream-bandit-shell-v6-24.js?v=writer-proof-test"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=writer-proof-test"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=writer-proof-test"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=writer-proof-test"></script>
+<script>
+(function(){
+'use strict';
+const PAGE='writer-proof-test.html';
+const TABLE='sb_movies';
+let sb=null,cfg=null,lastReport=null,busy=false;
+const $=id=>document.getElementById(id);
+function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c));}
+function setStatus(t,bad){const el=$('status');el.textContent=t;el.className=bad?'danger':'status';}
+function redactId(v){v=String(v||'');return v?v.slice(0,8)+'-[redacted]':'';}
+function render(obj){lastReport=obj;const cards=[['Diagnosis',obj.diagnosis||'not-run'],['Checks',String(obj.checksPassed||0)+'/'+String(obj.checksTotal||0)],['Created',obj.createOk?'yes':'no'],['Updated',obj.updateOk?'yes':'no'],['Deleted',obj.deleteOk?'yes':'no'],['Cleanup',obj.cleanupOk?'yes':(obj.cleanupTried?'no':'not run')]];$('summary').innerHTML=cards.map(c=>'<div class="card"><b>'+esc(c[0])+'</b><span>'+esc(c[1])+'</span></div>').join('');$('report').textContent=JSON.stringify(obj,null,2);}
+function baseReport(){return {page:PAGE,proof:'sb_movies create/read/update/delete proof',readOnly:false,table:TABLE,timestamp:new Date().toISOString(),sdkLoaded:!!window.supabase,configFound:false,createClientOk:false,sessionCheckOk:false,signedIn:false,email:'',userId:'',profileReadOk:false,profileRole:'',profileAdminLevel:'',profilePlanKey:'',profileAccountStatus:'',createOk:false,readAfterCreateOk:false,updateOk:false,readAfterUpdateOk:false,deleteOk:false,readAfterDeleteOk:false,cleanupTried:false,cleanupOk:false,createdId:'',errors:[],steps:[],checksPassed:0,checksTotal:12,diagnosis:'not-run',schemaChanges:false,rlsChange:false,storagePolicyChanges:false,bucketPolicyChanges:false,serviceRole:false,openAiKeys:false,indexPromotion:false,livePromotion:false};}
+function pass(r,name,ok,extra){r.steps.push(Object.assign({name:name,ok:!!ok},extra||{}));if(ok)r.checksPassed++;}
+function errText(e){return e&&e.message?e.message:String(e||'Unknown error');}
+async function readConfig(){if(cfg)return cfg;if(window.StreamBanditSupabaseConfig&&window.StreamBanditSupabaseConfig.url&&window.StreamBanditSupabaseConfig.key){cfg={url:window.StreamBanditSupabaseConfig.url,key:window.StreamBanditSupabaseConfig.key,source:'StreamBanditSupabaseConfig'};return cfg;}if(window.StreamBanditShell&&typeof window.StreamBanditShell.config==='function'){const c=window.StreamBanditShell.config();if(c&&c.url&&c.key){cfg={url:c.url,key:c.key,source:'StreamBanditShell.config'};return cfg;}}if(window.SUPABASE_URL&&(window.SUPABASE_KEY||window.SUPABASE_ANON_KEY)){cfg={url:window.SUPABASE_URL,key:window.SUPABASE_KEY||window.SUPABASE_ANON_KEY,source:'window globals'};return cfg;}throw new Error('Supabase config bridge not found.');}
+async function client(){if(sb)return sb;const c=await readConfig();sb=window.supabase.createClient(c.url,c.key);return sb;}
+async function readProfile(r,cli,user){let profile=null;const tries=[['id',user.id],['user_id',user.id],['auth_user_id',user.id]];if(user.email)tries.push(['email',user.email]);for(const t of tries){try{const res=await cli.from('sb_profiles').select('*').eq(t[0],t[1]).maybeSingle();if(!res.error&&res.data){profile=res.data;break;}}catch(e){}}
+if(profile){r.profileReadOk=true;r.profileRole=profile.role||profile.account_role||profile.user_role||'';r.profileAdminLevel=profile.admin_level||profile.account_level||'';r.profilePlanKey=profile.plan_key||'';r.profileAccountStatus=profile.account_status||'';}
+return profile;}
+function isAdminProfile(r){const role=String(r.profileRole||'').toLowerCase();const level=String(r.profileAdminLevel||'').toLowerCase();return ['admin','owner','superadmin','super_admin'].includes(role)||['admin','owner','superadmin','super_admin'].includes(level);}
+async function cleanupRows(cli,r){r.cleanupTried=true;const before=await cli.from(TABLE).select('id,title').ilike('title','SB WRITER PROOF TEST%').limit(20);if(before.error)throw before.error;const rows=before.data||[];if(!rows.length){r.cleanupOk=true;return {found:0,removed:0};}
+const ids=rows.map(x=>x.id);const del=await cli.from(TABLE).delete().in('id',ids).select('id,title');if(del.error)throw del.error;const after=await cli.from(TABLE).select('id').in('id',ids).limit(1);if(after.error)throw after.error;if(after.data&&after.data.length)throw new Error('Cleanup verify failed: proof row still exists.');r.cleanupOk=true;return {found:rows.length,removed:(del.data||[]).length};}
+async function runProof(){if(busy)return;busy=true;$('runProof').disabled=true;$('cleanup').disabled=true;const r=baseReport();try{setStatus('Running sb_movies writer proof...');pass(r,'SDK loaded',!!window.supabase);if(!window.supabase)throw new Error('Supabase SDK not loaded.');const c=await readConfig();r.configFound=!!(c.url&&c.key);pass(r,'config found',r.configFound,{source:c.source,urlHost:(new URL(c.url)).host,keyRedacted:true});const cli=await client();r.createClientOk=true;pass(r,'createClient',true);const sessionRes=await cli.auth.getSession();if(sessionRes.error)throw sessionRes.error;r.sessionCheckOk=true;pass(r,'auth.getSession',true);const session=sessionRes.data&&sessionRes.data.session;const user=session&&session.user;if(!user)throw new Error('Signed out. Sign in as admin/owner first.');r.signedIn=true;r.email=user.email||'';r.userId=redactId(user.id);pass(r,'signed in',true,{email:r.email,userId:r.userId});await readProfile(r,cli,user);pass(r,'profile read',r.profileReadOk,{role:r.profileRole,adminLevel:r.profileAdminLevel,planKey:r.profilePlanKey,accountStatus:r.profileAccountStatus});if(!isAdminProfile(r))throw new Error('Signed in, but profile is not admin/owner.');pass(r,'admin/owner allowed',true);
+const title='SB WRITER PROOF TEST '+new Date().toISOString();const row={title:title,description:'Temporary writer proof row created by writer-proof-test.html. Safe to remove.',status:'draft',source_type:'missing',genres:['Writer Proof'],tags:['writer-proof','temporary'],owner_id:user.id,featured:false,duration_seconds:0};const ins=await cli.from(TABLE).insert(row).select('*').single();if(ins.error)throw ins.error;if(!ins.data||!ins.data.id)throw new Error('Insert returned no id.');r.createOk=true;r.createdId=redactId(ins.data.id);pass(r,'insert sb_movies',true,{id:r.createdId,title:title});const read1=await cli.from(TABLE).select('*').eq('id',ins.data.id).maybeSingle();if(read1.error)throw read1.error;if(!read1.data)throw new Error('Read after create returned no row.');r.readAfterCreateOk=true;pass(r,'read after create',true);
+const upd=await cli.from(TABLE).update({description:'Temporary writer proof row updated and ready for verification.',rating:'proof-pass',updated_at:new Date().toISOString()}).eq('id',ins.data.id).select('*').maybeSingle();if(upd.error)throw upd.error;if(!upd.data)throw new Error('Update returned no row.');r.updateOk=true;pass(r,'update sb_movies',true);const read2=await cli.from(TABLE).select('id,rating,description').eq('id',ins.data.id).maybeSingle();if(read2.error)throw read2.error;if(!read2.data||read2.data.rating!=='proof-pass')throw new Error('Read after update did not show proof-pass rating.');r.readAfterUpdateOk=true;pass(r,'read after update',true);
+const del=await cli.from(TABLE).delete().eq('id',ins.data.id).select('id,title');if(del.error)throw del.error;r.deleteOk=true;pass(r,'remove sb_movies row',true);const read3=await cli.from(TABLE).select('id').eq('id',ins.data.id).maybeSingle();if(read3.error)throw read3.error;if(read3.data)throw new Error('Read after remove found row still present.');r.readAfterDeleteOk=true;pass(r,'read after remove',true);const clean=await cleanupRows(cli,r);pass(r,'cleanup leftover proof rows',r.cleanupOk,clean);r.diagnosis='writer-route-pass';setStatus('Writer proof passed: create, read, update, remove and cleanup all verified.');}catch(e){r.errors.push(errText(e));r.diagnosis=r.createOk&&!r.deleteOk?'needs-cleanup-or-policy-fix':'writer-route-failed';setStatus('Writer proof failed: '+errText(e),true);}finally{render(r);busy=false;$('runProof').disabled=false;$('cleanup').disabled=false;}}
+async function cleanupOnly(){if(busy)return;busy=true;$('cleanup').disabled=true;const r=baseReport();try{setStatus('Cleaning leftover proof rows...');if(!window.supabase)throw new Error('Supabase SDK not loaded.');const cli=await client();const s=await cli.auth.getSession();if(s.error)throw s.error;const user=s.data&&s.data.session&&s.data.session.user;if(!user)throw new Error('Signed out.');r.sessionCheckOk=true;r.signedIn=true;r.email=user.email||'';r.userId=redactId(user.id);await readProfile(r,cli,user);if(!isAdminProfile(r))throw new Error('Admin/owner required for cleanup.');const clean=await cleanupRows(cli,r);pass(r,'cleanup leftover proof rows',r.cleanupOk,clean);r.diagnosis='cleanup-complete';setStatus('Cleanup complete. Found '+clean.found+', removed '+clean.removed+'.');}catch(e){r.errors.push(errText(e));r.diagnosis='cleanup-failed';setStatus('Cleanup failed: '+errText(e),true);}finally{render(r);busy=false;$('cleanup').disabled=false;}}
+async function copyReport(){const txt=JSON.stringify(lastReport||baseReport(),null,2);try{await navigator.clipboard.writeText(txt);setStatus('Proof report copied.');}catch(e){$('report').textContent=txt;setStatus('Clipboard blocked. Report is shown below.',true);}}
+function boot(){try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}$('runProof').onclick=runProof;$('cleanup').onclick=cleanupOnly;$('copyReport').onclick=copyReport;render(baseReport());}
+boot();
+})();
+</script>
+</body>
+</html>
