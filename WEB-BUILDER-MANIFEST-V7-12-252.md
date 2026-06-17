@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.300.41
+# Web Builder Manifest V7.12.300.42
 
 ## Purpose
 
@@ -8,13 +8,17 @@ The Stream Bandit movie/app manifest remains separate.
 
 ## Current checkpoint status
 
-Status: OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / SOURCE MAP TRUTH CHECKER PASS / HEADER-FOOTER FUNCTIONAL PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
+Status: HEADER-FOOTER RAIL SEARCH WORKSPACE APPLY PASS / OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / SOURCE MAP TRUTH CHECKER PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
 
 Latest recorded Web Builder pass:
 
-`V7.12.300.41 Web Builder Owned Preview Menu Rail Icons Search Pass`
+`V7.12.300.42 Web Builder Header Footer Rail Search Workspace Apply Pass`
 
 Previous recorded Web Builder pass:
+
+`V7.12.300.41 Web Builder Owned Preview Menu Rail Icons Search Pass`
+
+Previous Page Menu Builder pass:
 
 `V7.12.300.40 Page Menu Builder Icon Restore + Published Menu Set Pass`
 
@@ -36,6 +40,7 @@ Previous checkpoint file:
 - Read-only pages are allowed only when they are useful inspectors, truth checkers or route/action maps.
 - No schema, RLS, storage policy, bucket policy, service-role, payment provider, DNS automation or final live-home replacement is approved by this checkpoint.
 - Web Builder passed pages are recorded here instead of replacing the main `index.html` until the full Web Builder group pass is approved.
+- The older Web Builder engine/global helper relationship may still be helping some global pages. Do not remove or bypass those helpers until Source Map, Route Map and global page scans confirm the dependency is safe to retire.
 
 ## Source Map pass recorded
 
@@ -144,6 +149,10 @@ Owner confirmed status:
 
 PASSED FULLY.
 
+Owner confirmed live route:
+
+`https://chatterfriendsstreambandit.co.uk/web-builder-preview-owned-v7-12-257-test.html`
+
 Passed behavior:
 
 - Owned Preview consumes Page Menu Builder output from `settings_json`
@@ -156,33 +165,68 @@ Passed behavior:
 - form submissions remain preserved
 - rating blocks remain preserved
 - content block rendering remains preserved
+- applied menu/header/footer output showed correctly across the chosen preview pages
 - no schema change
 - no storage action
 - no Header/Footer builder change
 - no index promotion
 
-## Header/Footer Builder next correction
+## Header/Footer Builder pass recorded
 
 Route:
 
 `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>`
 
-Required next pass:
+Passed version:
 
-`V7.12.300.42 Header/Footer Builder Rail Search + Apply Shell To Workspace Pages Pass`
+`V7.12.300.42 Web Builder Header Footer Rail Search Workspace Apply Pass`
 
-Required behavior:
+Owner confirmed status:
 
-- restore the Header/Footer Builder page's own Web Builder rail and search in the actual page header
-- keep the existing Header/Footer Builder layout and overlays
-- add an option like Page Menu Builder to apply the current header/footer shell to every page slug in that same user workspace
-- save the shared shell into each page row's existing `settings_json`
-- preserve other settings_json keys on every page row
-- platform owner scope must stay owner-safe and avoid applying one user's shell to unrelated workspaces
+PASSED FULLY.
+
+Passed behavior:
+
+- Header/Footer Builder page's own Web Builder rail and search were restored in the actual page header
+- the builder rail is a tidy horizontal scroll rail
+- search filters the rail links and Enter/Go opens the best match
+- existing Header/Footer Builder layout remained intact
+- overlays remained intact
+- selected page save still works
+- apply-to-workspace-pages checkbox applies the current header/footer shell to every selected user-created page slug in the same workspace
+- applied header/footer shell appeared correctly on every chosen preview page
+- save writes the shared shell into each page row's existing `settings_json`
+- each page row preserves its other settings_json keys
+- platform owner scope remains workspace-safe and does not apply one user's shell to unrelated workspaces
 - no schema change
 - no storage action
 - no Header/Footer custom-code execution change
 - no index promotion
+
+Header/Footer apply data model:
+
+- `settings_json.web_builder_shell`
+- `settings_json.web_builder_header_footer_builder`
+- `settings_json.site_name`
+- `settings_json.footer_title`
+- `settings_json.footer_text`
+- `settings_json.header_footer_updated_at`
+- `settings_json.header_footer_status`
+- `settings_json.header_footer_apply_source`
+- optional `settings_json.header_footer_apply_scope`
+- optional `settings_json.header_footer_applied_from_slug`
+
+## Web Builder engine / global pages memory note
+
+The owner remembered that the Web Builder engine was previously helping some global pages. This must be treated as an active dependency risk during later cleanup.
+
+Rules for future passes:
+
+- do not remove the Web Builder global projector, global helpers, global rail bridge, or engine-style helper behavior just because a page now has a cleaner standalone pass
+- global watch/browse/settings pages may still depend on helper behavior that came from earlier Web Builder engine work
+- verify with Source Map, Route Map, Control Map and page-specific smoke tests before retiring any helper
+- record engine/helper dependencies in the manifest instead of guessing
+- no schema change, storage action or final index promotion is approved by this memory note
 
 ## Product ownership correction
 
@@ -236,6 +280,7 @@ Owned Preview reads/render support:
 - fallback `settings_json.web_builder_header_footer`
 - old basic fields `site_name`, `footer_title`, `footer_text`
 - Page Menu Builder output fields listed in this manifest
+- Header/Footer apply output fields listed in this manifest
 
 ## Domain, subdomain and hosting requirement
 
@@ -263,7 +308,7 @@ No domain table, DNS write, hosting automation, schema change, RLS change or fin
 9. `web-builder-route-map-v7-12-252-test.html?page=<slug>` - PASS / route-health manager still planned
 10. `web-builder-control-map-v7-12-253-test.html?page=<slug>` - PASS / control truth page still planned
 11. `web-builder-pages-source-map-v7-12-255-test.html?page=<slug>` - FUNCTIONAL PASS / truth checker confirmed
-12. `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` - FUNCTIONAL PASS / NEXT: rail search + apply shell to workspace pages
+12. `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` - PASS / rail search + apply shell to workspace pages confirmed
 13. `WEB-BUILDER-MANIFEST-V7-12-252.md` - updated Web Builder record
 
 ## Future login/account gate
@@ -283,9 +328,9 @@ This login gate is future work and is not part of this checkpoint.
 
 ## Remaining Web Builder work
 
-1. Header/Footer Builder adds its own rail search and apply-shell-to-workspace-pages save option.
-2. Route Map becomes a route-health manager.
-3. Control Map becomes an action/button ownership truth page.
-4. Pages Manager, Form Designer, Inbox and Assets smoke checks against Source Map.
+1. Route Map becomes a route-health manager.
+2. Control Map becomes an action/button ownership truth page.
+3. Pages Manager, Form Designer, Inbox and Assets smoke checks against Source Map.
+4. Web Builder engine/global helper dependency audit across global pages.
 5. Domain/subdomain/hosting readiness remains future builder-owned product work.
 6. Final `index.html` promotion happens only after full Web Builder group pass and owner approval.
