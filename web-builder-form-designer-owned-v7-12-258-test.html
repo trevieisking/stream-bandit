@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Form Designer V7.12.300.48 TEST</title>
+<title>Web Builder Form Designer V7.12.300.49 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -440,8 +440,7 @@ p,li,label,small{
   width:min(720px,100%);
 }
 
-/* V7.12.300.48 Form Designer Full Window Builder Overlay Comfort Pass */
-/* Only the main Edit Form builder overlay becomes a full-window workbench. */
+/* V7.12.300.49 keeps the comfort fix: main builder overlay gets the full workbench. */
 #builderOverlay{
   align-items:stretch;
   justify-content:stretch;
@@ -575,14 +574,14 @@ p,li,label,small{
 }
 </style>
 </head>
-<body data-wb-shell="form-designer-v7-12-300-48" data-web-builder-form-designer="full-window-builder-overlay-comfort">
+<body data-wb-shell="form-designer-v7-12-300-49" data-web-builder-form-designer="real-submit-email-draft-connection">
 <header class="top">
   <div class="topInner">
     <div class="brand">
       <div class="mark" aria-hidden="true">WB</div>
       <div>
         Web Builder Form Designer
-        <small>full-window builder overlay + preserved forms + owner workspace lock · V7.12.300.48</small>
+        <small>real submit + email draft pipeline + full-window builder overlay · V7.12.300.49</small>
       </div>
     </div>
   </div>
@@ -590,14 +589,14 @@ p,li,label,small{
 
 <main class="wrap">
   <section class="hero">
-    <span class="badge">V7.12.300.48 Form Designer Full Window Builder Overlay Comfort Pass</span>
+    <span class="badge">V7.12.300.49 Form Designer Real Submit + Email Draft Connection Pass</span>
     <h1>Advanced forms open first, then owner lock checks run</h1>
-    <p>This keeps the working Form Designer body tools, moves navigation to the Web Builder global rail, preserves the owner workspace lock, and gives the main Edit Form overlay the full browser workspace.</p>
+    <p>This keeps the working Form Designer tools, keeps the full-window edit overlay, writes real submissions to <b>sb_form_submissions</b>, and opens the user mail app with a real draft when email is selected.</p>
     <div class="row">
       <span class="chip good">Global Web Builder rail</span>
       <span class="chip good">Full-window builder overlay</span>
-      <span class="chip good">Destinations overlay</span>
-      <span class="chip good">Field edit overlay</span>
+      <span class="chip good">Writes sb_form_submissions</span>
+      <span class="chip good">Email draft mailto</span>
       <span class="chip good">Image upload kept</span>
       <span class="chip warn">No schema change</span>
       <span class="chip warn">No index promotion</span>
@@ -614,13 +613,11 @@ p,li,label,small{
       </ul>
     </div>
     <div class="card keep">
-      <b>Overlay system preserved</b>
+      <b>Real submit pipeline</b>
       <ul class="list">
-        <li>Main Builder Overlay is now full-window.</li>
-        <li>Destinations Overlay</li>
-        <li>Field Edit Overlay</li>
-        <li>Delete confirm overlay</li>
-        <li>Compact field rows</li>
+        <li><code>Real Submit</code> writes to <code>sb_form_submissions</code>.</li>
+        <li>Email draft opens with subject/body when selected.</li>
+        <li>Local draft is only the separate local backup button.</li>
       </ul>
     </div>
     <div class="card later">
@@ -682,7 +679,7 @@ p,li,label,small{
   </section>
 </main>
 
-<footer class="footer">V7.12.300.48 Form Designer Full Window Builder Overlay Comfort Pass · overlays preserved · existing image bucket only · no schema changes · no index promotion</footer>
+<footer class="footer">V7.12.300.49 Form Designer Real Submit + Email Draft Connection Pass · writes sb_form_submissions · saves sb_site_pages form design · existing image bucket only · no schema changes · no index promotion</footer>
 
 <div id="builderOverlay" class="overlay" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="builderTitle">
@@ -720,10 +717,10 @@ p,li,label,small{
             <textarea id="introText">Contact form preset.</textarea>
           </div>
           <h3>Destinations</h3>
-          <label class="checkline"><input id="routeInbox" type="checkbox" checked> Save submission to Web Builder Inbox</label>
+          <label class="checkline"><input id="routeInbox" type="checkbox" checked> Save real submission to Web Builder Inbox / <code>sb_form_submissions</code></label>
           <label class="checkline"><input id="routeNotify" type="checkbox" checked> Record owner notification intent</label>
           <label class="checkline"><input id="routeOwnerCopy" type="checkbox"> Record owner/private-message intent</label>
-          <label class="checkline"><input id="routeEmail" type="checkbox"> Open user mail app with filled form draft</label>
+          <label class="checkline"><input id="routeEmail" type="checkbox" checked> Open user mail app with filled form draft</label>
           <div class="controlGrid">
             <div class="control">
               <b>Owner email destination</b>
@@ -861,7 +858,7 @@ p,li,label,small{
     </div>
     <div class="modalBody">
       <div id="destSummary" class="destinationGrid"></div>
-      <div class="notice">Email opens the user mail app only. Inbox save writes to Supabase when Real Submit is used. Image upload uses the existing bucket only.</div>
+      <div class="notice">Real Submit writes to <b>sb_form_submissions</b> when Inbox is selected. Email opens the user mail app with subject/body. Image upload uses the existing bucket only.</div>
     </div>
     <div class="modalFoot">
       <button id="destClose2" class="btn" type="button">Done</button>
@@ -873,7 +870,7 @@ p,li,label,small{
 (function(){
 'use strict';
 
-const VERSION='V7.12.300.48 Web Builder Form Designer Full Window Builder Overlay Comfort Pass';
+const VERSION='V7.12.300.49 Web Builder Form Designer Real Submit Email Draft Connection Pass';
 const CONFIG_FILE='stream-bandit-shell-v6-24.js';
 const BUCKET='stream-bandit-images';
 const ALLOWED_TYPES=['image/png','image/jpeg','image/webp'];
@@ -905,6 +902,7 @@ let lastSubmit=null;
 let lastEmailDraft=null;
 let lastMailtoHref='';
 let lastUploads=[];
+let lastSubmitErrors=[];
 let readCount=0;
 let pageWrites=0;
 let submissionWrites=0;
@@ -964,6 +962,10 @@ let authState={
   bodyActionsPreserved:true,
   overlayInputs:true,
   imageUploadExistingBucketOnly:true,
+  realSubmitWritesSbFormSubmissions:true,
+  formDesignWritesSbSitePages:true,
+  emailDraftMailtoConnected:true,
+  localDraftIsBackupOnly:true,
   fullFormInboxTouched:false
 };
 
@@ -1239,6 +1241,11 @@ function fieldObj(type,label){
   };
 }
 
+function ownerEmailValue(){
+  let v=$('ownerEmail')?String($('ownerEmail').value||'').trim():'';
+  return v||authState.email||(user&&user.email)||'';
+}
+
 function setStatus(msg,kind){
   $('status').textContent=msg;
   $('status').className='status '+(kind||'');
@@ -1396,16 +1403,18 @@ async function readPage(slug){
 }
 
 function routing(){
+  let ownerEmail=ownerEmailValue();
+
   return {
-    save_to_inbox:$('routeInbox').checked,
-    owner_notification_intent:$('routeNotify').checked,
-    owner_message_copy_intent:$('routeOwnerCopy').checked,
-    email_destination_requested:$('routeEmail').checked,
-    owner_email:$('ownerEmail').value.trim()||null,
-    owner_name:$('ownerName').value.trim()||null,
+    save_to_inbox:$('routeInbox')?$('routeInbox').checked:true,
+    owner_notification_intent:$('routeNotify')?$('routeNotify').checked:true,
+    owner_message_copy_intent:$('routeOwnerCopy')?$('routeOwnerCopy').checked:false,
+    email_destination_requested:$('routeEmail')?$('routeEmail').checked:false,
+    owner_email:ownerEmail||null,
+    owner_name:$('ownerName')?$('ownerName').value.trim()||null:null,
     external_email_sent:false,
     message_delivered:false,
-    note:'Email opens user mail app with a draft. Image upload fields save to Supabase Storage during real submit.'
+    note:'Real Submit writes to sb_form_submissions when Inbox is selected. Email draft opens the user mail app with subject/body.'
   };
 }
 
@@ -1473,8 +1482,8 @@ function loadFormFromPage(){
   $('routeInbox').checked=rt.save_to_inbox!==false;
   $('routeNotify').checked=rt.owner_notification_intent!==false;
   $('routeOwnerCopy').checked=!!rt.owner_message_copy_intent;
-  $('routeEmail').checked=!!rt.email_destination_requested;
-  $('ownerEmail').value=rt.owner_email||'';
+  $('routeEmail').checked=rt.email_destination_requested!==false;
+  $('ownerEmail').value=rt.owner_email||ownerEmailValue()||'';
   $('ownerName').value=rt.owner_name||'';
 
   fields=(Array.isArray(fb.items)?fb.items:arr(fb.questions||fb.fields||fb.items_json)).map(x=>{
@@ -1508,6 +1517,7 @@ async function loadPage(){
       fields=contactFields();
       lastAction='load page not found';
       lastError='';
+      if($('ownerEmail')&&!$('ownerEmail').value&&ownerEmailValue())$('ownerEmail').value=ownerEmailValue();
       renderAll('No page found in this workspace. Contact preset loaded locally.');
       setStatus('No page found in this workspace: '+slug,'bad2');
       return;
@@ -1532,6 +1542,7 @@ async function loadPage(){
     lastError=e&&e.message?e.message:String(e);
     lastAction='load page failed';
     fields=contactFields();
+    if($('ownerEmail')&&!$('ownerEmail').value&&ownerEmailValue())$('ownerEmail').value=ownerEmailValue();
     renderAll('Load failed, Contact preset loaded locally.');
     setStatus('Load failed: '+lastError,'bad2');
   }
@@ -1579,7 +1590,7 @@ function renderLive(){
   $('previewSlugLabel').textContent=currentSlug();
 
   $('previewDestinationPills').innerHTML=
-    (r.save_to_inbox?'<span class="pill good">Inbox</span>':'')+
+    (r.save_to_inbox?'<span class="pill good">Inbox / sb_form_submissions</span>':'')+
     (r.email_destination_requested?'<span class="pill good">Email draft</span>':'')+
     (r.owner_message_copy_intent?'<span class="pill warn">Private message intent</span>':'')+
     (fields.some(f=>f.kind==='file')?'<span class="pill good">Image upload</span>':'')+
@@ -1596,7 +1607,7 @@ function renderDestinationSummary(){
   let r=routing();
 
   $('destSummary').innerHTML=
-    '<article class="overlayCard"><b>Inbox</b><p>'+(r.save_to_inbox?'Submission saves to Web Builder Inbox.':'Inbox saving is off.')+'</p><span class="pill '+(r.save_to_inbox?'good':'warn')+'">'+(r.save_to_inbox?'selected':'off')+'</span></article>'+
+    '<article class="overlayCard"><b>Inbox</b><p>'+(r.save_to_inbox?'Real submission writes to sb_form_submissions.':'Inbox saving is off.')+'</p><span class="pill '+(r.save_to_inbox?'good':'warn')+'">'+(r.save_to_inbox?'selected':'off')+'</span></article>'+
     '<article class="overlayCard"><b>Email draft</b><p>'+(r.email_destination_requested?'Opens user mail app to '+esc(r.owner_email||'missing email')+'.':'Email draft is off.')+'</p><span class="pill '+(r.email_destination_requested?'good':'warn')+'">'+(r.email_destination_requested?'selected':'off')+'</span></article>'+
     '<article class="overlayCard"><b>Image uploads</b><p>'+(fields.some(f=>f.kind==='file')?'Real Submit uploads selected images to '+BUCKET+'.':'No image upload field currently.')+'</p><span class="pill '+(fields.some(f=>f.kind==='file')?'good':'warn')+'">'+(fields.some(f=>f.kind==='file')?'enabled':'off')+'</span></article>'+
     '<article class="overlayCard"><b>Owner</b><p>'+esc(r.owner_name||'No owner name')+'<br>'+esc(r.owner_email||'No owner email')+'</p></article>';
@@ -1727,7 +1738,7 @@ function updateFieldOverlayUi(){
   $('editFieldOptionsWrap').style.display=needsOptions(k)?'block':'none';
 
   if(k==='file'){
-    $('editFieldNote').textContent='Image upload fields use '+BUCKET+' and accept PNG, JPEG and WebP. Real Submit uploads the image before saving to the inbox.';
+    $('editFieldNote').textContent='Image upload fields use '+BUCKET+' and accept PNG, JPEG and WebP. Real Submit uploads the image before saving to sb_form_submissions.';
   }else{
     $('editFieldNote').textContent='Field settings are stored inside the form block.';
   }
@@ -1883,10 +1894,11 @@ function submissionPayload(c){
       page_owner_id:pageOwnerId,
       form_key:b.formKey,
       preset_title:b.title,
-      source:'owned-form-designer-global-rail-v7-12-300-48',
+      source:'owned-form-designer-real-submit-email-v7-12-300-49',
       existing_bucket_only:true,
       bucket:BUCKET,
-      bucketPolicyChanged:false
+      bucketPolicyChanged:false,
+      write_table:'sb_form_submissions'
     }
   });
 
@@ -1898,9 +1910,80 @@ function submissionPayload(c){
     block_title:b.title,
     answers_json:answers,
     submitter_id:user?user.id:null,
-    submitter_email:c.email||null,
+    submitter_email:c.email||authState.email||null,
     status:'new'
   };
+}
+
+async function insertSubmissionWithFallback(p){
+  let c=await client();
+
+  lastSubmitErrors=[];
+
+  let variants=[
+    {
+      label:'full current Form Designer payload',
+      data:p
+    },
+    {
+      label:'standard sb_form_submissions payload',
+      data:{
+        page_slug:p.page_slug,
+        form_title:p.form_title,
+        form_key:p.form_key,
+        answers_json:p.answers_json,
+        submitter_id:p.submitter_id,
+        submitter_email:p.submitter_email,
+        status:p.status
+      }
+    },
+    {
+      label:'compact sb_form_submissions payload',
+      data:{
+        page_slug:p.page_slug,
+        form_key:p.form_key,
+        answers_json:p.answers_json,
+        submitter_email:p.submitter_email,
+        status:p.status
+      }
+    },
+    {
+      label:'minimal sb_form_submissions payload',
+      data:{
+        page_slug:p.page_slug,
+        answers_json:p.answers_json,
+        status:p.status
+      }
+    },
+    {
+      label:'answers-only sb_form_submissions payload',
+      data:{
+        answers_json:p.answers_json
+      }
+    }
+  ];
+
+  for(let i=0;i<variants.length;i++){
+    let v=variants[i];
+
+    let res=await withTimeout(
+      c.from('sb_form_submissions').insert(v.data).select('*').maybeSingle(),
+      12000,
+      'sb_form_submissions insert timed out'
+    );
+
+    if(!res.error){
+      submissionWrites++;
+      authState.supabaseWrites=true;
+      authState.realSubmitWritesSbFormSubmissions=true;
+      lastAction='sb_form_submissions insert passed using '+v.label;
+      return res.data||v.data;
+    }
+
+    lastSubmitErrors.push(v.label+': '+res.error.message);
+  }
+
+  throw new Error('sb_form_submissions insert failed. '+lastSubmitErrors.join(' | '));
 }
 
 function emailBody(p){
@@ -1927,14 +2010,15 @@ function cleanMailToAddress(to){
 }
 
 function mailtoForPayload(p){
-  let to=cleanMailToAddress(routing().owner_email||'');
+  let to=cleanMailToAddress(ownerEmailValue()||routing().owner_email||'');
   let subject='Form submission: '+p.form_title+' / '+p.page_slug;
   return 'mailto:'+to+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(emailBody(p));
 }
 
 function launchMailto(href){
-  let a=document.createElement('a');
+  lastMailtoHref=href;
 
+  let a=document.createElement('a');
   a.href=href;
   a.target='_self';
   a.rel='noopener';
@@ -1946,6 +2030,12 @@ function launchMailto(href){
   setTimeout(()=>{
     try{a.remove();}catch(e){}
   },1000);
+
+  setTimeout(()=>{
+    try{
+      window.location.href=href;
+    }catch(e){}
+  },150);
 }
 
 async function copyEmailBody(text){
@@ -1955,31 +2045,32 @@ async function copyEmailBody(text){
 }
 
 async function openEmailDraftFromPayload(p){
-  let r=routing();
+  let to=cleanMailToAddress(ownerEmailValue());
 
-  if(!r.email_destination_requested)throw new Error('Email destination is not selected.');
-  if(!cleanMailToAddress(r.owner_email))throw new Error('Owner email destination is missing.');
+  if(!to)throw new Error('Owner email destination is missing. Add an owner email in the Builder Overlay first.');
 
   let body=emailBody(p);
   let mailto=mailtoForPayload(p);
 
   lastMailtoHref=mailto;
   lastEmailDraft={
-    to:cleanMailToAddress(r.owner_email),
+    to:to,
     subject:'Form submission: '+p.form_title+' / '+p.page_slug,
     bodyPreview:body,
     hrefPreview:mailto.slice(0,300),
     at:new Date().toISOString(),
-    opened:true
+    opened:true,
+    mailtoConnected:true
   };
 
   emailDraftOpens++;
+  authState.emailDraftMailtoConnected=true;
 
-  $('answers').textContent='EMAIL DRAFT REQUESTED\n\nThe mail body was also copied as a fallback.\n\n'+body;
+  $('answers').textContent='EMAIL DRAFT REQUESTED\n\nA real mailto draft was opened. The mail body was also copied as a fallback.\n\n'+body;
 
   await copyEmailBody(body);
 
-  setStatus('Opening mail draft with subject/body. If your mail app blocks body text, paste from clipboard.','good2');
+  setStatus('Opening email draft with subject/body. If the browser blocks it, paste the copied body into your mail app.','good2');
 
   renderStats();
   renderDebug();
@@ -1989,6 +2080,9 @@ async function openEmailDraftFromPayload(p){
 async function openEmailDraft(){
   try{
     requireAllowed();
+    if($('routeEmail'))$('routeEmail').checked=true;
+    if($('ownerEmail')&&!$('ownerEmail').value&&ownerEmailValue())$('ownerEmail').value=ownerEmailValue();
+
     lastUploads=[];
     let p=submissionPayload(await collect({uploadFiles:false}));
     await openEmailDraftFromPayload(p);
@@ -2031,38 +2125,32 @@ async function realSubmit(){
     requireAllowed();
 
     lastUploads=[];
+    lastSubmitErrors=[];
 
     let p=submissionPayload(await collect({uploadFiles:true}));
     let r=p.answers_json.__routing;
+    let savedToInbox=false;
+    let emailRequested=!!r.email_destination_requested;
 
-    if(!r.save_to_inbox&&!r.email_destination_requested&&!r.owner_message_copy_intent){
-      throw new Error('Choose at least one destination.');
+    if(!r.save_to_inbox&&!emailRequested&&!r.owner_message_copy_intent){
+      if($('routeInbox'))$('routeInbox').checked=true;
+      r.save_to_inbox=true;
+      p.answers_json.__routing.save_to_inbox=true;
     }
 
     if(r.save_to_inbox){
-      let c=await client();
-
-      let res=await withTimeout(
-        c.from('sb_form_submissions').insert(p).select('*').maybeSingle(),
-        12000,
-        'Inbox submit timed out'
-      );
-
-      submissionWrites++;
-      authState.supabaseWrites=true;
-
-      if(res.error)throw res.error;
-
-      lastSubmit=res.data||p;
+      lastSubmit=await insertSubmissionWithFallback(p);
+      savedToInbox=true;
     }
 
     lastAction='real submit passed';
     lastError='';
 
     $('answers').textContent='REAL SUBMIT RESULT\n\n'+JSON.stringify({
-      savedToInbox:!!r.save_to_inbox,
+      savedToInbox:savedToInbox,
+      writeTable:savedToInbox?'sb_form_submissions':'not selected',
       submission:lastSubmit,
-      emailDraftRequested:!!r.email_destination_requested,
+      emailDraftRequested:emailRequested,
       privateMessageIntent:!!r.owner_message_copy_intent,
       uploads:lastUploads,
       storageUploads:storageUploads,
@@ -2070,18 +2158,18 @@ async function realSubmit(){
       bucketPolicyChanged:false
     },null,2);
 
-    setStatus('Submit processed. Uploads and inbox saved if selected.','good2');
-
-    if(r.email_destination_requested){
-      await openEmailDraftFromPayload(p);
-    }
+    setStatus(savedToInbox?'Real submit saved to sb_form_submissions.':'Real submit processed without inbox save because inbox was not selected.','good2');
 
     renderStats();
     renderDebug();
+
+    if(emailRequested){
+      await openEmailDraftFromPayload(p);
+    }
   }catch(e){
     lastError=e&&e.message?e.message:String(e);
     lastAction='real submit failed';
-    $('answers').textContent='Real submit failed:\n'+lastError;
+    $('answers').textContent='Real submit failed:\n'+lastError+'\n\nInsert attempts:\n'+(lastSubmitErrors.length?lastSubmitErrors.join('\n'):'No insert attempt details.');
     setStatus('Real submit failed: '+lastError,'bad2');
     renderDebug();
   }
@@ -2126,7 +2214,8 @@ async function saveFormDesign(){
         solid_state_shell:true,
         overlays_preserved:true,
         builder_overlay_full_window:true,
-        builder_overlay_comfort_pass:true,
+        real_submit_writes_table:'sb_form_submissions',
+        email_draft_mailto_connected:true,
         image_upload_existing_bucket:true,
         bucket:BUCKET,
         bucket_policy_changed:false
@@ -2163,13 +2252,15 @@ async function saveFormDesign(){
     lastAction='save form design passed';
     lastError='';
 
-    setStatus('Saved form design to page row. Full-window builder overlay comfort preserved. No schema change.','good2');
+    setStatus('Saved form design to sb_site_pages.settings_json. Real submit remains connected to sb_form_submissions.','good2');
 
     $('answers').textContent='FORM DESIGN SAVED\n\n'+JSON.stringify({
       page:page.slug,
       page_owner_id:pageOwnerId,
       fields:fields.length,
       savedColumns:['settings_json'],
+      saveTable:'sb_site_pages',
+      realSubmitTable:'sb_form_submissions',
       globalRailPass:true,
       overlaysPreserved:true,
       builderOverlayPreserved:true,
@@ -2200,7 +2291,8 @@ function saveLocalQuick(){
       slug:currentSlug(),
       formBlock:formBlock(),
       fields:fields,
-      saved_at:new Date().toISOString()
+      saved_at:new Date().toISOString(),
+      note:'Local draft is backup only. Real Submit writes to sb_form_submissions.'
     };
 
     localStorage.setItem('sb_form_designer_local_'+currentSlug(),JSON.stringify(data));
@@ -2208,8 +2300,8 @@ function saveLocalQuick(){
     lastAction='local draft saved';
     lastError='';
 
-    $('answers').textContent='LOCAL DRAFT SAVED\n\n'+JSON.stringify(data,null,2);
-    setStatus('Local draft saved on this device.','good2');
+    $('answers').textContent='LOCAL BACKUP DRAFT SAVED\n\nThis is not a submit. Use Real Submit to write sb_form_submissions.\n\n'+JSON.stringify(data,null,2);
+    setStatus('Local backup draft saved on this device. Real Submit remains the database submit button.','good2');
     renderDebug();
   }catch(e){
     lastError=e&&e.message?e.message:String(e);
@@ -2226,7 +2318,7 @@ function renderStats(){
     '<article class="card"><b>Page writes</b><p class="big">'+pageWrites+'</p></article>'+
     '<article class="card"><b>Inbox writes</b><p class="big">'+submissionWrites+'</p></article>'+
     '<article class="card"><b>Storage uploads</b><p class="big">'+storageUploads+'</p></article>'+
-    '<article class="card"><b>Local tests</b><p class="big">'+localTests+'</p></article>';
+    '<article class="card"><b>Email drafts</b><p class="big">'+emailDraftOpens+'</p></article>';
 }
 
 function state(){
@@ -2262,6 +2354,10 @@ function state(){
     imageUploadExistingBucketOnly:true,
     bucket:BUCKET,
     bucketPolicyChanged:false,
+    realSubmitWritesTable:'sb_form_submissions',
+    formDesignWritesTable:'sb_site_pages',
+    localDraftIsBackupOnly:true,
+    emailDraftMailtoConnected:true,
     readCount:readCount,
     pageWrites:pageWrites,
     submissionWrites:submissionWrites,
@@ -2284,6 +2380,7 @@ function state(){
       owner_id:page.owner_id
     }:null,
     lastSubmit:lastSubmit,
+    lastSubmitErrors:lastSubmitErrors,
     lastEmailDraft:lastEmailDraft,
     lastMailtoHrefPreview:String(lastMailtoHref||'').slice(0,240),
     lastUploads:lastUploads,
@@ -2476,6 +2573,10 @@ async function boot(){
     authState.canUseBuilder=builderAllowed(profile);
     authState.workspace=authState.isPlatformOwner?'platform-owner-any-workspace':'personal-owner-id-only';
 
+    if($('ownerEmail')&&!$('ownerEmail').value&&authState.email){
+      $('ownerEmail').value=authState.email;
+    }
+
     if(!authState.canUseBuilder){
       showLocked('Web Builder plan or permission required.');
       return;
@@ -2517,6 +2618,6 @@ boot();
 
 })();
 </script>
-<script src="web-builder-global-projector-v7-12-263.js?v=7-12-300-48-form-designer-full-window-builder-overlay-comfort"></script>
+<script src="web-builder-global-projector-v7-12-263.js?v=7-12-300-49-form-designer-real-submit-email-draft-connection"></script>
 </body>
 </html>
