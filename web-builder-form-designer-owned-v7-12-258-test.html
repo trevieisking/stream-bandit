@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Form Designer V7.12.300.49 TEST</title>
+<title>Web Builder Form Designer V7.12.300.50 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -85,7 +85,64 @@ body{
   color:var(--muted);
   font-weight:800;
 }
-.actions,.row{
+.wrap{
+  width:min(1540px,100%);
+  margin:0 auto;
+  padding:14px;
+}
+.hero,.panel,.card,.question,.overlayCard{
+  border:1px solid #ffffff18;
+  border-radius:24px;
+  background:linear-gradient(135deg,var(--panel),var(--panel2));
+  padding:16px;
+  margin:0 0 14px;
+}
+.card,.question,.overlayCard{
+  background:#ffffff08;
+}
+.hero h1{
+  font-size:clamp(36px,5vw,76px);
+  line-height:.94;
+  margin:8px 0;
+  letter-spacing:-.055em;
+}
+h2,h3{margin:0 0 10px}
+p,li,label,small{
+  color:var(--muted);
+  line-height:1.5;
+}
+.badge,.chip,.pill{
+  display:inline-flex;
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  padding:6px 9px;
+  background:#ffffff0d;
+  color:#dbe7ff;
+  font-weight:900;
+  font-size:12px;
+  margin:2px;
+}
+.badge,.good{
+  background:#22d3a621;
+  border-color:#22d3a660;
+  color:#baf7df;
+}
+.warn{
+  background:#ffb14224;
+  border-color:#ffb14266;
+  color:#ffe7ad;
+}
+.bad{
+  background:#ff5d6c22;
+  border-color:#ff5d6c66;
+  color:#ffd0d5;
+}
+.cyan{
+  background:#41e8ff22;
+  border-color:#41e8ff66;
+  color:#cef9ff;
+}
+.row,.actions{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
@@ -133,59 +190,6 @@ body{
   background:linear-gradient(135deg,var(--bad),var(--purple));
   color:#fff;
 }
-.wrap{
-  width:min(1540px,100%);
-  margin:0 auto;
-  padding:14px;
-}
-.hero,.panel,.card,.question,.overlayCard{
-  border:1px solid #ffffff18;
-  border-radius:24px;
-  background:linear-gradient(135deg,var(--panel),var(--panel2));
-  padding:16px;
-  margin:0 0 14px;
-}
-.card,.question,.overlayCard{
-  background:#ffffff08;
-}
-.hero h1{
-  font-size:clamp(36px,5vw,76px);
-  line-height:.94;
-  margin:8px 0;
-  letter-spacing:-.055em;
-}
-h2,h3{margin:0 0 10px}
-.badge,.chip,.pill{
-  display:inline-flex;
-  border:1px solid #ffffff24;
-  border-radius:999px;
-  padding:6px 9px;
-  background:#ffffff0d;
-  color:#dbe7ff;
-  font-weight:900;
-  font-size:12px;
-  margin:2px;
-}
-.badge,.good{
-  background:#22d3a621;
-  border-color:#22d3a660;
-  color:#baf7df;
-}
-.warn{
-  background:#ffb14224;
-  border-color:#ffb14266;
-  color:#ffe7ad;
-}
-.bad{
-  background:#ff5d6c22;
-  border-color:#ff5d6c66;
-  color:#ffd0d5;
-}
-.cyan{
-  background:#41e8ff22;
-  border-color:#41e8ff66;
-  color:#cef9ff;
-}
 .grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -198,7 +202,7 @@ h2,h3{margin:0 0 10px}
 }
 .builderLayout{
   display:grid;
-  grid-template-columns:minmax(280px,.78fr) minmax(380px,1.22fr);
+  grid-template-columns:minmax(320px,.72fr) minmax(520px,1.28fr);
   gap:12px;
 }
 .card b,.control b,.question b,.overlayCard b{
@@ -217,10 +221,6 @@ h2,h3{margin:0 0 10px}
 .later{
   border-color:#7c3cff66;
   background:#7c3cff14;
-}
-p,li,label,small{
-  color:var(--muted);
-  line-height:1.5;
 }
 .list{
   margin:6px 0 0;
@@ -439,8 +439,6 @@ p,li,label,small{
 .modal.compact{
   width:min(720px,100%);
 }
-
-/* V7.12.300.49 keeps the comfort fix: main builder overlay gets the full workbench. */
 #builderOverlay{
   align-items:stretch;
   justify-content:stretch;
@@ -457,20 +455,13 @@ p,li,label,small{
   grid-template-rows:auto minmax(0,1fr) auto;
   overflow:hidden;
 }
-#builderOverlay .modalHead{
-  border-radius:0;
-}
 #builderOverlay .modalBody{
   min-height:0;
   overflow:auto;
   padding:clamp(12px,2vw,22px);
 }
-#builderOverlay .modalFoot{
-  border-radius:0;
-}
 #builderOverlay .builderLayout{
   min-height:calc(100vh - 150px);
-  grid-template-columns:minmax(320px,.72fr) minmax(520px,1.28fr);
   align-items:stretch;
 }
 #builderOverlay .builderLayout > .panel{
@@ -483,7 +474,6 @@ p,li,label,small{
 #builderOverlay .control textarea{
   min-height:120px;
 }
-
 .modalHead{
   position:sticky;
   top:0;
@@ -548,9 +538,6 @@ p,li,label,small{
   .hero h1{
     font-size:clamp(36px,12vw,58px);
   }
-  .modal{
-    max-height:96vh;
-  }
   #builderOverlay .modal{
     height:100dvh;
     max-height:100dvh;
@@ -574,14 +561,14 @@ p,li,label,small{
 }
 </style>
 </head>
-<body data-wb-shell="form-designer-v7-12-300-49" data-web-builder-form-designer="real-submit-email-draft-connection">
+<body data-wb-shell="form-designer-v7-12-300-50" data-web-builder-form-designer="save-design-inbox-route-email-preview-tab">
 <header class="top">
   <div class="topInner">
     <div class="brand">
       <div class="mark" aria-hidden="true">WB</div>
       <div>
         Web Builder Form Designer
-        <small>real submit + email draft pipeline + full-window builder overlay · V7.12.300.49</small>
+        <small>save design + real inbox route + new-tab email preview · V7.12.300.50</small>
       </div>
     </div>
   </div>
@@ -589,19 +576,19 @@ p,li,label,small{
 
 <main class="wrap">
   <section class="hero">
-    <span class="badge">V7.12.300.49 Form Designer Real Submit + Email Draft Connection Pass</span>
+    <span class="badge">V7.12.300.50 Form Designer Save Design + Inbox Route + Email Preview Tab Pass</span>
     <h1>Advanced forms open first, then owner lock checks run</h1>
-    <p>This keeps the working Form Designer tools, keeps the full-window edit overlay, writes real submissions to <b>sb_form_submissions</b>, and opens the user mail app with a real draft when email is selected.</p>
+    <p>This keeps the full-window Edit Form overlay, saves form design back to <b>sb_site_pages</b>, writes real submissions to <b>sb_form_submissions</b>, opens the correct submissions inbox, and opens email preview in a new browser tab.</p>
     <div class="row">
       <span class="chip good">Global Web Builder rail</span>
       <span class="chip good">Full-window builder overlay</span>
+      <span class="chip good">Saves sb_site_pages</span>
       <span class="chip good">Writes sb_form_submissions</span>
-      <span class="chip good">Email draft mailto</span>
-      <span class="chip good">Image upload kept</span>
+      <span class="chip good">New-tab email preview</span>
       <span class="chip warn">No schema change</span>
       <span class="chip warn">No index promotion</span>
     </div>
-    <div class="railNote">Old local top buttons are removed. Use the Web Builder rail across the top for Hub, Pages, Menu and Preview.</div>
+    <div class="railNote">The inbox button now opens the real submissions inbox route: web-builder-form-submissions-v7-12-94-test.html?page=&lt;slug&gt;.</div>
   </section>
 
   <section class="grid">
@@ -616,16 +603,16 @@ p,li,label,small{
       <b>Real submit pipeline</b>
       <ul class="list">
         <li><code>Real Submit</code> writes to <code>sb_form_submissions</code>.</li>
-        <li>Email draft opens with subject/body when selected.</li>
-        <li>Local draft is only the separate local backup button.</li>
+        <li>The inbox route opens the submissions inbox, not the private-message bridge.</li>
+        <li>Email preview opens in a new browser tab.</li>
       </ul>
     </div>
     <div class="card later">
-      <b>Uploads kept correctly</b>
+      <b>Save design pipeline</b>
       <ul class="list">
-        <li>Uses existing <code>stream-bandit-images</code> bucket.</li>
-        <li>No bucket or policy change.</li>
-        <li>Upload happens only during Real Submit.</li>
+        <li><code>Save Form Design</code> writes <code>settings_json</code>.</li>
+        <li>It also writes <code>layout_json</code> when available so older form pages can read it.</li>
+        <li>No table/schema change.</li>
       </ul>
     </div>
   </section>
@@ -656,10 +643,10 @@ p,li,label,small{
     </div>
     <div class="previewFoot">
       <button id="localTest" class="btn primary" type="button">Run Local Test - No Write</button>
-      <button id="openEmailDraft" class="btn blue" type="button">Open Email Draft</button>
+      <button id="openEmailDraft" class="btn blue" type="button">Open Email Preview Tab</button>
       <button id="realSubmit" class="btn hot" type="button">Real Submit</button>
-      <button id="saveLocalQuick" class="btn warnBtn" type="button">Save Local Draft</button>
-      <button id="openInbox" class="btn" type="button">Open Owned Inbox</button>
+      <button id="saveLocalQuick" class="btn warnBtn" type="button">Save Local Backup</button>
+      <button id="openInbox" class="btn" type="button">Open Submissions Inbox</button>
     </div>
   </section>
 
@@ -679,7 +666,7 @@ p,li,label,small{
   </section>
 </main>
 
-<footer class="footer">V7.12.300.49 Form Designer Real Submit + Email Draft Connection Pass · writes sb_form_submissions · saves sb_site_pages form design · existing image bucket only · no schema changes · no index promotion</footer>
+<footer class="footer">V7.12.300.50 Form Designer Save Design + Inbox Route + Email Preview Tab Pass · writes sb_site_pages + sb_form_submissions · existing image bucket only · no schema changes · no index promotion</footer>
 
 <div id="builderOverlay" class="overlay" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="builderTitle">
@@ -720,7 +707,7 @@ p,li,label,small{
           <label class="checkline"><input id="routeInbox" type="checkbox" checked> Save real submission to Web Builder Inbox / <code>sb_form_submissions</code></label>
           <label class="checkline"><input id="routeNotify" type="checkbox" checked> Record owner notification intent</label>
           <label class="checkline"><input id="routeOwnerCopy" type="checkbox"> Record owner/private-message intent</label>
-          <label class="checkline"><input id="routeEmail" type="checkbox" checked> Open user mail app with filled form draft</label>
+          <label class="checkline"><input id="routeEmail" type="checkbox"> Open new browser tab with email preview</label>
           <div class="controlGrid">
             <div class="control">
               <b>Owner email destination</b>
@@ -858,7 +845,7 @@ p,li,label,small{
     </div>
     <div class="modalBody">
       <div id="destSummary" class="destinationGrid"></div>
-      <div class="notice">Real Submit writes to <b>sb_form_submissions</b> when Inbox is selected. Email opens the user mail app with subject/body. Image upload uses the existing bucket only.</div>
+      <div class="notice">Real Submit writes to <b>sb_form_submissions</b> when Inbox is selected. Email preview opens in a new browser tab. Image upload uses the existing bucket only.</div>
     </div>
     <div class="modalFoot">
       <button id="destClose2" class="btn" type="button">Done</button>
@@ -870,11 +857,12 @@ p,li,label,small{
 (function(){
 'use strict';
 
-const VERSION='V7.12.300.49 Web Builder Form Designer Real Submit Email Draft Connection Pass';
+const VERSION='V7.12.300.50 Web Builder Form Designer Save Design Inbox Route Email Preview Tab Pass';
 const CONFIG_FILE='stream-bandit-shell-v6-24.js';
 const BUCKET='stream-bandit-images';
 const ALLOWED_TYPES=['image/png','image/jpeg','image/webp'];
-const OWNED_INBOX='web-builder-form-inbox-owned-v7-12-258-test.html';
+const SUBMISSIONS_INBOX='web-builder-form-submissions-v7-12-94-test.html';
+const PRIVATE_MESSAGE_BRIDGE='web-builder-form-inbox-owned-v7-12-258-test.html';
 const OWNER_SLUGS=['landing','home','home-page'];
 
 const RANK={
@@ -899,15 +887,15 @@ let editIndex=-1;
 let deleteIndex=-1;
 let lastError='';
 let lastSubmit=null;
-let lastEmailDraft=null;
-let lastMailtoHref='';
+let lastEmailPreview=null;
 let lastUploads=[];
-let lastSubmitErrors=[];
+let lastSaveMethod='';
+let lastSaveErrors=[];
 let readCount=0;
 let pageWrites=0;
 let submissionWrites=0;
 let localTests=0;
-let emailDraftOpens=0;
+let emailPreviewOpens=0;
 let storageUploads=0;
 let builderOverlayOpen=false;
 let destinationOverlayOpen=false;
@@ -945,13 +933,12 @@ let authState={
   streamBanditShellChanges:false,
   activeMenuPromotion:false,
   indexPromotion:false,
-  registryPromotion:true,
+  registryPromotion:false,
   solidStateShell:true,
   noHiddenLoadingGate:true,
   overlaysPreserved:true,
   builderOverlayPreserved:true,
   builderOverlayFullWindow:true,
-  builderOverlayComfortPass:true,
   destinationOverlayPreserved:true,
   fieldEditOverlayPreserved:true,
   fieldDeleteOverlayPreserved:true,
@@ -964,9 +951,10 @@ let authState={
   imageUploadExistingBucketOnly:true,
   realSubmitWritesSbFormSubmissions:true,
   formDesignWritesSbSitePages:true,
-  emailDraftMailtoConnected:true,
-  localDraftIsBackupOnly:true,
-  fullFormInboxTouched:false
+  saveFormDesignUpdatesLayoutJson:true,
+  emailPreviewOpensNewTab:true,
+  submissionsInboxRoute:SUBMISSIONS_INBOX,
+  privateMessageBridgeRoute:PRIVATE_MESSAGE_BRIDGE
 };
 
 const $=id=>document.getElementById(id);
@@ -1177,7 +1165,8 @@ function links(){
     studio:pageUrl('overlay-route-truth-machine-v7-12-66-test.html',s),
     preview:pageUrl('web-builder-preview-owned-v7-12-257-test.html',s),
     menu:'web-builder-menu-builder-owned-v7-12-264-test.html',
-    inbox:pageUrl(OWNED_INBOX,s)
+    inbox:pageUrl(SUBMISSIONS_INBOX,s),
+    privateMessageBridge:pageUrl(PRIVATE_MESSAGE_BRIDGE,s)
   };
 }
 
@@ -1224,9 +1213,9 @@ function needsOptions(t){
 
 function contactFields(){
   return [
-    {id:uid(),label:'Pick a mix',kind:'multiple',placeholder:'',options:'1\n2\n3\n4\n5',required:true},
+    {id:uid(),label:'What can we help with?',kind:'multiple',placeholder:'',options:'General question\nSupport\nBooking\nWebsite help',required:true},
     {id:uid(),label:'Your email',kind:'email',placeholder:'name@email.com',options:'',required:true},
-    {id:uid(),label:'Long text',kind:'long',placeholder:'Whats one saying',options:'',required:true}
+    {id:uid(),label:'Message',kind:'long',placeholder:'Write your message',options:'',required:true}
   ];
 }
 
@@ -1414,7 +1403,7 @@ function routing(){
     owner_name:$('ownerName')?$('ownerName').value.trim()||null:null,
     external_email_sent:false,
     message_delivered:false,
-    note:'Real Submit writes to sb_form_submissions when Inbox is selected. Email draft opens the user mail app with subject/body.'
+    note:'Real Submit writes to sb_form_submissions when Inbox is selected. Email preview opens in a new browser tab.'
   };
 }
 
@@ -1482,7 +1471,7 @@ function loadFormFromPage(){
   $('routeInbox').checked=rt.save_to_inbox!==false;
   $('routeNotify').checked=rt.owner_notification_intent!==false;
   $('routeOwnerCopy').checked=!!rt.owner_message_copy_intent;
-  $('routeEmail').checked=rt.email_destination_requested!==false;
+  $('routeEmail').checked=!!rt.email_destination_requested;
   $('ownerEmail').value=rt.owner_email||ownerEmailValue()||'';
   $('ownerName').value=rt.owner_name||'';
 
@@ -1591,7 +1580,7 @@ function renderLive(){
 
   $('previewDestinationPills').innerHTML=
     (r.save_to_inbox?'<span class="pill good">Inbox / sb_form_submissions</span>':'')+
-    (r.email_destination_requested?'<span class="pill good">Email draft</span>':'')+
+    (r.email_destination_requested?'<span class="pill good">Email preview tab</span>':'')+
     (r.owner_message_copy_intent?'<span class="pill warn">Private message intent</span>':'')+
     (fields.some(f=>f.kind==='file')?'<span class="pill good">Image upload</span>':'')+
     '<span class="pill">'+fields.length+' fields</span>';
@@ -1607,8 +1596,8 @@ function renderDestinationSummary(){
   let r=routing();
 
   $('destSummary').innerHTML=
-    '<article class="overlayCard"><b>Inbox</b><p>'+(r.save_to_inbox?'Real submission writes to sb_form_submissions.':'Inbox saving is off.')+'</p><span class="pill '+(r.save_to_inbox?'good':'warn')+'">'+(r.save_to_inbox?'selected':'off')+'</span></article>'+
-    '<article class="overlayCard"><b>Email draft</b><p>'+(r.email_destination_requested?'Opens user mail app to '+esc(r.owner_email||'missing email')+'.':'Email draft is off.')+'</p><span class="pill '+(r.email_destination_requested?'good':'warn')+'">'+(r.email_destination_requested?'selected':'off')+'</span></article>'+
+    '<article class="overlayCard"><b>Inbox</b><p>'+(r.save_to_inbox?'Real submission writes to sb_form_submissions and opens through the submissions inbox route.':'Inbox saving is off.')+'</p><span class="pill '+(r.save_to_inbox?'good':'warn')+'">'+(r.save_to_inbox?'selected':'off')+'</span></article>'+
+    '<article class="overlayCard"><b>Email preview</b><p>'+(r.email_destination_requested?'Opens a new browser tab for '+esc(r.owner_email||'missing email')+'.':'Email preview is off.')+'</p><span class="pill '+(r.email_destination_requested?'good':'warn')+'">'+(r.email_destination_requested?'selected':'off')+'</span></article>'+
     '<article class="overlayCard"><b>Image uploads</b><p>'+(fields.some(f=>f.kind==='file')?'Real Submit uploads selected images to '+BUCKET+'.':'No image upload field currently.')+'</p><span class="pill '+(fields.some(f=>f.kind==='file')?'good':'warn')+'">'+(fields.some(f=>f.kind==='file')?'enabled':'off')+'</span></article>'+
     '<article class="overlayCard"><b>Owner</b><p>'+esc(r.owner_name||'No owner name')+'<br>'+esc(r.owner_email||'No owner email')+'</p></article>';
 }
@@ -1894,11 +1883,12 @@ function submissionPayload(c){
       page_owner_id:pageOwnerId,
       form_key:b.formKey,
       preset_title:b.title,
-      source:'owned-form-designer-real-submit-email-v7-12-300-49',
+      source:'owned-form-designer-save-inbox-email-tab-v7-12-300-50',
       existing_bucket_only:true,
       bucket:BUCKET,
       bucketPolicyChanged:false,
-      write_table:'sb_form_submissions'
+      write_table:'sb_form_submissions',
+      inbox_route:pageUrl(SUBMISSIONS_INBOX,currentSlug())
     }
   });
 
@@ -1915,75 +1905,21 @@ function submissionPayload(c){
   };
 }
 
-async function insertSubmissionWithFallback(p){
+async function insertSubmission(p){
   let c=await client();
 
-  lastSubmitErrors=[];
+  let res=await withTimeout(
+    c.from('sb_form_submissions').insert(p).select('*').maybeSingle(),
+    12000,
+    'sb_form_submissions insert timed out'
+  );
 
-  let variants=[
-    {
-      label:'full current Form Designer payload',
-      data:p
-    },
-    {
-      label:'standard sb_form_submissions payload',
-      data:{
-        page_slug:p.page_slug,
-        form_title:p.form_title,
-        form_key:p.form_key,
-        answers_json:p.answers_json,
-        submitter_id:p.submitter_id,
-        submitter_email:p.submitter_email,
-        status:p.status
-      }
-    },
-    {
-      label:'compact sb_form_submissions payload',
-      data:{
-        page_slug:p.page_slug,
-        form_key:p.form_key,
-        answers_json:p.answers_json,
-        submitter_email:p.submitter_email,
-        status:p.status
-      }
-    },
-    {
-      label:'minimal sb_form_submissions payload',
-      data:{
-        page_slug:p.page_slug,
-        answers_json:p.answers_json,
-        status:p.status
-      }
-    },
-    {
-      label:'answers-only sb_form_submissions payload',
-      data:{
-        answers_json:p.answers_json
-      }
-    }
-  ];
+  if(res.error)throw res.error;
 
-  for(let i=0;i<variants.length;i++){
-    let v=variants[i];
+  submissionWrites++;
+  authState.supabaseWrites=true;
 
-    let res=await withTimeout(
-      c.from('sb_form_submissions').insert(v.data).select('*').maybeSingle(),
-      12000,
-      'sb_form_submissions insert timed out'
-    );
-
-    if(!res.error){
-      submissionWrites++;
-      authState.supabaseWrites=true;
-      authState.realSubmitWritesSbFormSubmissions=true;
-      lastAction='sb_form_submissions insert passed using '+v.label;
-      return res.data||v.data;
-    }
-
-    lastSubmitErrors.push(v.label+': '+res.error.message);
-  }
-
-  throw new Error('sb_form_submissions insert failed. '+lastSubmitErrors.join(' | '));
+  return res.data||p;
 }
 
 function emailBody(p){
@@ -2002,6 +1938,13 @@ function emailBody(p){
     lines.push('- '+k+': '+((v&&typeof v==='object')?v.answer:v));
   });
 
+  lines.push('');
+  lines.push('Debug summary:');
+  lines.push('Version: '+VERSION);
+  lines.push('Route: web-builder-form-designer-owned-v7-12-258-test.html?page='+currentSlug());
+  lines.push('Inbox route: '+pageUrl(SUBMISSIONS_INBOX,currentSlug()));
+  lines.push('Write table: sb_form_submissions');
+
   return lines.join('\r\n');
 }
 
@@ -2015,83 +1958,78 @@ function mailtoForPayload(p){
   return 'mailto:'+to+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(emailBody(p));
 }
 
-function launchMailto(href){
-  lastMailtoHref=href;
+function emailPreviewHtml(p,report){
+  let body=emailBody(p);
+  let mailto=mailtoForPayload(p);
+  let debug=JSON.stringify(report,null,2);
 
-  let a=document.createElement('a');
-  a.href=href;
-  a.target='_self';
-  a.rel='noopener';
-  a.style.display='none';
-
-  document.body.appendChild(a);
-  a.click();
-
-  setTimeout(()=>{
-    try{a.remove();}catch(e){}
-  },1000);
-
-  setTimeout(()=>{
-    try{
-      window.location.href=href;
-    }catch(e){}
-  },150);
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
+    '<title>Email Preview - '+esc(p.form_title)+'</title>'+
+    '<style>body{margin:0;padding:18px;background:#070910;color:#f7fbff;font-family:Inter,system-ui,Arial,sans-serif}.wrap{max-width:1100px;margin:auto}.box{border:1px solid #ffffff22;border-radius:22px;background:linear-gradient(135deg,#101529,#17122d);padding:16px;margin:0 0 14px}.btn{border:0;border-radius:999px;background:linear-gradient(135deg,#22d3a6,#7c3cff);color:#071015;font-weight:950;padding:12px 16px;text-decoration:none;display:inline-flex;margin:4px;cursor:pointer}.muted{color:#aeb8d6}textarea,pre{width:100%;min-height:220px;border:1px solid #ffffff22;border-radius:16px;background:#0007;color:#dfffee;padding:12px;font:14px ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow:auto}h1{font-size:clamp(34px,6vw,64px);line-height:.92;margin:10px 0}</style>'+
+    '</head><body><div class="wrap">'+
+    '<section class="box"><span class="muted">Stream Bandit Web Builder</span><h1>Email preview</h1><p class="muted">This tab is safe to read, copy, print, or use to open the real mail app draft. Your Form Designer page stays open in the first tab.</p>'+
+    '<a class="btn" href="'+esc(mailto)+'">Open Mail App Draft</a>'+
+    '<button class="btn" onclick="navigator.clipboard.writeText(document.getElementById(\'emailBody\').value)">Copy Email Body</button>'+
+    '<button class="btn" onclick="navigator.clipboard.writeText(document.getElementById(\'debugReport\').textContent)">Copy Debug</button>'+
+    '<button class="btn" onclick="window.print()">Print / Save PDF</button></section>'+
+    '<section class="box"><h2>Email body</h2><textarea id="emailBody">'+esc(body)+'</textarea></section>'+
+    '<section class="box"><h2>Debug report</h2><pre id="debugReport">'+esc(debug)+'</pre></section>'+
+    '</div></body></html>';
 }
 
-async function copyEmailBody(text){
-  try{
-    if(navigator.clipboard)await navigator.clipboard.writeText(text);
-  }catch(e){}
-}
-
-async function openEmailDraftFromPayload(p){
+function openEmailPreviewTab(p){
   let to=cleanMailToAddress(ownerEmailValue());
 
   if(!to)throw new Error('Owner email destination is missing. Add an owner email in the Builder Overlay first.');
 
-  let body=emailBody(p);
-  let mailto=mailtoForPayload(p);
+  let report=state();
 
-  lastMailtoHref=mailto;
-  lastEmailDraft={
+  lastEmailPreview={
     to:to,
     subject:'Form submission: '+p.form_title+' / '+p.page_slug,
-    bodyPreview:body,
-    hrefPreview:mailto.slice(0,300),
     at:new Date().toISOString(),
-    opened:true,
-    mailtoConnected:true
+    openedNewTab:true,
+    mailtoPreview:mailtoForPayload(p).slice(0,260)
   };
 
-  emailDraftOpens++;
-  authState.emailDraftMailtoConnected=true;
+  emailPreviewOpens++;
 
-  $('answers').textContent='EMAIL DRAFT REQUESTED\n\nA real mailto draft was opened. The mail body was also copied as a fallback.\n\n'+body;
+  let w=window.open('','_blank');
 
-  await copyEmailBody(body);
+  if(!w){
+    throw new Error('Browser blocked the email preview tab. Allow popups for this page and click Open Email Preview Tab again.');
+  }
 
-  setStatus('Opening email draft with subject/body. If the browser blocks it, paste the copied body into your mail app.','good2');
+  w.document.open();
+  w.document.write(emailPreviewHtml(p,report));
+  w.document.close();
+
+  $('answers').textContent='EMAIL PREVIEW TAB OPENED\n\nA new browser tab was opened with the email body and debug report.\n\n'+emailBody(p);
+
+  setStatus('Email preview opened in a new browser tab.','good2');
 
   renderStats();
   renderDebug();
-  launchMailto(mailto);
 }
 
 async function openEmailDraft(){
   try{
     requireAllowed();
+
     if($('routeEmail'))$('routeEmail').checked=true;
     if($('ownerEmail')&&!$('ownerEmail').value&&ownerEmailValue())$('ownerEmail').value=ownerEmailValue();
 
     lastUploads=[];
     let p=submissionPayload(await collect({uploadFiles:false}));
-    await openEmailDraftFromPayload(p);
-    lastAction='email draft requested';
+
+    openEmailPreviewTab(p);
+
+    lastAction='email preview tab opened';
     lastError='';
   }catch(e){
     lastError=e&&e.message?e.message:String(e);
-    lastAction='email draft failed';
-    $('answers').textContent='Email draft failed:\n'+lastError;
+    lastAction='email preview failed';
+    $('answers').textContent='Email preview failed:\n'+lastError;
     setStatus(lastError,'bad2');
     renderDebug();
   }
@@ -2125,7 +2063,6 @@ async function realSubmit(){
     requireAllowed();
 
     lastUploads=[];
-    lastSubmitErrors=[];
 
     let p=submissionPayload(await collect({uploadFiles:true}));
     let r=p.answers_json.__routing;
@@ -2139,7 +2076,7 @@ async function realSubmit(){
     }
 
     if(r.save_to_inbox){
-      lastSubmit=await insertSubmissionWithFallback(p);
+      lastSubmit=await insertSubmission(p);
       savedToInbox=true;
     }
 
@@ -2149,8 +2086,9 @@ async function realSubmit(){
     $('answers').textContent='REAL SUBMIT RESULT\n\n'+JSON.stringify({
       savedToInbox:savedToInbox,
       writeTable:savedToInbox?'sb_form_submissions':'not selected',
+      inboxRoute:pageUrl(SUBMISSIONS_INBOX,currentSlug()),
       submission:lastSubmit,
-      emailDraftRequested:emailRequested,
+      emailPreviewRequested:emailRequested,
       privateMessageIntent:!!r.owner_message_copy_intent,
       uploads:lastUploads,
       storageUploads:storageUploads,
@@ -2158,18 +2096,19 @@ async function realSubmit(){
       bucketPolicyChanged:false
     },null,2);
 
-    setStatus(savedToInbox?'Real submit saved to sb_form_submissions.':'Real submit processed without inbox save because inbox was not selected.','good2');
+    setStatus(savedToInbox?'Real submit saved to sb_form_submissions. Open Submissions Inbox should show it.':'Real submit processed without inbox save because inbox was not selected.','good2');
 
     renderStats();
     renderDebug();
 
     if(emailRequested){
-      await openEmailDraftFromPayload(p);
+      openEmailPreviewTab(p);
+      lastAction='real submit passed and email preview tab opened';
     }
   }catch(e){
     lastError=e&&e.message?e.message:String(e);
     lastAction='real submit failed';
-    $('answers').textContent='Real submit failed:\n'+lastError+'\n\nInsert attempts:\n'+(lastSubmitErrors.length?lastSubmitErrors.join('\n'):'No insert attempt details.');
+    $('answers').textContent='Real submit failed:\n'+lastError;
     setStatus('Real submit failed: '+lastError,'bad2');
     renderDebug();
   }
@@ -2191,6 +2130,74 @@ function replaceFormBlock(blocks,form){
   return out;
 }
 
+async function updatePageDesign(payloads){
+  let c=await client();
+  lastSaveErrors=[];
+
+  for(let i=0;i<payloads.length;i++){
+    let payload=payloads[i].payload;
+    let label=payloads[i].label;
+
+    let attempts=[];
+
+    if(page&&page.id){
+      attempts.push({
+        label:label+' by id',
+        build:function(){
+          let q=c.from('sb_site_pages').update(payload).eq('id',page.id);
+          if(!authState.isPlatformOwner)q=q.eq('owner_id',authState.userId);
+          return q.select('*').maybeSingle();
+        }
+      });
+    }
+
+    attempts.push({
+      label:label+' by slug',
+      build:function(){
+        let q=c.from('sb_site_pages').update(payload).eq('slug',currentSlug());
+        if(!authState.isPlatformOwner)q=q.eq('owner_id',authState.userId);
+        return q.select('*').maybeSingle();
+      }
+    });
+
+    for(let j=0;j<attempts.length;j++){
+      let a=attempts[j];
+
+      try{
+        let res=await withTimeout(a.build(),12000,'sb_site_pages save timed out');
+
+        if(res.error){
+          lastSaveErrors.push(a.label+': '+res.error.message);
+          continue;
+        }
+
+        pageWrites++;
+        authState.supabaseWrites=true;
+        lastSaveMethod=a.label;
+
+        if(res.data){
+          page=res.data;
+          pageOwnerId=page.owner_id||pageOwnerId;
+          return page;
+        }
+
+        let verify=await readPage(currentSlug());
+        if(verify){
+          page=verify;
+          pageOwnerId=page.owner_id||pageOwnerId;
+          return page;
+        }
+
+        return page;
+      }catch(e){
+        lastSaveErrors.push(a.label+': '+(e&&e.message?e.message:String(e)));
+      }
+    }
+  }
+
+  throw new Error('Save Form Design failed. '+lastSaveErrors.join(' | '));
+}
+
 async function saveFormDesign(){
   try{
     requireAllowed();
@@ -2210,12 +2217,16 @@ async function saveFormDesign(){
         form_block:form,
         updated_by:'web-builder-form-designer-owned-v7-12-258-test.html',
         updated_at:new Date().toISOString(),
+        version:VERSION,
         global_rail_pass:true,
         solid_state_shell:true,
         overlays_preserved:true,
         builder_overlay_full_window:true,
+        save_design_writes_table:'sb_site_pages',
         real_submit_writes_table:'sb_form_submissions',
-        email_draft_mailto_connected:true,
+        email_preview_new_tab:true,
+        submissions_inbox_route:SUBMISSIONS_INBOX,
+        private_message_bridge_route:PRIVATE_MESSAGE_BRIDGE,
         image_upload_existing_bucket:true,
         bucket:BUCKET,
         bucket_policy_changed:false
@@ -2224,50 +2235,41 @@ async function saveFormDesign(){
       blocks:nextBlocks
     });
 
-    let c=await client();
-
-    let q=c.from('sb_site_pages')
-      .update({settings_json:nextSettings})
-      .eq('id',page.id);
-
-    if(!authState.isPlatformOwner){
-      q=q.eq('owner_id',authState.userId);
-    }
-
-    let res=await withTimeout(
-      q.select('*').maybeSingle(),
-      12000,
-      'Form design save timed out'
-    );
-
-    pageWrites++;
-    authState.supabaseWrites=true;
-
-    if(res.error)throw res.error;
-
-    if(res.data)page=res.data;
-
-    pageOwnerId=page.owner_id||pageOwnerId;
+    await updatePageDesign([
+      {
+        label:'settings_json plus layout_json',
+        payload:{
+          settings_json:nextSettings,
+          layout_json:nextBlocks
+        }
+      },
+      {
+        label:'settings_json only fallback',
+        payload:{
+          settings_json:nextSettings
+        }
+      }
+    ]);
 
     lastAction='save form design passed';
     lastError='';
 
-    setStatus('Saved form design to sb_site_pages.settings_json. Real submit remains connected to sb_form_submissions.','good2');
+    setStatus('Saved Form Design to sb_site_pages. Saved method: '+lastSaveMethod+'.','good2');
 
     $('answers').textContent='FORM DESIGN SAVED\n\n'+JSON.stringify({
       page:page.slug,
       page_owner_id:pageOwnerId,
       fields:fields.length,
-      savedColumns:['settings_json'],
       saveTable:'sb_site_pages',
+      savedMethod:lastSaveMethod,
+      saveErrors:lastSaveErrors,
+      savedColumns:lastSaveMethod.indexOf('layout_json')>-1?['settings_json','layout_json']:['settings_json'],
       realSubmitTable:'sb_form_submissions',
+      inboxRoute:pageUrl(SUBMISSIONS_INBOX,currentSlug()),
       globalRailPass:true,
       overlaysPreserved:true,
-      builderOverlayPreserved:true,
       builderOverlayFullWindow:true,
-      destinationOverlayPreserved:true,
-      fieldEditOverlayPreserved:true,
-      fieldDeleteOverlayPreserved:true,
+      emailPreviewNewTab:true,
       imageUploadExistingBucket:true,
       bucket:BUCKET,
       bucketPolicyChanged:false,
@@ -2275,12 +2277,12 @@ async function saveFormDesign(){
       indexPromotion:false
     },null,2);
 
-    renderAll('Form design saved.');
+    renderAll('Form design saved to sb_site_pages.');
   }catch(e){
     lastError=e&&e.message?e.message:String(e);
     lastAction='save form design failed';
     setStatus('Save failed: '+lastError,'bad2');
-    $('answers').textContent='Save failed:\n'+lastError;
+    $('answers').textContent='Save failed:\n'+lastError+'\n\nSave attempts:\n'+(lastSaveErrors.length?lastSaveErrors.join('\n'):'No save attempt details.');
     renderDebug();
   }
 }
@@ -2292,21 +2294,21 @@ function saveLocalQuick(){
       formBlock:formBlock(),
       fields:fields,
       saved_at:new Date().toISOString(),
-      note:'Local draft is backup only. Real Submit writes to sb_form_submissions.'
+      note:'Local backup only. Save Form Design writes sb_site_pages. Real Submit writes sb_form_submissions.'
     };
 
     localStorage.setItem('sb_form_designer_local_'+currentSlug(),JSON.stringify(data));
 
-    lastAction='local draft saved';
+    lastAction='local backup saved';
     lastError='';
 
-    $('answers').textContent='LOCAL BACKUP DRAFT SAVED\n\nThis is not a submit. Use Real Submit to write sb_form_submissions.\n\n'+JSON.stringify(data,null,2);
-    setStatus('Local backup draft saved on this device. Real Submit remains the database submit button.','good2');
+    $('answers').textContent='LOCAL BACKUP SAVED\n\nThis is not a submit. Use Save Form Design to write sb_site_pages, and Real Submit to write sb_form_submissions.\n\n'+JSON.stringify(data,null,2);
+    setStatus('Local backup saved on this device.','good2');
     renderDebug();
   }catch(e){
     lastError=e&&e.message?e.message:String(e);
-    lastAction='local draft failed';
-    setStatus('Local draft failed: '+lastError,'bad2');
+    lastAction='local backup failed';
+    setStatus('Local backup failed: '+lastError,'bad2');
     renderDebug();
   }
 }
@@ -2318,14 +2320,13 @@ function renderStats(){
     '<article class="card"><b>Page writes</b><p class="big">'+pageWrites+'</p></article>'+
     '<article class="card"><b>Inbox writes</b><p class="big">'+submissionWrites+'</p></article>'+
     '<article class="card"><b>Storage uploads</b><p class="big">'+storageUploads+'</p></article>'+
-    '<article class="card"><b>Email drafts</b><p class="big">'+emailDraftOpens+'</p></article>';
+    '<article class="card"><b>Email tabs</b><p class="big">'+emailPreviewOpens+'</p></article>';
 }
 
 function state(){
   return Object.assign({},authState,{
     canonicalRoute:'web-builder-form-designer-owned-v7-12-258-test.html',
-    checkpoint:'CHECKPOINT: Web Builder Rail Pass + Live Promotion Guide / issue 47',
-    groupPromotionGate:'issue 48 - group pass before homepage candidate',
+    checkpoint:'WEB-BUILDER-MANIFEST-V7-12-252.md',
     formDesignerOwnerLock:true,
     requestedSlug:currentSlug(),
     activeSlug:activeSlug,
@@ -2345,7 +2346,6 @@ function state(){
     fieldDeleteOverlayOpen:fieldDeleteOverlayOpen,
     builderOverlayPreserved:true,
     builderOverlayFullWindow:true,
-    builderOverlayComfortPass:true,
     destinationOverlayPreserved:true,
     fieldEditOverlayPreserved:true,
     fieldDeleteOverlayPreserved:true,
@@ -2354,15 +2354,17 @@ function state(){
     imageUploadExistingBucketOnly:true,
     bucket:BUCKET,
     bucketPolicyChanged:false,
+    saveFormDesignWritesTable:'sb_site_pages',
+    saveFormDesignUpdatesLayoutJson:true,
     realSubmitWritesTable:'sb_form_submissions',
-    formDesignWritesTable:'sb_site_pages',
-    localDraftIsBackupOnly:true,
-    emailDraftMailtoConnected:true,
+    submissionsInboxRoute:pageUrl(SUBMISSIONS_INBOX,currentSlug()),
+    privateMessageBridgeRoute:pageUrl(PRIVATE_MESSAGE_BRIDGE,currentSlug()),
+    emailPreviewOpensNewTab:true,
     readCount:readCount,
     pageWrites:pageWrites,
     submissionWrites:submissionWrites,
     localTests:localTests,
-    emailDraftOpens:emailDraftOpens,
+    emailPreviewOpens:emailPreviewOpens,
     storageUploads:storageUploads,
     storageWrites:storageUploads>0,
     storageActions:storageUploads>0,
@@ -2380,15 +2382,15 @@ function state(){
       owner_id:page.owner_id
     }:null,
     lastSubmit:lastSubmit,
-    lastSubmitErrors:lastSubmitErrors,
-    lastEmailDraft:lastEmailDraft,
-    lastMailtoHrefPreview:String(lastMailtoHref||'').slice(0,240),
+    lastEmailPreview:lastEmailPreview,
+    lastSaveMethod:lastSaveMethod,
+    lastSaveErrors:lastSaveErrors,
     lastUploads:lastUploads,
     lastAction:lastAction,
     lastError:lastError,
     activeMenuPromotion:false,
     indexPromotion:false,
-    registryPromotion:true
+    registryPromotion:false
   });
 }
 
@@ -2478,7 +2480,7 @@ function bindPage(){
   $('saveLocalQuick').onclick=saveLocalQuick;
 
   $('openInbox').onclick=()=>{
-    location.href=links().inbox;
+    window.open(links().inbox,'_blank');
   };
 
   $('copyReport').onclick=async()=>{
@@ -2618,6 +2620,6 @@ boot();
 
 })();
 </script>
-<script src="web-builder-global-projector-v7-12-263.js?v=7-12-300-49-form-designer-real-submit-email-draft-connection"></script>
+<script src="web-builder-global-projector-v7-12-263.js?v=7-12-300-50-form-designer-save-design-inbox-route-email-preview-tab"></script>
 </body>
 </html>
