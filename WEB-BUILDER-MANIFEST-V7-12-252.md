@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.300.38
+# Web Builder Manifest V7.12.300.40
 
 ## Purpose
 
@@ -8,15 +8,19 @@ The Stream Bandit movie/app manifest remains separate.
 
 ## Current checkpoint status
 
-Status: SOURCE MAP TRUTH CHECKER PASS / HEADER-FOOTER + OWNED PREVIEW FUNCTIONAL PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
+Status: PAGE MENU BUILDER ICON RESTORE PASS / SOURCE MAP TRUTH CHECKER PASS / HEADER-FOOTER + OWNED PREVIEW FUNCTIONAL PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
 
-Latest checkpoint file:
+Latest recorded Web Builder pass:
 
-`CHECKPOINT-WEB-BUILDER-SOURCE-MAP-PASS-V7-12-300-38.md`
+`V7.12.300.40 Page Menu Builder Icon Restore + Published Menu Set Pass`
 
 Previous checkpoint file:
 
 `CHECKPOINT-WEB-BUILDER-HEADER-FOOTER-PREVIEW-PASS-V7-12-300-37.md`
+
+Source Map checkpoint file:
+
+`CHECKPOINT-WEB-BUILDER-SOURCE-MAP-PASS-V7-12-300-38.md`
 
 ## Current governing rule
 
@@ -27,6 +31,7 @@ Previous checkpoint file:
 - Outputs stay visible on-page.
 - Read-only pages are allowed only when they are useful inspectors, truth checkers or route/action maps.
 - No schema, RLS, storage policy, bucket policy, service-role, payment provider, DNS automation or final live-home replacement is approved by this checkpoint.
+- Web Builder passed pages are recorded here instead of replacing the main `index.html` until the full Web Builder group pass is approved.
 
 ## Source Map pass recorded
 
@@ -79,6 +84,61 @@ Safety:
 - no fake publish
 - no index promotion
 
+## Page Menu Builder pass recorded
+
+Route:
+
+`web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>`
+
+Passed version:
+
+`V7.12.300.40 Web Builder Page Menu Builder Icon Restore + Published Menu Set Pass`
+
+Owner confirmed status:
+
+PASSED FULLY.
+
+Passed behavior:
+
+- reclassified correctly as Page Menu Builder, not Header/Footer Builder
+- top menu is built as an on-page rail, not as the global header/footer menu
+- left and right menu placements remain supported
+- real selected icons are restored
+- expanded icon picker is available
+- icons render in menu rows and preview links
+- edit, reorder, visibility, remove and bulk actions stay in overlays
+- menu settings save into `sb_site_pages.settings_json`
+- optional apply-to-published-pages checkbox stores the current menu set into each published page settings_json
+- no schema change
+- no storage action
+- no Header/Footer controls added
+- no index promotion
+
+Saved data model:
+
+- `settings_json.menu_label`
+- `settings_json.menu_icon`
+- `settings_json.menu_position`
+- `settings_json.menu_order`
+- `settings_json.menu_indent`
+- `settings_json.show_in_menu`
+- optional `settings_json.page_menu_set`
+- optional `settings_json.web_builder_page_menu_set`
+- optional `settings_json.page_menu_set_applied_at`
+
+Preview follow-up required:
+
+`web-builder-preview-owned-v7-12-257-test.html?page=<slug>` must consume the saved page menu set and render the user-facing result as tidy rails:
+
+- top menu as a horizontal scroll/slider rail like the Web Builder rail
+- left and right menus as controlled scroll rails when there are many tabs
+- selected icons shown in the published preview menu
+- search box next to the preview top rail/header area
+- search filters/focuses page menu links and Enter opens the best match
+- no schema change
+- no storage action
+- no Header/Footer builder changes
+
 ## Product ownership correction
 
 ### Page Menu Builder
@@ -129,6 +189,7 @@ Owned Preview reads/render support:
 - fallback `settings_json.web_builder_header_footer_builder`
 - fallback `settings_json.web_builder_header_footer`
 - old basic fields `site_name`, `footer_title`, `footer_text`
+- Page Menu Builder output fields listed in this manifest
 
 ## Domain, subdomain and hosting requirement
 
@@ -148,8 +209,8 @@ No domain table, DNS write, hosting automation, schema change, RLS change or fin
 1. `web-builder-account-control-hub-v7-12-263-test.html` - PASS / golden shell
 2. `web-builder-pages-manager-owned-v7-12-256-test.html` - PASS
 3. `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>` - Studio route handoff / preserved
-4. `web-builder-preview-owned-v7-12-257-test.html?page=<slug>` - FUNCTIONAL PASS / visual polish later
-5. `web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>` - PASS / reclassified as Page Menu Builder / polish next
+4. `web-builder-preview-owned-v7-12-257-test.html?page=<slug>` - FUNCTIONAL PASS / NEXT: menu rail icons + search consumer pass
+5. `web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>` - PASS / Page Menu Builder / icon restore + published menu set apply confirmed
 6. `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>` - PASS
 7. `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>` - PASS / protected inbox bridge
 8. `web-builder-assets-v7-12-252-test.html?page=<slug>` - PASS
@@ -157,7 +218,7 @@ No domain table, DNS write, hosting automation, schema change, RLS change or fin
 10. `web-builder-control-map-v7-12-253-test.html?page=<slug>` - PASS / control truth page still planned
 11. `web-builder-pages-source-map-v7-12-255-test.html?page=<slug>` - FUNCTIONAL PASS / truth checker confirmed
 12. `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` - FUNCTIONAL PASS / saved shell confirmed
-13. `WEB-BUILDER-MANIFEST-V7-12-252.md` - updated checkpoint
+13. `WEB-BUILDER-MANIFEST-V7-12-252.md` - updated Web Builder record
 
 ## Future login/account gate
 
@@ -176,7 +237,7 @@ This login gate is future work and is not part of this checkpoint.
 
 ## Remaining Web Builder work
 
-1. Page Menu Builder wording and polish as the on-page custom menu builder.
+1. Owned Preview consumes the Page Menu Builder menu set and renders top/left/right rails with selected icons and search.
 2. Route Map becomes a route-health manager.
 3. Control Map becomes an action/button ownership truth page.
 4. Pages Manager, Form Designer, Inbox and Assets smoke checks against Source Map.
