@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.300.40
+# Web Builder Manifest V7.12.300.41
 
 ## Purpose
 
@@ -8,19 +8,23 @@ The Stream Bandit movie/app manifest remains separate.
 
 ## Current checkpoint status
 
-Status: PAGE MENU BUILDER ICON RESTORE PASS / SOURCE MAP TRUTH CHECKER PASS / HEADER-FOOTER + OWNED PREVIEW FUNCTIONAL PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
+Status: OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / SOURCE MAP TRUTH CHECKER PASS / HEADER-FOOTER FUNCTIONAL PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
 
 Latest recorded Web Builder pass:
 
+`V7.12.300.41 Web Builder Owned Preview Menu Rail Icons Search Pass`
+
+Previous recorded Web Builder pass:
+
 `V7.12.300.40 Page Menu Builder Icon Restore + Published Menu Set Pass`
-
-Previous checkpoint file:
-
-`CHECKPOINT-WEB-BUILDER-HEADER-FOOTER-PREVIEW-PASS-V7-12-300-37.md`
 
 Source Map checkpoint file:
 
 `CHECKPOINT-WEB-BUILDER-SOURCE-MAP-PASS-V7-12-300-38.md`
+
+Previous checkpoint file:
+
+`CHECKPOINT-WEB-BUILDER-HEADER-FOOTER-PREVIEW-PASS-V7-12-300-37.md`
 
 ## Current governing rule
 
@@ -126,18 +130,59 @@ Saved data model:
 - optional `settings_json.web_builder_page_menu_set`
 - optional `settings_json.page_menu_set_applied_at`
 
-Preview follow-up required:
+## Owned Preview pass recorded
 
-`web-builder-preview-owned-v7-12-257-test.html?page=<slug>` must consume the saved page menu set and render the user-facing result as tidy rails:
+Route:
 
-- top menu as a horizontal scroll/slider rail like the Web Builder rail
-- left and right menus as controlled scroll rails when there are many tabs
-- selected icons shown in the published preview menu
-- search box next to the preview top rail/header area
+`web-builder-preview-owned-v7-12-257-test.html?page=<slug>`
+
+Passed version:
+
+`V7.12.300.41 Web Builder Owned Preview Menu Rail Icons Search Pass`
+
+Owner confirmed status:
+
+PASSED FULLY.
+
+Passed behavior:
+
+- Owned Preview consumes Page Menu Builder output from `settings_json`
+- top page menu renders as a horizontal scroll/slider rail
+- left and right page menus render as controlled scroll rails when there are many tabs
+- selected Page Menu Builder icons appear in the preview menu links
+- search sits beside the preview top rail/header area
 - search filters/focuses page menu links and Enter opens the best match
+- owner preview lock remains preserved
+- form submissions remain preserved
+- rating blocks remain preserved
+- content block rendering remains preserved
 - no schema change
 - no storage action
-- no Header/Footer builder changes
+- no Header/Footer builder change
+- no index promotion
+
+## Header/Footer Builder next correction
+
+Route:
+
+`web-builder-header-footer-code-v7-12-254-test.html?page=<slug>`
+
+Required next pass:
+
+`V7.12.300.42 Header/Footer Builder Rail Search + Apply Shell To Workspace Pages Pass`
+
+Required behavior:
+
+- restore the Header/Footer Builder page's own Web Builder rail and search in the actual page header
+- keep the existing Header/Footer Builder layout and overlays
+- add an option like Page Menu Builder to apply the current header/footer shell to every page slug in that same user workspace
+- save the shared shell into each page row's existing `settings_json`
+- preserve other settings_json keys on every page row
+- platform owner scope must stay owner-safe and avoid applying one user's shell to unrelated workspaces
+- no schema change
+- no storage action
+- no Header/Footer custom-code execution change
+- no index promotion
 
 ## Product ownership correction
 
@@ -177,6 +222,7 @@ Header/Footer saves a shared builder shell into:
 
 Compatibility mirrors:
 
+- `settings_json.web_builder_header_footer_builder`
 - `settings_json.site_name`
 - `settings_json.footer_title`
 - `settings_json.footer_text`
@@ -209,7 +255,7 @@ No domain table, DNS write, hosting automation, schema change, RLS change or fin
 1. `web-builder-account-control-hub-v7-12-263-test.html` - PASS / golden shell
 2. `web-builder-pages-manager-owned-v7-12-256-test.html` - PASS
 3. `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>` - Studio route handoff / preserved
-4. `web-builder-preview-owned-v7-12-257-test.html?page=<slug>` - FUNCTIONAL PASS / NEXT: menu rail icons + search consumer pass
+4. `web-builder-preview-owned-v7-12-257-test.html?page=<slug>` - PASS / menu rail icons + search consumer pass confirmed
 5. `web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>` - PASS / Page Menu Builder / icon restore + published menu set apply confirmed
 6. `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>` - PASS
 7. `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>` - PASS / protected inbox bridge
@@ -217,7 +263,7 @@ No domain table, DNS write, hosting automation, schema change, RLS change or fin
 9. `web-builder-route-map-v7-12-252-test.html?page=<slug>` - PASS / route-health manager still planned
 10. `web-builder-control-map-v7-12-253-test.html?page=<slug>` - PASS / control truth page still planned
 11. `web-builder-pages-source-map-v7-12-255-test.html?page=<slug>` - FUNCTIONAL PASS / truth checker confirmed
-12. `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` - FUNCTIONAL PASS / saved shell confirmed
+12. `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` - FUNCTIONAL PASS / NEXT: rail search + apply shell to workspace pages
 13. `WEB-BUILDER-MANIFEST-V7-12-252.md` - updated Web Builder record
 
 ## Future login/account gate
@@ -237,7 +283,7 @@ This login gate is future work and is not part of this checkpoint.
 
 ## Remaining Web Builder work
 
-1. Owned Preview consumes the Page Menu Builder menu set and renders top/left/right rails with selected icons and search.
+1. Header/Footer Builder adds its own rail search and apply-shell-to-workspace-pages save option.
 2. Route Map becomes a route-health manager.
 3. Control Map becomes an action/button ownership truth page.
 4. Pages Manager, Form Designer, Inbox and Assets smoke checks against Source Map.
