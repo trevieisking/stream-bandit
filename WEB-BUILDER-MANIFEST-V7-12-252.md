@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.300.46
+# Web Builder Manifest V7.12.300.47
 
 ## Purpose
 
@@ -8,9 +8,13 @@ The Stream Bandit movie/app manifest remains separate.
 
 ## Current checkpoint status
 
-Status: CONTROL MAP NO-FIX PASS / ROUTE MAP NO-FIX PASS / SOURCE MAP GLOBAL PROJECTOR RAIL SEARCH PASS / HEADER-FOOTER RAIL SEARCH WORKSPACE APPLY PASS / OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
+Status: PAGES MANAGER BUILDER POLISH SEO DOMAIN PREVIEW CONTROLS PASS / CONTROL MAP NO-FIX PASS / ROUTE MAP NO-FIX PASS / SOURCE MAP GLOBAL PROJECTOR RAIL SEARCH PASS / HEADER-FOOTER RAIL SEARCH WORKSPACE APPLY PASS / OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
 
 Latest recorded Web Builder pass:
+
+`V7.12.300.47 Web Builder Pages Manager Builder Polish SEO Domain Preview Controls Pass`
+
+Previous recorded Web Builder pass:
 
 `V7.12.300.46 Web Builder Control Map No-Fix Stability Pass`
 
@@ -18,7 +22,7 @@ Current Control Map code version confirmed passed:
 
 `V7.12.299.19 Web Builder Control Map Global Rail Pass`
 
-Previous recorded Web Builder pass:
+Previous Route Map pass:
 
 `V7.12.300.45 Web Builder Route Map No-Fix Stability Pass`
 
@@ -62,6 +66,150 @@ Previous checkpoint file:
 - Web Builder passed pages are recorded here instead of replacing the main `index.html` until the full Web Builder group pass is approved.
 - The older Web Builder engine/global helper relationship may still be helping some global pages. Do not remove or bypass those helpers until Source Map, Route Map and global page scans confirm the dependency is safe to retire.
 - If a page already passes and nothing visible is broken, do not rewrite it just to increase a version number. Record the pass, preserve the working code, and move to the next planned page.
+- Pages Manager is allowed to grow into the page creation and readiness control centre, but it must keep its existing safe create/edit/save/delete behavior and keep all global Web Builder features.
+
+## Pages Manager builder polish pass recorded
+
+Route:
+
+`web-builder-pages-manager-owned-v7-12-256-test.html?page=<slug>`
+
+Passed version:
+
+`V7.12.300.47 Owned Pages Manager Builder Polish SEO Domain Preview Controls`
+
+Manifest record pass:
+
+`V7.12.300.47 Web Builder Pages Manager Builder Polish SEO Domain Preview Controls Pass`
+
+Owner confirmed status:
+
+PASSED FULLY.
+
+Owner supplied live page debug result:
+
+- checked true
+- allowed true
+- signed in true
+- platform_owner profile confirmed
+- workspace `platform-owner-all-rows`
+- create/edit/save/delete flow preserved
+- Supabase reads true
+- Supabase writes true
+- storage writes false
+- storage actions false
+- schema changes false
+- builder table changes false
+- file deletes false
+- HTML route deletes false
+- Stream Bandit shell changes false
+- active menu promotion false
+- index promotion false
+- shared rail true
+- body actions preserved true
+- inputs in overlays true
+- outputs on page true
+- local top buttons hidden true
+- global rail projector true
+- sort order stored in `settings_json`
+- page type stored in `settings_json`
+- page indent stored in `settings_json`
+- SEO stored in `settings_json`
+- domain/hosting planning stored in `settings_json`
+- guarded delete overlay true
+- global helper preserved true
+- personal workspace scoped true
+- platform owner can see all rows
+- creator users can only see own rows
+- admin role alone does not expose workspaces
+- reserved slugs protected: `landing`, `home`, `home-page`
+- compact page tabs true
+- page cards menu style true
+- expanded icon picker true
+- SEO inputs true
+- domain/hosting planning inputs true
+- controlled preview true
+- collapsible page menu true
+- expand preview true
+- responsive preview modes: desktop, tablet, mobile
+- drag reorder true
+- sub-tab indent true
+- tiny edit/delete buttons true
+- guarded Supabase row delete true
+- DNS automation false
+- domain automation false
+- source `supabase`
+- page count 11
+- visible page count 11
+- save all pages passed
+- last error empty
+
+Passed behavior:
+
+- Pages Manager now acts as the Web Builder page creation and readiness control centre.
+- It keeps the existing working page row create/edit/save/delete flow.
+- It keeps guarded delete and protects reserved slugs.
+- It never deletes HTML files, routes, storage, domains, DNS records, assets or app pages.
+- It keeps the shared Web Builder global projector, rail/search, uploaded logo/avatar and Hub/account overlay.
+- It keeps inputs in overlays and outputs on page.
+- It adds the richer icon picker pattern needed to match Menu Builder and Preview.
+- It adds SEO write-up fields for each page.
+- It adds domain, subdomain and hosting readiness planning fields for each page.
+- It adds controlled on-page preview output.
+- It adds page menu collapse control.
+- It adds preview expand/full-width control.
+- It adds desktop, tablet and mobile preview modes.
+- It keeps route buttons for Web Builder / Publish, Published Preview, Page Menu, Header/Footer, Source Map, Form Builder and Owned Inbox.
+- It saves future-prep settings into `sb_site_pages.settings_json` without a schema change.
+
+Safety:
+
+- reads `sb_profiles` and `sb_site_pages`
+- writes only `sb_site_pages`
+- SEO/domain/hosting readiness data is stored inside existing `settings_json`
+- no new Supabase table
+- no schema change
+- no RLS change
+- no storage write
+- no storage policy change
+- no bucket policy change
+- no DNS automation
+- no live domain automation
+- no service-role use
+- no Stream Bandit shell change
+- no index promotion
+- old Web Builder engine/helper behavior preserved
+
+Pages Manager saved data model:
+
+- `settings_json.page_label`
+- `settings_json.page_icon`
+- `settings_json.nav_visible`
+- `settings_json.page_indent`
+- `settings_json.sort_order`
+- `settings_json.page_type`
+- `settings_json.web_builder_seo.title`
+- `settings_json.web_builder_seo.description`
+- `settings_json.web_builder_seo.keywords`
+- `settings_json.web_builder_seo.socialTitle`
+- `settings_json.web_builder_seo.socialDescription`
+- `settings_json.web_builder_seo.socialImage`
+- `settings_json.web_builder_seo.canonicalUrl`
+- `settings_json.web_builder_seo.indexing`
+- `settings_json.web_builder_hosting.customDomain`
+- `settings_json.web_builder_hosting.subdomain`
+- `settings_json.web_builder_hosting.hostingStatus`
+- `settings_json.web_builder_hosting.sslStatus`
+- `settings_json.web_builder_hosting.deployTarget`
+- `settings_json.web_builder_hosting.notes`
+
+Future Pages Manager ideas recorded:
+
+- Pages Manager should be ready for everything the Web Builder page workflow is likely to need.
+- Pages Manager remains the place where Web Builder pages are created, selected, arranged and prepared before editing.
+- Future page readiness can build on SEO, domain, subdomain, hosting and responsive preview planning already saved in `settings_json`.
+- Future domain/deploy features must stay owner-safe and require a separate approval gate before any DNS or hosting automation.
+- Future builder tables may be considered later, but this pass intentionally stays on `sb_site_pages` and `settings_json`.
 
 ## Control Map no-fix pass recorded
 
@@ -401,6 +549,22 @@ Rules for future passes:
 
 ## Product ownership correction
 
+### Pages Manager
+
+Route:
+
+`web-builder-pages-manager-owned-v7-12-256-test.html`
+
+Correct product role:
+
+- This is the Web Builder page creation, ordering, ownership and readiness control centre.
+- It creates and edits page rows in `sb_site_pages`.
+- It owns page-level metadata, icon, order, indent, visibility, type, SEO planning and domain/hosting readiness planning.
+- It should be ready for future builder needs without forcing a schema change too early.
+- It is allowed to write page row settings, but it must keep guarded delete and owner/workspace scope.
+- It must keep inputs in overlays and outputs visible on-page.
+- It must not perform DNS, hosting, storage policy, bucket policy or index promotion actions.
+
 ### Page Menu Builder
 
 Route:
@@ -431,6 +595,21 @@ Correct product role:
 
 ## Saved data model
 
+Pages Manager saves page metadata and future-readiness planning into:
+
+`sb_site_pages.settings_json`
+
+Pages Manager fields recorded by this checkpoint:
+
+- `settings_json.page_label`
+- `settings_json.page_icon`
+- `settings_json.nav_visible`
+- `settings_json.page_indent`
+- `settings_json.sort_order`
+- `settings_json.page_type`
+- `settings_json.web_builder_seo`
+- `settings_json.web_builder_hosting`
+
 Header/Footer saves a shared builder shell into:
 
 `sb_site_pages.settings_json.web_builder_shell`
@@ -452,6 +631,7 @@ Owned Preview reads/render support:
 - old basic fields `site_name`, `footer_title`, `footer_text`
 - Page Menu Builder output fields listed in this manifest
 - Header/Footer apply output fields listed in this manifest
+- Pages Manager SEO/domain/hosting readiness fields listed in this manifest
 
 ## Domain, subdomain and hosting requirement
 
@@ -464,12 +644,14 @@ Web Builder still needs future domain/subdomain/hosting support as part of the b
 - publish status and rollback status
 - owner-safe approval gates
 
+Pages Manager now stores page-level domain/subdomain/hosting readiness planning inside `settings_json`, but this is planning data only.
+
 No domain table, DNS write, hosting automation, schema change, RLS change or final index promotion is approved by this checkpoint.
 
 ## User-facing Web Builder group
 
 1. `web-builder-account-control-hub-v7-12-263-test.html` - PASS / golden shell
-2. `web-builder-pages-manager-owned-v7-12-256-test.html` - PASS
+2. `web-builder-pages-manager-owned-v7-12-256-test.html` - PASS / builder polish + SEO/domain planning + preview controls confirmed
 3. `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>` - Studio route handoff / preserved
 4. `web-builder-preview-owned-v7-12-257-test.html?page=<slug>` - PASS / menu rail icons + search consumer pass confirmed
 5. `web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>` - PASS / Page Menu Builder / icon restore + published menu set apply confirmed
@@ -499,7 +681,7 @@ This login gate is future work and is not part of this checkpoint.
 
 ## Remaining Web Builder work
 
-1. Pages Manager, Form Designer, Inbox and Assets smoke checks against Source Map.
+1. Form Designer, Inbox and Assets smoke checks against Source Map.
 2. Web Builder engine/global helper dependency audit across global pages.
-3. Domain/subdomain/hosting readiness remains future builder-owned product work.
+3. Domain/subdomain/hosting readiness remains future builder-owned product work beyond the planning fields now stored by Pages Manager.
 4. Final `index.html` promotion happens only after full Web Builder group pass and owner approval.
