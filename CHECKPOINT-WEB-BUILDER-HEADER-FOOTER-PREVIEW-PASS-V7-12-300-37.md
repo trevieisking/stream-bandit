@@ -39,7 +39,7 @@ Owner screenshot/test confirmed:
 - Global projector/preview bridge: `V7.12.300.36 Web Builder Global Rail Preview Shell Bridge`
 - Web Builder manifest checkpoint: `V7.12.300.37`
 - Current app manifest checkpoint: `V7.12.300.37`
-- Index checkpoint: `V7.12.300.37`
+- Index checkpoint doorway: `V7.12.300.37`
 
 ## Saved data model
 
@@ -61,6 +61,12 @@ It also mirrors compatibility fields:
 - Page Menu Builder remains the on-page custom menu builder, comparable to the advanced Form Designer category.
 - Owned Preview renders both the saved builder-site shell and the separate on-page menu/body content.
 
+## Index note
+
+`index.html` is now a simple checkpoint doorway that links to Home, the manifests, the checkpoint and Owned Preview.
+
+It is not final live-home replacement.
+
 ## Safety
 
 No schema change.
@@ -72,8 +78,6 @@ No payment provider.
 No DNS/domain automation.
 No destructive write.
 No final live-home replacement.
-
-`index.html` remains a candidate tracker/root handoff and still redirects to the current Home route after a short pause.
 
 ## Remaining work
 
