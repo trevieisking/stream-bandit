@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.12.300.37
+# Stream Bandit Current App Manifest V7.12.300.38
 
 Date: 2026-06-17
 
@@ -6,59 +6,91 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.12.300.37 Web Builder Header/Footer + Owned Preview Functional Pass`
-
-The newest owner-confirmed pass is the Web Builder Header/Footer Builder to Owned Preview connection.
+`V7.12.300.38 Web Builder Source Map Truth Checker Pass`
 
 Latest checkpoint file:
+
+`CHECKPOINT-WEB-BUILDER-SOURCE-MAP-PASS-V7-12-300-38.md`
+
+Previous checkpoint file:
 
 `CHECKPOINT-WEB-BUILDER-HEADER-FOOTER-PREVIEW-PASS-V7-12-300-37.md`
 
 ## Current index note
 
-`index.html` is now a simple checkpoint doorway with links to Home, the manifests, the checkpoint, Header/Footer Builder and Owned Preview.
+The owner stated that the completed Web Builder group must eventually be promoted through `index.html`.
 
-This is not final live-home replacement.
+That final promotion is not done yet.
 
 Current Home route remains:
 
 `home-global-helpers-v7-4-4-test.html`
 
-## Web Builder pass detail
+## Web Builder Source Map pass detail
 
-Routes involved:
+Route passed:
 
-- `web-builder-header-footer-code-v7-12-254-test.html`
-- `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`
-- `web-builder-global-projector-v7-12-263.js`
-- `WEB-BUILDER-MANIFEST-V7-12-252.md`
+`web-builder-pages-source-map-v7-12-255-test.html?page=landing`
+
+Passed version:
+
+`V7.12.300.38 Web Builder Source Map Truth Checker`
 
 Passed behavior:
+
+- selected slug
+- page row found / missing
+- owner_id match
+- page status
+- layout_json present
+- settings_json present
+- web_builder_shell present
+- header/footer shell counts
+- Page Menu settings present
+- Form Designer settings present
+- Preview route
+- Studio route
+- Header/Footer route
+- readiness result
+- output on page
+- detail overlay
+
+Safety:
+
+- reads `sb_profiles` and `sb_site_pages`
+- no Supabase writes
+- no schema change
+- no storage action
+- no fake publish
+- no index promotion
+
+## Previous Web Builder pass detail
+
+Header/Footer Builder and Owned Preview connection passed at `V7.12.300.37`.
 
 - Header/Footer Builder saves a real builder-site shell to `sb_site_pages.settings_json.web_builder_shell`.
 - Compatibility fields are mirrored to `site_name`, `footer_title`, `footer_text`, `header_footer_status`, and `header_footer_updated_at`.
 - Owned Preview renders the saved header/footer shell.
-- Header page tick-list links render as pill navigation.
-- Header custom buttons render.
-- Sub tabs / rail tabs render.
-- Footer text renders.
-- Footer page tick-list links render in the footer Pages group.
-- Footer buttons render.
-- Main page content remains intact.
 - Page Menu Builder remains separate as the on-page custom menu builder.
-- Preview still needs later visual tidy, but the functional loop is passed.
 
-Safety:
+## Future login/account gate
 
-- No schema change.
-- No RLS change.
-- No storage policy change.
-- No bucket policy change.
-- No service-role key.
-- No payment provider.
-- No DNS/domain automation.
-- No destructive write.
-- No final live-home replacement.
+After the full Web Builder plan is complete and the group is promoted, the owner wants the finished builder flow locked behind a proper Supabase email/password login system.
+
+Future login requirements:
+
+- email/password sign-up and sign-in
+- one account per email
+- Supabase Auth-backed account creation
+- profile row creation in `sb_profiles`
+- no duplicate account for the same email
+- owner/admin gates remain protected
+
+This is future work and is not part of the current Source Map checkpoint.
+
+## Safety standard
+
+No page change should add schema, RLS, storage policy, bucket policy, service-role, final live-home replacement, payment provider, or browser secret keys without explicit approval.
 
 ## Previous live candidate groups
 
@@ -114,14 +146,12 @@ Scanner checks to preserve:
 - overlay flag
 - unknown table tokens
 
-No page change should add schema, RLS, storage policy, bucket policy, service-role, final live-home replacement, or API keys.
-
 ## Next plan target
 
 Continue doing every Web Builder page properly:
 
-1. Source Map should report `web_builder_shell` presence, counts and readiness.
-2. Preview needs visual tidy/polish later, not functional rescue.
-3. Page Menu Builder must stay classified as the on-page custom menu builder.
+1. Page Menu Builder must stay classified and polished as the on-page custom menu builder.
+2. Route Map should become route-health manager.
+3. Control Map should become action/button ownership truth page.
 4. Domain, subdomain and hosting support remains future builder-owned product work.
-5. Final live-home promotion remains owner-gated.
+5. Final `index.html` promotion remains owner-gated after the full Web Builder group pass.
