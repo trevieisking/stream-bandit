@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Owned Preview V7.12.299.14 TEST</title>
+<title>Web Builder Owned Preview V7.12.300.41 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -313,14 +313,86 @@ p,li,label,small{
   border-top:1px solid #ffffff12;
   border-bottom:0;
 }
+.siteHeadMain{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex:1 1 260px;
+}
 .siteLogo{
   font-weight:1000;
   font-size:20px;
+}
+.siteMenuBar{
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(230px,360px);
+  gap:10px;
+  align-items:center;
 }
 .siteNav,.sideNav{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
+}
+.siteTopRail{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:thin;
+  scroll-snap-type:x proximity;
+  border:1px solid #ffffff14;
+  border-radius:18px;
+  background:#05071188;
+  padding:10px;
+  max-width:100%;
+}
+.siteTopRail a{
+  flex:0 0 auto;
+  scroll-snap-align:start;
+}
+.siteMenuSearch{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  align-items:center;
+}
+.siteMenuSearch input{
+  width:100%;
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  background:#0007;
+  color:#fff;
+  padding:10px 12px;
+  font:inherit;
+  font-weight:850;
+}
+.siteMenuSearch button{
+  border:0;
+  border-radius:999px;
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  color:#071015;
+  font-weight:1000;
+  padding:10px 12px;
+  cursor:pointer;
+}
+.menuSearchCount{
+  grid-column:1/-1;
+  color:#aeb8d6;
+  font-size:12px;
+  font-weight:850;
+  min-height:18px;
+}
+.menuHidden{
+  display:none!important;
+}
+.menuIcon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:1.35em;
+  min-width:1.35em;
+  margin-right:2px;
 }
 .siteNav a,.sideNav a{
   color:#fff;
@@ -329,11 +401,32 @@ p,li,label,small{
   background:#ffffff12;
   padding:8px 11px;
   font-weight:850;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
 }
 .siteNav a.current,.sideNav a.current{
   background:linear-gradient(135deg,var(--good),var(--purple));
   color:#071015;
 }
+.sideNav{
+  display:grid;
+  align-content:start;
+  border:1px solid #ffffff14;
+  border-radius:18px;
+  background:#101529;
+  padding:12px;
+  max-height:min(64vh,560px);
+  overflow:auto;
+  scrollbar-width:thin;
+}
+.sideNav a{
+  width:100%;
+  justify-content:flex-start;
+}
+.sideNav .indent1{margin-left:12px;width:calc(100% - 12px)}
+.sideNav .indent2{margin-left:24px;width:calc(100% - 24px)}
+.sideNav .indent3{margin-left:36px;width:calc(100% - 36px)}
 .siteHero{
   min-height:clamp(300px,42vw,620px);
   display:grid;
@@ -395,13 +488,6 @@ p,li,label,small{
 }
 .siteBody.noRight .blockGrid{
   grid-column:2;
-}
-.sideNav{
-  display:grid;
-  border:1px solid #ffffff14;
-  border-radius:18px;
-  background:#101529;
-  padding:12px;
 }
 .sideNav.right{
   grid-column:3;
@@ -512,8 +598,11 @@ p,li,label,small{
   .actions .btn,.btn{
     flex:1 1 auto;
   }
-  .grid,.controlGrid,.miniGrid,.blockHero,.siteBody,.siteBody.full,.siteBody.noLeft,.siteBody.noRight,.siteHeroInner{
+  .grid,.controlGrid,.miniGrid,.blockHero,.siteBody,.siteBody.full,.siteBody.noLeft,.siteBody.noRight,.siteHeroInner,.siteMenuBar{
     grid-template-columns:1fr;
+  }
+  .siteMenuSearch{
+    width:100%;
   }
   .sideNav.right,.siteBody.noLeft .sideNav.right,.siteBody.noRight .blockGrid{
     grid-column:auto;
@@ -533,14 +622,14 @@ p,li,label,small{
 }
 </style>
 </head>
-<body data-wb-shell="preview-v7-12-299-14" data-web-builder-preview="global-rail">
+<body data-wb-shell="preview-v7-12-300-41" data-web-builder-preview="menu-rail-icons-search">
 <header class="top">
   <div class="topInner">
     <div class="brand">
       <div class="mark" aria-hidden="true"><img src="https://xzxqfrvqdgkzwujbkdbk.supabase.co/storage/v1/object/public/stream-bandit-images/builder/assets/landing/1781531792576-4bb8cb73-log_master_piece_15-6-2026_145453_xzxqfrvqdgkzwujbkdbk.supabase.co.jpeg" alt=""></div>
       <div>
         Web Builder Owned Preview
-        <small>shared rail preview lock · V7.12.299.14</small>
+        <small>menu rail icons + search consumer · V7.12.300.41</small>
       </div>
     </div>
   </div>
@@ -552,7 +641,7 @@ p,li,label,small{
       <span class="badge">Checking Web Builder preview access</span>
       <h1>Loading owned preview</h1>
       <p>The preview stays hidden until the page-owner workspace lock passes.</p>
-      <div class="railNote">Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see every Web Builder page.</div>
+      <div class="railNote">Preview now consumes Page Menu Builder icons and renders tidy menu rails with search.</div>
     </div>
   </section>
 </main>
@@ -561,10 +650,64 @@ p,li,label,small{
 (function(){
 'use strict';
 
-const VERSION='V7.12.299.14 Web Builder Owned Preview Global Rail Lock';
+const VERSION='V7.12.300.41 Web Builder Owned Preview Menu Rail Icons Search Pass';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const OWNER_SLUGS=['landing','home','home-page'];
+
+const ICONS={
+  home:'🏠',
+  page:'📄',
+  landing:'🛬',
+  about:'ℹ️',
+  blog:'📝',
+  news:'📰',
+  book:'📚',
+  play:'▶️',
+  video:'🎬',
+  movie:'🍿',
+  tv:'📺',
+  channel:'📡',
+  music:'🎵',
+  audio:'🔊',
+  podcast:'🎙️',
+  gallery:'🖼️',
+  image:'🌄',
+  camera:'📷',
+  collection:'🗂️',
+  playlist:'📜',
+  star:'⭐',
+  heart:'❤️',
+  like:'👍',
+  bookmark:'🔖',
+  fire:'🔥',
+  rocket:'🚀',
+  trophy:'🏆',
+  diamond:'💎',
+  form:'🧾',
+  inbox:'📥',
+  mail:'✉️',
+  contact:'👤',
+  team:'👥',
+  calendar:'📅',
+  shop:'🛒',
+  bag:'🛍️',
+  card:'💳',
+  map:'🗺️',
+  location:'📍',
+  globe:'🌐',
+  search:'🔎',
+  link:'🔗',
+  external:'↗️',
+  download:'⬇️',
+  upload:'⬆️',
+  settings:'⚙️',
+  tools:'🛠️',
+  lock:'🔒',
+  help:'❓',
+  warning:'⚠️',
+  brand:'💎'
+};
 
 const RANK={
   free_viewer:0,
@@ -614,6 +757,10 @@ let heroPromoted=false;
 let lastLayoutClass='full';
 let redirectTo='';
 let redirectSlug='';
+let menuSource='row-settings';
+let menuSetItemCount=0;
+let menuSearches=0;
+let lastMenuSearch='';
 
 let authState={
   version:VERSION,
@@ -647,7 +794,11 @@ let authState={
   localTopButtonsHidden:true,
   globalRailProjector:true,
   webBuilderShell:true,
-  appGlobalFooterInjected:false
+  appGlobalFooterInjected:false,
+  pageMenuSetConsumer:true,
+  previewMenuRails:true,
+  previewMenuIcons:true,
+  previewMenuSearch:true
 };
 
 const $=function(id){return document.getElementById(id);};
@@ -726,6 +877,14 @@ function truth(v){
 
 function rank(k){
   return RANK[String(k||'free_viewer')]||0;
+}
+
+function iconSymbol(value){
+  let raw=String(value||'page').trim();
+  if(!raw)return '📄';
+  if(ICONS[raw])return ICONS[raw];
+  if(raw.length<=3&&!/^[a-z0-9_-]+$/i.test(raw))return raw;
+  return '📄';
 }
 
 function client(){
@@ -1022,12 +1181,16 @@ function getBlocks(row){
 function menuItem(row,i){
   let s=settings(row);
   let slug=slugify(row.slug);
+  let icon=s.menu_icon||s.menuIcon||'page';
 
   return {
+    source:'row-settings',
     slug:slug,
     title:row.title||slug,
     status:String(row.status||'draft').toLowerCase(),
     label:s.menu_label||s.menuLabel||row.title||slug,
+    icon:icon,
+    iconSymbol:iconSymbol(icon),
     position:s.menu_position||s.menuPosition||'top',
     order:Number(s.menu_order!=null?s.menu_order:s.menuOrder!=null?s.menuOrder:s.sort_order!=null?s.sort_order:i+1),
     indent:Math.max(0,Math.min(3,Number(s.menu_indent!=null?s.menu_indent:s.menuIndent!=null?s.menuIndent:0))),
@@ -1035,11 +1198,56 @@ function menuItem(row,i){
   };
 }
 
+function menuSetFromPage(){
+  let s=settings(page);
+  let set=obj(s.page_menu_set||s.web_builder_page_menu_set||{});
+  let items=arr(set.items);
+
+  if(items.length)return items;
+
+  return [];
+}
+
+function menuSetItem(item,i){
+  item=obj(item);
+  let slug=slugify(item.slug||item.page_slug||item.route||item.title||('page-'+(i+1)));
+  let icon=item.icon||item.menu_icon||item.iconKey||item.icon_key||'page';
+
+  return {
+    source:'page_menu_set',
+    slug:slug,
+    title:item.title||slug,
+    status:String(item.status||'published').toLowerCase(),
+    label:item.label||item.menu_label||item.title||slug,
+    icon:icon,
+    iconSymbol:item.iconSymbol||item.icon_symbol||iconSymbol(icon),
+    position:item.position||item.menu_position||'top',
+    order:Number(item.order!=null?item.order:item.menu_order!=null?item.menu_order:i+1),
+    indent:Math.max(0,Math.min(3,Number(item.indent!=null?item.indent:item.menu_indent!=null?item.menu_indent:0))),
+    show:item.show_in_menu!=null?bool(item.show_in_menu,true):item.show!=null?bool(item.show,true):true
+  };
+}
+
+function menuSourceItems(){
+  let set=menuSetFromPage();
+
+  if(set.length){
+    menuSource='settings_json.page_menu_set';
+    menuSetItemCount=set.length;
+    return set.map(menuSetItem);
+  }
+
+  menuSource='sb_site_pages row settings';
+  menuSetItemCount=0;
+  return menuRows.map(menuItem);
+}
+
 function sortedMenu(pos){
-  return menuRows
-    .map(menuItem)
+  return menuSourceItems()
     .filter(function(m){
-      return m.status==='published'&&m.show&&m.position===pos;
+      return m.show!==false&&
+        (m.status==='published'||m.source==='page_menu_set'||!m.status)&&
+        m.position===pos;
     })
     .sort(function(a,b){
       return a.order-b.order||a.label.localeCompare(b.label);
@@ -1379,7 +1587,7 @@ async function submitInlineForm(form){
       block_title:title,
       answers_json:Object.assign({},collected.answers,{
         __form:{
-          source:'owned-preview-global-rail-v7-12-299-14',
+          source:'owned-preview-menu-rail-icons-search-v7-12-300-41',
           page_slug:currentSlug(),
           page_owner_id:pageOwnerId,
           block_index:blockIndex
@@ -1624,8 +1832,74 @@ function navHtml(pos,current){
   if(!items.length)return '';
 
   return items.map(function(m){
-    return '<a class="'+(m.slug===current?'current':'')+'" href="'+pageUrl(ROUTES.preview,m.slug)+'">'+esc(m.label)+'</a>';
+    let active=m.slug===current?'current':'';
+    let label=String(m.label||m.title||m.slug||'');
+    let slug=slugify(m.slug);
+    let icon=m.iconSymbol||iconSymbol(m.icon);
+
+    return '<a class="'+active+' indent'+m.indent+'" href="'+pageUrl(ROUTES.preview,slug)+'" data-page-menu-link="1" data-menu-position="'+esc(pos)+'" data-menu-label="'+esc(label.toLowerCase())+'" data-menu-slug="'+esc(slug)+'" data-menu-icon="'+esc(String(m.icon||''))+'"><span class="menuIcon" aria-hidden="true">'+esc(icon)+'</span><span>'+esc(label)+'</span></a>';
   }).join('');
+}
+
+function hydrateMenuSearch(){
+  let input=$('siteMenuSearchInput');
+  let button=$('siteMenuSearchGo');
+  let count=$('siteMenuSearchCount');
+
+  if(!input)return;
+
+  let links=[].slice.call(document.querySelectorAll('[data-page-menu-link="1"]'));
+
+  function apply(openBest){
+    let q=String(input.value||'').trim().toLowerCase();
+    let visible=[];
+    menuSearches++;
+    lastMenuSearch=q;
+
+    links.forEach(function(a){
+      let hay=[
+        a.getAttribute('data-menu-label')||'',
+        a.getAttribute('data-menu-slug')||'',
+        a.getAttribute('data-menu-icon')||'',
+        a.textContent||''
+      ].join(' ').toLowerCase();
+
+      let match=!q||hay.indexOf(q)>-1;
+
+      a.classList.toggle('menuHidden',!match);
+
+      if(match)visible.push(a);
+    });
+
+    if(count){
+      count.textContent=q?(visible.length+' menu match'+(visible.length===1?'':'es')):(links.length+' menu link'+(links.length===1?'':'s'));
+    }
+
+    if(openBest&&visible[0]){
+      location.href=visible[0].href;
+    }
+
+    debug();
+  }
+
+  input.addEventListener('input',function(){
+    apply(false);
+  });
+
+  input.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      e.preventDefault();
+      apply(true);
+    }
+  });
+
+  if(button){
+    button.addEventListener('click',function(){
+      apply(true);
+    });
+  }
+
+  apply(false);
 }
 
 function renderPage(){
@@ -1663,13 +1937,15 @@ function renderPage(){
     blockHtml='<section class="previewBlock"><h3>'+esc(title)+'</h3><p>'+esc(desc||'This page has no visible content blocks yet. Empty blocks are hidden by the preview guard.')+'</p></section>';
   }
 
+  let menuBar=topNav?'<div class="siteMenuBar"><nav class="siteNav siteTopRail" aria-label="Page menu top rail">'+topNav+'</nav><div class="siteMenuSearch"><input id="siteMenuSearchInput" type="search" placeholder="Search pages..." aria-label="Search page menu"><button id="siteMenuSearchGo" type="button">Go</button><small id="siteMenuSearchCount" class="menuSearchCount">Ready</small></div></div>':'';
+
   let html='<div class="sitePreview">\
-<header class="siteHead"><div class="siteLogo">'+esc(s.site_name||s.siteName||title)+'</div><nav class="siteNav">'+topNav+'</nav></header>\
+<header class="siteHead"><div class="siteHeadMain"><div class="siteLogo">'+esc(s.site_name||s.siteName||title)+'</div></div>'+menuBar+'</header>\
 '+heroHtml(title,slug,statusText,desc,heroBlock)+'\
 <main class="siteBody '+layoutClass+'">\
-'+(leftNav?'<nav class="sideNav">'+leftNav+'</nav>':'')+'\
+'+(leftNav?'<nav class="sideNav" aria-label="Left page menu">'+leftNav+'</nav>':'')+'\
 <section class="blockGrid">'+blockHtml+'</section>\
-'+(rightNav?'<nav class="sideNav right">'+rightNav+'</nav>':'')+'\
+'+(rightNav?'<nav class="sideNav right" aria-label="Right page menu">'+rightNav+'</nav>':'')+'\
 </main>\
 <footer class="siteFoot"><strong>'+esc(s.footer_title||s.footerTitle||s.site_name||title)+'</strong><small>'+esc(s.footer_text||s.footerText||'Web Builder owned preview.')+'</small></footer>\
 </div>';
@@ -1678,6 +1954,7 @@ function renderPage(){
 
   hydrateInlineForms();
   hydrateRatings();
+  hydrateMenuSearch();
   debug();
 }
 
@@ -1693,6 +1970,7 @@ function localFallback(){
     settings_json:{
       description:'Local fallback preview. Load Supabase to render the saved page.',
       menu_label:slug,
+      menu_icon:'page',
       show_in_menu:true,
       sort_order:100
     },
@@ -1764,7 +2042,7 @@ function debug(){
 
   let report=Object.assign({},authState,{
     canonicalRoute:'web-builder-preview-owned-v7-12-257-test.html',
-    checkpoint:'CHECKPOINT-WEB-BUILDER-DOORWAY-LOCK-ROLLPLAN-V7-12-263-8.md',
+    checkpoint:'WEB-BUILDER-MANIFEST-V7-12-252.md / V7.12.300.41 Owned Preview Menu Rail Icons Search Pass',
     previewOwnerLock:true,
     requestedSlug:selectedSlug,
     pageOwnerId:pageOwnerId,
@@ -1784,6 +2062,14 @@ function debug(){
     fullPreviewPreserved:true,
     formSubmissionsPreserved:true,
     appGlobalFooterInjected:false,
+    pageMenuSetConsumer:true,
+    previewMenuRails:true,
+    previewMenuIcons:true,
+    previewMenuSearch:true,
+    menuSource:menuSource,
+    menuSetItemCount:menuSetItemCount,
+    menuSearches:menuSearches,
+    lastMenuSearch:lastMenuSearch,
     supabaseReadCount:supabaseReadCount,
     submissionWrites:submissionWrites,
     storageWrites:false,
@@ -1832,19 +2118,20 @@ async function copyReport(){
 
 function renderShell(){
   app().innerHTML='<section class="hero">\
-<span class="badge">V7.12.299.14 Owned Preview Global Rail</span>\
-<h1>Published Preview shows only the allowed workspace page</h1>\
-<p>This preview reads <code>sb_site_pages</code> after the owner lock passes. Creator users can preview only their own rows. Platform owner can preview any workspace.</p>\
+<span class="badge">V7.12.300.41 Owned Preview Menu Rail Icons Search Pass</span>\
+<h1>Published Preview shows menu rails with selected icons and search</h1>\
+<p>This preview reads <code>sb_site_pages</code> after the owner lock passes. It consumes Page Menu Builder output from <code>settings_json</code> and renders tidy top/left/right menu rails.</p>\
 <div class="pillRow">\
 <span class="chip good">Page owner lock</span>\
-<span class="chip good">Reserved slug redirect</span>\
-<span class="chip good">Empty block guard</span>\
-<span class="chip good">Shared rail</span>\
+<span class="chip good">Selected icons</span>\
+<span class="chip good">Top menu slider rail</span>\
+<span class="chip good">Left/right scroll rails</span>\
+<span class="chip good">Preview search</span>\
 <span class="chip warn">No schema changes</span>\
 <span class="chip warn">No storage uploads from preview lock</span>\
 <span class="chip warn">No index promotion</span>\
 </div>\
-<div class="railNote">Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see every Web Builder page.</div>\
+<div class="railNote">Search belongs in the user-facing preview beside the page menu rail. Page Menu Builder stays focused on building the menu.</div>\
 </section>\
 <section class="panel">\
 <h2>Preview controls</h2>\
@@ -1864,7 +2151,7 @@ function renderShell(){
 <section class="previewFull"><div id="previewFrame"></div></section>\
 <section class="miniGrid">\
 <div class="panel"><h2>Safety rule</h2><div class="notice">Owned Preview reads owner-scoped pages/menu and can submit configured forms only. It does not change schema, storage, app shell or index.</div></div>\
-<div class="panel"><h2>Pass condition</h2><p>Trevor can preview all workspaces. Creator users preview only their own pages. Empty blocks are hidden.</p></div>\
+<div class="panel"><h2>Pass condition</h2><p>Trevor can preview all workspaces. Creator users preview only their own pages. Menu rails show selected icons and search works.</p></div>\
 <div class="panel"><h2>Debug</h2><div id="debug" class="debug">Waiting...</div></div>\
 </section>';
 
@@ -1958,6 +2245,6 @@ boot();
 
 })();
 </script>
-<script src="web-builder-global-projector-v7-12-263.js?v=7-12-299-14-preview-global-rail"></script>
+<script src="web-builder-global-projector-v7-12-263.js?v=7-12-300-41-preview-menu-rail-icons-search"></script>
 </body>
 </html>
