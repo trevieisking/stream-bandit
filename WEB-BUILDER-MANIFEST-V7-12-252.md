@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.300.45
+# Web Builder Manifest V7.12.300.46
 
 ## Purpose
 
@@ -8,9 +8,17 @@ The Stream Bandit movie/app manifest remains separate.
 
 ## Current checkpoint status
 
-Status: ROUTE MAP NO-FIX PASS / SOURCE MAP GLOBAL PROJECTOR RAIL SEARCH PASS / HEADER-FOOTER RAIL SEARCH WORKSPACE APPLY PASS / OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
+Status: CONTROL MAP NO-FIX PASS / ROUTE MAP NO-FIX PASS / SOURCE MAP GLOBAL PROJECTOR RAIL SEARCH PASS / HEADER-FOOTER RAIL SEARCH WORKSPACE APPLY PASS / OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
 
 Latest recorded Web Builder pass:
+
+`V7.12.300.46 Web Builder Control Map No-Fix Stability Pass`
+
+Current Control Map code version confirmed passed:
+
+`V7.12.299.19 Web Builder Control Map Global Rail Pass`
+
+Previous recorded Web Builder pass:
 
 `V7.12.300.45 Web Builder Route Map No-Fix Stability Pass`
 
@@ -18,7 +26,7 @@ Current Route Map code version confirmed passed:
 
 `V7.12.299.18 Web Builder Route Map Global Rail Pass`
 
-Previous recorded Web Builder pass:
+Previous Source Map pass:
 
 `V7.12.300.44 Web Builder Source Map Global Projector Rail Search Pass`
 
@@ -54,6 +62,84 @@ Previous checkpoint file:
 - Web Builder passed pages are recorded here instead of replacing the main `index.html` until the full Web Builder group pass is approved.
 - The older Web Builder engine/global helper relationship may still be helping some global pages. Do not remove or bypass those helpers until Source Map, Route Map and global page scans confirm the dependency is safe to retire.
 - If a page already passes and nothing visible is broken, do not rewrite it just to increase a version number. Record the pass, preserve the working code, and move to the next planned page.
+
+## Control Map no-fix pass recorded
+
+Route:
+
+`web-builder-control-map-v7-12-253-test.html?page=<slug>`
+
+Code version confirmed passed:
+
+`V7.12.299.19 Web Builder Control Map Global Rail Pass`
+
+Manifest record pass:
+
+`V7.12.300.46 Web Builder Control Map No-Fix Stability Pass`
+
+Owner confirmed status:
+
+PASSED FULLY / NO PAGE CODE CHANGE NEEDED.
+
+Owner supplied live page debug result:
+
+- checked true
+- allowed true
+- signed in true
+- platform_owner profile confirmed
+- builder planning lock passed
+- global rail projector true
+- Web Builder shell true
+- local top buttons hidden true
+- body actions preserved true
+- overlay inputs true
+- read-only planning page true
+- control map builder lock true
+- active registry protected true
+- Web Builder functions allowed true
+- personal workspace rule confirmed
+- platform owner override only confirmed
+- admin role alone does not expose workspaces confirmed
+- safe routes visible 19
+- protected areas visible 8
+- future systems visible 6
+- route checks run completed
+- all 19 route checks returned OK 200
+
+Passed behavior:
+
+- safe routes list works
+- protected areas list works
+- future systems list works
+- route checks work
+- detail/overlay behavior works
+- Copy Report works
+- Open route links work
+- global Web Builder rail/search/projector is present
+- active registry remains protected
+- current Stream Bandit shell files remain untouched
+- page already does what it needs to do
+- no edit/create/delete is required on Control Map now because this page is a read-only action/button ownership truth page, not the editor itself
+
+Safety:
+
+- reads `sb_profiles`
+- browser route checks only read same-origin files
+- no Supabase writes
+- no schema change
+- no storage action
+- no helper changes
+- no Stream Bandit branding change
+- no Stream Bandit shell change
+- no active menu promotion
+- no index promotion
+- no builder table changes
+- no global helper rewrite
+- old Web Builder engine/helper behavior preserved
+
+Decision:
+
+Control Map should not be rewritten now. It is promoted by confirmation and manifest record only. Future action/button ownership work must be additive and only if a concrete problem appears.
 
 ## Route Map no-fix pass recorded
 
@@ -391,7 +477,7 @@ No domain table, DNS write, hosting automation, schema change, RLS change or fin
 7. `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>` - PASS / protected inbox bridge
 8. `web-builder-assets-v7-12-252-test.html?page=<slug>` - PASS
 9. `web-builder-route-map-v7-12-252-test.html?page=<slug>` - PASS / no-fix stability pass / route checks all OK 200
-10. `web-builder-control-map-v7-12-253-test.html?page=<slug>` - PASS / control truth page still planned for action ownership upgrade if needed
+10. `web-builder-control-map-v7-12-253-test.html?page=<slug>` - PASS / no-fix stability pass / control map checks all OK 200
 11. `web-builder-pages-source-map-v7-12-255-test.html?page=<slug>` - PASS / global projector rail search + truth checker confirmed
 12. `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` - PASS / rail search + apply shell to workspace pages confirmed
 13. `WEB-BUILDER-MANIFEST-V7-12-252.md` - updated Web Builder record
@@ -413,8 +499,7 @@ This login gate is future work and is not part of this checkpoint.
 
 ## Remaining Web Builder work
 
-1. Control Map becomes an action/button ownership truth page if inspection shows a real gap.
-2. Pages Manager, Form Designer, Inbox and Assets smoke checks against Source Map.
-3. Web Builder engine/global helper dependency audit across global pages.
-4. Domain/subdomain/hosting readiness remains future builder-owned product work.
-5. Final `index.html` promotion happens only after full Web Builder group pass and owner approval.
+1. Pages Manager, Form Designer, Inbox and Assets smoke checks against Source Map.
+2. Web Builder engine/global helper dependency audit across global pages.
+3. Domain/subdomain/hosting readiness remains future builder-owned product work.
+4. Final `index.html` promotion happens only after full Web Builder group pass and owner approval.
