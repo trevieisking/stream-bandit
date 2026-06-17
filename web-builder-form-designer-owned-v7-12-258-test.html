@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Form Designer V7.12.299.17 TEST</title>
+<title>Web Builder Form Designer V7.12.300.48 TEST</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -439,6 +439,52 @@ p,li,label,small{
 .modal.compact{
   width:min(720px,100%);
 }
+
+/* V7.12.300.48 Form Designer Full Window Builder Overlay Comfort Pass */
+/* Only the main Edit Form builder overlay becomes a full-window workbench. */
+#builderOverlay{
+  align-items:stretch;
+  justify-content:stretch;
+  padding:0;
+}
+#builderOverlay .modal{
+  width:100vw;
+  max-width:none;
+  height:100vh;
+  max-height:100vh;
+  border-radius:0;
+  border:0;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  overflow:hidden;
+}
+#builderOverlay .modalHead{
+  border-radius:0;
+}
+#builderOverlay .modalBody{
+  min-height:0;
+  overflow:auto;
+  padding:clamp(12px,2vw,22px);
+}
+#builderOverlay .modalFoot{
+  border-radius:0;
+}
+#builderOverlay .builderLayout{
+  min-height:calc(100vh - 150px);
+  grid-template-columns:minmax(320px,.72fr) minmax(520px,1.28fr);
+  align-items:stretch;
+}
+#builderOverlay .builderLayout > .panel{
+  min-height:0;
+  overflow:auto;
+}
+#builderOverlay .fieldList{
+  max-height:none;
+}
+#builderOverlay .control textarea{
+  min-height:120px;
+}
+
 .modalHead{
   position:sticky;
   top:0;
@@ -506,6 +552,17 @@ p,li,label,small{
   .modal{
     max-height:96vh;
   }
+  #builderOverlay .modal{
+    height:100dvh;
+    max-height:100dvh;
+  }
+  #builderOverlay .builderLayout{
+    grid-template-columns:1fr;
+    min-height:auto;
+  }
+  #builderOverlay .modalBody{
+    padding:12px;
+  }
   .modalFoot .btn{
     flex:1 1 100%;
   }
@@ -518,14 +575,14 @@ p,li,label,small{
 }
 </style>
 </head>
-<body data-wb-shell="form-designer-v7-12-299-17" data-web-builder-form-designer="global-rail-preserve-overlays">
+<body data-wb-shell="form-designer-v7-12-300-48" data-web-builder-form-designer="full-window-builder-overlay-comfort">
 <header class="top">
   <div class="topInner">
     <div class="brand">
       <div class="mark" aria-hidden="true">WB</div>
       <div>
         Web Builder Form Designer
-        <small>global rail + preserved overlays + owner workspace lock · V7.12.299.17</small>
+        <small>full-window builder overlay + preserved forms + owner workspace lock · V7.12.300.48</small>
       </div>
     </div>
   </div>
@@ -533,12 +590,12 @@ p,li,label,small{
 
 <main class="wrap">
   <section class="hero">
-    <span class="badge">V7.12.299.17 Form Designer Global Rail Pass</span>
+    <span class="badge">V7.12.300.48 Form Designer Full Window Builder Overlay Comfort Pass</span>
     <h1>Advanced forms open first, then owner lock checks run</h1>
-    <p>This keeps the working Form Designer body tools, moves navigation to the Web Builder global rail, and preserves the owner workspace lock.</p>
+    <p>This keeps the working Form Designer body tools, moves navigation to the Web Builder global rail, preserves the owner workspace lock, and gives the main Edit Form overlay the full browser workspace.</p>
     <div class="row">
       <span class="chip good">Global Web Builder rail</span>
-      <span class="chip good">Builder overlay</span>
+      <span class="chip good">Full-window builder overlay</span>
       <span class="chip good">Destinations overlay</span>
       <span class="chip good">Field edit overlay</span>
       <span class="chip good">Image upload kept</span>
@@ -559,7 +616,7 @@ p,li,label,small{
     <div class="card keep">
       <b>Overlay system preserved</b>
       <ul class="list">
-        <li>Builder Overlay</li>
+        <li>Main Builder Overlay is now full-window.</li>
         <li>Destinations Overlay</li>
         <li>Field Edit Overlay</li>
         <li>Delete confirm overlay</li>
@@ -625,13 +682,13 @@ p,li,label,small{
   </section>
 </main>
 
-<footer class="footer">V7.12.299.17 Form Designer Global Rail Pass · overlays preserved · existing image bucket only · no schema changes · no index promotion</footer>
+<footer class="footer">V7.12.300.48 Form Designer Full Window Builder Overlay Comfort Pass · overlays preserved · existing image bucket only · no schema changes · no index promotion</footer>
 
 <div id="builderOverlay" class="overlay" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="builderTitle">
     <div class="modalHead">
       <div>
-        <span class="badge">Builder overlay</span>
+        <span class="badge">Full-window builder overlay</span>
         <h2 id="builderTitle">Edit form</h2>
       </div>
       <button id="closeBuilderOverlay" class="btn close" type="button">×</button>
@@ -816,7 +873,7 @@ p,li,label,small{
 (function(){
 'use strict';
 
-const VERSION='V7.12.299.17 Web Builder Form Designer Global Rail Overlay Pass';
+const VERSION='V7.12.300.48 Web Builder Form Designer Full Window Builder Overlay Comfort Pass';
 const CONFIG_FILE='stream-bandit-shell-v6-24.js';
 const BUCKET='stream-bandit-images';
 const ALLOWED_TYPES=['image/png','image/jpeg','image/webp'];
@@ -895,6 +952,8 @@ let authState={
   noHiddenLoadingGate:true,
   overlaysPreserved:true,
   builderOverlayPreserved:true,
+  builderOverlayFullWindow:true,
+  builderOverlayComfortPass:true,
   destinationOverlayPreserved:true,
   fieldEditOverlayPreserved:true,
   fieldDeleteOverlayPreserved:true,
@@ -1824,7 +1883,7 @@ function submissionPayload(c){
       page_owner_id:pageOwnerId,
       form_key:b.formKey,
       preset_title:b.title,
-      source:'owned-form-designer-global-rail-v7-12-299-17',
+      source:'owned-form-designer-global-rail-v7-12-300-48',
       existing_bucket_only:true,
       bucket:BUCKET,
       bucketPolicyChanged:false
@@ -2066,6 +2125,8 @@ async function saveFormDesign(){
         global_rail_pass:true,
         solid_state_shell:true,
         overlays_preserved:true,
+        builder_overlay_full_window:true,
+        builder_overlay_comfort_pass:true,
         image_upload_existing_bucket:true,
         bucket:BUCKET,
         bucket_policy_changed:false
@@ -2102,7 +2163,7 @@ async function saveFormDesign(){
     lastAction='save form design passed';
     lastError='';
 
-    setStatus('Saved form design to page row. Overlay system preserved. No schema change.','good2');
+    setStatus('Saved form design to page row. Full-window builder overlay comfort preserved. No schema change.','good2');
 
     $('answers').textContent='FORM DESIGN SAVED\n\n'+JSON.stringify({
       page:page.slug,
@@ -2112,6 +2173,7 @@ async function saveFormDesign(){
       globalRailPass:true,
       overlaysPreserved:true,
       builderOverlayPreserved:true,
+      builderOverlayFullWindow:true,
       destinationOverlayPreserved:true,
       fieldEditOverlayPreserved:true,
       fieldDeleteOverlayPreserved:true,
@@ -2190,6 +2252,8 @@ function state(){
     fieldOverlayOpen:fieldOverlayOpen,
     fieldDeleteOverlayOpen:fieldDeleteOverlayOpen,
     builderOverlayPreserved:true,
+    builderOverlayFullWindow:true,
+    builderOverlayComfortPass:true,
     destinationOverlayPreserved:true,
     fieldEditOverlayPreserved:true,
     fieldDeleteOverlayPreserved:true,
@@ -2453,6 +2517,6 @@ boot();
 
 })();
 </script>
-<script src="web-builder-global-projector-v7-12-263.js?v=7-12-299-17-form-designer-global-rail"></script>
+<script src="web-builder-global-projector-v7-12-263.js?v=7-12-300-48-form-designer-full-window-builder-overlay-comfort"></script>
 </body>
 </html>
