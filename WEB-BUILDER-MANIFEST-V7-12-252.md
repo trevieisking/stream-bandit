@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.12.300.42
+# Web Builder Manifest V7.12.300.44
 
 ## Purpose
 
@@ -8,13 +8,17 @@ The Stream Bandit movie/app manifest remains separate.
 
 ## Current checkpoint status
 
-Status: HEADER-FOOTER RAIL SEARCH WORKSPACE APPLY PASS / OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / SOURCE MAP TRUTH CHECKER PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
+Status: SOURCE MAP GLOBAL PROJECTOR RAIL SEARCH PASS / HEADER-FOOTER RAIL SEARCH WORKSPACE APPLY PASS / OWNED PREVIEW MENU RAIL ICONS SEARCH PASS / PAGE MENU BUILDER ICON RESTORE PASS / GLOBAL RAIL PASS / FINAL INDEX PROMOTION NOT DONE.
 
 Latest recorded Web Builder pass:
 
-`V7.12.300.42 Web Builder Header Footer Rail Search Workspace Apply Pass`
+`V7.12.300.44 Web Builder Source Map Global Projector Rail Search Pass`
 
 Previous recorded Web Builder pass:
+
+`V7.12.300.42 Web Builder Header Footer Rail Search Workspace Apply Pass`
+
+Previous Owned Preview pass:
 
 `V7.12.300.41 Web Builder Owned Preview Menu Rail Icons Search Pass`
 
@@ -50,17 +54,17 @@ Route:
 
 Passed version:
 
-`V7.12.300.38 Web Builder Source Map Truth Checker`
+`V7.12.300.44 Web Builder Source Map Global Projector Rail Search Pass`
 
-Owner confirmed route:
+Owner confirmed status:
 
-`web-builder-pages-source-map-v7-12-255-test.html?page=landing`
+PASSED FULLY.
 
 Purpose:
 
 Source Map is the Web Builder source/render/publish truth checker. It is not another editor.
 
-Passed behavior:
+Confirmed latest behavior:
 
 - selected slug
 - page row found / missing
@@ -83,6 +87,12 @@ Passed behavior:
 - readiness result
 - output on page
 - detail overlay
+- Web Builder shared global projector restored
+- shared uploaded logo/avatar restored
+- floating Hub/account overlay restored
+- global Web Builder rail/search restored exactly like the other Web Builder pages
+- rail/search passed owner click test
+- every visible button clicked by owner and worked
 
 Safety:
 
@@ -92,6 +102,7 @@ Safety:
 - no storage action
 - no fake publish
 - no index promotion
+- old Web Builder engine/helper behavior preserved
 
 ## Page Menu Builder pass recorded
 
@@ -307,7 +318,7 @@ No domain table, DNS write, hosting automation, schema change, RLS change or fin
 8. `web-builder-assets-v7-12-252-test.html?page=<slug>` - PASS
 9. `web-builder-route-map-v7-12-252-test.html?page=<slug>` - PASS / route-health manager still planned
 10. `web-builder-control-map-v7-12-253-test.html?page=<slug>` - PASS / control truth page still planned
-11. `web-builder-pages-source-map-v7-12-255-test.html?page=<slug>` - FUNCTIONAL PASS / truth checker confirmed
+11. `web-builder-pages-source-map-v7-12-255-test.html?page=<slug>` - PASS / global projector rail search + truth checker confirmed
 12. `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` - PASS / rail search + apply shell to workspace pages confirmed
 13. `WEB-BUILDER-MANIFEST-V7-12-252.md` - updated Web Builder record
 
