@@ -8,7 +8,7 @@ The Stream Bandit movie/app manifest remains separate. This file is Web Builder 
 
 ## Current checkpoint status
 
-Status: HEADER/FOOTER + OWNED PREVIEW FUNCTIONAL PASS / GLOBAL RAIL PASS / INDEX CANDIDATE TRACKER UPDATED / FINAL LIVE-HOME PROMOTION NOT DONE.
+Status: HEADER/FOOTER + OWNED PREVIEW FUNCTIONAL PASS / GLOBAL RAIL PASS / INDEX CHECKPOINT DOORWAY UPDATED / FINAL LIVE-HOME REPLACEMENT NOT DONE.
 
 Checkpoint issue:
 
@@ -24,10 +24,10 @@ Checkpoint file:
 - Hub remains the visual gold standard.
 - Active user-facing Web Builder pages use the shared global rail/projector.
 - Page-specific actions stay inside each page body.
-- Inputs belong in overlays where users create, edit, delete, reorder or confirm something.
+- Inputs belong in overlays where users create, edit, remove, reorder or confirm something.
 - Outputs stay visible on-page.
 - No schema, RLS, storage policy, bucket policy, service-role, payment provider, DNS automation or final live-home replacement is approved by this checkpoint.
-- `index.html` is a candidate tracker/root handoff and still redirects to the current Home route after a short pause.
+- `index.html` is a simple checkpoint doorway with links to Home, manifests, checkpoint, Header/Footer Builder and Owned Preview.
 
 ## Big pass recorded
 
@@ -53,7 +53,7 @@ Passed behavior:
 - Global projector/preview bridge: `V7.12.300.36 Web Builder Global Rail Preview Shell Bridge`
 - Web Builder manifest: `V7.12.300.37`
 - Current app manifest: `V7.12.300.37`
-- Index checkpoint: `V7.12.300.37`
+- Index checkpoint doorway: `V7.12.300.37`
 
 ## Product ownership correction
 
@@ -82,7 +82,7 @@ Correct product role:
 - This is the builder-site shell tool.
 - It owns header text, header links, header buttons, rail-style subtabs, footer text, footer groups, footer links, footer buttons and optional trusted header/footer code.
 - Users can use it as their own header/footer menu/rail if they want.
-- Every configurable item needs add, edit, delete and reorder controls where relevant.
+- Every configurable item needs add, edit, remove and reorder controls where relevant.
 - Inputs open in overlays and outputs stay visible on-page.
 - Code is an advanced option, not the default user experience.
 
@@ -118,28 +118,7 @@ Web Builder still needs future domain/subdomain/hosting support as part of the b
 - publish status and rollback status
 - owner-safe approval gates
 
-No domain table, DNS write, hosting automation, schema change, RLS change or final `index.html` live-home replacement is approved by this checkpoint.
-
-## Golden Web Builder shell
-
-Golden route:
-
-`web-builder-account-control-hub-v7-12-263-test.html`
-
-Required visual shell:
-
-- top-left Web Builder identity block
-- uploaded Web Builder logo in header mark
-- uploaded Web Builder logo in owner rail/account bubble
-- horizontal scrolling Web Builder rail under the header
-- integrated Web Builder search field on the rail row
-- page-specific body content below the rail
-- page-specific actions kept in page body, not moved into the rail
-- correct route-family body buttons on every user-facing page
-
-Required note:
-
-`Scrolling Web Builder menu tabs: swipe or scroll the rail left/right to see every Web Builder page.`
+No domain table, DNS write, hosting automation, schema change, RLS change or final live-home replacement is approved by this checkpoint.
 
 ## Shared global projector
 
@@ -155,11 +134,7 @@ Current job:
 
 - Web Builder rail
 - Web Builder route search
-- header `.mark` logo replacement
-- bottom/right owner rail logo
-- account/hover panel logo
-- Web Builder favicon
-- duplicated local top-button suppression
+- logo projection
 - current slug preservation in route links
 - Preview bridge for the saved Header/Footer shell
 
@@ -167,7 +142,7 @@ Safety rule:
 
 - No storage writes.
 - No schema changes.
-- No index live-home replacement.
+- No final live-home replacement.
 
 ## User-facing Web Builder group
 
@@ -185,70 +160,20 @@ Safety rule:
 12. `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` - FUNCTIONAL PASS / saved shell confirmed
 13. `WEB-BUILDER-MANIFEST-V7-12-252.md` - updated checkpoint
 
-## Passed route notes
+## Current index.html checkpoint doorway
 
-### Header/Footer Builder
+`index.html` now records the Web Builder pass with a simple checkpoint doorway.
 
-Status: FUNCTIONAL PASS.
+It links to:
 
-Owner-confirmed:
+- Home
+- Main manifest
+- Web Builder manifest
+- Header/Footer Builder
+- Owned Preview
+- Checkpoint
 
-- saved shell renders on Header/Footer page
-- page tick-list for header works
-- page tick-list for footer works
-- custom header/footer text works
-- Save Draft / Save Ready writes to Supabase
-- compatibility fields are mirrored
-
-### Owned Preview
-
-Status: FUNCTIONAL PASS / POLISH LATER.
-
-Owner-confirmed:
-
-- saved header/footer shell renders in Owned Preview
-- header page links render
-- header buttons render
-- sub tabs render
-- footer Pages group renders
-- footer button/text render
-- page content remains intact
-
-Visual polish debt remains:
-
-- rendered website cards need tidying
-- hero/card hierarchy needs polish
-- card spacing and layout need cleanup
-- do not mix visual polish with live-home promotion
-
-### Page Menu Builder
-
-Status: PASS / ON-PAGE CUSTOM MENU BUILDER.
-
-This page is not the global header/footer builder. It is the on-page custom menu builder, comparable to the advanced Form Designer category.
-
-## Studio safety handoff
-
-Routes:
-
-- `web-builder-studio-v7-12-252-test.html`
-- `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`
-
-Status: SAFETY PASS / HANDOFF PRESERVED.
-
-No-touch rule:
-
-Do not touch `web-builder-live-studio-v7-12-116.js` unless explicitly doing a Studio preservation fix. Studio must preserve unrelated `settings_json` keys when saving page content.
-
-## Current index.html promotion gate
-
-Status: CANDIDATE TRACKER UPDATED / ROOT STILL REDIRECTS TO HOME.
-
-`index.html` is updated to record the Web Builder pass, but this is not final live-home replacement.
-
-Root redirect remains:
-
-`home-global-helpers-v7-4-4-test.html`
+This is not final live-home replacement.
 
 ## Remaining Web Builder work
 
