@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Web Builder Form Designer rollback to V7.12.300.51</title>
+<title>Web Builder Form Designer V7.12.300.52 Private Message Kind Fix</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <style>
 :root{color-scheme:dark;--good:#22d3a6;--purple:#7c3cff;--warn:#ffb142;--bad:#ff5d6c;--bg:#050711;--text:#f7fbff;--muted:#aeb8d6;--line:#ffffff22}*{box-sizing:border-box}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;min-height:100vh;background:radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),linear-gradient(180deg,#070910,#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;padding:18px}.box{width:min(940px,100%);margin:10vh auto;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 22px 80px #0008;padding:22px}.badge{display:inline-flex;border:1px solid #22d3a660;border-radius:999px;background:#22d3a621;color:#baf7df;font-weight:950;padding:7px 10px}.warn{border-color:#ffb14266;background:#ffb14224;color:#ffe7ad}.bad{border-color:#ff5d6c66;background:#ff5d6c22;color:#ffd0d5}h1{font-size:clamp(36px,6vw,72px);line-height:.94;letter-spacing:-.055em;margin:10px 0}p{color:var(--muted);line-height:1.55;font-weight:750}.btn{display:inline-flex;border:0;border-radius:999px;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;text-decoration:none;font-weight:950;padding:11px 14px;margin:6px 6px 0 0}.ghost{background:#30384f;color:#fff}.out{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;border:1px solid #ffffff18;border-radius:16px;background:#0007;color:#dfffee;padding:12px;margin-top:12px;max-height:220px;overflow:auto}
 </style>
 </head>
-<body data-wb-shell="form-designer-rollback-v7-12-300-51">
+<body data-wb-shell="form-designer-v7-12-300-52-private-message-kind-fix">
 <main class="box">
-  <span class="badge">Rollback loader</span>
-  <h1>Restoring the submitting Form Designer</h1>
-  <p>This route is rolling back to the last working submitting build: <b>V7.12.300.51 Form Designer Private Message Submit Pipeline Pass</b>.</p>
-  <p>The restored build keeps submit behaviour, form design save, submissions inbox writes, private-message copies, email preview, and the full-window builder overlay.</p>
-  <div id="status" class="badge warn">Loading exact previous file...</div>
-  <div id="debug" class="out">Waiting for rollback fetch...</div>
+  <span class="badge">Private message kind fix</span>
+  <h1>Opening the submitting Form Designer</h1>
+  <p>This route loads the last working submitting build and patches one value only: <b>kind:'form_private_message'</b> becomes <b>kind:'message'</b> before the page opens.</p>
+  <p>The form/private-message identity stays in <b>meta.source</b>. This matches the working private-message rows already accepted by <code>sb_private_messages_kind_check</code>.</p>
+  <div id="status" class="badge warn">Loading exact previous file and applying safe one-line patch...</div>
+  <div id="debug" class="out">Waiting for patched rollback fetch...</div>
   <a class="btn ghost" href="web-builder-account-control-hub-v7-12-263-test.html">Back to Web Builder Hub</a>
 </main>
 <script>
@@ -26,22 +26,31 @@
 var PREVIOUS_COMMIT='def517a67aa42fa269cf6c09fe0d61e71d4ae560';
 var FILE='web-builder-form-designer-owned-v7-12-258-test.html';
 var RAW='https://raw.githubusercontent.com/trevieisking/stream-bandit/'+PREVIOUS_COMMIT+'/'+FILE;
+var VERSION='V7.12.300.52 Form Designer Private Message Kind Fix';
 var statusEl=document.getElementById('status');
 var debugEl=document.getElementById('debug');
-function setStatus(text,cls){statusEl.textContent=text;statusEl.className='badge '+(cls||'warn');debugEl.textContent=text+'\n\nSource: '+RAW;}
+function setStatus(text,cls){statusEl.textContent=text;statusEl.className='badge '+(cls||'warn');debugEl.textContent=text+'\n\nSource: '+RAW+'\nPatch: kind form_private_message -> message';}
 fetch(RAW,{cache:'no-store'})
   .then(function(r){if(!r.ok)throw new Error('Rollback source fetch failed: '+r.status+' '+r.statusText);return r.text();})
   .then(function(html){
     if(!html||html.indexOf('V7.12.300.51 Form Designer Private Message Submit Pipeline Pass')===-1){
       throw new Error('Rollback source did not match V7.12.300.51 submitting build.');
     }
-    setStatus('Loaded V7.12.300.51. Opening restored page...','');
+    if(html.indexOf("kind:'form_private_message'")===-1){
+      throw new Error('Expected private-message kind value was not found. Patch not applied.');
+    }
+    html=html.replace("kind:'form_private_message'","kind:'message'");
+    html=html.replace('V7.12.300.51 Web Builder Form Designer Private Message Submit Pipeline Pass','V7.12.300.52 Web Builder Form Designer Private Message Kind Fix');
+    html=html.replace('owned-form-designer-private-message-v7-12-300-51','owned-form-designer-private-message-v7-12-300-52-kind-message');
+    html=html.replace('web_builder_form_designer_private_message_v7_12_300_51','web_builder_form_designer_private_message_v7_12_300_52_kind_message');
+    html=html.replace('</body>','<script>window.SB_FORM_DESIGNER_KIND_FIX_VERSION='+JSON.stringify(VERSION)+';<\/script></body>');
+    setStatus('Loaded V7.12.300.51 and patched private message kind. Opening Form Designer...','');
     document.open();
     document.write(html);
     document.close();
   })
   .catch(function(err){
-    setStatus('Rollback loader failed','bad');
+    setStatus('Private message kind fix loader failed','bad');
     debugEl.textContent=String(err&&err.message||err)+'\n\nManual source: '+RAW+'\n\nNo database, schema, storage policy or index change was made.';
   });
 })();
