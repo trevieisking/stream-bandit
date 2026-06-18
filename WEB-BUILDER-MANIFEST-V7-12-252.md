@@ -1,4 +1,4 @@
-# Web Builder Manifest V7.13.011
+# Web Builder Manifest V7.13.016
 
 ## Purpose
 
@@ -8,16 +8,18 @@ The Stream Bandit movie/app manifest remains separate.
 
 ## Current checkpoint status
 
-Status: WEB BUILDER READ-ONLY MAP GROUP PASS / FORM DESIGNER PASS / PLANNING MOVED OUT OF STUDIO / STUDIO CLEANUP NEXT / HEADER-FOOTER BUILDER LATER / FINAL INDEX PROMOTION NOT DONE.
+Status: WEB BUILDER STUDIO CLEANUP PASS RECORDED / FORM DESIGNER PASS / PLANNING MOVED OUT OF STUDIO / READ-ONLY MAP GROUP PASS / GLOBAL FOOTER MESSENGER BORROW RULE RECORDED / FULL PREVIEW COMPOSITOR GAP NEXT / FINAL INDEX PROMOTION NOT DONE.
 
 Latest recorded Web Builder manifest pass:
 
-`V7.13.011 Web Builder Manifest Planning + Read-Only Group Pass`
+`V7.13.016 Web Builder Manifest Studio Pass + Full Preview Gap Record`
 
 Latest working page passes recorded:
 
-- `V7.12.300.53 Form Designer Safe Loader Kind Fix`
+- `V7.13.015 Web Builder Studio Duplicate Controls Cleanup`
+- `V7.13.014 Web Builder Studio Global Footer Messenger Overlay Fix`
 - `V7.13.010 Web Builder Planning Map / Studio Planning Split`
+- `V7.12.300.53 Form Designer Safe Loader Kind Fix`
 - `V7.12.299.19 Web Builder Control Map Global Rail Pass`
 - `V7.12.300.44 Web Builder Source Map Global Projector Rail Search Pass`
 - `V7.12.300.47 Web Builder Pages Manager Builder Polish SEO Domain Preview Controls Pass`
@@ -35,10 +37,11 @@ Latest working page passes recorded:
 - Read-only pages are allowed only when they are useful inspectors, truth checkers or route/action maps.
 - No schema, RLS, storage policy, bucket policy, service-role, payment provider, DNS automation or final live-home replacement is approved by this checkpoint.
 - Web Builder passed pages are recorded here instead of replacing the main `index.html` until the full Web Builder group pass is approved.
-- The older Web Builder engine/global helper relationship may still be helping some global pages. Do not remove or bypass those helpers until Studio, Source Map, Route Map and global page scans confirm the dependency is safe to retire.
 - If a page already passes and nothing visible is broken, do not rewrite it just to increase a version number. Record the pass, preserve the working code, and move to the next planned page.
 - Form Designer is now a do-not-touch page unless a real break appears.
 - Planning belongs on the Planning Map, not inside the live Studio canvas.
+- Private Messages are owned by the main app global footer messenger. Builder pages may borrow that overlay; do not rebuild full inbox overlays inside individual builder pages.
+- Slug, title, status, load, save, preview, form and form inbox controls on Studio are owned by the live builder panel. Do not duplicate those controls in the outer Studio shell.
 
 ## Page status board
 
@@ -46,16 +49,127 @@ Latest working page passes recorded:
 | --- | --- | --- | --- | --- |
 | Hub | `web-builder-account-control-hub-v7-12-263-test.html` | Working doorway / visual standard | `sb_profiles`, `sb_site_pages` | none expected |
 | Pages Manager | `web-builder-pages-manager-owned-v7-12-256-test.html` | Passed full page manager/control centre | `sb_profiles`, `sb_site_pages` | `sb_site_pages` |
-| Studio | `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>` | Next cleanup target | `sb_profiles`, `sb_site_pages` | `sb_site_pages` through existing builder engine |
-| Published Preview | `web-builder-preview-owned-v7-12-257-test.html?page=<slug>` | Passed | `sb_profiles`, `sb_site_pages` | none expected |
+| Studio | `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>` | Passed V7.13.015 / duplicate controls removed | `sb_profiles`, `sb_site_pages` | `sb_site_pages` through existing builder engine |
+| Published Preview | `web-builder-preview-owned-v7-12-257-test.html?page=<slug>` | Passed earlier, now next compositor gap target | `sb_profiles`, `sb_site_pages` | form submissions only when preview form is submitted |
 | Menu Builder | `web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>` | Passed | `sb_profiles`, `sb_site_pages` | `sb_site_pages.settings_json` |
+| Header/Footer Builder | `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` | Passed builder, writes real shell data | `sb_profiles`, `sb_site_pages` | `sb_site_pages.settings_json.web_builder_shell` |
 | Form Designer | `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>` | Passed / do not touch | `sb_profiles`, `sb_site_pages`, form tables | form submissions + private messages from existing flow |
 | Form Inbox | `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>` | Passed protected inbox/private-message bridge | `sb_profiles`, `sb_site_pages`, `sb_form_submissions`, `sb_private_messages` | private-message replies/actions from existing flow |
 | Assets | `web-builder-assets-v7-12-252-test.html` | Passed asset route | existing asset/profile tables/storage as already wired | existing asset flow only |
 | Planning Map | `web-builder-route-map-v7-12-252-test.html` | Passed read-only planning destination | `sb_profiles`, `sb_site_pages` | none |
 | Control Map | `web-builder-control-map-v7-12-253-test.html` | Passed read-only control map | `sb_profiles`, `sb_site_pages` | none |
 | Source Map | `web-builder-pages-source-map-v7-12-255-test.html` | Passed read-only source/debug map | `sb_profiles`, `sb_site_pages` | none |
-| Header/Footer Builder | `web-builder-header-footer-code-v7-12-254-test.html` | Later / harder write page | `sb_profiles`, `sb_site_pages` | `sb_site_pages.settings_json.web_builder_shell` |
+
+## Studio pass recorded
+
+Route:
+
+`overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`
+
+Passed version:
+
+`V7.13.015 Web Builder Studio Duplicate Controls Cleanup`
+
+Owner confirmed status:
+
+PASSED.
+
+Passed behavior:
+
+- page loads and shows current Studio version
+- global rail/search/hub/avatar remains present
+- planning panels removed from Studio body
+- builder canvas loads
+- Load works
+- Save + Publish works
+- Open Preview works from the builder panel
+- Open Form works from the builder panel
+- Form Inbox remains available as the full page from the builder panel
+- Private Messages now use the exact main app global footer messenger overlay
+- duplicate outer shell controls were removed
+- slug/title/status/load/save/preview/form/form-inbox remain controlled by the builder panel
+- device preview controls remain visible as shell-only frame-size controls
+
+Important fix recorded:
+
+- Footer owns the Private Messages overlay.
+- Studio borrows `stream-bandit-footer-shell-v7-12-156.js` and calls `StreamBanditFooterShell.openMessages()`.
+- The full footer shell is hidden on Studio; only the global Private Messages overlay is borrowed.
+- Do not build one-off message overlays on each builder page.
+
+Safety:
+
+- no schema change
+- no RLS change
+- no storage action
+- no new Supabase table
+- no DNS automation
+- no index promotion
+- no Form Designer touch
+- no app index promotion
+
+## Full Preview compositor gap recorded
+
+Current issue:
+
+The Studio builder's local Draft Preview currently renders only the builder engine's local block preview. It does not yet compose the full published page shell.
+
+Expected next behavior:
+
+- Studio preview should show the same full-page result as Published Preview.
+- The preview should include Page Menu Builder output.
+- The preview should include Header/Footer Builder output from `settings_json.web_builder_shell`.
+- Desktop/tablet/mobile controls should affect the full preview frame, not only the builder canvas frame.
+- The builder panel should still own slug/title/status/load/save/preview/form/form-inbox controls.
+
+Likely next target:
+
+`web-builder-preview-owned-v7-12-257-test.html`
+
+Secondary target if needed:
+
+`overlay-route-truth-machine-v7-12-66-test.html`
+
+Tables required:
+
+- `sb_profiles`
+- `sb_site_pages`
+
+No new table is approved for this preview compositor pass.
+
+## Planning Map pass recorded
+
+Route:
+
+`web-builder-route-map-v7-12-252-test.html?page=<slug>`
+
+Passed version:
+
+`V7.13.010 Web Builder Planning Map / Studio Planning Split`
+
+Owner confirmed status:
+
+PASSED READ-ONLY PLANNING PAGE.
+
+Planning areas now owned by Planning Map:
+
+- Theme / Brand / Font plan
+- Header / Footer / Navigation plan
+- Feature ownership plan
+- Builder-owned systems map
+- Future Supabase table plan
+- Route truth / build order
+
+Safety:
+
+- reads `sb_profiles` and `sb_site_pages`
+- read-only page
+- no Supabase writes
+- no schema change
+- no RLS change
+- no storage write
+- no index promotion
+- no Stream Bandit app shell change
 
 ## Form Designer pass recorded
 
@@ -85,67 +199,9 @@ Owner confirmed behavior:
 
 Important fix recorded:
 
-- The Form Designer now patches the private message insert kind from `form_private_message` to `message`.
+- The Form Designer patches the private message insert kind from `form_private_message` to `message`.
 - Form identity remains in `meta.source`.
 - This matches the working `sb_private_messages` rows and avoids the `sb_private_messages_kind_check` failure.
-
-Safety:
-
-- no schema change
-- no RLS change
-- no storage action
-- no new table
-- no index promotion
-- no Stream Bandit app shell change
-- no additional page created
-
-Future note:
-
-- Email draft wording can be polished later to clearly explain: copy the email body, click open, then paste if the mail app does not auto-fill.
-- Do not perform that polish now unless the page is already being touched for another necessary reason.
-
-## Planning Map pass recorded
-
-Route:
-
-`web-builder-route-map-v7-12-252-test.html?page=<slug>`
-
-Passed version:
-
-`V7.13.010 Web Builder Planning Map / Studio Planning Split`
-
-Owner confirmed status:
-
-PASSED READ-ONLY PLANNING PAGE.
-
-Purpose:
-
-- Planning content was moved out of the working Studio page and into this existing Route Map page.
-- No new file was created.
-- The Planning Map is now the destination for Web Builder planning, route truth, systems planning and future table planning.
-
-Planning areas now owned by Planning Map:
-
-- Theme / Brand / Font plan
-- Header / Footer / Navigation plan
-- Feature ownership plan
-- Builder-owned systems map
-- Future Supabase table plan
-- Route truth / build order
-
-Safety:
-
-- reads `sb_profiles` and `sb_site_pages`
-- read-only page
-- no Supabase writes
-- no schema change
-- no RLS change
-- no storage write
-- no storage policy change
-- no bucket policy change
-- no DNS automation
-- no index promotion
-- no Stream Bandit app shell change
 
 ## Control Map no-fix pass recorded
 
@@ -161,43 +217,20 @@ Manifest status:
 
 PASSED FULLY / NO PAGE CODE CHANGE NEEDED.
 
-Owner supplied live page debug result:
+Key pass points:
 
-- checked true
-- allowed true
-- signed in true
 - platform_owner profile confirmed
 - builder planning lock passed
 - global rail projector true
-- Web Builder shell true
-- local top buttons hidden true
-- body actions preserved true
-- overlay inputs true
-- read-only planning page true
-- control map builder lock true
+- read-only planning/control map true
 - active registry protected true
-- Web Builder functions allowed true
 - personal workspace rule confirmed
 - platform owner override only confirmed
-- admin role alone does not expose workspaces confirmed
-- safe routes visible 19
-- protected areas visible 8
-- future systems visible 6
-- route checks run completed
-- all 19 route checks returned OK 200
-
-Safety:
-
-- reads `sb_profiles` and `sb_site_pages`
-- Supabase writes false
-- storage writes false
-- schema changes false
-- storage actions false
-- helper changes false
-- Stream Bandit branding changes false
-- Stream Bandit shell changes false
-- active menu promotion false
-- index promotion false
+- all route checks returned OK 200
+- no Supabase writes
+- no storage writes
+- no schema changes
+- no index promotion
 
 ## Source Map no-fix pass recorded
 
@@ -213,39 +246,11 @@ Manifest status:
 
 PASSED FULLY / NO PAGE CODE CHANGE NEEDED.
 
-Owner supplied status:
-
-- debug is very large because it is a real source/debug map
-- page fully functions
-- checked true
-- allowed true
-- signed in true
-- platform_owner profile confirmed
-- canUseBuilder true
-- reads and displays `sb_site_pages` source data
-- displays `layout_json`
-- displays `settings_json`
-- displays page menu data
-- displays header/footer shell data
-- displays revisions, SEO and publish data
-
 Why the huge debug is acceptable:
 
 - Source Map is a read-only inspector/debug page.
 - It is expected to expose large route/page/settings/source truth.
 - It is not a normal creator-facing builder canvas.
-
-Safety:
-
-- reads `sb_profiles` and `sb_site_pages`
-- no Supabase writes recorded for this pass
-- no schema change
-- no RLS change
-- no storage write
-- no storage policy change
-- no bucket policy change
-- no index promotion
-- no Stream Bandit app shell change
 
 ## Pages Manager builder polish pass recorded
 
@@ -257,109 +262,11 @@ Passed version:
 
 `V7.12.300.47 Owned Pages Manager Builder Polish SEO Domain Preview Controls`
 
-Manifest record pass:
-
-`V7.12.300.47 Web Builder Pages Manager Builder Polish SEO Domain Preview Controls Pass`
-
 Owner confirmed status:
 
 PASSED FULLY.
 
-Owner supplied live page debug result:
-
-- checked true
-- allowed true
-- signed in true
-- platform_owner profile confirmed
-- workspace `platform-owner-all-rows`
-- create/edit/save/delete flow preserved
-- Supabase reads true
-- Supabase writes true
-- storage writes false
-- storage actions false
-- schema changes false
-- builder table changes false
-- file deletes false
-- HTML route deletes false
-- Stream Bandit shell changes false
-- active menu promotion false
-- index promotion false
-- shared rail true
-- body actions preserved true
-- inputs in overlays true
-- outputs on page true
-- local top buttons hidden true
-- global rail projector true
-- sort order stored in `settings_json`
-- page type stored in `settings_json`
-- page indent stored in `settings_json`
-- SEO stored in `settings_json`
-- domain/hosting planning stored in `settings_json`
-- guarded delete overlay true
-- global helper preserved true
-- personal workspace scoped true
-- platform owner can see all rows
-- creator users can only see own rows
-- admin role alone does not expose workspaces
-- reserved slugs protected: `landing`, `home`, `home-page`
-- compact page tabs true
-- page cards menu style true
-- expanded icon picker true
-- SEO inputs true
-- domain/hosting planning inputs true
-- controlled preview true
-- collapsible page menu true
-- expand preview true
-- responsive preview modes: desktop, tablet, mobile
-- drag reorder true
-- sub-tab indent true
-- tiny edit/delete buttons true
-- guarded Supabase row delete true
-- DNS automation false
-- domain automation false
-- source `supabase`
-- page count 11
-- visible page count 11
-- save all pages passed
-- last error empty
-
-Passed behavior:
-
-- Pages Manager now acts as the Web Builder page creation and readiness control centre.
-- It keeps the existing working page row create/edit/save/delete flow.
-- It keeps guarded delete and protects reserved slugs.
-- It never deletes HTML files, routes, storage, domains, DNS records, assets or app pages.
-- It keeps the shared Web Builder global projector, rail/search, uploaded logo/avatar and Hub/account overlay.
-- It keeps inputs in overlays and outputs on page.
-- It adds the richer icon picker pattern needed to match Menu Builder and Preview.
-- It adds SEO write-up fields for each page.
-- It adds domain, subdomain and hosting readiness planning fields for each page.
-- It adds controlled on-page preview output.
-- It adds page menu collapse control.
-- It adds preview expand/full-width control.
-- It adds desktop, tablet and mobile preview modes.
-- It keeps route buttons for Web Builder / Publish, Published Preview, Page Menu, Header/Footer, Source Map, Form Builder and Owned Inbox.
-- It saves future-prep settings into `sb_site_pages.settings_json` without a schema change.
-
-Safety:
-
-- reads `sb_profiles` and `sb_site_pages`
-- writes only `sb_site_pages`
-- SEO/domain/hosting readiness data is stored inside existing `settings_json`
-- no new Supabase table
-- no schema change
-- no RLS change
-- no storage write
-- no storage policy change
-- no bucket policy change
-- no DNS automation
-- no live domain automation
-- no service-role use
-- no Stream Bandit shell change
-- no index promotion
-- old Web Builder engine/helper behavior preserved
-
-Pages Manager saved data model:
+Key saved data model:
 
 - `settings_json.page_label`
 - `settings_json.page_icon`
@@ -367,20 +274,19 @@ Pages Manager saved data model:
 - `settings_json.page_indent`
 - `settings_json.sort_order`
 - `settings_json.page_type`
-- `settings_json.web_builder_seo.title`
-- `settings_json.web_builder_seo.description`
-- `settings_json.web_builder_seo.keywords`
-- `settings_json.web_builder_seo.socialTitle`
-- `settings_json.web_builder_seo.socialDescription`
-- `settings_json.web_builder_seo.socialImage`
-- `settings_json.web_builder_seo.canonicalUrl`
-- `settings_json.web_builder_seo.indexing`
-- `settings_json.web_builder_hosting.customDomain`
-- `settings_json.web_builder_hosting.subdomain`
-- `settings_json.web_builder_hosting.hostingStatus`
-- `settings_json.web_builder_hosting.sslStatus`
-- `settings_json.web_builder_hosting.deployTarget`
-- `settings_json.web_builder_hosting.notes`
+- `settings_json.web_builder_seo.*`
+- `settings_json.web_builder_hosting.*`
+
+Safety:
+
+- reads `sb_profiles` and `sb_site_pages`
+- writes only `sb_site_pages`
+- no new Supabase table
+- no schema change
+- no RLS change
+- no storage write
+- no DNS automation
+- no index promotion
 
 ## Header/Footer Builder status
 
@@ -390,7 +296,7 @@ Route:
 
 Current status:
 
-PASSED PREVIOUSLY BUT HARDER THAN READ-ONLY MAPS BECAUSE IT WRITES REAL HEADER/FOOTER SHELL DATA.
+PASSED PREVIOUSLY BUT MUST NOW BE CONSUMED BY FULL PREVIEW.
 
 Known save target:
 
@@ -404,64 +310,9 @@ Known behavior:
 
 Safety gate before touching:
 
-- Do not touch until Studio cleanup is either complete or explicitly skipped.
 - Do not alter Stream Bandit app header/footer shell.
 - Do not introduce custom code execution or unsafe script injection.
 - Keep custom code disabled unless a later protected owner-only gate is approved.
-
-## Studio cleanup next
-
-Route:
-
-`overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`
-
-Current role:
-
-The actual Web Builder Studio page.
-
-Next planned pass:
-
-Remove planning clutter from the Studio page and leave it focused on building.
-
-Must stay on Studio:
-
-- global Web Builder rail/search/hub/avatar
-- current page slug selector
-- desktop/tablet/mobile preview controls
-- actual builder engine/canvas
-- save and publish flow
-- draft preview
-- form route link
-- inbox bridge link/overlay
-- owner/workspace lock
-- compact debug/status
-
-Must not stay on Studio:
-
-- Theme / Brand / Font planning panels
-- Header/Footer Navigation planning panels
-- Feature Ownership plan
-- Builder-owned Systems Map
-- Future Supabase table plan
-- most “owns later / planned later / future” content
-
-Where removed planning belongs:
-
-`web-builder-route-map-v7-12-252-test.html`
-
-Tables needed for Studio cleanup:
-
-- `sb_profiles`
-- `sb_site_pages`
-
-Safety gate:
-
-- Keep existing builder engine behavior.
-- Keep save/publish behavior.
-- Keep owner/workspace locks.
-- Keep global rail/projector.
-- Do not change schema, RLS, storage, DNS, index or main Stream Bandit shell.
-- Do not touch Form Designer as part of Studio cleanup.
 
 ## Current safe build order
 
@@ -469,11 +320,12 @@ Safety gate:
 2. Planning Map: passed / read-only.
 3. Control Map: passed / read-only.
 4. Source Map: passed / read-only.
-5. Manifest: updated to V7.13.011.
-6. Studio cleanup: next.
-7. Header/Footer Builder: later, because it writes `settings_json.web_builder_shell`.
-8. Group pass: only after Studio and Header/Footer are both reviewed.
-9. Final index promotion: not approved.
+5. Studio cleanup: passed V7.13.015.
+6. Manifest: updated to V7.13.016.
+7. Full Preview compositor: next.
+8. Header/Footer Builder consumer check: part of Full Preview compositor.
+9. Group pass: only after Full Preview shows page body + page menu + header/footer shell.
+10. Final index promotion: not approved.
 
 ## Supabase table requirements by current page group
 
@@ -482,7 +334,7 @@ Read-only map group:
 - `sb_profiles`
 - `sb_site_pages`
 
-Studio / Pages / Menu / Header/Footer group:
+Studio / Pages / Menu / Header/Footer / Preview group:
 
 - `sb_profiles`
 - `sb_site_pages`
@@ -493,6 +345,13 @@ Form group:
 - `sb_site_pages`
 - `sb_form_submissions`
 - `sb_private_messages`
+
+Messages overlay group:
+
+- `sb_private_messages`
+- `sb_profiles`
+- `sb_user_friends`
+- `sb_user_blocks`
 
 Do not create future builder tables yet. Future table names remain planning only unless a separate migration is approved.
 
@@ -522,10 +381,12 @@ Future planning-only table names:
 
 ## Decision record
 
-Control Map and Source Map are now considered passed no-fix pages. Their very large debug outputs are acceptable because they are inspector/map pages.
+Control Map and Source Map are passed no-fix pages. Their very large debug outputs are acceptable because they are inspector/map pages.
 
 Planning Map is the permanent home for planning panels removed from Studio.
 
-Studio is the next real working-page cleanup target.
-
 Form Designer is protected after a difficult pass and should not be touched unless a real break appears.
+
+Studio has passed functional cleanup at V7.13.015.
+
+The next gap is not the builder canvas itself. The next gap is the full preview compositor: Studio/Preview must show one composed page result using saved page body, Page Menu Builder output and Header/Footer Builder output.
