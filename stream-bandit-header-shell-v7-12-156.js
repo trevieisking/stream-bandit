@@ -1,4 +1,4 @@
-/* Stream Bandit Header Shell V7.13.013
+/* Stream Bandit Header Shell V7.13.014
    Global header, menu overlay, current route markers, search bridge, saved count badges, social group routes and global account panel.
    Header Shell owns the site-wide account chip/avatar render and the left identity image decision.
    Profile Settings owns profile edits only and should trigger header refresh after saving sb_profiles.
@@ -13,7 +13,7 @@
 (function(){
 'use strict';
 
-const VERSION='V7.13.013 Header Shell / Profile Social Group Plug-in';
+const VERSION='V7.13.014 Header Shell / Account Settings Menu Cleanup';
 const THEME_OWNER='web-builder-theme-studio-controls-v7-8-9-test.html';
 const LOGO='stream_bandit_original_logo_square_256.png';
 const PROFILE='profile-settings-live-ready-v7-12-90-test.html';
@@ -59,8 +59,8 @@ const MENU=[
  ['Browse','🟢','Supabase Library Editor',ROUTES.supabaseLibrary,'Library editor'],['Browse','🏷️','Genres',ROUTES.genres,'Genres'],['Browse','🔎','Global Search',ROUTES.search,'Full search'],['Browse','ℹ️','About',ROUTES.about,'About'],
  ['Creator','⬆️','Submit Video',ROUTES.submit,'Submit'],['Creator','📜','Rules',ROUTES.rules,'Rules'],['Creator','🧾','Review Queue',ROUTES.review,'Review'],
  ['Group Play','📃','Playlists',ROUTES.playlists,'Playlists'],['Group Play','📺','Channels',ROUTES.channels,'Channels'],['Group Play','📡','My Channel',ROUTES.myChannel,'My Channel'],['Group Play','🧺','Collections',ROUTES.collections,'Collections'],['Group Play','▶️▶️','Player 2',ROUTES.player2,'Group player'],
- ['Social','👤','Social Profile',ROUTES.socialProfile,'Profile wall, account tools and family'],['Social','🤝','Friends',ROUTES.socialFriends,'Friends and family bridge'],['Social','📰','News Feed',ROUTES.socialFeed,'Posts, comments, likes and events'],['Social','👥','Groups',ROUTES.socialGroups,'Groups and events'],['Social','⚙️','Account Profile',ROUTES.accountProfile,'Account settings and profile tools'],
- ['Settings','⚙️','Settings Hub',ROUTES.settings,'Settings'],['Settings','🎨','Theme Studio',ROUTES.theme,'Theme owner'],['Settings','👤','Account Profile',ROUTES.profile,'Profile settings'],['Settings','🏗️','Web Builder',ROUTES.builder,'Builder'],
+ ['Social','👤','Social Profile',ROUTES.socialProfile,'Profile wall, account tools and family'],['Social','🤝','Friends',ROUTES.socialFriends,'Friends and family bridge'],['Social','📰','News Feed',ROUTES.socialFeed,'Posts, comments, likes and events'],['Social','👥','Groups',ROUTES.socialGroups,'Groups and events'],
+ ['Settings','⚙️','Settings Hub',ROUTES.settings,'Settings'],['Settings','🎨','Theme Studio',ROUTES.theme,'Theme owner'],['Settings','⚙️','Account Settings',ROUTES.profile,'Account settings'],['Settings','🏗️','Web Builder',ROUTES.builder,'Builder'],
  ['Policy','📚','Policy Documents',ROUTES.policyCentre,'Policy centre'],['Policy','📖','Policy Proof',ROUTES.policyReader,'Published policy'],['Policy','🧾','Policy Admin Editor',ROUTES.policyAdmin,'Policy admin'],
  ['Admin','🛠️','Admin Centre',ROUTES.admin,'Admin'],['Admin','🚦','Live Readiness',ROUTES.readiness,'Readiness'],['Admin','📋','Current Routes Registry',ROUTES.registry,'Registry'],['Admin','🧪','Test Checklist',ROUTES.checklist,'Testing'],['Admin','🧰','Tools',ROUTES.tools,'Tools'],['Admin','✅','Health Check',ROUTES.health,'Health'],['Admin','🎥','Mux Manager',ROUTES.mux,'Mux'],['Admin','🪣','Storage Prep',ROUTES.storage,'Storage'],['Admin','🛡️','Backup / Safety',ROUTES.backup,'Backup'],
  ['Owner','📬','Form Inbox',ROUTES.formInbox,'Form inbox'],['Owner','🧾','Advanced Form',ROUTES.formAdvanced,'Advanced form'],['Owner','🧠','One Machine',ROUTES.oneMachine,'Diagnostics'],['Owner','🎛️','Platform Control Centre',ROUTES.platformControl,'Controls'],['Owner','🧭','Final Shell Navigation',ROUTES.helperShell,'Helper shell'],['Owner','🗂️','Brand / App Icons',ROUTES.brandIcons,'Brand tools'],['Owner','🖼️','Brand Image Helper',ROUTES.brandHelper,'Brand helper'],['Owner','🦌','Favicon / App Icon Builder',ROUTES.faviconBuilder,'Icon builder'],['Owner','🧭','Pages Manager',ROUTES.pagesManager,'Pages'],['Owner','👁️','Published Preview',ROUTES.preview,'Preview'],
@@ -79,7 +79,7 @@ function load(src){
  try{
   if(Array.from(document.scripts||[]).some(x=>String(x.src||'').includes(src)))return;
   let s=document.createElement('script');
-  s.src=src+(src.includes('?')?'&':'?')+'v=7-13-013';
+  s.src=src+(src.includes('?')?'&':'?')+'v=7-13-014';
   s.defer=true;
   document.head.appendChild(s);
  }catch(e){}
@@ -512,7 +512,7 @@ function accountPanel(){
      '<button id="sbAccountRefresh" type="button">Refresh</button>'+
      '<button id="sbAccountSignOut" class="danger" type="button">Sign Out</button>'+
      '<a class="hot" href="'+esc(route(ROUTES.socialProfile))+'">Social Profile</a>'+
-     '<a href="'+esc(route(PROFILE))+'">Account Profile</a>'+
+     '<a href="'+esc(route(PROFILE))+'">Account Settings</a>'+
     '</div>'+
     '<div class="sb-account-note">Existing users only: sign-in links use shouldCreateUser false. The left identity image and account avatar are read from the signed-in user’s sb_profiles.avatar_url. Global branding is used when signed out or no profile avatar exists. Social Profile opens the passed Profile Social Media Group.</div>'+
    '</div>'+
@@ -906,7 +906,7 @@ function boot(){
  setInterval(updateCounts,5000);
  setInterval(()=>refreshAuth(false,false),60000);
 
- document.documentElement.dataset.sbHeaderShell='v7-13-013';
+ document.documentElement.dataset.sbHeaderShell='v7-13-014';
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
