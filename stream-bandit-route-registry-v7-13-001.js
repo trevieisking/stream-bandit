@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.022 Unified Route Registry Foundation / Group Play Plan Lock Alignment';
+  var VERSION = 'V7.13.023 Unified Route Registry Foundation / Canonical Old Route Aliases';
 
   var ROUTE_CLASSES = {
     PUBLIC: 'public',
@@ -64,6 +64,27 @@
     {label:'Web Builder Manifest',url:'WEB-BUILDER-MANIFEST-V7-12-252.md',group:'Manifest',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:[]}
   ];
 
+  var OLD_ALIASES = {
+    'collections-clean-machine-v7-12-48-test.html':'collections-clean-machine-v7-12-51-test.html',
+    'collections-clean-machine-v7-12-49-test.html':'collections-clean-machine-v7-12-51-test.html',
+    'collections-clean-machine-v7-12-50-test.html':'collections-clean-machine-v7-12-51-test.html',
+    'collections-global-helpers-v7-5-1-test.html':'collections-clean-machine-v7-12-51-test.html',
+    'collections-browse-shell-v6-46-1-test.html':'collections-clean-machine-v7-12-51-test.html',
+    'player-two-global-helpers-v7-3-4-test.html':'player-2-clean-machine-v7-12-58-test.html',
+    'player-2-clean-machine-v7-12-57-test.html':'player-2-clean-machine-v7-12-58-test.html',
+    'web-builder-live-studio-v7-12-116-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'web-builder-live-studio-v7-12-97-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'web-builder-live-studio-v7-12-93-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'web-builder-admin-shell-v6-57-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'web-builder-global-helpers-v7-9-3-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'user-dashboard-concept-v6-68-test.html':'user-management-dashboard-v7-11-2-test.html',
+    'plans-pricing-matrix-v6-69-test.html':'plans-pricing-feature-shop-v7-11-3-test.html',
+    'permissions-matrix-v6-70-test.html':'permissions-matrix-user-management-v7-11-4-test.html'
+  };
+
+  function fileOf(value){return String(value||'').split('/').pop().split('?')[0].split('#')[0] || 'index.html';}
+  function canonical(value){var f = fileOf(value); return OLD_ALIASES[f] || f;}
+
   var GROUPS = ROUTES.reduce(function(acc, route){
     if(!acc[route.group]) acc[route.group] = [];
     acc[route.group].push(route);
@@ -71,16 +92,17 @@
   }, {});
 
   var BY_URL = ROUTES.reduce(function(acc, route){
-    acc[String(route.url).split('?')[0]] = route;
+    acc[fileOf(route.url)] = route;
     acc[route.url] = route;
     return acc;
   }, {});
 
-  function normalizePath(path){
-    var clean = String(path || location.pathname || '').split('/').pop() || 'index.html';
-    if(clean.indexOf('?') !== -1) clean = clean.split('?')[0];
-    return clean;
-  }
+  Object.keys(OLD_ALIASES).forEach(function(oldPath){
+    var target = BY_URL[OLD_ALIASES[oldPath]];
+    if(target) BY_URL[oldPath] = target;
+  });
+
+  function normalizePath(path){return canonical(path || location.pathname || 'index.html');}
 
   function currentRoute(){
     var clean = normalizePath(location.pathname);
@@ -103,6 +125,9 @@
     routes: ROUTES,
     groups: GROUPS,
     byUrl: BY_URL,
+    oldAliases: OLD_ALIASES,
+    fileOf: fileOf,
+    canonical: canonical,
     normalizePath: normalizePath,
     currentRoute: currentRoute,
     isProtected: isProtected,
