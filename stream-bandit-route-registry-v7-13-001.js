@@ -1,10 +1,11 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.019 Unified Route Registry Foundation / Genres Public Browse Admin Managed Writes';
+  var VERSION = 'V7.13.020 Unified Route Registry Foundation / Account Optional Save Pages';
 
   var ROUTE_CLASSES = {
     PUBLIC: 'public',
+    ACCOUNT_OPTIONAL: 'account_optional',
     ACCOUNT_REQUIRED: 'account_required',
     CREATOR: 'creator_submit',
     ADMIN: 'admin_only',
@@ -27,11 +28,11 @@
     {label:'Details',url:'details-clean-machine-v7-12-38-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_movies'],write:[]},
     {label:'Player 1',url:'player-one-global-helpers-v7-3-3-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_movies'],write:[]},
     {label:'Player 2',url:'player-2-clean-machine-v7-12-58-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_movies'],write:[]},
-    {label:'Continue Watching',url:'continue-watching-global-helpers-v7-3-9-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_movies'],write:[]},
-    {label:'Watch History',url:'watch-history-global-helpers-v7-4-0-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_movies'],write:[]},
-    {label:'Watchlist',url:'watchlist-clean-machine-v7-12-43-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_movies','sb_watchlist'],write:['sb_watchlist']},
-    {label:'Favourites',url:'favourites-clean-machine-v7-12-41-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_movies','sb_favourites'],write:['sb_favourites']},
-    {label:'Likes',url:'likes-clean-machine-v7-12-42-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_movies','sb_likes'],write:['sb_likes']},
+    {label:'Continue Watching',url:'continue-watching-global-helpers-v7-3-9-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_OPTIONAL,read:['sb_movies'],write:[]},
+    {label:'Watch History',url:'watch-history-global-helpers-v7-4-0-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_OPTIONAL,read:['sb_movies'],write:[]},
+    {label:'Watchlist',url:'watchlist-clean-machine-v7-12-43-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_OPTIONAL,read:['sb_movies','sb_watchlist'],write:['sb_watchlist']},
+    {label:'Favourites',url:'favourites-clean-machine-v7-12-41-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_OPTIONAL,read:['sb_movies','sb_favourites'],write:['sb_favourites']},
+    {label:'Likes',url:'likes-clean-machine-v7-12-42-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_OPTIONAL,read:['sb_movies','sb_likes'],write:['sb_likes']},
     {label:'Accessibility',url:'accessibility-clean-machine-v7-12-44-test.html',group:'Watch',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_app_settings'],write:[]},
     {label:'Global Search',url:'global-search-global-helpers-v7-4-9-test.html',group:'Browse',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_movies','sb_channels','sb_playlists'],write:[]},
     {label:'About',url:'about-global-helpers-v7-4-7-test.html',group:'Browse',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:[],write:[]},
@@ -87,7 +88,7 @@
 
   function isProtected(route){
     if(!route) return false;
-    return route.routeClass !== ROUTE_CLASSES.PUBLIC;
+    return route.routeClass !== ROUTE_CLASSES.PUBLIC && route.routeClass !== ROUTE_CLASSES.ACCOUNT_OPTIONAL;
   }
 
   function isWebBuilder(route){
