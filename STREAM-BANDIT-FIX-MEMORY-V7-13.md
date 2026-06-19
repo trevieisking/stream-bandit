@@ -51,6 +51,7 @@ Keep old safe support routes until replaced safely.
 | Group Play locks | `stream-bandit-route-registry-v7-13-001.js` | Playlists, Channels and Collections aligned to `creator_plan` with minPlan metadata. |
 | Auth gate | `stream-bandit-auth-entry-gate-v7-13-001.js` | Gate now understands `account_optional`, `creator_plan`, plan rank and `permissions_json` feature checks. |
 | Access map | `stream-bandit-route-access-map-v7-12-271.js` | Old Web Builder live-studio URLs canonicalize to Web Builder Hub. |
+| Route registry aliases | `stream-bandit-route-registry-v7-13-001.js` | Registry now exposes `oldAliases`, `fileOf()`, `canonical()` and resolves old Collections, Player 2, Web Builder live-studio, dashboard, pricing and permissions URLs to current routes. |
 | Old studio scan | `CHECKPOINT-WEB-BUILDER-OLD-STUDIO-ROUTE-SCAN-V7-13-023.md` | Safe wrapper confirmed; source cleanup queued. |
 | Old studio reference scan | `CHECKPOINT-WEB-BUILDER-OLD-STUDIO-REFERENCE-SCAN-V7-13-024.md` | Old route references classified. |
 
@@ -118,14 +119,25 @@ These are not emergency runtime breaks because old wrappers/canonical maps exist
 
 ---
 
+## Current consistency state
+
+```text
+[x] Route access map old aliases updated.
+[x] Route registry old aliases updated.
+[x] Auth entry gate updated for account_optional and creator_plan.
+[ ] Web Builder support-page route strings cleaned where safe.
+[ ] Registry/protected helper rescan after route-string cleanup.
+```
+
+---
+
 ## Next working order
 
 ```text
-1. Check route registry/access-map consistency after latest updates.
-2. Scan Web Builder support pages that still point to old support routes.
-3. Patch only route strings where full-file preservation is safe.
-4. Re-scan registry/protected helpers.
-5. Do not touch SQL/RLS/storage/payment unless a scanned page proves it is required.
+1. Scan Web Builder support pages that still point to old support routes.
+2. Patch only route strings where full-file preservation is safe.
+3. Re-scan registry/protected helpers.
+4. Do not touch SQL/RLS/storage/payment unless a scanned page proves it is required.
 ```
 
 ---
