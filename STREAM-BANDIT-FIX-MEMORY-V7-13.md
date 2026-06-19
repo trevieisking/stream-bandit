@@ -57,6 +57,20 @@ Keep old safe support routes until replaced safely.
 
 ---
 
+## Connector status notes
+
+```text
+Supabase project visibility came back briefly: Stream Bandit / xzxqfrvqdgkzwujbkdbk / ACTIVE_HEALTHY.
+Supabase table inspection was blocked by safety checks.
+Supabase connector then disappeared again from the active api_tool namespace list.
+No SQL was run.
+No database rows were changed.
+No RLS, storage policy or payment changes were made.
+GitHub remains the active repair surface while Supabase is unavailable.
+```
+
+---
+
 ## Pages scanned and not rewritten
 
 These were scanned and did not need a full replacement:
@@ -73,6 +87,7 @@ web-builder-theme-studio-controls-v7-8-9-test.html
 settings-platform-control-hub-v7-12-85-test.html
 web-builder-preview-owned-v7-12-257-test.html
 web-builder-pages-manager-v7-12-111-test.html
+stream-bandit-shell-v6-24.js
 ```
 
 ---
@@ -88,6 +103,7 @@ These are not emergency runtime breaks because old wrappers/canonical maps exist
 | `web-builder-theme-studio-controls-v7-8-9-test.html` | `web-builder-live-studio-v7-12-116-test.html?page=test-page` | `web-builder-account-control-hub-v7-12-263-test.html` | Route-only link cleanup. |
 | `settings-platform-control-hub-v7-12-85-test.html` | `web-builder-live-studio-v7-12-116-test.html?page=test-page` | `web-builder-account-control-hub-v7-12-263-test.html` | Route-only link cleanup. |
 | `web-builder-pages-manager-v7-12-111-test.html` | old builder / old preview support routes | current owned Web Builder routes | Preserve support page; route-only cleanup later. |
+| `stream-bandit-shell-v6-24.js` | old support route aliases | current owned Web Builder routes | Full helper update attempted but blocked by safety checks because helper contains public Supabase config. |
 
 ---
 
@@ -137,7 +153,8 @@ These are not emergency runtime breaks because old wrappers/canonical maps exist
 1. Scan Web Builder support pages that still point to old support routes.
 2. Patch only route strings where full-file preservation is safe.
 3. Re-scan registry/protected helpers.
-4. Do not touch SQL/RLS/storage/payment unless a scanned page proves it is required.
+4. Keep checking for Supabase connector availability, but do not retry blocked calls repeatedly.
+5. Do not touch SQL/RLS/storage/payment unless a scanned page proves it is required and user approves it.
 ```
 
 ---
