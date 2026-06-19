@@ -1,15 +1,20 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.001 Shared Auth Entry Gate Foundation';
+  var VERSION = 'V7.13.025 Shared Auth Entry Gate / Account Optional + Creator Plan';
   var LOGIN_URL = 'profile-settings-live-ready-v7-12-90-test.html';
   var PROFILE_TABLE = 'sb_profiles';
   var SESSION_CACHE_KEY = 'sb_auth_gate_session_v7_13_001';
+  var PLAN_RANK = {free_viewer:0,viewer_plus:1,creator_starter:2,creator_growth:3,creator_pro:4,studio_business:5,platform_owner:6,enterprise:7};
 
   function $(sel, root){return (root || document).querySelector(sel);}
   function all(sel, root){return Array.prototype.slice.call((root || document).querySelectorAll(sel));}
   function now(){return new Date().toISOString();}
   function safeJSON(value, fallback){try{return JSON.parse(value);}catch(e){return fallback;}}
+  function planRank(key){return PLAN_RANK[String(key || 'free_viewer').toLowerCase()] || 0;}
+  function truthy(value){if(value === true || value === 1) return true;if(typeof value === 'string') return ['true','1','yes','on','enabled','allow','allowed'].indexOf(value.toLowerCase()) !== -1;return false;}
+  function readPermissions(profile){var v = profile && profile.permissions_json;if(v && typeof v === 'object') return v;if(typeof v === 'string' && v.trim()) return safeJSON(v, {});return {};}
+  function hasFeature(profile, feature){var perms = readPermissions(profile);if(!feature) return false;return truthy(perms[feature]) || truthy(perms['can_' + feature]) || truthy(perms[feature + '_enabled']) || truthy(perms[feature + '_access']);}
 
   function getClient(){
     if(window.sb && typeof window.sb.from === 'function') return window.sb;
@@ -75,11 +80,18 @@
     var isAdmin = isOwner || role === 'admin' || adminLevel === 'admin';
     var active = !accountStatus || accountStatus === 'active';
     if(!active) return {ok:false, reason:'Your account is not active.'};
-    if(routeClass === 'public') return {ok:true, reason:''};
+    if(routeClass === 'public' || routeClass === 'account_optional') return {ok:true, reason:''};
     if(routeClass === 'account_required') return {ok:true, reason:''};
     if(routeClass === 'creator_submit'){
       if(isAdmin || profile && profile.can_submit) return {ok:true, reason:''};
       return {ok:false, reason:'Creator submit access is not enabled on this account.'};
+    }
+    if(routeClass === 'creator_plan'){
+      if(isAdmin) return {ok:true, reason:''};
+      var minPlan = route.minPlan || 'creator_starter';
+      var feature = route.feature || '';
+      if(planRank(planKey) >= planRank(minPlan) || hasFeature(profile, feature)) return {ok:true, reason:''};
+      return {ok:false, reason:'This feature needs ' + minPlan + ' or an enabled ' + (feature || 'creator') + ' permission.'};
     }
     if(routeClass === 'admin_only'){
       if(isAdmin) return {ok:true, reason:''};
@@ -90,7 +102,7 @@
       return {ok:false, reason:'Owner access is required.'};
     }
     if(routeClass === 'web_builder' || routeClass === 'web_builder_owner'){
-      if(isOwner || isAdmin || planKey.indexOf('builder') !== -1 || planKey.indexOf('platform') !== -1) return {ok:true, reason:''};
+      if(isOwner || isAdmin || planRank(planKey) >= planRank(route.minPlan || 'creator_growth') || hasFeature(profile, route.feature || 'web_builder') || hasFeature(profile, 'web_builder') || planKey.indexOf('builder') !== -1 || planKey.indexOf('platform') !== -1) return {ok:true, reason:''};
       return {ok:false, reason:'Web Builder access is not enabled for this account.'};
     }
     return {ok:true, reason:''};
