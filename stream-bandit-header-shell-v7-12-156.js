@@ -1,5 +1,5 @@
-/* Stream Bandit Header Shell V7.12.297.1
-   Global header, menu overlay, current route markers, search bridge, saved count badges and global account panel.
+/* Stream Bandit Header Shell V7.13.013
+   Global header, menu overlay, current route markers, search bridge, saved count badges, social group routes and global account panel.
    Header Shell owns the site-wide account chip/avatar render and the left identity image decision.
    Profile Settings owns profile edits only and should trigger header refresh after saving sb_profiles.
    App/brand logo is separate from profile/account avatar:
@@ -7,15 +7,20 @@
    - signed in + no profile avatar = left identity image shows safe account fallback
    - signed out = left identity image is the global brand logo and IS data-sb-brand-logo
    Account panel supports existing-user-only magic-link sign-in and sign-out.
+   Social Profile routes are linked as a passed Profile Social Media Group.
    No public signup, no Auth Admin, no delete user actions.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.12.297.1 Header Shell / Profile Identity Image Owner';
+const VERSION='V7.13.013 Header Shell / Profile Social Group Plug-in';
 const THEME_OWNER='web-builder-theme-studio-controls-v7-8-9-test.html';
 const LOGO='stream_bandit_original_logo_square_256.png';
 const PROFILE='profile-settings-live-ready-v7-12-90-test.html';
+const SOCIAL_PROFILE='profile-social-v7-13-001-test.html';
+const SOCIAL_FRIENDS='friends-social-v7-13-001-test.html';
+const SOCIAL_FEED='news-feed-social-v7-13-003-test.html';
+const SOCIAL_GROUPS='groups-social-v7-13-001-test.html';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const PROFILE_CACHE_KEYS=['sb_header_profile_cache_v7_12_156','streamBanditProfile','sb_profile'];
@@ -31,7 +36,7 @@ const ROUTES={
  supabaseLibrary:'supabase-library-home-header-form-fix-v7-12-34-test.html',genres:'genres-clean-machine-v7-12-45-test.html',search:'global-search-global-helpers-v7-4-9-test.html',about:'about-global-helpers-v7-4-7-test.html',
  submit:'submit-video-clean-machine-v7-12-79-test.html',rules:'rules-clean-machine-v7-12-82-test.html',review:'review-queue-clean-machine-v7-12-80-publish-test.html',
  playlists:'playlists-global-helpers-v7-5-2-test.html',channels:'channels-global-helpers-v7-5-3-test.html',myChannel:'my-channel-clean-machine-v7-12-47-test.html',collections:'collections-clean-machine-v7-12-51-test.html',player2:'player-2-clean-machine-v7-12-58-test.html',
- settings:'settings-platform-control-hub-v7-12-85-test.html',theme:THEME_OWNER,profile:PROFILE,builder:'web-builder-account-control-hub-v7-12-263-test.html',
+ settings:'settings-platform-control-hub-v7-12-85-test.html',theme:THEME_OWNER,profile:PROFILE,accountProfile:PROFILE,socialProfile:SOCIAL_PROFILE,socialFriends:SOCIAL_FRIENDS,socialFeed:SOCIAL_FEED,socialGroups:SOCIAL_GROUPS,builder:'web-builder-account-control-hub-v7-12-263-test.html',
  policyCentre:'policy-documents-centre-v7-12-119-test.html',policyReader:'policy-reader-v7-12-119-test.html?policy=terms',policyAdmin:'policy-admin-documents-v7-12-120-test.html?policy=terms',
  admin:'admin-centre-command-deck-v7-12-121-test.html',readiness:'live-readiness-global-helpers-v7-10-2-test.html',registry:'all-pages-version-registry-v7-12-122-current-routes-test.html',checklist:'test-checklist-global-helpers-v7-10-5-test.html',tools:'tools-page-original-global-pass-v7-12-136-test.html',health:'health-check-global-helpers-v7-10-6-test.html',mux:'mux-manager-global-helpers-v7-10-7-test.html',storage:'storage-prep-global-helpers-v7-10-8-test.html',backup:'backup-safety-global-helpers-v7-10-9-test.html',
  formInbox:'web-builder-form-submissions-v7-12-94-test.html?page=test-page',formAdvanced:'web-builder-form-save-v7-12-94-test.html?page=test-page',oneMachine:'stream-bandit-one-machine-v7-12-73-test.html',platformControl:'settings-platform-control-hub-v7-12-85-test.html',helperShell:'stream-bandit-global-helper-shell-v7-12-126-test.html',brandIcons:'settings-brand-icons-promoted-v7-12-21-test.html',brandHelper:'brand-logo-helper-responsive-v7-12-20-test.html',faviconBuilder:'favicon-app-icon-builder-v7-12-15-test.html',pagesManager:'web-builder-pages-manager-v7-12-111-test.html',preview:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
@@ -45,7 +50,8 @@ const OLD={
  'web-builder-live-studio-v7-12-116-test.html':ROUTES.builder,'web-builder-live-studio-v7-12-97-test.html':ROUTES.builder,'web-builder-live-studio-v7-12-93-test.html':ROUTES.builder,'policy-agreements-centre-v7-11-6-test.html':ROUTES.policyCentre,'policy-reader-published-row-v7-12-27-test.html':ROUTES.policyReader,'policy-admin-save-editor-v7-12-25-test.html':ROUTES.policyAdmin,
  'stream-bandit-clean-machine-menu-v7-12-40-test.html':ROUTES.registry,'stream-bandit-route-pointer-machine-v7-12-36-test.html':ROUTES.registry,'platform-control-tower-route-guard-proof-v7-12-33-test.html':ROUTES.health,'final-shell-navigation-global-helpers-v7-5-9-test.html':ROUTES.helperShell,'stream-bandit-one-machine-v7-12-72-test.html':ROUTES.oneMachine,'platform-control-centre-admin-v7-12-59-test.html':ROUTES.platformControl,
  'brand-image-helper-v7-12-20-test.html':ROUTES.brandHelper,'brand-logo-helper-responsive-v7-12-20-test.html':ROUTES.brandHelper,'favicon-app-icon-builder-v7-12-15-test.html':ROUTES.faviconBuilder,
- 'user-dashboard-concept-v6-68-test.html':ROUTES.userDashboard,'plans-pricing-matrix-v6-69-test.html':ROUTES.pricing,'permissions-matrix-v6-70-test.html':ROUTES.permissions
+ 'user-dashboard-concept-v6-68-test.html':ROUTES.userDashboard,'plans-pricing-matrix-v6-69-test.html':ROUTES.pricing,'permissions-matrix-v6-70-test.html':ROUTES.permissions,
+ 'profile-social-v7-13-001-test.html':ROUTES.socialProfile,'friends-social-v7-13-001-test.html':ROUTES.socialFriends,'news-feed-social-v7-13-001-test.html':ROUTES.socialFeed,'news-feed-social-v7-13-002-test.html':ROUTES.socialFeed,'news-feed-social-v7-13-003-test.html':ROUTES.socialFeed,'groups-social-v7-13-001-test.html':ROUTES.socialGroups
 };
 
 const MENU=[
@@ -53,7 +59,8 @@ const MENU=[
  ['Browse','🟢','Supabase Library Editor',ROUTES.supabaseLibrary,'Library editor'],['Browse','🏷️','Genres',ROUTES.genres,'Genres'],['Browse','🔎','Global Search',ROUTES.search,'Full search'],['Browse','ℹ️','About',ROUTES.about,'About'],
  ['Creator','⬆️','Submit Video',ROUTES.submit,'Submit'],['Creator','📜','Rules',ROUTES.rules,'Rules'],['Creator','🧾','Review Queue',ROUTES.review,'Review'],
  ['Group Play','📃','Playlists',ROUTES.playlists,'Playlists'],['Group Play','📺','Channels',ROUTES.channels,'Channels'],['Group Play','📡','My Channel',ROUTES.myChannel,'My Channel'],['Group Play','🧺','Collections',ROUTES.collections,'Collections'],['Group Play','▶️▶️','Player 2',ROUTES.player2,'Group player'],
- ['Settings','⚙️','Settings Hub',ROUTES.settings,'Settings'],['Settings','🎨','Theme Studio',ROUTES.theme,'Theme owner'],['Settings','👤','Profile Settings',ROUTES.profile,'Profile'],['Settings','🏗️','Web Builder',ROUTES.builder,'Builder'],
+ ['Social','👤','Social Profile',ROUTES.socialProfile,'Profile wall, account tools and family'],['Social','🤝','Friends',ROUTES.socialFriends,'Friends and family bridge'],['Social','📰','News Feed',ROUTES.socialFeed,'Posts, comments, likes and events'],['Social','👥','Groups',ROUTES.socialGroups,'Groups and events'],['Social','⚙️','Account Profile',ROUTES.accountProfile,'Account settings and profile tools'],
+ ['Settings','⚙️','Settings Hub',ROUTES.settings,'Settings'],['Settings','🎨','Theme Studio',ROUTES.theme,'Theme owner'],['Settings','👤','Account Profile',ROUTES.profile,'Profile settings'],['Settings','🏗️','Web Builder',ROUTES.builder,'Builder'],
  ['Policy','📚','Policy Documents',ROUTES.policyCentre,'Policy centre'],['Policy','📖','Policy Proof',ROUTES.policyReader,'Published policy'],['Policy','🧾','Policy Admin Editor',ROUTES.policyAdmin,'Policy admin'],
  ['Admin','🛠️','Admin Centre',ROUTES.admin,'Admin'],['Admin','🚦','Live Readiness',ROUTES.readiness,'Readiness'],['Admin','📋','Current Routes Registry',ROUTES.registry,'Registry'],['Admin','🧪','Test Checklist',ROUTES.checklist,'Testing'],['Admin','🧰','Tools',ROUTES.tools,'Tools'],['Admin','✅','Health Check',ROUTES.health,'Health'],['Admin','🎥','Mux Manager',ROUTES.mux,'Mux'],['Admin','🪣','Storage Prep',ROUTES.storage,'Storage'],['Admin','🛡️','Backup / Safety',ROUTES.backup,'Backup'],
  ['Owner','📬','Form Inbox',ROUTES.formInbox,'Form inbox'],['Owner','🧾','Advanced Form',ROUTES.formAdvanced,'Advanced form'],['Owner','🧠','One Machine',ROUTES.oneMachine,'Diagnostics'],['Owner','🎛️','Platform Control Centre',ROUTES.platformControl,'Controls'],['Owner','🧭','Final Shell Navigation',ROUTES.helperShell,'Helper shell'],['Owner','🗂️','Brand / App Icons',ROUTES.brandIcons,'Brand tools'],['Owner','🖼️','Brand Image Helper',ROUTES.brandHelper,'Brand helper'],['Owner','🦌','Favicon / App Icon Builder',ROUTES.faviconBuilder,'Icon builder'],['Owner','🧭','Pages Manager',ROUTES.pagesManager,'Pages'],['Owner','👁️','Published Preview',ROUTES.preview,'Preview'],
@@ -72,7 +79,7 @@ function load(src){
  try{
   if(Array.from(document.scripts||[]).some(x=>String(x.src||'').includes(src)))return;
   let s=document.createElement('script');
-  s.src=src+(src.includes('?')?'&':'?')+'v=7-12-297-1';
+  s.src=src+(src.includes('?')?'&':'?')+'v=7-13-013';
   s.defer=true;
   document.head.appendChild(s);
  }catch(e){}
@@ -388,7 +395,8 @@ function header(){
   ['👍',ROUTES.likes,'Likes','likes'],
   ['▶️',ROUTES.player1,'Player 1'],
   ['♿',ROUTES.accessibility,'Accessibility'],
-  ['👤',ROUTES.profile,'Profile'],
+  ['👤',ROUTES.socialProfile,'Social Profile'],
+  ['📰',ROUTES.socialFeed,'News Feed'],
   ['⚙️',ROUTES.settings,'Settings'],
   ['🚦',ROUTES.readiness,'Readiness']
  ];
@@ -401,7 +409,7 @@ function header(){
    '<button id="sbHeaderAccountChip" class="sb-h-account" type="button">'+accountChipInner(p,!!authUser)+'</button>'+
   '</div>'+
   '<nav class="sb-h-icons">'+icons.map(x=>x[3]==='menu'?'<button id="sbHeaderMenuBtn" class="sb-h-menu" type="button" title="Open menu">☰</button>':'<a class="sb-h-ico '+(same(x[1],cur())?'current':'')+'" href="'+esc(route(x[1]))+'" title="'+esc(x[2])+'" '+(x[3]?'data-sb-count-link="'+esc(x[3])+'"':'')+'>'+x[0]+(x[3]?'<span class="sb-h-count" data-sb-count="'+esc(x[3])+'">0</span>':'')+'</a>').join('')+'</nav>'+
-  '<div class="sb-h-search-wrap"><div class="sb-h-search"><span>🔎</span><input id="sbHeaderSearchInput" placeholder="Search Stream Bandit"><button id="sbHeaderSearchBtn" class="sb-h-search-btn" type="button">Search</button></div><div id="sbSearchOverlay" class="sb-search-overlay"><div class="sb-search-top"><b>Search Stream Bandit</b><button id="sbSearchClose" class="sb-search-close" type="button">Close</button></div><div id="sbSearchResults"><div class="sb-note">Type to search movies, genres, channels, playlists, pages and policies.</div></div></div></div>'+
+  '<div class="sb-h-search-wrap"><div class="sb-h-search"><span>🔎</span><input id="sbHeaderSearchInput" placeholder="Search Stream Bandit"><button id="sbHeaderSearchBtn" class="sb-h-search-btn" type="button">Search</button></div><div id="sbSearchOverlay" class="sb-search-overlay"><div class="sb-search-top"><b>Search Stream Bandit</b><button id="sbSearchClose" class="sb-search-close" type="button">Close</button></div><div id="sbSearchResults"><div class="sb-note">Type to search movies, genres, channels, playlists, social pages and policies.</div></div></div></div>'+
  '</header>';
 }
 
@@ -475,7 +483,7 @@ function search(q,force){
  ov.classList.add('open');
  let n=q.toLowerCase();
  let rows=MENU.filter(r=>r[2].toLowerCase().includes(n)||r[0].toLowerCase().includes(n)||r[4].toLowerCase().includes(n));
- box.innerHTML=(rows.length?rows.slice(0,20).map(r=>'<a class="sb-result" href="'+esc(route(r[3]))+'"><b>'+esc(r[2])+'</b><small> '+esc(r[0])+' · '+esc(r[4])+'</small></a>').join(''):'<div class="sb-note">No page matches. Press Enter for full search.</div>')+'<div class="sb-note">Search covers movies, genres, channels, playlists, pages and policy agreements.</div>';
+ box.innerHTML=(rows.length?rows.slice(0,20).map(r=>'<a class="sb-result" href="'+esc(route(r[3]))+'"><b>'+esc(r[2])+'</b><small> '+esc(r[0])+' · '+esc(r[4])+'</small></a>').join(''):'<div class="sb-note">No page matches. Press Enter for full search.</div>')+'<div class="sb-note">Search covers movies, genres, channels, playlists, social pages and policy agreements.</div>';
  if(force&&window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.search){
   try{window.StreamBanditLiveReadinessSearchFallback.search(q,true);}catch(e){}
  }
@@ -503,9 +511,10 @@ function accountPanel(){
      '<button id="sbAccountSend" class="primary" type="button">Send Sign-in Link</button>'+
      '<button id="sbAccountRefresh" type="button">Refresh</button>'+
      '<button id="sbAccountSignOut" class="danger" type="button">Sign Out</button>'+
-     '<a class="hot" href="'+esc(route(PROFILE))+'">Profile Settings</a>'+
+     '<a class="hot" href="'+esc(route(ROUTES.socialProfile))+'">Social Profile</a>'+
+     '<a href="'+esc(route(PROFILE))+'">Account Profile</a>'+
     '</div>'+
-    '<div class="sb-account-note">Existing users only: sign-in links use shouldCreateUser false. The left identity image and account avatar are read from the signed-in user’s sb_profiles.avatar_url. Global branding is used when signed out or no profile avatar exists.</div>'+
+    '<div class="sb-account-note">Existing users only: sign-in links use shouldCreateUser false. The left identity image and account avatar are read from the signed-in user’s sb_profiles.avatar_url. Global branding is used when signed out or no profile avatar exists. Social Profile opens the passed Profile Social Media Group.</div>'+
    '</div>'+
   '</div>'+
  '</div>';
@@ -869,11 +878,14 @@ function boot(){
   openAccountPanel,
   closeAccountPanel,
   signOut,
-  state:()=>({
+  state:()=>( {
    version:VERSION,
    current:cur(),
    themeOwner:THEME_OWNER,
    profileRoute:PROFILE,
+   accountProfileRoute:PROFILE,
+   socialProfileRoute:SOCIAL_PROFILE,
+   socialGroupRoutes:{profile:SOCIAL_PROFILE,friends:SOCIAL_FRIENDS,feed:SOCIAL_FEED,groups:SOCIAL_GROUPS},
    identityImageElement:'sbHeaderBrandLogo',
    identityImageOwner:document.documentElement.dataset.sbHeaderIdentityImageOwner||'checking',
    brandLogoOwner:'Brand / App Icons when signed out or no profile avatar',
@@ -894,7 +906,7 @@ function boot(){
  setInterval(updateCounts,5000);
  setInterval(()=>refreshAuth(false,false),60000);
 
- document.documentElement.dataset.sbHeaderShell='v7-12-297-1';
+ document.documentElement.dataset.sbHeaderShell='v7-13-013';
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
