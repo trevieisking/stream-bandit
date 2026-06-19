@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.012
+# Stream Bandit Current App Manifest V7.13.013
 
 Date: 2026-06-19
 
@@ -6,13 +6,13 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.13.012 Profile Social Media Group Groups + Events Pass / Feed Fix Pending Test`
+`V7.13.013 Profile Social Media Group PASS / Header Overlay Plug-in Pending Test`
 
 ## Current index note
 
-The Profile Social Media Group is still a test/candidate group.
+The Profile Social Media Group has passed as a complete test/candidate group.
 
-Index promotion is not done yet. The owner has gated index promotion until the whole Profile Social Media Group is built and passed.
+Index promotion is still not done. Final `index.html` promotion remains owner-gated after the social routes are plugged into the global header/menu overlay and smoke-tested from the main app shell.
 
 Current Home route remains:
 
@@ -23,6 +23,10 @@ Current Home route remains:
 Group name for all future references:
 
 `Profile Social Media Group`
+
+Overall status:
+
+`PASSED AS COMPLETE SOCIAL GROUP`
 
 ### Main Social Profile
 
@@ -58,9 +62,13 @@ Route:
 
 Status:
 
-`FUNCTIONAL CANDIDATE`
+`PASSED AS SOCIAL GROUP CANDIDATE`
 
-Needs final group-link polish before whole-group promotion.
+Purpose:
+
+- simple user/friend bridge for the social profile group
+- links into profile/family/wall/feed/group flow
+- not intended to become a large external-style social network clone
 
 ### Groups + Events
 
@@ -101,24 +109,30 @@ Authenticated user required. No index promotion.
 
 Route:
 
-`news-feed-social-v7-13-001-test.html`
+`news-feed-social-v7-13-003-test.html`
 
 Status:
 
-`FIXED at V7.13.002 Profile Social Media Group Feed Collector Fix; pending owner retest`
+`PASSED at V7.13.007 Maestro Embed + Mux Support`
 
-Expected behavior to test:
+Passed behavior:
 
-- Reload Feed
-- Create Post overlay opens
-- Feed post publishes
-- optional image URL or file upload attaches to post
-- feed reads profile wall posts
-- feed reads group posts
-- feed reads events
+- hard refresh route
+- reload feed
+- create post overlay opens
+- text-only post publishes
+- image URL post publishes
+- direct image upload post publishes
+- profile wall post appears
+- group post appears
+- event appears
 - comment on feed post
 - like feed post
 - event RSVP from feed
+- edit own feed post
+- remove own feed post through `sb_social_remove_own_post`
+- Maestro embed / Maestro src video plays on feed
+- Mux/HLS/direct video support remains available for valid playable sources
 - Safe Checks pass
 
 Safety/read-write map:
@@ -130,6 +144,8 @@ Safety/read-write map:
 - reads `sb_social_post_reactions`
 - reads `sb_social_event_rsvps`
 - writes feed posts to `sb_social_posts`
+- edits own feed posts through `sb_social_update_own_post`
+- removes own feed posts through `sb_social_remove_own_post`
 - writes comments to `sb_social_post_comments`
 - writes reactions to `sb_social_post_reactions`
 - writes event RSVP to `sb_social_event_rsvps`
@@ -140,17 +156,34 @@ Authenticated user required. No index promotion.
 ## Current Profile Social Media Group routes
 
 - `profile-social-v7-13-001-test.html` — passed
-- `friends-social-v7-13-001-test.html` — candidate / final polish pending
+- `friends-social-v7-13-001-test.html` — passed as social group candidate
 - `groups-social-v7-13-001-test.html` — passed
-- `news-feed-social-v7-13-001-test.html` — fixed / pending retest
+- `news-feed-social-v7-13-003-test.html` — passed
+
+## Header/Menu Overlay Plug-in Plan
+
+The next safe integration target is the global header shell/menu overlay:
+
+`stream-bandit-header-shell-v7-12-156.js`
+
+Required plug-in behavior:
+
+- add Social Profile route to the global route map
+- add Friends route to the global route map
+- add News Feed route to the global route map
+- add Groups route to the global route map
+- add a Social group to the global menu overlay
+- keep old Account Profile route available as Account Profile / Profile Settings
+- point the visible profile/social route from the app shell toward `profile-social-v7-13-001-test.html`
+- do not change `index.html` yet
 
 ## Safety standard
 
-No page change should add schema, storage policy, payment provider, final live-home replacement, or production promotion without explicit approval.
+No page change should add schema, storage policy, payment provider, final live-home replacement, or production index promotion without explicit approval.
 
 ## Next plan target
 
-1. Retest fixed News Feed route.
-2. Final-polish Friends page links into the same group.
-3. Then update overlay/menu/registry for the complete group.
-4. Final `index.html` promotion remains owner-gated after the full Profile Social Media Group pass.
+1. Plug the passed Profile Social Media Group into the global header/menu overlay.
+2. Smoke-test from Home/header/menu/account chip.
+3. Then update any registry/route-map page if needed.
+4. Final `index.html` promotion remains owner-gated after the full shell plug-in pass.
