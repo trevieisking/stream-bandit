@@ -1,4 +1,4 @@
-/* Stream Bandit Header Shell V7.13.058
+/* Stream Bandit Header Shell V7.13.059
    Global header, menu overlay, current route markers, search bridge, saved count badges, social group routes and global account panel.
    Header Shell owns the site-wide account chip/avatar render and the left identity image decision.
    Profile Settings owns profile edits only and should trigger header refresh after saving sb_profiles.
@@ -9,12 +9,13 @@
    Account panel supports existing-user-only magic-link sign-in and sign-out.
    Social Profile routes are linked as a passed Profile Social Media Group.
    V7.13.058 keeps Owner group but removes Web Builder-owned Advanced Form, Pages Manager and Published Preview from normal Owner menu exposure. Form Inbox stays as the exception.
+   V7.13.059 fixes sign-in on pages where the header loaded before global Supabase config was ready.
    No public signup, no Auth Admin, no delete user actions.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.13.058 Header Shell / Owner Web Builder Menu Cleanup';
+const VERSION='V7.13.059 Header Shell / Dynamic Supabase Config Fix';
 const THEME_OWNER='web-builder-theme-studio-controls-v7-8-9-test.html';
 const LOGO='stream_bandit_original_logo_square_256.png';
 const PROFILE='profile-settings-live-ready-v7-12-90-test.html';
@@ -22,8 +23,7 @@ const SOCIAL_PROFILE='profile-social-v7-13-001-test.html';
 const SOCIAL_FRIENDS='friends-social-v7-13-001-test.html';
 const SOCIAL_FEED='news-feed-social-v7-13-001-test.html';
 const SOCIAL_GROUPS='groups-social-v7-13-001-test.html';
-const SUPABASE_URL=window.SUPABASE_URL||(window.StreamBanditSupabaseConfig&&window.StreamBanditSupabaseConfig.url)||'https://xzxqfrvqdgkzwujbkdbk.supabase.co';
-const SUPABASE_KEY=window.SUPABASE_KEY||(window.StreamBanditSupabaseConfig&&window.StreamBanditSupabaseConfig.key)||(window.StreamBanditShell&&window.StreamBanditShell.config&&window.StreamBanditShell.config().key)||'';
+const SUPABASE_URL_FALLBACK='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const PROFILE_CACHE_KEYS=['sb_header_profile_cache_v7_12_156','streamBanditProfile','sb_profile'];
 
 let sbClient=null;
@@ -75,19 +75,42 @@ function route(u){let r=OLD[file(u)]||String(u||'');return r.replace('page=test-
 function cur(){return file(location.pathname)||'index.html';}
 function same(a,b){return file(route(a))===file(route(b));}
 function short(s,n){s=String(s||'').trim();return s.length>n?s.slice(0,n-1).trim()+'…':s;}
+function wait(ms){return new Promise(res=>setTimeout(res,ms));}
+
+function currentSupabaseConfig(){
+ let shellCfg=null;
+ try{shellCfg=window.StreamBanditShell&&window.StreamBanditShell.config?window.StreamBanditShell.config():null;}catch(e){}
+ let cfg=window.StreamBanditSupabaseConfig||window.StreamBanditShellConfig||shellCfg||{};
+ return {
+  url:window.SUPABASE_URL||cfg.url||SUPABASE_URL_FALLBACK,
+  key:window.SUPABASE_KEY||cfg.key||cfg.anonKey||cfg.anon_key||''
+ };
+}
+
+async function ensureSupabaseConfig(){
+ let cfg=currentSupabaseConfig();
+ if(cfg.key)return cfg;
+ try{load('stream-bandit-shell-v6-24.js');}catch(e){}
+ for(let i=0;i<25;i++){
+  await wait(100);
+  cfg=currentSupabaseConfig();
+  if(cfg.key)return cfg;
+ }
+ return cfg;
+}
 
 function load(src){
  try{
   if(Array.from(document.scripts||[]).some(x=>String(x.src||'').includes(src)))return;
   let s=document.createElement('script');
-  s.src=src+(src.includes('?')?'&':'?')+'v=7-13-058';
+  s.src=src+(src.includes('?')?'&':'?')+'v=7-13-059';
   s.defer=true;
   document.head.appendChild(s);
  }catch(e){}
 }
 
 function helpers(){
- ['stream-bandit-theme-projector-v7-12-156.js','stream-bandit-settings-global-v7-1-8.js','stream-bandit-brand-logo-v7-12-12.js','stream-bandit-menu-saves-count-v6-72-1.js','stream-bandit-core-saves-v6-75.js','live-readiness-search-supabase-fallback-v7-12-130.js'].forEach(load);
+ ['stream-bandit-shell-v6-24.js','stream-bandit-theme-projector-v7-12-156.js','stream-bandit-settings-global-v7-1-8.js','stream-bandit-brand-logo-v7-12-12.js','stream-bandit-menu-saves-count-v6-72-1.js','stream-bandit-core-saves-v6-75.js','live-readiness-search-supabase-fallback-v7-12-130.js'].forEach(load);
 }
 
 async function loadSupabaseSdk(){
@@ -105,8 +128,9 @@ async function loadSupabaseSdk(){
 async function sb(){
  if(sbClient)return sbClient;
  await loadSupabaseSdk();
- if(!SUPABASE_KEY)throw new Error('Header Shell Supabase config not ready.');
- sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+ let cfg=await ensureSupabaseConfig();
+ if(!cfg.key)throw new Error('Header Shell Supabase config not ready.');
+ sbClient=window.supabase.createClient(cfg.url,cfg.key);
  return sbClient;
 }
 
@@ -908,7 +932,7 @@ function boot(){
  setInterval(updateCounts,5000);
  setInterval(()=>refreshAuth(false,false),60000);
 
- document.documentElement.dataset.sbHeaderShell='v7-13-058';
+ document.documentElement.dataset.sbHeaderShell='v7-13-059';
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
