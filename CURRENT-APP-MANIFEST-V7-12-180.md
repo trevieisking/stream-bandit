@@ -1,51 +1,60 @@
-# Stream Bandit Current App Manifest V7.13.018
+# Stream Bandit Current App Manifest V7.13.058
 
 Date: 2026-06-19
 
 Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages and One Machine reference this file.
 
+This existing manifest is also the scan-pass checkpoint for the final route/menu/ownership review. No new checkpoint file was created.
+
 ## Current strongest checkpoint
 
-`V7.13.018 Profile Social Media Group PASS / Platform Entry PASS / Registry PASS PROMOTED`
+`V7.13.058 Final Scan Pass / Header Owner Web Builder Menu Cleanup / Manifest Updated`
 
-## What is now promoted
+## Scan pass status
 
-### Platform entry
+`PASSED AS FINAL SCAN PASS WITH DEFERRED MANIFEST CLEANUP ITEMS LOGGED`
 
-Route:
+Confirmed boundaries:
 
-`index.html`
-
-Visible version:
-
-`V7.13.018 Platform Entry · Registry Promoted`
-
-Status:
-
-`PASSED AS PLATFORM ENTRY WITH SOCIAL GROUP AND REGISTRY PROMOTED`
-
-Confirmed behavior:
-
-- index is the platform entry route
-- Home remains the main app Home route, not replaced
-- platform entry links Social Profile, Friends, News Feed, Groups, Account Settings, Web Builder Hub and Current Routes Registry
-- platform entry now shows Registry V7.13.017 as passed
-- platform entry loads the global helper/header/footer/menu stack
-- no payment promotion
+- no new file created
+- no checkpoint file created
+- no SQL change
+- no RLS change
+- no storage policy change
+- no payment change
 - no production Home replacement
-- no schema/RLS/storage change
+- no player/audio/accessibility regression work
+- old useful hidden pages were not deleted
+- Web Builder-owned public aliases were moved to current owned Web Builder pages where appropriate
+- Form Inbox remains the temporary Owner exception and is queued for later Social placement
 
-### Main app Home
+## Changes made during this pass
 
-Route:
+### Main shell route cleanup
 
-`home-global-helpers-v7-4-4-test.html`
+File:
+
+`stream-bandit-shell-v6-24.js`
 
 Status:
 
-`STILL MAIN APP HOME`
+`UPDATED AND VERIFIED`
 
-### Passed global header shell JavaScript
+Effect:
+
+- app-facing old Web Builder support aliases now point to the current owned Web Builder pages
+- old Web Builder pages remain available as compatibility/support pages
+- no database or storage action was added
+
+Current Web Builder aliases:
+
+- Web Builder Hub: `web-builder-account-control-hub-v7-12-263-test.html`
+- Owned Pages Manager: `web-builder-pages-manager-owned-v7-12-256-test.html`
+- Owned Preview: `web-builder-preview-owned-v7-12-257-test.html?page=test-page`
+- Form Designer: `web-builder-form-designer-owned-v7-12-258-test.html?page=test-page`
+- Form Inbox: `web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page`
+
+### Header shell owner-menu cleanup
 
 File:
 
@@ -53,149 +62,143 @@ File:
 
 Visible shell version:
 
-`V7.13.014 Header Shell / Account Settings Menu Cleanup`
+`V7.13.058 Header Shell / Owner Web Builder Menu Cleanup`
 
 Status:
 
-`PASSED ON HOME AND PLATFORM ENTRY`
+`UPDATED AND VERIFIED`
 
-Passed shell behavior:
+Effect:
 
-- header shell loads on Home
-- header shell loads on platform entry
-- Social Profile route is available
-- Friends route is available
-- News Feed route is available
-- Groups route is available
-- Account Settings remains separate from Social Profile
-- duplicate Account Profile menu entry removed
-- old account/settings route remains available as Account Settings
+- Owner group was kept
+- Form Inbox was kept in Owner as the explicit exception
+- Advanced Form was removed from normal Owner menu exposure
+- Pages Manager was removed from normal Owner menu exposure
+- Published Preview was removed from normal Owner menu exposure
+- News Feed route was corrected to `news-feed-social-v7-13-001-test.html`
+- header shell reads Supabase config from the existing global shell/config path instead of carrying a visible inline key
 
-## Profile Social Media Group
+Owner menu now keeps:
 
-Group status:
+- Form Inbox
+- One Machine
+- Platform Control Centre
+- Final Shell Navigation
+- Brand / App Icons
+- Brand Image Helper
+- Favicon / App Icon Builder
 
-`PASSED AS COMPLETE SOCIAL GROUP`
+## Group scan results
 
-Routes:
+### Web Builder group
 
-- `profile-social-v7-13-001-test.html` — Social Profile, passed at V7.13.010
-- `friends-social-v7-13-001-test.html` — Friends bridge, passed candidate
-- `groups-social-v7-13-001-test.html` — Groups + Events, passed at V7.13.002
-- `news-feed-social-v7-13-003-test.html` — News Feed, passed at V7.13.007 Maestro Embed + Mux Support
+Status:
 
-Social Profile passed behavior:
+`CURRENT WEB BUILDER ROUTES VERIFIED / OLD SUPPORT ROUTES KEPT FOR COMPATIBILITY`
 
-- account profile text
-- avatar overlay
-- banner overlay
-- rich questions
-- privacy settings
-- family request / confirm / remove
-- wall post
-- wall comment
-- wall like
-- refresh persistence
-- safe checks
-- account request overlay opens only
+Current user-facing Web Builder ownership:
 
-Groups + Events passed behavior:
+- Web Builder Hub: `web-builder-account-control-hub-v7-12-263-test.html`
+- Owned Pages Manager: `web-builder-pages-manager-owned-v7-12-256-test.html`
+- Owned Preview: `web-builder-preview-owned-v7-12-257-test.html?page=test-page`
+- Form Designer: `web-builder-form-designer-owned-v7-12-258-test.html?page=test-page`
+- Form Inbox bridge: `web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page`
 
-- reload groups
-- create group
-- new group appears in My Groups
-- open selected group
-- publish group post
-- comment on group post
-- like group post
-- create event
-- RSVP Going / Interested
-- safe checks
+Deferred:
 
-News Feed passed behavior:
+- old Web Builder support pages can remain hidden/compatible
+- do not randomly delete useful hidden old pages
+- legacy `web-builder-form-submissions-v7-12-94-test.html?page=test-page` is queued for later Social inbox/message placement, not moved now
 
-- reload feed
-- create post overlay opens
-- text-only post publishes
-- image URL post publishes
-- direct image upload post publishes
-- profile wall post appears
-- group post appears
-- event appears
-- comment on feed post
-- like feed post
-- event RSVP from feed
-- edit own feed post
-- remove own feed post through `sb_social_remove_own_post`
-- Maestro embed / Maestro src video plays on feed
-- Mux/HLS/direct video support remains available for valid playable sources
-- safe checks
+### Admin group
 
-## Registry promoted checkpoint
+Status:
 
-Registry route:
+`SCAN PASSED / NO PATCH NEEDED`
 
-`all-pages-version-registry-v7-12-122-current-routes-test.html`
+Scanned Admin group pages:
 
-Installed registry version:
+- Admin Centre: `admin-centre-command-deck-v7-12-121-test.html`
+- Live Readiness: `live-readiness-global-helpers-v7-10-2-test.html`
+- Current Routes Registry: `all-pages-version-registry-v7-12-122-current-routes-test.html`
+- Test Checklist: `test-checklist-global-helpers-v7-10-5-test.html`
+- Tools: `tools-page-original-global-pass-v7-12-136-test.html`
+- Health Check: `health-check-global-helpers-v7-10-6-test.html`
+- Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html`
+- Storage Prep: `storage-prep-global-helpers-v7-10-8-test.html`
+- Backup / Safety: `backup-safety-global-helpers-v7-10-9-test.html`
 
-`V7.13.017 Registry Machine · Social Matrix + Supabase Proof · 16 Protected Checks`
+Admin notes:
 
-Browser report status:
+- Admin Centre is a command deck and route proof page, not a database writer
+- Live Readiness, Registry, Checklist, Tools, Health Check, Mux Manager and Backup/Safety remain read-only/proof/support pages
+- Storage Prep is scoped image-upload preparation only and must remain controlled
 
-`PASSED AND PROMOTED`
+### Social group
 
-Passed registry report numbers:
+Status:
 
-- registry entries: 72
-- unique URLs: 69
-- routes OK: 69 / 69
-- protected files OK: 16 / 16
-- social group matrix: true
-- main app rail pass: true
-- admin group rail: true
-- registry machine: true
-- protected checks configured: 16
-- protected checks expected: 16
+`SCAN PASSED / REAL SOCIAL PAGES PRESERVED`
 
-Registry V7.13.017 now recognises:
+Current Social group routes:
 
-- Platform route group
-- Social route group
-- Social Profile route
-- Friends route
-- News Feed route
-- Groups and Events route
-- Settings > Account Settings label
-- Social table parser coverage
-- Social proof table coverage
-- Optional/future social tokens as classified known tokens, not plain unknown schema warnings
+- Social Profile: `profile-social-v7-13-001-test.html`
+- Friends: `friends-social-v7-13-001-test.html`
+- News Feed: `news-feed-social-v7-13-001-test.html`
+- Groups and Events: `groups-social-v7-13-001-test.html`
 
-Active social proof tables now include:
+Social notes:
 
-- `sb_account_deletion_requests`
-- `sb_profile_social_settings`
-- `sb_social_events`
-- `sb_social_event_rsvps`
-- `sb_social_group_members`
-- `sb_social_groups`
-- `sb_social_post_comments`
-- `sb_social_post_reactions`
-- `sb_social_posts`
-- `sb_user_family_relationships`
+- Social Profile is a real account/social/profile write page and must not be blind-patched
+- Friends is present and is a real friends/messages/likes page
+- News Feed is a real post/comment/reaction/feed page and must not be blind-patched
+- Groups is a real groups/events/posts page and must not be blind-patched
 
-Known optional/future tokens are classified so they do not appear as plain unknown schema:
+### User Management group
 
-- `sb_social_notifications`
-- `sb_social_post_media`
-- `sb_user_blocks`
-- `sb_social_remove_own_post`
-- `sb_social_update_own_post`
-- Web Builder future `sb_builder_*` tokens
+Status:
+
+`SCAN PASSED / OWNER-ADMIN CONTROL GROUP PRESERVED`
+
+Current routes:
+
+- User Management Dashboard: `user-management-dashboard-v7-11-2-test.html`
+- Feature Shop / Pricing: `plans-pricing-feature-shop-v7-11-3-test.html`
+- Permissions Inspector: `permissions-matrix-user-management-v7-11-4-test.html`
+
+User Management notes:
+
+- User Management Dashboard is a real protected owner/admin control room
+- Feature Shop / Pricing is preview-only; no provider, billing, upgrades or entitlement writes
+- Permissions Inspector is read-only; no writes, no billing, no role changes
+
+### Owner group
+
+Status:
+
+`SCAN PASSED / OWNER ROUTES PRESERVED / WEB BUILDER MENU EXPOSURE REDUCED`
+
+Owner routes kept in Header menu:
+
+- Form Inbox: `web-builder-form-submissions-v7-12-94-test.html?page=test-page`
+- One Machine: `stream-bandit-one-machine-v7-12-73-test.html`
+- Platform Control Centre: `settings-platform-control-hub-v7-12-85-test.html`
+- Final Shell Navigation: `stream-bandit-global-helper-shell-v7-12-126-test.html`
+- Brand / App Icons: `settings-brand-icons-promoted-v7-12-21-test.html`
+- Brand Image Helper: `brand-logo-helper-responsive-v7-12-20-test.html`
+- Favicon / App Icon Builder: `favicon-app-icon-builder-v7-12-15-test.html`
+
+Owner notes:
+
+- One Machine is read-only route/security/ownership proof and may keep older route witnesses for diagnostics
+- Final Shell Navigation is read-only shell/navigation proof and may keep focused route witnesses
+- Brand / App Icons is a real owner/global-logo image upload and save page, so it stays preservation-first
+- Brand Image Helper is preview-only and writes off
+- Favicon / App Icon Builder is preview-only and writes off
 
 ## Current route groups by function
 
-Main app movie streaming:
+### Platform / core watch
 
 - Platform Entry: `index.html`
 - Home: `home-global-helpers-v7-4-4-test.html`
@@ -210,7 +213,7 @@ Main app movie streaming:
 - Likes: `likes-clean-machine-v7-12-42-test.html`
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html`
 
-Creator / library management:
+### Creator / library management
 
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html`
 - Rules: `rules-clean-machine-v7-12-82-test.html`
@@ -218,7 +221,7 @@ Creator / library management:
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html`
 - Genres: `genres-clean-machine-v7-12-45-test.html`
 
-Group Play:
+### Group Play
 
 - Playlists: `playlists-global-helpers-v7-5-2-test.html`
 - Channels: `channels-global-helpers-v7-5-3-test.html`
@@ -226,34 +229,28 @@ Group Play:
 - Collections: `collections-clean-machine-v7-12-51-test.html`
 - Player 2: `player-2-clean-machine-v7-12-58-test.html`
 
-Social Media Group:
+### Social Media Group
 
 - Social Profile: `profile-social-v7-13-001-test.html`
 - Friends: `friends-social-v7-13-001-test.html`
-- News Feed: `news-feed-social-v7-13-003-test.html`
+- News Feed: `news-feed-social-v7-13-001-test.html`
 - Groups and Events: `groups-social-v7-13-001-test.html`
 
-Account / settings:
+### Account / settings
 
 - Account Settings: `profile-settings-live-ready-v7-12-90-test.html`
 - Settings Hub: `settings-platform-control-hub-v7-12-85-test.html`
 - Theme Studio: `web-builder-theme-studio-controls-v7-8-9-test.html`
 
-Web Builder:
+### Web Builder
 
 - Web Builder Hub: `web-builder-account-control-hub-v7-12-263-test.html`
 - Owned Pages Manager: `web-builder-pages-manager-owned-v7-12-256-test.html`
-- Owned Preview: `web-builder-preview-owned-v7-12-257-test.html?page=landing`
-- Menu Builder: `web-builder-menu-builder-owned-v7-12-264-test.html`
-- Form Designer: `web-builder-form-designer-owned-v7-12-258-test.html?page=landing`
-- Form Inbox Bridge: `web-builder-form-inbox-owned-v7-12-258-test.html?page=landing`
-- Assets: `web-builder-assets-v7-12-252-test.html`
-- Route Map: `web-builder-route-map-v7-12-252-test.html`
-- Control Map: `web-builder-control-map-v7-12-253-test.html`
-- Source Map: `web-builder-pages-source-map-v7-12-255-test.html`
-- Header/Footer Code: `web-builder-header-footer-code-v7-12-254-test.html`
+- Owned Preview: `web-builder-preview-owned-v7-12-257-test.html?page=test-page`
+- Form Designer: `web-builder-form-designer-owned-v7-12-258-test.html?page=test-page`
+- Form Inbox Bridge: `web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page`
 
-Admin / proof:
+### Admin / proof
 
 - Admin Centre: `admin-centre-command-deck-v7-12-121-test.html`
 - Live Readiness: `live-readiness-global-helpers-v7-10-2-test.html`
@@ -265,10 +262,29 @@ Admin / proof:
 - Storage Prep: `storage-prep-global-helpers-v7-10-8-test.html`
 - Backup / Safety: `backup-safety-global-helpers-v7-10-9-test.html`
 
-## Safety standard
+### Owner / management
 
-No page change should add schema, storage policy, payment provider, production Home replacement, service-role key, or destructive cleanup without explicit approval.
+- Form Inbox: `web-builder-form-submissions-v7-12-94-test.html?page=test-page`
+- One Machine: `stream-bandit-one-machine-v7-12-73-test.html`
+- Platform Control Centre: `settings-platform-control-hub-v7-12-85-test.html`
+- Final Shell Navigation: `stream-bandit-global-helper-shell-v7-12-126-test.html`
+- Brand / App Icons: `settings-brand-icons-promoted-v7-12-21-test.html`
+- Brand Image Helper: `brand-logo-helper-responsive-v7-12-20-test.html`
+- Favicon / App Icon Builder: `favicon-app-icon-builder-v7-12-15-test.html`
 
-## Next safe plan target
+### User Management
 
-Use the promoted registry truth to choose the next focused batch. Do not start destructive cleanup. Do not replace Home. Do not promote payments. Keep Web Builder, Social Media Group, Account Settings, Main App Movie Streaming and Admin/Registry as separate functions.
+- User Management Dashboard: `user-management-dashboard-v7-11-2-test.html`
+- Feature Shop / Pricing: `plans-pricing-feature-shop-v7-11-3-test.html`
+- Permissions Inspector: `permissions-matrix-user-management-v7-11-4-test.html`
+
+## Deferred work, not for this pass
+
+- Move/correct Form Inbox into the Social group later.
+- Remove or update old Web Builder witness links inside Owner diagnostic pages only when owner diagnostics are intentionally cleaned.
+- Do not delete old useful pages just because they are old.
+- Do not touch SQL/RLS/storage/payment without a separate approved backend pass.
+
+## Final scan-pass decision
+
+`SCAN PASS COMPLETE. MANIFEST UPDATED. READY FOR NEXT CONTROLLED UPDATE PASS.`
