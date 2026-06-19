@@ -1,217 +1,180 @@
-# Stream Bandit Fix Memory V7.13
+# Stream Bandit Fix Memory V7.13.058
 
-Status: ACTIVE FIX LEDGER
+Status: ACTIVE FIX LEDGER / FINAL FULL-SCAN PASS RECORDED
 
-Purpose: one small memory file for the current cleanup-and-replace pass. This keeps the working state visible in GitHub so progress is not only remembered in chat.
+Date: 2026-06-19
 
-Governing documents:
+Purpose: compact working memory for the current cleanup-and-replace pass after the full beginning-to-end route/page scan. This keeps the current truth visible in GitHub so the project does not rely on chat memory.
+
+## Governing documents
 
 ```text
+CURRENT-APP-MANIFEST-V7-12-180.md
 STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md
 STREAM-BANDIT-PHASE-1-MASTER-AUDIT-SHEET-V7-13-019.md
+WEB-BUILDER-MANIFEST-V7-12-252.md
+STREAM-BANDIT-WHAT-CHANGED-V7-13-032.md
 stream-bandit-route-registry-v7-13-001.js
 stream-bandit-route-access-map-v7-12-271.js
 ```
 
-Working rule:
+## Current working rule
 
 ```text
 SCAN
 MAP
 LOCK
 PATCH ONLY WHAT FAILS
+HIDE OR CANONICALIZE OLD SUPPORT ROUTES
+DO NOT DELETE USEFUL OLD PAGES BLINDLY
 FULL-PAGE REPLACE ONLY WHEN PATCHING IS UNSAFE
 ```
 
----
-
-## Rules being followed
+## What the full scan taught us
 
 ```text
-No new throwaway page piles.
-Reuse safe old pages where possible.
-Never overwrite protected reference pages without full scan.
-No random SQL.
-No RLS/storage/payment/index/Home change unless explicitly approved.
-Keep Main App and Web Builder separate.
-Keep old safe support routes until replaced safely.
+Stream Bandit is not one flat pile of test pages anymore.
+It is a platform with route families.
+Most confusion came from old support routes still being visible, not from the current app being broken.
+Current owned Web Builder routes are now known.
+Owner should be lean and management/proof only.
+Social pages are real working pages and must not be blind-patched.
+User Management is a real protected owner/admin control group.
+Admin proof pages mostly do not need rewrites.
+Old useful pages should be kept as support/witness pages unless a controlled cleanup says otherwise.
 ```
 
----
-
-## Confirmed fixes already committed
-
-| Area | File | Result |
-|---|---|---|
-| Master plan | `STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md` | Governing plan saved. |
-| Phase 1 audit | `STREAM-BANDIT-PHASE-1-MASTER-AUDIT-SHEET-V7-13-019.md` | Foundation audit and conflict queue saved. |
-| Genres route lock | `stream-bandit-route-registry-v7-13-001.js` | Genres aligned as public browse with admin-managed writes. |
-| Save/history route locks | `stream-bandit-route-registry-v7-13-001.js` | Continue, History, Watchlist, Favourites and Likes aligned as `account_optional`. |
-| Rules route lock | `stream-bandit-route-registry-v7-13-001.js` | Creator Rules aligned as public read-only. |
-| Group Play locks | `stream-bandit-route-registry-v7-13-001.js` | Playlists, Channels and Collections aligned to `creator_plan` with minPlan metadata. |
-| Auth gate | `stream-bandit-auth-entry-gate-v7-13-001.js` | Gate now understands `account_optional`, `creator_plan`, plan rank and `permissions_json` feature checks. |
-| Access map | `stream-bandit-route-access-map-v7-12-271.js` | Old Web Builder live-studio URLs canonicalize to Web Builder Hub. |
-| Route registry aliases | `stream-bandit-route-registry-v7-13-001.js` | Registry now exposes `oldAliases`, `fileOf()`, `canonical()` and resolves old Collections, Player 2, Web Builder live-studio, dashboard, pricing and permissions URLs to current routes. |
-| Web Builder support queue | `CHECKPOINT-WEB-BUILDER-SUPPORT-ROUTE-CANONICAL-QUEUE-V7-13-026.md` | Old Web Builder support route cleanup is queued with canonical targets and safety rules. |
-| Old studio scan | `CHECKPOINT-WEB-BUILDER-OLD-STUDIO-ROUTE-SCAN-V7-13-023.md` | Safe wrapper confirmed; source cleanup queued. |
-| Old studio reference scan | `CHECKPOINT-WEB-BUILDER-OLD-STUDIO-REFERENCE-SCAN-V7-13-024.md` | Old route references classified. |
-
----
-
-## Connector status notes
+## Current final-scan route families
 
 ```text
-Supabase project visibility came back briefly: Stream Bandit / xzxqfrvqdgkzwujbkdbk / ACTIVE_HEALTHY.
-Supabase table inspection was blocked by safety checks.
-Supabase connector then disappeared again from the active api_tool namespace list.
-No SQL was run.
-No database rows were changed.
-No RLS, storage policy or payment changes were made.
-GitHub remains the active repair surface while Supabase is unavailable.
+Platform / Core Watch
+Creator / Library Management
+Group Play
+Social Media Group
+Account / Settings
+Web Builder
+Admin / Proof
+Owner / Management
+User Management
+Policy
 ```
 
----
+## Current Web Builder route map
 
-## Verified Web Builder target mapping
+These are the current user-facing Web Builder targets verified by source scan:
 
-These are the current targets verified by source scan.
+```text
+Web Builder Hub
+-> web-builder-account-control-hub-v7-12-263-test.html
 
-| Old/support route | Current target | Verified status |
-|---|---|---|
-| `web-builder-live-studio-v7-12-116-test.html?page=test-page` | `web-builder-account-control-hub-v7-12-263-test.html` | Web Builder Hub verified as current account control/workspace opener. |
-| `web-builder-pages-manager-v7-12-111-test.html` | `web-builder-pages-manager-owned-v7-12-256-test.html` | Owned Pages Manager verified as current guarded workspace manager. |
-| `web-builder-shared-style-preview-v7-12-117-test.html?page=test-page` | `web-builder-preview-owned-v7-12-257-test.html?page=test-page` | Owned Preview verified as current full compositor preview. |
-| `web-builder-form-save-v7-12-94-test.html?page=test-page` | `web-builder-form-designer-owned-v7-12-258-test.html?page=test-page` | Current target is a safe loader for the working Form Designer build. |
-| `web-builder-form-submissions-v7-12-94-test.html?page=test-page` | `web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page` | Current target is Web Builder Messages + Submissions V7.13.049. |
+Owned Pages Manager
+-> web-builder-pages-manager-owned-v7-12-256-test.html
+
+Owned Preview
+-> web-builder-preview-owned-v7-12-257-test.html?page=test-page
+
+Form Designer
+-> web-builder-form-designer-owned-v7-12-258-test.html?page=test-page
+
+Form Inbox Bridge
+-> web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page
+```
+
+Old Web Builder support routes may remain available for compatibility and diagnostics, but they should not be normal user/menu exposure when a current owned page exists.
+
+## Current Owner rule
+
+Owner is not a normal public-navigation group. It is management/proof/diagnostic.
+
+Header Owner menu should currently expose only:
+
+```text
+Form Inbox
+One Machine
+Platform Control Centre
+Final Shell Navigation
+Brand / App Icons
+Brand Image Helper
+Favicon / App Icon Builder
+```
 
 Notes:
 
 ```text
-The Form Designer target is a safe loader, not a normal full page.
-The Form Inbox target is current, but it still contains one old Full submissions manager link back to the older submissions page.
-Do not full-rewrite old form/save/inbox pages blindly because they preserve real Supabase form and private-message flows.
+Form Inbox is the temporary Owner exception and is queued for later Social placement.
+One Machine is read-only route/security/ownership proof.
+Final Shell Navigation is read-only shell/navigation proof.
+Brand / App Icons is a real owner/admin global-logo upload/save page and must be preservation-first.
+Brand Image Helper is preview-only and writes off.
+Favicon / App Icon Builder is preview-only and writes off.
 ```
 
----
-
-## Pages scanned and not rewritten
-
-These were scanned and did not need a full replacement:
+## Current User Management rule
 
 ```text
-watch-history-global-helpers-v7-4-0-test.html
-tools-page-original-global-pass-v7-12-136-test.html
-mux-manager-global-helpers-v7-10-7-test.html
-settings-brand-icons-promoted-v7-12-21-test.html
-brand-logo-helper-responsive-v7-12-20-test.html
-favicon-app-icon-builder-v7-12-15-test.html
-accessibility-clean-machine-v7-12-44-test.html
-web-builder-theme-studio-controls-v7-8-9-test.html
-settings-platform-control-hub-v7-12-85-test.html
-web-builder-preview-owned-v7-12-257-test.html
-web-builder-pages-manager-v7-12-111-test.html
-stream-bandit-shell-v6-24.js
-stream-bandit-global-helper-loader-v7-12-126.js
-web-builder-account-control-hub-v7-12-263-test.html
-web-builder-pages-manager-owned-v7-12-256-test.html
-web-builder-preview-owned-v7-12-257-test.html
-web-builder-form-designer-owned-v7-12-258-test.html
-web-builder-form-inbox-owned-v7-12-258-test.html
+User Management Dashboard = real protected owner/admin control room.
+Feature Shop / Pricing = preview-only, no provider, no billing, no upgrades, no entitlement writes.
+Permissions Inspector = read-only, no writes, no billing, no role changes.
 ```
 
----
-
-## Current queued route-only cleanup
-
-These are not emergency runtime breaks because old wrappers/canonical maps exist. They are still source cleanup targets.
-
-| File | Old target | Correct target | Patch type |
-|---|---|---|---|
-| `web-builder-form-save-v7-12-94-test.html` | old live studio / old inbox / old shared preview | current Hub / owned Form Inbox / owned Preview | Full-file preserve or line-safe update only. |
-| `web-builder-form-submissions-v7-12-94-test.html` | old live studio / old form / old shared preview | current Hub / owned Form Designer / owned Preview | Full-file preserve or line-safe update only. |
-| `web-builder-theme-studio-controls-v7-8-9-test.html` | old live studio / old Pages Manager / old shared preview | current Hub / owned Pages Manager / owned Preview | Route-only link cleanup. |
-| `settings-platform-control-hub-v7-12-85-test.html` | old live studio / old Pages Manager / old shared preview | current Hub / owned Pages Manager / owned Preview | Route-only link cleanup. |
-| `web-builder-form-inbox-owned-v7-12-258-test.html` | old Full submissions manager link | current owned Form Inbox or legacy manager decision required | Small route-only cleanup after confirming intended UX. |
-| `web-builder-pages-manager-v7-12-111-test.html` | old builder / old preview support routes | current owned Web Builder routes | Preserve support page; route-only cleanup later. |
-| `stream-bandit-shell-v6-24.js` | old support route aliases | current owned Web Builder routes | Full helper update attempted but blocked by safety checks because helper contains public Supabase config. |
-| `stream-bandit-global-helper-loader-v7-12-126.js` | old support route aliases | current owned Web Builder routes | Full helper update attempted but blocked by safety checks. |
-
----
-
-## Batch scan state
-
-### Batch 1
+## Current Social rule
 
 ```text
-[x] Watch History
-[x] Tools
-[x] Mux Manager
+Social Profile = real account/social/profile wall page.
+Friends = real friends/messages/likes page.
+News Feed = real post/comment/reaction/feed page.
+Groups and Events = real groups/events/posts page.
+Do not blind-patch these pages.
 ```
 
-### Batch 2
+## Current Admin rule
 
 ```text
-[x] Brand / App Icons
-[x] Brand Image Helper
-[x] Favicon / App Icon Builder
+Admin Centre = command deck / route proof.
+Live Readiness, Registry, Test Checklist, Tools, Health Check, Mux Manager, Backup/Safety = proof/support surfaces.
+Storage Prep = controlled image-upload prep surface.
+No broad Admin rewrite needed from this scan.
 ```
 
-### Batch 3
+## Confirmed changes made in this pass
 
 ```text
-[x] Accessibility global-effect scan
-[x] Theme Studio / Settings group scan
-[x] Published Preview scan
+CURRENT-APP-MANIFEST-V7-12-180.md updated to V7.13.058 and verified.
+stream-bandit-shell-v6-24.js app-facing Web Builder aliases updated to current owned routes.
+stream-bandit-header-shell-v7-12-156.js owner menu cleaned and versioned V7.13.058.
+STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md updated to V7.13.058.
 ```
 
-### Batch 4
+## Remaining docs being updated in this close-out
 
 ```text
-[x] Web Builder Hub target scan
-[x] Owned Pages Manager target scan
-[x] Owned Preview target scan
-[x] Owned Form Designer target scan
-[x] Owned Form Inbox target scan
-[x] Old support-route reference search
+STREAM-BANDIT-FIX-MEMORY-V7-13.md
+STREAM-BANDIT-WHAT-CHANGED-V7-13-032.md
+STREAM-BANDIT-PHASE-1-MASTER-AUDIT-SHEET-V7-13-019.md
+WEB-BUILDER-MANIFEST-V7-12-252.md
 ```
 
----
-
-## Current consistency state
+## Deferred work, not for this pass
 
 ```text
-[x] Route access map old aliases updated.
-[x] Route registry old aliases updated.
-[x] Auth entry gate updated for account_optional and creator_plan.
-[x] Web Builder current target mapping verified.
-[ ] Web Builder support-page route strings cleaned where safe.
-[ ] Registry/protected helper rescan after route-string cleanup.
+Move/correct Form Inbox into the Social group later.
+Clean old Web Builder witness links inside Owner diagnostic pages only if they cause real confusion later.
+Update route registry/access map only in a controlled code pass if the updated docs prove a stale user-facing route remains.
+Do not delete old useful pages just because they are old.
+Do not touch SQL/RLS/storage/payment without a separate approved backend pass.
 ```
-
----
-
-## Next working order
-
-```text
-1. Prefer exact small route-only edits for pages without unsafe full-page rewrite risk.
-2. Start with Settings Hub and Theme Studio top-rail route-only cleanup if full-file fetch/write is safe.
-3. Leave old form/save/inbox full pages alone unless a full preserve-safe replacement is prepared.
-4. Keep checking for Supabase connector availability, but do not retry blocked calls repeatedly.
-5. Do not touch SQL/RLS/storage/payment unless a scanned page proves it is required and user approves it.
-```
-
----
 
 ## Current safety state
 
 ```text
 Main App separate: yes
 Web Builder separate: yes
-Index unchanged: yes
-Home unchanged: yes
+Index remains Platform Entry: yes
+Home remains Main App Home: yes
 SQL added: no
 RLS changed: no
 Storage policy changed: no
 Payment activated: no
-Full page replacement triggered: no
+Player/audio/accessibility changed: no
+Useful old support pages deleted: no
 ```
