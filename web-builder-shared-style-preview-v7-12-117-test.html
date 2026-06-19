@@ -2,71 +2,125 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Published Preview V7.12.235</title>
-<link rel="icon" type="image/png" sizes="16x16" href="stream_bandit_stag_icon_16.png">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stream Bandit Published Preview V7.13.053 Safe Loader</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
-<meta name="theme-color" content="#050711">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--title:#fff;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),var(--bg);color:var(--title);font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}.wrap{max-width:1480px;margin:auto}.hero,.box,.card,.block{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0007;padding:15px;margin-bottom:13px}.card,.block{background:#ffffff0f;box-shadow:none}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;align-items:center;gap:6px}.badge{padding:5px 9px;font-size:11px}.pill{padding:4px 7px;font-size:10px;margin:2px}h1{font-size:clamp(34px,4.4vw,60px);line-height:.95;margin:8px 0;letter-spacing:-.055em}h2{margin:0 0 10px;font-size:22px}h3{margin:0 0 8px}.muted,p,small,li{color:var(--muted);line-height:1.48}.heroGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(260px,390px);gap:14px}.art{border:1px solid #ffffff1a;border-radius:24px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:210px;display:grid;place-items:center}.artIcon{font-size:62px}.actions,.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.btn,.tab{border:0;border-radius:999px;padding:9px 12px;background:#414667;color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}.primary,.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2));color:#fff}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.status,.note,.danger{padding:10px 12px;border-radius:16px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:10px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}.grid,.cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.fieldRow{display:grid;grid-template-columns:minmax(180px,1fr) auto auto auto;gap:8px;align-items:center}input,textarea{width:100%;border:1px solid #ffffff24;border-radius:16px;background:#0006;color:white;padding:10px 12px;font:inherit}textarea{min-height:80px}.imageBox{border:1px solid #ffffff22;border-radius:18px;background:#0004;overflow:hidden;min-height:160px;display:grid;place-items:center}.imageBox img{width:100%;height:auto;display:block}.blockHero{display:grid;grid-template-columns:minmax(240px,1fr) minmax(220px,420px);gap:14px;align-items:center}.blockHero .imageBox{min-height:220px}.video{aspect-ratio:16/9;border:1px solid #ffffff24;border-radius:18px;background:#000;display:grid;place-items:center;overflow:hidden}.video video{width:100%;height:100%}.stars{display:flex;gap:5px;align-items:center;margin:10px 0}.stars button{border:0;background:#ffffff12;color:#777;border-radius:12px;width:40px;height:38px;font-size:22px;cursor:pointer}.stars button.on,.stars button:hover{color:#ffcc38;background:#ffcc3822}.viewerBox{border:1px solid #22d3a644;border-radius:16px;background:#22d3a611;padding:12px;margin-top:10px}.src{white-space:pre-wrap;word-break:break-word;background:#0006;border-radius:14px;padding:12px;color:#dfffee;max-height:380px;overflow:auto;font-family:ui-monospace,Consolas,monospace;font-size:12px}.section{display:none}.section.active{display:block}.micro{text-align:center;color:#8f98b8;margin:18px 0;font-size:12px}code{color:#baf7df;overflow-wrap:anywhere}@media(max-width:980px){body{padding:10px}.heroGrid,.fieldRow,.blockHero{grid-template-columns:1fr}.btn,.tab{width:100%;white-space:normal}.art{min-height:170px}.grid,.cards{grid-template-columns:1fr}}
+:root{color-scheme:dark;--good:#22d3a6;--purple:#7c3cff;--warn:#ffb142;--bad:#ff5d6c;--bg:#050711;--text:#f7fbff;--muted:#aeb8d6;--line:#ffffff22}
+*{box-sizing:border-box}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;min-height:100vh;background:radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),linear-gradient(180deg,#070910,#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;padding:18px}.box{width:min(980px,100%);margin:10vh auto;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 22px 80px #0008;padding:22px}.badge{display:inline-flex;border:1px solid #22d3a660;border-radius:999px;background:#22d3a621;color:#baf7df;font-weight:950;padding:7px 10px}.warn{border-color:#ffb14266;background:#ffb14224;color:#ffe7ad}.bad{border-color:#ff5d6c66;background:#ff5d6c22;color:#ffd0d5}h1{font-size:clamp(36px,6vw,72px);line-height:.94;letter-spacing:-.055em;margin:10px 0}p{color:var(--muted);line-height:1.55;font-weight:750}.btn{display:inline-flex;border:0;border-radius:999px;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;text-decoration:none;font-weight:950;padding:11px 14px;margin:6px 6px 0 0}.ghost{background:#30384f;color:#fff}.out{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;border:1px solid #ffffff18;border-radius:16px;background:#0007;color:#dfffee;padding:12px;margin-top:12px;max-height:240px;overflow:auto}
 </style>
 </head>
-<body data-sb-preview-route="web-builder-shared-style-preview-v7-12-117-test.html">
-<div class="wrap">
-<section class="hero"><div class="heroGrid"><div><span class="badge">V7.12.235 Published Preview</span><h1>Published Preview</h1><p>Viewer-ready Web Builder page preview. Blocks render inline as the published page, with the current Header Shell and Footer Shell around the page content.</p><div class="fieldRow"><input id="slug" value="landing" aria-label="Page slug"><button id="load" class="btn primary" type="button">Load Page</button><a id="builderLink" class="btn hot" href="web-builder-live-studio-v7-12-116-test.html?page=landing">Builder</a><a id="formLink" class="btn cyan" href="web-builder-form-save-v7-12-94-test.html?page=landing">Advanced Form</a><a id="inboxLink" class="btn" href="web-builder-form-submissions-v7-12-94-test.html?page=landing">Form Inbox</a></div><div class="actions"><a class="btn" href="web-builder-theme-studio-controls-v7-8-9-test.html">Theme Studio</a><a class="btn" href="web-builder-pages-manager-v7-12-111-test.html">Pages Manager</a><a class="btn warn" href="settings-platform-control-hub-v7-12-85-test.html">Settings Hub</a></div><div id="status" class="status">Ready.</div><div id="helperStatus" class="note">Checking shell helpers...</div></div><div class="art"><div class="artIcon">🖥️🖼️</div></div></div></section>
-<section class="box"><div class="tabs"><button class="tab active" data-tab="preview" type="button">Preview</button><button class="tab" data-tab="debugTab" type="button">Debug</button></div></section>
-<section id="preview" class="section active"><main id="main" class="box"><p>Loading preview...</p></main></section>
-<section id="debugTab" class="box section"><h2>Debug</h2><div id="debug" class="src">Waiting...</div></section>
-<p class="micro">Published Preview V7.12.235 — current route preserved, full page preview renderer promoted.</p>
-</div>
-<script src="stream-bandit-shell-v6-24.js?v=preview-235"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=preview-235"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=preview-235"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=preview-235"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=preview-235"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=preview-235"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=preview-235"></script>
+<body data-wb-shell="legacy-preview-v7-13-053-safe-loader">
+<main class="box">
+  <span class="badge">Published Preview safe loader</span>
+  <h1>Opening Published Preview</h1>
+  <p>This loader preserves the working V7.12.235 Published Preview renderer, patches only old Web Builder route links, then re-runs the original scripts in order.</p>
+  <p>No SQL, RLS, storage policy, payment, index, Home, player engine or preview-render logic is changed by this loader.</p>
+  <div id="status" class="badge warn">Loading Published Preview safely...</div>
+  <div id="debug" class="out">Waiting for safe loader...</div>
+  <a class="btn ghost" href="web-builder-account-control-hub-v7-12-263-test.html">Back to Web Builder Hub</a>
+  <a class="btn ghost" href="web-builder-preview-owned-v7-12-257-test.html?page=landing">Open Owned Preview</a>
+</main>
 <script>
-(function(){'use strict';
-const VERSION='V7.12.235 Published Preview Full Page Renderer';
-const CURRENT_FILE='web-builder-shared-style-preview-v7-12-117-test.html';
-const BUILDER='web-builder-live-studio-v7-12-116-test.html';
-const FORM='web-builder-form-save-v7-12-94-test.html';
-const INBOX='web-builder-form-submissions-v7-12-94-test.html';
-let sb=null,page=null,blocks=[],rendered=0,lastError='',imageFieldsFound=0,posterFieldsFound=0;
-const $=id=>document.getElementById(id);
-function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-function sl(v){return String(v||'landing').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'landing';}
-function arr(v){if(Array.isArray(v))return v;if(typeof v==='string'&&v.trim()){try{const j=JSON.parse(v);if(Array.isArray(j))return j;}catch(e){}return v.split(/\n|,/).map(x=>x.trim()).filter(Boolean);}return[];}
-function obj(v){if(v&&typeof v==='object')return v;if(typeof v==='string'&&v.trim()){try{return JSON.parse(v)||{};}catch(e){}}return{};}
-function blockTitle(b,i){return b.title||b.heading||b.name||b.label||('Block '+(i+1));}
-function blockBody(b){return b.body||b.text||b.copy||b.content||b.description||'';}
-function mediaUrl(b){return b.imageUrl||b.image_url||b.thumbnailUrl||b.thumbnail_url||b.posterUrl||b.poster_url||b.coverUrl||b.cover_url||b.bannerUrl||b.banner_url||b.avatarUrl||b.avatar_url||b.image||b.poster||b.thumbnail||b.cover||'';}
-function posterUrl(b){return b.posterUrl||b.poster_url||b.thumbnailUrl||b.thumbnail_url||b.imageUrl||b.image_url||b.poster||b.thumbnail||b.image||'';}
-function videoUrl(b){return b.videoUrl||b.video_url||b.muxPlaybackUrl||b.mux_playback_url||b.hlsUrl||b.hls_url||b.url||b.src||'';}
-function blockButton(b){let txt=b.buttonText||b.button_text||'',url=b.buttonLink||b.button_link||'';if(!txt)return'';if(!url||url==='#')return'<span class="pill">'+esc(txt)+'</span>';return'<a class="btn primary" href="'+esc(url)+'">'+esc(txt)+'</a>';}
-function currentSlug(){return sl($('slug').value||'landing');}
-function setStatus(msg,bad){$('status').textContent=msg;$('status').className=bad?'danger':'status';}
-function updateLinks(){const s=encodeURIComponent(currentSlug());$('builderLink').href=BUILDER+'?page='+s;$('formLink').href=FORM+'?page='+s;$('inboxLink').href=INBOX+'?page='+s;}
-function config(){let c=window.StreamBanditSupabaseConfig||(window.StreamBanditShell&&window.StreamBanditShell.config&&window.StreamBanditShell.config());if(c&&c.url&&c.key)return c;throw new Error('Supabase config bridge not ready');}
-async function client(){if(sb)return sb;const c=config();sb=window.supabase.createClient(c.url,c.key);return sb;}
-function getBlocks(row){for(const c of [row.layout_json,row.blocks,row.content_json,row.page_json,row.sections]){let a=arr(c);if(a.length)return a;}return[];}
-function ratingKey(blockIndex,itemIndex){return 'sb_preview_rating_v7_12_235_'+currentSlug()+'_'+blockIndex+'_'+itemIndex;}
-function savedRating(blockIndex,itemIndex){try{return JSON.parse(localStorage.getItem(ratingKey(blockIndex,itemIndex))||'null');}catch(e){return null;}}
-function ratingControls(blockIndex,itemIndex){let saved=savedRating(blockIndex,itemIndex),val=Number(saved&&saved.rating)||0,comment=saved&&saved.comment||'',buttons=[1,2,3,4,5].map(n=>'<button type="button" data-rate="'+n+'" class="'+(n<=val?'on':'')+'">★</button>').join('');return '<div class="viewerBox" data-rating-box="1" data-block="'+blockIndex+'" data-item="'+itemIndex+'"><b>Rate this</b><div class="stars">'+buttons+'</div><textarea placeholder="Optional review note">'+esc(comment)+'</textarea><button class="btn hot" type="button" data-save-rating="1">Save rating</button><p class="note">'+(saved?'Your rating is saved on this device: '+val+' stars.':'Choose stars and save your rating.')+'</p></div>';}
-function cardList(items,blockIndex){items=arr(items);return '<div class="cards">'+items.map((x,i)=>{x=obj(x);let title=x.title||x.name||x.label||('Item '+(i+1)),desc=x.description||x.text||x.body||'',img=mediaUrl(x);if(img)imageFieldsFound++;return '<article class="card">'+(img?'<div class="imageBox"><img src="'+esc(img)+'" alt="'+esc(title)+'" loading="lazy"></div>':'')+'<h3>'+esc(title)+'</h3><p>'+esc(desc)+'</p>'+ratingControls(blockIndex,i)+'</article>';}).join('')+'</div>';}
-function renderVideo(b){let url=videoUrl(b),poster=posterUrl(b);if(poster)posterFieldsFound++;if(!url&&poster)return '<div class="imageBox"><img src="'+esc(poster)+'" alt="'+esc(blockTitle(b,0))+'" loading="lazy"></div>' ;if(!url)return '<div class="note">No video URL on this block.</div>';return '<div class="video"><video controls playsinline '+(poster?'poster="'+esc(poster)+'" ':'')+'src="'+esc(url)+'"></video></div><p><a class="btn" href="'+esc(url)+'" target="_blank" rel="noopener">Open video link</a></p>';}
-function renderHero(b,i){let img=mediaUrl(b),body=blockBody(b),btn=blockButton(b);if(img)imageFieldsFound++;return '<div class="blockHero"><div><p>'+esc(body||'')+'</p><div class="actions">'+btn+'</div></div><div class="imageBox">'+(img?'<img src="'+esc(img)+'" alt="'+esc(blockTitle(b,i))+'" loading="lazy">':'No hero image')+'</div></div>';}
-function renderBlock(b,i){b=obj(b);let type=String(b.type||b.kind||'text').toLowerCase(),title=blockTitle(b,i),body=blockBody(b),items=b.items||b.cards||b.list||b.links||[],img=mediaUrl(b),html='',btn=blockButton(b);if(type.includes('hero'))html=renderHero(b,i);else if(type.includes('video')||type.includes('hls')||type.includes('mux'))html=renderVideo(b);else if(type.includes('image')||img){if(img)imageFieldsFound++;html='<div class="imageBox">'+(img?'<img src="'+esc(img)+'" alt="'+esc(title)+'" loading="lazy">':'No image')+'</div><p>'+esc(body)+'</p><div class="actions">'+btn+'</div>';}else if(type.includes('card')||arr(items).length)html=cardList(items,i);else if(type.includes('form'))html='<p>'+esc(body||'This form block opens the passed Advanced Form route.')+'</p><a class="btn hot" href="'+FORM+'?page='+encodeURIComponent(currentSlug())+'">Open Advanced Form</a>';else html='<p>'+esc(body||'No text content on this block.')+'</p><div class="actions">'+btn+'</div>';return '<section class="block" data-block-index="'+i+'"><span class="pill">'+esc(type||'block')+'</span><h2>'+esc(title)+'</h2>'+html+'</section>';}
-function hydrateRatings(){document.querySelectorAll('[data-rating-box]').forEach(box=>{box.querySelectorAll('[data-rate]').forEach(btn=>btn.onclick=()=>{let n=parseInt(btn.dataset.rate,10)||0;box.dataset.currentRating=String(n);box.querySelectorAll('[data-rate]').forEach(b=>b.classList.toggle('on',(parseInt(b.dataset.rate,10)||0)<=n));});let save=box.querySelector('[data-save-rating]');if(save)save.onclick=()=>{let n=parseInt(box.dataset.currentRating||'0',10)||0;if(!n){let active=[...box.querySelectorAll('[data-rate].on')].pop();n=active?parseInt(active.dataset.rate,10):0;}let data={rating:n,comment:(box.querySelector('textarea')||{}).value||'',savedAt:new Date().toISOString(),publishedPreview:true};localStorage.setItem(ratingKey(box.dataset.block,box.dataset.item),JSON.stringify(data));let note=box.querySelector('.note');if(note)note.textContent='Thanks — rating saved on this device: '+n+' stars.';debug();};});}
-function debug(){let state={version:VERSION,currentFile:CURRENT_FILE,fullPagePreview:true,blockActionButtons:false,blockPreviewRouteUsed:false,imageFieldSupport:['imageUrl','image_url','posterUrl','poster_url','thumbnailUrl','thumbnail_url','coverUrl','cover_url','bannerUrl','banner_url','avatarUrl','avatar_url'],imageFieldsFound:imageFieldsFound,posterFieldsFound:posterFieldsFound,supabaseWrites:false,localRatingWrites:true,manualHeader:false,manualFooter:false,globalShell:true,helpers:{header:!!window.StreamBanditHeaderShell,footer:!!window.StreamBanditFooterShell,themeProjector:!!window.StreamBanditThemeProjector,menuCounts:!!window.StreamBanditMenuSavesCount,search:!!window.StreamBanditLiveReadinessSearchFallback},page:page?{slug:page.slug,title:page.title,status:page.status,page_type:page.page_type}:null,blocksLoaded:blocks.length,blocksRendered:rendered,lastError:lastError};$('debug').textContent=JSON.stringify(state,null,2);}
-function refreshHelpers(){try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();if(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.refresh)window.StreamBanditLiveReadinessSearchFallback.refresh();}catch(e){}$('helperStatus').innerHTML='<b>Helpers:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Counts '+(window.StreamBanditMenuSavesCount?'✅':'⚠️')+' · Search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Image fields ✅';debug();}
-async function loadPage(){try{lastError='';imageFieldsFound=0;posterFieldsFound=0;updateLinks();setStatus('Loading '+currentSlug()+' from sb_site_pages...');const c=await client();const r=await c.from('sb_site_pages').select('*').eq('slug',currentSlug()).maybeSingle();if(r.error)throw r.error;if(!r.data){page=null;blocks=[];rendered=0;$('main').innerHTML='<div class="note">No page found for slug <b>'+esc(currentSlug())+'</b>.</div>';setStatus('No page found for '+currentSlug(),true);debug();return;}page=r.data;blocks=getBlocks(page).filter(b=>obj(b).visible!==false);rendered=blocks.length;if(!blocks.length){$('main').innerHTML='<span class="badge">'+esc(page.status||'page')+'</span><h2>'+esc(page.title||page.slug||currentSlug())+'</h2><div class="note">Page loaded, but no visible layout_json blocks were found.</div>';}else{$('main').innerHTML='<span class="badge">'+esc(page.status||'page')+'</span><h2>'+esc(page.title||page.slug||currentSlug())+'</h2><p>'+esc(page.description||'Rendered from sb_site_pages.')+'</p>'+blocks.map(renderBlock).join('');}hydrateRatings();setStatus('Loaded '+currentSlug()+' as a full published preview.');debug();}catch(e){lastError=e.message||String(e);$('main').innerHTML='<div class="danger">Preview failed: '+esc(lastError)+'</div>';setStatus('Preview failed: '+lastError,true);debug();}}
-function wire(){document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$(btn.dataset.tab).classList.add('active');refreshHelpers();});$('load').onclick=loadPage;$('slug').addEventListener('input',updateLinks);}
-function boot(){try{let p=new URL(location.href).searchParams.get('page');if(p)$('slug').value=p;}catch(e){}wire();updateLinks();refreshHelpers();loadPage();setTimeout(refreshHelpers,700);setTimeout(refreshHelpers,1800);setInterval(refreshHelpers,6000);}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+(function(){
+'use strict';
+var PREVIOUS_COMMIT='95a83107505a932dff03e85f9fb4451c3093be36';
+var FILE='web-builder-shared-style-preview-v7-12-117-test.html';
+var RAW='https://raw.githubusercontent.com/trevieisking/stream-bandit/'+PREVIOUS_COMMIT+'/'+FILE;
+var VERSION='V7.13.053 Legacy Published Preview Route Canonical Safe Loader';
+var statusEl=document.getElementById('status');
+var debugEl=document.getElementById('debug');
+var replacements=[
+  ['web-builder-live-studio-v7-12-116-test.html','web-builder-account-control-hub-v7-12-263-test.html'],
+  ['web-builder-form-save-v7-12-94-test.html','web-builder-form-designer-owned-v7-12-258-test.html'],
+  ['web-builder-form-submissions-v7-12-94-test.html','web-builder-form-inbox-owned-v7-12-258-test.html'],
+  ['web-builder-pages-manager-v7-12-111-test.html','web-builder-pages-manager-owned-v7-12-256-test.html'],
+  ['Stream Bandit Published Preview V7.12.235','Stream Bandit Published Preview V7.13.053'],
+  ['V7.12.235 Published Preview','V7.13.053 Published Preview Route Canonical'],
+  ['V7.12.235 Published Preview Full Page Renderer','V7.13.053 Published Preview Route Canonical Renderer'],
+  ['Published Preview V7.12.235 — current route preserved, full page preview renderer promoted.','Published Preview V7.13.053 — canonical Web Builder routes, full page preview renderer preserved.'],
+  ['preview-235','preview-route-canonical-7-13-053'],
+  ['sb_preview_rating_v7_12_235_','sb_preview_rating_v7_13_053_']
+];
+function setStatus(text,cls){
+  if(statusEl){statusEl.textContent=text;statusEl.className='badge '+(cls||'warn');}
+  if(debugEl){
+    debugEl.textContent=text+'\n\nSource: '+RAW+'\nPatch: old Builder/Form/Inbox/Pages Manager routes -> current owned routes\nLoader: DOMParser + ordered script replay\nVersion: '+VERSION;
+  }
+}
+function copyAttrs(from,to){
+  for(var i=0;i<from.attributes.length;i++){
+    var a=from.attributes[i];
+    to.setAttribute(a.name,a.value);
+  }
+}
+function runScript(oldScript){
+  return new Promise(function(resolve,reject){
+    var s=document.createElement('script');
+    copyAttrs(oldScript,s);
+    s.async=false;
+    if(oldScript.src){
+      s.onload=function(){resolve();};
+      s.onerror=function(){reject(new Error('Script failed: '+oldScript.src));};
+      s.src=oldScript.src;
+      document.body.appendChild(s);
+      return;
+    }
+    s.text=oldScript.textContent||'';
+    document.body.appendChild(s);
+    resolve();
+  });
+}
+function replayScripts(scripts){
+  var chain=Promise.resolve();
+  scripts.forEach(function(script){
+    chain=chain.then(function(){return runScript(script);});
+  });
+  return chain;
+}
+function replaceAllText(haystack,needle,replacement){
+  return haystack.split(needle).join(replacement);
+}
+function openPatched(html){
+  if(!html||html.indexOf('V7.12.235 Published Preview Full Page Renderer')===-1){
+    throw new Error('Source did not match the expected V7.12.235 Published Preview build.');
+  }
+  var required=[
+    'web-builder-live-studio-v7-12-116-test.html',
+    'web-builder-form-save-v7-12-94-test.html',
+    'web-builder-form-submissions-v7-12-94-test.html',
+    'web-builder-pages-manager-v7-12-111-test.html'
+  ];
+  required.forEach(function(value){
+    if(html.indexOf(value)===-1)throw new Error('Expected old route was not found: '+value);
+  });
+  replacements.forEach(function(pair){
+    html=replaceAllText(html,pair[0],pair[1]);
+  });
+  var parsed=new DOMParser().parseFromString(html,'text/html');
+  var scripts=[].slice.call(parsed.querySelectorAll('script'));
+  scripts.forEach(function(s){s.parentNode.removeChild(s);});
+  document.head.innerHTML=parsed.head.innerHTML;
+  document.body.innerHTML=parsed.body.innerHTML;
+  document.body.setAttribute('data-preview-route-canonical-loader',VERSION);
+  window.SB_PREVIEW_ROUTE_CANONICAL_VERSION=VERSION;
+  return replayScripts(scripts).then(function(){
+    if(window.StreamBanditPublishedPreviewV712235&&!window.StreamBanditPublishedPreviewV713053){
+      window.StreamBanditPublishedPreviewV713053=window.StreamBanditPublishedPreviewV712235;
+    }
+    console.log(VERSION+' loaded');
+  });
+}
+setStatus('Fetching working Published Preview build...');
+fetch(RAW,{cache:'no-store'})
+  .then(function(r){if(!r.ok)throw new Error('Source fetch failed: '+r.status+' '+r.statusText);return r.text();})
+  .then(openPatched)
+  .then(function(){setTimeout(function(){var st=document.getElementById('status');if(st&&st.textContent.indexOf('Loading')!==-1){st.textContent='Published Preview loaded. If still loading, reload once.';}},2000);})
+  .catch(function(err){
+    setStatus('Published Preview safe loader failed','bad');
+    if(debugEl){debugEl.textContent=String(err&&err.message||err)+'\n\nSource: '+RAW+'\n\nNo database, schema, RLS, storage policy, payment, index or Home change was made.';}
+  });
 })();
 </script>
 </body>
