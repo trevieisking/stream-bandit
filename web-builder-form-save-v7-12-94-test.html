@@ -2,66 +2,124 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Advanced Form V7.12.213</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stream Bandit Advanced Form V7.13.051 Safe Loader</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff;--btnText:#fff;--fontScale:1}
-*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;padding:14px;background:radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 72%),transparent 34%),radial-gradient(circle at 92% 0,color-mix(in srgb,var(--accent2),transparent 66%),transparent 38%),radial-gradient(circle at bottom,color-mix(in srgb,var(--pink),transparent 84%),transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;font-size:calc(14px * var(--fontScale))}.wrap{max-width:1540px;margin:auto}.hero,.box,.q,.card{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 48px #0007;padding:16px;margin-bottom:14px}.card,.q{background:#ffffff0f;box-shadow:none}.badge,.pill{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950}.badge{padding:7px 12px}.pill{padding:5px 8px;font-size:12px;margin:2px}.warnPill{background:#ffb14222;border-color:#ffb14266;color:#ffe7ad}.badPill{background:#ff4d6d22;border-color:#ff4d6d66;color:#ffd8df}.infoPill{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}.okPill{background:#22d3a624;border-color:#22d3a657;color:#baf7df}h1{font-size:clamp(42px,6vw,80px);line-height:.94;margin:10px 0;letter-spacing:-.06em}h2,h3{margin:0 0 12px}.muted,p,label,small,li{color:var(--muted);line-height:1.55}.heroGrid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(300px,440px);gap:18px}.art{border:1px solid #ffffff1a;border-radius:30px;background:linear-gradient(135deg,#22d3a61f,#7c3cff2d);min-height:290px;display:grid;place-items:center}.artIcon{font-size:92px}.actions,.row{display:flex;gap:9px;flex-wrap:wrap}.btn,.locked{border:0;text-decoration:none;border-radius:999px;padding:11px 15px;background:#414667;color:#fff;font-weight:950;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.hot{background:linear-gradient(135deg,var(--pink),var(--accent2))}.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.badBtn{background:linear-gradient(135deg,var(--bad),var(--accent2))}.locked{opacity:.55;cursor:not-allowed}.status,.note,.danger,.good{padding:12px 14px;border-radius:18px;background:#22d3a61a;border:1px solid #22d3a647;color:#dfffee;font-weight:850;margin-top:14px}.note{background:#ffb1421f;border-color:#ffb14252;color:#ffe7ad}.danger{background:#ff4d6d1f;border-color:#ff4d6d52;color:#ffd2d9}.good{background:#22d3a61f}.grid,.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.card b{display:block;color:#baf7df;margin-bottom:8px}.card p.big{font-size:30px;font-weight:950;color:#fff;margin:0}.field input,.field textarea,.field select,input,textarea,select{width:100%;border:1px solid #ffffff24;border-radius:14px;background:#0006;color:#fff;padding:12px;font:inherit}.field textarea,textarea{min-height:120px;resize:vertical}.field{display:grid;gap:7px;margin:10px 0}.choice{display:block;background:#ffffff10;border:1px solid #ffffff14;border-radius:14px;padding:10px;margin:8px 0}.choice input{width:auto;margin-right:8px}.formShell{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:14px}.q b{display:block;color:#baf7df;font-size:18px;margin-bottom:4px}.out,.source{white-space:pre-wrap;background:#0006;border-radius:16px;padding:14px;color:#dfffee;overflow-wrap:anywhere;max-height:520px;overflow:auto;font-family:ui-monospace,Consolas,monospace}.preview{border:1px solid #ffffff1a;border-radius:18px;background:#0005;padding:12px;margin-top:8px}.micro{text-align:center;color:#8f98b8;margin:28px 0}.toast{position:fixed;right:18px;bottom:18px;background:#12172a;color:#fff;border:1px solid #ffffff35;border-radius:16px;padding:13px 16px;box-shadow:0 16px 44px #0009;font-weight:900;z-index:100001}@media(max-width:980px){body{padding:10px}.heroGrid,.formShell{grid-template-columns:1fr}.btn,.locked,.pill{width:100%;white-space:normal}}
+:root{color-scheme:dark;--good:#22d3a6;--purple:#7c3cff;--warn:#ffb142;--bad:#ff5d6c;--bg:#050711;--text:#f7fbff;--muted:#aeb8d6;--line:#ffffff22}
+*{box-sizing:border-box}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;min-height:100vh;background:radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),linear-gradient(180deg,#070910,#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;padding:18px}.box{width:min(980px,100%);margin:10vh auto;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 22px 80px #0008;padding:22px}.badge{display:inline-flex;border:1px solid #22d3a660;border-radius:999px;background:#22d3a621;color:#baf7df;font-weight:950;padding:7px 10px}.warn{border-color:#ffb14266;background:#ffb14224;color:#ffe7ad}.bad{border-color:#ff5d6c66;background:#ff5d6c22;color:#ffd0d5}h1{font-size:clamp(36px,6vw,72px);line-height:.94;letter-spacing:-.055em;margin:10px 0}p{color:var(--muted);line-height:1.55;font-weight:750}.btn{display:inline-flex;border:0;border-radius:999px;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;text-decoration:none;font-weight:950;padding:11px 14px;margin:6px 6px 0 0}.ghost{background:#30384f;color:#fff}.out{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;border:1px solid #ffffff18;border-radius:16px;background:#0007;color:#dfffee;padding:12px;margin-top:12px;max-height:240px;overflow:auto}
 </style>
 </head>
-<body data-sb-advanced-form-url="web-builder-form-save-v7-12-94-test.html">
-<div class="wrap">
-<section class="hero"><div class="heroGrid"><div><span class="badge">V7.12.213 Advanced Form</span><h1 id="pageTitle">🧾 Builder Form</h1><p id="pageIntro">Loads the current Web Builder form block from <b>sb_site_pages</b> and saves one complete row to <b>sb_form_submissions</b> for the Form Inbox.</p><div class="row"><input id="slug" placeholder="page slug" style="max-width:360px"><button id="load" class="btn hot" type="button">Load Form</button><a id="builderLink" class="btn primary" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Open Builder</a><a id="subsLink" class="btn warn" href="web-builder-form-submissions-v7-12-94-test.html?page=test-page">View Inbox</a><a id="previewLink" class="btn cyan" href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Published Preview</a></div><div id="helperStatus" class="status">Checking helpers...</div><div id="status" class="note">Ready. Load a page slug to render its form.</div><div class="note">Current Storage bucket is image-only. Image/file answer uploads are kept, but non-image files are blocked until a separate file bucket exists.</div></div><div class="art"><div class="artIcon">🧾📬</div></div></div></section>
-<section class="box"><div class="stats" id="stats"><div class="card"><b>Page</b><p class="big">--</p></div><div class="card"><b>Questions</b><p class="big">0</p></div><div class="card"><b>Signed in</b><p class="big">--</p></div><div class="card"><b>Last submit</b><p class="big">--</p></div></div></section>
-<section class="box"><h2>Form</h2><div class="formShell"><aside><div class="card"><b>Pipeline</b><p>1. Load form block from page.</p><p>2. Fill answers.</p><p>3. Upload image answers if needed.</p><p>4. Save one row to Form Inbox.</p></div><div class="card"><b>Links</b><p><a id="sideInbox" class="btn primary" href="web-builder-form-submissions-v7-12-94-test.html?page=test-page">Open Inbox</a></p><p><a id="sideBuilder" class="btn" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Open Builder</a></p></div></aside><main id="formBox"><p>No form loaded yet.</p></main></div></section>
-<section class="box"><h2>Submission Result</h2><div id="answers" class="out">Fill the form and click Submit Form.</div></section>
-<section class="box"><h2>Safe behaviour</h2><div class="grid"><div class="card"><b>Can do</b><p>Load builder form blocks, submit answers, upload image answers, save submissions.</p></div><div class="card"><b>Feeds</b><p>Form Inbox reads these rows from sb_form_submissions.</p></div><div class="card"><b>Does not do</b><p>No schema changes, no inbox message edits, no account/admin changes.</p></div><div class="card"><b>Later</b><p>A separate file bucket can be planned for PDF/DOC uploads if needed.</p></div></div></section>
-<section class="box"><h2>Debug</h2><div id="debug" class="source">Waiting...</div></section>
-<p class="micro">V7.12.213 Advanced Form — current shell helpers, real submission pipeline preserved.</p>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="stream-bandit-shell-v6-24.js?v=advanced-form-7-12-213"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=advanced-form-7-12-213"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=advanced-form-7-12-213"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=advanced-form-7-12-213"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=advanced-form-7-12-213"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=advanced-form-7-12-213"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=advanced-form-7-12-213"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=advanced-form-7-12-213"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=advanced-form-7-12-213"></script>
+<body data-wb-shell="advanced-form-v7-13-051-safe-loader">
+<main class="box">
+  <span class="badge">Advanced Form safe loader</span>
+  <h1>Opening Advanced Form</h1>
+  <p>This loader preserves the working V7.12.213 Advanced Form submission page, patches only old Web Builder route links, then re-runs the original scripts in order.</p>
+  <p>No SQL, RLS, storage policy, payment, index, Home, player engine or form-submission logic is changed by this loader.</p>
+  <div id="status" class="badge warn">Loading Advanced Form safely...</div>
+  <div id="debug" class="out">Waiting for safe loader...</div>
+  <a class="btn ghost" href="web-builder-account-control-hub-v7-12-263-test.html">Back to Web Builder Hub</a>
+  <a class="btn ghost" href="web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page">Back to Form Inbox</a>
+</main>
 <script>
 (function(){
 'use strict';
-const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
-const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
-const BUCKET='stream-bandit-images';
-let sb=null,page=null,formBlock=null,user=null,profile=null,lastSubmit=null;
-const $=id=>document.getElementById(id);
-const R={version:'V7.12.213 Advanced Form',loadsSitePages:true,writesSubmissions:false,uploadsImages:false,nonImageFilesBlocked:true,schemaChanges:false,accountActions:false,storagePolicyEdits:false,last:null};
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]||m))}
-function slug(v){return String(v||'test-page').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'test-page'}
-function key(v){return slug(v||'form')}
-function options(q){return String(q.options||'').split(/\n|,/).map(x=>x.trim()).filter(Boolean)}
-function toast(m){let t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2400)}
-function setStatus(t,bad){$('status').textContent=t;$('status').className=bad?'danger':'note'}
-function dbg(step,obj){R.last={step,at:new Date().toISOString(),data:obj||null};$('debug').textContent=JSON.stringify(Object.assign({},R,{signedIn:!!user,user:user?{id:user.id,email:user.email}:null,profile:profile?{id:profile.id,role:profile.role,display_name:profile.display_name}:null,page:page?{id:page.id,slug:page.slug,title:page.title,status:page.status}:null,formBlock:formBlock?{id:formBlock.id,title:formBlock.title,type:formBlock.type,items:(formBlock.items||[]).length}:null,lastSubmit}),null,2)}
-function client(){if(sb)return sb;sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return sb}
-async function refreshAuth(){try{let c=client();let u=await c.auth.getUser();user=u.data&&u.data.user||null;profile=null;if(user){let p=await c.from('sb_profiles').select('*').eq('id',user.id).maybeSingle();profile=p.data||null}}catch(e){user=null;profile=null}stats();dbg('auth refreshed')}
-function stats(){let q=formBlock&&Array.isArray(formBlock.items)?formBlock.items.length:0;$('stats').innerHTML='<div class="card"><b>Page</b><p class="big">'+esc(page&&page.slug?page.slug:'--')+'</p></div><div class="card"><b>Questions</b><p class="big">'+q+'</p></div><div class="card"><b>Signed in</b><p class="big">'+(user?'Yes':'No')+'</p></div><div class="card"><b>Last submit</b><p class="big">'+(lastSubmit?'Saved':'--')+'</p></div>'}
-function updateLinks(){let s=slug($('slug').value||new URL(location.href).searchParams.get('page')||'test-page');$('slug').value=s;let builder='web-builder-live-studio-v7-12-116-test.html?page='+encodeURIComponent(s),inbox='web-builder-form-submissions-v7-12-94-test.html?page='+encodeURIComponent(s),preview='web-builder-shared-style-preview-v7-12-117-test.html?page='+encodeURIComponent(s);$('builderLink').href=builder;$('sideBuilder').href=builder;$('subsLink').href=inbox;$('sideInbox').href=inbox;$('previewLink').href=preview}
-function parseLayout(v){if(Array.isArray(v))return v;if(typeof v==='string'){try{return JSON.parse(v)}catch(e){return[]}}return[]}
-async function loadForm(){try{await refreshAuth();updateLinks();let s=slug($('slug').value);let c=client();let r=await c.from('sb_site_pages').select('*').eq('slug',s).maybeSingle();if(r.error)throw r.error;if(!r.data)throw new Error('No sb_site_pages row found for '+s);page=r.data;let blocks=parseLayout(page.layout_json);formBlock=blocks.find(b=>String(b.type||'').toLowerCase().includes('form'))||null;if(!formBlock){$('formBox').innerHTML='<div class="note">No form block found on this page.</div>';setStatus('Page loaded, but no form block exists.',true);stats();dbg('no form block',{blocks:blocks.length});return}renderForm();setStatus('Loaded form from '+page.slug+'.');stats();dbg('form loaded',{page_slug:page.slug,form_title:formBlock.title,questions:(formBlock.items||[]).length})}catch(e){page=null;formBlock=null;stats();$('formBox').innerHTML='<div class="danger">'+esc(e.message||e)+'</div>';setStatus('Load failed: '+(e.message||e),true);dbg('load failed',e.message||String(e))}}
-function field(q,i){let n='q'+i,k=String(q.kind||q.type||'short').toLowerCase(),opts=options(q);if(k.includes('checkbox'))return (opts.length?opts:['Yes']).map(o=>'<label class="choice"><input type="checkbox" name="'+n+'" value="'+esc(o)+'"> '+esc(o)+'</label>').join('');if(k.includes('multiple')||k.includes('radio')||k.includes('choose one'))return (opts.length?opts:['Option 1']).map(o=>'<label class="choice"><input type="radio" name="'+n+'" value="'+esc(o)+'"> '+esc(o)+'</label>').join('');if(k.includes('dropdown')||k.includes('select'))return '<select name="'+n+'"><option value="">Choose...</option>'+opts.map(o=>'<option value="'+esc(o)+'">'+esc(o)+'</option>').join('')+'</select>';if(k.includes('yes'))return '<label class="choice"><input type="radio" name="'+n+'" value="Yes"> Yes</label><label class="choice"><input type="radio" name="'+n+'" value="No"> No</label>';if(k.includes('long')||k.includes('textarea')||k.includes('paragraph'))return '<textarea name="'+n+'" placeholder="Your answer"></textarea>';if(k.includes('image'))return '<input name="'+n+'" type="file" accept="image/png,image/jpeg,image/webp"><small>Image upload saves a public URL in the submission.</small>';if(k.includes('file'))return '<input name="'+n+'" type="file" accept="image/png,image/jpeg,image/webp"><small>Current bucket is image-only. Use PNG/JPEG/WEBP for now.</small>';let type=k.includes('email')?'email':k.includes('phone')?'tel':k.includes('date')?'date':k.includes('number')?'number':(k.includes('website')||k.includes('url'))?'url':'text';return '<input name="'+n+'" type="'+type+'" placeholder="Your answer">'}
-function renderForm(){let qs=Array.isArray(formBlock.items)?formBlock.items:[],owner=formBlock.ownerEmail||formBlock.notificationEmail||formBlock.contactEmail||'';$('pageTitle').textContent=formBlock.title||page.title||'Builder Form';$('pageIntro').textContent=formBlock.text||'Complete this form and submit.';$('formBox').innerHTML='<h2>'+esc(formBlock.title||'Form')+'</h2><p>'+esc(formBlock.text||'')+'</p>'+(owner?'<div class="note">Owner contact / notification email saved with this form block: '+esc(owner)+'</div>':'')+'<form id="f">'+qs.map((q,i)=>'<div class="q"><b>'+esc(q.label||q.title||('Question '+(i+1)))+'</b>'+(q.required===true||String(q.required)==='true'?' <span class="pill badPill">required</span>':'')+'<p>'+esc(q.kind||q.type||'short')+'</p>'+field(q,i)+'</div>').join('')+'<button class="btn hot" type="button" id="submitForm">'+esc(formBlock.submitButtonText||formBlock.buttonText||'Submit Form')+'</button></form>';document.getElementById('submitForm').onclick=submitForm}
-async function uploadFile(file,label){if(!file)return null;if(!['image/png','image/jpeg','image/webp'].includes(file.type)){throw new Error(label+': current storage bucket only allows PNG, JPEG or WEBP images.')}let safeName=String(file.name||'upload').replace(/[^a-z0-9._-]/gi,'-').toLowerCase();let path='forms/'+slug(page.slug||$('slug').value)+'/'+(user?user.id:'public')+'/'+Date.now()+'-'+safeName;let up=await client().storage.from(BUCKET).upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});if(up.error)throw up.error;let url=client().storage.from(BUCKET).getPublicUrl(path).data.publicUrl;R.uploadsImages=true;return {url,name:file.name,size:file.size,type:file.type,path,label}}
-async function collect(){let qs=Array.isArray(formBlock.items)?formBlock.items:[],answers={},missing=[],emailAnswer='';for(let i=0;i<qs.length;i++){let q=qs[i],label=q.label||q.title||('Question '+(i+1)),els=[...document.querySelectorAll('[name=q'+i+']')],kind=String(q.kind||q.type||'short').toLowerCase(),required=(q.required===true||String(q.required)==='true'),val='',extra={};if(kind.includes('file')||kind.includes('image')){let f=els[0]&&els[0].files&&els[0].files[0];if(f){setStatus('Uploading '+label+'...');let uploaded=await uploadFile(f,label);val=uploaded.url;extra={file_name:uploaded.name,file_size:uploaded.size,file_type:uploaded.type,storage_path:uploaded.path}}}else if(els.length&&els[0].type==='checkbox'){let vals=els.filter(e=>e.checked).map(e=>e.value);val=vals.join(', ');extra.values=vals}else if(els.length&&els[0].type==='radio'){let e=els.find(x=>x.checked);val=e?e.value:''}else if(els[0]){val=els[0].value.trim()}if(required&&!String(val||'').trim())missing.push(label);if(!emailAnswer&&String(val).includes('@'))emailAnswer=String(val).trim();answers[label]=Object.assign({type:q.kind||q.type||'short',answer:val,required},extra)}if(missing.length)throw new Error('Required answers missing: '+missing.join(', '));return {answers,emailAnswer}}
-async function submitForm(){try{if(!page||!formBlock){setStatus('Load a form first.',true);return}let c=client();await refreshAuth();let got=await collect();let payload={page_slug:page.slug,form_title:formBlock.title||page.title||'Form / Contact',form_key:key(formBlock.formKey||formBlock.blockSlug||formBlock.title||'form-contact'),block_id:formBlock.id||null,block_title:formBlock.title||'Form / Contact',answers_json:got.answers,submitter_id:user?user.id:null,submitter_email:user&&user.email?user.email:(got.emailAnswer||null),status:'new'};setStatus('Saving submission...');let r=await c.from('sb_form_submissions').insert(payload).select('*').maybeSingle();if(r.error)throw r.error;R.writesSubmissions=true;lastSubmit=r.data||payload;$('answers').textContent='Submission saved.\n\n'+JSON.stringify(lastSubmit,null,2);setStatus('Submission saved. Open Form Inbox to view it.');toast('Submission saved');stats();dbg('submitted',lastSubmit)}catch(e){setStatus('Submit failed: '+(e.message||e),true);$('answers').textContent='Submit failed:\n'+(e.message||e);dbg('submit failed',e.message||String(e))}}
-function helpers(){try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}try{if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}$('helperStatus').innerHTML='<b>Global helpers:</b> Supabase SDK '+(window.supabase?'✅':'❌')+' · Header '+(window.StreamBanditHeaderShell?'✅':'❌')+' · Footer '+(window.StreamBanditFooterShell?'✅':'❌')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'❌')+' · Counters '+(window.StreamBanditMenuSavesCount?'✅':'❌')+' · Search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'❌')+' · Signed in '+(user?'✅':'⚠️')}
-function bind(){$('load').onclick=loadForm;$('slug').addEventListener('change',()=>{updateLinks();loadForm()});}
-async function boot(){let start=new URL(location.href).searchParams.get('page')||'test-page';$('slug').value=slug(start);bind();updateLinks();client();await refreshAuth();helpers();stats();dbg('boot');await loadForm();setInterval(async()=>{await refreshAuth();helpers();dbg('heartbeat')},8000)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+var PREVIOUS_COMMIT='f7151b8b84f7d625d87e8c1edbf32dc12a07c104';
+var FILE='web-builder-form-save-v7-12-94-test.html';
+var RAW='https://raw.githubusercontent.com/trevieisking/stream-bandit/'+PREVIOUS_COMMIT+'/'+FILE;
+var VERSION='V7.13.051 Advanced Form Route Canonical Safe Loader';
+var statusEl=document.getElementById('status');
+var debugEl=document.getElementById('debug');
+var replacements=[
+  ['web-builder-live-studio-v7-12-116-test.html?page=test-page','web-builder-account-control-hub-v7-12-263-test.html'],
+  ['web-builder-live-studio-v7-12-116-test.html?page=','web-builder-account-control-hub-v7-12-263-test.html?page='],
+  ['web-builder-form-submissions-v7-12-94-test.html?page=test-page','web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page'],
+  ['web-builder-form-submissions-v7-12-94-test.html?page=','web-builder-form-inbox-owned-v7-12-258-test.html?page='],
+  ['web-builder-shared-style-preview-v7-12-117-test.html?page=test-page','web-builder-preview-owned-v7-12-257-test.html?page=test-page'],
+  ['web-builder-shared-style-preview-v7-12-117-test.html?page=','web-builder-preview-owned-v7-12-257-test.html?page='],
+  ['Stream Bandit Advanced Form V7.12.213','Stream Bandit Advanced Form V7.13.051'],
+  ['V7.12.213 Advanced Form','V7.13.051 Advanced Form Route Canonical'],
+  ['V7.12.213 Advanced Form — current shell helpers, real submission pipeline preserved.','V7.13.051 Advanced Form — canonical Web Builder routes, real submission pipeline preserved.'],
+  ['advanced-form-7-12-213','advanced-form-route-canonical-7-13-051']
+];
+function setStatus(text,cls){
+  if(statusEl){statusEl.textContent=text;statusEl.className='badge '+(cls||'warn');}
+  if(debugEl){
+    debugEl.textContent=text+'\n\nSource: '+RAW+'\nPatch: old Builder/Inbox/Preview route links -> current owned routes\nLoader: DOMParser + ordered script replay\nVersion: '+VERSION;
+  }
+}
+function copyAttrs(from,to){
+  for(var i=0;i<from.attributes.length;i++){
+    var a=from.attributes[i];
+    to.setAttribute(a.name,a.value);
+  }
+}
+function runScript(oldScript){
+  return new Promise(function(resolve,reject){
+    var s=document.createElement('script');
+    copyAttrs(oldScript,s);
+    s.async=false;
+    if(oldScript.src){
+      s.onload=function(){resolve();};
+      s.onerror=function(){reject(new Error('Script failed: '+oldScript.src));};
+      s.src=oldScript.src;
+      document.body.appendChild(s);
+      return;
+    }
+    s.text=oldScript.textContent||'';
+    document.body.appendChild(s);
+    resolve();
+  });
+}
+function replayScripts(scripts){
+  var chain=Promise.resolve();
+  scripts.forEach(function(script){
+    chain=chain.then(function(){return runScript(script);});
+  });
+  return chain;
+}
+function replaceAllText(haystack,needle,replacement){
+  return haystack.split(needle).join(replacement);
+}
+function openPatched(html){
+  if(!html||html.indexOf('V7.12.213 Advanced Form')===-1){
+    throw new Error('Source did not match the expected V7.12.213 Advanced Form build.');
+  }
+  var required=[
+    'web-builder-live-studio-v7-12-116-test.html?page=test-page',
+    'web-builder-form-submissions-v7-12-94-test.html?page=test-page',
+    'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page'
+  ];
+  required.forEach(function(value){
+    if(html.indexOf(value)===-1)throw new Error('Expected old route was not found: '+value);
+  });
+  replacements.forEach(function(pair){
+    html=replaceAllText(html,pair[0],pair[1]);
+  });
+  var parsed=new DOMParser().parseFromString(html,'text/html');
+  var scripts=[].slice.call(parsed.querySelectorAll('script'));
+  scripts.forEach(function(s){s.parentNode.removeChild(s);});
+  document.head.innerHTML=parsed.head.innerHTML;
+  document.body.innerHTML=parsed.body.innerHTML;
+  document.body.setAttribute('data-advanced-form-route-canonical-loader',VERSION);
+  window.SB_ADVANCED_FORM_ROUTE_CANONICAL_VERSION=VERSION;
+  return replayScripts(scripts).then(function(){
+    if(window.StreamBanditAdvancedFormV712213&&!window.StreamBanditAdvancedFormV713051){
+      window.StreamBanditAdvancedFormV713051=window.StreamBanditAdvancedFormV712213;
+    }
+    console.log(VERSION+' loaded');
+  });
+}
+setStatus('Fetching working Advanced Form build...');
+fetch(RAW,{cache:'no-store'})
+  .then(function(r){if(!r.ok)throw new Error('Source fetch failed: '+r.status+' '+r.statusText);return r.text();})
+  .then(openPatched)
+  .then(function(){setTimeout(function(){var st=document.getElementById('status');if(st&&st.textContent.indexOf('Loading')!==-1){st.textContent='Advanced Form loaded. If still loading, reload once.';}},2000);})
+  .catch(function(err){
+    setStatus('Advanced Form safe loader failed','bad');
+    if(debugEl){debugEl.textContent=String(err&&err.message||err)+'\n\nSource: '+RAW+'\n\nNo database, schema, RLS, storage policy, payment, index or Home change was made.';}
+  });
 })();
 </script>
 </body>
