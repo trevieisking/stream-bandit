@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.015
+# Stream Bandit Current App Manifest V7.13.016
 
 Date: 2026-06-19
 
@@ -6,17 +6,23 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest pause point
 
-`V7.13.015 Profile Social Media Group PASS / Header Shell JS PASS / Registry Social Matrix Upgrade`
+`V7.13.016 Profile Social Media Group PASS / Platform Entry Promotion PASS / Registry Social Matrix Next`
 
 ## Current index note
+
+`index.html` is now the platform entry route for the passed social group links and global overlay shell.
+
+Visible index version:
+
+`V7.13.016 Platform Entry · Social Group Promoted`
 
 Home remains the main app home route:
 
 `home-global-helpers-v7-4-4-test.html`
 
-The current `index.html` remains the platform entry page, not the Home replacement.
+The platform entry is not a Home replacement. It is a route launcher that now includes the passed Profile Social Media Group and loads the global helper/header/footer/menu stack.
 
-The passed global shell JavaScript for the main app is now:
+Passed global shell JavaScript:
 
 `stream-bandit-header-shell-v7-12-156.js`
 
@@ -24,18 +30,17 @@ Passed visible shell version:
 
 `V7.13.014 Header Shell / Account Settings Menu Cleanup`
 
-Passed Home smoke behavior:
+Passed shell behavior:
 
 - header shell loads on Home
+- header shell loads on the platform entry
 - Social Profile route is available
 - Friends route is available
 - News Feed route is available
 - Groups route is available
 - Account Settings remains separate from Social Profile
-- duplicate Account Profile menu entry is removed when the V7.13.014 shell code is installed
+- duplicate Account Profile menu entry is removed
 - old account/settings route remains available as Account Settings
-
-Index promotion is still owner-gated. The safe next index step is to reference the current passed shell state from the platform entry, not replace Home.
 
 ## Profile Social Media Group status
 
@@ -71,7 +76,7 @@ Passed behavior:
 - wall like
 - refresh persistence
 - safe checks
-- account deletion request overlay opens only
+- account request overlay opens only
 
 Safety/read-write map:
 
@@ -82,7 +87,7 @@ Safety/read-write map:
 - writes profile wall posts to `sb_social_posts`
 - writes wall comments to `sb_social_post_comments`
 - writes wall likes to `sb_social_post_reactions`
-- writes deletion requests only to `sb_account_deletion_requests`
+- writes account requests only to `sb_account_deletion_requests`
 
 ### Friends
 
@@ -139,7 +144,7 @@ Safety/read-write map:
 - `sb_social_events`
 - `sb_social_event_rsvps`
 
-Authenticated user required. No index promotion.
+Authenticated user required.
 
 ### News Feed
 
@@ -187,7 +192,7 @@ Safety/read-write map:
 - writes event RSVP to `sb_social_event_rsvps`
 - uploads feed images to the existing `stream-bandit-images` bucket only when a file is selected
 
-Authenticated user required. No index promotion.
+Authenticated user required.
 
 ## Current Profile Social Media Group routes
 
@@ -195,6 +200,17 @@ Authenticated user required. No index promotion.
 - `friends-social-v7-13-001-test.html` — passed as social group candidate
 - `groups-social-v7-13-001-test.html` — passed
 - `news-feed-social-v7-13-003-test.html` — passed
+
+## Platform entry routes now linked from `index.html`
+
+- Main App Home: `home-global-helpers-v7-4-4-test.html`
+- Social Profile: `profile-social-v7-13-001-test.html`
+- Friends: `friends-social-v7-13-001-test.html`
+- News Feed: `news-feed-social-v7-13-003-test.html`
+- Groups: `groups-social-v7-13-001-test.html`
+- Account Settings: `profile-settings-live-ready-v7-12-90-test.html`
+- Web Builder Hub: `web-builder-account-control-hub-v7-12-263-test.html`
+- Current Routes Registry: `all-pages-version-registry-v7-12-122-current-routes-test.html`
 
 ## Header/Menu Overlay status
 
@@ -206,17 +222,17 @@ Passed target version:
 
 `V7.13.014 Header Shell / Account Settings Menu Cleanup`
 
-Required/passed plug-in behavior:
+Passed plug-in behavior:
 
-- add Social Profile route to the global route map
-- add Friends route to the global route map
-- add News Feed route to the global route map
-- add Groups route to the global route map
-- add a Social group to the global menu overlay
-- keep old account route available as Account Settings
-- remove duplicate Account Profile from the Social group
-- rename Settings > Account Profile to Settings > Account Settings
-- point the visible profile/social route from the app shell toward `profile-social-v7-13-001-test.html`
+- Social Profile route in the global route map
+- Friends route in the global route map
+- News Feed route in the global route map
+- Groups route in the global route map
+- Social group in the global menu overlay
+- old account route available as Account Settings
+- duplicate Account Profile removed from the Social group
+- Settings > Account Profile renamed to Settings > Account Settings
+- visible social route points toward `profile-social-v7-13-001-test.html`
 
 ## Registry upgrade target
 
@@ -255,11 +271,11 @@ Social tables to include in known table proof:
 
 ## Safety standard
 
-No page change should add schema, storage policy, payment provider, final live-home replacement, or production index promotion without explicit approval.
+No page change should add schema, storage policy, payment provider, final live-home replacement, or production home replacement without explicit approval.
 
 ## Next plan target
 
-1. Upgrade the Current Routes Registry social group/table matrix.
-2. Smoke-test Scan All + Supabase Proof.
-3. Confirm Social routes and social tables are no longer only manifest unknown warnings.
-4. Then decide whether the platform entry `index.html` should show a simple link card for the passed Social group and passed Header Shell JS.
+1. Smoke-test `index.html` as platform entry.
+2. Upgrade the Current Routes Registry social group/table matrix.
+3. Smoke-test Scan All + Supabase Proof.
+4. Confirm Social routes and social tables are no longer only manifest unknown warnings.
