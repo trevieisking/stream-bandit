@@ -1,11 +1,12 @@
-/* Stream Bandit Route Access Map V7.12.272
+/* Stream Bandit Route Access Map V7.12.273
    Read-only route classes for plan, add-on, owner/admin and editor gates.
    Old URLs preserved. No Supabase writes. No redirects. No billing.
+   V7.12.273 canonicalizes the old Web Builder live-studio route to the current Web Builder Hub.
 */
 (function(){
   'use strict';
 
-  const VERSION = 'V7.12.272 Route Access Map / Plan Add-on Gate Classes';
+  const VERSION = 'V7.12.273 Route Access Map / Web Builder Live Studio Canonical';
 
   const ROUTES = {
     'home-global-helpers-v7-4-4-test.html': { group:'Watch', label:'Home', access:'public', routeClass:'public', feature:'watch_home', mode:'read' },
@@ -76,6 +77,11 @@
     'collections-browse-shell-v6-46-1-test.html':'collections-clean-machine-v7-12-51-test.html',
     'player-two-global-helpers-v7-3-4-test.html':'player-2-clean-machine-v7-12-58-test.html',
     'player-2-clean-machine-v7-12-57-test.html':'player-2-clean-machine-v7-12-58-test.html',
+    'web-builder-live-studio-v7-12-116-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'web-builder-live-studio-v7-12-97-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'web-builder-live-studio-v7-12-93-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'web-builder-admin-shell-v6-57-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'web-builder-global-helpers-v7-9-3-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
     'user-dashboard-concept-v6-68-test.html':'user-management-dashboard-v7-11-2-test.html',
     'plans-pricing-matrix-v6-69-test.html':'plans-pricing-feature-shop-v7-11-3-test.html',
     'permissions-matrix-v6-70-test.html':'permissions-matrix-user-management-v7-11-4-test.html'
@@ -96,5 +102,5 @@
     all: all
   };
 
-  document.documentElement.dataset.sbRouteAccessMap = 'v7-12-272';
+  document.documentElement.dataset.sbRouteAccessMap = 'v7-12-273';
 })();
