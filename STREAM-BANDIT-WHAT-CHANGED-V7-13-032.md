@@ -1,14 +1,22 @@
-# Stream Bandit What Changed V7.13.055
+# Stream Bandit What Changed V7.13.058
 
-Status: plain-English project checkpoint for the current Web Builder cleanup pass.
+Status: plain-English project checkpoint for the final beginning-to-end scan pass.
 
-This file exists because the project is now too large to keep safely in chat memory. It lists what has actually changed, what is still queued, and what has deliberately not been touched.
+Date: 2026-06-19
 
----
+This file records what actually changed, what the full scan taught us, what is now locked, and what deliberately remains deferred.
 
 ## Big picture
 
-Stream Bandit is not being rebuilt from scratch. The current pass is a controlled route/foundation cleanup:
+Stream Bandit is not being rebuilt from scratch. The full scan proved that the project is now a route-family platform, not one flat pile of pages.
+
+The main scan lesson:
+
+```text
+Most confusion came from old support routes still being visible in menus/maps, not from the current app being broken.
+```
+
+The governing repair rule remains:
 
 ```text
 Scan first.
@@ -16,390 +24,251 @@ Map the current truth.
 Lock old routes to current routes.
 Patch only what is proven wrong.
 Preserve real working pages with safe loaders when full rewrite is risky.
-Do not touch database/storage/payment/index/Home unless explicitly approved.
+Do not touch database/storage/payment/index/Home/player/accessibility unless explicitly approved.
 ```
-
----
 
 ## Current working boundary
 
 ```text
-Active group: Web Builder only
-Not active yet: Admin group
-Not active yet: Social group
-Not active unless needed: Owner group
-Supabase connector: treated as unavailable
-GitHub/source cleanup: active repair surface
+Final scan pass: complete
+Current active surface: documentation and route truth only
+Supabase/backend changes: not approved
+Old useful pages: not deleted
+New checkpoint file: not created
+Manifest: updated and verified
 ```
-
----
 
 ## What changed successfully
 
-### 1. Current project memory was created
+### 1. Current app manifest was updated and verified
+
+```text
+CURRENT-APP-MANIFEST-V7-12-180.md
+```
+
+Now records:
+
+```text
+V7.13.058 Final Scan Pass / Header Owner Web Builder Menu Cleanup / Manifest Updated
+```
+
+It also acts as the scan-pass checkpoint so no new checkpoint file was needed.
+
+### 2. Main shell route aliases were cleaned
+
+```text
+stream-bandit-shell-v6-24.js
+```
+
+App-facing old Web Builder support aliases now point to current owned Web Builder pages where appropriate.
+
+### 3. Header shell Owner menu was cleaned
+
+```text
+stream-bandit-header-shell-v7-12-156.js
+```
+
+Visible shell version now recorded as:
+
+```text
+V7.13.058 Header Shell / Owner Web Builder Menu Cleanup
+```
+
+Owner menu was reduced to management/proof items and old normal Web Builder support exposure was removed.
+
+### 4. Master plan was updated
+
+```text
+STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md
+```
+
+Now records the full scan lessons, route-family architecture, owner/social/user-management/admin boundaries, and the no-backend-change rule.
+
+### 5. Fix Memory was updated
 
 ```text
 STREAM-BANDIT-FIX-MEMORY-V7-13.md
 ```
 
-This is the active ledger for this repair pass.
+Now records the final scan route families, current Web Builder map, lean Owner rule, User Management rule, Social rule and Admin rule.
 
-### 2. Master route/foundation plan was saved
+### 6. Master Audit Sheet was updated
 
 ```text
-STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md
 STREAM-BANDIT-PHASE-1-MASTER-AUDIT-SHEET-V7-13-019.md
 ```
 
-These are the governing scan/repair documents.
+Now acts as the current scan/audit map instead of an old Phase 1-only sheet.
 
-### 3. Route registry was improved
+### 7. Web Builder Manifest was updated
 
 ```text
-stream-bandit-route-registry-v7-13-001.js
+WEB-BUILDER-MANIFEST-V7-12-252.md
 ```
 
-Added/confirmed route alias handling so old pages can resolve to the current safer route targets.
+Now records the current Web Builder owned route map and legacy support-route handling.
 
-Important old route families covered:
+## Final group scan results
+
+### Web Builder
+
+Status:
 
 ```text
-Old Collections routes -> current Collections page
-Old Player 2 routes -> current Player 2 page
-Old Web Builder live-studio routes -> current Web Builder Hub
-Old dashboard/pricing/permissions routes -> current account/plan route family
+CURRENT WEB BUILDER ROUTES VERIFIED / OLD SUPPORT ROUTES KEPT FOR COMPATIBILITY
 ```
 
-### 4. Route access map was improved
+Current Web Builder user-facing route truth:
 
 ```text
-stream-bandit-route-access-map-v7-12-271.js
-```
-
-Old Web Builder live-studio URLs are treated as aliases for the current Web Builder Hub.
-
-### 5. Auth entry gate was improved
-
-```text
-stream-bandit-auth-entry-gate-v7-13-001.js
-```
-
-The gate now understands:
-
-```text
-account_optional
-creator_plan
-plan rank checks
-permissions_json feature checks
-```
-
-This helps stop false blocking while still keeping creator/owner areas protected.
-
-### 6. Current Web Builder target map was verified
-
-Verified current Web Builder route truth:
-
-```text
-Old Web Builder live studio
+Web Builder Hub
 -> web-builder-account-control-hub-v7-12-263-test.html
 
-Old Pages Manager
+Owned Pages Manager
 -> web-builder-pages-manager-owned-v7-12-256-test.html
 
-Old Shared Preview
+Owned Preview
 -> web-builder-preview-owned-v7-12-257-test.html?page=test-page
 
-Old Form Save
+Form Designer
 -> web-builder-form-designer-owned-v7-12-258-test.html?page=test-page
 
-Old Form Submissions
+Form Inbox Bridge
 -> web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page
 ```
 
-### 7. Web Builder support-route queue was created
+Notes:
 
 ```text
-CHECKPOINT-WEB-BUILDER-SUPPORT-ROUTE-CANONICAL-QUEUE-V7-13-026.md
+Old support pages remain useful compatibility/witness pages.
+Do not delete them blindly.
+Normal user-facing menu/link flow should use the current owned routes.
 ```
 
-This records old Web Builder support links and their current owned targets.
+### Admin
 
-### 8. Settings Hub was updated
+Status:
 
 ```text
-settings-platform-control-hub-v7-12-85-test.html
+SCAN PASSED / NO BROAD PATCH NEEDED
 ```
 
-Committed as:
+Scanned as proof/support/control surfaces:
 
 ```text
-V7.13.031 Settings Hub Web Builder Route Canonical
+Admin Centre
+Live Readiness
+Current Routes Registry
+Test Checklist
+Tools
+Health Check
+Mux Manager
+Storage Prep
+Backup / Safety
 ```
 
-Changed route links:
+### Social
+
+Status:
 
 ```text
-Old web-builder-live-studio-v7-12-116-test.html?page=test-page
--> web-builder-account-control-hub-v7-12-263-test.html
-
-Old web-builder-pages-manager-v7-12-111-test.html
--> web-builder-pages-manager-owned-v7-12-256-test.html
-
-Old web-builder-shared-style-preview-v7-12-117-test.html?page=test-page
--> web-builder-preview-owned-v7-12-257-test.html?page=test-page
+SCAN PASSED / REAL SOCIAL PAGES PRESERVED
 ```
 
-No Supabase rows were changed by this page.
-No schema, RLS, storage, payment, index, or Home change was made.
-
-### 9. Theme Studio was fixed safely
+Current Social routes:
 
 ```text
-web-builder-theme-studio-controls-v7-8-9-test.html
+profile-social-v7-13-001-test.html
+friends-social-v7-13-001-test.html
+news-feed-social-v7-13-001-test.html
+groups-social-v7-13-001-test.html
 ```
 
-Committed as:
+Do not blind-patch these pages because they own real social/profile/feed/group/event behavior.
+
+### User Management
+
+Status:
 
 ```text
-V7.13.034 Theme Studio Route Canonical Safe Loader
+SCAN PASSED / OWNER-ADMIN CONTROL GROUP PRESERVED
 ```
 
-Why safe loader was used:
+Current routes:
 
 ```text
-Theme Studio owns real global theme saving.
-It reads/writes app settings and local bridge keys.
-A blind full rewrite would be unsafe.
-The loader preserves the working V7.12.295 build, patches only old Web Builder route links, then replays the original scripts.
+user-management-dashboard-v7-11-2-test.html
+plans-pricing-feature-shop-v7-11-3-test.html
+permissions-matrix-user-management-v7-11-4-test.html
 ```
 
-### 10. Owned Form Inbox was fixed safely
+Rules:
 
 ```text
-web-builder-form-inbox-owned-v7-12-258-test.html
+Dashboard = real protected owner/admin control.
+Pricing = preview-only, no billing, no provider, no entitlement writes.
+Permissions = read-only, no billing, no role changes, no writes.
 ```
 
-Committed as:
+### Owner
+
+Status:
 
 ```text
-V7.13.050 Form Inbox Route Canonical Safe Loader
+SCAN PASSED / OWNER ROUTES PRESERVED / WEB BUILDER MENU EXPOSURE REDUCED
 ```
 
-Purpose:
+Owner menu now keeps:
 
 ```text
-Preserve the working V7.13.049 Web Builder Messages + Submissions page.
-Patch only the old submissions-manager route.
-Keep message/submission logic intact.
+Form Inbox
+One Machine
+Platform Control Centre
+Final Shell Navigation
+Brand / App Icons
+Brand Image Helper
+Favicon / App Icon Builder
 ```
 
-### 11. Advanced Form support page was fixed safely
+Notes:
 
 ```text
-web-builder-form-save-v7-12-94-test.html
+Form Inbox is a temporary Owner exception and is queued for later Social placement.
+One Machine and Final Shell Navigation are read-only proof pages.
+Brand / App Icons is a real owner/global-logo write page and must be preservation-first.
+Brand Image Helper and Favicon Builder are preview-only.
 ```
 
-Committed as:
+## What deliberately did not change
 
 ```text
-V7.13.051 Advanced Form Route Canonical Safe Loader
+No SQL.
+No RLS.
+No storage policy.
+No payment provider.
+No DNS automation.
+No production Home replacement.
+No player/audio/accessibility changes.
+No service-role logic.
+No mass page deletion.
+No Web Builder/Main App shell merge.
 ```
 
-Purpose:
+## Deferred work
 
 ```text
-Preserve the working V7.12.213 Advanced Form submission page.
-Patch old Builder / Inbox / Preview route links only.
-Keep real form-submission logic intact.
+Move/correct Form Inbox into the Social group later.
+Clean old Web Builder witness links inside Owner diagnostic pages only if needed.
+Run a future controlled registry/access-map update pass if the updated docs prove a stale user-facing route remains.
+Do not delete old useful pages just because they are old.
 ```
 
-### 12. Old Pages Manager support page was scanned and checkpointed
+## Current decision
 
 ```text
-web-builder-pages-manager-v7-12-111-test.html
-CHECKPOINT-PAGES-MANAGER-ROUTE-CLEANUP-BLOCKED-V7-13-052.md
-```
-
-Result:
-
-```text
-The page is a real sb_site_pages manager.
-It has save, hide, restore and guarded permanent-delete logic.
-A safe-loader update was attempted but blocked by the platform safety check.
-The write was not forced or retried.
-The exact route map was checkpointed instead.
-```
-
-### 13. Published Preview support page was fixed safely
-
-```text
-web-builder-shared-style-preview-v7-12-117-test.html
-```
-
-Committed as:
-
-```text
-V7.13.053 Legacy Published Preview Route Canonical Safe Loader
-```
-
-Purpose:
-
-```text
-Preserve the working V7.12.235 Published Preview renderer.
-Patch old Builder / Form / Inbox / Pages Manager links only.
-Keep preview-render logic intact.
-```
-
-### 14. Old live-studio route was verified as already safe
-
-```text
-web-builder-live-studio-v7-12-116-test.html
-```
-
-Result:
-
-```text
-Already a fallback wrapper.
-Hands off to web-builder-account-control-hub-v7-12-263-test.html.
-Preserves query string and hash.
-Does not load the old Studio engine.
-Does not touch storage.
-No change needed.
-```
-
-### 15. Legacy Form Inbox support page was fixed safely
-
-```text
-web-builder-form-submissions-v7-12-94-test.html
-```
-
-Committed as:
-
-```text
-V7.13.054 Legacy Form Inbox Route Canonical Safe Loader
-```
-
-Purpose:
-
-```text
-Preserve the working V7.12.212 Form Inbox + Private Messages page.
-Patch old Builder / Form / Preview links only.
-Keep inbox, reply, private-message and soft-status logic intact.
-```
-
----
-
-## Current Web Builder status
-
-```text
-Settings Hub: fixed
-Theme Studio: fixed safely
-Owned Form Inbox target: fixed safely
-Advanced Form support: fixed safely
-Published Preview support: fixed safely
-Legacy Form Inbox support: fixed safely
-Old Live Studio support: already safe wrapper
-Old Pages Manager support: scanned, blocked, checkpointed
-```
-
----
-
-## What did not change
-
-These areas have deliberately not been touched:
-
-```text
-SQL
-RLS
-Supabase storage policies
-Payment activation
-Index/Home promotion
-Movie/player engine
-Database row contents
-Buckets
-Domain/DNS
-Admin group
-Social group
-Owner group
-```
-
----
-
-## Supabase status
-
-Supabase briefly appeared visible as:
-
-```text
-Stream Bandit
-Project ref: xzxqfrvqdgkzwujbkdbk
-ACTIVE_HEALTHY
-```
-
-But table inspection was blocked and the Supabase connector then disappeared again.
-
-Current working assumption:
-
-```text
-Treat Supabase as unavailable.
-Use GitHub/source cleanup only.
-Do not retry blocked Supabase calls repeatedly.
-```
-
----
-
-## Still queued / careful only
-
-### Blocked but mapped
-
-```text
-web-builder-pages-manager-v7-12-111-test.html
-```
-
-Reason:
-
-```text
-Real sb_site_pages manager.
-Safe-loader write was blocked.
-Checkpoint exists.
-Do not force.
-```
-
-### Protected helper/source cleanup only after separate decision
-
-```text
-stream-bandit-shell-v6-24.js
-stream-bandit-global-helper-loader-v7-12-126.js
-stream-bandit-route-registry-v7-13-001.js
-stream-bandit-route-access-map-v7-12-271.js
-```
-
-Reason:
-
-```text
-These are global/protected helpers.
-Some contain Supabase public config or route-critical code.
-Previous helper rewrites were blocked.
-Do not force.
-```
-
----
-
-## Current confidence
-
-```text
-The project is not dead.
-The hard part is route drift and too many historical page versions.
-The current plan is working when changes stay small and verified.
-The user does not need to know code to continue if every step is logged and tested.
-```
-
----
-
-## Next safe step
-
-```text
-Finish the Web Builder group pass by rescanning direct current files only.
-Ignore stale search-index/checkpoint/history hits.
-Do not jump to Admin, Social or Owner until Web Builder group is closed.
-Do not touch Supabase/database.
+SCAN PASS COMPLETE.
+DOCS UPDATED.
+MANIFEST UPDATED.
+WEB BUILDER MAP UPDATED.
+NEXT WORK MUST START FROM THESE DOCS, NOT FROM OLD MENU CONFUSION.
 ```
