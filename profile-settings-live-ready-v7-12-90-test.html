@@ -3,45 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Profile Account Centre V7.12.300.24 LIVE ROUTE</title>
+<title>Stream Bandit Account Settings V7.12.300.25 LIVE ROUTE</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--bad:#ff4d6d}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 8% 0,#22d3a633,transparent 34%),radial-gradient(circle at 92% 0,#7c3cff3d,transparent 38%),linear-gradient(180deg,#070910,#050711);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.card{width:min(920px,100%);border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 18px 58px #0008;padding:22px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,66px);line-height:.95;letter-spacing:-.055em;margin:12px 0}.muted,p{color:var(--muted);line-height:1.5}.btn{display:inline-flex;margin-top:12px;border-radius:999px;padding:12px 16px;background:linear-gradient(135deg,var(--good),var(--purple));color:#061017;font-weight:950;text-decoration:none}.hot{background:linear-gradient(135deg,var(--pink),var(--purple));color:white}.bad{color:#ffd2d9;background:#ff4d6d22;border:1px solid #ff4d6d66;border-radius:16px;padding:12px;margin-top:12px}code{color:#baf7df;overflow-wrap:anywhere}
+:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#17122d;--line:#ffffff22;--muted:#b9c0d8;--good:#22d3a6;--purple:#7c3cff;--pink:#ff2d85;--bad:#ff4d6d}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 8% 0,#22d3a633,transparent 34%),radial-gradient(circle at 92% 0,#7c3cff3d,transparent 38%),linear-gradient(180deg,#070910,#050711);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.card{width:min(920px,100%);border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 18px 58px #0008;padding:22px}.badge{display:inline-flex;border-radius:999px;background:#22d3a624;border:1px solid #22d3a657;color:#baf7df;font-weight:950;padding:7px 12px}h1{font-size:clamp(34px,6vw,66px);line-height:.95;letter-spacing:-.055em;margin:12px 0}.muted,p{color:var(--muted);line-height:1.5}.btn{display:inline-flex;margin-top:12px;margin-right:8px;border-radius:999px;padding:12px 16px;background:linear-gradient(135deg,var(--good),var(--purple));color:#061017;font-weight:950;text-decoration:none}.hot{background:linear-gradient(135deg,var(--pink),var(--purple));color:white}.bad{color:#ffd2d9;background:#ff4d6d22;border:1px solid #ff4d6d66;border-radius:16px;padding:12px;margin-top:12px}code{color:#baf7df;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 <main class="card" id="bootCard">
-<span class="badge">V7.12.300.24 Live Profile Route</span>
-<h1>Loading Profile Account Centre</h1>
-<p>This route keeps the old live Profile Settings URL, then loads the passed Profile Account Centre into this same page without forwarding away.</p>
+<span class="badge">V7.12.300.25 Account Settings Live Route</span>
+<h1>Loading Account Settings</h1>
+<p>This route keeps the old live Profile Settings URL, then loads the passed Account Settings tools into this same page without forwarding away.</p>
 <p><code>profile-settings-live-ready-v7-12-90-test.html</code></p>
-<p id="bootStatus" class="muted">Loading passed Account Centre source...</p>
-<a class="btn hot" href="profile-settings-complete-v7-0-4-test.html">Fallback: open Account Centre source</a>
+<p id="bootStatus" class="muted">Loading passed Account Settings source...</p>
+<a class="btn hot" href="profile-social-v7-13-001-test.html">Open Social Profile</a>
+<a class="btn" href="profile-settings-complete-v7-0-4-test.html">Fallback: open Account Settings source</a>
 <a class="btn" href="user-management-dashboard-v7-11-2-test.html">Open User Management</a>
 </main>
 <script>
 (function(){
   'use strict';
   var LIVE_ROUTE='profile-settings-live-ready-v7-12-90-test.html';
+  var SOCIAL_ROUTE='profile-social-v7-13-001-test.html';
   var SOURCE_ROUTE='profile-settings-complete-v7-0-4-test.html';
   var status=document.getElementById('bootStatus');
   function fail(message){
     if(status) status.innerHTML='<span class="bad">'+String(message).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})+'</span>';
   }
-  fetch(SOURCE_ROUTE+'?v=live-profile-copy-7-12-300-24',{cache:'no-store'})
+  fetch(SOURCE_ROUTE+'?v=live-account-settings-copy-7-12-300-25',{cache:'no-store'})
     .then(function(response){
-      if(!response.ok) throw new Error('Could not load Account Centre source: HTTP '+response.status);
+      if(!response.ok) throw new Error('Could not load Account Settings source: HTTP '+response.status);
       return response.text();
     })
     .then(function(html){
       html=html.replace(/profile-settings-complete-v7-0-4-test\.html/g,LIVE_ROUTE);
-      html=html.replace(/data-sb-profile-test-route="true"/g,'data-sb-profile-live-route="true"');
-      html=html.replace(/Stream Bandit Profile Account Centre V7\.12\.300\.16 TEST/g,'Stream Bandit Profile Account Centre V7.12.300.24 LIVE ROUTE');
-      html=html.replace(/V7\.12\.300\.16 Profile Account Centre · Real Request Queue Test/g,'V7.12.300.24 Profile Account Centre · Live Route Real Request Queue');
-      html=html.replace(/V7\.12\.300\.16 Profile Account Centre TEST/g,'V7.12.300.24 Profile Account Centre LIVE ROUTE');
-      html=html.replace(/old V7\.0\.4 test route/g,'live Profile Settings route');
-      html=html.replace(/current live Profile Settings URL is untouched/g,'this live Profile Settings URL now owns the Account Centre');
+      html=html.replace(/data-sb-profile-test-route="true"/g,'data-sb-account-settings-live-route="true"');
+      html=html.replace(/<a class="pagePill" href="profile-settings-live-ready-v7-12-90-test\.html">Current Profile<\/a><a class="pagePill active" href="profile-settings-live-ready-v7-12-90-test\.html">Account Centre Test<\/a>/g,'<a class="pagePill active" href="'+LIVE_ROUTE+'">Account Settings</a><a class="pagePill" href="'+SOCIAL_ROUTE+'">Social Profile</a>');
+      html=html.replace(/Stream Bandit Profile Account Centre V7\.12\.300\.16 TEST/g,'Stream Bandit Account Settings V7.12.300.25 LIVE ROUTE');
+      html=html.replace(/V7\.12\.300\.16 Profile Account Centre · Real Request Queue Test/g,'V7.12.300.25 Account Settings · Live Route Real Request Queue');
+      html=html.replace(/V7\.12\.300\.16 Profile Account Centre TEST/g,'V7.12.300.25 Account Settings LIVE ROUTE');
+      html=html.replace(/Profile Account Centre/g,'Account Settings');
+      html=html.replace(/Account Centre/g,'Account Settings');
+      html=html.replace(/Profile Settings URL/g,'Account Settings URL');
+      html=html.replace(/old V7\.0\.4 test route/g,'live Account Settings route');
+      html=html.replace(/current live Account Settings URL is untouched/g,'this live Account Settings URL now owns the Account Settings tools');
       document.open();
       document.write(html);
       document.close();
