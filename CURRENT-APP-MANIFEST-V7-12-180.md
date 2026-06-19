@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.017
+# Stream Bandit Current App Manifest V7.13.018
 
 Date: 2026-06-19
 
@@ -6,9 +6,9 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest checkpoint
 
-`V7.13.017 Profile Social Media Group PASS / Platform Entry PASS / Registry Social Matrix Upgrade Installed`
+`V7.13.018 Profile Social Media Group PASS / Platform Entry PASS / Registry PASS PROMOTED`
 
-## What is passed and logged
+## What is now promoted
 
 ### Platform entry
 
@@ -18,17 +18,18 @@ Route:
 
 Visible version:
 
-`V7.13.016 Platform Entry · Social Group Promoted`
+`V7.13.018 Platform Entry · Registry Promoted`
 
 Status:
 
-`PASSED AS PLATFORM ENTRY PROMOTION`
+`PASSED AS PLATFORM ENTRY WITH SOCIAL GROUP AND REGISTRY PROMOTED`
 
 Confirmed behavior:
 
 - index is the platform entry route
 - Home remains the main app Home route, not replaced
 - platform entry links Social Profile, Friends, News Feed, Groups, Account Settings, Web Builder Hub and Current Routes Registry
+- platform entry now shows Registry V7.13.017 as passed
 - platform entry loads the global helper/header/footer/menu stack
 - no payment promotion
 - no production Home replacement
@@ -130,7 +131,7 @@ News Feed passed behavior:
 - Mux/HLS/direct video support remains available for valid playable sources
 - safe checks
 
-## Registry status
+## Registry promoted checkpoint
 
 Registry route:
 
@@ -140,26 +141,37 @@ Installed registry version:
 
 `V7.13.017 Registry Machine · Social Matrix + Supabase Proof · 16 Protected Checks`
 
-Status:
+Browser report status:
 
-`INSTALLED / READY FOR BROWSER SCAN ALL TEST`
+`PASSED AND PROMOTED`
 
-What changed in registry V7.13.017:
+Passed registry report numbers:
 
-- added Platform route group
-- added Social route group
-- added Social Profile route
-- added Friends route
-- added News Feed route
-- added Groups and Events route
-- renamed Settings > Profile Settings to Account Settings
-- added social table parser coverage
-- added social proof table coverage
-- kept protected files at 16 checks
-- kept scanner read-only
-- kept no schema/RLS/storage/service-role/payment/Home replacement side effects
+- registry entries: 72
+- unique URLs: 69
+- routes OK: 69 / 69
+- protected files OK: 16 / 16
+- social group matrix: true
+- main app rail pass: true
+- admin group rail: true
+- registry machine: true
+- protected checks configured: 16
+- protected checks expected: 16
 
-Active proof tables now include the old main app table set plus social proof tables:
+Registry V7.13.017 now recognises:
+
+- Platform route group
+- Social route group
+- Social Profile route
+- Friends route
+- News Feed route
+- Groups and Events route
+- Settings > Account Settings label
+- Social table parser coverage
+- Social proof table coverage
+- Optional/future social tokens as classified known tokens, not plain unknown schema warnings
+
+Active social proof tables now include:
 
 - `sb_account_deletion_requests`
 - `sb_profile_social_settings`
@@ -257,21 +269,6 @@ Admin / proof:
 
 No page change should add schema, storage policy, payment provider, production Home replacement, service-role key, or destructive cleanup without explicit approval.
 
-## Next test
+## Next safe plan target
 
-Open:
-
-`https://chatterfriendsstreambandit.co.uk/all-pages-version-registry-v7-12-122-current-routes-test.html?v=713017`
-
-Run:
-
-`Scan All + Supabase Proof`
-
-Pass condition:
-
-- route bad = 0
-- file bad = 0
-- Social group appears as a route group
-- Platform group appears as a route group
-- social tables appear in table proof/matrix instead of only manifest unknown warnings
-- Supabase proof remains connected
+Use the promoted registry truth to choose the next focused batch. Do not start destructive cleanup. Do not replace Home. Do not promote payments. Keep Web Builder, Social Media Group, Account Settings, Main App Movie Streaming and Admin/Registry as separate functions.
