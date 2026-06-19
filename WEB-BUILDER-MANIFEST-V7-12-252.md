@@ -1,4 +1,8 @@
-# Web Builder Manifest V7.13.050
+# Web Builder Manifest V7.13.058
+
+Date: 2026-06-19
+
+Status: WEB BUILDER FINAL SCAN MAP / CURRENT OWNED ROUTES LOCKED / OLD SUPPORT ROUTES KEPT HIDDEN
 
 ## Purpose
 
@@ -6,87 +10,79 @@ This manifest tracks Web Builder as its own builder product area inside Stream B
 
 The Stream Bandit movie/app manifest remains separate.
 
-This file is the working project-memory checkpoint for Web Builder rules, shared shells, rails, projectors, Supabase table use, passed pages and protected boundaries.
+This file is the working project-memory checkpoint for Web Builder rules, shared Web Builder rails, projectors, Supabase table use, passed pages, old support-route handling and protected boundaries.
 
-## Current checkpoint status
+## What the full scan taught us
 
-Status: WEB BUILDER FORM INBOX TARGET BOX V7.13.049 LOCKED / GLOBAL FOOTER COMMUNICATIONS OVERLAY V7.13.048 LOCKED / WEB BUILDER ENGINE RAIL CONNECTED / FORM INBOX HAS INBOX + SUBMISSIONS + PRIVATE MESSAGES + NEW MESSAGE + FRIENDS + BLOCKED + NOTIFICATIONS / GLOBAL FOOTER OVERLAY HAS PRIVATE MESSAGES + SUBMISSIONS + NOTIFICATIONS / MAIN APP AND WEB BUILDER SEPARATION RULE RECORDED / NO NEW FILES / NO SCHEMA, RLS, STORAGE, INDEX OR DNS CHANGES.
+```text
+Web Builder is not the Main App shell.
+Web Builder has its own owned pages, rails and projector.
+Old Web Builder pages are useful support/compatibility witnesses.
+Normal user-facing Web Builder links should point to the current owned routes.
+Do not delete old support pages blindly.
+Do not merge Main App header/footer behavior into Web Builder pages.
+```
 
-Latest recorded Web Builder manifest lock:
+## Current Web Builder route truth
 
-`V7.13.050 Web Builder Form Inbox Target Box + Footer Overlay Exact Point Lock`
+Current user-facing Web Builder targets:
 
-## Exact point locked now
+```text
+Web Builder Hub
+-> web-builder-account-control-hub-v7-12-263-test.html
 
-Repository checkpoint locked before this manifest write:
+Owned Pages Manager
+-> web-builder-pages-manager-owned-v7-12-256-test.html
 
-- Web Builder Form Inbox commit: `cda746a1aac3155407d711631c1424a9dd6c033f`
-- Global footer shell overlay commit: `865263acbc01a7c3461d03ae106fe748f797419d`
+Owned Preview
+-> web-builder-preview-owned-v7-12-257-test.html?page=test-page
 
-Locked target routes/files:
+Form Designer
+-> web-builder-form-designer-owned-v7-12-258-test.html?page=test-page
 
-- Web Builder target box: `web-builder-form-inbox-owned-v7-12-258-test.html?page=form-flow-lab-test`
-- Global footer shell: `stream-bandit-footer-shell-v7-12-156.js`
+Form Inbox Bridge
+-> web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page
+```
 
-Locked Web Builder Form Inbox version:
+Core route group:
 
-`V7.13.049 Web Builder Messages Submissions Notifications Engine Connected`
+```text
+Hub: web-builder-account-control-hub-v7-12-263-test.html
+Pages Manager: web-builder-pages-manager-owned-v7-12-256-test.html
+Studio / canvas: overlay-route-truth-machine-v7-12-66-test.html?page=<slug>
+Published Full Preview: web-builder-preview-owned-v7-12-257-test.html?page=<slug>
+Page Menu Builder: web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>
+Header/Footer Builder: web-builder-header-footer-code-v7-12-254-test.html?page=<slug>
+Form Designer: web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>
+Form Inbox Bridge: web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>
+Assets: web-builder-assets-v7-12-252-test.html
+Planning Map: web-builder-route-map-v7-12-252-test.html
+Control Map: web-builder-control-map-v7-12-253-test.html
+Source Map: web-builder-pages-source-map-v7-12-255-test.html
+```
 
-Required behavior locked for Web Builder Form Inbox:
+## Legacy/support Web Builder routes
 
-- It is the actual Web Builder target box for `form-flow-lab-test`.
-- It is connected to the shared Web Builder rail/search/avatar engine used by the other Web Builder pages.
-- It loads Web Builder rail/auth foundations:
-  - `stream-bandit-route-registry-v7-13-001.js`
-  - `stream-bandit-auth-entry-gate-v7-13-001.js`
-  - `web-builder-global-projector-v7-12-263.js`
-- It carries `data-wb-no-stream-bandit-global-shell="true"` so the main app global footer shell must not be injected into this Web Builder page.
-- It keeps Web Builder page identity and Web Builder engine behavior.
-- It has tabs:
-  - Inbox
-  - Submissions
-  - Private Messages
-  - New Message
-  - Friends
-  - Blocked
-  - Notifications
-- It reads messages/submissions from existing tables only:
-  - `sb_private_messages`
-  - `sb_form_submissions`
-  - `sb_profiles`
-  - `sb_user_friends`
-  - `sb_user_blocks`
-- It writes only existing private-message actions and submission status actions already covered by current flow.
-- It must not create new Supabase tables.
-- It must not change schema, RLS, storage policies, buckets, indexes, DNS or service-role logic.
-- It must not use the main app footer shell as its page shell.
+These old routes may remain available as compatibility/support/witness pages:
 
-Locked global footer shell version:
+```text
+web-builder-live-studio-v7-12-116-test.html
+web-builder-pages-manager-v7-12-111-test.html
+web-builder-shared-style-preview-v7-12-117-test.html
+web-builder-form-save-v7-12-94-test.html
+web-builder-form-submissions-v7-12-94-test.html
+```
 
-`V7.13.048 Footer Shell Messages + Submissions`
+Support-route rules:
 
-Required behavior locked for global footer shell overlay:
+```text
+Do not delete old useful pages just because they are old.
+Do not expose old support routes as normal Web Builder menu items when current owned pages exist.
+Patch only user-facing stale links.
+Owner diagnostic pages may keep old witness links if they are clearly diagnostic.
+```
 
-- The main/global app footer shell remains the main app global footer shell.
-- Its communications overlay now has:
-  - Inbox
-  - Submissions
-  - Private Messages
-  - New Message
-  - Friends
-  - Blocked
-  - Notifications
-- It uses existing tables:
-  - `sb_private_messages`
-  - `sb_form_submissions`
-  - `sb_profiles`
-  - `sb_user_friends`
-  - `sb_user_blocks`
-- It links its Form Inbox route to `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>`.
-- It must not become the Web Builder page shell.
-- Web Builder pages that carry `data-wb-no-stream-bandit-global-shell="true"` must not receive the main app footer shell injection.
-
-## Thomas the Tank Engine rule
+## Main App and Web Builder separation
 
 Main app and Web Builder stay on separate tracks:
 
@@ -97,190 +93,86 @@ Main app and Web Builder stay on separate tracks:
 - The global footer communications overlay can read the same communication tables, but it must not become the Web Builder page shell.
 - Web Builder Form Inbox can show the same communication/submission data, but it must remain a Web Builder page with Web Builder engine rails.
 
-## Latest working page passes recorded
+## Current approved Web Builder table map
 
-- `V7.13.049 Web Builder Form Inbox Messages Submissions Notifications Engine Connected`
-- `V7.13.048 Footer Shell Messages + Submissions`
-- `V7.13.028 Web Builder Full Preview Choice Fields Uploads`
-- `V7.13.025 Web Builder Full Preview One Footer Lock`
-- `V7.13.021 Web Builder Studio Draft Preview Device Sizing`
-- `V7.13.010 Web Builder Planning Map / Studio Planning Split`
-- `V7.12.300.53 Form Designer Safe Loader Kind Fix`
-- `V7.12.299.19 Web Builder Control Map Global Rail Pass`
-- `V7.12.300.44 Web Builder Source Map Global Projector Rail Search Pass`
-- `V7.12.300.47 Web Builder Pages Manager Builder Polish SEO Domain Preview Controls Pass`
-- `V7.12.300.42 Web Builder Header Footer Rail Search Workspace Apply Pass`
-- `V7.12.300.40 Page Menu Builder Icon Restore + Published Menu Set Pass`
+```text
+sb_profiles
+sb_site_pages
+sb_form_submissions
+sb_private_messages
+sb_user_friends
+sb_user_blocks
+```
 
-## Project memory checkpoint
+Approved existing write surfaces:
 
-Owner/profile proof:
+```text
+Owned Pages Manager -> sb_site_pages
+Studio / builder engine -> sb_site_pages
+Menu Builder -> sb_site_pages.settings_json
+Header/Footer Builder -> sb_site_pages.settings_json.web_builder_shell
+Form Designer -> existing form/submission/private-message flow
+Form Inbox Bridge -> existing private-message and submission-status flow
+Published Preview -> sb_form_submissions and existing public image upload flow when form fields require it
+```
 
-- Current signed-in builder owner: `trevieisking@gmail.com`.
-- Current owner user id: `af380be8-d1e2-4154-a5ed-a113c8271afd`.
-- Current profile: `admin` / role `admin` / admin level `owner` / plan `platform_owner` / status `active`.
-- Platform owner can manage all workspaces.
-- Creator users only see their own `owner_id` rows.
-- Admin role alone does not expose other users' Web Builder workspaces.
+Not approved by this manifest:
 
-Main working Web Builder flow:
+```text
+New SQL tables
+RLS changes
+Storage policy changes
+Bucket creation
+Payment provider activation
+DNS automation
+Service-role browser logic
+Main App Home replacement
+Main App/Web Builder shell merge
+```
 
-`Hub -> Pages -> Studio / Publish -> Published Full Preview`
+## Current page status board
 
-Core Web Builder route group:
+| Area | Route | Current status | Writes |
+|---|---|---|---|
+| Hub | `web-builder-account-control-hub-v7-12-263-test.html` | Current user-facing doorway / visual standard | none expected |
+| Pages Manager | `web-builder-pages-manager-owned-v7-12-256-test.html` | Current owned page manager/control centre | `sb_site_pages` |
+| Studio | `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>` | Stable builder/canvas route | existing builder engine writes |
+| Published Full Preview | `web-builder-preview-owned-v7-12-257-test.html?page=<slug>` | Current full preview route | submissions/uploads only as existing flow allows |
+| Page Menu Builder | `web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>` | Passed menu route | `sb_site_pages.settings_json` |
+| Header/Footer Builder | `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` | Passed shell-data builder | `sb_site_pages.settings_json.web_builder_shell` |
+| Form Designer | `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>` | Passed / preserve | existing form/private-message flow |
+| Form Inbox Bridge | `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>` | Passed / preserve / Web Builder bridge | existing message/status flow |
+| Assets | `web-builder-assets-v7-12-252-test.html` | Existing asset route | existing asset flow only |
+| Planning Map | `web-builder-route-map-v7-12-252-test.html` | Read-only planning destination | none |
+| Control Map | `web-builder-control-map-v7-12-253-test.html` | Read-only control map | none |
+| Source Map | `web-builder-pages-source-map-v7-12-255-test.html` | Read-only source/debug map | none |
 
-- Hub: `web-builder-account-control-hub-v7-12-263-test.html`
-- Pages Manager: `web-builder-pages-manager-owned-v7-12-256-test.html`
-- Studio: `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>`
-- Published Full Preview: `web-builder-preview-owned-v7-12-257-test.html?page=<slug>`
-- Page Menu Builder: `web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>`
-- Header/Footer Builder: `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>`
-- Web Builder Form Designer: `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>`
-- Web Builder Form Inbox: `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>`
-- Assets: `web-builder-assets-v7-12-252-test.html`
-- Planning Map: `web-builder-route-map-v7-12-252-test.html`
-- Control Map: `web-builder-control-map-v7-12-253-test.html`
-- Source Map: `web-builder-pages-source-map-v7-12-255-test.html`
+## What changed in the final scan pass
 
-## Main app and Web Builder separation
+```text
+Main shell route aliases were cleaned to current owned Web Builder targets.
+Header Owner menu no longer exposes old Web Builder support pages as normal Owner items.
+Current App Manifest V7.13.058 records final scan results.
+Master Must-Follow Plan V7.13.058 records scan lessons.
+Fix Memory V7.13.058 records active route truth.
+What Changed V7.13.058 records actual changes and deferred work.
+Master Audit Sheet V7.13.058 records full route-family audit.
+```
 
-- Web Builder is its own builder product area, not the main Stream Bandit movie app shell.
-- Main app Watch/Browse/Creator/Group Play routes stay separate from Web Builder.
-- Main app Form Builder/Form Builder 2 is separate from Web Builder Form Designer.
-- Main Stream Bandit app routes, player routes, movie routes, accessibility/audio boost and main app form-builder systems are protected during Web Builder work.
-- Do not touch `index.html` for Web Builder until the full Web Builder group pass is approved.
-- Web Builder pages use Web Builder rail/projector/global settings behavior.
-- Main app global header/footer/settings must not appear on Web Builder pages unless the user explicitly asks for a main-app page.
+## Deferred Web Builder work
 
-## Shared shells, rails and projectors
+```text
+Do not delete old support pages yet.
+Move/correct Form Inbox into Social later only in a controlled pass.
+Clean old witness links inside Owner diagnostic pages only if they cause real confusion later.
+Update route registry/access map only after direct source verification proves a user-facing stale route remains.
+```
 
-- User-facing Web Builder pages use the shared Web Builder global rail/projector where already passed.
-- The global rail/search/hub/avatar projector remains active on passed Web Builder pages.
-- Full Preview owns its own header/footer render; it must block duplicate preview header/footer injection.
-- Header/Footer Builder writes Web Builder shell data into `sb_site_pages.settings_json.web_builder_shell`; it does not alter the main Stream Bandit app shell.
-- Web Builder Form Inbox is now a Web Builder target box using the shared Web Builder engine/projector.
-- The global footer shell is allowed to have a communications overlay with submissions/private messages/notifications, but it is not the Web Builder page shell.
+## Final Web Builder decision
 
-## Supabase table map, current approved tables
-
-- App/admin/settings: `sb_admin_audit_log`, `sb_app_settings`, `sb_policy_documents`
-- Watch/browse: `sb_movies`, `sb_genres`, `sb_watch_progress`, `sb_watchlist`, `sb_favourites`, `sb_likes`
-- Creator/group play: `sb_channels`, `sb_collections`, `sb_collection_movies`, `sb_playlists`, `sb_playlist_movies`, `sb_submissions`, `sb_import_batches`
-- User/profile: `sb_profiles`
-- Web Builder pages: `sb_site_pages`
-- Web Builder forms/messages: `sb_form_submissions`, `sb_private_messages`, `sb_user_friends`, `sb_user_blocks`
-
-Future/planning-only tables, not approved for migration yet:
-
-- `sb_builder_accounts`
-- `sb_builder_sites`
-- `sb_builder_pages`
-- `sb_builder_assets`
-- `sb_builder_themes`
-- `sb_builder_domains`
-- `sb_builder_deploys`
-- `sb_builder_revisions`
-- `sb_builder_audit_log`
-- `sb_account_deletion_requests`
-
-Browser-local/config tokens are not schema unless a matching Supabase call exists:
-
-- `sb_theme`
-- `sb_header_*`
-- `sb_profile`
-- `sb_preview_rating*`
-- `sb_wb_*`
-- `sb_form_designer_local_*`
-- `sb_publishable_*` is a publishable config token and must stay redacted.
-
-## Current governing rules
-
-- Hub remains the visual gold standard.
-- Inputs belong in overlays where users create, edit, remove, reorder or confirm something.
-- Outputs stay visible on-page.
-- Read-only pages are allowed only when they are useful inspectors, truth checkers or route/action maps.
-- No schema, RLS, storage policy, bucket policy, service-role, payment provider, DNS automation or final live-home replacement is approved by this checkpoint.
-- Web Builder passed pages are recorded here instead of replacing the main `index.html` until the full Web Builder group pass is approved.
-- If a page already passes and nothing visible is broken, do not rewrite it just to increase a version number. Record the pass, preserve the working code, and move to the next planned page.
-- Planning belongs on the Planning Map, not inside the live Studio canvas.
-- Studio Draft Preview is body/cards only.
-- Published Full Preview is the separate complete published page and shows header, footer, menus and full composed result.
-- Do not iframe the whole Published Preview page inside Studio.
-- Do not rebuild the full Published Preview compositor inside Studio.
-- Full Preview must show one footer only, from Header/Footer Builder.
-- Web Builder Full Preview V7.13.028 is passed and should not be touched again unless a real break appears.
-- Web Builder Form Inbox V7.13.049 is locked at this exact point unless a real break appears.
-- Global Footer Shell V7.13.048 communications overlay is locked at this exact point unless a real break appears.
-
-## Page status board
-
-| Area | Route | Current status | Tables needed | Writes |
-| --- | --- | --- | --- | --- |
-| Hub | `web-builder-account-control-hub-v7-12-263-test.html` | Working doorway / visual standard | `sb_profiles`, `sb_site_pages` | none expected |
-| Pages Manager | `web-builder-pages-manager-owned-v7-12-256-test.html` | Passed full page manager/control centre | `sb_profiles`, `sb_site_pages` | `sb_site_pages` |
-| Studio | `overlay-route-truth-machine-v7-12-66-test.html?page=<slug>` | Passed V7.13.021 / stable builder + draft preview device sizing | `sb_profiles`, `sb_site_pages` | `sb_site_pages` through existing builder engine |
-| Published Full Preview | `web-builder-preview-owned-v7-12-257-test.html?page=<slug>` | Passed V7.13.028 / complete preview + tidy hero + one footer + form controls/uploads | `sb_profiles`, `sb_site_pages`, `sb_form_submissions` | `sb_form_submissions`; uploads to existing `stream-bandit-images` bucket when form file/image fields are used |
-| Page Menu Builder | `web-builder-menu-builder-owned-v7-12-264-test.html?page=<slug>` | Passed | `sb_profiles`, `sb_site_pages` | `sb_site_pages.settings_json` |
-| Header/Footer Builder | `web-builder-header-footer-code-v7-12-254-test.html?page=<slug>` | Passed builder, writes real shell data | `sb_profiles`, `sb_site_pages` | `sb_site_pages.settings_json.web_builder_shell` |
-| Web Builder Form Designer | `web-builder-form-designer-owned-v7-12-258-test.html?page=<slug>` | Passed / do not touch | `sb_profiles`, `sb_site_pages`, form tables | form submissions + private messages from existing flow |
-| Web Builder Form Inbox | `web-builder-form-inbox-owned-v7-12-258-test.html?page=<slug>` | LOCKED V7.13.049 / Web Builder engine connected / inbox + submissions + private messages + notifications | `sb_profiles`, `sb_site_pages`, `sb_form_submissions`, `sb_private_messages`, `sb_user_friends`, `sb_user_blocks` | private-message replies/actions + submission review status from existing flow |
-| Global Footer Shell | `stream-bandit-footer-shell-v7-12-156.js` | LOCKED V7.13.048 / global communications overlay has messages + submissions + notifications | `sb_profiles`, `sb_form_submissions`, `sb_private_messages`, `sb_user_friends`, `sb_user_blocks` | private-message replies/actions only; no schema changes |
-| Assets | `web-builder-assets-v7-12-252-test.html` | Passed asset route | existing asset/profile tables/storage as already wired | existing asset flow only |
-| Planning Map | `web-builder-route-map-v7-12-252-test.html` | Passed read-only planning destination | `sb_profiles`, `sb_site_pages` | none |
-| Control Map | `web-builder-control-map-v7-12-253-test.html` | Passed read-only control map | `sb_profiles`, `sb_site_pages` | none |
-| Source Map | `web-builder-pages-source-map-v7-12-255-test.html` | Passed read-only source/debug map | `sb_profiles`, `sb_site_pages` | none |
-
-## Full Preview final pass recorded
-
-Route:
-
-`web-builder-preview-owned-v7-12-257-test.html?page=<slug>`
-
-Passed version:
-
-`V7.13.028 Web Builder Full Preview Choice Fields Uploads`
-
-Owner confirmed status:
-
-FULLY PASSED / NEVER TO BE TOUCHED AGAIN UNLESS A REAL BREAK APPEARS.
-
-Passed behavior:
-
-- reads `sb_profiles`
-- reads `sb_site_pages`
-- consumes page body / layout data
-- consumes Page Menu Builder output from `settings_json.page_menu_set` / related key
-- consumes Header/Footer Builder output from `settings_json.web_builder_shell`
-- renders header shell
-- renders page menu output
-- renders page body blocks/cards/forms/media
-- renders tidy hero card above hero image
-- keeps hero title visible and not hidden under the image
-- keeps hero text readable
-- renders footer once only from Header/Footer Builder
-- disables duplicate preview header/footer injection
-- keeps the global rail/search/avatar projector active
-- Desktop / Tablet / Mobile preview controls work
-- form text, textarea, phone, date, URL/email/number fields render properly
-- multiple choice renders clickable radio choices
-- choose-one/dropdown renders a real dropdown
-- checkboxes render clickable checkbox choices
-- yes/no renders clickable radio choices
-- Upload File renders a real file picker
-- Upload Image renders a real image picker with image accept
-- uploaded file/image links save into `sb_form_submissions.answers_json`
-- uses the existing `stream-bandit-images` bucket for upload fields
-- Web Builder Form Designer remains separate from main app Form Builder/Form Builder 2
-- no schema change
-- no RLS change
-- no storage policy change
-- no index promotion
-
-Important Full Preview fixes recorded:
-
-- `V7.13.023` improved hero text pulling and started footer filtering.
-- `V7.13.024` moved hero text/title into a clean card above the image.
-- `V7.13.025` fixed the real duplicate footer source by blocking duplicate header/footer.
-- `V7.13.027` changed file/image upload fields from fake URL/text inputs into real upload controls.
-- `V7.13.028` changed multiple choice, choose-one/dropdown, checkboxes and yes/no from dead text inputs into real controls.
-- One correct footer remains: the footer rendered by Full Preview from Header/Footer Builder shell data.
+```text
+WEB BUILDER CURRENT OWNED ROUTES ARE LOCKED.
+OLD WEB BUILDER SUPPORT PAGES ARE COMPATIBILITY/WITNESS PAGES.
+MAIN APP AND WEB BUILDER STAY SEPARATE.
+NO BACKEND OR STORAGE POLICY CHANGE IS APPROVED BY THIS MANIFEST.
+```
