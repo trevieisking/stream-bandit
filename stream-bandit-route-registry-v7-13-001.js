@@ -1,13 +1,14 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.021 Unified Route Registry Foundation / Public Rules Alignment';
+  var VERSION = 'V7.13.022 Unified Route Registry Foundation / Group Play Plan Lock Alignment';
 
   var ROUTE_CLASSES = {
     PUBLIC: 'public',
     ACCOUNT_OPTIONAL: 'account_optional',
     ACCOUNT_REQUIRED: 'account_required',
     CREATOR: 'creator_submit',
+    CREATOR_PLAN: 'creator_plan',
     ADMIN: 'admin_only',
     OWNER: 'owner_only',
     WEB_BUILDER: 'web_builder',
@@ -41,10 +42,10 @@
     {label:'Submit Video',url:'submit-video-clean-machine-v7-12-79-test.html',group:'Creator',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.CREATOR,read:['sb_channels','sb_movies','sb_profiles','sb_submissions'],write:['sb_submissions']},
     {label:'Creator Rules',url:'rules-clean-machine-v7-12-82-test.html',group:'Creator',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_profiles'],write:[]},
     {label:'Review Queue',url:'review-queue-clean-machine-v7-12-80-publish-test.html',group:'Creator',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ADMIN,read:['sb_movies','sb_submissions','sb_profiles','sb_channels'],write:['sb_movies','sb_submissions']},
-    {label:'Playlists',url:'playlists-global-helpers-v7-5-2-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_movies','sb_playlists','sb_playlist_movies','sb_profiles'],write:['sb_playlists','sb_playlist_movies']},
-    {label:'Channels',url:'channels-global-helpers-v7-5-3-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_channels','sb_movies','sb_profiles'],write:['sb_channels','sb_profiles']},
+    {label:'Playlists',url:'playlists-global-helpers-v7-5-2-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.CREATOR_PLAN,minPlan:'viewer_plus',feature:'playlists',read:['sb_movies','sb_playlists','sb_playlist_movies','sb_profiles'],write:['sb_playlists','sb_playlist_movies']},
+    {label:'Channels',url:'channels-global-helpers-v7-5-3-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.CREATOR_PLAN,minPlan:'creator_starter',feature:'channels',read:['sb_channels','sb_movies','sb_profiles'],write:['sb_channels','sb_profiles']},
     {label:'My Channel',url:'my-channel-clean-machine-v7-12-47-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_channels','sb_collections','sb_movies','sb_playlists','sb_profiles','sb_submissions'],write:['sb_profiles']},
-    {label:'Collections',url:'collections-clean-machine-v7-12-51-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_collection_movies','sb_collections','sb_movies','sb_profiles'],write:['sb_collections','sb_collection_movies']},
+    {label:'Collections',url:'collections-clean-machine-v7-12-51-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.CREATOR_PLAN,minPlan:'creator_growth',feature:'collections',read:['sb_collection_movies','sb_collections','sb_movies','sb_profiles'],write:['sb_collections','sb_collection_movies']},
     {label:'Profile / Login',url:'profile-settings-live-ready-v7-12-90-test.html',group:'Account',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_profiles'],write:['sb_profiles']},
     {label:'User Management Dashboard',url:'user-management-dashboard-v7-11-2-test.html',group:'User Management',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.OWNER,read:['sb_profiles','sb_admin_audit_log'],write:['sb_profiles']},
     {label:'Permissions Matrix',url:'permissions-matrix-user-management-v7-11-4-test.html',group:'User Management',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.OWNER,read:['sb_profiles','sb_admin_audit_log'],write:[]},
