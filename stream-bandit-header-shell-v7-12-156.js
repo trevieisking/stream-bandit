@@ -1,4 +1,4 @@
-/* Stream Bandit Header Shell V7.13.014
+/* Stream Bandit Header Shell V7.13.058
    Global header, menu overlay, current route markers, search bridge, saved count badges, social group routes and global account panel.
    Header Shell owns the site-wide account chip/avatar render and the left identity image decision.
    Profile Settings owns profile edits only and should trigger header refresh after saving sb_profiles.
@@ -8,21 +8,22 @@
    - signed out = left identity image is the global brand logo and IS data-sb-brand-logo
    Account panel supports existing-user-only magic-link sign-in and sign-out.
    Social Profile routes are linked as a passed Profile Social Media Group.
+   V7.13.058 keeps Owner group but removes Web Builder-owned Advanced Form, Pages Manager and Published Preview from normal Owner menu exposure. Form Inbox stays as the exception.
    No public signup, no Auth Admin, no delete user actions.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.13.014 Header Shell / Account Settings Menu Cleanup';
+const VERSION='V7.13.058 Header Shell / Owner Web Builder Menu Cleanup';
 const THEME_OWNER='web-builder-theme-studio-controls-v7-8-9-test.html';
 const LOGO='stream_bandit_original_logo_square_256.png';
 const PROFILE='profile-settings-live-ready-v7-12-90-test.html';
 const SOCIAL_PROFILE='profile-social-v7-13-001-test.html';
 const SOCIAL_FRIENDS='friends-social-v7-13-001-test.html';
-const SOCIAL_FEED='news-feed-social-v7-13-003-test.html';
+const SOCIAL_FEED='news-feed-social-v7-13-001-test.html';
 const SOCIAL_GROUPS='groups-social-v7-13-001-test.html';
-const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
-const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+const SUPABASE_URL=window.SUPABASE_URL||(window.StreamBanditSupabaseConfig&&window.StreamBanditSupabaseConfig.url)||'https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+const SUPABASE_KEY=window.SUPABASE_KEY||(window.StreamBanditSupabaseConfig&&window.StreamBanditSupabaseConfig.key)||(window.StreamBanditShell&&window.StreamBanditShell.config&&window.StreamBanditShell.config().key)||'';
 const PROFILE_CACHE_KEYS=['sb_header_profile_cache_v7_12_156','streamBanditProfile','sb_profile'];
 
 let sbClient=null;
@@ -39,7 +40,7 @@ const ROUTES={
  settings:'settings-platform-control-hub-v7-12-85-test.html',theme:THEME_OWNER,profile:PROFILE,accountProfile:PROFILE,socialProfile:SOCIAL_PROFILE,socialFriends:SOCIAL_FRIENDS,socialFeed:SOCIAL_FEED,socialGroups:SOCIAL_GROUPS,builder:'web-builder-account-control-hub-v7-12-263-test.html',
  policyCentre:'policy-documents-centre-v7-12-119-test.html',policyReader:'policy-reader-v7-12-119-test.html?policy=terms',policyAdmin:'policy-admin-documents-v7-12-120-test.html?policy=terms',
  admin:'admin-centre-command-deck-v7-12-121-test.html',readiness:'live-readiness-global-helpers-v7-10-2-test.html',registry:'all-pages-version-registry-v7-12-122-current-routes-test.html',checklist:'test-checklist-global-helpers-v7-10-5-test.html',tools:'tools-page-original-global-pass-v7-12-136-test.html',health:'health-check-global-helpers-v7-10-6-test.html',mux:'mux-manager-global-helpers-v7-10-7-test.html',storage:'storage-prep-global-helpers-v7-10-8-test.html',backup:'backup-safety-global-helpers-v7-10-9-test.html',
- formInbox:'web-builder-form-submissions-v7-12-94-test.html?page=test-page',formAdvanced:'web-builder-form-save-v7-12-94-test.html?page=test-page',oneMachine:'stream-bandit-one-machine-v7-12-73-test.html',platformControl:'settings-platform-control-hub-v7-12-85-test.html',helperShell:'stream-bandit-global-helper-shell-v7-12-126-test.html',brandIcons:'settings-brand-icons-promoted-v7-12-21-test.html',brandHelper:'brand-logo-helper-responsive-v7-12-20-test.html',faviconBuilder:'favicon-app-icon-builder-v7-12-15-test.html',pagesManager:'web-builder-pages-manager-v7-12-111-test.html',preview:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
+ formInbox:'web-builder-form-submissions-v7-12-94-test.html?page=test-page',formAdvanced:'web-builder-form-designer-owned-v7-12-258-test.html?page=test-page',oneMachine:'stream-bandit-one-machine-v7-12-73-test.html',platformControl:'settings-platform-control-hub-v7-12-85-test.html',helperShell:'stream-bandit-global-helper-shell-v7-12-126-test.html',brandIcons:'settings-brand-icons-promoted-v7-12-21-test.html',brandHelper:'brand-logo-helper-responsive-v7-12-20-test.html',faviconBuilder:'favicon-app-icon-builder-v7-12-15-test.html',pagesManager:'web-builder-pages-manager-owned-v7-12-256-test.html',preview:'web-builder-preview-owned-v7-12-257-test.html?page=test-page',
  userDashboard:'user-management-dashboard-v7-11-2-test.html',pricing:'plans-pricing-feature-shop-v7-11-3-test.html',permissions:'permissions-matrix-user-management-v7-11-4-test.html'
 };
 
@@ -47,7 +48,7 @@ const OLD={
  'collections-clean-machine-v7-12-48-test.html':ROUTES.collections,'collections-clean-machine-v7-12-49-test.html':ROUTES.collections,'collections-clean-machine-v7-12-50-test.html':ROUTES.collections,'collections-global-helpers-v7-5-1-test.html':ROUTES.collections,'collections-browse-shell-v6-46-1-test.html':ROUTES.collections,
  'player-2-progress-helper-v6-78-9-4-test.html':ROUTES.player2,'player-two-global-helpers-v7-3-4-test.html':ROUTES.player2,'player-2-clean-machine-v7-12-57-test.html':ROUTES.player2,
  'all-pages-version-registry-v7-1-4-full-test.html':ROUTES.registry,'all-pages-version-registry-v7-10-3-full-test.html':ROUTES.registry,'admin-centre-command-deck-v7-10-0-test.html':ROUTES.admin,'tools-page-global-helpers-v7-10-1-test.html':ROUTES.tools,
- 'web-builder-live-studio-v7-12-116-test.html':ROUTES.builder,'web-builder-live-studio-v7-12-97-test.html':ROUTES.builder,'web-builder-live-studio-v7-12-93-test.html':ROUTES.builder,'policy-agreements-centre-v7-11-6-test.html':ROUTES.policyCentre,'policy-reader-published-row-v7-12-27-test.html':ROUTES.policyReader,'policy-admin-save-editor-v7-12-25-test.html':ROUTES.policyAdmin,
+ 'web-builder-live-studio-v7-12-116-test.html':ROUTES.builder,'web-builder-live-studio-v7-12-97-test.html':ROUTES.builder,'web-builder-live-studio-v7-12-93-test.html':ROUTES.builder,'web-builder-pages-manager-v7-12-111-test.html':ROUTES.pagesManager,'web-builder-form-save-v7-12-94-test.html':ROUTES.formAdvanced,'web-builder-shared-style-preview-v7-12-117-test.html':ROUTES.preview,'policy-agreements-centre-v7-11-6-test.html':ROUTES.policyCentre,'policy-reader-published-row-v7-12-27-test.html':ROUTES.policyReader,'policy-admin-save-editor-v7-12-25-test.html':ROUTES.policyAdmin,
  'stream-bandit-clean-machine-menu-v7-12-40-test.html':ROUTES.registry,'stream-bandit-route-pointer-machine-v7-12-36-test.html':ROUTES.registry,'platform-control-tower-route-guard-proof-v7-12-33-test.html':ROUTES.health,'final-shell-navigation-global-helpers-v7-5-9-test.html':ROUTES.helperShell,'stream-bandit-one-machine-v7-12-72-test.html':ROUTES.oneMachine,'platform-control-centre-admin-v7-12-59-test.html':ROUTES.platformControl,
  'brand-image-helper-v7-12-20-test.html':ROUTES.brandHelper,'brand-logo-helper-responsive-v7-12-20-test.html':ROUTES.brandHelper,'favicon-app-icon-builder-v7-12-15-test.html':ROUTES.faviconBuilder,
  'user-dashboard-concept-v6-68-test.html':ROUTES.userDashboard,'plans-pricing-matrix-v6-69-test.html':ROUTES.pricing,'permissions-matrix-v6-70-test.html':ROUTES.permissions,
@@ -63,7 +64,7 @@ const MENU=[
  ['Settings','⚙️','Settings Hub',ROUTES.settings,'Settings'],['Settings','🎨','Theme Studio',ROUTES.theme,'Theme owner'],['Settings','⚙️','Account Settings',ROUTES.profile,'Account settings'],['Settings','🏗️','Web Builder',ROUTES.builder,'Builder'],
  ['Policy','📚','Policy Documents',ROUTES.policyCentre,'Policy centre'],['Policy','📖','Policy Proof',ROUTES.policyReader,'Published policy'],['Policy','🧾','Policy Admin Editor',ROUTES.policyAdmin,'Policy admin'],
  ['Admin','🛠️','Admin Centre',ROUTES.admin,'Admin'],['Admin','🚦','Live Readiness',ROUTES.readiness,'Readiness'],['Admin','📋','Current Routes Registry',ROUTES.registry,'Registry'],['Admin','🧪','Test Checklist',ROUTES.checklist,'Testing'],['Admin','🧰','Tools',ROUTES.tools,'Tools'],['Admin','✅','Health Check',ROUTES.health,'Health'],['Admin','🎥','Mux Manager',ROUTES.mux,'Mux'],['Admin','🪣','Storage Prep',ROUTES.storage,'Storage'],['Admin','🛡️','Backup / Safety',ROUTES.backup,'Backup'],
- ['Owner','📬','Form Inbox',ROUTES.formInbox,'Form inbox'],['Owner','🧾','Advanced Form',ROUTES.formAdvanced,'Advanced form'],['Owner','🧠','One Machine',ROUTES.oneMachine,'Diagnostics'],['Owner','🎛️','Platform Control Centre',ROUTES.platformControl,'Controls'],['Owner','🧭','Final Shell Navigation',ROUTES.helperShell,'Helper shell'],['Owner','🗂️','Brand / App Icons',ROUTES.brandIcons,'Brand tools'],['Owner','🖼️','Brand Image Helper',ROUTES.brandHelper,'Brand helper'],['Owner','🦌','Favicon / App Icon Builder',ROUTES.faviconBuilder,'Icon builder'],['Owner','🧭','Pages Manager',ROUTES.pagesManager,'Pages'],['Owner','👁️','Published Preview',ROUTES.preview,'Preview'],
+ ['Owner','📬','Form Inbox',ROUTES.formInbox,'Form inbox'],['Owner','🧠','One Machine',ROUTES.oneMachine,'Diagnostics'],['Owner','🎛️','Platform Control Centre',ROUTES.platformControl,'Controls'],['Owner','🧭','Final Shell Navigation',ROUTES.helperShell,'Helper shell'],['Owner','🗂️','Brand / App Icons',ROUTES.brandIcons,'Brand tools'],['Owner','🖼️','Brand Image Helper',ROUTES.brandHelper,'Brand helper'],['Owner','🦌','Favicon / App Icon Builder',ROUTES.faviconBuilder,'Icon builder'],
  ['User Management','👥','User Dashboard',ROUTES.userDashboard,'Users'],['User Management','💳','Pricing Matrix',ROUTES.pricing,'Pricing'],['User Management','🔐','Permissions Matrix',ROUTES.permissions,'Permissions']
 ];
 
@@ -79,7 +80,7 @@ function load(src){
  try{
   if(Array.from(document.scripts||[]).some(x=>String(x.src||'').includes(src)))return;
   let s=document.createElement('script');
-  s.src=src+(src.includes('?')?'&':'?')+'v=7-13-014';
+  s.src=src+(src.includes('?')?'&':'?')+'v=7-13-058';
   s.defer=true;
   document.head.appendChild(s);
  }catch(e){}
@@ -104,6 +105,7 @@ async function loadSupabaseSdk(){
 async function sb(){
  if(sbClient)return sbClient;
  await loadSupabaseSdk();
+ if(!SUPABASE_KEY)throw new Error('Header Shell Supabase config not ready.');
  sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
  return sbClient;
 }
@@ -906,7 +908,7 @@ function boot(){
  setInterval(updateCounts,5000);
  setInterval(()=>refreshAuth(false,false),60000);
 
- document.documentElement.dataset.sbHeaderShell='v7-13-014';
+ document.documentElement.dataset.sbHeaderShell='v7-13-058';
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
