@@ -1,32 +1,89 @@
-# Stream Bandit Current App Manifest V7.12.300.38
+# Stream Bandit Current App Manifest V7.13.010
 
-Date: 2026-06-17
+Date: 2026-06-19
 
 Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages and One Machine already reference this file.
 
 ## Current strongest pause point
 
-`V7.12.300.38 Web Builder Source Map Truth Checker Pass`
+`V7.13.010 Profile Social Media Group Main Profile Page Polish Pass`
 
-Latest checkpoint file:
-
-`CHECKPOINT-WEB-BUILDER-SOURCE-MAP-PASS-V7-12-300-38.md`
+Manifest-only checkpoint: no new checkpoint file was created for this log.
 
 Previous checkpoint file:
 
-`CHECKPOINT-WEB-BUILDER-HEADER-FOOTER-PREVIEW-PASS-V7-12-300-37.md`
+`CHECKPOINT-WEB-BUILDER-SOURCE-MAP-PASS-V7-12-300-38.md`
 
 ## Current index note
 
-The owner stated that the completed Web Builder group must eventually be promoted through `index.html`.
+The Profile Social Media Group main profile page has passed as a test/candidate page.
 
-That final promotion is not done yet.
+Index promotion is not done yet. The owner has gated index promotion until the whole Profile Social Media Group is built and passed.
 
 Current Home route remains:
 
 `home-global-helpers-v7-4-4-test.html`
 
-## Web Builder Source Map pass detail
+## Profile Social Media Group pass detail
+
+Main profile route passed:
+
+`profile-social-v7-13-001-test.html`
+
+Passed version:
+
+`V7.13.010 Profile Social Media Group Polish Test`
+
+Group name for all future references:
+
+`Profile Social Media Group`
+
+Passed behavior:
+
+- Account Tools > Save Profile Text
+- Account Tools > Avatar Overlay
+- Account Tools > Banner Overlay
+- Questions > Save Rich Questions
+- Privacy > Save Privacy
+- Friends & Family > family request / confirm
+- Friends & Family layout polish
+- Friends & Family > Remove Family Link
+- Wall > Publish Wall Post
+- Wall > Comment on post
+- Wall > Like post
+- Wall/comment/like persistence after refresh
+- Checks tab > Run Safe Checks
+- Delete account request overlay opens only
+
+Current known minor polish for later:
+
+- Friends & Family has a small visual/card polish issue, but the workflow passed.
+
+Safety:
+
+- writes current signed-in account text/avatar/banner to `sb_profiles`
+- writes social profile settings to `sb_profile_social_settings`
+- writes family request/status changes to `sb_user_family_relationships`
+- writes wall posts to `sb_social_posts`
+- writes wall comments to `sb_social_post_comments`
+- writes wall reactions/likes to `sb_social_post_reactions`
+- writes account deletion requests only to `sb_account_deletion_requests`
+- no browser Auth deletion
+- no service-role key
+- no schema change in the page
+- no storage policy change in the page
+- no index promotion
+- no live-home replacement
+
+Current Profile Social Media Group routes:
+
+- Main Social Profile: `profile-social-v7-13-001-test.html`
+- Friends: `friends-social-v7-13-001-test.html`
+- News Feed: `news-feed-social-v7-13-001-test.html` planned/linked, not passed yet
+- Groups: `groups-social-v7-13-001-test.html` planned/linked, not passed yet
+- Events: future group feature
+
+## Previous Web Builder Source Map pass detail
 
 Route passed:
 
@@ -86,13 +143,22 @@ Future login requirements:
 - no duplicate account for the same email
 - owner/admin gates remain protected
 
-This is future work and is not part of the current Source Map checkpoint.
+This is future work and is not part of the current Profile Social Media Group main page checkpoint.
 
 ## Safety standard
 
 No page change should add schema, RLS, storage policy, bucket policy, service-role, final live-home replacement, payment provider, or browser secret keys without explicit approval.
 
-## Previous live candidate groups
+## Current live candidate groups
+
+### Profile Social Media Group
+
+- `profile-social-v7-13-001-test.html` — passed as main profile candidate at V7.13.010
+- `friends-social-v7-13-001-test.html` — passed earlier as friends page candidate
+- `news-feed-social-v7-13-001-test.html` — linked/planned, not passed yet
+- `groups-social-v7-13-001-test.html` — linked/planned, not passed yet
+
+Index promotion for this group remains blocked until the whole group passes.
 
 ### Account + User Management
 
@@ -148,10 +214,10 @@ Scanner checks to preserve:
 
 ## Next plan target
 
-Continue doing every Web Builder page properly:
+Continue the Profile Social Media Group without index promotion:
 
-1. Page Menu Builder must stay classified and polished as the on-page custom menu builder.
-2. Route Map should become route-health manager.
-3. Control Map should become action/button ownership truth page.
-4. Domain, subdomain and hosting support remains future builder-owned product work.
-5. Final `index.html` promotion remains owner-gated after the full Web Builder group pass.
+1. Build/pass the News Feed route.
+2. Build/pass the Groups route.
+3. Add Events only after groups/feed are stable.
+4. Then update overlay/menu/registry for the complete group.
+5. Final `index.html` promotion remains owner-gated after the full Profile Social Media Group pass.
