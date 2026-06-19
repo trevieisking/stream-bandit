@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Settings Hub V7.12.294</title>
+<title>Stream Bandit Settings Hub V7.13.031</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -82,9 +82,9 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
     <a class="pagePill active" href="settings-platform-control-hub-v7-12-85-test.html">Settings Hub</a>
     <a class="pagePill" href="web-builder-theme-studio-controls-v7-8-9-test.html">Theme Studio</a>
     <a class="pagePill" href="profile-settings-live-ready-v7-12-90-test.html">Profile Settings</a>
-    <a class="pagePill" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Web Builder</a>
-    <a class="pagePill" href="web-builder-pages-manager-v7-12-111-test.html">Pages Manager</a>
-    <a class="pagePill" href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Published Preview</a>
+    <a class="pagePill" href="web-builder-account-control-hub-v7-12-263-test.html">Web Builder</a>
+    <a class="pagePill" href="web-builder-pages-manager-owned-v7-12-256-test.html">Pages Manager</a>
+    <a class="pagePill" href="web-builder-preview-owned-v7-12-257-test.html?page=test-page">Published Preview</a>
     <a class="pagePill" href="settings-brand-icons-promoted-v7-12-21-test.html">Brand / App Icons</a>
     <a class="pagePill" href="brand-logo-helper-responsive-v7-12-20-test.html">Brand Helper</a>
     <a class="pagePill" href="favicon-app-icon-builder-v7-12-15-test.html">Favicon Builder</a>
@@ -96,7 +96,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.294 Settings Hub · Web Builder Doorway</span>
+      <span class="badge">V7.13.031 Settings Hub · Web Builder Route Canonical</span>
       <h1>Settings Hub</h1>
       <p>Settings Hub is the safe doorway into Web Builder, Theme Studio, Profile Settings, Brand tools, Accessibility and Policy routes. This page is a map and health doorway only: it does not write to Supabase and does not save settings directly.</p>
       <div class="routeStrip">
@@ -146,30 +146,30 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div class="routeGrid">
     <div class="routeCard">
       <span class="pill cyanPill">Primary doorway</span>
-      <b>Web Builder Studio</b>
-      <p>Current builder work route. This hub opens it but does not rewrite it.</p>
-      <code>web-builder-live-studio-v7-12-116-test.html?page=test-page</code>
-      <a class="btn warn" href="web-builder-live-studio-v7-12-116-test.html?page=test-page">Open Web Builder</a>
+      <b>Web Builder Hub</b>
+      <p>Current builder account control and workspace opener. This hub opens it but does not rewrite it.</p>
+      <code>web-builder-account-control-hub-v7-12-263-test.html</code>
+      <a class="btn warn" href="web-builder-account-control-hub-v7-12-263-test.html">Open Web Builder</a>
     </div>
     <div class="routeCard">
       <span class="pill">Support route</span>
       <b>Pages Manager</b>
-      <p>Page list, page management, guarded page actions and builder route entry.</p>
-      <code>web-builder-pages-manager-v7-12-111-test.html</code>
-      <a class="btn primary" href="web-builder-pages-manager-v7-12-111-test.html">Open Pages Manager</a>
+      <p>Owned page list, page management, guarded page actions and builder route entry.</p>
+      <code>web-builder-pages-manager-owned-v7-12-256-test.html</code>
+      <a class="btn primary" href="web-builder-pages-manager-owned-v7-12-256-test.html">Open Pages Manager</a>
     </div>
     <div class="routeCard">
       <span class="pill">Output route</span>
       <b>Published Preview</b>
-      <p>Preview route for builder output and page blocks.</p>
-      <code>web-builder-shared-style-preview-v7-12-117-test.html?page=test-page</code>
-      <a class="btn" href="web-builder-shared-style-preview-v7-12-117-test.html?page=test-page">Open Published Preview</a>
+      <p>Current owned preview route for builder output and page blocks.</p>
+      <code>web-builder-preview-owned-v7-12-257-test.html?page=test-page</code>
+      <a class="btn" href="web-builder-preview-owned-v7-12-257-test.html?page=test-page">Open Published Preview</a>
     </div>
     <div class="routeCard">
       <span class="pill warnPill">Future studio rule</span>
       <b>Builder shell stays separate</b>
-      <p>Web Builder can become its own studio shell later. This Settings doorway does not merge builder chrome into the Stream Bandit app shell.</p>
-      <code>web-builder-live-studio-v7-12-116-test.html</code>
+      <p>Web Builder remains its own route family. This Settings doorway does not merge builder chrome into the Stream Bandit app shell.</p>
+      <code>web-builder-account-control-hub-v7-12-263-test.html</code>
     </div>
   </div>
 </section>
@@ -285,24 +285,24 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Settings Hub V7.12.294: Web Builder doorway + Settings route map + clean rail. No Supabase writes. No schema/storage/RLS/index/global-helper changes.</p>
+<p class="micro">Settings Hub V7.13.031: Web Builder canonical route map + clean rail. No Supabase writes. No schema/storage/RLS/index/global-helper changes.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=settings-web-builder-doorway-294"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=settings-web-builder-doorway-294"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=settings-web-builder-doorway-294"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=settings-web-builder-doorway-294"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=settings-web-builder-doorway-294"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=settings-web-builder-doorway-294"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=settings-web-builder-doorway-294"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=settings-web-builder-doorway-294"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=settings-web-builder-doorway-294"></script>
+<script src="stream-bandit-shell-v6-24.js?v=settings-web-builder-doorway-7-13-031"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=settings-web-builder-doorway-7-13-031"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=settings-web-builder-doorway-7-13-031"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=settings-web-builder-doorway-7-13-031"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=settings-web-builder-doorway-7-13-031"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=settings-web-builder-doorway-7-13-031"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=settings-web-builder-doorway-7-13-031"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=settings-web-builder-doorway-7-13-031"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=settings-web-builder-doorway-7-13-031"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.294 Settings Hub Web Builder Doorway';
+const VERSION='V7.13.031 Settings Hub Web Builder Route Canonical';
 let countBusy=false;
 let countReady=false;
 let lastCountRead=0;
@@ -311,9 +311,9 @@ let debugState={};
 const $=id=>document.getElementById(id);
 
 const ROUTES=[
- {group:'Web Builder',name:'Web Builder Studio',url:'web-builder-live-studio-v7-12-116-test.html?page=test-page',primary:true},
- {group:'Web Builder',name:'Pages Manager',url:'web-builder-pages-manager-v7-12-111-test.html'},
- {group:'Web Builder',name:'Published Preview',url:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page'},
+ {group:'Web Builder',name:'Web Builder Hub',url:'web-builder-account-control-hub-v7-12-263-test.html',primary:true},
+ {group:'Web Builder',name:'Pages Manager',url:'web-builder-pages-manager-owned-v7-12-256-test.html'},
+ {group:'Web Builder',name:'Published Preview',url:'web-builder-preview-owned-v7-12-257-test.html?page=test-page'},
  {group:'Global',name:'Theme Studio',url:'web-builder-theme-studio-controls-v7-8-9-test.html'},
  {group:'Global',name:'Accessibility',url:'accessibility-clean-machine-v7-12-44-test.html'},
  {group:'Account',name:'Profile Settings',url:'profile-settings-live-ready-v7-12-90-test.html'},
@@ -342,7 +342,7 @@ function renderStats(){
   stat('Web Builder doorway','YES','Main doorway route is visible and preserved.')+
   stat('Useful routes',String(ROUTES.length),'Settings, builder, brand, policy, account and plan routes are mapped.')+
   stat('Direct Supabase writes','0','This hub does not insert, update, delete, upload or publish.')+
-  stat('Builder routes',String(routeCount('Web Builder')),'Studio, Pages Manager and Published Preview stay visible.')+
+  stat('Builder routes',String(routeCount('Web Builder')),'Hub, owned Pages Manager and owned Published Preview stay visible.')+
   stat('Brand routes',String(routeCount('Brand')),'Brand/App Icons, Brand Helper and Favicon Builder stay visible.')+
   stat('Global helpers','Protected','Theme, settings, brand, shell, counts and search helpers are loaded, not rewritten.');
 }
@@ -445,6 +445,7 @@ function renderDebug(step){
   rlsChange:false,
   indexPromotion:false,
   globalHelperRewrite:false,
+  webBuilderSupportRouteCanonical:true,
   routeGroups:{
    webBuilder:ROUTES.filter(r=>r.group==='Web Builder'),
    global:ROUTES.filter(r=>r.group==='Global'),
@@ -509,13 +510,14 @@ function boot(){
  setInterval(helper,6000);
  setInterval(()=>refreshSavedCounters(false),15000);
 
- document.documentElement.dataset.sbSettingsHub='v7-12-294';
- window.StreamBanditSettingsHubV712294={
+ document.documentElement.dataset.sbSettingsHub='v7-13-031';
+ window.StreamBanditSettingsHubV713031={
   version:VERSION,
   routes:ROUTES.slice(),
   current:function(){return debugState;},
   refresh:function(){helper();refreshSavedCounters(true);renderDebug('external refresh');}
  };
+ window.StreamBanditSettingsHubV712294=window.StreamBanditSettingsHubV713031;
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
