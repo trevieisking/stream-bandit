@@ -9,17 +9,18 @@
    Player 2 -> player-2-clean-machine-v7-12-58-test.html
    V7.12.264 points legacy Web Builder route aliases to the Web Builder Hub.
    V7.12.271 loads the read-only Access Projector and protected-route Access Gate.
+   V7.13.057 points app-facing old Web Builder support aliases to current owned Web Builder pages.
    No visual old shell. No movie-card save helper auto-load. No Supabase writes. No payments.
 */
 (function(){
 'use strict';
 
-const VERSION='V6.24 Legacy Shell Bridge -> V7.12.271 Access Projector Gate Loader';
+const VERSION='V6.24 Legacy Shell Bridge -> V7.13.057 Web Builder Owned Route Exposure Cleanup';
 const DEF='test-page';
 const SUPABASE_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
 const SUPABASE_KEY='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 const FAVICON_URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co/storage/v1/object/public/stream-bandit-images/global/logo-1779203548544.png';
-const FOUNDATION='v7-12-271-access-projector-gate-loader';
+const FOUNDATION='v7-13-057-web-builder-owned-route-exposure-cleanup';
 
 const R={
  home:'home-global-helpers-v7-4-4-test.html',
@@ -58,10 +59,10 @@ const R={
 
  builder:'web-builder-account-control-hub-v7-12-263-test.html',
  builderStudio:'web-builder-account-control-hub-v7-12-263-test.html',
- pagesManager:'web-builder-pages-manager-v7-12-111-test.html',
- preview:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
- formAdvanced:'web-builder-form-save-v7-12-94-test.html?page=test-page',
- formInbox:'web-builder-form-submissions-v7-12-94-test.html?page=test-page',
+ pagesManager:'web-builder-pages-manager-owned-v7-12-256-test.html',
+ preview:'web-builder-preview-owned-v7-12-257-test.html?page=test-page',
+ formAdvanced:'web-builder-form-designer-owned-v7-12-258-test.html?page=test-page',
+ formInbox:'web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page',
 
  brandIcons:'settings-brand-icons-promoted-v7-12-21-test.html',
  brandHelper:'brand-logo-helper-responsive-v7-12-20-test.html',
@@ -117,11 +118,15 @@ const FIX={
  'web-builder-live-studio-v7-12-116-test.html':R.builder,
  'web-builder-live-studio-v7-12-97-test.html':R.builder,
  'web-builder-live-studio-v7-12-93-test.html':R.builder,
+ 'web-builder-pages-manager-v7-12-111-test.html':R.pagesManager,
 
  'web-builder-form-save-v7-6-5-test.html':R.formAdvanced,
  'web-builder-form-save-v7-6-7-test.html':R.formAdvanced,
+ 'web-builder-form-save-v7-12-94-test.html':R.formAdvanced,
+ 'web-builder-form-submissions-v7-12-94-test.html':R.formInbox,
  'web-builder-shared-style-preview-v7-9-0-test.html':R.preview,
  'web-builder-shared-style-preview-v7-9-2-test.html':R.preview,
+ 'web-builder-shared-style-preview-v7-12-117-test.html':R.preview,
 
  'submit-video-clean-machine-v7-12-53-test.html':R.submit,
  'submit-video-clean-machine-v7-12-75-test.html':R.submit,
@@ -214,7 +219,7 @@ function loadScript(src){
   let s=document.createElement('script');
   s.src=src;
   s.defer=true;
-  s.dataset.sbLoadedBy='legacy-shell-bridge-safe-v7-12-271';
+  s.dataset.sbLoadedBy='legacy-shell-bridge-safe-v7-13-057';
   document.head.appendChild(s);
  }catch(e){}
 }
@@ -257,7 +262,7 @@ function patchRoutes(root){
 
     if(old&&fix&&fix!==old){
      el.setAttribute(attr,fix);
-     el.dataset.sbRouteFixedBy='legacy-shell-bridge-v7-12-271';
+     el.dataset.sbRouteFixedBy='legacy-shell-bridge-v7-13-057';
     }
    });
   });
@@ -365,7 +370,7 @@ function boot(){
  };
 
  window.StreamBanditLegacyShellBridge=window.StreamBanditShell;
- document.documentElement.dataset.sbLegacyShellBridge='v7-12-271-access-projector-gate-loader';
+ document.documentElement.dataset.sbLegacyShellBridge='v7-13-057-web-builder-owned-route-exposure-cleanup';
 }
 
 if(document.readyState==='loading'){
