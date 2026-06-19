@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.020 Unified Route Registry Foundation / Account Optional Save Pages';
+  var VERSION = 'V7.13.021 Unified Route Registry Foundation / Public Rules Alignment';
 
   var ROUTE_CLASSES = {
     PUBLIC: 'public',
@@ -39,7 +39,7 @@
     {label:'Supabase Library Editor',url:'supabase-library-home-header-form-fix-v7-12-34-test.html',group:'Browse',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ADMIN,read:['sb_movies','sb_profiles'],write:['sb_movies']},
     {label:'Genres',url:'genres-clean-machine-v7-12-45-test.html',group:'Browse',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_genres','sb_movies'],write:['sb_genres']},
     {label:'Submit Video',url:'submit-video-clean-machine-v7-12-79-test.html',group:'Creator',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.CREATOR,read:['sb_channels','sb_movies','sb_profiles','sb_submissions'],write:['sb_submissions']},
-    {label:'Creator Rules',url:'rules-clean-machine-v7-12-82-test.html',group:'Creator',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_profiles'],write:[]},
+    {label:'Creator Rules',url:'rules-clean-machine-v7-12-82-test.html',group:'Creator',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_profiles'],write:[]},
     {label:'Review Queue',url:'review-queue-clean-machine-v7-12-80-publish-test.html',group:'Creator',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ADMIN,read:['sb_movies','sb_submissions','sb_profiles','sb_channels'],write:['sb_movies','sb_submissions']},
     {label:'Playlists',url:'playlists-global-helpers-v7-5-2-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_movies','sb_playlists','sb_playlist_movies','sb_profiles'],write:['sb_playlists','sb_playlist_movies']},
     {label:'Channels',url:'channels-global-helpers-v7-5-3-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_channels','sb_movies','sb_profiles'],write:['sb_channels','sb_profiles']},
