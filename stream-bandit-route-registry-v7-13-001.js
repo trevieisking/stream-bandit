@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.001 Unified Route Registry Foundation';
+  var VERSION = 'V7.13.019 Unified Route Registry Foundation / Genres Public Browse Admin Managed Writes';
 
   var ROUTE_CLASSES = {
     PUBLIC: 'public',
@@ -36,7 +36,7 @@
     {label:'Global Search',url:'global-search-global-helpers-v7-4-9-test.html',group:'Browse',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_movies','sb_channels','sb_playlists'],write:[]},
     {label:'About',url:'about-global-helpers-v7-4-7-test.html',group:'Browse',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:[],write:[]},
     {label:'Supabase Library Editor',url:'supabase-library-home-header-form-fix-v7-12-34-test.html',group:'Browse',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ADMIN,read:['sb_movies','sb_profiles'],write:['sb_movies']},
-    {label:'Genres',url:'genres-clean-machine-v7-12-45-test.html',group:'Browse',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ADMIN,read:['sb_genres','sb_movies'],write:['sb_genres']},
+    {label:'Genres',url:'genres-clean-machine-v7-12-45-test.html',group:'Browse',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_genres','sb_movies'],write:['sb_genres']},
     {label:'Submit Video',url:'submit-video-clean-machine-v7-12-79-test.html',group:'Creator',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.CREATOR,read:['sb_channels','sb_movies','sb_profiles','sb_submissions'],write:['sb_submissions']},
     {label:'Creator Rules',url:'rules-clean-machine-v7-12-82-test.html',group:'Creator',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_profiles'],write:[]},
     {label:'Review Queue',url:'review-queue-clean-machine-v7-12-80-publish-test.html',group:'Creator',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ADMIN,read:['sb_movies','sb_submissions','sb_profiles','sb_channels'],write:['sb_movies','sb_submissions']},
