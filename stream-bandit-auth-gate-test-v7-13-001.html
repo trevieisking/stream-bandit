@@ -23,6 +23,7 @@
       <button id="runGate" class="btn" type="button">Run Gate Check</button>
       <button id="openState" class="btn ghost" type="button">Show Gate State</button>
 <button id="logoutTest" class="btn ghost" type="button">Logout Test</button>
+<button id="logoutTest" class="btn ghost" type="button">Logout Test</button>
       <a class="btn ghost" href="index.html">Back to Platform Entry</a>
     </div>
     <pre id="out" class="ok">Loading helper...</pre>
@@ -53,6 +54,7 @@ async function run(){
 }
 document.getElementById('runGate').onclick=run;
 document.getElementById('openState').onclick=function(){brandGate();write(window.StreamBanditAuthGate?window.StreamBanditAuthGate.state():'Auth gate helper not ready yet.');};
+document.getElementById('logoutTest').onclick=function(){brandGate();if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.logout){window.StreamBanditAuthGate.logout();write('Logout requested. Gate should open and lock the page.');}else{write('Auth gate helper not ready yet.');}};
 document.getElementById('logoutTest').onclick=function(){brandGate();if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.logout){window.StreamBanditAuthGate.logout();write('Logout requested. Gate should open and lock the page.');}else{write('Auth gate helper not ready yet.');}};
 setTimeout(run,600);
 setTimeout(brandGate,1000);
