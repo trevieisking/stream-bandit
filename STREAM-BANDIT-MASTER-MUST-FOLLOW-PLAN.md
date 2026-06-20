@@ -1,12 +1,12 @@
-# Stream Bandit Master Must-Follow Plan V7.13.070
+# Stream Bandit Master Must-Follow Plan V7.13.071
 
 Date: 2026-06-20
 
-Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION / AUTH GATE HELPER PASSWORD SETUP AND LOGIN POPUP TEST PASSED / OWNER RECOVERY PATH BUILT AND AWAITING TEST / NOT ATTACHED TO INDEX OR HOME YET / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION / AUTH GATE HELPER PASSWORD SETUP LOGIN POPUP AND OWNER RECOVERY TEST PASSED / NOT ATTACHED TO INDEX OR HOME YET / ATTACH INDEX AND HOME NEXT / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit after the full beginning-to-end scan pass. It records what the scan taught us, what is now locked, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
-This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, the accepted User Management owner-only visual exception, the auth gate helper/password setup/login-popup proof, and the newly built owner recovery path waiting for browser test. It does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, or any additional shell-bridge rollout beyond specific tested safe passes.
+This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, the accepted User Management owner-only visual exception, the auth gate helper/password setup/login-popup proof, and the owner recovery path pass. It does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, or any additional shell-bridge rollout beyond specific tested safe passes.
 
 ## 1. What the full scan taught us
 
@@ -278,7 +278,7 @@ Publishable Supabase config must remain config-only and must not be copied into 
 Status:
 
 ```text
-HELPER BUILT / TEST PAGE CREATED / RESET PASSWORD FLOW PASSED / PASSWORD SETUP TEST PASSED / SIGNED-IN APPROVED PROOF PASSED / SIGNED-OUT GATE APPEARS / LOGIN POPUP FULLY VISIBLE PASSED / LOGIN WITH NEW PASSWORD PASSED / OWNER RECOVERY PATH BUILT / OWNER RECOVERY TEST PENDING / NOT ATTACHED TO INDEX OR HOME YET
+HELPER BUILT / TEST PAGE CREATED / RESET PASSWORD FLOW PASSED / PASSWORD SETUP TEST PASSED / SIGNED-IN APPROVED PROOF PASSED / SIGNED-OUT GATE APPEARS / LOGIN POPUP FULLY VISIBLE PASSED / LOGIN WITH NEW PASSWORD PASSED / OWNER RECOVERY PATH PASSED / NOT ATTACHED TO INDEX OR HOME YET / ATTACH INDEX AND HOME NEXT
 ```
 
 Goal:
@@ -383,17 +383,20 @@ Login works with the new password.
 This is the best-looking functional test login page so far.
 ```
 
-Owner recovery path built:
+Owner recovery path test result:
 
 ```text
-stream-bandit-auth-gate-v7-13-001.js V7.13.003 adds temporary owner recovery test mode.
-stream-bandit-auth-gate-test-v7-13-001.html V7.13.003 exposes Owner Recovery Link and Clear Recovery controls.
-Recovery is activated by sb_owner_recovery=1.
-Recovery is stored only in this browser through streamBanditAuthGateOwnerRecoveryUntil.
-Recovery lasts about 30 minutes.
-Recovery does not use a service-role key.
-Recovery makes no SQL, RLS, storage, payment or schema changes.
-Recovery must be browser-tested before the gate is attached to Index or Home.
+Logout Test worked.
+The login gate opened.
+Owner Recovery Link reloaded the page without trapping Trevor.
+Show Gate State returned allowed true.
+Show Gate State returned signedIn false.
+Show Gate State returned reason owner-recovery-test-mode.
+Show Gate State returned recoveryActive true.
+Show Gate State returned locked false.
+The helper reported serviceRoleInBrowser false.
+The helper reported publicSignup false.
+Owner recovery remains temporary test mode only and lasts about 30 minutes in the browser.
 ```
 
 Current visual asset note:
@@ -403,7 +406,7 @@ Trevor wants stream_bandit_original_running_stag_MASTER_1536x1024.png used on th
 The test page references that filename.
 The image asset is now visible on the auth gate test page.
 The actual login popup crop fix has passed on the auth gate test page.
-Do not attach the gate to index.html or Home until the owner recovery path is tested and passed.
+The owner recovery path has passed on the auth gate test page.
 ```
 
 Test first on only:
@@ -423,11 +426,11 @@ Do not apply to every page until the gate passes.
 3. Decide whether username login resolves to email, profile id, or remains email-only for phase one. PHASE ONE: email-only.
 4. Design reset-password redirect path. DONE FOR TEST: reset points to password setup test page.
 5. Build shared auth gate helper. DONE.
-6. Attach only to index.html and Home. NOT DONE.
+6. Attach only to index.html and Home. NEXT.
 7. Test login, logout and reset password. PASSED ON TEST PAGE.
 8. Test signed-out user cannot pass. PASSED ON TEST PAGE.
 9. Test signed-in admin/approved user can pass. PASSED ON TEST PAGE.
-10. Add owner emergency recovery path so Trevor is not locked out during testing. BUILT / TEST PENDING.
+10. Add owner emergency recovery path so Trevor is not locked out during testing. PASSED ON TEST PAGE.
 11. Expand to protected pages only after the first two pages pass. NOT DONE.
 12. Later decide Create Account mode: public, invite-only or owner-created only. NOT DONE.
 ```
@@ -585,8 +588,9 @@ AUTH GATE FUTURE PHASE HELPER BUILT AND TEST PAGE CREATED.
 AUTH GATE RESET PASSWORD AND PASSWORD SETUP TEST PASSED.
 AUTH GATE SIGNED-IN APPROVED PROOF PASSED.
 AUTH GATE LOGIN POPUP FULL VISUAL/FUNCTION TEST PASSED.
-AUTH GATE OWNER EMERGENCY RECOVERY PATH BUILT AND AWAITING TEST.
+AUTH GATE OWNER EMERGENCY RECOVERY PATH PASSED ON TEST PAGE.
 AUTH GATE IS NOT ATTACHED TO INDEX OR HOME YET.
+AUTH GATE INDEX AND HOME ATTACHMENT IS NEXT.
 HEADER/FOOTER PROJECTOR BRIDGE PASSED AND LOCKED.
 CODE FIX MACHINE OWNER SUPPORT TOOL APPROVED.
 USER MANAGEMENT 11B THEME BRIDGE ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION.
