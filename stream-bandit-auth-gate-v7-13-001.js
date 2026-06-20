@@ -301,7 +301,7 @@
       var email = String(($('sbAuthEmail') || {}).value || '').trim();
       if(!email || !email.includes('@')) throw new Error('Enter your email first.');
       var c = await client();
-      var redirectTo = location.origin + location.pathname + location.search;
+      var redirectTo = location.origin + '/stream-bandit-password-setup-test-v7-13-001.html';
       var res = await c.auth.resetPasswordForEmail(email, { redirectTo: redirectTo });
       if(res.error) throw res.error;
       setStatus('Password reset email sent. Check your inbox, then return to Stream Bandit.', true);
