@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stream Bandit Code Fix Machine V1</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#050711;
+  --panel:#101529;
+  --panel2:#17122d;
+  --line:#ffffff24;
+  --text:#f7fbff;
+  --muted:#aeb8d6;
+  --good:#22d3a6;
+  --purple:#7c3cff;
+  --pink:#ff2d85;
+  --warn:#ffb142;
+  --bad:#ff5d6c;
+  --cyan:#41e8ff;
+}
+
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;max-width:100vw;overflow-x:hidden}
+body{
+  background:
+    radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),
+    radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),
+    linear-gradient(180deg,#070910,#050711);
+  color:var(--text);
+  font-family:Inter,system-ui,Arial,sans-serif;
+}
+
+.top{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#0b1020f2;
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(14px);
+}
+
+.topIn,.wrap{
+  width:min(1500px,100%);
+  margin:auto;
+}
+
+.topIn{
+  padding:12px 14px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+}
+
+.brand{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  font-weight:950;
+}
+
+.mark{
+  width:44px;
+  height:44px;
+  min-width:44px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  color:#071015;
+  font-weight:1000;
+}
+
+.brand small{
+  display:block;
+  color:var(--muted);
+  font-weight:800;
+}
+
+.wrap{padding:14px}
+
+.hero,.panel,.card{
+  border:1px solid #ffffff18;
+  border-radius:24px;
+  background:linear-gradient(135deg,var(--panel),var(--panel2));
+  padding:16px;
+  margin:0 0 14px;
+  box-shadow:0 18px 55px #0006;
+}
+
+.card{
+  background:#ffffff0f;
+  box-shadow:none;
+}
+
+h1{
+  font-size:clamp(34px,6vw,72px);
+  line-height:.92;
+  letter-spacing:-.055em;
+  margin:8px 0;
+}
+
+h2,h3{margin:0 0 10px}
+p,small,label{color:var(--muted);line-height:1.5}
+
+.badge{
+  display:inline-flex;
+  border:1px solid #ffffff24;
+  border-radius:999px;
+  background:#22d3a621;
+  color:#baf7df;
+  font-weight:900;
+  font-size:12px;
+  padding:6px 9px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:minmax(300px,.9fr) minmax(420px,1.1fr);
+  gap:12px;
+}
+
+.two{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+textarea,input,select{
+  width:100%;
+  border:1px solid #ffffff24;
+  border-radius:14px;
+  background:#0008;
+  color:#fff;
+  padding:11px;
+  font:inherit;
+  font-family:ui-monospace,Consolas,monospace;
+}
+
+textarea{
+  min-height:240px;
+  resize:vertical;
+  line-height:1.45;
+  tab-size:2;
+}
+
+.smallArea{min-height:120px}
+
+.btn{
+  border:0;
+  border-radius:999px;
+  background:#30384f;
+  color:white;
+  text-decoration:none;
+  font-weight:950;
+  padding:10px 13px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+}
+
+.primary{
+  background:linear-gradient(135deg,var(--good),var(--purple));
+  color:#071015;
+}
+
+.hot{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;
+}
+
+.blue{
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  color:#061017;
+}
+
+.danger{
+  background:linear-gradient(135deg,var(--bad),var(--pink));
+  color:#fff;
+}
+
+.ghost{
+  background:#ffffff12;
+  border:1px solid #ffffff22;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:9px;
+}
+
+.resultList{
+  display:grid;
+  gap:8px;
+  max-height:420px;
+  overflow:auto;
+  padding-right:4px;
+}
+
+.result{
+  border:1px solid #ffffff16;
+  border-radius:18px;
+  background:#ffffff08;
+  padding:10px;
+  cursor:pointer;
+}
+
+.result.active{
+  outline:3px solid #22d3a688;
+  background:#22d3a618;
+}
+
+.result code{
+  display:block;
+  white-space:pre-wrap;
+  word-break:break-word;
+  color:#dfffee;
+  font-size:12px;
+}
+
+.out,.lineBox{
+  font-family:ui-monospace,Consolas,monospace;
+  white-space:pre-wrap;
+  word-break:break-word;
+  border:1px solid #ffffff14;
+  border-radius:16px;
+  background:#0007;
+  color:#dfffee;
+  padding:12px;
+  max-height:360px;
+  overflow:auto;
+}
+
+.line{
+  display:grid;
+  grid-template-columns:70px 1fr;
+  gap:10px;
+  border-bottom:1px solid #ffffff0c;
+  padding:2px 0;
+}
+
+.ln{
+  color:#ffdf9a;
+  text-align:right;
+  user-select:none;
+}
+
+.note,.goodBox,.badBox{
+  border:1px solid #ffb14266;
+  background:#ffb14217;
+  color:#ffe7ad;
+  border-radius:18px;
+  padding:12px;
+  margin:10px 0;
+  font-weight:850;
+}
+
+.goodBox{
+  border-color:#22d3a660;
+  background:#22d3a618;
+  color:#dfffee;
+}
+
+.badBox{
+  border-color:#ff5d6c66;
+  background:#ff5d6c18;
+  color:#ffd2d9;
+}
+
+@media(max-width:980px){
+  .layout,.two{grid-template-columns:1fr}
+  .btn{flex:1 1 auto}
+  textarea{min-height:210px}
+  .brand{flex:1 1 100%}
+}
+</style>
+</head>
+
+<body>
+<header class="top">
+  <div class="topIn">
+    <div class="brand">
+      <div class="mark">SB</div>
+      <div>
+        Stream Bandit Code Fix Machine
+        <small>Paste code, find exact lines, replace safely, copy back for checking - V1</small>
+      </div>
+    </div>
+    <button class="btn blue" id="downloadBtn" type="button">Download Output</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <span class="badge">Owner helper</span>
+    <h1>Find the line. Replace it. Send it back.</h1>
+    <p>Paste a whole page or code file, search exact text or a line range, replace safely, then copy the full fixed output back to ChatGPT for checking before GitHub upload.</p>
+    <div class="grid">
+      <div class="card">
+        <b>Exact search</b>
+        <p>Default search is exact text. No guessing.</p>
+      </div>
+      <div class="card">
+        <b>Line replace</b>
+        <p>Use start and end line when ChatGPT gives line numbers.</p>
+      </div>
+      <div class="card">
+        <b>Desktop or mobile</b>
+        <p>Big buttons, select output, and download output.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="layout">
+    <section class="panel">
+      <h2>1. Paste full code here</h2>
+      <textarea id="source" spellcheck="false" placeholder="Paste full HTML / JS / CSS here..."></textarea>
+      <div class="actions">
+        <button class="btn primary" id="loadBtn" type="button">Load / Refresh</button>
+        <button class="btn ghost" id="copyInputBtn" type="button">Copy Input</button>
+        <button class="btn danger" id="resetBtn" type="button">Reset Original</button>
+      </div>
+      <div id="sourceStatus" class="note">Waiting for code.</div>
+    </section>
+
+    <section class="panel">
+      <h2>2. Search and replace</h2>
+      <div class="two">
+        <div>
+          <label>Find exact text</label>
+          <textarea id="findText" class="smallArea" spellcheck="false" placeholder="Paste text to find..."></textarea>
+        </div>
+        <div>
+          <label>Replace with</label>
+          <textarea id="replaceText" class="smallArea" spellcheck="false" placeholder="Paste replacement..."></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="findBtn" type="button">Find Matches</button>
+        <button class="btn hot" id="replaceOneBtn" type="button">Replace Selected</button>
+        <button class="btn danger" id="replaceAllBtn" type="button">Replace All</button>
+      </div>
+      <div id="replaceStatus" class="note">No search run yet.</div>
+    </section>
+  </section>
+
+  <section class="layout">
+    <section class="panel">
+      <h2>3. Matches</h2>
+      <div id="matchCount" class="goodBox">0 matches</div>
+      <div id="results" class="resultList"></div>
+    </section>
+
+    <section class="panel">
+      <h2>4. Replace line range</h2>
+      <p>Use this when a fix says replace line 9 or replace lines 9-12.</p>
+      <div class="two">
+        <div>
+          <label>Start line</label>
+          <input id="startLine" type="number" min="1" value="1">
+        </div>
+        <div>
+          <label>End line</label>
+          <input id="endLine" type="number" min="1" value="1">
+        </div>
+      </div>
+      <label>Replacement for those lines</label>
+      <textarea id="lineReplacement" class="smallArea" spellcheck="false" placeholder="Paste replacement line/block here..."></textarea>
+      <div class="actions">
+        <button class="btn blue" id="showLinesBtn" type="button">Show Line Range</button>
+        <button class="btn hot" id="replaceLinesBtn" type="button">Replace Line Range</button>
+      </div>
+      <div id="lineStatus" class="note">No line range selected.</div>
+      <div id="linePreview" class="lineBox"></div>
+    </section>
+  </section>
+
+  <section class="panel">
+    <h2>5. Full fixed output</h2>
+    <div class="actions">
+      <button class="btn primary" id="copyOutputBtn" type="button">Copy Full Fixed Code</button>
+      <button class="btn blue" id="selectOutputBtn" type="button">Select Output</button>
+      <button class="btn ghost" id="reportBtn" type="button">Make Report</button>
+    </div>
+    <textarea id="output" spellcheck="false" placeholder="Fixed output appears here..."></textarea>
+    <div id="copyStatus" class="goodBox">Ready.</div>
+  </section>
+
+  <section class="panel">
+    <h2>Report to send back</h2>
+    <pre id="report" class="out">{}</pre>
+  </section>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  var original = '';
+  var matches = [];
+  var selected = -1;
+  var lastAction = 'none';
+
+  function $(id){
+    return document.getElementById(id);
+  }
+
+  function value(id){
+    return $(id).value;
+  }
+
+  function setValue(id, v){
+    $(id).value = v;
+  }
+
+  function setStatus(id, message, kind){
+    var el = $(id);
+    el.className = kind === 'bad' ? 'badBox' : kind === 'good' ? 'goodBox' : 'note';
+    el.textContent = message;
+  }
+
+  function escapeHtml(text){
+    return String(text == null ? '' : text).replace(/[&<>"']/g, function(ch){
+      return {
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#39;'
+      }[ch];
+    });
+  }
+
+  function splitLines(text){
+    return String(text || '').split(/\r\n|\n|\r/);
+  }
+
+  function updateOutput(){
+    setValue('output', value('source'));
+  }
+
+  function loadCode(){
+    var text = value('source');
+    if(!original) original = text;
+    updateOutput();
+    matches = [];
+    selected = -1;
+    setStatus('sourceStatus', 'Loaded ' + splitLines(text).length + ' lines and ' + text.length + ' characters.', 'good');
+    renderMatches();
+    makeReport();
+  }
+
+  function lineOfIndex(text, index){
+    return text.slice(0, index).split(/\r\n|\n|\r/).length;
+  }
+
+  function findMatches(){
+    var text = value('source');
+    var needle = value('findText');
+    matches = [];
+    selected = -1;
+
+    if(!needle){
+      setStatus('replaceStatus', 'Paste text to find first.', 'bad');
+      renderMatches();
+      return;
+    }
+
+    var pos = 0;
+    while((pos = text.indexOf(needle, pos)) !== -1){
+      matches.push({
+        index: pos,
+        length: needle.length,
+        line: lineOfIndex(text, pos)
+      });
+      pos += Math.max(1, needle.length);
+      if(matches.length > 2000) break;
+    }
+
+    selected = matches.length ? 0 : -1;
+    setStatus('replaceStatus', matches.length + ' match(es) found.', matches.length ? 'good' : 'bad');
+    renderMatches();
+    makeReport();
+  }
+
+  function contextFor(match){
+    var context = 3;
+    var all = splitLines(value('source'));
+    var start = Math.max(1, match.line - context);
+    var end = Math.min(all.length, match.line + context);
+    var rows = [];
+
+    for(var i = start; i <= end; i++){
+      rows.push(String(i).padStart(5, ' ') + ' | ' + all[i - 1]);
+    }
+
+    return rows.join('\n');
+  }
+
+  function renderMatches(){
+    $('matchCount').textContent = matches.length + ' match(es)';
+    var box = $('results');
+
+    if(!matches.length){
+      box.innerHTML = '<div class="result"><b>No matches</b><small>Search exact text, then matches appear here.</small></div>';
+      return;
+    }
+
+    box.innerHTML = matches.slice(0, 200).map(function(match, index){
+      return '<article class="result ' + (index === selected ? 'active' : '') + '" data-index="' + index + '">' +
+        '<b>Match ' + (index + 1) + ' - line ' + match.line + '</b>' +
+        '<small>Click to select this match</small>' +
+        '<code>' + escapeHtml(contextFor(match)) + '</code>' +
+        '</article>';
+    }).join('');
+
+    Array.prototype.forEach.call(box.querySelectorAll('.result'), function(card){
+      card.onclick = function(){
+        selected = Number(card.getAttribute('data-index'));
+        renderMatches();
+        makeReport();
+      };
+    });
+  }
+
+  function replaceSelected(){
+    if(selected < 0 || !matches[selected]){
+      setStatus('replaceStatus', 'No selected match. Run Find Matches first.', 'bad');
+      return;
+    }
+
+    var text = value('source');
+    var match = matches[selected];
+    var replacement = value('replaceText');
+
+    var next = text.slice(0, match.index) + replacement + text.slice(match.index + match.length);
+
+    setValue('source', next);
+    updateOutput();
+    lastAction = 'replace selected match at line ' + match.line;
+    setStatus('replaceStatus', 'Replaced selected match at line ' + match.line + '.', 'good');
+    findMatches();
+  }
+
+  function replaceAll(){
+    var needle = value('findText');
+    var replacement = value('replaceText');
+
+    if(!needle){
+      setStatus('replaceStatus', 'Paste text to find first.', 'bad');
+      return;
+    }
+
+    var before = value('source');
+    var count = before.split(needle).length - 1;
+    var next = before.split(needle).join(replacement);
+
+    setValue('source', next);
+    updateOutput();
+    lastAction = 'replace all matches: ' + count;
+    setStatus('replaceStatus', 'Replaced ' + count + ' match(es).', count ? 'good' : 'bad');
+    findMatches();
+  }
+
+  function showLines(){
+    var start = Math.max(1, Number(value('startLine') || 1));
+    var end = Math.max(start, Number(value('endLine') || start));
+    var all = splitLines(value('source'));
+
+    if(start > all.length){
+      setStatus('lineStatus', 'Start line is past the end. File has ' + all.length + ' lines.', 'bad');
+      return;
+    }
+
+    end = Math.min(end, all.length);
+
+    var html = [];
+    for(var i = start; i <= end; i++){
+      html.push('<div class="line"><span class="ln">' + i + '</span><code>' + escapeHtml(all[i - 1]) + '</code></div>');
+    }
+
+    $('linePreview').innerHTML = html.join('');
+    setStatus('lineStatus', 'Showing lines ' + start + '-' + end + '.', 'good');
+  }
+
+  function replaceLineRange(){
+    var start = Math.max(1, Number(value('startLine') || 1));
+    var end = Math.max(start, Number(value('endLine') || start));
+    var all = splitLines(value('source'));
+
+    if(start > all.length){
+      setStatus('lineStatus', 'Start line is past the end. File has ' + all.length + ' lines.', 'bad');
+      return;
+    }
+
+    end = Math.min(end, all.length);
+
+    var replacementLines = splitLines(value('lineReplacement'));
+    all.splice.apply(all, [start - 1, end - start + 1].concat(replacementLines));
+
+    setValue('source', all.join('\n'));
+    updateOutput();
+    lastAction = 'replace lines ' + start + '-' + end + ' with ' + replacementLines.length + ' line(s)';
+    setStatus('lineStatus', 'Replaced lines ' + start + '-' + end + '.', 'good');
+    showLines();
+    makeReport();
+  }
+
+  function selectOutput(){
+    var out = $('output');
+    out.focus();
+    out.select();
+    setStatus('copyStatus', 'Output selected. Use Ctrl+C if copy button is blocked.', 'good');
+  }
+
+  function copyText(text, statusId){
+    if(!navigator.clipboard){
+      setStatus(statusId || 'copyStatus', 'Clipboard unavailable. Use Select Output and Ctrl+C.', 'bad');
+      return;
+    }
+
+    navigator.clipboard.writeText(text).then(function(){
+      setStatus(statusId || 'copyStatus', 'Copied to clipboard.', 'good');
+    }).catch(function(){
+      setStatus(statusId || 'copyStatus', 'Clipboard blocked. Use Select Output and Ctrl+C.', 'bad');
+    });
+  }
+
+  function downloadOutput(){
+    var text = value('output') || value('source');
+    var blob = new Blob([text], {type:'text/html;charset=utf-8'});
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'fixed-code-output.html';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function(){
+      URL.revokeObjectURL(link.href);
+      link.remove();
+    }, 800);
+    setStatus('copyStatus', 'Download started as fixed-code-output.html.', 'good');
+  }
+
+  function resetOriginal(){
+    if(!original){
+      setStatus('sourceStatus', 'No original snapshot stored yet. Load code first.', 'bad');
+      return;
+    }
+
+    if(!confirm('Reset pasted code back to the first loaded version?')) return;
+
+    setValue('source', original);
+    updateOutput();
+    lastAction = 'reset to original';
+    setStatus('sourceStatus', 'Reset to original snapshot.', 'good');
+    findMatches();
+    makeReport();
+  }
+
+  function makeReport(){
+    var sourceText = value('source');
+    var outputText = value('output');
+
+    var data = {
+      tool: 'Stream Bandit Code Fix Machine',
+      version: 'V1',
+      input_lines: splitLines(sourceText).length,
+      input_characters: sourceText.length,
+      output_lines: splitLines(outputText).length,
+      output_characters: outputText.length,
+      matches_found: matches.length,
+      selected_match: selected >= 0 ? {
+        number: selected + 1,
+        line: matches[selected].line,
+        length: matches[selected].length
+      } : null,
+      last_action: lastAction,
+      note: 'Paste fixed output back to ChatGPT for checking before GitHub upload.'
+    };
+
+    $('report').textContent = JSON.stringify(data, null, 2);
+  }
+
+  $('loadBtn').onclick = loadCode;
+  $('findBtn').onclick = findMatches;
+  $('replaceOneBtn').onclick = replaceSelected;
+  $('replaceAllBtn').onclick = replaceAll;
+  $('showLinesBtn').onclick = showLines;
+  $('replaceLinesBtn').onclick = replaceLineRange;
+  $('selectOutputBtn').onclick = selectOutput;
+  $('downloadBtn').onclick = downloadOutput;
+  $('reportBtn').onclick = makeReport;
+  $('resetBtn').onclick = resetOriginal;
+
+  $('copyOutputBtn').onclick = function(){
+    copyText(value('output') || value('source'), 'copyStatus');
+  };
+
+  $('copyInputBtn').onclick = function(){
+    copyText(value('source'), 'sourceStatus');
+  };
+
+  $('source').addEventListener('input', function(){
+    updateOutput();
+    makeReport();
+  });
+
+  $('output').addEventListener('input', makeReport);
+
+  renderMatches();
+  makeReport();
+})();
+</script>
+</body>
+</html>
