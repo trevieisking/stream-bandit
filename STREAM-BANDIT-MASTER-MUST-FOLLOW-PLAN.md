@@ -1,12 +1,12 @@
-# Stream Bandit Master Must-Follow Plan V7.13.060
+# Stream Bandit Master Must-Follow Plan V7.13.061
 
 Date: 2026-06-20
 
-Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / SHELL BRIDGE FOLLOW-UP NOTES ADDED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
-Purpose: this document is the project-level source plan for Stream Bandit after the full beginning-to-end scan pass. It records what the scan taught us, what is now locked, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database or authentication-gate work.
+Purpose: this document is the project-level source plan for Stream Bandit after the full beginning-to-end scan pass. It records what the scan taught us, what is now locked, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
-This is a source-of-truth planning document only. It does not approve code rewrites, SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, shell merging or immediate auth-gate rollout.
+This is a source-of-truth planning document only. It does not approve code rewrites, SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, shell merging, immediate auth-gate rollout or immediate shell-bridge rollout.
 
 ## 1. What the full scan taught us
 
@@ -379,7 +379,84 @@ Mass page rewrite
 
 Any backend/RLS updates for private data protection require a separate backend/security pass.
 
-## 11. Current final-scan decision
+## 11. Future Phase: Shell Bridge Follow-Up Fixes
+
+Status:
+
+```text
+PLANNED ONLY / FOUND DURING FRESH REGISTRY BACKUP CHECK / NOT PATCHED YET
+```
+
+These are approved master-plan notes from the fresh registry backup check. They are not emergency patches and should be handled in a controlled UI/shell bridge pass.
+
+### 11A. Web Builder Header/Footer Builder page needs Web Builder identity bridge
+
+Observed issue:
+
+```text
+On the Web Builder Header/Footer page, the Web Builder global avatar is not showing.
+The page also has no Web Builder Hub overlay.
+It should show both.
+```
+
+Target area:
+
+```text
+web-builder-header-footer-code-v7-12-254-test.html
+```
+
+Required future behavior:
+
+```text
+Web Builder Header/Footer page should show the Web Builder global avatar/account identity.
+Web Builder Header/Footer page should have the Web Builder Hub overlay/rail access.
+The page must remain Web Builder-owned and must not be converted into the Main App shell.
+The fix should preserve header/footer builder logic and existing sb_site_pages.settings_json.web_builder_shell writes.
+```
+
+Safe implementation rule:
+
+```text
+Patch only the Web Builder identity/overlay bridge.
+Do not rewrite the builder editor.
+Do not merge the Main App header/footer shell into Web Builder.
+Verify Web Builder avatar, hub overlay, save flow and preview flow after patch.
+```
+
+### 11B. User Management Dashboard needs Main App shell/global feature bridge
+
+Observed issue:
+
+```text
+User Management Dashboard does not have Main App shell global features.
+User Management Dashboard does not have the theme bridge.
+It should.
+```
+
+Target area:
+
+```text
+user-management-dashboard-v7-11-2-test.html
+```
+
+Required future behavior:
+
+```text
+User Management Dashboard should load Main App global shell features where safe.
+User Management Dashboard should receive the Main App theme bridge/projector.
+User Management Dashboard should keep its protected owner/admin role and audit boundaries.
+User Management Dashboard must not lose protected-control behavior while adding shell/theme features.
+```
+
+Safe implementation rule:
+
+```text
+Patch only global shell/theme/helper loading and bridge behavior.
+Do not alter owner/admin RPC, audit, deletion queue, role checks or protected page logic.
+Verify theme bridge, header/footer/global helpers, and protected dashboard behavior after patch.
+```
+
+## 12. Current final-scan decision
 
 ```text
 FINAL SCAN PASS COMPLETE.
@@ -389,5 +466,6 @@ MASTER PLAN UPDATED.
 FIX MEMORY UPDATED.
 WHAT CHANGED UPDATED.
 AUTH GATE FUTURE PHASE ADDED TO MASTER PLAN.
+SHELL BRIDGE FOLLOW-UP NOTES ADDED TO MASTER PLAN.
 NEXT WORK MUST START FROM THESE DOCS, NOT FROM OLD MENU CONFUSION.
 ```
