@@ -23,7 +23,6 @@
       <button id="runGate" class="btn" type="button">Run Gate Check</button>
       <button id="openState" class="btn ghost" type="button">Show Gate State</button>
 <button id="logoutTest" class="btn ghost" type="button">Logout Test</button>
-<button id="logoutTest" class="btn ghost" type="button">Logout Test</button>
       <a class="btn ghost" href="index.html">Back to Platform Entry</a>
     </div>
     <pre id="out" class="ok">Loading helper...</pre>
@@ -43,7 +42,7 @@ function brandGate(){
   if(document.getElementById('sbAuthGateTestImageCss'))return;
   var style=document.createElement('style');
   style.id='sbAuthGateTestImageCss';
-  style.textContent='body .sb-auth-card:before{content:"";display:block;height:clamp(240px,38vw,500px);border-radius:24px;border:1px solid #ffffff24;margin-bottom:14px;background:linear-gradient(180deg,#00000000 0%,#00000022 44%,#000000c9 100%),url("'+IMAGE+'");background-size:cover;background-position:center 42%;box-shadow:0 0 45px #41e8ff33}body .sb-auth-logo{background-image:url("'+IMAGE+'");background-size:cover;background-position:center;color:transparent}body .sb-auth-card h1{text-shadow:0 0 24px #41e8ff}';
+    style.textContent='body .sb-auth-card:before{content:"";display:block;height:clamp(150px,24vw,280px);border-radius:24px;border:1px solid #ffffff24;margin-bottom:14px;background:linear-gradient(180deg,#00000000 0%,#00000014 45%,#000000a8 100%),url("'+IMAGE+'");background-size:contain;background-repeat:no-repeat;background-position:center center;background-color:#020611;box-shadow:0 0 45px #41e8ff33}body .sb-auth-logo{background-image:url("'+IMAGE+'");background-size:cover;background-position:center;color:transparent}body .sb-auth-card h1{text-shadow:0 0 24px #41e8ff}';
   document.head.appendChild(style);
 }
 async function run(){
@@ -54,7 +53,6 @@ async function run(){
 }
 document.getElementById('runGate').onclick=run;
 document.getElementById('openState').onclick=function(){brandGate();write(window.StreamBanditAuthGate?window.StreamBanditAuthGate.state():'Auth gate helper not ready yet.');};
-document.getElementById('logoutTest').onclick=function(){brandGate();if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.logout){window.StreamBanditAuthGate.logout();write('Logout requested. Gate should open and lock the page.');}else{write('Auth gate helper not ready yet.');}};
 document.getElementById('logoutTest').onclick=function(){brandGate();if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.logout){window.StreamBanditAuthGate.logout();write('Logout requested. Gate should open and lock the page.');}else{write('Auth gate helper not ready yet.');}};
 setTimeout(run,600);
 setTimeout(brandGate,1000);
