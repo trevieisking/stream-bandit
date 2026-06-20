@@ -1,15 +1,16 @@
-/* Stream Bandit Auth Gate V7.13.003
+/* Stream Bandit Auth Gate V7.13.004
    Shared future sign-in gate helper from Master Plan Section 10.
    Purpose: block normal guest browsing on pages that intentionally load this helper.
    Phase 1 target pages only: index.html and home-global-helpers-v7-4-4-test.html.
    Uses Supabase Auth email/password, signOut and resetPasswordForEmail.
    V7.13.002 fixes popup top alignment and double-scroll locking.
    V7.13.003 adds temporary owner recovery test mode so Trevor is not locked out during Phase 1 testing.
+   V7.13.004 watches Supabase auth state/session changes so Header Shell sign-out opens the gate without needing a refresh.
    No public signup. No service-role key. No SQL/RLS/storage/payment changes. */
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.003 Auth Gate / Email Password / No Guest Users / Owner Recovery Test';
+  var VERSION = 'V7.13.004 Auth Gate / Email Password / No Guest Users / Owner Recovery / Session Watch';
   var PROFILE_TABLE = 'sb_profiles';
   var APPROVED_STATUSES = ['active','approved','limited','review'];
   var BLOCKED_STATUSES = ['banned','restricted','deleted','disabled','suspended'];
@@ -19,6 +20,9 @@
   var sbClient = null;
   var running = false;
   var lastDecision = null;
+  var authWatchBound = false;
+  var sessionWatchBound = false;
+  var lastKnownSignedIn = null;
 
   function $(id){ return document.getElementById(id); }
 
@@ -74,7 +78,7 @@
     var cfg = readShellConfig();
     if(cfg.url && cfg.key) return cfg;
 
-    try{ await addScript('stream-bandit-shell-v6-24.js?v=auth-gate-7-13-003'); }catch(error){}
+    try{ await addScript('stream-bandit-shell-v6-24.js?v=auth-gate-7-13-004'); }catch(error){}
 
     for(var i=0;i<30;i++){
       await new Promise(function(resolve){ setTimeout(resolve,100); });
@@ -265,6 +269,67 @@
     document.documentElement.dataset.sbAuthGate = 'allowed';
   }
 
+  function forceSignedOutGate(message){
+    if(recoveryActive()){
+      var recovery = recoveryDecision();
+      lastDecision = recovery;
+      closeGate();
+      return recovery;
+    }
+    lastKnownSignedIn = false;
+    lastDecision = {
+      version: VERSION,
+      allowed: false,
+      signedIn: false,
+      reason: 'signed-out',
+      user: null,
+      profile: null
+    };
+    openGate(message || 'Signed out. Login required to continue.');
+    try{
+      window.dispatchEvent(new CustomEvent('streambandit:auth-gate-decision',{detail:lastDecision}));
+    }catch(error){}
+    return lastDecision;
+  }
+
+  async function checkSessionWatch(){
+    try{
+      if(recoveryActive()) return;
+      var c = await client();
+      var userRes = await c.auth.getUser();
+      var user = userRes.data && userRes.data.user ? userRes.data.user : null;
+      var signedIn = !!user;
+      if(lastKnownSignedIn === true && !signedIn){
+        forceSignedOutGate('Signed out. Login required to continue.');
+      }
+      lastKnownSignedIn = signedIn;
+    }catch(error){}
+  }
+
+  async function bindAuthWatch(){
+    if(authWatchBound) return;
+    authWatchBound = true;
+    try{
+      var c = await client();
+      if(c.auth && typeof c.auth.onAuthStateChange === 'function'){
+        c.auth.onAuthStateChange(function(event){
+          if(event === 'SIGNED_OUT'){
+            forceSignedOutGate('Signed out. Login required to continue.');
+          }else if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED'){
+            lastKnownSignedIn = true;
+            setTimeout(function(){ enforce(); }, 80);
+          }
+        });
+      }
+    }catch(error){}
+
+    if(!sessionWatchBound){
+      sessionWatchBound = true;
+      setInterval(checkSessionWatch, 1200);
+      setTimeout(checkSessionWatch, 300);
+    }
+  }
+
   async function decide(){
     var result = {
       version: VERSION,
@@ -281,11 +346,13 @@
       var user = userRes.data && userRes.data.user ? userRes.data.user : null;
 
       if(!user){
+        lastKnownSignedIn = false;
         result.reason = 'signed-out';
         lastDecision = result;
         return result;
       }
 
+      lastKnownSignedIn = true;
       result.signedIn = true;
       result.user = { id: user.id, email: user.email || '' };
 
@@ -370,6 +437,7 @@
       var c = await client();
       var res = await c.auth.signInWithPassword({ email: email, password: password });
       if(res.error) throw res.error;
+      lastKnownSignedIn = true;
       setStatus('Signed in. Checking approval...', true);
       await enforce();
     }catch(error){
@@ -396,7 +464,7 @@
       clearRecovery();
       var c = await client();
       await c.auth.signOut();
-      openGate('Signed out. Login required to continue.');
+      forceSignedOutGate('Signed out. Login required to continue.');
     }catch(error){
       openGate('Logout failed: ' + (error.message || String(error)));
     }
@@ -441,6 +509,8 @@
       recoveryActive: recoveryActive(),
       recoveryUntil: recoveryUntil(),
       recoveryMinutes: Math.max(0, Math.round((recoveryUntil() - Date.now()) / 60000)),
+      sessionWatchBound: sessionWatchBound,
+      authWatchBound: authWatchBound,
       serviceRoleInBrowser: false,
       publicSignup: false
     };
@@ -457,10 +527,12 @@
       enableRecovery: enableRecovery,
       clearRecovery: clearRecovery,
       recoveryActive: recoveryActive,
+      checkSessionWatch: checkSessionWatch,
       state: state
     };
     window.StreamBanditAuthGateV713001 = window.StreamBanditAuthGate;
-    document.documentElement.dataset.sbAuthGateHelper = 'v7-13-003';
+    document.documentElement.dataset.sbAuthGateHelper = 'v7-13-004';
+    bindAuthWatch();
     enforce();
   }
 
