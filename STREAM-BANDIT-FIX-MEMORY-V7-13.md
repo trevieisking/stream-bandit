@@ -1,8 +1,8 @@
-# Stream Bandit Fix Memory V7.13.058
+# Stream Bandit Fix Memory V7.13.061
 
-Status: ACTIVE FIX LEDGER / FINAL FULL-SCAN PASS RECORDED
+Status: ACTIVE FIX LEDGER / FINAL FULL-SCAN PASS RECORDED / SOCIAL CARD POLISH FIXES LOCKED
 
-Date: 2026-06-19
+Date: 2026-06-20
 
 Purpose: compact working memory for the current cleanup-and-replace pass after the full beginning-to-end route/page scan. This keeps the current truth visible in GitHub so the project does not rely on chat memory.
 
@@ -127,6 +127,56 @@ Groups and Events = real groups/events/posts page.
 Do not blind-patch these pages.
 ```
 
+## Locked Social card/media polish fixes from screenshot checks
+
+Status:
+
+```text
+LOCKED AS REQUIRED NEXT SOCIAL UI POLISH PASS / NOT PATCHED BLINDLY
+```
+
+User screenshot findings:
+
+```text
+Groups page currently needs stronger visual cards.
+Group banner/card images need to be big, clear, wide and responsive.
+Group banners should resize themselves cleanly and remain centered.
+Group post media should use the same strong banner/card sizing when image or video exists.
+
+News Feed currently needs stronger media card polish.
+News Feed video posts need a real player-style media block, not a dead image-looking area.
+Video blocks should be large, rounded, responsive and clearly controllable.
+Image media should remain large, clear and fitted without collapsing.
+```
+
+Required future fix scope:
+
+```text
+File: groups-social-v7-13-001-test.html
+- increase group banner height from small thumbnail feel to proper hero/banner feel
+- use responsive clamp/min-height sizing
+- keep image object-fit: cover with centered framing
+- make group post media cards large and clear
+- preserve group write/comment/like/event logic
+
+File: news-feed-social-v7-13-001-test.html
+- improve .media block for feed posts
+- make video player area large and intentionally styled
+- keep iframe/video controls clear
+- support YouTube/Vimeo/Mux/HLS/direct MP4/WebM/MOV behavior
+- prevent blank video cards from looking like broken image cards
+- preserve post/comment/like/edit/remove logic
+```
+
+Safe implementation rule:
+
+```text
+Do not rewrite Social page logic blind.
+Patch CSS/media-render only after direct source fetch.
+If full page replacement is risky because of minified long lines, prefer a small shared Social media-polish helper loaded by the page or header.
+Verify by browser screenshot after patch.
+```
+
 ## Current Admin rule
 
 ```text
@@ -142,7 +192,9 @@ No broad Admin rewrite needed from this scan.
 CURRENT-APP-MANIFEST-V7-12-180.md updated to V7.13.058 and verified.
 stream-bandit-shell-v6-24.js app-facing Web Builder aliases updated to current owned routes.
 stream-bandit-header-shell-v7-12-156.js owner menu cleaned and versioned V7.13.058.
-STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md updated to V7.13.058.
+stream-bandit-header-shell-v7-12-156.js sign-in config timing fixed and versioned V7.13.059.
+STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md updated to V7.13.060 with future auth-gate plan.
+STREAM-BANDIT-FIX-MEMORY-V7-13.md updated to V7.13.061 with social media-card polish requirements.
 ```
 
 ## Remaining docs being updated in this close-out
@@ -162,6 +214,8 @@ Clean old Web Builder witness links inside Owner diagnostic pages only if they c
 Update route registry/access map only in a controlled code pass if the updated docs prove a stale user-facing route remains.
 Do not delete old useful pages just because they are old.
 Do not touch SQL/RLS/storage/payment without a separate approved backend pass.
+Build proper Supabase auth gate later from the approved master-plan phase.
+Patch Groups/News Feed social media cards in a controlled UI pass.
 ```
 
 ## Current safety state
@@ -177,4 +231,5 @@ Storage policy changed: no
 Payment activated: no
 Player/audio/accessibility changed: no
 Useful old support pages deleted: no
+Social card/media polish fix logged: yes
 ```
