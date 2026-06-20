@@ -1,12 +1,12 @@
-# Stream Bandit Master Must-Follow Plan V7.13.058
+# Stream Bandit Master Must-Follow Plan V7.13.060
 
-Date: 2026-06-19
+Date: 2026-06-20
 
-Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
-Purpose: this document is the project-level source plan for Stream Bandit after the full beginning-to-end scan pass. It records what the scan taught us, what is now locked, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment or database work.
+Purpose: this document is the project-level source plan for Stream Bandit after the full beginning-to-end scan pass. It records what the scan taught us, what is now locked, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database or authentication-gate work.
 
-This is a source-of-truth planning document only. It does not approve code rewrites, SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement or shell merging.
+This is a source-of-truth planning document only. It does not approve code rewrites, SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, shell merging or immediate auth-gate rollout.
 
 ## 1. What the full scan taught us
 
@@ -270,7 +270,116 @@ Main App/Web Builder shell merge
 
 Publishable Supabase config must remain config-only and must not be copied into docs or exposed as a secret.
 
-## 10. Current final-scan decision
+## 10. Future Phase: Proper Supabase Sign-In Gate / No Guest Users
+
+Status:
+
+```text
+PLANNED ONLY / APPROVED FOR MASTER PLAN / NOT BUILT YET
+```
+
+Goal:
+
+Build a proper Stream Bandit sign-in gate that blocks guest users from the app until they are signed in through Supabase Auth. This should replace casual guest browsing with a controlled login-first experience.
+
+The gate is a future controlled phase. It is not approved as a late-night patch, broad shell rewrite or mass page edit.
+
+### Gate experience requirements
+
+The gate should show:
+
+```text
+Stream Bandit logo
+Welcome to Stream Bandit
+Email or username field
+Password field
+Login button
+Logout button
+Create Account button or section
+Reset Password flow
+Existing admin/approved users only message until signup rules are approved
+```
+
+Behavior requirements:
+
+```text
+No guest users through the main app.
+Signed-out users stay on the gate.
+Signed-out users cannot interact with app pages behind the gate.
+Signed-in users can enter only after Supabase session is confirmed.
+Create Account remains disabled, invite-only or controlled until public signup is explicitly approved.
+Magic links must not be the only dependency.
+```
+
+### Technical direction
+
+Use Supabase Auth email/password login as the core method:
+
+```text
+signInWithPassword
+signOut
+resetPasswordForEmail
+```
+
+Username login is allowed only after a safe design is chosen. Username login may require a profile lookup before sign-in, but this must not expose private emails, create a weak bypass, or leak account existence in a careless way.
+
+Password readiness must be checked before building the gate. Existing admin users must have password login enabled in Supabase Auth, otherwise email/password login will fail even if the gate is coded correctly.
+
+Reset password needs a safe redirect flow so the user lands back on Stream Bandit after setting a new password.
+
+### Recommended implementation
+
+Build one shared helper first:
+
+```text
+stream-bandit-auth-gate-v7-13-001.js
+```
+
+Test first on only:
+
+```text
+index.html
+home-global-helpers-v7-4-4-test.html
+```
+
+Do not apply to every page until the gate passes.
+
+### Required rollout phases
+
+```text
+1. Confirm this plan and lock gate scope.
+2. Confirm existing admin/approved user password login works in Supabase Auth.
+3. Decide whether username login resolves to email, profile id, or remains email-only for phase one.
+4. Design reset-password redirect path.
+5. Build shared auth gate helper.
+6. Attach only to index.html and Home.
+7. Test login, logout and reset password.
+8. Test signed-out user cannot pass.
+9. Test signed-in admin/approved user can pass.
+10. Add owner emergency recovery path so Trevor is not locked out during testing.
+11. Expand to protected pages only after the first two pages pass.
+12. Later decide Create Account mode: public, invite-only or owner-created only.
+```
+
+### Security rule
+
+Frontend gate improves user flow and blocks normal guest browsing, but real data protection still depends on Supabase Auth and RLS.
+
+This gate phase does not approve:
+
+```text
+SQL changes
+RLS changes
+Storage policy changes
+Service-role key in browser
+Payment activation
+Public signup
+Mass page rewrite
+```
+
+Any backend/RLS updates for private data protection require a separate backend/security pass.
+
+## 11. Current final-scan decision
 
 ```text
 FINAL SCAN PASS COMPLETE.
@@ -279,5 +388,6 @@ WEB BUILDER MAP UPDATED.
 MASTER PLAN UPDATED.
 FIX MEMORY UPDATED.
 WHAT CHANGED UPDATED.
+AUTH GATE FUTURE PHASE ADDED TO MASTER PLAN.
 NEXT WORK MUST START FROM THESE DOCS, NOT FROM OLD MENU CONFUSION.
 ```
