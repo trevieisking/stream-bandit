@@ -1,12 +1,12 @@
-# Stream Bandit Master Must-Follow Plan V7.13.067
+# Stream Bandit Master Must-Follow Plan V7.13.068
 
 Date: 2026-06-20
 
-Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION / AUTH GATE HELPER AND PASSWORD SETUP TEST PASSED / LOGIN POPUP IMAGE CROP FIX PENDING / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit after the full beginning-to-end scan pass. It records what the scan taught us, what is now locked, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
-This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, and the accepted User Management owner-only visual exception. It does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, or any additional shell-bridge rollout beyond specific tested safe passes.
+This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, the accepted User Management owner-only visual exception, and the first auth gate helper/password setup proof. It does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, or any additional shell-bridge rollout beyond specific tested safe passes.
 
 ## 1. What the full scan taught us
 
@@ -278,7 +278,7 @@ Publishable Supabase config must remain config-only and must not be copied into 
 Status:
 
 ```text
-PLANNED ONLY / APPROVED FOR MASTER PLAN / NOT BUILT YET
+HELPER BUILT / TEST PAGE CREATED / RESET PASSWORD FLOW PASSED / PASSWORD SETUP TEST PASSED / SIGNED-IN APPROVED PROOF PASSED / SIGNED-OUT GATE APPEARS / NOT ATTACHED TO INDEX OR HOME YET / LOGIN POPUP IMAGE CROP FIX PENDING
 ```
 
 Goal:
@@ -330,12 +330,57 @@ Password readiness must be checked before building the gate. Existing admin user
 
 Reset password needs a safe redirect flow so the user lands back on Stream Bandit after setting a new password.
 
-### Recommended implementation
-
-Build one shared helper first:
+### Built helper
 
 ```text
 stream-bandit-auth-gate-v7-13-001.js
+```
+
+Current test page:
+
+```text
+stream-bandit-auth-gate-test-v7-13-001.html
+```
+
+Password setup test page:
+
+```text
+stream-bandit-password-setup-test-v7-13-001.html
+```
+
+Current auth gate test result:
+
+```text
+The test page loaded the auth gate helper.
+Signed-in session was detected.
+Current owner/admin/platform-owner profile was approved through sb_profiles.
+Decision returned allowed true.
+Reason returned signed-in-approved.
+The helper reported serviceRoleInBrowser false.
+The helper reported publicSignup false.
+The helper is not mass-applied.
+```
+
+Password setup test result:
+
+```text
+Logout Test worked.
+Reset Password email was sent.
+Reset email opened stream-bandit-password-setup-test-v7-13-001.html.
+New password was entered twice and saved.
+The page returned to stream-bandit-auth-gate-test-v7-13-001.html.
+Signed-in approved proof still passed after password setup.
+```
+
+Current visual asset note:
+
+```text
+Trevor wants stream_bandit_original_running_stag_MASTER_1536x1024.png used on the login page and actual gate.
+The test page references that filename.
+The image asset is now visible on the auth gate test page.
+The actual login popup is too tall and the top of the banner image is cropped.
+This is a visual/layout fix only.
+Do not attach the gate to index.html or Home until the login popup is fully visible and retested.
 ```
 
 Test first on only:
@@ -350,18 +395,18 @@ Do not apply to every page until the gate passes.
 ### Required rollout phases
 
 ```text
-1. Confirm this plan and lock gate scope.
-2. Confirm existing admin/approved user password login works in Supabase Auth.
-3. Decide whether username login resolves to email, profile id, or remains email-only for phase one.
-4. Design reset-password redirect path.
-5. Build shared auth gate helper.
-6. Attach only to index.html and Home.
-7. Test login, logout and reset password.
-8. Test signed-out user cannot pass.
-9. Test signed-in admin/approved user can pass.
-10. Add owner emergency recovery path so Trevor is not locked out during testing.
-11. Expand to protected pages only after the first two pages pass.
-12. Later decide Create Account mode: public, invite-only or owner-created only.
+1. Confirm this plan and lock gate scope. DONE.
+2. Confirm existing admin/approved user password login works in Supabase Auth. DONE: password setup and post-reset signed-in approved proof passed.
+3. Decide whether username login resolves to email, profile id, or remains email-only for phase one. PHASE ONE: email-only.
+4. Design reset-password redirect path. DONE FOR TEST: reset points to password setup test page.
+5. Build shared auth gate helper. DONE.
+6. Attach only to index.html and Home. NOT DONE.
+7. Test login, logout and reset password. FUNCTIONAL TEST PASSED; visual popup crop fix pending.
+8. Test signed-out user cannot pass. PARTIAL: signed-out gate appears; final full visibility retest pending.
+9. Test signed-in admin/approved user can pass. DONE.
+10. Add owner emergency recovery path so Trevor is not locked out during testing. NOT DONE.
+11. Expand to protected pages only after the first two pages pass. NOT DONE.
+12. Later decide Create Account mode: public, invite-only or owner-created only. NOT DONE.
 ```
 
 ### Security rule
@@ -513,7 +558,11 @@ WEB BUILDER MAP UPDATED.
 MASTER PLAN UPDATED.
 FIX MEMORY UPDATED.
 WHAT CHANGED UPDATED.
-AUTH GATE FUTURE PHASE ADDED TO MASTER PLAN.
+AUTH GATE FUTURE PHASE HELPER BUILT AND TEST PAGE CREATED.
+AUTH GATE RESET PASSWORD AND PASSWORD SETUP TEST PASSED.
+AUTH GATE SIGNED-IN APPROVED PROOF PASSED.
+AUTH GATE LOGIN POPUP IMAGE CROP FIX IS THE CURRENT BLOCKER.
+AUTH GATE IS NOT ATTACHED TO INDEX OR HOME YET.
 HEADER/FOOTER PROJECTOR BRIDGE PASSED AND LOCKED.
 CODE FIX MACHINE OWNER SUPPORT TOOL APPROVED.
 USER MANAGEMENT 11B THEME BRIDGE ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION.
