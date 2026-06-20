@@ -1,12 +1,12 @@
-# Stream Bandit Master Must-Follow Plan V7.13.061
+# Stream Bandit Master Must-Follow Plan V7.13.064
 
 Date: 2026-06-20
 
-Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / SHELL BRIDGE FOLLOW-UP NOTES ADDED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT SHELL BRIDGE STILL PLANNED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit after the full beginning-to-end scan pass. It records what the scan taught us, what is now locked, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
-This is a source-of-truth planning document only. It does not approve code rewrites, SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, shell merging, immediate auth-gate rollout or immediate shell-bridge rollout.
+This is a source-of-truth planning document. It records the passed Header/Footer projector bridge and the approved Owner-only Code Fix Machine support helper. It does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, or any additional shell-bridge rollout beyond the specific passed 11A fix.
 
 ## 1. What the full scan taught us
 
@@ -142,6 +142,7 @@ Owner menu should currently expose only:
 ```text
 Form Inbox
 One Machine
+Code Fix Machine
 Platform Control Centre
 Final Shell Navigation
 Brand / App Icons
@@ -153,6 +154,7 @@ Owner rules:
 
 - Form Inbox is the temporary Owner exception and is queued for later Social placement.
 - One Machine is read-only route/security/ownership proof.
+- Code Fix Machine is an Owner-only support helper for safe paste/search/replace/check workflows when connector tools are blocked. It performs no Supabase writes, no SQL, no RLS, no storage actions, no live promotion and no app data mutation.
 - Final Shell Navigation is read-only shell/navigation proof.
 - Brand / App Icons is a real owner/admin global-logo upload/save page and must be preservation-first.
 - Brand Image Helper is preview-only and writes off.
@@ -379,23 +381,29 @@ Mass page rewrite
 
 Any backend/RLS updates for private data protection require a separate backend/security pass.
 
-## 11. Future Phase: Shell Bridge Follow-Up Fixes
+## 11. Shell Bridge Follow-Up Fixes
 
 Status:
 
 ```text
-PLANNED ONLY / FOUND DURING FRESH REGISTRY BACKUP CHECK / NOT PATCHED YET
+11A PASSED / 11B PLANNED ONLY / NO BROAD SHELL MERGE APPROVED
 ```
 
-These are approved master-plan notes from the fresh registry backup check. They are not emergency patches and should be handled in a controlled UI/shell bridge pass.
+These are approved master-plan notes from the fresh registry backup check. Only 11A has passed. Any remaining shell bridge work must be handled in a controlled UI/shell bridge pass.
 
-### 11A. Web Builder Header/Footer Builder page needs Web Builder identity bridge
+### 11A. Web Builder Header/Footer Builder page Web Builder identity bridge
 
-Observed issue:
+Status:
 
 ```text
-On the Web Builder Header/Footer page, the Web Builder global avatar is not showing.
-The page also has no Web Builder Hub overlay.
+PASSED / LOCKED / CURRENT BLOCKER CLEARED
+```
+
+Original observed issue:
+
+```text
+On the Web Builder Header/Footer page, the Web Builder global avatar was not showing.
+The page also had no Web Builder Hub overlay.
 It should show both.
 ```
 
@@ -405,22 +413,31 @@ Target area:
 web-builder-header-footer-code-v7-12-254-test.html
 ```
 
-Required future behavior:
+Passed behavior:
 
 ```text
-Web Builder Header/Footer page should show the Web Builder global avatar/account identity.
-Web Builder Header/Footer page should have the Web Builder Hub overlay/rail access.
-The page must remain Web Builder-owned and must not be converted into the Main App shell.
-The fix should preserve header/footer builder logic and existing sb_site_pages.settings_json.web_builder_shell writes.
+Web Builder Header/Footer page now loads the Web Builder global projector bridge.
+Web Builder Header/Footer page can show the Web Builder global avatar/account identity.
+Web Builder Header/Footer page can use the Web Builder Hub overlay/rail access.
+The old local builder rail is hidden only when the projector is active.
+The page remains Web Builder-owned and was not converted into the Main App shell.
+The fix preserves Header/Footer Builder editor logic and existing sb_site_pages.settings_json.web_builder_shell writes.
 ```
 
-Safe implementation rule:
+Implementation lock:
 
 ```text
-Patch only the Web Builder identity/overlay bridge.
+The passed fix is limited to loading web-builder-global-projector-v7-12-263.js and the active-projector local rail hide rule.
 Do not rewrite the builder editor.
 Do not merge the Main App header/footer shell into Web Builder.
-Verify Web Builder avatar, hub overlay, save flow and preview flow after patch.
+Do not change SQL, RLS, storage, auth policy, Supabase schema, or production index behavior.
+```
+
+Process lesson:
+
+```text
+The Stream Bandit Code Fix Machine helped complete this blocker by allowing safe paste/search/replace/full-output checking when connector file generation and patch tools were unreliable.
+Preserve the Code Fix Machine as an Owner support helper.
 ```
 
 ### 11B. User Management Dashboard needs Main App shell/global feature bridge
@@ -466,6 +483,8 @@ MASTER PLAN UPDATED.
 FIX MEMORY UPDATED.
 WHAT CHANGED UPDATED.
 AUTH GATE FUTURE PHASE ADDED TO MASTER PLAN.
-SHELL BRIDGE FOLLOW-UP NOTES ADDED TO MASTER PLAN.
+HEADER/FOOTER PROJECTOR BRIDGE PASSED AND LOCKED.
+CODE FIX MACHINE OWNER SUPPORT TOOL APPROVED.
+USER MANAGEMENT SHELL BRIDGE REMAINS PLANNED.
 NEXT WORK MUST START FROM THESE DOCS, NOT FROM OLD MENU CONFUSION.
 ```
