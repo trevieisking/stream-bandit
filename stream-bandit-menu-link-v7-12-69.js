@@ -1,16 +1,18 @@
-/* Stream Bandit V7.12.72 Stable Owner Menu Link
+/* Stream Bandit V7.13.063 Stable Owner Menu Link
+   Owner support link update: adds Code Fix Machine after it helped pass the Header/Footer projector bridge blocker.
    Emergency stabiliser: one-shot only. No MutationObserver. No interval loop.
    Adds/restores the Owner group on the Global Whatnots scanner page only.
    Safe UI-only navigation helper: no Supabase writes, no deletes, no live promotion, no payment unlocks. */
 (function(){
   'use strict';
 
-  var VERSION = 'v7-12-72-stable-one-shot';
+  var VERSION = 'v7-13-063-code-fix-machine-owner-link';
   var OWNER_PAGE_NAME = 'global-helper-property-owner-scan-v7-12-67-test.html';
   var done = false;
 
   var OWNER_PAGES = [
     ['🧠','One Machine','stream-bandit-one-machine-v7-12-72-test.html'],
+    ['🛠️','Code Fix Machine','stream-bandit-code-fix-machine-v1.html'],
     ['🧬','Global Whatnots','global-helper-property-owner-scan-v7-12-67-test.html'],
     ['🎛️','Platform Control Centre','platform-control-centre-combined-v7-12-61-test.html'],
     ['🗂️','Brand / App Icons','settings-brand-icons-promoted-v7-12-21-test.html'],
@@ -61,7 +63,7 @@
       var a = document.createElement('a');
       a.className = 'sb-shell-link owner';
       a.href = p[2];
-      a.setAttribute('data-sb-text',(p[1] + ' owner global whatnots settings bucket supabase role gate').toLowerCase());
+      a.setAttribute('data-sb-text',(p[1] + ' owner global whatnots settings bucket supabase role gate code fix machine patch helper').toLowerCase());
       a.innerHTML = '<span style="width:24px">' + esc(p[0]) + '</span>' + esc(p[1]);
       box.appendChild(a);
     });
