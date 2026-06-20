@@ -1,13 +1,14 @@
-/* Stream Bandit Auth Gate V7.13.001
+/* Stream Bandit Auth Gate V7.13.002
    Shared future sign-in gate helper from Master Plan Section 10.
    Purpose: block normal guest browsing on pages that intentionally load this helper.
    Phase 1 target pages only: index.html and home-global-helpers-v7-4-4-test.html.
    Uses Supabase Auth email/password, signOut and resetPasswordForEmail.
+   V7.13.002 fixes popup top alignment and double-scroll locking.
    No public signup. No service-role key. No SQL/RLS/storage/payment changes. */
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.001 Auth Gate / Email Password / No Guest Users';
+  var VERSION = 'V7.13.002 Auth Gate / Email Password / No Guest Users / Popup Scroll Lock';
   var PROFILE_TABLE = 'sb_profiles';
   var APPROVED_STATUSES = ['active','approved','limited','review'];
   var BLOCKED_STATUSES = ['banned','restricted','deleted','disabled','suspended'];
@@ -69,7 +70,7 @@
     var cfg = readShellConfig();
     if(cfg.url && cfg.key) return cfg;
 
-    try{ await addScript('stream-bandit-shell-v6-24.js?v=auth-gate-7-13-001'); }catch(error){}
+    try{ await addScript('stream-bandit-shell-v6-24.js?v=auth-gate-7-13-002'); }catch(error){}
 
     for(var i=0;i<30;i++){
       await new Promise(function(resolve){ setTimeout(resolve,100); });
@@ -129,12 +130,12 @@
     var style = document.createElement('style');
     style.id = 'sbAuthGateCss';
     style.textContent = ''+
-      '.sb-auth-gate{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:radial-gradient(circle at 0 0,#22d3a62d,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff36,transparent 38%),linear-gradient(180deg,#070910,#050711);color:#f7fbff;font-family:Inter,system-ui,Arial,sans-serif;overflow:auto}'+
+      '.sb-auth-gate{position:fixed;inset:0;z-index:2147483000;display:none;align-items:flex-start;justify-content:center;padding:max(10px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom));background:radial-gradient(circle at 0 0,#22d3a62d,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff36,transparent 38%),linear-gradient(180deg,#070910,#050711);color:#f7fbff;font-family:Inter,system-ui,Arial,sans-serif;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}'+
       '.sb-auth-gate.open{display:flex}'+
-      '.sb-auth-card{width:min(760px,100%);border:1px solid #ffffff24;border-radius:32px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 28px 100px #000c;padding:18px}'+
+      '.sb-auth-card{width:min(760px,100%);margin:0 auto;border:1px solid #ffffff24;border-radius:32px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 28px 100px #000c;padding:clamp(12px,2vw,18px)}'+
       '.sb-auth-head{display:flex;gap:12px;align-items:center;margin-bottom:14px}'+
       '.sb-auth-logo{width:58px;height:58px;min-width:58px;border-radius:18px;background:linear-gradient(135deg,#22d3a6,#7c3cff);display:grid;place-items:center;color:#071015;font-weight:1000}'+
-      '.sb-auth-card h1{font-size:clamp(34px,6vw,66px);line-height:.94;letter-spacing:-.055em;margin:8px 0}'+
+      '.sb-auth-card h1{font-size:clamp(30px,5vw,56px);line-height:.94;letter-spacing:-.055em;margin:8px 0;text-shadow:0 0 24px #41e8ff}'+
       '.sb-auth-card p,.sb-auth-card small,.sb-auth-card label{color:#b9c0d8;line-height:1.5}'+
       '.sb-auth-form{display:grid;gap:10px;margin-top:12px}'+
       '.sb-auth-form input{width:100%;border:1px solid #ffffff24;border-radius:16px;background:#0009;color:#fff;padding:12px;font:inherit}'+
@@ -145,8 +146,8 @@
       '.sb-auth-btn:disabled{opacity:.55;cursor:not-allowed}'+
       '.sb-auth-note{border:1px solid #ffb14266;background:#ffb14220;color:#ffe7ad;border-radius:18px;padding:12px;font-weight:850;margin-top:12px}'+
       '.sb-auth-good{border:1px solid #22d3a666;background:#22d3a620;color:#dfffee;border-radius:18px;padding:12px;font-weight:850;margin-top:12px}'+
-      'body.sb-auth-gate-locked{overflow:hidden!important}'+
-      '@media(max-width:700px){.sb-auth-actions .sb-auth-btn{flex:1 1 100%}.sb-auth-head{align-items:flex-start}}';
+      'html.sb-auth-gate-root-locked,body.sb-auth-gate-locked{overflow:hidden!important}'+
+      '@media(max-width:700px){.sb-auth-actions .sb-auth-btn{flex:1 1 100%}.sb-auth-head{align-items:flex-start}.sb-auth-gate{padding:8px 10px 18px}.sb-auth-card{border-radius:24px}}';
     document.head.appendChild(style);
   }
 
@@ -190,6 +191,7 @@
   function openGate(message){
     var gate = ensureGate();
     gate.classList.add('open');
+    document.documentElement.classList.add('sb-auth-gate-root-locked');
     document.body.classList.add('sb-auth-gate-locked');
     document.documentElement.dataset.sbAuthGate = 'locked';
     if(message) setStatus(message, false);
@@ -198,6 +200,7 @@
   function closeGate(){
     var gate = $('sbAuthGate');
     if(gate) gate.classList.remove('open');
+    document.documentElement.classList.remove('sb-auth-gate-root-locked');
     document.body.classList.remove('sb-auth-gate-locked');
     document.documentElement.dataset.sbAuthGate = 'allowed';
   }
@@ -372,7 +375,7 @@
       state: state
     };
     window.StreamBanditAuthGateV713001 = window.StreamBanditAuthGate;
-    document.documentElement.dataset.sbAuthGateHelper = 'v7-13-001';
+    document.documentElement.dataset.sbAuthGateHelper = 'v7-13-002';
     enforce();
   }
 
