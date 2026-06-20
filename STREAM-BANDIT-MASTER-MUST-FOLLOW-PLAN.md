@@ -1,12 +1,12 @@
-# Stream Bandit Master Must-Follow Plan V7.13.064
+# Stream Bandit Master Must-Follow Plan V7.13.066
 
 Date: 2026-06-20
 
-Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT SHELL BRIDGE STILL PLANNED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B BLOCKER FOUND / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit after the full beginning-to-end scan pass. It records what the scan taught us, what is now locked, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
-This is a source-of-truth planning document. It records the passed Header/Footer projector bridge and the approved Owner-only Code Fix Machine support helper. It does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, or any additional shell-bridge rollout beyond the specific passed 11A fix.
+This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, and the failed/blocked first User Management shell bridge test. It does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, or any additional shell-bridge rollout beyond specific tested safe passes.
 
 ## 1. What the full scan taught us
 
@@ -386,10 +386,10 @@ Any backend/RLS updates for private data protection require a separate backend/s
 Status:
 
 ```text
-11A PASSED / 11B PLANNED ONLY / NO BROAD SHELL MERGE APPROVED
+11A PASSED / 11B BLOCKED AFTER FIRST TEST / NO BROAD SHELL MERGE APPROVED
 ```
 
-These are approved master-plan notes from the fresh registry backup check. Only 11A has passed. Any remaining shell bridge work must be handled in a controlled UI/shell bridge pass.
+These are approved master-plan notes from the fresh registry backup check. Only 11A has passed. 11B has an active blocker and must not be marked passed until the duplicate/wrong header layer is fixed and the protected controls are reverified.
 
 ### 11A. Web Builder Header/Footer Builder page Web Builder identity bridge
 
@@ -442,12 +442,27 @@ Preserve the Code Fix Machine as an Owner support helper.
 
 ### 11B. User Management Dashboard needs Main App shell/global feature bridge
 
-Observed issue:
+Status:
 
 ```text
-User Management Dashboard does not have Main App shell global features.
-User Management Dashboard does not have the theme bridge.
+BLOCKED AFTER FIRST TEST / NOT PASSED / FIX MUST BE REDESIGNED
+```
+
+Original observed issue:
+
+```text
+User Management Dashboard did not have Main App shell global features.
+User Management Dashboard did not have the theme bridge.
 It should.
+```
+
+First test result:
+
+```text
+The theme projector part changed the theme and proved that theme projection can reach the page.
+The full Header Shell visual injection created a wrong/duplicate header layer on the User Management Dashboard.
+The page showed an unwanted top/local header conflict and the shell/header layout was not acceptable.
+This means 11B is not passed.
 ```
 
 Target area:
@@ -465,12 +480,27 @@ User Management Dashboard should keep its protected owner/admin role and audit b
 User Management Dashboard must not lose protected-control behavior while adding shell/theme features.
 ```
 
-Safe implementation rule:
+Corrected safe implementation rule:
 
 ```text
-Patch only global shell/theme/helper loading and bridge behavior.
+Do not load the full visual Header Shell on User Management as a blind script include.
+Do not create a duplicate top header or duplicate navigation rail.
+Patch only safe global shell/theme/helper loading and bridge behavior.
+Preferred next fix is a narrow User Management shell bridge that loads theme/favicons/account identity safely without injecting a second visual header.
+Alternative fix is theme projector only while leaving the existing Owner/Admin Hub header intact.
 Do not alter owner/admin RPC, audit, deletion queue, role checks or protected page logic.
-Verify theme bridge, header/footer/global helpers, and protected dashboard behavior after patch.
+Verify theme bridge, visible header layout, Refresh Me, Load Users, Delete Requests, Audit, and protected dashboard behavior after patch.
+```
+
+Next 11B repair order:
+
+```text
+1. Remove or avoid the full stream-bandit-header-shell-v7-12-156.js visual injection from User Management.
+2. Keep the theme projector only if it does not break protected controls.
+3. Design a tiny User Management shell bridge/helper if account identity or safe global helper features are still needed.
+4. Test browser layout first: no duplicate header, no Web Builder-looking header, no unwanted top local/global conflict.
+5. Test protected controls second: Refresh Me, Load Users, Delete Requests, Audit and update overlays.
+6. Only then mark 11B passed.
 ```
 
 ## 12. Current final-scan decision
@@ -485,6 +515,6 @@ WHAT CHANGED UPDATED.
 AUTH GATE FUTURE PHASE ADDED TO MASTER PLAN.
 HEADER/FOOTER PROJECTOR BRIDGE PASSED AND LOCKED.
 CODE FIX MACHINE OWNER SUPPORT TOOL APPROVED.
-USER MANAGEMENT SHELL BRIDGE REMAINS PLANNED.
+USER MANAGEMENT 11B FOUND A CURRENT HEADER/SHELL BLOCKER AND REMAINS NOT PASSED.
 NEXT WORK MUST START FROM THESE DOCS, NOT FROM OLD MENU CONFUSION.
 ```
