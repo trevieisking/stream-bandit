@@ -1,12 +1,12 @@
-# Stream Bandit Master Must-Follow Plan V7.13.072
+# Stream Bandit Master Must-Follow Plan V7.13.073
 
-Date: 2026-06-20
+Date: 2026-06-21
 
-Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION / AUTH GATE HELPER PASSWORD SETUP LOGIN POPUP OWNER RECOVERY AND INDEX SESSION WATCH TEST PASSED / HOME AUTH GATE ATTACHMENT NEXT / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION / AUTH GATE HELPER PASSWORD SETUP LOGIN POPUP OWNER RECOVERY INDEX SESSION WATCH AND HOME SESSION WATCH TEST PASSED / INDEX AND HOME AUTH GATE PASSED / NEXT PROTECTED PAGE ROLLOUT DECISION NEEDED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit after the full beginning-to-end scan pass. It records what the scan taught us, what is now locked, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
-This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, the accepted User Management owner-only visual exception, the auth gate helper/password setup/login-popup proof, the owner recovery path pass, and the first real Index auth-gate session-watch pass. It does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, or any additional shell-bridge rollout beyond specific tested safe passes.
+This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, the accepted User Management owner-only visual exception, the auth gate helper/password setup/login-popup proof, the owner recovery path pass, the first real Index auth-gate session-watch pass, and the first real Home auth-gate session-watch pass. It does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, header-shell auth-gate embedding, or any additional shell-bridge rollout beyond specific tested safe passes.
 
 ## 1. What the full scan taught us
 
@@ -269,6 +269,7 @@ Player/audio/accessibility comfort
 Service-role logic
 Global Supabase secrets
 Main App/Web Builder shell merge
+Header-shell auth-gate embedding
 ```
 
 Publishable Supabase config must remain config-only and must not be copied into docs or exposed as a secret.
@@ -278,7 +279,7 @@ Publishable Supabase config must remain config-only and must not be copied into 
 Status:
 
 ```text
-HELPER BUILT / TEST PAGE CREATED / RESET PASSWORD FLOW PASSED / PASSWORD SETUP TEST PASSED / SIGNED-IN APPROVED PROOF PASSED / SIGNED-OUT GATE APPEARS / LOGIN POPUP FULLY VISIBLE PASSED / LOGIN WITH NEW PASSWORD PASSED / OWNER RECOVERY PATH PASSED / INDEX AUTH GATE SESSION WATCH PASSED / HOME AUTH GATE ATTACHMENT NEXT
+HELPER BUILT / TEST PAGE CREATED / RESET PASSWORD FLOW PASSED / PASSWORD SETUP TEST PASSED / SIGNED-IN APPROVED PROOF PASSED / SIGNED-OUT GATE APPEARS / LOGIN POPUP FULLY VISIBLE PASSED / LOGIN WITH NEW PASSWORD PASSED / OWNER RECOVERY PATH PASSED / INDEX AUTH GATE SESSION WATCH PASSED / HOME AUTH GATE SESSION WATCH PASSED / INDEX AND HOME AUTH GATE PASSED / NEXT PROTECTED PAGE ROLLOUT DECISION NEEDED
 ```
 
 Goal:
@@ -412,6 +413,19 @@ Index remained the Platform Entry and did not replace Home.
 Home was not touched during the Index test.
 ```
 
+Home auth gate attachment test result:
+
+```text
+home-global-helpers-v7-4-4-test.html was upgraded to V7.12.159 for the second real-page auth gate test.
+Signed-in Home opened normally.
+Header Shell sign-out was tested without manual refresh.
+The Stream Bandit login gate opened instantly and stayed up after sign-out.
+Login with the new password worked from the Home gate.
+Home owner recovery URL worked: home-global-helpers-v7-4-4-test.html?sb_owner_recovery=1.
+Home remained the Main App Home route and did not replace Index.
+Index and Home are now both passed for Phase 1 auth-gate attachment.
+```
+
 Current visual asset note:
 
 ```text
@@ -420,17 +434,18 @@ The test page references that filename.
 The image asset is now visible on the auth gate test page.
 The actual login popup crop fix has passed on the auth gate test page.
 The owner recovery path has passed on the auth gate test page.
-Index gate pass is now complete.
+Index gate pass is complete.
+Home gate pass is complete.
 ```
 
-Test first on only:
+First two pages passed:
 
 ```text
 index.html
 home-global-helpers-v7-4-4-test.html
 ```
 
-Do not apply to every page until the gate passes on Home too.
+Do not apply to every page from Header Shell yet. Header Shell is global navigation and loads on mixed page families. Embedding the auth gate in Header Shell would silently mass-apply the gate to Web Builder, Owner, Admin, support and diagnostic pages before each route family is explicitly approved.
 
 ### Required rollout phases
 
@@ -440,12 +455,12 @@ Do not apply to every page until the gate passes on Home too.
 3. Decide whether username login resolves to email, profile id, or remains email-only for phase one. PHASE ONE: email-only.
 4. Design reset-password redirect path. DONE FOR TEST: reset points to password setup test page.
 5. Build shared auth gate helper. DONE.
-6. Attach only to index.html and Home. INDEX PASSED / HOME NEXT.
-7. Test login, logout and reset password. PASSED ON TEST PAGE AND INDEX.
-8. Test signed-out user cannot pass. PASSED ON TEST PAGE AND INDEX.
-9. Test signed-in admin/approved user can pass. PASSED ON TEST PAGE AND INDEX.
-10. Add owner emergency recovery path so Trevor is not locked out during testing. PASSED ON TEST PAGE AND INDEX.
-11. Expand to protected pages only after the first two pages pass. NOT DONE.
+6. Attach only to index.html and Home. DONE: INDEX AND HOME PASSED.
+7. Test login, logout and reset password. PASSED ON TEST PAGE, INDEX AND HOME.
+8. Test signed-out user cannot pass. PASSED ON TEST PAGE, INDEX AND HOME.
+9. Test signed-in admin/approved user can pass. PASSED ON TEST PAGE, INDEX AND HOME.
+10. Add owner emergency recovery path so Trevor is not locked out during testing. PASSED ON TEST PAGE, INDEX AND HOME.
+11. Expand to protected pages only after the first two pages pass. READY FOR CONTROLLED NEXT DECISION / NOT STARTED.
 12. Later decide Create Account mode: public, invite-only or owner-created only. NOT DONE.
 ```
 
@@ -463,6 +478,7 @@ Service-role key in browser
 Payment activation
 Public signup
 Mass page rewrite
+Header-shell auth-gate embedding
 ```
 
 Any backend/RLS updates for private data protection require a separate backend/security pass.
@@ -604,7 +620,10 @@ AUTH GATE SIGNED-IN APPROVED PROOF PASSED.
 AUTH GATE LOGIN POPUP FULL VISUAL/FUNCTION TEST PASSED.
 AUTH GATE OWNER EMERGENCY RECOVERY PATH PASSED ON TEST PAGE.
 AUTH GATE INDEX ATTACHMENT AND SESSION-WATCH TEST PASSED.
-AUTH GATE HOME ATTACHMENT IS NEXT.
+AUTH GATE HOME ATTACHMENT AND SESSION-WATCH TEST PASSED.
+AUTH GATE INDEX AND HOME PHASE 1 PASSED.
+HEADER SHELL AUTH-GATE EMBEDDING IS NOT APPROVED YET.
+NEXT STEP: DECIDE CONTROLLED PROTECTED PAGE ROLLOUT, NOT MASS PAGE OR HEADER-SHELL INJECTION.
 HEADER/FOOTER PROJECTOR BRIDGE PASSED AND LOCKED.
 CODE FIX MACHINE OWNER SUPPORT TOOL APPROVED.
 USER MANAGEMENT 11B THEME BRIDGE ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION.
