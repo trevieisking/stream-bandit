@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Supabase Library Editor V7.12.277</title>
+<title>Stream Bandit Supabase Library Editor V7.12.279 Auth Gate Test</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -21,21 +21,21 @@ body.sbEditorGatePending .modal{display:none!important}
 @media(max-width:560px){.movieGrid{grid-template-columns:1fr}.thumb{height:150px}.modal{padding:10px}.modalHead{display:block}.modalHead .btn{margin-top:10px}}
 </style>
 </head>
-<body class="sbEditorGatePending" data-sb-supabase-library-menu-url="supabase-library-editor-clean-nav-v7-12-277-test.html">
+<body class="sbEditorGatePending" data-sb-supabase-library-menu-url="supabase-library-editor-clean-nav-v7-12-277-test.html" data-sb-auth-gate-supabase-editor-test="v7-13-005">
 <div class="wrap">
 <section class="box pillTabs topRail"><div class="tabs" aria-label="Supabase Library Editor page links"><button class="pagePill back" id="backBtn" type="button">Back</button><a class="pagePill" href="home-global-helpers-v7-4-4-test.html">Hub</a><a class="pagePill" href="library-global-helpers-v7-4-8-test.html">Public Library</a><a class="pagePill active" href="supabase-library-editor-clean-nav-v7-12-277-test.html">Supabase Editor</a><a class="pagePill" href="genres-clean-machine-v7-12-45-test.html">Genres</a><a class="pagePill" href="details-clean-machine-v7-12-38-test.html">Details</a><a class="pagePill" href="player-one-global-helpers-v7-3-3-test.html">Player 1</a><a class="pagePill" href="player-2-clean-machine-v7-12-58-test.html">Player 2</a><a class="pagePill" href="continue-watching-global-helpers-v7-3-9-test.html">Continue</a><a class="pagePill" href="watch-history-global-helpers-v7-4-0-test.html">History</a></div></section>
 
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.277 Supabase Library Editor · Admin Lock Test</span>
+      <span class="badge">V7.12.279 Supabase Library Editor · Auth Gate + Admin Lock Test</span>
       <h1>Supabase Library Editor</h1>
-      <p>This is the admin/owner workbench for <b>sb_movies</b>. It can create, edit, upload poster URLs and permanently delete movie rows after confirmation, so editor controls stay locked for non-admin accounts.</p>
+      <p>This is the admin/owner workbench for <b>sb_movies</b>. Auth Gate V7.13.005 now blocks signed-out access first, then the existing admin/owner lock controls create, edit, upload poster URLs and permanent delete actions.</p>
       <div class="actions">
         <button id="reload" class="btn primary" type="button">Reload sb_movies</button>
         <button id="openAdd" class="btn hot" type="button">Create Video</button>
       </div>
-      <div id="status" class="status">Checking admin/owner access before loading Supabase Library Editor...</div>
+      <div id="status" class="status">Checking sign-in and admin/owner access before loading Supabase Library Editor...</div>
       <div id="helperStatus" class="note">Checking admin foundation...</div>
     </div>
     <div class="art"><div class="artIcon">🟢🎬</div></div>
@@ -51,7 +51,7 @@ body.sbEditorGatePending .modal{display:none!important}
     <div class="card"><b>Edits</b><p>Save updates the full editable movie form and verifies readback.</p></div>
     <div class="card"><b>Deletes</b><p>Delete permanently removes the selected <code>sb_movies</code> row after typed confirmation.</p></div>
   </div>
-  <div class="adminStrip"><span>Header shell</span><span>Footer shell</span><span>Theme projector</span><span>Admin/owner lock</span><span>Clean Details route</span><span>Player 1 route</span><span>Current Player 2 route</span><span>Real delete protected</span></div>
+  <div class="adminStrip"><span>Auth gate</span><span>Header shell</span><span>Footer shell</span><span>Theme projector</span><span>Admin/owner lock</span><span>Clean Details route</span><span>Player 1 route</span><span>Current Player 2 route</span><span>Real delete protected</span></div>
   <div class="note">Poster upload sends a resized 1920×1080 image to <b>stream-bandit-images</b>. Deleting a movie row does not delete storage files in this pass.</div>
 </section>
 
@@ -84,8 +84,8 @@ body.sbEditorGatePending .modal{display:none!important}
 <section id="rulesSec" class="box section active">
   <h2>Protected rules</h2>
   <div class="checks">
+    <div class="check"><b>Auth gate first</b><p>Signed-out users are blocked by the shared Auth Gate before editor controls load.</p></div>
     <div class="check"><b>Admin workbench</b><p>This page is allowed to create, edit and delete <code>sb_movies</code> rows only for owner/admin accounts.</p></div>
-    <div class="check"><b>No public delete</b><p>The public Library page keeps browse/watch behavior only.</p></div>
     <div class="check"><b>Typed confirmation</b><p>Permanent delete requires <b>DELETE FROM SUPABASE</b>.</p></div>
     <div class="check"><b>Verify after write</b><p>Create/edit/delete are verified with fresh Supabase reads.</p></div>
   </div>
@@ -107,35 +107,36 @@ body.sbEditorGatePending .modal{display:none!important}
     <div class="card"><b>Player 2</b><p>player-2-clean-machine-v7-12-58-test.html</p><a class="btn primary" href="player-2-clean-machine-v7-12-58-test.html">Open</a></div>
   </div>
 </section>
-<p class="micro">Supabase Library Editor V7.12.277: clean top rail + admin/owner lock test. Real create/edit/delete/upload logic retained from V7.12.217.</p>
+<p class="micro">Supabase Library Editor V7.12.279 auth gate test: clean top rail + Auth Gate + admin/owner lock. Real create/edit/delete/upload logic retained from V7.12.217.</p>
 </div>
 </div>
 
 <div id="editModal" class="modal"><div class="modalCard"><div class="modalHead"><div><span class="badge" id="modalBadge">Edit Video Overlay</span><h2 id="editTitle">Edit video</h2><p class="muted">Full-field save: editable form saves together and verifies after Supabase readback.</p></div><button class="btn" data-close="editModal" type="button">Close</button></div><div class="formGrid"><div class="wide"><label>Read-only ID</label><div id="editId" class="source"></div></div><div><label>Title</label><input id="f_title" class="input"></div><div><label>Status</label><select id="f_status" class="select"><option value="published">published</option><option value="draft">draft</option><option value="pending">pending</option><option value="hidden">hidden</option></select></div><div class="wide"><label>Description</label><textarea id="f_description" class="textarea medium"></textarea></div><div><label>Mux playback URL</label><input id="f_mux_playback_url" class="input"></div><div><label>Video URL</label><input id="f_video_url" class="input"></div><div><label>Thumbnail URL</label><input id="f_thumbnail_url" class="input"></div><div><label>Poster / thumbnail from device</label><input id="posterUpload" class="input" type="file" accept="image/*"><button id="uploadPoster" class="btn primary" type="button" style="margin-top:8px">Upload Poster 1920×1080</button></div><div class="wide preview"><img id="posterPreview" alt="Poster preview"></div><div><label>Trailer URL</label><input id="f_trailer_url" class="input"></div><div><label>Year</label><input id="f_year" class="input"></div><div><label>Rating</label><input id="f_rating" class="input"></div><div><label>Runtime</label><input id="f_runtime_text" class="input"></div><div><label>Age rating</label><input id="f_age_rating" class="input"></div><div><label>Director</label><input id="f_director" class="input"></div><div class="wide"><label>Cast organiser</label><textarea id="f_cast_text" class="textarea big"></textarea></div><div><label>Genres organiser</label><textarea id="f_genres" class="textarea medium"></textarea></div><div><label>Tags organiser</label><textarea id="f_tags" class="textarea medium"></textarea></div><div><label>Channel ID</label><input id="f_channel_id" class="input"></div><div><label>Owner ID</label><input id="f_owner_id" class="input"></div><div><label>Featured</label><select id="f_featured" class="select"><option value="false">false</option><option value="true">true</option></select></div><div><label>Duration seconds</label><input id="f_duration_seconds" class="input" type="number" min="0" step="1"></div><div><label>Source type</label><select id="f_source_type" class="select"><option value="mux">mux</option><option value="hls">hls</option><option value="url">url</option><option value="local">local</option><option value="missing">missing</option></select></div><div><label>Created at</label><div id="f_created_at" class="source"></div></div><div><label>Updated at</label><div id="f_updated_at" class="source"></div></div><div class="wide actions"><button id="saveVideo" class="btn hot" type="button">Save Full Video Form</button><button class="btn" data-close="editModal" type="button">Cancel</button></div></div></div></div>
 <div id="deleteModal" class="modal"><div class="modalCard"><div class="modalHead"><div><span class="badge">Permanent Delete Overlay</span><h2 id="deleteTitle">Delete row from sb_movies</h2><p class="muted">This permanently deletes the selected movie row from Supabase. Storage poster files are not deleted here.</p></div><button class="btn" data-close="deleteModal" type="button">Close</button></div><div class="danger">Permanent delete. Type <b>DELETE FROM SUPABASE</b> to confirm.</div><div class="formGrid"><div class="wide"><label>Selected row</label><div id="deleteInfo" class="source"></div></div><div class="wide"><label>Confirmation</label><input id="deleteConfirm" class="input" placeholder="Type DELETE FROM SUPABASE"></div><div class="wide actions"><button id="confirmDelete" class="btn dangerBtn" type="button">Delete Row From sb_movies</button><button class="btn" data-close="deleteModal" type="button">Cancel</button></div></div></div></div>
 
-<script src="stream-bandit-shell-v6-24.js?v=supabase-editor-clean-nav-277"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=supabase-editor-clean-nav-277"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=supabase-editor-clean-nav-277"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=supabase-editor-clean-nav-277"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=supabase-editor-clean-nav-277"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=supabase-editor-clean-nav-277"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=supabase-editor-clean-nav-277"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=supabase-editor-clean-nav-277"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=supabase-editor-clean-nav-277"></script>
+<script src="stream-bandit-shell-v6-24.js?v=supabase-editor-auth-gate-279"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=supabase-editor-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=supabase-editor-auth-gate-279"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=supabase-editor-auth-gate-279"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=supabase-editor-auth-gate-279"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=supabase-editor-auth-gate-279"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=supabase-editor-auth-gate-279"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=supabase-editor-auth-gate-279"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=supabase-editor-auth-gate-279"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=supabase-editor-auth-gate-279"></script>
 <script src="stream-bandit-supabase-editor-test-route-lock-v7-12-278.js?v=supabase-editor-lock-278"></script>
-<script src="stream-bandit-protected-page-v7-12-273.js?v=supabase-editor-clean-nav-277"></script>
+<script src="stream-bandit-protected-page-v7-12-273.js?v=supabase-editor-auth-gate-279"></script>
 <script>
 (function(){
 'use strict';
-const VERSION='V7.12.277 Supabase Library Editor / Clean Nav Admin Lock Test';
+const VERSION='V7.12.279 Supabase Library Editor / Auth Gate Admin Lock Test';
 const LIBRARY='library-global-helpers-v7-4-8-test.html';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER1='player-one-global-helpers-v7-3-3-test.html';
 const PLAYER2='player-2-clean-machine-v7-12-58-test.html';
 const BUCKET='stream-bandit-images';
 const DELETE_PHRASE='DELETE FROM SUPABASE';
-let sb=null,cfg=null,session=null,user=null,profile=null,isAdmin=false,movies=[],editing=null,deleting=null,busy=false,mode='edit';
+let sb=null,cfg=null,session=null,user=null,profile=null,isAdmin=false,movies=[],editing=null,deleting=null,busy=false,mode='edit',pageBooted=false,adminBooting=false;
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c));}
 function setStatus(t,bad){let el=$('status');if(el){el.textContent=t;el.className=bad?'danger':'status';}}
@@ -181,7 +182,7 @@ function presentLocked(prof){
 }
 async function requirePageAdmin(){
   try{
-    setStatus('Checking owner/admin permission before editor controls load...');
+    setStatus('Checking sign-in and owner/admin permission before editor controls load...');
     await getClient();
     let prof=await readProfile();
     helper();
@@ -189,9 +190,14 @@ async function requirePageAdmin(){
       document.body.classList.remove('sbEditorGatePending');
       return true;
     }
+    if(!user&&window.StreamBanditAuthGate){
+      setStatus('Auth Gate active. Sign in as an owner/admin account to load editor controls.');
+      return false;
+    }
     presentLocked(prof);
     return false;
   }catch(e){
+    if(window.StreamBanditAuthGate){setStatus('Auth/admin check waiting: '+(e.message||e),true);return false;}
     presentLocked({signedIn:false,role:'error',adminLevel:'',admin:false,email:'',message:e.message||String(e)});
     return false;
   }
@@ -213,10 +219,11 @@ async function uploadPoster(){try{requireSignedAdmin('uploading posters');const 
 function openDelete(m){deleting=m;$('deleteTitle').textContent='Delete row from sb_movies: '+(m.title||'Untitled');$('deleteInfo').textContent=JSON.stringify({id:m.id,title:m.title,status:m.status,thumbnail_url:poster(m)||null,note:'This deletes the sb_movies row only. Storage files remain.'},null,2);$('deleteConfirm').value='';openModal('deleteModal');}
 async function confirmDelete(){if(busy)return;busy=true;$('confirmDelete').disabled=true;try{requireSignedAdmin('deleting a video row');if(!deleting)throw new Error('No video selected');if($('deleteConfirm').value.trim()!==DELETE_PHRASE)throw new Error('Type DELETE FROM SUPABASE to confirm permanent delete.');const id=deleting.id,title=deleting.title||id,client=await getClient();dbg('delete start',{id:id,title:title});const del=await client.from('sb_movies').delete().eq('id',id).select('id,title');if(del.error)throw del.error;const verify=await client.from('sb_movies').select('id,title').eq('id',id).maybeSingle();if(verify.error)throw verify.error;if(verify.data)throw new Error('Delete verify failed: row still exists.');movies=movies.filter(m=>String(m.id)!==String(id));deleting=null;closeModal('deleteModal');render();dbg('delete verified',{id:id,title:title,deletedRows:del.data||[]});setStatus('Deleted from sb_movies and verified gone: '+title);}catch(e){dbg('delete error',{message:e.message||String(e),name:e.name||null});setStatus('Delete failed: '+(e.message||e),true);}finally{busy=false;$('confirmDelete').disabled=false;}}
 function playAll(){const rows=filtered().filter(firstUrl);if(!rows.length){setStatus('No playable visible videos.',true);return;}const payload={type:'library',version:VERSION,label:'Supabase Library',genre:'Supabase Library',createdAt:new Date().toISOString(),currentIndex:0,items:rows.map((m,i)=>({id:String(m.id),title:m.title||'Untitled',source:firstUrl(m),poster:poster(m),genres:arr(m.genres),index:i}))};try{sessionStorage.setItem('streamBanditQueueV1',JSON.stringify(payload));sessionStorage.setItem('streamBanditUpNextV1',JSON.stringify(payload));sessionStorage.setItem('streamBanditPlayer2Queue',JSON.stringify(payload));localStorage.setItem('streamBanditQueueV1',JSON.stringify(payload));localStorage.setItem('streamBanditUpNextV1',JSON.stringify(payload));localStorage.setItem('streamBanditPlayer2Queue',JSON.stringify(payload));}catch(e){}location.href=PLAYER2+'?id='+encodeURIComponent(String(rows[0].id))+'&queue=library&genre=Supabase%20Library';}
-function helper(){try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}let h=$('helperStatus');if(h)h.innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Counters '+(window.StreamBanditMenuSavesCount?'✅':'⚠️')+' · Search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Auth '+(user?'✅':'⚠️')+' · Admin '+(isAdmin?'✅':'⚠️')+' · '+esc(authNote());}
-async function load(showStatus){try{if(showStatus)setStatus('Loading sb_movies...');await getClient();let prof=await readProfile();const r=await sb.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(500);if(r.error)throw r.error;movies=r.data||[];render();helper();dbg('load ok',{version:VERSION,count:movies.length,signedIn:!!user,admin:isAdmin,profile:prof,configSource:cfg&&cfg.source,routes:{library:LIBRARY,details:DETAILS,player1:PLAYER1,player2:PLAYER2},writes:{create:true,update:true,delete:true,storageUpload:true},storageDelete:false,fieldKeys:['title','description','mux_playback_url','video_url','thumbnail_url','trailer_url','year','rating','runtime_text','age_rating','director','cast_text','genres','tags','channel_id','owner_id','featured','duration_seconds','source_type','status','updated_at']});if(showStatus)setStatus(user?(isAdmin?'Library editor ready. Admin/owner writes enabled.':'Library loaded. Admin role required before writes.'):'Library loaded. Sign in before admin writes.');}catch(e){dbg('load error',{message:e.message||String(e),name:e.name||null});setStatus('Library editor failed: '+(e.message||e),true);helper();}}
+function helper(){try{if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts();}catch(e){}let h=$('helperStatus');if(h)h.innerHTML='<b>Foundation:</b> Auth Gate '+(window.StreamBanditAuthGate?'✅':'⚠️')+' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Counters '+(window.StreamBanditMenuSavesCount?'✅':'⚠️')+' · Search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Auth '+(user?'✅':'⚠️')+' · Admin '+(isAdmin?'✅':'⚠️')+' · '+esc(authNote());}
+async function load(showStatus){try{if(showStatus)setStatus('Loading sb_movies...');await getClient();let prof=await readProfile();const r=await sb.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(500);if(r.error)throw r.error;movies=r.data||[];render();helper();dbg('load ok',{version:VERSION,authGate:!!window.StreamBanditAuthGate,count:movies.length,signedIn:!!user,admin:isAdmin,profile:prof,configSource:cfg&&cfg.source,routes:{library:LIBRARY,details:DETAILS,player1:PLAYER1,player2:PLAYER2},writes:{create:true,update:true,delete:true,storageUpload:true},storageDelete:false,fieldKeys:['title','description','mux_playback_url','video_url','thumbnail_url','trailer_url','year','rating','runtime_text','age_rating','director','cast_text','genres','tags','channel_id','owner_id','featured','duration_seconds','source_type','status','updated_at']});if(showStatus)setStatus(user?(isAdmin?'Library editor ready. Admin/owner writes enabled.':'Library loaded. Admin role required before writes.'):'Library loaded. Sign in before admin writes.');}catch(e){dbg('load error',{message:e.message||String(e),name:e.name||null});setStatus('Library editor failed: '+(e.message||e),true);helper();}}
 function wire(){document.addEventListener('click',e=>{const ed=e.target.closest('[data-edit]'),del=e.target.closest('[data-delete]'),cp=e.target.closest('[data-copy]'),cl=e.target.closest('[data-close]');if(ed){const m=movies.find(x=>String(x.id)===String(ed.dataset.edit));if(m)fillForm(m,false);}if(del){const m=movies.find(x=>String(x.id)===String(del.dataset.delete));if(m)openDelete(m);}if(cp){navigator.clipboard&&navigator.clipboard.writeText(cp.dataset.copy);setStatus('Video ID copied.');}if(cl)closeModal(cl.dataset.close);});['searchBox','statusFilter','sourceFilter','genreFilter','sortBy'].forEach(id=>{$(id).addEventListener('input',render);$(id).addEventListener('change',render);});document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));btn.classList.add('active');$(btn.dataset.tab).classList.add('active');}));$('backBtn').onclick=()=>{if(history.length>1)history.back();else location.href=LIBRARY};$('reload').onclick=()=>load(true);$('clearFilters').onclick=()=>{$('searchBox').value='';$('statusFilter').value='active';$('sourceFilter').value='all';$('genreFilter').value='all';$('sortBy').value='newest';render();};$('openAdd').onclick=()=>fillForm(blankMovie(),true);$('saveVideo').onclick=saveVideo;$('uploadPoster').onclick=uploadPoster;$('confirmDelete').onclick=confirmDelete;$('playAll').onclick=playAll;$('f_mux_playback_url').addEventListener('input',syncSource);$('f_video_url').addEventListener('input',syncSource);}
-async function start(){helper();let allowed=await requirePageAdmin();if(!allowed)return;wire();helper();load(true);setTimeout(helper,700);setTimeout(helper,1800);setInterval(helper,5000);document.documentElement.dataset.sbSupabaseLibraryEditor='v7-12-277';}
+async function start(){if(pageBooted||adminBooting)return;adminBooting=true;helper();let allowed=await requirePageAdmin();adminBooting=false;if(!allowed)return;pageBooted=true;wire();helper();load(true);setTimeout(helper,700);setTimeout(helper,1800);setInterval(helper,5000);document.documentElement.dataset.sbSupabaseLibraryEditor='v7-12-279-auth-gate';}
+window.addEventListener('streambandit:auth-gate-decision',function(e){try{let d=e&&e.detail;if(d&&d.allowed&&!pageBooted&&document.getElementById('editorContent'))setTimeout(start,120);}catch(err){}});
 start();
 })();
 </script>
