@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Review Queue V7.12.288</title>
+<title>Stream Bandit Review Queue V7.12.290 Auth Gate Test</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -77,7 +77,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 }
 </style>
 </head>
-<body data-sb-review-queue-menu-url="review-queue-clean-machine-v7-12-80-publish-test.html">
+<body data-sb-review-queue-menu-url="review-queue-clean-machine-v7-12-80-publish-test.html" data-sb-auth-gate-review-queue-test="v7-13-005">
 <div class="wrap">
 
 <section class="box pillTabs topRail">
@@ -100,10 +100,11 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.288 Review Queue · Clean Rail</span>
+      <span class="badge">V7.12.290 Review Queue · Auth Gate Test</span>
       <h1>Review Queue</h1>
-      <p>Admin review gate for creator submissions. Pending rows are read from <code>sb_submissions</code>. Approve + Publish creates or updates <code>sb_movies</code> for Library, Search, Details and Player 1.</p>
+      <p>Admin review gate for creator submissions after the shared Auth Gate allows the signed-in session. Pending rows are read from <code>sb_submissions</code>. Approve + Publish creates or updates <code>sb_movies</code> for Library, Search, Details and Player 1.</p>
       <div class="routeStrip">
+        <span>Auth Gate → signed in</span>
         <span>Read → sb_submissions</span>
         <span>Approve / Decline → sb_submissions</span>
         <span>Publish → sb_movies</span>
@@ -166,24 +167,25 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   </section>
 </section>
 
-<p class="micro">Review Queue V7.12.288: clean Creator rail + queue content + protected publish gate. Publishes approved submissions to sb_movies and hides archived queue rows safely.</p>
+<p class="micro">Review Queue V7.12.290 auth gate test: clean Creator rail + queue content + protected publish gate. Publishes approved submissions to sb_movies and hides archived queue rows safely.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=review-queue-clean-rail-288"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=review-queue-clean-rail-288"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=review-queue-clean-rail-288"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=review-queue-clean-rail-288"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=review-queue-clean-rail-288"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=review-queue-clean-rail-288"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=review-queue-clean-rail-288"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=review-queue-clean-rail-288"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=review-queue-clean-rail-288"></script>
+<script src="stream-bandit-shell-v6-24.js?v=review-queue-auth-gate-290"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=review-queue-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=review-queue-auth-gate-290"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=review-queue-auth-gate-290"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=review-queue-auth-gate-290"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=review-queue-auth-gate-290"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=review-queue-auth-gate-290"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=review-queue-auth-gate-290"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=review-queue-auth-gate-290"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=review-queue-auth-gate-290"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.288 Review Queue Clean Rail';
+const VERSION='V7.12.290 Review Queue Auth Gate Test';
 let cfg=null,sb=null,user=null,profile=null,rows=[],channels=[],selected=null,busy=false,countBusy=false,countReady=false,lastCountRead=0;
 const $=id=>document.getElementById(id);
 
@@ -443,6 +445,7 @@ async function load(){
     setStatus('Review Queue ready. Active queue hides archived submissions.');
     dbg('load ok',{
       version:VERSION,
+      authGate:!!window.StreamBanditAuthGate,
       configSource:cfg&&cfg.source,
       user:user&&user.email,
       admin:isAdmin(),
@@ -452,7 +455,7 @@ async function load(){
     });
   }catch(e){
     setStatus('Review Queue load failed: '+(e.message||e),true);
-    dbg('load error',{message:e.message||String(e)});
+    dbg('load error',{message:e.message||String(e),authGate:!!window.StreamBanditAuthGate});
   }
 }
 
@@ -669,6 +672,7 @@ async function archiveQueueRow(){
 
 function helper(){
   try{
+    if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();
     if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();
     if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();
     if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();
@@ -676,7 +680,8 @@ function helper(){
 
   refreshSavedCounters(false);
 
-  $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
+  $('helperStatus').innerHTML='<b>Foundation:</b> Auth Gate '+(window.StreamBanditAuthGate?'✅':'⚠️')+
+    ' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
     ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
     ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
     ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
@@ -707,7 +712,8 @@ setTimeout(helper,700);
 setTimeout(()=>refreshSavedCounters(true),1600);
 setTimeout(helper,1800);
 setInterval(helper,6000);
-document.documentElement.dataset.sbReviewQueue='v7-12-288';
+document.documentElement.dataset.sbReviewQueue='v7-12-290';
+document.documentElement.dataset.sbReviewQueueAuthGate='v7-12-290';
 
 })();
 </script>
