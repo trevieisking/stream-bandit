@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.085
+# Stream Bandit Master Must-Follow Plan V7.13.086
 
 Date: 2026-06-21
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / ABOUT PASSED / CHECKPOINT CREATED / INDEX PROMOTED / CURRENT APP LINKS UPDATED / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP STARTED / SUBMIT VIDEO AUTH GATE PASS / REVIEW QUEUE PREVIEW FIX REQUESTED / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -12,12 +12,6 @@ Strong rollback checkpoints now available:
 
 - `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 - `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
-
-Three old V6/V5 checkpoint files were deleted before the Browse Group checkpoint was created:
-
-- `CHECKPOINT-GROUP-PLAY-PLAYER-2-V6-78-9-4-PASSED.md`
-- `CHECKPOINT-PLAYER2-GLOBAL-CARRY-V6-78-9-4-PASSED.md`
-- `CHECKPOINT-V5.24.1.md`
 
 ## 2. Source of truth hierarchy
 
@@ -62,6 +56,8 @@ No future pass may touch these without explicit separate approval:
 - Genres `sb_movies` writes or movie deletion without separate approval
 - Global Search Supabase writes or admin-only conversion without separate approval
 - About Supabase writes, live publishing, tickets, uploads, billing, or policy editing without separate approval
+- Submit Video direct `sb_movies` writes or publish behavior without separate approval
+- Review Queue approval/publish logic rewrites without full-file review and separate approval
 
 Publishable Supabase config must remain config-only and must not be copied into docs as a secret.
 
@@ -75,25 +71,7 @@ Index version:
 
 `V7.13.022 Platform Entry Browse Group Promoted`
 
-Index now lists the passed Watch Group and Browse Group as current app page links while keeping the existing old/current URLs.
-
-Watch Group links:
-
-- Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html`
-- Watch History: `watch-history-global-helpers-v7-4-0-test.html`
-- Watchlist: `watchlist-clean-machine-v7-12-43-test.html`
-- Favourites: `favourites-clean-machine-v7-12-41-test.html`
-- Likes: `likes-clean-machine-v7-12-42-test.html`
-- Accessibility: `accessibility-clean-machine-v7-12-44-test.html`
-
-Browse Group links:
-
-- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html`
-- Genres: `genres-clean-machine-v7-12-45-test.html`
-- Global Search: `global-search-global-helpers-v7-4-9-test.html`
-- About: `about-global-helpers-v7-4-7-test.html`
-
-Index remains a platform entry and route launcher. Home remains:
+Index lists the passed Watch Group and Browse Group as current app page links while keeping existing old/current URLs. Home remains:
 
 `home-global-helpers-v7-4-4-test.html`
 
@@ -126,147 +104,114 @@ Passed auth-gate attachment pages:
 - `genres-clean-machine-v7-12-45-test.html`
 - `global-search-global-helpers-v7-4-9-test.html`
 - `about-global-helpers-v7-4-7-test.html`
+- `submit-video-clean-machine-v7-12-79-test.html`
 
 Auth gate autofill guard remains passed. The old Library browser-autofill problem is fixed by the central helper.
 
-## 7. Browse group rule
+## 7. Browse Group full pass rule
 
 Browse Group is permission-mixed and must not be handled as one flat page type.
-
-Current Browse routes:
 
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — admin/owner only, passed first time with Auth Gate plus admin lock
 - Genres: `genres-clean-machine-v7-12-45-test.html` — signed-in browse plus admin/owner genre tools, passed
 - Global Search: `global-search-global-helpers-v7-4-9-test.html` — signed-in read-only search, passed
 - About: `about-global-helpers-v7-4-7-test.html` — signed-in info/contact page, passed
 
-Supabase Library Editor must use this exact passed order:
-
-1. Auth Gate blocks signed-out access first.
-2. Existing page admin/owner lock blocks signed-in non-admin users.
-3. Admin/owner users can load editor controls.
-4. Every write action still calls `requireSignedAdmin()`.
-
-Genres must use this exact permission model:
-
-1. Auth Gate blocks signed-out access first.
-2. Signed-in users can browse active Supabase movies by genre.
-3. Existing account authority lock controls admin/owner tools.
-4. Admin/owner users can create/delete managed `sb_genres` labels.
-5. Genres must not write to `sb_movies` and must not delete or edit movie rows.
-
-Global Search must use this exact permission model:
-
-1. Auth Gate blocks signed-out access first.
-2. Signed-in users can run read-only search across movies, genres, channels, playlists, pages and policies.
-3. No admin/owner-only role check is required.
-4. Global Search must not add Supabase writes.
-5. Header query handoff must keep working.
-
-About must use this exact permission model:
-
-1. Auth Gate blocks signed-out access first.
-2. Signed-in users can use the informational page and email-draft forms.
-3. No admin/owner-only role check is required.
-4. About must not add Supabase writes, tickets, uploads, payments, live promotion or policy editing.
-5. Mailto/email-draft-only forms must remain the form model.
-
 Do not move this gate into Header Shell. Do not remove page-owned admin/owner locks. Do not flatten Browse pages into one permission type.
 
-## 8. Browse Group full pass results
+## 8. Creator Group rule
 
-### Supabase Library Editor
+Creator Group is permission-mixed and must not be handled as one flat page type.
 
-File: `supabase-library-home-header-form-fix-v7-12-34-test.html`
+Current Creator routes:
 
-Version: `V7.12.279 Supabase Library Editor / Auth Gate Admin Lock Test`
+- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — signed-in creator submission, passed
+- Rules: `rules-clean-machine-v7-12-82-test.html` — read-only workflow guidance, pending controlled pass
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — admin/owner review and publish gate, pending auth gate pass and video preview fix
 
-Status: `FIRST-TIME PASS / REMEMBER THIS EXACT ADMIN LOCK PATTERN`
+Submit Video must use this exact permission model:
+
+1. Auth Gate blocks signed-out access first.
+2. Signed-in users can create pending submissions.
+3. Submit Video writes only to `sb_submissions`.
+4. Submit Video must not publish to `sb_movies`.
+5. Review Queue remains the only publish path into Library.
+
+Rules must remain read-only workflow guidance:
+
+1. Auth Gate blocks signed-out access first during this app rollout.
+2. No admin/owner-only role check is required unless later separately approved.
+3. No submit, upload, approve, decline, publish, delete or migrate powers are allowed on Rules.
+
+Review Queue must use this exact permission model:
+
+1. Auth Gate blocks signed-out access first.
+2. Existing admin/owner lock blocks normal signed-in users.
+3. Admin/owner users can review, approve, decline, request changes, save status and publish to Library.
+4. Review Queue can write to `sb_movies` and `sb_submissions` only as its existing review/publish workflow allows.
+5. Approval should not happen blind. A preview/test tool for the submitted video URL is now requested before approval.
+
+Do not publish directly from Submit Video. Do not give Review Queue powers to public viewer pages. Do not add unrestricted upload permissions. Do not move Creator permissions into Header Shell.
+
+## 9. Submit Video pass
+
+File: `submit-video-clean-machine-v7-12-79-test.html`
+
+Version: `V7.12.289 Submit Video Auth Gate Test`
+
+Status: `PASSED / SIGNED-IN CREATOR SUBMISSION / PENDING SB_SUBMISSIONS ONLY / REVIEW QUEUE BRIDGE PRESERVED`
 
 Trevor browser-test result:
 
-- admin account sign-out/login passed
-- girlfriend signed-in non-admin account hit the page and was not allowed through
-- non-admin route offered return to Home
-- edit image on form passed
-- Play All passed
-- all movies display passed
-- filter passed
-- search passed
-- Details links passed
-- Play links passed
-- copy movie ID link passed
+- sign out then sign in passed
 - one Header and one Footer passed
-- Menu overlay passed
-- Menu overlay filter passed
+- submitting video goes to Review Queue passed
+- all other checked page functions passed
 
-Preserved:
+Preserved Submit Video controls and safety locks:
 
-- `sb_movies` load, create video, edit full form, poster/image upload and permanent delete stayed protected
-- typed `DELETE FROM SUPABASE` stayed required
-- create/edit/delete verify-after-write behavior stayed preserved
-- storage poster files are not deleted by movie-row deletion
-- no SQL, RLS, storage policy, schema, storage delete or Header Shell mass gate change
+- shared Auth Gate blocks signed-out users before page use
+- signed-in creator submission flow stayed preserved
+- poster upload stayed preserved
+- channel read stayed preserved
+- recent submission read stayed preserved
+- pending submission insert stayed preserved
+- verify-after-insert read stayed preserved
+- write target remains `sb_submissions` only
+- status remains `pending`
+- Review Queue remains the only publish path into `sb_movies`
+- no direct `sb_movies` write/publish added to Submit Video
+- no admin-only conversion added to Submit Video
+- no SQL changed
+- no RLS changed
+- no storage policy changed
+- no payment changed
+- no schema change
+- no Header Shell mass auth-gate injection
 
-### Genres
+## 10. Review Queue preview request
 
-File: `genres-clean-machine-v7-12-45-test.html`
+File: `review-queue-clean-machine-v7-12-80-publish-test.html`
 
-Version: `V7.12.283 Genres Auth Gate Test`
+Requested next fix:
 
-Status: `PASSED / SIGNED-IN BROWSE / ADMIN OWNER MANAGED GENRE TOOLS PRESERVED`
+- add a real video preview before approval
+- reviewer must be able to test the submitted URL before approving
+- prefer Player 1-style preview behavior
+- preview can appear below the card or in an overlay
+- do not weaken Review Queue admin/owner approval gate
+- do not approve/publish unless reviewer has a working preview/test tool
+- preserve approve, decline, request changes, save status and publish-to-library behavior
 
-Preserved:
+Implementation boundary for the Review Queue preview fix:
 
-- signed-in users can browse active Supabase movies by genre
-- `sb_movies` remains read-only from this page
-- `sb_genres` managed label reads stayed preserved
-- admin/owner-only Create Genre and Delete Managed Genre stayed preserved
-- deleting a managed genre deletes only the `sb_genres` label
-- deleting a managed genre does not delete movies or edit movie genre arrays
-- no SQL, RLS, storage policy, schema or Header Shell mass gate change
+- use the full current Review Queue page as the base
+- inspect current submitted URL fields before coding
+- add preview as a review aid only
+- do not change table names, publish field mapping, status values or delete/decline safeguards unless separately approved
+- keep existing approval and publish checks intact
 
-### Global Search
-
-File: `global-search-global-helpers-v7-4-9-test.html`
-
-Version: `V7.12.284 Global Search Auth Gate Test`
-
-Status: `PASSED / SIGNED-IN READ-ONLY SEARCH / HEADER QUERY HANDOFF PRESERVED`
-
-Preserved:
-
-- signed-in users can run read-only search
-- `sb_movies`, optional `sb_channels`, optional `sb_playlists`, pages and policy results stayed preserved
-- header query handoff, search input, type filter, source filter, sort, chips, Details, Play and save buttons stayed preserved
-- no admin/owner-only role check added
-- no Supabase writes added
-- no SQL, RLS, storage policy, schema or Header Shell mass gate change
-
-### About
-
-File: `about-global-helpers-v7-4-7-test.html`
-
-Version: `V7.12.285 About Auth Gate Test`
-
-Status: `PASSED / SIGNED-IN INFORMATION PAGE / EMAIL-DRAFT-ONLY FORMS PRESERVED`
-
-Trevor browser-test result:
-
-- About page passed
-- page works after the auth gate attachment
-- Browse group info/contact model remained correct
-
-Preserved:
-
-- signed-out users are blocked by Auth Gate before using About
-- page remains informational and read-only
-- Request a Title, Contact Us, Report Playback, Accessibility Feedback, Creator/Channel, Policy/Privacy, Removal/Rights, Business and Bug forms remain mailto/email-draft-only
-- no Supabase writes, tickets, uploads, billing, live promotion or policy editing were added
-- policy links, modal scroll behavior, header counters, clean top rail and helper bridges stayed preserved
-- no SQL, RLS, storage policy, schema or Header Shell mass gate change
-
-## 9. Watch Group full pass results
+## 11. Watch Group full pass results
 
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
 - Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate passed
@@ -275,40 +220,30 @@ Preserved:
 - Likes: `likes-clean-machine-v7-12-42-test.html` — V7.12.159 auth gate passed
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html` — V7.12.229 auth gate passed
 
-## 10. User save-page and Accessibility boundaries
+## 12. User save-page and Accessibility boundaries
 
 Watchlist, Favourites and Likes are user-account save pages. They must keep signed-in user scope, existing table reads and shared save helpers. They must not become admin/owner permission pages and must not change User Management, Owner controls, SQL, RLS, storage policies, payments or Header Shell gate behavior.
 
 Accessibility is a local comfort/readability page. It must not become a Supabase writer and must not take over Theme Studio colour ownership or Player 1's real audio boost controls.
 
-## 11. News Feed media display issue for later focused fix
+## 13. Known issues logged for later
+
+### News Feed media issue
 
 File: `news-feed-social-v7-13-001-test.html`
 
-Status: `LOGGED / NOT PART OF WATCH OR BROWSE AUTH-GATE PASS / FIX LATER IN DEDICATED NEWS FEED MEDIA LAYOUT PASS`
+Status: `LOGGED / NOT PART OF WATCH, BROWSE OR CREATOR AUTH-GATE PASS / FIX LATER IN DEDICATED NEWS FEED MEDIA LAYOUT PASS`
 
-Observed from Trevor's browser screenshot:
+- Latest Activity post renders account header, post text and post media.
+- The post image area does not show the full image used with the post.
+- The video card/player area below appears as a large black media block.
+- Trevor reports the video still plays, but the visible player/media is not correctly shown.
 
-- Latest Activity post renders the account header, post text and post media.
-- The image card is not showing the full image used with the post; it appears partially visible/cropped.
-- The video/player card below appears as a large black media block.
-- Trevor reports the video still plays, but the player/media is not visibly correct.
+### Player 1 Details-link issue
 
-Future fix direction:
+Player 1 Details can open the wrong movie and needs a dedicated Player 1 current-row/details-link pass. Preserve playback, audio boost, source bridge, resume helper, watch history and save buttons.
 
-- inspect media-card CSS, image sizing, video/player sizing, poster/preview handling and overflow/height rules
-- make the post image display correctly
-- make the video/player card visibly show the intended media area
-- preserve News Feed posts, comments, reactions, likes, visibility rules and account ownership behavior
-- do not change SQL, RLS, storage policies, payments, owner/admin permissions or Header Shell auth-gate behavior in that pass unless separately approved
-
-## 12. Player 1 Details-link issue for later
-
-Status: logged, not an auth blocker, Player 1 auth gate passed.
-
-Observed behavior: Player 1 Details can open a different/random title instead of the currently playing title. Fix later in a dedicated Player 1 Details-link/current-row routing pass. Preserve playback, audio boost, source bridge, resume helper, watch history and save buttons.
-
-## 13. Social group rule
+## 14. Social group rule
 
 Social pages are real working pages and must not be blind-patched.
 
@@ -321,8 +256,10 @@ Current Social group:
 
 News Feed is a real post/comment/reaction/feed page. Its media display issue must be handled as a focused fix, not as part of a broad social rewrite.
 
-## 14. Next controlled step
+## 15. Next controlled step
 
-Watch Group and Browse Group are passed, checkpointed and promoted to Index as current app links.
+Watch Group and Browse Group are passed, checkpointed and promoted to Index as current app links. Creator Group has started and Submit Video has passed.
 
-Next work should be chosen one page or one group at a time. No mass page rollout and no Header Shell auth-gate embedding are approved.
+Next work should be chosen one page or one focused fix at a time. The next requested focus is Review Queue video preview before approval.
+
+No mass page rollout and no Header Shell auth-gate embedding are approved.
