@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.081
+# Stream Bandit Current App Manifest V7.13.082
 
 Date: 2026-06-21
 
@@ -6,7 +6,7 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest checkpoint
 
-`V7.13.081 Watch Group Auth Gate Full Pass / Accessibility Passed / Checkpoint Created / Index Promoted / Manifest Updated`
+`V7.13.082 Watch Group Auth Gate Full Pass / Accessibility Passed / Checkpoint Created / Index Promoted / Supabase Library Editor Admin Gate First-Time Pass / Manifest Updated`
 
 Checkpoint file:
 
@@ -14,7 +14,7 @@ Checkpoint file:
 
 ## Repository count rule completed
 
-Three old V5 checkpoints were removed before creating the new checkpoint:
+Three old V5 checkpoints were removed before creating the Watch Group checkpoint:
 
 - `CHECKPOINT-V5.20.2.md`
 - `CHECKPOINT-V5.22.1.md`
@@ -22,7 +22,7 @@ Three old V5 checkpoints were removed before creating the new checkpoint:
 
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / INDEX LISTS CURRENT WATCH GROUP LINKS / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
+`WATCH GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / INDEX LISTS CURRENT WATCH GROUP LINKS / BROWSE GROUP STARTED / SUPABASE LIBRARY EDITOR AUTH GATE PLUS ADMIN LOCK PASSED FIRST TIME / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
 
 Confirmed boundaries:
 
@@ -33,8 +33,10 @@ Confirmed boundaries:
 - no production Home replacement
 - no player/audio/accessibility regression work
 - no Header Shell mass auth-gate injection
-- no admin or owner permission-system change
-- no News Feed code change during this documentation/index promotion pass
+- no admin or owner permission-system rewrite
+- no News Feed code change during this documentation pass
+- no schema fields invented for Supabase Library Editor
+- no storage delete added to Supabase Library Editor
 
 ## Index promotion
 
@@ -76,6 +78,72 @@ Passed pages:
 - Favourites: `favourites-clean-machine-v7-12-41-test.html`
 - Likes: `likes-clean-machine-v7-12-42-test.html`
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html`
+- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html`
+
+## Browse group status
+
+Browse group routes visible in the menu:
+
+- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.279 auth gate plus admin lock passed
+- Genres: `genres-clean-machine-v7-12-45-test.html` — pending Browse group gate pass
+- Global Search: `global-search-global-helpers-v7-4-9-test.html` — pending Browse group gate pass
+- About: `about-global-helpers-v7-4-7-test.html` — pending Browse group gate pass
+
+## Supabase Library Editor pass
+
+File:
+
+`supabase-library-home-header-form-fix-v7-12-34-test.html`
+
+Version:
+
+`V7.12.279 Supabase Library Editor Auth Gate Test`
+
+Status:
+
+`FIRST-TIME PASS / AUTH GATE PLUS EXISTING ADMIN OWNER LOCK / EXACT ADMIN LOCK PATTERN TO REMEMBER`
+
+Gate order that passed:
+
+1. Signed-out users hit the shared Auth Gate first.
+2. Signed-in non-admin/non-owner users remain blocked by the page admin lock and can go back Home/Public Library.
+3. Admin/owner user can load editor controls and use the workbench.
+
+Trevor browser-test result:
+
+- admin account sign-out/login passed
+- girlfriend signed-in non-admin account hit the page and was not allowed through
+- non-admin route offered return to Home
+- edit image on form passed
+- Play All passed
+- all movies display passed
+- filter passed
+- search passed
+- Details links passed
+- Play links passed
+- copy movie ID link passed
+- single Header and single Footer passed
+- menu overlay passed
+- menu overlay filter passed
+
+Preserved editor functions and locks:
+
+- `sb_movies` load preserved
+- create video preserved
+- edit full video form preserved
+- poster/image upload preserved
+- permanent delete preserved behind typed `DELETE FROM SUPABASE`
+- create/edit/delete verify-after-write behavior preserved
+- Play All visible in Player 2 preserved
+- Details route preserved
+- Player 1 route preserved
+- route lock helper preserved
+- protected page helper preserved
+- no schema invented
+- no RLS changed
+- no storage policy changed
+- no storage delete added
+- no Header Shell mass auth-gate injection
 
 ## Current Watch Group results
 
@@ -120,6 +188,10 @@ Watchlist, Favourites and Likes are user-account save pages. Keep signed-in user
 
 Accessibility is a local comfort/readability page. It must not become a Supabase writer and must not take over Theme Studio colour ownership or Player 1's real audio boost controls.
 
+## Browse group boundary
+
+Supabase Library Editor is admin/owner only because it can create, edit, upload poster URLs and permanently delete `sb_movies` rows. Genres, Global Search and About must each be handled page-by-page and must keep their own existing role model. Do not attach the gate from Header Shell.
+
 ## News Feed media issue logged for later
 
 File:
@@ -161,6 +233,13 @@ Future fix direction:
 - Favourites: `favourites-clean-machine-v7-12-41-test.html` — V7.12.160 auth gate passed
 - Likes: `likes-clean-machine-v7-12-42-test.html` — V7.12.159 auth gate passed
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html` — V7.12.229 auth gate passed
+
+### Browse group
+
+- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.279 auth gate plus admin lock passed
+- Genres: `genres-clean-machine-v7-12-45-test.html`
+- Global Search: `global-search-global-helpers-v7-4-9-test.html`
+- About: `about-global-helpers-v7-4-7-test.html`
 
 ### Social group
 
