@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.087
+# Stream Bandit Master Must-Follow Plan V7.13.088
 
 Date: 2026-06-21
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP IN PROGRESS / SUBMIT VIDEO AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / PLAYER 1 AND PLAYER 2 MAESTRO PLAYBACK COMPATIBILITY LOGGED / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP IN PROGRESS / SUBMIT VIDEO AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIBRARY STUDIO STARTED / PLAYER 1 AND PLAYER 2 MAESTRO PLAYBACK COMPATIBILITY LOGGED / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -28,7 +28,7 @@ Direct GitHub fetch beats old checkpoint text when they disagree. If GitHub outp
 
 ## 3. Permanent architecture lock
 
-Main App owns streaming, watching, browse, creator submission, review queue, channels, collections, playlists, social, messages, profile, settings, admin/proof pages and accessibility/audio comfort.
+Main App owns streaming, watching, browse, creator submission, review queue, channels, collections, playlists, social, messages, profile, settings, admin/proof pages, Mux Manager, library media management and accessibility/audio comfort.
 
 Main App Home remains:
 
@@ -59,6 +59,8 @@ No future pass may touch these without explicit separate approval:
 - Submit Video direct `sb_movies` writes or publish behavior without separate approval
 - Review Queue approval/publish logic rewrites without full-file review and separate approval
 - Player 1 or Player 2 playback compatibility rewrites without preserving audio boost, fullscreen, source bridge, resume, watch history and accessibility comfort
+- Mux token ID, Mux token secret, webhook secret, signing key, service-role key or any private credential in GitHub Pages, HTML, JavaScript, screenshots, docs or chat
+- Mux Manager publish/add-to-library/write actions without admin/owner lock and separate browser smoke test
 
 Publishable Supabase config must remain config-only and must not be copied into docs as a secret.
 
@@ -266,7 +268,132 @@ Required future fix:
 - Preserve audio boost, louder audio/accessibility comfort, fullscreen, resume, watch history, source bridge, save buttons and Details links.
 - Do not change SQL, RLS, storage policies, payments or owner/admin permissions during the playback compatibility pass unless separately approved.
 
-## 13. Watch Group full pass results
+## 13. Mux Manager Library Studio plan
+
+File: `mux-manager-global-helpers-v7-10-7-test.html`
+
+Target version path:
+
+- `V7.12.302 Mux Manager Admin Media Library Studio`
+
+Status: `STARTED / BACKEND FUNCTION DEPLOYED / PRIVATE SECRETS SAVED BY TREVOR / FRONTEND STUDIO UI PENDING SAFE PAGE PATCH`
+
+Backend function started:
+
+- Supabase Edge Function: `mux-create-direct-upload`
+- Function status: `ACTIVE`
+- Project: `xzxqfrvqdgkzwujbkdbk`
+- Purpose: create temporary Mux direct upload slots, check processing status, return public HLS/player/thumbnail output, and keep Mux credentials out of GitHub Pages.
+
+Secrets setup confirmed by Trevor screenshot:
+
+- `MUX_TOKEN_ID` saved in Supabase Edge Function secrets
+- `MUX_TOKEN_SECRET` saved in Supabase Edge Function secrets
+- Real secret values must never be pasted into ChatGPT, GitHub, HTML, JavaScript, docs or screenshots.
+
+Required Mux Manager Studio model:
+
+1. Admin/owner only.
+2. Page Auth Gate or existing protected/admin page authority must run before upload tools.
+3. Edge Function must also verify signed-in admin/owner before creating upload URLs.
+4. Upload many video container types where Mux accepts them: `video/*`, `.mp4`, `.mov`, `.m4v`, `.webm`, `.mkv`, `.avi`, `.wmv`, `.flv`, `.m2ts`, `.mts`, `.ts`, `.mpg`, `.mpeg`, `.ogv`.
+5. Browser uploads to Mux direct upload URL using resumable upload.
+6. Output must produce Stream Bandit usable playback fields:
+   - `https://stream.mux.com/PLAYBACK_ID.m3u8`
+   - `https://player.mux.com/PLAYBACK_ID`
+   - `https://image.mux.com/PLAYBACK_ID/thumbnail.jpg`
+   - Supabase-ready `video_url`, `mux_playback_url`, `thumbnail_url`, `source_type: mux`.
+7. Mux Manager should become a neat admin video library overlay similar to Maestro TV asset management, not a tiny helper only.
+
+Required Maestro-style overlay design:
+
+- asset search
+- thumbnail column
+- name/title
+- duration
+- source/status
+- action buttons
+- preview/play action
+- settings action
+- copy playback URL action
+- copy embed code action
+- processing status check
+
+Required Video Settings modal tabs:
+
+- Metadata
+- Thumbnails
+- Tags / Genres
+- Embed Code
+- Paywall Preview
+- Stream Bandit
+
+Metadata tab should support:
+
+- title
+- description
+- year
+- runtime/duration
+- age rating
+- Mux asset ID
+- playback ID
+- public HLS URL
+- player URL
+- thumbnail URL
+
+Thumbnails tab should start with safe public Mux thumbnail output and optional copy action. Custom thumbnail upload to Supabase Storage is later only unless separately approved.
+
+Tags / Genres tab should support existing genres and future managed genre creation only through admin/owner controls. Do not invent schema. Do not weaken the existing Genres page rule that it must not write `sb_movies`.
+
+Embed Code tab should output safe iframe/player embed code and public HLS copy text.
+
+Paywall Preview tab is preview-only for now:
+
+- free
+- rental
+- one-time purchase
+- membership
+- ticket
+
+No payment provider, billing enforcement, checkout, ticket enforcement or paid access logic may be added in this pass.
+
+Stream Bandit tab is the later controlled write pass:
+
+- add to Supabase Library
+- add to playlist
+- attach to channel
+- attach/create managed genre labels
+
+Those actions must not be mixed into the first upload smoke test. They require a separate approval and a browser smoke test because they write Stream Bandit library data.
+
+Recommended rollout:
+
+### Pass 1 — Upload and playback output only
+
+- Add Admin Upload tab to Mux Manager.
+- Create upload slot through `mux-create-direct-upload`.
+- Upload video file to Mux.
+- Check processing status.
+- Output public HLS/player/thumbnail/Supabase-ready text.
+- Do not write to Supabase library tables yet.
+
+### Pass 2 — Asset Library overlay
+
+- Add Maestro-style asset list overlay and settings modal.
+- Preview/play assets.
+- Copy playback URL and embed code.
+- Keep writes disabled except safe local UI state and copy actions.
+
+### Pass 3 — Stream Bandit library publishing controls
+
+- Add to Supabase Library.
+- Add to Playlist.
+- Attach to Channel.
+- Attach/create managed genre labels.
+- Preserve admin/owner-only locks and existing Supabase Library Editor patterns.
+- No SQL/RLS/storage policy/payment changes unless separately approved.
+
+## 14. Watch Group full pass results
 
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
 - Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate passed
@@ -275,13 +402,13 @@ Required future fix:
 - Likes: `likes-clean-machine-v7-12-42-test.html` — V7.12.159 auth gate passed
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html` — V7.12.229 auth gate passed
 
-## 14. User save-page and Accessibility boundaries
+## 15. User save-page and Accessibility boundaries
 
 Watchlist, Favourites and Likes are user-account save pages. They must keep signed-in user scope, existing table reads and shared save helpers. They must not become admin/owner permission pages and must not change User Management, Owner controls, SQL, RLS, storage policies, payments or Header Shell gate behavior.
 
 Accessibility is a local comfort/readability page. It must not become a Supabase writer and must not take over Theme Studio colour ownership or Player 1's real audio boost controls.
 
-## 15. Known issues logged for later
+## 16. Known issues logged for later
 
 ### News Feed media issue
 
@@ -298,7 +425,7 @@ Status: `LOGGED / NOT PART OF WATCH, BROWSE OR CREATOR AUTH-GATE PASS / FIX LATE
 
 Player 1 Details can open the wrong movie and needs a dedicated Player 1 current-row/details-link pass. Preserve playback, audio boost, source bridge, resume helper, watch history and save buttons.
 
-## 16. Social group rule
+## 17. Social group rule
 
 Social pages are real working pages and must not be blind-patched.
 
@@ -311,10 +438,10 @@ Current Social group:
 
 News Feed is a real post/comment/reaction/feed page. Its media display issue must be handled as a focused fix, not as part of a broad social rewrite.
 
-## 17. Next controlled step
+## 18. Next controlled step
 
-Watch Group and Browse Group are passed, checkpointed and promoted to Index as current app links. Creator Group has started. Submit Video and Review Queue Auth Gate have passed.
+Watch Group and Browse Group are passed, checkpointed and promoted to Index as current app links. Creator Group has started. Submit Video and Review Queue Auth Gate have passed. Mux Manager Library Studio has started with backend function and private secret setup.
 
-Next work should be chosen one page or one focused fix at a time. The next logged player focus is Player 1 and Player 2 playback compatibility for Maestro/page-style links, plus Review Queue preview using that same resolver.
+Next work should be chosen one page or one focused fix at a time. The next active focus is Mux Manager Pass 1: Admin Upload and playback output only.
 
 No mass page rollout and no Header Shell auth-gate embedding are approved.
