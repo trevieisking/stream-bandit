@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.077
+# Stream Bandit Current App Manifest V7.13.078
 
 Date: 2026-06-21
 
@@ -8,11 +8,11 @@ This existing manifest is also the scan-pass checkpoint for the final route/menu
 
 ## Current strongest checkpoint
 
-`V7.13.077 Auth Gate Controlled Watch Group Pass / Continue Watching Passed / Watch History Attached Pending Test / Manifest Updated`
+`V7.13.078 Auth Gate Controlled Watch Group Pass / Continue Watching Passed / Watch History Passed / Watchlist Passed / Manifest Updated`
 
 ## Scan pass status
 
-`FINAL SCAN PASS PRESERVED / AUTH GATE CONTROLLED ROLLOUT UPDATED / CONTINUE WATCHING PASSED / WATCH HISTORY PENDING BROWSER SMOKE TEST`
+`FINAL SCAN PASS PRESERVED / AUTH GATE CONTROLLED ROLLOUT UPDATED / CONTINUE WATCHING PASSED / WATCH HISTORY PASSED / WATCHLIST PASSED`
 
 Confirmed boundaries:
 
@@ -35,12 +35,13 @@ Confirmed boundaries:
 
 Status:
 
-`CONTROLLED PAGE-BY-PAGE ROLLOUT / NO MASS HEADER SHELL GATE / CONTINUE WATCHING PASSED / WATCH HISTORY ATTACHED PENDING TEST`
+`CONTROLLED PAGE-BY-PAGE ROLLOUT / NO MASS HEADER SHELL GATE / CONTINUE WATCHING PASSED / WATCH HISTORY PASSED / WATCHLIST PASSED`
 
 Files updated:
 
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html`
 - Watch History: `watch-history-global-helpers-v7-4-0-test.html`
+- Watchlist: `watchlist-clean-machine-v7-12-43-test.html`
 
 Continue Watching result:
 
@@ -65,13 +66,31 @@ Watch History result:
 - `StreamBanditAuthGate.enforce()` added to the existing helper loop
 - helper status now includes Auth Gate
 - debug state records `authGate` true/false
-- read-only history/progress logic was preserved in code
-- dedupe logic was preserved in code
-- resume links were preserved in code
-- save buttons were preserved in code
-- Details links were preserved in code
-- theme tabs were preserved in code
-- browser smoke test is pending Trevor's current test result
+- Trevor confirmed Watch History is working now and passed
+- read-only history/progress logic stayed preserved
+- dedupe logic stayed preserved
+- resume links stayed preserved
+- save buttons stayed preserved
+- Details links stayed preserved
+- theme tabs stayed preserved
+- no backend or destructive action was added
+
+Watchlist result:
+
+- upgraded from V7.12.159 to V7.12.160 Watchlist Auth Gate Test
+- visible badge is `V7.12.160 Watchlist · Auth Gate Test`
+- auth gate script added directly after `stream-bandit-shell-v6-24.js`
+- `StreamBanditAuthGate.enforce()` added to the existing helper loop
+- helper status now includes Auth Gate
+- summary now records Auth Gate attached/checking
+- Trevor confirmed the gate works and Watchlist passed
+- real `sb_watchlist` table read stayed preserved
+- search/filter stayed preserved
+- sort stayed preserved
+- shared save buttons stayed preserved
+- Details links stayed preserved
+- Player 1 links stayed preserved
+- clean top rail stayed preserved
 - no backend or destructive action was added
 
 Current auth-gate controlled rollout status:
@@ -82,7 +101,8 @@ Current auth-gate controlled rollout status:
 - Details: passed
 - Player 1: auth gate passed; separate Details wrong-movie link issue logged for later
 - Continue Watching: passed
-- Watch History: attached and pending browser smoke test
+- Watch History: passed
+- Watchlist: passed
 
 ### Main shell route cleanup
 
@@ -261,8 +281,8 @@ Owner notes:
 - Player 1: `player-one-global-helpers-v7-3-3-test.html`
 - Player 2: `player-2-clean-machine-v7-12-58-test.html`
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
-- Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate attached, pending browser test
-- Watchlist: `watchlist-clean-machine-v7-12-43-test.html`
+- Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate passed
+- Watchlist: `watchlist-clean-machine-v7-12-43-test.html` — V7.12.160 auth gate passed
 - Favourites: `favourites-clean-machine-v7-12-41-test.html`
 - Likes: `likes-clean-machine-v7-12-42-test.html`
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html`
