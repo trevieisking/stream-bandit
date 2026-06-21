@@ -1,4 +1,4 @@
-/* Stream Bandit Auth Gate V7.13.004
+/* Stream Bandit Auth Gate V7.13.005
    Shared future sign-in gate helper from Master Plan Section 10.
    Purpose: block normal guest browsing on pages that intentionally load this helper.
    Phase 1 target pages only: index.html and home-global-helpers-v7-4-4-test.html.
@@ -6,11 +6,12 @@
    V7.13.002 fixes popup top alignment and double-scroll locking.
    V7.13.003 adds temporary owner recovery test mode so Trevor is not locked out during Phase 1 testing.
    V7.13.004 watches Supabase auth state/session changes so Header Shell sign-out opens the gate without needing a refresh.
+   V7.13.005 removes hidden auth fields after approval and guards search/filter inputs from browser email autofill.
    No public signup. No service-role key. No SQL/RLS/storage/payment changes. */
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.004 Auth Gate / Email Password / No Guest Users / Owner Recovery / Session Watch';
+  var VERSION = 'V7.13.005 Auth Gate / Email Password / No Guest Users / Owner Recovery / Session Watch / Autofill Guard';
   var PROFILE_TABLE = 'sb_profiles';
   var APPROVED_STATUSES = ['active','approved','limited','review'];
   var BLOCKED_STATUSES = ['banned','restricted','deleted','disabled','suspended'];
@@ -78,7 +79,7 @@
     var cfg = readShellConfig();
     if(cfg.url && cfg.key) return cfg;
 
-    try{ await addScript('stream-bandit-shell-v6-24.js?v=auth-gate-7-13-004'); }catch(error){}
+    try{ await addScript('stream-bandit-shell-v6-24.js?v=auth-gate-7-13-005'); }catch(error){}
 
     for(var i=0;i<30;i++){
       await new Promise(function(resolve){ setTimeout(resolve,100); });
@@ -189,6 +190,92 @@
     return result.data || null;
   }
 
+  function hasIntentionalSearchQuery(){
+    try{
+      var params = new URL(location.href).searchParams;
+      var keys = ['q','search','query','term','s'];
+      for(var i=0;i<keys.length;i++){
+        if(String(params.get(keys[i]) || '').trim()) return true;
+      }
+    }catch(error){}
+    return false;
+  }
+
+  function looksLikeEmail(value){
+    value = String(value || '').trim();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  function isPageSearchInput(input){
+    if(!input || !input.tagName) return false;
+    if(input.id === 'sbAuthEmail' || input.id === 'sbAuthPassword') return false;
+    if(input.closest && input.closest('#sbAuthGate')) return false;
+    var tag = String(input.tagName || '').toLowerCase();
+    if(tag !== 'input' && tag !== 'textarea') return false;
+    var type = String(input.getAttribute('type') || 'text').toLowerCase();
+    if(['hidden','password','email','checkbox','radio','button','submit','reset','file','range','color','date','time','datetime-local'].indexOf(type) !== -1) return false;
+    var bag = [
+      input.id,
+      input.name,
+      input.className,
+      input.placeholder,
+      input.getAttribute('aria-label'),
+      input.getAttribute('data-search'),
+      input.getAttribute('role')
+    ].join(' ').toLowerCase();
+    return type === 'search' || input.id === 'q' || bag.indexOf('search') !== -1 || bag.indexOf('filter') !== -1 || bag.indexOf('query') !== -1;
+  }
+
+  function hardenSearchAndFilterInputs(){
+    try{
+      var allowUrlEmailQuery = hasIntentionalSearchQuery();
+      var inputs = Array.prototype.slice.call(document.querySelectorAll('input,textarea'));
+      inputs.forEach(function(input){
+        if(!isPageSearchInput(input)) return;
+        if(String(input.tagName || '').toLowerCase() === 'input'){
+          try{ input.setAttribute('type','search'); }catch(error){}
+        }
+        input.setAttribute('autocomplete','off');
+        input.setAttribute('autocorrect','off');
+        input.setAttribute('autocapitalize','none');
+        input.setAttribute('spellcheck','false');
+        input.setAttribute('inputmode','search');
+        input.setAttribute('data-form-type','other');
+        input.setAttribute('data-lpignore','true');
+        input.setAttribute('data-1p-ignore','true');
+        input.setAttribute('data-bwignore','true');
+        input.setAttribute('data-dashlane-rid','ignore');
+        if(looksLikeEmail(input.value) && !allowUrlEmailQuery){
+          input.value = '';
+          try{ input.dispatchEvent(new Event('input',{bubbles:true})); }catch(error){}
+          try{ input.dispatchEvent(new Event('change',{bubbles:true})); }catch(error){}
+        }
+      });
+    }catch(error){}
+  }
+
+  function scheduleAutofillGuard(){
+    hardenSearchAndFilterInputs();
+    [80,250,700,1500,2600].forEach(function(ms){
+      setTimeout(hardenSearchAndFilterInputs, ms);
+    });
+  }
+
+  function clearAuthInputs(){
+    try{
+      var email = $('sbAuthEmail');
+      var pass = $('sbAuthPassword');
+      if(email){
+        email.value = '';
+        email.setAttribute('autocomplete','off');
+      }
+      if(pass){
+        pass.value = '';
+        pass.setAttribute('autocomplete','off');
+      }
+    }catch(error){}
+  }
+
   function css(){
     if($('sbAuthGateCss')) return;
     var style = document.createElement('style');
@@ -223,8 +310,8 @@
           '<h1 id="sbAuthTitle">Welcome to Stream Bandit</h1>'+
           '<p>Sign in to continue. Guest access is blocked on pages that use this gate.</p>'+
           '<div class="sb-auth-form">'+
-            '<label>Email</label><input id="sbAuthEmail" type="email" autocomplete="email" placeholder="you@example.com">'+
-            '<label>Password</label><input id="sbAuthPassword" type="password" autocomplete="current-password" placeholder="Password">'+
+            '<label for="sbAuthEmail">Email</label><input id="sbAuthEmail" name="stream-bandit-auth-email" type="email" autocomplete="username" inputmode="email" placeholder="you@example.com">'+
+            '<label for="sbAuthPassword">Password</label><input id="sbAuthPassword" name="stream-bandit-auth-password" type="password" autocomplete="current-password" placeholder="Password">'+
           '</div>'+
           '<div class="sb-auth-actions">'+
             '<button id="sbAuthLogin" class="sb-auth-btn primary" type="button">Login</button>'+
@@ -263,10 +350,16 @@
 
   function closeGate(){
     var gate = $('sbAuthGate');
-    if(gate) gate.classList.remove('open');
+    clearAuthInputs();
+    if(gate){
+      gate.classList.remove('open');
+      try{ gate.remove(); }
+      catch(error){ if(gate.parentNode) gate.parentNode.removeChild(gate); }
+    }
     document.documentElement.classList.remove('sb-auth-gate-root-locked');
     document.body.classList.remove('sb-auth-gate-locked');
     document.documentElement.dataset.sbAuthGate = 'allowed';
+    scheduleAutofillGuard();
   }
 
   function forceSignedOutGate(message){
@@ -396,7 +489,6 @@
       var recovery = recoveryDecision();
       lastDecision = recovery;
       closeGate();
-      setStatus('Owner recovery test mode is active for about ' + recovery.recoveryMinutes + ' minutes.', true);
       try{
         window.dispatchEvent(new CustomEvent('streambandit:auth-gate-decision',{detail:recovery}));
       }catch(error){}
@@ -408,7 +500,6 @@
 
     if(decision.allowed){
       closeGate();
-      setStatus('Signed in and approved.', true);
     }else{
       var message = 'Sign in required.';
       if(decision.reason === 'profile-missing-not-approved') message = 'Signed in, but no approved Stream Bandit profile was found.';
@@ -511,6 +602,8 @@
       recoveryMinutes: Math.max(0, Math.round((recoveryUntil() - Date.now()) / 60000)),
       sessionWatchBound: sessionWatchBound,
       authWatchBound: authWatchBound,
+      autofillGuard: true,
+      hiddenAuthDomRemovedAfterApproval: true,
       serviceRoleInBrowser: false,
       publicSignup: false
     };
@@ -527,11 +620,12 @@
       enableRecovery: enableRecovery,
       clearRecovery: clearRecovery,
       recoveryActive: recoveryActive,
-      checkSessionWatch: checkSessionWatch,
+      hardenSearchAndFilterInputs: hardenSearchAndFilterInputs,
       state: state
     };
     window.StreamBanditAuthGateV713001 = window.StreamBanditAuthGate;
-    document.documentElement.dataset.sbAuthGateHelper = 'v7-13-004';
+    document.documentElement.dataset.sbAuthGateHelper = 'v7-13-005';
+    scheduleAutofillGuard();
     bindAuthWatch();
     enforce();
   }
