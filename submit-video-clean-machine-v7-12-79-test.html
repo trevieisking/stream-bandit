@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Submit Video V7.12.287</title>
+<title>Stream Bandit Submit Video V7.12.289 Auth Gate Test</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -87,7 +87,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 }
 </style>
 </head>
-<body data-sb-submit-video-menu-url="submit-video-clean-machine-v7-12-79-test.html">
+<body data-sb-submit-video-menu-url="submit-video-clean-machine-v7-12-79-test.html" data-sb-auth-gate-submit-video-test="v7-13-005">
 <div class="wrap">
 
 <section class="box pillTabs topRail">
@@ -110,10 +110,10 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.287 Submit Video · Clean Rail</span>
+      <span class="badge">V7.12.289 Submit Video · Auth Gate Test</span>
       <h1>Submit Video</h1>
-      <p>Creators submit a pending row to <code>sb_submissions</code>. Review Queue is the only place that approves and publishes into <code>sb_movies</code>.</p>
-      <div class="routeStrip"><span>Submit → sb_submissions</span><span>Status → pending</span><span>Review Queue → publish</span><span>Public Library → sb_movies</span></div>
+      <p>Creators submit a pending row to <code>sb_submissions</code> after the shared Auth Gate allows the signed-in session. Review Queue is the only place that approves and publishes into <code>sb_movies</code>.</p>
+      <div class="routeStrip"><span>Auth Gate → signed in</span><span>Submit → sb_submissions</span><span>Status → pending</span><span>Review Queue → publish</span><span>Public Library → sb_movies</span></div>
       <div class="actions">
         <button id="openSubmitModal" class="btn hot" type="button">Open Submit Form</button>
         <button id="refreshBtn" class="btn primary" type="button">Refresh Data</button>
@@ -134,10 +134,11 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="box">
   <h2>How this page works</h2>
   <div class="steps">
-    <div class="step"><b>1. Open overlay form</b><p>Keep the page tidy while the full submission form opens in a scrollable overlay.</p></div>
-    <div class="step"><b>2. Poster URL</b><p>Upload an image or paste a public poster URL. This becomes <code>thumbnail_url</code>.</p></div>
-    <div class="step"><b>3. Submit pending</b><p>The form inserts one pending row into <code>sb_submissions</code>.</p></div>
-    <div class="step"><b>4. Review Queue</b><p>Admin approves and publishes to <code>sb_movies</code>.</p></div>
+    <div class="step"><b>1. Auth Gate first</b><p>Signed-out users are blocked before the creator submission page is used.</p></div>
+    <div class="step"><b>2. Open overlay form</b><p>Keep the page tidy while the full submission form opens in a scrollable overlay.</p></div>
+    <div class="step"><b>3. Poster URL</b><p>Upload an image or paste a public poster URL. This becomes <code>thumbnail_url</code>.</p></div>
+    <div class="step"><b>4. Submit pending</b><p>The form inserts one pending row into <code>sb_submissions</code>.</p></div>
+    <div class="step"><b>5. Review Queue</b><p>Admin approves and publishes to <code>sb_movies</code>.</p></div>
   </div>
 </section>
 
@@ -163,7 +164,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   </aside>
 </section>
 
-<p class="micro">Submit Video V7.12.287: clean Creator rail + overlay form + pending sb_submissions write only.</p>
+<p class="micro">Submit Video V7.12.289 auth gate test: signed-in creator submission + clean Creator rail + overlay form + pending sb_submissions write only.</p>
 </div>
 
 <div id="submitModal" class="modal" aria-hidden="true">
@@ -213,21 +214,22 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   </div>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=submit-video-clean-rail-287"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=submit-video-clean-rail-287"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=submit-video-clean-rail-287"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=submit-video-clean-rail-287"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=submit-video-clean-rail-287"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=submit-video-clean-rail-287"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=submit-video-clean-rail-287"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=submit-video-clean-rail-287"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=submit-video-clean-rail-287"></script>
+<script src="stream-bandit-shell-v6-24.js?v=submit-video-auth-gate-289"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=submit-video-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=submit-video-auth-gate-289"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=submit-video-auth-gate-289"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=submit-video-auth-gate-289"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=submit-video-auth-gate-289"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=submit-video-auth-gate-289"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=submit-video-auth-gate-289"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=submit-video-auth-gate-289"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=submit-video-auth-gate-289"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.287 Submit Video Clean Rail';
+const VERSION='V7.12.289 Submit Video Auth Gate Test';
 const BUCKET='stream-bandit-images';
 const MAX_IMAGE_BYTES=50*1024*1024;
 
@@ -281,7 +283,7 @@ function closeModal(){let m=$('submitModal');m.classList.remove('open');m.setAtt
 
 function renderStatus(){
  let signed=!!user,prof=!!profile,ch=channels.length,pending=recent.filter(x=>String(x.status||'pending')==='pending').length;
- $('statusGrid').innerHTML='<div class="card"><b>Signed in</b><p>'+(signed?'Yes':'No')+'</p></div><div class="card"><b>Profile</b><p>'+(prof?'Loaded':'Not found yet')+'</p></div><div class="card"><b>Channels</b><p>'+ch+'</p></div><div class="card"><b>Recent pending</b><p>'+pending+'</p></div><div class="card"><b>Write target</b><p>sb_submissions only</p></div><div class="card"><b>Publish target</b><p>Review Queue only</p></div>';
+ $('statusGrid').innerHTML='<div class="card"><b>Auth Gate</b><p>'+(window.StreamBanditAuthGate?'Ready':'Checking')+'</p></div><div class="card"><b>Signed in</b><p>'+(signed?'Yes':'No')+'</p></div><div class="card"><b>Profile</b><p>'+(prof?'Loaded':'Not found yet')+'</p></div><div class="card"><b>Channels</b><p>'+ch+'</p></div><div class="card"><b>Recent pending</b><p>'+pending+'</p></div><div class="card"><b>Write target</b><p>sb_submissions only</p></div><div class="card"><b>Publish target</b><p>Review Queue only</p></div>';
 }
 
 function fillChannels(){
@@ -331,10 +333,10 @@ async function load(){
   renderRecent();
   helper();
   setStatus('Submit Video ready. Open the overlay form to submit a pending row.');
-  dbg('load ok',{version:VERSION,configSource:cfg&&cfg.source,user:user&&user.email,profileId:profileId(),channels:channels.length,recent:recent.length});
+  dbg('load ok',{version:VERSION,authGate:!!window.StreamBanditAuthGate,configSource:cfg&&cfg.source,user:user&&user.email,profileId:profileId(),channels:channels.length,recent:recent.length,writeTarget:'sb_submissions',publishTarget:'Review Queue only',sbMoviesWrite:false});
  }catch(e){
   setStatus('Submit Video load failed: '+(e.message||e),true);
-  dbg('load error',{message:e.message||String(e)});
+  dbg('load error',{message:e.message||String(e),authGate:!!window.StreamBanditAuthGate});
  }
 }
 
@@ -373,7 +375,7 @@ async function uploadPoster(){
   let blob=await imageTo1920(file);
   let owner=profileId()||user.id;
   let path='creator-submissions/'+owner+'/'+Date.now()+'-'+safeName(v('title')||file.name)+'-1920x1080.jpg';
-  dbg('poster upload start',{bucket:BUCKET,path,size:blob.size});
+  dbg('poster upload start',{bucket:BUCKET,path,size:blob.size,authGate:!!window.StreamBanditAuthGate});
   let up=await withTimeout(client.storage.from(BUCKET).upload(path,blob,{cacheControl:'3600',upsert:false,contentType:'image/jpeg'}),30000,'Poster upload');
   if(up.error)throw up.error;
   let url=client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
@@ -437,7 +439,7 @@ async function submit(){
   if(!verify.data)throw Error('Submit verify read returned no row.');
   $('submitResult').innerHTML='<h3>Submitted to Review Queue</h3><p>'+esc(verify.data.title||row.title)+'</p><span class="pill pending">pending</span>';
   $('verifiedBox').textContent=JSON.stringify(verify.data,null,2);
-  dbg('submit verified',{id:verify.data.id,status:verify.data.status,title:verify.data.title});
+  dbg('submit verified',{id:verify.data.id,status:verify.data.status,title:verify.data.title,writeTarget:'sb_submissions',sbMoviesWrite:false});
   setStatus('Submitted to Review Queue as pending.');
   closeModal();
   await load();
@@ -452,12 +454,14 @@ async function submit(){
 
 function helper(){
  try{
+  if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();
   if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();
   if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();
   if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();
  }catch(e){}
  refreshSavedCounters(false);
- $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
+ $('helperStatus').innerHTML='<b>Foundation:</b> Auth Gate '+(window.StreamBanditAuthGate?'✅':'⚠️')+
+ ' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
  ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
  ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
  ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
@@ -489,7 +493,8 @@ setTimeout(helper,700);
 setTimeout(()=>refreshSavedCounters(true),1600);
 setTimeout(helper,1800);
 setInterval(helper,6000);
-document.documentElement.dataset.sbSubmitVideo='v7-12-287';
+document.documentElement.dataset.sbSubmitVideo='v7-12-289';
+document.documentElement.dataset.sbSubmitVideoAuthGate='v7-12-289';
 
 })();
 </script>
