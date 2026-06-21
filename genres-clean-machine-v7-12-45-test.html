@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Genres V7.12.282</title>
+<title>Stream Bandit Genres V7.12.283 Auth Gate Test</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -92,16 +92,16 @@ h3{margin:0 0 6px}
 @media(max-width:560px){.movieGrid,.genreGrid{grid-template-columns:1fr}.thumb{height:150px}.modal{padding:10px}.modalHead{display:block}.modalHead .btn{margin-top:10px}}
 </style>
 </head>
-<body data-sb-genres-menu-url="genres-clean-machine-v7-12-45-test.html">
+<body data-sb-genres-menu-url="genres-clean-machine-v7-12-45-test.html" data-sb-auth-gate-genres-test="v7-13-005">
 <div class="wrap">
 <section class="box pillTabs topRail"><div class="tabs" aria-label="Genres page links"><button class="pagePill back" id="backBtn" type="button">Back</button><a class="pagePill" href="home-global-helpers-v7-4-4-test.html">Hub</a><a class="pagePill" href="library-global-helpers-v7-4-8-test.html">Public Library</a><a class="pagePill active" href="genres-clean-machine-v7-12-45-test.html">Genres</a><a class="pagePill" href="global-search-global-helpers-v7-4-9-test.html">Global Search</a><a class="pagePill" href="details-clean-machine-v7-12-38-test.html">Details</a><a class="pagePill" href="player-one-global-helpers-v7-3-3-test.html">Player 1</a><a class="pagePill" href="player-2-clean-machine-v7-12-58-test.html">Player 2</a><a class="pagePill" href="continue-watching-global-helpers-v7-3-9-test.html">Continue</a><a class="pagePill" href="watch-history-global-helpers-v7-4-0-test.html">History</a></div></section>
 
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.282 Genres · Clean Navigation</span>
+      <span class="badge">V7.12.283 Genres · Auth Gate Test</span>
       <h1>Genres</h1>
-      <p>Browse active Supabase movies by genre. Admin/owner accounts can create or delete managed genre labels. Deleting a genre never deletes movies.</p>
+      <p>Browse active Supabase movies by genre after the shared Auth Gate allows the signed-in session. Admin/owner accounts can create or delete managed genre labels through the existing authority lock. Deleting a genre never deletes movies.</p>
       <div class="actions">
         <button id="reload" class="btn primary" type="button">Reload Genres</button>
         <a id="supabaseEditorBtn" class="btn adminOnly" href="supabase-library-home-header-form-fix-v7-12-34-test.html" style="display:none">Supabase Editor</a>
@@ -152,7 +152,7 @@ h3{margin:0 0 6px}
 <section class="box">
   <h2>Rules</h2>
   <div class="grid">
-    <div class="card"><b>Public browse</b><p>Everyone can browse active genres and movies.</p></div>
+    <div class="card"><b>Signed-in browse</b><p>Signed-in users can browse active genres and movies after the shared Auth Gate passes.</p></div>
     <div class="card"><b>Managed genres</b><p>Reads <code>sb_genres</code> plus genre names already used by <code>sb_movies</code>.</p></div>
     <div class="card"><b>Admin tools</b><p>Create/delete genre tools are shown only to admin/owner accounts.</p></div>
     <div class="card"><b>No movie deletion</b><p>Deleting a managed genre removes only the <code>sb_genres</code> label, not movie rows.</p></div>
@@ -163,25 +163,26 @@ h3{margin:0 0 6px}
   <h2>Debug</h2>
   <div id="debug" class="source">Waiting...</div>
 </section>
-<p class="micro">Genres V7.12.282: clean navigation + public browse + admin/owner managed genre create/delete.</p>
+<p class="micro">Genres V7.12.283 auth gate test: clean navigation + signed-in browse + admin/owner managed genre create/delete.</p>
 </div>
 
 <div id="deleteGenreModal" class="modal"><div class="modalCard"><div class="modalHead"><div><span class="badge">Managed Genre Delete</span><h2 id="deleteGenreTitle">Delete genre</h2><p class="muted">This deletes the managed genre label from <code>sb_genres</code> only. It does not delete movies and does not edit movie genre arrays.</p></div><button class="btn" data-close="deleteGenreModal" type="button">Close</button></div><div class="danger">Type the genre name exactly to confirm delete.</div><div class="formGrid"><div class="wide"><label>Selected genre</label><div id="deleteGenreInfo" class="source"></div></div><div class="wide"><label>Confirmation</label><input id="deleteGenreConfirm" class="input" placeholder="Type genre name"></div><div class="wide actions"><button id="confirmDeleteGenre" class="btn dangerBtn" type="button">Delete Managed Genre</button><button class="btn" data-close="deleteGenreModal" type="button">Cancel</button></div></div></div></div>
 
-<script src="stream-bandit-shell-v6-24.js?v=genres-managed-281"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=genres-managed-281"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=genres-managed-281"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=genres-managed-281"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=genres-managed-281"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=genres-managed-281"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=genres-managed-281"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=genres-managed-281"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=genres-managed-281"></script>
-<script src="stream-bandit-account-authority-v7-12-273.js?v=genres-managed-281"></script>
+<script src="stream-bandit-shell-v6-24.js?v=genres-auth-gate-283"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=genres-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=genres-auth-gate-283"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=genres-auth-gate-283"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=genres-auth-gate-283"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=genres-auth-gate-283"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=genres-auth-gate-283"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=genres-auth-gate-283"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=genres-auth-gate-283"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=genres-auth-gate-283"></script>
+<script src="stream-bandit-account-authority-v7-12-273.js?v=genres-auth-gate-283"></script>
 <script>
 (function(){
 'use strict';
-const VERSION='V7.12.282 Genres Clean Navigation';
+const VERSION='V7.12.283 Genres Auth Gate Test';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER='player-one-global-helpers-v7-3-3-test.html';
 let rows=[],managedGenres=[],active='All',cfg=null,sb=null,core=null,auth=null,isAdmin=false,deletingGenre=null;
@@ -204,16 +205,16 @@ function allGenreObjects(){let map={};rows.forEach(m=>arr(m.genres).forEach(g=>{
 function filteredMovies(){let q=($('movieSearch').value||'').trim().toLowerCase();let list=active==='All'?rows.slice():rows.filter(m=>arr(m.genres).some(g=>String(g).toLowerCase()===active.toLowerCase()));if(q){list=list.filter(m=>[m.title,m.description,m.director,arr(m.genres).join(' '),arr(m.tags).join(' '),yearVal(m)].join(' ').toLowerCase().includes(q))}let sort=$('movieSort').value;if(sort==='title')list.sort((a,b)=>String(a.title||'').localeCompare(String(b.title||'')));else if(sort==='year')list.sort((a,b)=>String(yearVal(b)||'').localeCompare(String(yearVal(a)||'')));else list.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));return list}
 function genreCard(g){let managed=g.managed?'<span class="pill">managed</span>':'<span class="pill warnPill">from movies</span>';let del=(isAdmin&&g.managed&&g.id)?'<div class="genreManage adminVisible"><button class="genreDeletePill" type="button" data-delete-genre="'+esc(g.id)+'">Delete</button></div>':'';return '<article class="genreCard '+(g.name===active?'active':'')+'"><button class="genrePick" type="button" data-genre-pick="'+esc(g.name)+'"><b>'+esc(g.name)+'</b><p>'+g.count+' movie(s)</p><div class="genreMeta">'+managed+'</div></button>'+del+'</article>'}
 function movieCard(m){let id=String(m.id||''),enc=encodeURIComponent(id),img=poster(m),play=firstUrl(m),gs=arr(m.genres).slice(0,3);return '<article class="movie"><div class="thumb">'+(img?'<img src="'+esc(img)+'" loading="lazy" alt="'+esc(m.title||'Artwork')+'">':'No artwork')+'</div><div class="body"><h3>'+esc(m.title||'Untitled')+'</h3><p>'+esc(m.description||m.summary||'No description yet.')+'</p><div>'+(yearVal(m)?'<span class="pill">'+esc(yearVal(m))+'</span>':'')+gs.map(g=>'<span class="pill">'+esc(g)+'</span>').join('')+'</div><div class="actions"><a class="btn small primary" href="'+DETAILS+'?id='+enc+'">Details</a>'+(play?'<a class="btn small hot" href="'+PLAYER+'?id='+enc+'">Play</a>':'')+'</div><div class="saveTitle">Save this movie</div><div class="actions saveActions" data-movie-id="'+esc(id)+'">'+(core&&core.buttons?core.buttons(id,{className:'btn small sb-core-save-btn'}):'<span class="pill">Saves unavailable</span>')+'</div></div></article>'}
-function render(){let gs=allGenreObjects(),list=filteredMovies();$('genreGrid').innerHTML=gs.map(genreCard).join('');$('movieTitle').textContent=active==='All'?'Movies — All genres':'Movies — '+active;$('stats').innerHTML=stat('Movies',rows.length)+stat('Genres',Math.max(0,gs.length-1))+stat('Managed',managedGenres.length)+stat('Showing',list.length)+stat('Selected',active)+stat('Admin',isAdmin?'Yes':'No');$('movieGrid').innerHTML=list.map(movieCard).join('')||'<div class="note">No movies found.</div>';document.querySelectorAll('[data-genre-pick]').forEach(b=>b.onclick=()=>{active=b.dataset.genrePick;render()});applyAdminUi();$('debug').textContent=JSON.stringify({version:VERSION,movies:rows.length,managedGenres:managedGenres.length,active,shown:list.length,admin:isAdmin,authority:auth&&{user:!!auth.user,profile:auth.profile,is_admin:auth.is_admin,is_owner:auth.is_owner},configSource:cfg&&cfg.source,detailsRoute:DETAILS,playerRoute:PLAYER,sbMoviesWrite:false,sbGenresWrite:isAdmin},null,2)}
+function render(){let gs=allGenreObjects(),list=filteredMovies();$('genreGrid').innerHTML=gs.map(genreCard).join('');$('movieTitle').textContent=active==='All'?'Movies — All genres':'Movies — '+active;$('stats').innerHTML=stat('Movies',rows.length)+stat('Genres',Math.max(0,gs.length-1))+stat('Managed',managedGenres.length)+stat('Showing',list.length)+stat('Selected',active)+stat('Admin',isAdmin?'Yes':'No');$('movieGrid').innerHTML=list.map(movieCard).join('')||'<div class="note">No movies found.</div>';document.querySelectorAll('[data-genre-pick]').forEach(b=>b.onclick=()=>{active=b.dataset.genrePick;render()});applyAdminUi();$('debug').textContent=JSON.stringify({version:VERSION,authGate:!!window.StreamBanditAuthGate,movies:rows.length,managedGenres:managedGenres.length,active,shown:list.length,admin:isAdmin,authority:auth&&{user:!!auth.user,profile:auth.profile,is_admin:auth.is_admin,is_owner:auth.is_owner},configSource:cfg&&cfg.source,detailsRoute:DETAILS,playerRoute:PLAYER,sbMoviesWrite:false,sbGenresWrite:isAdmin},null,2)}
 async function loadManagedGenres(){let client=await getClient();let r=await client.from('sb_genres').select('*').order('sort_order',{ascending:true}).order('name',{ascending:true});if(r.error)throw r.error;managedGenres=r.data||[]}
 async function refreshSaves(){if(core&&core.refresh)await core.refresh();render();try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts()}catch(e){}setStatus('Genres saves refreshed.')}
 async function load(){try{setStatus('Loading Genres from sb_movies and sb_genres...');core=window.StreamBanditCoreSavesV675;if(core&&core.init)await core.init();await readAuthority();let client=await getClient();let movieRes=await client.from('sb_movies').select('*').order('created_at',{ascending:false}).limit(500);if(movieRes.error)throw movieRes.error;rows=(movieRes.data||[]).filter(publicRow);await loadManagedGenres();if(core&&core.refresh)await core.refresh();render();helper();setStatus('Genres loaded: '+rows.length+' active movies, '+managedGenres.length+' managed genres.')}catch(e){setStatus('Genres load failed: '+(e.message||e),true);$('movieGrid').innerHTML='<div class="note">Movies could not load yet. Routes and search still work.</div>';helper()}}
 async function createGenre(){try{requireAdmin('creating a genre');let name=$('newGenreName').value.trim(),description=$('newGenreDescription').value.trim();if(!name)throw new Error('Genre name is required');let s=slug(name);if(!s)throw new Error('Genre slug could not be made from that name');let client=await getClient();let payload={name:name,slug:s,description:description||null,is_active:true,sort_order:0};if(auth&&auth.user&&auth.user.id)payload.created_by=auth.user.id;let r=await client.from('sb_genres').insert(payload).select('*').single();if(r.error)throw r.error;$('newGenreName').value='';$('newGenreDescription').value='';await loadManagedGenres();active=name;render();setStatus('Managed genre created: '+name)}catch(e){setStatus('Create genre failed: '+(e.message||e),true)}}
 function openDeleteGenre(id){let g=managedGenres.find(x=>String(x.id)===String(id));if(!g)return;deletingGenre=g;$('deleteGenreTitle').textContent='Delete genre: '+(g.name||'');$('deleteGenreInfo').textContent=JSON.stringify({id:g.id,name:g.name,slug:g.slug,description:g.description||'',note:'Deletes sb_genres row only. Movies are not deleted or edited.'},null,2);$('deleteGenreConfirm').value='';$('deleteGenreModal').classList.add('open')}
 async function confirmDeleteGenre(){try{requireAdmin('deleting a genre');if(!deletingGenre)throw new Error('No genre selected');if($('deleteGenreConfirm').value.trim()!==String(deletingGenre.name||'').trim())throw new Error('Type the genre name exactly to confirm.');let client=await getClient();let r=await client.from('sb_genres').delete().eq('id',deletingGenre.id).select('id,name');if(r.error)throw r.error;let deletedName=deletingGenre.name;deletingGenre=null;$('deleteGenreModal').classList.remove('open');await loadManagedGenres();if(active===deletedName)active='All';render();setStatus('Managed genre deleted: '+deletedName+'. Movie rows were not changed.')}catch(e){setStatus('Delete genre failed: '+(e.message||e),true)}}
-function helper(){try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts()}catch(e){}$('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Authority '+(window.StreamBanditAccountAuthority?'✅':'⚠️')+' · Admin '+(isAdmin?'✅':'⚠️')}
+function helper(){try{if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.updateCounts)window.StreamBanditHeaderShell.updateCounts()}catch(e){}$('helperStatus').innerHTML='<b>Foundation:</b> Auth Gate '+(window.StreamBanditAuthGate?'✅':'⚠️')+' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+' · Full search '+(window.StreamBanditLiveReadinessSearchFallback?'✅':'⚠️')+' · Authority '+(window.StreamBanditAccountAuthority?'✅':'⚠️')+' · Admin '+(isAdmin?'✅':'⚠️')}
 function wire(){$('backBtn').onclick=()=>{if(history.length>1)history.back();else location.href='library-global-helpers-v7-4-8-test.html'};$('reload').onclick=load;$('createGenre').onclick=createGenre;$('confirmDeleteGenre').onclick=confirmDeleteGenre;$('clearFilters').onclick=()=>{$('genreSearch').value='';$('movieSearch').value='';$('genreSort').value='count';$('movieSort').value='newest';active='All';render()};['genreSearch','movieSearch','genreSort','movieSort'].forEach(id=>{$(id).oninput=render;$(id).onchange=render});document.addEventListener('click',async e=>{let close=e.target.closest('[data-close]');if(close){$(close.dataset.close).classList.remove('open');return}let dg=e.target.closest('[data-delete-genre]');if(dg){e.preventDefault();openDeleteGenre(dg.dataset.deleteGenre);return}let b=e.target.closest('[data-sb-core-save]');if(!b||!core)return;e.preventDefault();try{b.disabled=true;if(core.toggle){await core.toggle(b.dataset.sbCoreSave,b.dataset.movieId);await refreshSaves()}}catch(err){setStatus(err.message||String(err),true)}finally{b.disabled=false}})}
-wire();helper();load();setTimeout(readAuthority,700);setTimeout(helper,900);setTimeout(helper,1800);setInterval(helper,6000);document.documentElement.dataset.sbGenresManaged='v7-12-282';
+wire();helper();load();setTimeout(readAuthority,700);setTimeout(helper,900);setTimeout(helper,1800);setInterval(helper,6000);document.documentElement.dataset.sbGenresManaged='v7-12-283';document.documentElement.dataset.sbGenresAuthGate='v7-12-283';
 })();
 </script>
 </body>
