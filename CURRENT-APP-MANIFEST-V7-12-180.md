@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.085
+# Stream Bandit Current App Manifest V7.13.086
 
 Date: 2026-06-21
 
@@ -6,24 +6,16 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest checkpoint
 
-`V7.13.085 Browse Group Auth Gate Full Pass / About Passed / Checkpoint Created / Index Promoted / Manifest Updated`
+`V7.13.086 Watch Group Full Pass / Browse Group Full Pass / Creator Group Started / Submit Video Auth Gate Passed / Manifest Updated`
 
 Checkpoint files:
 
 - `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 - `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
 
-## Repository count rule completed for this pass
-
-Three old V6/V5 checkpoint files were removed before creating the Browse Group checkpoint:
-
-- `CHECKPOINT-GROUP-PLAY-PLAYER-2-V6-78-9-4-PASSED.md`
-- `CHECKPOINT-PLAYER2-GLOBAL-CARRY-V6-78-9-4-PASSED.md`
-- `CHECKPOINT-V5.24.1.md`
-
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / SUPABASE LIBRARY EDITOR ADMIN LOCK PASSED FIRST TIME / GENRES PASSED / GLOBAL SEARCH PASSED / ABOUT PASSED / INDEX LISTS CURRENT WATCH AND BROWSE LINKS / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
+`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / SUBMIT VIDEO AUTH GATE PASSED / CREATOR GROUP IN PROGRESS / REVIEW QUEUE PREVIEW FIX REQUESTED / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
 
 Confirmed boundaries:
 
@@ -35,7 +27,6 @@ Confirmed boundaries:
 - no player/audio/accessibility regression work
 - no Header Shell mass auth-gate injection
 - no admin or owner permission-system rewrite
-- no News Feed code change during this documentation/index promotion pass
 - no schema fields invented for Supabase Library Editor
 - no storage delete added to Supabase Library Editor
 - no `sb_movies` writes added to Genres
@@ -44,6 +35,8 @@ Confirmed boundaries:
 - no admin/owner role gate added to Global Search
 - no Supabase writes added to About
 - no live/publish/billing/policy edit action added to About
+- no direct `sb_movies` publish added to Submit Video
+- no Review Queue approval/publish logic changed during Submit Video pass
 
 ## Index promotion
 
@@ -55,7 +48,9 @@ Index version:
 
 `V7.13.022 Platform Entry Browse Group Promoted`
 
-Index now lists the passed Watch Group and Browse Group using the existing old/current URLs.
+Index lists the passed Watch Group and Browse Group using existing old/current URLs. Home remains:
+
+`home-global-helpers-v7-4-4-test.html`
 
 Watch Group links:
 
@@ -72,10 +67,6 @@ Browse Group links:
 - Genres: `genres-clean-machine-v7-12-45-test.html`
 - Global Search: `global-search-global-helpers-v7-4-9-test.html`
 - About: `about-global-helpers-v7-4-7-test.html`
-
-Index remains the platform entry and route launcher. Home remains:
-
-`home-global-helpers-v7-4-4-test.html`
 
 ## Auth gate controlled rollout status
 
@@ -98,6 +89,7 @@ Passed pages:
 - Genres: `genres-clean-machine-v7-12-45-test.html`
 - Global Search: `global-search-global-helpers-v7-4-9-test.html`
 - About: `about-global-helpers-v7-4-7-test.html`
+- Submit Video: `submit-video-clean-machine-v7-12-79-test.html`
 
 ## Browse group full pass
 
@@ -168,6 +160,59 @@ Preserved:
 - no Supabase writes, tickets, uploads, billing, live promotion or policy editing were added
 - policy links, modal scroll behavior, header counters, clean top rail and helper bridges stayed preserved
 
+## Creator group in progress
+
+Creator group routes:
+
+- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — V7.12.289 auth gate passed
+- Rules: `rules-clean-machine-v7-12-82-test.html` — pending Creator group auth gate pass
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — pending Creator group auth gate pass and video preview fix requested
+
+### Submit Video pass
+
+File: `submit-video-clean-machine-v7-12-79-test.html`
+
+Version: `V7.12.289 Submit Video Auth Gate Test`
+
+Status: `PASSED / SIGNED-IN CREATOR SUBMISSION / PENDING SB_SUBMISSIONS ONLY / REVIEW QUEUE BRIDGE PRESERVED`
+
+Trevor browser-test result:
+
+- sign out then sign in passed
+- one Header and one Footer passed
+- submitting video goes to Review Queue passed
+- all other checked page functions passed
+
+Preserved Submit Video behavior and locks:
+
+- shared Auth Gate blocks signed-out users before page use
+- signed-in creator submission flow stayed preserved
+- poster upload stayed preserved
+- channel read stayed preserved
+- recent submission read stayed preserved
+- pending submission insert stayed preserved
+- verify-after-insert read stayed preserved
+- write target remains `sb_submissions` only
+- status remains `pending`
+- Review Queue remains the only publish path into `sb_movies`
+- no direct `sb_movies` write/publish added to Submit Video
+- no admin-only conversion added to Submit Video
+- no SQL, RLS, storage policy, payment, schema or Header Shell mass-gate change
+
+### Review Queue preview request
+
+File: `review-queue-clean-machine-v7-12-80-publish-test.html`
+
+Requested next fix:
+
+- add a real video preview before approval
+- reviewer must be able to test the submitted URL before approving
+- prefer Player 1-style preview behavior
+- preview can appear below the card or in an overlay
+- do not weaken Review Queue admin/owner approval gate
+- do not approve/publish unless reviewer has a working preview/test tool
+- preserve approve, decline, request changes, save status and publish-to-library behavior
+
 ## Current Watch Group results
 
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
@@ -196,18 +241,32 @@ Browse Group is permission-mixed and must stay page-by-page:
 
 Do not attach the gate from Header Shell. Do not flatten Browse pages into one permission type.
 
-## News Feed media issue logged for later
+## Creator group boundary
+
+Creator Group is permission-mixed and must stay page-by-page:
+
+- Submit Video is signed-in creator submission into `sb_submissions` only.
+- Rules is read-only workflow guidance.
+- Review Queue is admin/owner review and publish gate.
+
+Do not publish directly from Submit Video. Do not give Review Queue powers to public viewer pages. Do not add unrestricted upload permissions. Do not move Creator permissions into Header Shell.
+
+## Known issues logged for later
+
+### News Feed media issue
 
 File: `news-feed-social-v7-13-001-test.html`
 
 Status: `LOGGED / FIX LATER IN A DEDICATED SOCIAL NEWS FEED MEDIA LAYOUT PASS`
 
-Observed from Trevor's browser screenshot:
-
 - Latest Activity post renders account header, post text and post media.
 - The post image area does not show the full image used with the post.
 - The video card/player area below appears as a large black media box.
 - Trevor reports the video still plays, but the visible player/media is not correctly shown.
+
+### Player 1 Details-link issue
+
+Player 1 Details can open the wrong movie and needs a dedicated Player 1 current-row/details-link pass. Preserve playback, audio boost, source bridge, resume helper, watch history and save buttons.
 
 ## Current route groups by function
 
@@ -233,15 +292,15 @@ Observed from Trevor's browser screenshot:
 - Global Search: `global-search-global-helpers-v7-4-9-test.html` — V7.12.284 auth gate passed
 - About: `about-global-helpers-v7-4-7-test.html` — V7.12.285 auth gate passed
 
+### Creator / library management
+
+- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — V7.12.289 auth gate passed
+- Rules: `rules-clean-machine-v7-12-82-test.html`
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
+
 ### Social group
 
 - Social Profile: `profile-social-v7-13-001-test.html`
 - Friends: `friends-social-v7-13-001-test.html`
 - News Feed: `news-feed-social-v7-13-001-test.html` — media display issue logged for later
 - Groups and Events: `groups-social-v7-13-001-test.html`
-
-### Creator / library management
-
-- Submit Video: `submit-video-clean-machine-v7-12-79-test.html`
-- Rules: `rules-clean-machine-v7-12-82-test.html`
-- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
