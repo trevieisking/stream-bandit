@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Global Search V7.12.283</title>
+<title>Stream Bandit Global Search V7.12.284 Auth Gate Test</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -68,7 +68,7 @@ h3{margin:0 0 6px}
 @media(max-width:560px){.resultsGrid{grid-template-columns:1fr}.thumb,.pageIcon{height:150px}}
 </style>
 </head>
-<body data-sb-global-search-menu-url="global-search-global-helpers-v7-4-9-test.html">
+<body data-sb-global-search-menu-url="global-search-global-helpers-v7-4-9-test.html" data-sb-auth-gate-global-search-test="v7-13-005">
 <div class="wrap">
 
 <section class="box pillTabs topRail">
@@ -87,9 +87,9 @@ h3{margin:0 0 6px}
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.283 Global Search · Header Query Handoff</span>
+      <span class="badge">V7.12.284 Global Search · Auth Gate Test</span>
       <h1>Global Search</h1>
-      <p>Search Stream Bandit movies, genres, pages and policy routes. Header search opens this page with the search text already filled in.</p>
+      <p>Search Stream Bandit movies, genres, pages and policy routes after the shared Auth Gate allows the signed-in session. Header search opens this page with the search text already filled in.</p>
       <div class="actions">
         <button id="runSearch" class="btn primary" type="button">Run Search</button>
       </div>
@@ -152,24 +152,25 @@ h3{margin:0 0 6px}
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Global Search V7.12.283: clean page rail + header query handoff + read-only search.</p>
+<p class="micro">Global Search V7.12.284 auth gate test: clean page rail + header query handoff + read-only search.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=global-search-polish-283"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=global-search-polish-283"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=global-search-polish-283"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=global-search-polish-283"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=global-search-polish-283"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=global-search-polish-283"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=global-search-polish-283"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=global-search-polish-283"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=global-search-polish-283"></script>
+<script src="stream-bandit-shell-v6-24.js?v=global-search-auth-gate-284"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=global-search-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=global-search-auth-gate-284"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=global-search-auth-gate-284"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=global-search-auth-gate-284"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=global-search-auth-gate-284"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=global-search-auth-gate-284"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=global-search-auth-gate-284"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=global-search-auth-gate-284"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=global-search-auth-gate-284"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.283 Global Search Header Query Handoff';
+const VERSION='V7.12.284 Global Search Auth Gate Test';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER='player-one-global-helpers-v7-3-3-test.html';
 
@@ -317,7 +318,7 @@ function render(){
  $('stats').innerHTML=stat('Results',list.length)+stat('Movies',movies.length)+stat('Genres',genreItems().length)+stat('Pages',PAGES.length)+stat('Policies',POLICIES.length)+stat('Channels',channels.length)+stat('Playlists',playlists.length);
  $('resultsTitle').textContent=q?'Results for '+q:'Results';
  $('results').innerHTML=list.map(card).join('')||'<div class="note">No matching results yet.</div>';
- $('debug').textContent=JSON.stringify({version:VERSION,query:q,results:list.length,movies:movies.length,genres:genreItems().length,channels:channels.length,playlists:playlists.length,pages:PAGES.length,policies:POLICIES.length,configSource:cfg&&cfg.source,readOnly:true,supabaseWrites:false,detailsRoute:DETAILS,playerRoute:PLAYER,core:core&&core.state?core.state():null},null,2);
+ $('debug').textContent=JSON.stringify({version:VERSION,authGate:!!window.StreamBanditAuthGate,query:q,results:list.length,movies:movies.length,genres:genreItems().length,channels:channels.length,playlists:playlists.length,pages:PAGES.length,policies:POLICIES.length,configSource:cfg&&cfg.source,readOnly:true,supabaseWrites:false,detailsRoute:DETAILS,playerRoute:PLAYER,core:core&&core.state?core.state():null},null,2);
 }
 
 async function loadOptional(table){
@@ -359,12 +360,13 @@ async function load(){
 
 function helper(){
  try{
+  if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();
   if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();
   if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();
   if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();
   if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();
  }catch(e){}
- $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+' · Header search handoff '+(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.headerSearchOpensGlobalSearch?'✅':'⚠️');
+ $('helperStatus').innerHTML='<b>Foundation:</b> Auth Gate '+(window.StreamBanditAuthGate?'✅':'⚠️')+' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+' · Header search handoff '+(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.headerSearchOpensGlobalSearch?'✅':'⚠️');
 }
 
 function applyInitialQuery(){
@@ -405,7 +407,8 @@ load();
 setTimeout(helper,700);
 setTimeout(helper,1800);
 setInterval(helper,6000);
-document.documentElement.dataset.sbGlobalSearch='v7-12-283';
+document.documentElement.dataset.sbGlobalSearch='v7-12-284';
+document.documentElement.dataset.sbGlobalSearchAuthGate='v7-12-284';
 
 })();
 </script>
