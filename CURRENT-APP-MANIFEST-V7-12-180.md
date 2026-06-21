@@ -1,6 +1,6 @@
-# Stream Bandit Current App Manifest V7.13.058
+# Stream Bandit Current App Manifest V7.13.077
 
-Date: 2026-06-19
+Date: 2026-06-21
 
 Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages and One Machine reference this file.
 
@@ -8,11 +8,11 @@ This existing manifest is also the scan-pass checkpoint for the final route/menu
 
 ## Current strongest checkpoint
 
-`V7.13.058 Final Scan Pass / Header Owner Web Builder Menu Cleanup / Manifest Updated`
+`V7.13.077 Auth Gate Controlled Watch Group Pass / Continue Watching Passed / Watch History Attached Pending Test / Manifest Updated`
 
 ## Scan pass status
 
-`PASSED AS FINAL SCAN PASS WITH DEFERRED MANIFEST CLEANUP ITEMS LOGGED`
+`FINAL SCAN PASS PRESERVED / AUTH GATE CONTROLLED ROLLOUT UPDATED / CONTINUE WATCHING PASSED / WATCH HISTORY PENDING BROWSER SMOKE TEST`
 
 Confirmed boundaries:
 
@@ -24,11 +24,65 @@ Confirmed boundaries:
 - no payment change
 - no production Home replacement
 - no player/audio/accessibility regression work
+- no Header Shell mass auth-gate injection
 - old useful hidden pages were not deleted
 - Web Builder-owned public aliases were moved to current owned Web Builder pages where appropriate
 - Form Inbox remains the temporary Owner exception and is queued for later Social placement
 
 ## Changes made during this pass
+
+### Auth gate controlled rollout update
+
+Status:
+
+`CONTROLLED PAGE-BY-PAGE ROLLOUT / NO MASS HEADER SHELL GATE / CONTINUE WATCHING PASSED / WATCH HISTORY ATTACHED PENDING TEST`
+
+Files updated:
+
+- Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html`
+- Watch History: `watch-history-global-helpers-v7-4-0-test.html`
+
+Continue Watching result:
+
+- upgraded from V7.12.230 to V7.12.231 Continue Watching Auth Gate Test
+- auth gate script added directly after `stream-bandit-shell-v6-24.js`
+- `StreamBanditAuthGate.enforce()` added to the existing helper loop
+- helper status now includes Auth Gate
+- helper state records `authGate` true/false
+- Trevor confirmed a full pass
+- read-only progress stayed preserved
+- dedupe stayed preserved
+- resume links stayed preserved
+- save buttons stayed preserved
+- Details links stayed preserved
+- clean navigation stayed preserved
+- no backend or destructive action was added
+
+Watch History result:
+
+- upgraded from V7.12.226 to V7.12.227 Watch History Auth Gate Test
+- auth gate script added directly after `stream-bandit-shell-v6-24.js`
+- `StreamBanditAuthGate.enforce()` added to the existing helper loop
+- helper status now includes Auth Gate
+- debug state records `authGate` true/false
+- read-only history/progress logic was preserved in code
+- dedupe logic was preserved in code
+- resume links were preserved in code
+- save buttons were preserved in code
+- Details links were preserved in code
+- theme tabs were preserved in code
+- browser smoke test is pending Trevor's current test result
+- no backend or destructive action was added
+
+Current auth-gate controlled rollout status:
+
+- Index: passed
+- Home: passed
+- Library: passed
+- Details: passed
+- Player 1: auth gate passed; separate Details wrong-movie link issue logged for later
+- Continue Watching: passed
+- Watch History: attached and pending browser smoke test
 
 ### Main shell route cleanup
 
@@ -206,8 +260,8 @@ Owner notes:
 - Details: `details-clean-machine-v7-12-38-test.html`
 - Player 1: `player-one-global-helpers-v7-3-3-test.html`
 - Player 2: `player-2-clean-machine-v7-12-58-test.html`
-- Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html`
-- Watch History: `watch-history-global-helpers-v7-4-0-test.html`
+- Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
+- Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate attached, pending browser test
 - Watchlist: `watchlist-clean-machine-v7-12-43-test.html`
 - Favourites: `favourites-clean-machine-v7-12-41-test.html`
 - Likes: `likes-clean-machine-v7-12-42-test.html`
@@ -218,73 +272,3 @@ Owner notes:
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html`
 - Rules: `rules-clean-machine-v7-12-82-test.html`
 - Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
-- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html`
-- Genres: `genres-clean-machine-v7-12-45-test.html`
-
-### Group Play
-
-- Playlists: `playlists-global-helpers-v7-5-2-test.html`
-- Channels: `channels-global-helpers-v7-5-3-test.html`
-- My Channel: `my-channel-clean-machine-v7-12-47-test.html`
-- Collections: `collections-clean-machine-v7-12-51-test.html`
-- Player 2: `player-2-clean-machine-v7-12-58-test.html`
-
-### Social Media Group
-
-- Social Profile: `profile-social-v7-13-001-test.html`
-- Friends: `friends-social-v7-13-001-test.html`
-- News Feed: `news-feed-social-v7-13-001-test.html`
-- Groups and Events: `groups-social-v7-13-001-test.html`
-
-### Account / settings
-
-- Account Settings: `profile-settings-live-ready-v7-12-90-test.html`
-- Settings Hub: `settings-platform-control-hub-v7-12-85-test.html`
-- Theme Studio: `web-builder-theme-studio-controls-v7-8-9-test.html`
-
-### Web Builder
-
-- Web Builder Hub: `web-builder-account-control-hub-v7-12-263-test.html`
-- Owned Pages Manager: `web-builder-pages-manager-owned-v7-12-256-test.html`
-- Owned Preview: `web-builder-preview-owned-v7-12-257-test.html?page=test-page`
-- Form Designer: `web-builder-form-designer-owned-v7-12-258-test.html?page=test-page`
-- Form Inbox Bridge: `web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page`
-
-### Admin / proof
-
-- Admin Centre: `admin-centre-command-deck-v7-12-121-test.html`
-- Live Readiness: `live-readiness-global-helpers-v7-10-2-test.html`
-- Current Routes Registry: `all-pages-version-registry-v7-12-122-current-routes-test.html`
-- Test Checklist: `test-checklist-global-helpers-v7-10-5-test.html`
-- Tools: `tools-page-original-global-pass-v7-12-136-test.html`
-- Health Check: `health-check-global-helpers-v7-10-6-test.html`
-- Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html`
-- Storage Prep: `storage-prep-global-helpers-v7-10-8-test.html`
-- Backup / Safety: `backup-safety-global-helpers-v7-10-9-test.html`
-
-### Owner / management
-
-- Form Inbox: `web-builder-form-submissions-v7-12-94-test.html?page=test-page`
-- One Machine: `stream-bandit-one-machine-v7-12-73-test.html`
-- Platform Control Centre: `settings-platform-control-hub-v7-12-85-test.html`
-- Final Shell Navigation: `stream-bandit-global-helper-shell-v7-12-126-test.html`
-- Brand / App Icons: `settings-brand-icons-promoted-v7-12-21-test.html`
-- Brand Image Helper: `brand-logo-helper-responsive-v7-12-20-test.html`
-- Favicon / App Icon Builder: `favicon-app-icon-builder-v7-12-15-test.html`
-
-### User Management
-
-- User Management Dashboard: `user-management-dashboard-v7-11-2-test.html`
-- Feature Shop / Pricing: `plans-pricing-feature-shop-v7-11-3-test.html`
-- Permissions Inspector: `permissions-matrix-user-management-v7-11-4-test.html`
-
-## Deferred work, not for this pass
-
-- Move/correct Form Inbox into the Social group later.
-- Remove or update old Web Builder witness links inside Owner diagnostic pages only when owner diagnostics are intentionally cleaned.
-- Do not delete old useful pages just because they are old.
-- Do not touch SQL/RLS/storage/payment without a separate approved backend pass.
-
-## Final scan-pass decision
-
-`SCAN PASS COMPLETE. MANIFEST UPDATED. READY FOR NEXT CONTROLLED UPDATE PASS.`
