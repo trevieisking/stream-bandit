@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.083
+# Stream Bandit Current App Manifest V7.13.084
 
 Date: 2026-06-21
 
@@ -6,7 +6,7 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest checkpoint
 
-`V7.13.083 Watch Group Auth Gate Full Pass / Accessibility Passed / Checkpoint Created / Index Promoted / Supabase Library Editor Admin Gate First-Time Pass / Genres Auth Gate Pass / Manifest Updated`
+`V7.13.084 Watch Group Auth Gate Full Pass / Accessibility Passed / Checkpoint Created / Index Promoted / Supabase Library Editor Admin Gate First-Time Pass / Genres Auth Gate Pass / Global Search Auth Gate Pass / Manifest Updated`
 
 Checkpoint file:
 
@@ -22,7 +22,7 @@ Three old V5 checkpoints were removed before creating the Watch Group checkpoint
 
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / INDEX LISTS CURRENT WATCH GROUP LINKS / BROWSE GROUP IN PROGRESS / SUPABASE LIBRARY EDITOR AUTH GATE PLUS ADMIN LOCK PASSED FIRST TIME / GENRES AUTH GATE PASSED / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
+`WATCH GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / INDEX LISTS CURRENT WATCH GROUP LINKS / BROWSE GROUP IN PROGRESS / SUPABASE LIBRARY EDITOR AUTH GATE PLUS ADMIN LOCK PASSED FIRST TIME / GENRES AUTH GATE PASSED / GLOBAL SEARCH AUTH GATE PASSED / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
 
 Confirmed boundaries:
 
@@ -39,6 +39,8 @@ Confirmed boundaries:
 - no storage delete added to Supabase Library Editor
 - no `sb_movies` writes added to Genres
 - no movie deletion added to Genres
+- no Supabase writes added to Global Search
+- no admin/owner role gate added to Global Search
 
 ## Index promotion
 
@@ -82,6 +84,7 @@ Passed pages:
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html`
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html`
 - Genres: `genres-clean-machine-v7-12-45-test.html`
+- Global Search: `global-search-global-helpers-v7-4-9-test.html`
 
 ## Browse group status
 
@@ -89,7 +92,7 @@ Browse group routes visible in the menu:
 
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.279 auth gate plus admin lock passed
 - Genres: `genres-clean-machine-v7-12-45-test.html` — V7.12.283 auth gate passed
-- Global Search: `global-search-global-helpers-v7-4-9-test.html` — pending Browse group gate pass
+- Global Search: `global-search-global-helpers-v7-4-9-test.html` — V7.12.284 auth gate passed
 - About: `about-global-helpers-v7-4-7-test.html` — pending Browse group gate pass
 
 ## Supabase Library Editor pass
@@ -191,6 +194,49 @@ Preserved Genres behavior and locks:
 - Header/Footer/Theme/Search helper bridge stayed preserved
 - no SQL, RLS, storage, payment, schema or Header Shell mass-gate change
 
+## Global Search pass
+
+File:
+
+`global-search-global-helpers-v7-4-9-test.html`
+
+Version:
+
+`V7.12.284 Global Search Auth Gate Test`
+
+Status:
+
+`PASSED / SIGNED-IN READ-ONLY SEARCH / HEADER QUERY HANDOFF PRESERVED`
+
+Trevor browser-test result:
+
+- Global Search passed
+- page works after the auth gate attachment
+- Browse group read-only search model remained correct
+
+Preserved Global Search behavior and locks:
+
+- shared Auth Gate blocks signed-out users before page use
+- no admin/owner role check was added
+- read-only search stayed preserved
+- `sb_movies` read stayed preserved
+- `sb_channels` optional read stayed preserved
+- `sb_playlists` optional read stayed preserved
+- pages and policy results stayed preserved
+- header query handoff stayed preserved
+- search input stayed preserved
+- type filter stayed preserved
+- source filter stayed preserved
+- sort stayed preserved
+- chips stayed preserved
+- Details links stayed preserved
+- Player 1 Play links stayed preserved
+- shared save buttons stayed preserved
+- clean top rail stayed preserved
+- Header/Footer/Theme/Search helper bridge stayed preserved
+- no Supabase writes were added
+- no SQL, RLS, storage, payment, schema or Header Shell mass-gate change
+
 ## Current Watch Group results
 
 ### Continue Watching
@@ -236,7 +282,7 @@ Accessibility is a local comfort/readability page. It must not become a Supabase
 
 ## Browse group boundary
 
-Supabase Library Editor is admin/owner only because it can create, edit, upload poster URLs and permanently delete `sb_movies` rows. Genres is signed-in browse with admin/owner-only managed genre tools. Global Search and About must each be handled page-by-page and must keep their own existing role model. Do not attach the gate from Header Shell.
+Supabase Library Editor is admin/owner only because it can create, edit, upload poster URLs and permanently delete `sb_movies` rows. Genres is signed-in browse with admin/owner-only managed genre tools. Global Search is signed-in read-only search. About must be handled page-by-page and must keep its own existing role model. Do not attach the gate from Header Shell.
 
 ## News Feed media issue logged for later
 
@@ -284,7 +330,7 @@ Future fix direction:
 
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.279 auth gate plus admin lock passed
 - Genres: `genres-clean-machine-v7-12-45-test.html` — V7.12.283 auth gate passed
-- Global Search: `global-search-global-helpers-v7-4-9-test.html`
+- Global Search: `global-search-global-helpers-v7-4-9-test.html` — V7.12.284 auth gate passed
 - About: `about-global-helpers-v7-4-7-test.html`
 
 ### Social group
