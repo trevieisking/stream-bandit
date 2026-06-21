@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.083
+# Stream Bandit Master Must-Follow Plan V7.13.084
 
 Date: 2026-06-21
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / ACCESSIBILITY PASSED / CHECKPOINT CREATED / INDEX PROMOTED / CURRENT APP LINKS UPDATED / BROWSE GROUP IN PROGRESS / SUPABASE LIBRARY EDITOR AUTH GATE PLUS ADMIN LOCK FIRST-TIME PASS / GENRES AUTH GATE PASS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / ACCESSIBILITY PASSED / CHECKPOINT CREATED / INDEX PROMOTED / CURRENT APP LINKS UPDATED / BROWSE GROUP IN PROGRESS / SUPABASE LIBRARY EDITOR AUTH GATE PLUS ADMIN LOCK FIRST-TIME PASS / GENRES AUTH GATE PASS / GLOBAL SEARCH AUTH GATE PASS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -58,6 +58,7 @@ No future pass may touch these without explicit separate approval:
 - Supabase Library Editor schema expansion without separate approval
 - Supabase Library Editor storage delete without separate approval
 - Genres `sb_movies` writes or movie deletion without separate approval
+- Global Search Supabase writes or admin-only conversion without separate approval
 
 Publishable Supabase config must remain config-only and must not be copied into docs as a secret.
 
@@ -111,6 +112,7 @@ Passed auth-gate attachment pages:
 - `accessibility-clean-machine-v7-12-44-test.html`
 - `supabase-library-home-header-form-fix-v7-12-34-test.html`
 - `genres-clean-machine-v7-12-45-test.html`
+- `global-search-global-helpers-v7-4-9-test.html`
 
 Auth gate autofill guard remains passed. The old Library browser-autofill problem is fixed by the central helper.
 
@@ -122,7 +124,7 @@ Current Browse routes:
 
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — admin/owner only, passed first time with Auth Gate plus admin lock
 - Genres: `genres-clean-machine-v7-12-45-test.html` — signed-in browse plus admin/owner genre tools, passed
-- Global Search: `global-search-global-helpers-v7-4-9-test.html` — read-only search, pending controlled pass
+- Global Search: `global-search-global-helpers-v7-4-9-test.html` — signed-in read-only search, passed
 - About: `about-global-helpers-v7-4-7-test.html` — info/contact page, pending controlled pass
 
 Supabase Library Editor must use this exact passed order:
@@ -139,6 +141,14 @@ Genres must use this exact permission model:
 3. Existing account authority lock controls admin/owner tools.
 4. Admin/owner users can create/delete managed `sb_genres` labels.
 5. Genres must not write to `sb_movies` and must not delete or edit movie rows.
+
+Global Search must use this exact permission model:
+
+1. Auth Gate blocks signed-out access first.
+2. Signed-in users can run read-only search across movies, genres, channels, playlists, pages and policies.
+3. No admin/owner-only role check is required.
+4. Global Search must not add Supabase writes.
+5. Header query handoff must keep working.
 
 Do not move this gate into Header Shell. Do not remove page-owned admin/owner locks. Do not flatten Browse pages into one permission type.
 
@@ -242,7 +252,55 @@ Preserved Genres controls and safety locks:
 - no schema change
 - no Header Shell mass auth-gate injection
 
-## 10. Watch Group full pass results
+## 10. Global Search pass
+
+File:
+
+`global-search-global-helpers-v7-4-9-test.html`
+
+Version:
+
+`V7.12.284 Global Search Auth Gate Test`
+
+Status:
+
+`PASSED / SIGNED-IN READ-ONLY SEARCH / HEADER QUERY HANDOFF PRESERVED`
+
+Trevor browser-test result:
+
+- Global Search passed
+- page works after the auth gate attachment
+- Browse group read-only search model remained correct
+
+Preserved Global Search controls and safety locks:
+
+- shared Auth Gate blocks signed-out users before page use
+- no admin/owner role check added
+- read-only search stayed preserved
+- `sb_movies` read stayed preserved
+- `sb_channels` optional read stayed preserved
+- `sb_playlists` optional read stayed preserved
+- pages and policy results stayed preserved
+- header query handoff stayed preserved
+- search input stayed preserved
+- type filter stayed preserved
+- source filter stayed preserved
+- sort stayed preserved
+- chips stayed preserved
+- Details links stayed preserved
+- Player 1 Play links stayed preserved
+- shared save buttons stayed preserved
+- clean top rail stayed preserved
+- Header/Footer/Theme/Search helper bridge stayed preserved
+- no SQL changed
+- no RLS changed
+- no storage policy changed
+- no payment changed
+- no schema change
+- no Supabase writes added
+- no Header Shell mass auth-gate injection
+
+## 11. Watch Group full pass results
 
 ### Continue Watching
 
@@ -283,13 +341,13 @@ Preserved Genres controls and safety locks:
 - text scale, contrast, reduced motion and preferred player boost reminder preserved
 - no Supabase writes added
 
-## 11. User save-page and Accessibility boundaries
+## 12. User save-page and Accessibility boundaries
 
 Watchlist, Favourites and Likes are user-account save pages. They must keep signed-in user scope, existing table reads and shared save helpers. They must not become admin/owner permission pages and must not change User Management, Owner controls, SQL, RLS, storage policies, payments or Header Shell gate behavior.
 
 Accessibility is a local comfort/readability page. It must not become a Supabase writer and must not take over Theme Studio colour ownership or Player 1's real audio boost controls.
 
-## 12. News Feed media display issue for later focused fix
+## 13. News Feed media display issue for later focused fix
 
 File:
 
@@ -314,13 +372,13 @@ Future fix direction:
 - preserve News Feed posts, comments, reactions, likes, visibility rules and account ownership behavior
 - do not change SQL, RLS, storage policies, payments, owner/admin permissions or Header Shell auth-gate behavior in that pass unless separately approved
 
-## 13. Player 1 Details-link issue for later
+## 14. Player 1 Details-link issue for later
 
 Status: logged, not an auth blocker, Player 1 auth gate passed.
 
 Observed behavior: Player 1 Details can open a different/random title instead of the currently playing title. Fix later in a dedicated Player 1 Details-link/current-row routing pass. Preserve playback, audio boost, source bridge, resume helper, watch history and save buttons.
 
-## 14. Social group rule
+## 15. Social group rule
 
 Social pages are real working pages and must not be blind-patched.
 
@@ -333,13 +391,12 @@ Current Social group:
 
 News Feed is a real post/comment/reaction/feed page. Its media display issue must be handled as a focused fix, not as part of a broad social rewrite.
 
-## 15. Next controlled step
+## 16. Next controlled step
 
-The Watch Group is passed, checkpointed and promoted to Index as current app links. Browse Group has started. Supabase Library Editor passed first time, and Genres passed.
+The Watch Group is passed, checkpointed and promoted to Index as current app links. Browse Group has started. Supabase Library Editor, Genres and Global Search have passed.
 
 Next Browse group target should be chosen one page at a time:
 
-- Global Search, read-only search gate; or
 - About, info/contact gate if approved.
 
 No mass page rollout and no Header Shell auth-gate embedding are approved.
