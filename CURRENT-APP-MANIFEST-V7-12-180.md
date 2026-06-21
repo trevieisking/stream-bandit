@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.086
+# Stream Bandit Current App Manifest V7.13.087
 
 Date: 2026-06-21
 
@@ -6,7 +6,7 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest checkpoint
 
-`V7.13.086 Watch Group Full Pass / Browse Group Full Pass / Creator Group Started / Submit Video Auth Gate Passed / Manifest Updated`
+`V7.13.087 Watch Group Full Pass / Browse Group Full Pass / Creator Group In Progress / Submit Video Passed / Review Queue Auth Gate Passed / Maestro Playback Compatibility Logged / Manifest Updated`
 
 Checkpoint files:
 
@@ -15,7 +15,7 @@ Checkpoint files:
 
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / SUBMIT VIDEO AUTH GATE PASSED / CREATOR GROUP IN PROGRESS / REVIEW QUEUE PREVIEW FIX REQUESTED / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
+`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / SUBMIT VIDEO AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / CREATOR GROUP IN PROGRESS / REVIEW QUEUE PLAYER PREVIEW STILL NEEDED / PLAYER 1 AND PLAYER 2 PLAYBACK COMPATIBILITY PASS LOGGED / MAESTRO LINKS DO NOT PLAY CURRENTLY / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
 
 Confirmed boundaries:
 
@@ -36,7 +36,8 @@ Confirmed boundaries:
 - no Supabase writes added to About
 - no live/publish/billing/policy edit action added to About
 - no direct `sb_movies` publish added to Submit Video
-- no Review Queue approval/publish logic changed during Submit Video pass
+- no Review Queue approval/publish logic changed during Review Queue gate pass
+- no Player 1 or Player 2 playback-code change during this documentation pass
 
 ## Index promotion
 
@@ -90,6 +91,7 @@ Passed pages:
 - Global Search: `global-search-global-helpers-v7-4-9-test.html`
 - About: `about-global-helpers-v7-4-7-test.html`
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html`
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
 
 ## Browse group full pass
 
@@ -166,7 +168,7 @@ Creator group routes:
 
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — V7.12.289 auth gate passed
 - Rules: `rules-clean-machine-v7-12-82-test.html` — pending Creator group auth gate pass
-- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — pending Creator group auth gate pass and video preview fix requested
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — V7.12.290 auth gate passed; player preview and Maestro playback compatibility still needed
 
 ### Submit Video pass
 
@@ -199,6 +201,30 @@ Preserved Submit Video behavior and locks:
 - no admin-only conversion added to Submit Video
 - no SQL, RLS, storage policy, payment, schema or Header Shell mass-gate change
 
+### Review Queue gate pass
+
+File: `review-queue-clean-machine-v7-12-80-publish-test.html`
+
+Version: `V7.12.290 Review Queue Auth Gate Test`
+
+Status: `PASSED / AUTH GATE ATTACHED / EXISTING ADMIN OWNER REVIEW GATE PRESERVED / PREVIEW FIX STILL NEEDED`
+
+Trevor browser-test result:
+
+- Review Queue auth gate passed
+- existing Review Queue admin/owner gate remains the publish safety gate
+- submitted Maestro-style links still do not play in the current page/player preview path and need a dedicated playback compatibility fix
+
+Preserved Review Queue behavior and locks:
+
+- shared Auth Gate blocks signed-out users before page use
+- existing `requireAdmin()` admin/owner lock stayed preserved
+- queue still reads `sb_submissions`
+- approve/publish, approve-only, decline and archive actions stayed preserved
+- publish path remains Review Queue to `sb_movies`
+- no approval or publish logic was rewritten during the gate pass
+- no SQL, RLS, storage policy, payment, schema or Header Shell mass-gate change
+
 ### Review Queue preview request
 
 File: `review-queue-clean-machine-v7-12-80-publish-test.html`
@@ -207,11 +233,34 @@ Requested next fix:
 
 - add a real video preview before approval
 - reviewer must be able to test the submitted URL before approving
-- prefer Player 1-style preview behavior
-- preview can appear below the card or in an overlay
+- preview should use the same playback compatibility layer planned for Player 1 and Player 2
+- if the submitted URL is a Maestro page URL, the preview must not treat it like a raw video file
+- preview can appear below the selected card or in an overlay
 - do not weaken Review Queue admin/owner approval gate
 - do not approve/publish unless reviewer has a working preview/test tool
 - preserve approve, decline, request changes, save status and publish-to-library behavior
+
+## Player playback compatibility backlog
+
+### Player 1 and Player 2 playback compatibility pass
+
+Status: `LOGGED / FIX LATER IN A DEDICATED PLAYER PLAYBACK COMPATIBILITY PASS`
+
+Problem reported by Trevor:
+
+- Maestro page links are not playing now, although they used to.
+- Example link type: `maestro.tv/chatterfriends/v/...`
+- These links are page/embed-style links, not guaranteed direct browser-playable media URLs.
+
+Required future fix:
+
+- Player 1 and Player 2 must support every approved Stream Bandit source type possible without breaking current playback.
+- Keep existing direct MP4/WebM/MOV/HLS/Mux behavior.
+- Add a source resolver/adapter for page-style providers such as Maestro where possible.
+- Do not feed non-media page URLs directly into a `<video>` element as if they were `.mp4` or `.m3u8` files.
+- Review Queue preview must use the same resolver/adapter so the reviewer can test the submitted URL before approval.
+- Preserve audio boost, louder audio/accessibility comfort, fullscreen, resume, watch history, source bridge, save buttons and Details links.
+- Do not change SQL, RLS, storage policies, payments or owner/admin permissions during the playback compatibility pass unless separately approved.
 
 ## Current Watch Group results
 
@@ -276,8 +325,8 @@ Player 1 Details can open the wrong movie and needs a dedicated Player 1 current
 - Home: `home-global-helpers-v7-4-4-test.html`
 - Library: `library-global-helpers-v7-4-8-test.html`
 - Details: `details-clean-machine-v7-12-38-test.html`
-- Player 1: `player-one-global-helpers-v7-3-3-test.html`
-- Player 2: `player-2-clean-machine-v7-12-58-test.html`
+- Player 1: `player-one-global-helpers-v7-3-3-test.html` — playback compatibility backlog logged
+- Player 2: `player-2-clean-machine-v7-12-58-test.html` — playback compatibility backlog logged
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
 - Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate passed
 - Watchlist: `watchlist-clean-machine-v7-12-43-test.html` — V7.12.160 auth gate passed
@@ -296,7 +345,7 @@ Player 1 Details can open the wrong movie and needs a dedicated Player 1 current
 
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — V7.12.289 auth gate passed
 - Rules: `rules-clean-machine-v7-12-82-test.html`
-- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — V7.12.290 auth gate passed; preview/playback compatibility fix still needed
 
 ### Social group
 
