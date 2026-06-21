@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.082
+# Stream Bandit Current App Manifest V7.13.083
 
 Date: 2026-06-21
 
@@ -6,7 +6,7 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest checkpoint
 
-`V7.13.082 Watch Group Auth Gate Full Pass / Accessibility Passed / Checkpoint Created / Index Promoted / Supabase Library Editor Admin Gate First-Time Pass / Manifest Updated`
+`V7.13.083 Watch Group Auth Gate Full Pass / Accessibility Passed / Checkpoint Created / Index Promoted / Supabase Library Editor Admin Gate First-Time Pass / Genres Auth Gate Pass / Manifest Updated`
 
 Checkpoint file:
 
@@ -22,7 +22,7 @@ Three old V5 checkpoints were removed before creating the Watch Group checkpoint
 
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / INDEX LISTS CURRENT WATCH GROUP LINKS / BROWSE GROUP STARTED / SUPABASE LIBRARY EDITOR AUTH GATE PLUS ADMIN LOCK PASSED FIRST TIME / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
+`WATCH GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / INDEX LISTS CURRENT WATCH GROUP LINKS / BROWSE GROUP IN PROGRESS / SUPABASE LIBRARY EDITOR AUTH GATE PLUS ADMIN LOCK PASSED FIRST TIME / GENRES AUTH GATE PASSED / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
 
 Confirmed boundaries:
 
@@ -37,6 +37,8 @@ Confirmed boundaries:
 - no News Feed code change during this documentation pass
 - no schema fields invented for Supabase Library Editor
 - no storage delete added to Supabase Library Editor
+- no `sb_movies` writes added to Genres
+- no movie deletion added to Genres
 
 ## Index promotion
 
@@ -79,13 +81,14 @@ Passed pages:
 - Likes: `likes-clean-machine-v7-12-42-test.html`
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html`
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html`
+- Genres: `genres-clean-machine-v7-12-45-test.html`
 
 ## Browse group status
 
 Browse group routes visible in the menu:
 
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.279 auth gate plus admin lock passed
-- Genres: `genres-clean-machine-v7-12-45-test.html` — pending Browse group gate pass
+- Genres: `genres-clean-machine-v7-12-45-test.html` — V7.12.283 auth gate passed
 - Global Search: `global-search-global-helpers-v7-4-9-test.html` — pending Browse group gate pass
 - About: `about-global-helpers-v7-4-7-test.html` — pending Browse group gate pass
 
@@ -145,6 +148,49 @@ Preserved editor functions and locks:
 - no storage delete added
 - no Header Shell mass auth-gate injection
 
+## Genres pass
+
+File:
+
+`genres-clean-machine-v7-12-45-test.html`
+
+Version:
+
+`V7.12.283 Genres Auth Gate Test`
+
+Status:
+
+`PASSED / SIGNED-IN BROWSE / ADMIN OWNER MANAGED GENRE TOOLS PRESERVED`
+
+Trevor browser-test result:
+
+- Genres page passed
+- page works after the auth gate attachment
+- Browse group permission model remained correct
+
+Preserved Genres behavior and locks:
+
+- shared Auth Gate blocks signed-out users before page use
+- signed-in users can browse active Supabase movies by genre
+- `sb_movies` remains read-only from this page
+- `sb_genres` managed label read stayed preserved
+- admin/owner authority check stayed preserved through `StreamBanditAccountAuthority`
+- admin/owner-only Create Genre stayed preserved
+- admin/owner-only Delete Managed Genre stayed preserved
+- deleting a managed genre deletes only the `sb_genres` label
+- deleting a managed genre does not delete movies
+- deleting a managed genre does not edit movie genre arrays
+- genre search stayed preserved
+- movie search stayed preserved
+- genre sort stayed preserved
+- movie sort stayed preserved
+- Details links stayed preserved
+- Player 1 Play links stayed preserved
+- shared save buttons stayed preserved
+- clean top rail stayed preserved
+- Header/Footer/Theme/Search helper bridge stayed preserved
+- no SQL, RLS, storage, payment, schema or Header Shell mass-gate change
+
 ## Current Watch Group results
 
 ### Continue Watching
@@ -190,7 +236,7 @@ Accessibility is a local comfort/readability page. It must not become a Supabase
 
 ## Browse group boundary
 
-Supabase Library Editor is admin/owner only because it can create, edit, upload poster URLs and permanently delete `sb_movies` rows. Genres, Global Search and About must each be handled page-by-page and must keep their own existing role model. Do not attach the gate from Header Shell.
+Supabase Library Editor is admin/owner only because it can create, edit, upload poster URLs and permanently delete `sb_movies` rows. Genres is signed-in browse with admin/owner-only managed genre tools. Global Search and About must each be handled page-by-page and must keep their own existing role model. Do not attach the gate from Header Shell.
 
 ## News Feed media issue logged for later
 
@@ -237,7 +283,7 @@ Future fix direction:
 ### Browse group
 
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.279 auth gate plus admin lock passed
-- Genres: `genres-clean-machine-v7-12-45-test.html`
+- Genres: `genres-clean-machine-v7-12-45-test.html` — V7.12.283 auth gate passed
 - Global Search: `global-search-global-helpers-v7-4-9-test.html`
 - About: `about-global-helpers-v7-4-7-test.html`
 
