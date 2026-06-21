@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.078
+# Stream Bandit Current App Manifest V7.13.079
 
 Date: 2026-06-21
 
@@ -8,11 +8,11 @@ This existing manifest is also the scan-pass checkpoint for the final route/menu
 
 ## Current strongest checkpoint
 
-`V7.13.078 Auth Gate Controlled Watch Group Pass / Continue Watching Passed / Watch History Passed / Watchlist Passed / Manifest Updated`
+`V7.13.079 Auth Gate Controlled Watch Group Pass / Continue Watching Passed / Watch History Passed / Watchlist Passed / Favourites Passed / Manifest Updated`
 
 ## Scan pass status
 
-`FINAL SCAN PASS PRESERVED / AUTH GATE CONTROLLED ROLLOUT UPDATED / CONTINUE WATCHING PASSED / WATCH HISTORY PASSED / WATCHLIST PASSED`
+`FINAL SCAN PASS PRESERVED / AUTH GATE CONTROLLED ROLLOUT UPDATED / CONTINUE WATCHING PASSED / WATCH HISTORY PASSED / WATCHLIST PASSED / FAVOURITES PASSED`
 
 Confirmed boundaries:
 
@@ -25,6 +25,7 @@ Confirmed boundaries:
 - no production Home replacement
 - no player/audio/accessibility regression work
 - no Header Shell mass auth-gate injection
+- no admin/owner permission-system change
 - old useful hidden pages were not deleted
 - Web Builder-owned public aliases were moved to current owned Web Builder pages where appropriate
 - Form Inbox remains the temporary Owner exception and is queued for later Social placement
@@ -35,13 +36,14 @@ Confirmed boundaries:
 
 Status:
 
-`CONTROLLED PAGE-BY-PAGE ROLLOUT / NO MASS HEADER SHELL GATE / CONTINUE WATCHING PASSED / WATCH HISTORY PASSED / WATCHLIST PASSED`
+`CONTROLLED PAGE-BY-PAGE ROLLOUT / NO MASS HEADER SHELL GATE / CONTINUE WATCHING PASSED / WATCH HISTORY PASSED / WATCHLIST PASSED / FAVOURITES PASSED`
 
 Files updated:
 
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html`
 - Watch History: `watch-history-global-helpers-v7-4-0-test.html`
 - Watchlist: `watchlist-clean-machine-v7-12-43-test.html`
+- Favourites: `favourites-clean-machine-v7-12-41-test.html`
 
 Continue Watching result:
 
@@ -93,6 +95,24 @@ Watchlist result:
 - clean top rail stayed preserved
 - no backend or destructive action was added
 
+Favourites result:
+
+- upgraded from V7.12.159 to V7.12.160 Favourites Auth Gate Test
+- visible badge is `V7.12.160 Favourites · Auth Gate Test`
+- auth gate script added directly after `stream-bandit-shell-v6-24.js`
+- `StreamBanditAuthGate.enforce()` added to the existing helper loop
+- helper status now includes Auth Gate
+- summary now records Auth Gate attached/checking
+- Trevor confirmed Favourites passed
+- real `sb_favourites` table read stayed preserved
+- search/filter stayed preserved
+- sort stayed preserved
+- shared save buttons stayed preserved
+- Details links stayed preserved
+- Player 1 links stayed preserved
+- clean top rail stayed preserved
+- no backend or destructive action was added
+
 Current auth-gate controlled rollout status:
 
 - Index: passed
@@ -103,6 +123,12 @@ Current auth-gate controlled rollout status:
 - Continue Watching: passed
 - Watch History: passed
 - Watchlist: passed
+- Favourites: passed
+- Likes: next likely same user-account save-page pattern, pending Trevor file/test
+
+### Permission boundary note for remaining group pages
+
+Watchlist, Favourites and Likes are user-account save pages. They must keep signed-in user scope and existing shared save helpers. They are not admin/owner permission pages, and this rollout must not change owner/admin controls, protected dashboard logic, SQL, RLS, storage policies or Header Shell auth-gate embedding.
 
 ### Main shell route cleanup
 
@@ -283,7 +309,7 @@ Owner notes:
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
 - Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate passed
 - Watchlist: `watchlist-clean-machine-v7-12-43-test.html` — V7.12.160 auth gate passed
-- Favourites: `favourites-clean-machine-v7-12-41-test.html`
+- Favourites: `favourites-clean-machine-v7-12-41-test.html` — V7.12.160 auth gate passed
 - Likes: `likes-clean-machine-v7-12-42-test.html`
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html`
 
