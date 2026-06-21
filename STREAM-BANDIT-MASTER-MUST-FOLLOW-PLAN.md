@@ -1,12 +1,12 @@
-# Stream Bandit Master Must-Follow Plan V7.13.073
+# Stream Bandit Master Must-Follow Plan V7.13.074
 
 Date: 2026-06-21
 
-Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION / AUTH GATE HELPER PASSWORD SETUP LOGIN POPUP OWNER RECOVERY INDEX SESSION WATCH AND HOME SESSION WATCH TEST PASSED / INDEX AND HOME AUTH GATE PASSED / NEXT PROTECTED PAGE ROLLOUT DECISION NEEDED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / FUTURE AUTH GATE PLAN ADDED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION / AUTH GATE HELPER PASSWORD SETUP LOGIN POPUP OWNER RECOVERY INDEX SESSION WATCH HOME SESSION WATCH AND LIBRARY SESSION WATCH TEST PASSED / INDEX HOME AND LIBRARY AUTH GATE PASSED / LIBRARY BROWSER AUTOFILL FILTER ISSUE LOGGED AS LATER SPECIFIC FIX / NEXT CONTROLLED PROTECTED PAGE ROLLOUT DECISION NEEDED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit after the full beginning-to-end scan pass. It records what the scan taught us, what is now locked, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
-This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, the accepted User Management owner-only visual exception, the auth gate helper/password setup/login-popup proof, the owner recovery path pass, the first real Index auth-gate session-watch pass, and the first real Home auth-gate session-watch pass. It does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, header-shell auth-gate embedding, or any additional shell-bridge rollout beyond specific tested safe passes.
+This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, the accepted User Management owner-only visual exception, the auth gate helper/password setup/login-popup proof, the owner recovery path pass, the first real Index auth-gate session-watch pass, the first real Home auth-gate session-watch pass, and the first controlled Library auth-gate session-watch pass. The Library pass has one non-blocking browser-autofill issue: saved browser email/password data may still autofill the Library filter/search box on initial page load. Removing the autofilled email restores the 23 movie rows and the auth-gate flow passes. This autofill behavior is logged for a later specific Library/autofill isolation fix and must not be mixed into the current auth-gate rollout pass. This plan does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, header-shell auth-gate embedding, or any additional shell-bridge rollout beyond specific tested safe passes.
 
 ## 1. What the full scan taught us
 
@@ -56,10 +56,10 @@ Every future decision must follow this order:
 6. `STREAM-BANDIT-WHAT-CHANGED-V7-13-032.md`
 7. `stream-bandit-route-registry-v7-13-001.js`
 8. `stream-bandit-route-access-map-v7-12-271.js`
-9. Current page source fetched directly from GitHub
+9. Current page source fetched directly from GitHub or complete user-supplied full file when GitHub output is truncated
 10. Browser smoke test result
 
-Search results and old checkpoint text are secondary. Direct fetch beats search when they disagree.
+Search results and old checkpoint text are secondary. Direct fetch beats search when they disagree. If GitHub output truncates an HTML or JavaScript file and the user has the full file, ask for the full file before changing that page. Do not predict missing HTML or JavaScript from truncated output.
 
 ## 3. Permanent architecture lock
 
@@ -155,7 +155,7 @@ Owner rules:
 
 - Form Inbox is the temporary Owner exception and is queued for later Social placement.
 - One Machine is read-only route/security/ownership proof.
-- Code Fix Machine is an Owner-only support helper for safe paste/search/replace/check workflows when connector tools are blocked. It performs no Supabase writes, no SQL, no RLS, no storage actions, no live promotion and no app data mutation.
+- Code Fix Machine is an Owner-only support helper for safe paste/search/replace/check workflows when connector tools are blocked or GitHub output is truncated. It requires exact old line/block and exact replacement line/block. It performs no Supabase writes, no SQL, no RLS, no storage actions, no live promotion and no app data mutation.
 - Final Shell Navigation is read-only shell/navigation proof.
 - Brand / App Icons is a real owner/admin global-logo upload/save page and must be preservation-first.
 - Brand Image Helper is preview-only and writes off.
@@ -279,14 +279,14 @@ Publishable Supabase config must remain config-only and must not be copied into 
 Status:
 
 ```text
-HELPER BUILT / TEST PAGE CREATED / RESET PASSWORD FLOW PASSED / PASSWORD SETUP TEST PASSED / SIGNED-IN APPROVED PROOF PASSED / SIGNED-OUT GATE APPEARS / LOGIN POPUP FULLY VISIBLE PASSED / LOGIN WITH NEW PASSWORD PASSED / OWNER RECOVERY PATH PASSED / INDEX AUTH GATE SESSION WATCH PASSED / HOME AUTH GATE SESSION WATCH PASSED / INDEX AND HOME AUTH GATE PASSED / NEXT PROTECTED PAGE ROLLOUT DECISION NEEDED
+HELPER BUILT / TEST PAGE CREATED / RESET PASSWORD FLOW PASSED / PASSWORD SETUP TEST PASSED / SIGNED-IN APPROVED PROOF PASSED / SIGNED-OUT GATE APPEARS / LOGIN POPUP FULLY VISIBLE PASSED / LOGIN WITH NEW PASSWORD PASSED / OWNER RECOVERY PATH PASSED / INDEX AUTH GATE SESSION WATCH PASSED / HOME AUTH GATE SESSION WATCH PASSED / LIBRARY AUTH GATE SESSION WATCH PASSED / INDEX HOME AND LIBRARY AUTH GATE PASSED / LIBRARY BROWSER AUTOFILL FILTER ISSUE LOGGED FOR LATER / NEXT CONTROLLED PROTECTED PAGE ROLLOUT DECISION NEEDED
 ```
 
 Goal:
 
 Build a proper Stream Bandit sign-in gate that blocks guest users from the app until they are signed in through Supabase Auth. This should replace casual guest browsing with a controlled login-first experience.
 
-The gate is a future controlled phase. It is not approved as a late-night patch, broad shell rewrite or mass page edit.
+The gate is a controlled phase. It is not approved as a broad shell rewrite or mass page edit.
 
 ### Gate experience requirements
 
@@ -312,7 +312,7 @@ Signed-out users stay on the gate.
 Signed-out users cannot interact with app pages behind the gate.
 Signed-in users can enter only after Supabase session is confirmed.
 Create Account remains disabled, invite-only or controlled until public signup is explicitly approved.
-Magic links must not be the only dependency.
+Magic/reset links only help existing Supabase Auth users and do not create approved profiles by themselves.
 ```
 
 ### Technical direction
@@ -423,7 +423,28 @@ The Stream Bandit login gate opened instantly and stayed up after sign-out.
 Login with the new password worked from the Home gate.
 Home owner recovery URL worked: home-global-helpers-v7-4-4-test.html?sb_owner_recovery=1.
 Home remained the Main App Home route and did not replace Index.
-Index and Home are now both passed for Phase 1 auth-gate attachment.
+Index and Home are both passed for Phase 1 auth-gate attachment.
+```
+
+Library auth gate attachment test result:
+
+```text
+library-global-helpers-v7-4-8-test.html was tested as the first controlled protected-page rollout after Index and Home passed.
+The auth gate script was added after the shell config script only.
+Signed-in Library opened.
+Library loaded 23 movies.
+Browser saved email/password autofill can still place Trevor's email into the Library local filter/search input on initial page load.
+When the autofilled email is removed from the filter/search input, all 23 Library rows reappear.
+Reload Library works after clearing the autofilled filter value.
+Details opens after clearing the autofilled filter value.
+Play opens after clearing the autofilled filter value.
+Continue Watching works.
+Header Shell sign-out was tested without manual refresh.
+The Stream Bandit login gate opened and stayed up after sign-out.
+Login with password worked from the Library gate.
+The Library auth gate itself is considered passed.
+The remaining browser-autofill filter issue is not a gate blocker and is logged for a later specific Library/autofill isolation fix.
+Do not mix the autofill fix into the broad auth-gate rollout pass.
 ```
 
 Current visual asset note:
@@ -436,16 +457,47 @@ The actual login popup crop fix has passed on the auth gate test page.
 The owner recovery path has passed on the auth gate test page.
 Index gate pass is complete.
 Home gate pass is complete.
+Library gate pass is complete with a non-blocking browser-autofill filter issue logged for later.
 ```
 
-First two pages passed:
+Passed auth-gate attachment pages:
 
 ```text
 index.html
 home-global-helpers-v7-4-4-test.html
+library-global-helpers-v7-4-8-test.html
 ```
 
 Do not apply to every page from Header Shell yet. Header Shell is global navigation and loads on mixed page families. Embedding the auth gate in Header Shell would silently mass-apply the gate to Web Builder, Owner, Admin, support and diagnostic pages before each route family is explicitly approved.
+
+### Library autofill issue for later specific fix
+
+Status:
+
+```text
+LOGGED / NON-BLOCKING FOR AUTH GATE PASS / FIX LATER IN A DEDICATED LIBRARY AUTOFILL PASS
+```
+
+Observed behavior:
+
+```text
+When Library opens, browser saved email/password data may autofill Trevor's email into the Library localSearch filter box.
+This makes the Library show 0 visible rows because it is filtering 23 loaded movies by the email string.
+Removing the email from the filter box immediately restores the Library rows.
+The auth gate still works correctly.
+```
+
+Later fix direction:
+
+```text
+Make a dedicated Library autofill isolation pass.
+Use the complete full Library HTML file as the base.
+Do not use truncated GitHub output for HTML/JS edits.
+Consider a delayed clear of localSearch after browser autofill fires.
+Consider using a less login-like input name and hidden decoy fields if needed.
+Consider checking document.activeElement before clearing so genuine user searches are not erased.
+Do not mix this fix into auth gate rollout unless it becomes a blocker.
+```
 
 ### Required rollout phases
 
@@ -456,11 +508,11 @@ Do not apply to every page from Header Shell yet. Header Shell is global navigat
 4. Design reset-password redirect path. DONE FOR TEST: reset points to password setup test page.
 5. Build shared auth gate helper. DONE.
 6. Attach only to index.html and Home. DONE: INDEX AND HOME PASSED.
-7. Test login, logout and reset password. PASSED ON TEST PAGE, INDEX AND HOME.
-8. Test signed-out user cannot pass. PASSED ON TEST PAGE, INDEX AND HOME.
-9. Test signed-in admin/approved user can pass. PASSED ON TEST PAGE, INDEX AND HOME.
-10. Add owner emergency recovery path so Trevor is not locked out during testing. PASSED ON TEST PAGE, INDEX AND HOME.
-11. Expand to protected pages only after the first two pages pass. READY FOR CONTROLLED NEXT DECISION / NOT STARTED.
+7. Test login, logout and reset password. PASSED ON TEST PAGE, INDEX, HOME AND LIBRARY.
+8. Test signed-out user cannot pass. PASSED ON TEST PAGE, INDEX, HOME AND LIBRARY.
+9. Test signed-in admin/approved user can pass. PASSED ON TEST PAGE, INDEX, HOME AND LIBRARY.
+10. Add owner emergency recovery path so Trevor is not locked out during testing. PASSED ON TEST PAGE, INDEX AND HOME. LIBRARY GATE TEST PASSED; OWNER RECOVERY CAN BE RETESTED IF NEEDED.
+11. Expand to protected pages only after the first two pages pass. STARTED: LIBRARY PASSED WITH NON-BLOCKING AUTOFILL ISSUE LOGGED.
 12. Later decide Create Account mode: public, invite-only or owner-created only. NOT DONE.
 ```
 
@@ -621,9 +673,11 @@ AUTH GATE LOGIN POPUP FULL VISUAL/FUNCTION TEST PASSED.
 AUTH GATE OWNER EMERGENCY RECOVERY PATH PASSED ON TEST PAGE.
 AUTH GATE INDEX ATTACHMENT AND SESSION-WATCH TEST PASSED.
 AUTH GATE HOME ATTACHMENT AND SESSION-WATCH TEST PASSED.
-AUTH GATE INDEX AND HOME PHASE 1 PASSED.
+AUTH GATE LIBRARY ATTACHMENT AND SESSION-WATCH TEST PASSED.
+LIBRARY BROWSER AUTOFILL FILTER ISSUE IS LOGGED AS NON-BLOCKING AND MUST BE FIXED LATER IN A DEDICATED LIBRARY AUTOFILL PASS.
+AUTH GATE INDEX HOME AND LIBRARY PHASE PASSED.
 HEADER SHELL AUTH-GATE EMBEDDING IS NOT APPROVED YET.
-NEXT STEP: DECIDE CONTROLLED PROTECTED PAGE ROLLOUT, NOT MASS PAGE OR HEADER-SHELL INJECTION.
+NEXT STEP: DECIDE NEXT CONTROLLED PROTECTED PAGE, NOT MASS PAGE OR HEADER-SHELL INJECTION.
 HEADER/FOOTER PROJECTOR BRIDGE PASSED AND LOCKED.
 CODE FIX MACHINE OWNER SUPPORT TOOL APPROVED.
 USER MANAGEMENT 11B THEME BRIDGE ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION.
