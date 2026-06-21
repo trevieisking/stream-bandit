@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.088
+# Stream Bandit Master Must-Follow Plan V7.13.089
 
 Date: 2026-06-21
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP IN PROGRESS / SUBMIT VIDEO AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIBRARY STUDIO STARTED / PLAYER 1 AND PLAYER 2 MAESTRO PLAYBACK COMPATIBILITY LOGGED / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP IN PROGRESS / SUBMIT VIDEO AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER UPCHUNK UPLOAD PASS / MUX MANAGER LIBRARY STUDIO STARTED / PLAYER 1 AND PLAYER 2 MAESTRO PLAYBACK COMPATIBILITY LOGGED / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -272,13 +272,13 @@ Required future fix:
 
 File: `mux-manager-global-helpers-v7-10-7-test.html`
 
-Target version path:
+Current version:
 
-- `V7.12.302 Mux Manager Admin Media Library Studio`
+- `V7.12.303 Mux Manager UpChunk Upload Fix`
 
-Status: `STARTED / BACKEND FUNCTION DEPLOYED / PRIVATE SECRETS SAVED BY TREVOR / FRONTEND STUDIO UI PENDING SAFE PAGE PATCH`
+Status: `PASSED PASS 1 / BACKEND FUNCTION DEPLOYED / PRIVATE SECRETS SAVED / ADMIN UPLOAD TO MUX WORKS / PUBLIC HLS OUTPUT WORKS / FRONTEND STUDIO UI PASS 2 NEXT`
 
-Backend function started:
+Backend function:
 
 - Supabase Edge Function: `mux-create-direct-upload`
 - Function status: `ACTIVE`
@@ -291,13 +291,44 @@ Secrets setup confirmed by Trevor screenshot:
 - `MUX_TOKEN_SECRET` saved in Supabase Edge Function secrets
 - Real secret values must never be pasted into ChatGPT, GitHub, HTML, JavaScript, docs or screenshots.
 
-Required Mux Manager Studio model:
+### Pass 1 upload pass result
+
+Trevor browser-test result:
+
+- Create Upload Slot passed
+- upload to Mux passed using UpChunk
+- upload progress reached 100%
+- Mux asset ready status was returned
+- public HLS `.m3u8` URL output was produced and worked
+- public player URL output was produced and worked
+- Mux thumbnail URL output was produced
+- Stream Bandit-ready fields were produced:
+  - `video_url`
+  - `mux_playback_url`
+  - `thumbnail_url`
+  - `source_type: mux`
+
+Pass 1 preserved:
+
+- no Supabase Library row insert/update
+- no playlist write
+- no channel write
+- no genre write
+- no SQL/RLS/storage policy/payment/schema change
+- no Mux private credential in browser code
+- manual copy/use only until Pass 3 is separately approved
+
+### Required final group move
+
+Mux Manager is currently under Admin tools for upload smoke testing. When Mux Manager Studio is finished and smoke-tested, it must move into the Supabase Library / media-management group with Supabase Library Editor, Genres and future library publishing controls.
+
+### Required Mux Manager Studio model
 
 1. Admin/owner only.
 2. Page Auth Gate or existing protected/admin page authority must run before upload tools.
 3. Edge Function must also verify signed-in admin/owner before creating upload URLs.
 4. Upload many video container types where Mux accepts them: `video/*`, `.mp4`, `.mov`, `.m4v`, `.webm`, `.mkv`, `.avi`, `.wmv`, `.flv`, `.m2ts`, `.mts`, `.ts`, `.mpg`, `.mpeg`, `.ogv`.
-5. Browser uploads to Mux direct upload URL using resumable upload.
+5. Browser uploads to Mux direct upload URL using Mux UpChunk.
 6. Output must produce Stream Bandit usable playback fields:
    - `https://stream.mux.com/PLAYBACK_ID.m3u8`
    - `https://player.mux.com/PLAYBACK_ID`
@@ -328,25 +359,6 @@ Required Video Settings modal tabs:
 - Paywall Preview
 - Stream Bandit
 
-Metadata tab should support:
-
-- title
-- description
-- year
-- runtime/duration
-- age rating
-- Mux asset ID
-- playback ID
-- public HLS URL
-- player URL
-- thumbnail URL
-
-Thumbnails tab should start with safe public Mux thumbnail output and optional copy action. Custom thumbnail upload to Supabase Storage is later only unless separately approved.
-
-Tags / Genres tab should support existing genres and future managed genre creation only through admin/owner controls. Do not invent schema. Do not weaken the existing Genres page rule that it must not write `sb_movies`.
-
-Embed Code tab should output safe iframe/player embed code and public HLS copy text.
-
 Paywall Preview tab is preview-only for now:
 
 - free
@@ -367,15 +379,6 @@ Stream Bandit tab is the later controlled write pass:
 Those actions must not be mixed into the first upload smoke test. They require a separate approval and a browser smoke test because they write Stream Bandit library data.
 
 Recommended rollout:
-
-### Pass 1 — Upload and playback output only
-
-- Add Admin Upload tab to Mux Manager.
-- Create upload slot through `mux-create-direct-upload`.
-- Upload video file to Mux.
-- Check processing status.
-- Output public HLS/player/thumbnail/Supabase-ready text.
-- Do not write to Supabase library tables yet.
 
 ### Pass 2 — Asset Library overlay
 
@@ -440,8 +443,8 @@ News Feed is a real post/comment/reaction/feed page. Its media display issue mus
 
 ## 18. Next controlled step
 
-Watch Group and Browse Group are passed, checkpointed and promoted to Index as current app links. Creator Group has started. Submit Video and Review Queue Auth Gate have passed. Mux Manager Library Studio has started with backend function and private secret setup.
+Watch Group and Browse Group are passed, checkpointed and promoted to Index as current app links. Creator Group has started. Submit Video and Review Queue Auth Gate have passed. Mux Manager Library Studio has started and Pass 1 upload/playback output has passed.
 
-Next work should be chosen one page or one focused fix at a time. The next active focus is Mux Manager Pass 1: Admin Upload and playback output only.
+Next work should be chosen one page or one focused fix at a time. The next active Mux focus is Mux Manager Pass 2: Maestro-style Asset Library overlay and settings modal, still with no Supabase Library writes.
 
 No mass page rollout and no Header Shell auth-gate embedding are approved.
