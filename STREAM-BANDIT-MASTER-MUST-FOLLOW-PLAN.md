@@ -1,12 +1,12 @@
-# Stream Bandit Master Must-Follow Plan V7.13.078
+# Stream Bandit Master Must-Follow Plan V7.13.079
 
 Date: 2026-06-21
 
-Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / AUTH GATE CONTROLLED ROLLOUT UPDATED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION / INDEX HOME LIBRARY DETAILS PLAYER 1 CONTINUE WATCHING WATCH HISTORY AND WATCHLIST AUTH GATE PASSED / AUTH GATE AUTOFILL GUARD PASSED / LIBRARY BROWSER AUTOFILL FILTER ISSUE FIXED BY CENTRAL AUTH GATE HELPER / PLAYER 1 DETAILS LINK WRONG MOVIE ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / FINAL SCAN PASS INCORPORATED / AUTH GATE CONTROLLED ROLLOUT UPDATED / HEADER FOOTER PROJECTOR BRIDGE PASSED / CODE FIX MACHINE OWNER SUPPORT TOOL ADDED / USER MANAGEMENT 11B ACCEPTED WITH OWNER-ONLY VISUAL EXCEPTION / INDEX HOME LIBRARY DETAILS PLAYER 1 CONTINUE WATCHING WATCH HISTORY WATCHLIST AND FAVOURITES AUTH GATE PASSED / AUTH GATE AUTOFILL GUARD PASSED / LIBRARY BROWSER AUTOFILL FILTER ISSUE FIXED BY CENTRAL AUTH GATE HELPER / PLAYER 1 DETAILS LINK WRONG MOVIE ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before any future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
-This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, the accepted User Management owner-only visual exception, the auth gate helper/password setup/login-popup proof, the owner recovery path pass, the Index auth-gate pass, the Home auth-gate pass, the Library auth-gate pass, the Details auth-gate pass, the Player 1 auth-gate pass, the Continue Watching auth-gate pass, the Watch History auth-gate pass, the Watchlist auth-gate pass, and the central auth-gate autofill guard pass. Player 1 has one non-auth page issue logged for later: its Details link can open a random movie title instead of the currently playing movie such as Doctor Strange. This is not an auth/account blocker. This plan does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, Header Shell auth-gate embedding, or broad shell-bridge rollout beyond specific tested safe passes.
+This is a source-of-truth planning document. It records the passed Header/Footer projector bridge, the approved Owner-only Code Fix Machine support helper, the accepted User Management owner-only visual exception, the auth gate helper/password setup/login-popup proof, the owner recovery path pass, the Index auth-gate pass, the Home auth-gate pass, the Library auth-gate pass, the Details auth-gate pass, the Player 1 auth-gate pass, the Continue Watching auth-gate pass, the Watch History auth-gate pass, the Watchlist auth-gate pass, the Favourites auth-gate pass, and the central auth-gate autofill guard pass. Player 1 has one non-auth page issue logged for later: its Details link can open a random movie title instead of the currently playing movie such as Doctor Strange. This is not an auth/account blocker. This plan does not approve SQL, RLS changes, storage policy changes, payment activation, DNS automation, production Home replacement, broad shell merging, broad auth-gate rollout, Header Shell auth-gate embedding, or broad shell-bridge rollout beyond specific tested safe passes.
 
 ## 1. What the full scan taught us
 
@@ -183,6 +183,7 @@ No future pass may touch these without explicit separate approval:
 - private Supabase credentials
 - Main App/Web Builder shell merge
 - Header Shell auth-gate embedding
+- owner/admin permission-system changes during user-account save-page rollout
 
 Publishable Supabase config must remain config-only and must not be copied into docs as a secret.
 
@@ -190,7 +191,7 @@ Publishable Supabase config must remain config-only and must not be copied into 
 
 Status:
 
-HELPER BUILT / TEST PAGE CREATED / RESET PASSWORD FLOW PASSED / PASSWORD SETUP TEST PASSED / SIGNED-IN APPROVED PROOF PASSED / SIGNED-OUT GATE APPEARS / LOGIN POPUP FULLY VISIBLE PASSED / LOGIN WITH NEW PASSWORD PASSED / OWNER RECOVERY PATH PASSED / INDEX AUTH GATE PASSED / HOME AUTH GATE PASSED / LIBRARY AUTH GATE PASSED / DETAILS AUTH GATE PASSED / PLAYER 1 AUTH GATE PASSED / CONTINUE WATCHING AUTH GATE PASSED / WATCH HISTORY AUTH GATE PASSED / WATCHLIST AUTH GATE PASSED / AUTH GATE AUTOFILL GUARD PASSED / LIBRARY AUTOFILL ISSUE FIXED BY CENTRAL HELPER / PLAYER 1 DETAILS LINK WRONG MOVIE ISSUE LOGGED FOR LATER
+HELPER BUILT / TEST PAGE CREATED / RESET PASSWORD FLOW PASSED / PASSWORD SETUP TEST PASSED / SIGNED-IN APPROVED PROOF PASSED / SIGNED-OUT GATE APPEARS / LOGIN POPUP FULLY VISIBLE PASSED / LOGIN WITH NEW PASSWORD PASSED / OWNER RECOVERY PATH PASSED / INDEX AUTH GATE PASSED / HOME AUTH GATE PASSED / LIBRARY AUTH GATE PASSED / DETAILS AUTH GATE PASSED / PLAYER 1 AUTH GATE PASSED / CONTINUE WATCHING AUTH GATE PASSED / WATCH HISTORY AUTH GATE PASSED / WATCHLIST AUTH GATE PASSED / FAVOURITES AUTH GATE PASSED / AUTH GATE AUTOFILL GUARD PASSED / LIBRARY AUTOFILL ISSUE FIXED BY CENTRAL HELPER / PLAYER 1 DETAILS LINK WRONG MOVIE ISSUE LOGGED FOR LATER
 
 Goal: build a proper Stream Bandit sign-in gate that blocks guest users from the app until they are signed in through Supabase Auth. This should replace casual guest browsing with a controlled login-first experience.
 
@@ -294,6 +295,21 @@ Watchlist auth gate attachment test result:
 - Trevor confirmed the gate works and Watchlist passed.
 - Real `sb_watchlist` table read, search/filter, sort, shared save buttons, Details links, Player 1 links and clean top rail remained preserved.
 
+Favourites auth gate attachment test result:
+
+- `favourites-clean-machine-v7-12-41-test.html` was upgraded to V7.12.160 Auth Gate Test.
+- The visible badge is `V7.12.160 Favourites · Auth Gate Test`.
+- The auth gate script was added directly after the shell script only.
+- The helper now calls `StreamBanditAuthGate.enforce()` from the existing helper loop.
+- Helper status now shows Auth Gate.
+- Summary now shows Auth Gate attached/checking.
+- Trevor confirmed Favourites passed.
+- Real `sb_favourites` table read, search/filter, sort, shared save buttons, Details links, Player 1 links and clean top rail remained preserved.
+
+### Permission boundary note for remaining group pages
+
+Watchlist, Favourites and Likes are user-account save pages. They must keep signed-in user scope, existing shared save helpers and existing user-owned table reads. They must not alter admin/owner permissions, User Management controls, owner recovery rules, SQL, RLS, storage policies, payment status or Header Shell mass gate behavior.
+
 Auth gate autofill guard test result:
 
 - `stream-bandit-auth-gate-v7-13-001.js` was upgraded to V7.13.005.
@@ -320,6 +336,7 @@ Passed auth-gate attachment pages:
 - `continue-watching-global-helpers-v7-3-9-test.html`
 - `watch-history-global-helpers-v7-4-0-test.html`
 - `watchlist-clean-machine-v7-12-43-test.html`
+- `favourites-clean-machine-v7-12-41-test.html`
 
 Do not apply to every page from Header Shell yet. Header Shell is global navigation and loads on mixed page families. Embedding the auth gate in Header Shell would silently mass-apply the gate to Web Builder, Owner, Admin, support and diagnostic pages before each route family is explicitly approved.
 
@@ -357,16 +374,16 @@ Later fix direction:
 4. Design reset-password redirect path. DONE FOR TEST.
 5. Build shared auth gate helper. DONE.
 6. Attach only to Index and Home first. DONE.
-7. Test login, logout and reset password. PASSED ON TEST PAGE, INDEX, HOME, LIBRARY, DETAILS, PLAYER 1, CONTINUE WATCHING, WATCH HISTORY AND WATCHLIST.
-8. Test signed-out user cannot pass. PASSED ON TEST PAGE, INDEX, HOME, LIBRARY, DETAILS, PLAYER 1, CONTINUE WATCHING, WATCH HISTORY AND WATCHLIST.
-9. Test signed-in admin/approved user can pass. PASSED ON TEST PAGE, INDEX, HOME, LIBRARY, DETAILS, PLAYER 1, CONTINUE WATCHING, WATCH HISTORY AND WATCHLIST.
+7. Test login, logout and reset password. PASSED ON TEST PAGE, INDEX, HOME, LIBRARY, DETAILS, PLAYER 1, CONTINUE WATCHING, WATCH HISTORY, WATCHLIST AND FAVOURITES.
+8. Test signed-out user cannot pass. PASSED ON TEST PAGE, INDEX, HOME, LIBRARY, DETAILS, PLAYER 1, CONTINUE WATCHING, WATCH HISTORY, WATCHLIST AND FAVOURITES.
+9. Test signed-in admin/approved user can pass. PASSED ON TEST PAGE, INDEX, HOME, LIBRARY, DETAILS, PLAYER 1, CONTINUE WATCHING, WATCH HISTORY, WATCHLIST AND FAVOURITES.
 10. Owner emergency recovery path is available for testing if needed.
 11. Expand to protected pages one at a time only. STARTED AND CONTINUING.
 12. Later decide Create Account mode: public, invite-only or owner-created only. NOT DONE.
 
 ### Next controlled protected page rollout target
 
-Current immediate target: decide next protected page after Watchlist, likely Favourites or Likes unless Trevor chooses another route.
+Current immediate target: Likes unless Trevor chooses another route. Likes should follow the same user-account save-page pattern as Watchlist and Favourites while preserving its own table, labels, links and page locks.
 
 Next rollout rules:
 
@@ -376,6 +393,7 @@ Next rollout rules:
 - Call `StreamBanditAuthGate.enforce()` safely from the page helper/status loop.
 - Update helper status to include Auth Gate.
 - Do not alter SQL, RLS, storage, payment, source playback, audio boost, accessibility/player comfort or Header Shell mass injection.
+- Do not alter owner/admin/User Management permissions during user-account save-page rollout.
 - Do not fix unrelated page-specific issues during an auth-gate attachment pass unless the user explicitly approves that issue as the current target.
 
 ## 11. Shell Bridge Follow-Up Fixes
@@ -402,11 +420,12 @@ Status: 11A passed; 11B accepted with owner-only visual exception; no broad shel
 - Auth gate Continue Watching passed.
 - Auth gate Watch History passed.
 - Auth gate Watchlist passed.
+- Auth gate Favourites passed.
 - Auth gate autofill guard passed.
 - Library browser autofill filter issue is fixed and ticked off by central auth gate helper V7.13.005.
 - Player 1 Details link wrong-movie issue is logged for later and is not an auth blocker.
 - Header Shell auth-gate embedding is not approved yet.
-- Next step: decide the next controlled protected page. No mass page or Header Shell injection.
+- Next step: Likes as the next controlled protected page unless Trevor chooses another route. No mass page or Header Shell injection.
 - Header/Footer projector bridge passed and locked.
 - Code Fix Machine Owner support tool approved.
 - User Management 11B theme bridge accepted with owner-only visual exception.
