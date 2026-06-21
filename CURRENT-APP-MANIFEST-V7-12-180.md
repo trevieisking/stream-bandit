@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.087
+# Stream Bandit Current App Manifest V7.13.089
 
 Date: 2026-06-21
 
@@ -6,7 +6,7 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest checkpoint
 
-`V7.13.087 Watch Group Full Pass / Browse Group Full Pass / Creator Group In Progress / Submit Video Passed / Review Queue Auth Gate Passed / Maestro Playback Compatibility Logged / Manifest Updated`
+`V7.13.089 Watch Group Full Pass / Browse Group Full Pass / Creator Group In Progress / Submit Video Passed / Review Queue Auth Gate Passed / Mux Manager Upload Pass / Maestro Playback Compatibility Logged / Manifest Updated`
 
 Checkpoint files:
 
@@ -15,7 +15,7 @@ Checkpoint files:
 
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / SUBMIT VIDEO AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / CREATOR GROUP IN PROGRESS / REVIEW QUEUE PLAYER PREVIEW STILL NEEDED / PLAYER 1 AND PLAYER 2 PLAYBACK COMPATIBILITY PASS LOGGED / MAESTRO LINKS DO NOT PLAY CURRENTLY / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
+`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / SUBMIT VIDEO AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / MUX MANAGER V7.12.303 UPCHUNK UPLOAD PASSED / CREATOR GROUP IN PROGRESS / REVIEW QUEUE PLAYER PREVIEW STILL NEEDED / PLAYER 1 AND PLAYER 2 PLAYBACK COMPATIBILITY PASS LOGGED / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
 
 Confirmed boundaries:
 
@@ -38,6 +38,8 @@ Confirmed boundaries:
 - no direct `sb_movies` publish added to Submit Video
 - no Review Queue approval/publish logic changed during Review Queue gate pass
 - no Player 1 or Player 2 playback-code change during this documentation pass
+- no Supabase Library insert/update from Mux Manager Pass 1
+- no private Mux token ID, Mux token secret, webhook secret, signing key or service-role key added to GitHub Pages, HTML or JavaScript
 
 ## Index promotion
 
@@ -240,6 +242,44 @@ Requested next fix:
 - do not approve/publish unless reviewer has a working preview/test tool
 - preserve approve, decline, request changes, save status and publish-to-library behavior
 
+## Mux Manager media-management group
+
+Mux Manager is currently under Admin tools for the upload smoke test. When the media studio is finished and smoke-tested, it should move to the Supabase Library / media-management group with Supabase Library Editor, Genres, and future Library publishing controls.
+
+### Mux Manager Pass 1 upload result
+
+File: `mux-manager-global-helpers-v7-10-7-test.html`
+
+Version: `V7.12.303 Mux Manager UpChunk Upload Fix`
+
+Status: `PASSED / ADMIN MUX UPLOAD WORKS / PUBLIC HLS URL OUTPUT WORKS / NO SUPABASE LIBRARY WRITES`
+
+Trevor browser-test result:
+
+- Mux upload slot was created successfully
+- video upload to Mux passed using UpChunk
+- progress reached 100%
+- Mux asset became ready
+- public HLS `.m3u8` URL was output
+- public player URL was output
+- thumbnail URL was output
+- Stream Bandit fields were output
+- URLs worked in browser testing
+
+Preserved Mux Manager behavior and locks:
+
+- private Mux token ID and token secret stayed in Supabase Edge Function secrets
+- no Mux private credentials were added to GitHub Pages, HTML or JavaScript
+- Pass 1 did not write to Supabase Library tables
+- Pass 1 did not add to playlist, channel or genres
+- Pass 1 did not change SQL, RLS, storage policies, payments or schema
+- Pass 1 output is for manual copy/use only until Pass 3 publishing controls are separately approved
+
+Next Mux Manager pass:
+
+- Pass 2: Maestro-style asset library overlay and video settings modal
+- Pass 3: admin/owner-controlled add-to-Supabase-Library, add-to-playlist, attach-to-channel and genre controls
+
 ## Player playback compatibility backlog
 
 ### Player 1 and Player 2 playback compatibility pass
@@ -334,12 +374,13 @@ Player 1 Details can open the wrong movie and needs a dedicated Player 1 current
 - Likes: `likes-clean-machine-v7-12-42-test.html` — V7.12.159 auth gate passed
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html` — V7.12.229 auth gate passed
 
-### Browse group
+### Browse / media-management group
 
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.279 auth gate plus admin lock passed
 - Genres: `genres-clean-machine-v7-12-45-test.html` — V7.12.283 auth gate passed
 - Global Search: `global-search-global-helpers-v7-4-9-test.html` — V7.12.284 auth gate passed
 - About: `about-global-helpers-v7-4-7-test.html` — V7.12.285 auth gate passed
+- Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — V7.12.303 upload pass; final group move to Supabase Library/media-management after studio completion
 
 ### Creator / library management
 
