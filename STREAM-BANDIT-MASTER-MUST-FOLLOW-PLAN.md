@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.082
+# Stream Bandit Master Must-Follow Plan V7.13.083
 
 Date: 2026-06-21
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / ACCESSIBILITY PASSED / CHECKPOINT CREATED / INDEX PROMOTED / CURRENT APP LINKS UPDATED / BROWSE GROUP STARTED / SUPABASE LIBRARY EDITOR AUTH GATE PLUS ADMIN LOCK FIRST-TIME PASS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / ACCESSIBILITY PASSED / CHECKPOINT CREATED / INDEX PROMOTED / CURRENT APP LINKS UPDATED / BROWSE GROUP IN PROGRESS / SUPABASE LIBRARY EDITOR AUTH GATE PLUS ADMIN LOCK FIRST-TIME PASS / GENRES AUTH GATE PASS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -57,6 +57,7 @@ No future pass may touch these without explicit separate approval:
 - owner/admin permission-system rewrites during controlled page rollout
 - Supabase Library Editor schema expansion without separate approval
 - Supabase Library Editor storage delete without separate approval
+- Genres `sb_movies` writes or movie deletion without separate approval
 
 Publishable Supabase config must remain config-only and must not be copied into docs as a secret.
 
@@ -109,6 +110,7 @@ Passed auth-gate attachment pages:
 - `likes-clean-machine-v7-12-42-test.html`
 - `accessibility-clean-machine-v7-12-44-test.html`
 - `supabase-library-home-header-form-fix-v7-12-34-test.html`
+- `genres-clean-machine-v7-12-45-test.html`
 
 Auth gate autofill guard remains passed. The old Library browser-autofill problem is fixed by the central helper.
 
@@ -119,7 +121,7 @@ Browse group is permission-mixed and must not be handled as one flat page type.
 Current Browse routes:
 
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — admin/owner only, passed first time with Auth Gate plus admin lock
-- Genres: `genres-clean-machine-v7-12-45-test.html` — mixed browse plus admin/owner genre tools, pending controlled pass
+- Genres: `genres-clean-machine-v7-12-45-test.html` — signed-in browse plus admin/owner genre tools, passed
 - Global Search: `global-search-global-helpers-v7-4-9-test.html` — read-only search, pending controlled pass
 - About: `about-global-helpers-v7-4-7-test.html` — info/contact page, pending controlled pass
 
@@ -130,7 +132,15 @@ Supabase Library Editor must use this exact passed order:
 3. Admin/owner users can load editor controls.
 4. Every write action still calls `requireSignedAdmin()`.
 
-Do not move this gate into Header Shell. Do not remove the page's own admin lock. Do not weaken the typed delete phrase.
+Genres must use this exact permission model:
+
+1. Auth Gate blocks signed-out access first.
+2. Signed-in users can browse active Supabase movies by genre.
+3. Existing account authority lock controls admin/owner tools.
+4. Admin/owner users can create/delete managed `sb_genres` labels.
+5. Genres must not write to `sb_movies` and must not delete or edit movie rows.
+
+Do not move this gate into Header Shell. Do not remove page-owned admin/owner locks. Do not flatten Browse pages into one permission type.
 
 ## 8. Supabase Library Editor full first-time pass
 
@@ -184,7 +194,55 @@ Preserved Supabase Editor controls and safety locks:
 - no storage delete added
 - no Header Shell mass auth-gate injection
 
-## 9. Watch Group full pass results
+## 9. Genres pass
+
+File:
+
+`genres-clean-machine-v7-12-45-test.html`
+
+Version:
+
+`V7.12.283 Genres Auth Gate Test`
+
+Status:
+
+`PASSED / SIGNED-IN BROWSE / ADMIN OWNER MANAGED GENRE TOOLS PRESERVED`
+
+Trevor browser-test result:
+
+- Genres page passed
+- page works after the auth gate attachment
+- Browse group permission model remained correct
+
+Preserved Genres controls and safety locks:
+
+- shared Auth Gate blocks signed-out users before page use
+- signed-in users can browse active Supabase movies by genre
+- `sb_movies` remains read-only from this page
+- `sb_genres` managed label reads stayed preserved
+- account authority check stayed preserved through `StreamBanditAccountAuthority`
+- admin/owner-only Create Genre stayed preserved
+- admin/owner-only Delete Managed Genre stayed preserved
+- deleting a managed genre deletes only the `sb_genres` label
+- deleting a managed genre does not delete movies
+- deleting a managed genre does not edit movie genre arrays
+- genre search stayed preserved
+- movie search stayed preserved
+- genre sort stayed preserved
+- movie sort stayed preserved
+- Details links stayed preserved
+- Player 1 Play links stayed preserved
+- shared save buttons stayed preserved
+- clean top rail stayed preserved
+- Header/Footer/Theme/Search helper bridge stayed preserved
+- no SQL changed
+- no RLS changed
+- no storage policy changed
+- no payment changed
+- no schema change
+- no Header Shell mass auth-gate injection
+
+## 10. Watch Group full pass results
 
 ### Continue Watching
 
@@ -225,13 +283,13 @@ Preserved Supabase Editor controls and safety locks:
 - text scale, contrast, reduced motion and preferred player boost reminder preserved
 - no Supabase writes added
 
-## 10. User save-page and Accessibility boundaries
+## 11. User save-page and Accessibility boundaries
 
 Watchlist, Favourites and Likes are user-account save pages. They must keep signed-in user scope, existing table reads and shared save helpers. They must not become admin/owner permission pages and must not change User Management, Owner controls, SQL, RLS, storage policies, payments or Header Shell gate behavior.
 
 Accessibility is a local comfort/readability page. It must not become a Supabase writer and must not take over Theme Studio colour ownership or Player 1's real audio boost controls.
 
-## 11. News Feed media display issue for later focused fix
+## 12. News Feed media display issue for later focused fix
 
 File:
 
@@ -256,13 +314,13 @@ Future fix direction:
 - preserve News Feed posts, comments, reactions, likes, visibility rules and account ownership behavior
 - do not change SQL, RLS, storage policies, payments, owner/admin permissions or Header Shell auth-gate behavior in that pass unless separately approved
 
-## 12. Player 1 Details-link issue for later
+## 13. Player 1 Details-link issue for later
 
 Status: logged, not an auth blocker, Player 1 auth gate passed.
 
 Observed behavior: Player 1 Details can open a different/random title instead of the currently playing title. Fix later in a dedicated Player 1 Details-link/current-row routing pass. Preserve playback, audio boost, source bridge, resume helper, watch history and save buttons.
 
-## 13. Social group rule
+## 14. Social group rule
 
 Social pages are real working pages and must not be blind-patched.
 
@@ -275,13 +333,12 @@ Current Social group:
 
 News Feed is a real post/comment/reaction/feed page. Its media display issue must be handled as a focused fix, not as part of a broad social rewrite.
 
-## 14. Next controlled step
+## 15. Next controlled step
 
-The Watch Group is passed, checkpointed and promoted to Index as current app links. Browse Group has started and Supabase Library Editor passed first time.
+The Watch Group is passed, checkpointed and promoted to Index as current app links. Browse Group has started. Supabase Library Editor passed first time, and Genres passed.
 
 Next Browse group target should be chosen one page at a time:
 
-- Genres, with signed-in browse and admin/owner genre tools preserved; or
 - Global Search, read-only search gate; or
 - About, info/contact gate if approved.
 
