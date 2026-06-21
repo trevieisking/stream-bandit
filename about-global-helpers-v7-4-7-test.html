@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit About V7.12.284</title>
+<title>Stream Bandit About V7.12.285 Auth Gate Test</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -74,7 +74,7 @@ h3{margin:0 0 6px}
 }
 </style>
 </head>
-<body data-sb-about-menu-url="about-global-helpers-v7-4-7-test.html">
+<body data-sb-about-menu-url="about-global-helpers-v7-4-7-test.html" data-sb-auth-gate-about-test="v7-13-005">
 <div class="wrap">
 
 <section class="box pillTabs topRail">
@@ -94,9 +94,9 @@ h3{margin:0 0 6px}
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.284 About · Clean Navigation</span>
+      <span class="badge">V7.12.285 About · Auth Gate Test</span>
       <h1>About Stream Bandit</h1>
-      <p>Stream Bandit is a custom streaming platform built around Supabase movies, safe release checks, accessible playback, saved lists, creator tools and clear policy pages.</p>
+      <p>Stream Bandit is a custom streaming platform built around Supabase movies, safe release checks, accessible playback, saved lists, creator tools and clear policy pages. This signed-in information page is protected by the shared Auth Gate, while its email forms stay draft-only.</p>
       <div class="actions">
         <button class="btn hot" data-form="request" type="button">Request a Title</button>
         <button class="btn primary" data-form="contact" type="button">Contact Us</button>
@@ -182,8 +182,9 @@ h3{margin:0 0 6px}
 </section>
 
 <section id="rules" class="box section">
-  <h2>Protected rules</h2>
+  <h2>Protected Rules</h2>
   <div class="checks">
+    <div class="check"><b>Auth Gate</b><p>Signed-out users are blocked by the shared Auth Gate before using About.</p></div>
     <div class="check"><b>No Supabase writes</b><p>About is informational and email-draft only.</p></div>
     <div class="check"><b>No live promotion</b><p>No index/live/publish action exists here.</p></div>
     <div class="check"><b>No billing</b><p>No payment, subscription or billing action exists here.</p></div>
@@ -196,7 +197,7 @@ h3{margin:0 0 6px}
   <div id="debugBox" class="source">Waiting...</div>
 </section>
 
-<p class="micro">About V7.12.284: clean page rail + email-draft forms + read-only information page.</p>
+<p class="micro">About V7.12.285 auth gate test: clean page rail + email-draft forms + read-only information page.</p>
 </div>
 
 <div id="formModal" class="modal" aria-hidden="true">
@@ -218,21 +219,22 @@ h3{margin:0 0 6px}
   </div>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=about-clean-nav-284"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=about-clean-nav-284"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=about-clean-nav-284"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=about-clean-nav-284"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=about-clean-nav-284"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=about-clean-nav-284"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=about-clean-nav-284"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=about-clean-nav-284"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=about-clean-nav-284"></script>
+<script src="stream-bandit-shell-v6-24.js?v=about-auth-gate-285"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=about-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=about-auth-gate-285"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=about-auth-gate-285"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=about-auth-gate-285"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=about-auth-gate-285"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=about-auth-gate-285"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=about-auth-gate-285"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=about-auth-gate-285"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=about-auth-gate-285"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.284 About Clean Navigation';
+const VERSION='V7.12.285 About Auth Gate Test';
 const SEARCH='global-search-global-helpers-v7-4-9-test.html';
 const TO=['info','chatterfriendsstreambandit.co.uk'].join('@');
 let activeForm='contact';
@@ -320,12 +322,14 @@ async function refreshSavedCounters(force){
 
 function helper(){
  try{
+  if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();
   if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();
   if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();
   if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();
  }catch(e){}
  refreshSavedCounters(false);
- $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
+ $('helperStatus').innerHTML='<b>Foundation:</b> Auth Gate '+(window.StreamBanditAuthGate?'✅':'⚠️')+
+  ' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
   ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
   ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
   ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
@@ -334,6 +338,8 @@ function helper(){
  $('debugBox').textContent=JSON.stringify({
   version:VERSION,
   page:'About',
+  authGate:!!window.StreamBanditAuthGate,
+  signedInInfoPage:true,
   cleanNavigation:true,
   topRail:true,
   readOnly:true,
@@ -385,7 +391,8 @@ setTimeout(helper,700);
 setTimeout(()=>refreshSavedCounters(true),1600);
 setTimeout(helper,1800);
 setInterval(helper,6000);
-document.documentElement.dataset.sbAbout='v7-12-284';
+document.documentElement.dataset.sbAbout='v7-12-285';
+document.documentElement.dataset.sbAboutAuthGate='v7-12-285';
 
 })();
 </script>
