@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Player 1 V7.12.268</title>
+<title>Stream Bandit Player 1 V7.12.269 Auth Gate Test</title>
 <link rel="icon" type="image/png" sizes="16x16" href="stream_bandit_stag_icon_16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple_touch_icon_180.png">
@@ -183,7 +183,7 @@ h2{margin:0 0 10px;font-size:22px}
 }
 </style>
 </head>
-<body data-sb-player-menu-url="player-one-global-helpers-v7-3-3-test.html">
+<body data-sb-player-menu-url="player-one-global-helpers-v7-3-3-test.html" data-sb-auth-gate-player1-test="v7-13-005">
 <div class="wrap">
 
 <section class="box pillTabs topRail">
@@ -199,9 +199,9 @@ h2{margin:0 0 10px;font-size:22px}
 </section>
 
 <section class="hero">
-  <span class="badge">V7.12.268 Player 1 · Source Bridge Fix</span>
+  <span class="badge">V7.12.269 Player 1 · Auth Gate Test</span>
   <h1 id="title">Stream Bandit Player 1</h1>
-  <p>Compact single-title player with Mux/HLS/direct video boost preserved, plus YouTube/Vimeo iframe support. Details and saves keep the real movie id when a source override is used.</p>
+  <p>Compact single-title player with Mux/HLS/direct video boost preserved, plus YouTube/Vimeo iframe support. Auth Gate V7.13.005 is now attached here after Index, Home, Library and Details passes.</p>
   <div class="actions">
     <a id="detailsTop" class="btn primary" href="details-clean-machine-v7-12-38-test.html">Details</a>
     <a class="btn" href="accessibility-clean-machine-v7-12-44-test.html">Player Comfort</a>
@@ -299,24 +299,25 @@ h2{margin:0 0 10px;font-size:22px}
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Player 1 V7.12.268 source bridge fix. Existing Player 1 URL and playback logic preserved.</p>
+<p class="micro">Player 1 V7.12.269 auth gate test. Existing Player 1 URL, source bridge, playback logic, audio boost, resume and watch history preserved.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=player1-source-bridge-v7-12-268"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=player1-source-bridge-v7-12-268"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=player1-source-bridge-v7-12-268"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=player1-source-bridge-v7-12-268"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=player1-source-bridge-v7-12-268"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=player1-source-bridge-v7-12-268"></script>
-<script src="continue-resume-player-v6-73.js?v=player1-source-bridge-v7-12-268"></script>
-<script src="watch-history-player-v6-74.js?v=player1-source-bridge-v7-12-268"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=player1-source-bridge-v7-12-268"></script>
+<script src="stream-bandit-shell-v6-24.js?v=player1-auth-gate-269"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=player1-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=player1-auth-gate-269"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=player1-auth-gate-269"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=player1-auth-gate-269"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=player1-auth-gate-269"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=player1-auth-gate-269"></script>
+<script src="continue-resume-player-v6-73.js?v=player1-auth-gate-269"></script>
+<script src="watch-history-player-v6-74.js?v=player1-auth-gate-269"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=player1-auth-gate-269"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION = 'V7.12.268 Player 1 Source Bridge Fix';
+const VERSION = 'V7.12.269 Player 1 Auth Gate Test';
 const DETAILS = 'details-clean-machine-v7-12-38-test.html';
 const LIBRARY = 'library-global-helpers-v7-4-8-test.html';
 const FALLBACK_SUPABASE_URL = 'https://xzxqfrvqdgkzwujbkdbk.supabase.co';
@@ -813,6 +814,7 @@ function updateProgress(){
     playerMode: 'Player 1 single title',
     detailsRoute: DETAILS,
     version: VERSION,
+    authGate: !!window.StreamBanditAuthGate,
     provider: resolved ? resolved.provider : null,
     mode: resolved ? resolved.mode : null,
     boostAvailable: resolved ? resolved.canBoost : false
@@ -864,6 +866,7 @@ function render(){
   $('debug').textContent = JSON.stringify({
     version: VERSION,
     route: 'player-one-global-helpers-v7-3-3-test.html',
+    authGateAttached: !!window.StreamBanditAuthGate,
     oldUrlPreserved: true,
     sourceOverrideKeptRealMovieId: !!param('id') && !!param('src'),
     row: row,
@@ -981,6 +984,7 @@ async function load(){
 
 function helper(){
   try{
+    if(window.StreamBanditAuthGate && window.StreamBanditAuthGate.enforce) window.StreamBanditAuthGate.enforce();
     if(window.StreamBanditThemeProjector && window.StreamBanditThemeProjector.refresh) window.StreamBanditThemeProjector.refresh();
     if(window.StreamBanditHeaderShell && window.StreamBanditHeaderShell.refresh) window.StreamBanditHeaderShell.refresh();
     if(window.StreamBanditFooterShell && window.StreamBanditFooterShell.refresh) window.StreamBanditFooterShell.refresh();
@@ -989,7 +993,8 @@ function helper(){
   }catch(e){}
 
   $('helperStatus').innerHTML =
-    '<b>Foundation:</b> Header ' + (window.StreamBanditHeaderShell ? '✅' : 'checking') +
+    '<b>Foundation:</b> Auth Gate ' + (window.StreamBanditAuthGate ? '✅' : 'checking') +
+    ' · Header ' + (window.StreamBanditHeaderShell ? '✅' : 'checking') +
     ' · Footer ' + (window.StreamBanditFooterShell ? '✅' : 'checking') +
     ' · Full search ' + (window.StreamBanditLiveReadinessSearchFallback ? '✅' : 'checking') +
     ' · Saves ' + (window.StreamBanditCoreSavesV675 ? '✅' : 'checking') +
@@ -1085,11 +1090,12 @@ function boot(){
   setTimeout(updateProgress, 1200);
   setInterval(helper, 6000);
 
-  document.documentElement.dataset.sbPlayer1ProviderPromoted = 'v7-12-268';
+  document.documentElement.dataset.sbPlayer1ProviderPromoted = 'v7-12-269';
 
   window.StreamBanditPlayer1ProviderPromotedV712266 = {
     version: VERSION,
     route: 'player-one-global-helpers-v7-3-3-test.html',
+    authGateAttached: true,
     resolveSource: resolveSource,
     current: function(){
       return {row: row, resolved: resolved};
