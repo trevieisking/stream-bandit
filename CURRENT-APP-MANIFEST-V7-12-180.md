@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.084
+# Stream Bandit Current App Manifest V7.13.085
 
 Date: 2026-06-21
 
@@ -6,23 +6,24 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest checkpoint
 
-`V7.13.084 Watch Group Auth Gate Full Pass / Accessibility Passed / Checkpoint Created / Index Promoted / Supabase Library Editor Admin Gate First-Time Pass / Genres Auth Gate Pass / Global Search Auth Gate Pass / Manifest Updated`
+`V7.13.085 Browse Group Auth Gate Full Pass / About Passed / Checkpoint Created / Index Promoted / Manifest Updated`
 
-Checkpoint file:
+Checkpoint files:
 
-`CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
+- `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
+- `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
 
-## Repository count rule completed
+## Repository count rule completed for this pass
 
-Three old V5 checkpoints were removed before creating the Watch Group checkpoint:
+Three old V6/V5 checkpoint files were removed before creating the Browse Group checkpoint:
 
-- `CHECKPOINT-V5.20.2.md`
-- `CHECKPOINT-V5.22.1.md`
-- `CHECKPOINT-V5.23.2.md`
+- `CHECKPOINT-GROUP-PLAY-PLAYER-2-V6-78-9-4-PASSED.md`
+- `CHECKPOINT-PLAYER2-GLOBAL-CARRY-V6-78-9-4-PASSED.md`
+- `CHECKPOINT-V5.24.1.md`
 
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / INDEX LISTS CURRENT WATCH GROUP LINKS / BROWSE GROUP IN PROGRESS / SUPABASE LIBRARY EDITOR AUTH GATE PLUS ADMIN LOCK PASSED FIRST TIME / GENRES AUTH GATE PASSED / GLOBAL SEARCH AUTH GATE PASSED / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
+`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / SUPABASE LIBRARY EDITOR ADMIN LOCK PASSED FIRST TIME / GENRES PASSED / GLOBAL SEARCH PASSED / ABOUT PASSED / INDEX LISTS CURRENT WATCH AND BROWSE LINKS / NEWS FEED MEDIA ISSUE LOGGED FOR LATER`
 
 Confirmed boundaries:
 
@@ -34,13 +35,15 @@ Confirmed boundaries:
 - no player/audio/accessibility regression work
 - no Header Shell mass auth-gate injection
 - no admin or owner permission-system rewrite
-- no News Feed code change during this documentation pass
+- no News Feed code change during this documentation/index promotion pass
 - no schema fields invented for Supabase Library Editor
 - no storage delete added to Supabase Library Editor
 - no `sb_movies` writes added to Genres
 - no movie deletion added to Genres
 - no Supabase writes added to Global Search
 - no admin/owner role gate added to Global Search
+- no Supabase writes added to About
+- no live/publish/billing/policy edit action added to About
 
 ## Index promotion
 
@@ -50,9 +53,11 @@ File promoted:
 
 Index version:
 
-`V7.13.021 Platform Entry Watch Group Promoted`
+`V7.13.022 Platform Entry Browse Group Promoted`
 
-Index now lists the passed Watch Group using the existing old/current URLs:
+Index now lists the passed Watch Group and Browse Group using the existing old/current URLs.
+
+Watch Group links:
 
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html`
 - Watch History: `watch-history-global-helpers-v7-4-0-test.html`
@@ -60,6 +65,13 @@ Index now lists the passed Watch Group using the existing old/current URLs:
 - Favourites: `favourites-clean-machine-v7-12-41-test.html`
 - Likes: `likes-clean-machine-v7-12-42-test.html`
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html`
+
+Browse Group links:
+
+- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html`
+- Genres: `genres-clean-machine-v7-12-45-test.html`
+- Global Search: `global-search-global-helpers-v7-4-9-test.html`
+- About: `about-global-helpers-v7-4-7-test.html`
 
 Index remains the platform entry and route launcher. Home remains:
 
@@ -85,192 +97,85 @@ Passed pages:
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html`
 - Genres: `genres-clean-machine-v7-12-45-test.html`
 - Global Search: `global-search-global-helpers-v7-4-9-test.html`
+- About: `about-global-helpers-v7-4-7-test.html`
 
-## Browse group status
+## Browse group full pass
 
-Browse group routes visible in the menu:
+### Supabase Library Editor
 
-- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.279 auth gate plus admin lock passed
-- Genres: `genres-clean-machine-v7-12-45-test.html` — V7.12.283 auth gate passed
-- Global Search: `global-search-global-helpers-v7-4-9-test.html` — V7.12.284 auth gate passed
-- About: `about-global-helpers-v7-4-7-test.html` — pending Browse group gate pass
+File: `supabase-library-home-header-form-fix-v7-12-34-test.html`
 
-## Supabase Library Editor pass
+Version: `V7.12.279 Supabase Library Editor Auth Gate Test`
 
-File:
+Status: `FIRST-TIME PASS / AUTH GATE PLUS EXISTING ADMIN OWNER LOCK / EXACT ADMIN LOCK PATTERN TO REMEMBER`
 
-`supabase-library-home-header-form-fix-v7-12-34-test.html`
+Preserved:
 
-Version:
+- signed-out users hit Auth Gate first
+- signed-in non-admin/non-owner users stay blocked by page admin lock
+- admin/owner user can load editor controls
+- `sb_movies` load, create, full edit, poster upload, Play All, Details, Play and copy ID stayed preserved
+- permanent delete remains behind typed `DELETE FROM SUPABASE`
+- create/edit/delete verify-after-write behavior stayed preserved
 
-`V7.12.279 Supabase Library Editor Auth Gate Test`
+### Genres
 
-Status:
+File: `genres-clean-machine-v7-12-45-test.html`
 
-`FIRST-TIME PASS / AUTH GATE PLUS EXISTING ADMIN OWNER LOCK / EXACT ADMIN LOCK PATTERN TO REMEMBER`
+Version: `V7.12.283 Genres Auth Gate Test`
 
-Gate order that passed:
+Status: `PASSED / SIGNED-IN BROWSE / ADMIN OWNER MANAGED GENRE TOOLS PRESERVED`
 
-1. Signed-out users hit the shared Auth Gate first.
-2. Signed-in non-admin/non-owner users remain blocked by the page admin lock and can go back Home/Public Library.
-3. Admin/owner user can load editor controls and use the workbench.
+Preserved:
 
-Trevor browser-test result:
-
-- admin account sign-out/login passed
-- girlfriend signed-in non-admin account hit the page and was not allowed through
-- non-admin route offered return to Home
-- edit image on form passed
-- Play All passed
-- all movies display passed
-- filter passed
-- search passed
-- Details links passed
-- Play links passed
-- copy movie ID link passed
-- single Header and single Footer passed
-- menu overlay passed
-- menu overlay filter passed
-
-Preserved editor functions and locks:
-
-- `sb_movies` load preserved
-- create video preserved
-- edit full video form preserved
-- poster/image upload preserved
-- permanent delete preserved behind typed `DELETE FROM SUPABASE`
-- create/edit/delete verify-after-write behavior preserved
-- Play All visible in Player 2 preserved
-- Details route preserved
-- Player 1 route preserved
-- route lock helper preserved
-- protected page helper preserved
-- no schema invented
-- no RLS changed
-- no storage policy changed
-- no storage delete added
-- no Header Shell mass auth-gate injection
-
-## Genres pass
-
-File:
-
-`genres-clean-machine-v7-12-45-test.html`
-
-Version:
-
-`V7.12.283 Genres Auth Gate Test`
-
-Status:
-
-`PASSED / SIGNED-IN BROWSE / ADMIN OWNER MANAGED GENRE TOOLS PRESERVED`
-
-Trevor browser-test result:
-
-- Genres page passed
-- page works after the auth gate attachment
-- Browse group permission model remained correct
-
-Preserved Genres behavior and locks:
-
-- shared Auth Gate blocks signed-out users before page use
 - signed-in users can browse active Supabase movies by genre
 - `sb_movies` remains read-only from this page
-- `sb_genres` managed label read stayed preserved
-- admin/owner authority check stayed preserved through `StreamBanditAccountAuthority`
-- admin/owner-only Create Genre stayed preserved
-- admin/owner-only Delete Managed Genre stayed preserved
+- `sb_genres` managed label reads stayed preserved
+- admin/owner-only Create Genre and Delete Managed Genre stayed preserved
 - deleting a managed genre deletes only the `sb_genres` label
-- deleting a managed genre does not delete movies
-- deleting a managed genre does not edit movie genre arrays
-- genre search stayed preserved
-- movie search stayed preserved
-- genre sort stayed preserved
-- movie sort stayed preserved
-- Details links stayed preserved
-- Player 1 Play links stayed preserved
-- shared save buttons stayed preserved
-- clean top rail stayed preserved
-- Header/Footer/Theme/Search helper bridge stayed preserved
-- no SQL, RLS, storage, payment, schema or Header Shell mass-gate change
+- movie rows and movie genre arrays are not deleted or edited
 
-## Global Search pass
+### Global Search
 
-File:
+File: `global-search-global-helpers-v7-4-9-test.html`
 
-`global-search-global-helpers-v7-4-9-test.html`
+Version: `V7.12.284 Global Search Auth Gate Test`
 
-Version:
+Status: `PASSED / SIGNED-IN READ-ONLY SEARCH / HEADER QUERY HANDOFF PRESERVED`
 
-`V7.12.284 Global Search Auth Gate Test`
+Preserved:
 
-Status:
-
-`PASSED / SIGNED-IN READ-ONLY SEARCH / HEADER QUERY HANDOFF PRESERVED`
-
-Trevor browser-test result:
-
-- Global Search passed
-- page works after the auth gate attachment
-- Browse group read-only search model remained correct
-
-Preserved Global Search behavior and locks:
-
-- shared Auth Gate blocks signed-out users before page use
-- no admin/owner role check was added
 - read-only search stayed preserved
-- `sb_movies` read stayed preserved
-- `sb_channels` optional read stayed preserved
-- `sb_playlists` optional read stayed preserved
-- pages and policy results stayed preserved
+- `sb_movies`, optional `sb_channels`, optional `sb_playlists`, pages and policy results stayed preserved
 - header query handoff stayed preserved
-- search input stayed preserved
-- type filter stayed preserved
-- source filter stayed preserved
-- sort stayed preserved
-- chips stayed preserved
-- Details links stayed preserved
-- Player 1 Play links stayed preserved
-- shared save buttons stayed preserved
-- clean top rail stayed preserved
-- Header/Footer/Theme/Search helper bridge stayed preserved
+- search input, type filter, source filter, sort, chips, Details, Play and shared save buttons stayed preserved
+- no admin/owner role check was added
 - no Supabase writes were added
-- no SQL, RLS, storage, payment, schema or Header Shell mass-gate change
+
+### About
+
+File: `about-global-helpers-v7-4-7-test.html`
+
+Version: `V7.12.285 About Auth Gate Test`
+
+Status: `PASSED / SIGNED-IN INFORMATION PAGE / EMAIL-DRAFT-ONLY FORMS PRESERVED`
+
+Preserved:
+
+- signed-out users are blocked by Auth Gate before using About
+- page remains informational and read-only
+- contact/request/playback/accessibility/creator/policy/removal/business/bug forms remain mailto/email-draft-only
+- no Supabase writes, tickets, uploads, billing, live promotion or policy editing were added
+- policy links, modal scroll behavior, header counters, clean top rail and helper bridges stayed preserved
 
 ## Current Watch Group results
 
-### Continue Watching
-
-- V7.12.231 Auth Gate Test passed
-- read-only progress, dedupe, resume links, save buttons, Details links and clean navigation stayed preserved
-
-### Watch History
-
-- V7.12.227 Auth Gate Test passed
-- read-only history/progress, dedupe, resume links, save buttons, Details links and theme tabs stayed preserved
-
-### Watchlist
-
-- V7.12.160 Auth Gate Test passed
-- `sb_watchlist` read, search/filter, sort, shared save buttons, Details links, Player 1 links and clean top rail stayed preserved
-
-### Favourites
-
-- V7.12.160 Auth Gate Test passed
-- `sb_favourites` read, search/filter, sort, shared save buttons, Details links, Player 1 links and clean top rail stayed preserved
-
-### Likes
-
-- V7.12.159 Auth Gate Test passed
-- `sb_likes` read, search/filter, sort, shared save buttons, Details links, Player 1 links and clean top rail stayed preserved
-
-### Accessibility
-
-- V7.12.229 Auth Gate Test passed
-- localStorage-only readability controls stayed preserved
-- Theme Projector bridge stayed preserved
-- text scale, contrast, reduced motion and preferred player boost reminder stayed preserved
-- no Supabase writes were added
+- Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
+- Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate passed
+- Watchlist: `watchlist-clean-machine-v7-12-43-test.html` — V7.12.160 auth gate passed
+- Favourites: `favourites-clean-machine-v7-12-41-test.html` — V7.12.160 auth gate passed
+- Likes: `likes-clean-machine-v7-12-42-test.html` — V7.12.159 auth gate passed
+- Accessibility: `accessibility-clean-machine-v7-12-44-test.html` — V7.12.229 auth gate passed
 
 ## User save-page boundary
 
@@ -282,17 +187,20 @@ Accessibility is a local comfort/readability page. It must not become a Supabase
 
 ## Browse group boundary
 
-Supabase Library Editor is admin/owner only because it can create, edit, upload poster URLs and permanently delete `sb_movies` rows. Genres is signed-in browse with admin/owner-only managed genre tools. Global Search is signed-in read-only search. About must be handled page-by-page and must keep its own existing role model. Do not attach the gate from Header Shell.
+Browse Group is permission-mixed and must stay page-by-page:
+
+- Supabase Library Editor is admin/owner only.
+- Genres is signed-in browse with admin/owner-only managed genre tools.
+- Global Search is signed-in read-only search.
+- About is signed-in info/contact with email-draft-only forms.
+
+Do not attach the gate from Header Shell. Do not flatten Browse pages into one permission type.
 
 ## News Feed media issue logged for later
 
-File:
+File: `news-feed-social-v7-13-001-test.html`
 
-`news-feed-social-v7-13-001-test.html`
-
-Status:
-
-`LOGGED / FIX LATER IN A DEDICATED SOCIAL NEWS FEED MEDIA LAYOUT PASS`
+Status: `LOGGED / FIX LATER IN A DEDICATED SOCIAL NEWS FEED MEDIA LAYOUT PASS`
 
 Observed from Trevor's browser screenshot:
 
@@ -301,19 +209,11 @@ Observed from Trevor's browser screenshot:
 - The video card/player area below appears as a large black media box.
 - Trevor reports the video still plays, but the visible player/media is not correctly shown.
 
-Future fix direction:
-
-- inspect News Feed media-card CSS, image sizing, video/player sizing, poster/preview handling and overflow/height rules
-- make the post image display correctly
-- make the video player/card visibly show the intended media area
-- preserve News Feed posts, comments, reactions, likes, visibility and account ownership behavior
-- do not change SQL, RLS, storage policies, payments, owner/admin permissions or Header Shell gate behavior in that media layout pass unless separately approved
-
 ## Current route groups by function
 
 ### Platform / core watch
 
-- Platform Entry: `index.html` — V7.13.021 Watch Group promoted
+- Platform Entry: `index.html` — V7.13.022 Browse Group promoted
 - Home: `home-global-helpers-v7-4-4-test.html`
 - Library: `library-global-helpers-v7-4-8-test.html`
 - Details: `details-clean-machine-v7-12-38-test.html`
@@ -331,7 +231,7 @@ Future fix direction:
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.279 auth gate plus admin lock passed
 - Genres: `genres-clean-machine-v7-12-45-test.html` — V7.12.283 auth gate passed
 - Global Search: `global-search-global-helpers-v7-4-9-test.html` — V7.12.284 auth gate passed
-- About: `about-global-helpers-v7-4-7-test.html`
+- About: `about-global-helpers-v7-4-7-test.html` — V7.12.285 auth gate passed
 
 ### Social group
 
