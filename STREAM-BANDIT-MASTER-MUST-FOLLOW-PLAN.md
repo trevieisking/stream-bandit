@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.095
+# Stream Bandit Master Must-Follow Plan V7.13.096
 
 Date: 2026-06-22
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / SUBMIT VIDEO AUTH GATE PASS / RULES AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS / MAESTRO UPLOAD WORKFLOW RETIRED FOR NEW OWNER ADMIN UPLOADS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY PLAYLISTS AUTH GATE PASS / SUBMIT VIDEO AUTH GATE PASS / RULES AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS / MAESTRO UPLOAD WORKFLOW RETIRED FOR NEW OWNER ADMIN UPLOADS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -15,18 +15,20 @@ Strong rollback checkpoints now available:
 - `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
 - `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 
+No new rollback checkpoint is created for the Playlists page pass because the cleanup/checkpoint rule applies after a full group pass.
+
 ## 2. Source of truth hierarchy
 
 Future decisions must start from:
 
 1. `CURRENT-APP-MANIFEST-V7-12-180.md`
 2. `STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md`
-3. `CHECKPOINT-CREATOR-GROUP-AUTH-GATE-FULL-PASS-V7-13-095.md`
-4. `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
-5. `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
-6. `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
-7. Current page source fetched directly from GitHub or complete user-supplied full file
-8. Browser smoke test result
+3. Current page source fetched directly from GitHub or complete user-supplied full file
+4. Browser smoke test result
+5. `CHECKPOINT-CREATOR-GROUP-AUTH-GATE-FULL-PASS-V7-13-095.md`
+6. `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
+7. `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
+8. `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 
 Direct GitHub fetch beats old checkpoint text when they disagree. If GitHub output truncates an HTML or JavaScript file and Trevor has the full page, use the full supplied page as the base.
 
@@ -63,6 +65,7 @@ No future pass may touch these without explicit separate approval:
 - Submit Video direct `sb_movies` writes or publish behavior without separate approval
 - Review Queue approval/publish logic rewrites without full-file review and separate approval
 - Rules Supabase writes, uploads, approvals, deletes, migrations, storage policy changes or publishing actions without separate approval
+- Playlists schema changes, public unrestricted playlist writes, Supabase Library editor access, all-users-private fallback, or entitlement bypass without separate approval
 - Player 1 or Player 2 playback compatibility rewrites without preserving audio boost, fullscreen, source bridge, resume, watch history and accessibility comfort
 - Mux token ID, Mux token secret, webhook secret, signing key, service-role key or any private credential in GitHub Pages, HTML, JavaScript, screenshots, docs or chat
 - Mux Manager public/unrestricted upload behavior without separate approval
@@ -79,15 +82,17 @@ Index version:
 
 `V7.13.024 Platform Entry Creator Group Full Pass + Mux Manager Live Candidate`
 
-Index now lists the passed Watch Group, Browse Group, Creator Group and Mux Manager media-management live candidate while keeping existing current page URLs. Home remains:
+Index currently lists the passed Watch Group, Browse Group, Creator Group and Mux Manager media-management live candidate while keeping existing current page URLs. Home remains:
 
 `home-global-helpers-v7-4-4-test.html`
+
+Group Play is not promoted as a full group yet. Only Playlists has passed in this group so far.
 
 Mux Manager link remains promoted:
 
 - Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — `V7.12.308 Mux Manager Stale ID Recovery + Collection Attach`
 
-Creator Group links now promoted as current passed candidates:
+Creator Group links remain promoted as current passed candidates:
 
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — `V7.12.289 Submit Video Auth Gate Test`
 - Rules: `rules-clean-machine-v7-12-82-test.html` — `V7.12.291 Creator Rules Auth Gate Test`
@@ -127,6 +132,7 @@ Passed auth-gate attachment pages:
 - `submit-video-clean-machine-v7-12-79-test.html`
 - `rules-clean-machine-v7-12-82-test.html`
 - `review-queue-clean-machine-v7-12-80-publish-test.html`
+- `playlists-global-helpers-v7-5-2-test.html`
 
 ## 7. Mux Manager live candidate rule
 
@@ -196,7 +202,7 @@ Browse Group is permission-mixed and must not be handled as one flat page type.
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — admin/owner only, passed first time with Auth Gate plus admin lock
 - Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — owner/admin media-management live candidate
 - Collections: `collections-clean-machine-v7-12-51-test.html` — collection browsing/management page
-- Playlists: `playlists-global-helpers-v7-5-2-test.html` — playlist page
+- Playlists: `playlists-global-helpers-v7-5-2-test.html` — also part of Group Play; V7.12.292 Auth Gate passed after Trevor browser test
 - Channels: `channels-global-helpers-v7-5-3-test.html` — channel page
 - Genres: `genres-clean-machine-v7-12-45-test.html` — signed-in browse plus admin/owner genre tools, passed
 - Global Search: `global-search-global-helpers-v7-4-9-test.html` — signed-in read-only search, passed
@@ -216,7 +222,33 @@ Current Creator routes:
 
 Creator Group full pass confirmed by Trevor after Rules browser test. Submit Video writes only to `sb_submissions`. Rules remains read-only and never writes, uploads, approves, deletes, migrates, changes storage policy or publishes. Review Queue remains the admin/owner review and publish path into Library. Mux Manager is an owner/admin media-management tool and does not make Submit Video public uploads unrestricted.
 
-## 10. Watch Group full pass results
+## 10. Group Play controlled pass status
+
+Group Play pages are being handled one page at a time under the controlled Auth Gate rollout. This is not a full group pass yet.
+
+Current Group Play routes:
+
+- Playlists: `playlists-global-helpers-v7-5-2-test.html` — V7.12.292 Playlists Auth Gate Test — passed by Trevor browser test
+- Channels: `channels-global-helpers-v7-5-3-test.html` — next candidate
+- My Channel: `my-channel-clean-machine-v7-12-47-test.html` — pending
+- Collections: `collections-clean-machine-v7-12-51-test.html` — pending in this group pass
+- Player 2: `player-2-clean-machine-v7-12-58-test.html` — pending
+
+Playlists preserved rules:
+
+- signed-out users hit Auth Gate first
+- signed-in users load the Playlists page
+- existing playlist browse stayed preserved
+- own playlist create/edit/delete behavior stayed page-owned and entitlement-limited
+- add/remove videos to own playlists stayed page-owned and entitlement-limited
+- `sb_playlists`, `sb_playlist_movies`, `sb_movies` and `sb_profiles` behavior stayed preserved
+- no schema change
+- no Supabase Library editor access added
+- no index/registry promotion
+- no all-users-private fallback
+- no Header Shell mass auth-gate embedding
+
+## 11. Watch Group full pass results
 
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
 - Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate passed
@@ -225,7 +257,7 @@ Creator Group full pass confirmed by Trevor after Rules browser test. Submit Vid
 - Likes: `likes-clean-machine-v7-12-42-test.html` — V7.12.159 auth gate passed
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html` — V7.12.229 auth gate passed
 
-## 11. Known issues logged for later
+## 12. Known issues logged for later
 
 ### News Feed media issue
 
