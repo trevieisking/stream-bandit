@@ -54,11 +54,14 @@
     }catch(err){console.error(err);setStatus('Load failed','bad');toast('Could not load history: '+(err.message||err));}
   }
   function addPanel(){
-    var main=$('.main');if(!main||$('#clHistoryPanel'))return;
+    var main=$('.main');
+    if(!main){setTimeout(addPanel,120);return;}
+    if($('#clHistoryPanel'))return;
     var panel=document.createElement('section');panel.className='panel';panel.id='clHistoryPanel';
     panel.innerHTML='<h2>Supabase Repair History</h2><p>Save this repair job to your private Code Labs tables. This uses authenticated owner-only rows and still does not write to GitHub or change live files.</p><div class="actions"><span id="clHistoryStatus" class="badge warn">Not checked</span><button class="btn primary" id="clSaveHistory">Save repair history</button><button class="btn ghost" id="clLoadHistory">Load saved history</button></div><div class="notice"><p><b>Sign-in rule:</b> You must be signed in on this domain. If saving says sign in needed, open the normal site login/profile page first, sign in, then return here.</p></div><div id="clHistoryList" class="list"><div class="empty">History not loaded yet.</div></div>';
     var safety=$('#clSafetyTools');var footer=$('.footerNote');if(safety&&safety.parentNode){safety.parentNode.insertBefore(panel,safety.nextSibling);}else if(footer){main.insertBefore(panel,footer);}else{main.appendChild(panel);} 
     $('#clSaveHistory').onclick=saveAll;$('#clLoadHistory').onclick=loadHistory;currentUser().then(function(cu){setStatus(cu.user?'Signed in':'Sign in needed',cu.user?'good':'bad');});
   }
-  document.addEventListener('DOMContentLoaded',function(){setTimeout(addPanel,140);});
+  function start(){setTimeout(addPanel,180);setTimeout(addPanel,650);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
