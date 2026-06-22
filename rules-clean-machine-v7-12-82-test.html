@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Creator Rules V7.12.286</title>
+<title>Stream Bandit Creator Rules V7.12.291 Auth Gate Test</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -82,7 +82,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 }
 </style>
 </head>
-<body data-sb-rules-menu-url="rules-clean-machine-v7-12-82-test.html">
+<body data-sb-rules-menu-url="rules-clean-machine-v7-12-82-test.html" data-sb-auth-gate-rules-test="v7-13-005">
 <div class="wrap">
 
 <section class="box pillTabs topRail">
@@ -106,7 +106,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.286 Creator Rules · Platform Truth Map</span>
+      <span class="badge">V7.12.291 Creator Rules · Auth Gate Test</span>
       <h1>Creator Rulebook</h1>
       <p>This page is the real map for Creator, Admin, Owner, Pricing, User Dashboard, Supabase tables, global helpers, Theme Bridge and page-owned jobs. It explains what everything is doing before we edit Submit Video, Review Queue or group-play pages.</p>
       <div class="routeStrip"><span>Submit → sb_submissions</span><span>Review → approve / decline</span><span>Publish → sb_movies</span><span>Plans → Pricing Matrix</span><span>Roles → User Dashboard</span></div>
@@ -346,24 +346,25 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debugBox" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Creator Rules V7.12.286: full platform truth map + Supabase table family + account/pricing links + clean Creator rail.</p>
+<p class="micro">Creator Rules V7.12.291 auth gate test: full platform truth map + Supabase table family + account/pricing links + clean Creator rail.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=creator-rules-truth-286"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=creator-rules-truth-286"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=creator-rules-truth-286"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=creator-rules-truth-286"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=creator-rules-truth-286"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=creator-rules-truth-286"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=creator-rules-truth-286"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=creator-rules-truth-286"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=creator-rules-truth-286"></script>
+<script src="stream-bandit-shell-v6-24.js?v=creator-rules-auth-gate-291"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=creator-rules-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=creator-rules-auth-gate-291"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=creator-rules-auth-gate-291"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=creator-rules-auth-gate-291"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=creator-rules-auth-gate-291"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=creator-rules-auth-gate-291"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=creator-rules-auth-gate-291"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=creator-rules-auth-gate-291"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=creator-rules-auth-gate-291"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.286 Creator Rules Platform Truth Map';
+const VERSION='V7.12.291 Creator Rules Auth Gate Test';
 let countBusy=false;
 let countReady=false;
 let lastCountRead=0;
@@ -400,12 +401,14 @@ function showTab(id){
 
 function helper(){
  try{
+  if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();
   if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();
   if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();
   if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();
  }catch(e){}
  refreshSavedCounters(false);
- $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
+ $('helperStatus').innerHTML='<b>Foundation:</b> Auth Gate '+(window.StreamBanditAuthGate?'✅':'⚠️')+
+  ' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
   ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
   ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
   ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
@@ -488,7 +491,8 @@ setTimeout(helper,700);
 setTimeout(()=>refreshSavedCounters(true),1600);
 setTimeout(helper,1800);
 setInterval(helper,6000);
-document.documentElement.dataset.sbCreatorRules='v7-12-286';
+document.documentElement.dataset.sbCreatorRules='v7-12-291';
+document.documentElement.dataset.sbCreatorRulesAuthGate='v7-12-291';
 
 })();
 </script>
