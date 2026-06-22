@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.097
+# Stream Bandit Master Must-Follow Plan V7.13.098
 
 Date: 2026-06-22
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY PLAYLISTS AUTH GATE PASS / GROUP PLAY CHANNELS AUTH GATE PASS / SUBMIT VIDEO AUTH GATE PASS / RULES AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS / MAESTRO UPLOAD WORKFLOW RETIRED FOR NEW OWNER ADMIN UPLOADS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY PLAYLISTS AUTH GATE PASS / GROUP PLAY CHANNELS AUTH GATE PASS / GROUP PLAY MY CHANNEL AUTH GATE PASS / SUBMIT VIDEO AUTH GATE PASS / RULES AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS / MAESTRO UPLOAD WORKFLOW RETIRED FOR NEW OWNER ADMIN UPLOADS / CHANNEL-SPECIFIC VIDEO PLACEMENT LOCK LOGGED FOR FUTURE DEDICATED PASS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -15,7 +15,7 @@ Strong rollback checkpoints now available:
 - `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
 - `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 
-No new rollback checkpoint is created for the Playlists or Channels page pass because the cleanup/checkpoint rule applies after a full group pass.
+No new rollback checkpoint is created for the Playlists, Channels or My Channel page pass because the cleanup/checkpoint rule applies after a full group pass.
 
 ## 2. Source of truth hierarchy
 
@@ -67,6 +67,8 @@ No future pass may touch these without explicit separate approval:
 - Rules Supabase writes, uploads, approvals, deletes, migrations, storage policy changes or publishing actions without separate approval
 - Playlists schema changes, public unrestricted playlist writes, Supabase Library editor access, all-users-private fallback, or entitlement bypass without separate approval
 - Channels schema changes, `is_public` column dependency, public unrestricted channel writes, Supabase Library editor access, all-users-private fallback, or entitlement bypass without separate approval
+- My Channel schema changes, all-users-content fallback, Supabase Library editor access, unrestricted channel placement, or entitlement bypass without separate approval
+- Channel-specific video placement lock implementation without first scanning Supabase Library Editor and Mux Manager
 - Player 1 or Player 2 playback compatibility rewrites without preserving audio boost, fullscreen, source bridge, resume, watch history and accessibility comfort
 - Mux token ID, Mux token secret, webhook secret, signing key, service-role key or any private credential in GitHub Pages, HTML, JavaScript, screenshots, docs or chat
 - Mux Manager public/unrestricted upload behavior without separate approval
@@ -87,17 +89,17 @@ Index currently lists the passed Watch Group, Browse Group, Creator Group and Mu
 
 `home-global-helpers-v7-4-4-test.html`
 
-Group Play is not promoted as a full group yet. Playlists and Channels have passed in this group so far.
+Group Play is not promoted as a full group yet. Playlists, Channels and My Channel have passed in this group so far.
 
 Mux Manager link remains promoted:
 
-- Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — `V7.12.308 Mux Manager Stale ID Recovery + Collection Attach`
+- Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` - `V7.12.308 Mux Manager Stale ID Recovery + Collection Attach`
 
 Creator Group links remain promoted as current passed candidates:
 
-- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — `V7.12.289 Submit Video Auth Gate Test`
-- Rules: `rules-clean-machine-v7-12-82-test.html` — `V7.12.291 Creator Rules Auth Gate Test`
-- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — `V7.12.290 Review Queue Auth Gate Test`
+- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` - `V7.12.289 Submit Video Auth Gate Test`
+- Rules: `rules-clean-machine-v7-12-82-test.html` - `V7.12.291 Creator Rules Auth Gate Test`
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` - `V7.12.290 Review Queue Auth Gate Test`
 
 This promotion does not replace Home and does not promote payments, schema/RLS/storage-policy changes, owner/admin rewrites or Header Shell mass auth-gate embedding.
 
@@ -135,6 +137,7 @@ Passed auth-gate attachment pages:
 - `review-queue-clean-machine-v7-12-80-publish-test.html`
 - `playlists-global-helpers-v7-5-2-test.html`
 - `channels-global-helpers-v7-5-3-test.html`
+- `my-channel-clean-machine-v7-12-47-test.html`
 
 ## 7. Mux Manager live candidate rule
 
@@ -201,14 +204,15 @@ For new owner/admin video uploads, the old Maestro upload workflow can be retire
 
 Browse Group is permission-mixed and must not be handled as one flat page type.
 
-- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — admin/owner only, passed first time with Auth Gate plus admin lock
-- Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — owner/admin media-management live candidate
-- Collections: `collections-clean-machine-v7-12-51-test.html` — collection browsing/management page
-- Playlists: `playlists-global-helpers-v7-5-2-test.html` — also part of Group Play; V7.12.292 Auth Gate passed after Trevor browser test
-- Channels: `channels-global-helpers-v7-5-3-test.html` — also part of Group Play; V7.12.293 Auth Gate passed after Trevor browser test
-- Genres: `genres-clean-machine-v7-12-45-test.html` — signed-in browse plus admin/owner genre tools, passed
-- Global Search: `global-search-global-helpers-v7-4-9-test.html` — signed-in read-only search, passed
-- About: `about-global-helpers-v7-4-7-test.html` — signed-in info/contact page, passed
+- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` - admin/owner only, passed first time with Auth Gate plus admin lock
+- Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` - owner/admin media-management live candidate
+- Collections: `collections-clean-machine-v7-12-51-test.html` - collection browsing/management page, pending in current Group Play pass
+- Playlists: `playlists-global-helpers-v7-5-2-test.html` - also part of Group Play; V7.12.292 Auth Gate passed after Trevor browser test
+- Channels: `channels-global-helpers-v7-5-3-test.html` - also part of Group Play; V7.12.293 Auth Gate passed after Trevor browser test
+- My Channel: `my-channel-clean-machine-v7-12-47-test.html` - also part of Group Play; V7.12.294 Auth Gate passed after Trevor browser test
+- Genres: `genres-clean-machine-v7-12-45-test.html` - signed-in browse plus admin/owner genre tools, passed
+- Global Search: `global-search-global-helpers-v7-4-9-test.html` - signed-in read-only search, passed
+- About: `about-global-helpers-v7-4-7-test.html` - signed-in info/contact page, passed
 
 Do not move this gate into Header Shell. Do not remove page-owned admin/owner locks. Do not flatten Browse or media-management pages into one permission type.
 
@@ -218,9 +222,9 @@ Creator Group is permission-mixed and must not be handled as one flat page type.
 
 Current Creator routes:
 
-- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — V7.12.289 signed-in creator submission, auth gate passed
-- Rules: `rules-clean-machine-v7-12-82-test.html` — V7.12.291 read-only workflow guidance, auth gate passed
-- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — V7.12.290 admin/owner review and publish gate, auth gate passed, preview/playback compatibility fix still logged
+- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` - V7.12.289 signed-in creator submission, auth gate passed
+- Rules: `rules-clean-machine-v7-12-82-test.html` - V7.12.291 read-only workflow guidance, auth gate passed
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` - V7.12.290 admin/owner review and publish gate, auth gate passed, preview/playback compatibility fix still logged
 
 Creator Group full pass confirmed by Trevor after Rules browser test. Submit Video writes only to `sb_submissions`. Rules remains read-only and never writes, uploads, approves, deletes, migrates, changes storage policy or publishes. Review Queue remains the admin/owner review and publish path into Library. Mux Manager is an owner/admin media-management tool and does not make Submit Video public uploads unrestricted.
 
@@ -230,11 +234,11 @@ Group Play pages are being handled one page at a time under the controlled Auth 
 
 Current Group Play routes:
 
-- Playlists: `playlists-global-helpers-v7-5-2-test.html` — V7.12.292 Playlists Auth Gate Test — passed by Trevor browser test
-- Channels: `channels-global-helpers-v7-5-3-test.html` — V7.12.293 Channels Auth Gate Test — passed by Trevor browser test
-- My Channel: `my-channel-clean-machine-v7-12-47-test.html` — pending
-- Collections: `collections-clean-machine-v7-12-51-test.html` — pending in this group pass
-- Player 2: `player-2-clean-machine-v7-12-58-test.html` — pending
+- Playlists: `playlists-global-helpers-v7-5-2-test.html` - V7.12.292 Playlists Auth Gate Test - passed by Trevor browser test
+- Channels: `channels-global-helpers-v7-5-3-test.html` - V7.12.293 Channels Auth Gate Test - passed by Trevor browser test
+- My Channel: `my-channel-clean-machine-v7-12-47-test.html` - V7.12.294 My Channel Auth Gate Test - passed by Trevor browser test
+- Collections: `collections-clean-machine-v7-12-51-test.html` - pending in this group pass
+- Player 2: `player-2-clean-machine-v7-12-58-test.html` - pending
 
 Playlists preserved rules:
 
@@ -265,16 +269,67 @@ Channels preserved rules:
 - no all-users-private fallback
 - no Header Shell mass auth-gate embedding
 
-## 11. Watch Group full pass results
+My Channel preserved rules:
 
-- Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
-- Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate passed
-- Watchlist: `watchlist-clean-machine-v7-12-43-test.html` — V7.12.160 auth gate passed
-- Favourites: `favourites-clean-machine-v7-12-41-test.html` — V7.12.160 auth gate passed
-- Likes: `likes-clean-machine-v7-12-42-test.html` — V7.12.159 auth gate passed
-- Accessibility: `accessibility-clean-machine-v7-12-44-test.html` — V7.12.229 auth gate passed
+- signed-out users hit Auth Gate first
+- signed-in users load My Channel
+- Dashboard, Edit Profile Channel, My Videos, Submissions, Permissions and Rules tabs passed
+- profile channel identity writes stayed on `sb_profiles`
+- owned videos stayed scoped to `sb_movies.owner_id`
+- owned submissions stayed scoped to `sb_submissions.submitter_id`
+- Play My Videos In Player 2 stayed preserved
+- owned-data-only rule stayed preserved
+- no schema change
+- no Supabase Library editor access added
+- no index/registry promotion
+- no all-users-content fallback
+- no Header Shell mass auth-gate embedding
 
-## 12. Known issues logged for later
+## 11. Future fix plan: channel-specific video placement lock
+
+Status: `LOGGED / DEDICATED FUTURE PASS ONLY / NOT PART OF MY CHANNEL AUTH GATE PASS`
+
+Problem to solve later:
+
+Normal non-owner/non-admin users should only be able to select or assign videos into channels they created or own. They must not be able to place videos into arbitrary channels or owner/admin channels.
+
+Important classification:
+
+- This is not a My Channel Auth Gate failure.
+- This is a cross-page workflow/permission hardening pass.
+- It likely involves Supabase Library Editor and Mux Manager first because those are current publish/placement tools.
+- Channels and My Channel should be reviewed after the first two scans.
+
+Required future workflow before changing code:
+
+1. Fetch and scan `supabase-library-home-header-form-fix-v7-12-34-test.html`.
+2. Fetch and scan `mux-manager-global-helpers-v7-10-7-test.html`.
+3. Fetch and scan `channels-global-helpers-v7-5-3-test.html`.
+4. Fetch and scan `my-channel-clean-machine-v7-12-47-test.html` if still relevant.
+5. Confirm actual Supabase table columns before coding.
+6. Preserve owner/admin rights to manage media globally.
+7. Restrict non-owner/non-admin channel placement selectors to signed-in user's owned/created channels only.
+8. Keep backend/RLS as the final authority.
+9. Do not add SQL, RLS, schema or storage policy changes unless Trevor separately approves a backend pass.
+10. Test with owner/admin and a normal creator-style account if available.
+
+Candidate pages:
+
+- `supabase-library-home-header-form-fix-v7-12-34-test.html`
+- `mux-manager-global-helpers-v7-10-7-test.html`
+- `channels-global-helpers-v7-5-3-test.html`
+- `my-channel-clean-machine-v7-12-47-test.html`
+
+## 12. Watch Group full pass results
+
+- Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` - V7.12.231 auth gate passed
+- Watch History: `watch-history-global-helpers-v7-4-0-test.html` - V7.12.227 auth gate passed
+- Watchlist: `watchlist-clean-machine-v7-12-43-test.html` - V7.12.160 auth gate passed
+- Favourites: `favourites-clean-machine-v7-12-41-test.html` - V7.12.160 auth gate passed
+- Likes: `likes-clean-machine-v7-12-42-test.html` - V7.12.159 auth gate passed
+- Accessibility: `accessibility-clean-machine-v7-12-44-test.html` - V7.12.229 auth gate passed
+
+## 13. Known issues logged for later
 
 ### News Feed media issue
 
