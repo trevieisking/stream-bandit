@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.096
+# Stream Bandit Current App Manifest V7.13.097
 
 Date: 2026-06-22
 
@@ -6,7 +6,7 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest status
 
-`V7.13.096 Watch Group Full Pass / Browse Group Full Pass / Creator Group Auth Gate Full Pass / Group Play Playlists Auth Gate Passed / Mux Manager Live Candidate / Index Promoted`
+`V7.13.097 Watch Group Full Pass / Browse Group Full Pass / Creator Group Auth Gate Full Pass / Group Play Playlists Auth Gate Passed / Group Play Channels Auth Gate Passed / Mux Manager Live Candidate / Index Promoted`
 
 Checkpoint files still in force:
 
@@ -15,11 +15,11 @@ Checkpoint files still in force:
 - `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
 - `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 
-No new rollback checkpoint was created for the Playlists page pass because cleanup/checkpoint happens after the full Group Play group pass.
+No new rollback checkpoint was created for the Playlists or Channels page pass because cleanup/checkpoint happens after the full Group Play group pass.
 
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY PLAYLISTS AUTH GATE PASSED / SUBMIT VIDEO AUTH GATE PASSED / RULES AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / MUX MANAGER LIVE CANDIDATE PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS AND MEDIA MANAGEMENT LIVE CANDIDATE`
+`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY PLAYLISTS AUTH GATE PASSED / GROUP PLAY CHANNELS AUTH GATE PASSED / SUBMIT VIDEO AUTH GATE PASSED / RULES AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / MUX MANAGER LIVE CANDIDATE PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS AND MEDIA MANAGEMENT LIVE CANDIDATE`
 
 Confirmed boundaries for this page pass:
 
@@ -34,6 +34,11 @@ Confirmed boundaries for this page pass:
 - no Playlists Supabase Library editor access added
 - no Playlists public unrestricted playlist write path added
 - no Playlists all-users-private fallback added
+- no Channels schema change
+- no Channels `is_public` column dependency added
+- no Channels Supabase Library editor access added
+- no Channels public unrestricted channel write path added
+- no Channels all-users-private fallback added
 - no Player 1 or Player 2 playback-code change during this documentation pass
 
 ## Index promotion
@@ -50,7 +55,7 @@ Index currently lists Watch Group, Browse Group, Creator Group and the Mux Manag
 
 `home-global-helpers-v7-4-4-test.html`
 
-Group Play is not promoted as a full group yet. Only Playlists has passed in this group so far.
+Group Play is not promoted as a full group yet. Playlists and Channels have passed in this group so far.
 
 ## Auth gate controlled rollout status
 
@@ -77,6 +82,7 @@ Passed pages:
 - Rules: `rules-clean-machine-v7-12-82-test.html`
 - Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
 - Playlists: `playlists-global-helpers-v7-5-2-test.html`
+- Channels: `channels-global-helpers-v7-5-3-test.html`
 
 ## Mux Manager media-management live candidate
 
@@ -130,9 +136,33 @@ Trevor browser-test result:
 - no all-users-private fallback
 - no Header Shell mass auth-gate embedding
 
+### Channels
+
+File: `channels-global-helpers-v7-5-3-test.html`
+
+Version: `V7.12.293 Channels Auth Gate Test`
+
+Status: `PASSED / GROUP PLAY PAGE PASS / SIGNED-IN CHANNELS / PROFILE CHANNEL AND OWN EXTRA CHANNEL WRITES PRESERVED / ENTITLEMENTS PRESERVED`
+
+Trevor browser-test result:
+
+- Channels passed the Auth Gate test
+- signed-out users hit Auth Gate first
+- signed-in page loads
+- channel browsing stayed preserved
+- tabs stayed preserved
+- profile channel edit stayed on `sb_profiles`
+- extra channel create/edit/delete stayed on owned `sb_channels` rows only
+- movie attach/remove stayed through `sb_group_play_set_movie_channel`
+- working `sb_channels` column list preserved with no `is_public` dependency
+- no schema change
+- no Supabase Library editor access
+- no index or registry promotion
+- no all-users-private fallback
+- no Header Shell mass auth-gate embedding
+
 Pending Group Play pages:
 
-- Channels: `channels-global-helpers-v7-5-3-test.html`
 - My Channel: `my-channel-clean-machine-v7-12-47-test.html`
 - Collections: `collections-clean-machine-v7-12-51-test.html`
 - Player 2: `player-2-clean-machine-v7-12-58-test.html`
@@ -175,7 +205,7 @@ Pending Group Play pages:
 - Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — V7.12.308 live candidate
 - Collections: `collections-clean-machine-v7-12-51-test.html`
 - Playlists: `playlists-global-helpers-v7-5-2-test.html` — V7.12.292 auth gate passed
-- Channels: `channels-global-helpers-v7-5-3-test.html`
+- Channels: `channels-global-helpers-v7-5-3-test.html` — V7.12.293 auth gate passed
 - Genres: `genres-clean-machine-v7-12-45-test.html`
 - Global Search: `global-search-global-helpers-v7-4-9-test.html`
 - About: `about-global-helpers-v7-4-7-test.html`
@@ -189,7 +219,7 @@ Pending Group Play pages:
 ### Group Play pass in progress
 
 - Playlists: `playlists-global-helpers-v7-5-2-test.html` — V7.12.292 auth gate passed
-- Channels: `channels-global-helpers-v7-5-3-test.html` — pending
+- Channels: `channels-global-helpers-v7-5-3-test.html` — V7.12.293 auth gate passed
 - My Channel: `my-channel-clean-machine-v7-12-47-test.html` — pending
 - Collections: `collections-clean-machine-v7-12-51-test.html` — pending
 - Player 2: `player-2-clean-machine-v7-12-58-test.html` — pending
