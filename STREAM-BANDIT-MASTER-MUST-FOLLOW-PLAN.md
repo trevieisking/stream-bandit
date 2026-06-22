@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.089
+# Stream Bandit Master Must-Follow Plan V7.13.090
 
 Date: 2026-06-21
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP IN PROGRESS / SUBMIT VIDEO AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER UPCHUNK UPLOAD PASS / MUX MANAGER LIBRARY STUDIO STARTED / PLAYER 1 AND PLAYER 2 MAESTRO PLAYBACK COMPATIBILITY LOGGED / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP STARTED / SUBMIT VIDEO AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED / MAESTRO UPLOAD WORKFLOW RETIRED FOR NEW OWNER ADMIN UPLOADS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -12,6 +12,7 @@ Strong rollback checkpoints now available:
 
 - `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 - `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
+- `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
 
 ## 2. Source of truth hierarchy
 
@@ -19,10 +20,11 @@ Future decisions must start from:
 
 1. `CURRENT-APP-MANIFEST-V7-12-180.md`
 2. `STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md`
-3. `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
-4. `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
-5. Current page source fetched directly from GitHub or complete user-supplied full file
-6. Browser smoke test result
+3. `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
+4. `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
+5. `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
+6. Current page source fetched directly from GitHub or complete user-supplied full file
+7. Browser smoke test result
 
 Direct GitHub fetch beats old checkpoint text when they disagree. If GitHub output truncates an HTML or JavaScript file and Trevor has the full page, use the full supplied page as the base.
 
@@ -34,7 +36,7 @@ Main App Home remains:
 
 `home-global-helpers-v7-4-4-test.html`
 
-`index.html` remains the Platform Entry, not a replacement for Home.
+`index.html` remains the Platform Entry and route launcher, not a replacement for Home.
 
 Web Builder stays Web Builder. It owns Builder Hub, Owned Pages Manager, Studio/page canvas, Published Preview, Menu Builder, Header/Footer Builder, Form Designer, Form Inbox bridge, Assets, Planning Map, Control Map and Source Map.
 
@@ -60,7 +62,7 @@ No future pass may touch these without explicit separate approval:
 - Review Queue approval/publish logic rewrites without full-file review and separate approval
 - Player 1 or Player 2 playback compatibility rewrites without preserving audio boost, fullscreen, source bridge, resume, watch history and accessibility comfort
 - Mux token ID, Mux token secret, webhook secret, signing key, service-role key or any private credential in GitHub Pages, HTML, JavaScript, screenshots, docs or chat
-- Mux Manager publish/add-to-library/write actions without admin/owner lock and separate browser smoke test
+- Mux Manager public/unrestricted upload behavior without separate approval
 
 Publishable Supabase config must remain config-only and must not be copied into docs as a secret.
 
@@ -72,11 +74,17 @@ File promoted:
 
 Index version:
 
-`V7.13.022 Platform Entry Browse Group Promoted`
+`V7.13.023 Platform Entry Mux Manager Live Candidate`
 
-Index lists the passed Watch Group and Browse Group as current app page links while keeping existing old/current URLs. Home remains:
+Index now lists the passed Watch Group, Browse Group and Mux Manager media-management live candidate while keeping existing current page URLs. Home remains:
 
 `home-global-helpers-v7-4-4-test.html`
+
+Mux Manager link promoted:
+
+- Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — `V7.12.308 Mux Manager Stale ID Recovery + Collection Attach`
+
+This promotion does not replace Home and does not promote payments, schema/RLS/storage-policy changes, owner/admin rewrites or Header Shell mass auth-gate embedding.
 
 ## 6. Auth Gate phase status
 
@@ -110,20 +118,83 @@ Passed auth-gate attachment pages:
 - `submit-video-clean-machine-v7-12-79-test.html`
 - `review-queue-clean-machine-v7-12-80-publish-test.html`
 
-Auth gate autofill guard remains passed. The old Library browser-autofill problem is fixed by the central helper.
+## 7. Mux Manager live candidate rule
 
-## 7. Browse Group full pass rule
+File: `mux-manager-global-helpers-v7-10-7-test.html`
+
+Current version:
+
+`V7.12.308 Mux Manager Stale ID Recovery + Collection Attach`
+
+Status: `PASSED / LIVE CANDIDATE / OWNER ADMIN MEDIA STUDIO / MUX UPLOAD / POSTER UPLOAD / SUPABASE LIBRARY PUBLISH / PLAYLIST CHANNEL COLLECTION ATTACH`
+
+Mux Manager is now the owner/admin media studio live candidate for new Stream Bandit uploads. It belongs with the Supabase Library / media-management group.
+
+Trevor browser-test result:
+
+- Mux upload slot creation passed
+- video upload to Mux passed using UpChunk
+- processing check returned public HLS `.m3u8`
+- public player URL worked
+- poster upload created a 1920x1080 Supabase Storage public URL
+- Mux Asset Library overlay worked
+- Video Settings modal worked
+- local target saving worked
+- publish to Supabase Library worked through `sb_movies`
+- playlist attach worked through `sb_playlist_movies`
+- channel attach worked through `sb_group_play_set_movie_channel`
+- collection attach worked through `sb_collection_movies` after stale local movie ID recovery
+- a second movie upload passed, proving the workflow is repeatable
+
+Required Mux Manager safety model:
+
+1. Owner/admin only.
+2. Private Mux token ID and token secret remain only in Supabase Edge Function secrets.
+3. Browser code uses the Supabase Edge Function `mux-create-direct-upload`; it never contains private Mux credentials.
+4. Upload goes to Mux through a temporary direct-upload URL and Mux UpChunk.
+5. Poster upload produces a 1920x1080 public Supabase Storage URL in `stream-bandit-images`.
+6. Publish is manual from Video Settings → Stream Bandit.
+7. Existing matching movie rows are reused when possible.
+8. Stale local browser `sb_movie_id` values must be verified or repaired before playlist, channel or collection attach.
+9. Playlist and collection attach must avoid duplicate join rows.
+10. No SQL, RLS, storage policy, payment or schema change is allowed unless separately approved.
+
+V7.12.308 recovery lookup order:
+
+1. saved `sb_movie_id`
+2. `video_url`
+3. `mux_playback_url`
+4. Mux playback ID search
+5. title fallback only when no URL is available
+6. create a new `sb_movies` row only when no matching row exists
+
+Tables and paths used:
+
+- `sb_movies`
+- `sb_playlist_movies`
+- `sb_collection_movies`
+- `sb_group_play_set_movie_channel`
+- Supabase Storage bucket: `stream-bandit-images`
+- Supabase Edge Function: `mux-create-direct-upload`
+
+For new owner/admin video uploads, the old Maestro upload workflow can be retired in favor of Mux Manager. Existing Maestro/source compatibility work for Player 1, Player 2 or Review Queue remains a separate playback compatibility task only if needed.
+
+## 8. Browse Group full pass rule
 
 Browse Group is permission-mixed and must not be handled as one flat page type.
 
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — admin/owner only, passed first time with Auth Gate plus admin lock
+- Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — owner/admin media-management live candidate
+- Collections: `collections-clean-machine-v7-12-51-test.html` — collection browsing/management page
+- Playlists: `playlists-global-helpers-v7-5-2-test.html` — playlist page
+- Channels: `channels-global-helpers-v7-5-3-test.html` — channel page
 - Genres: `genres-clean-machine-v7-12-45-test.html` — signed-in browse plus admin/owner genre tools, passed
 - Global Search: `global-search-global-helpers-v7-4-9-test.html` — signed-in read-only search, passed
 - About: `about-global-helpers-v7-4-7-test.html` — signed-in info/contact page, passed
 
-Do not move this gate into Header Shell. Do not remove page-owned admin/owner locks. Do not flatten Browse pages into one permission type.
+Do not move this gate into Header Shell. Do not remove page-owned admin/owner locks. Do not flatten Browse or media-management pages into one permission type.
 
-## 8. Creator Group rule
+## 9. Creator Group rule
 
 Creator Group is permission-mixed and must not be handled as one flat page type.
 
@@ -131,272 +202,11 @@ Current Creator routes:
 
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — signed-in creator submission, passed
 - Rules: `rules-clean-machine-v7-12-82-test.html` — read-only workflow guidance, pending controlled pass
-- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — admin/owner review and publish gate, auth gate passed, preview/playback compatibility fix still needed
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — admin/owner review and publish gate, auth gate passed, preview/playback compatibility fix still logged
 
-Submit Video must use this exact permission model:
+Submit Video writes only to `sb_submissions`. Review Queue remains the admin/owner review and publish path into Library. Mux Manager is an owner/admin media-management tool and does not make Submit Video public uploads unrestricted.
 
-1. Auth Gate blocks signed-out access first.
-2. Signed-in users can create pending submissions.
-3. Submit Video writes only to `sb_submissions`.
-4. Submit Video must not publish to `sb_movies`.
-5. Review Queue remains the only publish path into Library.
-
-Rules must remain read-only workflow guidance:
-
-1. Auth Gate blocks signed-out access first during this app rollout.
-2. No admin/owner-only role check is required unless later separately approved.
-3. No submit, upload, approve, decline, publish, delete or migrate powers are allowed on Rules.
-
-Review Queue must use this exact permission model:
-
-1. Auth Gate blocks signed-out access first.
-2. Existing admin/owner lock blocks normal signed-in users.
-3. Admin/owner users can review, approve, decline, request changes, save status and publish to Library.
-4. Review Queue can write to `sb_movies` and `sb_submissions` only as its existing review/publish workflow allows.
-5. Approval should not happen blind. A preview/test tool for the submitted video URL is required before final approval confidence.
-
-Do not publish directly from Submit Video. Do not give Review Queue powers to public viewer pages. Do not add unrestricted upload permissions. Do not move Creator permissions into Header Shell.
-
-## 9. Submit Video pass
-
-File: `submit-video-clean-machine-v7-12-79-test.html`
-
-Version: `V7.12.289 Submit Video Auth Gate Test`
-
-Status: `PASSED / SIGNED-IN CREATOR SUBMISSION / PENDING SB_SUBMISSIONS ONLY / REVIEW QUEUE BRIDGE PRESERVED`
-
-Trevor browser-test result:
-
-- sign out then sign in passed
-- one Header and one Footer passed
-- submitting video goes to Review Queue passed
-- all other checked page functions passed
-
-Preserved Submit Video controls and safety locks:
-
-- shared Auth Gate blocks signed-out users before page use
-- signed-in creator submission flow stayed preserved
-- poster upload stayed preserved
-- channel read stayed preserved
-- recent submission read stayed preserved
-- pending submission insert stayed preserved
-- verify-after-insert read stayed preserved
-- write target remains `sb_submissions` only
-- status remains `pending`
-- Review Queue remains the only publish path into `sb_movies`
-- no direct `sb_movies` write/publish added to Submit Video
-- no admin-only conversion added to Submit Video
-- no SQL changed
-- no RLS changed
-- no storage policy changed
-- no payment changed
-- no schema change
-- no Header Shell mass auth-gate injection
-
-## 10. Review Queue gate pass
-
-File: `review-queue-clean-machine-v7-12-80-publish-test.html`
-
-Version: `V7.12.290 Review Queue Auth Gate Test`
-
-Status: `PASSED / AUTH GATE ATTACHED / EXISTING ADMIN OWNER REVIEW GATE PRESERVED / PREVIEW FIX STILL NEEDED`
-
-Trevor browser-test result:
-
-- Review Queue passed the Auth Gate
-- Existing Review Queue admin/owner gate remains the publish safety gate
-- Submitted Maestro-style links still do not play in the current page/player preview path and need a dedicated playback compatibility fix
-
-Preserved Review Queue controls and safety locks:
-
-- shared Auth Gate blocks signed-out users before page use
-- existing `requireAdmin()` admin/owner lock stayed preserved
-- queue still reads `sb_submissions`
-- approve/publish, approve-only, decline and archive actions stayed preserved
-- publish path remains Review Queue to `sb_movies`
-- no approval or publish logic was rewritten during the gate pass
-- no SQL changed
-- no RLS changed
-- no storage policy changed
-- no payment changed
-- no schema change
-- no Header Shell mass auth-gate injection
-
-## 11. Review Queue preview request
-
-File: `review-queue-clean-machine-v7-12-80-publish-test.html`
-
-Requested next fix:
-
-- add a real video preview before approval
-- reviewer must be able to test the submitted URL before approving
-- preview should use the same playback compatibility layer planned for Player 1 and Player 2
-- if the submitted URL is a Maestro page URL, the preview must not treat it like a raw video file
-- preview can appear below the selected card or in an overlay
-- do not weaken Review Queue admin/owner approval gate
-- do not approve/publish unless reviewer has a working preview/test tool
-- preserve approve, decline, request changes, save status and publish-to-library behavior
-
-Implementation boundary for the Review Queue preview fix:
-
-- use the full current Review Queue page as the base
-- inspect current submitted URL fields before coding
-- add preview as a review aid only
-- do not change table names, publish field mapping, status values or delete/decline safeguards unless separately approved
-- keep existing approval and publish checks intact
-- share the same source resolver/adapter planned for Player 1 and Player 2 where practical
-
-## 12. Player playback compatibility backlog
-
-### Player 1 and Player 2 playback compatibility pass
-
-Status: `LOGGED / FIX LATER IN A DEDICATED PLAYER PLAYBACK COMPATIBILITY PASS`
-
-Problem reported by Trevor:
-
-- Maestro page links are not playing now, although they used to.
-- Example link type: `maestro.tv/chatterfriends/v/...`
-- These links are page/embed-style links, not guaranteed direct browser-playable media URLs.
-
-Required future fix:
-
-- Player 1 and Player 2 must support every approved Stream Bandit source type possible without breaking current playback.
-- Keep existing direct MP4/WebM/MOV/HLS/Mux behavior.
-- Add a source resolver/adapter for page-style providers such as Maestro where possible.
-- Do not feed non-media page URLs directly into a `<video>` element as if they were `.mp4` or `.m3u8` files.
-- Review Queue preview must use the same resolver/adapter so the reviewer can test the submitted URL before approval.
-- Preserve audio boost, louder audio/accessibility comfort, fullscreen, resume, watch history, source bridge, save buttons and Details links.
-- Do not change SQL, RLS, storage policies, payments or owner/admin permissions during the playback compatibility pass unless separately approved.
-
-## 13. Mux Manager Library Studio plan
-
-File: `mux-manager-global-helpers-v7-10-7-test.html`
-
-Current version:
-
-- `V7.12.303 Mux Manager UpChunk Upload Fix`
-
-Status: `PASSED PASS 1 / BACKEND FUNCTION DEPLOYED / PRIVATE SECRETS SAVED / ADMIN UPLOAD TO MUX WORKS / PUBLIC HLS OUTPUT WORKS / FRONTEND STUDIO UI PASS 2 NEXT`
-
-Backend function:
-
-- Supabase Edge Function: `mux-create-direct-upload`
-- Function status: `ACTIVE`
-- Project: `xzxqfrvqdgkzwujbkdbk`
-- Purpose: create temporary Mux direct upload slots, check processing status, return public HLS/player/thumbnail output, and keep Mux credentials out of GitHub Pages.
-
-Secrets setup confirmed by Trevor screenshot:
-
-- `MUX_TOKEN_ID` saved in Supabase Edge Function secrets
-- `MUX_TOKEN_SECRET` saved in Supabase Edge Function secrets
-- Real secret values must never be pasted into ChatGPT, GitHub, HTML, JavaScript, docs or screenshots.
-
-### Pass 1 upload pass result
-
-Trevor browser-test result:
-
-- Create Upload Slot passed
-- upload to Mux passed using UpChunk
-- upload progress reached 100%
-- Mux asset ready status was returned
-- public HLS `.m3u8` URL output was produced and worked
-- public player URL output was produced and worked
-- Mux thumbnail URL output was produced
-- Stream Bandit-ready fields were produced:
-  - `video_url`
-  - `mux_playback_url`
-  - `thumbnail_url`
-  - `source_type: mux`
-
-Pass 1 preserved:
-
-- no Supabase Library row insert/update
-- no playlist write
-- no channel write
-- no genre write
-- no SQL/RLS/storage policy/payment/schema change
-- no Mux private credential in browser code
-- manual copy/use only until Pass 3 is separately approved
-
-### Required final group move
-
-Mux Manager is currently under Admin tools for upload smoke testing. When Mux Manager Studio is finished and smoke-tested, it must move into the Supabase Library / media-management group with Supabase Library Editor, Genres and future library publishing controls.
-
-### Required Mux Manager Studio model
-
-1. Admin/owner only.
-2. Page Auth Gate or existing protected/admin page authority must run before upload tools.
-3. Edge Function must also verify signed-in admin/owner before creating upload URLs.
-4. Upload many video container types where Mux accepts them: `video/*`, `.mp4`, `.mov`, `.m4v`, `.webm`, `.mkv`, `.avi`, `.wmv`, `.flv`, `.m2ts`, `.mts`, `.ts`, `.mpg`, `.mpeg`, `.ogv`.
-5. Browser uploads to Mux direct upload URL using Mux UpChunk.
-6. Output must produce Stream Bandit usable playback fields:
-   - `https://stream.mux.com/PLAYBACK_ID.m3u8`
-   - `https://player.mux.com/PLAYBACK_ID`
-   - `https://image.mux.com/PLAYBACK_ID/thumbnail.jpg`
-   - Supabase-ready `video_url`, `mux_playback_url`, `thumbnail_url`, `source_type: mux`.
-7. Mux Manager should become a neat admin video library overlay similar to Maestro TV asset management, not a tiny helper only.
-
-Required Maestro-style overlay design:
-
-- asset search
-- thumbnail column
-- name/title
-- duration
-- source/status
-- action buttons
-- preview/play action
-- settings action
-- copy playback URL action
-- copy embed code action
-- processing status check
-
-Required Video Settings modal tabs:
-
-- Metadata
-- Thumbnails
-- Tags / Genres
-- Embed Code
-- Paywall Preview
-- Stream Bandit
-
-Paywall Preview tab is preview-only for now:
-
-- free
-- rental
-- one-time purchase
-- membership
-- ticket
-
-No payment provider, billing enforcement, checkout, ticket enforcement or paid access logic may be added in this pass.
-
-Stream Bandit tab is the later controlled write pass:
-
-- add to Supabase Library
-- add to playlist
-- attach to channel
-- attach/create managed genre labels
-
-Those actions must not be mixed into the first upload smoke test. They require a separate approval and a browser smoke test because they write Stream Bandit library data.
-
-Recommended rollout:
-
-### Pass 2 — Asset Library overlay
-
-- Add Maestro-style asset list overlay and settings modal.
-- Preview/play assets.
-- Copy playback URL and embed code.
-- Keep writes disabled except safe local UI state and copy actions.
-
-### Pass 3 — Stream Bandit library publishing controls
-
-- Add to Supabase Library.
-- Add to Playlist.
-- Attach to Channel.
-- Attach/create managed genre labels.
-- Preserve admin/owner-only locks and existing Supabase Library Editor patterns.
-- No SQL/RLS/storage policy/payment changes unless separately approved.
-
-## 14. Watch Group full pass results
+## 10. Watch Group full pass results
 
 - Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html` — V7.12.231 auth gate passed
 - Watch History: `watch-history-global-helpers-v7-4-0-test.html` — V7.12.227 auth gate passed
@@ -405,19 +215,13 @@ Recommended rollout:
 - Likes: `likes-clean-machine-v7-12-42-test.html` — V7.12.159 auth gate passed
 - Accessibility: `accessibility-clean-machine-v7-12-44-test.html` — V7.12.229 auth gate passed
 
-## 15. User save-page and Accessibility boundaries
-
-Watchlist, Favourites and Likes are user-account save pages. They must keep signed-in user scope, existing table reads and shared save helpers. They must not become admin/owner permission pages and must not change User Management, Owner controls, SQL, RLS, storage policies, payments or Header Shell gate behavior.
-
-Accessibility is a local comfort/readability page. It must not become a Supabase writer and must not take over Theme Studio colour ownership or Player 1's real audio boost controls.
-
-## 16. Known issues logged for later
+## 11. Known issues logged for later
 
 ### News Feed media issue
 
 File: `news-feed-social-v7-13-001-test.html`
 
-Status: `LOGGED / NOT PART OF WATCH, BROWSE OR CREATOR AUTH-GATE PASS / FIX LATER IN DEDICATED NEWS FEED MEDIA LAYOUT PASS`
+Status: `LOGGED / NOT PART OF WATCH, BROWSE, CREATOR OR MUX MANAGER LIVE-CANDIDATE PASS / FIX LATER IN DEDICATED NEWS FEED MEDIA LAYOUT PASS`
 
 - Latest Activity post renders the account header, post text and post media.
 - The post image area does not show the full image used with the post.
@@ -428,23 +232,12 @@ Status: `LOGGED / NOT PART OF WATCH, BROWSE OR CREATOR AUTH-GATE PASS / FIX LATE
 
 Player 1 Details can open the wrong movie and needs a dedicated Player 1 current-row/details-link pass. Preserve playback, audio boost, source bridge, resume helper, watch history and save buttons.
 
-## 17. Social group rule
+### Playback compatibility backlog
 
-Social pages are real working pages and must not be blind-patched.
+Player 1, Player 2 and Review Queue can still receive a later source-resolver/player compatibility pass if existing Maestro/page-style links must remain playable. Preserve direct MP4/WebM/MOV/HLS/Mux behavior and do not regress audio boost/accessibility comfort.
 
-Current Social group:
+## 12. Next controlled step
 
-- Social Profile: `profile-social-v7-13-001-test.html`
-- Friends: `friends-social-v7-13-001-test.html`
-- News Feed: `news-feed-social-v7-13-001-test.html`
-- Groups and Events: `groups-social-v7-13-001-test.html`
+Watch Group and Browse Group are passed, checkpointed and promoted. Creator Group has started. Mux Manager is now passed as the owner/admin media-management live candidate and promoted to Index.
 
-News Feed is a real post/comment/reaction/feed page. Its media display issue must be handled as a focused fix, not as part of a broad social rewrite.
-
-## 18. Next controlled step
-
-Watch Group and Browse Group are passed, checkpointed and promoted to Index as current app links. Creator Group has started. Submit Video and Review Queue Auth Gate have passed. Mux Manager Library Studio has started and Pass 1 upload/playback output has passed.
-
-Next work should be chosen one page or one focused fix at a time. The next active Mux focus is Mux Manager Pass 2: Maestro-style Asset Library overlay and settings modal, still with no Supabase Library writes.
-
-No mass page rollout and no Header Shell auth-gate embedding are approved.
+Next work should be chosen one page or one focused fix at a time. No mass page rollout and no Header Shell auth-gate embedding are approved.
