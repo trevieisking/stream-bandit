@@ -31,6 +31,14 @@
       var packet=nav.querySelector('a[href="packet-builder.html"]');
       if(packet && packet.nextSibling){nav.insertBefore(handoff,packet.nextSibling);}else{nav.appendChild(handoff);}
     }
+    if(!document.querySelector('a[href="publish-prep.html"]')){
+      var pub=document.createElement('a');
+      pub.href='publish-prep.html';
+      if(location.pathname.indexOf('/publish-prep.html')!==-1)pub.className='active';
+      pub.innerHTML='<span>🚦</span><div>Publish Prep<small>Safe test branch request</small></div>';
+      var handoffLink=nav.querySelector('a[href="ai-handoff.html"]');
+      if(handoffLink && handoffLink.nextSibling){nav.insertBefore(pub,handoffLink.nextSibling);}else{nav.appendChild(pub);}
+    }
   }
   function polishStatus(){
     if(document.body.getAttribute('data-page')!=='connector-status')return;
