@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Playlists V7.12.289</title>
+<title>Stream Bandit Playlists V7.12.292 Auth Gate Test</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -79,7 +79,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 }
 </style>
 </head>
-<body data-sb-playlists-menu-url="playlists-global-helpers-v7-5-2-test.html">
+<body data-sb-playlists-menu-url="playlists-global-helpers-v7-5-2-test.html" data-sb-auth-gate-playlists-test="v7-13-005">
 <div class="wrap">
 
 <section class="box pillTabs topRail">
@@ -102,7 +102,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.289 Playlists · Clean Rail</span>
+      <span class="badge">V7.12.292 Playlists · Auth Gate Test</span>
       <h1>Playlists</h1>
       <p>Browse playlists and manage your own plan-limited playlists. Creator accounts can create playlists, add owned videos, and add allowed Stream Bandit library videos without receiving Supabase Library editor access.</p>
       <div class="routeStrip">
@@ -190,25 +190,26 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Playlists V7.12.289: clean Creator rail + playlist page content + plan controls. No schema change. No Supabase Library editor access. No index/registry promotion.</p>
+<p class="micro">Playlists V7.12.292 auth gate test: clean Creator rail + playlist page content + plan controls. No schema change. No Supabase Library editor access. No index/registry promotion.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=playlists-clean-rail-289"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=playlists-clean-rail-289"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=playlists-clean-rail-289"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=playlists-clean-rail-289"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=playlists-clean-rail-289"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=playlists-clean-rail-289"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=playlists-clean-rail-289"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=playlists-clean-rail-289"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=playlists-clean-rail-289"></script>
-<script src="stream-bandit-entitlements-v7-12-269.js?v=playlists-clean-rail-289"></script>
+<script src="stream-bandit-shell-v6-24.js?v=playlists-auth-gate-292"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=playlists-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=playlists-auth-gate-292"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=playlists-auth-gate-292"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=playlists-auth-gate-292"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=playlists-auth-gate-292"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=playlists-auth-gate-292"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=playlists-auth-gate-292"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=playlists-auth-gate-292"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=playlists-auth-gate-292"></script>
+<script src="stream-bandit-entitlements-v7-12-269.js?v=playlists-auth-gate-292"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.289 Playlists Clean Rail';
+const VERSION='V7.12.292 Playlists Auth Gate Test';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER1='player-one-global-helpers-v7-3-3-test.html';
 const PLAYER2='player-2-clean-machine-v7-12-58-test.html';
@@ -648,6 +649,7 @@ function dbg(step,obj){
   },
   safeRules:{
    ownPlaylistWritesOnly:true,
+   authGateAttached:!!window.StreamBanditAuthGate,
    noSupabaseLibraryEditorAccess:true,
    noSchemaChange:true,
    noIndexPromotion:true,
@@ -696,13 +698,15 @@ async function refreshSavedCounters(force){
 }
 
 function helper(){
+ try{if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();}catch(e){}
  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}
  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
  try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
 
  refreshSavedCounters(false);
 
- $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
+ $('helperStatus').innerHTML='<b>Foundation:</b> Auth Gate '+(window.StreamBanditAuthGate?'✅':'⚠️')+
+  ' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
   ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
   ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
   ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
@@ -749,8 +753,10 @@ function boot(){
  setTimeout(helper,1800);
  setInterval(helper,6000);
 
- document.documentElement.dataset.sbPlaylists='v7-12-289';
- window.StreamBanditPlaylistsV712289={version:VERSION,reload:load,current:function(){return debugState;}};
+ document.documentElement.dataset.sbPlaylists='v7-12-292';
+ document.documentElement.dataset.sbPlaylistsAuthGate='v7-12-292';
+ window.StreamBanditPlaylistsV712292={version:VERSION,reload:load,current:function(){return debugState;}};
+ window.StreamBanditPlaylistsV712289=window.StreamBanditPlaylistsV712292;
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
