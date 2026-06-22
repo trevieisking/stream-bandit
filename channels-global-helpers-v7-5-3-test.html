@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit Channels V7.12.290</title>
+<title>Stream Bandit Channels V7.12.293 Auth Gate Test</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -79,7 +79,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 }
 </style>
 </head>
-<body data-sb-channels-route="channels-global-helpers-v7-5-3-test.html">
+<body data-sb-channels-route="channels-global-helpers-v7-5-3-test.html" data-sb-auth-gate-channels-test="v7-13-005">
 <div class="wrap">
 
 <section class="box pillTabs topRail">
@@ -102,10 +102,11 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.290 Channels · Clean Rail</span>
+      <span class="badge">V7.12.293 Channels · Auth Gate Test</span>
       <h1>Channels</h1>
       <p>Browse public channels and manage your own permitted channels. Profile identity uses <code>sb_profiles</code>. Extra/group channels use <code>sb_channels</code>. Users can use their own movies and allowed Stream Bandit library videos without taking other users' private videos.</p>
       <div class="routeStrip">
+        <span>Auth Gate → signed-in first</span>
         <span>Profile → sb_profiles</span>
         <span>Extra channels → sb_channels</span>
         <span>Videos → sb_movies</span>
@@ -202,25 +203,26 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Channels V7.12.290: clean Creator rail + channel page content + main library attach fix. Old URL preserved. Header + page + footer only. No index promotion.</p>
+<p class="micro">Channels V7.12.293 auth gate test: signed-in Auth Gate + channel page content + plan controls. No schema change. No Supabase Library editor access. No index/registry promotion.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=channels-clean-rail-290"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=channels-clean-rail-290"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=channels-clean-rail-290"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=channels-clean-rail-290"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=channels-clean-rail-290"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=channels-clean-rail-290"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=channels-clean-rail-290"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=channels-clean-rail-290"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=channels-clean-rail-290"></script>
-<script src="stream-bandit-entitlements-v7-12-269.js?v=channels-clean-rail-290"></script>
+<script src="stream-bandit-shell-v6-24.js?v=channels-auth-gate-293"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=channels-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=channels-auth-gate-293"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=channels-auth-gate-293"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=channels-auth-gate-293"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=channels-auth-gate-293"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=channels-auth-gate-293"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=channels-auth-gate-293"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=channels-auth-gate-293"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=channels-auth-gate-293"></script>
+<script src="stream-bandit-entitlements-v7-12-269.js?v=channels-auth-gate-293"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.290 Channels Clean Rail';
+const VERSION='V7.12.293 Channels Auth Gate Test';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER1='player-one-global-helpers-v7-3-3-test.html';
 const PLAYER2='player-2-clean-machine-v7-12-58-test.html';
@@ -273,11 +275,11 @@ async function loadProfile(){
  user=au&&au.data&&au.data.user||null;
  profile=null;
 
- if(user){
-  let pr=await c.from('sb_profiles').select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,account_status,admin_level,permissions_json,plan_key,updated_at').eq('id',user.id).maybeSingle();
-  if(pr.error)throw pr.error;
-  profile=pr.data||null;
- }
+ if(!user)throw Error('Signed-in user required. Auth Gate should open first.');
+
+ let pr=await c.from('sb_profiles').select('id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,account_status,admin_level,permissions_json,plan_key,updated_at').eq('id',user.id).maybeSingle();
+ if(pr.error)throw pr.error;
+ profile=pr.data||null;
 }
 
 async function loadData(){
@@ -327,7 +329,7 @@ function profileChannel(){
 }
 
 function isVisibleExtraChannel(c){
- return isAdmin()||String(c&&c.is_public)==='true'||c&&c.is_public===true||profile&&String(c.owner_id||'')===String(profile.id)||c&&c.is_official;
+ return isAdmin()||profile&&String(c.owner_id||'')===String(profile.id)||c&&c.is_official;
 }
 
 function allChannelCards(){
@@ -547,6 +549,7 @@ function dbg(step,obj){
    attachRpc:'sb_group_play_set_movie_channel'
   },
   safeRules:{
+   authGateAttached:!!window.StreamBanditAuthGate,
    profileChannelWritesSbProfiles:true,
    extraChannelWritesOwnedSbChannelsOnly:true,
    attachUsesRpc:true,
@@ -781,13 +784,15 @@ async function refreshSavedCounters(force){
 }
 
 function helper(){
+ try{if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();}catch(e){}
  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}
  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
  try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
 
  refreshSavedCounters(false);
 
- $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
+ $('helperStatus').innerHTML='<b>Foundation:</b> Auth Gate '+(window.StreamBanditAuthGate?'✅':'⚠️')+
+  ' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
   ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
   ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
   ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
@@ -826,8 +831,8 @@ function boot(){
  setTimeout(helper,1800);
  setInterval(helper,6000);
 
- document.documentElement.dataset.sbChannels='v7-12-290';
- window.StreamBanditChannelsV712290={version:VERSION,reload:load,current:function(){return debugState;}};
+ document.documentElement.dataset.sbChannels='v7-12-293-auth-gate-test';
+ window.StreamBanditChannelsV712293={version:VERSION,reload:load,current:function(){return debugState;}};
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
