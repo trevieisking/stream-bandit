@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.100
+# Stream Bandit Master Must-Follow Plan V7.13.101
 
 Date: 2026-06-22
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY AUTH GATE FULL PASS / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED TO GROUP PLAY FULL PASS / GROUP PLAY ROLLBACK CHECKPOINT CREATED / VIDEO OUTPUT CHANNEL PLACEMENT LOCK LOGGED FOR FUTURE DEDICATED PASS / GROUP PLAY PAGE ORGANIZATION POLISH LOGGED FOR FUTURE PASS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY AUTH GATE FULL PASS / COLLECTIONS SOURCE FORMATTING CORRECTED / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED TO GROUP PLAY FINAL ROLLBACK POINT / GROUP PLAY FINAL ROLLBACK CHECKPOINT CREATED / VIDEO OUTPUT CHANNEL PLACEMENT LOCK LOGGED FOR FUTURE DEDICATED PASS / GROUP PLAY PAGE ORGANIZATION POLISH LOGGED FOR FUTURE PASS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -10,19 +10,19 @@ Purpose: this document is the project-level source plan for Stream Bandit. It re
 
 Strong rollback checkpoints now available:
 
-- `CHECKPOINT-GROUP-PLAY-AUTH-GATE-FULL-PASS-V7-13-100.md`
+- `CHECKPOINT-GROUP-PLAY-AUTH-GATE-FULL-PASS-V7-13-101.md`
 - `CHECKPOINT-CREATOR-GROUP-AUTH-GATE-FULL-PASS-V7-13-095.md`
 - `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
 - `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
 - `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 
-Three older checkpoint files were deleted before the new Group Play rollback point was created:
+Three older checkpoint files were deleted before the Group Play rollback point was created:
 
 - `CHECKPOINT-FOCUSED-SCOPE-ZERO-MISSING-V7-12-56.md`
 - `CHECKPOINT-LIVE-APP-ROLE-LOCK-PLAN-V7-12-64.md`
 - `CHECKPOINT-WEB-BUILDER-PAGES-MANAGER-START-V7-12-107.md`
 
-These were old superseded planning/checkpoint files and are not part of the current source-of-truth checkpoint chain.
+The first Group Play checkpoint `CHECKPOINT-GROUP-PLAY-AUTH-GATE-FULL-PASS-V7-13-100.md` was replaced after the Collections source-format correction so the active rollback point matches the current readable source.
 
 ## 2. Source of truth hierarchy
 
@@ -32,7 +32,7 @@ Future decisions must start from:
 2. `STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md`
 3. Current page source fetched directly from GitHub or complete user-supplied full file
 4. Browser smoke test result
-5. `CHECKPOINT-GROUP-PLAY-AUTH-GATE-FULL-PASS-V7-13-100.md`
+5. `CHECKPOINT-GROUP-PLAY-AUTH-GATE-FULL-PASS-V7-13-101.md`
 6. `CHECKPOINT-CREATOR-GROUP-AUTH-GATE-FULL-PASS-V7-13-095.md`
 7. `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
 8. `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
@@ -76,7 +76,7 @@ No future pass may touch these without explicit separate approval:
 - Playlists schema changes, public unrestricted playlist writes, Supabase Library editor access, all-users-private fallback, or entitlement bypass without separate approval
 - Channels schema changes, `is_public` column dependency, public unrestricted channel writes, Supabase Library editor access, all-users-private fallback, or entitlement bypass without separate approval
 - My Channel schema changes, all-users-content fallback, Supabase Library editor access, unrestricted channel placement, or entitlement bypass without separate approval
-- Collections schema changes, storage policy changes, Supabase Library editor access, all-users-private fallback, unrestricted collection placement, or entitlement bypass without separate approval
+- Collections schema changes, storage policy changes, Supabase Library editor access, all-users-private fallback, unrestricted collection placement, one-line source regression, or entitlement bypass without separate approval
 - Player 2 playback architecture rewrite without preserving queue mode, Mux/HLS/direct HTML video, YouTube/Vimeo iframe mode, audio boost, progress saves, Details route and Player 1 separation
 - Video output / channel placement lock implementation without first scanning Supabase Library Editor and Mux Manager
 - Group Play organization/page-polish pass mixed with SQL/RLS/storage/payment/player-source rewrites
@@ -93,9 +93,9 @@ File promoted:
 
 Index version:
 
-`V7.13.100 Platform Entry Group Play Full Pass + Mux Manager Live Candidate`
+`V7.13.101 Platform Entry Group Play Full Pass + Collections Source Correction + Mux Manager Live Candidate`
 
-Index now promotes Group Play as a full passed live-candidate group while keeping existing current page URLs. Home remains:
+Index now promotes Group Play as a full passed live-candidate group with corrected readable Collections source while keeping existing current page URLs. Home remains:
 
 `home-global-helpers-v7-4-4-test.html`
 
@@ -173,14 +173,14 @@ Required Mux Manager safety model remains unchanged: owner/admin only, private M
 
 ## 8. Group Play full pass status
 
-Status: `PASSED / FULL GROUP PASS / LIVE CANDIDATE GROUP / INDEX PROMOTED`
+Status: `PASSED / FULL GROUP PASS / LIVE CANDIDATE GROUP / INDEX PROMOTED / FINAL ROLLBACK POINT CREATED`
 
 Current Group Play routes:
 
 - Playlists: `playlists-global-helpers-v7-5-2-test.html` - V7.12.292 Playlists Auth Gate Test - passed
 - Channels: `channels-global-helpers-v7-5-3-test.html` - V7.12.293 Channels Auth Gate Test - passed
 - My Channel: `my-channel-clean-machine-v7-12-47-test.html` - V7.12.294 My Channel Auth Gate Test - passed
-- Collections: `collections-clean-machine-v7-12-51-test.html` - V7.12.295 Collections Auth Gate Test - passed
+- Collections: `collections-clean-machine-v7-12-51-test.html` - V7.12.295 Collections Auth Gate Test - passed and source-format corrected
 - Player 2: `player-2-clean-machine-v7-12-58-test.html` - V7.12.296 Player 2 Auth Gate Test - passed
 
 Playlists preserved rules:
@@ -234,6 +234,7 @@ Collections preserved rules:
 - Play Selected In Player 2 stayed preserved
 - `sb_collections`, `sb_collection_movies`, `sb_movies` and storage artwork behavior stayed preserved
 - selected-card sync and Remove Collection stayed preserved
+- readable multi-line page source is restored and must be preserved
 - no schema change
 - no storage policy change
 - no Supabase Library editor access added
