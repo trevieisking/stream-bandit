@@ -1,4 +1,4 @@
-# Stream Bandit Current App Manifest V7.13.100
+# Stream Bandit Current App Manifest V7.13.101
 
 Date: 2026-06-22
 
@@ -6,29 +6,33 @@ Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner p
 
 ## Current strongest status
 
-`V7.13.100 Watch Group Full Pass / Browse Group Full Pass / Creator Group Auth Gate Full Pass / Group Play Auth Gate Full Pass / Mux Manager Live Candidate / Index Promoted`
+`V7.13.101 Watch Group Full Pass / Browse Group Full Pass / Creator Group Auth Gate Full Pass / Group Play Auth Gate Full Pass / Collections Source Corrected / Mux Manager Live Candidate / Index Promoted`
 
 Current checkpoint files in force:
 
-- `CHECKPOINT-GROUP-PLAY-AUTH-GATE-FULL-PASS-V7-13-100.md`
+- `CHECKPOINT-GROUP-PLAY-AUTH-GATE-FULL-PASS-V7-13-101.md`
 - `CHECKPOINT-CREATOR-GROUP-AUTH-GATE-FULL-PASS-V7-13-095.md`
 - `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
 - `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
 - `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 
-## Cleanup before Group Play rollback point
+## Cleanup and rollback point history
 
-Three older checkpoint files were deleted before the new Group Play rollback checkpoint was created:
+Three older checkpoint files were deleted before the Group Play rollback checkpoint was created:
 
 - `CHECKPOINT-FOCUSED-SCOPE-ZERO-MISSING-V7-12-56.md`
 - `CHECKPOINT-LIVE-APP-ROLE-LOCK-PLAN-V7-12-64.md`
 - `CHECKPOINT-WEB-BUILDER-PAGES-MANAGER-START-V7-12-107.md`
 
-These were old superseded planning/checkpoint files and are not part of the current source-of-truth checkpoint chain.
+The first Group Play checkpoint `CHECKPOINT-GROUP-PLAY-AUTH-GATE-FULL-PASS-V7-13-100.md` was then replaced after the Collections source-format correction so the active rollback point matches the current readable Collections source.
+
+Current active Group Play rollback checkpoint:
+
+`CHECKPOINT-GROUP-PLAY-AUTH-GATE-FULL-PASS-V7-13-101.md`
 
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY AUTH GATE FULL PASS / SUBMIT VIDEO AUTH GATE PASSED / RULES AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / MUX MANAGER LIVE CANDIDATE PASSED / INDEX PROMOTED TO GROUP PLAY FULL PASS AND MEDIA MANAGEMENT LIVE CANDIDATE`
+`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY AUTH GATE FULL PASS / COLLECTIONS SOURCE FORMATTING CORRECTED / SUBMIT VIDEO AUTH GATE PASSED / RULES AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / MUX MANAGER LIVE CANDIDATE PASSED / INDEX PROMOTED TO GROUP PLAY FINAL ROLLBACK POINT AND MEDIA MANAGEMENT LIVE CANDIDATE`
 
 Confirmed boundaries for this promotion/documentation pass:
 
@@ -46,6 +50,30 @@ Confirmed boundaries for this promotion/documentation pass:
 - no Player 2 playback architecture rewrite
 - no Supabase Library Editor or Mux Manager placement-lock code change in this pass
 
+## Collections source-format correction
+
+File corrected:
+
+`collections-clean-machine-v7-12-51-test.html`
+
+Version remains:
+
+`V7.12.295 Collections Auth Gate Test`
+
+Correction status:
+
+`SOURCE FORMAT CORRECTED / READABLE MULTI-LINE HTML CSS JS RESTORED / OLD URL PRESERVED / GROUP PLAY PASS STILL VALID`
+
+The Collections page had been functioning but was stored as one long source line after the Auth Gate patch. That was corrected without changing the route, page version, SQL, RLS, storage policies, schema, payment, index route, or Header Shell gate behavior.
+
+Formatting correction commit:
+
+`e5fad79e5c2ff3b3eb9bee65d044ec3f10f47c01`
+
+Current corrected Collections content SHA:
+
+`33e15e34d9f4cb9b84f7446affffa48564a598ac`
+
 ## Index promotion
 
 File promoted:
@@ -54,9 +82,9 @@ File promoted:
 
 Index version now:
 
-`V7.13.100 Platform Entry Group Play Full Pass + Mux Manager Live Candidate`
+`V7.13.101 Platform Entry Group Play Full Pass + Collections Source Correction + Mux Manager Live Candidate`
 
-Index now promotes Group Play as a full passed live-candidate group while keeping Home as the main app Home:
+Index now promotes Group Play as a full passed live-candidate group with the corrected readable Collections source while keeping Home as the main app Home:
 
 `home-global-helpers-v7-4-4-test.html`
 
@@ -100,7 +128,7 @@ Passed pages:
 
 ## Group Play full pass
 
-Status: `PASSED / FULL GROUP PASS / LIVE CANDIDATE GROUP / INDEX PROMOTED`
+Status: `PASSED / FULL GROUP PASS / LIVE CANDIDATE GROUP / INDEX PROMOTED / FINAL ROLLBACK POINT CREATED`
 
 ### Playlists
 
@@ -132,7 +160,7 @@ File: `collections-clean-machine-v7-12-51-test.html`
 
 Version: `V7.12.295 Collections Auth Gate Test`
 
-Status: `PASSED / COLLECTION STUDIO PRESERVED / ADD REMOVE VIDEOS PRESERVED / PERMISSIONS DEBUG PLAY QUEUE PRESERVED`
+Status: `PASSED / SOURCE FORMATTING CORRECTED / COLLECTION STUDIO PRESERVED / ADD REMOVE VIDEOS PRESERVED / PERMISSIONS DEBUG PLAY QUEUE PRESERVED`
 
 ### Player 2
 
