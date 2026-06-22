@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.090
+# Stream Bandit Master Must-Follow Plan V7.13.095
 
-Date: 2026-06-21
+Date: 2026-06-22
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP STARTED / SUBMIT VIDEO AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED / MAESTRO UPLOAD WORKFLOW RETIRED FOR NEW OWNER ADMIN UPLOADS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / SUBMIT VIDEO AUTH GATE PASS / RULES AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS / MAESTRO UPLOAD WORKFLOW RETIRED FOR NEW OWNER ADMIN UPLOADS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -10,9 +10,10 @@ Purpose: this document is the project-level source plan for Stream Bandit. It re
 
 Strong rollback checkpoints now available:
 
-- `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
-- `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
+- `CHECKPOINT-CREATOR-GROUP-AUTH-GATE-FULL-PASS-V7-13-095.md`
 - `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
+- `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
+- `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 
 ## 2. Source of truth hierarchy
 
@@ -20,11 +21,12 @@ Future decisions must start from:
 
 1. `CURRENT-APP-MANIFEST-V7-12-180.md`
 2. `STREAM-BANDIT-MASTER-MUST-FOLLOW-PLAN.md`
-3. `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
-4. `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
-5. `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
-6. Current page source fetched directly from GitHub or complete user-supplied full file
-7. Browser smoke test result
+3. `CHECKPOINT-CREATOR-GROUP-AUTH-GATE-FULL-PASS-V7-13-095.md`
+4. `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
+5. `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
+6. `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
+7. Current page source fetched directly from GitHub or complete user-supplied full file
+8. Browser smoke test result
 
 Direct GitHub fetch beats old checkpoint text when they disagree. If GitHub output truncates an HTML or JavaScript file and Trevor has the full page, use the full supplied page as the base.
 
@@ -60,6 +62,7 @@ No future pass may touch these without explicit separate approval:
 - About Supabase writes, live publishing, tickets, uploads, billing, or policy editing without separate approval
 - Submit Video direct `sb_movies` writes or publish behavior without separate approval
 - Review Queue approval/publish logic rewrites without full-file review and separate approval
+- Rules Supabase writes, uploads, approvals, deletes, migrations, storage policy changes or publishing actions without separate approval
 - Player 1 or Player 2 playback compatibility rewrites without preserving audio boost, fullscreen, source bridge, resume, watch history and accessibility comfort
 - Mux token ID, Mux token secret, webhook secret, signing key, service-role key or any private credential in GitHub Pages, HTML, JavaScript, screenshots, docs or chat
 - Mux Manager public/unrestricted upload behavior without separate approval
@@ -74,15 +77,21 @@ File promoted:
 
 Index version:
 
-`V7.13.023 Platform Entry Mux Manager Live Candidate`
+`V7.13.024 Platform Entry Creator Group Full Pass + Mux Manager Live Candidate`
 
-Index now lists the passed Watch Group, Browse Group and Mux Manager media-management live candidate while keeping existing current page URLs. Home remains:
+Index now lists the passed Watch Group, Browse Group, Creator Group and Mux Manager media-management live candidate while keeping existing current page URLs. Home remains:
 
 `home-global-helpers-v7-4-4-test.html`
 
-Mux Manager link promoted:
+Mux Manager link remains promoted:
 
 - Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — `V7.12.308 Mux Manager Stale ID Recovery + Collection Attach`
+
+Creator Group links now promoted as current passed candidates:
+
+- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — `V7.12.289 Submit Video Auth Gate Test`
+- Rules: `rules-clean-machine-v7-12-82-test.html` — `V7.12.291 Creator Rules Auth Gate Test`
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — `V7.12.290 Review Queue Auth Gate Test`
 
 This promotion does not replace Home and does not promote payments, schema/RLS/storage-policy changes, owner/admin rewrites or Header Shell mass auth-gate embedding.
 
@@ -116,6 +125,7 @@ Passed auth-gate attachment pages:
 - `global-search-global-helpers-v7-4-9-test.html`
 - `about-global-helpers-v7-4-7-test.html`
 - `submit-video-clean-machine-v7-12-79-test.html`
+- `rules-clean-machine-v7-12-82-test.html`
 - `review-queue-clean-machine-v7-12-80-publish-test.html`
 
 ## 7. Mux Manager live candidate rule
@@ -153,7 +163,7 @@ Required Mux Manager safety model:
 3. Browser code uses the Supabase Edge Function `mux-create-direct-upload`; it never contains private Mux credentials.
 4. Upload goes to Mux through a temporary direct-upload URL and Mux UpChunk.
 5. Poster upload produces a 1920x1080 public Supabase Storage URL in `stream-bandit-images`.
-6. Publish is manual from Video Settings → Stream Bandit.
+6. Publish is manual from Video Settings -> Stream Bandit.
 7. Existing matching movie rows are reused when possible.
 8. Stale local browser `sb_movie_id` values must be verified or repaired before playlist, channel or collection attach.
 9. Playlist and collection attach must avoid duplicate join rows.
@@ -194,17 +204,17 @@ Browse Group is permission-mixed and must not be handled as one flat page type.
 
 Do not move this gate into Header Shell. Do not remove page-owned admin/owner locks. Do not flatten Browse or media-management pages into one permission type.
 
-## 9. Creator Group rule
+## 9. Creator Group full pass rule
 
 Creator Group is permission-mixed and must not be handled as one flat page type.
 
 Current Creator routes:
 
-- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — signed-in creator submission, passed
-- Rules: `rules-clean-machine-v7-12-82-test.html` — read-only workflow guidance, pending controlled pass
-- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — admin/owner review and publish gate, auth gate passed, preview/playback compatibility fix still logged
+- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — V7.12.289 signed-in creator submission, auth gate passed
+- Rules: `rules-clean-machine-v7-12-82-test.html` — V7.12.291 read-only workflow guidance, auth gate passed
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — V7.12.290 admin/owner review and publish gate, auth gate passed, preview/playback compatibility fix still logged
 
-Submit Video writes only to `sb_submissions`. Review Queue remains the admin/owner review and publish path into Library. Mux Manager is an owner/admin media-management tool and does not make Submit Video public uploads unrestricted.
+Creator Group full pass confirmed by Trevor after Rules browser test. Submit Video writes only to `sb_submissions`. Rules remains read-only and never writes, uploads, approves, deletes, migrates, changes storage policy or publishes. Review Queue remains the admin/owner review and publish path into Library. Mux Manager is an owner/admin media-management tool and does not make Submit Video public uploads unrestricted.
 
 ## 10. Watch Group full pass results
 
@@ -221,23 +231,17 @@ Submit Video writes only to `sb_submissions`. Review Queue remains the admin/own
 
 File: `news-feed-social-v7-13-001-test.html`
 
-Status: `LOGGED / NOT PART OF WATCH, BROWSE, CREATOR OR MUX MANAGER LIVE-CANDIDATE PASS / FIX LATER IN DEDICATED NEWS FEED MEDIA LAYOUT PASS`
+Status: `LOGGED / FIX LATER IN A DEDICATED SOCIAL NEWS FEED MEDIA LAYOUT PASS`
 
-- Latest Activity post renders the account header, post text and post media.
+- Latest Activity post renders account header, post text and post media.
 - The post image area does not show the full image used with the post.
-- The video card/player area below appears as a large black media block.
+- The video card/player area below appears as a large black media box.
 - Trevor reports the video still plays, but the visible player/media is not correctly shown.
 
 ### Player 1 Details-link issue
 
 Player 1 Details can open the wrong movie and needs a dedicated Player 1 current-row/details-link pass. Preserve playback, audio boost, source bridge, resume helper, watch history and save buttons.
 
-### Playback compatibility backlog
+### Review Queue preview/playback compatibility
 
-Player 1, Player 2 and Review Queue can still receive a later source-resolver/player compatibility pass if existing Maestro/page-style links must remain playable. Preserve direct MP4/WebM/MOV/HLS/Mux behavior and do not regress audio boost/accessibility comfort.
-
-## 12. Next controlled step
-
-Watch Group and Browse Group are passed, checkpointed and promoted. Creator Group has started. Mux Manager is now passed as the owner/admin media-management live candidate and promoted to Index.
-
-Next work should be chosen one page or one focused fix at a time. No mass page rollout and no Header Shell auth-gate embedding are approved.
+Review Queue auth-gate pass preserved its admin/owner review and publish behavior. Preview/playback compatibility remains logged for a later focused pass, not for the Creator Group Auth Gate pass.
