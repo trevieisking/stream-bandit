@@ -39,6 +39,14 @@
       var handoffLink=nav.querySelector('a[href="ai-handoff.html"]');
       if(handoffLink && handoffLink.nextSibling){nav.insertBefore(pub,handoffLink.nextSibling);}else{nav.appendChild(pub);}
     }
+    if(!document.querySelector('a[href="github-tracker.html"]')){
+      var tracker=document.createElement('a');
+      tracker.href='github-tracker.html';
+      if(location.pathname.indexOf('/github-tracker.html')!==-1)tracker.className='active';
+      tracker.innerHTML='<span>🧭</span><div>GitHub Tracker<small>Track test links</small></div>';
+      var pubLink=nav.querySelector('a[href="publish-prep.html"]');
+      if(pubLink && pubLink.nextSibling){nav.insertBefore(tracker,pubLink.nextSibling);}else{nav.appendChild(tracker);}
+    }
   }
   function polishStatus(){
     if(document.body.getAttribute('data-page')!=='connector-status')return;
