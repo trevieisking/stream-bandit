@@ -12,15 +12,25 @@
       if(node.nodeValue.indexOf(from)!==-1){node.nodeValue=node.nodeValue.replace(from,to);}
     }
   }
-  function addPatchLabMenu(){
+  function addExtraMenus(){
     var nav=document.querySelector('.nav');
-    if(!nav || document.querySelector('a[href="patch-lab.html"]'))return;
-    var link=document.createElement('a');
-    link.href='patch-lab.html';
-    if(location.pathname.indexOf('/patch-lab.html')!==-1)link.className='active';
-    link.innerHTML='<span>🧠</span><div>Patch Lab<small>Find and replace safely</small></div>';
-    var patchDesk=nav.querySelector('a[href="patch-desk.html"]');
-    if(patchDesk && patchDesk.nextSibling){nav.insertBefore(link,patchDesk.nextSibling);}else if(patchDesk){nav.appendChild(link);}else{nav.appendChild(link);}
+    if(!nav)return;
+    if(!document.querySelector('a[href="patch-lab.html"]')){
+      var patch=document.createElement('a');
+      patch.href='patch-lab.html';
+      if(location.pathname.indexOf('/patch-lab.html')!==-1)patch.className='active';
+      patch.innerHTML='<span>🧠</span><div>Patch Lab<small>Find and replace safely</small></div>';
+      var patchDesk=nav.querySelector('a[href="patch-desk.html"]');
+      if(patchDesk && patchDesk.nextSibling){nav.insertBefore(patch,patchDesk.nextSibling);}else if(patchDesk){nav.appendChild(patch);}else{nav.appendChild(patch);}
+    }
+    if(!document.querySelector('a[href="ai-handoff.html"]')){
+      var handoff=document.createElement('a');
+      handoff.href='ai-handoff.html';
+      if(location.pathname.indexOf('/ai-handoff.html')!==-1)handoff.className='active';
+      handoff.innerHTML='<span>🤖</span><div>AI Handoff<small>Send fix back to ChatGPT</small></div>';
+      var packet=nav.querySelector('a[href="packet-builder.html"]');
+      if(packet && packet.nextSibling){nav.insertBefore(handoff,packet.nextSibling);}else{nav.appendChild(handoff);}
+    }
   }
   function polishStatus(){
     if(document.body.getAttribute('data-page')!=='connector-status')return;
@@ -36,8 +46,8 @@
     });
   }
   loadHistory();
-  setTimeout(addPatchLabMenu,120);
-  setTimeout(addPatchLabMenu,500);
+  setTimeout(addExtraMenus,120);
+  setTimeout(addExtraMenus,500);
   setTimeout(polishStatus,220);
   setTimeout(polishStatus,800);
 })();
