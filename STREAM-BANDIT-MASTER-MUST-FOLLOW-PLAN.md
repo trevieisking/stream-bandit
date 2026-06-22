@@ -1,8 +1,8 @@
-# Stream Bandit Master Must-Follow Plan V7.13.096
+# Stream Bandit Master Must-Follow Plan V7.13.097
 
 Date: 2026-06-22
 
-Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY PLAYLISTS AUTH GATE PASS / SUBMIT VIDEO AUTH GATE PASS / RULES AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS / MAESTRO UPLOAD WORKFLOW RETIRED FOR NEW OWNER ADMIN UPLOADS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
+Status: MASTER GOVERNING PLAN / WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY PLAYLISTS AUTH GATE PASS / GROUP PLAY CHANNELS AUTH GATE PASS / SUBMIT VIDEO AUTH GATE PASS / RULES AUTH GATE PASS / REVIEW QUEUE AUTH GATE PASS / MUX MANAGER LIVE CANDIDATE PASS / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST CHANNEL COLLECTION ATTACH PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS / MAESTRO UPLOAD WORKFLOW RETIRED FOR NEW OWNER ADMIN UPLOADS / NEWS FEED MEDIA DISPLAY ISSUE LOGGED FOR LATER / HEADER SHELL MASS AUTH GATE NOT APPROVED / MUST FOLLOW BEFORE FUTURE PAGE OR SCHEMA WORK
 
 Purpose: this document is the project-level source plan for Stream Bandit. It records what is locked, what passed, what is pending, what stays separate, and what must happen before future page, shell, registry, Web Builder, Owner, Admin, Social, User Management, storage, payment, database, authentication-gate or shell-bridge work.
 
@@ -15,7 +15,7 @@ Strong rollback checkpoints now available:
 - `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
 - `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 
-No new rollback checkpoint is created for the Playlists page pass because the cleanup/checkpoint rule applies after a full group pass.
+No new rollback checkpoint is created for the Playlists or Channels page pass because the cleanup/checkpoint rule applies after a full group pass.
 
 ## 2. Source of truth hierarchy
 
@@ -66,6 +66,7 @@ No future pass may touch these without explicit separate approval:
 - Review Queue approval/publish logic rewrites without full-file review and separate approval
 - Rules Supabase writes, uploads, approvals, deletes, migrations, storage policy changes or publishing actions without separate approval
 - Playlists schema changes, public unrestricted playlist writes, Supabase Library editor access, all-users-private fallback, or entitlement bypass without separate approval
+- Channels schema changes, `is_public` column dependency, public unrestricted channel writes, Supabase Library editor access, all-users-private fallback, or entitlement bypass without separate approval
 - Player 1 or Player 2 playback compatibility rewrites without preserving audio boost, fullscreen, source bridge, resume, watch history and accessibility comfort
 - Mux token ID, Mux token secret, webhook secret, signing key, service-role key or any private credential in GitHub Pages, HTML, JavaScript, screenshots, docs or chat
 - Mux Manager public/unrestricted upload behavior without separate approval
@@ -86,7 +87,7 @@ Index currently lists the passed Watch Group, Browse Group, Creator Group and Mu
 
 `home-global-helpers-v7-4-4-test.html`
 
-Group Play is not promoted as a full group yet. Only Playlists has passed in this group so far.
+Group Play is not promoted as a full group yet. Playlists and Channels have passed in this group so far.
 
 Mux Manager link remains promoted:
 
@@ -133,6 +134,7 @@ Passed auth-gate attachment pages:
 - `rules-clean-machine-v7-12-82-test.html`
 - `review-queue-clean-machine-v7-12-80-publish-test.html`
 - `playlists-global-helpers-v7-5-2-test.html`
+- `channels-global-helpers-v7-5-3-test.html`
 
 ## 7. Mux Manager live candidate rule
 
@@ -203,7 +205,7 @@ Browse Group is permission-mixed and must not be handled as one flat page type.
 - Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — owner/admin media-management live candidate
 - Collections: `collections-clean-machine-v7-12-51-test.html` — collection browsing/management page
 - Playlists: `playlists-global-helpers-v7-5-2-test.html` — also part of Group Play; V7.12.292 Auth Gate passed after Trevor browser test
-- Channels: `channels-global-helpers-v7-5-3-test.html` — channel page
+- Channels: `channels-global-helpers-v7-5-3-test.html` — also part of Group Play; V7.12.293 Auth Gate passed after Trevor browser test
 - Genres: `genres-clean-machine-v7-12-45-test.html` — signed-in browse plus admin/owner genre tools, passed
 - Global Search: `global-search-global-helpers-v7-4-9-test.html` — signed-in read-only search, passed
 - About: `about-global-helpers-v7-4-7-test.html` — signed-in info/contact page, passed
@@ -229,7 +231,7 @@ Group Play pages are being handled one page at a time under the controlled Auth 
 Current Group Play routes:
 
 - Playlists: `playlists-global-helpers-v7-5-2-test.html` — V7.12.292 Playlists Auth Gate Test — passed by Trevor browser test
-- Channels: `channels-global-helpers-v7-5-3-test.html` — next candidate
+- Channels: `channels-global-helpers-v7-5-3-test.html` — V7.12.293 Channels Auth Gate Test — passed by Trevor browser test
 - My Channel: `my-channel-clean-machine-v7-12-47-test.html` — pending
 - Collections: `collections-clean-machine-v7-12-51-test.html` — pending in this group pass
 - Player 2: `player-2-clean-machine-v7-12-58-test.html` — pending
@@ -242,6 +244,21 @@ Playlists preserved rules:
 - own playlist create/edit/delete behavior stayed page-owned and entitlement-limited
 - add/remove videos to own playlists stayed page-owned and entitlement-limited
 - `sb_playlists`, `sb_playlist_movies`, `sb_movies` and `sb_profiles` behavior stayed preserved
+- no schema change
+- no Supabase Library editor access added
+- no index/registry promotion
+- no all-users-private fallback
+- no Header Shell mass auth-gate embedding
+
+Channels preserved rules:
+
+- signed-out users hit Auth Gate first
+- signed-in users load the Channels page
+- existing channel browse stayed preserved
+- profile channel edit stayed on `sb_profiles`
+- extra channel create/edit/delete stayed on owned `sb_channels` rows only
+- video attach/remove stayed through `sb_group_play_set_movie_channel`
+- working `sb_channels` column list stayed limited to real columns and no `is_public` dependency was added
 - no schema change
 - no Supabase Library editor access added
 - no index/registry promotion
