@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Stream Bandit My Channel V7.12.291.1</title>
+<title>Stream Bandit My Channel V7.12.294 Auth Gate Test</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -76,7 +76,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 }
 </style>
 </head>
-<body data-sb-my-channel-route="my-channel-clean-machine-v7-12-47-test.html">
+<body data-sb-my-channel-route="my-channel-clean-machine-v7-12-47-test.html" data-sb-auth-gate-my-channel-test="v7-13-005">
 <div class="wrap">
 
 <section class="box pillTabs topRail">
@@ -99,10 +99,11 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.12.291.1 My Channel · Plan Stat Wrap Fix</span>
+      <span class="badge">V7.12.294 My Channel · Auth Gate Test</span>
       <h1>My Channel</h1>
       <p>Creator dashboard for the signed-in profile. Profile channel identity is read from <code>sb_profiles</code>. Movies are read from <code>sb_movies.owner_id</code>. No fallback to other users' channels or movies.</p>
       <div class="routeStrip">
+        <span>Auth Gate → signed-in first</span>
         <span>Profile → sb_profiles</span>
         <span>Videos → sb_movies.owner_id</span>
         <span>Submissions → sb_submissions.submitter_id</span>
@@ -197,25 +198,26 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">My Channel V7.12.291.1: clean Creator rail + plan stat wrap fix + profile content + owned data only. Old URL preserved. Header + page + footer only. No index promotion.</p>
+<p class="micro">My Channel V7.12.294 auth gate test: signed-in Auth Gate + profile content + owned data only. Old URL preserved. Header + page + footer only. No index promotion.</p>
 </div>
 
-<script src="stream-bandit-shell-v6-24.js?v=my-channel-plan-wrap-291-1"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=my-channel-plan-wrap-291-1"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=my-channel-plan-wrap-291-1"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=my-channel-plan-wrap-291-1"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=my-channel-plan-wrap-291-1"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=my-channel-plan-wrap-291-1"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=my-channel-plan-wrap-291-1"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=my-channel-plan-wrap-291-1"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=my-channel-plan-wrap-291-1"></script>
-<script src="stream-bandit-entitlements-v7-12-269.js?v=my-channel-plan-wrap-291-1"></script>
+<script src="stream-bandit-shell-v6-24.js?v=my-channel-auth-gate-294"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=my-channel-auth-gate-7-13-005"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=my-channel-auth-gate-294"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=my-channel-auth-gate-294"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=my-channel-auth-gate-294"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=my-channel-auth-gate-294"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=my-channel-auth-gate-294"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=my-channel-auth-gate-294"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=my-channel-auth-gate-294"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=my-channel-auth-gate-294"></script>
+<script src="stream-bandit-entitlements-v7-12-269.js?v=my-channel-auth-gate-294"></script>
 
 <script>
 (function(){
 'use strict';
 
-const VERSION='V7.12.291.1 My Channel Plan Stat Wrap Fix';
+const VERSION='V7.12.294 My Channel Auth Gate Test';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER1='player-one-global-helpers-v7-3-3-test.html';
 const PLAYER2='player-2-clean-machine-v7-12-58-test.html';
@@ -287,6 +289,7 @@ function dbg(step,obj){
    collections:'sb_collections.created_by'
   },
   safeRules:{
+   authGateAttached:!!window.StreamBanditAuthGate,
    ownedDataOnly:true,
    noOtherUsersFallback:true,
    profileChannelWritesSbProfiles:true,
@@ -600,13 +603,15 @@ async function refreshSavedCounters(force){
 }
 
 function helper(){
+ try{if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();}catch(e){}
  try{if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();}catch(e){}
  try{if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();}catch(e){}
  try{if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();}catch(e){}
 
  refreshSavedCounters(false);
 
- $('helperStatus').innerHTML='<b>Foundation:</b> Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
+ $('helperStatus').innerHTML='<b>Foundation:</b> Auth Gate '+(window.StreamBanditAuthGate?'✅':'⚠️')+
+  ' · Header '+(window.StreamBanditHeaderShell?'✅':'⚠️')+
   ' · Footer '+(window.StreamBanditFooterShell?'✅':'⚠️')+
   ' · Theme '+(window.StreamBanditThemeProjector?'✅':'⚠️')+
   ' · Saves '+(window.StreamBanditCoreSavesV675?'✅':'⚠️')+
@@ -641,8 +646,8 @@ function boot(){
  setTimeout(helper,1800);
  setInterval(helper,6000);
 
- document.documentElement.dataset.sbMyChannel='v7-12-291-1';
- window.StreamBanditMyChannelV7122911={version:VERSION,reload:load,current:function(){return debugState;}};
+ document.documentElement.dataset.sbMyChannel='v7-12-294-auth-gate-test';
+ window.StreamBanditMyChannelV712294={version:VERSION,reload:load,current:function(){return debugState;}};
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
