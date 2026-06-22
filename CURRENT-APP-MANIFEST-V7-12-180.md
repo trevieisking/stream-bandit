@@ -1,47 +1,40 @@
-# Stream Bandit Current App Manifest V7.13.095
+# Stream Bandit Current App Manifest V7.13.096
 
 Date: 2026-06-22
 
 Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages and One Machine reference this file.
 
-## Current strongest checkpoint
+## Current strongest status
 
-`V7.13.095 Watch Group Full Pass / Browse Group Full Pass / Creator Group Auth Gate Full Pass / Rules Auth Gate Passed / Mux Manager Live Candidate / Supabase Library Publish Passed / Playlist Channel Collection Attach Passed / Index Promoted`
+`V7.13.096 Watch Group Full Pass / Browse Group Full Pass / Creator Group Auth Gate Full Pass / Group Play Playlists Auth Gate Passed / Mux Manager Live Candidate / Index Promoted`
 
-Checkpoint files:
+Checkpoint files still in force:
 
 - `CHECKPOINT-CREATOR-GROUP-AUTH-GATE-FULL-PASS-V7-13-095.md`
 - `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
 - `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
 - `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 
+No new rollback checkpoint was created for the Playlists page pass because cleanup/checkpoint happens after the full Group Play group pass.
+
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / SUBMIT VIDEO AUTH GATE PASSED / RULES AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / MUX MANAGER V7.12.308 LIVE CANDIDATE PASSED / MUX UPLOAD PASSED / POSTER UPLOAD PASSED / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST ATTACH PASSED / CHANNEL ATTACH PASSED / COLLECTION ATTACH PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS AND MEDIA MANAGEMENT LIVE CANDIDATE`
+`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / GROUP PLAY PLAYLISTS AUTH GATE PASSED / SUBMIT VIDEO AUTH GATE PASSED / RULES AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / MUX MANAGER LIVE CANDIDATE PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS AND MEDIA MANAGEMENT LIVE CANDIDATE`
 
-Confirmed boundaries:
+Confirmed boundaries for this page pass:
 
 - no SQL change
 - no RLS change
 - no storage policy change
 - no payment change
 - no production Home replacement
-- no player/audio/accessibility comfort regression work
 - no Header Shell mass auth-gate injection
 - no admin or owner permission-system rewrite
-- no schema fields invented for Supabase Library Editor
-- no storage delete added to Supabase Library Editor
-- no `sb_movies` writes added to Genres
-- no movie deletion added to Genres
-- no Supabase writes added to Global Search
-- no admin/owner role gate added to Global Search
-- no Supabase writes added to About
-- no live/publish/billing/policy edit action added to About
-- no direct `sb_movies` publish added to Submit Video
-- no Supabase writes, uploads, approvals, deletes, migrations, storage policy changes or publishing actions added to Rules
-- no Review Queue approval/publish logic changed during Review Queue gate pass
+- no Playlists schema change
+- no Playlists Supabase Library editor access added
+- no Playlists public unrestricted playlist write path added
+- no Playlists all-users-private fallback added
 - no Player 1 or Player 2 playback-code change during this documentation pass
-- no private Mux token ID, Mux token secret, webhook secret, signing key or service-role key added to GitHub Pages, HTML or JavaScript
 
 ## Index promotion
 
@@ -49,39 +42,15 @@ File promoted:
 
 `index.html`
 
-Index version:
+Index version remains:
 
 `V7.13.024 Platform Entry Creator Group Full Pass + Mux Manager Live Candidate`
 
-Index now lists Watch Group, Browse Group, Creator Group and the Mux Manager media-management live candidate using existing current page URLs. Home remains:
+Index currently lists Watch Group, Browse Group, Creator Group and the Mux Manager media-management live candidate using existing current page URLs. Home remains:
 
 `home-global-helpers-v7-4-4-test.html`
 
-Watch Group links:
-
-- Continue Watching: `continue-watching-global-helpers-v7-3-9-test.html`
-- Watch History: `watch-history-global-helpers-v7-4-0-test.html`
-- Watchlist: `watchlist-clean-machine-v7-12-43-test.html`
-- Favourites: `favourites-clean-machine-v7-12-41-test.html`
-- Likes: `likes-clean-machine-v7-12-42-test.html`
-- Accessibility: `accessibility-clean-machine-v7-12-44-test.html`
-
-Browse / media-management links:
-
-- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html`
-- Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html`
-- Collections: `collections-clean-machine-v7-12-51-test.html`
-- Playlists: `playlists-global-helpers-v7-5-2-test.html`
-- Channels: `channels-global-helpers-v7-5-3-test.html`
-- Genres: `genres-clean-machine-v7-12-45-test.html`
-- Global Search: `global-search-global-helpers-v7-4-9-test.html`
-- About: `about-global-helpers-v7-4-7-test.html`
-
-Creator Group links:
-
-- Submit Video: `submit-video-clean-machine-v7-12-79-test.html`
-- Rules: `rules-clean-machine-v7-12-82-test.html`
-- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
+Group Play is not promoted as a full group yet. Only Playlists has passed in this group so far.
 
 ## Auth gate controlled rollout status
 
@@ -107,6 +76,7 @@ Passed pages:
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html`
 - Rules: `rules-clean-machine-v7-12-82-test.html`
 - Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
+- Playlists: `playlists-global-helpers-v7-5-2-test.html`
 
 ## Mux Manager media-management live candidate
 
@@ -116,102 +86,56 @@ Version: `V7.12.308 Mux Manager Stale ID Recovery + Collection Attach`
 
 Status: `PASSED / LIVE CANDIDATE / OWNER ADMIN MEDIA STUDIO / MUX UPLOAD / POSTER UPLOAD / SUPABASE LIBRARY PUBLISH / PLAYLIST CHANNEL COLLECTION ATTACH`
 
-Trevor browser-test result:
-
-- Mux upload slot creation passed
-- video upload to Mux passed using UpChunk
-- processing check returned public HLS `.m3u8`
-- public player URL worked
-- poster upload created a 1920x1080 Supabase Storage public URL
-- Mux Asset Library overlay worked
-- Video Settings modal worked
-- local target saving worked
-- publish to Supabase Library worked through `sb_movies`
-- playlist attach worked through `sb_playlist_movies`
-- channel attach worked through `sb_group_play_set_movie_channel`
-- collection attach worked through `sb_collection_movies` after stale movie ID recovery
-- second movie upload passed, proving the workflow is repeatable
-
-Important V7.12.308 fix:
-
-- verifies or recovers the real `sb_movies.id` before playlist, collection or channel attach
-- stale local browser movie IDs are repaired by saved ID, `video_url`, `mux_playback_url`, playback ID search or title fallback
-- creates a new `sb_movies` row only if no matching row exists
-- protects playlist and collection attach against duplicate link rows
-- adds a `Repair Local Movie ID` button in Video Settings
-
-Mux Manager table / service paths:
-
-- `sb_movies`
-- `sb_playlist_movies`
-- `sb_collection_movies`
-- `sb_group_play_set_movie_channel`
-- Supabase Storage bucket `stream-bandit-images`
-- Supabase Edge Function `mux-create-direct-upload`
-
-Mux Manager is now part of the Browse / Supabase Library / media-management group and should be treated as the owner/admin upload studio live candidate. For new owner/admin video uploads, the old Maestro upload workflow can be retired in favor of Mux Manager. Existing Maestro/source compatibility work for Player 1, Player 2 or Review Queue remains a separate playback compatibility task only if needed.
+Mux Manager remains the owner/admin media-management upload studio live candidate. It is separate from Submit Video and does not create a public unrestricted upload path.
 
 ## Browse group full pass
 
-### Supabase Library Editor
-
-File: `supabase-library-home-header-form-fix-v7-12-34-test.html`
-
-Version: `V7.12.279 Supabase Library Editor Auth Gate Test`
-
-Status: `FIRST-TIME PASS / AUTH GATE PLUS EXISTING ADMIN OWNER LOCK / EXACT ADMIN LOCK PATTERN TO REMEMBER`
-
-Preserved:
-
-- signed-out users hit Auth Gate first
-- signed-in non-admin/non-owner users stay blocked by page admin lock
-- admin/owner user can load editor controls
-- `sb_movies` load, create, full edit, poster upload, Play All, Details, Play and copy ID stayed preserved
-- permanent delete remains behind typed `DELETE FROM SUPABASE`
-- create/edit/delete verify-after-write behavior stayed preserved
-
-### Genres
-
-File: `genres-clean-machine-v7-12-45-test.html`
-
-Version: `V7.12.283 Genres Auth Gate Test`
-
-Status: `PASSED / SIGNED-IN BROWSE / ADMIN OWNER MANAGED GENRE TOOLS PRESERVED`
-
-Preserved:
-
-- signed-in users can browse active Supabase movies by genre
-- `sb_movies` remains read-only from this page
-- `sb_genres` managed label reads stayed preserved
-- admin/owner-only Create Genre and Delete Managed Genre stayed preserved
-- deleting a managed genre deletes only the `sb_genres` label
-- movie rows and movie genre arrays are not deleted or edited
-
-### Global Search
-
-File: `global-search-global-helpers-v7-4-9-test.html`
-
-Version: `V7.12.284 Global Search Auth Gate Test`
-
-Status: `PASSED / SIGNED-IN READ-ONLY SEARCH / HEADER QUERY HANDOFF PRESERVED`
-
-### About
-
-File: `about-global-helpers-v7-4-7-test.html`
-
-Version: `V7.12.285 About Auth Gate Test`
-
-Status: `PASSED / SIGNED-IN INFORMATION PAGE / EMAIL-DRAFT-ONLY FORMS PRESERVED`
+- Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html` — V7.12.279 auth gate plus admin lock passed
+- Genres: `genres-clean-machine-v7-12-45-test.html` — V7.12.283 auth gate passed
+- Global Search: `global-search-global-helpers-v7-4-9-test.html` — V7.12.284 auth gate passed
+- About: `about-global-helpers-v7-4-7-test.html` — V7.12.285 auth gate passed
 
 ## Creator group full pass
-
-Creator group routes:
 
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — V7.12.289 auth gate passed
 - Rules: `rules-clean-machine-v7-12-82-test.html` — V7.12.291 auth gate passed, read-only truth map preserved
 - Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — V7.12.290 auth gate passed; preview/playback compatibility still logged
 
-Trevor confirmed the Rules browser test passed, completing the Creator Group pass. Submit Video remains signed-in creator submission into `sb_submissions` only. Rules remains read-only and performs no Supabase writes, uploads, approvals, deletes, migrations, storage policy changes or publishing actions. Review Queue remains the admin/owner review and publish gate.
+Trevor confirmed the Rules browser test passed, completing the Creator Group pass.
+
+## Group Play controlled pass
+
+Group Play is now in progress page-by-page. This is not a full group pass yet.
+
+### Playlists
+
+File: `playlists-global-helpers-v7-5-2-test.html`
+
+Version: `V7.12.292 Playlists Auth Gate Test`
+
+Status: `PASSED / GROUP PLAY PAGE PASS / SIGNED-IN PLAYLISTS / OWN PLAYLIST WRITES ONLY / ENTITLEMENTS PRESERVED`
+
+Trevor browser-test result:
+
+- Playlists passed the Auth Gate test
+- signed-out users hit Auth Gate first
+- signed-in page loads
+- playlist browsing stayed preserved
+- tabs stayed preserved
+- existing own-playlist create/edit/delete behavior stayed page-owned and entitlement-limited
+- add/remove videos to own playlists stayed page-owned and entitlement-limited
+- no schema change
+- no Supabase Library editor access
+- no index or registry promotion
+- no all-users-private fallback
+- no Header Shell mass auth-gate embedding
+
+Pending Group Play pages:
+
+- Channels: `channels-global-helpers-v7-5-3-test.html`
+- My Channel: `my-channel-clean-machine-v7-12-47-test.html`
+- Collections: `collections-clean-machine-v7-12-51-test.html`
+- Player 2: `player-2-clean-machine-v7-12-58-test.html`
 
 ## Current Watch Group results
 
@@ -224,24 +148,9 @@ Trevor confirmed the Rules browser test passed, completing the Creator Group pas
 
 ## Known issues logged for later
 
-### News Feed media issue
-
-File: `news-feed-social-v7-13-001-test.html`
-
-Status: `LOGGED / FIX LATER IN A DEDICATED SOCIAL NEWS FEED MEDIA LAYOUT PASS`
-
-- Latest Activity post renders account header, post text and post media.
-- The post image area does not show the full image used with the post.
-- The video card/player area below appears as a large black media box.
-- Trevor reports the video still plays, but the visible player/media is not correctly shown.
-
-### Player 1 Details-link issue
-
-Player 1 Details can open the wrong movie and needs a dedicated Player 1 current-row/details-link pass. Preserve playback, audio boost, source bridge, resume helper, watch history and save buttons.
-
-### Review Queue preview/playback compatibility
-
-Review Queue auth-gate pass preserved admin/owner review and publish behavior. Preview/playback compatibility remains logged for a later focused pass.
+- News Feed media display issue remains logged for a dedicated Social News Feed media layout pass.
+- Player 1 Details link can open the wrong movie and needs a dedicated Player 1 current-row/details-link pass.
+- Review Queue preview/playback compatibility remains logged for a later focused pass.
 
 ## Current route groups by function
 
@@ -265,7 +174,7 @@ Review Queue auth-gate pass preserved admin/owner review and publish behavior. P
 - Supabase Library Editor: `supabase-library-home-header-form-fix-v7-12-34-test.html`
 - Mux Manager: `mux-manager-global-helpers-v7-10-7-test.html` — V7.12.308 live candidate
 - Collections: `collections-clean-machine-v7-12-51-test.html`
-- Playlists: `playlists-global-helpers-v7-5-2-test.html`
+- Playlists: `playlists-global-helpers-v7-5-2-test.html` — V7.12.292 auth gate passed
 - Channels: `channels-global-helpers-v7-5-3-test.html`
 - Genres: `genres-clean-machine-v7-12-45-test.html`
 - Global Search: `global-search-global-helpers-v7-4-9-test.html`
@@ -276,3 +185,11 @@ Review Queue auth-gate pass preserved admin/owner review and publish behavior. P
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — V7.12.289 auth gate passed
 - Rules: `rules-clean-machine-v7-12-82-test.html` — V7.12.291 auth gate passed
 - Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — V7.12.290 auth gate passed
+
+### Group Play pass in progress
+
+- Playlists: `playlists-global-helpers-v7-5-2-test.html` — V7.12.292 auth gate passed
+- Channels: `channels-global-helpers-v7-5-3-test.html` — pending
+- My Channel: `my-channel-clean-machine-v7-12-47-test.html` — pending
+- Collections: `collections-clean-machine-v7-12-51-test.html` — pending
+- Player 2: `player-2-clean-machine-v7-12-58-test.html` — pending
