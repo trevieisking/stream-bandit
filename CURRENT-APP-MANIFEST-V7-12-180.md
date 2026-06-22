@@ -1,22 +1,23 @@
-# Stream Bandit Current App Manifest V7.13.090
+# Stream Bandit Current App Manifest V7.13.095
 
-Date: 2026-06-21
+Date: 2026-06-22
 
 Filename remains `CURRENT-APP-MANIFEST-V7-12-180.md` because protected scanner pages and One Machine reference this file.
 
 ## Current strongest checkpoint
 
-`V7.13.090 Watch Group Full Pass / Browse Group Full Pass / Creator Group Started / Mux Manager Live Candidate / Supabase Library Publish Passed / Playlist Channel Collection Attach Passed / Index Promoted`
+`V7.13.095 Watch Group Full Pass / Browse Group Full Pass / Creator Group Auth Gate Full Pass / Rules Auth Gate Passed / Mux Manager Live Candidate / Supabase Library Publish Passed / Playlist Channel Collection Attach Passed / Index Promoted`
 
 Checkpoint files:
 
-- `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
-- `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
+- `CHECKPOINT-CREATOR-GROUP-AUTH-GATE-FULL-PASS-V7-13-095.md`
 - `CHECKPOINT-MUX-MANAGER-LIVE-CANDIDATE-V7-13-090.md`
+- `CHECKPOINT-BROWSE-GROUP-AUTH-GATE-FULL-PASS-V7-13-085.md`
+- `CHECKPOINT-WATCH-GROUP-AUTH-GATE-FULL-PASS-V7-13-080.md`
 
 ## Current pass status
 
-`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / SUBMIT VIDEO AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / MUX MANAGER V7.12.308 LIVE CANDIDATE PASSED / MUX UPLOAD PASSED / POSTER UPLOAD PASSED / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST ATTACH PASSED / CHANNEL ATTACH PASSED / COLLECTION ATTACH PASSED / INDEX PROMOTED TO MEDIA MANAGEMENT LIVE CANDIDATE`
+`WATCH GROUP AUTH GATE FULL PASS / BROWSE GROUP AUTH GATE FULL PASS / CREATOR GROUP AUTH GATE FULL PASS / USER SAVE PAGES PASSED / ACCESSIBILITY PASSED / SUBMIT VIDEO AUTH GATE PASSED / RULES AUTH GATE PASSED / REVIEW QUEUE AUTH GATE PASSED / MUX MANAGER V7.12.308 LIVE CANDIDATE PASSED / MUX UPLOAD PASSED / POSTER UPLOAD PASSED / SUPABASE LIBRARY PUBLISH PASSED / PLAYLIST ATTACH PASSED / CHANNEL ATTACH PASSED / COLLECTION ATTACH PASSED / INDEX PROMOTED TO CREATOR GROUP FULL PASS AND MEDIA MANAGEMENT LIVE CANDIDATE`
 
 Confirmed boundaries:
 
@@ -37,6 +38,7 @@ Confirmed boundaries:
 - no Supabase writes added to About
 - no live/publish/billing/policy edit action added to About
 - no direct `sb_movies` publish added to Submit Video
+- no Supabase writes, uploads, approvals, deletes, migrations, storage policy changes or publishing actions added to Rules
 - no Review Queue approval/publish logic changed during Review Queue gate pass
 - no Player 1 or Player 2 playback-code change during this documentation pass
 - no private Mux token ID, Mux token secret, webhook secret, signing key or service-role key added to GitHub Pages, HTML or JavaScript
@@ -49,9 +51,9 @@ File promoted:
 
 Index version:
 
-`V7.13.023 Platform Entry Mux Manager Live Candidate`
+`V7.13.024 Platform Entry Creator Group Full Pass + Mux Manager Live Candidate`
 
-Index now lists Watch Group, Browse Group and the Mux Manager media-management live candidate using existing current page URLs. Home remains:
+Index now lists Watch Group, Browse Group, Creator Group and the Mux Manager media-management live candidate using existing current page URLs. Home remains:
 
 `home-global-helpers-v7-4-4-test.html`
 
@@ -75,6 +77,12 @@ Browse / media-management links:
 - Global Search: `global-search-global-helpers-v7-4-9-test.html`
 - About: `about-global-helpers-v7-4-7-test.html`
 
+Creator Group links:
+
+- Submit Video: `submit-video-clean-machine-v7-12-79-test.html`
+- Rules: `rules-clean-machine-v7-12-82-test.html`
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
+
 ## Auth gate controlled rollout status
 
 The auth gate rollout remains page-by-page. It is not approved as a Header Shell mass gate.
@@ -97,6 +105,7 @@ Passed pages:
 - Global Search: `global-search-global-helpers-v7-4-9-test.html`
 - About: `about-global-helpers-v7-4-7-test.html`
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html`
+- Rules: `rules-clean-machine-v7-12-82-test.html`
 - Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
 
 ## Mux Manager media-management live candidate
@@ -194,15 +203,15 @@ Version: `V7.12.285 About Auth Gate Test`
 
 Status: `PASSED / SIGNED-IN INFORMATION PAGE / EMAIL-DRAFT-ONLY FORMS PRESERVED`
 
-## Creator group status
+## Creator group full pass
 
 Creator group routes:
 
 - Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — V7.12.289 auth gate passed
-- Rules: `rules-clean-machine-v7-12-82-test.html` — pending Creator group auth gate pass
+- Rules: `rules-clean-machine-v7-12-82-test.html` — V7.12.291 auth gate passed, read-only truth map preserved
 - Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — V7.12.290 auth gate passed; preview/playback compatibility still logged
 
-Submit Video remains signed-in creator submission into `sb_submissions` only. Review Queue remains the admin/owner review and publish gate.
+Trevor confirmed the Rules browser test passed, completing the Creator Group pass. Submit Video remains signed-in creator submission into `sb_submissions` only. Rules remains read-only and performs no Supabase writes, uploads, approvals, deletes, migrations, storage policy changes or publishing actions. Review Queue remains the admin/owner review and publish gate.
 
 ## Current Watch Group results
 
@@ -230,11 +239,15 @@ Status: `LOGGED / FIX LATER IN A DEDICATED SOCIAL NEWS FEED MEDIA LAYOUT PASS`
 
 Player 1 Details can open the wrong movie and needs a dedicated Player 1 current-row/details-link pass. Preserve playback, audio boost, source bridge, resume helper, watch history and save buttons.
 
+### Review Queue preview/playback compatibility
+
+Review Queue auth-gate pass preserved admin/owner review and publish behavior. Preview/playback compatibility remains logged for a later focused pass.
+
 ## Current route groups by function
 
 ### Platform / core watch
 
-- Platform Entry: `index.html` — V7.13.023 Mux Manager live candidate promoted
+- Platform Entry: `index.html` — V7.13.024 Creator Group full pass + Mux Manager live candidate promoted
 - Home: `home-global-helpers-v7-4-4-test.html`
 - Library: `library-global-helpers-v7-4-8-test.html`
 - Details: `details-clean-machine-v7-12-38-test.html`
@@ -258,15 +271,8 @@ Player 1 Details can open the wrong movie and needs a dedicated Player 1 current
 - Global Search: `global-search-global-helpers-v7-4-9-test.html`
 - About: `about-global-helpers-v7-4-7-test.html`
 
-### Creator / library management
+### Creator group
 
-- Submit Video: `submit-video-clean-machine-v7-12-79-test.html`
-- Rules: `rules-clean-machine-v7-12-82-test.html`
-- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html`
-
-### Social group
-
-- Social Profile: `profile-social-v7-13-001-test.html`
-- Friends: `friends-social-v7-13-001-test.html`
-- News Feed: `news-feed-social-v7-13-001-test.html`
-- Groups and Events: `groups-social-v7-13-001-test.html`
+- Submit Video: `submit-video-clean-machine-v7-12-79-test.html` — V7.12.289 auth gate passed
+- Rules: `rules-clean-machine-v7-12-82-test.html` — V7.12.291 auth gate passed
+- Review Queue: `review-queue-clean-machine-v7-12-80-publish-test.html` — V7.12.290 auth gate passed
