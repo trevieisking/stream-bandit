@@ -79,6 +79,22 @@
       $('#clGithubPath').value='code-labs/index.html';
       toast('Demo GitHub file filled in. Click Load GitHub file read-only.');
     };
+    addSearchPanel();
+  }
+  function addSearchPanel(){
+    var main=$('.main');if(!main||$('#clCodeSearchPanel'))return;
+    var panel=document.createElement('section');panel.className='panel';panel.id='clCodeSearchPanel';
+    panel.innerHTML='<h2>Code Search</h2><p>Search the full loaded file and copy a short report for ChatGPT.</p><label>Search text<input id="clCodeSearchText" placeholder="script, supabase, function, class, error text"></label><div class="actions"><button class="btn primary" id="clCodeSearchBtn">Search code</button><button class="btn ghost" id="clCopySearchReport">Copy report</button></div><textarea id="clCodeSearchOut" class="big" readonly></textarea>';
+    var footer=$('.footerNote');if(footer){main.insertBefore(panel,footer);}else{main.appendChild(panel);}
+    function buildReport(){
+      var s=state(),f=s.file||{},src=f.githubSource||{},code=($('#currentCode')&&$('#currentCode').value)||f.currentCode||'',needle=($('#clCodeSearchText')&&$('#clCodeSearchText').value)||'',lines=code.split(/\r?\n/),matches=[];
+      if(needle){var n=needle.toLowerCase();lines.forEach(function(line,i){if(line.toLowerCase().indexOf(n)!==-1&&matches.length<60){matches.push({line:i+1,text:line});}});}
+      var report=['CODE LABS CODE SEARCH REPORT','File: '+(f.filename||'Not set'),'Path: '+(src.path||'Not set'),'Repo: '+((src.owner&&src.repo)?src.owner+'/'+src.repo:'Not set'),'Branch: '+(src.branch||'Not set'),'Lines: '+lines.length,'Characters: '+code.length,'Search: '+(needle||'Not set'),'Matches: '+matches.length,'','MATCH LINES',matches.map(function(m){return m.line+': '+m.text.slice(0,260);}).join('\n')||'No matches listed','','ASK CHATGPT','Use this search report to find the safest exact fix. Ask for more line ranges if needed.'].join('\n');
+      $('#clCodeSearchOut').value=report;
+      return report;
+    }
+    $('#clCodeSearchBtn').onclick=function(){buildReport();toast('Search report made');};
+    $('#clCopySearchReport').onclick=function(){copyText(buildReport());};
   }
   function setCard(title,badge,kind,text){
     var cards=[].slice.call(document.querySelectorAll('.card'));
