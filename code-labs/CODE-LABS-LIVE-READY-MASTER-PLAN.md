@@ -1,0 +1,346 @@
+# Code Labs Live-Ready Master Plan
+
+Status: active build plan / Code Labs only / do not touch Stream Bandit app pages.
+
+Date: 2026-06-23
+
+## 1. Mission
+
+Code Labs is a small tool for people who cannot code when ChatGPT tools fail, truncate output, or cannot safely patch a file directly.
+
+Code Labs must help a non-coder:
+
+1. explain what is broken in plain English;
+2. give ChatGPT the exact file, code, problem, and do-not-touch rules;
+3. generate correct full-file or exact patch instructions;
+4. preview and test before replacing anything live;
+5. save checkpoints and repair history;
+6. ask ChatGPT to use GitHub safely only through test branches and pull requests.
+
+## 2. Product lanes
+
+### Code Labs lane
+
+Code Labs is `CL`.
+
+Allowed Code Labs paths:
+
+- `/code-labs/`
+- `/code-labs/index.html`
+- `/code-labs/v20.html`
+- `/code-labs/*`
+
+Code Labs may use:
+
+- the existing `trevieisking/stream-bandit` GitHub repo;
+- the existing IONOS/custom domain;
+- the existing Supabase project if rows stay in Code Labs tables;
+- the existing Supabase Auth project only if called from Code Labs own login/control later.
+
+### Stream Bandit lane
+
+Stream Bandit stays Stream Bandit.
+
+Code Labs must not:
+
+- use Stream Bandit buttons;
+- link users to Stream Bandit app pages;
+- send users to Stream Bandit login;
+- use Stream Bandit tables for Code Labs records;
+- touch or recode Stream Bandit app features;
+- cross-match Code Labs routes with Stream Bandit routes.
+
+## 3. Connector rule
+
+GitHub and Supabase are separate connectors.
+
+When a connector is needed, ask for one only:
+
+- `Connect GitHub please, Trev` for repo, branch, PR, preview, and merge work.
+- `Connect Supabase please, Trev` for database/table/history work.
+
+Do not ask for both at the same time unless the user explicitly wants both connected.
+
+## 4. Current page map
+
+No new pages unless agreed. Existing pages should be connected into one clear flow.
+
+### Main beginner journey
+
+1. `index.html` - Code Labs home and mission.
+2. `start-guide.html` - plain-English intake.
+3. `fix-wizard.html` - tells the user one next step.
+4. `v20.html` - Workflow Hub: Read Request, Code Generator Request, Safe Change Request.
+5. `file-lab.html` - paste/load full code.
+6. `rescue-room.html` - describe problem and protected rules.
+7. `packet-builder.html` - build ChatGPT repair packet.
+8. `patch-desk.html` - paste full fixed code.
+9. `patch-lab.html` - exact search/replace and line-range repairs.
+10. `preview-test.html` - preview and test checklist.
+11. `checkpoints.html` - rollback and test records.
+
+### Connector and finishing pages
+
+12. `connector-status.html` - explains GitHub and Supabase separately.
+13. `ai-handoff.html` - send clean review package back to ChatGPT.
+14. `publish-prep.html` - prepare safe test-branch request.
+15. `github-tracker.html` - track PR, preview link, pass/fail.
+16. `project-picker.html` - choose project mode.
+17. `setup.html` - workspace setup.
+18. `help.html` - plain-English help.
+
+## 5. Live-ready target flow
+
+The live-ready version should feel like one small machine, not many separate tools.
+
+### Flow A - user has no idea where to start
+
+1. Home says `Start here`.
+2. Start Guide asks project, file, problem, do-not-touch rules.
+3. Fix Wizard tells one next page.
+4. Workflow Hub gives the exact ChatGPT request.
+
+### Flow B - tools failed or output truncated
+
+1. User opens Workflow Hub.
+2. User copies `CODE LABS CODE GENERATOR REQUEST`.
+3. ChatGPT receives strict no-truncation and full-file rules.
+4. User pastes output into Patch Desk or Patch Lab.
+5. User previews and tests.
+6. User saves checkpoint.
+7. User asks GitHub for a safe branch only after preview passes.
+
+### Flow C - exact patch only
+
+1. User opens Patch Lab.
+2. Loads saved Code Labs code.
+3. Finds exact text or line range.
+4. Replaces safely.
+5. Saves fixed output.
+6. Sends report back to ChatGPT.
+
+### Flow D - safe publish
+
+1. Preview Test passes.
+2. Publish Prep creates safe test branch request.
+3. ChatGPT uses GitHub connector.
+4. GitHub Tracker records PR/preview link.
+5. User tests branch preview.
+6. Merge only after user says pass.
+
+## 6. Required build phases
+
+### Phase 1 - Planning lock
+
+Goal: stop drifting.
+
+Tasks:
+
+- Keep this master plan updated.
+- Add a repair log/checkpoint section.
+- Keep Code Labs and Stream Bandit lane rules visible.
+- Do not start random page builds without updating this plan.
+
+Status: in progress.
+
+### Phase 2 - Navigation and wording cleanup
+
+Goal: make the app feel small and understandable.
+
+Tasks:
+
+- Home should show only the main beginner route.
+- Menu should group or visually separate primary and advanced tools.
+- No duplicate icon meanings.
+- Every page should say: what this page is for, what to click next, and what not to do.
+- Use `CL` branding, not Stream Bandit branding.
+
+Status: started.
+
+### Phase 3 - Workflow Hub becomes command centre
+
+Goal: one page can create the right request for ChatGPT.
+
+Required requests:
+
+- Read Request.
+- Code Generator Request.
+- Safe Change Request.
+- Review Request.
+- Exact Patch Request.
+- Supabase Help Request.
+- GitHub Help Request.
+
+Status: Read, Generator, and Safe Change are started.
+
+### Phase 4 - State handoff between pages
+
+Goal: pages share one repair job cleanly.
+
+Tasks:
+
+- Start Guide writes project, file, problem, rules.
+- File Lab writes current code and GitHub source.
+- Rescue Room writes problem and errors.
+- Workflow Hub reads all saved data.
+- Patch Desk/Patch Lab write fixed code.
+- Preview Test writes pass/fail result.
+- GitHub Tracker writes PR and preview link.
+- Checkpoints shows repair timeline.
+
+Status: partially working through `codeLabsV1State`.
+
+### Phase 5 - Supabase repair history
+
+Goal: optional save/load for Code Labs records.
+
+Rules:
+
+- Use Code Labs tables only.
+- Do not use Stream Bandit tables.
+- Do not send user to Stream Bandit login.
+- If auth is shared project-wide, the login control must still be Code Labs-branded and Code Labs-routed.
+- Browser may use publishable/anon keys only.
+- No service-role key in browser.
+
+Status: save/load exists, wording corrected, auth UI still needs final Code Labs-only pass.
+
+### Phase 6 - GitHub safe publishing
+
+Goal: GitHub actions happen through ChatGPT connector, not browser writes.
+
+Rules:
+
+- Browser pages do not write to GitHub.
+- ChatGPT creates test branch and PR.
+- User tests raw.githack preview.
+- Merge only after user confirms pass.
+
+Status: Workflow Hub and Publish Prep request flow exists.
+
+### Phase 7 - Branding and favicon
+
+Goal: Code Labs has its own identity.
+
+Tasks:
+
+- Generate 4 to 8 logo options.
+- User chooses favourites.
+- Pick one final logo.
+- Create favicon/app icon assets.
+- Update Code Labs shell only.
+- Do not use Stream Bandit logo/branding.
+
+Status: planned.
+
+### Phase 8 - Final live-readiness pass
+
+Goal: launch Code Labs as a small useful public helper.
+
+Checklist:
+
+- all Code Labs pages open on live domain;
+- menu works from every Code Labs page;
+- no Stream Bandit login/page redirects;
+- connector status is clear;
+- manual mode works without connectors;
+- Workflow Hub generator request works;
+- patch lab works;
+- preview/test works;
+- checkpoints work;
+- Supabase save/load is clear and safe;
+- help page explains the app simply;
+- favicon/logo installed;
+- no root Stream Bandit app changes.
+
+Status: not complete.
+
+## 7. Current passed checkpoints
+
+- V1 Manual Rescue: pass.
+- V1.1 Safety Tools: pass.
+- V1.2 Supabase Repair History: pass, but auth UI needs final Code Labs-only pass.
+- V1.3 GitHub Read-Only Loader: pass.
+- V1.4 Patch Lab: pass.
+- V1.5 AI Handoff: pass.
+- V1.6 Publish Prep: pass.
+- V1.7 GitHub Tracker: pass.
+- V1.8 Fix Wizard: pass.
+- V1.9 Start Guide: pass.
+- V2.0 Workflow Hub: pass.
+- V2.2 Connector boundary wording: pass and merged.
+- V2.3 Code Generator Request: pass and merged.
+- Menu icon duplicate fix: pass and merged.
+- Workflow Hub cache refresh: pass and merged.
+
+## 8. Repair log format
+
+Use this format for every future Code Labs fix:
+
+```text
+Date:
+Branch:
+PR:
+Page/file touched:
+Problem:
+Fix:
+User test:
+Merge status:
+Notes:
+```
+
+## 9. Next recommended jobs
+
+Do these in order.
+
+### Job 1 - Home command centre
+
+Make `index.html`/home explain the live-ready path in four choices:
+
+1. Start Guide.
+2. Workflow Hub.
+3. Patch Lab.
+4. Preview + Test.
+
+### Job 2 - Menu grouping
+
+Make the menu easier without adding pages:
+
+- Start here.
+- Fix flow.
+- Test and publish.
+- Advanced tools.
+
+### Job 3 - Workflow Hub request set
+
+Add missing request types:
+
+- Review Request.
+- Exact Patch Request.
+- Supabase Help Request.
+- GitHub Help Request.
+
+### Job 4 - Code Labs auth UI decision
+
+Decide whether Supabase auth stays in same project with Code Labs-only login control, or separate project later.
+
+Current user rule:
+
+- same auth may be okay if called from Code Labs own login;
+- no Stream Bandit buttons, pages, tables, or redirects.
+
+### Job 5 - Logo and favicon
+
+Generate logo options, choose final, then wire favicon and CL logo into Code Labs shell.
+
+## 10. Stop rules
+
+Stop and ask before:
+
+- adding a new page;
+- touching Stream Bandit app files;
+- changing Supabase schema;
+- adding auth redirects;
+- adding browser-side GitHub writes;
+- deleting any Code Labs page;
+- replacing a full page when a tiny safe fix would work.
