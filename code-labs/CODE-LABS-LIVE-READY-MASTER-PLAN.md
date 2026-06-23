@@ -13,9 +13,12 @@ Code Labs must help a non-coder:
 1. explain what is broken in plain English;
 2. give ChatGPT the exact file, code, problem, and do-not-touch rules;
 3. generate correct full-file or exact patch instructions;
-4. preview and test before replacing anything live;
-5. save checkpoints and repair history;
-6. ask ChatGPT to use GitHub safely only through test branches and pull requests.
+4. pull untruncated code from a public GitHub file when possible;
+5. search large code files by exact text, tag, function name, script link, CSS class, or line range;
+6. preview and test before replacing anything live;
+7. save checkpoints and repair history;
+8. commit or prepare commits safely only after the user approves the exact change;
+9. ask ChatGPT to use GitHub safely through test branches and pull requests.
 
 ## 2. Product lanes
 
@@ -56,14 +59,14 @@ GitHub and Supabase are separate connectors.
 
 When a connector is needed, ask for one only:
 
-- `Connect GitHub please, Trev` for repo, branch, PR, preview, and merge work.
+- `Connect GitHub please, Trev` for repo, branch, PR, preview, merge, public/private repo read, and commit work.
 - `Connect Supabase please, Trev` for database/table/history work.
 
 Do not ask for both at the same time unless the user explicitly wants both connected.
 
 ## 4. Current page map
 
-No new pages unless agreed. Existing pages should be connected into one clear flow.
+No new pages unless agreed. Existing pages should be connected into one clear flow first.
 
 ### Main beginner journey
 
@@ -73,8 +76,8 @@ No new pages unless agreed. Existing pages should be connected into one clear fl
 4. `v20.html` - Workflow Hub: Read Request, Code Generator Request, Safe Change Request.
 5. `file-lab.html` - paste/load full code.
 6. `rescue-room.html` - describe problem and protected rules.
-7. `packet-builder.html` - build ChatGPT repair packet.
-8. `patch-desk.html` - paste full fixed code.
+7. `packet-builder.html` - build copyable ChatGPT repair packet.
+8. `patch-desk.html` - paste fixed full code.
 9. `patch-lab.html` - exact search/replace and line-range repairs.
 10. `preview-test.html` - preview and test checklist.
 11. `checkpoints.html` - rollback and test records.
@@ -128,7 +131,226 @@ The live-ready version should feel like one small machine, not many separate too
 5. User tests branch preview.
 6. Merge only after user says pass.
 
-## 6. Required build phases
+### Flow E - pull untruncated code from a repository
+
+1. User enters a GitHub file URL, repo/branch/path, or public raw URL.
+2. Code Labs pulls the full file into File Lab without truncating.
+3. Code Labs stores filename, path, branch, raw URL, line count, and character count.
+4. Code Search/Find tools help locate script tags, broken links, functions, CSS classes, IDs, and line ranges.
+5. Workflow Hub creates a read, generator, patch, or safe publish request from the exact file.
+
+### Flow F - direct repository commit from Code Labs later
+
+This is important for live usefulness, but it needs its own safety layer.
+
+Target behaviour:
+
+1. User connects GitHub from Code Labs.
+2. Code Labs reads the target repository and selected file.
+3. User generates or pastes fixed code.
+4. User previews and saves a checkpoint.
+5. Code Labs creates a test branch and commit, or opens a PR.
+6. User tests the preview.
+7. User explicitly approves merge.
+
+Default rule: commit to a test branch / pull request, not direct to `main`.
+
+Direct-to-main can only exist as a locked expert option later, with a warning and explicit confirmation.
+
+## 6. Tool catalogue for live readiness
+
+Code Labs should become useful by giving ChatGPT and the user these tools.
+
+### 6.1 Start Guide
+
+Purpose: plain-English intake.
+
+Should collect:
+
+- site/project name;
+- repo or URL;
+- file URL/path;
+- problem;
+- do-not-touch rules;
+- screenshot/error notes.
+
+### 6.2 Repo Reader / Full Code Pull
+
+Purpose: get perfect, untruncated source code.
+
+Should support:
+
+- public GitHub blob URL;
+- public raw.githubusercontent.com URL;
+- owner/repo/branch/path;
+- optional private repo later through GitHub connection;
+- line count and character count;
+- save to current Code Labs repair state.
+
+Rules:
+
+- no secrets in browser;
+- no write from read mode;
+- if private repo cannot be read, ask user to connect GitHub.
+
+### 6.3 Code Search / Code Lens
+
+Purpose: help ChatGPT and non-coders inspect a big page without losing context.
+
+Should support searching for:
+
+- `<script`;
+- `<link`;
+- `supabase`;
+- `auth`;
+- CSS class names;
+- function names;
+- button text;
+- IDs;
+- routes;
+- exact error text.
+
+Outputs should include:
+
+- match count;
+- line numbers;
+- context before/after match;
+- copy line range;
+- send search report to ChatGPT;
+- load selected range into Patch Lab.
+
+This can start inside existing File Lab or Patch Lab. Add a new page only if the existing pages become too crowded.
+
+### 6.4 Workflow Hub Request Builder
+
+Purpose: produce exact prompts for ChatGPT.
+
+Required request types:
+
+- Read Request;
+- Code Generator Request;
+- Safe Change Request;
+- Review Request;
+- Exact Patch Request;
+- Supabase Help Request;
+- GitHub Help Request;
+- Direct Commit Request later.
+
+### 6.5 Patch Lab
+
+Purpose: exact safe changes when full replacement is risky.
+
+Should support:
+
+- search exact text;
+- replace selected match;
+- replace all;
+- replace line range;
+- show match context;
+- save output as fixed code;
+- generate report for ChatGPT.
+
+### 6.6 Patch Desk
+
+Purpose: paste a full fixed file from ChatGPT.
+
+Should support:
+
+- original vs fixed comparison;
+- character and line count;
+- save fixed code;
+- checkpoint fixed code;
+- copy/download fixed file;
+- send to Preview Test.
+
+### 6.7 Preview Test
+
+Purpose: prevent broken live updates.
+
+Should support:
+
+- original/fixed preview;
+- desktop/mobile width;
+- checklist;
+- PASS/FAIL record;
+- send pass result to Publish Prep.
+
+### 6.8 Checkpoints
+
+Purpose: rollback safety.
+
+Should support:
+
+- original checkpoint;
+- fixed checkpoint;
+- publish checkpoint;
+- copy checkpoint code;
+- restore as current;
+- restore as fixed;
+- show test history.
+
+### 6.9 GitHub Publisher
+
+Purpose: commit safely to a user's repo.
+
+MVP path:
+
+- ChatGPT connector creates branch/PR.
+- Code Labs prepares the exact request and tracks the result.
+
+Later direct app path:
+
+- user connects GitHub;
+- Code Labs reads repo file;
+- Code Labs commits fixed code to a new branch;
+- Code Labs opens PR;
+- Code Labs records PR and preview link.
+
+Safety rules:
+
+- no browser service tokens;
+- no hidden writes;
+- branch first;
+- PR first;
+- merge only after user pass;
+- show exact file path before write.
+
+### 6.10 Supabase Repair History
+
+Purpose: save jobs and make repair work reusable.
+
+Should support:
+
+- Code Labs projects;
+- files;
+- jobs;
+- versions;
+- packets;
+- test runs;
+- audit log.
+
+Rules:
+
+- Code Labs tables only;
+- no Stream Bandit tables;
+- Code Labs login/control only;
+- no Stream Bandit page redirect.
+
+### 6.11 Tips and Help System
+
+Purpose: teach non-coders what to do without guessing.
+
+Useful tips:
+
+- paste the full file, not a screenshot of code;
+- save a checkpoint before replacing anything;
+- preview before publishing;
+- if output is cut off, use Code Generator Request again and say split only when asked;
+- use exact line search for small fixes;
+- never paste secret keys into ChatGPT or browser pages;
+- only merge after the branch preview passes.
+
+## 7. Required build phases
 
 ### Phase 1 - Planning lock
 
@@ -170,6 +392,7 @@ Required requests:
 - Exact Patch Request.
 - Supabase Help Request.
 - GitHub Help Request.
+- Direct Commit Request later.
 
 Status: Read, Generator, and Safe Change are started.
 
@@ -190,7 +413,21 @@ Tasks:
 
 Status: partially working through `codeLabsV1State`.
 
-### Phase 5 - Supabase repair history
+### Phase 5 - Repo Reader and Code Search
+
+Goal: let Code Labs pull full pages from GitHub and inspect them without truncation.
+
+Tasks:
+
+- Improve File Lab GitHub loader.
+- Add searchable code index/report.
+- Add line-range copy helper.
+- Add search report for ChatGPT.
+- Send selected code/range to Patch Lab.
+
+Status: planned.
+
+### Phase 6 - Supabase repair history
 
 Goal: optional save/load for Code Labs records.
 
@@ -205,20 +442,27 @@ Rules:
 
 Status: save/load exists, wording corrected, auth UI still needs final Code Labs-only pass.
 
-### Phase 6 - GitHub safe publishing
+### Phase 7 - GitHub safe publishing
 
-Goal: GitHub actions happen through ChatGPT connector, not browser writes.
+Goal: GitHub actions happen safely.
 
-Rules:
+MVP rules:
 
 - Browser pages do not write to GitHub.
 - ChatGPT creates test branch and PR.
 - User tests raw.githack preview.
 - Merge only after user confirms pass.
 
+Later direct-write rules:
+
+- Code Labs may commit to a user's repo only after GitHub is connected.
+- Show target owner/repo/branch/path before write.
+- Create branch/PR by default.
+- Do not write to `main` unless a later expert mode is explicitly approved.
+
 Status: Workflow Hub and Publish Prep request flow exists.
 
-### Phase 7 - Branding and favicon
+### Phase 8 - Branding and favicon
 
 Goal: Code Labs has its own identity.
 
@@ -233,7 +477,7 @@ Tasks:
 
 Status: planned.
 
-### Phase 8 - Final live-readiness pass
+### Phase 9 - Final live-readiness pass
 
 Goal: launch Code Labs as a small useful public helper.
 
@@ -244,6 +488,8 @@ Checklist:
 - no Stream Bandit login/page redirects;
 - connector status is clear;
 - manual mode works without connectors;
+- repo reader can pull public GitHub files;
+- code search can find script tags, routes, functions, and line ranges;
 - Workflow Hub generator request works;
 - patch lab works;
 - preview/test works;
@@ -255,7 +501,7 @@ Checklist:
 
 Status: not complete.
 
-## 7. Current passed checkpoints
+## 8. Current passed checkpoints
 
 - V1 Manual Rescue: pass.
 - V1.1 Safety Tools: pass.
@@ -273,7 +519,7 @@ Status: not complete.
 - Menu icon duplicate fix: pass and merged.
 - Workflow Hub cache refresh: pass and merged.
 
-## 8. Repair log format
+## 9. Repair log format
 
 Use this format for every future Code Labs fix:
 
@@ -289,7 +535,7 @@ Merge status:
 Notes:
 ```
 
-## 9. Next recommended jobs
+## 10. Next recommended jobs
 
 Do these in order.
 
@@ -302,7 +548,20 @@ Make `index.html`/home explain the live-ready path in four choices:
 3. Patch Lab.
 4. Preview + Test.
 
-### Job 2 - Menu grouping
+### Job 2 - Repo Reader and Code Search MVP
+
+Use existing File Lab/Patch Lab first.
+
+Add:
+
+- pull full public GitHub file;
+- search big file;
+- show line numbers and snippets;
+- copy selected line range;
+- generate Code Search Report for ChatGPT;
+- send selected range to Patch Lab.
+
+### Job 3 - Menu grouping
 
 Make the menu easier without adding pages:
 
@@ -311,7 +570,7 @@ Make the menu easier without adding pages:
 - Test and publish.
 - Advanced tools.
 
-### Job 3 - Workflow Hub request set
+### Job 4 - Workflow Hub request set
 
 Add missing request types:
 
@@ -319,8 +578,9 @@ Add missing request types:
 - Exact Patch Request.
 - Supabase Help Request.
 - GitHub Help Request.
+- Direct Commit Request later.
 
-### Job 4 - Code Labs auth UI decision
+### Job 5 - Code Labs auth UI decision
 
 Decide whether Supabase auth stays in same project with Code Labs-only login control, or separate project later.
 
@@ -329,11 +589,24 @@ Current user rule:
 - same auth may be okay if called from Code Labs own login;
 - no Stream Bandit buttons, pages, tables, or redirects.
 
-### Job 5 - Logo and favicon
+### Job 6 - GitHub direct commit design
+
+Design before coding.
+
+Must answer:
+
+- public repo only or private repo too;
+- branch-only by default;
+- PR creation;
+- rollback/checkpoint;
+- whether direct main commit is allowed later as expert mode;
+- how Code Labs receives GitHub permission without secrets in browser.
+
+### Job 7 - Logo and favicon
 
 Generate logo options, choose final, then wire favicon and CL logo into Code Labs shell.
 
-## 10. Stop rules
+## 11. Stop rules
 
 Stop and ask before:
 
