@@ -31,6 +31,14 @@
       var startLink=nav.querySelector('a[href="start-guide.html"]');
       if(startLink && startLink.nextSibling){nav.insertBefore(wizard,startLink.nextSibling);}else{nav.appendChild(wizard);}
     }
+    if(!document.querySelector('a[href="v20.html"]')){
+      var hub=document.createElement('a');
+      hub.href='v20.html';
+      if(location.pathname.indexOf('/v20.html')!==-1)hub.className='active';
+      hub.innerHTML='<span>🧩</span><div>Workflow Hub<small>One place helper</small></div>';
+      var wizardLink=nav.querySelector('a[href="fix-wizard.html"]');
+      if(wizardLink && wizardLink.nextSibling){nav.insertBefore(hub,wizardLink.nextSibling);}else{nav.appendChild(hub);}
+    }
     if(!document.querySelector('a[href="patch-lab.html"]')){
       var patch=document.createElement('a');
       patch.href='patch-lab.html';
