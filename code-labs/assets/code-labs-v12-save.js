@@ -63,13 +63,21 @@
       var handoffLink=nav.querySelector('a[href="ai-handoff.html"]');
       if(handoffLink && handoffLink.nextSibling){nav.insertBefore(pub,handoffLink.nextSibling);}else{nav.appendChild(pub);}
     }
+    if(!document.querySelector('a[href="repo-desk.html"]')){
+      var desk=document.createElement('a');
+      desk.href='repo-desk.html';
+      if(location.pathname.indexOf('/repo-desk.html')!==-1)desk.className='active';
+      desk.innerHTML='<span>🗄️</span><div>Repo Desk<small>Plan file work</small></div>';
+      var pubLinkForDesk=nav.querySelector('a[href="publish-prep.html"]');
+      if(pubLinkForDesk && pubLinkForDesk.nextSibling){nav.insertBefore(desk,pubLinkForDesk.nextSibling);}else{nav.appendChild(desk);}
+    }
     if(!document.querySelector('a[href="github-tracker.html"]')){
       var tracker=document.createElement('a');
       tracker.href='github-tracker.html';
       if(location.pathname.indexOf('/github-tracker.html')!==-1)tracker.className='active';
       tracker.innerHTML='<span>🧭</span><div>GitHub Tracker<small>Track test links</small></div>';
-      var pubLink=nav.querySelector('a[href="publish-prep.html"]');
-      if(pubLink && pubLink.nextSibling){nav.insertBefore(tracker,pubLink.nextSibling);}else{nav.appendChild(tracker);}
+      var repoDesk=nav.querySelector('a[href="repo-desk.html"]');
+      if(repoDesk && repoDesk.nextSibling){nav.insertBefore(tracker,repoDesk.nextSibling);}else{nav.appendChild(tracker);}
     }
   }
   function polishStatus(){
