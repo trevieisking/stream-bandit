@@ -15,6 +15,14 @@
   function addExtraMenus(){
     var nav=document.querySelector('.nav');
     if(!nav)return;
+    if(!document.querySelector('a[href="fix-wizard.html"]')){
+      var wizard=document.createElement('a');
+      wizard.href='fix-wizard.html';
+      if(location.pathname.indexOf('/fix-wizard.html')!==-1)wizard.className='active';
+      wizard.innerHTML='<span>🧙</span><div>Fix Wizard<small>One next step</small></div>';
+      var home=nav.querySelector('a[href="index.html"]');
+      if(home && home.nextSibling){nav.insertBefore(wizard,home.nextSibling);}else{nav.insertBefore(wizard,nav.firstChild);}
+    }
     if(!document.querySelector('a[href="patch-lab.html"]')){
       var patch=document.createElement('a');
       patch.href='patch-lab.html';
