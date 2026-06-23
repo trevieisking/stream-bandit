@@ -35,7 +35,7 @@
       var hub=document.createElement('a');
       hub.href='v20.html';
       if(location.pathname.indexOf('/v20.html')!==-1)hub.className='active';
-      hub.innerHTML='<span>🧩</span><div>Workflow Hub<small>One place helper</small></div>';
+      hub.innerHTML='<span>🧰</span><div>Workflow Hub<small>One place helper</small></div>';
       var wizardLink=nav.querySelector('a[href="fix-wizard.html"]');
       if(wizardLink && wizardLink.nextSibling){nav.insertBefore(hub,wizardLink.nextSibling);}else{nav.appendChild(hub);}
     }
