@@ -11,13 +11,14 @@
   function loadScript(){return new Promise(function(resolve,reject){if(window.supabase&&window.supabase.createClient)return resolve();var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=resolve;s.onerror=reject;document.head.appendChild(s);});}
   async function client(){await loadScript();if(!window.CL_SB){window.CL_SB=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});}return window.CL_SB;}
   function setStatus(msg,kind){var el=$('#clHistoryStatus');if(el){el.className='badge '+(kind||'warn');el.textContent=msg;}}
+  function setHelp(html){var el=$('#clHistoryHelp');if(el)el.innerHTML=html;}
   async function currentUser(){var sb=await client();var res=await sb.auth.getUser();return {sb:sb,user:res&&res.data?res.data.user:null,error:res.error};}
   function projectPayload(s){var p=s.project||{};return {workspace:p.workspace||'',site_name:p.siteName||'Untitled project',site_url:p.siteUrl||'',repo:p.repo||'',mode:p.mode||'manual',notes:p.notes||'',metadata:{source:'code-labs-v1.2',domain:location.hostname}};}
+  async function refreshStatus(){try{setStatus('Checking Supabase','warn');var cu=await currentUser();if(cu.user){setStatus('Supabase ready','good');setHelp('<p><b>Supabase:</b> ready for Code Labs repair history. This panel does not use Stream Bandit login buttons and does not write to GitHub.</p>');}else{setStatus('Connect Supabase','warn');setHelp('<p><b>Supabase:</b> not active for this Code Labs session. Connect Supabase when asked by ChatGPT/settings, then refresh this panel. Do not use Stream Bandit login for this page.</p>');}return cu;}catch(err){console.error(err);setStatus('Supabase unavailable','bad');setHelp('<p><b>Supabase:</b> check failed. Connect Supabase when asked, then try again. GitHub is separate.</p>');return {user:null,error:err};}}
   async function saveAll(){
     try{
-      setStatus('Checking login','warn');
-      var cu=await currentUser();
-      if(!cu.user){setStatus('Sign in needed','bad');toast('Sign in to the site first, then save history.');return;}
+      var cu=await refreshStatus();
+      if(!cu.user){toast('Connect Supabase for Code Labs first, then save history.');return;}
       var s=state(), f=s.file||{}, p=s.project||{};
       setStatus('Saving','warn');
       var pr=await cu.sb.from('code_labs_projects').insert(projectPayload(s)).select('id').single();
@@ -38,29 +39,29 @@
       var tests=(s.tests||[]).slice(0,20).map(function(t){return {project_id:projectId,job_id:jobId,filename:t.filename||f.filename||'',result:t.result||'UNKNOWN',checked_count:t.checked||0,total_count:t.total||0,notes:t.notes||'',details:t};});
       if(tests.length){var tr=await cu.sb.from('code_labs_test_runs').insert(tests);if(tr.error)throw tr.error;}
       await cu.sb.from('code_labs_audit_log').insert({project_id:projectId,job_id:jobId,action:'saved_repair_history',details:{filename:f.filename||'',hasFixed:!!f.fixedCode,tests:tests.length}});
-      setStatus('Saved to Supabase','good');toast('Repair history saved to Supabase.');
+      setStatus('Saved to Supabase','good');setHelp('<p><b>Saved:</b> Code Labs repair history saved to Supabase. No GitHub write happened.</p>');toast('Repair history saved to Supabase.');
       loadHistory();
-    }catch(err){console.error(err);setStatus('Save failed','bad');toast('Supabase save failed: '+(err.message||err));}
+    }catch(err){console.error(err);setStatus('Supabase save failed','bad');setHelp('<p><b>Supabase save failed:</b> '+esc(err.message||err)+'. GitHub is separate.</p>');toast('Supabase save failed: '+(err.message||err));}
   }
   async function loadHistory(){
     try{
-      var cu=await currentUser();
-      if(!cu.user){setStatus('Sign in needed','bad');return;}
+      var cu=await refreshStatus();
+      if(!cu.user){return;}
       var r=await cu.sb.from('code_labs_projects').select('id,site_name,site_url,repo,mode,created_at').order('created_at',{ascending:false}).limit(8);
       if(r.error)throw r.error;
       var box=$('#clHistoryList');
       if(box){box.innerHTML=(r.data||[]).length?(r.data||[]).map(function(x){return '<div class="item"><b>'+esc(x.site_name||'Untitled')+'</b><p>'+esc(x.site_url||'No URL')+'</p><p>'+esc(new Date(x.created_at).toLocaleString())+' · '+esc(x.mode||'manual')+'</p></div>';}).join(''):'<div class="empty">No saved Supabase history yet.</div>';}
       setStatus('History loaded','good');
-    }catch(err){console.error(err);setStatus('Load failed','bad');toast('Could not load history: '+(err.message||err));}
+    }catch(err){console.error(err);setStatus('Load failed','bad');setHelp('<p><b>Load failed:</b> '+esc(err.message||err)+'.</p>');toast('Could not load history: '+(err.message||err));}
   }
   function addPanel(){
     var main=$('.main');
     if(!main){setTimeout(addPanel,120);return;}
     if($('#clHistoryPanel'))return;
     var panel=document.createElement('section');panel.className='panel';panel.id='clHistoryPanel';
-    panel.innerHTML='<h2>Supabase Repair History</h2><p>Save this repair job to your private Code Labs tables. This uses authenticated owner-only rows and still does not write to GitHub or change live files.</p><div class="actions"><span id="clHistoryStatus" class="badge warn">Not checked</span><button class="btn primary" id="clSaveHistory">Save repair history</button><button class="btn ghost" id="clLoadHistory">Load saved history</button></div><div class="notice"><p><b>Sign-in rule:</b> You must be signed in on this domain. If saving says sign in needed, open the normal site login/profile page first, sign in, then return here.</p></div><div id="clHistoryList" class="list"><div class="empty">History not loaded yet.</div></div>';
+    panel.innerHTML='<h2>Supabase Repair History</h2><p>Save this repair job to dedicated Code Labs tables. Supabase and GitHub are separate connectors; one can be disconnected while the other still works.</p><div class="actions"><span id="clHistoryStatus" class="badge warn">Not checked</span><button class="btn ghost" id="clRefreshHistoryStatus">Refresh Supabase</button><button class="btn primary" id="clSaveHistory">Save repair history</button><button class="btn ghost" id="clLoadHistory">Load saved history</button></div><div id="clHistoryHelp" class="notice"><p><b>Supabase:</b> not checked yet. This panel never sends you to Stream Bandit login.</p></div><div id="clHistoryList" class="list"><div class="empty">History not loaded yet.</div></div>';
     var safety=$('#clSafetyTools');var footer=$('.footerNote');if(safety&&safety.parentNode){safety.parentNode.insertBefore(panel,safety.nextSibling);}else if(footer){main.insertBefore(panel,footer);}else{main.appendChild(panel);} 
-    $('#clSaveHistory').onclick=saveAll;$('#clLoadHistory').onclick=loadHistory;currentUser().then(function(cu){setStatus(cu.user?'Signed in':'Sign in needed',cu.user?'good':'bad');});
+    $('#clSaveHistory').onclick=saveAll;$('#clLoadHistory').onclick=loadHistory;$('#clRefreshHistoryStatus').onclick=refreshStatus;refreshStatus();
   }
   function start(){setTimeout(addPanel,180);setTimeout(addPanel,650);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
