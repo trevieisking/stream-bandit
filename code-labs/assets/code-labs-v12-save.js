@@ -15,13 +15,21 @@
   function addExtraMenus(){
     var nav=document.querySelector('.nav');
     if(!nav)return;
+    if(!document.querySelector('a[href="start-guide.html"]')){
+      var start=document.createElement('a');
+      start.href='start-guide.html';
+      if(location.pathname.indexOf('/start-guide.html')!==-1)start.className='active';
+      start.innerHTML='<span>🟢</span><div>Start Guide<small>Tell us what broke</small></div>';
+      var home=nav.querySelector('a[href="index.html"]');
+      if(home && home.nextSibling){nav.insertBefore(start,home.nextSibling);}else{nav.insertBefore(start,nav.firstChild);}
+    }
     if(!document.querySelector('a[href="fix-wizard.html"]')){
       var wizard=document.createElement('a');
       wizard.href='fix-wizard.html';
       if(location.pathname.indexOf('/fix-wizard.html')!==-1)wizard.className='active';
       wizard.innerHTML='<span>🧙</span><div>Fix Wizard<small>One next step</small></div>';
-      var home=nav.querySelector('a[href="index.html"]');
-      if(home && home.nextSibling){nav.insertBefore(wizard,home.nextSibling);}else{nav.insertBefore(wizard,nav.firstChild);}
+      var startLink=nav.querySelector('a[href="start-guide.html"]');
+      if(startLink && startLink.nextSibling){nav.insertBefore(wizard,startLink.nextSibling);}else{nav.appendChild(wizard);}
     }
     if(!document.querySelector('a[href="patch-lab.html"]')){
       var patch=document.createElement('a');
