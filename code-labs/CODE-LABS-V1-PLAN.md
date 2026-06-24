@@ -2,7 +2,7 @@
 
 Status: Code Labs only / live-ready path / connector future planned / no Stream Bandit lane crossing.
 
-Last audit update: 2026-06-24 - GitHub source, PR history, page map, page shell audit, menu grouping, account/usage status panels, and Supabase inspection recorded before database changes.
+Last audit update: 2026-06-24 - GitHub source, PR history, page map, page shell audit, menu grouping, account/usage status panels, Supabase inspection, workflow request set, connector rule helper, and repository cleanup rule recorded before database changes.
 
 ## Mission
 
@@ -31,7 +31,7 @@ If Code Labs uses the same Supabase Auth project later, the user-facing control 
 3. Fix Wizard - one next step for non-coders.
 4. File Lab - paste, upload, or public GitHub read-only load.
 5. Code Search - find exact lines and make a Code Search Report.
-6. Workflow Hub - build ChatGPT read, generator, and safe change requests.
+6. Workflow Hub - build ChatGPT read, generator, review, exact patch, safe change, GitHub help, and Supabase help requests.
 7. Patch Desk / Patch Lab - paste fixed code or line-safe patches.
 8. Preview + Test - test before replacing.
 9. Checkpoints - rollback safety.
@@ -60,7 +60,7 @@ GitHub `main` currently has these 19 Code Labs pages.
 
 ### Connector, finishing, and support pages
 
-- `code-labs/connector-status.html` - GitHub/Supabase status and lane wording.
+- `code-labs/connector-status.html` - GitHub/Supabase status, one-connector rule, and lane wording.
 - `code-labs/ai-handoff.html` - copyable review handoff.
 - `code-labs/publish-prep.html` - safe branch/PR request.
 - `code-labs/github-tracker.html` - PR, branch, preview, and test tracking.
@@ -80,7 +80,7 @@ The architecture is:
 3. `assets/code-labs.js` renders the original core pages and local manual repair state.
 4. `assets/code-labs-v1-1-safety.js` adds local safety/export/import tools.
 5. `assets/code-labs-v12-save.js` loads Supabase history support and injects newer menu links.
-6. Page-specific JavaScript files render newer tools such as Start Guide, Fix Wizard, Workflow Hub, Patch Lab, AI Handoff, Publish Prep, GitHub Tracker, and Repo Desk.
+6. Page-specific JavaScript files render newer tools such as Start Guide, Fix Wizard, Workflow Hub, Patch Lab, AI Handoff, Publish Prep, GitHub Tracker, Repo Desk, and Connector Status helpers.
 
 This layered model is working, but it is fragile. If a page-specific script fails, a newer page can fall back to the base Home shell or show confusing identity. Future hygiene work should make loader failure obvious and eventually move page registry/status into one source of truth.
 
@@ -94,6 +94,9 @@ This layered model is working, but it is fragile. If a page-specific script fail
 - Workflow Hub uses the saved Code Search Report.
 - ChatGPT read request.
 - ChatGPT generator request.
+- ChatGPT review request.
+- ChatGPT exact patch request.
+- GitHub Help and Supabase Help prompts using plain connector wording for Trev.
 - Safe change request wording.
 - Fixed-code paste area.
 - Compare summary.
@@ -108,6 +111,7 @@ This layered model is working, but it is fragile. If a page-specific script fail
 - GitHub Tracker link/test tracking.
 - Repo Desk request planner.
 - Separate GitHub and Supabase connector wording.
+- One-connector-at-a-time rule visible on Connector Status.
 - Safe create-file drill passed.
 - Safe delete-file drill passed.
 - Noscript page-load hygiene added to `v20.html` and `repo-desk.html` in PR #84.
@@ -129,7 +133,7 @@ This layered model is working, but it is fragile. If a page-specific script fail
 - The page-specific JavaScript assets exist on GitHub for the newer pages.
 - The manual repair path is coherent and should be preserved.
 - The read-only GitHub loader and Code Search path are now part of the live-ready direction.
-- Workflow Hub already reads the saved Code Search Report.
+- Workflow Hub reads the saved Code Search Report and now includes review, exact patch, GitHub help, and Supabase help request types.
 - Repo Desk exists on `main` after the Repo Desk planner and identity promotion work.
 - 19 Code Labs HTML shells were checked on `main`; CSS, page identity, noscript fallback, base loader, safety/save layers, and expected page-specific scripts are present.
 
@@ -140,6 +144,7 @@ This layered model is working, but it is fragile. If a page-specific script fail
 - Connector Status wording is still partly patched after render instead of coming from one source of truth.
 - Supabase account/status wording must stay Code Labs-only.
 - Stale uploaded files and stale draft PRs can conflict with GitHub `main`.
+- Repo bloat can cause GitHub truncation; prefer rewriting/reusing existing Code Labs files and clean old Stream Bandit V4/V5/V6 test pages when new repo files/checkpoints are unavoidable.
 - Do not merge old connector wording that points users to Stream Bandit sign-in.
 
 ## Stale branch and PR handling
@@ -172,6 +177,9 @@ Trusted merged milestones:
 - PR #85 / sidebar menu grouping.
 - PR #86 / account status panel.
 - PR #87 / usage and feedback status panel.
+- PR #88 / Supabase inspection recorded in the master plan.
+- PR #89 / Workflow Hub request set.
+- PR #90 / one-connector rule helper.
 
 ## Live page audit checklist
 
@@ -426,8 +434,8 @@ GitHub write tools are later and must require:
 1. Keep this merged master plan authoritative.
 2. Keep stale PRs closed or rebuild them from current `main` only.
 3. Continue live page checks after every UI/helper change.
-4. Add missing Workflow Hub request types only after the current planning/status lane is stable.
-5. Design the Code Labs-only Supabase migration for account/profile link, usage, feedback, FK indexes, function search path, and RLS initplan cleanup.
+4. Code Labs auth UI decision - same Supabase project is acceptable only with Code Labs-only login/control wording.
+5. Code Labs Supabase migration design - plan before SQL.
 6. Run one Supabase migration pass only after the exact SQL is reviewed.
 7. Build server-side connector prototype.
 8. Add ChatGPT app/connector setup notes.
@@ -440,13 +448,24 @@ GitHub write tools are later and must require:
 Do these in order:
 
 1. Planning lock - this master plan stays authoritative.
-2. Live page spot check after PR #84, PR #85, PR #86, and PR #87.
-3. Workflow Hub request set - add missing Review, Exact Patch, Supabase Help, and GitHub Help requests.
-4. Code Labs auth UI decision - same Supabase project is acceptable only with Code Labs-only login/control wording.
-5. Code Labs Supabase migration design - plan before SQL.
-6. Usage and feedback UI - local/read-only first; database writes only after RLS is confirmed.
-7. GitHub direct commit design - design before coding, branch/PR only by default.
-8. Logo and favicon - Code Labs identity only, no Stream Bandit branding.
+2. Live page spot check after PR #84, PR #85, PR #86, PR #87, PR #89, and PR #90.
+3. Code Labs auth UI decision - same Supabase project is acceptable only with Code Labs-only login/control wording.
+4. Code Labs Supabase migration design - plan before SQL.
+5. Usage and feedback UI - local/read-only first; database writes only after RLS is confirmed.
+6. GitHub direct commit design - design before coding, branch/PR only by default.
+7. Logo and favicon - Code Labs identity only, no Stream Bandit branding.
+
+## Repository cleanup rule
+
+To reduce GitHub truncation and repo clutter:
+
+- Prefer rewriting or reusing existing Code Labs files instead of creating new files.
+- If a future Code Labs step must create new repository files or checkpoint pages, delete or replace 3 old Stream Bandit V4/V5/V6 test or checkpoint pages in the same cleanup pass.
+- Never delete Stream Bandit V7 files for this cleanup rule.
+- Never delete Code Labs files for this cleanup rule.
+- Verify candidate cleanup files first before deleting anything.
+- If an old V4/V5/V6 file is still live, useful, or uncertain, do not delete it; reuse an old test/checkpoint file instead or stop for review.
+- This cleanup rule does not apply to branch creation or editing existing files.
 
 ## Stop rules
 
@@ -458,6 +477,8 @@ Stop and ask before:
 - adding auth redirects,
 - adding browser-side GitHub writes,
 - deleting any Code Labs page,
+- deleting any Stream Bandit V7 file,
+- deleting old Stream Bandit V4/V5/V6 files without first verifying they are stale test/checkpoint pages,
 - replacing a full page when a tiny safe fix would work,
 - merging a stale draft PR,
 - merging connector wording that mentions Stream Bandit login as a Code Labs path.
@@ -469,6 +490,7 @@ Stop and ask before:
 - Never hide what changed.
 - Always support manual copy/paste rescue mode.
 - Prefer full-file replacement for non-coders.
+- Prefer reuse/rewrite of existing Code Labs files over adding new files.
 - Keep Code Labs and Stream Bandit user-facing lanes separate.
 - Keep secrets server-side only.
 - Make every write action visible in an audit trail.
