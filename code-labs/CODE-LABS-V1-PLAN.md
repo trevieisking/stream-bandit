@@ -1,8 +1,8 @@
 # Code Labs Master Plan
 
-Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / future Python analysis lane noted / no Stream Bandit lane crossing.
+Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / future Python analysis lane noted / future utility toolbox noted / no Stream Bandit lane crossing.
 
-Last update: 2026-06-24 - live-promotion position, passed-page notes, connector reality, signed-in user wording, cleanup rule, Python sandbox idea, and ChatGPT workbench purpose recorded.
+Last update: 2026-06-24 - live-promotion position, passed-page notes, connector reality, signed-in user wording, cleanup rule, Python sandbox idea, utility toolbox idea, and ChatGPT workbench purpose recorded.
 
 ## Mission
 
@@ -168,7 +168,7 @@ Before any page patch:
 
 ## Connector reality
 
-There are four distinct layers. Do not mix them up.
+There are four distinct active/future layers. Do not mix them up.
 
 ### Browser Code Labs
 
@@ -222,6 +222,49 @@ Python safety rules:
 ### Future hosted ChatGPT app/connector
 
 A proper hosted Code Labs ChatGPT app/connector is still future work. It needs a server endpoint, account handshake, scoped tool actions, audit trail, and user approval gates before write actions.
+
+## Future Code Labs utility toolbox
+
+Code Labs should eventually include a toolbox for common repair and ChatGPT support tasks. These are small practical tools that help non-coders and ChatGPT prepare safer requests without needing separate websites.
+
+Candidate browser-safe utilities:
+
+- Base64 encode/decode,
+- URL encode/decode,
+- HTML entity encode/decode,
+- JSON validate, format, minify, and compare,
+- Markdown/plain-text cleaner,
+- regex tester with clear match count,
+- line counter and character counter,
+- duplicate ID and duplicate script checker,
+- HTML/CSS/JS quick structure checker,
+- before/after diff viewer,
+- raw GitHub URL builder,
+- GitHub blob URL to raw URL converter,
+- file path normalizer,
+- hash/checksum generator for copied files,
+- local repair-job JSON validator,
+- safe secrets scanner for obvious API keys before sharing code,
+- file manifest builder for pasted project bundles,
+- cleanup candidate report builder for old V4/V5/V6 pages/checkpoints.
+
+Candidate hosted/sandbox-only utilities:
+
+- ZIP/project package inspection,
+- dependency/package manifest inspection,
+- deeper syntax/lint checks,
+- static link checker,
+- batch duplicate-code scan,
+- generated test report builder,
+- Python-powered cleanup report.
+
+Utility toolbox safety rules:
+
+- browser utilities should run locally and not upload code by default,
+- no secrets should be sent to hosted tools without explicit approval,
+- hosted utilities need signed-in user scope and audit logs,
+- outputs should be copyable into Workflow Hub, AI Handoff, Repo Desk, or Supabase notes,
+- utility tools should support non-coders with plain-English explanations.
 
 ## Supabase checkpoint
 
@@ -326,8 +369,9 @@ Feedback can include rating, what worked, what was confusing, and optional conta
 9. Build server-side connector prototype after static workflow is stable.
 10. Add read-only connector tools before write tools.
 11. Add scoped Code Labs write tools after account/RLS review.
-12. Add Python sandbox/analysis connector design as an optional non-blocking improvement.
-13. Add GitHub branch/PR actions only after explicit safety review.
+12. Add browser-safe utility toolbox where it improves non-coder repair flow.
+13. Add Python sandbox/analysis connector design as an optional non-blocking improvement.
+14. Add GitHub branch/PR actions only after explicit safety review.
 
 ## Stop rules
 
