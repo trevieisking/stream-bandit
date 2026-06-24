@@ -112,9 +112,16 @@
     var panel=document.createElement('section');
     panel.className='panel';
     panel.id='clAuthDecisionPanel';
-    panel.innerHTML='<h2>Code Labs account decision</h2><p>Use guest local mode now. Real Code Labs accounts come later after user-owned rows, permissions, and server-side connector actions are ready.</p><div class="grid2"><div class="item"><b>Now</b><p>Manual/local workspace. No login redirect. No database write. No hidden admin mode.</p><span class="badge good">Guest local</span></div><div class="item"><b>Later</b><p>Same Supabase project is allowed only if the controls, profile rows, and wording stay Code Labs-only.</p><span class="badge warn">Planned</span></div></div><div class="notice"><p><b>Separation:</b> do not send Code Labs users to Stream Bandit login. Do not touch Stream Bandit app tables, auth, or policies during Code Labs account work unless Trev starts a separate Stream Bandit pass.</p></div>';
+    panel.innerHTML='<h2>Code Labs account decision</h2><p>Use guest local mode now. GitHub repo work already works through the ChatGPT GitHub connector. Real Code Labs accounts come later after user-owned rows, permissions, and server-side connector actions are ready.</p><div class="grid2"><div class="item"><b>Now</b><p>Manual/local workspace plus ChatGPT GitHub connector for repo branches, PRs, test files, and cleanup when Trev connects GitHub.</p><span class="badge good">GitHub connector works</span></div><div class="item"><b>Later</b><p>Same Supabase project is allowed only if the controls, profile rows, and wording stay Code Labs-only.</p><span class="badge warn">Account mode planned</span></div></div><div class="notice"><p><b>Separation:</b> browser pages stay safe/manual. ChatGPT handles GitHub connector work when Trev connects GitHub. Do not send Code Labs users to Stream Bandit login.</p></div>';
     var panels=[].slice.call(main.querySelectorAll('.panel'));
     if(panels[0]&&panels[0].parentNode){panels[0].parentNode.insertBefore(panel,panels[0].nextSibling);}else{main.appendChild(panel);}
+  }
+  function polishSetupAndProjects(){
+    var page=document.body.getAttribute('data-page');
+    if(page!=='setup'&&page!=='project-picker')return;
+    textReplace(document.body,'GitHub later','GitHub via ChatGPT connector');
+    textReplace(document.body,'GitHub and Supabase are future connector layers.','GitHub works through ChatGPT connector now. Supabase/database work uses the separate Supabase connector when Trev connects it.');
+    textReplace(document.body,'Future connector mode: load files from a repo, save fixed code to a test branch, keep rollback commits.','ChatGPT GitHub connector mode: read repo files, create test branches, open PRs, add test files, and help with verified cleanup when Trev connects GitHub. Browser pages stay safe/manual.');
   }
   function polishStatus(){
     if(document.body.getAttribute('data-page')!=='connector-status')return;
@@ -130,8 +137,8 @@
     });
   }
   loadHistory();
-  setTimeout(function(){addExtraMenus();groupMenus();addAuthDecisionPanel();},120);
-  setTimeout(function(){addExtraMenus();groupMenus();addAuthDecisionPanel();},500);
+  setTimeout(function(){addExtraMenus();groupMenus();addAuthDecisionPanel();polishSetupAndProjects();},120);
+  setTimeout(function(){addExtraMenus();groupMenus();addAuthDecisionPanel();polishSetupAndProjects();},500);
   setTimeout(polishStatus,220);
   setTimeout(polishStatus,800);
 })();
