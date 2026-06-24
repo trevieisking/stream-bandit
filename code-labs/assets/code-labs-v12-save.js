@@ -1,4 +1,4 @@
-/* Code Labs V1.2 loader alias and status polish */
+/* Code Labs V1.3 - shared menu, save, and workspace polish */
 (function(){
   function loadHistory(){
     var s=document.createElement('script');
@@ -107,6 +107,19 @@
   function polishGlobal(){
     textReplace(document.body,'Manual rescue works now. GitHub and Supabase are planned connector layers.','Manual rescue works now. GitHub connector work is proven through ChatGPT, and Supabase can save Code Labs history when connected.');
   }
+  function addWorkspaceLivePanel(){
+    var page=document.body.getAttribute('data-page');
+    if(page!=='setup'&&page!=='project-picker')return;
+    var main=document.querySelector('.main');
+    if(!main){setTimeout(addWorkspaceLivePanel,160);return;}
+    if(document.querySelector('#clWorkspaceLivePanel'))return;
+    var panel=document.createElement('section');
+    panel.className='panel';
+    panel.id='clWorkspaceLivePanel';
+    panel.innerHTML='<h2>Workspace live-ready rules</h2><p>Workspace pages save local project context for the signed-in Code Labs user. They do not write to GitHub, Supabase, or Stream Bandit app files by themselves.</p><div class="grid2"><div class="item"><b>Manual/local now</b><p>Save project name, live URL, repo path if known, and notes. Code Labs still works when connectors are unavailable.</p><span class="badge good">Ready</span></div><div class="item"><b>GitHub connector lane</b><p>Repo work happens through ChatGPT after the user connects GitHub. Use branches and PRs, not direct browser writes.</p><span class="badge good">Proven</span></div><div class="item"><b>Supabase history lane</b><p>Supabase can save Code Labs repair history when connected. It stays separate from Stream Bandit login and app tables.</p><span class="badge warn">Separate connector</span></div><div class="item"><b>Account later</b><p>Live user names should come from Code Labs profile/account data later. Do not hard-code developer names.</p><span class="badge warn">Planned</span></div></div><div class="notice"><p><b>Promotion check:</b> Setup and Project Picker pass when they save local context clearly, use signed-in-user wording, and keep Code Labs separate from Stream Bandit.</p></div>';
+    var first=document.querySelector('.panel');
+    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first.nextSibling);}else{main.appendChild(panel);}
+  }
   function addAuthDecisionPanel(){
     if(document.body.getAttribute('data-page')!=='setup')return;
     var main=document.querySelector('.main');
@@ -116,8 +129,8 @@
     panel.className='panel';
     panel.id='clAuthDecisionPanel';
     panel.innerHTML='<h2>Code Labs account decision</h2><p>Use guest local mode now. GitHub repo work already works through the ChatGPT GitHub connector. Real Code Labs accounts come later after user-owned rows, permissions, and server-side connector actions are ready.</p><div class="grid2"><div class="item"><b>Now</b><p>Manual/local workspace plus ChatGPT GitHub connector for repo branches, PRs, test files, and cleanup when the signed-in user connects GitHub.</p><span class="badge good">GitHub connector works</span></div><div class="item"><b>Later</b><p>Same Supabase project is allowed only if the controls, profile rows, and wording stay Code Labs-only.</p><span class="badge warn">Account mode planned</span></div></div><div class="notice"><p><b>Separation:</b> browser pages stay safe/manual. ChatGPT handles GitHub connector work when the signed-in user connects GitHub. Do not send Code Labs users to Stream Bandit login.</p></div>';
-    var panels=[].slice.call(main.querySelectorAll('.panel'));
-    if(panels[0]&&panels[0].parentNode){panels[0].parentNode.insertBefore(panel,panels[0].nextSibling);}else{main.appendChild(panel);}
+    var ref=document.querySelector('#clWorkspaceLivePanel')||document.querySelector('.panel');
+    if(ref&&ref.parentNode){ref.parentNode.insertBefore(panel,ref.nextSibling);}else{main.appendChild(panel);}
   }
   function addHelpOperatingMap(){
     if(document.body.getAttribute('data-page')!=='help')return;
@@ -148,7 +161,9 @@
     var page=document.body.getAttribute('data-page');
     if(page!=='setup'&&page!=='project-picker')return;
     textReplace(document.body,'GitHub later','GitHub via ChatGPT connector');
+    textReplace(document.body,'Supabase later','Supabase history when connected');
     textReplace(document.body,'GitHub and Supabase are future connector layers.','GitHub works through ChatGPT connector now. Supabase/database work uses the separate Supabase connector when the signed-in user connects it.');
+    textReplace(document.body,'Manual mode is ready now; GitHub and Supabase are future connector layers.','Manual mode works now. GitHub works through ChatGPT connector, and Supabase history works when connected.');
     textReplace(document.body,'Future connector mode: load files from a repo, save fixed code to a test branch, keep rollback commits.','ChatGPT GitHub connector mode: read repo files, create test branches, open PRs, add test files, and help with verified cleanup when the signed-in user connects GitHub. Browser pages stay safe/manual.');
   }
   function polishStatus(){
@@ -164,7 +179,7 @@
       }
     });
   }
-  function runSharedPolish(){addExtraMenus();groupMenus();polishGlobal();addAuthDecisionPanel();addHelpOperatingMap();addPromotionChecklist();polishSetupAndProjects();}
+  function runSharedPolish(){addExtraMenus();groupMenus();polishGlobal();addWorkspaceLivePanel();addAuthDecisionPanel();addHelpOperatingMap();addPromotionChecklist();polishSetupAndProjects();}
   loadHistory();
   setTimeout(runSharedPolish,120);
   setTimeout(runSharedPolish,500);
