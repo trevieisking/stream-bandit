@@ -116,6 +116,12 @@
       panel.innerHTML='<h2>Connectors are separate</h2><p>Code Labs can use the same Stream Bandit GitHub repo and the same Supabase project, but the connector controls stay separate. No Stream Bandit login buttons belong here.</p><div class="grid2"><div class="item"><b>GitHub</b><p>For repo reads, branches, commits, PRs, previews, and merges.</p><span class="badge warn">Connect GitHub</span></div><div class="item"><b>Supabase</b><p>For Code Labs projects, repair jobs, packets, versions, checkpoints, and history tables.</p><span class="badge warn">Connect Supabase</span></div></div><div class="notice"><p><b>Plain English:</b> if I need repo code work, I will say <b>Connect GitHub please, Trev</b>. If I need database/table work, I will say <b>Connect Supabase please, Trev</b>.</p></div>';
       if(top&&top.parentNode){top.parentNode.insertBefore(panel,top.nextSibling);}else{main.appendChild(panel);}
     }
+    if(!$('#clAccountStatusPanel')){
+      var boundary=$('#clConnectorBoundary');
+      var account=document.createElement('section');account.className='panel';account.id='clAccountStatusPanel';
+      account.innerHTML='<h2>Code Labs account status</h2><p>Guest local mode is active now. Real Code Labs accounts come later, after user-owned rows, permissions, and server-side connector actions are built.</p><div class="grid2"><div class="item"><b>Current mode</b><p>Local browser workspace only. Repairs, packets, previews, and checkpoints stay in this browser unless copied out.</p><span class="badge good">Guest local</span></div><div class="item"><b>Future account mode</b><p>Code Labs accounts will own their projects, jobs, files, packets, checkpoints, and test runs.</p><span class="badge warn">Planned</span></div></div><div class="notice"><p><b>Safety:</b> there is no service-role key in browser code, no hidden admin access, no cross-user repair history, and no silent writes to main.</p></div>';
+      if(boundary&&boundary.parentNode){boundary.parentNode.insertBefore(account,boundary.nextSibling);}else{main.appendChild(account);}
+    }
     setCard('GitHub mode','Connect GitHub','warn','Use GitHub for repo reads, test branches, PRs, previews, and merges. It is separate from Supabase.');
     setCard('Supabase mode','Connect Supabase','warn','Use Supabase for Code Labs repair history and code_labs_* tables. It is separate from GitHub.');
     setCard('ChatGPT app','Bridge only','warn','ChatGPT tells Trev which connector is needed. Code Labs should not redirect to Stream Bandit login.');
