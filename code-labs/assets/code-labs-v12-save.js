@@ -1,4 +1,4 @@
-/* Code Labs V1.5 - shared menu, save, workspace, repair, and safety gate polish */
+/* Code Labs V1.5.1 - shared menu, save, workspace, repair, and safety gate polish */
 (function(){
   var REPAIR_PAGES=['rescue-room','packet-builder','patch-desk'];
   var SAFETY_PAGES=['patch-lab','preview-test','checkpoints'];
@@ -102,15 +102,15 @@
     if(SAFETY_PAGES.indexOf(p)===-1)return;
     if(document.querySelector('#clSafetyGatePanel'))return;
     var labels={
-      'patch-lab':['Patch Lab','make targeted line/text changes without replacing more than intended'],
-      'preview-test':['Preview + Test','prove the fixed code opens and behaves before live replacement'],
-      'checkpoints':['Checkpoints','keep rollback versions and saved test notes available']
+      'patch-lab':['2. Patch Lab safety-gate rules','make targeted line/text changes without replacing more than intended'],
+      'preview-test':['Preview + Test safety-gate rules','prove the fixed code opens and behaves before live replacement'],
+      'checkpoints':['Checkpoints safety-gate rules','keep rollback versions and saved test notes available']
     };
-    var info=labels[p]||['Safety gate','protect the repair before publish'];
+    var info=labels[p]||['Safety gate rules','protect the repair before publish'];
     var panel=document.createElement('section');
     panel.className='panel';
     panel.id='clSafetyGatePanel';
-    panel.innerHTML='<h2>'+info[0]+' safety-gate rules</h2><p>This page should '+info[1]+'. It is part of the final manual safety gate before any GitHub branch, PR, or live file replacement.</p><div class="grid2"><div class="item"><b>Check before publish</b><p>Confirm the fixed code was saved, compared, previewed, and tested before asking GitHub connector to help publish.</p><span class="badge good">Required</span></div><div class="item"><b>Rollback ready</b><p>Keep an original checkpoint and a fixed-code checkpoint so the user can recover if a test fails.</p><span class="badge good">Safe</span></div><div class="item"><b>PASS/FAIL notes</b><p>Record what worked and what failed in plain English so ChatGPT can continue without guessing.</p><span class="badge warn">Evidence</span></div><div class="item"><b>No live writes here</b><p>These browser pages prepare and test. GitHub write work belongs in the signed-in connector branch/PR lane.</p><span class="badge warn">Manual gate</span></div></div><div class="notice"><p><b>Promotion check:</b> this page passes when it protects rollback, supports plain-English test notes, and gives the user a clear next step.</p></div>';
+    panel.innerHTML='<h2>'+info[0]+'</h2><p>This page should '+info[1]+'. It is part of the final manual safety gate before any GitHub branch, PR, or live file replacement.</p><div class="grid2"><div class="item"><b>Check before publish</b><p>Confirm the fixed code was saved, compared, previewed, and tested before asking GitHub connector to help publish.</p><span class="badge good">Required</span></div><div class="item"><b>Rollback ready</b><p>Keep an original checkpoint and a fixed-code checkpoint so the user can recover if a test fails.</p><span class="badge good">Safe</span></div><div class="item"><b>PASS/FAIL notes</b><p>Record what worked and what failed in plain English so ChatGPT can continue without guessing.</p><span class="badge warn">Evidence</span></div><div class="item"><b>No live writes here</b><p>These browser pages prepare and test. GitHub write work belongs in the signed-in connector branch/PR lane.</p><span class="badge warn">Manual gate</span></div></div><div class="notice"><p><b>Promotion check:</b> this page passes when it protects rollback, supports plain-English test notes, and gives the user a clear next step.</p></div>';
     insertAfterFirstPanel(panel);
   }
   function addAuthDecisionPanel(){
