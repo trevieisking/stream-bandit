@@ -144,7 +144,7 @@ This layered model is working, but it is fragile. If a page-specific script fail
 - Connector Status wording is still partly patched after render instead of coming from one source of truth.
 - Supabase account/status wording must stay Code Labs-only.
 - Stale uploaded files and stale draft PRs can conflict with GitHub `main`.
-- Repo bloat can cause GitHub truncation; prefer rewriting/reusing existing Code Labs files and clean old Stream Bandit V4/V5/V6 test pages when new repo files/checkpoints are unavoidable.
+- Repo bloat can cause GitHub truncation; prefer rewriting/reusing existing Code Labs files. V7 is protected; other old Stream Bandit test/checkpoint pages may be cleanup candidates after verification when new repo files/checkpoints are unavoidable.
 - Do not merge old connector wording that points users to Stream Bandit sign-in.
 
 ## Stale branch and PR handling
@@ -460,11 +460,11 @@ Do these in order:
 To reduce GitHub truncation and repo clutter:
 
 - Prefer rewriting or reusing existing Code Labs files instead of creating new files.
-- If a future Code Labs step must create new repository files or checkpoint pages, delete or replace 3 old Stream Bandit V4/V5/V6 test or checkpoint pages in the same cleanup pass.
-- Never delete Stream Bandit V7 files for this cleanup rule.
+- V7 Stream Bandit files are protected.
+- Other old Stream Bandit test/checkpoint pages may be used as cleanup candidates after verification when future new repo files or checkpoint pages are unavoidable.
 - Never delete Code Labs files for this cleanup rule.
-- Verify candidate cleanup files first before deleting anything.
-- If an old V4/V5/V6 file is still live, useful, or uncertain, do not delete it; reuse an old test/checkpoint file instead or stop for review.
+- Verify candidate cleanup files first before changing anything.
+- If an old Stream Bandit cleanup candidate is still live, useful, or uncertain, do not use it; reuse an old test/checkpoint file instead or stop for review.
 - This cleanup rule does not apply to branch creation or editing existing files.
 
 ## Stop rules
@@ -478,7 +478,7 @@ Stop and ask before:
 - adding browser-side GitHub writes,
 - deleting any Code Labs page,
 - deleting any Stream Bandit V7 file,
-- deleting old Stream Bandit V4/V5/V6 files without first verifying they are stale test/checkpoint pages,
+- cleaning up old Stream Bandit files without first verifying they are stale test/checkpoint pages,
 - replacing a full page when a tiny safe fix would work,
 - merging a stale draft PR,
 - merging connector wording that mentions Stream Bandit login as a Code Labs path.
