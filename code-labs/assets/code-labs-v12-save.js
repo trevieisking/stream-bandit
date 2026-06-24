@@ -80,6 +80,30 @@
       if(repoDesk && repoDesk.nextSibling){nav.insertBefore(tracker,repoDesk.nextSibling);}else{nav.appendChild(tracker);}
     }
   }
+  function groupMenus(){
+    var nav=document.querySelector('.nav');
+    if(!nav)return;
+    var links={};
+    [].slice.call(nav.querySelectorAll('a[href]')).forEach(function(a){links[a.getAttribute('href')]=a;});
+    while(nav.firstChild){nav.removeChild(nav.firstChild);}
+    var groups=[
+      ['Start',['index.html','start-guide.html','fix-wizard.html','v20.html']],
+      ['Workspace',['setup.html','project-picker.html']],
+      ['Repair',['file-lab.html','rescue-room.html','packet-builder.html','patch-desk.html','patch-lab.html','preview-test.html','checkpoints.html']],
+      ['Publish',['ai-handoff.html','publish-prep.html','repo-desk.html','github-tracker.html']],
+      ['Connect + Help',['connector-status.html','help.html']]
+    ];
+    groups.forEach(function(group){
+      var found=group[1].filter(function(href){return !!links[href];});
+      if(!found.length)return;
+      var label=document.createElement('div');
+      label.className='navGroupLabel';
+      label.textContent=group[0];
+      nav.appendChild(label);
+      found.forEach(function(href){nav.appendChild(links[href]);delete links[href];});
+    });
+    Object.keys(links).forEach(function(href){nav.appendChild(links[href]);});
+  }
   function polishStatus(){
     if(document.body.getAttribute('data-page')!=='connector-status')return;
     textReplace(document.body,'Supabase repair history is planned.','Supabase repair history is production-tested.');
@@ -94,8 +118,8 @@
     });
   }
   loadHistory();
-  setTimeout(addExtraMenus,120);
-  setTimeout(addExtraMenus,500);
+  setTimeout(function(){addExtraMenus();groupMenus();},120);
+  setTimeout(function(){addExtraMenus();groupMenus();},500);
   setTimeout(polishStatus,220);
   setTimeout(polishStatus,800);
 })();
