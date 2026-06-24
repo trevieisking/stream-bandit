@@ -2,6 +2,8 @@
 
 Status: Code Labs only / live-ready path / connector future planned / no Stream Bandit lane crossing.
 
+Last audit update: 2026-06-24 - GitHub source, uploaded files, PR history, stale branches, current page map, and live-ready direction scanned before coding.
+
 ## Mission
 
 Code Labs helps non-coders and ChatGPT work on website code safely. It gives ChatGPT the exact file context, search evidence, repair request, preview checklist, checkpoint trail, and safe branch request needed to fix code without guessing or deleting working logic.
@@ -20,19 +22,69 @@ Code Labs must not:
 - expose secret keys in browser code,
 - make live writes without a checkpoint, preview, and user approval.
 
+If Code Labs uses the same Supabase Auth project later, the user-facing control must still be Code Labs branded and Code Labs routed. It must not say Stream Bandit login, open Stream Bandit app pages as Code Labs controls, or rely on Stream Bandit page wording.
+
 ## Current working flow
 
 The current Code Labs flow is now:
 
 1. Home Command Centre - choose the safe path.
 2. Start Guide - plain-English first step.
-3. File Lab - paste, upload, or public GitHub read-only load.
-4. Code Search - find exact lines and make a Code Search Report.
-5. Workflow Hub - build ChatGPT read, generator, and safe change requests.
-6. Patch Desk / Patch Lab - paste fixed code or line-safe patches.
-7. Preview + Test - test before replacing.
-8. Checkpoints - rollback safety.
-9. Publish Prep / GitHub Tracker - safe branch and PR tracking later.
+3. Fix Wizard - one next step for non-coders.
+4. File Lab - paste, upload, or public GitHub read-only load.
+5. Code Search - find exact lines and make a Code Search Report.
+6. Workflow Hub - build ChatGPT read, generator, and safe change requests.
+7. Patch Desk / Patch Lab - paste fixed code or line-safe patches.
+8. Preview + Test - test before replacing.
+9. Checkpoints - rollback safety.
+10. AI Handoff - send a clean review package back to ChatGPT.
+11. Publish Prep - prepare a safe test-branch request.
+12. GitHub Tracker - track PR, preview link, and pass/fail decision.
+13. Repo Desk - plan repo read/add/change/review requests.
+
+## Current page map
+
+GitHub `main` currently has these Code Labs pages:
+
+### Beginner and repair flow
+
+- `code-labs/index.html` - Home Command Centre.
+- `code-labs/start-guide.html` - plain-English intake.
+- `code-labs/fix-wizard.html` - one next step.
+- `code-labs/file-lab.html` - paste/upload/read-only GitHub file load and Code Search.
+- `code-labs/rescue-room.html` - problem, errors, and do-not-touch rules.
+- `code-labs/packet-builder.html` - ChatGPT repair packet.
+- `code-labs/v20.html` - Workflow Hub.
+- `code-labs/patch-desk.html` - paste full fixed code.
+- `code-labs/patch-lab.html` - exact search/replace and line-range changes.
+- `code-labs/preview-test.html` - original/fixed preview and PASS/FAIL checklist.
+- `code-labs/checkpoints.html` - rollback and test history.
+
+### Connector, finishing, and support pages
+
+- `code-labs/connector-status.html` - GitHub/Supabase status and lane wording.
+- `code-labs/ai-handoff.html` - copyable review handoff.
+- `code-labs/publish-prep.html` - safe branch/PR request.
+- `code-labs/github-tracker.html` - PR, branch, preview, and test tracking.
+- `code-labs/repo-desk.html` - repo action planning.
+- `code-labs/project-picker.html` - project mode selection.
+- `code-labs/setup.html` - workspace setup.
+- `code-labs/help.html` - plain-English help.
+
+## Current source architecture
+
+Code Labs is currently a static, JavaScript-rendered helper app.
+
+The current architecture is:
+
+1. A small HTML shell page under `code-labs/`.
+2. `assets/code-labs.css` provides the shared Code Labs app shell and UI.
+3. `assets/code-labs.js` renders the original core pages and local manual repair state.
+4. `assets/code-labs-v1-1-safety.js` adds local safety/export/import tools.
+5. `assets/code-labs-v12-save.js` loads Supabase history support and injects newer menu links.
+6. Page-specific JavaScript files render newer tools such as Start Guide, Fix Wizard, Workflow Hub, Patch Lab, AI Handoff, Publish Prep, GitHub Tracker, and Repo Desk.
+
+This layered model is working, but it is fragile. If a page-specific script fails, a newer page can fall back to the base Home shell or show confusing identity. Future hygiene work should make loader failure obvious and eventually move page registry/status into one source of truth.
 
 ## Current proven features
 
@@ -42,15 +94,125 @@ The current Code Labs flow is now:
 - Public GitHub read-only file load.
 - Code Search Report with file, path, repo, branch, line count, character count, match count, and match lines.
 - Workflow Hub uses the saved Code Search Report.
+- ChatGPT read request.
 - ChatGPT generator request.
 - Safe change request wording.
 - Fixed-code paste area.
 - Compare summary.
+- Exact Patch Lab find/replace and line-range workflow.
 - Preview iframe.
+- Desktop/mobile preview width switch.
 - Test checklist.
 - Local checkpoints.
 - Copy/download/select workflows.
+- AI Handoff package.
+- Publish Prep safe branch request.
+- GitHub Tracker link/test tracking.
+- Repo Desk request planner.
 - Separate GitHub and Supabase connector wording.
+- Safe create-file drill passed.
+- Safe delete-file drill passed.
+
+## Audit findings from 2026-06-24 scan
+
+These findings come from scanning the uploaded Code Labs files, GitHub `main`, the merged plan, the open draft plan, recent PR history, and current open/draft PR state.
+
+### Source of truth
+
+- GitHub `main` is the source of truth.
+- Uploaded HTML files may be stale. Example: uploaded `repo-desk.html` still showed `data-page="github-tracker"`, but GitHub `main` has already corrected Repo Desk to `data-page="repo-desk"`.
+- Before coding, fetch from GitHub `main`, not the uploaded bundle.
+
+### Current health
+
+- The shared CSS file exists on GitHub and contains the Code Labs UI shell.
+- The page-specific JavaScript assets exist on GitHub for the newer pages.
+- The manual repair path is coherent and should be preserved.
+- The read-only GitHub loader and Code Search path are now part of the live-ready direction.
+- Workflow Hub already reads the saved Code Search Report.
+- Repo Desk exists on `main` after the Repo Desk planner and identity promotion work.
+
+### Main technical risks
+
+- The layered loader model can hide a failed page-specific script.
+- Some advanced pages rely on JavaScript after the base shell has already rendered Home fallback.
+- Connector Status wording is still partly patched after render instead of coming from one source of truth.
+- Supabase auth/status wording needs a final Code Labs-only pass.
+- Stale uploaded files and stale draft PRs can conflict with GitHub `main`.
+- Do not merge old connector wording that points users to Stream Bandit sign-in.
+
+### Page-load hygiene targets
+
+Later, after live page testing, a tiny hygiene PR may:
+
+- add missing `noscript` fallbacks to newer shell pages that do not have them,
+- add a visible loader-failed warning for page-specific tools,
+- keep script order stable,
+- avoid behaviour changes,
+- avoid touching Stream Bandit app files.
+
+## Stale branch and PR handling
+
+Open draft PRs must be reviewed against current `main` before any merge.
+
+### Do not merge as-is
+
+- PR #82 - `Code Labs Repo Desk planner` is open/draft and stale because Repo Desk already exists on `main` and identity was promoted by PR #81.
+- PR #68 - `Code Labs Supabase sign-in status clarity` needs caution because it included live-site sign-in wording. It may conflict with the later rule that Code Labs must not send users to Stream Bandit login.
+- PR #72 - `Code Labs connector boundary wording` is open/draft and diverged. It may contain useful connector wording, but it must be rebased or rebuilt from current `main` before merge.
+- PR #71 - `Code Labs live-ready master plan` is open/draft and useful, but it is not the current `main` plan until merged or rebuilt.
+
+### Already merged and trusted milestones
+
+- PR #65 / connector boundary wording: merged useful separation language.
+- PR #73 / File Lab Code Search MVP: merged Code Search.
+- PR #74 / Code Search to Workflow Hub: merged report handoff.
+- PR #75 / Home Command Centre: merged live-ready home path.
+- PR #76 / navigation and home polish: merged UI polish.
+- PR #77 / connector master plan: merged this planning direction.
+- PR #78 / Repo Desk planner: merged first Repo Desk.
+- PR #79 / safe create-file drill: merged harmless create drill.
+- PR #80 / safe delete-file drill: merged harmless delete drill.
+- PR #81 / Repo Desk identity: merged Repo Desk page identity fix.
+
+## Live page audit checklist before next code PR
+
+Before any feature coding, test every live Code Labs page on the live domain or a RawGitHack branch preview.
+
+Pages to test:
+
+- `/code-labs/index.html`
+- `/code-labs/start-guide.html`
+- `/code-labs/fix-wizard.html`
+- `/code-labs/v20.html`
+- `/code-labs/file-lab.html`
+- `/code-labs/rescue-room.html`
+- `/code-labs/packet-builder.html`
+- `/code-labs/patch-desk.html`
+- `/code-labs/patch-lab.html`
+- `/code-labs/preview-test.html`
+- `/code-labs/checkpoints.html`
+- `/code-labs/connector-status.html`
+- `/code-labs/ai-handoff.html`
+- `/code-labs/publish-prep.html`
+- `/code-labs/github-tracker.html`
+- `/code-labs/repo-desk.html`
+- `/code-labs/project-picker.html`
+- `/code-labs/setup.html`
+- `/code-labs/help.html`
+
+For each page confirm:
+
+- page opens,
+- intended content appears,
+- it does not render as the wrong page or Home fallback,
+- menu appears,
+- correct active menu state where possible,
+- primary buttons are visible,
+- no Stream Bandit login wording or redirect,
+- no console-breaking script failure,
+- mobile layout is usable,
+- no Stream Bandit app page is changed.
 
 ## Tool goal
 
@@ -219,16 +381,49 @@ GitHub write tools are later and must require:
 
 ## Build order from here
 
-1. Finish navigation/home polish.
-2. Add Code Labs account plan UI or account status page.
-3. Add usage and feedback plan UI in read-only/local mode first.
-4. Add Supabase schema plan for Code Labs accounts, usage, and feedback.
-5. Add RLS policies in a Supabase branch/test pass only.
-6. Build server-side connector prototype.
-7. Add ChatGPT app/connector setup notes.
-8. Add read-only connector tools first.
-9. Add scoped Code Labs write tools.
-10. Add GitHub branch/PR actions only after safety review.
+1. Make the merged master plan authoritative by folding useful live-ready draft findings into this file.
+2. Mark stale open draft PRs as do-not-merge, or close/rebuild them from current `main`.
+3. Run the live page audit for all Code Labs pages.
+4. Do a tiny page-load hygiene PR if the audit confirms missing fallbacks or loader ambiguity.
+5. Finish navigation/home/menu grouping polish.
+6. Add Code Labs account plan UI or account status page.
+7. Add usage and feedback plan UI in read-only/local mode first.
+8. Add Supabase schema plan for Code Labs accounts, usage, and feedback.
+9. Add RLS policies in a Supabase branch/test pass only.
+10. Build server-side connector prototype.
+11. Add ChatGPT app/connector setup notes.
+12. Add read-only connector tools first.
+13. Add scoped Code Labs write tools.
+14. Add GitHub branch/PR actions only after safety review.
+
+## Next recommended jobs
+
+Do these in order:
+
+1. Planning lock - this master plan stays authoritative.
+2. Stale PR cleanup - close/rebuild stale drafts before coding features.
+3. Live page audit - test all 19 Code Labs pages.
+4. Page-load hygiene pass - only if needed after audit.
+5. Menu grouping - make the menu easier without adding pages.
+6. Workflow Hub request set - add missing Review, Exact Patch, Supabase Help, and GitHub Help requests.
+7. Code Labs auth UI decision - same Supabase project is acceptable only with Code Labs-only login/control wording.
+8. Usage and feedback UI - local/read-only plan first.
+9. GitHub direct commit design - design before coding, branch/PR only by default.
+10. Logo and favicon - Code Labs identity only, no Stream Bandit branding.
+
+## Stop rules
+
+Stop and ask before:
+
+- adding a new page,
+- touching Stream Bandit app files,
+- changing Supabase schema,
+- adding auth redirects,
+- adding browser-side GitHub writes,
+- deleting any Code Labs page,
+- replacing a full page when a tiny safe fix would work,
+- merging a stale draft PR,
+- merging connector wording that mentions Stream Bandit login as a Code Labs path.
 
 ## Safety rules
 
@@ -240,3 +435,5 @@ GitHub write tools are later and must require:
 - Keep Code Labs and Stream Bandit user-facing lanes separate.
 - Keep secrets server-side only.
 - Make every write action visible in an audit trail.
+- Use test branches and pull requests before merge.
+- Merge only after user testing says pass.
