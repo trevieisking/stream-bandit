@@ -34,7 +34,7 @@
     }
   }
   var s=document.createElement('script');
-  s.src='assets/code-labs-v1-3-github-readonly.js?v=cl-v26-search-to-workflow';
+  s.src='assets/code-labs-v1-3-github-readonly.js?v=cl-v50-live-user';
   document.head.appendChild(s);
   setTimeout(wireButtons,500);
   setTimeout(wireButtons,1200);
