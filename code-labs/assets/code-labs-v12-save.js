@@ -131,6 +131,19 @@
     var first=document.querySelector('.panel');
     if(first&&first.parentNode){first.parentNode.insertBefore(panel,first);}else{main.appendChild(panel);}
   }
+  function addPromotionChecklist(){
+    var page=document.body.getAttribute('data-page');
+    if(page!=='help'&&page!=='connector-status')return;
+    var main=document.querySelector('.main');
+    if(!main){setTimeout(addPromotionChecklist,160);return;}
+    if(document.querySelector('#clPromotionChecklist'))return;
+    var panel=document.createElement('section');
+    panel.className='panel';
+    panel.id='clPromotionChecklist';
+    panel.innerHTML='<h2>Live promotion menu checklist</h2><p>Work through the menu in order. A page is promotion-ready only when its purpose is clear, its buttons work, it saves or copies the right thing, and it keeps Code Labs separate from Stream Bandit.</p><div class="grid2"><div class="item"><b>1. Start</b><p>Home, Start Guide, Fix Wizard, and Workflow Hub must guide a non-coder from confusion to a clean ChatGPT request.</p></div><div class="item"><b>2. Workspace</b><p>Setup and Project Picker must save local project context and explain GitHub/Supabase lanes without Stream Bandit login wording.</p></div><div class="item"><b>3. Repair</b><p>File Lab, Rescue Room, Packet Builder, Patch Desk, Patch Lab, Preview + Test, and Checkpoints must preserve full code, exact line evidence, previews, tests, and rollback.</p></div><div class="item"><b>4. Publish</b><p>AI Handoff, Publish Prep, Repo Desk, and GitHub Tracker must prepare safe branch/PR work and track preview plus Trev PASS/FAIL.</p></div><div class="item"><b>5. Connect</b><p>Connector Status must show one connector at a time: GitHub for repo work or Supabase for Code Labs history work.</p></div><div class="item"><b>6. Hard stop rules</b><p>Never touch Stream Bandit V7 pages. Never create new files unless three old V4/V5/V6 Stream Bandit pages or checkpoints are verified for cleanup first.</p></div></div><div class="notice"><p><b>Promotion rule:</b> use existing Code Labs files first. GitHub main is the source of truth. Supabase schema changes need a reviewed plan before SQL.</p></div>';
+    var ref=document.querySelector('#clHelpOperatingMap')||document.querySelector('.panel');
+    if(ref&&ref.parentNode){ref.parentNode.insertBefore(panel,ref.nextSibling);}else{main.appendChild(panel);}
+  }
   function polishSetupAndProjects(){
     var page=document.body.getAttribute('data-page');
     if(page!=='setup'&&page!=='project-picker')return;
@@ -151,7 +164,7 @@
       }
     });
   }
-  function runSharedPolish(){addExtraMenus();groupMenus();polishGlobal();addAuthDecisionPanel();addHelpOperatingMap();polishSetupAndProjects();}
+  function runSharedPolish(){addExtraMenus();groupMenus();polishGlobal();addAuthDecisionPanel();addHelpOperatingMap();addPromotionChecklist();polishSetupAndProjects();}
   loadHistory();
   setTimeout(runSharedPolish,120);
   setTimeout(runSharedPolish,500);
