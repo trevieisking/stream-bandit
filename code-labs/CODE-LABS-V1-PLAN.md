@@ -35,6 +35,7 @@ A page is live-promotion ready when:
 
 Passed during live promotion review:
 
+- `code-labs/index.html` - passed after Home was cache-busted, showed the durable ChatGPT workbench wording, and displayed the live-promotion status cleanly.
 - `code-labs/file-lab.html` - passed after GitHub read-only loader showed correct loaded state and generic repo placeholders stopped showing false failure.
 - `code-labs/v20.html` - passed after Workflow Hub card buttons were polished into a neat showcase row and signed-in user prompt wording was added.
 
@@ -76,7 +77,7 @@ Use the menu as the live-promotion checklist.
 
 ### Start
 
-- `code-labs/index.html` - Home Command Centre / first showcase landing page.
+- `code-labs/index.html` - Home Command Centre / first showcase landing page. Passed live polish.
 - `code-labs/start-guide.html` - plain-English intake.
 - `code-labs/fix-wizard.html` - one next step for non-coders.
 - `code-labs/v20.html` - Workflow Hub request builder. Passed live polish.
