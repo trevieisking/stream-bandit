@@ -1,4 +1,4 @@
-/* Code Labs V1.3.1 - GitHub read-only file loader live user wording */
+/* Code Labs V1.3.2 - GitHub read-only file loader safe generic repo */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
@@ -10,6 +10,8 @@
   function now(){return new Date().toLocaleString();}
   function copyText(text){if(navigator.clipboard){navigator.clipboard.writeText(text||'').then(function(){toast('Copied')});return;}var a=document.createElement('textarea');a.value=text||'';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('Copied')}
   function rawFromInputs(owner,repo,branch,path){return 'https://raw.githubusercontent.com/'+encodeURIComponent(owner).replace(/%2F/g,'/')+'/'+encodeURIComponent(repo).replace(/%2F/g,'/')+'/'+encodeURIComponent(branch||'main').replace(/%2F/g,'/')+'/'+String(path||'').split('/').map(encodeURIComponent).join('/');}
+  function isGenericRepo(owner,repo){return !owner||!repo||owner==='owner'||repo==='repo'||owner==='example'||repo==='example';}
+  function setStatus(kind,text){var status=$('#clGithubStatus');if(status){status.className='badge '+(kind||'warn');status.textContent=text||'Read-only';}}
   function parseGitHubUrl(url){
     try{
       var u=new URL(url.trim());
@@ -46,9 +48,8 @@
     toast('GitHub file loaded read-only. Save file code when ready.');
   }
   async function loadFromPanel(){
-    var status=$('#clGithubStatus');
     try{
-      if(status){status.className='badge warn';status.textContent='Loading';}
+      setStatus('warn','Loading');
       var url=($('#clGithubUrl')&&$('#clGithubUrl').value.trim())||'';
       var info=url?parseGitHubUrl(url):null;
       if(!info){
@@ -56,14 +57,16 @@
         var repo=($('#clGithubRepo')&&$('#clGithubRepo').value.trim())||'';
         var branch=($('#clGithubBranch')&&$('#clGithubBranch').value.trim())||'main';
         var path=($('#clGithubPath')&&$('#clGithubPath').value.trim())||'';
-        if(!owner||!repo||!path)throw new Error('Add a GitHub file URL or owner/repo/path.');
+        if(isGenericRepo(owner,repo)){setStatus('warn','Needs repo');toast('Add a real GitHub owner and repo, or save the repo in Setup first.');return;}
+        if(!path){setStatus('warn','Needs path');toast('Add the file path to load.');return;}
         info={owner:owner,repo:repo,branch:branch,path:path,raw:rawFromInputs(owner,repo,branch,path)};
       }
-      if(!info.raw||!info.path)throw new Error('That GitHub URL is not a file URL. Use a /blob/ URL or a raw file URL.');
+      if(isGenericRepo(info.owner,info.repo)){setStatus('warn','Needs repo');toast('Add a real GitHub owner and repo, or save the repo in Setup first.');return;}
+      if(!info.raw||!info.path){setStatus('warn','Needs file URL');toast('Use a GitHub /blob/ file URL, raw file URL, or owner/repo/path.');return;}
       var code=await fetchText(info.raw);
       applyLoadedFile(info,code);
-      if(status){status.className='badge good';status.textContent='Loaded read-only';}
-    }catch(err){console.error(err);if(status){status.className='badge bad';status.textContent='Load failed';}toast(err.message||String(err));}
+      setStatus('good','Loaded read-only');
+    }catch(err){console.error(err);setStatus('bad','Load failed');toast(err.message||String(err));}
   }
   function addFileLabPanel(){
     if(document.body.getAttribute('data-page')!=='file-lab')return;
@@ -73,12 +76,21 @@
     var firstPanel=$('.panel');if(firstPanel&&firstPanel.parentNode){firstPanel.parentNode.insertBefore(panel,firstPanel.nextSibling);}else{main.appendChild(panel);} 
     $('#clLoadGithubFile').onclick=loadFromPanel;
     $('#clUseDemoGithub').onclick=function(){
-      var s=state(),p=s.project||{},repoText=p.repo||'owner/repo',parts=repoText.split('/');
+      var s=state(),p=s.project||{},repoText=p.repo||'',parts=repoText.split('/');
       $('#clGithubUrl').value='';
-      $('#clGithubOwner').value=parts[0]||'owner';
-      $('#clGithubRepo').value=parts[1]||'repo';
+      if(isGenericRepo(parts[0]||'',parts[1]||'')){
+        $('#clGithubOwner').value='';
+        $('#clGithubRepo').value='';
+        $('#clGithubPath').value='';
+        setStatus('warn','Needs setup');
+        toast('No saved project repo yet. Open Setup and save owner/repo first, or paste a GitHub file URL.');
+        return;
+      }
+      $('#clGithubOwner').value=parts[0]||'';
+      $('#clGithubRepo').value=parts[1]||'';
       $('#clGithubBranch').value='main';
       $('#clGithubPath').value=(s.file&&s.file.githubSource&&s.file.githubSource.path)||'code-labs/index.html';
+      setStatus('warn','Ready to load');
       toast('Saved project repo filled in. Check the path, then click Load GitHub file read-only.');
     };
     addSearchPanel();
