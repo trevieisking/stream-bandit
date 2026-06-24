@@ -2,13 +2,13 @@
 
 Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / future Python analysis lane noted / future utility toolbox noted / no Stream Bandit lane crossing.
 
-Last update: 2026-06-24 - live-promotion position, passed-page notes, connector reality, signed-in user wording, cleanup rule, Python sandbox idea, utility toolbox idea, and ChatGPT workbench purpose recorded.
+Last update: 2026-06-24 - Home, Start Guide, Fix Wizard, Setup, Project Picker, File Lab, and Workflow Hub live-promotion passes recorded.
 
 ## Mission
 
 Code Labs exists because long ChatGPT chats can become too large to load or too hard to continue. Code Labs is the durable project workbench where the repair job lives so a new chat, a non-coder, and ChatGPT can continue safely.
 
-Code Labs must help two modes:
+Code Labs must support two modes:
 
 1. ChatGPT guides or performs the work when the right connector is available.
 2. The user follows the same plain-English pages manually when tools are unavailable.
@@ -36,10 +36,52 @@ A page is live-promotion ready when:
 Passed during live promotion review:
 
 - `code-labs/index.html` - passed after Home was cache-busted, showed the durable ChatGPT workbench wording, and displayed the live-promotion status cleanly.
+- `code-labs/start-guide.html` - passed after live-user wording, generic examples, and plain-English intake were cleaned up.
+- `code-labs/fix-wizard.html` - passed after brand-new users were routed to Start Guide first and the menu-aligned next-step flow was cleaned up.
+- `code-labs/setup.html` - passed after Workspace live-ready rules explained local/manual mode, GitHub connector lane, Supabase history lane, and account-later rule.
+- `code-labs/project-picker.html` - passed after the same Workspace live-ready rules were added and visible.
 - `code-labs/file-lab.html` - passed after GitHub read-only loader showed correct loaded state and generic repo placeholders stopped showing false failure.
 - `code-labs/v20.html` - passed after Workflow Hub card buttons were polished into a neat showcase row and signed-in user prompt wording was added.
 
 Continue testing through the menu checklist and record passes here.
+
+## Menu checklist and page map
+
+Use the menu as the live-promotion checklist.
+
+### Start
+
+- `code-labs/index.html` - Home Command Centre / first showcase landing page. Passed live polish.
+- `code-labs/start-guide.html` - plain-English intake. Passed live polish.
+- `code-labs/fix-wizard.html` - one next step for non-coders. Passed live polish.
+- `code-labs/v20.html` - Workflow Hub request builder. Passed live polish.
+
+### Workspace
+
+- `code-labs/setup.html` - workspace setup and saved repo/project context. Passed live polish.
+- `code-labs/project-picker.html` - project mode selection. Passed live polish.
+
+### Repair
+
+- `code-labs/file-lab.html` - paste/upload/read-only GitHub file load and Code Search. Passed live polish.
+- `code-labs/rescue-room.html` - problem, errors, and do-not-touch rules.
+- `code-labs/packet-builder.html` - ChatGPT repair packet.
+- `code-labs/patch-desk.html` - paste full fixed code.
+- `code-labs/patch-lab.html` - exact search/replace and line-range changes.
+- `code-labs/preview-test.html` - original/fixed preview and PASS/FAIL checklist.
+- `code-labs/checkpoints.html` - rollback and test history.
+
+### Publish
+
+- `code-labs/ai-handoff.html` - copyable review handoff.
+- `code-labs/publish-prep.html` - safe branch/PR request.
+- `code-labs/repo-desk.html` - repo action planning and new-file cleanup rule.
+- `code-labs/github-tracker.html` - PR, branch, preview, and test tracking.
+
+### Connect and Help
+
+- `code-labs/connector-status.html` - GitHub/Supabase status, one-connector rule, and lane wording.
+- `code-labs/help.html` - tool map, promotion checklist, and plain-English help.
 
 ## Separation rule
 
@@ -70,44 +112,6 @@ To avoid GitHub truncation and repo clutter:
 - Never delete Code Labs pages for this cleanup rule.
 - If any cleanup candidate is live, useful, uncertain, or not clearly an old V4/V5/V6 page/checkpoint, do not delete it.
 - Branch creation and editing existing files do not trigger the cleanup rule.
-
-## Menu checklist and page map
-
-Use the menu as the live-promotion checklist.
-
-### Start
-
-- `code-labs/index.html` - Home Command Centre / first showcase landing page. Passed live polish.
-- `code-labs/start-guide.html` - plain-English intake.
-- `code-labs/fix-wizard.html` - one next step for non-coders.
-- `code-labs/v20.html` - Workflow Hub request builder. Passed live polish.
-
-### Workspace
-
-- `code-labs/setup.html` - workspace setup and saved repo/project context.
-- `code-labs/project-picker.html` - project mode selection.
-
-### Repair
-
-- `code-labs/file-lab.html` - paste/upload/read-only GitHub file load and Code Search. Passed live polish.
-- `code-labs/rescue-room.html` - problem, errors, and do-not-touch rules.
-- `code-labs/packet-builder.html` - ChatGPT repair packet.
-- `code-labs/patch-desk.html` - paste full fixed code.
-- `code-labs/patch-lab.html` - exact search/replace and line-range changes.
-- `code-labs/preview-test.html` - original/fixed preview and PASS/FAIL checklist.
-- `code-labs/checkpoints.html` - rollback and test history.
-
-### Publish
-
-- `code-labs/ai-handoff.html` - copyable review handoff.
-- `code-labs/publish-prep.html` - safe branch/PR request.
-- `code-labs/repo-desk.html` - repo action planning and new-file cleanup rule.
-- `code-labs/github-tracker.html` - PR, branch, preview, and test tracking.
-
-### Connect and Help
-
-- `code-labs/connector-status.html` - GitHub/Supabase status, one-connector rule, and lane wording.
-- `code-labs/help.html` - tool map, promotion checklist, and plain-English help.
 
 ## Current source architecture
 
@@ -141,6 +145,9 @@ Before any page patch:
 - Full-file paste and upload.
 - Public GitHub read-only file load.
 - Code Search Report with file, path, repo, branch, line count, character count, match count, and match lines.
+- Start Guide live-user intake.
+- Fix Wizard next-step routing.
+- Setup and Project Picker Workspace live-ready rules.
 - Workflow Hub uses the saved Code Search Report.
 - ChatGPT read request.
 - ChatGPT generator request.
@@ -164,7 +171,7 @@ Before any page patch:
 - One-connector-at-a-time rule visible on Connector Status.
 - Safe create-file drill passed through ChatGPT GitHub connector in PR #79.
 - Safe delete-file drill passed through ChatGPT GitHub connector in PR #80.
-- Repo Desk and Workflow Hub now support the new-file cleanup rule.
+- Repo Desk and Workflow Hub support the new-file cleanup rule.
 - Hard-coded developer name wording was removed from live user-facing connector prompts in PR #101.
 
 ## Connector reality
@@ -201,15 +208,7 @@ No Supabase schema, RLS, auth, or policy changes should be made without a review
 
 A Python lane would be useful later for controlled analysis, validation, and report generation. It should be treated as an optional hosted/sandboxed connector, not a live-promotion blocker and not unsafe browser-side Python.
 
-Useful Python jobs could include:
-
-- checking HTML/CSS/JS files for obvious syntax or structure problems,
-- counting files, lines, duplicate IDs, duplicate scripts, or repeated sections,
-- comparing before/after code safely,
-- validating exported Code Labs repair-job JSON,
-- building simple reports for ChatGPT,
-- running non-destructive local-style tests in a sandbox,
-- preparing cleanup candidate reports before new files are added.
+Useful Python jobs could include checking HTML/CSS/JS structure, counting files and duplicate sections, comparing before/after code, validating exported repair-job JSON, building reports, running non-destructive sandbox tests, and preparing cleanup candidate reports.
 
 Python safety rules:
 
@@ -309,12 +308,7 @@ Out of scope for Code Labs promotion unless separately requested:
 
 ## Account and signed-in user rule
 
-Before live promotion, no user-facing Code Labs page should hard-code the developer/user name. Use neutral wording such as:
-
-- signed-in Code Labs user,
-- this Code Labs user,
-- saved project owner,
-- owner/repo for examples.
+Before live promotion, no user-facing Code Labs page should hard-code the developer/user name. Use neutral wording such as signed-in Code Labs user, this Code Labs user, saved project owner, or owner/repo for examples.
 
 Later, when the account layer is active, replace neutral text with the actual signed-in Code Labs profile/user name where appropriate.
 
@@ -336,24 +330,9 @@ Account system requirements before production connector writes:
 
 Usage tracking should be privacy-light.
 
-Allowed later:
+Allowed later: page opened, GitHub file loaded read-only, Code Search report generated, Workflow request copied, preview test saved, checkpoint saved, safe change request generated, feedback submitted.
 
-- page opened,
-- GitHub file loaded read-only,
-- Code Search report generated,
-- Workflow request copied,
-- preview test saved,
-- checkpoint saved,
-- safe change request generated,
-- feedback submitted.
-
-Avoid storing:
-
-- full user code in usage events,
-- private personal details,
-- secret keys,
-- unrelated browser data,
-- other users' repair details.
+Avoid storing full user code in usage events, private personal details, secret keys, unrelated browser data, or other users' repair details.
 
 Feedback can include rating, what worked, what was confusing, and optional contact only if the user chooses to provide it.
 
