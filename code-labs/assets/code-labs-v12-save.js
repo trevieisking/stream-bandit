@@ -104,6 +104,18 @@
     });
     Object.keys(links).forEach(function(href){nav.appendChild(links[href]);});
   }
+  function addAuthDecisionPanel(){
+    if(document.body.getAttribute('data-page')!=='setup')return;
+    var main=document.querySelector('.main');
+    if(!main){setTimeout(addAuthDecisionPanel,160);return;}
+    if(document.querySelector('#clAuthDecisionPanel'))return;
+    var panel=document.createElement('section');
+    panel.className='panel';
+    panel.id='clAuthDecisionPanel';
+    panel.innerHTML='<h2>Code Labs account decision</h2><p>Use guest local mode now. Real Code Labs accounts come later after user-owned rows, permissions, and server-side connector actions are ready.</p><div class="grid2"><div class="item"><b>Now</b><p>Manual/local workspace. No login redirect. No database write. No hidden admin mode.</p><span class="badge good">Guest local</span></div><div class="item"><b>Later</b><p>Same Supabase project is allowed only if the controls, profile rows, and wording stay Code Labs-only.</p><span class="badge warn">Planned</span></div></div><div class="notice"><p><b>Separation:</b> do not send Code Labs users to Stream Bandit login. Do not touch Stream Bandit app tables, auth, or policies during Code Labs account work unless Trev starts a separate Stream Bandit pass.</p></div>';
+    var panels=[].slice.call(main.querySelectorAll('.panel'));
+    if(panels[0]&&panels[0].parentNode){panels[0].parentNode.insertBefore(panel,panels[0].nextSibling);}else{main.appendChild(panel);}
+  }
   function polishStatus(){
     if(document.body.getAttribute('data-page')!=='connector-status')return;
     textReplace(document.body,'Supabase repair history is planned.','Supabase repair history is production-tested.');
@@ -118,8 +130,8 @@
     });
   }
   loadHistory();
-  setTimeout(function(){addExtraMenus();groupMenus();},120);
-  setTimeout(function(){addExtraMenus();groupMenus();},500);
+  setTimeout(function(){addExtraMenus();groupMenus();addAuthDecisionPanel();},120);
+  setTimeout(function(){addExtraMenus();groupMenus();addAuthDecisionPanel();},500);
   setTimeout(polishStatus,220);
   setTimeout(polishStatus,800);
 })();
