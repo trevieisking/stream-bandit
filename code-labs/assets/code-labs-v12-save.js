@@ -1,6 +1,7 @@
-/* Code Labs V1.4 - shared menu, save, workspace, and repair flow polish */
+/* Code Labs V1.5 - shared menu, save, workspace, repair, and safety gate polish */
 (function(){
   var REPAIR_PAGES=['rescue-room','packet-builder','patch-desk'];
+  var SAFETY_PAGES=['patch-lab','preview-test','checkpoints'];
   function page(){return document.body.getAttribute('data-page')||'';}
   function loadHistory(){
     var s=document.createElement('script');
@@ -96,6 +97,22 @@
     panel.innerHTML='<h2>'+info[0]+' live-ready rules</h2><p>This repair page should '+info[1]+'. It must preserve manual copy/paste rescue, checkpoints, and Code Labs separation.</p><div class="grid2"><div class="item"><b>Input first</b><p>Use full file context, plain-English problem text, and do-not-touch rules so ChatGPT does not guess.</p><span class="badge good">Manual safe</span></div><div class="item"><b>ChatGPT handoff</b><p>The output should be copyable into ChatGPT or the next Code Labs page without losing context.</p><span class="badge good">Copy-ready</span></div><div class="item"><b>Checkpoint before replace</b><p>Do not replace a live file until the original and fixed code are checkpointed and Preview + Test has passed.</p><span class="badge warn">Safety gate</span></div><div class="item"><b>Connector lane</b><p>GitHub repo work stays in ChatGPT/GitHub connector flow. Browser repair pages do not silently push to main.</p><span class="badge warn">No silent writes</span></div></div><div class="notice"><p><b>Promotion check:</b> this page passes when its save/copy/next buttons work, its text is clear for non-coders, and its output helps ChatGPT continue the job.</p></div>';
     insertAfterFirstPanel(panel);
   }
+  function addSafetyGatePanel(){
+    var p=page();
+    if(SAFETY_PAGES.indexOf(p)===-1)return;
+    if(document.querySelector('#clSafetyGatePanel'))return;
+    var labels={
+      'patch-lab':['Patch Lab','make targeted line/text changes without replacing more than intended'],
+      'preview-test':['Preview + Test','prove the fixed code opens and behaves before live replacement'],
+      'checkpoints':['Checkpoints','keep rollback versions and saved test notes available']
+    };
+    var info=labels[p]||['Safety gate','protect the repair before publish'];
+    var panel=document.createElement('section');
+    panel.className='panel';
+    panel.id='clSafetyGatePanel';
+    panel.innerHTML='<h2>'+info[0]+' safety-gate rules</h2><p>This page should '+info[1]+'. It is part of the final manual safety gate before any GitHub branch, PR, or live file replacement.</p><div class="grid2"><div class="item"><b>Check before publish</b><p>Confirm the fixed code was saved, compared, previewed, and tested before asking GitHub connector to help publish.</p><span class="badge good">Required</span></div><div class="item"><b>Rollback ready</b><p>Keep an original checkpoint and a fixed-code checkpoint so the user can recover if a test fails.</p><span class="badge good">Safe</span></div><div class="item"><b>PASS/FAIL notes</b><p>Record what worked and what failed in plain English so ChatGPT can continue without guessing.</p><span class="badge warn">Evidence</span></div><div class="item"><b>No live writes here</b><p>These browser pages prepare and test. GitHub write work belongs in the signed-in connector branch/PR lane.</p><span class="badge warn">Manual gate</span></div></div><div class="notice"><p><b>Promotion check:</b> this page passes when it protects rollback, supports plain-English test notes, and gives the user a clear next step.</p></div>';
+    insertAfterFirstPanel(panel);
+  }
   function addAuthDecisionPanel(){
     if(page()!=='setup')return;
     if(document.querySelector('#clAuthDecisionPanel'))return;
@@ -150,10 +167,11 @@
       }
     });
   }
-  function runSharedPolish(){addExtraMenus();groupMenus();polishText();addWorkspaceLivePanel();addRepairLivePanel();addAuthDecisionPanel();addHelpOperatingMap();addPromotionChecklist();}
+  function runSharedPolish(){addExtraMenus();groupMenus();polishText();addWorkspaceLivePanel();addRepairLivePanel();addSafetyGatePanel();addAuthDecisionPanel();addHelpOperatingMap();addPromotionChecklist();}
   loadHistory();
   setTimeout(runSharedPolish,120);
   setTimeout(runSharedPolish,500);
+  setTimeout(runSharedPolish,1000);
   setTimeout(polishStatus,220);
   setTimeout(polishStatus,800);
 })();
