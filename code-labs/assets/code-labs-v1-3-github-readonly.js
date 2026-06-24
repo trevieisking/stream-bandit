@@ -1,4 +1,4 @@
-/* Code Labs V1.3 - GitHub read-only file loader */
+/* Code Labs V1.3.1 - GitHub read-only file loader live user wording */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
@@ -8,6 +8,7 @@
   function save(s){localStorage.setItem(KEY,JSON.stringify(s||{}));}
   function toast(msg){var t=$('#toast');if(!t){alert(msg);return;}t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2600);}
   function now(){return new Date().toLocaleString();}
+  function copyText(text){if(navigator.clipboard){navigator.clipboard.writeText(text||'').then(function(){toast('Copied')});return;}var a=document.createElement('textarea');a.value=text||'';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('Copied')}
   function rawFromInputs(owner,repo,branch,path){return 'https://raw.githubusercontent.com/'+encodeURIComponent(owner).replace(/%2F/g,'/')+'/'+encodeURIComponent(repo).replace(/%2F/g,'/')+'/'+encodeURIComponent(branch||'main').replace(/%2F/g,'/')+'/'+String(path||'').split('/').map(encodeURIComponent).join('/');}
   function parseGitHubUrl(url){
     try{
@@ -68,16 +69,17 @@
     if(document.body.getAttribute('data-page')!=='file-lab')return;
     var main=$('.main');if(!main){setTimeout(addFileLabPanel,160);return;}if($('#clGithubLoader'))return;
     var panel=document.createElement('section');panel.className='panel';panel.id='clGithubLoader';
-    panel.innerHTML='<h2>GitHub Read-Only Loader</h2><p>Load a public GitHub file into File Lab without writing to GitHub. This is for copying code into the normal repair flow only.</p><div class="actions"><span id="clGithubStatus" class="badge warn">Read-only</span></div><label>GitHub file URL<input id="clGithubUrl" placeholder="https://github.com/owner/repo/blob/main/path/file.html"></label><div class="fieldRow"><label>Owner<input id="clGithubOwner" placeholder="trevieisking"></label><label>Repo<input id="clGithubRepo" placeholder="stream-bandit"></label></div><div class="fieldRow"><label>Branch<input id="clGithubBranch" value="main"></label><label>File path<input id="clGithubPath" placeholder="code-labs/index.html"></label></div><div class="actions"><button class="btn primary" id="clLoadGithubFile">Load GitHub file read-only</button><button class="btn ghost" id="clUseDemoGithub">Use Code Labs demo file</button></div><div class="notice"><p><b>Safety:</b> this reads public GitHub files only. It does not commit, push, delete, or change any repo file.</p></div>';
+    panel.innerHTML='<h2>GitHub Read-Only Loader</h2><p>Load a public GitHub file into File Lab without writing to GitHub. This is for copying code into the normal repair flow only.</p><div class="actions"><span id="clGithubStatus" class="badge warn">Read-only</span></div><label>GitHub file URL<input id="clGithubUrl" placeholder="https://github.com/owner/repo/blob/main/path/file.html"></label><div class="fieldRow"><label>Owner<input id="clGithubOwner" placeholder="owner"></label><label>Repo<input id="clGithubRepo" placeholder="repo"></label></div><div class="fieldRow"><label>Branch<input id="clGithubBranch" value="main"></label><label>File path<input id="clGithubPath" placeholder="code-labs/index.html"></label></div><div class="actions"><button class="btn primary" id="clLoadGithubFile">Load GitHub file read-only</button><button class="btn ghost" id="clUseDemoGithub">Use saved project repo</button></div><div class="notice"><p><b>Safety:</b> this reads public GitHub files only. It does not commit, push, delete, or change any repo file.</p></div>';
     var firstPanel=$('.panel');if(firstPanel&&firstPanel.parentNode){firstPanel.parentNode.insertBefore(panel,firstPanel.nextSibling);}else{main.appendChild(panel);} 
     $('#clLoadGithubFile').onclick=loadFromPanel;
     $('#clUseDemoGithub').onclick=function(){
-      $('#clGithubUrl').value='https://github.com/trevieisking/stream-bandit/blob/main/code-labs/index.html';
-      $('#clGithubOwner').value='trevieisking';
-      $('#clGithubRepo').value='stream-bandit';
+      var s=state(),p=s.project||{},repoText=p.repo||'owner/repo',parts=repoText.split('/');
+      $('#clGithubUrl').value='';
+      $('#clGithubOwner').value=parts[0]||'owner';
+      $('#clGithubRepo').value=parts[1]||'repo';
       $('#clGithubBranch').value='main';
-      $('#clGithubPath').value='code-labs/index.html';
-      toast('Demo GitHub file filled in. Click Load GitHub file read-only.');
+      $('#clGithubPath').value=(s.file&&s.file.githubSource&&s.file.githubSource.path)||'code-labs/index.html';
+      toast('Saved project repo filled in. Check the path, then click Load GitHub file read-only.');
     };
     addSearchPanel();
   }
@@ -113,7 +115,7 @@
     if(!$('#clConnectorBoundary')){
       var top=$('.hero');
       var panel=document.createElement('section');panel.className='panel';panel.id='clConnectorBoundary';
-      panel.innerHTML='<h2>Connectors are separate</h2><p>Code Labs can use the same Stream Bandit GitHub repo and the same Supabase project, but the connector controls stay separate. No Stream Bandit login buttons belong here.</p><div class="grid2"><div class="item"><b>GitHub</b><p>For repo reads, branches, commits, PRs, previews, and merges.</p><span class="badge warn">Connect GitHub</span></div><div class="item"><b>Supabase</b><p>For Code Labs projects, repair jobs, packets, versions, checkpoints, and history tables.</p><span class="badge warn">Connect Supabase</span></div></div><div class="notice"><p><b>Plain English:</b> if I need repo code work, I will say <b>Connect GitHub please, Trev</b>. If I need database/table work, I will say <b>Connect Supabase please, Trev</b>.</p></div>';
+      panel.innerHTML='<h2>Connectors are separate</h2><p>Code Labs can use the same Stream Bandit GitHub repo and the same Supabase project, but the connector controls stay separate. No Stream Bandit login buttons belong here.</p><div class="grid2"><div class="item"><b>GitHub</b><p>For repo reads, branches, commits, PRs, previews, and merges.</p><span class="badge warn">Connect GitHub</span></div><div class="item"><b>Supabase</b><p>For Code Labs projects, repair jobs, packets, versions, checkpoints, and history tables.</p><span class="badge warn">Connect Supabase</span></div></div><div class="notice"><p><b>Plain English:</b> if repo code work is needed, use <b>Connect GitHub for this Code Labs user</b>. If database/table work is needed, use <b>Connect Supabase for this Code Labs user</b>.</p></div>';
       if(top&&top.parentNode){top.parentNode.insertBefore(panel,top.nextSibling);}else{main.appendChild(panel);}
     }
     if(!$('#clAccountStatusPanel')){
@@ -130,7 +132,7 @@
     }
     setCard('GitHub mode','Connect GitHub','warn','Use GitHub for repo reads, test branches, PRs, previews, and merges. It is separate from Supabase.');
     setCard('Supabase mode','Connect Supabase','warn','Use Supabase for Code Labs repair history and code_labs_* tables. It is separate from GitHub.');
-    setCard('ChatGPT app','Bridge only','warn','ChatGPT tells Trev which connector is needed. Code Labs should not redirect to Stream Bandit login.');
+    setCard('ChatGPT app','Bridge only','warn','ChatGPT tells the signed-in user which connector is needed. Code Labs should not redirect to Stream Bandit login.');
   }
   function start(){setTimeout(addFileLabPanel,220);setTimeout(addFileLabPanel,800);setTimeout(polishStatus,300);setTimeout(polishStatus,900);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
