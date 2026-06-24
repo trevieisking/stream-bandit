@@ -1,8 +1,8 @@
 # Code Labs Master Plan
 
-Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / no Stream Bandit lane crossing.
+Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / future Python analysis lane noted / no Stream Bandit lane crossing.
 
-Last update: 2026-06-24 - live-promotion position, passed-page notes, connector reality, signed-in user wording, cleanup rule, and ChatGPT workbench purpose recorded.
+Last update: 2026-06-24 - live-promotion position, passed-page notes, connector reality, signed-in user wording, cleanup rule, Python sandbox idea, and ChatGPT workbench purpose recorded.
 
 ## Mission
 
@@ -168,7 +168,7 @@ Before any page patch:
 
 ## Connector reality
 
-There are three distinct layers. Do not mix them up.
+There are four distinct layers. Do not mix them up.
 
 ### Browser Code Labs
 
@@ -195,6 +195,29 @@ For Supabase/database work, the live user-facing prompt should be:
 `Connect Supabase for this Code Labs user`
 
 No Supabase schema, RLS, auth, or policy changes should be made without a reviewed Code Labs-only SQL plan.
+
+### Future Python sandbox / analysis connector
+
+A Python lane would be useful later for controlled analysis, validation, and report generation. It should be treated as an optional hosted/sandboxed connector, not a live-promotion blocker and not unsafe browser-side Python.
+
+Useful Python jobs could include:
+
+- checking HTML/CSS/JS files for obvious syntax or structure problems,
+- counting files, lines, duplicate IDs, duplicate scripts, or repeated sections,
+- comparing before/after code safely,
+- validating exported Code Labs repair-job JSON,
+- building simple reports for ChatGPT,
+- running non-destructive local-style tests in a sandbox,
+- preparing cleanup candidate reports before new files are added.
+
+Python safety rules:
+
+- no arbitrary user code execution without a sandbox,
+- no secret keys exposed to Python jobs,
+- no filesystem or repo writes unless explicitly approved through a scoped connector action,
+- read-only analysis first,
+- audit every production Python connector run,
+- keep manual copy/paste fallback available.
 
 ### Future hosted ChatGPT app/connector
 
@@ -303,7 +326,8 @@ Feedback can include rating, what worked, what was confusing, and optional conta
 9. Build server-side connector prototype after static workflow is stable.
 10. Add read-only connector tools before write tools.
 11. Add scoped Code Labs write tools after account/RLS review.
-12. Add GitHub branch/PR actions only after explicit safety review.
+12. Add Python sandbox/analysis connector design as an optional non-blocking improvement.
+13. Add GitHub branch/PR actions only after explicit safety review.
 
 ## Stop rules
 
