@@ -122,6 +122,12 @@
       account.innerHTML='<h2>Code Labs account status</h2><p>Guest local mode is active now. Real Code Labs accounts come later, after user-owned rows, permissions, and server-side connector actions are built.</p><div class="grid2"><div class="item"><b>Current mode</b><p>Local browser workspace only. Repairs, packets, previews, and checkpoints stay in this browser unless copied out.</p><span class="badge good">Guest local</span></div><div class="item"><b>Future account mode</b><p>Code Labs accounts will own their projects, jobs, files, packets, checkpoints, and test runs.</p><span class="badge warn">Planned</span></div></div><div class="notice"><p><b>Safety:</b> there is no service-role key in browser code, no hidden admin access, no cross-user repair history, and no silent writes to main.</p></div>';
       if(boundary&&boundary.parentNode){boundary.parentNode.insertBefore(account,boundary.nextSibling);}else{main.appendChild(account);}
     }
+    if(!$('#clUsageFeedbackPanel')){
+      var accountPanel=$('#clAccountStatusPanel');
+      var usage=document.createElement('section');usage.className='panel';usage.id='clUsageFeedbackPanel';
+      usage.innerHTML='<h2>Usage and feedback status</h2><p>Usage and feedback are planned as privacy-light Code Labs tools. They are not active tracking yet.</p><div class="grid2"><div class="item"><b>Allowed later</b><p>Counts, timestamps, route/tool name, and events like page opened, report generated, checkpoint saved, or feedback submitted.</p><span class="badge warn">Planned</span></div><div class="item"><b>Not allowed</b><p>No full user code, secret keys, unrelated browser data, private personal details, or other users repair details.</p><span class="badge good">Protected</span></div></div><div class="notice"><p><b>Feedback later:</b> rating, what worked, what was confusing, and optional contact only if the user chooses to provide it.</p></div>';
+      if(accountPanel&&accountPanel.parentNode){accountPanel.parentNode.insertBefore(usage,accountPanel.nextSibling);}else{main.appendChild(usage);}
+    }
     setCard('GitHub mode','Connect GitHub','warn','Use GitHub for repo reads, test branches, PRs, previews, and merges. It is separate from Supabase.');
     setCard('Supabase mode','Connect Supabase','warn','Use Supabase for Code Labs repair history and code_labs_* tables. It is separate from GitHub.');
     setCard('ChatGPT app','Bridge only','warn','ChatGPT tells Trev which connector is needed. Code Labs should not redirect to Stream Bandit login.');
