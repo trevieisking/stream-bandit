@@ -104,6 +104,9 @@
     });
     Object.keys(links).forEach(function(href){nav.appendChild(links[href]);});
   }
+  function polishGlobal(){
+    textReplace(document.body,'Manual rescue works now. GitHub and Supabase are planned connector layers.','Manual rescue works now. GitHub connector work is proven through ChatGPT, and Supabase can save Code Labs history when connected.');
+  }
   function addAuthDecisionPanel(){
     if(document.body.getAttribute('data-page')!=='setup')return;
     var main=document.querySelector('.main');
@@ -115,6 +118,18 @@
     panel.innerHTML='<h2>Code Labs account decision</h2><p>Use guest local mode now. GitHub repo work already works through the ChatGPT GitHub connector. Real Code Labs accounts come later after user-owned rows, permissions, and server-side connector actions are ready.</p><div class="grid2"><div class="item"><b>Now</b><p>Manual/local workspace plus ChatGPT GitHub connector for repo branches, PRs, test files, and cleanup when Trev connects GitHub.</p><span class="badge good">GitHub connector works</span></div><div class="item"><b>Later</b><p>Same Supabase project is allowed only if the controls, profile rows, and wording stay Code Labs-only.</p><span class="badge warn">Account mode planned</span></div></div><div class="notice"><p><b>Separation:</b> browser pages stay safe/manual. ChatGPT handles GitHub connector work when Trev connects GitHub. Do not send Code Labs users to Stream Bandit login.</p></div>';
     var panels=[].slice.call(main.querySelectorAll('.panel'));
     if(panels[0]&&panels[0].parentNode){panels[0].parentNode.insertBefore(panel,panels[0].nextSibling);}else{main.appendChild(panel);}
+  }
+  function addHelpOperatingMap(){
+    if(document.body.getAttribute('data-page')!=='help')return;
+    var main=document.querySelector('.main');
+    if(!main){setTimeout(addHelpOperatingMap,160);return;}
+    if(document.querySelector('#clHelpOperatingMap'))return;
+    var panel=document.createElement('section');
+    panel.className='panel';
+    panel.id='clHelpOperatingMap';
+    panel.innerHTML='<h2>Code Labs tool map for users and ChatGPT</h2><p>Code Labs exists because long ChatGPT chats can get too big to load. This app keeps the repair job in one place so ChatGPT and non-coders can continue safely.</p><div class="grid2"><div class="item"><b>Start</b><p>Home, Start Guide, and Fix Wizard explain the next safest step in plain English.</p></div><div class="item"><b>Load and search</b><p>File Lab can paste, upload, or read a public GitHub file, then Code Search makes exact line evidence.</p></div><div class="item"><b>Ask ChatGPT</b><p>Workflow Hub builds read, generator, review, exact patch, safe change, GitHub help, and Supabase help requests.</p></div><div class="item"><b>Patch and test</b><p>Patch Desk, Patch Lab, Preview + Test, and Checkpoints help save, compare, preview, and roll back.</p></div><div class="item"><b>Publish lane</b><p>AI Handoff, Publish Prep, Repo Desk, and GitHub Tracker prepare and track safe branch, PR, preview, and approval work.</p></div><div class="item"><b>Connectors</b><p>Use one connector at a time: Connect GitHub please, Trev for repo work, or Connect Supabase please, Trev for database/history work.</p></div></div><div class="notice"><p><b>Rule:</b> Code Labs helps ChatGPT do the work for the user, and also lets the user do the same work manually when tools are unavailable. No silent writes to main, no Stream Bandit login path, and no hidden admin access.</p></div>';
+    var first=document.querySelector('.panel');
+    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first);}else{main.appendChild(panel);}
   }
   function polishSetupAndProjects(){
     var page=document.body.getAttribute('data-page');
@@ -136,9 +151,10 @@
       }
     });
   }
+  function runSharedPolish(){addExtraMenus();groupMenus();polishGlobal();addAuthDecisionPanel();addHelpOperatingMap();polishSetupAndProjects();}
   loadHistory();
-  setTimeout(function(){addExtraMenus();groupMenus();addAuthDecisionPanel();polishSetupAndProjects();},120);
-  setTimeout(function(){addExtraMenus();groupMenus();addAuthDecisionPanel();polishSetupAndProjects();},500);
+  setTimeout(runSharedPolish,120);
+  setTimeout(runSharedPolish,500);
   setTimeout(polishStatus,220);
   setTimeout(polishStatus,800);
 })();
