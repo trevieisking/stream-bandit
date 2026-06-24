@@ -1,4 +1,4 @@
-/* Code Labs V2.8 - Home Command Centre connector alignment */
+/* Code Labs V2.9 - Home Command Centre Patch Lab alignment */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
@@ -23,10 +23,10 @@
       card(1,'Start Guide','Use this when the user does not know what to do first. It captures the problem in plain English.','start-guide.html','Start here','primary')+
       card(2,'File Lab + Code Search','Load a public GitHub file or paste full code, then search exact lines and make a report.','file-lab.html','Load and search','primary')+
       card(3,'Workflow Hub','Build the exact ChatGPT request. It includes the saved Code Search Report when one exists.','v20.html','Build request','good')+
-      card(4,'Patch and Preview','Paste fixed code, compare it, preview it, and save PASS/FAIL before publish.','patch-desk.html','Patch safely','ghost')+
+      card(4,'Patch Lab','Use exact find/replace or line-range changes when a small targeted patch is safer than replacing a full file.','patch-lab.html','Patch exact lines','ghost')+
       '</section>'+ 
-      '<section class="panel"><h2>Safe publish lane</h2><div class="grid"><div class="item"><b>Manual first</b><p>Code Labs can work without connectors by copy/paste, preview, checkpoints, export, and handoff.</p></div><div class="item"><b>GitHub connector works</b><p>Use ChatGPT GitHub connector for repo reads, test branches, PRs, previews, merges, and verified cleanup after Trev connects GitHub.</p></div><div class="item"><b>Supabase separate</b><p>Use Code Labs tables for repair history only when Supabase is connected. No Stream Bandit login redirects or buttons.</p></div></div><div class="actions"><a class="btn ghost" href="connector-status.html">Connector status</a><a class="btn ghost" href="repo-desk.html">Repo Desk</a><a class="btn ghost" href="checkpoints.html">Checkpoints</a><a class="btn ghost" href="preview-test.html">Preview + Test</a></div></section>'+ 
-      '<div class="footerNote">Code Labs V2.8 Home Command Centre · File Lab, Code Search, Workflow Hub, Repo Desk, Patch Desk, and Preview are the main flow.</div>';
+      '<section class="panel"><h2>Safe publish lane</h2><div class="grid"><div class="item"><b>Manual first</b><p>Code Labs can work without connectors by copy/paste, Patch Desk, Patch Lab, preview, checkpoints, export, and handoff.</p></div><div class="item"><b>GitHub connector works</b><p>Use ChatGPT GitHub connector for repo reads, test branches, PRs, previews, merges, and verified cleanup after Trev connects GitHub.</p></div><div class="item"><b>New file cleanup rule</b><p>Before any new repo file is created, verify three old Stream Bandit V4/V5/V6 pages or checkpoint files for cleanup. Never delete V7 or Code Labs pages for this rule.</p></div><div class="item"><b>Supabase separate</b><p>Use Code Labs tables for repair history only when Supabase is connected. No Stream Bandit login redirects or buttons.</p></div></div><div class="actions"><a class="btn ghost" href="patch-desk.html">Patch Desk</a><a class="btn ghost" href="patch-lab.html">Patch Lab</a><a class="btn ghost" href="connector-status.html">Connector status</a><a class="btn ghost" href="repo-desk.html">Repo Desk</a><a class="btn ghost" href="checkpoints.html">Checkpoints</a><a class="btn ghost" href="preview-test.html">Preview + Test</a></div></section>'+ 
+      '<div class="footerNote">Code Labs V2.9 Home Command Centre · File Lab, Code Search, Workflow Hub, Patch Lab, Repo Desk, Patch Desk, and Preview are the main flow.</div>';
   }
   function start(){setTimeout(render,240);setTimeout(render,900)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
