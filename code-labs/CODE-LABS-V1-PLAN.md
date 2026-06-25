@@ -1,8 +1,8 @@
 # Code Labs Master Plan
 
-Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / future Python analysis lane noted / future utility toolbox noted / no Stream Bandit lane crossing / full current Code Labs menu scan recorded.
+Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / future Python analysis lane noted / future utility toolbox noted / no Stream Bandit lane crossing / full current Code Labs menu scan recorded / Publish lane user-tested pass recorded.
 
-Last update: 2026-06-25 - Home, Start Guide, Fix Wizard, Setup, Project Picker, File Lab, Rescue Room, Packet Builder, Patch Desk, Patch Lab, Preview + Test, Checkpoints, Workflow Hub, AI Handoff, Publish Prep, Repo Desk, GitHub Tracker, Connector Status, and Help scan recorded. One master plan is the source of truth.
+Last update: 2026-06-25 - Home, Start Guide, Fix Wizard, Setup, Project Picker, File Lab, Rescue Room, Packet Builder, Patch Desk, Patch Lab, Preview + Test, Checkpoints, Workflow Hub, AI Handoff, Publish Prep, Repo Desk, GitHub Tracker, Connector Status, and Help live-promotion passes recorded. One master plan is the source of truth.
 
 ## Mission
 
@@ -76,16 +76,14 @@ Passed during live promotion review:
 - `code-labs/preview-test.html` - passed after safety-gate guidance appeared and PASS/FAIL preview testing was visible.
 - `code-labs/checkpoints.html` - passed after safety-gate guidance appeared and rollback/test history remained visible.
 - `code-labs/v20.html` - passed after Workflow Hub card buttons were polished into a neat showcase row and signed-in user prompt wording was added.
-- `code-labs/ai-handoff.html` - scanned after Publish live-ready rules were added and the copyable review handoff remained intact.
-- `code-labs/publish-prep.html` - scanned after Publish live-ready rules were added and the safe branch/PR request remained intact.
-- `code-labs/repo-desk.html` - scanned after Publish live-ready rules were added and the repo action planner plus cleanup rule remained intact.
-- `code-labs/github-tracker.html` - scanned after Publish live-ready rules were added and the PR/preview/test tracking flow remained intact.
-- `code-labs/connector-status.html` - scanned with one-connector rule, connector boundary, account status, usage/feedback status, and promotion checklist visible.
-- `code-labs/help.html` - scanned with tool map, promotion checklist, and plain-English user/ChatGPT guidance visible.
+- `code-labs/ai-handoff.html` - passed after user test showed the AI Handoff package includes source lock, fixed-code stats, and full fixed code.
+- `code-labs/publish-prep.html` - passed after user test showed safe branch/PR request, target path, rollback rules, and full fixed code.
+- `code-labs/repo-desk.html` - passed after user test of the publish-lane flow and connector-safe request pattern.
+- `code-labs/github-tracker.html` - passed after user test showed PR/review link, branch link, preview link, notes, and next safe action report.
+- `code-labs/connector-status.html` - passed after one-connector wording, browser-vs-ChatGPT connector clarity, mode-card clarity, live connection fields, and Supabase history status were verified.
+- `code-labs/help.html` - passed after tool map, promotion checklist, plain-English user/ChatGPT guidance, and exact live connection test fields were verified.
 
-Continue testing through the menu checklist and record passes here.
-
-Every current Code Labs menu/index page has now been scanned from GitHub `main` and recorded in this master plan. No Stream Bandit app page was edited during this scan.
+Every current Code Labs menu/index page has now been scanned from GitHub `main`, tested through the current live-promotion pass, and recorded in this master plan. No Stream Bandit app page was edited during this scan.
 
 ## Menu checklist and page map
 
@@ -115,15 +113,15 @@ Use the menu as the live-promotion checklist.
 
 ### Publish
 
-- `code-labs/ai-handoff.html` - copyable review handoff. Publish lane scanned.
-- `code-labs/publish-prep.html` - safe branch/PR request. Publish lane scanned.
-- `code-labs/repo-desk.html` - repo action planning and new-file cleanup rule. Publish lane scanned.
-- `code-labs/github-tracker.html` - PR, branch, preview, and test tracking. Publish lane scanned.
+- `code-labs/ai-handoff.html` - copyable review handoff. Passed live polish.
+- `code-labs/publish-prep.html` - safe branch/PR request. Passed live polish.
+- `code-labs/repo-desk.html` - repo action planning and new-file cleanup rule. Passed live polish.
+- `code-labs/github-tracker.html` - PR, branch, preview, and test tracking. Passed live polish.
 
 ### Connect and Help
 
-- `code-labs/connector-status.html` - GitHub/Supabase status, one-connector rule, and lane wording. Connect lane scanned.
-- `code-labs/help.html` - tool map, promotion checklist, and plain-English help. Help lane scanned.
+- `code-labs/connector-status.html` - GitHub/Supabase status, one-connector rule, lane wording, and browser-vs-ChatGPT connector clarity. Passed live polish.
+- `code-labs/help.html` - tool map, promotion checklist, plain-English help, and exact live connection test fields. Passed live polish.
 
 ## Current index scan map
 
@@ -148,8 +146,8 @@ This scan covered Code Labs only. It checked the current shell page, `body data-
 | `code-labs/publish-prep.html` | `publish-prep` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v16-publish-prep.js` | Safe branch/PR request packet. |
 | `code-labs/repo-desk.html` | `repo-desk` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v30-repo-desk.js` | GitHub connector request planning and new-file cleanup rule. |
 | `code-labs/github-tracker.html` | `github-tracker` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v17-github-tracker.js` | PR, branch, preview, test result, and approval tracker. |
-| `code-labs/connector-status.html` | `connector-status` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v13-loader.js`, `code-labs-v40-connector-rule.js` | GitHub/Supabase connector boundary and one-connector rule. |
-| `code-labs/help.html` | `help` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js` | Tool map, promotion checklist, and plain-English help. |
+| `code-labs/connector-status.html` | `connector-status` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v13-loader.js`, `code-labs-v40-connector-rule.js` | GitHub/Supabase connector boundary, one-connector rule, and browser-vs-ChatGPT connector clarity. |
+| `code-labs/help.html` | `help` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js` | Tool map, promotion checklist, plain-English help, and exact live connection test fields. |
 
 Scan finding: all current menu/index pages are Code Labs pages under `code-labs/`. Several pages are rendered by shared JavaScript after the small HTML shell loads; this is expected for the current static helper architecture.
 
@@ -263,8 +261,8 @@ Before any page patch:
 - Repo Desk and Workflow Hub support the new-file cleanup rule.
 - Hard-coded developer name wording was removed from live user-facing connector prompts in PR #101.
 - Full current Code Labs menu/index scan recorded in this master plan.
-- Publish lane live-ready panels recorded for AI Handoff, Publish Prep, Repo Desk, and GitHub Tracker.
-- Help and Connector Status hold the tool map, promotion checklist, and hard stop rules.
+- Publish lane user-tested pass recorded for AI Handoff, Publish Prep, Repo Desk, and GitHub Tracker.
+- Help and Connector Status hold the tool map, promotion checklist, hard stop rules, exact live connection test fields, and connector-status clarity.
 
 ## Plans already made and folded into this master plan
 
@@ -294,6 +292,9 @@ Recorded plan/history points:
 - PR #118 recorded Patch Lab as passed.
 - PR #119 added Publish lane live-ready panels.
 - PR #120 recorded the full Code Labs menu scan in the master plan.
+- PR #121 added live connection test fields to Help and Connector Status.
+- PR #122 clarified browser-vs-ChatGPT connector status wording.
+- PR #123 clarified Connector Status mode cards.
 
 Planning principle: do not scatter future plans across random files. Add them here first, then build from existing Code Labs pages/assets when a visible change is needed.
 
