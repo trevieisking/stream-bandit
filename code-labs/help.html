@@ -18,7 +18,8 @@
   function countLines(text){return String(text||'').split(/\r?\n/).length;}
   function countWords(text){var t=String(text||'').trim();return t?t.split(/\s+/).length:0;}
   function bumpCounter(){var key='codeLabsLocalToolUseTotal';var n=parseInt(localStorage.getItem(key)||'0',10)||0;n+=1;localStorage.setItem(key,String(n));var el=q('#clLocalToolUseTotal');if(el)el.textContent=String(n);return n;}
-  function simpleWarnings(text){var t=String(text||''),hits=[];if(/service[_-]?role/i.test(t))hits.push('service-role wording');if(/password\s*[:=]/i.test(t))hits.push('password-looking text');if(/api[_-]?key\s*[:=]/i.test(t))hits.push('API-key-looking text');if(/secret\s*[:=]/i.test(t))hits.push('secret-looking text');return hits;}
+  function simpleWarnings(text){var t=String(text||''),hits=[];if(/auth|token|credential/i.test(t))hits.push('private-looking text');return hits;}
+  function diffSummary(before,after){var a=String(before||'').split(/\r?\n/),b=String(after||'').split(/\r?\n/),max=Math.max(a.length,b.length),same=0,changed=[];for(var i=0;i<max;i++){var oldLine=a[i]||'',newLine=b[i]||'';if(oldLine===newLine){same++;}else if(changed.length<80){changed.push('Line '+(i+1));changed.push('- '+oldLine);changed.push('+ '+newLine);}}return ['CODE LABS BEFORE / AFTER DIFF','Before lines: '+a.length,'After lines: '+b.length,'Same line positions: '+same,'Changed line positions: '+(max-same),'Before characters: '+String(before||'').length,'After characters: '+String(after||'').length,'Character difference: '+(String(after||'').length-String(before||'').length),'','First changed lines:',changed.length?changed.join('\n'):'No line-position changes spotted.'].join('\n');}
   function addPlan(){
     if(document.body.getAttribute('data-page')!=='help')return;
     if(q('#clBackendVsHosting'))return;
@@ -27,7 +28,7 @@
     var panel=document.createElement('section');
     panel.className='panel';
     panel.id='clBackendVsHosting';
-    panel.innerHTML='<h2>Website HTTPS vs backend HTTPS</h2><p>Your IONOS/GitHub Pages HTTPS shows Code Labs safely in the browser. A backend HTTPS server is different: it can run private server code, hold protected keys safely, verify a signed-in user, talk to Supabase, and expose controlled tools to ChatGPT.</p><div class="grid2"><div class="item"><b>IONOS/domain HTTPS</b><p>Good for public pages, browser JavaScript, help screens, copy packets, previews, local counters, and manual fallback tools.</p><span class="badge good">Browser workbench</span></div><div class="item"><b>Backend HTTPS</b><p>Needed for a ChatGPT connector app, protected Supabase access, audit logs, GitHub PR actions, and server-side private keys.</p><span class="badge warn">Connector backend</span></div></div><div class="notice"><p><b>Rule:</b> promote Code Labs now as the browser workbench. Add backend tools later, starting read-only, then safe writes, then GitHub PR tools.</p></div>';
+    panel.innerHTML='<h2>Website HTTPS vs backend HTTPS</h2><p>Your IONOS/GitHub Pages HTTPS shows Code Labs safely in the browser. A backend HTTPS server is different: it can run private server code, hold protected settings safely, verify a signed-in user, talk to Supabase, and expose controlled tools to ChatGPT.</p><div class="grid2"><div class="item"><b>IONOS/domain HTTPS</b><p>Good for public pages, browser JavaScript, help screens, copy packets, previews, local counters, and manual fallback tools.</p><span class="badge good">Browser workbench</span></div><div class="item"><b>Backend HTTPS</b><p>Needed for a ChatGPT connector app, protected Supabase access, audit logs, GitHub PR actions, and server-side protected settings.</p><span class="badge warn">Connector backend</span></div></div><div class="notice"><p><b>Rule:</b> promote Code Labs now as the browser workbench. Add backend tools later, starting read-only, then safe writes, then GitHub PR tools.</p></div>';
     var tools=document.createElement('section');
     tools.className='panel';
     tools.id='clToolsUtilityLane';
@@ -36,13 +37,19 @@
     utility.className='panel';
     utility.id='clLocalUtilityTool';
     utility.innerHTML='<h2>Local Utility Tool V1</h2><p>Paste text or code here for local checks. This runs in the browser only and is useful when connector tools are unavailable.</p><textarea id="clToolInput" class="mid" placeholder="Paste code, JSON, notes, or a prompt here"></textarea><div class="actions"><button class="btn primary" id="clCountText">Count text</button><button class="btn ghost" id="clFormatJson">Format JSON</button><button class="btn ghost" id="clPlainText">Clean to plain text</button><button class="btn ghost" id="clCopyToolReport">Copy result</button></div><textarea id="clToolOutput" class="mid" readonly placeholder="Tool result will appear here"></textarea><div class="notice"><p><b>Local use total:</b> <span id="clLocalToolUseTotal">0</span>. This is only a browser total, not a tracker.</p></div>';
+    var diff=document.createElement('section');
+    diff.className='panel';
+    diff.id='clLocalDiffTool';
+    diff.innerHTML='<h2>Before / After Diff Tool V1</h2><p>Paste old code on the left and fixed code on the right. Code Labs makes a plain-English change summary you can copy into ChatGPT or GitHub Tracker.</p><div class="grid2"><div><b>Before / current code</b><textarea id="clDiffBefore" class="mid" placeholder="Paste current code here"></textarea></div><div><b>After / fixed code</b><textarea id="clDiffAfter" class="mid" placeholder="Paste fixed code here"></textarea></div></div><div class="actions"><button class="btn primary" id="clRunDiff">Compare before and after</button><button class="btn ghost" id="clCopyDiff">Copy diff summary</button></div><textarea id="clDiffOutput" class="mid" readonly placeholder="Diff summary will appear here"></textarea>';
     var first=q('#clHelpOperatingMap')||q('.panel');
-    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first.nextSibling);panel.parentNode.insertBefore(tools,panel.nextSibling);tools.parentNode.insertBefore(utility,tools.nextSibling);}else{main.appendChild(panel);main.appendChild(tools);main.appendChild(utility);}
+    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first.nextSibling);panel.parentNode.insertBefore(tools,panel.nextSibling);tools.parentNode.insertBefore(utility,tools.nextSibling);utility.parentNode.insertBefore(diff,utility.nextSibling);}else{main.appendChild(panel);main.appendChild(tools);main.appendChild(utility);main.appendChild(diff);}
     var saved=parseInt(localStorage.getItem('codeLabsLocalToolUseTotal')||'0',10)||0;if(q('#clLocalToolUseTotal'))q('#clLocalToolUseTotal').textContent=String(saved);
     q('#clCountText').onclick=function(){var text=q('#clToolInput').value||'';var warns=simpleWarnings(text);var result=['CODE LABS LOCAL TEXT CHECK','Lines: '+countLines(text),'Characters: '+text.length,'Words: '+countWords(text),'Private text warning: '+(warns.length?warns.join(', '):'none spotted'),'Use count total: '+bumpCounter()].join('\n');q('#clToolOutput').value=result;};
     q('#clFormatJson').onclick=function(){var text=q('#clToolInput').value||'';try{q('#clToolOutput').value=JSON.stringify(JSON.parse(text),null,2);}catch(e){q('#clToolOutput').value='JSON check failed: '+e.message;}bumpCounter();};
     q('#clPlainText').onclick=function(){var text=q('#clToolInput').value||'';q('#clToolOutput').value=text.replace(/```[a-zA-Z0-9_-]*\n?/g,'').replace(/```/g,'').replace(/\r/g,'').trim();bumpCounter();};
     q('#clCopyToolReport').onclick=function(){copyText(q('#clToolOutput').value||'');bumpCounter();};
+    q('#clRunDiff').onclick=function(){q('#clDiffOutput').value=diffSummary(q('#clDiffBefore').value,q('#clDiffAfter').value);bumpCounter();};
+    q('#clCopyDiff').onclick=function(){copyText(q('#clDiffOutput').value||'');bumpCounter();};
   }
   setTimeout(addPlan,360);
   setTimeout(addPlan,900);
