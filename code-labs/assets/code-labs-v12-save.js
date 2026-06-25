@@ -1,4 +1,4 @@
-/* Code Labs V1.5.1 - shared menu, save, workspace, repair, and safety gate polish */
+/* Code Labs V1.5.2 - shared menu, save, workspace, repair, and safety gate polish */
 (function(){
   var REPAIR_PAGES=['rescue-room','packet-builder','patch-desk'];
   var SAFETY_PAGES=['patch-lab','preview-test','checkpoints'];
@@ -71,6 +71,11 @@
     if(first&&first.parentNode){first.parentNode.insertBefore(panel,first.nextSibling);}else{main.appendChild(panel);}
     return true;
   }
+  function insertPatchLabSafetyPanel(panel){
+    var firstGrid=document.querySelector('#patchLabV14 + .grid2');
+    if(firstGrid&&firstGrid.parentNode){firstGrid.parentNode.insertBefore(panel,firstGrid.nextSibling);return true;}
+    return insertAfterFirstPanel(panel);
+  }
   function addWorkspaceLivePanel(){
     var p=page();
     if(p!=='setup'&&p!=='project-picker')return;
@@ -111,7 +116,7 @@
     panel.className='panel';
     panel.id='clSafetyGatePanel';
     panel.innerHTML='<h2>'+info[0]+'</h2><p>This page should '+info[1]+'. It is part of the final manual safety gate before any GitHub branch, PR, or live file replacement.</p><div class="grid2"><div class="item"><b>Check before publish</b><p>Confirm the fixed code was saved, compared, previewed, and tested before asking GitHub connector to help publish.</p><span class="badge good">Required</span></div><div class="item"><b>Rollback ready</b><p>Keep an original checkpoint and a fixed-code checkpoint so the user can recover if a test fails.</p><span class="badge good">Safe</span></div><div class="item"><b>PASS/FAIL notes</b><p>Record what worked and what failed in plain English so ChatGPT can continue without guessing.</p><span class="badge warn">Evidence</span></div><div class="item"><b>No live writes here</b><p>These browser pages prepare and test. GitHub write work belongs in the signed-in connector branch/PR lane.</p><span class="badge warn">Manual gate</span></div></div><div class="notice"><p><b>Promotion check:</b> this page passes when it protects rollback, supports plain-English test notes, and gives the user a clear next step.</p></div>';
-    insertAfterFirstPanel(panel);
+    if(p==='patch-lab'){insertPatchLabSafetyPanel(panel);}else{insertAfterFirstPanel(panel);}
   }
   function addAuthDecisionPanel(){
     if(page()!=='setup')return;
