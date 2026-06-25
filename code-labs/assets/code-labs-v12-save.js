@@ -1,9 +1,11 @@
-/* Code Labs V1.6 - shared menu, save, workspace, repair, safety gate, and publish polish */
+/* Code Labs V1.7 - shared menu, save, workspace, repair, safety gate, publish polish, and live connection test fields */
 (function(){
   var REPAIR_PAGES=['rescue-room','packet-builder','patch-desk'];
   var SAFETY_PAGES=['patch-lab','preview-test','checkpoints'];
   var PUBLISH_PAGES=['ai-handoff','publish-prep','repo-desk','github-tracker'];
   function page(){return document.body.getAttribute('data-page')||'';}
+  function toast(msg){var t=document.querySelector('#toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}}
+  function copyText(text){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text||'').then(function(){toast('Copied');});return;}var a=document.createElement('textarea');a.value=text||'';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('Copied');}
   function loadHistory(){
     var s=document.createElement('script');
     s.src='assets/code-labs-v1-2-history.js';
@@ -167,7 +169,29 @@
     var ref=document.querySelector('#clHelpOperatingMap')||document.querySelector('.panel');
     if(ref&&ref.parentNode){ref.parentNode.insertBefore(panel,ref.nextSibling);}else{insertAfterFirstPanel(panel);}
   }
+  function addLiveConnectionTestPanel(){
+    var p=page();
+    if(p!=='help'&&p!=='connector-status')return;
+    if(document.querySelector('#clLiveConnectionTest'))return;
+    var panel=document.createElement('section');
+    panel.className='panel';
+    panel.id='clLiveConnectionTest';
+    var fields=['CODE LABS LIVE CONNECTION TEST FIELDS','', 'START GUIDE','Website or project name: Code Labs Live Test','Website URL optional: https://trevieisking.github.io/stream-bandit/code-labs/','GitHub file link or filename optional: https://github.com/trevieisking/stream-bandit/blob/main/code-labs/index.html','Repo optional: trevieisking/stream-bandit','Problem in normal words: Test that Code Labs can guide ChatGPT, load a GitHub file read-only, build a request, and keep GitHub and Supabase separate.','Do not touch / important rules: Do not touch Stream Bandit app files. Do not touch V7 files. Do not create new files. Keep Code Labs and Stream Bandit separate.','', 'SETUP','Your workspace name: Code Labs Live Test Workspace','Website name: Code Labs Live Test','Website URL: https://trevieisking.github.io/stream-bandit/code-labs/','GitHub repo optional: trevieisking/stream-bandit','Mode: Manual paste mode','Notes: Connector test - GitHub stays separate from Supabase.','', 'FILE LAB GITHUB READ-ONLY LOADER','GitHub file URL: https://github.com/trevieisking/stream-bandit/blob/main/code-labs/index.html','Owner: trevieisking','Repo: stream-bandit','Branch: main','File path: code-labs/index.html','Code Search text: Code Labs','', 'WHAT SHOULD PASS','File Lab should load code-labs/index.html read-only and Code Search should make a report.','Workflow Hub should copy GitHub requests that say: Connect GitHub for this Code Labs user.','Workflow Hub should copy Supabase requests that say: Connect Supabase for this Code Labs user.','Connector Status should show GitHub and Supabase as separate lanes.','No page should show the private user name in user-facing wording.'].join('\n');
+    panel.innerHTML='<h2>Exact live connection test fields</h2><p>Use these exact fields when testing. This keeps the test simple, repeatable, and separate from Stream Bandit app work.</p><div class="actions"><button class="btn primary" id="clCopyLiveConnectionFields">Copy exact fields</button><a class="btn ghost" href="start-guide.html">Start Guide</a><a class="btn ghost" href="file-lab.html">File Lab</a><a class="btn ghost" href="v20.html">Workflow Hub</a><a class="btn ghost" href="connector-status.html">Connector Status</a></div><textarea id="clLiveConnectionFields" class="mid" readonly></textarea><div class="notice"><p><b>Pass rule:</b> GitHub is for repo reads, branches, PRs, previews, and merges. Supabase is for Code Labs repair history. Test one connector at a time.</p></div>';
+    var ref=document.querySelector('#clPromotionChecklist')||document.querySelector('#clOneConnectorRule')||document.querySelector('.panel');
+    if(ref&&ref.parentNode&&ref.nextSibling){ref.parentNode.insertBefore(panel,ref.nextSibling);}else if(ref&&ref.parentNode){ref.parentNode.appendChild(panel);}else{insertAfterFirstPanel(panel);}
+    var out=document.querySelector('#clLiveConnectionFields');
+    if(out)out.value=fields;
+    var btn=document.querySelector('#clCopyLiveConnectionFields');
+    if(btn)btn.onclick=function(){copyText(fields);};
+  }
   function polishText(){
+    textReplace(document.body,'Connect GitHub please, Trev','Connect GitHub for this Code Labs user');
+    textReplace(document.body,'Connect Supabase please, Trev','Connect Supabase for this Code Labs user');
+    textReplace(document.body,'Trev PASS/FAIL','signed-in user PASS/FAIL');
+    textReplace(document.body,'Trev connects GitHub','the signed-in user connects GitHub');
+    textReplace(document.body,'Trevor','the repository owner');
+    textReplace(document.body,'Trev','this Code Labs user');
     textReplace(document.body,'Manual rescue works now. GitHub and Supabase are planned connector layers.','Manual rescue works now. GitHub connector work is proven through ChatGPT, and Supabase can save Code Labs history when connected.');
     var p=page();
     if(p==='setup'||p==='project-picker'){
@@ -190,7 +214,7 @@
       }
     });
   }
-  function runSharedPolish(){addExtraMenus();groupMenus();polishText();addWorkspaceLivePanel();addRepairLivePanel();addSafetyGatePanel();addPublishLivePanel();addAuthDecisionPanel();addHelpOperatingMap();addPromotionChecklist();}
+  function runSharedPolish(){addExtraMenus();groupMenus();polishText();addWorkspaceLivePanel();addRepairLivePanel();addSafetyGatePanel();addPublishLivePanel();addAuthDecisionPanel();addHelpOperatingMap();addPromotionChecklist();addLiveConnectionTestPanel();}
   loadHistory();
   setTimeout(runSharedPolish,120);
   setTimeout(runSharedPolish,500);
