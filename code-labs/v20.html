@@ -12,5 +12,34 @@
 <script src="assets/code-labs-v1-1-safety.js"></script>
 <script src="assets/code-labs-v12-save.js?v=cl-v50-live-user"></script>
 <script src="assets/code-labs-v20.js?v=cl-v50-live-user"></script>
+<script>
+(function(){
+  function swap(text){
+    return String(text||'')
+      .split('Connect GitHub for this Code Labs user').join('Connect GitHub connector for this Code Labs user')
+      .split('Connect Supabase for this Code Labs user').join('Connect Supabase connector for this Code Labs user')
+      .split('GitHub Help').join('GitHub connector Help')
+      .split('Supabase Help').join('Supabase connector Help')
+      .split('Use these when only one connector can be connected at a time.').join('Use one connector at a time. Choose GitHub connector for repo work or Supabase connector for database work.');
+  }
+  function polish(root){
+    var walker=document.createTreeWalker(root||document.body,NodeFilter.SHOW_TEXT,null),node;
+    while((node=walker.nextNode())){
+      var next=swap(node.nodeValue);
+      if(next!==node.nodeValue)node.nodeValue=next;
+    }
+    var out=document.querySelector('#v20Out');
+    if(out)out.value=swap(out.value);
+  }
+  var originalWrite=navigator.clipboard&&navigator.clipboard.writeText;
+  if(originalWrite){
+    navigator.clipboard.writeText=function(text){return originalWrite.call(navigator.clipboard,swap(text));};
+  }
+  document.addEventListener('click',function(){setTimeout(function(){polish(document.body);},80);});
+  setTimeout(function(){polish(document.body);},260);
+  setTimeout(function(){polish(document.body);},900);
+  setTimeout(function(){polish(document.body);},1600);
+})();
+</script>
 </body>
 </html>
