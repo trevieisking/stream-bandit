@@ -11,5 +11,29 @@
 <script src="assets/code-labs.js"></script>
 <script src="assets/code-labs-v1-1-safety.js"></script>
 <script src="assets/code-labs-v12-save.js?v=cl-v71-live-connect"></script>
+<script>
+(function(){
+  function q(s,r){return(r||document).querySelector(s);}
+  function addPlan(){
+    if(document.body.getAttribute('data-page')!=='help')return;
+    if(q('#clBackendVsHosting'))return;
+    var main=q('.main');
+    if(!main){setTimeout(addPlan,160);return;}
+    var panel=document.createElement('section');
+    panel.className='panel';
+    panel.id='clBackendVsHosting';
+    panel.innerHTML='<h2>Website HTTPS vs backend HTTPS</h2><p>Your IONOS/GitHub Pages HTTPS shows Code Labs safely in the browser. A backend HTTPS server is different: it can run private server code, hold secrets safely, verify a signed-in user, talk to Supabase, and expose controlled tools to ChatGPT.</p><div class="grid2"><div class="item"><b>IONOS/domain HTTPS</b><p>Good for public pages, browser JavaScript, help screens, copy packets, previews, local counters, and manual fallback tools.</p><span class="badge good">Browser workbench</span></div><div class="item"><b>Backend HTTPS</b><p>Needed for a ChatGPT connector app, protected Supabase access, audit logs, GitHub PR actions, and server-side secrets.</p><span class="badge warn">Connector backend</span></div></div><div class="notice"><p><b>Rule:</b> promote Code Labs now as the browser workbench. Add backend tools later, starting read-only, then safe writes, then GitHub PR tools.</p></div>';
+    var tools=document.createElement('section');
+    tools.className='panel';
+    tools.id='clToolsUtilityLane';
+    tools.innerHTML='<h2>Small Tools and Utilities lane</h2><p>These are browser-safe helpers Code Labs can add before the backend. They help users copy cleaner results when ChatGPT tools are unavailable.</p><div class="grid2"><div class="item"><b>Code helpers</b><p>Line counter, character counter, before/after diff, duplicate ID checker, and simple secrets warning before sharing code.</p></div><div class="item"><b>Data helpers</b><p>JSON format/check, URL encode/decode, HTML entity encode/decode, and Markdown/plain-text cleaner.</p></div><div class="item"><b>GitHub helpers</b><p>Raw GitHub URL builder, repo/path normaliser, branch/PR checklist, and copyable safe-change request.</p></div><div class="item"><b>Image/logo helpers</b><p>Logo prompt builder, icon prompt builder, favourite art prompt helper, image size notes, and contrast/accessibility checklist.</p></div></div><div class="notice"><p><b>Privacy:</b> local tools should run in the browser and not upload code by default. The use counter should count totals only, not track people.</p></div>';
+    var first=q('#clHelpOperatingMap')||q('.panel');
+    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first.nextSibling);panel.parentNode.insertBefore(tools,panel.nextSibling);}else{main.appendChild(panel);main.appendChild(tools);}
+  }
+  setTimeout(addPlan,360);
+  setTimeout(addPlan,900);
+  setTimeout(addPlan,1500);
+})();
+</script>
 </body>
 </html>
