@@ -1,7 +1,8 @@
-/* Code Labs V1.5.2 - shared menu, save, workspace, repair, and safety gate polish */
+/* Code Labs V1.6 - shared menu, save, workspace, repair, safety gate, and publish polish */
 (function(){
   var REPAIR_PAGES=['rescue-room','packet-builder','patch-desk'];
   var SAFETY_PAGES=['patch-lab','preview-test','checkpoints'];
+  var PUBLISH_PAGES=['ai-handoff','publish-prep','repo-desk','github-tracker'];
   function page(){return document.body.getAttribute('data-page')||'';}
   function loadHistory(){
     var s=document.createElement('script');
@@ -118,6 +119,23 @@
     panel.innerHTML='<h2>'+info[0]+'</h2><p>This page should '+info[1]+'. It is part of the final manual safety gate before any GitHub branch, PR, or live file replacement.</p><div class="grid2"><div class="item"><b>Check before publish</b><p>Confirm the fixed code was saved, compared, previewed, and tested before asking GitHub connector to help publish.</p><span class="badge good">Required</span></div><div class="item"><b>Rollback ready</b><p>Keep an original checkpoint and a fixed-code checkpoint so the user can recover if a test fails.</p><span class="badge good">Safe</span></div><div class="item"><b>PASS/FAIL notes</b><p>Record what worked and what failed in plain English so ChatGPT can continue without guessing.</p><span class="badge warn">Evidence</span></div><div class="item"><b>No live writes here</b><p>These browser pages prepare and test. GitHub write work belongs in the signed-in connector branch/PR lane.</p><span class="badge warn">Manual gate</span></div></div><div class="notice"><p><b>Promotion check:</b> this page passes when it protects rollback, supports plain-English test notes, and gives the user a clear next step.</p></div>';
     if(p==='patch-lab'){insertPatchLabSafetyPanel(panel);}else{insertAfterFirstPanel(panel);}
   }
+  function addPublishLivePanel(){
+    var p=page();
+    if(PUBLISH_PAGES.indexOf(p)===-1)return;
+    if(document.querySelector('#clPublishLivePanel'))return;
+    var labels={
+      'ai-handoff':['AI Handoff','package the fixed code, source lock, rules, and review request for ChatGPT'],
+      'publish-prep':['Publish Prep','prepare a safe branch and PR request without touching main directly'],
+      'repo-desk':['Repo Desk','plan repo work, cleanup rules, branches, PRs, and connector-safe actions'],
+      'github-tracker':['GitHub Tracker','track PR, preview, test result, approval, and report-back notes']
+    };
+    var info=labels[p]||['Publish page','keep the final publish lane safe'];
+    var panel=document.createElement('section');
+    panel.className='panel';
+    panel.id='clPublishLivePanel';
+    panel.innerHTML='<h2>'+info[0]+' live-ready rules</h2><p>This page should '+info[1]+'. It is part of the publish lane, so it must protect main, keep rollback available, and make the next action obvious.</p><div class="grid2"><div class="item"><b>Branch or packet first</b><p>Use AI Handoff or Publish Prep before asking ChatGPT/GitHub to change repo files. Browser pages prepare; they do not push.</p><span class="badge good">Safe lane</span></div><div class="item"><b>One target at a time</b><p>Keep the target repo, branch, path, PR, and preview link clear. Stop when anything is missing or uncertain.</p><span class="badge good">Clear target</span></div><div class="item"><b>Preview before merge</b><p>GitHub Tracker should record the preview link, user PASS/FAIL, and final approval before any merge.</p><span class="badge warn">Approval gate</span></div><div class="item"><b>Cleanup rule</b><p>Do not create new repo files unless three stale old V4/V5/V6 Stream Bandit cleanup candidates are verified first. Never V7.</p><span class="badge warn">Hard stop</span></div></div><div class="notice"><p><b>Promotion check:</b> this page passes when it produces a clear handoff, branch/PR request, repo plan, or tracker report without hidden writes.</p></div>';
+    insertAfterFirstPanel(panel);
+  }
   function addAuthDecisionPanel(){
     if(page()!=='setup')return;
     if(document.querySelector('#clAuthDecisionPanel'))return;
@@ -172,7 +190,7 @@
       }
     });
   }
-  function runSharedPolish(){addExtraMenus();groupMenus();polishText();addWorkspaceLivePanel();addRepairLivePanel();addSafetyGatePanel();addAuthDecisionPanel();addHelpOperatingMap();addPromotionChecklist();}
+  function runSharedPolish(){addExtraMenus();groupMenus();polishText();addWorkspaceLivePanel();addRepairLivePanel();addSafetyGatePanel();addPublishLivePanel();addAuthDecisionPanel();addHelpOperatingMap();addPromotionChecklist();}
   loadHistory();
   setTimeout(runSharedPolish,120);
   setTimeout(runSharedPolish,500);
