@@ -1,8 +1,8 @@
 # Code Labs Master Plan
 
-Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / future Python analysis lane noted / future utility toolbox noted / no Stream Bandit lane crossing.
+Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / future Python analysis lane noted / future utility toolbox noted / no Stream Bandit lane crossing / full current Code Labs menu scan recorded.
 
-Last update: 2026-06-25 - Home, Start Guide, Fix Wizard, Setup, Project Picker, File Lab, Rescue Room, Packet Builder, Patch Desk, Patch Lab, Preview + Test, Checkpoints, and Workflow Hub live-promotion passes recorded.
+Last update: 2026-06-25 - Home, Start Guide, Fix Wizard, Setup, Project Picker, File Lab, Rescue Room, Packet Builder, Patch Desk, Patch Lab, Preview + Test, Checkpoints, Workflow Hub, AI Handoff, Publish Prep, Repo Desk, GitHub Tracker, Connector Status, and Help scan recorded. One master plan is the source of truth.
 
 ## Mission
 
@@ -14,6 +14,34 @@ Code Labs must support two modes:
 2. The user follows the same plain-English pages manually when tools are unavailable.
 
 Code Labs should keep the repair state, loaded file, Code Search Report, request packet, fixed code, preview result, checkpoint, GitHub PR/preview links, Supabase repair history, and final PASS/FAIL decision in one place.
+
+## AI operating map for users like Trev
+
+Code Labs should be built for users who do not want to manage code manually and for ChatGPT sessions that need durable, exact context.
+
+Core intent:
+
+- Make coding repairs easier for users who do not code.
+- Let ChatGPT use Code Labs pages and tools to guide the user step by step.
+- Let the user also work manually when connectors are unavailable.
+- Keep enough project state in Code Labs so a new chat can continue without reloading an enormous old conversation.
+- Keep Code Labs separate from Stream Bandit app logic unless the signed-in user explicitly starts a separate Stream Bandit repair.
+- Keep one master plan here instead of scattered notes.
+
+The intended user path is:
+
+1. Start Guide captures the plain-English problem.
+2. Fix Wizard chooses the next safest page.
+3. File Lab loads or pastes the full file and creates Code Search evidence.
+4. Workflow Hub builds the exact request for ChatGPT.
+5. Patch Desk or Patch Lab captures the fix.
+6. Preview + Test records PASS/FAIL.
+7. Checkpoints preserve rollback.
+8. AI Handoff, Publish Prep, Repo Desk, and GitHub Tracker handle the branch/PR/publish lane.
+9. Connector Status and Help explain the one-connector rule and the safe tool map.
+10. Supabase history is used only for Code Labs repair history after the user connects Supabase.
+
+Issue `#97` was treated as the durable AI operating note and is now folded into this master plan.
 
 ## Live promotion goal
 
@@ -48,8 +76,16 @@ Passed during live promotion review:
 - `code-labs/preview-test.html` - passed after safety-gate guidance appeared and PASS/FAIL preview testing was visible.
 - `code-labs/checkpoints.html` - passed after safety-gate guidance appeared and rollback/test history remained visible.
 - `code-labs/v20.html` - passed after Workflow Hub card buttons were polished into a neat showcase row and signed-in user prompt wording was added.
+- `code-labs/ai-handoff.html` - scanned after Publish live-ready rules were added and the copyable review handoff remained intact.
+- `code-labs/publish-prep.html` - scanned after Publish live-ready rules were added and the safe branch/PR request remained intact.
+- `code-labs/repo-desk.html` - scanned after Publish live-ready rules were added and the repo action planner plus cleanup rule remained intact.
+- `code-labs/github-tracker.html` - scanned after Publish live-ready rules were added and the PR/preview/test tracking flow remained intact.
+- `code-labs/connector-status.html` - scanned with one-connector rule, connector boundary, account status, usage/feedback status, and promotion checklist visible.
+- `code-labs/help.html` - scanned with tool map, promotion checklist, and plain-English user/ChatGPT guidance visible.
 
 Continue testing through the menu checklist and record passes here.
+
+Every current Code Labs menu/index page has now been scanned from GitHub `main` and recorded in this master plan. No Stream Bandit app page was edited during this scan.
 
 ## Menu checklist and page map
 
@@ -79,15 +115,43 @@ Use the menu as the live-promotion checklist.
 
 ### Publish
 
-- `code-labs/ai-handoff.html` - copyable review handoff.
-- `code-labs/publish-prep.html` - safe branch/PR request.
-- `code-labs/repo-desk.html` - repo action planning and new-file cleanup rule.
-- `code-labs/github-tracker.html` - PR, branch, preview, and test tracking.
+- `code-labs/ai-handoff.html` - copyable review handoff. Publish lane scanned.
+- `code-labs/publish-prep.html` - safe branch/PR request. Publish lane scanned.
+- `code-labs/repo-desk.html` - repo action planning and new-file cleanup rule. Publish lane scanned.
+- `code-labs/github-tracker.html` - PR, branch, preview, and test tracking. Publish lane scanned.
 
 ### Connect and Help
 
-- `code-labs/connector-status.html` - GitHub/Supabase status, one-connector rule, and lane wording.
-- `code-labs/help.html` - tool map, promotion checklist, and plain-English help.
+- `code-labs/connector-status.html` - GitHub/Supabase status, one-connector rule, and lane wording. Connect lane scanned.
+- `code-labs/help.html` - tool map, promotion checklist, and plain-English help. Help lane scanned.
+
+## Current index scan map
+
+This scan covered Code Labs only. It checked the current shell page, `body data-page`, loaded CSS, shared JS, page-specific JS, and the visible operating purpose for every current menu/index page.
+
+| Page | `data-page` | Main loaded Code Labs assets | Current role |
+| --- | --- | --- | --- |
+| `code-labs/index.html` | `index` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-home-live.js` | Home Command Centre and durable ChatGPT workbench landing page. |
+| `code-labs/start-guide.html` | `start-guide` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v19-start-guide.js` | Plain-English intake for a non-coder. |
+| `code-labs/fix-wizard.html` | `fix-wizard` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v18-fix-wizard.js` | One next safest step. |
+| `code-labs/v20.html` | `v20` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v20.js` | Workflow Hub and ChatGPT request builder. |
+| `code-labs/setup.html` | `setup` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js` | Workspace setup and Code Labs account/auth decision notes. |
+| `code-labs/project-picker.html` | `project-picker` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js` | Project mode selection. |
+| `code-labs/file-lab.html` | `file-lab` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v13-loader.js`, `code-labs-v1-3-github-readonly.js` | Paste/upload/read-only GitHub file load and Code Search Report. |
+| `code-labs/rescue-room.html` | `rescue-room` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js` | Problem, errors, and do-not-touch rules. |
+| `code-labs/packet-builder.html` | `packet-builder` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js` | ChatGPT repair packet builder. |
+| `code-labs/patch-desk.html` | `patch-desk` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js` | Paste full fixed code, compare, checkpoint, copy, and download. |
+| `code-labs/patch-lab.html` | `patch-lab` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v14-loader.js`, `code-labs-v14-patch-lab.js` | Exact find/replace and line-range patching. |
+| `code-labs/preview-test.html` | `preview-test` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js` | Original/fixed preview and PASS/FAIL test notes. |
+| `code-labs/checkpoints.html` | `checkpoints` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js` | Rollback versions and saved test history. |
+| `code-labs/ai-handoff.html` | `ai-handoff` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v15-handoff.js` | Copyable review handoff for ChatGPT. |
+| `code-labs/publish-prep.html` | `publish-prep` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v16-publish-prep.js` | Safe branch/PR request packet. |
+| `code-labs/repo-desk.html` | `repo-desk` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v30-repo-desk.js` | GitHub connector request planning and new-file cleanup rule. |
+| `code-labs/github-tracker.html` | `github-tracker` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v17-github-tracker.js` | PR, branch, preview, test result, and approval tracker. |
+| `code-labs/connector-status.html` | `connector-status` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js`, `code-labs-v13-loader.js`, `code-labs-v40-connector-rule.js` | GitHub/Supabase connector boundary and one-connector rule. |
+| `code-labs/help.html` | `help` | `code-labs.js`, `code-labs-v1-1-safety.js`, `code-labs-v12-save.js` | Tool map, promotion checklist, and plain-English help. |
+
+Scan finding: all current menu/index pages are Code Labs pages under `code-labs/`. Several pages are rendered by shared JavaScript after the small HTML shell loads; this is expected for the current static helper architecture.
 
 ## Separation rule
 
@@ -105,6 +169,22 @@ Code Labs must not:
 - hide what changed.
 
 If Code Labs later uses Supabase Auth, the user-facing control must still be Code Labs branded and Code Labs routed. The live name should come from the signed-in Code Labs user/profile, not from hard-coded developer wording.
+
+## One main cleanup rule
+
+One main rule for new repo files:
+
+**Do not create any new repo file unless three old Stream Bandit V4/V5/V6 pages or checkpoint files are first verified as stale cleanup candidates.**
+
+This rule is only triggered by creating a new repo file. Editing existing Code Labs files and creating a branch/PR do not trigger the cleanup rule.
+
+Under this rule:
+
+- Never delete Stream Bandit V7 files.
+- Never delete Code Labs pages.
+- Never use live, useful, uncertain, or unverified files as cleanup candidates.
+- Prefer editing existing Code Labs files over adding files.
+- If three safe old V4/V5/V6 cleanup candidates cannot be verified, stop before creating the new file.
 
 ## Protected files and cleanup rule
 
@@ -182,6 +262,39 @@ Before any page patch:
 - Safe delete-file drill passed through ChatGPT GitHub connector in PR #80.
 - Repo Desk and Workflow Hub support the new-file cleanup rule.
 - Hard-coded developer name wording was removed from live user-facing connector prompts in PR #101.
+- Full current Code Labs menu/index scan recorded in this master plan.
+- Publish lane live-ready panels recorded for AI Handoff, Publish Prep, Repo Desk, and GitHub Tracker.
+- Help and Connector Status hold the tool map, promotion checklist, and hard stop rules.
+
+## Plans already made and folded into this master plan
+
+This master plan is the single source of truth for the Code Labs plans made so far.
+
+Recorded plan/history points:
+
+- PR #79 proved a safe create-file workflow through ChatGPT GitHub connector.
+- PR #80 proved a safe delete-file workflow through ChatGPT GitHub connector.
+- Issue #97 recorded the AI operating map and promotion readiness intent; that content is now folded into this plan.
+- PR #100 added the live-promotion menu checklist and hard stop rules.
+- PR #101 removed hard-coded developer/user wording from live Code Labs connector prompts.
+- PR #102 fixed Code Labs UI polish issues for Workflow Hub and File Lab.
+- PR #103, PR #104, and PR #105 polished Workflow Hub card/button layout.
+- PR #106 refreshed this master plan for live promotion.
+- PR #107 updated Home wording and recorded the future Python sandbox/analysis lane.
+- PR #108 added the future Code Labs utility toolbox plan.
+- PR #109 recorded Home as passed.
+- PR #110 polished Start Guide and Fix Wizard.
+- PR #111 polished Workspace pages.
+- PR #112 recorded Start and Workspace pages as passed.
+- PR #113 added Repair flow live-ready panels.
+- PR #114 recorded Repair flow pages as passed.
+- PR #115 added safety-gate live-ready panels.
+- PR #116 corrected Patch Lab step order.
+- PR #117 polished Patch Lab card layout.
+- PR #118 recorded Patch Lab as passed.
+- PR #119 added Publish lane live-ready panels.
+
+Planning principle: do not scatter future plans across random files. Add them here first, then build from existing Code Labs pages/assets when a visible change is needed.
 
 ## Connector reality
 
@@ -347,20 +460,24 @@ Feedback can include rating, what worked, what was confusing, and optional conta
 
 ## Build order from here
 
-1. Continue menu-by-menu live promotion checks.
-2. Record passed pages in this plan.
-3. Keep GitHub `main` as the source of truth.
-4. Keep using existing Code Labs files where possible.
-5. Fix only visible page problems or connector-readiness blockers.
-6. Keep hard-coded user names out of live pages.
-7. Plan Code Labs auth/profile layer before adding production account flows.
-8. Plan Supabase schema changes before SQL.
-9. Build server-side connector prototype after static workflow is stable.
-10. Add read-only connector tools before write tools.
-11. Add scoped Code Labs write tools after account/RLS review.
-12. Add browser-safe utility toolbox where it improves non-coder repair flow.
-13. Add Python sandbox/analysis connector design as an optional non-blocking improvement.
-14. Add GitHub branch/PR actions only after explicit safety review.
+1. Keep this file as the one Code Labs master plan.
+2. Keep GitHub `main` as the source of truth.
+3. Keep using existing Code Labs files where possible.
+4. Fix only visible page problems or connector-readiness blockers.
+5. Keep hard-coded user names out of live pages.
+6. Keep Start Guide, Fix Wizard, and Workflow Hub as the main non-coder path.
+7. Keep File Lab and Code Search as the evidence path ChatGPT can rely on.
+8. Keep Preview + Test and Checkpoints as the manual safety gate.
+9. Keep AI Handoff, Publish Prep, Repo Desk, and GitHub Tracker as the publish lane.
+10. Plan Code Labs auth/profile layer before adding production account flows.
+11. Plan Supabase schema changes before SQL.
+12. Build server-side connector prototype after static workflow is stable.
+13. Add read-only connector tools before write tools.
+14. Add scoped Code Labs write tools after account/RLS review.
+15. Add browser-safe utility toolbox where it improves non-coder repair flow.
+16. Add Python sandbox/analysis connector design as an optional non-blocking improvement.
+17. Add GitHub branch/PR actions only after explicit safety review.
+18. Keep the one main cleanup rule in force before any new repo file is created.
 
 ## Stop rules
 
