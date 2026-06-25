@@ -1,8 +1,20 @@
 # Code Labs Master Plan
 
-Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / future Python analysis lane noted / future utility toolbox noted / no Stream Bandit lane crossing / full current Code Labs menu scan recorded / Publish lane user-tested pass recorded.
+Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / Supabase Code Labs maintenance migration applied / future Python analysis lane noted / future utility toolbox noted / no Stream Bandit lane crossing / full current Code Labs menu scan recorded / Publish lane user-tested pass recorded.
 
-Last update: 2026-06-25 - Home, Start Guide, Fix Wizard, Setup, Project Picker, File Lab, Rescue Room, Packet Builder, Patch Desk, Patch Lab, Preview + Test, Checkpoints, Workflow Hub, AI Handoff, Publish Prep, Repo Desk, GitHub Tracker, Connector Status, and Help live-promotion passes recorded. One master plan is the source of truth.
+Last update: 2026-06-25 - Home, Start Guide, Fix Wizard, Setup, Project Picker, File Lab, Rescue Room, Packet Builder, Patch Desk, Patch Lab, Preview + Test, Checkpoints, Workflow Hub, AI Handoff, Publish Prep, Repo Desk, GitHub Tracker, Connector Status, and Help live-promotion passes recorded. Supabase Code Labs maintenance migration `code_labs_maintenance_indexes_20260625` was applied. One master plan is the source of truth.
+
+## Source of truth rule
+
+GitHub `main` is the live Code Labs source of truth. Uploaded files from chats are old reference material only unless the signed-in user explicitly says a specific uploaded file is the new replacement source.
+
+For current work:
+
+- do not copy old uploaded Code Labs files over GitHub `main`,
+- fetch current files from GitHub before any repo patch,
+- use Supabase connector only for Code Labs database/history/account work,
+- use GitHub connector only for repo files, branches, PRs, previews, and plan updates,
+- do not use GitHub connector and Supabase connector in the same pass.
 
 ## Mission
 
@@ -263,6 +275,8 @@ Before any page patch:
 - Full current Code Labs menu/index scan recorded in this master plan.
 - Publish lane user-tested pass recorded for AI Handoff, Publish Prep, Repo Desk, and GitHub Tracker.
 - Help and Connector Status hold the tool map, promotion checklist, hard stop rules, exact live connection test fields, and connector-status clarity.
+- Connector Status says GitHub connector and Supabase connector do not run together.
+- Supabase Code Labs maintenance migration `code_labs_maintenance_indexes_20260625` has been applied.
 
 ## Plans already made and folded into this master plan
 
@@ -295,6 +309,9 @@ Recorded plan/history points:
 - PR #121 added live connection test fields to Help and Connector Status.
 - PR #122 clarified browser-vs-ChatGPT connector status wording.
 - PR #123 clarified Connector Status mode cards.
+- PR #124 recorded the user-tested Publish lane pass.
+- PR #126 clarified one-connector labels on Connector Status.
+- Supabase migration `code_labs_maintenance_indexes_20260625` fixed Code Labs maintenance items without touching Stream Bandit `sb_*` tables.
 
 Planning principle: do not scatter future plans across random files. Add them here first, then build from existing Code Labs pages/assets when a visible change is needed.
 
@@ -314,9 +331,11 @@ GitHub repo work through ChatGPT is proven. The ChatGPT GitHub connector has alr
 
 For GitHub repo work, the live user-facing prompt should be:
 
-`Connect GitHub for this Code Labs user`
+`Connect GitHub connector for this Code Labs user`
 
-Use GitHub for repo reads, branches, PRs, previews, merges, and verified cleanup after the signed-in user connects GitHub.
+Use GitHub connector for repo reads, branches, PRs, previews, merges, and verified cleanup after the signed-in user connects GitHub connector.
+
+Do not use Supabase connector in the same GitHub connector pass.
 
 ### Supabase
 
@@ -324,9 +343,13 @@ Supabase repair-history support exists for Code Labs tables when Supabase auth i
 
 For Supabase/database work, the live user-facing prompt should be:
 
-`Connect Supabase for this Code Labs user`
+`Connect Supabase connector for this Code Labs user`
 
-No Supabase schema, RLS, auth, or policy changes should be made without a reviewed Code Labs-only SQL plan.
+Use Supabase connector for Code Labs tables, RLS, auth planning, repair history, database migrations, and database inspections.
+
+Do not use GitHub connector in the same Supabase connector pass.
+
+No additional Supabase schema, RLS, auth, or policy changes should be made without a reviewed Code Labs-only SQL plan.
 
 ### Future Python sandbox / analysis connector
 
@@ -392,6 +415,28 @@ Utility toolbox safety rules:
 
 ## Supabase checkpoint
 
+### 2026-06-25 Code Labs maintenance
+
+Supabase connector was used by itself for a Code Labs-only maintenance pass. GitHub connector was not used in that Supabase pass.
+
+Applied migration:
+
+- `20260625162930` - `code_labs_maintenance_indexes_20260625`.
+
+Migration scope:
+
+- fixed `public.code_labs_set_updated_at` search path,
+- added missing covering indexes for Code Labs foreign keys,
+- touched only Code Labs `code_labs_*` objects,
+- did not change Stream Bandit `sb_*` tables,
+- did not change storage buckets,
+- did not change auth settings,
+- did not change Code Labs data rows.
+
+The larger Code Labs RLS performance rewrite was intentionally not applied yet. It remains a future reviewed SQL plan item.
+
+### 2026-06-24 read-only checkpoint
+
 Supabase inspection on 2026-06-24 was read-only. No schema changes, no table writes, no RLS edits, and no auth changes were made.
 
 Project inspected:
@@ -418,11 +463,11 @@ Planned tables not present yet:
 - `code_labs_feedback`.
 - `code_labs_accounts` or a Code Labs profile link table.
 
-Advisor findings to fix later in a Code Labs-only migration:
+Remaining Code Labs Supabase findings to fix later in a reviewed Code Labs-only migration:
 
-1. Security: `public.code_labs_set_updated_at` has mutable `search_path`.
-2. Performance: Code Labs foreign keys are missing covering indexes.
-3. Performance: Code Labs RLS policies should avoid per-row auth function re-evaluation where possible.
+1. RLS policies should avoid per-row auth function re-evaluation where possible.
+2. Account/profile design should be reviewed before production connector writes.
+3. Usage and feedback tables should only be added if privacy-light tracking is approved.
 
 Out of scope for Code Labs promotion unless separately requested:
 
@@ -464,22 +509,25 @@ Feedback can include rating, what worked, what was confusing, and optional conta
 
 1. Keep this file as the one Code Labs master plan.
 2. Keep GitHub `main` as the source of truth.
-3. Keep using existing Code Labs files where possible.
-4. Fix only visible page problems or connector-readiness blockers.
-5. Keep hard-coded user names out of live pages.
-6. Keep Start Guide, Fix Wizard, and Workflow Hub as the main non-coder path.
-7. Keep File Lab and Code Search as the evidence path ChatGPT can rely on.
-8. Keep Preview + Test and Checkpoints as the manual safety gate.
-9. Keep AI Handoff, Publish Prep, Repo Desk, and GitHub Tracker as the publish lane.
-10. Plan Code Labs auth/profile layer before adding production account flows.
-11. Plan Supabase schema changes before SQL.
-12. Build server-side connector prototype after static workflow is stable.
-13. Add read-only connector tools before write tools.
-14. Add scoped Code Labs write tools after account/RLS review.
-15. Add browser-safe utility toolbox where it improves non-coder repair flow.
-16. Add Python sandbox/analysis connector design as an optional non-blocking improvement.
-17. Add GitHub branch/PR actions only after explicit safety review.
-18. Keep the one main cleanup rule in force before any new repo file is created.
+3. Keep uploaded files as old reference unless explicitly promoted.
+4. Keep using existing Code Labs files where possible.
+5. Fix only visible page problems or connector-readiness blockers.
+6. Keep hard-coded user names out of live pages.
+7. Keep Start Guide, Fix Wizard, and Workflow Hub as the main non-coder path.
+8. Keep File Lab and Code Search as the evidence path ChatGPT can rely on.
+9. Keep Preview + Test and Checkpoints as the manual safety gate.
+10. Keep AI Handoff, Publish Prep, Repo Desk, and GitHub Tracker as the publish lane.
+11. Use GitHub connector by itself for repo plan/page/file changes.
+12. Use Supabase connector by itself for Code Labs database/history/account work.
+13. Plan Code Labs auth/profile layer before adding production account flows.
+14. Plan remaining Supabase RLS changes before SQL.
+15. Build server-side connector prototype after static workflow is stable.
+16. Add read-only connector tools before write tools.
+17. Add scoped Code Labs write tools after account/RLS review.
+18. Add browser-safe utility toolbox where it improves non-coder repair flow.
+19. Add Python sandbox/analysis connector design as an optional non-blocking improvement.
+20. Add GitHub branch/PR actions only after explicit safety review.
+21. Keep the one main cleanup rule in force before any new repo file is created.
 
 ## Stop rules
 
@@ -488,7 +536,7 @@ Stop and ask before:
 - adding a new page,
 - touching Stream Bandit app files,
 - touching any Stream Bandit V7 file,
-- changing Supabase schema,
+- changing Supabase schema beyond the reviewed Code Labs-only plan,
 - adding auth redirects,
 - adding browser-side GitHub writes,
 - deleting any Code Labs page,
@@ -496,7 +544,8 @@ Stop and ask before:
 - cleaning old Stream Bandit files without verifying they are stale V4/V5/V6 page/checkpoint candidates,
 - replacing a full page when a tiny safe fix would work,
 - merging a stale draft PR,
-- merging connector wording that mentions Stream Bandit login as a Code Labs path.
+- merging connector wording that mentions Stream Bandit login as a Code Labs path,
+- using GitHub connector and Supabase connector together in one pass.
 
 ## Safety rules
 
@@ -507,6 +556,7 @@ Stop and ask before:
 - Prefer full-file replacement for non-coders when safe.
 - Prefer reuse/rewrite of existing Code Labs files over adding new files.
 - Keep Code Labs and Stream Bandit user-facing lanes separate.
+- Keep Stream Bandit `sb_*` database objects out of Code Labs database passes unless a separate Stream Bandit pass is explicitly started.
 - Keep secrets server-side only.
 - Make every production write action visible in an audit trail.
 - Use test branches and pull requests before merge.
