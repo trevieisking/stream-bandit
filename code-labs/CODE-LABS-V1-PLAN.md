@@ -2,7 +2,7 @@
 
 Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / future Python analysis lane noted / future utility toolbox noted / no Stream Bandit lane crossing.
 
-Last update: 2026-06-24 - Home, Start Guide, Fix Wizard, Setup, Project Picker, File Lab, Rescue Room, Packet Builder, Patch Desk, Preview + Test, Checkpoints, and Workflow Hub live-promotion passes recorded. Patch Lab correction is in progress and must be user-tested before being marked passed.
+Last update: 2026-06-25 - Home, Start Guide, Fix Wizard, Setup, Project Picker, File Lab, Rescue Room, Packet Builder, Patch Desk, Patch Lab, Preview + Test, Checkpoints, and Workflow Hub live-promotion passes recorded.
 
 ## Mission
 
@@ -44,6 +44,7 @@ Passed during live promotion review:
 - `code-labs/rescue-room.html` - passed after Repair live-ready rules appeared and the existing save/copy flow still worked.
 - `code-labs/packet-builder.html` - passed after Repair live-ready rules appeared and the packet flow still worked.
 - `code-labs/patch-desk.html` - passed after Repair live-ready rules appeared and the fixed-code paste/checkpoint flow still worked.
+- `code-labs/patch-lab.html` - passed after the step order and card layout were corrected so Full code input sits beside Search and replace, the safety gate is step 2, and Replace line range sits beside Full fixed output.
 - `code-labs/preview-test.html` - passed after safety-gate guidance appeared and PASS/FAIL preview testing was visible.
 - `code-labs/checkpoints.html` - passed after safety-gate guidance appeared and rollback/test history remained visible.
 - `code-labs/v20.html` - passed after Workflow Hub card buttons were polished into a neat showcase row and signed-in user prompt wording was added.
@@ -72,7 +73,7 @@ Use the menu as the live-promotion checklist.
 - `code-labs/rescue-room.html` - problem, errors, and do-not-touch rules. Passed live polish.
 - `code-labs/packet-builder.html` - ChatGPT repair packet. Passed live polish.
 - `code-labs/patch-desk.html` - paste full fixed code. Passed live polish.
-- `code-labs/patch-lab.html` - exact search/replace and line-range changes. Correction in progress; test before marking passed.
+- `code-labs/patch-lab.html` - exact search/replace and line-range changes. Passed live polish.
 - `code-labs/preview-test.html` - original/fixed preview and PASS/FAIL checklist. Passed live polish.
 - `code-labs/checkpoints.html` - rollback and test history. Passed live polish.
 
@@ -154,6 +155,7 @@ Before any page patch:
 - Fix Wizard next-step routing.
 - Setup and Project Picker Workspace live-ready rules.
 - Rescue Room, Packet Builder, and Patch Desk Repair live-ready rules.
+- Patch Lab exact change workflow, corrected step order, and corrected card layout.
 - Preview + Test and Checkpoints safety-gate rules.
 - Workflow Hub uses the saved Code Search Report.
 - ChatGPT read request.
