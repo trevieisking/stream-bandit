@@ -15,7 +15,7 @@ Code Labs must support two modes:
 
 Code Labs should keep the repair state, loaded file, Code Search Report, request packet, fixed code, preview result, checkpoint, GitHub PR/preview links, Supabase repair history, and final PASS/FAIL decision in one place.
 
-## AI operating map for users like Trev
+## AI operating map for users who do not code
 
 Code Labs should be built for users who do not want to manage code manually and for ChatGPT sessions that need durable, exact context.
 
@@ -293,6 +293,7 @@ Recorded plan/history points:
 - PR #117 polished Patch Lab card layout.
 - PR #118 recorded Patch Lab as passed.
 - PR #119 added Publish lane live-ready panels.
+- PR #120 recorded the full Code Labs menu scan in the master plan.
 
 Planning principle: do not scatter future plans across random files. Add them here first, then build from existing Code Labs pages/assets when a visible change is needed.
 
