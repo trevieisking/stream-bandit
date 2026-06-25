@@ -20,6 +20,9 @@
   function bumpCounter(){var key='codeLabsLocalToolUseTotal';var n=parseInt(localStorage.getItem(key)||'0',10)||0;n+=1;localStorage.setItem(key,String(n));var el=q('#clLocalToolUseTotal');if(el)el.textContent=String(n);return n;}
   function simpleWarnings(text){var t=String(text||''),hits=[];if(/auth|token|credential/i.test(t))hits.push('private-looking text');return hits;}
   function diffSummary(before,after){var a=String(before||'').split(/\r?\n/),b=String(after||'').split(/\r?\n/),max=Math.max(a.length,b.length),same=0,changed=[];for(var i=0;i<max;i++){var oldLine=a[i]||'',newLine=b[i]||'';if(oldLine===newLine){same++;}else if(changed.length<80){changed.push('Line '+(i+1));changed.push('- '+oldLine);changed.push('+ '+newLine);}}return ['CODE LABS BEFORE / AFTER DIFF','Before lines: '+a.length,'After lines: '+b.length,'Same line positions: '+same,'Changed line positions: '+(max-same),'Before characters: '+String(before||'').length,'After characters: '+String(after||'').length,'Character difference: '+(String(after||'').length-String(before||'').length),'','First changed lines:',changed.length?changed.join('\n'):'No line-position changes spotted.'].join('\n');}
+  function normalRepo(v){v=String(v||'').trim().replace(/^https:\/\/github\.com\//,'').replace(/^github\.com\//,'');v=v.replace(/\.git$/,'');return v.split('/').slice(0,2).join('/');}
+  function cleanPath(v){return String(v||'').trim().replace(/^\/+/, '').replace(/^blob\/[^/]+\//,'');}
+  function rawSummary(repo,branch,path){repo=normalRepo(repo);branch=String(branch||'main').trim()||'main';path=cleanPath(path);var raw=repo&&path?'https://raw.githubusercontent.com/'+repo+'/'+branch+'/'+path:'';var blob=repo&&path?'https://github.com/'+repo+'/blob/'+branch+'/'+path:'';return ['CODE LABS RAW GITHUB FILE HELPER','Repo: '+(repo||'missing owner/repo'),'Branch: '+branch,'Path: '+(path||'missing path'),'','GitHub page URL:',blob||'missing repo or path','','Raw file URL:',raw||'missing repo or path','','File Lab fields:','Owner/repo: '+(repo||''),'Branch: '+branch,'File path: '+(path||''),'','Connector prompt:','Connect GitHub connector for this Code Labs user'].join('\n');}
   function addPlan(){
     if(document.body.getAttribute('data-page')!=='help')return;
     if(q('#clBackendVsHosting'))return;
@@ -41,8 +44,12 @@
     diff.className='panel';
     diff.id='clLocalDiffTool';
     diff.innerHTML='<h2>Before / After Diff Tool V1</h2><p>Paste old code on the left and fixed code on the right. Code Labs makes a plain-English change summary you can copy into ChatGPT or GitHub Tracker.</p><div class="grid2"><div><b>Before / current code</b><textarea id="clDiffBefore" class="mid" placeholder="Paste current code here"></textarea></div><div><b>After / fixed code</b><textarea id="clDiffAfter" class="mid" placeholder="Paste fixed code here"></textarea></div></div><div class="actions"><button class="btn primary" id="clRunDiff">Compare before and after</button><button class="btn ghost" id="clCopyDiff">Copy diff summary</button></div><textarea id="clDiffOutput" class="mid" readonly placeholder="Diff summary will appear here"></textarea>';
+    var raw=document.createElement('section');
+    raw.className='panel';
+    raw.id='clRawGitHubTool';
+    raw.innerHTML='<h2>Raw GitHub URL Builder V1</h2><p>Build the exact GitHub page URL and raw file URL for File Lab, Workflow Hub, and ChatGPT GitHub connector requests.</p><div class="grid2"><label>Owner/repo<input id="clRawRepo" placeholder="trevieisking/stream-bandit"></label><label>Branch<input id="clRawBranch" placeholder="main" value="main"></label></div><label>File path<input id="clRawPath" placeholder="code-labs/index.html"></label><div class="actions"><button class="btn primary" id="clBuildRaw">Build GitHub links</button><button class="btn ghost" id="clCopyRaw">Copy GitHub link packet</button></div><textarea id="clRawOutput" class="mid" readonly placeholder="GitHub link packet will appear here"></textarea>';
     var first=q('#clHelpOperatingMap')||q('.panel');
-    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first.nextSibling);panel.parentNode.insertBefore(tools,panel.nextSibling);tools.parentNode.insertBefore(utility,tools.nextSibling);utility.parentNode.insertBefore(diff,utility.nextSibling);}else{main.appendChild(panel);main.appendChild(tools);main.appendChild(utility);main.appendChild(diff);}
+    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first.nextSibling);panel.parentNode.insertBefore(tools,panel.nextSibling);tools.parentNode.insertBefore(utility,tools.nextSibling);utility.parentNode.insertBefore(diff,utility.nextSibling);diff.parentNode.insertBefore(raw,diff.nextSibling);}else{main.appendChild(panel);main.appendChild(tools);main.appendChild(utility);main.appendChild(diff);main.appendChild(raw);}
     var saved=parseInt(localStorage.getItem('codeLabsLocalToolUseTotal')||'0',10)||0;if(q('#clLocalToolUseTotal'))q('#clLocalToolUseTotal').textContent=String(saved);
     q('#clCountText').onclick=function(){var text=q('#clToolInput').value||'';var warns=simpleWarnings(text);var result=['CODE LABS LOCAL TEXT CHECK','Lines: '+countLines(text),'Characters: '+text.length,'Words: '+countWords(text),'Private text warning: '+(warns.length?warns.join(', '):'none spotted'),'Use count total: '+bumpCounter()].join('\n');q('#clToolOutput').value=result;};
     q('#clFormatJson').onclick=function(){var text=q('#clToolInput').value||'';try{q('#clToolOutput').value=JSON.stringify(JSON.parse(text),null,2);}catch(e){q('#clToolOutput').value='JSON check failed: '+e.message;}bumpCounter();};
@@ -50,6 +57,8 @@
     q('#clCopyToolReport').onclick=function(){copyText(q('#clToolOutput').value||'');bumpCounter();};
     q('#clRunDiff').onclick=function(){q('#clDiffOutput').value=diffSummary(q('#clDiffBefore').value,q('#clDiffAfter').value);bumpCounter();};
     q('#clCopyDiff').onclick=function(){copyText(q('#clDiffOutput').value||'');bumpCounter();};
+    q('#clBuildRaw').onclick=function(){q('#clRawOutput').value=rawSummary(q('#clRawRepo').value,q('#clRawBranch').value,q('#clRawPath').value);bumpCounter();};
+    q('#clCopyRaw').onclick=function(){copyText(q('#clRawOutput').value||'');bumpCounter();};
   }
   setTimeout(addPlan,360);
   setTimeout(addPlan,900);
