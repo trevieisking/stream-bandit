@@ -1,4 +1,4 @@
-/* Code Labs V4.3 - one connector rule helper with browser-vs-ChatGPT clarity */
+/* Code Labs V4.4 - one connector rule helper with explicit connector labels */
 (function(){
   'use strict';
   function q(s,r){return (r||document).querySelector(s);}
@@ -15,9 +15,9 @@
   }
   function clarifyModeCards(){
     if(document.body.getAttribute('data-page')!=='connector-status')return;
-    setModeCard('GitHub mode','Instruction only','warn','Use ChatGPT GitHub for repo reads, test branches, PRs, previews, and merges. This browser page cannot see whether ChatGPT GitHub is already connected.');
-    setModeCard('Supabase mode','History below','good','Browser Supabase status is shown in the Supabase Repair History panel. Use ChatGPT Supabase only for database/table work.');
-    setModeCard('ChatGPT app','Bridge only','warn','ChatGPT decides which connector is needed. Code Labs should not redirect to Stream Bandit login.');
+    setModeCard('GitHub mode','Instruction only','warn','Use the GitHub connector for repo reads, test branches, PRs, previews, or merges. Use it by itself.');
+    setModeCard('Supabase mode','History below','good','Use the Supabase connector for Code Labs table/history work. Browser Supabase status is shown below. Use it by itself.');
+    setModeCard('ChatGPT app','Bridge only','warn','ChatGPT chooses one connector at a time. GitHub connector and Supabase connector do not run together in one pass.');
   }
   function addRule(){
     if(document.body.getAttribute('data-page')!=='connector-status')return;
@@ -28,7 +28,7 @@
       var panel=document.createElement('section');
       panel.className='panel';
       panel.id='clOneConnectorRule';
-      panel.innerHTML='<h2>One connector at a time</h2><p>This browser page shows instructions, not ChatGPT connector sign-in state. GitHub or Supabase can be connected in ChatGPT even when this page still says which connector to use.</p><div class="grid2"><div class="item"><b>Repo or file work</b><p>Use this when GitHub is the only connector needed for repository reading, branches, PRs, previews, or merges.</p><span class="badge warn">Use ChatGPT GitHub connector</span></div><div class="item"><b>Database or table work</b><p>Use this when Supabase is the only connector needed for Code Labs tables or repair history.</p><span class="badge warn">Use ChatGPT Supabase connector</span></div></div><div class="notice"><p><b>Separation:</b> Code Labs stays in its own lane. Stream Bandit app files, tables, auth, and policies are not changed unless the signed-in user explicitly starts a separate Stream Bandit pass.</p></div>';
+      panel.innerHTML='<h2>One connector at a time</h2><p>Use one ChatGPT connector per pass. GitHub connector and Supabase connector do not run together.</p><div class="grid2"><div class="item"><b>Repo or file work</b><p>Use this when GitHub is the only connector needed for repository reading, branches, PRs, previews, or merges.</p><span class="badge warn">GitHub connector only</span></div><div class="item"><b>Database or table work</b><p>Use this when Supabase is the only connector needed for Code Labs tables or repair history.</p><span class="badge warn">Supabase connector only</span></div></div><div class="notice"><p><b>Separation:</b> Code Labs stays in its own lane. Stream Bandit app files, tables, auth, and policies are not changed unless the signed-in user explicitly starts a separate Stream Bandit pass.</p></div>';
       if(anchor&&anchor.parentNode&&anchor.nextSibling){anchor.parentNode.insertBefore(panel,anchor.nextSibling);}else if(anchor&&anchor.parentNode){anchor.parentNode.appendChild(panel);}else{main.appendChild(panel);}
     }
     clarifyModeCards();
