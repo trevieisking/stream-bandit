@@ -1,0 +1,10 @@
+/* Code Labs extra help tools */
+(function(){
+'use strict';
+function q(s,r){return(r||document).querySelector(s)}
+function copy(t){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t||'');return}var a=document.createElement('textarea');a.value=t||'';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}
+function text(){return ['CODE LABS LIVE PACKET','Open the eight Code Labs pages.','Confirm Help starts with Tool Search.','Confirm shortcut buttons jump to tools.','Confirm Export state and Copy summary are visible.','Confirm FAQ opens without flicker.','Confirm wording says Connect GitHub and Connect Supabase.','Keep Code Labs separate from Stream Bandit.','Use small reviewed changes.'].join('\n')}
+function add(){var main=q('.main');if(!main||q('#clLivePacket'))return false;var p=document.createElement('section');p.className='panel';p.id='clLivePacket';p.innerHTML='<h2>Live packet gadget</h2><p>Copy a quick launch checklist for Code Labs.</p><div class="actions"><button class="btn primary" id="clMakeLivePacket">Build live packet</button><button class="btn ghost" id="clCopyLivePacket">Copy live packet</button></div><textarea id="clLivePacketOut" class="mid" readonly placeholder="Live packet appears here"></textarea>';var after=q('#clSafeChangePacketTool')||q('#clToolSearch');if(after&&after.nextSibling)main.insertBefore(p,after.nextSibling);else main.appendChild(p);q('#clMakeLivePacket').onclick=function(){q('#clLivePacketOut').value=text()};q('#clCopyLivePacket').onclick=function(){copy(q('#clLivePacketOut').value||text())};return true}
+function run(){if(!add())setTimeout(run,400)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(run,1600)});else setTimeout(run,1600);setTimeout(run,2600);
+})();
