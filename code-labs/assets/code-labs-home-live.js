@@ -1,4 +1,4 @@
-/* Code Labs V3.3 - simple workflow home with Patch Desk */
+/* Code Labs V3.4 - simple workflow home, product-neutral promotion copy */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
@@ -16,7 +16,7 @@
     var s=state(), f=s.file||{}, p=s.project||{};
     var top=q('.topbar');
     main.innerHTML=(top?top.outerHTML:'')+
-      '<section class="hero" id="clHomeLiveCentre"><div><span class="pill">Simple Code Labs flow</span><h1>Fix Stream Bandit with one clear path.</h1><p>Use this as a small helper, not a second website. Load or paste the file, ask ChatGPT, paste the fixed file, preview it, then keep a checkpoint.</p><div class="actions"><a class="btn primary" href="file-lab.html">Start: File Lab</a><a class="btn ghost" href="patch-desk.html">Open Patch Desk</a><a class="btn ghost" href="patch-lab.html">Advanced Patch Lab</a></div></div><div class="heroCard"><b>Main flow</b><ol><li>File Lab: load or paste code.</li><li>Workflow Hub: ask ChatGPT.</li><li>Patch Desk: paste the fixed file.</li><li>Preview + Test: check before live.</li><li>Checkpoints: keep rollback.</li></ol></div></section>'+ 
+      '<section class="hero" id="clHomeLiveCentre"><div><span class="pill">Simple Code Labs flow</span><h1>Fix website code with one clear path.</h1><p>Use Code Labs as a focused browser workbench. Load or paste a file, ask ChatGPT, paste the fixed file, preview it, then keep a checkpoint before anything goes live.</p><div class="actions"><a class="btn primary" href="file-lab.html">Start: File Lab</a><a class="btn ghost" href="patch-desk.html">Open Patch Desk</a><a class="btn ghost" href="patch-lab.html">Advanced Patch Lab</a></div></div><div class="heroCard"><b>Main flow</b><ol><li>File Lab: load or paste code.</li><li>Workflow Hub: ask ChatGPT.</li><li>Patch Desk: paste the fixed file.</li><li>Preview + Test: check before live.</li><li>Checkpoints: keep rollback.</li></ol></div></section>'+ 
       '<section class="panel"><h2>Current repair state</h2><div class="grid3"><div class="stat"><b>Project</b><span>'+esc(p.siteName||p.workspace||'Not set')+'</span></div><div class="stat"><b>File</b><span>'+esc(f.filename||'No file yet')+'</span></div><div class="stat"><b>Current code</b><span>'+lines(f.currentCode||'')+' lines · '+chars(f.currentCode||'')+' chars</span></div></div></section>'+ 
       '<section class="grid">'+
       step(1,'File Lab','Load a public GitHub file or paste full code. Use Code Search only when you need exact line evidence.','file-lab.html','Start here','primary')+
@@ -26,7 +26,7 @@
       step(5,'Checkpoints','Save rollback/test notes before any live change.','checkpoints.html','Checkpoint','ghost')+
       '</section>'+ 
       '<section class="panel"><h2>Advanced tool kept</h2><p>Patch Lab is still available for exact line changes, but Patch Desk is the normal workflow patch page.</p><div class="actions"><a class="btn ghost" href="patch-lab.html">Open advanced Patch Lab</a></div></section>'+ 
-      '<div class="footerNote">Code Labs V3.3 · simple workflow · Home → File Lab → Workflow Hub → Patch Desk → Preview + Test → Checkpoints.</div>';
+      '<div class="footerNote">Code Labs V3.4 · simple workflow · Home → File Lab → Workflow Hub → Patch Desk → Preview + Test → Checkpoints.</div>';
   }
   function start(){setTimeout(render,240);setTimeout(render,900)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
