@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Code Labs Help</title>
-<link rel="stylesheet" href="assets/code-labs.css?v=cl-v82-fixed-help">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v83-live-promo-polish">
 </head>
 <body data-page="help">
 <noscript><main style="padding:20px;font-family:system-ui"><h1>Code Labs Help</h1><p>This app needs JavaScript.</p></main></noscript>
 <script src="assets/code-labs.js"></script>
 <script src="assets/code-labs-v1-1-safety.js"></script>
-<script src="assets/code-labs-v12-save.js?v=cl-v82-fixed-help"></script>
+<script src="assets/code-labs-v12-save.js?v=cl-v83-live-promo-polish"></script>
 <script>
 (function(){
   function q(s,r){return(r||document).querySelector(s);}
@@ -62,28 +63,26 @@
     var htmlTool=document.createElement('section');
     htmlTool.className='panel';
     htmlTool.id='clHtmlSafetyTool';
-    htmlTool.innerHTML='<h2>HTML Safety Checker V1</h2><p>Paste an HTML page or snippet. Code Labs checks duplicate IDs, buttons, inputs, links, scripts, styles, and private-looking text before you ask ChatGPT for a repair.</p><textarea id="clHtmlInput" class="mid" placeholder="Paste HTML here"></textarea><div class="actions"><button class="btn primary" id="clCheckHtml">Check HTML safety</button><button class="btn ghost" id="clCopyHtmlCheck">Copy HTML check</button></div><textarea id="clHtmlOutput" class="mid" readonly placeholder="HTML safety check will appear here"></textarea>';
-    var first=q('#clHelpOperatingMap')||q('.panel');
-    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first.nextSibling);panel.parentNode.insertBefore(tools,panel.nextSibling);tools.parentNode.insertBefore(search,tools.nextSibling);search.parentNode.insertBefore(safe,search.nextSibling);safe.parentNode.insertBefore(utility,safe.nextSibling);utility.parentNode.insertBefore(diff,utility.nextSibling);diff.parentNode.insertBefore(raw,diff.nextSibling);raw.parentNode.insertBefore(htmlTool,raw.nextSibling);}else{main.appendChild(panel);main.appendChild(tools);main.appendChild(search);main.appendChild(safe);main.appendChild(utility);main.appendChild(diff);main.appendChild(raw);main.appendChild(htmlTool);}
-    var saved=parseInt(localStorage.getItem('codeLabsLocalToolUseTotal')||'0',10)||0;if(q('#clLocalToolUseTotal'))q('#clLocalToolUseTotal').textContent=String(saved);
-    q('#clRunToolSearch').onclick=function(){q('#clToolSearchOutput').value=toolSearchSummary(q('#clToolSearchInput').value);bumpCounter();};
-    q('#clCopyToolSearch').onclick=function(){copyText(q('#clToolSearchOutput').value||'');bumpCounter();};
-    q('#clBuildSafePacket').onclick=function(){q('#clSafePacketOutput').value=safeChangeSummary(q('#clSafeRepo').value,q('#clSafeBranch').value,q('#clSafePath').value,q('#clSafeProblem').value,q('#clSafeKeep').value,q('#clSafeTest').value);bumpCounter();};
-    q('#clCopySafePacket').onclick=function(){copyText(q('#clSafePacketOutput').value||'');bumpCounter();};
-    q('#clCountText').onclick=function(){var text=q('#clToolInput').value||'';var warns=simpleWarnings(text);var result=['CODE LABS LOCAL TEXT CHECK','Lines: '+countLines(text),'Characters: '+text.length,'Words: '+countWords(text),'Private text warning: '+(warns.length?warns.join(', '):'none spotted'),'Use count total: '+bumpCounter()].join('\n');q('#clToolOutput').value=result;};
-    q('#clFormatJson').onclick=function(){var text=q('#clToolInput').value||'';try{q('#clToolOutput').value=JSON.stringify(JSON.parse(text),null,2);}catch(e){q('#clToolOutput').value='JSON check failed: '+e.message;}bumpCounter();};
-    q('#clPlainText').onclick=function(){var text=q('#clToolInput').value||'';q('#clToolOutput').value=text.replace(/```[a-zA-Z0-9_-]*\n?/g,'').replace(/```/g,'').replace(/\r/g,'').trim();bumpCounter();};
-    q('#clCopyToolReport').onclick=function(){copyText(q('#clToolOutput').value||'');bumpCounter();};
-    q('#clRunDiff').onclick=function(){q('#clDiffOutput').value=diffSummary(q('#clDiffBefore').value,q('#clDiffAfter').value);bumpCounter();};
-    q('#clCopyDiff').onclick=function(){copyText(q('#clDiffOutput').value||'');bumpCounter();};
-    q('#clBuildRaw').onclick=function(){q('#clRawOutput').value=rawSummary(q('#clRawRepo').value,q('#clRawBranch').value,q('#clRawPath').value);bumpCounter();};
-    q('#clCopyRaw').onclick=function(){copyText(q('#clRawOutput').value||'');bumpCounter();};
-    q('#clCheckHtml').onclick=function(){q('#clHtmlOutput').value=htmlSummary(q('#clHtmlInput').value);bumpCounter();};
-    q('#clCopyHtmlCheck').onclick=function(){copyText(q('#clHtmlOutput').value||'');bumpCounter();};
+    htmlTool.innerHTML='<h2>HTML Safety Checker V1</h2><p>Paste an HTML page or snippet. Code Labs checks duplicate IDs, buttons, inputs, links, scripts, styles, and private-looking text before you ask ChatGPT for a repair.</p><textarea id="clHtmlInput" class="mid" placeholder="Paste HTML here"></textarea><div class="actions"><button class="btn primary" id="clRunHtmlCheck">Check HTML</button><button class="btn ghost" id="clCopyHtmlCheck">Copy HTML check</button></div><textarea id="clHtmlOutput" class="mid" readonly placeholder="HTML check result will appear here"></textarea>';
+    main.appendChild(panel);main.appendChild(tools);main.appendChild(search);main.appendChild(safe);main.appendChild(utility);main.appendChild(diff);main.appendChild(raw);main.appendChild(htmlTool);
+    var total=localStorage.getItem('codeLabsLocalToolUseTotal')||'0';var totalEl=q('#clLocalToolUseTotal');if(totalEl)totalEl.textContent=total;
+    q('#clRunToolSearch').onclick=function(){bumpCounter();q('#clToolSearchOutput').value=toolSearchSummary(q('#clToolSearchInput').value);};
+    q('#clCopyToolSearch').onclick=function(){copyText(q('#clToolSearchOutput').value||toolSearchSummary(q('#clToolSearchInput').value));};
+    q('#clBuildSafePacket').onclick=function(){bumpCounter();q('#clSafePacketOutput').value=safeChangeSummary(q('#clSafeRepo').value,q('#clSafeBranch').value,q('#clSafePath').value,q('#clSafeProblem').value,q('#clSafeKeep').value,q('#clSafeTest').value);};
+    q('#clCopySafePacket').onclick=function(){copyText(q('#clSafePacketOutput').value||'');};
+    q('#clCountText').onclick=function(){bumpCounter();var t=q('#clToolInput').value;q('#clToolOutput').value='Lines: '+countLines(t)+'\nWords: '+countWords(t)+'\nCharacters: '+t.length+'\nPrivate-looking text warning: '+(simpleWarnings(t).join(', ')||'none spotted');};
+    q('#clFormatJson').onclick=function(){bumpCounter();try{q('#clToolOutput').value=JSON.stringify(JSON.parse(q('#clToolInput').value),null,2);}catch(e){q('#clToolOutput').value='JSON error: '+e.message;}};
+    q('#clPlainText').onclick=function(){bumpCounter();q('#clToolOutput').value=q('#clToolInput').value.replace(/[\t ]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();};
+    q('#clCopyToolReport').onclick=function(){copyText(q('#clToolOutput').value||'');};
+    q('#clRunDiff').onclick=function(){bumpCounter();q('#clDiffOutput').value=diffSummary(q('#clDiffBefore').value,q('#clDiffAfter').value);};
+    q('#clCopyDiff').onclick=function(){copyText(q('#clDiffOutput').value||'');};
+    q('#clBuildRaw').onclick=function(){bumpCounter();q('#clRawOutput').value=rawSummary(q('#clRawRepo').value,q('#clRawBranch').value,q('#clRawPath').value);};
+    q('#clCopyRaw').onclick=function(){copyText(q('#clRawOutput').value||'');};
+    q('#clRunHtmlCheck').onclick=function(){bumpCounter();q('#clHtmlOutput').value=htmlSummary(q('#clHtmlInput').value);};
+    q('#clCopyHtmlCheck').onclick=function(){copyText(q('#clHtmlOutput').value||'');};
   }
-  setTimeout(addPlan,360);
-  setTimeout(addPlan,900);
-  setTimeout(addPlan,1500);
+  setTimeout(addPlan,700);
+  setTimeout(addPlan,1400);
 })();
 </script>
 </body>
