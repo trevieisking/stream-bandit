@@ -1,8 +1,8 @@
 # Code Labs Master Plan
 
-Status: Code Labs only / live-promotion preparation / ChatGPT workbench / GitHub connector proven through ChatGPT / Supabase repair history available when connected / Supabase Code Labs maintenance migration applied / future Python analysis lane noted / future utility toolbox noted / no Stream Bandit lane crossing / full current Code Labs menu scan recorded / Publish lane user-tested pass recorded.
+Status: Code Labs only / live-promotion ready / final GitHub scan mode / browser workbench / ChatGPT GitHub connector workflow proven / shared helper cache aligned / Home inline favicon added without a new repo file / Supabase repair history available when connected / Supabase Code Labs maintenance migration applied / no Stream Bandit lane crossing / full current Code Labs menu scan recorded / freeze scan active.
 
-Last update: 2026-06-25 - Home, Start Guide, Fix Wizard, Setup, Project Picker, File Lab, Rescue Room, Packet Builder, Patch Desk, Patch Lab, Preview + Test, Checkpoints, Workflow Hub, AI Handoff, Publish Prep, Repo Desk, GitHub Tracker, Connector Status, and Help live-promotion passes recorded. Supabase Code Labs maintenance migration `code_labs_maintenance_indexes_20260625` was applied. One master plan is the source of truth.
+Last update: 2026-06-26 - Final GitHub-only scan refresh recorded after PR #140 through PR #144. Final wording polish, shared helper cache alignment, AI Handoff/Repo Desk/Help cache follow-up, Home final-scan wording, and the inline Home favicon are now recorded. No new repo file was created for the favicon. Code Labs remains live-promotion ready as a browser workbench plus ChatGPT GitHub connector workflow; Supabase remains separate for Code Labs database/history/account work.
 
 ## Source of truth rule
 
@@ -75,7 +75,7 @@ A page is live-promotion ready when:
 
 Passed during live promotion review:
 
-- `code-labs/index.html` - passed after Home was cache-busted, showed the durable ChatGPT workbench wording, and displayed the live-promotion status cleanly.
+- `code-labs/index.html` - passed after Home was cache-busted, showed the durable ChatGPT workbench wording, displayed the final GitHub-only scan status cleanly, and added an inline Code Labs favicon without creating a new repo file.
 - `code-labs/start-guide.html` - passed after live-user wording, generic examples, and plain-English intake were cleaned up.
 - `code-labs/fix-wizard.html` - passed after brand-new users were routed to Start Guide first and the menu-aligned next-step flow was cleaned up.
 - `code-labs/setup.html` - passed after Workspace live-ready rules explained local/manual mode, GitHub connector lane, Supabase history lane, and account-later rule.
@@ -88,12 +88,12 @@ Passed during live promotion review:
 - `code-labs/preview-test.html` - passed after safety-gate guidance appeared and PASS/FAIL preview testing was visible.
 - `code-labs/checkpoints.html` - passed after safety-gate guidance appeared and rollback/test history remained visible.
 - `code-labs/v20.html` - passed after Workflow Hub card buttons were polished into a neat showcase row and signed-in user prompt wording was added.
-- `code-labs/ai-handoff.html` - passed after user test showed the AI Handoff package includes source lock, fixed-code stats, and full fixed code.
+- `code-labs/ai-handoff.html` - passed after user test showed the AI Handoff package includes source lock, fixed-code stats, full fixed code, and final shared helper cache alignment.
 - `code-labs/publish-prep.html` - passed after user test showed safe branch/PR request, target path, rollback rules, and full fixed code.
-- `code-labs/repo-desk.html` - passed after user test of the publish-lane flow and connector-safe request pattern.
+- `code-labs/repo-desk.html` - passed after user test of the publish-lane flow, connector-safe request pattern, and final shared helper cache alignment.
 - `code-labs/github-tracker.html` - passed after user test showed PR/review link, branch link, preview link, notes, and next safe action report.
 - `code-labs/connector-status.html` - passed after one-connector wording, browser-vs-ChatGPT connector clarity, mode-card clarity, live connection fields, and Supabase history status were verified.
-- `code-labs/help.html` - passed after tool map, promotion checklist, plain-English user/ChatGPT guidance, and exact live connection test fields were verified.
+- `code-labs/help.html` - passed after tool map, promotion checklist, plain-English user/ChatGPT guidance, exact live connection test fields, and final shared helper cache alignment were verified.
 
 Every current Code Labs menu/index page has now been scanned from GitHub `main`, tested through the current live-promotion pass, and recorded in this master plan. No Stream Bandit app page was edited during this scan.
 
@@ -117,7 +117,7 @@ Use the menu as the live-promotion checklist.
 
 - `code-labs/file-lab.html` - paste/upload/read-only GitHub file load and Code Search. Passed live polish.
 - `code-labs/rescue-room.html` - problem, errors, and do-not-touch rules. Passed live polish.
-- `code-labs/packet-builder.html` - ChatGPT repair packet. Passed live polish.
+- `code-labs/packet-builder.html` - ChatGPT repair packet builder. Passed live polish.
 - `code-labs/patch-desk.html` - paste full fixed code. Passed live polish.
 - `code-labs/patch-lab.html` - exact search/replace and line-range changes. Passed live polish.
 - `code-labs/preview-test.html` - original/fixed preview and PASS/FAIL checklist. Passed live polish.
@@ -277,6 +277,8 @@ Before any page patch:
 - Help and Connector Status hold the tool map, promotion checklist, hard stop rules, exact live connection test fields, and connector-status clarity.
 - Connector Status says GitHub connector and Supabase connector do not run together.
 - Supabase Code Labs maintenance migration `code_labs_maintenance_indexes_20260625` has been applied.
+- Final shared helper cache alignment was completed for all current Code Labs page shells through PR #141 and PR #142.
+- Home final GitHub-only scan status and inline favicon were completed through PR #144 without creating a new repo file.
 
 ## Plans already made and folded into this master plan
 
@@ -312,6 +314,11 @@ Recorded plan/history points:
 - PR #124 recorded the user-tested Publish lane pass.
 - PR #126 clarified one-connector labels on Connector Status.
 - Supabase migration `code_labs_maintenance_indexes_20260625` fixed Code Labs maintenance items without touching Stream Bandit `sb_*` tables.
+- PR #140 polished final wording in the shared helper and replaced stale planned/future connector wording with live-ready wording.
+- PR #141 aligned the final shared helper cache tag on the main Code Labs page set.
+- PR #142 finished the helper cache scan for AI Handoff, Repo Desk, and Help.
+- Issue #143 was closed as a duplicate of active final scan/freeze issue #139.
+- PR #144 polished Home final scan status, removed stale partial-pass wording, added an inline Home favicon, and cache-busted Home live JS.
 
 Planning principle: do not scatter future plans across random files. Add them here first, then build from existing Code Labs pages/assets when a visible change is needed.
 
