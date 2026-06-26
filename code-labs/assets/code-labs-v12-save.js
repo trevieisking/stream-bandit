@@ -1,4 +1,4 @@
-/* Code Labs V1.8.1 - simple workflow with previous and next buttons */
+/* Code Labs V1.8.2 - simple workflow, previous/next buttons, and Help feedback */
 (function(){
   var FLOW=[
     ['index','Home','Start here','index.html','🏠'],
@@ -35,13 +35,14 @@
     FLOW.forEach(function(item){nav.appendChild(link(item,id));});
     var adv=document.createElement('div');adv.className='navGroupLabel';adv.style.display='block';adv.textContent='Advanced';nav.appendChild(adv);
     nav.appendChild(link(['patch-lab','Patch Lab','Exact line tool','patch-lab.html','🧠'],id));
+    nav.appendChild(link(['help','Help + Tools','All utilities','help.html','🛠️'],id));
   }
   function flowInfo(id){
     var next=findFlow(NEXT[id])||FLOW[1], prev=findFlow(PREV[id])||FLOW[0];
     var pos=FLOW_INDEX[id];
     var step=(typeof pos==='number')?pos+1:'Advanced';
-    var title=(typeof pos==='number')?FLOW[pos][1]:(id==='patch-lab'?'Patch Lab advanced tool':'Extra tool');
-    var note=(typeof pos==='number')?'This is part '+step+' of '+FLOW.length+' in the main Code Labs flow.':(id==='patch-lab'?'Patch Lab is kept as an advanced exact-line tool. Patch Desk is the main workflow patching page.':'This extra page is not in the main flow. Use Previous or Next to return to the simple workflow.');
+    var title=(typeof pos==='number')?FLOW[pos][1]:(id==='patch-lab'?'Patch Lab advanced tool':id==='help'?'Help + Tools':'Extra tool');
+    var note=(typeof pos==='number')?'This is part '+step+' of '+FLOW.length+' in the main Code Labs flow.':(id==='patch-lab'?'Patch Lab is kept as an advanced exact-line tool. Patch Desk is the main workflow patching page.':id==='help'?'Help keeps the useful tools and feedback in one place.':'This extra page is not in the main flow. Use Previous or Next to return to the simple workflow.');
     return {next:next,prev:prev,step:step,title:title,note:note};
   }
   function addNextFlowPanel(){
@@ -62,12 +63,24 @@
     textReplace(document.body,'GitHub later','GitHub through ChatGPT');
     textReplace(document.body,'Supabase later','Supabase history separate');
   }
+  function addHelpFeedback(){
+    if(page()!=='help'||document.querySelector('#clHelpFeedback'))return;
+    var main=document.querySelector('.main');if(!main)return;
+    var panel=document.createElement('section');panel.className='panel';panel.id='clHelpFeedback';
+    panel.innerHTML='<h2>Feedback</h2><p>Use this to tell ChatGPT what is useful, confusing, broken, or missing. It saves in this browser only and can be copied into ChatGPT.</p><div class="grid2"><label>Rating<select id="clFeedbackRating"><option>PASS - useful</option><option>OK - needs polish</option><option>FAIL - confusing</option></select></label><label>Page or tool<input id="clFeedbackPage" placeholder="Example: Patch Desk, File Lab, Help"></label></div><label>What worked?<textarea id="clFeedbackWorked" class="mid" placeholder="What helped you?"></textarea></label><label>What needs fixing?<textarea id="clFeedbackFix" class="mid" placeholder="What was confusing or missing?"></textarea></label><div class="actions"><button class="btn primary" id="clSaveFeedback">Save feedback</button><button class="btn ghost" id="clCopyFeedback">Copy feedback</button></div><textarea id="clFeedbackOutput" class="mid" readonly placeholder="Saved feedback report will appear here"></textarea>';
+    main.appendChild(panel);
+    function report(){return ['CODE LABS FEEDBACK','Rating: '+(document.querySelector('#clFeedbackRating')||{}).value,'Page/tool: '+(document.querySelector('#clFeedbackPage')||{}).value,'','What worked:',(document.querySelector('#clFeedbackWorked')||{}).value,'','What needs fixing:',(document.querySelector('#clFeedbackFix')||{}).value,'','Rule: keep Code Labs simple and useful for non-coders.'].join('\n');}
+    function save(){var out=document.querySelector('#clFeedbackOutput');var text=report();if(out)out.value=text;localStorage.setItem('codeLabsFeedbackLatest',text);toast('Feedback saved');}
+    document.querySelector('#clSaveFeedback').onclick=save;
+    document.querySelector('#clCopyFeedback').onclick=function(){save();copyText((document.querySelector('#clFeedbackOutput')||{}).value||'');};
+    var old=localStorage.getItem('codeLabsFeedbackLatest');if(old){document.querySelector('#clFeedbackOutput').value=old;}
+  }
   function addHelpShortcut(){
     if(document.querySelector('#clHelpShortcut'))return;
     var main=document.querySelector('.main');if(!main)return;
-    var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Workflow Hub → Patch Desk → Preview + Test → Checkpoints. Patch Lab stays as an advanced exact-line tool.';
+    var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Workflow Hub → Patch Desk → Preview + Test → Checkpoints. Patch Lab stays as an advanced exact-line tool. Help keeps all useful extra tools and feedback.';
     main.appendChild(div);
   }
-  function run(){simplifyMenu();simpleText();addNextFlowPanel();addHelpShortcut();}
+  function run(){simplifyMenu();simpleText();addNextFlowPanel();addHelpFeedback();addHelpShortcut();}
   loadHistory();setTimeout(run,120);setTimeout(run,500);setTimeout(run,1000);setTimeout(run,1800);
 })();
