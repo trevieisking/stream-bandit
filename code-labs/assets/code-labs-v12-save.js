@@ -1,4 +1,4 @@
-/* Code Labs V1.8.3 - 8-page promo flow, shared icon, stable page chrome */
+/* Code Labs V1.8.4 - 8-page promo flow, shared icon, help public guide */
 (function(){
   var ICON='assets/code-labs-icon.svg';
   var FLOW=[
@@ -27,7 +27,7 @@
     'start-guide':'index','setup':'index','project-picker':'index','fix-wizard':'index','rescue-room':'file-lab','packet-builder':'file-lab','ai-handoff':'patch-desk','publish-prep':'patch-desk','repo-desk':'patch-desk','github-tracker':'patch-desk','connector-status':'index','help':'index'
   };
   function page(){return document.body.getAttribute('data-page')||'index';}
-  function esc(v){return String(v==null?'':v).replace(/[&<>\"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function toast(msg){var t=document.querySelector('#toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}}
   function copyText(text){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text||'').then(function(){toast('Copied');});return;}var a=document.createElement('textarea');a.value=text||'';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('Copied');}
   function loadHistory(){if(document.querySelector('script[data-code-labs-history]'))return;var s=document.createElement('script');s.src='assets/code-labs-v1-2-history.js';s.setAttribute('data-code-labs-history','yes');document.head.appendChild(s);}
@@ -80,6 +80,14 @@
     textReplace(document.body,'GitHub later','GitHub through ChatGPT');
     textReplace(document.body,'Supabase later','Supabase history separate');
   }
+  function addPublicHelpGuide(){
+    if(page()!=='help'||document.querySelector('#clPublicHelpGuide'))return;
+    var main=document.querySelector('.main');if(!main)return;
+    var panel=document.createElement('section');panel.className='panel';panel.id='clPublicHelpGuide';panel.style.border='2px solid rgba(36,91,255,.22)';
+    panel.innerHTML='<h2>Code Labs public guide</h2><p>Use this page when you are not sure what to copy, what to preserve, or whether a change is safe to promote.</p><div class="grid3"><div class="item"><b>Use in 60 seconds</b><p>Start in File Lab, build the request in Workflow Hub, paste the fixed file in Patch Desk, preview it, then save a checkpoint.</p><span class="badge good">Normal flow</span></div><div class="item"><b>Promotion checklist</b><p>Only promote after the page opens, menu/buttons work, mobile looks acceptable, no obvious error text is visible, and a checkpoint exists.</p><span class="badge warn">Before live</span></div><div class="item"><b>Problem report</b><p>Tell ChatGPT the page, what you clicked, what happened, what must not change, and paste any copied report from these tools.</p><span class="badge">Copy evidence</span></div></div><div class="notice"><p><b>Safe rule:</b> the tested workflow stays locked. Help adds guidance only; it does not replace the File Lab → Workflow Hub → Patch Desk → Preview + Test → Checkpoints flow.</p></div>';
+    var first=document.querySelector('#clBackendVsHosting,.panel');
+    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first);}else{main.appendChild(panel);}
+  }
   function addHelpFeedback(){
     if(page()!=='help'||document.querySelector('#clHelpFeedback'))return;
     var main=document.querySelector('.main');if(!main)return;
@@ -98,6 +106,6 @@
     var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Workflow Hub → Patch Desk → Preview + Test → Checkpoints. Patch Lab stays as an advanced exact-line tool. Help keeps all useful extra tools and feedback.';
     main.appendChild(div);
   }
-  function run(){ensureFavicon();simplifyMenu();updatePageChrome();simpleText();addNextFlowPanel();addHelpFeedback();addHelpShortcut();}
+  function run(){ensureFavicon();simplifyMenu();updatePageChrome();simpleText();addNextFlowPanel();addPublicHelpGuide();addHelpFeedback();addHelpShortcut();}
   loadHistory();setTimeout(run,120);setTimeout(run,500);setTimeout(run,1000);setTimeout(run,1800);
 })();
