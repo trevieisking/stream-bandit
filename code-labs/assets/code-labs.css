@@ -1,4 +1,4 @@
-/* Code Labs V1.4 - separate product UI, no Stream Bandit branding */
+/* Code Labs V1.5 - separate product UI, sidebar brand logo matches favicon */
 :root{
   color-scheme: light dark;
   --bg:#f5f7fb;
@@ -54,7 +54,7 @@ code,kbd{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",mono
 .app{min-height:100vh;display:grid;grid-template-columns:290px 1fr}
 .sidebar{position:sticky;top:0;height:100vh;overflow:hidden;background:linear-gradient(180deg,#0c1220,#12182a);color:white;padding:14px;border-right:1px solid rgba(255,255,255,.12);display:grid;grid-template-rows:auto 1fr auto auto;gap:12px}
 .logo{display:flex;gap:12px;align-items:center;margin:0;padding:2px 2px 8px;border-bottom:1px solid rgba(255,255,255,.1)}
-.logoMark{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,#58d3ff,#7f58ff);display:grid;place-items:center;font-weight:1000;color:#07101f;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.logoMark{width:48px;height:48px;border-radius:16px;background:#0f172a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Cpath d='M18 19h28v8H28v10h16v8H18z' fill='%23e0f2fe'/%3E%3Cpath d='M38 19h8v26h-8z' fill='%2338bdf8' opacity='.9'/%3E%3C/svg%3E") center/46px 46px no-repeat;display:grid;place-items:center;font-size:0;color:transparent;box-shadow:0 12px 30px rgba(0,0,0,.3);border:1px solid rgba(224,242,254,.22)}
 .logo b{display:block;font-size:19px;letter-spacing:-.03em}.logo small{display:block;color:#aeb9ce;font-weight:800;line-height:1.25}
 .nav{display:grid;gap:7px;margin:0;overflow:auto;padding:2px 4px 8px 0;align-content:start;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.35) transparent}.nav a{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;text-decoration:none;color:#eaf0ff;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.055);border-radius:16px;padding:10px 11px;font-weight:900}.nav a:hover,.nav a.active{background:linear-gradient(135deg,rgba(88,211,255,.22),rgba(127,88,255,.22));border-color:rgba(255,255,255,.28)}.nav span{font-size:18px}.nav small{display:block;color:#aeb9ce;font-size:11px;font-weight:800;margin-top:2px}.navGroupLabel{margin:10px 8px 0;color:#8fa0be;font-size:10px;font-weight:1000;letter-spacing:.11em;text-transform:uppercase}
 .sideBox{border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(255,255,255,.06);padding:11px;margin:0}.sideBox b{display:block;margin-bottom:6px}.sideBox p{margin:0;color:#c7d0e5;font-size:12px;line-height:1.45}
