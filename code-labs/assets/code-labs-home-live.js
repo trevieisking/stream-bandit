@@ -1,4 +1,4 @@
-/* Code Labs V3.6 - live use pack with FAQ link */
+/* Code Labs V3.7 */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
@@ -7,11 +7,13 @@
   function state(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
   function chars(t){return String(t||'').length}
   function lines(t){return String(t||'').split(/\r?\n/).length}
+  function addNav(){var n=q('.nav');if(!n||q('a[href="faq.html"]',n))return;var a=document.createElement('a');a.href='faq.html';a.innerHTML='<span>?</span><div>FAQ<small>Clear answers</small></div>';n.appendChild(a)}
   function step(n,title,text,href,btn,kind){return '<div class="card step"><div class="num">'+n+'</div><div><b>'+esc(title)+'</b><p>'+esc(text)+'</p><div class="actions"><a class="btn '+(kind||'primary')+'" href="'+href+'">'+esc(btn)+'</a></div></div></div>'}
   function render(){
     if(document.body.getAttribute('data-page')!=='index')return;
     var main=q('.main');
     if(!main){setTimeout(render,180);return}
+    addNav();
     if(q('#clHomeLiveCentre'))return;
     var s=state(), f=s.file||{}, p=s.project||{};
     var top=q('.topbar');
@@ -27,8 +29,9 @@
       step(5,'Checkpoints','Save rollback/test notes before any live change.','checkpoints.html','Checkpoint','ghost')+
       '</section>'+ 
       '<section class="panel"><h2>Advanced tool kept</h2><p>Patch Lab is still available for exact line changes, but Patch Desk is the normal workflow patch page.</p><div class="actions"><a class="btn ghost" href="patch-lab.html">Open advanced Patch Lab</a><a class="btn ghost" href="faq.html">Open FAQ</a></div></section>'+ 
-      '<div class="footerNote">Code Labs V3.6 · Live Use Pack · Home → File Lab → Workflow Hub → Patch Desk → Preview + Test → Checkpoints. FAQ explains the build.</div>';
+      '<div class="footerNote">Code Labs V3.7 · Live Use Pack.</div>';
+    addNav();
   }
-  function start(){setTimeout(render,240);setTimeout(render,900)}
+  function start(){setTimeout(render,240);setTimeout(render,900);setTimeout(addNav,1500);setTimeout(addNav,2500)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
