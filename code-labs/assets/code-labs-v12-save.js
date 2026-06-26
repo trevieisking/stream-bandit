@@ -1,5 +1,6 @@
-/* Code Labs V1.8.2 - simple workflow, previous/next buttons, and Help feedback */
+/* Code Labs V1.8.3 - 8-page promo flow, shared icon, stable page chrome */
 (function(){
+  var ICON='assets/code-labs-icon.svg';
   var FLOW=[
     ['index','Home','Start here','index.html','🏠'],
     ['file-lab','File Lab','Load or read code','file-lab.html','📄'],
@@ -8,6 +9,11 @@
     ['preview-test','Preview + Test','Check before live','preview-test.html','🧪'],
     ['checkpoints','Checkpoints','Rollback saved','checkpoints.html','💾']
   ];
+  var ADV=[
+    ['patch-lab','Patch Lab','Exact line tool','patch-lab.html','🧠'],
+    ['help','Help + Tools','All utilities','help.html','🛠️']
+  ];
+  var ALL=FLOW.concat(ADV);
   var FLOW_INDEX={};
   FLOW.forEach(function(item,i){FLOW_INDEX[item[0]]=i;});
   var NEXT={
@@ -21,24 +27,35 @@
     'start-guide':'index','setup':'index','project-picker':'index','fix-wizard':'index','rescue-room':'file-lab','packet-builder':'file-lab','ai-handoff':'patch-desk','publish-prep':'patch-desk','repo-desk':'patch-desk','github-tracker':'patch-desk','connector-status':'index','help':'index'
   };
   function page(){return document.body.getAttribute('data-page')||'index';}
-  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function esc(v){return String(v==null?'':v).replace(/[&<>\"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function toast(msg){var t=document.querySelector('#toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}}
   function copyText(text){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text||'').then(function(){toast('Copied');});return;}var a=document.createElement('textarea');a.value=text||'';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('Copied');}
-  function loadHistory(){var s=document.createElement('script');s.src='assets/code-labs-v1-2-history.js';document.head.appendChild(s);}
+  function loadHistory(){if(document.querySelector('script[data-code-labs-history]'))return;var s=document.createElement('script');s.src='assets/code-labs-v1-2-history.js';s.setAttribute('data-code-labs-history','yes');document.head.appendChild(s);}
   function textReplace(root,from,to){var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),node;while((node=walker.nextNode())){if(node.nodeValue.indexOf(from)!==-1){node.nodeValue=node.nodeValue.split(from).join(to);}}}
-  function findFlow(id){return FLOW.filter(function(x){return x[0]===id;})[0]||null;}
+  function findFlow(id){return ALL.filter(function(x){return x[0]===id;})[0]||FLOW[0];}
+  function flowOnly(id){return FLOW.filter(function(x){return x[0]===id;})[0]||null;}
   function link(item,id){var a=document.createElement('a');a.href=item[3];if(item[0]===id)a.className='active';a.innerHTML='<span>'+item[4]+'</span><div>'+item[1]+'<small>'+item[2]+'</small></div>';return a;}
+  function ensureFavicon(){
+    var icon=document.querySelector('link[rel="icon"]');
+    if(!icon){icon=document.createElement('link');icon.rel='icon';document.head.appendChild(icon);}
+    icon.type='image/svg+xml';icon.href=ICON;
+  }
   function simplifyMenu(){
     var nav=document.querySelector('.nav');if(!nav)return;
     var id=page();while(nav.firstChild)nav.removeChild(nav.firstChild);
     var label=document.createElement('div');label.className='navGroupLabel';label.style.display='block';label.textContent='Workflow';nav.appendChild(label);
     FLOW.forEach(function(item){nav.appendChild(link(item,id));});
     var adv=document.createElement('div');adv.className='navGroupLabel';adv.style.display='block';adv.textContent='Advanced';nav.appendChild(adv);
-    nav.appendChild(link(['patch-lab','Patch Lab','Exact line tool','patch-lab.html','🧠'],id));
-    nav.appendChild(link(['help','Help + Tools','All utilities','help.html','🛠️'],id));
+    ADV.forEach(function(item){nav.appendChild(link(item,id));});
+  }
+  function updatePageChrome(){
+    var id=page(), item=findFlow(id), title=item[1];
+    document.title=id==='index'?'Code Labs':'Code Labs - '+title;
+    var crumbs=document.querySelector('.crumbs');
+    if(crumbs){crumbs.innerHTML='<span>Code Labs</span><span>›</span><b>'+esc(title)+'</b>';}
   }
   function flowInfo(id){
-    var next=findFlow(NEXT[id])||FLOW[1], prev=findFlow(PREV[id])||FLOW[0];
+    var next=flowOnly(NEXT[id])||FLOW[1], prev=flowOnly(PREV[id])||FLOW[0];
     var pos=FLOW_INDEX[id];
     var step=(typeof pos==='number')?pos+1:'Advanced';
     var title=(typeof pos==='number')?FLOW[pos][1]:(id==='patch-lab'?'Patch Lab advanced tool':id==='help'?'Help + Tools':'Extra tool');
@@ -81,6 +98,6 @@
     var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Workflow Hub → Patch Desk → Preview + Test → Checkpoints. Patch Lab stays as an advanced exact-line tool. Help keeps all useful extra tools and feedback.';
     main.appendChild(div);
   }
-  function run(){simplifyMenu();simpleText();addNextFlowPanel();addHelpFeedback();addHelpShortcut();}
+  function run(){ensureFavicon();simplifyMenu();updatePageChrome();simpleText();addNextFlowPanel();addHelpFeedback();addHelpShortcut();}
   loadHistory();setTimeout(run,120);setTimeout(run,500);setTimeout(run,1000);setTimeout(run,1800);
 })();
