@@ -18,7 +18,11 @@
       if(a.getAttribute('href')==='faq.html'){a.className='active';}
       else{a.classList.remove('active');}
     });
+    var panel=q('#clNextFlowPanel');
+    if(panel){
+      panel.innerHTML='<h2>FAQ navigation</h2><p><b>FAQ</b> · This extra page explains the current Code Labs build without changing the tested repair flow.</p><div class="actions"><a class="btn ghost" href="help.html">Previous: Help + Tools</a><a class="btn good" href="index.html">Next: Home</a></div>';
+    }
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fix);else fix();
-  setTimeout(fix,300);setTimeout(fix,900);setTimeout(fix,1600);setTimeout(fix,2400);
+  setTimeout(fix,300);setTimeout(fix,700);setTimeout(fix,1100);setTimeout(fix,1800);setTimeout(fix,2600);
 })();
