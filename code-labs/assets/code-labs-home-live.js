@@ -1,4 +1,4 @@
-/* Code Labs V3.8 */
+/* Code Labs V3.9 - Repo Desk rescue */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
@@ -7,7 +7,12 @@
   function state(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
   function chars(t){return String(t||'').length}
   function lines(t){return String(t||'').split(/\r?\n/).length}
-  function addNav(){var n=q('.nav');if(!n||q('a[href="faq.html"]',n))return;var a=document.createElement('a');a.href='faq.html';a.innerHTML='<span>?</span><div>FAQ<small>Clear answers</small></div>';n.appendChild(a)}
+  function navItem(href,icon,title,small){var a=document.createElement('a');a.href=href;a.innerHTML='<span>'+icon+'</span><div>'+esc(title)+'<small>'+esc(small)+'</small></div>';return a}
+  function addNav(){
+    var n=q('.nav');if(!n)return;
+    if(!q('a[href="repo-desk.html"]',n)){n.appendChild(navItem('repo-desk.html','🗄️','Repo Desk','GitHub file work'))}
+    if(!q('a[href="faq.html"]',n)){n.appendChild(navItem('faq.html','?','FAQ','Clear answers'))}
+  }
   function step(n,title,text,href,btn,kind){return '<div class="card step"><div class="num">'+n+'</div><div><b>'+esc(title)+'</b><p>'+esc(text)+'</p><div class="actions"><a class="btn '+(kind||'primary')+'" href="'+href+'">'+esc(btn)+'</a></div></div></div>'}
   function render(){
     if(document.body.getAttribute('data-page')!=='index')return;
@@ -18,8 +23,8 @@
     var s=state(), f=s.file||{}, p=s.project||{};
     var top=q('.topbar');
     main.innerHTML=(top?top.outerHTML:'')+
-      '<section class="hero" id="clHomeLiveCentre"><div><span class="pill">Simple Code Labs flow</span><h1>Fix website code with one clear path.</h1><p>Use Code Labs as a focused browser workbench. Load or paste a file, use Rescue Room for safe repair prep, ask ChatGPT, paste the fixed file, preview it, then keep a checkpoint before anything goes live.</p><div class="actions"><a class="btn primary" href="file-lab.html">Start: File Lab</a><a class="btn ghost" href="rescue-room.html">Open Rescue Room</a><a class="btn ghost" href="patch-desk.html">Open Patch Desk</a><a class="btn ghost" href="help.html">60-second help</a><a class="btn ghost" href="faq.html">FAQ</a></div></div><div class="heroCard"><b>Main flow</b><ol><li>File Lab: load or paste code.</li><li>Rescue Room: check the repair path.</li><li>Workflow Hub: ask ChatGPT.</li><li>Patch Desk: paste the fixed file.</li><li>Preview + Test: check before live.</li><li>Checkpoints: keep rollback.</li></ol></div></section>'+ 
-      '<section class="panel"><h2>Use Code Labs in 60 seconds</h2><div class="grid3"><div class="item"><b>1. Start with the full file</b><p>Use File Lab to load or paste the complete broken file. Full files stop hidden logic being lost.</p></div><div class="item"><b>2. Use Rescue Room when needed</b><p>Check the repair path before you build the ChatGPT request. This keeps File Lab and Workflow Hub consistent.</p></div><div class="item"><b>3. Preview before live</b><p>Use Workflow Hub, Patch Desk, Preview + Test, then Checkpoints. Do not replace a live file until the preview is checked.</p></div></div><div class="actions"><a class="btn good" href="rescue-room.html">Open Rescue Room</a><a class="btn ghost" href="v20.html">Open Workflow Hub</a><a class="btn ghost" href="help.html">Open Help</a><a class="btn ghost" href="faq.html">Open FAQ</a></div></section>'+ 
+      '<section class="hero" id="clHomeLiveCentre"><div><span class="pill">Simple Code Labs flow</span><h1>Fix website code with one clear path.</h1><p>Use Code Labs as a focused browser workbench. Load or paste a file, use Rescue Room for safe repair prep, ask ChatGPT, paste the fixed file, preview it, then keep a checkpoint before anything goes live.</p><div class="actions"><a class="btn primary" href="file-lab.html">Start: File Lab</a><a class="btn ghost" href="rescue-room.html">Open Rescue Room</a><a class="btn ghost" href="patch-desk.html">Open Patch Desk</a><a class="btn good" href="repo-desk.html">Open Repo Desk</a><a class="btn ghost" href="help.html">60-second help</a><a class="btn ghost" href="faq.html">FAQ</a></div></div><div class="heroCard"><b>Main flow</b><ol><li>File Lab: load or paste code.</li><li>Rescue Room: check the repair path.</li><li>Workflow Hub: ask ChatGPT.</li><li>Patch Desk: paste the fixed file.</li><li>Preview + Test: check before live.</li><li>Checkpoints: keep rollback.</li></ol></div></section>'+ 
+      '<section class="panel"><h2>Use Code Labs in 60 seconds</h2><div class="grid3"><div class="item"><b>1. Start with the full file</b><p>Use File Lab to load or paste the complete broken file. Full files stop hidden logic being lost.</p></div><div class="item"><b>2. Use Rescue Room when needed</b><p>Check the repair path before you build the ChatGPT request. This keeps File Lab and Workflow Hub consistent.</p></div><div class="item"><b>3. Preview before live</b><p>Use Workflow Hub, Patch Desk, Preview + Test, then Checkpoints. Do not replace a live file until the preview is checked.</p></div></div><div class="actions"><a class="btn good" href="rescue-room.html">Open Rescue Room</a><a class="btn ghost" href="v20.html">Open Workflow Hub</a><a class="btn ghost" href="repo-desk.html">Open Repo Desk</a><a class="btn ghost" href="help.html">Open Help</a><a class="btn ghost" href="faq.html">Open FAQ</a></div></section>'+ 
       '<section class="panel"><h2>Current repair state</h2><div class="grid3"><div class="stat"><b>Project</b><span>'+esc(p.siteName||p.workspace||'Not set')+'</span></div><div class="stat"><b>File</b><span>'+esc(f.filename||'No file yet')+'</span></div><div class="stat"><b>Current code</b><span>'+lines(f.currentCode||'')+' lines · '+chars(f.currentCode||'')+' chars</span></div></div></section>'+ 
       '<section class="grid">'+
       step(1,'File Lab','Load a public GitHub file or paste full code. Use Code Search only when you need exact line evidence.','file-lab.html','Start here','primary')+
@@ -29,8 +34,8 @@
       step(5,'Preview + Test','Open the fixed result before live replacement. Keep the check simple: opens, buttons visible, no obvious break.','preview-test.html','Preview','ghost')+
       step(6,'Checkpoints','Save rollback/test notes before any live change.','checkpoints.html','Checkpoint','ghost')+
       '</section>'+ 
-      '<section class="panel"><h2>Advanced tool kept</h2><p>Patch Lab is still available for exact line changes, but Patch Desk is the normal workflow patch page.</p><div class="actions"><a class="btn ghost" href="patch-lab.html">Open advanced Patch Lab</a><a class="btn ghost" href="faq.html">Open FAQ</a></div></section>'+ 
-      '<div class="footerNote">Code Labs V3.8 · Live Use Pack.</div>';
+      '<section class="panel"><h2>Advanced GitHub tool restored</h2><p>Repo Desk is back as the safe GitHub connector planner. Use it to prepare read, add, change, delete verified test-file, and PR tracking requests. The public browser page still does not silently push to GitHub.</p><div class="actions"><a class="btn good" href="repo-desk.html">Open Repo Desk</a><a class="btn ghost" href="patch-lab.html">Open advanced Patch Lab</a><a class="btn ghost" href="faq.html">Open FAQ</a></div></section>'+ 
+      '<div class="footerNote">Code Labs V3.9 · Repo Desk restored for GitHub connector file work.</div>';
     addNav();
   }
   function start(){setTimeout(render,240);setTimeout(render,900);setTimeout(addNav,1500);setTimeout(addNav,2500)}
