@@ -4,6 +4,7 @@ function nav(){
 var items=[
 ['index.html','H','Home','Start here'],
 ['file-lab.html','F','File Lab','Load or read code'],
+['rescue-room.html','R','Rescue Room','Repair safely'],
 ['v20.html','W','Workflow Hub','Ask ChatGPT'],
 ['patch-desk.html','P','Patch Desk','Paste fixed file'],
 ['preview-test.html','T','Preview + Test','Check before live'],
