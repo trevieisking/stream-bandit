@@ -1,4 +1,4 @@
-/* Code Labs V1.8.4 - 8-page promo flow, shared icon, help public guide */
+/* Code Labs V1.8.5 - File Lab routes to Rescue Room */
 (function(){
   var ICON='assets/code-labs-icon.svg';
   var FLOW=[
@@ -16,9 +16,10 @@
   var ALL=FLOW.concat(ADV);
   var FLOW_INDEX={};
   FLOW.forEach(function(item,i){FLOW_INDEX[item[0]]=i;});
+  var RESCUE=['rescue-room','Rescue Room','Repair safely','rescue-room.html','🛟'];
   var NEXT={
     'index':'file-lab','start-guide':'file-lab','setup':'file-lab','project-picker':'file-lab','fix-wizard':'file-lab',
-    'file-lab':'v20','rescue-room':'v20','packet-builder':'v20','v20':'patch-desk',
+    'file-lab':'rescue-room','rescue-room':'v20','packet-builder':'v20','v20':'patch-desk',
     'patch-desk':'preview-test','patch-lab':'preview-test','preview-test':'checkpoints','checkpoints':'index',
     'ai-handoff':'index','publish-prep':'index','repo-desk':'index','github-tracker':'index','connector-status':'index','help':'index'
   };
@@ -32,8 +33,8 @@
   function copyText(text){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text||'').then(function(){toast('Copied');});return;}var a=document.createElement('textarea');a.value=text||'';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('Copied');}
   function loadHistory(){if(document.querySelector('script[data-code-labs-history]'))return;var s=document.createElement('script');s.src='assets/code-labs-v1-2-history.js';s.setAttribute('data-code-labs-history','yes');document.head.appendChild(s);}
   function textReplace(root,from,to){var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),node;while((node=walker.nextNode())){if(node.nodeValue.indexOf(from)!==-1){node.nodeValue=node.nodeValue.split(from).join(to);}}}
-  function findFlow(id){return ALL.filter(function(x){return x[0]===id;})[0]||FLOW[0];}
-  function flowOnly(id){return FLOW.filter(function(x){return x[0]===id;})[0]||null;}
+  function findFlow(id){if(id==='rescue-room')return RESCUE;return ALL.filter(function(x){return x[0]===id;})[0]||FLOW[0];}
+  function flowOnly(id){if(id==='rescue-room')return RESCUE;return FLOW.filter(function(x){return x[0]===id;})[0]||null;}
   function link(item,id){var a=document.createElement('a');a.href=item[3];if(item[0]===id)a.className='active';a.innerHTML='<span>'+item[4]+'</span><div>'+item[1]+'<small>'+item[2]+'</small></div>';return a;}
   function ensureFavicon(){
     var icon=document.querySelector('link[rel="icon"]');
@@ -58,8 +59,8 @@
     var next=flowOnly(NEXT[id])||FLOW[1], prev=flowOnly(PREV[id])||FLOW[0];
     var pos=FLOW_INDEX[id];
     var step=(typeof pos==='number')?pos+1:'Advanced';
-    var title=(typeof pos==='number')?FLOW[pos][1]:(id==='patch-lab'?'Patch Lab advanced tool':id==='help'?'Help + Tools':'Extra tool');
-    var note=(typeof pos==='number')?'This is part '+step+' of '+FLOW.length+' in the main Code Labs flow.':(id==='patch-lab'?'Patch Lab is kept as an advanced exact-line tool. Patch Desk is the main workflow patching page.':id==='help'?'Help keeps the useful tools and feedback in one place.':'This extra page is not in the main flow. Use Previous or Next to return to the simple workflow.');
+    var title=(typeof pos==='number')?FLOW[pos][1]:(id==='patch-lab'?'Patch Lab advanced tool':id==='help'?'Help + Tools':id==='rescue-room'?'Rescue Room':'Extra tool');
+    var note=(typeof pos==='number')?'This is part '+step+' of '+FLOW.length+' in the main Code Labs flow.':(id==='patch-lab'?'Patch Lab is kept as an advanced exact-line tool. Patch Desk is the main workflow patching page.':id==='help'?'Help keeps the useful tools and feedback in one place.':id==='rescue-room'?'Rescue Room checks and repairs after File Lab before Workflow Hub.':'This extra page is not in the main flow. Use Previous or Next to return to the simple workflow.');
     return {next:next,prev:prev,step:step,title:title,note:note};
   }
   function addNextFlowPanel(){
@@ -84,7 +85,7 @@
     if(page()!=='help'||document.querySelector('#clPublicHelpGuide'))return;
     var main=document.querySelector('.main');if(!main)return;
     var panel=document.createElement('section');panel.className='panel';panel.id='clPublicHelpGuide';panel.style.border='2px solid rgba(36,91,255,.22)';
-    panel.innerHTML='<h2>Code Labs public guide</h2><p>Use this page when you are not sure what to copy, what to preserve, or whether a change is safe to promote.</p><div class="grid3"><div class="item"><b>Use in 60 seconds</b><p>Start in File Lab, build the request in Workflow Hub, paste the fixed file in Patch Desk, preview it, then save a checkpoint.</p><span class="badge good">Normal flow</span></div><div class="item"><b>Promotion checklist</b><p>Only promote after the page opens, menu/buttons work, mobile looks acceptable, no obvious error text is visible, and a checkpoint exists.</p><span class="badge warn">Before live</span></div><div class="item"><b>Problem report</b><p>Tell ChatGPT the page, what you clicked, what happened, what must not change, and paste any copied report from these tools.</p><span class="badge">Copy evidence</span></div></div><div class="notice"><p><b>Safe rule:</b> the tested workflow stays locked. Help adds guidance only; it does not replace the File Lab → Workflow Hub → Patch Desk → Preview + Test → Checkpoints flow.</p></div>';
+    panel.innerHTML='<h2>Code Labs public guide</h2><p>Use this page when you are not sure what to copy, what to preserve, or whether a change is safe to promote.</p><div class="grid3"><div class="item"><b>Use in 60 seconds</b><p>Start in File Lab, use Rescue Room if needed, build the request in Workflow Hub, paste the fixed file in Patch Desk, preview it, then save a checkpoint.</p><span class="badge good">Normal flow</span></div><div class="item"><b>Promotion checklist</b><p>Only promote after the page opens, menu/buttons work, mobile looks acceptable, no obvious error text is visible, and a checkpoint exists.</p><span class="badge warn">Before live</span></div><div class="item"><b>Problem report</b><p>Tell ChatGPT the page, what you clicked, what happened, what must not change, and paste any copied report from these tools.</p><span class="badge">Copy evidence</span></div></div><div class="notice"><p><b>Safe rule:</b> the tested workflow stays locked. Help adds guidance only; it does not replace the File Lab → Rescue Room → Workflow Hub → Patch Desk → Preview + Test → Checkpoints flow.</p></div>';
     var first=document.querySelector('#clBackendVsHosting,.panel');
     if(first&&first.parentNode){first.parentNode.insertBefore(panel,first);}else{main.appendChild(panel);}
   }
@@ -103,7 +104,7 @@
   function addHelpShortcut(){
     if(document.querySelector('#clHelpShortcut'))return;
     var main=document.querySelector('.main');if(!main)return;
-    var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Workflow Hub → Patch Desk → Preview + Test → Checkpoints. Patch Lab stays as an advanced exact-line tool. Help keeps all useful extra tools and feedback.';
+    var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Rescue Room → Workflow Hub → Patch Desk → Preview + Test → Checkpoints. Patch Lab stays as an advanced exact-line tool. Help keeps all useful extra tools and feedback.';
     main.appendChild(div);
   }
   function run(){ensureFavicon();simplifyMenu();updatePageChrome();simpleText();addNextFlowPanel();addPublicHelpGuide();addHelpFeedback();addHelpShortcut();}
