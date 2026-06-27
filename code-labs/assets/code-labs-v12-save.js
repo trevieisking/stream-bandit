@@ -1,4 +1,4 @@
-/* Code Labs V1.8.7 - Checklist Builder in tools menu */
+/* Code Labs V1.8.8 - Repo Desk rescued in tools menu */
 (function(){
   var ICON='assets/code-labs-icon.svg';
   var FLOW=[
@@ -10,6 +10,7 @@
     ['checkpoints','Checkpoints','Rollback saved','checkpoints.html','💾']
   ];
   var ADV=[
+    ['repo-desk','Repo Desk','GitHub file work','repo-desk.html','🗄️'],
     ['patch-lab','Patch Lab','Exact line tool','patch-lab.html','🧠'],
     ['checklist-builder','Checklist Builder','Build pass lists','checklist-builder.html','✅'],
     ['help','Help + Tools','All utilities','help.html','🛠️']
@@ -61,8 +62,8 @@
     var next=flowOnly(NEXT[id])||FLOW[1], prev=flowOnly(PREV[id])||FLOW[0];
     var pos=FLOW_INDEX[id];
     var step=(typeof pos==='number')?pos+1:'Advanced';
-    var title=(typeof pos==='number')?FLOW[pos][1]:(id==='patch-lab'?'Patch Lab advanced tool':id==='help'?'Help + Tools':id==='rescue-room'?'Rescue Room':id==='checklist-builder'?'Checklist Builder':'Extra tool');
-    var note=(typeof pos==='number')?'This is part '+step+' of '+FLOW.length+' in the main Code Labs flow.':(id==='patch-lab'?'Patch Lab is kept as an advanced exact-line tool. Patch Desk is the main workflow patching page.':id==='help'?'Help keeps the useful tools and feedback in one place.':id==='rescue-room'?'Rescue Room checks and repairs after File Lab before Workflow Hub.':id==='checklist-builder'?'Checklist Builder creates copyable pass and promotion lists after Code Labs pages pass.':'This extra page is not in the main flow. Use Previous or Next to return to the simple workflow.');
+    var title=(typeof pos==='number')?FLOW[pos][1]:(id==='patch-lab'?'Patch Lab advanced tool':id==='repo-desk'?'Repo Desk GitHub connector tool':id==='help'?'Help + Tools':id==='rescue-room'?'Rescue Room':id==='checklist-builder'?'Checklist Builder':'Extra tool');
+    var note=(typeof pos==='number')?'This is part '+step+' of '+FLOW.length+' in the main Code Labs flow.':(id==='patch-lab'?'Patch Lab is kept as an advanced exact-line tool. Patch Desk is the main workflow patching page.':id==='repo-desk'?'Repo Desk builds safe GitHub connector requests for reading, adding, changing, deleting verified test files, and tracking PRs.':id==='help'?'Help keeps the useful tools and feedback in one place.':id==='rescue-room'?'Rescue Room checks and repairs after File Lab before Workflow Hub.':id==='checklist-builder'?'Checklist Builder creates copyable pass and promotion lists after Code Labs pages pass.':'This extra page is not in the main flow. Use Previous or Next to return to the simple workflow.');
     return {next:next,prev:prev,step:step,title:title,note:note};
   }
   function addNextFlowPanel(){
@@ -106,7 +107,7 @@
   function addHelpShortcut(){
     if(document.querySelector('#clHelpShortcut'))return;
     var main=document.querySelector('.main');if(!main)return;
-    var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Rescue Room → Workflow Hub → Patch Desk → Preview + Test → Checkpoints. Patch Lab stays as an advanced exact-line tool. Checklist Builder creates pass lists after pages pass. Help keeps all useful extra tools and feedback.';
+    var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Rescue Room → Workflow Hub → Patch Desk → Preview + Test → Checkpoints. Repo Desk is restored as the advanced GitHub connector planner for read/add/change/delete requests and PR tracking. Patch Lab stays as an advanced exact-line tool. Checklist Builder creates pass lists after pages pass. Help keeps all useful extra tools and feedback.';
     main.appendChild(div);
   }
   function run(){ensureFavicon();simplifyMenu();updatePageChrome();simpleText();addNextFlowPanel();addPublicHelpGuide();addHelpFeedback();addHelpShortcut();}
