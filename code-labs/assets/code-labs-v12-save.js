@@ -1,4 +1,4 @@
-/* Code Labs V1.8.8 - Repo Desk rescued in tools menu */
+/* Code Labs V1.8.9 - Repo Desk final workflow step */
 (function(){
   var ICON='assets/code-labs-icon.svg';
   var FLOW=[
@@ -7,10 +7,10 @@
     ['v20','Workflow Hub','Ask ChatGPT','v20.html','🧰'],
     ['patch-desk','Patch Desk','Paste fixed file','patch-desk.html','🧩'],
     ['preview-test','Preview + Test','Check before live','preview-test.html','🧪'],
-    ['checkpoints','Checkpoints','Rollback saved','checkpoints.html','💾']
+    ['checkpoints','Checkpoints','Rollback saved','checkpoints.html','💾'],
+    ['repo-desk','Repo Desk','GitHub file work','repo-desk.html','🗄️']
   ];
   var ADV=[
-    ['repo-desk','Repo Desk','GitHub file work','repo-desk.html','🗄️'],
     ['patch-lab','Patch Lab','Exact line tool','patch-lab.html','🧠'],
     ['checklist-builder','Checklist Builder','Build pass lists','checklist-builder.html','✅'],
     ['help','Help + Tools','All utilities','help.html','🛠️']
@@ -23,12 +23,12 @@
   var NEXT={
     'index':'file-lab','start-guide':'file-lab','setup':'file-lab','project-picker':'file-lab','fix-wizard':'file-lab',
     'file-lab':'rescue-room','rescue-room':'v20','packet-builder':'v20','v20':'patch-desk',
-    'patch-desk':'preview-test','patch-lab':'preview-test','checklist-builder':'help','preview-test':'checkpoints','checkpoints':'index',
-    'ai-handoff':'index','publish-prep':'index','repo-desk':'index','github-tracker':'index','connector-status':'index','help':'index'
+    'patch-desk':'preview-test','patch-lab':'preview-test','checklist-builder':'help','preview-test':'checkpoints','checkpoints':'repo-desk','repo-desk':'index',
+    'ai-handoff':'index','publish-prep':'index','github-tracker':'index','connector-status':'index','help':'index'
   };
   var PREV={
-    'index':'checkpoints','file-lab':'index','v20':'file-lab','patch-desk':'v20','patch-lab':'patch-desk','checklist-builder':'patch-lab','preview-test':'patch-desk','checkpoints':'preview-test',
-    'start-guide':'index','setup':'index','project-picker':'index','fix-wizard':'index','rescue-room':'file-lab','packet-builder':'file-lab','ai-handoff':'patch-desk','publish-prep':'patch-desk','repo-desk':'patch-desk','github-tracker':'patch-desk','connector-status':'index','help':'index'
+    'index':'repo-desk','file-lab':'index','v20':'file-lab','patch-desk':'v20','patch-lab':'patch-desk','checklist-builder':'patch-lab','preview-test':'patch-desk','checkpoints':'preview-test','repo-desk':'checkpoints',
+    'start-guide':'index','setup':'index','project-picker':'index','fix-wizard':'index','rescue-room':'file-lab','packet-builder':'file-lab','ai-handoff':'patch-desk','publish-prep':'patch-desk','github-tracker':'patch-desk','connector-status':'index','help':'index'
   };
   function page(){return document.body.getAttribute('data-page')||'index';}
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -62,8 +62,9 @@
     var next=flowOnly(NEXT[id])||FLOW[1], prev=flowOnly(PREV[id])||FLOW[0];
     var pos=FLOW_INDEX[id];
     var step=(typeof pos==='number')?pos+1:'Advanced';
-    var title=(typeof pos==='number')?FLOW[pos][1]:(id==='patch-lab'?'Patch Lab advanced tool':id==='repo-desk'?'Repo Desk GitHub connector tool':id==='help'?'Help + Tools':id==='rescue-room'?'Rescue Room':id==='checklist-builder'?'Checklist Builder':'Extra tool');
-    var note=(typeof pos==='number')?'This is part '+step+' of '+FLOW.length+' in the main Code Labs flow.':(id==='patch-lab'?'Patch Lab is kept as an advanced exact-line tool. Patch Desk is the main workflow patching page.':id==='repo-desk'?'Repo Desk builds safe GitHub connector requests for reading, adding, changing, deleting verified test files, and tracking PRs.':id==='help'?'Help keeps the useful tools and feedback in one place.':id==='rescue-room'?'Rescue Room checks and repairs after File Lab before Workflow Hub.':id==='checklist-builder'?'Checklist Builder creates copyable pass and promotion lists after Code Labs pages pass.':'This extra page is not in the main flow. Use Previous or Next to return to the simple workflow.');
+    var title=(typeof pos==='number')?FLOW[pos][1]:(id==='patch-lab'?'Patch Lab advanced tool':id==='help'?'Help + Tools':id==='rescue-room'?'Rescue Room':id==='checklist-builder'?'Checklist Builder':'Extra tool');
+    var note=(typeof pos==='number')?'This is part '+step+' of '+FLOW.length+' in the main Code Labs flow.':(id==='patch-lab'?'Patch Lab is kept as an advanced exact-line tool. Patch Desk is the main workflow patching page.':id==='help'?'Help keeps the useful tools and feedback in one place.':id==='rescue-room'?'Rescue Room checks and repairs after File Lab before Workflow Hub.':id==='checklist-builder'?'Checklist Builder creates copyable pass and promotion lists after Code Labs pages pass.':'This extra page is not in the main flow. Use Previous or Next to return to the simple workflow.');
+    if(id==='repo-desk'){note='Repo Desk is the final workflow step for controlled GitHub file work after preview and checkpoint notes are saved.';}
     return {next:next,prev:prev,step:step,title:title,note:note};
   }
   function addNextFlowPanel(){
@@ -88,7 +89,7 @@
     if(page()!=='help'||document.querySelector('#clPublicHelpGuide'))return;
     var main=document.querySelector('.main');if(!main)return;
     var panel=document.createElement('section');panel.className='panel';panel.id='clPublicHelpGuide';panel.style.border='2px solid rgba(36,91,255,.22)';
-    panel.innerHTML='<h2>Code Labs public guide</h2><p>Use this page when you are not sure what to copy, what to preserve, or whether a change is safe to promote.</p><div class="grid3"><div class="item"><b>Use in 60 seconds</b><p>Start in File Lab, use Rescue Room if needed, build the request in Workflow Hub, paste the fixed file in Patch Desk, preview it, then save a checkpoint.</p><span class="badge good">Normal flow</span></div><div class="item"><b>Promotion checklist</b><p>Only promote after the page opens, menu/buttons work, mobile looks acceptable, no obvious error text is visible, and a checkpoint exists.</p><span class="badge warn">Before live</span></div><div class="item"><b>Problem report</b><p>Tell ChatGPT the page, what you clicked, what happened, what must not change, and paste any copied report from these tools.</p><span class="badge">Copy evidence</span></div></div><div class="notice"><p><b>Safe rule:</b> the tested workflow stays locked. Help adds guidance only; it does not replace the File Lab → Rescue Room → Workflow Hub → Patch Desk → Preview + Test → Checkpoints flow.</p></div>';
+    panel.innerHTML='<h2>Code Labs public guide</h2><p>Use this page when you are not sure what to copy, what to preserve, or whether a change is safe to promote.</p><div class="grid3"><div class="item"><b>Use in 60 seconds</b><p>Start in File Lab, use Rescue Room if needed, build the request in Workflow Hub, paste the fixed file in Patch Desk, preview it, then save a checkpoint.</p><span class="badge good">Normal flow</span></div><div class="item"><b>Promotion checklist</b><p>Only promote after the page opens, menu/buttons work, mobile looks acceptable, no obvious error text is visible, and a checkpoint exists.</p><span class="badge warn">Before live</span></div><div class="item"><b>Problem report</b><p>Tell ChatGPT the page, what you clicked, what happened, what must not change, and paste any copied report from these tools.</p><span class="badge">Copy evidence</span></div></div><div class="notice"><p><b>Safe rule:</b> the tested workflow stays locked. Repo Desk is the final controlled GitHub file-work step after Checkpoints.</p></div>';
     var first=document.querySelector('#clBackendVsHosting,.panel');
     if(first&&first.parentNode){first.parentNode.insertBefore(panel,first);}else{main.appendChild(panel);}
   }
@@ -107,7 +108,7 @@
   function addHelpShortcut(){
     if(document.querySelector('#clHelpShortcut'))return;
     var main=document.querySelector('.main');if(!main)return;
-    var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Rescue Room → Workflow Hub → Patch Desk → Preview + Test → Checkpoints. Repo Desk is restored as the advanced GitHub connector planner for read/add/change/delete requests and PR tracking. Patch Lab stays as an advanced exact-line tool. Checklist Builder creates pass lists after pages pass. Help keeps all useful extra tools and feedback.';
+    var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Rescue Room → Workflow Hub → Patch Desk → Preview + Test → Checkpoints → Repo Desk. Repo Desk is the final controlled GitHub file-work step for read/add/change/delete requests and PR tracking. Patch Lab stays as an advanced exact-line tool. Checklist Builder creates pass lists after pages pass. Help keeps all useful extra tools and feedback.';
     main.appendChild(div);
   }
   function run(){ensureFavicon();simplifyMenu();updatePageChrome();simpleText();addNextFlowPanel();addPublicHelpGuide();addHelpFeedback();addHelpShortcut();}
