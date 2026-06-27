@@ -1,4 +1,4 @@
-/* Code Labs V1.8.5 - File Lab routes to Rescue Room */
+/* Code Labs V1.8.6 - Rescue Room in workflow menu */
 (function(){
   var ICON='assets/code-labs-icon.svg';
   var FLOW=[
@@ -17,6 +17,7 @@
   var FLOW_INDEX={};
   FLOW.forEach(function(item,i){FLOW_INDEX[item[0]]=i;});
   var RESCUE=['rescue-room','Rescue Room','Repair safely','rescue-room.html','🛟'];
+  var MENU_FLOW=FLOW.slice(0,2).concat([RESCUE],FLOW.slice(2));
   var NEXT={
     'index':'file-lab','start-guide':'file-lab','setup':'file-lab','project-picker':'file-lab','fix-wizard':'file-lab',
     'file-lab':'rescue-room','rescue-room':'v20','packet-builder':'v20','v20':'patch-desk',
@@ -45,7 +46,7 @@
     var nav=document.querySelector('.nav');if(!nav)return;
     var id=page();while(nav.firstChild)nav.removeChild(nav.firstChild);
     var label=document.createElement('div');label.className='navGroupLabel';label.style.display='block';label.textContent='Workflow';nav.appendChild(label);
-    FLOW.forEach(function(item){nav.appendChild(link(item,id));});
+    MENU_FLOW.forEach(function(item){nav.appendChild(link(item,id));});
     var adv=document.createElement('div');adv.className='navGroupLabel';adv.style.display='block';adv.textContent='Advanced';nav.appendChild(adv);
     ADV.forEach(function(item){nav.appendChild(link(item,id));});
   }
