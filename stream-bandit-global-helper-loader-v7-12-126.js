@@ -1,15 +1,16 @@
-/* Stream Bandit Global Helper Loader V7.12.186
+/* Stream Bandit Global Helper Loader V7.12.187
    Filename kept for old pages.
    Owner Brand Route Truth fix.
    Stops Brand Image Helper and Favicon / App Icon Builder being rewritten back to Brand / App Icons.
+   Adds canonical Social route parity and safe Web Builder owned-route targets.
    No Supabase writes, no payments, no player engine changes, no live promotion.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.12.186 Global Helper Loader / Owner Brand Route Truth';
+const VERSION='V7.12.187 Global Helper Loader / Social Route Parity';
 const DEF='test-page';
-const FOUNDATION_VERSION='foundation-7-12-186-owner-brand-route-truth';
+const FOUNDATION_VERSION='foundation-7-12-187-social-route-parity';
 
 const ROUTES={
   home:'home-global-helpers-v7-4-4-test.html',
@@ -32,6 +33,11 @@ const ROUTES={
   watchHistory:'watch-history-global-helpers-v7-4-0-test.html',
   profile:'profile-settings-live-ready-v7-12-90-test.html',
 
+  socialProfile:'profile-social-v7-13-001-test.html',
+  friends:'friends-social-v7-13-001-test.html',
+  newsFeed:'news-feed-social-v7-13-001-test.html',
+  groups:'groups-social-v7-13-001-test.html',
+
   submit:'submit-video-clean-machine-v7-12-79-test.html',
   rules:'rules-clean-machine-v7-12-82-test.html',
   review:'review-queue-clean-machine-v7-12-80-publish-test.html',
@@ -50,10 +56,10 @@ const ROUTES={
 
   builder:'web-builder-account-control-hub-v7-12-263-test.html',
   theme:'web-builder-theme-studio-controls-v7-8-9-test.html',
-  pagesManager:'web-builder-pages-manager-v7-12-111-test.html',
-  preview:'web-builder-shared-style-preview-v7-12-117-test.html?page=test-page',
-  formAdvanced:'web-builder-form-save-v7-12-94-test.html?page=test-page',
-  formInbox:'web-builder-form-submissions-v7-12-94-test.html?page=test-page',
+  pagesManager:'web-builder-pages-manager-owned-v7-12-256-test.html',
+  preview:'web-builder-preview-owned-v7-12-257-test.html?page=test-page',
+  formAdvanced:'web-builder-form-designer-owned-v7-12-258-test.html?page=test-page',
+  formInbox:'web-builder-form-inbox-owned-v7-12-258-test.html?page=test-page',
 
   policyCentre:'policy-documents-centre-v7-12-119-test.html',
   policyReader:'policy-reader-v7-12-119-test.html?policy=terms',
@@ -88,6 +94,9 @@ const ROUTE_FIXES={
   'profile-settings-global-helpers-v7-5-8-test.html':ROUTES.profile,
   'profile-settings-admin-shell-v6-56-test.html':ROUTES.profile,
 
+  'news-feed-social-v7-13-002-test.html':ROUTES.newsFeed,
+  'news-feed-social-v7-13-003-test.html':ROUTES.newsFeed,
+
   'settings-studio-admin-shell-v6-55-test.html':ROUTES.theme,
   'settings-sources-owner-launcher-v7-6-6-test.html':ROUTES.theme,
 
@@ -104,8 +113,12 @@ const ROUTE_FIXES={
 
   'web-builder-form-save-v7-6-5-test.html':ROUTES.formAdvanced,
   'web-builder-form-save-v7-6-7-test.html':ROUTES.formAdvanced,
+  'web-builder-form-save-v7-12-94-test.html':ROUTES.formAdvanced,
+  'web-builder-form-submissions-v7-12-94-test.html':ROUTES.formInbox,
   'web-builder-shared-style-preview-v7-9-0-test.html':ROUTES.preview,
   'web-builder-shared-style-preview-v7-9-2-test.html':ROUTES.preview,
+  'web-builder-shared-style-preview-v7-12-117-test.html':ROUTES.preview,
+  'web-builder-pages-manager-v7-12-111-test.html':ROUTES.pagesManager,
 
   'submit-video-clean-machine-v7-12-53-test.html':ROUTES.submit,
   'submit-video-clean-machine-v7-12-75-test.html':ROUTES.submit,
@@ -173,6 +186,11 @@ const LABEL_FIXES={
   'Collections':[ROUTES.collections,'Collections'],
   'Player 2':[ROUTES.player2,'Group Player'],
 
+  'Social Profile':[ROUTES.socialProfile,'Social profile and wall'],
+  'Friends':[ROUTES.friends,'Friends and requests'],
+  'News Feed':[ROUTES.newsFeed,'Social feed'],
+  'Groups':[ROUTES.groups,'Groups and events'],
+
   'Submit Video':[ROUTES.submit,'Passed direct poster upload + direct submission'],
   'Rules':[ROUTES.rules,'Passed workflow checkpoint'],
   'Review Queue':[ROUTES.review,'Passed publish to Library'],
@@ -191,6 +209,10 @@ const LABEL_FIXES={
   'Profile Settings':[ROUTES.profile,'Profile image overlay'],
   'Supabase Library Editor':[ROUTES.supabaseLibrary,'Supabase editor'],
   'Web Builder':[ROUTES.builder,'Web Builder hub'],
+  'Pages Manager':[ROUTES.pagesManager,'Owned Web Builder pages manager'],
+  'Published Preview':[ROUTES.preview,'Owned Web Builder preview'],
+  'Form Inbox':[ROUTES.formInbox,'Owned Web Builder form inbox'],
+  'Advanced Form':[ROUTES.formAdvanced,'Owned Web Builder form designer'],
 
   'Brand / App Icons':[ROUTES.brandIcons,'Logos, favicons and app icons'],
   'Brand Image Helper':[ROUTES.brandHelper,'Brand helper'],
@@ -268,7 +290,7 @@ function patchLabelLink(a){
     changed++;
   }
 
-  a.dataset.sbRouteFixedBy='v7-12-186-loader';
+  a.dataset.sbRouteFixedBy='v7-12-187-loader';
   return changed;
 }
 
@@ -284,7 +306,7 @@ function patchRoutes(root){
 
         if(old&&fix&&fix!==old){
           el.setAttribute(attr,fix);
-          el.dataset.sbRouteFixedBy='v7-12-186-loader';
+          el.dataset.sbRouteFixedBy='v7-12-187-loader';
           changed++;
         }
       });
@@ -316,7 +338,11 @@ function patchRouteGlobals(){
         groupPlayer:ROUTES.player2,
         brandIcons:ROUTES.brandIcons,
         brandHelper:ROUTES.brandHelper,
-        faviconBuilder:ROUTES.faviconBuilder
+        faviconBuilder:ROUTES.faviconBuilder,
+        socialProfile:ROUTES.socialProfile,
+        friends:ROUTES.friends,
+        newsFeed:ROUTES.newsFeed,
+        groups:ROUTES.groups
       }
     );
   }catch(e){}
@@ -349,7 +375,7 @@ function loadScript(src){
     let s=document.createElement('script');
     s.src=src;
     s.defer=true;
-    s.dataset.sbLoadedBy='v7-12-186-loader';
+    s.dataset.sbLoadedBy='v7-12-187-loader';
     document.head.appendChild(s);
   }catch(e){}
 }
@@ -459,7 +485,7 @@ function boot(){
     }
   };
 
-  document.documentElement.dataset.streamBanditGlobalHelperLoader='v7-12-186-owner-brand-route-truth';
+  document.documentElement.dataset.streamBanditGlobalHelperLoader='v7-12-187-social-route-parity';
 }
 
 if(document.readyState==='loading'){
