@@ -2610,14 +2610,49 @@ function bindPostButtons(){
   document.querySelectorAll('[data-comment-send]').forEach(b=>b.onclick=()=>sendComment(b.getAttribute('data-comment-send')));
 }
 
-function openMessage(){
-  $('messageTitle').textContent='Message '+nameOf(profile);
-  $('messageSub').textContent=handleOf(profile);
-  $('messageBody').value='';
-  $('messageStatus').textContent='Waiting...';
-  $('messageStatus').className='status';
-  $('messageModal').classList.add('open');
-  $('messageModal').setAttribute('aria-hidden','false');
+async function messageBlocked(otherId){
+  if(!user||!otherId)return true;
+
+  const r=await (await client()).from('sb_user_blocks')
+    .select('id,blocker_id,blocked_id')
+    .or('blocker_id.eq.'+user.id+',blocked_id.eq.'+user.id)
+    .limit(100);
+
+  if(r.error)throw r.error;
+
+  return (r.data||[]).some(row=>
+    (row.blocker_id===user.id&&row.blocked_id===otherId)||
+    (row.blocker_id===otherId&&row.blocked_id===user.id)
+  );
+}
+
+async function openMessage(){
+  try{
+    if(!user){
+      toast('Sign in first.');
+      return;
+    }
+
+    if(!profile||profile.id===user.id){
+      toast('Open another profile to send a message.');
+      return;
+    }
+
+    if(await messageBlocked(profile.id)){
+      toast('Messaging is blocked between these accounts.');
+      return;
+    }
+
+    $('messageTitle').textContent='Message '+nameOf(profile);
+    $('messageSub').textContent=handleOf(profile);
+    $('messageBody').value='';
+    $('messageStatus').textContent='Waiting...';
+    $('messageStatus').className='status';
+    $('messageModal').classList.add('open');
+    $('messageModal').setAttribute('aria-hidden','false');
+  }catch(e){
+    toast('Message check failed: '+(e.message||e));
+  }
 }
 
 function closeMessage(){
@@ -2627,7 +2662,23 @@ function closeMessage(){
 
 async function sendMessage(){
   try{
-    if(!user)return;
+    if(!user){
+      $('messageStatus').textContent='Sign in first.';
+      $('messageStatus').className='note';
+      return;
+    }
+
+    if(!profile||profile.id===user.id){
+      $('messageStatus').textContent='Open another profile to send a message.';
+      $('messageStatus').className='note';
+      return;
+    }
+
+    if(await messageBlocked(profile.id)){
+      $('messageStatus').textContent='Messaging is blocked between these accounts.';
+      $('messageStatus').className='danger';
+      return;
+    }
 
     const body=String($('messageBody').value||'').trim();
 
