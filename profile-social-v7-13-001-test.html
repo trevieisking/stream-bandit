@@ -219,19 +219,20 @@ textarea{width:100%;min-height:110px;resize:vertical}
 <section class="hero">
   <div class="heroGrid">
     <div>
-      <span class="badge">V7.13.010 Profile Social Media Group - Polish Test</span>
+      <span class="badge">V7.13.010 Profile Social Media Group - Social First Polish</span>
       <h1 id="heroTitle">Social Profile</h1>
-      <p id="heroBio">Loads account basics from the existing profile row, saves social extras to the social settings table, and keeps Account Centre tools available.</p>
-      <div id="profilePills"><span class="pill">Main app profile</span></div>
+      <p id="heroBio">A social-first profile for wall posts, friends, family, liked movies, pages and public profile details. Account tools stay available without taking over the page.</p>
+      <div id="profilePills"><span class="pill">Social-first profile</span></div>
       <div class="actions">
         <button id="reload" class="btn primary" type="button">Reload Profile</button>
-        <button class="btn cyan tabJump" data-jump="accountToolsSec" type="button">Account Tools</button>
+        <button class="btn cyan tabJump" data-jump="wallSec" type="button">View Wall</button>
+        <button class="btn tabJump" data-jump="accountToolsSec" type="button">Account Tools</button>
         <button id="friendAction" class="btn hot" type="button">Friend</button>
         <button id="messageAction" class="btn hot" type="button">Message</button>
         <button id="blockAction" class="btn dangerBtn" type="button">Block</button>
       </div>
       <div id="status" class="status">Loading profile...</div>
-      <div id="helperStatus" class="note">Account basics stay in sb_profiles. Social extras stay in sb_profile_social_settings.</div>
+      <div id="helperStatus" class="note">Social profile opens on the wall first. Account basics still stay safely in sb_profiles.</div>
     </div>
     <div class="profileArt">
       <div id="bannerHero" class="banner">Banner</div>
@@ -260,20 +261,20 @@ textarea{width:100%;min-height:110px;resize:vertical}
 
 <section class="box">
   <div class="tabs">
-    <button class="tab active" data-tab="aboutSec" type="button">About</button>
-    <button class="tab" data-tab="accountToolsSec" type="button">Account Tools</button>
-    <button class="tab" data-tab="wallSec" type="button">Wall</button>
+    <button class="tab active" data-tab="wallSec" type="button">Wall</button>
+    <button class="tab" data-tab="aboutSec" type="button">About</button>
+    <button class="tab" data-tab="friendsSec" type="button">Friends & Family</button>
+    <button class="tab" data-tab="likesSec" type="button">Liked Movies</button>
+    <button class="tab" data-tab="pagesSec" type="button">Pages</button>
     <button class="tab" data-tab="questionsSec" type="button">Questions</button>
     <button class="tab" data-tab="privacySec" type="button">Privacy</button>
-    <button class="tab" data-tab="likesSec" type="button">Liked Movies</button>
-    <button class="tab" data-tab="friendsSec" type="button">Friends & Family</button>
-    <button class="tab" data-tab="pagesSec" type="button">Pages</button>
+    <button class="tab" data-tab="accountToolsSec" type="button">Account Tools</button>
     <button class="tab" data-tab="checksSec" type="button">Checks</button>
     <button class="tab" data-tab="rulesSec" type="button">Rules</button>
   </div>
 </section>
 
-<section id="aboutSec" class="box section active">
+<section id="aboutSec" class="box section">
   <h2>About</h2>
   <div class="grid">
     <div class="card"><b>Bio</b><p id="aboutBio">Loading...</p></div>
@@ -362,7 +363,7 @@ textarea{width:100%;min-height:110px;resize:vertical}
   </div>
 </section>
 
-<section id="wallSec" class="box section">
+<section id="wallSec" class="box section active">
   <h2>Profile wall</h2>
   <div class="card">
     <b>Post on this profile</b>
@@ -532,7 +533,7 @@ textarea{width:100%;min-height:110px;resize:vertical}
   </div>
 </section>
 
-<p class="micro">Profile Social V7.13.010 - polish test, no index promotion.</p>
+<p class="micro">Profile Social V7.13.010 - social-first polish test, no index promotion.</p>
 </div>
 
 <div id="imageModal" class="modal" aria-hidden="true">
@@ -632,7 +633,7 @@ textarea{width:100%;min-height:110px;resize:vertical}
 (function(){
 'use strict';
 
-const VERSION='V7.13.010 Profile Social Media Group Polish Test';
+const VERSION='V7.13.010 Profile Social Media Group Social First Polish';
 const SELF='profile-social-v7-13-001-test.html';
 const FRIENDS='friends-social-v7-13-001-test.html';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
@@ -1164,7 +1165,7 @@ function renderAll(){
 function renderHero(){
   document.title='Stream Bandit Social Profile - '+nameOf(profile);
   $('heroTitle').textContent=nameOf(profile);
-  $('heroBio').textContent=bioOf(profile)||'No bio yet.';
+  $('heroBio').textContent=bioOf(profile)||'Wall posts, friends, family, liked movies, pages and public profile details live here.';
   $('displayName').textContent=nameOf(profile);
   $('profileHandle').textContent=handleOf(profile);
   $('rolePill').textContent='Role: '+(profile.role||'user');
@@ -1994,6 +1995,7 @@ function safetyTruth(){
     page:SELF,
     group:'Profile Social Media Group',
     profileAccountCentreMerged:true,
+    productPolish:{socialFirst:true,defaultTab:'wallSec',accountTools:'kept available after social tabs'},
     writes:[
       'sb_profiles current user text/avatar/banner',
       'sb_profile_social_settings current user social settings',
@@ -2161,6 +2163,7 @@ function debug(extra){
 
   const out={
     version:VERSION,
+    activeSections:Array.from(document.querySelectorAll('.section.active')).map(s=>s.id),
     user:user?{id:user.id,email:user.email}:null,
     myProfile:myProfile||null,
     viewedProfile:profile||null,
