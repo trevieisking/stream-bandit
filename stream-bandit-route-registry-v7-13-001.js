@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.023 Unified Route Registry Foundation / Canonical Old Route Aliases';
+  var VERSION = 'V7.13.024 Unified Route Registry Foundation / Social Route Parity';
 
   var ROUTE_CLASSES = {
     PUBLIC: 'public',
@@ -47,6 +47,10 @@
     {label:'My Channel',url:'my-channel-clean-machine-v7-12-47-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_channels','sb_collections','sb_movies','sb_playlists','sb_profiles','sb_submissions'],write:['sb_profiles']},
     {label:'Collections',url:'collections-clean-machine-v7-12-51-test.html',group:'Group Play',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.CREATOR_PLAN,minPlan:'creator_growth',feature:'collections',read:['sb_collection_movies','sb_collections','sb_movies','sb_profiles'],write:['sb_collections','sb_collection_movies']},
     {label:'Profile / Login',url:'profile-settings-live-ready-v7-12-90-test.html',group:'Account',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.PUBLIC,read:['sb_profiles'],write:['sb_profiles']},
+    {label:'Social Profile',url:'profile-social-v7-13-001-test.html',group:'Social',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_profiles','sb_profile_social_settings'],write:['sb_profile_social_settings']},
+    {label:'Friends',url:'friends-social-v7-13-001-test.html',group:'Social',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_profiles','sb_user_friends','sb_likes','sb_movies'],write:['sb_user_friends']},
+    {label:'News Feed',url:'news-feed-social-v7-13-001-test.html',group:'Social',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_social_posts','sb_social_events','sb_social_post_comments','sb_social_post_reactions'],write:['sb_social_posts','sb_social_post_comments','sb_social_post_reactions','sb_social_event_rsvps']},
+    {label:'Groups',url:'groups-social-v7-13-001-test.html',group:'Social',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_social_groups','sb_social_group_members','sb_social_posts','sb_social_events'],write:['sb_social_groups','sb_social_group_members','sb_social_posts','sb_social_events','sb_social_event_rsvps']},
     {label:'User Management Dashboard',url:'user-management-dashboard-v7-11-2-test.html',group:'User Management',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.OWNER,read:['sb_profiles','sb_admin_audit_log'],write:['sb_profiles']},
     {label:'Permissions Matrix',url:'permissions-matrix-user-management-v7-11-4-test.html',group:'User Management',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.OWNER,read:['sb_profiles','sb_admin_audit_log'],write:[]},
     {label:'Web Builder Hub',url:'web-builder-account-control-hub-v7-12-263-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER,read:['sb_profiles','sb_site_pages'],write:[]},
@@ -77,6 +81,8 @@
     'web-builder-live-studio-v7-12-93-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
     'web-builder-admin-shell-v6-57-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
     'web-builder-global-helpers-v7-9-3-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'news-feed-social-v7-13-002-test.html':'news-feed-social-v7-13-001-test.html',
+    'news-feed-social-v7-13-003-test.html':'news-feed-social-v7-13-001-test.html',
     'user-dashboard-concept-v6-68-test.html':'user-management-dashboard-v7-11-2-test.html',
     'plans-pricing-matrix-v6-69-test.html':'plans-pricing-feature-shop-v7-11-3-test.html',
     'permissions-matrix-v6-70-test.html':'permissions-matrix-user-management-v7-11-4-test.html'
