@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.025 Shared Auth Entry Gate / Account Optional + Creator Plan';
+  var VERSION = 'V7.13.026 Shared Auth Entry Gate / Config Discovery Alignment';
   var LOGIN_URL = 'profile-settings-live-ready-v7-12-90-test.html';
   var PROFILE_TABLE = 'sb_profiles';
   var SESSION_CACHE_KEY = 'sb_auth_gate_session_v7_13_001';
@@ -16,15 +16,28 @@
   function readPermissions(profile){var v = profile && profile.permissions_json;if(v && typeof v === 'object') return v;if(typeof v === 'string' && v.trim()) return safeJSON(v, {});return {};}
   function hasFeature(profile, feature){var perms = readPermissions(profile);if(!feature) return false;return truthy(perms[feature]) || truthy(perms['can_' + feature]) || truthy(perms[feature + '_enabled']) || truthy(perms[feature + '_access']);}
 
+  function readConfig(){
+    try{
+      if(window.StreamBanditShell && typeof window.StreamBanditShell.config === 'function'){
+        var shellConfig = window.StreamBanditShell.config();
+        if(shellConfig && shellConfig.url && shellConfig.key) return shellConfig;
+      }
+    }catch(e){}
+    var c = window.StreamBanditSupabaseConfig || window.StreamBanditShellConfig || {};
+    return {
+      url: window.SUPABASE_URL || window.SB_SUPABASE_URL || window.STREAM_BANDIT_SUPABASE_URL || c.url || c.supabaseUrl || '',
+      key: window.SUPABASE_KEY || window.SB_SUPABASE_ANON_KEY || window.SB_SUPABASE_PUBLISHABLE_KEY || window.STREAM_BANDIT_SUPABASE_ANON_KEY || window.STREAM_BANDIT_SUPABASE_PUBLISHABLE_KEY || c.key || c.anonKey || c.anon_key || c.publishableKey || ''
+    };
+  }
+
   function getClient(){
     if(window.sb && typeof window.sb.from === 'function') return window.sb;
     if(window.supabaseClient && typeof window.supabaseClient.from === 'function') return window.supabaseClient;
     if(window.SB_SUPABASE_CLIENT && typeof window.SB_SUPABASE_CLIENT.from === 'function') return window.SB_SUPABASE_CLIENT;
     if(window.supabase && typeof window.supabase.createClient === 'function'){
-      var url = window.SB_SUPABASE_URL || window.STREAM_BANDIT_SUPABASE_URL || '';
-      var key = window.SB_SUPABASE_ANON_KEY || window.SB_SUPABASE_PUBLISHABLE_KEY || window.STREAM_BANDIT_SUPABASE_ANON_KEY || window.STREAM_BANDIT_SUPABASE_PUBLISHABLE_KEY || '';
-      if(url && key){
-        window.SB_SUPABASE_CLIENT = window.supabase.createClient(url, key);
+      var cfg = readConfig();
+      if(cfg.url && cfg.key){
+        window.SB_SUPABASE_CLIENT = window.supabase.createClient(cfg.url, cfg.key);
         return window.SB_SUPABASE_CLIENT;
       }
     }
