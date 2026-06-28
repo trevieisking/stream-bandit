@@ -2411,6 +2411,13 @@ async function familyRespond(id,status){
       .maybeSingle();
 
     if(r.error)throw r.error;
+    if(!r.data){
+      toast('No matching incoming family request for this signed-in user.');
+      await loadFamily();
+      renderFamily();
+      renderStats();
+      return;
+    }
 
     toast(status==='accepted'?'Family confirmed.':'Family request declined.');
     await loadFamily();
@@ -2423,6 +2430,11 @@ async function familyRespond(id,status){
 
 async function familyRemove(id){
   try{
+    if(!user){
+      toast('Sign in first.');
+      return;
+    }
+
     if(!confirm('Remove this family link/request?'))return;
 
     const r=await (await client()).from('sb_user_family_relationships')
@@ -2436,10 +2448,18 @@ async function familyRemove(id){
         }
       })
       .eq('id',id)
+      .or('requester_id.eq.'+user.id+',addressee_id.eq.'+user.id)
       .select('*')
       .maybeSingle();
 
     if(r.error)throw r.error;
+    if(!r.data){
+      toast('No matching family row for this signed-in user.');
+      await loadFamily();
+      renderFamily();
+      renderStats();
+      return;
+    }
 
     toast('Family link removed.');
     await loadFamily();
