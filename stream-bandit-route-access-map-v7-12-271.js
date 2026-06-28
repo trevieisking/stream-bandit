@@ -1,12 +1,12 @@
-/* Stream Bandit Route Access Map V7.12.273
+/* Stream Bandit Route Access Map V7.12.274
    Read-only route classes for plan, add-on, owner/admin and editor gates.
    Old URLs preserved. No Supabase writes. No redirects. No billing.
-   V7.12.273 canonicalizes the old Web Builder live-studio route to the current Web Builder Hub.
+   V7.12.274 adds canonical Social route parity with the JS Route Registry.
 */
 (function(){
   'use strict';
 
-  const VERSION = 'V7.12.273 Route Access Map / Web Builder Live Studio Canonical';
+  const VERSION = 'V7.12.274 Route Access Map / Social Route Parity';
 
   const ROUTES = {
     'home-global-helpers-v7-4-4-test.html': { group:'Watch', label:'Home', access:'public', routeClass:'public', feature:'watch_home', mode:'read' },
@@ -39,6 +39,11 @@
     'web-builder-theme-studio-controls-v7-8-9-test.html': { group:'Settings', label:'Settings Studio / Theme Studio', access:'feature_addon', routeClass:'feature_addon', feature:'branding_theme_studio', mode:'theme_projector' },
     'profile-settings-live-ready-v7-12-90-test.html': { group:'Settings', label:'Profile Settings', access:'account_required', routeClass:'account_required', feature:'profile_settings', mode:'profile_settings' },
     'web-builder-account-control-hub-v7-12-263-test.html': { group:'Settings', label:'Web Builder', access:'web_builder', routeClass:'web_builder', feature:'web_builder_starter', minPlan:'creator_growth', mode:'web_builder_doorway' },
+
+    'profile-social-v7-13-001-test.html': { group:'Social', label:'Social Profile', access:'account_required', routeClass:'account_required', feature:'social_profile', mode:'social_profile' },
+    'friends-social-v7-13-001-test.html': { group:'Social', label:'Friends', access:'account_required', routeClass:'account_required', feature:'social_friends', mode:'social_relationships' },
+    'news-feed-social-v7-13-001-test.html': { group:'Social', label:'News Feed', access:'account_required', routeClass:'account_required', feature:'social_feed', mode:'social_feed' },
+    'groups-social-v7-13-001-test.html': { group:'Social', label:'Groups', access:'account_required', routeClass:'account_required', feature:'social_groups', mode:'social_groups_events' },
 
     'policy-documents-centre-v7-12-119-test.html': { group:'Policy', label:'Policy & FAQ Centre', access:'public', routeClass:'public', feature:'policy_centre', mode:'read' },
     'policy-reader-v7-12-119-test.html': { group:'Policy', label:'Published Policy Proof', access:'public', routeClass:'public', feature:'policy_reader', mode:'read' },
@@ -82,6 +87,8 @@
     'web-builder-live-studio-v7-12-93-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
     'web-builder-admin-shell-v6-57-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
     'web-builder-global-helpers-v7-9-3-test.html':'web-builder-account-control-hub-v7-12-263-test.html',
+    'news-feed-social-v7-13-002-test.html':'news-feed-social-v7-13-001-test.html',
+    'news-feed-social-v7-13-003-test.html':'news-feed-social-v7-13-001-test.html',
     'user-dashboard-concept-v6-68-test.html':'user-management-dashboard-v7-11-2-test.html',
     'plans-pricing-matrix-v6-69-test.html':'plans-pricing-feature-shop-v7-11-3-test.html',
     'permissions-matrix-v6-70-test.html':'permissions-matrix-user-management-v7-11-4-test.html'
@@ -102,5 +109,5 @@
     all: all
   };
 
-  document.documentElement.dataset.sbRouteAccessMap = 'v7-12-273';
+  document.documentElement.dataset.sbRouteAccessMap = 'v7-12-274';
 })();
