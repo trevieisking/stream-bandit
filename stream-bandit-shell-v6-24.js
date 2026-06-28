@@ -297,7 +297,8 @@ function ensureFoundation(){
  loadScript('stream-bandit-theme-projector-v7-12-156.js?v='+FOUNDATION);
  loadScript('stream-bandit-route-access-map-v7-12-271.js?v='+FOUNDATION);
  loadScript('stream-bandit-access-projector-v7-12-271.js?v='+FOUNDATION);
- loadScript('stream-bandit-access-gate-v7-12-271.js?v='+FOUNDATION);
+ loadScript('stream-bandit-route-registry-v7-13-001.js?v='+FOUNDATION);
+ loadScript('stream-bandit-auth-entry-gate-v7-13-001.js?v='+FOUNDATION);
  loadScript('stream-bandit-header-shell-v7-12-156.js?v='+FOUNDATION);
  loadScript('stream-bandit-footer-shell-v7-12-156.js?v='+FOUNDATION);
  loadScript('stream-bandit-global-helper-loader-v7-12-126.js?v='+FOUNDATION);
