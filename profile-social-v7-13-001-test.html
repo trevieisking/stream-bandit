@@ -2270,6 +2270,16 @@ async function addFriend(){
       return;
     }
 
+    if(!profile||isOwn()){
+      toast('Open another profile to send a friend request.');
+      return;
+    }
+
+    if(relation){
+      toast('Friend row already exists.');
+      return;
+    }
+
     const r=await (await client()).from('sb_user_friends').insert({
       requester_id:user.id,
       addressee_id:profile.id,
@@ -2289,13 +2299,25 @@ async function addFriend(){
 
 async function acceptFriend(){
   try{
+    if(!relation||relation.addressee_id!==user.id){
+      toast('No incoming friend request for this signed-in user.');
+      await reload();
+      return;
+    }
+
     const r=await (await client()).from('sb_user_friends')
       .update({status:'accepted',updated_at:new Date().toISOString()})
       .eq('id',relation.id)
+      .eq('addressee_id',user.id)
       .select('*')
       .maybeSingle();
 
     if(r.error)throw r.error;
+    if(!r.data){
+      toast('No matching incoming request for this signed-in user.');
+      await reload();
+      return;
+    }
 
     toast('Friend accepted.');
     await reload();
@@ -2306,11 +2328,27 @@ async function acceptFriend(){
 
 async function cancelFriend(){
   try{
+    if(!relation||relation.requester_id!==user.id){
+      toast('No outgoing friend request for this signed-in user.');
+      await reload();
+      return;
+    }
+
     if(!confirm('Cancel this friend request?'))return;
 
-    const r=await (await client()).from('sb_user_friends').delete().eq('id',relation.id);
+    const r=await (await client()).from('sb_user_friends')
+      .delete()
+      .eq('id',relation.id)
+      .eq('requester_id',user.id)
+      .select('*')
+      .maybeSingle();
 
     if(r.error)throw r.error;
+    if(!r.data){
+      toast('No matching outgoing request for this signed-in user.');
+      await reload();
+      return;
+    }
 
     toast('Friend request removed.');
     await reload();
