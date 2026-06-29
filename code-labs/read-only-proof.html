@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Code Labs Read-Only Backend Proof</title>
+<meta name="description" content="Code Labs V90 read-only backend proof. This page checks that the backend can read Code Labs history without writing, deleting, or opening GitHub pull requests.">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v90-readonly-backend-proof-2">
+<style>
+body{font-size:14px}.sidebar{width:260px;padding:10px;gap:9px}.logo{gap:9px;padding-bottom:6px}.logoMark{width:38px;height:38px;border-radius:13px;background-size:36px 36px}.logo b{font-size:16px}.logo small{font-size:11px}.nav{gap:5px}.nav a{grid-template-columns:28px 1fr;gap:8px;border-radius:13px;padding:7px 9px;min-height:46px}.nav span{font-size:15px}.nav small{font-size:10px}.sideBox{padding:9px;border-radius:15px}.sideBox p{font-size:11px}.main{margin-left:260px;width:min(1360px,calc(100vw - 260px));padding:16px}.topbar{margin-bottom:10px}.pill,.badge{padding:5px 8px;font-size:11px}.hero{border-radius:24px;padding:18px;margin-bottom:12px;gap:14px;grid-template-columns:minmax(280px,1fr) minmax(240px,330px)}.hero h1{font-size:clamp(30px,3.9vw,54px);line-height:.96;margin:6px 0}.hero p{font-size:15px;line-height:1.45}.heroCard{border-radius:18px;padding:12px}.heroCard ol{line-height:1.42}.panel,.card,.notice,.danger,.success{border-radius:20px;padding:14px;margin-bottom:10px}.grid,.grid2,.grid3{gap:10px}.actions{gap:7px;margin-top:9px}.btn{min-height:38px;padding:9px 12px;font-size:13px}.item{border-radius:15px;padding:10px}.footerNote{font-size:11px;margin:18px 0}.diffBox{white-space:pre-wrap;overflow:auto;min-height:230px}@media(max-width:980px){.sidebar{width:auto}.main{margin:0;width:100%;padding:12px}.hero{grid-template-columns:1fr}.hero h1{font-size:clamp(30px,10vw,48px)}}
+</style>
+</head>
+<body data-page="read-only-proof">
+<div class="app">
+<aside class="sidebar">
+<div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>Read-only backend proof</small></div></div>
+<nav class="nav"><a href="index.html"><span>🏠</span><div>Home<small>Start here</small></div></a><a href="connection-guide.html"><span>🔗</span><div>Connection Guide<small>One safe click</small></div></a><a class="active" href="read-only-proof.html"><span>🔒</span><div>Read-Only Proof<small>V90 backend</small></div></a><a href="file-lab.html"><span>📄</span><div>File Lab<small>Load or read code</small></div></a><a href="repo-desk.html"><span>🗄️</span><div>Repo Desk<small>Choose action</small></div></a><a href="publish-prep.html"><span>🚀</span><div>GitHub Writer<small>Build handoff</small></div></a></nav>
+<div class="sideBox"><b>V90 rule</b><p>This page reads status only. It must not write to GitHub, change Supabase schema, or open a PR.</p></div>
+<div class="sideBox"><b>Session note</b><p>Branch previews may not share your live Supabase session. The final proof should be tested on the live Code Labs domain.</p></div>
+</aside>
+<main class="main">
+<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>Read-Only Proof</b></div><div><span class="badge good">Read only</span><span class="badge warn">No writes</span></div></div>
+<section class="panel" style="border:2px solid rgba(15,159,110,.24)"><h2>Workflow buttons</h2><p><b>Read-Only Proof</b> · This page checks the backend can read Code Labs history without write actions.</p><div class="actions"><a class="btn ghost" href="connection-guide.html">Previous: Connection Guide</a><a class="btn good" href="file-lab.html">Next: File Lab</a></div></section>
+<section class="hero"><div><span class="pill">V90 Backend Proof</span><h1>Prove the backend can read safely.</h1><p>This test calls the Code Labs read-only Supabase Edge Function. It uses your live Supabase session and returns a summary of Code Labs history rows. It does not write files, change database schema, remove anything, or open GitHub pull requests.</p><div class="actions"><button class="btn primary" id="clRunReadonlyProof" type="button">Run read-only proof</button><button class="btn ghost" id="clRefreshSession" type="button">Check Supabase session</button><a class="btn ghost" href="connection-guide.html">Back to Connection Guide</a></div></div><div class="heroCard"><b>Pass condition</b><ol><li>Status says backend proof passed.</li><li>The result says read_only is true.</li><li>wrote_database is false.</li><li>wrote_github is false.</li><li>opened_pr is false.</li></ol></div></section>
+<section class="panel"><h2>Current proof status</h2><div class="actions"><span id="clReadonlyStatus" class="badge warn">Not checked</span><span id="clReadonlySession" class="badge warn">Session unknown</span></div><div id="clReadonlyHelp" class="notice"><p>Click <b>Check Supabase session</b> first. Then run the read-only proof.</p></div></section>
+<section class="panel"><h2>Backend response</h2><pre id="clReadonlyOutput" class="diffBox">No backend response yet.</pre></section>
+<section class="panel"><h2>What this test is allowed to do</h2><div class="grid3"><div class="item"><b>Read Code Labs history</b><p>Reads small summaries from Code Labs Supabase tables using your session.</p></div><div class="item"><b>Report safety flags</b><p>Reports that it did not write to the database, GitHub, or PRs.</p></div><div class="item"><b>Prepare next proof</b><p>Gives us a safe checkpoint before any future write tools.</p></div></div></section>
+<section class="panel"><h2>What this test must not do</h2><div class="grid3"><div class="item"><b>No GitHub write</b><p>No branch, file change, PR, merge, or repo action happens.</p></div><div class="item"><b>No Supabase schema change</b><p>No table, auth, storage, RLS, or migration change happens.</p></div><div class="item"><b>No Stream Bandit change</b><p>No Stream Bandit app file is touched by this proof.</p></div></div></section>
+<div class="footerNote">Code Labs V90 · read-only backend proof · live Supabase session required. This page intentionally does not load the old Code Labs page renderer, so its V90 buttons remain visible.</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+'use strict';
+var URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+var PUB='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+var FN=URL+'/functions/v1/code-labs-readonly-proof';
+function $(s){return document.querySelector(s)}
+function out(v){var el=$('#clReadonlyOutput');if(el)el.textContent=typeof v==='string'?v:JSON.stringify(v,null,2)}
+function set(id,msg,kind){var el=$(id);if(el){el.className='badge '+(kind||'warn');el.textContent=msg}}
+function help(html){var el=$('#clReadonlyHelp');if(el)el.innerHTML=html}
+function toast(msg){var t=$('#toast');if(!t){alert(msg);return}t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2600)}
+function loadScript(){return new Promise(function(resolve,reject){if(window.supabase&&window.supabase.createClient)return resolve();var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
+async function client(){await loadScript();if(!window.CL_SB){window.CL_SB=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}return window.CL_SB}
+async function session(){var sb=await client();var res=await sb.auth.getSession();return {sb:sb,session:res&&res.data?res.data.session:null,error:res.error}}
+async function checkSession(){try{set('#clReadonlySession','Checking','warn');var s=await session();if(s.session&&s.session.access_token){set('#clReadonlySession','Supabase session ready','good');help('<p><b>Ready:</b> Supabase session found. You can run the read-only backend proof.</p>');return s}set('#clReadonlySession','No Supabase session','warn');help('<p><b>Hold:</b> no Supabase session on this page. Branch previews often do not share the live Code Labs session. Test this page on the live domain after promotion.</p>');return s}catch(err){set('#clReadonlySession','Session check failed','bad');help('<p><b>Session check failed:</b> '+String(err.message||err)+'</p>');return {session:null,error:err}}}
+async function runProof(){try{set('#clReadonlyStatus','Running proof','warn');var s=await checkSession();if(!s.session||!s.session.access_token){set('#clReadonlyStatus','No session','bad');toast('Supabase session required.');return}var r=await fetch(FN,{method:'POST',headers:{'Authorization':'Bearer '+s.session.access_token,'apikey':PUB,'Content-Type':'application/json'},body:JSON.stringify({source:'code-labs-v90-read-only-proof'})});var text=await r.text();var data;try{data=JSON.parse(text)}catch(e){data={ok:false,raw:text}}out(data);if(r.ok&&data.ok&&data.read_only===true&&data.wrote_database===false&&data.wrote_github===false&&data.opened_pr===false&&data.deleted_anything===false){set('#clReadonlyStatus','Backend proof passed','good');help('<p><b>PASS:</b> backend read-only proof returned safe flags. It did not write to GitHub or Supabase.</p>');toast('Read-only backend proof passed.');}else{set('#clReadonlyStatus','Proof needs review','bad');help('<p><b>Review:</b> backend response did not match every pass flag. Send a screenshot.</p>')}}catch(err){set('#clReadonlyStatus','Proof failed','bad');out(String(err.message||err));help('<p><b>Proof failed:</b> '+String(err.message||err)+'</p>')}}
+setTimeout(checkSession,450);var refresh=$('#clRefreshSession');var run=$('#clRunReadonlyProof');if(refresh)refresh.onclick=checkSession;if(run)run.onclick=runProof;
+})();
+</script>
+</body>
+</html>
