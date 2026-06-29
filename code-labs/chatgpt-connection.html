@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Code Labs ChatGPT Connection Stub</title>
+<meta name="description" content="Code Labs V92 ChatGPT connection stub. Tests the read-only get_code_labs_context tool contract.">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v92-connection-stub-2">
+<style>
+body{font-size:14px}.sidebar{width:260px;padding:10px;gap:9px}.logo{gap:9px;padding-bottom:6px}.logoMark{width:38px;height:38px;border-radius:13px;background-size:36px 36px}.logo b{font-size:16px}.logo small{font-size:11px}.nav{gap:5px}.nav a{grid-template-columns:28px 1fr;gap:8px;border-radius:13px;padding:7px 9px;min-height:46px}.nav span{font-size:15px}.nav small{font-size:10px}.sideBox{padding:9px;border-radius:15px}.sideBox p{font-size:11px}.main{margin-left:260px;width:min(1360px,calc(100vw - 260px));padding:16px}.topbar{margin-bottom:10px}.pill,.badge{padding:5px 8px;font-size:11px}.hero{border-radius:24px;padding:18px;margin-bottom:12px;gap:14px;grid-template-columns:minmax(280px,1fr) minmax(240px,330px)}.hero h1{font-size:clamp(30px,3.9vw,54px);line-height:.96;margin:6px 0}.hero p{font-size:15px;line-height:1.45}.heroCard{border-radius:18px;padding:12px}.heroCard ol{line-height:1.42}.panel,.notice{border-radius:20px;padding:14px;margin-bottom:10px}.grid3{gap:10px}.actions{gap:7px;margin-top:9px}.btn{min-height:38px;padding:9px 12px;font-size:13px}.item{border-radius:15px;padding:10px}.footerNote{font-size:11px;margin:18px 0}.diffBox{white-space:pre-wrap;overflow:auto;min-height:320px}textarea{min-height:260px;font-size:12px}@media(max-width:980px){.sidebar{width:auto}.main{margin:0;width:100%;padding:12px}.hero{grid-template-columns:1fr}.hero h1{font-size:clamp(30px,10vw,48px)}}
+</style>
+</head>
+<body data-page="chatgpt-connection">
+<div class="app">
+<aside class="sidebar">
+<div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>ChatGPT connection</small></div></div>
+<nav class="nav"><a href="index.html"><span>🏠</span><div>Home<small>Start here</small></div></a><a href="connection-guide.html"><span>🔗</span><div>Connection Guide<small>One safe click</small></div></a><a href="read-only-proof.html"><span>🔒</span><div>Read-Only Proof<small>V90 backend</small></div></a><a href="context-packet.html"><span>📦</span><div>Context Packet<small>V91 read</small></div></a><a class="active" href="chatgpt-connection.html"><span>🤝</span><div>ChatGPT Connect<small>V92 stub</small></div></a><a href="repo-desk.html"><span>🗄️</span><div>Repo Desk<small>Choose action</small></div></a></nav>
+<div class="sideBox"><b>V92 rule</b><p>This tests one read-only tool contract: get_code_labs_context. No repo write tools exist here.</p></div>
+</aside>
+<main class="main">
+<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>ChatGPT Connect</b></div><div><span class="badge good">Read tool</span><span class="badge warn">No writes</span></div></div>
+<section class="hero"><div><span class="pill">V92 Connection Stub</span><h1>Give ChatGPT its first Code Labs tool.</h1><p>This page tests the first tool-style connection: <b>get_code_labs_context</b>. It lists the tool, calls it, and shows the result using your live Supabase session.</p><div class="actions"><button class="btn primary" id="clListTools" type="button">List tool</button><button class="btn good" id="clCallTool" type="button">Call get_code_labs_context</button><button class="btn ghost" id="clCopyToolResult" type="button">Copy result</button></div></div><div class="heroCard"><b>Pass condition</b><ol><li>Tool list shows get_code_labs_context.</li><li>Tool call returns ok true.</li><li>read_only is true.</li><li>Write flags are false.</li><li>No PR or file action happens.</li></ol></div></section>
+<section class="panel"><h2>Status</h2><div class="actions"><span id="clToolStatus" class="badge warn">Not checked</span><span id="clToolSession" class="badge warn">Session unknown</span></div><div id="clToolHelp" class="notice"><p>Click <b>List tool</b>, then <b>Call get_code_labs_context</b>.</p></div></section>
+<section class="panel"><h2>Tool list / response</h2><pre id="clToolRaw" class="diffBox">No response yet.</pre></section>
+<section class="panel"><h2>ChatGPT tool result</h2><textarea id="clToolPacket" readonly>Tool result not loaded yet.</textarea></section>
+<div class="footerNote">Code Labs V92 · first read-only ChatGPT tool contract · no write functions.</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+'use strict';
+var URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+var PUB='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+var FN=URL+'/functions/v1/code-labs-mcp-stub';
+function $(s){return document.querySelector(s)}
+function set(id,msg,kind){var el=$(id);if(el){el.className='badge '+(kind||'warn');el.textContent=msg}}
+function help(html){var el=$('#clToolHelp');if(el)el.innerHTML=html}
+function toast(msg){var t=$('#toast');if(!t){alert(msg);return}t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400)}
+function show(v){$('#clToolRaw').textContent=typeof v==='string'?v:JSON.stringify(v,null,2)}
+function loadScript(){return new Promise(function(resolve,reject){if(window.supabase&&window.supabase.createClient)return resolve();var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
+async function token(){await loadScript();var sb=window.CL_SB||window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});window.CL_SB=sb;var r=await sb.auth.getSession();var sess=r&&r.data?r.data.session:null;if(sess&&sess.access_token){set('#clToolSession','Supabase session ready','good');return sess.access_token}set('#clToolSession','No Supabase session','bad');throw new Error('No Supabase session on this page')}
+async function listTools(){try{set('#clToolStatus','Listing tool','warn');var access=await token();var r=await fetch(FN,{method:'POST',headers:{'Authorization':'Bearer '+access,'apikey':PUB,'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list'})});var data=await r.json();show(data);var tools=(data.result&&data.result.tools)||data.tools||[];if(tools[0]&&tools[0].name==='get_code_labs_context'){set('#clToolStatus','Tool listed','good');help('<p><b>Tool listed:</b> get_code_labs_context is available as read-only.</p>')}else{set('#clToolStatus','Tool list needs review','bad')}}catch(e){set('#clToolStatus','List failed','bad');show(String(e.message||e));help('<p><b>Hold:</b> live Supabase session is needed. Test this on the live domain.</p>')}}
+async function callTool(){try{set('#clToolStatus','Calling tool','warn');var access=await token();var r=await fetch(FN,{method:'POST',headers:{'Authorization':'Bearer '+access,'apikey':PUB,'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'get_code_labs_context',arguments:{limit:5}}})});var data=await r.json();show(data);var result=data.result||data;var packet=result.chatgpt_context_packet||'';$('#clToolPacket').value=packet||'No tool packet returned.';if(result.ok&&result.read_only===true&&result.wrote_database===false&&result.wrote_github===false&&result.opened_pr===false&&result.deleted_anything===false&&packet){set('#clToolStatus','Tool call passed','good');help('<p><b>PASS:</b> ChatGPT-style read tool returned Code Labs context safely.</p>');toast('V92 tool call passed.')}else{set('#clToolStatus','Tool call needs review','bad');help('<p><b>Review:</b> tool call did not return all safe flags.</p>')}}catch(e){set('#clToolStatus','Call failed','bad');show(String(e.message||e));help('<p><b>Hold:</b> live Supabase session is needed. Test this on the live domain.</p>')}}
+async function copyResult(){var text=$('#clToolPacket').value;if(!text||text.indexOf('CODE LABS')===-1){toast('Call the tool first.');return}try{await navigator.clipboard.writeText(text);toast('Tool result copied.')}catch(e){$('#clToolPacket').focus();$('#clToolPacket').select();document.execCommand('copy');toast('Tool result selected/copied.')}}
+$('#clListTools').onclick=listTools;$('#clCallTool').onclick=callTool;$('#clCopyToolResult').onclick=copyResult;setTimeout(listTools,450);
+})();
+</script>
+</body>
+</html>
