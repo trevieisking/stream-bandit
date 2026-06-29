@@ -1,4 +1,4 @@
-/* Code Labs V1.9.0 - About page added */
+/* Code Labs V2.0 - visible flow with GitHub Writer */
 (function(){
   var ICON='assets/code-labs-icon.svg';
   var FLOW=[
@@ -8,28 +8,31 @@
     ['patch-desk','Patch Desk','Paste fixed file','patch-desk.html','🧩'],
     ['preview-test','Preview + Test','Check before live','preview-test.html','🧪'],
     ['checkpoints','Checkpoints','Rollback saved','checkpoints.html','💾'],
-    ['repo-desk','Repo Desk','GitHub file work','repo-desk.html','🗄️']
+    ['repo-desk','Repo Desk','Choose action','repo-desk.html','🗄️'],
+    ['publish-prep','GitHub Writer','Build handoff','publish-prep.html','🚀'],
+    ['github-tracker','GitHub Tracker','PR and preview','github-tracker.html','🔎']
   ];
   var ADV=[
     ['about','About','What Code Labs does','about.html','ℹ️'],
     ['patch-lab','Patch Lab','Exact line tool','patch-lab.html','🧠'],
     ['checklist-builder','Checklist Builder','Build pass lists','checklist-builder.html','✅'],
-    ['help','Help + Tools','All utilities','help.html','🛠️']
+    ['ai-handoff','AI Handoff','Review package','ai-handoff.html','📤'],
+    ['help','Help + Tools','All utilities','help.html','🛠️'],
+    ['faq','FAQ','Clear answers','faq.html','❓']
   ];
-  var ALL=FLOW.concat(ADV);
-  var FLOW_INDEX={};
+  var ALL=FLOW.concat(ADV), FLOW_INDEX={};
   FLOW.forEach(function(item,i){FLOW_INDEX[item[0]]=i;});
   var RESCUE=['rescue-room','Rescue Room','Repair safely','rescue-room.html','🛟'];
   var MENU_FLOW=FLOW.slice(0,2).concat([RESCUE],FLOW.slice(2));
   var NEXT={
     'index':'file-lab','start-guide':'file-lab','setup':'file-lab','project-picker':'file-lab','fix-wizard':'file-lab',
     'file-lab':'rescue-room','rescue-room':'v20','packet-builder':'v20','v20':'patch-desk',
-    'patch-desk':'preview-test','patch-lab':'preview-test','checklist-builder':'help','preview-test':'checkpoints','checkpoints':'repo-desk','repo-desk':'index',
-    'ai-handoff':'index','publish-prep':'index','github-tracker':'index','connector-status':'index','help':'about','about':'index'
+    'patch-desk':'preview-test','patch-lab':'preview-test','checklist-builder':'help','preview-test':'checkpoints','checkpoints':'repo-desk','repo-desk':'publish-prep','publish-prep':'github-tracker','github-tracker':'index',
+    'ai-handoff':'repo-desk','connector-status':'repo-desk','help':'about','about':'file-lab','faq':'file-lab'
   };
   var PREV={
-    'index':'repo-desk','file-lab':'index','v20':'file-lab','patch-desk':'v20','patch-lab':'patch-desk','checklist-builder':'patch-lab','preview-test':'patch-desk','checkpoints':'preview-test','repo-desk':'checkpoints',
-    'start-guide':'index','setup':'index','project-picker':'index','fix-wizard':'index','rescue-room':'file-lab','packet-builder':'file-lab','ai-handoff':'patch-desk','publish-prep':'patch-desk','github-tracker':'patch-desk','connector-status':'index','help':'index','about':'help'
+    'index':'github-tracker','file-lab':'index','v20':'rescue-room','patch-desk':'v20','patch-lab':'patch-desk','checklist-builder':'patch-lab','preview-test':'patch-desk','checkpoints':'preview-test','repo-desk':'checkpoints','publish-prep':'repo-desk','github-tracker':'publish-prep',
+    'start-guide':'index','setup':'index','project-picker':'index','fix-wizard':'index','rescue-room':'file-lab','packet-builder':'rescue-room','ai-handoff':'patch-desk','connector-status':'repo-desk','help':'index','about':'help','faq':'help'
   };
   function page(){return document.body.getAttribute('data-page')||'index';}
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -40,78 +43,13 @@
   function findFlow(id){if(id==='rescue-room')return RESCUE;return ALL.filter(function(x){return x[0]===id;})[0]||FLOW[0];}
   function flowOnly(id){if(id==='rescue-room')return RESCUE;return FLOW.filter(function(x){return x[0]===id;})[0]||null;}
   function link(item,id){var a=document.createElement('a');a.href=item[3];if(item[0]===id)a.className='active';a.innerHTML='<span>'+item[4]+'</span><div>'+item[1]+'<small>'+item[2]+'</small></div>';return a;}
-  function ensureFavicon(){
-    var icon=document.querySelector('link[rel="icon"]');
-    if(!icon){icon=document.createElement('link');icon.rel='icon';document.head.appendChild(icon);}
-    icon.type='image/svg+xml';icon.href=ICON;
-  }
-  function simplifyMenu(){
-    var nav=document.querySelector('.nav');if(!nav)return;
-    var id=page();while(nav.firstChild)nav.removeChild(nav.firstChild);
-    var label=document.createElement('div');label.className='navGroupLabel';label.style.display='block';label.textContent='Workflow';nav.appendChild(label);
-    MENU_FLOW.forEach(function(item){nav.appendChild(link(item,id));});
-    var adv=document.createElement('div');adv.className='navGroupLabel';adv.style.display='block';adv.textContent='Advanced';nav.appendChild(adv);
-    ADV.forEach(function(item){nav.appendChild(link(item,id));});
-  }
-  function updatePageChrome(){
-    var id=page(), item=findFlow(id), title=item[1];
-    document.title=id==='index'?'Code Labs':'Code Labs - '+title;
-    var crumbs=document.querySelector('.crumbs');
-    if(crumbs){crumbs.innerHTML='<span>Code Labs</span><span>›</span><b>'+esc(title)+'</b>';}
-  }
-  function flowInfo(id){
-    var next=flowOnly(NEXT[id])||FLOW[1], prev=flowOnly(PREV[id])||FLOW[0];
-    var pos=FLOW_INDEX[id];
-    var step=(typeof pos==='number')?pos+1:'Advanced';
-    var title=(typeof pos==='number')?FLOW[pos][1]:(id==='patch-lab'?'Patch Lab advanced tool':id==='help'?'Help + Tools':id==='about'?'About Code Labs':id==='rescue-room'?'Rescue Room':id==='checklist-builder'?'Checklist Builder':'Extra tool');
-    var note=(typeof pos==='number')?'This is part '+step+' of '+FLOW.length+' in the main Code Labs flow.':(id==='patch-lab'?'Patch Lab is kept as an advanced exact-line tool. Patch Desk is the main workflow patching page.':id==='help'?'Help keeps the useful tools and feedback in one place.':id==='about'?'About explains how Code Labs helps non-coders patch website files with ChatGPT guidance and controlled GitHub follow-up.':id==='rescue-room'?'Rescue Room checks and repairs after File Lab before Workflow Hub.':id==='checklist-builder'?'Checklist Builder creates copyable pass and promotion lists after Code Labs pages pass.':'This extra page is not in the main flow. Use Previous or Next to return to the simple workflow.');
-    if(id==='repo-desk'){note='Repo Desk is the final workflow step for controlled GitHub file work after preview and checkpoint notes are saved.';}
-    return {next:next,prev:prev,step:step,title:title,note:note};
-  }
-  function addNextFlowPanel(){
-    var main=document.querySelector('.main');if(!main||document.querySelector('#clNextFlowPanel'))return;
-    var id=page(), info=flowInfo(id);
-    var panel=document.createElement('section');panel.className='panel';panel.id='clNextFlowPanel';panel.style.border='2px solid rgba(15,159,110,.28)';
-    panel.innerHTML='<h2>Workflow buttons</h2><p><b>'+esc(info.title)+'</b> · '+esc(info.note)+'</p><div class="actions"><a class="btn ghost" href="'+info.prev[3]+'">Previous: '+esc(info.prev[1])+'</a><a class="btn good" href="'+info.next[3]+'">Next: '+esc(info.next[1])+'</a></div>';
-    var top=document.querySelector('.topbar');
-    if(top&&top.parentNode){top.parentNode.insertBefore(panel,top.nextSibling);return;}
-    var first=document.querySelector('.hero,.panel');
-    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first);}else{main.insertBefore(panel,main.firstChild);}
-  }
-  function simpleText(){
-    textReplace(document.body,'Code Labs V1 Manual Rescue Build','Code Labs simple workflow build');
-    textReplace(document.body,'Local manual mode · No live writes from these pages.','Simple workflow · browser prepares, ChatGPT/GitHub handles repo work.');
-    textReplace(document.body,'Future app links','Extra connector info');
-    textReplace(document.body,'Manual rescue works now. GitHub and Supabase are planned connector layers.','Use the simple workflow. GitHub connector work happens through ChatGPT; Supabase history is separate.');
-    textReplace(document.body,'GitHub later','GitHub through ChatGPT');
-    textReplace(document.body,'Supabase later','Supabase history separate');
-  }
-  function addPublicHelpGuide(){
-    if(page()!=='help'||document.querySelector('#clPublicHelpGuide'))return;
-    var main=document.querySelector('.main');if(!main)return;
-    var panel=document.createElement('section');panel.className='panel';panel.id='clPublicHelpGuide';panel.style.border='2px solid rgba(36,91,255,.22)';
-    panel.innerHTML='<h2>Code Labs public guide</h2><p>Use this page when you are not sure what to copy, what to preserve, or whether a change is safe to promote.</p><div class="grid3"><div class="item"><b>Use in 60 seconds</b><p>Start in File Lab, use Rescue Room if needed, build the request in Workflow Hub, paste the fixed file in Patch Desk, preview it, then save a checkpoint.</p><span class="badge good">Normal flow</span></div><div class="item"><b>Promotion checklist</b><p>Only promote after the page opens, menu/buttons work, mobile looks acceptable, no obvious error text is visible, and a checkpoint exists.</p><span class="badge warn">Before live</span></div><div class="item"><b>Problem report</b><p>Tell ChatGPT the page, what you clicked, what happened, what must not change, and paste any copied report from these tools.</p><span class="badge">Copy evidence</span></div></div><div class="notice"><p><b>Safe rule:</b> the tested workflow stays locked. Repo Desk is the final controlled GitHub file-work step after Checkpoints.</p></div>';
-    var first=document.querySelector('#clBackendVsHosting,.panel');
-    if(first&&first.parentNode){first.parentNode.insertBefore(panel,first);}else{main.appendChild(panel);}
-  }
-  function addHelpFeedback(){
-    if(page()!=='help'||document.querySelector('#clHelpFeedback'))return;
-    var main=document.querySelector('.main');if(!main)return;
-    var panel=document.createElement('section');panel.className='panel';panel.id='clHelpFeedback';
-    panel.innerHTML='<h2>Feedback</h2><p>Use this to tell ChatGPT what is useful, confusing, broken, or missing. It saves in this browser only and can be copied into ChatGPT.</p><div class="grid2"><label>Rating<select id="clFeedbackRating"><option>PASS - useful</option><option>OK - needs polish</option><option>FAIL - confusing</option></select></label><label>Page or tool<input id="clFeedbackPage" placeholder="Example: Patch Desk, File Lab, Help"></label></div><label>What worked?<textarea id="clFeedbackWorked" class="mid" placeholder="What helped you?"></textarea></label><label>What needs fixing?<textarea id="clFeedbackFix" class="mid" placeholder="What was confusing or missing?"></textarea></label><div class="actions"><button class="btn primary" id="clSaveFeedback">Save feedback</button><button class="btn ghost" id="clCopyFeedback">Copy feedback</button></div><textarea id="clFeedbackOutput" class="mid" readonly placeholder="Saved feedback report will appear here"></textarea>';
-    main.appendChild(panel);
-    function report(){return ['CODE LABS FEEDBACK','Rating: '+(document.querySelector('#clFeedbackRating')||{}).value,'Page/tool: '+(document.querySelector('#clFeedbackPage')||{}).value,'','What worked:',(document.querySelector('#clFeedbackWorked')||{}).value,'','What needs fixing:',(document.querySelector('#clFeedbackFix')||{}).value,'','Rule: keep Code Labs simple and useful for non-coders.'].join('\n');}
-    function save(){var out=document.querySelector('#clFeedbackOutput');var text=report();if(out)out.value=text;localStorage.setItem('codeLabsFeedbackLatest',text);toast('Feedback saved');}
-    document.querySelector('#clSaveFeedback').onclick=save;
-    document.querySelector('#clCopyFeedback').onclick=function(){save();copyText((document.querySelector('#clFeedbackOutput')||{}).value||'');};
-    var old=localStorage.getItem('codeLabsFeedbackLatest');if(old){document.querySelector('#clFeedbackOutput').value=old;}
-  }
-  function addHelpShortcut(){
-    if(document.querySelector('#clHelpShortcut'))return;
-    var main=document.querySelector('.main');if(!main)return;
-    var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Rescue Room → Workflow Hub → Patch Desk → Preview + Test → Checkpoints → Repo Desk. About explains the purpose for users and search summaries. Repo Desk is the final controlled GitHub file-work step for read/add/change/delete requests and PR tracking. Patch Lab stays as an advanced exact-line tool. Checklist Builder creates pass lists after pages pass. Help keeps all useful extra tools and feedback.';
-    main.appendChild(div);
-  }
-  function run(){ensureFavicon();simplifyMenu();updatePageChrome();simpleText();addNextFlowPanel();addPublicHelpGuide();addHelpFeedback();addHelpShortcut();}
-  loadHistory();setTimeout(run,120);setTimeout(run,500);setTimeout(run,1000);setTimeout(run,1800);
+  function ensureFavicon(){var icon=document.querySelector('link[rel="icon"]');if(!icon){icon=document.createElement('link');icon.rel='icon';document.head.appendChild(icon);}icon.type='image/svg+xml';icon.href=ICON;}
+  function simplifyMenu(){var nav=document.querySelector('.nav');if(!nav)return;var id=page();while(nav.firstChild)nav.removeChild(nav.firstChild);var label=document.createElement('div');label.className='navGroupLabel';label.style.display='block';label.textContent='Workflow';nav.appendChild(label);MENU_FLOW.forEach(function(item){nav.appendChild(link(item,id));});var adv=document.createElement('div');adv.className='navGroupLabel';adv.style.display='block';adv.textContent='Tools';nav.appendChild(adv);ADV.forEach(function(item){nav.appendChild(link(item,id));});}
+  function updatePageChrome(){var id=page(), item=findFlow(id), title=item[1];document.title=id==='index'?'Code Labs':'Code Labs - '+title;var crumbs=document.querySelector('.crumbs');if(crumbs){crumbs.innerHTML='<span>Code Labs</span><span>›</span><b>'+esc(title)+'</b>';}}
+  function flowInfo(id){var next=flowOnly(NEXT[id])||FLOW[1], prev=flowOnly(PREV[id])||FLOW[0], pos=FLOW_INDEX[id], item=findFlow(id), note;if(typeof pos==='number'){note='This is step '+(pos+1)+' of '+FLOW.length+' in the main Code Labs flow.';}else{note='This tool page is outside the main flow. Use Previous or Next to return.';}if(id==='repo-desk')note='Repo Desk chooses the GitHub action before the final handoff is built.';if(id==='publish-prep')note='GitHub Writer builds the final handoff for add, change, or verified cleanup work.';if(id==='github-tracker')note='GitHub Tracker records PR and preview links after GitHub responds.';return {next:next,prev:prev,title:item[1],note:note};}
+  function addNextFlowPanel(){var main=document.querySelector('.main');if(!main||document.querySelector('#clNextFlowPanel'))return;var id=page(), info=flowInfo(id);var panel=document.createElement('section');panel.className='panel';panel.id='clNextFlowPanel';panel.style.border='2px solid rgba(15,159,110,.28)';panel.innerHTML='<h2>Workflow buttons</h2><p><b>'+esc(info.title)+'</b> · '+esc(info.note)+'</p><div class="actions"><a class="btn ghost" href="'+info.prev[3]+'">Previous: '+esc(info.prev[1])+'</a><a class="btn good" href="'+info.next[3]+'">Next: '+esc(info.next[1])+'</a></div>';var top=document.querySelector('.topbar');if(top&&top.parentNode){top.parentNode.insertBefore(panel,top.nextSibling);return;}var first=document.querySelector('.hero,.panel');if(first&&first.parentNode){first.parentNode.insertBefore(panel,first);}else{main.insertBefore(panel,main.firstChild);}}
+  function simpleText(){textReplace(document.body,'Code Labs V1 Manual Rescue Build','Code Labs simple workflow build');textReplace(document.body,'Local manual mode · No live writes from these pages.','Simple workflow · browser prepares, ChatGPT/GitHub handles repo work.');textReplace(document.body,'Future app links','Extra connector info');textReplace(document.body,'Manual rescue works now. GitHub and Supabase are planned connector layers.','Use the simple workflow. GitHub connector work happens through ChatGPT; Supabase history is separate.');textReplace(document.body,'Publish Prep','GitHub Writer');textReplace(document.body,'Safe Change','GitHub Change');}
+  function addHelpShortcut(){if(document.querySelector('#clHelpShortcut'))return;var main=document.querySelector('.main');if(!main)return;var div=document.createElement('div');div.id='clHelpShortcut';div.className='footerNote';div.innerHTML='Simple Code Labs flow: Home → File Lab → Rescue Room → Workflow Hub → Patch Desk → Preview + Test → Checkpoints → Repo Desk → GitHub Writer → GitHub Tracker. Repo Desk chooses the action. GitHub Writer builds the final handoff. GitHub Tracker records PR and preview links.';main.appendChild(div);}
+  function run(){ensureFavicon();simplifyMenu();updatePageChrome();simpleText();addNextFlowPanel();addHelpShortcut();}
+  loadHistory();setTimeout(run,120);setTimeout(run,500);setTimeout(run,1000);setTimeout(run,1800);setTimeout(run,2800);
 })();
