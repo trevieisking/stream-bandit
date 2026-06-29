@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Stream Bandit Social Media Upgrade Checklist V7.13.107</title>
+<title>Stream Bandit Social Media Upgrade Checklist V7.13.108</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <style>
 :root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#210812;--card:#ffffff0f;--line:#ffffff24;--text:#f7fbff;--muted:#b8c3df;--good:#22d3a6;--purple:#7c3cff;--warn:#ffb142;--bad:#ff4d6d;--blue:#41e8ff;--pink:#ff2d85}*{box-sizing:border-box}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;padding:14px;background:radial-gradient(circle at 0 0,#22d3a633,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff40,transparent 38%),var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}.wrap{max-width:1500px;margin:auto}.hero,.panel,.task{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 16px 55px #0007;padding:16px;margin:0 0 14px}.hero{display:grid;grid-template-columns:minmax(280px,1fr) minmax(260px,430px);gap:14px}.task{background:var(--card);box-shadow:none}.pass{border-color:#22d3a677}.hold{border-color:#ffb14277}.blueBorder{border-color:#41e8ff77}h1{font-size:clamp(36px,5vw,72px);line-height:.92;letter-spacing:-.06em;margin:8px 0}h2{margin:0 0 10px}h3{margin:0 0 7px}p,label,small,li{color:var(--muted);line-height:1.45}.badge,.pill{display:inline-flex;border:1px solid #ffffff24;border-radius:999px;background:#ffffff0d;color:#dbe7ff;font-weight:950;padding:6px 9px;font-size:12px;margin:2px}.ok{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.hot{background:#ff2d8524;border-color:#ff2d8566;color:#ffd2e8}.blue{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}.task b{color:#baf7df}.top{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}.num{width:40px;height:40px;border-radius:15px;background:linear-gradient(135deg,var(--good),var(--purple));color:#061017;display:grid;place-items:center;font-weight:1000}.checks{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}.checks span{border:1px solid #ffffff20;border-radius:999px;background:#ffffff0d;padding:8px 10px;font-weight:900}.source{white-space:pre-wrap;word-break:break-word;background:#0006;border:1px solid #ffffff18;border-radius:16px;padding:12px;color:#dfffee;font-family:ui-monospace,Consolas,monospace}@media(max-width:760px){.hero,.top{grid-template-columns:1fr}.num{width:auto;height:auto;padding:8px}}
@@ -16,9 +16,10 @@
     <span class="badge ok">Social Media Group passed</span>
     <span class="badge ok">Platform entry promoted</span>
     <span class="badge ok">News Feed actions passed</span>
+    <span class="badge ok">Friends profile share passed</span>
     <span class="badge blue">User smoke test complete</span>
     <h1>Social Media Upgrade Checklist</h1>
-    <p>Current project record for the Stream Bandit Social Media upgrade. Promotion is visible and the News Feed Share/Edit/Remove pass is now recorded after user testing confirmed delete works through the social RPC path.</p>
+    <p>Current project record for the Stream Bandit Social Media upgrade. Promotion is visible, News Feed Share/Edit/Remove passed, and Friends Share Profile passed on visible profile cards.</p>
   </div>
   <div class="task pass">
     <h2>Final status</h2>
@@ -26,6 +27,7 @@
     <p><b>Platform home:</b> index.html V7.13.106</p>
     <p><b>Promotion commit:</b> 8428426a78d01f9ddb1d26a8b87db30804c2087d</p>
     <p><b>News Feed actions commit:</b> ffa713b94760356db590bba28ed55f7de26eb80f</p>
+    <p><b>Friends profile share commit:</b> 9f4b325ad87a68476b94ee0a9a01c7774e9e0494</p>
   </div>
 </section>
 
@@ -33,7 +35,7 @@
   <h2>Canonical Social URLs</h2>
   <div class="grid">
     <div class="task pass"><b>Social Profile</b><p>profile-social-v7-13-001-test.html</p><span class="pill ok">Passed</span></div>
-    <div class="task pass"><b>Friends</b><p>friends-social-v7-13-001-test.html</p><span class="pill ok">Passed</span></div>
+    <div class="task pass"><b>Friends</b><p>friends-social-v7-13-001-test.html</p><span class="pill ok">Passed</span><span class="pill ok">Share Profile passed</span></div>
     <div class="task pass"><b>News Feed</b><p>news-feed-social-v7-13-001-test.html</p><span class="pill ok">Passed</span><span class="pill ok">Share/Edit/Remove passed</span></div>
     <div class="task pass"><b>Groups</b><p>groups-social-v7-13-001-test.html</p><span class="pill ok">Passed</span></div>
   </div>
@@ -45,9 +47,9 @@
     <div class="task pass"><div class="top"><div class="num">19</div><div><h3>Make Social Profile social-first</h3><p>Passed by user test. Profile still works and remains connected.</p></div></div><div class="checks"><span>Changed</span><span>Passed</span></div></div>
     <div class="task pass"><div class="top"><div class="num">20</div><div><h3>Make Friends discovery privacy-aware</h3><p>Passed by user test. Friends and Social Profile links work.</p></div></div><div class="checks"><span>Changed</span><span>Passed</span></div></div>
     <div class="task pass"><div class="top"><div class="num">21</div><div><h3>Disable Social Profile image upload upsert</h3><p>Storage upload uses no-overwrite mode in the supplied profile replacement. Profile smoke testing passed.</p></div></div><div class="checks"><span>Changed</span><span>Passed</span></div></div>
-    <div class="task pass"><div class="top"><div class="num">22</div><div><h3>External Social share helper</h3><p>Share helper and visible Share action passed on News Feed. Public content can be shared; private/friends-only/group-members-only content is blocked from external share.</p></div></div><div class="checks"><span>Changed</span><span>Passed</span></div></div>
+    <div class="task pass"><div class="top"><div class="num">22</div><div><h3>External Social share helper</h3><p>Share helper passed on News Feed and Friends profile cards. Public content can be shared; private/friends-only/group-members-only content is blocked from external share.</p></div></div><div class="checks"><span>Changed</span><span>Passed</span></div></div>
     <div class="task pass"><div class="top"><div class="num">23</div><div><h3>News Feed own edit/delete</h3><p>Share, Edit Post and Remove Post passed on News Feed. Delete now uses <code>sb_social_remove_own_post</code>; edit uses <code>sb_social_update_own_post</code>.</p></div></div><div class="checks"><span>Changed</span><span>Passed</span></div></div>
-    <div class="task pass"><div class="top"><div class="num">24</div><div><h3>User smoke test all Social pages</h3><p>User confirmed every button, tab, menu and page link tested from the platform home worked.</p></div></div><div class="checks"><span>Passed</span></div></div>
+    <div class="task pass"><div class="top"><div class="num">24</div><div><h3>User smoke test all Social pages</h3><p>User confirmed platform links, News Feed actions, and Friends Share Profile passed.</p></div></div><div class="checks"><span>Passed</span></div></div>
     <div class="task pass"><div class="top"><div class="num">25</div><div><h3>Promotion decision</h3><p>Promotion is no longer blocked. Social Media is visible on index.html and the home page is now user-facing.</p></div></div><div class="checks"><span>Changed</span><span>Passed</span></div></div>
   </div>
 </section>
@@ -59,6 +61,7 @@
     <div class="task pass"><b>Header</b><p>User confirmed the signed-in header works.</p></div>
     <div class="task pass"><b>Buttons and links</b><p>User confirmed all buttons, tabs, menu links and page links work from the tested pages.</p></div>
     <div class="task pass"><b>News Feed actions</b><p>User confirmed Share passed, Edit passed, and Delete passed after the RPC repair.</p></div>
+    <div class="task pass"><b>Friends profile share</b><p>User confirmed Share Profile passed on Friends.</p></div>
     <div class="task hold"><b>Safety boundary</b><p>No SQL, RLS, storage policy, payment, or Header Shell mass auth-gate change was made by this promotion/action pass.</p></div>
   </div>
 </section>
@@ -75,6 +78,7 @@ News Feed Share: PASSED
 News Feed Edit: PASSED
 News Feed Remove/Delete: PASSED via sb_social_remove_own_post
 News Feed Edit RPC: PASSED via sb_social_update_own_post
+Friends Share Profile: PASSED
 No live Supabase schema/RLS/storage policy mutation performed here.</pre>
 </section>
 </div>
