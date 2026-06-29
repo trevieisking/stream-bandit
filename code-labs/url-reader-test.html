@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Code Labs URL Reader Test</title>
+<meta name="description" content="Code Labs V96 read-only URL reader proof page.">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v96-read-page-2">
+<style>
+body{font-size:14px}.sidebar{width:260px;padding:10px;gap:9px}.logo{gap:9px;padding-bottom:6px}.logoMark{width:38px;height:38px;border-radius:13px;background-size:36px 36px}.logo b{font-size:16px}.logo small{font-size:11px}.nav{gap:5px}.nav a{grid-template-columns:28px 1fr;gap:8px;border-radius:13px;padding:7px 9px;min-height:46px}.nav span{font-size:15px}.nav small{font-size:10px}.sideBox{padding:9px;border-radius:15px}.sideBox p{font-size:11px}.main{margin-left:260px;width:min(1360px,calc(100vw - 260px));padding:16px}.topbar{margin-bottom:10px}.pill,.badge{padding:5px 8px;font-size:11px}.hero{border-radius:24px;padding:18px;margin-bottom:12px;gap:14px;grid-template-columns:minmax(280px,1fr) minmax(240px,330px)}.hero h1{font-size:clamp(30px,3.9vw,54px);line-height:.96;margin:6px 0}.hero p{font-size:15px;line-height:1.45}.heroCard{border-radius:18px;padding:12px}.heroCard ol{line-height:1.42}.panel,.notice{border-radius:20px;padding:14px;margin-bottom:10px}.actions{gap:7px;margin-top:9px}.btn{min-height:38px;padding:9px 12px;font-size:13px}.input{min-height:38px}.footerNote{font-size:11px;margin:18px 0}.diffBox{white-space:pre-wrap;overflow:auto;min-height:320px}textarea{min-height:260px;font-size:12px}@media(max-width:980px){.sidebar{width:auto}.main{margin:0;width:100%;padding:12px}.hero{grid-template-columns:1fr}.hero h1{font-size:clamp(30px,10vw,48px)}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>URL reader</small></div></div>
+<nav class="nav"><a href="index.html"><span>🏠</span><div>Home<small>Start here</small></div></a><a href="chatgpt-connection.html"><span>🤝</span><div>ChatGPT Connect<small>Connected</small></div></a><a href="oauth-flow-test.html"><span>✅</span><div>OAuth Flow<small>V95 passed</small></div></a><a class="active" href="url-reader-test.html"><span>📖</span><div>URL Reader<small>V96 proof</small></div></a></nav>
+<div class="sideBox"><b>V96 rule</b><p>Read only. This can fetch public /code-labs/ pages. It cannot write files or touch GitHub.</p></div>
+</aside>
+<main class="main">
+<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>URL Reader</b></div><div><span class="badge good">Read only</span><span class="badge warn">No writes</span></div></div>
+<section class="hero"><div><span class="pill">V96 Page Reader Proof</span><h1>Read a live Code Labs page safely.</h1><p>This tests the next connection layer: reading a public Code Labs URL through a read-only backend function. It is not added to the ChatGPT app tool list yet, so the working V95 app remains untouched.</p><div class="actions"><button class="btn primary" id="readHome" type="button">Read Code Labs Home</button><button class="btn ghost" id="readEntered" type="button">Read entered URL</button><button class="btn ghost" id="copyResult" type="button">Copy result</button></div></div><div class="heroCard"><b>Pass condition</b><ol><li>Public reader is ready.</li><li>Read returns ok true.</li><li>Title is found.</li><li>read_only is true.</li><li>Write flags are false.</li></ol></div></section>
+<section class="panel"><h2>URL to read</h2><input id="urlBox" class="input" style="width:100%" value="https://chatterfriendsstreambandit.co.uk/code-labs/index.html"><div class="actions"><span id="status" class="badge warn">Not checked</span><span id="session" class="badge good">Public reader ready</span></div><div id="help" class="notice"><p>Click <b>Read Code Labs Home</b>. This should read the live home page and show the title/text below.</p></div></section>
+<section class="panel"><h2>Readable page text</h2><textarea id="preview" readonly>Nothing read yet.</textarea></section>
+<section class="panel"><h2>Raw result</h2><pre id="raw" class="diffBox">No response yet.</pre></section>
+<div class="footerNote">Code Labs V96 · separate read-only URL proof · working V95 app preserved.</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+'use strict';
+var FN='https://xzxqfrvqdgkzwujbkdbk.supabase.co/functions/v1/code-labs-url-reader-proof';
+function $(s){return document.querySelector(s)}
+function set(id,msg,kind){var el=$(id);if(el){el.className='badge '+(kind||'warn');el.textContent=msg}}
+function help(html){$('#help').innerHTML=html}
+function show(v){$('#raw').textContent=typeof v==='string'?v:JSON.stringify(v,null,2)}
+function toast(msg){var t=$('#toast');if(!t){alert(msg);return}t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)}
+async function read(target){try{set('#status','Reading page','warn');var r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:target,max_chars:22000})});var data=await r.json();show(data);$('#preview').value=(data.title?'Title: '+data.title+'\n\n':'')+(data.text_preview||data.source_text||'No text returned.');if(data.ok&&data.read_only===true&&data.wrote_database===false&&data.wrote_github===false&&data.opened_pr===false&&data.deleted_anything===false){set('#status','URL read passed','good');help('<p><b>PASS:</b> Code Labs page was read safely. This was public-page read-only.</p>');toast('V96 URL read passed.')}else{set('#status','Needs review','bad');help('<p>Result returned, but pass flags did not all match.</p>')}}catch(e){set('#status','Read failed','bad');show(String(e.message||e));help('<p><b>Failed:</b> send a screenshot.</p>')}}
+async function copy(){var text=$('#preview').value;if(!text||text==='Nothing read yet.'){toast('Read a page first.');return}try{await navigator.clipboard.writeText(text);toast('Copied.')}catch(e){$('#preview').focus();$('#preview').select();document.execCommand('copy');toast('Selected/copied.')}}
+$('#readHome').onclick=function(){var u='https://chatterfriendsstreambandit.co.uk/code-labs/index.html';$('#urlBox').value=u;read(u)};
+$('#readEntered').onclick=function(){read($('#urlBox').value)};
+$('#copyResult').onclick=copy;
+})();
+</script>
+</body>
+</html>
