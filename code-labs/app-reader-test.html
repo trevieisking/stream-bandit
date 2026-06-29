@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Code Labs App Reader Test</title>
+<meta name="description" content="Code Labs V97 ChatGPT app read_code_labs_url test page.">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v97-app-reader-test">
+<style>
+body{font-size:14px}.sidebar{width:260px;padding:10px;gap:9px}.logo{gap:9px;padding-bottom:6px}.logoMark{width:38px;height:38px;border-radius:13px;background-size:36px 36px}.logo b{font-size:16px}.logo small{font-size:11px}.nav{gap:5px}.nav a{grid-template-columns:28px 1fr;gap:8px;border-radius:13px;padding:7px 9px;min-height:46px}.nav span{font-size:15px}.nav small{font-size:10px}.sideBox{padding:9px;border-radius:15px}.sideBox p{font-size:11px}.main{margin-left:260px;width:min(1360px,calc(100vw - 260px));padding:16px}.topbar{margin-bottom:10px}.pill,.badge{padding:5px 8px;font-size:11px}.hero{border-radius:24px;padding:18px;margin-bottom:12px;gap:14px;grid-template-columns:minmax(280px,1fr) minmax(240px,330px)}.hero h1{font-size:clamp(30px,3.9vw,54px);line-height:.96;margin:6px 0}.hero p{font-size:15px;line-height:1.45}.heroCard{border-radius:18px;padding:12px}.heroCard ol{line-height:1.42}.panel,.notice{border-radius:20px;padding:14px;margin-bottom:10px}.actions{gap:7px;margin-top:9px}.btn{min-height:38px;padding:9px 12px;font-size:13px}.input{min-height:38px}.footerNote{font-size:11px;margin:18px 0}.diffBox{white-space:pre-wrap;overflow:auto;min-height:300px}textarea{min-height:250px;font-size:12px}@media(max-width:980px){.sidebar{width:auto}.main{margin:0;width:100%;padding:12px}.hero{grid-template-columns:1fr}.hero h1{font-size:clamp(30px,10vw,48px)}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>App reader test</small></div></div>
+<nav class="nav"><a href="index.html"><span>🏠</span><div>Home<small>Start here</small></div></a><a href="chatgpt-connection.html"><span>🤝</span><div>ChatGPT Connect<small>Connected</small></div></a><a href="oauth-flow-test.html"><span>✅</span><div>OAuth Flow<small>V95 passed</small></div></a><a href="url-reader-test.html"><span>📖</span><div>URL Reader<small>V96 passed</small></div></a><a class="active" href="app-reader-test.html"><span>🔎</span><div>App Reader<small>V97 test</small></div></a></nav>
+<div class="sideBox"><b>V97 rule</b><p>Read first. This tests the reader inside the ChatGPT app server. No GitHub write tools are exposed.</p></div>
+</aside>
+<main class="main">
+<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>App Reader Test</b></div><div><span class="badge good">Read only</span><span class="badge warn">No writes</span></div></div>
+<section class="hero"><div><span class="pill">V97 ChatGPT App Reader</span><h1>Test read_code_labs_url in the app server.</h1><p>This proves the actual Code Labs ChatGPT app server now exposes the second read-only tool. It does not add GitHub Writer permissions yet.</p><div class="actions"><button class="btn primary" id="startOAuth" type="button">Start app reader token</button><button class="btn ghost" id="listTools" type="button">List app tools</button><button class="btn good" id="readHome" type="button">Read Code Labs Home</button><button class="btn ghost" id="copyResult" type="button">Copy result</button></div></div><div class="heroCard"><b>Pass condition</b><ol><li>OAuth token ready.</li><li>Tool list shows get_code_labs_context.</li><li>Tool list shows read_code_labs_url.</li><li>Read returns the live page title.</li><li>All write flags are false.</li></ol></div></section>
+<section class="panel"><h2>URL to read</h2><input id="urlBox" class="input" style="width:100%" value="https://chatterfriendsstreambandit.co.uk/code-labs/index.html"><div class="actions"><span id="status" class="badge warn">Not started</span></div><div id="help" class="notice"><p>Click <b>Start app reader token</b>. It should return here and say token ready. Then click <b>List app tools</b>, then <b>Read Code Labs Home</b>.</p></div></section>
+<section class="panel"><h2>Readable page text</h2><textarea id="preview" readonly>Nothing read yet.</textarea></section>
+<section class="panel"><h2>Raw result</h2><pre id="raw" class="diffBox">No response yet.</pre></section>
+<div class="footerNote">Code Labs V97 · app reader test · read-only tools only.</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+'use strict';
+var BASE='https://xzxqfrvqdgkzwujbkdbk.supabase.co/functions/v1/code-labs-mcp-stub';
+function $(s){return document.querySelector(s)}
+function set(msg,kind){var el=$('#status');if(el){el.className='badge '+(kind||'warn');el.textContent=msg}}
+function help(html){$('#help').innerHTML=html}
+function show(v){$('#raw').textContent=typeof v==='string'?v:JSON.stringify(v,null,2)}
+function toast(msg){var t=$('#toast');if(!t){alert(msg);return}t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)}
+function b64url(bytes){var s='';new Uint8Array(bytes).forEach(function(b){s+=String.fromCharCode(b)});return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+async function challenge(verifier){return b64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier)))}
+function rand(){var a=new Uint8Array(32);crypto.getRandomValues(a);return b64url(a)}
+async function start(){var verifier=rand();var state=rand();sessionStorage.setItem('cl_v97_verifier',verifier);sessionStorage.setItem('cl_v97_state',state);var redirect=location.origin+location.pathname;var url=BASE+'/oauth/authorize?response_type=code&client_id=code-labs-v97-browser-test&redirect_uri='+encodeURIComponent(redirect)+'&scope=code_labs.read&state='+encodeURIComponent(state)+'&code_challenge='+encodeURIComponent(await challenge(verifier))+'&code_challenge_method=S256';location.href=url}
+async function exchange(code){set('Exchanging code','warn');var verifier=sessionStorage.getItem('cl_v97_verifier')||'';var body=new URLSearchParams({grant_type:'authorization_code',code:code,redirect_uri:location.origin+location.pathname,client_id:'code-labs-v97-browser-test',code_verifier:verifier});var r=await fetch(BASE+'/oauth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body});var data=await r.json();show({token_response:data});if(!data.access_token){set('Token failed','bad');help('<p><b>Token failed.</b> Send a screenshot.</p>');return null}sessionStorage.setItem('cl_v97_access_token',data.access_token);set('OAuth token ready','good');help('<p><b>Token ready.</b> Click List app tools, then Read Code Labs Home.</p>');history.replaceState({},'',location.pathname);return data.access_token}
+function token(){return sessionStorage.getItem('cl_v97_access_token')||''}
+async function list(){try{var t=token();if(!t){set('No token','bad');help('<p>Start app reader token first.</p>');return}set('Listing tools','warn');var r=await fetch(BASE,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list'})});var data=await r.json();show(data);var names=((data.result&&data.result.tools)||[]).map(function(x){return x.name});if(names.indexOf('get_code_labs_context')>-1&&names.indexOf('read_code_labs_url')>-1){set('Two read tools listed','good');help('<p><b>PASS:</b> The app lists both read tools. Now click Read Code Labs Home.</p>')}else{set('Tool list needs review','bad');help('<p>The tool list returned but did not show both tools.</p>')}}catch(e){set('List failed','bad');show(String(e.message||e));help('<p>Send a screenshot.</p>')}}
+async function read(){try{var t=token();if(!t){set('No token','bad');help('<p>Start app reader token first.</p>');return}set('Reading through app','warn');var u=$('#urlBox').value;var r=await fetch(BASE,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'read_code_labs_url',arguments:{url:u,max_chars:22000}}})});var data=await r.json();show(data);var result=(data.result&&data.result.structuredContent)||{};$('#preview').value=(result.title?'Title: '+result.title+'\n\n':'')+(result.text_preview||data.result?.content?.[0]?.text||'No text returned.');if(result.ok&&result.tool==='read_code_labs_url'&&result.read_only===true&&result.wrote_database===false&&result.wrote_github===false&&result.opened_pr===false&&result.deleted_anything===false){set('App URL read passed','good');help('<p><b>PASS:</b> ChatGPT app server read the Code Labs page. Read-only flags are safe.</p>');toast('V97 app reader passed.')}else{set('Read needs review','bad');help('<p>Result returned, but pass flags did not all match.</p>')}}catch(e){set('Read failed','bad');show(String(e.message||e));help('<p>Send a screenshot.</p>')}}
+async function copy(){var text=$('#preview').value;if(!text||text==='Nothing read yet.'){toast('Read a page first.');return}try{await navigator.clipboard.writeText(text);toast('Copied.')}catch(e){$('#preview').focus();$('#preview').select();document.execCommand('copy');toast('Selected/copied.')}}
+$('#startOAuth').onclick=start;$('#listTools').onclick=list;$('#readHome').onclick=read;$('#copyResult').onclick=copy;
+var params=new URLSearchParams(location.search);var code=params.get('code');var state=params.get('state');if(code){if(state!==sessionStorage.getItem('cl_v97_state')){set('State mismatch','bad');help('<p>OAuth state did not match. Start again.</p>')}else{exchange(code)}}
+})();
+</script>
+</body>
+</html>
