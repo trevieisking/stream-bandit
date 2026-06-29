@@ -1875,7 +1875,7 @@ async function uploadImage(){
 
     const up=await (await client()).storage.from(BUCKET).upload(path,selectedFile,{
       cacheControl:'3600',
-      upsert:true,
+      upsert:false,
       contentType:selectedFile.type||'image/jpeg'
     });
 
