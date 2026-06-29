@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Code Labs OAuth Discovery</title>
+<meta name="description" content="Code Labs V94 OAuth discovery test page for the ChatGPT app connection.">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v94-oauth-discovery">
+<style>
+body{font-size:14px}.sidebar{width:260px;padding:10px;gap:9px}.logo{gap:9px;padding-bottom:6px}.logoMark{width:38px;height:38px;border-radius:13px;background-size:36px 36px}.logo b{font-size:16px}.logo small{font-size:11px}.nav{gap:5px}.nav a{grid-template-columns:28px 1fr;gap:8px;border-radius:13px;padding:7px 9px;min-height:46px}.nav span{font-size:15px}.nav small{font-size:10px}.sideBox{padding:9px;border-radius:15px}.sideBox p{font-size:11px}.main{margin-left:260px;width:min(1360px,calc(100vw - 260px));padding:16px}.topbar{margin-bottom:10px}.pill,.badge{padding:5px 8px;font-size:11px}.hero{border-radius:24px;padding:18px;margin-bottom:12px;gap:14px;grid-template-columns:minmax(280px,1fr) minmax(240px,330px)}.hero h1{font-size:clamp(30px,3.9vw,54px);line-height:.96;margin:6px 0}.hero p{font-size:15px;line-height:1.45}.heroCard{border-radius:18px;padding:12px}.heroCard ol{line-height:1.42}.panel,.notice{border-radius:20px;padding:14px;margin-bottom:10px}.actions{gap:7px;margin-top:9px}.btn{min-height:38px;padding:9px 12px;font-size:13px}.footerNote{font-size:11px;margin:18px 0}.diffBox{white-space:pre-wrap;overflow:auto;min-height:260px}@media(max-width:980px){.sidebar{width:auto}.main{margin:0;width:100%;padding:12px}.hero{grid-template-columns:1fr}.hero h1{font-size:clamp(30px,10vw,48px)}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>OAuth discovery</small></div></div>
+<nav class="nav"><a href="index.html"><span>🏠</span><div>Home<small>Start here</small></div></a><a href="chatgpt-connection.html"><span>🤝</span><div>ChatGPT Connect<small>V93 passed</small></div></a><a class="active" href="oauth-discovery.html"><span>🔑</span><div>OAuth Discovery<small>V94 test</small></div></a><a href="connection-guide.html"><span>🔗</span><div>Connection Guide<small>One safe click</small></div></a></nav>
+<div class="sideBox"><b>V94 rule</b><p>Discovery only. Do not press Create in ChatGPT until this says pass and V95 is ready.</p></div>
+</aside>
+<main class="main">
+<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>OAuth Discovery</b></div><div><span class="badge good">Discovery</span><span class="badge warn">No connect yet</span></div></div>
+<section class="hero"><div><span class="pill">V94 OAuth Discovery</span><h1>Let ChatGPT find the auth settings.</h1><p>This page checks whether the Code Labs MCP server now exposes OAuth discovery metadata. This is only the discovery step. Full authorization is not switched on yet.</p><div class="actions"><button class="btn primary" id="clCheckOAuth" type="button">Check OAuth discovery</button><button class="btn ghost" id="clCopyFields" type="button">Copy New App fields</button><a class="btn ghost" href="chatgpt-connection.html">Back to ChatGPT Connect</a></div></div><div class="heroCard"><b>Pass condition</b><ol><li>Authorization metadata loads.</li><li>Protected resource metadata loads.</li><li>Registration endpoint is visible.</li><li>No write tools are added.</li><li>ChatGPT Create is still held for V95.</li></ol></div></section>
+<section class="panel"><h2>Status</h2><div class="actions"><span id="clOAuthStatus" class="badge warn">Not checked</span></div><div id="clOAuthHelp" class="notice"><p>Click <b>Check OAuth discovery</b>. If it passes, ChatGPT should stop saying the server does not implement OAuth.</p></div></section>
+<section class="panel"><h2>OAuth metadata response</h2><pre id="clOAuthOutput" class="diffBox">No OAuth response yet.</pre></section>
+<section class="panel"><h2>New App fields for the next retry</h2><pre id="clNewAppFields" class="diffBox">Name: Code Labs
+Description: ChatGPT repair room for non-coders
+Server URL: https://xzxqfrvqdgkzwujbkdbk.supabase.co/functions/v1/code-labs-mcp-stub
+Authentication: OAuth
+
+Do not click Create until told.</pre></section>
+<div class="footerNote">Code Labs V94 · OAuth discovery only · no write tools.</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+'use strict';
+var BASE='https://xzxqfrvqdgkzwujbkdbk.supabase.co/functions/v1/code-labs-mcp-stub';
+function $(s){return document.querySelector(s)}
+function set(msg,kind){var el=$('#clOAuthStatus');if(el){el.className='badge '+(kind||'warn');el.textContent=msg}}
+function help(html){var el=$('#clOAuthHelp');if(el)el.innerHTML=html}
+function toast(msg){var t=$('#toast');if(!t){alert(msg);return}t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)}
+async function get(url){var r=await fetch(url);var text=await r.text();try{return {ok:r.ok,status:r.status,json:JSON.parse(text)}}catch(e){return {ok:r.ok,status:r.status,text:text}}}
+async function check(){try{set('Checking','warn');var auth=await get(BASE+'/.well-known/oauth-authorization-server');var res=await get(BASE+'/.well-known/oauth-protected-resource');var root=await get(BASE);var out={authorization_server:auth,protected_resource:res,root:root};$('#clOAuthOutput').textContent=JSON.stringify(out,null,2);if(auth.ok&&res.ok&&auth.json&&auth.json.authorization_endpoint&&auth.json.token_endpoint&&auth.json.registration_endpoint&&res.json&&res.json.authorization_servers){set('OAuth discovery passed','good');help('<p><b>PASS:</b> OAuth discovery metadata is visible. Next retry should get past the previous OAuth configuration error. Still do not click Create unless told.</p>');toast('OAuth discovery passed.')}else{set('Discovery needs review','bad');help('<p><b>Review:</b> metadata loaded but a required OAuth field was missing.</p>')}}catch(e){set('Discovery failed','bad');$('#clOAuthOutput').textContent=String(e.message||e);help('<p><b>Failed:</b> send a screenshot.</p>')}}
+async function copyFields(){var text=$('#clNewAppFields').textContent;try{await navigator.clipboard.writeText(text);toast('Fields copied.')}catch(e){toast('Copy failed; select the fields manually.')}}
+$('#clCheckOAuth').onclick=check;$('#clCopyFields').onclick=copyFields;setTimeout(check,450);
+})();
+</script>
+</body>
+</html>
