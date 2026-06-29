@@ -1,10 +1,10 @@
 (function(){
 'use strict';
 
-const VERSION='V7.12.227 Global Brand Logo Helper / Settings Read + Social Actions Event Share Loader';
+const VERSION='V7.12.228 Global Brand Logo Helper / Profile Group Event Social Actions Loader';
 const DEFAULT_PARTS=['https://xzxqfrvqdgkzwujbkdbk.supabase','.co/storage/v1/object/public/','stream-bandit-images/global/','logo-1779203548544.png'];
 const DEFAULT_LOGO=DEFAULT_PARTS.join('');
-const SOCIAL_ACTIONS_SRC='stream-bandit-social-actions-v7-13-002.js?v=brand-loader-7-12-227-social-actions-7-13-005';
+const SOCIAL_ACTIONS_SRC='stream-bandit-social-actions-v7-13-002.js?v=brand-loader-7-12-228-social-actions-7-13-006';
 const SOCIAL_PAGES={
   'news-feed-social-v7-13-001-test.html':true,
   'profile-social-v7-13-001-test.html':true,
@@ -19,7 +19,7 @@ let reading=false;
 function defaultLogo(){return DEFAULT_LOGO;}
 function currentFile(){return String(location.pathname||'').split('/').pop()||'index.html';}
 function isSocialPage(){return !!SOCIAL_PAGES[currentFile()]||!!(document.body&&document.body.dataset&&(document.body.dataset.sbSocialFeedUrl||document.body.dataset.sbSocialProfileUrl||document.body.dataset.sbFriendsMenuUrl||document.body.dataset.sbGroupsUrl));}
-function loadSocialActionsIfNeeded(){try{if(!isSocialPage())return;let base=SOCIAL_ACTIONS_SRC.split('?')[0];let wanted=SOCIAL_ACTIONS_SRC.split('?')[1]||'';if(Array.from(document.scripts||[]).some(s=>String(s.src||'').includes(base)&&String(s.src||'').includes(wanted)))return;let s=document.createElement('script');s.src=SOCIAL_ACTIONS_SRC;s.defer=true;s.dataset.sbLoadedBy='brand-logo-helper-v7-12-227';document.head.appendChild(s);document.documentElement.dataset.sbSocialActionsLoader='brand-logo-v7-12-227';}catch(e){}}
+function loadSocialActionsIfNeeded(){try{if(!isSocialPage())return;let base=SOCIAL_ACTIONS_SRC.split('?')[0];let wanted=SOCIAL_ACTIONS_SRC.split('?')[1]||'';if(Array.from(document.scripts||[]).some(s=>String(s.src||'').includes(base)&&String(s.src||'').includes(wanted)))return;let s=document.createElement('script');s.src=SOCIAL_ACTIONS_SRC;s.defer=true;s.dataset.sbLoadedBy='brand-logo-helper-v7-12-228';document.head.appendChild(s);document.documentElement.dataset.sbSocialActionsLoader='brand-logo-v7-12-228';}catch(e){}}
 function cleanupLegacyFooter(){try{document.querySelectorAll('#sbGlobalFooter,#sbGlobalFooterStyle').forEach(el=>el.remove());document.documentElement.removeAttribute('data-stream-bandit-global-footer');document.documentElement.removeAttribute('data-streambanditglobalfooter');}catch(e){}}
 function safeApply(url,source){currentUrl=String(url||DEFAULT_LOGO).trim()||DEFAULT_LOGO;try{document.querySelectorAll('[data-sb-brand-logo]').forEach(el=>{if(el.tagName&&el.tagName.toLowerCase()==='img'){el.src=currentUrl;if(!el.alt)el.alt='Stream Bandit brand logo';}else{el.innerHTML='<img alt="Stream Bandit brand logo" src="'+currentUrl+'">';}});document.querySelectorAll('[data-sb-brand-logo-bg]').forEach(el=>{el.style.backgroundImage='url("'+currentUrl.replace(/"/g,'%22')+'")';el.style.backgroundSize=el.dataset.sbBrandLogoFit||'cover';el.style.backgroundPosition=el.dataset.sbBrandLogoPosition||'center';el.style.backgroundRepeat='no-repeat';});cleanupLegacyFooter();loadSocialActionsIfNeeded();document.documentElement.dataset.streamBanditBrandLogo='loaded';document.dispatchEvent(new CustomEvent('streambandit:brand-logo-loaded',{detail:{version:VERSION,url:currentUrl,source:source||lastReadState.source,legacyFooters:false,socialActionsLoader:isSocialPage()}}));}catch(e){document.documentElement.dataset.streamBanditBrandLogo='waiting';}
 return currentUrl;}
