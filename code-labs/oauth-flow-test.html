@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Code Labs OAuth Flow Test</title>
+<meta name="description" content="Code Labs V95 OAuth authorization flow test for ChatGPT app connection.">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v95-oauth-flow-2">
+<style>
+body{font-size:14px}.sidebar{width:260px;padding:10px;gap:9px}.logo{gap:9px;padding-bottom:6px}.logoMark{width:38px;height:38px;border-radius:13px;background-size:36px 36px}.logo b{font-size:16px}.logo small{font-size:11px}.nav{gap:5px}.nav a{grid-template-columns:28px 1fr;gap:8px;border-radius:13px;padding:7px 9px;min-height:46px}.nav span{font-size:15px}.nav small{font-size:10px}.sideBox{padding:9px;border-radius:15px}.sideBox p{font-size:11px}.main{margin-left:260px;width:min(1360px,calc(100vw - 260px));padding:16px}.topbar{margin-bottom:10px}.pill,.badge{padding:5px 8px;font-size:11px}.hero{border-radius:24px;padding:18px;margin-bottom:12px;gap:14px;grid-template-columns:minmax(280px,1fr) minmax(240px,330px)}.hero h1{font-size:clamp(30px,3.9vw,54px);line-height:.96;margin:6px 0}.hero p{font-size:15px;line-height:1.45}.heroCard{border-radius:18px;padding:12px}.heroCard ol{line-height:1.42}.panel,.notice{border-radius:20px;padding:14px;margin-bottom:10px}.actions{gap:7px;margin-top:9px}.btn{min-height:38px;padding:9px 12px;font-size:13px}.footerNote{font-size:11px;margin:18px 0}.diffBox{white-space:pre-wrap;overflow:auto;min-height:260px}textarea{min-height:230px;font-size:12px}@media(max-width:980px){.sidebar{width:auto}.main{margin:0;width:100%;padding:12px}.hero{grid-template-columns:1fr}.hero h1{font-size:clamp(30px,10vw,48px)}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>OAuth flow</small></div></div>
+<nav class="nav"><a href="index.html"><span>🏠</span><div>Home<small>Start here</small></div></a><a href="chatgpt-connection.html"><span>🤝</span><div>ChatGPT Connect<small>V93 passed</small></div></a><a href="oauth-discovery.html"><span>🔑</span><div>OAuth Discovery<small>V94 passed</small></div></a><a class="active" href="oauth-flow-test.html"><span>✅</span><div>OAuth Flow<small>V95 test</small></div></a></nav>
+<div class="sideBox"><b>V95 rule</b><p>Test OAuth authorization only. The only tool remains get_code_labs_context, read-only.</p></div>
+</aside>
+<main class="main">
+<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>OAuth Flow</b></div><div><span class="badge good">OAuth</span><span class="badge warn">Read-only</span></div></div>
+<section class="hero"><div><span class="pill">V95 OAuth Flow</span><h1>Test the token step.</h1><p>This checks the browser OAuth flow before you try the ChatGPT New App screen again. It requests read-only access, returns with a code, exchanges it for a token, then calls get_code_labs_context.</p><div class="actions"><button class="btn primary" id="startOAuth" type="button">Start OAuth token test</button><button class="btn good" id="callTool" type="button">Call tool with OAuth token</button><button class="btn ghost" id="copyResult" type="button">Copy result</button></div></div><div class="heroCard"><b>Pass condition</b><ol><li>Start returns here with a code.</li><li>Token exchange succeeds.</li><li>Tool call passes read-only.</li><li>Write flags are false.</li><li>No PR or file action happens.</li></ol></div></section>
+<section class="panel"><h2>Status</h2><div class="actions"><span id="status" class="badge warn">Not started</span></div><div id="help" class="notice"><p>Click <b>Start OAuth token test</b>. It should return here automatically with a token ready message.</p></div></section>
+<section class="panel"><h2>OAuth / tool response</h2><pre id="raw" class="diffBox">No response yet.</pre></section>
+<section class="panel"><h2>Tool result</h2><textarea id="packet" readonly>Tool result not loaded yet.</textarea></section>
+<div class="footerNote">Code Labs V95 · OAuth authorization flow · read-only tool only.</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+'use strict';
+var BASE='https://xzxqfrvqdgkzwujbkdbk.supabase.co/functions/v1/code-labs-mcp-stub';
+function $(s){return document.querySelector(s)}
+function set(msg,kind){var el=$('#status');if(el){el.className='badge '+(kind||'warn');el.textContent=msg}}
+function help(html){$('#help').innerHTML=html}
+function show(v){$('#raw').textContent=typeof v==='string'?v:JSON.stringify(v,null,2)}
+function toast(msg){var t=$('#toast');if(!t){alert(msg);return}t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)}
+function b64url(bytes){var s='';new Uint8Array(bytes).forEach(function(b){s+=String.fromCharCode(b)});return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+async function challenge(verifier){return b64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier)))}
+function rand(){var a=new Uint8Array(32);crypto.getRandomValues(a);return b64url(a)}
+async function start(){var verifier=rand();var state=rand();sessionStorage.setItem('cl_oauth_verifier',verifier);sessionStorage.setItem('cl_oauth_state',state);var redirect=location.origin+location.pathname;var url=BASE+'/oauth/authorize?response_type=code&client_id=code-labs-browser-test&redirect_uri='+encodeURIComponent(redirect)+'&scope=code_labs.read&state='+encodeURIComponent(state)+'&code_challenge='+encodeURIComponent(await challenge(verifier))+'&code_challenge_method=S256';location.href=url}
+async function exchange(code){set('Exchanging code','warn');var verifier=sessionStorage.getItem('cl_oauth_verifier')||'';var body=new URLSearchParams({grant_type:'authorization_code',code:code,redirect_uri:location.origin+location.pathname,client_id:'code-labs-browser-test',code_verifier:verifier});var r=await fetch(BASE+'/oauth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body});var data=await r.json();show({token_response:data});if(!data.access_token){set('Token failed','bad');help('<p><b>Token failed.</b> Send a screenshot.</p>');return null}sessionStorage.setItem('cl_oauth_access_token',data.access_token);set('OAuth token ready','good');help('<p><b>Token ready.</b> Now click Call tool with OAuth token.</p>');history.replaceState({},'',location.pathname);return data.access_token}
+async function callTool(){try{var token=sessionStorage.getItem('cl_oauth_access_token')||'';if(!token){set('No OAuth token','bad');help('<p>Start OAuth token test first.</p>');return}set('Calling tool','warn');var r=await fetch(BASE,{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'get_code_labs_context',arguments:{limit:5}}})});var data=await r.json();show(data);var result=(data.result&&data.result.structuredContent)||{};var text=result.chatgpt_context_packet||(data.result&&data.result.content&&data.result.content[0]&&data.result.content[0].text)||'';$('#packet').value=text||'No packet returned.';if(result.ok&&result.auth_mode==='oauth'&&result.read_only===true&&result.wrote_database===false&&result.wrote_github===false&&result.opened_pr===false&&result.deleted_anything===false){set('OAuth tool call passed','good');help('<p><b>PASS:</b> OAuth token called the read-only Code Labs tool.</p>');toast('V95 OAuth flow passed.')}else{set('Tool needs review','bad');help('<p><b>Review:</b> tool call returned but not every pass flag matched.</p>')}}catch(e){set('Tool failed','bad');show(String(e.message||e));help('<p>Send a screenshot.</p>')}}
+async function copy(){var text=$('#packet').value;if(!text||text.indexOf('CODE LABS')===-1){toast('Call the tool first.');return}try{await navigator.clipboard.writeText(text);toast('Copied.')}catch(e){$('#packet').focus();$('#packet').select();document.execCommand('copy');toast('Selected/copied.')}}
+$('#startOAuth').onclick=start;$('#callTool').onclick=callTool;$('#copyResult').onclick=copy;
+var params=new URLSearchParams(location.search);var code=params.get('code');var state=params.get('state');if(code){if(state!==sessionStorage.getItem('cl_oauth_state')){set('State mismatch','bad');help('<p>OAuth state did not match. Start again.</p>')}else{exchange(code)}}
+})();
+</script>
+</body>
+</html>
