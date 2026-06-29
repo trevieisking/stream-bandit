@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Code Labs Context Packet</title>
+<meta name="description" content="Code Labs V91 read-only context packet for ChatGPT. Reads live Code Labs history safely and prepares a copyable context report.">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v91-context">
+<style>
+body{font-size:14px}.sidebar{width:260px;padding:10px;gap:9px}.logo{gap:9px;padding-bottom:6px}.logoMark{width:38px;height:38px;border-radius:13px;background-size:36px 36px}.logo b{font-size:16px}.logo small{font-size:11px}.nav{gap:5px}.nav a{grid-template-columns:28px 1fr;gap:8px;border-radius:13px;padding:7px 9px;min-height:46px}.nav span{font-size:15px}.nav small{font-size:10px}.sideBox{padding:9px;border-radius:15px}.sideBox p{font-size:11px}.main{margin-left:260px;width:min(1360px,calc(100vw - 260px));padding:16px}.topbar{margin-bottom:10px}.pill,.badge{padding:5px 8px;font-size:11px}.hero{border-radius:24px;padding:18px;margin-bottom:12px;gap:14px;grid-template-columns:minmax(280px,1fr) minmax(240px,330px)}.hero h1{font-size:clamp(30px,3.9vw,54px);line-height:.96;margin:6px 0}.hero p{font-size:15px;line-height:1.45}.heroCard{border-radius:18px;padding:12px}.heroCard ol{line-height:1.42}.panel,.notice{border-radius:20px;padding:14px;margin-bottom:10px}.grid3{gap:10px}.actions{gap:7px;margin-top:9px}.btn{min-height:38px;padding:9px 12px;font-size:13px}.item{border-radius:15px;padding:10px}.footerNote{font-size:11px;margin:18px 0}.diffBox{white-space:pre-wrap;overflow:auto;min-height:360px}textarea{min-height:360px;font-size:12px}@media(max-width:980px){.sidebar{width:auto}.main{margin:0;width:100%;padding:12px}.hero{grid-template-columns:1fr}.hero h1{font-size:clamp(30px,10vw,48px)}}
+</style>
+</head>
+<body data-page="context-packet">
+<div class="app">
+<aside class="sidebar">
+<div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>Context packet</small></div></div>
+<nav class="nav"><a href="index.html"><span>🏠</span><div>Home<small>Start here</small></div></a><a href="connection-guide.html"><span>🔗</span><div>Connection Guide<small>One safe click</small></div></a><a href="read-only-proof.html"><span>🔒</span><div>Read-Only Proof<small>V90 backend</small></div></a><a class="active" href="context-packet.html"><span>📦</span><div>Context Packet<small>V91 read</small></div></a><a href="repo-desk.html"><span>🗄️</span><div>Repo Desk<small>Choose action</small></div></a><a href="publish-prep.html"><span>🚀</span><div>GitHub Writer<small>Build handoff</small></div></a></nav>
+<div class="sideBox"><b>V91 rule</b><p>This page only reads Code Labs history and builds a context packet for ChatGPT. No repo or database write happens.</p></div>
+</aside>
+<main class="main">
+<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>Context Packet</b></div><div><span class="badge good">Read only</span><span class="badge warn">No writes</span></div></div>
+<section class="panel" style="border:2px solid rgba(15,159,110,.24)"><h2>Workflow buttons</h2><p><b>Context Packet</b> · This page reads Code Labs history and prepares a clean packet that ChatGPT can use.</p><div class="actions"><a class="btn ghost" href="read-only-proof.html">Previous: Read-Only Proof</a><a class="btn good" href="file-lab.html">Next: File Lab</a></div></section>
+<section class="hero"><div><span class="pill">V91 Read-Only Context</span><h1>Give ChatGPT the live Code Labs context.</h1><p>This page calls the read-only backend and extracts a clean context packet from the latest Code Labs project, repair job, packet, tests, and audit events. It helps ChatGPT understand what is happening without asking you to paste everything manually.</p><div class="actions"><button class="btn primary" id="clLoadContext" type="button">Load context packet</button><button class="btn ghost" id="clCopyContext" type="button">Copy context packet</button><a class="btn ghost" href="read-only-proof.html">Back to V90 Proof</a></div></div><div class="heroCard"><b>Pass condition</b><ol><li>Status says context loaded.</li><li>Packet begins with Code Labs context packet.</li><li>read_only is true.</li><li>Write flags are false.</li><li>Copy button copies the packet.</li></ol></div></section>
+<section class="panel"><h2>Current context status</h2><div class="actions"><span id="clContextStatus" class="badge warn">Not checked</span><span id="clContextSession" class="badge warn">Session unknown</span></div><div id="clContextHelp" class="notice"><p>Click <b>Load context packet</b>. If the live Supabase session is ready, the packet will appear below.</p></div></section>
+<section class="panel"><h2>ChatGPT context packet</h2><textarea id="clContextPacket" readonly>Context packet not loaded yet.</textarea></section>
+<section class="panel"><h2>Raw backend response</h2><pre id="clRawContext" class="diffBox">No backend response yet.</pre></section>
+<section class="panel"><h2>What this connection can do now</h2><div class="grid3"><div class="item"><b>Read repair state</b><p>Reads the latest Code Labs project, job, packet, tests, and audit notes.</p></div><div class="item"><b>Build ChatGPT context</b><p>Turns the read result into a copyable packet for this chat.</p></div><div class="item"><b>Keep writes blocked</b><p>Reports safe flags proving no GitHub or database write happened.</p></div></div></section>
+<div class="footerNote">Code Labs V91 · read-only context packet · use this before any future write tools.</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+'use strict';
+var URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+var PUB='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+var FN=URL+'/functions/v1/code-labs-readonly-proof';
+function $(s){return document.querySelector(s)}
+function set(id,msg,kind){var el=$(id);if(el){el.className='badge '+(kind||'warn');el.textContent=msg}}
+function help(html){var el=$('#clContextHelp');if(el)el.innerHTML=html}
+function toast(msg){var t=$('#toast');if(!t){alert(msg);return}t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2600)}
+function loadScript(){return new Promise(function(resolve,reject){if(window.supabase&&window.supabase.createClient)return resolve();var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
+async function client(){await loadScript();if(!window.CL_SB){window.CL_SB=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}return window.CL_SB}
+async function session(){var sb=await client();var res=await sb.auth.getSession();return {session:res&&res.data?res.data.session:null,error:res.error}}
+async function loadContext(){try{set('#clContextStatus','Loading context','warn');var s=await session();if(!s.session||!s.session.access_token){set('#clContextSession','No Supabase session','bad');set('#clContextStatus','No session','bad');help('<p><b>Hold:</b> live Supabase session is needed. Open live Code Labs Home first if needed, then return here.</p>');return}set('#clContextSession','Supabase session ready','good');var r=await fetch(FN,{method:'POST',headers:{'Authorization':'Bearer '+s.session.access_token,'apikey':PUB,'Content-Type':'application/json'},body:JSON.stringify({source:'code-labs-v91-context-packet'})});var text=await r.text();var data;try{data=JSON.parse(text)}catch(e){data={ok:false,raw:text}}$('#clRawContext').textContent=JSON.stringify(data,null,2);$('#clContextPacket').value=data.chatgpt_context_packet||'No context packet returned.';if(r.ok&&data.ok&&data.read_only===true&&data.wrote_database===false&&data.wrote_github===false&&data.opened_pr===false&&data.deleted_anything===false&&data.chatgpt_context_packet){set('#clContextStatus','Context loaded','good');help('<p><b>PASS:</b> read-only context packet loaded. Copy it into ChatGPT when needed.</p>');toast('Context packet loaded.');}else{set('#clContextStatus','Context needs review','bad');help('<p><b>Review:</b> backend did not return every safe flag or packet.</p>')}}catch(err){set('#clContextStatus','Context failed','bad');$('#clRawContext').textContent=String(err.message||err);help('<p><b>Failed:</b> '+String(err.message||err)+'</p>')}}
+async function copyContext(){var box=$('#clContextPacket');var text=box?box.value:'';if(!text||text.indexOf('CODE LABS')===-1){toast('Load the context packet first.');return}try{await navigator.clipboard.writeText(text);toast('Context packet copied.');}catch(e){box.focus();box.select();document.execCommand('copy');toast('Context packet selected/copied.')}}
+$('#clLoadContext').onclick=loadContext;$('#clCopyContext').onclick=copyContext;setTimeout(loadContext,450);
+})();
+</script>
+</body>
+</html>
