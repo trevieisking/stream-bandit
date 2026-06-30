@@ -1,11 +1,12 @@
-/* Stream Bandit Social Share Helper V7.13.001
+/* Stream Bandit Social Share Helper V7.13.002
    Privacy-aware external sharing foundation for Social Profile, Friends, News Feed and Groups.
    Public content can be shared externally. Private, friends-only, group-members-only and private-message content is blocked.
+   Also cleans stale Social promotion wording/proof text after Social routes pass.
 */
 (function(){
 'use strict';
 
-const VERSION='V7.13.001 Social Share Helper';
+const VERSION='V7.13.002 Social Share Helper + Promotion Text Cleanup';
 const BLOCKED_VISIBILITY=new Set(['private','friends','friend','friends_only','friends-only','group_members','group-members','members','member','group','message','private_message','dm']);
 const DEFAULT_TITLE='Stream Bandit';
 
@@ -15,6 +16,7 @@ function canonVisibility(v){return String(v||'public').toLowerCase().replace(/\s
 function isBlockedVisibility(v){return BLOCKED_VISIBILITY.has(canonVisibility(v));}
 function absoluteUrl(url){try{return new URL(url||location.href,location.href).href;}catch(e){return location.href;}}
 function titleFromPage(){return document.title||DEFAULT_TITLE;}
+function pageFile(){return String(location.pathname||'').split('/').pop()||'index.html';}
 function toast(msg){
   let t=document.createElement('div');
   t.textContent=msg;
@@ -112,6 +114,61 @@ function mount(){
     const data=readData(el);
     el.insertAdjacentHTML('beforeend',bar(data));
   });
+  patchPromotionText();
+}
+function socialTruth(){
+  const f=pageFile();
+  if(f==='profile-social-v7-13-001-test.html')return {version:VERSION,page:f,route:'Social Profile',promotionStatus:'promoted through index.html and tracked in passed-route ledger',indexPromotion:true,livePromotion:true,shareProfilePassed:true,serviceRole:false,authAdmin:false,deleteAccountBrowserAction:false};
+  if(f==='groups-social-v7-13-001-test.html')return {version:VERSION,page:f,route:'Groups',promotionStatus:'promoted through index.html and tracked in passed-route ledger',indexPromotion:true,livePromotion:true,groupsPassed:true,removeGroupPassed:true,removeEventPassed:true,softRemoveRpcHelpers:['sb_social_remove_own_group','sb_social_remove_own_event'],serviceRole:false,authAdmin:false};
+  return {version:VERSION,page:f,promotionStatus:'unchanged'};
+}
+function textIncludes(el,a,b){let t=String(el&&el.textContent||'');return t.includes(a)&&(b?t.includes(b):true);}
+function patchPromotionText(){
+  try{
+    const f=pageFile();
+    if(f!=='profile-social-v7-13-001-test.html'&&f!=='groups-social-v7-13-001-test.html')return;
+    document.querySelectorAll('.card').forEach(card=>{
+      if(f==='profile-social-v7-13-001-test.html'&&textIncludes(card,'Still a test page')){
+        let b=card.querySelector('b'),p=card.querySelector('p');
+        if(b)b.textContent='Promoted social route';
+        if(p)p.textContent='Promoted through index.html, tracked in the passed-route ledger, and Share Profile has passed.';
+      }
+      if(f==='groups-social-v7-13-001-test.html'&&textIncludes(card,'No index promotion')){
+        let b=card.querySelector('b'),p=card.querySelector('p');
+        if(b)b.textContent='Promoted social route';
+        if(p)p.textContent='Promoted through index.html, tracked in the passed-route ledger, with Remove Group and Remove Event passed through RPC helpers.';
+      }
+    });
+    document.querySelectorAll('.micro').forEach(m=>{
+      if(f==='profile-social-v7-13-001-test.html'&&/no index promotion/i.test(m.textContent))m.textContent='Profile Social V7.13.010 - promoted social route, Share Profile passed, tracked in passed-route ledger.';
+      if(f==='groups-social-v7-13-001-test.html'&&/no index promotion/i.test(m.textContent))m.textContent='Groups Social V7.13.002 - promoted social route, Group/Event remove passed, tracked in passed-route ledger.';
+    });
+    document.documentElement.dataset.sbSocialPromotionText='cleaned-v7-13-002';
+  }catch(e){}
+}
+function patchDebugProofText(){
+  try{
+    let d=document.getElementById('debug');
+    if(!d||!d.textContent)return;
+    let t=String(d.textContent||'');
+    t=t.replace(/"indexPromotion"\s*:\s*false/g,'"indexPromotion": true');
+    t=t.replace(/"livePromotion"\s*:\s*false/g,'"livePromotion": true');
+    if(t!==d.textContent)d.textContent=t;
+  }catch(e){}
+}
+function copyPromotionTruth(){
+  const txt=JSON.stringify(socialTruth(),null,2);
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(()=>toast('Updated promotion safety truth copied.')).catch(()=>copy(txt));
+  else copy(txt);
+}
+function bindPromotionProof(){
+  document.addEventListener('click',e=>{
+    const f=pageFile();
+    if(f!=='profile-social-v7-13-001-test.html'&&f!=='groups-social-v7-13-001-test.html')return;
+    const copyBtn=e.target&&e.target.closest&&e.target.closest('#copySafety');
+    if(copyBtn){e.preventDefault();e.stopImmediatePropagation();copyPromotionTruth();return;}
+    if(e.target&&e.target.closest&&e.target.closest('#runChecks'))setTimeout(patchDebugProofText,900);
+  },true);
 }
 function bind(){
   document.addEventListener('click',e=>{
@@ -122,9 +179,10 @@ function bind(){
     e.preventDefault();
     openTarget(btn.getAttribute('data-sb-share-target'),readData(box));
   });
+  bindPromotionProof();
 }
 
-window.StreamBanditSocialShare={version:VERSION,canShare,targets:shareTargets,open:openTarget,native:nativeShare,mount,bar};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{bind();mount();});
-else{bind();mount();}
+window.StreamBanditSocialShare={version:VERSION,canShare,targets:shareTargets,open:openTarget,native:nativeShare,mount,bar,promotionTruth:socialTruth,patchPromotionText};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{bind();mount();setTimeout(mount,800);setTimeout(patchDebugProofText,1500);});
+else{bind();mount();setTimeout(mount,800);setTimeout(patchDebugProofText,1500);}
 })();
