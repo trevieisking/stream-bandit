@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Stream Bandit Passed Route Ledger V7.13.112</title>
+<title>Stream Bandit Passed Route Ledger V7.13.113</title>
 <link rel="icon" href="stream_bandit_stag_icon_32.png">
 <style>
 :root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#210812;--card:#ffffff0f;--line:#ffffff24;--text:#f7fbff;--muted:#b8c3df;--good:#22d3a6;--purple:#7c3cff;--warn:#ffb142;--blue:#41e8ff;--pink:#ff2d85}*{box-sizing:border-box}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;padding:14px;background:radial-gradient(circle at 0 0,#22d3a633,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff40,transparent 38%),var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}.wrap{max-width:1500px;margin:auto}.hero,.panel,.task{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 16px 55px #0007;padding:16px;margin:0 0 14px}.hero{display:grid;grid-template-columns:minmax(280px,1fr) minmax(260px,430px);gap:14px}.task{background:var(--card);box-shadow:none}.pass{border-color:#22d3a677}.hold{border-color:#ffb14277}.blueBorder{border-color:#41e8ff77}h1{font-size:clamp(36px,5vw,72px);line-height:.92;letter-spacing:-.06em;margin:8px 0}h2{margin:0 0 10px}h3{margin:0 0 7px}p,label,small,li{color:var(--muted);line-height:1.45}.badge,.pill{display:inline-flex;border:1px solid #ffffff24;border-radius:999px;background:#ffffff0d;color:#dbe7ff;font-weight:950;padding:6px 9px;font-size:12px;margin:2px}.ok{background:#22d3a621;border-color:#22d3a660;color:#baf7df}.warn{background:#ffb14224;border-color:#ffb14266;color:#ffe7ad}.blue{background:#41e8ff22;border-color:#41e8ff66;color:#cef9ff}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}.task b{color:#baf7df}.top{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}.num{width:42px;height:42px;border-radius:15px;background:linear-gradient(135deg,var(--good),var(--purple));color:#061017;display:grid;place-items:center;font-weight:1000}.checks{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.checks span{border:1px solid #ffffff20;border-radius:999px;background:#ffffff0d;padding:7px 9px;font-weight:900;font-size:12px}.source{white-space:pre-wrap;word-break:break-word;background:#0006;border:1px solid #ffffff18;border-radius:16px;padding:12px;color:#dfffee;font-family:ui-monospace,Consolas,monospace}.btn{display:inline-flex;align-items:center;justify-content:center;margin:6px 6px 0 0;padding:10px 13px;border-radius:999px;background:linear-gradient(135deg,var(--good),var(--purple));color:#061017;text-decoration:none;font-weight:950}.cyan{background:linear-gradient(135deg,var(--blue),var(--purple));color:#061017}.hotBtn{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}@media(max-width:760px){.hero,.top{grid-template-columns:1fr}.num{width:auto;height:auto;padding:8px}.btn{width:100%}}
@@ -17,6 +17,7 @@
     <span class="badge ok">Platform entry promoted</span>
     <span class="badge ok">Profile wording pass</span>
     <span class="badge ok">Groups wording pass</span>
+    <span class="badge ok">News Feed 001 canonical</span>
     <span class="badge blue">Rule 1: Code Labs fallback</span>
     <h1>Stream Bandit Passed Route Ledger</h1>
     <p>This is the single project record for pages that have passed user smoke testing, pages visibly promoted on the platform home, and pages kept as admin/fallback/support routes. The user-facing home stays clean; this ledger keeps the proof.</p>
@@ -31,6 +32,7 @@
   <div class="task pass">
     <h2>Current decision</h2>
     <p><b>Rule 1:</b> If GitHub tools fail from truncation or safety blocking, use Code Labs/Patch Lab to build the exact corrected full file, then manually commit, then verify the live GitHub file before testing.</p>
+    <p><b>News Feed canonical route:</b> keep <code>news-feed-social-v7-13-001-test.html</code>. Hold <code>news-feed-social-v7-13-003-test.html</code> as a candidate/checkpoint until separately tested.</p>
     <p><b>Promote useful user routes on index.</b></p>
     <p><b>Track every passed/support route here.</b></p>
     <p><b>Do not crowd the home page with every checkpoint.</b></p>
@@ -47,7 +49,7 @@
     <div class="task pass"><b>Global Search</b><p>global-search-global-helpers-v7-4-9-test.html</p><div class="checks"><span>Promoted</span><span>Browse</span></div></div>
     <div class="task pass"><b>Social Profile</b><p>profile-social-v7-13-001-test.html</p><div class="checks"><span>Promoted</span><span>Share Profile passed</span><span>Promotion wording passed</span><span>Passed</span></div></div>
     <div class="task pass"><b>Friends</b><p>friends-social-v7-13-001-test.html</p><div class="checks"><span>Promoted</span><span>Share Profile passed</span></div></div>
-    <div class="task pass"><b>News Feed</b><p>news-feed-social-v7-13-001-test.html</p><div class="checks"><span>Promoted</span><span>Share/Edit/Delete passed</span></div></div>
+    <div class="task pass"><b>News Feed</b><p>news-feed-social-v7-13-001-test.html</p><div class="checks"><span>Promoted</span><span>Share/Edit/Delete passed</span><span>Canonical 001</span><span>003 held</span></div></div>
     <div class="task pass"><b>Groups</b><p>groups-social-v7-13-001-test.html</p><div class="checks"><span>Promoted</span><span>Groups passed</span><span>Remove Group passed</span><span>Remove Event passed</span><span>Promotion wording passed</span></div></div>
     <div class="task pass"><b>Watchlist</b><p>watchlist-clean-machine-v7-12-43-test.html</p><div class="checks"><span>Promoted</span><span>Watch/Saved</span></div></div>
     <div class="task pass"><b>Favourites</b><p>favourites-clean-machine-v7-12-41-test.html</p><div class="checks"><span>Promoted</span><span>Watch/Saved</span></div></div>
@@ -84,6 +86,7 @@
     <div class="task pass"><div class="top"><div class="num">26</div><div><h3>Groups and Events remove</h3><p>Remove Group and Remove Event passed through <code>sb_social_remove_own_group</code> and <code>sb_social_remove_own_event</code>. Helper was loaded through the Code Labs/Patch Lab fallback process after GitHub edits were blocked.</p></div></div><div class="checks"><span>Passed</span><span>RPC path</span><span>Code Labs fallback proven</span></div></div>
     <div class="task pass"><div class="top"><div class="num">27</div><div><h3>Profile promotion wording cleanup</h3><p>Profile Rules card and bottom micro text now show promoted social route status instead of stale no-index-promotion wording.</p></div></div><div class="checks"><span>Passed</span><span>User screenshot verified</span><span>Stale wording cleaned</span></div></div>
     <div class="task pass"><div class="top"><div class="num">28</div><div><h3>Groups promotion wording cleanup</h3><p>Groups Rules card and bottom micro text now show promoted social route status and Group/Event remove pass instead of stale no-index-promotion wording.</p></div></div><div class="checks"><span>Passed</span><span>User screenshot verified</span><span>Stale wording cleaned</span></div></div>
+    <div class="task pass"><div class="top"><div class="num">29</div><div><h3>News Feed canonical route check</h3><p>News Feed 001 remains canonical and promoted. News Feed 002/003 are mapped as old aliases/candidates and are not promoted until separately tested.</p></div></div><div class="checks"><span>Canonical 001</span><span>003 held</span><span>No code change needed</span></div></div>
   </div>
 </section>
 
@@ -106,7 +109,7 @@ Passed route ledger: THIS FILE
 Rule 1 fallback: USE CODE LABS/PATCH LAB WHEN GITHUB TOOLS FAIL FROM TRUNCATION OR SAFETY BLOCKING
 Social Profile: PASSED / PROMOTED / SHARE PROFILE PASSED / PROMOTION WORDING CLEANED
 Friends: PASSED / PROMOTED / SHARE PROFILE PASSED
-News Feed: PASSED / PROMOTED / SHARE EDIT DELETE PASSED
+News Feed: PASSED / PROMOTED / SHARE EDIT DELETE PASSED / CANONICAL 001 / 003 HELD
 Groups: PASSED / PROMOTED / REMOVE GROUP PASSED / REMOVE EVENT PASSED / PROMOTION WORDING CLEANED
 Watch, Browse, Creator, Group Play, Mux Manager: PROMOTED ON INDEX
 Details/About/Rules/Code Labs: SUPPORT OR SEPARATE, NOT MAIN HOME CLUTTER
