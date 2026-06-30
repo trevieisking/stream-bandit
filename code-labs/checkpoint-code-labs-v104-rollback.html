@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Code Labs V104 Rollback Checkpoint</title>
+<meta name="description" content="Rollback checkpoint and plain-English tool map for Code Labs V104, GitHub, Supabase, and the browser Code Labs pages.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<style>
+:root{color-scheme:light;--bg:#f5f7ff;--ink:#101828;--muted:#475467;--card:#fff;--line:#d8e0f0;--accent:#2563eb;--good:#079455;--warn:#b54708;--bad:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;line-height:1.55}.wrap{max-width:1060px;margin:auto;padding:28px 16px 44px}.hero,.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;margin:0 0 16px;box-shadow:0 12px 34px #10182812}.pill{display:inline-flex;border-radius:999px;padding:6px 10px;background:#dcfce7;color:#166534;font-weight:900;font-size:12px}h1{font-size:clamp(34px,5vw,58px);line-height:1;margin:12px 0}h2{margin:0 0 10px;font-size:24px}h3{margin:16px 0 6px}p,li{color:var(--muted)}code,pre{background:#f1f5f9;border:1px solid #d8e0f0;border-radius:10px}code{padding:2px 6px}pre{padding:14px;overflow:auto;white-space:pre-wrap}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.card{border:1px solid var(--line);border-radius:18px;padding:16px;background:#fbfdff}.good{color:var(--good);font-weight:900}.warn{color:var(--warn);font-weight:900}.bad{color:var(--bad);font-weight:900}.rule{border-left:5px solid var(--accent);padding:10px 12px;background:#eff6ff;border-radius:12px}.small{font-size:13px}.footer{color:#667085;text-align:center;font-size:12px;margin-top:18px}
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="hero">
+<span class="pill">Rollback checkpoint</span>
+<h1>Code Labs V104 safe checkpoint</h1>
+<p>This page records the rollback point after Code Labs V104 OAuth was repaired and before any more help-tool changes. It is a documentation checkpoint only. It does not change Stream Bandit app behaviour.</p>
+<pre>Checkpoint date: 2026-06-30
+Repo: trevieisking/stream-bandit
+Safe baseline: Code Labs V104 connector works with OAuth and can queue write requests.
+Rollback purpose: return here if later tool or connector changes break the workflow.</pre>
+</section>
+
+<section class="panel">
+<h2>Current working state</h2>
+<div class="grid">
+<div class="card"><h3>Code Labs V104</h3><p><span class="good">Working.</span> Reads Code Labs context, reads Code Labs URLs, and saves safe branch/PR write requests into Supabase SQL.</p></div>
+<div class="card"><h3>GitHub connector</h3><p><span class="good">Actual PR writer.</span> GitHub creates branches, writes files, and opens pull requests. Code Labs does not directly write GitHub.</p></div>
+<div class="card"><h3>Supabase</h3><p><span class="good">Storage and history.</span> Supabase holds Code Labs repair history, write-request queue, and the V104 MCP Edge Function.</p></div>
+<div class="card"><h3>Browser Code Labs pages</h3><p><span class="warn">Helper pages only.</span> They prepare handoffs, copy packets, track links, and save local/Supabase history. They do not hold a GitHub token.</p></div>
+</div>
+</section>
+
+<section class="panel">
+<h2>What each tool is for</h2>
+<h3>Code Labs V104</h3>
+<ul>
+<li><code>get_code_labs_context</code> reads latest Code Labs project, job, packets, tests, and audit history.</li>
+<li><code>read_code_labs_url</code> reads public pages under <code>/code-labs/</code> only.</li>
+<li><code>save_code_labs_write_request</code> saves one safe database-only write request for a branch/PR. It does not edit GitHub and does not open a PR.</li>
+</ul>
+<h3>GitHub</h3>
+<ul>
+<li>Creates the branch from <code>main</code>.</li>
+<li>Creates or updates the exact requested file only.</li>
+<li>Opens the pull request and returns the PR/review link.</li>
+<li>Does not write to <code>main</code> directly unless Trevor explicitly asks after testing.</li>
+</ul>
+<h3>Supabase</h3>
+<ul>
+<li>Hosts the <code>code-labs-mcp-stub</code> Edge Function.</li>
+<li>Stores Code Labs repair history and queued write requests.</li>
+<li>Should not be used to edit Stream Bandit public files directly.</li>
+</ul>
+</section>
+
+<section class="panel">
+<h2>What ChatGPT can and cannot do</h2>
+<div class="grid">
+<div class="card"><h3>Can do</h3><ul><li>Read Code Labs context.</li><li>Read Code Labs public helper pages.</li><li>Save a safe write request in Code Labs SQL.</li><li>Use GitHub connector to create a branch and PR when GitHub is available.</li><li>Explain plain-English steps for non-coders.</li></ul></div>
+<div class="card"><h3>Cannot do through Code Labs V104</h3><ul><li>Cannot directly write GitHub files.</li><li>Cannot open a PR by itself.</li><li>Cannot merge to main.</li><li>Cannot delete files unless a separate GitHub workflow is explicitly approved.</li><li>Cannot bypass missing full file contents.</li></ul></div>
+</div>
+</section>
+
+<section class="panel">
+<h2>Safe workflow from this checkpoint</h2>
+<ol>
+<li>Use Code Labs V104 to read context or save a write request.</li>
+<li>Use GitHub to create a branch from <code>main</code>.</li>
+<li>Touch only the exact target file.</li>
+<li>Open a PR. Do not merge.</li>
+<li>Use GitHub Tracker to store PR and preview links.</li>
+<li>Trevor tests the preview.</li>
+<li>Only after Trevor approves, continue to merge or promote.</li>
+</ol>
+<div class="rule"><b>Hard rule:</b> no more help-tool rewrites unless Trevor explicitly asks. Documentation/checkpoint files are allowed only as branch/PR work.</div>
+</section>
+
+<section class="panel">
+<h2>Rollback note</h2>
+<p>If future connector or helper changes break the workflow, roll back to the state described here: Code Labs V104 OAuth read-write scope repair, database-only write-request queue, GitHub as the only branch/PR writer, and browser Code Labs pages as non-secret handoff helpers.</p>
+</section>
+<p class="footer">Code Labs V104 rollback checkpoint. Documentation only. No live Stream Bandit behaviour changes.</p>
+</main>
+</body>
+</html>
