@@ -190,7 +190,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Playlists V7.12.292 auth gate test: clean Creator rail + playlist page content + plan controls. No schema change. No Supabase Library editor access. No index/registry promotion.</p>
+<p class="micro">Playlists V7.12.292 auth gate test: clean Creator rail + playlist page content + plan controls. Promoted Group Play route with old URL preserved. No schema change. No Supabase Library editor access.</p>
 </div>
 
 <script src="stream-bandit-shell-v6-24.js?v=playlists-auth-gate-292"></script>
@@ -652,7 +652,8 @@ function dbg(step,obj){
    authGateAttached:!!window.StreamBanditAuthGate,
    noSupabaseLibraryEditorAccess:true,
    noSchemaChange:true,
-   noIndexPromotion:true,
+   promotedGroupPlayRoute:true,
+   oldUrlPreserved:true,
    noAllUsersPrivateFallback:true
   },
   extra:obj||{}
