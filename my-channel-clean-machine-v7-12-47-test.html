@@ -198,7 +198,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">My Channel V7.12.294 auth gate test: signed-in Auth Gate + profile content + owned data only. Old URL preserved. Header + page + footer only. No index promotion.</p>
+<p class="micro">My Channel V7.12.294 auth gate test: signed-in Auth Gate + profile content + owned data only. Promoted Group Play route with old URL preserved. Header + page + footer only.</p>
 </div>
 
 <script src="stream-bandit-shell-v6-24.js?v=my-channel-auth-gate-294"></script>
@@ -297,7 +297,8 @@ function dbg(step,obj){
    planStatWrapFix:true,
    noSchemaChange:true,
    noStorageChange:true,
-   noIndexPromotion:true
+   promotedGroupPlayRoute:true,
+   oldUrlPreserved:true
   },
   extra:obj||{}
  };
