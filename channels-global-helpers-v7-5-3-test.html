@@ -203,7 +203,7 @@ code{background:#0005;border:1px solid #ffffff18;border-radius:9px;padding:1px 5
   <div id="debug" class="source">Waiting...</div>
 </section>
 
-<p class="micro">Channels V7.12.293 auth gate test: signed-in Auth Gate + channel page content + plan controls. No schema change. No Supabase Library editor access. No index/registry promotion.</p>
+<p class="micro">Channels V7.12.293 auth gate test: signed-in Auth Gate + channel page content + plan controls. Promoted Group Play route with old URL preserved. No schema change. No Supabase Library editor access.</p>
 </div>
 
 <script src="stream-bandit-shell-v6-24.js?v=channels-auth-gate-293"></script>
@@ -555,7 +555,8 @@ function dbg(step,obj){
    attachUsesRpc:true,
    noAllUsersPrivateFallback:true,
    noSchemaChange:true,
-   noIndexPromotion:true
+   promotedGroupPlayRoute:true,
+   oldUrlPreserved:true
   },
   extra:obj||{}
  };
