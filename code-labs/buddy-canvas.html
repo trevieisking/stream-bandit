@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Code Labs - Buddy Canvas</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v104-buddy-canvas">
+<style>
+.canvasGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}.canvasBox{min-height:72vh;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.35;white-space:pre;overflow:auto}.miniGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.statusLine{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.bigReport{min-height:180px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px}.stickyApply{position:sticky;top:10px;z-index:5;background:linear-gradient(135deg,#101529,#210812);border:1px solid #ffffff28;border-radius:20px;padding:12px;margin-bottom:12px;box-shadow:0 14px 44px #0008}.oneButton{font-size:15px;padding:14px 18px}.readonlyNote{font-size:12px;color:#c4c9dc}@media(max-width:1000px){.canvasGrid{grid-template-columns:1fr}.canvasBox{min-height:55vh}}
+</style>
+</head>
+<body data-page="buddy-canvas">
+<div class="app">
+<aside class="sidebar"><div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>Buddy canvas</small></div></div><nav class="nav"><a href="index.html"><span>🏠</span><div>Home<small>Start here</small></div></a><a href="file-lab.html"><span>📄</span><div>File Lab<small>Load full file</small></div></a><a class="active" href="buddy-canvas.html"><span>🖼️</span><div>Buddy Canvas<small>Full replacement</small></div></a><a href="patch-desk.html"><span>🧩</span><div>Patch Desk<small>Fixed file</small></div></a><a href="publish-prep.html"><span>🚀</span><div>GitHub Writer<small>Branch/PR</small></div></a><a href="repo-desk.html"><span>🧾</span><div>Repo Desk<small>Safe handoff</small></div></a><a href="chatgpt-buddy-tools.html"><span>🤖</span><div>Buddy Tools<small>Internal index</small></div></a></nav><div class="sideBox"><b>Simple rule</b><p>File Lab loads the file. Buddy Canvas saves one complete fixed file. GitHub writes happen later through branch and PR.</p></div></aside>
+<main class="main">
+<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>Buddy Canvas</b></div><div><span class="badge good">Full file lane</span><span class="badge warn">No GitHub write</span></div></div>
+<section class="hero"><div><span class="pill">V104 Buddy Canvas</span><h1>One full code canvas.</h1><p>Use this after File Lab has loaded a page. The left canvas shows the full loaded source. Paste ChatGPT's finished full replacement into the right canvas, then apply once. This avoids fragile multi-recipe patching.</p><div class="actions"><a class="btn ghost" href="file-lab.html">Back to File Lab</a><a class="btn ghost" href="patch-desk.html">Patch Desk</a><a class="btn ghost" href="publish-prep.html">Publish Prep</a></div></div><div class="heroCard"><b>Use order</b><ol><li>Load the exact file in File Lab.</li><li>Open Buddy Canvas.</li><li>Paste ChatGPT full replacement on the right.</li><li>Click Apply once.</li><li>Use Publish Prep or Repo Desk for branch/PR.</li></ol></div></section>
+<section class="panel stickyApply"><h2>Apply full replacement</h2><div class="statusLine"><span id="loadStatus" class="badge warn">Loading File Lab state</span><span id="fileBadge" class="badge warn">No file yet</span><span id="safeBadge" class="badge warn">Waiting</span></div><p class="readonlyNote">This browser page only reads and saves Code Labs local repair state. It does not write GitHub, Supabase, main branch, RLS, storage, payment, or secrets.</p><div class="actions"><button class="btn primary oneButton" id="applyFull" type="button">Apply Full Replacement To Code Labs</button><button class="btn ghost" id="copyReport" type="button">Copy Report</button><button class="btn ghost" id="useLoaded" type="button">Reset Right Canvas To Loaded Code</button></div></section>
+<section class="panel"><h2>Loaded file proof</h2><div class="miniGrid"><div class="stat"><b>File</b><span id="statFile">Not loaded</span></div><div class="stat"><b>Path</b><span id="statPath">Not loaded</span></div><div class="stat"><b>Repo</b><span id="statRepo">Not loaded</span></div><div class="stat"><b>Branch</b><span id="statBranch">Not loaded</span></div><div class="stat"><b>Loaded lines</b><span id="statLines">0</span></div><div class="stat"><b>Fixed lines</b><span id="statFixedLines">0</span></div></div></section>
+<section class="canvasGrid"><div class="panel"><h2>1. Full loaded source from File Lab</h2><p class="muted">Read-only. This is what File Lab currently has loaded.</p><textarea id="loadedCode" class="canvasBox" readonly>No File Lab code loaded yet.</textarea></div><div class="panel"><h2>2. ChatGPT fixed full code</h2><p class="muted">Paste the complete replacement file here. Do not paste a patch recipe or report.</p><textarea id="fixedCode" class="canvasBox" placeholder="Paste ChatGPT full replacement file here"></textarea></div></section>
+<section class="panel"><h2>Report to send back</h2><textarea id="report" class="bigReport" readonly>Waiting for loaded file.</textarea></section>
+<div class="footerNote">Code Labs V104 Buddy Canvas · one full replacement · local state only · no direct main writes.</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+'use strict';
+var KEY='codeLabsV1State';
+function q(s){return document.querySelector(s)}
+function toast(msg){var t=q('#toast');if(!t){alert(msg);return}t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)}
+function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
+function write(s){localStorage.setItem(KEY,JSON.stringify(s||{}))}
+function lines(t){return String(t||'').split(/\r?\n/).length}
+function chars(t){return String(t||'').length}
+function escText(v){return String(v==null?'':v)}
+function sourceInfo(s){var f=s.file||{},src=f.githubSource||{},p=s.project||{},parts=String(p.repo||'').split('/');return{file:f.filename||'Not set',path:src.path||f.path||f.filename||'Not set',repo:(src.owner&&src.repo)?src.owner+'/'+src.repo:((parts[0]&&parts[1])?parts[0]+'/'+parts[1]:'Not set'),branch:src.branch||'main',loadedAt:src.loadedAt||f.codeSearchSavedAt||''}}
+function loadedCode(s){var f=s.file||{};return String(f.currentCode||'')}
+function currentFixed(s){var f=s.file||{};return String(f.fixedCode||'')}
+function setText(id,v){var e=q(id);if(e)e.textContent=v}
+function setVal(id,v){var e=q(id);if(e)e.value=v}
+function checkFull(original,fixed,path){var warns=[];if(!fixed.trim())warns.push('Fixed code is empty.');if(/\.html?$/i.test(path||'')&&!(/<!doctype\s+html/i.test(fixed)||/<html[\s>]/i.test(fixed)))warns.push('HTML target needs a complete HTML document.');if(original.trim()&&fixed.length<Math.max(120,Math.floor(original.length*0.65)))warns.push('Fixed code is much smaller than loaded code.');if(lines(fixed)<3&&chars(fixed)<120)warns.push('Fixed code looks like a snippet.');if(/BEGIN PATCH|Find:\s*\n|Replace with:/i.test(fixed))warns.push('This looks like a patch recipe, not a full file.');return warns}
+function buildReport(action){var s=read(),info=sourceInfo(s),orig=loadedCode(s),fixed=q('#fixedCode').value||'',warns=checkFull(orig,fixed,info.path),ok=!warns.length;var out={tool:'Code Labs Buddy Canvas',version:'V104',action:action||'ready',file:info.file,path:info.path,repo:info.repo,branch:info.branch,loaded_lines:lines(orig),loaded_characters:chars(orig),fixed_lines:lines(fixed),fixed_characters:chars(fixed),full_replacement_ok:ok,warnings:warns,source_loaded_at:info.loadedAt||null,note:'Buddy Canvas saves one complete fixed file into Code Labs local state. It does not write GitHub.'};return JSON.stringify(out,null,2)}
+function refresh(){var s=read(),info=sourceInfo(s),orig=loadedCode(s),fixed=currentFixed(s)||orig;setText('#statFile',info.file);setText('#statPath',info.path);setText('#statRepo',info.repo);setText('#statBranch',info.branch);setText('#statLines',String(lines(orig)));setText('#statFixedLines',String(lines(fixed)));setVal('#loadedCode',orig||'No File Lab code loaded yet.');if(!q('#fixedCode').value)q('#fixedCode').value=fixed||'';var has=!!orig.trim();q('#loadStatus').className='badge '+(has?'good':'bad');q('#loadStatus').textContent=has?'File Lab code loaded':'No File Lab code loaded';q('#fileBadge').className='badge '+(info.path!=='Not set'?'good':'warn');q('#fileBadge').textContent=info.path;var warns=checkFull(orig,q('#fixedCode').value||'',info.path);q('#safeBadge').className='badge '+(!warns.length?'good':'warn');q('#safeBadge').textContent=!warns.length?'Full file looks safe':'Check warnings';setVal('#report',buildReport('ready'))}
+function apply(){var s=read(),info=sourceInfo(s),orig=loadedCode(s),fixed=q('#fixedCode').value||'',warns=checkFull(orig,fixed,info.path);if(warns.length){setVal('#report',buildReport('blocked'));toast('Blocked: '+warns[0]);return}s.file=s.file||{};s.file.fixedCode=fixed;s.file.buddyCanvas={version:'V104',path:info.path,repo:info.repo,branch:info.branch,appliedAt:new Date().toISOString(),loadedCharacters:chars(orig),fixedCharacters:chars(fixed)};s.log=s.log||[];s.log.unshift({id:'cl_'+Date.now(),date:new Date().toLocaleString(),msg:'Buddy Canvas saved full replacement for '+info.path});s.log=s.log.slice(0,80);write(s);setVal('#report',buildReport('saved_full_replacement'));toast('Full replacement saved to Code Labs');refresh()}
+q('#applyFull').onclick=apply;
+q('#copyReport').onclick=function(){var r=q('#report').value||buildReport('copy');navigator.clipboard.writeText(r).then(function(){toast('Report copied')}).catch(function(){q('#report').focus();q('#report').select();document.execCommand('copy');toast('Report selected/copied')})};
+q('#useLoaded').onclick=function(){var s=read();q('#fixedCode').value=loadedCode(s);refresh();toast('Right canvas reset to loaded code')};
+q('#fixedCode').addEventListener('input',refresh);
+refresh();
+})();
+</script>
+</body>
+</html>
