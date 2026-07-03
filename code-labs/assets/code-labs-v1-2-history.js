@@ -1,4 +1,4 @@
-/* Code Labs V1.2.3 - Supabase saved repair history + verified remove */
+/* Code Labs V1.2.4 - Supabase saved repair history + file-row rendering */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
@@ -14,7 +14,7 @@
   function setStatus(msg,kind){var el=$('#clHistoryStatus');if(el){el.className='badge '+(kind||'warn');el.textContent=msg;}}
   function setHelp(html){var el=$('#clHistoryHelp');if(el)el.innerHTML=html;}
   async function currentUser(){var sb=await client();var res=await sb.auth.getUser();return {sb:sb,user:res&&res.data?res.data.user:null,error:res.error};}
-  function projectPayload(s){var p=s.project||{};return {workspace:p.workspace||'',site_name:p.siteName||'Untitled project',site_url:p.siteUrl||'',repo:p.repo||'',mode:p.mode||'manual',notes:p.notes||'',metadata:{source:'code-labs-v1.2.3',domain:location.hostname}};}
+  function projectPayload(s){var p=s.project||{};return {workspace:p.workspace||'',site_name:p.siteName||'Untitled project',site_url:p.siteUrl||'',repo:p.repo||'',mode:p.mode||'manual',notes:p.notes||'',metadata:{source:'code-labs-v1.2.4',domain:location.hostname}};}
   async function refreshStatus(){try{setStatus('Checking Supabase','warn');var cu=await currentUser();if(cu.user){setStatus('Supabase ready','good');setHelp('<p><b>Supabase:</b> ready for Code Labs repair history. Remove clears selected Code Labs history rows only.</p>');}else{setStatus('Connect Supabase','warn');setHelp('<p><b>Supabase:</b> not active for this Code Labs session. Connect Supabase when asked by ChatGPT/settings, then refresh this panel. Do not use Stream Bandit login for this page.</p>');}return cu;}catch(err){console.error(err);setStatus('Supabase unavailable','bad');setHelp('<p><b>Supabase:</b> check failed. Connect Supabase when asked, then try again. GitHub is separate.</p>');return {user:null,error:err};}}
   async function saveAll(){
     try{
@@ -25,21 +25,21 @@
       var pr=await cu.sb.from('code_labs_projects').insert(projectPayload(s)).select('id').single();
       if(pr.error)throw pr.error;
       var projectId=pr.data.id;
-      var fr=await cu.sb.from('code_labs_files').insert({project_id:projectId,filename:f.filename||'file.html',file_type:(f.filename||'').split('.').pop()||'html',current_code:f.currentCode||'',current_hash:String((f.currentCode||'').length),metadata:{site:p.siteName||'',source:'code-labs-v1.2.3'}}).select('id').single();
+      var fr=await cu.sb.from('code_labs_files').insert({project_id:projectId,filename:f.filename||'file.html',file_type:(f.filename||'').split('.').pop()||'html',current_code:f.currentCode||'',current_hash:String((f.currentCode||'').length),metadata:{site:p.siteName||'',source:'code-labs-v1.2.4'}}).select('id').single();
       if(fr.error)throw fr.error;
       var fileId=fr.data.id;
       var jr=await cu.sb.from('code_labs_jobs').insert({project_id:projectId,file_id:fileId,title:(f.problem||'Manual repair').slice(0,120),problem:f.problem||'',dont_touch:f.dontTouch||'',errors:f.errors||'',status:'saved',started_at:new Date().toISOString(),completed_at:new Date().toISOString(),metadata:{localLogCount:(s.log||[]).length,buddyCanvas:f.buddyCanvas||null}}).select('id').single();
       if(jr.error)throw jr.error;
       var jobId=jr.data.id;
       var versions=[];
-      if(f.currentCode)versions.push({project_id:projectId,job_id:jobId,file_id:fileId,version_kind:'original',label:'Original code',filename:f.filename||'file.html',code:f.currentCode,note:'Saved from Code Labs V1.2.3'});
-      if(f.fixedCode)versions.push({project_id:projectId,job_id:jobId,file_id:fileId,version_kind:'fixed',label:'Fixed code',filename:f.filename||'file.html',code:f.fixedCode,note:'Saved from Code Labs V1.2.3'});
+      if(f.currentCode)versions.push({project_id:projectId,job_id:jobId,file_id:fileId,version_kind:'original',label:'Original code',filename:f.filename||'file.html',code:f.currentCode,note:'Saved from Code Labs V1.2.4'});
+      if(f.fixedCode)versions.push({project_id:projectId,job_id:jobId,file_id:fileId,version_kind:'fixed',label:'Fixed code',filename:f.filename||'file.html',code:f.fixedCode,note:'Saved from Code Labs V1.2.4'});
       (s.checkpoints||[]).slice(0,20).forEach(function(c){versions.push({project_id:projectId,job_id:jobId,file_id:fileId,version_kind:c.kind||'checkpoint',label:c.label||'Checkpoint',filename:c.filename||f.filename||'file.html',code:c.code||'',note:c.note||''});});
       if(versions.length){var vr=await cu.sb.from('code_labs_versions').insert(versions);if(vr.error)throw vr.error;}
       if(f.packet){var pk=await cu.sb.from('code_labs_packets').insert({project_id:projectId,job_id:jobId,packet_type:f.packetType||'full-file-repair',packet_text:f.packet,metadata:{filename:f.filename||''}});if(pk.error)throw pk.error;}
       var tests=(s.tests||[]).slice(0,20).map(function(t){return {project_id:projectId,job_id:jobId,filename:t.filename||f.filename||'',result:t.result||'UNKNOWN',checked_count:t.checked||0,total_count:t.total||0,notes:t.notes||'',details:t};});
       if(tests.length){var tr=await cu.sb.from('code_labs_test_runs').insert(tests);if(tr.error)throw tr.error;}
-      await cu.sb.from('code_labs_audit_log').insert({project_id:projectId,job_id:jobId,action:'saved_repair_history',details:{filename:f.filename||'',hasFixed:!!f.fixedCode,tests:tests.length,source:'code-labs-v1.2.3'}});
+      await cu.sb.from('code_labs_audit_log').insert({project_id:projectId,job_id:jobId,action:'saved_repair_history',details:{filename:f.filename||'',hasFixed:!!f.fixedCode,tests:tests.length,source:'code-labs-v1.2.4'}});
       setStatus('Saved to Supabase','good');setHelp('<p><b>Saved:</b> Code Labs repair history saved to Supabase. No GitHub write happened.</p>');toast('Repair history saved to Supabase.');
       loadHistory();
       return {ok:true,project_id:projectId,file_id:fileId,job_id:jobId};
@@ -75,18 +75,36 @@
       return {ok:true,project_id:projectId};
     }catch(err){console.error(err);setStatus('Remove failed','bad');setHelp('<p><b>Remove failed:</b> '+esc(err.message||err)+'.</p>');toast('Remove failed: '+(err.message||err));loadHistory();return {ok:false,error:String(err.message||err)};}
   }
+  function renderHistoryItem(project, file){
+    file=file||{};
+    var filename=file.filename||project.site_url||project.site_name||'Saved repair history';
+    var chars=file.current_hash?(' · '+file.current_hash+' chars'):'';
+    var projectName=project.site_name||project.repo||'Code Labs';
+    var sub=projectName+' · '+(project.mode||'manual')+chars;
+    var url=project.site_url||'No URL';
+    return '<div class="item" data-cl-history-item="'+esc(project.id)+'"><b>'+esc(filename)+'</b><p>'+esc(sub)+'</p><p>'+esc(new Date(project.created_at).toLocaleString())+'</p><p>'+esc(url)+'</p><div class="actions"><button class="btn bad smallBtn" data-cl-remove-history="'+esc(project.id)+'" data-cl-history-name="'+esc(filename)+'" type="button">Remove</button></div></div>';
+  }
   async function loadHistory(){
     try{
       var cu=await refreshStatus();
       if(!cu.user){return;}
       var r=await cu.sb.from('code_labs_projects').select('id,site_name,site_url,repo,mode,created_at').order('created_at',{ascending:false}).limit(8);
       if(r.error)throw r.error;
+      var projects=r.data||[];
+      var ids=projects.map(function(x){return x.id;});
+      var byProject={};
+      if(ids.length){
+        var fr=await cu.sb.from('code_labs_files').select('project_id,filename,current_hash,metadata').in('project_id',ids);
+        if(fr.error)throw fr.error;
+        (fr.data||[]).forEach(function(f){if(f&&f.project_id&&!byProject[f.project_id])byProject[f.project_id]=f;});
+      }
       var box=$('#clHistoryList');
       if(box){
-        box.innerHTML=(r.data||[]).length?(r.data||[]).map(function(x){var name=x.site_name||'Untitled';return '<div class="item" data-cl-history-item="'+esc(x.id)+'"><b>'+esc(name)+'</b><p>'+esc(x.site_url||'No URL')+'</p><p>'+esc(new Date(x.created_at).toLocaleString())+' · '+esc(x.mode||'manual')+'</p><div class="actions"><button class="btn bad smallBtn" data-cl-remove-history="'+esc(x.id)+'" data-cl-history-name="'+esc(name)+'" type="button">Remove</button></div></div>';}).join(''):'<div class="empty">No saved Supabase history yet.</div>';
+        box.innerHTML=projects.length?projects.map(function(x){return renderHistoryItem(x,byProject[x.id]);}).join(''):'<div class="empty">No saved Supabase history yet.</div>';
         $all('[data-cl-remove-history]',box).forEach(function(btn){btn.onclick=function(){removeProject(btn.getAttribute('data-cl-remove-history'),btn.getAttribute('data-cl-history-name'));};});
       }
       setStatus('History loaded','good');
+      setHelp('<p><b>Supabase:</b> history cards show the saved file row first, not stale project text.</p>');
     }catch(err){console.error(err);setStatus('Load failed','bad');setHelp('<p><b>Load failed:</b> '+esc(err.message||err)+'.</p>');toast('Could not load history: '+(err.message||err));}
   }
   window.CodeLabsRepairHistory={refreshStatus:refreshStatus,saveAll:saveAll,loadHistory:loadHistory,currentUser:currentUser,removeProject:removeProject};
