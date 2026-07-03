@@ -1,4 +1,4 @@
-/* Code Labs V1.3.3 - GitHub read-only file loader safe generic repo */
+/* Code Labs V1.3.4 - GitHub read-only file loader safe generic repo */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
@@ -12,6 +12,7 @@
   function rawFromInputs(owner,repo,branch,path){return 'https://raw.githubusercontent.com/'+encodeURIComponent(owner).replace(/%2F/g,'/')+'/'+encodeURIComponent(repo).replace(/%2F/g,'/')+'/'+encodeURIComponent(branch||'main').replace(/%2F/g,'/')+'/'+String(path||'').split('/').map(encodeURIComponent).join('/');}
   function isGenericRepo(owner,repo){return !owner||!repo||owner==='owner'||repo==='repo'||owner==='example'||repo==='example';}
   function setStatus(kind,text){var status=$('#clGithubStatus');if(status){status.className='badge '+(kind||'warn');status.textContent=text||'Read-only';}}
+  function sourceKey(src){return [src&&src.owner||'',src&&src.repo||'',src&&src.branch||'',src&&src.path||''].join('/');}
   function parseGitHubUrl(url){
     try{
       var u=new URL(url.trim());
@@ -32,9 +33,9 @@
     if(!res.ok)throw new Error('GitHub read failed: HTTP '+res.status);
     return await res.text();
   }
-  function clearFixedStateForNewFile(s,newPath){
-    var f=s.file||{}, old=(f.githubSource&&f.githubSource.path)||f.path||f.filename||'';
-    if(old&&newPath&&old!==newPath){
+  function clearFixedStateForNewFile(s,info){
+    var f=s.file||{}, oldSrc=f.githubSource||{}, oldKey=sourceKey(oldSrc), newKey=sourceKey(info||{}), newPath=(info&&info.path)||'';
+    if(oldKey&&newKey&&oldKey!==newKey){
       delete f.fixedCode;
       delete f.fixedPath;
       delete f.fixedFile;
@@ -44,14 +45,14 @@
       f.fixedCodeClearedAt=new Date().toISOString();
       try{localStorage.removeItem('codeLabsV30RepoDesk');localStorage.removeItem('codeLabsGithubWriterV2');localStorage.removeItem('codeLabsV17Tracker');}catch(e){}
       s.log=s.log||[];
-      s.log.unshift({id:'cl_'+Date.now()+'_clear',date:now(),msg:'Cleared stale fixed output for new File Lab path: '+newPath});
+      s.log.unshift({id:'cl_'+Date.now()+'_clear',date:now(),msg:'Cleared stale fixed output for new File Lab source: '+newKey});
     }
   }
   function applyLoadedFile(info,code){
     var s=state();
     s.project=s.project||{};
     s.file=s.file||{};
-    clearFixedStateForNewFile(s,info.path||'');
+    clearFixedStateForNewFile(s,info||{});
     s.file.filename=(info.path||'github-file.txt').split('/').pop()||'github-file.txt';
     s.file.currentCode=code||'';
     s.file.githubSource={owner:info.owner||'',repo:info.repo||'',branch:info.branch||'',path:info.path||'',raw:info.raw||'',loadedAt:new Date().toISOString(),mode:'read-only'};
@@ -61,7 +62,7 @@
     var name=$('#filename'), box=$('#currentCode');
     if(name)name.value=s.file.filename;
     if(box){box.value=code||'';box.dispatchEvent(new Event('input',{bubbles:true}));}
-    toast('GitHub file loaded read-only. Stale fixed output cleared when the target changed.');
+    toast('GitHub file loaded read-only. Stale fixed output cleared when the source changed.');
   }
   async function loadFromPanel(){
     try{
