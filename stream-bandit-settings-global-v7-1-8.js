@@ -1,15 +1,30 @@
-/* Stream Bandit V7.1.8 Safe Global Settings Bridge
+/* Stream Bandit V7.1.9 Safe Global Settings Bridge / Settings Hub Auth Gate
    Reads future Settings Platform Control Hub JSON shape and exposes it globally.
    Safe stage: no redirects, no hiding pages, no favicon replacement, no Supabase writes.
-   Pages can include this helper later to read feature visibility consistently. */
+   Settings Hub only: injects the standard Stream Bandit Auth Gate so the Settings group uses
+   the normal login/logout/reset flow while Create Account remains locked. */
 (function(){
 'use strict';
-const VERSION='V7.1.8 Safe Global Settings Bridge';
+const VERSION='V7.1.9 Safe Global Settings Bridge / Settings Hub Auth Gate';
 const STORE_ID='stream_bandit';
 const SETTINGS_KEYS=['settings_platform_control_hub','platform_feature_controls','featureControls','streamBanditSettings'];
+const SETTINGS_HUB_FILE='settings-platform-control-hub-v7-12-85-test.html';
+const AUTH_GATE_SRC='stream-bandit-auth-gate-v7-13-001.js?v=settings-auth-gate-7-13-005';
 let sb=null;
 let state={loaded:false,source:'defaults',settings:{},brandingFiles:{},error:''};
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function currentFile(){return String(location.pathname||'').split('/').pop()||'';}
+function isSettingsHub(){return currentFile()===SETTINGS_HUB_FILE;}
+function ensureSettingsHubAuthGate(){
+  if(!isSettingsHub())return;
+  if(document.querySelector('script[src*="stream-bandit-auth-gate-v7-13-001.js"]'))return;
+  const s=document.createElement('script');
+  s.src=AUTH_GATE_SRC;
+  s.defer=true;
+  s.dataset.sbSettingsHubAuthGate='v7-13-005';
+  document.head.appendChild(s);
+  document.documentElement.dataset.sbSettingsHubAuthGate='v7-13-005';
+}
 async function readConfig(){
   try{
     const txt=await fetch('stream-bandit-shell-v6-24.js',{cache:'no-store'}).then(r=>r.text());
@@ -31,7 +46,7 @@ function pickSettings(settings){
 function applyData(data,source){
   const d=data||defaults();
   state={loaded:true,source:source||d.sourceKey||'defaults',settings:d.settings||{},brandingFiles:d.brandingFiles||{},error:''};
-  document.documentElement.dataset.streamBanditSettingsBridge='v7-1-8';
+  document.documentElement.dataset.streamBanditSettingsBridge='v7-1-9';
   document.documentElement.dataset.streamBanditSettingsLoaded='true';
   document.dispatchEvent(new CustomEvent('streambandit:settings-loaded',{detail:{...state}}));
   return state;
@@ -47,7 +62,7 @@ async function load(){
     return applyData(picked,picked.sourceKey||'sb_app_settings');
   }catch(e){
     state={...state,loaded:false,error:e.message||String(e)};
-    document.documentElement.dataset.streamBanditSettingsBridge='v7-1-8-error';
+    document.documentElement.dataset.streamBanditSettingsBridge='v7-1-9-error';
     document.dispatchEvent(new CustomEvent('streambandit:settings-error',{detail:{...state}}));
     return state;
   }
@@ -68,12 +83,13 @@ function injectStatus(){
   const el=document.createElement('div');
   el.id='sbSettingsBridgeStatus';
   el.style.cssText='margin:12px 0;padding:10px 12px;border-radius:14px;border:1px solid #22d3a647;background:#22d3a61a;color:#dfffee;font-weight:800;font-family:Inter,system-ui,Arial,sans-serif';
-  el.textContent='Settings bridge loaded safely. No global hiding/favicon replacement yet.';
+  el.textContent='Settings bridge loaded safely. Settings Hub auth gate aligned. No global hiding/favicon replacement yet.';
   if(target&&target.parentNode)target.parentNode.insertBefore(el,target);else document.body.appendChild(el);
 }
 function init(){
-  window.StreamBanditSettingsGlobal={version:VERSION,load,getState:()=>({...state}),get,enabled,mode,visible};
-  load().then(()=>{if(location.pathname.includes('settings-platform-control-hub'))injectStatus();});
+  ensureSettingsHubAuthGate();
+  window.StreamBanditSettingsGlobal={version:VERSION,load,getState:()=>({...state}),get,enabled,mode,visible,ensureSettingsHubAuthGate};
+  load().then(()=>{if(location.pathname.includes('settings-platform-control-hub')){ensureSettingsHubAuthGate();injectStatus();}});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
