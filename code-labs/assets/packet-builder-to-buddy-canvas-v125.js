@@ -1,12 +1,13 @@
-/* Code Labs Packet Builder To Buddy Canvas V125 - exact target transmit for ChatGPT/GitHub/Supabase/Code Labs reads */
+/* Code Labs Packet Builder To Buddy Canvas V126 - exact target transmit into Source Control preview */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
+  var PENDING='codeLabsSourceControlPendingReadV126';
   function q(s,r){return (r||document).querySelector(s);}
   function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){return{};}}
   function save(s){try{localStorage.setItem(KEY,JSON.stringify(s||{}));return true;}catch(e){console.error(e);return false;}}
   function val(sel){var el=q(sel);return el?String(el.value==null?'':el.value):'';}
-  function toast(msg){var t=q('#toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}else{console.log(msg);}}
+  function toast(msg){var t=q('#toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2400);}else{console.log(msg);}}
   function lines(t){var v=String(t||'');return v?v.split(/\r?\n/).length:0;}
   function hash32(str){str=String(str||'');var h=0;for(var i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}return ('00000000'+(h>>>0).toString(16)).slice(-8);}
   function basename(path){return String(path||'').split(/[\\/]/).pop()||'';}
@@ -49,32 +50,37 @@
     if(!p.repo)p.repo='trevieisking/stream-bandit';
     p.siteUrl=targetPath;
     p.mode=p.mode||'manual';
-    s.buddyCanvasTarget={
-      version:'V125',
+    var pending={
+      version:'V126',
       source:'packet-builder',
       target:target||'chatgpt',
+      read_kind:target==='github'?'github':(target==='supabase'?'supabase':'code_labs'),
+      label:target==='github'?'GitHub Read':(target==='supabase'?'Supabase Read':(target==='codelabs'?'Code Labs Read':'Packet Builder ChatGPT Target')),
       filename:filename,
       path:targetPath,
       repo:p.repo||'trevieisking/stream-bandit',
       branch:f.githubSource.branch||'main',
       packet_type:packetType,
       packet_characters:(packet||'').length,
-      current_code_characters:(f.currentCode||'').length,
-      current_code_lines:lines(f.currentCode||''),
-      current_code_hash32:hash32(f.currentCode||''),
+      code:code||'',
+      current_code_characters:(code||'').length,
+      current_code_lines:lines(code||''),
+      current_code_hash32:hash32(code||''),
       created_at:new Date().toISOString(),
-      safety:{browser_github_write:false,browser_supabase_schema:false,browser_delete:false,code_labs_state_only:true}
+      safety:{preview_only:true,browser_github_write:false,browser_supabase_schema:false,browser_delete:false,code_labs_state_only:true}
     };
-    s.log.unshift({id:'cl_'+Date.now(),date:new Date().toLocaleString(),msg:'Packet Builder sent '+targetPath+' to Buddy Canvas target '+(target||'chatgpt')});
+    s.buddyCanvasTarget=pending;
+    s.log.unshift({id:'cl_'+Date.now(),date:new Date().toLocaleString(),msg:'Packet Builder sent '+targetPath+' to Source Control preview target '+(target||'chatgpt')});
     s.log=s.log.slice(0,80);
     save(s);
+    try{localStorage.setItem(PENDING,JSON.stringify(pending));}catch(e){}
+    try{window.dispatchEvent(new StorageEvent('storage',{key:PENDING,newValue:JSON.stringify(pending)}));}catch(e){try{window.dispatchEvent(new CustomEvent('code-labs-source-control-pending-read',{detail:pending}));}catch(_){}}
     return s;
   }
   function send(target){
     var s=syncVisibleFields(target);
-    toast('Loaded for Buddy Canvas: '+((s.buddyCanvasTarget&&s.buddyCanvasTarget.path)||(s.file&&s.file.filename)||'file'));
-    var url='buddy-canvas.html?source=packet-builder&target='+encodeURIComponent(target||'chatgpt')+'&file='+encodeURIComponent((s.buddyCanvasTarget&&s.buddyCanvasTarget.path)||(s.file&&s.file.filename)||'file.html')+'&v=125';
-    setTimeout(function(){location.href=url;},220);
+    var path=(s.buddyCanvasTarget&&s.buddyCanvasTarget.path)||(s.file&&s.file.filename)||'file';
+    toast('Sent to Buddy Canvas Source Control preview: '+path);
   }
   function addButtons(){
     if(document.body.getAttribute('data-page')!=='packet-builder')return;
@@ -88,10 +94,10 @@
     wrap.style.margin='10px 0';
     wrap.style.borderColor='#ff4d6d66';
     wrap.style.background='#ff4d6d18';
-    wrap.innerHTML='<p style="color:#ffd2d9;font-weight:950;margin:0 0 8px">Load for ChatGPT: send this exact Packet Builder state into Buddy Canvas.</p><div class="actions"><button class="btn hot" type="button" data-pb-target="chatgpt">Load for ChatGPT</button><button class="btn ghost" type="button" data-pb-target="github">GitHub</button><button class="btn ghost" type="button" data-pb-target="supabase">Supabase</button><button class="btn ghost" type="button" data-pb-target="codelabs">Code Labs</button></div><p style="margin:8px 0 0;color:#b9c0d8">This only updates Code Labs browser state and opens Buddy Canvas. No GitHub write, no Supabase schema change, no live route change.</p>';
+    wrap.innerHTML='<p style="color:#ffd2d9;font-weight:950;margin:0 0 8px">Load for ChatGPT: send this exact Packet Builder state into Buddy Canvas Source Control preview.</p><div class="actions"><button class="btn hot" type="button" data-pb-target="chatgpt">Load for ChatGPT</button><button class="btn ghost" type="button" data-pb-target="github">GitHub</button><button class="btn ghost" type="button" data-pb-target="supabase">Supabase</button><button class="btn ghost" type="button" data-pb-target="codelabs">Code Labs</button></div><p style="margin:8px 0 0;color:#b9c0d8">This updates Code Labs state and the Buddy Canvas Source Control preview only. It does not click Load Into Buddy Canvas Source, does not write GitHub, and does not change Supabase schema.</p>';
     actions.parentNode.insertBefore(wrap,out);
     Array.prototype.slice.call(wrap.querySelectorAll('[data-pb-target]')).forEach(function(btn){btn.onclick=function(){send(btn.getAttribute('data-pb-target')||'chatgpt');};});
   }
-  function boot(){addButtons();setTimeout(addButtons,450);setTimeout(addButtons,1200);window.CodeLabsPacketToBuddyV125={send:send,syncVisibleFields:syncVisibleFields,resolveTargetPath:resolveTargetPath};}
+  function boot(){addButtons();setTimeout(addButtons,450);setTimeout(addButtons,1200);window.CodeLabsPacketToBuddyV126={send:send,syncVisibleFields:syncVisibleFields,resolveTargetPath:resolveTargetPath};window.CodeLabsPacketToBuddyV125=window.CodeLabsPacketToBuddyV126;}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

@@ -1,12 +1,14 @@
-/* Code Labs Buddy Canvas V112 - GitHub / Supabase / Code Labs read switch
-   Purpose: preview and load a trusted source copy before a repair pass.
+/* Code Labs Buddy Canvas V126 - GitHub / Supabase / Code Labs read switch + Packet Builder preview receiver
+   Purpose: preview a trusted source copy before a repair pass.
    Safety: read-only by default. Load writes local Code Labs browser state only.
 */
 (function(){
 'use strict';
 
 var KEY='codeLabsV1State';
+var PENDING='codeLabsSourceControlPendingReadV126';
 var selected=null;
+var lastPendingId='';
 
 function q(s,r){return(r||document).querySelector(s);}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -32,6 +34,8 @@ function rawUrl(repo,branch,path){var r=splitRepo(repo);return 'https://raw.gith
 function sourceLooksFull(code,path){code=String(code||'');if(!code.trim())return false;if(/\.html?$/i.test(path||''))return /<!doctype\s+html/i.test(code)||/<html[\s>]/i.test(code);return true;}
 function setStatus(msg,kind){var e=q('#clSourceControlStatus');if(e){e.className='badge '+(kind||'warn');e.textContent=msg;}}
 function currentCanvasCode(){return val('#loadedCode')||String(((read().file||{}).currentCode)||'');}
+function clearPending(){try{localStorage.removeItem(PENDING);}catch(e){}}
+function pendingExpired(payload){var t=Date.parse(payload&&payload.created_at||'');return !!(t&&Date.now()-t>10*60*1000);}
 function renderCompare(){
   var cur=currentCanvasCode(), code=selected?selected.code:'';
   var out=q('#clSourceCompare');
@@ -47,7 +51,7 @@ function choose(kind,label,code,meta){
   text('#clSourceMeta',label+' · '+selected.path+' · '+chars(selected.code)+' chars · '+lines(selected.code)+' lines');
   setStatus(kind+' ready',sourceLooksFull(selected.code,selected.path)?'good':'warn');
   renderCompare();
-  toast(label+' loaded into preview. Press Load Into Buddy Canvas Source to use it.');
+  toast(label+' loaded into Source Control preview.');
 }
 function ensureUi(){
   var main=q('.main');
@@ -58,7 +62,7 @@ function ensureUi(){
   panel.style.border='3px solid rgba(65,232,255,.35)';
   panel.innerHTML='\
     <h2>Buddy Canvas Source Control</h2>\
-    <p class="muted"><b>Read switch:</b> choose GitHub Read, Supabase Read, or Code Labs Read, preview the result, then load it into the left source canvas when it is the right file. Reads do not save, delete, write GitHub, or change schema.</p>\
+    <p class="muted"><b>Read switch:</b> choose GitHub Read, Supabase Read, or Code Labs Read. The result loads into the preview box below. The main Buddy Canvas source is only changed if you deliberately press Load Into Buddy Canvas Source.</p>\
     <div class="actions" style="align-items:center">\
       <span id="clSourceControlStatus" class="badge warn">Source switch ready</span>\
       <input id="clSourcePath" type="text" placeholder="path or filename" style="min-width:280px;flex:1;border-radius:999px;border:1px solid #ffffff24;padding:10px 12px;background:#0005;color:inherit">\
@@ -97,7 +101,7 @@ function ensureHistoryHelper(){return new Promise(function(resolve){
   if(window.CodeLabsRepairHistory&&window.CodeLabsRepairHistory.currentUser)return resolve(true);
   if(q('script[data-cl-source-history-helper]')){setTimeout(function(){resolve(!!(window.CodeLabsRepairHistory&&window.CodeLabsRepairHistory.currentUser));},800);return;}
   var sc=document.createElement('script');
-  sc.src='assets/code-labs-v1-2-history.js?v=source-control-v112';
+  sc.src='assets/code-labs-v1-2-history.js?v=source-control-v126';
   sc.setAttribute('data-cl-source-history-helper','yes');
   sc.onload=function(){setTimeout(function(){resolve(!!(window.CodeLabsRepairHistory&&window.CodeLabsRepairHistory.currentUser));},400);};
   sc.onerror=function(){resolve(false);};
@@ -146,13 +150,13 @@ function loadSelected(){
     s.file.currentCode=selected.code;
     s.file.filename=selected.path||s.file.filename||'file.html';
     s.file.path=selected.path||s.file.path||s.file.filename;
-    s.file.sourceSwitch={version:'V112',source:selected.kind,label:selected.label,loadedAt:selected.loadedAt,characters:chars(selected.code),lines:lines(selected.code),meta:selected.meta||{}};
+    s.file.sourceSwitch={version:'V126',source:selected.kind,label:selected.label,loadedAt:selected.loadedAt,characters:chars(selected.code),lines:lines(selected.code),meta:selected.meta||{}};
     if(selected.kind==='github'){
       var r=splitRepo(selected.repo);
-      s.file.githubSource={owner:r.owner,repo:r.repo,path:selected.path,branch:selected.branch||'main',raw:selected.meta&&selected.meta.raw||rawUrl(selected.repo,selected.branch,selected.path),loadedAt:selected.loadedAt,loadedBy:'buddy-canvas-source-control-v112'};
+      s.file.githubSource={owner:r.owner,repo:r.repo,path:selected.path,branch:selected.branch||'main',raw:selected.meta&&selected.meta.raw||rawUrl(selected.repo,selected.branch,selected.path),loadedAt:selected.loadedAt,loadedBy:'buddy-canvas-source-control-v126'};
     }
     if(selected.kind==='supabase'){
-      s.file.supabaseSource={rowId:selected.meta.row_id||'',projectId:selected.meta.project_id||'',updatedAt:selected.meta.updated_at||'',loadedAt:selected.loadedAt,loadedBy:'buddy-canvas-source-control-v112'};
+      s.file.supabaseSource={rowId:selected.meta.row_id||'',projectId:selected.meta.project_id||'',updatedAt:selected.meta.updated_at||'',loadedAt:selected.loadedAt,loadedBy:'buddy-canvas-source-control-v126'};
     }
     s.project.repo=selected.repo||s.project.repo||'trevieisking/stream-bandit';
     s.project.siteName=s.project.siteName||'stream-bandit';
@@ -175,17 +179,52 @@ function loadSelected(){
     toast('Loaded into Buddy Canvas source. Right fixed canvas was not overwritten.');
   }catch(err){console.error(err);setStatus('Load failed','bad');toast(err.message||String(err));}
 }
+function applyPending(payload){
+  try{
+    if(!payload||payload.version!=='V126')return;
+    if(pendingExpired(payload)){
+      clearPending();
+      setStatus('Packet Builder target expired','warn');
+      return;
+    }
+    var id=[payload.created_at,payload.target,payload.path,payload.current_code_hash32].join('|');
+    if(id===lastPendingId)return;
+    lastPendingId=id;
+    clearPending();
+    ensureUi();
+    if(payload.path)setVal('#clSourcePath',payload.path);
+    var kind=payload.read_kind||payload.target||'code_labs';
+    if(kind==='github'){readGitHub();return;}
+    if(kind==='supabase'){readSupabase();return;}
+    if(payload.code&&String(payload.code).trim()){
+      choose('packet_builder',payload.label||'Packet Builder Target',payload.code,{path:payload.path,repo:payload.repo,branch:payload.branch,packet_type:payload.packet_type,target:payload.target,preview_only:true});
+      setStatus('Packet Builder preview ready','good');
+      return;
+    }
+    readCodeLabs();
+  }catch(err){console.error(err);clearPending();setStatus('Packet target failed','bad');toast(err.message||String(err));}
+}
+function checkPending(){
+  try{var raw=localStorage.getItem(PENDING);if(raw)applyPending(JSON.parse(raw));}catch(e){}
+}
+function listenPending(){
+  window.addEventListener('storage',function(e){if(e&&e.key===PENDING&&e.newValue){try{applyPending(JSON.parse(e.newValue));}catch(_){}}});
+  window.addEventListener('code-labs-source-control-pending-read',function(e){applyPending(e.detail);});
+  setTimeout(checkPending,300);
+  setTimeout(checkPending,1200);
+}
 function expose(){
   window.CodeLabsBuddyCanvasSourceControl={
-    version:'V112',
+    version:'V126',
     current:function(){return selected;},
     readGitHub:readGitHub,
     readSupabase:readSupabase,
     readCodeLabs:readCodeLabs,
     loadSelected:loadSelected,
-    safety:function(){return{read_only_by_default:true,github_write:false,supabase_write:false,delete:false,local_write_only_on_load:true};}
+    applyPending:applyPending,
+    safety:function(){return{read_only_by_default:true,github_write:false,supabase_write:false,delete:false,preview_only_for_packet_builder:true,local_write_only_on_manual_load:true,pending_expires_minutes:10,pending_cleared_on_consume:true};}
   };
 }
-function boot(){ensureUi();expose();setInterval(function(){if(q('#clSourceControlPanel'))renderCompare();},2000);}
+function boot(){ensureUi();expose();listenPending();setInterval(function(){if(q('#clSourceControlPanel'))renderCompare();},2000);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
