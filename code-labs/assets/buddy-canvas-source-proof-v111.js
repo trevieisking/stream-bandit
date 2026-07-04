@@ -1,4 +1,4 @@
-/* Code Labs Buddy Canvas V112 - source proof helper + source control loader */
+/* Code Labs Buddy Canvas V113 - source proof helper + source control/proof tools loader */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
@@ -18,18 +18,21 @@
     var actions=q('.stickyApply .actions');
     if(actions&&!q('#copySource')){var btn=document.createElement('button');btn.className='btn ghost';btn.id='copySource';btn.type='button';btn.textContent='Copy Source';btn.onclick=function(){var code=(q('#loadedCode')&&q('#loadedCode').value)||source();navigator.clipboard.writeText(code).catch(function(){if(q('#loadedCode')){q('#loadedCode').focus();q('#loadedCode').select();document.execCommand('copy');}});};actions.appendChild(btn);}
   }
-  function report(){var i=info(),orig=source(),out=fixed(),ok=fullSourceOk(orig,i.path);return{tool:'Code Labs Buddy Canvas',version:'V112 source proof helper + source control loader',file:i.file,path:i.path,repo:i.repo,source_branch:i.branch,source_loaded:!!orig.trim(),source_full_loaded:ok,source_is_full_page:ok,source_characters:chars(orig),source_lines:lines(orig),source_loaded_at:i.loadedAt||null,source_saved_filename:i.savedFilename||null,fixed_characters:chars(out),fixed_lines:lines(out),full_replacement_ok:ok&&!!out.trim(),source_control_loaded:!!window.CodeLabsBuddyCanvasSourceControl,safety:'Browser repair-state proof only. No GitHub write.'};}
-  function loadSourceControl(){
-    if(window.CodeLabsBuddyCanvasSourceControl)return;
-    if(q('script[data-cl-source-control-v112]'))return;
+  function report(){var i=info(),orig=source(),out=fixed(),ok=fullSourceOk(orig,i.path);return{tool:'Code Labs Buddy Canvas',version:'V113 source proof helper + source control/proof tools loader',file:i.file,path:i.path,repo:i.repo,source_branch:i.branch,source_loaded:!!orig.trim(),source_full_loaded:ok,source_is_full_page:ok,source_characters:chars(orig),source_lines:lines(orig),source_loaded_at:i.loadedAt||null,source_saved_filename:i.savedFilename||null,fixed_characters:chars(out),fixed_lines:lines(out),full_replacement_ok:ok&&!!out.trim(),source_control_loaded:!!window.CodeLabsBuddyCanvasSourceControl,proof_tools_loaded:!!window.CodeLabsBuddyCanvasProofTools,safety:'Browser repair-state proof only.'};}
+  function loadHelper(src,marker){
+    if(q('script['+marker+']'))return;
     var sc=document.createElement('script');
-    sc.src='assets/buddy-canvas-source-control-v112.js?v=cl-v112-source-switch';
-    sc.setAttribute('data-cl-source-control-v112','yes');
+    sc.src=src;
+    sc.setAttribute(marker,'yes');
     document.head.appendChild(sc);
+  }
+  function loadHelpers(){
+    if(!window.CodeLabsBuddyCanvasSourceControl)loadHelper('assets/buddy-canvas-source-control-v112.js?v=cl-v112-source-switch','data-cl-source-control-v112');
+    if(!window.CodeLabsBuddyCanvasProofTools)loadHelper('assets/buddy-canvas-proof-tools-v113.js?v=cl-v113-proof-tools','data-cl-proof-tools-v113');
   }
   function update(){
     ensureUi();
-    loadSourceControl();
+    loadHelpers();
     var i=info(),orig=source(),ok=fullSourceOk(orig,i.path);
     var stat=q('#statChars');if(stat)stat.textContent=String(chars(orig));
     var proof=q('#sourceProof');if(proof){proof.className=ok?'notice good':'notice warn';proof.innerHTML=ok?('<b>Full source loaded:</b> '+i.path+' · '+chars(orig)+' chars · '+lines(orig)+' lines.'):('<b>Source proof waiting:</b> load a complete file in File Lab or use Buddy Canvas Source Control.');}
