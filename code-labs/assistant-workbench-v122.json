@@ -1,0 +1,66 @@
+{
+  "tool": "Stream Bandit Code Labs Assistant Workbench",
+  "version": "V122",
+  "purpose": "Machine-readable map for ChatGPT connector work. This is for assistant-side scanning and controlled GitHub/Code Labs/Supabase decisions, not for Trevor to operate manually.",
+  "repo": "trevieisking/stream-bandit",
+  "site": "https://chatterfriendsstreambandit.co.uk/",
+  "assistant_lane": {
+    "primary_reads": [
+      "GitHub.fetch_file for source truth",
+      "Code_Labs_V104.get_code_labs_context for saved projects, packets, tests and audit",
+      "Supabase SQL over code_labs_* tables when Supabase tool is available"
+    ],
+    "primary_writes": [
+      "GitHub branch + PR + merge after scan",
+      "Code_Labs_V104.save_code_labs_write_request when available for queue receipts",
+      "Supabase only for Code Labs support metadata when explicitly needed"
+    ],
+    "avoid_user_handoff": true,
+    "user_should_not_be_required_to_copy_code": true
+  },
+  "current_code_labs_support_pages": {
+    "buddy_canvas": "code-labs/buddy-canvas.html",
+    "receipt_page": "code-labs/buddy-canvas-receipt-v115.html",
+    "source_control_helper": "code-labs/assets/buddy-canvas-source-control-v112.js",
+    "proof_tools_helper": "code-labs/assets/buddy-canvas-proof-tools-v113.js",
+    "handoff_desk_helper": "code-labs/assets/buddy-canvas-handoff-desk-v114.js"
+  },
+  "known_receipt_versions": {
+    "V117": "GitHub freshness check",
+    "V118": "PR readiness check",
+    "V119": "Start fixed from source",
+    "V120": "Build handoff packet and copy fixed file",
+    "V121": "Fixed file chunk builder"
+  },
+  "assistant_preferred_flow": [
+    "Read current target from GitHub first.",
+    "Read Code Labs context next to see saved project, packet, tests and audit.",
+    "Read Supabase code_labs_* tables when available for latest file snapshots and duplicates.",
+    "Avoid asking Trevor to paste code unless all connector reads fail.",
+    "Open one controlled branch for each real change.",
+    "Compare diff before PR.",
+    "Merge only when scope is small and safe."
+  ],
+  "do_not_touch_without_reason": [
+    "auth/session logic",
+    "Supabase schema/RLS/storage",
+    "payments/pricing live buttons",
+    "global shell helpers",
+    "accessibility/audio/player helpers",
+    "profile/avatar/account deletion flows",
+    "web builder live page ownership",
+    "social pages unless social pass is active"
+  ],
+  "next_real_upgrade": {
+    "name": "Assistant-readable current file sync",
+    "goal": "Make Code Labs save the current selected file/path/hash into a server-readable Code Labs packet or table so ChatGPT can read it through Code_Labs_V104.get_code_labs_context without Trevor copying anything.",
+    "preferred_method": "Use existing Code Labs Supabase helper/history path if possible; avoid new Stream Bandit app schema.",
+    "fallback_method": "Add a small Code Labs-only JSON snapshot page/helper and queue via existing code_labs_packets or code_labs_write_requests."
+  },
+  "safety": {
+    "browser_github_write": false,
+    "browser_delete": false,
+    "browser_schema_change": false,
+    "requires_chatgpt_connector_for_repo_writes": true
+  }
+}
