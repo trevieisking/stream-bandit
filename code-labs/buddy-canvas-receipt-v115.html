@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Code Labs - Buddy Canvas Receipt</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v106-buddy-canvas-local">
+<style>.receiptBox{min-height:55vh;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.35;white-space:pre;overflow:auto}.miniGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}</style>
+</head>
+<body data-page="buddy-canvas-receipt">
+<div class="app">
+<aside class="sidebar"><div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>Buddy receipt</small></div></div><nav class="nav"><a href="index.html"><span>🏠</span><div>Home<small>Start here</small></div></a><a href="file-lab.html"><span>📄</span><div>File Lab<small>Load full file</small></div></a><a href="buddy-canvas.html"><span>🖼️</span><div>Buddy Canvas<small>Source/fixed canvas</small></div></a><a class="active" href="buddy-canvas-receipt-v115.html"><span>✅</span><div>Receipt<small>Local proof</small></div></a><a href="publish-prep.html"><span>🚀</span><div>GitHub Writer<small>Branch/PR</small></div></a></nav><div class="sideBox"><b>Plain rule</b><p>This page reads Code Labs browser state only. It does not publish, delete, or change database schema.</p></div></aside>
+<main class="main">
+<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>Buddy Canvas Receipt</b></div><div><span class="badge good">V115</span><span class="badge warn">Local proof only</span></div></div>
+<section class="hero"><div><span class="pill">V115 Receipt</span><h1>Buddy Canvas local receipt.</h1><p>This page reads the same browser-local Code Labs state used by Buddy Canvas and builds a copyable receipt with path, repo, source/fixed counts, hashes, and cache warnings.</p><div class="actions"><a class="btn ghost" href="buddy-canvas.html">Back to Buddy Canvas</a><button class="btn primary" id="runReceipt" type="button">Run Receipt</button><button class="btn ghost" id="copyReceipt" type="button">Copy Receipt</button></div></div><div class="heroCard"><b>Use when</b><ol><li>Buddy Canvas panels do not visibly load.</li><li>You need proof of local source/fixed state.</li><li>You need to copy a safe receipt back to ChatGPT.</li></ol></div></section>
+<section class="panel"><h2>Status</h2><div class="miniGrid"><div class="stat"><b>Path</b><span id="statPath">Not run</span></div><div class="stat"><b>Source</b><span id="statSource">0 chars</span></div><div class="stat"><b>Fixed</b><span id="statFixed">0 chars</span></div><div class="stat"><b>Cache</b><span id="statCache">Not run</span></div></div></section>
+<section class="panel"><h2>Receipt</h2><textarea id="receiptOut" class="receiptBox" readonly>Not run yet.</textarea></section>
+<div class="footerNote">Code Labs Buddy Canvas Receipt V115 - same-origin local-state proof only.</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+'use strict';
+var KEY='codeLabsV1State',last=null;
+function q(s){return document.querySelector(s)}
+function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
+function chars(t){return String(t||'').length}
+function lines(t){var v=String(t||'');return v?v.split(/\r?\n/).length:0}
+function hash32(str){str=String(str||'');var h=0;for(var i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0}return ('00000000'+(h>>>0).toString(16)).slice(-8)}
+function toast(msg){var t=q('#toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)}}
+function info(){var s=read(),f=s.file||{},g=f.githubSource||{},p=s.project||{},parts=String(p.repo||'').split('/');var path=g.path||f.path||f.filename||'';var repo=(g.owner&&g.repo)?g.owner+'/'+g.repo:((parts[0]&&parts[1])?parts[0]+'/'+parts[1]:(p.repo||'trevieisking/stream-bandit'));return{state:s,file:f,path:path,repo:repo,branch:g.branch||'main'}}
+function receipt(){var i=info(),src=String((i.file||{}).currentCode||''),fix=String((i.file||{}).fixedCode||'');return{tool:'Code Labs Buddy Canvas Receipt Page',version:'V115',created_at:new Date().toISOString(),repo:i.repo,path:i.path||null,branch:i.branch,source:{characters:chars(src),lines:lines(src),hash:hash32(src)},fixed:{characters:chars(fix),lines:lines(fix),hash:hash32(fix)},local_state_bytes:chars(JSON.stringify(i.state||{})),cache_note:'This page reads browser-local Code Labs state only.',safety:{publish:false,delete:false,database_schema:false}}}
+function render(){last=receipt();q('#receiptOut').value=JSON.stringify(last,null,2);q('#statPath').textContent=last.path||'Not set';q('#statSource').textContent=last.source.characters+' chars / '+last.source.lines+' lines';q('#statFixed').textContent=last.fixed.characters+' chars / '+last.fixed.lines+' lines';q('#statCache').textContent=last.local_state_bytes+' bytes'}
+q('#runReceipt').onclick=render;
+q('#copyReceipt').onclick=function(){if(!last)render();navigator.clipboard.writeText(JSON.stringify(last,null,2)).then(function(){toast('Receipt copied')}).catch(function(){q('#receiptOut').focus();q('#receiptOut').select();document.execCommand('copy');toast('Receipt selected')})};
+render();
+})();
+</script>
+</body>
+</html>
