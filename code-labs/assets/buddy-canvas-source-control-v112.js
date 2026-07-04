@@ -34,6 +34,8 @@ function rawUrl(repo,branch,path){var r=splitRepo(repo);return 'https://raw.gith
 function sourceLooksFull(code,path){code=String(code||'');if(!code.trim())return false;if(/\.html?$/i.test(path||''))return /<!doctype\s+html/i.test(code)||/<html[\s>]/i.test(code);return true;}
 function setStatus(msg,kind){var e=q('#clSourceControlStatus');if(e){e.className='badge '+(kind||'warn');e.textContent=msg;}}
 function currentCanvasCode(){return val('#loadedCode')||String(((read().file||{}).currentCode)||'');}
+function clearPending(){try{localStorage.removeItem(PENDING);}catch(e){}}
+function pendingExpired(payload){var t=Date.parse(payload&&payload.created_at||'');return !!(t&&Date.now()-t>10*60*1000);}
 function renderCompare(){
   var cur=currentCanvasCode(), code=selected?selected.code:'';
   var out=q('#clSourceCompare');
@@ -180,9 +182,15 @@ function loadSelected(){
 function applyPending(payload){
   try{
     if(!payload||payload.version!=='V126')return;
+    if(pendingExpired(payload)){
+      clearPending();
+      setStatus('Packet Builder target expired','warn');
+      return;
+    }
     var id=[payload.created_at,payload.target,payload.path,payload.current_code_hash32].join('|');
     if(id===lastPendingId)return;
     lastPendingId=id;
+    clearPending();
     ensureUi();
     if(payload.path)setVal('#clSourcePath',payload.path);
     var kind=payload.read_kind||payload.target||'code_labs';
@@ -194,7 +202,7 @@ function applyPending(payload){
       return;
     }
     readCodeLabs();
-  }catch(err){console.error(err);setStatus('Packet target failed','bad');toast(err.message||String(err));}
+  }catch(err){console.error(err);clearPending();setStatus('Packet target failed','bad');toast(err.message||String(err));}
 }
 function checkPending(){
   try{var raw=localStorage.getItem(PENDING);if(raw)applyPending(JSON.parse(raw));}catch(e){}
@@ -214,7 +222,7 @@ function expose(){
     readCodeLabs:readCodeLabs,
     loadSelected:loadSelected,
     applyPending:applyPending,
-    safety:function(){return{read_only_by_default:true,github_write:false,supabase_write:false,delete:false,preview_only_for_packet_builder:true,local_write_only_on_manual_load:true};}
+    safety:function(){return{read_only_by_default:true,github_write:false,supabase_write:false,delete:false,preview_only_for_packet_builder:true,local_write_only_on_manual_load:true,pending_expires_minutes:10,pending_cleared_on_consume:true};}
   };
 }
 function boot(){ensureUi();expose();listenPending();setInterval(function(){if(q('#clSourceControlPanel'))renderCompare();},2000);}
