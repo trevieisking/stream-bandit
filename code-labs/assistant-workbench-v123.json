@@ -1,0 +1,76 @@
+{
+  "tool": "Stream Bandit Code Labs Assistant Workbench",
+  "version": "V123",
+  "purpose": "Assistant-side operating map for GitHub, Code Labs V104 and Supabase. This is built so ChatGPT can do more of the scan/work itself and Trevor does not need to copy code manually.",
+  "repo": "trevieisking/stream-bandit",
+  "site": "https://chatterfriendsstreambandit.co.uk/",
+  "supabase_support_views": {
+    "code_labs_assistant_latest_files": {
+      "created": true,
+      "type": "security_invoker view",
+      "purpose": "Latest saved Code Labs file summary per filename: repo, site, mode, filename, hash, character count, line count, preview and timestamps.",
+      "full_code_exposed": false,
+      "full_code_source": "public.code_labs_files.current_code when needed through controlled Supabase connector query"
+    },
+    "code_labs_assistant_recent_activity": {
+      "created": true,
+      "type": "security_invoker view",
+      "purpose": "Unified assistant-readable activity stream from Code Labs projects, files, jobs, tests and audit rows."
+    }
+  },
+  "assistant_lane": {
+    "primary_reads": [
+      "GitHub.fetch_file for repository source truth",
+      "Code_Labs_V104.get_code_labs_context for latest saved projects, jobs, packets, tests and audit",
+      "Supabase select from public.code_labs_assistant_latest_files for latest saved file summaries",
+      "Supabase select from public.code_labs_assistant_recent_activity for recent Code Labs activity"
+    ],
+    "primary_writes": [
+      "GitHub branch + PR + merge after scan",
+      "Code_Labs_V104.save_code_labs_write_request when available for queue receipts",
+      "Supabase only for Code Labs support metadata and assistant-readable views when explicitly useful"
+    ],
+    "avoid_user_handoff": true,
+    "user_should_not_be_required_to_copy_code": true,
+    "browser_buddy_canvas_is_optional": true
+  },
+  "assistant_preferred_flow": [
+    "Read assistant workbench map from GitHub.",
+    "Read GitHub target source truth.",
+    "Read Code Labs V104 context.",
+    "Read Supabase assistant latest files/activity views.",
+    "Decide page/pass/PR path without asking Trevor to paste code unless all connector reads fail.",
+    "Open one controlled branch for each real change.",
+    "Compare diff before PR.",
+    "Merge only when scope is small and safe."
+  ],
+  "known_code_labs_support_pages": {
+    "buddy_canvas": "code-labs/buddy-canvas.html",
+    "receipt_page": "code-labs/buddy-canvas-receipt-v115.html",
+    "assistant_workbench_v122": "code-labs/assistant-workbench-v122.json",
+    "assistant_workbench_v123": "code-labs/assistant-workbench-v123.json"
+  },
+  "do_not_touch_without_reason": [
+    "auth/session logic",
+    "Supabase app schema/RLS/storage",
+    "payments/pricing live buttons",
+    "global shell helpers",
+    "accessibility/audio/player helpers",
+    "profile/avatar/account deletion flows",
+    "web builder live page ownership",
+    "social pages unless social pass is active"
+  ],
+  "next_real_upgrade": {
+    "name": "Code Labs current selection autosync",
+    "goal": "Make Code Labs browser state autosave the currently selected file/path/hash into existing Code Labs history or a narrow support row so ChatGPT can read it through Code Labs V104/Supabase views.",
+    "preferred_method": "Use existing code_labs_files/history save path and assistant latest-files view; avoid new app-facing Stream Bandit schema.",
+    "fallback_method": "Add a Code Labs-only support table/view after confirming RLS and security_invoker behavior."
+  },
+  "safety": {
+    "browser_github_write": false,
+    "browser_delete": false,
+    "browser_schema_change": false,
+    "views_are_summary_only": true,
+    "requires_chatgpt_connector_for_repo_writes": true
+  }
+}
