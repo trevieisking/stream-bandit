@@ -1,4 +1,4 @@
-/* Code Labs Buddy Canvas V113 - source proof helper + source control/proof tools loader */
+/* Code Labs Buddy Canvas V127 - source proof helper + refreshed source control/proof tools loader */
 (function(){
   'use strict';
   var KEY='codeLabsV1State';
@@ -18,7 +18,7 @@
     var actions=q('.stickyApply .actions');
     if(actions&&!q('#copySource')){var btn=document.createElement('button');btn.className='btn ghost';btn.id='copySource';btn.type='button';btn.textContent='Copy Source';btn.onclick=function(){var code=(q('#loadedCode')&&q('#loadedCode').value)||source();navigator.clipboard.writeText(code).catch(function(){if(q('#loadedCode')){q('#loadedCode').focus();q('#loadedCode').select();document.execCommand('copy');}});};actions.appendChild(btn);}
   }
-  function report(){var i=info(),orig=source(),out=fixed(),ok=fullSourceOk(orig,i.path);return{tool:'Code Labs Buddy Canvas',version:'V113 source proof helper + source control/proof tools loader',file:i.file,path:i.path,repo:i.repo,source_branch:i.branch,source_loaded:!!orig.trim(),source_full_loaded:ok,source_is_full_page:ok,source_characters:chars(orig),source_lines:lines(orig),source_loaded_at:i.loadedAt||null,source_saved_filename:i.savedFilename||null,fixed_characters:chars(out),fixed_lines:lines(out),full_replacement_ok:ok&&!!out.trim(),source_control_loaded:!!window.CodeLabsBuddyCanvasSourceControl,proof_tools_loaded:!!window.CodeLabsBuddyCanvasProofTools,safety:'Browser repair-state proof only.'};}
+  function report(){var i=info(),orig=source(),out=fixed(),ok=fullSourceOk(orig,i.path);return{tool:'Code Labs Buddy Canvas',version:'V127 source proof helper + source control/proof tools loader',file:i.file,path:i.path,repo:i.repo,source_branch:i.branch,source_loaded:!!orig.trim(),source_full_loaded:ok,source_is_full_page:ok,source_characters:chars(orig),source_lines:lines(orig),source_loaded_at:i.loadedAt||null,source_saved_filename:i.savedFilename||null,fixed_characters:chars(out),fixed_lines:lines(out),full_replacement_ok:ok&&!!out.trim(),source_control_loaded:!!window.CodeLabsBuddyCanvasSourceControl,proof_tools_loaded:!!window.CodeLabsBuddyCanvasProofTools,safety:'Browser repair-state proof only.'};}
   function loadHelper(src,marker){
     if(q('script['+marker+']'))return;
     var sc=document.createElement('script');
@@ -27,8 +27,9 @@
     document.head.appendChild(sc);
   }
   function loadHelpers(){
-    if(!window.CodeLabsBuddyCanvasSourceControl)loadHelper('assets/buddy-canvas-source-control-v112.js?v=cl-v112-source-switch','data-cl-source-control-v112');
+    if(!window.CodeLabsBuddyCanvasSourceControl)loadHelper('assets/buddy-canvas-source-control-v112.js?v=cl-v127-source-control-hydrate','data-cl-source-control-v127');
     if(!window.CodeLabsBuddyCanvasProofTools)loadHelper('assets/buddy-canvas-proof-tools-v113.js?v=cl-v113-proof-tools','data-cl-proof-tools-v113');
+    loadHelper('assets/buddy-canvas-source-preview-autoload-v127.js?v=cl-v127-source-preview-autoload','data-cl-source-preview-autoload-v127');
   }
   function update(){
     ensureUi();
