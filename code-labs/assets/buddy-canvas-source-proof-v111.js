@@ -29,6 +29,7 @@
   }
   function loadHelpers(){
     loadHelper('assets/code-labs-workflow-clarity-v130.js?v=cl-workflow-clarity-v130','data-cl-workflow-clarity-v130');
+    loadHelper('assets/code-labs-save-language-v132.js?v=cl-save-language-v132','data-cl-save-language-v132');
     if(!window.CodeLabsBuddyCanvasSourceControl)loadHelper('assets/buddy-canvas-source-control-v112.js?v=cl-v127-source-control-hydrate','data-cl-source-control-v127');
     if(!window.CodeLabsBuddyCanvasProofTools)loadHelper('assets/buddy-canvas-proof-tools-v113.js?v=cl-v113-proof-tools','data-cl-proof-tools-v113');
   }
