@@ -1,4 +1,4 @@
-/* Code Labs Workflow Clarity V129 - numbered guidance, SEO descriptions, soft locks, no helper rewrite */
+/* Code Labs Workflow Clarity V129 - route guidance, SEO descriptions, soft locks, no helper rewrite */
 (function(){
   'use strict';
 
@@ -6,7 +6,7 @@
   var STATE_KEY='codeLabsV1State';
 
   var STEPS={
-    'index':{n:1,title:'Start Code Labs',route:'index.html',desc:'Start a safe Code Labs repair workflow with a clear numbered path before loading or changing any file.',purpose:'Start here. This page explains the full repair flow before any file work starts.',requires:[],next:'setup',action:'Start Setup'},
+    'index':{n:1,title:'Start Code Labs',route:'index.html',desc:'Start a safe Code Labs repair workflow with a clear path before loading or changing any file.',purpose:'Start here. This page explains the full repair flow before any file work starts.',requires:[],next:'setup',action:'Start Setup'},
     'setup':{n:2,title:'Setup Workspace',route:'setup.html',desc:'Confirm the Code Labs workspace, repository, safety rules and repair context before loading files.',purpose:'Confirm workspace basics before file work.',requires:[],prev:'index',next:'project-picker',action:'Choose Project'},
     'project-picker':{n:3,title:'Choose Project',route:'project-picker.html',desc:'Choose the project and repair target used by File Lab, Packet Builder, Buddy Canvas and GitHub handoff.',purpose:'Choose or confirm the current project.',requires:[],prev:'setup',next:'file-lab',action:'Open File Lab'},
     'file-lab':{n:4,title:'Load Current File',route:'file-lab.html',desc:'Load the current full source file into Code Labs so every later step works from the same source of truth.',purpose:'Load the current full file. This is the source-of-truth step.',requires:[],prev:'project-picker',next:'rescue-room',action:'Describe Problem'},
@@ -113,11 +113,11 @@
       '#clWorkflowClarityV129 .cl-v129-note{border-left:4px solid #ff4d6d;padding-left:10px}'+
       '@media(max-width:820px){#clWorkflowClarityV129 .cl-v129-next,#clWorkflowClarityV129 .cl-v129-back,#clWorkflowClarityV129 .cl-v129-buddy{width:100%;justify-content:center}}'+
       '</style>'+
-      '<div class="cl-v129-top"><span class="cl-v129-badge">Step '+escapeHtml(st.n)+' · '+escapeHtml(type)+'</span><span class="cl-v129-pill '+(locked?'cl-v129-red':'')+'">'+(locked?'Locked until previous step is complete':'Ready for this step')+'</span></div>'+
+      '<div class="cl-v129-top"><span class="cl-v129-badge">Page guide · '+escapeHtml(type)+'</span><span class="cl-v129-pill '+(locked?'cl-v129-red':'')+'">'+(locked?'Locked until previous step is complete':'Ready for this page')+'</span></div>'+
       '<h2>'+escapeHtml(st.title)+'</h2><p>'+escapeHtml(st.desc)+'</p>'+
       (locked?'<p class="cl-v129-note"><b>Missing:</b> '+escapeHtml(miss.map(labelNeed).join(', '))+'. Use the red back link first; do not skip the workflow.</p>':'')+
       '<div>'+actionHtml+'<a class="cl-v129-buddy" href="'+escapeHtml(buddyHref)+'">'+escapeHtml(buddyText)+'</a></div>'+
-      '<div class="cl-v129-grid"><div class="cl-v129-card"><b>Purpose</b><p>'+escapeHtml(st.purpose)+'</p></div><div class="cl-v129-card"><b>Save wording</b><p>'+escapeHtml(saveMeaning(key))+'</p></div><div class="cl-v129-card"><b>Buddy Canvas</b><p>'+escapeHtml(buddyMessage(key))+'</p></div><div class="cl-v129-card"><b>Safety</b><p>Does not remove, replace or rewrite existing helpers. This is a clarity layer only.</p></div></div>';
+      '<div class="cl-v129-grid"><div class="cl-v129-card"><b>Purpose</b><p>'+escapeHtml(st.purpose)+'</p></div><div class="cl-v129-card"><b>Save wording</b><p>'+escapeHtml(saveMeaning(key))+'</p></div><div class="cl-v129-card"><b>Buddy Canvas</b><p>'+escapeHtml(buddyMessage(key))+'</p></div><div class="cl-v129-card"><b>Existing workflow buttons stay</b><p>The green Workflow buttons / where am I panel remains the main step map. This V129 panel only adds guidance and soft locks.</p></div></div>';
 
     var target=insertTarget();
     if(target.firstChild)target.insertBefore(box,target.firstChild);else target.appendChild(box);
