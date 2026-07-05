@@ -47,7 +47,7 @@ var BACK={setup:'index','project-picker':'setup','file-lab':'project-picker','re
 function q(s,r){return(r||document).querySelector(s)}
 function page(){return (document.body&&document.body.getAttribute('data-page'))||location.pathname.split('/').pop().replace(/\.html$/,'')||'index'}
 function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
-function sourceReady(){var s=read(),f=s.file||{};return !!(f.currentCode||f.path||f.filename||(f.githubSource&&f.githubSource.path))}
+function sourceReady(){var s=read(),f=s.file||{},code=String(f.currentCode||f.code||f.sourceCode||'');return code.trim().length>40}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function idx(a,k){for(var i=0;i<a.length;i++){if(a[i]===k)return i+1}return 0}
 function file(k){var m=INFO[k];return m?k+'.html':'#'}
