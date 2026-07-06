@@ -1,32 +1,34 @@
-/* Code Labs Workflow Clarity V130 - aligned page numbering and soft guidance only */
+/* Code Labs Workflow Clarity V130 - aligned page numbering and soft guidance only
+   V151 route-register alignment: Home -> Setup -> File Lab. Project Picker stays support/legacy prep.
+*/
 (function(){
 'use strict';
 var KEY='codeLabsV1State';
-var PREP=['index','setup','project-picker'];
+var PREP=['index','setup'];
 var FLOW=['file-lab','rescue-room','packet-builder','buddy-canvas','v20','patch-desk','patch-lab','preview-test','checkpoints','repo-desk','publish-prep','github-tracker','connection-guide','read-only-proof'];
-var HELP=['helper-route-map','help','faq','about','ai-handoff','fix-wizard','start-guide','context-packet','connector-status','chatgpt-connection','checklist-builder','repair-bridge-status','owner-read-proof','oauth-discovery','oauth-flow-test','app-reader-test','url-reader-test','buddy-canvas-receipt-v115'];
+var HELP=['project-picker','helper-route-map','help','faq','about','ai-handoff','fix-wizard','start-guide','context-packet','connector-status','chatgpt-connection','checklist-builder','repair-bridge-status','owner-read-proof','oauth-discovery','oauth-flow-test','app-reader-test','url-reader-test','buddy-canvas-receipt-v115'];
 var INFO={
 'index':['Start Code Labs','Start the safe Code Labs repair path before loading files.','Start here.'],
-'setup':['Setup Workspace','Confirm workspace, repo notes and repair context.','Set the workspace.'],
-'project-picker':['Choose Project','Choose the project or repair target before File Lab.','Choose the repair target.'],
+'setup':['Setup Workspace','Confirm workspace, repo notes and repair context before File Lab.','Set the workspace.'],
+'project-picker':['Optional Project Picker','Older/support project selector. Use only when you need the legacy project-picker route; the normal path goes from Setup to File Lab.','Optional legacy prep selector.'],
 'file-lab':['Load Current File','Load the current full source file so later pages share one source of truth.','Load the current full file.'],
 'rescue-room':['Describe The Problem','Explain what is broken and what must be preserved before building the packet.','Describe the repair safely.'],
 'packet-builder':['Packet Builder','Build the assistant packet from Rescue Room and send it to Source Control/Buddy Canvas.','Build and send the repair packet.'],
 'buddy-canvas':['Buddy Canvas','Assistant review lane for source proof and fixed full-file output after Packet Builder.','Assistant canvas lane.'],
-'v20':['Workflow Hub','Choose the safest repair lane after the packet and Buddy Canvas route are clear.','Choose the next route.'],
+v20:['Workflow Hub','Choose the safest repair lane after the packet and Buddy Canvas route are clear.','Choose the next route.'],
 'patch-desk':['Patch Desk','Review the fixed full-file candidate before Patch Lab and Preview.','Review fixed full-file output.'],
 'patch-lab':['Patch Lab','Manual exact repair fallback when the normal route needs help.','Patch only when needed.'],
 'preview-test':['Preview And Test','Preview and test before checkpointing or handoff.','Test before promotion.'],
-'checkpoints':['Checkpoints','Save rollback proof after preview and test.','Keep rollback proof.'],
+checkpoints:['Checkpoints','Save rollback proof after preview and test.','Keep rollback proof.'],
 'repo-desk':['Repo Desk','Prepare the repo handoff after checkpoint proof.','Prepare handoff details.'],
 'publish-prep':['GitHub Writer','Prepare the branch and PR handoff after testing.','Prepare a safe handoff.'],
 'github-tracker':['GitHub Tracker','Track PR, preview and checks after handoff.','Track the result.'],
 'connection-guide':['Connection Guide','Connector separation and safe routing guide.','Connector guide.'],
 'read-only-proof':['Read Only Proof','Read-only proof and return route back to File Lab.','Read-only proof.'],
 'helper-route-map':['Helper Route Map','Scan Code Labs pages and helpers before changing them.','Scanner page.'],
-'help':['Help','Plain-English help for Code Labs.','Help page.'],
-'faq':['FAQ','Clear answers about workflow, saves and handoff.','FAQ page.'],
-'about':['About Code Labs','What Code Labs does and does not do.','About page.'],
+help:['Help','Plain-English help for Code Labs.','Help page.'],
+faq:['FAQ','Clear answers about workflow, saves and handoff.','FAQ page.'],
+about:['About Code Labs','What Code Labs does and does not do.','About page.'],
 'ai-handoff':['AI Handoff','Assistant handoff support page.','Support page.'],
 'fix-wizard':['Fix Wizard','Guided repair support page.','Support page.'],
 'start-guide':['Start Guide','Starter guide for Code Labs.','Support page.'],
@@ -42,8 +44,8 @@ var INFO={
 'url-reader-test':['URL Reader Test','URL reader test page.','Test page.'],
 'buddy-canvas-receipt-v115':['Buddy Canvas Receipt','Receipt page for Buddy Canvas handoff.','Receipt page.']
 };
-var ROUTE={index:'setup',setup:'project-picker','project-picker':'file-lab','file-lab':'rescue-room','rescue-room':'packet-builder','packet-builder':'buddy-canvas','buddy-canvas':'v20',v20:'patch-desk','patch-desk':'patch-lab','patch-lab':'preview-test','preview-test':'checkpoints',checkpoints:'repo-desk','repo-desk':'publish-prep','publish-prep':'github-tracker','github-tracker':'connection-guide','connection-guide':'read-only-proof','read-only-proof':'file-lab','helper-route-map':'help',help:'faq',faq:'about'};
-var BACK={setup:'index','project-picker':'setup','file-lab':'project-picker','rescue-room':'file-lab','packet-builder':'rescue-room','buddy-canvas':'packet-builder',v20:'buddy-canvas','patch-desk':'v20','patch-lab':'patch-desk','preview-test':'patch-lab',checkpoints:'preview-test','repo-desk':'checkpoints','publish-prep':'repo-desk','github-tracker':'publish-prep','connection-guide':'github-tracker','read-only-proof':'connection-guide'};
+var ROUTE={index:'setup',setup:'file-lab','project-picker':'file-lab','file-lab':'rescue-room','rescue-room':'packet-builder','packet-builder':'buddy-canvas','buddy-canvas':'v20',v20:'patch-desk','patch-desk':'patch-lab','patch-lab':'preview-test','preview-test':'checkpoints',checkpoints:'repo-desk','repo-desk':'publish-prep','publish-prep':'github-tracker','github-tracker':'connection-guide','connection-guide':'read-only-proof','read-only-proof':'file-lab','helper-route-map':'help',help:'faq',faq:'about'};
+var BACK={setup:'index','project-picker':'setup','file-lab':'setup','rescue-room':'file-lab','packet-builder':'rescue-room','buddy-canvas':'packet-builder',v20:'buddy-canvas','patch-desk':'v20','patch-lab':'patch-desk','preview-test':'patch-lab',checkpoints:'preview-test','repo-desk':'checkpoints','publish-prep':'repo-desk','github-tracker':'publish-prep','connection-guide':'github-tracker','read-only-proof':'connection-guide'};
 function q(s,r){return(r||document).querySelector(s)}
 function page(){return (document.body&&document.body.getAttribute('data-page'))||location.pathname.split('/').pop().replace(/\.html$/,'')||'index'}
 function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
