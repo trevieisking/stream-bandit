@@ -1,4 +1,4 @@
-# Code Labs Page Role Register V147
+# Code Labs Page Role Register V147/V148
 
 This register is the no-drop list for Code Labs pages. A page can be removed from the visible main route only when it is clearly documented as support, proof, receipt, test, or legacy/watch. A working page must not disappear just because it is not part of the main repair workflow.
 
@@ -9,6 +9,15 @@ This register is the no-drop list for Code Labs pages. A page can be removed fro
 - Project Picker still exists, but it is not currently a required step between Setup and File Lab.
 - Main workflow starts at File Lab.
 - Support, proof, receipt, scanner, and test pages may be outside the main workflow, but they must stay discoverable from Help, Tools, About, Connection Guide, scanner output, or documentation.
+
+## Scanner coverage note
+
+The live scanner remains `code-labs/helper-route-map.html`. Do not build another scanner.
+
+V148 adds `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md` so the scanner manifest can be refreshed deliberately to include:
+
+- `code-labs/assets/code-labs-setup-route-v145.js`
+- `code-labs/CODE_LABS_PAGE_ROLE_REGISTER_V147.md`
 
 ## Prep pages
 
@@ -90,5 +99,6 @@ Before changing menu, route, helper loading, or page labels:
 2. Compare the page against this register.
 3. Decide whether the page is Prep, Main Workflow, Support, Proof/Test, Receipt, or Legacy/Watch.
 4. Never remove a working page from docs or access paths without explicitly recording why.
-5. If a page is hidden from the main menu, make sure it is still discoverable from Tools, Help, About, scanner output, or a route document.
+5. If a page is hidden from the main menu, make sure it is still discoverable from Tools, Help, About, Connection Guide, scanner output, or a route document.
 6. If two helpers fight, fix the source route owner when possible. If a protected helper cannot be safely rewritten, keep the stabilizer small and document it here.
+7. Before editing the scanner manifest, read `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md`.
