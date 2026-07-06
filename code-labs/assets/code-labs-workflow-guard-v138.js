@@ -1,5 +1,6 @@
 /* Code Labs Workflow Guard V138 - soft locks for previous-step completion. No menu edits.
-   V161: guard panel sits below the real page hero/title. */
+   V165: red/back guidance sits directly below the workflow intro instead of below save wording.
+*/
 (function(){
 'use strict';
 var KEY='codeLabsV1State';
@@ -36,10 +37,10 @@ function actionSelectors(id){var map={
 function setLocked(el,msg){if(!el||el.getAttribute('data-cl-guard-locked-v138')==='yes')return;el.classList.add('clGuardLockedV138');el.setAttribute('data-cl-guard-locked-v138','yes');el.setAttribute('aria-disabled','true');el.setAttribute('title',msg);if(el.tagName==='BUTTON')el.type='button';}
 function unlock(el){if(!el)return;el.classList.remove('clGuardLockedV138');el.removeAttribute('data-cl-guard-locked-v138');el.removeAttribute('aria-disabled')}
 function applyLocks(id,req){qa('[data-cl-guard-locked-v138]').forEach(unlock);if(req.ok)return;actionSelectors(id).forEach(function(sel){qa(sel).forEach(function(el){setLocked(el,req.need)})});qa('a[href]').forEach(function(a){if(targetAfterCurrent(a.getAttribute('href'),id))setLocked(a,req.need)});}
-function place(box){var target=q('#clSaveMeaningV132')||q('#clWorkflowClarityV130')||q('.hero');if(target&&target.parentNode){target.parentNode.insertBefore(box,target.nextSibling);return}(q('.main')||document.body).appendChild(box)}
+function place(box){var target=q('#clWorkflowClarityV130')||q('.hero');if(target&&target.parentNode){target.parentNode.insertBefore(box,target.nextSibling);return}(q('.main')||document.body).appendChild(box)}
 function panel(id,req){var old=q('#clWorkflowGuardV138');if(old)old.remove();if(ORDER.indexOf(id)<0)return;var box=document.createElement('section');box.id='clWorkflowGuardV138';box.className='clGuardV138 '+(req.ok?'':'bad');var back=req.back||BACK[id];box.innerHTML='<b>'+(req.ok?'Workflow guard: ready':'Workflow guard: previous step needed')+'</b><p>'+(req.ok?'The previous requirement for '+esc(TITLES[id]||id)+' is complete.':'Missing: '+esc(req.need))+'</p>'+(req.ok?'':'<a class="redBack" href="'+esc(back||'file-lab')+'.html">Back to '+esc(TITLES[back]||'previous step')+'</a>');place(box)}
 function intercept(e){var el=e.target&&e.target.closest&&e.target.closest('[data-cl-guard-locked-v138="yes"]');if(!el)return;e.preventDefault();e.stopPropagation();var msg=el.getAttribute('title')||'Previous workflow step is not complete.';var t=q('#toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400)}else alert(msg)}
-function run(){style();var id=page(),req=requirement(id);panel(id,req);applyLocks(id,req);document.body.setAttribute('data-code-labs-workflow-guard-v138',req.ok?'ready':'locked');window.CodeLabsWorkflowGuardV138={version:'V161',page:id,ready:req.ok,requirement:req,checks:checks()}}
+function run(){style();var id=page(),req=requirement(id);panel(id,req);applyLocks(id,req);document.body.setAttribute('data-code-labs-workflow-guard-v138',req.ok?'ready':'locked');window.CodeLabsWorkflowGuardV138={version:'V165',page:id,ready:req.ok,requirement:req,checks:checks()}}
 function boot(){document.addEventListener('click',intercept,true);run();setTimeout(run,400);setTimeout(run,1200);setTimeout(run,2600)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
