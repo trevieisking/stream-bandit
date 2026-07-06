@@ -1,4 +1,4 @@
-# Code Labs Page Role Register V147/V148
+# Code Labs Page Role Register V147/V148/V163
 
 This register is the no-drop list for Code Labs pages. A page can be removed from the visible main route only when it is clearly documented as support, proof, receipt, test, or legacy/watch. A working page must not disappear just because it is not part of the main repair workflow.
 
@@ -9,6 +9,20 @@ This register is the no-drop list for Code Labs pages. A page can be removed fro
 - Project Picker still exists, but it is not currently a required step between Setup and File Lab.
 - Main workflow starts at File Lab.
 - Support, proof, receipt, scanner, and test pages may be outside the main workflow, but they must stay discoverable from Help, Tools, About, Connection Guide, scanner output, or documentation.
+
+## V163 layout and polish checkpoint
+
+Issue #284 is now the future polish reference: `Code Labs polish: align workflow panels and red-back guidance under page hero`.
+
+Use this checkpoint at the right point in the plan:
+
+1. Finish route/chrome stability first.
+2. Keep the current V161/V162 direction: real page hero/title at the top, then workflow guidance, then page tools, then Supabase/backup near the bottom.
+3. Run/read the Helper Route Map Scanner before a polish PR.
+4. During the polish pass, align panels across all 12 main workflow pages without deleting working page functions.
+5. Red/blocked/back guidance belongs directly under that page hero/title area when relevant.
+6. Support/proof/test pages stay discoverable, but do not clutter the normal user sidebar.
+7. Do this polish before larger feature work such as saved-files management, unless a live page is badly broken.
 
 ## Scanner coverage note
 
@@ -79,10 +93,10 @@ V148 adds `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md` so the scanner
 These helpers are especially important and must not be removed casually:
 
 - `code-labs/assets/code-labs.js` — base app/state/page renderer.
-- `code-labs/assets/cl-nav.js` — shared navigation loader and helper loader.
-- `code-labs/assets/code-labs-v1-1-safety.js` — safety/backup panel and promoted helper loader.
-- `code-labs/assets/code-labs-v12-save.js` — rebuilt sidebar, workflow panel, and safe write packet source owner.
-- `code-labs/assets/code-labs-setup-route-v145.js` — keeps Setup visible after Home while protected V12 still omits Setup.
+- `code-labs/assets/cl-nav.js` — shared navigation loader and helper loader. V161 stops the old workflow tidy overlay from fighting the main page chrome.
+- `code-labs/assets/code-labs-v1-1-safety.js` — safety/backup panel and promoted helper loader. V162 keeps the real page intro at the top.
+- `code-labs/assets/code-labs-v12-save.js` — clean sidebar owner, ChatGPT-readable context, and safe write packet source owner.
+- `code-labs/assets/code-labs-setup-route-v145.js` — keeps Setup visible after Home while protected older routes settle.
 - `code-labs/assets/code-labs-workflow-clarity-v130.js` — numbering, purpose, soft guidance.
 - `code-labs/assets/code-labs-save-language-v132.js` — clearer save/checkpoint labels.
 - `code-labs/assets/code-labs-buddy-canvas-menu-v134.js` — Buddy Canvas menu alignment.
@@ -101,4 +115,5 @@ Before changing menu, route, helper loading, or page labels:
 4. Never remove a working page from docs or access paths without explicitly recording why.
 5. If a page is hidden from the main menu, make sure it is still discoverable from Tools, Help, About, Connection Guide, scanner output, or a route document.
 6. If two helpers fight, fix the source route owner when possible. If a protected helper cannot be safely rewritten, keep the stabilizer small and document it here.
-7. Before editing the scanner manifest, read `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md`.
+7. For layout polish, use issue #284 and keep red/blocked/back guidance directly under the real page hero/title.
+8. Before editing the scanner manifest, read `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md`.
