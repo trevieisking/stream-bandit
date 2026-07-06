@@ -1,8 +1,9 @@
-/* Code Labs Buddy Canvas Menu V134 - align Buddy Canvas sidebar with promoted workflow. No canvas/save behavior changes. */
+/* Code Labs Buddy Canvas Menu V134/V144 - align Buddy Canvas sidebar with promoted workflow. No canvas/save behavior changes. */
 (function(){
 'use strict';
 var ROUTES=[
  ['index.html','🏠','Home','Start here'],
+ ['setup.html','⚙️','Setup','Project and repo'],
  ['file-lab.html','📄','File Lab','Load or read code'],
  ['rescue-room.html','🛟','Rescue Room','Repair safely'],
  ['packet-builder.html','📦','Packet Builder','Build packet'],
@@ -34,7 +35,7 @@ function run(){
   var logoSmall=q('.logo small');if(logoSmall)logoSmall.textContent='ChatGPT repair room for non-coders';
   var simple=q('.sideBox b');if(simple&&/Simple rule/i.test(simple.textContent))simple.textContent='Safety rule';
   var p=q('.sideBox p');if(p&&/File Lab loads the source/i.test(p.textContent))p.textContent='Do not replace a live file until you have saved a checkpoint and tested the preview.';
-  window.CodeLabsBuddyCanvasMenuV134={version:'V134',active:true,routes:ROUTES.map(function(x){return x[2]})};
+  window.CodeLabsBuddyCanvasMenuV134={version:'V144',active:true,routes:ROUTES.map(function(x){return x[2]})};
 }
 function boot(){run();setTimeout(run,250);setTimeout(run,900);setTimeout(run,1700)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
