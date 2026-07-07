@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Stream Bandit Theme Studio V7.13.034 Safe Loader</title>
+<title>Stream Bandit Theme Studio V7.13.035 Safe Loader Gate</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
 <style>
@@ -11,41 +11,44 @@
 *{box-sizing:border-box}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;min-height:100vh;background:radial-gradient(circle at 0 0,#22d3a62a,transparent 34%),radial-gradient(circle at 100% 0,#7c3cff34,transparent 38%),linear-gradient(180deg,#070910,#050711);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;padding:18px}.box{width:min(980px,100%);margin:10vh auto;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 22px 80px #0008;padding:22px}.badge{display:inline-flex;border:1px solid #22d3a660;border-radius:999px;background:#22d3a621;color:#baf7df;font-weight:950;padding:7px 10px}.warn{border-color:#ffb14266;background:#ffb14224;color:#ffe7ad}.bad{border-color:#ff5d6c66;background:#ff5d6c22;color:#ffd0d5}h1{font-size:clamp(36px,6vw,72px);line-height:.94;letter-spacing:-.055em;margin:10px 0}p{color:var(--muted);line-height:1.55;font-weight:750}.btn{display:inline-flex;border:0;border-radius:999px;background:linear-gradient(135deg,var(--good),var(--purple));color:#071015;text-decoration:none;font-weight:950;padding:11px 14px;margin:6px 6px 0 0}.ghost{background:#30384f;color:#fff}.out{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;border:1px solid #ffffff18;border-radius:16px;background:#0007;color:#dfffee;padding:12px;margin-top:12px;max-height:240px;overflow:auto}
 </style>
 </head>
-<body data-sb-theme-owner="theme-studio-v7-13-034-safe-loader">
+<body data-sb-theme-owner="theme-studio-v7-13-035-safe-loader-gate" data-sb-auth-gate-theme-studio-test="v7-13-005">
 <main class="box">
-  <span class="badge">Theme Studio safe loader</span>
+  <span class="badge">Theme Studio safe loader gate</span>
   <h1>Opening Theme Studio</h1>
-  <p>This loader preserves the working V7.12.295 Theme Studio, patches only old Web Builder support route links, then re-runs the original scripts in order.</p>
+  <p>This loader checks the shared Auth Gate first, then preserves the working V7.12.295 Theme Studio, patches only old Web Builder support route links, and re-runs the original scripts in order.</p>
   <p>No SQL, RLS, storage policy, payment, index, Home, player engine or theme-save logic is changed by this loader.</p>
-  <div id="status" class="badge warn">Loading Theme Studio safely...</div>
-  <div id="debug" class="out">Waiting for safe loader...</div>
+  <div id="status" class="badge warn">Checking Theme Studio access...</div>
+  <div id="debug" class="out">Waiting for Auth Gate preflight...</div>
   <a class="btn ghost" href="settings-platform-control-hub-v7-12-85-test.html">Back to Settings Hub</a>
   <a class="btn ghost" href="web-builder-account-control-hub-v7-12-263-test.html">Back to Web Builder Hub</a>
 </main>
+<script src="stream-bandit-shell-v6-24.js?v=theme-studio-preflight-gate-7-13-035"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=theme-studio-preflight-gate-7-13-005"></script>
 <script>
 (function(){
 'use strict';
 var PREVIOUS_COMMIT='6cbba9425c5ad8540f9d3ca1d0feded7f0dd269d';
 var FILE='web-builder-theme-studio-controls-v7-8-9-test.html';
 var RAW='https://raw.githubusercontent.com/trevieisking/stream-bandit/'+PREVIOUS_COMMIT+'/'+FILE;
-var VERSION='V7.13.034 Theme Studio Route Canonical Safe Loader';
+var VERSION='V7.13.035 Theme Studio Preflight Auth Gate Safe Loader';
 var statusEl=document.getElementById('status');
 var debugEl=document.getElementById('debug');
+var loaderStarted=false;
 var replacements=[
   ['web-builder-live-studio-v7-12-116-test.html?page=test-page','web-builder-account-control-hub-v7-12-263-test.html'],
   ['web-builder-pages-manager-v7-12-111-test.html','web-builder-pages-manager-owned-v7-12-256-test.html'],
   ['web-builder-shared-style-preview-v7-12-117-test.html?page=test-page','web-builder-preview-owned-v7-12-257-test.html?page=test-page'],
-  ['Stream Bandit Theme Studio V7.12.295','Stream Bandit Theme Studio V7.13.034'],
-  ['V7.12.295 Theme Studio · Clean Rail Global Bridge','V7.13.034 Theme Studio · Route Canonical Global Bridge'],
-  ['V7.12.295 Theme Studio Clean Rail Global Bridge','V7.13.034 Theme Studio Route Canonical Global Bridge'],
-  ['V7.12.295 Theme Studio — clean Settings rail + global theme bridge + Supabase/local projection. Current helper stack loaded. No schema/storage/RLS/index changes.','V7.13.034 Theme Studio — canonical Web Builder routes + global theme bridge + Supabase/local projection. Current helper stack loaded. No schema/storage/RLS/index changes.'],
-  ['theme-clean-rail-295','theme-route-canonical-7-13-034'],
-  ["document.documentElement.dataset.sbThemeStudio='v7-12-295';","document.documentElement.dataset.sbThemeStudio='v7-13-034';"]
+  ['Stream Bandit Theme Studio V7.12.295','Stream Bandit Theme Studio V7.13.035'],
+  ['V7.12.295 Theme Studio · Clean Rail Global Bridge','V7.13.035 Theme Studio · Preflight Auth Gate Route Canonical Bridge'],
+  ['V7.12.295 Theme Studio Clean Rail Global Bridge','V7.13.035 Theme Studio Preflight Auth Gate Route Canonical Bridge'],
+  ['V7.12.295 Theme Studio — clean Settings rail + global theme bridge + Supabase/local projection. Current helper stack loaded. No schema/storage/RLS/index changes.','V7.13.035 Theme Studio — Auth Gate preflight + canonical Web Builder routes + global theme bridge + Supabase/local projection. Current helper stack loaded. No schema/storage/RLS/index changes.'],
+  ['theme-clean-rail-295','theme-preflight-gate-7-13-035'],
+  ["document.documentElement.dataset.sbThemeStudio='v7-12-295';","document.documentElement.dataset.sbThemeStudio='v7-13-035';"]
 ];
 function setStatus(text,cls){
   if(statusEl){statusEl.textContent=text;statusEl.className='badge '+(cls||'warn');}
   if(debugEl){
-    debugEl.textContent=text+'\n\nSource: '+RAW+'\nPatch: old Web Builder support links -> current owned routes\nLoader: DOMParser + ordered script replay\nVersion: '+VERSION;
+    debugEl.textContent=text+'\n\nSource: '+RAW+'\nPatch: Auth Gate preflight + old Web Builder support links -> current owned routes\nLoader: auth check + DOMParser + ordered script replay\nVersion: '+VERSION;
   }
 }
 function copyAttrs(from,to){
@@ -81,6 +84,41 @@ function replayScripts(scripts){
 function replaceAllText(haystack,needle,replacement){
   return haystack.split(needle).join(replacement);
 }
+function authGateReady(){
+  return !!(window.StreamBanditAuthGate&&typeof window.StreamBanditAuthGate.enforce==='function');
+}
+function waitForAuthGate(){
+  return new Promise(function(resolve){
+    var tries=0;
+    function tick(){
+      tries++;
+      if(authGateReady()){resolve(true);return;}
+      if(tries>80){resolve(false);return;}
+      setTimeout(tick,100);
+    }
+    tick();
+  });
+}
+function runAuthPreflight(){
+  return waitForAuthGate().then(function(ready){
+    if(!ready){
+      setStatus('Theme Studio auth gate unavailable','bad');
+      return false;
+    }
+    return Promise.resolve(window.StreamBanditAuthGate.enforce()).then(function(decision){
+      if(decision&&decision.allowed)return true;
+      setStatus('Theme Studio locked. Sign in with an approved account to continue.','warn');
+      if(debugEl){
+        debugEl.textContent='Theme Studio locked before safe-loader replay.\n\nAuth Gate: stream-bandit-auth-gate-v7-13-001.js\nSource fetch paused until sign-in is allowed.\nVersion: '+VERSION;
+      }
+      return false;
+    }).catch(function(err){
+      setStatus('Theme Studio auth check failed','bad');
+      if(debugEl){debugEl.textContent=String(err&&err.message||err)+'\n\nNo pinned Theme Studio source was fetched.';}
+      return false;
+    });
+  });
+}
 function openPatched(html){
   if(!html||html.indexOf('V7.12.295 Theme Studio Clean Rail Global Bridge')===-1){
     throw new Error('Source did not match the expected V7.12.295 Theme Studio build.');
@@ -102,24 +140,38 @@ function openPatched(html){
   document.head.innerHTML=parsed.head.innerHTML;
   document.body.innerHTML=parsed.body.innerHTML;
   document.body.setAttribute('data-theme-route-canonical-loader',VERSION);
+  document.body.setAttribute('data-theme-auth-gate-preflight','passed');
   window.SB_THEME_STUDIO_ROUTE_CANONICAL_VERSION=VERSION;
   return replayScripts(scripts).then(function(){
-    document.documentElement.dataset.sbThemeStudio='v7-13-034';
-    if(window.StreamBanditThemeStudioV712295&&!window.StreamBanditThemeStudioV713034){
-      window.StreamBanditThemeStudioV713034=window.StreamBanditThemeStudioV712295;
+    document.documentElement.dataset.sbThemeStudio='v7-13-035';
+    document.documentElement.dataset.sbThemeStudioAuthGate='v7-13-005';
+    if(window.StreamBanditThemeStudioV712295&&!window.StreamBanditThemeStudioV713035){
+      window.StreamBanditThemeStudioV713035=window.StreamBanditThemeStudioV712295;
     }
     console.log(VERSION+' loaded');
   });
 }
-setStatus('Fetching working Theme Studio build...');
-fetch(RAW,{cache:'no-store'})
-  .then(function(r){if(!r.ok)throw new Error('Source fetch failed: '+r.status+' '+r.statusText);return r.text();})
-  .then(openPatched)
-  .then(function(){setTimeout(function(){var st=document.getElementById('status');if(st&&st.textContent.indexOf('Checking')!==-1){st.textContent='Theme Studio loaded. If still checking, reload once.';}},2000);})
-  .catch(function(err){
-    setStatus('Theme Studio safe loader failed','bad');
-    if(debugEl){debugEl.textContent=String(err&&err.message||err)+'\n\nSource: '+RAW+'\n\nNo database, schema, RLS, storage policy, payment, index or Home change was made.';}
-  });
+function startLoader(){
+  if(loaderStarted)return;
+  loaderStarted=true;
+  setStatus('Fetching working Theme Studio build...');
+  fetch(RAW,{cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error('Source fetch failed: '+r.status+' '+r.statusText);return r.text();})
+    .then(openPatched)
+    .then(function(){setTimeout(function(){var st=document.getElementById('status');if(st&&st.textContent.indexOf('Checking')!==-1){st.textContent='Theme Studio loaded. If still checking, reload once.';}},2000);})
+    .catch(function(err){
+      setStatus('Theme Studio safe loader failed','bad');
+      if(debugEl){debugEl.textContent=String(err&&err.message||err)+'\n\nSource: '+RAW+'\n\nNo database, schema, RLS, storage policy, payment, index or Home change was made.';}
+    });
+}
+window.addEventListener('streambandit:auth-gate-decision',function(event){
+  var detail=event&&event.detail?event.detail:{};
+  if(detail.allowed)startLoader();
+});
+setStatus('Checking Theme Studio access...');
+runAuthPreflight().then(function(allowed){
+  if(allowed)startLoader();
+});
 })();
 </script>
 </body>
