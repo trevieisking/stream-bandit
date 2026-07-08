@@ -5,6 +5,8 @@ function q(s,r){return(r||document).querySelector(s)}
 function make(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html)e.innerHTML=html;return e}
 function jump(id){var e=q(id);if(e)e.scrollIntoView({behavior:'smooth',block:'start'})}
 function copy(t){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t||'');return}var a=document.createElement('textarea');a.value=t||'';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}
+function addScript(src,attr){if(q('script['+attr+']'))return;var s=document.createElement('script');s.src=src;s.setAttribute(attr,'yes');document.head.appendChild(s)}
+function loadBackend(){if(document.body.getAttribute('data-page')!=='help')return;if(!q('script[data-cl-backend-v135]')&&!window.CodeLabsBackendWriteQueueV135)addScript('assets/code-labs-backend-write-queue-v135.js?v=cl-v135-final-pages','data-cl-backend-v135');addScript('assets/code-labs-backend-final-page-current-state-guard-v135.js?v=cl-v135-stale-guard','data-cl-backend-v135-guard')}
 function card(title,text,id){return '<button class="btn ghost smallBtn" data-jump="'+id+'"><b>'+title+'</b><small>'+text+'</small></button>'}
 function liveText(){return ['CODE LABS LIVE PACKET','Open the eight Code Labs pages.','Confirm Help starts with Tool Search.','Confirm shortcut buttons jump to tools.','Confirm Export state and Copy summary are visible.','Confirm FAQ opens without flicker.','Confirm wording says Connect GitHub and Connect Supabase.','Keep Code Labs separate from Stream Bandit.','Use small reviewed changes.'].join('\n')}
 function livePanel(){var p=make('section','panel','<h2>Live packet gadget</h2><p>Copy a quick launch checklist for Code Labs.</p><div class="actions"><button class="btn primary" id="clMakeLivePacket">Build live packet</button><button class="btn ghost" id="clCopyLivePacket">Copy live packet</button></div><textarea id="clLivePacketOut" class="mid" readonly placeholder="Live packet appears here"></textarea>');p.id='clLivePacket';return p}
@@ -24,9 +26,10 @@ q('#clMakeLivePacket').onclick=function(){q('#clLivePacketOut').value=liveText()
 if(q('#clRunToolSearch'))q('#clRunToolSearch').onclick=function(){q('#clToolSearchOutput').value=searchText(q('#clToolSearchInput').value)};
 if(q('#clCopyToolSearch'))q('#clCopyToolSearch').onclick=function(){copy(q('#clToolSearchOutput').value||searchText(q('#clToolSearchInput').value))};
 Array.prototype.forEach.call(document.querySelectorAll('[data-jump]'),function(b){b.addEventListener('click',function(){jump(b.getAttribute('data-jump'))})});
+loadBackend();
 return true;
 }
-function run(){var main=q('.main');if(!order(main))setTimeout(run,300)}
+function run(){loadBackend();var main=q('.main');if(!order(main))setTimeout(run,300)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(run,1200)});else setTimeout(run,1200);
 setTimeout(run,2200);
 })();
