@@ -1,0 +1,69 @@
+/* Code Labs Backend Write Queue V132
+   Supabase-backed request sender for Buddy/GitHub connector work.
+   Browser does not write GitHub, stores no GitHub token, and never writes main.
+*/
+(function(){
+'use strict';
+var KEY='codeLabsV1State';
+var RD='codeLabsV30RepoDesk';
+var GW='codeLabsGithubWriterV2';
+var GT='codeLabsV17Tracker';
+var LANE='codeLabsGithubLaneAutopilotV131';
+var BACKEND='codeLabsBackendWriteQueueV132';
+var URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+var PUB='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+function q(s,r){return(r||document).querySelector(s)}
+function read(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch(e){return{}}}
+function write(k,v){try{localStorage.setItem(k,JSON.stringify(v||{}));return true}catch(e){return false}}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function slug(v){return String(v||'file').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,58)||'file'}
+function chars(t){return String(t||'').length}
+function lines(t){var v=String(t||'');return v?v.split(/\r?\n/).length:0}
+function now(){return new Date().toISOString()}
+function page(){return document.body&&document.body.getAttribute('data-page')||''}
+function toast(m){var t=q('#toast');if(t){t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400)}else{console.log(m)}}
+function loadScript(){return new Promise(function(resolve,reject){if(window.supabase&&window.supabase.createClient)return resolve();var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
+async function client(){await loadScript();if(!window.CL_SB){window.CL_SB=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}return window.CL_SB}
+async function currentUser(){var sb=await client();var res=await sb.auth.getUser();return{sb:sb,user:res&&res.data?res.data.user:null,error:res.error}}
+function safeBranch(action,path){return'code-labs-backend-'+slug(action||'update')+'-'+slug(path||'file')+'-v132'}
+function collect(){
+  var st=read(KEY),rd=read(RD),gw=read(GW),gt=read(GT),lane=read(LANE),ctx=lane.context||{},f=st.file||{},g=f.githubSource||{},p=st.project||{};
+  var repo=gw.repo||ctx.repo||((g.owner&&g.repo)?g.owner+'/'+g.repo:p.repo)||'trevieisking/stream-bandit';
+  var path=gw.path||ctx.path||rd.path||g.path||f.path||f.filename||'';
+  var branch=gw.branch||ctx.branch||rd.branch||safeBranch(gw.action||ctx.action||rd.mode||'update',path);
+  var content=gw.fixedCode||ctx.fixed||f.fixedCode||'';
+  var action='create_or_update_file';
+  var commit='Code Labs backend queued update for '+(path||'file');
+  var title='Code Labs backend update: '+(path||'file');
+  var request=lane.request||'';
+  var prBody=['## Code Labs backend request','Generated: '+now(),'','Repo: '+repo,'Path: '+(path||'missing'),'Branch: '+branch,'Action: '+action,'','Safety: branch and PR only. Browser did not write GitHub. No direct main write.','','Source page: '+page(),'Content characters: '+chars(content),'Content lines: '+lines(content),'',request?('## Buddy/GitHub request\n```text\n'+request.slice(0,18000)+'\n```'):''].join('\n');
+  return{repo:repo,path:path,branch:branch,action:action,content:content,commit_message:commit,pr_title:title,pr_body:prBody,source_page:page(),lane_request:request,created_at:now()}
+}
+function warnings(d){var w=[];if(d.repo!=='trevieisking/stream-bandit')w.push('Repo must be trevieisking/stream-bandit.');if(!d.path)w.push('Target path is missing.');if(!d.branch||/^(main|master|gh-pages|production|live)$/i.test(d.branch))w.push('Branch is missing or protected.');if(d.branch&&d.branch.indexOf('/')>-1)w.push('Branch must be a simple branch name, not a slash path.');if(!String(d.content||'').trim())w.push('Full file content is missing. Complete Buddy Canvas / GitHub Writer first.');if(/BEGIN PATCH|Find:\s*\n|Replace with:/i.test(d.content||''))w.push('Content looks like a patch recipe, not a full replacement file.');return w}
+function previewUrl(d){if(!/\.html?$/i.test(d.path||''))return'';return'https://raw.githack.com/'+d.repo+'/'+encodeURIComponent(d.branch)+'/'+String(d.path).split('/').map(encodeURIComponent).join('/')}
+function renderRows(rows){rows=rows||[];if(!rows.length)return'<div class="empty">No backend queue rows loaded yet.</div>';return rows.map(function(r){return'<div class="item"><b>'+esc(r.path||r.target||'request')+'</b><p>Status: '+esc(r.status||'queued')+' · Branch: '+esc(r.branch||'')+'</p><p>PR: '+(r.pull_request_url?'<a href="'+esc(r.pull_request_url)+'" target="_blank" rel="noopener">open PR</a>':'not opened yet')+'</p><p>'+esc(r.created_at||'')+'</p></div>'}).join('')}
+function setStatus(m,kind){var e=q('#clBackendQueueStatus');if(e){e.className='badge '+(kind||'warn');e.textContent=m}}
+function setOut(m){var e=q('#clBackendQueueOut');if(e)e.value=String(m||'')}
+function renderStatus(){var d=collect(),w=warnings(d),box=q('#clBackendQueueProof');if(!box)return;box.innerHTML='<div class="grid3"><div class="stat"><b>Repo</b><span>'+esc(d.repo)+'</span></div><div class="stat"><b>Path</b><span>'+esc(d.path||'missing')+'</span></div><div class="stat"><b>Branch</b><span>'+esc(d.branch||'missing')+'</span></div><div class="stat"><b>Content</b><span>'+chars(d.content)+' chars</span></div><div class="stat"><b>Status</b><span>'+esc(w.length?'Check warnings':'Ready to queue')+'</span></div></div><div class="'+(w.length?'notice':'success')+'"><p><b>'+(w.length?'Warnings':'Ready')+':</b> '+esc(w.length?w.join(' '):'This will save a Supabase queue row only. Buddy/GitHub connector still creates the branch and PR.')+'</p></div>';setOut(JSON.stringify({request:d,warnings:w,preview_url:previewUrl(d)},null,2))}
+async function send(){
+  var d=collect(),w=warnings(d);renderStatus();
+  if(w.length){setStatus('Blocked by safety checks','bad');toast('Backend queue blocked: check warnings.');return{ok:false,warnings:w}}
+  try{
+    setStatus('Checking Supabase','warn');
+    var cu=await currentUser();
+    if(!cu.user){setStatus('Connect Supabase','bad');toast('Connect Supabase first, then send to Buddy Backend.');return{ok:false,reason:'no_supabase_session'}}
+    setStatus('Queueing request','warn');
+    var row={repo:d.repo,path:d.path,branch:d.branch,action:d.action,content:d.content,commit_message:d.commit_message,pr_title:d.pr_title,pr_body:d.pr_body,status:'queued',preview_url:previewUrl(d),direct_main_write:false,branch_pr_only:true,deletes_anything:false,safety_note:'Code Labs Backend Write Queue V132: Supabase row only; Buddy/GitHub connector creates branch and PR.'};
+    var r=await cu.sb.from('code_labs_write_requests').insert(row).select('id,status,created_at,path,branch,preview_url').single();
+    if(r.error)throw r.error;
+    var saved={version:'V132',queued:r.data,request:d,saved_at:now()};
+    write(BACKEND,saved);
+    var st=read(KEY);st.file=st.file||{};st.file.backendWriteQueue=saved;st.log=Array.isArray(st.log)?st.log:[];st.log.unshift({id:'cl_backend_queue_'+Date.now(),date:new Date().toLocaleString(),msg:'Queued backend write request for '+d.path});st.log=st.log.slice(0,80);write(KEY,st);
+    setStatus('Queued for Buddy','good');toast('Backend request queued for Buddy.');setOut(JSON.stringify(saved,null,2));await loadQueue();return{ok:true,row:r.data}
+  }catch(err){console.error(err);setStatus('Queue failed','bad');toast('Backend queue failed: '+(err.message||err));setOut(String(err.message||err));return{ok:false,error:String(err.message||err)}}
+}
+async function loadQueue(){try{setStatus('Loading queue','warn');var cu=await currentUser();if(!cu.user){setStatus('Connect Supabase','bad');return}var r=await cu.sb.from('code_labs_write_queue_ready').select('id,created_at,path,branch,status,preview_url,pull_request_url,pull_request_number,error').order('created_at',{ascending:false}).limit(6);if(r.error)throw r.error;var box=q('#clBackendQueueList');if(box)box.innerHTML=renderRows(r.data||[]);setStatus('Queue loaded','good');return r.data||[]}catch(err){console.error(err);setStatus('Queue load failed','bad');var box=q('#clBackendQueueList');if(box)box.innerHTML='<div class="notice"><p>'+esc(err.message||err)+'</p></div>';return[]}}
+function panel(){if(!['repo-desk','publish-prep','github-tracker','buddy-canvas'].includes(page()))return;if(q('#clBackendWriteQueueV132'))return;var main=q('.main');if(!main){setTimeout(panel,300);return}var p=document.createElement('section');p.id='clBackendWriteQueueV132';p.className='panel';p.style.border='3px solid rgba(20,184,166,.30)';p.innerHTML='<h2>Buddy Backend Queue V132</h2><p class="muted">Sends one safe branch/PR request to Supabase for Buddy to execute with the GitHub connector. Browser does not write GitHub and stores no GitHub token.</p><div id="clBackendQueueProof"></div><div class="actions"><span id="clBackendQueueStatus" class="badge warn">Not checked</span><button class="btn primary" id="clBackendQueueSend" type="button">Send to Buddy Backend</button><button class="btn ghost" id="clBackendQueueRefresh" type="button">Load Backend Queue</button></div><textarea id="clBackendQueueOut" class="big" readonly></textarea><div id="clBackendQueueList" class="list"><div class="empty">Queue not loaded yet.</div></div>';var anchor=q('#clGithubLaneAutopilot')||q('#clSourceControlPanel')||q('.hero')||q('.topbar');if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(p,anchor.nextSibling);else main.appendChild(p);q('#clBackendQueueSend').onclick=send;q('#clBackendQueueRefresh').onclick=loadQueue;setTimeout(renderStatus,250)}
+function boot(){panel();setTimeout(panel,900);setTimeout(panel,1800);setInterval(renderStatus,4000);window.CodeLabsBackendWriteQueueV132={version:'V132',collect:collect,send:send,loadQueue:loadQueue,status:renderStatus}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
