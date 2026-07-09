@@ -1,6 +1,7 @@
-/* Code Labs V1.5.0 Patch Lab Simplifier
+/* Code Labs V1.5.1 Patch Lab Simplifier
    Makes Patch Lab easier to use without changing repo-write rules.
    No GitHub write from the browser. No direct-main write.
+   V1.5.1 keeps the advanced manual search box visibly numbered as step 3.
 */
 (function(){
 'use strict';
@@ -13,11 +14,11 @@ function putSimpleGuide(){var main=q('.main');if(!main||q('#clSimplePatchGuide')
 function findPanelWith(selector){var el=q(selector);while(el&&el!==document.body){if(el.classList&&el.classList.contains('panel'))return el;el=el.parentNode}return null}
 function tidyRecipe(){var recipe=q('#plRecipe');if(!recipe)return;var panel=findPanelWith('#plRecipe');if(panel){panel.classList.add('clRecipeFocus');var h=panel.querySelector('h2');if(h)h.textContent='2. Paste ChatGPT recipe here';var p=panel.querySelector('p');if(p)p.innerHTML='Paste the recipe I give you here. Then press <b>Apply Recipe To Full Output</b>. You do not need to understand JSON.';}
 recipe.placeholder='Paste buddy\'s Find / Replace recipe here';var btn=q('#plApplyRecipe');if(btn)btn.textContent='2. Apply ChatGPT Recipe To Full Output';var copy=q('#plCopyRecipeReport');if(copy)copy.textContent='Copy Result For Buddy';var report=q('#plRecipeReport');if(report)report.placeholder='Result appears here. If anything says missing, copy this back to buddy.'}
-function tidySearch(){var panel=findPanelWith('#plFind');if(!panel||q('#clSearchAdvancedNote',panel))return;var h=panel.querySelector('h2');if(h)h.textContent='Advanced: manual search and replace';var note=document.createElement('div');note.id='clSearchAdvancedNote';note.className='clAdvancedNote';note.innerHTML='<b>Use this only if buddy says.</b> Normal workflow is the ChatGPT recipe box.';panel.insertBefore(note,panel.children[1]||null)}
+function tidySearch(){var panel=findPanelWith('#plFind');if(!panel||q('#clSearchAdvancedNote',panel))return;var h=panel.querySelector('h2');if(h)h.textContent='3. Advanced manual search and replace';var note=document.createElement('div');note.id='clSearchAdvancedNote';note.className='clAdvancedNote';note.innerHTML='<b>Use this only if buddy says.</b> Normal workflow is the ChatGPT recipe box.';panel.insertBefore(note,panel.children[1]||null)}
 function explainRecipeReport(){var out=q('#plRecipeReport');if(!out)return;var raw=String(out.value||'');if(!raw.trim()||raw.indexOf('{')<0||raw.indexOf('applied')<0)return;try{var json=JSON.parse(raw);var missing=(json.missing||[]).length,applied=(json.applied||[]).length,pairs=json.pairs||0;out.value='Recipe result\nPairs found: '+pairs+'\nPairs applied: '+applied+'\nPairs missing: '+missing+'\n\n'+(missing?'STOP: copy this result back to buddy.':'NEXT: click Save Full Fixed Output, then use the green Safe Write Request box.')+'\n\nJSON details:\n'+raw}catch(e){}}
 function hookRecipeButton(){var btn=q('#plApplyRecipe');if(!btn||btn.dataset.clSimpleHook)return;btn.dataset.clSimpleHook='yes';btn.addEventListener('click',function(){setTimeout(explainRecipeReport,120)})}
 function tidySafeWrite(){var p=q('#clSafeWritePanel');if(!p)return;var text=q('#clSafeWriteText'),btn=q('#clCopySafeWrite'),ready=false;if(text)ready=/Ready to write:\s*true/i.test(text.value||text.textContent||'');if(p.querySelector('.clReady'))ready=true;if(btn){btn.textContent=ready?'Copy Safe Write Request - READY':'Copy Safe Write Request - WAIT';btn.disabled=!ready}var g=q('#clSafeGuide',p);if(!g){g=document.createElement('div');g.id='clSafeGuide';p.insertBefore(g,p.querySelector('.actions')||p.firstChild)}g.className='clSafeGuide '+(ready?'':'bad');g.innerHTML=ready?'<b>Green means ready.</b> Press <b>Copy Safe Write Request - READY</b> now.':'<b>Wait.</b> Do not copy this yet. First apply the recipe, press <b>Save Full Fixed Output</b>, then press <b>Refresh Request</b> until this box turns green.'}
-function renumber(){var h=q('#plLoad');if(h)h.textContent='1. Load / Refresh Full Code';var save=q('#plSave');if(save)save.textContent='3. Save Full Fixed Output'}
+function renumber(){var h=q('#plLoad');if(h)h.textContent='1. Load / Refresh Full Code';var save=q('#plSave');if(save)save.textContent='4. Save Full Fixed Output'}
 function run(){if(!isPatchLab())return;style();putSimpleGuide();tidyRecipe();tidySearch();hookRecipeButton();tidySafeWrite();renumber()}
 setTimeout(run,300);setTimeout(run,900);setTimeout(run,1700);setTimeout(run,3000);setInterval(run,4000);
 })();
