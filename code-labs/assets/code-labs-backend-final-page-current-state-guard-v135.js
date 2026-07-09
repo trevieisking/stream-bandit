@@ -1,8 +1,8 @@
-/* Code Labs Backend Final Page Current-State Guard V135.4
+/* Code Labs Backend Final Page Current-State Guard V135.5
    Protects final-page backend sends from stale GitHub Writer or lane payloads.
    Browser still does not write GitHub. This validates/sanitizes local Code Labs state only when Send is clicked.
    It must not repaint the backend panel on a timer.
-   V135.4 also loads the Buddy Page Bridge so final pages are readable without Supabase blocking.
+   V135.5 also loads the Buddy Page Bridge and V172 polish so final pages are readable and consistently labelled.
 */
 (function(){
 'use strict';
@@ -23,9 +23,11 @@ function staleReason(cur,sv){if(!cur.path)return'';if(sv.gwPath&&sv.gwPath!==cur
 function escMsg(msg){return String(msg||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function show(msg){var box=q('#clBackendQueueProofV135'),status=q('#clBackendQueueStatusV135'),out=q('#clBackendQueueOutV135');if(status){status.className='badge bad';status.textContent='Blocked stale writer'}if(box){box.innerHTML='<div class="notice"><p><b>Warnings:</b> '+escMsg(msg)+'</p></div>'}if(out){out.value=JSON.stringify({ok:false,blocked:true,reason:msg},null,2)}}
 function sanitize(){var cur=current(),sv=saved(),bad=staleReason(cur,sv);if(bad)return{ok:false,reason:bad,current:cur,saved:sv};var fixed=cur.fixed||sv.gwFixed||sv.ctxFixed||'';if(cur.path&&fixed){var branch=sv.gwBranch||sv.ctxBranch||('code-labs-backend-create-or-update-file-'+slug(cur.path)+'-v135');var gw=sv.gw||{};gw.repo=cur.repo;gw.path=cur.path;gw.fixedCode=fixed;gw.branch=branch;write(WRITER,gw);var lane=sv.lane||{};lane.context=lane.context||{};lane.context.repo=cur.repo;lane.context.path=cur.path;lane.context.fixed=fixed;lane.context.branch=branch;write(LANE,lane)}return{ok:true,current:cur,saved:sv}}
-function loadBuddyBridge(){if(!PAGES[page()])return;if(q('script[data-cl-buddy-page-bridge-v139]')||window.CodeLabsBuddyPageBridge)return;var s=document.createElement('script');s.src='assets/code-labs-buddy-page-bridge-v139.js?v=cl-v139-buddy-page-bridge';s.setAttribute('data-cl-buddy-page-bridge-v139','yes');document.head.appendChild(s)}
+function addScript(src,attr){if(q('script['+attr+']'))return;var s=document.createElement('script');s.src=src;s.setAttribute(attr,'yes');document.head.appendChild(s)}
+function loadBuddyBridge(){if(!PAGES[page()])return;if(q('script[data-cl-buddy-page-bridge-v139]')||window.CodeLabsBuddyPageBridge)return;addScript('assets/code-labs-buddy-page-bridge-v139.js?v=cl-v139-buddy-page-bridge','data-cl-buddy-page-bridge-v139')}
+function loadPagePolish(){if(!PAGES[page()])return;addScript('assets/code-labs-page-polish-v172.js?v=cl-v172-page-polish','data-cl-page-polish-v172')}
 function rebindButton(api){var btn=q('#clBackendQueueSendV135');if(btn&&btn.__clGuardedSend!==api.send){btn.onclick=api.send;btn.__clGuardedSend=api.send}}
-function bind(){if(!PAGES[page()])return;loadBuddyBridge();var api=window.CodeLabsBackendWriteQueueV135;if(!api||!api.send){setTimeout(bind,300);return}if(!api.__finalPageCurrentStateGuard){var originalSend=api.send;api.send=function(){var s=sanitize();if(!s.ok){show(s.reason);return Promise.resolve({ok:false,blocked:true,reason:s.reason})}return originalSend.apply(api,arguments)};api.__finalPageCurrentStateGuard=true;api.__finalPageCurrentStateGuardVersion='V135.4'}rebindButton(api)}
-function boot(){loadBuddyBridge();bind();setTimeout(bind,500);setTimeout(bind,1000);setTimeout(bind,1800);setTimeout(bind,3200)}
+function bind(){if(!PAGES[page()])return;loadBuddyBridge();loadPagePolish();var api=window.CodeLabsBackendWriteQueueV135;if(!api||!api.send){setTimeout(bind,300);return}if(!api.__finalPageCurrentStateGuard){var originalSend=api.send;api.send=function(){var s=sanitize();if(!s.ok){show(s.reason);return Promise.resolve({ok:false,blocked:true,reason:s.reason})}return originalSend.apply(api,arguments)};api.__finalPageCurrentStateGuard=true;api.__finalPageCurrentStateGuardVersion='V135.5'}rebindButton(api)}
+function boot(){loadBuddyBridge();loadPagePolish();bind();setTimeout(bind,500);setTimeout(bind,1000);setTimeout(bind,1800);setTimeout(bind,3200)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
