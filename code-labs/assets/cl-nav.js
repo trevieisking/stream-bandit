@@ -1,24 +1,49 @@
 (function(){
+'use strict';
+var VERSION='v173-menu-stability';
+var LINKS=[
+ ['index.html','🏠','Home','Start here'],
+ ['setup.html','⚙️','Setup','Project and repo'],
+ ['file-lab.html','📄','File Lab','Load full file'],
+ ['rescue-room.html','🛟','Rescue Room','Problem and rules'],
+ ['packet-builder.html','📦','Packet Builder','Build packet'],
+ ['buddy-canvas.html','🤖','Buddy Canvas','Assistant lane'],
+ ['v20.html','🧭','Workflow Hub','Choose route'],
+ ['patch-desk.html','🧩','Patch Desk','Full fixed file'],
+ ['patch-lab.html','🧪','Patch Lab','Exact fallback'],
+ ['preview-test.html','🎯','Preview + Test','Check before live'],
+ ['checkpoints.html','💾','Checkpoints','Rollback proof'],
+ ['repo-desk.html','🗂️','Repo Desk','Repo handoff'],
+ ['publish-prep.html','GitHub','GitHub Writer','File handoff'],
+ ['github-tracker.html','PR','GitHub Tracker','PR and preview'],
+ ['saved-files.html','🗃️','Saved Files','Edit saved files'],
+ ['connection-guide.html','🔌','Connection Guide','Connect tools'],
+ ['read-only-proof.html','✅','Read-Only Proof','Backend proof'],
+ ['checklist-builder.html','☑️','Checklist Builder','Pass lists'],
+ ['help.html','FAQ','Help','Tools and guide'],
+ ['faq.html','FAQ','FAQ','Clear answers'],
+ ['about.html','Info','About','What Code Labs does']
+];
 function q(s,r){return(r||document).querySelector(s)}
 function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
-function makeLink(href,icon,title,small){var a=document.createElement('a');a.href=href;a.innerHTML='<span>'+icon+'</span><div>'+title+'<small>'+small+'</small></div>';return a}
-function addLink(href,icon,title,small){var n=q('.nav');if(!n||q('.nav a[href="'+href+'"]'))return;var a=makeLink(href,icon,title,small);n.appendChild(a)}
+function page(){return document.body&&document.body.getAttribute('data-page')||location.pathname.split('/').pop().replace(/\.html?$/,'')||'index'}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function makeLink(item,i){var href=item[0],icon=item[1],title=item[2],small=item[3],a=document.createElement('a');a.href=href;a.setAttribute('data-step',String(i));if(page()+'.html'===href||(page()==='index'&&href==='index.html'))a.className='active';a.innerHTML='<span>'+esc(icon)+'</span><div>'+i+'. '+esc(title)+'<small>'+esc(small)+'</small></div>';return a}
+function sameOrder(nav){var got=qa('a',nav).map(function(a){return (a.getAttribute('href')||'').split('?')[0].split('#')[0]}).join('|');var want=LINKS.map(function(x){return x[0]}).join('|');return got===want}
+function stabilizeNav(){var nav=q('.nav');if(!nav)return false;if(nav.getAttribute('data-cl-nav-stable')===VERSION&&sameOrder(nav))return true;var active=page()+'.html';nav.innerHTML='';LINKS.forEach(function(item,i){nav.appendChild(makeLink(item,i))});nav.setAttribute('data-cl-nav-stable',VERSION);nav.setAttribute('aria-label','Code Labs workflow navigation');return true}
 function buddyOn(){try{var p=new URLSearchParams(location.search);if(p.get('buddy')==='1'){localStorage.setItem('clBuddyTools','1');return true}if(p.get('hideBuddy')==='1'){localStorage.removeItem('clBuddyTools');return false}return localStorage.getItem('clBuddyTools')==='1'}catch(e){return false}}
-function addBuddyBox(){if(!buddyOn())return;var side=q('.sidebar'),nav=q('.nav');if(!side||!nav||q('#clBuddyToolsBox',side))return;var box=document.createElement('div');box.className='sideBox';box.id='clBuddyToolsBox';box.innerHTML='<b>Buddy Tools</b><p>Owner tools index. Separate from the workflow menu.</p><a class="btn good" href="chatgpt-buddy-tools.html" style="width:100%;justify-content:center;margin-top:8px">Open Buddy Tools</a>';if(nav.nextSibling)side.insertBefore(box,nav.nextSibling);else side.appendChild(box)}
+function addBuddyBox(){if(!buddyOn())return;var side=q('.sidebar'),nav=q('.nav');if(!side||!nav||q('#clBuddyToolsBox',side))return;var box=document.createElement('div');box.className='sideBox';box.id='clBuddyToolsBox';box.innerHTML='<b>Buddy Tools</b><p>Owner tools index. Separate from the workflow menu.</p><a class="btn good" href="chatgpt-buddy-tools.html" style="width:100%;justify-content:center;margin-top:8px">Open Buddy Tools</a>';side.insertBefore(box,nav.nextSibling)}
 function loadScriptOnce(src,attr){if(q('script['+attr+']'))return;var s=document.createElement('script');s.src=src;s.setAttribute(attr,'yes');document.head.appendChild(s)}
 function loadWorkflowClarity(){loadScriptOnce('assets/code-labs-workflow-clarity-v130.js?v=cl-workflow-clarity-v161','data-cl-workflow-clarity-v130');loadScriptOnce('assets/code-labs-page-completion-v139.js?v=cl-v161','data-cl-page-completion-v139')}
 function loadRouteAgreement(){loadScriptOnce('assets/code-labs-packet-builder-route-v131.js?v=cl-packet-builder-route-v131','data-cl-packet-builder-route-v131')}
-function loadBuddyLaneGuide(){var id=document.body&&document.body.getAttribute('data-page');var allowed={"preview-test":1,"checkpoints":1,"repo-desk":1,"publish-prep":1,"github-tracker":1};if(allowed[id])loadScriptOnce('assets/code-labs-v16-buddy-lane-guide.js?v=cl-buddy-lane-20260701','data-cl-buddy-lane-guide')}
-function loadNextButtons(){var id=document.body&&document.body.getAttribute('data-page');var allowed={"patch-lab":1,"preview-test":1,"checkpoints":1,"repo-desk":1,"publish-prep":1,"github-tracker":1};if(allowed[id])loadScriptOnce('assets/code-labs-v16-next-step-buttons.js?v=cl-next-buttons-v165','data-cl-next-buttons')}
-function loadCurrentFilePanel(){var id=document.body&&document.body.getAttribute('data-page');var allowed={"publish-prep":1,"github-tracker":1,"connection-guide":1};if(allowed[id])loadScriptOnce('assets/code-labs-v32-current-file-panel.js?v=cl-current-file-20260701','data-cl-current-file-panel')}
-function loadPagePolish(){loadScriptOnce('assets/code-labs-page-polish-v172.js?v=cl-v172-page-polish','data-cl-page-polish-v172')}
-function loadWorkflowTidy(){return}
-function loadPatchDeskDedupe(){var id=document.body&&document.body.getAttribute('data-page');if(id==='patch-desk')loadScriptOnce('assets/code-labs-v34-patch-desk-dedupe.js?v=cl-v34-patch-desk-dedupe-20260701','data-cl-patch-desk-dedupe')}
-function setupIconStyle(){if(q('#clSetupIconV144'))return;var st=document.createElement('style');st.id='clSetupIconV144';st.textContent='.nav a[href="setup.html"]>span:before{content:"⚙️"!important;color:#dbeafe!important;font-size:16px!important;line-height:1!important}.nav a[href="setup.html"].active>span:before{color:#34d399!important}';document.head.appendChild(st)}
-function restoreSetupAfterHome(){var n=q('.nav');if(!n)return;setupIconStyle();var setup=q('.nav a[href="setup.html"]');if(!setup)setup=makeLink('setup.html','⚙️','Setup','Project and repo');var home=q('.nav a[href="index.html"]');if(home&&setup.previousElementSibling!==home)n.insertBefore(setup,home.nextSibling);else if(!setup.parentNode)n.appendChild(setup);if((document.body&&document.body.getAttribute('data-page'))==='setup')setup.classList.add('active')}
-function setupNextToFileLab(){if((document.body&&document.body.getAttribute('data-page'))!=='setup')return;qa('a[href="project-picker.html"]').forEach(function(a){a.href='file-lab.html';a.textContent=/next/i.test(a.textContent)?'Next: File Lab':'File Lab'});var box=q('#clWorkflowClarityV130');if(box){var next=q('.next',box);if(next){next.href='file-lab.html';next.textContent='Next: File Lab'}}}
-function addWorkflowLinks(){addLink('buddy-canvas.html','🤖','Buddy Canvas','Assistant lane');addLink('v20.html','🧭','Workflow Hub','Choose route');addLink('patch-desk.html','🧩','Patch Desk','Full fixed file');addLink('patch-lab.html','🧪','Patch Lab','Exact fallback');addLink('preview-test.html','🎯','Preview + Test','Check before live');addLink('checkpoints.html','💾','Checkpoints','Rollback proof');addLink('repo-desk.html','🗂️','Repo Desk','Repo handoff')}
-function add(){addBuddyBox();restoreSetupAfterHome();setupNextToFileLab();addWorkflowLinks();addLink('publish-prep.html','GitHub','GitHub Writer','File handoff');addLink('github-tracker.html','PR','GitHub Tracker','PR and preview');addLink('saved-files.html','🗃️','Saved Files','Edit saved files');addLink('about.html','Info','About','What Code Labs does');addLink('faq.html','FAQ','FAQ','Clear answers');loadWorkflowClarity();loadRouteAgreement();loadBuddyLaneGuide();loadNextButtons();loadCurrentFilePanel();loadPagePolish();loadWorkflowTidy();loadPatchDeskDedupe()}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',add);else add();
-setTimeout(add,180);setTimeout(add,700);setTimeout(add,1600);setTimeout(add,3200);setTimeout(add,5200);
+function loadBuddyLaneGuide(){var id=page();var allowed={"preview-test":1,"checkpoints":1,"repo-desk":1,"publish-prep":1,"github-tracker":1};if(allowed[id])loadScriptOnce('assets/code-labs-v16-buddy-lane-guide.js?v=cl-buddy-lane-20260701','data-cl-buddy-lane-guide')}
+function loadNextButtons(){var id=page();var allowed={"patch-lab":1,"preview-test":1,"checkpoints":1,"repo-desk":1,"publish-prep":1,"github-tracker":1};if(allowed[id])loadScriptOnce('assets/code-labs-v16-next-step-buttons.js?v=cl-next-buttons-v165','data-cl-next-buttons')}
+function loadCurrentFilePanel(){var id=page();var allowed={"publish-prep":1,"github-tracker":1,"connection-guide":1};if(allowed[id])loadScriptOnce('assets/code-labs-v32-current-file-panel.js?v=cl-current-file-20260701','data-cl-current-file-panel')}
+function loadPagePolish(){loadScriptOnce('assets/code-labs-page-polish-v172.js?v=cl-v173-menu-stability','data-cl-page-polish-v172')}
+function loadPatchDeskDedupe(){if(page()==='patch-desk')loadScriptOnce('assets/code-labs-v34-patch-desk-dedupe.js?v=cl-v34-patch-desk-dedupe-20260701','data-cl-patch-desk-dedupe')}
+function setupNextToFileLab(){if(page()!=='setup')return;qa('a[href="project-picker.html"]').forEach(function(a){a.href='file-lab.html';a.textContent=/next/i.test(a.textContent)?'Next: File Lab':'File Lab'});var box=q('#clWorkflowClarityV130');if(box){var next=q('.next',box);if(next){next.href='file-lab.html';next.textContent='Next: File Lab'}}}
+function run(){var ok=stabilizeNav();if(!ok){setTimeout(run,100);return}addBuddyBox();setupNextToFileLab();loadWorkflowClarity();loadRouteAgreement();loadBuddyLaneGuide();loadNextButtons();loadCurrentFilePanel();loadPagePolish();loadPatchDeskDedupe()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+setTimeout(run,250);setTimeout(run,900);
+window.CodeLabsStableNav={version:VERSION,links:LINKS.length,run:run};
 })();
