@@ -1,6 +1,7 @@
-/* Code Labs Backend Final Page Current-State Guard V135.2
+/* Code Labs Backend Final Page Current-State Guard V135.3
    Protects final-page backend sends from stale GitHub Writer or lane payloads.
-   Browser still does not write GitHub. This only validates/sanitizes local Code Labs state before queue send.
+   Browser still does not write GitHub. This validates/sanitizes local Code Labs state only when Send is clicked.
+   It must not repaint the backend panel on a timer.
 */
 (function(){
 'use strict';
@@ -22,7 +23,7 @@ function escMsg(msg){return String(msg||'').replace(/[&<>"']/g,function(c){retur
 function show(msg){var box=q('#clBackendQueueProofV135'),status=q('#clBackendQueueStatusV135'),out=q('#clBackendQueueOutV135');if(status){status.className='badge bad';status.textContent='Blocked stale writer'}if(box){box.innerHTML='<div class="notice"><p><b>Warnings:</b> '+escMsg(msg)+'</p></div>'}if(out){out.value=JSON.stringify({ok:false,blocked:true,reason:msg},null,2)}}
 function sanitize(){var cur=current(),sv=saved(),bad=staleReason(cur,sv);if(bad)return{ok:false,reason:bad,current:cur,saved:sv};var fixed=cur.fixed||sv.gwFixed||sv.ctxFixed||'';if(cur.path&&fixed){var branch=sv.gwBranch||sv.ctxBranch||('code-labs-backend-create-or-update-file-'+slug(cur.path)+'-v135');var gw=sv.gw||{};gw.repo=cur.repo;gw.path=cur.path;gw.fixedCode=fixed;gw.branch=branch;write(WRITER,gw);var lane=sv.lane||{};lane.context=lane.context||{};lane.context.repo=cur.repo;lane.context.path=cur.path;lane.context.fixed=fixed;lane.context.branch=branch;write(LANE,lane)}return{ok:true,current:cur,saved:sv}}
 function rebindButton(api){var btn=q('#clBackendQueueSendV135');if(btn&&btn.__clGuardedSend!==api.send){btn.onclick=api.send;btn.__clGuardedSend=api.send}}
-function bind(){if(!PAGES[page()])return;var api=window.CodeLabsBackendWriteQueueV135;if(!api||!api.send){setTimeout(bind,300);return}if(!api.__finalPageCurrentStateGuard){var originalSend=api.send;api.send=function(){var s=sanitize();if(!s.ok){show(s.reason);return Promise.resolve({ok:false,blocked:true,reason:s.reason})}return originalSend.apply(api,arguments)};api.__finalPageCurrentStateGuard=true;api.__finalPageCurrentStateGuardVersion='V135.2'}rebindButton(api);var s=sanitize();if(!s.ok)show(s.reason)}
-function boot(){bind();setTimeout(bind,500);setTimeout(bind,1000);setTimeout(bind,1800);setInterval(bind,2000)}
+function bind(){if(!PAGES[page()])return;var api=window.CodeLabsBackendWriteQueueV135;if(!api||!api.send){setTimeout(bind,300);return}if(!api.__finalPageCurrentStateGuard){var originalSend=api.send;api.send=function(){var s=sanitize();if(!s.ok){show(s.reason);return Promise.resolve({ok:false,blocked:true,reason:s.reason})}return originalSend.apply(api,arguments)};api.__finalPageCurrentStateGuard=true;api.__finalPageCurrentStateGuardVersion='V135.3'}rebindButton(api)}
+function boot(){bind();setTimeout(bind,500);setTimeout(bind,1000);setTimeout(bind,1800);setTimeout(bind,3200)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
