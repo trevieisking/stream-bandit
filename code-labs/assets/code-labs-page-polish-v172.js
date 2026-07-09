@@ -1,19 +1,15 @@
-/* Code Labs Page Polish V172.3
+/* Code Labs Page Polish V172.4
    Small non-destructive polish layer:
-   - keeps workflow order visible and numbered with plain text
-   - sorts sidebar workflow links after late links are added
+   - leaves sidebar order owned by cl-nav.js V173 stable nav
+   - keeps workflow wording and SEO polish
    - fixes stale Setup/Project wording after render
    - adds runtime SEO metadata where pages are thin
    - adds a Buddy/GitHub connector request copy lane without browser GitHub writes
-   V172.3 removes the extra blue number badges because they fought with native page helpers and caused flicker.
+   V172.4 does not append, sort, or move sidebar links. That prevents menu jumping.
 */
 (function(){
 'use strict';
-var VERSION='V172.3';
-var ORDER={
-'index.html':'0','setup.html':'1','file-lab.html':'2','rescue-room.html':'3','packet-builder.html':'4','buddy-canvas.html':'5','v20.html':'6','patch-desk.html':'7','patch-lab.html':'8','preview-test.html':'9','checkpoints.html':'10','repo-desk.html':'11','publish-prep.html':'12','github-tracker.html':'13','saved-files.html':'14','connection-guide.html':'15','read-only-proof.html':'16','checklist-builder.html':'17','help.html':'18','faq.html':'19','about.html':'20'};
-var LABELS={
-'index.html':['Home','Start here'],'setup.html':['Setup','Project and repo'],'file-lab.html':['File Lab','Load full file'],'rescue-room.html':['Rescue Room','Problem and rules'],'packet-builder.html':['Packet Builder','Build packet'],'buddy-canvas.html':['Buddy Canvas','Assistant lane'],'v20.html':['Workflow Hub','Choose route'],'patch-desk.html':['Patch Desk','Full fixed file'],'patch-lab.html':['Exact fallback','Patch Lab'],'preview-test.html':['Preview + Test','Check before live'],'checkpoints.html':['Checkpoints','Rollback proof'],'repo-desk.html':['Repo Desk','Repo handoff'],'publish-prep.html':['GitHub Writer','Branch/PR request'],'github-tracker.html':['GitHub Tracker','PR and preview'],'saved-files.html':['Saved Files','Edit saved rows'],'connection-guide.html':['Connection Guide','Connect tools'],'read-only-proof.html':['Read-Only Proof','Backend proof'],'checklist-builder.html':['Checklist Builder','Pass lists'],'help.html':['Help','Tools and guide'],'faq.html':['FAQ','Clear answers'],'about.html':['What Code Labs does','Overview']};
+var VERSION='V172.4';
 var SEO={
 'index':'Code Labs guided ChatGPT repair workflow for non-coders with Setup, File Lab, Buddy Canvas, preview, checkpoints, GitHub Writer, GitHub Tracker, Saved Files, and Supabase repair history.',
 'setup':'Code Labs Setup stores workspace, site, repo, GitHub connector, Supabase repair-history, and notes before the full repair workflow starts.',
@@ -44,9 +40,8 @@ function keyFromHref(h){return String(h||'').split('?')[0].split('#')[0].split('
 function ensureMeta(name,content){if(!content)return;var m=q('meta[name="'+name+'"]');if(!m){m=document.createElement('meta');m.setAttribute('name',name);document.head.appendChild(m)}if(!m.getAttribute('content'))m.setAttribute('content',content)}
 function ensureProp(prop,content){if(!content)return;var m=q('meta[property="'+prop+'"]');if(!m){m=document.createElement('meta');m.setAttribute('property',prop);document.head.appendChild(m)}if(!m.getAttribute('content'))m.setAttribute('content',content)}
 function seo(){var id=page(),desc=SEO[id]||SEO[keyFromHref(location.pathname).replace(/\.html$/,'')]||'';ensureMeta('description',desc);ensureMeta('keywords','Code Labs, ChatGPT repair workflow, Buddy Canvas, GitHub connector, Supabase repair history, non-coder website repair, checkpoints, Saved Files');ensureProp('og:title',document.title||'Code Labs');ensureProp('og:description',desc);ensureMeta('twitter:card','summary');ensureMeta('twitter:description',desc)}
-function numberNav(){var nav=q('.nav');if(!nav)return;var links=qa('a',nav);links.forEach(function(a){var k=keyFromHref(a.getAttribute('href')),n=ORDER[k],lab=LABELS[k];if(lab){var d=q('div',a);if(d)d.innerHTML=esc((n?n+'. ':'')+lab[0])+'<small>'+esc(lab[1])+'</small>'}if(n)a.setAttribute('data-step',n)});links.sort(function(a,b){var ak=ORDER[keyFromHref(a.getAttribute('href'))],bk=ORDER[keyFromHref(b.getAttribute('href'))];var an=ak==null?999:Number(ak),bn=bk==null?999:Number(bk);return an-bn});links.forEach(function(a){nav.appendChild(a)})}
 function addStyle(){if(q('#clPagePolishV172Style'))return;var s=document.createElement('style');s.id='clPagePolishV172Style';s.textContent='.clPolishNote{border:1px solid #bfdbfe;background:#eff6ff;color:#172554;border-radius:18px;padding:12px;margin:10px 0}.clPolishNote b{color:#0f172a}.clTiny{font-size:12px;opacity:.85}.clReqBox{width:100%;min-height:130px;margin-top:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px}.clStepBadge,.clPanelStep .clStepBadge{display:none!important}';document.head.appendChild(s)}
-function visibleWorkflowNumbers(){qa('.heroCard ol').forEach(function(ol){ol.classList.remove('clNumberedWorkflow')});qa('.clStepBadge').forEach(function(b){b.remove()});qa('.panel h2').forEach(function(h){var b=q('.clPanelStep',h);if(b)h.textContent=b.textContent.replace(/^\s*(\d+)\s*/,function(_,n){return n+'. '})})}
+function cleanNumberBadges(){qa('.clStepBadge').forEach(function(b){b.remove()});qa('.panel h2').forEach(function(h){var b=q('.clPanelStep',h);if(b)h.textContent=b.textContent.replace(/^\s*(\d+)\s*/,function(_,n){return n+'. '})})}
 function patchText(){
 var id=page();
 qa('.sideBox').forEach(function(box){if(/GitHub and Supabase are planned connector layers|future connector/i.test(box.textContent||'')){box.innerHTML='<b>Mode</b><p>Manual workflow, Buddy Page Bridge, GitHub connector requests, and Supabase repair history are active support lanes. Browser pages still do not write GitHub directly.</p>'}});
@@ -62,8 +57,8 @@ qa('.hero p,.card p,.sideBox p').forEach(function(el){var t=el.textContent||'';i
 function requestText(){var p={};try{if(window.CodeLabsBuddyPageBridge&&window.CodeLabsBuddyPageBridge.packet)p=window.CodeLabsBuddyPageBridge.packet()||{}}catch(e){}var repo=p.repo||'trevieisking/stream-bandit',path=p.path||'',branch=p.request_branch||'',action=p.action||'read_context';return ['CODE LABS GITHUB CONNECTOR REQUEST '+VERSION,'Page: '+page(),'Repo: '+repo,'Path: '+(path||'missing - fill before write request'),'Branch: '+(branch||'Buddy should choose a safe non-main branch'),'Action: '+action,'','Request:','Use the GitHub connector in ChatGPT to read, create, or update the target file safely. Do not write main directly. Open a branch/PR only when a real file path and full replacement content are present.','','Buddy Page Bridge packet:',(window.CodeLabsBuddyPageBridge&&window.CodeLabsBuddyPageBridge.text?window.CodeLabsBuddyPageBridge.text():'Build the Buddy Read Packet first.')].join('\n')}
 function copy(t){if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();return Promise.resolve()}
 function bridgeRequest(){var p=q('#clBuddyPageBridgeV139');if(!p||q('#clGithubConnectorRequestV172'))return;var wrap=document.createElement('div');wrap.id='clGithubConnectorRequestV172';wrap.className='clPolishNote';wrap.innerHTML='<b>GitHub connector request</b><p class="clTiny">This prepares the request for Buddy/ChatGPT. The browser still does not write GitHub directly.</p><div class="actions"><button class="btn good" type="button" id="clCopyGithubRequestV172">Copy GitHub Connector Request</button><button class="btn ghost" type="button" id="clBuildGithubRequestV172">Build Request Text</button></div><textarea class="clReqBox" id="clGithubRequestOutV172" readonly></textarea>';p.appendChild(wrap);q('#clBuildGithubRequestV172').onclick=function(){q('#clGithubRequestOutV172').value=requestText()};q('#clCopyGithubRequestV172').onclick=function(){var t=requestText();q('#clGithubRequestOutV172').value=t;copy(t)}}
-function run(){addStyle();seo();numberNav();visibleWorkflowNumbers();patchText();bridgeRequest()}
+function run(){addStyle();seo();cleanNumberBadges();patchText();bridgeRequest()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(run,80)});else setTimeout(run,80);
-setTimeout(run,400);setTimeout(run,1200);setTimeout(run,2400);setTimeout(run,4200);
-window.CodeLabsPagePolishV172={run:run,version:VERSION};
+setTimeout(run,600);setTimeout(run,1800);
+window.CodeLabsPagePolishV172={run:run,version:VERSION,menu_owner:'cl-nav.js'};
 })();
