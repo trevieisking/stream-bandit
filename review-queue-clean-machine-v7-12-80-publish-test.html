@@ -204,6 +204,26 @@ function isArchived(x){return String(x&&x.decline_reason||'').includes('[ARCHIVE
 function displayStatusOf(x){return isArchived(x)?'archived':statusOf(x);}
 function channelName(x){return firstNonEmpty(x&&x.channel_name,'No channel');}
 function yearFromTitle(t){let m=String(t||'').match(/(19|20)\d{2}/);return m?m[0]:null;}
+function schemeCount(raw){return (String(raw||'').match(/https?:\/\//gi)||[]).length;}
+function muxPlaybackId(raw){let s=String(raw||'').trim().replace(/&amp;/g,'&');let m=s.match(/stream\.mux\.com\/([A-Za-z0-9._-]+)\.m3u8/i)||s.match(/player\.mux\.com\/([A-Za-z0-9._-]+)/i);return m?m[1].replace(/[^A-Za-z0-9._-].*$/,''):'';}
+function normaliseMedia(raw){
+  let input=String(raw||'').trim().replace(/&amp;/g,'&');
+  if(!input)throw Error('Submission has no video URL.');
+  if(schemeCount(input)>1||/m3u8https?:\/\//i.test(input))throw Error('Video URL contains more than one URL. Fix the submission URL before publishing.');
+  let pid=muxPlaybackId(input);
+  if(/(?:stream|player)\.mux\.com/i.test(input)){
+    if(!pid)throw Error('Mux URL is invalid. Use one public Mux playback URL before publishing.');
+    let canonical='https://stream.mux.com/'+pid+'.m3u8';
+    return{video_url:canonical,mux_playback_url:canonical,playback_id:pid,source_type:'mux'};
+  }
+  try{
+    let parsed=new URL(input);
+    if(!/^https?:$/.test(parsed.protocol))throw Error('unsupported protocol');
+  }catch(e){
+    throw Error('Video URL must be one valid public http or https URL.');
+  }
+  return{video_url:input,mux_playback_url:null,playback_id:'',source_type:/\.m3u8(?:\?|$)/i.test(input)?'hls':'url'};
+}
 
 async function readConfig(){
   if(cfg)return cfg;
@@ -486,17 +506,15 @@ async function markSubmission(status,extra){
   return r.data;
 }
 
-function movieFromSubmission(){
+function movieFromSubmission(media){
   let ch=selectedChannel();
-  let video=urlOf(selected);
-
-  if(!video)throw Error('Submission has no video URL.');
+  media=media||normaliseMedia(urlOf(selected));
 
   return{
     title:titleOf(selected),
     description:descOf(selected),
-    mux_playback_url:video,
-    video_url:video,
+    mux_playback_url:media.mux_playback_url,
+    video_url:media.video_url,
     thumbnail_url:imgOf(selected)||null,
     trailer_url:selected.trailer_url||null,
     year:yearFromTitle(titleOf(selected)),
@@ -507,24 +525,54 @@ function movieFromSubmission(){
     owner_id:selected.submitter_id||profileId(),
     featured:false,
     duration_seconds:0,
-    source_type:video.includes('stream.mux.com')?'mux':(/\.m3u8(\?|$)/i.test(video)?'hls':'url'),
+    source_type:media.source_type,
     status:'published',
     updated_at:new Date().toISOString()
   };
 }
 
-async function findMovie(video){
+async function findMovie(mediaInput){
   let client=await getClient();
+  let media=typeof mediaInput==='string'?normaliseMedia(mediaInput):mediaInput;
+  let target=movieFromSubmission(media);
 
-  let r=await withTimeout(
-    client.from('sb_movies').select('*').or('video_url.eq.'+video+',mux_playback_url.eq.'+video).limit(1),
+  function scoped(query){
+    query=query.eq('owner_id',target.owner_id);
+    return target.channel_id
+      ?query.eq('channel_id',target.channel_id)
+      :query.is('channel_id',null);
+  }
+
+  let byVideo=await withTimeout(
+    scoped(client.from('sb_movies').select('*').eq('video_url',media.video_url)).limit(1),
     15000,
-    'Find movie'
+    'Find movie by video URL'
   );
+  if(byVideo.error)throw byVideo.error;
+  if(byVideo.data&&byVideo.data[0])return byVideo.data[0];
 
-  if(r.error)throw r.error;
+  if(media.mux_playback_url){
+    let byMux=await withTimeout(
+      scoped(client.from('sb_movies').select('*').eq('mux_playback_url',media.mux_playback_url)).limit(1),
+      15000,
+      'Find movie by Mux URL'
+    );
+    if(byMux.error)throw byMux.error;
+    if(byMux.data&&byMux.data[0])return byMux.data[0];
+  }
 
-  return r.data&&r.data[0]||null;
+  if(media.playback_id){
+    let needle='%'+media.playback_id.replace(/[%_,]/g,'')+'%';
+    let byPlayback=await withTimeout(
+      scoped(client.from('sb_movies').select('*').or('video_url.ilike.'+needle+',mux_playback_url.ilike.'+needle)).limit(1),
+      15000,
+      'Find movie by Mux playback ID'
+    );
+    if(byPlayback.error)throw byPlayback.error;
+    if(byPlayback.data&&byPlayback.data[0])return byPlayback.data[0];
+  }
+
+  return null;
 }
 
 async function publish(){
@@ -538,12 +586,13 @@ async function publish(){
 
     if(!selected)throw Error('Select a submission first.');
 
-    let movie=movieFromSubmission();
+    let media=normaliseMedia(urlOf(selected));
+    let movie=movieFromSubmission(media);
 
-    dbg('publish start',{submission:selected.id,movie});
+    dbg('publish start',{submission:selected.id,media:media,movie:movie});
 
     let client=await getClient();
-    let existing=await findMovie(urlOf(selected));
+    let existing=await findMovie(media);
     let saved;
 
     if(existing){
