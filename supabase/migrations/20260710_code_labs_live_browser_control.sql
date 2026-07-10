@@ -2,7 +2,7 @@ create extension if not exists pgcrypto;
 
 create table if not exists public.code_labs_browser_sessions (
   id uuid primary key default gen_random_uuid(),
-  owner_id uuid not null,
+  owner_id uuid not null references public.code_labs_owners(user_id) on delete cascade,
   pairing_code_hash text not null unique,
   browser_secret_hash text not null,
   control_token_hash text unique,
