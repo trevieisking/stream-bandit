@@ -71,4 +71,5 @@ end;
 $$;
 
 revoke all on function public.code_labs_approve_sol_v106(uuid, text) from public;
+revoke execute on function public.code_labs_approve_sol_v106(uuid, text) from anon;
 grant execute on function public.code_labs_approve_sol_v106(uuid, text) to authenticated;
