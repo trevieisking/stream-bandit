@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Code Labs Sol Control</title>
+<meta name="description" content="Code Labs Sol Control securely pairs one signed-in Code Labs workspace with Sol for temporary live page assistance.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v174-cache-layout-consistency">
+</head>
+<body data-page="sol-control">
+<div class="app">
+<aside class="sidebar">
+<div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>Sol Control</small></div></div>
+<nav class="nav">
+<div class="navGroupLabel">Control</div>
+<a class="active" href="sol-control.html"><span>🔗</span><div>Sol Control<small>Pair workspace</small></div></a>
+<a href="index.html"><span>🏠</span><div>Code Labs Home<small>Normal workspace</small></div></a>
+<a href="help.html"><span>🧰</span><div>Help<small>Code Labs guide</small></div></a>
+</nav>
+<div class="sideBox"><b>Keep this page open</b><p>Sol Control remains open while the separate Code Labs workspace moves between normal pages.</p></div>
+</aside>
+<main class="main">
+<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>Sol Control</b></div><div><span class="badge good">V105</span><span class="badge warn">Temporary pairing</span></div></div>
+<section class="hero"><div><span class="pill">Code Labs Live V105</span><h1>Pair one Code Labs workspace with Sol.</h1><p>This control page stays open while a separate Code Labs workspace window uses the existing V140 read, write, action, receipt and undo controls. Existing Buddy pages and wording are unchanged.</p></div><div class="heroCard"><b>Safe operating order</b><ol><li>Sign in to Code Labs.</li><li>Open the Code Labs workspace.</li><li>Pair the workspace with Sol.</li><li>Send Sol the temporary code.</li><li>Keep both windows open until the task is finished.</li></ol></div></section>
+<section class="panel"><h2>What Sol can use</h2><div class="grid3"><div class="item"><b>Read live page</b><p>Safe sections, fields, action keys and current page proof.</p></div><div class="item"><b>Write approved fields</b><p>Normal Code Labs inputs through the existing V140 bridge.</p></div><div class="item"><b>Press approved actions</b><p>Dangerous actions still require explicit confirmation and page opt-in.</p></div><div class="item"><b>Read receipts</b><p>Every command reports success, failure and changed field keys.</p></div><div class="item"><b>Undo last write</b><p>The existing V140 one-step undo remains available.</p></div><div class="item"><b>Move between pages</b><p>Use the normal Code Labs menu inside the separate workspace window.</p></div></div></section>
+<section class="notice"><p><b>Still protected:</b> passwords, tokens, service-role keys, local file selection, login prompts, CAPTCHA, direct GitHub main writes and unconfirmed dangerous actions.</p></section>
+<div class="footerNote">Code Labs Live V105 · temporary owner pairing · V140 page controls · no existing Buddy wording changed.</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="assets/code-labs-sol-pairing-v105.js?v=cl-v105-sol-control"></script>
+</body>
+</html>
