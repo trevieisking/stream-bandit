@@ -17,6 +17,8 @@
   var pollTimer = 0;
   var heartbeatTimer = 0;
   var busy = false;
+  var lastSnapshot = {};
+  var lastPageUrl = '';
 
   if (document.documentElement.getAttribute('data-cl-sol-pairing-v105-installed') === 'yes') return;
   document.documentElement.setAttribute('data-cl-sol-pairing-v105-installed', 'yes');
@@ -84,6 +86,8 @@
       sessionStorage.removeItem(SECRET_KEY);
       sessionStorage.removeItem(CODE_KEY);
     } catch (error) {}
+    lastSnapshot = {};
+    lastPageUrl = '';
   }
 
   function status(text, kind) {
@@ -119,10 +123,26 @@
     return null;
   }
 
+  function workspaceLocation() {
+    var target = workspaceWindow();
+    if (!target) throw new Error('Open the Code Labs workspace first.');
+    try {
+      var url = new URL(target.location.href);
+      if (url.origin !== location.origin || !url.pathname.startsWith('/code-labs/')) {
+        throw new Error('The workspace left Code Labs. Return it to a /code-labs/ page.');
+      }
+      return url;
+    } catch (error) {
+      if (error && /workspace left Code Labs/.test(String(error.message || error))) throw error;
+      throw new Error('The workspace left the Code Labs site. Return it to a Code Labs page.');
+    }
+  }
+
   function workspaceBridge() {
     var target = workspaceWindow();
     if (!target) return null;
     try {
+      workspaceLocation();
       return target.CodeLabsBuddyPageBridgeV140 || target.CodeLabsBuddyPageBridge || null;
     } catch (error) {
       return null;
@@ -143,55 +163,72 @@
     });
   }
 
+  function trimText(value, limit) {
+    if (typeof value !== 'string' || value.length <= limit) return value;
+    return value.slice(0, limit) + '\n...[trimmed for live pairing]';
+  }
+
   function safeSnapshot() {
     var bridge = workspaceBridge();
     if (!bridge || !bridge.readPage) return {};
     var packet = bridge.readPage();
     var text = JSON.stringify(packet);
-    if (text.length <= 650000) return packet;
-
-    var copy = JSON.parse(text);
-    ['current_source', 'fixed_output'].forEach(function (key) {
-      if (copy[key] && typeof copy[key].value === 'string' && copy[key].value.length > 160000) {
-        copy[key].value = copy[key].value.slice(0, 160000) + '\n...[trimmed for live pairing]';
-      }
-    });
-    (copy.fields || []).forEach(function (field) {
-      if (typeof field.value === 'string' && field.value.length > 160000) {
-        field.value = field.value.slice(0, 160000) + '\n...[trimmed for live pairing]';
-      }
-    });
-    return copy;
+    if (text.length > 650000) {
+      var copy = JSON.parse(text);
+      ['current_source', 'fixed_output'].forEach(function (key) {
+        if (copy[key]) {
+          copy[key].value = trimText(copy[key].value, 120000);
+          copy[key].preview = trimText(copy[key].preview, 12000);
+        }
+      });
+      (copy.fields || []).forEach(function (field) {
+        field.value = trimText(field.value, 40000);
+      });
+      (copy.sections || []).forEach(function (section) {
+        section.text = trimText(section.text, 40000);
+        (section.fields || []).forEach(function (field) {
+          field.value = trimText(field.value, 40000);
+        });
+      });
+      packet = copy;
+    }
+    if (JSON.stringify(packet).length > 740000) {
+      throw new Error('The live Code Labs page packet is too large. Shorten the current code/output before pairing.');
+    }
+    lastSnapshot = packet;
+    lastPageUrl = workspaceLocation().toString();
+    return packet;
   }
 
   function pageInfo(includeSnapshot) {
     var target = workspaceWindow();
     if (!target) throw new Error('Open the Code Labs workspace first.');
-    var snapshot = includeSnapshot ? safeSnapshot() : {};
+    var url = workspaceLocation().toString();
+    var snapshot = includeSnapshot ? safeSnapshot() : (url === lastPageUrl ? lastSnapshot : {});
     var pageName = '';
-    var pageUrl = '';
     try {
       pageName = snapshot.page || target.document.body && target.document.body.getAttribute('data-page') || '';
-      pageUrl = target.location.href;
     } catch (error) {
       throw new Error('The workspace left the Code Labs site. Return it to a Code Labs page.');
     }
     return {
       page_name: pageName,
-      page_url: pageUrl,
-      page_fingerprint: snapshot.page_fingerprint || (workspaceBridge() && workspaceBridge().readPage().page_fingerprint) || '',
+      page_url: url,
+      page_fingerprint: snapshot.page_fingerprint || '',
       page_snapshot: includeSnapshot ? snapshot : undefined
     };
   }
 
-  function post(action, extra, includeSnapshot) {
+  function request(action, extra, includeSnapshot, requireWorkspace) {
     return accessToken().then(function (token) {
       if (!token) throw new Error('Sign in to Code Labs first, then return to this page.');
-      var body = Object.assign({
+      var body = {
         action: action,
         session_id: sessionId(),
         browser_secret: browserSecret()
-      }, pageInfo(Boolean(includeSnapshot)), extra || {});
+      };
+      if (requireWorkspace !== false) Object.assign(body, pageInfo(Boolean(includeSnapshot)));
+      Object.assign(body, extra || {});
       if (!includeSnapshot) delete body.page_snapshot;
       return fetch(ENDPOINT, {
         method: 'POST',
@@ -222,7 +259,7 @@
     }
     waitForWorkspace().then(function () {
       status('Creating code', 'warn');
-      return post('create_pairing', {}, true);
+      return request('create_pairing', {}, true, true);
     }).then(function (data) {
       remember(data);
       showCode(data.pairing_code);
@@ -237,7 +274,7 @@
 
   function heartbeat() {
     if (!sessionId() || !browserSecret() || busy || !workspaceWindow()) return;
-    post('heartbeat', {}, true).then(function (data) {
+    request('heartbeat', {}, true, true).then(function (data) {
       if (data.status === 'paired') {
         status('Sol connected', 'good');
         message('Sol can now read and use approved controls in the open Code Labs workspace.');
@@ -250,13 +287,27 @@
     });
   }
 
+  function commandType(command) {
+    return String(command && (command.type || command.command) || '').toLowerCase();
+  }
+
   function applyCommand(commandRow) {
     var bridge = workspaceBridge();
-    if (!bridge || !bridge.applyCommand) {
+    if (!bridge || !bridge.applyCommand || !bridge.readPage) {
       return Promise.resolve({ ok: false, error: 'The open Code Labs page is not ready for V140 commands.' });
     }
     try {
-      return Promise.resolve(bridge.applyCommand(commandRow.command || {}));
+      var command = commandRow.command || {};
+      var type = commandType(command);
+      if (['write', 'write_fields', 'write_section', 'run_action', 'action', 'undo'].indexOf(type) >= 0) {
+        var current = bridge.readPage();
+        var expected = String(command.expected_page_fingerprint || '');
+        if (!expected) return Promise.resolve({ ok: false, error: 'A current page fingerprint is required for live changes.' });
+        if (expected !== String(current.page_fingerprint || '')) {
+          return Promise.resolve({ ok: false, error: 'The Code Labs page changed before this command. Read the live page again.' });
+        }
+      }
+      return Promise.resolve(bridge.applyCommand(command));
     } catch (error) {
       return Promise.resolve({ ok: false, error: String(error.message || error) });
     }
@@ -265,11 +316,11 @@
   function poll() {
     if (!sessionId() || !browserSecret() || busy || !workspaceWindow()) return;
     busy = true;
-    post('poll', {}, false).then(function (data) {
+    request('poll', {}, false, true).then(function (data) {
       if (data.status === 'paired') status('Sol connected', 'good');
       if (!data.command) return null;
       return applyCommand(data.command).then(function (receipt) {
-        return post('receipt', { command_id: data.command.id, receipt: receipt }, true);
+        return request('receipt', { command_id: data.command.id, receipt: receipt }, true, true);
       });
     }).catch(function (error) {
       status('Pairing paused', 'bad');
@@ -287,15 +338,15 @@
       message('');
       stopLoops();
     };
-    if (!sessionId() || !browserSecret() || !workspaceWindow()) return finish();
-    post('close', {}, false).then(finish).catch(finish);
+    if (!sessionId() || !browserSecret()) return finish();
+    request('close', {}, false, false).then(finish).catch(finish);
   }
 
   function startLoops() {
     stopLoops();
     heartbeat();
     poll();
-    heartbeatTimer = setInterval(heartbeat, 4000);
+    heartbeatTimer = setInterval(heartbeat, 8000);
     pollTimer = setInterval(poll, 1800);
   }
 
@@ -304,6 +355,17 @@
     clearInterval(pollTimer);
     heartbeatTimer = 0;
     pollTimer = 0;
+  }
+
+  function restorePairing() {
+    if (!sessionId() || !browserSecret()) return;
+    waitForWorkspace().then(function () {
+      status('Restoring pairing', 'warn');
+      startLoops();
+    }).catch(function (error) {
+      status('Pairing paused', 'bad');
+      message(String(error.message || error));
+    });
   }
 
   function buildPanel() {
@@ -331,6 +393,7 @@
         openWorkspace();
         status('Workspace open', 'good');
         message('Use the normal Code Labs menu in the workspace window. Keep this control page open.');
+        restorePairing();
       } catch (error) {
         status('Workspace blocked', 'bad');
         message(String(error.message || error));
