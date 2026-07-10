@@ -212,6 +212,7 @@ function normaliseMedia(raw){
   if(schemeCount(input)>1||/m3u8https?:\/\//i.test(input))throw Error('Video URL contains more than one URL. Fix the submission URL before publishing.');
   let pid=muxPlaybackId(input);
   if(/(?:stream|player)\.mux\.com/i.test(input)){
+    if(/[?&]token=/i.test(input))throw Error('Signed Mux playback URLs are not supported. Use one public Mux playback URL before publishing.');
     if(!pid)throw Error('Mux URL is invalid. Use one public Mux playback URL before publishing.');
     let canonical='https://stream.mux.com/'+pid+'.m3u8';
     return{video_url:canonical,mux_playback_url:canonical,playback_id:pid,source_type:'mux'};
