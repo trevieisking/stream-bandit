@@ -4,7 +4,8 @@ const PUBLIC_KEY = "sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, mcp-session-id",
+  "Access-Control-Expose-Headers": "Mcp-Session-Id",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
