@@ -74,7 +74,6 @@ declare
   v_session public.code_labs_browser_sessions%rowtype;
   v_connection public.code_labs_live_connections_v107%rowtype;
   v_pending_count integer;
-  v_approval_hash text := encode(digest('SOLAPPROVE', 'sha256'), 'hex');
 begin
   if v_user_id is null then
     raise exception 'Sign in to Code Labs first.';
@@ -99,19 +98,22 @@ begin
     raise exception 'This Sol pairing is not valid for the signed-in owner.';
   end if;
 
-  if v_session.status = 'paired' and v_session.control_expires_at > now() then
-    return jsonb_build_object('ok', true, 'status', 'paired', 'message', 'Sol is already connected.');
-  end if;
-
-  if v_session.status <> 'pairing' then
+  if v_session.status not in ('pairing', 'paired') then
     raise exception 'Create a fresh pairing first.';
   end if;
 
-  if v_session.pairing_expires_at < now() then
+  if v_session.status = 'pairing' and v_session.pairing_expires_at < now() then
     update public.code_labs_browser_sessions
       set status = 'expired', updated_at = now()
       where id = v_session.id;
     raise exception 'This pairing expired. Create a fresh pairing first.';
+  end if;
+
+  if v_session.status = 'paired' and (v_session.control_expires_at is null or v_session.control_expires_at < now()) then
+    update public.code_labs_browser_sessions
+      set status = 'expired', updated_at = now()
+      where id = v_session.id;
+    raise exception 'This Sol connection expired. Create a fresh pairing first.';
   end if;
 
   update public.code_labs_live_connections_v107
@@ -162,23 +164,7 @@ begin
     );
   end if;
 
-  update public.code_labs_browser_sessions
-  set pairing_code_hash = encode(digest(id::text || clock_timestamp()::text, 'sha256'), 'hex'),
-      updated_at = now()
-  where id <> v_session.id
-    and pairing_code_hash = v_approval_hash;
-
-  update public.code_labs_browser_sessions
-  set pairing_code_hash = v_approval_hash,
-      updated_at = now(),
-      last_seen_at = now()
-  where id = v_session.id;
-
-  return jsonb_build_object(
-    'ok', true,
-    'status', 'approved',
-    'message', 'Approval saved. Return to ChatGPT and retry the live read.'
-  );
+  raise exception 'The pending ChatGPT connection could not be claimed. Return to ChatGPT and start the live connection again.';
 end;
 $$;
 
