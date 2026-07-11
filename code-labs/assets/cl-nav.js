@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-var VERSION='v173-menu-stability';
+var VERSION='v176-sol-workbench';
 var LINKS=[
  ['index.html','🏠','Home','Start here'],
  ['setup.html','⚙️','Setup','Project and repo'],
@@ -30,7 +30,7 @@ function page(){return document.body&&document.body.getAttribute('data-page')||l
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function makeLink(item,i){var href=item[0],icon=item[1],title=item[2],small=item[3],a=document.createElement('a');a.href=href;a.setAttribute('data-step',String(i));if(page()+'.html'===href||(page()==='index'&&href==='index.html'))a.className='active';a.innerHTML='<span>'+esc(icon)+'</span><div>'+i+'. '+esc(title)+'<small>'+esc(small)+'</small></div>';return a}
 function sameOrder(nav){var got=qa('a',nav).map(function(a){return (a.getAttribute('href')||'').split('?')[0].split('#')[0]}).join('|');var want=LINKS.map(function(x){return x[0]}).join('|');return got===want}
-function stabilizeNav(){var nav=q('.nav');if(!nav)return false;if(nav.getAttribute('data-cl-nav-stable')===VERSION&&sameOrder(nav))return true;var active=page()+'.html';nav.innerHTML='';LINKS.forEach(function(item,i){nav.appendChild(makeLink(item,i))});nav.setAttribute('data-cl-nav-stable',VERSION);nav.setAttribute('aria-label','Code Labs workflow navigation');return true}
+function stabilizeNav(){var nav=q('.nav');if(!nav)return false;if(nav.getAttribute('data-cl-nav-stable')===VERSION&&sameOrder(nav))return true;nav.innerHTML='';LINKS.forEach(function(item,i){nav.appendChild(makeLink(item,i))});nav.setAttribute('data-cl-nav-stable',VERSION);nav.setAttribute('aria-label','Code Labs workflow navigation');return true}
 function buddyOn(){try{var p=new URLSearchParams(location.search);if(p.get('buddy')==='1'){localStorage.setItem('clBuddyTools','1');return true}if(p.get('hideBuddy')==='1'){localStorage.removeItem('clBuddyTools');return false}return localStorage.getItem('clBuddyTools')==='1'}catch(e){return false}}
 function addBuddyBox(){if(!buddyOn())return;var side=q('.sidebar'),nav=q('.nav');if(!side||!nav||q('#clBuddyToolsBox',side))return;var box=document.createElement('div');box.className='sideBox';box.id='clBuddyToolsBox';box.innerHTML='<b>Buddy Tools</b><p>Owner tools index. Separate from the workflow menu.</p><a class="btn good" href="chatgpt-buddy-tools.html" style="width:100%;justify-content:center;margin-top:8px">Open Buddy Tools</a>';side.insertBefore(box,nav.nextSibling)}
 function loadScriptOnce(src,attr){if(q('script['+attr+']'))return;var s=document.createElement('script');s.src=src;s.setAttribute(attr,'yes');document.head.appendChild(s)}
@@ -41,8 +41,9 @@ function loadNextButtons(){var id=page();var allowed={"patch-lab":1,"preview-tes
 function loadCurrentFilePanel(){var id=page();var allowed={"publish-prep":1,"github-tracker":1,"connection-guide":1};if(allowed[id])loadScriptOnce('assets/code-labs-v32-current-file-panel.js?v=cl-current-file-20260701','data-cl-current-file-panel')}
 function loadPagePolish(){loadScriptOnce('assets/code-labs-page-polish-v172.js?v=cl-v173-menu-stability','data-cl-page-polish-v172')}
 function loadPatchDeskDedupe(){if(page()==='patch-desk')loadScriptOnce('assets/code-labs-v34-patch-desk-dedupe.js?v=cl-v34-patch-desk-dedupe-20260701','data-cl-patch-desk-dedupe')}
+function loadSolWorkbench(){loadScriptOnce('assets/code-labs-sol-workbench-v141.js?v=cl-v141-sol-workbench','data-cl-sol-workbench-v141')}
 function setupNextToFileLab(){if(page()!=='setup')return;qa('a[href="project-picker.html"]').forEach(function(a){a.href='file-lab.html';a.textContent=/next/i.test(a.textContent)?'Next: File Lab':'File Lab'});var box=q('#clWorkflowClarityV130');if(box){var next=q('.next',box);if(next){next.href='file-lab.html';next.textContent='Next: File Lab'}}}
-function run(){var ok=stabilizeNav();if(!ok){setTimeout(run,100);return}addBuddyBox();setupNextToFileLab();loadWorkflowClarity();loadRouteAgreement();loadBuddyLaneGuide();loadNextButtons();loadCurrentFilePanel();loadPagePolish();loadPatchDeskDedupe()}
+function run(){var ok=stabilizeNav();if(!ok){setTimeout(run,100);return}addBuddyBox();setupNextToFileLab();loadWorkflowClarity();loadRouteAgreement();loadBuddyLaneGuide();loadNextButtons();loadCurrentFilePanel();loadPagePolish();loadPatchDeskDedupe();loadSolWorkbench()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
 setTimeout(run,250);setTimeout(run,900);
 window.CodeLabsStableNav={version:VERSION,links:LINKS.length,run:run};
