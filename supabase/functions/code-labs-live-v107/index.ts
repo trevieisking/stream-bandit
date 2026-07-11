@@ -1,6 +1,5 @@
 const VERSION = "Code Labs Live V107 no-secret session bridge";
-const SUPABASE_URL = "https://xzxqfrvqdgkzwujbkdbk.supabase.co";
-const PUBLIC_KEY = "sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN";
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,16 +14,30 @@ function json(body, status = 200, extraHeaders = {}) {
     headers: { ...corsHeaders, ...extraHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
 }
+
 function rpc(id, result, extraHeaders = {}) {
   return json({ jsonrpc: "2.0", id: id ?? null, result }, 200, extraHeaders);
 }
+
 function rpcError(id, code, message, status = 400) {
   return json({ jsonrpc: "2.0", id: id ?? null, error: { code, message } }, status);
+}
+
+function publishableKey() {
+  try {
+    const keys = JSON.parse(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS") || "{}");
+    const key = keys.default || Deno.env.get("SUPABASE_ANON_KEY") || "";
+    if (!SUPABASE_URL || !key) throw new Error("missing runtime variables");
+    return key;
+  } catch {
+    throw new Error("Code Labs Live is missing its Supabase publishable runtime configuration.");
+  }
 }
 
 async function sha256Bytes(value) {
   return new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(value || ""))));
 }
+
 async function connectionId(meta, transportSession = "") {
   const raw = String(transportSession || meta?.["openai/session"] || meta?.["openai/subject"] || "");
   if (!raw) throw new Error("ChatGPT did not provide an MCP session identity. Reconnect the V107 connector and try again.");
@@ -37,8 +50,7 @@ async function callRpc(name, body) {
   const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
     method: "POST",
     headers: {
-      apikey: PUBLIC_KEY,
-      Authorization: `Bearer ${PUBLIC_KEY}`,
+      apikey: publishableKey(),
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body || {}),
@@ -55,9 +67,11 @@ function safeObject(value, max = 300000) {
   if (text.length > max) throw new Error("The live command is too large.");
   return JSON.parse(text);
 }
+
 function isDangerous(value) {
   return /(delete|remove|trash|merge|publish|deploy|send|submit|approve|reject|production|main branch)/i.test(String(value || ""));
 }
+
 async function ensureRegistered(meta, transportSession) {
   const id = await connectionId(meta, transportSession);
   await callRpc("code_labs_live_register_v107", { p_connection_id: id });
@@ -68,6 +82,7 @@ async function readLive(meta, transportSession) {
   const id = await ensureRegistered(meta, transportSession);
   return await callRpc("code_labs_live_read_v107", { p_connection_id: id });
 }
+
 async function enqueue(meta, transportSession, command, dangerous = false) {
   const id = await ensureRegistered(meta, transportSession);
   return await callRpc("code_labs_live_enqueue_v107", {
@@ -76,6 +91,7 @@ async function enqueue(meta, transportSession, command, dangerous = false) {
     p_dangerous: dangerous,
   });
 }
+
 async function readReceipt(meta, transportSession, commandId) {
   const id = await ensureRegistered(meta, transportSession);
   return await callRpc("code_labs_live_receipt_v107", {
@@ -83,6 +99,7 @@ async function readReceipt(meta, transportSession, commandId) {
     p_command_id: commandId || null,
   });
 }
+
 async function closeLive(meta, transportSession) {
   const id = await connectionId(meta, transportSession);
   return await callRpc("code_labs_live_close_v107", { p_connection_id: id });
@@ -180,7 +197,9 @@ function toolList() {
 }
 
 async function callTool(name, args, meta, transportSession) {
-  if (name === "get_live_code_labs_pairing" || name === "read_live_code_labs_page") return await readLive(meta, transportSession);
+  if (name === "get_live_code_labs_pairing" || name === "read_live_code_labs_page") {
+    return await readLive(meta, transportSession);
+  }
   if (name === "write_live_code_labs_fields") {
     const fields = safeObject(args.fields || {});
     if (!Object.keys(fields).length || Object.keys(fields).length > 100) throw new Error("Provide between 1 and 100 field writes.");
@@ -215,7 +234,9 @@ async function callTool(name, args, meta, transportSession) {
       allow_dangerous: args.allow_dangerous === true,
     }, dangerous);
   }
-  if (name === "read_live_code_labs_receipt") return await readReceipt(meta, transportSession, String(args.command_id || ""));
+  if (name === "read_live_code_labs_receipt") {
+    return await readReceipt(meta, transportSession, String(args.command_id || ""));
+  }
   if (name === "undo_live_code_labs_write") {
     return await enqueue(meta, transportSession, {
       type: "undo",
