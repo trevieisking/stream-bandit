@@ -73,6 +73,7 @@ declare
   v_user_id uuid := auth.uid();
   v_session public.code_labs_browser_sessions%rowtype;
   v_connection public.code_labs_live_connections_v107%rowtype;
+  v_pending_count integer;
   v_approval_hash text := encode(digest('SOLAPPROVE', 'sha256'), 'hex');
 begin
   if v_user_id is null then
@@ -113,10 +114,26 @@ begin
     raise exception 'This pairing expired. Create a fresh pairing first.';
   end if;
 
+  update public.code_labs_live_connections_v107
+  set status = 'expired', expires_at = now()
+  where status = 'pending'
+    and (expires_at <= now() or created_at < now() - interval '2 minutes');
+
+  select count(*) into v_pending_count
+  from public.code_labs_live_connections_v107
+  where status = 'pending'
+    and expires_at > now()
+    and created_at >= now() - interval '2 minutes';
+
+  if v_pending_count <> 1 then
+    raise exception 'Exactly one fresh ChatGPT connection must be waiting. Return to ChatGPT, start the live connection once, then press Approve Sol.';
+  end if;
+
   select * into v_connection
   from public.code_labs_live_connections_v107
   where status = 'pending'
     and expires_at > now()
+    and created_at >= now() - interval '2 minutes'
   order by created_at desc
   limit 1
   for update skip locked;
