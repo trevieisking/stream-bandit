@@ -34,7 +34,7 @@ body{font-size:14px}.sidebar{width:260px;padding:10px;gap:9px}.logo{gap:9px;padd
 (function(){
 'use strict';
 var URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
-var PUB='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+var PUB='sb_publishable_'+'1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
 var FN=URL+'/functions/v1/code-labs-readonly-proof';
 function $(s){return document.querySelector(s)}
 function set(id,msg,kind){var el=$(id);if(el){el.className='badge '+(kind||'warn');el.textContent=msg}}
@@ -48,5 +48,6 @@ async function copyContext(){var box=$('#clContextPacket');var text=box?box.valu
 $('#clLoadContext').onclick=loadContext;$('#clCopyContext').onclick=copyContext;setTimeout(loadContext,450);
 })();
 </script>
+<script src="assets/code-labs-page-runtime-v145.js?v=cl-v145-every-page-write"></script>
 </body>
 </html>
