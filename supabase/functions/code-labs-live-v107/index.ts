@@ -8,14 +8,14 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
-function json(body, status = 200) {
+function json(body, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(body, null, 2), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" },
+    headers: { ...corsHeaders, ...extraHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
 }
-function rpc(id, result) {
-  return json({ jsonrpc: "2.0", id: id ?? null, result });
+function rpc(id, result, extraHeaders = {}) {
+  return json({ jsonrpc: "2.0", id: id ?? null, result }, 200, extraHeaders);
 }
 function rpcError(id, code, message, status = 400) {
   return json({ jsonrpc: "2.0", id: id ?? null, error: { code, message } }, status);
@@ -24,9 +24,9 @@ function rpcError(id, code, message, status = 400) {
 async function sha256Bytes(value) {
   return new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(value || ""))));
 }
-async function connectionId(meta) {
-  const raw = String(meta?.["openai/session"] || meta?.["openai/subject"] || "");
-  if (!raw) throw new Error("ChatGPT did not provide a session identity. Start a fresh chat and try again.");
+async function connectionId(meta, transportSession = "") {
+  const raw = String(transportSession || meta?.["openai/session"] || meta?.["openai/subject"] || "");
+  if (!raw) throw new Error("ChatGPT did not provide an MCP session identity. Reconnect the V107 connector and try again.");
   const bytes = await sha256Bytes("code-labs-live-v107:" + raw);
   const hex = Array.from(bytes.slice(0, 16), (byte) => byte.toString(16).padStart(2, "0")).join("");
   return [hex.slice(0, 8), hex.slice(8, 12), "4" + hex.slice(13, 16), "a" + hex.slice(17, 20), hex.slice(20, 32)].join("-");
@@ -57,33 +57,33 @@ function safeObject(value, max = 300000) {
 function isDangerous(value) {
   return /(delete|remove|trash|merge|publish|deploy|send|submit|approve|reject|production|main branch)/i.test(String(value || ""));
 }
-async function ensureRegistered(meta) {
-  const id = await connectionId(meta);
+async function ensureRegistered(meta, transportSession) {
+  const id = await connectionId(meta, transportSession);
   await callRpc("code_labs_live_register_v107", { p_connection_id: id });
   return id;
 }
 
-async function readLive(meta) {
-  const id = await ensureRegistered(meta);
+async function readLive(meta, transportSession) {
+  const id = await ensureRegistered(meta, transportSession);
   return await callRpc("code_labs_live_read_v107", { p_connection_id: id });
 }
-async function enqueue(meta, command, dangerous = false) {
-  const id = await ensureRegistered(meta);
+async function enqueue(meta, transportSession, command, dangerous = false) {
+  const id = await ensureRegistered(meta, transportSession);
   return await callRpc("code_labs_live_enqueue_v107", {
     p_connection_id: id,
     p_command: safeObject(command),
     p_dangerous: dangerous,
   });
 }
-async function readReceipt(meta, commandId) {
-  const id = await ensureRegistered(meta);
+async function readReceipt(meta, transportSession, commandId) {
+  const id = await ensureRegistered(meta, transportSession);
   return await callRpc("code_labs_live_receipt_v107", {
     p_connection_id: id,
     p_command_id: commandId || null,
   });
 }
-async function closeLive(meta) {
-  const id = await connectionId(meta);
+async function closeLive(meta, transportSession) {
+  const id = await connectionId(meta, transportSession);
   return await callRpc("code_labs_live_close_v107", { p_connection_id: id });
 }
 
@@ -178,12 +178,12 @@ function toolList() {
   ];
 }
 
-async function callTool(name, args, meta) {
-  if (name === "get_live_code_labs_pairing" || name === "read_live_code_labs_page") return await readLive(meta);
+async function callTool(name, args, meta, transportSession) {
+  if (name === "get_live_code_labs_pairing" || name === "read_live_code_labs_page") return await readLive(meta, transportSession);
   if (name === "write_live_code_labs_fields") {
     const fields = safeObject(args.fields || {});
     if (!Object.keys(fields).length || Object.keys(fields).length > 100) throw new Error("Provide between 1 and 100 field writes.");
-    return await enqueue(meta, {
+    return await enqueue(meta, transportSession, {
       type: "write_fields",
       expected_page_fingerprint: String(args.expected_page_fingerprint || ""),
       fields,
@@ -192,7 +192,7 @@ async function callTool(name, args, meta) {
   if (name === "write_live_code_labs_section") {
     const section = String(args.section_key || "").slice(0, 180);
     if (!section) throw new Error("section_key is required.");
-    return await enqueue(meta, {
+    return await enqueue(meta, transportSession, {
       type: "write_section",
       expected_page_fingerprint: String(args.expected_page_fingerprint || ""),
       section,
@@ -206,7 +206,7 @@ async function callTool(name, args, meta) {
     if (dangerous && !(args.confirmed === true && args.allow_dangerous === true)) {
       throw new Error("This action requires explicit confirmed=true and allow_dangerous=true.");
     }
-    return await enqueue(meta, {
+    return await enqueue(meta, transportSession, {
       type: "run_action",
       expected_page_fingerprint: String(args.expected_page_fingerprint || ""),
       action,
@@ -214,14 +214,14 @@ async function callTool(name, args, meta) {
       allow_dangerous: args.allow_dangerous === true,
     }, dangerous);
   }
-  if (name === "read_live_code_labs_receipt") return await readReceipt(meta, String(args.command_id || ""));
+  if (name === "read_live_code_labs_receipt") return await readReceipt(meta, transportSession, String(args.command_id || ""));
   if (name === "undo_live_code_labs_write") {
-    return await enqueue(meta, {
+    return await enqueue(meta, transportSession, {
       type: "undo",
       expected_page_fingerprint: String(args.expected_page_fingerprint || ""),
     });
   }
-  if (name === "close_live_code_labs_pairing") return await closeLive(meta);
+  if (name === "close_live_code_labs_pairing") return await closeLive(meta, transportSession);
   throw new Error("Unknown tool.");
 }
 
@@ -231,15 +231,17 @@ Deno.serve(async (req) => {
 
   const body = await req.json().catch(() => ({}));
   const id = body.id ?? null;
+  const requestSession = req.headers.get("mcp-session-id") || "";
   try {
     if (body.jsonrpc !== "2.0") return json({ ok: false, version: VERSION, error: "JSON-RPC 2.0 required." }, 400);
     if (body.method === "initialize") {
+      const sessionId = requestSession || crypto.randomUUID();
       return rpc(id, {
         protocolVersion: "2025-06-18",
         capabilities: { tools: {} },
         serverInfo: { name: "code-labs-live-v107", version: VERSION },
         instructions: "Use the browser-approved Code Labs session. Read first, write the smallest field set, inspect receipts, and never bypass confirmation for dangerous actions.",
-      });
+      }, { "Mcp-Session-Id": sessionId });
     }
     if (body.method === "ping") return rpc(id, {});
     if (body.method === "notifications/initialized") return new Response(null, { status: 202, headers: corsHeaders });
@@ -248,7 +250,7 @@ Deno.serve(async (req) => {
     if (body.method === "prompts/list") return rpc(id, { prompts: [] });
     if (body.method === "tools/call") {
       const meta = body.params?._meta || {};
-      const result = await callTool(body.params?.name || "", body.params?.arguments || {}, meta);
+      const result = await callTool(body.params?.name || "", body.params?.arguments || {}, meta, requestSession);
       return rpc(id, {
         content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         structuredContent: result,
