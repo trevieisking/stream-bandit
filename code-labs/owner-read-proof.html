@@ -55,5 +55,6 @@ $('#startToken').onclick=start;$('#readRepo').onclick=readRepo;$('#readLive').on
 var params=new URLSearchParams(location.search);var code=params.get('code');var state=params.get('state');if(code){if(state!==sessionStorage.getItem('cl_v99_state')){set('State mismatch','bad');help('<p>Token state did not match. Start again.</p>')}else{exchange(code)}}
 })();
 </script>
+<script src="assets/code-labs-page-runtime-v145.js?v=cl-v145-every-page-write"></script>
 </body>
 </html>
