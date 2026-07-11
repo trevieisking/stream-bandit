@@ -21,84 +21,62 @@ const tools = [
 
 function cors(req: Request) {
   const origin = req.headers.get("origin") || "";
-  const allowOrigin = ORIGINS.has(origin) ? origin : "https://chatterfriendsstreambandit.co.uk";
   return {
-    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Origin": ORIGINS.has(origin) ? origin : "https://chatterfriendsstreambandit.co.uk",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Vary": "Origin",
   };
 }
-
 function json(req: Request, body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...cors(req), "Content-Type": "application/json", "Cache-Control": "no-store" },
+  return new Response(JSON.stringify(body), { status, headers: { ...cors(req), "Content-Type": "application/json", "Cache-Control": "no-store" } });
+}
+function text(value: unknown, max: number) { return String(value == null ? "" : value).slice(0, max); }
+function safeArray(value: unknown, maxItems: number, maxText: number) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, maxItems).map((entry) => {
+    if (!entry || typeof entry !== "object") return entry;
+    const out: Record<string, unknown> = {};
+    for (const [key, item] of Object.entries(entry as Record<string, unknown>)) {
+      out[key] = typeof item === "string" ? text(item, maxText) : item;
+    }
+    return out;
   });
 }
-
-function text(value: unknown, max: number) {
-  return String(value == null ? "" : value).slice(0, max);
-}
-
 function compact(value: unknown) {
   if (!value || typeof value !== "object") return {};
   const p = value as Record<string, unknown>;
-  const safe = {
-    page: p.page,
-    page_fingerprint: p.page_fingerprint,
-    title: p.title,
-    url: p.url,
-    repo: p.repo,
-    path: p.path,
-    source_branch: p.source_branch,
-    request_branch: p.request_branch,
-    action: p.action,
-    problem: p.problem,
-    preserve_rules: p.preserve_rules,
-    error_notes: p.error_notes,
-    test_notes: p.test_notes,
-    counts: p.counts,
-    sections: p.sections,
-    fields: p.fields,
-    actions: p.actions,
-    current_source: p.current_source,
-    fixed_output: p.fixed_output,
-    github_writer: p.github_writer,
-    github_lane: p.github_lane,
-    safety_rules: p.safety_rules,
+  return {
+    page: text(p.page, 300), page_fingerprint: text(p.page_fingerprint, 500), title: text(p.title, 500), url: text(p.url, 2000),
+    repo: text(p.repo, 500), path: text(p.path, 1500), source_branch: text(p.source_branch, 500), request_branch: text(p.request_branch, 500),
+    action: text(p.action, 2000), problem: text(p.problem, 12000), preserve_rules: text(p.preserve_rules, 12000), error_notes: text(p.error_notes, 12000), test_notes: text(p.test_notes, 12000),
+    counts: p.counts || {}, sections: safeArray(p.sections, 80, 4000), fields: safeArray(p.fields, 240, 12000), actions: safeArray(p.actions, 160, 4000),
+    current_source: text(p.current_source, 120000), fixed_output: text(p.fixed_output, 120000),
+    github_writer: p.github_writer || null, github_lane: p.github_lane || null, safety_rules: p.safety_rules || null,
   };
-  return JSON.parse(text(JSON.stringify(safe), 260000));
 }
-
 function instructions() {
   return [
-    "You are Sol inside Code Labs, a workbench for a non-coder.",
-    "Be direct, patient and practical. Read before writing.",
+    "You are Sol inside Code Labs, a workbench for a non-coder.", "Be direct, patient and practical. Read before writing.",
     "Use live page tools instead of asking the user to copy or patch code manually.",
     "For page edits, write the smallest field set, inspect the receipt, then read again before claiming success.",
-    "Never invent field or action keys.",
-    "Never handle passwords, tokens, API keys, private keys, login prompts, CAPTCHA or local file selections.",
+    "Never invent field or action keys.", "Never handle passwords, tokens, API keys, private keys, login prompts, CAPTCHA or local file selections.",
     "Never claim a repository, deployment or database change happened unless a tool receipt proves it.",
     "Repository changes remain branch-and-pull-request only.",
     "Delete, remove, publish, deploy, merge, send, submit and production actions require explicit confirmation of that exact action in the current message.",
     "Do not expose secrets or hidden reasoning.",
   ].join("\n");
 }
-
 function outputText(response: Record<string, unknown>) {
   if (typeof response.output_text === "string") return response.output_text;
   const output = Array.isArray(response.output) ? response.output as Array<Record<string, unknown>> : [];
   const parts: string[] = [];
   for (const item of output) {
     if (item.type !== "message" || !Array.isArray(item.content)) continue;
-    for (const content of item.content as Array<Record<string, unknown>>) {
-      if (content.type === "output_text" && typeof content.text === "string") parts.push(content.text);
-    }
+    for (const content of item.content as Array<Record<string, unknown>>) if (content.type === "output_text" && typeof content.text === "string") parts.push(content.text);
   }
   return parts.join("\n").trim();
 }
-
 function calls(response: Record<string, unknown>) {
   const output = Array.isArray(response.output) ? response.output as Array<Record<string, unknown>> : [];
   return output.filter((item) => item.type === "function_call").map((item) => {
@@ -107,31 +85,19 @@ function calls(response: Record<string, unknown>) {
     return { call_id: String(item.call_id || ""), name: String(item.name || ""), arguments: args };
   }).filter((item) => item.call_id && item.name);
 }
-
 async function requireOwner(req: Request) {
   const authorization = req.headers.get("authorization") || "";
   if (!authorization.toLowerCase().startsWith("bearer ")) throw new Error("Sign in to Code Labs first.");
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) throw new Error("Code Labs authentication is not configured.");
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    global: { headers: { Authorization: authorization } },
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-  });
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { global: { headers: { Authorization: authorization } }, auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
   const userResult = await supabase.auth.getUser();
   const user = userResult.data.user;
   if (userResult.error || !user) throw new Error("Your Code Labs sign-in has expired. Sign in again and retry.");
-
   const ownerResult = await supabase.from("code_labs_owners").select("user_id").eq("user_id", user.id).maybeSingle();
   if (ownerResult.error || !ownerResult.data) throw new Error("This account is not approved to use the Code Labs Sol workbench.");
-  return user.id;
 }
-
 async function openai(body: Record<string, unknown>) {
-  const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data?.error?.message || `OpenAI request failed (${response.status})`);
   return data as Record<string, unknown>;
@@ -146,7 +112,6 @@ Deno.serve(async (req: Request) => {
     const action = text(body.action || "chat", 40);
     if (action === "health") return json(req, { ok: true, version: VERSION, configured: Boolean(OPENAI_API_KEY), model: OPENAI_MODEL });
     if (!OPENAI_API_KEY) return json(req, { ok: false, error: "Code Labs Sol is waiting for its server-side OpenAI key." }, 503);
-
     const previousResponseId = text(body.previous_response_id, 160) || undefined;
     let input: unknown;
     if (action === "tool_outputs") {
@@ -158,19 +123,9 @@ Deno.serve(async (req: Request) => {
     } else {
       const message = text(body.message, 12000);
       if (!message.trim()) return json(req, { ok: false, error: "Message required" }, 400);
-      input = `CODE LABS LIVE CONTEXT\n${text(JSON.stringify({ live_page: compact(body.page), recent_visible_chat: Array.isArray(body.history) ? body.history.slice(-10) : [], user_request: message }), 300000)}`;
+      input = `CODE LABS LIVE CONTEXT\n${JSON.stringify({ live_page: compact(body.page), recent_visible_chat: Array.isArray(body.history) ? body.history.slice(-10) : [], user_request: message })}`;
     }
-
-    const request: Record<string, unknown> = {
-      model: OPENAI_MODEL,
-      instructions: instructions(),
-      input,
-      tools,
-      tool_choice: "auto",
-      parallel_tool_calls: false,
-      max_output_tokens: 6000,
-      store: true,
-    };
+    const request: Record<string, unknown> = { model: OPENAI_MODEL, instructions: instructions(), input, tools, tool_choice: "auto", parallel_tool_calls: false, max_output_tokens: 6000, store: true };
     if (previousResponseId) request.previous_response_id = previousResponseId;
     const result = await openai(request);
     return json(req, { ok: true, version: VERSION, model: result.model || OPENAI_MODEL, response_id: result.id || "", text: outputText(result), tool_calls: calls(result), usage: result.usage || null });
