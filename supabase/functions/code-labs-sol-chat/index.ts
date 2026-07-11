@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const VERSION = "Code Labs Sol Chat V141";
+const VERSION = "Code Labs Sol Chat V144";
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") || "";
 const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") || "gpt-5.1";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
@@ -55,6 +55,25 @@ function compact(value: unknown) {
     github_writer: p.github_writer || null, github_lane: p.github_lane || null, safety_rules: p.safety_rules || null,
   };
 }
+function compactReadPacket(value: unknown) {
+  if (!value || typeof value !== "object") return {};
+  const p = value as Record<string, unknown>;
+  return {
+    page: text(p.page, 300), page_fingerprint: text(p.page_fingerprint, 500), title: text(p.title, 500), url: text(p.url, 2000),
+    repo: text(p.repo, 500), path: text(p.path, 1500), action: text(p.action, 1000), counts: p.counts || {},
+    sections: safeArray(p.sections, 80, 1500), fields: safeArray(p.fields, 240, 4000), actions: safeArray(p.actions, 160, 1500),
+  };
+}
+function compactToolOutput(value: unknown) {
+  const raw = String(value == null ? "" : value);
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    if (parsed && parsed.packet) parsed.packet = compactReadPacket(parsed.packet);
+    return text(JSON.stringify(parsed), 30000);
+  } catch {
+    return text(raw, 30000);
+  }
+}
 function instructions() {
   return [
     "You are Sol inside Code Labs, a workbench for a non-coder.", "Be direct, patient and practical. Read before writing.",
@@ -96,18 +115,24 @@ async function requireOwner(req: Request) {
   const ownerResult = await supabase.from("code_labs_owners").select("user_id").eq("user_id", user.id).maybeSingle();
   if (ownerResult.error || !ownerResult.data) throw new Error("This account is not approved to use the Code Labs Sol workbench.");
 }
-async function openai(body: Record<string, unknown>) {
+async function openai(body: Record<string, unknown>, stage: string) {
   const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data?.error?.message || `OpenAI request failed (${response.status})`);
+  const data = await response.json().catch(() => ({})) as Record<string, any>;
+  if (!response.ok) {
+    const detail = text(data?.error?.message || `OpenAI request failed (${response.status})`, 1000);
+    const code = text(data?.error?.code || data?.error?.type || "upstream_error", 120);
+    throw new Error(`OpenAI ${stage} failed (${response.status}, ${code}): ${detail}`);
+  }
   return data as Record<string, unknown>;
 }
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors(req) });
   if (req.method !== "POST") return json(req, { ok: false, error: "POST required" }, 405);
+  let stage = "authentication";
   try {
     await requireOwner(req);
+    stage = "request";
     const body = await req.json().catch(() => ({})) as Record<string, unknown>;
     const action = text(body.action || "chat", 40);
     if (action === "health") return json(req, { ok: true, version: VERSION, configured: Boolean(OPENAI_API_KEY), model: OPENAI_MODEL });
@@ -115,23 +140,27 @@ Deno.serve(async (req: Request) => {
     const previousResponseId = text(body.previous_response_id, 160) || undefined;
     let input: unknown;
     if (action === "tool_outputs") {
+      stage = "tool-output continuation";
+      if (!previousResponseId) return json(req, { ok: false, error: "Previous Sol response is missing. Start a new Sol chat and retry.", version: VERSION, stage }, 400);
       const outputs = Array.isArray(body.tool_outputs) ? body.tool_outputs : [];
+      if (!outputs.length) return json(req, { ok: false, error: "Tool output is missing.", version: VERSION, stage }, 400);
       input = outputs.slice(0, 8).map((value) => {
         const item = value as Record<string, unknown>;
-        return { type: "function_call_output", call_id: text(item.call_id, 160), output: text(item.output, 120000) };
+        return { type: "function_call_output", call_id: text(item.call_id, 160), output: compactToolOutput(item.output) };
       });
     } else {
+      stage = "initial response";
       const message = text(body.message, 12000);
       if (!message.trim()) return json(req, { ok: false, error: "Message required" }, 400);
       input = `CODE LABS LIVE CONTEXT\n${JSON.stringify({ live_page: compact(body.page), recent_visible_chat: Array.isArray(body.history) ? body.history.slice(-10) : [], user_request: message })}`;
     }
     const request: Record<string, unknown> = { model: OPENAI_MODEL, instructions: instructions(), input, tools, tool_choice: "auto", parallel_tool_calls: false, max_output_tokens: 6000, store: true };
     if (previousResponseId) request.previous_response_id = previousResponseId;
-    const result = await openai(request);
+    const result = await openai(request, stage);
     return json(req, { ok: true, version: VERSION, model: result.model || OPENAI_MODEL, response_id: result.id || "", text: outputText(result), tool_calls: calls(result), usage: result.usage || null });
   } catch (error) {
-    const message = String((error as Error).message || error);
+    const message = text((error as Error).message || error, 1400);
     const status = /sign-in|approved|authentication/i.test(message) ? 401 : 500;
-    return json(req, { ok: false, error: message, version: VERSION }, status);
+    return json(req, { ok: false, error: message, version: VERSION, stage }, status);
   }
 });
