@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-var VERSION='v176-sol-workbench';
+var VERSION='v177-sol-packet-guard';
 var LINKS=[
  ['index.html','🏠','Home','Start here'],
  ['setup.html','⚙️','Setup','Project and repo'],
@@ -41,7 +41,7 @@ function loadNextButtons(){var id=page();var allowed={"patch-lab":1,"preview-tes
 function loadCurrentFilePanel(){var id=page();var allowed={"publish-prep":1,"github-tracker":1,"connection-guide":1};if(allowed[id])loadScriptOnce('assets/code-labs-v32-current-file-panel.js?v=cl-current-file-20260701','data-cl-current-file-panel')}
 function loadPagePolish(){loadScriptOnce('assets/code-labs-page-polish-v172.js?v=cl-v173-menu-stability','data-cl-page-polish-v172')}
 function loadPatchDeskDedupe(){if(page()==='patch-desk')loadScriptOnce('assets/code-labs-v34-patch-desk-dedupe.js?v=cl-v34-patch-desk-dedupe-20260701','data-cl-patch-desk-dedupe')}
-function loadSolWorkbench(){function sol(){loadScriptOnce('assets/code-labs-sol-workbench-v141.js?v=cl-v141-sol-workbench','data-cl-sol-workbench-v141')}if(window.CL_SB||window.CodeLabsRepairHistory){sol();return}document.documentElement.setAttribute('data-cl-sol-auth-only','1');if(!q('style[data-cl-sol-auth-only]')){var st=document.createElement('style');st.setAttribute('data-cl-sol-auth-only','yes');st.textContent='html[data-cl-sol-auth-only="1"] #clHistoryPanel{display:none!important}';document.head.appendChild(st)}loadScriptOnce('assets/code-labs-v1-2-history.js?v=cl-sol-auth-20260711','data-cl-sol-auth-helper',sol)}
+function loadSolWorkbench(){function sol(){loadScriptOnce('assets/code-labs-sol-packet-guard-v142.js?v=cl-v142-sol-packet-guard','data-cl-sol-packet-guard-v142',function(){loadScriptOnce('assets/code-labs-sol-workbench-v141.js?v=cl-v142-sol-workbench','data-cl-sol-workbench-v141')})}if(window.CL_SB||window.CodeLabsRepairHistory){sol();return}document.documentElement.setAttribute('data-cl-sol-auth-only','1');if(!q('style[data-cl-sol-auth-only]')){var st=document.createElement('style');st.setAttribute('data-cl-sol-auth-only','yes');st.textContent='html[data-cl-sol-auth-only="1"] #clHistoryPanel{display:none!important}';document.head.appendChild(st)}loadScriptOnce('assets/code-labs-v1-2-history.js?v=cl-sol-auth-20260711','data-cl-sol-auth-helper',sol)}
 function setupNextToFileLab(){if(page()!=='setup')return;qa('a[href="project-picker.html"]').forEach(function(a){a.href='file-lab.html';a.textContent=/next/i.test(a.textContent)?'Next: File Lab':'File Lab'});var box=q('#clWorkflowClarityV130');if(box){var next=q('.next',box);if(next){next.href='file-lab.html';next.textContent='Next: File Lab'}}}
 function run(){var ok=stabilizeNav();if(!ok){setTimeout(run,100);return}addBuddyBox();setupNextToFileLab();loadWorkflowClarity();loadRouteAgreement();loadBuddyLaneGuide();loadNextButtons();loadCurrentFilePanel();loadPagePolish();loadPatchDeskDedupe();loadSolWorkbench()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
