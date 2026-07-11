@@ -50,5 +50,6 @@ $('#startOAuth').onclick=start;$('#listTools').onclick=list;$('#readHome').oncli
 var params=new URLSearchParams(location.search);var code=params.get('code');var state=params.get('state');if(code){if(state!==sessionStorage.getItem('cl_v97_state')){set('State mismatch','bad');help('<p>OAuth state did not match. Start again.</p>')}else{exchange(code)}}
 })();
 </script>
+<script src="assets/code-labs-page-runtime-v145.js?v=cl-v145-every-page-write"></script>
 </body>
 </html>
