@@ -18,4 +18,17 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on
+    runs-on: ubuntu-latest
+        env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Deploy Code Labs Sol V142
+        run: supabase functions deploy code-labs-sol-chat-v142 --project-ref xzxqfrvqdgkzwujbkdbk
