@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V200.5';
+  var VERSION = 'V200.6';
   var STATE = 'codeLabsV1State';
   var HANDOFF = 'codeLabsBuddyLaneHandoffV200';
   var sendInFlight = false;
@@ -214,6 +214,7 @@
     if (repositoryContext && repositoryContext.source === 'selected_saved_file') {
       source.owner = repositoryContext.owner;
       source.repo = repositoryContext.repoName;
+      state.project.repo = repositoryContext.repo;
       state.file.projectId = repositoryContext.projectId;
       state.file.repositorySource = 'selected_saved_file';
     } else {
