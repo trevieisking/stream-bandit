@@ -1,0 +1,21 @@
+name: Deploy Code Labs Sol V142
+
+on:
+  push:
+    branches:
+      - fix/code-labs-sol-chat-v142-diagnostics
+    paths:
+      - .github/workflows/deploy-code-labs-sol-v142.yml
+      - supabase/functions/code-labs-sol-chat-v142/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-code-labs-sol-v142
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on
