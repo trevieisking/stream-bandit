@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V200.16-v104-relay';
+  var VERSION = 'V200.17-v104-safe-relay';
   var ROUTES = [
     ['index', 'index.html', 'Home'],
     ['setup', 'setup.html', 'Setup'],
@@ -43,7 +43,7 @@
 
   function loadPageBridge() {
     if (window.CodeLabsBuddyPageBridgeV140 || window.CodeLabsBuddyPageBridge) return;
-    loadScriptOnce('assets/code-labs-buddy-page-bridge-v139.js?v=cl-v200-16-v104-relay', 'data-cl-buddy-page-bridge-v139');
+    loadScriptOnce('assets/code-labs-buddy-page-bridge-v139.js?v=cl-v200-17-v104-safe-relay', 'data-cl-buddy-page-bridge-v139');
   }
 
   function loadSol() {
@@ -60,7 +60,7 @@
       style.textContent = 'html[data-cl-sol-auth-only="1"] #clHistoryPanel{display:none!important}';
       document.head.appendChild(style);
     }
-    loadScriptOnce('assets/code-labs-v1-2-history.js?v=cl-v200-16-v104-relay', 'data-cl-sol-auth-helper', startSol);
+    loadScriptOnce('assets/code-labs-v1-2-history.js?v=cl-v200-17-v104-safe-relay', 'data-cl-sol-auth-helper', startSol);
   }
 
   function relaySession() { try { return sessionStorage.getItem(RELAY_SESSION_KEY) || ''; } catch (e) { return ''; } }
@@ -109,10 +109,22 @@
       p_browser_secret: relaySecret()
     }).then(function () {}).catch(function () {});
   }
+  function isChangingCommand(command) {
+    var type = String(command && command.type || '');
+    return type === 'write_fields' || type === 'write_section' || type === 'run_action' || type === 'undo';
+  }
   function applyCommand(row) {
     var b = bridge();
     if (!b || !b.applyCommand || !b.readPage) return Promise.resolve({ ok: false, error: 'The current Code Labs page bridge is not ready.' });
-    try { return Promise.resolve(b.applyCommand(row.command || {})); }
+    var command = row && row.command || {};
+    var current = snapshot() || {};
+    if (isChangingCommand(command)) {
+      var expected = String(command.expected_page_fingerprint || '');
+      var actual = String(current.page_fingerprint || '');
+      if (!expected) return Promise.resolve({ ok: false, error: 'Read the current Code Labs page before writing. A current page fingerprint is required.' });
+      if (!actual || expected !== actual) return Promise.resolve({ ok: false, error: 'The Code Labs page changed. Read the page again before writing.' });
+    }
+    try { return Promise.resolve(b.applyCommand(command)); }
     catch (error) { return Promise.resolve({ ok: false, error: String(error.message || error) }); }
   }
   function relayTick() {
