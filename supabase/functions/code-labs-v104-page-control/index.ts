@@ -1,11 +1,12 @@
 const VERSION = "Code Labs V104 page control v1";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "https://xzxqfrvqdgkzwujbkdbk.supabase.co";
-const PUBLIC_KEY = Deno.env.get("SUPABASE_ANON_KEY") || "";
+const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SB_SERVICE_ROLE_KEY") || "";
+const INTERNAL_SECRET = Deno.env.get("CODE_LABS_OAUTH_SECRET") || "";
 const CLAIMED_BY = "code-labs-v104";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "https://chatterfriendsstreambandit.co.uk",
-  "Access-Control-Allow-Headers": "authorization, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-code-labs-secret",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -16,15 +17,20 @@ function json(body: unknown, status = 200) {
   });
 }
 
-async function rest(req: Request, path: string, options: RequestInit = {}) {
-  const authorization = req.headers.get("authorization") || "";
-  if (!authorization.startsWith("Bearer ")) throw new Error("Missing authenticated V104 request.");
+function requireInternalRequest(req: Request) {
+  if (!INTERNAL_SECRET) throw new Error("V104 internal secret is not configured.");
+  const supplied = req.headers.get("x-code-labs-secret") || "";
+  if (!supplied || supplied !== INTERNAL_SECRET) throw new Error("Unauthorized V104 page-control request.");
+}
+
+async function rest(_req: Request, path: string, options: RequestInit = {}) {
+  if (!SERVICE_KEY) throw new Error("Supabase service key is not configured.");
 
   const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...options,
     headers: {
-      apikey: PUBLIC_KEY,
-      Authorization: authorization,
+      apikey: SERVICE_KEY,
+      Authorization: "Bearer " + SERVICE_KEY,
       "Content-Type": "application/json",
       ...(options.headers || {}),
     },
@@ -165,6 +171,7 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json({ ok: false, version: VERSION, error: "POST only" }, 405);
 
   try {
+    requireInternalRequest(req);
     const body = await req.json().catch(() => ({})) as Record<string, unknown>;
     const action = String(body.action || "");
     if (action === "read_page") return json(await readPage(req));
