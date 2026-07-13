@@ -1,5 +1,6 @@
 -- Upgrade the existing Code Labs page approval function for direct V104 use.
--- Keeps the legacy pending-connection path for compatibility.
+-- V104 binds only to its own fixed connector identity.
+-- Legacy/V107 pending sessions are never auto-claimed.
 -- Creates no new function or table.
 
 create or replace function public.code_labs_approve_sol_v106(
@@ -14,8 +15,6 @@ as $$
 declare
   v_user_id uuid := auth.uid();
   v_session public.code_labs_browser_sessions%rowtype;
-  v_connection public.code_labs_live_connections_v107%rowtype;
-  v_claimed_by text;
 begin
   if v_user_id is null then
     raise exception 'Sign in to Code Labs first.';
@@ -61,36 +60,9 @@ begin
     raise exception 'This live Code Labs page session expired.';
   end if;
 
-  update public.code_labs_live_connections_v107
-  set status = 'expired', expires_at = now()
-  where status = 'pending'
-    and (expires_at <= now() or created_at < now() - interval '2 minutes');
-
-  select * into v_connection
-  from public.code_labs_live_connections_v107
-  where status = 'pending'
-    and expires_at > now()
-    and created_at >= now() - interval '2 minutes'
-  order by created_at desc
-  limit 1
-  for update skip locked;
-
-  if v_connection.id is not null then
-    update public.code_labs_live_connections_v107
-    set owner_id = v_user_id,
-        status = 'approved',
-        approved_at = now(),
-        expires_at = now() + interval '8 hours'
-    where id = v_connection.id;
-
-    v_claimed_by := v_connection.id::text;
-  else
-    v_claimed_by := 'code-labs-v104';
-  end if;
-
   update public.code_labs_browser_sessions
   set status = 'paired',
-      claimed_by = v_claimed_by,
+      claimed_by = 'code-labs-v104',
       control_expires_at = now() + interval '8 hours',
       paired_at = coalesce(paired_at, now()),
       updated_at = now(),
@@ -100,7 +72,7 @@ begin
   return jsonb_build_object(
     'ok', true,
     'status', 'approved',
-    'connector', case when v_connection.id is null then 'code-labs-v104' else 'legacy-pending-session' end,
+    'connector', 'code-labs-v104',
     'message', 'The signed-in Code Labs page is approved for the existing V104 connector.'
   );
 end;
