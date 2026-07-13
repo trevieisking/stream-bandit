@@ -1,10 +1,11 @@
 /* Code Labs Page Runtime V200
-   Loads the shared one-flow behavior and preserves existing route-specific tools.
+   Loads shared workflow behavior, preserves specialist tools, and synchronizes the current visible full-file editor before Buddy Lane handoff.
 */
 (function () {
   'use strict';
 
   var VERSION = 'V200.9';
+  var STATE_KEY = 'codeLabsV1State';
   var PAGE_ROLES = {
     index: { step: 1, title: 'Home' },
     setup: { step: 2, title: 'Setup' },
@@ -31,6 +32,89 @@
     return (document.body && document.body.getAttribute('data-page')) ||
       location.pathname.split('/').pop().replace(/\.html?$/i, '') ||
       'index';
+  }
+
+  function readState() {
+    try {
+      return JSON.parse(localStorage.getItem(STATE_KEY) || '{}') || {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function writeState(state) {
+    localStorage.setItem(STATE_KEY, JSON.stringify(state || {}));
+  }
+
+  function isFullFile(path, code) {
+    var text = String(code || '').trim();
+    if (!text || text.length < 120) return false;
+    if (/BEGIN PATCH|Find:\s*\n|Replace with:/i.test(text)) return false;
+    if (/^(?:diff --git |Index: )/i.test(text)) return false;
+    if (/^@@\s*-\d+(?:,\d+)?\s+\+\d+(?:,\d+)?\s*@@/m.test(text)) return false;
+    if (/^---\s+\S+/m.test(text) && /^\+\+\+\s+\S+/m.test(text)) return false;
+    if (/\.html?$/i.test(path || '') && !/<!doctype\s+html/i.test(text) && !/<html[\s>]/i.test(text)) return false;
+    return true;
+  }
+
+  function toast(message) {
+    var element = q('#toast');
+    if (!element) return;
+    element.textContent = message;
+    element.classList.add('show');
+    setTimeout(function () { element.classList.remove('show'); }, 2400);
+  }
+
+  function synchronizeVisibleEditor(event) {
+    var target = event && event.target;
+    if (!target || (target.id !== 'clSendBuddyLaneV200' && target.id !== 'clSavedToBuddyV200')) return;
+
+    var page = pageId();
+    if (page !== 'patch-lab' && page !== 'buddy-canvas') return;
+
+    var state = readState();
+    state.file = state.file || {};
+    var path = state.file.path || (state.file.githubSource || {}).path || state.file.filename || 'file.html';
+    var source = String(state.file.currentCode || '');
+    var fixed = String(state.file.fixedCode || '');
+
+    if (page === 'patch-lab') {
+      var patchInput = q('#plIn');
+      var patchOutput = q('#plOut');
+      if (patchInput && String(patchInput.value || '').trim()) source = String(patchInput.value || '');
+      if (patchOutput && String(patchOutput.value || '').trim()) fixed = String(patchOutput.value || '');
+    }
+
+    if (page === 'buddy-canvas') {
+      var loaded = q('#loadedCode');
+      var canvasFixed = q('#fixedCode');
+      if (loaded && String(loaded.value || '').trim() && !/^No File Lab code loaded yet\.?$/i.test(String(loaded.value || '').trim())) {
+        source = String(loaded.value || '');
+      }
+      if (canvasFixed && String(canvasFixed.value || '').trim() && !/^Paste ChatGPT fixed full replacement here$/i.test(String(canvasFixed.value || '').trim())) {
+        fixed = String(canvasFixed.value || '');
+      }
+    }
+
+    fixed = fixed || source;
+    if (!isFullFile(path, fixed)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      toast('Buddy Lane needs the current complete file, not a snippet or patch. No workflow state changed.');
+      return;
+    }
+
+    state.file.currentCode = source || state.file.currentCode || '';
+    state.file.fixedCode = fixed;
+    state.file.syncedFromVisibleEditor = page;
+    state.file.syncedAt = new Date().toISOString();
+    writeState(state);
+  }
+
+  function bindCurrentEditorSync() {
+    if (document.documentElement.getAttribute('data-cl-current-editor-sync') === VERSION) return;
+    document.documentElement.setAttribute('data-cl-current-editor-sync', VERSION);
+    document.addEventListener('click', synchronizeVisibleEditor, true);
   }
 
   function loadScriptOnce(src, attribute, onload) {
@@ -87,6 +171,7 @@
   }
 
   function run() {
+    bindCurrentEditorSync();
     normalizeRole();
     loadPreservedHelpers();
     loadOneFlow();
@@ -104,6 +189,8 @@
   window.CodeLabsPageRuntimeV200 = {
     version: VERSION,
     roles: PAGE_ROLES,
+    isFullFile: isFullFile,
+    synchronizeVisibleEditor: synchronizeVisibleEditor,
     run: run
   };
 })();
