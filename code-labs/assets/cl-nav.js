@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V200.13-sequential-shells';
+  var VERSION = 'V200.14-current-file-context';
   var started = false;
   var completed = false;
 
@@ -54,27 +54,38 @@
     return script;
   }
 
-  function runOwners() {
-    if (window.CodeLabsHeaderShellV200 && window.CodeLabsHeaderShellV200.run) {
-      window.CodeLabsHeaderShellV200.run();
-    }
+  function loadPageOwners() {
     loadScript(
-      'assets/code-labs-page-runtime-v200.js?v=cl-v200-13-sequential',
-      'data-cl-page-runtime-v200',
-      function () { return !!window.CodeLabsPageRuntimeV200; },
+      'assets/code-labs-current-file-context-v200.js?v=cl-v200-1-read-only',
+      'data-cl-current-file-context-v200',
+      function () { return !!window.CodeLabsCurrentFileContextV200; },
       function () {
-        if (window.CodeLabsPageRuntimeV200.run) window.CodeLabsPageRuntimeV200.run();
         loadScript(
-          'assets/code-labs-footer-buddy-shell-v200.js?v=cl-v200-18-v104-safe-relay',
-          'data-cl-footer-buddy-shell-v200',
-          function () { return !!window.CodeLabsFooterBuddyShellV200; },
+          'assets/code-labs-page-runtime-v200.js?v=cl-v200-14-current-file-context',
+          'data-cl-page-runtime-v200',
+          function () { return !!window.CodeLabsPageRuntimeV200; },
           function () {
-            if (window.CodeLabsFooterBuddyShellV200.run) window.CodeLabsFooterBuddyShellV200.run();
-            reveal();
+            if (window.CodeLabsPageRuntimeV200.run) window.CodeLabsPageRuntimeV200.run();
+            loadScript(
+              'assets/code-labs-footer-buddy-shell-v200.js?v=cl-v200-18-v104-safe-relay',
+              'data-cl-footer-buddy-shell-v200',
+              function () { return !!window.CodeLabsFooterBuddyShellV200; },
+              function () {
+                if (window.CodeLabsFooterBuddyShellV200.run) window.CodeLabsFooterBuddyShellV200.run();
+                reveal();
+              }
+            );
           }
         );
       }
     );
+  }
+
+  function runOwners() {
+    if (window.CodeLabsHeaderShellV200 && window.CodeLabsHeaderShellV200.run) {
+      window.CodeLabsHeaderShellV200.run();
+    }
+    loadPageOwners();
   }
 
   function run() {
