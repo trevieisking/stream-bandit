@@ -4,11 +4,11 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V200.9-three-shell';
+  var VERSION = 'V200.12-three-shell';
   var SHELLS = [
     ['assets/code-labs-header-shell-v200.js?v=cl-v200-9', 'data-cl-header-shell-v200'],
-    ['assets/code-labs-page-runtime-v200.js?v=cl-v200-9', 'data-cl-page-runtime-v200'],
-    ['assets/code-labs-footer-buddy-shell-v200.js?v=cl-v200-9', 'data-cl-footer-buddy-shell-v200']
+    ['assets/code-labs-page-runtime-v200.js?v=cl-v200-10', 'data-cl-page-runtime-v200'],
+    ['assets/code-labs-footer-buddy-shell-v200.js?v=cl-v200-11', 'data-cl-footer-buddy-shell-v200']
   ];
 
   function q(selector) {
