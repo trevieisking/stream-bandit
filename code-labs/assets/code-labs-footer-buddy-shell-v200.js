@@ -5,12 +5,11 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V200.9';
+  var VERSION = 'V200.11';
   var ROUTES = [
     ['index', 'index.html', 'Home'],
     ['setup', 'setup.html', 'Setup'],
     ['saved-files', 'saved-files.html', 'Saved Files'],
-    ['file-lab', 'saved-files.html', 'Saved Files'],
     ['rescue-room', 'rescue-room.html', 'Rescue Room'],
     ['packet-builder', 'packet-builder.html', 'Packet Builder'],
     ['patch-lab', 'patch-lab.html', 'Patch Lab'],
@@ -25,9 +24,10 @@
   }
 
   function pageId() {
-    return (document.body && document.body.getAttribute('data-page')) ||
+    var id = (document.body && document.body.getAttribute('data-page')) ||
       location.pathname.split('/').pop().replace(/\.html?$/i, '') ||
       'index';
+    return id === 'file-lab' ? 'saved-files' : id;
   }
 
   function loadScriptOnce(src, attribute, onload) {
