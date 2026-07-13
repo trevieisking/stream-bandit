@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V200.17-v104-safe-relay';
+  var VERSION = 'V200.18-v104-safe-relay';
   var ROUTES = [
     ['index', 'index.html', 'Home'],
     ['setup', 'setup.html', 'Setup'],
@@ -43,7 +43,7 @@
 
   function loadPageBridge() {
     if (window.CodeLabsBuddyPageBridgeV140 || window.CodeLabsBuddyPageBridge) return;
-    loadScriptOnce('assets/code-labs-buddy-page-bridge-v139.js?v=cl-v200-17-v104-safe-relay', 'data-cl-buddy-page-bridge-v139');
+    loadScriptOnce('assets/code-labs-buddy-page-bridge-v139.js?v=cl-v200-18-v104-safe-relay', 'data-cl-buddy-page-bridge-v139');
   }
 
   function loadSol() {
@@ -60,7 +60,7 @@
       style.textContent = 'html[data-cl-sol-auth-only="1"] #clHistoryPanel{display:none!important}';
       document.head.appendChild(style);
     }
-    loadScriptOnce('assets/code-labs-v1-2-history.js?v=cl-v200-17-v104-safe-relay', 'data-cl-sol-auth-helper', startSol);
+    loadScriptOnce('assets/code-labs-v1-2-history.js?v=cl-v200-18-v104-safe-relay', 'data-cl-sol-auth-helper', startSol);
   }
 
   function relaySession() { try { return sessionStorage.getItem(RELAY_SESSION_KEY) || ''; } catch (e) { return ''; } }
@@ -104,13 +104,19 @@
   }
   function approveV104() {
     if (!window.CL_SB || !window.CL_SB.rpc || !relaySession() || !relaySecret()) return Promise.resolve();
-    return window.CL_SB.rpc('code_labs_approve_sol_v106', {
+    return window.CL_SB.rpc('code_labs_approve_v104_page', {
       p_session_id: relaySession(),
       p_browser_secret: relaySecret()
     }).then(function () {}).catch(function () {});
   }
+  function normalizedCommandType(command) {
+    var raw = String(command && (command.type || command.command) || '').toLowerCase();
+    if (raw === 'write') return 'write_fields';
+    if (raw === 'action') return 'run_action';
+    return raw;
+  }
   function isChangingCommand(command) {
-    var type = String(command && command.type || '');
+    var type = normalizedCommandType(command);
     return type === 'write_fields' || type === 'write_section' || type === 'run_action' || type === 'undo';
   }
   function applyCommand(row) {
