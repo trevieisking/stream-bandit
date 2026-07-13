@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V200.15-code-god';
+  var VERSION = 'V200.16-code-god-lane';
   var started = false;
   var completed = false;
 
@@ -54,9 +54,21 @@
     return script;
   }
 
+  function loadCodeGodLane() {
+    loadScript(
+      'assets/code-god-lane-v200.js?v=cl-v200-1-explicit-review',
+      'data-cl-code-god-lane-v200',
+      function () { return !!window.CodeGodLaneV200; },
+      function () {
+        if (window.CodeGodLaneV200.install) window.CodeGodLaneV200.install();
+        reveal();
+      }
+    );
+  }
+
   function loadRuntimeAndFooter() {
     loadScript(
-      'assets/code-labs-page-runtime-v200.js?v=cl-v200-15-code-god',
+      'assets/code-labs-page-runtime-v200.js?v=cl-v200-16-code-god-lane',
       'data-cl-page-runtime-v200',
       function () { return !!window.CodeLabsPageRuntimeV200; },
       function () {
@@ -67,7 +79,7 @@
           function () { return !!window.CodeLabsFooterBuddyShellV200; },
           function () {
             if (window.CodeLabsFooterBuddyShellV200.run) window.CodeLabsFooterBuddyShellV200.run();
-            reveal();
+            loadCodeGodLane();
           }
         );
       }
