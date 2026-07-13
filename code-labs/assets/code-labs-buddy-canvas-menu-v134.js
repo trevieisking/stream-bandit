@@ -1,4 +1,4 @@
-/* Code Labs Buddy Canvas compatibility loader V200.9. */
+/* Code Labs Buddy Canvas compatibility loader V200.11. */
 (function () {
   'use strict';
 
@@ -9,22 +9,27 @@
   function loadShells() {
     if (q('script[data-cl-nav-v200]')) return;
     var script = document.createElement('script');
-    script.src = 'assets/cl-nav.js?v=cl-v200-9-three-shell';
+    script.src = 'assets/cl-nav.js?v=cl-v200-11-three-shell';
     script.setAttribute('data-cl-nav-v200', 'yes');
     document.head.appendChild(script);
+  }
+
+  function ruleBox() {
+    return q('.sidebar .sideBox:not(#clBuddyToolsBox)');
   }
 
   function run() {
     if ((document.body && document.body.getAttribute('data-page')) !== 'buddy-canvas') return;
     var logoSmall = q('.logo small');
     if (logoSmall) logoSmall.textContent = 'Kind repair workflow for non-coders';
-    var side = q('.sideBox');
+    var side = ruleBox();
     if (side) {
+      side.setAttribute('data-cl-buddy-lane-rule', 'V200.11');
       side.innerHTML = '<b>Buddy Lane rule</b><p>You prepare or approve the complete file. ChatGPT and Sol help with the page; GitHub changes stay on a reviewed branch and pull request.</p>';
     }
     loadShells();
     window.CodeLabsBuddyCanvasMenuV134 = {
-      version: 'V200.9',
+      version: 'V200.11',
       active: true,
       routes: window.CodeLabsHeaderShellV200 ? window.CodeLabsHeaderShellV200.routes : []
     };
