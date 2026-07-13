@@ -1,4 +1,4 @@
-/* Code Labs Buddy Canvas Menu V200 - align Buddy Canvas with the simple one-flow workflow. */
+/* Code Labs Buddy Canvas Menu V200.8 - align Buddy Canvas with the branch/PR-only one-flow workflow. */
 (function(){
 'use strict';
 var ROUTES=[
@@ -15,7 +15,7 @@ var ROUTES=[
 ];
 function q(s,r){return(r||document).querySelector(s)}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function link(item){var active=item[0]==='buddy-canvas.html';return '<a class="'+(active?'active':'')+'" href="'+item[0]+'"><span>'+item[1]+'</span><div>'+esc(item[2])+'<small>'+esc(item[3])+'</small></div></a>'}
+function link(item){var active=item[0]==='buddy-canvas.html';return'<a class="'+(active?'active':'')+'" href="'+item[0]+'"><span>'+item[1]+'</span><div>'+esc(item[2])+'<small>'+esc(item[3])+'</small></div></a>'}
 function loadOneFlow(){if(q('script[data-cl-one-flow-v200]'))return;var s=document.createElement('script');s.src='assets/code-labs-one-flow-v200.js?v=cl-v200-one-flow';s.setAttribute('data-cl-one-flow-v200','yes');document.head.appendChild(s)}
 function run(){
  if((document.body&&document.body.getAttribute('data-page'))!=='buddy-canvas')return;
@@ -23,9 +23,9 @@ function run(){
  nav.innerHTML=ROUTES.map(link).join('');
  nav.setAttribute('aria-label','Code Labs simple workflow navigation');
  var logoSmall=q('.logo small');if(logoSmall)logoSmall.textContent='Kind repair workflow for non-coders';
- var side=q('.sideBox');if(side)side.innerHTML='<b>Buddy Lane rule</b><p>You prepare or approve the complete file. ChatGPT handles branch, pull request, review and deployment.</p>';
+ var side=q('.sideBox');if(side)side.innerHTML='<b>Buddy Lane rule</b><p>You prepare or approve the complete file. ChatGPT handles the branch, pull request and review.</p>';
  loadOneFlow();
- window.CodeLabsBuddyCanvasMenuV134={version:'V200',active:true,routes:ROUTES.map(function(x){return x[2]})};
+ window.CodeLabsBuddyCanvasMenuV134={version:'V200.8',active:true,routes:ROUTES.map(function(x){return x[2]})};
 }
 function boot(){run();setTimeout(run,250);setTimeout(run,900);setTimeout(run,1700)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
