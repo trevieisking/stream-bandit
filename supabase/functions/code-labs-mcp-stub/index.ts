@@ -24,7 +24,7 @@ function rpc(id: unknown, result: unknown) { return json({ jsonrpc: "2.0", id: i
 function rpcError(id: unknown, code: number, message: string, status = 400) { return json({ jsonrpc: "2.0", id: id ?? null, error: { code, message } }, status); }
 function authHeaders() { return { "WWW-Authenticate": `Bearer resource_metadata="${BASE}/.well-known/oauth-protected-resource"` }; }
 function serviceKey() { return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SB_SERVICE_ROLE_KEY") || ""; }
-function signingSecret() { return Deno.env.get("CODE_LABS_OAUTH_SECRET") || serviceKey(); }
+function signingSecret() { return Deno.env.get("CODE_LABS_OAUTH_SECRET") || ""; }
 function now() { return Math.floor(Date.now() / 1000); }
 function b64url(bytes: Uint8Array | string) { const bin = typeof bytes === "string" ? bytes : String.fromCharCode(...bytes); return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, ""); }
 function fromB64url(text: string) { let b64 = text.replace(/-/g, "+").replace(/_/g, "/"); while (b64.length % 4) b64 += "="; return atob(b64); }
@@ -63,7 +63,7 @@ function oauthMetadata() {
     response_types_supported: ["code"],
     response_modes_supported: ["query"],
     grant_types_supported: ["authorization_code", "refresh_token"],
-    token_endpoint_auth_methods_supported: ["none", "client_secret_post"],
+    token_endpoint_auth_methods_supported: ["none"],
     code_challenge_methods_supported: ["S256", "plain"],
     scopes_supported: ["code_labs.read", "code_labs.write"],
   };
@@ -91,9 +91,20 @@ async function token(req: Request) {
   if (!(await verifyPkce(code, String(params.code_verifier || "")))) return json({ error: "pkce_verification_failed" }, 400);
   return json({ access_token: await signPayload({ typ: "access", exp: now() + 3600, scope: "code_labs.read code_labs.write", sub: code.sub || "code-labs-owner" }), refresh_token: await signPayload({ typ: "refresh", exp: now() + 1209600, scope: "code_labs.read code_labs.write", sub: code.sub || "code-labs-owner" }), token_type: "Bearer", expires_in: 3600, scope: "code_labs.read code_labs.write" });
 }
-async function accessPayload(req: Request) { const auth = req.headers.get("authorization") || ""; if (!auth.startsWith("Bearer ")) throw new Error("Missing bearer token."); return await verifySigned(auth.slice(7), "access"); }
-async function authMode(req: Request) { const auth = req.headers.get("authorization") || ""; if (auth.startsWith("Bearer ")) { try { await verifySigned(auth.slice(7), "access"); return "oauth"; } catch {} } if (auth.startsWith("Bearer ") && req.headers.get("apikey")) return "supabase"; return "missing"; }
-async function requireToolAuth(req: Request) { if ((await authMode(req)) === "missing") throw new Error("Missing bearer token"); return await accessPayload(req); }
+async function accessPayload(req: Request) {
+  const auth = req.headers.get("authorization") || "";
+  if (!auth.startsWith("Bearer ")) throw new Error("Missing bearer token.");
+  return await verifySigned(auth.slice(7), "access");
+}
+async function requireToolAuth(req: Request) {
+  const payload = await accessPayload(req);
+  const session = await activeSession();
+  const ownerId = String(session.owner_id || "");
+  if (!ownerId) throw new Error("The active Code Labs page is not bound to an approved owner.");
+  const owners = await rest("code_labs_owners?select=user_id&user_id=eq." + encodeURIComponent(ownerId) + "&limit=1");
+  if (!Array.isArray(owners) || !owners[0]) throw new Error("The active Code Labs page owner is not approved for V104.");
+  return { payload, session, owner_id: ownerId };
+}
 
 async function rest(path: string, options: RequestInit = {}) {
   const key = serviceKey(); if (!key) throw new Error("Code Labs service key is missing.");
