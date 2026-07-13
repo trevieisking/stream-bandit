@@ -7,7 +7,7 @@ Rebuild Code Labs as one simple, non-coder-first repair workflow while preservin
 ## Normal workflow
 
 1. Home — understand the current project and next safe step.
-2. Setup — choose the project and repository.
+2. Setup — choose and save the independent project repository.
 3. Saved Files — upload, load, select or edit one complete source file.
 4. Rescue Room — describe the fault and preserve rules.
 5. Packet Builder — collect the repair context.
@@ -43,25 +43,21 @@ Repo Desk, GitHub Writer and GitHub Tracker are advanced diagnostics, not requir
 - latest safety receipt
 - Help and Sol entry points
 
-## One visible connector
+## Foundation connector boundary
 
-The visible connector is named Code Labs. It may:
+For PR #343, the visible Code Labs connector may:
 
 - read the active page and approved fields
-- write the smallest approved field set
+- write the smallest approved page-field set
 - run exposed safe actions
-- undo the latest page write
-- read repository files
+- undo the latest page-field write
+- read repository files through ChatGPT
 - create or update non-protected branches
-- create, update or remove files on non-protected branches
+- create or update complete files on non-protected branches
 - open, inspect and review pull requests
-- merge only after explicit confirmation and clean gates
-- read Code Labs Supabase context
-- save complete-file Buddy Lane handoffs
-- deploy Code Labs Edge Functions only after review and explicit confirmation
 - return receipts
 
-The user does not choose repeatedly between V104, V107, GitHub and Supabase.
+For this foundation batch it may not delete files, deploy, publish or merge. Those actions require separate reviewed phases and explicit confirmation.
 
 ## Sol
 
@@ -75,19 +71,22 @@ Sol is read-only. Sol may:
 
 Sol may not write GitHub, Supabase rows, branches, pull requests, deployments, merges or page fields.
 
-## Saved Files
+## Saved Files foundation behavior
 
-`code-labs/saved-files.html` is the normal file entry and management page. It must:
+`code-labs/saved-files.html` is the normal file entry and management page for this foundation. It must:
 
 - upload a local code or text file
 - paste or edit a complete source file
-- load an existing Code Labs Supabase file
-- load a GitHub file read-only through the connector
-- show filename, repository, path, branch, size and source hash
+- load an existing Code Labs Supabase saved-file row
+- show saved-row filename, project/path context and saved size/hash where available
+- preserve repository, target path and branch context in workflow state
 - keep local uploads separate from saved Supabase edit targets
+- preserve the independent Setup repository for local files
 - validate complete-file input before workflow state changes
 - reject snippets, patch recipes and unified diffs
 - send one complete file to Buddy Lane
+
+A GitHub read-only file picker inside Saved Files is a later implementation slice and is not claimed by PR #343.
 
 ## Buddy Lane handoff
 
@@ -102,19 +101,21 @@ A handoff must include:
 - hashes and character counts
 - branch/PR-only safety flags
 - a one-time handoff token
+- creation and expiry timestamps
 
-Buddy Canvas may hydrate only from a matching fresh token and must consume that token once.
+Buddy Canvas may hydrate only from a matching token created within the previous 15 minutes. It must consume that token once. Expired tokens are removed without changing workflow state.
 
 ## Safety boundaries
 
 - branch and pull request only; never direct `main`
 - no browser-side GitHub write
 - no automatic delete, deploy, publish or merge
-- dangerous actions require explicit confirmation
+- dangerous actions require explicit confirmation in later phases
 - Code Labs files and tables only
 - no Stream Bandit application files or tables
 - no secrets exposed in UI, logs or receipts
 - failed validation must not mutate workflow state
+- a local upload must never inherit a previously selected saved-row repository
 
 ## Acceptance gates
 
@@ -126,10 +127,13 @@ Before merge:
 - Saved Files local upload works
 - saved-row load and Save restoration work
 - local upload clears the saved-row edit target
+- local upload uses the independent Setup repository
 - invalid content leaves workflow state unchanged
 - repository ownership and path remain correct
 - double-click Send creates one handoff
+- expired handoffs are rejected without state mutation
 - Buddy Canvas hydration is one-time
+- the V200 menu remains stable after legacy helper timers
 - no duplicate Buddy Lane or Sol panels
 - mobile layout is usable
 - owner visual smoke test passes
@@ -137,10 +141,13 @@ Before merge:
 
 ## Parked later work
 
-These ideas are approved for a later reviewed phase and are not part of this foundation PR:
+These ideas are approved for later reviewed phases and are not part of this foundation PR:
 
+- GitHub read-only file picker inside Saved Files
 - File Relationship Scanner
 - Project Integrity Reviewer
 - Tool Station
+- deployment and merge controls
+- file deletion controls
 
-They should reuse existing Helper Route Map logic and remain read-only by default until a separate plan, review and acceptance gate are complete.
+They should reuse existing Helper Route Map logic where relevant and remain read-only by default until separate plans, reviews and acceptance gates are complete.
