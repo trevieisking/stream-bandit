@@ -1,6 +1,6 @@
 import { BASE, SCOPE, authorize, binding, register, token } from "./oauth.ts";
 import { VERSION, getContext, readUrl, saveRequest } from "./context.ts";
-import { createCheckpoint, getWorkspace, listActions, listRecords, readCurrentFile, readReceipt, runAction, selectRecord, undoAction, updateCurrentFile, updateJob, updatePacket, updateProject, updateTest } from "./workspace.ts";
+import { acceptCandidate, createCheckpoint, getWorkspace, listActions, listRecords, readCurrentFile, readReceipt, runAction, saveCandidate, selectRecord, undoAction, updateCurrentFile, updateJob, updatePacket, updateProject, updateTest } from "./workspace.ts";
 type Row=Record<string,any>;
 const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type","Access-Control-Allow-Methods":"GET, POST, OPTIONS"};
 const json=(body:unknown,status=200,extra:Record<string,string>={})=>new Response(JSON.stringify(body,null,2),{status,headers:{...cors,...extra,"Content-Type":"application/json","Cache-Control":"no-store"}});
@@ -23,10 +23,12 @@ function tools(){const fields={type:"object",additionalProperties:true};return[
 {name:"update_code_labs_project",title:"Update Code Labs Project",description:"Update the currently selected project in place.",inputSchema:{type:"object",properties:{fields},required:["fields"]},annotations:write},
 {name:"update_code_labs_current_file",title:"Update Current Code Labs File",description:"Update the currently selected file row in place; never creates a duplicate file.",inputSchema:{type:"object",properties:{fields},required:["fields"]},annotations:write},
 {name:"update_code_labs_repair_job",title:"Update Code Labs Repair Job",description:"Update the currently selected repair job in place.",inputSchema:{type:"object",properties:{fields},required:["fields"]},annotations:write},
-{name:"update_code_labs_packet",title:"Update Code Labs Packet",description:"Update the currently selected packet in place.",inputSchema:{type:"object",properties:{fields},required:["fields"]},annotations:write},
-{name:"update_code_labs_test_result",title:"Update Code Labs Test Result",description:"Update the currently selected test result in place.",inputSchema:{type:"object",properties:{fields},required:["fields"]},annotations:write},
+{name:"upsert_code_labs_packet",title:"Upsert Code Labs Packet",description:"Update the selected packet in place. This tool does not create a duplicate packet.",inputSchema:{type:"object",properties:{fields},required:["fields"]},annotations:write},
+{name:"save_code_labs_candidate",title:"Save Code Labs Candidate",description:"Save candidate code in the selected file metadata without replacing current_code.",inputSchema:{type:"object",properties:{candidate_code:{type:"string"},note:{type:"string"}},required:["candidate_code"]},annotations:write},
+{name:"accept_code_labs_candidate",title:"Accept Code Labs Candidate",description:"Explicitly replace current_code with the saved candidate for the selected file.",inputSchema:{type:"object",properties:{confirmed:{type:"boolean"}},required:["confirmed"]},annotations:{readOnlyHint:false,destructiveHint:true,idempotentHint:false}},
+{name:"upsert_code_labs_test_result",title:"Upsert Code Labs Test Result",description:"Update the selected test result in place. This tool does not create a duplicate test row.",inputSchema:{type:"object",properties:{fields},required:["fields"]},annotations:write},
 {name:"create_code_labs_checkpoint",title:"Create Code Labs Checkpoint",description:"Create one deliberate version checkpoint from the selected current file.",inputSchema:{type:"object",properties:{label:{type:"string"},note:{type:"string"},confirmed:{type:"boolean"}},required:["confirmed"]},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:false}},
-{name:"run_code_labs_action",title:"Run Code Labs Action",description:"Run one strict server-side Code Labs action ID. This does not click a browser page.",inputSchema:{type:"object",properties:{action:{type:"string"},record_id:{type:"string"},expected_state_version:{type:"number"},confirmed:{type:"boolean"},label:{type:"string"},note:{type:"string"}},required:["action"]},annotations:{readOnlyHint:false,destructiveHint:true,idempotentHint:false}},
+{name:"run_code_labs_action",title:"Run Code Labs Action",description:"Run one strict server-side Code Labs action ID. This does not click a browser page.",inputSchema:{type:"object",properties:{action:{type:"string"},record_id:{type:"string"},expected_state_version:{type:"number"},confirmed:{type:"boolean"},label:{type:"string"},note:{type:"string"},fields,candidate_code:{type:"string"}},required:["action"]},annotations:{readOnlyHint:false,destructiveHint:true,idempotentHint:false}},
 {name:"undo_code_labs_action",title:"Undo Code Labs Action",description:"Undo one eligible in-place Code Labs write by receipt ID.",inputSchema:{type:"object",properties:{receipt_id:{type:"string"}},required:["receipt_id"]},annotations:write},
 {name:"save_code_labs_write_request",title:"Save Code Labs Write Request",description:"Queue one full-file GitHub branch and pull-request request. Never writes directly to main.",inputSchema:{type:"object",properties:{repo:{type:"string"},path:{type:"string"},branch:{type:"string"},content:{type:"string"},action:{type:"string"},commit_message:{type:"string"},pr_title:{type:"string"},pr_body:{type:"string"},confirm_branch_pr_only:{type:"boolean"}},required:["repo","path","branch","content","commit_message","pr_title","confirm_branch_pr_only"]},annotations:write}
 ];}
@@ -42,8 +44,10 @@ if(name==="select_code_labs_record")return selectRecord(b,args);
 if(name==="update_code_labs_project")return updateProject(b,args);
 if(name==="update_code_labs_current_file")return updateCurrentFile(b,args);
 if(name==="update_code_labs_repair_job")return updateJob(b,args);
-if(name==="update_code_labs_packet")return updatePacket(b,args);
-if(name==="update_code_labs_test_result")return updateTest(b,args);
+if(name==="upsert_code_labs_packet")return updatePacket(b,args);
+if(name==="save_code_labs_candidate")return saveCandidate(b,args);
+if(name==="accept_code_labs_candidate")return acceptCandidate(b,args);
+if(name==="upsert_code_labs_test_result")return updateTest(b,args);
 if(name==="create_code_labs_checkpoint")return createCheckpoint(b,args);
 if(name==="run_code_labs_action")return runAction(b,args);
 if(name==="undo_code_labs_action")return undoAction(b,args);
