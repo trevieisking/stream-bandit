@@ -2,6 +2,7 @@ export const SUPABASE_URL = "https://xzxqfrvqdgkzwujbkdbk.supabase.co";
 export const BASE = SUPABASE_URL + "/functions/v1/code-labs-mcp-stub";
 export const SCOPE = "code_labs.read code_labs.write";
 export const CLAIM = "code-labs-v104";
+export const CHATGPT_CLIENT_ID = "code-labs-chatgpt-client";
 export type Row = Record<string, any>;
 export type Binding = { owner_id: string; session_id?: string; session?: Row };
 
@@ -15,7 +16,7 @@ const hex = async (v: string) => Array.from(await bytes(v)).map((x) => x.toStrin
 const randomCode = () => crypto.randomUUID() + "." + b64(crypto.getRandomValues(new Uint8Array(32)));
 
 async function mac(v: string) {
-  if (!secret()) throw new Error("Code Labs OAuth secret is missing.");
+  if (!secret()) throw new Error("Code Labs OAuth signing key is unavailable.");
   const k = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret()), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   return b64(new Uint8Array(await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(v))));
 }
@@ -39,6 +40,18 @@ export function redirectUri(raw: unknown) {
   const u = new URL(String(raw || ""));
   if (u.protocol !== "https:" || u.username || u.password || u.hash) throw new Error("Only clean HTTPS redirect URIs are allowed.");
   return u.toString();
+}
+function isChatGptRedirect(uri: string) {
+  const u = new URL(uri);
+  return (u.hostname === "chatgpt.com" || u.hostname === "www.chatgpt.com") && u.pathname.startsWith("/connector/oauth/");
+}
+async function validateClient(clientId: string, redirectUriValue: string) {
+  if (clientId === CHATGPT_CLIENT_ID) {
+    if (!isChatGptRedirect(redirectUriValue)) throw new Error("redirect_uri_not_registered");
+    return;
+  }
+  const client = await verify(clientId, "client");
+  if (!Array.isArray(client.redirect_uris) || !client.redirect_uris.includes(redirectUriValue)) throw new Error("redirect_uri_not_registered");
 }
 async function configuredOwnerId() {
   const rows = await rest("code_labs_owners?select=user_id&order=created_at.asc&limit=2");
@@ -64,9 +77,8 @@ export async function exactSession(owner_id: string, session_id: string) {
 }
 export async function activeSession(owner_id: string): Promise<Binding> {
   const cutoff = new Date(Date.now() - 30000).toISOString();
-  const rows = await rest("code_labs_browser_sessions?select=*&owner_id=eq." + encodeURIComponent(owner_id) + "&status=eq.paired&claimed_by=eq." + encodeURIComponent(CLAIM) + "&last_seen_at=gt." + encodeURIComponent(cutoff) + "&control_expires_at=gt." + encodeURIComponent(new Date().toISOString()) + "&order=last_seen_at.desc&limit=2");
+  const rows = await rest("code_labs_browser_sessions?select=*&owner_id=eq." + encodeURIComponent(owner_id) + "&status=eq.paired&claimed_by=eq." + encodeURIComponent(CLAIM) + "&last_seen_at=gt." + encodeURIComponent(cutoff) + "&control_expires_at=gt." + encodeURIComponent(new Date().toISOString()) + "&order=last_seen_at.desc&limit=1");
   if (!Array.isArray(rows) || !rows[0]) throw new Error("No active V104 Code Labs page is available. Open one Code Labs page and keep it visible.");
-  if (rows.length > 1) throw new Error("Keep only one V104 Code Labs page visible while using live page controls.");
   const session = rows[0];
   return { owner_id, session_id: String(session.id), session };
 }
@@ -75,8 +87,7 @@ export async function authorize(req: Request) {
   const client_id = u.searchParams.get("client_id") || "";
   const redirect_uri = redirectUri(u.searchParams.get("redirect_uri") || "");
   const challenge = u.searchParams.get("code_challenge") || "";
-  const client = await verify(client_id, "client");
-  if (!Array.isArray(client.redirect_uris) || !client.redirect_uris.includes(redirect_uri)) throw new Error("redirect_uri_not_registered");
+  await validateClient(client_id, redirect_uri);
   if (!challenge || u.searchParams.get("code_challenge_method") !== "S256") throw new Error("pkce_s256_required");
   const owner_id = await configuredOwnerId();
   const code = randomCode();
