@@ -1,4 +1,4 @@
-import { APPROVAL_PAGE, BASE, SCOPE, approve, authorize, binding, register, token } from "./oauth.ts";
+import { BASE, SCOPE, authorize, binding, register, token } from "./oauth.ts";
 import { VERSION, getContext, readUrl, saveRequest } from "./context.ts";
 import { readPage, receipt, runAction, undo, writeFields, writeSection } from "./live.ts";
 type Row=Record<string,any>;
@@ -12,8 +12,8 @@ const metadata=()=>({issuer:BASE,authorization_endpoint:BASE+"/oauth/authorize",
 function tools(){const fp={type:"string",description:"Exact page fingerprint from read_live_code_labs_page."};return[
 {name:"get_code_labs_context",title:"Get Code Labs Context",description:"Read saved Code Labs context.",inputSchema:{type:"object",properties:{limit:{type:"number",minimum:1,maximum:25}}},annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}},
 {name:"read_code_labs_url",title:"Read Code Labs URL",description:"Read a public Code Labs URL.",inputSchema:{type:"object",properties:{url:{type:"string"},max_chars:{type:"number",maximum:60000}},required:["url"]},annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}},
-{name:"read_live_code_labs_page",title:"Read Live Code Labs Page",description:"Read the exact approved signed-in Code Labs page.",inputSchema:{type:"object",properties:{}},annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}},
-{name:"write_live_code_labs_fields",title:"Write Live Code Labs Fields",description:"Write the smallest safe field set on the exact approved page.",inputSchema:{type:"object",properties:{expected_page_fingerprint:fp,fields:{type:"object",additionalProperties:true}},required:["expected_page_fingerprint","fields"]},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:false}},
+{name:"read_live_code_labs_page",title:"Read Live Code Labs Page",description:"Read the exact active V104 Code Labs page.",inputSchema:{type:"object",properties:{}},annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}},
+{name:"write_live_code_labs_fields",title:"Write Live Code Labs Fields",description:"Write the smallest safe field set on the exact active V104 page.",inputSchema:{type:"object",properties:{expected_page_fingerprint:fp,fields:{type:"object",additionalProperties:true}},required:["expected_page_fingerprint","fields"]},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:false}},
 {name:"write_live_code_labs_section",title:"Write Live Code Labs Section",description:"Write safe fields in one page section.",inputSchema:{type:"object",properties:{expected_page_fingerprint:fp,section_key:{type:"string"},fields:{type:"object",additionalProperties:true}},required:["expected_page_fingerprint","section_key","fields"]},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:false}},
 {name:"run_live_code_labs_action",title:"Run Live Code Labs Action",description:"Press an approved page button by stable action key.",inputSchema:{type:"object",properties:{expected_page_fingerprint:fp,action_key:{type:"string"},confirmed:{type:"boolean"},allow_dangerous:{type:"boolean"}},required:["expected_page_fingerprint","action_key"]},annotations:{readOnlyHint:false,destructiveHint:true,idempotentHint:false}},
 {name:"read_live_code_labs_receipt",title:"Read Live Code Labs Receipt",description:"Read a command result or latest page receipt.",inputSchema:{type:"object",properties:{command_id:{type:"string"}}},annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}},
@@ -26,12 +26,11 @@ if(p.endsWith("/.well-known/oauth-authorization-server")||p.endsWith("/.well-kno
 if(p.endsWith("/.well-known/oauth-protected-resource"))return json(protectedResource());
 if(p.endsWith("/oauth/register")&&req.method==="POST")return json(await register(req),201);
 if(p.endsWith("/oauth/authorize"))return go(await authorize(req));
-if(p.endsWith("/oauth/approve")&&req.method==="POST")return json(await approve(req));
 if(p.endsWith("/oauth/token")&&req.method==="POST")return json(await token(req));
-if(req.method!=="POST")return json({ok:true,version:VERSION,approval_page:APPROVAL_PAGE,scope:SCOPE,tools:tools(),endpoint:BASE});
+if(req.method!=="POST")return json({ok:true,version:VERSION,connector:"code-labs-v104",scope:SCOPE,tools:tools(),endpoint:BASE});
 const body=await req.json().catch(()=>({})),id=body.id??null;
 if(body.jsonrpc==="2.0"){
-if(body.method==="initialize")return rpc(id,{protocolVersion:"2025-06-18",capabilities:{tools:{}},serverInfo:{name:"code-labs-mcp-stub",version:VERSION},instructions:"Approve the exact signed-in Code Labs page, read it first, use the exact fingerprint, inspect the receipt, and keep GitHub changes branch and pull-request only."});
+if(body.method==="initialize")return rpc(id,{protocolVersion:"2025-06-18",capabilities:{tools:{}},serverInfo:{name:"code-labs-mcp-stub",version:VERSION},instructions:"Use the one active V104 Code Labs page. Read it first, use the exact fingerprint, press buttons or write fields through the listed tools, inspect receipts, and keep GitHub changes branch and pull-request only."});
 if(body.method==="ping")return rpc(id,{});if(body.method==="notifications/initialized")return new Response(null,{status:202,headers:cors});if(body.method==="tools/list")return rpc(id,{tools:tools()});if(body.method==="resources/list")return rpc(id,{resources:[]});if(body.method==="prompts/list")return rpc(id,{prompts:[]});
 if(body.method==="tools/call"){const b=await binding(req);const result=await call(b,body.params?.name||"",body.params?.arguments||{});return rpc(id,{content:[{type:"text",text:JSON.stringify(result,null,2)}],structuredContent:result,isError:false});}return rpcError(id,-32601,"Unknown method",404);}
 const b=await binding(req);return json(await call(b,body.tool||body.name||"",body));
