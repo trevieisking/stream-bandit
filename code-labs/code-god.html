@@ -4,61 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Code Labs Code God Review</title>
-<meta name="description" content="Read-only pre-PR review for the selected Code Labs file.">
+<meta name="description" content="Read-only pre-PR review for the selected Code Labs file and requested branch.">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
-<link rel="stylesheet" href="assets/code-labs.css?v=cl-v205-code-god">
-<style>
-.cgGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.cgResult{white-space:pre-wrap;overflow-wrap:anywhere}.cgStatus{font-size:clamp(34px,6vw,72px);font-weight:1000;letter-spacing:-.05em}.cgPass{color:#0b8f62}.cgFix{color:#b66a00}.cgBlock{color:#b42318}
-</style>
-</head>
-<body data-page="code-god">
-<div class="app">
-<aside class="sidebar">
-<div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>Complete repair workflow</small></div></div>
-<nav class="nav" aria-label="Complete Code Labs workflow"></nav>
-</aside>
-<main class="main">
-<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>Code God</b></div><div><span class="badge good">Read only</span><span class="badge warn">Before GitHub Writer</span></div></div>
-<section class="hero">
-<div><span class="pill">Code God V205</span><h1>Review the complete file before the PR.</h1><p>Code God checks the selected original and proposed file using the existing deterministic V200 review engine. It reports PASS, FIX_FIRST, or BLOCK. It does not save, commit, open, merge, publish, deploy, or delete anything.</p></div>
-<div class="heroCard"><b>Workflow</b><ol><li>Finish the complete proposed file.</li><li>Run Code God.</li><li>Resolve every blocking finding.</li><li>Continue to GitHub Writer.</li><li>Open a non-main PR for Codex review.</li></ol></div>
-</section>
-<section class="panel">
-<h2>Current file context</h2>
-<div class="cgGrid">
-<div class="item"><b>Repository</b><p id="cgRepo">Not loaded</p></div>
-<div class="item"><b>Path</b><p id="cgPath">Not loaded</p></div>
-<div class="item"><b>Original characters</b><p id="cgOriginal">0</p></div>
-<div class="item"><b>Proposed characters</b><p id="cgProposed">0</p></div>
-</div>
-<div class="actions"><button class="btn primary" id="cgRun" type="button">Run Code God Review</button><a class="btn" href="publish-prep.html">Continue to GitHub Writer</a></div>
-</section>
-<section class="panel">
-<h2>Review result</h2>
-<div id="cgStatus" class="cgStatus">READY</div>
-<div id="cgSummary" class="notice"><p>Load a complete file in Code Labs, then run the review.</p></div>
-<div id="cgFindings" class="cgGrid"></div>
-</section>
-<section class="notice"><p><b>Boundary:</b> Code God is advisory and read-only. GitHub Writer remains branch-and-PR only, and Codex remains the independent PR reviewer.</p></section>
-<div class="footerNote">Code God V205 · deterministic V200 engine · no browser pairing · no direct-main write.</div>
-</main>
-</div>
-<script src="assets/code-labs-current-file-context-v200.js?v=cl-v205-code-god"></script>
-<script src="assets/code-god-review-v200.js?v=cl-v205-code-god"></script>
-<script src="assets/cl-nav.js?v=cl-v205-code-god"></script>
-<script>
-(function(){
-'use strict';
-function q(id){return document.getElementById(id)}
-function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function context(){return window.CodeLabsCurrentFileContextV200?window.CodeLabsCurrentFileContextV200.current():{}}
-function renderContext(c){q('cgRepo').textContent=c.repo||'Not loaded';q('cgPath').textContent=c.path||'Not loaded';q('cgOriginal').textContent=String(c.original_characters||0);q('cgProposed').textContent=String(c.proposed_characters||0)}
-function render(result){var status=q('cgStatus');status.textContent=result.outcome||'READY';status.className='cgStatus '+(result.outcome==='PASS'?'cgPass':result.outcome==='BLOCK'?'cgBlock':'cgFix');q('cgSummary').innerHTML='<p><b>'+esc(result.outcome||'READY')+':</b> '+esc(result.findings&&result.findings.length?result.findings.length+' finding(s) require review.':'No blocking findings were reported.')+'</p>';q('cgFindings').innerHTML=(result.findings||[]).map(function(item){return '<div class="item"><b>'+esc(item.severity)+' · '+esc(item.rule_id)+'</b><p>'+esc(item.message)+'</p><p><b>Correction:</b> '+esc(item.correction)+'</p></div>'}).join('')||'<div class="item"><b>PASS</b><p>The current proposal passed the deterministic pre-PR checks.</p></div>'}
-function run(){var c=context();renderContext(c);if(!window.CodeGodReviewV200){render({outcome:'BLOCK',findings:[{severity:'P1',rule_id:'CG-ENGINE',message:'The Code God engine did not load.',correction:'Reload this page and retry.'}]});return}var input=Object.assign({},c,{request_branch:'code-labs-v205-code-god'});render(window.CodeGodReviewV200.review(input))}
-function boot(){renderContext(context());q('cgRun').addEventListener('click',run)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-})();
-</script>
-</body>
-</html>
+<link
