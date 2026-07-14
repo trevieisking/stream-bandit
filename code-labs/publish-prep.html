@@ -15,10 +15,18 @@
 <body data-page="publish-prep">
 <noscript><main style="padding:20px;font-family:system-ui"><h1>Code Labs GitHub Writer</h1><p>This page needs JavaScript to build GitHub read, add, edit, remove verified file, and review handoffs.</p></main></noscript>
 <script src="assets/code-labs.js"></script>
-<script src="assets/cl-nav.js?v=cl-v200-12-shell-entry"></script>
-<script src="assets/code-labs-v1-1-safety.js?v=cl-v174-cache-layout-consistency"></script>
+<script src="assets/cl-nav.js?v=cl-v206-code-god-route"></script>
+<script src="assets/code-labs-v1-1-safety.js?v=cl-v206-code-god-route"></script>
 <script src="assets/code-labs-v12-save.js?v=cl-v85-flow-fix"></script>
 <script src="assets/code-labs-v16-publish-prep.js?v=cl-v86-github-writer-seo"></script>
+<script>
+(function(){'use strict';
+function q(s,r){return(r||document).querySelector(s)}
+function add(){if((document.body&&document.body.getAttribute('data-page'))!=='publish-prep')return false;var actions=q('#githubWriter .actions');if(!actions)return false;if(q('#gwCodeGodCheck',actions))return true;var link=document.createElement('a');link.id='gwCodeGodCheck';link.className='btn warn';link.href='code-god.html';link.textContent='Code God Check';link.setAttribute('data-code-god-route','V206');var back=q('a[href="repo-desk.html"]',actions);if(back&&back.nextSibling)actions.insertBefore(link,back.nextSibling);else actions.insertBefore(link,actions.firstChild);return true}
+function boot(){if(add())return;var attempts=0,timer=setInterval(function(){attempts+=1;if(add()||attempts>=40)clearInterval(timer)},150)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
 <script src="assets/code-labs-v32-current-file-panel.js?v=cl-current-file-20260701"></script>
 <script src="assets/code-labs-github-lane-autopilot-v131.js?v=cl-v131-github-lane-autopilot"></script>
 <script src="assets/code-labs-backend-write-queue-v132.js?v=cl-v138-backend-context-sync"></script>
