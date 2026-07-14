@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V200.16-code-god-lane';
+  var VERSION = 'V200.19-v104-state-fingerprint';
   var started = false;
   var completed = false;
 
@@ -66,15 +66,15 @@
     );
   }
 
-  function loadRuntimeAndFooter() {
+  function loadFingerprintAndFooter() {
     loadScript(
-      'assets/code-labs-page-runtime-v200.js?v=cl-v200-16-code-god-lane',
-      'data-cl-page-runtime-v200',
-      function () { return !!window.CodeLabsPageRuntimeV200; },
+      'assets/code-labs-v104-state-fingerprint-v200.js?v=cl-v200-19-state-fingerprint',
+      'data-cl-v104-state-fingerprint-v200',
+      function () { return !!window.CodeLabsV104StateFingerprintV200; },
       function () {
-        if (window.CodeLabsPageRuntimeV200.run) window.CodeLabsPageRuntimeV200.run();
+        if (window.CodeLabsV104StateFingerprintV200.install) window.CodeLabsV104StateFingerprintV200.install();
         loadScript(
-          'assets/code-labs-footer-buddy-shell-v200.js?v=cl-v200-18-v104-safe-relay',
+          'assets/code-labs-footer-buddy-shell-v200.js?v=cl-v200-19-state-fingerprint',
           'data-cl-footer-buddy-shell-v200',
           function () { return !!window.CodeLabsFooterBuddyShellV200; },
           function () {
@@ -82,6 +82,18 @@
             loadCodeGodLane();
           }
         );
+      }
+    );
+  }
+
+  function loadRuntimeAndFooter() {
+    loadScript(
+      'assets/code-labs-page-runtime-v200.js?v=cl-v200-16-code-god-lane',
+      'data-cl-page-runtime-v200',
+      function () { return !!window.CodeLabsPageRuntimeV200; },
+      function () {
+        if (window.CodeLabsPageRuntimeV200.run) window.CodeLabsPageRuntimeV200.run();
+        loadFingerprintAndFooter();
       }
     );
   }
