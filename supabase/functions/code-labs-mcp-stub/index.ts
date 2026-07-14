@@ -1,9 +1,10 @@
-const VERSION = "Code Labs V104 unified page read-write";
+const VERSION = "Code Labs V104 owner-session-bound page read-write";
 const SUPABASE_URL = "https://xzxqfrvqdgkzwujbkdbk.supabase.co";
 const BASE = SUPABASE_URL + "/functions/v1/code-labs-mcp-stub";
 const PUBLIC_KEY = "sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN";
 const REPO = "trevieisking/stream-bandit";
 const V104_CLAIM = "code-labs-v104";
+const CLIENT_ID = "code-labs-chatgpt-client";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -44,10 +45,8 @@ async function verifySigned(token: string, expectedType: string) {
   return payload;
 }
 async function verifyPkce(payload: AnyRecord, verifier: string) {
-  if (!payload.code_challenge) return true;
-  if (!verifier) return false;
-  if (payload.code_challenge_method === "S256") return b64url(await sha256(verifier)) === payload.code_challenge;
-  return verifier === payload.code_challenge;
+  if (!payload.code_challenge || payload.code_challenge_method !== "S256" || !verifier) return false;
+  return b64url(await sha256(verifier)) === payload.code_challenge;
 }
 function parseParams(req: Request, text: string) {
   if ((req.headers.get("content-type") || "").includes("application/json")) { try { return JSON.parse(text || "{}"); } catch { return {}; } }
@@ -64,32 +63,67 @@ function oauthMetadata() {
     response_modes_supported: ["query"],
     grant_types_supported: ["authorization_code", "refresh_token"],
     token_endpoint_auth_methods_supported: ["none"],
-    code_challenge_methods_supported: ["S256", "plain"],
+    code_challenge_methods_supported: ["S256"],
     scopes_supported: ["code_labs.read", "code_labs.write"],
   };
 }
 async function registerClient(req: Request) {
   const body = await req.json().catch(() => ({}));
-  return json({ client_id: "code-labs-chatgpt-client", client_id_issued_at: now(), redirect_uris: body.redirect_uris || [], token_endpoint_auth_method: "none", grant_types: ["authorization_code", "refresh_token"], response_types: ["code"], scope: "code_labs.read code_labs.write" }, 201);
+  return json({ client_id: CLIENT_ID, client_id_issued_at: now(), redirect_uris: body.redirect_uris || [], token_endpoint_auth_method: "none", grant_types: ["authorization_code", "refresh_token"], response_types: ["code"], scope: "code_labs.read code_labs.write" }, 201);
+}
+async function rest(path: string, options: RequestInit = {}) {
+  const key = serviceKey(); if (!key) throw new Error("Code Labs service key is missing.");
+  const response = await fetch(SUPABASE_URL + "/rest/v1/" + path, { ...options, headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json", ...(options.headers || {}) } });
+  const text = await response.text(); let data: any = null; try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  if (!response.ok) throw new Error(typeof data === "string" ? data.slice(0, 600) : JSON.stringify(data).slice(0, 600));
+  return data;
+}
+async function activeSession() {
+  const cutoff = new Date(Date.now() - 30000).toISOString();
+  const rows = await rest("code_labs_browser_sessions?select=*&status=eq.paired&claimed_by=eq." + encodeURIComponent(V104_CLAIM) + "&last_seen_at=gt." + encodeURIComponent(cutoff) + "&order=last_seen_at.desc&limit=2");
+  if (!Array.isArray(rows) || !rows[0]) throw new Error("No active signed-in Code Labs page is connected to V104. Open one Code Labs page and sign in.");
+  if (rows.length > 1) throw new Error("More than one active V104 page session was found. Keep only the page you want V104 to control visible.");
+  const session = rows[0];
+  if (!session.control_expires_at || new Date(session.control_expires_at).getTime() < Date.now()) throw new Error("The active V104 page session expired. Refresh the Code Labs page.");
+  return session;
+}
+async function approvedBinding() {
+  const session = await activeSession();
+  const ownerId = String(session.owner_id || "");
+  const sessionId = String(session.id || "");
+  if (!ownerId || !sessionId) throw new Error("The active Code Labs page is not bound to an approved owner session.");
+  const owners = await rest("code_labs_owners?select=user_id&user_id=eq." + encodeURIComponent(ownerId) + "&limit=1");
+  if (!Array.isArray(owners) || !owners[0]) throw new Error("The active Code Labs page owner is not approved for V104.");
+  return { session, ownerId, sessionId };
 }
 async function authorize(req: Request) {
-  const url = new URL(req.url); const redirectUri = url.searchParams.get("redirect_uri") || ""; const clientId = url.searchParams.get("client_id") || "";
-  if (!redirectUri || !clientId) return json({ error: "missing_redirect_uri_or_client_id" }, 400);
-  const code = await signPayload({ typ: "code", exp: now() + 300, client_id: clientId, redirect_uri: redirectUri, scope: "code_labs.read code_labs.write", code_challenge: url.searchParams.get("code_challenge") || "", code_challenge_method: url.searchParams.get("code_challenge_method") || "plain", sub: "code-labs-owner" });
+  const url = new URL(req.url);
+  const redirectUri = url.searchParams.get("redirect_uri") || "";
+  const clientId = url.searchParams.get("client_id") || "";
+  const challenge = url.searchParams.get("code_challenge") || "";
+  const challengeMethod = url.searchParams.get("code_challenge_method") || "";
+  if (!redirectUri || clientId !== CLIENT_ID) return json({ error: "invalid_client_or_redirect_uri" }, 400);
+  if (!challenge || challengeMethod !== "S256") return json({ error: "pkce_s256_required" }, 400);
+  const binding = await approvedBinding();
+  const code = await signPayload({ typ: "code", exp: now() + 300, client_id: clientId, redirect_uri: redirectUri, scope: "code_labs.read code_labs.write", code_challenge: challenge, code_challenge_method: "S256", sub: binding.ownerId, owner_id: binding.ownerId, session_id: binding.sessionId });
   const destination = new URL(redirectUri); destination.searchParams.set("code", code); const state = url.searchParams.get("state"); if (state) destination.searchParams.set("state", state); return redirect(destination.toString());
 }
 async function token(req: Request) {
   const params = parseParams(req, await req.text()); const grant = params.grant_type || "authorization_code";
   if (grant === "refresh_token") {
     const old = await verifySigned(String(params.refresh_token || ""), "refresh");
-    return json({ access_token: await signPayload({ typ: "access", exp: now() + 3600, scope: "code_labs.read code_labs.write", sub: old.sub || "code-labs-owner" }), token_type: "Bearer", expires_in: 3600, scope: "code_labs.read code_labs.write" });
+    const binding = await approvedBinding();
+    if (String(old.owner_id || old.sub || "") !== binding.ownerId || String(old.session_id || "") !== binding.sessionId) return json({ error: "owner_session_binding_changed" }, 400);
+    return json({ access_token: await signPayload({ typ: "access", exp: now() + 3600, scope: "code_labs.read code_labs.write", sub: binding.ownerId, owner_id: binding.ownerId, session_id: binding.sessionId }), refresh_token: await signPayload({ typ: "refresh", exp: now() + 1209600, scope: "code_labs.read code_labs.write", sub: binding.ownerId, owner_id: binding.ownerId, session_id: binding.sessionId }), token_type: "Bearer", expires_in: 3600, scope: "code_labs.read code_labs.write" });
   }
   if (grant !== "authorization_code") return json({ error: "unsupported_grant_type" }, 400);
   const code = await verifySigned(String(params.code || ""), "code");
   if (params.redirect_uri && params.redirect_uri !== code.redirect_uri) return json({ error: "redirect_uri_mismatch" }, 400);
   if (params.client_id && params.client_id !== code.client_id) return json({ error: "client_id_mismatch" }, 400);
   if (!(await verifyPkce(code, String(params.code_verifier || "")))) return json({ error: "pkce_verification_failed" }, 400);
-  return json({ access_token: await signPayload({ typ: "access", exp: now() + 3600, scope: "code_labs.read code_labs.write", sub: code.sub || "code-labs-owner" }), refresh_token: await signPayload({ typ: "refresh", exp: now() + 1209600, scope: "code_labs.read code_labs.write", sub: code.sub || "code-labs-owner" }), token_type: "Bearer", expires_in: 3600, scope: "code_labs.read code_labs.write" });
+  const binding = await approvedBinding();
+  if (String(code.owner_id || code.sub || "") !== binding.ownerId || String(code.session_id || "") !== binding.sessionId) return json({ error: "owner_session_binding_changed" }, 400);
+  return json({ access_token: await signPayload({ typ: "access", exp: now() + 3600, scope: "code_labs.read code_labs.write", sub: binding.ownerId, owner_id: binding.ownerId, session_id: binding.sessionId }), refresh_token: await signPayload({ typ: "refresh", exp: now() + 1209600, scope: "code_labs.read code_labs.write", sub: binding.ownerId, owner_id: binding.ownerId, session_id: binding.sessionId }), token_type: "Bearer", expires_in: 3600, scope: "code_labs.read code_labs.write" });
 }
 async function accessPayload(req: Request) {
   const auth = req.headers.get("authorization") || "";
@@ -98,30 +132,15 @@ async function accessPayload(req: Request) {
 }
 async function requireToolAuth(req: Request) {
   const payload = await accessPayload(req);
-  const session = await activeSession();
-  const ownerId = String(session.owner_id || "");
-  if (!ownerId) throw new Error("The active Code Labs page is not bound to an approved owner.");
-  const owners = await rest("code_labs_owners?select=user_id&user_id=eq." + encodeURIComponent(ownerId) + "&limit=1");
-  if (!Array.isArray(owners) || !owners[0]) throw new Error("The active Code Labs page owner is not approved for V104.");
-  return { payload, session, owner_id: ownerId };
-}
-
-async function rest(path: string, options: RequestInit = {}) {
-  const key = serviceKey(); if (!key) throw new Error("Code Labs service key is missing.");
-  const response = await fetch(SUPABASE_URL + "/rest/v1/" + path, { ...options, headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json", ...(options.headers || {}) } });
-  const text = await response.text(); let data: any = null; try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-  if (!response.ok) throw new Error(typeof data === "string" ? data.slice(0, 600) : JSON.stringify(data).slice(0, 600));
-  return data;
+  const binding = await approvedBinding();
+  if (String(payload.owner_id || payload.sub || "") !== binding.ownerId || String(payload.session_id || "") !== binding.sessionId) throw new Error("OAuth token is not bound to the active approved Code Labs owner session.");
+  return { payload, session: binding.session, owner_id: binding.ownerId, session_id: binding.sessionId };
 }
 function safeObject(value: unknown, max = 350000) { const text = JSON.stringify(value || {}); if (text.length > max) throw new Error("Payload is too large."); return JSON.parse(text); }
 function safePath(path: string) { const p = String(path || "").trim().replace(/^\/+/, ""); if (!p || p.includes("..") || p.includes("\\") || p.startsWith(".")) throw new Error("Unsafe path"); if (/\.(env|pem|key|p12|pfx)$/i.test(p) || p.startsWith(".github/") || p.toLowerCase().includes("secrets")) throw new Error("Secret-like path blocked"); return p; }
 function safeBranch(branch: string) { const b = String(branch || "").trim(); if (!/^[A-Za-z0-9._/-]{3,80}$/.test(b)) throw new Error("Unsafe branch name"); if (["main", "master", "gh-pages", "production", "live"].includes(b.toLowerCase())) throw new Error("Protected branch writes are blocked"); return b; }
 function isDangerous(value: unknown) { return /(delete|remove|trash|merge|publish|deploy|send|submit|approve|reject|production|main branch)/i.test(String(value || "")); }
-
-async function readTable(table: string, selectText: string, limit: number) {
-  const rows = await rest(table + "?select=" + encodeURIComponent(selectText) + "&order=created_at.desc&limit=" + String(limit));
-  return Array.isArray(rows) ? rows : [];
-}
+async function readTable(table: string, selectText: string, limit: number) { const rows = await rest(table + "?select=" + encodeURIComponent(selectText) + "&order=created_at.desc&limit=" + String(limit)); return Array.isArray(rows) ? rows : []; }
 async function getContext(limit = 5) {
   const cap = Math.max(1, Math.min(Number(limit || 5), 25));
   const [projects, jobs, packets, tests, audit] = await Promise.all([
@@ -135,16 +154,6 @@ async function getContext(limit = 5) {
 }
 function validateCodeLabsUrl(rawUrl: string) { const u = new URL(String(rawUrl || "")); if (u.protocol !== "https:" || u.hostname !== "chatterfriendsstreambandit.co.uk" || !u.pathname.startsWith("/code-labs/")) throw new Error("Only public Code Labs HTTPS URLs are allowed"); u.username = ""; u.password = ""; u.hash = ""; return u.toString(); }
 async function readCodeLabsUrl(args: AnyRecord) { const url = validateCodeLabsUrl(args.url); const max = Math.max(1000, Math.min(Number(args.max_chars || 20000), 60000)); const response = await fetch(url, { redirect: "follow" }); const source = await response.text(); return { ok: response.ok, version: VERSION, tool: "read_code_labs_url", read_only: true, url, status: response.status, content_type: response.headers.get("content-type") || "", chars_total: source.length, chars_returned: Math.min(source.length, max), source_text: source.length > max ? source.slice(0, max) + "\n...[trimmed]" : source }; }
-
-async function activeSession() {
-  const cutoff = new Date(Date.now() - 30000).toISOString();
-  const rows = await rest("code_labs_browser_sessions?select=*&status=eq.paired&claimed_by=eq." + encodeURIComponent(V104_CLAIM) + "&last_seen_at=gt." + encodeURIComponent(cutoff) + "&order=last_seen_at.desc&limit=2");
-  if (!Array.isArray(rows) || !rows[0]) throw new Error("No active signed-in Code Labs page is connected to V104. Open one Code Labs page and sign in.");
-  if (rows.length > 1) throw new Error("More than one active V104 page session was found. Keep only the page you want V104 to control visible.");
-  const session = rows[0];
-  if (!session.control_expires_at || new Date(session.control_expires_at).getTime() < Date.now()) throw new Error("The active V104 page session expired. Refresh the Code Labs page.");
-  return session;
-}
 async function readLivePage() { const session = await activeSession(); return { ok: true, version: VERSION, tool: "read_live_code_labs_page", session_id: session.id, page: session.page_name, page_url: session.page_url, page_fingerprint: session.page_fingerprint, last_seen_at: session.last_seen_at, page_snapshot: session.page_snapshot, last_receipt: session.last_receipt }; }
 async function enqueue(command: AnyRecord, dangerous = false) {
   const session = await activeSession();
@@ -158,7 +167,6 @@ async function writeSection(args: AnyRecord) { const section = String(args.secti
 async function runAction(args: AnyRecord) { const action = String(args.action_key || "").slice(0, 220); if (!action) throw new Error("action_key is required."); const dangerous = isDangerous(action); if (dangerous && !(args.confirmed === true && args.allow_dangerous === true)) throw new Error("This action requires confirmed=true and allow_dangerous=true."); return await enqueue({ type: "run_action", expected_page_fingerprint: String(args.expected_page_fingerprint || ""), action, confirmed: args.confirmed === true, allow_dangerous: args.allow_dangerous === true }, dangerous); }
 async function undo(args: AnyRecord) { return await enqueue({ type: "undo", expected_page_fingerprint: String(args.expected_page_fingerprint || "") }); }
 async function readReceipt(args: AnyRecord) { const session = await activeSession(); const commandId = String(args.command_id || ""); if (!commandId) return { ok: true, version: VERSION, tool: "read_live_code_labs_receipt", session_id: session.id, receipt: session.last_receipt }; const rows = await rest("code_labs_browser_commands?select=*&id=eq." + encodeURIComponent(commandId) + "&session_id=eq." + encodeURIComponent(session.id) + "&limit=1"); if (!rows[0]) throw new Error("Command receipt not found."); return { ok: true, version: VERSION, command_id: commandId, status: rows[0].status, receipt: rows[0].receipt, error: rows[0].error }; }
-
 async function saveWriteRequest(args: AnyRecord) {
   if (args.repo !== REPO) throw new Error("repo must be trevieisking/stream-bandit");
   if (args.confirm_branch_pr_only !== true) throw new Error("confirm_branch_pr_only must be true");
@@ -167,7 +175,6 @@ async function saveWriteRequest(args: AnyRecord) {
   const saved = await rest("code_labs_write_requests", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(row) });
   return { ok: true, version: VERSION, tool: "save_code_labs_write_request", wrote_database: true, wrote_github: false, opened_pr: false, deleted_anything: false, request_id: saved?.[0]?.id || null, status: saved?.[0]?.status || "queued", repo: row.repo, path: row.path, branch: row.branch, action: row.action };
 }
-
 function toolList() {
   const fingerprint = { type: "string", description: "Exact page fingerprint from read_live_code_labs_page." };
   return [
@@ -194,7 +201,6 @@ async function callTool(name: string, args: AnyRecord) {
   if (name === "save_code_labs_write_request") return await saveWriteRequest(args);
   throw new Error("Unknown tool.");
 }
-
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const url = new URL(req.url); const path = url.pathname;
