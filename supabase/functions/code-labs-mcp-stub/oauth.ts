@@ -1,9 +1,7 @@
 export const SUPABASE_URL = "https://xzxqfrvqdgkzwujbkdbk.supabase.co";
 export const BASE = SUPABASE_URL + "/functions/v1/code-labs-mcp-stub";
-export const PUBLIC_KEY = "sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN";
 export const SCOPE = "code_labs.read code_labs.write";
 export const CLAIM = "code-labs-v104";
-export const APPROVAL_PAGE = "https://chatterfriendsstreambandit.co.uk/code-labs/v104-authorize.html";
 export type Row = Record<string, any>;
 export type Binding = { owner_id: string; session_id: string; session: Row };
 
@@ -50,6 +48,24 @@ export async function register(req: Request) {
   const client_id = await sign({ typ: "client", exp: now() + 31536000, redirect_uris: uris });
   return { client_id, client_id_issued_at: now(), client_id_expires_at: now() + 31536000, redirect_uris: uris, token_endpoint_auth_method: "none", grant_types: ["authorization_code", "refresh_token"], response_types: ["code"], scope: SCOPE };
 }
+export async function exactSession(owner_id: string, session_id: string) {
+  const cutoff = new Date(Date.now() - 30000).toISOString();
+  const rows = await rest("code_labs_browser_sessions?select=*&id=eq." + encodeURIComponent(session_id) + "&owner_id=eq." + encodeURIComponent(owner_id) + "&status=eq.paired&claimed_by=eq." + encodeURIComponent(CLAIM) + "&last_seen_at=gt." + encodeURIComponent(cutoff) + "&limit=1");
+  const session = Array.isArray(rows) ? rows[0] : null;
+  if (!session) throw new Error("Open one signed-in Code Labs page and keep it visible.");
+  if (!session.control_expires_at || new Date(session.control_expires_at).getTime() < Date.now()) throw new Error("The active V104 Code Labs page session expired. Refresh the page.");
+  return session;
+}
+async function activeSession(): Promise<Binding> {
+  const cutoff = new Date(Date.now() - 30000).toISOString();
+  const rows = await rest("code_labs_browser_sessions?select=*&status=eq.paired&claimed_by=eq." + encodeURIComponent(CLAIM) + "&last_seen_at=gt." + encodeURIComponent(cutoff) + "&control_expires_at=gt." + encodeURIComponent(new Date().toISOString()) + "&order=last_seen_at.desc&limit=2");
+  if (!Array.isArray(rows) || !rows[0]) throw new Error("Open one signed-in Code Labs page and keep it visible.");
+  if (rows.length > 1) throw new Error("Keep only one V104 Code Labs page visible while using the connector.");
+  const session = rows[0];
+  const owner_id = String(session.owner_id || "");
+  if (!owner_id) throw new Error("The active V104 page is not signed in to the Code Labs owner account.");
+  return { owner_id, session_id: String(session.id), session };
+}
 export async function authorize(req: Request) {
   const u = new URL(req.url);
   const client_id = u.searchParams.get("client_id") || "";
@@ -58,52 +74,20 @@ export async function authorize(req: Request) {
   const client = await verify(client_id, "client");
   if (!Array.isArray(client.redirect_uris) || !client.redirect_uris.includes(redirect_uri)) throw new Error("redirect_uri_not_registered");
   if (!challenge || u.searchParams.get("code_challenge_method") !== "S256") throw new Error("pkce_s256_required");
-  const request = await sign({ typ: "approval_request", exp: now() + 300, client_id, redirect_uri, code_challenge: challenge, state: u.searchParams.get("state") || "" });
-  const target = new URL(APPROVAL_PAGE); target.searchParams.set("request", request); return target.toString();
-}
-async function user(req: Request) {
-  const auth = req.headers.get("authorization") || "";
-  if (!auth.startsWith("Bearer ")) throw new Error("Sign in to Code Labs first.");
-  const r = await fetch(SUPABASE_URL + "/auth/v1/user", { headers: { apikey: PUBLIC_KEY, Authorization: auth } });
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok || !data.id) throw new Error("Your Code Labs sign-in is not valid.");
-  return data;
-}
-export async function exactSession(owner_id: string, session_id: string) {
-  const cutoff = new Date(Date.now() - 30000).toISOString();
-  const rows = await rest("code_labs_browser_sessions?select=*&id=eq." + encodeURIComponent(session_id) + "&owner_id=eq." + encodeURIComponent(owner_id) + "&status=eq.paired&claimed_by=eq." + encodeURIComponent(CLAIM) + "&last_seen_at=gt." + encodeURIComponent(cutoff) + "&limit=1");
-  const session = Array.isArray(rows) ? rows[0] : null;
-  if (!session) throw new Error("The approved Code Labs page is no longer active.");
-  if (!session.control_expires_at || new Date(session.control_expires_at).getTime() < Date.now()) throw new Error("The approved Code Labs page session expired.");
-  return session;
-}
-async function ownerSession(owner_id: string) {
-  const cutoff = new Date(Date.now() - 30000).toISOString();
-  const rows = await rest("code_labs_browser_sessions?select=*&owner_id=eq." + encodeURIComponent(owner_id) + "&status=eq.paired&claimed_by=eq." + encodeURIComponent(CLAIM) + "&last_seen_at=gt." + encodeURIComponent(cutoff) + "&order=last_seen_at.desc&limit=2");
-  if (!Array.isArray(rows) || !rows[0]) throw new Error("Open one signed-in Code Labs page before approving ChatGPT.");
-  if (rows.length > 1) throw new Error("Keep exactly one V104 Code Labs page visible while approving ChatGPT.");
-  return await exactSession(owner_id, String(rows[0].id));
-}
-export async function approve(req: Request) {
-  const me = await user(req); const owner_id = String(me.id);
-  const owners = await rest("code_labs_owners?select=user_id&user_id=eq." + encodeURIComponent(owner_id) + "&limit=1");
-  if (!Array.isArray(owners) || !owners[0]) throw new Error("This Code Labs account is not an approved owner.");
-  const body = await req.json().catch(() => ({})); const request = await verify(String(body.request || ""), "approval_request");
-  const client = await verify(String(request.client_id || ""), "client");
-  if (!Array.isArray(client.redirect_uris) || !client.redirect_uris.includes(String(request.redirect_uri || ""))) throw new Error("The OAuth redirect is not registered.");
-  const session = await ownerSession(owner_id); const code = randomCode();
-  await rest("code_labs_oauth_grants", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ code_hash: await hex(code), owner_id, session_id: session.id, client_id: request.client_id, redirect_uri: request.redirect_uri, code_challenge: request.code_challenge, scope: SCOPE, expires_at: new Date(Date.now() + 120000).toISOString() }) });
-  const target = new URL(String(request.redirect_uri)); target.searchParams.set("code", code); if (request.state) target.searchParams.set("state", String(request.state));
-  return { ok: true, redirect_url: target.toString(), owner_id, session_id: session.id };
+  const binding = await activeSession();
+  const code = randomCode();
+  await rest("code_labs_oauth_grants", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ code_hash: await hex(code), owner_id: binding.owner_id, session_id: binding.session_id, client_id, redirect_uri, code_challenge: challenge, scope: SCOPE, expires_at: new Date(Date.now() + 120000).toISOString() }) });
+  const target = new URL(redirect_uri); target.searchParams.set("code", code); const state = u.searchParams.get("state"); if (state) target.searchParams.set("state", state);
+  return target.toString();
 }
 function params(req: Request, text: string) { if ((req.headers.get("content-type") || "").includes("application/json")) { try { return JSON.parse(text || "{}"); } catch { return {}; } } return Object.fromEntries(new URLSearchParams(text)); }
-async function issue(owner_id: string, session_id: string) {
-  await exactSession(owner_id, session_id);
-  return { access_token: await sign({ typ: "access", exp: now() + 3600, scope: SCOPE, sub: owner_id, owner_id, session_id }), refresh_token: await sign({ typ: "refresh", exp: now() + 1209600, scope: SCOPE, sub: owner_id, owner_id, session_id }), token_type: "Bearer", expires_in: 3600, scope: SCOPE };
+async function issue(owner_id?: string, session_id?: string) {
+  const bound = owner_id && session_id ? { owner_id, session_id, session: await exactSession(owner_id, session_id) } : await activeSession();
+  return { access_token: await sign({ typ: "access", exp: now() + 3600, scope: SCOPE, sub: bound.owner_id, owner_id: bound.owner_id, session_id: bound.session_id }), refresh_token: await sign({ typ: "refresh", exp: now() + 1209600, scope: SCOPE, sub: bound.owner_id, owner_id: bound.owner_id, session_id: bound.session_id }), token_type: "Bearer", expires_in: 3600, scope: SCOPE };
 }
 export async function token(req: Request) {
   const p = params(req, await req.text()); const grant = String(p.grant_type || "authorization_code");
-  if (grant === "refresh_token") { const old = await verify(String(p.refresh_token || ""), "refresh"); return await issue(String(old.owner_id || ""), String(old.session_id || "")); }
+  if (grant === "refresh_token") { const old = await verify(String(p.refresh_token || ""), "refresh"); return await issue(String(old.owner_id || old.sub || ""), String(old.session_id || "")); }
   if (grant !== "authorization_code") throw new Error("unsupported_grant_type");
   const code_hash = await hex(String(p.code || ""));
   const rows = await rest("code_labs_oauth_grants?select=*&code_hash=eq." + encodeURIComponent(code_hash) + "&used_at=is.null&expires_at=gt." + encodeURIComponent(new Date().toISOString()) + "&limit=1");
@@ -119,6 +103,6 @@ export async function token(req: Request) {
 export async function binding(req: Request): Promise<Binding> {
   const auth = req.headers.get("authorization") || ""; if (!auth.startsWith("Bearer ")) throw new Error("Missing bearer token.");
   const payload = await verify(auth.slice(7), "access"); const owner_id = String(payload.owner_id || payload.sub || ""); const session_id = String(payload.session_id || "");
-  if (!owner_id || !session_id) throw new Error("OAuth token is not bound to a Code Labs owner session.");
+  if (!owner_id || !session_id) return await activeSession();
   return { owner_id, session_id, session: await exactSession(owner_id, session_id) };
 }
