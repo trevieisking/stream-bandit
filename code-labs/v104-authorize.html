@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Approve Code Labs V104</title>
+<meta name="description" content="Approve one owner-bound Code Labs V104 connection for the currently active page.">
+<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
+<link rel="stylesheet" href="assets/code-labs.css?v=cl-v200-owner-bound-oauth">
+<style>
+body{min-height:100vh}.main{max-width:880px;margin:0 auto;padding:24px}.hero,.panel{margin-bottom:16px}.status{font-weight:800}.status.good{color:#55d98a}.status.bad{color:#ff7d8b}.requestBox{overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn[disabled]{opacity:.55;cursor:not-allowed}@media(max-width:720px){.main{padding:14px}.hero{padding:18px}.actions .btn{width:100%}}
+</style>
+</head>
+<body data-page="v104-authorize">
+<main class="main">
+<section class="hero">
+<div>
+<span class="pill">Owner-bound V104 approval</span>
+<h1>Approve Buddy for this Code Labs page.</h1>
+<p>This approval binds ChatGPT to your signed-in Code Labs owner account and the one active V104 page session. It does not give the browser a GitHub token and it cannot write directly to <code>main</code>.</p>
+</div>
+</section>
+<section class="panel">
+<h2>Connection check</h2>
+<p id="status" class="status">Checking your Code Labs sign-in…</p>
+<p id="detail">Keep exactly one signed-in Code Labs page open and visible.</p>
+<div class="actions">
+<button id="approve" class="btn primary" type="button" disabled>Approve this connection</button>
+<button id="cancel" class="btn ghost" type="button">Cancel</button>
+</div>
+</section>
+<section class="panel">
+<h2>Safety boundary</h2>
+<ul>
+<li>The authorization code expires after five minutes.</li>
+<li>The access token is tied to the same owner ID and page-session ID.</li>
+<li>Every tool call rechecks that the page is visible, fresh and still approved.</li>
+<li>GitHub work remains branch and pull-request only.</li>
+</ul>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+'use strict';
+var URL='https://xzxqfrvqdgkzwujbkdbk.supabase.co';
+var PUB='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
+var APPROVE=URL+'/functions/v1/code-labs-mcp-stub/oauth/approve';
+var request=new URLSearchParams(location.search).get('request')||'';
+var status=document.getElementById('status');
+var detail=document.getElementById('detail');
+var approve=document.getElementById('approve');
+var cancel=document.getElementById('cancel');
+var sb=window.CL_SB||window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+window.CL_SB=sb;
+function show(text,kind,more){status.textContent=text;status.className='status '+(kind||'');if(more)detail.textContent=more;}
+async function session(){var result=await sb.auth.getSession();return result&&result.data&&result.data.session||null;}
+async function ready(){
+ if(!request){show('This approval request is missing or expired.','bad','Return to ChatGPT and reconnect Code Labs.');return;}
+ var current=await session();
+ if(!current||!current.access_token){show('Sign in to Code Labs first.','bad','Open the normal Code Labs sign-in, then return to this approval page.');return;}
+ show('Signed-in owner found.','good','Keep one Code Labs page open and visible, then approve.');approve.disabled=false;
+}
+approve.onclick=async function(){
+ approve.disabled=true;show('Approving the exact live page…','', 'Do not close your active Code Labs page.');
+ try{
+  var current=await session();if(!current)throw new Error('Your Code Labs sign-in expired.');
+  var response=await fetch(APPROVE,{method:'POST',headers:{Authorization:'Bearer '+current.access_token,apikey:PUB,'Content-Type':'application/json'},body:JSON.stringify({request:request})});
+  var data=await response.json().catch(function(){return {};});
+  if(!response.ok||!data.ok||!data.redirect_url)throw new Error(data.error||'V104 approval failed.');
+  show('Approved. Returning to ChatGPT…','good','The token is now bound to this owner and page session.');
+  location.replace(data.redirect_url);
+ }catch(error){show('Approval stopped.','bad',String(error&&error.message||error));approve.disabled=false;}
+};
+cancel.onclick=function(){show('Connection cancelled.','bad','You may close this tab and reconnect from ChatGPT later.');approve.disabled=true;};
+ready().catch(function(error){show('Approval page could not start.','bad',String(error&&error.message||error));});
+})();
+</script>
+</body>
+</html>
