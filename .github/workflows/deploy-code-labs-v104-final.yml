@@ -3,6 +3,7 @@ name: Deploy Code Labs V104 Final
 on:
   push:
     branches:
+      - main
       - deploy/code-labs-v104-final
     paths:
       - .github/workflows/deploy-code-labs-v104-final.yml
