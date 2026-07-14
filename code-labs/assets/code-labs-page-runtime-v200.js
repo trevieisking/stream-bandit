@@ -3,7 +3,7 @@
 */
 (function(){
 'use strict';
-var VERSION='V201.1-full-page-roles';
+var VERSION='V201.2-full-page-roles';
 var ROLES={
 'index':{step:1,title:'Home'},'setup':{step:2,title:'Setup'},'project-picker':{step:3,title:'Project Picker'},
 'file-lab':{step:4,title:'File Lab'},'saved-files':{step:5,title:'Saved Files'},'rescue-room':{step:6,title:'Rescue Room'},
@@ -28,12 +28,14 @@ if(id==='patch-lab'){source=q('#plIn')&&q('#plIn').value||'';fixed=q('#plOut')&&
 if(id==='publish-prep'){path=q('#gwPath')&&q('#gwPath').value||path;fixed=q('#gwFixed')&&q('#gwFixed').value||''}
 if(source.trim())state.file.currentCode=source;if(fixed.trim())state.file.fixedCode=fixed;if(path){state.file.path=path;state.file.filename=path.split('/').pop()||state.file.filename;state.file.githubSource=state.file.githubSource||{};state.file.githubSource.path=path}state.file.lastVisibleSyncPage=id;state.file.lastVisibleSyncAt=new Date().toISOString();localStorage.setItem('codeLabsV1State',JSON.stringify(state));return state}
 function run(){var id=page(),role=ROLES[id];document.documentElement.setAttribute('data-cl-page-runtime-v201',VERSION);if(role){if(role.step)document.documentElement.setAttribute('data-cl-workflow-step',String(role.step));var crumb=q('.crumbs b');if(crumb)crumb.textContent=role.title;}
-load('assets/code-labs-workflow-clarity-v130.js?v=cl-v201','data-cl-workflow-clarity-v130');
-load('assets/code-labs-page-completion-v139.js?v=cl-v201','data-cl-page-completion-v139');
-load('assets/code-labs-page-polish-v172.js?v=cl-v201','data-cl-page-polish-v172');
-if(id==='saved-files')load('assets/code-labs-saved-files-repo-puller-v201.js?v=cl-v201','data-cl-saved-files-repo-puller-v201');
-load('assets/code-labs-current-file-overwrite-v201.js?v=cl-v201','data-cl-current-file-overwrite-v201');
-document.addEventListener('input',function(){syncVisibleEditor();},{capture:true});document.addEventListener('change',function(){syncVisibleEditor();},{capture:true});return true}
+load('assets/code-labs-workflow-clarity-v130.js?v=cl-v201-2','data-cl-workflow-clarity-v130');
+load('assets/code-labs-page-completion-v139.js?v=cl-v201-2','data-cl-page-completion-v139');
+load('assets/code-labs-page-polish-v172.js?v=cl-v201-2','data-cl-page-polish-v172');
+if(id==='saved-files')load('assets/code-labs-saved-files-repo-puller-v201.js?v=cl-v201-2','data-cl-saved-files-repo-puller-v201');
+load('assets/code-labs-current-file-overwrite-v201.js?v=cl-v201-2','data-cl-current-file-overwrite-v201');
+load('assets/code-labs-current-file-v104-overwrite-v201.js?v=cl-v201-2','data-cl-current-file-v104-overwrite-v201');
+load('assets/code-labs-history-overwrite-compat-v201.js?v=cl-v201-2','data-cl-history-overwrite-compat-v201');
+document.addEventListener('input',syncVisibleEditor,true);document.addEventListener('change',syncVisibleEditor,true);return true}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();setTimeout(run,350);setTimeout(run,1200);
 window.CodeLabsPageRuntimeV201={version:VERSION,roles:ROLES,isFullFile:isFullFile,syncVisibleEditor:syncVisibleEditor,run:run};window.CodeLabsPageRuntimeV200=window.CodeLabsPageRuntimeV201;
 })();
