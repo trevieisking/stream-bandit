@@ -1,0 +1,33 @@
+name: Deploy Code Labs V104 Final
+
+on:
+  push:
+    branches:
+      - deploy/code-labs-v104-final
+    paths:
+      - .github/workflows/deploy-code-labs-v104-final.yml
+      - supabase/functions/code-labs-mcp-stub/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-code-labs-v104-final
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_ID: xzxqfrvqdgkzwujbkdbk
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Deploy owner-approved exact-session V104 connector
+        run: supabase functions deploy code-labs-mcp-stub --project-ref "$PROJECT_ID" --no-verify-jwt
