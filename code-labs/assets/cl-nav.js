@@ -33,7 +33,7 @@ var TOOLS=[
 ];
 function q(s,r){return(r||document).querySelector(s)}
 function page(){return(document.body&&document.body.getAttribute('data-page'))||location.pathname.split('/').pop().replace(/\.html?$/i,'')||'index'}
-function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]})}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function active(href){return page()+'.html'===href||(page()==='index'&&href==='index.html')}
 function link(item,i){var a=document.createElement('a');a.href=item[0];a.setAttribute('data-step',String(i+1));if(active(item[0]))a.className='active';a.innerHTML='<span>'+esc(item[1])+'</span><div>'+(i+1)+'. '+esc(item[2])+'<small>'+esc(item[3])+'</small></div>';return a}
 function nav(){var n=q('.nav');if(!n)return false;if(n.getAttribute('data-cl-nav-owner')===VERSION)return true;n.innerHTML='';LINKS.forEach(function(item,i){n.appendChild(link(item,i))});n.setAttribute('data-cl-nav-owner',VERSION);n.setAttribute('aria-label','Complete Code Labs workflow');return true}
