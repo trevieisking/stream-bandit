@@ -147,6 +147,10 @@ begin
     raise exception 'This live Code Labs page session is not valid for the signed-in owner.';
   end if;
 
+  if v_session.claimed_by is not null and v_session.claimed_by <> 'code-labs-v104' then
+    raise exception 'This page session is already owned by another connector.';
+  end if;
+
   if v_session.status not in ('pairing', 'paired') then
     raise exception 'Create a fresh live Code Labs page session first.';
   end if;
@@ -173,7 +177,12 @@ begin
       paired_at = coalesce(paired_at, now()),
       updated_at = now(),
       last_seen_at = now()
-  where id = v_session.id;
+  where id = v_session.id
+    and (claimed_by is null or claimed_by = 'code-labs-v104');
+
+  if not found then
+    raise exception 'This page session is already owned by another connector.';
+  end if;
 
   return jsonb_build_object(
     'ok', true,
