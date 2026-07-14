@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - rebuild/code-labs-v201-restore-full-pages
     paths:
       - .github/workflows/deploy-code-labs-v104-final.yml
       - supabase/functions/code-labs-mcp-stub/**
-      - supabase/functions/code-labs-browser-control/**
   workflow_dispatch:
 
 permissions:
@@ -31,7 +29,5 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
-      - name: Deploy V104 connector
+      - name: Deploy tool-only V104 connector
         run: supabase functions deploy code-labs-mcp-stub --project-ref "$PROJECT_ID" --no-verify-jwt
-      - name: Deploy no-login V104 browser relay
-        run: supabase functions deploy code-labs-browser-control --project-ref "$PROJECT_ID" --no-verify-jwt
