@@ -120,12 +120,7 @@
     var main = mainRoot();
     if (!main || observer) return;
     observer = new MutationObserver(schedule);
-    observer.observe(main, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class', 'hidden', 'aria-selected']
-    });
+    observer.observe(main, { childList: true });
   }
 
   function boot() {
