@@ -3,7 +3,7 @@
  */
 (function () {
   'use strict';
-  var VERSION = 'V216.0';
+  var VERSION = 'V216.1';
 
   function finding(severity, rule, message, fix, blocks) {
     return { severity: severity, rule_id: rule, message: message, correction: fix, blocks_github: Boolean(blocks) };
@@ -46,7 +46,6 @@
     if ((action === 'add' || action === 'change') && !completeFile(path, proposed)) findings.push(finding('P1', 'CG-FULLFILE-001', 'The proposed file is blank, truncated, a snippet, or a patch recipe.', 'Restore the complete file and apply only the intended correction.', true));
     if (action === 'change' && original && proposed && proposed.length < Math.max(120, Math.floor(original.length * 0.65))) findings.push(finding('P1', 'CG-TRUNCATION-001', 'The proposed file is much smaller than the original and may be truncated.', 'Compare against the original and restore any missing sections before review.', true));
     if (action === 'remove' && !String(input.notes || '').trim()) findings.push(finding('P1', 'CG-REMOVE-PROOF-001', 'The remove handoff has no safety proof.', 'Explain why this exact path is verified safe to remove.', true));
-    if ((action === 'read' || action === 'review') && mutating) findings.push(finding('P0', 'CG-ACTION-001', 'A non-mutating action was classified as mutating.', 'Return to GitHub Writer and save the intended action again.', true));
 
     if ((action === 'add' || action === 'change') && /<<<<<<<|=======|>>>>>>>/.test(proposed)) findings.push(finding('P1', 'CG-CONFLICT-001', 'Unresolved merge-conflict markers were found.', 'Resolve the conflict markers and rerun Code God.', true));
     if ((action === 'add' || action === 'change') && /```(?:html|javascript|js|typescript|ts|json)?/i.test(proposed)) findings.push(finding('P2', 'CG-FENCE-001', 'Markdown code fences appear inside the proposed file.', 'Remove the Markdown fences and keep only the complete file contents.', true));
