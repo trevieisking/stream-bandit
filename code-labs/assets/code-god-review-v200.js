@@ -1,9 +1,9 @@
-/* Code God Review V218
+/* Code God Review V219
    Read-only pre-commit analysis for the Buddy lane.
  */
 (function () {
   'use strict';
-  var VERSION = 'V218.1';
+  var VERSION = 'V219.0';
 
   function finding(severity, rule, message, fix, blocks) {
     return { severity: severity, rule_id: rule, message: message, correction: fix, blocks_github: Boolean(blocks) };
@@ -36,10 +36,21 @@
     var sourceRepo = String(input.source_repo || '');
     var path = String(input.path || '');
     var original = String(input.original || '');
-    var proposed = String(input.proposed || '');
+    var proposed = input.latest_handoff_body_bound ? String(input.latest_handoff_proposed || '') : String(input.proposed || '');
     var branch = String(input.request_branch || '');
     var mutating = action === 'add' || action === 'change' || action === 'remove';
     var requiresSource = action === 'read' || action === 'change' || action === 'remove';
+    var latestPresent = Boolean(input.latest_handoff_present);
+    var latestAction = actionOf({ action: input.latest_handoff_action });
+    var latestRepo = String(input.latest_handoff_repo || '');
+    var latestPath = String(input.latest_handoff_path || '');
+    var latestBranch = String(input.latest_handoff_branch || '');
+    var selectedMatchesLatest = !latestPresent || (
+      action === latestAction && repo === latestRepo && path === latestPath && branch === latestBranch
+    );
+
+    if (latestPresent && !selectedMatchesLatest) findings.push(finding('P1', 'CG-HANDOFF-STALE-001', 'Code God selected an older saved handoff instead of the newest request.', 'Return to Repo Desk or GitHub Writer, complete the newest request, and rerun Code God.', true));
+    if (latestPresent && !input.latest_handoff_complete) findings.push(finding('P1', 'CG-HANDOFF-INCOMPLETE-001', 'The newest saved repository handoff is incomplete.', 'Complete the newest action, repository, target path, required branch, and remove proof before review.', true));
 
     if (requiresSource && !sourceRepo) findings.push(finding('P1', 'CG-IDENTITY-004', 'The loaded review source has no verified repository identity.', 'Reload the complete source directly from the selected GitHub repository, then rerun Code God.', true));
     else if (sourceRepo && repo && sourceRepo !== repo) findings.push(finding('P1', 'CG-IDENTITY-003', 'The loaded source repository does not match the saved handoff repository.', 'Reload the complete source from the same repository selected for the handoff, then rerun Code God.', true));
@@ -59,7 +70,7 @@
 
     var blocking = findings.some(function (item) { return item.blocks_github; });
     var outcome = blocking ? (findings.some(function (item) { return item.severity === 'P0'; }) ? 'BLOCK' : 'FIX_FIRST') : 'PASS';
-    return { tool: 'code_god_review', version: VERSION, outcome: outcome, action: action, repo: repo, source_repo: sourceRepo, path: path, saved_file_id: input.saved_file_id || '', original_characters: original.length, proposed_characters: proposed.length, findings: findings, checks_run: ['action-scope', 'source-repository-identity', 'identity', 'full-file-integrity', 'json-syntax', 'truncation', 'remove-proof', 'conflicts', 'secret-scan', 'timer-scan', 'duplicate-save-scan', 'branch-safety'], created_at: new Date().toISOString(), wrote_database: false, wrote_github: false, opened_pr: false };
+    return { tool: 'code_god_review', version: VERSION, outcome: outcome, action: action, repo: repo, source_repo: sourceRepo, path: path, saved_file_id: input.saved_file_id || '', original_characters: original.length, proposed_characters: proposed.length, findings: findings, checks_run: ['action-scope', 'newest-handoff', 'handoff-body-binding', 'source-repository-identity', 'identity', 'full-file-integrity', 'json-syntax', 'truncation', 'remove-proof', 'conflicts', 'secret-scan', 'timer-scan', 'duplicate-save-scan', 'branch-safety'], created_at: new Date().toISOString(), wrote_database: false, wrote_github: false, opened_pr: false };
   }
 
   window.CodeGodReviewV200 = { version: VERSION, review: review, completeFile: completeFile };
