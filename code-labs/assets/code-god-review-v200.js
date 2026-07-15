@@ -1,9 +1,9 @@
-/* Code God Review V216
+/* Code God Review V218
    Read-only pre-commit analysis for the Buddy lane.
  */
 (function () {
   'use strict';
-  var VERSION = 'V216.1';
+  var VERSION = 'V218.1';
 
   function finding(severity, rule, message, fix, blocks) {
     return { severity: severity, rule_id: rule, message: message, correction: fix, blocks_github: Boolean(blocks) };
@@ -15,6 +15,9 @@
     if (/BEGIN PATCH|Find:\s*\n|Replace with:/i.test(value)) return false;
     if (/^(?:diff --git |Index: |@@\s*-\d+)/m.test(value)) return false;
     if (/\.html?$/i.test(path || '') && !/<!doctype\s+html/i.test(value) && !/<html[\s>]/i.test(value)) return false;
+    if (/\.json$/i.test(path || '')) {
+      try { JSON.parse(value); } catch (error) { return false; }
+    }
     return true;
   }
 
@@ -43,7 +46,7 @@
     if (repo && repo !== 'trevieisking/stream-bandit') findings.push(finding('P1', 'CG-IDENTITY-001', 'The selected repository is not the approved repository.', 'Reload the correct saved file and repository before continuing.', true));
     if (!path || path.indexOf('..') >= 0) findings.push(finding('P1', 'CG-IDENTITY-002', 'The target file path is missing or unsafe.', 'Save the exact repository-relative path without traversal segments.', true));
 
-    if ((action === 'add' || action === 'change') && !completeFile(path, proposed)) findings.push(finding('P1', 'CG-FULLFILE-001', 'The proposed file is blank, truncated, a snippet, or a patch recipe.', 'Restore the complete file and apply only the intended correction.', true));
+    if ((action === 'add' || action === 'change') && !completeFile(path, proposed)) findings.push(finding('P1', 'CG-FULLFILE-001', 'The proposed file is blank, malformed, truncated, a snippet, or a patch recipe.', 'Restore a syntactically valid complete file and apply only the intended correction.', true));
     if (action === 'change' && original && proposed && proposed.length < Math.max(120, Math.floor(original.length * 0.65))) findings.push(finding('P1', 'CG-TRUNCATION-001', 'The proposed file is much smaller than the original and may be truncated.', 'Compare against the original and restore any missing sections before review.', true));
     if (action === 'remove' && !String(input.notes || '').trim()) findings.push(finding('P1', 'CG-REMOVE-PROOF-001', 'The remove handoff has no safety proof.', 'Explain why this exact path is verified safe to remove.', true));
 
@@ -56,7 +59,7 @@
 
     var blocking = findings.some(function (item) { return item.blocks_github; });
     var outcome = blocking ? (findings.some(function (item) { return item.severity === 'P0'; }) ? 'BLOCK' : 'FIX_FIRST') : 'PASS';
-    return { tool: 'code_god_review', version: VERSION, outcome: outcome, action: action, repo: repo, source_repo: sourceRepo, path: path, saved_file_id: input.saved_file_id || '', original_characters: original.length, proposed_characters: proposed.length, findings: findings, checks_run: ['action-scope', 'source-repository-identity', 'identity', 'full-file-integrity', 'truncation', 'remove-proof', 'conflicts', 'secret-scan', 'timer-scan', 'duplicate-save-scan', 'branch-safety'], created_at: new Date().toISOString(), wrote_database: false, wrote_github: false, opened_pr: false };
+    return { tool: 'code_god_review', version: VERSION, outcome: outcome, action: action, repo: repo, source_repo: sourceRepo, path: path, saved_file_id: input.saved_file_id || '', original_characters: original.length, proposed_characters: proposed.length, findings: findings, checks_run: ['action-scope', 'source-repository-identity', 'identity', 'full-file-integrity', 'json-syntax', 'truncation', 'remove-proof', 'conflicts', 'secret-scan', 'timer-scan', 'duplicate-save-scan', 'branch-safety'], created_at: new Date().toISOString(), wrote_database: false, wrote_github: false, opened_pr: false };
   }
 
   window.CodeGodReviewV200 = { version: VERSION, review: review, completeFile: completeFile };
