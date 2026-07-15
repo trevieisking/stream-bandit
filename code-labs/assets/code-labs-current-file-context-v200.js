@@ -171,3 +171,12 @@
 
   window.CodeLabsCurrentFileContextV200 = { version: VERSION, current: current, verifiedGitHubSource: verifiedGitHubSource, newestHandoff: newestHandoff };
 })();
+
+(function(){
+'use strict';
+if(!document.body||document.body.getAttribute('data-page')!=='code-god'||document.querySelector('script[data-cl-code-god-polish-v222]'))return;
+var script=document.createElement('script');
+script.src='assets/code-labs-code-god-polish-v222.js?v=cl-v222-protected-pages';
+script.setAttribute('data-cl-code-god-polish-v222','yes');
+document.head.appendChild(script);
+})();
