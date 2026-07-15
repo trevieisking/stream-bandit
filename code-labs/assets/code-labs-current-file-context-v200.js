@@ -1,7 +1,7 @@
-/* Code Labs Current File Context V212 - read only. */
+/* Code Labs Current File Context V213 - read only. */
 (function () {
   'use strict';
-  var VERSION = 'V212.0';
+  var VERSION = 'V213.0';
   var STATE_KEY = 'codeLabsV1State';
 
   function readState() {
@@ -20,7 +20,8 @@
     var source = file.githubSource || {};
     var project = state.project || {};
     var path = source.path || file.path || file.filename || '';
-    var repo = source.owner && source.repo ? source.owner + '/' + source.repo : project.repo || '';
+    var sourceRepo = source.owner && source.repo ? source.owner + '/' + source.repo : '';
+    var repo = sourceRepo || project.repo || '';
     var original = value('#loadedCode') || value('#plIn') || file.currentCode || '';
     var proposed = value('#fixedCode') || value('#plOut') || file.fixedCode || original;
     return {
@@ -28,7 +29,7 @@
       saved_file_id: file.savedFileId || file.saved_file_id || '',
       project_id: file.projectId || file.project_id || '',
       repo: repo,
-      source_repo: repo,
+      source_repo: sourceRepo,
       path: path,
       source_branch: source.branch || 'main',
       filename: file.filename || path.split('/').pop() || '',
