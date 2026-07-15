@@ -1,9 +1,9 @@
-/* Code God Review V212
+/* Code God Review V213
    Read-only pre-commit analysis for the Buddy lane.
 */
 (function () {
   'use strict';
-  var VERSION = 'V212.0';
+  var VERSION = 'V213.0';
 
   function finding(severity, rule, message, fix, blocks) {
     return {
@@ -34,7 +34,9 @@
     var proposed = String(input.proposed || '');
     var branch = String(input.request_branch || '');
 
-    if (sourceRepo && repo && sourceRepo !== repo) {
+    if (!sourceRepo) {
+      findings.push(finding('P1', 'CG-IDENTITY-004', 'The loaded review source has no verified repository identity.', 'Reload the complete source directly from the selected GitHub repository, then rerun Code God.', true));
+    } else if (repo && sourceRepo !== repo) {
       findings.push(finding('P1', 'CG-IDENTITY-003', 'The loaded source repository does not match the saved handoff repository.', 'Reload the complete source from the same repository selected for the handoff, then rerun Code God.', true));
     }
     if (repo && repo !== 'trevieisking/stream-bandit') {
