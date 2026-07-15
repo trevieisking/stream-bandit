@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const VERSION = "Code Labs Sol Guide V220";
+const VERSION = "Code Labs Sol Guide V221";
 const API_KEY = Deno.env.get("OPENAI_API_KEY") || "";
 const MODEL = Deno.env.get("OPENAI_MODEL") || "gpt-5.6-terra";
 const URL = Deno.env.get("SUPABASE_URL") || "";
@@ -72,6 +72,16 @@ function outputText(result: Record<string, unknown>) {
   return parts.join("\n").trim();
 }
 
+async function callOpenAI(request: Record<string, unknown>) {
+  const upstream = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  const result = await upstream.json().catch(() => ({})) as Record<string, unknown>;
+  return { upstream, result };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: headers(req) });
   if (req.method !== "POST") return reply(req, { ok: false, error: "POST required" }, 405);
@@ -101,21 +111,25 @@ Deno.serve(async (req: Request) => {
     };
     const previous = text(body.previous_response_id, 160);
     if (previous) request.previous_response_id = previous;
-    const upstream = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify(request),
-    });
-    const result = await upstream.json().catch(() => ({})) as Record<string, unknown>;
-    if (!upstream.ok) {
-      console.error("Sol guide upstream failure", { status: upstream.status });
-      throw new Error("Sol could not complete this guide request. Try again shortly.");
+
+    let attempt = await callOpenAI(request);
+    let recovered = false;
+    if (!attempt.upstream.ok && previous) {
+      delete request.previous_response_id;
+      attempt = await callOpenAI(request);
+      recovered = true;
     }
+    if (!attempt.upstream.ok) {
+      console.error("Sol guide upstream failure", { status: attempt.upstream.status, recovered });
+      throw new Error("Sol could not complete this guide request. Start a new Sol chat and try again shortly.");
+    }
+    const answer = outputText(attempt.result) || "This page is ready. Use the visible page instructions and continue with the next safe workflow step shown on screen.";
     return reply(req, {
       ok: true,
       version: VERSION,
-      response_id: text(result.id, 160),
-      text: outputText(result),
+      response_id: text(attempt.result.id, 160),
+      text: answer,
+      conversation_recovered: recovered,
     });
   } catch (error) {
     const message = text((error as Error).message || error, 500);
