@@ -1,4 +1,4 @@
-/* Code Labs Repo Desk and GitHub Writer Code God Gate V214. Save visible handoff, then route every forward CTA through read-only review. */
+/* Code Labs Repo Desk and GitHub Writer Code God Gate V215. Save visible handoff, then route every forward CTA through read-only review. */
 (function () {
   'use strict';
 
@@ -6,9 +6,13 @@
     return document.body && document.body.getAttribute('data-page') || '';
   }
 
+  function forwardHref(link) {
+    if (!link) return '';
+    return String(link.getAttribute('data-code-god-original-href') || link.getAttribute('href') || '').split('?')[0].split('#')[0];
+  }
+
   function isForward(link) {
-    if (!link) return false;
-    var href = String(link.getAttribute('href') || '').split('?')[0].split('#')[0];
+    var href = forwardHref(link);
     if (page() === 'repo-desk') return href === 'publish-prep.html' || href === 'github-tracker.html';
     if (page() === 'publish-prep') return href === 'github-tracker.html';
     return false;
@@ -22,9 +26,10 @@
 
   function gate(link) {
     if (!isForward(link)) return false;
+    if (!link.getAttribute('data-code-god-original-href')) link.setAttribute('data-code-god-original-href', forwardHref(link));
     link.setAttribute('href', 'code-god.html');
     if (/track pr|github writer|publish prep|next/i.test(link.textContent || '')) link.textContent = 'Next: Code God';
-    link.setAttribute('data-code-god-gate', 'V214');
+    link.setAttribute('data-code-god-gate', 'V215');
     return true;
   }
 
