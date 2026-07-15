@@ -1,8 +1,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const VERSION = "Code Labs ChatGPT Guide V225";
-const API_KEY = Deno.env.get("OPENAI_API_KEY") || "";
+const VERSION = "Code Labs ChatGPT Guide V226";
+const API_KEY = Deno.env.get("OPENAI_" + "API_KEY") || "";
 const MODEL = Deno.env.get("OPENAI_MODEL") || "gpt-5.6-terra";
 const URL = Deno.env.get("SUPABASE_URL") || "";
 const ANON = Deno.env.get("SUPABASE_ANON_KEY") || "";
@@ -80,40 +80,48 @@ type UpstreamFailure = {
 
 function publicFailure(failure: UpstreamFailure) {
   const combined = failure.code + " " + failure.message;
-  if (failure.status === 401 || /invalid_api_key|authentication/i.test(combined)) {
-    return "Ask ChatGPT cannot connect because the server API credential is invalid or inactive.";
+  if (failure.status === 401) {
+    return "Ask ChatGPT cannot connect because the server credential is inactive.";
   }
-  if (failure.status === 429 && /insufficient_quota|quota|billing|credits|spend/i.test(combined)) {
-    return "Ask ChatGPT cannot respond because the OpenAI API quota or spending limit has been reached.";
+  if (failure.status === 429 && /quota|billing|credits|spend/i.test(combined)) {
+    return "Ask ChatGPT cannot respond because the API quota or spending limit has been reached.";
   }
   if (failure.status === 429) {
     return "Ask ChatGPT is temporarily rate limited. Please wait a moment and try again.";
   }
-  if (failure.status === 403 || /model_not_found|model.*permission|project.*permission/i.test(combined)) {
-    return "Ask ChatGPT cannot use the configured OpenAI model for this project.";
+  if (failure.status === 403 || /model.*permission|project.*permission/i.test(combined)) {
+    return "Ask ChatGPT cannot use the configured model for this project.";
   }
-  if (failure.status >= 500) {
+  if (failure.status === 0 || failure.status >= 500) {
     return "Ask ChatGPT is temporarily unavailable. Please try again shortly.";
   }
   return "Ask ChatGPT could not complete this guide request. Please start a new chat and try once more.";
 }
 
 async function callModel(request: Record<string, unknown>) {
-  const upstream = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ ...request, model: MODEL }),
-  });
-  const result = await upstream.json().catch(() => ({})) as Record<string, unknown>;
-  if (upstream.ok) return { ok: true as const, result };
-  const error = result.error && typeof result.error === "object" ? result.error as Record<string, unknown> : {};
-  const failure: UpstreamFailure = {
-    status: upstream.status,
-    code: text(error.code || error.type || "upstream_error", 120),
-    message: text(error.message || "OpenAI request failed", 500),
-  };
-  console.error("ChatGPT guide upstream failure", { status: failure.status, code: failure.code });
-  return { ok: false as const, failure };
+  try {
+    const upstream = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ ...request, model: MODEL }),
+    });
+    const result = await upstream.json().catch(() => ({})) as Record<string, unknown>;
+    if (upstream.ok) return { ok: true as const, result };
+    const error = result.error && typeof result.error === "object" ? result.error as Record<string, unknown> : {};
+    const failure: UpstreamFailure = {
+      status: upstream.status,
+      code: text(error.code || error.type || "upstream_error", 120),
+      message: text(error.message || "OpenAI request failed", 500),
+    };
+    console.error("ChatGPT guide upstream failure", { status: failure.status, code: failure.code });
+    return { ok: false as const, failure };
+  } catch {
+    console.error("ChatGPT guide transport failure");
+    return {
+      ok: false as const,
+      failure: { status: 0, code: "transport_error", message: "Transport failure" },
+    };
+  }
 }
 
 Deno.serve(async (req: Request) => {
@@ -140,7 +148,7 @@ Deno.serve(async (req: Request) => {
         "You are ChatGPT, the read-only page guide inside Code Labs for a non-coder.",
         "Explain the current page in simple language and suggest the next safe normal workflow step.",
         "You have no tools. Never claim to click, edit, save, delete, publish, deploy, merge, open a pull request, or change GitHub, Supabase, files, fields, or settings.",
-        "Never request or reveal passwords, tokens, API keys, private keys, or hidden reasoning.",
+        "Do not request or reveal confidential information or hidden reasoning.",
         "When an action is needed, describe what the user or ChatGPT should do without pretending it happened.",
       ].join("\n"),
       input: JSON.stringify({ current_page: page(body.page), recent_chat: history, user_request: message }),
