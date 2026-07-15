@@ -1,10 +1,10 @@
-/* Code Labs Repo Desk and GitHub Writer Code God Gate V216.
-   Save visible handoff, then route forward CTAs through read-only review.
-   Bounded, idempotent scans prevent browser mutation loops.
+/* Code Labs Repo Desk Code God Gate V217.
+   Route only the Repo Desk content CTA through read-only Code God review.
+   Sidebar navigation and GitHub Writer -> Tracker remain canonical and untouched.
 */
 (function () {
   'use strict';
-  var VERSION = 'V216';
+  var VERSION = 'V217';
   var timer = 0;
   var observer = null;
   var scans = 0;
@@ -14,47 +14,51 @@
     return document.body && document.body.getAttribute('data-page') || '';
   }
 
-  function forwardHref(link) {
+  function cleanHref(link) {
     if (!link) return '';
     return String(link.getAttribute('data-code-god-original-href') || link.getAttribute('href') || '')
       .split('?')[0].split('#')[0];
   }
 
-  function isForward(link) {
-    var href = forwardHref(link);
-    if (page() === 'repo-desk') return href === 'publish-prep.html' || href === 'github-tracker.html';
-    if (page() === 'publish-prep') return href === 'github-tracker.html';
-    return false;
+  function eligible(link) {
+    if (!link || page() !== 'repo-desk') return false;
+    if (link.closest && link.closest('.sidebar')) return false;
+    if (!(link.closest && link.closest('.main'))) return false;
+    return cleanHref(link) === 'publish-prep.html';
   }
 
   function saveVisibleHandoff() {
-    var selector = page() === 'publish-prep' ? '#gwSave' : page() === 'repo-desk' ? '#rdSave' : '';
-    var button = selector && document.querySelector(selector);
+    var button = document.querySelector('#rdSave');
     if (button && typeof button.click === 'function') button.click();
   }
 
   function gate(link) {
-    if (!isForward(link)) return false;
-    var original = forwardHref(link);
+    if (!eligible(link)) return false;
+    var changed = false;
     if (!link.getAttribute('data-code-god-original-href')) {
-      link.setAttribute('data-code-god-original-href', original);
+      link.setAttribute('data-code-god-original-href', cleanHref(link));
+      changed = true;
     }
     if (link.getAttribute('href') !== 'code-god.html') {
       link.setAttribute('href', 'code-god.html');
+      changed = true;
     }
-    if (/track pr|github writer|publish prep|next/i.test(link.textContent || '') &&
-        link.textContent !== 'Next: Code God') {
+    if (link.textContent !== 'Next: Code God') {
       link.textContent = 'Next: Code God';
+      changed = true;
     }
-    link.setAttribute('data-code-god-gate', VERSION);
-    return true;
+    if (link.getAttribute('data-code-god-gate') !== VERSION) {
+      link.setAttribute('data-code-god-gate', VERSION);
+      changed = true;
+    }
+    return changed;
   }
 
   function apply() {
-    if (page() !== 'repo-desk' && page() !== 'publish-prep') return false;
+    if (page() !== 'repo-desk') return false;
     scans += 1;
     var changed = false;
-    var links = document.querySelectorAll('a[href],a[data-code-god-original-href]');
+    var links = document.querySelectorAll('.main a[href],.main a[data-code-god-original-href]');
     Array.prototype.forEach.call(links, function (link) {
       if (gate(link)) changed = true;
     });
@@ -74,10 +78,10 @@
   }
 
   function intercept(event) {
-    if (page() !== 'repo-desk' && page() !== 'publish-prep') return;
+    if (page() !== 'repo-desk') return;
     var link = event.target && event.target.closest &&
-      event.target.closest('a[href],a[data-code-god-original-href]');
-    if (!isForward(link)) return;
+      event.target.closest('.main a[href],.main a[data-code-god-original-href]');
+    if (!eligible(link)) return;
     event.preventDefault();
     event.stopPropagation();
     saveVisibleHandoff();
@@ -85,28 +89,11 @@
   }
 
   function boot() {
-    if (page() !== 'repo-desk' && page() !== 'publish-prep') return;
+    if (page() !== 'repo-desk') return;
     document.addEventListener('click', intercept, true);
     apply();
-    observer = new MutationObserver(scheduleApply);
-    observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
-    window.setTimeout(function () {
-      if (observer) {
-        observer.disconnect();
-        observer = null;
-      }
-    }, 5000);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot, { once: true });
-  } else {
-    boot();
-  }
-
-  window.CodeLabsCodeGodGate = {
-    version: VERSION,
-    run: apply,
-    max_scans: MAX_SCANS
-  };
-})();
+    var main = document.querySelector('.main');
+    if (main) {
+      observer = new MutationObserver(scheduleApply);
+      observer.observe(main, { childList: true, subtree: true });
+   
