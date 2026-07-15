@@ -1,17 +1,17 @@
-/* Code Labs Footer and V104 Tool-Only Action Registry V204.
+/* Code Labs Footer and V104 Tool-Only Action Registry V206.
    Navigation and shared server action IDs only. No browser relay, pairing, polling, or live-tab control.
 */
 (function(){
 'use strict';
 if(location.hostname==='www.chatterfriendsstreambandit.co.uk'){location.replace('https://chatterfriendsstreambandit.co.uk'+location.pathname+location.search+location.hash);return}
-var VERSION='V204-tool-only-actions';
+var VERSION='V206-tool-only-actions';
 var ROUTES=[
 ['index','index.html','Home'],['setup','setup.html','Setup'],['project-picker','project-picker.html','Project Picker'],
 ['file-lab','file-lab.html','File Lab'],['saved-files','saved-files.html','Saved Files'],['rescue-room','rescue-room.html','Rescue Room'],
 ['packet-builder','packet-builder.html','Packet Builder'],['buddy-canvas','buddy-canvas.html','Buddy Canvas'],['v20','v20.html','Workflow Hub'],
 ['patch-desk','patch-desk.html','Patch Desk'],['patch-lab','patch-lab.html','Patch Lab'],['preview-test','preview-test.html','Preview + Test'],
-['checkpoints','checkpoints.html','Checkpoints'],['repo-desk','repo-desk.html','Repo Desk'],['publish-prep','publish-prep.html','GitHub Writer'],
-['github-tracker','github-tracker.html','GitHub Tracker'],['help','help.html','Help + Tools']
+['checkpoints','checkpoints.html','Checkpoints'],['repo-desk','repo-desk.html','Repo Desk'],['code-god','code-god.html','Code God'],
+['publish-prep','publish-prep.html','GitHub Writer'],['github-tracker','github-tracker.html','GitHub Tracker'],['help','help.html','Help + Tools']
 ];
 var ACTIONS={
 setup:'setup.save','project-picker':'project.select','file-lab':'file.select','saved-files':'file.select','rescue-room':'repair.save',
