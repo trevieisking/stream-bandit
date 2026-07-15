@@ -106,6 +106,21 @@ function finding(severity: string, rule_id: string, message: string, correction:
   return { severity, rule_id, message, correction, blocks_github };
 }
 
+function handoffMarker(value: Row) {
+  return {
+    version: value.version || null,
+    action: value.action || null,
+    repo: value.repo || null,
+    source_repo: value.source_repo || null,
+    source_branch: value.source_branch || null,
+    request_branch: value.request_branch || null,
+    path: value.path || null,
+    current_hash: value.current_hash || null,
+    proposed_hash: value.proposed_hash || null,
+    created_at: value.created_at || null,
+  };
+}
+
 export async function prepareRepoHandoff(b: Binding, args: Row) {
   const c = await selected(b.owner_id);
   const fields = clone(args.fields || {});
@@ -135,6 +150,7 @@ export async function prepareRepoHandoff(b: Binding, args: Row) {
     created_at: new Date().toISOString(),
   };
   const metadataBefore = clone(c.file.metadata || {});
+  const previous = handoffMarker(clone(metadataBefore.repo_handoff || {}));
   const metadata = { ...metadataBefore, repo_handoff: handoff };
   delete metadata.code_god_review;
   delete metadata.github_writer_request;
@@ -144,9 +160,9 @@ export async function prepareRepoHandoff(b: Binding, args: Row) {
     version: VERSION,
     tool: "run_code_labs_action",
     action: "repo.prepare_handoff",
-    handoff: { ...handoff, original: undefined, proposed: undefined },
+    handoff: handoffMarker(handoff),
     file_id: file.id,
-    receipt: await receipt(b.owner_id, "repo.prepare_handoff", c.file, metadataBefore.repo_handoff || {}, handoff),
+    receipt: await receipt(b.owner_id, "repo.prepare_handoff", c.file, previous, handoffMarker(handoff)),
   };
 }
 
@@ -243,9 +259,9 @@ export async function prepareGithubWriter(b: Binding, args: Row) {
 export async function backendTablesSnapshot(b: Binding) {
   const specs = [
     ["code_labs_projects", "id,site_name,site_url,repo,mode,status,created_at,updated_at", "owner_id"],
-    ["code_labs_files", "id,project_id,filename,file_type,current_hash,metadata,created_at,updated_at", "owner_id"],
+    ["code_labs_files", "id,project_id,filename,file_type,current_hash,created_at,updated_at", "owner_id"],
     ["code_labs_jobs", "id,project_id,file_id,title,status,created_at,updated_at", "owner_id"],
-    ["code_labs_packets", "id,project_id,job_id,packet_type,metadata,created_at", "owner_id"],
+    ["code_labs_packets", "id,project_id,job_id,packet_type,created_at", "owner_id"],
     ["code_labs_test_runs", "id,project_id,job_id,filename,result,checked_count,total_count,created_at", "owner_id"],
     ["code_labs_versions", "id,project_id,job_id,file_id,version_kind,label,filename,created_at", "owner_id"],
     ["code_labs_write_requests", "id,repo,path,branch,action,status,branch_pr_only,direct_main_write,deletes_anything,created_at,updated_at", "requested_by"],
