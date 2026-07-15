@@ -23,7 +23,7 @@
 (function(){'use strict';
 function q(s,r){return(r||document).querySelector(s)}
 function go(){var save=q('#gwSave');if(save)save.click();window.location.href='code-god.html'}
-function add(){if((document.body&&document.body.getAttribute('data-page'))!=='publish-prep')return false;var actions=q('#githubWriter .actions');if(!actions)return false;if(q('#gwCodeGodCheck',actions))return true;var link=document.createElement('button');link.id='gwCodeGodCheck';link.className='btn warn';link.type='button';link.textContent='Code God Check';link.setAttribute('data-code-god-route','V214');link.addEventListener('click',go);var back=q('a[href="repo-desk.html"]',actions);if(back&&back.nextSibling)actions.insertBefore(link,back.nextSibling);else actions.insertBefore(link,actions.firstChild);return true}
+function add(){if((document.body&&document.body.getAttribute('data-page'))!=='publish-prep')return false;var actions=q('#githubWriter .actions');if(!actions)return false;if(q('#gwCodeGodCheck',actions))return true;var link=document.createElement('button');link.id='gwCodeGodCheck';link.className='btn warn';link.type='button';link.textContent='Code God Check';link.setAttribute('data-code-god-route','V215');link.addEventListener('click',go);var back=q('a[href="repo-desk.html"]',actions);if(back&&back.nextSibling)actions.insertBefore(link,back.nextSibling);else actions.insertBefore(link,actions.firstChild);return true}
 function boot(){if(add())return;var attempts=0,timer=setInterval(function(){attempts+=1;if(add()||attempts>=40)clearInterval(timer)},150)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
@@ -32,6 +32,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script src="assets/code-labs-github-lane-autopilot-v131.js?v=cl-v131-github-lane-autopilot"></script>
 <script src="assets/code-labs-backend-write-queue-v132.js?v=cl-v138-backend-context-sync"></script>
 <script src="assets/code-labs-buddy-page-bridge-v139.js?v=cl-v140-full-page-write"></script>
-<script src="assets/code-labs-repo-desk-code-god-gate-v212.js?v=cl-v214-code-god-provenance-gate"></script>
+<script src="assets/code-labs-repo-desk-code-god-gate-v212.js?v=cl-v215-code-god-original-route"></script>
 </body>
 </html>
