@@ -1,9 +1,9 @@
-/* Code God Review V200
+/* Code God Review V212
    Read-only pre-commit analysis for the Buddy lane.
 */
 (function () {
   'use strict';
-  var VERSION = 'V200.1';
+  var VERSION = 'V212.0';
 
   function finding(severity, rule, message, fix, blocks) {
     return {
@@ -28,11 +28,15 @@
     input = input || (window.CodeLabsCurrentFileContextV200 && window.CodeLabsCurrentFileContextV200.current()) || {};
     var findings = [];
     var repo = String(input.repo || '');
+    var sourceRepo = String(input.source_repo || '');
     var path = String(input.path || '');
     var original = String(input.original || '');
     var proposed = String(input.proposed || '');
     var branch = String(input.request_branch || '');
 
+    if (sourceRepo && repo && sourceRepo !== repo) {
+      findings.push(finding('P1', 'CG-IDENTITY-003', 'The loaded source repository does not match the saved handoff repository.', 'Reload the complete source from the same repository selected for the handoff, then rerun Code God.', true));
+    }
     if (repo && repo !== 'trevieisking/stream-bandit') {
       findings.push(finding('P1', 'CG-IDENTITY-001', 'The selected repository is not the approved repository.', 'Reload the correct saved file and repository before continuing.', true));
     }
@@ -71,12 +75,13 @@
       version: VERSION,
       outcome: outcome,
       repo: repo,
+      source_repo: sourceRepo,
       path: path,
       saved_file_id: input.saved_file_id || '',
       original_characters: original.length,
       proposed_characters: proposed.length,
       findings: findings,
-      checks_run: ['identity', 'full-file-integrity', 'truncation', 'conflicts', 'secret-scan', 'timer-scan', 'duplicate-save-scan', 'branch-safety'],
+      checks_run: ['source-repository-identity', 'identity', 'full-file-integrity', 'truncation', 'conflicts', 'secret-scan', 'timer-scan', 'duplicate-save-scan', 'branch-safety'],
       created_at: new Date().toISOString(),
       wrote_database: false,
       wrote_github: false,
