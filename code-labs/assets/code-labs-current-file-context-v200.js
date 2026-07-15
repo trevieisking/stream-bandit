@@ -1,7 +1,7 @@
-/* Code Labs Current File Context V214 - read only. */
+/* Code Labs Current File Context V216 - read only. */
 (function () {
   'use strict';
-  var VERSION = 'V214.0';
+  var VERSION = 'V216.0';
   var STATE_KEY = 'codeLabsV1State';
 
   function readState() {
@@ -60,7 +60,10 @@
       repo: repo,
       source_repo: sourceRepo,
       source_verified: verified,
+      source_raw: verified ? String(source.raw || '') : '',
+      source_loaded_at: verified ? String(source.loadedAt || '') : '',
       path: path,
+      fixed_path: file.fixedPath || file.fixedFile || file.fixedFilename || '',
       source_branch: source.branch || 'main',
       filename: file.filename || path.split('/').pop() || '',
       original: String(original),
