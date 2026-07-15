@@ -156,7 +156,6 @@ Deno.serve(async (req: Request) => {
         ok: false,
         error: publicFailure(attempt.failure),
         version: VERSION,
-        category: attempt.failure.code,
       });
     }
 
