@@ -96,4 +96,25 @@
     if (main) {
       observer = new MutationObserver(scheduleApply);
       observer.observe(main, { childList: true, subtree: true });
-   
+    }
+    window.setTimeout(function () {
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+    }, 5000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+
+  window.CodeLabsCodeGodGate = {
+    version: VERSION,
+    run: apply,
+    max_scans: MAX_SCANS,
+    scope: 'repo-desk-main-only'
+  };
+})();
