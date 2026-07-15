@@ -1,9 +1,10 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const VERSION = "Code Labs Sol Guide V220";
+const VERSION = "Code Labs Sol Guide V223";
 const API_KEY = Deno.env.get("OPENAI_API_KEY") || "";
-const MODEL = Deno.env.get("OPENAI_MODEL") || "gpt-5.6-terra";
+const CONFIGURED_MODEL = Deno.env.get("OPENAI_MODEL") || "gpt-5-mini";
+const FALLBACK_MODEL = "gpt-5-mini";
 const URL = Deno.env.get("SUPABASE_URL") || "";
 const ANON = Deno.env.get("SUPABASE_ANON_KEY") || "";
 const ALLOWED = new Set([
@@ -22,15 +23,12 @@ function headers(req: Request) {
     "Vary": "Origin",
   };
 }
-
 function reply(req: Request, body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: headers(req) });
 }
-
 function text(value: unknown, limit: number) {
   return String(value == null ? "" : value).slice(0, limit);
 }
-
 function page(value: unknown) {
   const p = value && typeof value === "object" ? value as Record<string, unknown> : {};
   return {
@@ -43,7 +41,6 @@ function page(value: unknown) {
     links: Array.isArray(p.links) ? p.links.slice(0, 40) : [],
   };
 }
-
 async function requireOwner(req: Request) {
   const authorization = req.headers.get("authorization") || "";
   if (!authorization.toLowerCase().startsWith("bearer ")) throw new Error("Sign in to Code Labs first.");
@@ -58,7 +55,6 @@ async function requireOwner(req: Request) {
   const owner = await client.from("code_labs_owners").select("user_id").eq("user_id", user.id).maybeSingle();
   if (owner.error || !owner.data) throw new Error("This account is not approved for Code Labs.");
 }
-
 function outputText(result: Record<string, unknown>) {
   if (typeof result.output_text === "string") return result.output_text;
   const output = Array.isArray(result.output) ? result.output as Array<Record<string, unknown>> : [];
@@ -71,6 +67,35 @@ function outputText(result: Record<string, unknown>) {
   }
   return parts.join("\n").trim();
 }
+type UpstreamFailure = { status: number; code: string; message: string; model: string };
+function modelFailure(failure: UpstreamFailure) {
+  return failure.status === 400 || failure.status === 404 || /model|not_found|unsupported/i.test(failure.code + " " + failure.message);
+}
+function publicFailure(failure: UpstreamFailure) {
+  if (failure.status === 401 || failure.status === 403) return "Sol's server connection needs attention.";
+  if (failure.status === 429) return "Sol is busy right now. Please wait a moment and try again.";
+  if (failure.status >= 500) return "Sol's AI service is temporarily unavailable. Please try again shortly.";
+  if (modelFailure(failure)) return "Sol's configured AI model is unavailable. The safe fallback also could not respond.";
+  return "Sol could not complete this guide request. Please start a new chat and try once more.";
+}
+async function callModel(request: Record<string, unknown>, model: string) {
+  const upstream = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ ...request, model }),
+  });
+  const result = await upstream.json().catch(() => ({})) as Record<string, unknown>;
+  if (upstream.ok) return { ok: true as const, result, model };
+  const error = result.error && typeof result.error === "object" ? result.error as Record<string, unknown> : {};
+  const failure: UpstreamFailure = {
+    status: upstream.status,
+    code: text(error.code || error.type || "upstream_error", 120),
+    message: text(error.message || "OpenAI request failed", 500),
+    model,
+  };
+  console.error("Sol guide upstream failure", { status: failure.status, code: failure.code, model });
+  return { ok: false as const, failure };
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: headers(req) });
@@ -79,15 +104,13 @@ Deno.serve(async (req: Request) => {
     await requireOwner(req);
     const body = await req.json().catch(() => ({})) as Record<string, unknown>;
     if (text(body.action, 40) === "health") {
-      return reply(req, { ok: true, version: VERSION, configured: Boolean(API_KEY) });
+      return reply(req, { ok: true, version: VERSION, configured: Boolean(API_KEY), model: CONFIGURED_MODEL, fallback_model: FALLBACK_MODEL });
     }
-    if (!API_KEY) return reply(req, { ok: false, error: "Sol is waiting for its server-side AI key." });
+    if (!API_KEY) return reply(req, { ok: false, error: "Sol needs server setup before it can answer." });
     const message = text(body.message, 12000).trim();
     if (!message) return reply(req, { ok: false, error: "Message required" });
     const history = Array.isArray(body.history) ? body.history.slice(-10) : [];
-    const input = JSON.stringify({ current_page: page(body.page), recent_chat: history, user_request: message });
     const request: Record<string, unknown> = {
-      model: MODEL,
       instructions: [
         "You are Sol, the read-only page guide inside Code Labs for a non-coder.",
         "Explain the current page in simple language and suggest the next safe normal workflow step.",
@@ -95,31 +118,34 @@ Deno.serve(async (req: Request) => {
         "Never request or reveal passwords, tokens, API keys, private keys, or hidden reasoning.",
         "When an action is needed, describe what the user or ChatGPT should do without pretending it happened.",
       ].join("\n"),
-      input,
+      input: JSON.stringify({ current_page: page(body.page), recent_chat: history, user_request: message }),
       max_output_tokens: 1800,
       store: true,
     };
     const previous = text(body.previous_response_id, 160);
     if (previous) request.previous_response_id = previous;
-    const upstream = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify(request),
-    });
-    const result = await upstream.json().catch(() => ({})) as Record<string, unknown>;
-    if (!upstream.ok) {
-      console.error("Sol guide upstream failure", { status: upstream.status });
-      throw new Error("Sol could not complete this guide request. Try again shortly.");
+
+    let attempt = await callModel(request, CONFIGURED_MODEL);
+    let usedFallback = false;
+    if (!attempt.ok && CONFIGURED_MODEL !== FALLBACK_MODEL && modelFailure(attempt.failure)) {
+      usedFallback = true;
+      attempt = await callModel(request, FALLBACK_MODEL);
     }
+    if (!attempt.ok) return reply(req, { ok: false, error: publicFailure(attempt.failure), version: VERSION, category: attempt.failure.code });
+
+    const answer = outputText(attempt.result);
+    if (!answer) return reply(req, { ok: false, error: "Sol returned no guidance. Please start a new chat and try again.", version: VERSION });
     return reply(req, {
       ok: true,
       version: VERSION,
-      response_id: text(result.id, 160),
-      text: outputText(result),
+      model: attempt.model,
+      used_fallback: usedFallback,
+      response_id: text(attempt.result.id, 160),
+      text: answer,
     });
   } catch (error) {
     const message = text((error as Error).message || error, 500);
     const status = /sign in|expired|approved|authentication/i.test(message) ? 401 : 200;
-    return reply(req, { ok: false, error: message || "Sol guide is unavailable." }, status);
+    return reply(req, { ok: false, error: message || "Sol guide is unavailable.", version: VERSION }, status);
   }
 });
