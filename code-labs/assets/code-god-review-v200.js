@@ -30,7 +30,7 @@
 
   function containsSecretValue(text) {
     var value = String(text || '');
-    return /(?:authorization\s*:\s*bearer\s+[A-Za-z0-9._~-]{12,}|sk-[A-Za-z0-9_-]{12,}|sb_secret_[A-Za-z0-9_-]{12,}|(?:service[_ -]?role|private[_ -]?key|api[_ -]?key|secret)\s*(?:=|:)\s*["']?[A-Za-z0-9._~-]{16,})/i.test(value);
+    return /(?:authorization\s*:\s*bearer\s+[A-Za-z0-9._~-]{12,}|sk-[A-Za-z0-9_-]{12,}|sb_secret_[A-Za-z0-9_-]{12,}|[A-Za-z0-9_]*(?:service[_ -]?role|private[_ -]?key|api[_ -]?key|secret)[A-Za-z0-9_]*\s*(?:=|:)\s*["']?[A-Za-z0-9._~-]{16,})/i.test(value);
   }
 
   function ensureShell() {
