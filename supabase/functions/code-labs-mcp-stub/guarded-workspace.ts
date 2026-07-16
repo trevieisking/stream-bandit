@@ -86,7 +86,11 @@ export async function runAction(b: Binding, args: Row) {
   const action = String(args.action || "");
 
   if (action === "backend.tables_snapshot") return backendTablesSnapshot(b);
-  if (action === "repo.prepare_handoff") return guarded(b, args, prepareRepoHandoff);
+  if (action === "repo.prepare_handoff") {
+    const requested = String(args.fields?.action || "change").toLowerCase();
+    if (requested === "remove" || requested === "delete") throw new Error("File removal is not available in the normal V104 lane.");
+    return guarded(b, args, prepareRepoHandoff);
+  }
   if (action === "code_god.review") return guarded(b, args, reviewCodeGod);
   if (action === "github.writer_prepare") return guarded(b, args, prepareGithubWriter);
 
