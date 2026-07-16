@@ -1,4 +1,4 @@
-/* Code Labs Source Family V252 - File Lab, Saved Files, Rescue Room and Packet Builder presentation only. */
+/* Code Labs Source Family V256 - bounded File Lab, Saved Files, Rescue Room and Packet Builder presentation only. */
 (function(){
 'use strict';
 var PAGE=(document.body&&document.body.getAttribute('data-page'))||'';
@@ -9,16 +9,15 @@ var ROUTES=[
   ['packet-builder','packet-builder.html','7','Packet Builder']
 ];
 if(!ROUTES.some(function(x){return x[0]===PAGE}))return;
-var observer=null;
 function q(s,r){return(r||document).querySelector(s)}
-function all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
 function add(n,c){if(n)n.classList.add(c)}
 function closestPanel(n){return n&&n.closest?n.closest('section,.panel,.layout'):null}
 function progress(main){
   var hero=q(':scope>.hero',main)||q('.hero',main);if(!hero)return;
   var nav=q('#clSourceFamilyV252',hero);
   if(!nav){nav=document.createElement('nav');nav.id='clSourceFamilyV252';nav.className='clSourceFamilyNavV252';nav.setAttribute('aria-label','Source and context pages');nav.setAttribute('data-cl-product-ignore','yes');nav.setAttribute('data-cl-page-runtime-ignore','yes');hero.appendChild(nav)}
-  nav.innerHTML=ROUTES.map(function(x){var active=x[0]===PAGE;return '<a href="'+x[1]+'"'+(active?' class="active" aria-current="page"':'')+'><span>'+x[2]+'</span><b>'+x[3]+'</b></a>'}).join('');
+  var html=ROUTES.map(function(x){var active=x[0]===PAGE;return '<a href="'+x[1]+'"'+(active?' class="active" aria-current="page"':'')+'><span>'+x[2]+'</span><b>'+x[3]+'</b></a>'}).join('');
+  if(nav.innerHTML!==html)nav.innerHTML=html;
 }
 function fileLab(main){
   document.body.classList.add('clSourceFileLabV252');
@@ -91,9 +90,9 @@ function apply(){
   if(PAGE==='saved-files')savedFiles(main);
   if(PAGE==='rescue-room')rescue(main);
   if(PAGE==='packet-builder')packet(main);
-  document.body.setAttribute('data-cl-source-family','v252');return true;
+  document.body.setAttribute('data-cl-source-family','v256-bounded');return true;
 }
-function boot(){apply();if(document.body){observer=new MutationObserver(apply);observer.observe(document.body,{childList:true,subtree:true})}setTimeout(function(){if(observer)observer.disconnect();apply()},6500)}
-window.CodeLabsSourceFamilyV252={version:'V252',apply:apply,page:PAGE};
+function boot(){apply();[80,350,1000,2600].forEach(function(ms){setTimeout(apply,ms)})}
+window.CodeLabsSourceFamilyV252={version:'V256-bounded',apply:apply,page:PAGE};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
