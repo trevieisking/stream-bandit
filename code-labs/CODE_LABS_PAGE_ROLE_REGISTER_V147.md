@@ -1,4 +1,4 @@
-# Code Labs Page Role Register V147/V148/V163
+# Code Labs Page Role Register V147/V148/V163/V244
 
 This register is the no-drop list for Code Labs pages. A page can be removed from the visible main route only when it is clearly documented as support, proof, receipt, test, or legacy/watch. A working page must not disappear just because it is not part of the main repair workflow.
 
@@ -9,6 +9,13 @@ This register is the no-drop list for Code Labs pages. A page can be removed fro
 - Project Picker still exists, but it is not currently a required step between Setup and File Lab.
 - Main workflow starts at File Lab.
 - Support, proof, receipt, scanner, and test pages may be outside the main workflow, but they must stay discoverable from Help, Tools, About, Connection Guide, scanner output, or documentation.
+
+## V244 owner-proof retirement checkpoint
+
+- `code-labs/owner-read-proof.html` is retained only as a static retirement notice for old bookmarks and documentation.
+- It must not start OAuth, call an Edge Function, read repository content, or perform any write.
+- The supported backend proof is `code-labs/read-only-proof.html`.
+- Current assistant workspace reads use Code Labs V104 tool-only control.
 
 ## V163 layout and polish checkpoint
 
@@ -78,9 +85,9 @@ V148 adds `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md` so the scanner
 | Page | Path | Role | Keep rule |
 | --- | --- | --- | --- |
 | Helper Route Map Scanner | `code-labs/helper-route-map.html` | Source-read scanner for pages/helpers/assets | Keep. Use before editing Code Labs. |
-| Read-Only Proof | `code-labs/read-only-proof.html` | Backend read-only proof | Keep as proof page. |
-| Owner Read Proof | `code-labs/owner-read-proof.html` | Owner proof/read test | Keep as proof page. |
-| Repair Bridge Status | `code-labs/repair-bridge-status.html` | Repair bridge status | Keep as status/proof page. |
+| Read-Only Proof | `code-labs/read-only-proof.html` | Supported backend read-only proof | Keep as the active backend proof page. |
+| Owner Read Proof | `code-labs/owner-read-proof.html` | Retired V99 route tombstone | Keep the static notice for old bookmarks. It must contain no OAuth, Edge Function call, repository read, or write action. |
+| Repair Bridge Status | `code-labs/repair-bridge-status.html` | V104 tool-only repair status | Keep as status/proof page. |
 | ChatGPT Connection | `code-labs/chatgpt-connection.html` | Connection stub/test | Keep as test/support page. |
 | OAuth Discovery | `code-labs/oauth-discovery.html` | OAuth discovery test | Keep as test page. |
 | OAuth Flow Test | `code-labs/oauth-flow-test.html` | OAuth flow test | Keep as test page. |
