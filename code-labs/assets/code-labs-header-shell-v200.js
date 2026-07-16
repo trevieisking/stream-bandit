@@ -1,9 +1,9 @@
-/* Code Labs Header Shell V202.
+/* Code Labs Header Shell V244.
    Canonical 18-step fallback navigation. cl-nav.js remains the primary owner.
 */
 (function () {
   'use strict';
-  var VERSION = 'V202-canonical-18';
+  var VERSION = 'V244-canonical-18';
   var ROUTES = [
     ['index.html','🏠','Home','Start and current repair'],
     ['setup.html','⚙️','Setup','Project and repository'],
@@ -28,7 +28,7 @@
     ['start-guide.html','Start Guide'],['fix-wizard.html','Fix Wizard'],['ai-handoff.html','AI Handoff'],
     ['checklist-builder.html','Checklist Builder'],['about.html','About'],['faq.html','FAQ'],
     ['context-packet.html','Context Packet'],['helper-route-map.html','Route Scanner'],
-    ['read-only-proof.html','Read-only Proof'],['owner-read-proof.html','Owner Read Proof'],
+    ['read-only-proof.html','Read-only Proof'],['repair-bridge-status.html','Repair Bridge Status'],
     ['buddy-canvas-receipt-v115.html','Canvas Receipt'],['chatgpt-buddy-tools.html','All Buddy Tools']
   ];
   var scans = 0;
@@ -45,7 +45,8 @@
   function run(){scans+=1;if(!nav())return false;tools();var small=q('.logo small');if(small)small.textContent='Complete repair workflow · Code God before GitHub Writer';if(scans>=20&&observer){observer.disconnect();observer=null}return true}
   function boot(){run();var n=q('.nav');if(n){observer=new MutationObserver(function(){window.setTimeout(run,40)});observer.observe(n,{childList:true,subtree:true,attributes:true,attributeFilter:['href','data-step']})}window.setTimeout(function(){if(observer){observer.disconnect();observer=null}},5000)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
-  window.CodeLabsHeaderShellV202={version:VERSION,routes:ROUTES,run:run};
-  window.CodeLabsHeaderShellV201=window.CodeLabsHeaderShellV202;
-  window.CodeLabsHeaderShellV200=window.CodeLabsHeaderShellV202;
+  window.CodeLabsHeaderShellV244={version:VERSION,routes:ROUTES,run:run};
+  window.CodeLabsHeaderShellV202=window.CodeLabsHeaderShellV244;
+  window.CodeLabsHeaderShellV201=window.CodeLabsHeaderShellV244;
+  window.CodeLabsHeaderShellV200=window.CodeLabsHeaderShellV244;
 })();
