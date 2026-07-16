@@ -3,57 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Code Labs - Owner Read Proof</title>
-<meta name="robots" content="noindex,nofollow">
-<link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
-<link rel="stylesheet" href="assets/code-labs.css?v=cl-v99-read-proof">
-<style>textarea{min-height:270px;font-size:12px}.diffBox{min-height:260px}</style>
-</head>
-<body data-page="owner-read-proof">
-<div class="app">
-<aside class="sidebar">
-<div class="logo"><div class="logoMark">CL</div><div><b>Code Labs</b><small>Owner read proof</small></div></div>
-<nav class="nav">
-<a href="index.html"><span>🏠</span><div>Home<small>Start here</small></div></a>
-<a href="chatgpt-buddy-tools.html"><span>🤖</span><div>Buddy Tools<small>Owner index</small></div></a>
-<a href="app-reader-test.html"><span>🔎</span><div>App Reader<small>V97 passed</small></div></a>
-<a class="active" href="owner-read-proof.html"><span>📚</span><div>Owner Read Proof<small>V99 test</small></div></a>
-</nav>
-<div class="sideBox"><b>V99 rule</b><p>Read full owner files first. No write actions in this proof.</p></div>
-</aside>
-<main class="main">
-<div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>Owner Read Proof</b></div><div><span class="badge good">Read only</span><span class="badge warn">Owner lane</span></div></div>
-<section class="hero"><div><span class="pill">V99 read proof</span><h1>Pull full files safely before writing.</h1><p>This proves Code Labs can read a full approved repo file or a live Steam Bandit page through the owner lane before any patch or GitHub handoff happens.</p><div class="actions"><button class="btn primary" id="startToken" type="button">Start owner token</button><button class="btn good" id="readRepo" type="button">Read repo file</button><button class="btn ghost" id="readLive" type="button">Read live page</button><button class="btn ghost" id="copyResult" type="button">Copy result</button></div></div><div class="heroCard"><b>Pass condition</b><ol><li>Owner token ready.</li><li>Repo file read returns ok true.</li><li>Live page read returns ok true.</li><li>Full text appears.</li><li>All write flags are false.</li></ol></div></section>
-<section class="panel"><h2>Target</h2><div class="fieldRow"><label>Repo<input id="repo" value="trevieisking/stream-bandit"></label><label>Branch/ref<input id="ref" value="main"></label></div><label>Repo file path<input id="path" value="code-labs/index.html"></label><label>Live URL<input id="liveUrl" value="https://chatterfriendsstreambandit.co.uk/code-labs/index.html"></label><div class="actions"><span id="status" class="badge warn">Not started</span></div><div id="help" class="notice"><p>Click <b>Start owner token</b>, then read the repo file or live page. This proof does not write.</p></div></section>
-<section class="panel"><h2>Full text pulled</h2><textarea id="preview" readonly>No file read yet.</textarea></section>
-<section class="panel"><h2>Raw result</h2><pre id="raw" class="diffBox">No response yet.</pre></section>
-<div class="footerNote">Code Labs V99 · owner read proof · read-only.</div>
-</main>
-</div>
-<div id="toast" class="toast"></div>
-<script>
-(function(){
-'use strict';
-var APP='https://xzxqfrvqdgkzwujbkdbk.supabase.co/functions/v1/code-labs-mcp-stub';
-var FN='https://xzxqfrvqdgkzwujbkdbk.supabase.co/functions/v1/code-labs-owner-bridge-proof';
-function $(s){return document.querySelector(s)}
-function set(msg,kind){var el=$('#status');if(el){el.className='badge '+(kind||'warn');el.textContent=msg}}
-function help(html){$('#help').innerHTML=html}
-function show(v){$('#raw').textContent=typeof v==='string'?v:JSON.stringify(v,null,2)}
-function toast(msg){var t=$('#toast');if(!t){alert(msg);return}t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)}
-function b64url(bytes){var s='';new Uint8Array(bytes).forEach(function(b){s+=String.fromCharCode(b)});return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
-async function challenge(verifier){return b64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier)))}
-function rand(){var a=new Uint8Array(32);crypto.getRandomValues(a);return b64url(a)}
-async function start(){var verifier=rand();var state=rand();sessionStorage.setItem('cl_v99_verifier',verifier);sessionStorage.setItem('cl_v99_state',state);var redirect=location.origin+location.pathname;var url=APP+'/oauth/authorize?response_type=code&client_id=code-labs-v99-owner-read-proof&redirect_uri='+encodeURIComponent(redirect)+'&scope=code_labs.read&state='+encodeURIComponent(state)+'&code_challenge='+encodeURIComponent(await challenge(verifier))+'&code_challenge_method=S256';location.href=url}
-async function exchange(code){set('Exchanging owner token','warn');var verifier=sessionStorage.getItem('cl_v99_verifier')||'';var body=new URLSearchParams({grant_type:'authorization_code',code:code,redirect_uri:location.origin+location.pathname,client_id:'code-labs-v99-owner-read-proof',code_verifier:verifier});var r=await fetch(APP+'/oauth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body});var data=await r.json();show({token_response:data});if(!data.access_token){set('Token failed','bad');help('<p><b>Token failed.</b> Send a screenshot.</p>');return}sessionStorage.setItem('cl_v99_access_token',data.access_token);set('Owner token ready','good');help('<p><b>Token ready.</b> Click Read repo file, then Read live page.</p>');history.replaceState({},'',location.pathname)}
-function token(){return sessionStorage.getItem('cl_v99_access_token')||''}
-async function call(body){var t=token();if(!t){set('No owner token','bad');help('<p>Click Start owner token first.</p>');return null}var r=await fetch(FN,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(body)});var data=await r.json();show(data);$('#preview').value=(data.title?'Title: '+data.title+'\n\n':'')+(data.source_text||data.text_preview||'No text returned.');if(data.ok&&data.read_only===true&&data.wrote_database===false&&data.wrote_github===false&&data.opened_pr===false&&data.deleted_anything===false){set((body.mode==='live_url'?'Live page':'Repo file')+' read passed','good');help('<p><b>PASS:</b> Full text was pulled read-only. No write flags changed.</p>')}else{set('Needs review','bad');help('<p>Result returned, but pass flags did not all match.</p>')}return data}
-async function readRepo(){set('Reading repo file','warn');await call({mode:'repo_file',repo:$('#repo').value,ref:$('#ref').value,path:$('#path').value,max_chars:120000})}
-async function readLive(){set('Reading live page','warn');await call({mode:'live_url',url:$('#liveUrl').value,max_chars:90000})}
-async function copy(){var text=$('#preview').value;if(!text||text==='No file read yet.'){toast('Read a file first.');return}try{await navigator.clipboard.writeText(text);toast('Copied.')}catch(e){$('#preview').focus();$('#preview').select();document.execCommand('copy');toast('Selected/copied.')}}
-$('#startToken').onclick=start;$('#readRepo').onclick=readRepo;$('#readLive').onclick=readLive;$('#copyResult').onclick=copy;
-var params=new URLSearchParams(location.search);var code=params.get('code');var state=params.get('state');if(code){if(state!==sessionStorage.getItem('cl_v99_state')){set('State mismatch','bad');help('<p>Token state did not match. Start again.</p>')}else{exchange(code)}}
-})();
-</script>
-</body>
-</html>
+<title>Code Labs - Owner Read Proof Retired</title>
+<meta name="description" content="Retirement notice for the obsolete Code Labs V99 owner read proof. Current Code Labs reads use the V104 tool-only connector instead of a browser OAuth proof page.">
+<meta name="robots"
