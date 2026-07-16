@@ -12,7 +12,7 @@ function run(){
   normaliseStore('codeLabsGithubWriterV2','action');
   normaliseStore('codeLabsV30RepoDesk','mode');
   var select=q('#gwAction');
-  if(select){var remove=select.querySelector('option[value="remove"]');if(remove)remove.remove();if(select.value==='remove'){select.value='change';select.dispatchEvent(new Event('change',{bubbles:true}))}}
+  if(select){if(select.value==='remove'){select.value='change';select.dispatchEvent(new Event('change',{bubbles:true}))}var remove=select.querySelector('option[value="remove"]');if(remove)remove.remove()}
   var drill=q('#gwSafeRemove');if(drill)drill.remove();
   replaceText(document.body,'Read, add, edit, remove, or review one GitHub file safely.','Read, add, edit, or review one GitHub file safely.');
   replaceText(document.body,'verified file removals, and PR review','PR review and tracking');
