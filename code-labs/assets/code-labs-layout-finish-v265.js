@@ -1,0 +1,13 @@
+/* Code Labs Layout Finish V265 - tighten two-column Buddy Notes without changing functions. */
+(function(){'use strict';
+var V='V265-tight-layout-columns';
+function q(s,r){return(r||document).querySelector(s)}
+function all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function direct(r,s){try{return all(':scope>'+s,r)}catch(e){return all(s,r).filter(function(n){return n.parentNode===r})}}
+function style(){if(q('#clLayoutFinishV265Style'))return;var s=document.createElement('style');s.id='clLayoutFinishV265Style';s.textContent='body.clLayoutFinishV265 .layout.clTightColumnsV265{display:grid;grid-template-columns:minmax(300px,.8fr) minmax(420px,1.2fr);gap:14px;align-items:start}body.clLayoutFinishV265 .clLayoutColumnV265{display:flex;flex-direction:column;min-width:0;align-self:start}body.clLayoutFinishV265 .clLayoutColumnV265>.panel{width:100%;margin:0 0 12px}body.clLayoutFinishV265 .clLayoutColumnV265>details[data-cl-buddy-notes-ui="true"]{width:100%;margin:0 0 12px!important}body.clLayoutFinishV265 .clLayoutColumnV265>details[data-cl-buddy-notes-ui="true"] textarea{min-height:150px}@media(max-width:980px){body.clLayoutFinishV265 .layout.clTightColumnsV265{grid-template-columns:1fr}}';document.head.appendChild(s)}
+function tighten(layout){var left=q(':scope>.clLayoutColumnV265[data-side="left"]',layout),right=q(':scope>.clLayoutColumnV265[data-side="right"]',layout),notes=direct(layout,'details[data-cl-buddy-notes-ui="true"]');if(left&&right){notes.forEach(function(n){left.appendChild(n)});return true}var panels=direct(layout,'.panel');if(panels.length!==2||!notes.length)return false;left=document.createElement('div');right=document.createElement('div');left.className=right.className='clLayoutColumnV265';left.dataset.side='left';right.dataset.side='right';layout.insertBefore(left,panels[0]);layout.insertBefore(right,panels[1]);left.appendChild(panels[0]);notes.forEach(function(n){left.appendChild(n)});right.appendChild(panels[1]);layout.classList.add('clTightColumnsV265');layout.dataset.clLayoutFinishVersion=V;return true}
+function apply(){style();if(document.body)document.body.classList.add('clLayoutFinishV265');all('.main .layout,main .layout').forEach(tighten);return true}
+function boot(){apply();[120,500,1200,2600].forEach(function(ms){setTimeout(apply,ms)})}
+window.CodeLabsLayoutFinishV265={version:V,apply:apply};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
