@@ -1,4 +1,4 @@
-/* Code Labs Workbench Polish V266 - shared visual system only. */
+/* Code Labs Workbench Polish V267 - shared visual system only. */
 (function () {
   'use strict';
 
@@ -63,7 +63,7 @@
 
   document.head.appendChild(style);
   document.body.classList.add('clWorkbenchV228', 'clWorkbenchV250');
-  window.CodeLabsWorkbenchPolishV228 = { version: 'V266-shared-visual-system', active: true };
+  window.CodeLabsWorkbenchPolishV228 = { version: 'V267-shared-visual-system', active: true };
 
   if (!document.querySelector('script[data-cl-layout-finish-v265]')) {
     var finish = document.createElement('script');
@@ -73,11 +73,11 @@
     document.head.appendChild(finish);
   }
 
-  if (!document.querySelector('script[data-cl-hero-utilities-v266]')) {
+  if (!document.querySelector('script[data-cl-hero-utilities-v267]')) {
     var utilities = document.createElement('script');
     utilities.async = false;
-    utilities.src = 'assets/code-labs-hero-utilities-v266.js?v=cl-v266-autofill-under-hero';
-    utilities.setAttribute('data-cl-hero-utilities-v266', 'yes');
+    utilities.src = 'assets/code-labs-hero-utilities-v266.js?v=cl-v267-patch-checkpoint-hero';
+    utilities.setAttribute('data-cl-hero-utilities-v267', 'yes');
     document.head.appendChild(utilities);
   }
 })();
