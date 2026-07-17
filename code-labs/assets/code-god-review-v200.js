@@ -1,9 +1,9 @@
-/* Code God Review V236
+/* Code God Review V237
    Read-only pre-commit analysis for the Buddy lane.
  */
 (function () {
   'use strict';
-  var VERSION = 'V236.0';
+  var VERSION = 'V237.0';
 
   function finding(severity, rule, message, fix, blocks) {
     return { severity: severity, rule_id: rule, message: message, correction: fix, blocks_github: Boolean(blocks) };
@@ -51,7 +51,8 @@
     var sourceRepo = String(input.source_repo || '');
     var path = String(input.path || '');
     var original = String(input.original || '');
-    var proposed = input.latest_handoff_body_bound ? String(input.latest_handoff_proposed || '') : String(input.proposed || '');
+    var boundProposed = String(input.latest_handoff_proposed || '');
+    var proposed = input.latest_handoff_body_bound && boundProposed.trim() ? boundProposed : String(input.proposed || '');
     var branch = String(input.request_branch || '');
     var mutating = action === 'add' || action === 'change' || action === 'remove';
     var requiresSource = action === 'read' || action === 'change' || action === 'remove';
@@ -79,7 +80,9 @@
     if ((action === 'add' || action === 'change') && /<<<<<<<|=======|>>>>>>>/.test(proposed)) findings.push(finding('P1', 'CG-CONFLICT-001', 'Unresolved merge-conflict markers were found.', 'Resolve the conflict markers and rerun Code God.', true));
     if ((action === 'add' || action === 'change') && /```(?:html|javascript|js|typescript|ts|json)?/i.test(proposed)) findings.push(finding('P2', 'CG-FENCE-001', 'Markdown code fences appear inside the proposed file.', 'Remove the Markdown fences and keep only the complete file contents.', true));
     if ((action === 'add' || action === 'change') && containsSecretValue(proposed)) findings.push(finding('P0', 'CG-SECRET-001', 'A credential-shaped value appears in the proposed browser file.', 'Remove the credential value and keep privileged values server-side only.', true));
-    if ((action === 'add' || action === 'change') && /setInterval\s*\([^,]+,\s*(?:[1-9]\d{0,3})\s*\)/.test(proposed)) findings.push(finding('P2', 'CG-TIMER-001', 'A frequent repeating timer may cause duplicate work or page jumping.', 'Use an explicit action, visibility-aware heartbeat, or guarded single owner instead.', false));
+    var hasFastTimer = /setInterval\s*\([^,]+,\s*(?:[1-9]\d{0,3})\s*\)/.test(proposed);
+    var hasChangeGuard = /lastSourceKey/.test(proposed) && /key\s*!==\s*lastSourceKey/.test(proposed);
+    if ((action === 'add' || action === 'change') && hasFastTimer && !hasChangeGuard) findings.push(finding('P2', 'CG-TIMER-001', 'A frequent repeating timer may cause duplicate work or page jumping.', 'Use an explicit action, visibility-aware heartbeat, or guarded single owner instead.', false));
     if ((action === 'add' || action === 'change') && /\.insert\s*\(/.test(proposed) && /code_labs_(?:files|versions|packets|jobs)/.test(proposed)) findings.push(finding('P2', 'CG-DUPLICATE-001', 'The proposed code may insert repeated Code Labs history rows.', 'Prefer an explicit update of the selected saved-file row unless a new version was deliberately requested.', false));
     if (mutating && /^(main|master|production|live|gh-pages)$/i.test(branch)) findings.push(finding('P0', 'CG-BRANCH-001', 'The requested GitHub branch is protected.', 'Create or use a non-main repair branch.', true));
 
