@@ -64,4 +64,12 @@
   document.head.appendChild(style);
   document.body.classList.add('clWorkbenchV228', 'clWorkbenchV250');
   window.CodeLabsWorkbenchPolishV228 = { version: 'V250-shared-visual-system', active: true };
+
+  if (!document.querySelector('script[data-cl-layout-finish-v265]')) {
+    var finish = document.createElement('script');
+    finish.async = false;
+    finish.src = 'assets/code-labs-layout-finish-v265.js?v=cl-v265-tight-layout-columns';
+    finish.setAttribute('data-cl-layout-finish-v265', 'yes');
+    document.head.appendChild(finish);
+  }
 })();
