@@ -1,4 +1,4 @@
-/* Code Labs Workbench Polish V250 - shared visual system only. */
+/* Code Labs Workbench Polish V266 - shared visual system only. */
 (function () {
   'use strict';
 
@@ -63,7 +63,7 @@
 
   document.head.appendChild(style);
   document.body.classList.add('clWorkbenchV228', 'clWorkbenchV250');
-  window.CodeLabsWorkbenchPolishV228 = { version: 'V250-shared-visual-system', active: true };
+  window.CodeLabsWorkbenchPolishV228 = { version: 'V266-shared-visual-system', active: true };
 
   if (!document.querySelector('script[data-cl-layout-finish-v265]')) {
     var finish = document.createElement('script');
@@ -71,5 +71,13 @@
     finish.src = 'assets/code-labs-layout-finish-v265.js?v=cl-v265-tight-layout-columns';
     finish.setAttribute('data-cl-layout-finish-v265', 'yes');
     document.head.appendChild(finish);
+  }
+
+  if (!document.querySelector('script[data-cl-hero-utilities-v266]')) {
+    var utilities = document.createElement('script');
+    utilities.async = false;
+    utilities.src = 'assets/code-labs-hero-utilities-v266.js?v=cl-v266-autofill-under-hero';
+    utilities.setAttribute('data-cl-hero-utilities-v266', 'yes');
+    document.head.appendChild(utilities);
   }
 })();
