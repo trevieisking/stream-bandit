@@ -24,14 +24,11 @@ type Row = Record<string, any>;
 async function reserveStateVersion(b: Binding, args: Row) {
   const expected = Number(args.expected_state_version);
   if (!Number.isFinite(expected)) throw new Error("expected_state_version is required. Read the workspace again before writing.");
-  const rows = await rest(
-    "code_labs_workspace_state?owner_id=eq." + encodeURIComponent(b.owner_id) + "&state_version=eq." + encodeURIComponent(expected),
-    {
-      method: "PATCH",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify({ state_version: expected + 1, updated_at: new Date().toISOString() }),
-    },
-  );
+  const rows = await rest("rpc/code_labs_reserve_workspace_state", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ p_owner_id: b.owner_id, p_expected_state_version: expected }),
+  });
   if (!Array.isArray(rows) || !rows[0]) throw new Error("Workspace state changed. Read the workspace again before writing.");
   return rows[0];
 }
