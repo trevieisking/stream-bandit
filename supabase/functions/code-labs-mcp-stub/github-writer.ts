@@ -32,6 +32,62 @@ function safePath(value: unknown) {
   return path;
 }
 
+function concatBytes(...parts: Uint8Array[]) {
+  const total = parts.reduce((sum, part) => sum + part.length, 0);
+  const out = new Uint8Array(total);
+  let offset = 0;
+  for (const part of parts) { out.set(part, offset); offset += part.length; }
+  return out;
+}
+
+function derLength(length: number) {
+  if (length < 128) return new Uint8Array([length]);
+  const bytes: number[] = [];
+  for (let value = length; value > 0; value >>>= 8) bytes.unshift(value & 255);
+  return new Uint8Array([0x80 | bytes.length, ...bytes]);
+}
+
+function der(tag: number, body: Uint8Array) {
+  return concatBytes(new Uint8Array([tag]), derLength(body.length), body);
+}
+
+function base64ToBytes(value: string) {
+  const binary = atob(value.replace(/\s+/g, ""));
+  const out = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) out[i] = binary.charCodeAt(i);
+  return out;
+}
+
+function bytesToBase64(value: Uint8Array) {
+  let binary = "";
+  const size = 0x8000;
+  for (let offset = 0; offset < value.length; offset += size) {
+    binary += String.fromCharCode(...value.subarray(offset, Math.min(offset + size, value.length)));
+  }
+  return btoa(binary);
+}
+
+function pem(label: string, value: Uint8Array) {
+  const encoded = bytesToBase64(value);
+  const lines = encoded.match(/.{1,64}/g) || [];
+  return "-----BEGIN " + label + "-----\n" + lines.join("\n") + "\n-----END " + label + "-----\n";
+}
+
+function normalizePrivateKey(value: string) {
+  const key = String(value || "").trim();
+  if (key.includes("-----BEGIN PRIVATE KEY-----")) return key + "\n";
+  if (!key.includes("-----BEGIN RSA PRIVATE KEY-----")) throw new Error("The GitHub App private key format is unsupported.");
+  const body = key
+    .replace("-----BEGIN RSA PRIVATE KEY-----", "")
+    .replace("-----END RSA PRIVATE KEY-----", "")
+    .replace(/\s+/g, "");
+  const pkcs1 = base64ToBytes(body);
+  const version = der(0x02, new Uint8Array([0]));
+  const rsaAlgorithm = new Uint8Array([0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00]);
+  const privateKey = der(0x04, pkcs1);
+  return pem("PRIVATE KEY", der(0x30, concatBytes(version, rsaAlgorithm, privateKey)));
+}
+
 async function digest(value: unknown) {
   const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify(value ?? null)));
   return Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
@@ -46,7 +102,8 @@ async function githubAppToken() {
   const appId = requiredSecret("CODE_LABS_GITHUB_APP_ID");
   const installationId = requiredSecret("CODE_LABS_GITHUB_INSTALLATION_ID");
   const encodedKey = requiredSecret("CODE_LABS_GITHUB_APP_KEY_B64");
-  const keyText = new TextDecoder().decode(Uint8Array.from(atob(encodedKey), (character) => character.charCodeAt(0)));
+  const keyBytes = base64ToBytes(encodedKey);
+  const keyText = normalizePrivateKey(new TextDecoder().decode(keyBytes));
   const key = await importPKCS8(keyText, "RS256");
   const now = Math.floor(Date.now() / 1000);
   const jwt = await new SignJWT({})
@@ -144,7 +201,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     if (String(request.action) !== "create_file") throw error;
   }
 
-  const encodedContent = btoa(String.fromCharCode(...new TextEncoder().encode(content)));
+  const encodedContent = bytesToBase64(new TextEncoder().encode(content));
   const commitPayload: Row = { message: String(request.commit_message || "Code Labs complete-file update"), content: encodedContent, branch };
   if (currentSha) commitPayload.sha = currentSha;
   const committed = await github("/repos/" + OWNER + "/" + REPO_NAME + "/contents/" + path.split("/").map(encodeURIComponent).join("/"), token, { method: "PUT", body: JSON.stringify(commitPayload) });
