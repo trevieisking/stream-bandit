@@ -96,7 +96,10 @@ export async function runAction(b: Binding, args: Row) {
   }
   if (action === "code_god.review") return guarded(b, args, reviewCodeGod);
   if (action === "github.writer_prepare") return guarded(b, args, prepareGithubWriter);
-  if (action === "github.writer_execute") return guarded(b, args, executeGithubWriter);
+  if (action === "github.writer_execute") {
+    const requestId = String(args.request_id || args.record_id || args.fields?.request_id || "").trim();
+    return guarded(b, { ...args, request_id: requestId }, executeGithubWriter);
+  }
 
   const alreadyLocked = action.endsWith(".select") || action === "workflow.advance" || action === "workflow.reset";
   const readOnlyAction = action === "canvas.load_packet" || action === "github.prepare_request";
