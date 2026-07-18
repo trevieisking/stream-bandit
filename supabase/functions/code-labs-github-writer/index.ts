@@ -3,7 +3,7 @@ import { executeGithubWriter } from "../code-labs-mcp-stub/github-writer.ts";
 
 type Row = Record<string, any>;
 
-const VERSION = "Code Labs V104 GitHub Writer v2";
+const VERSION = "Code Labs V104 GitHub Writer v3";
 const PROJECT_URL = "https://xzxqfrvqdgkzwujbkdbk.supabase.co";
 const BASE = PROJECT_URL + "/functions/v1/code-labs-github-writer";
 const AUTH_SERVER = PROJECT_URL + "/functions/v1/code-labs-mcp-stub";
@@ -52,22 +52,41 @@ const writerTool = {
   },
 };
 
+function unwrapReservation(value: unknown): Row | null {
+  let current: any = value;
+  if (typeof current === "string") {
+    try { current = JSON.parse(current); } catch { return null; }
+  }
+  if (Array.isArray(current)) current = current.length === 1 ? current[0] : null;
+  if (
+    current &&
+    typeof current === "object" &&
+    Object.prototype.hasOwnProperty.call(current, "code_labs_reserve_workspace_state_json")
+  ) {
+    current = current.code_labs_reserve_workspace_state_json;
+  }
+  if (typeof current === "string") {
+    try { current = JSON.parse(current); } catch { return null; }
+  }
+  return current && typeof current === "object" && !Array.isArray(current) ? current : null;
+}
+
 async function reserveWorkspace(ownerId: string, expected: number) {
   if (!Number.isFinite(expected)) {
     throw new Error("expected_state_version is required. Read the workspace again before writing.");
   }
 
-  const workspace = await rest("rpc/code_labs_reserve_workspace_state_json", {
+  const result = await rest("rpc/code_labs_reserve_workspace_state_json", {
     method: "POST",
     body: JSON.stringify({
       p_owner_id: ownerId,
       p_expected_state_version: expected,
     }),
   });
+  const workspace = unwrapReservation(result);
 
   if (
     !workspace ||
-    Array.isArray(workspace) ||
     String(workspace.owner_id || "") !== ownerId ||
     Number(workspace.state_version) !== expected + 1
   ) {
