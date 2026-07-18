@@ -3,7 +3,7 @@ import { executeGithubWriter } from "../code-labs-mcp-stub/github-writer.ts";
 
 type Row = Record<string, any>;
 
-const VERSION = "Code Labs V104 GitHub Writer v3";
+const VERSION = "Code Labs V104 GitHub Writer v4";
 const PROJECT_URL = "https://xzxqfrvqdgkzwujbkdbk.supabase.co";
 const BASE = PROJECT_URL + "/functions/v1/code-labs-github-writer";
 const AUTH_SERVER = PROJECT_URL + "/functions/v1/code-labs-mcp-stub";
@@ -54,21 +54,32 @@ const writerTool = {
 
 function unwrapReservation(value: unknown): Row | null {
   let current: any = value;
-  if (typeof current === "string") {
-    try { current = JSON.parse(current); } catch { return null; }
+  for (let depth = 0; depth < 6; depth += 1) {
+    if (typeof current === "string") {
+      try {
+        current = JSON.parse(current);
+        continue;
+      } catch {
+        return null;
+      }
+    }
+    if (Array.isArray(current)) {
+      if (current.length !== 1) return null;
+      current = current[0];
+      continue;
+    }
+    if (!current || typeof current !== "object") return null;
+    if (
+      Object.prototype.hasOwnProperty.call(current, "owner_id") &&
+      Object.prototype.hasOwnProperty.call(current, "state_version")
+    ) {
+      return current;
+    }
+    const keys = Object.keys(current);
+    if (keys.length !== 1) return null;
+    current = current[keys[0]];
   }
-  if (Array.isArray(current)) current = current.length === 1 ? current[0] : null;
-  if (
-    current &&
-    typeof current === "object" &&
-    Object.prototype.hasOwnProperty.call(current, "code_labs_reserve_workspace_state_json")
-  ) {
-    current = current.code_labs_reserve_workspace_state_json;
-  }
-  if (typeof current === "string") {
-    try { current = JSON.parse(current); } catch { return null; }
-  }
-  return current && typeof current === "object" && !Array.isArray(current) ? current : null;
+  return null;
 }
 
 async function reserveWorkspace(ownerId: string, expected: number) {
