@@ -191,14 +191,40 @@ function safeFailureMessage(stage: string, error: unknown) {
   return fixed[stage] || "The guarded GitHub writer failed before completion.";
 }
 
-async function recordFailure(ownerId: string, requestId: string, stage: string, error: unknown) {
+function requiresManualRecovery(stage: string) {
+  return ["file_commit", "draft_pr", "request_update"].includes(stage);
+}
+
+async function recordFailure(ownerId: string, requestId: string, stage: string, error: unknown, progress: Row) {
   const message = safeFailureMessage(stage, error);
+  const recoveryRequired = requiresManualRecovery(stage);
+  const patch: Row = {
+    status: recoveryRequired ? "failed" : "queued",
+    error: stage + ": " + message,
+    updated_at: new Date().toISOString(),
+  };
+  if (progress.commit_sha && progress.content_sha) {
+    patch.github_branch_created = true;
+    patch.github_commit_sha = progress.commit_sha;
+    patch.github_content_sha = progress.content_sha;
+  }
+  if (progress.pull_request_number && progress.pull_request_url) {
+    patch.status = "pr_opened";
+    patch.pull_request_number = progress.pull_request_number;
+    patch.pull_request_url = progress.pull_request_url;
+  }
   await Promise.allSettled([
-    audit(requestId, "writer_failed", { stage, message }),
+    audit(requestId, "writer_failed", {
+      stage,
+      message,
+      recovery_required: recoveryRequired,
+      commit_proof_preserved: Boolean(progress.commit_sha && progress.content_sha),
+      pull_request_proof_preserved: Boolean(progress.pull_request_number && progress.pull_request_url),
+    }),
     rest("code_labs_write_requests?id=eq." + encodeURIComponent(requestId) + "&requested_by=eq." + encodeURIComponent(ownerId), {
       method: "PATCH",
       headers: { Prefer: "return=minimal" },
-      body: JSON.stringify({ status: "queued", error: stage + ": " + message, updated_at: new Date().toISOString() }),
+      body: JSON.stringify(patch),
     }),
   ]);
 }
@@ -209,10 +235,11 @@ export async function executeGithubWriter(b: Binding, args: Row) {
   if (!requestId) throw new Error("request_id is required.");
 
   let stage = "request_lookup";
+  const progress: Row = {};
   try {
     const request = await selectedRequest(b.owner_id, requestId);
     if (request.direct_main_write !== false || request.branch_pr_only !== true || request.deletes_anything !== false) throw new Error("The request safety flags are invalid.");
-    if (!["queued", "prepared", "branch_created", "failed"].includes(String(request.status || ""))) throw new Error("The request is not executable in its current state.");
+    if (!["queued", "prepared", "branch_created"].includes(String(request.status || ""))) throw new Error("The request is not executable in its current state.");
     const branch = safeBranch(request.branch);
     const path = safePath(request.path);
     const content = String(request.content || "");
@@ -247,6 +274,8 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     const commitSha = String(committed?.commit?.sha || "");
     const contentSha = String(committed?.content?.sha || "");
     if (!commitSha || !contentSha) throw new Error("GitHub did not return commit proof.");
+    progress.commit_sha = commitSha;
+    progress.content_sha = contentSha;
     await audit(requestId, "file_committed", { branch, path, commit_sha: commitSha, content_sha: contentSha });
 
     stage = "draft_pr";
@@ -261,6 +290,8 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     const pullNumber = Number(pull?.number || 0);
     const pullUrl = String(pull?.html_url || "");
     if (!pullNumber || !pullUrl) throw new Error("GitHub did not return pull-request proof.");
+    progress.pull_request_number = pullNumber;
+    progress.pull_request_url = pullUrl;
     await audit(requestId, "draft_pr_opened", { pull_request_number: pullNumber, pull_request_url: pullUrl, reused: Array.isArray(pulls) && pulls.length > 0 });
 
     stage = "request_update";
@@ -271,7 +302,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     });
     return { ok: true, version: VERSION, tool: "execute_code_labs_github_writer", wrote_database: true, wrote_github: true, opened_pr: true, deleted_anything: false, request: updated?.[0] || null, github: { branch, path, commit_sha: commitSha, content_sha: contentSha, pull_request_number: pullNumber, pull_request_url: pullUrl, draft: true } };
   } catch (error) {
-    await recordFailure(b.owner_id, requestId, stage, error);
+    await recordFailure(b.owner_id, requestId, stage, error, progress);
     throw error;
   }
 }
