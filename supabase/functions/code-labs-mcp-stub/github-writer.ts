@@ -174,59 +174,104 @@ async function approvedHandoff(ownerId: string, request: Row) {
   return { handoff, review };
 }
 
+function safeFailureMessage(stage: string, error: unknown) {
+  const raw = error instanceof Error ? error.message : String(error || "Writer execution failed.");
+  const fixed: Record<string, string> = {
+    request_lookup: "The queued request could not be loaded or validated.",
+    handoff_validation: "The reviewed Code Labs handoff could not be validated.",
+    github_token: "GitHub App installation authentication failed.",
+    branch_verification: "The required GitHub branch could not be verified.",
+    file_lookup: "The target GitHub file could not be read safely.",
+    file_commit: "GitHub did not accept the reviewed complete-file commit.",
+    draft_pr: "The draft pull request could not be opened or reused.",
+    request_update: "GitHub completed, but the Code Labs request receipt could not be updated.",
+  };
+  if (/GitHub App installation token could not be created/i.test(raw)) return fixed.github_token;
+  if (/branch does not exist|GitHub API request failed/i.test(raw) && stage === "branch_verification") return fixed.branch_verification;
+  return fixed[stage] || "The guarded GitHub writer failed before completion.";
+}
+
+async function recordFailure(ownerId: string, requestId: string, stage: string, error: unknown) {
+  const message = safeFailureMessage(stage, error);
+  await Promise.allSettled([
+    audit(requestId, "writer_failed", { stage, message }),
+    rest("code_labs_write_requests?id=eq." + encodeURIComponent(requestId) + "&requested_by=eq." + encodeURIComponent(ownerId), {
+      method: "PATCH",
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify({ status: "queued", error: stage + ": " + message, updated_at: new Date().toISOString() }),
+    }),
+  ]);
+}
+
 export async function executeGithubWriter(b: Binding, args: Row) {
   if (args.confirmed !== true) throw new Error("confirmed must be true to execute the GitHub writer.");
   const requestId = String(args.request_id || "").trim();
   if (!requestId) throw new Error("request_id is required.");
-  const request = await selectedRequest(b.owner_id, requestId);
-  if (request.direct_main_write !== false || request.branch_pr_only !== true || request.deletes_anything !== false) throw new Error("The request safety flags are invalid.");
-  if (!["queued", "prepared", "branch_created", "failed"].includes(String(request.status || ""))) throw new Error("The request is not executable in its current state.");
-  const branch = safeBranch(request.branch);
-  const path = safePath(request.path);
-  const content = String(request.content || "");
-  if (!content || content.length > MAX_CONTENT) throw new Error("A complete file under the queue limit is required.");
-  await approvedHandoff(b.owner_id, request);
 
-  const token = await githubAppToken();
-  const branchRef = await github("/repos/" + OWNER + "/" + REPO_NAME + "/git/ref/heads/" + encodeURIComponent(branch), token);
-  const branchSha = String(branchRef?.object?.sha || "");
-  if (!branchSha) throw new Error("The required GitHub branch does not exist.");
-  await audit(requestId, "branch_verified", { branch, branch_sha: branchSha });
-
-  let currentSha: string | null = null;
+  let stage = "request_lookup";
   try {
-    const existing = await github("/repos/" + OWNER + "/" + REPO_NAME + "/contents/" + path.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(branch), token);
-    currentSha = existing?.sha ? String(existing.sha) : null;
-  } catch (error) {
-    if (String(request.action) !== "create_file") throw error;
-  }
+    const request = await selectedRequest(b.owner_id, requestId);
+    if (request.direct_main_write !== false || request.branch_pr_only !== true || request.deletes_anything !== false) throw new Error("The request safety flags are invalid.");
+    if (!["queued", "prepared", "branch_created", "failed"].includes(String(request.status || ""))) throw new Error("The request is not executable in its current state.");
+    const branch = safeBranch(request.branch);
+    const path = safePath(request.path);
+    const content = String(request.content || "");
+    if (!content || content.length > MAX_CONTENT) throw new Error("A complete file under the queue limit is required.");
 
-  const encodedContent = bytesToBase64(new TextEncoder().encode(content));
-  const commitPayload: Row = { message: String(request.commit_message || "Code Labs complete-file update"), content: encodedContent, branch };
-  if (currentSha) commitPayload.sha = currentSha;
-  const committed = await github("/repos/" + OWNER + "/" + REPO_NAME + "/contents/" + path.split("/").map(encodeURIComponent).join("/"), token, { method: "PUT", body: JSON.stringify(commitPayload) });
-  const commitSha = String(committed?.commit?.sha || "");
-  const contentSha = String(committed?.content?.sha || "");
-  if (!commitSha || !contentSha) throw new Error("GitHub did not return commit proof.");
-  await audit(requestId, "file_committed", { branch, path, commit_sha: commitSha, content_sha: contentSha });
+    stage = "handoff_validation";
+    await approvedHandoff(b.owner_id, request);
 
-  const pulls = await github("/repos/" + OWNER + "/" + REPO_NAME + "/pulls?state=open&head=" + encodeURIComponent(OWNER + ":" + branch) + "&base=" + encodeURIComponent(BASE_BRANCH), token);
-  let pull = Array.isArray(pulls) ? pulls[0] : null;
-  if (!pull) {
-    pull = await github("/repos/" + OWNER + "/" + REPO_NAME + "/pulls", token, {
-      method: "POST",
-      body: JSON.stringify({ title: String(request.pr_title || "Code Labs update: " + path), body: String(request.pr_body || "Prepared by Code Labs after Code God PASS."), head: branch, base: BASE_BRANCH, draft: true, maintainer_can_modify: false }),
+    stage = "github_token";
+    const token = await githubAppToken();
+
+    stage = "branch_verification";
+    const branchRef = await github("/repos/" + OWNER + "/" + REPO_NAME + "/git/ref/heads/" + encodeURIComponent(branch), token);
+    const branchSha = String(branchRef?.object?.sha || "");
+    if (!branchSha) throw new Error("The required GitHub branch does not exist.");
+    await audit(requestId, "branch_verified", { branch, branch_sha: branchSha });
+
+    stage = "file_lookup";
+    let currentSha: string | null = null;
+    try {
+      const existing = await github("/repos/" + OWNER + "/" + REPO_NAME + "/contents/" + path.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(branch), token);
+      currentSha = existing?.sha ? String(existing.sha) : null;
+    } catch (error) {
+      if (String(request.action) !== "create_file") throw error;
+    }
+
+    stage = "file_commit";
+    const encodedContent = bytesToBase64(new TextEncoder().encode(content));
+    const commitPayload: Row = { message: String(request.commit_message || "Code Labs complete-file update"), content: encodedContent, branch };
+    if (currentSha) commitPayload.sha = currentSha;
+    const committed = await github("/repos/" + OWNER + "/" + REPO_NAME + "/contents/" + path.split("/").map(encodeURIComponent).join("/"), token, { method: "PUT", body: JSON.stringify(commitPayload) });
+    const commitSha = String(committed?.commit?.sha || "");
+    const contentSha = String(committed?.content?.sha || "");
+    if (!commitSha || !contentSha) throw new Error("GitHub did not return commit proof.");
+    await audit(requestId, "file_committed", { branch, path, commit_sha: commitSha, content_sha: contentSha });
+
+    stage = "draft_pr";
+    const pulls = await github("/repos/" + OWNER + "/" + REPO_NAME + "/pulls?state=open&head=" + encodeURIComponent(OWNER + ":" + branch) + "&base=" + encodeURIComponent(BASE_BRANCH), token);
+    let pull = Array.isArray(pulls) ? pulls[0] : null;
+    if (!pull) {
+      pull = await github("/repos/" + OWNER + "/" + REPO_NAME + "/pulls", token, {
+        method: "POST",
+        body: JSON.stringify({ title: String(request.pr_title || "Code Labs update: " + path), body: String(request.pr_body || "Prepared by Code Labs after Code God PASS."), head: branch, base: BASE_BRANCH, draft: true, maintainer_can_modify: false }),
+      });
+    }
+    const pullNumber = Number(pull?.number || 0);
+    const pullUrl = String(pull?.html_url || "");
+    if (!pullNumber || !pullUrl) throw new Error("GitHub did not return pull-request proof.");
+    await audit(requestId, "draft_pr_opened", { pull_request_number: pullNumber, pull_request_url: pullUrl, reused: Array.isArray(pulls) && pulls.length > 0 });
+
+    stage = "request_update";
+    const updated = await rest("code_labs_write_requests?id=eq." + encodeURIComponent(requestId) + "&requested_by=eq." + encodeURIComponent(b.owner_id), {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ status: "pr_opened", github_branch_created: true, github_commit_sha: commitSha, github_content_sha: contentSha, pull_request_number: pullNumber, pull_request_url: pullUrl, error: null, updated_at: new Date().toISOString() }),
     });
+    return { ok: true, version: VERSION, tool: "execute_code_labs_github_writer", wrote_database: true, wrote_github: true, opened_pr: true, deleted_anything: false, request: updated?.[0] || null, github: { branch, path, commit_sha: commitSha, content_sha: contentSha, pull_request_number: pullNumber, pull_request_url: pullUrl, draft: true } };
+  } catch (error) {
+    await recordFailure(b.owner_id, requestId, stage, error);
+    throw error;
   }
-  const pullNumber = Number(pull?.number || 0);
-  const pullUrl = String(pull?.html_url || "");
-  if (!pullNumber || !pullUrl) throw new Error("GitHub did not return pull-request proof.");
-  await audit(requestId, "draft_pr_opened", { pull_request_number: pullNumber, pull_request_url: pullUrl, reused: Array.isArray(pulls) && pulls.length > 0 });
-
-  const updated = await rest("code_labs_write_requests?id=eq." + encodeURIComponent(requestId) + "&requested_by=eq." + encodeURIComponent(b.owner_id), {
-    method: "PATCH",
-    headers: { Prefer: "return=representation" },
-    body: JSON.stringify({ status: "pr_opened", github_branch_created: true, github_commit_sha: commitSha, github_content_sha: contentSha, pull_request_number: pullNumber, pull_request_url: pullUrl, error: null, updated_at: new Date().toISOString() }),
-  });
-  return { ok: true, version: VERSION, tool: "execute_code_labs_github_writer", wrote_database: true, wrote_github: true, opened_pr: true, deleted_anything: false, request: updated?.[0] || null, github: { branch, path, commit_sha: commitSha, content_sha: contentSha, pull_request_number: pullNumber, pull_request_url: pullUrl, draft: true } };
 }
