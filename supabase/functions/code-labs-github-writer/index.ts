@@ -3,7 +3,7 @@ import { executeGithubWriter } from "../code-labs-mcp-stub/github-writer.ts";
 
 type Row = Record<string, any>;
 
-const VERSION = "Code Labs V104 GitHub Writer v1";
+const VERSION = "Code Labs V104 GitHub Writer v2";
 const PROJECT_URL = "https://xzxqfrvqdgkzwujbkdbk.supabase.co";
 const BASE = PROJECT_URL + "/functions/v1/code-labs-github-writer";
 const AUTH_SERVER = PROJECT_URL + "/functions/v1/code-labs-mcp-stub";
@@ -57,18 +57,17 @@ async function reserveWorkspace(ownerId: string, expected: number) {
     throw new Error("expected_state_version is required. Read the workspace again before writing.");
   }
 
-  const result = await rest("rpc/code_labs_reserve_workspace_state", {
+  const workspace = await rest("rpc/code_labs_reserve_workspace_state_json", {
     method: "POST",
-    headers: { Prefer: "return=representation" },
     body: JSON.stringify({
       p_owner_id: ownerId,
       p_expected_state_version: expected,
     }),
   });
 
-  const workspace = Array.isArray(result) ? result[0] : result;
   if (
     !workspace ||
+    Array.isArray(workspace) ||
     String(workspace.owner_id || "") !== ownerId ||
     Number(workspace.state_version) !== expected + 1
   ) {
