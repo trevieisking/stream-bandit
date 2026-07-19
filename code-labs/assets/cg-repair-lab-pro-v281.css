@@ -1,0 +1,14 @@
+.cgrlStatus{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--panel2);padding:8px 12px;margin-bottom:12px;font-weight:1000;letter-spacing:.06em}
+.cgrlStatus[data-state="working"]{color:var(--warn)}
+.cgrlStatus[data-state="pass"]{color:var(--good)}
+.cgrlStatus[data-state="block"]{color:var(--bad)}
+#cgrlForm fieldset{border:0;padding:0;margin:0}
+#cgrlForm fieldset:disabled{opacity:.58}
+.cgrlFinding{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.cgrlSeverity{min-width:42px;text-align:center;border-radius:12px;padding:6px 8px;background:var(--panel);border:1px solid var(--line);font-weight:1000}
+.cgrlFinding[data-severity="P0"] .cgrlSeverity,.cgrlFinding[data-severity="P1"] .cgrlSeverity{color:var(--bad)}
+.cgrlFinding[data-severity="P2"] .cgrlSeverity{color:var(--warn)}
+.cgrlFinding[data-severity="P3"] .cgrlSeverity{color:var(--good)}
+.cgrlLocation,.cgrlCalls{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-size:12px;overflow-wrap:anywhere}
+.cgrlSecretName{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-weight:1000}
+@media(max-width:700px){.cgrlFinding{grid-template-columns:1fr}.cgrlSeverity{width:max-content}}
