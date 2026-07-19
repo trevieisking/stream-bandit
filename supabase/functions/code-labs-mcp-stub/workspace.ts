@@ -376,7 +376,21 @@ export async function runAction(b: Binding, args: Row) {
 
   if (action === "workflow.advance") {
     const before = await ensureState(b.owner_id);
-    const order = ["setup", "project", "file", "repair", "packet", "candidate", "test", "checkpoint", "github"];
+    const order = [
+      "setup",
+      "project",
+      "file",
+      "repair",
+      "packet",
+      "candidate",
+      "test",
+      "checkpoint",
+      "repo",
+      "cg_repair_lab",
+      "code_god",
+      "github_writer",
+      "github_tracker",
+    ];
     const index = Math.max(0, order.indexOf(before.workflow_step));
     const after = await patchState(b.owner_id, { workflow_step: order[Math.min(index + 1, order.length - 1)] }, args.expected_state_version);
     return { ok: true, version: VERSION, tool: "run_code_labs_action", workspace: after, receipt: await receipt(b.owner_id, action, "workspace", b.owner_id, before, after, false, true) };
