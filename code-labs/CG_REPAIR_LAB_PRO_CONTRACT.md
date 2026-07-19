@@ -35,6 +35,15 @@ Entitlement must be enforced in both places:
 
 Client state, hidden controls or a previously successful request are not sufficient proof of entitlement. The server must deny an unentitled request even if it is called directly.
 
+Before Code Labs has its separate customer sign-in, billing and subscription
+workflow, the authenticated platform owner may perform one confirmed interim
+activation. That setup operation must verify an arbitrary requested repository
+through the already connected GitHub installation before it stores the owner's
+Pro entitlement and repository binding. It must not hard-code a repository or
+installation identifier, return installation metadata, expose credential
+values, or become part of CG Repair Lab analysis. Future customer entitlement
+and GitHub installation onboarding must replace this interim owner-only setup.
+
 ## 3. Repository scope and GitHub verification
 
 CG Repair Lab must support arbitrary repositories owned by the current user. It must not hard-code Stream Bandit, a repository ID, a repository name, an installation ID, a branch or a file path.

@@ -181,6 +181,103 @@ export async function githubRequest(
   return payload;
 }
 
+async function upsertControlRow(
+  table: string,
+  conflictColumns: string,
+  row: Row,
+) {
+  await rest(
+    table + "?on_conflict=" + encodeURIComponent(conflictColumns),
+    {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify(row),
+    },
+  );
+}
+
+export async function activateOwnerRepository(
+  ownerId: string,
+  requestedRepository: unknown,
+) {
+  const repo = cleanRepository(requestedRepository);
+  const installationId = requiredSecret(
+    "CODE_LABS_GITHUB_INSTALLATION_ID",
+  );
+  if (!/^[1-9][0-9]*$/.test(installationId)) {
+    throw new Error(
+      "The connected GitHub installation reference is not configured correctly.",
+    );
+  }
+  const [owner, name] = repo.split("/");
+  const token = await installationToken(
+    installationId,
+    name,
+    { contents: "read", metadata: "read" },
+  );
+  const verified: Row = await githubRequest(
+    "/repos/" + [owner, name].map(encodeURIComponent).join("/"),
+    token,
+  );
+  if (String(verified.full_name || "").toLowerCase() !== repo.toLowerCase()) {
+    throw new Error("GitHub did not verify the requested repository identity.");
+  }
+  const defaultBranch = String(verified.default_branch || "main");
+
+  await upsertControlRow(
+    "code_labs_github_installations",
+    "owner_id,installation_id",
+    {
+      owner_id: ownerId,
+      installation_id: installationId,
+      status: "active",
+      updated_at: new Date().toISOString(),
+    },
+  );
+  await upsertControlRow(
+    "code_labs_github_repositories",
+    "owner_id,repo_full_name",
+    {
+      owner_id: ownerId,
+      installation_id: installationId,
+      repo_full_name: repo,
+      default_branch: defaultBranch,
+      status: "active",
+      updated_at: new Date().toISOString(),
+    },
+  );
+  await upsertControlRow(
+    "code_labs_entitlements",
+    "owner_id,product_key",
+    {
+      owner_id: ownerId,
+      product_key: "code_labs",
+      plan_key: "pro",
+      status: "active",
+      starts_at: new Date().toISOString(),
+      expires_at: null,
+      features: {
+        cg_repair_lab: true,
+        interim_owner_access: true,
+      },
+      updated_at: new Date().toISOString(),
+    },
+  );
+
+  return {
+    ok: true,
+    owner_access_active: true,
+    repository: {
+      repo,
+      default_branch: defaultBranch,
+    },
+    wrote_database: true,
+    wrote_github: false,
+    returned_installation_metadata: false,
+    returned_credentials: false,
+  };
+}
+
 export async function verifyOwnerRepository(
   ownerId: string,
   requestedRepository: unknown,
