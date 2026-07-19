@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
 <link rel="stylesheet" href="assets/code-labs.css?v=cl-v83-live-promo-polish">
-<link rel="stylesheet" href="assets/cg-repair-lab-pro-v281.css?v=cgrl-v281">
+<link rel="stylesheet" href="assets/cg-repair-lab-pro-v281.css?v=cgrl-v282">
 </head>
 <body data-page="cg-repair-lab">
 <div class="app">
@@ -22,7 +22,7 @@
 <div class="topbar"><div class="crumbs"><span>Code Labs</span><span>›</span><b>CG Repair Lab</b></div><div><span class="badge warn">Code Labs Pro</span><span class="badge good">Read only</span></div></div>
 <section class="hero"><div><span class="pill">Step 15 of 19</span><h1>Understand the whole repository before Code God.</h1><p>Map every indexed live page and its connected HTML, CSS, JavaScript, TypeScript, JSON, SQL, Edge Functions, tables, RPCs, storage routes and secret-call references. Findings and a separate complete-file candidate still require deterministic Code God review.</p></div><div class="heroCard"><b>Fixed safety order</b><ol><li>File Lab or verified repository source.</li><li>CG Repair Lab Pro analysis.</li><li>Code God deterministic review.</li><li>GitHub Writer branch and draft PR.</li></ol></div></section>
 
-<section id="cgrlGate" class="notice" aria-live="polite"><h2>Pro access check</h2><p id="cgrlAccessText">CG Repair Lab is locked until the server confirms an active Code Labs Pro entitlement and at least one owner-authorized GitHub repository.</p><div class="actions"><button class="btn primary" id="cgrlCheckAccess" type="button">Check Pro access</button></div></section>
+<section id="cgrlGate" class="notice" aria-live="polite"><h2>Pro access check</h2><p id="cgrlAccessText">CG Repair Lab is locked until the server confirms an active Code Labs Pro entitlement and at least one owner-authorized GitHub repository.</p><div class="actions"><button class="btn primary" id="cgrlCheckAccess" type="button" data-code-labs-tool="get_cg_repair_lab_access">Check Pro access</button></div></section>
 
 <section class="panel" aria-labelledby="cgrlRunTitle">
 <h2 id="cgrlRunTitle">Repository analysis</h2>
@@ -34,26 +34,32 @@
 <label>Branch, tag or commit<input id="cgrlRef" name="ref" autocomplete="off" placeholder="Verified default branch"></label>
 <label>Selected source path<input id="cgrlPath" name="path" autocomplete="off" required placeholder="src/page.ts or public/index.html"></label>
 </div>
-<div class="actions"><button class="btn primary" id="cgrlRun" type="submit">Run read-only repository analysis</button><a class="btn ghost" href="file-lab.html">Back to File Lab</a></div>
+<div class="actions"><button class="btn primary" id="cgrlRun" type="submit" data-code-labs-tool="analyze_code_labs_repository">Run read-only repository analysis</button><a class="btn ghost" href="file-lab.html" data-code-labs-tool="read_code_labs_url">Back to File Lab</a></div>
 </fieldset>
 </form>
 </section>
 
-<section class="panel" aria-labelledby="cgrlResultTitle">
+<section class="panel" aria-label="CG Repair Lab report tabs"><div class="cgrlTabs" role="tablist"><button class="cgrlTab active" type="button" role="tab" aria-selected="true" data-cgrl-tab="summary">Summary</button><button class="cgrlTab" type="button" role="tab" aria-selected="false" data-cgrl-tab="findings">Findings</button><button class="cgrlTab" type="button" role="tab" aria-selected="false" data-cgrl-tab="dependencies">Dependencies</button><button class="cgrlTab" type="button" role="tab" aria-selected="false" data-cgrl-tab="database">Database</button><button class="cgrlTab" type="button" role="tab" aria-selected="false" data-cgrl-tab="secrets">Secret calls</button><button class="cgrlTab" type="button" role="tab" aria-selected="false" data-cgrl-tab="debug">Debug</button><button class="cgrlTab" type="button" role="tab" aria-selected="false" data-cgrl-tab="handoff">Code God + Writer</button></div></section>
+
+<section class="panel cgrlPanel active" data-cgrl-panel="summary" aria-labelledby="cgrlResultTitle">
 <h2 id="cgrlResultTitle">Analysis result</h2>
 <div id="cgrlStatus" class="cgrlStatus" data-state="ready">READY</div>
 <div id="cgrlSummary" class="notice"><p>Check Pro access, choose an authorized repository and run the analysis.</p></div>
 <div id="cgrlCounts" class="grid" aria-label="Repository analysis counts"></div>
 </section>
 
-<section class="panel"><h2>Findings and debug map</h2><div id="cgrlFindings" class="list"><div class="empty">No analysis has run.</div></div></section>
-<section class="panel"><h2>Exact secret-call references</h2><p>Entries show the secret name, exact environment or global reference, declaration location and downstream call expression. Values are never requested, stored or displayed.</p><div id="cgrlSecrets" class="list"><div class="empty">No references loaded.</div></div></section>
-<section class="panel"><h2>Code God handoff</h2><p id="cgrlCandidateText">No proposed complete-file candidate is ready. CG Repair Lab never replaces the selected source automatically.</p><div class="actions"><button class="btn good" id="cgrlCodeGod" type="button" disabled>Send separate candidate to Code God</button><a class="btn ghost" href="code-god.html">Open Code God</a></div></section>
+<section class="panel cgrlPanel" data-cgrl-panel="findings"><h2>Findings</h2><div id="cgrlFindings" class="list"><div class="empty">No analysis has run.</div></div></section>
+<section class="panel cgrlPanel" data-cgrl-panel="dependencies"><h2>Dependency map</h2><div id="cgrlDependencies" class="list"><div class="empty">No dependency map loaded.</div></div></section>
+<section class="panel cgrlPanel" data-cgrl-panel="database"><h2>Database, RPC, Edge Function and storage map</h2><div id="cgrlDatabase" class="list"><div class="empty">No database map loaded.</div></div></section>
+<section class="panel cgrlPanel" data-cgrl-panel="secrets"><h2>Exact secret-call references</h2><p>Entries show the secret name, exact environment or global reference, declaration location and downstream call expression. Values are never requested, stored or displayed.</p><div id="cgrlSecrets" class="list"><div class="empty">No references loaded.</div></div></section>
+<section class="panel cgrlPanel" data-cgrl-panel="debug"><h2>Debug report</h2><div id="cgrlDebug" class="list"><div class="empty">No debug report loaded.</div></div></section>
+<section class="panel cgrlPanel" data-cgrl-panel="handoff"><h2>Code God and Writer handoff</h2><p id="cgrlCandidateText">No proposed complete-file candidate is ready. CG Repair Lab never replaces the selected source automatically.</p><div class="fieldRow3"><label>Existing non-protected branch<input id="cgrlWriterBranch" autocomplete="off" placeholder="feature/reviewed-repair"></label><label>Commit message<input id="cgrlCommitMessage" autocomplete="off" placeholder="Repair selected source"></label><label>Draft PR title<input id="cgrlPrTitle" autocomplete="off" placeholder="Repair selected source"></label></div><div class="actions"><button class="btn good" id="cgrlSaveCandidate" type="button" disabled data-code-labs-tool="run_code_labs_action" data-code-labs-action="cg_repair_lab.save_candidate">1. Save separate candidate</button><button class="btn primary" id="cgrlPrepareHandoff" type="button" disabled data-code-labs-tool="run_code_labs_action" data-code-labs-action="repo.prepare_handoff">2. Prepare Code God handoff</button><button class="btn primary" id="cgrlRunCodeGod" type="button" disabled data-code-labs-tool="run_code_labs_action" data-code-labs-action="code_god.review">3. Run Code God</button><button class="btn warn" id="cgrlQueueWriter" type="button" disabled data-code-labs-tool="run_code_labs_action" data-code-labs-action="github.writer_prepare">4. Queue reviewed Writer request</button><button class="btn warn" id="cgrlExecuteWriter" type="button" disabled data-code-labs-tool="execute_code_labs_github_writer">5. Execute Code Labs Writer</button><a class="btn ghost" href="code-god.html" data-code-labs-tool="read_code_labs_url">Open Code God</a></div><div id="cgrlWorkflowStatus" class="notice"><p>Tool-Only performs the small private workspace writes. Code Labs Writer is enabled only after a current Code God PASS and queued request.</p></div></section>
 <section class="notice"><p><b>Boundary:</b> CG Repair Lab can produce findings, dependency maps, debug reports and a proposed complete-file candidate. Code God remains the final deterministic review gate. GitHub Writer remains the only reviewed branch-and-draft-PR execution route.</p></section>
-<div class="footerNote">CG Repair Lab V281 · Code Labs Pro · owner-scoped GitHub installation · read-only analysis · value-redacting output.</div>
+<div class="footerNote">CG Repair Lab V282 · Code Labs Pro · full-read/little-write workflow · owner-scoped GitHub installation · Code God before Writer.</div>
 </main>
 </div>
 <script src="assets/cl-nav.js?v=cl-v281-cg-repair-lab"></script>
-<script src="assets/cg-repair-lab-pro-v281.js?v=cgrl-v281"></script>
+<script type="application/json" id="cgrlToolContract">{"version":"V282","controls":{"cgrlCheckAccess":{"connector":"Code Labs V104 Tool-Only","tool":"get_cg_repair_lab_access"},"cgrlRun":{"connector":"Code Labs V104 Tool-Only","tool":"analyze_code_labs_repository"},"cgrlSaveCandidate":{"connector":"Code Labs V104 Tool-Only","tool":"run_code_labs_action","action":"cg_repair_lab.save_candidate","replaces_selected_source":false},"cgrlPrepareHandoff":{"connector":"Code Labs V104 Tool-Only","tool":"run_code_labs_action","action":"repo.prepare_handoff"},"cgrlRunCodeGod":{"connector":"Code Labs V104 Tool-Only","tool":"run_code_labs_action","action":"code_god.review"},"cgrlQueueWriter":{"connector":"Code Labs V104 Tool-Only","tool":"run_code_labs_action","action":"github.writer_prepare"},"cgrlExecuteWriter":{"connector":"Code Labs V104 Writer","tool":"execute_code_labs_github_writer","requires_code_god_pass":true},"pageLinks":{"connector":"Code Labs V104","tool":"read_code_labs_url"}},"prohibited":["candidate.accept","direct default-branch write","merge","deploy","database mutation by analysis"]}</script>
+<script src="assets/cg-repair-lab-pro-v281.js?v=cgrl-v282"></script>
 </body>
 </html>
