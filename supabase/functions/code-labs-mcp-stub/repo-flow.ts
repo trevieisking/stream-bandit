@@ -151,7 +151,7 @@ export async function prepareRepoHandoff(b: Binding, args: Row) {
   };
   const metadataBefore = clone(c.file.metadata || {});
   const previous = handoffMarker(clone(metadataBefore.repo_handoff || {}));
-  const metadata = { ...metadataBefore, repo_handoff: handoff };
+  const metadata: Row = { ...metadataBefore, repo_handoff: handoff };
   delete metadata.code_god_review;
   delete metadata.github_writer_request;
   const file = await saveMetadata(b.owner_id, c.file, metadata);
@@ -198,7 +198,7 @@ export async function reviewCodeGod(b: Binding) {
     checks_run: ["identity", "branch", "full-file", "queue-limit", "truncation", "conflicts", "fences", "secret-values", "duplicate-queue", "timers"],
     created_at: new Date().toISOString(),
   };
-  const metadata = { ...metadataBefore, code_god_review: review };
+  const metadata: Row = { ...metadataBefore, code_god_review: review };
   delete metadata.github_writer_request;
   const file = await saveMetadata(b.owner_id, c.file, metadata);
   return { ok: true, version: VERSION, tool: "run_code_labs_action", action: "code_god.review", review, file_id: file.id, receipt: await receipt(b.owner_id, "code_god.review", c.file, metadataBefore.code_god_review || {}, review) };
@@ -251,7 +251,7 @@ export async function prepareGithubWriter(b: Binding, args: Row) {
   const queued = rows?.[0];
   if (!queued) throw new Error("The GitHub request could not be queued.");
   const marker = { request_id: queued.id, status: queued.status, repo: queued.repo, path: queued.path, branch: queued.branch, prepared_at: new Date().toISOString() };
-  const metadata = { ...metadataBefore, github_writer_request: marker };
+  const metadata: Row = { ...metadataBefore, github_writer_request: marker };
   const file = await saveMetadata(b.owner_id, c.file, metadata);
   return { ok: true, version: VERSION, tool: "run_code_labs_action", action: "github.writer_prepare", request: { ...request, content: undefined }, queued: marker, next_tool: "GitHub connector", file_id: file.id, receipt: await receipt(b.owner_id, "github.writer_prepare", c.file, metadataBefore.github_writer_request || {}, marker) };
 }
