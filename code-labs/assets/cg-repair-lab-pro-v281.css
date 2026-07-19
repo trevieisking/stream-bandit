@@ -11,4 +11,13 @@
 .cgrlFinding[data-severity="P3"] .cgrlSeverity{color:var(--good)}
 .cgrlLocation,.cgrlCalls{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-size:12px;overflow-wrap:anywhere}
 .cgrlSecretName{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-weight:1000}
+.cgrlTabs{display:flex;gap:8px;flex-wrap:wrap}
+.cgrlTab{border:1px solid var(--line);border-radius:999px;background:var(--panel2);color:var(--ink);padding:9px 12px;font-weight:900;cursor:pointer}
+.cgrlTab.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-color:transparent}
+.cgrlPanel{display:none}
+.cgrlPanel.active{display:block}
+.cgrlMapGroup{display:grid;gap:8px}
+.cgrlMapGroup h3{margin:0}
+.cgrlMapLine{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-size:12px;overflow-wrap:anywhere}
+#cgrlWorkflowStatus{margin-top:14px;margin-bottom:0}
 @media(max-width:700px){.cgrlFinding{grid-template-columns:1fr}.cgrlSeverity{width:max-content}}
