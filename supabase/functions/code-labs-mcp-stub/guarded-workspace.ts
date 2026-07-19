@@ -48,6 +48,7 @@ export function listActions() {
     { action: "repo.prepare_handoff", requires_confirmation: false },
     { action: "cg_repair_lab.access", requires_confirmation: false },
     { action: "cg_repair_lab.analyze", requires_confirmation: false },
+    { action: "cg_repair_lab.save_candidate", requires_confirmation: false },
     { action: "code_god.review", requires_confirmation: false },
     { action: "github.writer_prepare", requires_confirmation: true },
     { action: "github.writer_execute", requires_confirmation: true },
@@ -93,6 +94,13 @@ export async function runAction(b: Binding, args: Row) {
 
   if (action === "cg_repair_lab.access") return getCgRepairLabAccess(b);
   if (action === "cg_repair_lab.analyze") return analyzeCgRepairLab(b, { ...args, ...(args.fields || {}) });
+  if (action === "cg_repair_lab.save_candidate") {
+    return guarded(b, {
+      ...args,
+      candidate_code: args.candidate_code ?? args.fields?.candidate_code,
+      note: args.note ?? args.fields?.note,
+    }, saveCandidateBase);
+  }
   if (action === "backend.tables_snapshot") return backendTablesSnapshot(b);
   if (action === "repo.prepare_handoff") {
     const requested = String(args.fields?.action || "change").toLowerCase();
