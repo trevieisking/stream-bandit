@@ -254,3 +254,70 @@ Deno.test("current owner activation is explicit and separate from analysis", () 
     "Owner activation must not be part of the read-only analysis workflow.",
   );
 });
+
+Deno.test("publishable configuration and detector literals are not urgent findings", async () => {
+  const publishable = "sb_" + "publishable_" + "TESTCONFIG1234567890";
+  const report = await scanRepositorySnapshot({
+    repo: "owner/example",
+    ref: "verified-commit",
+    selected_path: "index.html",
+    manifest_paths: ["index.html", "detector.ts"],
+    coverage_complete: true,
+    files: [
+      {
+        path: "index.html",
+        content:
+          '<!doctype html><html data-page="test"><script>const publicConfig="' +
+          publishable + '";</script></html>',
+      },
+      {
+        path: "detector.ts",
+        content: 'const conflictPattern = /<<<<<<<|=======|>>>>>>>/;',
+      },
+    ],
+  });
+  const urgent = report.findings.filter((item) =>
+    item.severity === "P0" || item.severity === "P1"
+  );
+  assert(
+    urgent.length === 0,
+    "Publishable configuration and detector literals must not become urgent findings.",
+  );
+});
+
+Deno.test("genuine secret shapes and line-anchored conflict markers still block", async () => {
+  const secret = "sb_" + "secret_" + "TESTSECRET1234567890";
+  const report = await scanRepositorySnapshot({
+    repo: "owner/example",
+    ref: "verified-commit",
+    selected_path: "index.html",
+    manifest_paths: ["index.html", "conflicted.js"],
+    coverage_complete: true,
+    files: [
+      {
+        path: "index.html",
+        content:
+          '<!doctype html><html data-page="test"><script>const unsafe="' +
+          secret + '";</script></html>',
+      },
+      {
+        path: "conflicted.js",
+        content: "<<<<<<< ours\nconst value = 1;\n=======\nconst value = 2;\n>>>>>>> theirs",
+      },
+    ],
+  });
+  assert(
+    report.findings.some((item) =>
+      item.rule_id === "CGRL-CREDENTIAL-VALUE-001" &&
+      item.path === "index.html"
+    ),
+    "A genuine secret-key shape must remain blocked.",
+  );
+  assert(
+    report.findings.some((item) =>
+      item.rule_id === "CGRL-CONFLICT-001" &&
+      item.path === "conflicted.js"
+    ),
+    "Actual line-anchored conflict markers must remain blocked.",
+  );
+});

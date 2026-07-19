@@ -321,7 +321,10 @@ export async function reviewCodeGod(b: Binding) {
       ),
     );
   }
-  if (/<<<<<<<|=======|>>>>>>>/.test(proposed)) {
+  if (
+    /^(?:\s*<<<<<<<(?:\s|$)|\s*=======\s*$|\s*>>>>>>>(?:\s|$))/m
+      .test(proposed)
+  ) {
     findings.push(
       finding(
         "P1",
