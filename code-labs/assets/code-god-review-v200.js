@@ -1,9 +1,9 @@
-/* Code God Review V237
+/* Code God Review V238
    Read-only pre-commit analysis for the Buddy lane.
  */
 (function () {
   'use strict';
-  var VERSION = 'V237.0';
+  var VERSION = 'V238.0';
 
   function finding(severity, rule, message, fix, blocks) {
     return { severity: severity, rule_id: rule, message: message, correction: fix, blocks_github: Boolean(blocks) };
@@ -30,7 +30,7 @@
 
   function containsSecretValue(text) {
     var value = String(text || '');
-    return /(?:authorization\s*:\s*bearer\s+[A-Za-z0-9._~-]{12,}|sk-[A-Za-z0-9_-]{12,}|sb_secret_[A-Za-z0-9_-]{12,}|[A-Za-z0-9_]*(?:service[_ -]?role|private[_ -]?key|api[_ -]?key|secret)[A-Za-z0-9_]*\s*(?:=|:)\s*["']?[A-Za-z0-9._~-]{16,})/i.test(value);
+    return /(?:authorization\s*:\s*bearer\s+[A-Za-z0-9._~-]{12,}|sk-[A-Za-z0-9_-]{12,}|sb_secret_[A-Za-z0-9_-]{12,}|[A-Za-z0-9_]*(?:service[_ -]?role|private[_ -]?key|api[_ -]?key|secret)[A-Za-z0-9_]*\s*(?:=|:)\s*["'][^"'\\n]{12,}["'])/i.test(value);
   }
 
   function ensureShell() {
@@ -70,7 +70,7 @@
 
     if (requiresSource && !sourceRepo) findings.push(finding('P1', 'CG-IDENTITY-004', 'The loaded review source has no verified repository identity.', 'Reload the complete source directly from the selected GitHub repository, then rerun Code God.', true));
     else if (sourceRepo && repo && sourceRepo !== repo) findings.push(finding('P1', 'CG-IDENTITY-003', 'The loaded source repository does not match the saved handoff repository.', 'Reload the complete source from the same repository selected for the handoff, then rerun Code God.', true));
-    if (repo && repo !== 'trevieisking/stream-bandit') findings.push(finding('P1', 'CG-IDENTITY-001', 'The selected repository is not the approved repository.', 'Reload the correct saved file and repository before continuing.', true));
+    if (repo && !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)) findings.push(finding('P1', 'CG-IDENTITY-001', 'The selected repository is not a safe owner/name identity.', 'Reload an owner-authorized repository through the verified GitHub installation.', true));
     if (!path || path.indexOf('..') >= 0) findings.push(finding('P1', 'CG-IDENTITY-002', 'The target file path is missing or unsafe.', 'Save the exact repository-relative path without traversal segments.', true));
 
     if ((action === 'add' || action === 'change') && !completeFile(path, proposed)) findings.push(finding('P1', 'CG-FULLFILE-001', 'The proposed file is blank, malformed, truncated, a snippet, or a patch recipe.', 'Restore a syntactically valid complete file and apply only the intended correction.', true));
@@ -94,3 +94,4 @@
   ensureShell();
   window.CodeGodReviewV200 = { version: VERSION, review: review, completeFile: completeFile, containsSecretValue: containsSecretValue };
 })();
+
