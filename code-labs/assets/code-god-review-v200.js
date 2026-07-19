@@ -1,9 +1,9 @@
-/* Code God Review V238
+/* Code God Review V239
    Read-only pre-commit analysis for the Buddy lane.
  */
 (function () {
   'use strict';
-  var VERSION = 'V238.0';
+  var VERSION = 'V239.0';
 
   function finding(severity, rule, message, fix, blocks) {
     return { severity: severity, rule_id: rule, message: message, correction: fix, blocks_github: Boolean(blocks) };
@@ -77,7 +77,7 @@
     if (action === 'change' && original && proposed && proposed.length < Math.max(120, Math.floor(original.length * 0.65))) findings.push(finding('P1', 'CG-TRUNCATION-001', 'The proposed file is much smaller than the original and may be truncated.', 'Compare against the original and restore any missing sections before review.', true));
     if (action === 'remove' && !String(input.notes || '').trim()) findings.push(finding('P1', 'CG-REMOVE-PROOF-001', 'The remove handoff has no safety proof.', 'Explain why this exact path is verified safe to remove.', true));
 
-    if ((action === 'add' || action === 'change') && /<<<<<<<|=======|>>>>>>>/.test(proposed)) findings.push(finding('P1', 'CG-CONFLICT-001', 'Unresolved merge-conflict markers were found.', 'Resolve the conflict markers and rerun Code God.', true));
+    if ((action === 'add' || action === 'change') && /^(?:\s*<<<<<<<(?:\s|$)|\s*=======\s*$|\s*>>>>>>>(?:\s|$))/m.test(proposed)) findings.push(finding('P1', 'CG-CONFLICT-001', 'Unresolved merge-conflict markers were found.', 'Resolve the conflict markers and rerun Code God.', true));
     if ((action === 'add' || action === 'change') && /```(?:html|javascript|js|typescript|ts|json)?/i.test(proposed)) findings.push(finding('P2', 'CG-FENCE-001', 'Markdown code fences appear inside the proposed file.', 'Remove the Markdown fences and keep only the complete file contents.', true));
     if ((action === 'add' || action === 'change') && containsSecretValue(proposed)) findings.push(finding('P0', 'CG-SECRET-001', 'A credential-shaped value appears in the proposed browser file.', 'Remove the credential value and keep privileged values server-side only.', true));
     var hasFastTimer = /setInterval\s*\([^,]+,\s*(?:[1-9]\d{0,3})\s*\)/.test(proposed);
@@ -94,4 +94,3 @@
   ensureShell();
   window.CodeGodReviewV200 = { version: VERSION, review: review, completeFile: completeFile, containsSecretValue: containsSecretValue };
 })();
-
