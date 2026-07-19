@@ -1,6 +1,6 @@
-import { importPKCS8, SignJWT } from "npm:jose@5.9.6";
 import { Binding, rest } from "./oauth.ts";
 import { VERSION } from "./context.ts";
+import { githubRequest, verifyOwnerRepository } from "./github-authority.ts";
 
 type Row = Record<string, any>;
 
@@ -26,8 +26,6 @@ type SecretReference = {
   call_sites: Array<{ path: string; line: number; expression: string }>;
 };
 
-const API = "https://api.github.com";
-const API_VERSION = "2022-11-28";
 const MAX_FILES = 600;
 const MAX_FILE_BYTES = 240000;
 const MAX_TOTAL_BYTES = 12000000;
@@ -49,12 +47,6 @@ const CREDENTIAL_VALUE_PATTERNS = [
   /\bsk-[A-Za-z0-9_-]{20,}\b/,
   /(?:api[_-]?key|access[_-]?token|client[_-]?secret|password|private[_-]?key)\s*[:=]\s*["'][^"'\n]{12,}["']/i,
 ];
-
-function requiredSecret(name: string) {
-  const value = String(Deno.env.get(name) || "").trim();
-  if (!value) throw new Error(name + " is not configured in Supabase secrets.");
-  return value;
-}
 
 function cleanRepo(value: unknown) {
   const repo = String(value || "").trim();
@@ -130,89 +122,13 @@ function safeMessage(value: unknown, max = 500) {
   return redactCredentialValues(String(value || "")).slice(0, max);
 }
 
-function concatBytes(...parts: Uint8Array[]) {
-  const total = parts.reduce((sum, part) => sum + part.length, 0);
-  const out = new Uint8Array(total);
-  let offset = 0;
-  for (const part of parts) {
-    out.set(part, offset);
-    offset += part.length;
-  }
-  return out;
-}
-
-function derLength(length: number) {
-  if (length < 128) return new Uint8Array([length]);
-  const bytes: number[] = [];
-  for (let value = length; value > 0; value >>>= 8) bytes.unshift(value & 255);
-  return new Uint8Array([0x80 | bytes.length, ...bytes]);
-}
-
-function der(tag: number, body: Uint8Array) {
-  return concatBytes(new Uint8Array([tag]), derLength(body.length), body);
-}
-
 function base64ToBytes(value: string) {
   const binary = atob(value.replace(/\s+/g, ""));
-  const out = new Uint8Array(binary.length);
+  const output = new Uint8Array(binary.length);
   for (let index = 0; index < binary.length; index += 1) {
-    out[index] = binary.charCodeAt(index);
+    output[index] = binary.charCodeAt(index);
   }
-  return out;
-}
-
-function bytesToBase64(value: Uint8Array) {
-  let binary = "";
-  const size = 0x8000;
-  for (let offset = 0; offset < value.length; offset += size) {
-    binary += String.fromCharCode(
-      ...value.subarray(offset, Math.min(offset + size, value.length)),
-    );
-  }
-  return btoa(binary);
-}
-
-function pem(label: string, value: Uint8Array) {
-  const encoded = bytesToBase64(value);
-  const lines = encoded.match(/.{1,64}/g) || [];
-  return "-----BEGIN " + label + "-----\n" + lines.join("\n") + "\n-----END " +
-    label + "-----\n";
-}
-
-function normalizePrivateKey(value: string) {
-  const key = String(value || "").trim();
-  if (key.includes("-----BEGIN PRIVATE KEY-----")) return key + "\n";
-  if (!key.includes("-----BEGIN RSA PRIVATE KEY-----")) {
-    throw new Error("The GitHub App private key format is unsupported.");
-  }
-  const body = key
-    .replace("-----BEGIN RSA PRIVATE KEY-----", "")
-    .replace("-----END RSA PRIVATE KEY-----", "")
-    .replace(/\s+/g, "");
-  const pkcs1 = base64ToBytes(body);
-  const version = der(0x02, new Uint8Array([0]));
-  const rsaAlgorithm = new Uint8Array([
-    0x30,
-    0x0d,
-    0x06,
-    0x09,
-    0x2a,
-    0x86,
-    0x48,
-    0x86,
-    0xf7,
-    0x0d,
-    0x01,
-    0x01,
-    0x01,
-    0x05,
-    0x00,
-  ]);
-  const privateKey = der(0x04, pkcs1);
-  return pem(
-    "PRIVATE KEY",
-    der(0x30, concatBytes(version, rsaAlgorithm, privateKey)),
-  );
+  return output;
 }
 
 async function digest(value: unknown) {
@@ -229,66 +145,6 @@ async function digest(value: unknown) {
 async function one(path: string) {
   const rows = await rest(path);
   return Array.isArray(rows) ? rows[0] || null : null;
-}
-
-async function githubAppToken(installationId: string, repositoryName: string) {
-  const appId = requiredSecret("CODE_LABS_GITHUB_APP_ID");
-  const encodedKey = requiredSecret("CODE_LABS_GITHUB_APP_KEY_B64");
-  const keyBytes = base64ToBytes(encodedKey);
-  const keyText = normalizePrivateKey(new TextDecoder().decode(keyBytes));
-  const key = await importPKCS8(keyText, "RS256");
-  const now = Math.floor(Date.now() / 1000);
-  const jwt = await new SignJWT({})
-    .setProtectedHeader({ alg: "RS256" })
-    .setIssuer(appId)
-    .setIssuedAt(now - 60)
-    .setExpirationTime(now + 540)
-    .sign(key);
-  const response = await fetch(
-    API + "/app/installations/" + encodeURIComponent(installationId) +
-      "/access_tokens",
-    {
-      method: "POST",
-      headers: {
-        Accept: "application/vnd.github+json",
-        Authorization: "Bearer " + jwt,
-        "X-GitHub-Api-Version": API_VERSION,
-        "User-Agent": "code-labs-cg-repair-lab",
-      },
-      body: JSON.stringify({
-        repositories: [repositoryName],
-        permissions: { contents: "read", metadata: "read" },
-      }),
-    },
-  );
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok || !payload.token) {
-    throw new Error(
-      "The connected GitHub installation could not authorize a read-only repository scan.",
-    );
-  }
-  return String(payload.token);
-}
-
-async function github(path: string, token: string, init: RequestInit = {}) {
-  const response = await fetch(API + path, {
-    ...init,
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: "Bearer " + token,
-      "X-GitHub-Api-Version": API_VERSION,
-      "User-Agent": "code-labs-cg-repair-lab",
-      ...(init.headers || {}),
-    },
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(
-      "The read-only GitHub request failed with status " + response.status +
-        ".",
-    );
-  }
-  return payload;
 }
 
 async function entitlement(ownerId: string) {
@@ -312,45 +168,6 @@ async function entitlement(ownerId: string) {
     plan_key: row?.plan_key || "free",
     status: row?.status || "inactive",
     expires_at: row?.expires_at || null,
-  };
-}
-
-async function repositoryAuthority(ownerId: string, repo: string) {
-  const repository = await one(
-    "code_labs_github_repositories?select=repo_full_name,default_branch,installation_id,status" +
-      "&owner_id=eq." + encodeURIComponent(ownerId) +
-      "&repo_full_name=eq." + encodeURIComponent(repo) +
-      "&status=eq.active&limit=1",
-  );
-  if (!repository) {
-    throw new Error("The repository is not connected to this Code Labs owner.");
-  }
-  const installation = await one(
-    "code_labs_github_installations?select=installation_id,status" +
-      "&owner_id=eq." + encodeURIComponent(ownerId) +
-      "&installation_id=eq." + encodeURIComponent(repository.installation_id) +
-      "&status=eq.active&limit=1",
-  );
-  if (!installation) {
-    throw new Error("The owner-scoped GitHub installation is not active.");
-  }
-  const repositoryName = repo.split("/")[1];
-  const token = await githubAppToken(
-    String(installation.installation_id),
-    repositoryName,
-  );
-  const verified = await github(
-    "/repos/" + repo.split("/").map(encodeURIComponent).join("/"),
-    token,
-  );
-  if (String(verified.full_name || "").toLowerCase() !== repo.toLowerCase()) {
-    throw new Error("GitHub did not verify the requested repository identity.");
-  }
-  return {
-    token,
-    default_branch: String(
-      verified.default_branch || repository.default_branch || "main",
-    ),
   };
 }
 
@@ -881,7 +698,7 @@ export async function scanRepositorySnapshot(input: {
 async function fetchBlob(repo: string, token: string, row: Row) {
   const size = Number(row.size || 0);
   if (!row.sha || size > MAX_FILE_BYTES) return null;
-  const blob = await github(
+  const blob = await githubRequest(
     "/repos/" + repo.split("/").map(encodeURIComponent).join("/") +
       "/git/blobs/" + encodeURIComponent(row.sha),
     token,
@@ -1027,12 +844,16 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
     );
   }
   const repo = cleanRepo(args.repo);
-  const authority = await repositoryAuthority(b.owner_id, repo);
+  const authority = await verifyOwnerRepository(
+    b.owner_id,
+    repo,
+    { contents: "read", metadata: "read" },
+  );
   const ref = cleanRef(args.ref, authority.default_branch);
   const selectedPath = cleanPath(args.path);
   const repoPath = "/repos/" +
     repo.split("/").map(encodeURIComponent).join("/");
-  const commit = await github(
+  const commit = await githubRequest(
     repoPath + "/commits/" + encodeURIComponent(ref),
     authority.token,
   );
@@ -1041,7 +862,7 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
   if (!commitSha || !treeSha) {
     throw new Error("GitHub did not return verified source provenance.");
   }
-  const tree = await github(
+  const tree = await githubRequest(
     repoPath + "/git/trees/" + encodeURIComponent(treeSha) + "?recursive=1",
     authority.token,
   );
