@@ -1,6 +1,7 @@
 import { BASE, SCOPE, authorize, binding, register, token } from "./oauth.ts";
 import { VERSION, getContext, readUrl, saveRequest } from "./context.ts";
 import { createCheckpoint, executeDirectGithubWriter, getWorkspace, listActions, listRecords, readCurrentFile, readReceipt, runAction, saveCandidate, selectRecord, undoAction, updateCurrentFile, updateJob, updatePacket, updateProject, updateTest } from "./guarded-workspace.ts";
+import { analyzeCgRepairLab, getCgRepairLabAccess, getCgRepairLabWorkflow } from "./cg-repair-lab.ts";
 
 type Row = Record<string, any>;
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "GET, POST, OPTIONS" };
@@ -27,6 +28,9 @@ function tools() {
     { name: "read_code_labs_current_file", title: "Read Current Code Labs File", description: "Read the complete currently selected Code Labs file row.", inputSchema: { type: "object", properties: {} }, outputSchema: resultSchema, annotations: read },
     { name: "list_code_labs_actions", title: "List Code Labs Actions", description: "List the strict server-side Code Labs action IDs available to V104.", inputSchema: { type: "object", properties: {} }, outputSchema: resultSchema, annotations: read },
     { name: "read_code_labs_receipt", title: "Read Code Labs Receipt", description: "Read one action receipt or the most recent receipt.", inputSchema: { type: "object", properties: { receipt_id: { type: "string" } } }, outputSchema: resultSchema, annotations: read },
+    { name: "get_cg_repair_lab_access", title: "Get CG Repair Lab Access", description: "Check the signed-in owner's Code Labs Pro entitlement and owner-scoped GitHub repository bindings. This read-only check never returns credential values, user identifiers, email addresses, or installation metadata.", inputSchema: { type: "object", properties: {} }, outputSchema: resultSchema, annotations: read },
+    { name: "get_cg_repair_lab_workflow", title: "Get CG Repair Lab Workflow", description: "Read the authoritative mapping between every CG Repair Lab control and the Code Labs V104, Tool-Only, Code God, and Writer tools. This does not read repository contents or change state.", inputSchema: { type: "object", properties: {} }, outputSchema: resultSchema, annotations: read },
+    { name: "analyze_code_labs_repository", title: "Analyze Repository with CG Repair Lab", description: "Run Code Labs Pro's read-only CG Repair Lab across the selected owner-authorized GitHub repository. It reports dependency, database and exact secret-reference call sites while redacting credential-shaped values. It cannot replace source, commit, merge, deploy, change a database, or bypass Code God and GitHub Writer.", inputSchema: { type: "object", properties: { repo: { type: "string", description: "Owner-authorized repository in owner/name form." }, ref: { type: "string", description: "Optional branch, tag, or commit ref. Defaults to the verified repository's default branch." }, path: { type: "string", description: "Repository-relative source file to prepare as the optional complete-file candidate." } }, required: ["repo", "path"] }, outputSchema: resultSchema, annotations: read },
     { name: "select_code_labs_record", title: "Select Code Labs Record", description: "Select an existing project, file, job, packet, or test without creating a duplicate; requires the current workspace version.", inputSchema: { type: "object", properties: { record_type: { type: "string", enum: ["project", "file", "job", "packet", "test"] }, record_id: { type: "string" }, expected_state_version: expected }, required: ["record_type", "record_id", "expected_state_version"] }, outputSchema: resultSchema, annotations: privateWrite },
     { name: "update_code_labs_project", title: "Update Code Labs Project", description: "Update the selected project in place after matching the current workspace version.", inputSchema: { type: "object", properties: { fields, expected_state_version: expected }, required: ["fields", "expected_state_version"] }, outputSchema: resultSchema, annotations: privateWrite },
     { name: "update_code_labs_current_file", title: "Update Current Code Labs File", description: "Update the selected file row in place after matching the current workspace version; never creates a duplicate file.", inputSchema: { type: "object", properties: { fields, expected_state_version: expected }, required: ["fields", "expected_state_version"] }, outputSchema: resultSchema, annotations: destructiveWrite },
@@ -50,6 +54,9 @@ async function call(b: any, name: string, args: Row) {
   if (name === "read_code_labs_current_file") return readCurrentFile(b);
   if (name === "list_code_labs_actions") return listActions();
   if (name === "read_code_labs_receipt") return readReceipt(b, args);
+  if (name === "get_cg_repair_lab_access") return getCgRepairLabAccess(b);
+  if (name === "get_cg_repair_lab_workflow") return getCgRepairLabWorkflow();
+  if (name === "analyze_code_labs_repository") return analyzeCgRepairLab(b, args);
   if (name === "select_code_labs_record") return selectRecord(b, args);
   if (name === "update_code_labs_project") return updateProject(b, args);
   if (name === "update_code_labs_current_file") return updateCurrentFile(b, args);
@@ -78,7 +85,7 @@ Deno.serve(async (req: Request) => {
     const body = await req.json().catch(() => ({}));
     const id = body.id ?? null;
     if (body.jsonrpc === "2.0") {
-      if (body.method === "initialize") return rpc(id, { protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: true } }, serverInfo: { name: "code-labs-mcp-stub", version: VERSION }, instructions: "Use Code Labs V104 server tools directly. No browser pairing, page session, page fingerprint, or live-tab control is used. Read the workspace before writes, supply its current state_version, inspect receipts, and keep GitHub changes branch and pull-request only." });
+      if (body.method === "initialize") return rpc(id, { protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: true } }, serverInfo: { name: "code-labs-mcp-stub", version: VERSION }, instructions: "Use Code Labs V104 server tools directly. The reviewed route is File Lab, CG Repair Lab, Code God, then GitHub Writer. CG Repair Lab is Code Labs Pro, owner-scoped, read-only, and value-redacting. No browser pairing, page session, page fingerprint, or live-tab control is used. Read the workspace before writes, supply its current state_version, inspect receipts, and keep GitHub changes branch and pull-request only." });
       if (body.method === "ping") return rpc(id, {});
       if (body.method === "notifications/initialized") return new Response(null, { status: 202, headers: cors });
       if (body.method === "tools/list") return rpc(id, { tools: tools() });
