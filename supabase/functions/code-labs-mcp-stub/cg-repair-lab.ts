@@ -772,13 +772,15 @@ export function getCgRepairLabWorkflow() {
       {
         control: "check_pro_access",
         connector: "Code Labs V104 Tool-Only",
-        tool: "get_cg_repair_lab_access",
+        tool: "run_code_labs_action",
+        action: "cg_repair_lab.access",
         writes: false,
       },
       {
         control: "analyze_repository",
         connector: "Code Labs V104 Tool-Only",
-        tool: "analyze_code_labs_repository",
+        tool: "run_code_labs_action",
+        action: "cg_repair_lab.analyze",
         writes: false,
       },
       {
