@@ -944,6 +944,81 @@ export async function getCgRepairLabAccess(b: Binding) {
   };
 }
 
+export function getCgRepairLabWorkflow() {
+  return {
+    ok: true,
+    version: VERSION,
+    feature: "CG Repair Lab",
+    product: "Code Labs Pro",
+    read_only_default: true,
+    controls: [
+      {
+        control: "check_pro_access",
+        connector: "Code Labs V104 Tool-Only",
+        tool: "get_cg_repair_lab_access",
+        writes: false,
+      },
+      {
+        control: "analyze_repository",
+        connector: "Code Labs V104 Tool-Only",
+        tool: "analyze_code_labs_repository",
+        writes: false,
+      },
+      {
+        control: "save_separate_candidate",
+        connector: "Code Labs V104 Tool-Only",
+        tool: "run_code_labs_action",
+        action: "cg_repair_lab.save_candidate",
+        writes: "selected file metadata only",
+        replaces_selected_source: false,
+      },
+      {
+        control: "prepare_code_god_handoff",
+        connector: "Code Labs V104 Tool-Only",
+        tool: "run_code_labs_action",
+        action: "repo.prepare_handoff",
+        writes: "selected file metadata and receipt only",
+      },
+      {
+        control: "run_code_god",
+        connector: "Code Labs V104 Tool-Only",
+        tool: "run_code_labs_action",
+        action: "code_god.review",
+        writes: "deterministic review and receipt only",
+      },
+      {
+        control: "queue_writer_request",
+        connector: "Code Labs V104 Tool-Only",
+        tool: "run_code_labs_action",
+        action: "github.writer_prepare",
+        writes: "private queue and receipt only",
+        requires_code_god_pass: true,
+      },
+      {
+        control: "execute_reviewed_writer",
+        connector: "Code Labs V104 Writer",
+        tool: "execute_code_labs_github_writer",
+        writes:
+          "one reviewed file on an existing non-protected branch and one draft PR",
+        requires_code_god_pass: true,
+      },
+      {
+        control: "read_code_labs_page",
+        connector: "Code Labs V104",
+        tool: "read_code_labs_url",
+        writes: false,
+      },
+    ],
+    prohibited: [
+      "candidate.accept",
+      "direct default-branch write",
+      "merge",
+      "deploy",
+      "database mutation by analysis",
+    ],
+  };
+}
+
 export async function analyzeCgRepairLab(b: Binding, args: Row) {
   const access = await entitlement(b.owner_id);
   if (!access.entitled) {
