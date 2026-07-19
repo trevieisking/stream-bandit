@@ -18,6 +18,7 @@ import {
 } from "./workspace.ts";
 import { backendTablesSnapshot, prepareGithubWriter, prepareRepoHandoff, reviewCodeGod } from "./repo-flow.ts";
 import { executeGithubWriter } from "./github-writer.ts";
+import { analyzeCgRepairLab, getCgRepairLabAccess } from "./cg-repair-lab.ts";
 
 type Row = Record<string, any>;
 
@@ -45,6 +46,8 @@ export function listActions() {
   const base: any = listActionsBase();
   const extra = [
     { action: "repo.prepare_handoff", requires_confirmation: false },
+    { action: "cg_repair_lab.access", requires_confirmation: false },
+    { action: "cg_repair_lab.analyze", requires_confirmation: false },
     { action: "code_god.review", requires_confirmation: false },
     { action: "github.writer_prepare", requires_confirmation: true },
     { action: "github.writer_execute", requires_confirmation: true },
@@ -88,6 +91,8 @@ export function executeDirectGithubWriter(b: Binding, args: Row) {
 export async function runAction(b: Binding, args: Row) {
   const action = String(args.action || "");
 
+  if (action === "cg_repair_lab.access") return getCgRepairLabAccess(b);
+  if (action === "cg_repair_lab.analyze") return analyzeCgRepairLab(b, { ...args, ...(args.fields || {}) });
   if (action === "backend.tables_snapshot") return backendTablesSnapshot(b);
   if (action === "repo.prepare_handoff") {
     const requested = String(args.fields?.action || "change").toLowerCase();
