@@ -3,6 +3,7 @@ import {
   scanRepositorySnapshot,
 } from "./cg-repair-lab.ts";
 import { cleanRepository } from "./github-authority.ts";
+import { listActions } from "./guarded-workspace.ts";
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message);
@@ -234,4 +235,22 @@ Deno.test("repository validation accepts arbitrary owner/name repositories", () 
     rejected = true;
   }
   assert(rejected, "Unsafe repository identities must be rejected.");
+});
+
+Deno.test("current owner activation is explicit and separate from analysis", () => {
+  const actions = listActions().actions as Array<Record<string, any>>;
+  assert(
+    actions.some((item) =>
+      item.action === "code_labs.owner_activate_repository" &&
+      item.requires_confirmation === true
+    ),
+    "Interim owner activation must be a confirmed control action.",
+  );
+  const workflow = getCgRepairLabWorkflow();
+  assert(
+    !workflow.controls.some((item: Record<string, any>) =>
+      item.action === "code_labs.owner_activate_repository"
+    ),
+    "Owner activation must not be part of the read-only analysis workflow.",
+  );
 });
