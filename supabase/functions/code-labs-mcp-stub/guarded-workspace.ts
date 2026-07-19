@@ -19,6 +19,7 @@ import {
 import { backendTablesSnapshot, prepareGithubWriter, prepareRepoHandoff, reviewCodeGod } from "./repo-flow.ts";
 import { executeGithubWriter } from "./github-writer.ts";
 import { analyzeCgRepairLab, getCgRepairLabAccess } from "./cg-repair-lab.ts";
+import { activateOwnerRepository } from "./github-authority.ts";
 
 type Row = Record<string, any>;
 
@@ -49,6 +50,7 @@ export function listActions() {
     { action: "cg_repair_lab.access", requires_confirmation: false },
     { action: "cg_repair_lab.analyze", requires_confirmation: false },
     { action: "cg_repair_lab.save_candidate", requires_confirmation: false },
+    { action: "code_labs.owner_activate_repository", requires_confirmation: true },
     { action: "code_god.review", requires_confirmation: false },
     { action: "github.writer_prepare", requires_confirmation: true },
     { action: "github.writer_execute", requires_confirmation: true },
@@ -94,6 +96,15 @@ export async function runAction(b: Binding, args: Row) {
 
   if (action === "cg_repair_lab.access") return getCgRepairLabAccess(b);
   if (action === "cg_repair_lab.analyze") return analyzeCgRepairLab(b, { ...args, ...(args.fields || {}) });
+  if (action === "code_labs.owner_activate_repository") {
+    if (args.confirmed !== true) {
+      throw new Error("Confirmed owner activation is required.");
+    }
+    return activateOwnerRepository(
+      b.owner_id,
+      args.fields?.repo,
+    );
+  }
   if (action === "cg_repair_lab.save_candidate") {
     return guarded(b, {
       ...args,
