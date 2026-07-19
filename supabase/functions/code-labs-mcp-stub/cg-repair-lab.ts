@@ -38,14 +38,18 @@ const TEST_PATH =
   /(?:^|\/)(?:test|tests|__tests__|fixtures|snapshots)(?:\/|$)|(?:[-_.](?:test|spec))\.[^.]+$/i;
 
 const CREDENTIAL_VALUE_PATTERNS = [
-  /-----BEGIN [A-Z ]*PRIVATE KEY-----/i,
+  /-----BEGIN [A-Z ]*PRIVATE KEY-----\r?\n[A-Za-z0-9+/=\r\n]{40,}\r?\n-----END [A-Z ]*PRIVATE KEY-----/i,
   /\b(?:gh[pousr]|github_pat)_[A-Za-z0-9_]{12,}\b/i,
   /\b(?:sk|rk|pk)_(?:live|test)_[A-Za-z0-9]{12,}\b/i,
-  /\bsb_(?:secret|publishable)_[A-Za-z0-9_-]{12,}\b/i,
+  /\bsb_secret_[A-Za-z0-9_-]{12,}\b/i,
   /\bAKIA[A-Z0-9]{16}\b/,
   /\beyJ[A-Za-z0-9_-]{12,}\.[A-Za-z0-9_-]{12,}\.[A-Za-z0-9_-]{12,}\b/,
   /\bsk-[A-Za-z0-9_-]{20,}\b/,
   /(?:api[_-]?key|access[_-]?token|client[_-]?secret|password|private[_-]?key)\s*[:=]\s*["'][^"'\n]{12,}["']/i,
+];
+const OUTPUT_REDACTION_PATTERNS = [
+  ...CREDENTIAL_VALUE_PATTERNS,
+  /\bsb_publishable_[A-Za-z0-9_-]{12,}\b/i,
 ];
 
 function cleanRepo(value: unknown) {
@@ -106,7 +110,7 @@ function hasCredentialValue(value: string) {
 
 function redactCredentialValues(value: string) {
   let output = String(value || "");
-  for (const pattern of CREDENTIAL_VALUE_PATTERNS) {
+  for (const pattern of OUTPUT_REDACTION_PATTERNS) {
     output = output.replace(
       new RegExp(
         pattern.source,
@@ -116,6 +120,11 @@ function redactCredentialValues(value: string) {
     );
   }
   return output;
+}
+
+function hasConflictMarkers(value: string) {
+  return /^(?:\s*<<<<<<<(?:\s|$)|\s*=======\s*$|\s*>>>>>>>(?:\s|$))/m
+    .test(String(value || ""));
 }
 
 function safeMessage(value: unknown, max = 500) {
@@ -496,7 +505,7 @@ export async function scanRepositorySnapshot(input: {
         path: file.path,
       });
     }
-    if (/<<<<<<<|=======|>>>>>>>/.test(file.content)) {
+    if (hasConflictMarkers(file.content)) {
       addFinding(findings, {
         severity: "P1",
         rule_id: "CGRL-CONFLICT-001",
