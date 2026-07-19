@@ -14,6 +14,16 @@ The required sequence is:
 
 CG Repair Lab is advisory and preparatory. It does not bypass, replace, weaken or duplicate Code God.
 
+### Tool responsibilities
+
+The connected Code Labs tools have distinct responsibilities and must not be treated as interchangeable:
+
+- **Code Labs V104** provides broad read access to public Code Labs URLs and repository-source retrieval, plus the existing narrowly bounded private request queue where applicable.
+- **Code Labs V104 Tool-Only** controls the owner-scoped workspace, read-only CG Repair Lab actions, separate candidate metadata, repository handoff, Code God review and reviewed Writer-request preparation. Its writes are limited to the minimum private Code Labs records and receipts required by the workflow.
+- **Code Labs V104 Writer** is the only GitHub execution tool. It may execute exactly one queued complete file only after a current Code God PASS, on an existing non-protected branch, and may open or reuse only a draft pull request.
+
+Every interactive CG Repair Lab control must publish its matching connector, tool and action identifier so an assistant can operate the complete workflow without guessing. Browser controls alone never grant entitlement, repository authority or write permission.
+
 ## 2. Code Labs Pro entitlement
 
 Access requires an active Code Labs Pro entitlement.
