@@ -187,9 +187,19 @@ Deno.test("CG Repair Lab publishes the complete tool workflow without candidate 
   const controls = workflow.controls as Array<Record<string, any>>;
   assert(
     controls.some((item) =>
-      item.tool === "get_cg_repair_lab_access" && item.writes === false
+      item.tool === "run_code_labs_action" &&
+      item.action === "cg_repair_lab.access" &&
+      item.writes === false
     ),
-    "The Pro access control must map to a read-only tool.",
+    "The Pro access control must map to the stable read-only action route.",
+  );
+  assert(
+    controls.some((item) =>
+      item.tool === "run_code_labs_action" &&
+      item.action === "cg_repair_lab.analyze" &&
+      item.writes === false
+    ),
+    "Repository analysis must map to the stable read-only action route.",
   );
   assert(
     controls.some((item) =>
