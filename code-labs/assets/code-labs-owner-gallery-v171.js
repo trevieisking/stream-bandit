@@ -1,8 +1,8 @@
-/* Code Labs Owner Gallery V171 - private owner-only image storage from Saved Files. */
+/* Code Labs Owner Gallery V172 - resilient owner-only launcher and private image storage. */
 (function () {
   'use strict';
 
-  var VERSION = 'V171';
+  var VERSION = 'V172';
   var BUCKET = 'code-labs-owner-gallery';
   var MAX_BYTES = 10 * 1024 * 1024;
   var MAX_FILES_PER_UPLOAD = 10;
@@ -10,6 +10,7 @@
   var ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
   var accessContext = null;
   var rendered = false;
+  var delegatedClickBound = false;
 
   function q(selector, root) {
     return (root || document).querySelector(selector);
@@ -101,7 +102,8 @@
       '.clOwnerGalleryCard .actions{gap:6px}',
       '.clOwnerGalleryCard .btn{padding:7px 9px;font-size:12px}',
       '.clOwnerGalleryUpload{display:flex;flex-wrap:wrap;gap:10px;align-items:center}',
-      '.clOwnerGalleryUpload input[type=file]{max-width:100%}'
+      '.clOwnerGalleryUpload input[type=file]{max-width:100%}',
+      '.clOwnerGalleryLauncher{position:relative;z-index:4;pointer-events:auto!important;touch-action:manipulation}'
     ].join('');
     document.head.appendChild(style);
   }
@@ -116,9 +118,11 @@
     var actions = q('.actions', hero);
     var button = document.createElement('button');
     button.id = 'clOpenOwnerGallery';
-    button.className = 'btn ghost';
+    button.className = 'btn ghost clOwnerGalleryLauncher';
     button.type = 'button';
     button.hidden = true;
+    button.setAttribute('aria-controls', 'clOwnerGalleryV171');
+    button.setAttribute('aria-expanded', 'false');
     button.textContent = 'Owner image gallery';
     if (actions) actions.appendChild(button);
 
@@ -140,10 +144,9 @@
     var footer = q('.footerNote', main);
     if (footer) main.insertBefore(section, footer); else main.appendChild(section);
 
-    button.addEventListener('click', openGallery);
     q('#clOwnerGalleryUpload').addEventListener('click', uploadSelected);
     q('#clOwnerGalleryRefresh').addEventListener('click', loadGallery);
-    q('#clOwnerGalleryClose').addEventListener('click', function () { section.hidden = true; });
+    q('#clOwnerGalleryClose').addEventListener('click', closeGallery);
     rendered = true;
     return true;
   }
@@ -285,10 +288,36 @@
 
   async function openGallery() {
     var section = q('#clOwnerGalleryV171');
-    if (!section) return;
+    if (!section) return { ok: false };
     section.hidden = false;
-    await loadGallery();
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var button = q('#clOpenOwnerGallery');
+    if (button) button.setAttribute('aria-expanded', 'true');
+    setStatus('Opening private gallery', 'warn');
+    if (typeof section.scrollIntoView === 'function') {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    return loadGallery();
+  }
+
+  function closeGallery() {
+    var section = q('#clOwnerGalleryV171');
+    if (section) section.hidden = true;
+    var button = q('#clOpenOwnerGallery');
+    if (button) {
+      button.setAttribute('aria-expanded', 'false');
+      if (typeof button.focus === 'function') button.focus();
+    }
+  }
+
+  function bindDelegatedClick() {
+    if (delegatedClickBound) return;
+    delegatedClickBound = true;
+    document.addEventListener('click', function (event) {
+      var target = event.target && event.target.closest ? event.target.closest('#clOpenOwnerGallery') : null;
+      if (!target) return;
+      event.preventDefault();
+      openGallery();
+    });
   }
 
   async function revealForOwner() {
@@ -305,6 +334,7 @@
 
   function boot(attempt) {
     attempt = attempt || 0;
+    bindDelegatedClick();
     if (!injectUi()) {
       if (attempt < 20) window.setTimeout(function () { boot(attempt + 1); }, 150);
       return;
@@ -312,7 +342,7 @@
     revealForOwner();
   }
 
-  window.CodeLabsOwnerGalleryV171 = {
+  window.CodeLabsOwnerGalleryV172 = {
     version: VERSION,
     bucket: BUCKET,
     activeAt: activeAt,
@@ -320,9 +350,12 @@
     safeName: safeName,
     ownerObjectPath: ownerObjectPath,
     ownerAccess: ownerAccess,
+    openGallery: openGallery,
+    closeGallery: closeGallery,
     loadGallery: loadGallery,
     uploadSelected: uploadSelected
   };
+  window.CodeLabsOwnerGalleryV171 = window.CodeLabsOwnerGalleryV172;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { boot(0); });
   else boot(0);
