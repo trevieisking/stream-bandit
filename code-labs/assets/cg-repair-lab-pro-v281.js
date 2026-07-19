@@ -1,106 +1,68 @@
 (function(){
 'use strict';
-var VERSION='CG Repair Lab Pro V281';
+var VERSION='CG Repair Lab Pro V282';
 var access={entitled:false,repositories:[]};
 var lastReport=null;
+var workflow={state_version:null,candidate_saved:false,handoff_prepared:false,code_god_pass:false,request_id:''};
 function q(id){return document.getElementById(id)}
 function text(value){return String(value==null?'':value)}
-function redact(value){
-  return text(value)
-    .replace(/-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/gi,'[REDACTED_CREDENTIAL]')
-    .replace(/\b(?:gh[pousr]|github_pat)_[A-Za-z0-9_]{12,}\b/g,'[REDACTED_CREDENTIAL]')
-    .replace(/\b(?:sk|rk|pk)_(?:live|test)_[A-Za-z0-9]{12,}\b/g,'[REDACTED_CREDENTIAL]')
-    .replace(/\bsb_(?:secret|publishable)_[A-Za-z0-9_-]{12,}\b/g,'[REDACTED_CREDENTIAL]')
-    .replace(/\bsk-[A-Za-z0-9_-]{20,}\b/g,'[REDACTED_CREDENTIAL]');
-}
+function redact(value){return text(value).replace(/-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/gi,'[REDACTED_CREDENTIAL]').replace(/\b(?:gh[pousr]|github_pat)_[A-Za-z0-9_]{12,}\b/g,'[REDACTED_CREDENTIAL]').replace(/\b(?:sk|rk|pk)_(?:live|test)_[A-Za-z0-9]{12,}\b/g,'[REDACTED_CREDENTIAL]').replace(/\bsb_(?:secret|publishable)_[A-Za-z0-9_-]{12,}\b/g,'[REDACTED_CREDENTIAL]').replace(/\bsk-[A-Za-z0-9_-]{20,}\b/g,'[REDACTED_CREDENTIAL]')}
 function node(tag,className,value){var el=document.createElement(tag);if(className)el.className=className;if(value!=null)el.textContent=redact(value);return el}
 function emit(name,detail){window.dispatchEvent(new CustomEvent(name,{detail:detail}))}
-function setStatus(label,state){var el=q('cgrlStatus');el.textContent=label;el.dataset.state=state||'ready'}
+function setStatus(label,state){var el=q('cgrlStatus');el.textContent=redact(label);el.dataset.state=state||'ready'}
+function workflowMessage(value){q('cgrlWorkflowStatus').textContent=redact(value)}
+function stateVersion(result){return Number(result&&((result.workspace&&result.workspace.state_version)||result.state_version||(result.workspace_state&&result.workspace_state.state_version)))||null}
+function applyWorkspace(result){var version=stateVersion(result);if(version)workflow.state_version=version;return version}
+function selectTab(name){document.querySelectorAll('[data-cgrl-tab]').forEach(function(button){var active=button.dataset.cgrlTab===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('[data-cgrl-panel]').forEach(function(panel){panel.classList.toggle('active',panel.dataset.cgrlPanel===name)})}
 function requestAccess(){q('cgrlAccessText').textContent='Checking Code Labs Pro entitlement and owner-authorized repositories…';emit('code-labs:cg-repair-lab-access-request',{tool:'get_cg_repair_lab_access',read_only:true})}
-function applyAccess(result){
-  result=result&&typeof result==='object'?result:{};
-  var repositories=Array.isArray(result.repositories)?result.repositories.filter(function(row){return row&&typeof row.repo==='string'}):[];
-  access={entitled:result.entitled===true,repositories:repositories};
-  var select=q('cgrlRepo');select.replaceChildren();
-  if(!access.entitled){
-    select.appendChild(new Option('Code Labs Pro required',''));
-    q('cgrlFields').disabled=true;
-    q('cgrlAccessText').textContent='Locked. An active Code Labs Pro entitlement is required. The server will enforce this again for every analysis.';
-    setStatus('PRO REQUIRED','block');return;
-  }
-  if(!repositories.length){
-    select.appendChild(new Option('Connect an owner-authorized GitHub repository',''));
-    q('cgrlFields').disabled=true;
-    q('cgrlAccessText').textContent='Code Labs Pro is active, but no owner-authorized GitHub repository is available.';
-    setStatus('REPOSITORY REQUIRED','block');return;
-  }
-  repositories.forEach(function(row){var option=new Option(redact(row.repo),row.repo);option.dataset.defaultBranch=text(row.default_branch);select.appendChild(option)});
-  q('cgrlFields').disabled=false;
-  q('cgrlAccessText').textContent='Code Labs Pro confirmed. Only repositories verified for this signed-in owner are selectable.';
-  setStatus('READY','pass');
-}
-function requestAnalysis(event){
-  event.preventDefault();
-  if(!access.entitled||q('cgrlFields').disabled)return;
-  var repo=text(q('cgrlRepo').value).trim(),ref=text(q('cgrlRef').value).trim(),path=text(q('cgrlPath').value).trim();
-  if(!repo||!path)return;
-  setStatus('ANALYSING','working');q('cgrlRun').disabled=true;
-  emit('code-labs:cg-repair-lab-request',{tool:'analyze_code_labs_repository',repo:repo,ref:ref,path:path,read_only:true});
-}
-function renderCounts(report){
-  var coverage=report.coverage||{},database=report.database_map||{},debug=report.debug_report||{};
-  var rows=[['Indexed files',coverage.indexed_files||0],['Live pages',coverage.indexed_live_pages||0],['Findings',(report.findings||[]).length],['Dependencies',(report.dependency_map||[]).length],['Secret references',(report.secret_reference_map||[]).length],['Tables',(database.tables||[]).length],['Write routes',(debug.write_routes||[]).length],['Coverage',coverage.complete===true?'Complete':'Safe failure']];
-  var root=q('cgrlCounts');root.replaceChildren();rows.forEach(function(row){var card=node('div','stat');card.appendChild(node('b','',row[0]));card.appendChild(node('span','',row[1]));root.appendChild(card)});
-}
-function renderFindings(report){
-  var root=q('cgrlFindings'),rows=Array.isArray(report.findings)?report.findings:[];root.replaceChildren();
-  if(!rows.length){root.appendChild(node('div','empty','No findings were reported.'));return}
-  rows.forEach(function(row){var item=node('div','item cgrlFinding');item.dataset.severity=text(row.severity);item.appendChild(node('div','cgrlSeverity',row.severity||'P3'));var body=node('div');body.appendChild(node('b','',row.rule_id||'CGRL-FINDING'));body.appendChild(node('p','',row.message));if(row.path)body.appendChild(node('div','cgrlLocation',row.path+(row.line?':'+row.line:'')));body.appendChild(node('p','',row.correction));item.appendChild(body);root.appendChild(item)});
-}
-function renderSecrets(report){
-  var root=q('cgrlSecrets'),rows=Array.isArray(report.secret_reference_map)?report.secret_reference_map:[];root.replaceChildren();
-  if(!rows.length){root.appendChild(node('div','empty','No supported secret references were found.'));return}
+function applyAccess(result){result=result&&typeof result==='object'?result:{};var repositories=Array.isArray(result.repositories)?result.repositories.filter(function(row){return row&&typeof row.repo==='string'}):[];access={entitled:result.entitled===true,repositories:repositories};var select=q('cgrlRepo');select.replaceChildren();if(!access.entitled){select.appendChild(new Option('Code Labs Pro required',''));q('cgrlFields').disabled=true;q('cgrlAccessText').textContent='Locked. An active Code Labs Pro entitlement is required. The server will enforce this again for every analysis.';setStatus('PRO REQUIRED','block');return}if(!repositories.length){select.appendChild(new Option('Connect an owner-authorized GitHub repository',''));q('cgrlFields').disabled=true;q('cgrlAccessText').textContent='Code Labs Pro is active, but no owner-authorized GitHub repository is available.';setStatus('REPOSITORY REQUIRED','block');return}repositories.forEach(function(row){var option=new Option(redact(row.repo),row.repo);option.dataset.defaultBranch=text(row.default_branch);select.appendChild(option)});q('cgrlFields').disabled=false;q('cgrlAccessText').textContent='Code Labs Pro confirmed. Only repositories verified for this signed-in owner are selectable.';setStatus('READY','pass')}
+function requestAnalysis(event){event.preventDefault();if(!access.entitled||q('cgrlFields').disabled)return;var repo=text(q('cgrlRepo').value).trim(),ref=text(q('cgrlRef').value).trim(),path=text(q('cgrlPath').value).trim();if(!repo||!path)return;setStatus('ANALYSING','working');q('cgrlRun').disabled=true;emit('code-labs:cg-repair-lab-request',{tool:'analyze_code_labs_repository',repo:repo,ref:ref,path:path,read_only:true})}
+function renderCounts(report){var coverage=report.coverage||{},database=report.database_map||{},debug=report.debug_report||{};var rows=[['Indexed files',coverage.indexed_files||0],['Live pages',coverage.indexed_live_pages||0],['Findings',(report.findings||[]).length],['Dependencies',(report.dependency_map||[]).length],['Secret references',(report.secret_reference_map||[]).length],['Tables',(database.tables||[]).length],['Write routes',(debug.write_routes||[]).length],['Coverage',coverage.complete===true?'Complete':'Safe failure']];var root=q('cgrlCounts');root.replaceChildren();rows.forEach(function(row){var card=node('div','stat');card.appendChild(node('b','',row[0]));card.appendChild(node('span','',row[1]));root.appendChild(card)})}
+function renderFindings(report){var root=q('cgrlFindings'),rows=Array.isArray(report.findings)?report.findings:[];root.replaceChildren();if(!rows.length){root.appendChild(node('div','empty','No findings were reported.'));return}rows.forEach(function(row){var item=node('div','item cgrlFinding');item.dataset.severity=text(row.severity);item.appendChild(node('div','cgrlSeverity',row.severity||'P3'));var body=node('div');body.appendChild(node('b','',row.rule_id||'CGRL-FINDING'));body.appendChild(node('p','',row.message));if(row.path)body.appendChild(node('div','cgrlLocation',row.path+(row.line?':'+row.line:'')));body.appendChild(node('p','',row.correction));item.appendChild(body);root.appendChild(item)})}
+function renderDependencies(report){
+  var root=q('cgrlDependencies'),rows=Array.isArray(report.dependency_map)?report.dependency_map:[];
+  root.replaceChildren();
+  if(!rows.length){root.appendChild(node('div','empty','No local dependency routes were mapped.'));return}
   rows.forEach(function(row){
-    var item=node('div','item');
-    item.appendChild(node('div','cgrlSecretName',row.name));
-    item.appendChild(node('p','',row.reference));
-    var declaration=row.declaration||{};
-    item.appendChild(node('div','cgrlLocation',text(declaration.path)+(declaration.line?':'+declaration.line:'')));
-    var calls=Array.isArray(row.call_sites)?row.call_sites:[];
-    item.appendChild(node('p','',calls.length?'Downstream call sites:':'No downstream alias call was mapped.'));
-    calls.forEach(function(call){
-      item.appendChild(node('div','cgrlCalls',text(call.expression)+' — '+text(call.path)+(call.line?':'+call.line:'')));
+    var item=node('div','item cgrlMapGroup');
+    item.appendChild(node('h3','',row.source));
+    (row.targets||[]).forEach(function(target){
+      item.appendChild(node('div','cgrlMapLine',(target.exists?'✓ ':'Missing: ')+target.path+(target.line?' · line '+target.line:'')));
     });
     root.appendChild(item);
   });
 }
-function applyReport(report){
-  q('cgrlRun').disabled=false;
-  if(!report||typeof report!=='object'){setStatus('SAFE FAILURE','block');q('cgrlSummary').textContent='No valid read-only report was returned.';return}
-  lastReport=report;
-  var complete=report.coverage&&report.coverage.complete===true;
-  setStatus(redact(report.outcome||'REVIEW'),complete?'pass':'block');
-  q('cgrlSummary').textContent=complete?'Read-only analysis completed. Review every finding and exact call site before preparing a candidate.':'Analysis failed closed because complete indexed coverage was not proven. No repair candidate may continue.';
-  renderCounts(report);renderFindings(report);renderSecrets(report);
-  var ready=complete&&typeof report.proposed_complete_file_candidate==='string'&&report.proposed_complete_file_candidate.length>0;
-  q('cgrlCodeGod').disabled=!ready;
-  q('cgrlCandidateText').textContent=ready?'A separate complete-file candidate is ready for deterministic Code God review. It has not replaced the selected source.':'No proposed complete-file candidate is ready. CG Repair Lab has not replaced the selected source.';
+function renderMapGroup(root,label,rows){var item=node('div','item cgrlMapGroup');item.appendChild(node('h3','',label));if(!rows.length)item.appendChild(node('p','','None mapped.'));rows.forEach(function(row){var reads=(row.read_call_sites||[]).length,writes=(row.write_call_sites||[]).length;item.appendChild(node('div','cgrlMapLine',text(row.name)+' · reads '+reads+' · writes '+writes))});root.appendChild(item)}
+function renderDatabase(report){var root=q('cgrlDatabase'),map=report.database_map||{};root.replaceChildren();renderMapGroup(root,'Tables',Array.isArray(map.tables)?map.tables:[]);renderMapGroup(root,'RPCs',Array.isArray(map.rpcs)?map.rpcs:[]);renderMapGroup(root,'Edge Functions',Array.isArray(map.edge_functions)?map.edge_functions:[]);renderMapGroup(root,'Storage buckets',Array.isArray(map.storage_buckets)?map.storage_buckets:[]);var unresolved=node('div','item cgrlMapGroup');unresolved.appendChild(node('h3','','Unresolved table references'));unresolved.appendChild(node('div','cgrlMapLine',(map.unresolved_tables||[]).join('\n')||'None'));root.appendChild(unresolved)}
+function renderSecrets(report){var root=q('cgrlSecrets'),rows=Array.isArray(report.secret_reference_map)?report.secret_reference_map:[];root.replaceChildren();if(!rows.length){root.appendChild(node('div','empty','No supported secret references were found.'));return}rows.forEach(function(row){var item=node('div','item');item.appendChild(node('div','cgrlSecretName',row.name));item.appendChild(node('p','',row.reference));var declaration=row.declaration||{};item.appendChild(node('div','cgrlLocation',text(declaration.path)+(declaration.line?':'+declaration.line:'')));var calls=Array.isArray(row.call_sites)?row.call_sites:[];item.appendChild(node('p','',calls.length?'Downstream call sites:':'No downstream alias call was mapped.'));calls.forEach(function(call){item.appendChild(node('div','cgrlCalls',text(call.expression)+' — '+text(call.path)+(call.line?':'+call.line:'')))});root.appendChild(item)})}
+function renderDebug(report){
+  var root=q('cgrlDebug'),debug=report.debug_report||{};
+  root.replaceChildren();
+  var groups=[['Missing dependencies',debug.missing_dependencies||[]],['Duplicate symbols',debug.duplicate_symbols||[]],['Local storage calls',debug.local_storage_calls||[]],['Write routes',(debug.write_routes||[]).map(function(path){return{path:path}})]];
+  groups.forEach(function(group){
+    var item=node('div','item cgrlMapGroup');
+    item.appendChild(node('h3','',group[0]));
+    if(!group[1].length)item.appendChild(node('p','','None.'));
+    group[1].forEach(function(row){
+      var value=row.name?row.name+' · '+(row.locations||[]).map(function(x){return x.path+':'+x.line}).join(', '):text(row.path)+(row.line?':'+row.line:'')+(row.target?' → '+row.target:'')+(row.action?' · '+row.action:'');
+      item.appendChild(node('div','cgrlMapLine',value));
+    });
+    root.appendChild(item);
+  });
 }
-function applyError(error){q('cgrlRun').disabled=false;setStatus('BLOCKED','block');q('cgrlSummary').textContent=redact(error&&error.message||error||'The server blocked the request.')}
-function sendToCodeGod(){
-  if(!lastReport||typeof lastReport.proposed_complete_file_candidate!=='string')return;
-  emit('code-labs:cg-repair-lab-code-god-request',{candidate_code:lastReport.proposed_complete_file_candidate,candidate_hash:lastReport.proposed_candidate_hash||'',repository:lastReport.repository||'',ref:lastReport.ref||'',path:lastReport.selected_path||'',requires_code_god:true,replace_selected_source:false});
-}
-function boot(){
-  q('cgrlCheckAccess').addEventListener('click',requestAccess);
-  q('cgrlForm').addEventListener('submit',requestAnalysis);
-  q('cgrlCodeGod').addEventListener('click',sendToCodeGod);
-  q('cgrlRepo').addEventListener('change',function(){var selected=q('cgrlRepo').selectedOptions[0];if(selected&&selected.dataset.defaultBranch&&!q('cgrlRef').value)q('cgrlRef').placeholder=selected.dataset.defaultBranch});
-  window.addEventListener('code-labs:cg-repair-lab-access-result',function(event){applyAccess(event.detail)});
-  window.addEventListener('code-labs:cg-repair-lab-result',function(event){applyReport(event.detail)});
-  window.addEventListener('code-labs:cg-repair-lab-error',function(event){applyError(event.detail)});
-  window.CodeLabsCgRepairLabProV281={version:VERSION,applyAccess:applyAccess,applyReport:applyReport,applyError:applyError};
-  emit('code-labs:cg-repair-lab-ready',{version:VERSION,read_only:true});
-}
+function applyReport(report){q('cgrlRun').disabled=false;if(!report||typeof report!=='object'){setStatus('SAFE FAILURE','block');q('cgrlSummary').textContent='No valid read-only report was returned.';return}lastReport=report;workflow.candidate_saved=false;workflow.handoff_prepared=false;workflow.code_god_pass=false;workflow.request_id='';var complete=report.coverage&&report.coverage.complete===true;setStatus(redact(report.outcome||'REVIEW'),complete?'pass':'block');q('cgrlSummary').textContent=complete?'Read-only analysis completed. Review every report tab before preparing the separate candidate.':'Analysis failed closed because complete indexed coverage was not proven. No repair candidate may continue.';renderCounts(report);renderFindings(report);renderDependencies(report);renderDatabase(report);renderSecrets(report);renderDebug(report);var ready=complete&&typeof report.proposed_complete_file_candidate==='string'&&report.proposed_complete_file_candidate.length>0;q('cgrlSaveCandidate').disabled=!ready;q('cgrlPrepareHandoff').disabled=true;q('cgrlRunCodeGod').disabled=true;q('cgrlQueueWriter').disabled=true;q('cgrlExecuteWriter').disabled=true;q('cgrlCandidateText').textContent=ready?'A separate complete-file candidate is ready to save in Code Labs metadata. It has not replaced the selected source.':'No proposed complete-file candidate is ready. CG Repair Lab has not replaced the selected source.'}
+function needWorkspace(next){if(workflow.state_version)return true;workflowMessage('Load the current Tool-Only workspace version before '+next+'.');emit('code-labs:cg-repair-lab-workspace-request',{tool:'get_code_labs_workspace',then:next});return false}
+function saveCandidate(){if(!lastReport||typeof lastReport.proposed_complete_file_candidate!=='string'||!needWorkspace('saving the candidate'))return;emit('code-labs:cg-repair-lab-action-request',{tool:'run_code_labs_action',action:'cg_repair_lab.save_candidate',expected_state_version:workflow.state_version,candidate_code:lastReport.proposed_complete_file_candidate,note:'CG Repair Lab candidate '+text(lastReport.proposed_candidate_hash),replace_selected_source:false})}
+function applyCandidateSaved(result){applyWorkspace(result);workflow.candidate_saved=true;q('cgrlPrepareHandoff').disabled=false;workflowMessage('Separate candidate saved. The selected source was not replaced. Prepare the repository handoff next.')}
+function prepareHandoff(){if(!workflow.candidate_saved||!lastReport||!needWorkspace('preparing the Code God handoff'))return;var branch=text(q('cgrlWriterBranch').value).trim();if(!branch){workflowMessage('Enter an existing non-protected branch before preparing the handoff.');return}emit('code-labs:cg-repair-lab-action-request',{tool:'run_code_labs_action',action:'repo.prepare_handoff',expected_state_version:workflow.state_version,fields:{action:'change',repo:lastReport.repository,path:lastReport.selected_path,branch:branch,source_branch:lastReport.ref,content:lastReport.proposed_complete_file_candidate,notes:'Prepared by CG Repair Lab for deterministic Code God review.'}})}
+function applyHandoff(result){applyWorkspace(result);workflow.handoff_prepared=true;q('cgrlRunCodeGod').disabled=false;workflowMessage('Repository handoff prepared. Run deterministic Code God review.')}
+function runCodeGod(){if(!workflow.handoff_prepared||!needWorkspace('running Code God'))return;emit('code-labs:cg-repair-lab-action-request',{tool:'run_code_labs_action',action:'code_god.review',expected_state_version:workflow.state_version})}
+function applyCodeGod(result){applyWorkspace(result);var outcome=text(result&&result.review&&result.review.outcome);workflow.code_god_pass=outcome==='PASS';q('cgrlQueueWriter').disabled=!workflow.code_god_pass;workflowMessage(workflow.code_god_pass?'Code God PASS confirmed. The reviewed request may now be queued for Writer.':'Code God returned '+(outcome||'no outcome')+'. Resolve findings before Writer.')}
+function queueWriter(){if(!workflow.code_god_pass||!needWorkspace('queuing the Writer request'))return;emit('code-labs:cg-repair-lab-action-request',{tool:'run_code_labs_action',action:'github.writer_prepare',confirmed:true,expected_state_version:workflow.state_version,fields:{commit_message:text(q('cgrlCommitMessage').value).trim()||'Repair selected source',pr_title:text(q('cgrlPrTitle').value).trim()||'Repair selected source',pr_body:'Prepared by CG Repair Lab and approved by Code God.'}})}
+function applyWriterPrepared(result){applyWorkspace(result);workflow.request_id=text(result&&result.queued&&result.queued.request_id);q('cgrlExecuteWriter').disabled=!workflow.request_id;workflowMessage(workflow.request_id?'Reviewed Writer request queued. Code Labs Writer may execute it now.':'Writer preparation did not return a request receipt.')}
+function executeWriter(){if(!workflow.request_id||!needWorkspace('executing Code Labs Writer'))return;emit('code-labs:cg-repair-lab-writer-request',{tool:'execute_code_labs_github_writer',request_id:workflow.request_id,expected_state_version:workflow.state_version,confirmed:true})}
+function applyWriterResult(result){applyWorkspace(result);q('cgrlExecuteWriter').disabled=true;workflowMessage(result&&result.opened_pr===true?'Code Labs Writer committed the reviewed file and opened or reused a draft PR.':'Writer did not return draft-PR proof.')}
+function applyError(error){q('cgrlRun').disabled=false;setStatus('BLOCKED','block');var message=redact(error&&error.message||error||'The server blocked the request.');q('cgrlSummary').textContent=message;workflowMessage(message)}
+function boot(){q('cgrlCheckAccess').addEventListener('click',requestAccess);q('cgrlForm').addEventListener('submit',requestAnalysis);q('cgrlSaveCandidate').addEventListener('click',saveCandidate);q('cgrlPrepareHandoff').addEventListener('click',prepareHandoff);q('cgrlRunCodeGod').addEventListener('click',runCodeGod);q('cgrlQueueWriter').addEventListener('click',queueWriter);q('cgrlExecuteWriter').addEventListener('click',executeWriter);q('cgrlRepo').addEventListener('change',function(){var selected=q('cgrlRepo').selectedOptions[0];if(selected&&selected.dataset.defaultBranch&&!q('cgrlRef').value)q('cgrlRef').placeholder=selected.dataset.defaultBranch});document.querySelectorAll('[data-cgrl-tab]').forEach(function(button){button.addEventListener('click',function(){selectTab(button.dataset.cgrlTab)})});window.addEventListener('code-labs:cg-repair-lab-access-result',function(event){applyAccess(event.detail)});window.addEventListener('code-labs:cg-repair-lab-result',function(event){applyReport(event.detail)});window.addEventListener('code-labs:cg-repair-lab-workspace-result',function(event){applyWorkspace(event.detail)});window.addEventListener('code-labs:cg-repair-lab-candidate-saved',function(event){applyCandidateSaved(event.detail)});window.addEventListener('code-labs:cg-repair-lab-handoff-result',function(event){applyHandoff(event.detail)});window.addEventListener('code-labs:cg-repair-lab-code-god-result',function(event){applyCodeGod(event.detail)});window.addEventListener('code-labs:cg-repair-lab-writer-prepared',function(event){applyWriterPrepared(event.detail)});window.addEventListener('code-labs:cg-repair-lab-writer-result',function(event){applyWriterResult(event.detail)});window.addEventListener('code-labs:cg-repair-lab-error',function(event){applyError(event.detail)});window.CodeLabsCgRepairLabProV282={version:VERSION,applyAccess:applyAccess,applyReport:applyReport,applyWorkspace:applyWorkspace,applyCandidateSaved:applyCandidateSaved,applyHandoff:applyHandoff,applyCodeGod:applyCodeGod,applyWriterPrepared:applyWriterPrepared,applyWriterResult:applyWriterResult,applyError:applyError,selectTab:selectTab};window.CodeLabsCgRepairLabProV281=window.CodeLabsCgRepairLabProV282;emit('code-labs:cg-repair-lab-ready',{version:VERSION,tool_contract:'get_cg_repair_lab_workflow',read_only_default:true})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
