@@ -1,4 +1,8 @@
-import { scanRepositorySnapshot } from "./cg-repair-lab.ts";
+import {
+  getCgRepairLabWorkflow,
+  scanRepositorySnapshot,
+} from "./cg-repair-lab.ts";
+import { cleanRepository } from "./github-authority.ts";
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message);
@@ -176,4 +180,48 @@ Deno.test("CG Repair Lab preserves exact bracket and global secret references wi
     globalReference?.reference === "globalThis.SB_SECRET_KEY_CALL",
     "The globalThis reference must not be rewritten as a window reference.",
   );
+});
+
+Deno.test("CG Repair Lab publishes the complete tool workflow without candidate replacement", () => {
+  const workflow = getCgRepairLabWorkflow();
+  const controls = workflow.controls as Array<Record<string, any>>;
+  assert(
+    controls.some((item) =>
+      item.tool === "get_cg_repair_lab_access" && item.writes === false
+    ),
+    "The Pro access control must map to a read-only tool.",
+  );
+  assert(
+    controls.some((item) =>
+      item.action === "cg_repair_lab.save_candidate" &&
+      item.replaces_selected_source === false
+    ),
+    "Candidate saving must stay separate from selected-source replacement.",
+  );
+  assert(
+    controls.some((item) =>
+      item.connector === "Code Labs V104 Writer" &&
+      item.requires_code_god_pass === true
+    ),
+    "Writer execution must remain a separate post-Code-God control.",
+  );
+  assert(
+    workflow.prohibited.includes("candidate.accept"),
+    "CG Repair Lab must prohibit the source-replacement action.",
+  );
+});
+
+Deno.test("repository validation accepts arbitrary owner/name repositories", () => {
+  assert(
+    cleanRepository("example-owner/example-repository") ===
+      "example-owner/example-repository",
+    "Repository validation must not hard-code one project.",
+  );
+  let rejected = false;
+  try {
+    cleanRepository("not a repository URL");
+  } catch {
+    rejected = true;
+  }
+  assert(rejected, "Unsafe repository identities must be rejected.");
 });
