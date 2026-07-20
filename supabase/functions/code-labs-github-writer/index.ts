@@ -1,9 +1,6 @@
-import { binding, rest } from "../code-labs-mcp-stub/oauth.ts";
-import { executeGithubWriter } from "../code-labs-mcp-stub/github-writer.ts";
+type Row = Record<string, unknown>;
 
-type Row = Record<string, any>;
-
-const VERSION = "Code Labs V104 GitHub Writer v7";
+const VERSION = "Code Labs V104 GitHub Writer clean proxy v8";
 const PROJECT_URL = "https://xzxqfrvqdgkzwujbkdbk.supabase.co";
 const BASE = PROJECT_URL + "/functions/v1/code-labs-github-writer";
 const AUTH_SERVER = PROJECT_URL + "/functions/v1/code-labs-mcp-stub";
@@ -14,7 +11,11 @@ const cors = {
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
-const json = (body: unknown, status = 200, extra: Record<string, string> = {}) =>
+const json = (
+  body: unknown,
+  status = 200,
+  extra: Record<string, string> = {},
+) =>
   new Response(JSON.stringify(body, null, 2), {
     status,
     headers: {
@@ -25,15 +26,21 @@ const json = (body: unknown, status = 200, extra: Record<string, string> = {}) =
     },
   });
 
-const rpc = (id: unknown, result: unknown) => json({ jsonrpc: "2.0", id: id ?? null, result });
-const rpcError = (id: unknown, code: number, message: string, status = 400) =>
-  json({ jsonrpc: "2.0", id: id ?? null, error: { code, message } }, status);
+const rpc = (id: unknown, result: unknown) =>
+  json({ jsonrpc: "2.0", id: id ?? null, result });
+
+const rpcError = (
+  id: unknown,
+  code: number,
+  message: string,
+  status = 400,
+) => json({ jsonrpc: "2.0", id: id ?? null, error: { code, message } }, status);
 
 const writerTool = {
   name: "execute_code_labs_github_writer",
   title: "Execute Reviewed GitHub Writer Request",
   description:
-    "Use this only for an already queued Code Labs request with Code God PASS. It verifies an existing non-protected branch, commits exactly one complete reviewed file through the configured GitHub App, and opens or reuses a draft pull request. It cannot write to main, merge, delete, force-push, or modify workflow files.",
+    "Execute one already queued and Code God-approved Code Labs request through the guarded Code Labs backend. The backend verifies the existing non-main branch, commits one complete reviewed file through the configured GitHub App, and opens or reuses a draft pull request. It cannot write to main, merge, delete, force-push, or modify workflow files.",
   inputSchema: {
     type: "object",
     properties: {
@@ -52,69 +59,62 @@ const writerTool = {
   },
 };
 
-async function reserveWorkspace(ownerId: string, expected: number) {
-  if (!Number.isSafeInteger(expected) || expected < 1) {
-    throw new Error("expected_state_version is required. Read the workspace again before writing.");
-  }
-
-  const reservationId = crypto.randomUUID();
-  await rest("rpc/code_labs_reserve_writer_workspace", {
-    method: "POST",
-    body: JSON.stringify({
-      p_owner_id: ownerId,
-      p_expected_state_version: expected,
-      p_reservation_id: reservationId,
-    }),
-  });
-
-  return {
-    owner_id: ownerId,
-    state_version: expected + 1,
-    writer_reservation_id: reservationId,
-  };
+function authorization(req: Request) {
+  const value = String(req.headers.get("authorization") || "").trim();
+  if (!value) throw new Error("Missing Code Labs OAuth authorization.");
+  return value;
 }
 
 async function execute(req: Request, args: Row) {
-  const auth = await binding(req);
   const requestId = String(args.request_id || "").trim();
   const expected = Number(args.expected_state_version);
 
   if (!requestId) throw new Error("request_id is required.");
+  if (!Number.isSafeInteger(expected) || expected < 1) {
+    throw new Error(
+      "expected_state_version is required. Read the workspace again before writing.",
+    );
+  }
   if (args.confirmed !== true) throw new Error("confirmed must be true.");
 
-  const workspace = await reserveWorkspace(auth.owner_id, expected);
-  const result: any = await executeGithubWriter(auth, {
-    request_id: requestId,
-    confirmed: true,
+  const upstream = await fetch(AUTH_SERVER, {
+    method: "POST",
+    headers: {
+      Authorization: authorization(req),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: crypto.randomUUID(),
+      method: "tools/call",
+      params: {
+        name: "execute_code_labs_github_writer",
+        arguments: {
+          request_id: requestId,
+          expected_state_version: expected,
+          confirmed: true,
+        },
+      },
+    }),
   });
 
-  return {
-    ok: true,
-    version: VERSION,
-    tool: writerTool.name,
-    wrote_database: result?.wrote_database === true,
-    wrote_github: result?.wrote_github === true,
-    opened_pr: result?.opened_pr === true,
-    deleted_anything: false,
-    workspace: {
-      owner_id: workspace.owner_id,
-      state_version: workspace.state_version,
-    },
-    github: result?.github || null,
-    request: result?.request
-      ? {
-          id: result.request.id,
-          status: result.request.status,
-          repo: result.request.repo,
-          path: result.request.path,
-          branch: result.request.branch,
-          github_commit_sha: result.request.github_commit_sha,
-          github_content_sha: result.request.github_content_sha,
-          pull_request_number: result.request.pull_request_number,
-          pull_request_url: result.request.pull_request_url,
-        }
-      : null,
-  };
+  const payload = await upstream.json().catch(() => null) as Record<string, unknown> | null;
+  if (!upstream.ok) {
+    throw new Error("The guarded Code Labs Writer request was not accepted.");
+  }
+
+  const rpcFailure = payload?.error as Record<string, unknown> | undefined;
+  if (rpcFailure) {
+    throw new Error(String(rpcFailure.message || "The guarded Writer failed."));
+  }
+
+  const result = payload?.result as Record<string, unknown> | undefined;
+  const structured = result?.structuredContent as Record<string, unknown> | undefined;
+  if (!structured || structured.ok !== true) {
+    throw new Error("The guarded Code Labs Writer did not return verified proof.");
+  }
+
+  return structured;
 }
 
 Deno.serve(async (req: Request) => {
@@ -136,13 +136,13 @@ Deno.serve(async (req: Request) => {
         ok: true,
         version: VERSION,
         connector: "code-labs-github-writer",
-        architecture: "writer-only",
+        architecture: "guarded-code-labs-proxy",
         tools: [writerTool],
         endpoint: BASE,
       });
     }
 
-    const body = await req.json().catch(() => ({}));
+    const body = await req.json().catch(() => ({})) as Row;
     const id = body.id ?? null;
 
     if (body.jsonrpc === "2.0") {
@@ -152,7 +152,7 @@ Deno.serve(async (req: Request) => {
           capabilities: { tools: { listChanged: true } },
           serverInfo: { name: "code-labs-github-writer", version: VERSION },
           instructions:
-            "This connector exposes one reviewed branch-and-draft-PR writer. Never target main, merge, delete, or force-push.",
+            "This connector forwards only the reviewed request ID, workspace state and confirmation to the guarded Code Labs backend. GitHub App credentials and installation tokens remain server-side.",
         });
       }
       if (body.method === "ping") return rpc(id, {});
@@ -163,10 +163,11 @@ Deno.serve(async (req: Request) => {
       if (body.method === "resources/list") return rpc(id, { resources: [] });
       if (body.method === "prompts/list") return rpc(id, { prompts: [] });
       if (body.method === "tools/call") {
-        if (body.params?.name !== writerTool.name) {
+        const params = body.params as Row | undefined;
+        if (params?.name !== writerTool.name) {
           return rpcError(id, -32601, "Unknown tool.", 404);
         }
-        const result = await execute(req, body.params?.arguments || {});
+        const result = await execute(req, (params?.arguments || {}) as Row);
         return rpc(id, {
           content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
           structuredContent: result,
@@ -176,12 +177,12 @@ Deno.serve(async (req: Request) => {
       return rpcError(id, -32601, "Unknown method.", 404);
     }
 
-    const toolName = body.tool || body.name || "";
+    const toolName = String(body.tool || body.name || "");
     if (toolName !== writerTool.name) throw new Error("Unknown tool.");
     return json(await execute(req, body));
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    const status = /Missing bearer token|OAuth token|sign-in/i.test(message) ? 401 : 400;
+    const status = /authorization|OAuth|sign-in/i.test(message) ? 401 : 400;
     return json(
       {
         ok: false,
@@ -194,7 +195,10 @@ Deno.serve(async (req: Request) => {
       },
       status,
       status === 401
-        ? { "WWW-Authenticate": `Bearer resource_metadata="${BASE}/.well-known/oauth-protected-resource"` }
+        ? {
+            "WWW-Authenticate":
+              `Bearer resource_metadata="${BASE}/.well-known/oauth-protected-resource"`,
+          }
         : {},
     );
   }
