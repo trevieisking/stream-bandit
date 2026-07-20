@@ -2,6 +2,7 @@ import { BASE, SCOPE, authorize, binding, register, token } from "./oauth.ts";
 import { VERSION, getContext, readUrl, saveRequest } from "./context.ts";
 import { createCheckpoint, executeDirectGithubWriter, getWorkspace, listActions, listRecords, readCurrentFile, readReceipt, runAction, saveCandidate, selectRecord, undoAction, updateCurrentFile, updateJob, updatePacket, updateProject, updateTest } from "./guarded-workspace.ts";
 import { analyzeCgRepairLab, getCgRepairLabAccess, getCgRepairLabWorkflow } from "./cg-repair-lab.ts";
+import { listOwnerGalleryReferences, readOwnerGalleryImage } from "./owner-gallery-reader.ts";
 
 type Row = Record<string, any>;
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "GET, POST, OPTIONS" };
@@ -31,6 +32,8 @@ function tools() {
     { name: "get_cg_repair_lab_access", title: "Get CG Repair Lab Access", description: "Check the signed-in owner's Code Labs Pro entitlement and owner-scoped GitHub repository bindings. This read-only check never returns credential values, user identifiers, email addresses, or installation metadata.", inputSchema: { type: "object", properties: {} }, outputSchema: resultSchema, annotations: read },
     { name: "get_cg_repair_lab_workflow", title: "Get CG Repair Lab Workflow", description: "Read the authoritative mapping between every CG Repair Lab control and the Code Labs V104, Tool-Only, Code God, and Writer tools. This does not read repository contents or change state.", inputSchema: { type: "object", properties: {} }, outputSchema: resultSchema, annotations: read },
     { name: "analyze_code_labs_repository", title: "Analyze Repository with CG Repair Lab", description: "Run Code Labs Pro's read-only CG Repair Lab across the selected owner-authorized GitHub repository. It reports dependency, database and exact secret-reference call sites while redacting credential-shaped values. It cannot replace source, commit, merge, deploy, change a database, or bypass Code God and GitHub Writer.", inputSchema: { type: "object", properties: { repo: { type: "string", description: "Owner-authorized repository in owner/name form." }, ref: { type: "string", description: "Optional branch, tag, or commit ref. Defaults to the verified repository's default branch." }, path: { type: "string", description: "Repository-relative source file to prepare as the optional complete-file candidate." } }, required: ["repo", "path"] }, outputSchema: resultSchema, annotations: read },
+    { name: "list_code_labs_owner_gallery_images", title: "List Code Labs Owner Gallery Images", description: "List the signed-in Code Labs owner's private gallery as opaque image references. Rechecks owner and active Pro access server-side and returns no filenames, owner identifiers, object paths, or signed URLs. This tool cannot upload, replace, or delete images.", inputSchema: { type: "object", properties: {} }, outputSchema: resultSchema, annotations: read },
+    { name: "read_code_labs_owner_gallery_image", title: "Read Code Labs Owner Gallery Image", description: "Read one deliberately selected private owner-gallery image by its opaque reference. Rechecks owner and active Pro access server-side and returns the image directly without exposing a filename, owner identifier, object path, or signed URL. This tool cannot upload, replace, or delete images.", inputSchema: { type: "object", properties: { reference: { type: "string", pattern: "^img_[a-f0-9]{64}$" } }, required: ["reference"] }, outputSchema: resultSchema, annotations: read },
     { name: "select_code_labs_record", title: "Select Code Labs Record", description: "Select an existing project, file, job, packet, or test without creating a duplicate; requires the current workspace version.", inputSchema: { type: "object", properties: { record_type: { type: "string", enum: ["project", "file", "job", "packet", "test"] }, record_id: { type: "string" }, expected_state_version: expected }, required: ["record_type", "record_id", "expected_state_version"] }, outputSchema: resultSchema, annotations: privateWrite },
     { name: "update_code_labs_project", title: "Update Code Labs Project", description: "Update the selected project in place after matching the current workspace version.", inputSchema: { type: "object", properties: { fields, expected_state_version: expected }, required: ["fields", "expected_state_version"] }, outputSchema: resultSchema, annotations: privateWrite },
     { name: "update_code_labs_current_file", title: "Update Current Code Labs File", description: "Update the selected file row in place after matching the current workspace version; never creates a duplicate file.", inputSchema: { type: "object", properties: { fields, expected_state_version: expected }, required: ["fields", "expected_state_version"] }, outputSchema: resultSchema, annotations: destructiveWrite },
@@ -57,6 +60,8 @@ async function call(b: any, name: string, args: Row) {
   if (name === "get_cg_repair_lab_access") return getCgRepairLabAccess(b);
   if (name === "get_cg_repair_lab_workflow") return getCgRepairLabWorkflow();
   if (name === "analyze_code_labs_repository") return analyzeCgRepairLab(b, args);
+  if (name === "list_code_labs_owner_gallery_images") return listOwnerGalleryReferences(b);
+  if (name === "read_code_labs_owner_gallery_image") return readOwnerGalleryImage(b, args);
   if (name === "select_code_labs_record") return selectRecord(b, args);
   if (name === "update_code_labs_project") return updateProject(b, args);
   if (name === "update_code_labs_current_file") return updateCurrentFile(b, args);
@@ -72,6 +77,21 @@ async function call(b: any, name: string, args: Row) {
   throw new Error("Unknown tool.");
 }
 
+function toolResult(name: string, result: Row) {
+  if (name !== "read_code_labs_owner_gallery_image") {
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result, isError: false };
+  }
+  const { data, ...metadata } = result;
+  return {
+    content: [
+      { type: "text", text: JSON.stringify(metadata, null, 2) },
+      { type: "image", data: String(data || ""), mimeType: String(result.mime_type || "image/jpeg") },
+    ],
+    structuredContent: metadata,
+    isError: false,
+  };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   const p = new URL(req.url).pathname;
@@ -85,7 +105,7 @@ Deno.serve(async (req: Request) => {
     const body = await req.json().catch(() => ({}));
     const id = body.id ?? null;
     if (body.jsonrpc === "2.0") {
-      if (body.method === "initialize") return rpc(id, { protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: true } }, serverInfo: { name: "code-labs-mcp-stub", version: VERSION }, instructions: "Use Code Labs V104 server tools directly. The reviewed route is File Lab, CG Repair Lab, Code God, then GitHub Writer. CG Repair Lab is Code Labs Pro, owner-scoped, read-only, and value-redacting. No browser pairing, page session, page fingerprint, or live-tab control is used. Read the workspace before writes, supply its current state_version, inspect receipts, and keep GitHub changes branch and pull-request only." });
+      if (body.method === "initialize") return rpc(id, { protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: true } }, serverInfo: { name: "code-labs-mcp-stub", version: VERSION }, instructions: "Use Code Labs V104 server tools directly. The reviewed route is File Lab, CG Repair Lab, Code God, then GitHub Writer. CG Repair Lab is Code Labs Pro, owner-scoped, read-only, and value-redacting. The private owner gallery is available only through opaque read-only references and deliberate selected-image reads. No browser pairing, page session, page fingerprint, or live-tab control is used. Read the workspace before writes, supply its current state_version, inspect receipts, and keep GitHub changes branch and pull-request only." });
       if (body.method === "ping") return rpc(id, {});
       if (body.method === "notifications/initialized") return new Response(null, { status: 202, headers: cors });
       if (body.method === "tools/list") return rpc(id, { tools: tools() });
@@ -93,8 +113,9 @@ Deno.serve(async (req: Request) => {
       if (body.method === "prompts/list") return rpc(id, { prompts: [] });
       if (body.method === "tools/call") {
         const b = await binding(req);
-        const result = await call(b, body.params?.name || "", body.params?.arguments || {});
-        return rpc(id, { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], structuredContent: result, isError: false });
+        const name = body.params?.name || "";
+        const result = await call(b, name, body.params?.arguments || {});
+        return rpc(id, toolResult(name, result));
       }
       return rpcError(id, -32601, "Unknown method", 404);
     }
