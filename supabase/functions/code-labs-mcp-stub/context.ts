@@ -1,49 +1,103 @@
 import { Binding, rest, Row } from "./oauth.ts";
 import { verifyOwnerRepository } from "./github-authority.ts";
 export const VERSION = "Code Labs V104 tool-only workspace control";
-async function table(name: string, select: string, limit: number) {
+
+async function table(
+  b: Binding,
+  name: string,
+  select: string,
+  limit: number,
+  filters = "",
+  ownerColumn = "owner_id",
+) {
   const rows = await rest(
     name + "?select=" + encodeURIComponent(select) +
-      "&order=created_at.desc&limit=" + limit,
+      "&" + ownerColumn + "=eq." + encodeURIComponent(b.owner_id) +
+      filters + "&order=created_at.desc&limit=" + limit,
   );
   return Array.isArray(rows) ? rows : [];
 }
-export async function getContext(limit = 5) {
+
+async function one(path: string) {
+  const rows = await rest(path);
+  return Array.isArray(rows) ? rows[0] || null : null;
+}
+
+export async function getContext(b: Binding, limit = 5) {
   const cap = Math.max(1, Math.min(Number(limit || 5), 25));
-  const [projects, jobs, packets, tests, audit] = await Promise.all([
-    table(
-      "code_labs_projects",
-      "id,site_name,site_url,repo,mode,created_at",
-      cap,
-    ),
-    table(
-      "code_labs_jobs",
-      "id,title,status,problem,created_at,started_at,completed_at",
-      cap,
-    ),
-    table(
-      "code_labs_packets",
-      "id,packet_type,packet_text,created_at",
-      Math.min(cap, 10),
-    ),
-    table(
-      "code_labs_test_runs",
-      "id,filename,result,checked_count,total_count,created_at",
-      cap,
-    ),
-    table("code_labs_audit_log", "id,action,created_at", cap),
-  ]);
+  const state = await one(
+    "code_labs_workspace_state?select=current_project_id,current_test_run_id" +
+      "&owner_id=eq." + encodeURIComponent(b.owner_id) + "&limit=1",
+  );
+  const currentProjectId = String(state?.current_project_id || "");
+  const selectedTestId = String(state?.current_test_run_id || "");
+  const currentProjectFilter = currentProjectId
+    ? "&project_id=eq." + encodeURIComponent(currentProjectId)
+    : "&id=is.null";
+
+  const [projects, jobs, packets, tests, testHistory, audit, selectedTest] =
+    await Promise.all([
+      table(
+        b,
+        "code_labs_projects",
+        "id,site_name,site_url,repo,mode,created_at",
+        cap,
+      ),
+      table(
+        b,
+        "code_labs_jobs",
+        "id,title,status,problem,created_at,started_at,completed_at",
+        cap,
+      ),
+      table(
+        b,
+        "code_labs_packets",
+        "id,packet_type,packet_text,created_at",
+        Math.min(cap, 10),
+      ),
+      table(
+        b,
+        "code_labs_test_runs",
+        "id,filename,result,checked_count,total_count,created_at",
+        cap,
+        currentProjectFilter,
+      ),
+      table(
+        b,
+        "code_labs_test_runs",
+        "id,project_id,filename,result,checked_count,total_count,created_at",
+        cap,
+      ),
+      table(b, "code_labs_audit_log", "id,action,created_at", cap),
+      selectedTestId
+        ? one(
+          "code_labs_test_runs?select=id,filename,result,checked_count,total_count,notes,details,created_at" +
+            "&id=eq." + encodeURIComponent(selectedTestId) +
+            "&owner_id=eq." + encodeURIComponent(b.owner_id) + "&limit=1",
+        )
+        : Promise.resolve(null),
+    ]);
+
   return {
     ok: true,
     version: VERSION,
     tool: "get_code_labs_context",
     limit: cap,
     read_only: true,
+    owner_scoped: true,
     wrote_database: false,
     wrote_github: false,
     opened_pr: false,
     deleted_anything: false,
-    reads: { projects, jobs, packets, tests, audit },
+    reads: {
+      projects,
+      jobs,
+      packets,
+      selected_test: selectedTest,
+      tests,
+      test_history: testHistory,
+      audit,
+    },
   };
 }
 function validUrl(raw: unknown) {
