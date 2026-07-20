@@ -50,7 +50,7 @@ function tools() {
 }
 
 async function call(b: any, name: string, args: Row) {
-  if (name === "get_code_labs_context") return getContext(args.limit);
+  if (name === "get_code_labs_context") return getContext(b, args.limit);
   if (name === "read_code_labs_url") return readUrl(args);
   if (name === "get_code_labs_workspace") return getWorkspace(b);
   if (name === "list_code_labs_records") return listRecords(b, args);
