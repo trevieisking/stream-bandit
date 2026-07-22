@@ -1,9 +1,9 @@
-/* Code Labs Header Shell V243 - sole shared navigation/sidebar owner. */
+/* Code Labs Header Shell V244 - bounded shared navigation boot. */
 (function(){'use strict';
-var VERSION='V243-cg-repair-lab-pro';
+var VERSION='V244-header-shell-bounded-boot';
 var LINKS=[['index.html','🏠','Home','Start and current repair'],['setup.html','⚙','Setup','Project and repository'],['project-picker.html','🗂️','Project Picker','Choose saved project'],['file-lab.html','📥','File Lab','Load complete source'],['saved-files.html','🗃️','Saved Files','Select one saved file'],['rescue-room.html','🛟','Rescue Room','Problem and preserve rules'],['packet-builder.html','📦','Packet Builder','Complete repair context'],['buddy-canvas.html','🤖','Buddy Canvas','Source and fixed file'],['v20.html','🧭','Workflow Hub','Choose the safe route'],['patch-desk.html','🧩','Patch Desk','Review full replacement'],['patch-lab.html','🧪','Patch Lab','Exact-edit fallback'],['preview-test.html','🎯','Preview + Test','Check before GitHub'],['checkpoints.html','💾','Checkpoints','Rollback and receipts'],['repo-desk.html','🧾','Repo Desk','Choose repository action'],['cg-repair-lab.html','🧠','CG Repair Lab','Code Labs Pro analysis'],['code-god.html','⚖️','Code God','Deterministic final review'],['publish-prep.html','🚀','GitHub Writer','Branch and PR handoff'],['github-tracker.html','🔎','GitHub Tracker','PR, preview and checks'],['help.html','❔','Help + Tools','Guides and specialist tools']];
 var TOOLS=[['start-guide.html','Start Guide'],['fix-wizard.html','Fix Wizard'],['ai-handoff.html','AI Handoff'],['checklist-builder.html','Checklist Builder'],['about.html','About'],['faq.html','FAQ'],['context-packet.html','Context Packet'],['helper-route-map.html','Route Scanner'],['read-only-proof.html','Read-only Proof'],['owner-read-proof.html','Owner Read Proof'],['buddy-canvas-receipt-v115.html','Canvas Receipt'],['chatgpt-buddy-tools.html','Buddy Tools']];
-var observer=null,timer=0,repairing=false;
+var observer=null,timer=0,repairing=false,bootTimer=0,bootAttempt=0,BOOT_DELAYS=[0,80,160,320,640,1000];
 function q(s,r){return(r||document).querySelector(s)}
 function page(){return(document.body&&document.body.getAttribute('data-page'))||location.pathname.split('/').pop().replace(/\.html?$/i,'')||'index'}
 function esc(v){return String(v==null?'':v).replace(/[<>"'&]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -15,6 +15,8 @@ function tools(){var side=q('.sidebar'),n=q('.nav');if(!side||!n||q('#clV202Tool
 function style(){if(q('#clHeaderShellV235Style'))return;var s=document.createElement('style');s.id='clHeaderShellV235Style';s.textContent='.clV235ToolLinks{display:grid;gap:6px;margin-top:8px}.clV235ToolLinks a{display:block;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.08);text-decoration:none}@media(max-width:980px){.sidebar{position:relative!important;max-height:none!important}.main{min-width:0!important}}';document.head.appendChild(s)}
 function schedule(){if(repairing||timer)return;timer=setTimeout(function(){timer=0;run()},0)}
 function watch(){var n=q('.nav');if(!n)return;if(observer)observer.disconnect();observer=new MutationObserver(schedule);observer.observe(n,{childList:true,subtree:true,attributes:true,attributeFilter:['href','data-step','class']})}
-function run(){style();if(!nav()){setTimeout(run,0);return false}tools();var small=q('.logo small');if(small)small.textContent='Complete repair workflow · CG Repair Lab and Code God before GitHub Writer';watch();document.documentElement.dataset.clHeaderReady='v243';window.CodeLabsStableNav={version:VERSION,links:LINKS.length,run:run,routes:LINKS};window.CodeLabsHeaderShellV235=window.CodeLabsStableNav;return true}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
+function stopBoot(){if(bootTimer){window.clearTimeout(bootTimer);bootTimer=0}}
+function run(){style();if(!nav())return false;stopBoot();tools();var small=q('.logo small');if(small)small.textContent='Complete repair workflow · CG Repair Lab and Code God before GitHub Writer';watch();document.documentElement.dataset.clHeaderReady='v244';window.CodeLabsStableNav={version:VERSION,links:LINKS.length,run:run,routes:LINKS};window.CodeLabsHeaderShellV235=window.CodeLabsStableNav;return true}
+function boot(){if(run())return true;if(bootAttempt>=BOOT_DELAYS.length){stopBoot();return false}var delay=BOOT_DELAYS[bootAttempt++];stopBoot();bootTimer=window.setTimeout(boot,delay);return false}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
