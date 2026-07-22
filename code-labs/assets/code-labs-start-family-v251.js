@@ -1,4 +1,4 @@
-/* Code Labs Start Family V256 - bounded Home, Setup and Project Picker presentation only. */
+/* Code Labs Start Family V257 - canonical 19-route navigation check. */
 (function(){
 'use strict';
 var PAGE=(document.body&&document.body.getAttribute('data-page'))||'';
@@ -6,7 +6,7 @@ if(['index','setup','project-picker'].indexOf(PAGE)<0)return;
 function q(s,r){return(r||document).querySelector(s)}
 function all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
 function add(n,c){if(n)n.classList.add(c)}
-function restoreNav(){var nav=q('.nav');if(!nav||!window.CodeLabsShellLoaderV235||!window.CodeLabsShellLoaderV235.firstNav)return;var links=all('a[href]',nav);if(links.length!==18)window.CodeLabsShellLoaderV235.firstNav()}
+function restoreNav(){var nav=q('.nav');if(!nav||!window.CodeLabsShellLoaderV235||!window.CodeLabsShellLoaderV235.firstNav)return;var links=all('a[href]',nav);if(links.length!==19)window.CodeLabsShellLoaderV235.firstNav()}
 function heading(n){var h=q('h2,h3',n);return String(h&&h.textContent||'').replace(/\s+/g,' ').trim().toLowerCase()}
 function markByHeading(main,name,cls){all(':scope>section,:scope>.panel',main).forEach(function(n){if(heading(n)===name)add(n,cls)})}
 function home(main){document.body.classList.add('clStartHomeV251');add(q('#clV36Home',main)||q('.hero',main),'clStartHeroV251');markByHeading(main,'current repair state','clStartSummaryV251');markByHeading(main,'what code labs is for','clStartPurposeV251');markByHeading(main,'how to work with code labs now','clStartStepsV251');markByHeading(main,'best next clicks','clStartActionsV251')}
@@ -39,8 +39,8 @@ function style(){if(q('#clStartFamilyV251Style'))return;var s=document.createEle
 '@media(max-width:1100px){body.clStartPickerV251 .clStartPickerGridV251{grid-template-columns:1fr 1fr}body.clStartPickerV251 .clStartRecommendedV251{grid-column:1/-1}}',
 '@media(max-width:760px){body.clStartFamilyV251 .clStartSummaryV251 .grid3,body.clStartHomeV251 .clStartStepsV251 .grid,body.clStartPickerV251 .clStartPickerGridV251{grid-template-columns:1fr}body.clStartPickerV251 .clStartRecommendedV251{grid-column:auto}body.clStartSetupV251 .clStartPrimaryActionsV251 .btn{width:100%;min-width:0}}'
 ].join('');document.head.appendChild(s)}
-function apply(){var main=q('.main')||q('main');if(!main)return false;restoreNav();document.body.classList.add('clStartFamilyV251');style();if(PAGE==='index')home(main);if(PAGE==='setup')setup(main);if(PAGE==='project-picker')picker(main);document.body.setAttribute('data-cl-start-family','v256-bounded');return true}
+function apply(){var main=q('.main')||q('main');if(!main)return false;restoreNav();document.body.classList.add('clStartFamilyV251');style();if(PAGE==='index')home(main);if(PAGE==='setup')setup(main);if(PAGE==='project-picker')picker(main);document.body.setAttribute('data-cl-start-family','v257-canonical-nav');return true}
 function boot(){apply();[80,350,1000,2600].forEach(function(ms){setTimeout(apply,ms)})}
-window.CodeLabsStartFamilyV251={version:'V256-bounded',apply:apply,page:PAGE};
+window.CodeLabsStartFamilyV251={version:'V257-canonical-nav',apply:apply,page:PAGE};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
