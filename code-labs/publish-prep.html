@@ -3,23 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Code Labs GitHub Writer | Prepare a Safe Branch and Pull Request</title>
-<meta name="description" content="Workflow step 16: prepare read, add, change, remove or review handoffs for the selected repository file using a non-main branch, pull request notes and the saved Code Labs repair context.">
-<meta name="keywords" content="Code Labs GitHub Writer, branch and pull request, add file, change file, remove verified file, repository handoff, safe GitHub workflow">
+<title>Code Labs GitHub Writer | Protected Branch and Pull Request Execution</title>
+<meta name="description" content="Workflow step 17: review the saved one-file branch-and-pull-request context after Code God PASS. Actual GitHub execution remains restricted to the protected Code Labs Writer.">
+<meta name="keywords" content="Code Labs GitHub Writer, protected writer, branch and pull request, Code God PASS, safe GitHub workflow">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://chatterfriendsstreambandit.co.uk/code-labs/publish-prep.html">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Code Labs GitHub Writer | Prepare a Safe Branch and Pull Request">
-<meta property="og:description" content="Build the safe GitHub handoff for the selected action, repository path and non-main branch after Code God review.">
+<meta property="og:title" content="Code Labs GitHub Writer | Protected Branch and Pull Request Execution">
+<meta property="og:description" content="Review the saved non-main branch and one-file handoff after Code God PASS. The protected Writer performs the actual GitHub execution.">
 <meta property="og:url" content="https://chatterfriendsstreambandit.co.uk/code-labs/publish-prep.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Code Labs GitHub Writer">
-<meta name="twitter:description" content="Prepare the branch-and-pull-request handoff for the reviewed Code Labs repair.">
+<meta name="twitter:description" content="Protected one-file branch-and-pull-request execution after Code God PASS.">
 <link rel="icon" type="image/svg+xml" href="assets/code-labs-icon.svg">
 <link rel="stylesheet" href="assets/code-labs.css?v=cl-v85-flow-fix">
 </head>
 <body data-page="publish-prep">
-<noscript><main style="padding:20px;font-family:system-ui"><h1>Code Labs GitHub Writer</h1><p>This page needs JavaScript to build GitHub read, add, edit, remove verified file, and review handoffs.</p></main></noscript>
+<noscript><main style="padding:20px;font-family:system-ui"><h1>Code Labs GitHub Writer</h1><p>This page displays the reviewed Writer context. Actual GitHub execution requires the protected Code Labs Writer after Code God PASS.</p></main></noscript>
 <script src="assets/code-labs.js"></script>
 <script src="assets/cl-nav.js?v=cl-v268-repository-autofill-cleanup"></script>
 <script src="assets/code-labs-v1-1-safety.js?v=cl-v220-visible-cache-polish"></script>
@@ -27,10 +27,29 @@
 <script src="assets/code-labs-v16-publish-prep.js?v=cl-v86-github-writer-seo"></script>
 <script>
 (function(){'use strict';
+var VERSION='V216-protected-writer-route';
 function q(s,r){return(r||document).querySelector(s)}
-function go(){var save=q('#gwSave');if(save)save.click();window.location.href='code-god.html'}
-function add(){if((document.body&&document.body.getAttribute('data-page'))!=='publish-prep')return false;var actions=q('#githubWriter .actions');if(!actions)return false;if(q('#gwCodeGodCheck',actions))return true;var link=document.createElement('button');link.id='gwCodeGodCheck';link.className='btn warn';link.type='button';link.textContent='Code God Check';link.setAttribute('data-code-god-route','V215');link.addEventListener('click',go);var back=q('a[href="repo-desk.html"]',actions);if(back&&back.nextSibling)actions.insertBefore(link,back.nextSibling);else actions.insertBefore(link,actions.firstChild);return true}
-function boot(){if(add())return;var attempts=0,timer=setInterval(function(){attempts+=1;if(add()||attempts>=40)clearInterval(timer)},150)}
+function disable(id,label){var el=q(id);if(!el)return;el.disabled=true;el.setAttribute('aria-disabled','true');el.setAttribute('title','Legacy direct-connector execution is disabled. Use the protected Code Labs Writer after Code God PASS.');if(label)el.textContent=label}
+function align(){
+  if((document.body&&document.body.getAttribute('data-page'))!=='publish-prep')return true;
+  var root=q('#githubWriter');
+  if(!root)return false;
+  var old=q('#gwCodeGodCheck');if(old)old.remove();
+  var back=q('a[href="repo-desk.html"]',root);if(back){back.href='code-god.html';back.textContent='Back to Code God'}
+  var pill=q('.pill',root);if(pill)pill.textContent='Step 17 of 19 · GitHub Writer';
+  var heading=q('h1',root);if(heading)heading.textContent='Review the protected one-file Writer context.';
+  var intro=q('h1 + p',root);if(intro)intro.textContent='Code God must pass before the protected Writer validates the queued request, commits exactly one complete file to an existing non-main branch, and opens or reuses a draft pull request. This browser page does not execute GitHub writes.';
+  disable('#gwCopyTop','Protected Writer only');
+  disable('#gwBuild','Protected Writer only');
+  disable('#gwCopy','Protected Writer only');
+  disable('#gwSelect','Reviewed context only');
+  var out=q('#gwOut');if(out){out.value='PROTECTED CODE LABS WRITER CONTEXT\n\nThis browser page does not create branches, commits, pull requests, merges, deletions or deployments.\n\nRequired route: Repo Desk handoff -> CG Repair Lab -> Code God PASS -> queued one-file request -> protected Code Labs Writer -> draft PR -> GitHub Tracker.'}
+  var main=q('.main')||document.body;if(main)main.setAttribute('data-code-labs-writer-route',VERSION);
+  window.CodeLabsGithubWriterRouteV216={version:VERSION,step:17,execution:'protected-writer-only'};
+  return true;
+}
+function schedule(){align();[120,400,900,1800,3000].forEach(function(ms){setTimeout(align,ms)})}
+function boot(){schedule();document.addEventListener('input',function(){setTimeout(align,0)},true);document.addEventListener('change',function(){setTimeout(align,0)},true)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
