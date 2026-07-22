@@ -61,8 +61,8 @@ async function one(path: string) {
   return Array.isArray(rows) ? rows[0] || null : null;
 }
 
-async function latest(owner: string, table: string, filters = "") {
-  return one(table + "?select=*&owner_id=eq." + encodeURIComponent(owner) + filters + "&order=created_at.desc&limit=1");
+async function latest(owner: string, table: string, filters = "", order = "created_at") {
+  return one(table + "?select=*&owner_id=eq." + encodeURIComponent(owner) + filters + "&order=" + encodeURIComponent(order) + ".desc&limit=1");
 }
 
 async function owned(owner: string, type: RecordType, id: unknown) {
@@ -95,9 +95,9 @@ async function ensureState(owner: string) {
 
   const project = await latest(owner, "code_labs_projects");
   const projectFilter = project ? "&project_id=eq." + encodeURIComponent(project.id) : "";
-  const file = project ? await latest(owner, "code_labs_files", projectFilter) : null;
+  const file = project ? await latest(owner, "code_labs_files", projectFilter, "updated_at") : null;
   const job = project && file
-    ? await latest(owner, "code_labs_jobs", projectFilter + "&file_id=eq." + encodeURIComponent(file.id))
+    ? await latest(owner, "code_labs_jobs", projectFilter + "&file_id=eq." + encodeURIComponent(file.id), "updated_at")
     : null;
   const packet = project && job
     ? await latest(owner, "code_labs_packets", projectFilter + "&job_id=eq." + encodeURIComponent(job.id))
@@ -155,10 +155,8 @@ async function hierarchy(owner: string, state: Row) {
   const job = state.current_job_id
     ? requireProjectMatch(await owned(owner, "job", state.current_job_id), projectId, "job")
     : null;
-  if (job) {
-    if (!file || String(job.file_id || "") !== String(file.id)) {
-      throw new Error("The selected job is not linked to the selected file.");
-    }
+  if (job && (!file || String(job.file_id || "") !== String(file.id))) {
+    throw new Error("The selected job is not linked to the selected file.");
   }
   const packet = state.current_packet_id
     ? requireProjectMatch(await owned(owner, "packet", state.current_packet_id), projectId, "packet")
@@ -364,9 +362,14 @@ export async function updateCurrentFile(b: Binding, args: Row) {
 export async function updateJob(b: Binding, args: Row) {
   const fields = cleanObject(args.fields);
   const state = await ensureState(b.owner_id);
-  if (!state.current_project_id) throw new Error("Select a project before updating a job.");
+  const projectId = String(state.current_project_id || "");
+  const selectedFileId = String(state.current_file_id || "");
+  if (!projectId || !selectedFileId) throw new Error("Select a project and file before updating a job.");
   if (Object.prototype.hasOwnProperty.call(fields, "file_id")) {
-    await linkedFile(b.owner_id, String(state.current_project_id), fields.file_id);
+    const file = await linkedFile(b.owner_id, projectId, fields.file_id);
+    if (String(file.id) !== selectedFileId) {
+      throw new Error("The updated job must remain linked to the selected file.");
+    }
   }
   return patchSelected(b, "job", fields, ["file_id", "title", "problem", "dont_touch", "errors", "status", "started_at", "completed_at", "metadata"], "update_code_labs_repair_job");
 }
@@ -374,9 +377,15 @@ export async function updateJob(b: Binding, args: Row) {
 export async function updatePacket(b: Binding, args: Row) {
   const fields = cleanObject(args.fields);
   const state = await ensureState(b.owner_id);
-  if (!state.current_project_id) throw new Error("Select a project before updating a packet.");
+  const projectId = String(state.current_project_id || "");
+  const selectedFileId = String(state.current_file_id || "");
+  const selectedJobId = String(state.current_job_id || "");
+  if (!projectId || !selectedFileId || !selectedJobId) throw new Error("Select a project, file and job before updating a packet.");
   if (Object.prototype.hasOwnProperty.call(fields, "job_id")) {
-    await linkedJob(b.owner_id, String(state.current_project_id), fields.job_id);
+    const linked = await linkedJob(b.owner_id, projectId, fields.job_id);
+    if (String(linked.job.id) !== selectedJobId || String(linked.file.id) !== selectedFileId) {
+      throw new Error("The updated packet must remain linked to the selected job and file.");
+    }
   }
   return patchSelected(b, "packet", fields, ["job_id", "packet_type", "packet_text", "metadata"], "upsert_code_labs_packet");
 }
@@ -384,9 +393,15 @@ export async function updatePacket(b: Binding, args: Row) {
 export async function updateTest(b: Binding, args: Row) {
   const fields = cleanObject(args.fields);
   const state = await ensureState(b.owner_id);
-  if (!state.current_project_id) throw new Error("Select a project before updating a test.");
+  const projectId = String(state.current_project_id || "");
+  const selectedFileId = String(state.current_file_id || "");
+  const selectedJobId = String(state.current_job_id || "");
+  if (!projectId || !selectedFileId || !selectedJobId) throw new Error("Select a project, file and job before updating a test.");
   if (Object.prototype.hasOwnProperty.call(fields, "job_id")) {
-    await linkedJob(b.owner_id, String(state.current_project_id), fields.job_id);
+    const linked = await linkedJob(b.owner_id, projectId, fields.job_id);
+    if (String(linked.job.id) !== selectedJobId || String(linked.file.id) !== selectedFileId) {
+      throw new Error("The updated test must remain linked to the selected job and file.");
+    }
   }
   return patchSelected(b, "test", fields, ["job_id", "filename", "result", "checked_count", "total_count", "notes", "details"], "upsert_code_labs_test_result");
 }
