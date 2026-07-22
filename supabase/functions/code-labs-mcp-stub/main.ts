@@ -76,7 +76,29 @@ function fileType(path: string) {
   return index > -1 ? name.slice(index + 1).toLowerCase().slice(0, 20) : "text";
 }
 
-async function intakeReceipt(ownerId: string, fileId: string, created: boolean, path: string, stateVersion: number) {
+function cleanIntakeMetadata(value: unknown) {
+  const source = value && typeof value === "object" && !Array.isArray(value)
+    ? { ...(value as Row) }
+    : {};
+  for (const key of [
+    "fixed_output",
+    "candidate_hash",
+    "candidate_note",
+    "candidate_saved_at",
+    "candidate_accepted_at",
+    "repo_handoff",
+    "code_god_review",
+    "github_writer_request",
+    "proposed",
+    "proposed_hash",
+    "repair_branch",
+    "request_scope",
+    "request_branch",
+  ]) delete source[key];
+  return source;
+}
+
+async function intakeReceipt(ownerId: string, fileId: string, created: boolean, path: string, stateVersion: number, commitSha: string) {
   const rows = await rest("code_labs_action_receipts", {
     method: "POST",
     headers: { Prefer: "return=representation" },
@@ -86,7 +108,7 @@ async function intakeReceipt(ownerId: string, fileId: string, created: boolean, 
       record_type: "file",
       record_id: fileId,
       before_data: {},
-      after_data: { path, selected: true, downstream_cleared: true, state_version: stateVersion },
+      after_data: { path, selected: true, downstream_cleared: true, state_version: stateVersion, source_commit_sha: commitSha },
       changed_fields: ["current_file_id", "current_job_id", "current_packet_id", "current_test_run_id", "workflow_step", "state_version"],
       created_new_row: created,
       undo_available: false,
@@ -109,37 +131,42 @@ async function intakeFile(b: any, args: Row) {
   const project = Array.isArray(projectRows) ? projectRows[0] || null : null;
   if (!project || String(project.repo || "") !== repo) throw new Error("The selected File Lab project and requested repository do not match.");
   const authority = await verifyOwnerRepository(b.owner_id, repo, { contents: "read", metadata: "read" });
-  const ref = String(input.ref || authority.default_branch).trim();
-  if (!ref || ref.length > 200 || /[\u0000-\u001f\u007f]/.test(ref)) throw new Error("A safe repository ref is required.");
-  const source = await githubRequest("/repos/" + repo.split("/").map(encodeURIComponent).join("/") + "/contents/" + path.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(ref), authority.token);
+  const requestedRef = String(input.ref || authority.default_branch).trim();
+  if (!requestedRef || requestedRef.length > 200 || /[\u0000-\u001f\u007f]/.test(requestedRef)) throw new Error("A safe repository ref is required.");
+  const repoPath = "/repos/" + repo.split("/").map(encodeURIComponent).join("/");
+  const commit = await githubRequest(repoPath + "/commits/" + encodeURIComponent(requestedRef), authority.token);
+  const commitSha = String(commit?.sha || "");
+  if (!/^[a-f0-9]{40}$/i.test(commitSha)) throw new Error("GitHub did not return immutable source provenance.");
+  const source = await githubRequest(repoPath + "/contents/" + path.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(commitSha), authority.token);
   if (!source || source.type !== "file" || source.encoding !== "base64" || typeof source.content !== "string") throw new Error("GitHub did not return one readable File Lab source file.");
   const code = decodeBase64(source.content);
   const size = new TextEncoder().encode(code).length;
   if (!code || size > 750000) throw new Error("The File Lab source must be non-empty and under 750000 bytes.");
   const currentHash = await hashText(code);
+  const matches = await rest("code_labs_files?select=*&owner_id=eq." + encodeURIComponent(b.owner_id) + "&project_id=eq." + encodeURIComponent(project.id) + "&filename=eq." + encodeURIComponent(path) + "&order=updated_at.desc&limit=2");
+  if (!Array.isArray(matches)) throw new Error("File Lab could not read its exact file inventory.");
+  if (matches.length > 1) throw new Error("Multiple File Lab rows already exist for this exact path. Resolve the duplicate before intake.");
   const now = new Date().toISOString();
   const lockedRows = await rest("code_labs_workspace_state?owner_id=eq." + encodeURIComponent(b.owner_id) + "&state_version=eq." + encodeURIComponent(expectedVersion), {
     method: "PATCH",
     headers: { Prefer: "return=representation" },
-    body: JSON.stringify({ current_file_id: null, current_job_id: null, current_packet_id: null, current_test_run_id: null, workflow_step: "file", state_version: expectedVersion + 1, updated_at: now }),
+    body: JSON.stringify({ state_version: expectedVersion + 1, updated_at: now }),
   });
   const locked = Array.isArray(lockedRows) ? lockedRows[0] || null : null;
   if (!locked) throw new Error("Workspace state changed before File Lab intake could begin.");
-  const matches = await rest("code_labs_files?select=*&owner_id=eq." + encodeURIComponent(b.owner_id) + "&project_id=eq." + encodeURIComponent(project.id) + "&filename=eq." + encodeURIComponent(path) + "&order=updated_at.desc&limit=2");
-  if (!Array.isArray(matches)) throw new Error("File Lab could not read its exact file inventory.");
-  if (matches.length > 1) throw new Error("Multiple File Lab rows already exist for this exact path. Resolve the duplicate before intake.");
+  let file = matches[0] || null;
+  let created = false;
   const sourceMetadata = {
+    ...cleanIntakeMetadata(file?.metadata),
     source: "file.intake",
     source_repo: repo,
-    source_ref: ref,
+    source_ref: requestedRef,
     source_path: path,
     source_blob_sha: String(source.sha || ""),
-    source_commit_sha: String(source._links?.git || "").split("/").pop() || null,
+    source_commit_sha: commitSha,
     verified_owner_repository: true,
     intake_at: now,
   };
-  let file = matches[0] || null;
-  let created = false;
   if (file) {
     const rows = await rest("code_labs_files?id=eq." + encodeURIComponent(file.id) + "&owner_id=eq." + encodeURIComponent(b.owner_id) + "&project_id=eq." + encodeURIComponent(project.id), {
       method: "PATCH",
@@ -157,7 +184,7 @@ async function intakeFile(b: any, args: Row) {
     created = true;
   }
   if (!file) throw new Error("File Lab could not save the verified source file.");
-  const selectedRows = await rest("code_labs_workspace_state?owner_id=eq." + encodeURIComponent(b.owner_id) + "&state_version=eq." + encodeURIComponent(expectedVersion + 1), {
+  const selectedRows = await rest("code_labs_workspace_state?owner_id=eq." + encodeURIComponent(b.owner_id) + "&state_version=eq." + encodeURIComponent(expectedVersion + 1) + "&current_project_id=eq." + encodeURIComponent(project.id), {
     method: "PATCH",
     headers: { Prefer: "return=representation" },
     body: JSON.stringify({ current_file_id: file.id, current_job_id: null, current_packet_id: null, current_test_run_id: null, workflow_step: "file", state_version: expectedVersion + 2, updated_at: new Date().toISOString() }),
@@ -169,9 +196,9 @@ async function intakeFile(b: any, args: Row) {
     version: VERSION,
     tool: "run_code_labs_action",
     action: "file.intake",
-    file: { path, file_type: file.file_type, current_hash: currentHash, created, source_verified: true },
+    file: { path, file_type: file.file_type, current_hash: currentHash, created, source_verified: true, source_commit_sha: commitSha },
     workspace: { workflow_step: selected.workflow_step, state_version: selected.state_version, downstream_cleared: true },
-    receipt: await intakeReceipt(b.owner_id, file.id, created, path, Number(selected.state_version)),
+    receipt: await intakeReceipt(b.owner_id, file.id, created, path, Number(selected.state_version), commitSha),
     wrote_database: true,
     wrote_github: false,
     opened_pr: false,
