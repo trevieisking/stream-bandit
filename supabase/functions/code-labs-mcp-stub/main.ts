@@ -1,7 +1,8 @@
-import { BASE, SCOPE, authorize, binding, register, token } from "./oauth.ts";
+import { BASE, SCOPE, authorize, binding, register, rest, token } from "./oauth.ts";
 import { VERSION, getContext, readUrl, saveRequest } from "./context.ts";
 import { createCheckpoint, executeDirectGithubWriter, getWorkspace, listActions, listRecords, readCurrentFile, readReceipt, runAction, saveCandidate, selectRecord, undoAction, updateCurrentFile, updateJob, updatePacket, updateProject, updateTest } from "./guarded-workspace.ts";
 import { analyzeCgRepairLab, getCgRepairLabAccess, getCgRepairLabWorkflow } from "./cg-repair-lab.ts";
+import { githubRequest, verifyOwnerRepository } from "./github-authority.ts";
 import { listOwnerGalleryReferences, readOwnerGalleryImage } from "./owner-gallery-reader.ts";
 
 type Row = Record<string, any>;
@@ -44,9 +45,211 @@ function tools() {
     { name: "create_code_labs_checkpoint", title: "Create Code Labs Checkpoint", description: "Create one deliberate version checkpoint from the selected current file after matching the current workspace version.", inputSchema: { type: "object", properties: { label: { type: "string" }, note: { type: "string" }, confirmed: { type: "boolean" }, expected_state_version: expected }, required: ["confirmed", "expected_state_version"] }, outputSchema: resultSchema, annotations: privateWrite },
     { name: "run_code_labs_action", title: "Run Code Labs Action", description: "Run one strict server-side Code Labs action ID. State-changing actions require the current workspace version; this never clicks a browser page.", inputSchema: { type: "object", properties: { action: { type: "string" }, record_id: { type: "string" }, request_id: { type: "string" }, expected_state_version: expected, confirmed: { type: "boolean" }, label: { type: "string" }, note: { type: "string" }, fields, candidate_code: { type: "string" } }, required: ["action"] }, outputSchema: resultSchema, annotations: destructiveWrite },
     { name: "execute_code_labs_github_writer", title: "Execute Code Labs GitHub Writer", description: "Use this only after a Code God PASS and a queued branch-and-PR request exist. It verifies an existing non-protected branch, commits one complete reviewed file through the configured GitHub App, opens or reuses a draft pull request, and records GitHub proof in Supabase. It cannot write to main, delete files, merge, force-push, or modify workflow files.", inputSchema: { type: "object", properties: { request_id: { type: "string" }, expected_state_version: expected, confirmed: { type: "boolean" } }, required: ["request_id", "expected_state_version", "confirmed"] }, outputSchema: resultSchema, annotations: destructiveWrite },
-    { name: "undo_code_labs_action", title: "Undo Code Labs Action", description: "Restore an eligible in-place Code Labs write from its receipt.", inputSchema: { type: "object", properties: { receipt_id: { type: "string" } }, required: ["receipt_id"] }, outputSchema: resultSchema, annotations: destructiveWrite },
+    { name: "undo_code_labs_action", title: "Undo Code Labs Action", description: "Restore an eligible in-place Code Labs write from its receipt.", inputSchema: { type: "object", properties: { receipt_id: { type: "string" } } , required: ["receipt_id"] }, outputSchema: resultSchema, annotations: destructiveWrite },
     { name: "save_code_labs_write_request", title: "Save Code Labs Write Request", description: "Queue one private full-file GitHub branch-and-pull-request request. It never writes GitHub or main directly.", inputSchema: { type: "object", properties: { repo: { type: "string" }, path: { type: "string" }, branch: { type: "string" }, content: { type: "string" }, action: { type: "string" }, commit_message: { type: "string" }, pr_title: { type: "string" }, pr_body: { type: "string" }, confirm_branch_pr_only: { type: "boolean" } }, required: ["repo", "path", "branch", "content", "commit_message", "pr_title", "confirm_branch_pr_only"] }, outputSchema: resultSchema, annotations: privateWrite },
   ];
+}
+
+function decodeBase64(value: string) {
+  const binary = atob(String(value || "").replace(/\s+/g, ""));
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+  return new TextDecoder().decode(bytes);
+}
+
+async function hashText(value: string) {
+  const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function deterministicFileId(ownerId: string, projectId: string, path: string) {
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ownerId + "\n" + projectId + "\n" + path)));
+  const bytes = digest.slice(0, 16);
+  bytes[6] = (bytes[6] & 0x0f) | 0x80;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join("-");
+}
+
+const INTAKE_RESERVATION_PREFIX = "file_intake_pending:";
+
+function intakeReservationStep() {
+  return INTAKE_RESERVATION_PREFIX + crypto.randomUUID();
+}
+
+function intakeReserved(value: unknown) {
+  return String(value || "").startsWith(INTAKE_RESERVATION_PREFIX);
+}
+
+async function releaseIntakeReservation(ownerId: string, stateVersion: number, marker: string, fallbackStep: string) {
+  try {
+    const rows = await rest("code_labs_workspace_state?owner_id=eq." + encodeURIComponent(ownerId) + "&state_version=eq." + encodeURIComponent(stateVersion) + "&workflow_step=eq." + encodeURIComponent(marker), {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ workflow_step: fallbackStep, state_version: stateVersion + 1, updated_at: new Date().toISOString() }),
+    });
+    return Array.isArray(rows) && Boolean(rows[0]);
+  } catch {
+    return false;
+  }
+}
+
+function safeIntakePath(value: unknown) {
+  const path = String(value || "").trim().replace(/^\/+/, "");
+  if (!path || path.includes("..") || path.includes("\\") || path.startsWith(".") || /(?:^|\/)(?:secrets?|\.env[^/]*)$/i.test(path) || /\.(?:pem|key|p12|pfx)$/i.test(path) || path.startsWith(".github/")) {
+    throw new Error("A safe repository-relative File Lab path is required.");
+  }
+  return path;
+}
+
+function fileType(path: string) {
+  const name = path.split("/").pop() || path;
+  const index = name.lastIndexOf(".");
+  return index > -1 ? name.slice(index + 1).toLowerCase().slice(0, 20) : "text";
+}
+
+function cleanIntakeMetadata(value: unknown) {
+  const source = value && typeof value === "object" && !Array.isArray(value)
+    ? { ...(value as Row) }
+    : {};
+  for (const key of [
+    "fixed_output",
+    "candidate_hash",
+    "candidate_note",
+    "candidate_saved_at",
+    "candidate_accepted_at",
+    "repo_handoff",
+    "code_god_review",
+    "github_writer_request",
+    "proposed",
+    "proposed_hash",
+    "repair_branch",
+    "request_scope",
+    "request_branch",
+  ]) delete source[key];
+  return source;
+}
+
+async function intakeReceipt(ownerId: string, fileId: string, created: boolean, path: string, stateVersion: number, commitSha: string) {
+  const rows = await rest("code_labs_action_receipts", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({
+      owner_id: ownerId,
+      action: "file.intake",
+      record_type: "file",
+      record_id: fileId,
+      before_data: {},
+      after_data: { path, selected: true, downstream_cleared: true, state_version: stateVersion, source_commit_sha: commitSha, concurrency_reserved: true },
+      changed_fields: ["current_file_id", "current_job_id", "current_packet_id", "current_test_run_id", "workflow_step", "state_version"],
+      created_new_row: created,
+      undo_available: false,
+    }),
+  });
+  return Array.isArray(rows) ? rows[0] || null : null;
+}
+
+async function intakeFile(b: any, args: Row) {
+  const expectedVersion = Number(args.expected_state_version);
+  if (!Number.isInteger(expectedVersion) || expectedVersion < 1) throw new Error("expected_state_version is required.");
+  const input = args.fields && typeof args.fields === "object" ? args.fields : {};
+  const path = safeIntakePath(input.path);
+  const repo = String(input.repo || "").trim();
+  const stateRows = await rest("code_labs_workspace_state?select=*&owner_id=eq." + encodeURIComponent(b.owner_id) + "&limit=1");
+  const before = Array.isArray(stateRows) ? stateRows[0] || null : null;
+  if (!before || Number(before.state_version) !== expectedVersion) throw new Error("Workspace state changed. Read the workspace again before writing.");
+  if (intakeReserved(before.workflow_step)) throw new Error("Another File Lab intake is already reserved. Read the workspace before retrying.");
+  if (!before.current_project_id) throw new Error("Select the File Lab project first.");
+  const projectRows = await rest("code_labs_projects?select=id,repo&owner_id=eq." + encodeURIComponent(b.owner_id) + "&id=eq." + encodeURIComponent(before.current_project_id) + "&limit=1");
+  const project = Array.isArray(projectRows) ? projectRows[0] || null : null;
+  if (!project || String(project.repo || "") !== repo) throw new Error("The selected File Lab project and requested repository do not match.");
+  const authority = await verifyOwnerRepository(b.owner_id, repo, { contents: "read", metadata: "read" });
+  const requestedRef = String(input.ref || authority.default_branch).trim();
+  if (!requestedRef || requestedRef.length > 200 || /[\u0000-\u001f\u007f]/.test(requestedRef)) throw new Error("A safe repository ref is required.");
+  const repoPath = "/repos/" + repo.split("/").map(encodeURIComponent).join("/");
+  const commit = await githubRequest(repoPath + "/commits/" + encodeURIComponent(requestedRef), authority.token);
+  const commitSha = String(commit?.sha || "");
+  if (!/^[a-f0-9]{40}$/i.test(commitSha)) throw new Error("GitHub did not return immutable source provenance.");
+  const source = await githubRequest(repoPath + "/contents/" + path.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(commitSha), authority.token);
+  if (!source || source.type !== "file" || source.encoding !== "base64" || typeof source.content !== "string") throw new Error("GitHub did not return one readable File Lab source file.");
+  const code = decodeBase64(source.content);
+  const size = new TextEncoder().encode(code).length;
+  if (!code || size > 750000) throw new Error("The File Lab source must be non-empty and under 750000 bytes.");
+  const currentHash = await hashText(code);
+  const matches = await rest("code_labs_files?select=*&owner_id=eq." + encodeURIComponent(b.owner_id) + "&project_id=eq." + encodeURIComponent(project.id) + "&filename=eq." + encodeURIComponent(path) + "&order=updated_at.desc&limit=2");
+  if (!Array.isArray(matches)) throw new Error("File Lab could not read its exact file inventory.");
+  if (matches.length > 1) throw new Error("Multiple File Lab rows already exist for this exact path. Resolve the duplicate before intake.");
+  const now = new Date().toISOString();
+  const reservationStep = intakeReservationStep();
+  const fallbackStep = String(before.workflow_step || (before.current_file_id ? "file" : "project"));
+  const lockedRows = await rest("code_labs_workspace_state?owner_id=eq." + encodeURIComponent(b.owner_id) + "&state_version=eq." + encodeURIComponent(expectedVersion) + "&current_project_id=eq." + encodeURIComponent(project.id) + "&workflow_step=eq." + encodeURIComponent(fallbackStep), {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ workflow_step: reservationStep, state_version: expectedVersion + 1, updated_at: now }),
+  });
+  const locked = Array.isArray(lockedRows) ? lockedRows[0] || null : null;
+  if (!locked) throw new Error("Workspace state changed before File Lab intake could begin.");
+  try {
+    let file = matches[0] || null;
+    let created = false;
+    const sourceMetadata = {
+      ...cleanIntakeMetadata(file?.metadata),
+      source: "file.intake",
+      source_repo: repo,
+      source_ref: requestedRef,
+      source_path: path,
+      source_blob_sha: String(source.sha || ""),
+      source_commit_sha: commitSha,
+      verified_owner_repository: true,
+      intake_at: now,
+    };
+    if (file) {
+      const rows = await rest("code_labs_files?id=eq." + encodeURIComponent(file.id) + "&owner_id=eq." + encodeURIComponent(b.owner_id) + "&project_id=eq." + encodeURIComponent(project.id), {
+        method: "PATCH",
+        headers: { Prefer: "return=representation" },
+        body: JSON.stringify({ filename: path, file_type: fileType(path), current_code: code, current_hash: currentHash, metadata: sourceMetadata, updated_at: now }),
+      });
+      file = Array.isArray(rows) ? rows[0] || null : null;
+    } else {
+      const rows = await rest("code_labs_files", {
+        method: "POST",
+        headers: { Prefer: "return=representation" },
+        body: JSON.stringify({ id: await deterministicFileId(b.owner_id, project.id, path), owner_id: b.owner_id, project_id: project.id, filename: path, file_type: fileType(path), current_code: code, current_hash: currentHash, metadata: sourceMetadata }),
+      });
+      file = Array.isArray(rows) ? rows[0] || null : null;
+      created = true;
+    }
+    if (!file) throw new Error("File Lab could not save the verified source file.");
+    const selectedRows = await rest("code_labs_workspace_state?owner_id=eq." + encodeURIComponent(b.owner_id) + "&state_version=eq." + encodeURIComponent(expectedVersion + 1) + "&current_project_id=eq." + encodeURIComponent(project.id) + "&workflow_step=eq." + encodeURIComponent(reservationStep), {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ current_file_id: file.id, current_job_id: null, current_packet_id: null, current_test_run_id: null, workflow_step: "file", state_version: expectedVersion + 2, updated_at: new Date().toISOString() }),
+    });
+    const selected = Array.isArray(selectedRows) ? selectedRows[0] || null : null;
+    if (!selected) throw new Error("File Lab source was saved but the workspace changed before selection completed. Read the workspace before continuing.");
+    return {
+      ok: true,
+      version: VERSION,
+      tool: "run_code_labs_action",
+      action: "file.intake",
+      file: { path, file_type: file.file_type, current_hash: currentHash, created, source_verified: true, source_commit_sha: commitSha, deterministic_identity: true },
+      workspace: { workflow_step: selected.workflow_step, state_version: selected.state_version, downstream_cleared: true, reservation_released: true },
+      receipt: await intakeReceipt(b.owner_id, file.id, created, path, Number(selected.state_version), commitSha),
+      wrote_database: true,
+      wrote_github: false,
+      opened_pr: false,
+      deleted_anything: false,
+    };
+  } catch (error) {
+    await releaseIntakeReservation(b.owner_id, expectedVersion + 1, reservationStep, fallbackStep);
+    throw error;
+  }
+}
+
+function actionsWithIntake() {
+  const result = listActions();
+  const actions = Array.isArray(result.actions) ? result.actions : [];
+  return { ...result, actions: [{ action: "file.intake", requires_confirmation: false }, ...actions] };
 }
 
 async function call(b: any, name: string, args: Row) {
@@ -55,7 +258,7 @@ async function call(b: any, name: string, args: Row) {
   if (name === "get_code_labs_workspace") return getWorkspace(b);
   if (name === "list_code_labs_records") return listRecords(b, args);
   if (name === "read_code_labs_current_file") return readCurrentFile(b);
-  if (name === "list_code_labs_actions") return listActions();
+  if (name === "list_code_labs_actions") return actionsWithIntake();
   if (name === "read_code_labs_receipt") return readReceipt(b, args);
   if (name === "get_cg_repair_lab_access") return getCgRepairLabAccess(b);
   if (name === "get_cg_repair_lab_workflow") return getCgRepairLabWorkflow();
@@ -70,7 +273,7 @@ async function call(b: any, name: string, args: Row) {
   if (name === "save_code_labs_candidate") return saveCandidate(b, args);
   if (name === "upsert_code_labs_test_result") return updateTest(b, args);
   if (name === "create_code_labs_checkpoint") return createCheckpoint(b, args);
-  if (name === "run_code_labs_action") return runAction(b, args);
+  if (name === "run_code_labs_action") return String(args.action || "") === "file.intake" ? intakeFile(b, args) : runAction(b, args);
   if (name === "execute_code_labs_github_writer") return executeDirectGithubWriter(b, args);
   if (name === "undo_code_labs_action") return undoAction(b, args);
   if (name === "save_code_labs_write_request") return saveRequest(b, args);
