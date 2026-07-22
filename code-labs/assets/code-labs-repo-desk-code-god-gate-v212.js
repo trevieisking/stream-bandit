@@ -1,10 +1,10 @@
-/* Code Labs Repo Desk Code God Gate V217.
-   Route only the Repo Desk content CTA through read-only Code God review.
+/* Code Labs Repo Desk CG Repair Lab Gate V218.
+   Route only the Repo Desk content CTA through read-only CG Repair Lab before Code God.
    Sidebar navigation and GitHub Writer -> Tracker remain canonical and untouched.
 */
 (function () {
   'use strict';
-  var VERSION = 'V217';
+  var VERSION = 'V218';
   var timer = 0;
   var observer = null;
   var scans = 0;
@@ -39,12 +39,12 @@
       link.setAttribute('data-code-god-original-href', cleanHref(link));
       changed = true;
     }
-    if (link.getAttribute('href') !== 'code-god.html') {
-      link.setAttribute('href', 'code-god.html');
+    if (link.getAttribute('href') !== 'cg-repair-lab.html') {
+      link.setAttribute('href', 'cg-repair-lab.html');
       changed = true;
     }
-    if (link.textContent !== 'Next: Code God') {
-      link.textContent = 'Next: Code God';
+    if (link.textContent !== 'Next: CG Repair Lab') {
+      link.textContent = 'Next: CG Repair Lab';
       changed = true;
     }
     if (link.getAttribute('data-code-god-gate') !== VERSION) {
@@ -85,7 +85,7 @@
     event.preventDefault();
     event.stopPropagation();
     saveVisibleHandoff();
-    window.location.assign('code-god.html');
+    window.location.assign('cg-repair-lab.html');
   }
 
   function boot() {
