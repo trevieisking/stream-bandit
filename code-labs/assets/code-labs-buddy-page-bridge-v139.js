@@ -1,11 +1,11 @@
-/* Code Labs Buddy Page Bridge V140
+/* Code Labs Buddy Page Bridge V141
    Shared full-page read/write bridge for Code Labs.
    Browser-only: no GitHub token, no direct main write, no browser GitHub write.
 */
 (function () {
   'use strict';
 
-  var VERSION = 'V140';
+  var VERSION = 'V141';
   var STATE_KEY = 'codeLabsV1State';
   var LEGACY_OUTPUT_KEY = 'codeLabsBuddyPageBridgeV139';
   var OUTPUT_KEY = 'codeLabsBuddyPageBridgeV140';
@@ -16,10 +16,12 @@
   var ROOT_ID = 'clBuddyPageBridgeV139';
   var INSTALLED_V139 = 'data-cl-buddy-page-bridge-v139-installed';
   var INSTALLED_V140 = 'data-cl-buddy-page-bridge-v140-installed';
+  var INSTALLED_V141 = 'data-cl-buddy-page-bridge-v141-installed';
 
-  if (document.documentElement.getAttribute(INSTALLED_V140) === 'yes') return;
+  if (document.documentElement.getAttribute(INSTALLED_V141) === 'yes') return;
   document.documentElement.setAttribute(INSTALLED_V139, 'yes');
   document.documentElement.setAttribute(INSTALLED_V140, 'yes');
+  document.documentElement.setAttribute(INSTALLED_V141, 'yes');
 
   function q(selector, root) {
     return (root || document).querySelector(selector);
@@ -54,6 +56,19 @@
     for (var i = 0; i < arguments.length; i += 1) {
       var value = String(arguments[i] == null ? '' : arguments[i]);
       if (value.trim()) return value;
+    }
+    return '';
+  }
+
+  function validRepo(value) {
+    return /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(String(value || '').trim());
+  }
+
+  function firstValidRepo(values) {
+    values = Array.isArray(values) ? values : [];
+    for (var i = 0; i < values.length; i += 1) {
+      var value = String(values[i] == null ? '' : values[i]).trim();
+      if (validRepo(value)) return value;
     }
     return '';
   }
@@ -139,15 +154,15 @@
     var bridge = currentFileBridge();
     var canvas = buddyCanvas();
 
-    var repo = firstNonEmpty(
+    var repo = firstValidRepo([
       githubWriter.repo,
       laneContext.repo,
       repoDesk.repo,
       bridge.repo,
       githubSource.owner && githubSource.repo ? githubSource.owner + '/' + githubSource.repo : '',
-      project.repo,
-      'trevieisking/stream-bandit'
-    );
+      project.repo
+    ]);
+    var repoContextReady = validRepo(repo);
 
     var path = cleanPath(firstNonEmpty(
       githubWriter.path,
@@ -193,12 +208,12 @@
       canvas.source
     );
 
-    var writeReady = Boolean(repo === 'trevieisking/stream-bandit' && path && fixed.trim());
+    var writeReady = Boolean(repoContextReady && path && fixed.trim());
     var requestBranch = firstNonEmpty(
       githubWriter.branch,
       laneContext.branch,
       repoDesk.branch,
-      writeReady ? 'code-labs-buddy-' + slug(action) + '-' + slug(path) + '-v140' : ''
+      writeReady ? 'code-labs-buddy-' + slug(action) + '-' + slug(path) + '-v141' : ''
     );
 
     return {
@@ -212,6 +227,7 @@
       bridge: bridge,
       canvas: canvas,
       repo: repo,
+      repoContextReady: repoContextReady,
       path: path,
       sourceBranch: sourceBranch,
       requestBranch: requestBranch,
@@ -532,10 +548,11 @@
       page_fingerprint: pageFingerprint(),
       title: document.title || '',
       url: location.href,
-      mode: legacy.writeReady ? 'write_context_ready' : 'read_write_page_bridge',
+      mode: legacy.writeReady ? 'protected_writer_context_ready' : 'read_write_page_bridge',
 
       /* V139 compatibility fields consumed by code-labs-page-polish-v172.js. */
       repo: legacy.repo,
+      repo_context_ready: legacy.repoContextReady,
       path: legacy.path,
       source_branch: legacy.sourceBranch,
       request_branch: legacy.requestBranch,
@@ -591,6 +608,9 @@
         'Normal input, change, and blur events are dispatched.',
         'Dangerous actions require page opt-in and explicit confirmation.',
         'Every write returns a receipt and supports one-step undo.',
+        'Repository context must be a valid owner/name value and is re-authorized server-side.',
+        'Code God PASS and the protected Code Labs Writer are mandatory before GitHub source execution.',
+        'The browser bridge cannot create branches, commits, pull requests, merges, deletions or deployments.',
         'No GitHub token, no direct main write, and no browser GitHub write.'
       ]
     };
@@ -870,6 +890,7 @@
       '',
       'REPO / FILE',
       'Repo: ' + (packet.repo || 'missing'),
+      'Repository context valid: ' + Boolean(packet.repo_context_ready),
       'Path: ' + (packet.path || 'missing'),
       'Source branch: ' + (packet.source_branch || 'main'),
       'Request branch: ' + (packet.request_branch || 'context-only'),
@@ -909,7 +930,7 @@
     }));
     output.push('');
     output.push('Buddy must read first, write the smallest field set, inspect the receipt, then read again.');
-    output.push('GitHub source changes remain branch/PR-only through ChatGPT connectors.');
+    output.push('GitHub source execution remains restricted to the protected Code Labs Writer after Code God PASS, on an existing non-main branch and draft pull request.');
 
     return output.join('\n');
   }
@@ -961,7 +982,7 @@
 
     if (status) {
       status.className = 'badge good';
-      status.textContent = 'Full page read/write ready';
+      status.textContent = 'Full page read/write context ready';
     }
     if (proof) {
       proof.innerHTML =
@@ -994,8 +1015,8 @@
     panel.className = 'panel';
     panel.style.border = '3px solid rgba(59,130,246,.28)';
     panel.innerHTML =
-      '<h2>Buddy Page Bridge V140</h2>' +
-      '<p class="muted">Reads every section and empty field. Adds persistent Buddy Notes, writes approved fields by stable key, records receipts, and supports undo. Browser GitHub writes remain disabled.</p>' +
+      '<h2>Buddy Page Bridge V141</h2>' +
+      '<p class="muted">Reads every section and empty field. Adds persistent Buddy Notes, writes approved page fields by stable key, records receipts, and supports undo. Browser page commands stay local; GitHub execution requires server-side owner/repository authorization, Code God PASS, and the protected Writer.</p>' +
       '<div id="clBuddyBridgeProofV139"></div>' +
       '<div class="actions">' +
       '<span id="clBuddyBridgeStatusV139" class="badge warn">Checking</span>' +
@@ -1058,6 +1079,7 @@
       }
     };
     window.CodeLabsBuddyPageBridgeV140 = window.CodeLabsBuddyPageBridge;
+    window.CodeLabsBuddyPageBridgeV141 = window.CodeLabsBuddyPageBridge;
 
     createPanel();
     setTimeout(createPanel, 700);
