@@ -37,9 +37,9 @@ var MEANING={
   'patch-lab':'Fallback repair lane. Save after the output is complete.',
   'preview-test':'Stores the test result only.',
   checkpoints:'Stores rollback proof.',
-  'repo-desk':'Prepares repository handoff details.',
-  'publish-prep':'Prepares GitHub handoff instructions.',
-  'github-tracker':'Tracks PR and preview results.'
+  'repo-desk':'Prepares the one-file repository handoff for CG Repair Lab and Code God review.',
+  'publish-prep':'Shows protected Writer context. GitHub execution starts only after Code God PASS.',
+  'github-tracker':'Tracks the draft PR, audited head SHA and preview results.'
 };
 function q(s,r){return(r||document).querySelector(s)}
 function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
