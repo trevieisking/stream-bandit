@@ -36,14 +36,14 @@ begin
     and file.owner_id = new.requested_by
   limit 1;
 
-  handoff := pg_catalog.coalesce(selected_metadata -> 'repo_handoff', '{}'::jsonb);
-  review := pg_catalog.coalesce(selected_metadata -> 'code_god_review', '{}'::jsonb);
+  handoff := coalesce(selected_metadata -> 'repo_handoff', '{}'::jsonb);
+  review := coalesce(selected_metadata -> 'code_god_review', '{}'::jsonb);
 
   if selected_file_id is null or review ->> 'outcome' is distinct from 'PASS' then
     raise exception 'writer_code_god_pass_required';
   end if;
-  if pg_catalog.coalesce(review ->> 'handoff_hash', '') !~ '^[a-f0-9]{64}$'
-    or pg_catalog.coalesce(review ->> 'proposed_hash', '') !~ '^[a-f0-9]{64}$'
+  if coalesce(review ->> 'handoff_hash', '') !~ '^[a-f0-9]{64}$'
+    or coalesce(review ->> 'proposed_hash', '') !~ '^[a-f0-9]{64}$'
   then
     raise exception 'writer_review_hash_invalid';
   end if;
@@ -65,7 +65,7 @@ begin
     raise exception 'writer_review_timestamp_invalid';
   end;
 
-  new.code_god_review_version := pg_catalog.left(pg_catalog.coalesce(review ->> 'version', ''), 120);
+  new.code_god_review_version := left(coalesce(review ->> 'version', ''), 120);
   new.code_god_outcome := 'PASS';
   new.code_god_handoff_hash := review ->> 'handoff_hash';
   new.code_god_proposed_hash := review ->> 'proposed_hash';
@@ -128,9 +128,9 @@ alter table public.code_labs_write_requests
     status not in ('queued', 'prepared', 'branch_created', 'processing')
     or (
       code_god_outcome = 'PASS'
-      and pg_catalog.coalesce(code_god_review_version, '') <> ''
-      and pg_catalog.coalesce(code_god_handoff_hash, '') ~ '^[a-f0-9]{64}$'
-      and pg_catalog.coalesce(code_god_proposed_hash, '') ~ '^[a-f0-9]{64}$'
+      and coalesce(code_god_review_version, '') <> ''
+      and coalesce(code_god_handoff_hash, '') ~ '^[a-f0-9]{64}$'
+      and coalesce(code_god_proposed_hash, '') ~ '^[a-f0-9]{64}$'
       and code_god_reviewed_at is not null
       and code_god_source_file_id is not null
     )
@@ -164,9 +164,9 @@ begin
     and request.status in ('queued', 'prepared', 'branch_created')
     and request.writer_claim_id is null
     and request.code_god_outcome = 'PASS'
-    and pg_catalog.coalesce(request.code_god_review_version, '') <> ''
-    and pg_catalog.coalesce(request.code_god_handoff_hash, '') ~ '^[a-f0-9]{64}$'
-    and pg_catalog.coalesce(request.code_god_proposed_hash, '') ~ '^[a-f0-9]{64}$'
+    and coalesce(request.code_god_review_version, '') <> ''
+    and coalesce(request.code_god_handoff_hash, '') ~ '^[a-f0-9]{64}$'
+    and coalesce(request.code_god_proposed_hash, '') ~ '^[a-f0-9]{64}$'
     and request.code_god_reviewed_at is not null
     and request.code_god_source_file_id is not null
   returning pg_catalog.to_jsonb(request) into claimed;
