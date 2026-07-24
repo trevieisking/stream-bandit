@@ -6,6 +6,7 @@ type Row = Record<string, any>;
 
 const MAX_CONTENT = 180000;
 const PROTECTED = new Set(["main", "master", "production", "live", "gh-pages"]);
+const HASH = /^[a-f0-9]{64}$/;
 
 function safeBranch(value: unknown) {
   const branch = String(value || "").trim();
@@ -37,17 +38,6 @@ function bytesToBase64(value: Uint8Array) {
     );
   }
   return btoa(binary);
-}
-
-async function digest(value: unknown) {
-  const bytes = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(JSON.stringify(value ?? null)),
-  );
-  return Array.from(
-    new Uint8Array(bytes),
-    (byte) => byte.toString(16).padStart(2, "0"),
-  ).join("");
 }
 
 async function one(path: string) {
@@ -93,6 +83,32 @@ function completedProof(request: Row) {
   };
 }
 
+function immutableReviewProof(request: Row) {
+  const proof = {
+    version: String(request.code_god_review_version || ""),
+    outcome: String(request.code_god_outcome || ""),
+    handoff_hash: String(request.code_god_handoff_hash || ""),
+    proposed_hash: String(request.code_god_proposed_hash || ""),
+    reviewed_at: String(request.code_god_reviewed_at || ""),
+    source_file_id: String(request.code_god_source_file_id || ""),
+  };
+  if (
+    proof.outcome !== "PASS" || !proof.version ||
+    !HASH.test(proof.handoff_hash) || !HASH.test(proof.proposed_hash) ||
+    !proof.reviewed_at || Number.isNaN(Date.parse(proof.reviewed_at)) ||
+    !proof.source_file_id
+  ) throw new Error("Immutable Code God PASS proof is required.");
+  return proof;
+}
+
+function sameReviewProof(left: Row, right: Row) {
+  return left.version === right.version && left.outcome === right.outcome &&
+    left.handoff_hash === right.handoff_hash &&
+    left.proposed_hash === right.proposed_hash &&
+    left.reviewed_at === right.reviewed_at &&
+    left.source_file_id === right.source_file_id;
+}
+
 async function claimRequest(ownerId: string, requestId: string, claimId: string) {
   const value = await rest("rpc/code_labs_claim_write_request", {
     method: "POST",
@@ -112,51 +128,13 @@ async function claimRequest(ownerId: string, requestId: string, claimId: string)
   return claimed;
 }
 
-async function approvedHandoff(ownerId: string, request: Row) {
-  const state = await one(
-    "code_labs_workspace_state?select=*&owner_id=eq." +
-      encodeURIComponent(ownerId) + "&limit=1",
-  );
-  if (!state?.current_file_id) {
-    throw new Error("No Code Labs file is selected.");
-  }
-  const file = await one(
-    "code_labs_files?select=*&id=eq." +
-      encodeURIComponent(state.current_file_id) + "&owner_id=eq." +
-      encodeURIComponent(ownerId) + "&limit=1",
-  );
-  const handoff = file?.metadata?.repo_handoff || {};
-  const review = file?.metadata?.code_god_review || {};
-  if (review.outcome !== "PASS") throw new Error("Code God PASS is required.");
-  if (
-    review.handoff_hash !== await digest(handoff) ||
-    review.proposed_hash !== handoff.proposed_hash
-  ) throw new Error("The reviewed handoff changed after Code God review.");
-  if (!handoff.repo || String(handoff.repo) !== String(request.repo)) {
-    throw new Error(
-      "The queued repository does not match the reviewed handoff.",
-    );
-  }
-  if (
-    String(handoff.path) !== String(request.path) ||
-    String(handoff.request_branch) !== String(request.branch)
-  ) throw new Error("The queued request does not match the reviewed handoff.");
-  if (String(handoff.proposed || "") !== String(request.content || "")) {
-    throw new Error(
-      "The queued content does not match the reviewed candidate.",
-    );
-  }
-  return { handoff, review };
-}
-
 function safeFailureMessage(stage: string, error: unknown) {
   const raw = error instanceof Error
     ? error.message
     : String(error || "Writer execution failed.");
   const fixed: Record<string, string> = {
     request_lookup: "The queued request could not be loaded or validated.",
-    handoff_validation:
-      "The reviewed Code Labs handoff could not be validated.",
+    review_validation: "The immutable Code God review proof is missing or invalid.",
     request_claim: "The queued request is already claimed or no longer executable.",
     github_token: "GitHub App installation authentication failed.",
     branch_verification: "The required GitHub branch could not be verified.",
@@ -279,16 +257,23 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       throw new Error("A complete file under the queue limit is required.");
     }
 
-    stage = "handoff_validation";
-    await approvedHandoff(b.owner_id, pending);
+    stage = "review_validation";
+    const pendingReview = immutableReviewProof(pending);
 
     stage = "request_claim";
     const request = await claimRequest(b.owner_id, requestId, claimId);
     claimOwned = true;
+    const claimedReview = immutableReviewProof(request);
+    if (!sameReviewProof(pendingReview, claimedReview)) {
+      throw new Error("The immutable Code God review proof changed during claim.");
+    }
     await audit(requestId, "writer_claimed", {
       claim_id: claimId,
       branch,
       path,
+      code_god_review_version: claimedReview.version,
+      code_god_handoff_hash: claimedReview.handoff_hash,
+      code_god_proposed_hash: claimedReview.proposed_hash,
     });
 
     stage = "github_token";
