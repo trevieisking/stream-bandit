@@ -72,6 +72,46 @@ async function selectedRequest(ownerId: string, requestId: string) {
   return row;
 }
 
+function completedProof(request: Row) {
+  const commitSha = String(request.github_commit_sha || "");
+  const contentSha = String(request.github_content_sha || "");
+  const pullNumber = Number(request.pull_request_number || 0);
+  const pullUrl = String(request.pull_request_url || "");
+  if (
+    String(request.status || "") !== "pr_opened" || !commitSha || !contentSha ||
+    !pullNumber || !pullUrl
+  ) return null;
+  return {
+    branch: String(request.branch || ""),
+    path: String(request.path || ""),
+    commit_sha: commitSha,
+    content_sha: contentSha,
+    pull_request_number: pullNumber,
+    pull_request_url: pullUrl,
+    draft: true,
+    reused: true,
+  };
+}
+
+async function claimRequest(ownerId: string, requestId: string, claimId: string) {
+  const value = await rest("rpc/code_labs_claim_write_request", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({
+      p_owner_id: ownerId,
+      p_request_id: requestId,
+      p_claim_id: claimId,
+    }),
+  });
+  const claimed = Array.isArray(value) ? value[0] : value;
+  if (
+    !claimed || String(claimed.id || "") !== requestId ||
+    String(claimed.writer_claim_id || "") !== claimId ||
+    String(claimed.status || "") !== "processing"
+  ) throw new Error("The Code Labs write request could not be claimed.");
+  return claimed;
+}
+
 async function approvedHandoff(ownerId: string, request: Row) {
   const state = await one(
     "code_labs_workspace_state?select=*&owner_id=eq." +
@@ -117,6 +157,7 @@ function safeFailureMessage(stage: string, error: unknown) {
     request_lookup: "The queued request could not be loaded or validated.",
     handoff_validation:
       "The reviewed Code Labs handoff could not be validated.",
+    request_claim: "The queued request is already claimed or no longer executable.",
     github_token: "GitHub App installation authentication failed.",
     branch_verification: "The required GitHub branch could not be verified.",
     file_lookup: "The target GitHub file could not be read safely.",
@@ -142,6 +183,7 @@ function requiresManualRecovery(stage: string) {
 async function recordFailure(
   ownerId: string,
   requestId: string,
+  claimId: string,
   stage: string,
   error: unknown,
   progress: Row,
@@ -153,6 +195,10 @@ async function recordFailure(
     error: stage + ": " + message,
     updated_at: new Date().toISOString(),
   };
+  if (!recoveryRequired) {
+    patch.writer_claim_id = null;
+    patch.writer_claimed_at = null;
+  }
   if (progress.commit_sha && progress.content_sha) {
     patch.github_branch_created = true;
     patch.github_commit_sha = progress.commit_sha;
@@ -166,6 +212,7 @@ async function recordFailure(
   await Promise.allSettled([
     audit(requestId, "writer_failed", {
       stage,
+      claim_id: claimId,
       message,
       recovery_required: recoveryRequired,
       commit_proof_preserved: Boolean(
@@ -177,7 +224,9 @@ async function recordFailure(
     }),
     rest(
       "code_labs_write_requests?id=eq." + encodeURIComponent(requestId) +
-        "&requested_by=eq." + encodeURIComponent(ownerId),
+        "&requested_by=eq." + encodeURIComponent(ownerId) +
+        "&status=eq.processing&writer_claim_id=eq." +
+        encodeURIComponent(claimId),
       {
         method: "PATCH",
         headers: { Prefer: "return=minimal" },
@@ -195,27 +244,52 @@ export async function executeGithubWriter(b: Binding, args: Row) {
   if (!requestId) throw new Error("request_id is required.");
 
   let stage = "request_lookup";
+  let claimOwned = false;
+  const claimId = crypto.randomUUID();
   const progress: Row = {};
   try {
-    const request = await selectedRequest(b.owner_id, requestId);
+    const pending = await selectedRequest(b.owner_id, requestId);
+    const proof = completedProof(pending);
+    if (proof) {
+      return {
+        ok: true,
+        version: VERSION,
+        tool: "execute_code_labs_github_writer",
+        wrote_database: false,
+        wrote_github: false,
+        opened_pr: false,
+        deleted_anything: false,
+        request: pending,
+        github: proof,
+      };
+    }
     if (
-      request.direct_main_write !== false || request.branch_pr_only !== true ||
-      request.deletes_anything !== false
+      pending.direct_main_write !== false || pending.branch_pr_only !== true ||
+      pending.deletes_anything !== false
     ) throw new Error("The request safety flags are invalid.");
     if (
       !["queued", "prepared", "branch_created"].includes(
-        String(request.status || ""),
+        String(pending.status || ""),
       )
     ) throw new Error("The request is not executable in its current state.");
-    const branch = safeBranch(request.branch);
-    const path = safePath(request.path);
-    const content = String(request.content || "");
+    const branch = safeBranch(pending.branch);
+    const path = safePath(pending.path);
+    const content = String(pending.content || "");
     if (!content || content.length > MAX_CONTENT) {
       throw new Error("A complete file under the queue limit is required.");
     }
 
     stage = "handoff_validation";
-    await approvedHandoff(b.owner_id, request);
+    await approvedHandoff(b.owner_id, pending);
+
+    stage = "request_claim";
+    const request = await claimRequest(b.owner_id, requestId, claimId);
+    claimOwned = true;
+    await audit(requestId, "writer_claimed", {
+      claim_id: claimId,
+      branch,
+      path,
+    });
 
     stage = "github_token";
     const authority = await verifyOwnerRepository(b.owner_id, request.repo, {
@@ -239,6 +313,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       throw new Error("The required GitHub branch does not exist.");
     }
     await audit(requestId, "branch_verified", {
+      claim_id: claimId,
       branch,
       branch_sha: branchSha,
     });
@@ -281,6 +356,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     progress.commit_sha = commitSha;
     progress.content_sha = contentSha;
     await audit(requestId, "file_committed", {
+      claim_id: claimId,
       branch,
       path,
       commit_sha: commitSha,
@@ -318,6 +394,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     progress.pull_request_number = pullNumber;
     progress.pull_request_url = pullUrl;
     await audit(requestId, "draft_pr_opened", {
+      claim_id: claimId,
       pull_request_number: pullNumber,
       pull_request_url: pullUrl,
       reused: Array.isArray(pulls) && pulls.length > 0,
@@ -326,7 +403,9 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     stage = "request_update";
     const updated = await rest(
       "code_labs_write_requests?id=eq." + encodeURIComponent(requestId) +
-        "&requested_by=eq." + encodeURIComponent(b.owner_id),
+        "&requested_by=eq." + encodeURIComponent(b.owner_id) +
+        "&status=eq.processing&writer_claim_id=eq." +
+        encodeURIComponent(claimId),
       {
         method: "PATCH",
         headers: { Prefer: "return=representation" },
@@ -342,6 +421,9 @@ export async function executeGithubWriter(b: Binding, args: Row) {
         }),
       },
     );
+    if (!Array.isArray(updated) || !updated[0]) {
+      throw new Error("The claimed request could not be finalized.");
+    }
     return {
       ok: true,
       version: VERSION,
@@ -350,7 +432,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       wrote_github: true,
       opened_pr: true,
       deleted_anything: false,
-      request: updated?.[0] || null,
+      request: updated[0],
       github: {
         branch,
         path,
@@ -362,7 +444,16 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       },
     };
   } catch (error) {
-    await recordFailure(b.owner_id, requestId, stage, error, progress);
+    if (claimOwned) {
+      await recordFailure(
+        b.owner_id,
+        requestId,
+        claimId,
+        stage,
+        error,
+        progress,
+      );
+    }
     throw error;
   }
 }
