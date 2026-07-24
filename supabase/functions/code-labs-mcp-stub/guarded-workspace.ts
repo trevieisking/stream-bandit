@@ -25,14 +25,15 @@ type Row = Record<string, any>;
 
 async function reserveStateVersion(b: Binding, args: Row) {
   const expected = Number(args.expected_state_version);
-  if (!Number.isFinite(expected)) throw new Error("expected_state_version is required. Read the workspace again before writing.");
-  const rows = await rest("rpc/code_labs_reserve_workspace_state", {
+  if (!Number.isSafeInteger(expected) || expected < 1) throw new Error("expected_state_version is required. Read the workspace again before writing.");
+  const value = await rest("rpc/code_labs_reserve_workspace_state_version", {
     method: "POST",
     headers: { Prefer: "return=representation" },
     body: JSON.stringify({ p_owner_id: b.owner_id, p_expected_state_version: expected }),
   });
-  if (!Array.isArray(rows) || !rows[0]) throw new Error("Workspace state changed. Read the workspace again before writing.");
-  return rows[0];
+  const reservedVersion = Number(Array.isArray(value) ? value[0] : value);
+  if (!Number.isSafeInteger(reservedVersion) || reservedVersion !== expected + 1) throw new Error("Workspace state changed. Read the workspace again before writing.");
+  return { state_version: reservedVersion };
 }
 
 async function guarded<T>(b: Binding, args: Row, fn: (b: Binding, args: Row) => Promise<T>) {
