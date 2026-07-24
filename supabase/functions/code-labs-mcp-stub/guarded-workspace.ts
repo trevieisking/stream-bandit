@@ -42,6 +42,42 @@ async function guarded<T>(b: Binding, args: Row, fn: (b: Binding, args: Row) => 
   return { ...result, workspace };
 }
 
+function safeWriterResult(result: Row) {
+  const github = result?.github && typeof result.github === "object"
+    ? {
+      branch: String(result.github.branch || ""),
+      path: String(result.github.path || ""),
+      commit_sha: String(result.github.commit_sha || ""),
+      content_sha: String(result.github.content_sha || ""),
+      pull_request_number: Number(result.github.pull_request_number || 0),
+      pull_request_url: String(result.github.pull_request_url || ""),
+      draft: result.github.draft === true,
+      reused: result.github.reused === true,
+    }
+    : null;
+  return {
+    ok: result?.ok === true,
+    version: String(result?.version || ""),
+    tool: "execute_code_labs_github_writer",
+    wrote_database: result?.wrote_database === true,
+    wrote_github: result?.wrote_github === true,
+    opened_pr: result?.opened_pr === true,
+    deleted_anything: false,
+    direct_main_write: false,
+    merged: false,
+    force_pushed: false,
+    workflows_modified: false,
+    github,
+    workspace: result?.workspace && typeof result.workspace === "object"
+      ? { state_version: Number(result.workspace.state_version || 0) }
+      : undefined,
+  };
+}
+
+async function guardedWriter(b: Binding, args: Row) {
+  return safeWriterResult(await guarded(b, args, executeGithubWriter) as Row);
+}
+
 export { getWorkspace, listRecords, readCurrentFile, readReceipt, selectRecord, undoAction };
 
 export function listActions() {
@@ -89,7 +125,7 @@ export function createCheckpoint(b: Binding, args: Row) {
 }
 
 export function executeDirectGithubWriter(b: Binding, args: Row) {
-  return guarded(b, args, executeGithubWriter);
+  return guardedWriter(b, args);
 }
 
 export async function runAction(b: Binding, args: Row) {
@@ -123,7 +159,7 @@ export async function runAction(b: Binding, args: Row) {
   if (action === "github.writer_prepare") return guarded(b, args, prepareGithubWriter);
   if (action === "github.writer_execute") {
     const requestId = String(args.request_id || args.record_id || args.fields?.request_id || "").trim();
-    return guarded(b, { ...args, request_id: requestId }, executeGithubWriter);
+    return guardedWriter(b, { ...args, request_id: requestId });
   }
 
   const alreadyLocked = action.endsWith(".select") || action === "workflow.advance" || action === "workflow.reset";
