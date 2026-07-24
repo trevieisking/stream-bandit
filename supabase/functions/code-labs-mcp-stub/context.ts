@@ -1,6 +1,6 @@
 import { Binding, rest, Row } from "./oauth.ts";
 import { verifyOwnerRepository } from "./github-authority.ts";
-export const VERSION = "Code Labs V104 tool-only workspace control";
+export const VERSION = "Code Labs V104 tool-only workspace control V45 immutable proof";
 
 async function table(
   b: Binding,
