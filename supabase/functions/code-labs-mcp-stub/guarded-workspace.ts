@@ -1,4 +1,5 @@
 import { Binding, rest } from "./oauth.ts";
+import { VERSION } from "./context.ts";
 import {
   createCheckpoint as createCheckpointBase,
   getWorkspace,
@@ -74,8 +75,66 @@ function safeWriterResult(result: Row) {
   };
 }
 
+function writerRequestId(args: Row) {
+  if (args.confirmed !== true) {
+    throw new Error("confirmed must be true to execute the GitHub writer.");
+  }
+  const requestId = String(args.request_id || "").trim();
+  if (!requestId) throw new Error("request_id is required.");
+  return requestId;
+}
+
+async function completedWriterResult(b: Binding, args: Row) {
+  const requestId = writerRequestId(args);
+  const [requestRows, workspaceRows] = await Promise.all([
+    rest(
+      "code_labs_write_requests?select=status,branch,path,github_commit_sha,github_content_sha,pull_request_number,pull_request_url" +
+        "&id=eq." + encodeURIComponent(requestId) +
+        "&requested_by=eq." + encodeURIComponent(b.owner_id) + "&limit=1",
+    ),
+    rest(
+      "code_labs_workspace_state?select=state_version&owner_id=eq." +
+        encodeURIComponent(b.owner_id) + "&limit=1",
+    ),
+  ]);
+  const request = Array.isArray(requestRows) ? requestRows[0] || null : null;
+  if (!request || String(request.status || "") !== "pr_opened") return null;
+  const commitSha = String(request.github_commit_sha || "");
+  const contentSha = String(request.github_content_sha || "");
+  const pullNumber = Number(request.pull_request_number || 0);
+  const pullUrl = String(request.pull_request_url || "");
+  if (!commitSha || !contentSha || !pullNumber || !pullUrl) return null;
+  const workspace = Array.isArray(workspaceRows) ? workspaceRows[0] || null : null;
+  return {
+    ok: true,
+    version: VERSION,
+    tool: "execute_code_labs_github_writer",
+    wrote_database: false,
+    wrote_github: false,
+    opened_pr: false,
+    deleted_anything: false,
+    github: {
+      branch: String(request.branch || ""),
+      path: String(request.path || ""),
+      commit_sha: commitSha,
+      content_sha: contentSha,
+      pull_request_number: pullNumber,
+      pull_request_url: pullUrl,
+      draft: true,
+      reused: true,
+    },
+    workspace: workspace
+      ? { state_version: Number(workspace.state_version || 0) }
+      : undefined,
+  };
+}
+
 async function guardedWriter(b: Binding, args: Row) {
-  return safeWriterResult(await guarded(b, args, executeGithubWriter) as Row);
+  const requestId = writerRequestId(args);
+  const normalized = { ...args, request_id: requestId };
+  const completed = await completedWriterResult(b, normalized);
+  if (completed) return safeWriterResult(completed);
+  return safeWriterResult(await guarded(b, normalized, executeGithubWriter) as Row);
 }
 
 export { getWorkspace, listRecords, readCurrentFile, readReceipt, selectRecord, undoAction };
