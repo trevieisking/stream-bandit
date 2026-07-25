@@ -1,10 +1,10 @@
 /* Code Labs Current File Overwrite V202.
-   Explicit forward-only stage saves. The actual workflow page owns every save.
+   Explicit immediate-successor stage submissions. The actual workflow page owns every save.
    Backend source replacement is delegated only to the protected V104 adapter.
 */
 (function(){
 'use strict';
-var VERSION='V202.3';
+var VERSION='V202.4';
 var KEY='codeLabsV1State';
 var FORWARD_KEY='codeLabsForwardStagesV202';
 var STAGES=['file-lab','rescue-room','packet-builder','buddy-canvas','v20','patch-desk','patch-lab','preview-test','checkpoints','repo-desk','publish-prep','github-tracker'];
@@ -121,27 +121,33 @@ function applySnapshot(s){
   }
 }
 function saveForward(stage){
-  var normalized=ownedStage(stage||page()),index=stageIndex(normalized),s=sync(),store=forward();
+  var normalized=ownedStage(stage||page()),index=stageIndex(normalized),s=sync(),store=forward(),nextIndex=index+1,nextStage='';
   if(index<0)return{ok:false,reason:'not_a_forward_stage'};
-  for(var i=index;i<STAGES.length;i++)store.stages[STAGES[i]]=clone(s);
+  store.stages[normalized]=clone(s);
+  if(nextIndex<STAGES.length){
+    nextStage=STAGES[nextIndex];
+    store.stages[nextStage]=clone(s);
+  }
+  for(var i=index+2;i<STAGES.length;i++)delete store.stages[STAGES[i]];
   store.version=VERSION;
   store.lastStage=normalized;
+  store.nextStage=nextStage;
   store.savedAt=new Date().toISOString();
   writeForward(store);
-  window.dispatchEvent(new CustomEvent('code-labs-forward-stage-saved',{detail:{stage:normalized,from:index,to:STAGES.length-1}}));
-  status(normalized==='file-lab'?'File Lab saved to every later stage':'Saved this stage and every later stage','good');
-  return{ok:true,stage:normalized,from:index,to:STAGES.length-1};
+  window.dispatchEvent(new CustomEvent('code-labs-forward-stage-saved',{detail:{stage:normalized,nextStage:nextStage,from:index,to:nextStage?nextIndex:index}}));
+  status(nextStage?'Submitted '+normalized+' to '+nextStage:'Saved final workflow stage','good');
+  return{ok:true,stage:normalized,nextStage:nextStage,from:index,to:nextStage?nextIndex:index};
 }
 function hydrate(){
   var normalized=stagePage(page()),index=stageIndex(normalized);
   if(index<0)return;
-  var store=forward(),snapshot=store.stages[normalized];
-  if(!snapshot){for(var i=index-1;i>=0&&!snapshot;i--)snapshot=store.stages[STAGES[i]]}
+  var store=forward(),snapshot=store.stages[normalized],sourceStage=normalized;
+  if(!snapshot&&index>0){sourceStage=STAGES[index-1];snapshot=store.stages[sourceStage]}
   if(!snapshot)return;
   snapshot=clone(snapshot);
   write(snapshot);
   applySnapshot(snapshot);
-  window.dispatchEvent(new CustomEvent('code-labs-forward-stage-loaded',{detail:{stage:normalized}}));
+  window.dispatchEvent(new CustomEvent('code-labs-forward-stage-loaded',{detail:{stage:normalized,sourceStage:sourceStage}}));
 }
 function guardedAdapter(original){
   if(!original||original.__clForwardGuardV202)return original;
@@ -174,7 +180,7 @@ async function backendOverwrite(){
   if(!sourcePageAllowed())return{ok:true,local_only:true,reason:'later_stage_cannot_overwrite_file_lab'};
   var adapter=protectedAdapter();
   if(!adapter){
-    status('Saved forward · protected V104 overwrite unavailable','warn');
+    status('Submitted forward · protected V104 overwrite unavailable','warn');
     return{ok:true,local_only:true,reason:'v104_adapter_unavailable'};
   }
   return adapter();
@@ -212,7 +218,7 @@ function addPanel(){
   var panel=document.createElement('section');
   panel.id='clCurrentFileOverwriteV201';
   panel.className='panel';
-  panel.innerHTML='<h2>Current saved file</h2><p>Only an explicit File Lab or Saved Files action may request a protected V104 overwrite. Typing never writes the backend. Each workflow save updates its own stage and the stages that follow.</p><div class="actions"><span id="clOverwriteStatusV201" class="badge warn">Explicit save mode ready</span><button id="clOverwriteNowV201" class="btn primary" type="button">Overwrite current saved file</button><a class="btn ghost" href="saved-files.html">Choose current file</a></div><p class="fine">Earlier workflow stages keep their own last explicit save. No direct browser database fallback is available.</p>';
+  panel.innerHTML='<h2>Current saved file</h2><p>Only an explicit File Lab or Saved Files action may request a protected V104 overwrite. Typing never writes the backend. Each explicit submit saves this stage and prepares only the immediate next workflow stage.</p><div class="actions"><span id="clOverwriteStatusV201" class="badge warn">Explicit submit mode ready</span><button id="clOverwriteNowV201" class="btn primary" type="button">Overwrite current saved file</button><a class="btn ghost" href="saved-files.html">Choose current file</a></div><p class="fine">Later stages remain unchanged until their immediate predecessor is explicitly submitted. No direct browser database fallback is available.</p>';
   var footer=q('#clFooterBuddyShellV201')||q('#clFooterBuddyShellV200')||q('.footerNote');
   if(footer&&footer.parentNode===main)main.insertBefore(panel,footer);else main.appendChild(panel);
   q('#clOverwriteNowV201').onclick=requestOverwrite;
