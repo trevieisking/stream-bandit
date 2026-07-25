@@ -4,7 +4,7 @@
 */
 (function(){
 'use strict';
-var VERSION='V203.1';
+var VERSION='V203.2';
 var KEY='codeLabsV1State';
 var FORWARD_KEY='codeLabsForwardStagesV202';
 var STAGES=['file-lab','saved-files','rescue-room','packet-builder','buddy-canvas','v20','patch-desk','patch-lab','preview-test','checkpoints','repo-desk','publish-prep','github-tracker'];
@@ -206,22 +206,22 @@ function explicitStage(target){
   return detected?ownedStage(detected):'';
 }
 function waitForSavedFilesCompletion(target,stage){
-  var id=String(target&&target.id||''),statusEl=q('#clSavedFilesStatus'),pending='',success='',failure='',deadline;
+  var id=String(target&&target.id||''),statusEl=q('#clSavedFilesStatus'),pending='',success=[],failure=[],deadline;
   if(id==='clLoadSelectedSavedFile'){
     pending='Loading selected file';
-    success='Selected file loaded';
-    failure='Load selected failed';
+    success=['Selected file loaded'];
+    failure=['Load selected failed'];
   }else if(id==='clSaveUpdatedSavedFile'){
     pending='Saving updated saved file';
-    success='Updated saved file';
-    failure='Save failed';
+    success=['Updated saved file','Saved files loaded','Load failed'];
+    failure=['Save failed'];
   }else return false;
   if(!statusEl||String(statusEl.textContent||'').trim()!==pending)return true;
   deadline=Date.now()+15000;
   (function check(){
     var text=String(statusEl.textContent||'').trim();
-    if(text===success){saveForward(stage);return}
-    if(text===failure||Date.now()>=deadline)return;
+    if(success.indexOf(text)>=0){saveForward(stage);return}
+    if(failure.indexOf(text)>=0||Date.now()>=deadline)return;
     setTimeout(check,100);
   })();
   return true;
