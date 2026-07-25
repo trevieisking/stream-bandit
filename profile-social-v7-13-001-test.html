@@ -256,6 +256,7 @@ textarea{width:100%;min-height:110px;resize:vertical}
     <div class="card"><b>Wall posts</b><span id="statPosts" class="statNum">--</span><p>Uses <code>sb_social_posts</code>.</p></div>
     <div class="card"><b>Friends</b><span id="statFriends" class="statNum">--</span><p>Accepted friends only.</p></div>
     <div class="card"><b>Pages</b><span id="statPages" class="statNum">--</span><p>Reads <code>sb_site_pages</code>.</p></div>
+    <div class="card"><b>Gallery</b><span id="statGallery" class="statNum">--</span><p>Profile-owned photos and videos.</p></div>
   </div>
 </section>
 
@@ -266,6 +267,7 @@ textarea{width:100%;min-height:110px;resize:vertical}
     <button class="tab" data-tab="friendsSec" type="button">Friends & Family</button>
     <button class="tab" data-tab="likesSec" type="button">Liked Movies</button>
     <button class="tab" data-tab="pagesSec" type="button">Pages</button>
+    <button class="tab" data-tab="gallerySec" type="button">Gallery</button>
     <button class="tab" data-tab="questionsSec" type="button">Questions</button>
     <button class="tab" data-tab="privacySec" type="button">Privacy</button>
     <button class="tab" data-tab="accountToolsSec" type="button">Account Tools</button>
@@ -384,6 +386,30 @@ textarea{width:100%;min-height:110px;resize:vertical}
     <div id="wallStatus" class="note">Wall uses <code>sb_social_posts</code>.</div>
   </div>
   <div id="postsGrid" class="grid" style="margin-top:14px"><div class="empty">Loading posts...</div></div>
+</section>
+
+<section id="gallerySec" class="box section">
+  <h2>Profile Gallery</h2>
+  <p>Photos, short videos and external video links belong to this profile. Visibility follows both the profile and each gallery item.</p>
+  <div id="galleryOwnerPanel" class="card field" style="margin-bottom:14px">
+    <b>Add to my gallery</b>
+    <div class="twoGrid">
+      <div><label>Upload an image or short video</label><input id="galleryFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif,video/mp4,video/webm"></div>
+      <div><label>Or add an external video URL</label><input id="galleryExternalUrl" class="input" placeholder="https://..."></div>
+    </div>
+    <div class="twoGrid">
+      <div><label>Caption</label><input id="galleryCaption" class="input" maxlength="500"></div>
+      <div><label>Alt text</label><input id="galleryAlt" class="input" maxlength="300"></div>
+    </div>
+    <div class="controls">
+      <select id="galleryVisibility" class="select"><option value="public">Public</option><option value="friends">Friends</option><option value="private">Private</option></select>
+      <button id="galleryUpload" class="btn primary" type="button">Upload File</button>
+      <button id="galleryAddExternal" class="btn cyan" type="button">Add Video Link</button>
+      <button id="galleryReload" class="btn" type="button">Reload Gallery</button>
+    </div>
+    <div id="galleryStatus" class="note">Gallery storage is private and profile-scoped.</div>
+  </div>
+  <div id="galleryGrid" class="pageGrid"><div class="empty">Loading gallery...</div></div>
 </section>
 
 <section id="questionsSec" class="box section">
@@ -640,6 +666,7 @@ const FRIENDS='friends-social-v7-13-001-test.html';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const PLAYER='player-one-global-helpers-v7-3-3-test.html';
 const BUCKET='stream-bandit-images';
+const GALLERY_BUCKET='stream-bandit-profile-gallery';
 const REQUEST_TABLE='sb_account_deletion_requests';
 const PROFILE_FIELDS='id,username,display_name,channel_name,channel_about,avatar_url,banner_url,role,can_submit,updated_at,account_status,admin_level,plan_key';
 const CACHE_KEYS=['sb_header_profile_cache_v7_12_156','streamBanditProfile','sb_profile'];
@@ -694,6 +721,9 @@ let uploadedUrl='';
 let currentKind='avatar';
 let latestRequest=null;
 let latestCheck=null;
+let galleryRows=[];
+let galleryUrls={};
+let galleryReady=false;
 
 const $=id=>document.getElementById(id);
 
@@ -1138,6 +1168,7 @@ async function reload(){
     await loadPages();
     await loadFamily();
     await loadSocial();
+    await loadGallery();
     renderAll();
     setStatus('Social profile loaded for '+nameOf(profile)+'.','good');
     helpers();
@@ -1159,6 +1190,7 @@ function renderAll(){
   renderLikes();
   renderPages();
   renderPosts();
+  renderGallery();
   renderButtons();
   debug();
 }
@@ -1256,6 +1288,7 @@ function renderStats(){
   $('statPosts').textContent=socialReady?posts.length:'SQL';
   $('statFriends').textContent=(friendRows.preview||[]).length;
   $('statPages').textContent=pages.length;
+  $('statGallery').textContent=galleryReady?galleryRows.length:'SQL';
 }
 
 function renderChecks(id,items,group){
@@ -1633,6 +1666,98 @@ function renderPosts(){
 
   box.innerHTML=posts.length?posts.map(postCard).join(''):'<div class="empty">No wall posts yet.</div>';
   bindPostButtons();
+}
+
+function galleryMsg(message,kind){
+  const el=$('galleryStatus');
+  if(!el)return;
+  el.textContent=message;
+  el.className=kind==='bad'?'danger':kind==='good'?'good':'note';
+}
+function galleryFileName(file){
+  const original=String(file&&file.name||'media').toLowerCase();
+  const ext=(original.match(/\.([a-z0-9]{2,8})$/)||[])[1]||((file&&file.type||'').split('/')[1]||'bin');
+  const safeExt=ext.replace(/[^a-z0-9]/g,'').slice(0,8)||'bin';
+  const token=window.crypto&&crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2);
+  return Date.now()+'-'+token+'.'+safeExt;
+}
+async function loadGallery(){
+  galleryRows=[];galleryUrls={};galleryReady=false;
+  if(!user||!profile||!profile.id){galleryMsg('Sign in to view profile gallery media.','note');return;}
+  try{
+    const c=await client();
+    const r=await c.from('sb_profile_gallery_items').select('*').eq('user_id',profile.id).eq('status','active').order('sort_order',{ascending:true}).order('created_at',{ascending:false});
+    if(r.error)throw r.error;
+    galleryRows=r.data||[];
+    for(const item of galleryRows){
+      if(item.storage_bucket&&item.storage_path){
+        const signed=await c.storage.from(item.storage_bucket).createSignedUrl(item.storage_path,3600);
+        if(!signed.error&&signed.data&&signed.data.signedUrl)galleryUrls[item.id]=signed.data.signedUrl;
+      }else if(item.external_url)galleryUrls[item.id]=item.external_url;
+    }
+    galleryReady=true;galleryMsg(galleryRows.length?'Gallery loaded.':'No gallery items yet.','good');
+  }catch(e){galleryMsg('Gallery unavailable: '+(e.message||e),'bad');}
+}
+function galleryMedia(item){
+  const url=galleryUrls[item.id]||'';
+  if(!url)return '<div class="thumb" style="height:240px;border-radius:18px">Media unavailable</div>';
+  if(item.media_kind==='image')return '<div class="thumb" style="height:240px;border-radius:18px"><img src="'+esc(url)+'" alt="'+esc(item.alt_text||item.caption||'Gallery image')+'" loading="lazy"></div>';
+  if(item.media_kind==='video')return '<video controls preload="metadata" playsinline style="width:100%;height:240px;border-radius:18px;background:#000" src="'+esc(url)+'"></video>';
+  const watch=PLAYER+'?src='+encodeURIComponent(url)+'&title='+encodeURIComponent(item.caption||'Gallery video');
+  return '<div class="thumb" style="height:240px;border-radius:18px"><div><span class="pill infoPill">External video</span><p>'+esc(item.caption||'Video link')+'</p><a class="btn primary" href="'+esc(watch)+'">Watch in Player 1</a></div></div>';
+}
+function galleryCard(item){
+  const controls=isOwn()?'<div class="field" style="margin-top:10px"><label>Caption</label><input id="gallery-caption-'+esc(item.id)+'" value="'+esc(item.caption||'')+'" maxlength="500"><label>Alt text</label><input id="gallery-alt-'+esc(item.id)+'" value="'+esc(item.alt_text||'')+'" maxlength="300"><label>Visibility</label><select id="gallery-vis-'+esc(item.id)+'"><option value="public" '+(item.visibility==='public'?'selected':'')+'>Public</option><option value="friends" '+(item.visibility==='friends'?'selected':'')+'>Friends</option><option value="private" '+(item.visibility==='private'?'selected':'')+'>Private</option></select><div class="actions"><button class="btn primary" data-gallery-save="'+esc(item.id)+'" type="button">Save Item</button><button class="btn dangerBtn" data-gallery-delete="'+esc(item.id)+'" type="button">Delete</button></div></div>':'';
+  return '<article class="card">'+galleryMedia(item)+'<h3 style="margin-top:10px">'+esc(item.caption||'Untitled gallery item')+'</h3><div><span class="pill">'+esc(item.media_kind)+'</span><span class="pill infoPill">'+esc(item.visibility)+'</span></div>'+controls+'</article>';
+}
+function renderGallery(){
+  const panel=$('galleryOwnerPanel');if(panel)panel.style.display=isOwn()?'block':'none';
+  const grid=$('galleryGrid');if(!grid)return;
+  if(!galleryReady){grid.innerHTML='<div class="empty">Gallery is unavailable or still loading.</div>';return;}
+  grid.innerHTML=galleryRows.length?galleryRows.map(galleryCard).join(''):'<div class="empty">This profile has no visible gallery items yet.</div>';
+  grid.querySelectorAll('[data-gallery-save]').forEach(b=>b.onclick=()=>galleryUpdate(b.getAttribute('data-gallery-save')));
+  grid.querySelectorAll('[data-gallery-delete]').forEach(b=>b.onclick=()=>galleryDelete(b.getAttribute('data-gallery-delete')));
+}
+async function galleryUpload(){
+  if(!isOwn()||!user)return galleryMsg('Only the profile owner can upload gallery media.','bad');
+  const input=$('galleryFile'),file=input&&input.files&&input.files[0];
+  if(!file)return galleryMsg('Choose an image or MP4/WebM video first.','note');
+  const image=String(file.type||'').startsWith('image/'),video=['video/mp4','video/webm'].includes(String(file.type||''));
+  if(!image&&!video)return galleryMsg('Use an approved image, MP4 or WebM file.','bad');
+  if(file.size>52428800)return galleryMsg('Gallery files must be 50MB or smaller.','bad');
+  const path=user.id+'/gallery/'+galleryFileName(file),c=await client();
+  galleryMsg('Uploading gallery media...','note');
+  const uploaded=await c.storage.from(GALLERY_BUCKET).upload(path,file,{upsert:false,cacheControl:'3600',contentType:file.type});
+  if(uploaded.error)return galleryMsg('Upload failed: '+uploaded.error.message,'bad');
+  const payload={user_id:user.id,media_kind:image?'image':'video',storage_bucket:GALLERY_BUCKET,storage_path:path,caption:raw($('galleryCaption').value,500),alt_text:raw($('galleryAlt').value,300),visibility:$('galleryVisibility').value||'public',status:'active',metadata_json:{mime_type:file.type,size_bytes:file.size,original_name:String(file.name||'').slice(0,180)}};
+  const saved=await c.from('sb_profile_gallery_items').insert(payload).select('*').maybeSingle();
+  if(saved.error){await c.storage.from(GALLERY_BUCKET).remove([path]);return galleryMsg('Gallery record failed: '+saved.error.message,'bad');}
+  input.value='';$('galleryCaption').value='';$('galleryAlt').value='';
+  await loadGallery();renderStats();renderGallery();toast('Gallery media added.');
+}
+async function galleryAddExternal(){
+  if(!isOwn()||!user)return galleryMsg('Only the profile owner can add gallery media.','bad');
+  const url=raw($('galleryExternalUrl').value,1500);
+  try{const parsed=new URL(url);if(!/^https?:$/.test(parsed.protocol))throw Error('URL must use http or https.');}catch(e){return galleryMsg('Enter a valid external video URL.','bad');}
+  const saved=await (await client()).from('sb_profile_gallery_items').insert({user_id:user.id,media_kind:'external_video',external_url:url,caption:raw($('galleryCaption').value,500),alt_text:raw($('galleryAlt').value,300),visibility:$('galleryVisibility').value||'public',status:'active'}).select('*').maybeSingle();
+  if(saved.error)return galleryMsg('Video link failed: '+saved.error.message,'bad');
+  $('galleryExternalUrl').value='';$('galleryCaption').value='';$('galleryAlt').value='';
+  await loadGallery();renderStats();renderGallery();toast('Video link added.');
+}
+async function galleryUpdate(id){
+  if(!isOwn()||!user)return;
+  const caption=$('gallery-caption-'+id),alt=$('gallery-alt-'+id),vis=$('gallery-vis-'+id);
+  const r=await (await client()).from('sb_profile_gallery_items').update({caption:raw(caption&&caption.value,500),alt_text:raw(alt&&alt.value,300),visibility:vis&&vis.value||'public'}).eq('id',id).eq('user_id',user.id);
+  if(r.error)return galleryMsg('Gallery update failed: '+r.error.message,'bad');
+  await loadGallery();renderGallery();toast('Gallery item saved.');
+}
+async function galleryDelete(id){
+  if(!isOwn()||!user||!confirm('Delete this gallery item?'))return;
+  const item=galleryRows.find(x=>x.id===id);if(!item)return;
+  const c=await client(),removed=await c.from('sb_profile_gallery_items').delete().eq('id',id).eq('user_id',user.id);
+  if(removed.error)return galleryMsg('Gallery delete failed: '+removed.error.message,'bad');
+  if(item.storage_bucket&&item.storage_path){const objectDelete=await c.storage.from(item.storage_bucket).remove([item.storage_path]);if(objectDelete.error)galleryMsg('Gallery record deleted; stored object cleanup needs attention.','bad');}
+  await loadGallery();renderStats();renderGallery();toast('Gallery item deleted.');
 }
 
 async function sendMagic(){
@@ -2771,6 +2896,9 @@ function bind(){
     renderPosts();
   };
 
+  $('galleryUpload').onclick=galleryUpload;
+  $('galleryAddExternal').onclick=galleryAddExternal;
+  $('galleryReload').onclick=async()=>{await loadGallery();renderStats();renderGallery();};
   $('publishPost').onclick=publishPost;
   $('saveQuestions').onclick=saveQuestions;
   $('copyQuestions').onclick=copyQuestions;
