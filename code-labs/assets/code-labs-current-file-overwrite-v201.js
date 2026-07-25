@@ -1,16 +1,16 @@
-/* Code Labs Current File Overwrite V202.
-   Explicit forward-only stage saves. The actual workflow page owns every save.
+/* Code Labs Current File Overwrite V203.
+   Explicit one-stage-at-a-time handoffs. The actual workflow page owns every save.
    Backend source replacement is delegated only to the protected V104 adapter.
 */
 (function(){
 'use strict';
-var VERSION='V202.3';
+var VERSION='V203.0';
 var KEY='codeLabsV1State';
 var FORWARD_KEY='codeLabsForwardStagesV202';
-var STAGES=['file-lab','rescue-room','packet-builder','buddy-canvas','v20','patch-desk','patch-lab','preview-test','checkpoints','repo-desk','publish-prep','github-tracker'];
+var STAGES=['file-lab','saved-files','rescue-room','packet-builder','buddy-canvas','v20','patch-desk','patch-lab','preview-test','checkpoints','repo-desk','publish-prep','github-tracker'];
 var SOURCE_PAGES={'file-lab':true,'saved-files':true};
-var SAVE_IDS={saveFile:'file-lab',clSavedFileUse:'file-lab',saveProblem:'rescue-room',buildPacket:'rescue-room',makePacket:'packet-builder',savePacket:'packet-builder',saveNow:'buddy-canvas',saveCanvas:'buddy-canvas',saveWorkflow:'v20',advanceWorkflow:'v20',saveFixed:'patch-desk',savePatch:'patch-desk',plSave:'patch-lab',savePatchLab:'patch-lab',savePass:'preview-test',saveFail:'preview-test',saveCheckpoint:'checkpoints',checkpointOriginal:'checkpoints',checkpointFixed:'checkpoints',saveRepo:'repo-desk',saveHandoff:'repo-desk',prepareRepo:'repo-desk',saveWriter:'publish-prep',savePublish:'publish-prep',gwSave:'publish-prep',saveTracker:'github-tracker',savePr:'github-tracker'};
-var ACTION_STAGES={'save-current-source':'file-lab','save-repair-notes':'rescue-room','build-repair-packet':'rescue-room','save-repair-packet':'packet-builder','save-buddy-canvas':'buddy-canvas','save-fixed-full-file':'patch-desk','save-patch-lab':'patch-lab','save-test-result':'preview-test','create-checkpoint':'checkpoints','prepare-repository-handoff':'repo-desk','prepare-github-writer':'publish-prep','save-github-tracker':'github-tracker'};
+var SAVE_IDS={saveFile:'file-lab',clSavedFileUse:'saved-files',clLoadSelectedSavedFile:'saved-files',clSaveUpdatedSavedFile:'saved-files',saveProblem:'rescue-room',buildPacket:'rescue-room',makePacket:'packet-builder',savePacket:'packet-builder',saveNow:'buddy-canvas',saveCanvas:'buddy-canvas',saveWorkflow:'v20',advanceWorkflow:'v20',saveFixed:'patch-desk',savePatch:'patch-desk',plSave:'patch-lab',savePatchLab:'patch-lab',savePass:'preview-test',saveFail:'preview-test',saveCheckpoint:'checkpoints',checkpointOriginal:'checkpoints',checkpointFixed:'checkpoints',saveRepo:'repo-desk',saveHandoff:'repo-desk',prepareRepo:'repo-desk',saveWriter:'publish-prep',savePublish:'publish-prep',gwSave:'publish-prep',saveTracker:'github-tracker',savePr:'github-tracker'};
+var ACTION_STAGES={'save-current-source':'file-lab','select-saved-file':'saved-files','save-selected-file':'saved-files','save-repair-notes':'rescue-room','build-repair-packet':'rescue-room','save-repair-packet':'packet-builder','save-buddy-canvas':'buddy-canvas','save-fixed-full-file':'patch-desk','save-patch-lab':'patch-lab','save-test-result':'preview-test','create-checkpoint':'checkpoints','prepare-repository-handoff':'repo-desk','prepare-github-writer':'publish-prep','save-github-tracker':'github-tracker'};
 function q(s,r){return(r||document).querySelector(s)}
 function clone(v){try{return JSON.parse(JSON.stringify(v||{}))}catch(e){return{}}}
 function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
@@ -18,8 +18,9 @@ function write(s){try{localStorage.setItem(KEY,JSON.stringify(s||{}))}catch(e){}
 function forward(){try{var x=JSON.parse(localStorage.getItem(FORWARD_KEY)||'{}')||{};x.stages=x.stages||{};return x}catch(e){return{stages:{}}}}
 function writeForward(x){try{localStorage.setItem(FORWARD_KEY,JSON.stringify(x||{stages:{}}))}catch(e){}}
 function page(){return document.body&&document.body.getAttribute('data-page')||location.pathname.split('/').pop().replace(/\.html?$/i,'')||''}
-function stagePage(id){return id==='saved-files'?'file-lab':id}
+function stagePage(id){return String(id||'')}
 function stageIndex(id){return STAGES.indexOf(stagePage(id))}
+function nextStage(id){var index=stageIndex(id);return index>=0&&index+1<STAGES.length?STAGES[index+1]:''}
 function ownedStage(requested){var current=stagePage(page());return stageIndex(current)>=0?current:stagePage(requested)}
 function sourcePageAllowed(){return Boolean(SOURCE_PAGES[page()])}
 function value(s){var e=q(s);return e?String(e.value==null?'':e.value):''}
@@ -121,27 +122,31 @@ function applySnapshot(s){
   }
 }
 function saveForward(stage){
-  var normalized=ownedStage(stage||page()),index=stageIndex(normalized),s=sync(),store=forward();
+  var normalized=ownedStage(stage||page()),index=stageIndex(normalized),s=sync(),store=forward(),next;
   if(index<0)return{ok:false,reason:'not_a_forward_stage'};
-  for(var i=index;i<STAGES.length;i++)store.stages[STAGES[i]]=clone(s);
+  next=nextStage(normalized);
+  store.stages[normalized]=clone(s);
+  if(next)store.stages[next]=clone(s);
   store.version=VERSION;
   store.lastStage=normalized;
+  store.nextStage=next||null;
   store.savedAt=new Date().toISOString();
   writeForward(store);
-  window.dispatchEvent(new CustomEvent('code-labs-forward-stage-saved',{detail:{stage:normalized,from:index,to:STAGES.length-1}}));
-  status(normalized==='file-lab'?'File Lab saved to every later stage':'Saved this stage and every later stage','good');
-  return{ok:true,stage:normalized,from:index,to:STAGES.length-1};
+  window.dispatchEvent(new CustomEvent('code-labs-forward-stage-saved',{detail:{stage:normalized,next_stage:next||null}}));
+  status(next?'Saved '+normalized+' for next stage: '+next:'Saved final workflow stage','good');
+  return{ok:true,stage:normalized,next_stage:next||null};
 }
 function hydrate(){
-  var normalized=stagePage(page()),index=stageIndex(normalized);
-  if(index<0)return;
-  var store=forward(),snapshot=store.stages[normalized];
-  if(!snapshot){for(var i=index-1;i>=0&&!snapshot;i--)snapshot=store.stages[STAGES[i]]}
-  if(!snapshot)return;
+  var normalized=stagePage(page()),index=stageIndex(normalized),store,snapshot;
+  if(index<0)return{ok:false,reason:'not_a_forward_stage'};
+  store=forward();
+  snapshot=store.stages[normalized];
+  if(!snapshot)return{ok:false,reason:'no_exact_stage_snapshot',stage:normalized};
   snapshot=clone(snapshot);
   write(snapshot);
   applySnapshot(snapshot);
   window.dispatchEvent(new CustomEvent('code-labs-forward-stage-loaded',{detail:{stage:normalized}}));
+  return{ok:true,stage:normalized};
 }
 function guardedAdapter(original){
   if(!original||original.__clForwardGuardV202)return original;
@@ -174,7 +179,7 @@ async function backendOverwrite(){
   if(!sourcePageAllowed())return{ok:true,local_only:true,reason:'later_stage_cannot_overwrite_file_lab'};
   var adapter=protectedAdapter();
   if(!adapter){
-    status('Saved forward · protected V104 overwrite unavailable','warn');
+    status('Saved for next stage · protected V104 overwrite unavailable','warn');
     return{ok:true,local_only:true,reason:'v104_adapter_unavailable'};
   }
   return adapter();
@@ -212,7 +217,7 @@ function addPanel(){
   var panel=document.createElement('section');
   panel.id='clCurrentFileOverwriteV201';
   panel.className='panel';
-  panel.innerHTML='<h2>Current saved file</h2><p>Only an explicit File Lab or Saved Files action may request a protected V104 overwrite. Typing never writes the backend. Each workflow save updates its own stage and the stages that follow.</p><div class="actions"><span id="clOverwriteStatusV201" class="badge warn">Explicit save mode ready</span><button id="clOverwriteNowV201" class="btn primary" type="button">Overwrite current saved file</button><a class="btn ghost" href="saved-files.html">Choose current file</a></div><p class="fine">Earlier workflow stages keep their own last explicit save. No direct browser database fallback is available.</p>';
+  panel.innerHTML='<h2>Current saved file</h2><p>Only an explicit File Lab or Saved Files action may request a protected V104 overwrite. Typing never writes the backend. Each workflow save updates its own stage and hands the result to the next stage only.</p><div class="actions"><span id="clOverwriteStatusV201" class="badge warn">Explicit save mode ready</span><button id="clOverwriteNowV201" class="btn primary" type="button">Overwrite current saved file</button><a class="btn ghost" href="saved-files.html">Choose current file</a></div><p class="fine">Earlier and later workflow stages keep their own last explicit save. No direct browser database fallback is available.</p>';
   var footer=q('#clFooterBuddyShellV201')||q('#clFooterBuddyShellV200')||q('.footerNote');
   if(footer&&footer.parentNode===main)main.insertBefore(panel,footer);else main.appendChild(panel);
   q('#clOverwriteNowV201').onclick=requestOverwrite;
@@ -230,6 +235,6 @@ function boot(){
   setTimeout(installAdapterGuard,1600);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-window.CodeLabsCurrentFileOverwriteV201={version:VERSION,sync:sync,overwrite:requestOverwrite,overwriteNow:requestOverwrite,overwriteProtected:backendOverwrite,schedule:schedule,saveForward:saveForward,hydrate:hydrate,stages:STAGES.slice(),ownedStage:ownedStage};
+window.CodeLabsCurrentFileOverwriteV201={version:VERSION,sync:sync,overwrite:requestOverwrite,overwriteNow:requestOverwrite,overwriteProtected:backendOverwrite,schedule:schedule,saveForward:saveForward,hydrate:hydrate,stages:STAGES.slice(),ownedStage:ownedStage,nextStage:nextStage};
 window.CodeLabsCurrentFileOverwrite=window.CodeLabsCurrentFileOverwriteV201;
 })();
