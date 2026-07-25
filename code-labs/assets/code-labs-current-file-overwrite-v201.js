@@ -4,7 +4,7 @@
 */
 (function(){
 'use strict';
-var VERSION='V203.0';
+var VERSION='V203.1';
 var KEY='codeLabsV1State';
 var FORWARD_KEY='codeLabsForwardStagesV202';
 var STAGES=['file-lab','saved-files','rescue-room','packet-builder','buddy-canvas','v20','patch-desk','patch-lab','preview-test','checkpoints','repo-desk','publish-prep','github-tracker'];
@@ -28,7 +28,7 @@ function setValue(s,v){var e=q(s);if(e&&v!=null&&String(v)!==String(e.value==nul
 function status(text,kind){var e=q('#clOverwriteStatusV201');if(e){e.className='badge '+(kind||'warn');e.textContent=text}}
 function ensure(s){s=s||{};s.project=s.project||{};s.file=s.file||{};s.checkpoints=Array.isArray(s.checkpoints)?s.checkpoints:[];s.tests=Array.isArray(s.tests)?s.tests:[];s.log=Array.isArray(s.log)?s.log:[];return s}
 function sync(){
-  var s=ensure(read()),f=s.file,p=s.project,id=page();
+  var s=ensure(read()),f=s.file,p=s.project,id=page(),selected;
   if(id==='file-lab'){
     p.workspace=value('#workspaceName')||value('#workspace')||p.workspace||'';
     p.siteName=value('#siteName')||p.siteName||'';
@@ -42,6 +42,13 @@ function sync(){
   if(id==='saved-files'){
     f.filename=value('#clSavedFileName')||value('#sfName')||f.filename||'';
     f.currentCode=value('#clSavedFileCode')||value('#sfOriginal')||f.currentCode||'';
+    selected=q('[data-cl-saved-file-check]:checked');
+    if(selected&&selected.value){
+      f.savedFileId=String(selected.value);
+      f.saved_file_id=String(selected.value);
+      f.savedFileSource='saved-files-explicit-selection';
+      f.savedFileSelectedAt=new Date().toISOString();
+    }
   }
   if(id==='rescue-room'){
     f.problem=value('#problem')||f.problem||'';
@@ -198,11 +205,33 @@ function explicitStage(target){
   var detected=SAVE_IDS[id]||ACTION_STAGES[action]||'';
   return detected?ownedStage(detected):'';
 }
+function waitForSavedFilesCompletion(target,stage){
+  var id=String(target&&target.id||''),statusEl=q('#clSavedFilesStatus'),pending='',success='',failure='',deadline;
+  if(id==='clLoadSelectedSavedFile'){
+    pending='Loading selected file';
+    success='Selected file loaded';
+    failure='Load selected failed';
+  }else if(id==='clSaveUpdatedSavedFile'){
+    pending='Saving updated saved file';
+    success='Updated saved file';
+    failure='Save failed';
+  }else return false;
+  if(!statusEl||String(statusEl.textContent||'').trim()!==pending)return true;
+  deadline=Date.now()+15000;
+  (function check(){
+    var text=String(statusEl.textContent||'').trim();
+    if(text===success){saveForward(stage);return}
+    if(text===failure||Date.now()>=deadline)return;
+    setTimeout(check,100);
+  })();
+  return true;
+}
 function onExplicitSave(event){
   var target=event.target&&event.target.closest?event.target.closest('button,a,[data-buddy-action]'):event.target;
   if(target&&target.id==='clOverwriteNowV201')return;
   var stage=explicitStage(target);
   if(!stage)return;
+  if(waitForSavedFilesCompletion(target,stage))return;
   setTimeout(function(){
     var result=saveForward(stage);
     if(stage==='file-lab'&&target&&target.id==='saveFile')Promise.resolve(backendOverwrite()).catch(function(){});
