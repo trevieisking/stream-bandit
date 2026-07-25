@@ -24,6 +24,20 @@ import { activateOwnerRepository } from "./github-authority.ts";
 
 type Row = Record<string, any>;
 
+function rpcNumber(value: unknown) {
+  let current: unknown = value;
+  if (Array.isArray(current)) {
+    if (current.length !== 1) return Number.NaN;
+    current = current[0];
+  }
+  if (current && typeof current === "object") {
+    const values = Object.values(current as Row);
+    if (values.length !== 1) return Number.NaN;
+    current = values[0];
+  }
+  return Number(current);
+}
+
 async function reserveStateVersion(b: Binding, args: Row) {
   const expected = Number(args.expected_state_version);
   if (!Number.isSafeInteger(expected) || expected < 1) throw new Error("expected_state_version is required. Read the workspace again before writing.");
@@ -32,7 +46,7 @@ async function reserveStateVersion(b: Binding, args: Row) {
     headers: { Prefer: "return=representation" },
     body: JSON.stringify({ p_owner_id: b.owner_id, p_expected_state_version: expected }),
   });
-  const reservedVersion = Number(Array.isArray(value) ? value[0] : value);
+  const reservedVersion = rpcNumber(value);
   if (!Number.isSafeInteger(reservedVersion) || reservedVersion !== expected + 1) throw new Error("Workspace state changed. Read the workspace again before writing.");
   return { state_version: reservedVersion };
 }
