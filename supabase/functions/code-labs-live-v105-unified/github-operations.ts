@@ -1,6 +1,6 @@
-import type { Binding } from "../code-labs-mcp-stub/oauth.ts";
-import { rest } from "../code-labs-mcp-stub/oauth.ts";
-import { verifyOwnerRepository } from "../code-labs-mcp-stub/github-authority.ts";
+import type { Binding } from "./oauth.ts";
+import { rest } from "./oauth.ts";
+import { verifyOwnerRepository } from "./github-authority.ts";
 
 type Row = Record<string, any>;
 type OperationType = "branch_create" | "file_create" | "file_update" | "draft_pr_create";
@@ -107,8 +107,46 @@ function contentInput(args: Row) {
     throw new Error(`Complete file content is required and must be at most ${MAX_CONTENT_BYTES} bytes.`);
   }
   const expectedHash = String(args.content_hash || "").toLowerCase();
-  if (!SHA256.test(expectedHash)) throw new Error("content_hash must be a lowercase SHA-256 value.");
   return { content, size, expectedHash };
+}
+
+async function validateContentHash(contentValue: unknown, expectedHashValue: unknown) {
+  const content = String(contentValue ?? "");
+  const expectedHash = String(expectedHashValue || "").toLowerCase();
+  if (!SHA256.test(expectedHash)) {
+    throw new Error("content_hash must be a lowercase SHA-256 value.");
+  }
+  const actualHash = await sha256(content);
+  if (actualHash !== expectedHash) {
+    throw new Error("The complete file content does not match content_hash.");
+  }
+  return actualHash;
+}
+
+function validateExpectedBlobSha(value: unknown, currentBlobSha?: unknown) {
+  const expectedBlobSha = String(value || "").toLowerCase();
+  if (!SHA1.test(expectedBlobSha)) {
+    throw new Error("expected_blob_sha is required for a file update.");
+  }
+  if (
+    currentBlobSha !== undefined &&
+    String(currentBlobSha || "").toLowerCase() !== expectedBlobSha
+  ) {
+    throw new Error("The GitHub blob changed. Read the file again and supply the new expected_blob_sha.");
+  }
+  return expectedBlobSha;
+}
+
+function validateDraftPullRequest(headValue: unknown, baseValue: unknown, draftValue: unknown) {
+  const head = String(headValue || "");
+  const base = String(baseValue || "");
+  if (head.toLowerCase() === base.toLowerCase()) {
+    throw new Error("Pull-request head and base branches must differ.");
+  }
+  if (draftValue !== true) {
+    throw new Error("The pull request is not a draft; V105 will not continue.");
+  }
+  return { head, base, draft: true as const };
 }
 
 async function githubApi(path: string, token: string, init: RequestInit = {}, allow404 = false) {
@@ -161,6 +199,25 @@ async function requestHash(type: OperationType, request: Row) {
   return sha256(JSON.stringify(canonical({ operation_type: type, ...request })));
 }
 
+function operationIdentityMatches(row: Row | null | undefined, type: OperationType, hash: string) {
+  return Boolean(
+    row &&
+    row.request_hash === hash &&
+    row.operation_type === type,
+  );
+}
+
+export const V105_GITHUB_VALIDATION_TEST_API = Object.freeze({
+  validateOperationKey: cleanOperationKey,
+  calculateRequestHash: requestHash,
+  operationIdentityMatches,
+  validateBranch: cleanBranch,
+  validatePath: cleanPath,
+  validateContentHash,
+  validateExpectedBlobSha,
+  validateDraftPullRequest,
+});
+
 async function ensureOperation(binding: Binding, type: OperationType, input: Row) {
   const operationKey = cleanOperationKey(input.operation_key);
   const immutable = {
@@ -193,7 +250,7 @@ async function ensureOperation(binding: Binding, type: OperationType, input: Row
     "code_labs_github_operations?select=*&owner_id=eq." + encodeURIComponent(binding.owner_id) +
       "&operation_key=eq." + encodeURIComponent(operationKey) + "&limit=1",
   );
-  if (!row || row.request_hash !== hash || row.operation_type !== type) {
+  if (!operationIdentityMatches(row, type, hash)) {
     throw new Error("The durable GitHub operation identity conflicts with different input.");
   }
   return { row, operationKey, hash };
@@ -376,12 +433,10 @@ async function writeFile(binding: Binding, args: Row, mode: "file_create" | "fil
   const branch = cleanBranch(args.branch, authority.default_branch);
   const path = cleanPath(args.path);
   const content = contentInput(args);
-  const actualHash = await sha256(content.content);
-  if (actualHash !== content.expectedHash) throw new Error("The complete file content does not match content_hash.");
-  const expectedBlobSha = mode === "file_update" ? String(args.expected_blob_sha || "").toLowerCase() : null;
-  if (mode === "file_update" && !SHA1.test(String(expectedBlobSha))) {
-    throw new Error("expected_blob_sha is required for a file update.");
-  }
+  const actualHash = await validateContentHash(content.content, content.expectedHash);
+  const expectedBlobSha = mode === "file_update"
+    ? validateExpectedBlobSha(args.expected_blob_sha)
+    : null;
   return executeDurable(binding, mode, {
     operation_key: args.operation_key,
     repo,
@@ -399,9 +454,7 @@ async function writeFile(binding: Binding, args: Row, mode: "file_create" | "fil
     if (mode === "file_create" && current) throw new Error("The target file already exists; use the update tool with its exact blob SHA.");
     if (mode === "file_update") {
       if (!current || current.type !== "file") throw new Error("The target file does not exist for update.");
-      if (String(current.sha || "").toLowerCase() !== expectedBlobSha) {
-        throw new Error("The GitHub blob changed. Read the file again and supply the new expected_blob_sha.");
-      }
+      validateExpectedBlobSha(expectedBlobSha, current.sha);
     }
     const payload: Row = {
       message: operation.commit_message,
@@ -444,7 +497,7 @@ export async function createOrReuseDraftPr(binding: Binding, args: Row) {
   const authority = await verifyOwnerRepository(binding.owner_id, repo, { contents: "read", pull_requests: "write", metadata: "read" });
   const branch = cleanBranch(args.branch, authority.default_branch);
   const baseRef = cleanRef(args.base_ref || authority.default_branch, "base branch");
-  if (branch.toLowerCase() === baseRef.toLowerCase()) throw new Error("Pull-request head and base branches must differ.");
+  validateDraftPullRequest(branch, baseRef, true);
   const title = safeText(args.pr_title || `Code Labs V105: ${branch}`, 240);
   const body = safeText(args.pr_body || "Prepared by the independent Code Labs V105 GitHub operation lane.", 20000);
   return executeDurable(binding, "draft_pr_create", {
@@ -476,7 +529,7 @@ export async function createOrReuseDraftPr(binding: Binding, args: Row) {
     const number = Number(pull?.number || 0);
     const url = String(pull?.html_url || "");
     if (!number || !url) throw new Error("GitHub did not return draft pull-request proof.");
-    if (pull.draft !== true) throw new Error("The pull request is not a draft; V105 will not continue.");
+    validateDraftPullRequest(branch, baseRef, pull.draft);
     return {
       operation: "draft_pr_create",
       repo,
