@@ -903,8 +903,17 @@ function health() {
     private_tool_only_mcp: true,
     widget: false,
     staging_safe_mode: V105_STAGING_SAFE_MODE,
-    mutations_enabled: false,
+    application_mutations_enabled: false,
+    workspace_mutations_enabled: false,
+    github_mutations_enabled: false,
+    storage_mutations_enabled: false,
+    oauth_control_plane_enabled: true,
+    oauth_control_plane_writes_limited: true,
     database_migrations_required_for_github_mutations: true,
+    oauth_control_plane_write_scope: [
+      "authorization grant creation",
+      "authorization code consumption",
+    ],
     scope: SCOPE,
     claim: CLAIM,
     endpoint: BASE,
@@ -944,7 +953,7 @@ Deno.serve(async (req: Request) => {
           capabilities: { tools: { listChanged: true } },
           serverInfo: { name: CONNECTOR, version: VERSION },
           instructions:
-            "Code Labs V105 is a private tool-only MCP app. Staging safe mode currently blocks all workspace, database, storage and GitHub mutations before handler invocation while preserving final mutation schemas for audit. Read-only repository access redacts credential-shaped values. Independent GitHub operations never accept expected_state_version.",
+            "Code Labs V105 is a private tool-only MCP app. Staging safe mode blocks application, workspace, GitHub and storage mutations dispatched through MCP tools. OAuth registration, authorization and token protocol routes remain enabled outside the MCP tool dispatcher. OAuth authorization may create a grant record, and authorization-code exchange may mark that grant as consumed. Read-only repository access redacts credential-shaped values. Independent GitHub operations never accept expected_state_version.",
         });
       }
       if (body.method === "ping") return rpc(id, {});
