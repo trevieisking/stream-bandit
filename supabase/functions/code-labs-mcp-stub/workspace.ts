@@ -412,16 +412,29 @@ function nonEmptyText(value: unknown) {
 }
 
 function validCheckEvidence(value: unknown) {
-  if (nonEmptyText(value)) return true;
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const check = value as Row;
   const status = String(check.status || check.result || "").trim().toUpperCase();
-  return nonEmptyText(check.name || check.check || check.label) && (status === "PASS" || status === "PASSED");
+  const proof = check.evidence ?? check.proof ?? check.observed;
+  return nonEmptyText(check.name || check.check || check.label) && status === "PASS" && nonEmptyText(proof);
 }
 
-function validatePassingTestEvidence(details: Row, context: {
+async function trustedWriterRequest(owner: string, requestId: string) {
+  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(requestId)) {
+    throw new Error("PASS evidence requires a valid Code Labs Writer request ID.");
+  }
+  return one(
+    "code_labs_write_requests?select=id,repo,path,status,github_commit_sha,github_content_sha," +
+      "code_god_outcome,code_god_proposed_hash,code_god_source_file_id,branch_pr_only,direct_main_write,deletes_anything" +
+      "&id=eq." + encodeURIComponent(requestId) +
+      "&requested_by=eq." + encodeURIComponent(owner) + "&limit=1",
+  );
+}
+
+async function validatePassingTestEvidence(owner: string, details: Row, context: {
   repo: string;
   path: string;
+  fileId: string;
   filename: string;
   checked: number;
   total: number;
@@ -432,19 +445,38 @@ function validatePassingTestEvidence(details: Row, context: {
   const evidence = details.evidence && typeof details.evidence === "object" && !Array.isArray(details.evidence)
     ? details.evidence as Row
     : details;
-  if (String(evidence.source_repo || "").trim() !== context.repo) {
-    throw new Error("PASS evidence must identify the exact selected repository.");
+  const writerRequestId = String(evidence.writer_request_id || details.writer_request_id || "").trim();
+  const request = await trustedWriterRequest(owner, writerRequestId);
+  if (!request) throw new Error("PASS evidence Writer request was not found for this owner.");
+  if (String(request.status || "") !== "pr_opened") {
+    throw new Error("PASS evidence requires a completed Writer request with draft PR proof.");
   }
-  if (String(evidence.source_path || "").trim() !== context.path) {
-    throw new Error("PASS evidence must identify the exact selected source path.");
+  if (String(request.code_god_outcome || "") !== "PASS") {
+    throw new Error("PASS evidence requires Code God PASS on the exact Writer request.");
   }
-  if (!/^[a-f0-9]{40}$/i.test(String(evidence.source_commit_sha || ""))) {
-    throw new Error("PASS evidence requires an immutable 40-character source commit SHA.");
+  if (request.branch_pr_only !== true || request.direct_main_write === true || request.deletes_anything === true) {
+    throw new Error("PASS evidence Writer request does not preserve branch-and-PR-only safety.");
   }
-  const blobSha = String(evidence.source_blob_sha || "");
-  const candidateHash = String(evidence.candidate_hash || "");
-  if (!/^[a-f0-9]{40}$/i.test(blobSha) && !/^[a-f0-9]{64}$/i.test(candidateHash)) {
-    throw new Error("PASS evidence requires source blob SHA or complete candidate hash proof.");
+  if (String(request.repo || "").trim() !== context.repo || String(request.path || "").trim() !== context.path) {
+    throw new Error("PASS evidence Writer request does not match the selected repository and source path.");
+  }
+  if (String(request.code_god_source_file_id || "") !== context.fileId) {
+    throw new Error("PASS evidence Writer request does not belong to the selected Code Labs file.");
+  }
+  const commitSha = String(evidence.source_commit_sha || "").trim();
+  const contentSha = String(evidence.source_blob_sha || evidence.github_content_sha || "").trim();
+  const candidateHash = String(evidence.candidate_hash || "").trim();
+  if (!/^[a-f0-9]{40}$/i.test(commitSha) || commitSha !== String(request.github_commit_sha || "")) {
+    throw new Error("PASS evidence commit SHA does not match the authoritative Writer proof.");
+  }
+  if (!/^[a-f0-9]{40}$/i.test(contentSha) || contentSha !== String(request.github_content_sha || "")) {
+    throw new Error("PASS evidence content SHA does not match the authoritative Writer proof.");
+  }
+  if (!/^[a-f0-9]{64}$/i.test(candidateHash) || candidateHash !== String(request.code_god_proposed_hash || "")) {
+    throw new Error("PASS evidence candidate hash does not match the reviewed Writer candidate.");
+  }
+  if (String(evidence.source_repo || "").trim() !== context.repo || String(evidence.source_path || "").trim() !== context.path) {
+    throw new Error("PASS evidence must identify the exact selected repository and source path.");
   }
   if (String(details.filename || context.filename).trim() !== context.filename) {
     throw new Error("PASS evidence filename must match the selected test filename.");
@@ -456,12 +488,13 @@ function validatePassingTestEvidence(details: Row, context: {
     throw new Error("PASS evidence total count does not match the test record.");
   }
   const verifiedAt = String(details.verified_at || evidence.verified_at || "").trim();
-  if (!verifiedAt || Number.isNaN(Date.parse(verifiedAt))) {
-    throw new Error("PASS evidence requires a valid verification timestamp.");
+  const verifiedTime = Date.parse(verifiedAt);
+  if (!verifiedAt || Number.isNaN(verifiedTime) || verifiedTime > Date.now() + 300000) {
+    throw new Error("PASS evidence requires a valid non-future verification timestamp.");
   }
   const checks = Array.isArray(details.checks) ? details.checks : Array.isArray(evidence.checks) ? evidence.checks : null;
   if (!checks || checks.length !== context.total || !checks.every(validCheckEvidence)) {
-    throw new Error("PASS evidence must contain one successful evidence item for every declared check.");
+    throw new Error("PASS evidence must contain one explicit successful proof item for every declared check.");
   }
 }
 
@@ -499,9 +532,10 @@ export async function updateTest(b: Binding, args: Row) {
     if (total < 1 || checked !== total) {
       throw new Error("PASS requires every declared check to be completed.");
     }
-    validatePassingTestEvidence(details, {
+    await validatePassingTestEvidence(b.owner_id, details, {
       repo: String(project.repo || "").trim(),
       path: String(file.filename || "").trim(),
+      fileId: String(file.id || ""),
       filename,
       checked,
       total,
