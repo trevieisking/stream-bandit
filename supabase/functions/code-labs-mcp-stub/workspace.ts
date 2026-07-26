@@ -390,6 +390,81 @@ export async function updatePacket(b: Binding, args: Row) {
   return patchSelected(b, "packet", fields, ["job_id", "packet_type", "packet_text", "metadata"], "upsert_code_labs_packet");
 }
 
+function normalizeTestResult(value: unknown) {
+  const normalized = String(value || "").trim().toUpperCase();
+  const result = normalized === "PASSED" ? "PASS" : normalized;
+  if (!new Set(["PASS", "FAIL", "HOLD"]).has(result)) {
+    throw new Error("Test result must be PASS, FAIL, or HOLD.");
+  }
+  return result;
+}
+
+function testCount(value: unknown, label: string) {
+  const count = Number(value);
+  if (!Number.isSafeInteger(count) || count < 0) {
+    throw new Error(label + " must be a non-negative integer.");
+  }
+  return count;
+}
+
+function nonEmptyText(value: unknown) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function validCheckEvidence(value: unknown) {
+  if (nonEmptyText(value)) return true;
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const check = value as Row;
+  const status = String(check.status || check.result || "").trim().toUpperCase();
+  return nonEmptyText(check.name || check.check || check.label) && (status === "PASS" || status === "PASSED");
+}
+
+function validatePassingTestEvidence(details: Row, context: {
+  repo: string;
+  path: string;
+  filename: string;
+  checked: number;
+  total: number;
+}) {
+  if (!details || typeof details !== "object" || Array.isArray(details)) {
+    throw new Error("PASS requires structured test evidence.");
+  }
+  const evidence = details.evidence && typeof details.evidence === "object" && !Array.isArray(details.evidence)
+    ? details.evidence as Row
+    : details;
+  if (String(evidence.source_repo || "").trim() !== context.repo) {
+    throw new Error("PASS evidence must identify the exact selected repository.");
+  }
+  if (String(evidence.source_path || "").trim() !== context.path) {
+    throw new Error("PASS evidence must identify the exact selected source path.");
+  }
+  if (!/^[a-f0-9]{40}$/i.test(String(evidence.source_commit_sha || ""))) {
+    throw new Error("PASS evidence requires an immutable 40-character source commit SHA.");
+  }
+  const blobSha = String(evidence.source_blob_sha || "");
+  const candidateHash = String(evidence.candidate_hash || "");
+  if (!/^[a-f0-9]{40}$/i.test(blobSha) && !/^[a-f0-9]{64}$/i.test(candidateHash)) {
+    throw new Error("PASS evidence requires source blob SHA or complete candidate hash proof.");
+  }
+  if (String(details.filename || context.filename).trim() !== context.filename) {
+    throw new Error("PASS evidence filename must match the selected test filename.");
+  }
+  if (Object.prototype.hasOwnProperty.call(details, "checked") && Number(details.checked) !== context.checked) {
+    throw new Error("PASS evidence checked count does not match the test record.");
+  }
+  if (Object.prototype.hasOwnProperty.call(details, "total") && Number(details.total) !== context.total) {
+    throw new Error("PASS evidence total count does not match the test record.");
+  }
+  const verifiedAt = String(details.verified_at || evidence.verified_at || "").trim();
+  if (!verifiedAt || Number.isNaN(Date.parse(verifiedAt))) {
+    throw new Error("PASS evidence requires a valid verification timestamp.");
+  }
+  const checks = Array.isArray(details.checks) ? details.checks : Array.isArray(evidence.checks) ? evidence.checks : null;
+  if (!checks || checks.length !== context.total || !checks.every(validCheckEvidence)) {
+    throw new Error("PASS evidence must contain one successful evidence item for every declared check.");
+  }
+}
+
 export async function updateTest(b: Binding, args: Row) {
   const fields = cleanObject(args.fields);
   const state = await ensureState(b.owner_id);
@@ -403,6 +478,41 @@ export async function updateTest(b: Binding, args: Row) {
       throw new Error("The updated test must remain linked to the selected job and file.");
     }
   }
+
+  const [{ row: currentTest }, project, file] = await Promise.all([
+    selected(b.owner_id, "test"),
+    owned(b.owner_id, "project", projectId),
+    owned(b.owner_id, "file", selectedFileId),
+  ]);
+  if (!project || !file) throw new Error("The selected project and file must still exist before recording test truth.");
+
+  const result = normalizeTestResult(Object.prototype.hasOwnProperty.call(fields, "result") ? fields.result : currentTest.result);
+  const checked = testCount(Object.prototype.hasOwnProperty.call(fields, "checked_count") ? fields.checked_count : currentTest.checked_count, "checked_count");
+  const total = testCount(Object.prototype.hasOwnProperty.call(fields, "total_count") ? fields.total_count : currentTest.total_count, "total_count");
+  if (checked > total) throw new Error("checked_count cannot exceed total_count.");
+
+  const filename = String(Object.prototype.hasOwnProperty.call(fields, "filename") ? fields.filename : currentTest.filename || "").trim();
+  if (!filename) throw new Error("A test filename is required.");
+  const details = cleanObject(Object.prototype.hasOwnProperty.call(fields, "details") ? fields.details : currentTest.details || {});
+
+  if (result === "PASS") {
+    if (total < 1 || checked !== total) {
+      throw new Error("PASS requires every declared check to be completed.");
+    }
+    validatePassingTestEvidence(details, {
+      repo: String(project.repo || "").trim(),
+      path: String(file.filename || "").trim(),
+      filename,
+      checked,
+      total,
+    });
+  }
+
+  fields.result = result;
+  fields.checked_count = checked;
+  fields.total_count = total;
+  fields.filename = filename;
+  fields.details = details;
   return patchSelected(b, "test", fields, ["job_id", "filename", "result", "checked_count", "total_count", "notes", "details"], "upsert_code_labs_test_result");
 }
 
