@@ -38,23 +38,129 @@ function rpcNumber(value: unknown) {
   return Number(current);
 }
 
-async function reserveStateVersion(b: Binding, args: Row) {
-  const expected = Number(args.expected_state_version);
-  if (!Number.isSafeInteger(expected) || expected < 1) throw new Error("expected_state_version is required. Read the workspace again before writing.");
-  const value = await rest("rpc/code_labs_reserve_workspace_state_version", {
-    method: "POST",
-    headers: { Prefer: "return=representation" },
-    body: JSON.stringify({ p_owner_id: b.owner_id, p_expected_state_version: expected }),
-  });
-  const reservedVersion = rpcNumber(value);
-  if (!Number.isSafeInteger(reservedVersion) || reservedVersion !== expected + 1) throw new Error("Workspace state changed. Read the workspace again before writing.");
-  return { state_version: reservedVersion };
+function canonicalValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalValue);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Row)
+        .filter(([, entry]) => entry !== undefined)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, entry]) => [key, canonicalValue(entry)]),
+    );
+  }
+  return value;
 }
 
-async function guarded<T>(b: Binding, args: Row, fn: (b: Binding, args: Row) => Promise<T>) {
-  const workspace = await reserveStateVersion(b, args);
-  const result: any = await fn(b, args);
-  return { ...result, workspace };
+function canonicalJson(value: unknown) {
+  return JSON.stringify(canonicalValue(value));
+}
+
+function uuidFromBytes(bytes: Uint8Array) {
+  const copy = bytes.slice(0, 16);
+  copy[6] = (copy[6] & 0x0f) | 0x50;
+  copy[8] = (copy[8] & 0x3f) | 0x80;
+  const hex = Array.from(copy, (value) => value.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+export async function codeLabsOperationId(ownerId: string, action: string, args: Row) {
+  const source = `${ownerId}\n${action}\n${canonicalJson(args)}`;
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(source)));
+  return uuidFromBytes(digest);
+}
+
+function rpcObject(value: unknown): Row {
+  let current: unknown = value;
+  if (Array.isArray(current)) {
+    if (current.length !== 1) throw new Error("Code Labs action lease returned an ambiguous array.");
+    current = current[0];
+  }
+  if (current && typeof current === "object") {
+    const row = current as Row;
+    if (typeof row.state === "string") return row;
+    const values = Object.values(row);
+    if (values.length === 1 && values[0] && typeof values[0] === "object") return values[0] as Row;
+  }
+  throw new Error("Code Labs action lease returned an invalid response.");
+}
+
+async function beginWorkspaceAction(b: Binding, args: Row, action: string, operationId: string) {
+  const expected = Number(args.expected_state_version);
+  if (!Number.isSafeInteger(expected) || expected < 1) {
+    throw new Error("expected_state_version is required. Read the workspace again before writing.");
+  }
+  const value = await rest("rpc/code_labs_begin_workspace_action", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({
+      p_owner_id: b.owner_id,
+      p_operation_id: operationId,
+      p_action: action,
+      p_expected_state_version: expected,
+    }),
+  });
+  return { expected, lease: rpcObject(value) };
+}
+
+async function completeWorkspaceAction(b: Binding, operationId: string, expected: number, result: Row) {
+  const value = await rest("rpc/code_labs_complete_workspace_action", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({
+      p_owner_id: b.owner_id,
+      p_operation_id: operationId,
+      p_expected_state_version: expected,
+      p_result: result,
+    }),
+  });
+  const completedVersion = rpcNumber(value);
+  if (!Number.isSafeInteger(completedVersion) || completedVersion !== expected + 1) {
+    throw new Error("Code Labs action lease completed with an invalid workspace version.");
+  }
+  return completedVersion;
+}
+
+async function failWorkspaceAction(b: Binding, operationId: string, expected: number, error: unknown) {
+  try {
+    await rest("rpc/code_labs_fail_workspace_action", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({
+        p_owner_id: b.owner_id,
+        p_operation_id: operationId,
+        p_expected_state_version: expected,
+        p_error_message: error instanceof Error ? error.message : String(error),
+      }),
+    });
+  } catch (_) {
+    // Preserve the original error. Any durable running lease remains visible for recovery.
+  }
+}
+
+async function guarded<T>(b: Binding, args: Row, action: string, fn: (b: Binding, args: Row) => Promise<T>) {
+  const operationId = await codeLabsOperationId(b.owner_id, action, args);
+  const { expected, lease } = await beginWorkspaceAction(b, args, action, operationId);
+  const leaseState = String(lease.state || "");
+
+  if (leaseState === "completed") {
+    const prior = lease.result && typeof lease.result === "object" ? lease.result as Row : {};
+    return { ...prior, workspace: { state_version: Number(lease.state_version || expected + 1) } };
+  }
+  if (leaseState === "running") {
+    throw new Error("This Code Labs action is already processing. Read the workspace before retrying.");
+  }
+  if (leaseState !== "acquired") {
+    throw new Error("Code Labs action lease was not acquired.");
+  }
+
+  try {
+    const result: any = await fn(b, args);
+    const completedVersion = await completeWorkspaceAction(b, operationId, expected, result || {});
+    return { ...result, workspace: { state_version: completedVersion } };
+  } catch (error) {
+    await failWorkspaceAction(b, operationId, expected, error);
+    throw error;
+  }
 }
 
 function safeWriterResult(result: Row) {
@@ -90,9 +196,7 @@ function safeWriterResult(result: Row) {
 }
 
 function writerRequestId(args: Row) {
-  if (args.confirmed !== true) {
-    throw new Error("confirmed must be true to execute the GitHub writer.");
-  }
+  if (args.confirmed !== true) throw new Error("confirmed must be true to execute the GitHub writer.");
   const requestId = String(args.request_id || "").trim();
   if (!requestId) throw new Error("request_id is required.");
   return requestId;
@@ -107,8 +211,7 @@ async function completedWriterResult(b: Binding, args: Row) {
         "&requested_by=eq." + encodeURIComponent(b.owner_id) + "&limit=1",
     ),
     rest(
-      "code_labs_workspace_state?select=state_version&owner_id=eq." +
-        encodeURIComponent(b.owner_id) + "&limit=1",
+      "code_labs_workspace_state?select=state_version&owner_id=eq." + encodeURIComponent(b.owner_id) + "&limit=1",
     ),
   ]);
   const request = Array.isArray(requestRows) ? requestRows[0] || null : null;
@@ -137,9 +240,7 @@ async function completedWriterResult(b: Binding, args: Row) {
       draft: true,
       reused: true,
     },
-    workspace: workspace
-      ? { state_version: Number(workspace.state_version || 0) }
-      : undefined,
+    workspace: workspace ? { state_version: Number(workspace.state_version || 0) } : undefined,
   };
 }
 
@@ -148,7 +249,7 @@ async function guardedWriter(b: Binding, args: Row) {
   const normalized = { ...args, request_id: requestId };
   const completed = await completedWriterResult(b, normalized);
   if (completed) return safeWriterResult(completed);
-  return safeWriterResult(await guarded(b, normalized, executeGithubWriter) as Row);
+  return safeWriterResult(await guarded(b, normalized, "github.writer_execute", executeGithubWriter) as Row);
 }
 
 export { getWorkspace, listRecords, readCurrentFile, readReceipt, selectRecord, undoAction };
@@ -170,33 +271,26 @@ export function listActions() {
 }
 
 export function updateProject(b: Binding, args: Row) {
-  return guarded(b, args, updateProjectBase);
+  return guarded(b, args, "project.update", updateProjectBase);
 }
-
 export function updateCurrentFile(b: Binding, args: Row) {
-  return guarded(b, args, updateCurrentFileBase);
+  return guarded(b, args, "file.update", updateCurrentFileBase);
 }
-
 export function updateJob(b: Binding, args: Row) {
-  return guarded(b, args, updateJobBase);
+  return guarded(b, args, "job.update", updateJobBase);
 }
-
 export function updatePacket(b: Binding, args: Row) {
-  return guarded(b, args, updatePacketBase);
+  return guarded(b, args, "packet.update", updatePacketBase);
 }
-
 export function updateTest(b: Binding, args: Row) {
-  return guarded(b, args, updateTestBase);
+  return guarded(b, args, "test.update", updateTestBase);
 }
-
 export function saveCandidate(b: Binding, args: Row) {
-  return guarded(b, args, saveCandidateBase);
+  return guarded(b, args, "candidate.save", saveCandidateBase);
 }
-
 export function createCheckpoint(b: Binding, args: Row) {
-  return guarded(b, args, createCheckpointBase);
+  return guarded(b, args, "checkpoint.create", createCheckpointBase);
 }
-
 export function executeDirectGithubWriter(b: Binding, args: Row) {
   return guardedWriter(b, args);
 }
@@ -207,29 +301,24 @@ export async function runAction(b: Binding, args: Row) {
   if (action === "cg_repair_lab.access") return getCgRepairLabAccess(b);
   if (action === "cg_repair_lab.analyze") return analyzeCgRepairLab(b, { ...args, ...(args.fields || {}) });
   if (action === "code_labs.owner_activate_repository") {
-    if (args.confirmed !== true) {
-      throw new Error("Confirmed owner activation is required.");
-    }
-    return activateOwnerRepository(
-      b.owner_id,
-      args.fields?.repo,
-    );
+    if (args.confirmed !== true) throw new Error("Confirmed owner activation is required.");
+    return activateOwnerRepository(b.owner_id, args.fields?.repo);
   }
   if (action === "cg_repair_lab.save_candidate") {
     return guarded(b, {
       ...args,
       candidate_code: args.candidate_code ?? args.fields?.candidate_code,
       note: args.note ?? args.fields?.note,
-    }, saveCandidateBase);
+    }, action, saveCandidateBase);
   }
   if (action === "backend.tables_snapshot") return backendTablesSnapshot(b);
   if (action === "repo.prepare_handoff") {
     const requested = String(args.fields?.action || "change").toLowerCase();
     if (requested === "remove" || requested === "delete") throw new Error("File removal is not available in the normal V104 lane.");
-    return guarded(b, args, prepareRepoHandoff);
+    return guarded(b, args, action, prepareRepoHandoff);
   }
-  if (action === "code_god.review") return guarded(b, args, reviewCodeGod);
-  if (action === "github.writer_prepare") return guarded(b, args, prepareGithubWriter);
+  if (action === "code_god.review") return guarded(b, args, action, reviewCodeGod);
+  if (action === "github.writer_prepare") return guarded(b, args, action, prepareGithubWriter);
   if (action === "github.writer_execute") {
     const requestId = String(args.request_id || args.record_id || args.fields?.request_id || "").trim();
     return guardedWriter(b, { ...args, request_id: requestId });
@@ -239,7 +328,7 @@ export async function runAction(b: Binding, args: Row) {
   const readOnlyAction = action === "canvas.load_packet" || action === "github.prepare_request";
   const result: any = alreadyLocked || readOnlyAction
     ? await runActionBase(b, args)
-    : await guarded(b, args, runActionBase);
+    : await guarded(b, args, action || "workspace.action", runActionBase);
 
   if ((action === "workflow.advance" || action === "workflow.reset") && result?.receipt?.receipt_id) {
     await rest("code_labs_action_receipts?id=eq." + encodeURIComponent(result.receipt.receipt_id) + "&owner_id=eq." + encodeURIComponent(b.owner_id), {
