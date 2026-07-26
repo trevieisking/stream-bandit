@@ -24,6 +24,16 @@ import { activateOwnerRepository, githubRequest, verifyOwnerRepository } from ".
 
 type Row = Record<string, any>;
 
+type PreparedGithubBranch = {
+  authority: Row;
+  repoPath: string;
+  branch: string;
+  sourceRef: string;
+  sourceSha: string;
+  createdRef: string;
+  replay: boolean;
+};
+
 const PROTECTED_BRANCHES = new Set(["main", "master", "production", "live", "gh-pages"]);
 
 function rpcNumber(value: unknown) {
@@ -73,59 +83,170 @@ function cleanRef(value: unknown, fallback: string) {
   return ref;
 }
 
-async function createGithubBranch(b: Binding, args: Row) {
+async function prepareGithubBranch(b: Binding, args: Row): Promise<PreparedGithubBranch> {
   if (args.confirmed !== true) throw new Error("confirmed must be true to create a GitHub branch.");
   const repo = String(args.fields?.repo || "").trim();
+  if (!repo) throw new Error("repo is required to create a GitHub branch.");
   const branch = cleanBranch(args.fields?.branch);
   const authority = await verifyOwnerRepository(b.owner_id, repo, { contents: "write", metadata: "read" });
-  if (branch.toLowerCase() === authority.default_branch.toLowerCase()) throw new Error("The requested branch is the verified default branch.");
+  if (branch.toLowerCase() === String(authority.default_branch || "").toLowerCase()) throw new Error("The requested branch is the verified default branch.");
   const sourceRef = cleanRef(args.fields?.source_ref, authority.default_branch);
   const repoPath = "/repos/" + [authority.owner, authority.name].map(encodeURIComponent).join("/");
-  const matches = await githubRequest(repoPath + "/git/matching-refs/heads/" + encodeURIComponent(branch), authority.token);
-  if (Array.isArray(matches) && matches.some((row: Row) => String(row?.ref || "") === "refs/heads/" + branch)) {
-    throw new Error("The requested GitHub branch already exists.");
-  }
   const source = await githubRequest(repoPath + "/commits/" + encodeURIComponent(sourceRef), authority.token);
   const sourceSha = String(source?.sha || "");
   if (!/^[a-f0-9]{40}$/i.test(sourceSha)) throw new Error("GitHub did not return immutable source commit proof.");
-  const created = await githubRequest(repoPath + "/git/refs", authority.token, {
-    method: "POST",
-    body: JSON.stringify({ ref: "refs/heads/" + branch, sha: sourceSha }),
-  });
-  const createdRef = String(created?.ref || "");
-  const createdSha = String(created?.object?.sha || "");
-  if (createdRef !== "refs/heads/" + branch || createdSha !== sourceSha) throw new Error("GitHub did not return branch creation proof.");
-  const receipts = await rest("code_labs_action_receipts", {
-    method: "POST",
-    headers: { Prefer: "return=representation" },
-    body: JSON.stringify({
-      owner_id: b.owner_id,
+  const createdRef = "refs/heads/" + branch;
+  const matches = await githubRequest(repoPath + "/git/matching-refs/heads/" + encodeURIComponent(branch), authority.token);
+  const existing = Array.isArray(matches)
+    ? matches.find((row: Row) => String(row?.ref || "") === createdRef)
+    : null;
+  if (existing) {
+    const existingSha = String(existing?.object?.sha || "");
+    if (existingSha !== sourceSha) throw new Error("The requested GitHub branch already exists at a different commit.");
+  }
+  return { authority, repoPath, branch, sourceRef, sourceSha, createdRef, replay: Boolean(existing) };
+}
+
+async function persistGithubBranchReceipt(b: Binding, prepared: PreparedGithubBranch) {
+  const payload = {
+    owner_id: b.owner_id,
+    action: "github.branch_create",
+    record_type: "github_branch",
+    record_id: null,
+    before_data: {},
+    after_data: {
+      repo: prepared.authority.repo,
+      branch: prepared.branch,
+      source_ref: prepared.sourceRef,
+      source_commit_sha: prepared.sourceSha,
+      created_ref: prepared.createdRef,
+      idempotent_replay: prepared.replay,
+    },
+    changed_fields: ["github_branch"],
+    created_new_row: !prepared.replay,
+    undo_available: false,
+  };
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const receipts = await rest("code_labs_action_receipts", {
+        method: "POST",
+        headers: { Prefer: "return=representation" },
+        body: JSON.stringify(payload),
+      });
+      const receipt = Array.isArray(receipts) ? receipts[0] || null : null;
+      if (receipt) return receipt;
+    } catch (_error) {
+      if (attempt === 1) return null;
+    }
+  }
+  return null;
+}
+
+async function executeGithubBranch(b: Binding, prepared: PreparedGithubBranch) {
+  let wroteGithub = false;
+  if (!prepared.replay) {
+    const created = await githubRequest(prepared.repoPath + "/git/refs", prepared.authority.token, {
+      method: "POST",
+      body: JSON.stringify({ ref: prepared.createdRef, sha: prepared.sourceSha }),
+    });
+    const returnedRef = String(created?.ref || "");
+    const returnedSha = String(created?.object?.sha || "");
+    if (returnedRef !== prepared.createdRef || returnedSha !== prepared.sourceSha) throw new Error("GitHub did not return branch creation proof.");
+    wroteGithub = true;
+  }
+  const receipt = await persistGithubBranchReceipt(b, prepared);
+  if (!receipt) {
+    return {
+      ok: false,
+      version: VERSION,
+      tool: "run_code_labs_action",
       action: "github.branch_create",
-      record_type: "github_branch",
-      record_id: null,
-      before_data: {},
-      after_data: { repo: authority.repo, branch, source_ref: sourceRef, source_commit_sha: sourceSha, created_ref: createdRef },
-      changed_fields: ["github_branch"],
-      created_new_row: true,
-      undo_available: false,
-    }),
-  });
+      wrote_database: false,
+      wrote_github: wroteGithub,
+      opened_pr: false,
+      deleted_anything: false,
+      direct_main_write: false,
+      merged: false,
+      force_pushed: false,
+      workflows_modified: false,
+      recoverable: true,
+      error: {
+        code: "branch_receipt_persistence_failed",
+        message: "Branch proof exists, but its receipt could not be persisted. Retry the same request to recover without creating a second ref.",
+      },
+      github: {
+        repo: prepared.authority.repo,
+        branch: prepared.branch,
+        source_ref: prepared.sourceRef,
+        source_commit_sha: prepared.sourceSha,
+        created_ref: prepared.createdRef,
+        idempotent_replay: prepared.replay,
+      },
+      receipt: null,
+    };
+  }
   return {
     ok: true,
     version: VERSION,
     tool: "run_code_labs_action",
     action: "github.branch_create",
     wrote_database: true,
-    wrote_github: true,
+    wrote_github: wroteGithub,
     opened_pr: false,
     deleted_anything: false,
     direct_main_write: false,
     merged: false,
     force_pushed: false,
     workflows_modified: false,
-    github: { repo: authority.repo, branch, source_ref: sourceRef, source_commit_sha: sourceSha, created_ref: createdRef },
-    receipt: Array.isArray(receipts) ? receipts[0] || null : null,
+    github: {
+      repo: prepared.authority.repo,
+      branch: prepared.branch,
+      source_ref: prepared.sourceRef,
+      source_commit_sha: prepared.sourceSha,
+      created_ref: prepared.createdRef,
+      idempotent_replay: prepared.replay,
+    },
+    receipt,
   };
+}
+
+async function guardedGithubBranch(b: Binding, args: Row) {
+  const prepared = await prepareGithubBranch(b, args);
+  const workspace = await reserveStateVersion(b, args);
+  try {
+    const result = await executeGithubBranch(b, prepared);
+    return { ...result, workspace };
+  } catch (_error) {
+    return {
+      ok: false,
+      version: VERSION,
+      tool: "run_code_labs_action",
+      action: "github.branch_create",
+      wrote_database: false,
+      wrote_github: false,
+      opened_pr: false,
+      deleted_anything: false,
+      direct_main_write: false,
+      merged: false,
+      force_pushed: false,
+      workflows_modified: false,
+      recoverable: true,
+      error: {
+        code: "branch_execution_failed",
+        message: "GitHub branch execution failed after workspace reservation. Read the workspace and retry only after verifying GitHub state.",
+      },
+      github: {
+        repo: prepared.authority.repo,
+        branch: prepared.branch,
+        source_ref: prepared.sourceRef,
+        source_commit_sha: prepared.sourceSha,
+        created_ref: prepared.createdRef,
+        idempotent_replay: prepared.replay,
+      },
+      receipt: null,
+      workspace,
+    };
+  }
 }
 
 function safeWriterResult(result: Row) {
@@ -301,7 +422,7 @@ export async function runAction(b: Binding, args: Row) {
     return guarded(b, args, prepareRepoHandoff);
   }
   if (action === "code_god.review") return guarded(b, args, reviewCodeGod);
-  if (action === "github.branch_create") return guarded(b, args, createGithubBranch);
+  if (action === "github.branch_create") return guardedGithubBranch(b, args);
   if (action === "github.writer_prepare") return guarded(b, args, prepareGithubWriter);
   if (action === "github.writer_execute") {
     const requestId = String(args.request_id || args.record_id || args.fields?.request_id || "").trim();
