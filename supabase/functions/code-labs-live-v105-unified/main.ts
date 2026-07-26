@@ -41,10 +41,11 @@ import {
   readRepository,
   updateFile,
 } from "./github-operations.ts";
+import { protectRepositoryRead } from "./credential-redaction.ts";
 
 type Row = Record<string, any>;
 
-const VERSION = "Code Labs V105 unified candidate V1";
+const VERSION = "Code Labs V105 unified candidate V2 credential-safe reads";
 const PROJECT_URL = "https://xzxqfrvqdgkzwujbkdbk.supabase.co";
 const BASE = PROJECT_URL + "/functions/v1/code-labs-live-v105";
 const cors = {
@@ -111,7 +112,6 @@ function tools() {
     { name: "analyze_code_labs_repository", title: "Analyze Repository with CG Repair Lab", description: "Run owner-scoped, read-only, credential-redacting CG Repair Lab analysis.", inputSchema: { type: "object", properties: { repo, ref: { type: "string" }, path: { type: "string" } }, required: ["repo", "path"], additionalProperties: false }, outputSchema: resultSchema, annotations: read },
     { name: "list_code_labs_owner_gallery_images", title: "List Code Labs Owner Gallery Images", description: "List private Pro owner-gallery images as opaque references only.", inputSchema: { type: "object", properties: {}, additionalProperties: false }, outputSchema: resultSchema, annotations: read },
     { name: "read_code_labs_owner_gallery_image", title: "Read Code Labs Owner Gallery Image", description: "Read one selected private gallery image without exposing its storage path or signed URL.", inputSchema: { type: "object", properties: { reference: { type: "string", pattern: "^img_[a-f0-9]{64}$" } }, required: ["reference"], additionalProperties: false }, outputSchema: resultSchema, annotations: read },
-
     { name: "select_code_labs_record", title: "Select Code Labs Record", description: "Select a workspace record using expected_state_version.", inputSchema: { type: "object", properties: { record_type: { type: "string", enum: ["project", "file", "job", "packet", "test"] }, record_id: { type: "string" }, expected_state_version: expected }, required: ["record_type", "record_id", "expected_state_version"], additionalProperties: false }, outputSchema: resultSchema, annotations: privateWrite },
     { name: "update_code_labs_project", title: "Update Code Labs Project", description: "Update the selected project under workspace state locking.", inputSchema: { type: "object", properties: { fields, expected_state_version: expected }, required: ["fields", "expected_state_version"], additionalProperties: false }, outputSchema: resultSchema, annotations: privateWrite },
     { name: "update_code_labs_current_file", title: "Update Current Code Labs File", description: "Replace the selected workspace file under state locking.", inputSchema: { type: "object", properties: { fields, expected_state_version: expected }, required: ["fields", "expected_state_version"], additionalProperties: false }, outputSchema: resultSchema, annotations: destructiveWrite },
@@ -123,8 +123,7 @@ function tools() {
     { name: "run_code_labs_action", title: "Run Code Labs Workspace Action", description: "Run one strict workspace action. GitHub execution actions are rejected in V105 and must use independent operation tools.", inputSchema: { type: "object", properties: { action: { type: "string" }, record_id: { type: "string" }, request_id: { type: "string" }, expected_state_version: expected, confirmed: { type: "boolean" }, label: { type: "string" }, note: { type: "string" }, fields, candidate_code: { type: "string" } }, required: ["action"], additionalProperties: false }, outputSchema: resultSchema, annotations: destructiveWrite },
     { name: "undo_code_labs_action", title: "Undo Code Labs Action", description: "Restore an eligible workspace mutation from its receipt.", inputSchema: { type: "object", properties: { receipt_id: { type: "string" } }, required: ["receipt_id"], additionalProperties: false }, outputSchema: resultSchema, annotations: destructiveWrite },
     { name: "save_code_labs_write_request", title: "Save Legacy Reviewed Write Request", description: "Preserved V104 queue preparation. V105 GitHub execution does not consume workspace state or this queue.", inputSchema: { type: "object", properties: { repo, path: { type: "string" }, branch, content: { type: "string" }, action: { type: "string" }, commit_message: { type: "string" }, pr_title: { type: "string" }, pr_body: { type: "string" }, confirm_branch_pr_only: { type: "boolean" } }, required: ["repo", "path", "branch", "content", "commit_message", "pr_title", "confirm_branch_pr_only"], additionalProperties: false }, outputSchema: resultSchema, annotations: privateWrite },
-
-    { name: "read_code_labs_repository", title: "Read Owner-Authorised Repository", description: "Read repository metadata and optionally one complete file. This tool never reads workspace state.", inputSchema: { type: "object", properties: { repo, ref: { type: "string" }, path: { type: "string" } }, required: ["repo"], additionalProperties: false }, outputSchema: resultSchema, annotations: read },
+    { name: "read_code_labs_repository", title: "Read Owner-Authorised Repository", description: "Read repository metadata and optionally one complete source file with credential-shaped literal values redacted. Environment-variable names, identifiers and call sites remain visible. This tool never reads workspace state.", inputSchema: { type: "object", properties: { repo, ref: { type: "string" }, path: { type: "string" } }, required: ["repo"], additionalProperties: false }, outputSchema: resultSchema, annotations: read },
     { name: "create_code_labs_github_branch", title: "Create GitHub Branch", description: "Create one non-main branch through an owner-authorised GitHub App operation with durable identity and claim protection. No expected_state_version is accepted.", inputSchema: { type: "object", properties: { operation_key: operationKey, repo, branch, base_ref: { type: "string" } }, required: ["operation_key", "repo", "branch", "base_ref"], additionalProperties: false }, outputSchema: resultSchema, annotations: destructiveWrite },
     { name: "create_code_labs_github_file", title: "Create Complete GitHub File", description: "Create one complete file on an existing non-main branch after verifying its SHA-256 content hash. No expected_state_version is accepted.", inputSchema: { type: "object", properties: { operation_key: operationKey, repo, branch, path: { type: "string" }, content: { type: "string" }, content_hash: sha256, commit_message: { type: "string" } }, required: ["operation_key", "repo", "branch", "path", "content", "content_hash"], additionalProperties: false }, outputSchema: resultSchema, annotations: destructiveWrite },
     { name: "update_code_labs_github_file", title: "Update Complete GitHub File", description: "Replace one complete file on an existing non-main branch after exact expected blob SHA and content-hash verification. No expected_state_version is accepted.", inputSchema: { type: "object", properties: { operation_key: operationKey, repo, branch, path: { type: "string" }, expected_blob_sha: sha1, content: { type: "string" }, content_hash: sha256, commit_message: { type: "string" } }, required: ["operation_key", "repo", "branch", "path", "expected_blob_sha", "content", "content_hash"], additionalProperties: false }, outputSchema: resultSchema, annotations: destructiveWrite },
@@ -172,10 +171,9 @@ async function call(b: any, name: string, args: Row) {
   }
   if (name === "undo_code_labs_action") return undoAction(b, args);
   if (name === "save_code_labs_write_request") return saveRequest(b, args);
-
   if (name === "read_code_labs_repository") {
     rejectWorkspaceVersion(args);
-    return readRepository(b, args);
+    return protectRepositoryRead(await readRepository(b, args));
   }
   if (name === "create_code_labs_github_branch") {
     rejectWorkspaceVersion(args);
@@ -249,7 +247,7 @@ Deno.serve(async (req: Request) => {
           protocolVersion: "2025-06-18",
           capabilities: { tools: { listChanged: true } },
           serverInfo: { name: "code-labs-live-v105-unified", version: VERSION },
-          instructions: "Workspace writes retain expected_state_version locking. GitHub reads and writes use a separate durable operation lane that never accepts, reads or increments workspace state. All GitHub mutations require owner-authorised repository binding, a non-main branch, durable operation identity, claim/idempotency protection and proof.",
+          instructions: "Workspace writes retain expected_state_version locking. GitHub reads and writes use a separate durable operation lane that never accepts, reads or increments workspace state. Repository reads redact credential-shaped literal values while preserving identifiers, environment-variable names and call sites. All GitHub mutations require owner-authorised repository binding, a non-main branch, durable operation identity, claim/idempotency protection and proof.",
         });
       }
       if (body.method === "ping") return rpc(id, {});
