@@ -20,9 +20,11 @@ import {
 import { backendTablesSnapshot, prepareGithubWriter, prepareRepoHandoff, reviewCodeGod } from "./repo-flow.ts";
 import { executeGithubWriter } from "./github-writer.ts";
 import { analyzeCgRepairLab, getCgRepairLabAccess } from "./cg-repair-lab.ts";
-import { activateOwnerRepository } from "./github-authority.ts";
+import { activateOwnerRepository, githubRequest, verifyOwnerRepository } from "./github-authority.ts";
 
 type Row = Record<string, any>;
+
+const PROTECTED_BRANCHES = new Set(["main", "master", "production", "live", "gh-pages"]);
 
 function rpcNumber(value: unknown) {
   let current: unknown = value;
@@ -55,6 +57,75 @@ async function guarded<T>(b: Binding, args: Row, fn: (b: Binding, args: Row) => 
   const workspace = await reserveStateVersion(b, args);
   const result: any = await fn(b, args);
   return { ...result, workspace };
+}
+
+function cleanBranch(value: unknown) {
+  const branch = String(value || "").trim();
+  if (!/^[A-Za-z0-9._/-]{3,80}$/.test(branch) || branch.startsWith("/") || branch.endsWith("/") || branch.includes("//") || branch.includes("..") || PROTECTED_BRANCHES.has(branch.toLowerCase())) {
+    throw new Error("A safe non-protected GitHub branch is required.");
+  }
+  return branch;
+}
+
+function cleanRef(value: unknown, fallback: string) {
+  const ref = String(value || fallback || "").trim();
+  if (!ref || ref.length > 200 || /[\u0000-\u001f\u007f]/.test(ref)) throw new Error("A safe source ref is required.");
+  return ref;
+}
+
+async function createGithubBranch(b: Binding, args: Row) {
+  if (args.confirmed !== true) throw new Error("confirmed must be true to create a GitHub branch.");
+  const repo = String(args.fields?.repo || "").trim();
+  const branch = cleanBranch(args.fields?.branch);
+  const authority = await verifyOwnerRepository(b.owner_id, repo, { contents: "write", metadata: "read" });
+  if (branch.toLowerCase() === authority.default_branch.toLowerCase()) throw new Error("The requested branch is the verified default branch.");
+  const sourceRef = cleanRef(args.fields?.source_ref, authority.default_branch);
+  const repoPath = "/repos/" + [authority.owner, authority.name].map(encodeURIComponent).join("/");
+  const matches = await githubRequest(repoPath + "/git/matching-refs/heads/" + encodeURIComponent(branch), authority.token);
+  if (Array.isArray(matches) && matches.some((row: Row) => String(row?.ref || "") === "refs/heads/" + branch)) {
+    throw new Error("The requested GitHub branch already exists.");
+  }
+  const source = await githubRequest(repoPath + "/commits/" + encodeURIComponent(sourceRef), authority.token);
+  const sourceSha = String(source?.sha || "");
+  if (!/^[a-f0-9]{40}$/i.test(sourceSha)) throw new Error("GitHub did not return immutable source commit proof.");
+  const created = await githubRequest(repoPath + "/git/refs", authority.token, {
+    method: "POST",
+    body: JSON.stringify({ ref: "refs/heads/" + branch, sha: sourceSha }),
+  });
+  const createdRef = String(created?.ref || "");
+  const createdSha = String(created?.object?.sha || "");
+  if (createdRef !== "refs/heads/" + branch || createdSha !== sourceSha) throw new Error("GitHub did not return branch creation proof.");
+  const receipts = await rest("code_labs_action_receipts", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({
+      owner_id: b.owner_id,
+      action: "github.branch_create",
+      record_type: "github_branch",
+      record_id: null,
+      before_data: {},
+      after_data: { repo: authority.repo, branch, source_ref: sourceRef, source_commit_sha: sourceSha, created_ref: createdRef },
+      changed_fields: ["github_branch"],
+      created_new_row: true,
+      undo_available: false,
+    }),
+  });
+  return {
+    ok: true,
+    version: VERSION,
+    tool: "run_code_labs_action",
+    action: "github.branch_create",
+    wrote_database: true,
+    wrote_github: true,
+    opened_pr: false,
+    deleted_anything: false,
+    direct_main_write: false,
+    merged: false,
+    force_pushed: false,
+    workflows_modified: false,
+    github: { repo: authority.repo, branch, source_ref: sourceRef, source_commit_sha: sourceSha, created_ref: createdRef },
+    receipt: Array.isArray(receipts) ? receipts[0] || null : null,
+  };
 }
 
 function safeWriterResult(result: Row) {
@@ -162,6 +233,7 @@ export function listActions() {
     { action: "cg_repair_lab.save_candidate", requires_confirmation: false },
     { action: "code_labs.owner_activate_repository", requires_confirmation: true },
     { action: "code_god.review", requires_confirmation: false },
+    { action: "github.branch_create", requires_confirmation: true },
     { action: "github.writer_prepare", requires_confirmation: true },
     { action: "github.writer_execute", requires_confirmation: true },
     { action: "backend.tables_snapshot", requires_confirmation: false },
@@ -229,6 +301,7 @@ export async function runAction(b: Binding, args: Row) {
     return guarded(b, args, prepareRepoHandoff);
   }
   if (action === "code_god.review") return guarded(b, args, reviewCodeGod);
+  if (action === "github.branch_create") return guarded(b, args, createGithubBranch);
   if (action === "github.writer_prepare") return guarded(b, args, prepareGithubWriter);
   if (action === "github.writer_execute") {
     const requestId = String(args.request_id || args.record_id || args.fields?.request_id || "").trim();
