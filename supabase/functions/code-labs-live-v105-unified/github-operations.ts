@@ -67,9 +67,17 @@ function cleanBranch(value: unknown, defaultBranch?: string) {
 }
 
 function cleanPath(value: unknown) {
-  const path = String(value || "").trim().replace(/^\/+/, "");
+  const original = String(value || "");
   if (
-    !path || path.length > 500 || path.includes("..") || path.includes("\\") ||
+    original.startsWith("/") || original.startsWith("\\") ||
+    /^[A-Za-z]:[\\/]/.test(original)
+  ) throw new Error("A safe repository-relative file path is required.");
+
+  const path = original.trim();
+  if (
+    !path || path.length > 500 || path.startsWith("/") ||
+    path.startsWith("\\") || /^[A-Za-z]:[\\/]/.test(path) ||
+    path.includes("..") || path.includes("\\") ||
     path.startsWith(".") || path.startsWith(".github/") ||
     /(?:^|\/)(?:secrets?|\.env[^/]*)$/i.test(path) ||
     /\.(?:pem|key|p12|pfx)$/i.test(path)
