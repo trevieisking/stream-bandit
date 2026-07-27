@@ -572,14 +572,14 @@ export async function runAction(b: Binding, args: Row) {
   if (action.endsWith(".select")) {
     return selectRecord(b, { record_type: action.split(".")[0], record_id: args.record_id, expected_state_version: args.expected_state_version, operation_id: args.operation_id });
   }
-  if (action === "setup.save") return updateProject(b, { fields: args.fields });
-  if (action === "file.replace_current") return updateCurrentFile(b, { fields: args.fields });
-  if (action === "repair.save") return updateJob(b, { fields: args.fields });
-  if (action === "packet.build") return updatePacket(b, { fields: args.fields });
+  if (action === "setup.save") return updateProject(b, { fields: args.fields, operation_id: args.operation_id });
+  if (action === "file.replace_current") return updateCurrentFile(b, { fields: args.fields, operation_id: args.operation_id });
+  if (action === "repair.save") return updateJob(b, { fields: args.fields, operation_id: args.operation_id });
+  if (action === "packet.build") return updatePacket(b, { fields: args.fields, operation_id: args.operation_id });
   if (action === "canvas.load_packet") return selected(b.owner_id, "packet").then(({ row }) => ({ ok: true, version: VERSION, tool: "run_code_labs_action", action, packet: row }));
   if (action === "canvas.save_candidate" || action === "candidate.save") return saveCandidate(b, args);
   if (action === "candidate.accept") return acceptCandidate(b, args);
-  if (action === "test.record") return updateTest(b, { fields: args.fields });
+  if (action === "test.record") return updateTest(b, { fields: args.fields, operation_id: args.operation_id });
   if (action === "checkpoint.create") return createCheckpoint(b, args);
   if (action === "github.prepare_request") {
     if (args.confirmed !== true) throw new Error("confirmed must be true to prepare a GitHub request.");
