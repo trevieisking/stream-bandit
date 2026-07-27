@@ -122,18 +122,18 @@ async function ensureState(owner: string) {
   return saved[0];
 }
 
-async function patchState(owner: string, patch: Row, expected?: number) {
+async function patchState(owner: string, patch: Row, expected?: number, operationId = "") {
   const state = await ensureState(owner);
   if (expected != null && Number(expected) !== Number(state.state_version)) {
     throw new Error("Workspace state changed. Read the workspace again before writing.");
   }
   const body = {
     ...patch,
-    state_version: Number(state.state_version || 0) + 1,
+    state_version: operationId ? Number(state.state_version || 0) : Number(state.state_version || 0) + 1,
     updated_at: new Date().toISOString(),
   };
   const rows = await rest(
-    "code_labs_workspace_state?owner_id=eq." + encodeURIComponent(owner) + "&state_version=eq." + encodeURIComponent(state.state_version),
+    "code_labs_workspace_state?owner_id=eq." + encodeURIComponent(owner) + "&state_version=eq." + encodeURIComponent(state.state_version) + (operationId ? "&action_reservation_id=eq." + encodeURIComponent(operationId) : "&action_reservation_id=is.null"),
     { method: "PATCH", headers: { Prefer: "return=representation" }, body: JSON.stringify(body) },
   );
   if (!rows[0]) throw new Error("Workspace state changed before this write completed.");
@@ -190,7 +190,28 @@ async function receipt(
   after: Row,
   created = false,
   undo = false,
+  operationId = "",
 ) {
+  if (operationId) {
+    const prior = await one(
+      "code_labs_action_receipts?select=*&owner_id=eq." + encodeURIComponent(owner) +
+        "&operation_id=eq." + encodeURIComponent(operationId) + "&limit=1",
+    );
+    if (prior) {
+      return {
+        receipt_id: prior.id,
+        action: prior.action,
+        record_type: prior.record_type,
+        record_id: prior.record_id,
+        before_hash: await digest(prior.before_data),
+        after_hash: await digest(prior.after_data),
+        changed_fields: prior.changed_fields,
+        created_new_row: prior.created_new_row,
+        undo_available: prior.undo_available,
+        completed_at: prior.created_at,
+      };
+    }
+  }
   const rows = await rest("code_labs_action_receipts", {
     method: "POST",
     headers: { Prefer: "return=representation" },
@@ -221,7 +242,7 @@ async function receipt(
   };
 }
 
-async function patchSelected(b: Binding, type: RecordType, fields: Row, allowed: string[], action: string) {
+async function patchSelected(b: Binding, type: RecordType, fields: Row, allowed: string[], action: string, operationId = "") {
   const { state, row } = await selected(b.owner_id, type);
   const safe = cleanObject(fields);
   const patch: Row = {};
@@ -244,7 +265,7 @@ async function patchSelected(b: Binding, type: RecordType, fields: Row, allowed:
     version: VERSION,
     tool: action,
     record: rows[0],
-    receipt: await receipt(b.owner_id, action, type, row.id, row, rows[0], false, true),
+    receipt: await receipt(b.owner_id, action, type, row.id, row, rows[0], false, true, operationId),
   };
 }
 
@@ -333,7 +354,7 @@ export async function selectRecord(b: Binding, args: Row) {
     }
   }
 
-  const state = await patchState(b.owner_id, patch, args.expected_state_version);
+  const state = await patchState(b.owner_id, patch, args.expected_state_version, String(args.operation_id || ""));
   return {
     ok: true,
     version: VERSION,
@@ -341,12 +362,12 @@ export async function selectRecord(b: Binding, args: Row) {
     record_type: type,
     record: row,
     workspace: state,
-    receipt: await receipt(b.owner_id, type + ".select", "workspace", b.owner_id, before, state, false, false),
+    receipt: await receipt(b.owner_id, type + ".select", "workspace", b.owner_id, before, state, false, false, String(args.operation_id || "")),
   };
 }
 
 export async function updateProject(b: Binding, args: Row) {
-  return patchSelected(b, "project", args.fields, ["workspace", "site_name", "site_url", "repo", "mode", "notes", "status", "metadata"], "update_code_labs_project");
+  return patchSelected(b, "project", args.fields, ["workspace", "site_name", "site_url", "repo", "mode", "notes", "status", "metadata"], "update_code_labs_project", String(args.operation_id || ""));
 }
 
 export async function updateCurrentFile(b: Binding, args: Row) {
@@ -356,7 +377,7 @@ export async function updateCurrentFile(b: Binding, args: Row) {
     if (!code || code.length > 750000) throw new Error("current_code is required and must be under 750000 characters.");
     fields.current_hash = await digest(code);
   }
-  return patchSelected(b, "file", fields, ["filename", "file_type", "current_code", "current_hash", "metadata"], "update_code_labs_current_file");
+  return patchSelected(b, "file", fields, ["filename", "file_type", "current_code", "current_hash", "metadata"], "update_code_labs_current_file", String(args.operation_id || ""));
 }
 
 export async function updateJob(b: Binding, args: Row) {
@@ -371,7 +392,7 @@ export async function updateJob(b: Binding, args: Row) {
       throw new Error("The updated job must remain linked to the selected file.");
     }
   }
-  return patchSelected(b, "job", fields, ["file_id", "title", "problem", "dont_touch", "errors", "status", "started_at", "completed_at", "metadata"], "update_code_labs_repair_job");
+  return patchSelected(b, "job", fields, ["file_id", "title", "problem", "dont_touch", "errors", "status", "started_at", "completed_at", "metadata"], "update_code_labs_repair_job", String(args.operation_id || ""));
 }
 
 export async function updatePacket(b: Binding, args: Row) {
@@ -387,7 +408,7 @@ export async function updatePacket(b: Binding, args: Row) {
       throw new Error("The updated packet must remain linked to the selected job and file.");
     }
   }
-  return patchSelected(b, "packet", fields, ["job_id", "packet_type", "packet_text", "metadata"], "upsert_code_labs_packet");
+  return patchSelected(b, "packet", fields, ["job_id", "packet_type", "packet_text", "metadata"], "upsert_code_labs_packet", String(args.operation_id || ""));
 }
 
 export async function updateTest(b: Binding, args: Row) {
@@ -403,7 +424,7 @@ export async function updateTest(b: Binding, args: Row) {
       throw new Error("The updated test must remain linked to the selected job and file.");
     }
   }
-  return patchSelected(b, "test", fields, ["job_id", "filename", "result", "checked_count", "total_count", "notes", "details"], "upsert_code_labs_test_result");
+  return patchSelected(b, "test", fields, ["job_id", "filename", "result", "checked_count", "total_count", "notes", "details"], "upsert_code_labs_test_result", String(args.operation_id || ""));
 }
 
 export async function saveCandidate(b: Binding, args: Row) {
@@ -415,7 +436,7 @@ export async function saveCandidate(b: Binding, args: Row) {
   metadata.candidate_hash = await digest(candidateCode);
   metadata.candidate_note = String(args.note || "").slice(0, 4000);
   metadata.candidate_saved_at = new Date().toISOString();
-  return patchSelected(b, "file", { metadata }, ["metadata"], "save_code_labs_candidate");
+  return patchSelected(b, "file", { metadata }, ["metadata"], "save_code_labs_candidate", String(args.operation_id || ""));
 }
 
 export async function acceptCandidate(b: Binding, args: Row) {
@@ -425,7 +446,7 @@ export async function acceptCandidate(b: Binding, args: Row) {
   const candidateCode = String(metadata.fixed_output || "");
   if (!candidateCode) throw new Error("No saved candidate is available.");
   metadata.candidate_accepted_at = new Date().toISOString();
-  return updateCurrentFile(b, { fields: { current_code: candidateCode, metadata } });
+  return updateCurrentFile(b, { fields: { current_code: candidateCode, metadata }, operation_id: args.operation_id });
 }
 
 export async function createCheckpoint(b: Binding, args: Row) {
@@ -444,13 +465,35 @@ export async function createCheckpoint(b: Binding, args: Row) {
     note: String(args.note || "").slice(0, 4000),
     metadata: { source: "code-labs-v104-tool-only", state_version: state.state_version },
   };
-  const rows = await rest("code_labs_versions", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(body) });
+
+  const operationId = String(args.operation_id || "");
+  if (operationId) {
+    const prior = await one(
+      "code_labs_versions?select=*&owner_id=eq." + encodeURIComponent(b.owner_id) +
+        "&operation_id=eq." + encodeURIComponent(operationId) + "&limit=1",
+    );
+    if (prior) {
+      return {
+        ok: true,
+        version: VERSION,
+        tool: "create_code_labs_checkpoint",
+        checkpoint: prior,
+        receipt: await receipt(b.owner_id, "checkpoint.create", "version", prior.id, {}, prior, true, false, operationId),
+      };
+    }
+  }
+  const rows = await rest("code_labs_versions", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ ...body, operation_id: operationId || null }),
+  });
+
   return {
     ok: true,
     version: VERSION,
     tool: "create_code_labs_checkpoint",
     checkpoint: rows[0],
-    receipt: await receipt(b.owner_id, "checkpoint.create", "version", rows[0].id, {}, rows[0], true, false),
+    receipt: await receipt(b.owner_id, "checkpoint.create", "version", rows[0].id, {}, rows[0], true, false, operationId),
   };
 }
 
@@ -499,8 +542,8 @@ export async function runAction(b: Binding, args: Row) {
 
   if (action === "workflow.reset") {
     const before = await ensureState(b.owner_id);
-    const after = await patchState(b.owner_id, { workflow_step: "setup" }, args.expected_state_version);
-    return { ok: true, version: VERSION, tool: "run_code_labs_action", workspace: after, receipt: await receipt(b.owner_id, action, "workspace", b.owner_id, before, after, false, true) };
+    const after = await patchState(b.owner_id, { workflow_step: "setup" }, args.expected_state_version, String(args.operation_id || ""));
+    return { ok: true, version: VERSION, tool: "run_code_labs_action", workspace: after, receipt: await receipt(b.owner_id, action, "workspace", b.owner_id, before, after, false, true, String(args.operation_id || "")) };
   }
 
   if (action === "workflow.advance") {
@@ -521,12 +564,12 @@ export async function runAction(b: Binding, args: Row) {
       "github_tracker",
     ];
     const index = Math.max(0, order.indexOf(before.workflow_step));
-    const after = await patchState(b.owner_id, { workflow_step: order[Math.min(index + 1, order.length - 1)] }, args.expected_state_version);
-    return { ok: true, version: VERSION, tool: "run_code_labs_action", workspace: after, receipt: await receipt(b.owner_id, action, "workspace", b.owner_id, before, after, false, true) };
+    const after = await patchState(b.owner_id, { workflow_step: order[Math.min(index + 1, order.length - 1)] }, args.expected_state_version, String(args.operation_id || ""));
+    return { ok: true, version: VERSION, tool: "run_code_labs_action", workspace: after, receipt: await receipt(b.owner_id, action, "workspace", b.owner_id, before, after, false, true, String(args.operation_id || "")) };
   }
 
   if (action.endsWith(".select")) {
-    return selectRecord(b, { record_type: action.split(".")[0], record_id: args.record_id, expected_state_version: args.expected_state_version });
+    return selectRecord(b, { record_type: action.split(".")[0], record_id: args.record_id, expected_state_version: args.expected_state_version, operation_id: args.operation_id });
   }
   if (action === "setup.save") return updateProject(b, { fields: args.fields });
   if (action === "file.replace_current") return updateCurrentFile(b, { fields: args.fields });
