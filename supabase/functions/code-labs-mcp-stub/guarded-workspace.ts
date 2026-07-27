@@ -154,7 +154,7 @@ async function guarded<T>(b: Binding, args: Row, action: string, fn: (b: Binding
   }
 
   try {
-    const result: any = await fn(b, args);
+    const result: any = await fn(b, { ...args, operation_id: operationId });
     const completedVersion = await completeWorkspaceAction(b, operationId, expected, result || {});
     return { ...result, workspace: { state_version: completedVersion } };
   } catch (error) {
@@ -324,9 +324,8 @@ export async function runAction(b: Binding, args: Row) {
     return guardedWriter(b, { ...args, request_id: requestId });
   }
 
-  const alreadyLocked = action.endsWith(".select") || action === "workflow.advance" || action === "workflow.reset";
   const readOnlyAction = action === "canvas.load_packet" || action === "github.prepare_request";
-  const result: any = alreadyLocked || readOnlyAction
+  const result: any = readOnlyAction
     ? await runActionBase(b, args)
     : await guarded(b, args, action || "workspace.action", runActionBase);
 
