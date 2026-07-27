@@ -1,4 +1,9 @@
 import { codeLabsOperationId } from "./guarded-workspace.ts";
+import {
+  codeGodMissingOperationIdentityDispatches,
+  codeGodShouldCheckIdentityPropagation,
+  codeGodTestEvidenceAuthenticityIssue,
+} from "./repo-flow.ts";
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message);
@@ -6,6 +11,13 @@ function assert(condition: unknown, message: string) {
 
 function assertIncludes(source: string, expected: string, message: string) {
   assert(source.includes(expected), message + ` Missing: ${expected}`);
+}
+
+function assertEqual(actual: unknown, expected: unknown, message: string) {
+  assert(
+    JSON.stringify(actual) === JSON.stringify(expected),
+    `${message} Expected: ${JSON.stringify(expected)} Actual: ${JSON.stringify(actual)}`,
+  );
 }
 
 function block(source: string, startMarker: string, endMarker: string) {
@@ -80,6 +92,86 @@ Deno.test("CG-IDEMPOTENCY-001 rejects lookup-without-persist and accepts the cor
   assert(!lookupWithoutPersist(fixed), "The corrected fixture must not be detected.");
 });
 
+Deno.test("CG-IDENTITY-PROPAGATION-001 detects every dropped dispatcher identity", () => {
+  const broken = [
+    "export async function runAction(b: Binding, args: Row) {",
+    "  const action = String(args.action || '');",
+    '  if (action === "setup.save") return updateProject(b, { ...args });',
+    '  if (action === "file.replace_current") return updateCurrentFile(b, { ...args });',
+    '  if (action === "repair.save") return updateJob(b, { ...args });',
+    '  if (action === "packet.build") return updatePacket(b, { ...args });',
+    '  if (action === "test.record") return updateTest(b, { ...args });',
+    "}",
+  ].join("\n");
+
+  assertEqual(
+    codeGodMissingOperationIdentityDispatches(broken),
+    ["setup.save", "file.replace_current", "repair.save", "packet.build", "test.record"],
+    "The deliberately broken dispatcher fixture must identify all missing identities.",
+  );
+});
+
+Deno.test("CG-IDENTITY-PROPAGATION-001 accepts corrected dispatcher identity", () => {
+  const fixed = [
+    "export async function runAction(b: Binding, args: Row) {",
+    "  const action = String(args.action || '');",
+    '  if (action === "setup.save") return updateProject(b, { ...args, operation_id: args.operation_id });',
+    '  if (action === "file.replace_current") return updateCurrentFile(b, { ...args, operation_id: args.operation_id });',
+    '  if (action === "repair.save") return updateJob(b, { ...args, operation_id: args.operation_id });',
+    '  if (action === "packet.build") return updatePacket(b, { ...args, operation_id: args.operation_id });',
+    '  if (action === "test.record") return updateTest(b, { ...args, operation_id: args.operation_id });',
+    "}",
+  ].join("\n");
+
+  assertEqual(
+    codeGodMissingOperationIdentityDispatches(fixed),
+    [],
+    "The corrected dispatcher fixture must preserve one operation identity through every mutation.",
+  );
+});
+
+Deno.test("CG-DETECTOR-SCOPE-001 applies identity propagation only to workspace implementation", () => {
+  assert(codeGodShouldCheckIdentityPropagation("workspace.ts"), "The root workspace implementation must be checked.");
+  assert(
+    codeGodShouldCheckIdentityPropagation("supabase/functions/code-labs-mcp-stub/workspace.ts"),
+    "The nested workspace implementation must be checked.",
+  );
+  assert(
+    !codeGodShouldCheckIdentityPropagation("workspace-action-lease.test.ts"),
+    "A test fixture must not be judged as the live workspace implementation.",
+  );
+  assert(
+    !codeGodShouldCheckIdentityPropagation("docs/workspace.ts.md"),
+    "Documentation quoting workspace code must not be judged as live source.",
+  );
+  assert(
+    !codeGodShouldCheckIdentityPropagation("examples/workspace.ts.example"),
+    "Example code must not be judged as the live workspace implementation.",
+  );
+});
+
+Deno.test("CG-TEST-AUTHENTICITY-001 detects overstated source-only evidence", () => {
+  const broken = [
+    'const source = await Deno.readTextFile("workspace.ts");',
+    'assertIncludes(source, "transaction", "This proves concurrent database runtime behaviour and durable side effects.");',
+  ].join("\n");
+  const corrected = [
+    'const evidenceKind = "source-contract";',
+    'const missingEvidence = "database-integration";',
+    'const source = await Deno.readTextFile("workspace.ts");',
+    'assertIncludes(source, "transaction", "This checks declared source structure only.");',
+  ].join("\n");
+
+  assert(
+    codeGodTestEvidenceAuthenticityIssue("workspace-action-lease.test.ts", broken),
+    "The overstated source-only fixture must be detected.",
+  );
+  assert(
+    !codeGodTestEvidenceAuthenticityIssue("workspace-action-lease.test.ts", corrected),
+    "The honest evidence-boundary fixture must not be detected.",
+  );
+});
+
 Deno.test("source contract: guarded callbacks forward one operation identity", async () => {
   const guarded = await source("./guarded-workspace.ts");
   assertIncludes(
@@ -117,6 +209,22 @@ Deno.test("source contract: Writer preparation replays one durable request", asy
   assertIncludes(writer, "const rows = replay ? [replay]", "Writer retries must reuse the existing request.");
   assertIncludes(writer, "operation_id: operationId || null", "Writer requests must persist operation identity.");
   assert(!lookupWithoutPersist(writer), "The Writer block must satisfy CG-IDEMPOTENCY-001.");
+});
+
+Deno.test("source contract: Code God V4.1 exposes lessons, evidence scope and human explanation", async () => {
+  const flow = await source("./repo-flow.ts");
+  assertIncludes(flow, 'version: "V104-code-god-4.1"', "The reviewed Code God version must remain explicit.");
+  assertIncludes(flow, '"CG-IDENTITY-PROPAGATION-001"', "The identity propagation lesson must remain permanent.");
+  assertIncludes(flow, '"CG-TEST-AUTHENTICITY-001"', "The evidence authenticity lesson must remain permanent.");
+  assertIncludes(flow, '"CG-DETECTOR-SCOPE-001"', "The detector scope lesson must remain permanent.");
+  assertIncludes(flow, "why_it_matters", "Every lesson must explain why it matters.");
+  assertIncludes(flow, "next_safe_action", "Every finding must explain the next safe action.");
+  assertIncludes(flow, "evidence_required", "Every lesson must state the evidence it requires.");
+  assertIncludes(flow, "learned_message", "Every lesson must preserve what Code God learned.");
+  assertIncludes(flow, "can_continue_to_writer", "The explanation must state whether Writer can continue.");
+  assertIncludes(flow, "executable_rule_fixtures: false", "Code God must not claim fixtures ran before execution evidence exists.");
+  assertIncludes(flow, "database_integration: false", "Code God must not claim database integration evidence before it exists.");
+  assertIncludes(flow, "deployment_smoke_test: false", "Code God must not claim deployment proof before deployment.");
 });
 
 Deno.test("source contract: migration declares lease recovery and durable uniqueness", async () => {
