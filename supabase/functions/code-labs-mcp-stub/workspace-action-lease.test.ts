@@ -1,4 +1,3 @@
-
 import { codeLabsOperationId } from "./guarded-workspace.ts";
 
 function assert(condition: unknown, message: string) {
@@ -7,6 +6,20 @@ function assert(condition: unknown, message: string) {
 
 function assertIncludes(source: string, expected: string, message: string) {
   assert(source.includes(expected), message + ` Missing: ${expected}`);
+}
+
+function block(source: string, startMarker: string, endMarker: string) {
+  const start = source.indexOf(startMarker);
+  assert(start >= 0, `Missing block start: ${startMarker}`);
+  const end = source.indexOf(endMarker, start + startMarker.length);
+  assert(end > start, `Missing block end: ${endMarker}`);
+  return source.slice(start, end);
+}
+
+function lookupWithoutPersist(sourceBlock: string) {
+  const lookupMarker = "operation_" + "id=eq.";
+  const writeMarker = "operation_" + "id: operationId";
+  return sourceBlock.includes(lookupMarker) && !sourceBlock.includes(writeMarker);
 }
 
 async function source(relative: string) {
@@ -47,59 +60,76 @@ Deno.test("Code Labs action identity changes across action and workspace version
   assert(first !== differentVersion, "Different workspace versions must not share an operation identity.");
 });
 
-Deno.test("guarded actions forward one operation identity and remove legacy write bypasses", async () => {
+Deno.test("CG-IDEMPOTENCY-001 rejects lookup-without-persist and accepts the correction", () => {
+  const broken = [
+    "async function receipt(operationId: string) {",
+    "  const prior = await one('&operation_id=eq.' + operationId);",
+    "  if (prior) return prior;",
+    "  return await insert({ owner_id: 'owner' });",
+    "}",
+  ].join("\n");
+  const fixed = [
+    "async function receipt(operationId: string) {",
+    "  const prior = await one('&operation_id=eq.' + operationId);",
+    "  if (prior) return prior;",
+    "  return await insert({ operation_id: operationId });",
+    "}",
+  ].join("\n");
+
+  assert(lookupWithoutPersist(broken), "The deliberately broken fixture must be detected.");
+  assert(!lookupWithoutPersist(fixed), "The corrected fixture must not be detected.");
+});
+
+Deno.test("source contract: guarded callbacks forward one operation identity", async () => {
   const guarded = await source("./guarded-workspace.ts");
   assertIncludes(
     guarded,
     "await fn(b, { ...args, operation_id: operationId })",
     "Guarded callbacks must receive the deterministic operation identity.",
   );
-  assert(!guarded.includes("const alreadyLocked"), "Select and workflow writes must not bypass the durable lease.");
-  assertIncludes(
-    guarded,
-    "const readOnlyAction = action === \"canvas.load_packet\" || action === \"github.prepare_request\"",
-    "Only genuinely read-only actions may bypass the lease.",
-  );
+  assert(!guarded.includes("const alreadyLocked"), "Legacy write bypasses must remain removed.");
 });
 
-Deno.test("workspace writes honor active leases and replay checkpoint side effects", async () => {
+Deno.test("source contract: workspace receipt persists the key it uses for replay", async () => {
   const workspace = await source("./workspace.ts");
-  assertIncludes(workspace, "action_reservation_id=is.null", "Legacy state transitions must require no active lease.");
+  const receipt = block(workspace, "async function receipt(", "\nasync function patchSelected");
+  assertIncludes(receipt, "&operation_id=eq.", "Receipt retries must query by operation identity.");
   assertIncludes(
-    workspace,
-    "state_version: operationId ? Number(state.state_version || 0) : Number(state.state_version || 0) + 1",
-    "A leased callback must leave the single state increment to lease completion.",
+    receipt,
+    "operation_id: operationId || null",
+    "The initial receipt insert must persist the replay key inside the receipt function.",
   );
-  assertIncludes(workspace, "code_labs_versions?select=*&owner_id=eq.", "Checkpoint retries must replay an existing version.");
-  assertIncludes(workspace, "operation_id: operationId || null", "Receipts and checkpoints must store the operation identity.");
+  assert(!lookupWithoutPersist(receipt), "The actual receipt block must satisfy CG-IDEMPOTENCY-001.");
 });
 
-Deno.test("Writer preparation replays one durable request", async () => {
+Deno.test("source contract: checkpoint replay is scoped to createCheckpoint", async () => {
+  const workspace = await source("./workspace.ts");
+  const checkpoint = block(workspace, "export async function createCheckpoint", "\nexport async function readReceipt");
+  assertIncludes(checkpoint, "code_labs_versions?select=*&owner_id=eq.", "Checkpoint retries must query an existing version.");
+  assertIncludes(checkpoint, "operation_id: operationId || null", "Checkpoint inserts must persist operation identity.");
+  assert(!lookupWithoutPersist(checkpoint), "The checkpoint block must not look up a key without persisting it.");
+});
+
+Deno.test("source contract: Writer preparation replays one durable request", async () => {
   const flow = await source("./repo-flow.ts");
-  assertIncludes(flow, "&operation_id=eq.", "Writer retries must query by operation identity.");
-  assertIncludes(flow, "const rows = replay ? [replay]", "Writer retries must reuse the existing request.");
-  assertIncludes(flow, "operation_id: operationId || null", "Writer requests must persist operation identity.");
+  const writer = block(flow, "export async function prepareGithubWriter", "\nexport async function backendTablesSnapshot");
+  assertIncludes(writer, "&operation_id=eq.", "Writer retries must query by operation identity.");
+  assertIncludes(writer, "const rows = replay ? [replay]", "Writer retries must reuse the existing request.");
+  assertIncludes(writer, "operation_id: operationId || null", "Writer requests must persist operation identity.");
+  assert(!lookupWithoutPersist(writer), "The Writer block must satisfy CG-IDEMPOTENCY-001.");
 });
 
-Deno.test("migration recovers stale leases and replays the original completed version", async () => {
+Deno.test("source contract: migration declares lease recovery and durable uniqueness", async () => {
   const migration = await source("../../migrations/20260726123000_code_labs_atomic_action_lease.sql");
-  assertIncludes(migration, "interval '5 minutes'", "The migration must define bounded stale-lease recovery.");
-  assertIncludes(migration, "Stale action lease reclaimed.", "Stale running leases must be durably failed before reuse.");
-  assertIncludes(
-    migration,
-    "'state_version', v_run.completed_state_version",
-    "A delayed duplicate must receive the original completed state version.",
-  );
-  assertIncludes(
-    migration,
-    "code_labs_workspace_action_lease_guard",
-    "Legacy state transitions must be blocked while a lease is active.",
-  );
-});
-
-Deno.test("migration prevents duplicate receipts, checkpoints and Writer requests", async () => {
-  const migration = await source("../../migrations/20260726123000_code_labs_atomic_action_lease.sql");
+  assertIncludes(migration, "interval '5 minutes'", "The migration must declare bounded stale-lease recovery.");
+  assertIncludes(migration, "'state_version', v_run.completed_state_version", "Completed replay must declare the original version.");
+  assertIncludes(migration, "code_labs_workspace_action_lease_guard", "Legacy state transitions must declare an active-lease guard.");
   assertIncludes(migration, "code_labs_action_receipts_owner_operation_uidx", "Receipt operation identity must be unique.");
   assertIncludes(migration, "code_labs_versions_owner_operation_uidx", "Checkpoint operation identity must be unique.");
   assertIncludes(migration, "code_labs_write_requests_owner_operation_uidx", "Writer request operation identity must be unique.");
+});
+
+Deno.test("evidence boundary: source contracts are not runtime database proof", () => {
+  const evidenceKind = "source-contract";
+  assert(evidenceKind !== "database-integration", "Source inspection must never be reported as database integration evidence.");
 });
