@@ -170,14 +170,188 @@ function secretLike(text: string) {
     /(?:password|passwd)\s*[:=]\s*["'][^"']{8,}["']/i.test(value);
 }
 
+const CODE_GOD_RULES: Record<string, Row> = {
+  "CG-IDENTITY-001": {
+    title: "Repository authority could not be verified",
+    category: "identity",
+    why_it_matters: "Code God must prove that the selected repository belongs to the signed-in owner before trusting a repair handoff.",
+    evidence_required: "A fresh owner-repository authority check for the exact repository.",
+    learned_message: "I learned to verify repository authority before trusting a repair handoff.",
+  },
+  "CG-IDENTITY-002": {
+    title: "Repository path is missing or unsafe",
+    category: "identity",
+    why_it_matters: "An unsafe or ambiguous path can target the wrong file or escape the intended repository location.",
+    evidence_required: "One exact repository-relative path that passes the protected-path checks.",
+    learned_message: "I learned that every repair must name one exact safe repository path.",
+  },
+  "CG-BRANCH-001": {
+    title: "Protected branch requested",
+    category: "branch-safety",
+    why_it_matters: "Writing to a protected branch would bypass the reviewed branch-and-draft-PR boundary.",
+    evidence_required: "An existing non-protected branch confirmed for this repair.",
+    learned_message: "I learned never to send a repair directly to a protected branch.",
+  },
+  "CG-FULLFILE-001": {
+    title: "Complete file evidence is missing",
+    category: "file-integrity",
+    why_it_matters: "Writer replaces one complete file, so fragments or oversized content cannot prove a safe replacement.",
+    evidence_required: "One complete file under the queue limit with no patch-only markers.",
+    learned_message: "I learned to require the complete replacement file before approving Writer.",
+  },
+  "CG-TRUNCATION-001": {
+    title: "Proposed file may be truncated",
+    category: "file-integrity",
+    why_it_matters: "A much shorter replacement can silently remove working sections even when the edited portion looks correct.",
+    evidence_required: "A complete candidate preserving all required sections, with an intentional size reduction explained when applicable.",
+    learned_message: "I learned to compare the whole file, not just the repaired section.",
+  },
+  "CG-CONFLICT-001": {
+    title: "Merge conflict markers remain",
+    category: "file-integrity",
+    why_it_matters: "Conflict markers are unresolved alternatives, not executable final source.",
+    evidence_required: "A complete file with every conflict resolved and no conflict markers remaining.",
+    learned_message: "I learned that unresolved merge markers must never reach Writer.",
+  },
+  "CG-FENCE-001": {
+    title: "Markdown wrapper found inside source",
+    category: "file-integrity",
+    why_it_matters: "Chat formatting fences can corrupt a file when they are accidentally saved as source.",
+    evidence_required: "Raw complete file contents without conversational wrappers.",
+    learned_message: "I learned to separate source code from chat formatting.",
+  },
+  "CG-SECRET-001": {
+    title: "Secret-like value detected",
+    category: "security",
+    why_it_matters: "Credential-shaped values in source or review evidence can expose privileged access.",
+    evidence_required: "A redacted candidate that uses server-side secret references rather than secret values.",
+    learned_message: "I learned to report secret names and call sites without exposing secret values.",
+  },
+  "CG-TIMER-001": {
+    title: "Fast repeating timer may duplicate work",
+    category: "runtime-safety",
+    why_it_matters: "Frequent unguarded timers can overlap actions, duplicate writes and amplify retries.",
+    evidence_required: "A single-owner guard, explicit scheduling boundary or proof that overlapping execution is harmless.",
+    learned_message: "I learned to distrust fast repeating work unless ownership and overlap are controlled.",
+  },
+  "CG-IDEMPOTENCY-001": {
+    title: "Replay key is read but not persisted",
+    category: "idempotency",
+    why_it_matters: "A retry cannot locate the first durable side effect when the lookup identity was never written, so duplicate rows can be created.",
+    evidence_required: "A broken fixture that is detected, a corrected fixture that passes, the exact identity persisted on first insert and database uniqueness evidence.",
+    learned_message: "I learned that an idempotency key only works when the first durable write stores the same key used by retries.",
+  },
+  "CG-IDENTITY-PROPAGATION-001": {
+    title: "Operation identity is lost between layers",
+    category: "idempotency",
+    why_it_matters: "A guarded action can create one identity and still lose replay safety when a dispatcher omits it before nested writes or receipts.",
+    evidence_required: "Broken and corrected dispatcher fixtures plus source proof that every mutating nested call forwards the same operation identity.",
+    learned_message: "I learned to follow one operation identity through every mutating layer until all durable side effects are complete.",
+  },
+  "CG-TEST-AUTHENTICITY-001": {
+    title: "Source inspection is being presented as runtime proof",
+    category: "evidence-integrity",
+    why_it_matters: "Finding text in a file cannot prove concurrency, transactions, retries or durable database side effects actually behave correctly.",
+    evidence_required: "A deliberately broken fixture that fails, a corrected fixture that passes, actual function execution and database or faithful transaction-harness evidence for runtime claims.",
+    learned_message: "I learned to call source checks source checks and reserve runtime claims for executed evidence.",
+  },
+  "CG-DUPLICATE-001": {
+    title: "Matching Writer request already exists",
+    category: "queue-safety",
+    why_it_matters: "Multiple active requests for the same file and branch can produce conflicting or duplicate writes.",
+    evidence_required: "Proof that the existing request was reused, completed or deliberately closed before another is queued.",
+    learned_message: "I learned to reuse one active Writer request instead of creating competing duplicates.",
+  },
+};
+
+function ruleDefinition(ruleId: string) {
+  return CODE_GOD_RULES[ruleId] || {
+    title: ruleId,
+    category: "general",
+    why_it_matters: "This rule protects the reviewed Code Labs workflow.",
+    evidence_required: "Correct the finding and rerun Code God against the complete file.",
+    learned_message: "I learned a new reusable Code God rule: " + ruleId + ".",
+  };
+}
+
 function finding(
   severity: string,
   rule_id: string,
   message: string,
   correction: string,
   blocks_github = true,
+  details: Row = {},
 ) {
-  return { severity, rule_id, message, correction, blocks_github };
+  const rule = ruleDefinition(rule_id);
+  return {
+    severity,
+    rule_id,
+    title: String(details.title || rule.title || rule_id),
+    category: String(details.category || rule.category || "general"),
+    message,
+    why_it_matters: String(details.why_it_matters || rule.why_it_matters || message),
+    correction,
+    next_safe_action: String(details.next_safe_action || correction),
+    evidence_required: String(details.evidence_required || rule.evidence_required || "Correct the finding and rerun Code God."),
+    learned_message: String(details.learned_message || rule.learned_message || ("I learned " + rule_id + ": " + message)),
+    blocks_github,
+  };
+}
+
+export function codeGodMissingOperationIdentityDispatches(source: string) {
+  const start = source.indexOf("export async function runAction");
+  if (start < 0) return [];
+  const runAction = source.slice(start);
+  const checks = [
+    { action: "setup.save", callee: "updateProject" },
+    { action: "file.replace_current", callee: "updateCurrentFile" },
+    { action: "repair.save", callee: "updateJob" },
+    { action: "packet.build", callee: "updatePacket" },
+    { action: "test.record", callee: "updateTest" },
+  ];
+  return checks.filter((check) => {
+    const line = runAction.split("\n").find((candidate) =>
+      candidate.includes('action === "' + check.action + '"') &&
+      candidate.includes("return " + check.callee + "(b, {")
+    );
+    return Boolean(line && !line.includes("operation_id: args.operation_id"));
+  }).map((check) => check.action);
+}
+
+export function codeGodTestEvidenceAuthenticityIssue(path: string, source: string) {
+  if (!/\.test\.(?:ts|tsx|js|jsx)$/i.test(String(path || ""))) return false;
+  const sourceInspection = source.includes("Deno.readTextFile") &&
+    (source.includes("assertIncludes(") || source.includes(".includes("));
+  const behaviouralClaim = /\b(runtime|database[- ]integration|concurrent|transaction|stale lease|duplicate delivery|durable side effect)\b/i.test(source);
+  const honestBoundary = source.includes('"source-contract"') && source.includes('"database-integration"');
+  return sourceInspection && behaviouralClaim && !honestBoundary;
+}
+
+function codeGodReviewSpeech(outcome: string, findings: Row[]) {
+  const blocking = findings.filter((item) => item.blocks_github);
+  if (!findings.length) {
+    return {
+      headline: "I checked the complete candidate and found no blocking rule matches within my current evidence scope.",
+      what_i_found: [],
+      what_i_learned: [],
+      next_safe_action: "Keep the reviewed handoff unchanged and continue only through the protected Writer route.",
+      can_continue_to_writer: outcome === "PASS",
+    };
+  }
+  return {
+    headline: blocking.length
+      ? "I found " + blocking.length + " blocking lesson" + (blocking.length === 1 ? "" : "s") + " that must be corrected before Writer can continue."
+      : "I found advisory lessons that should be reviewed before continuing.",
+    what_i_found: findings.map((item) => ({
+      rule_id: item.rule_id,
+      title: item.title,
+      severity: item.severity,
+      message: item.message,
+    })),
+    what_i_learned: findings.map((item) => item.learned_message),
+    next_safe_action: String((blocking[0] || findings[0])?.next_safe_action || "Review the findings and rerun Code God."),
+    can_continue_to_writer: outcome === "PASS",
+  };
 }
 
 function handoffMarker(value: Row) {
@@ -410,6 +584,27 @@ export async function reviewCodeGod(b: Binding, args: Row = {}) {
       );
     }
   }
+  const missingIdentityDispatches = codeGodMissingOperationIdentityDispatches(proposed);
+  if (missingIdentityDispatches.length) {
+    findings.push(
+      finding(
+        "P1",
+        "CG-IDENTITY-PROPAGATION-001",
+        "The runAction dispatcher drops operation identity for: " + missingIdentityDispatches.join(", ") + ". Nested mutations and receipts can no longer replay the same guarded action safely.",
+        "Forward operation_id: args.operation_id through every mutating dispatcher call and verify broken-versus-fixed fixtures.",
+      ),
+    );
+  }
+  if (codeGodTestEvidenceAuthenticityIssue(String(handoff.path || ""), proposed)) {
+    findings.push(
+      finding(
+        "P1",
+        "CG-TEST-AUTHENTICITY-001",
+        "This test inspects source text while using language that implies runtime, concurrency, transaction or durable-side-effect proof, but it does not declare the source-contract evidence boundary.",
+        "Label source inspections honestly and add executed fixtures plus database or faithful transaction-harness evidence before making runtime claims.",
+      ),
+    );
+  }
   const duplicateRows = await rest(
     "code_labs_write_requests?select=id,status,branch,path,created_at&requested_by=eq." +
       encodeURIComponent(b.owner_id) + "&repo=eq." +
@@ -433,9 +628,11 @@ export async function reviewCodeGod(b: Binding, args: Row = {}) {
   const outcome = blocking
     ? (findings.some((item) => item.severity === "P0") ? "BLOCK" : "FIX_FIRST")
     : "PASS";
+  const explanation = codeGodReviewSpeech(outcome, findings);
   const review = {
-    version: "V104-code-god-3",
-    rules_version: "2026-07-27.1",
+    version: "V104-code-god-4",
+    rules_version: "2026-07-27.2",
+    rule_catalog_version: "2026-07-27.2",
     outcome,
     handoff_hash: await digest(handoff),
     repo: handoff.repo,
@@ -443,6 +640,17 @@ export async function reviewCodeGod(b: Binding, args: Row = {}) {
     request_branch: handoff.request_branch,
     proposed_hash: handoff.proposed_hash,
     findings,
+    explanation,
+    learned_rules: Array.from(new Set(findings.map((item) => item.rule_id))),
+    evidence_scope: {
+      static_source_review: true,
+      owner_repository_authority: true,
+      live_queue_snapshot: true,
+      executable_rule_fixtures: false,
+      database_integration: false,
+      deployment_smoke_test: false,
+      note: "PASS means no blocking rule matched within this evidence scope; it is not runtime or deployment proof.",
+    },
     checks_run: [
       "owner-repository-authority",
       "identity",
@@ -454,6 +662,9 @@ export async function reviewCodeGod(b: Binding, args: Row = {}) {
       "fences",
       "secret-values",
       "operation-identity-persistence",
+      "operation-identity-propagation",
+      "test-evidence-authenticity",
+      "human-readable-explanation",
       "duplicate-queue",
       "timers",
     ],
