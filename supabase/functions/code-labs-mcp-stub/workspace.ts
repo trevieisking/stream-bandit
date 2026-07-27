@@ -225,6 +225,7 @@ async function receipt(
       changed_fields: changed(before || {}, after || {}),
       created_new_row: created,
       undo_available: undo,
+      operation_id: operationId || null,
     }),
   });
   const r = rows[0];
