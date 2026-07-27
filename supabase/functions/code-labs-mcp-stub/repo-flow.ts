@@ -255,6 +255,13 @@ const CODE_GOD_RULES: Record<string, Row> = {
     evidence_required: "A deliberately broken fixture that fails, a corrected fixture that passes, actual function execution and database or faithful transaction-harness evidence for runtime claims.",
     learned_message: "I learned to call source checks source checks and reserve runtime claims for executed evidence.",
   },
+  "CG-DETECTOR-SCOPE-001": {
+    title: "Detector is judging the wrong artifact",
+    category: "evidence-integrity",
+    why_it_matters: "A useful detector can still create false positives when it treats tests, documentation or quoted examples as live implementation code.",
+    evidence_required: "Executable scope fixtures showing that the detector runs for its intended production artifact and ignores tests, documentation and quoted examples.",
+    learned_message: "I learned to identify the real artifact before applying a specialised rule, so I do not mistake practice examples for live defects.",
+  },
   "CG-DUPLICATE-001": {
     title: "Matching Writer request already exists",
     category: "queue-safety",
@@ -296,6 +303,10 @@ function finding(
     learned_message: String(details.learned_message || rule.learned_message || ("I learned " + rule_id + ": " + message)),
     blocks_github,
   };
+}
+
+export function codeGodShouldCheckIdentityPropagation(path: string) {
+  return /(^|\/)workspace\.ts$/i.test(String(path || ""));
 }
 
 export function codeGodMissingOperationIdentityDispatches(source: string) {
@@ -584,16 +595,18 @@ export async function reviewCodeGod(b: Binding, args: Row = {}) {
       );
     }
   }
-  const missingIdentityDispatches = codeGodMissingOperationIdentityDispatches(proposed);
-  if (missingIdentityDispatches.length) {
-    findings.push(
-      finding(
-        "P1",
-        "CG-IDENTITY-PROPAGATION-001",
-        "The runAction dispatcher drops operation identity for: " + missingIdentityDispatches.join(", ") + ". Nested mutations and receipts can no longer replay the same guarded action safely.",
-        "Forward operation_id: args.operation_id through every mutating dispatcher call and verify broken-versus-fixed fixtures.",
-      ),
-    );
+  if (codeGodShouldCheckIdentityPropagation(String(handoff.path || ""))) {
+    const missingIdentityDispatches = codeGodMissingOperationIdentityDispatches(proposed);
+    if (missingIdentityDispatches.length) {
+      findings.push(
+        finding(
+          "P1",
+          "CG-IDENTITY-PROPAGATION-001",
+          "The runAction dispatcher drops operation identity for: " + missingIdentityDispatches.join(", ") + ". Nested mutations and receipts can no longer replay the same guarded action safely.",
+          "Forward operation_id: args.operation_id through every mutating dispatcher call and verify broken-versus-fixed fixtures.",
+        ),
+      );
+    }
   }
   if (codeGodTestEvidenceAuthenticityIssue(String(handoff.path || ""), proposed)) {
     findings.push(
@@ -630,9 +643,9 @@ export async function reviewCodeGod(b: Binding, args: Row = {}) {
     : "PASS";
   const explanation = codeGodReviewSpeech(outcome, findings);
   const review = {
-    version: "V104-code-god-4",
-    rules_version: "2026-07-27.2",
-    rule_catalog_version: "2026-07-27.2",
+    version: "V104-code-god-4.1",
+    rules_version: "2026-07-27.3",
+    rule_catalog_version: "2026-07-27.3",
     outcome,
     handoff_hash: await digest(handoff),
     repo: handoff.repo,
@@ -663,6 +676,7 @@ export async function reviewCodeGod(b: Binding, args: Row = {}) {
       "secret-values",
       "operation-identity-persistence",
       "operation-identity-propagation",
+      "detector-target-scope",
       "test-evidence-authenticity",
       "human-readable-explanation",
       "duplicate-queue",
