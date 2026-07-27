@@ -105,6 +105,7 @@ async function receipt(
       changed_fields: ["metadata"],
       created_new_row: false,
       undo_available: false,
+      operation_id: operationId || null,
     }),
   });
   return rows?.[0] || null;
@@ -376,6 +377,39 @@ export async function reviewCodeGod(b: Binding, args: Row = {}) {
       ),
     );
   }
+  const operationLookupMarker = "operation_" + "id=eq.";
+  const operationWriteMarker = "operation_" + "id: operationId";
+  const idempotencyBlocks = [
+    {
+      name: "action receipt",
+      start: "async function receipt(",
+      end: "\nfunction normalizeAction",
+    },
+    {
+      name: "Writer request",
+      start: "export async function prepareGithubWriter",
+      end: "\nexport async function backendTablesSnapshot",
+    },
+  ];
+  for (const check of idempotencyBlocks) {
+    const start = proposed.indexOf(check.start);
+    if (start < 0) continue;
+    const end = proposed.indexOf(check.end, start);
+    const block = proposed.slice(start, end > start ? end : proposed.length);
+    if (
+      block.includes(operationLookupMarker) &&
+      !block.includes(operationWriteMarker)
+    ) {
+      findings.push(
+        finding(
+          "P1",
+          "CG-IDEMPOTENCY-001",
+          check.name + " looks up a prior row by operation ID but does not persist the same operation ID on the first insert. A retry cannot find the original side effect and may create a duplicate.",
+          "Persist the exact operation ID on the first insert, enforce owner-and-operation uniqueness in the database, and replay the existing durable row.",
+        ),
+      );
+    }
+  }
   const duplicateRows = await rest(
     "code_labs_write_requests?select=id,status,branch,path,created_at&requested_by=eq." +
       encodeURIComponent(b.owner_id) + "&repo=eq." +
@@ -400,7 +434,8 @@ export async function reviewCodeGod(b: Binding, args: Row = {}) {
     ? (findings.some((item) => item.severity === "P0") ? "BLOCK" : "FIX_FIRST")
     : "PASS";
   const review = {
-    version: "V104-code-god-2",
+    version: "V104-code-god-3",
+    rules_version: "2026-07-27.1",
     outcome,
     handoff_hash: await digest(handoff),
     repo: handoff.repo,
@@ -418,6 +453,7 @@ export async function reviewCodeGod(b: Binding, args: Row = {}) {
       "conflicts",
       "fences",
       "secret-values",
+      "operation-identity-persistence",
       "duplicate-queue",
       "timers",
     ],
