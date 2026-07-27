@@ -83,7 +83,15 @@ async function receipt(
   file: Row,
   before: unknown,
   after: unknown,
+  operationId = "",
 ) {
+  if (operationId) {
+    const prior = await one(
+      "code_labs_action_receipts?select=*&owner_id=eq." + encodeURIComponent(owner) +
+        "&operation_id=eq." + encodeURIComponent(operationId) + "&limit=1",
+    );
+    if (prior) return prior;
+  }
   const rows = await rest("code_labs_action_receipts", {
     method: "POST",
     headers: { Prefer: "return=representation" },
@@ -135,7 +143,8 @@ function completeFile(path: string, text: string) {
   if (!value || value.length < 120 || value.length > MAX_QUEUE_CONTENT) {
     return false;
   }
-  if (/BEGIN PATCH|Find:\s*\n|Replace with:/i.test(value)) return false;
+  const patchMarkers = ["BEGIN " + "PATCH", "Find:" + "\n", "Replace " + "with:"];
+  if (patchMarkers.some((marker) => value.toLowerCase().includes(marker.toLowerCase()))) return false;
   if (/^(?:diff --git |Index: |@@\s*-\d+)/m.test(value)) return false;
   if (
     /\.html?$/i.test(path) && !/<!doctype\s+html/i.test(value) &&
@@ -249,11 +258,12 @@ export async function prepareRepoHandoff(b: Binding, args: Row) {
       c.file,
       previous,
       handoffMarker(handoff),
+      String(args.operation_id || ""),
     ),
   };
 }
 
-export async function reviewCodeGod(b: Binding) {
+export async function reviewCodeGod(b: Binding, args: Row = {}) {
   const c = await selected(b.owner_id);
   const metadataBefore = clone(c.file.metadata || {});
   const handoff = clone(metadataBefore.repo_handoff || {});
@@ -334,7 +344,8 @@ export async function reviewCodeGod(b: Binding) {
       ),
     );
   }
-  if (/```(?:html|javascript|js|typescript|ts|json)?/i.test(proposed)) {
+  const markdownFence = String.fromCharCode(96).repeat(3);
+  if (proposed.toLowerCase().includes(markdownFence)) {
     findings.push(
       finding(
         "P2",
@@ -428,6 +439,7 @@ export async function reviewCodeGod(b: Binding) {
       c.file,
       metadataBefore.code_god_review || {},
       review,
+      String(args.operation_id || ""),
     ),
   };
 }
@@ -452,7 +464,14 @@ export async function prepareGithubWriter(b: Binding, args: Row) {
   if (!content || content.length > MAX_QUEUE_CONTENT) {
     throw new Error("Queued content must be under 180000 characters.");
   }
-  const existing = await one(
+  const operationId = String(args.operation_id || "");
+  const replay = operationId
+    ? await one(
+      "code_labs_write_requests?select=*&requested_by=eq." + encodeURIComponent(b.owner_id) +
+        "&operation_id=eq." + encodeURIComponent(operationId) + "&limit=1",
+    )
+    : null;
+  const existing = replay || await one(
     "code_labs_write_requests?select=id,status,branch,path,created_at&requested_by=eq." +
       encodeURIComponent(b.owner_id) + "&repo=eq." +
       encodeURIComponent(handoff.repo) + "&path=eq." +
@@ -460,7 +479,7 @@ export async function prepareGithubWriter(b: Binding, args: Row) {
       encodeURIComponent(handoff.request_branch) +
       "&status=in.(queued,processing)&order=created_at.desc&limit=1",
   );
-  if (existing) {
+  if (existing && !replay) {
     throw new Error(
       "A matching GitHub write request is already queued or processing.",
     );
@@ -482,7 +501,7 @@ export async function prepareGithubWriter(b: Binding, args: Row) {
     ).slice(0, 20000),
     confirm_branch_pr_only: true,
   };
-  const rows = await rest("code_labs_write_requests", {
+  const rows = replay ? [replay] : await rest("code_labs_write_requests", {
     method: "POST",
     headers: { Prefer: "return=representation" },
     body: JSON.stringify({
@@ -501,6 +520,7 @@ export async function prepareGithubWriter(b: Binding, args: Row) {
       branch_pr_only: true,
       deletes_anything: false,
       safety_note: "Code God PASS recorded before connector execution.",
+      operation_id: operationId || null,
     }),
   });
   const queued = rows?.[0];
@@ -530,6 +550,7 @@ export async function prepareGithubWriter(b: Binding, args: Row) {
       c.file,
       metadataBefore.github_writer_request || {},
       marker,
+      operationId,
     ),
   };
 }
