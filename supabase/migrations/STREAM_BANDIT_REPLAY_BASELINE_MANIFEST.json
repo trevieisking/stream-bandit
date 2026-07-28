@@ -3,6 +3,7 @@
   "purpose": "Authoritative schema-only inventory for reconstructing the pre-ledger Stream Bandit and Code Labs foundation before migration 20260527201804.",
   "first_recorded_migration": "20260527201804_create_private_messages_v7_12_105",
   "required_baseline_version_before": "20260527201804",
+  "foundation_parts": 7,
   "evidence_boundary": "Derived from the live production schema and migration ledger on 2026-07-28. Contains table names and dependency scope only; no rows, credentials, secrets, policies, or user data.",
   "rules": {
     "schema_only": true,
