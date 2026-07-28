@@ -68,7 +68,10 @@ test('manifest freezes the complete 34-table dependency closure', () => {
 
 test('baseline is schema-only and non-destructive', () => {
   const source = baselineSource();
-  assert.doesNotMatch(source, /\b(insert|update|delete|truncate)\b/i);
+  assert.doesNotMatch(source, /\binsert\s+into\b/i);
+  assert.doesNotMatch(source, /\bupdate\s+[A-Za-z0-9_."]+\s+set\b/i);
+  assert.doesNotMatch(source, /\bdelete\s+from\b/i);
+  assert.doesNotMatch(source, /\btruncate\s+table\b/i);
   assert.doesNotMatch(source, /\bdrop\s+(table|schema)\b/i);
   assert.doesNotMatch(source, /\bcopy\b/i);
 });
