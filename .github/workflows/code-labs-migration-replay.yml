@@ -37,6 +37,33 @@ jobs:
       - name: Run source replay contract
         run: node --test supabase/functions/code-labs-mcp-stub/migration-replay-baseline.contract.test.mjs
 
+      - name: Audit unique migration versions
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const dir = path.join(process.cwd(), 'supabase', 'migrations');
+          const groups = new Map();
+          for (const name of fs.readdirSync(dir).filter((value) => value.endsWith('.sql')).sort()) {
+            const match = name.match(/^(\d+)_/);
+            if (!match) continue;
+            const list = groups.get(match[1]) || [];
+            list.push(name);
+            groups.set(match[1], list);
+          }
+          const duplicates = [...groups.entries()].filter(([, names]) => names.length > 1);
+          if (duplicates.length === 0) {
+            console.log('All migration versions are unique.');
+            process.exit(0);
+          }
+          console.error('Duplicate migration versions found:');
+          for (const [version, names] of duplicates) {
+            console.error(`${version}:`);
+            for (const name of names) console.error(`  - ${name}`);
+          }
+          process.exit(1);
+          NODE
+
       - name: Start disposable local database
         run: supabase db start
 
