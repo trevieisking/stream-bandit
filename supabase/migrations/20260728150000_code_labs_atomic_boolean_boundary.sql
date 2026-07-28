@@ -1,4 +1,4 @@
--- Code Labs atomic workspace strict boolean boundary.
+-- Code Labs atomic workspace strict boolean and failure-persistence boundary.
 -- EXPANSION ONLY: safe to install before the atomic-only runtime is deployed.
 -- The currently deployed V49 runtime does not call either RPC in this file.
 
@@ -48,6 +48,9 @@ declare
   v_effect jsonb;
   v_request jsonb;
   v_index integer;
+  v_workspace_state_version bigint;
+  v_reserved_fencing_token bigint;
+  v_result jsonb;
 begin
   if p_payload is null or jsonb_typeof(p_payload) <> 'object' then
     raise exception using errcode = 'P0001', message = 'atomic_action_request_invalid';
@@ -87,7 +90,27 @@ begin
     end if;
   end if;
 
-  return public.code_labs_execute_workspace_action(
+  -- The wrapper owns the workspace lock. It survives the raw function's inner
+  -- exception subtransaction and serialises every atomic attempt per owner.
+  select s.state_version, s.workspace_fencing_token + 1
+  into v_workspace_state_version, v_reserved_fencing_token
+  from public.code_labs_workspace_state s
+  where s.owner_id = p_owner_id
+  for update;
+
+  perform set_config('code_labs.operation_id', p_operation_id::text, true);
+  if v_workspace_state_version is not distinct from p_expected_state_version then
+    perform set_config(
+      'code_labs.fencing_token',
+      v_reserved_fencing_token::text,
+      true
+    );
+  else
+    perform set_config('code_labs.fencing_token', '', true);
+    v_reserved_fencing_token := null;
+  end if;
+
+  v_result := public.code_labs_execute_workspace_action(
     p_owner_id,
     p_operation_id,
     p_action,
@@ -96,6 +119,36 @@ begin
     p_payload,
     p_fencing_token
   );
+
+  -- Validation failures remain fence-free. An unexpected interruption reserves
+  -- the attempted fence without advancing state_version or workspace_fencing_token.
+  -- The same operation must retry with this fence before another action can pass.
+  if coalesce(v_result->>'status', '') = 'interrupted'
+     and nullif(v_result->>'fencing_token', '') is null
+     and v_reserved_fencing_token is not null then
+    update public.code_labs_action_runs r
+    set fencing_token = v_reserved_fencing_token,
+        stored_result = jsonb_set(
+          coalesce(r.stored_result, '{}'::jsonb),
+          '{fencing_token}',
+          to_jsonb(v_reserved_fencing_token),
+          true
+        ),
+        updated_at = now()
+    where r.owner_id = p_owner_id
+      and r.operation_id = p_operation_id
+      and r.status = 'interrupted'
+      and r.fencing_token is null
+    returning r.stored_result into v_result;
+
+    if not found then
+      raise exception using
+        errcode = 'P0001',
+        message = 'operation_failure_fence_persistence_failed';
+    end if;
+  end if;
+
+  return v_result;
 end;
 $$;
 
@@ -110,6 +163,11 @@ revoke all on function public.code_labs_execute_workspace_action_strict(
 revoke execute on function public.code_labs_execute_workspace_action(
   uuid, uuid, text, bigint, text, jsonb, bigint
 ) from service_role;
+
+-- Direct action-run writes would bypass the wrapper's workspace lock and fence.
+revoke insert, update, delete on table public.code_labs_action_runs
+  from service_role;
+grant select on table public.code_labs_action_runs to service_role;
 
 grant execute on function public.code_labs_execute_workspace_action_strict(
   uuid, uuid, text, bigint, text, jsonb, bigint
