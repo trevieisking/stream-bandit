@@ -37,12 +37,36 @@ jobs:
       - name: Run source replay contract
         run: node --test supabase/functions/code-labs-mcp-stub/migration-replay-baseline.contract.test.mjs
 
-      - name: Audit unique migration versions
+      - name: Normalise historical migration versions in disposable checkout
         run: |
           node <<'NODE'
           const fs = require('node:fs');
           const path = require('node:path');
           const dir = path.join(process.cwd(), 'supabase', 'migrations');
+          const mapping = new Map([
+            ['20260710_code_labs_live_browser_control.sql', '20260710220113_code_labs_live_browser_control.sql'],
+            ['20260710_code_labs_v106_browser_approval.sql', '20260710232703_code_labs_v106_browser_approval.sql'],
+            ['20260713_upgrade_existing_code_labs_v104_page_approval.sql', '20260713160832_upgrade_existing_code_labs_v104_page_approval.sql'],
+            ['20260713_harden_v104_page_claim_ownership.sql', '20260713203140_harden_v104_page_claim_ownership.sql'],
+            ['20260714_code_labs_v104_oauth_grants.sql', '20260714113742_code_labs_v104_oauth_grants.sql'],
+            ['20260714_code_labs_v104_oauth_owner_tokens.sql', '20260714133641_code_labs_v104_oauth_owner_tokens.sql'],
+            ['20260714_code_labs_v104_tool_only_workspace.sql', '20260714170700_code_labs_v104_tool_only_workspace.sql'],
+            ['20260718_code_labs_atomic_workspace_reservation.sql', '20260718195657_code_labs_atomic_workspace_reservation.sql'],
+            ['20260718_code_labs_json_workspace_reservation.sql', '20260718211148_code_labs_json_workspace_reservation.sql'],
+            ['20260718_code_labs_scalar_workspace_reservation.sql', '20260718212457_code_labs_scalar_workspace_reservation.sql'],
+            ['20260718_code_labs_writer_reservation_id.sql', '20260718213016_code_labs_writer_reservation_id.sql'],
+            ['20260718_code_labs_writer_atomic_raise.sql', '20260718214334_code_labs_writer_atomic_raise.sql'],
+            ['20260724_code_labs_writer_atomic_claim.sql', '20260724123314_code_labs_writer_atomic_claim.sql'],
+            ['20260724_code_labs_writer_immutable_review_proof.sql', '20260724132611_code_labs_writer_immutable_review_proof.sql'],
+          ]);
+          for (const [from, to] of mapping) {
+            const source = path.join(dir, from);
+            const target = path.join(dir, to);
+            if (!fs.existsSync(source)) throw new Error(`Missing historical migration: ${from}`);
+            if (fs.existsSync(target)) throw new Error(`Target migration already exists: ${to}`);
+            fs.renameSync(source, target);
+            console.log(`${from} -> ${to}`);
+          }
           const groups = new Map();
           for (const name of fs.readdirSync(dir).filter((value) => value.endsWith('.sql')).sort()) {
             const match = name.match(/^(\d+)_/);
@@ -52,16 +76,13 @@ jobs:
             groups.set(match[1], list);
           }
           const duplicates = [...groups.entries()].filter(([, names]) => names.length > 1);
-          if (duplicates.length === 0) {
-            console.log('All migration versions are unique.');
-            process.exit(0);
+          if (duplicates.length > 0) {
+            for (const [version, names] of duplicates) {
+              console.error(`${version}: ${names.join(', ')}`);
+            }
+            throw new Error('Duplicate migration versions remain after normalisation.');
           }
-          console.error('Duplicate migration versions found:');
-          for (const [version, names] of duplicates) {
-            console.error(`${version}:`);
-            for (const name of names) console.error(`  - ${name}`);
-          }
-          process.exit(1);
+          console.log('All migration versions are unique after disposable normalisation.');
           NODE
 
       - name: Start disposable local database
