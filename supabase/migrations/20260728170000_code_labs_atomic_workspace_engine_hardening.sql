@@ -1,4 +1,7 @@
 -- Code Labs atomic workspace engine hardening.
+-- POST-CUTOVER ONLY.
+-- Never apply while code-labs-mcp-stub V49 or any legacy reservation-based
+-- runtime remains active.
 -- Candidate only: apply only after the foundation migration and only in an
 -- isolated database after exact-head review and disposable-database tests.
 
