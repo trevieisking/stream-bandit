@@ -238,6 +238,147 @@ Deno.test("source contract: migration declares lease recovery and durable unique
 });
 
 Deno.test("evidence boundary: source contracts are not runtime database proof", () => {
-  const evidenceKind = "source-contract";
+  const evidenceKind: string = "source-contract";
   assert(evidenceKind !== "database-integration", "Source inspection must never be reported as database integration evidence.");
+});
+
+function functionBody(sourceText: string, name: string) {
+  const marker = "function " + name + "(";
+  const start = sourceText.indexOf(marker);
+  assert(start >= 0, `Missing function: ${name}`);
+  const open = sourceText.indexOf("{", start + marker.length);
+  assert(open >= 0, `Missing function body: ${name}`);
+  let depth = 0;
+  for (let index = open; index < sourceText.length; index += 1) {
+    const char = sourceText[index];
+    if (char === "{") depth += 1;
+    if (char === "}") {
+      depth -= 1;
+      if (depth === 0) return sourceText.slice(open + 1, index);
+    }
+  }
+  throw new Error(`Unclosed function body: ${name}`);
+}
+
+function executableFunction(sourceText: string, name: string, parameters: string[]) {
+  return new Function(...parameters, functionBody(sourceText, name));
+}
+
+function executableAsyncFunction(sourceText: string, name: string, parameters: string[]) {
+  const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+  return new AsyncFunction(...parameters, functionBody(sourceText, name));
+}
+
+function assertThrows(fn: () => unknown, message: string) {
+  let threw = false;
+  try {
+    fn();
+  } catch {
+    threw = true;
+  }
+  assert(threw, message);
+}
+
+Deno.test("File candidate path helper executes accepted and protected-path fixtures", async () => {
+  const main = await source("./main.ts");
+  const safeCandidatePath = executableFunction(main, "safeCandidatePath", ["value"]) as (value: unknown) => string;
+
+  assertEqual(safeCandidatePath("src/new-file.ts"), "src/new-file.ts", "A normal repository-relative path must be accepted.");
+  assertEqual(safeCandidatePath(" docs/new-file.md "), "docs/new-file.md", "Safe surrounding whitespace must be trimmed.");
+
+  for (const unsafe of [
+    "",
+    "/absolute.ts",
+    "folder/",
+    "../escape.ts",
+    "folder\\escape.ts",
+    ".hidden.ts",
+    ".env",
+    "nested/.env.local",
+    "nested/secret",
+    "nested/secrets",
+    ".github/workflows/write.yml",
+    "private.pem",
+    "private.key",
+    "bad\u0000name.ts",
+  ]) {
+    assertThrows(() => safeCandidatePath(unsafe), `Unsafe path must be rejected: ${JSON.stringify(unsafe)}`);
+  }
+});
+
+Deno.test("File candidate repository helper executes owner/repository fixtures", async () => {
+  const main = await source("./main.ts");
+  const safeRepo = executableFunction(main, "safeRepo", ["value"]) as (value: unknown) => string;
+
+  assertEqual(safeRepo("trevieisking/stream-bandit"), "trevieisking/stream-bandit", "The selected repository format must be accepted.");
+  for (const unsafe of ["", "stream-bandit", "/stream-bandit", "owner/", "owner/repo/extra", "owner repo/name"]) {
+    assertThrows(() => safeRepo(unsafe), `Unsafe repository must be rejected: ${JSON.stringify(unsafe)}`);
+  }
+});
+
+Deno.test("File candidate deterministic identity executes stable and separating fixtures", async () => {
+  const main = await source("./main.ts");
+  const deterministicFileId = executableAsyncFunction(main, "deterministicFileId", ["ownerId", "projectId", "path"]) as (
+    ownerId: string,
+    projectId: string,
+    path: string,
+  ) => Promise<string>;
+
+  const first = await deterministicFileId("owner-a", "project-a", "src/new-file.ts");
+  const replay = await deterministicFileId("owner-a", "project-a", "src/new-file.ts");
+  const otherPath = await deterministicFileId("owner-a", "project-a", "src/other.ts");
+  const otherProject = await deterministicFileId("owner-a", "project-b", "src/new-file.ts");
+
+  assertEqual(first, replay, "An identical new-file request must resolve to one deterministic identity.");
+  assert(first !== otherPath, "Different paths must not share a file identity.");
+  assert(first !== otherProject, "Different projects must not share a file identity.");
+  assert(
+    /^[0-9a-f]{8}-[0-9a-f]{4}-8[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(first),
+    "The deterministic file identity must be UUIDv8-shaped.",
+  );
+});
+
+Deno.test("File candidate reservation helper executes intake and create-candidate fixtures", async () => {
+  const main = await source("./main.ts");
+  const fileReservationActive = new Function(
+    "value",
+    'const INTAKE_RESERVATION_PREFIX = "file_intake_pending:";' +
+      'const CREATE_CANDIDATE_RESERVATION_PREFIX = "file_create_candidate_pending:";' +
+      functionBody(main, "fileReservationActive"),
+  ) as (value: unknown) => boolean;
+
+  assert(fileReservationActive("file_intake_pending:123"), "An intake reservation must be recognised.");
+  assert(fileReservationActive("file_create_candidate_pending:123"), "A new-file candidate reservation must be recognised.");
+  assert(!fileReservationActive("file"), "A completed File Lab step must not be treated as reserved.");
+  assert(!fileReservationActive("project"), "A project step must not be treated as reserved.");
+});
+
+Deno.test("source contract: new-file candidate stays proposed-only and cannot call GitHub", async () => {
+  const main = await source("./main.ts");
+  const candidate = block(main, "async function createFileCandidate", "\nfunction actionsWithFileBootstrap");
+
+  assert(!candidate.includes("githubRequest("), "New-file candidate creation must not call GitHub.");
+  assert(!candidate.includes("verifyOwnerRepository("), "New-file candidate creation must not acquire GitHub authority.");
+  assertIncludes(candidate, 'source: "file.create_candidate"', "The proposed row must identify its source action.");
+  assertIncludes(candidate, "proposed: true", "The new-file row must remain proposed-only.");
+  assertIncludes(candidate, 'current_code: ""', "The new-file row must not pretend candidate code is live source.");
+  assertIncludes(candidate, "github_source_verified: false", "The candidate must not claim GitHub source verification.");
+  assertIncludes(candidate, "can_authorize_writer: false", "The candidate must not authorise Writer.");
+  assertIncludes(candidate, "if (file && !matchingProposedFile)", "A real or conflicting file must be refused.");
+  assertIncludes(candidate, "matchingProposedFile &&", "An identical proposed row must be eligible for replay.");
+  assertIncludes(candidate, "wrote_database: false", "A completed identical replay must report no new database write.");
+  assertIncludes(candidate, "wrote_github: false", "Every candidate result must report no GitHub write.");
+  assertIncludes(candidate, "releaseFileReservation", "Failure must attempt to release the workspace reservation.");
+});
+
+Deno.test("source contract: new-file candidate action is listed and dispatched deliberately", async () => {
+  const main = await source("./main.ts");
+  assertIncludes(main, '{ action: "file.create_candidate", requires_confirmation: false }', "The new-file action must be listed explicitly.");
+  assertIncludes(main, 'if (action === "file.create_candidate") return createFileCandidate(b, args);', "The dispatcher must route only the exact action ID.");
+});
+
+Deno.test("evidence boundary: executable pure helpers are not database integration proof", () => {
+  const evidenceKind: string = "executable-pure-helper";
+  const missingEvidence: string = "database-integration";
+  assert(evidenceKind !== missingEvidence, "Pure helper execution must not be reported as database integration evidence.");
 });

@@ -72,16 +72,22 @@ async function deterministicFileId(ownerId: string, projectId: string, path: str
 }
 
 const INTAKE_RESERVATION_PREFIX = "file_intake_pending:";
+const CREATE_CANDIDATE_RESERVATION_PREFIX = "file_create_candidate_pending:";
 
 function intakeReservationStep() {
   return INTAKE_RESERVATION_PREFIX + crypto.randomUUID();
 }
 
-function intakeReserved(value: unknown) {
-  return String(value || "").startsWith(INTAKE_RESERVATION_PREFIX);
+function createCandidateReservationStep() {
+  return CREATE_CANDIDATE_RESERVATION_PREFIX + crypto.randomUUID();
 }
 
-async function releaseIntakeReservation(ownerId: string, stateVersion: number, marker: string, fallbackStep: string) {
+function fileReservationActive(value: unknown) {
+  const step = String(value || "");
+  return step.startsWith(INTAKE_RESERVATION_PREFIX) || step.startsWith(CREATE_CANDIDATE_RESERVATION_PREFIX);
+}
+
+async function releaseFileReservation(ownerId: string, stateVersion: number, marker: string, fallbackStep: string) {
   try {
     const rows = await rest("code_labs_workspace_state?owner_id=eq." + encodeURIComponent(ownerId) + "&state_version=eq." + encodeURIComponent(stateVersion) + "&workflow_step=eq." + encodeURIComponent(marker), {
       method: "PATCH",
@@ -100,6 +106,20 @@ function safeIntakePath(value: unknown) {
     throw new Error("A safe repository-relative File Lab path is required.");
   }
   return path;
+}
+
+function safeCandidatePath(value: unknown) {
+  const path = String(value || "").trim();
+  if (!path || path.startsWith("/") || path.endsWith("/") || path.includes("..") || path.includes("\\") || path.startsWith(".") || /[\u0000-\u001f\u007f]/.test(path) || /(?:^|\/)(?:secrets?|\.env[^/]*)$/i.test(path) || /\.(?:pem|key|p12|pfx)$/i.test(path) || path.startsWith(".github/")) {
+    throw new Error("A safe new repository-relative candidate path is required.");
+  }
+  return path;
+}
+
+function safeRepo(value: unknown) {
+  const repo = String(value || "").trim();
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)) throw new Error("A valid owner/repository is required.");
+  return repo;
 }
 
 function fileType(path: string) {
@@ -149,6 +169,25 @@ async function intakeReceipt(ownerId: string, fileId: string, created: boolean, 
   return Array.isArray(rows) ? rows[0] || null : null;
 }
 
+async function createCandidateReceipt(ownerId: string, fileId: string, created: boolean, path: string, candidateHash: string, stateVersion: number) {
+  const rows = await rest("code_labs_action_receipts", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({
+      owner_id: ownerId,
+      action: "file.create_candidate",
+      record_type: "file",
+      record_id: fileId,
+      before_data: {},
+      after_data: { path, candidate_hash: candidateHash, proposed_only: true, selected: true, downstream_cleared: true, state_version: stateVersion, concurrency_reserved: true, wrote_github: false },
+      changed_fields: ["current_file_id", "current_job_id", "current_packet_id", "current_test_run_id", "workflow_step", "state_version"],
+      created_new_row: created,
+      undo_available: false,
+    }),
+  });
+  return Array.isArray(rows) ? rows[0] || null : null;
+}
+
 async function intakeFile(b: any, args: Row) {
   const expectedVersion = Number(args.expected_state_version);
   if (!Number.isInteger(expectedVersion) || expectedVersion < 1) throw new Error("expected_state_version is required.");
@@ -158,7 +197,7 @@ async function intakeFile(b: any, args: Row) {
   const stateRows = await rest("code_labs_workspace_state?select=*&owner_id=eq." + encodeURIComponent(b.owner_id) + "&limit=1");
   const before = Array.isArray(stateRows) ? stateRows[0] || null : null;
   if (!before || Number(before.state_version) !== expectedVersion) throw new Error("Workspace state changed. Read the workspace again before writing.");
-  if (intakeReserved(before.workflow_step)) throw new Error("Another File Lab intake is already reserved. Read the workspace before retrying.");
+  if (fileReservationActive(before.workflow_step)) throw new Error("Another File Lab operation is already reserved. Read the workspace before retrying.");
   if (!before.current_project_id) throw new Error("Select the File Lab project first.");
   const projectRows = await rest("code_labs_projects?select=id,repo&owner_id=eq." + encodeURIComponent(b.owner_id) + "&id=eq." + encodeURIComponent(before.current_project_id) + "&limit=1");
   const project = Array.isArray(projectRows) ? projectRows[0] || null : null;
@@ -241,15 +280,126 @@ async function intakeFile(b: any, args: Row) {
       deleted_anything: false,
     };
   } catch (error) {
-    await releaseIntakeReservation(b.owner_id, expectedVersion + 1, reservationStep, fallbackStep);
+    await releaseFileReservation(b.owner_id, expectedVersion + 1, reservationStep, fallbackStep);
     throw error;
   }
 }
 
-function actionsWithIntake() {
+async function createFileCandidate(b: any, args: Row) {
+  const expectedVersion = Number(args.expected_state_version);
+  if (!Number.isInteger(expectedVersion) || expectedVersion < 1) throw new Error("expected_state_version is required.");
+  const input = args.fields && typeof args.fields === "object" ? args.fields : {};
+  const path = safeCandidatePath(input.path);
+  const repo = safeRepo(input.repo);
+  const candidateCode = String(args.candidate_code ?? input.candidate_code ?? "");
+  const candidateSize = new TextEncoder().encode(candidateCode).length;
+  if (!candidateCode || candidateSize > 750000) throw new Error("candidate_code is required and must be under 750000 bytes.");
+  const candidateHash = await hashText(candidateCode);
+  const note = String(args.note ?? input.note ?? "").slice(0, 4000);
+  const stateRows = await rest("code_labs_workspace_state?select=*&owner_id=eq." + encodeURIComponent(b.owner_id) + "&limit=1");
+  const before = Array.isArray(stateRows) ? stateRows[0] || null : null;
+  if (!before || Number(before.state_version) !== expectedVersion) throw new Error("Workspace state changed. Read the workspace again before writing.");
+  if (fileReservationActive(before.workflow_step)) throw new Error("Another File Lab operation is already reserved. Read the workspace before retrying.");
+  if (!before.current_project_id) throw new Error("Select the File Lab project first.");
+  const projectRows = await rest("code_labs_projects?select=id,repo&owner_id=eq." + encodeURIComponent(b.owner_id) + "&id=eq." + encodeURIComponent(before.current_project_id) + "&limit=1");
+  const project = Array.isArray(projectRows) ? projectRows[0] || null : null;
+  if (!project || String(project.repo || "") !== repo) throw new Error("The selected File Lab project and requested repository do not match.");
+  const matches = await rest("code_labs_files?select=*&owner_id=eq." + encodeURIComponent(b.owner_id) + "&project_id=eq." + encodeURIComponent(project.id) + "&filename=eq." + encodeURIComponent(path) + "&order=updated_at.desc&limit=2");
+  if (!Array.isArray(matches)) throw new Error("File Lab could not read its exact file inventory.");
+  if (matches.length > 1) throw new Error("Multiple File Lab rows already exist for this exact path. Resolve the duplicate before creating a candidate.");
+  let file = matches[0] || null;
+  const existingMetadata = file?.metadata && typeof file.metadata === "object" && !Array.isArray(file.metadata) ? file.metadata as Row : {};
+  const matchingProposedFile = Boolean(file) && existingMetadata.source === "file.create_candidate" && existingMetadata.proposed === true && String(existingMetadata.candidate_hash || "") === candidateHash && String(existingMetadata.fixed_output || "") === candidateCode;
+  if (file && !matchingProposedFile) throw new Error("A File Lab record already exists for this path. Intake or select the existing file instead of replacing it.");
+  if (matchingProposedFile && String(before.current_file_id || "") === String(file.id) && !before.current_job_id && !before.current_packet_id && !before.current_test_run_id && String(before.workflow_step || "") === "file") {
+    return {
+      ok: true,
+      version: VERSION,
+      tool: "run_code_labs_action",
+      action: "file.create_candidate",
+      replayed: true,
+      file: { path, file_type: file.file_type, candidate_hash: candidateHash, created: false, proposed_only: true, source_verified: false, deterministic_identity: true },
+      workspace: { workflow_step: before.workflow_step, state_version: before.state_version, downstream_cleared: true, reservation_released: true },
+      receipt: null,
+      wrote_database: false,
+      wrote_github: false,
+      opened_pr: false,
+      deleted_anything: false,
+    };
+  }
+  const now = new Date().toISOString();
+  const reservationStep = createCandidateReservationStep();
+  const fallbackStep = String(before.workflow_step || (before.current_file_id ? "file" : "project"));
+  const lockedRows = await rest("code_labs_workspace_state?owner_id=eq." + encodeURIComponent(b.owner_id) + "&state_version=eq." + encodeURIComponent(expectedVersion) + "&current_project_id=eq." + encodeURIComponent(project.id) + "&workflow_step=eq." + encodeURIComponent(fallbackStep), {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ workflow_step: reservationStep, state_version: expectedVersion + 1, updated_at: now }),
+  });
+  const locked = Array.isArray(lockedRows) ? lockedRows[0] || null : null;
+  if (!locked) throw new Error("Workspace state changed before the new-file candidate could be reserved.");
+  let created = false;
+  try {
+    if (!file) {
+      const currentHash = await hashText("");
+      const candidateMetadata = {
+        source: "file.create_candidate",
+        source_repo: repo,
+        source_path: path,
+        proposed: true,
+        proposed_hash: candidateHash,
+        fixed_output: candidateCode,
+        candidate_hash: candidateHash,
+        candidate_note: note,
+        candidate_saved_at: now,
+        github_source_verified: false,
+        owner_scoped_project_verified: true,
+        can_authorize_writer: false,
+        create_candidate_at: now,
+      };
+      const rows = await rest("code_labs_files", {
+        method: "POST",
+        headers: { Prefer: "return=representation" },
+        body: JSON.stringify({ id: await deterministicFileId(b.owner_id, project.id, path), owner_id: b.owner_id, project_id: project.id, filename: path, file_type: fileType(path), current_code: "", current_hash: currentHash, metadata: candidateMetadata }),
+      });
+      file = Array.isArray(rows) ? rows[0] || null : null;
+      created = true;
+    }
+    if (!file) throw new Error("File Lab could not save the proposed new-file candidate.");
+    const selectedRows = await rest("code_labs_workspace_state?owner_id=eq." + encodeURIComponent(b.owner_id) + "&state_version=eq." + encodeURIComponent(expectedVersion + 1) + "&current_project_id=eq." + encodeURIComponent(project.id) + "&workflow_step=eq." + encodeURIComponent(reservationStep), {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ current_file_id: file.id, current_job_id: null, current_packet_id: null, current_test_run_id: null, workflow_step: "file", state_version: expectedVersion + 2, updated_at: new Date().toISOString() }),
+    });
+    const selected = Array.isArray(selectedRows) ? selectedRows[0] || null : null;
+    if (!selected) throw new Error("The proposed file was saved but the workspace changed before selection completed. Read the workspace and retry the same candidate safely.");
+    return {
+      ok: true,
+      version: VERSION,
+      tool: "run_code_labs_action",
+      action: "file.create_candidate",
+      replayed: !created,
+      file: { path, file_type: file.file_type, candidate_hash: candidateHash, created, proposed_only: true, source_verified: false, deterministic_identity: true },
+      workspace: { workflow_step: selected.workflow_step, state_version: selected.state_version, downstream_cleared: true, reservation_released: true },
+      receipt: await createCandidateReceipt(b.owner_id, file.id, created, path, candidateHash, Number(selected.state_version)),
+      wrote_database: true,
+      wrote_github: false,
+      opened_pr: false,
+      deleted_anything: false,
+    };
+  } catch (error) {
+    await releaseFileReservation(b.owner_id, expectedVersion + 1, reservationStep, fallbackStep);
+    throw error;
+  }
+}
+
+function actionsWithFileBootstrap() {
   const result = listActions();
   const actions = Array.isArray(result.actions) ? result.actions : [];
-  return { ...result, actions: [{ action: "file.intake", requires_confirmation: false }, ...actions] };
+  return { ...result, actions: [
+    { action: "file.intake", requires_confirmation: false },
+    { action: "file.create_candidate", requires_confirmation: false },
+    ...actions,
+  ] };
 }
 
 async function call(b: any, name: string, args: Row) {
@@ -258,7 +408,7 @@ async function call(b: any, name: string, args: Row) {
   if (name === "get_code_labs_workspace") return getWorkspace(b);
   if (name === "list_code_labs_records") return listRecords(b, args);
   if (name === "read_code_labs_current_file") return readCurrentFile(b);
-  if (name === "list_code_labs_actions") return actionsWithIntake();
+  if (name === "list_code_labs_actions") return actionsWithFileBootstrap();
   if (name === "read_code_labs_receipt") return readReceipt(b, args);
   if (name === "get_cg_repair_lab_access") return getCgRepairLabAccess(b);
   if (name === "get_cg_repair_lab_workflow") return getCgRepairLabWorkflow();
@@ -273,7 +423,12 @@ async function call(b: any, name: string, args: Row) {
   if (name === "save_code_labs_candidate") return saveCandidate(b, args);
   if (name === "upsert_code_labs_test_result") return updateTest(b, args);
   if (name === "create_code_labs_checkpoint") return createCheckpoint(b, args);
-  if (name === "run_code_labs_action") return String(args.action || "") === "file.intake" ? intakeFile(b, args) : runAction(b, args);
+  if (name === "run_code_labs_action") {
+    const action = String(args.action || "");
+    if (action === "file.intake") return intakeFile(b, args);
+    if (action === "file.create_candidate") return createFileCandidate(b, args);
+    return runAction(b, args);
+  }
   if (name === "execute_code_labs_github_writer") return executeDirectGithubWriter(b, args);
   if (name === "undo_code_labs_action") return undoAction(b, args);
   if (name === "save_code_labs_write_request") return saveRequest(b, args);

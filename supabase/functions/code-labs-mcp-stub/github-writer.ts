@@ -109,6 +109,67 @@ function sameReviewProof(left: Row, right: Row) {
     left.source_file_id === right.source_file_id;
 }
 
+function exactOpenHeadPulls(value: unknown, repo: string, branch: string) {
+  if (!Array.isArray(value)) {
+    throw new Error("GitHub did not return an open pull-request inventory.");
+  }
+  return value.filter((pull: Row) =>
+    String(pull?.state || "") === "open" &&
+    pull?.merged_at == null &&
+    String(pull?.head?.ref || "") === branch &&
+    String(pull?.head?.repo?.full_name || "").toLowerCase() === repo.toLowerCase()
+  );
+}
+
+function verifiedPullBinding(pull: Row, repo: string, branch: string) {
+  const number = Number(pull?.number || 0);
+  const url = String(pull?.html_url || "");
+  const base = String(pull?.base?.ref || "");
+  const head = String(pull?.head?.ref || "");
+  const headRepo = String(pull?.head?.repo?.full_name || "");
+  if (
+    !number || !url || !base || head !== branch ||
+    headRepo.toLowerCase() !== repo.toLowerCase() ||
+    String(pull?.state || "") !== "open" || pull?.merged_at != null ||
+    pull?.draft !== true
+  ) {
+    throw new Error("The open pull request is not a valid draft binding for this Writer request.");
+  }
+  return { number, url, base, head, reused: true };
+}
+
+async function resolvePullBinding(
+  repoPath: string,
+  repo: string,
+  owner: string,
+  branch: string,
+  defaultBranch: string,
+  token: string,
+) {
+  const pulls = await githubRequest(
+    repoPath + "/pulls?state=open&head=" +
+      encodeURIComponent(owner + ":" + branch),
+    token,
+  );
+  const matches = exactOpenHeadPulls(pulls, repo, branch);
+  if (matches.length > 1) {
+    throw new Error("Multiple open pull requests use this Writer branch. Resolve the ambiguity before committing.");
+  }
+  if (matches.length === 1) {
+    return { pull: matches[0], binding: verifiedPullBinding(matches[0], repo, branch) };
+  }
+  return {
+    pull: null,
+    binding: {
+      number: 0,
+      url: "",
+      base: defaultBranch,
+      head: branch,
+      reused: false,
+    },
+  };
+}
+
 async function claimRequest(ownerId: string, requestId: string, claimId: string) {
   const value = await rest("rpc/code_labs_claim_write_request", {
     method: "POST",
@@ -138,9 +199,10 @@ function safeFailureMessage(stage: string, error: unknown) {
     request_claim: "The queued request is already claimed or no longer executable.",
     github_token: "GitHub App installation authentication failed.",
     branch_verification: "The required GitHub branch could not be verified.",
+    pr_binding: "The branch could not be bound to one unambiguous draft pull request.",
     file_lookup: "The target GitHub file could not be read safely.",
     file_commit: "GitHub did not accept the reviewed complete-file commit.",
-    draft_pr: "The draft pull request could not be opened or reused.",
+    draft_pr: "The draft pull request could not be opened or revalidated.",
     request_update:
       "GitHub completed, but the Code Labs request receipt could not be updated.",
   };
@@ -303,6 +365,26 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       branch_sha: branchSha,
     });
 
+    stage = "pr_binding";
+    const resolved = await resolvePullBinding(
+      repoPath,
+      authority.repo,
+      authority.owner,
+      branch,
+      authority.default_branch,
+      token,
+    );
+    let pull = resolved.pull;
+    let pullBinding = resolved.binding;
+    await audit(requestId, "pull_request_bound", {
+      claim_id: claimId,
+      branch,
+      base: pullBinding.base,
+      pull_request_number: pullBinding.number || null,
+      reused: pullBinding.reused,
+      bound_before_commit: true,
+    });
+
     stage = "file_lookup";
     let currentSha: string | null = null;
     try {
@@ -346,17 +428,25 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       path,
       commit_sha: commitSha,
       content_sha: contentSha,
+      pull_request_number: pullBinding.number || null,
+      pull_request_base: pullBinding.base,
     });
 
     stage = "draft_pr";
-    const pulls = await githubRequest(
-      repoPath + "/pulls?state=open&head=" +
-        encodeURIComponent(authority.owner + ":" + branch) + "&base=" +
-        encodeURIComponent(authority.default_branch),
-      token,
-    );
-    let pull = Array.isArray(pulls) ? pulls[0] : null;
-    if (!pull) {
+    if (pullBinding.reused) {
+      pull = await githubRequest(
+        repoPath + "/pulls/" + encodeURIComponent(pullBinding.number),
+        token,
+      );
+      const revalidated = verifiedPullBinding(pull, authority.repo, branch);
+      if (
+        revalidated.number !== pullBinding.number ||
+        revalidated.base !== pullBinding.base
+      ) {
+        throw new Error("The bound pull request changed after the commit.");
+      }
+      pullBinding = revalidated;
+    } else {
       pull = await githubRequest(repoPath + "/pulls", token, {
         method: "POST",
         body: JSON.stringify({
@@ -365,24 +455,26 @@ export async function executeGithubWriter(b: Binding, args: Row) {
             request.pr_body || "Prepared by Code Labs after Code God PASS.",
           ),
           head: branch,
-          base: authority.default_branch,
+          base: pullBinding.base,
           draft: true,
           maintainer_can_modify: false,
         }),
       });
+      pullBinding = verifiedPullBinding(pull, authority.repo, branch);
+      pullBinding.reused = false;
     }
-    const pullNumber = Number(pull?.number || 0);
-    const pullUrl = String(pull?.html_url || "");
-    if (!pullNumber || !pullUrl) {
-      throw new Error("GitHub did not return pull-request proof.");
-    }
+    const pullNumber = pullBinding.number;
+    const pullUrl = pullBinding.url;
     progress.pull_request_number = pullNumber;
     progress.pull_request_url = pullUrl;
-    await audit(requestId, "draft_pr_opened", {
+    await audit(requestId, pullBinding.reused ? "draft_pr_reused" : "draft_pr_opened", {
       claim_id: claimId,
       pull_request_number: pullNumber,
       pull_request_url: pullUrl,
-      reused: Array.isArray(pulls) && pulls.length > 0,
+      base: pullBinding.base,
+      head: pullBinding.head,
+      reused: pullBinding.reused,
+      bound_before_commit: true,
     });
 
     stage = "request_update";
@@ -415,7 +507,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       tool: "execute_code_labs_github_writer",
       wrote_database: true,
       wrote_github: true,
-      opened_pr: true,
+      opened_pr: !pullBinding.reused,
       deleted_anything: false,
       request: updated[0],
       github: {
@@ -425,7 +517,9 @@ export async function executeGithubWriter(b: Binding, args: Row) {
         content_sha: contentSha,
         pull_request_number: pullNumber,
         pull_request_url: pullUrl,
+        pull_request_base: pullBinding.base,
         draft: true,
+        reused: pullBinding.reused,
       },
     };
   } catch (error) {
