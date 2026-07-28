@@ -1,5 +1,5 @@
 /**
- * Red source-contract tests for the Code Labs expand–cutover sequence.
+ * Red source-contract tests for the Code Labs expand-cutover sequence.
  *
  * These tests protect the currently deployed V49 function from schema skew while
  * the atomic-only replacement is prepared. They are source-contract evidence
@@ -18,6 +18,37 @@ function assertExcludes(source: string, forbidden: string, message: string) {
   assert(!source.includes(forbidden), `${message} Forbidden: ${forbidden}`);
 }
 
+/**
+ * Remove dollar-quoted SQL bodies before inspecting migration-time statements.
+ *
+ * A CREATE FUNCTION body can contain UPDATE/INSERT/DELETE statements without
+ * executing those statements when the migration is applied. Expansion safety
+ * must therefore inspect top-level migration SQL separately from dormant RPC
+ * implementation text.
+ */
+function stripDollarQuotedBodies(source: string) {
+  const opener = /\$[A-Za-z_][A-Za-z0-9_]*\$|\$\$/g;
+  let output = "";
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = opener.exec(source))) {
+    const delimiter = match[0];
+    const closing = source.indexOf(delimiter, opener.lastIndex);
+    if (closing < 0) {
+      output += source.slice(cursor);
+      return output;
+    }
+
+    output += source.slice(cursor, match.index);
+    output += `${delimiter}/* dollar-quoted body omitted for top-level inspection */${delimiter}`;
+    cursor = closing + delimiter.length;
+    opener.lastIndex = cursor;
+  }
+
+  return output + source.slice(cursor);
+}
+
 async function read(relative: string) {
   return await Deno.readTextFile(new URL(relative, import.meta.url));
 }
@@ -32,31 +63,37 @@ async function enforcement() {
 
 Deno.test("expand contract: the pre-cutover migration remains backward compatible with V49", async () => {
   const sql = await expansion();
+  const topLevelSql = stripDollarQuotedBodies(sql);
 
   assertIncludes(
     sql,
     "Candidate only: do not apply to production",
     "The expansion candidate must retain an explicit non-production boundary.",
   );
-  assertExcludes(
+  assertIncludes(
     sql,
+    "create or replace function public.code_labs_execute_workspace_action",
+    "The expansion may define the dormant atomic RPC without executing its mutation body.",
+  );
+  assertExcludes(
+    topLevelSql,
     "create trigger",
     "The expansion phase must not attach enforcement triggers to tables used by V49.",
   );
   assertExcludes(
-    sql,
+    topLevelSql,
     "drop function public.code_labs_reserve_workspace_state_version",
     "The expansion phase must preserve the reservation RPC required by V49.",
   );
   assertExcludes(
-    sql,
+    topLevelSql,
     "revoke all on function public.code_labs_reserve_workspace_state_version",
     "The expansion phase must not revoke the reservation RPC required by V49.",
   );
   assertExcludes(
-    sql,
+    topLevelSql,
     "update public.code_labs_files",
-    "The expansion phase must not rewrite existing live file rows or hash metadata.",
+    "The expansion phase must not rewrite existing live file rows or hash metadata during migration application.",
   );
 });
 
