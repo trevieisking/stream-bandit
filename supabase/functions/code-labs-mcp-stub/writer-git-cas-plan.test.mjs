@@ -45,6 +45,8 @@ async function fixture(overrides = {}) {
     merge_base_sha: request.github_base_sha,
     blob_absent: request.expected_github_blob_absent,
     blob_sha: request.expected_github_blob_sha,
+    blob_type: 'blob',
+    blob_mode: '100644',
     ...overrides.live,
   };
   return { request, live };
@@ -70,6 +72,7 @@ test('CAS plan uses Git Database writes rather than Repository Contents writes',
 
 test('CAS sequence claims first and verifies immutable evidence before creating Git objects', () => {
   assert.equal(WRITER_GIT_CAS_SEQUENCE[0], 'claim_request');
+  assert.ok(WRITER_GIT_CAS_SEQUENCE.indexOf('read_reviewed_parent_tree') < WRITER_GIT_CAS_SEQUENCE.indexOf('verify_immutable_snapshot'));
   assert.ok(WRITER_GIT_CAS_SEQUENCE.indexOf('verify_immutable_snapshot') < WRITER_GIT_CAS_SEQUENCE.indexOf('create_blob'));
   assert.ok(WRITER_GIT_CAS_SEQUENCE.indexOf('create_commit_with_reviewed_parent') < WRITER_GIT_CAS_SEQUENCE.indexOf('update_ref_fast_forward_only'));
 });
@@ -82,7 +85,7 @@ test('create_file requires immutable absence proof', async () => {
 test('create_or_update_file rejects an absent target', async () => {
   const { request, live } = await fixture({
     request: { expected_github_blob_absent: true, expected_github_blob_sha: null },
-    live: { blob_absent: true, blob_sha: null },
+    live: { blob_absent: true, blob_sha: null, blob_type: null, blob_mode: null },
   });
   await assert.rejects(() => buildWriterGitCasPlan(request, live), /requires an existing target blob proof/);
 });
@@ -105,6 +108,32 @@ test('changed target blob is rejected', async () => {
 test('content hash mismatch is rejected', async () => {
   const { request, live } = await fixture({ request: { content: CONTENT + 'changed' } });
   await assert.rejects(() => buildWriterGitCasPlan(request, live), /content no longer matches/);
+});
+
+test('existing executable file mode is preserved', async () => {
+  const { request, live } = await fixture({ live: { blob_mode: '100755' } });
+  const plan = await buildWriterGitCasPlan(request, live);
+  assert.equal(plan.expected_blob_mode, '100755');
+  assert.equal(plan.requests.create_tree.body.tree[0].mode, '100755');
+});
+
+test('new files use the safe regular-file mode', async () => {
+  const { request, live } = await fixture({
+    request: { action: 'create_file', expected_github_blob_absent: true, expected_github_blob_sha: null },
+    live: { blob_absent: true, blob_sha: null, blob_type: null, blob_mode: null },
+  });
+  const plan = await buildWriterGitCasPlan(request, live);
+  assert.equal(plan.requests.create_tree.body.tree[0].mode, '100644');
+});
+
+test('symlink and submodule targets are rejected instead of replaced', async () => {
+  for (const target of [
+    { blob_type: 'blob', blob_mode: '120000' },
+    { blob_type: 'commit', blob_mode: '160000' },
+  ]) {
+    const { request, live } = await fixture({ live: target });
+    await assert.rejects(() => buildWriterGitCasPlan(request, live), /not a writable regular Git blob/);
+  }
 });
 
 test('created commit proof must retain the exact reviewed parent', async () => {
