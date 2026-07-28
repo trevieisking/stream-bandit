@@ -1,9 +1,9 @@
 /**
  * Red source-contract tests for the atomic workspace migration bundle.
  *
- * These tests review the foundation migration together with its additive
- * hardening migration. They must become green before either migration is
- * attempted against an isolated database.
+ * These tests review the foundation, strict boundary and additive hardening
+ * migrations together. They must become green before any migration is attempted
+ * against an isolated database.
  *
  * Evidence boundary: this file is source-contract evidence only. It is not a
  * substitute for disposable-database rollback, concurrency, replay or fencing
@@ -38,10 +38,13 @@ async function migrations() {
   const foundation = await Deno.readTextFile(
     new URL("../../migrations/20260728143000_code_labs_atomic_workspace_engine.sql", import.meta.url),
   );
+  const boundary = await Deno.readTextFile(
+    new URL("../../migrations/20260728150000_code_labs_atomic_boolean_boundary.sql", import.meta.url),
+  );
   const hardening = await Deno.readTextFile(
     new URL("../../migrations/20260728170000_code_labs_atomic_workspace_engine_hardening.sql", import.meta.url),
   );
-  return { foundation, hardening, bundle: `${foundation}\n${hardening}` };
+  return { foundation, boundary, hardening, bundle: `${foundation}\n${boundary}\n${hardening}` };
 }
 
 Deno.test("schema safety: existing constraints are replaced with the new state machine", async () => {
@@ -117,30 +120,46 @@ Deno.test("schema safety: parent-changing patches validate the complete owner hi
   }
 });
 
-Deno.test("schema safety: untrusted JSON booleans are parsed without direct casts", async () => {
-  const { bundle } = await migrations();
+Deno.test("schema safety: untrusted JSON booleans pass one strict service-role boundary", async () => {
+  const { boundary } = await migrations();
+  const atomicClient = await Deno.readTextFile(new URL("./atomic-workspace-engine.ts", import.meta.url));
 
   assertIncludes(
-    bundle,
-    "code_labs_jsonb_boolean",
-    "The migration bundle must use one strict helper for optional JSON booleans.",
+    boundary,
+    "code_labs_require_jsonb_boolean",
+    "The expansion bundle must provide one strict JSON-boolean validator.",
   );
-  assertIncludes(bundle, "writer_expected_blob_absent_invalid", "Malformed Writer absence proof must fail validation.");
-  assertIncludes(bundle, "receipt_boolean_invalid", "Malformed receipt booleans must fail validation.");
-  assertExcludes(
-    bundle,
-    "coalesce((v_request->>'expected_github_blob_absent')::boolean, false)",
-    "Writer input must not rely on a direct boolean cast that can bypass controlled validation.",
+  assertMatches(
+    boundary,
+    /jsonb_typeof\(p_value\) = 'boolean'[\s\S]*?return p_value::text::boolean/i,
+    "Only genuine JSON booleans may be accepted.",
   );
   assertExcludes(
-    bundle,
-    "coalesce((v_receipt_spec->>'created_new_row')::boolean, false)",
-    "Receipt input must not directly cast created_new_row.",
+    boundary,
+    "jsonb_typeof(p_value) = 'string'",
+    "String values such as 'true' and 'false' must not be accepted as booleans.",
+  );
+  assertIncludes(boundary, "writer_expected_blob_absent_invalid", "Malformed Writer absence proof must fail validation.");
+  assertIncludes(boundary, "receipt_boolean_invalid", "Malformed receipt booleans must fail validation.");
+  assertIncludes(
+    boundary,
+    "revoke execute on function public.code_labs_execute_workspace_action",
+    "The service role must not bypass the strict boundary and call the raw transaction.",
+  );
+  assertIncludes(
+    boundary,
+    "grant execute on function public.code_labs_execute_workspace_action_strict",
+    "The service role must enter the strict wrapper only.",
+  );
+  assertIncludes(
+    atomicClient,
+    'rpc/code_labs_execute_workspace_action_strict',
+    "The atomic client must call the strict wrapper.",
   );
   assertExcludes(
-    bundle,
-    "coalesce((v_receipt_spec->>'undo_available')::boolean, false)",
-    "Receipt input must not directly cast undo_available.",
+    atomicClient,
+    'rest("rpc/code_labs_execute_workspace_action",',
+    "The atomic client must not call the raw RPC directly.",
   );
 });
 
