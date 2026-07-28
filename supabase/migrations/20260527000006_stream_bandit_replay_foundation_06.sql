@@ -6,6 +6,20 @@
 
 begin;
 
+-- Shared update trigger helper already present in production before the
+-- recorded migration ledger begins. Later migrations depend on this exact
+-- contract when creating table-specific updated_at triggers.
+create or replace function public.sb_touch_updated_at()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
 -- RLS state mirrors the live foundation before later policy migrations replay.
 alter table public.code_labs_audit_log enable row level security;
 alter table public.code_labs_files enable row level security;
