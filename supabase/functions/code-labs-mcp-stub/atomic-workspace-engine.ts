@@ -203,7 +203,7 @@ export async function executeAtomicWorkspaceAction(
   const requestHash = await atomicRequestHash(normalized);
   const operationId = await atomicOperationId(binding.owner_id, normalized);
 
-  const value = await rest("rpc/code_labs_execute_workspace_action", {
+  const value = await rest("rpc/code_labs_execute_workspace_action_strict", {
     method: "POST",
     headers: { Prefer: "return=representation" },
     body: JSON.stringify({
