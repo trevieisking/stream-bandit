@@ -67,7 +67,7 @@ test('V50 Writer verifies base, head, merge base, blob identity, type and mode',
     'blob_sha: entry == null ? null : exactSha(entry.sha',
     'blob_mode: entry == null ? null : String(entry.mode',
     'blob_type: entry == null ? null : String(entry.type',
-    'parentTree?.truncated',
+    'tree?.truncated',
   ]) {
     assert.match(source, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
