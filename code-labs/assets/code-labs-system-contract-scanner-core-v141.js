@@ -36,13 +36,6 @@
     await Promise.all(Array.from({length:Math.min(limit,items.length)}, run));
     return out;
   }
-  function references(text) {
-    return uniq(Array.from(text.matchAll(/(?:["'`](?:\.\.\/|\.\/)?|\b)(code-labs\/[A-Za-z0-9_./-]+\.(?:html?|js|css|json|md|svg))/g), match=>match[1]));
-  }
-  function storage(text, method) {
-    const regex = new RegExp(`localStorage\\.${method}\\(\\s*["'\\x60]([^"'\\x60]+)`, 'g');
-    return uniq(Array.from(text.matchAll(regex), match=>match[1]));
-  }
   function normalise(from, value) {
     if (!value || /^(?:https?:|data:|mailto:|tel:|#)/i.test(value)) return '';
     const clean=value.split(/[?#]/)[0]; if (!clean) return '';
@@ -51,38 +44,99 @@
     for (const part of clean.split('/')) { if(part==='.'||!part)continue; if(part==='..')base.pop(); else base.push(part); }
     return base.join('/');
   }
+  function references(text, from='') {
+    const found=[];
+    for(const match of text.matchAll(/(?:["'`](?:\.\.\/|\.\/)?|\b)(code-labs\/[A-Za-z0-9_./-]+\.(?:html?|js|css|json|md|svg))/g)) found.push(match[1]);
+    if(from) {
+      for(const match of text.matchAll(/["'`]((?:(?:\.\.\/|\.\/)?assets\/)[A-Za-z0-9_./-]+\.(?:js|css|json|svg)|(?:\.\.\/|\.\/)?[A-Za-z0-9_-]+\.html?)(?:[?#][^"'`]*)?["'`]/g)) {
+        const value=normalise(from,match[1]); if(value.startsWith('code-labs/')) found.push(value);
+      }
+    }
+    return uniq(found);
+  }
+  function constantStrings(text) {
+    const values=new Map();
+    const declarations=/(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*((?:["'`][^"'`]*["'`]\s*\+\s*)*["'`][^"'`]*["'`])/g;
+    let match;
+    while((match=declarations.exec(text))) {
+      const parts=Array.from(match[2].matchAll(/["'`]([^"'`]*)["'`]/g), x=>x[1]);
+      if(parts.length) values.set(match[1],parts.join(''));
+    }
+    return values;
+  }
+  function storage(text, method) {
+    const constants=constantStrings(text), found=[];
+    const calls=new RegExp(`localStorage\\.${method}\\(\\s*([^,\\)]+)`, 'g');
+    let match;
+    while((match=calls.exec(text))) {
+      const expr=match[1].trim();
+      const literal=expr.match(/^["'`]([^"'`]*)["'`]$/);
+      if(literal) found.push(literal[1]);
+      else if(constants.has(expr)) found.push(constants.get(expr));
+      else found.push(`[dynamic:${expr.slice(0,80)}]`);
+    }
+    return uniq(found);
+  }
+  function storageAuthority(key) {
+    const value=String(key||'');
+    if(value==='codeLabsV1State'||/workflow|current(file|project|job|packet|test)|candidate|codegod|writer|handoff/i.test(value)) return 'workflow_authoritative_risk';
+    if(/token|auth|session|credential|secret/i.test(value)) return 'security_sensitive';
+    if(/memory|counter|tooluse|preference|theme|layout/i.test(value)) return 'local_utility';
+    if(/draft|backup|canvas|packet|pending|autosave/i.test(value)) return 'local_draft_or_backup';
+    if(value.startsWith('[dynamic:')) return 'dynamic_needs_review';
+    return 'local_unknown';
+  }
+  function transitiveScripts(directScripts, fileMap) {
+    const seen=new Set(), queue=[...directScripts];
+    while(queue.length) {
+      const path=queue.shift(); if(seen.has(path)||!fileMap.has(path)) continue; seen.add(path);
+      for(const ref of references(fileMap.get(path)||'',path)) if(/\.js$/i.test(ref)&&!seen.has(ref)) queue.push(ref);
+    }
+    return [...seen];
+  }
   function authEvidence(text) {
-    const evidence=[];
-    const checks=[
-      ['browser_session',/supabase\.auth|getSession\s*\(|onAuthStateChange\s*\(/i],
-      ['bearer_token',/Authorization|Bearer\s+/i],
-      ['connector_oauth',/oauth\/authorize|oauth\/token|code_labs\.read|code_labs\.write/i],
-      ['owner',/code_labs_owners|owner[_ -]?only|configuredOwnerId|get_cg_repair_lab_access/i],
-      ['pro_entitlement',/entitlement|code\s*labs\s*pro|pro_access|subscription/i]
+    const evidence=[], confirmed=[], keyword=[];
+    const concrete=[
+      ['browser_session',/supabase\.auth\.(?:getUser|getSession|onAuthStateChange)|\.auth\.getUser\s*\(|\.auth\.getSession\s*\(/i],
+      ['bearer_token',/headers\s*:\s*\{[^}]*Authorization|authorization\s*:\s*["'`]Bearer|req\.headers\.get\(["'`]authorization/i],
+      ['connector_oauth',/\/oauth\/(?:authorize|token|register)|code_labs\.read\s+code_labs\.write/i],
+      ['owner_enforcement',/configuredOwnerId\s*\(|\.eq\(\s*["'`]owner_id["'`]|code_labs_owners/i],
+      ['pro_entitlement_enforcement',/get_cg_repair_lab_access|code_labs_entitlements|pro_access|entitlement.*(?:active|enabled)/i]
     ];
-    for(const [kind,regex] of checks) if(regex.test(text)) evidence.push(kind);
-    return {classification:evidence.length?evidence.join('+'):'none_found',evidence};
+    for(const [kind,regex] of concrete) if(regex.test(text)) { evidence.push(kind); confirmed.push(kind); }
+    for(const [kind,regex] of [['owner_keyword',/owner[_ -]?only/i],['pro_keyword',/code\s*labs\s*pro|subscription/i],['bearer_keyword',/\bBearer\b|Authorization/i]]) if(regex.test(text)&&!evidence.includes(kind.replace('_keyword',''))) keyword.push(kind);
+    return {classification:confirmed.length?confirmed.join('+'):keyword.length?'keyword_only':'none_found',evidence,keyword_evidence:keyword,confidence:confirmed.length?'confirmed_source_pattern':keyword.length?'keyword_only':'none'};
   }
   function pageRecord(path, text, fileMap, imported) {
     const doc = new DOMParser().parseFromString(text, 'text/html');
     const scripts = [...doc.querySelectorAll('script[src]')].map(x=>normalise(path,x.getAttribute('src'))).filter(Boolean);
+    const allScripts=transitiveScripts(scripts,fileMap);
     const styles = [...doc.querySelectorAll('link[href]')].map(x=>normalise(path,x.getAttribute('href'))).filter(x=>/\.(css|svg)$/i.test(x));
     const anchors = [...doc.querySelectorAll('a[href]')].map(x=>normalise(path,x.getAttribute('href'))).filter(x=>x&&x.startsWith('code-labs/'));
-    const combined = [text, ...scripts.map(x=>fileMap.get(x)||'')].join('\n');
+    const combined = [text, ...allScripts.map(x=>fileMap.get(x)||'')].join('\n');
     const live = imported?.htmlPages?.find(x=>x.path===path) || null;
+    const localStorage={read:storage(combined,'getItem'),write:storage(combined,'setItem'),remove:storage(combined,'removeItem')};
     return {
       path, title: doc.title || '', data_page: doc.documentElement.dataset.page || doc.body?.dataset.page || '',
-      scripts, styles, anchors:uniq(anchors), inline_scripts:[...doc.querySelectorAll('script:not([src])')].length,
+      scripts, transitive_scripts:allScripts.filter(x=>!scripts.includes(x)), styles, anchors:uniq(anchors), inline_scripts:[...doc.querySelectorAll('script:not([src])')].length,
       buttons:doc.querySelectorAll('button').length, forms:doc.querySelectorAll('form').length,
-      local_storage:{read:storage(combined,'getItem'),write:storage(combined,'setItem'),remove:storage(combined,'removeItem')},
-      auth:authEvidence(combined), references:references(combined),
+      local_storage:localStorage,
+      local_storage_authority:uniq([...localStorage.write,...localStorage.remove].map(key=>`${key}:${storageAuthority(key)}`)),
+      auth:authEvidence(combined), references:references(combined,path),
       live_http:live ? {ok:live.ok,status:live.status,error:live.error||''} : null
     };
+  }
+  function sourceKind(path) {
+    if(/(?:^|\/)(?:test|tests|fixtures?)(?:\/|\.)|\.(?:test|spec)\.[^.]+$/i.test(path)) return 'test_or_fixture';
+    if(/\.(?:md|txt)$/i.test(path)) return 'documentation';
+    if(path.startsWith('supabase/migrations/')||/\.sql$/i.test(path)) return 'migration';
+    if(path.startsWith('.github/workflows/')) return 'workflow';
+    return 'runtime_source';
   }
   function dedupe(rows,key) { const seen=new Set(); return rows.filter(x=>{const k=key(x); if(seen.has(k))return false; seen.add(k); return true;}); }
 
   window.CodeLabsSystemContractScannerV141Core = Object.freeze({
     VERSION,TEXT_EXT,RELEVANT,WORKFLOW_ORDER,SECRET_NAME,CREDENTIAL_VALUE,$,uniq,esc,lineOf,safeJson,table,setStatus,
-    fetchJson,resolveRepository,fetchText,pool,references,storage,normalise,authEvidence,pageRecord,dedupe
+    fetchJson,resolveRepository,fetchText,pool,references,constantStrings,storage,storageAuthority,transitiveScripts,normalise,authEvidence,pageRecord,sourceKind,dedupe
   });
 })();
