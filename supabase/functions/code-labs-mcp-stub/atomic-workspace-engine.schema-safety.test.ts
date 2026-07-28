@@ -1,9 +1,9 @@
 /**
- * Red source-contract tests for the atomic workspace migration.
+ * Red source-contract tests for the atomic workspace migration bundle.
  *
- * These tests deliberately describe safety requirements that are not all
- * satisfied by the current migration candidate. They must become green before
- * an isolated database migration is attempted.
+ * These tests review the foundation migration together with its additive
+ * hardening migration. They must become green before either migration is
+ * attempted against an isolated database.
  *
  * Evidence boundary: this file is source-contract evidence only. It is not a
  * substitute for disposable-database rollback, concurrency, replay or fencing
@@ -34,15 +34,20 @@ function assertBefore(source: string, first: string, second: string, message: st
   assert(firstIndex < secondIndex, `${message} Expected ${first} before ${second}.`);
 }
 
-async function migration() {
-  return await Deno.readTextFile(
+async function migrations() {
+  const foundation = await Deno.readTextFile(
     new URL("../../migrations/20260728143000_code_labs_atomic_workspace_engine.sql", import.meta.url),
   );
+  const hardening = await Deno.readTextFile(
+    new URL("../../migrations/20260728170000_code_labs_atomic_workspace_engine_hardening.sql", import.meta.url),
+  );
+  return { foundation, hardening, bundle: `${foundation}\n${hardening}` };
 }
 
 Deno.test("schema safety: existing constraints are replaced with the new state machine", async () => {
-  const sql = await migration();
+  const { hardening } = await migrations();
   const constraints = [
+    "code_labs_action_runs_request_hash_check",
     "code_labs_action_runs_status_check",
     "code_labs_action_runs_completion_check",
     "code_labs_writer_phase_check",
@@ -54,37 +59,41 @@ Deno.test("schema safety: existing constraints are replaced with the new state m
     const drop = `drop constraint if exists ${constraint}`;
     const add = `add constraint ${constraint}`;
     assertIncludes(
-      sql,
+      hardening,
       drop,
       `An already-existing ${constraint} must be upgraded instead of silently retaining stale rules.`,
     );
-    assertBefore(sql, drop, add, `The old ${constraint} must be removed before its replacement is added.`);
+    assertBefore(hardening, drop, add, `The old ${constraint} must be removed before its replacement is added.`);
   }
 });
 
 Deno.test("schema safety: failure persistence is fenced and retains the operation fence", async () => {
-  const sql = await migration();
-  const failure = sql.slice(sql.indexOf("exception when others"));
+  const { hardening } = await migrations();
 
-  assertMatches(
-    failure,
-    /update public\.code_labs_action_runs[\s\S]*?where owner_id = p_owner_id[\s\S]*?and operation_id = p_operation_id[\s\S]*?and status = 'running'[\s\S]*?and fencing_token = v_fencing_token/i,
-    "A stale worker must not be able to overwrite the durable failure state for a newer fence.",
+  assertIncludes(
+    hardening,
+    "code_labs_guard_action_run_transition",
+    "Failure-state transitions must pass through one database guard.",
   );
-  assertExcludes(
-    failure,
-    "fencing_token = null",
-    "Failure evidence must retain the exact fencing token that owned the attempt.",
+  assertMatches(
+    hardening,
+    /old\.status\s*<>\s*'running'[\s\S]*?old\.fencing_token is null[\s\S]*?operation_failure_fence_failed/i,
+    "A failure transition must originate from the running operation that owns a fence.",
+  );
+  assertMatches(
+    hardening,
+    /v_operation_id is distinct from old\.operation_id[\s\S]*?v_fencing_token is distinct from old\.fencing_token/i,
+    "The transaction-local operation ID and fence must match the durable running row.",
   );
   assertIncludes(
-    failure,
-    "operation_failure_fence_failed",
-    "Failure recording must stop when its fenced update does not match exactly one running operation.",
+    hardening,
+    "new.fencing_token := old.fencing_token",
+    "Failure evidence must retain the exact fencing token that owned the attempt.",
   );
 });
 
 Deno.test("schema safety: parent-changing patches validate the complete owner hierarchy", async () => {
-  const sql = await migration();
+  const { hardening } = await migrations();
 
   for (const marker of [
     "job_patch_file_hierarchy_invalid",
@@ -93,81 +102,99 @@ Deno.test("schema safety: parent-changing patches validate the complete owner hi
     "undo_hierarchy_invalid",
   ]) {
     assertIncludes(
-      sql,
+      hardening,
       marker,
       "A patch that changes a parent relationship must be rejected before it can create a cross-project or cross-owner hierarchy.",
     );
   }
+
+  for (const trigger of [
+    "code_labs_jobs_hierarchy_guard",
+    "code_labs_packets_hierarchy_guard",
+    "code_labs_test_runs_hierarchy_guard",
+  ]) {
+    assertIncludes(hardening, trigger, `The database must install ${trigger}.`);
+  }
 });
 
 Deno.test("schema safety: untrusted JSON booleans are parsed without direct casts", async () => {
-  const sql = await migration();
+  const { bundle } = await migrations();
 
   assertIncludes(
-    sql,
+    bundle,
     "code_labs_jsonb_boolean",
-    "The migration must use one strict helper for optional JSON booleans.",
+    "The migration bundle must use one strict helper for optional JSON booleans.",
   );
-  assertIncludes(sql, "writer_expected_blob_absent_invalid", "Malformed Writer absence proof must fail validation.");
-  assertIncludes(sql, "receipt_boolean_invalid", "Malformed receipt booleans must fail validation.");
+  assertIncludes(bundle, "writer_expected_blob_absent_invalid", "Malformed Writer absence proof must fail validation.");
+  assertIncludes(bundle, "receipt_boolean_invalid", "Malformed receipt booleans must fail validation.");
   assertExcludes(
-    sql,
+    bundle,
     "coalesce((v_request->>'expected_github_blob_absent')::boolean, false)",
     "Writer input must not rely on a direct boolean cast that can bypass controlled validation.",
   );
   assertExcludes(
-    sql,
+    bundle,
     "coalesce((v_receipt_spec->>'created_new_row')::boolean, false)",
     "Receipt input must not directly cast created_new_row.",
   );
   assertExcludes(
-    sql,
+    bundle,
     "coalesce((v_receipt_spec->>'undo_available')::boolean, false)",
     "Receipt input must not directly cast undo_available.",
   );
 });
 
 Deno.test("schema safety: source and candidate hashes are recomputed by PostgreSQL", async () => {
-  const sql = await migration();
+  const { foundation, hardening } = await migrations();
 
-  assertIncludes(sql, "candidate_hash_invalid", "Candidate metadata must be verified against fixed_output server-side.");
-  assertIncludes(sql, "source_hash_invalid", "Source metadata must be verified against current_code server-side.");
+  assertIncludes(hardening, "candidate_hash_invalid", "Candidate metadata must be verified against fixed_output server-side.");
+  assertIncludes(hardening, "source_hash_invalid", "Source metadata must be verified against current_code server-side.");
   assertMatches(
-    sql,
+    foundation,
     /v_expected_content_sha256\s*<>\s*public\.code_labs_sha256_text\(v_content\)/i,
     "Writer content proof must be recomputed from the complete content inside PostgreSQL.",
   );
   assertMatches(
-    sql,
+    foundation,
     /current_hash\s*=\s*case[\s\S]*?public\.code_labs_sha256_text/i,
     "A current-file replacement must derive current_hash from current_code.",
+  );
+  assertIncludes(
+    hardening,
+    "code_labs_files_hash_guard",
+    "Direct and future file writes must also pass through a database hash guard.",
   );
 });
 
 Deno.test("schema safety: Writer preparation requires immutable verified branch proof", async () => {
-  const sql = await migration();
+  const { hardening } = await migrations();
 
   for (const field of ["github_head_branch_sha", "github_branch_verified_at"]) {
-    assertIncludes(sql, field, `Writer preparation must persist ${field}.`);
+    assertIncludes(hardening, field, `Writer preparation must persist ${field}.`);
   }
   assertIncludes(
-    sql,
+    hardening,
     "writer_branch_proof_invalid",
     "Writer preparation must reject missing or mismatched external branch proof.",
   );
   assertIncludes(
-    sql,
+    hardening,
     "writer_protected_branch_invalid",
     "Writer preparation must reject main, the default base branch and any protected target.",
+  );
+  assertIncludes(
+    hardening,
+    "code_labs_writer_request_proof_guard",
+    "Every atomic Writer request row must pass the immutable proof trigger.",
   );
 });
 
 Deno.test("schema safety: the database-only transaction contains no GitHub network lane", async () => {
-  const sql = await migration();
+  const { bundle } = await migrations();
 
   for (const forbidden of ["net.http", "http_post", "api.github.com", "github.com/repos/"]) {
     assertExcludes(
-      sql,
+      bundle,
       forbidden,
       "The database-only atomic action must never perform an external GitHub request.",
     );
