@@ -1,19 +1,6 @@
--- Code Labs atomic boolean owner cleanup.
--- POST-CUTOVER CLEANUP ONLY.
--- Candidate only: keep with the hardening bundle until it is folded into the
--- final hardening migration before any deployment decision.
+-- Folded into 20260728172000_code_labs_v50_coherent_hardening.sql.
+-- Marker only: it intentionally owns no function, trigger, constraint or grant.
+-- Kept so the reviewed migration sequence remains explicit and auditable.
 
 begin;
-
-revoke all on function public.code_labs_jsonb_boolean(jsonb, boolean, text)
-  from public, anon, authenticated, service_role;
-
-drop function if exists public.code_labs_jsonb_boolean(jsonb, boolean, text);
-
--- The strict expansion boundary remains the sole service-role boolean owner.
-revoke all on function public.code_labs_require_jsonb_boolean(jsonb, boolean, text)
-  from public, anon, authenticated;
-grant execute on function public.code_labs_require_jsonb_boolean(jsonb, boolean, text)
-  to service_role;
-
 commit;
