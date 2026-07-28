@@ -2,6 +2,7 @@ import { verifyWriterExecutionSnapshot } from './writer-immutable-branch-proof.m
 
 const MAX_CONTENT = 180000;
 const SHA40 = /^[a-f0-9]{40}$/;
+const WRITABLE_BLOB_MODES = new Set(['100644', '100755']);
 
 function required(value, label) {
   const output = String(value ?? '').trim();
@@ -25,11 +26,22 @@ function encodePath(path) {
   return path.split('/').map(encodeURIComponent).join('/');
 }
 
+function targetMode(proof, live) {
+  if (proof.expected_blob_absent) return '100644';
+  const type = required(live.blob_type, 'live target type');
+  const mode = required(live.blob_mode, 'live target mode');
+  if (type !== 'blob' || !WRITABLE_BLOB_MODES.has(mode)) {
+    throw new Error('The existing target is not a writable regular Git blob.');
+  }
+  return mode;
+}
+
 export const WRITER_GIT_CAS_SEQUENCE = Object.freeze([
   'claim_request',
   'reload_claimed_request',
   'read_head_ref',
   'read_reviewed_parent_commit',
+  'read_reviewed_parent_tree',
   'read_target_blob',
   'verify_immutable_snapshot',
   'create_blob',
@@ -67,9 +79,10 @@ export async function buildWriterGitCasPlan(request, live) {
   const repository = required(request.repo, 'repository');
   const branchRef = `heads/${encodeRef(proof.head_branch)}`;
   const path = encodePath(proof.path);
+  const mode = targetMode(proof, live);
 
   return {
-    version: 'writer-git-cas-v1',
+    version: 'writer-git-cas-v2',
     repository,
     branch: proof.head_branch,
     path: proof.path,
@@ -77,6 +90,7 @@ export async function buildWriterGitCasPlan(request, live) {
     expected_base_sha: proof.base_sha,
     expected_blob_sha: proof.expected_blob_sha,
     expected_blob_absent: proof.expected_blob_absent,
+    expected_blob_mode: mode,
     expected_content_sha256: proof.expected_content_sha256,
     sequence: [...WRITER_GIT_CAS_SEQUENCE],
     requests: {
@@ -89,6 +103,12 @@ export async function buildWriterGitCasPlan(request, live) {
         method: 'GET',
         path: `/git/commits/${proof.head_sha}`,
         expect_commit_sha: proof.head_sha,
+      },
+      read_parent_tree: {
+        method: 'GET',
+        path: '/git/trees/$reviewed_parent_tree_sha?recursive=1',
+        expect_target_mode: mode,
+        expect_target_type: 'blob',
       },
       read_target_blob: {
         method: 'GET',
@@ -109,7 +129,7 @@ export async function buildWriterGitCasPlan(request, live) {
           base_tree: '$reviewed_parent_tree_sha',
           tree: [{
             path: proof.path,
-            mode: '100644',
+            mode,
             type: 'blob',
             sha: '$created_blob_sha',
           }],
@@ -142,6 +162,8 @@ export async function buildWriterGitCasPlan(request, live) {
       deletes_anything: false,
       modifies_workflows: false,
       one_complete_file: true,
+      preserves_existing_file_mode: true,
+      rejects_symlink_or_submodule_targets: true,
       unreachable_objects_possible_after_ref_conflict: true,
       unreachable_objects_change_branch: false,
     },
