@@ -1,41 +1,23 @@
 <!doctype html>
 <html lang="en-GB" data-page="system-contract-scanner">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
-  <title>Code Labs System Contract Scanner V141</title>
-  <style>
-    :root{color-scheme:dark;--bg:#0d1321;--panel:#151e31;--line:#31405e;--ink:#eef4ff;--muted:#aab8d1;--good:#5fe0a1;--warn:#ffd479;--bad:#ff8585}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1500px;margin:auto;padding:24px}h1,h2{line-height:1.2}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}label{display:block;font-weight:700;margin-bottom:4px}input,textarea,button{width:100%;border:1px solid var(--line);border-radius:9px;background:#0b1220;color:var(--ink);padding:10px}textarea{min-height:110px;resize:vertical}button{cursor:pointer;background:#17355d;font-weight:800}button.secondary{background:#202a3e}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions button{width:auto}.status{padding:10px 12px;border-radius:9px;background:#0b1220}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid var(--line);padding:7px;vertical-align:top;text-align:left}th{background:#101a2b;position:sticky;top:0}.scroll{overflow:auto;max-height:620px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.card{background:#0b1220;border:1px solid var(--line);border-radius:10px;padding:12px}.card strong{font-size:1.5rem;display:block}.small{font-size:12px;color:var(--muted)}details{margin:10px 0}summary{cursor:pointer;font-weight:800}#reportJson{min-height:320px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
-  </style>
-</head>
-<body>
-<main>
-  <h1>Code Labs System Contract Scanner <span class="small">V141</span></h1>
-  <p>Read-only repository and page-contract scanner. It never writes Supabase, GitHub, localStorage, secrets, deployments or Code Labs workflow state.</p>
-  <section class="panel">
-    <div class="grid">
-      <div><label for="repo">Repository</label><input id="repo" value="trevieisking/stream-bandit"></div>
-      <div><label for="ref">Ref, branch or commit</label><input id="ref" value="main"></div>
-      <div><label for="siteBase">Optional deployed Code Labs base URL</label><input id="siteBase" placeholder="https://example.com/"></div>
-    </div>
-    <details><summary>Optional V140 helper-route report JSON</summary><textarea id="v140" placeholder="Paste the complete V140 JSON report to preserve live page/asset HTTP and dynamic-load evidence."></textarea></details>
-    <details><summary>Optional current live deployment evidence JSON</summary><textarea id="live" placeholder='{"repository":"trevieisking/stream-bandit","commit_sha":"40-char SHA","functions":[{"name":"code-labs-mcp-stub","version":49,"status":"ACTIVE","verify_jwt":false}],"smoke_tests":[],"rollback":{}}'></textarea><p class="small">Only metadata is accepted. Secret values are never required and credential-shaped fields are discarded.</p></details>
-    <div class="actions"><button id="run">Run read-only scan</button><button id="download" class="secondary" disabled>Download JSON</button><button id="copy" class="secondary" disabled>Copy report</button></div>
-    <p id="status" class="status">Ready.</p>
-  </section>
-  <section class="panel"><h2>Summary</h2><div id="summary" class="cards"></div><div id="findings"></div></section>
-  <section class="panel"><h2>1. Page and helper dependency manifest</h2><div id="dependency" class="scroll"></div></section>
-  <section class="panel"><h2>2. Secret-call and environment-variable map</h2><div id="environment" class="scroll"></div></section>
-  <section class="panel"><h2>3. Database and RPC mutation matrix</h2><div id="database" class="scroll"></div></section>
-  <section class="panel"><h2>4. Exact tool-to-handler routing snapshot</h2><div id="routing" class="scroll"></div></section>
-  <section class="panel"><h2>5. Per-page authentication and entitlement matrix</h2><div id="authentication" class="scroll"></div></section>
-  <section class="panel"><h2>6. Cross-page workflow-state matrix</h2><div id="workflow" class="scroll"></div></section>
-  <section class="panel"><h2>7. Deployment, rollback and smoke-test ledger</h2><div id="deployment" class="scroll"></div></section>
-  <section class="panel"><h2>Complete assistant-readable report</h2><textarea id="reportJson" readonly></textarea></section>
-</main>
-<script src="assets/code-labs-system-contract-scanner-core-v141.js"></script>
-<script src="assets/code-labs-system-contract-scanner-analyzers-v141.js"></script>
-<script src="assets/code-labs-system-contract-scanner-app-v141.js"></script>
-</body>
-</html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>Code Labs System Contract Scanner V143</title>
+<style>:root{color-scheme:dark;--bg:#0d1321;--panel:#151e31;--line:#31405e;--ink:#eef4ff;--muted:#aab8d1;--good:#5fe0a1;--warn:#ffd479;--bad:#ff8585}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1500px;margin:auto;padding:24px}h1,h2{line-height:1.2}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}label{display:block;font-weight:700;margin-bottom:4px}input,textarea,button{width:100%;border:1px solid var(--line);border-radius:9px;background:#0b1220;color:var(--ink);padding:10px}textarea{min-height:110px;resize:vertical}button{cursor:pointer;background:#17355d;font-weight:800}button.secondary{background:#202a3e}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions button{width:auto}.status{padding:10px 12px;border-radius:9px;background:#0b1220}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid var(--line);padding:7px;vertical-align:top;text-align:left}th{background:#101a2b;position:sticky;top:0}.scroll{overflow:auto;max-height:620px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.card{background:#0b1220;border:1px solid var(--line);border-radius:10px;padding:12px}.card strong{font-size:1.5rem;display:block}.small{font-size:12px;color:var(--muted)}details{margin:10px 0}summary{cursor:pointer;font-weight:800}#reportJson{min-height:320px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}</style>
+</head><body><main>
+<h1>Code Labs System Contract Scanner <span class="small">V143 red triage</span></h1>
+<p>Read-only evidence scanner. It preserves working capabilities and separates confirmed runtime blockers from workflow risks, scanner defects, source-review items, review-only findings and missing live proof.</p>
+<section class="panel"><div class="grid"><div><label for="repo">Repository</label><input id="repo" value="trevieisking/stream-bandit"></div><div><label for="ref">Ref, branch or commit</label><input id="ref" value="main"></div><div><label for="siteBase">Optional deployed Code Labs base URL</label><input id="siteBase" placeholder="https://example.com/"></div></div>
+<details><summary>Optional V140 helper-route report JSON</summary><textarea id="v140" placeholder="Paste the complete V140 report JSON."></textarea></details>
+<details><summary>Optional current live deployment evidence JSON</summary><textarea id="live" placeholder='{"repository":"trevieisking/stream-bandit","commit_sha":"40-char SHA","functions":[],"smoke_tests":[],"rollback":{}}'></textarea><p class="small">Metadata only. Never paste secret values.</p></details>
+<div class="actions"><button id="run">Run read-only scan</button><button id="download" class="secondary" disabled>Download JSON</button><button id="copy" class="secondary" disabled>Copy report</button></div><p id="status" class="status">Ready.</p></section>
+<section class="panel"><h2>Red triage summary</h2><div id="summary" class="cards"></div><div id="findings"></div></section>
+<section class="panel"><h2>1. Page and helper dependency manifest</h2><div id="dependency" class="scroll"></div></section>
+<section class="panel"><h2>2. Secret-call and environment-variable map</h2><div id="environment" class="scroll"></div></section>
+<section class="panel"><h2>3. Database and RPC mutation matrix</h2><div id="database" class="scroll"></div></section>
+<section class="panel"><h2>4. Exact tool-to-handler routing snapshot</h2><div id="routing" class="scroll"></div></section>
+<section class="panel"><h2>5. Per-page authentication and entitlement matrix</h2><div id="authentication" class="scroll"></div></section>
+<section class="panel"><h2>6. Cross-page workflow-state matrix</h2><div id="workflow" class="scroll"></div></section>
+<section class="panel"><h2>7. Deployment, rollback and smoke-test ledger</h2><div id="deployment" class="scroll"></div></section>
+<section class="panel"><h2>Complete assistant-readable report</h2><textarea id="reportJson" readonly></textarea></section>
+</main><script src="assets/code-labs-system-contract-scanner-core-v141.js"></script><script src="assets/code-labs-system-contract-scanner-analyzers-v141.js"></script><script src="assets/code-labs-system-contract-scanner-app-v141.js"></script></body></html>
