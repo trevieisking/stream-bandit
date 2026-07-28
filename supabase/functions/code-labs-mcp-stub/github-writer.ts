@@ -1,17 +1,30 @@
 import { Binding, rest } from "./oauth.ts";
 import { VERSION } from "./context.ts";
 import { githubRequest, verifyOwnerRepository } from "./github-authority.ts";
+// @ts-ignore -- Deno loads the reviewed JavaScript source-contract module directly.
+import {
+  normaliseWriterBranchProof,
+  verifyWriterExecutionSnapshot,
+} from "./writer-immutable-branch-proof.mjs";
+// @ts-ignore -- Deno loads the reviewed JavaScript source-contract module directly.
+import {
+  buildWriterGitCasPlan,
+  validateCreatedCommitProof,
+} from "./writer-git-cas-plan.mjs";
 
 type Row = Record<string, any>;
 
 const MAX_CONTENT = 180000;
 const PROTECTED = new Set(["main", "master", "production", "live", "gh-pages"]);
 const HASH = /^[a-f0-9]{64}$/;
+const SHA40 = /^[a-f0-9]{40}$/;
 
 function safeBranch(value: unknown) {
   const branch = String(value || "").trim();
   if (
     !/^[A-Za-z0-9._/-]{3,80}$/.test(branch) ||
+    branch.startsWith("/") || branch.endsWith("/") ||
+    branch.includes("//") || branch.includes("..") ||
     PROTECTED.has(branch.toLowerCase())
   ) throw new Error("The GitHub branch is missing or protected.");
   return branch;
@@ -29,15 +42,14 @@ function safePath(value: unknown) {
   return path;
 }
 
-function bytesToBase64(value: Uint8Array) {
-  let binary = "";
-  const size = 0x8000;
-  for (let offset = 0; offset < value.length; offset += size) {
-    binary += String.fromCharCode(
-      ...value.subarray(offset, Math.min(offset + size, value.length)),
-    );
-  }
-  return btoa(binary);
+function exactSha(value: unknown, label: string) {
+  const sha = String(value || "").trim().toLowerCase();
+  if (!SHA40.test(sha)) throw new Error(label + " is missing or invalid.");
+  return sha;
+}
+
+function encodeRef(branch: string) {
+  return branch.split("/").map(encodeURIComponent).join("/");
 }
 
 async function one(path: string) {
@@ -68,8 +80,8 @@ function completedProof(request: Row) {
   const pullNumber = Number(request.pull_request_number || 0);
   const pullUrl = String(request.pull_request_url || "");
   if (
-    String(request.status || "") !== "pr_opened" || !commitSha || !contentSha ||
-    !pullNumber || !pullUrl
+    String(request.status || "") !== "pr_opened" || !SHA40.test(commitSha) ||
+    !SHA40.test(contentSha) || !pullNumber || !pullUrl
   ) return null;
   return {
     branch: String(request.branch || ""),
@@ -109,6 +121,21 @@ function sameReviewProof(left: Row, right: Row) {
     left.source_file_id === right.source_file_id;
 }
 
+function sameRequestProof(left: Row, right: Row) {
+  const leftBranch = normaliseWriterBranchProof(left);
+  const rightBranch = normaliseWriterBranchProof(right);
+  return JSON.stringify(leftBranch) === JSON.stringify(rightBranch) &&
+    String(left.repo || "") === String(right.repo || "") &&
+    String(left.action || "") === String(right.action || "") &&
+    String(left.content || "") === String(right.content || "") &&
+    String(left.commit_message || "") === String(right.commit_message || "") &&
+    String(left.pr_title || "") === String(right.pr_title || "") &&
+    String(left.pr_body || "") === String(right.pr_body || "") &&
+    left.direct_main_write === right.direct_main_write &&
+    left.branch_pr_only === right.branch_pr_only &&
+    left.deletes_anything === right.deletes_anything;
+}
+
 async function claimRequest(ownerId: string, requestId: string, claimId: string) {
   const value = await rest("rpc/code_labs_claim_write_request", {
     method: "POST",
@@ -137,25 +164,39 @@ function safeFailureMessage(stage: string, error: unknown) {
     review_validation: "The immutable Code God review proof is missing or invalid.",
     request_claim: "The queued request is already claimed or no longer executable.",
     github_token: "GitHub App installation authentication failed.",
-    branch_verification: "The required GitHub branch could not be verified.",
-    file_lookup: "The target GitHub file could not be read safely.",
-    file_commit: "GitHub did not accept the reviewed complete-file commit.",
+    branch_verification: "The reviewed GitHub branch proof could not be verified.",
+    snapshot_validation: "The GitHub branch, base, target or pull-request state changed after review.",
+    pr_preflight: "The branch already has an unsafe or ambiguous pull-request state.",
+    git_blob: "GitHub did not accept the reviewed complete-file blob.",
+    git_tree: "GitHub did not accept the reviewed one-file tree.",
+    git_commit: "GitHub did not accept the parent-bound commit.",
+    ref_update_no_write: "The branch reference was not advanced; the request may be retried.",
+    ref_update_conflict: "The branch changed after review; prepare a fresh handoff.",
+    ref_update_unknown: "The branch-reference outcome could not be reconciled safely.",
+    ref_verify: "The updated branch reference could not be verified.",
+    commit_checkpoint: "GitHub committed, but the durable Writer checkpoint could not be saved.",
     draft_pr: "The draft pull request could not be opened or reused.",
     request_update:
-      "GitHub completed, but the Code Labs request receipt could not be updated.",
+      "GitHub completed, but the Code Labs request receipt could not be finalized.",
   };
   if (/GitHub App|GitHub installation|repository operation/i.test(raw)) {
     return fixed.github_token;
   }
-  if (
-    /branch does not exist|GitHub request failed/i.test(raw) &&
-    stage === "branch_verification"
-  ) return fixed.branch_verification;
   return fixed[stage] || "The guarded GitHub writer failed before completion.";
 }
 
 function requiresManualRecovery(stage: string) {
-  return ["file_commit", "draft_pr", "request_update"].includes(stage);
+  return [
+    "ref_update_unknown",
+    "ref_verify",
+    "commit_checkpoint",
+    "draft_pr",
+    "request_update",
+  ].includes(stage);
+}
+
+function requiresFreshReview(stage: string) {
+  return ["snapshot_validation", "pr_preflight", "ref_update_conflict"].includes(stage);
 }
 
 async function recordFailure(
@@ -168,12 +209,14 @@ async function recordFailure(
 ) {
   const message = safeFailureMessage(stage, error);
   const recoveryRequired = requiresManualRecovery(stage);
+  const freshReviewRequired = requiresFreshReview(stage);
+  const retryable = !recoveryRequired && !freshReviewRequired;
   const patch: Row = {
-    status: recoveryRequired ? "failed" : "queued",
+    status: retryable ? "queued" : "failed",
     error: stage + ": " + message,
     updated_at: new Date().toISOString(),
   };
-  if (!recoveryRequired) {
+  if (retryable) {
     patch.writer_claim_id = null;
     patch.writer_claimed_at = null;
   }
@@ -181,9 +224,11 @@ async function recordFailure(
     patch.github_branch_created = true;
     patch.github_commit_sha = progress.commit_sha;
     patch.github_content_sha = progress.content_sha;
+    patch.writer_phase = "github_committed";
   }
   if (progress.pull_request_number && progress.pull_request_url) {
     patch.status = "pr_opened";
+    patch.writer_phase = "pr_opened";
     patch.pull_request_number = progress.pull_request_number;
     patch.pull_request_url = progress.pull_request_url;
   }
@@ -192,6 +237,8 @@ async function recordFailure(
       stage,
       claim_id: claimId,
       message,
+      retryable,
+      fresh_review_required: freshReviewRequired,
       recovery_required: recoveryRequired,
       commit_proof_preserved: Boolean(
         progress.commit_sha && progress.content_sha,
@@ -214,6 +261,76 @@ async function recordFailure(
   ]);
 }
 
+function treeEntry(tree: Row, path: string) {
+  if (tree?.truncated === true) {
+    throw new Error("The reviewed parent tree is too large to verify safely.");
+  }
+  const rows = Array.isArray(tree?.tree) ? tree.tree : [];
+  return rows.find((entry: Row) => String(entry?.path || "") === path) || null;
+}
+
+async function openPulls(
+  repoPath: string,
+  token: string,
+  owner: string,
+  branch: string,
+  baseBranch: string,
+) {
+  const pulls = await githubRequest(
+    repoPath + "/pulls?state=open&head=" +
+      encodeURIComponent(owner + ":" + branch) + "&base=" +
+      encodeURIComponent(baseBranch),
+    token,
+  );
+  return Array.isArray(pulls) ? pulls : [];
+}
+
+function safeDraftPull(pulls: Row[], branch: string, baseBranch: string) {
+  if (pulls.length > 1) {
+    throw new Error("More than one open pull request matches the reviewed branch route.");
+  }
+  const pull = pulls[0] || null;
+  if (!pull) return null;
+  if (
+    pull.draft !== true || String(pull.state || "") !== "open" ||
+    String(pull.head?.ref || "") !== branch ||
+    String(pull.base?.ref || "") !== baseBranch
+  ) {
+    throw new Error("The existing pull request is not the reviewed open draft route.");
+  }
+  return pull;
+}
+
+async function persistCommitCheckpoint(
+  ownerId: string,
+  requestId: string,
+  claimId: string,
+  commitSha: string,
+  contentSha: string,
+) {
+  const updated = await rest(
+    "code_labs_write_requests?id=eq." + encodeURIComponent(requestId) +
+      "&requested_by=eq." + encodeURIComponent(ownerId) +
+      "&status=eq.processing&writer_claim_id=eq." + encodeURIComponent(claimId),
+    {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({
+        github_branch_created: true,
+        github_commit_sha: commitSha,
+        github_content_sha: contentSha,
+        writer_phase: "github_committed",
+        error: null,
+        updated_at: new Date().toISOString(),
+      }),
+    },
+  );
+  if (!Array.isArray(updated) || !updated[0]) {
+    throw new Error("The GitHub commit checkpoint could not be persisted.");
+  }
+  return updated[0];
+}
+
 export async function executeGithubWriter(b: Binding, args: Row) {
   if (args.confirmed !== true) {
     throw new Error("confirmed must be true to execute the GitHub writer.");
@@ -227,8 +344,8 @@ export async function executeGithubWriter(b: Binding, args: Row) {
   const progress: Row = {};
   try {
     const pending = await selectedRequest(b.owner_id, requestId);
-    const proof = completedProof(pending);
-    if (proof) {
+    const completed = completedProof(pending);
+    if (completed) {
       return {
         ok: true,
         version: VERSION,
@@ -238,7 +355,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
         opened_pr: false,
         deleted_anything: false,
         request: pending,
-        github: proof,
+        github: completed,
       };
     }
     if (
@@ -259,13 +376,14 @@ export async function executeGithubWriter(b: Binding, args: Row) {
 
     stage = "review_validation";
     const pendingReview = immutableReviewProof(pending);
+    normaliseWriterBranchProof(pending);
 
     stage = "request_claim";
     const request = await claimRequest(b.owner_id, requestId, claimId);
     claimOwned = true;
     const claimedReview = immutableReviewProof(request);
-    if (!sameReviewProof(pendingReview, claimedReview)) {
-      throw new Error("The immutable Code God review proof changed during claim.");
+    if (!sameReviewProof(pendingReview, claimedReview) || !sameRequestProof(pending, request)) {
+      throw new Error("The immutable request proof changed during claim.");
     }
     await audit(requestId, "writer_claimed", {
       claim_id: claimId,
@@ -284,78 +402,219 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     const token = authority.token;
     const repoPath = "/repos/" +
       [authority.owner, authority.name].map(encodeURIComponent).join("/");
+    const proof = normaliseWriterBranchProof(request);
+    if (proof.base_branch !== authority.default_branch) {
+      throw new Error("The reviewed base branch is no longer the verified default branch.");
+    }
     if (branch.toLowerCase() === authority.default_branch.toLowerCase()) {
       throw new Error("The requested branch is the verified default branch.");
     }
 
     stage = "branch_verification";
-    const branchRef = await githubRequest(
-      repoPath + "/git/ref/heads/" + encodeURIComponent(branch),
+    const [baseRef, headRef] = await Promise.all([
+      githubRequest(
+        repoPath + "/git/ref/heads/" + encodeRef(proof.base_branch),
+        token,
+      ),
+      githubRequest(
+        repoPath + "/git/ref/heads/" + encodeRef(branch),
+        token,
+      ),
+    ]);
+    const baseSha = exactSha(baseRef?.object?.sha, "The base branch SHA");
+    const headSha = exactSha(headRef?.object?.sha, "The repair branch SHA");
+    const comparison = await githubRequest(
+      repoPath + "/compare/" + encodeURIComponent(baseSha) + "..." +
+        encodeURIComponent(headSha),
       token,
     );
-    const branchSha = String(branchRef?.object?.sha || "");
-    if (!branchSha) {
-      throw new Error("The required GitHub branch does not exist.");
-    }
+    const mergeBaseSha = exactSha(
+      comparison?.merge_base_commit?.sha,
+      "The merge-base SHA",
+    );
+    const parentCommit = await githubRequest(
+      repoPath + "/git/commits/" + encodeURIComponent(headSha),
+      token,
+    );
+    const parentTreeSha = exactSha(
+      parentCommit?.tree?.sha,
+      "The reviewed parent tree SHA",
+    );
+    const parentTree = await githubRequest(
+      repoPath + "/git/trees/" + encodeURIComponent(parentTreeSha) + "?recursive=1",
+      token,
+    );
+    const entry = treeEntry(parentTree, path);
+    const live = {
+      repo: String(request.repo || ""),
+      branch,
+      base_sha: baseSha,
+      head_sha: headSha,
+      merge_base_sha: mergeBaseSha,
+      blob_absent: entry == null,
+      blob_sha: entry == null ? null : exactSha(entry.sha, "The target blob SHA"),
+      blob_mode: entry == null ? null : String(entry.mode || ""),
+      blob_type: entry == null ? null : String(entry.type || ""),
+    };
+
+    stage = "snapshot_validation";
+    verifyWriterExecutionSnapshot(request, live);
+    const plan = await buildWriterGitCasPlan(request, live);
     await audit(requestId, "branch_verified", {
       claim_id: claimId,
       branch,
-      branch_sha: branchSha,
+      base_sha: plan.expected_base_sha,
+      head_sha: plan.expected_parent_sha,
+      merge_base_sha: mergeBaseSha,
+      target_blob_sha: plan.expected_blob_sha,
+      target_blob_absent: plan.expected_blob_absent,
+      target_blob_mode: plan.expected_blob_mode,
     });
 
-    stage = "file_lookup";
-    let currentSha: string | null = null;
-    try {
-      const existing = await githubRequest(
-        repoPath + "/contents/" +
-          path.split("/").map(encodeURIComponent).join("/") + "?ref=" +
-          encodeURIComponent(branch),
-        token,
-      );
-      currentSha = existing?.sha ? String(existing.sha) : null;
-    } catch (error) {
-      if (String(request.action) !== "create_file") throw error;
+    stage = "pr_preflight";
+    safeDraftPull(
+      await openPulls(repoPath, token, authority.owner, branch, proof.base_branch),
+      branch,
+      proof.base_branch,
+    );
+
+    stage = "git_blob";
+    const createdBlob = await githubRequest(repoPath + "/git/blobs", token, {
+      method: "POST",
+      body: JSON.stringify(plan.requests.create_blob.body),
+    });
+    const contentSha = exactSha(createdBlob?.sha, "The created blob SHA");
+
+    stage = "git_tree";
+    const createdTree = await githubRequest(repoPath + "/git/trees", token, {
+      method: "POST",
+      body: JSON.stringify({
+        base_tree: parentTreeSha,
+        tree: [{
+          path,
+          mode: plan.expected_blob_mode,
+          type: "blob",
+          sha: contentSha,
+        }],
+      }),
+    });
+    const createdTreeSha = exactSha(createdTree?.sha, "The created tree SHA");
+
+    stage = "git_commit";
+    const createdCommit = await githubRequest(repoPath + "/git/commits", token, {
+      method: "POST",
+      body: JSON.stringify({
+        message: String(
+          request.commit_message || "Code Labs complete-file update",
+        ).slice(0, 240),
+        tree: createdTreeSha,
+        parents: [plan.expected_parent_sha],
+      }),
+    });
+    const createdCommitSha = exactSha(
+      createdCommit?.sha,
+      "The created commit SHA",
+    );
+    const createdCommitProof = await githubRequest(
+      repoPath + "/git/commits/" + encodeURIComponent(createdCommitSha),
+      token,
+    );
+    const createdParents = Array.isArray(createdCommitProof?.parents)
+      ? createdCommitProof.parents
+      : [];
+    if (
+      createdParents.length !== 1 ||
+      exactSha(createdParents[0]?.sha, "The created commit parent SHA") !==
+        plan.expected_parent_sha
+    ) {
+      throw new Error("The created commit is not bound to the reviewed parent.");
     }
 
-    stage = "file_commit";
-    const encodedContent = bytesToBase64(new TextEncoder().encode(content));
-    const commitPayload: Row = {
-      message: String(
-        request.commit_message || "Code Labs complete-file update",
-      ),
-      content: encodedContent,
+    stage = "pr_preflight";
+    safeDraftPull(
+      await openPulls(repoPath, token, authority.owner, branch, proof.base_branch),
       branch,
-    };
-    if (currentSha) commitPayload.sha = currentSha;
-    const committed = await githubRequest(
-      repoPath + "/contents/" +
-        path.split("/").map(encodeURIComponent).join("/"),
-      token,
-      { method: "PUT", body: JSON.stringify(commitPayload) },
+      proof.base_branch,
     );
-    const commitSha = String(committed?.commit?.sha || "");
-    const contentSha = String(committed?.content?.sha || "");
-    if (!commitSha || !contentSha) {
-      throw new Error("GitHub did not return commit proof.");
+
+    stage = "ref_update_no_write";
+    try {
+      await githubRequest(
+        repoPath + "/git/refs/heads/" + encodeRef(branch),
+        token,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ sha: createdCommitSha, force: false }),
+        },
+      );
+    } catch (error) {
+      let reconciledSha = "";
+      try {
+        const refAfterError = await githubRequest(
+          repoPath + "/git/ref/heads/" + encodeRef(branch),
+          token,
+        );
+        reconciledSha = exactSha(
+          refAfterError?.object?.sha,
+          "The reconciled branch SHA",
+        );
+      } catch {
+        stage = "ref_update_unknown";
+        throw error;
+      }
+      if (reconciledSha === createdCommitSha) {
+        // GitHub applied the ref update but the original response was lost.
+      } else if (reconciledSha === plan.expected_parent_sha) {
+        stage = "ref_update_no_write";
+        throw error;
+      } else {
+        stage = "ref_update_conflict";
+        throw new Error("The branch head changed before the reviewed commit could be applied.");
+      }
     }
-    progress.commit_sha = commitSha;
+
+    stage = "ref_verify";
+    const updatedRef = await githubRequest(
+      repoPath + "/git/ref/heads/" + encodeRef(branch),
+      token,
+    );
+    const refSha = exactSha(updatedRef?.object?.sha, "The updated branch SHA");
+    validateCreatedCommitProof(plan, {
+      commit_sha: createdCommitSha,
+      parent_sha: plan.expected_parent_sha,
+      ref_sha: refSha,
+    });
+    progress.commit_sha = createdCommitSha;
     progress.content_sha = contentSha;
     await audit(requestId, "file_committed", {
       claim_id: claimId,
       branch,
       path,
-      commit_sha: commitSha,
+      parent_sha: plan.expected_parent_sha,
+      commit_sha: createdCommitSha,
       content_sha: contentSha,
+      file_mode: plan.expected_blob_mode,
+      force: false,
     });
 
-    stage = "draft_pr";
-    const pulls = await githubRequest(
-      repoPath + "/pulls?state=open&head=" +
-        encodeURIComponent(authority.owner + ":" + branch) + "&base=" +
-        encodeURIComponent(authority.default_branch),
-      token,
+    stage = "commit_checkpoint";
+    await persistCommitCheckpoint(
+      b.owner_id,
+      requestId,
+      claimId,
+      createdCommitSha,
+      contentSha,
     );
-    let pull = Array.isArray(pulls) ? pulls[0] : null;
+
+    stage = "draft_pr";
+    const pulls = await openPulls(
+      repoPath,
+      token,
+      authority.owner,
+      branch,
+      proof.base_branch,
+    );
+    let pull = safeDraftPull(pulls, branch, proof.base_branch);
     if (!pull) {
       pull = await githubRequest(repoPath + "/pulls", token, {
         method: "POST",
@@ -365,7 +624,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
             request.pr_body || "Prepared by Code Labs after Code God PASS.",
           ),
           head: branch,
-          base: authority.default_branch,
+          base: proof.base_branch,
           draft: true,
           maintainer_can_modify: false,
         }),
@@ -373,8 +632,8 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     }
     const pullNumber = Number(pull?.number || 0);
     const pullUrl = String(pull?.html_url || "");
-    if (!pullNumber || !pullUrl) {
-      throw new Error("GitHub did not return pull-request proof.");
+    if (!pullNumber || !pullUrl || pull?.draft !== true) {
+      throw new Error("GitHub did not return draft pull-request proof.");
     }
     progress.pull_request_number = pullNumber;
     progress.pull_request_url = pullUrl;
@@ -383,6 +642,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       pull_request_number: pullNumber,
       pull_request_url: pullUrl,
       reused: Array.isArray(pulls) && pulls.length > 0,
+      draft: true,
     });
 
     stage = "request_update";
@@ -396,8 +656,9 @@ export async function executeGithubWriter(b: Binding, args: Row) {
         headers: { Prefer: "return=representation" },
         body: JSON.stringify({
           status: "pr_opened",
+          writer_phase: "pr_opened",
           github_branch_created: true,
-          github_commit_sha: commitSha,
+          github_commit_sha: createdCommitSha,
           github_content_sha: contentSha,
           pull_request_number: pullNumber,
           pull_request_url: pullUrl,
@@ -421,8 +682,10 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       github: {
         branch,
         path,
-        commit_sha: commitSha,
+        parent_sha: plan.expected_parent_sha,
+        commit_sha: createdCommitSha,
         content_sha: contentSha,
+        file_mode: plan.expected_blob_mode,
         pull_request_number: pullNumber,
         pull_request_url: pullUrl,
         draft: true,
