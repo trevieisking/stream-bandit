@@ -2,6 +2,8 @@ import { Binding, rest } from "./oauth.ts";
 
 type Row = Record<string, unknown>;
 
+export const ATOMIC_CONTENT_HASH_VERSION = "sha256-utf8-v1";
+
 export type AtomicWorkspaceActionInput = {
   action: string;
   expected_state_version: number;
@@ -41,12 +43,14 @@ async function sha256Bytes(value: string) {
   );
 }
 
-export async function sha256Hex(value: string) {
+export async function hashUtf8Text(value: string) {
   return Array.from(
     await sha256Bytes(value),
     (byte) => byte.toString(16).padStart(2, "0"),
   ).join("");
 }
+
+export const sha256Hex = hashUtf8Text;
 
 function uuidFromDigest(bytes: Uint8Array) {
   const copy = bytes.slice(0, 16);
@@ -104,7 +108,7 @@ export async function atomicRequestHash(input: AtomicWorkspaceActionInput) {
   const action = cleanAction(input.action);
   const expected = cleanExpectedVersion(input.expected_state_version);
   const payload = cleanPayload(input.payload);
-  return await sha256Hex(canonicalJson({ action, expected_state_version: expected, payload }));
+  return await hashUtf8Text(canonicalJson({ action, expected_state_version: expected, payload }));
 }
 
 export async function atomicOperationId(
