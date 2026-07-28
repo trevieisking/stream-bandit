@@ -248,28 +248,135 @@ security definer
 set search_path = pg_catalog, public, extensions
 as $$
 declare
+  v_hash_version constant text := 'sha256-utf8-v1';
+  v_operation_text text;
+  v_fence_text text;
+  v_operation_id uuid;
+  v_fencing_token bigint;
+  v_old_metadata jsonb := '{}'::jsonb;
   v_candidate text;
   v_candidate_hash text;
+  v_old_candidate_hash text;
   v_source_hash text;
+  v_canonical_source_hash text;
+  v_canonical_candidate_hash text;
+  v_source_changed boolean := false;
+  v_candidate_changed boolean := false;
 begin
-  new.current_hash := public.code_labs_sha256_text(coalesce(new.current_code, ''));
+  v_operation_text := nullif(current_setting('code_labs.operation_id', true), '');
+  v_fence_text := nullif(current_setting('code_labs.fencing_token', true), '');
 
-  v_candidate := coalesce(new.metadata->>'fixed_output', '');
-  v_candidate_hash := lower(coalesce(new.metadata->>'candidate_hash', ''));
-  if v_candidate_hash <> '' and (
-    v_candidate = ''
-    or v_candidate_hash !~ '^[a-f0-9]{64}$'
-    or v_candidate_hash <> public.code_labs_sha256_text(v_candidate)
-  ) then
-    raise exception using errcode = 'P0001', message = 'candidate_hash_invalid';
+  -- Existing legacy rows remain readable and metadata-only legacy updates are
+  -- not silently rewritten by the post-cutover hash classifier.
+  if v_operation_text is null and v_fence_text is null then
+    return new;
+  end if;
+  if v_operation_text is null or v_fence_text is null then
+    raise exception using errcode = 'P0001', message = 'atomic_hash_operation_invalid';
   end if;
 
-  v_source_hash := lower(coalesce(new.metadata->>'source_hash', ''));
-  if v_source_hash <> '' and (
-    v_source_hash !~ '^[a-f0-9]{64}$'
-    or v_source_hash <> public.code_labs_sha256_text(coalesce(new.current_code, ''))
+  begin
+    v_operation_id := v_operation_text::uuid;
+    v_fencing_token := v_fence_text::bigint;
+  exception when others then
+    raise exception using errcode = 'P0001', message = 'atomic_hash_operation_invalid';
+  end;
+
+  if not exists (
+    select 1
+    from public.code_labs_action_runs r
+    where r.owner_id = new.owner_id
+      and r.operation_id = v_operation_id
+      and r.status = 'running'
+      and r.fencing_token = v_fencing_token
   ) then
-    raise exception using errcode = 'P0001', message = 'source_hash_invalid';
+    raise exception using errcode = 'P0001', message = 'atomic_hash_operation_invalid';
+  end if;
+
+  new.metadata := coalesce(new.metadata, '{}'::jsonb);
+  if tg_op = 'UPDATE' then
+    v_old_metadata := coalesce(old.metadata, '{}'::jsonb);
+    v_source_changed :=
+      new.current_code is distinct from old.current_code
+      or new.current_hash is distinct from old.current_hash
+      or coalesce(new.metadata->>'source_hash', '') is distinct from coalesce(v_old_metadata->>'source_hash', '')
+      or coalesce(new.metadata->>'hash_version', '') is distinct from coalesce(v_old_metadata->>'hash_version', '');
+    v_candidate_changed :=
+      coalesce(new.metadata->>'fixed_output', '') is distinct from coalesce(v_old_metadata->>'fixed_output', '')
+      or coalesce(new.metadata->>'candidate_hash', '') is distinct from coalesce(v_old_metadata->>'candidate_hash', '')
+      or coalesce(new.metadata->>'candidate_hash_version', '') is distinct from coalesce(v_old_metadata->>'candidate_hash_version', '');
+  else
+    v_source_changed := true;
+    v_candidate_changed :=
+      coalesce(new.metadata->>'fixed_output', '') <> ''
+      or coalesce(new.metadata->>'candidate_hash', '') <> ''
+      or coalesce(new.metadata->>'candidate_hash_version', '') <> '';
+  end if;
+
+  if v_source_changed then
+    v_canonical_source_hash := public.code_labs_sha256_text(coalesce(new.current_code, ''));
+    v_source_hash := lower(coalesce(new.metadata->>'source_hash', ''));
+
+    if lower(coalesce(new.current_hash, '')) <> v_canonical_source_hash
+       or (v_source_hash <> '' and v_source_hash <> v_canonical_source_hash) then
+      raise exception using errcode = 'P0001', message = 'source_hash_invalid';
+    end if;
+
+    if tg_op = 'UPDATE'
+       and nullif(old.current_hash, '') is not null
+       and lower(old.current_hash) is distinct from v_canonical_source_hash
+       and not (new.metadata ? 'legacy_hash') then
+      new.metadata := new.metadata || jsonb_build_object(
+        'legacy_hash', old.current_hash,
+        'legacy_hash_version', coalesce(
+          nullif(v_old_metadata->>'hash_version', ''),
+          'legacy-unclassified'
+        )
+      );
+    end if;
+
+    new.current_hash := v_canonical_source_hash;
+    new.metadata := new.metadata || jsonb_build_object(
+      'source_hash', v_canonical_source_hash,
+      'hash_version', v_hash_version
+    );
+  end if;
+
+  if v_candidate_changed then
+    v_candidate := coalesce(new.metadata->>'fixed_output', '');
+    v_candidate_hash := lower(coalesce(new.metadata->>'candidate_hash', ''));
+    v_old_candidate_hash := lower(coalesce(v_old_metadata->>'candidate_hash', ''));
+
+    if v_candidate = '' then
+      if v_candidate_hash <> '' then
+        raise exception using errcode = 'P0001', message = 'candidate_hash_invalid';
+      end if;
+      new.metadata := new.metadata - 'candidate_hash_version';
+    else
+      v_canonical_candidate_hash := public.code_labs_sha256_text(v_candidate);
+      if v_candidate_hash !~ '^[a-f0-9]{64}$'
+         or v_candidate_hash <> v_canonical_candidate_hash then
+        raise exception using errcode = 'P0001', message = 'candidate_hash_invalid';
+      end if;
+
+      if tg_op = 'UPDATE'
+         and v_old_candidate_hash <> ''
+         and v_old_candidate_hash is distinct from v_canonical_candidate_hash
+         and not (new.metadata ? 'legacy_candidate_hash') then
+        new.metadata := new.metadata || jsonb_build_object(
+          'legacy_candidate_hash', v_old_metadata->>'candidate_hash',
+          'candidate_legacy_hash_version', coalesce(
+            nullif(v_old_metadata->>'candidate_hash_version', ''),
+            'legacy-unclassified'
+          )
+        );
+      end if;
+
+      new.metadata := new.metadata || jsonb_build_object(
+        'candidate_hash', v_canonical_candidate_hash,
+        'candidate_hash_version', v_hash_version
+      );
+    end if;
   end if;
 
   return new;
