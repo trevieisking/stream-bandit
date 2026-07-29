@@ -1120,7 +1120,18 @@ begin
         v_expected_blob_absent := coalesce((v_request->>'expected_github_blob_absent')::boolean, false);
 
         if jsonb_typeof(v_request) <> 'object' then raise exception 'writer_request_invalid'; end if;
-        if coalesce(v_review->>'outcome','') <> 'PASS' then raise exception 'code_god_pass_required'; end if;
+        if lower(coalesce(v_request->>'independent_evidence_checkpoint_id','')) !~ '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+           or lower(coalesce(v_request->>'independent_evidence_receipt_id','')) !~ '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$' then
+          raise exception 'independent_evidence_ids_invalid';
+        end if;
+        if coalesce(v_review->>'outcome','') <> 'PASS'
+           or coalesce(v_review->>'scope_outcome','') <> 'BOUNDED_CHECKS_CLEAR'
+           or coalesce(v_review->>'authoritative','') <> 'false'
+           or coalesce(v_review->>'trust_state','') <> 'HOLD_UNTRUSTED_ADVISORY'
+           or coalesce(v_review->>'requires_independent_evidence_receipt','') <> 'true'
+           or coalesce(v_request->>'code_god_scope_outcome','') <> 'BOUNDED_CHECKS_CLEAR' then
+          raise exception 'bounded_code_god_advisory_required';
+        end if;
         if coalesce(v_review->>'proposed_hash','') <> coalesce(v_handoff->>'proposed_hash','')
            or coalesce(v_request->>'code_god_proposed_hash','') <> coalesce(v_review->>'proposed_hash','')
            or coalesce(v_request->>'code_god_handoff_hash','') <> coalesce(v_review->>'handoff_hash','')
@@ -1192,7 +1203,11 @@ begin
           false,
           true,
           false,
-          'Atomic Code Labs request: reviewed branch and draft PR only.',
+          jsonb_build_object(
+            'kind', 'code-labs-writer-evidence-request-v1',
+            'checkpoint_id', v_request->>'independent_evidence_checkpoint_id',
+            'receipt_id', v_request->>'independent_evidence_receipt_id'
+          )::text,
           v_request->>'code_god_review_version',
           'PASS',
           v_request->>'code_god_handoff_hash',
@@ -1219,6 +1234,9 @@ begin
           'github_base_branch', v_inserted_request.github_base_branch,
           'github_head_branch', v_inserted_request.github_head_branch,
           'expected_content_sha256', v_inserted_request.expected_content_sha256,
+          'independent_evidence_checkpoint_id', v_request->>'independent_evidence_checkpoint_id',
+          'independent_evidence_receipt_id', v_request->>'independent_evidence_receipt_id',
+          'independent_evidence_state', 'validated_by_final_hardening_trigger',
           'prepared_at', v_inserted_request.created_at
         );
         update public.code_labs_files f
