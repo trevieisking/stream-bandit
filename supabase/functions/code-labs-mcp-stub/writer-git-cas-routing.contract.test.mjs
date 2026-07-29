@@ -120,6 +120,35 @@ test('V50 Writer retains one-file, non-main, draft-only and no-force safeguards'
   assert.doesNotMatch(source, /force:\s*true/);
 });
 
+test('V50 Writer requires immutable Master Plan checkpoint evidence before and after claim', async () => {
+  const source = await writerSource();
+  const review = position(source, 'const pendingReview = immutableReviewProof(pending);', 'Bounded review validation');
+  const independent = position(source, 'const pendingIndependent = await verifyIndependentEvidence(', 'Independent checkpoint validation');
+  const claim = position(source, 'const request = await claimRequest(', 'Writer claim');
+  const claimedIndependent = position(source, 'const claimedIndependent = await verifyIndependentEvidence(', 'Post-claim independent checkpoint validation');
+  assert.ok(review < independent, 'Independent evidence follows bounded Code God validation.');
+  assert.ok(independent < claim, 'Independent evidence must be verified before request claim.');
+  assert.ok(claim < claimedIndependent, 'Independent evidence must be re-read after claim.');
+  for (const marker of [
+    'WRITER_EVIDENCE_BINDING_KIND',
+    'INDEPENDENT_EVIDENCE_KIND',
+    'HOLD_UNTRUSTED_ADVISORY',
+    'code_labs_versions?select=id,file_id,version_kind,label,filename,code,note,operation_id,fencing_token,created_at',
+    'code_labs_action_receipts?select=id,action,record_type,record_id,operation_id,fencing_token,created_at',
+    'code-labs/CODE-LABS-V1-PLAN.md',
+    'checkpoint_note_hash',
+    'checklist_scope_state',
+    'String(left.safety_note || "") === String(right.safety_note || "")',
+    'packet.independent_of_code_god !== true',
+    'packet.independent_of_repair_lab !== true',
+    'await hashCanonicalJson(handoff)',
+    'await hashUtf8Text(String(metadata.fixed_output || ""))',
+  ]) {
+    assert.ok(source.includes(marker), `Writer checkpoint evidence contract is missing: ${marker}`);
+  }
+  assert.doesNotMatch(source, /Immutable Code God PASS proof is required/);
+});
+
 test('evidence boundary: the routing gate is green source evidence, not runtime proof', () => {
   const evidence = {
     source_gate: true,
