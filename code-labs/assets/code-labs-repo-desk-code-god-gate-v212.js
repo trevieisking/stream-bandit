@@ -1,10 +1,10 @@
-/* Code Labs Repo Desk CG Repair Lab Gate V218.
-   Route only the Repo Desk content CTA through read-only CG Repair Lab before Code God.
+/* Code Labs Repo Desk CG Repair Lab Gate V219.
+   Sole owner for Repo Desk main-content handoffs into read-only CG Repair Lab before Code God.
    Sidebar navigation and GitHub Writer -> Tracker remain canonical and untouched.
 */
 (function () {
   'use strict';
-  var VERSION = 'V218';
+  var VERSION = 'V219-single-owner';
   var timer = 0;
   var observer = null;
   var scans = 0;
@@ -24,7 +24,8 @@
     if (!link || page() !== 'repo-desk') return false;
     if (link.closest && link.closest('.sidebar')) return false;
     if (!(link.closest && link.closest('.main'))) return false;
-    return cleanHref(link) === 'publish-prep.html';
+    var href = cleanHref(link);
+    return href === 'publish-prep.html' || href === 'cg-repair-lab.html';
   }
 
   function saveVisibleHandoff() {
@@ -90,6 +91,7 @@
 
   function boot() {
     if (page() !== 'repo-desk') return;
+    document.body.setAttribute('data-code-labs-repo-handoff-owner', VERSION);
     document.addEventListener('click', intercept, true);
     apply();
     var main = document.querySelector('.main');
@@ -113,6 +115,7 @@
 
   window.CodeLabsCodeGodGate = {
     version: VERSION,
+    owner: 'repo-desk-main-handoff',
     run: apply,
     max_scans: MAX_SCANS,
     scope: 'repo-desk-main-only'
