@@ -183,42 +183,72 @@ Deno.test("CG Repair Lab preserves exact bracket and global secret references wi
   );
 });
 
-Deno.test("CG Repair Lab publishes the complete tool workflow without candidate replacement", () => {
+Deno.test("CG Repair Lab publishes a held read-only workflow with owner controls separated", () => {
   const workflow = getCgRepairLabWorkflow();
   const controls = workflow.controls as Array<Record<string, any>>;
   assert(
-    controls.some((item) =>
-      item.tool === "run_code_labs_action" &&
-      item.action === "cg_repair_lab.access" &&
-      item.writes === false
-    ),
-    "The Pro access control must map to the stable read-only action route.",
+    workflow.trust_state === "HOLD_UNTRUSTED_ADVISORY" &&
+      workflow.authoritative_use === false,
+    "Repair Lab must disclose that it is advisory and held from authoritative use.",
+  );
+  for (const action of ["cg_repair_lab.access", "cg_repair_lab.analyze"]) {
+    assert(
+      controls.some((item) =>
+        item.tool === "run_code_labs_action" &&
+        item.action === action &&
+        item.enabled === true &&
+        item.writes === false
+      ),
+      `The read-only Repair Lab action must remain enabled: ${action}`,
+    );
+  }
+  const candidateControl = controls.find((item) =>
+    item.control === "save_separate_candidate"
   );
   assert(
-    controls.some((item) =>
-      item.tool === "run_code_labs_action" &&
-      item.action === "cg_repair_lab.analyze" &&
-      item.writes === false
-    ),
-    "Repository analysis must map to the stable read-only action route.",
+    candidateControl?.tool === "save_code_labs_candidate" &&
+      candidateControl?.enabled === false &&
+      candidateControl?.owner_control === true &&
+      candidateControl?.repair_lab_authority === false &&
+      candidateControl?.replaces_selected_source === false,
+    "Candidate saving must be an explicitly held owner control outside Repair Lab authority.",
   );
   assert(
-    controls.some((item) =>
-      item.action === "cg_repair_lab.save_candidate" &&
-      item.replaces_selected_source === false
-    ),
-    "Candidate saving must stay separate from selected-source replacement.",
+    !controls.some((item) => item.action === "cg_repair_lab.save_candidate"),
+    "The removed Repair Lab mutation alias must not be published as a workflow action.",
+  );
+  for (const controlName of [
+    "prepare_code_god_handoff",
+    "run_code_god",
+    "queue_writer_request",
+    "execute_reviewed_writer",
+  ]) {
+    const control = controls.find((item) => item.control === controlName);
+    assert(
+      control?.enabled === false,
+      `The downstream control must remain held during education: ${controlName}`,
+    );
+  }
+  const writerControl = controls.find((item) =>
+    item.control === "execute_reviewed_writer"
   );
   assert(
-    controls.some((item) =>
-      item.connector === "Code Labs V104 Writer" &&
-      item.requires_code_god_pass === true
-    ),
-    "Writer execution must remain a separate post-Code-God control.",
+    writerControl?.requires_code_god_pass === true &&
+      writerControl?.requires_independent_evidence_receipt === true,
+    "Writer must require both the mechanical Code God prerequisite and independent evidence.",
   );
   assert(
     workflow.prohibited.includes("candidate.accept"),
     "CG Repair Lab must prohibit the source-replacement action.",
+  );
+  const repairActions = (listActions().actions as Array<Record<string, any>>)
+    .map((item) => String(item.action || ""))
+    .filter((action) => action.startsWith("cg_repair_lab."));
+  assert(
+    repairActions.length === 2 &&
+      repairActions.includes("cg_repair_lab.access") &&
+      repairActions.includes("cg_repair_lab.analyze"),
+    "The public Repair Lab namespace must contain only its two read-only actions.",
   );
 });
 
