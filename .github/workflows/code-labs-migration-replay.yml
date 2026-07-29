@@ -10,6 +10,7 @@ on:
       - supabase/migrations/**
       - supabase/functions/code-labs-mcp-stub/migration-replay-baseline.contract.test.mjs
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
