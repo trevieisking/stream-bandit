@@ -3,12 +3,17 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const root = new URL('../../migrations/', import.meta.url);
+const foundationPath = new URL('./20260728143000_code_labs_atomic_workspace_engine.sql', root);
 const finalPath = new URL('./20260728172000_code_labs_v50_coherent_hardening.sql', root);
 const markers = [
   '20260728170500_code_labs_atomic_boolean_owner_cleanup.sql',
   '20260728171000_code_labs_atomic_failure_transition_cleanup.sql',
   '20260728171500_code_labs_writer_immutable_branch_sha.sql',
 ];
+
+async function foundationSql() {
+  return readFile(foundationPath, 'utf8');
+}
 
 async function finalSql() {
   return readFile(finalPath, 'utf8');
@@ -89,8 +94,83 @@ test('protected branches and exact content/blob proofs remain fail closed', asyn
     'writer_protected_branch_invalid',
     'writer_content_hash_invalid',
     'writer_expected_blob_invalid',
-    'writer_review_binding_invalid',
+    'writer_bounded_review_binding_invalid',
     'writer_handoff_branch_binding_invalid',
+  ]);
+});
+
+
+test('foundation transports exact independent evidence IDs and advisory Code God scope', async () => {
+  const sql = await foundationSql();
+  mustContain(sql, [
+    'independent_evidence_checkpoint_id',
+    'independent_evidence_receipt_id',
+    'independent_evidence_ids_invalid',
+    'bounded_code_god_advisory_required',
+    'code-labs-writer-evidence-request-v1',
+    'validated_by_final_hardening_trigger',
+  ]);
+  assert.doesNotMatch(
+    sql,
+    /Atomic Code Labs request: reviewed branch and draft PR only\./,
+    'The old static safety note must not survive the independent evidence cutover.',
+  );
+});
+
+test('final proof trigger owns independent checkpoint, receipt, plan and checklist validation', async () => {
+  const sql = await finalSql();
+  mustContain(sql, [
+    'writer_independent_evidence_request_invalid',
+    'writer_independent_checkpoint_invalid',
+    'writer_independent_checkpoint_receipt_invalid',
+    'writer_independent_checkpoint_packet_invalid',
+    'writer_master_plan_binding_invalid',
+    'writer_independent_evidence_binding_invalid',
+    'master-checklist-independent-gate-v1',
+    "v_master_plan.filename <> 'code-labs/CODE-LABS-V1-PLAN.md'",
+    "metadata->'exact_checklist'->>'checklist_id'",
+    "metadata->'exact_checklist'->>'checklist_version'",
+  ]);
+});
+
+test('final proof trigger canonicalises safety_note and detects later tampering', async () => {
+  const sql = await finalSql();
+  mustContain(sql, [
+    "'kind', 'code-labs-writer-evidence-binding-v1'",
+    "'checkpoint_note_hash', v_checkpoint_note_hash",
+    'new.safety_note := v_evidence_binding::text',
+    'writer_independent_evidence_binding_changed',
+    'writer_independent_evidence_binding_too_large',
+    'code_god_review_version,',
+    'code_god_outcome,',
+    'code_god_reviewed_at,',
+    'safety_note',
+  ]);
+});
+
+test('independent evidence binds current source, candidate, handoff, review and branch head', async () => {
+  const sql = await finalSql();
+  mustContain(sql, [
+    "v_evidence_packet->>'github_head_sha'",
+    "v_evidence_packet->>'source_file_id'",
+    "v_evidence_packet->>'source_hash'",
+    "v_evidence_packet->>'candidate_hash'",
+    "v_evidence_packet->>'handoff_hash'",
+    "v_evidence_packet->>'code_god_review_version'",
+    "v_evidence_packet->>'code_god_scope_outcome'",
+    "v_evidence_packet->>'code_god_trust_state'",
+    "public.code_labs_sha256_text(coalesce(v_checkpoint.code, ''))",
+  ]);
+});
+
+test('independent check manifest and limitations cannot be empty', async () => {
+  const sql = await finalSql();
+  mustContain(sql, [
+    "jsonb_typeof(v_evidence_packet->'checks_run') <> 'array'",
+    "jsonb_array_length(v_evidence_packet->'checks_run') < 1",
+    "jsonb_typeof(v_evidence_packet->'checks_not_run') <> 'array'",
+    "jsonb_array_length(v_evidence_packet->'limitations') < 1",
+    "jsonb_array_length(v_evidence_packet->'evidence_sources') < 1",
   ]);
 });
 
@@ -108,10 +188,14 @@ test('evidence boundary remains source-only', () => {
     source_contract: true,
     isolated_postgres_rerun: false,
     full_migration_replay: false,
+    independent_checkpoint_runtime: false,
+    protected_writer_runtime: false,
     deployed: false,
   };
   assert.equal(evidence.source_contract, true);
   assert.equal(evidence.isolated_postgres_rerun, false);
   assert.equal(evidence.full_migration_replay, false);
+  assert.equal(evidence.independent_checkpoint_runtime, false);
+  assert.equal(evidence.protected_writer_runtime, false);
   assert.equal(evidence.deployed, false);
 });
