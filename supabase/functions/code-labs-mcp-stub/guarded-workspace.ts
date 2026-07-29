@@ -38,6 +38,11 @@ const PROTECTED_BRANCHES = new Set([
 
 const ATOMIC_WORKSPACE_RPC_ROUTE = "rpc/code_labs_execute_workspace_action";
 
+const REPAIR_LAB_READ_ONLY_ACTIONS = new Set([
+  "cg_repair_lab.access",
+  "cg_repair_lab.analyze",
+]);
+
 const TRANSACTIONAL_ACTIONS = new Set([
   "file.intake",
   "setup.save",
@@ -639,7 +644,6 @@ export function listActions() {
     { action: "repo.prepare_handoff", requires_confirmation: false },
     { action: "cg_repair_lab.access", requires_confirmation: false },
     { action: "cg_repair_lab.analyze", requires_confirmation: false },
-    { action: "cg_repair_lab.save_candidate", requires_confirmation: false },
     { action: "code_labs.owner_activate_repository", requires_confirmation: true },
     { action: "code_god.review", requires_confirmation: false },
     { action: "github.branch_create", requires_confirmation: true },
@@ -698,9 +702,16 @@ export function executeDirectGithubWriter(b: Binding, args: Row) {
 export async function runAction(b: Binding, args: Row) {
   let action = String(args.action || "");
 
-  if (action === "cg_repair_lab.access") return getCgRepairLabAccess(b);
-  if (action === "cg_repair_lab.analyze") {
-    return analyzeCgRepairLab(b, { ...args, ...(args.fields || {}) });
+  if (REPAIR_LAB_READ_ONLY_ACTIONS.has(action)) {
+    if (action === "cg_repair_lab.access") return getCgRepairLabAccess(b);
+    if (action === "cg_repair_lab.analyze") {
+      return analyzeCgRepairLab(b, { ...args, ...(args.fields || {}) });
+    }
+  }
+  if (action.startsWith("cg_repair_lab.")) {
+    throw new Error(
+      "CG Repair Lab is read-only and cannot execute workspace mutations while trust is held.",
+    );
   }
   if (action === "backend.tables_snapshot") return backendTablesSnapshot(b);
   if (action === "canvas.load_packet" || action === "github.prepare_request") {
@@ -720,14 +731,6 @@ export async function runAction(b: Binding, args: Row) {
       args.request_id || args.record_id || args.fields?.request_id || "",
     ).trim();
     return executeWriterExternal(b, { ...args, request_id: requestId });
-  }
-  if (action === "cg_repair_lab.save_candidate") {
-    action = "candidate.save";
-    args = {
-      ...args,
-      candidate_code: args.candidate_code ?? args.fields?.candidate_code,
-      note: args.note ?? args.fields?.note,
-    };
   }
 
   if (!TRANSACTIONAL_ACTIONS.has(action)) {
