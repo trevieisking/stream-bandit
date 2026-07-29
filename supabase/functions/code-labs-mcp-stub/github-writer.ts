@@ -590,14 +590,9 @@ export async function executeGithubWriter(b: Binding, args: Row) {
         stage = "ref_update_unknown";
         throw error;
       }
-      const reconciliation = reconcileExistingCommit(
-        reconciledSha,
-        createdCommitSha,
-        plan.expected_parent_sha,
-      );
-      if (reconciliation === "applied") {
+      if (reconciledSha === createdCommitSha) {
         // GitHub applied the ref update but the original response was lost.
-      } else if (reconciliation === "no_write") {
+      } else if (reconciledSha === plan.expected_parent_sha) {
         stage = "ref_update_no_write";
         throw error;
       } else {
