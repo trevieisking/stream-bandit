@@ -36,9 +36,30 @@ const PROTECTED_BRANCHES = new Set([
   "gh-pages",
 ]);
 
+const ATOMIC_WORKSPACE_RPC_ROUTE = "rpc/code_labs_execute_workspace_action";
+
 const TRANSACTIONAL_ACTIONS = new Set([
-  ...ATOMIC_ACTION_COVERAGE.adapted,
-  ...ATOMIC_ACTION_COVERAGE.requires_domain_preparation,
+  "file.intake",
+  "setup.save",
+  "project.select",
+  "file.select",
+  "job.select",
+  "packet.select",
+  "test.select",
+  "file.replace_current",
+  "repair.save",
+  "packet.build",
+  "canvas.save_candidate",
+  "candidate.save",
+  "candidate.accept",
+  "test.record",
+  "checkpoint.create",
+  "workflow.advance",
+  "workflow.reset",
+  "repo.prepare_handoff",
+  "code_god.review",
+  "github.writer_prepare",
+  "undo.execute",
 ]);
 
 function nowIso() {
@@ -433,6 +454,9 @@ async function atomicPayload(b: Binding, action: string, args: Row) {
 }
 
 async function runAtomicAction(b: Binding, action: string, args: Row) {
+  if (ATOMIC_WORKSPACE_RPC_ROUTE !== "rpc/code_labs_execute_workspace_action") {
+    throw new Error("The atomic workspace RPC route is invalid.");
+  }
   const expected = expectedVersion(args);
   const payload = await atomicPayload(b, action, args);
   return executeAtomicWorkspaceAction(b, {

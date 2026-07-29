@@ -18,6 +18,29 @@ const MAX_CONTENT = 180000;
 const PROTECTED = new Set(["main", "master", "production", "live", "gh-pages"]);
 const HASH = /^[a-f0-9]{64}$/;
 const SHA40 = /^[a-f0-9]{40}$/;
+const WRITER_PHASES = new Set(["queued", "processing", "github_committed", "pr_opened", "completed"]);
+
+function writerFencingToken(request: Row) {
+  const writer_fencing_token = String(request.writer_claim_id || "").trim();
+  if (!writer_fencing_token) throw new Error("The Writer fencing token is missing.");
+  return writer_fencing_token;
+}
+
+function reconcileExistingCommit(currentHead: string, createdCommit: string, expectedParent: string) {
+  if (currentHead === createdCommit) return "applied";
+  if (currentHead === expectedParent) return "no_write";
+  return "conflict";
+}
+
+function verifyStoredPullRequest(request: Row, pull: Row) {
+  if (
+    !pull || pull.draft !== true || String(pull.state || "") !== "open" ||
+    Number(pull.number || 0) !== Number(request.pull_request_number || pull.number || 0) ||
+    String(pull.head?.ref || "") !== String(request.branch || "") ||
+    String(pull.base?.ref || "") !== String(request.github_base_branch || "")
+  ) throw new Error("The stored draft pull-request proof is no longer valid.");
+  return pull;
+}
 
 function safeBranch(value: unknown) {
   const branch = String(value || "").trim();
@@ -75,6 +98,8 @@ async function selectedRequest(ownerId: string, requestId: string) {
 }
 
 function completedProof(request: Row) {
+  const phase = String(request.writer_phase || "pr_opened");
+  if (!WRITER_PHASES.has(phase)) return null;
   const commitSha = String(request.github_commit_sha || "");
   const contentSha = String(request.github_content_sha || "");
   const pullNumber = Number(request.pull_request_number || 0);
@@ -380,6 +405,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
 
     stage = "request_claim";
     const request = await claimRequest(b.owner_id, requestId, claimId);
+    writerFencingToken(request);
     claimOwned = true;
     const claimedReview = immutableReviewProof(request);
     if (!sameReviewProof(pendingReview, claimedReview) || !sameRequestProof(pending, request)) {
@@ -562,9 +588,14 @@ export async function executeGithubWriter(b: Binding, args: Row) {
         stage = "ref_update_unknown";
         throw error;
       }
-      if (reconciledSha === createdCommitSha) {
+      const reconciliation = reconcileExistingCommit(
+        reconciledSha,
+        createdCommitSha,
+        plan.expected_parent_sha,
+      );
+      if (reconciliation === "applied") {
         // GitHub applied the ref update but the original response was lost.
-      } else if (reconciledSha === plan.expected_parent_sha) {
+      } else if (reconciliation === "no_write") {
         stage = "ref_update_no_write";
         throw error;
       } else {
@@ -635,6 +666,10 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     if (!pullNumber || !pullUrl || pull?.draft !== true) {
       throw new Error("GitHub did not return draft pull-request proof.");
     }
+    verifyStoredPullRequest({
+      ...request,
+      pull_request_number: pullNumber,
+    }, pull);
     progress.pull_request_number = pullNumber;
     progress.pull_request_url = pullUrl;
     await audit(requestId, "draft_pr_opened", {
@@ -656,7 +691,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
         headers: { Prefer: "return=representation" },
         body: JSON.stringify({
           status: "pr_opened",
-          writer_phase: "pr_opened",
+          writer_phase: "completed",
           github_branch_created: true,
           github_commit_sha: createdCommitSha,
           github_content_sha: contentSha,

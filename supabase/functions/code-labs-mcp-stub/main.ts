@@ -49,47 +49,6 @@ function tools() {
   ];
 }
 
-/**
- * V50 connector-preservation and atomic-cutover note
- *
- * This entrypoint intentionally remains the sole public MCP and OAuth surface for
- * Code Labs V104. The cutover changes transaction ownership, not the connector
- * contract. Every public tool name remains registered in its historical order,
- * every read route remains owner-bound through binding(req), and both JSON-RPC
- * and compatibility tool-call routes continue to call the same dispatcher.
- *
- * File Lab intake no longer reserves workspace state or performs a chain of
- * direct REST mutations inside this entrypoint. The file.intake action now uses
- * runAction exactly like the other guarded actions. guarded-workspace.ts gathers
- * immutable GitHub source evidence, builds the File Lab effect payload, and sends
- * that payload through code_labs_execute_workspace_action_strict. The database
- * function is therefore the only owner of file upsert, downstream-selection
- * clearing, workspace version advancement and receipt insertion.
- *
- * The following capabilities are deliberately preserved here:
- * - OAuth discovery, dynamic client registration, PKCE authorisation and token
- *   exchange under the existing code-labs-mcp-stub endpoint and scopes.
- * - owner-token binding for every protected tool invocation;
- * - context reads, approved URL reads and workspace/record/receipt reads;
- * - CG Repair Lab entitlement, workflow and repository-analysis tools;
- * - opaque owner-gallery listing and deliberate selected-image reads;
- * - project, file, job, packet, test, candidate and checkpoint operations;
- * - the strict action dispatcher, protected Writer execution and compatibility
- *   save_code_labs_write_request route;
- * - structured text/image MCP results and the existing no-store error envelope.
- *
- * No helper in this file may reintroduce a second workspace reservation owner,
- * direct Code Labs table write, compensating File Lab write, browser session,
- * engine selector, shadow write or dual write. Read-only preparation may occur
- * before dispatch, while database mutation belongs exclusively to the atomic
- * workspace engine and GitHub mutation belongs exclusively to the protected
- * external Writer boundary.
- *
- * decodeBase64 remains as a stable source-contract boundary marker used by the
- * connector-preservation test to delimit the public tools registry. It does not
- * perform File Lab work and must not become another intake implementation.
- */
-
 function decodeBase64(value: string) {
   return value;
 }
