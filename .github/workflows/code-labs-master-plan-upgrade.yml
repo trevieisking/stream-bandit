@@ -1,0 +1,33 @@
+name: Code Labs Master Plan Upgrade Note
+
+on:
+  push:
+    branches:
+      - fix/code-labs-master-recovery-atomic-engine-20260728
+    paths:
+      - code-labs/tests/apply-master-plan-upgrade.mjs
+
+permissions:
+  contents: write
+
+jobs:
+  update-plan:
+    name: Add plan-bound checklist upgrade
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact recovery branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/code-labs-master-recovery-atomic-engine-20260728
+          fetch-depth: 0
+
+      - name: Apply assertion-guarded plan update
+        run: node code-labs/tests/apply-master-plan-upgrade.mjs
+
+      - name: Commit only the existing master plan
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add code-labs/CODE-LABS-V1-PLAN.md
+          git commit -m "Plan master-plan and exact-checklist control pages"
+          git push origin HEAD:fix/code-labs-master-recovery-atomic-engine-20260728
