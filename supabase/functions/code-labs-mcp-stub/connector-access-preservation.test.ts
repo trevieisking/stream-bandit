@@ -214,6 +214,46 @@ Deno.test("connector access: read tools and owner-gallery reads remain callable 
   }
 });
 
+Deno.test("connector access: V50 preserves File Lab intake discovery and frozen undo compatibility", async () => {
+  const guarded = await source("./guarded-workspace.ts");
+  const listBlock = block(
+    guarded,
+    "export function listActions()",
+    "\n}\n\nexport function selectRecord",
+  );
+  const undoBlock = block(
+    guarded,
+    "export async function undoAction",
+    "\n}\n\nexport function executeDirectGithubWriter",
+  );
+
+  assertIncludes(
+    listBlock,
+    '{ action: "file.intake", requires_confirmation: false }',
+    "The atomic cutover must keep the existing File Lab intake action discoverable.",
+  );
+  assertIncludes(
+    undoBlock,
+    "expectedStateVersion === undefined",
+    "The frozen pre-V50 undo registration must remain compatible when it omits state_version.",
+  );
+  assertIncludes(
+    undoBlock,
+    "const current = await getWorkspace(b);",
+    "The compatibility adapter must read the current owner workspace before atomic undo.",
+  );
+  assertIncludes(
+    undoBlock,
+    "expectedStateVersion = current.workspace?.state_version;",
+    "The compatibility adapter must bind atomic undo to the freshly read state version.",
+  );
+  assertIncludes(
+    undoBlock,
+    'return runAtomicAction(b, "undo.execute"',
+    "Both old and refreshed app registrations must use the same atomic undo route.",
+  );
+});
+
 Deno.test("connector access: atomic migration does not alter OAuth, owner or browser-session tables", async () => {
   const migration = await source(
     "../../migrations/20260728143000_code_labs_atomic_workspace_engine.sql",
