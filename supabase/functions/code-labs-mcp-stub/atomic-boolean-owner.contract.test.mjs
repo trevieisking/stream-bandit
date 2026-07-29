@@ -11,7 +11,7 @@ const hardeningUrl = new URL(
   import.meta.url,
 );
 const cleanupUrl = new URL(
-  '../../migrations/20260728170500_code_labs_atomic_boolean_owner_cleanup.sql',
+  '../../migrations/20260728172000_code_labs_v50_coherent_hardening.sql',
   import.meta.url,
 );
 
@@ -73,11 +73,12 @@ test('boolean owner: strict helper accepts JSON booleans but not strings', async
   assert.match(boundary, /receipt_boolean_invalid/i);
 });
 
-test('boolean owner: cleanup must be folded into hardening before deployment', async () => {
+test('boolean owner: cleanup is owned by final hardening before deployment', async () => {
   const { cleanup } = await sources();
 
-  assert.match(cleanup, /POST-CUTOVER CLEANUP ONLY/i);
-  assert.match(cleanup, /folded into the[\s\S]*final hardening migration before any deployment decision/i);
+  assert.match(cleanup, /strict expansion helper is the sole boolean boundary/i);
+  assert.match(cleanup, /drop function if exists public\.code_labs_jsonb_boolean/i);
+  assert.match(cleanup, /grant execute on function public\.code_labs_require_jsonb_boolean/i);
 });
 
 test('evidence boundary: source ownership is not database execution proof', () => {

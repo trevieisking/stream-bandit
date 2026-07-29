@@ -26,9 +26,9 @@ function writerFencingToken(request: Row) {
   return writer_fencing_token;
 }
 
-function reconcileExistingCommit(currentHead: string, createdCommit: string, expectedParent: string) {
-  if (currentHead === createdCommit) return "applied";
-  if (currentHead === expectedParent) return "no_write";
+function reconcileExistingCommit(reconciledSha: string, createdCommitSha: string, expectedParentSha: string) {
+  if (reconciledSha === createdCommitSha) return "applied";
+  if (reconciledSha === expectedParentSha) return "no_write";
   return "conflict";
 }
 
@@ -156,6 +156,8 @@ function sameRequestProof(left: Row, right: Row) {
     String(left.commit_message || "") === String(right.commit_message || "") &&
     String(left.pr_title || "") === String(right.pr_title || "") &&
     String(left.pr_body || "") === String(right.pr_body || "") &&
+    String(left.expected_github_blob_sha || "") === String(right.expected_github_blob_sha || "") &&
+    left.expected_github_blob_absent === right.expected_github_blob_absent &&
     left.direct_main_write === right.direct_main_write &&
     left.branch_pr_only === right.branch_pr_only &&
     left.deletes_anything === right.deletes_anything;

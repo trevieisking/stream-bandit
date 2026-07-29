@@ -40,7 +40,7 @@ test('failure fence: service_role cannot bypass the wrapper', async () => {
 });
 
 test('failure fence: final guard separates validation failure from interruption', async () => {
-  const cleanup = await read('20260728171000_code_labs_atomic_failure_transition_cleanup.sql');
+  const cleanup = await read('20260728172000_code_labs_v50_coherent_hardening.sql');
 
   assert.match(cleanup, /if new\.status = 'failed_validation' then[\s\S]*?new\.fencing_token := null/i);
   assert.match(cleanup, /else[\s\S]*?current_setting\('code_labs\.fencing_token', true\)/i);
@@ -54,7 +54,7 @@ test('failure fence: final guard separates validation failure from interruption'
 });
 
 test('failure fence: failed result identity and stored evidence are mandatory', async () => {
-  const cleanup = await read('20260728171000_code_labs_atomic_failure_transition_cleanup.sql');
+  const cleanup = await read('20260728172000_code_labs_v50_coherent_hardening.sql');
 
   assert.match(cleanup, /v_operation_id is distinct from old\.operation_id/i);
   assert.match(cleanup, /new\.completed_state_version is not null/i);
