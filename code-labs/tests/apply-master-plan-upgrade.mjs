@@ -179,3 +179,4 @@ This upgrade is complete only when:
 const after = before.slice(0, first) + section + before.slice(first);
 await writeFile(path, after);
 console.log('Added Master Plan and Exact Checklist upgrade to the authoritative Code Labs plan.');
+// Retriggered after exact-head smoke evidence passed.
