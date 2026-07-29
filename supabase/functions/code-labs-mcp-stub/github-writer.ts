@@ -18,6 +18,9 @@ const MAX_CONTENT = 180000;
 const PROTECTED = new Set(["main", "master", "production", "live", "gh-pages"]);
 const HASH = /^[a-f0-9]{64}$/;
 const SHA40 = /^[a-f0-9]{40}$/;
+const INDEPENDENT_EVIDENCE_KIND = "master-checklist-independent-gate-v1";
+const WRITER_EVIDENCE_BINDING_KIND = "code-labs-writer-evidence-binding-v1";
+const CODE_GOD_TRUST_STATE = "HOLD_UNTRUSTED_ADVISORY";
 const WRITER_PHASES = new Set(["queued", "processing", "github_committed", "pr_opened", "completed"]);
 
 function writerFencingToken(request: Row) {
@@ -71,6 +74,72 @@ function exactSha(value: unknown, label: string) {
   return sha;
 }
 
+function exactHash(value: unknown, label: string) {
+  const hash = String(value || "").trim().toLowerCase();
+  if (!HASH.test(hash)) throw new Error(label + " is missing or invalid.");
+  return hash;
+}
+
+function exactUuid(value: unknown, label: string) {
+  const id = String(value || "").trim().toLowerCase();
+  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(id)) {
+    throw new Error(label + " is missing or invalid.");
+  }
+  return id;
+}
+
+function exactTime(value: unknown, label: string) {
+  const output = String(value || "").trim();
+  if (!output || Number.isNaN(Date.parse(output))) {
+    throw new Error(label + " is missing or invalid.");
+  }
+  return output;
+}
+
+function canonicalValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalValue);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Row)
+        .filter(([, entry]) => entry !== undefined)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, entry]) => [key, canonicalValue(entry)]),
+    );
+  }
+  return value;
+}
+
+function canonicalJson(value: unknown) {
+  return JSON.stringify(canonicalValue(value));
+}
+
+async function hashUtf8Text(value: unknown) {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(String(value ?? "")),
+  );
+  return Array.from(
+    new Uint8Array(digest),
+    (byte) => byte.toString(16).padStart(2, "0"),
+  ).join("");
+}
+
+async function hashCanonicalJson(value: unknown) {
+  return await hashUtf8Text(canonicalJson(value));
+}
+
+function textArray(value: unknown, label: string, allowEmpty = false) {
+  if (!Array.isArray(value)) throw new Error(label + " is missing or invalid.");
+  const output = value.map((item) => String(item || "").trim()).filter(Boolean);
+  if ((!allowEmpty && output.length === 0) || output.length > 100) {
+    throw new Error(label + " is incomplete.");
+  }
+  if (output.some((item) => item.length > 500)) {
+    throw new Error(label + " contains an oversized entry.");
+  }
+  return output;
+}
+
 function encodeRef(branch: string) {
   return branch.split("/").map(encodeURIComponent).join("/");
 }
@@ -120,7 +189,61 @@ function completedProof(request: Row) {
   };
 }
 
+function independentBindingProof(request: Row) {
+  const raw = String(request.safety_note || "").trim();
+  if (!raw || raw.length > 4000) {
+    throw new Error("The independent evidence safety binding is missing or invalid.");
+  }
+  let parsed: Row;
+  try {
+    parsed = JSON.parse(raw) as Row;
+  } catch {
+    throw new Error("The independent evidence safety binding is not valid JSON.");
+  }
+  const checklistVersion = Number(parsed.checklist_version);
+  if (!Number.isSafeInteger(checklistVersion) || checklistVersion < 1) {
+    throw new Error("The independent evidence checklist version is invalid.");
+  }
+  const proof = {
+    kind: String(parsed.kind || ""),
+    checkpoint_id: exactUuid(parsed.checkpoint_id, "Independent evidence checkpoint id"),
+    receipt_id: exactUuid(parsed.receipt_id, "Independent evidence receipt id"),
+    checkpoint_note_hash: exactHash(
+      parsed.checkpoint_note_hash,
+      "Independent evidence checkpoint note hash",
+    ),
+    evidence_kind: String(parsed.evidence_kind || ""),
+    decision: String(parsed.decision || ""),
+    checked_at: exactTime(parsed.checked_at, "Independent evidence checked_at"),
+    master_plan_record_id: exactUuid(
+      parsed.master_plan_record_id,
+      "Independent evidence Master Plan record id",
+    ),
+    master_plan_source_hash: exactHash(
+      parsed.master_plan_source_hash,
+      "Independent evidence Master Plan source hash",
+    ),
+    checklist_id: String(parsed.checklist_id || "").trim(),
+    checklist_version: checklistVersion,
+    checklist_scope_state: String(parsed.checklist_scope_state || ""),
+    code_god_scope_outcome: String(parsed.code_god_scope_outcome || ""),
+    code_god_trust_state: String(parsed.code_god_trust_state || ""),
+  };
+  if (
+    proof.kind !== WRITER_EVIDENCE_BINDING_KIND ||
+    proof.evidence_kind !== INDEPENDENT_EVIDENCE_KIND ||
+    proof.decision !== "PASS" || proof.checklist_scope_state !== "PASS" ||
+    !proof.checklist_id || proof.checklist_id.length > 200 ||
+    proof.code_god_scope_outcome !== "BOUNDED_CHECKS_CLEAR" ||
+    proof.code_god_trust_state !== CODE_GOD_TRUST_STATE
+  ) {
+    throw new Error("The independent evidence safety binding is not an approved PASS binding.");
+  }
+  return proof;
+}
+
 function immutableReviewProof(request: Row) {
+  const independent = independentBindingProof(request);
   const proof = {
     version: String(request.code_god_review_version || ""),
     outcome: String(request.code_god_outcome || ""),
@@ -128,13 +251,19 @@ function immutableReviewProof(request: Row) {
     proposed_hash: String(request.code_god_proposed_hash || ""),
     reviewed_at: String(request.code_god_reviewed_at || ""),
     source_file_id: String(request.code_god_source_file_id || ""),
+    independent,
   };
   if (
-    proof.outcome !== "PASS" || !proof.version ||
+    proof.outcome !== "PASS" ||
+    proof.version !== "V50-code-god-2-bounded-advisory" ||
     !HASH.test(proof.handoff_hash) || !HASH.test(proof.proposed_hash) ||
     !proof.reviewed_at || Number.isNaN(Date.parse(proof.reviewed_at)) ||
     !proof.source_file_id
-  ) throw new Error("Immutable Code God PASS proof is required.");
+  ) {
+    throw new Error(
+      "Immutable bounded Code God and independent evidence proof is required.",
+    );
+  }
   return proof;
 }
 
@@ -143,7 +272,8 @@ function sameReviewProof(left: Row, right: Row) {
     left.handoff_hash === right.handoff_hash &&
     left.proposed_hash === right.proposed_hash &&
     left.reviewed_at === right.reviewed_at &&
-    left.source_file_id === right.source_file_id;
+    left.source_file_id === right.source_file_id &&
+    canonicalJson(left.independent) === canonicalJson(right.independent);
 }
 
 function sameRequestProof(left: Row, right: Row) {
@@ -156,11 +286,154 @@ function sameRequestProof(left: Row, right: Row) {
     String(left.commit_message || "") === String(right.commit_message || "") &&
     String(left.pr_title || "") === String(right.pr_title || "") &&
     String(left.pr_body || "") === String(right.pr_body || "") &&
+    String(left.safety_note || "") === String(right.safety_note || "") &&
     String(left.expected_github_blob_sha || "") === String(right.expected_github_blob_sha || "") &&
     left.expected_github_blob_absent === right.expected_github_blob_absent &&
     left.direct_main_write === right.direct_main_write &&
     left.branch_pr_only === right.branch_pr_only &&
     left.deletes_anything === right.deletes_anything;
+}
+
+async function verifyIndependentEvidence(
+  ownerId: string,
+  request: Row,
+  binding: Row,
+) {
+  const [checkpoint, receipt, plan, source] = await Promise.all([
+    one(
+      "code_labs_versions?select=id,file_id,version_kind,label,filename,code,note,operation_id,fencing_token,created_at" +
+        "&id=eq." + encodeURIComponent(binding.checkpoint_id) +
+        "&owner_id=eq." + encodeURIComponent(ownerId) + "&limit=1",
+    ),
+    one(
+      "code_labs_action_receipts?select=id,action,record_type,record_id,operation_id,fencing_token,created_at" +
+        "&id=eq." + encodeURIComponent(binding.receipt_id) +
+        "&owner_id=eq." + encodeURIComponent(ownerId) + "&limit=1",
+    ),
+    one(
+      "code_labs_files?select=id,filename,current_hash,metadata" +
+        "&id=eq." + encodeURIComponent(binding.master_plan_record_id) +
+        "&owner_id=eq." + encodeURIComponent(ownerId) + "&limit=1",
+    ),
+    one(
+      "code_labs_files?select=id,filename,current_code,current_hash,metadata" +
+        "&id=eq." + encodeURIComponent(String(request.code_god_source_file_id || "")) +
+        "&owner_id=eq." + encodeURIComponent(ownerId) + "&limit=1",
+    ),
+  ]);
+  if (!checkpoint || !receipt || !plan || !source) {
+    throw new Error("The independent evidence checkpoint, receipt, plan or source is missing.");
+  }
+  if (
+    String(checkpoint.id || "") !== binding.checkpoint_id ||
+    String(checkpoint.version_kind || "") !== "checkpoint" ||
+    String(checkpoint.file_id || "") !== String(request.code_god_source_file_id || "") ||
+    String(checkpoint.filename || "") !== String(request.path || "")
+  ) {
+    throw new Error("The independent checkpoint does not belong to the reviewed source file.");
+  }
+  if (
+    String(receipt.id || "") !== binding.receipt_id ||
+    String(receipt.action || "") !== "checkpoint.create" ||
+    String(receipt.record_type || "") !== "version" ||
+    String(receipt.record_id || "") !== binding.checkpoint_id ||
+    String(receipt.operation_id || "") !== String(checkpoint.operation_id || "") ||
+    String(receipt.fencing_token || "") !== String(checkpoint.fencing_token || "")
+  ) {
+    throw new Error("The independent checkpoint receipt is not the immutable creation receipt.");
+  }
+  const note = String(checkpoint.note || "");
+  if (await hashUtf8Text(note) !== binding.checkpoint_note_hash) {
+    throw new Error("The independent checkpoint note changed after Writer preparation.");
+  }
+  let packet: Row;
+  try {
+    packet = JSON.parse(note) as Row;
+  } catch {
+    throw new Error("The independent checkpoint note is not valid JSON.");
+  }
+  const checksRun = textArray(packet.checks_run, "Independent checks_run");
+  textArray(packet.checks_not_run, "Independent checks_not_run", true);
+  const limitations = textArray(packet.limitations, "Independent limitations");
+  const evidenceSources = textArray(
+    packet.evidence_sources,
+    "Independent evidence_sources",
+  );
+  const checklistVersion = Number(packet.checklist_version);
+  if (!Number.isSafeInteger(checklistVersion) || checklistVersion < 1) {
+    throw new Error("The independent checkpoint checklist version is invalid.");
+  }
+  const metadata = source.metadata && typeof source.metadata === "object"
+    ? source.metadata as Row
+    : {};
+  const handoff = metadata.repo_handoff && typeof metadata.repo_handoff === "object"
+    ? metadata.repo_handoff as Row
+    : {};
+  const review = metadata.code_god_review && typeof metadata.code_god_review === "object"
+    ? metadata.code_god_review as Row
+    : {};
+  const planMetadata = plan.metadata && typeof plan.metadata === "object"
+    ? plan.metadata as Row
+    : {};
+  const exactChecklist = planMetadata.exact_checklist &&
+      typeof planMetadata.exact_checklist === "object"
+    ? planMetadata.exact_checklist as Row
+    : {};
+  const contentHash = await hashUtf8Text(String(request.content || ""));
+  const currentHash = await hashUtf8Text(String(source.current_code || ""));
+  const candidateHash = await hashUtf8Text(String(metadata.fixed_output || ""));
+  const handoffHash = await hashCanonicalJson(handoff);
+  if (
+    String(packet.kind || "") !== INDEPENDENT_EVIDENCE_KIND ||
+    String(packet.decision || "") !== "PASS" ||
+    String(packet.review_scope || "") !== "writer-preparation" ||
+    packet.independent_of_code_god !== true ||
+    packet.independent_of_repair_lab !== true ||
+    String(packet.repo || "") !== String(request.repo || "") ||
+    String(packet.path || "") !== String(request.path || "") ||
+    String(packet.branch || "") !== String(request.branch || "") ||
+    String(packet.github_head_sha || "") !== String(request.github_head_sha || "") ||
+    String(packet.source_file_id || "") !== String(request.code_god_source_file_id || "") ||
+    String(packet.source_hash || "") !== currentHash ||
+    String(packet.source_hash || "") !== String(source.current_hash || "") ||
+    String(packet.candidate_hash || "") !== contentHash ||
+    String(packet.candidate_hash || "") !== candidateHash ||
+    String(packet.handoff_hash || "") !== String(request.code_god_handoff_hash || "") ||
+    String(packet.handoff_hash || "") !== handoffHash ||
+    String(packet.code_god_review_version || "") !== String(request.code_god_review_version || "") ||
+    String(packet.code_god_scope_outcome || "") !== "BOUNDED_CHECKS_CLEAR" ||
+    String(packet.code_god_trust_state || "") !== CODE_GOD_TRUST_STATE ||
+    String(review.scope_outcome || "") !== "BOUNDED_CHECKS_CLEAR" ||
+    String(review.trust_state || "") !== CODE_GOD_TRUST_STATE ||
+    String(packet.master_plan_record_id || "") !== binding.master_plan_record_id ||
+    String(packet.master_plan_source_hash || "") !== binding.master_plan_source_hash ||
+    String(plan.id || "") !== binding.master_plan_record_id ||
+    String(plan.filename || "") !== "code-labs/CODE-LABS-V1-PLAN.md" ||
+    String(plan.current_hash || "") !== binding.master_plan_source_hash ||
+    String(packet.checklist_id || "") !== binding.checklist_id ||
+    checklistVersion !== binding.checklist_version ||
+    String(packet.checklist_scope_state || "") !== "PASS" ||
+    String(exactChecklist.checklist_id || "") !== binding.checklist_id ||
+    Number(exactChecklist.checklist_version || 0) !== binding.checklist_version ||
+    String(packet.checked_at || "") !== binding.checked_at ||
+    checksRun.length === 0 || limitations.length === 0 ||
+    evidenceSources.length === 0
+  ) {
+    throw new Error(
+      "The independent checkpoint no longer matches the plan, checklist, source, candidate, handoff, review or branch head.",
+    );
+  }
+  if (await hashUtf8Text(String(checkpoint.code || "")) !== currentHash) {
+    throw new Error("The independent checkpoint source snapshot does not match the reviewed source.");
+  }
+  return {
+    checkpoint_id: binding.checkpoint_id,
+    receipt_id: binding.receipt_id,
+    checkpoint_note_hash: binding.checkpoint_note_hash,
+    checklist_id: binding.checklist_id,
+    checklist_version: binding.checklist_version,
+    checked_at: binding.checked_at,
+  };
 }
 
 async function claimRequest(ownerId: string, requestId: string, claimId: string) {
@@ -188,7 +461,10 @@ function safeFailureMessage(stage: string, error: unknown) {
     : String(error || "Writer execution failed.");
   const fixed: Record<string, string> = {
     request_lookup: "The queued request could not be loaded or validated.",
-    review_validation: "The immutable Code God review proof is missing or invalid.",
+    review_validation:
+      "The immutable bounded Code God review proof is missing or invalid.",
+    independent_evidence_validation:
+      "The independent Master Plan and checklist checkpoint is missing, stale or invalid.",
     request_claim: "The queued request is already claimed or no longer executable.",
     github_token: "GitHub App installation authentication failed.",
     branch_verification: "The reviewed GitHub branch proof could not be verified.",
@@ -404,14 +680,30 @@ export async function executeGithubWriter(b: Binding, args: Row) {
     stage = "review_validation";
     const pendingReview = immutableReviewProof(pending);
     normaliseWriterBranchProof(pending);
+    stage = "independent_evidence_validation";
+    const pendingIndependent = await verifyIndependentEvidence(
+      b.owner_id,
+      pending,
+      pendingReview.independent,
+    );
 
     stage = "request_claim";
     const request = await claimRequest(b.owner_id, requestId, claimId);
     writerFencingToken(request);
     claimOwned = true;
     const claimedReview = immutableReviewProof(request);
-    if (!sameReviewProof(pendingReview, claimedReview) || !sameRequestProof(pending, request)) {
-      throw new Error("The immutable request proof changed during claim.");
+    stage = "independent_evidence_validation";
+    const claimedIndependent = await verifyIndependentEvidence(
+      b.owner_id,
+      request,
+      claimedReview.independent,
+    );
+    if (
+      !sameReviewProof(pendingReview, claimedReview) ||
+      !sameRequestProof(pending, request) ||
+      canonicalJson(pendingIndependent) !== canonicalJson(claimedIndependent)
+    ) {
+      throw new Error("The immutable request or independent evidence changed during claim.");
     }
     await audit(requestId, "writer_claimed", {
       claim_id: claimId,
@@ -420,6 +712,14 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       code_god_review_version: claimedReview.version,
       code_god_handoff_hash: claimedReview.handoff_hash,
       code_god_proposed_hash: claimedReview.proposed_hash,
+      independent_evidence_checkpoint_id:
+        claimedIndependent.checkpoint_id,
+      independent_evidence_receipt_id: claimedIndependent.receipt_id,
+      independent_evidence_note_hash:
+        claimedIndependent.checkpoint_note_hash,
+      independent_checklist_id: claimedIndependent.checklist_id,
+      independent_checklist_version: claimedIndependent.checklist_version,
+      independent_evidence_checked_at: claimedIndependent.checked_at,
     });
 
     stage = "github_token";
@@ -649,7 +949,8 @@ export async function executeGithubWriter(b: Binding, args: Row) {
         body: JSON.stringify({
           title: String(request.pr_title || "Code Labs update: " + path),
           body: String(
-            request.pr_body || "Prepared by Code Labs after Code God PASS.",
+            request.pr_body ||
+              "Prepared by Code Labs after bounded Code God checks and an independently verified Master Checklist checkpoint.",
           ),
           head: branch,
           base: proof.base_branch,
