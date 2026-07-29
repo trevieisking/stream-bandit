@@ -641,6 +641,7 @@ export { getWorkspace, listRecords, readCurrentFile, readReceipt };
 export function listActions() {
   const base: any = listActionsBase();
   const extra = [
+    { action: "file.intake", requires_confirmation: false },
     { action: "repo.prepare_handoff", requires_confirmation: false },
     { action: "cg_repair_lab.access", requires_confirmation: false },
     { action: "cg_repair_lab.analyze", requires_confirmation: false },
@@ -687,10 +688,18 @@ export function createCheckpoint(b: Binding, args: Row) {
   return runAtomicAction(b, "checkpoint.create", args);
 }
 
-export function undoAction(b: Binding, args: Row) {
+export async function undoAction(b: Binding, args: Row) {
+  let expectedStateVersion = args.expected_state_version;
+  if (
+    expectedStateVersion === undefined || expectedStateVersion === null ||
+    expectedStateVersion === ""
+  ) {
+    const current = await getWorkspace(b);
+    expectedStateVersion = current.workspace?.state_version;
+  }
   return runAtomicAction(b, "undo.execute", {
     ...args,
-    expected_state_version: args.expected_state_version,
+    expected_state_version: expectedStateVersion,
     receipt_id: args.receipt_id,
   });
 }
