@@ -37,7 +37,12 @@ jobs:
           if grep -q 'simplifyMenu();' code-labs/assets/code-labs-v12-save.js; then
             node code-labs/tests/apply-v50-source-repair.mjs
           else
-            echo 'Single-owner repair already applied.'
+            echo 'Initial single-owner repair already applied.'
+          fi
+          if ! grep -q 'CodeLabsWorkflowNextStepPolicy' code-labs/v20.html; then
+            node code-labs/tests/apply-v50-source-repair-2.mjs
+          else
+            echo 'Remaining page-owner repair already applied.'
           fi
 
       - name: Commit exact repaired sources
@@ -48,8 +53,8 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add code-labs/assets code-labs/CODE_LABS_PAGE_ROLE_REGISTER_V147.md
-          git commit -m 'Repair Code Labs single-owner source contracts'
+          git add code-labs/assets code-labs/v20.html code-labs/CODE_LABS_PAGE_ROLE_REGISTER_V147.md
+          git commit -m 'Complete Code Labs single-owner source repair'
           git push origin HEAD:fix/code-labs-master-recovery-atomic-engine-20260728
 
   node-contracts:
