@@ -1,5 +1,7 @@
 const HASH_VERSION = "sha256-utf8-v1";
 const HANDOFF_HASH_VERSION = "canonical-json-v1";
+const INDEPENDENT_EVIDENCE_KIND = "master-checklist-independent-gate-v1";
+const CODE_GOD_TRUST_STATE = "HOLD_UNTRUSTED_ADVISORY";
 const MAX_QUEUE_CONTENT = 180000;
 const PROTECTED_BRANCHES = new Set(["main", "master", "production", "live", "gh-pages"]);
 
@@ -14,10 +16,15 @@ export const ATOMIC_DOMAIN_PREPARATION_COVERAGE = Object.freeze({
     "immutable_branch_proof",
     "active_queue_snapshot",
     "target_blob_snapshot",
+    "independent_review_checkpoint_receipt",
   ]),
   schema_binding_required_before_cutover: Object.freeze([
     "github_base_sha",
     "github_head_sha",
+    "code_god_scope_outcome",
+    "independent_evidence_checkpoint_id",
+    "independent_evidence_receipt_id",
+    "safety_note",
   ]),
 });
 
@@ -47,6 +54,14 @@ function exactSha(value, label) {
 function exactHash(value, label) {
   const output = String(value || "").trim().toLowerCase();
   if (!/^[a-f0-9]{64}$/.test(output)) throw new Error(`${label} must be an exact SHA-256 hash.`);
+  return output;
+}
+
+function exactUuid(value, label) {
+  const output = String(value || "").trim().toLowerCase();
+  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(output)) {
+    throw new Error(`${label} must be an exact UUID.`);
+  }
   return output;
 }
 
@@ -207,6 +222,21 @@ function blobSnapshot(context, expected) {
     throw new Error("An absent target blob cannot also have a blob SHA.");
   }
   return { absent, blob_sha: blobSha, captured_at: exactTime(snapshot.captured_at, "blob snapshot time") };
+}
+
+function independentEvidenceIds(args) {
+  const fields = object(args.fields, "Writer preparation fields");
+  return {
+    kind: INDEPENDENT_EVIDENCE_KIND,
+    checkpoint_id: exactUuid(
+      fields.independent_evidence_checkpoint_id,
+      "independent evidence checkpoint id",
+    ),
+    receipt_id: exactUuid(
+      fields.independent_evidence_receipt_id,
+      "independent evidence receipt id",
+    ),
+  };
 }
 
 function receiptEffect(recordId, changedFields) {
@@ -378,9 +408,17 @@ export async function prepareCodeGodAtomic(_argsValue, contextValue) {
 
   const blocking = findings.some((item) => item.blocks_github);
   const outcome = blocking ? (findings.some((item) => item.severity === "P0") ? "BLOCK" : "FIX_FIRST") : "PASS";
+  const scopeOutcome = blocking
+    ? (findings.some((item) => item.severity === "P0") ? "BLOCK" : "FINDINGS_PRESENT")
+    : "BOUNDED_CHECKS_CLEAR";
   const review = {
-    version: "V50-code-god-1",
+    version: "V50-code-god-2-bounded-advisory",
     outcome,
+    scope_outcome: scopeOutcome,
+    authoritative: false,
+    decision_scope: "bounded_static_checks",
+    trust_state: CODE_GOD_TRUST_STATE,
+    requires_independent_evidence_receipt: true,
     handoff_hash: await hashCanonicalJson(handoff),
     handoff_hash_version: HANDOFF_HASH_VERSION,
     repo,
@@ -395,6 +433,16 @@ export async function prepareCodeGodAtomic(_argsValue, contextValue) {
       "owner-repository-authority", "immutable-branch-proof", "source-file-identity",
       "hash-contract", "full-file", "queue-limit", "truncation", "conflicts",
       "fences", "secret-values", "duplicate-queue", "timers",
+    ],
+    checks_not_run: [
+      "language-compile-or-typecheck", "runtime-behaviour", "browser-interaction",
+      "database-integration", "migration-replay", "deployment",
+      "feature-and-workflow-parity", "user-acceptance",
+    ],
+    limitations: [
+      "The result covers only the deterministic checks listed in checks_run.",
+      "A compatibility PASS token is not Writer, merge, deployment or production approval.",
+      "An independent Master Checklist checkpoint and exact-head evidence remain mandatory.",
     ],
     evidence: {
       authority_verified_at: authority.verified_at,
@@ -429,7 +477,13 @@ export async function prepareGithubWriterAtomic(argsValue, contextValue) {
   const metadata = clone(file.metadata || {});
   const handoff = object(metadata.repo_handoff, "Repo handoff");
   const review = object(metadata.code_god_review, "Code God review");
-  if (review.outcome !== "PASS") throw new Error("Code God PASS is required before GitHub Writer preparation.");
+  if (
+    review.outcome !== "PASS" || review.scope_outcome !== "BOUNDED_CHECKS_CLEAR" ||
+    review.authoritative !== false || review.trust_state !== CODE_GOD_TRUST_STATE ||
+    review.requires_independent_evidence_receipt !== true
+  ) {
+    throw new Error("Bounded Code God checks must be clear and explicitly advisory before Writer preparation.");
+  }
   const repo = safeRepo(handoff.repo);
   const path = safePath(handoff.path);
   const branch = safeBranch(handoff.request_branch);
@@ -458,6 +512,7 @@ export async function prepareGithubWriterAtomic(argsValue, contextValue) {
     throw new Error("The Writer base SHA does not match current repository authority evidence.");
   }
   if (!completeFile(path, content)) throw new Error("Queued content must be one complete file under 180000 characters.");
+  const independent = independentEvidenceIds(args);
 
   const fields = args.fields && typeof args.fields === "object" ? args.fields : {};
   const request = {
@@ -468,7 +523,7 @@ export async function prepareGithubWriterAtomic(argsValue, contextValue) {
     content,
     commit_message: String(fields.commit_message || `Code Labs update ${path}`).slice(0, 240),
     pr_title: String(fields.pr_title || `Code Labs update: ${path}`).slice(0, 240),
-    pr_body: String(fields.pr_body || "Prepared by Code Labs V50 after exact Code God PASS.").slice(0, 20000),
+    pr_body: String(fields.pr_body || "Prepared by Code Labs V50 after bounded Code God checks and an independently verified Master Checklist checkpoint.").slice(0, 20000),
     confirm_branch_pr_only: true,
     expected_content_sha256: contentHash,
     expected_github_blob_sha: blob.blob_sha,
@@ -478,10 +533,14 @@ export async function prepareGithubWriterAtomic(argsValue, contextValue) {
     github_head_branch: branchProof.branch,
     github_head_sha: branchProof.head_sha,
     code_god_review_version: review.version,
+    code_god_outcome: review.outcome,
+    code_god_scope_outcome: review.scope_outcome,
     code_god_handoff_hash: review.handoff_hash,
     code_god_proposed_hash: review.proposed_hash,
     code_god_reviewed_at: review.created_at,
     code_god_source_file_id: review.source_file_id,
+    independent_evidence_checkpoint_id: independent.checkpoint_id,
+    independent_evidence_receipt_id: independent.receipt_id,
   };
 
   return {
@@ -500,7 +559,15 @@ export async function prepareGithubWriterAtomic(argsValue, contextValue) {
           base_sha: branchProof.base_sha,
           head_sha: branchProof.head_sha,
         },
-        schema_binding_required_before_cutover: ["github_base_sha", "github_head_sha"],
+        schema_binding_required_before_cutover: [
+          "github_base_sha", "github_head_sha", "code_god_scope_outcome",
+          "independent_evidence_checkpoint_id",
+          "independent_evidence_receipt_id", "safety_note",
+        ],
+        independent_evidence: {
+          kind: independent.kind, checkpoint_id: independent.checkpoint_id,
+          receipt_id: independent.receipt_id, validation: "atomic-sql-and-protected-writer",
+        },
       },
     },
     request,
