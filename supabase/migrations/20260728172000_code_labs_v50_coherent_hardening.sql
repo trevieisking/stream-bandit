@@ -72,6 +72,21 @@ declare
   v_base_sha text;
   v_head_sha text;
   v_verified_at timestamptz;
+  v_source public.code_labs_files%rowtype;
+  v_checkpoint public.code_labs_versions%rowtype;
+  v_checkpoint_receipt public.code_labs_action_receipts%rowtype;
+  v_master_plan public.code_labs_files%rowtype;
+  v_evidence_input jsonb := '{}'::jsonb;
+  v_evidence_packet jsonb := '{}'::jsonb;
+  v_evidence_binding jsonb := '{}'::jsonb;
+  v_checkpoint_id uuid;
+  v_checkpoint_receipt_id uuid;
+  v_master_plan_id uuid;
+  v_checklist_version bigint;
+  v_checked_at timestamptz;
+  v_checkpoint_note_hash text;
+  v_current_hash text;
+  v_candidate_hash text;
 begin
   -- Existing pre-atomic Writer rows retain their historical shape.
   if new.operation_id is null then
@@ -82,8 +97,8 @@ begin
     raise exception using errcode = 'P0001', message = 'writer_source_file_required';
   end if;
 
-  select coalesce(f.metadata, '{}'::jsonb)
-  into v_metadata
+  select f.*
+  into v_source
   from public.code_labs_files f
   where f.owner_id = new.requested_by
     and f.id = new.code_god_source_file_id;
@@ -92,6 +107,7 @@ begin
     raise exception using errcode = 'P0001', message = 'writer_source_file_not_found';
   end if;
 
+  v_metadata := coalesce(v_source.metadata, '{}'::jsonb);
   v_handoff := coalesce(v_metadata->'repo_handoff', '{}'::jsonb);
   v_review := coalesce(v_metadata->'code_god_review', '{}'::jsonb);
   v_base_sha := lower(coalesce(v_handoff->>'github_base_sha', ''));
@@ -104,10 +120,18 @@ begin
   end;
 
   if coalesce(v_review->>'outcome', '') <> 'PASS'
+     or coalesce(v_review->>'scope_outcome', '') <> 'BOUNDED_CHECKS_CLEAR'
+     or coalesce(v_review->>'authoritative', '') <> 'false'
+     or coalesce(v_review->>'trust_state', '') <> 'HOLD_UNTRUSTED_ADVISORY'
+     or coalesce(v_review->>'requires_independent_evidence_receipt', '') <> 'true'
+     or coalesce(v_review->>'version', '') <> 'V50-code-god-2-bounded-advisory'
+     or coalesce(new.code_god_review_version, '') <> coalesce(v_review->>'version', '')
+     or coalesce(new.code_god_outcome, '') <> 'PASS'
+     or new.code_god_reviewed_at is distinct from nullif(v_review->>'created_at', '')::timestamptz
      or coalesce(v_review->>'source_file_id', '') <> new.code_god_source_file_id::text
      or coalesce(v_review->>'proposed_hash', '') <> coalesce(new.code_god_proposed_hash, '')
      or coalesce(v_review->>'handoff_hash', '') <> coalesce(new.code_god_handoff_hash, '') then
-    raise exception using errcode = 'P0001', message = 'writer_review_binding_invalid';
+    raise exception using errcode = 'P0001', message = 'writer_bounded_review_binding_invalid';
   end if;
 
   if coalesce(v_handoff->>'repo', '') <> coalesce(new.repo, '')
@@ -168,6 +192,144 @@ begin
     raise exception using errcode = 'P0001', message = 'writer_expected_blob_invalid';
   end if;
 
+
+  begin
+    v_evidence_input := coalesce(new.safety_note, '')::jsonb;
+    v_checkpoint_id := nullif(v_evidence_input->>'checkpoint_id', '')::uuid;
+    v_checkpoint_receipt_id := nullif(v_evidence_input->>'receipt_id', '')::uuid;
+  exception when others then
+    raise exception using errcode = 'P0001', message = 'writer_independent_evidence_request_invalid';
+  end;
+
+  if coalesce(v_evidence_input->>'kind', '') not in (
+       'code-labs-writer-evidence-request-v1',
+       'code-labs-writer-evidence-binding-v1'
+     )
+     or v_checkpoint_id is null
+     or v_checkpoint_receipt_id is null then
+    raise exception using errcode = 'P0001', message = 'writer_independent_evidence_request_invalid';
+  end if;
+
+  select v.* into v_checkpoint
+  from public.code_labs_versions v
+  where v.owner_id = new.requested_by
+    and v.id = v_checkpoint_id;
+
+  select r.* into v_checkpoint_receipt
+  from public.code_labs_action_receipts r
+  where r.owner_id = new.requested_by
+    and r.id = v_checkpoint_receipt_id;
+
+  if v_checkpoint.id is null
+     or v_checkpoint.version_kind <> 'checkpoint'
+     or v_checkpoint.file_id is distinct from new.code_god_source_file_id
+     or v_checkpoint.filename is distinct from new.path
+     or v_checkpoint.operation_id is null
+     or v_checkpoint.fencing_token is null then
+    raise exception using errcode = 'P0001', message = 'writer_independent_checkpoint_invalid';
+  end if;
+
+  if v_checkpoint_receipt.id is null
+     or v_checkpoint_receipt.action <> 'checkpoint.create'
+     or v_checkpoint_receipt.record_type <> 'version'
+     or v_checkpoint_receipt.record_id is distinct from v_checkpoint.id
+     or v_checkpoint_receipt.operation_id is distinct from v_checkpoint.operation_id
+     or v_checkpoint_receipt.fencing_token is distinct from v_checkpoint.fencing_token
+     or v_checkpoint_receipt.undone_at is not null then
+    raise exception using errcode = 'P0001', message = 'writer_independent_checkpoint_receipt_invalid';
+  end if;
+
+  v_checkpoint_note_hash := public.code_labs_sha256_text(coalesce(v_checkpoint.note, ''));
+  begin
+    v_evidence_packet := coalesce(v_checkpoint.note, '')::jsonb;
+    v_master_plan_id := nullif(v_evidence_packet->>'master_plan_record_id', '')::uuid;
+    v_checklist_version := nullif(v_evidence_packet->>'checklist_version', '')::bigint;
+    v_checked_at := nullif(v_evidence_packet->>'checked_at', '')::timestamptz;
+  exception when others then
+    raise exception using errcode = 'P0001', message = 'writer_independent_checkpoint_packet_invalid';
+  end;
+
+  select p.* into v_master_plan
+  from public.code_labs_files p
+  where p.owner_id = new.requested_by
+    and p.id = v_master_plan_id;
+
+  if v_master_plan.id is null
+     or v_master_plan.filename <> 'code-labs/CODE-LABS-V1-PLAN.md'
+     or coalesce(v_master_plan.current_hash, '') !~ '^[a-f0-9]{64}$' then
+    raise exception using errcode = 'P0001', message = 'writer_master_plan_binding_invalid';
+  end if;
+
+  v_current_hash := public.code_labs_sha256_text(coalesce(v_source.current_code, ''));
+  v_candidate_hash := public.code_labs_sha256_text(coalesce(v_metadata->>'fixed_output', ''));
+
+  if coalesce(v_evidence_packet->>'kind', '') <> 'master-checklist-independent-gate-v1'
+     or coalesce(v_evidence_packet->>'decision', '') <> 'PASS'
+     or coalesce(v_evidence_packet->>'review_scope', '') <> 'writer-preparation'
+     or coalesce(v_evidence_packet->>'independent_of_code_god', '') <> 'true'
+     or coalesce(v_evidence_packet->>'independent_of_repair_lab', '') <> 'true'
+     or coalesce(v_evidence_packet->>'repo', '') <> coalesce(new.repo, '')
+     or coalesce(v_evidence_packet->>'path', '') <> coalesce(new.path, '')
+     or coalesce(v_evidence_packet->>'branch', '') <> coalesce(new.branch, '')
+     or coalesce(v_evidence_packet->>'github_head_sha', '') <> v_head_sha
+     or coalesce(v_evidence_packet->>'source_file_id', '') <> new.code_god_source_file_id::text
+     or coalesce(v_evidence_packet->>'source_hash', '') <> v_current_hash
+     or coalesce(v_source.current_hash, '') <> v_current_hash
+     or coalesce(v_evidence_packet->>'candidate_hash', '') <> v_candidate_hash
+     or coalesce(v_evidence_packet->>'candidate_hash', '') <> coalesce(new.expected_content_sha256, '')
+     or v_candidate_hash <> public.code_labs_sha256_text(coalesce(new.content, ''))
+     or coalesce(v_evidence_packet->>'handoff_hash', '') <> coalesce(new.code_god_handoff_hash, '')
+     or coalesce(v_evidence_packet->>'handoff_hash', '') <> coalesce(v_review->>'handoff_hash', '')
+     or coalesce(v_evidence_packet->>'code_god_review_version', '') <> coalesce(new.code_god_review_version, '')
+     or coalesce(v_evidence_packet->>'code_god_scope_outcome', '') <> 'BOUNDED_CHECKS_CLEAR'
+     or coalesce(v_evidence_packet->>'code_god_trust_state', '') <> 'HOLD_UNTRUSTED_ADVISORY'
+     or coalesce(v_master_plan.current_hash, '') <> coalesce(v_evidence_packet->>'master_plan_source_hash', '')
+     or coalesce(v_master_plan.metadata->'exact_checklist'->>'checklist_id', '') <> coalesce(v_evidence_packet->>'checklist_id', '')
+     or coalesce((v_master_plan.metadata->'exact_checklist'->>'checklist_version')::bigint, 0) <> v_checklist_version
+     or coalesce(v_evidence_packet->>'checklist_scope_state', '') <> 'PASS'
+     or coalesce(v_master_plan.metadata->'review_system_trust_program'->>'status', '') <> 'HOLD_UNTRUSTED_ADVISORY'
+     or v_checklist_version is null or v_checklist_version < 1
+     or v_checked_at is null
+     or v_checked_at < nullif(v_review->>'created_at', '')::timestamptz
+     or v_checkpoint.created_at < v_checked_at
+     or public.code_labs_sha256_text(coalesce(v_checkpoint.code, '')) <> v_current_hash
+     or jsonb_typeof(v_evidence_packet->'checks_run') <> 'array'
+     or jsonb_array_length(v_evidence_packet->'checks_run') < 1
+     or jsonb_typeof(v_evidence_packet->'checks_not_run') <> 'array'
+     or jsonb_typeof(v_evidence_packet->'limitations') <> 'array'
+     or jsonb_array_length(v_evidence_packet->'limitations') < 1
+     or jsonb_typeof(v_evidence_packet->'evidence_sources') <> 'array'
+     or jsonb_array_length(v_evidence_packet->'evidence_sources') < 1 then
+    raise exception using errcode = 'P0001', message = 'writer_independent_evidence_binding_invalid';
+  end if;
+
+  v_evidence_binding := jsonb_build_object(
+    'kind', 'code-labs-writer-evidence-binding-v1',
+    'checkpoint_id', v_checkpoint.id,
+    'receipt_id', v_checkpoint_receipt.id,
+    'checkpoint_note_hash', v_checkpoint_note_hash,
+    'evidence_kind', v_evidence_packet->>'kind',
+    'decision', v_evidence_packet->>'decision',
+    'checked_at', v_evidence_packet->>'checked_at',
+    'master_plan_record_id', v_master_plan.id,
+    'master_plan_source_hash', v_master_plan.current_hash,
+    'checklist_id', v_evidence_packet->>'checklist_id',
+    'checklist_version', v_checklist_version,
+    'checklist_scope_state', v_evidence_packet->>'checklist_scope_state',
+    'code_god_scope_outcome', v_evidence_packet->>'code_god_scope_outcome',
+    'code_god_trust_state', v_evidence_packet->>'code_god_trust_state'
+  );
+
+  if coalesce(v_evidence_input->>'kind', '') = 'code-labs-writer-evidence-binding-v1'
+     and v_evidence_input is distinct from v_evidence_binding then
+    raise exception using errcode = 'P0001', message = 'writer_independent_evidence_binding_changed';
+  end if;
+
+  if length(v_evidence_binding::text) > 4000 then
+    raise exception using errcode = 'P0001', message = 'writer_independent_evidence_binding_too_large';
+  end if;
+  new.safety_note := v_evidence_binding::text;
+
   return new;
 end;
 $$;
@@ -191,9 +353,13 @@ before insert or update of
   expected_content_sha256,
   expected_github_blob_sha,
   expected_github_blob_absent,
+  code_god_review_version,
+  code_god_outcome,
+  code_god_reviewed_at,
   code_god_handoff_hash,
   code_god_proposed_hash,
-  code_god_source_file_id
+  code_god_source_file_id,
+  safety_note
 on public.code_labs_write_requests
 for each row execute function public.code_labs_validate_writer_request_proof();
 
