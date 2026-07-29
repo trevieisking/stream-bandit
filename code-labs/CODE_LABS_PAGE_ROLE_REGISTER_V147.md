@@ -1,5 +1,7 @@
 # Code Labs Page Role Register V147/V148/V163/V244
 
+**Visible route owner:** V282 shared shell loader.
+
 This register is the no-drop list for Code Labs pages. A page can be removed from the visible main route only when it is clearly documented as support, proof, receipt, test, or legacy/watch. A working page must not disappear just because it is not part of the main repair workflow.
 
 ## Route protection rule
@@ -53,6 +55,7 @@ V148 adds `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md` so the scanner
 | Step | Page | Path | Role | Keep rule |
 | --- | --- | --- | --- | --- |
 | 1 | File Lab | `code-labs/file-lab.html` | Load or read the full current file | Main workflow start. |
+| 1A | Saved Files | `code-labs/saved-files.html` | Select an existing saved file without creating a competing file owner | Bounded source-selection support inside the canonical workflow. |
 | 2 | Rescue Room | `code-labs/rescue-room.html` | Describe the problem and preserve rules | Main workflow. |
 | 3 | Packet Builder | `code-labs/packet-builder.html` | Build the assistant repair packet | Main workflow, not support-only. |
 | 4 | Buddy Canvas | `code-labs/buddy-canvas.html` | Assistant/source-proof and fixed-code lane | Main workflow, not support-only. |
@@ -79,6 +82,7 @@ V148 adds `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md` so the scanner
 | Connection Guide | `code-labs/connection-guide.html` | Safe connection walkthrough | Keep discoverable from Tools. |
 | Connector Status | `code-labs/connector-status.html` | Connection/helper status page | Keep as support/status page. |
 | Context Packet | `code-labs/context-packet.html` | Assistant context packet support | Keep as support/proof page. |
+| Buddy Tools | `code-labs/help.html` specialist-tools drawer | Assistant utilities, memory recovery, and bounded local helpers | Keep discoverable; never become a second workflow engine. |
 
 ## Proof, scanner, receipt, and test pages
 
