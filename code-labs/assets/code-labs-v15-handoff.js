@@ -1,7 +1,7 @@
 /* Code Labs V1.5 - AI Handoff */
 (function(){
 'use strict';
-var KEY='codeLabsV1State';
+var KEY='codeLabsV1State', ROLE='read_only_context';
 function q(s,r){return(r||document).querySelector(s)}
 function h(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function st(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}

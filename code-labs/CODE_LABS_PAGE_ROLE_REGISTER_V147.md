@@ -65,6 +65,8 @@ V148 adds `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md` so the scanner
 | 8 | Preview + Test | `code-labs/preview-test.html` | Preview and pass/fail test notes | Main workflow. |
 | 9 | Checkpoints | `code-labs/checkpoints.html` | Rollback proof | Main workflow. |
 | 10 | Repo Desk | `code-labs/repo-desk.html` | Choose repo handoff/action | Main workflow. |
+| 10A | CG Repair Lab | `code-labs/cg-repair-lab.html` | Read-only repair analysis and evidence preparation | Specialist gate; never owns workflow state or GitHub execution. |
+| 10B | Code God | `code-labs/code-god.html` | Deterministic final review | Sole final-review owner; cannot merge or deploy. |
 | 11 | GitHub Writer | `code-labs/publish-prep.html` | Build reviewed GitHub handoff | Main workflow. |
 | 12 | GitHub Tracker | `code-labs/github-tracker.html` | Track PR, preview, checks, and result | Main workflow. |
 
