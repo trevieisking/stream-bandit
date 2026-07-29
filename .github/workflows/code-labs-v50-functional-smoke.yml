@@ -14,49 +14,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: code-labs-v50-functional-smoke-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
 jobs:
-  source-repair:
-    name: Apply assertion-guarded single-owner repair
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Check out recovery branch
-        uses: actions/checkout@v4
-        with:
-          ref: fix/code-labs-master-recovery-atomic-engine-20260728
-          fetch-depth: 0
-
-      - name: Apply repair when still required
-        run: |
-          if grep -q 'simplifyMenu();' code-labs/assets/code-labs-v12-save.js; then
-            node code-labs/tests/apply-v50-source-repair.mjs
-          else
-            echo 'Initial single-owner repair already applied.'
-          fi
-          if ! grep -q 'CodeLabsWorkflowNextStepPolicy' code-labs/v20.html; then
-            node code-labs/tests/apply-v50-source-repair-2.mjs
-          else
-            echo 'Remaining page-owner repair already applied.'
-          fi
-
-      - name: Commit exact repaired sources
-        run: |
-          if git diff --quiet; then
-            echo 'No source changes required.'
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add code-labs/assets code-labs/v20.html code-labs/CODE_LABS_PAGE_ROLE_REGISTER_V147.md
-          git commit -m 'Complete Code Labs single-owner source repair'
-          git push origin HEAD:fix/code-labs-master-recovery-atomic-engine-20260728
-
   node-contracts:
     name: Node source and failure-contract smoke
     runs-on: ubuntu-latest
