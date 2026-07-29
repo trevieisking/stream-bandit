@@ -15,6 +15,8 @@ const repo = "trevieisking/stream-bandit";
 const baseSha = "1".repeat(40);
 const headSha = "2".repeat(40);
 const blobSha = "3".repeat(40);
+const checkpointId = "11111111-1111-4111-8111-111111111111";
+const receiptId = "22222222-2222-4222-8222-222222222222";
 const currentCode = "export const current = true;\n".repeat(8);
 const proposedCode = "export const current = true;\nexport const repaired = true;\n".repeat(6);
 
@@ -121,9 +123,15 @@ test("Repo handoff rejects branch proof from a different base commit", async () 
   );
 });
 
-test("Code God produces PASS only from complete matching evidence", async () => {
+test("Code God returns bounded advisory checks and explicit limitations", async () => {
   const { reviewResult, handoffResult } = await reviewedContext();
   assert.equal(reviewResult.review.outcome, "PASS");
+  assert.equal(reviewResult.review.scope_outcome, "BOUNDED_CHECKS_CLEAR");
+  assert.equal(reviewResult.review.authoritative, false);
+  assert.equal(reviewResult.review.trust_state, "HOLD_UNTRUSTED_ADVISORY");
+  assert.equal(reviewResult.review.requires_independent_evidence_receipt, true);
+  assert.ok(reviewResult.review.checks_not_run.includes("runtime-behaviour"));
+  assert.ok(reviewResult.review.limitations.length > 0);
   assert.equal(reviewResult.review.handoff_hash, await hashCanonicalJson(handoffResult.handoff));
   assert.equal(reviewResult.review.github_head_sha, headSha);
   assert.equal(reviewResult.payload.effects[0].kind, "record_update");
@@ -157,9 +165,15 @@ test("Code God refuses incomplete queue evidence", async () => {
   await assert.rejects(prepareCodeGodAtomic({}, context), /queue evidence is incomplete/);
 });
 
-test("Writer payload binds exact review, branch and blob proof", async () => {
+test("Writer payload binds exact review, branch, blob and independent checkpoint IDs", async () => {
   const { context, reviewResult } = await reviewedContext();
-  const result = await prepareGithubWriterAtomic({ confirmed: true, fields: {} }, context);
+  const result = await prepareGithubWriterAtomic({
+    confirmed: true,
+    fields: {
+      independent_evidence_checkpoint_id: checkpointId,
+      independent_evidence_receipt_id: receiptId,
+    },
+  }, context);
   const request = result.request;
 
   assert.equal(result.payload.effects[0].kind, "write_request_insert");
@@ -170,9 +184,59 @@ test("Writer payload binds exact review, branch and blob proof", async () => {
   assert.equal(request.expected_github_blob_absent, false);
   assert.equal(request.github_base_sha, baseSha);
   assert.equal(request.github_head_sha, headSha);
+  assert.equal(request.code_god_scope_outcome, "BOUNDED_CHECKS_CLEAR");
+  assert.equal(request.independent_evidence_checkpoint_id, checkpointId);
+  assert.equal(request.independent_evidence_receipt_id, receiptId);
   assert.deepEqual(
     result.payload.response.schema_binding_required_before_cutover,
-    ["github_base_sha", "github_head_sha"],
+    [
+      "github_base_sha", "github_head_sha", "code_god_scope_outcome",
+      "independent_evidence_checkpoint_id",
+      "independent_evidence_receipt_id", "safety_note",
+    ],
+  );
+  assert.deepEqual(result.payload.response.independent_evidence, {
+    kind: "master-checklist-independent-gate-v1",
+    checkpoint_id: checkpointId,
+    receipt_id: receiptId,
+    validation: "atomic-sql-and-protected-writer",
+  });
+});
+
+test("Writer preparation refuses missing independent checkpoint IDs", async () => {
+  const { context } = await reviewedContext();
+  await assert.rejects(
+    prepareGithubWriterAtomic({ confirmed: true, fields: {} }, context),
+    /independent evidence checkpoint id must be an exact UUID/,
+  );
+});
+
+test("Writer preparation refuses malformed independent evidence IDs", async () => {
+  const { context } = await reviewedContext();
+  await assert.rejects(
+    prepareGithubWriterAtomic({
+      confirmed: true,
+      fields: {
+        independent_evidence_checkpoint_id: "not-a-checkpoint",
+        independent_evidence_receipt_id: receiptId,
+      },
+    }, context),
+    /independent evidence checkpoint id must be an exact UUID/,
+  );
+});
+
+test("Writer preparation refuses an unscoped or authoritative Code God result", async () => {
+  const { context } = await reviewedContext();
+  context.file.metadata.code_god_review.scope_outcome = "PASS";
+  await assert.rejects(
+    prepareGithubWriterAtomic({
+      confirmed: true,
+      fields: {
+        independent_evidence_checkpoint_id: checkpointId,
+        independent_evidence_receipt_id: receiptId,
+      },
+    }, context),
+    /Bounded Code God checks must be clear and explicitly advisory/,
   );
 });
 
@@ -181,7 +245,7 @@ test("Writer preparation blocks a changed branch head", async () => {
   context.branch_proof.head_sha = "5".repeat(40);
   context.blob_snapshot.head_sha = context.branch_proof.head_sha;
   await assert.rejects(
-    prepareGithubWriterAtomic({ confirmed: true }, context),
+    prepareGithubWriterAtomic({ confirmed: true, fields: { independent_evidence_checkpoint_id: checkpointId, independent_evidence_receipt_id: receiptId } }, context),
     /reviewed branch head changed/,
   );
 });
@@ -190,7 +254,7 @@ test("Writer preparation blocks an active duplicate request", async () => {
   const { context } = await reviewedContext();
   context.queue_snapshot.active_matching_requests = 1;
   await assert.rejects(
-    prepareGithubWriterAtomic({ confirmed: true }, context),
+    prepareGithubWriterAtomic({ confirmed: true, fields: { independent_evidence_checkpoint_id: checkpointId, independent_evidence_receipt_id: receiptId } }, context),
     /already queued or processing/,
   );
 });
@@ -201,9 +265,18 @@ test("Domain preparation declares all external evidence and missing schema bindi
     ["repo.prepare_handoff", "code_god.review", "github.writer_prepare"],
   );
   assert.ok(ATOMIC_DOMAIN_PREPARATION_COVERAGE.external_evidence_required.includes("immutable_branch_proof"));
+  assert.ok(
+    ATOMIC_DOMAIN_PREPARATION_COVERAGE.external_evidence_required.includes(
+      "independent_review_checkpoint_receipt",
+    ),
+  );
   assert.deepEqual(
     ATOMIC_DOMAIN_PREPARATION_COVERAGE.schema_binding_required_before_cutover,
-    ["github_base_sha", "github_head_sha"],
+    [
+      "github_base_sha", "github_head_sha", "code_god_scope_outcome",
+      "independent_evidence_checkpoint_id",
+      "independent_evidence_receipt_id", "safety_note",
+    ],
   );
 });
 
