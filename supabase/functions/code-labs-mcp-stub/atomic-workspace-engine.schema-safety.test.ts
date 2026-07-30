@@ -44,7 +44,16 @@ async function migrations() {
   const hardening = await Deno.readTextFile(
     new URL("../../migrations/20260728170000_code_labs_atomic_workspace_engine_hardening.sql", import.meta.url),
   );
-  return { foundation, boundary, hardening, bundle: `${foundation}\n${boundary}\n${hardening}` };
+  const projectUndo = await Deno.readTextFile(
+    new URL("../../migrations/20260730131500_code_labs_project_undo_owner_fix.sql", import.meta.url),
+  );
+  return {
+    foundation,
+    boundary,
+    hardening,
+    projectUndo,
+    bundle: `${foundation}\n${boundary}\n${hardening}\n${projectUndo}`,
+  };
 }
 
 Deno.test("schema safety: existing constraints are replaced with the new state machine", async () => {
@@ -118,6 +127,51 @@ Deno.test("schema safety: parent-changing patches validate the complete owner hi
   ]) {
     assertIncludes(hardening, trigger, `The database must install ${trigger}.`);
   }
+});
+
+Deno.test("schema safety: selected project undo reuses the single record-patch owner", async () => {
+  const { projectUndo } = await migrations();
+
+  assertIncludes(
+    projectUndo,
+    "pg_catalog.pg_get_functiondef",
+    "The forward migration must inspect the existing function owner rather than replace migration history.",
+  );
+  assertIncludes(
+    projectUndo,
+    "'public.code_labs_apply_record_patch(uuid,text,text,uuid,timestamptz,jsonb)'::regprocedure",
+    "The repair must target the exact existing atomic record-patch signature.",
+  );
+  assertIncludes(
+    projectUndo,
+    "p_action not in ('setup.save', 'undo.execute')",
+    "Project records may only be changed by setup.save or an eligible undo.execute receipt.",
+  );
+  assertIncludes(
+    projectUndo,
+    "v_state.current_project_id is distinct from p_record_id",
+    "Undo must remain bound to the currently selected project.",
+  );
+  assertMatches(
+    projectUndo,
+    /v_old_count\s*<>\s*1[\s\S]*?project_undo_patch_source_mismatch/i,
+    "The forward migration must fail closed unless the verified old gate occurs exactly once.",
+  );
+  assertMatches(
+    projectUndo,
+    /position\(v_new_gate in v_definition\)\s*=\s*0[\s\S]*?project_undo_patch_verification_failed/i,
+    "The migration must verify the replacement before committing.",
+  );
+  assertExcludes(
+    projectUndo,
+    "create table public.code_labs",
+    "The undo repair must not introduce a second table or workflow owner.",
+  );
+  assertExcludes(
+    projectUndo,
+    "drop function public.code_labs_apply_record_patch",
+    "The existing atomic function owner must not be dropped.",
+  );
 });
 
 Deno.test("schema safety: untrusted JSON booleans pass one strict service-role boundary", async () => {
