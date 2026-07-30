@@ -254,6 +254,36 @@ Deno.test("connector access: V50 preserves File Lab intake discovery and frozen 
   );
 });
 
+Deno.test("connector access: advertised compatibility actions remain callable and read-only", async () => {
+  const guarded = await source("./guarded-workspace.ts");
+  const actionBlock = block(
+    guarded,
+    "export async function runAction",
+    "\n}",
+  );
+
+  assertIncludes(
+    guarded,
+    "runAction as runCompatibilityAction",
+    "The guarded router must retain the existing read-only compatibility implementation.",
+  );
+  assertIncludes(
+    actionBlock,
+    'if (action === "canvas.load_packet" || action === "github.prepare_request")',
+    "Both advertised compatibility actions must remain explicitly routed.",
+  );
+  assertIncludes(
+    actionBlock,
+    "return runCompatibilityAction(b, { ...args, action });",
+    "Compatibility actions must call their existing read-only implementation.",
+  );
+  assertExcludes(
+    actionBlock,
+    "is not available through the mutation dispatcher",
+    "An advertised compatibility action must not unconditionally fail.",
+  );
+});
+
 Deno.test("connector access: atomic migration does not alter OAuth, owner or browser-session tables", async () => {
   const migration = await source(
     "../../migrations/20260728143000_code_labs_atomic_workspace_engine.sql",
