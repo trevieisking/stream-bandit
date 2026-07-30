@@ -179,6 +179,8 @@ function cleanIntakeMetadata(value: unknown) {
       "candidate_note",
       "candidate_saved_at",
       "candidate_accepted_at",
+      "source_hash",
+      "hash_version",
       "repo_handoff",
       "code_god_review",
       "github_writer_request",
