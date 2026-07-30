@@ -46,7 +46,12 @@
       const entries=resolved.entries.filter(x=>x.type==='blob'&&x.size<=750000&&C.TEXT_EXT.test(x.path)&&C.RELEVANT.test(x.path));
       C.setStatus(`Reading ${entries.length} relevant repository files at ${resolved.commitSha.slice(0,12)}…`,'warn');
       const fetched=await C.pool(entries,async entry=>({path:entry.path,text:await C.fetchText(repo,resolved.commitSha,entry.path),size:entry.size}));
-      const files=fetched.filter(x=>x&&!x.error), failures=fetched.filter(x=>x?.error), fileMap=new Map(files.map(x=>[x.path,x.text]));
+      const files=fetched.filter(x=>x&&!x.error), failures=fetched.filter(x=>x?.error);
+      if(failures.length) {
+        const paths=failures.slice(0,5).map((x,index)=>x?.path||entries[fetched.indexOf(x)]?.path||`source-${index+1}`);
+        throw new Error(`Repository scan is incomplete: ${failures.length} relevant source file(s) could not be read${paths.length?` (${paths.join(', ')}${failures.length>paths.length?', …':''})`:''}. No readiness result was produced.`);
+      }
+      const fileMap=new Map(files.map(x=>[x.path,x.text]));
       const pages=files.filter(x=>x.path.startsWith('code-labs/')&&/\.html?$/.test(x.path)).map(x=>C.pageRecord(x.path,x.text,fileMap,importedV140));
       await scanLivePages(pages,C.$('siteBase').value.trim());
       const reverseReferences=new Map();
