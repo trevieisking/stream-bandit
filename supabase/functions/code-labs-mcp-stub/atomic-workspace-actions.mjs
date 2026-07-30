@@ -109,6 +109,7 @@ function timestamp(value, label) {
 }
 
 function clone(value) {
+  if (value === null) return null;
   return JSON.parse(JSON.stringify(value ?? {}));
 }
 
