@@ -226,11 +226,26 @@ Deno.test("connector access: V50 preserves File Lab intake discovery and frozen 
     "export async function undoAction",
     "\n}\n\nexport function executeDirectGithubWriter",
   );
+  const intakeMetadataBlock = block(
+    guarded,
+    "function cleanIntakeMetadata",
+    "\n}\n\nasync function workspaceContext",
+  );
 
   assertIncludes(
     listBlock,
     '{ action: "file.intake", requires_confirmation: false }',
     "The atomic cutover must keep the existing File Lab intake action discoverable.",
+  );
+  assertIncludes(
+    intakeMetadataBlock,
+    '"source_hash"',
+    "File Lab must clear a derived source hash before refreshing an existing file.",
+  );
+  assertIncludes(
+    intakeMetadataBlock,
+    '"hash_version"',
+    "File Lab must clear the matching derived hash version before the database regenerates both fields.",
   );
   assertIncludes(
     undoBlock,
