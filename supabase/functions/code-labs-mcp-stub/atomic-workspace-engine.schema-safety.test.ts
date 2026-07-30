@@ -144,7 +144,7 @@ Deno.test("schema safety: selected project undo reuses the single record-patch o
   );
   assertIncludes(
     projectUndo,
-    "p_action not in ('setup.save', 'undo.execute')",
+    "p_action not in (''setup.save'', ''undo.execute'')",
     "Project records may only be changed by setup.save or an eligible undo.execute receipt.",
   );
   assertIncludes(
