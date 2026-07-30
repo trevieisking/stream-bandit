@@ -44,6 +44,37 @@ test("record updates strip unsupported fields", async () => {
   assert.equal(payload.effects[1].undo_available, true);
 });
 
+test("record updates and undo preserve explicit null values", async () => {
+  const update = await buildAtomicWorkspacePayload(
+    "repair.save",
+    { fields: { completed_at: null } },
+    context(),
+  );
+  assert.deepEqual(update.effects[0].patch, { completed_at: null });
+
+  const undo = await buildAtomicWorkspacePayload(
+    "undo.execute",
+    { receipt_id: "receipt-null" },
+    context({
+      undo_receipt: {
+        id: "receipt-null",
+        record_type: "job",
+        record_id: "job-1",
+        before_data: {
+          id: "job-1",
+          owner_id: "owner-1",
+          title: "Restore nullable job",
+          completed_at: null,
+          metadata: null,
+        },
+      },
+      undo_record: current.job,
+    }),
+  );
+  assert.equal(undo.effects[0].patch.completed_at, null);
+  assert.equal(undo.effects[0].patch.metadata, null);
+});
+
 test("candidate hashing is raw UTF-8 SHA-256 with an explicit version", async () => {
   const payload = await buildAtomicWorkspacePayload(
     "candidate.save",
