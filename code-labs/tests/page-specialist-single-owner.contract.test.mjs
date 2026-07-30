@@ -1,9 +1,8 @@
 /**
- * Red source-contract tests for Code Labs page and Specialist Tool ownership.
+ * Source-contract tests for Code Labs page and Specialist Tool ownership.
  *
- * These tests intentionally expose duplicate ownership that still exists in
- * the current source. They do not prove browser behaviour or authorise a
- * deployment.
+ * These tests enforce single-owner and bounded-authority rules in source.
+ * They do not prove browser behaviour or authorise a deployment.
  */
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -24,14 +23,22 @@ function assertExcludes(source, forbidden, message) {
   assert.ok(!source.includes(forbidden), `${message} Forbidden: ${forbidden}`);
 }
 
-test('sidebar: V282 is the sole visible route owner', async () => {
+test('sidebar: V283 is the sole visible route owner', async () => {
   const loader = await read('code-labs/assets/cl-nav.js');
   const header = await read('code-labs/assets/code-labs-header-shell-v235.js');
   const v12 = await read('code-labs/assets/code-labs-v12-save.js');
 
-  assertIncludes(loader, "data-cl-nav-owner','V282-first-paint", 'The canonical shell must mark its menu ownership.');
-  assertIncludes(header, 'owner.firstNav()', 'The compatibility header must delegate any sidebar repair to V282.');
-  assertExcludes(header, "n.innerHTML=''", 'The compatibility header must not redraw the V282-owned sidebar.');
+  const canonicalOwners = [loader, header, v12].filter((source) =>
+    source.includes("data-cl-route-registry-owner','cl-nav-v283") &&
+    source.includes('window.CodeLabsWorkflowRegistry=registry')
+  );
+
+  assert.equal(canonicalOwners.length, 1, 'Exactly one inspected shell source must publish the canonical V283 route registry.');
+  assertIncludes(loader, "var VERSION='V283-canonical-workflow-registry'", 'The canonical shell must identify the V283 registry contract.');
+  assertIncludes(loader, "data-cl-nav-owner','cl-nav-v283", 'The canonical shell must mark its menu ownership.');
+  assertIncludes(loader, 'var ROUTES=Object.freeze([', 'The canonical route collection must be immutable.');
+  assertIncludes(header, 'owner.firstNav()', 'The compatibility header must delegate sidebar repair to the canonical owner.');
+  assertExcludes(header, "n.innerHTML=''", 'The compatibility header must not redraw the canonical sidebar.');
   assertExcludes(header, 'n.appendChild(link(', 'The compatibility header must not maintain a second sidebar renderer.');
   assertExcludes(v12, 'simplifyMenu();', 'V12 must preserve packet/context features without redrawing the sidebar.');
 });
@@ -145,7 +152,7 @@ test('route policy: one current route register matches the visible shell', async
     assertIncludes(loader, page, `The current visible route must include ${page}.`);
     assertIncludes(register, page, `The page-role register must document the current visible route entry ${page}.`);
   }
-  assertIncludes(register, 'V282', 'The page-role register must name the current route owner.');
+  assertIncludes(register, 'code-labs/assets/cl-nav.js', 'The page-role register must name the canonical shared-loader file.');
 });
 
 test('next-step guidance: support pages consume one shared Workflow Hub policy', async () => {
@@ -172,9 +179,11 @@ test('Buddy Bridge: every page family has an explicit bounded mode', async () =>
   const loader = await read('code-labs/assets/cl-nav.js');
   const bridge = await read('code-labs/assets/code-labs-buddy-page-bridge-v139.js');
 
-  assertIncludes(loader, 'BUDDY_BRIDGE_MODES', 'The shared loader must declare Buddy Bridge modes by page.');
+  assertIncludes(loader, 'window.CodeLabsWorkflowRegistry=registry', 'Buddy Bridge modes must be anchored to the canonical route registry.');
+  assertIncludes(loader, 'buddyBridgeMode', 'Each canonical route must declare its bounded Buddy Bridge mode.');
+  assertIncludes(loader, 'buddyBridgeModes:Object.freeze(ROUTES.reduce', 'The compatibility API must derive an immutable mode map from canonical routes.');
   for (const marker of ['draft_fields', 'read_only_context', 'assisted_page_fields', 'protected_action_only']) {
-    assertIncludes(loader, marker, `The bridge mode register must include ${marker}.`);
+    assertIncludes(loader, marker, `The canonical route registry must include ${marker}.`);
   }
   assertExcludes(bridge, 'fetch(', 'The browser bridge must not perform authoritative network mutation.');
   assertExcludes(bridge, '.from(', 'The browser bridge must not call Supabase directly.');
