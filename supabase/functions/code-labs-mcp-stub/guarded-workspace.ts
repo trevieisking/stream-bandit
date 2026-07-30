@@ -6,6 +6,7 @@ import {
   listRecords,
   readCurrentFile,
   readReceipt,
+  runAction as runCompatibilityAction,
 } from "./workspace.ts";
 import { backendTablesSnapshot } from "./repo-flow.ts";
 import { executeGithubWriter } from "./github-writer.ts";
@@ -724,9 +725,7 @@ export async function runAction(b: Binding, args: Row) {
   }
   if (action === "backend.tables_snapshot") return backendTablesSnapshot(b);
   if (action === "canvas.load_packet" || action === "github.prepare_request") {
-    throw new Error(
-      action + " is a read-only compatibility action and is not available through the mutation dispatcher.",
-    );
+    return runCompatibilityAction(b, { ...args, action });
   }
   if (action === "code_labs.owner_activate_repository") {
     if (args.confirmed !== true) {
