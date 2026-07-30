@@ -199,6 +199,15 @@ test('Checklist Builder: checks are derived from the exact repair and evidence c
   assertExcludes(checklist, 'A checklist cannot mark itself PASS', 'Runtime output must not self-authorise promotion.');
 });
 
+test('System Contract Scanner: incomplete source fetches fail closed', async () => {
+  const scanner = await read('code-labs/assets/code-labs-system-contract-scanner-app-v141.js');
+
+  assertIncludes(scanner, 'if(failures.length)', 'The scanner must stop when any relevant source fetch fails.');
+  assertIncludes(scanner, 'Repository scan is incomplete:', 'The failure must be reported as incomplete coverage.');
+  assertIncludes(scanner, 'No readiness result was produced.', 'An incomplete scan must not emit a green readiness result.');
+  assertExcludes(scanner, 'const files=fetched.filter(x=>x&&!x.error), failures=fetched.filter(x=>x?.error), fileMap=', 'Failed files must not be silently dropped before analysis.');
+});
+
 test('Specialist Tools: working support and proof capabilities remain discoverable', async () => {
   const register = await read('code-labs/CODE_LABS_PAGE_ROLE_REGISTER_V147.md');
   const help = await read('code-labs/help.html');
