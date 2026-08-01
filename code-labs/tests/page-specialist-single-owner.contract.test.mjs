@@ -139,7 +139,7 @@ test('Specialist Tools: working support and proof capabilities remain discoverab
   const loader = await read('code-labs/assets/cl-nav.js');
   const discoverability = `${register}\n${help}\n${loader}`;
   for (const capability of ['Start Guide','Fix Wizard','AI Handoff','Buddy Canvas Receipt','Context Packet','read-only-proof.html','Buddy Tools']) assertIncludes(discoverability,capability,'Discoverability');
-  assertIncludes(register,'static retirement notice','Retirement notice');
+  assertIncludes(register,'Static retirement notice only','Retirement notice');
 });
 
 test('manual renderer bundle: existing shells are adopted and navigation is never redrawn', async () => {
