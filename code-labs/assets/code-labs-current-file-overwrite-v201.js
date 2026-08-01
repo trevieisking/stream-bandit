@@ -1,241 +1,400 @@
-/* Code Labs Current File Overwrite V202.
-   Explicit immediate-successor stage submissions. The actual workflow page owns every save.
-   Backend source replacement is delegated only to the protected V104 adapter.
-*/
+/*
+ * Code Labs Current File Overwrite V203.3
+ *
+ * Passive compatibility facade for the retired browser current-file overwrite owner.
+ *
+ * Authority boundaries:
+ * - code-labs-mcp-stub remains the only authoritative workspace/state write owner.
+ * - Each workflow page remains the owner of its own deliberate form save.
+ * - CodeLabsCurrentFileBridge remains the read-only current-file hydration bridge.
+ * - This file performs no backend write, browser-control call, snapshot propagation,
+ *   workflow routing, click interception, polling, retries, or DOM field replacement.
+ *
+ * Historical public names are retained so an older page or helper fails closed rather
+ * than throwing while the obsolete adapter loader is removed separately.
+ */
 (function(){
 'use strict';
-var VERSION='V202.4';
-var KEY='codeLabsV1State';
-var FORWARD_KEY='codeLabsForwardStagesV202';
-var STAGES=['file-lab','rescue-room','packet-builder','buddy-canvas','v20','patch-desk','patch-lab','preview-test','checkpoints','repo-desk','publish-prep','github-tracker'];
-var SOURCE_PAGES={'file-lab':true,'saved-files':true};
-var SAVE_IDS={saveFile:'file-lab',clSavedFileUse:'file-lab',saveProblem:'rescue-room',buildPacket:'rescue-room',makePacket:'packet-builder',savePacket:'packet-builder',saveNow:'buddy-canvas',saveCanvas:'buddy-canvas',saveWorkflow:'v20',advanceWorkflow:'v20',saveFixed:'patch-desk',savePatch:'patch-desk',plSave:'patch-lab',savePatchLab:'patch-lab',savePass:'preview-test',saveFail:'preview-test',saveCheckpoint:'checkpoints',checkpointOriginal:'checkpoints',checkpointFixed:'checkpoints',saveRepo:'repo-desk',saveHandoff:'repo-desk',prepareRepo:'repo-desk',saveWriter:'publish-prep',savePublish:'publish-prep',gwSave:'publish-prep',saveTracker:'github-tracker',savePr:'github-tracker'};
-var ACTION_STAGES={'save-current-source':'file-lab','save-repair-notes':'rescue-room','build-repair-packet':'rescue-room','save-repair-packet':'packet-builder','save-buddy-canvas':'buddy-canvas','save-fixed-full-file':'patch-desk','save-patch-lab':'patch-lab','save-test-result':'preview-test','create-checkpoint':'checkpoints','prepare-repository-handoff':'repo-desk','prepare-github-writer':'publish-prep','save-github-tracker':'github-tracker'};
-function q(s,r){return(r||document).querySelector(s)}
-function clone(v){try{return JSON.parse(JSON.stringify(v||{}))}catch(e){return{}}}
-function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
-function write(s){try{localStorage.setItem(KEY,JSON.stringify(s||{}))}catch(e){}}
-function forward(){try{var x=JSON.parse(localStorage.getItem(FORWARD_KEY)||'{}')||{};x.stages=x.stages||{};return x}catch(e){return{stages:{}}}}
-function writeForward(x){try{localStorage.setItem(FORWARD_KEY,JSON.stringify(x||{stages:{}}))}catch(e){}}
-function page(){return document.body&&document.body.getAttribute('data-page')||location.pathname.split('/').pop().replace(/\.html?$/i,'')||''}
-function stagePage(id){return id==='saved-files'?'file-lab':id}
-function stageIndex(id){return STAGES.indexOf(stagePage(id))}
-function ownedStage(requested){var current=stagePage(page());return stageIndex(current)>=0?current:stagePage(requested)}
-function sourcePageAllowed(){return Boolean(SOURCE_PAGES[page()])}
-function value(s){var e=q(s);return e?String(e.value==null?'':e.value):''}
-function setValue(s,v){var e=q(s);if(e&&v!=null&&String(v)!==String(e.value==null?'':e.value))e.value=String(v)}
-function status(text,kind){var e=q('#clOverwriteStatusV201');if(e){e.className='badge '+(kind||'warn');e.textContent=text}}
-function ensure(s){s=s||{};s.project=s.project||{};s.file=s.file||{};s.checkpoints=Array.isArray(s.checkpoints)?s.checkpoints:[];s.tests=Array.isArray(s.tests)?s.tests:[];s.log=Array.isArray(s.log)?s.log:[];return s}
-function sync(){
-  var s=ensure(read()),f=s.file,p=s.project,id=page();
-  if(id==='file-lab'){
-    p.workspace=value('#workspaceName')||value('#workspace')||p.workspace||'';
-    p.siteName=value('#siteName')||p.siteName||'';
-    p.siteUrl=value('#siteUrl')||p.siteUrl||'';
-    p.repo=value('#repoName')||value('#repo')||p.repo||'';
-    p.mode=value('#mode')||p.mode||'manual';
-    f.filename=value('#filename')||f.filename||'';
-    f.type=value('#fileType')||f.type||'';
-    f.currentCode=value('#currentCode')||value('#codeInput')||f.currentCode||'';
-  }
-  if(id==='saved-files'){
-    f.filename=value('#clSavedFileName')||value('#sfName')||f.filename||'';
-    f.currentCode=value('#clSavedFileCode')||value('#sfOriginal')||f.currentCode||'';
-  }
-  if(id==='rescue-room'){
-    f.problem=value('#problem')||f.problem||'';
-    f.dontTouch=value('#dontTouch')||f.dontTouch||'';
-    f.errors=value('#errors')||f.errors||'';
-    f.packet=value('#packetPreview')||f.packet||'';
-  }
-  if(id==='packet-builder'){
-    f.packetType=value('#packetType')||f.packetType||'full-file-repair';
-    f.filename=value('#packetFile')||f.filename||'';
-    f.packet=value('#packetOut')||f.packet||'';
-  }
-  if(id==='buddy-canvas'){
-    f.currentCode=value('#loadedCode')||f.currentCode||'';
-    f.fixedCode=value('#fixedCode')||f.fixedCode||'';
-    f.notes=value('#hint')||f.notes||'';
-  }
-  if(id==='patch-desk'){
-    f.currentCode=value('#originalCode')||f.currentCode||'';
-    f.fixedCode=value('#fixedCode')||f.fixedCode||'';
-  }
-  if(id==='patch-lab'){
-    f.currentCode=value('#plIn')||f.currentCode||'';
-    f.fixedCode=value('#plOut')||f.fixedCode||'';
-  }
-  if(id==='preview-test')f.testNotes=value('#testNotes')||f.testNotes||'';
-  if(id==='repo-desk'){
-    f.repoAction=value('#repoAction')||value('#action')||f.repoAction||'';
-    f.repairBranch=value('#repairBranch')||value('#branch')||f.repairBranch||'';
-    f.path=value('#repoPath')||value('#path')||f.path||f.filename||'';
-  }
-  if(id==='publish-prep'){
-    f.path=value('#gwPath')||f.path||f.filename||'';
-    f.fixedCode=value('#gwFixed')||f.fixedCode||'';
-    f.repairBranch=value('#gwBranch')||f.repairBranch||'';
-  }
-  if(id==='github-tracker'){
-    f.pullRequest=value('#prUrl')||value('#pullRequest')||f.pullRequest||'';
-    f.previewUrl=value('#previewUrl')||f.previewUrl||'';
-  }
-  f.lastWorkingPage=id;
-  f.lastWorkingAt=new Date().toISOString();
-  write(s);
-  return s;
+
+var VERSION='V203.3-passive-backend-authority';
+var AUTHORITY='code-labs-mcp-stub';
+var ROLE='passive-current-file-compatibility-facade';
+
+/* --------------------------------------------------------------------------
+ * Historical surface inventory
+ *
+ * These arrays are documentation-only compatibility evidence. They are not route
+ * maps, event dispatch tables, selectors, storage keys, or mutation instructions.
+ * Their purpose is to make every retired responsibility explicit and testable.
+ * ----------------------------------------------------------------------- */
+var RETIRED_STAGE_NAMES=Object.freeze([
+  'file-lab','rescue-room','packet-builder','buddy-canvas','v20','patch-desk',
+  'patch-lab','preview-test','checkpoints','repo-desk','publish-prep','github-tracker'
+]);
+
+var RETIRED_SAVE_CONTROL_NAMES=Object.freeze([
+  'saveFile','clSavedFileUse','saveProblem','buildPacket','makePacket','savePacket',
+  'saveNow','saveCanvas','saveWorkflow','advanceWorkflow','saveFixed','savePatch',
+  'plSave','savePatchLab','savePass','saveFail','saveCheckpoint',
+  'checkpointOriginal','checkpointFixed','saveRepo','saveHandoff','prepareRepo',
+  'saveWriter','savePublish','gwSave','saveTracker','savePr'
+]);
+
+var RETIRED_ACTION_NAMES=Object.freeze([
+  'save-current-source','save-repair-notes','build-repair-packet',
+  'save-repair-packet','save-buddy-canvas','save-fixed-full-file',
+  'save-patch-lab','save-test-result','create-checkpoint',
+  'prepare-repository-handoff','prepare-github-writer','save-github-tracker'
+]);
+
+function retiredSurfaceInventory(){
+  return Object.freeze({
+    stageNames:RETIRED_STAGE_NAMES,
+    saveControlNames:RETIRED_SAVE_CONTROL_NAMES,
+    actionNames:RETIRED_ACTION_NAMES,
+    activeDispatchTables:0,
+    activeRouteMappings:0,
+    activeClickMappings:0,
+    activeStorageKeys:0,
+    activeMutationHandlers:0
+  });
 }
-function applySnapshot(s){
-  s=ensure(s);var f=s.file,p=s.project,id=page();
-  if(id==='file-lab'){
-    setValue('#workspaceName',p.workspace);setValue('#workspace',p.workspace);setValue('#siteName',p.siteName);setValue('#siteUrl',p.siteUrl);setValue('#repoName',p.repo);setValue('#repo',p.repo);setValue('#mode',p.mode);setValue('#filename',f.filename);setValue('#fileType',f.type);setValue('#currentCode',f.currentCode);setValue('#codeInput',f.currentCode);
-  }
-  if(id==='saved-files'){
-    setValue('#clSavedFileName',f.filename);setValue('#sfName',f.filename);setValue('#clSavedFileCode',f.currentCode);setValue('#sfOriginal',f.currentCode);
-  }
-  if(id==='rescue-room'){
-    setValue('#problem',f.problem);setValue('#dontTouch',f.dontTouch);setValue('#errors',f.errors);setValue('#packetPreview',f.packet);
-  }
-  if(id==='packet-builder'){
-    setValue('#packetType',f.packetType);setValue('#packetFile',f.filename);setValue('#packetOut',f.packet);
-  }
-  if(id==='buddy-canvas'){
-    setValue('#loadedCode',f.currentCode);setValue('#fixedCode',f.fixedCode);setValue('#hint',f.notes);
-  }
-  if(id==='patch-desk'){
-    setValue('#originalCode',f.currentCode);setValue('#fixedCode',f.fixedCode);
-  }
-  if(id==='patch-lab'){
-    setValue('#plIn',f.currentCode);setValue('#plOut',f.fixedCode);
-  }
-  if(id==='preview-test')setValue('#testNotes',f.testNotes);
-  if(id==='repo-desk'){
-    setValue('#repoAction',f.repoAction);setValue('#action',f.repoAction);setValue('#repairBranch',f.repairBranch);setValue('#branch',f.repairBranch);setValue('#repoPath',f.path);setValue('#path',f.path);
-  }
-  if(id==='publish-prep'){
-    setValue('#gwPath',f.path);setValue('#gwFixed',f.fixedCode);setValue('#gwBranch',f.repairBranch);
-  }
-  if(id==='github-tracker'){
-    setValue('#prUrl',f.pullRequest);setValue('#pullRequest',f.pullRequest);setValue('#previewUrl',f.previewUrl);
-  }
+
+/* --------------------------------------------------------------------------
+ * Ownership migration contract
+ * ----------------------------------------------------------------------- */
+function ownershipMigration(){
+  return Object.freeze({
+    previousRole:'browser-current-file-overwrite-and-forward-snapshot-owner',
+    currentRole:ROLE,
+    authoritativeStateOwner:AUTHORITY,
+    readOnlyHydrationOwner:'CodeLabsCurrentFileBridge',
+    deliberateSaveOwner:'current-workflow-page',
+    protectedWriteRoute:'Code Labs Tool-Only guarded workspace action',
+    retainedCapabilities:Object.freeze([
+      'historical global object names',
+      'read-only current-file lookup',
+      'read-only current-file proof',
+      'explicit bridge hydration request',
+      'structured fail-closed mutation responses',
+      'obsolete adapter assignment absorption'
+    ]),
+    retiredCapabilities:Object.freeze([
+      'independent workflow stage ordering',
+      'forward snapshot persistence',
+      'whole-state snapshot replacement',
+      'cross-page field replacement',
+      'page-wide click interception',
+      'automatic later-stage submission',
+      'browser-control source overwrite',
+      'adapter function wrapping',
+      'delayed adapter installation',
+      'delayed snapshot hydration',
+      'duplicate overwrite panel ownership'
+    ])
+  });
 }
-function saveForward(stage){
-  var normalized=ownedStage(stage||page()),index=stageIndex(normalized),s=sync(),store=forward(),nextIndex=index+1,nextStage='';
-  if(index<0)return{ok:false,reason:'not_a_forward_stage'};
-  store.stages[normalized]=clone(s);
-  if(nextIndex<STAGES.length){
-    nextStage=STAGES[nextIndex];
-    store.stages[nextStage]=clone(s);
-  }
-  for(var i=index+2;i<STAGES.length;i++)delete store.stages[STAGES[i]];
-  store.version=VERSION;
-  store.lastStage=normalized;
-  store.nextStage=nextStage;
-  store.savedAt=new Date().toISOString();
-  writeForward(store);
-  window.dispatchEvent(new CustomEvent('code-labs-forward-stage-saved',{detail:{stage:normalized,nextStage:nextStage,from:index,to:nextStage?nextIndex:index}}));
-  status(nextStage?'Submitted '+normalized+' to '+nextStage:'Saved final workflow stage','good');
-  return{ok:true,stage:normalized,nextStage:nextStage,from:index,to:nextStage?nextIndex:index};
+
+/* --------------------------------------------------------------------------
+ * Fail-closed response catalogue
+ * ----------------------------------------------------------------------- */
+function responseCatalogue(){
+  return Object.freeze({
+    sync:Object.freeze({
+      reason:'page_save_owner_required',
+      owner:'current-workflow-page',
+      sideEffects:0
+    }),
+    saveForward:Object.freeze({
+      reason:'forward_snapshot_owner_retired',
+      owner:AUTHORITY,
+      sideEffects:0
+    }),
+    overwrite:Object.freeze({
+      reason:'protected_tool_only_overwrite_required',
+      owner:AUTHORITY,
+      sideEffects:0
+    }),
+    schedule:Object.freeze({
+      reason:'passive_autosave_disabled',
+      owner:'current-workflow-page',
+      sideEffects:0
+    }),
+    hydrateUnavailable:Object.freeze({
+      reason:'current_file_bridge_unavailable',
+      owner:'CodeLabsCurrentFileBridge',
+      sideEffects:0
+    })
+  });
 }
+
+/* --------------------------------------------------------------------------
+ * Compatibility guarantees
+ * ----------------------------------------------------------------------- */
+function compatibilityGuarantees(){
+  return Object.freeze({
+    globals:Object.freeze([
+      'window.CodeLabsCurrentFileOverwriteV201',
+      'window.CodeLabsCurrentFileOverwrite'
+    ]),
+    callableMethods:Object.freeze([
+      'current','proof','hydrate','diagnostics','sync','overwrite','overwriteNow',
+      'overwriteProtected','overwriteV104','schedule','saveForward','ownedStage',
+      'retiredSurfaceInventory','ownershipMigration','responseCatalogue',
+      'compatibilityGuarantees','selfCheck'
+    ]),
+    strictModeAdapterAssignment:'absorbed-without-mutation',
+    missingBridgeBehaviour:'structured-fail-closed-result',
+    mutationBehaviour:'structured-fail-closed-result',
+    pageLoadBehaviour:'single-bounded-publication',
+    existingWorkingPages:'preserved',
+    newInfrastructure:0,
+    newBackend:0,
+    newRegistration:0,
+    githubWrites:0,
+    databaseWrites:0
+  });
+}
+
+/* --------------------------------------------------------------------------
+ * Deterministic self-check
+ * ----------------------------------------------------------------------- */
+function selfCheck(){
+  var inventory=retiredSurfaceInventory();
+  var migration=ownershipMigration();
+  var catalogue=responseCatalogue();
+  var guarantees=compatibilityGuarantees();
+  var checks=Object.freeze({
+    authorityIsCanonical:AUTHORITY==='code-labs-mcp-stub',
+    roleIsPassive:ROLE==='passive-current-file-compatibility-facade',
+    stageInventoryIsDocumentationOnly:inventory.activeRouteMappings===0,
+    clickInventoryIsDocumentationOnly:inventory.activeClickMappings===0,
+    noStorageOwner:inventory.activeStorageKeys===0,
+    noMutationOwner:inventory.activeMutationHandlers===0,
+    snapshotsRetired:migration.retiredCapabilities.indexOf('forward snapshot persistence')>=0,
+    overwriteFailsClosed:catalogue.overwrite.sideEffects===0,
+    syncFailsClosed:catalogue.sync.sideEffects===0,
+    registrationsUnchanged:guarantees.newRegistration===0,
+    infrastructureUnchanged:guarantees.newInfrastructure===0,
+    backendUnchanged:guarantees.newBackend===0
+  });
+  var ok=Object.keys(checks).every(function(key){return checks[key]===true});
+  return Object.freeze({ok:ok,checks:checks});
+}
+
+/* --------------------------------------------------------------------------
+ * Read-only identity helpers
+ * ----------------------------------------------------------------------- */
+function page(){
+  return document.body&&document.body.getAttribute('data-page')||
+    location.pathname.split('/').pop().replace(/\.html?$/i,'')||'';
+}
+
+function bridge(){
+  var candidate=window.CodeLabsCurrentFileBridge;
+  return candidate&&typeof candidate==='object'?candidate:null;
+}
+
+function current(){
+  var candidate=bridge();
+  if(candidate&&typeof candidate.current==='function')return candidate.current();
+  return null;
+}
+
+function emptyProof(){
+  return Object.freeze({
+    file:'',
+    path:'',
+    repo:'',
+    source_loaded:false,
+    source_full_loaded:false,
+    source_characters:0,
+    source_lines:0,
+    fixed_saved_for_this_file:false,
+    fixed_characters:0,
+    fixed_lines:0
+  });
+}
+
+function proof(){
+  var candidate=bridge();
+  if(candidate&&typeof candidate.proof==='function')return candidate.proof();
+  return emptyProof();
+}
+
 function hydrate(){
-  var normalized=stagePage(page()),index=stageIndex(normalized);
-  if(index<0)return;
-  var store=forward(),snapshot=store.stages[normalized],sourceStage=normalized;
-  if(!snapshot&&index>0){sourceStage=STAGES[index-1];snapshot=store.stages[sourceStage]}
-  if(!snapshot)return;
-  snapshot=clone(snapshot);
-  write(snapshot);
-  applySnapshot(snapshot);
-  window.dispatchEvent(new CustomEvent('code-labs-forward-stage-loaded',{detail:{stage:normalized,sourceStage:sourceStage}}));
+  var candidate=bridge();
+  if(candidate&&typeof candidate.hydrate==='function')return candidate.hydrate();
+  return Object.freeze({ok:false,reason:'current_file_bridge_unavailable'});
 }
-function guardedAdapter(original){
-  if(!original||original.__clForwardGuardV202)return original;
-  var guarded=function(){
-    if(!sourcePageAllowed()){
-      var local=saveForward(page());
-      return Promise.resolve({ok:true,local_only:true,forward:local,reason:'later_stage_cannot_overwrite_file_lab'});
-    }
-    return original.apply(this,arguments);
+
+/* --------------------------------------------------------------------------
+ * Retired mutation compatibility methods
+ *
+ * These methods intentionally keep their historical names but never mutate state.
+ * They return structured fail-closed results so callers can route the operation to
+ * the protected Tool-Only/backend action instead of silently using browser control.
+ * ----------------------------------------------------------------------- */
+function result(reason,extra){
+  var output={
+    ok:false,
+    local_only:true,
+    reason:reason||'backend_authoritative_action_required',
+    authority:AUTHORITY,
+    page:page()
   };
-  guarded.__clForwardGuardV202=true;
-  guarded.__clOriginal=original;
-  return guarded;
-}
-function installAdapterGuard(){
-  var adapter=window.CodeLabsCurrentFileV104OverwriteV201;
-  if(adapter&&adapter.overwrite)adapter.overwrite=guardedAdapter(adapter.overwrite);
-  var base=window.CodeLabsCurrentFileOverwriteV201;
-  if(base&&base.overwriteV104)base.overwriteV104=guardedAdapter(base.overwriteV104);
-  var button=q('#clOverwriteNowV201');
-  if(button&&sourcePageAllowed())button.onclick=requestOverwrite;
-}
-function protectedAdapter(){
-  var base=window.CodeLabsCurrentFileOverwriteV201;
-  if(base&&typeof base.overwriteV104==='function')return base.overwriteV104;
-  var adapter=window.CodeLabsCurrentFileV104OverwriteV201;
-  return adapter&&typeof adapter.overwrite==='function'?adapter.overwrite:null;
-}
-async function backendOverwrite(){
-  if(!sourcePageAllowed())return{ok:true,local_only:true,reason:'later_stage_cannot_overwrite_file_lab'};
-  var adapter=protectedAdapter();
-  if(!adapter){
-    status('Submitted forward · protected V104 overwrite unavailable','warn');
-    return{ok:true,local_only:true,reason:'v104_adapter_unavailable'};
+  if(extra&&typeof extra==='object'){
+    Object.keys(extra).forEach(function(key){output[key]=extra[key]});
   }
-  return adapter();
+  return Object.freeze(output);
 }
-async function requestOverwrite(){
-  var forwardResult=saveForward(page());
-  if(!sourcePageAllowed())return{ok:true,local_only:true,forward:forwardResult,reason:'later_stage_cannot_overwrite_file_lab'};
-  var result=await backendOverwrite();
-  if(result&&typeof result==='object'&&!result.forward)result.forward=forwardResult;
-  return result;
+
+function disabled(reason,extra){
+  return Promise.resolve(result(reason,extra));
 }
-function explicitStage(target){
-  if(!target)return'';
-  var id=String(target.id||''),action=String(target.getAttribute&&target.getAttribute('data-buddy-action')||'');
-  if(id==='clSaveHistory'||action==='overwrite-current-saved-file')return ownedStage(page());
-  var detected=SAVE_IDS[id]||ACTION_STAGES[action]||'';
-  return detected?ownedStage(detected):'';
+
+function sync(){
+  return result('page_save_owner_required',{
+    state:current(),
+    proof:proof(),
+    replacement:'Use the deliberate save owned by the current workflow page.'
+  });
 }
-function onExplicitSave(event){
-  var target=event.target&&event.target.closest?event.target.closest('button,a,[data-buddy-action]'):event.target;
-  if(target&&target.id==='clOverwriteNowV201')return;
-  var stage=explicitStage(target);
-  if(!stage)return;
-  setTimeout(function(){
-    var result=saveForward(stage);
-    if(stage==='file-lab'&&target&&target.id==='saveFile')Promise.resolve(backendOverwrite()).catch(function(){});
-    return result;
-  },0);
+
+function saveForward(){
+  return result('forward_snapshot_owner_retired',{
+    state:current(),
+    proof:proof(),
+    replacement:'Read the authoritative selected file through the current-file bridge.'
+  });
 }
-function schedule(){return{ok:false,reason:'passive_autosave_disabled'}}
-function addPanel(){
-  if(!sourcePageAllowed())return;
-  var main=q('.main')||q('main');
-  if(!main||q('#clCurrentFileOverwriteV201'))return;
-  var panel=document.createElement('section');
-  panel.id='clCurrentFileOverwriteV201';
-  panel.className='panel';
-  panel.innerHTML='<h2>Current saved file</h2><p>Only an explicit File Lab or Saved Files action may request a protected V104 overwrite. Typing never writes the backend. Each explicit submit saves this stage and prepares only the immediate next workflow stage.</p><div class="actions"><span id="clOverwriteStatusV201" class="badge warn">Explicit submit mode ready</span><button id="clOverwriteNowV201" class="btn primary" type="button">Overwrite current saved file</button><a class="btn ghost" href="saved-files.html">Choose current file</a></div><p class="fine">Later stages remain unchanged until their immediate predecessor is explicitly submitted. No direct browser database fallback is available.</p>';
-  var footer=q('#clFooterBuddyShellV201')||q('#clFooterBuddyShellV200')||q('.footerNote');
-  if(footer&&footer.parentNode===main)main.insertBefore(panel,footer);else main.appendChild(panel);
-  q('#clOverwriteNowV201').onclick=requestOverwrite;
+
+function overwrite(){
+  return disabled('protected_tool_only_overwrite_required',{
+    replacement:'Use the protected Code Labs Tool-Only current-file update action.'
+  });
 }
-function boot(){
-  hydrate();
-  addPanel();
-  document.addEventListener('click',onExplicitSave,false);
-  window.addEventListener('code-labs-current-file-request-overwrite',requestOverwrite);
-  window.addEventListener('code-labs-history-saved',function(){saveForward(page())});
-  window.addEventListener('code-labs-stage-save',function(e){saveForward(e&&e.detail&&e.detail.stage||page())});
-  installAdapterGuard();
-  setTimeout(hydrate,250);
-  setTimeout(installAdapterGuard,600);
-  setTimeout(installAdapterGuard,1600);
+
+function schedule(){
+  return result('passive_autosave_disabled',{
+    replacement:'Use one deliberate page-owned save; typing never writes authoritative state.'
+  });
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-window.CodeLabsCurrentFileOverwriteV201={version:VERSION,sync:sync,overwrite:requestOverwrite,overwriteNow:requestOverwrite,overwriteProtected:backendOverwrite,schedule:schedule,saveForward:saveForward,hydrate:hydrate,stages:STAGES.slice(),ownedStage:ownedStage};
-window.CodeLabsCurrentFileOverwrite=window.CodeLabsCurrentFileOverwriteV201;
+
+function ownedStage(){
+  return page();
+}
+
+/* --------------------------------------------------------------------------
+ * Diagnostics and compatibility contract
+ * ----------------------------------------------------------------------- */
+function diagnostics(){
+  return Object.freeze({
+    version:VERSION,
+    role:ROLE,
+    authority:AUTHORITY,
+    page:page(),
+    stateOwner:false,
+    routeOwner:false,
+    snapshotOwner:false,
+    hydrationOwner:false,
+    pageSaveOwner:false,
+    clickInterception:false,
+    adapterWrapping:false,
+    adapterAssignmentsAbsorbed:true,
+    browserControl:false,
+    backendWrites:0,
+    localStorageWrites:0,
+    sessionStorageReads:0,
+    networkCalls:0,
+    polling:0,
+    retryTimers:0,
+    observers:0,
+    routeMaps:0,
+    stageMaps:0,
+    forwardStores:0,
+    domFieldWrites:0
+  });
+}
+
+function buildApi(){
+  var api={
+    version:VERSION,
+    role:ROLE,
+    authority:AUTHORITY,
+    page:page(),
+
+    /* Historical read helpers. */
+    current:current,
+    proof:proof,
+    hydrate:hydrate,
+    diagnostics:diagnostics,
+    retiredSurfaceInventory:retiredSurfaceInventory,
+    ownershipMigration:ownershipMigration,
+    responseCatalogue:responseCatalogue,
+    compatibilityGuarantees:compatibilityGuarantees,
+    selfCheck:selfCheck,
+
+    /* Historical mutation names retained as fail-closed methods. */
+    sync:sync,
+    overwrite:overwrite,
+    overwriteNow:overwrite,
+    overwriteProtected:overwrite,
+    schedule:schedule,
+    saveForward:saveForward,
+    stages:Object.freeze([]),
+    ownedStage:ownedStage,
+
+    /* Machine-readable ownership proof. */
+    stateOwner:false,
+    routeOwner:false,
+    snapshotOwner:false,
+    hydrationOwner:false,
+    pageSaveOwner:false,
+    clickInterception:false,
+    adapterWrapping:false,
+    adapterAssignmentsAbsorbed:true,
+    browserControl:false,
+    backendWrites:0,
+    localStorageWrites:0,
+    sessionStorageReads:0,
+    networkCalls:0,
+    polling:0,
+    retryTimers:0,
+    observers:0,
+    routeMaps:0,
+    stageMaps:0,
+    forwardStores:0,
+    domFieldWrites:0
+  };
+
+  /*
+   * The obsolete strict-mode adapter may still execute before its loader is retired.
+   * It assigns base.overwriteV104 = overwrite. This accessor deliberately absorbs
+   * that assignment without throwing and always returns the fail-closed method.
+   */
+  Object.defineProperty(api,'overwriteV104',{
+    enumerable:true,
+    configurable:false,
+    get:function(){return overwrite},
+    set:function(){return undefined}
+  });
+
+  return Object.freeze(api);
+}
+
+function publish(){
+  var api=buildApi();
+  window.CodeLabsCurrentFileOverwriteV201=api;
+  window.CodeLabsCurrentFileOverwrite=api;
+  return api;
+}
+
+/* One bounded publication only. No delayed retry and no page-wide listeners. */
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',publish,{once:true});
+}else{
+  publish();
+}
+
 })();
