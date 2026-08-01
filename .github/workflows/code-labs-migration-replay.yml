@@ -1,0 +1,49 @@
+name: Code Labs Migration Replay
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/code-labs-migration-replay.yml
+      - supabase/config.toml
+      - supabase/migrations/**
+      - supabase/functions/code-labs-mcp-stub/migration-replay-baseline.contract.test.mjs
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: code-labs-migration-replay-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  replay:
+    name: Replay every migration from zero
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out reviewed head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Run source replay contract
+        run: node --test supabase/functions/code-labs-mcp-stub/migration-replay-baseline.contract.test.mjs
+
+      - name: Start disposable local database
+        run: supabase db start
+
+      - name: Reset and replay every migration again
+        run: supabase db reset --local --no-seed
+
+      - name: Stop disposable local database
+        if: always()
+        run: supabase stop --no-backup || true

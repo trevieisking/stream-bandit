@@ -1,65 +1,177 @@
-/* Code Labs V104 current-file overwrite adapter V202 */
+/*
+ * Code Labs V104 Current-File Overwrite Adapter V203.0
+ *
+ * Retired browser-control transport compatibility facade.
+ *
+ * Authority boundaries:
+ * - code-labs-mcp-stub is the only authoritative current-file write owner.
+ * - CodeLabsCurrentFileOverwriteV201 is the passive read/fail-closed facade.
+ * - This adapter performs no browser session lookup, secret lookup, network call,
+ *   local/session storage mutation, button rebinding, timer, retry or DOM mutation.
+ */
 (function(){
 'use strict';
-var VERSION='V202.0';
-var ENDPOINT='https://xzxqfrvqdgkzwujbkdbk.supabase.co/functions/v1/code-labs-browser-control';
-var PUB='sb_publishable_1wHhSq2xo0XBwsKXO_64HQ_xyVY9xRN';
-var SESSION='codeLabsV104BrowserSession';
-var SECRET='codeLabsV104BrowserSecret';
-var KEY='codeLabsV1State';
-var SOURCE_PAGES={'file-lab':true,'saved-files':true};
-function q(s){return document.querySelector(s)}
-function stored(k){try{return sessionStorage.getItem(k)||''}catch(e){return''}}
-function state(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
-function save(s){try{localStorage.setItem(KEY,JSON.stringify(s||{}))}catch(e){}}
-function page(){return document.body&&document.body.getAttribute('data-page')||location.pathname.split('/').pop().replace(/\.html?$/i,'')||''}
-function sourcePageAllowed(){return Boolean(SOURCE_PAGES[page()])}
-function status(text,kind){var e=q('#clOverwriteStatusV201');if(e){e.className='badge '+(kind||'warn');e.textContent=text}}
-async function send(fileId,filename,content,metadata){
-  var sessionId=stored(SESSION),secret=stored(SECRET);
-  if(!sessionId||!secret)throw new Error('The V104 page session is still starting.');
-  var response=await fetch(ENDPOINT,{method:'POST',headers:{apikey:PUB,'Content-Type':'application/json'},body:JSON.stringify({action:'overwrite_current_file',session_id:sessionId,browser_secret:secret,file_id:fileId,filename:filename,content:content,metadata:metadata||{}})});
-  var data=await response.json().catch(function(){return{}});
-  if(!response.ok||data.ok===false)throw new Error(data.error||'V104 overwrite failed.');
-  return data;
+
+var VERSION='V203.0-retired-browser-control-transport';
+var ROLE='passive-v104-overwrite-adapter-compatibility-facade';
+var AUTHORITY='code-labs-mcp-stub';
+var RETIRED_ENDPOINT='code-labs-browser-control';
+
+function page(){
+  return document.body&&document.body.getAttribute('data-page')||
+    location.pathname.split('/').pop().replace(/\.html?$/i,'')||'';
 }
-async function overwrite(){
-  var base=window.CodeLabsCurrentFileOverwriteV201;
-  if(!base)throw new Error('Current-file overwrite helper is not available.');
-  if(!sourcePageAllowed()){
-    var forward=base.saveForward?base.saveForward(page()):null;
-    return{ok:true,local_only:true,forward:forward,reason:'later_stage_cannot_overwrite_file_lab'};
-  }
-  var s=base.sync?base.sync():state(),f=s.file||{};
-  var fileId=String(f.savedFileId||f.saved_file_id||'');
-  var filename=f.filename||f.path||'file.txt';
-  var content=String(f.currentCode||'');
-  if(!fileId){status('Choose one saved file first','warn');return{ok:false,reason:'no_saved_file_id'}}
-  if(!content.trim()){status('No complete File Lab source is available','warn');return{ok:false,reason:'empty_source'}}
-  status('Overwriting through V104','warn');
-  try{
-    var result=await send(fileId,filename,content,{path:f.path||filename,repo:(s.project||{}).repo||'',branch:(f.githubSource||{}).branch||'main',lastPage:page(),source:'code-labs-v104-overwrite-adapter-v202'});
-    f.lastSupabaseOverwriteAt=result.updated_at||new Date().toISOString();
-    f.lastSupabaseOverwriteSource='v104';
-    save(s);
-    status('Current saved file overwritten from File Lab','good');
-    return result;
-  }catch(error){
-    status('Overwrite will retry','bad');
-    return{ok:false,error:String(error.message||error)};
-  }
+
+function base(){
+  var candidate=window.CodeLabsCurrentFileOverwriteV201;
+  return candidate&&typeof candidate==='object'?candidate:null;
 }
-function install(){
-  var base=window.CodeLabsCurrentFileOverwriteV201;
-  if(!base){setTimeout(install,180);return}
-  base.overwriteV104=overwrite;
-  var button=q('#clOverwriteNowV201');
-  if(button&&sourcePageAllowed()){
-    button.onclick=overwrite;
-    button.setAttribute('data-cl-v104-overwrite','yes');
-  }
-  window.CodeLabsCurrentFileV104OverwriteV201={version:VERSION,overwrite:overwrite,send:send,sourcePageAllowed:sourcePageAllowed};
+
+function readOnlyState(){
+  var candidate=base();
+  if(candidate&&typeof candidate.current==='function')return candidate.current();
+  return null;
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
-setTimeout(install,500);setTimeout(install,1400);
+
+function readOnlyProof(){
+  var candidate=base();
+  if(candidate&&typeof candidate.proof==='function')return candidate.proof();
+  return Object.freeze({
+    file:'',path:'',repo:'',source_loaded:false,source_full_loaded:false,
+    source_characters:0,source_lines:0,fixed_saved_for_this_file:false,
+    fixed_characters:0,fixed_lines:0
+  });
+}
+
+function fail(reason,extra){
+  var result={
+    ok:false,
+    local_only:true,
+    reason:reason||'protected_tool_only_overwrite_required',
+    authority:AUTHORITY,
+    page:page(),
+    retiredEndpoint:RETIRED_ENDPOINT,
+    replacement:'Use the protected Code Labs Tool-Only current-file update action.'
+  };
+  if(extra&&typeof extra==='object'){
+    Object.keys(extra).forEach(function(key){result[key]=extra[key]});
+  }
+  return Object.freeze(result);
+}
+
+function overwrite(){
+  return Promise.resolve(fail('browser_control_overwrite_retired',{
+    state:readOnlyState(),
+    proof:readOnlyProof()
+  }));
+}
+
+function send(){
+  return Promise.resolve(fail('browser_control_transport_retired'));
+}
+
+function sourcePageAllowed(){
+  return false;
+}
+
+function compatibilityContract(){
+  return Object.freeze({
+    historicalGlobal:'window.CodeLabsCurrentFileV104OverwriteV201',
+    historicalMethods:Object.freeze(['overwrite','send','sourcePageAllowed','diagnostics','selfCheck']),
+    retainedBehaviour:Object.freeze([
+      'historical global publication',
+      'promise-compatible overwrite response',
+      'promise-compatible send response',
+      'read-only delegation to current-file facade',
+      'structured fail-closed replacement guidance'
+    ]),
+    retiredBehaviour:Object.freeze([
+      'browser-control Edge Function transport',
+      'publishable-key browser request',
+      'browser session secret lookup',
+      'sessionStorage reads',
+      'localStorage reads and writes',
+      'shared state replacement',
+      'button handler replacement',
+      'status badge mutation',
+      'delayed adapter installation',
+      'automatic retry',
+      'source overwrite from browser state'
+    ])
+  });
+}
+
+function diagnostics(){
+  return Object.freeze({
+    version:VERSION,
+    role:ROLE,
+    authority:AUTHORITY,
+    retiredEndpoint:RETIRED_ENDPOINT,
+    page:page(),
+    browserControl:false,
+    networkCalls:0,
+    fetchCalls:0,
+    sessionStorageReads:0,
+    localStorageReads:0,
+    localStorageWrites:0,
+    buttonRebindings:0,
+    domMutations:0,
+    timers:0,
+    retries:0,
+    observers:0,
+    backendWrites:0,
+    sourcePageAllowed:false
+  });
+}
+
+function selfCheck(){
+  var d=diagnostics();
+  var checks=Object.freeze({
+    canonicalAuthority:d.authority==='code-labs-mcp-stub',
+    browserControlRetired:d.browserControl===false,
+    noNetwork:d.networkCalls===0&&d.fetchCalls===0,
+    noBrowserSecrets:d.sessionStorageReads===0,
+    noSharedState:d.localStorageReads===0&&d.localStorageWrites===0,
+    noDomOwnership:d.buttonRebindings===0&&d.domMutations===0,
+    noRetryOwnership:d.timers===0&&d.retries===0&&d.observers===0,
+    noBackendWrite:d.backendWrites===0,
+    sourcePagesDisabled:d.sourcePageAllowed===false
+  });
+  return Object.freeze({
+    ok:Object.keys(checks).every(function(key){return checks[key]===true}),
+    checks:checks
+  });
+}
+
+function publish(){
+  var api=Object.freeze({
+    version:VERSION,
+    role:ROLE,
+    authority:AUTHORITY,
+    overwrite:overwrite,
+    send:send,
+    sourcePageAllowed:sourcePageAllowed,
+    diagnostics:diagnostics,
+    compatibilityContract:compatibilityContract,
+    selfCheck:selfCheck,
+    browserControl:false,
+    networkCalls:0,
+    sessionStorageReads:0,
+    localStorageWrites:0,
+    buttonRebindings:0,
+    timers:0,
+    retries:0,
+    backendWrites:0
+  });
+  window.CodeLabsCurrentFileV104OverwriteV201=api;
+  return api;
+}
+
+/* One bounded publication only. No delayed install and no page-wide listeners. */
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',publish,{once:true});
+}else{
+  publish();
+}
+
 })();

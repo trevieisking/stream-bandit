@@ -1,11 +1,11 @@
 /* Code Labs V157 - Start Guide route wording */
 (function(){
 'use strict';
-var KEY='codeLabsV1State';
+var KEY='codeLabsV1State', DRAFT_KEY='codeLabsStartGuideDraft', ROLE='draft_fields';
 function q(s,r){return(r||document).querySelector(s)}
 function h(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function state(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
-function saveState(s){localStorage.setItem(KEY,JSON.stringify(s||{}))}
+function state(){try{var base=JSON.parse(localStorage.getItem(KEY)||'{}')||{},draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}')||{};return Object.assign({},base,draft,{project:Object.assign({},base.project||{},draft.project||{}),file:Object.assign({},base.file||{},draft.file||{})})}catch(e){return{}}}
+function saveState(s){localStorage.setItem(DRAFT_KEY,JSON.stringify(s||{}))}
 function val(id){var e=q(id);return e?e.value.trim():''}
 function put(id,v){var e=q(id);if(e)e.value=v||''}
 function toast(m){var t=q('#toast');if(!t){alert(m);return}t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)}

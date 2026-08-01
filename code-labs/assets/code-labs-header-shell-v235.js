@@ -1,23 +1,100 @@
-/* Code Labs Header Shell V245 - bounded compatibility decorator.
-   V282 remains the sole visible sidebar owner; this helper delegates repairs to it.
+/* Code Labs Header Shell V247 - passive canonical-registry tool drawer.
+
+   Ownership contract:
+   - code-labs/assets/cl-nav.js is the only route catalogue and sidebar renderer.
+   - this helper never creates, repairs, reorders, renumbers or observes sidebar links.
+   - specialist links come only from the canonical registry toolRoutes group.
+   - this helper performs one bounded decoration pass after cl-nav has rendered.
+
+   Preserved compatibility surfaces:
+   - responsive sidebar/tool-link styling;
+   - the existing #clV202Tools specialist drawer location and identifier;
+   - the logo status text;
+   - window.CodeLabsStableNav and window.CodeLabsHeaderShellV235 diagnostics.
 */
 (function(){'use strict';
-var VERSION='V245-header-shell-v282-delegate';
-var LINKS=[['index.html','🏠','Home','Start and current repair'],['setup.html','⚙','Setup','Project and repository'],['project-picker.html','🗂️','Project Picker','Choose saved project'],['file-lab.html','📥','File Lab','Load complete source'],['saved-files.html','🗃️','Saved Files','Select one saved file'],['rescue-room.html','🛟','Rescue Room','Problem and preserve rules'],['packet-builder.html','📦','Packet Builder','Complete repair context'],['buddy-canvas.html','🤖','Buddy Canvas','Source and fixed file'],['v20.html','🧭','Workflow Hub','Choose the safe route'],['patch-desk.html','🧩','Patch Desk','Review full replacement'],['patch-lab.html','🧪','Patch Lab','Exact-edit fallback'],['preview-test.html','🎯','Preview + Test','Check before GitHub'],['checkpoints.html','💾','Checkpoints','Rollback and receipts'],['repo-desk.html','🧾','Repo Desk','Choose repository action'],['cg-repair-lab.html','🧠','CG Repair Lab','Code Labs Pro analysis'],['code-god.html','⚖️','Code God','Deterministic final review'],['publish-prep.html','🚀','GitHub Writer','Branch and PR handoff'],['github-tracker.html','🔎','GitHub Tracker','PR, preview and checks'],['help.html','❔','Help + Tools','Guides and specialist tools']];
-var TOOLS=[['start-guide.html','Start Guide'],['fix-wizard.html','Fix Wizard'],['ai-handoff.html','AI Handoff'],['checklist-builder.html','Checklist Builder'],['about.html','About'],['faq.html','FAQ'],['context-packet.html','Context Packet'],['helper-route-map.html','Route Scanner'],['read-only-proof.html','Read-only Proof'],['owner-read-proof.html','Owner Read Proof'],['buddy-canvas-receipt-v115.html','Canvas Receipt'],['chatgpt-buddy-tools.html','Buddy Tools']];
-var observer=null,timer=0,bootTimer=0,bootAttempt=0,BOOT_DELAYS=[0,80,160,320,640,1000];
-function q(s,r){return(r||document).querySelector(s)}
-function page(){return(document.body&&document.body.getAttribute('data-page'))||location.pathname.split('/').pop().replace(/\.html?$/i,'')||'index'}
-function esc(v){return String(v==null?'':v).replace(/[<>"'&]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function active(h){return page()+'.html'===h||(page()==='index'&&h==='index.html')}
-function correct(n){var a=n?Array.prototype.slice.call(n.querySelectorAll('a[data-step]')):[];return a.length===LINKS.length&&a.every(function(x,i){var icon=q(':scope>span',x);return(x.getAttribute('href')||'').split('?')[0].split('#')[0]===LINKS[i][0]&&x.dataset.step===String(i+1)&&String(icon&&icon.textContent||'')===LINKS[i][1]})}
-function nav(){var n=q('.nav');if(!n)return false;if(n.getAttribute('data-cl-nav-owner')!=='V282-first-paint'||!correct(n)){var owner=window.CodeLabsShellLoaderV235;if(!owner||typeof owner.firstNav!=='function'||!owner.firstNav())return false;n=q('.nav');if(!n||n.getAttribute('data-cl-nav-owner')!=='V282-first-paint'||!correct(n))return false}n.setAttribute('data-cl-header-shell',VERSION);n.setAttribute('aria-label','Complete Code Labs workflow');return true}
-function tools(){var side=q('.sidebar'),n=q('.nav');if(!side||!n||q('#clV202Tools',side))return;var d=document.createElement('details');d.id='clV202Tools';d.className='sideBox';d.innerHTML='<summary><b>Specialist tools</b></summary><p>Original helpers stay available without cluttering the main route.</p><div class="clV235ToolLinks">'+TOOLS.map(function(t){return'<a href="'+esc(t[0])+'">'+esc(t[1])+'</a>'}).join('')+'</div>';side.insertBefore(d,n.nextSibling)}
-function style(){if(q('#clHeaderShellV235Style'))return;var s=document.createElement('style');s.id='clHeaderShellV235Style';s.textContent='.clV235ToolLinks{display:grid;gap:6px;margin-top:8px}.clV235ToolLinks a{display:block;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.08);text-decoration:none}@media(max-width:980px){.sidebar{position:relative!important;max-height:none!important}.main{min-width:0!important}}';document.head.appendChild(s)}
-function schedule(){if(timer)return;timer=setTimeout(function(){timer=0;run()},0)}
-function watch(){var n=q('.nav');if(!n)return;if(observer)observer.disconnect();observer=new MutationObserver(schedule);observer.observe(n,{childList:true,subtree:true,attributes:true,attributeFilter:['href','data-step','class']})}
-function stopBoot(){if(bootTimer){window.clearTimeout(bootTimer);bootTimer=0}}
-function run(){style();if(!nav())return false;stopBoot();tools();var small=q('.logo small');if(small)small.textContent='Complete repair workflow · CG Repair Lab and Code God before GitHub Writer';watch();document.documentElement.dataset.clHeaderReady='v245';window.CodeLabsStableNav={version:VERSION,role:'v282-compatibility-decorator',links:LINKS.length,run:run,routes:LINKS};window.CodeLabsHeaderShellV235=window.CodeLabsStableNav;return true}
-function boot(){if(run())return true;if(bootAttempt>=BOOT_DELAYS.length){stopBoot();return false}var delay=BOOT_DELAYS[bootAttempt++];stopBoot();bootTimer=window.setTimeout(boot,delay);return false}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+var VERSION='V247-header-shell-passive-tool-registry';
+var ROLE='passive-canonical-registry-consumer';
+var EXPECTED_OWNER='code-labs/assets/cl-nav.js';
+
+function q(selector,scope){return(scope||document).querySelector(selector)}
+function esc(value){return String(value==null?'':value).replace(/[<>"'&]/g,function(character){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]})}
+function registry(){var value=window.CodeLabsWorkflowRegistry;return value&&Array.isArray(value.toolRoutes)&&value.owner===EXPECTED_OWNER?value:null}
+function canonicalNav(){var node=q('.nav'),rootOwner=document.documentElement.getAttribute('data-cl-route-registry-owner'),navOwner=node&&node.getAttribute('data-cl-route-registry-owner');return node&&rootOwner&&navOwner===rootOwner?node:null}
+function toolRoutes(){var value=registry();if(!value)return[];return value.toolRoutes.filter(function(route){return route&&route.file&&route.label&&route.tool===true})}
+function routeSnapshot(routes){return Object.freeze(routes.map(function(route){return Object.freeze({id:route.id,file:route.file,label:route.label})}))}
+
+function ensureStyle(){
+ if(q('#clHeaderShellV235Style'))return false;
+ var node=document.createElement('style');
+ node.id='clHeaderShellV235Style';
+ node.textContent='.clV235ToolLinks{display:grid;gap:6px;margin-top:8px}.clV235ToolLinks a{display:block;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.08);text-decoration:none}@media(max-width:980px){.sidebar{position:relative!important;max-height:none!important}.main{min-width:0!important}}';
+ document.head.appendChild(node);
+ return true
+}
+
+function ensureTools(routes){
+ var side=q('.sidebar'),nav=canonicalNav();
+ if(!side||!nav||!routes.length)return false;
+ var existing=q('#clV202Tools',side);
+ if(existing)return true;
+ var details=document.createElement('details');
+ details.id='clV202Tools';
+ details.className='sideBox';
+ details.setAttribute('data-cl-header-shell-owner',VERSION);
+ details.innerHTML='<summary><b>Specialist tools</b></summary><p>Original helpers stay available without cluttering the main route.</p><div class="clV235ToolLinks">'+routes.map(function(route){return'<a href="'+esc(route.file)+'">'+esc(route.label)+'</a>'}).join('')+'</div>';
+ side.insertBefore(details,nav.nextSibling);
+ return true
+}
+
+function updateLogo(){
+ var small=q('.logo small');
+ if(!small)return false;
+ small.textContent='Complete repair workflow · CG Repair Lab and Code God before GitHub Writer';
+ small.setAttribute('data-cl-header-shell-owner',VERSION);
+ return true
+}
+
+function publishDiagnostics(routes,result){
+ var value=registry();
+ var api=Object.freeze({
+  version:VERSION,
+  role:ROLE,
+  routeOwner:value?value.owner:null,
+  routeRegistryVersion:value?value.version:null,
+  toolRouteCount:routes.length,
+  toolRoutes:routeSnapshot(routes),
+  navMutations:0,
+  observers:0,
+  retryTimers:0,
+  lastResult:Object.freeze(result),
+  run:run
+ });
+ window.CodeLabsStableNav=api;
+ window.CodeLabsHeaderShellV235=api;
+ return api
+}
+
+function run(){
+ var value=registry(),nav=canonicalNav();
+ if(!value||!nav){
+  publishDiagnostics([],{ok:false,reason:'canonical_registry_unavailable'});
+  return false
+ }
+ var routes=toolRoutes();
+ var result={
+  ok:true,
+  styleReady:ensureStyle(),
+  toolsReady:ensureTools(routes),
+  logoReady:updateLogo(),
+  routeOwner:value.owner,
+  navOwner:nav.getAttribute('data-cl-route-registry-owner')
+ };
+ nav.setAttribute('data-cl-header-shell',VERSION);
+ document.documentElement.dataset.clHeaderReady='v247';
+ publishDiagnostics(routes,result);
+ return true
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();

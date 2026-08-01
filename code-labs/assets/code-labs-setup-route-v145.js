@@ -1,16 +1,181 @@
-/* Code Labs Setup Route V266 - canonical Home -> Setup -> Project Picker -> File Lab. No writes. */
+/* Code Labs Setup Route V288 - passive V287 registry consumer.
+ *
+ * This file preserves the historical CodeLabsSetupRouteV145 compatibility
+ * surface while retiring every former ownership behaviour. cl-nav.js is the
+ * sole route, ordering, visible-step numbering and sidebar owner.
+ *
+ * Retired here:
+ * - navigation creation, insertion, ordering and active-state mutation;
+ * - workflow-panel and footer text rewriting;
+ * - setup-next-link rewriting;
+ * - MutationObserver ownership loops;
+ * - delayed retries, timers and polling;
+ * - click interception, reloads and independent route maps.
+ */
 (function(){
 'use strict';
-function q(s,r){return(r||document).querySelector(s)}
-function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
-function iconStyle(){if(q('#clSetupRouteV145Style'))return;var st=document.createElement('style');st.id='clSetupRouteV145Style';st.textContent='.nav a[href="setup.html"]>span{color:#dbeafe!important;font-size:16px!important;line-height:1!important}.nav a[href="setup.html"].active>span{color:#34d399!important}';document.head.appendChild(st)}
-function make(){var a=document.createElement('a');a.href='setup.html';a.innerHTML='<span>⚙️</span><div>Setup<small>Project and repo</small></div>';return a}
-function keepSetup(){var nav=q('.nav');if(!nav)return;iconStyle();var setup=q('.nav a[href="setup.html"]')||make(),home=q('.nav a[href="index.html"]');if(home&&setup.previousElementSibling!==home)nav.insertBefore(setup,home.nextSibling);else if(!setup.parentNode)nav.appendChild(setup);if((document.body&&document.body.getAttribute('data-page'))==='setup')setup.classList.add('active')}
-function nextLink(box,href,label){var next=box&&q('.next',box);if(!next)return;next.href=href;next.textContent='Next: '+label}
-function restoreSetupNext(){if((document.body&&document.body.getAttribute('data-page'))!=='setup')return;qa('a').forEach(function(a){if(a.closest&&a.closest('.nav'))return;if(/^Next:/i.test(String(a.textContent||'').trim())){a.href='project-picker.html';a.textContent='Next: Project Picker'}})}
-function fixRoutePanels(){var id=(document.body&&document.body.getAttribute('data-page'))||'',box=q('#clWorkflowClarityV130');if(id==='index')nextLink(box,'setup.html','Setup');if(id==='setup'){nextLink(box,'project-picker.html','Project Picker');restoreSetupNext()}if(id==='project-picker')nextLink(box,'file-lab.html','File Lab');var foot=q('#clHelpShortcut');if(foot){foot.innerHTML=foot.innerHTML.replace(/Home\s*→\s*Setup(?:\s*→\s*Project Picker)?\s*→\s*File Lab/g,'Home → Setup → Project Picker → File Lab').replace(/Home\s*→\s*File Lab/g,'Home → Setup → Project Picker → File Lab')}}
-function watch(){var nav=q('.nav');if(!nav||nav.getAttribute('data-cl-setup-route-v145')==='yes')return;nav.setAttribute('data-cl-setup-route-v145','yes');try{new MutationObserver(function(){keepSetup();fixRoutePanels()}).observe(nav,{childList:true})}catch(e){}}
-function run(){keepSetup();fixRoutePanels();watch();document.body.setAttribute('data-code-labs-setup-route-v145','active');window.CodeLabsSetupRouteV145={version:'V266',active:true,route:'Home -> Setup -> Project Picker -> File Lab'}}
-function boot(){run();setTimeout(run,60);setTimeout(run,300);setTimeout(run,1000);setTimeout(run,2600)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+
+var EXPECTED_OWNER='code-labs/assets/cl-nav.js';
+var EXPECTED_SEQUENCE=Object.freeze([
+  Object.freeze({id:'setup',file:'setup.html'}),
+  Object.freeze({id:'project-picker',file:'project-picker.html'}),
+  Object.freeze({id:'file-lab',file:'file-lab.html'})
+]);
+var RETIRED_BEHAVIOURS=Object.freeze([
+  'create-navigation-link',
+  'insert-or-reorder-navigation-link',
+  'set-navigation-active-state',
+  'rewrite-workflow-next-link',
+  'rewrite-help-route-copy',
+  'observe-navigation-mutations',
+  'run-delayed-retries',
+  'poll-or-reload-page',
+  'own-route-map',
+  'own-visible-step-numbers'
+]);
+
+function registry(){
+  return window.CodeLabsWorkflowRegistry||null;
+}
+
+function route(source,id){
+  return source&&typeof source.route==='function'?source.route(id):null;
+}
+
+function workflowIndex(source,id){
+  return source&&typeof source.workflowIndex==='function'?source.workflowIndex(id):-1;
+}
+
+function sameRoute(actual,expected){
+  return !!(
+    actual&&expected&&
+    actual.id===expected.id&&
+    actual.file===expected.file
+  );
+}
+
+function numericStep(item){
+  return item&&typeof item.step==='number'&&Number.isFinite(item.step)?item.step:null;
+}
+
+function validate(source){
+  if(!source||source.owner!==EXPECTED_OWNER)return false;
+  if(typeof source.route!=='function'||typeof source.next!=='function'||typeof source.previous!=='function')return false;
+  if(typeof source.workflowIndex!=='function')return false;
+  var home=route(source,'index');
+  var setup=route(source,'setup');
+  var picker=route(source,'project-picker');
+  var fileLab=route(source,'file-lab');
+  var homeStep=numericStep(home);
+  var setupStep=numericStep(setup);
+  var pickerStep=numericStep(picker);
+  var fileStep=numericStep(fileLab);
+  return !!(
+    home&&home.id==='index'&&home.file==='index.html'&&
+    sameRoute(setup,EXPECTED_SEQUENCE[0])&&
+    sameRoute(picker,EXPECTED_SEQUENCE[1])&&
+    sameRoute(fileLab,EXPECTED_SEQUENCE[2])&&
+    homeStep!==null&&setupStep===homeStep+1&&
+    pickerStep===setupStep+1&&fileStep===pickerStep+1&&
+    workflowIndex(source,'setup')===0&&
+    workflowIndex(source,'project-picker')===1&&
+    workflowIndex(source,'file-lab')===2&&
+    source.previous('setup')===null&&
+    source.next('setup')===picker&&
+    source.next('project-picker')===fileLab
+  );
+}
+
+function snapshot(){
+  var source=registry();
+  var valid=validate(source);
+  var home=valid?route(source,'index'):null;
+  var setup=valid?route(source,'setup'):null;
+  var picker=valid?route(source,'project-picker'):null;
+  var fileLab=valid?route(source,'file-lab'):null;
+  return Object.freeze({
+    version:'V288-passive-v287-registry-consumer',
+    active:valid,
+    valid:valid,
+    mode:'read-only-registry-consumer',
+    registryOwner:source&&source.owner||null,
+    expectedOwner:EXPECTED_OWNER,
+    route:valid?'Home -> Master Plan + Setup -> Project Picker -> File Lab':null,
+    home:home,
+    setup:setup,
+    projectPicker:picker,
+    fileLab:fileLab,
+    visibleSteps:valid?Object.freeze({
+      home:home.step,
+      setup:setup.step,
+      projectPicker:picker.step,
+      fileLab:fileLab.step
+    }):null,
+    retiredBehaviours:RETIRED_BEHAVIOURS,
+    mutatesDom:false,
+    ownsNavigation:false,
+    ownsRoutes:false,
+    ownsNumbering:false,
+    ownsSidebar:false,
+    rewritesContent:false,
+    interceptsClicks:false,
+    reloadsPage:false,
+    usesTimers:false,
+    usesObservers:false,
+    usesPolling:false
+  });
+}
+
+function readRoute(id){
+  var source=registry();
+  return validate(source)?route(source,id):null;
+}
+
+function readSequence(){
+  var source=registry();
+  if(!validate(source))return Object.freeze([]);
+  return Object.freeze(EXPECTED_SEQUENCE.map(function(item){return route(source,item.id)}));
+}
+
+function verify(){
+  var state=snapshot();
+  if(!state.valid&&window.console&&typeof window.console.warn==='function'){
+    window.console.warn('Code Labs Setup Route is inactive because the canonical cl-nav.js registry is unavailable or incompatible.');
+  }
+  return state.valid;
+}
+
+var state=snapshot();
+window.CodeLabsSetupRouteV145=Object.freeze({
+  version:state.version,
+  active:state.active,
+  valid:state.valid,
+  mode:state.mode,
+  registryOwner:state.registryOwner,
+  expectedOwner:state.expectedOwner,
+  route:state.route,
+  home:state.home,
+  setup:state.setup,
+  projectPicker:state.projectPicker,
+  fileLab:state.fileLab,
+  visibleSteps:state.visibleSteps,
+  retiredBehaviours:state.retiredBehaviours,
+  mutatesDom:false,
+  ownsNavigation:false,
+  ownsRoutes:false,
+  ownsNumbering:false,
+  ownsSidebar:false,
+  rewritesContent:false,
+  interceptsClicks:false,
+  reloadsPage:false,
+  usesTimers:false,
+  usesObservers:false,
+  usesPolling:false,
+  readRoute:readRoute,
+  readSequence:readSequence,
+  snapshot:snapshot,
+  verify:verify
+});
+
+verify();
 })();

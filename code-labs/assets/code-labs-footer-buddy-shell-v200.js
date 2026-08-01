@@ -1,30 +1,56 @@
-/* Code Labs Footer and V104 Tool-Only Action Registry V207.
-   Navigation and shared server action IDs only. No browser relay, pairing, polling, or live-tab control.
-*/
+/* Code Labs Footer Buddy Shell V209 - passive canonical route and page-action reader.
+ *
+ * Ownership contract:
+ * - code-labs/assets/cl-nav.js alone owns route identity and governed order.
+ * - page-owned controls alone declare executable server action IDs.
+ * - this helper adds one generated Safe next step footer and read-only diagnostics.
+ * - this helper never stamps actions onto controls, invents routes, polls, observes,
+ *   pairs a browser tab, writes storage, calls the backend, or mutates navigation.
+ */
 (function(){
 'use strict';
-if(location.hostname==='www.chatterfriendsstreambandit.co.uk'){location.replace('https://chatterfriendsstreambandit.co.uk'+location.pathname+location.search+location.hash);return}
-var VERSION='V207-cg-repair-lab-route';
-var ROUTES=[
-['index','index.html','Home'],['setup','setup.html','Setup'],['project-picker','project-picker.html','Project Picker'],
-['file-lab','file-lab.html','File Lab'],['saved-files','saved-files.html','Saved Files'],['rescue-room','rescue-room.html','Rescue Room'],
-['packet-builder','packet-builder.html','Packet Builder'],['buddy-canvas','buddy-canvas.html','Buddy Canvas'],['v20','v20.html','Workflow Hub'],
-['patch-desk','patch-desk.html','Patch Desk'],['patch-lab','patch-lab.html','Patch Lab'],['preview-test','preview-test.html','Preview + Test'],
-['checkpoints','checkpoints.html','Checkpoints'],['repo-desk','repo-desk.html','Repo Desk'],['cg-repair-lab','cg-repair-lab.html','CG Repair Lab'],['code-god','code-god.html','Code God'],
-['publish-prep','publish-prep.html','GitHub Writer'],['github-tracker','github-tracker.html','GitHub Tracker'],['help','help.html','Help + Tools']
-];
-var ACTIONS={
-setup:'setup.save','project-picker':'project.select','file-lab':'file.select','saved-files':'file.select','rescue-room':'repair.save',
-'packet-builder':'packet.build','buddy-canvas':'canvas.load_packet','patch-desk':'candidate.save','patch-lab':'candidate.save',
-'preview-test':'test.record','checkpoints':'checkpoint.create','repo-desk':'github.prepare_request','cg-repair-lab':'cg_repair_lab.analyze','publish-prep':'github.prepare_request',
-v20:'workflow.advance'
-};
-function q(s,r){return(r||document).querySelector(s)}
-function page(){return document.body&&document.body.getAttribute('data-page')||location.pathname.split('/').pop().replace(/\.html?$/i,'')||'index'}
-function routeIndex(){var id=page();for(var i=0;i<ROUTES.length;i++)if(ROUTES[i][0]===id)return i;return-1}
-function markActions(){var action=ACTIONS[page()]||'';if(!action)return;var buttons=document.querySelectorAll('button,.btn,[role="button"]');for(var i=0;i<buttons.length;i++){if(!buttons[i].getAttribute('data-code-labs-action'))buttons[i].setAttribute('data-code-labs-action',action)}}
-function addFooter(){var main=q('.main')||q('main');if(!main||q('#clFooterBuddyShellV201'))return;var i=routeIndex();if(i<0)return;var prev=i>0?ROUTES[i-1]:null,next=i<ROUTES.length-1?ROUTES[i+1]:null,action=ACTIONS[page()]||'none',f=document.createElement('section');f.id='clFooterBuddyShellV201';f.className='panel';f.innerHTML='<h2>Safe next step</h2><p>Code Labs V104 is tool-only. Meaningful workflow controls use the shared server action ID <code>'+action+'</code>. No browser pairing, page polling, active-tab lease, or page-control request is used.</p><div class="actions">'+(prev?'<a class="btn ghost" href="'+prev[1]+'">Previous: '+prev[2]+'</a>':'')+(next?'<a class="btn primary" href="'+next[1]+'">Next: '+next[2]+'</a>':'')+'<a class="btn ghost" href="help.html">Help + Tools</a></div><p class="fine">'+VERSION+' · one Code Labs V104 connector · GitHub changes remain branch and pull request only.</p>';main.appendChild(f)}
-function run(){markActions();addFooter();window.CodeLabsV104ToolOnlyActions={version:VERSION,actions:ACTIONS,current:ACTIONS[page()]||null};return true}
+if(location.hostname==='www.chatterfriendsstreambandit.co.uk'){
+  location.replace('https://chatterfriendsstreambandit.co.uk'+location.pathname+location.search+location.hash);
+  return;
+}
+var VERSION='V209-footer-passive-route-and-page-action-reader';
+var EXPECTED_OWNER='code-labs/assets/cl-nav.js';
+function q(selector,scope){return(scope||document).querySelector(selector)}
+function all(selector,scope){return Array.prototype.slice.call((scope||document).querySelectorAll(selector))}
+function esc(value){return String(value==null?'':value).replace(/[<>"'&]/g,function(character){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]})}
+function page(){return(document.body&&document.body.getAttribute('data-page'))||location.pathname.split('/').pop().replace(/\.html?$/i,'')||'index'}
+function registry(){var value=window.CodeLabsWorkflowRegistry;return value&&value.owner===EXPECTED_OWNER&&typeof value.route==='function'&&typeof value.previous==='function'&&typeof value.next==='function'?value:null}
+function currentRoute(){var value=registry();return value?value.route(page()):null}
+function routeSnapshot(route){return route?Object.freeze({id:route.id,file:route.file,label:route.label,step:route.step,kind:route.kind}):null}
+function declaredActions(){var seen=Object.create(null);all('[data-code-labs-action]').forEach(function(control){var action=String(control.getAttribute('data-code-labs-action')||'').trim();if(action)seen[action]=true});return Object.freeze(Object.keys(seen).sort())}
+function helpRoute(){var value=registry(),route=value&&value.route('help');return route&&route.file?route:null}
+function actionMap(actions){var map={};if(actions.length===1)map[page()]=actions[0];return Object.freeze(map)}
+function addFooter(){
+  var value=registry(),current=currentRoute(),main=q('.main')||q('main');
+  if(!value||!current||current.kind!=='workflow'||!main||q('#clFooterBuddyShellV201'))return false;
+  var previous=value.previous(current.id),next=value.next(current.id),help=helpRoute(),actions=declaredActions(),footer=document.createElement('section');
+  var actionText=actions.length?actions.map(function(action){return'<code>'+esc(action)+'</code>'}).join(', '):'No executable server action is declared by this page.';
+  footer.id='clFooterBuddyShellV201';
+  footer.className='panel';
+  footer.setAttribute('data-cl-footer-owner',VERSION);
+  footer.setAttribute('data-cl-generated-helper-surface','footer-buddy-shell');
+  footer.setAttribute('data-cl-page-runtime-ignore','yes');
+  footer.setAttribute('data-cl-product-ignore','yes');
+  footer.innerHTML='<h2>Safe next step</h2><p>Code Labs V104 is tool-only. Page-owned controls declare these exact server action IDs: '+actionText+' This footer does not assign actions or control execution.</p><div class="actions">'+(previous?'<a class="btn ghost" href="'+esc(previous.file)+'">Previous: '+esc(previous.label)+'</a>':'')+(next?'<a class="btn primary" href="'+esc(next.file)+'">Next: '+esc(next.label)+'</a>':'')+(help?'<a class="btn ghost" href="'+esc(help.file)+'">'+esc(help.label||'Help + Tools')+'</a>':'')+'</div><p class="fine">'+esc(VERSION)+' · one canonical route registry · GitHub changes remain branch and pull request only.</p>';
+  main.appendChild(footer);
+  return true;
+}
+function publish(footerReady){
+  var value=registry(),current=currentRoute(),previous=value&&current?value.previous(current.id):null,next=value&&current?value.next(current.id):null,actions=declaredActions(),currentAction=actions.length===1?actions[0]:null;
+  var api=Object.freeze({version:VERSION,role:'passive-canonical-route-and-page-action-reader',routeOwner:value?value.owner:null,routeRegistryVersion:value?value.version:null,routes:value?value.workflowRoutes:Object.freeze([]),currentActions:actions,currentAction:currentAction,currentRoute:routeSnapshot(current),previousRoute:routeSnapshot(previous),nextRoute:routeSnapshot(next),footerReady:footerReady,actionAnnotationsAdded:0,actionMutations:0,routeMutations:0,navMutations:0,storageWrites:0,backendWrites:0,observers:0,retryTimers:0,run:run});
+  window.CodeLabsV104ToolOnlyActions=Object.freeze({version:VERSION,role:'read-only-page-declared-action-view',actions:actionMap(actions),current:currentAction,currentActions:actions,authoritative:false});
+  window.CodeLabsFooterBuddyShellV204=api;
+  window.CodeLabsFooterBuddyShellV203=api;
+  window.CodeLabsFooterBuddyShellV202=api;
+  window.CodeLabsFooterBuddyShellV201=api;
+  window.CodeLabsFooterBuddyShellV200=api;
+  return api;
+}
+function run(){var footerReady=addFooter();publish(footerReady);return!!registry()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
-window.CodeLabsFooterBuddyShellV204={version:VERSION,routes:ROUTES,actions:ACTIONS,run:run};window.CodeLabsFooterBuddyShellV203=window.CodeLabsFooterBuddyShellV204;window.CodeLabsFooterBuddyShellV202=window.CodeLabsFooterBuddyShellV204;window.CodeLabsFooterBuddyShellV201=window.CodeLabsFooterBuddyShellV204;window.CodeLabsFooterBuddyShellV200=window.CodeLabsFooterBuddyShellV204;
 })();

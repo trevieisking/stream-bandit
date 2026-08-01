@@ -1,0 +1,79 @@
+name: Code Labs V50 Functional Smoke
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/code-labs-v50-functional-smoke.yml
+      - .github/workflows/code-labs-migration-replay.yml
+      - code-labs/**
+      - supabase/config.toml
+      - supabase/migrations/**
+      - supabase/functions/code-labs-mcp-stub/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: code-labs-v50-functional-smoke-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  node-contracts:
+    name: Node source and failure-contract smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out reviewed head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run page single-owner contract
+        run: node --test code-labs/tests/page-specialist-single-owner.contract.test.mjs
+
+      - name: Run atomic workspace and Writer contracts
+        run: |
+          node --test \
+            supabase/functions/code-labs-mcp-stub/atomic-boolean-owner.contract.test.mjs \
+            supabase/functions/code-labs-mcp-stub/atomic-domain-preparation.test.mjs \
+            supabase/functions/code-labs-mcp-stub/atomic-failure-fencing.contract.test.mjs \
+            supabase/functions/code-labs-mcp-stub/atomic-hash-compatibility.contract.test.mjs \
+            supabase/functions/code-labs-mcp-stub/atomic-only-routing.contract.test.mjs \
+            supabase/functions/code-labs-mcp-stub/atomic-workspace-actions.test.mjs \
+            supabase/functions/code-labs-mcp-stub/migration-replay-baseline.contract.test.mjs \
+            supabase/functions/code-labs-mcp-stub/v50-coherent-hardening.contract.test.mjs \
+            supabase/functions/code-labs-mcp-stub/writer-cas-controlled-runtime.test.mjs \
+            supabase/functions/code-labs-mcp-stub/writer-git-cas-plan.test.mjs \
+            supabase/functions/code-labs-mcp-stub/writer-git-cas-routing.contract.test.mjs \
+            supabase/functions/code-labs-mcp-stub/writer-immutable-branch-proof.test.mjs
+
+  deno-contracts:
+    name: Deno atomic engine and connector-preservation smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out reviewed head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Run Deno contracts
+        run: |
+          deno test --allow-read \
+            supabase/functions/code-labs-mcp-stub/atomic-expand-cutover.compatibility.test.ts \
+            supabase/functions/code-labs-mcp-stub/atomic-workspace-engine.client.test.ts \
+            supabase/functions/code-labs-mcp-stub/atomic-workspace-engine.recovery.test.ts \
+            supabase/functions/code-labs-mcp-stub/atomic-workspace-engine.schema-safety.test.ts \
+            supabase/functions/code-labs-mcp-stub/connector-access-preservation.test.ts
+
+  migration-replay:
+    name: PostgreSQL replay smoke
+    uses: ./.github/workflows/code-labs-migration-replay.yml
