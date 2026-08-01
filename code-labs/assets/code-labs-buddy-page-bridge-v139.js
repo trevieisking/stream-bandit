@@ -1,11 +1,11 @@
-/* Code Labs Buddy Page Bridge V141
+/* Code Labs Buddy Page Bridge V142 - page-owned notes only
    Shared full-page read/write bridge for Code Labs.
    Browser-only: no GitHub token, no direct main write, no browser GitHub write.
 */
 (function () {
   'use strict';
 
-  var VERSION = 'V141';
+  var VERSION = 'V142';
   var STATE_KEY = 'codeLabsV1State';
   var LEGACY_OUTPUT_KEY = 'codeLabsBuddyPageBridgeV139';
   var OUTPUT_KEY = 'codeLabsBuddyPageBridgeV140';
@@ -17,11 +17,13 @@
   var INSTALLED_V139 = 'data-cl-buddy-page-bridge-v139-installed';
   var INSTALLED_V140 = 'data-cl-buddy-page-bridge-v140-installed';
   var INSTALLED_V141 = 'data-cl-buddy-page-bridge-v141-installed';
+  var INSTALLED_V142 = 'data-cl-buddy-page-bridge-v142-installed';
 
-  if (document.documentElement.getAttribute(INSTALLED_V141) === 'yes') return;
+  if (document.documentElement.getAttribute(INSTALLED_V142) === 'yes') return;
   document.documentElement.setAttribute(INSTALLED_V139, 'yes');
   document.documentElement.setAttribute(INSTALLED_V140, 'yes');
   document.documentElement.setAttribute(INSTALLED_V141, 'yes');
+  document.documentElement.setAttribute(INSTALLED_V142, 'yes');
 
   function q(selector, root) {
     return (root || document).querySelector(selector);
@@ -108,6 +110,42 @@
   function isHidden(element) {
     var style = getComputedStyle(element);
     return Boolean(element.hidden || style.display === 'none' || style.visibility === 'hidden');
+  }
+
+  var GENERATED_SURFACE_SELECTORS = Object.freeze([
+    '#' + ROOT_ID,
+    '[id^="clWorkflowClarity"]',
+    '[id^="clWorkflowBridge"]',
+    '[id^="clPageCompletion"]',
+    '[id^="clFooterBuddyShell"]',
+    '[id^="clHeaderShell"]',
+    '[id^="clSpecialistTools"]',
+    '[id^="clSaveMeaning"]',
+    '[id^="clWorkflowGuard"]',
+    '[id^="clProductTabs"]',
+    '[id^="clPageTabs"]',
+    '[id^="clCurrentFile"]',
+    '[id^="clBuddyBridgeTab"]',
+    '[id^="clWorkbench"]',
+    '[id^="clStartFamily"]',
+    '[data-cl-generated-helper-surface]',
+    '[data-cl-helper-surface]',
+    '[data-cl-buddy-notes-ui="true"]',
+    '[data-cl-buddy-notes="off"]',
+    '.nav',
+    '.sidebar'
+  ]);
+  var GENERATED_SURFACE_SELECTOR = GENERATED_SURFACE_SELECTORS.join(',');
+
+  function generatedSurface(element) {
+    if (!element || element === document || element === document.documentElement || element === document.body) return null;
+    var matches = element.matches || element.msMatchesSelector || element.webkitMatchesSelector;
+    if (matches && matches.call(element, GENERATED_SURFACE_SELECTOR)) return element;
+    return element.closest ? element.closest(GENERATED_SURFACE_SELECTOR) : null;
+  }
+
+  function isPageOwnedSurface(element) {
+    return !generatedSurface(element);
   }
 
   function isSensitive(element, key) {
@@ -213,7 +251,7 @@
       githubWriter.branch,
       laneContext.branch,
       repoDesk.branch,
-      writeReady ? 'code-labs-buddy-' + slug(action) + '-' + slug(path) + '-v141' : ''
+      writeReady ? 'code-labs-buddy-' + slug(action) + '-' + slug(path) + '-v142' : ''
     );
 
     return {
@@ -282,15 +320,16 @@
 
     var seen = [];
     var roots = all(selectors).filter(function (element) {
-      if (element.id === ROOT_ID) return false;
-      if (element.closest && element.closest('#' + ROOT_ID)) return false;
-      if (element.closest && element.closest('[data-cl-buddy-notes-ui="true"]')) return false;
+      if (!isPageOwnedSurface(element)) return false;
       if (seen.indexOf(element) >= 0) return false;
       seen.push(element);
       return true;
     });
 
-    if (!roots.length) roots = [q('.main') || q('main') || document.body];
+    if (!roots.length) {
+      var fallback = q('[data-cl-page-content]') || q('.main') || q('main') || document.body;
+      if (fallback && isPageOwnedSurface(fallback)) roots = [fallback];
+    }
     return roots;
   }
 
@@ -336,6 +375,7 @@
       var details = document.createElement('details');
       details.open = true;
       details.setAttribute('data-cl-buddy-notes-ui', 'true');
+      details.setAttribute('data-cl-generated-helper-surface', 'buddy-section-notes');
       details.style.cssText = 'margin-top:12px;padding:10px;border:1px dashed rgba(59,130,246,.35);border-radius:14px';
 
       var summary = document.createElement('summary');
@@ -363,7 +403,7 @@
   function fieldElements(root) {
     return all('input,textarea,select,[contenteditable="true"],[data-cl-buddy-writable="true"]', root || document)
       .filter(function (element) {
-        return !(element.closest && element.closest('#' + ROOT_ID));
+        return isPageOwnedSurface(element);
       });
   }
 
@@ -453,7 +493,7 @@
 
   function actionElements(root) {
     return all('button,a[href],[role="button"]', root || document).filter(function (element) {
-      return !(element.closest && element.closest('#' + ROOT_ID));
+      return isPageOwnedSurface(element);
     });
   }
 
@@ -549,6 +589,9 @@
       title: document.title || '',
       url: location.href,
       mode: legacy.writeReady ? 'protected_writer_context_ready' : 'read_write_page_bridge',
+      section_scope: 'page_owned_only',
+      generated_helper_surfaces_excluded: true,
+      excluded_helper_surface_selectors: GENERATED_SURFACE_SELECTORS.slice(),
 
       /* V139 compatibility fields consumed by code-labs-page-polish-v172.js. */
       repo: legacy.repo,
@@ -600,8 +643,8 @@
       fields: fields,
       actions: actions,
       safety_rules: [
-        'Every detected section and empty field is included.',
-        'Every section receives a persistent Buddy Notes field.',
+        'Only genuine page-owned sections and fields are included.',
+        'Generated shared helper surfaces never receive Buddy Notes; page-owned sections keep persistent notes.',
         'Sensitive fields are redacted and blocked.',
         'Blocked or sensitive field values are never stored in undo state.',
         'Writes use stable field keys only.',
@@ -964,10 +1007,15 @@
     }, 2000);
   }
 
-  var renderTimer = 0;
+  var rendering = false;
   function scheduleRender() {
-    clearTimeout(renderTimer);
-    renderTimer = setTimeout(render, 180);
+    if (rendering) return;
+    rendering = true;
+    try {
+      render();
+    } finally {
+      rendering = false;
+    }
   }
 
   function render() {
@@ -1005,18 +1053,16 @@
   function createPanel() {
     if (q('#' + ROOT_ID)) return;
     var main = q('.main') || q('main');
-    if (!main) {
-      setTimeout(createPanel, 250);
-      return;
-    }
+    if (!main) return false;
 
     var panel = document.createElement('section');
     panel.id = ROOT_ID;
     panel.className = 'panel';
+    panel.setAttribute('data-cl-generated-helper-surface', 'buddy-page-bridge');
     panel.style.border = '3px solid rgba(59,130,246,.28)';
     panel.innerHTML =
-      '<h2>Buddy Page Bridge V141</h2>' +
-      '<p class="muted">Reads every section and empty field. Adds persistent Buddy Notes, writes approved page fields by stable key, records receipts, and supports undo. Browser page commands stay local; GitHub execution requires server-side owner/repository authorization, Code God PASS, and the protected Writer.</p>' +
+      '<h2>Buddy Page Bridge V142</h2>' +
+      '<p class="muted">Reads genuine page-owned sections and fields. Shared helper panels, navigation and generated shells are excluded from Buddy Notes and write discovery. Approved page-field writes still use stable keys, receipts and undo. GitHub execution requires server-side owner/repository authorization, Code God PASS, and the protected Writer.</p>' +
       '<div id="clBuddyBridgeProofV139"></div>' +
       '<div class="actions">' +
       '<span id="clBuddyBridgeStatusV139" class="badge warn">Checking</span>' +
@@ -1080,13 +1126,11 @@
     };
     window.CodeLabsBuddyPageBridgeV140 = window.CodeLabsBuddyPageBridge;
     window.CodeLabsBuddyPageBridgeV141 = window.CodeLabsBuddyPageBridge;
+    window.CodeLabsBuddyPageBridgeV142 = window.CodeLabsBuddyPageBridge;
 
     createPanel();
-    setTimeout(createPanel, 700);
-    setTimeout(function () {
-      render();
-      processQueuedCommand();
-    }, 300);
+    render();
+    processQueuedCommand();
 
     document.addEventListener('input', function (event) {
       if (!(event.target.closest && event.target.closest('#' + ROOT_ID))) scheduleRender();
@@ -1097,7 +1141,7 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
   } else {
     boot();
   }
