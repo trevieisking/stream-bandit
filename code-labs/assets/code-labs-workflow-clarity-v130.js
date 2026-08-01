@@ -1,27 +1,412 @@
-/* Code Labs Workflow Clarity V221 - canonical 19-step route and soft guidance only. */
+/* Code Labs Workflow Clarity V288 - complete passive V287 registry consumer.
+ *
+ * Compatibility purpose
+ * ---------------------
+ * The historical Workflow Clarity helper exposed page identity, visible-step
+ * numbering, next/back guidance, support-page information and a public
+ * CodeLabsWorkflowClarityV130 diagnostics object. Those read surfaces remain
+ * available here, but all workflow authority has been removed from this file.
+ *
+ * Sole authority
+ * --------------
+ * code-labs/assets/cl-nav.js owns route records, workflow order, visible-step
+ * numbers, previous/next relationships, sidebar membership and support
+ * classification. This file only reads window.CodeLabsWorkflowRegistry. It
+ * never creates a fallback route, repairs a missing route, or substitutes its
+ * own sequence.
+ *
+ * Explicitly retired
+ * ------------------
+ * - FLOW and SUPPORT arrays;
+ * - INFO, ROUTE and BACK maps;
+ * - independent step-number ownership;
+ * - breadcrumb, navigation or guidance-panel mutation;
+ * - style injection and page-content movement;
+ * - localStorage readiness gates;
+ * - delayed retries, observers, polling, click interception and reloads.
+ */
 (function(){
 'use strict';
-var KEY='codeLabsV1State';
-var FLOW=['index','setup','project-picker','file-lab','saved-files','rescue-room','packet-builder','buddy-canvas','v20','patch-desk','patch-lab','preview-test','checkpoints','repo-desk','cg-repair-lab','code-god','publish-prep','github-tracker','help'];
-var SUPPORT=['connection-guide','read-only-proof','helper-route-map','faq','about','ai-handoff','fix-wizard','start-guide','context-packet','connector-status','chatgpt-connection','checklist-builder','repair-bridge-status','owner-read-proof','oauth-discovery','oauth-flow-test','app-reader-test','url-reader-test','buddy-canvas-receipt-v115'];
-var INFO={
-index:['Home','Start and current repair.','Start here.'],setup:['Setup','Project and repository details.','Set the workspace.'],'project-picker':['Project Picker','Choose one saved project.','Choose the project.'],'file-lab':['File Lab','Load the complete current source.','Load the current file.'],'saved-files':['Saved Files','Select one saved file and history record.','Choose one saved file.'],'rescue-room':['Rescue Room','Describe the problem and preserve rules.','Describe the repair safely.'],'packet-builder':['Packet Builder','Build complete repair context.','Build the repair packet.'],'buddy-canvas':['Buddy Canvas','Review source and full fixed file.','Assistant canvas lane.'],v20:['Workflow Hub','Choose the safe repair route.','Choose the next route.'],'patch-desk':['Patch Desk','Review the complete replacement.','Review fixed output.'],'patch-lab':['Patch Lab','Exact-edit fallback only when needed.','Use exact fallback carefully.'],'preview-test':['Preview + Test','Check the fixed result before GitHub.','Test before promotion.'],checkpoints:['Checkpoints','Save rollback and receipt proof.','Keep rollback proof.'],'repo-desk':['Repo Desk','Choose the exact repository action.','Prepare handoff details.'],'cg-repair-lab':['CG Repair Lab','Run owner-scoped read-only repository analysis before Code God.','Analyze dependencies and findings safely.'],'code-god':['Code God','Run the deterministic pre-PR review.','Review before GitHub Writer.'],'publish-prep':['GitHub Writer','Prepare the branch and PR handoff.','Prepare a safe handoff.'],'github-tracker':['GitHub Tracker','Track PR, preview and checks.','Track the result.'],help:['Help + Tools','Guides and specialist utilities.','Find the correct helper.'],faq:['FAQ','Answers about workflow and saves.','Support page.'],about:['About Code Labs','What Code Labs does and does not do.','Support page.'],'connection-guide':['Connection Guide','Safe connector separation and routing.','Support page.'],'read-only-proof':['Read-only Proof','Read context without writes.','Proof page.'],'helper-route-map':['Route Scanner','Scan pages and helpers before changing them.','Scanner page.']};
-var ROUTE={},BACK={};
-FLOW.forEach(function(k,i){if(FLOW[i+1])ROUTE[k]=FLOW[i+1];if(FLOW[i-1])BACK[k]=FLOW[i-1]});
-ROUTE.faq='about';ROUTE.about='setup';ROUTE['connection-guide']='read-only-proof';ROUTE['read-only-proof']='file-lab';ROUTE['helper-route-map']='help';BACK.faq='help';BACK.about='faq';
-function q(s,r){return(r||document).querySelector(s)}
-function page(){return(document.body&&document.body.getAttribute('data-page'))||location.pathname.split('/').pop().replace(/\.html?$/i,'')||'index'}
-function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}}
-function sourceReady(){var f=(read().file||{}),c=String(f.currentCode||f.code||f.sourceCode||'');return c.trim().length>40}
-function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function idx(k){return FLOW.indexOf(k)}
-function number(k){var i=idx(k);return i>-1?'Workflow step '+(i+1)+' of '+FLOW.length:'Specialist support page'}
-function file(k){return INFO[k]?k+'.html':'#'}
-function needsSource(k){var i=idx(k);return i>=3&&i<=17}
-function saveText(k){if(k==='file-lab')return'Save stores the complete current source.';if(k==='packet-builder')return'Build prepares context; it does not publish.';if(k==='checkpoints')return'Save creates rollback proof after testing.';if(k==='buddy-canvas')return'Save stores the assistant/source snapshot.';if(k==='repo-desk'||k==='cg-repair-lab'||k==='code-god'||k==='publish-prep'||k==='github-tracker')return'This is analysis, review, handoff, or tracking—not a generic live save.';return'Save only appears where this page owns a real record.'}
-function iconStyle(){if(q('#clMenuIconClampV220'))return;var st=document.createElement('style');st.id='clMenuIconClampV220';st.textContent='.nav a>span{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:28px!important;min-width:28px!important;height:28px!important;overflow:hidden!important;border-radius:9px!important;background:rgba(255,255,255,.08)!important;line-height:1!important}.nav a>div{min-width:0!important}.nav a>div small{display:block;white-space:normal;line-height:1.2}';document.head.appendChild(st)}
-function place(box){var main=q('.main')||q('main')||document.body,hero=q('.hero',main),top=q('.topbar',main);if(hero&&hero.parentNode){hero.parentNode.insertBefore(box,hero.nextSibling);return}if(top&&top.parentNode){top.parentNode.insertBefore(box,top.nextSibling);return}main.insertBefore(box,main.firstChild)}
-function render(){iconStyle();var k=page(),info=INFO[k]||[k.replace(/-/g,' '),'Specialist Code Labs page.','Support page.'],old=q('#clWorkflowClarityV130');if(old){place(old);return}var locked=needsSource(k)&&!sourceReady(),next=ROUTE[k],back=BACK[k];var crumb=q('.crumbs b');if(crumb)crumb.textContent=info[0];var box=document.createElement('section');box.id='clWorkflowClarityV130';box.innerHTML='<style>#clWorkflowClarityV130{border:1px solid #ffffff24;border-radius:24px;background:linear-gradient(135deg,#101529,#17122d);box-shadow:0 16px 44px #0007;padding:14px;margin:0 0 14px;color:#fff}#clWorkflowClarityV130 .top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}#clWorkflowClarityV130 .badge,#clWorkflowClarityV130 .pill{display:inline-flex;border-radius:999px;padding:6px 10px;font-weight:950;border:1px solid #22d3a666;background:#22d3a624;color:#dfffee}#clWorkflowClarityV130 .bad{border-color:#ff4d6d88;background:#ff4d6d24;color:#ffd1da}#clWorkflowClarityV130 h2{margin:10px 0 6px;font-size:22px}#clWorkflowClarityV130 p{margin:6px 0;color:#b9c0d8;line-height:1.45}#clWorkflowClarityV130 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:9px;margin-top:10px}#clWorkflowClarityV130 .card{border:1px solid #ffffff18;background:#ffffff0c;border-radius:16px;padding:10px}#clWorkflowClarityV130 a{display:inline-flex;border-radius:999px;padding:10px 13px;font-weight:950;text-decoration:none;margin:6px 8px 0 0}.clNext{background:linear-gradient(135deg,#22d3a6,#7c3cff);color:#061017}.clBack{background:linear-gradient(135deg,#ff4d6d,#7c3cff);color:#fff}</style><div class="top"><span class="badge">'+esc(number(k))+'</span><span class="pill '+(locked?'bad':'')+'">'+(locked?'Current source required':'Ready for this page')+'</span></div><h2>'+esc(info[0])+'</h2><p>'+esc(info[1])+'</p><div>'+(locked&&back?'<a class="clBack" href="'+esc(file(back))+'">Back: '+esc((INFO[back]||['Previous'])[0])+'</a>':next?'<a class="clNext" href="'+esc(file(next))+'">Next: '+esc((INFO[next]||['Continue'])[0])+'</a>':'')+'</div><div class="grid"><div class="card"><b>Number</b><p>'+esc(number(k))+'</p></div><div class="card"><b>Purpose</b><p>'+esc(info[2])+'</p></div><div class="card"><b>Save wording</b><p>'+esc(saveText(k))+'</p></div><div class="card"><b>Safety</b><p>The canonical sidebar order remains unchanged.</p></div></div>';place(box);window.CodeLabsWorkflowClarityV130={version:'V221',flow:FLOW,page:k,number:number(k)}}
-function boot(){render();setTimeout(render,250);setTimeout(render,900);setTimeout(render,1800)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+
+var EXPECTED_OWNER='code-labs/assets/cl-nav.js';
+var VERSION='V288-complete-passive-v287-registry-consumer';
+var MODE='read-only-registry-consumer';
+var RETIRED_BEHAVIOURS=Object.freeze([
+  'own-workflow-array',
+  'own-support-array',
+  'own-info-map',
+  'own-route-map',
+  'own-back-map',
+  'own-step-numbering',
+  'create-navigation-link',
+  'rewrite-navigation-link',
+  'rewrite-breadcrumb',
+  'inject-guidance-panel',
+  'inject-styles',
+  'move-page-content',
+  'read-local-storage',
+  'gate-pages-from-local-state',
+  'run-delayed-retries',
+  'observe-page-mutations',
+  'poll-page-state',
+  'intercept-clicks',
+  'reload-page'
+]);
+
+function registry(){
+  return window.CodeLabsWorkflowRegistry||null;
+}
+
+function isFunction(value){
+  return typeof value==='function';
+}
+
+function currentPage(){
+  var bodyPage=document.body&&document.body.getAttribute('data-page');
+  if(bodyPage)return String(bodyPage);
+  var name=String(location.pathname||'').split('/').pop()||'index';
+  return name.replace(/\.html?$/i,'')||'index';
+}
+
+function routeFrom(source,id){
+  return source&&isFunction(source.route)?source.route(String(id||'')):null;
+}
+
+function previousFrom(source,id){
+  return source&&isFunction(source.previous)?source.previous(String(id||'')):null;
+}
+
+function nextFrom(source,id){
+  return source&&isFunction(source.next)?source.next(String(id||'')):null;
+}
+
+function indexFrom(source,id){
+  return source&&isFunction(source.workflowIndex)?source.workflowIndex(String(id||'')):-1;
+}
+
+function familyFrom(source,id,family){
+  return source&&isFunction(source.hasFamily)?source.hasFamily(String(id||''),String(family||'')):false;
+}
+
+function sameRoute(actual,id,file){
+  return !!(
+    actual&&
+    actual.id===id&&
+    actual.file===file
+  );
+}
+
+function numericStep(item){
+  return item&&typeof item.step==='number'&&Number.isFinite(item.step)?item.step:null;
+}
+
+function validateRegistry(source){
+  if(!source||source.owner!==EXPECTED_OWNER)return false;
+  if(!isFunction(source.route)||!isFunction(source.next)||!isFunction(source.previous))return false;
+  if(!isFunction(source.workflowIndex)||!isFunction(source.hasFamily))return false;
+  var home=routeFrom(source,'index');
+  var setup=routeFrom(source,'setup');
+  var picker=routeFrom(source,'project-picker');
+  var fileLab=routeFrom(source,'file-lab');
+  var homeStep=numericStep(home);
+  var setupStep=numericStep(setup);
+  var pickerStep=numericStep(picker);
+  var fileStep=numericStep(fileLab);
+  return !!(
+    sameRoute(home,'index','index.html')&&
+    sameRoute(setup,'setup','setup.html')&&
+    sameRoute(picker,'project-picker','project-picker.html')&&
+    sameRoute(fileLab,'file-lab','file-lab.html')&&
+    homeStep!==null&&setupStep===homeStep+1&&
+    pickerStep===setupStep+1&&fileStep===pickerStep+1&&
+    indexFrom(source,'setup')===0&&
+    indexFrom(source,'project-picker')===1&&
+    indexFrom(source,'file-lab')===2&&
+    previousFrom(source,'setup')===null&&
+    nextFrom(source,'setup')===picker&&
+    nextFrom(source,'project-picker')===fileLab
+  );
+}
+
+function safeSource(){
+  var source=registry();
+  return validateRegistry(source)?source:null;
+}
+
+function cloneArray(value){
+  return Object.freeze(Array.isArray(value)?value.slice():[]);
+}
+
+function numberedRoutes(value){
+  return Array.isArray(value)?value.filter(function(item){return numericStep(item)!==null}):[];
+}
+
+function sourceOwnedFlow(source){
+  if(!source)return Object.freeze([]);
+  if(Array.isArray(source.numberedRoutes))return cloneArray(numberedRoutes(source.numberedRoutes));
+  if(Array.isArray(source.navRoutes))return cloneArray(numberedRoutes(source.navRoutes));
+  if(Array.isArray(source.routes))return cloneArray(numberedRoutes(source.routes));
+  if(Array.isArray(source.flow))return cloneArray(numberedRoutes(source.flow));
+  if(Array.isArray(source.workflow))return cloneArray(numberedRoutes(source.workflow));
+  if(Array.isArray(source.workflowRoutes))return cloneArray(numberedRoutes(source.workflowRoutes));
+  return Object.freeze([]);
+}
+
+function sourceOwnedSupport(source){
+  if(!source)return Object.freeze([]);
+  if(Array.isArray(source.supportRoutes))return cloneArray(source.supportRoutes);
+  if(Array.isArray(source.support))return cloneArray(source.support);
+  if(Array.isArray(source.supportPages))return cloneArray(source.supportPages);
+  if(Array.isArray(source.routes)){
+    return cloneArray(source.routes.filter(function(item){return item&&item.kind==='support'}));
+  }
+  return Object.freeze([]);
+}
+
+function visibleStepTotal(source){
+  var routes=sourceOwnedFlow(source);
+  var maximum=0;
+  routes.forEach(function(item){
+    var step=numericStep(item);
+    if(step!==null&&step>maximum)maximum=step;
+  });
+  return maximum||null;
+}
+
+function readRoute(id){
+  return routeFrom(safeSource(),id);
+}
+
+function readNext(id){
+  return nextFrom(safeSource(),id);
+}
+
+function readPrevious(id){
+  return previousFrom(safeSource(),id);
+}
+
+function workflowIndex(id){
+  return indexFrom(safeSource(),id);
+}
+
+function hasFamily(id,family){
+  return familyFrom(safeSource(),id,family);
+}
+
+function readFlow(){
+  return sourceOwnedFlow(safeSource());
+}
+
+function readSupport(){
+  return sourceOwnedSupport(safeSource());
+}
+
+function routeFile(id){
+  var item=readRoute(id);
+  return item&&item.file||null;
+}
+
+function routeLabel(id){
+  var item=readRoute(id);
+  if(!item)return null;
+  return item.label||item.title||item.name||item.id||null;
+}
+
+function routePurpose(id){
+  var item=readRoute(id);
+  if(!item)return null;
+  return item.purpose||item.description||item.help||null;
+}
+
+function routeStep(id){
+  return numericStep(readRoute(id));
+}
+
+function isWorkflowPage(id){
+  var item=readRoute(id);
+  return !!(item&&(item.kind==='workflow'||item.kind==='entry'||workflowIndex(id)>=0));
+}
+
+function isSupportPage(id){
+  var item=readRoute(id);
+  if(!item)return false;
+  if(item.kind==='support'||item.support===true||item.role==='support'||item.family==='support')return true;
+  var support=readSupport();
+  for(var index=0;index<support.length;index+=1){
+    var entry=support[index];
+    if(entry===id||entry&&entry.id===id)return true;
+  }
+  return false;
+}
+
+function number(id){
+  var source=safeSource();
+  var item=source?routeFrom(source,id):null;
+  var step=numericStep(item);
+  if(step===null)return 'Specialist support page';
+  var total=visibleStepTotal(source);
+  return total?'Workflow step '+step+' of '+total:'Workflow step '+step;
+}
+
+function needsSource(id){
+  var source=safeSource();
+  var item=source?routeFrom(source,id):null;
+  if(!item)return false;
+  if(typeof item.requiresSource==='boolean')return item.requiresSource;
+  if(typeof item.needsSource==='boolean')return item.needsSource;
+  return familyFrom(source,id,'source');
+}
+
+function saveText(id){
+  var item=readRoute(id);
+  if(!item)return 'Save only appears where the canonical page owner provides a real record action.';
+  if(item.saveText)return String(item.saveText);
+  if(item.saveDescription)return String(item.saveDescription);
+  return 'Save behaviour is owned by the canonical page action, not Workflow Clarity.';
+}
+
+function describe(id){
+  var item=readRoute(id);
+  if(!item)return Object.freeze({
+    id:String(id||''),
+    found:false,
+    file:null,
+    label:null,
+    purpose:null,
+    step:null,
+    number:'Specialist support page',
+    workflow:false,
+    support:false,
+    requiresSource:false,
+    previous:null,
+    next:null,
+    families:Object.freeze([])
+  });
+  return Object.freeze({
+    id:item.id,
+    found:true,
+    file:item.file||null,
+    label:routeLabel(id),
+    purpose:routePurpose(id),
+    step:routeStep(id),
+    number:number(id),
+    workflow:isWorkflowPage(id),
+    support:isSupportPage(id),
+    requiresSource:needsSource(id),
+    previous:readPrevious(id),
+    next:readNext(id),
+    families:Object.freeze(Array.isArray(item.families)?item.families.slice():[])
+  });
+}
+
+function snapshot(){
+  var source=registry();
+  var valid=validateRegistry(source);
+  var page=currentPage();
+  var selected=valid?routeFrom(source,page):null;
+  return Object.freeze({
+    version:VERSION,
+    active:valid,
+    valid:valid,
+    mode:MODE,
+    registryOwner:source&&source.owner||null,
+    expectedOwner:EXPECTED_OWNER,
+    page:page,
+    route:selected,
+    description:valid?describe(page):null,
+    flow:valid?sourceOwnedFlow(source):Object.freeze([]),
+    support:valid?sourceOwnedSupport(source):Object.freeze([]),
+    visibleStepTotal:valid?visibleStepTotal(source):null,
+    workflowIndex:valid?indexFrom(source,page):-1,
+    previous:valid?previousFrom(source,page):null,
+    next:valid?nextFrom(source,page):null,
+    retiredBehaviours:RETIRED_BEHAVIOURS,
+    completeCompatibilitySurface:true,
+    ownsWorkflow:false,
+    ownsSupportClassification:false,
+    ownsRouteInformation:false,
+    ownsRoutes:false,
+    ownsNumbering:false,
+    ownsNavigation:false,
+    mutatesDom:false,
+    rewritesContent:false,
+    readsLocalStorage:false,
+    injectsStyles:false,
+    movesContent:false,
+    gatesPages:false,
+    usesTimers:false,
+    usesObservers:false,
+    usesPolling:false,
+    interceptsClicks:false,
+    reloadsPage:false
+  });
+}
+
+function verify(){
+  var state=snapshot();
+  if(!state.valid&&window.console&&isFunction(window.console.warn)){
+    window.console.warn('Code Labs Workflow Clarity is inactive because the canonical cl-nav.js registry is unavailable or incompatible.');
+  }
+  return state.valid;
+}
+
+var initial=snapshot();
+var api={
+  version:initial.version,
+  active:initial.active,
+  valid:initial.valid,
+  mode:initial.mode,
+  registryOwner:initial.registryOwner,
+  expectedOwner:initial.expectedOwner,
+  page:initial.page,
+  route:initial.route,
+  description:initial.description,
+  flow:initial.flow,
+  support:initial.support,
+  visibleStepTotal:initial.visibleStepTotal,
+  workflowIndex:initial.workflowIndex,
+  previous:initial.previous,
+  next:initial.next,
+  retiredBehaviours:initial.retiredBehaviours,
+  completeCompatibilitySurface:true,
+  ownsWorkflow:false,
+  ownsSupportClassification:false,
+  ownsRouteInformation:false,
+  ownsRoutes:false,
+  ownsNumbering:false,
+  ownsNavigation:false,
+  mutatesDom:false,
+  rewritesContent:false,
+  readsLocalStorage:false,
+  injectsStyles:false,
+  movesContent:false,
+  gatesPages:false,
+  usesTimers:false,
+  usesObservers:false,
+  usesPolling:false,
+  interceptsClicks:false,
+  reloadsPage:false,
+  readRoute:readRoute,
+  readNext:readNext,
+  readPrevious:readPrevious,
+  readFlow:readFlow,
+  readSupport:readSupport,
+  routeFile:routeFile,
+  routeLabel:routeLabel,
+  routePurpose:routePurpose,
+  routeStep:routeStep,
+  isWorkflowPage:isWorkflowPage,
+  isSupportPage:isSupportPage,
+  workflowNumber:number,
+  number:number,
+  needsSource:needsSource,
+  saveText:saveText,
+  hasFamily:hasFamily,
+  describe:describe,
+  snapshot:snapshot,
+  verify:verify
+};
+
+window.CodeLabsWorkflowClarityV130=Object.freeze(api);
+verify();
 })();
