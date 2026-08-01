@@ -1,11 +1,11 @@
-/* Code Labs Buddy Page Bridge V142 - page-owned notes only
-   Shared full-page read/write bridge for Code Labs.
-   Browser-only: no GitHub token, no direct main write, no browser GitHub write.
-*/
+/* Code Labs Buddy Page Bridge V143 - page-owned notes and explicit identity only.
+ * Browser-local page assistance only: no GitHub token, direct GitHub write,
+ * main write, merge, deploy, delete, backend mutation, or invented write identity.
+ */
 (function () {
   'use strict';
 
-  var VERSION = 'V142';
+  var VERSION = 'V143';
   var STATE_KEY = 'codeLabsV1State';
   var LEGACY_OUTPUT_KEY = 'codeLabsBuddyPageBridgeV139';
   var OUTPUT_KEY = 'codeLabsBuddyPageBridgeV140';
@@ -14,16 +14,18 @@
   var UNDO_KEY = 'codeLabsBuddyPageUndoV140';
   var NOTES_KEY = 'codeLabsBuddySectionNotesV140:' + location.pathname;
   var ROOT_ID = 'clBuddyPageBridgeV139';
-  var INSTALLED_V139 = 'data-cl-buddy-page-bridge-v139-installed';
-  var INSTALLED_V140 = 'data-cl-buddy-page-bridge-v140-installed';
-  var INSTALLED_V141 = 'data-cl-buddy-page-bridge-v141-installed';
-  var INSTALLED_V142 = 'data-cl-buddy-page-bridge-v142-installed';
+  var INSTALL_ATTRS = [
+    'data-cl-buddy-page-bridge-v139-installed',
+    'data-cl-buddy-page-bridge-v140-installed',
+    'data-cl-buddy-page-bridge-v141-installed',
+    'data-cl-buddy-page-bridge-v142-installed',
+    'data-cl-buddy-page-bridge-v143-installed'
+  ];
 
-  if (document.documentElement.getAttribute(INSTALLED_V142) === 'yes') return;
-  document.documentElement.setAttribute(INSTALLED_V139, 'yes');
-  document.documentElement.setAttribute(INSTALLED_V140, 'yes');
-  document.documentElement.setAttribute(INSTALLED_V141, 'yes');
-  document.documentElement.setAttribute(INSTALLED_V142, 'yes');
+  if (document.documentElement.getAttribute(INSTALL_ATTRS[4]) === 'yes') return;
+  INSTALL_ATTRS.forEach(function (name) {
+    document.documentElement.setAttribute(name, 'yes');
+  });
 
   function q(selector, root) {
     return (root || document).querySelector(selector);
@@ -55,8 +57,8 @@
   }
 
   function firstNonEmpty() {
-    for (var i = 0; i < arguments.length; i += 1) {
-      var value = String(arguments[i] == null ? '' : arguments[i]);
+    for (var index = 0; index < arguments.length; index += 1) {
+      var value = String(arguments[index] == null ? '' : arguments[index]);
       if (value.trim()) return value;
     }
     return '';
@@ -68,33 +70,40 @@
 
   function firstValidRepo(values) {
     values = Array.isArray(values) ? values : [];
-    for (var i = 0; i < values.length; i += 1) {
-      var value = String(values[i] == null ? '' : values[i]).trim();
+    for (var index = 0; index < values.length; index += 1) {
+      var value = String(values[index] == null ? '' : values[index]).trim();
       if (validRepo(value)) return value;
     }
     return '';
   }
 
+  function validBranch(value, allowProtected) {
+    var branch = String(value || '').trim();
+    if (!branch || !/^[A-Za-z0-9._\/-]+$/.test(branch) || branch.indexOf('..') >= 0) return false;
+    return allowProtected === true || !/^(main|master)$/i.test(branch);
+  }
+
+  function validAction(value) {
+    return /^(add|change|remove|delete)$/i.test(String(value || '').trim());
+  }
+
   function hash32(value) {
     var text = String(value == null ? '' : value);
     var hash = 0;
-    for (var i = 0; i < text.length; i += 1) {
-      hash = ((hash << 5) - hash) + text.charCodeAt(i);
+    for (var index = 0; index < text.length; index += 1) {
+      hash = ((hash << 5) - hash) + text.charCodeAt(index);
       hash |= 0;
     }
     return ('00000000' + (hash >>> 0).toString(16)).slice(-8);
   }
 
   function slug(value) {
-    return String(value || 'item')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .slice(0, 70) || 'item';
+    return String(value || 'item').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70) || 'item';
   }
 
   function cleanPath(value) {
-    return String(value || '').trim().replace(/^\/+/, '').replace(/\.\.\//g, '');
+    var path = String(value || '').trim().replace(/^\/+/, '');
+    return /(^|\/)\.\.(\/|$)/.test(path) ? '' : path;
   }
 
   function pageName() {
@@ -150,34 +159,30 @@
 
   function isSensitive(element, key) {
     var type = String(element.type || '').toLowerCase();
-    var proof = [
-      key,
-      element.id,
-      element.name,
-      element.autocomplete,
-      element.getAttribute('aria-label'),
-      element.placeholder
-    ].join(' ');
-    return type === 'password' ||
-      /(password|passcode|secret|token|authorization|api.?key|service.?role|private.?key)/i.test(proof);
+    var proof = [key, element.id, element.name, element.autocomplete, element.getAttribute('aria-label'), element.placeholder].join(' ');
+    return type === 'password' || /(password|passcode|secret|token|authorization|api.?key|service.?role|private.?key)/i.test(proof);
   }
 
   function currentFileBridge() {
     try {
-      if (window.CodeLabsCurrentFileBridge && window.CodeLabsCurrentFileBridge.current) {
-        return window.CodeLabsCurrentFileBridge.current() || {};
-      }
-    } catch (error) {}
-    return {};
+      return window.CodeLabsCurrentFileBridge && window.CodeLabsCurrentFileBridge.current ? window.CodeLabsCurrentFileBridge.current() || {} : {};
+    } catch (error) {
+      return {};
+    }
   }
 
   function buddyCanvas() {
     try {
-      if (window.CodeLabsBuddyCanvas && window.CodeLabsBuddyCanvas.read) {
-        return window.CodeLabsBuddyCanvas.read() || {};
-      }
-    } catch (error) {}
-    return {};
+      return window.CodeLabsBuddyCanvas && window.CodeLabsBuddyCanvas.read ? window.CodeLabsBuddyCanvas.read() || {} : {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function valueBySelector(selector) {
+    var element = q(selector);
+    if (!element) return '';
+    return String(element.value == null ? element.textContent || '' : element.value);
   }
 
   function legacyContext() {
@@ -200,8 +205,6 @@
       githubSource.owner && githubSource.repo ? githubSource.owner + '/' + githubSource.repo : '',
       project.repo
     ]);
-    var repoContextReady = validRepo(repo);
-
     var path = cleanPath(firstNonEmpty(
       githubWriter.path,
       laneContext.path,
@@ -212,24 +215,24 @@
       file.filename,
       canvas.path
     ));
-
     var sourceBranch = firstNonEmpty(
       githubWriter.sourceBranch,
       laneContext.source_branch,
       repoDesk.sourceBranch,
-      githubSource.branch,
-      'main'
-    );
-
+      githubSource.branch
+    ).trim();
+    var requestBranch = firstNonEmpty(
+      githubWriter.branch,
+      laneContext.branch,
+      repoDesk.branch
+    ).trim();
     var action = firstNonEmpty(
       githubWriter.action,
       laneContext.action,
       lane.action,
       repoDesk.action,
-      repoDesk.mode,
-      'read_context'
-    );
-
+      repoDesk.mode
+    ).trim();
     var fixed = firstNonEmpty(
       githubWriter.fixedCode,
       laneContext.fixed,
@@ -238,20 +241,15 @@
       valueBySelector('#fixedCode'),
       canvas.fixed
     );
-
     var source = firstNonEmpty(
       bridge.currentCode,
       file.currentCode,
       valueBySelector('#loadedCode'),
       canvas.source
     );
-
-    var writeReady = Boolean(repoContextReady && path && fixed.trim());
-    var requestBranch = firstNonEmpty(
-      githubWriter.branch,
-      laneContext.branch,
-      repoDesk.branch,
-      writeReady ? 'code-labs-buddy-' + slug(action) + '-' + slug(path) + '-v142' : ''
+    var repoContextReady = validRepo(repo);
+    var identityReady = Boolean(
+      repoContextReady && path && validBranch(sourceBranch, true) && validBranch(requestBranch, false) && validAction(action)
     );
 
     return {
@@ -272,60 +270,27 @@
       action: action,
       source: source,
       fixed: fixed,
-      writeReady: writeReady,
-      problem: firstNonEmpty(
-        file.problem,
-        valueBySelector('#problem'),
-        valueBySelector('#problemText'),
-        valueBySelector('#repairProblem'),
-        valueBySelector('#clSafeProblem')
-      ),
-      preserve: firstNonEmpty(
-        file.dontTouch,
-        file.preserve,
-        valueBySelector('#dontTouch'),
-        valueBySelector('#preserve'),
-        valueBySelector('#clSafeKeep')
-      ),
-      errors: firstNonEmpty(
-        file.errors,
-        valueBySelector('#errors'),
-        valueBySelector('#errorNotes')
-      ),
-      tests: firstNonEmpty(
-        valueBySelector('#testNotes'),
-        valueBySelector('#previewNotes'),
-        valueBySelector('#clSafeTest')
-      )
+      identityReady: identityReady,
+      writeReady: Boolean(identityReady && fixed.trim()),
+      problem: firstNonEmpty(file.problem, valueBySelector('#problem'), valueBySelector('#problemText'), valueBySelector('#repairProblem'), valueBySelector('#clSafeProblem')),
+      preserve: firstNonEmpty(file.dontTouch, file.preserve, valueBySelector('#dontTouch'), valueBySelector('#preserve'), valueBySelector('#clSafeKeep')),
+      errors: firstNonEmpty(file.errors, valueBySelector('#errors'), valueBySelector('#errorNotes')),
+      tests: firstNonEmpty(valueBySelector('#testNotes'), valueBySelector('#previewNotes'), valueBySelector('#clSafeTest'))
     };
-  }
-
-  function valueBySelector(selector) {
-    var element = q(selector);
-    if (!element) return '';
-    return String(element.value == null ? element.textContent || '' : element.value);
   }
 
   function sectionRoots() {
     var selectors = [
-      'main section',
-      'main .panel',
-      'main [data-section]',
-      '.main section',
-      '.main .panel',
-      '.main [data-section]',
-      'body > section',
-      'body > .panel'
+      'main section', 'main .panel', 'main [data-section]',
+      '.main section', '.main .panel', '.main [data-section]',
+      'body > section', 'body > .panel'
     ].join(',');
-
     var seen = [];
     var roots = all(selectors).filter(function (element) {
-      if (!isPageOwnedSurface(element)) return false;
-      if (seen.indexOf(element) >= 0) return false;
+      if (!isPageOwnedSurface(element) || seen.indexOf(element) >= 0) return false;
       seen.push(element);
       return true;
     });
-
     if (!roots.length) {
       var fallback = q('[data-cl-page-content]') || q('.main') || q('main') || document.body;
       if (fallback && isPageOwnedSurface(fallback)) roots = [fallback];
@@ -337,51 +302,38 @@
     var roots = sectionRoots();
     var best = null;
     var bestIndex = -1;
-
     roots.forEach(function (root, index) {
       if ((root === element || root.contains(element)) && (!best || best.contains(root))) {
         best = root;
         bestIndex = index;
       }
     });
-
     if (!best) return { element: document.body, key: 'page' };
-
-    var key = firstNonEmpty(
-      best.getAttribute('data-buddy-section-key'),
-      best.id,
-      best.getAttribute('data-section')
-    );
-
+    var key = firstNonEmpty(best.getAttribute('data-buddy-section-key'), best.id, best.getAttribute('data-section'));
     if (!key) {
       var heading = q('h1,h2,h3,h4,[role="heading"]', best);
       key = 'section-' + slug(heading && heading.textContent || 'part') + '-' + (bestIndex + 1);
       best.setAttribute('data-buddy-section-key', key);
     }
-
     return { element: best, key: key };
   }
 
   function ensureSectionNotes() {
     var savedNotes = readJson(NOTES_KEY);
-
     sectionRoots().forEach(function (root) {
       var section = sectionFor(root);
       var existing = all('[data-cl-buddy-section-note-for]', root).some(function (element) {
         return element.getAttribute('data-cl-buddy-section-note-for') === section.key;
       });
       if (existing) return;
-
       var details = document.createElement('details');
       details.open = true;
       details.setAttribute('data-cl-buddy-notes-ui', 'true');
       details.setAttribute('data-cl-generated-helper-surface', 'buddy-section-notes');
       details.style.cssText = 'margin-top:12px;padding:10px;border:1px dashed rgba(59,130,246,.35);border-radius:14px';
-
       var summary = document.createElement('summary');
       summary.textContent = 'Buddy Notes - ' + section.key;
       summary.style.cursor = 'pointer';
-
       var textarea = document.createElement('textarea');
       textarea.setAttribute('data-cl-buddy-section-note-for', section.key);
       textarea.setAttribute('data-cl-buddy-writable', 'true');
@@ -393,7 +345,6 @@
         notes[section.key] = textarea.value;
         writeJson(NOTES_KEY, notes);
       });
-
       details.appendChild(summary);
       details.appendChild(textarea);
       root.appendChild(details);
@@ -401,18 +352,11 @@
   }
 
   function fieldElements(root) {
-    return all('input,textarea,select,[contenteditable="true"],[data-cl-buddy-writable="true"]', root || document)
-      .filter(function (element) {
-        return isPageOwnedSurface(element);
-      });
+    return all('input,textarea,select,[contenteditable="true"],[data-cl-buddy-writable="true"]', root || document).filter(isPageOwnedSurface);
   }
 
   function fieldKey(element) {
-    return firstNonEmpty(
-      element.getAttribute('data-buddy-key'),
-      element.id,
-      element.name
-    );
+    return firstNonEmpty(element.getAttribute('data-buddy-key'), element.id, element.name);
   }
 
   function ensureFieldKeys() {
@@ -431,25 +375,16 @@
   function canWriteField(element) {
     var type = String(element.type || '').toLowerCase();
     var key = fieldKey(element);
-    return !isSensitive(element, key) &&
-      !element.disabled &&
-      !element.readOnly &&
-      !element.hasAttribute('data-cl-buddy-readonly') &&
-      !/^(file|button|submit|reset|image|hidden)$/i.test(type);
+    return !isSensitive(element, key) && !element.disabled && !element.readOnly &&
+      !element.hasAttribute('data-cl-buddy-readonly') && !/^(file|button|submit|reset|image|hidden)$/i.test(type);
   }
 
   function readFieldValue(element) {
     var type = String(element.type || '').toLowerCase();
-    if (type === 'file') {
-      return element.files && element.files.length ? '[FILES SELECTED: ' + element.files.length + ']' : '';
-    }
+    if (type === 'file') return element.files && element.files.length ? '[FILES SELECTED: ' + element.files.length + ']' : '';
     if (type === 'checkbox' || type === 'radio') return Boolean(element.checked);
     if (element.tagName === 'SELECT' && element.multiple) {
-      return all('option', element).filter(function (option) {
-        return option.selected;
-      }).map(function (option) {
-        return option.value;
-      });
+      return all('option', element).filter(function (option) { return option.selected; }).map(function (option) { return option.value; });
     }
     if (element.isContentEditable) return element.textContent || '';
     return element.value == null ? '' : String(element.value);
@@ -457,14 +392,7 @@
 
   function fieldLabel(element) {
     var label = element.id ? q('label[for="' + element.id.replace(/"/g, '\\"') + '"]') : null;
-    return firstNonEmpty(
-      element.getAttribute('aria-label'),
-      label && label.textContent,
-      element.placeholder,
-      element.name,
-      element.id,
-      element.tagName
-    );
+    return firstNonEmpty(element.getAttribute('aria-label'), label && label.textContent, element.placeholder, element.name, element.id, element.tagName);
   }
 
   function fieldInfo(element) {
@@ -472,7 +400,6 @@
     var sensitive = isSensitive(element, key);
     var value = sensitive ? '[REDACTED]' : readFieldValue(element);
     var text = typeof value === 'string' ? value : JSON.stringify(value);
-
     return {
       key: key,
       section: sectionFor(element).key,
@@ -492,16 +419,11 @@
   }
 
   function actionElements(root) {
-    return all('button,a[href],[role="button"]', root || document).filter(function (element) {
-      return isPageOwnedSurface(element);
-    });
+    return all('button,a[href],[role="button"]', root || document).filter(isPageOwnedSurface);
   }
 
   function actionKey(element) {
-    return firstNonEmpty(
-      element.getAttribute('data-buddy-action'),
-      element.id
-    );
+    return firstNonEmpty(element.getAttribute('data-buddy-action'), element.id);
   }
 
   function ensureActionKeys() {
@@ -509,9 +431,7 @@
     actionElements().forEach(function (element) {
       var key = actionKey(element);
       if (!key) {
-        var base = sectionFor(element).key + '-action-' + slug(
-          element.textContent || element.getAttribute('aria-label') || element.tagName
-        );
+        var base = sectionFor(element).key + '-action-' + slug(element.textContent || element.getAttribute('aria-label') || element.tagName);
         counters[base] = (counters[base] || 0) + 1;
         key = base + '-' + counters[base];
       }
@@ -521,9 +441,7 @@
 
   function isDangerousAction(element) {
     return /(delete|remove|trash|merge|publish|deploy|send|submit|approve|reject|production|main branch)/i.test([
-      actionKey(element),
-      element.textContent,
-      element.getAttribute('aria-label')
+      actionKey(element), element.textContent, element.getAttribute('aria-label')
     ].join(' '));
   }
 
@@ -545,14 +463,9 @@
     return sectionRoots().map(function (root) {
       var section = sectionFor(root);
       var heading = q('h1,h2,h3,h4,[role="heading"]', root);
-      var fields = fieldElements(root).filter(function (element) {
-        return sectionFor(element).element === root;
-      }).map(fieldInfo);
-      var actions = actionElements(root).filter(function (element) {
-        return sectionFor(element).element === root;
-      }).map(actionInfo);
+      var fields = fieldElements(root).filter(function (element) { return sectionFor(element).element === root; }).map(fieldInfo);
+      var actions = actionElements(root).filter(function (element) { return sectionFor(element).element === root; }).map(actionInfo);
       var text = String(root.innerText || root.textContent || '');
-
       return {
         key: section.key,
         heading: String(heading && heading.textContent || '').trim(),
@@ -569,17 +482,14 @@
     ensureSectionNotes();
     ensureFieldKeys();
     ensureActionKeys();
-
     var legacy = legacyContext();
     var sections = collectSections();
     var fields = [];
     var actions = [];
-
     sections.forEach(function (section) {
       fields = fields.concat(section.fields);
       actions = actions.concat(section.actions);
     });
-
     return {
       tool: 'Code Labs Buddy Page Bridge',
       version: VERSION,
@@ -592,15 +502,14 @@
       section_scope: 'page_owned_only',
       generated_helper_surfaces_excluded: true,
       excluded_helper_surface_selectors: GENERATED_SURFACE_SELECTORS.slice(),
-
-      /* V139 compatibility fields consumed by code-labs-page-polish-v172.js. */
+      identity_context_ready: legacy.identityReady,
+      identity_defaults_applied: false,
       repo: legacy.repo,
       repo_context_ready: legacy.repoContextReady,
       path: legacy.path,
       source_branch: legacy.sourceBranch,
       request_branch: legacy.requestBranch,
       action: legacy.action,
-
       problem: legacy.problem,
       preserve_rules: legacy.preserve,
       error_notes: legacy.errors,
@@ -645,14 +554,15 @@
       safety_rules: [
         'Only genuine page-owned sections and fields are included.',
         'Generated shared helper surfaces never receive Buddy Notes; page-owned sections keep persistent notes.',
+        'Missing repository, path, source branch, non-main request branch, or write action remains missing; this bridge never invents write identity.',
         'Sensitive fields are redacted and blocked.',
         'Blocked or sensitive field values are never stored in undo state.',
         'Writes use stable field keys only.',
         'Normal input, change, and blur events are dispatched.',
         'Dangerous actions require page opt-in and explicit confirmation.',
         'Every write returns a receipt and supports one-step undo.',
-        'Repository context must be a valid owner/name value and is re-authorized server-side.',
-        'Code God PASS and the protected Code Labs Writer are mandatory before GitHub source execution.',
+        'Repository context is re-authorized server-side before any protected execution.',
+        'Code God PASS, independent evidence, and the protected Code Labs Writer are mandatory before GitHub source execution.',
         'The browser bridge cannot create branches, commits, pull requests, merges, deletions or deployments.',
         'No GitHub token, no direct main write, and no browser GitHub write.'
       ]
@@ -662,12 +572,8 @@
   function elementMaps() {
     var fields = {};
     var actions = {};
-    fieldElements().forEach(function (element) {
-      fields[fieldKey(element)] = element;
-    });
-    actionElements().forEach(function (element) {
-      actions[actionKey(element)] = element;
-    });
+    fieldElements().forEach(function (element) { fields[fieldKey(element)] = element; });
+    actionElements().forEach(function (element) { actions[actionKey(element)] = element; });
     return { fields: fields, actions: actions };
   }
 
@@ -685,29 +591,23 @@
 
   function setFieldValue(element, value) {
     if (!canWriteField(element)) throw new Error('Field is not writable.');
-
     var type = String(element.type || '').toLowerCase();
     if (type === 'checkbox' || type === 'radio') {
       element.checked = Boolean(value);
     } else if (element.tagName === 'SELECT' && element.multiple) {
       var wanted = Array.isArray(value) ? value.map(String) : [String(value)];
-      all('option', element).forEach(function (option) {
-        option.selected = wanted.indexOf(String(option.value)) >= 0;
-      });
+      all('option', element).forEach(function (option) { option.selected = wanted.indexOf(String(option.value)) >= 0; });
     } else if (element.isContentEditable) {
       element.textContent = value == null ? '' : String(value);
     } else {
       element.value = value == null ? '' : String(value);
     }
-
     dispatchFieldEvents(element);
   }
 
   function commandItems(value) {
     if (Array.isArray(value)) return value;
-    return Object.keys(value || {}).map(function (key) {
-      return { key: key, value: value[key] };
-    });
+    return Object.keys(value || {}).map(function (key) { return { key: key, value: value[key] }; });
   }
 
   function newReceipt(command) {
@@ -729,12 +629,10 @@
   function runAction(command) {
     command = command || {};
     ensureActionKeys();
-
     var receipt = newReceipt(command);
     var maps = elementMaps();
     var key = String(command.action || command.key || '');
     var element = maps.actions[key];
-
     if (command.expected_page_fingerprint && command.expected_page_fingerprint !== pageFingerprint()) {
       receipt.failed.push({ key: 'page', error: 'Page changed before action.' });
     } else if (!element) {
@@ -751,7 +649,6 @@
         receipt.ok = true;
       }
     }
-
     receipt.completed_at = now();
     writeJson(RECEIPT_KEY, receipt);
     return receipt;
@@ -763,7 +660,6 @@
     var receipt = newReceipt(command);
     var maps = elementMaps();
     var undo = { page_fingerprint: before.page_fingerprint, fields: {} };
-
     if (command.expected_page && command.expected_page !== before.page) {
       receipt.failed.push({ key: 'page', error: 'Wrong page.' });
     } else if (command.expected_page_fingerprint && command.expected_page_fingerprint !== before.page_fingerprint) {
@@ -775,30 +671,21 @@
           receipt.failed.push({ key: item.key, error: 'Field key not found.' });
           return;
         }
-
-        /* Security boundary: check first, then capture the undo value. */
         if (!canWriteField(element) || isSensitive(element, item.key)) {
           receipt.failed.push({ key: item.key, error: 'Field is blocked or sensitive.' });
           return;
         }
-
         try {
           undo.fields[item.key] = readFieldValue(element);
           setFieldValue(element, item.value);
-          receipt.changed.push({
-            key: item.key,
-            section: sectionFor(element).key,
-            after_hash: fieldInfo(element).hash32
-          });
+          receipt.changed.push({ key: item.key, section: sectionFor(element).key, after_hash: fieldInfo(element).hash32 });
         } catch (error) {
           delete undo.fields[item.key];
           receipt.failed.push({ key: item.key, error: String(error.message || error) });
         }
       });
     }
-
     if (receipt.changed.length) writeJson(UNDO_KEY, undo);
-
     if (command.action) {
       receipt.action = runAction({
         id: receipt.id + '-action',
@@ -808,10 +695,7 @@
         expected_page_fingerprint: before.page_fingerprint
       });
     }
-
-    receipt.ok = receipt.changed.length > 0 &&
-      receipt.failed.length === 0 &&
-      (!receipt.action || receipt.action.ok);
+    receipt.ok = receipt.changed.length > 0 && receipt.failed.length === 0 && (!receipt.action || receipt.action.ok);
     receipt.completed_at = now();
     writeJson(RECEIPT_KEY, receipt);
     saveSnapshot(readPage());
@@ -823,10 +707,7 @@
     command = command || {};
     var snapshot = readPage();
     var sectionKey = command.section || command.section_key;
-    var section = snapshot.sections.filter(function (item) {
-      return item.key === sectionKey;
-    })[0];
-
+    var section = snapshot.sections.filter(function (item) { return item.key === sectionKey; })[0];
     if (!section) {
       var receipt = newReceipt(command);
       receipt.failed.push({ key: sectionKey || '', error: 'Section key not found.' });
@@ -834,17 +715,12 @@
       writeJson(RECEIPT_KEY, receipt);
       return receipt;
     }
-
     var allowed = {};
-    section.fields.forEach(function (field) {
-      allowed[field.key] = true;
-    });
-
+    section.fields.forEach(function (field) { allowed[field.key] = true; });
     var fields = {};
     commandItems(command.fields || {}).forEach(function (item) {
       if (allowed[item.key]) fields[item.key] = item.value;
     });
-
     command.fields = fields;
     return writeFields(command);
   }
@@ -853,7 +729,6 @@
     var undo = readJson(UNDO_KEY);
     var receipt = newReceipt({ type: 'undo' });
     var maps = elementMaps();
-
     if (!undo.fields) {
       receipt.failed.push({ key: 'undo', error: 'No Buddy write to undo.' });
     } else if (undo.page_fingerprint !== pageFingerprint()) {
@@ -873,7 +748,6 @@
         }
       });
     }
-
     receipt.ok = receipt.changed.length > 0 && receipt.failed.length === 0;
     receipt.completed_at = now();
     writeJson(RECEIPT_KEY, receipt);
@@ -891,30 +765,20 @@
         return { ok: false, error: 'Invalid command JSON.' };
       }
     }
-
     command = command || {};
     var type = String(command.type || command.command || '').toLowerCase();
-
-    if (type === 'read' || type === 'read_page' || type === 'snapshot') {
-      return { ok: true, packet: readPage() };
-    }
+    if (type === 'read' || type === 'read_page' || type === 'snapshot') return { ok: true, packet: readPage() };
     if (type === 'write' || type === 'write_fields') return writeFields(command);
     if (type === 'write_section') return writeSection(command);
     if (type === 'run_action' || type === 'action') return runAction(command);
     if (type === 'undo') return undoLastWrite();
-
-    return {
-      ok: false,
-      error: 'Use read_page, write_fields, write_section, run_action, or undo.'
-    };
+    return { ok: false, error: 'Use read_page, write_fields, write_section, run_action, or undo.' };
   }
 
   function processQueuedCommand() {
     var command = readJson(COMMAND_KEY);
     var last = readJson(RECEIPT_KEY);
-    if (!command.id || last.command_id === command.id || last.id === command.id) {
-      return last.id ? last : null;
-    }
+    if (!command.id || last.command_id === command.id || last.id === command.id) return last.id ? last : null;
     var receipt = applyCommand(command);
     receipt.command_id = command.id;
     writeJson(RECEIPT_KEY, receipt);
@@ -934,10 +798,11 @@
       'REPO / FILE',
       'Repo: ' + (packet.repo || 'missing'),
       'Repository context valid: ' + Boolean(packet.repo_context_ready),
+      'Identity context complete: ' + Boolean(packet.identity_context_ready),
       'Path: ' + (packet.path || 'missing'),
-      'Source branch: ' + (packet.source_branch || 'main'),
-      'Request branch: ' + (packet.request_branch || 'context-only'),
-      'Action: ' + (packet.action || 'read_context'),
+      'Source branch: ' + (packet.source_branch || 'missing'),
+      'Request branch: ' + (packet.request_branch || 'missing'),
+      'Action: ' + (packet.action || 'missing'),
       '',
       'COUNTS',
       'Sections: ' + packet.counts.sections,
@@ -946,14 +811,8 @@
       '',
       'SECTIONS'
     ];
-
     packet.sections.forEach(function (section) {
-      output.push('');
-      output.push('[' + section.key + '] ' + (section.heading || 'Untitled'));
-      output.push('Hidden: ' + section.hidden);
-      output.push('SECTION TEXT');
-      output.push(section.text || '(empty)');
-      output.push('FIELDS');
+      output.push('', '[' + section.key + '] ' + (section.heading || 'Untitled'), 'Hidden: ' + section.hidden, 'SECTION TEXT', section.text || '(empty)', 'FIELDS');
       section.fields.forEach(function (field) {
         output.push('- ' + field.key + ' | ' + field.label + ' | writable=' + field.writable + ' | value=' + JSON.stringify(field.value));
       });
@@ -962,19 +821,13 @@
         output.push('- ' + action.key + ' | ' + action.label + ' | dangerous=' + action.dangerous + ' | approved=' + action.approved);
       });
     });
-
-    output.push('');
-    output.push('WRITE FORMAT');
-    output.push(JSON.stringify({
+    output.push('', 'WRITE FORMAT', JSON.stringify({
       type: 'write_fields',
       expected_page: packet.page,
       expected_page_fingerprint: packet.page_fingerprint,
       fields: { 'field-key': 'new value' }
-    }));
-    output.push('');
-    output.push('Buddy must read first, write the smallest field set, inspect the receipt, then read again.');
-    output.push('GitHub source execution remains restricted to the protected Code Labs Writer after Code God PASS, on an existing non-main branch and draft pull request.');
-
+    }), '', 'Buddy must read first, write the smallest field set, inspect the receipt, then read again.',
+    'GitHub source execution remains restricted to the protected Code Labs Writer after Code God PASS and independent evidence, on an existing non-main branch and draft pull request.');
     return output.join('\n');
   }
 
@@ -985,9 +838,7 @@
   }
 
   function copyText(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text);
-    }
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
     var textarea = document.createElement('textarea');
     textarea.value = text;
     document.body.appendChild(textarea);
@@ -1002,9 +853,7 @@
     if (!element) return;
     element.textContent = message;
     element.classList.add('show');
-    setTimeout(function () {
-      element.classList.remove('show');
-    }, 2000);
+    setTimeout(function () { element.classList.remove('show'); }, 2000);
   }
 
   var rendering = false;
@@ -1022,19 +871,16 @@
     var packet = readPage();
     var text = packetText(packet);
     saveSnapshot(packet);
-
     var status = q('#clBuddyBridgeStatusV139');
     var proof = q('#clBuddyBridgeProofV139');
     var output = q('#clBuddyBridgeOutV139');
     var receipt = q('#clBuddyBridgeReceiptV140');
-
     if (status) {
       status.className = 'badge good';
-      status.textContent = 'Full page read/write context ready';
+      status.textContent = packet.identity_context_ready ? 'Explicit protected identity ready' : 'Page context ready; protected identity incomplete';
     }
     if (proof) {
-      proof.innerHTML =
-        '<div class="grid3">' +
+      proof.innerHTML = '<div class="grid3">' +
         '<div class="stat"><b>Sections</b><span>' + packet.counts.sections + '</span></div>' +
         '<div class="stat"><b>Fields</b><span>' + packet.counts.fields + '</span></div>' +
         '<div class="stat"><b>Writable</b><span>' + packet.counts.writable_fields + '</span></div>' +
@@ -1046,64 +892,44 @@
       var savedReceipt = readJson(RECEIPT_KEY);
       receipt.value = savedReceipt.id ? JSON.stringify(savedReceipt, null, 2) : 'No Buddy page write receipt yet.';
     }
-
     return { text: text, packet: packet };
   }
 
   function createPanel() {
-    if (q('#' + ROOT_ID)) return;
+    if (q('#' + ROOT_ID)) return true;
     var main = q('.main') || q('main');
     if (!main) return false;
-
     var panel = document.createElement('section');
     panel.id = ROOT_ID;
     panel.className = 'panel';
     panel.setAttribute('data-cl-generated-helper-surface', 'buddy-page-bridge');
     panel.style.border = '3px solid rgba(59,130,246,.28)';
-    panel.innerHTML =
-      '<h2>Buddy Page Bridge V142</h2>' +
-      '<p class="muted">Reads genuine page-owned sections and fields. Shared helper panels, navigation and generated shells are excluded from Buddy Notes and write discovery. Approved page-field writes still use stable keys, receipts and undo. GitHub execution requires server-side owner/repository authorization, Code God PASS, and the protected Writer.</p>' +
-      '<div id="clBuddyBridgeProofV139"></div>' +
-      '<div class="actions">' +
+    panel.innerHTML = '<h2>Buddy Page Bridge V143</h2>' +
+      '<p class="muted">Reads genuine page-owned sections and fields. Generated helper panels and navigation are excluded. Local field writes still use stable keys, receipts and undo. Missing repository, source branch, non-main request branch or action stays missing; this bridge never invents protected write identity.</p>' +
+      '<div id="clBuddyBridgeProofV139"></div><div class="actions">' +
       '<span id="clBuddyBridgeStatusV139" class="badge warn">Checking</span>' +
       '<button class="btn primary" id="clBuddyBridgeBuildV139" type="button">Build Full Page Packet</button>' +
       '<button class="btn good" id="clBuddyBridgeCopyV139" type="button">Copy Full Page Packet</button>' +
-      '<button class="btn ghost" id="clBuddyBridgeUndoV140" type="button">Undo Last Buddy Write</button>' +
-      '</div>' +
+      '<button class="btn ghost" id="clBuddyBridgeUndoV140" type="button">Undo Last Buddy Write</button></div>' +
       '<textarea id="clBuddyBridgeOutV139" class="big" readonly></textarea>' +
-      '<h3>Buddy page command</h3>' +
-      '<textarea id="clBuddyBridgeCommandV140" class="big" placeholder=\'{"type":"write_fields","fields":{"field-key":"new value"}}\'></textarea>' +
+      '<h3>Buddy page command</h3><textarea id="clBuddyBridgeCommandV140" class="big" placeholder=\'{"type":"write_fields","fields":{"field-key":"new value"}}\'></textarea>' +
       '<div class="actions"><button class="btn primary" id="clBuddyBridgeApplyV140" type="button">Apply Buddy Page Command</button></div>' +
       '<textarea id="clBuddyBridgeReceiptV140" class="big" readonly></textarea>';
-
     main.insertBefore(panel, main.firstChild || null);
-
     q('#clBuddyBridgeBuildV139').onclick = render;
-    q('#clBuddyBridgeCopyV139').onclick = function () {
-      copyText(render().text).then(function () {
-        toast('Full Buddy page packet copied');
-      });
-    };
-    q('#clBuddyBridgeUndoV140').onclick = function () {
-      q('#clBuddyBridgeReceiptV140').value = JSON.stringify(undoLastWrite(), null, 2);
-    };
+    q('#clBuddyBridgeCopyV139').onclick = function () { copyText(render().text).then(function () { toast('Full Buddy page packet copied'); }); };
+    q('#clBuddyBridgeUndoV140').onclick = function () { q('#clBuddyBridgeReceiptV140').value = JSON.stringify(undoLastWrite(), null, 2); };
     q('#clBuddyBridgeApplyV140').onclick = function () {
-      q('#clBuddyBridgeReceiptV140').value = JSON.stringify(
-        applyCommand(q('#clBuddyBridgeCommandV140').value),
-        null,
-        2
-      );
+      q('#clBuddyBridgeReceiptV140').value = JSON.stringify(applyCommand(q('#clBuddyBridgeCommandV140').value), null, 2);
     };
-
-    render();
+    return true;
   }
 
   function boot() {
     ensureSectionNotes();
     ensureFieldKeys();
     ensureActionKeys();
-
-    window.CodeLabsBuddyPageBridge = {
+    var api = {
       version: VERSION,
       readPage: readPage,
       collect: readPage,
@@ -1122,16 +948,28 @@
         command: COMMAND_KEY,
         receipt: RECEIPT_KEY,
         undo: UNDO_KEY
+      },
+      diagnostics: function () {
+        return Object.freeze({
+          version: VERSION,
+          sectionScope: 'page_owned_only',
+          identityDefaultsApplied: false,
+          networkWrites: 0,
+          backendWrites: 0,
+          githubWrites: 0,
+          retryTimers: 0,
+          observers: 0
+        });
       }
     };
-    window.CodeLabsBuddyPageBridgeV140 = window.CodeLabsBuddyPageBridge;
-    window.CodeLabsBuddyPageBridgeV141 = window.CodeLabsBuddyPageBridge;
-    window.CodeLabsBuddyPageBridgeV142 = window.CodeLabsBuddyPageBridge;
-
+    window.CodeLabsBuddyPageBridge = api;
+    window.CodeLabsBuddyPageBridgeV140 = api;
+    window.CodeLabsBuddyPageBridgeV141 = api;
+    window.CodeLabsBuddyPageBridgeV142 = api;
+    window.CodeLabsBuddyPageBridgeV143 = api;
     createPanel();
     render();
     processQueuedCommand();
-
     document.addEventListener('input', function (event) {
       if (!(event.target.closest && event.target.closest('#' + ROOT_ID))) scheduleRender();
     }, true);
@@ -1140,9 +978,6 @@
     }, true);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot, { once: true });
-  } else {
-    boot();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
+  else boot();
 })();
