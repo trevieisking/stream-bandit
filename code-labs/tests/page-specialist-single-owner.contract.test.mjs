@@ -138,7 +138,7 @@ test('Specialist Tools: working support and proof capabilities remain discoverab
   const help = await read('code-labs/help.html');
   const loader = await read('code-labs/assets/cl-nav.js');
   const discoverability = `${register}\n${help}\n${loader}`;
-  for (const capability of ['Start Guide','Fix Wizard','AI Handoff','Buddy Canvas Receipt','Context Packet','Read-Only Proof','Buddy Tools']) assertIncludes(discoverability,capability,'Discoverability');
+  for (const capability of ['Start Guide','Fix Wizard','AI Handoff','Buddy Canvas Receipt','Context Packet','read-only-proof.html','Buddy Tools']) assertIncludes(discoverability,capability,'Discoverability');
   assertIncludes(register,'static retirement notice','Retirement notice');
 });
 
