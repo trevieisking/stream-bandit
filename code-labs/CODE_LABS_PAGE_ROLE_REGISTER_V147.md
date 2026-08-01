@@ -84,17 +84,18 @@ The canonical union is **39 unique routes**: 1 entry, 18 governed workflow route
 | `code-labs/helper-route-map.html` | V141 scanner | Sole scanner; canonical 39-page coverage fails closed. |
 | `code-labs/chatgpt-buddy-tools.html` | V245 Buddy Tools | Unnumbered support page; one empty canonical nav mount. |
 | `code-labs/buddy-canvas-receipt-v115.html` | V122 Receipt | Requires explicit repo/branch/path and successful freshness before handoff/chunks. |
-| `code-labs/assets/code-labs-buddy-page-bridge-v139.js` | V142 Buddy Bridge | Excludes helper-generated surfaces from recursive notes; local notes/undo/receipts only. |
+| `code-labs/assets/code-labs-buddy-page-bridge-v139.js` | V143 Buddy Bridge | Excludes helper-generated surfaces; preserves local notes/write/undo/receipts and requires explicit protected identity without defaults. |
 | `code-labs/assets/code-labs-checklist-builder.js` | Master Checklist V2 | Local final-verification view only; cannot authorise Writer or promotion. |
 | `code-labs/assets/code-labs-page-runtime-v235.js` | V250 page runtime baseline | Bounded tab grouping and discovery; no route ownership. |
 
-## Known release blocker — CL-HIST-070
+## Resolved release blocker — CL-HIST-070
 
-The committed Buddy Bridge V142 still carries legacy browser-local context defaults for missing source branch, requested action and request branch. Those defaults must be removed in a separately reviewed V143 candidate before live promotion. Until V143 and its regression evidence are present:
+Buddy Bridge V143 is committed on the recovery branch with complete page-local notes/write/section/action/receipt/undo compatibility and fail-closed protected identity. It no longer invents a source branch, requested action or request branch when those values are absent.
 
-- the branch may continue receiving reviewed non-main fixes;
-- the final regression must report this condition as blocking;
-- Writer, merge, deployment and production promotion must not be inferred from Buddy Bridge browser context.
+- local page assistance remains browser-local and cannot write GitHub;
+- protected context is ready only with an explicit valid repository, safe path, source branch, non-main request branch, supported action and fixed output;
+- the 19-test single-owner regression binds V143 identity, compatibility methods, helper-surface exclusion and forbidden fallback values;
+- Writer, merge, deployment and production promotion are never inferred from Buddy Bridge browser context.
 
 ## Promotion evidence boundary
 
@@ -113,4 +114,4 @@ The committed Buddy Bridge V142 still carries legacy browser-local context defau
 5. Keep support pages discoverable without numbering them or inserting them into `workflowRoutes`.
 6. Preserve the protected sequence: Tool-Only workspace → Code God bounded review → independent checkpoint/receipt → one-file Writer → existing non-main branch and draft PR.
 7. Never write directly to `main`, merge, deploy, delete, force-push, expose secrets or create a paid parallel backend through browser helpers.
-8. Do not mark the release ready while CL-HIST-070 or any failed/not-run required acceptance gate remains.
+8. Treat CL-HIST-070 as resolved only while V143 and its exact-head regression remain present; do not mark live promotion ready while any required browser, user-acceptance or deployed-source gate remains not run.
