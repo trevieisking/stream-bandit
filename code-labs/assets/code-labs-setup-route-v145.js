@@ -1,8 +1,8 @@
-/* Code Labs Setup Route V284 - complete passive canonical-registry consumer.
+/* Code Labs Setup Route V288 - passive V287 registry consumer.
  *
- * This file deliberately preserves the historical CodeLabsSetupRouteV145
- * compatibility surface while retiring every former ownership behaviour.
- * cl-nav.js is the sole route, ordering, numbering and sidebar owner.
+ * This file preserves the historical CodeLabsSetupRouteV145 compatibility
+ * surface while retiring every former ownership behaviour. cl-nav.js is the
+ * sole route, ordering, visible-step numbering and sidebar owner.
  *
  * Retired here:
  * - navigation creation, insertion, ordering and active-state mutation;
@@ -17,9 +17,9 @@
 
 var EXPECTED_OWNER='code-labs/assets/cl-nav.js';
 var EXPECTED_SEQUENCE=Object.freeze([
-  Object.freeze({id:'setup',file:'setup.html',step:1}),
-  Object.freeze({id:'project-picker',file:'project-picker.html',step:2}),
-  Object.freeze({id:'file-lab',file:'file-lab.html',step:3})
+  Object.freeze({id:'setup',file:'setup.html'}),
+  Object.freeze({id:'project-picker',file:'project-picker.html'}),
+  Object.freeze({id:'file-lab',file:'file-lab.html'})
 ]);
 var RETIRED_BEHAVIOURS=Object.freeze([
   'create-navigation-link',
@@ -30,7 +30,8 @@ var RETIRED_BEHAVIOURS=Object.freeze([
   'observe-navigation-mutations',
   'run-delayed-retries',
   'poll-or-reload-page',
-  'own-route-map'
+  'own-route-map',
+  'own-visible-step-numbers'
 ]);
 
 function registry(){
@@ -41,44 +42,75 @@ function route(source,id){
   return source&&typeof source.route==='function'?source.route(id):null;
 }
 
+function workflowIndex(source,id){
+  return source&&typeof source.workflowIndex==='function'?source.workflowIndex(id):-1;
+}
+
 function sameRoute(actual,expected){
   return !!(
     actual&&expected&&
     actual.id===expected.id&&
-    actual.file===expected.file&&
-    actual.step===expected.step
+    actual.file===expected.file
   );
+}
+
+function numericStep(item){
+  return item&&typeof item.step==='number'&&Number.isFinite(item.step)?item.step:null;
 }
 
 function validate(source){
   if(!source||source.owner!==EXPECTED_OWNER)return false;
-  for(var index=0;index<EXPECTED_SEQUENCE.length;index+=1){
-    if(!sameRoute(route(source,EXPECTED_SEQUENCE[index].id),EXPECTED_SEQUENCE[index]))return false;
-  }
+  if(typeof source.route!=='function'||typeof source.next!=='function'||typeof source.previous!=='function')return false;
+  if(typeof source.workflowIndex!=='function')return false;
+  var home=route(source,'index');
   var setup=route(source,'setup');
-  var previous=typeof source.previous==='function'?source.previous('setup'):null;
-  var next=typeof source.next==='function'?source.next('setup'):null;
+  var picker=route(source,'project-picker');
+  var fileLab=route(source,'file-lab');
+  var homeStep=numericStep(home);
+  var setupStep=numericStep(setup);
+  var pickerStep=numericStep(picker);
+  var fileStep=numericStep(fileLab);
   return !!(
-    setup&&
-    previous===null&&
-    next&&next.id==='project-picker'&&next.file==='project-picker.html'
+    home&&home.id==='index'&&home.file==='index.html'&&
+    sameRoute(setup,EXPECTED_SEQUENCE[0])&&
+    sameRoute(picker,EXPECTED_SEQUENCE[1])&&
+    sameRoute(fileLab,EXPECTED_SEQUENCE[2])&&
+    homeStep!==null&&setupStep===homeStep+1&&
+    pickerStep===setupStep+1&&fileStep===pickerStep+1&&
+    workflowIndex(source,'setup')===0&&
+    workflowIndex(source,'project-picker')===1&&
+    workflowIndex(source,'file-lab')===2&&
+    source.previous('setup')===null&&
+    source.next('setup')===picker&&
+    source.next('project-picker')===fileLab
   );
 }
 
 function snapshot(){
   var source=registry();
   var valid=validate(source);
+  var home=valid?route(source,'index'):null;
+  var setup=valid?route(source,'setup'):null;
+  var picker=valid?route(source,'project-picker'):null;
+  var fileLab=valid?route(source,'file-lab'):null;
   return Object.freeze({
-    version:'V284-complete-passive-registry-consumer',
+    version:'V288-passive-v287-registry-consumer',
     active:valid,
     valid:valid,
     mode:'read-only-registry-consumer',
     registryOwner:source&&source.owner||null,
     expectedOwner:EXPECTED_OWNER,
     route:valid?'Home -> Master Plan + Setup -> Project Picker -> File Lab':null,
-    setup:valid?route(source,'setup'):null,
-    projectPicker:valid?route(source,'project-picker'):null,
-    fileLab:valid?route(source,'file-lab'):null,
+    home:home,
+    setup:setup,
+    projectPicker:picker,
+    fileLab:fileLab,
+    visibleSteps:valid?Object.freeze({
+      home:home.step,
+      setup:setup.step,
+      projectPicker:picker.step,
+      fileLab:fileLab.step
+    }):null,
     retiredBehaviours:RETIRED_BEHAVIOURS,
     mutatesDom:false,
     ownsNavigation:false,
@@ -108,7 +140,7 @@ function readSequence(){
 function verify(){
   var state=snapshot();
   if(!state.valid&&window.console&&typeof window.console.warn==='function'){
-    window.console.warn('Code Labs Setup Route is inactive because the canonical cl-nav.js registry is unavailable or invalid.');
+    window.console.warn('Code Labs Setup Route is inactive because the canonical cl-nav.js registry is unavailable or incompatible.');
   }
   return state.valid;
 }
@@ -122,9 +154,11 @@ window.CodeLabsSetupRouteV145=Object.freeze({
   registryOwner:state.registryOwner,
   expectedOwner:state.expectedOwner,
   route:state.route,
+  home:state.home,
   setup:state.setup,
   projectPicker:state.projectPicker,
   fileLab:state.fileLab,
+  visibleSteps:state.visibleSteps,
   retiredBehaviours:state.retiredBehaviours,
   mutatesDom:false,
   ownsNavigation:false,
