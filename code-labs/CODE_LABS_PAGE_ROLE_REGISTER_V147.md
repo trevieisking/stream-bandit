@@ -1,132 +1,116 @@
-# Code Labs Page Role Register V147/V148/V163/V244
+# Code Labs Page Role Register — V287 Release Alignment
 
-**Visible route owner:** V282 shared shell loader.
+This file is the no-drop and single-owner register for the current Code Labs recovery branch. It documents roles only. It does not create routes, mutate workflow state, authorise Writer, merge, deploy, or replace the authoritative Master Plan and Master Checklist evidence.
 
-This register is the no-drop list for Code Labs pages. A page can be removed from the visible main route only when it is clearly documented as support, proof, receipt, test, or legacy/watch. A working page must not disappear just because it is not part of the main repair workflow.
+## Canonical ownership contract
 
-## Route protection rule
+- **Sole route, visible-step, sidebar and route-family owner:** `code-labs/assets/cl-nav.js` — V287.
+- **Visible entry:** Home is visible step 1 but is not a governed workflow stage.
+- **First governed workflow stage:** Master Plan + Setup is visible step 2 and workflow index 0.
+- **Final governed workflow stage:** Master Plan Checklist is visible step 19.
+- **Support pages:** unnumbered and outside `workflowRoutes`; they remain addressable and discoverable.
+- **No helper may maintain a second workflow array, page map, next/previous map, visible-step sequence or sidebar renderer.**
+- **No browser page may write directly to `main`, merge, deploy, delete, force-push, expose secrets or create parallel infrastructure.**
 
-- Prep route: Home -> Setup -> File Lab.
-- Setup is required because it stores project, site, and repo details before File Lab.
-- Project Picker still exists, but it is not currently a required step between Setup and File Lab.
-- Main workflow starts at File Lab.
-- Support, proof, receipt, scanner, and test pages may be outside the main workflow, but they must stay discoverable from Help, Tools, About, Connection Guide, scanner output, or documentation.
+## Canonical visible route
 
-## V244 owner-proof retirement checkpoint
+| Visible step | Route ID | Page | Path | Kind | Role |
+| ---: | --- | --- | --- | --- | --- |
+| 1 | `index` | Home | `code-labs/index.html` | Entry | Lightweight start and current-repair content. |
+| 2 | `setup` | Master Plan + Setup | `code-labs/setup.html` | Workflow | First governed stage; selected plan/project/repository setup. |
+| 3 | `project-picker` | Project Picker | `code-labs/project-picker.html` | Workflow | Select the owner-scoped project. |
+| 4 | `file-lab` | File Lab | `code-labs/file-lab.html` | Workflow | Load and verify complete source. |
+| 5 | `saved-files` | Saved Files | `code-labs/saved-files.html` | Workflow | Select an existing saved file without creating another file owner. |
+| 6 | `rescue-room` | Rescue Room | `code-labs/rescue-room.html` | Workflow | Describe the defect and preserve rules. |
+| 7 | `packet-builder` | Packet Builder | `code-labs/packet-builder.html` | Workflow | Build complete repair context. |
+| 8 | `buddy-canvas` | Buddy Canvas | `code-labs/buddy-canvas.html` | Workflow | Source/fixed-file working lane. |
+| 9 | `v20` | Workflow Hub | `code-labs/v20.html` | Workflow | Page-local workflow tools; consumes canonical routes. |
+| 10 | `patch-desk` | Patch Desk | `code-labs/patch-desk.html` | Workflow | Review the complete replacement file. |
+| 11 | `patch-lab` | Patch Lab | `code-labs/patch-lab.html` | Workflow | Exact-edit fallback. |
+| 12 | `preview-test` | Preview + Test | `code-labs/preview-test.html` | Workflow | Preview and record bounded test evidence. |
+| 13 | `checkpoints` | Checkpoints | `code-labs/checkpoints.html` | Workflow | Rollback, receipts and recovery evidence. |
+| 14 | `repo-desk` | Repo Desk | `code-labs/repo-desk.html` | Workflow | Sole visible repository-action handoff preparation stage. |
+| 15 | `cg-repair-lab` | CG Repair Lab | `code-labs/cg-repair-lab.html` | Workflow | Read-only advisory repository analysis. |
+| 16 | `code-god` | Code God | `code-labs/code-god.html` | Workflow | Deterministic final review consumer; bounded advisory only. |
+| 17 | `publish-prep` | GitHub Writer | `code-labs/publish-prep.html` | Workflow | Prepare the protected one-file branch/draft-PR execution. |
+| 18 | `github-tracker` | GitHub Tracker | `code-labs/github-tracker.html` | Workflow | Read PR, preview and check evidence. |
+| 19 | `checklist-builder` | Master Plan Checklist | `code-labs/checklist-builder.html` | Workflow | Final exact-plan verification view; no promotion authority. |
+| — | `help` | Help + Tools | `code-labs/help.html` | Support/nav | Discoverable support index; unnumbered. |
 
-- `code-labs/owner-read-proof.html` is retained only as a static retirement notice for old bookmarks and documentation.
-- It must not start OAuth, call an Edge Function, read repository content, or perform any write.
-- The supported backend proof is `code-labs/read-only-proof.html`.
-- Current assistant workspace reads use Code Labs V104 tool-only control.
+## Unnumbered support, proof and test routes
 
-## V163 layout and polish checkpoint
+| Route ID | Path | Role / keep rule |
+| --- | --- | --- |
+| `connection-guide` | `code-labs/connection-guide.html` | Safe connection walkthrough. |
+| `read-only-proof` | `code-labs/read-only-proof.html` | Active backend read-only proof. |
+| `helper-route-map` | `code-labs/helper-route-map.html` | Sole read-only route/helper scanner; do not duplicate. |
+| `faq` | `code-labs/faq.html` | Workflow and save guidance. |
+| `about` | `code-labs/about.html` | Product explanation. |
+| `ai-handoff` | `code-labs/ai-handoff.html` | Read-only assistant context support. |
+| `fix-wizard` | `code-labs/fix-wizard.html` | Draft/support guidance; consumes shared policy. |
+| `start-guide` | `code-labs/start-guide.html` | Beginner guidance. |
+| `context-packet` | `code-labs/context-packet.html` | Assistant context packet support. |
+| `connector-status` | `code-labs/connector-status.html` | Connector/status support. |
+| `chatgpt-connection` | `code-labs/chatgpt-connection.html` | Connection support/test. |
+| `repair-bridge-status` | `code-labs/repair-bridge-status.html` | Tool-only repair status/proof. |
+| `owner-read-proof` | `code-labs/owner-read-proof.html` | Static retirement notice only; no OAuth, repository read or write. |
+| `oauth-discovery` | `code-labs/oauth-discovery.html` | OAuth discovery test. |
+| `oauth-flow-test` | `code-labs/oauth-flow-test.html` | OAuth flow test. |
+| `app-reader-test` | `code-labs/app-reader-test.html` | App reader test. |
+| `url-reader-test` | `code-labs/url-reader-test.html` | URL reader proof/test. |
+| `buddy-canvas-receipt-v115` | `code-labs/buddy-canvas-receipt-v115.html` | V122 local proof and fail-closed freshness/handoff builder. |
+| `chatgpt-buddy-tools` | `code-labs/chatgpt-buddy-tools.html` | V245 bounded local support index. |
 
-Issue #284 is now the future polish reference: `Code Labs polish: align workflow panels and red-back guidance under page hero`.
+The canonical union is **39 unique routes**: 1 entry, 18 governed workflow routes and 20 support routes. The visible navigation contains Home, all 18 workflow routes and Help + Tools.
 
-Use this checkpoint at the right point in the plan:
+## Current shared-owner and specialist-helper register
 
-1. Finish route/chrome stability first.
-2. Keep the current V161/V162 direction: real page hero/title at the top, then workflow guidance, then page tools, then Supabase/backup near the bottom.
-3. Run/read the Helper Route Map Scanner before a polish PR.
-4. During the polish pass, align panels across all 12 main workflow pages without deleting working page functions.
-5. Red/blocked/back guidance belongs directly under that page hero/title area when relevant.
-6. Support/proof/test pages stay discoverable, but do not clutter the normal user sidebar.
-7. Do this polish before larger feature work such as saved-files management, unless a live page is badly broken.
+| File | Current role | Ownership boundary |
+| --- | --- | --- |
+| `code-labs/assets/cl-nav.js` | V287 canonical route union and sidebar renderer | Sole route/order/number/family/sidebar owner. |
+| `code-labs/assets/code-labs-setup-route-v145.js` | V288 compatibility reader | Passive registry consumer; no DOM, route or numbering authority. |
+| `code-labs/assets/code-labs-workflow-clarity-v130.js` | V288 clarity API | Passive registry consumer; no private route maps, DOM panel or timers. |
+| `code-labs/assets/code-labs-v20.js` | V3.2 Workflow Hub | Page-local root only; preserves siblings and resolves links through V287. |
+| `code-labs/assets/code-labs-page-completion-v139.js` | V208 completion panel | Completion wording/checklist only; canonical next route comes from V287. |
+| `code-labs/assets/code-labs-v33-workflow-current-file-bridge.js` | V3.5 current-file hydration | Event-driven field hydration; no invented repo/branch/action or route filenames. |
+| `code-labs/assets/code-labs-current-file-overwrite-v201.js` | V203.3 compatibility facade | Read-only delegation and fail-closed mutation methods. |
+| `code-labs/assets/code-labs-current-file-v104-overwrite-v201.js` | V203.0 retired transport facade | No browser endpoint, secret, button, timer or backend-write authority. |
+| `code-labs/assets/code-labs-preview-route-v200.js` | V201 preview normaliser | Only relative `#preview[srcdoc]` base/link normalisation. |
+| `code-labs/code-god.html` | V242 Code God page | One canonical nav and one read-only handoff-context consumer. |
+| `code-labs/assets/code-labs-header-shell-v235.js` | V247 header/tool drawer | Passive `toolRoutes` consumer; never rebuilds workflow navigation. |
+| `code-labs/assets/code-labs-footer-buddy-shell-v200.js` | V209 footer | Reads page-declared action IDs and canonical previous/next; never stamps actions. |
+| `code-labs/assets/code-labs.js` | V204 manual renderer | Preserves local manual functions and resolves generated links through V287. |
+| `code-labs/index.html` | V263 Home content | One empty canonical nav mount; content only. |
+| `code-labs/helper-route-map.html` | V141 scanner | Sole scanner; canonical 39-page coverage fails closed. |
+| `code-labs/chatgpt-buddy-tools.html` | V245 Buddy Tools | Unnumbered support page; one empty canonical nav mount. |
+| `code-labs/buddy-canvas-receipt-v115.html` | V122 Receipt | Requires explicit repo/branch/path and successful freshness before handoff/chunks. |
+| `code-labs/assets/code-labs-buddy-page-bridge-v139.js` | V142 Buddy Bridge | Excludes helper-generated surfaces from recursive notes; local notes/undo/receipts only. |
+| `code-labs/assets/code-labs-checklist-builder.js` | Master Checklist V2 | Local final-verification view only; cannot authorise Writer or promotion. |
+| `code-labs/assets/code-labs-page-runtime-v235.js` | V250 page runtime baseline | Bounded tab grouping and discovery; no route ownership. |
 
-## Scanner coverage note
+## Known release blocker — CL-HIST-070
 
-The live scanner remains `code-labs/helper-route-map.html`. Do not build another scanner.
+The committed Buddy Bridge V142 still carries legacy browser-local context defaults for missing source branch, requested action and request branch. Those defaults must be removed in a separately reviewed V143 candidate before live promotion. Until V143 and its regression evidence are present:
 
-V148 adds `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md` so the scanner manifest can be refreshed deliberately to include:
+- the branch may continue receiving reviewed non-main fixes;
+- the final regression must report this condition as blocking;
+- Writer, merge, deployment and production promotion must not be inferred from Buddy Bridge browser context.
 
-- `code-labs/assets/code-labs-setup-route-v145.js`
-- `code-labs/CODE_LABS_PAGE_ROLE_REGISTER_V147.md`
+## Promotion evidence boundary
 
-## Prep pages
+- Code God and CG Repair Lab remain bounded advisory evidence.
+- Candidate, handoff, checkpoint, receipt, source hash and exact GitHub head binding are authoritative only through the protected Code Labs workflow and current GitHub facts.
+- Missing workflow runs or statuses are reported as none found; absence is never converted to PASS.
+- Browser visual, desktop/mobile, duplicate-panel, user-acceptance and deployed-source checks remain separate release gates.
+- This register is documentation and a regression source; it is not a promotion decision.
 
-| Page | Path | Role | Keep rule |
-| --- | --- | --- | --- |
-| Home | `code-labs/index.html` | Public landing and first route page | Must point users to Setup first. |
-| Setup | `code-labs/setup.html` | Project, site, repo, mode, and notes setup | Must stay after Home and before File Lab. Not a locked repair step. |
-| Project Picker | `code-labs/project-picker.html` | Older/support prep selector | Keep as support/legacy prep unless explicitly re-promoted. Do not force it between Setup and File Lab. |
+## No-drop checklist
 
-## Main repair workflow pages
-
-| Step | Page | Path | Role | Keep rule |
-| --- | --- | --- | --- | --- |
-| 1 | File Lab | `code-labs/file-lab.html` | Load or read the full current file | Main workflow start. |
-| 1A | Saved Files | `code-labs/saved-files.html` | Select an existing saved file without creating a competing file owner | Bounded source-selection support inside the canonical workflow. |
-| 2 | Rescue Room | `code-labs/rescue-room.html` | Describe the problem and preserve rules | Main workflow. |
-| 3 | Packet Builder | `code-labs/packet-builder.html` | Build the assistant repair packet | Main workflow, not support-only. |
-| 4 | Buddy Canvas | `code-labs/buddy-canvas.html` | Assistant/source-proof and fixed-code lane | Main workflow, not support-only. |
-| 5 | Workflow Hub | `code-labs/v20.html` | Choose next safe route | Main workflow. |
-| 6 | Patch Desk | `code-labs/patch-desk.html` | Full fixed file review/writer lane | Main workflow. |
-| 7 | Patch Lab | `code-labs/patch-lab.html` | Exact patch fallback | Main workflow. |
-| 8 | Preview + Test | `code-labs/preview-test.html` | Preview and pass/fail test notes | Main workflow. |
-| 9 | Checkpoints | `code-labs/checkpoints.html` | Rollback proof | Main workflow. |
-| 10 | Repo Desk | `code-labs/repo-desk.html` | Choose repo handoff/action | Main workflow. |
-| 10A | CG Repair Lab | `code-labs/cg-repair-lab.html` | Read-only repair analysis and evidence preparation | Specialist gate; never owns workflow state or GitHub execution. |
-| 10B | Code God | `code-labs/code-god.html` | Deterministic final review | Sole final-review owner; cannot merge or deploy. |
-| 11 | GitHub Writer | `code-labs/publish-prep.html` | Build reviewed GitHub handoff | Main workflow. |
-| 12 | GitHub Tracker | `code-labs/github-tracker.html` | Track PR, preview, checks, and result | Main workflow. |
-
-## Support and user guidance pages
-
-| Page | Path | Role | Keep rule |
-| --- | --- | --- | --- |
-| About | `code-labs/about.html` | Explains what Code Labs does | Keep discoverable from Tools/About. |
-| FAQ | `code-labs/faq.html` | Answers workflow and save questions | Keep discoverable from Help/FAQ. |
-| Help + Tools | `code-labs/help.html` | Utility/help page | Keep as tool index. |
-| Start Guide | `code-labs/start-guide.html` | Beginner guide | Keep as support page. |
-| Fix Wizard | `code-labs/fix-wizard.html` | Guided repair support page | Keep as support page; do not force into main route. |
-| AI Handoff | `code-labs/ai-handoff.html` | Assistant handoff package support | Keep as support page. |
-| Checklist Builder | `code-labs/checklist-builder.html` | Build review/pass checklists | Keep as support/tool page. |
-| Connection Guide | `code-labs/connection-guide.html` | Safe connection walkthrough | Keep discoverable from Tools. |
-| Connector Status | `code-labs/connector-status.html` | Connection/helper status page | Keep as support/status page. |
-| Context Packet | `code-labs/context-packet.html` | Assistant context packet support | Keep as support/proof page. |
-| Buddy Tools | `code-labs/help.html` specialist-tools drawer | Assistant utilities, memory recovery, and bounded local helpers | Keep discoverable; never become a second workflow engine. |
-
-## Proof, scanner, receipt, and test pages
-
-| Page | Path | Role | Keep rule |
-| --- | --- | --- | --- |
-| Helper Route Map Scanner | `code-labs/helper-route-map.html` | Source-read scanner for pages/helpers/assets | Keep. Use before editing Code Labs. |
-| Read-Only Proof | `code-labs/read-only-proof.html` | Supported backend read-only proof | Keep as the active backend proof page. |
-| Owner Read Proof | `code-labs/owner-read-proof.html` | Retired V99 route tombstone | Keep the static notice for old bookmarks. It must contain no OAuth, Edge Function call, repository read, or write action. |
-| Repair Bridge Status | `code-labs/repair-bridge-status.html` | V104 tool-only repair status | Keep as status/proof page. |
-| ChatGPT Connection | `code-labs/chatgpt-connection.html` | Connection stub/test | Keep as test/support page. |
-| OAuth Discovery | `code-labs/oauth-discovery.html` | OAuth discovery test | Keep as test page. |
-| OAuth Flow Test | `code-labs/oauth-flow-test.html` | OAuth flow test | Keep as test page. |
-| App Reader Test | `code-labs/app-reader-test.html` | App read tool test | Keep as test page. |
-| URL Reader Test | `code-labs/url-reader-test.html` | URL reader proof/test | Keep as test page. |
-| Buddy Canvas Receipt | `code-labs/buddy-canvas-receipt-v115.html` | Local receipt and handoff proof | Keep as receipt/proof page. |
-
-## Asset/helper protection summary
-
-These helpers are especially important and must not be removed casually:
-
-- `code-labs/assets/code-labs.js` — base app/state/page renderer.
-- `code-labs/assets/cl-nav.js` — shared navigation loader and helper loader. V161 stops the old workflow tidy overlay from fighting the main page chrome.
-- `code-labs/assets/code-labs-v1-1-safety.js` — safety/backup panel and promoted helper loader. V162 keeps the real page intro at the top.
-- `code-labs/assets/code-labs-v12-save.js` — clean sidebar owner, ChatGPT-readable context, and safe write packet source owner.
-- `code-labs/assets/code-labs-setup-route-v145.js` — keeps Setup visible after Home while protected older routes settle.
-- `code-labs/assets/code-labs-workflow-clarity-v130.js` — numbering, purpose, soft guidance.
-- `code-labs/assets/code-labs-save-language-v132.js` — clearer save/checkpoint labels.
-- `code-labs/assets/code-labs-buddy-canvas-menu-v134.js` — Buddy Canvas menu alignment.
-- `code-labs/assets/code-labs-workflow-guard-v138.js` — soft workflow locks.
-- `code-labs/assets/code-labs-page-completion-v139.js` — page completion checklist.
-- `code-labs/assets/code-labs-v33-workflow-current-file-bridge.js` — current file bridge for workflow pages.
-- `code-labs/assets/buddy-canvas-source-proof-v111.js` and related Buddy Canvas helpers — source proof, source control, proof tools, handoff desk, assistant sync, and autosave lanes.
-
-## No-drop checklist before future route/menu work
-
-Before changing menu, route, helper loading, or page labels:
-
-1. Run or read the Helper Route Map Scanner.
-2. Compare the page against this register.
-3. Decide whether the page is Prep, Main Workflow, Support, Proof/Test, Receipt, or Legacy/Watch.
-4. Never remove a working page from docs or access paths without explicitly recording why.
-5. If a page is hidden from the main menu, make sure it is still discoverable from Tools, Help, About, Connection Guide, scanner output, or a route document.
-6. If two helpers fight, fix the source route owner when possible. If a protected helper cannot be safely rewritten, keep the stabilizer small and document it here.
-7. For layout polish, use issue #284 and keep red/blocked/back guidance directly under the real page hero/title.
-8. Before editing the scanner manifest, read `code-labs/CODE_LABS_SCANNER_MANIFEST_ADDENDUM_V148.md`.
+1. Read the current V287 registry before changing routes or labels.
+2. Run/read Helper Route Map V141 and fail closed on missing canonical pages.
+3. Preserve all 39 unique route targets unless an explicit retirement is separately approved and documented.
+4. Preserve one owner per route, stage, mutable property and execution capability.
+5. Keep support pages discoverable without numbering them or inserting them into `workflowRoutes`.
+6. Preserve the protected sequence: Tool-Only workspace → Code God bounded review → independent checkpoint/receipt → one-file Writer → existing non-main branch and draft PR.
+7. Never write directly to `main`, merge, deploy, delete, force-push, expose secrets or create a paid parallel backend through browser helpers.
+8. Do not mark the release ready while CL-HIST-070 or any failed/not-run required acceptance gate remains.
