@@ -2,6 +2,8 @@ const HASH_VERSION = "sha256-utf8-v1";
 const HANDOFF_HASH_VERSION = "canonical-json-v1";
 const INDEPENDENT_EVIDENCE_KIND = "master-checklist-independent-gate-v1";
 const CODE_GOD_TRUST_STATE = "HOLD_UNTRUSTED_ADVISORY";
+const CODE_GOD_REVIEW_VERSION = "V50-code-god-2-bounded-advisory";
+const CODE_GOD_CAPABILITY_VERSION = "code-god-structural-preservation-and-five-senses-v1";
 const MAX_QUEUE_CONTENT = 180000;
 const PROTECTED_BRANCHES = new Set(["main", "master", "production", "live", "gh-pages"]);
 
@@ -505,7 +507,8 @@ export async function prepareCodeGodAtomic(_argsValue, contextValue) {
     ? (findings.some((item) => item.severity === "P0") ? "BLOCK" : "FINDINGS_PRESENT")
     : "BOUNDED_CHECKS_CLEAR";
   const review = {
-    version: "V51-code-god-structural-preservation-advisory",
+    version: CODE_GOD_REVIEW_VERSION,
+    capability_version: CODE_GOD_CAPABILITY_VERSION,
     outcome,
     scope_outcome: scopeOutcome,
     authoritative: false,
@@ -577,6 +580,8 @@ export async function prepareGithubWriterAtomic(argsValue, contextValue) {
   const handoff = object(metadata.repo_handoff, "Repo handoff");
   const review = object(metadata.code_god_review, "Code God review");
   if (
+    review.version !== CODE_GOD_REVIEW_VERSION ||
+    review.capability_version !== CODE_GOD_CAPABILITY_VERSION ||
     review.outcome !== "PASS" || review.scope_outcome !== "BOUNDED_CHECKS_CLEAR" ||
     review.authoritative !== false || review.trust_state !== CODE_GOD_TRUST_STATE ||
     review.requires_independent_evidence_receipt !== true
