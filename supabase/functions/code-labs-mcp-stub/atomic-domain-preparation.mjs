@@ -158,12 +158,27 @@ function matchedValues(value, patterns) {
   return Array.from(found).sort();
 }
 
+function normalizeExportSpecifiers(value) {
+  return String(value || "")
+    .split(",")
+    .map((part) => part.trim().replace(/^type\s+/i, "").split(/\s+as\s+/i).pop()?.trim())
+    .filter(Boolean);
+}
+
 function structuralInventory(value) {
+  const declarations = matchedValues(value, [
+    /\bexport\s+(?:declare\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)/g,
+    /\bexport\s+(?:declare\s+)?class\s+([A-Za-z_$][\w$]*)/g,
+    /\bexport\s+(?:declare\s+)?(?:const(?!\s+enum\b)|let|var)\s+([A-Za-z_$][\w$]*)/g,
+    /\bexport\s+(?:declare\s+)?interface\s+([A-Za-z_$][\w$]*)/g,
+    /\bexport\s+(?:declare\s+)?type\s+([A-Za-z_$][\w$]*)\s*=/g,
+    /\bexport\s+(?:declare\s+)?(?:const\s+)?enum\s+([A-Za-z_$][\w$]*)/g,
+  ]);
+  const specifiers = matchedValues(value, [
+    /\bexport\s+(?:type\s+)?\{([^}]+)\}/g,
+  ]).flatMap(normalizeExportSpecifiers);
   return {
-    exports: matchedValues(value, [
-      /\bexport\s+(?:async\s+)?(?:function|class|const|let|var)\s+([A-Za-z_$][\w$]*)/g,
-      /\bexport\s*\{([^}]+)\}/g,
-    ]).flatMap((item) => item.includes(",") ? item.split(",").map((part) => part.trim().split(/\s+as\s+/i).pop()).filter(Boolean) : [item]),
+    exports: Array.from(new Set([...declarations, ...specifiers])).sort(),
     default_export: /\bexport\s+default\b/.test(String(value || "")) ? ["default"] : [],
     symbols: matchedValues(value, [
       /^(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/gm,
