@@ -351,3 +351,303 @@ Deno.test("genuine secret shapes and line-anchored conflict markers still block"
     "Actual line-anchored conflict markers must remain blocked.",
   );
 });
+
+Deno.test("CG Repair Lab emits deterministic five-senses evidence without gaining authority", async () => {
+  const commitSha = "b".repeat(40);
+  const signalHash = "a".repeat(64);
+  const credentialValue = "sk-" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456";
+  const input = {
+    repo: "trevieisking/stream-bandit",
+    ref: commitSha,
+    selected_path: "code-labs/app.js",
+    manifest_paths: [
+      "code-labs/app.js",
+      "code-labs/dep.js",
+      "code-labs/page.html",
+      "supabase/functions/example/secret.js",
+    ],
+    coverage_complete: true,
+    files: [
+      {
+        path: "code-labs/app.js",
+        content: [
+          'import { dep } from "./dep.js";',
+          'import { dep } from "./dep.js";',
+          "export const app = dep;",
+        ].join("\n"),
+      },
+      {
+        path: "code-labs/dep.js",
+        content: "export const dep = true;\n",
+      },
+      {
+        path: "code-labs/page.html",
+        content:
+          '<!doctype html><html data-page="test"><body id="one"></body></html>\n',
+      },
+      {
+        path: "supabase/functions/example/secret.js",
+        content: 'const unsafe = "' + credentialValue + '";\n',
+      },
+    ],
+    intent: "Preserve working behaviour and inspect exact evidence.",
+    signal_references: [
+      { kind: "test", id: "run-1", outcome: "PASS", hash: signalHash },
+    ],
+    signal_references_complete: true,
+    questions: ["Does " + credentialValue + " appear?"],
+  };
+
+  const first = await scanRepositorySnapshot(input);
+  const second = await scanRepositorySnapshot(structuredClone(input));
+  const senses = first.machine_senses as Record<string, any>;
+
+  assert(
+    first.machine_senses_hash === second.machine_senses_hash,
+    "Identical evidence must produce the same five-senses hash.",
+  );
+  assert(
+    first.machine_senses_hash_version ===
+      "machine-senses-canonical-json-sha256-v1",
+    "The five-senses hash contract must be explicit.",
+  );
+  assert(
+    senses.registry_version === "code-labs-machine-senses-v1",
+    "The canonical machine-senses registry version must be present.",
+  );
+  assert(
+    Object.keys(senses.owners).join(",") === "eye,ear,nose,mouth,brain",
+    "The packet must expose exactly one owner for each of the five senses.",
+  );
+  assert(
+    senses.brain.required_senses.join(",") === "eye,ear,nose,mouth,brain",
+    "Brain must require all five canonical senses.",
+  );
+  assert(
+    senses.brain.evidence_complete === true &&
+      senses.brain.missing_evidence.length === 0,
+    "Complete exact evidence must be marked complete.",
+  );
+  assert(
+    senses.trust_state === "HOLD_UNTRUSTED_ADVISORY" &&
+      senses.brain.trust_state === "HOLD_UNTRUSTED_ADVISORY",
+    "Five-senses evidence must remain held and advisory.",
+  );
+  assert(
+    senses.brain.authoritative_for === "evidence-binding-only",
+    "Brain must not gain workflow, Writer, merge, or deployment authority.",
+  );
+  assert(
+    senses.mouth.can_approve === false &&
+      senses.mouth.can_write_github === false &&
+      senses.mouth.can_merge === false &&
+      senses.mouth.can_deploy === false,
+    "Mouth must remain explanation-only.",
+  );
+  assert(
+    senses.eye.commit_sha === commitSha &&
+      senses.eye.selected_path === "code-labs/app.js" &&
+      /^[a-f0-9]{64}$/.test(senses.eye.selected_source_sha256),
+    "Eye must bind the exact commit, path, and source hash.",
+  );
+  assert(
+    Object.values(senses.brain.sense_hashes).every((value) =>
+      /^[a-f0-9]{64}$/.test(String(value))
+    ),
+    "Every component sense must have a canonical SHA-256.",
+  );
+  assert(
+    /^[a-f0-9]{64}$/.test(first.machine_senses_hash),
+    "The complete machine-senses packet must have a canonical SHA-256.",
+  );
+  assert(
+    !JSON.stringify(senses).includes("created_at"),
+    "Dynamic timestamps must not enter the canonical packet.",
+  );
+  assert(
+    !JSON.stringify(senses).includes(credentialValue) &&
+      senses.mouth.questions[0] === "Does [REDACTED_CREDENTIAL] appear?",
+    "Credential-shaped values must be redacted from machine-senses output.",
+  );
+  assert(
+    first.read_only === true &&
+      first.wrote_database === false &&
+      first.wrote_github === false &&
+      first.replaced_selected_source === false,
+    "The legacy read-only scanner contract must remain unchanged.",
+  );
+  assert(
+    first.outcome === "CANDIDATE_READY" &&
+      /^[a-f0-9]{64}$/.test(String(first.proposed_candidate_hash || "")),
+    "The existing duplicate-only candidate behaviour must remain intact.",
+  );
+});
+
+Deno.test("CG Repair Lab five-senses hash ignores input ordering but detects evidence drift", async () => {
+  const files = [
+    {
+      path: "src/main.js",
+      content: 'import { dep } from "./dep.js";\nexport const main = dep;\n',
+    },
+    { path: "src/dep.js", content: "export const dep = true;\n" },
+  ];
+  const signals = [
+    { kind: "test", id: "run-1", outcome: "PASS", hash: "c".repeat(64) },
+    {
+      kind: "receipt",
+      id: "receipt-1",
+      outcome: "PASS",
+      hash: "d".repeat(64),
+    },
+  ];
+  const base = {
+    repo: "trevieisking/stream-bandit",
+    ref: "e".repeat(40),
+    selected_path: "src/main.js",
+    files,
+    manifest_paths: files.map((file) => file.path),
+    coverage_complete: true,
+    signal_references: signals,
+    signal_references_complete: true,
+  };
+
+  const original = await scanRepositorySnapshot(base);
+  const reordered = await scanRepositorySnapshot({
+    ...base,
+    files: [...files].reverse(),
+    manifest_paths: [...base.manifest_paths].reverse(),
+    signal_references: [...signals].reverse(),
+  });
+  const pathDrift = await scanRepositorySnapshot({
+    ...base,
+    selected_path: "src/dep.js",
+  });
+  const signalDrift = await scanRepositorySnapshot({
+    ...base,
+    signal_references: [
+      { ...signals[0], id: "run-2" },
+      signals[1],
+    ],
+  });
+  const repositoryDrift = await scanRepositorySnapshot({
+    ...base,
+    repo: "trevieisking/another-repository",
+  });
+
+  assert(
+    reordered.machine_senses_hash === original.machine_senses_hash,
+    "File, manifest, and signal ordering must not change the evidence hash.",
+  );
+  assert(
+    pathDrift.machine_senses_hash !== original.machine_senses_hash,
+    "Selected-path drift must invalidate the evidence hash.",
+  );
+  assert(
+    signalDrift.machine_senses_hash !== original.machine_senses_hash,
+    "External-signal drift must invalidate the evidence hash.",
+  );
+  assert(
+    repositoryDrift.machine_senses_hash !== original.machine_senses_hash,
+    "Repository-identity drift must invalidate the evidence hash.",
+  );
+});
+
+Deno.test("CG Repair Lab five-senses evidence fails closed when required proof is missing", async () => {
+  const base = {
+    repo: "trevieisking/stream-bandit",
+    ref: "f".repeat(40),
+    selected_path: "src/main.js",
+    files: [{ path: "src/main.js", content: "export const main = true;\n" }],
+    manifest_paths: ["src/main.js"],
+    coverage_complete: true,
+    signal_references: [
+      { kind: "test", id: "run-1", outcome: "PASS", hash: "a".repeat(64) },
+    ],
+    signal_references_complete: true,
+  };
+
+  const incompleteCoverage = await scanRepositorySnapshot({
+    ...base,
+    coverage_complete: false,
+  });
+  const invalidSignal = await scanRepositorySnapshot({
+    ...base,
+    signal_references: [
+      { kind: "test", id: "bad", outcome: "PASS", hash: "not-a-hash" },
+    ],
+  });
+  const emptySignals = await scanRepositorySnapshot({
+    ...base,
+    signal_references: [],
+  });
+  const invalidCommit = await scanRepositorySnapshot({
+    ...base,
+    ref: "not-a-commit-sha",
+  });
+
+  assert(
+    incompleteCoverage.machine_senses.brain.evidence_complete === false &&
+      incompleteCoverage.machine_senses.brain.missing_evidence.includes(
+        "eye.coverage.complete",
+      ),
+    "Incomplete repository coverage must fail closed.",
+  );
+  assert(
+    invalidSignal.machine_senses.brain.evidence_complete === false &&
+      invalidSignal.machine_senses.brain.missing_evidence.includes(
+        "ear.signals_complete",
+      ) &&
+      invalidSignal.machine_senses.brain.missing_evidence.includes(
+        "ear.signal:bad",
+      ),
+    "An invalid external-signal hash must fail closed and identify the signal.",
+  );
+  assert(
+    emptySignals.machine_senses.brain.evidence_complete === false &&
+      emptySignals.machine_senses.brain.missing_evidence.includes(
+        "ear.signals_complete",
+      ),
+    "An empty signal set must not be treated as complete Ear evidence.",
+  );
+  assert(
+    invalidCommit.machine_senses.brain.evidence_complete === false &&
+      invalidCommit.machine_senses.brain.missing_evidence.includes(
+        "eye.commit_sha",
+      ),
+    "An unverified commit identity must fail closed.",
+  );
+});
+
+Deno.test("CG Repair Lab five-senses evidence remains bounded at the scanner file limit", async () => {
+  const files = Array.from({ length: 600 }, (_, index) => ({
+    path: `src/file-${String(index).padStart(3, "0")}.js`,
+    content: `export const value${index} = ${index};\n`,
+  }));
+  const report = await scanRepositorySnapshot({
+    repo: "trevieisking/stream-bandit",
+    ref: "1".repeat(40),
+    selected_path: "src/file-000.js",
+    files,
+    manifest_paths: files.map((file) => file.path),
+    coverage_complete: true,
+    signal_references: [
+      {
+        kind: "test",
+        id: "bounded-600",
+        outcome: "PASS",
+        hash: "2".repeat(64),
+      },
+    ],
+    signal_references_complete: true,
+  });
+
+  assert(
+    report.machine_senses.eye.files.length === 600,
+    "The canonical Eye inventory must include the full bounded file set.",
+  );
+  assert(
+    report.machine_senses.brain.evidence_complete === true &&
+      /^[a-f0-9]{64}$/.test(report.machine_senses_hash),
+    "The bounded maximum file set must still produce complete deterministic evidence.",
+  );
+});
