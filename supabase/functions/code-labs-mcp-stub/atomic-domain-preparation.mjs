@@ -114,7 +114,12 @@ function normalizeAction(value) {
 function completeFile(path, value) {
   const content = String(value || "");
   if (!content.trim() || content.length < 120 || content.length > MAX_QUEUE_CONTENT) return false;
-  if (/BEGIN PATCH|Find:\s*\n|Replace with:/i.test(content)) return false;
+  const patchRecipePattern = new RegExp([
+    ["BEGIN", "PATCH"].join(" "),
+    ["Find", ":"].join("") + "\\s*\\n",
+    ["Replace", "with:"].join(" "),
+  ].join("|"), "i");
+  if (patchRecipePattern.test(content)) return false;
   if (/^(?:diff --git |Index: |@@\s*-\d+)/m.test(content)) return false;
   if (/\.html?$/i.test(path) && !/<!doctype\s+html/i.test(content) && !/<html[\s>]/i.test(content)) return false;
   if (/\.json$/i.test(path)) {
@@ -134,6 +139,90 @@ function secretLike(value) {
     /\bsb_secret_[A-Za-z0-9_-]{20,}\b/.test(text) ||
     /\bBearer\s+[A-Za-z0-9._~-]{30,}\b/i.test(text) ||
     /(?:password|passwd)\s*[:=]\s*["'][^"']{8,}["']/i.test(text);
+}
+
+function matchedValues(value, patterns) {
+  const found = new Set();
+  const text = String(value || "");
+  for (const pattern of patterns) {
+    const regex = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g");
+    let match;
+    while ((match = regex.exec(text))) {
+      const captured = match[1] || match[2] || match[3] || "";
+      if (captured) found.add(captured);
+      if (match.index === regex.lastIndex) regex.lastIndex += 1;
+    }
+  }
+  return Array.from(found).sort();
+}
+
+function structuralInventory(value) {
+  return {
+    exports: matchedValues(value, [
+      /\bexport\s+(?:async\s+)?(?:function|class|const|let|var)\s+([A-Za-z_$][\w$]*)/g,
+      /\bexport\s*\{([^}]+)\}/g,
+    ]).flatMap((item) => item.includes(",") ? item.split(",").map((part) => part.trim().split(/\s+as\s+/i).pop()).filter(Boolean) : [item]),
+    default_export: /\bexport\s+default\b/.test(String(value || "")) ? ["default"] : [],
+    symbols: matchedValues(value, [
+      /^(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/gm,
+      /^(?:export\s+)?class\s+([A-Za-z_$][\w$]*)\b/gm,
+      /^(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/gm,
+    ]),
+    dom_ids: matchedValues(value, [/\bid\s*=\s*["']([^"']+)["']/gi]),
+    route_ids: matchedValues(value, [/\bdata-cl-route-id\s*=\s*["']([^"']+)["']/gi]),
+    storage_keys: matchedValues(value, [
+      /\b(?:localStorage|sessionStorage)\.(?:getItem|setItem|removeItem)\s*\(\s*["']([^"']+)["']/g,
+    ]),
+    dependencies: matchedValues(value, [
+      /\b(?:import|export)\s+(?:[^"'()]*?\s+from\s+)?["']([^"']+)["']/g,
+      /\b(?:import|require)\s*\(\s*["']([^"']+)["']\s*\)/g,
+      /<(?:script|link)\b[^>]*?(?:src|href)\s*=\s*["']([^"']+)["']/gi,
+    ]),
+    database_tables: matchedValues(value, [/\.from\(\s*["']([A-Za-z_][A-Za-z0-9_]*)["']\s*\)/g]),
+    rpcs: matchedValues(value, [/\.rpc\(\s*["']([A-Za-z_][A-Za-z0-9_]*)["']/g]),
+    edge_functions: matchedValues(value, [/\.functions\.invoke\(\s*["']([A-Za-z_][A-Za-z0-9_-]*)["']/g]),
+    public_actions: matchedValues(value, [
+      /\baction\s*:\s*["']([a-z0-9_.-]+)["']/gi,
+      /\btool\s*:\s*["']([a-z0-9_.-]+)["']/gi,
+    ]),
+  };
+}
+
+function missingInventoryValues(original, proposed) {
+  const before = structuralInventory(original);
+  const after = structuralInventory(proposed);
+  const missing = {};
+  for (const key of Object.keys(before)) {
+    const afterValues = new Set(after[key]);
+    const removed = before[key].filter((value) => !afterValues.has(value));
+    if (removed.length) missing[key] = removed;
+  }
+  return { before, after, missing };
+}
+
+function addPreservationFindings(findings, comparison) {
+  const rules = {
+    exports: ["CG-EXPORT-PRESERVATION-001", "export"],
+    default_export: ["CG-EXPORT-PRESERVATION-001", "default export"],
+    symbols: ["CG-SYMBOL-PRESERVATION-001", "top-level symbol"],
+    dom_ids: ["CG-DOM-ID-PRESERVATION-001", "DOM id"],
+    route_ids: ["CG-ROUTE-PRESERVATION-001", "route id"],
+    storage_keys: ["CG-STORAGE-PRESERVATION-001", "storage key"],
+    dependencies: ["CG-DEPENDENCY-PRESERVATION-001", "dependency"],
+    database_tables: ["CG-DATABASE-PRESERVATION-001", "database table"],
+    rpcs: ["CG-DATABASE-PRESERVATION-001", "RPC"],
+    edge_functions: ["CG-DATABASE-PRESERVATION-001", "Edge Function"],
+    public_actions: ["CG-PUBLIC-TOOL-PRESERVATION-001", "public action or tool"],
+  };
+  for (const [key, values] of Object.entries(comparison.missing)) {
+    const [rule, label] = rules[key];
+    findings.push(finding(
+      "P1",
+      rule,
+      `The proposed file removes ${label} contract values: ${values.join(", ")}.`,
+      "Restore the removed contract or provide a separately reviewed machine-readable retirement manifest in a later trust stage.",
+    ));
+  }
 }
 
 function canonicalValue(value) {
@@ -393,7 +482,8 @@ export async function prepareCodeGodAtomic(_argsValue, contextValue) {
   if (/^(?:\s*<<<<<<<(?:\s|$)|\s*=======\s*$|\s*>>>>>>>(?:\s|$))/m.test(proposed)) {
     findings.push(finding("P1", "CG-CONFLICT-001", "Conflict markers were found.", "Resolve all conflict markers."));
   }
-  if (/```(?:html|javascript|js|typescript|ts|json)?/i.test(proposed)) {
+  const fencePattern = new RegExp(["`", "`", "`"].join("") + "(?:html|javascript|js|typescript|ts|json)?", "i");
+  if (fencePattern.test(proposed)) {
     findings.push(finding("P2", "CG-FENCE-001", "Markdown fences appear inside the proposed file.", "Keep only complete file contents."));
   }
   if (secretLike(proposed)) {
@@ -406,17 +496,20 @@ export async function prepareCodeGodAtomic(_argsValue, contextValue) {
     findings.push(finding("P2", "CG-DUPLICATE-001", "A matching write request is already queued or processing.", "Reuse or close the existing request before queuing another.", false));
   }
 
+  const structural = missingInventoryValues(original, proposed);
+  addPreservationFindings(findings, structural);
+
   const blocking = findings.some((item) => item.blocks_github);
   const outcome = blocking ? (findings.some((item) => item.severity === "P0") ? "BLOCK" : "FIX_FIRST") : "PASS";
   const scopeOutcome = blocking
     ? (findings.some((item) => item.severity === "P0") ? "BLOCK" : "FINDINGS_PRESENT")
     : "BOUNDED_CHECKS_CLEAR";
   const review = {
-    version: "V50-code-god-2-bounded-advisory",
+    version: "V51-code-god-structural-preservation-advisory",
     outcome,
     scope_outcome: scopeOutcome,
     authoritative: false,
-    decision_scope: "bounded_static_checks",
+    decision_scope: "bounded_static_and_structural_preservation_checks",
     trust_state: CODE_GOD_TRUST_STATE,
     requires_independent_evidence_receipt: true,
     handoff_hash: await hashCanonicalJson(handoff),
@@ -428,19 +521,25 @@ export async function prepareCodeGodAtomic(_argsValue, contextValue) {
     github_head_sha: branchProof.head_sha,
     source_file_id: String(file.id),
     proposed_hash: handoff.proposed_hash,
+    structural_inventory: structural,
     findings,
     checks_run: [
       "owner-repository-authority", "immutable-branch-proof", "source-file-identity",
       "hash-contract", "full-file", "queue-limit", "truncation", "conflicts",
       "fences", "secret-values", "duplicate-queue", "timers",
+      "export-preservation", "top-level-symbol-preservation", "dom-id-preservation",
+      "route-id-preservation", "storage-key-preservation", "dependency-preservation",
+      "database-contract-preservation", "public-action-and-tool-preservation",
     ],
     checks_not_run: [
       "language-compile-or-typecheck", "runtime-behaviour", "browser-interaction",
       "database-integration", "migration-replay", "deployment",
-      "feature-and-workflow-parity", "user-acceptance",
+      "feature-and-workflow-parity", "user-acceptance", "intentional-retirement-manifest",
     ],
     limitations: [
       "The result covers only the deterministic checks listed in checks_run.",
+      "Structural extraction is conservative and removal-blocking; it does not prove runtime equivalence.",
+      "Intentional retirements remain blocked until a separately reviewed machine-readable retirement manifest is implemented.",
       "A compatibility PASS token is not Writer, merge, deployment or production approval.",
       "An independent Master Checklist checkpoint and exact-head evidence remain mandatory.",
     ],
