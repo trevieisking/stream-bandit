@@ -31,6 +31,18 @@ const MAX_FILE_BYTES = 240000;
 const MAX_TOTAL_BYTES = 12000000;
 const MAX_FINDINGS = 500;
 const MAX_MAP_ITEMS = 1200;
+const MAX_MACHINE_SIGNALS = 100;
+const MACHINE_SENSES_REGISTRY_VERSION = "code-labs-machine-senses-v1";
+const MACHINE_SENSES_HASH_VERSION =
+  "machine-senses-canonical-json-sha256-v1";
+const MACHINE_SENSES_TRUST_STATE = "HOLD_UNTRUSTED_ADVISORY";
+const MACHINE_SENSES_REQUIRED = Object.freeze([
+  "eye",
+  "ear",
+  "nose",
+  "mouth",
+  "brain",
+]);
 const SUPPORTED = /\.(?:html?|css|m?js|cjs|jsx|ts|tsx|json|sql)$/i;
 const SKIP_PATH =
   /(^|\/)(?:node_modules|vendor|dist|build|coverage|\.git|\.github|archive|archives|backup|backups)(\/|$)|(?:^|\/)(?:\.env[^/]*|[^/]+\.(?:pem|key|p12|pfx))$/i;
@@ -149,6 +161,244 @@ async function digest(value: unknown) {
     new Uint8Array(bytes),
     (byte) => byte.toString(16).padStart(2, "0"),
   ).join("");
+}
+
+function canonicalValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalValue);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Row)
+        .filter(([, entry]) => entry !== undefined)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, entry]) => [key, canonicalValue(entry)]),
+    );
+  }
+  return value;
+}
+
+function canonicalUnorderedValue(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value
+      .map(canonicalUnorderedValue)
+      .sort((left, right) =>
+        JSON.stringify(left).localeCompare(JSON.stringify(right))
+      );
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Row)
+        .filter(([, entry]) => entry !== undefined)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, entry]) => [key, canonicalUnorderedValue(entry)]),
+    );
+  }
+  return value;
+}
+
+function canonicalJson(value: unknown) {
+  return JSON.stringify(canonicalValue(value));
+}
+
+async function hashCanonical(value: unknown) {
+  return await digest(canonicalJson(value));
+}
+
+function exactHashOrNull(value: unknown, length: 40 | 64) {
+  const output = String(value || "").trim().toLowerCase();
+  const pattern = length === 40 ? /^[a-f0-9]{40}$/ : /^[a-f0-9]{64}$/;
+  return pattern.test(output) ? output : null;
+}
+
+function normalizedMachineSignals(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, MAX_MACHINE_SIGNALS).map((entry) => {
+    const row = entry && typeof entry === "object" ? entry as Row : {};
+    const hashValue = String(row.hash || "").trim();
+    return {
+      kind: safeMessage(row.kind, 100),
+      id: safeMessage(row.id, 200),
+      outcome: safeMessage(row.outcome, 100),
+      hash: hashValue ? exactHashOrNull(hashValue, 64) : null,
+      hash_supplied: Boolean(hashValue),
+    };
+  }).sort((left, right) => canonicalJson(left).localeCompare(canonicalJson(right)));
+}
+
+function normalizedMachineFindings(findings: Finding[]) {
+  return findings.map((finding) => ({
+    severity: finding.severity,
+    rule_id: safeMessage(finding.rule_id, 120),
+    path: finding.path ? safeMessage(finding.path, 500) : null,
+    line: Number.isInteger(finding.line) && Number(finding.line) > 0
+      ? Number(finding.line)
+      : null,
+    message: safeMessage(finding.message, 500),
+    correction: safeMessage(finding.correction, 500),
+  })).sort((left, right) => canonicalJson(left).localeCompare(canonicalJson(right)));
+}
+
+function findingCounts(findings: Array<{ severity: string }>) {
+  const counts: Row = { P0: 0, P1: 0, P2: 0, P3: 0 };
+  for (const finding of findings) {
+    if (Object.prototype.hasOwnProperty.call(counts, finding.severity)) {
+      counts[finding.severity] += 1;
+    }
+  }
+  return counts;
+}
+
+async function buildMachineSensesEvidence(input: {
+  repository: string;
+  ref: string;
+  selected_path: string;
+  files: SnapshotFile[];
+  manifest_paths: string[];
+  coverage: Row;
+  findings: Finding[];
+  dependency_map: unknown;
+  database_map: unknown;
+  secret_reference_map: unknown;
+  debug_report: unknown;
+  candidate_hash: string | null;
+  outcome: string;
+  next_stage: string;
+  intent?: unknown;
+  signal_references?: unknown;
+  signal_references_complete?: boolean;
+  questions?: unknown;
+}) {
+  const fileInventory: Array<{ path: string; sha256: string; bytes: number }> = [];
+  for (const file of input.files) {
+    fileInventory.push({
+      path: normalizePath(file.path),
+      sha256: await digest(file.content),
+      bytes: new TextEncoder().encode(file.content).length,
+    });
+  }
+  fileInventory.sort((left, right) => left.path.localeCompare(right.path));
+  const selectedFile = fileInventory.find((file) =>
+    file.path === input.selected_path
+  );
+  const manifestPaths = Array.from(new Set(input.manifest_paths.map(normalizePath)))
+    .sort();
+  const findings = normalizedMachineFindings(input.findings);
+  const signals = normalizedMachineSignals(input.signal_references);
+  const invalidSignals = signals.filter((signal) =>
+    !signal.kind || !signal.id || !signal.outcome ||
+    (signal.hash_supplied && !signal.hash)
+  );
+  const commitSha = exactHashOrNull(input.ref, 40);
+  const candidateHash = input.candidate_hash
+    ? exactHashOrNull(input.candidate_hash, 64)
+    : null;
+
+  const eye = {
+    owner: "repository-source-and-identity",
+    repository: safeMessage(input.repository, 200),
+    requested_ref: safeMessage(input.ref, 200),
+    commit_sha: commitSha,
+    selected_path: safeMessage(input.selected_path, 500),
+    selected_source_sha256: selectedFile?.sha256 || null,
+    files: fileInventory,
+    file_manifest_hash: await hashCanonical(manifestPaths),
+    coverage: canonicalValue(input.coverage),
+  };
+  const ear = {
+    owner: "intent-and-external-signal-references",
+    intent: safeMessage(
+      input.intent || "Analyze the selected source without changing it.",
+      1000,
+    ),
+    signals: signals.map(({ hash_supplied: _hashSupplied, ...signal }) => signal),
+    signal_count: signals.length,
+    signals_complete: input.signal_references_complete === true &&
+      signals.length > 0 && invalidSignals.length === 0,
+  };
+  const nose = {
+    owner: "risk-findings-and-contract-maps",
+    findings,
+    finding_counts: findingCounts(findings),
+    dependency_map_hash: await hashCanonical(
+      canonicalUnorderedValue(input.dependency_map),
+    ),
+    database_map_hash: await hashCanonical(
+      canonicalUnorderedValue(input.database_map),
+    ),
+    secret_reference_map_hash: await hashCanonical(
+      canonicalUnorderedValue(input.secret_reference_map),
+    ),
+    debug_report_hash: await hashCanonical(
+      canonicalUnorderedValue(input.debug_report),
+    ),
+    candidate_hash: candidateHash,
+    credential_values_exposed: false,
+  };
+  const questions = Array.isArray(input.questions)
+    ? input.questions.slice(0, 5).map((question) => safeMessage(question, 300))
+    : [];
+  const mouth = {
+    owner: "redacted-explanation-and-next-step",
+    summary: safeMessage(
+      "CG Repair Lab outcome " + input.outcome +
+        " was bound to exact repository evidence for independent review.",
+      1000,
+    ),
+    next_stage: safeMessage(input.next_stage, 500),
+    questions,
+    can_approve: false,
+    can_write_github: false,
+    can_merge: false,
+    can_deploy: false,
+  };
+  const missingEvidence = [
+    ...(commitSha ? [] : ["eye.commit_sha"]),
+    ...(selectedFile ? [] : ["eye.selected_source_sha256"]),
+    ...(input.coverage.complete === true ? [] : ["eye.coverage.complete"]),
+    ...(ear.signals_complete ? [] : ["ear.signals_complete"]),
+    ...invalidSignals.map((signal) =>
+      "ear.signal:" + (signal.id || "unidentified")
+    ),
+    ...(input.candidate_hash && !candidateHash ? ["nose.candidate_hash"] : []),
+  ].sort();
+  const brain = {
+    owner: "canonicalization-hash-and-completeness",
+    registry_version: MACHINE_SENSES_REGISTRY_VERSION,
+    hash_version: MACHINE_SENSES_HASH_VERSION,
+    trust_state: MACHINE_SENSES_TRUST_STATE,
+    authoritative_for: "evidence-binding-only",
+    required_senses: MACHINE_SENSES_REQUIRED,
+    sense_hashes: {
+      eye: await hashCanonical(eye),
+      ear: await hashCanonical(ear),
+      nose: await hashCanonical(nose),
+      mouth: await hashCanonical(mouth),
+    },
+    missing_evidence: missingEvidence,
+    evidence_complete: missingEvidence.length === 0,
+    code_god_required: true,
+    independent_evidence_required: true,
+  };
+  const machineSenses = {
+    registry_version: MACHINE_SENSES_REGISTRY_VERSION,
+    trust_state: MACHINE_SENSES_TRUST_STATE,
+    owners: {
+      eye: eye.owner,
+      ear: ear.owner,
+      nose: nose.owner,
+      mouth: mouth.owner,
+      brain: brain.owner,
+    },
+    eye,
+    ear,
+    nose,
+    mouth,
+    brain,
+  };
+  return {
+    machine_senses: machineSenses,
+    machine_senses_hash: await hashCanonical(machineSenses),
+    machine_senses_hash_version: MACHINE_SENSES_HASH_VERSION,
+  };
 }
 
 async function one(path: string) {
@@ -467,6 +717,10 @@ export async function scanRepositorySnapshot(input: {
   manifest_paths?: string[];
   coverage_complete?: boolean;
   skipped_paths?: string[];
+  intent?: unknown;
+  signal_references?: unknown;
+  signal_references_complete?: boolean;
+  questions?: unknown;
 }) {
   const files = input.files
     .filter((file) => supportedPath(file.path))
@@ -658,6 +912,43 @@ export async function scanRepositorySnapshot(input: {
     : candidateCode
     ? "CANDIDATE_READY"
     : "READY_FOR_REVIEW";
+  const coverage = {
+    complete: coverageComplete,
+    indexed_files: files.length,
+    indexed_live_pages: files.filter((file) => isLivePage(file.path)).length,
+    manifest_files: pathSet.size,
+    skipped_paths: (input.skipped_paths || []).slice(0, 200),
+    credential_value_files: credentialFiles,
+  };
+  const debugReport = {
+    missing_dependencies: missingDependencies,
+    duplicate_symbols: duplicateSymbols,
+    local_storage_calls: localStorageMap,
+    write_routes: databaseMap.write_routes,
+  };
+  const nextStage = candidateCode
+    ? "Code God deterministic review"
+    : "Review findings and prepare a complete-file candidate";
+  const machineSenses = await buildMachineSensesEvidence({
+    repository: input.repo,
+    ref: input.ref,
+    selected_path: input.selected_path,
+    files,
+    manifest_paths: Array.from(pathSet),
+    coverage,
+    findings,
+    dependency_map: dependencyMap,
+    database_map: databaseMap,
+    secret_reference_map: secretReferences,
+    debug_report: debugReport,
+    candidate_hash: candidateHash,
+    outcome,
+    next_stage: nextStage,
+    intent: input.intent,
+    signal_references: input.signal_references,
+    signal_references_complete: input.signal_references_complete,
+    questions: input.questions,
+  });
 
   return {
     ok: coverageComplete,
@@ -678,29 +969,16 @@ export async function scanRepositorySnapshot(input: {
     repository: input.repo,
     ref: input.ref,
     selected_path: input.selected_path,
-    coverage: {
-      complete: coverageComplete,
-      indexed_files: files.length,
-      indexed_live_pages: files.filter((file) => isLivePage(file.path)).length,
-      manifest_files: pathSet.size,
-      skipped_paths: (input.skipped_paths || []).slice(0, 200),
-      credential_value_files: credentialFiles,
-    },
+    coverage,
     findings,
     dependency_map: dependencyMap,
-    debug_report: {
-      missing_dependencies: missingDependencies,
-      duplicate_symbols: duplicateSymbols,
-      local_storage_calls: localStorageMap,
-      write_routes: databaseMap.write_routes,
-    },
+    debug_report: debugReport,
     database_map: databaseMap,
     secret_reference_map: secretReferences,
     proposed_complete_file_candidate: candidateCode,
     proposed_candidate_hash: candidateHash,
-    next_stage: candidateCode
-      ? "Code God deterministic review"
-      : "Review findings and prepare a complete-file candidate",
+    next_stage: nextStage,
+    ...machineSenses,
   };
 }
 
@@ -913,6 +1191,10 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
       manifest_paths: [],
       coverage_complete: false,
       skipped_paths: ["Repository tree was truncated by GitHub."],
+      intent: args.intent,
+      signal_references: args.signal_references,
+      signal_references_complete: args.signal_references_complete === true,
+      questions: args.questions,
     });
   }
   const blobs: Row[] = Array.isArray(tree.tree)
@@ -949,6 +1231,10 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
       skipped_paths: [
         "The live-page and backend seed set exceeds the bounded scan limit.",
       ],
+      intent: args.intent,
+      signal_references: args.signal_references,
+      signal_references_complete: args.signal_references_complete === true,
+      questions: args.questions,
     });
   }
   const fetched = new Map<string, SnapshotFile>();
@@ -1007,6 +1293,10 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
     coverage_complete: liveCoverage && selectedCoverage && sizeCoverage &&
       skipped.length === 0,
     skipped_paths: skipped,
+    intent: args.intent,
+    signal_references: args.signal_references,
+    signal_references_complete: args.signal_references_complete === true,
+    questions: args.questions,
   });
   return {
     ...report,
