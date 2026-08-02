@@ -90,12 +90,26 @@ async function reviewedContext() {
   return { context, handoffResult, reviewResult };
 }
 
+async function reviewMutation(mutator) {
+  const context = baseContext();
+  const handoffResult = await prepareRepoHandoffAtomic({
+    fields: { action: "change", branch: "fix/example-repair" },
+  }, context);
+  context.file = {
+    ...context.file,
+    updated_at: "2026-07-28T14:01:00.000Z",
+    metadata: { ...context.file.metadata, repo_handoff: handoffResult.handoff },
+  };
+  await mutator({ context, handoff: handoffResult.handoff });
+  context.now = "2026-07-28T14:02:00.000Z";
+  return await prepareCodeGodAtomic({}, context);
+}
+
 test("Repo handoff is pure, atomic and bound to immutable branch proof", async () => {
   const context = baseContext();
   const result = await prepareRepoHandoffAtomic({
     fields: { action: "change", branch: "fix/example-repair" },
   }, context);
-
   assert.equal(result.payload.effects[0].kind, "record_update");
   assert.equal(result.payload.effects[1].kind, "receipt_insert");
   assert.equal(result.handoff.current_hash, await hashUtf8Text(currentCode));
@@ -175,7 +189,6 @@ test("Writer payload binds exact review, branch, blob and independent checkpoint
     },
   }, context);
   const request = result.request;
-
   assert.equal(result.payload.effects[0].kind, "write_request_insert");
   assert.equal(result.payload.effects[1].kind, "receipt_insert");
   assert.equal(request.code_god_handoff_hash, reviewResult.review.handoff_hash);
@@ -191,8 +204,7 @@ test("Writer payload binds exact review, branch, blob and independent checkpoint
     result.payload.response.schema_binding_required_before_cutover,
     [
       "github_base_sha", "github_head_sha", "code_god_scope_outcome",
-      "independent_evidence_checkpoint_id",
-      "independent_evidence_receipt_id", "safety_note",
+      "independent_evidence_checkpoint_id", "independent_evidence_receipt_id", "safety_note",
     ],
   );
   assert.deepEqual(result.payload.response.independent_evidence, {
@@ -245,7 +257,13 @@ test("Writer preparation blocks a changed branch head", async () => {
   context.branch_proof.head_sha = "5".repeat(40);
   context.blob_snapshot.head_sha = context.branch_proof.head_sha;
   await assert.rejects(
-    prepareGithubWriterAtomic({ confirmed: true, fields: { independent_evidence_checkpoint_id: checkpointId, independent_evidence_receipt_id: receiptId } }, context),
+    prepareGithubWriterAtomic({
+      confirmed: true,
+      fields: {
+        independent_evidence_checkpoint_id: checkpointId,
+        independent_evidence_receipt_id: receiptId,
+      },
+    }, context),
     /reviewed branch head changed/,
   );
 });
@@ -254,7 +272,13 @@ test("Writer preparation blocks an active duplicate request", async () => {
   const { context } = await reviewedContext();
   context.queue_snapshot.active_matching_requests = 1;
   await assert.rejects(
-    prepareGithubWriterAtomic({ confirmed: true, fields: { independent_evidence_checkpoint_id: checkpointId, independent_evidence_receipt_id: receiptId } }, context),
+    prepareGithubWriterAtomic({
+      confirmed: true,
+      fields: {
+        independent_evidence_checkpoint_id: checkpointId,
+        independent_evidence_receipt_id: receiptId,
+      },
+    }, context),
     /already queued or processing/,
   );
 });
@@ -266,16 +290,13 @@ test("Domain preparation declares all external evidence and missing schema bindi
   );
   assert.ok(ATOMIC_DOMAIN_PREPARATION_COVERAGE.external_evidence_required.includes("immutable_branch_proof"));
   assert.ok(
-    ATOMIC_DOMAIN_PREPARATION_COVERAGE.external_evidence_required.includes(
-      "independent_review_checkpoint_receipt",
-    ),
+    ATOMIC_DOMAIN_PREPARATION_COVERAGE.external_evidence_required.includes("independent_review_checkpoint_receipt"),
   );
   assert.deepEqual(
     ATOMIC_DOMAIN_PREPARATION_COVERAGE.schema_binding_required_before_cutover,
     [
       "github_base_sha", "github_head_sha", "code_god_scope_outcome",
-      "independent_evidence_checkpoint_id",
-      "independent_evidence_receipt_id", "safety_note",
+      "independent_evidence_checkpoint_id", "independent_evidence_receipt_id", "safety_note",
     ],
   );
 });
@@ -288,4 +309,148 @@ test("Pure domain module contains no database, GitHub or ambient-clock calls", a
   assert.doesNotMatch(source, /Date\.now\s*\(/);
   assert.doesNotMatch(source, /new Date\s*\(/);
   assert.doesNotMatch(source, /crypto\.randomUUID\s*\(/);
+});
+
+test("CL-TRUST-001 frozen 15-case Code God benchmark", async (t) => {
+  const cases = [
+    {
+      id: "clean-control",
+      expected: "PASS",
+      run: async () => (await reviewedContext()).reviewResult,
+    },
+    {
+      id: "repository-provenance-drift",
+      rule: "CG-IDENTITY-001",
+      expected: "FIX_FIRST",
+      run: () => reviewMutation(({ handoff }) => { handoff.source_commit_sha = "9".repeat(40); }),
+    },
+    {
+      id: "selected-file-identity-drift",
+      rule: "CG-FILE-IDENTITY-001",
+      expected: "FIX_FIRST",
+      run: () => reviewMutation(({ handoff }) => { handoff.source_file_id = "different-file"; }),
+    },
+    {
+      id: "branch-proof-drift",
+      rule: "CG-BRANCH-PROOF-001",
+      expected: "FIX_FIRST",
+      run: () => reviewMutation(({ handoff }) => { handoff.github_head_sha = "8".repeat(40); }),
+    },
+    {
+      id: "noncanonical-hash-version",
+      rule: "CG-HASH-VERSION-001",
+      expected: "FIX_FIRST",
+      run: () => reviewMutation(({ handoff }) => { handoff.hash_version = "legacy"; }),
+    },
+    {
+      id: "candidate-content-tampering",
+      rule: "CG-HASH-BINDING-001",
+      expected: "FIX_FIRST",
+      run: () => reviewMutation(({ handoff }) => { handoff.proposed += "\nchanged"; }),
+    },
+    {
+      id: "incomplete-file",
+      rule: "CG-FULLFILE-001",
+      expected: "FIX_FIRST",
+      run: () => reviewMutation(async ({ handoff }) => {
+        handoff.proposed = "short";
+        handoff.proposed_hash = await hashUtf8Text(handoff.proposed);
+      }),
+    },
+    {
+      id: "truncated-file",
+      rule: "CG-TRUNCATION-001",
+      expected: "FIX_FIRST",
+      run: () => reviewMutation(async ({ handoff }) => {
+        handoff.proposed = "export const stillComplete = true;\n".repeat(4);
+        handoff.proposed_hash = await hashUtf8Text(handoff.proposed);
+      }),
+    },
+    {
+      id: "merge-conflict-markers",
+      rule: "CG-CONFLICT-001",
+      expected: "FIX_FIRST",
+      run: () => reviewMutation(async ({ handoff }) => {
+        handoff.proposed += "\n<<<<<<< ours\nvalue\n=======\nother\n>>>>>>> theirs\n";
+        handoff.proposed_hash = await hashUtf8Text(handoff.proposed);
+      }),
+    },
+    {
+      id: "markdown-fence-contamination",
+      rule: "CG-FENCE-001",
+      expected: "FIX_FIRST",
+      run: () => reviewMutation(async ({ handoff }) => {
+        const fence = String.fromCharCode(96).repeat(3);
+        handoff.proposed += "\n" + fence + "js\nconsole.log('review');\n" + fence + "\n";
+        handoff.proposed_hash = await hashUtf8Text(handoff.proposed);
+      }),
+    },
+    {
+      id: "secret-shaped-value",
+      rule: "CG-SECRET-001",
+      expected: "BLOCK",
+      run: () => reviewMutation(async ({ handoff }) => {
+        handoff.proposed += "\nconst password = \"very-secret-password\";\n";
+        handoff.proposed_hash = await hashUtf8Text(handoff.proposed);
+      }),
+    },
+    {
+      id: "frequent-duplicate-timer",
+      rule: "CG-TIMER-001",
+      expected: "PASS",
+      nonblocking: true,
+      run: () => reviewMutation(async ({ handoff }) => {
+        handoff.proposed += "\nset" + "Interval(() => refresh(), 500);\n";
+        handoff.proposed_hash = await hashUtf8Text(handoff.proposed);
+      }),
+    },
+    {
+      id: "duplicate-active-queue",
+      rule: "CG-DUPLICATE-001",
+      expected: "PASS",
+      nonblocking: true,
+      run: () => reviewMutation(({ context }) => { context.queue_snapshot.active_matching_requests = 1; }),
+    },
+    {
+      id: "incomplete-queue-evidence",
+      rejects: /queue evidence is incomplete/,
+      run: () => reviewMutation(({ context }) => { context.queue_snapshot.complete = false; }),
+    },
+    {
+      id: "post-review-branch-drift",
+      rejects: /reviewed branch head changed/,
+      run: async () => {
+        const { context } = await reviewedContext();
+        context.branch_proof.head_sha = "5".repeat(40);
+        context.blob_snapshot.head_sha = context.branch_proof.head_sha;
+        return await prepareGithubWriterAtomic({
+          confirmed: true,
+          fields: {
+            independent_evidence_checkpoint_id: checkpointId,
+            independent_evidence_receipt_id: receiptId,
+          },
+        }, context);
+      },
+    },
+  ];
+
+  assert.equal(cases.length, 15);
+  let blockingMisses = 0;
+  for (const benchmark of cases) {
+    await t.test(benchmark.id, async () => {
+      if (benchmark.rejects) {
+        await assert.rejects(benchmark.run(), benchmark.rejects);
+        return;
+      }
+      const result = await benchmark.run();
+      const review = result.review;
+      assert.equal(review.outcome, benchmark.expected);
+      if (!benchmark.rule) return;
+      const finding = review.findings.find((item) => item.rule_id === benchmark.rule);
+      if (!finding && !benchmark.nonblocking) blockingMisses += 1;
+      assert.ok(finding, `${benchmark.id} must emit ${benchmark.rule}`);
+      assert.equal(finding.blocks_github, benchmark.nonblocking !== true);
+    });
+  }
+  assert.equal(blockingMisses, 0, "No blocking benchmark defect may be missed");
 });
