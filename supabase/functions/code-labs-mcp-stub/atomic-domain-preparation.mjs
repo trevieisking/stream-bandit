@@ -2,8 +2,14 @@ const HASH_VERSION = "sha256-utf8-v1";
 const HANDOFF_HASH_VERSION = "canonical-json-v1";
 const INDEPENDENT_EVIDENCE_KIND = "master-checklist-independent-gate-v1";
 const CODE_GOD_TRUST_STATE = "HOLD_UNTRUSTED_ADVISORY";
+const CODE_GOD_REVIEW_VERSION = "V50-code-god-2-bounded-advisory";
+const CODE_GOD_CAPABILITY_VERSION = "code-god-structural-preservation-and-five-senses-v3";
 const MAX_QUEUE_CONTENT = 180000;
+const MAX_REVIEW_INPUTS = 12;
+const MAX_REVIEW_INPUT_TEXT = 4000;
 const PROTECTED_BRANCHES = new Set(["main", "master", "production", "live", "gh-pages"]);
+const CODE_GOD_SENSE_ORDER = Object.freeze(["eyes", "nose", "ears", "brain", "mouth"]);
+const REVIEW_INPUT_KINDS = new Set(["instruction", "change", "patch", "fix", "constraint", "question"]);
 
 export const ATOMIC_DOMAIN_PREPARATION_COVERAGE = Object.freeze({
   prepared: Object.freeze([
@@ -114,7 +120,12 @@ function normalizeAction(value) {
 function completeFile(path, value) {
   const content = String(value || "");
   if (!content.trim() || content.length < 120 || content.length > MAX_QUEUE_CONTENT) return false;
-  if (/BEGIN PATCH|Find:\s*\n|Replace with:/i.test(content)) return false;
+  const patchRecipePattern = new RegExp([
+    ["BEGIN", "PATCH"].join(" "),
+    ["Find", ":"].join("") + "\\s*\\n",
+    ["Replace", "with:"].join(" "),
+  ].join("|"), "i");
+  if (patchRecipePattern.test(content)) return false;
   if (/^(?:diff --git |Index: |@@\s*-\d+)/m.test(content)) return false;
   if (/\.html?$/i.test(path) && !/<!doctype\s+html/i.test(content) && !/<html[\s>]/i.test(content)) return false;
   if (/\.json$/i.test(path)) {
@@ -134,6 +145,244 @@ function secretLike(value) {
     /\bsb_secret_[A-Za-z0-9_-]{20,}\b/.test(text) ||
     /\bBearer\s+[A-Za-z0-9._~-]{30,}\b/i.test(text) ||
     /(?:password|passwd)\s*[:=]\s*["'][^"']{8,}["']/i.test(text);
+}
+
+function matchedValues(value, patterns) {
+  const found = new Set();
+  const text = String(value || "");
+  for (const pattern of patterns) {
+    const regex = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g");
+    let match;
+    while ((match = regex.exec(text))) {
+      const captured = match[1] || match[2] || match[3] || "";
+      if (captured) found.add(captured);
+      if (match.index === regex.lastIndex) regex.lastIndex += 1;
+    }
+  }
+  return Array.from(found).sort();
+}
+
+function normalizeExportSpecifiers(value) {
+  return String(value || "")
+    .split(",")
+    .map((part) => part.trim().replace(/^type\s+/i, "").split(/\s+as\s+/i).pop()?.trim())
+    .filter(Boolean);
+}
+
+function topLevelIndex(value, target) {
+  const text = String(value || "");
+  let quote = "";
+  let escaped = false;
+  let round = 0;
+  let square = 0;
+  let curly = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (quote) {
+      if (escaped) {
+        escaped = false;
+      } else if (character === "\\") {
+        escaped = true;
+      } else if (character === quote) {
+        quote = "";
+      }
+      continue;
+    }
+    if (character === "'" || character === '"' || character === "`") {
+      quote = character;
+      continue;
+    }
+    if (character === "(") round += 1;
+    else if (character === ")") round = Math.max(0, round - 1);
+    else if (character === "[") square += 1;
+    else if (character === "]") square = Math.max(0, square - 1);
+    else if (character === "{") curly += 1;
+    else if (character === "}") curly = Math.max(0, curly - 1);
+    else if (character === target && round === 0 && square === 0 && curly === 0) return index;
+  }
+  return -1;
+}
+
+function splitTopLevel(value) {
+  const text = String(value || "");
+  const parts = [];
+  let cursor = 0;
+  while (cursor <= text.length) {
+    const relative = topLevelIndex(text.slice(cursor), ",");
+    if (relative < 0) {
+      parts.push(text.slice(cursor));
+      break;
+    }
+    parts.push(text.slice(cursor, cursor + relative));
+    cursor += relative + 1;
+  }
+  return parts;
+}
+
+function bindingNames(value) {
+  let pattern = String(value || "").trim();
+  if (!pattern) return [];
+  if (pattern.startsWith("...")) pattern = pattern.slice(3).trim();
+  const defaultIndex = topLevelIndex(pattern, "=");
+  if (defaultIndex >= 0) pattern = pattern.slice(0, defaultIndex).trim();
+  if (pattern.startsWith("[") && pattern.endsWith("]")) {
+    return splitTopLevel(pattern.slice(1, -1)).flatMap(bindingNames);
+  }
+  if (pattern.startsWith("{") && pattern.endsWith("}")) {
+    return splitTopLevel(pattern.slice(1, -1)).flatMap((entry) => {
+      const property = entry.trim();
+      if (!property) return [];
+      if (property.startsWith("...")) return bindingNames(property.slice(3));
+      const colonIndex = topLevelIndex(property, ":");
+      return bindingNames(colonIndex >= 0 ? property.slice(colonIndex + 1) : property);
+    });
+  }
+  const typeIndex = topLevelIndex(pattern, ":");
+  if (typeIndex >= 0) pattern = pattern.slice(0, typeIndex).trim();
+  const identifier = pattern.match(/^([A-Za-z_$][\w$]*)$/);
+  return identifier ? [identifier[1]] : [];
+}
+
+function declarationBody(text, start) {
+  let quote = "";
+  let escaped = false;
+  let round = 0;
+  let square = 0;
+  let curly = 0;
+  for (let index = start; index < text.length; index += 1) {
+    const character = text[index];
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (character === "\\") escaped = true;
+      else if (character === quote) quote = "";
+      continue;
+    }
+    if (character === "'" || character === '"' || character === "`") {
+      quote = character;
+      continue;
+    }
+    if (character === "(") round += 1;
+    else if (character === ")") round = Math.max(0, round - 1);
+    else if (character === "[") square += 1;
+    else if (character === "]") square = Math.max(0, square - 1);
+    else if (character === "{") curly += 1;
+    else if (character === "}") curly = Math.max(0, curly - 1);
+    else if (character === ";" && round === 0 && square === 0 && curly === 0) {
+      return text.slice(start, index);
+    } else if (character === "\n" && round === 0 && square === 0 && curly === 0) {
+      const current = text.slice(start, index).trimEnd();
+      if (/[,=:>]$/.test(current)) continue;
+      const next = text.slice(index + 1).match(/^\s*(export|import|const|let|var|function|class|interface|type|enum|return|if|for|while|switch|try|throw)\b/);
+      if (next) return text.slice(start, index);
+    }
+  }
+  return text.slice(start);
+}
+
+function variableBindings(value, exportedOnly) {
+  const text = String(value || "");
+  const found = new Set();
+  const declaration = /^(export\s+)?(?:declare\s+)?(?:const(?!\s+enum\b)|let|var)\s+/gm;
+  let match;
+  while ((match = declaration.exec(text))) {
+    if (exportedOnly && !match[1]) continue;
+    const body = declarationBody(text, declaration.lastIndex);
+    for (const declarator of splitTopLevel(body)) {
+      for (const name of bindingNames(declarator)) found.add(name);
+    }
+  }
+  return Array.from(found).sort();
+}
+
+function wildcardReExports(value) {
+  const text = String(value || "");
+  const found = new Set();
+  const pattern = /^export\s+\*\s*(?:as\s+([A-Za-z_$][\w$]*)\s+)?from\s+["']([^"']+)["']/gm;
+  let match;
+  while ((match = pattern.exec(text))) {
+    found.add(match[1] ? `* as ${match[1]} from ${match[2]}` : `* from ${match[2]}`);
+  }
+  return Array.from(found).sort();
+}
+
+function structuralInventory(value) {
+  const text = String(value || "");
+  const declarations = matchedValues(text, [
+    /^export\s+(?:declare\s+)?(?:async\s+)?function(?:\s*\*\s*|\s+)([A-Za-z_$][\w$]*)/gm,
+    /^export\s+(?:declare\s+)?class\s+([A-Za-z_$][\w$]*)/gm,
+    /^export\s+(?:declare\s+)?interface\s+([A-Za-z_$][\w$]*)/gm,
+    /^export\s+(?:declare\s+)?type\s+([A-Za-z_$][\w$]*)\s*=/gm,
+    /^export\s+(?:declare\s+)?(?:const\s+)?enum\s+([A-Za-z_$][\w$]*)/gm,
+  ]);
+  const exportedVariables = variableBindings(text, true);
+  const specifiers = matchedValues(text, [
+    /^export\s+(?:type\s+)?\{([^}]+)\}/gm,
+  ]).flatMap(normalizeExportSpecifiers);
+  const topLevelFunctionsAndClasses = matchedValues(text, [
+    /^(?:export\s+)?(?:declare\s+)?(?:async\s+)?function(?:\s*\*\s*|\s+)([A-Za-z_$][\w$]*)\s*\(/gm,
+    /^(?:export\s+)?(?:declare\s+)?class\s+([A-Za-z_$][\w$]*)\b/gm,
+  ]);
+  return {
+    exports: Array.from(new Set([...declarations, ...exportedVariables, ...specifiers])).sort(),
+    wildcard_exports: wildcardReExports(text),
+    default_export: /\bexport\s+default\b/.test(text) ? ["default"] : [],
+    symbols: Array.from(new Set([...topLevelFunctionsAndClasses, ...variableBindings(text, false)])).sort(),
+    dom_ids: matchedValues(text, [/\bid\s*=\s*["']([^"']+)["']/gi]),
+    route_ids: matchedValues(text, [/\bdata-cl-route-id\s*=\s*["']([^"']+)["']/gi]),
+    storage_keys: matchedValues(text, [
+      /\b(?:localStorage|sessionStorage)\.(?:getItem|setItem|removeItem)\s*\(\s*["']([^"']+)["']/g,
+    ]),
+    dependencies: matchedValues(text, [
+      /\b(?:import|export)\s+(?:[^"'()]*?\s+from\s+)?["']([^"']+)["']/g,
+      /\b(?:import|require)\s*\(\s*["']([^"']+)["']\s*\)/g,
+      /<(?:script|link)\b[^>]*?(?:src|href)\s*=\s*["']([^"']+)["']/gi,
+    ]),
+    database_tables: matchedValues(text, [/\.from\(\s*["']([A-Za-z_][A-Za-z0-9_]*)["']\s*\)/g]),
+    rpcs: matchedValues(text, [/\.rpc\(\s*["']([A-Za-z_][A-Za-z0-9_]*)["']/g]),
+    edge_functions: matchedValues(text, [/\.functions\.invoke\(\s*["']([A-Za-z_][A-Za-z0-9_-]*)["']/g]),
+    public_actions: matchedValues(text, [
+      /\baction\s*:\s*["']([a-z0-9_.-]+)["']/gi,
+      /\btool\s*:\s*["']([a-z0-9_.-]+)["']/gi,
+    ]),
+  };
+}
+
+function missingInventoryValues(original, proposed) {
+  const before = structuralInventory(original);
+  const after = structuralInventory(proposed);
+  const missing = {};
+  for (const key of Object.keys(before)) {
+    const afterValues = new Set(after[key]);
+    const removed = before[key].filter((value) => !afterValues.has(value));
+    if (removed.length) missing[key] = removed;
+  }
+  return { before, after, missing };
+}
+
+function addPreservationFindings(findings, comparison) {
+  const rules = {
+    exports: ["CG-EXPORT-PRESERVATION-001", "export"],
+    wildcard_exports: ["CG-EXPORT-PRESERVATION-001", "wildcard re-export"],
+    default_export: ["CG-EXPORT-PRESERVATION-001", "default export"],
+    symbols: ["CG-SYMBOL-PRESERVATION-001", "top-level symbol"],
+    dom_ids: ["CG-DOM-ID-PRESERVATION-001", "DOM id"],
+    route_ids: ["CG-ROUTE-PRESERVATION-001", "route id"],
+    storage_keys: ["CG-STORAGE-PRESERVATION-001", "storage key"],
+    dependencies: ["CG-DEPENDENCY-PRESERVATION-001", "dependency"],
+    database_tables: ["CG-DATABASE-PRESERVATION-001", "database table"],
+    rpcs: ["CG-DATABASE-PRESERVATION-001", "RPC"],
+    edge_functions: ["CG-DATABASE-PRESERVATION-001", "Edge Function"],
+    public_actions: ["CG-PUBLIC-TOOL-PRESERVATION-001", "public action or tool"],
+  };
+  for (const [key, values] of Object.entries(comparison.missing)) {
+    const [rule, label] = rules[key];
+    findings.push(finding(
+      "P1",
+      rule,
+      `The proposed file removes ${label} contract values: ${values.join(", ")}.`,
+      "Restore the removed contract or provide a separately reviewed machine-readable retirement manifest in a later trust stage.",
+    ));
+  }
 }
 
 function canonicalValue(value) {
@@ -352,38 +601,146 @@ function finding(severity, rule_id, message, correction, blocks_github = true) {
   return { severity, rule_id, message, correction, blocks_github };
 }
 
-export async function prepareCodeGodAtomic(_argsValue, contextValue) {
-  const context = object(contextValue || {}, "Code God context");
-  const file = object(context.file, "selected file");
-  const metadata = clone(file.metadata || {});
-  const handoff = object(metadata.repo_handoff, "Repo handoff");
-  const repo = safeRepo(handoff.repo);
-  const branch = safeBranch(handoff.request_branch);
-  const authority = verifiedAuthority(context, repo);
-  const branchProof = verifiedBranch(context, repo, branch);
-  const queue = queueSnapshot(context, { repo, path: safePath(handoff.path), branch });
-  const proposed = String(handoff.proposed || "");
-  const original = String(handoff.original || "");
-  const findings = [];
+function canonicalLearningHistory(context) {
+  const source = context?.project?.metadata?.workflow_learning_history;
+  if (!source || typeof source !== "object" || Array.isArray(source)) {
+    return { entries: [], invalid_ids: ["missing"] };
+  }
+  const entries = [];
+  const invalidIds = [];
+  for (const id of Object.keys(source).filter((value) => /^CL-HIST-\d+$/.test(value)).sort()) {
+    const value = source[id];
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      invalidIds.push(id);
+      continue;
+    }
+    const cause = String(value.cause || "").trim();
+    const correction = String(value.correction || "").trim();
+    const regression = String(value.regression || "").trim();
+    if (!cause || !correction || !regression) {
+      invalidIds.push(id);
+      continue;
+    }
+    entries.push({
+      id,
+      cause,
+      correction,
+      regression,
+      runtime_proof: String(value.runtime_proof || "").trim(),
+      promotion_boundary: String(value.promotion_boundary || "").trim(),
+    });
+  }
+  if (!entries.length && !invalidIds.length) invalidIds.push("missing");
+  return { entries, invalid_ids: invalidIds };
+}
 
-  if (handoff.source_repo !== authority.repo || handoff.source_commit_sha !== authority.source_commit_sha) {
-    findings.push(finding("P1", "CG-IDENTITY-001", "The reviewed repository provenance changed.", "Prepare the handoff again from current immutable repository evidence."));
+function normalizedReviewInput(kindValue, textValue, source) {
+  const kind = String(kindValue || "instruction").trim().toLowerCase();
+  if (!REVIEW_INPUT_KINDS.has(kind)) {
+    return { rejected: true, source, kind, reason: "unsupported-input-kind" };
   }
-  if (handoff.source_file_id !== String(file.id || "")) {
-    findings.push(finding("P1", "CG-FILE-IDENTITY-001", "The handoff belongs to a different selected file.", "Select the correct file and prepare the handoff again."));
+  const text = String(textValue || "").trim();
+  if (!text) return null;
+  if (text.length > MAX_REVIEW_INPUT_TEXT) {
+    return { rejected: true, source, kind, reason: "input-too-large" };
   }
-  if (
-    handoff.github_base_branch !== branchProof.base_branch || handoff.github_base_sha !== branchProof.base_sha ||
-    handoff.github_head_branch !== branchProof.branch || handoff.github_head_sha !== branchProof.head_sha
-  ) {
-    findings.push(finding("P1", "CG-BRANCH-PROOF-001", "The immutable branch proof changed after handoff preparation.", "Refresh branch proof and prepare the handoff again."));
+  if (secretLike(text)) {
+    return { rejected: true, source, kind, reason: "secret-like-input" };
   }
-  if (handoff.hash_version !== HASH_VERSION) {
-    findings.push(finding("P1", "CG-HASH-VERSION-001", "The handoff does not use the canonical UTF-8 hash contract.", "Rebuild the handoff with sha256-utf8-v1."));
+  return { rejected: false, source, kind, text };
+}
+
+async function listenToReviewInputs(argsValue, handoff) {
+  const args = argsValue && typeof argsValue === "object" && !Array.isArray(argsValue) ? argsValue : {};
+  const fields = args.fields && typeof args.fields === "object" && !Array.isArray(args.fields) ? args.fields : {};
+  const candidates = [
+    { kind: "instruction", text: handoff.notes, source: "handoff.notes" },
+    { kind: "constraint", text: handoff.preserve, source: "handoff.preserve" },
+  ];
+  for (const kind of ["instruction", "change", "patch", "fix", "constraint", "question"]) {
+    if (Object.prototype.hasOwnProperty.call(fields, kind)) {
+      candidates.push({ kind, text: fields[kind], source: `fields.${kind}` });
+    }
   }
-  if (handoff.current_hash !== await hashUtf8Text(original) || handoff.proposed_hash !== await hashUtf8Text(proposed)) {
-    findings.push(finding("P1", "CG-HASH-BINDING-001", "The handoff content no longer matches its recorded hashes.", "Prepare a fresh handoff from the exact complete files."));
+  if (Object.prototype.hasOwnProperty.call(fields, "input")) {
+    candidates.push({ kind: "instruction", text: fields.input, source: "fields.input" });
   }
+  if (Array.isArray(fields.review_inputs)) {
+    fields.review_inputs.forEach((entry, index) => {
+      if (typeof entry === "string") {
+        candidates.push({ kind: "instruction", text: entry, source: `fields.review_inputs[${index}]` });
+      } else if (entry && typeof entry === "object" && !Array.isArray(entry)) {
+        candidates.push({
+          kind: entry.kind,
+          text: entry.text ?? entry.value,
+          source: `fields.review_inputs[${index}]`,
+        });
+      } else {
+        candidates.push({ kind: "instruction", text: "", source: `fields.review_inputs[${index}]`, malformed: true });
+      }
+    });
+  }
+
+  const accepted = [];
+  const rejected = [];
+  const seen = new Set();
+  for (const candidate of candidates) {
+    if (accepted.length + rejected.length >= MAX_REVIEW_INPUTS) {
+      rejected.push({ source: candidate.source, kind: String(candidate.kind || "instruction"), reason: "input-limit-exceeded" });
+      continue;
+    }
+    if (candidate.malformed) {
+      rejected.push({ source: candidate.source, kind: "instruction", reason: "malformed-input" });
+      continue;
+    }
+    const normalized = normalizedReviewInput(candidate.kind, candidate.text, candidate.source);
+    if (!normalized) continue;
+    if (normalized.rejected) {
+      rejected.push(normalized);
+      continue;
+    }
+    const identity = normalized.kind + "\n" + normalized.text;
+    if (seen.has(identity)) continue;
+    seen.add(identity);
+    accepted.push({
+      input_id: `input-${accepted.length + 1}`,
+      source: normalized.source,
+      kind: normalized.kind,
+      text: normalized.text,
+      text_hash: await hashUtf8Text(normalized.text),
+    });
+  }
+  return {
+    status: "INPUTS_REVIEWED",
+    acknowledgement: "Instructions, changes, fixes and patches were listened to as review evidence; none were applied directly.",
+    accepted,
+    rejected,
+    accepted_count: accepted.length,
+    rejected_count: rejected.length,
+    secret_rejection_count: rejected.filter((entry) => entry.reason === "secret-like-input").length,
+  };
+}
+
+async function seeCode(original, proposed, comparison, handoff) {
+  const encoder = new TextEncoder();
+  return {
+    status: "SCANNED",
+    acknowledgement: "The exact original and proposed files were scanned and are waiting for Nose, Ears, Brain and Mouth processing.",
+    source_file_id: String(handoff.source_file_id || ""),
+    path: String(handoff.path || ""),
+    original_hash: await hashUtf8Text(original),
+    proposed_hash: await hashUtf8Text(proposed),
+    original_bytes: encoder.encode(original).length,
+    proposed_bytes: encoder.encode(proposed).length,
+    original_lines: original ? original.split(/\r?\n/).length : 0,
+    proposed_lines: proposed ? proposed.split(/\r?\n/).length : 0,
+    structural_inventory: comparison,
+    waiting_for: "mouth",
+  };
+}
+
+function smellProblems({ original, proposed, handoff, queue, comparison }) {
+  const findings = [];
   if (!completeFile(String(handoff.path || ""), proposed)) {
     findings.push(finding("P1", "CG-FULLFILE-001", "The proposed file is incomplete or too large for the queue.", "Save one complete file under 180000 characters."));
   }
@@ -393,7 +750,8 @@ export async function prepareCodeGodAtomic(_argsValue, contextValue) {
   if (/^(?:\s*<<<<<<<(?:\s|$)|\s*=======\s*$|\s*>>>>>>>(?:\s|$))/m.test(proposed)) {
     findings.push(finding("P1", "CG-CONFLICT-001", "Conflict markers were found.", "Resolve all conflict markers."));
   }
-  if (/```(?:html|javascript|js|typescript|ts|json)?/i.test(proposed)) {
+  const fencePattern = new RegExp(["`", "`", "`"].join("") + "(?:html|javascript|js|typescript|ts|json)?", "i");
+  if (fencePattern.test(proposed)) {
     findings.push(finding("P2", "CG-FENCE-001", "Markdown fences appear inside the proposed file.", "Keep only complete file contents."));
   }
   if (secretLike(proposed)) {
@@ -405,18 +763,134 @@ export async function prepareCodeGodAtomic(_argsValue, contextValue) {
   if (queue.active_matching_requests > 0) {
     findings.push(finding("P2", "CG-DUPLICATE-001", "A matching write request is already queued or processing.", "Reuse or close the existing request before queuing another.", false));
   }
+  addPreservationFindings(findings, comparison);
+  return {
+    findings,
+    report: {
+      status: "SIGNALS_REPORTED",
+      acknowledgement: "Local defects, contract removals and unsafe patterns were smelled and reported to the Brain.",
+      signal_count: findings.length,
+      signal_rule_ids: Array.from(new Set(findings.map((item) => item.rule_id))).sort(),
+      missing_contract_categories: Object.keys(comparison.missing).sort(),
+    },
+  };
+}
 
+async function thinkAboutReview(context, systemFindings, noseFindings, ears) {
+  const learning = canonicalLearningHistory(context);
+  const findings = [...systemFindings, ...noseFindings];
+  if (!learning.entries.length || learning.invalid_ids.length) {
+    findings.push(finding(
+      "P1",
+      "CG-LEARNING-HISTORY-001",
+      "The Brain could not load a complete canonical CL-HIST regression history.",
+      "Restore every confirmed fix as a valid CL-HIST entry with cause, correction and regression fields before Writer preparation.",
+    ));
+  }
+  if (ears.secret_rejection_count > 0) {
+    findings.push(finding(
+      "P0",
+      "CG-INPUT-SECRET-001",
+      "The Ears rejected secret-shaped review input.",
+      "Remove privileged values and provide only safe instructions, changes, fixes or patches.",
+    ));
+  }
   const blocking = findings.some((item) => item.blocks_github);
   const outcome = blocking ? (findings.some((item) => item.severity === "P0") ? "BLOCK" : "FIX_FIRST") : "PASS";
   const scopeOutcome = blocking
     ? (findings.some((item) => item.severity === "P0") ? "BLOCK" : "FINDINGS_PRESENT")
     : "BOUNDED_CHECKS_CLEAR";
-  const review = {
-    version: "V50-code-god-2-bounded-advisory",
+  const learningHistoryHash = await hashCanonicalJson(learning.entries);
+  return {
+    findings,
     outcome,
     scope_outcome: scopeOutcome,
+    report: {
+      status: "SYNTHESIZED",
+      acknowledgement: "The Brain combined immutable evidence, Eyes inventory, Nose signals, Ear input and canonical regression history.",
+      learning_history_status: learning.entries.length && !learning.invalid_ids.length ? "CURRENT" : "INCOMPLETE",
+      learning_history_hash: learningHistoryHash,
+      known_regression_count: learning.entries.length,
+      known_regression_ids: learning.entries.map((entry) => entry.id),
+      invalid_regression_ids: learning.invalid_ids,
+      accepted_input_ids: ears.accepted.map((entry) => entry.input_id),
+      finding_rule_ids: Array.from(new Set(findings.map((item) => item.rule_id))).sort(),
+      blocking_finding_count: findings.filter((item) => item.blocks_github).length,
+      outcome,
+      scope_outcome: scopeOutcome,
+    },
+  };
+}
+
+function speakReview(brainResult, ears) {
+  const findings = brainResult.findings;
+  return {
+    status: "SPOKEN",
+    acknowledgement: findings.length
+      ? `The Mouth is reporting ${findings.length} finding${findings.length === 1 ? "" : "s"} and proposed corrections.`
+      : "The Mouth found no bounded defect to report.",
+    findings_owner: "review.findings",
+    finding_rule_ids: brainResult.report.finding_rule_ids,
+    proposed_fixes: findings.map((item) => ({
+      rule_id: item.rule_id,
+      severity: item.severity,
+      correction: item.correction,
+      blocks_github: item.blocks_github,
+      derived_from: "review.findings",
+    })),
+    acknowledged_input_ids: ears.accepted.map((entry) => entry.input_id),
+    change_and_patch_policy: "Inputs, changes, fixes and patches are reviewed as evidence. The Mouth proposes corrections but cannot apply them; the protected one-file Writer remains the only GitHub write path.",
+  };
+}
+
+export async function prepareCodeGodAtomic(argsValue, contextValue) {
+  const args = argsValue && typeof argsValue === "object" && !Array.isArray(argsValue) ? argsValue : {};
+  const context = object(contextValue || {}, "Code God context");
+  const file = object(context.file, "selected file");
+  const metadata = clone(file.metadata || {});
+  const handoff = object(metadata.repo_handoff, "Repo handoff");
+  const repo = safeRepo(handoff.repo);
+  const branch = safeBranch(handoff.request_branch);
+  const authority = verifiedAuthority(context, repo);
+  const branchProof = verifiedBranch(context, repo, branch);
+  const queue = queueSnapshot(context, { repo, path: safePath(handoff.path), branch });
+  const proposed = String(handoff.proposed || "");
+  const original = String(handoff.original || "");
+  const systemFindings = [];
+
+  if (handoff.source_repo !== authority.repo || handoff.source_commit_sha !== authority.source_commit_sha) {
+    systemFindings.push(finding("P1", "CG-IDENTITY-001", "The reviewed repository provenance changed.", "Prepare the handoff again from current immutable repository evidence."));
+  }
+  if (handoff.source_file_id !== String(file.id || "")) {
+    systemFindings.push(finding("P1", "CG-FILE-IDENTITY-001", "The handoff belongs to a different selected file.", "Select the correct file and prepare the handoff again."));
+  }
+  if (
+    handoff.github_base_branch !== branchProof.base_branch || handoff.github_base_sha !== branchProof.base_sha ||
+    handoff.github_head_branch !== branchProof.branch || handoff.github_head_sha !== branchProof.head_sha
+  ) {
+    systemFindings.push(finding("P1", "CG-BRANCH-PROOF-001", "The immutable branch proof changed after handoff preparation.", "Refresh branch proof and prepare the handoff again."));
+  }
+  if (handoff.hash_version !== HASH_VERSION) {
+    systemFindings.push(finding("P1", "CG-HASH-VERSION-001", "The handoff does not use the canonical UTF-8 hash contract.", "Rebuild the handoff with sha256-utf8-v1."));
+  }
+  if (handoff.current_hash !== await hashUtf8Text(original) || handoff.proposed_hash !== await hashUtf8Text(proposed)) {
+    systemFindings.push(finding("P1", "CG-HASH-BINDING-001", "The handoff content no longer matches its recorded hashes.", "Prepare a fresh handoff from the exact complete files."));
+  }
+
+  const structural = missingInventoryValues(original, proposed);
+  const eyes = await seeCode(original, proposed, structural, handoff);
+  const nose = smellProblems({ original, proposed, handoff, queue, comparison: structural });
+  const ears = await listenToReviewInputs(args, handoff);
+  const brain = await thinkAboutReview(context, systemFindings, nose.findings, ears);
+  const mouth = speakReview(brain, ears);
+
+  const review = {
+    version: CODE_GOD_REVIEW_VERSION,
+    capability_version: CODE_GOD_CAPABILITY_VERSION,
+    outcome: brain.outcome,
+    scope_outcome: brain.scope_outcome,
     authoritative: false,
-    decision_scope: "bounded_static_checks",
+    decision_scope: "bounded_static_structural_and_five_senses_checks",
     trust_state: CODE_GOD_TRUST_STATE,
     requires_independent_evidence_receipt: true,
     handoff_hash: await hashCanonicalJson(handoff),
@@ -428,19 +902,39 @@ export async function prepareCodeGodAtomic(_argsValue, contextValue) {
     github_head_sha: branchProof.head_sha,
     source_file_id: String(file.id),
     proposed_hash: handoff.proposed_hash,
-    findings,
+    structural_inventory_owner: "senses.eyes.structural_inventory",
+    findings: brain.findings,
+    senses: {
+      order: [...CODE_GOD_SENSE_ORDER],
+      eyes,
+      nose: nose.report,
+      ears,
+      brain: brain.report,
+      mouth,
+    },
     checks_run: [
       "owner-repository-authority", "immutable-branch-proof", "source-file-identity",
       "hash-contract", "full-file", "queue-limit", "truncation", "conflicts",
       "fences", "secret-values", "duplicate-queue", "timers",
+      "export-preservation", "wildcard-reexport-preservation", "top-level-symbol-preservation",
+      "dom-id-preservation", "route-id-preservation", "storage-key-preservation",
+      "dependency-preservation", "database-contract-preservation",
+      "public-action-and-tool-preservation", "eyes-code-scan", "nose-problem-signals",
+      "ears-review-inputs", "brain-regression-history", "mouth-fix-proposals",
     ],
     checks_not_run: [
       "language-compile-or-typecheck", "runtime-behaviour", "browser-interaction",
       "database-integration", "migration-replay", "deployment",
-      "feature-and-workflow-parity", "user-acceptance",
+      "feature-and-workflow-parity", "user-acceptance", "intentional-retirement-manifest",
+      "natural-language-semantic-proof", "automatic-patch-application",
     ],
     limitations: [
       "The result covers only the deterministic checks listed in checks_run.",
+      "The Brain knows the canonical CL-HIST entries supplied by the selected project; it cannot know an unrecorded fix.",
+      "The Ears acknowledge bounded text inputs but do not prove the semantic correctness of natural-language advice.",
+      "Structural extraction is conservative and removal-blocking; it does not prove runtime equivalence.",
+      "The Mouth proposes corrections but cannot apply a patch, write GitHub, merge or deploy.",
+      "Intentional retirements remain blocked until a separately reviewed machine-readable retirement manifest is implemented.",
       "A compatibility PASS token is not Writer, merge, deployment or production approval.",
       "An independent Master Checklist checkpoint and exact-head evidence remain mandatory.",
     ],
@@ -448,6 +942,7 @@ export async function prepareCodeGodAtomic(_argsValue, contextValue) {
       authority_verified_at: authority.verified_at,
       branch_verified_at: branchProof.verified_at,
       queue_snapshot_at: queue.captured_at,
+      learning_history_hash: brain.report.learning_history_hash,
     },
     created_at: exactTime(context.now, "review time"),
   };
@@ -478,11 +973,30 @@ export async function prepareGithubWriterAtomic(argsValue, contextValue) {
   const handoff = object(metadata.repo_handoff, "Repo handoff");
   const review = object(metadata.code_god_review, "Code God review");
   if (
+    review.version !== CODE_GOD_REVIEW_VERSION ||
+    review.capability_version !== CODE_GOD_CAPABILITY_VERSION ||
     review.outcome !== "PASS" || review.scope_outcome !== "BOUNDED_CHECKS_CLEAR" ||
     review.authoritative !== false || review.trust_state !== CODE_GOD_TRUST_STATE ||
-    review.requires_independent_evidence_receipt !== true
+    review.requires_independent_evidence_receipt !== true ||
+    !review.senses || !Array.isArray(review.senses.order) ||
+    review.senses.order.join(",") !== CODE_GOD_SENSE_ORDER.join(",") ||
+    review.senses.eyes?.status !== "SCANNED" ||
+    review.senses.nose?.status !== "SIGNALS_REPORTED" ||
+    review.senses.ears?.status !== "INPUTS_REVIEWED" ||
+    review.senses.brain?.status !== "SYNTHESIZED" ||
+    review.senses.mouth?.status !== "SPOKEN" ||
+    review.senses.brain?.learning_history_status !== "CURRENT"
   ) {
-    throw new Error("Bounded Code God checks must be clear and explicitly advisory before Writer preparation.");
+    throw new Error("Bounded Code God senses must be complete, clear and explicitly advisory before Writer preparation.");
+  }
+  const currentLearning = canonicalLearningHistory(context);
+  const currentLearningHash = await hashCanonicalJson(currentLearning.entries);
+  if (
+    currentLearning.invalid_ids.length ||
+    review.senses.brain.learning_history_hash !== currentLearningHash ||
+    review.evidence?.learning_history_hash !== currentLearningHash
+  ) {
+    throw new Error("The canonical CL-HIST regression history changed or is incomplete. Run Code God again.");
   }
   const repo = safeRepo(handoff.repo);
   const path = safePath(handoff.path);
