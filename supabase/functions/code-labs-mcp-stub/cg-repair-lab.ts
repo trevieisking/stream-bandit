@@ -31,11 +31,28 @@ const MAX_FILE_BYTES = 240000;
 const MAX_TOTAL_BYTES = 12000000;
 const MAX_FINDINGS = 500;
 const MAX_MAP_ITEMS = 1200;
-const SUPPORTED = /\.(?:html?|css|m?js|cjs|jsx|ts|tsx|json|sql)$/i;
-const SKIP_PATH =
-  /(^|\/)(?:node_modules|vendor|dist|build|coverage|\.git|\.github|archive|archives|backup|backups)(\/|$)|(?:^|\/)(?:\.env[^/]*|[^/]+\.(?:pem|key|p12|pfx))$/i;
+const SUPPORTED = /\.(?:html?|css|m?js|cjs|jsx|ts|tsx|json|sql|ya?ml)$/i;
+const ALWAYS_SKIP_PATH =
+  /(^|\/)(?:node_modules|vendor|dist|build|coverage|\.git|archive|archives|backup|backups)(\/|$)|(?:^|\/)(?:\.env[^/]*|[^/]+\.(?:pem|key|p12|pfx))$/i;
+const SKIP_PATH = ALWAYS_SKIP_PATH;
+const GITHUB_PATH = /(^|\/)\.github(\/|$)/i;
+const WORKFLOW_PATH = /^\.github\/workflows\/[^/]+\.ya?ml$/i;
 const TEST_PATH =
   /(?:^|\/)(?:test|tests|__tests__|fixtures|snapshots)(?:\/|$)|(?:[-_.](?:test|spec))\.[^.]+$/i;
+const PAGE_OWNER_CONTRACT =
+  "code-labs/tests/page-specialist-single-owner.contract.test.mjs";
+const FUNCTIONAL_SMOKE_WORKFLOW =
+  ".github/workflows/code-labs-v50-functional-smoke.yml";
+const CONNECTOR_PRESERVATION_CONTRACT =
+  "supabase/functions/code-labs-mcp-stub/connector-access-preservation.test.ts";
+const MCP_MAIN = "supabase/functions/code-labs-mcp-stub/main.ts";
+const CERTIFICATION_CRITICAL_TESTS = [
+  PAGE_OWNER_CONTRACT,
+  "code-labs/tests/scan-labs-mcp.contract.test.mjs",
+  "supabase/functions/code-labs-mcp-stub/atomic-domain-preparation.test.mjs",
+  CONNECTOR_PRESERVATION_CONTRACT,
+  "supabase/functions/code-labs-mcp-stub/cg-repair-lab.test.ts",
+];
 
 const CREDENTIAL_VALUE_PATTERNS = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----\r?\n[A-Za-z0-9+/=\r\n]{40,}\r?\n-----END [A-Z ]*PRIVATE KEY-----/i,
@@ -51,6 +68,13 @@ const OUTPUT_REDACTION_PATTERNS = [
   ...CREDENTIAL_VALUE_PATTERNS,
   /\bsb_publishable_[A-Za-z0-9_-]{12,}\b/i,
 ];
+
+function shouldSkipPath(path: string) {
+  const value = String(path || "").replace(/\\/g, "/");
+  if (SKIP_PATH.test(value)) return true;
+  if (GITHUB_PATH.test(value) && !WORKFLOW_PATH.test(value)) return true;
+  return false;
+}
 
 function cleanRepo(value: unknown) {
   const repo = String(value || "").trim();
@@ -72,7 +96,7 @@ function cleanPath(value: unknown) {
   const path = normalizePath(String(value || "").trim().replace(/^\/+/, ""));
   if (
     !path || path.startsWith("../") || path.includes("\\") ||
-    SKIP_PATH.test(path)
+    shouldSkipPath(path)
   ) {
     throw new Error("A safe repository-relative source path is required.");
   }
@@ -191,11 +215,11 @@ function addFinding(findings: Finding[], finding: Finding) {
 
 function isLivePage(path: string) {
   return /\.html?$/i.test(path) && !TEST_PATH.test(path) &&
-    !SKIP_PATH.test(path);
+    !shouldSkipPath(path);
 }
 
 function supportedPath(path: string) {
-  return SUPPORTED.test(path) && !SKIP_PATH.test(path);
+  return SUPPORTED.test(path) && !shouldSkipPath(path);
 }
 
 function extractDependencyReferences(path: string, content: string) {
@@ -255,7 +279,8 @@ function exactSecretReferences(files: SnapshotFile[]) {
       label: (name: string) => "process.env." + name,
     },
     {
-      regex: /import\.meta\.env\.([A-Za-z_][A-Za-z0-9_]*)/g,
+      regex:
+        /import\.meta\.env\.([A-Za-z_][A-Za-z0-9_]*)/g,
       label: (name: string) => "import.meta.env." + name,
     },
     {
@@ -459,6 +484,146 @@ function mapDatabaseCalls(files: SnapshotFile[]) {
   };
 }
 
+function extractToolNamesFromMain(source: string) {
+  const start = source.indexOf("function tools()");
+  const end = start >= 0 ? source.indexOf("function decodeBase64", start) : -1;
+  if (start < 0 || end <= start) return [] as string[];
+  const block = source.slice(start, end);
+  return Array.from(block.matchAll(/\bname:\s*["']([^"']+)["']/g), (match) =>
+    match[1]
+  );
+}
+
+function extractPreservedToolNames(source: string) {
+  const marker = "const expected = [";
+  const start = source.indexOf(marker);
+  const end = start >= 0 ? source.indexOf("];", start) : -1;
+  if (start < 0 || end <= start) return [] as string[];
+  return Array.from(
+    source.slice(start, end).matchAll(/^\s*["']([^"']+)["'],?\s*$/gm),
+    (match) => match[1],
+  );
+}
+
+function ciContractCoverage(
+  path: string,
+  workflow: string,
+  byPath: Map<string, SnapshotFile>,
+) {
+  if (!workflow) return { covered: false, via: null as string | null };
+  if (workflow.includes(path)) {
+    return { covered: true, via: FUNCTIONAL_SMOKE_WORKFLOW };
+  }
+  const allPaths = new Set(byPath.keys());
+  for (const [runnerPath, runner] of byPath.entries()) {
+    if (!workflow.includes(runnerPath)) continue;
+    const importsTarget = extractDependencyReferences(runnerPath, runner.content)
+      .some((reference) =>
+        resolveDependency(runnerPath, reference.raw, allPaths) === path
+      );
+    if (importsTarget) return { covered: true, via: runnerPath };
+  }
+  return { covered: false, via: null as string | null };
+}
+
+function mapGovernanceContracts(files: SnapshotFile[], findings: Finding[]) {
+  const byPath = new Map(files.map((file) => [file.path, file]));
+  const assets = files.filter((file) =>
+    /^code-labs\/assets\/[^/]+\.js$/i.test(file.path)
+  );
+  const navigationOwners = assets.filter((file) =>
+    file.content.includes("nav.innerHTML=")
+  ).map((file) => file.path);
+  if (navigationOwners.length > 1) {
+    addFinding(findings, {
+      severity: "P1",
+      rule_id: "CGRL-OWNERSHIP-COLLISION-001",
+      message:
+        "Multiple Code Labs helpers rebuild the visible workflow navigation: " +
+        navigationOwners.join(", ") + ".",
+      correction:
+        "Keep code-labs/assets/cl-nav.js as the sole visible route/sidebar owner and convert every other helper to a bounded consumer or decorator.",
+    });
+  }
+
+  const handoffOwners = assets.filter((file) =>
+    /window\.location\.assign\(\s*["']cg-repair-lab\.html["']\s*\)/.test(
+      file.content,
+    ) ||
+    /setAttribute\(\s*["']href["']\s*,\s*["']cg-repair-lab\.html["']\s*\)/.test(
+      file.content,
+    ) || /\brouteRepoDesk\b/.test(file.content)
+  ).map((file) => file.path);
+  if (handoffOwners.length > 1) {
+    addFinding(findings, {
+      severity: "P1",
+      rule_id: "CGRL-HANDOFF-OWNER-COLLISION-001",
+      message:
+        "Multiple Code Labs helpers independently own the Repo Desk handoff into CG Repair Lab: " +
+        handoffOwners.join(", ") + ".",
+      correction:
+        "Keep one Repo Desk main-content handoff owner; advisory helpers must not rewrite or independently route that handoff.",
+    });
+  }
+
+  const main = byPath.get(MCP_MAIN)?.content || "";
+  const preservation = byPath.get(CONNECTOR_PRESERVATION_CONTRACT)?.content || "";
+  const registeredTools = extractToolNamesFromMain(main);
+  const preservedTools = extractPreservedToolNames(preservation);
+  const toolContractComparable = registeredTools.length > 0 && preservedTools.length > 0;
+  const toolContractMatches = toolContractComparable &&
+    JSON.stringify(registeredTools) === JSON.stringify(preservedTools);
+  if (toolContractComparable && !toolContractMatches) {
+    addFinding(findings, {
+      severity: "P1",
+      rule_id: "CGRL-PUBLIC-TOOL-CONTRACT-DRIFT-001",
+      message:
+        "The public MCP tool registration and strict connector-preservation contract disagree.",
+      correction:
+        "Update the registration and preservation expectation in the same reviewed change, preserving exact public tool order unless an intentional publication migration is separately approved.",
+      path: CONNECTOR_PRESERVATION_CONTRACT,
+    });
+  }
+
+  const workflow = byPath.get(FUNCTIONAL_SMOKE_WORKFLOW)?.content || "";
+  const ciCoverage = Object.fromEntries(
+    CERTIFICATION_CRITICAL_TESTS.filter((path) => byPath.has(path)).map((path) =>
+      [path, ciContractCoverage(path, workflow, byPath)]
+    ),
+  ) as Record<string, { covered: boolean; via: string | null }>;
+  const missingCiTests = Object.entries(ciCoverage)
+    .filter(([, coverage]) => !coverage.covered)
+    .map(([path]) => path);
+  for (const path of missingCiTests) {
+    addFinding(findings, {
+      severity: "P1",
+      rule_id: "CGRL-CI-CONTRACT-NOT-RUN-001",
+      message:
+        "A certification-critical Code Labs contract exists but is not executed directly or through an imported contract by the canonical functional-smoke workflow: " +
+        path + ".",
+      correction:
+        "Reuse an existing canonical smoke test owner and bind the contract through a real repository dependency, or update the existing workflow owner in place; do not create a duplicate workflow.",
+      path: FUNCTIONAL_SMOKE_WORKFLOW,
+    });
+  }
+
+  return {
+    policy_source: PAGE_OWNER_CONTRACT,
+    navigation_owners: navigationOwners,
+    repo_handoff_owners: handoffOwners,
+    registered_tools: registeredTools,
+    preserved_tools: preservedTools,
+    public_tool_contract_comparable: toolContractComparable,
+    public_tool_contract_matches: toolContractMatches,
+    canonical_ci_workflow_present: Boolean(workflow),
+    certification_critical_tests: CERTIFICATION_CRITICAL_TESTS.filter((path) =>
+      byPath.has(path)
+    ),
+    ci_coverage: ciCoverage,
+    missing_ci_tests: missingCiTests,
+  };
+}
+
 export async function scanRepositorySnapshot(input: {
   repo: string;
   ref: string;
@@ -630,6 +795,7 @@ export async function scanRepositorySnapshot(input: {
     });
   }
 
+  const governanceMap = mapGovernanceContracts(files, findings);
   const selected = files.find((file) => file.path === input.selected_path);
   let candidateCode: string | null = null;
   let candidateHash: string | null = null;
@@ -693,6 +859,7 @@ export async function scanRepositorySnapshot(input: {
       duplicate_symbols: duplicateSymbols,
       local_storage_calls: localStorageMap,
       write_routes: databaseMap.write_routes,
+      governance_contracts: governanceMap,
     },
     database_map: databaseMap,
     secret_reference_map: secretReferences,
@@ -917,7 +1084,7 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
   }
   const blobs: Row[] = Array.isArray(tree.tree)
     ? tree.tree.filter((row: Row) =>
-      row.type === "blob" && !SKIP_PATH.test(String(row.path || ""))
+      row.type === "blob" && !shouldSkipPath(String(row.path || ""))
     )
     : [];
   const rows = blobs.filter((row) => supportedPath(String(row.path || "")));
@@ -934,8 +1101,20 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
     /(?:^|\/)(?:package|deno|tsconfig|vite\.config|next\.config)[^/]*\.(?:json|js|mjs|ts)$/i
       .test(String(row.path))
   );
+  const governance = rows.filter((row) => {
+    const path = String(row.path || "");
+    return WORKFLOW_PATH.test(path) ||
+      CERTIFICATION_CRITICAL_TESTS.includes(path);
+  });
   const seedMap = new Map<string, Row>();
-  for (const row of [byPath.get(selectedPath), ...livePages, ...backend]) {
+  for (
+    const row of [
+      byPath.get(selectedPath),
+      ...livePages,
+      ...backend,
+      ...governance,
+    ]
+  ) {
     if (row) seedMap.set(String(row.path), row);
   }
   if (seedMap.size > MAX_FILES) {
@@ -947,7 +1126,7 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
       manifest_paths: manifestPaths,
       coverage_complete: false,
       skipped_paths: [
-        "The live-page and backend seed set exceeds the bounded scan limit.",
+        "The live-page, backend and governance seed set exceeds the bounded scan limit.",
       ],
     });
   }
@@ -998,6 +1177,9 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
   const liveCoverage = livePages.every((row) => fetched.has(String(row.path)));
   const selectedCoverage = fetched.has(selectedPath);
   const sizeCoverage = totalBytes <= MAX_TOTAL_BYTES;
+  const governanceCoverage = governance.every((row) =>
+    fetched.has(String(row.path))
+  );
   const report = await scanRepositorySnapshot({
     repo,
     ref: commitSha,
@@ -1005,7 +1187,7 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
     files: Array.from(fetched.values()),
     manifest_paths: manifestPaths,
     coverage_complete: liveCoverage && selectedCoverage && sizeCoverage &&
-      skipped.length === 0,
+      governanceCoverage && skipped.length === 0,
     skipped_paths: skipped,
   });
   return {

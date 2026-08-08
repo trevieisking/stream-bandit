@@ -1,3 +1,5 @@
+import "./cg-repair-lab.test.ts";
+
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message);
 }
