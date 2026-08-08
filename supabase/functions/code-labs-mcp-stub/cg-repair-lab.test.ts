@@ -117,7 +117,7 @@ Deno.test("CG Repair Lab maps dependencies, database calls, and exact secret ref
     secret?.call_sites.some((item) =>
       item.expression === "createClient(… clientKey …)"
     ),
-    "The downstream call using the key alias should be reported without a value.",
+    "The downstream call using the key alias should be included.",
   );
 });
 
@@ -349,5 +349,160 @@ Deno.test("genuine secret shapes and line-anchored conflict markers still block"
       item.path === "conflicted.js"
     ),
     "Actual line-anchored conflict markers must remain blocked.",
+  );
+});
+
+function governanceFixture(extraFiles: Array<{ path: string; content: string }>) {
+  return scanRepositorySnapshot({
+    repo: "owner/example",
+    ref: "verified-commit",
+    selected_path: "code-labs/assets/cl-nav.js",
+    manifest_paths: extraFiles.map((file) => file.path),
+    coverage_complete: true,
+    files: extraFiles,
+  });
+}
+
+Deno.test("CG Repair Lab blocks duplicate workflow navigation and Repo Desk handoff owners", async () => {
+  const report = await governanceFixture([
+    {
+      path: "code-labs/assets/cl-nav.js",
+      content: 'function render(){nav.innerHTML="canonical";} window.location.assign("cg-repair-lab.html");',
+    },
+    {
+      path: "code-labs/assets/legacy-route-owner.js",
+      content: 'function rewrite(){nav.innerHTML="legacy";} window.location.assign("cg-repair-lab.html");',
+    },
+  ]);
+  const rules = report.findings.map((item) => item.rule_id);
+  assert(
+    rules.includes("CGRL-OWNERSHIP-COLLISION-001"),
+    "Two visible navigation rebuilders must be a P1 ownership collision.",
+  );
+  assert(
+    rules.includes("CGRL-HANDOFF-OWNER-COLLISION-001"),
+    "Two independent Repo Desk-to-CGRL routers must be a P1 handoff collision.",
+  );
+  assert(
+    report.debug_report.governance_contracts.navigation_owners.length === 2 &&
+      report.debug_report.governance_contracts.repo_handoff_owners.length === 2,
+    "The governance evidence must name both competing owners.",
+  );
+});
+
+Deno.test("CG Repair Lab does not false-block one canonical owner with advisory consumers", async () => {
+  const report = await governanceFixture([
+    {
+      path: "code-labs/assets/cl-nav.js",
+      content: 'function render(){nav.innerHTML="canonical";} window.location.assign("cg-repair-lab.html");',
+    },
+    {
+      path: "code-labs/assets/advisory-helper.js",
+      content: 'function decorate(){document.body.dataset.routeHint="cg-repair-lab";}',
+    },
+  ]);
+  const rules = report.findings.map((item) => item.rule_id);
+  assert(
+    !rules.includes("CGRL-OWNERSHIP-COLLISION-001") &&
+      !rules.includes("CGRL-HANDOFF-OWNER-COLLISION-001"),
+    "A single canonical owner plus an advisory consumer must remain a clean control.",
+  );
+});
+
+Deno.test("CG Repair Lab detects public MCP registration and preservation-contract drift", async () => {
+  const main = [
+    "function tools() {",
+    '  return [{ name: "alpha" }, { name: "beta" }];',
+    "}",
+    "function decodeBase64(value) { return value; }",
+  ].join("\n");
+  const preservation = [
+    "const expected = [",
+    '  "alpha",',
+    "];",
+  ].join("\n");
+  const report = await governanceFixture([
+    { path: "supabase/functions/code-labs-mcp-stub/main.ts", content: main },
+    {
+      path: "supabase/functions/code-labs-mcp-stub/connector-access-preservation.test.ts",
+      content: preservation,
+    },
+  ]);
+  assert(
+    report.findings.some((item) =>
+      item.rule_id === "CGRL-PUBLIC-TOOL-CONTRACT-DRIFT-001"
+    ),
+    "A public tool added without the strict preservation expectation must be blocked.",
+  );
+  assert(
+    report.debug_report.governance_contracts.public_tool_contract_comparable === true &&
+      report.debug_report.governance_contracts.public_tool_contract_matches === false,
+    "The report must disclose that the two tool inventories were comparable but mismatched.",
+  );
+});
+
+Deno.test("CG Repair Lab accepts synchronized public MCP registration and preservation contract", async () => {
+  const main = [
+    "function tools() {",
+    '  return [{ name: "alpha" }, { name: "beta" }];',
+    "}",
+    "function decodeBase64(value) { return value; }",
+  ].join("\n");
+  const preservation = [
+    "const expected = [",
+    '  "alpha",',
+    '  "beta",',
+    "];",
+  ].join("\n");
+  const report = await governanceFixture([
+    { path: "supabase/functions/code-labs-mcp-stub/main.ts", content: main },
+    {
+      path: "supabase/functions/code-labs-mcp-stub/connector-access-preservation.test.ts",
+      content: preservation,
+    },
+  ]);
+  assert(
+    !report.findings.some((item) =>
+      item.rule_id === "CGRL-PUBLIC-TOOL-CONTRACT-DRIFT-001"
+    ) && report.debug_report.governance_contracts.public_tool_contract_matches === true,
+    "Synchronized registration and preservation inventories must remain a clean control.",
+  );
+});
+
+Deno.test("CG Repair Lab detects a certification-critical contract that canonical smoke does not run", async () => {
+  const criticalPath = "supabase/functions/code-labs-mcp-stub/cg-repair-lab.test.ts";
+  const report = await governanceFixture([
+    { path: criticalPath, content: 'Deno.test("fixture", () => {});' },
+    {
+      path: ".github/workflows/code-labs-v50-functional-smoke.yml",
+      content: "name: Code Labs V50 Functional Smoke\nsteps:\n  - run: deno test other.test.ts",
+    },
+  ]);
+  assert(
+    report.findings.some((item) =>
+      item.rule_id === "CGRL-CI-CONTRACT-NOT-RUN-001" &&
+      item.path === ".github/workflows/code-labs-v50-functional-smoke.yml"
+    ),
+    "An existing certification contract omitted from canonical smoke must be blocked.",
+  );
+  assert(
+    report.debug_report.governance_contracts.missing_ci_tests.includes(criticalPath),
+    "The missing CI contract must be named in governance evidence.",
+  );
+});
+
+Deno.test("CG Repair Lab clears the CI drift finding when canonical smoke invokes the contract", async () => {
+  const criticalPath = "supabase/functions/code-labs-mcp-stub/cg-repair-lab.test.ts";
+  const report = await governanceFixture([
+    { path: criticalPath, content: 'Deno.test("fixture", () => {});' },
+    {
+      path: ".github/workflows/code-labs-v50-functional-smoke.yml",
+      content: "name: Code Labs V50 Functional Smoke\nsteps:\n  - run: deno test " + criticalPath,
+    },
+  ]);
+  assert(
+    !report.findings.some((item) => item.rule_id === "CGRL-CI-CONTRACT-NOT-RUN-001") &&
+      report.debug_report.governance_contracts.missing_ci_tests.length === 0,
+    "A correctly wired certification contract must not be reported as missing from CI.",
   );
 });
