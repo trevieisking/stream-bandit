@@ -37,6 +37,7 @@ jobs:
       - name: Run atomic workspace and Writer contracts
         run: |
           node --test \
+            code-labs/tests/scan-labs-mcp.contract.test.mjs \
             supabase/functions/code-labs-mcp-stub/atomic-boolean-owner.contract.test.mjs \
             supabase/functions/code-labs-mcp-stub/atomic-domain-preparation.test.mjs \
             supabase/functions/code-labs-mcp-stub/atomic-failure-fencing.contract.test.mjs \
