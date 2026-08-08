@@ -37,3 +37,5 @@ await change('code-labs/assets/code-labs-v15-handoff.js', (source) =>
 );
 
 console.log('Applied remaining V50 page-owner repairs.');
+
+// Code Labs live smoke: harmless disposable Writer-path proof; never merge.
