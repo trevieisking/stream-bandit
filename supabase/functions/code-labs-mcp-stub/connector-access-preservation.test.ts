@@ -169,6 +169,7 @@ Deno.test("connector access: all current public tool names remain registered thr
     "get_cg_repair_lab_access",
     "get_cg_repair_lab_workflow",
     "analyze_code_labs_repository",
+    "scan_code_labs_repository",
     "list_code_labs_owner_gallery_images",
     "read_code_labs_owner_gallery_image",
     "select_code_labs_record",
