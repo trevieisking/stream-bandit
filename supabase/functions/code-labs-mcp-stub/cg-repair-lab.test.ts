@@ -183,13 +183,18 @@ Deno.test("CG Repair Lab preserves exact bracket and global secret references wi
   );
 });
 
-Deno.test("CG Repair Lab publishes a held read-only workflow with owner controls separated", () => {
+Deno.test("CG Repair Lab publishes guarded workflow availability without promoting Repair Lab or Code God authority", () => {
   const workflow = getCgRepairLabWorkflow();
   const controls = workflow.controls as Array<Record<string, any>>;
   assert(
     workflow.trust_state === "HOLD_UNTRUSTED_ADVISORY" &&
       workflow.authoritative_use === false,
-    "Repair Lab must disclose that it is advisory and held from authoritative use.",
+    "Repair Lab must remain advisory and held from independent authoritative use.",
+  );
+  assert(
+    String(workflow.availability_semantics || "").includes("callable") &&
+      String(workflow.availability_semantics || "").includes("never grants"),
+    "Workflow metadata must distinguish guarded availability from authority.",
   );
   for (const action of ["cg_repair_lab.access", "cg_repair_lab.analyze"]) {
     assert(
@@ -207,39 +212,72 @@ Deno.test("CG Repair Lab publishes a held read-only workflow with owner controls
   );
   assert(
     candidateControl?.tool === "save_code_labs_candidate" &&
-      candidateControl?.enabled === false &&
+      candidateControl?.enabled === true &&
       candidateControl?.owner_control === true &&
       candidateControl?.repair_lab_authority === false &&
-      candidateControl?.replaces_selected_source === false,
-    "Candidate saving must be an explicitly held owner control outside Repair Lab authority.",
+      candidateControl?.replaces_selected_source === false &&
+      candidateControl?.requires_complete_file_candidate === true,
+    "Candidate saving must be an available guarded owner control outside Repair Lab authority.",
+  );
+  const handoff = controls.find((item) =>
+    item.control === "prepare_code_god_handoff"
+  );
+  assert(
+    handoff?.enabled === true &&
+      handoff?.authoritative_use === false &&
+      handoff?.requires_verified_provenance === true &&
+      handoff?.requires_existing_non_protected_branch === true,
+    "Code God handoff must be callable only through verified branch/provenance gates.",
+  );
+  const codeGod = controls.find((item) => item.control === "run_code_god");
+  assert(
+    codeGod?.enabled === true &&
+      codeGod?.code_god_advisory_only === true &&
+      codeGod?.cannot_self_certify === true,
+    "Code God may be callable but must remain bounded, advisory, and unable to self-certify.",
+  );
+  const writerPrepare = controls.find((item) =>
+    item.control === "queue_writer_request"
+  );
+  assert(
+    writerPrepare?.enabled === true &&
+      writerPrepare?.requires_code_god_pass === true &&
+      writerPrepare?.requires_independent_evidence_receipt === true &&
+      writerPrepare?.requires_existing_non_protected_branch === true,
+    "Writer preparation must stay behind Code God, independent evidence, and branch proof.",
+  );
+  const writerControl = controls.find((item) =>
+    item.control === "execute_reviewed_writer"
+  );
+  assert(
+    writerControl?.enabled === true &&
+      writerControl?.repair_lab_authority === false &&
+      writerControl?.requires_code_god_pass === true &&
+      writerControl?.requires_independent_evidence_receipt === true &&
+      writerControl?.requires_validated_queued_request === true,
+    "Writer execution must remain a separate guarded owner requiring validated review and evidence.",
+  );
+  const checkpoint = workflow.independent_checkpoint_contract as Record<string, any>;
+  assert(
+    checkpoint?.kind === "master-checklist-independent-gate-v1" &&
+      checkpoint?.tool === "create_code_labs_checkpoint" &&
+      checkpoint?.generic_prose_checkpoint_writer_valid === false &&
+      checkpoint?.writer_revalidates_at_prepare === true &&
+      checkpoint?.writer_revalidates_at_execute === true &&
+      Array.isArray(checkpoint?.required_bindings) &&
+      checkpoint.required_bindings.length >= 8,
+    "Workflow guidance must publish the actual strict Writer-independent checkpoint contract.",
   );
   assert(
     !controls.some((item) => item.action === "cg_repair_lab.save_candidate"),
     "The removed Repair Lab mutation alias must not be published as a workflow action.",
   );
-  for (const controlName of [
-    "prepare_code_god_handoff",
-    "run_code_god",
-    "queue_writer_request",
-    "execute_reviewed_writer",
-  ]) {
-    const control = controls.find((item) => item.control === controlName);
-    assert(
-      control?.enabled === false,
-      `The downstream control must remain held during education: ${controlName}`,
-    );
-  }
-  const writerControl = controls.find((item) =>
-    item.control === "execute_reviewed_writer"
-  );
   assert(
-    writerControl?.requires_code_god_pass === true &&
-      writerControl?.requires_independent_evidence_receipt === true,
-    "Writer must require both the mechanical Code God prerequisite and independent evidence.",
-  );
-  assert(
-    workflow.prohibited.includes("candidate.accept"),
-    "CG Repair Lab must prohibit the source-replacement action.",
+    workflow.prohibited.includes("candidate.accept") &&
+      workflow.prohibited.includes("direct default-branch write") &&
+      workflow.prohibited.includes("merge") &&
+      workflow.prohibited.includes("deploy"),
+    "CGRL workflow guidance must continue to prohibit authority and protected production mutations.",
   );
   const repairActions = (listActions().actions as Array<Record<string, any>>)
     .map((item) => String(item.action || ""))
@@ -390,7 +428,7 @@ Deno.test("CG Repair Lab blocks duplicate workflow navigation and Repo Desk hand
   );
 });
 
-Deno.test("CG Repair Lab does not false-block one canonical owner with advisory consumers", async () => {
+Deno.test("CG Repair Lab does not false-block one canonical owner with a passive routeRepoDesk delegate", async () => {
   const report = await governanceFixture([
     {
       path: "code-labs/assets/cl-nav.js",
@@ -398,14 +436,24 @@ Deno.test("CG Repair Lab does not false-block one canonical owner with advisory 
     },
     {
       path: "code-labs/assets/advisory-helper.js",
-      content: 'function decorate(){document.body.dataset.routeHint="cg-repair-lab";}',
+      content: [
+        'function routeRepoDesk(context){return context && context.next;}',
+        'function decorate(){document.body.dataset.routeHint="cg-repair-lab";}',
+        'const delegated = routeRepoDesk({next:"cg-repair-lab"});',
+      ].join("\n"),
     },
   ]);
   const rules = report.findings.map((item) => item.rule_id);
   assert(
     !rules.includes("CGRL-OWNERSHIP-COLLISION-001") &&
       !rules.includes("CGRL-HANDOFF-OWNER-COLLISION-001"),
-    "A single canonical owner plus an advisory consumer must remain a clean control.",
+    "A passive routeRepoDesk symbol/delegate without route mutation must not be misclassified as a handoff owner.",
+  );
+  assert(
+    report.debug_report.governance_contracts.repo_handoff_owners.length === 1 &&
+      report.debug_report.governance_contracts.repo_handoff_owners[0] ===
+        "code-labs/assets/cl-nav.js",
+    "Only the helper that actually mutates the CGRL route may own the handoff in this fixture.",
   );
 });
 
