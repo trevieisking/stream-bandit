@@ -279,18 +279,15 @@ function exactSecretReferences(files: SnapshotFile[]) {
       label: (name: string) => "process.env." + name,
     },
     {
-      regex:
-        /import\.meta\.env\.([A-Za-z_][A-Za-z0-9_]*)/g,
+      regex: /import\.meta\.env\.([A-Za-z_][A-Za-z0-9_]*)/g,
       label: (name: string) => "import.meta.env." + name,
     },
     {
-      regex:
-        /window\.([A-Za-z_$][\w$]*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL)[\w$]*)/g,
+      regex: /window\.([A-Za-z_$][\w$]*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL)[\w$]*)/g,
       label: (name: string) => "window." + name,
     },
     {
-      regex:
-        /globalThis\.([A-Za-z_$][\w$]*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL)[\w$]*)/g,
+      regex: /globalThis\.([A-Za-z_$][\w$]*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL)[\w$]*)/g,
       label: (name: string) => "globalThis." + name,
     },
     {
@@ -526,6 +523,16 @@ function ciContractCoverage(
   return { covered: false, via: null as string | null };
 }
 
+function ownsRepoDeskHandoff(content: string) {
+  const source = String(content || "");
+  return (
+    /window\.location\.assign\(\s*["']cg-repair-lab\.html["']\s*\)/.test(source) ||
+    /(?:window\.)?location\.href\s*=\s*["']cg-repair-lab\.html["']/.test(source) ||
+    /setAttribute\(\s*["']href["']\s*,\s*["']cg-repair-lab\.html["']\s*\)/.test(source) ||
+    /data-code-labs-repo-handoff-owner/.test(source) && /cg-repair-lab\.html/.test(source)
+  );
+}
+
 function mapGovernanceContracts(files: SnapshotFile[], findings: Finding[]) {
   const byPath = new Map(files.map((file) => [file.path, file]));
   const assets = files.filter((file) =>
@@ -547,12 +554,7 @@ function mapGovernanceContracts(files: SnapshotFile[], findings: Finding[]) {
   }
 
   const handoffOwners = assets.filter((file) =>
-    /window\.location\.assign\(\s*["']cg-repair-lab\.html["']\s*\)/.test(
-      file.content,
-    ) ||
-    /setAttribute\(\s*["']href["']\s*,\s*["']cg-repair-lab\.html["']\s*\)/.test(
-      file.content,
-    ) || /\brouteRepoDesk\b/.test(file.content)
+    ownsRepoDeskHandoff(file.content)
   ).map((file) => file.path);
   if (handoffOwners.length > 1) {
     addFinding(findings, {
@@ -946,6 +948,32 @@ export function getCgRepairLabWorkflow() {
     read_only_default: true,
     trust_state: "HOLD_UNTRUSTED_ADVISORY",
     authoritative_use: false,
+    availability_semantics:
+      "enabled means the owner-authorized guarded workflow action is callable; it never grants CG Repair Lab or Code God independent mutation or promotion authority.",
+    independent_checkpoint_contract: {
+      tool: "create_code_labs_checkpoint",
+      kind: "master-checklist-independent-gate-v1",
+      purpose:
+        "Writer-independent evidence must be created after the bounded Code God PASS and before github.writer_prepare.",
+      required_bindings: [
+        "repository and path",
+        "source_hash and candidate_hash",
+        "repo_handoff identity/hash",
+        "Code God review/handoff identity, outcome and trust state",
+        "Master Plan record id/hash",
+        "Master Checklist id/version and scoped checklist PASS",
+        "branch/base/head proof",
+        "checks_run and checks_not_run",
+        "limitations and evidence_sources",
+        "captured timestamps",
+      ],
+      generic_prose_checkpoint_writer_valid: false,
+      writer_revalidates_at_prepare: true,
+      writer_revalidates_at_execute: true,
+      global_master_plan_may_remain_hold: true,
+      note:
+        "A normal prose checkpoint is valid for rollback/history but is intentionally insufficient as Writer independent evidence.",
+    },
     controls: [
       {
         control: "check_pro_access",
@@ -967,59 +995,56 @@ export function getCgRepairLabWorkflow() {
         control: "save_separate_candidate",
         connector: "Code Labs V104 Tool-Only",
         tool: "save_code_labs_candidate",
-        enabled: false,
+        enabled: true,
         owner_control: true,
         repair_lab_authority: false,
         writes: "selected file metadata only",
         replaces_selected_source: false,
-        hold_reason:
-          "Repair Lab candidate use is held until the education and independent evidence gates pass.",
+        requires_complete_file_candidate: true,
       },
       {
         control: "prepare_code_god_handoff",
         connector: "Code Labs V104 Tool-Only",
         tool: "run_code_labs_action",
         action: "repo.prepare_handoff",
-        enabled: false,
+        enabled: true,
         authoritative_use: false,
         writes: "selected file metadata and receipt only",
-        hold_reason:
-          "Use the independently reviewed owner workflow rather than Repair Lab authority while trust is held.",
+        requires_verified_provenance: true,
+        requires_existing_non_protected_branch: true,
       },
       {
         control: "run_code_god",
         connector: "Code Labs V104 Tool-Only",
         tool: "run_code_labs_action",
         action: "code_god.review",
-        enabled: false,
+        enabled: true,
         code_god_advisory_only: true,
         writes: "bounded review and receipt only",
-        hold_reason:
-          "Code God remains advisory until its separate education and trust promotion passes.",
+        cannot_self_certify: true,
       },
       {
         control: "queue_writer_request",
         connector: "Code Labs V104 Tool-Only",
         tool: "run_code_labs_action",
         action: "github.writer_prepare",
-        enabled: false,
+        enabled: true,
         writes: "private queue and receipt only",
         requires_code_god_pass: true,
         requires_independent_evidence_receipt: true,
-        hold_reason:
-          "Writer preparation is held until independent evidence and review-system trust gates pass.",
+        requires_existing_non_protected_branch: true,
       },
       {
         control: "execute_reviewed_writer",
         connector: "Code Labs V104 Writer",
         tool: "execute_code_labs_github_writer",
-        enabled: false,
+        enabled: true,
+        repair_lab_authority: false,
         writes:
           "one reviewed file on an existing non-protected branch and one draft PR",
         requires_code_god_pass: true,
         requires_independent_evidence_receipt: true,
-        hold_reason:
-          "Writer execution is outside Repair Lab authority and remains held during education.",
+        requires_validated_queued_request: true,
       },
       {
         control: "read_code_labs_page",
@@ -1032,7 +1057,9 @@ export function getCgRepairLabWorkflow() {
     prohibited: [
       "cg_repair_lab.save_candidate",
       "candidate.accept",
-      "authoritative candidate, handoff, Code God, or Writer action while trust is held",
+      "Repair Lab or Code God claiming independent authoritative mutation or promotion authority",
+      "Writer preparation without bounded Code God PASS and independent evidence",
+      "Writer execution without a validated queued request",
       "direct default-branch write",
       "merge",
       "deploy",
