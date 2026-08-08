@@ -279,7 +279,8 @@ function exactSecretReferences(files: SnapshotFile[]) {
       label: (name: string) => "process.env." + name,
     },
     {
-      regex: /import\.meta\.env\.([A-Za-z_][A-Za-z0-9_]*)/g,
+      regex:
+        /import\.meta\.env\.([A-Za-z_][A-Za-z0-9_]*)/g,
       label: (name: string) => "import.meta.env." + name,
     },
     {
@@ -504,6 +505,27 @@ function extractPreservedToolNames(source: string) {
   );
 }
 
+function ciContractCoverage(
+  path: string,
+  workflow: string,
+  byPath: Map<string, SnapshotFile>,
+) {
+  if (!workflow) return { covered: false, via: null as string | null };
+  if (workflow.includes(path)) {
+    return { covered: true, via: FUNCTIONAL_SMOKE_WORKFLOW };
+  }
+  const allPaths = new Set(byPath.keys());
+  for (const [runnerPath, runner] of byPath.entries()) {
+    if (!workflow.includes(runnerPath)) continue;
+    const importsTarget = extractDependencyReferences(runnerPath, runner.content)
+      .some((reference) =>
+        resolveDependency(runnerPath, reference.raw, allPaths) === path
+      );
+    if (importsTarget) return { covered: true, via: runnerPath };
+  }
+  return { covered: false, via: null as string | null };
+}
+
 function mapGovernanceContracts(files: SnapshotFile[], findings: Finding[]) {
   const byPath = new Map(files.map((file) => [file.path, file]));
   const assets = files.filter((file) =>
@@ -564,18 +586,23 @@ function mapGovernanceContracts(files: SnapshotFile[], findings: Finding[]) {
   }
 
   const workflow = byPath.get(FUNCTIONAL_SMOKE_WORKFLOW)?.content || "";
-  const missingCiTests = CERTIFICATION_CRITICAL_TESTS.filter((path) =>
-    byPath.has(path) && workflow && !workflow.includes(path)
-  );
+  const ciCoverage = Object.fromEntries(
+    CERTIFICATION_CRITICAL_TESTS.filter((path) => byPath.has(path)).map((path) =>
+      [path, ciContractCoverage(path, workflow, byPath)]
+    ),
+  ) as Record<string, { covered: boolean; via: string | null }>;
+  const missingCiTests = Object.entries(ciCoverage)
+    .filter(([, coverage]) => !coverage.covered)
+    .map(([path]) => path);
   for (const path of missingCiTests) {
     addFinding(findings, {
       severity: "P1",
       rule_id: "CGRL-CI-CONTRACT-NOT-RUN-001",
       message:
-        "A certification-critical Code Labs contract exists but is not invoked by the canonical functional-smoke workflow: " +
+        "A certification-critical Code Labs contract exists but is not executed directly or through an imported contract by the canonical functional-smoke workflow: " +
         path + ".",
       correction:
-        "Wire the existing contract into .github/workflows/code-labs-v50-functional-smoke.yml without creating a duplicate workflow owner.",
+        "Reuse an existing canonical smoke test owner and bind the contract through a real repository dependency, or update the existing workflow owner in place; do not create a duplicate workflow.",
       path: FUNCTIONAL_SMOKE_WORKFLOW,
     });
   }
@@ -592,6 +619,7 @@ function mapGovernanceContracts(files: SnapshotFile[], findings: Finding[]) {
     certification_critical_tests: CERTIFICATION_CRITICAL_TESTS.filter((path) =>
       byPath.has(path)
     ),
+    ci_coverage: ciCoverage,
     missing_ci_tests: missingCiTests,
   };
 }
@@ -1075,7 +1103,8 @@ export async function analyzeCgRepairLab(b: Binding, args: Row) {
   );
   const governance = rows.filter((row) => {
     const path = String(row.path || "");
-    return WORKFLOW_PATH.test(path) || path === PAGE_OWNER_CONTRACT;
+    return WORKFLOW_PATH.test(path) ||
+      CERTIFICATION_CRITICAL_TESTS.includes(path);
   });
   const seedMap = new Map<string, Row>();
   for (
