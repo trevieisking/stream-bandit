@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  var VERSION = 'V7.13.024 Unified Route Registry Foundation / Social Route Parity';
+  var VERSION = 'V7.13.025 Unified Route Registry + Manic Records';
 
   var ROUTE_CLASSES = {
     PUBLIC: 'public',
@@ -51,6 +51,7 @@
     {label:'Friends',url:'friends-social-v7-13-001-test.html',group:'Social',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_profiles','sb_user_friends','sb_likes','sb_movies'],write:['sb_user_friends']},
     {label:'News Feed',url:'news-feed-social-v7-13-001-test.html',group:'Social',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_social_posts','sb_social_events','sb_social_post_comments','sb_social_post_reactions'],write:['sb_social_posts','sb_social_post_comments','sb_social_post_reactions','sb_social_event_rsvps']},
     {label:'Groups',url:'groups-social-v7-13-001-test.html',group:'Social',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_REQUIRED,read:['sb_social_groups','sb_social_group_members','sb_social_posts','sb_social_events'],write:['sb_social_groups','sb_social_group_members','sb_social_posts','sb_social_events','sb_social_event_rsvps']},
+    {label:'Manic Records',url:'manic-records.html',group:'Music',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.ACCOUNT_OPTIONAL,read:['manic_tracks','manic_track_comments','manic_track_likes','sb_profiles'],write:['manic_tracks','manic_track_comments','manic_track_likes']},
     {label:'User Management Dashboard',url:'user-management-dashboard-v7-11-2-test.html',group:'User Management',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.OWNER,read:['sb_profiles','sb_admin_audit_log'],write:['sb_profiles']},
     {label:'Permissions Matrix',url:'permissions-matrix-user-management-v7-11-4-test.html',group:'User Management',shell:SHELLS.MAIN_APP,routeClass:ROUTE_CLASSES.OWNER,read:['sb_profiles','sb_admin_audit_log'],write:[]},
     {label:'Web Builder Hub',url:'web-builder-account-control-hub-v7-12-263-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER,read:['sb_profiles','sb_site_pages'],write:[]},
@@ -63,7 +64,7 @@
     {label:'Assets',url:'web-builder-assets-v7-12-252-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:[]},
     {label:'Route Map',url:'web-builder-route-map-v7-12-252-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles'],write:[]},
     {label:'Control Map',url:'web-builder-control-map-v7-12-253-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles'],write:[]},
-    {label:'Pages Source Map',url:'web-builder-pages-source-map-v7-12-255-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:[]},
+    {label:'Pages Source Map',url:'web-builder-pages-source-map-v7-12-255.md',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:[]},
     {label:'Header/Footer Code',url:'web-builder-header-footer-code-v7-12-254-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:['sb_site_pages']},
     {label:'Web Builder Manifest',url:'WEB-BUILDER-MANIFEST-V7-12-252.md',group:'Manifest',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:[]}
   ];
