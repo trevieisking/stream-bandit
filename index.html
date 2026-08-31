@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Stream Bandit Home V7.13.106</title>
+<title>Stream Bandit Home V7.13.107</title>
 <link rel="icon" type="image/png" sizes="16x16" href="stream_bandit_stag_icon_16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <link rel="apple-touch-icon" href="apple_touch_icon_180.png">
@@ -47,7 +47,7 @@ code{color:#baf7df;overflow-wrap:anywhere}
 @media(max-width:900px){body{padding:10px}.heroGrid{grid-template-columns:1fr}.btn{width:100%;white-space:normal}.miniRail .btn,.actions .btn{width:100%}}
 </style>
 </head>
-<body data-sb-main-app-page="true" data-sb-index-entry="v7-13-106" data-sb-watch-group-promoted="v7-13-080" data-sb-browse-group-promoted="v7-13-085" data-sb-mux-manager-live-candidate="v7-13-090" data-sb-creator-group-promoted="v7-13-095" data-sb-group-play-promoted="v7-13-101" data-sb-social-group-promoted="v7-13-105" data-sb-platform-home-polish="v7-13-106" data-sb-registry-promoted="true" data-sb-auth-gate-index-test="v7-13-005">
+<body data-sb-main-app-page="true" data-sb-index-entry="v7-13-107" data-sb-watch-group-promoted="v7-13-080" data-sb-browse-group-promoted="v7-13-085" data-sb-mux-manager-live-candidate="v7-13-090" data-sb-creator-group-promoted="v7-13-095" data-sb-group-play-promoted="v7-13-101" data-sb-social-group-promoted="v7-13-105" data-sb-platform-home-polish="v7-13-106" data-sb-manic-records-entry="v1" data-sb-registry-promoted="true" data-sb-auth-gate-index-test="v7-13-005">
 <div class="wrap">
   <main class="hero">
     <div class="heroGrid">
@@ -56,15 +56,16 @@ code{color:#baf7df;overflow-wrap:anywhere}
         <span class="pill hotPill">Social is live in the platform entry</span>
         <span class="pill cyanPill">Watch, browse, create and connect</span>
         <h1>Welcome back to Stream Bandit</h1>
-        <p>Jump straight into watching, browse the library, or open the social area for profiles, friends, the feed and groups.</p>
+        <p>Jump straight into watching, browse the library, open the social area, or head into Manic Records for the dedicated music feed.</p>
         <div class="miniRail" aria-label="Primary actions">
           <a class="btn hot" href="player-2-clean-machine-v7-12-58-test.html">Watch Player 2</a>
           <a class="btn" href="library-global-helpers-v7-4-8-test.html">Open Library</a>
           <a class="btn cyan" href="continue-watching-global-helpers-v7-3-9-test.html">Continue Watching</a>
           <a class="btn hot" href="profile-social-v7-13-001-test.html">Open Social Profile</a>
+          <a class="btn hot" href="manic-records.html">Open Manic Records</a>
           <a class="btn cyan" href="global-search-global-helpers-v7-4-9-test.html">Search Stream Bandit</a>
         </div>
-        <div id="status" class="status">Signed-in platform home loaded. Social, Watch, Browse, Creator and admin routes stay available from here.</div>
+        <div id="status" class="status">Signed-in platform home loaded. Social, Watch, Browse, Creator, Music and admin routes stay available from here.</div>
         <div id="helperStatus" class="note">Checking global helpers...</div>
       </div>
       <div class="art"><div><b>WATCH<br>CONNECT<br>CREATE</b><p>Your main routes are ready in one place.</p></div></div>
@@ -88,6 +89,13 @@ code{color:#baf7df;overflow-wrap:anywhere}
       <article class="card"><b>Friends</b><p>Find friends, manage requests and open social profiles.</p><a class="btn hot" href="friends-social-v7-13-001-test.html">Open Friends</a></article>
       <article class="card"><b>News Feed</b><p>Open posts and activity from the social area.</p><a class="btn cyan" href="news-feed-social-v7-13-001-test.html">Open News Feed</a></article>
       <article class="card"><b>Groups and Events</b><p>Create/open groups, posts, comments, likes, events and RSVP.</p><a class="btn cyan" href="groups-social-v7-13-001-test.html">Open Groups</a></article>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>Music</h2>
+    <div class="grid">
+      <article class="card"><b>Manic Records</b><p>Dedicated grime and hip hop music feed with MP3/audio, Mux video, square covers, public/private uploads, child-friendly or explicit labels, likes, comments and sharing.</p><a class="btn hot" href="manic-records.html">Open Manic Records</a></article>
     </div>
   </section>
 
@@ -127,33 +135,33 @@ code{color:#baf7df;overflow-wrap:anywhere}
 
   <section class="box release">
     <h2>Release status</h2>
-    <p>Social is promoted on the platform entry. This page is user-facing, while the technical promotion facts remain available below for rollback clarity.</p>
+    <p>Social is promoted on the platform entry. Manic Records is staged as a dedicated music route on the feature branch while its exact release evidence is checked.</p>
     <div class="foot">
-      <span class="pill">Platform Home: V7.13.106</span>
+      <span class="pill">Platform Home: V7.13.107</span>
+      <span class="pill hotPill">Manic Records entry staged</span>
       <span class="pill hotPill">Social Media Group promoted: V7.13.105</span>
       <span class="pill hotPill">Group Play full pass: V7.13.101</span>
       <span class="pill hotPill">Mux Manager live candidate passed</span>
-      <span class="pill warn">No SQL/RLS/storage policy changes here</span>
-      <span class="pill warn">Header Shell mass gate not approved</span>
+      <span class="pill warn">No sb_movies reuse for music</span>
     </div>
   </section>
 </div>
-<script src="stream-bandit-shell-v6-24.js?v=index-7-13-106"></script>
+<script src="stream-bandit-shell-v6-24.js?v=index-7-13-107"></script>
 <script src="stream-bandit-auth-gate-v7-13-001.js?v=index-auth-gate-7-13-005"></script>
-<script src="stream-bandit-theme-projector-v7-12-156.js?v=index-7-13-106"></script>
-<script src="stream-bandit-header-shell-v7-12-156.js?v=index-7-13-106"></script>
-<script src="stream-bandit-footer-shell-v7-12-156.js?v=index-7-13-106"></script>
-<script src="stream-bandit-core-saves-v6-75.js?v=index-7-13-106"></script>
-<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=index-7-13-106"></script>
-<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=index-7-13-106"></script>
-<script src="stream-bandit-settings-global-v7-1-8.js?v=index-7-13-106"></script>
-<script src="stream-bandit-brand-logo-v7-12-12.js?v=index-7-13-106"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=index-7-13-107"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=index-7-13-107"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=index-7-13-107"></script>
+<script src="stream-bandit-core-saves-v6-75.js?v=index-7-13-107"></script>
+<script src="stream-bandit-menu-saves-count-v6-72-1.js?v=index-7-13-107"></script>
+<script src="live-readiness-search-supabase-fallback-v7-12-130.js?v=index-7-13-107"></script>
+<script src="stream-bandit-settings-global-v7-1-8.js?v=index-7-13-107"></script>
+<script src="stream-bandit-brand-logo-v7-12-12.js?v=index-7-13-107"></script>
 <script>
 (function(){'use strict';
-const VERSION='V7.13.106 Platform Entry User-Facing Home After Social Promotion';
+const VERSION='V7.13.107 Platform Entry + Manic Records Music Route';
 const $=id=>document.getElementById(id);
 function refresh(){try{if(window.StreamBanditAuthGate&&window.StreamBanditAuthGate.enforce)window.StreamBanditAuthGate.enforce();if(window.StreamBanditThemeProjector&&window.StreamBanditThemeProjector.refresh)window.StreamBanditThemeProjector.refresh();if(window.StreamBanditHeaderShell&&window.StreamBanditHeaderShell.refresh)window.StreamBanditHeaderShell.refresh();if(window.StreamBanditFooterShell&&window.StreamBanditFooterShell.refresh)window.StreamBanditFooterShell.refresh();if(window.StreamBanditMenuSavesCount&&window.StreamBanditMenuSavesCount.refresh)window.StreamBanditMenuSavesCount.refresh();if(window.StreamBanditLiveReadinessSearchFallback&&window.StreamBanditLiveReadinessSearchFallback.refresh)window.StreamBanditLiveReadinessSearchFallback.refresh();if(window.StreamBanditBrandLogo&&window.StreamBanditBrandLogo.refresh)window.StreamBanditBrandLogo.refresh()}catch(e){}let h=$('helperStatus');if(h)h.textContent='Header OK · Footer OK · Theme OK · Auth Gate OK';}
-refresh();setTimeout(refresh,900);setTimeout(refresh,2200);window.StreamBanditIndex={version:VERSION,muxManagerLiveCandidate:'v7-13-090',creatorGroupPromoted:'v7-13-095',groupPlayPromoted:'v7-13-101',socialGroupPromoted:'v7-13-105',platformHomePolish:'v7-13-106',collectionsSourceCorrected:true};document.documentElement.dataset.sbIndex='v7-13-106-platform-home-user-facing';
+refresh();setTimeout(refresh,900);setTimeout(refresh,2200);window.StreamBanditIndex={version:VERSION,muxManagerLiveCandidate:'v7-13-090',creatorGroupPromoted:'v7-13-095',groupPlayPromoted:'v7-13-101',socialGroupPromoted:'v7-13-105',platformHomePolish:'v7-13-106',manicRecordsEntry:'v1',collectionsSourceCorrected:true};document.documentElement.dataset.sbIndex='v7-13-107-platform-home-manic-records';
 })();
 </script>
 </body>
