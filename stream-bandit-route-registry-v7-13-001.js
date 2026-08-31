@@ -64,7 +64,7 @@
     {label:'Assets',url:'web-builder-assets-v7-12-252-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:[]},
     {label:'Route Map',url:'web-builder-route-map-v7-12-252-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles'],write:[]},
     {label:'Control Map',url:'web-builder-control-map-v7-12-253-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles'],write:[]},
-    {label:'Pages Source Map',url:'web-builder-pages-source-map-v7-12-255.md',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:[]},
+    {label:'Pages Source Map',url:'web-builder-pages-source-map-v7-12-255-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:[]},
     {label:'Header/Footer Code',url:'web-builder-header-footer-code-v7-12-254-test.html',group:'Web Builder',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:['sb_site_pages']},
     {label:'Web Builder Manifest',url:'WEB-BUILDER-MANIFEST-V7-12-252.md',group:'Manifest',shell:SHELLS.WEB_BUILDER,routeClass:ROUTE_CLASSES.WEB_BUILDER_OWNER,read:['sb_profiles','sb_site_pages'],write:[]}
   ];
