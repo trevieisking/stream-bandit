@@ -2,12 +2,16 @@
 -- Production retained the original V1 url|mux source checks even though the
 -- live uploader and the newer foundation schema use storage-backed audio.
 -- Preserve legacy URL audio and Mux video while accepting validated Storage
--- metadata for audio uploads.
+-- metadata for audio uploads. Drop both historical source-constraint names so
+-- production and databases replayed from repository migrations converge.
 
 begin;
 
 alter table public.manic_tracks
   drop constraint if exists manic_tracks_source_fields;
+
+alter table public.manic_tracks
+  drop constraint if exists manic_tracks_source_check;
 
 alter table public.manic_tracks
   drop constraint if exists manic_tracks_source_type_check;
