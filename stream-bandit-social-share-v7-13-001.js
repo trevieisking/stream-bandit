@@ -10,7 +10,7 @@ const VERSION='V7.13.002 Social Share Helper + Promotion Text Cleanup';
 const BLOCKED_VISIBILITY=new Set(['private','friends','friend','friends_only','friends-only','group_members','group-members','members','member','group','message','private_message','dm']);
 const DEFAULT_TITLE='Stream Bandit';
 
-function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[m]||m));}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]||m));}
 function clean(v,n){v=String(v||'').replace(/\s+/g,' ').trim();return n&&v.length>n?v.slice(0,n-1).trim()+'…':v;}
 function canonVisibility(v){return String(v||'public').toLowerCase().replace(/\s+/g,'_');}
 function isBlockedVisibility(v){return BLOCKED_VISIBILITY.has(canonVisibility(v));}
