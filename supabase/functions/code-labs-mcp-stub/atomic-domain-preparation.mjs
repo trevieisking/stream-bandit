@@ -551,7 +551,7 @@ export async function prepareRepoHandoffAtomic(argsValue, contextValue) {
   const path = safePath(fields.path || file.metadata?.source_path || file.filename);
   const proposed = String(fields.content ?? file.metadata?.fixed_output ?? "");
   if (!completeFile(path, proposed)) throw new Error("A complete proposed file under 180000 characters is required.");
-  const original = String(file.current_code || "");
+  const original = normalizeAction(fields.action) === "add" ? "" : String(file.current_code || "");
   const now = exactTime(context.now, "preparation time");
   const handoff = {
     version: "V50-repo-handoff-1",
