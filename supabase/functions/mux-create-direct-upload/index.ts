@@ -75,20 +75,27 @@ async function getSignedInUser(req: Request) {
     }
   }
 
-  const role = String(
-    profile?.role ||
-    profile?.account_role ||
-    profile?.user_role ||
-    user.app_metadata?.role ||
-    ""
-  ).toLowerCase();
+  const role = String(profile?.role || user.app_metadata?.role || "").toLowerCase();
+  const adminLevel = String(profile?.admin_level || "").toLowerCase();
+  const planKey = String(profile?.plan_key || "").toLowerCase();
+  const accountStatus = String(profile?.account_status || "").toLowerCase();
+  const active = !!profile && (!accountStatus || accountStatus === "active");
+  const privileged = active && (
+    ADMIN_ROLES.has(role) ||
+    adminLevel === "admin" ||
+    adminLevel === "owner" ||
+    planKey === "platform_owner"
+  );
 
-  return { user, profile, role, admin };
+  return { user, profile, role, adminLevel, planKey, accountStatus, active, privileged, admin };
 }
 
 async function getSignedInAdmin(req: Request) {
   const signedIn = await getSignedInUser(req);
-  if (!ADMIN_ROLES.has(signedIn.role)) {
+  if (!signedIn.active) {
+    throw new Error("An active Stream Bandit profile is required for Mux access.");
+  }
+  if (!signedIn.privileged) {
     throw new Error("Admin or owner role required for Mux uploads.");
   }
   return signedIn;
@@ -276,6 +283,9 @@ async function removeStoredObject(
 
 async function deleteTrack(body: any, req: Request) {
   const signedIn = await getSignedInUser(req);
+  if (!signedIn.active) {
+    throw new Error("An active Stream Bandit profile is required before deleting a track.");
+  }
   const trackId = String(body?.track_id || "").trim();
   if (!UUID.test(trackId)) throw new Error("A valid track_id is required.");
 
@@ -292,7 +302,7 @@ async function deleteTrack(body: any, req: Request) {
 
   const creatorId = String(track.created_by || "").trim();
   const isCreator = creatorId === String(signedIn.user.id);
-  const privileged = ADMIN_ROLES.has(signedIn.role);
+  const privileged = signedIn.privileged;
   if (!isCreator && !privileged) {
     throw new Error("Only the track creator or an administrator can delete this item.");
   }
