@@ -80,7 +80,6 @@ async function getSignedInUser(req: Request) {
     profile?.account_role ||
     profile?.user_role ||
     user.app_metadata?.role ||
-    user.user_metadata?.role ||
     ""
   ).toLowerCase();
 
