@@ -1,15 +1,19 @@
-/* Stream Bandit Theme Projector V7.12.173
+/* Stream Bandit Theme Projector V7.12.174
    Reads the theme owned by web-builder-theme-studio-controls-v7-8-9-test.html
    and projects it onto every page through shared CSS variables.
    Also carries the global Details route bridge so old/bare Details buttons keep the clicked movie id/title.
-   V7.12.173 adds a tiny favicon bridge so two-shell pages such as Details load the approved favicon helper. */
+   V7.12.173 adds a tiny favicon bridge so two-shell pages such as Details load the approved favicon helper.
+   V7.12.174 adds dataset-gated helper loading only for Manic Records, Manic Studio and Manic DJ. */
 (function(){
 'use strict';
 
-const VERSION='V7.12.173 Theme Projector + Details Route Bridge + Favicon Bridge';
+const VERSION='V7.12.174 Theme Projector + Details Route Bridge + Manic Page Helpers';
 const OWNER='web-builder-theme-studio-controls-v7-8-9-test.html';
 const DETAILS='details-clean-machine-v7-12-38-test.html';
 const FAVICON_HELPER='stream-bandit-favicon-v7-12-16.js';
+const MANIC_TRACK_CONTROLS='manic-track-controls-v1.js?v=20260902-live1';
+const MANIC_RECORDS_POLISH='manic-records-polish-v3.js?v=20260902-live1';
+const MANIC_STUDIO_PROJECT_CONTROLS='manic-studio-project-controls-v1.js?v=20260902-live1';
 const KEYS=['streamBanditTheme','stream-bandit-theme','sbTheme','sb_theme','web_builder_shared_style_v7_8_8','web_builder_style'];
 const DEFAULT={accent:'#22d3a6',accent2:'#7c3cff',bg:'#050711',background:'#050711',card:'#101529',card2:'#17122d',p:'#101529',p2:'#17122d',title:'#ffffff',titleColor:'#ffffff',muted:'#b9c0d8',textColor:'#b9c0d8',btnText:'#ffffff',buttonText:'#ffffff',font:'Inter,system-ui,Arial,sans-serif',fontScale:'1',line:'#ffffff22'};
 
@@ -90,7 +94,7 @@ function apply(theme,source){
 
   try{document.body.style.fontFamily=s.font||DEFAULT.font;}catch(e){}
 
-  r.dataset.sbThemeProjector='v7-12-173';
+  r.dataset.sbThemeProjector='v7-12-174';
   r.dataset.sbThemeOwner=OWNER;
   r.dataset.sbThemeSource=source||s.source||'local';
 
@@ -128,6 +132,39 @@ function loadFaviconHelper(){
     s.defer=true;
     s.dataset.sbLoadedBy='theme-projector-favicon-bridge';
     document.head.appendChild(s);
+  }catch(e){}
+}
+
+function loadPageHelper(id,src){
+  try{
+    if(document.getElementById(id))return;
+    const base=String(src||'').split('?')[0];
+    if(!base)return;
+    if(Array.from(document.scripts||[]).some(script=>String(script.src||'').includes(base)))return;
+    const script=document.createElement('script');
+    script.id=id;
+    script.src=src;
+    script.async=false;
+    script.defer=true;
+    script.dataset.sbLoadedBy='theme-projector-manic-v7-12-174';
+    document.head.appendChild(script);
+  }catch(e){}
+}
+
+function loadManicPageHelpers(){
+  try{
+    const body=document.body;
+    if(!body)return;
+    if(body.dataset.sbManicRecordsPage){
+      loadPageHelper('manicRecordsPolishV31',MANIC_RECORDS_POLISH);
+      loadPageHelper('manicTrackControlsV1',MANIC_TRACK_CONTROLS);
+    }
+    if(body.dataset.sbManicStudioPage){
+      loadPageHelper('manicStudioProjectControlsV1',MANIC_STUDIO_PROJECT_CONTROLS);
+    }
+    if(body.dataset.sbManicDjPage){
+      loadPageHelper('manicTrackControlsV1',MANIC_TRACK_CONTROLS);
+    }
   }catch(e){}
 }
 
@@ -284,11 +321,14 @@ function bridgeBoot(){
 
 function boot(){
   loadFaviconHelper();
+  loadManicPageHelpers();
   refresh(true);
   bridgeBoot();
 
   setTimeout(()=>refresh(true),250);
   setTimeout(()=>refresh(true),1000);
+  setTimeout(loadManicPageHelpers,250);
+  setTimeout(loadManicPageHelpers,1000);
   setTimeout(refreshFavicon,550);
   setTimeout(refreshFavicon,1600);
 
@@ -313,6 +353,7 @@ function boot(){
     saveAndApply:saveAndApply,
     read:readLocal,
     patchDetailsLinks:patchDetailsLinks,
+    loadManicPageHelpers:loadManicPageHelpers,
     refreshFavicon:refreshFavicon,
     state:()=>({
       version:VERSION,
@@ -320,6 +361,7 @@ function boot(){
       theme:normalized(readLocal()||DEFAULT),
       detailsRouteBridge:'v7-12-173',
       faviconBridge:'theme-projector-favicon-bridge-1',
+      manicPageHelpers:'dataset-gated-v1',
       detailsTarget:readStoredTarget()
     })
   };
