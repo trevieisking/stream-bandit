@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { buildWriterGitCasPlan, validateCreatedCommitProof } from './writer-git-cas-plan.mjs';
+import {
+  verifyWriterRefAfterUpdate,
+  WRITER_REF_VERIFICATION_EVIDENCE,
+} from './writer-ref-verification.mjs';
 
 const BASE = 'a'.repeat(40);
 const REVIEWED = 'b'.repeat(40);
@@ -154,4 +158,73 @@ test('completed replay returns existing proof without creating another commit or
   const isComplete = completed.status === 'pr_opened' && /^[a-f0-9]{40}$/.test(completed.github_commit_sha) && completed.pull_request_number > 0;
   assert.equal(isComplete, true);
   assert.deepEqual({ commits: git.createdCommits, prs: git.prs, head: git.head }, before);
+});
+
+test('stale parent read is retried until the created commit is visible', async () => {
+  const observed = [REVIEWED, CREATED];
+  const sleeps = [];
+  const result = await verifyWriterRefAfterUpdate({
+    readRef: async () => observed.shift(),
+    createdCommitSha: CREATED,
+    expectedParentSha: REVIEWED,
+    delays: [0, 10, 20],
+    sleep: async (milliseconds) => sleeps.push(milliseconds),
+  });
+  assert.deepEqual(result, { outcome: 'applied', ref_sha: CREATED, attempts: 2 });
+  assert.deepEqual(sleeps, [0, 10]);
+});
+
+test('transient ref-read failure is retried without repeating the write', async () => {
+  let reads = 0;
+  const result = await verifyWriterRefAfterUpdate({
+    readRef: async () => {
+      reads += 1;
+      if (reads === 1) throw new Error('temporary read failure');
+      return CREATED;
+    },
+    createdCommitSha: CREATED,
+    expectedParentSha: REVIEWED,
+    delays: [0, 1],
+    sleep: async () => {},
+  });
+  assert.equal(result.outcome, 'applied');
+  assert.equal(reads, 2);
+  assert.equal(WRITER_REF_VERIFICATION_EVIDENCE.ref_update_retried, false);
+  assert.equal(WRITER_REF_VERIFICATION_EVIDENCE.second_commit_created, false);
+});
+
+test('persistent stale parent remains a fail-closed verification error', async () => {
+  let reads = 0;
+  await assert.rejects(
+    verifyWriterRefAfterUpdate({
+      readRef: async () => {
+        reads += 1;
+        return REVIEWED;
+      },
+      createdCommitSha: CREATED,
+      expectedParentSha: REVIEWED,
+      delays: [0, 1, 2],
+      sleep: async () => {},
+    }),
+    /still reports the reviewed parent after bounded verification/,
+  );
+  assert.equal(reads, 3);
+});
+
+test('an unexpected third SHA is reported as conflict without further reads', async () => {
+  let reads = 0;
+  const result = await verifyWriterRefAfterUpdate({
+    readRef: async () => {
+      reads += 1;
+      return MOVED;
+    },
+    createdCommitSha: CREATED,
+    expectedParentSha: REVIEWED,
+    delays: [0, 1, 2],
+    sleep: async () => {},
+  });
+  assert.deepEqual(result, { outcome: 'conflict', ref_sha: MOVED, attempts: 1 });
+  assert.equal(reads, 1);
+  assert.equal(WRITER_REF_VERIFICATION_EVIDENCE.unexpected_sha_accepted, false);
+  assert.equal(WRITER_REF_VERIFICATION_EVIDENCE.force_push_allowed, false);
 });
