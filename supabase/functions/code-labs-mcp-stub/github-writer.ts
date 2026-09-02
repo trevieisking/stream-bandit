@@ -11,6 +11,8 @@ import {
   buildWriterGitCasPlan,
   validateCreatedCommitProof,
 } from "./writer-git-cas-plan.mjs";
+// @ts-ignore -- Deno loads the reviewed JavaScript source-contract module directly.
+import { verifyWriterRefAfterUpdate } from "./writer-ref-verification.mjs";
 
 type Row = Record<string, any>;
 
@@ -901,19 +903,36 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       }
     }
 
+    progress.commit_sha = createdCommitSha;
+    progress.content_sha = contentSha;
     stage = "ref_verify";
-    const updatedRef = await githubRequest(
-      repoPath + "/git/ref/heads/" + encodeRef(branch),
-      token,
-    );
-    const refSha = exactSha(updatedRef?.object?.sha, "The updated branch SHA");
+    const refVerification = await verifyWriterRefAfterUpdate({
+      createdCommitSha,
+      expectedParentSha: plan.expected_parent_sha,
+      readRef: async () => {
+        const updatedRef = await githubRequest(
+          repoPath + "/git/ref/heads/" + encodeRef(branch),
+          token,
+          {
+            cache: "no-store",
+            headers: { "Cache-Control": "no-cache" },
+          },
+        );
+        return exactSha(updatedRef?.object?.sha, "The updated branch SHA");
+      },
+    });
+    if (refVerification.outcome === "conflict") {
+      stage = "ref_update_conflict";
+      throw new Error(
+        "The branch head changed after the reviewed commit was applied.",
+      );
+    }
+    const refSha = refVerification.ref_sha;
     validateCreatedCommitProof(plan, {
       commit_sha: createdCommitSha,
       parent_sha: plan.expected_parent_sha,
       ref_sha: refSha,
     });
-    progress.commit_sha = createdCommitSha;
-    progress.content_sha = contentSha;
     await audit(requestId, "file_committed", {
       claim_id: claimId,
       branch,
@@ -923,6 +942,7 @@ export async function executeGithubWriter(b: Binding, args: Row) {
       content_sha: contentSha,
       file_mode: plan.expected_blob_mode,
       force: false,
+      ref_verify_attempts: refVerification.attempts,
     });
 
     stage = "commit_checkpoint";
