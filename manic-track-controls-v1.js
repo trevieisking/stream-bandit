@@ -5,7 +5,7 @@
 (function(){
 'use strict';
 
-const VERSION='V1.0.1 Manic Track Download Edit Delete';
+const VERSION='V1.1.0 Manic Track Download Edit Delete + Server Cleanup';
 const TABLE='manic_tracks';
 const PUBLIC_AUDIO_BUCKET='manic-records-public-audio';
 const CARD_SELECTOR='[data-sb-social-share][data-sb-share-type="manic_track"][data-sb-share-id],[data-sb-manic-track-card][data-track-id]';
@@ -227,6 +227,29 @@ function notify(type,id,row){
     if(reload)setTimeout(function(){reload.click();},40);
   }
 }
+async function deleteThroughServer(track){
+  const sessionResult=await client().auth.getSession();
+  const accessToken=sessionResult&&sessionResult.data&&sessionResult.data.session&&sessionResult.data.session.access_token||'';
+  if(!accessToken)throw new Error('Your sign-in session is unavailable. Sign in again before deleting.');
+  const c=config();
+  const response=await fetch(c.url+'/functions/v1/mux-create-direct-upload',{
+    method:'POST',
+    headers:{
+      Authorization:'Bearer '+accessToken,
+      apikey:c.key,
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({action:'delete_track',track_id:track.id})
+  });
+  const payload=await response.json().catch(function(){return {};});
+  if(!response.ok||payload.ok!==true){
+    throw new Error(payload.error||'The protected media deletion service rejected the request.');
+  }
+  if(payload.record_deleted!==true&&payload.already_deleted!==true){
+    throw new Error('The protected media deletion service did not confirm catalogue deletion.');
+  }
+  return payload;
+}
 async function downloadTrack(id,btn){
   setBusy(btn,true,'Preparing…');
   try{
@@ -334,17 +357,13 @@ async function deleteTrack(id,btn){
     if(!user)throw new Error('Sign in to delete your track.');
     const track=await one(id);
     if(track.created_by!==user.id)throw new Error('Only the track creator can delete this item.');
-    const detail=track.media_kind==='audio'?'The track, comments, likes, uploaded audio and uploaded cover will be removed.':'The track, comments and likes will be removed. The underlying Mux video asset is not deleted by this browser action.';
+    const detail=track.media_kind==='audio'
+      ?'The track, comments, likes, playlist links, uploaded audio and uploaded cover will be removed.'
+      :'The track, comments, likes, playlist links, Mux video asset and uploaded cover will be permanently removed.';
     if(!window.confirm('Delete “'+track.title+'”?\n\n'+detail+'\n\nThis cannot be undone.'))return;
     setBusy(btn,true,'Deleting…');
-    const removed=await client().from(TABLE).delete().eq('id',track.id).eq('created_by',user.id).select('id');
-    if(removed.error)throw removed.error;
-    if(!removed.data||!removed.data.length)throw new Error('The track was not deleted.');
-    const cleanup=[];
-    if(track.audio_bucket&&track.audio_storage_path)cleanup.push(client().storage.from(track.audio_bucket).remove([track.audio_storage_path]));
-    if(track.cover_bucket&&track.cover_storage_path)cleanup.push(client().storage.from(track.cover_bucket).remove([track.cover_storage_path]));
-    if(cleanup.length)await Promise.allSettled(cleanup);
-    toast('Track deleted.');
+    await deleteThroughServer(track);
+    toast('Track and stored media deleted.');
     notify('deleted',track.id,null);
   }catch(error){toast(error&&error.message||'Track deletion failed.',true);}
   finally{setBusy(btn,false);}
