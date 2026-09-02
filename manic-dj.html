@@ -3,58 +3,1099 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Manic DJ | Stream Bandit Music</title>
+<title>Manic DJ Studio | Stream Bandit Music</title>
 <link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#050711;--p:#101529;--p2:#250812;--card:#ffffff10;--line:#ffffff2a;--muted:#c4c9dc;--accent:#22d3a6;--accent2:#7c3cff;--pink:#ff2d85;--warn:#ffb142;--bad:#ff4d6d;--cyan:#41e8ff}*{box-sizing:border-box;min-width:0}html,body{max-width:100vw;overflow-x:hidden}body{margin:0;padding:14px 14px 90px;background:radial-gradient(circle at 8% 0,#22d3a624,transparent 34%),radial-gradient(circle at 92% 0,#ff2d8524,transparent 38%),var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif}.wrap{max-width:1480px;margin:auto}.box,.hero,.deck,.trackCard{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 14px 44px #0008;padding:16px;margin-bottom:14px}.trackCard{background:var(--card);box-shadow:none}.tabs,.actions,.filters,.deckActions,.manic-track-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.pill,.btn{border:0;border-radius:999px;padding:10px 14px;background:#475071;color:#fff;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;gap:7px}.pill.active,.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}.btn.hot{background:linear-gradient(135deg,var(--pink),var(--accent2));color:#fff}.btn.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}.badge,.metaPill{display:inline-flex;align-items:center;border-radius:999px;background:#22d3a624;border:1px solid #22d3a666;color:#dfffee;font-weight:950;padding:5px 9px;font-size:12px;margin:2px}.metaPill.private{background:#ffb14222;border-color:#ffb14266;color:#ffe8b8}.metaPill.explicit{background:#ff4d6d22;border-color:#ff4d6d66;color:#ffd8de}h1{font-size:clamp(42px,6vw,80px);line-height:.94;margin:8px 0;letter-spacing:-.06em}h2{margin:0 0 10px}p,.muted,small,label{color:var(--muted);line-height:1.5}.heroGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,390px);gap:16px;align-items:stretch}.heroArt{border:1px solid #ffffff20;border-radius:28px;background:linear-gradient(135deg,#22d3a625,#7c3cff38,#ff2d8524);display:grid;place-items:center;text-align:center;min-height:240px;font-size:clamp(30px,5vw,58px);font-weight:1000;letter-spacing:-.05em}.status,.note,.danger{padding:11px 13px;border-radius:16px;background:#22d3a620;border:1px solid #22d3a666;color:#dfffee;font-weight:850;margin-top:10px}.note{background:#41e8ff18;border-color:#41e8ff55;color:#d7fbff}.danger{background:#ff4d6d22;border-color:#ff4d6d66;color:#ffd8de}.deckGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.deck{margin:0;background:linear-gradient(135deg,#0e1428,#250812)}.deckHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.deckLetter{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017;font-size:26px;font-weight:1000}.deck audio{width:100%;margin:14px 0}.deck label{display:grid;grid-template-columns:80px 1fr 48px;gap:8px;align-items:center}.deck input[type="range"],.mixer input[type="range"]{width:100%;accent-color:var(--accent)}.mixer{text-align:center}.mixerLine{display:grid;grid-template-columns:80px minmax(180px,1fr) 80px;gap:12px;align-items:center;max-width:760px;margin:10px auto}.filters input,.filters select{border:1px solid #ffffff28;border-radius:16px;background:#0006;color:#fff;padding:11px 12px;font:inherit;min-width:170px}.library{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.trackCard{margin:0}.trackHead{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center}.cover{width:76px;height:76px;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#22d3a625,#7c3cff45,#ff2d8525);display:grid;place-items:center;font-weight:1000}.cover img{width:100%;height:100%;object-fit:cover}.trackTitle{font-size:20px;font-weight:1000;overflow-wrap:anywhere}.trackArtist{color:var(--muted);font-weight:850}.empty{grid-column:1/-1;border:1px dashed #ffffff35;border-radius:20px;background:#ffffff08;color:var(--muted);font-weight:850;padding:18px}.manic-track-actions{margin-top:9px}@media(max-width:900px){body{padding:10px 10px 110px}.heroGrid,.deckGrid{grid-template-columns:1fr}.btn,.pill{flex:1 1 auto}.mixerLine{grid-template-columns:58px minmax(120px,1fr) 58px}.library{grid-template-columns:1fr}.filters input,.filters select{width:100%}}
+:root{
+  color-scheme:dark;
+  --bg:#050711;
+  --p:#101529;
+  --p2:#250812;
+  --card:#ffffff10;
+  --line:#ffffff2a;
+  --muted:#c4c9dc;
+  --accent:#22d3a6;
+  --accent2:#7c3cff;
+  --pink:#ff2d85;
+  --warn:#ffb142;
+  --bad:#ff4d6d;
+  --cyan:#41e8ff;
+  --deckA:#22d3a6;
+  --deckB:#ff2d85;
+  --fontScale:1;
+}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100vw;overflow-x:hidden}
+body{
+  margin:0;
+  padding:14px 14px 110px;
+  background:
+    radial-gradient(circle at 8% 0,color-mix(in srgb,var(--accent),transparent 76%),transparent 34%),
+    radial-gradient(circle at 92% 0,color-mix(in srgb,var(--pink),transparent 76%),transparent 38%),
+    var(--bg);
+  color:#fff;
+  font-family:Inter,system-ui,Arial,sans-serif;
+  font-size:calc(14px * var(--fontScale));
+}
+button,input,select{font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.wrap{max-width:1680px;margin:auto}
+.box,.hero,.deck,.mixer,.browser,.samplerBox{
+  border:1px solid var(--line);
+  border-radius:24px;
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  box-shadow:0 14px 44px #0008;
+  padding:16px;
+  margin-bottom:14px;
+}
+.tabs,.actions,.filters,.deckActions,.performanceRow,.modeRow,.recordActions,.samplerPads,.manic-track-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.pill,.btn,.pad,.tinyBtn{
+  border:0;
+  border-radius:999px;
+  padding:10px 14px;
+  background:#475071;
+  color:#fff;
+  font-weight:950;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:13px;
+  gap:7px;
+  box-shadow:inset 0 1px #ffffff12;
+}
+.btn:hover,.pill:hover,.pad:hover,.tinyBtn:hover{filter:brightness(1.08)}
+.btn:disabled,.pad:disabled,.tinyBtn:disabled,input:disabled,select:disabled{opacity:.48;cursor:not-allowed}
+.pill.active,.btn.primary,.btn.on,.tinyBtn.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#061017}
+.btn.hot{background:linear-gradient(135deg,var(--pink),var(--accent2));color:#fff}
+.btn.cyan{background:linear-gradient(135deg,var(--cyan),var(--accent2));color:#061017}
+.btn.warn{background:linear-gradient(135deg,var(--warn),var(--accent2));color:#111}
+.btn.danger,.tinyBtn.danger{background:linear-gradient(135deg,var(--bad),var(--accent2));color:#fff}
+.btn.deckA,.tinyBtn.deckA{background:linear-gradient(135deg,var(--deckA),var(--accent2));color:#061017}
+.btn.deckB,.tinyBtn.deckB{background:linear-gradient(135deg,var(--deckB),var(--accent2));color:#fff}
+.tinyBtn{padding:7px 10px;font-size:11px}
+.badge,.metaPill,.readout{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  background:#22d3a624;
+  border:1px solid #22d3a666;
+  color:#dfffee;
+  font-weight:950;
+  padding:5px 9px;
+  font-size:12px;
+  margin:2px;
+}
+.metaPill.private{background:#ffb14222;border-color:#ffb14266;color:#ffe8b8}
+.metaPill.explicit{background:#ff4d6d22;border-color:#ff4d6d66;color:#ffd8de}
+.readout{font-family:ui-monospace,Consolas,monospace;background:#0006;border-color:#ffffff22;color:#fff;min-width:62px;justify-content:center}
+h1{font-size:clamp(42px,6vw,80px);line-height:.94;margin:8px 0;letter-spacing:-.06em}
+h2{margin:0 0 10px}
+h3{margin:0 0 8px;font-size:16px}
+p,.muted,small,label{color:var(--muted);line-height:1.5}
+.heroGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,390px);gap:16px;align-items:stretch}
+.heroArt{border:1px solid #ffffff20;border-radius:28px;background:linear-gradient(135deg,#22d3a625,#7c3cff38,#ff2d8524);display:grid;place-items:center;text-align:center;min-height:240px;font-size:clamp(30px,5vw,58px);font-weight:1000;letter-spacing:-.05em}
+.status,.note,.danger,.good{
+  padding:11px 13px;
+  border-radius:16px;
+  background:#22d3a620;
+  border:1px solid #22d3a666;
+  color:#dfffee;
+  font-weight:850;
+  margin-top:10px;
+}
+.note{background:#41e8ff18;border-color:#41e8ff55;color:#d7fbff}
+.danger{background:#ff4d6d22;border-color:#ff4d6d66;color:#ffd8de}
+.good{background:#22d3a620;border-color:#22d3a666;color:#dfffee}
+.topWaveGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.wavePanel{border:1px solid #ffffff1d;border-radius:20px;background:#02040b;overflow:hidden;position:relative;min-height:132px}
+.wavePanel canvas{width:100%;height:132px;display:block}
+.waveLabel{position:absolute;left:10px;top:8px;z-index:2;display:flex;gap:7px;align-items:center;pointer-events:none}
+.consoleGrid{display:grid;grid-template-columns:minmax(350px,1fr) minmax(360px,.9fr) minmax(350px,1fr);gap:14px;align-items:start}
+.deck{margin:0;background:linear-gradient(135deg,#0e1428,#250812);position:relative;overflow:hidden}
+.deck[data-deck="A"]{border-color:#22d3a655}
+.deck[data-deck="B"]{border-color:#ff2d8555}
+.deck.dragTarget{outline:4px solid var(--cyan);outline-offset:2px}
+.deckHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.deckLetter{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;color:#061017;font-size:28px;font-weight:1000;flex:0 0 58px}
+.deck[data-deck="A"] .deckLetter{background:linear-gradient(135deg,var(--deckA),var(--accent2))}
+.deck[data-deck="B"] .deckLetter{background:linear-gradient(135deg,var(--deckB),var(--accent2));color:#fff}
+.deckTitle{font-size:clamp(20px,2vw,28px);font-weight:1000;overflow-wrap:anywhere}
+.deckMeta{display:block;min-height:22px}
+.deckReadouts{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.deckWave{border:1px solid #ffffff1c;border-radius:16px;background:#02040b;overflow:hidden;position:relative;margin:10px 0}
+.deckWave canvas{display:block;width:100%;height:96px}
+.deckTime{position:absolute;left:8px;right:8px;bottom:5px;display:flex;justify-content:space-between;font:850 11px ui-monospace,Consolas,monospace;color:#fff;text-shadow:0 1px 3px #000}
+.seek{width:100%;accent-color:var(--accent)}
+.transportGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:9px 0}
+.transportGrid .btn{padding:10px 8px;font-size:12px}
+.jogTempo{display:grid;grid-template-columns:112px minmax(0,1fr);gap:12px;align-items:center;margin:10px 0}
+.jog{
+  width:112px;height:112px;border-radius:50%;border:5px solid #ffffff1f;
+  background:radial-gradient(circle at 50% 45%,#28314d 0 13%,#090d18 14% 33%,#252a3a 34% 37%,#060810 38% 68%,#3b4056 69% 73%,#090b12 74%);
+  box-shadow:inset 0 0 0 1px #ffffff26,0 12px 32px #0009;
+  display:grid;place-items:center;user-select:none;touch-action:none;cursor:grab;position:relative;
+}
+.jog:active{cursor:grabbing}
+.jogDisc{width:74px;height:74px;border-radius:50%;border:1px solid #ffffff25;display:grid;place-items:center;font-size:12px;font-weight:1000;transition:transform .08s linear;will-change:transform}
+.jogMark{position:absolute;top:7px;left:50%;width:4px;height:18px;border-radius:8px;background:var(--cyan);transform:translateX(-50%)}
+.tempoPanel{display:grid;gap:8px}
+.controlLine{display:grid;grid-template-columns:80px minmax(90px,1fr) 58px;gap:8px;align-items:center}
+.controlLine input[type="range"]{width:100%;accent-color:var(--accent)}
+.hotCueGrid,.loopGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0}
+.hotCue,.loopBtn{border:1px solid #ffffff22;border-radius:12px;background:#ffffff0e;color:#fff;font-weight:950;padding:9px 5px;cursor:pointer;font-size:11px}
+.hotCue.set{background:#22d3a627;border-color:#22d3a677;color:#dfffee}
+.hotCue.active,.loopBtn.active{background:linear-gradient(135deg,var(--pink),var(--accent2));border-color:transparent}
+.deckSection{border-top:1px solid #ffffff18;margin-top:11px;padding-top:10px}
+.deckSectionHead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:7px}
+.nativeAudio{display:none;width:100%;margin-top:8px}
+.nativeAudio.fallback{display:block}
+.mixer{margin:0;background:linear-gradient(135deg,#0b1020,#161022);position:sticky;top:10px}
+.mixerTitle{text-align:center;margin-bottom:10px}
+.channelGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.channelStrip{border:1px solid #ffffff1c;border-radius:18px;background:#ffffff08;padding:10px}
+.channelStrip[data-channel="A"]{border-color:#22d3a64a}
+.channelStrip[data-channel="B"]{border-color:#ff2d854a}
+.knobLine{display:grid;grid-template-columns:54px minmax(70px,1fr) 44px;gap:5px;align-items:center;margin:7px 0}
+.knobLine label{font-size:11px;font-weight:900;color:#e9ebf5}
+.knobLine input[type="range"]{width:100%;accent-color:var(--accent)}
+.killBtn{border:1px solid #ff4d6d55;border-radius:9px;background:#ff4d6d16;color:#ffd8de;font-size:9px;font-weight:1000;padding:5px 3px;cursor:pointer}
+.killBtn.on{background:#ff4d6d;color:#fff}
+.channelFader{height:142px;display:grid;grid-template-rows:108px auto;place-items:center;margin:7px 0}
+.channelFader input{width:108px;transform:rotate(-90deg);accent-color:var(--accent)}
+.vu{height:10px;border:1px solid #ffffff20;border-radius:999px;background:#0008;overflow:hidden;margin:7px 0}
+.vu>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--warn),var(--bad));transition:width .07s linear}
+.masterSection{border-top:1px solid #ffffff18;padding-top:11px;margin-top:11px}
+.crossLine{display:grid;grid-template-columns:36px minmax(130px,1fr) 36px;gap:8px;align-items:center}
+.crossLine input{width:100%;accent-color:var(--pink)}
+.masterControls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:9px}
+.field{display:grid;gap:5px}
+.field select,.field input[type="number"],.filters input,.filters select{
+  border:1px solid #ffffff28;border-radius:14px;background:#0006;color:#fff;padding:9px 10px;font:inherit;width:100%;
+}
+.field input[type="range"]{width:100%;accent-color:var(--accent)}
+.micGrid,.recordGrid{display:grid;grid-template-columns:1fr;gap:8px}
+.recordTimer{font:1000 23px ui-monospace,Consolas,monospace;text-align:center;color:#fff}
+.downloadMix{display:none;margin-top:8px}
+.downloadMix.ready{display:flex}
+.spectralNote{font-size:11px;color:#ffe8b8;border:1px solid #ffb14255;background:#ffb14213;border-radius:12px;padding:8px;margin-top:9px}
+.samplerBox{background:linear-gradient(135deg,#0f1428,#190d24)}
+.samplerPads{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
+.pad{border-radius:14px;min-height:58px;padding:8px;background:linear-gradient(135deg,#26304f,#3e225a);font-size:11px;flex-direction:column}
+.pad:active,.pad.hit{transform:translateY(2px);filter:brightness(1.35)}
+.libraryHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.filters{margin-top:10px}
+.filters input{min-width:220px;flex:1}
+.filters select{width:auto;min-width:150px}
+.libraryTable{margin-top:12px;border:1px solid #ffffff1b;border-radius:18px;overflow:hidden}
+.libraryColumns,.trackRow{
+  display:grid;
+  grid-template-columns:50px minmax(190px,1.65fr) 80px 70px 78px 110px minmax(260px,1.25fr);
+  gap:8px;align-items:center;padding:9px 10px;
+}
+.libraryColumns{background:#0006;color:#aeb5cc;font-size:11px;font-weight:1000;text-transform:uppercase;letter-spacing:.04em}
+.trackRow{background:#ffffff06;border-top:1px solid #ffffff12;position:relative}
+.trackRow:nth-child(odd){background:#ffffff09}
+.trackRow:hover{background:#22d3a610}
+.trackRow.loadedA{box-shadow:inset 4px 0 var(--deckA)}
+.trackRow.loadedB{box-shadow:inset -4px 0 var(--deckB)}
+.trackRow.prepared{background:#7c3cff16}
+.miniCover{width:42px;height:42px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,#22d3a630,#7c3cff40);display:grid;place-items:center;font-weight:1000}
+.miniCover img{width:100%;height:100%;object-fit:cover}
+.trackInfo{overflow:hidden}
+.trackTitle{font-weight:1000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trackArtist{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trackGenre{font-size:11px;color:var(--muted)}
+.trackActions{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.trackActions .tinyBtn{flex:1 1 auto}
+.trackRow .manic-track-actions{grid-column:2/-1;margin:0}
+.empty{border:1px dashed #ffffff35;border-radius:16px;background:#ffffff08;color:var(--muted);font-weight:850;padding:18px;margin:10px}
+.shortcutGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.shortcut{border:1px solid #ffffff16;border-radius:12px;background:#ffffff07;padding:9px;font-size:11px;color:var(--muted)}
+kbd{border:1px solid #ffffff2c;border-radius:6px;background:#0007;color:#fff;padding:2px 6px;font:900 11px ui-monospace,Consolas,monospace}
+#cueMonitor{display:none}
+@media(max-width:1260px){
+  .consoleGrid{grid-template-columns:1fr 1fr}.mixer{grid-column:1/-1;position:static}.channelGrid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:900px){
+  body{padding:10px 10px 130px}
+  .heroGrid,.topWaveGrid,.consoleGrid{grid-template-columns:1fr}
+  .mixer{grid-column:auto}
+  .btn,.pill{flex:1 1 auto}
+  .samplerPads{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .libraryColumns{display:none}
+  .trackRow{grid-template-columns:48px minmax(0,1fr);padding:10px}
+  .trackRow>.trackBpm,.trackRow>.trackKey,.trackRow>.trackLength,.trackRow>.trackGenre{display:inline-flex;grid-column:2;font-size:11px}
+  .trackRow>.trackBpm:before{content:'BPM ';font-weight:950;margin-right:4px}
+  .trackRow>.trackKey:before{content:'Key ';font-weight:950;margin-right:4px}
+  .trackRow>.trackLength:before{content:'Time ';font-weight:950;margin-right:4px}
+  .trackRow>.trackGenre:before{content:'Genre ';font-weight:950;margin-right:4px}
+  .trackActions,.trackRow .manic-track-actions{grid-column:1/-1}
+}
+@media(max-width:560px){
+  .channelGrid,.masterControls,.jogTempo{grid-template-columns:1fr}
+  .jog{margin:auto}
+  .transportGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hotCueGrid,.loopGrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.jogDisc{transition:none}.vu>span{transition:none}}
 </style>
 </head>
-<body data-sb-main-app-page="true" data-sb-manic-dj-page="v1">
+<body data-sb-main-app-page="true" data-sb-manic-dj-page="v2-professional-browser-studio">
 <div class="wrap">
 <section class="box"><div class="tabs"><a class="pill" href="index.html">Home</a><a class="pill" href="manic-records.html">Manic Records</a><a class="pill" href="manic-studio.html">Manic Studio</a><a class="pill active" href="manic-dj.html">Manic DJ</a><a class="pill" href="profile-social-v7-13-001-test.html">Social Profile</a></div></section>
-<section class="hero"><div class="heroGrid"><div><span class="badge">Manic Records · Two-deck audio player</span><h1>Manic DJ</h1><p>Load any available Manic Records audio into Deck A or Deck B, mix with the crossfader, and use creator-enabled free downloads. No extra paid download service is used.</p><div class="actions"><button id="reloadDj" class="btn primary" type="button">Reload Library</button><button id="allTracks" class="btn cyan" type="button">All Available Audio</button><button id="myTracks" class="btn" type="button">My Audio</button></div><div id="djStatus" class="status">Loading the Manic Records audio library…</div></div><div class="heroArt">MANIC<br>DJ</div></div></section>
-<section class="box"><div class="deckGrid"><article class="deck"><div class="deckHead"><div><span class="badge">Deck A</span><h2 id="deckATitle">No track loaded</h2><small id="deckAMeta">Choose Load A from the library.</small></div><div class="deckLetter">A</div></div><audio id="deckAAudio" controls preload="metadata"></audio><div class="deckActions"><button class="btn primary" type="button" data-deck-play="A">Play / Pause</button><button class="btn" type="button" data-deck-restart="A">Restart</button><button class="btn" type="button" data-deck-clear="A">Clear</button></div><label>Deck level <input id="deckALevel" type="range" min="0" max="100" value="100"><b id="deckALevelValue">100%</b></label></article><article class="deck"><div class="deckHead"><div><span class="badge">Deck B</span><h2 id="deckBTitle">No track loaded</h2><small id="deckBMeta">Choose Load B from the library.</small></div><div class="deckLetter">B</div></div><audio id="deckBAudio" controls preload="metadata"></audio><div class="deckActions"><button class="btn primary" type="button" data-deck-play="B">Play / Pause</button><button class="btn" type="button" data-deck-restart="B">Restart</button><button class="btn" type="button" data-deck-clear="B">Clear</button></div><label>Deck level <input id="deckBLevel" type="range" min="0" max="100" value="100"><b id="deckBLevelValue">100%</b></label></article></div></section>
-<section class="box mixer"><span class="badge">Crossfader</span><div class="mixerLine"><b>Deck A</b><input id="crossfader" type="range" min="-100" max="100" value="0" aria-label="Crossfader"><b>Deck B</b></div><small id="crossfadeValue">Centre · both decks</small></section>
-<section class="box"><div class="filters"><input id="djSearch" type="search" placeholder="Search title or artist"><select id="djGenre"><option value="all">All genres</option></select><select id="djRating"><option value="all">All content</option><option value="child_friendly">Child friendly</option><option value="explicit">Explicit / not child friendly</option></select></div><div class="note">Manic DJ is audio-only. Mux music videos stay available on Manic Records and are not converted or downloaded here.</div></section>
-<section class="box"><div id="djLibrary" class="library"><div class="empty">Loading tracks…</div></div></section>
+<section class="hero"><div class="heroGrid"><div><span class="badge">Manic Records · Two-deck DJ and MC studio</span><h1>Manic DJ Studio</h1><p>Mix your Manic Records audio through two professional browser decks with cue points, hot cues, BPM sync, loops, channel EQ, vocal and beat shaping, effects, microphone talkover, sampler pads and local master recording.</p><div class="actions"><button id="reloadDj" class="btn primary" type="button">Reload Library</button><button id="allTracks" class="btn cyan" type="button">All Audio</button><button id="myTracks" class="btn" type="button">My Audio</button><button id="prepareTracks" class="btn" type="button">Prepare List</button><button id="recentTracks" class="btn" type="button">Recently Loaded</button></div><div id="djStatus" class="status" role="status" aria-live="polite">Loading the Manic Records audio library...</div></div><div class="heroArt">MANIC<br>DJ<br><small>STUDIO</small></div></div></section>
+<section class="box"><div class="topWaveGrid"><div class="wavePanel"><div class="waveLabel"><span class="badge">Deck A</span><span id="topWaveATitle" class="readout">No track</span></div><canvas id="topWaveA" width="760" height="132" role="img" aria-label="Deck A live waveform and beat phase"></canvas></div><div class="wavePanel"><div class="waveLabel"><span class="badge">Deck B</span><span id="topWaveBTitle" class="readout">No track</span></div><canvas id="topWaveB" width="760" height="132" role="img" aria-label="Deck B live waveform and beat phase"></canvas></div></div>
+<div class="consoleGrid">
+<article class="deck" data-deck="A" id="deckAPanel" aria-label="Deck A">
+  <div class="deckHead"><div><span class="badge">Deck A</span><div id="deckATitle" class="deckTitle">No track loaded</div><small id="deckAMeta" class="deckMeta">Choose Load A from the tune list.</small></div><div class="deckLetter">A</div></div>
+  <div class="deckReadouts"><span id="deckABpm" class="readout">-- BPM</span><span id="deckAKey" class="readout">Key --</span><span id="deckARate" class="readout">0.0%</span><span id="deckALoopState" class="readout">Loop off</span></div>
+  <div class="deckWave"><canvas id="deckAWave" width="620" height="96" role="img" aria-label="Deck A live waveform"></canvas><div class="deckTime"><span id="deckACurrent">0:00.0</span><span id="deckARemaining">-0:00.0</span></div></div>
+  <input id="deckASeek" class="seek" type="range" min="0" max="1000" value="0" aria-label="Deck A track position">
+  <div class="jogTempo">
+    <div class="jog" id="deckAJog" data-jog="A" role="slider" tabindex="0" aria-label="Deck A jog and seek wheel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="jogMark"></span><div id="deckAJogDisc" class="jogDisc">JOG A</div></div>
+    <div class="tempoPanel">
+      <div class="controlLine"><label for="deckATempo">Tempo</label><input id="deckATempo" type="range" min="-16" max="16" value="0" step="0.1"><output id="deckATempoValue" class="readout">0.0%</output></div>
+      <div class="controlLine"><label for="deckAManualBpm">BPM</label><input id="deckAManualBpm" type="number" min="40" max="240" step="0.01" placeholder="Tap"><button class="tinyBtn" type="button" data-deck-action="tap-bpm" data-deck="A">Tap</button></div>
+      <label class="field">Echo timing<select id="deckAEchoBeat" data-deck-param="echoBeat" data-deck="A"><option value="0.25">1/4 beat</option><option value="0.5" selected>1/2 beat</option><option value="1">1 beat</option><option value="2">2 beats</option></select></label>
+    </div>
+  </div>
+  <div class="transportGrid">
+    <button class="btn deckA" type="button" data-deck-action="cue" data-deck="A">CUE</button>
+    <button class="btn" type="button" data-deck-action="set-cue" data-deck="A">Set Cue</button>
+    <button class="btn primary" type="button" data-deck-action="play" data-deck="A">Play / Pause</button>
+    <button class="btn cyan" type="button" data-deck-action="sync" data-deck="A">SYNC</button>
+    <button class="btn" type="button" data-deck-action="nudge-down" data-deck="A">Pitch -</button>
+    <button class="btn" type="button" data-deck-action="nudge-up" data-deck="A">Pitch +</button>
+    <button id="deckAKeyLock" class="btn on" type="button" data-deck-action="key-lock" data-deck="A" aria-pressed="true">Key Lock</button>
+    <button id="deckAPfl" class="btn" type="button" data-deck-action="pfl" data-deck="A" aria-pressed="false">Headphones</button>
+  </div>
+  <div class="deckSection"><div class="deckSectionHead"><h3>Hot Cues</h3><small>Click to set or jump · Shift/right-click clears</small></div><div id="deckAHotCues" class="hotCueGrid"></div></div>
+  <div class="deckSection"><div class="deckSectionHead"><h3>Loops and Performance</h3><button class="tinyBtn" type="button" data-deck-action="loop-off" data-deck="A">Loop Off</button></div><div id="deckALoops" class="loopGrid"></div><div class="performanceRow"><button class="tinyBtn" type="button" data-deck-action="beat-back" data-deck="A">-4 Beats</button><button class="tinyBtn" type="button" data-deck-action="beat-forward" data-deck="A">+4 Beats</button><button class="tinyBtn" type="button" data-deck-action="stutter" data-deck="A">Stutter</button><button class="tinyBtn warn" type="button" data-deck-action="brake" data-deck="A">Brake</button><button class="tinyBtn danger" type="button" data-deck-action="bleep" data-deck="A">Hold Bleep</button><button class="tinyBtn" type="button" data-deck-action="restart" data-deck="A">Restart</button><button class="tinyBtn" type="button" data-deck-action="clear" data-deck="A">Clear</button></div></div>
+  <div class="deckSection"><div class="deckSectionHead"><h3>Deck Effects</h3><button class="tinyBtn" type="button" data-deck-action="fx-reset" data-deck="A">Reset FX</button></div><div class="controlLine"><label for="deckAEcho">Echo</label><input id="deckAEcho" type="range" min="0" max="100" value="0" data-deck-param="echo" data-deck="A"><output id="deckAEchoValue" class="readout">0%</output></div><div class="controlLine"><label for="deckAReverb">Reverb</label><input id="deckAReverb" type="range" min="0" max="100" value="0" data-deck-param="reverb" data-deck="A"><output id="deckAReverbValue" class="readout">0%</output></div><div class="performanceRow"><button class="tinyBtn" type="button" data-deck-action="echo-punch" data-deck="A">Echo Punch</button><button class="tinyBtn" type="button" data-deck-action="reverb-hit" data-deck="A">Reverb Hit</button></div></div>
+  <audio id="deckAAudio" class="nativeAudio" preload="metadata" crossorigin="anonymous" playsinline></audio>
+</article>
+
+<section class="mixer" aria-label="Central DJ mixer">
+  <div class="mixerTitle"><span class="badge">Professional Browser Mixer</span><h2>Master Console</h2><small>Channel controls feed one protected master bus and local recorder.</small></div>
+  <div class="channelGrid">
+    <section class="channelStrip" data-channel="A"><h3>Channel A</h3><div class="vu" aria-label="Channel A level"><span id="deckAVu"></span></div>
+      <div class="knobLine"><label for="deckATrim">Trim</label><input id="deckATrim" type="range" min="-12" max="12" value="0" step="0.1" data-mix-param="trim" data-deck="A"><output id="deckATrimValue">0</output></div>
+      <div class="knobLine"><label for="deckABass">Bass</label><input id="deckABass" type="range" min="-24" max="12" value="0" step="0.1" data-mix-param="bass" data-deck="A"><button class="killBtn" type="button" data-kill="bass" data-deck="A">KILL</button></div>
+      <div class="knobLine"><label for="deckAMid">Mid</label><input id="deckAMid" type="range" min="-24" max="12" value="0" step="0.1" data-mix-param="mid" data-deck="A"><button class="killBtn" type="button" data-kill="mid" data-deck="A">KILL</button></div>
+      <div class="knobLine"><label for="deckATreble">Treble</label><input id="deckATreble" type="range" min="-24" max="12" value="0" step="0.1" data-mix-param="treble" data-deck="A"><button class="killBtn" type="button" data-kill="treble" data-deck="A">KILL</button></div>
+      <div class="knobLine"><label for="deckAVocal">Vocal</label><input id="deckAVocal" type="range" min="-24" max="12" value="0" step="0.1" data-mix-param="vocal" data-deck="A"><button class="killBtn" type="button" data-kill="vocal" data-deck="A">CUT</button></div>
+      <div class="knobLine"><label for="deckABeat">Beat</label><input id="deckABeat" type="range" min="-24" max="12" value="0" step="0.1" data-mix-param="beat" data-deck="A"><button class="killBtn" type="button" data-kill="beat" data-deck="A">CUT</button></div>
+      <div class="knobLine"><label for="deckAFilter">Filter</label><input id="deckAFilter" type="range" min="-100" max="100" value="0" step="1" data-mix-param="filter" data-deck="A"><button class="killBtn" type="button" data-mix-reset="filter" data-deck="A">0</button></div>
+      <div class="channelFader"><input id="deckALevel" type="range" min="0" max="100" value="100" data-mix-param="channel" data-deck="A" aria-label="Deck A channel fader"><output id="deckALevelValue" class="readout">100%</output></div>
+      <div class="modeRow"><button class="tinyBtn deckA" type="button" data-deck-action="pfl" data-deck="A">PFL</button><button class="tinyBtn" type="button" data-mix-reset="all" data-deck="A">Reset A</button></div>
+    </section>
+    <section class="channelStrip" data-channel="B"><h3>Channel B</h3><div class="vu" aria-label="Channel B level"><span id="deckBVu"></span></div>
+      <div class="knobLine"><label for="deckBTrim">Trim</label><input id="deckBTrim" type="range" min="-12" max="12" value="0" step="0.1" data-mix-param="trim" data-deck="B"><output id="deckBTrimValue">0</output></div>
+      <div class="knobLine"><label for="deckBBass">Bass</label><input id="deckBBass" type="range" min="-24" max="12" value="0" step="0.1" data-mix-param="bass" data-deck="B"><button class="killBtn" type="button" data-kill="bass" data-deck="B">KILL</button></div>
+      <div class="knobLine"><label for="deckBMid">Mid</label><input id="deckBMid" type="range" min="-24" max="12" value="0" step="0.1" data-mix-param="mid" data-deck="B"><button class="killBtn" type="button" data-kill="mid" data-deck="B">KILL</button></div>
+      <div class="knobLine"><label for="deckBTreble">Treble</label><input id="deckBTreble" type="range" min="-24" max="12" value="0" step="0.1" data-mix-param="treble" data-deck="B"><button class="killBtn" type="button" data-kill="treble" data-deck="B">KILL</button></div>
+      <div class="knobLine"><label for="deckBVocal">Vocal</label><input id="deckBVocal" type="range" min="-24" max="12" value="0" step="0.1" data-mix-param="vocal" data-deck="B"><button class="killBtn" type="button" data-kill="vocal" data-deck="B">CUT</button></div>
+      <div class="knobLine"><label for="deckBBeat">Beat</label><input id="deckBBeat" type="range" min="-24" max="12" value="0" step="0.1" data-mix-param="beat" data-deck="B"><button class="killBtn" type="button" data-kill="beat" data-deck="B">CUT</button></div>
+      <div class="knobLine"><label for="deckBFilter">Filter</label><input id="deckBFilter" type="range" min="-100" max="100" value="0" step="1" data-mix-param="filter" data-deck="B"><button class="killBtn" type="button" data-mix-reset="filter" data-deck="B">0</button></div>
+      <div class="channelFader"><input id="deckBLevel" type="range" min="0" max="100" value="100" data-mix-param="channel" data-deck="B" aria-label="Deck B channel fader"><output id="deckBLevelValue" class="readout">100%</output></div>
+      <div class="modeRow"><button class="tinyBtn deckB" type="button" data-deck-action="pfl" data-deck="B">PFL</button><button class="tinyBtn" type="button" data-mix-reset="all" data-deck="B">Reset B</button></div>
+    </section>
+  </div>
+  <div class="spectralNote"><b>Vocal and Beat controls are honest spectral shaping:</b> they cut or boost the main vocal and rhythmic frequency zones. They do not pretend to be AI-separated stems.</div>
+  <div class="masterSection"><h3>Crossfader</h3><div class="crossLine"><b>A</b><input id="crossfader" type="range" min="-100" max="100" value="0" aria-label="Crossfader"><b>B</b></div><div class="masterControls"><label class="field">Curve<select id="crossfaderCurve"><option value="smooth">Smooth equal-power</option><option value="linear">Linear blend</option><option value="sharp">Sharp mix</option><option value="scratch">Scratch cut</option></select></label><button id="crossfaderReverse" class="btn" type="button" aria-pressed="false">Reverse / Hamster</button></div><div id="crossfadeValue" class="readout">Centre · both decks</div></div>
+  <div class="masterSection"><h3>Master Output</h3><div class="vu" aria-label="Master output level"><span id="masterVu"></span></div><div class="masterControls"><label class="field">Master level<input id="masterLevel" type="range" min="0" max="125" value="92"></label><label class="field">Cue level<input id="cueLevel" type="range" min="0" max="100" value="70"></label><label class="field">Cue / master blend<input id="cueBlend" type="range" min="0" max="100" value="100"></label><label class="field">Headphone output<select id="cueOutput"><option value="">Default audio output</option></select></label></div><div class="modeRow"><button id="refreshOutputs" class="tinyBtn" type="button">Refresh Outputs</button><button id="resetMixer" class="tinyBtn" type="button">Reset Whole Mixer</button><span id="limiterState" class="readout">Limiter armed</span></div></div>
+  <div class="masterSection"><h3>MC Microphone</h3><div class="vu" aria-label="Microphone input level"><span id="micVu"></span></div><div class="micGrid"><div class="recordActions"><button id="micEnable" class="btn hot" type="button">Enable Mic</button><button id="micMute" class="btn" type="button" disabled aria-pressed="false">Mute Mic</button><button id="talkover" class="btn" type="button" disabled aria-pressed="false">Talkover</button></div><label class="field">Mic level<input id="micLevel" type="range" min="0" max="150" value="85" disabled></label><small id="micState">Microphone is off. Headphones are strongly recommended to prevent feedback.</small></div></div>
+  <div class="masterSection"><h3>Record Master Mix</h3><div id="recordTimer" class="recordTimer">00:00:00</div><div class="recordGrid"><div class="recordActions"><button id="recordStart" class="btn danger" type="button">● Record</button><button id="recordPause" class="btn" type="button" disabled>Pause</button><button id="recordStop" class="btn" type="button" disabled>Stop</button></div><a id="downloadMix" class="btn cyan downloadMix" download>Download Recorded Mix</a><small id="recordState">Records the master mix locally in this browser. Nothing is uploaded automatically.</small></div></div>
+</section>
+
+<article class="deck" data-deck="B" id="deckBPanel" aria-label="Deck B">
+  <div class="deckHead"><div><span class="badge">Deck B</span><div id="deckBTitle" class="deckTitle">No track loaded</div><small id="deckBMeta" class="deckMeta">Choose Load B from the tune list.</small></div><div class="deckLetter">B</div></div>
+  <div class="deckReadouts"><span id="deckBBpm" class="readout">-- BPM</span><span id="deckBKey" class="readout">Key --</span><span id="deckBRate" class="readout">0.0%</span><span id="deckBLoopState" class="readout">Loop off</span></div>
+  <div class="deckWave"><canvas id="deckBWave" width="620" height="96" role="img" aria-label="Deck B live waveform"></canvas><div class="deckTime"><span id="deckBCurrent">0:00.0</span><span id="deckBRemaining">-0:00.0</span></div></div>
+  <input id="deckBSeek" class="seek" type="range" min="0" max="1000" value="0" aria-label="Deck B track position">
+  <div class="jogTempo">
+    <div class="jog" id="deckBJog" data-jog="B" role="slider" tabindex="0" aria-label="Deck B jog and seek wheel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="jogMark"></span><div id="deckBJogDisc" class="jogDisc">JOG B</div></div>
+    <div class="tempoPanel">
+      <div class="controlLine"><label for="deckBTempo">Tempo</label><input id="deckBTempo" type="range" min="-16" max="16" value="0" step="0.1"><output id="deckBTempoValue" class="readout">0.0%</output></div>
+      <div class="controlLine"><label for="deckBManualBpm">BPM</label><input id="deckBManualBpm" type="number" min="40" max="240" step="0.01" placeholder="Tap"><button class="tinyBtn" type="button" data-deck-action="tap-bpm" data-deck="B">Tap</button></div>
+      <label class="field">Echo timing<select id="deckBEchoBeat" data-deck-param="echoBeat" data-deck="B"><option value="0.25">1/4 beat</option><option value="0.5" selected>1/2 beat</option><option value="1">1 beat</option><option value="2">2 beats</option></select></label>
+    </div>
+  </div>
+  <div class="transportGrid">
+    <button class="btn deckB" type="button" data-deck-action="cue" data-deck="B">CUE</button>
+    <button class="btn" type="button" data-deck-action="set-cue" data-deck="B">Set Cue</button>
+    <button class="btn primary" type="button" data-deck-action="play" data-deck="B">Play / Pause</button>
+    <button class="btn cyan" type="button" data-deck-action="sync" data-deck="B">SYNC</button>
+    <button class="btn" type="button" data-deck-action="nudge-down" data-deck="B">Pitch -</button>
+    <button class="btn" type="button" data-deck-action="nudge-up" data-deck="B">Pitch +</button>
+    <button id="deckBKeyLock" class="btn on" type="button" data-deck-action="key-lock" data-deck="B" aria-pressed="true">Key Lock</button>
+    <button id="deckBPfl" class="btn" type="button" data-deck-action="pfl" data-deck="B" aria-pressed="false">Headphones</button>
+  </div>
+  <div class="deckSection"><div class="deckSectionHead"><h3>Hot Cues</h3><small>Click to set or jump · Shift/right-click clears</small></div><div id="deckBHotCues" class="hotCueGrid"></div></div>
+  <div class="deckSection"><div class="deckSectionHead"><h3>Loops and Performance</h3><button class="tinyBtn" type="button" data-deck-action="loop-off" data-deck="B">Loop Off</button></div><div id="deckBLoops" class="loopGrid"></div><div class="performanceRow"><button class="tinyBtn" type="button" data-deck-action="beat-back" data-deck="B">-4 Beats</button><button class="tinyBtn" type="button" data-deck-action="beat-forward" data-deck="B">+4 Beats</button><button class="tinyBtn" type="button" data-deck-action="stutter" data-deck="B">Stutter</button><button class="tinyBtn warn" type="button" data-deck-action="brake" data-deck="B">Brake</button><button class="tinyBtn danger" type="button" data-deck-action="bleep" data-deck="B">Hold Bleep</button><button class="tinyBtn" type="button" data-deck-action="restart" data-deck="B">Restart</button><button class="tinyBtn" type="button" data-deck-action="clear" data-deck="B">Clear</button></div></div>
+  <div class="deckSection"><div class="deckSectionHead"><h3>Deck Effects</h3><button class="tinyBtn" type="button" data-deck-action="fx-reset" data-deck="B">Reset FX</button></div><div class="controlLine"><label for="deckBEcho">Echo</label><input id="deckBEcho" type="range" min="0" max="100" value="0" data-deck-param="echo" data-deck="B"><output id="deckBEchoValue" class="readout">0%</output></div><div class="controlLine"><label for="deckBReverb">Reverb</label><input id="deckBReverb" type="range" min="0" max="100" value="0" data-deck-param="reverb" data-deck="B"><output id="deckBReverbValue" class="readout">0%</output></div><div class="performanceRow"><button class="tinyBtn" type="button" data-deck-action="echo-punch" data-deck="B">Echo Punch</button><button class="tinyBtn" type="button" data-deck-action="reverb-hit" data-deck="B">Reverb Hit</button></div></div>
+  <audio id="deckBAudio" class="nativeAudio" preload="metadata" crossorigin="anonymous" playsinline></audio>
+</article>
+</div></section>
+
+<section class="samplerBox"><div class="libraryHead"><div><span class="badge">MC Performance</span><h2>Built-in Sampler Pads</h2><p class="muted">Eight generated one-shot sounds feed the same master bus and are included in recordings. No sample files or paid service are required.</p></div><label class="field">Sampler level<input id="samplerLevel" type="range" min="0" max="125" value="72"></label></div><div class="samplerPads"><button class="pad" type="button" data-sample="kick"><b>1</b>Kick</button><button class="pad" type="button" data-sample="snare"><b>2</b>Snare</button><button class="pad" type="button" data-sample="clap"><b>3</b>Clap</button><button class="pad" type="button" data-sample="hat"><b>4</b>Hat</button><button class="pad" type="button" data-sample="siren"><b>5</b>Siren</button><button class="pad" type="button" data-sample="laser"><b>6</b>Laser</button><button class="pad" type="button" data-sample="bass"><b>7</b>Bass Drop</button><button class="pad" type="button" data-sample="horn"><b>8</b>Horn</button></div></section>
+
+<section class="browser"><div class="libraryHead"><div><span class="badge">Manic Records Tune Browser</span><h2>Your Tunes</h2><p class="muted">Compact DJ list: title, artist, BPM, key, time and direct loading into either deck.</p></div><div id="libraryCount" class="readout">0 tunes</div></div><div class="filters"><input id="djSearch" type="search" placeholder="Search title, artist or description" aria-label="Search tunes"><select id="djGenre" aria-label="Filter by genre"><option value="all">All genres</option></select><select id="djRating" aria-label="Filter by content rating"><option value="all">All content</option><option value="child_friendly">Child friendly</option><option value="explicit">Explicit / not child friendly</option></select><select id="djSort" aria-label="Sort tune list"><option value="newest">Newest</option><option value="title">Title</option><option value="artist">Artist</option><option value="bpm">BPM</option><option value="key">Key</option><option value="length">Length</option></select></div><div class="note">Drag a tune row onto a deck, double-click a row to use the first empty deck, or press Load A / Load B. Mux videos remain on Manic Records and are not converted here.</div><div class="libraryTable"><div class="libraryColumns"><span>Cover</span><span>Title / Artist</span><span>BPM</span><span>Key</span><span>Time</span><span>Genre</span><span>Actions</span></div><div id="djLibrary"><div class="empty">Loading tunes...</div></div></div></section>
+
+<section class="box"><span class="badge">Keyboard Shortcuts</span><div class="shortcutGrid"><div class="shortcut"><kbd>Q</kbd> play/pause Deck A</div><div class="shortcut"><kbd>P</kbd> play/pause Deck B</div><div class="shortcut"><kbd>A</kbd> cue Deck A</div><div class="shortcut"><kbd>L</kbd> cue Deck B</div><div class="shortcut"><kbd>Z</kbd>/<kbd>X</kbd> nudge Deck A</div><div class="shortcut"><kbd>N</kbd>/<kbd>M</kbd> nudge Deck B</div><div class="shortcut"><kbd>1</kbd>–<kbd>8</kbd> trigger sampler pads</div><div class="shortcut"><kbd>Esc</kbd> stop both decks</div></div></section>
 </div>
+<audio id="cueMonitor" autoplay playsinline></audio>
 <script src="stream-bandit-shell-v6-24.js?v=manic-dj-v1"></script><script src="stream-bandit-theme-projector-v7-12-156.js?v=manic-dj-v1"></script><script src="stream-bandit-header-shell-v7-12-156.js?v=manic-dj-v1"></script><script src="stream-bandit-footer-shell-v7-12-156.js?v=manic-dj-v1"></script><script src="stream-bandit-settings-global-v7-1-8.js?v=manic-dj-v1"></script><script src="stream-bandit-brand-logo-v7-12-12.js?v=manic-dj-v1"></script><script id="manicTrackControlsV1" src="manic-track-controls-v1.js?v=20260902"></script>
 <script>
 (function(){
 'use strict';
+const VERSION='V2.0.0 Manic DJ Professional Browser Studio';
 const TABLE='manic_tracks';
-let sb=null,user=null,tracks=[],mineOnly=false;
-const decks={A:{track:null,url:null},B:{track:null,url:null}};
+const STORE={prepare:'sb:manic-dj:v2:prepare',recent:'sb:manic-dj:v2:recent',settings:'sb:manic-dj:v2:settings',cuePrefix:'sb:manic-dj:v2:cues:'};
+const LOOP_BEATS=[0.5,1,2,4,8,16];
+const DECK_NAMES=['A','B'];
+let sb=null,user=null,tracks=[],libraryMode='all',mineOnly=false;
+const storedPrepare=readJson(STORE.prepare,[]);
+const storedRecent=readJson(STORE.recent,[]);
+let prepareIds=new Set(Array.isArray(storedPrepare)?storedPrepare:[]);
+let recentIds=Array.isArray(storedRecent)?storedRecent:[];
+let audioContext=null,audioReady=false,audioStarting=null,fallbackMode=false,audioFailureReason='';
+let musicBus=null,duckGain=null,masterMix=null,masterGain=null,limiter=null,masterAnalyser=null,recordDestination=null;
+let cueBus=null,cueMasterGain=null,cueDestination=null,samplerGain=null;
+let micStream=null,micSource=null,micNodes=[],micGain=null,micMuteGain=null,micAnalyser=null,micEnabled=false,micMuted=false,talkoverEnabled=false;
+let recorder=null,recordChunks=[],recordStartedAt=0,recordPausedAt=0,recordPausedTotal=0,recordUrl='';
+let animationHandle=null,noiseBuffer=null,reverbImpulse=null,crossfaderReversed=false;
+let jogDrag=null;
 const $=function(id){return document.getElementById(id);};
-const esc=function(v){return String(v==null?'':v).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]||m;});};
-function config(){const c=window.StreamBanditSupabaseConfig||window.StreamBanditShellConfig;if(c&&c.url&&c.key)return c;if(window.SUPABASE_URL&&window.SUPABASE_KEY)return {url:window.SUPABASE_URL,key:window.SUPABASE_KEY};throw new Error('Stream Bandit configuration is unavailable.');}
-function client(){if(sb)return sb;const c=config();sb=window.supabase.createClient(c.url,c.key);return sb;}
-function status(message,bad){const el=$('djStatus');el.textContent=message;el.className=bad?'danger':'status';}
-function trackById(id){return tracks.find(function(track){return track.id===id;})||null;}
-function time(seconds){seconds=Math.max(0,Math.round(Number(seconds)||0));return Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');}
-function meta(track){const parts=[track.artist||'Manic Records'];if(track.genre)parts.push(track.genre);if(track.bpm)parts.push(track.bpm+' BPM');if(track.musical_key)parts.push(track.musical_key);if(track.duration_seconds)parts.push(time(track.duration_seconds));return parts.join(' · ');}
-function cover(track){if(track.cover_url)return '<img src="'+esc(track.cover_url)+'" alt="">';return 'MR';}
-function pills(track){const out=[];if(track.genre)out.push('<span class="metaPill">'+esc(track.genre)+'</span>');if(track.bpm)out.push('<span class="metaPill">'+esc(track.bpm)+' BPM</span>');if(track.musical_key)out.push('<span class="metaPill">'+esc(track.musical_key)+'</span>');if(track.visibility==='private')out.push('<span class="metaPill private">Private</span>');if(track.content_rating==='explicit')out.push('<span class="metaPill explicit">Explicit</span>');if(track.allow_download===true)out.push('<span class="metaPill">Free download</span>');return out.join('');}
-function row(track){return '<article class="trackCard" data-sb-manic-track-card="true" data-track-id="'+esc(track.id)+'"><div class="trackHead"><div class="cover">'+cover(track)+'</div><div><div class="trackTitle">'+esc(track.title||'Untitled track')+'</div><div class="trackArtist">'+esc(track.artist||'Manic Records')+'</div><div>'+pills(track)+'</div></div></div><p class="muted">'+esc(track.description||'No description.')+'</p><div class="actions"><button class="btn primary" type="button" data-load-deck="A" data-track-id="'+esc(track.id)+'">Load A</button><button class="btn hot" type="button" data-load-deck="B" data-track-id="'+esc(track.id)+'">Load B</button></div><div class="manic-track-actions"></div></article>';}
-function visibleTracks(){const query=$('djSearch').value.trim().toLowerCase(),genre=$('djGenre').value,rating=$('djRating').value;return tracks.filter(function(track){if(mineOnly&&(!user||track.created_by!==user.id))return false;if(genre!=='all'&&track.genre!==genre)return false;if(rating!=='all'&&track.content_rating!==rating)return false;if(query&&!String(track.title+' '+track.artist+' '+(track.description||'')).toLowerCase().includes(query))return false;return true;});}
-function render(){const list=visibleTracks();$('djLibrary').innerHTML=list.length?list.map(row).join(''):'<div class="empty">No matching Manic Records audio tracks are available.</div>';status(list.length+' audio track'+(list.length===1?'':'s')+' available'+(mineOnly?' in My Audio.':'.'));if(window.ManicTrackControls&&window.ManicTrackControls.mount)window.ManicTrackControls.mount();}
-function genres(){const values=[...new Set(tracks.map(function(track){return track.genre;}).filter(Boolean))].sort();$('djGenre').innerHTML='<option value="all">All genres</option>'+values.map(function(value){return '<option value="'+esc(value)+'">'+esc(value)+'</option>';}).join('');}
-async function loadTracks(){status('Loading the Manic Records audio library…');try{const auth=await client().auth.getUser();user=auth.data&&auth.data.user||null;const result=await client().from(TABLE).select('*').eq('media_kind','audio').order('created_at',{ascending:false}).limit(250);if(result.error)throw result.error;tracks=result.data||[];genres();render();}catch(error){tracks=[];$('djLibrary').innerHTML='<div class="empty">The audio library could not load.</div>';status(error&&error.message||'The audio library could not load.',true);}}
-async function playableUrl(track){if(track.audio_url)return track.audio_url;if(!track.audio_bucket||!track.audio_storage_path)throw new Error('This track has no playable audio source.');if(track.visibility==='public'||String(track.audio_bucket).includes('public')){const result=client().storage.from(track.audio_bucket).getPublicUrl(track.audio_storage_path);if(result.data&&result.data.publicUrl)return result.data.publicUrl;}const signed=await client().storage.from(track.audio_bucket).createSignedUrl(track.audio_storage_path,3600);if(signed.error)throw signed.error;return signed.data.signedUrl;}
+const esc=function(value){return String(value==null?'':value).replace(/[&<>"']/g,function(character){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]||character;});};
+const clamp=function(value,min,max){return Math.max(min,Math.min(max,Number(value)||0));};
+function readJson(key,fallback){try{const value=JSON.parse(localStorage.getItem(key)||'null');return value==null?fallback:value;}catch(error){return fallback;}}
+function writeJson(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch(error){}}
+function config(){
+  let value=window.StreamBanditSupabaseConfig||window.StreamBanditShellConfig||null;
+  try{value=value||(window.StreamBanditShell&&window.StreamBanditShell.config&&window.StreamBanditShell.config());}catch(error){}
+  if(value&&value.url&&value.key)return value;
+  if(window.SUPABASE_URL&&window.SUPABASE_KEY)return {url:window.SUPABASE_URL,key:window.SUPABASE_KEY};
+  throw new Error('Stream Bandit configuration is unavailable.');
+}
+function client(){if(sb)return sb;if(!window.supabase||!window.supabase.createClient)throw new Error('Supabase SDK is unavailable.');const value=config();sb=window.supabase.createClient(value.url,value.key);return sb;}
+function setStatus(message,bad){const node=$('djStatus');if(!node)return;node.textContent=String(message||'');node.className=bad?'danger':'status';}
+function flash(message,bad){
+  const node=document.createElement('div');
+  node.className=bad?'danger':'status';
+  node.style.cssText='position:fixed;right:16px;bottom:94px;z-index:2147483647;max-width:min(430px,calc(100vw - 32px));background:#11172a;box-shadow:0 18px 60px #000c';
+  node.textContent=String(message||'');document.body.appendChild(node);setTimeout(function(){node.remove();},3600);
+}
+function formatTime(seconds,decimal){seconds=Math.max(0,Number(seconds)||0);const minutes=Math.floor(seconds/60);const whole=Math.floor(seconds%60);return minutes+':'+String(whole).padStart(2,'0')+(decimal?'.'+Math.floor((seconds%1)*10):'');}
+function trackById(id){return tracks.find(function(track){return String(track.id)===String(id);})||null;}
+function baseBpm(track){const value=Number(track&&track.bpm);return Number.isFinite(value)&&value>=40&&value<=240?value:0;}
+function safeNumber(value,fallback){const number=Number(value);return Number.isFinite(number)?number:(fallback||0);}
+function coverHtml(track){return track&&track.cover_url?'<img src="'+esc(track.cover_url)+'" alt="">':'MR';}
+function cueKey(trackId){return STORE.cuePrefix+String(trackId||'none');}
+function createDeckState(name){
+  return {
+    name:name,
+    audio:$('deck'+name+'Audio'),
+    track:null,url:'',graph:null,loadToken:0,
+    baseBpm:0,cuePoint:0,hotCues:Array(8).fill(null),loop:null,
+    tapTimes:[],keyLock:true,pfl:false,kills:{bass:false,mid:false,treble:false,vocal:false,beat:false},
+    nudgeRate:null,cueHolding:false,brakeTimer:null,bleep:false,
+    lastWave:new Uint8Array(256)
+  };
+}
+const decks={A:null,B:null};
+function deck(name){return decks[name];}
+function otherDeck(name){return decks[name==='A'?'B':'A'];}
+function deckTrackName(track){return String(track&&track.title||'Untitled track');}
+function trackMeta(track){const bits=[String(track&&track.artist||'Manic Records')];if(track&&track.genre)bits.push(track.genre);if(baseBpm(track))bits.push(baseBpm(track)+' BPM');if(track&&track.musical_key)bits.push(track.musical_key);if(track&&track.duration_seconds)bits.push(formatTime(track.duration_seconds,false));return bits.join(' · ');}
+// Baseline compatibility owners retained for shared helpers and rollback-safe upgrades.
+function status(message,bad){return setStatus(message,bad);}
+function time(seconds){return formatTime(seconds,false);}
+function meta(track){return trackMeta(track);}
+function cover(track){return coverHtml(track);}
+function pills(track){
+  const bits=[];
+  if(track&&track.genre)bits.push('<span class="metaPill">'+esc(track.genre)+'</span>');
+  if(baseBpm(track))bits.push('<span class="metaPill">'+esc(baseBpm(track))+' BPM</span>');
+  if(track&&track.musical_key)bits.push('<span class="metaPill">'+esc(track.musical_key)+'</span>');
+  if(track&&track.visibility==='private')bits.push('<span class="metaPill private">Private</span>');
+  if(track&&track.content_rating==='explicit')bits.push('<span class="metaPill explicit">Explicit</span>');
+  if(track&&track.allow_download===true)bits.push('<span class="metaPill">Free download</span>');
+  return bits.join('');
+}
+function row(track){return compactTrackRow(track);}
+function render(){return renderLibrary();}
+function genres(){return genreOptions();}
 function deckAudio(name){return $('deck'+name+'Audio');}
 function deckTitle(name){return $('deck'+name+'Title');}
 function deckMeta(name){return $('deck'+name+'Meta');}
-async function loadDeck(name,id){const track=trackById(id);if(!track)return;status('Loading '+track.title+' into Deck '+name+'…');try{const url=await playableUrl(track);const audio=deckAudio(name);audio.pause();audio.src=url;audio.load();decks[name]={track:track,url:url};deckTitle(name).textContent=track.title||'Untitled track';deckMeta(name).textContent=meta(track);updateMix();status(track.title+' loaded into Deck '+name+'.');}catch(error){status(error&&error.message||'Deck could not load the track.',true);}}
-function clearDeck(name){const audio=deckAudio(name);audio.pause();audio.removeAttribute('src');audio.load();decks[name]={track:null,url:null};deckTitle(name).textContent='No track loaded';deckMeta(name).textContent='Choose Load '+name+' from the library.';}
-function toggleDeck(name){const audio=deckAudio(name);if(!audio.src)return;if(audio.paused)audio.play().catch(function(error){status(error&&error.message||'Playback was blocked.',true);});else audio.pause();}
-function restartDeck(name){const audio=deckAudio(name);if(!audio.src)return;audio.currentTime=0;audio.play().catch(function(){});}
-function updateMix(){const position=(Number($('crossfader').value)+100)/200;const gainA=Math.cos(position*Math.PI/2),gainB=Math.sin(position*Math.PI/2);const levelA=Number($('deckALevel').value)/100,levelB=Number($('deckBLevel').value)/100;deckAudio('A').volume=Math.max(0,Math.min(1,gainA*levelA));deckAudio('B').volume=Math.max(0,Math.min(1,gainB*levelB));$('deckALevelValue').textContent=Math.round(levelA*100)+'%';$('deckBLevelValue').textContent=Math.round(levelB*100)+'%';const raw=Number($('crossfader').value);$('crossfadeValue').textContent=raw===0?'Centre · both decks':raw<0?'Deck A '+Math.abs(raw)+'%':'Deck B '+raw+'%';}
-document.addEventListener('click',function(event){const load=event.target.closest('[data-load-deck]');if(load){loadDeck(load.dataset.loadDeck,load.dataset.trackId);return;}const play=event.target.closest('[data-deck-play]');if(play){toggleDeck(play.dataset.deckPlay);return;}const restart=event.target.closest('[data-deck-restart]');if(restart){restartDeck(restart.dataset.deckRestart);return;}const clear=event.target.closest('[data-deck-clear]');if(clear){clearDeck(clear.dataset.deckClear);}});
-$('reloadDj').onclick=loadTracks;$('allTracks').onclick=function(){mineOnly=false;$('allTracks').classList.add('cyan');$('myTracks').classList.remove('cyan');render();};$('myTracks').onclick=function(){if(!user){status('Sign in to view My Audio.',true);return;}mineOnly=true;$('myTracks').classList.add('cyan');$('allTracks').classList.remove('cyan');render();};$('djSearch').oninput=render;$('djGenre').onchange=render;$('djRating').onchange=render;$('crossfader').oninput=updateMix;$('deckALevel').oninput=updateMix;$('deckBLevel').oninput=updateMix;
-window.addEventListener('manic-track-changed',function(event){const detail=event.detail||{};if(detail.type==='deleted'){['A','B'].forEach(function(name){if(decks[name].track&&decks[name].track.id===detail.id)clearDeck(name);});}loadTracks();});
-try{client().auth.onAuthStateChange(function(_event,session){user=session&&session.user||null;loadTracks();});}catch(e){}
-updateMix();loadTracks();
+function updateMix(){return applyCrossfader();}
+function modeButtonState(){
+  const map={all:'allTracks',mine:'myTracks',prepare:'prepareTracks',recent:'recentTracks'};
+  Object.keys(map).forEach(function(mode){const node=$(map[mode]);if(node)node.classList.toggle('cyan',libraryMode===mode);});
+}
+function genreOptions(){
+  const selected=$('djGenre').value||'all';
+  const values=[...new Set(tracks.map(function(track){return track.genre;}).filter(Boolean))].sort(function(a,b){return String(a).localeCompare(String(b));});
+  $('djGenre').innerHTML='<option value="all">All genres</option>'+values.map(function(value){return '<option value="'+esc(value)+'">'+esc(value)+'</option>';}).join('');
+  $('djGenre').value=values.includes(selected)?selected:'all';
+}
+function sortTracks(rows){
+  const mode=$('djSort').value;
+  return rows.sort(function(a,b){
+    if(mode==='title')return String(a.title||'').localeCompare(String(b.title||''));
+    if(mode==='artist')return String(a.artist||'').localeCompare(String(b.artist||''));
+    if(mode==='bpm')return safeNumber(a.bpm,999)-safeNumber(b.bpm,999);
+    if(mode==='key')return String(a.musical_key||'ZZ').localeCompare(String(b.musical_key||'ZZ'));
+    if(mode==='length')return safeNumber(a.duration_seconds,999999)-safeNumber(b.duration_seconds,999999);
+    return String(b.created_at||'').localeCompare(String(a.created_at||''));
+  });
+}
+function visibleTracks(){
+  const query=$('djSearch').value.trim().toLowerCase();
+  const genre=$('djGenre').value;
+  const rating=$('djRating').value;
+  let rows=tracks.slice();
+  if(libraryMode==='mine')rows=rows.filter(function(track){return !!user&&String(track.created_by)===String(user.id);});
+  if(libraryMode==='prepare')rows=rows.filter(function(track){return prepareIds.has(String(track.id));});
+  if(libraryMode==='recent'){
+    const order=new Map(recentIds.map(function(id,index){return [String(id),index];}));
+    rows=rows.filter(function(track){return order.has(String(track.id));}).sort(function(a,b){return order.get(String(a.id))-order.get(String(b.id));});
+  }
+  rows=rows.filter(function(track){
+    if(genre!=='all'&&String(track.genre)!==genre)return false;
+    if(rating!=='all'&&String(track.content_rating)!==rating)return false;
+    if(query&&!String((track.title||'')+' '+(track.artist||'')+' '+(track.description||'')+' '+(track.genre||'')).toLowerCase().includes(query))return false;
+    return true;
+  });
+  return libraryMode==='recent'?rows:sortTracks(rows);
+}
+function compactTrackRow(track){
+  const id=String(track.id);
+  const prepared=prepareIds.has(id);
+  const loadedA=decks.A&&decks.A.track&&String(decks.A.track.id)===id;
+  const loadedB=decks.B&&decks.B.track&&String(decks.B.track.id)===id;
+  const classes=['trackRow'];if(prepared)classes.push('prepared');if(loadedA)classes.push('loadedA');if(loadedB)classes.push('loadedB');
+  return '<article class="'+classes.join(' ')+'" draggable="true" data-sb-manic-track-card="true" data-track-id="'+esc(id)+'" title="Double-click to load the first empty deck">'+
+    '<div class="miniCover">'+coverHtml(track)+'</div>'+
+    '<div class="trackInfo"><div class="trackTitle">'+esc(track.title||'Untitled track')+'</div><div class="trackArtist">'+esc(track.artist||'Manic Records')+'</div></div>'+
+    '<div class="trackBpm">'+(baseBpm(track)?esc(baseBpm(track)):'--')+'</div>'+
+    '<div class="trackKey">'+esc(track.musical_key||'--')+'</div>'+
+    '<div class="trackLength">'+(track.duration_seconds?formatTime(track.duration_seconds,false):'--:--')+'</div>'+
+    '<div class="trackGenre">'+esc(track.genre||'other')+'</div>'+
+    '<div class="trackActions"><button class="tinyBtn deckA" type="button" data-load-deck="A" data-track-id="'+esc(id)+'">Load A</button><button class="tinyBtn deckB" type="button" data-load-deck="B" data-track-id="'+esc(id)+'">Load B</button><button class="tinyBtn '+(prepared?'on':'')+'" type="button" data-prepare-track="'+esc(id)+'">'+(prepared?'Prepared':'Prepare')+'</button></div>'+
+    '<div class="manic-track-actions"></div></article>';
+}
+function renderLibrary(){
+  mineOnly=libraryMode==='mine';
+  modeButtonState();
+  const rows=visibleTracks();
+  $('libraryCount').textContent=rows.length+' tune'+(rows.length===1?'':'s');
+  $('djLibrary').innerHTML=rows.length?rows.map(compactTrackRow).join(''):'<div class="empty">No matching Manic Records audio tunes are available in this view.</div>';
+  setStatus(rows.length+' audio tune'+(rows.length===1?'':'s')+' ready'+(libraryMode==='prepare'?' in the Prepare List.':libraryMode==='recent'?' in Recently Loaded.':'.'));
+  if(window.ManicTrackControls&&window.ManicTrackControls.mount)window.ManicTrackControls.mount();
+}
+async function loadTracks(){
+  setStatus('Loading the Manic Records audio library...');
+  try{
+    const authResult=await client().auth.getUser();
+    user=authResult&&authResult.data&&authResult.data.user||null;
+    const result=await client().from(TABLE).select('*').eq('media_kind','audio').order('created_at',{ascending:false}).limit(250);
+    if(result.error)throw result.error;
+    tracks=result.data||[];
+    const liveIds=new Set(tracks.map(function(track){return String(track.id);}));
+    prepareIds=new Set([...prepareIds].filter(function(id){return liveIds.has(String(id));}));
+    recentIds=recentIds.filter(function(id,index,array){return liveIds.has(String(id))&&array.indexOf(id)===index;}).slice(0,50);
+    writeJson(STORE.prepare,[...prepareIds]);writeJson(STORE.recent,recentIds);
+    genreOptions();renderLibrary();
+  }catch(error){tracks=[];$('djLibrary').innerHTML='<div class="empty">The audio library could not load.</div>';setStatus(error&&error.message||'The audio library could not load.',true);}
+}
+async function playableUrl(track){
+  if(track.audio_url)return track.audio_url;
+  if(!track.audio_bucket||!track.audio_storage_path)throw new Error('This track has no playable audio source.');
+  if(track.visibility==='public'||String(track.audio_bucket).includes('public')){
+    const result=client().storage.from(track.audio_bucket).getPublicUrl(track.audio_storage_path);
+    if(result.data&&result.data.publicUrl)return result.data.publicUrl;
+  }
+  const signed=await client().storage.from(track.audio_bucket).createSignedUrl(track.audio_storage_path,3600);
+  if(signed.error)throw signed.error;
+  if(!signed.data||!signed.data.signedUrl)throw new Error('The private audio URL could not be created.');
+  return signed.data.signedUrl;
+}
+let cuePflBlendGain=null,cueProgramGain=null,settingsSaveTimer=null;
+function dbToGain(db){return Math.pow(10,Number(db)/20);}
+function smoothParam(param,value,time){if(!param||!audioContext)return;const now=audioContext.currentTime;try{param.cancelScheduledValues(now);param.setTargetAtTime(Number(value),now,time==null?0.012:time);}catch(error){param.value=Number(value);}}
+function makeImpulse(context,seconds,decay){
+  const length=Math.max(1,Math.floor(context.sampleRate*seconds));
+  const buffer=context.createBuffer(2,length,context.sampleRate);
+  for(let channel=0;channel<2;channel++){
+    const data=buffer.getChannelData(channel);
+    for(let index=0;index<length;index++)data[index]=(Math.random()*2-1)*Math.pow(1-index/length,decay);
+  }
+  return buffer;
+}
+function makeNoise(context,seconds){
+  const length=Math.max(1,Math.floor(context.sampleRate*seconds));
+  const buffer=context.createBuffer(1,length,context.sampleRate);
+  const data=buffer.getChannelData(0);
+  for(let index=0;index<length;index++)data[index]=Math.random()*2-1;
+  return buffer;
+}
+function createDeckGraph(state){
+  const source=audioContext.createMediaElementSource(state.audio);
+  const trim=audioContext.createGain();
+  const bass=audioContext.createBiquadFilter();bass.type='lowshelf';bass.frequency.value=120;
+  const mid=audioContext.createBiquadFilter();mid.type='peaking';mid.frequency.value=1000;mid.Q.value=0.85;
+  const treble=audioContext.createBiquadFilter();treble.type='highshelf';treble.frequency.value=7600;
+  const vocal=audioContext.createBiquadFilter();vocal.type='peaking';vocal.frequency.value=1750;vocal.Q.value=0.9;
+  const beatLow=audioContext.createBiquadFilter();beatLow.type='peaking';beatLow.frequency.value=105;beatLow.Q.value=1.05;
+  const beatHigh=audioContext.createBiquadFilter();beatHigh.type='peaking';beatHigh.frequency.value=3100;beatHigh.Q.value=1.15;
+  const highpass=audioContext.createBiquadFilter();highpass.type='highpass';highpass.frequency.value=20;highpass.Q.value=0.75;
+  const lowpass=audioContext.createBiquadFilter();lowpass.type='lowpass';lowpass.frequency.value=20000;lowpass.Q.value=0.75;
+  const dry=audioContext.createGain();dry.gain.value=1;
+  const mix=audioContext.createGain();
+  const echoSend=audioContext.createGain();echoSend.gain.value=0;
+  const delay=audioContext.createDelay(4);delay.delayTime.value=0.25;
+  const feedback=audioContext.createGain();feedback.gain.value=0.34;
+  const echoReturn=audioContext.createGain();echoReturn.gain.value=0.72;
+  const reverbSend=audioContext.createGain();reverbSend.gain.value=0;
+  const convolver=audioContext.createConvolver();convolver.buffer=reverbImpulse;
+  const reverbReturn=audioContext.createGain();reverbReturn.gain.value=0.55;
+  const channelFader=audioContext.createGain();channelFader.gain.value=1;
+  const performanceGain=audioContext.createGain();performanceGain.gain.value=1;
+  const crossGain=audioContext.createGain();crossGain.gain.value=1;
+  const analyser=audioContext.createAnalyser();analyser.fftSize=512;analyser.smoothingTimeConstant=0.72;
+  const cueSend=audioContext.createGain();cueSend.gain.value=0;
+
+  source.connect(trim);trim.connect(bass);bass.connect(mid);mid.connect(treble);treble.connect(vocal);vocal.connect(beatLow);beatLow.connect(beatHigh);beatHigh.connect(highpass);highpass.connect(lowpass);
+  lowpass.connect(dry);dry.connect(mix);
+  lowpass.connect(echoSend);echoSend.connect(delay);delay.connect(echoReturn);echoReturn.connect(mix);delay.connect(feedback);feedback.connect(delay);
+  lowpass.connect(reverbSend);reverbSend.connect(convolver);convolver.connect(reverbReturn);reverbReturn.connect(mix);
+  mix.connect(channelFader);channelFader.connect(performanceGain);performanceGain.connect(crossGain);crossGain.connect(analyser);analyser.connect(musicBus);
+  mix.connect(cueSend);cueSend.connect(cueBus);
+  return {source,trim,bass,mid,treble,vocal,beatLow,beatHigh,highpass,lowpass,dry,mix,echoSend,delay,feedback,echoReturn,reverbSend,convolver,reverbReturn,channelFader,performanceGain,crossGain,analyser,cueSend};
+}
+async function ensureAudio(){
+  if(audioReady){if(audioContext&&audioContext.state==='suspended')await audioContext.resume().catch(function(){});return true;}
+  if(audioStarting)return audioStarting;
+  audioStarting=(async function(){
+    try{
+      const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+      if(!AudioContextClass)throw new Error('This browser does not provide the Web Audio mixer required by Manic DJ Studio.');
+      audioContext=new AudioContextClass({latencyHint:'interactive'});
+      reverbImpulse=makeImpulse(audioContext,2.4,2.8);
+      noiseBuffer=makeNoise(audioContext,2);
+      musicBus=audioContext.createGain();musicBus.gain.value=1;
+      duckGain=audioContext.createGain();duckGain.gain.value=1;
+      masterMix=audioContext.createGain();
+      masterGain=audioContext.createGain();masterGain.gain.value=0.92;
+      limiter=audioContext.createDynamicsCompressor();limiter.threshold.value=-3;limiter.knee.value=6;limiter.ratio.value=20;limiter.attack.value=0.003;limiter.release.value=0.24;
+      masterAnalyser=audioContext.createAnalyser();masterAnalyser.fftSize=512;masterAnalyser.smoothingTimeConstant=0.72;
+      recordDestination=audioContext.createMediaStreamDestination();
+      cueBus=audioContext.createGain();
+      cuePflBlendGain=audioContext.createGain();cuePflBlendGain.gain.value=1;
+      cueProgramGain=audioContext.createGain();cueProgramGain.gain.value=0;
+      cueMasterGain=audioContext.createGain();cueMasterGain.gain.value=0.7;
+      cueDestination=audioContext.createMediaStreamDestination();
+      samplerGain=audioContext.createGain();samplerGain.gain.value=0.72;
+
+      musicBus.connect(duckGain);duckGain.connect(masterMix);samplerGain.connect(masterMix);
+      masterMix.connect(masterGain);masterGain.connect(limiter);limiter.connect(masterAnalyser);masterAnalyser.connect(audioContext.destination);masterAnalyser.connect(recordDestination);
+      cueBus.connect(cuePflBlendGain);cuePflBlendGain.connect(cueMasterGain);masterAnalyser.connect(cueProgramGain);cueProgramGain.connect(cueMasterGain);cueMasterGain.connect(cueDestination);
+
+      DECK_NAMES.forEach(function(name){const state=deck(name);state.audio.crossOrigin='anonymous';state.audio.volume=1;state.graph=createDeckGraph(state);});
+      const cueMonitor=$('cueMonitor');cueMonitor.srcObject=cueDestination.stream;cueMonitor.volume=1;cueMonitor.muted=false;await cueMonitor.play().catch(function(){});
+      audioReady=true;fallbackMode=false;audioFailureReason='';
+      DECK_NAMES.forEach(function(name){applyDeckMixer(name);applyDeckFx(name);applyPfl(name);});
+      applyCrossfader();applyMasterControls();startVisuals();
+      if(audioContext.state==='suspended')await audioContext.resume().catch(function(){});
+      return true;
+    }catch(error){
+      fallbackMode=true;audioReady=false;audioFailureReason=String(error&&error.message||error||'Unknown audio engine error');
+      DECK_NAMES.forEach(function(name){const audio=deck(name).audio;audio.controls=true;audio.classList.add('fallback');});
+      document.querySelectorAll('[data-deck-action="pfl"],#recordStart,#micEnable,.pad').forEach(function(node){node.disabled=true;});
+      setStatus((error&&error.message||'The professional audio engine could not start.')+' Basic deck playback remains available.',true);
+      return false;
+    }finally{audioStarting=null;}
+  })();
+  return audioStarting;
+}
+function effectiveBpm(state){return state&&state.baseBpm?state.baseBpm*safeNumber(state.audio.playbackRate,1):0;}
+function updateEchoTiming(name){
+  const state=deck(name);if(!state.graph)return;
+  const bpm=effectiveBpm(state)||state.baseBpm||120;
+  const fraction=safeNumber($('deck'+name+'EchoBeat').value,0.5);
+  smoothParam(state.graph.delay.delayTime,clamp((60/bpm)*fraction,0.03,3.5),0.02);
+}
+function applyDeckMixer(name){
+  const state=deck(name);if(!state)return;
+  const trim=safeNumber($('deck'+name+'Trim').value,0);
+  const bass=safeNumber($('deck'+name+'Bass').value,0);
+  const mid=safeNumber($('deck'+name+'Mid').value,0);
+  const treble=safeNumber($('deck'+name+'Treble').value,0);
+  const vocal=safeNumber($('deck'+name+'Vocal').value,0);
+  const beat=safeNumber($('deck'+name+'Beat').value,0);
+  const filter=safeNumber($('deck'+name+'Filter').value,0);
+  const channel=clamp($('deck'+name+'Level').value,0,100)/100;
+  $('deck'+name+'LevelValue').textContent=Math.round(channel*100)+'%';
+  $('deck'+name+'TrimValue').textContent=(trim>0?'+':'')+trim.toFixed(1);
+  if(state.graph){
+    smoothParam(state.graph.trim.gain,dbToGain(trim));
+    smoothParam(state.graph.bass.gain,state.kills.bass?-40:bass);
+    smoothParam(state.graph.mid.gain,state.kills.mid?-40:mid);
+    smoothParam(state.graph.treble.gain,state.kills.treble?-40:treble);
+    smoothParam(state.graph.vocal.gain,state.kills.vocal?-40:vocal);
+    smoothParam(state.graph.beatLow.gain,state.kills.beat?-40:beat*0.72);
+    smoothParam(state.graph.beatHigh.gain,state.kills.beat?-32:beat*0.38);
+    let highpass=20,lowpass=20000;
+    if(filter<0)highpass=20*Math.pow(200,Math.abs(filter)/100);
+    if(filter>0)lowpass=20000*Math.pow(0.05,filter/100);
+    smoothParam(state.graph.highpass.frequency,clamp(highpass,20,4200),0.025);
+    smoothParam(state.graph.lowpass.frequency,clamp(lowpass,700,20000),0.025);
+    smoothParam(state.graph.channelFader.gain,channel);
+  }
+  scheduleSettingsSave();
+}
+function applyDeckFx(name){
+  const state=deck(name);if(!state)return;
+  const echo=clamp($('deck'+name+'Echo').value,0,100);
+  const reverb=clamp($('deck'+name+'Reverb').value,0,100);
+  $('deck'+name+'EchoValue').textContent=Math.round(echo)+'%';$('deck'+name+'ReverbValue').textContent=Math.round(reverb)+'%';
+  if(state.graph){smoothParam(state.graph.echoSend.gain,(echo/100)*0.78);smoothParam(state.graph.reverbSend.gain,(reverb/100)*0.74);updateEchoTiming(name);}
+  scheduleSettingsSave();
+}
+function crossGains(position,curve){
+  const x=clamp(position,0,1);
+  if(curve==='linear')return [1-x,x];
+  if(curve==='sharp')return [Math.pow(1-x,1.8),Math.pow(x,1.8)];
+  if(curve==='scratch')return [x<0.985?1:clamp((1-x)/0.015,0,1),x>0.015?1:clamp(x/0.015,0,1)];
+  return [Math.cos(x*Math.PI/2),Math.sin(x*Math.PI/2)];
+}
+function applyCrossfader(){
+  let raw=clamp($('crossfader').value,-100,100);
+  let x=(raw+100)/200;if(crossfaderReversed)x=1-x;
+  const gains=crossGains(x,$('crossfaderCurve').value);
+  if(decks.A&&decks.A.graph)smoothParam(decks.A.graph.crossGain.gain,gains[0]);
+  if(decks.B&&decks.B.graph)smoothParam(decks.B.graph.crossGain.gain,gains[1]);
+  if(fallbackMode){decks.A.audio.volume=clamp(gains[0]*clamp($('deckALevel').value,0,100)/100,0,1);decks.B.audio.volume=clamp(gains[1]*clamp($('deckBLevel').value,0,100)/100,0,1);}
+  $('crossfadeValue').textContent=raw===0?'Centre · both decks':raw<0?'Deck A '+Math.abs(raw)+'%':'Deck B '+raw+'%';
+  scheduleSettingsSave();
+}
+function applyPfl(name){
+  const state=deck(name);if(!state)return;
+  if(state.graph)smoothParam(state.graph.cueSend.gain,state.pfl?1:0);
+  document.querySelectorAll('[data-deck-action="pfl"][data-deck="'+name+'"]').forEach(function(button){button.classList.toggle('on',state.pfl);button.setAttribute('aria-pressed',String(state.pfl));});
+}
+function applyMasterControls(){
+  const master=clamp($('masterLevel').value,0,125)/100;
+  const cue=clamp($('cueLevel').value,0,100)/100;
+  const blend=clamp($('cueBlend').value,0,100)/100;
+  if(masterGain)smoothParam(masterGain.gain,master);
+  if(samplerGain)smoothParam(samplerGain.gain,clamp($('samplerLevel').value,0,125)/100);
+  if(cueMasterGain)smoothParam(cueMasterGain.gain,cue);
+  if(cuePflBlendGain)smoothParam(cuePflBlendGain.gain,Math.sin(blend*Math.PI/2));
+  if(cueProgramGain)smoothParam(cueProgramGain.gain,Math.cos(blend*Math.PI/2));
+  scheduleSettingsSave();
+}
+function collectSettings(){
+  const output={crossfader:$('crossfader').value,curve:$('crossfaderCurve').value,reverse:crossfaderReversed,master:$('masterLevel').value,cue:$('cueLevel').value,cueBlend:$('cueBlend').value,sampler:$('samplerLevel').value,decks:{}};
+  DECK_NAMES.forEach(function(name){output.decks[name]={trim:$('deck'+name+'Trim').value,bass:$('deck'+name+'Bass').value,mid:$('deck'+name+'Mid').value,treble:$('deck'+name+'Treble').value,vocal:$('deck'+name+'Vocal').value,beat:$('deck'+name+'Beat').value,filter:$('deck'+name+'Filter').value,channel:$('deck'+name+'Level').value,echo:$('deck'+name+'Echo').value,reverb:$('deck'+name+'Reverb').value,echoBeat:$('deck'+name+'EchoBeat').value,kills:Object.assign({},deck(name).kills)};});
+  return output;
+}
+function scheduleSettingsSave(){clearTimeout(settingsSaveTimer);settingsSaveTimer=setTimeout(function(){writeJson(STORE.settings,collectSettings());},120);}
+function restoreSettings(){
+  const saved=readJson(STORE.settings,null);if(!saved||typeof saved!=='object')return;
+  [['crossfader','crossfader'],['crossfaderCurve','curve'],['masterLevel','master'],['cueLevel','cue'],['cueBlend','cueBlend'],['samplerLevel','sampler']].forEach(function(pair){if(saved[pair[1]]!=null&&$(pair[0]))$(pair[0]).value=saved[pair[1]];});
+  crossfaderReversed=saved.reverse===true;$('crossfaderReverse').classList.toggle('on',crossfaderReversed);$('crossfaderReverse').setAttribute('aria-pressed',String(crossfaderReversed));
+  DECK_NAMES.forEach(function(name){const values=saved.decks&&saved.decks[name]||{};['trim','bass','mid','treble','vocal','beat','filter','channel','echo','reverb','echoBeat'].forEach(function(key){const id='deck'+name+(key==='channel'?'Level':key.charAt(0).toUpperCase()+key.slice(1));if(values[key]!=null&&$(id))$(id).value=values[key];});if(values.kills)deck(name).kills=Object.assign(deck(name).kills,values.kills);});
+  refreshKillButtons();
+}
+function refreshKillButtons(){document.querySelectorAll('[data-kill]').forEach(function(button){const state=deck(button.dataset.deck);button.classList.toggle('on',!!state.kills[button.dataset.kill]);});}
+function cueMemoryFor(state){if(!state.track)return {main:0,hot:Array(8).fill(null)};const saved=readJson(cueKey(state.track.id),{});const hot=Array.isArray(saved.hot)?saved.hot.slice(0,8):[];while(hot.length<8)hot.push(null);return {main:Math.max(0,safeNumber(saved.main,0)),hot:hot.map(function(value){return value==null?null:Math.max(0,safeNumber(value,0));})};}
+function saveCueMemory(state){if(!state.track)return;writeJson(cueKey(state.track.id),{main:state.cuePoint,hot:state.hotCues});}
+function renderHotCues(name){
+  const state=deck(name);const host=$('deck'+name+'HotCues');if(!host)return;
+  host.innerHTML=state.hotCues.map(function(value,index){const set=value!=null;return '<button class="hotCue '+(set?'set':'')+'" type="button" data-hot-cue="'+index+'" data-deck="'+name+'" title="'+(set?'Cue '+(index+1)+' at '+formatTime(value,true)+'; Shift/right-click clears':'Set hot cue '+(index+1))+'">H'+(index+1)+(set?'<small> '+formatTime(value,false)+'</small>':'')+'</button>';}).join('');
+}
+function renderLoops(name){
+  const state=deck(name);const host=$('deck'+name+'Loops');if(!host)return;
+  host.innerHTML=LOOP_BEATS.map(function(beats){const active=state.loop&&state.loop.beats===beats;const label=beats===0.5?'1/2':String(beats);return '<button class="loopBtn '+(active?'active':'')+'" type="button" data-loop-beats="'+beats+'" data-deck="'+name+'">'+label+' beat'+(beats===1?'':'s')+'</button>';}).join('');
+  $('deck'+name+'LoopState').textContent=state.loop?String(state.loop.beats)+' beat loop':'Loop off';
+}
+function updateDeckIdentity(name){
+  const state=deck(name);const track=state.track;
+  $('deck'+name+'Title').textContent=track?deckTrackName(track):'No track loaded';
+  $('deck'+name+'Meta').textContent=track?trackMeta(track):'Choose Load '+name+' from the tune list.';
+  $('topWave'+name+'Title').textContent=track?deckTrackName(track):'No track';
+  $('deck'+name+'Key').textContent='Key '+(track&&track.musical_key||'--');
+  updateDeckBpmReadout(name);renderHotCues(name);renderLoops(name);
+}
+function updateDeckBpmReadout(name){
+  const state=deck(name);const bpm=effectiveBpm(state);
+  $('deck'+name+'Bpm').textContent=bpm?bpm.toFixed(1)+' BPM':'-- BPM';
+  const rate=(safeNumber(state.audio.playbackRate,1)-1)*100;
+  $('deck'+name+'Rate').textContent=(rate>=0?'+':'')+rate.toFixed(1)+'%';
+  $('deck'+name+'TempoValue').textContent=(rate>=0?'+':'')+rate.toFixed(1)+'%';
+  if(state.baseBpm&&!$('deck'+name+'ManualBpm').matches(':focus'))$('deck'+name+'ManualBpm').value=state.baseBpm.toFixed(2).replace(/\.00$/,'');
+}
+function addRecent(id){id=String(id);recentIds=[id].concat(recentIds.filter(function(value){return String(value)!==id;})).slice(0,50);writeJson(STORE.recent,recentIds);}
+async function loadDeck(name,id){
+  const state=deck(name);const track=trackById(id);if(!state||!track)return;
+  const token=++state.loadToken;
+  setStatus('Loading '+deckTrackName(track)+' into Deck '+name+'...');
+  await ensureAudio();
+  try{
+    const url=await playableUrl(track);if(token!==state.loadToken)return;
+    if(state.brakeTimer){cancelAnimationFrame(state.brakeTimer);state.brakeTimer=null;}
+    state.audio.pause();state.audio.crossOrigin='anonymous';state.audio.removeAttribute('src');state.audio.load();
+    state.track=track;state.url=url;state.baseBpm=baseBpm(track);state.loop=null;state.tapTimes=[];state.audio.playbackRate=1;setPreservesPitch(state,true);
+    const memory=cueMemoryFor(state);state.cuePoint=memory.main;state.hotCues=memory.hot;
+    state.audio.src=url;state.audio.load();
+    $('deck'+name+'Tempo').value=0;
+    addRecent(track.id);updateDeckIdentity(name);applyDeckMixer(name);applyDeckFx(name);applyCrossfader();renderLibrary();
+    setStatus(deckTrackName(track)+' loaded into Deck '+name+'. Press Play or set a cue point.');
+  }catch(error){if(token===state.loadToken)setStatus(error&&error.message||'Deck '+name+' could not load the tune.',true);}
+}
+function clearDeck(name){
+  const state=deck(name);if(!state)return;
+  state.loadToken++;
+  if(state.brakeTimer){cancelAnimationFrame(state.brakeTimer);state.brakeTimer=null;}
+  state.audio.pause();state.audio.removeAttribute('src');state.audio.load();state.audio.playbackRate=1;
+  state.track=null;state.url='';state.baseBpm=0;state.cuePoint=0;state.hotCues=Array(8).fill(null);state.loop=null;state.tapTimes=[];state.cueHolding=false;state.bleep=false;
+  if(state.graph)smoothParam(state.graph.performanceGain.gain,1);
+  $('deck'+name+'Tempo').value=0;$('deck'+name+'ManualBpm').value='';$('deck'+name+'Seek').value=0;
+  updateDeckIdentity(name);updateDeckTimes(name);renderLibrary();setStatus('Deck '+name+' cleared.');
+}
+async function toggleDeck(name){
+  const state=deck(name);if(!state||!state.audio.src){flash('Load a tune into Deck '+name+' first.',true);return;}
+  await ensureAudio();if(audioContext&&audioContext.state==='suspended')await audioContext.resume().catch(function(){});
+  if(state.audio.paused){state.audio.play().catch(function(error){setStatus(error&&error.message||'Playback was blocked.',true);});}else state.audio.pause();
+}
+function restartDeck(name,play){const state=deck(name);if(!state||!state.audio.src)return;state.audio.currentTime=0;if(play!==false)state.audio.play().catch(function(){});}
+function setPreservesPitch(state,on){state.keyLock=!!on;['preservesPitch','mozPreservesPitch','webkitPreservesPitch'].forEach(function(key){try{if(key in state.audio)state.audio[key]=!!on;}catch(error){}});const button=$('deck'+state.name+'KeyLock');button.classList.toggle('on',state.keyLock);button.setAttribute('aria-pressed',String(state.keyLock));}
+function setTempo(name,percent,quiet){
+  const state=deck(name);if(!state)return;
+  const value=clamp(percent,-16,16);$('deck'+name+'Tempo').value=value;
+  const rate=1+value/100;state.audio.playbackRate=rate;state.nudgeRate=null;updateDeckBpmReadout(name);updateEchoTiming(name);
+  if(!quiet)scheduleSettingsSave();
+}
+function setManualBpm(name,value){const state=deck(name);const bpm=clamp(value,40,240);if(!Number.isFinite(Number(value))||Number(value)<40||Number(value)>240){flash('BPM must be between 40 and 240.',true);return;}state.baseBpm=bpm;updateDeckBpmReadout(name);updateEchoTiming(name);flash('Deck '+name+' beat grid set to '+bpm.toFixed(2)+' BPM.');}
+function tapBpm(name){
+  const state=deck(name);const now=performance.now();state.tapTimes=state.tapTimes.filter(function(value){return now-value<4000;});state.tapTimes.push(now);if(state.tapTimes.length>9)state.tapTimes.shift();
+  if(state.tapTimes.length<2){flash('Tap again in time with Deck '+name+'.');return;}
+  const intervals=[];for(let index=1;index<state.tapTimes.length;index++)intervals.push(state.tapTimes[index]-state.tapTimes[index-1]);
+  const average=intervals.reduce(function(sum,value){return sum+value;},0)/intervals.length;let bpm=60000/average;while(bpm<70)bpm*=2;while(bpm>180)bpm/=2;bpm=clamp(bpm,40,240);state.baseBpm=bpm;$('deck'+name+'ManualBpm').value=bpm.toFixed(2);updateDeckBpmReadout(name);updateEchoTiming(name);
+}
+function syncDeck(name){
+  const state=deck(name);const target=otherDeck(name);if(!state.track||!target.track){flash('Load both decks before using Sync.',true);return;}
+  if(!state.baseBpm||!target.baseBpm){flash('Both decks need a BPM value. Use Tap BPM or type it manually.',true);return;}
+  const targetBpm=effectiveBpm(target);const desiredRate=targetBpm/state.baseBpm;const percent=(desiredRate-1)*100;
+  if(percent<-16||percent>16){flash('The BPM difference is outside the current ±16% tempo range.',true);return;}
+  setTempo(name,percent);
+  const beatSeconds=60/targetBpm;let difference=(target.audio.currentTime%beatSeconds)-(state.audio.currentTime%beatSeconds);if(difference>beatSeconds/2)difference-=beatSeconds;if(difference<-beatSeconds/2)difference+=beatSeconds;
+  if(Number.isFinite(difference))state.audio.currentTime=clamp(state.audio.currentTime+difference,0,state.audio.duration||Infinity);
+  flash('Deck '+name+' matched to '+targetBpm.toFixed(1)+' BPM and nearest beat phase.');
+}
+function setCue(name){const state=deck(name);if(!state.track)return;state.cuePoint=Math.max(0,state.audio.currentTime||0);saveCueMemory(state);flash('Deck '+name+' cue set at '+formatTime(state.cuePoint,true)+'.');}
+function cuePress(name){
+  const state=deck(name);if(!state.track)return;
+  state.audio.currentTime=state.cuePoint||0;
+  if(state.audio.paused){state.cueHolding=true;ensureAudio().then(function(){state.audio.play().catch(function(){});});}
+}
+function cueRelease(name){const state=deck(name);if(!state||!state.cueHolding)return;state.audio.pause();state.audio.currentTime=state.cuePoint||0;state.cueHolding=false;}
+function activateHotCue(name,index,clear){
+  const state=deck(name);if(!state.track)return;
+  if(clear){state.hotCues[index]=null;saveCueMemory(state);renderHotCues(name);return;}
+  const value=state.hotCues[index];
+  if(value==null){state.hotCues[index]=Math.max(0,state.audio.currentTime||0);saveCueMemory(state);renderHotCues(name);flash('Hot Cue '+(index+1)+' set on Deck '+name+'.');return;}
+  state.audio.currentTime=value;ensureAudio().then(function(){state.audio.play().catch(function(){});});
+}
+function beatLengthInAudio(state){return state.baseBpm?60/state.baseBpm:0;}
+function toggleLoop(name,beats){
+  const state=deck(name);if(!state.track)return;
+  if(!state.baseBpm){flash('Set or tap the BPM before creating a beat loop.',true);return;}
+  if(state.loop&&state.loop.beats===beats){state.loop=null;renderLoops(name);return;}
+  const beat=beatLengthInAudio(state);const start=Math.max(0,Math.round((state.audio.currentTime||0)/beat)*beat);const end=Math.min(state.audio.duration||Infinity,start+beat*beats);
+  if(!Number.isFinite(end)||end<=start){flash('The tune is not ready for looping yet.',true);return;}
+  state.loop={start:start,end:end,beats:beats};state.audio.currentTime=start;renderLoops(name);
+}
+function loopOff(name){const state=deck(name);if(!state)return;state.loop=null;renderLoops(name);}
+function beatJump(name,direction){const state=deck(name);const beat=beatLengthInAudio(state);if(!beat){flash('Set BPM before using Beat Jump.',true);return;}state.audio.currentTime=clamp((state.audio.currentTime||0)+direction*beat*4,0,state.audio.duration||Infinity);}
+function stutter(name){const state=deck(name);if(!state.track)return;const beat=beatLengthInAudio(state)||0.25;state.audio.currentTime=Math.max(0,(state.audio.currentTime||0)-beat*0.5);state.audio.play().catch(function(){});}
+function brakeDeck(name){
+  const state=deck(name);if(!state.track||state.audio.paused||state.brakeTimer)return;
+  const restoreRate=state.audio.playbackRate;const restorePitch=state.keyLock;const started=performance.now();const duration=1200;setPreservesPitch(state,false);
+  const finish=function(){state.brakeTimer=null;state.audio.pause();state.audio.playbackRate=restoreRate;setPreservesPitch(state,restorePitch);updateDeckBpmReadout(name);};
+  const step=function(now){const progress=clamp((now-started)/duration,0,1);if(progress>=1){finish();return;}state.audio.playbackRate=Math.max(0.2,restoreRate*(1-progress*0.82));state.brakeTimer=requestAnimationFrame(step);};
+  state.brakeTimer=requestAnimationFrame(step);
+}
+function setBleep(name,on){const state=deck(name);state.bleep=!!on;if(state.graph)smoothParam(state.graph.performanceGain.gain,on?0:1,0.005);else state.audio.muted=!!on;}
+function nudge(name,direction,on){
+  const state=deck(name);if(!state.track)return;
+  if(on){if(state.nudgeRate==null)state.nudgeRate=state.audio.playbackRate;state.audio.playbackRate=clamp(state.nudgeRate+direction*0.035,0.5,2);}else if(state.nudgeRate!=null){state.audio.playbackRate=state.nudgeRate;state.nudgeRate=null;}
+  updateDeckBpmReadout(name);updateEchoTiming(name);
+}
+function updateDeckTimes(name){
+  const state=deck(name);const audio=state.audio;const duration=Number.isFinite(audio.duration)?audio.duration:0;const current=clamp(audio.currentTime,0,duration||Infinity);
+  $('deck'+name+'Current').textContent=formatTime(current,true);$('deck'+name+'Remaining').textContent='-'+formatTime(Math.max(0,duration-current),true);
+  $('deck'+name+'Seek').value=duration?Math.round(current/duration*1000):0;
+  const jog=$('deck'+name+'Jog');const percent=duration?Math.round(current/duration*100):0;jog.setAttribute('aria-valuenow',String(percent));$('deck'+name+'JogDisc').style.transform='rotate('+(current*24%360)+'deg)';
+  if(state.loop&&current>=state.loop.end-0.015)audio.currentTime=state.loop.start;
+}
+function updatePlayButtons(name){const state=deck(name);document.querySelectorAll('[data-deck-action="play"][data-deck="'+name+'"]').forEach(function(button){button.textContent=state.audio.paused?'Play / Pause':'Pause / Play';button.classList.toggle('on',!state.audio.paused);});}
+function beginJog(event,name){const state=deck(name);if(!state.track)return;jogDrag={name:name,startX:event.clientX,startTime:state.audio.currentTime,wasPlaying:!state.audio.paused};event.currentTarget.setPointerCapture&&event.currentTarget.setPointerCapture(event.pointerId);}
+function moveJog(event){if(!jogDrag)return;const state=deck(jogDrag.name);const delta=(event.clientX-jogDrag.startX)*0.045;state.audio.currentTime=clamp(jogDrag.startTime+delta,0,state.audio.duration||Infinity);}
+function endJog(){jogDrag=null;}
+function jogKey(event,name){const state=deck(name);if(!state.track)return;if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();const direction=event.key==='ArrowLeft'?-1:1;state.audio.currentTime=clamp(state.audio.currentTime+direction*(event.shiftKey?5:0.5),0,state.audio.duration||Infinity);}}
+function analyserLevel(analyser){
+  if(!analyser)return 0;const data=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(data);let sum=0,peak=0;for(let index=0;index<data.length;index++){const value=(data[index]-128)/128;sum+=value*value;peak=Math.max(peak,Math.abs(value));}return clamp(Math.max(Math.sqrt(sum/data.length)*1.8,peak*0.85),0,1);
+}
+function sizeCanvas(canvas){const ratio=Math.min(2,window.devicePixelRatio||1);const width=Math.max(240,Math.floor(canvas.clientWidth*ratio));const height=Math.max(80,Math.floor(canvas.clientHeight*ratio));if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}return {width,height,ratio};}
+function drawDeckWave(name,canvas,large){
+  if(!canvas)return;const state=deck(name);const size=sizeCanvas(canvas);const context=canvas.getContext('2d');const width=size.width,height=size.height;
+  context.clearRect(0,0,width,height);context.fillStyle='#02040b';context.fillRect(0,0,width,height);
+  const accent=name==='A'?'#22d3a6':'#ff2d85';
+  context.strokeStyle='rgba(255,255,255,.09)';context.lineWidth=1;
+  for(let index=1;index<8;index++){const x=index*width/8;context.beginPath();context.moveTo(x,0);context.lineTo(x,height);context.stroke();}
+  const bpm=effectiveBpm(state);if(bpm&&state.audio){const phase=((state.audio.currentTime||0)/(60/bpm))%1;context.fillStyle='rgba(65,232,255,.12)';context.fillRect((1-phase)*width/4,0,Math.max(2,width/100),height);}
+  let data=state.lastWave;
+  if(state.graph&&state.graph.analyser){if(data.length!==state.graph.analyser.fftSize)data=new Uint8Array(state.graph.analyser.fftSize);state.graph.analyser.getByteTimeDomainData(data);state.lastWave=data;}else data.fill(128);
+  context.lineWidth=large?3:2;context.strokeStyle=accent;context.beginPath();
+  const slice=width/(data.length-1);for(let index=0;index<data.length;index++){const y=(data[index]/255)*height;const x=index*slice;if(index===0)context.moveTo(x,y);else context.lineTo(x,y);}context.stroke();
+  context.strokeStyle='rgba(255,255,255,.22)';context.beginPath();context.moveTo(0,height/2);context.lineTo(width,height/2);context.stroke();
+  const duration=Number.isFinite(state.audio.duration)?state.audio.duration:0;const progress=duration?clamp(state.audio.currentTime/duration,0,1):0;context.fillStyle=accent;context.fillRect(0,height-5,width*progress,5);
+  if(state.loop&&duration){context.fillStyle='rgba(255,177,66,.25)';context.fillRect(width*state.loop.start/duration,0,width*(state.loop.end-state.loop.start)/duration,height-5);}
+  state.hotCues.forEach(function(value,index){if(value==null||!duration)return;const x=width*value/duration;context.fillStyle=index%2?'#7c3cff':'#41e8ff';context.fillRect(x,0,Math.max(2,size.ratio*2),height);});
+}
+function startVisuals(){
+  if(animationHandle)return;
+  const frame=function(){
+    DECK_NAMES.forEach(function(name){drawDeckWave(name,$('deck'+name+'Wave'),false);drawDeckWave(name,$('topWave'+name),true);updateDeckTimes(name);updatePlayButtons(name);const level=deck(name).graph?analyserLevel(deck(name).graph.analyser):0;$('deck'+name+'Vu').style.width=(level*100).toFixed(1)+'%';});
+    const masterLevelValue=analyserLevel(masterAnalyser);$('masterVu').style.width=(masterLevelValue*100).toFixed(1)+'%';$('limiterState').textContent=masterLevelValue>.93?'Limiter working':'Limiter armed';$('limiterState').style.color=masterLevelValue>.93?'#ffe8b8':'';
+    const micLevelValue=analyserLevel(micAnalyser);$('micVu').style.width=(micLevelValue*100).toFixed(1)+'%';if(duckGain&&talkoverEnabled)smoothParam(duckGain.gain,micLevelValue>.09?0.28:1,0.045);
+    updateRecordTimer();
+    animationHandle=requestAnimationFrame(frame);
+  };
+  animationHandle=requestAnimationFrame(frame);
+}
+function resetDeckMixer(name){
+  const values={Trim:0,Bass:0,Mid:0,Treble:0,Vocal:0,Beat:0,Filter:0,Level:100,Echo:0,Reverb:0,EchoBeat:0.5};
+  Object.keys(values).forEach(function(key){const node=$('deck'+name+key);if(node)node.value=values[key];});
+  deck(name).kills={bass:false,mid:false,treble:false,vocal:false,beat:false};refreshKillButtons();applyDeckMixer(name);applyDeckFx(name);
+}
+function resetWholeMixer(){
+  DECK_NAMES.forEach(resetDeckMixer);$('crossfader').value=0;$('crossfaderCurve').value='smooth';crossfaderReversed=false;$('crossfaderReverse').classList.remove('on');$('crossfaderReverse').setAttribute('aria-pressed','false');$('masterLevel').value=92;$('cueLevel').value=70;$('cueBlend').value=100;$('samplerLevel').value=72;applyCrossfader();applyMasterControls();flash('Manic DJ mixer reset to its protected neutral state.');
+}
+function resetFilter(name){$('deck'+name+'Filter').value=0;applyDeckMixer(name);}
+function resetFx(name){$('deck'+name+'Echo').value=0;$('deck'+name+'Reverb').value=0;$('deck'+name+'EchoBeat').value=0.5;applyDeckFx(name);}
+function pulseFx(name,type){
+  const id='deck'+name+(type==='echo'?'Echo':'Reverb');const node=$(id);const original=node.value;node.value=type==='echo'?78:82;applyDeckFx(name);setTimeout(function(){node.value=original;applyDeckFx(name);},type==='echo'?1600:2100);
+}
+async function refreshOutputs(){
+  const select=$('cueOutput');const current=select.value;select.innerHTML='<option value="">Default audio output</option>';
+  try{
+    if(!navigator.mediaDevices||!navigator.mediaDevices.enumerateDevices)throw new Error('Audio output discovery is unavailable in this browser.');
+    const devices=await navigator.mediaDevices.enumerateDevices();const outputs=devices.filter(function(device){return device.kind==='audiooutput';});
+    outputs.forEach(function(device,index){const option=document.createElement('option');option.value=device.deviceId;option.textContent=device.label||('Audio output '+(index+1));select.appendChild(option);});
+    if([...select.options].some(function(option){return option.value===current;}))select.value=current;
+    if(!outputs.length)flash('No selectable headphone outputs were reported. The default output remains active.');
+  }catch(error){flash(error&&error.message||'Audio outputs could not be listed.',true);}
+}
+async function chooseCueOutput(){
+  const monitor=$('cueMonitor');const id=$('cueOutput').value;
+  if(typeof monitor.setSinkId!=='function'){flash('This browser cannot route browser cue audio to a separate output. PFL still works through the default output.',true);return;}
+  try{await monitor.setSinkId(id);await monitor.play();flash(id?'Headphone cue output changed.':'Headphone cue returned to the default output.');}catch(error){flash(error&&error.message||'The headphone output could not be changed.',true);}
+}
+async function toggleMicrophone(){
+  if(micEnabled){disableMicrophone();return;}
+  try{
+    const ready=await ensureAudio();if(!ready)throw new Error('The professional audio engine is unavailable.');
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error('Microphone access is unavailable in this browser.');
+    micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:false},video:false});
+    micSource=audioContext.createMediaStreamSource(micStream);
+    const highpass=audioContext.createBiquadFilter();highpass.type='highpass';highpass.frequency.value=80;highpass.Q.value=0.7;
+    const compressor=audioContext.createDynamicsCompressor();compressor.threshold.value=-18;compressor.knee.value=12;compressor.ratio.value=4;compressor.attack.value=0.008;compressor.release.value=0.18;
+    micGain=audioContext.createGain();micMuteGain=audioContext.createGain();micAnalyser=audioContext.createAnalyser();micAnalyser.fftSize=512;micAnalyser.smoothingTimeConstant=0.66;
+    micSource.connect(highpass);highpass.connect(compressor);compressor.connect(micGain);micGain.connect(micMuteGain);micMuteGain.connect(micAnalyser);micAnalyser.connect(masterMix);
+    micNodes=[highpass,compressor,micGain,micMuteGain,micAnalyser];
+    micEnabled=true;micMuted=false;applyMicLevel();
+    $('micEnable').textContent='Disable Mic';$('micEnable').classList.add('on');$('micMute').disabled=false;$('talkover').disabled=false;$('micLevel').disabled=false;$('micMute').setAttribute('aria-pressed','false');$('micState').textContent='Microphone is live in the master mix and recorder. Use headphones to avoid feedback.';
+    await refreshOutputs();
+  }catch(error){disableMicrophone();flash(error&&error.message||'Microphone could not start.',true);}
+}
+function disableMicrophone(){
+  if(micStream)micStream.getTracks().forEach(function(track){track.stop();});
+  if(micSource){try{micSource.disconnect();}catch(error){}}
+  micNodes.forEach(function(node){try{node.disconnect();}catch(error){}});
+  micStream=null;micSource=null;micNodes=[];micGain=null;micMuteGain=null;micAnalyser=null;micEnabled=false;micMuted=false;talkoverEnabled=false;if(duckGain)smoothParam(duckGain.gain,1,0.03);
+  $('micEnable').textContent='Enable Mic';$('micEnable').classList.remove('on');$('micMute').disabled=true;$('talkover').disabled=true;$('micLevel').disabled=true;$('micMute').classList.remove('on');$('talkover').classList.remove('on');$('micMute').setAttribute('aria-pressed','false');$('talkover').setAttribute('aria-pressed','false');$('micState').textContent='Microphone is off. Headphones are strongly recommended to prevent feedback.';$('micVu').style.width='0%';
+}
+function applyMicLevel(){if(micGain)smoothParam(micGain.gain,clamp($('micLevel').value,0,150)/100);if(micMuteGain)smoothParam(micMuteGain.gain,micMuted?0:1);}
+function toggleMicMute(){if(!micEnabled)return;micMuted=!micMuted;applyMicLevel();$('micMute').classList.toggle('on',micMuted);$('micMute').setAttribute('aria-pressed',String(micMuted));$('micMute').textContent=micMuted?'Unmute Mic':'Mute Mic';}
+function toggleTalkover(){if(!micEnabled)return;talkoverEnabled=!talkoverEnabled;$('talkover').classList.toggle('on',talkoverEnabled);$('talkover').setAttribute('aria-pressed',String(talkoverEnabled));if(!talkoverEnabled&&duckGain)smoothParam(duckGain.gain,1,0.04);}
+function makeGainEnvelope(node,start,peak,attack,hold,release){const gain=node.gain;gain.setValueAtTime(0.0001,start);gain.exponentialRampToValueAtTime(Math.max(0.0002,peak),start+attack);gain.setValueAtTime(Math.max(0.0002,peak),start+attack+hold);gain.exponentialRampToValueAtTime(0.0001,start+attack+hold+release);}
+function noiseShot(start,duration,filterType,frequency,level){
+  const source=audioContext.createBufferSource();source.buffer=noiseBuffer;const filter=audioContext.createBiquadFilter();filter.type=filterType;filter.frequency.value=frequency;const gain=audioContext.createGain();makeGainEnvelope(gain,start,level,0.002,Math.max(0,duration*0.08),Math.max(0.02,duration*0.9));source.connect(filter);filter.connect(gain);gain.connect(samplerGain);source.start(start);source.stop(start+duration+0.08);
+}
+function oscillatorShot(type,start,frequency,endFrequency,duration,level){
+  const oscillator=audioContext.createOscillator();const gain=audioContext.createGain();oscillator.type=type;oscillator.frequency.setValueAtTime(Math.max(1,frequency),start);if(endFrequency)oscillator.frequency.exponentialRampToValueAtTime(Math.max(1,endFrequency),start+duration);makeGainEnvelope(gain,start,level,0.003,Math.max(0,duration*0.08),Math.max(0.03,duration*0.88));oscillator.connect(gain);gain.connect(samplerGain);oscillator.start(start);oscillator.stop(start+duration+0.1);
+}
+async function triggerSample(type,button){
+  const ready=await ensureAudio();if(!ready)return;const now=audioContext.currentTime+0.01;
+  if(type==='kick'){oscillatorShot('sine',now,155,46,0.48,0.95);}
+  else if(type==='snare'){noiseShot(now,0.34,'highpass',900,0.54);oscillatorShot('triangle',now,190,120,0.16,0.22);}
+  else if(type==='clap'){[0,0.045,0.09].forEach(function(offset){noiseShot(now+offset,0.18,'bandpass',1500,0.34);});}
+  else if(type==='hat'){noiseShot(now,0.12,'highpass',6500,0.32);}
+  else if(type==='siren'){const oscillator=audioContext.createOscillator();const gain=audioContext.createGain();const lfo=audioContext.createOscillator();const depth=audioContext.createGain();oscillator.type='sawtooth';oscillator.frequency.value=520;lfo.frequency.value=5.4;depth.gain.value=180;lfo.connect(depth);depth.connect(oscillator.frequency);makeGainEnvelope(gain,now,0.24,0.02,0.92,0.28);oscillator.connect(gain);gain.connect(samplerGain);oscillator.start(now);lfo.start(now);oscillator.stop(now+1.25);lfo.stop(now+1.25);}
+  else if(type==='laser'){oscillatorShot('sawtooth',now,1400,55,0.72,0.38);}
+  else if(type==='bass'){oscillatorShot('sine',now,92,29,1.25,0.82);oscillatorShot('triangle',now,184,58,0.76,0.22);}
+  else if(type==='horn'){[233.08,293.66,349.23].forEach(function(frequency,index){oscillatorShot('square',now+index*0.012,frequency,frequency,0.64,0.11);});}
+  if(button){button.classList.add('hit');setTimeout(function(){button.classList.remove('hit');},130);}
+}
+function recorderMime(){if(typeof MediaRecorder==='undefined')return '';const choices=['audio/webm;codecs=opus','audio/ogg;codecs=opus','audio/webm'];return choices.find(function(type){return MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(type);})||'';}
+function updateRecordTimer(){
+  if(!recorder||recorder.state==='inactive')return;
+  const now=Date.now();const active=Math.max(0,now-recordStartedAt-recordPausedTotal-(recorder.state==='paused'?now-recordPausedAt:0));const seconds=Math.floor(active/1000);$('recordTimer').textContent=String(Math.floor(seconds/3600)).padStart(2,'0')+':'+String(Math.floor(seconds/60)%60).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
+}
+async function startRecording(){
+  try{
+    const ready=await ensureAudio();if(!ready)throw new Error('The professional audio engine is unavailable.');
+    if(typeof MediaRecorder==='undefined'||!recordDestination)throw new Error('Local audio recording is unavailable in this browser.');
+    if(recorder&&recorder.state!=='inactive')return;
+    if(recordUrl){URL.revokeObjectURL(recordUrl);recordUrl='';}
+    $('downloadMix').classList.remove('ready');recordChunks=[];const mime=recorderMime();recorder=mime?new MediaRecorder(recordDestination.stream,{mimeType:mime,audioBitsPerSecond:192000}):new MediaRecorder(recordDestination.stream);
+    recorder.ondataavailable=function(event){if(event.data&&event.data.size)recordChunks.push(event.data);};
+    recorder.onerror=function(event){$('recordState').textContent='Recording error: '+(event.error&&event.error.message||'unknown error');};
+    recorder.onstop=function(){
+      const type=recorder.mimeType||mime||'audio/webm';const blob=new Blob(recordChunks,{type:type});
+      if(!blob.size){$('recordState').textContent='The browser returned an empty recording.';return;}
+      recordUrl=URL.createObjectURL(blob);const link=$('downloadMix');link.href=recordUrl;const extension=type.includes('ogg')?'ogg':'webm';link.download='manic-dj-mix-'+new Date().toISOString().replace(/[:.]/g,'-')+'.'+extension;link.classList.add('ready');$('recordState').textContent='Recording ready. Download it locally before leaving this page.';
+    };
+    recorder.start(1000);recordStartedAt=Date.now();recordPausedAt=0;recordPausedTotal=0;$('recordTimer').textContent='00:00:00';
+    $('recordStart').disabled=true;$('recordPause').disabled=false;$('recordStop').disabled=false;$('recordState').textContent='Recording the master mix, sampler and live microphone...';
+  }catch(error){flash(error&&error.message||'Recording could not start.',true);}
+}
+function pauseRecording(){
+  if(!recorder||recorder.state==='inactive')return;
+  if(recorder.state==='recording'){recorder.pause();recordPausedAt=Date.now();$('recordPause').textContent='Resume';$('recordState').textContent='Recording paused.';}
+  else if(recorder.state==='paused'){recorder.resume();recordPausedTotal+=Date.now()-recordPausedAt;recordPausedAt=0;$('recordPause').textContent='Pause';$('recordState').textContent='Recording resumed.';}
+}
+function stopRecording(){if(!recorder||recorder.state==='inactive')return;recorder.stop();$('recordStart').disabled=false;$('recordPause').disabled=true;$('recordStop').disabled=true;$('recordPause').textContent='Pause';}
+const heldControls=new Map();
+function handleDeckAction(action,name){
+  const state=deck(name);if(!state)return;
+  if(action==='play')toggleDeck(name);
+  else if(action==='set-cue')setCue(name);
+  else if(action==='sync')syncDeck(name);
+  else if(action==='key-lock')setPreservesPitch(state,!state.keyLock);
+  else if(action==='pfl'){state.pfl=!state.pfl;applyPfl(name);}
+  else if(action==='tap-bpm')tapBpm(name);
+  else if(action==='loop-off')loopOff(name);
+  else if(action==='beat-back')beatJump(name,-1);
+  else if(action==='beat-forward')beatJump(name,1);
+  else if(action==='stutter')stutter(name);
+  else if(action==='brake')brakeDeck(name);
+  else if(action==='restart')restartDeck(name,true);
+  else if(action==='clear')clearDeck(name);
+  else if(action==='fx-reset')resetFx(name);
+  else if(action==='echo-punch')pulseFx(name,'echo');
+  else if(action==='reverb-hit')pulseFx(name,'reverb');
+}
+function bindEvents(){
+  document.addEventListener('click',function(event){
+    const load=event.target.closest('[data-load-deck]');if(load){event.preventDefault();loadDeck(load.dataset.loadDeck,load.dataset.trackId);return;}
+    const prepare=event.target.closest('[data-prepare-track]');if(prepare){event.preventDefault();const id=String(prepare.dataset.prepareTrack);if(prepareIds.has(id))prepareIds.delete(id);else prepareIds.add(id);writeJson(STORE.prepare,[...prepareIds]);renderLibrary();return;}
+    const hot=event.target.closest('[data-hot-cue]');if(hot){event.preventDefault();activateHotCue(hot.dataset.deck,Number(hot.dataset.hotCue),event.shiftKey);return;}
+    const loop=event.target.closest('[data-loop-beats]');if(loop){event.preventDefault();toggleLoop(loop.dataset.deck,Number(loop.dataset.loopBeats));return;}
+    const kill=event.target.closest('[data-kill]');if(kill){event.preventDefault();const state=deck(kill.dataset.deck);const key=kill.dataset.kill;state.kills[key]=!state.kills[key];refreshKillButtons();applyDeckMixer(state.name);return;}
+    const reset=event.target.closest('[data-mix-reset]');if(reset){event.preventDefault();if(reset.dataset.mixReset==='filter')resetFilter(reset.dataset.deck);else resetDeckMixer(reset.dataset.deck);return;}
+    const sample=event.target.closest('[data-sample]');if(sample){event.preventDefault();triggerSample(sample.dataset.sample,sample);return;}
+    const actionButton=event.target.closest('[data-deck-action]');
+    if(actionButton){
+      const action=actionButton.dataset.deckAction;const name=actionButton.dataset.deck;
+      if(['cue','nudge-down','nudge-up','bleep'].includes(action)){
+        if(event.detail===0){if(action==='cue'){cuePress(name);setTimeout(function(){cueRelease(name);},180);}if(action==='bleep'){setBleep(name,true);setTimeout(function(){setBleep(name,false);},220);}if(action==='nudge-down'||action==='nudge-up'){const direction=action==='nudge-down'?-1:1;nudge(name,direction,true);setTimeout(function(){nudge(name,direction,false);},220);}}
+        return;
+      }
+      event.preventDefault();handleDeckAction(action,name);
+    }
+  });
+  document.addEventListener('contextmenu',function(event){const hot=event.target.closest('[data-hot-cue]');if(hot){event.preventDefault();activateHotCue(hot.dataset.deck,Number(hot.dataset.hotCue),true);}});
+  document.addEventListener('pointerdown',function(event){
+    const button=event.target.closest('[data-deck-action]');if(!button)return;const action=button.dataset.deckAction;if(!['cue','nudge-down','nudge-up','bleep'].includes(action))return;
+    event.preventDefault();const name=button.dataset.deck;heldControls.set(event.pointerId,{action:action,name:name});button.setPointerCapture&&button.setPointerCapture(event.pointerId);
+    if(action==='cue')cuePress(name);if(action==='bleep')setBleep(name,true);if(action==='nudge-down')nudge(name,-1,true);if(action==='nudge-up')nudge(name,1,true);
+  });
+  ['pointerup','pointercancel'].forEach(function(type){document.addEventListener(type,function(event){const held=heldControls.get(event.pointerId);if(!held)return;heldControls.delete(event.pointerId);if(held.action==='cue')cueRelease(held.name);if(held.action==='bleep')setBleep(held.name,false);if(held.action==='nudge-down')nudge(held.name,-1,false);if(held.action==='nudge-up')nudge(held.name,1,false);});});
+  document.addEventListener('input',function(event){
+    const target=event.target;
+    if(target.matches('[data-mix-param]')){applyDeckMixer(target.dataset.deck);if(target.dataset.mixParam==='channel')applyCrossfader();return;}
+    if(target.matches('[data-deck-param]')){applyDeckFx(target.dataset.deck);return;}
+    if(target.id==='crossfader'){applyCrossfader();return;}
+    if(target.id==='masterLevel'||target.id==='cueLevel'||target.id==='cueBlend'||target.id==='samplerLevel'){applyMasterControls();return;}
+    if(target.id==='micLevel'){applyMicLevel();return;}
+    if(target.id==='djSearch'){renderLibrary();return;}
+    const tempo=target.id&&target.id.match(/^deck([AB])Tempo$/);if(tempo){setTempo(tempo[1],target.value);return;}
+    const seek=target.id&&target.id.match(/^deck([AB])Seek$/);if(seek){const state=deck(seek[1]);if(Number.isFinite(state.audio.duration))state.audio.currentTime=state.audio.duration*clamp(target.value,0,1000)/1000;}
+  });
+  document.addEventListener('change',function(event){
+    const target=event.target;
+    if(['djGenre','djRating','djSort'].includes(target.id)){renderLibrary();return;}
+    if(target.id==='crossfaderCurve'){applyCrossfader();return;}
+    if(target.id==='cueOutput'){chooseCueOutput();return;}
+    const manual=target.id&&target.id.match(/^deck([AB])ManualBpm$/);if(manual&&target.value!==''){setManualBpm(manual[1],target.value);return;}
+  });
+  $('reloadDj').addEventListener('click',loadTracks);
+  $('allTracks').addEventListener('click',function(){libraryMode='all';renderLibrary();});
+  $('myTracks').addEventListener('click',function(){if(!user){flash('Sign in to view My Audio.',true);return;}libraryMode='mine';renderLibrary();});
+  $('prepareTracks').addEventListener('click',function(){libraryMode='prepare';renderLibrary();});
+  $('recentTracks').addEventListener('click',function(){libraryMode='recent';renderLibrary();});
+  $('crossfaderReverse').addEventListener('click',function(){crossfaderReversed=!crossfaderReversed;this.classList.toggle('on',crossfaderReversed);this.setAttribute('aria-pressed',String(crossfaderReversed));applyCrossfader();});
+  $('refreshOutputs').addEventListener('click',refreshOutputs);$('resetMixer').addEventListener('click',resetWholeMixer);
+  $('micEnable').addEventListener('click',toggleMicrophone);$('micMute').addEventListener('click',toggleMicMute);$('talkover').addEventListener('click',toggleTalkover);
+  $('recordStart').addEventListener('click',startRecording);$('recordPause').addEventListener('click',pauseRecording);$('recordStop').addEventListener('click',stopRecording);
+  $('samplerLevel').addEventListener('change',applyMasterControls);
+  DECK_NAMES.forEach(function(name){
+    const state=deck(name);const audio=state.audio;
+    audio.addEventListener('loadedmetadata',function(){updateDeckTimes(name);updateDeckIdentity(name);});
+    audio.addEventListener('play',function(){updatePlayButtons(name);});audio.addEventListener('pause',function(){updatePlayButtons(name);});
+    audio.addEventListener('timeupdate',function(){if(state.loop&&audio.currentTime>=state.loop.end-0.02)audio.currentTime=state.loop.start;});
+    audio.addEventListener('ended',function(){if(state.loop)audio.currentTime=state.loop.start;});
+    audio.addEventListener('error',function(){if(state.track)setStatus('Deck '+name+' could not play '+deckTrackName(state.track)+'. Refresh the library and try again.',true);});
+    const jog=$('deck'+name+'Jog');jog.addEventListener('pointerdown',function(event){beginJog(event,name);});jog.addEventListener('pointermove',moveJog);jog.addEventListener('pointerup',endJog);jog.addEventListener('pointercancel',endJog);jog.addEventListener('keydown',function(event){jogKey(event,name);});
+    const panel=$('deck'+name+'Panel');panel.addEventListener('dragover',function(event){event.preventDefault();panel.classList.add('dragTarget');});panel.addEventListener('dragleave',function(){panel.classList.remove('dragTarget');});panel.addEventListener('drop',function(event){event.preventDefault();panel.classList.remove('dragTarget');const id=event.dataTransfer&&event.dataTransfer.getData('text/manic-track-id');if(id)loadDeck(name,id);});
+  });
+  $('djLibrary').addEventListener('dragstart',function(event){const row=event.target.closest('[data-track-id]');if(row&&event.dataTransfer){event.dataTransfer.effectAllowed='copy';event.dataTransfer.setData('text/manic-track-id',row.dataset.trackId);event.dataTransfer.setData('text/plain',row.dataset.trackId);}});
+  $('djLibrary').addEventListener('dblclick',function(event){if(event.target.closest('button,a,input,select'))return;const row=event.target.closest('[data-track-id]');if(!row)return;const target=!decks.A.track?'A':!decks.B.track?'B':'A';loadDeck(target,row.dataset.trackId);});
+  document.addEventListener('keydown',function(event){
+    if(event.target&&event.target.closest('input,select,textarea,button,a,[contenteditable="true"]'))return;const key=event.key.toLowerCase();
+    if(key==='q'){event.preventDefault();toggleDeck('A');}else if(key==='p'){event.preventDefault();toggleDeck('B');}
+    else if(key==='a'&&!event.repeat){event.preventDefault();cuePress('A');}else if(key==='l'&&!event.repeat){event.preventDefault();cuePress('B');}
+    else if(key==='z'&&!event.repeat){event.preventDefault();nudge('A',-1,true);}else if(key==='x'&&!event.repeat){event.preventDefault();nudge('A',1,true);}
+    else if(key==='n'&&!event.repeat){event.preventDefault();nudge('B',-1,true);}else if(key==='m'&&!event.repeat){event.preventDefault();nudge('B',1,true);}
+    else if(/^[1-8]$/.test(key)&&!event.repeat){event.preventDefault();const button=document.querySelector('[data-sample]:nth-child('+key+')');if(button)triggerSample(button.dataset.sample,button);}
+    else if(event.key==='Escape'){event.preventDefault();DECK_NAMES.forEach(function(name){deck(name).audio.pause();});}
+  });
+  document.addEventListener('keyup',function(event){if(event.target&&event.target.closest('input,select,textarea,button,a,[contenteditable="true"]'))return;const key=event.key.toLowerCase();if(key==='a')cueRelease('A');if(key==='l')cueRelease('B');if(key==='z')nudge('A',-1,false);if(key==='x')nudge('A',1,false);if(key==='n')nudge('B',-1,false);if(key==='m')nudge('B',1,false);});
+  window.addEventListener('manic-track-changed',function(event){const detail=event.detail||{};if(detail.type==='deleted')DECK_NAMES.forEach(function(name){if(deck(name).track&&String(deck(name).track.id)===String(detail.id))clearDeck(name);});loadTracks();});
+  window.addEventListener('beforeunload',function(){if(recordUrl)URL.revokeObjectURL(recordUrl);if(micStream)micStream.getTracks().forEach(function(track){track.stop();});});
+}
+function boot(){
+  decks.A=createDeckState('A');decks.B=createDeckState('B');
+  DECK_NAMES.forEach(function(name){renderHotCues(name);renderLoops(name);updateDeckIdentity(name);});
+  restoreSettings();DECK_NAMES.forEach(function(name){applyDeckMixer(name);applyDeckFx(name);});applyCrossfader();applyMasterControls();bindEvents();startVisuals();loadTracks();
+  try{client().auth.onAuthStateChange(function(_event,session){user=session&&session.user||null;loadTracks();});}catch(error){}
+  window.ManicDJStudio={version:VERSION,loadDeck:loadDeck,clearDeck:clearDeck,resetMixer:resetWholeMixer,state:function(){return {audioReady:audioReady,fallbackMode:fallbackMode,libraryMode:libraryMode,tracks:tracks.length,deckA:decks.A.track&&decks.A.track.id||null,deckB:decks.B.track&&decks.B.track.id||null,microphone:micEnabled,recording:recorder&&recorder.state||'inactive',audioFailureReason:audioFailureReason,databaseWrites:false,storageWrites:false};}};
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 </script>
 </body>
