@@ -30,6 +30,18 @@ alter table public.manic_tracks
   add constraint manic_tracks_download_eligibility_check
   check (allow_download = false or (media_kind = 'audio' and visibility = 'public'));
 
+-- Supabase object deletion returns deleted rows, so authenticated creators need owner-scoped
+-- select access to their own public objects as well as the existing private-object read policy.
+drop policy if exists "Manic Records object read own" on storage.objects;
+create policy "Manic Records object read own"
+on storage.objects
+for select
+to authenticated
+using (
+  bucket_id in ('manic-records-public-audio','manic-records-audio','manic-records-public-covers','manic-records-covers')
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+
 create or replace function public.manic_increment_track_download(p_track_id uuid)
 returns bigint
 language plpgsql
