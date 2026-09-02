@@ -30,39 +30,47 @@ alter table public.manic_playlist_tracks enable row level security;
 drop policy if exists "manic playlists visible" on public.manic_playlists;
 create policy "manic playlists visible"
 on public.manic_playlists for select
+to anon, authenticated
 using (
   is_public
-  or owner_id = auth.uid()
-  or (auth.uid() is not null and public.sb_is_admin_or_owner())
+  or owner_id = (select auth.uid())
 );
 
 drop policy if exists "manic playlists insert own" on public.manic_playlists;
 create policy "manic playlists insert own"
 on public.manic_playlists for insert to authenticated
-with check (owner_id = auth.uid());
+with check (owner_id = (select auth.uid()));
 
 drop policy if exists "manic playlists update own" on public.manic_playlists;
 create policy "manic playlists update own"
 on public.manic_playlists for update to authenticated
-using (owner_id = auth.uid() or public.sb_is_admin_or_owner())
-with check (owner_id = auth.uid() or public.sb_is_admin_or_owner());
+using (owner_id = (select auth.uid()))
+with check (owner_id = (select auth.uid()));
 
 drop policy if exists "manic playlists delete own" on public.manic_playlists;
 create policy "manic playlists delete own"
 on public.manic_playlists for delete to authenticated
-using (owner_id = auth.uid() or public.sb_is_admin_or_owner());
+using (owner_id = (select auth.uid()));
 
 drop policy if exists "manic playlist tracks visible" on public.manic_playlist_tracks;
 create policy "manic playlist tracks visible"
 on public.manic_playlist_tracks for select
+to anon, authenticated
 using (
   exists (
     select 1 from public.manic_playlists p
     where p.id = playlist_id
       and (
         p.is_public
-        or p.owner_id = auth.uid()
-        or (auth.uid() is not null and public.sb_is_admin_or_owner())
+        or p.owner_id = (select auth.uid())
+      )
+  )
+  and exists (
+    select 1 from public.manic_tracks t
+    where t.id = track_id
+      and (
+        (t.visibility = 'public' and t.status = 'published')
+        or t.created_by = (select auth.uid())
       )
   )
 );
@@ -74,7 +82,15 @@ with check (
   exists (
     select 1 from public.manic_playlists p
     where p.id = playlist_id
-      and (p.owner_id = auth.uid() or public.sb_is_admin_or_owner())
+      and p.owner_id = (select auth.uid())
+  )
+  and exists (
+    select 1 from public.manic_tracks t
+    where t.id = track_id
+      and (
+        (t.visibility = 'public' and t.status = 'published')
+        or t.created_by = (select auth.uid())
+      )
   )
 );
 
@@ -85,14 +101,22 @@ using (
   exists (
     select 1 from public.manic_playlists p
     where p.id = playlist_id
-      and (p.owner_id = auth.uid() or public.sb_is_admin_or_owner())
+      and p.owner_id = (select auth.uid())
   )
 )
 with check (
   exists (
     select 1 from public.manic_playlists p
     where p.id = playlist_id
-      and (p.owner_id = auth.uid() or public.sb_is_admin_or_owner())
+      and p.owner_id = (select auth.uid())
+  )
+  and exists (
+    select 1 from public.manic_tracks t
+    where t.id = track_id
+      and (
+        (t.visibility = 'public' and t.status = 'published')
+        or t.created_by = (select auth.uid())
+      )
   )
 );
 
@@ -103,10 +127,12 @@ using (
   exists (
     select 1 from public.manic_playlists p
     where p.id = playlist_id
-      and (p.owner_id = auth.uid() or public.sb_is_admin_or_owner())
+      and p.owner_id = (select auth.uid())
   )
 );
 
+revoke all on table public.manic_playlists from anon, authenticated;
+revoke all on table public.manic_playlist_tracks from anon, authenticated;
 grant select on public.manic_playlists to anon, authenticated;
 grant insert, update, delete on public.manic_playlists to authenticated;
 grant select on public.manic_playlist_tracks to anon, authenticated;
