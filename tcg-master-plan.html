@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Stream Bandit TCG — Master Plan Workbench</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b0d12;--panel:#121722;--panel2:#171e2b;--line:#2a3446;--text:#f4f7fb;--muted:#9daac0;--good:#52d273;--hold:#ffc857;--warn:#ff7b72;--accent:#73a7ff;--purple:#b99cff}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#090b10,#0f1420 38%,#0b0d12);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.wrap{width:min(1180px,calc(100% - 28px));margin:0 auto;padding:32px 0 64px}.hero{padding:28px;border:1px solid var(--line);background:rgba(18,23,34,.94);border-radius:20px;box-shadow:0 18px 60px rgba(0,0,0,.28)}h1{font-size:clamp(28px,5vw,48px);line-height:1.05;margin:0 0 10px}h2{margin:30px 0 12px;font-size:24px}h3{margin:0 0 8px;font-size:17px}.kicker{letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-size:12px;font-weight:800}.lead{font-size:17px;color:#d8e0ec;max-width:900px}.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.badge{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#0e1420;font-size:12px;font-weight:800}.good{color:var(--good)}.hold{color:var(--hold)}.warn{color:var(--warn)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{grid-column:span 6;padding:18px;border:1px solid var(--line);background:var(--panel);border-radius:16px}.card.wide{grid-column:1/-1}.card.third{grid-column:span 4}.stat{font-size:28px;font-weight:900;line-height:1;margin-bottom:6px}.muted{color:var(--muted)}ul,ol{padding-left:20px;margin:8px 0}li+li{margin-top:5px}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}.table th{color:#c7d2e5;font-size:12px;text-transform:uppercase;letter-spacing:.06em}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.note{border-left:4px solid var(--accent);padding:12px 14px;background:#101827;border-radius:8px}.danger{border-left-color:var(--warn)}.stage{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}.stage:last-child{border:0}.num{flex:0 0 30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#1c2638;border:1px solid #33425d;font-weight:900}.small{font-size:12px}.footer{margin-top:30px;color:var(--muted);font-size:12px}.elements{display:flex;flex-wrap:wrap;gap:7px}.element{padding:6px 9px;border-radius:8px;background:#101827;border:1px solid var(--line)}
+    @media(max-width:760px){.card,.card.third{grid-column:1/-1}.hero{padding:20px}.wrap{width:min(100% - 18px,1180px)}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <div class="kicker">Stream Bandit TCG · development source of truth</div>
+    <h1>Master Plan Workbench</h1>
+    <p class="lead">This unlisted page belongs to PR #549 and the TCG-only development branch. It is the portable control sheet for rules, card redesign, engine work, tests and eventual promotion. The old live TCG is a legacy prototype only and is not a compatibility target.</p>
+    <div class="badges">
+      <span class="badge good">BRANCH DEVELOPMENT: ACTIVE</span>
+      <span class="badge hold">PR MERGE: HOLD</span>
+      <span class="badge hold">PRODUCTION: HOLD</span>
+      <span class="badge">TCG ONLY</span>
+      <span class="badge">STANDALONE PRODUCT</span>
+    </div>
+  </section>
+
+  <h2>Authority and boundaries</h2>
+  <section class="grid">
+    <article class="card">
+      <h3>Development authority</h3>
+      <ul>
+        <li>PR <strong>#549</strong> on <span class="mono">feature/tcg-private-alpha-v0-5-source-recovery</span> is the active implementation workspace.</li>
+        <li>The current master rules below outrank first-release card text and the legacy live prototype.</li>
+        <li>Actual gameplay must come from structured registry data and deterministic server interpreters, never from decorative artwork or guessed English text.</li>
+        <li>Safe branch work may continue; merge/deploy waits for exact evidence and two-player integration.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Hard scope fence</h3>
+      <ul>
+        <li>Do not touch DJ, Manic Studio, Web Builder, social pages or unrelated Stream Bandit systems.</li>
+        <li>Do not use the legacy live TCG as the design baseline.</li>
+        <li>Do not freeze old Set One effects into the engine before the current-rules card audit is complete.</li>
+        <li>Do not merge only because GitHub reports the PR mergeable.</li>
+      </ul>
+    </article>
+  </section>
+
+  <h2>Permanent product architecture</h2>
+  <section class="grid">
+    <article class="card">
+      <h3>Standalone Stream Bandit TCG product</h3>
+      <ul>
+        <li><strong>Stream Bandit TCG owns its own application shell, navigation, visual identity and route hierarchy.</strong></li>
+        <li>The main Stream Bandit platform provides only one discovery/navigation link labelled <strong>Stream Bandit TCG</strong>.</li>
+        <li>The Stream Bandit shell must not be loaded, copied or made the navigation owner inside the TCG product.</li>
+        <li>The legacy prototype route is disposable and does not constrain the final TCG location or frontend architecture.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Shared account, separate product UI</h3>
+      <ul>
+        <li>Existing Stream Bandit account identity/authentication is reused so a Stream Bandit user can sign in to the TCG with the same account.</li>
+        <li>New users may sign up through the TCG entry flow, creating the same shared Stream Bandit account identity rather than a duplicate account system.</li>
+        <li>Gameplay, collection, deck building, trading, shop, battle pass, matchmaking and player profile areas require authentication.</li>
+        <li>Authentication may be shared; shell ownership, menus, page layout and product state remain TCG-owned.</li>
+      </ul>
+    </article>
+    <article class="card wide">
+      <h3>SEO and public discovery</h3>
+      <p class="note"><strong>The finished TCG must be discoverable on the public web without making gameplay public.</strong> Public, indexable pages should explain the game and lead users into sign-up/sign-in; authenticated game routes stay protected.</p>
+      <table class="table">
+        <tr><th>Surface</th><th>Indexing / purpose</th></tr>
+        <tr><td>TCG home / landing page</td><td>Public and indexable. Original SEO copy describing Stream Bandit TCG, its online card-battle identity, elements, collecting and competitive play.</td></tr>
+        <tr><td>How to Play / Rules</td><td>Public and indexable. Search-friendly canonical explanation of Vanguard, Reserve, Reward Cards, Essence, Tactics, evolution, Shield and conditions.</td></tr>
+        <tr><td>Cards / Sets / Series information</td><td>Public and indexable where appropriate. Search-visible set overviews and card-discovery content without exposing private player data.</td></tr>
+        <tr><td>Sign up / Sign in</td><td>Public entry points; authentication bridge into the standalone product.</td></tr>
+        <tr><td>Game app, Collection, Deck Builder, Trading, Shop, Battle Pass, Matchmaking, account areas</td><td>Authenticated product routes; not used as the primary SEO surface.</td></tr>
+      </table>
+      <ul>
+        <li>Final public pages need unique page titles, meta descriptions, canonical URLs, Open Graph/social metadata and appropriate structured data.</li>
+        <li>The standalone TCG needs its own sitemap/robots strategy and internal SEO copy rather than inheriting generic Stream Bandit page metadata.</li>
+        <li>SEO copy must remain original to Stream Bandit TCG and accurately describe the finished rules/features; do not publish claims for unfinished features as though they are live.</li>
+      </ul>
+    </article>
+  </section>
+
+  <h2>Locked game rules</h2>
+  <section class="grid">
+    <article class="card third"><div class="stat">8</div><h3>Elements</h3><div class="elements"><span class="element">Astral</span><span class="element">Ember</span><span class="element">Gale</span><span class="element">Grove</span><span class="element">Shade</span><span class="element">Stone</span><span class="element">Tide</span><span class="element">Volt</span></div></article>
+    <article class="card third"><div class="stat">60</div><h3>Cards per deck</h3><p class="muted">Eight exact starter decks. A new player chooses one starter initially.</p></article>
+    <article class="card third"><div class="stat">6</div><h3>Reward Cards</h3><p class="muted">Starting hand is 7. Deck, hand, discard, Reward Cards, Vanguard and Reserve are core battle zones.</p></article>
+
+    <article class="card">
+      <h3>Creature progression</h3>
+      <ul>
+        <li>Primary evolution chain: <strong>Baby → Teen → Adult</strong>.</li>
+        <li>Only one evolution per creature stack per turn.</li>
+        <li>Printed HP minimum <strong>40</strong>; printed HP maximum <strong>390</strong>.</li>
+        <li>HP may exceed 390 only through temporary or conditional effects.</li>
+        <li>Creature design must remain species-diverse; the Stream Bandit stag is the master brand identity, not the dominant creature species.</li>
+        <li>Mythic remains a special copy-limit class. Existing Standalone designs must be audited against the final current-rules role before being retained.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Turn and play rules</h3>
+      <ul>
+        <li>Every playable card is played from the player's hand; Essence is a real card, not a detached external resource system.</li>
+        <li>First player cannot attack on their first personal turn.</li>
+        <li>First-player Ally restriction remains part of the rules.</li>
+        <li>Vanguard / Reserve movement, withdrawal, evolution, attacks and Aftermath are server-authoritative.</li>
+        <li>Shield and conditions are first-class battle mechanics.</li>
+      </ul>
+    </article>
+    <article class="card wide">
+      <h3>Card families and conditions</h3>
+      <table class="table">
+        <tr><th>Family</th><th>Current structure</th></tr>
+        <tr><td>Creature</td><td>Baby, Teen, Adult plus audited special roles such as Mythic / possible Standalone.</td></tr>
+        <tr><td>Essence</td><td>Played from hand as cards. Basic and special Essence effects are registry-driven.</td></tr>
+        <tr><td>Tactic</td><td>Ally, Device, Relic and Realm.</td></tr>
+        <tr><td>Conditions</td><td>Scorched, Venomed, Blinded, Mindbound, Dazed, Stunned, Rooted, Silenced, Crushed and Drenched.</td></tr>
+      </table>
+    </article>
+  </section>
+
+  <h2>Economy and progression</h2>
+  <section class="grid">
+    <article class="card">
+      <h3>Exactly three currencies</h3>
+      <ol>
+        <li><strong>Battle Pass Tokens</strong></li>
+        <li><strong>Trade Tokens</strong></li>
+        <li><strong>Shop Coins</strong></li>
+      </ol>
+      <p class="muted">Do not introduce substitute or duplicate currency systems.</p>
+    </article>
+    <article class="card">
+      <h3>Collection limits</h3>
+      <ul>
+        <li>Normal card: keep up to <strong>4</strong> copies; extras convert under the economy rules.</li>
+        <li>Mythic: keep up to <strong>1</strong> copy.</li>
+        <li>Collection, Deck Builder, Trading, Shop, Battle Pass, Sets/Series and card presentation remain planned product layers.</li>
+      </ul>
+    </article>
+    <article class="card wide">
+      <h3>Modes</h3>
+      <p><strong>Arcade</strong> is the current non-ranked progression mode. Ranked matchmaking, player XP/rank and battle rewards are master-plan systems. Private friend/test rooms remain useful for testing and direct battles and are not the normal reward-eligible matchmaking path.</p>
+      <p><strong>Test Deck Battle / AI Test Match</strong> is a separate QA mode for testing decks and card interactions against a deterministic computer opponent. It never awards rank, XP, Battle Pass Tokens, Trade Tokens, Shop Coins, reward progression or public matchmaking statistics.</p>
+    </article>
+  </section>
+
+  <h2>Test Deck Battle / AI Test Match</h2>
+  <section class="grid">
+    <article class="card">
+      <h3>Purpose</h3>
+      <ul>
+        <li>Provide a fast repeatable battle opponent whenever a new deck, starter, card rewrite or engine change needs testing.</li>
+        <li>Allow developers/testers to choose a current test deck for the human seat and a selected current test deck for the AI seat.</li>
+        <li>Catch illegal actions, broken effects, dead turns, impossible choices, balance spikes, bad deck curves and engine regressions before human-vs-human testing.</li>
+        <li>Remain a testing instrument, not the authority for final balance; human playtesting is still required.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>AI implementation rule</h3>
+      <ul>
+        <li>Use a <strong>deterministic in-house rules/strategy bot</strong>, not a paid external generative-AI service.</li>
+        <li>The bot submits moves through the same server-authoritative legal action path used by a player rather than bypassing the battle engine.</li>
+        <li>The bot may inspect only information that its seat is legally allowed to know; it must not cheat by reading the opponent's hidden hand, deck order or Reward Cards.</li>
+        <li>Strategy profiles may evolve from simple legal-play heuristics to stronger tactical evaluation without changing the battle rules.</li>
+      </ul>
+    </article>
+    <article class="card wide">
+      <h3>Reproducible QA contract</h3>
+      <table class="table">
+        <tr><th>Requirement</th><th>Locked behaviour</th></tr>
+        <tr><td>Seeded randomness</td><td>Test matches can use a recorded RNG seed so tosses, shuffles and random effects can be reproduced during debugging.</td></tr>
+        <tr><td>Version binding</td><td>Each test result records the human deck revision, AI deck revision, card-registry/rules version and battle-engine version.</td></tr>
+        <tr><td>Action log</td><td>Record the legal action sequence, pending choices, result and any server error/fail-closed event so a failed match can be replayed or inspected.</td></tr>
+        <tr><td>No economy writes</td><td>No rank, XP, streak, rewards, currency, Battle Pass, trading or collection rewards are issued by AI test matches.</td></tr>
+        <tr><td>No matchmaking pollution</td><td>AI test matches do not enter public matchmaking queues or competitive/player statistics.</td></tr>
+        <tr><td>Future batch testing</td><td>The same deterministic bot contract may later run repeated deck-vs-deck simulations to identify suspicious matchups, but simulation output remains QA evidence rather than an automatic balance decision.</td></tr>
+      </table>
+      <p class="note">A future player-facing <strong>Practice vs AI</strong> mode may reuse this engine with owned legal decks, but it remains separate from the internal Test Deck Battle controls and still cannot farm the competitive economy.</p>
+    </article>
+  </section>
+
+  <h2>Set One audit snapshot</h2>
+  <section class="grid">
+    <article class="card third"><div class="stat">193</div><h3>Active SB1 cards</h3><p class="muted">All still carry the old <span class="mono">set-one-v0.6.1</span> rules generation and therefore require current-rules review.</p></article>
+    <article class="card third"><div class="stat">89</div><h3>Creatures</h3><p class="muted">81 currently have attacks; 139 attack slots total.</p></article>
+    <article class="card third"><div class="stat">72</div><h3>Tactics</h3><p class="muted">18 Ally · 30 Device · 16 Relic · 8 Realm.</p></article>
+    <article class="card third"><div class="stat">32</div><h3>Essence</h3><p class="muted">Four per element in the old set: one Basic plus three special Essence designs.</p></article>
+    <article class="card third"><div class="stat">139</div><h3>Attack slots</h3><p class="muted">No structured attack metadata exists yet. English-text parsing is temporary architecture debt.</p></article>
+    <article class="card third"><div class="stat">0</div><h3>Structured attacks</h3><p class="muted">Do not generate them until each card has passed the current-rules redesign.</p></article>
+    <article class="card wide">
+      <h3>Card redesign rule</h3>
+      <p class="note danger"><strong>The first-release card text is not authoritative.</strong> Names, creatures, themes, elemental identity and strong concepts may be retained, but costs, HP, attacks, abilities, timing and effects must be changed wherever the current master rules or game balance require it.</p>
+      <table class="table">
+        <tr><th>Audit label</th><th>Meaning</th></tr>
+        <tr><td class="good"><strong>KEEP</strong></td><td>Already fits the finished rule set and balance target.</td></tr>
+        <tr><td class="hold"><strong>TUNE</strong></td><td>Concept survives; values, cost, wording or timing require adjustment.</td></tr>
+        <tr><td class="warn"><strong>REWRITE</strong></td><td>Effect conflicts with the current game or creates bad gameplay and must be redesigned.</td></tr>
+        <tr><td><strong>STRUCTURE</strong></td><td>Only after design approval: encode deterministic machine-readable effects used by the battle engine.</td></tr>
+      </table>
+    </article>
+  </section>
+
+  <h2>Eight starter identities</h2>
+  <section class="grid">
+    <article class="card wide">
+      <table class="table">
+        <tr><th>Element</th><th>Starter</th><th>Audit status</th></tr>
+        <tr><td>Astral</td><td>Second Sky</td><td>60-card legacy list; rebuild/check after SB1 card redesign.</td></tr>
+        <tr><td>Ember</td><td>Ashrush</td><td>60-card legacy list; rebuild/check after SB1 card redesign.</td></tr>
+        <tr><td>Gale</td><td>Skyshift</td><td>60-card legacy list; rebuild/check after SB1 card redesign.</td></tr>
+        <tr><td>Grove</td><td>Wildgrowth</td><td>60-card legacy list; rebuild/check after SB1 card redesign.</td></tr>
+        <tr><td>Shade</td><td>Nightbind</td><td>60-card legacy list; rebuild/check after SB1 card redesign.</td></tr>
+        <tr><td>Stone</td><td>Unbroken</td><td>60-card legacy list; rebuild/check after SB1 card redesign.</td></tr>
+        <tr><td>Tide</td><td>Deep Current</td><td>60-card legacy list; rebuild/check after SB1 card redesign.</td></tr>
+        <tr><td>Volt</td><td>Live Wire</td><td>60-card legacy list; rebuild/check after SB1 card redesign.</td></tr>
+      </table>
+    </article>
+  </section>
+
+  <h2>Implementation ledger</h2>
+  <section class="grid">
+    <article class="card">
+      <h3 class="good">Completed / branch-proven foundations</h3>
+      <ul>
+        <li>TCG source recovery and additive foundation/security migrations.</li>
+        <li>Atomic one-starter grant and server deck validation.</li>
+        <li>Private room lobby, join-code compatibility and match state shell.</li>
+        <li>Atomic match command commit path.</li>
+        <li>Card printing/art bucket source migration.</li>
+        <li>Three-currency and copy-limit alignment source migration.</li>
+        <li>Automatic matchmaking and Arcade progression/rewards source migration.</li>
+        <li><span class="mono">tcg-match-actions</span> is the intended sole in-battle turn/Aftermath owner.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3 class="hold">Implemented but subject to card rewrite</h3>
+      <ul>
+        <li><span class="mono">tcg-tactic-actions</span> currently covers all 40 structured Ally/Device definitions in the old registry.</li>
+        <li>Six lifecycle-sensitive old definitions have shared hooks for temporary attack bonus, withdrawal cost, condition immunity, final-Vanguard attack eligibility and generated Essence cleanup.</li>
+        <li>This runtime coverage is useful engineering, but it does <strong>not</strong> make those old card designs final.</li>
+      </ul>
+    </article>
+    <article class="card wide">
+      <h3 class="warn">Known architecture debt / blockers</h3>
+      <ul>
+        <li>Attack resolution still parses printed English text. This must be replaced after the card redesign.</li>
+        <li>Three current old attacks explicitly need a pending-choice engine: Celestyr — Dream Ray, Nebulynx — Starfall Path and Myceliarch — Mycelial Bloom.</li>
+        <li>Creature abilities still need a deterministic structured registry/interpreter pass after their card designs are audited.</li>
+        <li>The legacy <span class="mono">t.html</span> Arcade Lab is a useful branch test harness, not the final production route.</li>
+        <li>The AI Test Match bot is planned QA infrastructure and must be built only after the final deterministic card/action contracts are stable enough for it to consume.</li>
+      </ul>
+    </article>
+  </section>
+
+  <h2>Build order from here</h2>
+  <section class="card wide">
+    <div class="stage"><div class="num">1</div><div><h3>Audit and redesign all 193 SB1 cards</h3><p class="muted">Apply KEEP / TUNE / REWRITE. Lock final rules text, stats, costs, timing and elemental identity before machine structure.</p></div></div>
+    <div class="stage"><div class="num">2</div><div><h3>Rebuild/check the eight exact 60-card starters</h3><p class="muted">Each starter must teach and express its element properly, maintain sensible Essence consistency, and remain playable under the finished rules.</p></div></div>
+    <div class="stage"><div class="num">3</div><div><h3>Structure attacks and card effects</h3><p class="muted">Encode final attacks/effects as deterministic registry data. Printed wording becomes presentation, never runtime logic.</p></div></div>
+    <div class="stage"><div class="num">4</div><div><h3>Finish creature abilities and pending choices</h3><p class="muted">Add deterministic ability timing, targets, selections, triggers, lifecycle expiry and private-choice handling.</p></div></div>
+    <div class="stage"><div class="num">5</div><div><h3>Build Test Deck Battle / AI Test Match</h3><p class="muted">Add a deterministic no-reward bot opponent using the same legal action APIs, seeded randomness and replayable QA logs. Use it to exercise new decks and interactions before two-human testing.</p></div></div>
+    <div class="stage"><div class="num">6</div><div><h3>Two-user private-alpha integration</h3><p class="muted">Desktop user + phone user: sign in, choose starter/deck, enter matchmaking together, complete setup and play a full battle through completion/rewards.</p></div></div>
+    <div class="stage"><div class="num">7</div><div><h3>Build standalone public entry + authenticated TCG shell</h3><p class="muted">Create the final TCG-owned landing/SEO surfaces, shared Stream Bandit account sign-up/sign-in bridge and protected game application without importing the Stream Bandit shell.</p></div></div>
+    <div class="stage"><div class="num">8</div><div><h3>Final transfer and promotion</h3><p class="muted">Only after exact-head CI, database/function deployment evidence and player-facing testing. Publish the finished standalone TCG and add one Stream Bandit navigation link to it; the old live prototype does not need compatibility preservation.</p></div></div>
+  </section>
+
+  <h2>Promotion truth</h2>
+  <section class="grid">
+    <article class="card"><h3 class="good">Branch development</h3><p><strong>PROMOTE</strong> when each bounded change passes exact-head evidence.</p></article>
+    <article class="card"><h3 class="hold">PR merge / production</h3><p><strong>HOLD</strong> until the rebuilt cards, deterministic engine, AI test harness, standalone product boundary and two-user battle flow are proven together.</p></article>
+  </section>
+
+  <p class="footer">Portable development ledger for Stream Bandit TCG PR #549. This file intentionally has no remote dependencies, no production API calls and no live navigation ownership.</p>
+</main>
+</body>
+</html>
