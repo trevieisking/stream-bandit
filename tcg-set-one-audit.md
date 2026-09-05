@@ -843,8 +843,106 @@ All HP, withdrawal, attack costs, base damage and bonus values remain provisiona
 
 ---
 
+## EMBER-02 — Coalfinch → Sootwing → Cindercrest
+
+**Family purpose:** Teach Ember's movement/Scorched loop separately from the self-damage family: moving into Vanguard creates immediate pressure, attacking can pivot the Teen back to safety, and the Adult turns a Vanguard transition into a Scorched setup for its finishing attack.
+
+### Coalfinch
+
+**Current prototype**
+
+- Stage: Baby
+- HP: 50
+- Withdrawal: 0
+- Ability: **missing**
+- Attack: `1 Ember — Cinder Peck — 20.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Baby**
+- HP: **50**
+- Withdrawal: **0**
+- **Ability — Cinder Lift:** The first time during your turn this creature moves from Reserve to Vanguard, its next attack that turn deals 10 more damage.
+- **Attack — Cinder Peck:** `1 Ember — 20 damage.`
+
+**Reason:** Coalfinch introduces the family's positioning identity without self-damage or automatic Scorched. The modest bonus rewards deliberately bringing it forward and expires with the turn.
+
+### Sootwing
+
+**Current prototype**
+
+- Stage: Teen; evolves from Coalfinch
+- HP: 120
+- Withdrawal: 0
+- Ability: **missing**
+- Attack 1: `1 Ember — Soot Dive — 40.`
+- Attack 2: `2 Ember — Flash Wing — 60; you may switch this creature with a Reserve creature after damage.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Teen**
+- HP: **120**
+- Withdrawal: **0**
+- **Ability — Soot Glide:** Once during your turn, after this creature moves from Vanguard to Reserve because of one of its attacks, heal 10 damage from this creature.
+- **Attack — Soot Dive:** `1 Ember — 40 damage.`
+- **Attack — Flash Wing:** `2 Ember — 60 damage. After damage, you may switch this creature with 1 of your Reserve creatures.`
+
+**Reason:** Flash Wing already supplies the family's core hit-and-pivot action. Soot Glide makes that movement meaningful without becoming a generic free heal every time another effect switches the creature.
+
+### Cindercrest
+
+**Current prototype**
+
+- Stage: Adult; evolves from Sootwing
+- HP: 220
+- Withdrawal: 1
+- **Ability — Ash Mark:** Once during your turn after this creature becomes Vanguard, you may make the opposing Vanguard Scorched.
+- Attack 1: `2 Ember — Fireline Sweep — 70.`
+- Attack 2: `3 Ember — Cinder Spiral — 120; if the target is Scorched, +30 damage.`
+
+**Audit:** **KEEP** with deterministic trigger wording
+
+**Current-rules design draft v1**
+
+- Stage: **Adult**
+- HP: **220**
+- Withdrawal: **1**
+- **Ability — Ash Mark:** The first time during your turn this creature becomes Vanguard, make the opposing Vanguard Scorched.
+- **Attack — Fireline Sweep:** `2 Ember — 70 damage.`
+- **Attack — Cinder Spiral:** `3 Ember — 120 damage. If the target is Scorched, this attack deals 30 more damage.`
+
+**Reason:** Cindercrest cleanly completes the line: movement creates the status setup and the expensive attack converts that setup into pressure. The automatic first-transition trigger removes an unnecessary Ability-button decision while preserving counterplay through switching and normal Scorched recovery.
+
+### Movement / Scorched engine note
+
+The current branch already records `became_vanguard_turn` on both voluntary Vanguard/Reserve switching and forced Reserve promotion after a defeated Vanguard, so the later generic Vanguard-entry listener can behave consistently regardless of how Cindercrest arrived. The attack interpreter also already recognises the existing post-attack switch wording and `target is Scorched` damage bonus. During STRUCTURE, Cinder Lift, Soot Glide and Ash Mark must become generic movement/condition listeners rather than card-name branches.
+
+Ordinary conditions are cleared when creatures switch between Vanguard and Reserve in the current lifecycle, while Scorched otherwise resolves during the affected player's Aftermath for 20 damage followed by its normal recovery check. That supplies real counterplay to Ash Mark rather than turning Scorched into a permanent lock.
+
+### Weakness/resistance decision
+
+Weakness and resistance remain **pending the cross-element matchup review**. No values are guessed during this isolated Ember family pass.
+
+### Family decision
+
+**EMBER-02 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+The family now progresses clearly:
+
+1. **Coalfinch:** moving forward produces a small one-turn pressure reward;
+2. **Sootwing:** attacks and pivots back to Reserve, gaining a small recovery reward for its own attack-driven movement;
+3. **Cindercrest:** entering Vanguard creates Scorched pressure and Cinder Spiral converts that status into a finishing bonus.
+
+All HP, withdrawal, attack costs, damage and healing values remain provisional until the complete Ember package and later deterministic AI/human testing are available.
+
+---
+
 ## Next bounded audit
 
-**EMBER-02 — Coalfinch → Sootwing → Cindercrest**
+**EMBER-03 — Standalone package**
 
-Review Ember's mobility/Scorched evolution family. Add the missing named Abilities on Coalfinch and Sootwing, preserve Flash Wing's optional post-attack switch, preserve Cindercrest's Scorched payoff where sound, and keep the family distinct from Glowcub's self-damage line. Use generic movement/condition triggers later rather than card-name runtime branches.
+Review Ashcobra, Kilnback, Magmagecko and pack-only Cinderburrow as four different Ember roles: fast pressure/finisher, self-Scorched bruiser, risky Essence acceleration and recovery/Scorched synergy. Preserve their distinct identities, add missing named Abilities/withdrawal data where required, and avoid turning all four into generic damage-bonus cards. Pyrohorn remains a separate Mythic audit after the Standalone package.
