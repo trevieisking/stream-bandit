@@ -458,8 +458,105 @@ All HP, attack costs and damage remain provisional until AI Test Match and human
 
 ---
 
+## ASTRAL-05 — Essence package
+
+**Package purpose:** Keep Essence as actual cards played/attached through the normal game flow while giving Astral a compact set of foresight payoffs. No detached energy meter or second resource system is introduced.
+
+### Essence play contract
+
+- A normal manual Essence attachment is played from the player's hand to a friendly creature and is limited by the universal one-manual-Essence-per-turn rule.
+- A card effect may move or attach Essence from another legal zone only when that effect explicitly authorizes it; this does not create an external resource system.
+- Each attached Essence continues to provide the element printed on that card for attack-cost and other rules checks.
+- A “once while attached” effect is tracked on that specific card instance. Once used, it stays used for the remainder of that continuous attachment. If the card legally leaves play and is later attached again, that later attachment is a new attachment lifetime unless a future effect explicitly says otherwise.
+- Printed wording is presentation. These triggers and usage markers must later be represented by generic deterministic effect metadata rather than card-name checks.
+
+### Basic Astral Essence
+
+**Current prototype**
+
+- Subtype: Basic
+- Effect: `Provides one Astral Essence. Basic Essence has no special text.`
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1**
+
+- **Basic Astral Essence:** Provides **1 Astral Essence** while attached. It has no additional card effect.
+
+**Reason:** The Basic card is intentionally simple and establishes the normal Astral attack resource without adding bookkeeping.
+
+### Star Essence
+
+**Current prototype**
+
+- Subtype: Special
+- Effect: `Provides Astral. When attached from hand, look at the top card of your deck; you may leave it or put it on the bottom.`
+
+**Audit:** **KEEP** with wording normalization
+
+**Current-rules design draft v1**
+
+- Provides **1 Astral Essence** while attached.
+- **When you attach this card from your hand to a friendly creature, look at the top card of your deck. You may leave it on top or put it on the bottom.**
+
+**Reason:** This is the cleanest Special Essence introduction for Astral: the normal attachment itself creates a small foresight decision and naturally enables cards that reward looking at the deck.
+
+### Orbit Essence
+
+**Current prototype**
+
+- Subtype: Special
+- Effect: `Provides Astral. Once while attached, after you look at your own Reward Card through an effect, heal 20 from this creature.`
+
+**Audit:** **KEEP** with explicit attachment-lifetime wording
+
+**Current-rules design draft v1**
+
+- Provides **1 Astral Essence** while attached.
+- **The first time during this attachment that you look at one or more of your face-down Reward Cards through an effect while this creature has damage, heal 20 damage from the attached creature.**
+
+**Reason:** Orbit Essence directly supports the Moonbit → Comettail → Nebulynx Reward-foresight family without creating repeated healing every turn. Requiring existing damage prevents the one-use trigger from being accidentally spent for no effect.
+
+**Hidden-information rule:** Orbit Essence reacts only to the fact that a legal Reward look occurred. It never exposes the Reward Card identity to the opponent.
+
+### Nova Essence
+
+**Current prototype**
+
+- Subtype: Special
+- Pack-only: yes
+- Effect: `Provides Astral; once while attached, after you reorder the top of your deck, the attached creature gets +20 attack damage that turn.`
+
+**Audit:** **KEEP / TUNE wording**
+
+**Current-rules design draft v1**
+
+- Provides **1 Astral Essence** while attached.
+- **The first time during this attachment that you reorder two or more cards on top of your deck through an effect during your turn, the attached creature's next attack that turn deals 20 more damage.**
+
+**Reason:** Nova Essence is a suitable pack-only alternative because it turns Astral sequencing into a temporary offensive payoff without replacing Basic, Star or Orbit Essence. The “next attack that turn” wording makes expiry deterministic and prevents the bonus from leaking into a later turn.
+
+### Engine / structure note
+
+The current branch engine does not contain Astral Essence card-ID special cases. That is desirable. During STRUCTURE, Star, Orbit and Nova should be expressed through generic attachment, hidden-zone-look, deck-reorder, heal and temporary-attack-modifier operations. No Astral-specific runtime branch should be introduced.
+
+### Essence package decision
+
+**ASTRAL-05 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+The package now has four distinct jobs:
+
+1. **Basic Astral Essence:** normal resource card;
+2. **Star Essence:** attachment-triggered top-card foresight;
+3. **Orbit Essence:** one-use Reward-foresight healing;
+4. **Nova Essence:** pack-only one-use sequencing-to-damage payoff.
+
+All numeric bonuses/healing remain provisional until deterministic AI Test Match and human balance testing.
+
+---
+
 ## Next bounded audit
 
-**ASTRAL-05 — Essence package**
+**ASTRAL-06 — Tactic package**
 
-Review Basic Astral Essence, Star Essence, Orbit Essence and pack-only Nova Essence. Preserve the existing foresight identity where sound, normalize “once while attached” into explicit attachment-state usage, and avoid introducing a second energy/resource system outside cards played from hand.
+Review Archivist Sol, Cartographer Lyra, Future Draw, Gravity Shift, Star Chart, Celestial Observatory, Dreamglass, Orbit Ring and pack-only Parallax Window. Preserve Astral foresight and sequencing, remove obsolete Reward-position bookkeeping, separate Astral's symmetrical future-reset identity from Shade's hand-disruption identity, and identify the four Tactics that still need structured engine metadata.
