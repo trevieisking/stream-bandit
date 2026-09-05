@@ -399,8 +399,67 @@ All new numbers and existing attack values remain provisional until the whole As
 
 ---
 
+## ASTRAL-04 — Celestyr — Dream Cartographer
+
+**Mythic purpose:** Carry Astral's rare signature mechanic, Timefold, while remaining a legal non-evolving starting creature and obeying the shared one-Starbound-per-player-per-match rule.
+
+### Celestyr — Dream Cartographer
+
+**Current prototype**
+
+- Stage: Mythic
+- Trait: Mythic
+- HP: 340
+- Withdrawal: 2
+- Reward value: implied by Mythic runtime fallback, not explicit in the card definition
+- **Ability — Dream Cartographer:** Once during your turn, look at the top 4 cards of your deck and return them in any order. You may put exactly one of them on the bottom.
+- **Attack — Dream Ray:** `2 Astral — 80; look at the top 2 cards of your deck and draw 1 of them, putting the other on the bottom.`
+- **Starbound Power — Second Horizon:** `3 Astral + 2 any — 160; after damage, defeats, Reward resolution and win checks, perform Timefold and take one additional turn. Consumes your one Starbound marker for the match.`
+
+**Audit:** **TUNE**
+
+**Reason:** Celestyr already expresses Astral's signature identity well. The necessary changes are schema/timing corrections rather than a mechanical replacement: Mythic must be a trait rather than a fourth creature stage, reward value should be explicit, and Timefold needs fail-closed timing around match completion and extra-turn chaining.
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- Traits: **Mythic**
+- HP: **340**
+- Withdrawal: **2**
+- Reward value: **2**
+- **Ability — Dream Cartographer:** Once during your turn, look at the top 4 cards of your deck and return them in any order. You may put exactly 1 of those cards on the bottom of your deck instead.
+- **Attack — Dream Ray:** `2 Astral — 80 damage. After damage, look at the top 2 cards of your deck. Put 1 into your hand and put the other on the bottom of your deck.`
+- **Starbound Power — Second Horizon:** `3 Astral + 2 any — 160 damage. You may declare this attack only if you still have your Starbound marker. Consume that marker when the legal attack is declared. After damage, defeat resolution, Reward resolution, replacement effects and win checks, if the match is still active, perform Timefold and take 1 additional turn.`
+
+### Starbound / Timefold contract
+
+- Each player has **one Starbound marker per match**, shared across all of that player's cards that can use a Starbound Power.
+- A legal Starbound declaration consumes that player's marker immediately; cancelling or avoiding the later Timefold result cannot restore the marker unless a future explicit rule says so.
+- Timefold occurs only after damage, defeats, Reward claims/resolution, mandatory replacement processing and win checks complete.
+- If those checks have already ended the match, the extra turn does not occur.
+- A turn created by Timefold **cannot create another extra turn**. The engine must fail closed against extra-turn chaining even if a future card effect would otherwise attempt it.
+- The one-marker rule also means a deck containing multiple different Mythic identities does not gain multiple Starbound uses.
+
+### Runtime compatibility note
+
+The current branch `rewardValue()` logic already recognises the `Mythic` trait when assigning a two-Reward defeat value, so moving Celestyr from `stage = Mythic` to `stage = Standalone` will not remove its two-Reward identity once the card registry is updated. `Standalone` is also already a legal starting stage. The later deterministic engine pass should nevertheless use the explicit `reward_value = 2` card field rather than depend on fallback inference.
+
+### Weakness/resistance decision
+
+As with the other Astral creatures, Celestyr's weakness/resistance remains **pending the cross-element matchup review**. No value is guessed during the isolated Astral pass.
+
+### Mythic decision
+
+**ASTRAL-04 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+Celestyr keeps all three defining concepts—Dream Cartographer, Dream Ray and Second Horizon—but now has a clean creature-stage/class separation and an explicit, deterministic Timefold contract.
+
+All HP, attack costs and damage remain provisional until AI Test Match and human balance testing.
+
+---
+
 ## Next bounded audit
 
-**ASTRAL-04 — Celestyr — Dream Cartographer**
+**ASTRAL-05 — Essence package**
 
-Review the Astral Mythic as **Standalone stage + Mythic trait**, preserve the one-Starbound-per-player Timefold contract, make reward value explicit, and decide whether Dream Cartographer, Dream Ray and Second Horizon can be kept with wording/schema normalization rather than mechanical replacement.
+Review Basic Astral Essence, Star Essence, Orbit Essence and pack-only Nova Essence. Preserve the existing foresight identity where sound, normalize “once while attached” into explicit attachment-state usage, and avoid introducing a second energy/resource system outside cards played from hand.
