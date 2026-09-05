@@ -555,8 +555,138 @@ All numeric bonuses/healing remain provisional until deterministic AI Test Match
 
 ---
 
+## ASTRAL-06 — Tactic package
+
+**Package purpose:** Preserve Astral's foresight, sequencing and controlled future-reset identity while removing obsolete Reward-memory bookkeeping and keeping Shade as the stronger hand-disruption element.
+
+### Current Tactic structure
+
+Astral contains **9 Tactics**: 2 Allies, 4 Devices, 2 Relics and 1 Realm. The current prototype has structured `engine_effects` for Archivist Sol, Cartographer Lyra, Future Draw, Gravity Shift and Star Chart. Celestial Observatory, Dreamglass, Orbit Ring and Parallax Window are still unstructured. Because Archivist Sol is being tuned, its existing structured definition must also be replaced; therefore **5 Astral Tactic definitions need structure work later**.
+
+### Archivist Sol
+
+**Current prototype:** Both players discard their remaining hands, then each draws 5 cards.
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1:**
+
+- **Ally — Archivist Sol:** Each player shuffles all cards from their hand into their own deck without revealing those cards. Then each player draws exactly 5 cards. After both fixed draws resolve, apply the normal deck-depletion check to either player who could not complete the draw.
+
+**Reason:** A total hand discard overlaps Shade's deliberate disruption identity and feeds discard synergies. Shuffling both hands back preserves the symmetrical “reset both futures” idea while making the effect unmistakably Astral.
+
+**Hidden-information rule:** Neither hand is revealed during the reset. Only public hand counts and the fact that Sol resolved are visible to the opponent.
+
+### Cartographer Lyra
+
+**Current prototype:** Look at the top 5 cards of your deck, return them in any order, then draw 1 card.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** Look at the top 5 cards of your deck and return them in any order. Then draw 1 card.
+
+**Reason:** This is a direct, strong but transparent Astral sequencing Ally and needs no mechanical redesign.
+
+### Future Draw
+
+**Current prototype:** Look at the top 3 cards of your deck. Put one into your hand and the other two on the bottom in either order.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** Look at the top 3 cards of your deck. Put 1 into your hand, then put the other 2 on the bottom of your deck in either order.
+
+**Reason:** Clean card selection that is fully aligned with Astral's identity.
+
+### Gravity Shift
+
+**Current prototype:** Switch either player's Vanguard with one of that player's Reserve creatures; that player chooses the Reserve creature.
+
+**Audit:** **KEEP** with legality wording
+
+**Current-rules design draft v1:** Choose either player who has at least 1 Reserve creature. That player chooses 1 of their Reserve creatures and switches it with their Vanguard.
+
+**Reason:** The caster chooses whose formation changes, while the affected player retains the creature choice. This creates tactical positioning without stealing hidden control decisions.
+
+### Star Chart
+
+**Current prototype:** Search your deck for an Astral Ally or Astral Relic, reveal it, put it into your hand, then shuffle.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** Search your deck for 1 Astral Ally or Astral Relic, reveal it, put it into your hand, then shuffle your deck.
+
+**Reason:** A focused Astral consistency Device that supports both one-shot and persistent foresight tools.
+
+### Celestial Observatory
+
+**Current prototype:** Once during each player's turn, after that player looks at the top of their deck through an effect, they may move the top card to the bottom.
+
+**Audit:** **KEEP** with trigger normalization
+
+**Current-rules design draft v1:** **Realm — Celestial Observatory:** Once during each player's turn, after that player looks at one or more cards on top of their own deck through an effect, that player may put the current top card of their deck on the bottom.
+
+**Reason:** This is an appropriately symmetrical Realm: both players can exploit it, but Astral decks are constructed to trigger it more reliably.
+
+**Engine note:** Requires a generic persistent Realm listener with a per-player/per-turn usage marker and an optional top-to-bottom action.
+
+### Dreamglass
+
+**Current prototype:** Once during your turn when you look at hidden information through the attached creature, heal 10 from it.
+
+**Audit:** **KEEP** with trigger normalization
+
+**Current-rules design draft v1:** **Relic — Dreamglass:** Once during your turn, after an Ability or attack of the attached creature lets you look at hidden information, heal 10 damage from that creature.
+
+**Reason:** Dreamglass rewards creatures that personally generate foresight rather than every unrelated Tactic played by the deck.
+
+**Engine note:** Requires a generic attached-source hidden-information listener; it must not inspect card names.
+
+### Orbit Ring
+
+**Current prototype:** After the attached Astral creature attacks, look at the top card of your deck; you may leave it or put it on the bottom.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** **Relic — Orbit Ring:** After the attached Astral creature finishes an attack, look at the top card of your deck. You may leave it on top or put it on the bottom.
+
+**Reason:** A simple repeatable foresight Relic that naturally prepares the player's next turn.
+
+**Engine note:** Requires a generic after-attached-creature-attack trigger plus the ordinary private top-card look/choice operation.
+
+### Parallax Window
+
+**Current prototype:** Pack-only Device; look at the top 3 cards of your deck and one face-down Reward Card you previously recorded as viewed; return all cards to their original zones, then draw 1 card.
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1:** **Device — Parallax Window:** Choose 1 of your face-down Reward Cards and look at it. Return it face-down to the same Reward position. Then look at the top 3 cards of your deck and return them in any order. Draw 1 card.
+
+**Reason:** The pack-only Device keeps its premium two-zone foresight identity but removes the obsolete requirement to maintain a previously recorded Reward position. Ordering the top 3 immediately before drawing creates a clear, useful sequencing payoff.
+
+**Hidden-information rule:** The inspected Reward Card and deck cards remain private to the resolving player; the opponent sees only public resolution events/counts.
+
+### Structure consequence
+
+During STRUCTURE, the five Astral Tactic metadata changes are:
+
+1. **Archivist Sol:** replace discard-hand steps with generic shuffle-hand-into-own-deck operations, fixed draws and a post-resolution deck-depletion check;
+2. **Celestial Observatory:** add a generic persistent Realm trigger/listener;
+3. **Dreamglass:** add a generic attached-source hidden-information trigger;
+4. **Orbit Ring:** add a generic after-attached-creature-attack trigger;
+5. **Parallax Window:** add generic private Reward look + deck look/order + draw operations.
+
+Cartographer Lyra, Future Draw, Gravity Shift and Star Chart already map cleanly to the current structured choice/search concepts and should not receive card-ID runtime branches.
+
+### Tactic package decision
+
+**ASTRAL-06 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+Astral now has a coherent Tactic identity: prediction, selection, formation control, private information, top-deck sequencing and symmetrical future reset. Shade remains the stronger dedicated hand-disruption element.
+
+---
+
 ## Next bounded audit
 
-**ASTRAL-06 — Tactic package**
+**ASTRAL-07 — Second Sky exact 60-card starter audit**
 
-Review Archivist Sol, Cartographer Lyra, Future Draw, Gravity Shift, Star Chart, Celestial Observatory, Dreamglass, Orbit Ring and pack-only Parallax Window. Preserve Astral foresight and sequencing, remove obsolete Reward-position bookkeeping, separate Astral's symmetrical future-reset identity from Shade's hand-disruption identity, and identify the four Tactics that still need structured engine metadata.
+Verify the finished Astral design package against the current exact starter recipe: opening-creature density, evolution consistency, Essence curve, Tactic counts, copy limits, pack-only exclusions, elemental purity and Celestyr's stage/class normalization. Keep the 60-card recipe unchanged unless the evidence shows a real structural problem; numerical balance remains for deterministic AI Test Match and human playtesting.
