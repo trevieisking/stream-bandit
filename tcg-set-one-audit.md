@@ -685,8 +685,54 @@ Astral now has a coherent Tactic identity: prediction, selection, formation cont
 
 ---
 
+## ASTRAL-07 — Second Sky exact 60-card starter audit
+
+**Starter identity:** `Second Sky` remains the Astral starter for **foresight, sequencing and future information**, with **Timefold** as its signature effect.
+
+### Exact current recipe check
+
+- **60 cards exactly**
+- **22 Creatures / 18 Essence / 20 Tactics**
+- **14 legal opening creatures** after the current-rules redesign: 6 Babies, 7 normal Standalones and Celestyr as a Standalone creature carrying the Mythic trait.
+- Two complete evolution lines use the same stable ratio: `3 Baby → 2 Teen → 2 Adult` for Stardot → Orbitail → Cosmarch and Moonbit → Comettail → Nebulynx.
+- No evolution card is orphaned from its required predecessor.
+- Essence remains `14 Basic Astral / 2 Star / 2 Orbit`; pack-only Nova Essence is excluded.
+- Tactics remain `3 Star Chart / 3 Future Draw / 2 Gravity Shift / 2 Cartographer Lyra / 2 Archivist Sol / 3 Orbit Ring / 2 Dreamglass / 3 Celestial Observatory`; pack-only Parallax Window is excluded.
+- Pack-only Cometmanta is also excluded, preserving the set pattern of 21 starter identities plus 3 pack-only identities per element.
+- Every starter card is Astral; there is no off-element inclusion.
+- Normal starter identities do not exceed the current 4-copy gameplay limit. Celestyr appears exactly once, satisfying the Mythic one-copy-per-identity rule. Basic Essence follows its separate high copy allowance.
+
+### Celestyr normalization inside the starter
+
+The stored prototype recipe still labels Celestyr as `Creature — Mythic`. During the later registry/recipe STRUCTURE pass, that display/runtime classification must become **Creature — Standalone** with **Mythic** retained separately as its class/trait. The physical starter count remains one Celestyr; this is a schema correction, not a deck-composition change.
+
+### Starter decision
+
+**ASTRAL-07 audit: KEEP THE EXACT 60-CARD RECIPE PROVISIONALLY.**
+
+No evidence in the current-rules design pass justifies changing card counts before playtesting. The starter has sufficient legal opening creatures, complete evolution access, a coherent Essence curve, deliberate Tactic density and no illegal pack-only/copy-limit inclusions.
+
+The following are **balance-test questions, not current defects**:
+
+1. opening-hand/mulligan frequency with 14 legal starting creatures;
+2. practical access to both evolution lines under real draw sequencing;
+3. whether 18 Essence reaches Celestyr's five-Essence Starbound attack at an appropriate pace;
+4. whether 2 Archivist Sol and 3 Celestial Observatory remain healthy after their current-rules wording;
+5. whether Reward-foresight and top-deck-foresight packages compete for space or create useful choices;
+6. whether Timefold is powerful but sufficiently rare and costly under actual match conditions.
+
+These questions belong in deterministic AI Test Match followed by human playtesting. They do not justify speculative starter edits now.
+
+### Astral element completion state
+
+**ASTRAL CURRENT-RULES DESIGN AUDIT: COMPLETE — 24 / 24 IDENTITIES REVIEWED, STARTER RECIPE REVIEWED.**
+
+Astral is **not registry-ready yet**. Weakness/resistance remains pending the cross-element review; all provisional numbers still require AI/human balance testing; accepted designs must later be encoded in the shared deterministic metadata grammar.
+
+---
+
 ## Next bounded audit
 
-**ASTRAL-07 — Second Sky exact 60-card starter audit**
+**EMBER-01 — Glowcub → Bristleflare → Furnacefang**
 
-Verify the finished Astral design package against the current exact starter recipe: opening-creature density, evolution consistency, Essence curve, Tactic counts, copy limits, pack-only exclusions, elemental purity and Celestyr's stage/class normalization. Keep the 60-card recipe unchanged unless the evidence shows a real structural problem; numerical balance remains for deterministic AI Test Match and human playtesting.
+Begin Ember from its locked starter identity: fast pressure, controlled self-damage and Scorched. Review the first evolution family as a risk/reward teaching line, add Glowcub's missing named Ability, preserve good self-damage mechanics where sound, and keep all numbers provisional until the complete Ember package and later AI/human testing are available.
