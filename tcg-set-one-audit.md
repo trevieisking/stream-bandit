@@ -731,8 +731,120 @@ Astral is **not registry-ready yet**. Weakness/resistance remains pending the cr
 
 ---
 
+# EMBER audit
+
+## Ember registry snapshot
+
+The current active SB1 Ember pool contains **24 identities**: the 21 identities used by `Ashrush` plus 3 pack-only identities. The starter remains exactly **60 cards** with the same broad category skeleton as Second Sky: **22 Creatures / 18 Essence / 20 Tactics**.
+
+**Locked Ember identity:** fast pressure, controlled self-damage and Scorched.
+
+**Pack-only Ember identities:** Cinderburrow, Wildfire Essence and Ashen Gamble.
+
+The Ember audit therefore keeps self-damage, movement and Scorched as separate but interacting subthemes instead of turning every Ember card into a generic damage bonus.
+
+---
+
+## EMBER-01 — Glowcub → Bristleflare → Furnacefang
+
+**Family purpose:** Teach Ember's controlled-risk loop progressively: a damaged creature gains a small payoff → the player may accept self-damage for card value → the Adult turns existing damage into sustained offensive pressure.
+
+### Glowcub
+
+**Current prototype**
+
+- Stage: Baby
+- HP: 60
+- Withdrawal: 1
+- Ability: **missing**
+- Attack: `1 Ember — Spark Pounce — 20.`
+
+**Audit:** **TUNE**
+
+**Reason:** Glowcub needs the mandatory named Ability and should introduce Ember's risk/reward identity without forcing a fragile Baby to damage itself on entry.
+
+**Current-rules design draft v1**
+
+- Stage: **Baby**
+- HP: **60**
+- Withdrawal: **1**
+- **Ability — Warm Blood:** While this creature has damage on it, Spark Pounce deals 10 more damage.
+- **Attack — Spark Pounce:** `1 Ember — 20 damage.`
+
+**Why this fits:** Glowcub teaches that damage is not always purely a liability for Ember. The player must still get Glowcub damaged through combat or another legal effect before receiving the small offensive payoff.
+
+### Bristleflare
+
+**Current prototype**
+
+- Stage: Teen; evolves from Glowcub
+- HP: 140
+- Withdrawal: 1
+- **Ability — Heat Up:** When this creature evolves, you may place 10 damage on it. If you do, draw 1 card.
+- Attack 1: `1 Ember — Ember Claw — 40.`
+- Attack 2: `2 Ember — Reckless Rush — 70; place 10 damage on this creature.`
+
+**Audit:** **KEEP** with timing normalization
+
+**Current-rules design draft v1**
+
+- Stage: **Teen**
+- HP: **140**
+- Withdrawal: **1**
+- **Ability — Heat Up:** When this creature evolves, you may place 10 damage on it. If you do, draw 1 card.
+- **Attack — Ember Claw:** `1 Ember — 40 damage.`
+- **Attack — Reckless Rush:** `2 Ember — 70 damage. After damage, place 10 damage on this creature.`
+
+**Reason:** Bristleflare cleanly escalates the family idea. Heat Up lets the player deliberately trade durability for a card, while Reckless Rush teaches that Ember can continue taking controlled damage to maintain tempo.
+
+### Furnacefang
+
+**Current prototype**
+
+- Stage: Adult; evolves from Bristleflare
+- HP: 260
+- Withdrawal: 2
+- **Ability — Controlled Burn:** Once during your turn, if this creature has damage on it, its next attack this turn deals +20 damage.
+- Attack 1: `2 Ember — Furnace Bite — 80.`
+- Attack 2: `3 Ember — Meltline Charge — 140; place 20 damage on this creature.`
+
+**Audit:** **KEEP** with deterministic trigger wording
+
+**Current-rules design draft v1**
+
+- Stage: **Adult**
+- HP: **260**
+- Withdrawal: **2**
+- **Ability — Controlled Burn:** The first attack this creature declares during your turn deals 20 more damage if this creature has damage on it when that attack is declared.
+- **Attack — Furnace Bite:** `2 Ember — 80 damage.`
+- **Attack — Meltline Charge:** `3 Ember — 140 damage. After damage, place 20 damage on this creature.`
+
+**Why this fits:** The Adult converts the family's accumulated risk directly into pressure. The declaration-time condition is deterministic and avoids adding an unnecessary manual Ability button to the card-first battle UI.
+
+### Structure / engine note
+
+The current attack interpreter already supports attack instructions that place fixed damage on the attacking creature, so Reckless Rush and Meltline Charge can later map to the shared self-damage operation. Warm Blood, Heat Up and Controlled Burn still require generic Ability metadata/listeners during STRUCTURE. They must not be implemented as Glowcub/Bristleflare/Furnacefang card-name branches.
+
+### Weakness/resistance decision
+
+Weakness and resistance remain **pending the cross-element matchup review**. No values are guessed during this isolated Ember family pass.
+
+### Family decision
+
+**EMBER-01 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+The family now progresses clearly:
+
+1. **Glowcub:** being damaged unlocks a small attack bonus;
+2. **Bristleflare:** deliberately accepts damage for cards and tempo;
+3. **Furnacefang:** converts existing damage into a repeatable offensive payoff while its strongest attack feeds the damaged state again.
+
+All HP, withdrawal, attack costs, base damage and bonus values remain provisional until the whole Ember package can be compared and then exercised by deterministic AI Test Match and human playtesting.
+
+---
+
 ## Next bounded audit
 
-**EMBER-01 — Glowcub → Bristleflare → Furnacefang**
+**EMBER-02 — Coalfinch → Sootwing → Cindercrest**
 
-Begin Ember from its locked starter identity: fast pressure, controlled self-damage and Scorched. Review the first evolution family as a risk/reward teaching line, add Glowcub's missing named Ability, preserve good self-damage mechanics where sound, and keep all numbers provisional until the complete Ember package and later AI/human testing are available.
+Review Ember's mobility/Scorched evolution family. Add the missing named Abilities on Coalfinch and Sootwing, preserve Flash Wing's optional post-attack switch, preserve Cindercrest's Scorched payoff where sound, and keep the family distinct from Glowcub's self-damage line. Use generic movement/condition triggers later rather than card-name runtime branches.
