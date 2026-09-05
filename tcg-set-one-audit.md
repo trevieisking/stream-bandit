@@ -33,6 +33,11 @@ The branch migration `20260905105500_tcg_economy_and_copy_limit_alignment.sql` s
 - Only one evolution per creature stack per turn; ordinary evolution cannot occur during that player's first turn or on the same turn the creature entered play.
 - Printed creature HP remains within the current **40–390** range.
 - Astral's identity is foresight, card selection, prediction, sequencing and rare Timefold access.
+- **Starbound is an explicit prestige mechanic, not an automatic consequence of Mythic class or visual rarity.** Every Set One card audit must record whether that card is Starbound or not.
+- A creature/card designated **Starbound** must print exactly one Starbound effect, which may be a **Starbound Ability** or a **Starbound Power attack**.
+- Each player has exactly **one shared Starbound marker per match**. A legal Starbound Ability activation or legal Starbound attack declaration consumes that marker. Once spent, that player cannot use another Starbound Ability or Starbound attack for the rest of that match unless a later explicit rule changes the limit.
+- The Starbound marker belongs to the player, not the card. Multiple Starbound cards therefore do not provide multiple uses.
+- Ordinary Abilities and ordinary attacks on a Starbound card remain usable normally; only the explicitly labelled Starbound effect consumes the marker.
 - Printed card text is presentation/rules wording. Runtime behaviour will later come from deterministic structured registry metadata.
 - All final balance values remain subject to deterministic AI Test Match and human playtesting before release.
 
@@ -47,12 +52,15 @@ The current 193-card registry is a design source, not a finished rules registry.
 - **0 / 89** currently have an explicit resistance field.
 - **81 / 89** have explicit withdrawal data.
 - **8 / 89** are legacy Standalones whose HP, Ability and attacks were packed into `effect_text` and whose withdrawal value is missing.
+- A full active Set One text scan currently finds only **Celestyr — Dream Cartographer** with explicit Starbound wording in the first-release registry. That does not mean it is the only current-rules Starbound card; each card must now receive an explicit yes/no Starbound audit decision.
 
-Audit consequence: every creature must receive an explicit review for stage/class, HP, named Ability, withdrawal, weakness/resistance state, attacks, reward value and deterministic effect structure. “No weakness” or “no resistance” may be a valid deliberate result; an absent unreviewed field is not.
+Audit consequence: every creature must receive an explicit review for stage/class, HP, named Ability, withdrawal, weakness/resistance state, attacks, reward value, Starbound designation and deterministic effect structure. “No weakness”, “no resistance” and “not Starbound” may each be valid deliberate results; an absent unreviewed field is not.
 
 ### Mythic stage/class normalization
 
 All eight current elemental Mythics are stored with `stage = Mythic` and also carry the `Mythic` trait. The Prismatic Founder already demonstrates the cleaner model: creature stage and prestige class are separate concepts. During each Mythic redesign, the audit will normalize the current non-evolving elemental Mythics to an appropriate creature stage (currently expected to be **Standalone**) while retaining **Mythic** as a separate class/trait. Mythic must not become a fourth normal evolution stage.
+
+Mythic and Starbound are also separate concepts. A Mythic may be Starbound only when its current-rules card definition explicitly designates it Starbound. Conversely, any future non-Mythic card may use Starbound only if its card definition explicitly carries that prestige mechanic.
 
 ## 4. Audit labels
 
@@ -424,6 +432,7 @@ All new numbers and existing attack values remain provisional until the whole As
 
 - Stage: **Standalone**
 - Traits: **Mythic**
+- Prestige mechanic: **Starbound**
 - HP: **340**
 - Withdrawal: **2**
 - Reward value: **2**
@@ -433,16 +442,20 @@ All new numbers and existing attack values remain provisional until the whole As
 
 ### Starbound / Timefold contract
 
-- Each player has **one Starbound marker per match**, shared across all of that player's cards that can use a Starbound Power.
-- A legal Starbound declaration consumes that player's marker immediately; cancelling or avoiding the later Timefold result cannot restore the marker unless a future explicit rule says so.
+- Celestyr is explicitly **Starbound**.
+- Each player has **one Starbound marker per match**, shared across all of that player's Starbound cards.
+- A Starbound effect may be printed as an Ability or an attack; both forms use the same shared marker.
+- A legal Starbound activation/declaration consumes that player's marker immediately; cancelling or avoiding the later result cannot restore the marker unless a future explicit rule says so.
 - Timefold occurs only after damage, defeats, Reward claims/resolution, mandatory replacement processing and win checks complete.
 - If those checks have already ended the match, the extra turn does not occur.
 - A turn created by Timefold **cannot create another extra turn**. The engine must fail closed against extra-turn chaining even if a future card effect would otherwise attempt it.
-- The one-marker rule also means a deck containing multiple different Mythic identities does not gain multiple Starbound uses.
+- The one-marker rule means a deck containing multiple different Starbound cards does not gain multiple Starbound uses.
 
 ### Runtime compatibility note
 
 The current branch `rewardValue()` logic already recognises the `Mythic` trait when assigning a two-Reward defeat value, so moving Celestyr from `stage = Mythic` to `stage = Standalone` will not remove its two-Reward identity once the card registry is updated. `Standalone` is also already a legal starting stage. The later deterministic engine pass should nevertheless use the explicit `reward_value = 2` card field rather than depend on fallback inference.
+
+The current attack path already recognises `Starbound Power —` attacks and consumes the player's shared `starbound_used` marker on legal declaration. Final STRUCTURE must replace printed-English detection with explicit Starbound metadata and must add the same generic marker-consumption path for any future Starbound Ability.
 
 ### Weakness/resistance decision
 
@@ -452,7 +465,7 @@ As with the other Astral creatures, Celestyr's weakness/resistance remains **pen
 
 **ASTRAL-04 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
 
-Celestyr keeps all three defining concepts—Dream Cartographer, Dream Ray and Second Horizon—but now has a clean creature-stage/class separation and an explicit, deterministic Timefold contract.
+Celestyr keeps all three defining concepts—Dream Cartographer, Dream Ray and Second Horizon—but now has a clean creature-stage/class separation, an explicit Starbound designation and a deterministic Timefold contract.
 
 All HP, attack costs and damage remain provisional until AI Test Match and human balance testing.
 
@@ -701,10 +714,11 @@ Astral now has a coherent Tactic identity: prediction, selection, formation cont
 - Pack-only Cometmanta is also excluded, preserving the set pattern of 21 starter identities plus 3 pack-only identities per element.
 - Every starter card is Astral; there is no off-element inclusion.
 - Normal starter identities do not exceed the current 4-copy gameplay limit. Celestyr appears exactly once, satisfying the Mythic one-copy-per-identity rule. Basic Essence follows its separate high copy allowance.
+- Celestyr is the current Astral Starbound card; no other Astral identity in this completed design pass is designated Starbound.
 
 ### Celestyr normalization inside the starter
 
-The stored prototype recipe still labels Celestyr as `Creature — Mythic`. During the later registry/recipe STRUCTURE pass, that display/runtime classification must become **Creature — Standalone** with **Mythic** retained separately as its class/trait. The physical starter count remains one Celestyr; this is a schema correction, not a deck-composition change.
+The stored prototype recipe still labels Celestyr as `Creature — Mythic`. During the later registry/recipe STRUCTURE pass, that display/runtime classification must become **Creature — Standalone** with **Mythic** retained separately as its class/trait and **Starbound** retained as an explicit prestige designation. The physical starter count remains one Celestyr; this is a schema correction, not a deck-composition change.
 
 ### Starter decision
 
@@ -1062,7 +1076,7 @@ Weakness/resistance remains pending cross-element review, and all new numbers re
 
 ## EMBER-04 — Pyrohorn — Ash Crown
 
-**Mythic purpose:** Serve as Ember's damaged-team amplifier and late-game pressure Mythic without becoming a fourth evolution stage or automatically consuming the shared Starbound marker.
+**Mythic purpose:** Serve as Ember's explicitly Starbound Mythic damaged-team amplifier and late-game pressure finisher without becoming a fourth evolution stage.
 
 ### Pyrohorn — Ash Crown
 
@@ -1081,38 +1095,40 @@ Weakness/resistance remains pending cross-element review, and all new numbers re
 
 **Audit:** **TUNE**
 
-**Reason:** Pyrohorn's current gameplay identity is strong and already fits Ember. The required correction is mainly schema and deterministic wording: Mythic is a class/trait rather than a creature stage, the two-Reward value should be explicit, and the damaged-team scaling/timing should be stated precisely.
+**Reason:** Pyrohorn's current gameplay identity is strong and already fits Ember, but the first-release definition omitted the Starbound designation/presentation that the current rule requires. The correction is therefore both schema and prestige normalization: Mythic is a class/trait rather than a creature stage, the two-Reward value is explicit, Pyrohorn is explicitly Starbound, and Ashen Stampede becomes its once-per-match Starbound Power.
 
-**Current-rules design draft v1**
+**Current-rules design draft v2**
 
 - Stage: **Standalone**
 - Creature stage: **Standalone**
 - Recipe/display type: **Creature — Standalone**
 - Traits: **Mythic**
+- Prestige mechanic: **Starbound**
 - HP: **340**
 - Withdrawal: **3**
 - Reward value: **2**
 - **Ability — Ash Crown:** Once during your turn, choose 1 damaged friendly Ember creature. That creature's next attack this turn deals 30 more damage. After that attack finishes resolving, place 20 damage on that creature.
 - **Attack — Crownfire:** `2 Ember — 90 damage.`
-- **Attack — Ashen Stampede:** `4 Ember — 160 damage. When this attack is declared, count your friendly damaged creatures, including Pyrohorn if it is damaged. This attack deals 10 more damage for each of them, to a maximum of 40 additional damage.`
+- **Starbound Power — Ashen Stampede:** `4 Ember — 160 damage. You may declare this attack only if you still have your Starbound marker. Consume that marker when the legal attack is declared. When this attack is declared, count your friendly damaged creatures, including Pyrohorn if it is damaged. This attack deals 10 more damage for each of them, to a maximum of 40 additional damage.`
 
 ### Mythic / Starbound decision
 
-Pyrohorn remains **Mythic**, but it does **not** gain a Starbound Power merely because it carries the Mythic trait. Starbound is a specific card mechanic, not a compulsory property of every Mythic creature.
+Pyrohorn is explicitly both **Mythic** and **Starbound**. These are separate rule fields: Mythic controls its class/copy/reward identity; Starbound controls its once-per-match prestige effect.
 
 Therefore:
 
-- Crownfire is an ordinary attack;
-- Ashen Stampede is an ordinary attack with damaged-team scaling;
-- neither attack consumes the player's shared Starbound marker;
-- Pyrohorn can coexist in a deck with another Mythic identity subject to the normal one-copy-per-Mythic-identity rule;
-- if another card uses a Starbound Power, that separate card still uses the player's one shared Starbound marker for the match.
+- **Ash Crown** remains an ordinary once-per-turn Ability and does not consume the Starbound marker;
+- **Crownfire** remains an ordinary attack and does not consume the Starbound marker;
+- **Ashen Stampede** is Pyrohorn's single Starbound Power attack;
+- a legal Ashen Stampede declaration consumes the player's one shared Starbound marker immediately;
+- if that marker was already spent by any other Starbound Ability or Starbound attack, Ashen Stampede cannot be declared;
+- using Pyrohorn's Starbound Power prevents that player from using any other Starbound effect later in the same match, while Pyrohorn's ordinary Ability/attack remain usable normally.
 
 ### Runtime compatibility note
 
 The current branch `rewardValue()` helper already recognises the `Mythic` trait and therefore preserves a two-Reward defeat value even after the stage is normalized from `Mythic` to `Standalone`. The later registry STRUCTURE pass should still write **`reward_value = 2` explicitly** rather than depend on fallback inference.
 
-The current attack interpreter also already recognises the prototype phrase for “friendly damaged creature” and calculates `+10` for each damaged friendly creature up to `+40`. That is useful implementation evidence, but the final structured effect must use explicit deterministic metadata rather than printed-English parsing.
+The current attack path already recognises `Starbound Power —` attacks and consumes `starbound_used` on legal declaration, and it already recognises the prototype phrase for “friendly damaged creature” to calculate `+10` per damaged friendly creature up to `+40`. Both are useful implementation evidence only. Final STRUCTURE must encode Starbound and damaged-friendly scaling in deterministic metadata rather than printed-English parsing.
 
 ### Ash Crown structure note
 
@@ -1126,6 +1142,19 @@ Ash Crown needs a generic once-per-turn friendly-creature selector with the foll
 
 If the chosen creature never attacks before the turn ends, neither the attack bonus nor the post-attack 20 damage carries into a later turn. No Pyrohorn card-ID branch should be introduced.
 
+### Starbound engine note
+
+The final effect grammar needs one shared generic Starbound gate used by both forms:
+
+1. confirm the card/effect carries explicit Starbound metadata;
+2. confirm the player's shared Starbound marker is unused;
+3. confirm the Ability activation or attack declaration is otherwise legal;
+4. consume the marker atomically on the legal activation/declaration;
+5. resolve the effect through normal Ability/attack timing;
+6. never restore the marker merely because later damage/effect resolution is prevented, unless a future explicit rule says so.
+
+The current attack engine already implements this concept for printed Starbound attacks. A generic Starbound Ability action path remains implementation work for later STRUCTURE.
+
 ### Weakness/resistance decision
 
 Weakness and resistance remain **pending the cross-element matchup review**. No value is guessed during this isolated Ember Mythic pass.
@@ -1134,7 +1163,7 @@ Weakness and resistance remain **pending the cross-element matchup review**. No 
 
 **EMBER-04 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
 
-Pyrohorn keeps its three defining concepts—Ash Crown, Crownfire and Ashen Stampede—while the current-rules model cleanly separates its legal creature stage from its Mythic prestige class.
+Pyrohorn keeps its three defining concepts—Ash Crown, Crownfire and Ashen Stampede—while the current-rules model cleanly separates its legal creature stage, Mythic class and Starbound prestige mechanic.
 
 All HP, attack costs, damage and modifier values remain provisional until deterministic AI Test Match and human playtesting.
 
