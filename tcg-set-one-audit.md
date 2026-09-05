@@ -1441,8 +1441,563 @@ Ember is **not registry-ready yet**. Weakness/resistance remains pending the lat
 
 ---
 
+# GALE audit
+
+## Gale registry snapshot
+
+The current active SB1 Gale pool contains **24 identities**: the 21 identities used by `Skyshift` plus 3 pack-only identities. Fresh inventory confirms the same Set One element skeleton: **11 Creatures / 4 Essence / 9 Tactics**.
+
+**Locked Gale identity:** switching, low withdrawal, positional attacks and Blinded pressure.
+
+**Pack-only Gale identities:** Zephyrhare, Jetstream Essence and Cyclone Route.
+
+The Gale audit keeps movement as the core engine, but distinguishes entry-to-Vanguard rewards, hit-and-relay positioning, Reserve pressure and Blinded control so the element does not collapse into repeated generic switching.
+
+---
+
+## GALE-01 — Driftlet → Skyweaver → Tempestalon
+
+**Family purpose:** Teach the Gale reward for moving from Reserve into Vanguard: a small attack payoff at Baby, hand filtering at Teen and a larger attack burst plus repositioning at Adult.
+
+### Driftlet
+
+**Current prototype**
+
+- Stage: Baby
+- HP: 50
+- Withdrawal: 0
+- Ability: **missing**
+- Attack: `1 Gale — Puff Strike — 20.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Baby**
+- HP: **50**
+- Withdrawal: **0**
+- Starbound: **no**
+- **Ability — Rising Draft:** The first time during your turn this creature moves from Reserve to Vanguard, its next attack that turn deals 10 more damage.
+- **Attack — Puff Strike:** `1 Gale — 20 damage.`
+
+**Reason:** Rising Draft is a small, visible introduction to Gale's Vanguard-entry payoff without adding hand advantage or a second switch by itself.
+
+### Skyweaver
+
+**Current prototype**
+
+- Stage: Teen; evolves from Driftlet
+- HP: 120
+- Withdrawal: 0
+- **Ability — Crosswind:** When this creature becomes Vanguard from Reserve, draw 1 card then discard 1 card.
+- Attack 1: `1 Gale — Crosswind Cut — 40.`
+- Attack 2: `2 Gale — Lift Away — 50; you may switch this creature with a Reserve creature.`
+
+**Audit:** **TUNE** timing only
+
+**Current-rules design draft v1**
+
+- Stage: **Teen**
+- HP: **120**
+- Withdrawal: **0**
+- Starbound: **no**
+- **Ability — Crosswind:** The first time during your turn this creature moves from Reserve to Vanguard, draw 1 card, then discard 1 card.
+- **Attack — Crosswind Cut:** `1 Gale — 40 damage.`
+- **Attack — Lift Away:** `2 Gale — 50 damage. After damage, you may switch this creature with 1 of your Reserve creatures.`
+
+**Reason:** The first-time/your-turn fence prevents Pilot Sera, forced promotion or repeated movement from farming hand filtering while preserving the intended Gale sequencing reward.
+
+### Tempestalon
+
+**Current prototype**
+
+- Stage: Adult; evolves from Skyweaver
+- HP: 230
+- Withdrawal: 1
+- **Ability — Storm Entry:** The first time each turn this creature becomes Vanguard from Reserve, its next attack deals +30 damage.
+- Attack 1: `2 Gale — Talon Gust — 70.`
+- Attack 2: `3 Gale — Tempest Dive — 110; after damage, you may switch this creature with a Reserve creature.`
+
+**Audit:** **KEEP** with active-turn normalization
+
+**Current-rules design draft v1**
+
+- Stage: **Adult**
+- HP: **230**
+- Withdrawal: **1**
+- Starbound: **no**
+- **Ability — Storm Entry:** The first time during your turn this creature moves from Reserve to Vanguard, its next attack that turn deals 30 more damage.
+- **Attack — Talon Gust:** `2 Gale — 70 damage.`
+- **Attack — Tempest Dive:** `3 Gale — 110 damage. After damage, you may switch this creature with 1 of your Reserve creatures.`
+
+**Reason:** Tempestalon becomes the family's mature burst-and-pivot creature while keeping the same movement language as Driftlet and Skyweaver.
+
+### Family decision
+
+**GALE-01 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+STRUCTURE later needs generic `Reserve → Vanguard` listeners, first-use-per-turn markers, temporary attack modifiers, hand draw/discard and post-attack switching. No card-name branch is required.
+
+---
+
+## GALE-02 — Whiffin → Slipwing → Skyrend
+
+**Family purpose:** Develop Gale's other movement direction: help the Vanguard withdraw, relay momentum after an attack-driven switch, then punish opposing Reserve positioning at Adult.
+
+### Whiffin
+
+**Current prototype**
+
+- Stage: Baby
+- HP: 60
+- Withdrawal: 0
+- Ability: **missing**
+- Attack: `1 Gale — Breeze Peck — 20.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Baby**
+- HP: **60**
+- Withdrawal: **0**
+- Starbound: **no**
+- **Ability — Featherdraft:** When you play this creature from your hand into an empty Reserve space during your Build phase, your current Vanguard's next voluntary withdrawal that turn costs 1 less Essence, minimum 0.
+- **Attack — Breeze Peck:** `1 Gale — 20 damage.`
+
+**Reason:** Whiffin helps the existing Vanguard move without becoming another Quickstep creature itself. The bonus applies only to the next normal voluntary withdrawal that turn.
+
+### Slipwing
+
+**Current prototype**
+
+- Stage: Teen; evolves from Whiffin
+- HP: 110
+- Withdrawal: 0
+- Ability: **missing**
+- Attack 1: `1 Gale — Slip Cut — 30.`
+- Attack 2: `2 Gale — Backdraft — 60; switch this creature with a Reserve creature after damage.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Teen**
+- HP: **110**
+- Withdrawal: **0**
+- Starbound: **no**
+- **Ability — Slipstream Relay:** The first time during your turn this creature moves from Vanguard to Reserve because of one of its attacks, the friendly creature that becomes Vanguard has withdrawal cost 1 less for the rest of that turn, minimum 0.
+- **Attack — Slip Cut:** `1 Gale — 30 damage.`
+- **Attack — Backdraft:** `2 Gale — 60 damage. After damage, if you have at least 1 Reserve creature, switch this creature with 1 of them.`
+
+**Reason:** Backdraft remains the deliberate hit-and-run attack. Slipstream Relay lets the new Vanguard continue Gale's positional play after the attack rather than giving Slipwing a generic heal borrowed from another element.
+
+### Skyrend
+
+**Current prototype**
+
+- Stage: Adult; evolves from Slipwing
+- HP: 210
+- Withdrawal: 1
+- **Ability — Open Sky Hunter:** This creature can target opposing Reserve creatures with attacks that explicitly allow a target; if it does, attack damage is -20.
+- Attack 1: `2 Gale — Razorwind — 70.`
+- Attack 2: `3 Gale — Sky Rend — 110; you may target an opposing Reserve creature.`
+
+**Audit:** **KEEP** with deterministic targeting wording
+
+**Current-rules design draft v1**
+
+- Stage: **Adult**
+- HP: **210**
+- Withdrawal: **1**
+- Starbound: **no**
+- **Ability — Open Sky Hunter:** When one of this creature's attacks explicitly allows an opposing Reserve target and you choose a Reserve creature, that attack deals 20 less damage to that Reserve target.
+- **Attack — Razorwind:** `2 Gale — 70 damage.`
+- **Attack — Sky Rend:** `3 Gale — 110 damage. You may choose 1 opposing Reserve creature as this attack's target instead of the opposing Vanguard.`
+
+**Reason:** Skyrend is Gale's positional hunter. The Adult does not gain unrestricted bench attacks; only an attack that explicitly grants the alternate target can use Open Sky Hunter.
+
+**Engine drift note:** The current branch has a Skyrend card-ID target exception but does not encode the printed `-20` Reserve-target modifier through a generic attack-target rule. STRUCTURE must replace that special case with explicit alternate-target metadata and the Reserve-target damage modifier.
+
+### Family decision
+
+**GALE-02 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+The line now progresses from withdrawal assistance → attack-driven relay movement → controlled Reserve targeting.
+
+---
+
+## GALE-03 — Standalone package
+
+**Package purpose:** Give Gale four distinct starting roles: voluntary-withdrawal tempo, immediate entry switching, Blinded-linked repositioning and pack-only formation support.
+
+### Cloudray
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 130
+- Withdrawal: 0
+- Ability: **missing**
+- Attack 1: `1 Gale — Wing Sweep — 30.`
+- Attack 2: `2 Gale — Cloud Crash — 60.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **130**
+- Withdrawal: **0**
+- Starbound: **no**
+- **Ability — Cloudwake:** The first time during your turn this creature voluntarily withdraws, the friendly creature that becomes Vanguard has its next attack that turn deal 10 more damage.
+- **Attack — Wing Sweep:** `1 Gale — 30 damage.`
+- **Attack — Cloud Crash:** `2 Gale — 60 damage.`
+
+**Reason:** Cloudray converts its free withdrawal into a small tempo reward for the incoming Vanguard, making the otherwise blank Standalone a purposeful movement enabler.
+
+### Gustfox
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 100
+- Withdrawal: 0
+- **Ability — Quickstep:** When played from hand to Reserve, you may switch it with your Vanguard.
+- Attack 1: `1 Gale — Gust Bite — 30.`
+- Attack 2: `2 Gale — Tailwind Strike — 60; if this creature became Vanguard this turn, +20.`
+
+**Audit:** **KEEP** with play-zone wording
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **100**
+- Withdrawal: **0**
+- Starbound: **no**
+- **Ability — Quickstep:** When you play this creature from your hand into an empty Reserve space during your Build phase, you may switch this creature with your Vanguard. This effect switch does not use your normal voluntary withdrawal for the turn.
+- **Attack — Gust Bite:** `1 Gale — 30 damage.`
+- **Attack — Tailwind Strike:** `2 Gale — 60 damage. If this creature became Vanguard during this turn, this attack deals 20 more damage.`
+
+### Pinionserpent
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 160
+- Withdrawal: 1
+- Ability: **missing**
+- Attack 1: `2 Gale — Coil Gust — 50.`
+- Attack 2: `3 Gale — Blindside Spiral — 80; the opposing Vanguard becomes Blinded.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **160**
+- Withdrawal: **1**
+- Starbound: **no**
+- **Ability — Wind Coil:** The first time during your turn this creature makes the opposing Vanguard Blinded, this creature's withdrawal cost becomes 0 for the rest of that turn.
+- **Attack — Coil Gust:** `2 Gale — 50 damage.`
+- **Attack — Blindside Spiral:** `3 Gale — 80 damage. After damage, make the opposing Vanguard Blinded.`
+
+**Reason:** Pinionserpent owns Gale's ordinary Blinded pressure but turns successful status application into repositioning rather than a second damage bonus.
+
+### Zephyrhare
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 100
+- Withdrawal: **missing**
+- Pack-only: yes
+- Structured Ability/attacks: **missing**
+- Legacy `effect_text`: `100 HP. Windbound Leap: when played to Reserve, you may move another friendly Reserve Gale creature to Vanguard. 1 Gale — Zephyr Kick — 30; if it became Vanguard this turn, +20.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **100**
+- Withdrawal: **0** provisional
+- Pack-only: **yes**
+- Starbound: **no**
+- **Ability — Windbound Leap:** When you play this creature from your hand into an empty Reserve space during your Build phase, you may choose another friendly Gale creature in your Reserve and switch that creature with your Vanguard. This effect switch does not use your normal voluntary withdrawal.
+- **Attack — Zephyr Kick:** `1 Gale — 30 damage. If this creature became Vanguard during this turn, this attack deals 20 more damage.`
+
+**Reason:** The old “move to Vanguard” wording is normalized into a proper Vanguard/Reserve switch so no creature disappears from the board state. Zephyrhare stays a pack-only formation tool rather than a stronger Gustfox duplicate.
+
+### Standalone package decision
+
+**GALE-03 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+Cloudray, Gustfox, Pinionserpent and Zephyrhare now have separate deck roles while all remain recognisably Gale.
+
+---
+
+## GALE-04 — Aeralith — Storm Shepherd
+
+**Mythic purpose:** Act as Gale's explicit Starbound formation master: ordinary turns gain controlled extra movement, while the once-per-match Starbound attack combines pressure, repositioning and Blinded.
+
+### Aeralith — Storm Shepherd
+
+**Current prototype**
+
+- Stage: Mythic
+- Creature stage field: Mythic
+- Recipe type: Creature — Mythic
+- Trait: Mythic
+- HP: 310
+- Withdrawal: 1
+- Reward value: implied by Mythic runtime fallback, not explicit
+- **Ability — Storm Shepherd:** Once during your turn, switch your Vanguard with a Reserve Gale creature. This does not use your normal withdrawal.
+- Attack 1: `2 Gale — Shepherd Wind — 80.`
+- Attack 2: `4 Gale — Eye of the Storm — 140; after damage, switch this creature with a Reserve creature and the opposing Vanguard becomes Blinded.`
+
+**Audit:** **TUNE** schema/prestige/timing
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- Creature stage: **Standalone**
+- Recipe/display type: **Creature — Standalone**
+- Traits: **Mythic**
+- Prestige mechanic: **Starbound**
+- HP: **310**
+- Withdrawal: **1**
+- Reward value: **2**
+- **Ability — Storm Shepherd:** Once during your turn, while this creature is in play, you may switch your Vanguard with 1 friendly Gale creature in your Reserve. This is an effect switch and does not use your normal voluntary withdrawal for the turn.
+- **Attack — Shepherd Wind:** `2 Gale — 80 damage.`
+- **Starbound Power — Eye of the Storm:** `4 Gale — 140 damage. You may declare this attack only if you still have your Starbound marker. Consume that marker when the legal attack is declared. After damage, you may switch this creature with 1 friendly Gale creature in your Reserve. Then make the opposing Vanguard Blinded.`
+
+### Starbound decision
+
+Aeralith is explicitly **Mythic + Starbound**. Eye of the Storm is its single Starbound effect.
+
+- Storm Shepherd remains an ordinary once-per-turn Ability.
+- Shepherd Wind remains an ordinary attack.
+- Eye of the Storm consumes the player's one shared Starbound marker on legal declaration.
+- The post-attack switch is optional so the Starbound attack remains legal when no Reserve creature exists.
+- Blinded is applied after the optional switch and only if the match remains in a state where the opposing Vanguard still exists after ordinary damage/defeat resolution.
+
+### Runtime note
+
+The current branch already has an Aeralith card-ID switch requirement in the printed-English attack path. Final STRUCTURE must remove that special case and encode Eye of the Storm as generic Starbound metadata plus optional post-attack switch and condition application.
+
+### Mythic decision
+
+**GALE-04 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+Weakness/resistance remains pending cross-element review, and all numbers remain provisional for AI/human testing.
+
+---
+
+## GALE-05 — Essence package
+
+**Package purpose:** Let attached Gale Essence reduce movement friction or convert the normal voluntary withdrawal into a card-driven repositioning choice without creating any external energy resource.
+
+### Basic Gale Essence
+
+**Audit:** **KEEP**
+
+- Provides **1 Gale Essence** while attached and has no additional effect.
+
+### Breeze Essence
+
+**Current prototype:** Provides Gale; attached creature has withdrawal cost 1 less, minimum 0.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** Provides **1 Gale Essence** while attached. The attached creature's withdrawal cost is 1 less, minimum 0.
+
+**Engine drift note:** The current branch implements Breeze through a direct `gale-breeze-essence` card-ID check in `withdrawalCost()`. STRUCTURE must replace that shortcut with a generic attached withdrawal-cost modifier.
+
+### Draft Essence
+
+**Current prototype:** Provides Gale. When attached from hand to a Reserve Gale creature, you may switch that creature with your Vanguard; this uses your normal withdrawal for the turn.
+
+**Audit:** **TUNE** for exact voluntary-withdrawal semantics
+
+**Current-rules design draft v1:** Provides **1 Gale Essence** while attached. **When you attach this card from your hand to a friendly Gale creature in your Reserve, if your normal voluntary withdrawal for the turn is still available and legal, you may immediately perform that withdrawal choosing the attached creature as the incoming Vanguard. Pay the current Vanguard's withdrawal cost normally. If you do, your voluntary withdrawal is used for the turn.**
+
+**Reason:** This preserves the old statement that Draft uses the normal withdrawal instead of silently turning it into a free effect switch. Rooted/Stunned and any other universal withdrawal restrictions therefore still apply to the outgoing Vanguard.
+
+### Jetstream Essence
+
+**Current prototype:** Pack-only; provides Gale; when attached from hand to a Reserve Gale creature, that creature's next withdrawal this turn costs 0.
+
+**Audit:** **TUNE** timing clarity
+
+**Current-rules design draft v1:** Provides **1 Gale Essence** while attached. Pack-only: **yes**. **When you attach this card from your hand to a friendly Gale creature in your Reserve, until the end of that turn, if that creature becomes Vanguard, its next voluntary withdrawal that turn costs 0.**
+
+**Reason:** Jetstream remains the higher-combo pack-only Essence. It does not move the creature itself and the zero-cost window expires if the creature never becomes Vanguard that turn.
+
+### Essence package decision
+
+**GALE-05 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+Breeze, Draft and Jetstream will later use generic attachment/withdrawal metadata, never Gale card-ID branches.
+
+---
+
+## GALE-06 — Tactic package
+
+**Package purpose:** Give Gale reliable formation tools, low-withdrawal consistency and a controlled amount of Blinded recovery/pressure while leaving the actual damage plan on creatures.
+
+### Clear Skies
+
+**Current prototype:** Clear Blinded or Dazed from one friendly creature; draw 1 card.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** **Device — Clear Skies:** Choose 1 friendly creature that is Blinded or Dazed. Clear 1 of those conditions from it, then draw 1 card.
+
+### Cyclone Route
+
+**Current prototype:** Pack-only Device; switch your Vanguard with a Reserve creature, then you may switch the opponent's Vanguard with a Reserve creature chosen by that opponent.
+
+**Audit:** **KEEP / TUNE legality wording**
+
+**Current-rules design draft v1:** **Device — Cyclone Route:** Choose 1 of your Reserve creatures and switch it with your Vanguard. Then, if the opponent has at least 1 Reserve creature, you may have that opponent choose 1 of their Reserve creatures and switch it with their Vanguard. These are effect switches and do not use either player's normal voluntary withdrawal.
+
+### Featherstep
+
+**Current prototype:** Switch your Vanguard with a Reserve creature. The new Vanguard has withdrawal cost 0 this turn.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** **Device — Featherstep:** Choose 1 of your Reserve creatures and switch it with your Vanguard. The creature that becomes Vanguard has withdrawal cost 0 for the rest of that turn. This effect switch does not use your normal voluntary withdrawal.
+
+### Highwind Spires
+
+**Current prototype:** Realm; the first voluntary withdrawal each player makes during their turn costs 1 fewer Essence, minimum 0.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** **Realm — Highwind Spires:** The first voluntary withdrawal each player makes during their own turn costs 1 less Essence, minimum 0.
+
+### Pilot Sera
+
+**Current prototype:** Ally; switch up to two pairs of your friendly Vanguard/Reserve positions one at a time; only the final Vanguard may attack this turn.
+
+**Audit:** **KEEP** with effect-switch wording
+
+**Current-rules design draft v1:** **Ally — Pilot Sera:** You may perform up to 2 switches, one at a time. For each switch, choose 1 of your Reserve creatures and switch it with your Vanguard. These switches do not use your normal voluntary withdrawal. Only the creature that is your Vanguard after the final chosen switch may attack during that turn.
+
+**Rules note:** Normal `becomes Vanguard` triggers still see these switches, but each card's first-time-per-turn fences apply normally. Sera therefore enables Gale sequencing without multiplying Skyweaver/Tempestalon triggers indefinitely.
+
+### Pressure Compass
+
+**Current prototype:** Relic; when attached Gale creature moves to Reserve, draw 1 card, maximum once per turn.
+
+**Audit:** **KEEP** with zone wording
+
+**Current-rules design draft v1:** **Relic — Pressure Compass:** The first time during each turn the attached Gale creature moves from Vanguard to Reserve, draw 1 card.
+
+**Reason:** The trigger may occur on either player's turn if an effect legally moves the attached creature, but it can produce only one draw during that turn.
+
+### Scout Zeph
+
+**Current prototype:** Ally; look at top 5 cards, put up to 2 Gale creatures among them into hand, put rest on bottom.
+
+**Audit:** **KEEP** with bottom-order decision
+
+**Current-rules design draft v1:** **Ally — Scout Zeph:** Look at the top 5 cards of your deck. Choose up to 2 Gale Creature cards among them and put those cards into your hand. Put the remaining cards on the bottom of your deck in any order.
+
+**Hidden-information rule:** Because Zeph looks at a known-size private deck slice rather than searching the entire deck, the chosen card identities are not automatically revealed to the opponent unless a later universal rule explicitly requires it.
+
+### Tailwind Map
+
+**Current prototype:** Search your deck for a Gale creature with withdrawal cost 0 or 1, reveal it, put it into hand, shuffle. Current structured selection requires exactly one result.
+
+**Audit:** **TUNE** hidden-deck selection
+
+**Current-rules design draft v1:** **Device — Tailwind Map:** Search your deck for **up to 1** Gale Creature card with printed withdrawal cost 0 or 1, reveal it, put it into your hand, then shuffle your deck.
+
+**Reason:** As with Forgekeeper Bram, a hidden-deck search must allow zero legal results rather than requiring the engine to prove a target exists.
+
+### Wingclip Charm
+
+**Current prototype:** Relic; attached Gale creature deals +20 damage if it became Vanguard this turn.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** **Relic — Wingclip Charm:** While attached to a Gale creature, that creature's attacks deal 20 more damage during a turn in which that creature became Vanguard.
+
+### Structure consequence
+
+The Gale Tactic STRUCTURE pass must support:
+
+1. optional player/opponent switching in Cyclone Route;
+2. persistent Realm withdrawal discount in Highwind Spires;
+3. Pressure Compass's once-per-turn movement listener;
+4. Tailwind Map's `0..1` hidden-deck search;
+5. Wingclip Charm's `became_vanguard_turn` static attack modifier.
+
+Clear Skies, Featherstep, Pilot Sera and Scout Zeph already map closely to generic operations but must remain card-name agnostic.
+
+### Tactic package decision
+
+**GALE-06 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+---
+
+## GALE-07 — Skyshift exact 60-card starter audit
+
+**Starter identity:** `Skyshift` remains the Gale starter for **switching, low withdrawal and positional attacks**, with **Blinded** as its signature condition and Aeralith — Storm Shepherd as its Starbound/Mythic formation finisher.
+
+### Exact current recipe check
+
+Fresh starter inventory confirms:
+
+- **60 cards exactly**
+- **22 Creatures / 18 Essence / 20 Tactics**
+- **21 distinct starter identities**
+- **14 legal opening creature copies** after Aeralith normalization: 6 Babies plus 8 Standalone copies across Cloudray, Gustfox, Pinionserpent and Aeralith
+- Two complete evolution lines at `3 Baby → 2 Teen → 2 Adult`: Driftlet → Skyweaver → Tempestalon and Whiffin → Slipwing → Skyrend
+- No orphan evolution cards
+- Essence remains `14 Basic Gale / 2 Breeze / 2 Draft`
+- Tactics remain `3 Tailwind Map / 3 Featherstep / 2 Clear Skies / 2 Pilot Sera / 2 Scout Zeph / 3 Wingclip Charm / 2 Pressure Compass / 3 Highwind Spires`
+- Pack-only **Zephyrhare, Jetstream Essence and Cyclone Route** are excluded
+- Every starter card is Gale; there is no off-element inclusion
+- Normal identities remain within the 4-copy gameplay limit; Aeralith appears exactly once and satisfies the Mythic one-copy-per-identity rule
+- Aeralith is the current Gale **Starbound** card; no other Gale identity in this completed design pass is designated Starbound
+
+### Aeralith normalization inside the starter
+
+The prototype recipe still labels Aeralith as `Creature — Mythic`. During STRUCTURE, that becomes **Creature — Standalone** with **Mythic** retained as class/trait, **Starbound** retained as prestige metadata and explicit `reward_value = 2`.
+
+### Starter decision
+
+**GALE-07 audit: KEEP THE EXACT 60-CARD RECIPE PROVISIONALLY.**
+
+The composition already gives Gale sufficient opening creatures, two complete evolution families, heavy access to low-withdrawal bodies and a Tactic package that exercises the intended movement identity without requiring the pack-only cards.
+
+The following are balance-test questions, not current defects:
+
+1. whether Driftlet/Skyweaver/Tempestalon plus Wingclip Charm creates excessive Vanguard-entry burst;
+2. whether Pilot Sera, Featherstep, Draft Essence and Aeralith together create too many free or near-free formation changes;
+3. whether repeated 0-cost withdrawal bodies make positional counterplay too difficult;
+4. whether Pressure Compass draws too efficiently when Gale is switching on both players' turns;
+5. whether Skyrend's Reserve-target access remains fair at the explicit 20-damage penalty;
+6. whether Blinded's current random-target effect is too swingy when Aeralith and Pinionserpent can apply it reliably;
+7. whether 18 Essence reaches Aeralith's four-Gale Starbound attack at an appropriate pace;
+8. whether 3 Highwind Spires makes the starter's already-low withdrawal values effectively free too often.
+
+These questions belong in deterministic AI Test Match followed by human playtesting rather than speculative deck-count changes now.
+
+### Gale element completion state
+
+**GALE CURRENT-RULES DESIGN AUDIT: COMPLETE — 24 / 24 IDENTITIES REVIEWED, STARTER RECIPE REVIEWED.**
+
+Gale is **not registry-ready yet**. Weakness/resistance remains pending the cross-element review, all numeric values remain provisional until AI/human testing, and accepted designs still need deterministic structured metadata. The current first-release registry remains prototype evidence only.
+
+---
+
 ## Next bounded audit
 
-**GALE — complete element audit**
+**GROVE — complete element audit**
 
-Audit all 24 active Gale identities as one coherent element package, including both evolution families, Standalones, Aeralith — Storm Shepherd, all four Gale Essence cards, all nine Gale Tactics and the exact 60-card `Skyshift` starter. Apply the locked Starbound yes/no decision to every card, normalize Mythic stage/class separation, keep weakness/resistance pending cross-element review, and only STRUCTURE after the complete Gale design pass is accepted.
+Audit all 24 active Grove identities as one coherent element package, including both evolution families, Standalones, Elderbloom, all four Grove Essence cards, all nine Grove Tactics and the exact 60-card `Wildgrowth` starter. Apply the locked Starbound yes/no rule, normalize Mythic stage/class separation, keep weakness/resistance pending cross-element review and only STRUCTURE after the whole Grove design pass is accepted.
