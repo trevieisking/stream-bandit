@@ -1,6 +1,6 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const VERSION = "Stream Bandit TCG private alpha API v0.2";
+const VERSION = "Stream Bandit TCG private alpha API v0.3";
 const corsHeaders={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type","Access-Control-Allow-Methods":"POST, OPTIONS"};
 const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:{...corsHeaders,"Content-Type":"application/json","Cache-Control":"no-store"}});
 const env=(n:string)=>Deno.env.get(n)||"";
@@ -38,6 +38,7 @@ Deno.serve(async(req)=>{
   if(action==="choose_starter"){const id=String(body.starter_id||"").trim();if(!id)return json({ok:false,error:"starter_id_required",version:VERSION},400);return json({version:VERSION,result:await rpc("tcg_server_grant_starter",{p_user_id:userId,p_starter_id:id})})}
   if(action==="create_room"){const d=String(body.deck_id||"").trim();if(!d)return json({ok:false,error:"deck_id_required",version:VERSION},400);return json({version:VERSION,result:await rpc("tcg_server_create_room",{p_user_id:userId,p_deck_id:d})})}
   if(action==="join_room"){const code=String(body.join_code||"").trim().toUpperCase(),d=String(body.deck_id||"").trim();if(!code||!d)return json({ok:false,error:"join_code_and_deck_id_required",version:VERSION},400);return json({version:VERSION,result:await rpc("tcg_server_join_room",{p_user_id:userId,p_join_code:code,p_deck_id:d})})}
+  if(action==="matchmake"){const d=String(body.deck_id||"").trim();if(!d)return json({ok:false,error:"deck_id_required",version:VERSION},400);const r:any=await rpc("tcg_server_matchmake",{p_user_id:userId,p_deck_id:d});let match=null;if(r?.paired&&r?.room_id)match=await initialize(String(r.room_id));return json({version:VERSION,result:r,match})}
   if(action==="set_ready"){const room=String(body.room_id||"").trim(),d=String(body.deck_id||"").trim();if(!room||!d)return json({ok:false,error:"room_id_and_deck_id_required",version:VERSION},400);const r:any=await rpc("tcg_server_set_room_ready",{p_user_id:userId,p_room_id:room,p_deck_id:d,p_ready:body.ready!==false});let match=null;if(r?.all_ready)match=await initialize(room);return json({version:VERSION,result:r,match})}
   if(action==="room_snapshot"){const room=String(body.room_id||"").trim();return json({version:VERSION,result:await rpc("tcg_server_room_snapshot",{p_user_id:userId,p_room_id:room})})}
   if(action==="match_view"){const match=String(body.match_id||"").trim();const {data,error}=await user.from("tcg_match_views").select("revision,view_state,updated_at").eq("match_id",match).eq("user_id",userId).maybeSingle();if(error)return json({ok:false,version:VERSION,error:error.message},400);return json({ok:true,version:VERSION,view:data})}
