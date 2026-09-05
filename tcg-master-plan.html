@@ -148,6 +148,42 @@
     <article class="card wide">
       <h3>Modes</h3>
       <p><strong>Arcade</strong> is the current non-ranked progression mode. Ranked matchmaking, player XP/rank and battle rewards are master-plan systems. Private friend/test rooms remain useful for testing and direct battles and are not the normal reward-eligible matchmaking path.</p>
+      <p><strong>Test Deck Battle / AI Test Match</strong> is a separate QA mode for testing decks and card interactions against a deterministic computer opponent. It never awards rank, XP, Battle Pass Tokens, Trade Tokens, Shop Coins, reward progression or public matchmaking statistics.</p>
+    </article>
+  </section>
+
+  <h2>Test Deck Battle / AI Test Match</h2>
+  <section class="grid">
+    <article class="card">
+      <h3>Purpose</h3>
+      <ul>
+        <li>Provide a fast repeatable battle opponent whenever a new deck, starter, card rewrite or engine change needs testing.</li>
+        <li>Allow developers/testers to choose a current test deck for the human seat and a selected current test deck for the AI seat.</li>
+        <li>Catch illegal actions, broken effects, dead turns, impossible choices, balance spikes, bad deck curves and engine regressions before human-vs-human testing.</li>
+        <li>Remain a testing instrument, not the authority for final balance; human playtesting is still required.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>AI implementation rule</h3>
+      <ul>
+        <li>Use a <strong>deterministic in-house rules/strategy bot</strong>, not a paid external generative-AI service.</li>
+        <li>The bot submits moves through the same server-authoritative legal action path used by a player rather than bypassing the battle engine.</li>
+        <li>The bot may inspect only information that its seat is legally allowed to know; it must not cheat by reading the opponent's hidden hand, deck order or Reward Cards.</li>
+        <li>Strategy profiles may evolve from simple legal-play heuristics to stronger tactical evaluation without changing the battle rules.</li>
+      </ul>
+    </article>
+    <article class="card wide">
+      <h3>Reproducible QA contract</h3>
+      <table class="table">
+        <tr><th>Requirement</th><th>Locked behaviour</th></tr>
+        <tr><td>Seeded randomness</td><td>Test matches can use a recorded RNG seed so tosses, shuffles and random effects can be reproduced during debugging.</td></tr>
+        <tr><td>Version binding</td><td>Each test result records the human deck revision, AI deck revision, card-registry/rules version and battle-engine version.</td></tr>
+        <tr><td>Action log</td><td>Record the legal action sequence, pending choices, result and any server error/fail-closed event so a failed match can be replayed or inspected.</td></tr>
+        <tr><td>No economy writes</td><td>No rank, XP, streak, rewards, currency, Battle Pass, trading or collection rewards are issued by AI test matches.</td></tr>
+        <tr><td>No matchmaking pollution</td><td>AI test matches do not enter public matchmaking queues or competitive/player statistics.</td></tr>
+        <tr><td>Future batch testing</td><td>The same deterministic bot contract may later run repeated deck-vs-deck simulations to identify suspicious matchups, but simulation output remains QA evidence rather than an automatic balance decision.</td></tr>
+      </table>
+      <p class="note">A future player-facing <strong>Practice vs AI</strong> mode may reuse this engine with owned legal decks, but it remains separate from the internal Test Deck Battle controls and still cannot farm the competitive economy.</p>
     </article>
   </section>
 
@@ -219,6 +255,7 @@
         <li>Three current old attacks explicitly need a pending-choice engine: Celestyr — Dream Ray, Nebulynx — Starfall Path and Myceliarch — Mycelial Bloom.</li>
         <li>Creature abilities still need a deterministic structured registry/interpreter pass after their card designs are audited.</li>
         <li>The legacy <span class="mono">t.html</span> Arcade Lab is a useful branch test harness, not the final production route.</li>
+        <li>The AI Test Match bot is planned QA infrastructure and must be built only after the final deterministic card/action contracts are stable enough for it to consume.</li>
       </ul>
     </article>
   </section>
@@ -229,15 +266,16 @@
     <div class="stage"><div class="num">2</div><div><h3>Rebuild/check the eight exact 60-card starters</h3><p class="muted">Each starter must teach and express its element properly, maintain sensible Essence consistency, and remain playable under the finished rules.</p></div></div>
     <div class="stage"><div class="num">3</div><div><h3>Structure attacks and card effects</h3><p class="muted">Encode final attacks/effects as deterministic registry data. Printed wording becomes presentation, never runtime logic.</p></div></div>
     <div class="stage"><div class="num">4</div><div><h3>Finish creature abilities and pending choices</h3><p class="muted">Add deterministic ability timing, targets, selections, triggers, lifecycle expiry and private-choice handling.</p></div></div>
-    <div class="stage"><div class="num">5</div><div><h3>Two-user private-alpha integration</h3><p class="muted">Desktop user + phone user: sign in, choose starter/deck, enter matchmaking together, complete setup and play a full battle through completion/rewards.</p></div></div>
-    <div class="stage"><div class="num">6</div><div><h3>Build standalone public entry + authenticated TCG shell</h3><p class="muted">Create the final TCG-owned landing/SEO surfaces, shared Stream Bandit account sign-up/sign-in bridge and protected game application without importing the Stream Bandit shell.</p></div></div>
-    <div class="stage"><div class="num">7</div><div><h3>Final transfer and promotion</h3><p class="muted">Only after exact-head CI, database/function deployment evidence and player-facing testing. Publish the finished standalone TCG and add one Stream Bandit navigation link to it; the old live prototype does not need compatibility preservation.</p></div></div>
+    <div class="stage"><div class="num">5</div><div><h3>Build Test Deck Battle / AI Test Match</h3><p class="muted">Add a deterministic no-reward bot opponent using the same legal action APIs, seeded randomness and replayable QA logs. Use it to exercise new decks and interactions before two-human testing.</p></div></div>
+    <div class="stage"><div class="num">6</div><div><h3>Two-user private-alpha integration</h3><p class="muted">Desktop user + phone user: sign in, choose starter/deck, enter matchmaking together, complete setup and play a full battle through completion/rewards.</p></div></div>
+    <div class="stage"><div class="num">7</div><div><h3>Build standalone public entry + authenticated TCG shell</h3><p class="muted">Create the final TCG-owned landing/SEO surfaces, shared Stream Bandit account sign-up/sign-in bridge and protected game application without importing the Stream Bandit shell.</p></div></div>
+    <div class="stage"><div class="num">8</div><div><h3>Final transfer and promotion</h3><p class="muted">Only after exact-head CI, database/function deployment evidence and player-facing testing. Publish the finished standalone TCG and add one Stream Bandit navigation link to it; the old live prototype does not need compatibility preservation.</p></div></div>
   </section>
 
   <h2>Promotion truth</h2>
   <section class="grid">
     <article class="card"><h3 class="good">Branch development</h3><p><strong>PROMOTE</strong> when each bounded change passes exact-head evidence.</p></article>
-    <article class="card"><h3 class="hold">PR merge / production</h3><p><strong>HOLD</strong> until the rebuilt cards, deterministic engine, standalone product boundary and two-user battle flow are proven together.</p></article>
+    <article class="card"><h3 class="hold">PR merge / production</h3><p><strong>HOLD</strong> until the rebuilt cards, deterministic engine, AI test harness, standalone product boundary and two-user battle flow are proven together.</p></article>
   </section>
 
   <p class="footer">Portable development ledger for Stream Bandit TCG PR #549. This file intentionally has no remote dependencies, no production API calls and no live navigation ownership.</p>
