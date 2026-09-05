@@ -29,7 +29,7 @@ The branch migration `20260905105500_tcg_economy_and_copy_limit_alignment.sql` s
 - Creature evolution uses **Baby → Teen → Adult**.
 - **Standalone** is a valid creature stage and may be a legal starting creature.
 - Every creature requires **one named Ability** separate from its attacks.
-- A Baby Ability should be short and introduce its family idea; Teen develops it; Adult expresses the family's signature identity; Standalone has a clear deck role.
+- A Baby Ability should be short and introduce the family idea; Teen develops it; Adult expresses the family's signature identity; Standalone has a clear deck role.
 - Only one evolution per creature stack per turn; ordinary evolution cannot occur during that player's first turn or on the same turn the creature entered play.
 - Printed creature HP remains within the current **40–390** range.
 - Astral's identity is foresight, card selection, prediction, sequencing and rare Timefold access.
@@ -270,8 +270,137 @@ All HP, withdrawal, attack costs and base damage remain provisional until AI Tes
 
 ---
 
+## ASTRAL-03 — Standalone package
+
+**Package purpose:** Keep Standalone as a real starting-creature class while giving each Astral Standalone a distinct role that reinforces foresight and sequencing rather than acting as an unevolved filler body.
+
+### Cometmanta
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 180
+- Withdrawal: **missing**
+- Structured Ability: **missing**
+- Legacy `effect_text`: `Passing Orbit: when this creature moves to Reserve, look at the top 2 cards of your deck and return them in either order.`
+- Legacy attacks: `2 Astral — Comet Ray — 60; 3 Astral — Falling Star — 100.`
+
+**Audit:** **TUNE**
+
+**Reason:** The movement/foresight identity is good, but the whole card is packed into legacy free text, has no explicit withdrawal value and the movement trigger is broad enough to invite repeated-trigger ambiguity.
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **180**
+- Withdrawal: **2** provisional
+- **Ability — Passing Orbit:** Once during your turn, when this creature moves from Vanguard to Reserve, look at the top 2 cards of your deck and return them in either order.
+- **Attack — Comet Ray:** `2 Astral — 60 damage.`
+- **Attack — Falling Star:** `3 Astral — 100 damage.`
+
+**Why this fits:** Cometmanta becomes the Astral movement scout: it rewards a deliberate withdrawal or switch without creating a repeatable loop from every zone movement.
+
+### Orbitortoise
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 170
+- Withdrawal: 2
+- Ability: **missing**
+- Attack 1: `2 Astral — Orbit Bash — 50.`
+- Attack 2: `3 Astral — Gravity Shell — 80; gain 20 Shield.`
+
+**Audit:** **TUNE**
+
+**Reason:** Gravity Shell already gives this creature a defensive Astral identity, but the card violates the mandatory named-Ability rule.
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **170**
+- Withdrawal: **2**
+- **Ability — Forecast Shell:** The first time during your turn you look at one or more cards in your deck through an effect, gain 10 Shield on this creature. This Ability can contribute no more than 20 Shield to this creature at one time.
+- **Attack — Orbit Bash:** `2 Astral — 50 damage.`
+- **Attack — Gravity Shell:** `3 Astral — 80 damage. After damage, gain 20 Shield on this creature.`
+
+**Why this fits:** Orbitortoise is the Astral stabilizer. It converts successful foresight into modest protection while Gravity Shell remains its larger defensive payoff.
+
+**Engine note:** Final Shield cap/consumption semantics must come from the universal Shield rule, not from Orbitortoise-specific runtime code.
+
+### Prismowl
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 110
+- Withdrawal: 1
+- **Ability — Wide Eyes:** The first time each turn you look at one or more cards in a hidden zone through an effect, draw 1 card then discard 1 card.
+- Attack 1: `1 Astral — Prism Peck — 30.`
+- Attack 2: `2 Astral — Insight Dive — 60.`
+
+**Audit:** **KEEP** with wording normalization
+
+**Reason:** Prismowl already has a clear low-HP utility role and rewards Astral's hidden-information play without creating raw unconditional draw advantage.
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **110**
+- Withdrawal: **1**
+- **Ability — Wide Eyes:** The first time during your turn you look at one or more cards in a hidden zone through an effect, draw 1 card, then discard 1 card.
+- **Attack — Prism Peck:** `1 Astral — 30 damage.`
+- **Attack — Insight Dive:** `2 Astral — 60 damage.`
+
+**Engine note:** “Hidden zone” must be a defined selector/category in the shared effect grammar, covering only zones the resolving effect legally permits the controller to inspect.
+
+### Starwhale
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 200
+- Withdrawal: 3
+- Ability: **missing**
+- Attack 1: `2 Astral — Gravity Song — 60.`
+- Attack 2: `3 Astral — Starwake — 90.`
+
+**Audit:** **TUNE**
+
+**Reason:** The bulky body is useful, but without an Ability it has no special deck role and its high withdrawal is simply a penalty rather than an Astral sequencing decision.
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **200**
+- Withdrawal: **3**
+- **Ability — Star Current:** Once during your turn, after you look at one or more cards in your deck through an effect, this creature's withdrawal cost is 1 less for the rest of that turn.
+- **Attack — Gravity Song:** `2 Astral — 60 damage.`
+- **Attack — Starwake:** `3 Astral — 90 damage.`
+
+**Why this fits:** Starwhale remains the heavier Astral Standalone but can be repositioned more efficiently when the player first performs the element's core foresight action.
+
+### Weakness/resistance decision for ASTRAL-03
+
+No Astral Standalone receives a guessed weakness or resistance during this isolated element pass. Those fields remain **explicitly pending cross-element matchup review**. The eventual decision must compare all eight elements together, assign deliberate per-creature values where they improve gameplay, and record an explicit reviewed “none” where no weakness/resistance is appropriate.
+
+### Standalone package decision
+
+**ASTRAL-03 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+The four Standalones now have separate reasons to exist:
+
+1. **Cometmanta:** movement + deck-order scouting;
+2. **Orbitortoise:** foresight converted into Shield protection;
+3. **Prismowl:** hidden-information hand filtering;
+4. **Starwhale:** bulky Vanguard/pivot whose mobility improves after foresight.
+
+All new numbers and existing attack values remain provisional until the whole Astral package can be exercised by deterministic AI Test Match and human playtesting.
+
+---
+
 ## Next bounded audit
 
-**ASTRAL-03 — Standalone package**
+**ASTRAL-04 — Celestyr — Dream Cartographer**
 
-Review Cometmanta, Orbitortoise, Prismowl and Starwhale. Focus on giving every Standalone a clear deck role, unpacking Cometmanta's legacy `effect_text`, supplying missing Abilities/withdrawal data, and explicitly reviewing weakness/resistance state without forcing meaningless values.
+Review the Astral Mythic as **Standalone stage + Mythic trait**, preserve the one-Starbound-per-player Timefold contract, make reward value explicit, and decide whether Dream Cartographer, Dream Ray and Second Horizon can be kept with wording/schema normalization rather than mechanical replacement.
