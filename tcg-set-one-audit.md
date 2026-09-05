@@ -941,8 +941,127 @@ All HP, withdrawal, attack costs, damage and healing values remain provisional u
 
 ---
 
+## EMBER-03 — Standalone package
+
+**Package purpose:** Keep Ember's Standalones as four different starting-creature roles instead of repeating the evolution families: a light finisher, a self-Scorched bruiser, a risky Essence accelerator and a pack-only recovery/support creature.
+
+### Ashcobra
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 110
+- Withdrawal: 1
+- Ability: **missing**
+- Attack 1: `1 Ember — Coal Fang — 30.`
+- Attack 2: `2 Ember — Ashcoil — 60.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **110**
+- Withdrawal: **1**
+- **Ability — Ash Scent:** The first attack this creature declares during your turn deals 10 more damage if the opposing Vanguard already has damage on it when that attack is declared.
+- **Attack — Coal Fang:** `1 Ember — 30 damage.`
+- **Attack — Ashcoil:** `2 Ember — 60 damage.`
+
+**Reason:** Ashcobra becomes a low-HP pressure/finisher body that rewards attacking an opponent already softened by combat, Scorched or another legal effect. It does not copy Glowcub's self-damaged payoff and does not create another condition engine.
+
+### Kilnback
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 180
+- Withdrawal: 2
+- Ability: **missing**
+- Attack 1: `2 Ember — Kiln Ram — 70.`
+- Attack 2: `3 Ember — Overheat — 110; this creature becomes Scorched.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **180**
+- Withdrawal: **2**
+- **Ability — Furnace Hide:** While this creature is Scorched, damage dealt to it by opposing attacks is reduced by 10 before Shield and damage are applied.
+- **Attack — Kiln Ram:** `2 Ember — 70 damage.`
+- **Attack — Overheat:** `3 Ember — 110 damage. After damage, this creature becomes Scorched.`
+
+**Reason:** Kilnback deliberately accepts Scorched as the price of a stronger attack, but Furnace Hide makes that state a bruiser stance rather than pure downside. Scorched still deals its ordinary Aftermath damage and can recover normally, so the Ability mitigates opponent pressure without nullifying Ember's own risk.
+
+**Engine note:** Furnace Hide later needs a generic incoming-attack damage modifier keyed to the creature's own condition state. It must not alter direct condition damage and must not become a Kilnback-specific damage branch.
+
+### Magmagecko
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 90
+- Withdrawal: 0
+- **Ability — Ember Feed:** Once during your turn, you may attach 1 Basic Ember Essence from your hand to 1 damaged friendly Ember creature. If you do, place 10 damage on that creature. This is additional to your normal manual Essence attachment.
+- Attack: `1 Ember — Lava Flick — 30.`
+
+**Audit:** **KEEP** with rules normalization
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **90**
+- Withdrawal: **0**
+- **Ability — Ember Feed:** Once during your turn, you may attach 1 Basic Ember Essence from your hand to 1 damaged friendly Ember creature. If you do, place 10 damage on that creature. This attachment is additional to your normal manual Essence attachment for the turn.
+- **Attack — Lava Flick:** `1 Ember — 30 damage.`
+
+**Reason:** Magmagecko already has a distinct and useful role: it converts controlled damage into accelerated access to attack costs without creating an external energy system. The effect still consumes an actual Basic Ember Essence card from hand and explicitly sits outside the one-manual-Essence-per-turn allowance.
+
+**Engine note:** STRUCTURE needs a generic Ability-driven extra attachment operation with card-family/element/zone/target filters and a post-attachment self/friendly damage instruction. It must not be implemented as a Magmagecko card-ID exception.
+
+### Cinderburrow
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 130
+- Withdrawal: **missing**
+- Structured Ability/attacks: **missing**
+- Pack-only: yes
+- Legacy `effect_text`: `130 HP. Ash Tunnel: when played to Reserve, heal 10 from a damaged Ember creature. 2 Ember — Burrow Burst — 60; if your Vanguard is Scorched, +20.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **130**
+- Withdrawal: **1** provisional
+- Pack-only: **yes**
+- **Ability — Ash Tunnel:** When you play this creature from your hand into an empty Reserve space during your Build phase, choose 1 damaged friendly Ember creature and heal 10 damage from it.
+- **Attack — Burrow Burst:** `2 Ember — 60 damage. If this creature is Scorched, this attack deals 20 more damage.`
+
+**Reason:** Cinderburrow remains the pack-only support option, but the old wording is normalized into real fields. Ash Tunnel gives immediate recovery without replacing the stronger self-damage payoffs elsewhere. Changing Burrow Burst from “if your Vanguard is Scorched” to “if this creature is Scorched” removes a redundant Vanguard-state check when Cinderburrow itself is the attacking Vanguard and makes the risk/payoff local and deterministic.
+
+**Engine note:** Ash Tunnel needs a generic on-play-to-Reserve friendly-target heal choice. Burrow Burst can later use the generic attacking-creature-condition predicate.
+
+### Standalone package decision
+
+**EMBER-03 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+The four Standalones now have separate jobs:
+
+1. **Ashcobra:** light finisher against an already-damaged opposing Vanguard;
+2. **Kilnback:** self-Scorched bruiser whose defensive Ability softens opposing attack damage while it accepts Scorched's own risk;
+3. **Magmagecko:** risky extra Basic Ember Essence acceleration for damaged friendly Ember creatures;
+4. **Cinderburrow:** pack-only recovery/support that can later convert its own Scorched state into attack pressure.
+
+Weakness/resistance remains pending cross-element review, and all new numbers remain provisional until deterministic AI Test Match and human playtesting.
+
+---
+
 ## Next bounded audit
 
-**EMBER-03 — Standalone package**
+**EMBER-04 — Pyrohorn — Ash Crown**
 
-Review Ashcobra, Kilnback, Magmagecko and pack-only Cinderburrow as four different Ember roles: fast pressure/finisher, self-Scorched bruiser, risky Essence acceleration and recovery/Scorched synergy. Preserve their distinct identities, add missing named Abilities/withdrawal data where required, and avoid turning all four into generic damage-bonus cards. Pyrohorn remains a separate Mythic audit after the Standalone package.
+Normalize Pyrohorn from the prototype `stage = Mythic` schema into **Standalone + Mythic trait**, preserve its damaged-team Ember identity, make its two-Reward value explicit, review Ash Crown/Crownfire/Ashen Stampede against the shared one-Starbound-per-player-per-match rules, and keep all values provisional until the full Ember package can be tested.
