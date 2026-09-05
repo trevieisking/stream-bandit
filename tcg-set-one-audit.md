@@ -1060,8 +1060,88 @@ Weakness/resistance remains pending cross-element review, and all new numbers re
 
 ---
 
+## EMBER-04 — Pyrohorn — Ash Crown
+
+**Mythic purpose:** Serve as Ember's damaged-team amplifier and late-game pressure Mythic without becoming a fourth evolution stage or automatically consuming the shared Starbound marker.
+
+### Pyrohorn — Ash Crown
+
+**Current prototype**
+
+- Stage: Mythic
+- Creature stage field: Mythic
+- Recipe type: Creature — Mythic
+- Trait: Mythic
+- HP: 340
+- Withdrawal: 3
+- Reward value: implied by Mythic runtime fallback, not explicit in the card definition
+- **Ability — Ash Crown:** Once during your turn, choose 1 damaged friendly Ember creature. Its next attack this turn deals +30 damage; after that attack, place 20 damage on it.
+- **Attack — Crownfire:** `2 Ember — 90.`
+- **Attack — Ashen Stampede:** `4 Ember — 160; each friendly damaged creature makes this attack +10 damage, maximum +40.`
+
+**Audit:** **TUNE**
+
+**Reason:** Pyrohorn's current gameplay identity is strong and already fits Ember. The required correction is mainly schema and deterministic wording: Mythic is a class/trait rather than a creature stage, the two-Reward value should be explicit, and the damaged-team scaling/timing should be stated precisely.
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- Creature stage: **Standalone**
+- Recipe/display type: **Creature — Standalone**
+- Traits: **Mythic**
+- HP: **340**
+- Withdrawal: **3**
+- Reward value: **2**
+- **Ability — Ash Crown:** Once during your turn, choose 1 damaged friendly Ember creature. That creature's next attack this turn deals 30 more damage. After that attack finishes resolving, place 20 damage on that creature.
+- **Attack — Crownfire:** `2 Ember — 90 damage.`
+- **Attack — Ashen Stampede:** `4 Ember — 160 damage. When this attack is declared, count your friendly damaged creatures, including Pyrohorn if it is damaged. This attack deals 10 more damage for each of them, to a maximum of 40 additional damage.`
+
+### Mythic / Starbound decision
+
+Pyrohorn remains **Mythic**, but it does **not** gain a Starbound Power merely because it carries the Mythic trait. Starbound is a specific card mechanic, not a compulsory property of every Mythic creature.
+
+Therefore:
+
+- Crownfire is an ordinary attack;
+- Ashen Stampede is an ordinary attack with damaged-team scaling;
+- neither attack consumes the player's shared Starbound marker;
+- Pyrohorn can coexist in a deck with another Mythic identity subject to the normal one-copy-per-Mythic-identity rule;
+- if another card uses a Starbound Power, that separate card still uses the player's one shared Starbound marker for the match.
+
+### Runtime compatibility note
+
+The current branch `rewardValue()` helper already recognises the `Mythic` trait and therefore preserves a two-Reward defeat value even after the stage is normalized from `Mythic` to `Standalone`. The later registry STRUCTURE pass should still write **`reward_value = 2` explicitly** rather than depend on fallback inference.
+
+The current attack interpreter also already recognises the prototype phrase for “friendly damaged creature” and calculates `+10` for each damaged friendly creature up to `+40`. That is useful implementation evidence, but the final structured effect must use explicit deterministic metadata rather than printed-English parsing.
+
+### Ash Crown structure note
+
+Ash Crown needs a generic once-per-turn friendly-creature selector with the following filters and lifecycle:
+
+1. controller = self;
+2. element = Ember;
+3. damaged = true;
+4. apply one next-attack modifier of +30 expiring at end of turn;
+5. after the affected creature finishes that attack, place 20 damage on that same creature.
+
+If the chosen creature never attacks before the turn ends, neither the attack bonus nor the post-attack 20 damage carries into a later turn. No Pyrohorn card-ID branch should be introduced.
+
+### Weakness/resistance decision
+
+Weakness and resistance remain **pending the cross-element matchup review**. No value is guessed during this isolated Ember Mythic pass.
+
+### Mythic decision
+
+**EMBER-04 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+Pyrohorn keeps its three defining concepts—Ash Crown, Crownfire and Ashen Stampede—while the current-rules model cleanly separates its legal creature stage from its Mythic prestige class.
+
+All HP, attack costs, damage and modifier values remain provisional until deterministic AI Test Match and human playtesting.
+
+---
+
 ## Next bounded audit
 
-**EMBER-04 — Pyrohorn — Ash Crown**
+**EMBER-05 — Essence package**
 
-Normalize Pyrohorn from the prototype `stage = Mythic` schema into **Standalone + Mythic trait**, preserve its damaged-team Ember identity, make its two-Reward value explicit, review Ash Crown/Crownfire/Ashen Stampede against the shared one-Starbound-per-player-per-match rules, and keep all values provisional until the full Ember package can be tested.
+Review Basic Ember Essence, Hearth Essence, Smolder Essence and pack-only Wildfire Essence. Preserve the real-card attachment model and one-manual-Essence-per-turn rule, normalize trigger timing, make Wildfire's Scorched risk/reward wording deterministic, and replace the current Hearth/Smolder card-ID shortcuts with generic attachment metadata during the later STRUCTURE pass.
