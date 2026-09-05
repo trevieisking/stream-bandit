@@ -22,7 +22,7 @@
       <span class="badge hold">PR MERGE: HOLD</span>
       <span class="badge hold">PRODUCTION: HOLD</span>
       <span class="badge">TCG ONLY</span>
-      <span class="badge">UNLISTED / NO LIVE ROUTE</span>
+      <span class="badge">STANDALONE PRODUCT</span>
     </div>
   </section>
 
@@ -44,6 +44,45 @@
         <li>Do not use the legacy live TCG as the design baseline.</li>
         <li>Do not freeze old Set One effects into the engine before the current-rules card audit is complete.</li>
         <li>Do not merge only because GitHub reports the PR mergeable.</li>
+      </ul>
+    </article>
+  </section>
+
+  <h2>Permanent product architecture</h2>
+  <section class="grid">
+    <article class="card">
+      <h3>Standalone Stream Bandit TCG product</h3>
+      <ul>
+        <li><strong>Stream Bandit TCG owns its own application shell, navigation, visual identity and route hierarchy.</strong></li>
+        <li>The main Stream Bandit platform provides only one discovery/navigation link labelled <strong>Stream Bandit TCG</strong>.</li>
+        <li>The Stream Bandit shell must not be loaded, copied or made the navigation owner inside the TCG product.</li>
+        <li>The legacy prototype route is disposable and does not constrain the final TCG location or frontend architecture.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Shared account, separate product UI</h3>
+      <ul>
+        <li>Existing Stream Bandit account identity/authentication is reused so a Stream Bandit user can sign in to the TCG with the same account.</li>
+        <li>New users may sign up through the TCG entry flow, creating the same shared Stream Bandit account identity rather than a duplicate account system.</li>
+        <li>Gameplay, collection, deck building, trading, shop, battle pass, matchmaking and player profile areas require authentication.</li>
+        <li>Authentication may be shared; shell ownership, menus, page layout and product state remain TCG-owned.</li>
+      </ul>
+    </article>
+    <article class="card wide">
+      <h3>SEO and public discovery</h3>
+      <p class="note"><strong>The finished TCG must be discoverable on the public web without making gameplay public.</strong> Public, indexable pages should explain the game and lead users into sign-up/sign-in; authenticated game routes stay protected.</p>
+      <table class="table">
+        <tr><th>Surface</th><th>Indexing / purpose</th></tr>
+        <tr><td>TCG home / landing page</td><td>Public and indexable. Original SEO copy describing Stream Bandit TCG, its online card-battle identity, elements, collecting and competitive play.</td></tr>
+        <tr><td>How to Play / Rules</td><td>Public and indexable. Search-friendly canonical explanation of Vanguard, Reserve, Reward Cards, Essence, Tactics, evolution, Shield and conditions.</td></tr>
+        <tr><td>Cards / Sets / Series information</td><td>Public and indexable where appropriate. Search-visible set overviews and card-discovery content without exposing private player data.</td></tr>
+        <tr><td>Sign up / Sign in</td><td>Public entry points; authentication bridge into the standalone product.</td></tr>
+        <tr><td>Game app, Collection, Deck Builder, Trading, Shop, Battle Pass, Matchmaking, account areas</td><td>Authenticated product routes; not used as the primary SEO surface.</td></tr>
+      </table>
+      <ul>
+        <li>Final public pages need unique page titles, meta descriptions, canonical URLs, Open Graph/social metadata and appropriate structured data.</li>
+        <li>The standalone TCG needs its own sitemap/robots strategy and internal SEO copy rather than inheriting generic Stream Bandit page metadata.</li>
+        <li>SEO copy must remain original to Stream Bandit TCG and accurately describe the finished rules/features; do not publish claims for unfinished features as though they are live.</li>
       </ul>
     </article>
   </section>
@@ -191,13 +230,14 @@
     <div class="stage"><div class="num">3</div><div><h3>Structure attacks and card effects</h3><p class="muted">Encode final attacks/effects as deterministic registry data. Printed wording becomes presentation, never runtime logic.</p></div></div>
     <div class="stage"><div class="num">4</div><div><h3>Finish creature abilities and pending choices</h3><p class="muted">Add deterministic ability timing, targets, selections, triggers, lifecycle expiry and private-choice handling.</p></div></div>
     <div class="stage"><div class="num">5</div><div><h3>Two-user private-alpha integration</h3><p class="muted">Desktop user + phone user: sign in, choose starter/deck, enter matchmaking together, complete setup and play a full battle through completion/rewards.</p></div></div>
-    <div class="stage"><div class="num">6</div><div><h3>Final transfer and promotion</h3><p class="muted">Only after exact-head CI, database/function deployment evidence and player-facing testing. Transfer the finished TCG into its permanent route; the old live prototype does not need compatibility preservation.</p></div></div>
+    <div class="stage"><div class="num">6</div><div><h3>Build standalone public entry + authenticated TCG shell</h3><p class="muted">Create the final TCG-owned landing/SEO surfaces, shared Stream Bandit account sign-up/sign-in bridge and protected game application without importing the Stream Bandit shell.</p></div></div>
+    <div class="stage"><div class="num">7</div><div><h3>Final transfer and promotion</h3><p class="muted">Only after exact-head CI, database/function deployment evidence and player-facing testing. Publish the finished standalone TCG and add one Stream Bandit navigation link to it; the old live prototype does not need compatibility preservation.</p></div></div>
   </section>
 
   <h2>Promotion truth</h2>
   <section class="grid">
     <article class="card"><h3 class="good">Branch development</h3><p><strong>PROMOTE</strong> when each bounded change passes exact-head evidence.</p></article>
-    <article class="card"><h3 class="hold">PR merge / production</h3><p><strong>HOLD</strong> until the rebuilt cards, deterministic engine and two-user battle flow are proven together.</p></article>
+    <article class="card"><h3 class="hold">PR merge / production</h3><p><strong>HOLD</strong> until the rebuilt cards, deterministic engine, standalone product boundary and two-user battle flow are proven together.</p></article>
   </section>
 
   <p class="footer">Portable development ledger for Stream Bandit TCG PR #549. This file intentionally has no remote dependencies, no production API calls and no live navigation ownership.</p>
