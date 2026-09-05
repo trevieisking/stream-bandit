@@ -1996,8 +1996,561 @@ Gale is **not registry-ready yet**. Weakness/resistance remains pending the cros
 
 ---
 
+# GROVE audit
+
+## Grove registry snapshot
+
+Fresh read-only inventory confirms Grove follows the locked Set One element template exactly:
+
+- **24 identities**
+- **11 Creatures / 4 Essence / 9 Tactics**
+- **3 pack-only identities**
+- `Wildgrowth` = **60 cards / 21 identities**
+
+**Locked Grove identity:** evolution, Reserve development, growing pressure, healing, Venomed and Rooted control.
+
+**Pack-only Grove identities:** Bloomhare, Symbiote Essence and Canopy Call.
+
+All Grove cards in this completed pass are explicitly **not Starbound** except Elderbloom — First Canopy.
+
+---
+
+## GROVE-01 — Budburrow → Briarback → Verdantusk
+
+**Family purpose:** Reward building a healthy Reserve: Baby becomes easier to reposition once the board grows, Teen converts Reserve development into healing, and Adult protects the developed board and rewards a full canopy.
+
+### Budburrow
+
+**Current prototype**
+
+- Stage: Baby
+- HP: 80
+- Withdrawal: 1
+- Ability: **missing**
+- Attack: `1 Grove — Sprout Jab — 20.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Baby**
+- HP: **80**
+- Withdrawal: **1**
+- Starbound: **no**
+- **Ability — Root Nest:** While you have at least 2 friendly creatures in your Reserve, this creature's withdrawal cost is 0.
+- **Attack — Sprout Jab:** `1 Grove — 20 damage.`
+
+**Reason:** Root Nest introduces Reserve-count gameplay without giving a Baby free cards or extra healing. It becomes easier to reposition only after the player has actually developed the board.
+
+### Briarback
+
+**Current prototype**
+
+- Stage: Teen; evolves from Budburrow
+- HP: 160
+- Withdrawal: 2
+- **Ability — Growing Wall:** When this creature evolves while you have at least 2 Reserve creatures, heal 30 from it.
+- Attack 1: `2 Grove — Briar Ram — 50.`
+- Attack 2: `3 Grove — Thorn Rush — 80; if you have 3 or more Reserve creatures, +20 damage.`
+
+**Audit:** **KEEP** with wording normalization
+
+**Current-rules design draft v1**
+
+- Stage: **Teen**
+- HP: **160**
+- Withdrawal: **2**
+- Starbound: **no**
+- **Ability — Growing Wall:** When this creature evolves, if you have at least 2 friendly creatures in your Reserve, heal 30 damage from this creature.
+- **Attack — Briar Ram:** `2 Grove — 50 damage.`
+- **Attack — Thorn Rush:** `3 Grove — 80 damage. If you have at least 3 friendly creatures in your Reserve, this attack deals 20 more damage.`
+
+**Engine drift note:** The current branch implements Growing Wall through a direct Briarback card-ID branch in the evolution action. STRUCTURE must replace it with a generic on-evolution Reserve-count predicate plus heal operation.
+
+### Verdantusk
+
+**Current prototype**
+
+- Stage: Adult; evolves from Briarback
+- HP: 300
+- Withdrawal: 3
+- **Ability — Full Canopy:** Your other Grove creatures in Reserve take 10 less attack damage.
+- Attack 1: `2 Grove — Rooted Charge — 80.`
+- Attack 2: `4 Grove — Canopy Crash — 140; if your Reserve is full, heal 20 from each friendly Reserve creature.`
+
+**Audit:** **KEEP** with explicit friendly wording
+
+**Current-rules design draft v1**
+
+- Stage: **Adult**
+- HP: **300**
+- Withdrawal: **3**
+- Starbound: **no**
+- **Ability — Full Canopy:** Damage dealt by opposing attacks to your **other friendly Grove creatures in Reserve** is reduced by 10 before Shield and damage are applied.
+- **Attack — Rooted Charge:** `2 Grove — 80 damage.`
+- **Attack — Canopy Crash:** `4 Grove — 140 damage. After damage, if all 4 of your Reserve spaces are occupied, heal 20 damage from each friendly Reserve creature.`
+
+**Reason:** Verdantusk becomes the completed-board guardian. The protection applies only to opposing attack damage and never to condition/direct/recoil damage.
+
+### Family decision
+
+**GROVE-01 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+The family now progresses cleanly from Reserve-enabled mobility → Reserve-enabled healing/pressure → full-board protection and recovery.
+
+---
+
+## GROVE-02 — Sporeling → Capscout → Myceliarch
+
+**Family purpose:** Combine Grove's Venomed pressure with Device-fed growth and recycling: Baby benefits from Device play, Teen develops the discard-recovery loop, and Adult converts Devices into team healing while recycling them through an attack.
+
+### Sporeling
+
+**Current prototype**
+
+- Stage: Baby
+- HP: 50
+- Withdrawal: 1
+- Ability: **missing**
+- Attack: `1 Grove — Puff Tap — 10; the opposing Vanguard becomes Venomed.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Baby**
+- HP: **50**
+- Withdrawal: **1**
+- Starbound: **no**
+- **Ability — Spore Feed:** The first time during your turn you play a Device, heal 10 damage from this creature.
+- **Attack — Puff Tap:** `1 Grove — 10 damage. After damage, make the opposing Vanguard Venomed.`
+
+**Reason:** Spore Feed gives the Baby a simple taste of the family's Device-growth loop while Puff Tap establishes the Venomed half of the identity.
+
+### Capscout
+
+**Current prototype**
+
+- Stage: Teen; evolves from Sporeling
+- HP: 120
+- Withdrawal: 1
+- Ability: **missing**
+- Attack 1: `1 Grove — Spore Shot — 30.`
+- Attack 2: `2 Grove — Fungal Burst — 50; if the target is Venomed, +20 damage.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Teen**
+- HP: **120**
+- Withdrawal: **1**
+- Starbound: **no**
+- **Ability — Fungal Forage:** When this creature evolves, you may choose up to 1 Device in your discard and put it on the bottom of your deck.
+- **Attack — Spore Shot:** `1 Grove — 30 damage.`
+- **Attack — Fungal Burst:** `2 Grove — 50 damage. If the target is Venomed, this attack deals 20 more damage.`
+
+**Reason:** The Teen now develops both halves of the family: Device recovery through Fungal Forage and a direct Venomed payoff through Fungal Burst.
+
+### Myceliarch
+
+**Current prototype**
+
+- Stage: Adult; evolves from Capscout
+- HP: 240
+- Withdrawal: 2
+- **Ability — Networked Growth:** Once during your turn, if you played a Device this turn, heal 20 from one friendly Grove creature.
+- Attack 1: `2 Grove — Colony Pulse — 70.`
+- Attack 2: `3 Grove — Mycelial Bloom — 110; put 1 Device from your discard on the bottom of your deck.`
+
+**Audit:** **KEEP / TUNE optional discard target**
+
+**Current-rules design draft v1**
+
+- Stage: **Adult**
+- HP: **240**
+- Withdrawal: **2**
+- Starbound: **no**
+- **Ability — Networked Growth:** Once during your turn, if you played a Device during that turn, choose 1 damaged friendly Grove creature and heal 20 damage from it.
+- **Attack — Colony Pulse:** `2 Grove — 70 damage.`
+- **Attack — Mycelial Bloom:** `3 Grove — 110 damage. After damage, you may choose up to 1 Device in your discard and put it on the bottom of your deck.`
+
+**Reason:** Making the Device recovery optional prevents the attack from depending on a discard target being available. Myceliarch remains the family's mature engine: play Device → heal team → attack → recycle Device.
+
+**Engine drift note:** The current attack engine explicitly fails Myceliarch into a card-ID `pending_choice_engine` path. STRUCTURE must replace that with a generic optional public-discard selection and deck-bottom move.
+
+### Family decision
+
+**GROVE-02 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+---
+
+## GROVE-03 — Standalone package
+
+**Package purpose:** Give Grove four distinct starting roles: condition-pressure attacker, Rooted bruiser, condition cleanser and pack-only Reserve healing support.
+
+### Thornmantis
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 120
+- Withdrawal: 1
+- Ability: **missing**
+- Attack 1: `1 Grove — Vine Lash — 30.`
+- Attack 2: `2 Grove — Thorn Cut — 60.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **120**
+- Withdrawal: **1**
+- Starbound: **no**
+- **Ability — Briar Instinct:** The first attack this creature declares during your turn deals 10 more damage if the opposing Vanguard is Venomed or Rooted when that attack is declared.
+- **Attack — Vine Lash:** `1 Grove — 30 damage.`
+- **Attack — Thorn Cut:** `2 Grove — 60 damage.`
+
+**Reason:** Thornmantis becomes a lightweight payoff creature for Grove's two signature pressure conditions without creating another status source itself.
+
+### Mossram
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 180
+- Withdrawal: 2
+- Ability: **missing**
+- Attack 1: `2 Grove — Moss Bash — 60.`
+- Attack 2: `3 Grove — Ramroot — 90; the opposing Vanguard becomes Rooted.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **180**
+- Withdrawal: **2**
+- Starbound: **no**
+- **Ability — Moss Guard:** While the opposing Vanguard is Rooted, damage dealt to this creature by that Vanguard's attacks is reduced by 10 before Shield and damage are applied.
+- **Attack — Moss Bash:** `2 Grove — 60 damage.`
+- **Attack — Ramroot:** `3 Grove — 90 damage. After damage, make the opposing Vanguard Rooted.`
+
+**Reason:** Mossram becomes a Rooted bruiser rather than another pure damage card. Rooting the opponent can establish its defensive stance for the following exchange.
+
+### Vinecoil
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 140
+- Withdrawal: 1
+- **Ability — Binding Growth:** When this creature is played from hand to Reserve, you may clear Rooted or Crushed from your Vanguard.
+- Attack: `2 Grove — Coil Snap — 50.`
+
+**Audit:** **KEEP** with play-zone wording
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **140**
+- Withdrawal: **1**
+- Starbound: **no**
+- **Ability — Binding Growth:** When you play this creature from your hand into an empty Reserve space during your Build phase, you may clear Rooted or Crushed from your Vanguard.
+- **Attack — Coil Snap:** `2 Grove — 50 damage.`
+
+### Bloomhare
+
+**Current prototype**
+
+- Stage: Standalone
+- HP: 110
+- Withdrawal: **missing**
+- Pack-only: yes
+- Structured Ability/attacks: **missing**
+- Legacy `effect_text`: `110 HP. Spring Growth: when played to Reserve while you have another Grove creature, heal 20 from your Vanguard. 1 Grove — Petal Kick — 30.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- HP: **110**
+- Withdrawal: **1** provisional
+- Pack-only: **yes**
+- Starbound: **no**
+- **Ability — Spring Growth:** When you play this creature from your hand into an empty Reserve space during your Build phase, if you control another friendly Grove creature and your Vanguard has damage, heal 20 damage from your Vanguard.
+- **Attack — Petal Kick:** `1 Grove — 30 damage.`
+
+**Reason:** Bloomhare stays the pack-only Reserve-development healer but is normalized into proper fields and a clear legal trigger.
+
+### Standalone package decision
+
+**GROVE-03 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+Weakness/resistance remains pending the cross-element review for every Grove creature.
+
+---
+
+## GROVE-04 — Elderbloom — First Canopy
+
+**Mythic purpose:** Serve as Grove's explicit Starbound Mythic culmination: ordinary turns reward a developed Reserve with distributed healing, while the once-per-match Starbound attack turns a full canopy into Venomed + Rooted battlefield control.
+
+### Elderbloom — First Canopy
+
+**Current prototype**
+
+- Stage: Mythic
+- Trait: Mythic
+- HP: 360
+- Withdrawal: 4
+- Reward value: implicit by Mythic fallback
+- **Ability — First Canopy:** Once during your turn, if you have 3 or more Reserve creatures, heal 20 from each of up to 2 friendly creatures.
+- Attack 1: `3 Grove — Ancient Bough — 100.`
+- Attack 2: `5 Grove — Forest Awakening — 160; if your Reserve is full, the opposing Vanguard becomes Venomed and Rooted is applied only if its control slot is empty.`
+
+**Audit:** **TUNE** schema/prestige/timing
+
+**Current-rules design draft v1**
+
+- Stage: **Standalone**
+- Creature stage: **Standalone**
+- Recipe/display type: **Creature — Standalone**
+- Traits: **Mythic**
+- Prestige mechanic: **Starbound**
+- HP: **360**
+- Withdrawal: **4**
+- Reward value: **2**
+- **Ability — First Canopy:** Once during your turn, if you have at least 3 friendly creatures in your Reserve, choose up to 2 damaged friendly creatures and heal 20 damage from each chosen creature.
+- **Attack — Ancient Bough:** `3 Grove — 100 damage.`
+- **Starbound Power — Forest Awakening:** `5 Grove — 160 damage. You may declare this attack only if you still have your Starbound marker. Consume that marker when the legal attack is declared. After damage, if all 4 of your Reserve spaces are occupied and the attack target remains in play, make that creature Venomed. If its control-condition slot is empty, also make it Rooted.`
+
+### Starbound decision
+
+Elderbloom is explicitly **Mythic + Starbound** and Forest Awakening is its single Starbound effect.
+
+- First Canopy remains an ordinary once-per-turn Ability.
+- Ancient Bough remains an ordinary attack.
+- Forest Awakening consumes the player's one shared Starbound marker on legal declaration.
+- The attack remains legal without a full Reserve; the full-canopy state controls only the post-damage condition package.
+- Rooted is applied only if the target's control-condition slot is empty; Venomed uses its separate condition track.
+
+### Runtime note
+
+The current branch can already parse ordinary Venomed/Rooted application phrases, but final STRUCTURE must encode Forest Awakening's Starbound gate, full-Reserve predicate and ordered condition application as metadata rather than printed-English parsing.
+
+### Mythic decision
+
+**GROVE-04 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+---
+
+## GROVE-05 — Essence package
+
+**Package purpose:** Support Grove's healing, evolution and board-development identity while keeping Essence as actual attached cards.
+
+All four Grove Essence identities are explicitly **not Starbound**.
+
+### Basic Grove Essence
+
+**Audit:** **KEEP**
+
+- Provides **1 Grove Essence** while attached and has no additional card effect.
+
+### Bloom Essence
+
+**Current prototype:** Provides Grove; when attached from hand to an evolved Grove creature, heal 20 from it.
+
+**Audit:** **KEEP** with damaged/friendly wording
+
+**Current-rules design draft v1:** Provides **1 Grove Essence** while attached. **When you attach this card from your hand to a damaged friendly evolved Grove creature, heal 20 damage from that creature.**
+
+**Engine drift note:** The current branch implements Bloom through a direct `grove-bloom-essence` card-ID branch in the manual Essence action. STRUCTURE must replace it with generic attachment metadata plus evolved/Grove/damaged predicates.
+
+### Root Essence
+
+**Current prototype:** Provides Grove; attached creature has withdrawal cost 1 less, minimum 0.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** Provides **1 Grove Essence** while attached. The attached creature's withdrawal cost is 1 less, minimum 0.
+
+**Engine drift note:** The current branch implements Root through a direct `grove-root-essence` card-ID check in `withdrawalCost()`. Final STRUCTURE must use a generic static withdrawal-cost modifier.
+
+### Symbiote Essence
+
+**Current prototype:** Pack-only; provides Grove; while attached to an evolved Grove creature, the first healing it receives each turn is +10.
+
+**Audit:** **TUNE** to remove duplication with Sapstone Charm and strengthen the symbiotic identity
+
+**Current-rules design draft v1:** Provides **1 Grove Essence** while attached. Pack-only: **yes**. **The first time during each turn an Ability or attack of the attached evolved Grove creature heals one or more other friendly creatures, heal 10 damage from the attached creature.**
+
+**Reason:** The prototype duplicated Sapstone Charm almost exactly. The corrected pack-only Essence now rewards evolved Grove creatures that actively heal teammates, creating reciprocal healing rather than another generic incoming-heal amplifier.
+
+### Essence package decision
+
+**GROVE-05 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+---
+
+## GROVE-06 — Tactic package
+
+**Package purpose:** Supply evolution consistency, Device recycling, condition recovery, healing amplification and full-board sustain without replacing the creature package.
+
+All nine Grove Tactics are explicitly **not Starbound**.
+
+### Canopy Call
+
+**Current prototype:** Pack-only Ally; search your deck for up to 2 different Grove evolution cards that evolve from creatures you have in play; reveal them, hand, shuffle.
+
+**Audit:** **KEEP** with deterministic search wording
+
+**Current-rules design draft v1:** **Ally — Canopy Call:** Search your deck for up to 2 Grove Teen or Adult Creature cards with different card identities, each of which evolves from a creature you currently have in play. Reveal the chosen cards, put them into your hand, then shuffle your deck.
+
+### Elderwood Glade
+
+**Current prototype:** Realm; a player with at least 3 Reserve creatures heals 10 from their Vanguard during their Aftermath.
+
+**Audit:** **TUNE** timing clarity
+
+**Current-rules design draft v1:** **Realm — Elderwood Glade:** At the start of each player's Aftermath, if that player has at least 3 friendly creatures in Reserve and their Vanguard has damage, heal 10 damage from that Vanguard. Then continue normal Aftermath condition damage and recovery.
+
+**Reason:** Start-of-Aftermath timing is deterministic and prevents the Realm from ambiguously healing after a creature has already been defeated by condition damage.
+
+### Forager Nia
+
+**Current prototype:** Put up to 2 Devices from your discard on the bottom of your deck, then draw 1 card.
+
+**Audit:** **KEEP** with bottom-order wording
+
+**Current-rules design draft v1:** **Ally — Forager Nia:** Choose up to 2 Device cards in your discard and put them on the bottom of your deck in any order. Then draw 1 card.
+
+### Rootway Map
+
+**Current prototype:** Search your deck for a Grove Adult or Grove Realm, reveal it, hand, shuffle. Current structured search uses exactly 1.
+
+**Audit:** **TUNE** hidden-deck selection
+
+**Current-rules design draft v1:** **Device — Rootway Map:** Search your deck for **up to 1** Grove Adult Creature card or Grove Realm card, reveal it, put it into your hand, then shuffle your deck.
+
+### Sapstone Charm
+
+**Current prototype:** Whenever the attached Grove creature is healed by a card effect, heal 10 additional damage, maximum once per turn.
+
+**Audit:** **KEEP** with deterministic first-trigger wording
+
+**Current-rules design draft v1:** **Relic — Sapstone Charm:** The first time during each turn the attached Grove creature would be healed by a card effect, increase that healing amount by 10.
+
+**Reason:** Sapstone remains the general incoming-healing amplifier, while pack-only Symbiote now has a distinct reciprocal-healing role.
+
+### Seed Satchel
+
+**Current prototype:** Search your deck for up to 2 Grove Baby creatures, reveal them, hand, shuffle.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** **Device — Seed Satchel:** Search your deck for up to 2 Grove Baby Creature cards, reveal them, put them into your hand, then shuffle your deck.
+
+### Spore Remedy
+
+**Current prototype:** Clear one condition from a friendly Grove creature and heal 10 from it.
+
+**Audit:** **TUNE** target legality
+
+**Current-rules design draft v1:** **Device — Spore Remedy:** Choose 1 friendly Grove creature that has at least 1 condition. Choose and clear 1 condition from that creature, then heal 10 damage from it.
+
+**Reason:** The current structured selector can choose a condition-free creature before asking the player to clear a condition. The corrected target filter keeps the action legal and meaningful.
+
+### Thorn Crown
+
+**Current prototype:** When the attached Grove creature receives attack damage while Vanguard, place 10 damage on the attacking creature.
+
+**Audit:** **KEEP** with damage-event timing
+
+**Current-rules design draft v1:** **Relic — Thorn Crown:** After the attached Grove creature, while Vanguard, receives 1 or more damage from an opposing attack, place 10 damage on the attacking creature. Resolve resulting defeats through the normal post-attack defeat flow.
+
+### Warden Fern
+
+**Current prototype:** If you have at least 2 Reserve creatures, draw 3 cards, then put 1 card from your hand on the bottom of your deck.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** **Ally — Warden Fern:** You may play this Ally only if you have at least 2 friendly creatures in Reserve. Draw 3 cards, then choose 1 card from your hand and put it on the bottom of your deck.
+
+### Structure consequence
+
+The Grove Tactic STRUCTURE pass must support:
+
+1. **Canopy Call:** public `0..2` hidden-deck search with different-identity and evolves-from-in-play predicates;
+2. **Elderwood Glade:** persistent start-of-Aftermath Realm listener;
+3. **Rootway Map:** change hidden-deck selection to `0..1`;
+4. **Sapstone Charm:** first-per-turn healing-amount modifier;
+5. **Spore Remedy:** creature target predicate `has_any_condition` before condition choice;
+6. **Thorn Crown:** post-opposing-attack-damage reflection listener.
+
+Forager Nia, Seed Satchel and Warden Fern already map closely to generic structured operations.
+
+### Tactic package decision
+
+**GROVE-06 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+---
+
+## GROVE-07 — Wildgrowth exact 60-card starter audit
+
+**Starter identity:** `Wildgrowth` remains the Grove starter for **evolution, Reserve development and growing pressure**, with **Venomed** as its signature condition and Elderbloom — First Canopy as its Starbound/Mythic culmination.
+
+### Exact current recipe check
+
+Fresh Supabase inventory confirms:
+
+- **60 cards exactly**
+- **22 Creatures / 18 Essence / 20 Tactics**
+- **21 distinct starter identities**
+- **14 legal opening creature copies** after Elderbloom normalization: 6 Babies plus 8 Standalone copies across Thornmantis, Mossram, Vinecoil and Elderbloom
+- Two complete evolution lines at `3 Baby → 2 Teen → 2 Adult`: Budburrow → Briarback → Verdantusk and Sporeling → Capscout → Myceliarch
+- No orphan evolution cards
+- Essence remains `14 Basic Grove / 2 Root / 2 Bloom`
+- Tactics remain `3 Seed Satchel / 3 Spore Remedy / 2 Rootway Map / 2 Warden Fern / 2 Forager Nia / 3 Thorn Crown / 2 Sapstone Charm / 3 Elderwood Glade`
+- Pack-only **Bloomhare, Symbiote Essence and Canopy Call** are excluded
+- Every starter card is Grove; there is no off-element inclusion
+- Normal identities remain within the 4-copy gameplay limit; Elderbloom appears exactly once and satisfies the Mythic one-copy-per-identity rule
+- Elderbloom is the current Grove **Starbound** card; no other Grove identity in this completed design pass is designated Starbound
+
+### Elderbloom normalization inside the starter
+
+The prototype recipe still labels Elderbloom as `Creature — Mythic`. During STRUCTURE, that becomes **Creature — Standalone** with **Mythic** retained as class/trait, **Starbound** retained as prestige metadata and explicit `reward_value = 2`.
+
+### Starter decision
+
+**GROVE-07 audit: KEEP THE EXACT 60-CARD RECIPE PROVISIONALLY.**
+
+The recipe already gives Grove enough legal opening creatures, both complete evolution families, strong Reserve-development support and a coherent mixture of healing, conditions and Device recursion without relying on its pack-only identities.
+
+The following are balance-test questions, not current defects:
+
+1. whether 3 Seed Satchel plus 2 Rootway Map makes both evolution lines too consistent;
+2. whether Briarback, Bloom Essence, Spore Remedy, Sapstone Charm, Elderwood Glade and Elderbloom stack into excessive sustain;
+3. whether Verdantusk's Reserve damage reduction makes a full Grove board too difficult to dismantle through positional attacks;
+4. whether Sporeling/Capscout plus Elderbloom produce too much Venomed pressure for an onboarding deck;
+5. whether Mossram's Rooted pressure plus Vinecoil's self-cleansing makes Grove disproportionately strong in condition matchups;
+6. whether Thorn Crown's reflected damage is healthy at 3 starter copies;
+7. whether Myceliarch plus Forager Nia creates an overly recursive Device loop;
+8. whether 18 Essence reaches Elderbloom's five-Grove Starbound Power at the intended pace.
+
+These questions belong in deterministic AI Test Match followed by human playtesting rather than speculative starter-count changes now.
+
+### Grove element completion state
+
+**GROVE CURRENT-RULES DESIGN AUDIT: COMPLETE — 24 / 24 IDENTITIES REVIEWED, STARTER RECIPE REVIEWED.**
+
+Grove is **not registry-ready yet**. Weakness/resistance remains pending cross-element review, all numeric values remain provisional until deterministic AI/human testing, and the accepted designs still need deterministic structured metadata. The current `set-one-v0.6.1` Grove registry remains prototype evidence only.
+
+---
+
 ## Next bounded audit
 
-**GROVE — complete element audit**
+**SHADE — complete element audit**
 
-Audit all 24 active Grove identities as one coherent element package, including both evolution families, Standalones, Elderbloom, all four Grove Essence cards, all nine Grove Tactics and the exact 60-card `Wildgrowth` starter. Apply the locked Starbound yes/no rule, normalize Mythic stage/class separation, keep weakness/resistance pending cross-element review and only STRUCTURE after the whole Grove design pass is accepted.
+Audit all 24 active Shade identities as one coherent element package, including both evolution families, Standalones, Umbravale, all four Shade Essence cards, all nine Shade Tactics and the exact 60-card `Nightbind` starter. Apply the locked Starbound yes/no rule, normalize Mythic stage/class separation, keep weakness/resistance pending cross-element review and only STRUCTURE after the whole Shade design pass is accepted.
