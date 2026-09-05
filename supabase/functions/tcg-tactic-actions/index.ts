@@ -1,6 +1,6 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const VERSION = "Stream Bandit TCG tactic actions v0.2";
+const VERSION = "Stream Bandit TCG tactic actions v0.3";
 const EFFECT_SCHEMA = "sb-tcg-effects-v0.1";
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -269,10 +269,11 @@ function unsupportedOps(steps: any[]): string[] {
   const walk = (items: any[]) => {
     for (const step of items || []) {
       const op = String(step?.op || "");
-      if (["ADD_ATTACK_DAMAGE_MODIFIER", "ADD_CONDITION_IMMUNITY", "SET_ATTACK_ELIGIBILITY", "SET_WITHDRAWAL_COST"].includes(op)) unsupported.add(op);
-      if (op === "ATTACH_ESSENCE_FROM_ZONE" && step?.flags?.discard_during_target_aftermath) {
-        unsupported.add("ATTACH_ESSENCE_FROM_ZONE_AFTERMATH_EXPIRY");
-      }
+      if (op === "ADD_ATTACK_DAMAGE_MODIFIER" && String(step.expires || "end_of_turn") !== "end_of_turn") unsupported.add("ADD_ATTACK_DAMAGE_MODIFIER_EXPIRY");
+      if (op === "SET_ATTACK_ELIGIBILITY" && String(step.expires || "end_of_turn") !== "end_of_turn") unsupported.add("SET_ATTACK_ELIGIBILITY_EXPIRY");
+      if (op === "SET_WITHDRAWAL_COST" && !["end_of_turn", "aftermath"].includes(String(step.expires || "end_of_turn"))) unsupported.add("SET_WITHDRAWAL_COST_EXPIRY");
+      if (op === "ADD_CONDITION_IMMUNITY" && !["end_of_turn", "aftermath"].includes(String(step.expires || "aftermath"))) unsupported.add("ADD_CONDITION_IMMUNITY_EXPIRY");
+      if (op === "ATTACH_ESSENCE_FROM_ZONE" && String(step.from || "") !== "discard") unsupported.add("ATTACH_ESSENCE_FROM_ZONE_SOURCE");
       if (Array.isArray(step?.steps)) walk(step.steps);
       if (Array.isArray(step?.then)) walk(step.then);
       if (Array.isArray(step?.else)) walk(step.else);
@@ -280,6 +281,24 @@ function unsupportedOps(steps: any[]): string[] {
   };
   walk(steps);
   return [...unsupported];
+}
+function requiredEffectResourcesAvailable(state: any, ownerSeat: number, steps: any[]) {
+  let ok = true;
+  const walk = (items: any[]) => {
+    for (const step of items || []) {
+      if (String(step?.op || "") === "ATTACH_ESSENCE_FROM_ZONE" && String(step.from || "") === "discard") {
+        const seat = playerSeat(ownerSeat, step.player || "self", {});
+        const zone = state.players[String(seat)]?.discard || [];
+        const range = countRange(step.selection);
+        if (cardOptions(state, zone, step.selection?.filters, ownerSeat).length < range.min) ok = false;
+      }
+      if (Array.isArray(step?.steps)) walk(step.steps);
+      if (Array.isArray(step?.then)) walk(step.then);
+      if (Array.isArray(step?.else)) walk(step.else);
+    }
+  };
+  walk(steps);
+  return ok;
 }
 function publicField(player: any) {
   return {
@@ -451,6 +470,9 @@ function log(state: any, message: string) {
 function finishEffect(state: any, effect: EffectState) {
   const owner = state.players[String(effect.owner_seat)];
   if (effect.discard_after_resolve) owner.discard.push(effect.source_card);
+  state.turn_flags ||= {};
+  state.turn_flags[String(effect.owner_seat)] ||= {};
+  if (effect.source_subtype === "Device") state.turn_flags[String(effect.owner_seat)].device_turn = Number(state.turn_seq || 0);
   log(state, `Seat ${effect.owner_seat} resolved ${effect.source_name}.`);
   delete state.effect_resolution;
   delete state.pending_choice;
@@ -801,6 +823,90 @@ function executeUntilChoice(state: any) {
       effect.steps.splice(effect.cursor, 1, ...(branch || []));
       continue;
     }
+    if (op === "ADD_ATTACK_DAMAGE_MODIFIER") {
+      const ref = resolveVar(vars, step.target) as CreatureRef;
+      const found = findCreature(state, ref);
+      if (!found) throw new Error("attack_modifier_target_missing");
+      found.cr.flags ||= {};
+      (found.cr.flags as any).lifecycle_attack_bonus = {
+        turn_seq: Number(state.turn_seq || 0),
+        amount: Math.max(0, Number(step.amount || 0)),
+        uses: Math.max(1, Number(step.uses || 1)),
+        expires: String(step.expires || "end_of_turn"),
+      };
+      effect.cursor++;
+      continue;
+    }
+    if (op === "SET_WITHDRAWAL_COST") {
+      const ref = resolveVar(vars, step.target) as CreatureRef;
+      const found = findCreature(state, ref);
+      if (!found) throw new Error("withdrawal_modifier_target_missing");
+      found.cr.flags ||= {};
+      (found.cr.flags as any).lifecycle_withdrawal_cost = {
+        turn_seq: Number(state.turn_seq || 0),
+        value: Math.max(0, Number(step.value || 0)),
+        expires: String(step.expires || "end_of_turn"),
+      };
+      effect.cursor++;
+      continue;
+    }
+    if (op === "ADD_CONDITION_IMMUNITY") {
+      const ref = resolveVar(vars, step.target) as CreatureRef;
+      const found = findCreature(state, ref);
+      if (!found) throw new Error("condition_immunity_target_missing");
+      found.cr.flags ||= {};
+      (found.cr.flags as any).lifecycle_condition_immunity = {
+        turn_seq: Number(state.turn_seq || 0),
+        conditions: Array.isArray(step.conditions) ? step.conditions.map((x: unknown) => String(x)) : [],
+        expires: String(step.expires || "aftermath"),
+      };
+      effect.cursor++;
+      continue;
+    }
+    if (op === "SET_ATTACK_ELIGIBILITY") {
+      const targetSeat = playerSeat(ownerSeat, step.player || "self", vars);
+      const player = state.players[String(targetSeat)];
+      const anchor = topInst(player?.vanguard || null)?.uid || "";
+      if (!anchor) throw new Error("attack_eligibility_vanguard_missing");
+      state.turn_flags ||= {};
+      state.turn_flags[String(targetSeat)] ||= {};
+      state.turn_flags[String(targetSeat)].lifecycle_attack_eligibility = {
+        turn_seq: Number(state.turn_seq || 0),
+        mode: String(step.mode || "final_vanguard_only"),
+        anchor_uid: anchor,
+        expires: String(step.expires || "end_of_turn"),
+      };
+      effect.cursor++;
+      continue;
+    }
+    if (op === "ATTACH_ESSENCE_FROM_ZONE") {
+      const target = resolveVar(vars, step.target) as CreatureRef;
+      const found = findCreature(state, target);
+      if (!found) throw new Error("essence_attachment_target_missing");
+      const sourceSeat = playerSeat(ownerSeat, step.player || "self", vars);
+      const sourcePlayer = state.players[String(sourceSeat)];
+      if (String(step.from || "") !== "discard") throw new Error(`unsupported_essence_attachment_source:${step.from}`);
+      const options = cardOptions(state, sourcePlayer.discard || [], step.selection?.filters, ownerSeat);
+      const bounds = choiceBounds(step.selection, options.length, false);
+      setPending(state, effect, {
+        seat: ownerSeat,
+        kind: "attach_essence_from_discard",
+        prompt: "Choose Essence to attach",
+        min: bounds.min,
+        max: bounds.max,
+        mode: "select",
+        options,
+        context: {
+          apply: "attach_essence_from_zone",
+          zone_seat: sourceSeat,
+          from: "discard",
+          target,
+          effect_flags: step.flags || {},
+          attachment_kind: String(step.attachment_kind || "effect_generated"),
+        },
+      });
+      return;
+    }
     if (op === "CHECK_DECKOUT_AFTER_RESOLUTION") {
       effect.cursor++;
       if (evaluateWinner(state)) {
@@ -808,9 +914,6 @@ function executeUntilChoice(state: any) {
         return;
       }
       continue;
-    }
-    if (["ADD_ATTACK_DAMAGE_MODIFIER", "ADD_CONDITION_IMMUNITY", "SET_ATTACK_ELIGIBILITY", "SET_WITHDRAWAL_COST", "ATTACH_ESSENCE_FROM_ZONE"].includes(op)) {
-      throw new Error(`unsupported_effect_op:${op}`);
     }
     throw new Error(`unknown_effect_op:${op}`);
   }
@@ -887,6 +990,22 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
       const essence = removeByUid(source.cr.essence, essenceUid);
       if (!essence) throw new Error("essence_move_source_missing");
       destination.cr.essence.push(essence);
+    }
+  } else if (apply === "attach_essence_from_zone") {
+    const player = state.players[String(context.zone_seat)];
+    const target = findCreature(state, context.target as CreatureRef);
+    if (!target) throw new Error("essence_attachment_target_missing");
+    if (String(context.from || "") !== "discard") throw new Error("selected_essence_zone_unsupported");
+    for (const option of selected) {
+      const inst = removeByUid(player.discard, String(option.data.uid));
+      if (!inst) throw new Error("selected_discard_essence_missing");
+      inst.attached_turn = Number(state.turn_seq || 0);
+      inst.effect_flags = {
+        ...(inst.effect_flags || {}),
+        ...(context.effect_flags || {}),
+        attachment_kind: String(context.attachment_kind || "effect_generated"),
+      };
+      target.cr.essence.push(inst);
     }
   } else if (apply === "repeat_optional") {
     const count = Number(selected[0]?.data?.count || 0);
@@ -1022,12 +1141,15 @@ Deno.serve(async (req) => {
       if (!firstRequiredCreatureTargetAvailable(state, seat, engine.steps || [])) {
         return json({ ok: false, version: VERSION, error: "required_tactic_target_unavailable" }, 400);
       }
+      if (!requiredEffectResourcesAvailable(state, seat, engine.steps || [])) {
+        return json({ ok: false, version: VERSION, error: "required_tactic_resource_unavailable" }, 400);
+      }
       const unsupported = unsupportedOps(engine.steps || []);
       if (unsupported.length) {
         return json({
           ok: false,
           version: VERSION,
-          error: "tactic_waiting_for_battle_lifecycle_support",
+          error: "tactic_lifecycle_contract_unsupported",
           unsupported_ops: unsupported,
         }, 409);
       }
