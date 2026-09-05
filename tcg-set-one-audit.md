@@ -1169,8 +1169,280 @@ All HP, attack costs, damage and modifier values remain provisional until determ
 
 ---
 
+## EMBER-05 — Essence package
+
+**Package purpose:** Preserve Ember's real-card Essence economy while turning damage and Scorched into deliberate risk/reward choices. Ember Essence remains attached card state; it never becomes a detached energy meter.
+
+### Basic Ember Essence
+
+**Current prototype**
+
+- Subtype: Basic
+- Effect: `Provides one Ember Essence. Basic Essence has no special text.`
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1**
+
+- **Basic Ember Essence:** Provides **1 Ember Essence** while attached. It has no additional card effect.
+
+### Hearth Essence
+
+**Current prototype**
+
+- Subtype: Special
+- Effect: `Provides Ember. When attached from hand to an Ember creature with damage, heal 20 from it.`
+
+**Audit:** **KEEP** with target/timing normalization
+
+**Current-rules design draft v1**
+
+- Provides **1 Ember Essence** while attached.
+- **When you attach this card from your hand to a friendly Ember creature that has damage, heal 20 damage from that creature.**
+
+**Reason:** Hearth supports controlled self-damage without erasing it. The heal occurs only when the attachment is made from hand to an already-damaged friendly Ember creature.
+
+### Smolder Essence
+
+**Current prototype**
+
+- Subtype: Special
+- Effect: `Provides Ember. When attached from hand to a damaged Ember creature, its next attack this turn deals +10 damage.`
+
+**Audit:** **KEEP** with deterministic expiry wording
+
+**Current-rules design draft v1**
+
+- Provides **1 Ember Essence** while attached.
+- **When you attach this card from your hand to a damaged friendly Ember creature, that creature's next attack that turn deals 10 more damage.**
+
+**Reason:** Smolder rewards playing into Ember's damaged-creature state but cannot bank the bonus into a later turn.
+
+### Wildfire Essence
+
+**Current prototype**
+
+- Subtype: Special
+- Pack-only: yes
+- Effect: `provides Ember; attached creature's Scorched attacks deal +10 damage, but Scorched placed on it deals +10.`
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1**
+
+- Provides **1 Ember Essence** while attached.
+- Pack-only: **yes**.
+- **While the attached creature is Scorched, its attacks deal 10 more damage. When Scorched deals its normal Aftermath damage to that creature, that Scorched damage is increased by 10.**
+
+**Rules result:** Under the current universal Scorched rule, the normal 20-damage Aftermath hit becomes **30 damage** while Wildfire is attached. The ordinary Scorched recovery check still follows that damage.
+
+**Reason:** Wildfire becomes the purest Ember risk/reward Essence: it turns a dangerous condition into pressure but makes carrying that condition materially more dangerous. The old phrase “Scorched attacks” is removed because attacks themselves are not Scorched; the creature is.
+
+### Engine / structure note
+
+The current branch still handles Hearth and Smolder through direct `card_id` checks inside the manual Essence attachment action, and those shortcuts do not represent the final generic effect grammar. During STRUCTURE:
+
+- Hearth becomes a generic `ATTACH_FROM_HAND` trigger with `friendly + Ember + damaged` filters and a 20-heal operation;
+- Smolder becomes the same trigger shape with a one-use, end-of-turn attack-damage modifier;
+- Wildfire becomes a persistent attached-condition listener that modifies outgoing attack damage while Scorched and incoming Scorched-source Aftermath damage;
+- no Ember Essence card-ID branch survives in the final engine.
+
+### Essence package decision
+
+**EMBER-05 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+The four Essence identities are now distinct:
+
+1. **Basic Ember Essence:** ordinary Ember resource card;
+2. **Hearth Essence:** damaged-creature recovery on attachment;
+3. **Smolder Essence:** damaged-creature tempo boost on attachment;
+4. **Wildfire Essence:** pack-only Scorched power/risk amplifier.
+
+All numeric values remain provisional until deterministic AI Test Match and human playtesting.
+
+---
+
+## EMBER-06 — Tactic package
+
+**Package purpose:** Support Ember's self-damage, mobility and Scorched pressure without replacing the creature package. The nine Tactics should create setup, recovery, movement and risk decisions rather than become unconditional burn cards.
+
+### Current Tactic structure
+
+Ember contains **9 Tactics**: 2 Allies, 4 Devices, 2 Relics and 1 Realm.
+
+The prototype already has structured `engine_effects` for Ember Salve, Flash Forge, Forgekeeper Bram, Kindling Cache and Rhea Ashrunner. Ashen Gamble, Cinder Charm, Heatguard Bracer and Volcanic Caldera are unstructured. Bram and Rhea also require current-rules metadata corrections, so **6 Ember Tactic definitions require STRUCTURE work later**.
+
+### Ashen Gamble
+
+**Current prototype:** Pack-only Device; place 20 damage on one friendly Ember creature, draw 3 cards, then discard 1.
+
+**Audit:** **KEEP** with sequencing normalization
+
+**Current-rules design draft v1:** **Device — Ashen Gamble:** Choose 1 friendly Ember creature. Place 20 damage on it. Then draw 3 cards, then discard 1 card.
+
+**Reason:** This is a strong pack-only expression of Ember's identity: deliberately accept board risk for hand velocity. It is not included in the starter, so it can be slightly more specialised without becoming mandatory onboarding material.
+
+### Cinder Charm
+
+**Current prototype:** Relic; attached Ember creature deals +10 attack damage, or +20 instead if it has at least 200 printed HP.
+
+**Audit:** **KEEP** with wording normalization
+
+**Current-rules design draft v1:** **Relic — Cinder Charm:** The attached creature's attacks deal 10 more damage while that creature is Ember. If that creature has **200 or more printed HP**, its attacks deal 20 more damage instead.
+
+**Reason:** Cinder Charm gives larger Ember bodies a meaningful Relic payoff while still offering a smaller bonus to lighter Ember creatures. Printed HP is checked from the authoritative card definition, not temporary HP effects.
+
+### Ember Salve
+
+**Current prototype:** Heal 30 from one friendly Ember creature; if it is Scorched, clear Scorched.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** **Device — Ember Salve:** Choose 1 friendly Ember creature. Heal 30 damage from it. If that creature is Scorched, clear Scorched.
+
+**Reason:** Ember needs one clean recovery valve so the self-damage archetype does not become pure attrition against itself.
+
+### Flash Forge
+
+**Current prototype:** Draw 2 cards, then discard 1 card.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** **Device — Flash Forge:** Draw 2 cards, then discard 1 card.
+
+**Reason:** Simple hand velocity suits a fast-pressure starter and creates discard decisions without becoming Shade-style opponent disruption.
+
+### Forgekeeper Bram
+
+**Current prototype:** Search your deck for an Ember Teen or Adult that evolves from a creature you have in play, reveal it, put it into your hand, then shuffle. The current structured metadata requires exactly one result.
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1:** **Ally — Forgekeeper Bram:** Search your deck for **up to 1** Ember Teen or Adult creature that evolves from a creature you have in play, reveal it, put it into your hand, then shuffle your deck.
+
+**Reason:** Search effects into a hidden deck should not require the engine to prove a valid target exists before the Ally can resolve. `Up to 1` keeps the intended evolution consistency while allowing a legal zero-result search.
+
+### Heatguard Bracer
+
+**Current prototype:** The first recoil or Scorched damage placed on the attached creature each turn is reduced by 10.
+
+**Audit:** **KEEP** with source normalization
+
+**Current-rules design draft v1:** **Relic — Heatguard Bracer:** The first time during each turn the attached creature would take damage **from one of its own attacks or from Scorched**, reduce that damage by 10.
+
+**Reason:** Heatguard protects specifically against Ember's self-created attack recoil and Scorched risk. It does not reduce arbitrary Ability damage, ordinary opposing attack damage or unrelated direct-damage effects.
+
+### Kindling Cache
+
+**Current prototype:** Search your deck for up to 2 Basic Ember Essence, reveal them, put them into your hand, then shuffle.
+
+**Audit:** **KEEP**
+
+**Current-rules design draft v1:** **Device — Kindling Cache:** Search your deck for up to 2 Basic Ember Essence cards, reveal them, put them into your hand, then shuffle your deck.
+
+**Reason:** A starter with 14 Basic Ember Essence benefits from a clean consistency Device, especially because Magmagecko and several higher-cost attacks care about actual attached Essence cards.
+
+### Rhea Ashrunner
+
+**Current prototype:** Choose a damaged friendly Ember creature, switch it with your Vanguard, then its next attack that turn deals +20. The current structured selector can also choose the Vanguard itself.
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1:** **Ally — Rhea Ashrunner:** Choose 1 damaged friendly Ember creature **in your Reserve**. Switch it with your Vanguard. The creature that becomes Vanguard has its next attack that turn deal 20 more damage.
+
+**Reason:** Rhea is a movement Ally. Restricting the chosen creature to Reserve makes the switch real and deterministic, avoids a no-op Vanguard target, and intentionally combines with Ember's Vanguard-entry creatures and Volcanic Caldera.
+
+### Volcanic Caldera
+
+**Current prototype:** Once each turn when an Ember creature becomes Vanguard, its next attack that turn deals +10. Non-Ember creatures take 10 damage when they voluntarily withdraw.
+
+**Audit:** **TUNE**
+
+**Current-rules design draft v1:** **Realm — Volcanic Caldera:** Once during each player's turn, the first time an **Ember creature controlled by the active player** becomes Vanguard, that creature's next attack that turn deals 10 more damage. Whenever a non-Ember creature voluntarily withdraws while this Realm is active, after the switch place 10 damage on the creature that moved to Reserve.
+
+**Reason:** The active-player wording prevents an opponent's forced promotion during your attack turn from receiving a bonus that cannot sensibly be used. The second clause makes Caldera symmetrical: both players can use the Realm, but non-Ember movement carries a real environmental cost.
+
+### Structure consequence
+
+During STRUCTURE, the six Ember Tactic metadata changes are:
+
+1. **Ashen Gamble:** generic friendly-Ember select → direct damage → draw → discard sequence;
+2. **Cinder Charm:** persistent attached-creature attack modifier using element and printed-HP predicates;
+3. **Forgekeeper Bram:** change hidden-deck selection from exactly 1 to `0..1` while retaining reveal/shuffle;
+4. **Heatguard Bracer:** persistent first-per-turn damage-source reduction listener;
+5. **Rhea Ashrunner:** require a damaged friendly Ember **Reserve** target before switching and applying the temporary bonus;
+6. **Volcanic Caldera:** persistent shared Realm listeners for active-player Ember Vanguard entry and non-Ember voluntary withdrawal damage.
+
+Ember Salve, Flash Forge and Kindling Cache already map cleanly to generic current structured operations and should remain card-name agnostic.
+
+### Tactic package decision
+
+**EMBER-06 status: DESIGN PASS — READY FOR LATER STRUCTURE, NOT YET REGISTRY-READY.**
+
+The package now has clear jobs:
+
+- **Bram / Kindling Cache:** consistency;
+- **Flash Forge / Ashen Gamble:** hand velocity, with Ashen Gamble carrying greater risk;
+- **Ember Salve / Heatguard Bracer:** recovery and risk management;
+- **Rhea Ashrunner:** damaged-creature mobility and tempo;
+- **Cinder Charm:** persistent attack pressure;
+- **Volcanic Caldera:** shared battlefield pressure centred on Vanguard movement.
+
+---
+
+## EMBER-07 — Ashrush exact 60-card starter audit
+
+**Starter identity:** `Ashrush` remains the Ember starter for **fast pressure, controlled self-damage and Scorched**, with **Scorched** as its signature condition and Pyrohorn — Ash Crown as its Starbound/Mythic finisher.
+
+### Exact current recipe check
+
+Fresh starter inventory confirms:
+
+- **60 cards exactly**
+- **22 Creatures / 18 Essence / 20 Tactics**
+- **21 distinct starter identities**
+- **14 legal opening creatures** after Pyrohorn normalization: 6 Babies plus 8 Standalone copies across Ashcobra, Magmagecko, Kilnback and Pyrohorn
+- Two complete evolution lines at `3 Baby → 2 Teen → 2 Adult`: Glowcub → Bristleflare → Furnacefang and Coalfinch → Sootwing → Cindercrest
+- No orphan evolution cards
+- Essence remains `14 Basic Ember / 2 Smolder / 2 Hearth`
+- Tactics remain `3 Kindling Cache / 3 Flash Forge / 2 Ember Salve / 2 Rhea Ashrunner / 2 Forgekeeper Bram / 3 Cinder Charm / 2 Heatguard Bracer / 3 Volcanic Caldera`
+- Pack-only **Cinderburrow, Wildfire Essence and Ashen Gamble** are excluded
+- Every starter card is Ember; there is no off-element inclusion
+- Normal starter identities stay within the 4-copy gameplay limit; Pyrohorn appears exactly once and therefore satisfies the Mythic one-copy-per-identity rule
+- Pyrohorn is the current Ember **Starbound** card; no other Ember identity in this completed design pass is designated Starbound
+
+### Pyrohorn normalization inside the starter
+
+The stored prototype recipe still labels Pyrohorn as `Creature — Mythic`. During the later registry/recipe STRUCTURE pass, that display/runtime classification becomes **Creature — Standalone**, while **Mythic** remains its class/trait and **Starbound** remains its explicit prestige mechanic. The starter still contains exactly one physical Pyrohorn.
+
+### Starter decision
+
+**EMBER-07 audit: KEEP THE EXACT 60-CARD RECIPE PROVISIONALLY.**
+
+The corrected package has enough legal openers, two complete evolution lines, practical Essence access, recovery tools and multiple distinct ways to exploit damaged creatures without requiring the pack-only cards.
+
+The following are balance-test questions, not current defects:
+
+1. whether 14 legal starting-creature copies produce the desired opening consistency;
+2. whether the self-damage line survives often enough to reach Furnacefang without becoming trivial to remove;
+3. whether Coalfinch/Sootwing/Cindercrest plus Rhea and 3 Volcanic Caldera create too much Vanguard-entry stacking;
+4. whether 3 Cinder Charm produces excessive persistent damage on the 200+ HP creatures;
+5. whether 2 Heatguard Bracer plus 2 Ember Salve reduce Ember's intended risk too efficiently;
+6. whether 18 Essence reaches Pyrohorn's four-Ember Starbound attack at an appropriate pace;
+7. whether Pyrohorn's Ash Crown and Starbound Ashen Stampede can combine for unhealthy one-turn burst when several friendly creatures are already damaged.
+
+These questions belong in deterministic AI Test Match followed by human playtesting. They do not justify speculative count changes before the engine can exercise the corrected card definitions.
+
+### Ember element completion state
+
+**EMBER CURRENT-RULES DESIGN AUDIT: COMPLETE — 24 / 24 IDENTITIES REVIEWED, STARTER RECIPE REVIEWED.**
+
+Ember is **not registry-ready yet**. Weakness/resistance remains pending the later cross-element review, all numeric values remain provisional until AI/human testing, and accepted designs still need to be encoded in the shared deterministic metadata grammar. The current registry remains prototype evidence only until that STRUCTURE pass.
+
+---
+
 ## Next bounded audit
 
-**EMBER-05 — Essence package**
+**GALE — complete element audit**
 
-Review Basic Ember Essence, Hearth Essence, Smolder Essence and pack-only Wildfire Essence. Preserve the real-card attachment model and one-manual-Essence-per-turn rule, normalize trigger timing, make Wildfire's Scorched risk/reward wording deterministic, and replace the current Hearth/Smolder card-ID shortcuts with generic attachment metadata during the later STRUCTURE pass.
+Audit all 24 active Gale identities as one coherent element package, including both evolution families, Standalones, Aeralith — Storm Shepherd, all four Gale Essence cards, all nine Gale Tactics and the exact 60-card `Skyshift` starter. Apply the locked Starbound yes/no decision to every card, normalize Mythic stage/class separation, keep weakness/resistance pending cross-element review, and only STRUCTURE after the complete Gale design pass is accepted.
