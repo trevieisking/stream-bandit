@@ -1,0 +1,57 @@
+import { structuredRuntimeAttackMetadata } from "./tcg-match-attack-v0-2.ts";
+
+export type LegacyAttackCompatibility = {
+  name: string;
+  raw: string;
+  typed: Record<string, number>;
+  any: number;
+  damage: number;
+  effect: string;
+  starbound: boolean;
+};
+
+export type RuntimeAttackAuthority = LegacyAttackCompatibility & {
+  id: string | null;
+  metadata_source: "legacy" | "structured_v0_2";
+  damage_source: "legacy" | "base_damage" | "damage_formula.base";
+};
+
+export function resolveRuntimeAttackAuthority(
+  state: unknown,
+  instanceOrId: unknown,
+  attackSlot: number,
+  legacy: LegacyAttackCompatibility | null,
+): RuntimeAttackAuthority | null {
+  const structured = structuredRuntimeAttackMetadata(state, instanceOrId, attackSlot);
+
+  if (structured == null) {
+    if (!legacy) return null;
+    return {
+      ...legacy,
+      typed: { ...legacy.typed },
+      id: null,
+      metadata_source: "legacy",
+      damage_source: "legacy",
+    };
+  }
+
+  if (!legacy) {
+    throw new Error(`tcg_v0_2_attack_legacy_compatibility_required:${structured.id}`);
+  }
+  if (structured.base_damage == null || structured.damage_source == null) {
+    throw new Error(`tcg_v0_2_attack_baseline_damage_required:${structured.id}`);
+  }
+
+  return {
+    raw: legacy.raw,
+    effect: legacy.effect,
+    starbound: legacy.starbound,
+    id: structured.id,
+    name: structured.name,
+    typed: { ...structured.typed },
+    any: structured.any,
+    damage: structured.base_damage,
+    metadata_source: "structured_v0_2",
+    damage_source: structured.damage_source,
+  };
+}
