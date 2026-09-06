@@ -1,0 +1,259 @@
+{
+  "validator_id": "sb-tcg-validator-v0.2",
+  "status": "branch_candidate",
+  "scope": "Set One card-structure validation plus future-capability grammar ownership",
+  "authority": {
+    "order": [
+      "latest_explicit_user_corrections",
+      "current_repo_master_plan_and_current_rules_audits",
+      "accepted_card_pass_2_amendments_and_candidates",
+      "earlier_locked_rules_not_superseded",
+      "historical_google_plan_as_non_authoritative_reference"
+    ],
+    "base_schema": "tcg-card-pass-2-schema.md",
+    "amendments": [
+      "tcg-card-pass-2-schema-amendment-astral.md",
+      "tcg-card-pass-2-schema-amendment-b.md",
+      "tcg-card-pass-2-schema-amendment-c.md",
+      "tcg-card-pass-2-schema-amendment-d.md",
+      "tcg-card-pass-2-schema-amendment-e.md",
+      "tcg-card-pass-2-schema-amendment-f.md",
+      "tcg-card-pass-2-schema-amendment-g.md",
+      "tcg-card-pass-2-schema-amendment-h.md",
+      "tcg-card-pass-2-schema-amendment-i.md",
+      "tcg-card-pass-2-schema-amendment-j.md",
+      "tcg-card-pass-2-schema-amendment-k.md",
+      "tcg-card-pass-2-schema-amendment-l.md",
+      "tcg-card-pass-2-schema-amendment-m.md",
+      "tcg-card-pass-2-schema-amendment-n-vitality-damage.md",
+      "tcg-card-pass-2-schema-amendment-o-selective-protection.md",
+      "tcg-card-pass-2-schema-amendment-p-layered-counterplay.md",
+      "tcg-card-pass-2-schema-amendment-q-precision-execution.md",
+      "tcg-card-pass-2-schema-amendment-r-condition-execution.md"
+    ]
+  },
+  "global_rules": {
+    "set_one_elements": ["Astral", "Ember", "Gale", "Grove", "Shade", "Stone", "Tide", "Volt"],
+    "future_full_elements": ["Fairy", "Underworld"],
+    "creature_type_only": ["Martial"],
+    "world_chain": ["Tide", "Ember", "Grove", "Gale", "Stone", "Volt", "Tide"],
+    "mystical_combat_chain": ["Astral", "Martial", "Shade", "Fairy", "Underworld", "Astral"],
+    "weakness_multiplier": 2,
+    "weakness_applies_to": "attack_damage_only",
+    "weakness_max_applications_per_attack": 1,
+    "routine_per_card_weakness_forbidden": true,
+    "automatic_reverse_resistance": false,
+    "resistance_default": null,
+    "attack_element_default": "printed_attacking_creature_element",
+    "printed_hp": {"min": 40, "max": 390},
+    "starting_hand": 7,
+    "reward_cards": 6,
+    "reserve_slots": 4,
+    "evolution_stages": ["Baby", "Teen", "Adult", "Standalone"],
+    "evolution_limit_per_stack_per_turn": 1,
+    "normal_identity_deck_limit": 4,
+    "mythic_identity_deck_limit": 1,
+    "essence_uses_separate_global_allowance": true,
+    "starbound_marker_per_player_per_match": 1,
+    "first_player_attack_forbidden_on_first_personal_turn": true,
+    "first_player_ally_restriction_exists": true
+  },
+  "card_families": ["Creature", "Essence", "Tactic"],
+  "tactic_subtypes": ["Ally", "Device", "Relic", "Realm"],
+  "conditions": [
+    "Scorched", "Venomed", "Blinded", "Mindbound", "Dazed", "Stunned", "Rooted", "Silenced", "Crushed", "Drenched"
+  ],
+  "creature_contract": {
+    "required": [
+      "stage", "hp", "withdrawal", "reward_value", "creature_types", "resistance", "matchup_override", "attacks"
+    ],
+    "stage_values": ["Baby", "Teen", "Adult", "Standalone"],
+    "teen_requires_evolves_from": true,
+    "adult_requires_evolves_from": true,
+    "baby_requires_null_evolves_from": true,
+    "standalone_requires_null_evolves_from": true,
+    "weakness_field": "forbidden_for_routine_set_one_cards",
+    "mythic_is_trait_not_stage": true,
+    "starbound_is_prestige_not_stage": true
+  },
+  "matchup": {
+    "resolution_order": [
+      "base_damage_and_attack_bonuses",
+      "attacker_matchup_keys",
+      "defender_matchup_keys",
+      "global_matchup_tables",
+      "weakness_once_maximum",
+      "explicit_resistance",
+      "defender_attack_reduction_and_prevention",
+      "shield",
+      "hp_damage",
+      "after_damage_effects",
+      "defeat_rewards_win"
+    ],
+    "effect_damage_uses_weakness": false,
+    "condition_damage_uses_weakness": false,
+    "recoil_uses_weakness": false,
+    "damage_placement_uses_weakness": false,
+    "damage_movement_uses_weakness": false
+  },
+  "damage_classes": {
+    "attack_damage": {
+      "weakness": true,
+      "resistance": true,
+      "shield": true
+    },
+    "effect_damage": {
+      "weakness": false,
+      "resistance": false,
+      "shield": true
+    },
+    "damage_placement": {
+      "weakness": false,
+      "resistance": false,
+      "shield": false
+    },
+    "damage_movement": {
+      "weakness": false,
+      "resistance": false,
+      "shield": false,
+      "counts_as_healing": false
+    },
+    "vitality_drain": {
+      "damage_class": "effect_damage",
+      "heal_from": "actual_hp_damage_only"
+    }
+  },
+  "protection_layers": {
+    "independent": true,
+    "kinds": [
+      "incoming_attack_damage_protection",
+      "effect_damage_protection",
+      "condition_immunity",
+      "damage_placement_protection",
+      "hostile_damage_movement_protection",
+      "switch_movement_protection",
+      "targeting_protection"
+    ],
+    "generic_immune_flag_forbidden": true,
+    "realm_replacement_removes_old_continuous_effects_before_new_realm_authority": true,
+    "selective_attack_protection_does_not_imply": [
+      "untargetable",
+      "condition_immunity",
+      "effect_damage_immunity",
+      "damage_placement_immunity",
+      "damage_movement_immunity",
+      "switch_immunity"
+    ]
+  },
+  "execution": {
+    "precision": {
+      "operation": "DEFEAT_TARGET_IF",
+      "predicates": [
+        "target_damage_equals",
+        "target_damage_at_least",
+        "target_damage_at_most",
+        "target_remaining_hp_at_most"
+      ],
+      "default_exact_threshold_recheck": ["declaration", "pre_resolution"],
+      "overshoot_fails_equals": true,
+      "uses_attack_damage": false,
+      "shield_prevents_execute": false,
+      "weakness_modifies_execute": false
+    },
+    "condition": {
+      "operation": "DEFEAT_TARGET_IF",
+      "predicates": [
+        "target_has_any_condition",
+        "target_has_condition",
+        "target_has_any_named_condition"
+      ],
+      "default_recheck": ["declaration", "pre_resolution"],
+      "uses_attack_damage": false,
+      "shield_prevents_execute": false,
+      "weakness_modifies_execute": false
+    },
+    "shared_defeat_owner_required": true
+  },
+  "targeting": {
+    "default_attack_target": "opposing_vanguard",
+    "alternate_attack_target_requires_explicit_permission": true,
+    "reserve_targeting_must_be_explicit": true,
+    "multi_target_distinct_default": true
+  },
+  "movement": {
+    "effect_switch_distinct_from_voluntary_withdrawal": true,
+    "voluntary_withdrawal_uses_global_allowance_and_cost": true,
+    "switch_context_binds_outgoing_and_incoming": true
+  },
+  "hidden_information": {
+    "server_owns_random_hidden_selection": true,
+    "client_hidden_state_never_authoritative": true,
+    "public_discard_selection_supported": true,
+    "hidden_search_fail_closed": true
+  },
+  "event_integrity": {
+    "authoritative_event_ids_required": true,
+    "listener_use_idempotent": true,
+    "reconnect_retry_must_not_double_trigger": true,
+    "automatic_multi_target_listener_default_snapshot": "trigger_time"
+  },
+  "future_mechanics": {
+    "drain_bands": [10, 20, 40, 60],
+    "rare_hostile_damage_transfer": true,
+    "rare_tide_multi_target_placement": {
+      "amount_each": 120,
+      "max_targets": 2,
+      "requires_high_tier_gate": true
+    },
+    "low_hp_utility_wall_guidance": {"min_hp": 40, "max_hp": 120},
+    "periodic_damage_placement_prefers_existing_timing": ["aftermath_started", "aftermath_finished"]
+  },
+  "validation_errors": [
+    "routine_per_card_weakness_present",
+    "hp_outside_40_390",
+    "invalid_stage",
+    "teen_or_adult_missing_predecessor",
+    "baby_or_standalone_has_predecessor",
+    "ordinary_identity_limit_above_4",
+    "mythic_identity_limit_above_1",
+    "card_name_or_display_text_used_as_runtime_authority",
+    "weakness_applied_more_than_once",
+    "damage_placement_absorbed_by_shield",
+    "damage_movement_treated_as_healing",
+    "vitality_drain_heals_from_prevented_damage",
+    "alternate_attack_target_without_permission",
+    "client_owned_hidden_random_choice",
+    "generic_immune_flag",
+    "condition_immunity_silently_clears_existing_condition",
+    "realm_effect_survives_replacement",
+    "precision_equals_silently_treated_as_at_least",
+    "execution_bypasses_shared_defeat_owner",
+    "condition_execution_uses_duplicate_hidden_condition_state",
+    "multi_target_120_without_high_tier_gate",
+    "recursive_drain_or_listener_loop",
+    "card_specific_runtime_exception_required_for_candidate"
+  ],
+  "set_one_candidate_files": [
+    "tcg-card-pass-2-astral.md",
+    "tcg-card-pass-2-ember.md",
+    "tcg-card-pass-2-gale.md",
+    "tcg-card-pass-2-grove.md",
+    "tcg-card-pass-2-shade.md",
+    "tcg-card-pass-2-stone.md",
+    "tcg-card-pass-2-tide.md",
+    "tcg-card-pass-2-volt.md",
+    "tcg-card-pass-2-founder.md"
+  ],
+  "future_candidate_files": [
+    "tcg-future-fairy-audit.md",
+    "tcg-future-underworld-audit.md"
+  ],
+  "completion": {
+    "hard_invariants_consolidated": true,
+    "amendment_authority_map_consolidated": true,
+    "set_one_candidate_inventory_declared": true,
+    "full_opcode_predicate_parameter_schema_consolidated": false,
+    "all_set_one_candidates_machine_validated": false,
+    "production_registry_frozen": false
+  }
+}
