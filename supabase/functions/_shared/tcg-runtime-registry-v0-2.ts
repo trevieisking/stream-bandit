@@ -137,9 +137,44 @@ export function runtimeV02SnapshotMarker(): Record<string, unknown> {
   };
 }
 
+function validateRuntimeV02CardIndex(state: Record<string, unknown>): { cardIndex: RuntimeCardIndex; structured: boolean } {
+  const cardIndex = objectRecord(state.card_index) as RuntimeCardIndex | null;
+  if (!cardIndex) throw new Error("tcg_v0_2_snapshot_card_index_required");
+  const entries = Object.entries(cardIndex);
+  if (!entries.length) return { cardIndex, structured: false };
+
+  const expected = TCG_RUNTIME_REGISTRY_V0_2;
+  let structuredCount = 0;
+  for (const [cardId, rawEntry] of entries) {
+    const entry = objectRecord(rawEntry);
+    const definition = objectRecord(entry?.definition_v0_2);
+    const rulesVersion = entry?.definition_v0_2_rules_version;
+    const hasStructuredSignal = definition != null || rulesVersion != null;
+    if (!hasStructuredSignal) continue;
+    structuredCount += 1;
+    if (!definition) throw new Error(`tcg_v0_2_snapshot_definition_missing:${cardId}`);
+    if (String(rulesVersion || "") !== expected.card_schema) throw new Error(`tcg_v0_2_snapshot_rules_version_mismatch:${cardId}`);
+    if (String(definition.id || "") !== cardId) throw new Error(`tcg_v0_2_snapshot_definition_id_mismatch:${cardId}`);
+    if (String(definition.schema || "") !== expected.card_schema) throw new Error(`tcg_v0_2_snapshot_definition_schema_mismatch:${cardId}`);
+    if (String(definition.effect_schema || "") !== expected.effect_schema) throw new Error(`tcg_v0_2_snapshot_definition_effect_schema_mismatch:${cardId}`);
+  }
+
+  if (structuredCount === 0) return { cardIndex, structured: false };
+  if (structuredCount !== entries.length) {
+    const missing = entries.find(([cardId, rawEntry]) => {
+      const entry = objectRecord(rawEntry);
+      return !objectRecord(entry?.definition_v0_2) || String(entry?.definition_v0_2_rules_version || "") !== expected.card_schema;
+    })?.[0] || "unknown";
+    throw new Error(`tcg_v0_2_snapshot_definition_missing:${missing}`);
+  }
+  return { cardIndex, structured: true };
+}
+
 export function assertRuntimeV02MatchSnapshot(state: Record<string, unknown>): boolean {
   const marker = objectRecord(state.runtime_registry_v0_2);
-  if (!marker) return false;
+  const { structured } = validateRuntimeV02CardIndex(state);
+  if (!marker) return structured;
+
   const expected = TCG_RUNTIME_REGISTRY_V0_2;
   const markerChecks: Array<[string, unknown, unknown]> = [
     ["registry_id", marker.registry_id, expected.registry_id],
@@ -153,17 +188,7 @@ export function assertRuntimeV02MatchSnapshot(state: Record<string, unknown>): b
   for (const [field, actual, wanted] of markerChecks) {
     if (actual !== wanted) throw new Error(`tcg_v0_2_snapshot_marker_mismatch:${field}`);
   }
-
-  const cardIndex = objectRecord(state.card_index) as RuntimeCardIndex | null;
-  if (!cardIndex) throw new Error("tcg_v0_2_snapshot_card_index_required");
-  for (const [cardId, rawEntry] of Object.entries(cardIndex)) {
-    const entry = objectRecord(rawEntry);
-    const definition = objectRecord(entry?.definition_v0_2);
-    if (!definition) throw new Error(`tcg_v0_2_snapshot_definition_missing:${cardId}`);
-    if (String(definition.id || "") !== cardId) throw new Error(`tcg_v0_2_snapshot_definition_id_mismatch:${cardId}`);
-    if (String(definition.schema || "") !== expected.card_schema) throw new Error(`tcg_v0_2_snapshot_definition_schema_mismatch:${cardId}`);
-    if (String(definition.effect_schema || "") !== expected.effect_schema) throw new Error(`tcg_v0_2_snapshot_definition_effect_schema_mismatch:${cardId}`);
-  }
+  if (!structured) throw new Error("tcg_v0_2_snapshot_definition_missing:card_index");
   return true;
 }
 
