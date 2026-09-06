@@ -24,6 +24,30 @@ export type RuntimePlayerZones = {
   discard: RuntimeCardInstance[];
 };
 
+export type RuntimeContinuousEffect = {
+  id?: string;
+  kind?: string;
+  target?: string;
+  when?: unknown;
+  amount?: number;
+  mode?: string;
+  minimum?: number;
+  maximum?: number;
+  filters?: Record<string, unknown>;
+  [key: string]: unknown;
+};
+
+export type RuntimeAttachedContinuousEffect = {
+  source: RuntimeCardInstance;
+  effect: RuntimeContinuousEffect;
+};
+
+export type RuntimeDefinitionLookup = (instance: RuntimeCardInstance) => unknown;
+
+export type RuntimeContinuousContext = Record<string, unknown> & {
+  evaluate_when?: (when: unknown) => boolean;
+};
+
 const CONTROL_CONDITIONS = new Set(["Stunned", "Dazed", "Rooted", "Blinded", "Mindbound"]);
 const MODIFIER_CONDITIONS = new Set(["Silenced", "Drenched", "Crushed"]);
 const CONDITION_NAMES = new Set([
@@ -170,6 +194,105 @@ export function transferRuntimeShield(
   source.shield = sourceShield - moved;
   destination.shield = destinationShield + moved;
   return moved;
+}
+
+function runtimeWhenMatches(when: unknown, context: RuntimeContinuousContext): boolean {
+  if (when == null) return true;
+  const evaluator = context.evaluate_when;
+  return typeof evaluator === "function" && evaluator(when) === true;
+}
+
+function runtimeFilterValueMatches(actual: unknown, expected: unknown): boolean {
+  if (Array.isArray(expected)) {
+    return expected.some((value) => Object.is(value, actual) || String(value) === String(actual));
+  }
+  if (expected != null && typeof expected === "object") return false;
+  return Object.is(actual, expected) || (actual != null && expected != null && String(actual) === String(expected));
+}
+
+function runtimeContinuousFiltersMatch(
+  filters: Record<string, unknown> | undefined,
+  context: RuntimeContinuousContext,
+  ignoredKeys: string[] = [],
+): boolean {
+  const ignored = new Set(ignoredKeys);
+  for (const [key, expected] of Object.entries(filters || {})) {
+    if (ignored.has(key)) continue;
+    if (!Object.hasOwn(context, key)) return false;
+    if (!runtimeFilterValueMatches(context[key], expected)) return false;
+  }
+  return true;
+}
+
+export function collectRuntimeAttachedContinuousEffects(
+  attachments: RuntimeCardInstance[],
+  definitionLookup: RuntimeDefinitionLookup,
+  kind: string,
+): RuntimeAttachedContinuousEffect[] {
+  const result: RuntimeAttachedContinuousEffect[] = [];
+  for (const source of attachments || []) {
+    const definition = definitionLookup(source) as Record<string, unknown> | null | undefined;
+    const essence = definition?.essence as Record<string, unknown> | null | undefined;
+    const continuous = Array.isArray(essence?.continuous) ? essence.continuous : [];
+    for (const raw of continuous) {
+      if (!raw || typeof raw !== "object") continue;
+      const effect = raw as RuntimeContinuousEffect;
+      if (String(effect.kind || "") !== kind) continue;
+      const target = effect.target == null ? "$attached_creature" : String(effect.target);
+      if (target !== "$attached_creature") continue;
+      result.push({ source, effect });
+    }
+  }
+  return result;
+}
+
+export function applyRuntimeContinuousNumericModifiers(
+  baseValue: number,
+  attachments: RuntimeCardInstance[],
+  definitionLookup: RuntimeDefinitionLookup,
+  kind: string,
+  context: RuntimeContinuousContext = {},
+  floor = 0,
+): number {
+  const minimumFloor = Number.isFinite(Number(floor)) ? Number(floor) : 0;
+  let value = Number.isFinite(Number(baseValue)) ? Number(baseValue) : minimumFloor;
+
+  for (const { effect } of collectRuntimeAttachedContinuousEffects(attachments, definitionLookup, kind)) {
+    if (!runtimeWhenMatches(effect.when, context)) continue;
+    if (!runtimeContinuousFiltersMatch(effect.filters, context)) continue;
+
+    const amount = Number(effect.amount);
+    if (!Number.isFinite(amount)) continue;
+    const mode = effect.mode == null ? "delta" : String(effect.mode);
+    if (mode === "set") value = amount;
+    else if (mode === "delta") value += amount;
+    else continue;
+
+    const minimum = Number(effect.minimum);
+    if (Number.isFinite(minimum)) value = Math.max(value, minimum);
+    const maximum = Number(effect.maximum);
+    if (Number.isFinite(maximum)) value = Math.min(value, maximum);
+  }
+
+  return Math.max(minimumFloor, value);
+}
+
+export function runtimeContinuousBlocksSource(
+  attachments: RuntimeCardInstance[],
+  definitionLookup: RuntimeDefinitionLookup,
+  kind: string,
+  sourceCategory: string,
+  context: RuntimeContinuousContext = {},
+): boolean {
+  for (const { effect } of collectRuntimeAttachedContinuousEffects(attachments, definitionLookup, kind)) {
+    if (!runtimeWhenMatches(effect.when, context)) continue;
+    const filters = effect.filters || {};
+    const blocked = Array.isArray(filters.blocked_sources) ? filters.blocked_sources.map((value) => String(value)) : [];
+    if (!blocked.includes(sourceCategory)) continue;
+    if (!runtimeContinuousFiltersMatch(filters, context, ["blocked_sources"])) continue;
+    return true;
+  }
+  return false;
 }
 
 export function incrementRuntimeSourceCounter(
