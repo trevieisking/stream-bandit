@@ -29,7 +29,8 @@
       "tcg-card-pass-2-schema-amendment-o-selective-protection.md",
       "tcg-card-pass-2-schema-amendment-p-layered-counterplay.md",
       "tcg-card-pass-2-schema-amendment-q-precision-execution.md",
-      "tcg-card-pass-2-schema-amendment-r-condition-execution.md"
+      "tcg-card-pass-2-schema-amendment-r-condition-execution.md",
+      "tcg-card-pass-2-schema-amendment-s-threshold-sweep-comeback.md"
     ]
   },
   "global_rules": {
@@ -97,31 +98,11 @@
     "damage_movement_uses_weakness": false
   },
   "damage_classes": {
-    "attack_damage": {
-      "weakness": true,
-      "resistance": true,
-      "shield": true
-    },
-    "effect_damage": {
-      "weakness": false,
-      "resistance": false,
-      "shield": true
-    },
-    "damage_placement": {
-      "weakness": false,
-      "resistance": false,
-      "shield": false
-    },
-    "damage_movement": {
-      "weakness": false,
-      "resistance": false,
-      "shield": false,
-      "counts_as_healing": false
-    },
-    "vitality_drain": {
-      "damage_class": "effect_damage",
-      "heal_from": "actual_hp_damage_only"
-    }
+    "attack_damage": {"weakness": true, "resistance": true, "shield": true},
+    "effect_damage": {"weakness": false, "resistance": false, "shield": true},
+    "damage_placement": {"weakness": false, "resistance": false, "shield": false},
+    "damage_movement": {"weakness": false, "resistance": false, "shield": false, "counts_as_healing": false},
+    "vitality_drain": {"damage_class": "effect_damage", "heal_from": "actual_hp_damage_only"}
   },
   "protection_layers": {
     "independent": true,
@@ -148,12 +129,7 @@
   "execution": {
     "precision": {
       "operation": "DEFEAT_TARGET_IF",
-      "predicates": [
-        "target_damage_equals",
-        "target_damage_at_least",
-        "target_damage_at_most",
-        "target_remaining_hp_at_most"
-      ],
+      "predicates": ["target_damage_equals", "target_damage_at_least", "target_damage_at_most"],
       "default_exact_threshold_recheck": ["declaration", "pre_resolution"],
       "overshoot_fails_equals": true,
       "uses_attack_damage": false,
@@ -162,17 +138,33 @@
     },
     "condition": {
       "operation": "DEFEAT_TARGET_IF",
-      "predicates": [
-        "target_has_any_condition",
-        "target_has_condition",
-        "target_has_any_named_condition"
-      ],
+      "predicates": ["target_has_any_condition", "target_has_condition", "target_has_any_named_condition"],
       "default_recheck": ["declaration", "pre_resolution"],
       "uses_attack_damage": false,
       "shield_prevents_execute": false,
       "weakness_modifies_execute": false
     },
+    "remaining_hp": {
+      "single_target_operation": "DEFEAT_TARGET_IF",
+      "sweep_operation": "DEFEAT_EACH_MATCHING",
+      "predicates": ["target_remaining_hp_equals", "target_remaining_hp_at_most", "target_remaining_hp_at_least"],
+      "example_threshold": 50,
+      "uses_attack_damage": false,
+      "shield_prevents_execute": false,
+      "weakness_modifies_execute": false,
+      "sweep_default_snapshot": "resolution_time",
+      "high_tier_gate_required_for_board_wide_sweep": true
+    },
     "shared_defeat_owner_required": true
+  },
+  "comeback_scaling": {
+    "public_state": "opponent_rewards_claimed",
+    "example_amount_per_reward": 60,
+    "produces": "ordinary_attack_damage",
+    "uses_weakness": true,
+    "uses_resistance": true,
+    "uses_shield": true,
+    "client_state_authoritative": false
   },
   "targeting": {
     "default_attack_target": "opposing_vanguard",
@@ -200,13 +192,13 @@
   "future_mechanics": {
     "drain_bands": [10, 20, 40, 60],
     "rare_hostile_damage_transfer": true,
-    "rare_tide_multi_target_placement": {
-      "amount_each": 120,
-      "max_targets": 2,
-      "requires_high_tier_gate": true
-    },
+    "rare_tide_multi_target_placement": {"amount_each": 120, "max_targets": 2, "requires_high_tier_gate": true},
     "low_hp_utility_wall_guidance": {"min_hp": 40, "max_hp": 120},
-    "periodic_damage_placement_prefers_existing_timing": ["aftermath_started", "aftermath_finished"]
+    "periodic_damage_placement_prefers_existing_timing": ["aftermath_started", "aftermath_finished"],
+    "condition_execution_supported": true,
+    "precision_execution_supported": true,
+    "remaining_hp_execution_supported": true,
+    "reward_progress_comeback_scaling_supported": true
   },
   "validation_errors": [
     "routine_per_card_weakness_present",
@@ -229,6 +221,11 @@
     "precision_equals_silently_treated_as_at_least",
     "execution_bypasses_shared_defeat_owner",
     "condition_execution_uses_duplicate_hidden_condition_state",
+    "remaining_hp_confused_with_accumulated_damage",
+    "remaining_hp_sweep_without_high_tier_gate",
+    "reward_progress_read_from_client",
+    "reward_progress_scaling_treated_as_execute_instead_of_attack_damage",
+    "wrong_players_reward_progress_counted",
     "multi_target_120_without_high_tier_gate",
     "recursive_drain_or_listener_loop",
     "card_specific_runtime_exception_required_for_candidate"
@@ -244,10 +241,7 @@
     "tcg-card-pass-2-volt.md",
     "tcg-card-pass-2-founder.md"
   ],
-  "future_candidate_files": [
-    "tcg-future-fairy-audit.md",
-    "tcg-future-underworld-audit.md"
-  ],
+  "future_candidate_files": ["tcg-future-fairy-audit.md", "tcg-future-underworld-audit.md"],
   "completion": {
     "hard_invariants_consolidated": true,
     "amendment_authority_map_consolidated": true,
