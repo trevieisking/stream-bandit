@@ -13,6 +13,7 @@ import {
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
+const registryLock = JSON.parse(fs.readFileSync(path.join(root, 'tcg-card-pass-2-registry-lock-v0.2.json'), 'utf8'));
 
 function starterCardIds() {
   const manifest = JSON.parse(fs.readFileSync(path.join(root, 'tcg-set-one-starters-v0.2.json'), 'utf8'));
@@ -62,7 +63,8 @@ test('registry rows are unique, sorted and directly shaped for tcg_card_definiti
   }
 });
 
-test('registry serialization is deterministic and contains no generated timestamp', () => {
+test('registry serialization is deterministic and frozen by the source-controlled digest lock', () => {
+  const registry = buildSetOneRegistry(root);
   const first = serializeSetOneRegistry(root);
   const second = serializeSetOneRegistry(root);
   assert.equal(first, second);
@@ -70,8 +72,17 @@ test('registry serialization is deterministic and contains no generated timestam
   assert.equal(first.includes('generated_at'), false);
   assert.equal(first.includes('created_at'), false);
   assert.equal(first.includes('updated_at'), false);
+
   const digest = createHash('sha256').update(first).digest('hex');
-  console.log(`SET_ONE_REGISTRY_SHA256=${digest}`);
+  assert.equal(registryLock.schema, 'sb-tcg-registry-lock-v0.2');
+  assert.equal(registryLock.registry_id, registry.registry_id);
+  assert.equal(registryLock.card_schema, registry.card_schema);
+  assert.equal(registryLock.effect_schema, registry.effect_schema);
+  assert.equal(registryLock.card_count, registry.card_count);
+  assert.deepEqual(registryLock.source_files, registry.source_files);
+  assert.deepEqual(registryLock.source_counts, registry.source_counts);
+  assert.equal(registryLock.sha256, digest, 'registry bytes changed without an explicit lock update');
+  assert.equal(registryLock.runtime_authority, false, 'digest lock must not silently activate v0.2 runtime authority');
 });
 
 test('every exact starter reference exists in the deterministic registry', () => {
