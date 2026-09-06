@@ -45,7 +45,7 @@ create table if not exists public.tcg_card_definition_versions (
     check (definition ->> 'id' = card_id),
   constraint tcg_card_definition_versions_definition_name_check
     check (definition ->> 'name' = name),
-  constraint tcg_card_definition_versions_card_family_check
+  constraint tcg_card_definition_versions_definition_card_family_check
     check (definition ->> 'card_family' = card_family),
   constraint tcg_card_definition_versions_card_schema_check
     check (definition ->> 'schema' = card_schema),
