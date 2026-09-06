@@ -2,11 +2,22 @@
 
 **Checkpoint date:** 2026-09-06  
 **Active implementation:** PR #549 — `feature/tcg-private-alpha-v0-5-source-recovery`  
-**Evidence head before this checklist update:** `d7d8b1c50485e7ccebff385baf7827cb826de1e2`
+**Current implementation head before this checklist update:** `efc0c33537bfe5aeb5335d15f7addbddb6aef3cf`
 
 ## Current authority
 
-This checklist is the operational companion to `tcg-master-plan.html` and the 4 September 2026 locked TCG master plan.
+This checklist is the operational companion to the living repo TCG master plan, current-rules audit ledgers and Card Pass 2 structure files.
+
+The 4 September 2026 Google Docs master plan is retained as **historical scope/restart evidence only**. It must not overwrite later explicit corrections made by Trev or the current repo rules. When an older document conflicts with a later explicit decision, the later decision/current repo authority wins.
+
+Current authority order:
+
+1. Trev's latest explicit TCG corrections/decisions.
+2. Current repo master plan/current-rules audit and accepted Card Pass 2 amendments/candidates.
+3. Earlier locked rules that have not been superseded.
+4. The 4 September Google master plan and old prototype registry only as historical/design evidence.
+
+Examples of later corrections already binding include the two global Weakness/matchup chains instead of per-card Weakness duplication, the three-currency naming, identity-based copy limits and the separation of Mythic from Starbound/stage.
 
 When older Code Labs workflow notes conflict with the current TCG master plan or Trev's later explicit direction, the current TCG master plan wins. Code Labs, GitHub and Supabase are tools to complete the game; they are not allowed to turn an obsolete workflow checkpoint into a permanent blocker.
 
@@ -32,6 +43,8 @@ The engineering rule remains: preserve working systems, understand the change be
 - [x] **DONE** — Vanguard / four Reserve slots / six Reward Cards / real Essence cards / Tactic families / Shield / conditions recorded.
 - [x] **DONE** — Starbound is separate from Mythic and uses one player-owned marker per match.
 - [x] **DONE** — global matchup-table architecture replaces per-card Weakness duplication.
+- [x] **DONE** — world Weakness chain: `Tide → Ember → Grove → Gale → Stone → Volt → Tide`.
+- [x] **DONE** — mystical/combat chain: `Astral → Martial → Shade → Fairy → Underworld → Astral`; Martial is a Creature Type, Fairy/Underworld are future full elements.
 - [x] **DONE** — current Set One design audits completed across Astral, Ember, Gale, Grove, Shade, Stone, Tide and Volt.
 - [ ] **IN PROGRESS** — final deterministic STRUCTURE pass for all 193 identities.
 - [ ] **TODO** — AI Test Match balance pass across all eight starters after the deterministic registry is complete.
@@ -39,12 +52,14 @@ The engineering rule remains: preserve working systems, understand the change be
 
 ## Card Pass 2 structure
 
-- [x] **DONE (branch)** — `sb-tcg-card-v0.2` / `sb-tcg-effects-v0.2` schema work and Amendments A–F.
+- [x] **DONE (branch)** — `sb-tcg-card-v0.2` / `sb-tcg-effects-v0.2` base schema.
+- [x] **DONE (branch)** — Schema Amendments A–F.
+- [x] **DONE (branch)** — Amendment G: generic additive alternate attack targets + target-zone attack context/damage modifier; removes need for Skyrend target-name logic.
+- [x] **DONE (branch)** — Amendment H: atomic switch counterpart bindings, real voluntary-withdrawal invocation/cost modification and post-attack completion timing.
 - [x] **DONE (branch)** — Astral structured candidate.
 - [x] **DONE (branch)** — Ember 24 structured candidate.
-- [ ] **NEXT** — Schema Amendment G: generic alternate attack target + target-zone conditional damage; remove the current Skyrend card-name exception.
-- [ ] **NEXT AFTER G** — Gale 24 structured candidate.
-- [ ] **TODO** — Grove structured candidate.
+- [x] **DONE (branch)** — Gale 24 structured candidate.
+- [ ] **NEXT** — Grove structured candidate; add shared grammar only if the complete Grove mapping proves a reusable gap.
 - [ ] **TODO** — Shade structured candidate.
 - [ ] **TODO** — Stone structured candidate.
 - [ ] **TODO** — Tide structured candidate.
@@ -98,8 +113,10 @@ The engineering rule remains: preserve working systems, understand the change be
 - [x] **DONE (branch)** — defeat scan / winner completion / match reward handoff foundation exists.
 - [x] **DONE (branch)** — deterministic Ally/Device interpreter exists for the currently structured 40 Tactics.
 - [x] **DONE (branch)** — lifecycle support added for temporary attack bonuses, withdrawal overrides, condition immunity, final-Vanguard attack eligibility and generated Essence cleanup.
+- [x] **DONE (schema/structure)** — Skyrend's accepted Reserve targeting and -20 Reserve-target penalty now have generic Card Pass 2 representation; the runtime card-ID branch still needs removal when v0.2 is wired into the engine.
+- [x] **DONE (schema/structure)** — Gale movement handoffs and real voluntary-withdrawal effects now have shared deterministic representation.
 - [ ] **IN PROGRESS** — generic pending-choice engine must finish attack effects and creature Abilities; no runtime parsing of printed English.
-- [ ] **REPAIR / NEXT** — remove `gale-skyrend` attack-target card-name logic and encode generic Reserve targeting + required Reserve damage modifier.
+- [ ] **REPAIR (runtime)** — remove `gale-skyrend`, `gale-breeze-essence`, Aeralith and other remaining card-name/card-id shortcuts as v0.2 registry/effect execution becomes authoritative.
 - [ ] **IN PROGRESS** — replace remaining creature/card-name gameplay branches with structured event/listener metadata as each Card Pass 2 element lands.
 - [ ] **TODO** — complete all hidden-information choices: hand, deck and Reward-card inspections with player-private views.
 - [ ] **TODO** — complete reconnect/resume test through an interrupted real match.
@@ -170,13 +187,13 @@ The engineering rule remains: preserve working systems, understand the change be
 
 # 8. Current tests and release gates
 
-At evidence head `d7d8b1c50485e7ccebff385baf7827cb826de1e2`:
+Confirmed clean checkpoint before the current schema/card batch:
 
-- [x] **PASS** — Code Labs Migration Replay run #183.
-- [x] **PASS** — Code Labs V50 Functional Smoke run #201.
-- [x] **PASS** — no submitted PR reviews or inline review threads currently block PR #549.
-- [ ] **INFO** — GitHub has no separate combined-status contexts on that head; absence is not counted as another PASS.
-- [ ] **TODO** — exact-head tests must rerun after every gameplay/schema batch.
+- [x] **PASS** — head `09bc7a3af10b07408a38b6d0ca4b9fd9201b4df3`: Code Labs Migration Replay #184.
+- [x] **PASS** — head `09bc7a3af10b07408a38b6d0ca4b9fd9201b4df3`: Code Labs V50 Functional Smoke #202.
+- [x] **PASS** — Amendment G migration replay #185 at head `4370385472c3d16c6100604b003dacb39178543c`.
+- [ ] **PENDING AT CHECKPOINT** — Amendment H/new Gale head workflows were queued/pending when this checklist update was written; pending is not counted as PASS or FAIL.
+- [ ] **TODO** — exact-head tests must finish successfully on the latest checklist head after this batch.
 - [ ] **TODO** — deploy later TCG migrations/functions only after their source and integration path match the current master rules.
 - [ ] **TODO** — sign in as two real accounts, choose starters/decks, enter matchmaking together and finish a complete battle.
 - [ ] **TODO** — reconnect one player during a match and prove hidden/private state remains correct.
@@ -189,9 +206,9 @@ At evidence head `d7d8b1c50485e7ccebff385baf7827cb826de1e2`:
 
 # 9. Exact next execution order
 
-1. **Schema Amendment G** — generic alternate attack target + target-zone damage modifier; remove Skyrend name-check dependency.
-2. **Gale 24 Card Pass 2 structured candidate.**
-3. Continue **Grove → Shade → Stone → Tide → Volt** STRUCTURE batches, adding shared grammar only when an element proves a real reusable gap.
+1. **Grove 24 Card Pass 2 structured candidate**, adding shared grammar only where the complete accepted Grove audit proves a reusable gap.
+2. Continue **Shade → Stone → Tide → Volt** STRUCTURE batches.
+3. Consolidate the base schema + Amendments A–H and any later element-proven additions into one machine-readable validator/specification.
 4. Finish the **unified server-authoritative effect + pending-choice engine** for attacks and creature Abilities; remove remaining gameplay card-name hacks.
 5. Repair **deck validation/copy-limit drift** before the economy migration is applied.
 6. Reconcile final Card Pass 2 registry with the eight exact starters and freeze the first deterministic SB1 registry version.
@@ -207,4 +224,4 @@ At evidence head `d7d8b1c50485e7ccebff385baf7827cb826de1e2`:
 
 ## Master-plan checkpoint conclusion
 
-Yesterday produced substantial real branch work. The missing piece was not implementation progress; it was that the visible checklist had not been reconciled to that progress. This file closes that bookkeeping gap and is now the current progress ledger to update after every meaningful TCG batch.
+The current visible ledger now includes the 6 September schema/structure work through **Gale 24**, including Amendments G and H. Future meaningful TCG batches must update this checklist in the same work cycle so implementation and planning truth do not drift apart.
