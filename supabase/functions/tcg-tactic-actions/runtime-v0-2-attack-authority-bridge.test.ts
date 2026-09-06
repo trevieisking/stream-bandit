@@ -1,5 +1,6 @@
 import { resolveRuntimeAttackAuthority } from "../_shared/tcg-match-attack-authority-v0-2.ts";
 import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
+type _TcgMatchActionsCompileContract = typeof import("../tcg-match-actions/index.ts");
 
 function assertEquals(actual: unknown, expected: unknown, message = "values differ") {
   if (!Object.is(actual, expected)) throw new Error(`${message}: expected ${String(expected)}, got ${String(actual)}`);
