@@ -2,7 +2,7 @@
 
 **Checkpoint date:** 2026-09-06  
 **Active implementation:** PR #549 — `feature/tcg-private-alpha-v0-5-source-recovery`  
-**Current implementation head before this checklist update:** `0f7d6201a8f6b61d39df5bf70a5670f25c726cb6`
+**Current implementation head before this checklist update:** `63f9d43b16a8ed29b3bd9810e82d7c24a49f9ff6`
 
 ## Authority
 
@@ -11,7 +11,7 @@
 3. Earlier locked rules not superseded.
 4. 4 Sep Google plan / old prototype only as historical evidence.
 
-Hard rule: ordinary Weakness comes from the two global matchup chains. Routine per-card `weakness` on an ordinary Set One Creature is a validation defect.
+**Hard rule:** ordinary Weakness comes from the two global matchup chains. Routine per-card `weakness` on an ordinary Set One Creature is a validation defect.
 
 ---
 
@@ -39,14 +39,15 @@ Hard rule: ordinary Weakness comes from the two global matchup chains. Routine p
 - [x] H — switch counterpart bindings + real voluntary withdrawal + post-attack completion.
 - [x] I — public discard selection + healing packets/modifiers + aura selectors + damage-source binding + Weakness validator guard.
 - [x] J — server-random hidden sampling + opponent-deck inspection/reorder + delayed lifecycle action + control-condition replacement.
+- [x] K — prevention attribution/counters + threshold defence + Shield-source events + source-aware withdrawal-tax immunity.
 - [x] Astral candidate exists.
 - [ ] **REPAIR** — Astral physical candidate still contains stale per-card Weakness objects from before Trev's global-chain correction. Repair projection is correct, but source must be consolidated.
 - [x] Ember 24 candidate.
 - [x] Gale 24 candidate.
 - [x] Grove 24 candidate — zero per-card Weakness.
 - [x] Shade 24 candidate — zero per-card Weakness.
-- [ ] **NEXT — Stone 24**.
-- [ ] Tide 24.
+- [x] Stone 24 candidate — zero per-card Weakness.
+- [ ] **NEXT — Tide 24**.
 - [ ] Volt 24.
 - [ ] Consolidated machine-readable v0.2 validator/spec.
 - [ ] Freeze final 193-card registry only after simulation + human balance.
@@ -91,10 +92,11 @@ Hard rule: ordinary Weakness comes from the two global matchup chains. Routine p
 - [x] Starbound attack-consumption foundation.
 - [x] Defeat/winner/reward handoff foundation.
 - [x] Deterministic current Ally/Device interpreter.
-- [x] Skyrend target/penalty has generic schema path.
-- [x] Gale movement/withdrawal has generic schema path.
-- [x] Grove heal/recycle/aura/reflect has generic schema path.
-- [x] Shade hidden-information/control mechanics have generic schema path.
+- [x] Skyrend target/penalty generic schema path.
+- [x] Gale movement/withdrawal generic schema path.
+- [x] Grove heal/recycle/aura/reflect generic schema path.
+- [x] Shade hidden-information/control generic schema path.
+- [x] Stone threshold-defence/Shield/prevention/Relic generic schema path.
 - [ ] Generic pending-choice engine — IN PROGRESS.
 - [ ] Remove remaining card-id/name runtime shortcuts as v0.2 becomes authority.
 - [ ] Hidden hand/deck/Reward choices.
@@ -179,24 +181,23 @@ Hard rule: ordinary Weakness comes from the two global matchup chains. Routine p
 
 # 9. Exact next execution order
 
-1. Stone 24 STRUCTURE.
-2. Tide 24 STRUCTURE.
-3. Volt 24 STRUCTURE.
-4. Physically consolidate Astral to remove stale per-card Weakness.
-5. Consolidate base schema + A–J and any later element-proven amendments into one machine-readable validator/spec.
-6. Finish unified effect + pending-choice runtime and remove card-name/card-id hacks.
-7. Repair deck validation/copy-limit drift.
-8. Reconcile all 193 definitions with the 8 exact starters and freeze deterministic SB1 registry.
-9. Deploy matching TCG migrations/functions.
-10. Collection + Deck Builder + renderer + battle UI.
-11. Trade Token duplicate conversion + Shop/pack opening.
-12. Battle Pass + dailies.
-13. AI Test Match + simulation + human balance.
-14. Real two-account battle + reconnect/security/economy tests.
-15. Release ladder only after all gates pass.
+1. Tide 24 STRUCTURE.
+2. Volt 24 STRUCTURE.
+3. Physically consolidate Astral to remove stale per-card Weakness.
+4. Consolidate base schema + A–K and any later element-proven amendments into one machine-readable validator/spec.
+5. Finish unified effect + pending-choice runtime and remove card-name/card-id hacks.
+6. Repair deck validation/copy-limit drift.
+7. Reconcile all 193 definitions with the 8 exact starters and freeze deterministic SB1 registry.
+8. Deploy matching TCG migrations/functions.
+9. Collection + Deck Builder + renderer + battle UI.
+10. Trade Token duplicate conversion + Shop/pack opening.
+11. Battle Pass + dailies.
+12. AI Test Match + simulation + human balance.
+13. Real two-account battle + reconnect/security/economy tests.
+14. Release ladder only after all gates pass.
 
 ---
 
 ## Checkpoint conclusion
 
-Visible planning truth now includes Card Pass 2 through **Shade 24** and Amendments G–J. Trev's global Weakness-chain correction remains an explicit schema guard and the stale Astral physical-file contradiction remains a named repair item until removed.
+Visible planning truth now includes Card Pass 2 through **Stone 24** and Amendments G–K. Trev's global Weakness-chain correction remains an explicit schema guard and every newly structured element since the correction contains zero routine per-card Weakness fields. The stale Astral physical-file contradiction remains a named repair item until removed.
