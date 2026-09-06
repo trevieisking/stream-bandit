@@ -9,12 +9,14 @@
 This batch is derived only from the current reviewed authorities:
 
 1. `tcg-set-one-audit.md` — accepted Astral card designs and exact Second Sky audit;
-2. `tcg-card-pass-2-weakness-resistance.md` — directional Weakness ×2 and Astral per-creature assignments; all current SB1 resistance is null;
+2. `tcg-card-pass-2-weakness-resistance.md` — **global matchup-table authority**; routine Weakness is not stored on individual cards;
 3. `tcg-card-pass-2-schema.md` — `sb-tcg-card-v0.2` / `sb-tcg-effects-v0.2` base schema;
 4. `tcg-card-pass-2-schema-amendment-astral.md` — hidden-zone inspection, inspection/reorder events, whole-hand shuffle-back, card-variable predicates, source-scoped Shield caps and source matching;
 5. `tcg-card-pass-2-schema-amendment-b.md` — event context, non-inspecting deck movement, top-level Starbound ownership, Essence deck-limit delegation and trigger snapshots;
 6. `tcg-card-pass-2-schema-amendment-c.md` — server-only hidden checks, event-history predicates, optional actions, filtered player choice, temporary modifier lifetime and hidden-search semantics;
-7. fresh active Supabase SB1 Astral identity data and the exact current `Second Sky` 60-card recipe as identity/source evidence only.
+7. `tcg-card-pass-2-schema-amendment-e.md` — global matchup ownership and explicit matchup override fields;
+8. `tcg-card-pass-2-schema-amendment-i.md` — validator rejection of stale routine per-card Weakness data;
+9. fresh active Supabase SB1 Astral identity data and the exact current `Second Sky` 60-card recipe as identity/source evidence only.
 
 The old `set-one-v0.6.1` registry remains prototype evidence. This file does not make it production authority.
 
@@ -31,7 +33,10 @@ All candidate records below use:
 - ordinary identity deck limit `max = 4` unless explicitly overridden
 - Mythic identity deck limit `max = 1`
 - Essence deck limit delegated to `global_essence_allowance` until the global exact Essence allowance is frozen
-- all current SB1 Astral creature `resistance = null`
+- current Set One Astral creature `creature_types = []` unless a later accepted card definition explicitly adds a type
+- current Set One Astral creature `resistance = null`
+- current Set One Astral creature `matchup_override = null`
+- **zero routine per-card Weakness fields**; the global matchup table owns Weakness
 - attack `damage_element = source_creature`
 - no printed-English parsing as gameplay authority
 - no Astral card-id runtime branches
@@ -52,7 +57,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":false}},
   "creature":{
     "stage":"Baby","evolves_from_id":null,"hp":50,"withdrawal":0,"reward_value":1,
-    "weakness":{"element":"Shade","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{
       "id":"star-sense","name":"Star Sense","mode":"triggered","event":"creature_entered_play","timing":"build","limit":null,
       "requirements":{"all":[{"predicate":"source_is_self"},{"predicate":"event_origin_zone_is","zone":"hand"},{"predicate":"event_destination_zone_is","zone":"reserve"},{"predicate":"event_phase_is","phase":"build"}]},
@@ -79,7 +84,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":false}},
   "creature":{
     "stage":"Teen","evolves_from_id":"astral-stardot","hp":120,"withdrawal":1,"reward_value":1,
-    "weakness":{"element":"Shade","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{"id":"orbit-check","name":"Orbit Check","mode":"triggered","event":"creature_evolved","timing":"own_turn","limit":null,"requirements":{"all":[{"predicate":"source_is_self"}]},"costs":[],"steps":[{"op":"LOOK_TOP","player":"self","count":2,"as":"looked"},{"op":"RETURN_SET_TO_DECK_TOP","player":"self","cards":"$looked","order":"player_choice"}]},
     "attacks":[
       {"id":"orbit-swipe","name":"Orbit Swipe","cost":[{"element":"Astral","amount":1}],"damage_element":"source_creature","base_damage":40,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[]},
@@ -99,7 +104,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":false}},
   "creature":{
     "stage":"Adult","evolves_from_id":"astral-orbitail","hp":240,"withdrawal":2,"reward_value":1,
-    "weakness":{"element":"Shade","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{"id":"charted-future","name":"Charted Future","mode":"active","event":null,"timing":"own_turn","limit":{"scope":"turn","count":1,"owner":"controller"},"requirements":[],"costs":[],"steps":[{"op":"LOOK_TOP","player":"self","count":3,"as":"looked"},{"op":"RETURN_SET_TO_DECK_TOP","player":"self","cards":"$looked","order":"player_choice"}]},
     "attacks":[
       {"id":"constellation-claw","name":"Constellation Claw","cost":[{"element":"Astral","amount":2}],"damage_element":"source_creature","base_damage":70,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[]},
@@ -119,7 +124,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":false}},
   "creature":{
     "stage":"Baby","evolves_from_id":null,"hp":60,"withdrawal":1,"reward_value":1,
-    "weakness":{"element":"Volt","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{"id":"moon-glimpse","name":"Moon Glimpse","mode":"triggered","event":"creature_entered_play","timing":"build","limit":null,"requirements":{"all":[{"predicate":"source_is_self"},{"predicate":"event_origin_zone_is","zone":"hand"},{"predicate":"event_destination_zone_is","zone":"reserve"},{"predicate":"event_phase_is","phase":"build"}]},"costs":[],"steps":[{"op":"INSPECT_ZONE","player":"self","zone":"rewards","selection":{"min":1,"max":1,"filters":{}},"visibility":"controller_private","return_policy":"same_position","as":"inspected_rewards"}]},
     "attacks":[{"id":"moon-tap","name":"Moon Tap","cost":[{"element":"Astral","amount":1}],"damage_element":"source_creature","base_damage":20,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[]}]
   },"essence":null,"tactic":null
@@ -136,7 +141,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":false}},
   "creature":{
     "stage":"Teen","evolves_from_id":"astral-moonbit","hp":130,"withdrawal":1,"reward_value":1,
-    "weakness":{"element":"Volt","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{"id":"comet-survey","name":"Comet Survey","mode":"triggered","event":"creature_evolved","timing":"own_turn","limit":null,"requirements":{"all":[{"predicate":"source_is_self"}]},"costs":[],"steps":[{"op":"INSPECT_ZONE","player":"self","zone":"rewards","selection":{"min":0,"max":2,"filters":{},"distinct":true},"visibility":"controller_private","return_policy":"same_position","as":"inspected_rewards"}]},
     "attacks":[
       {"id":"comet-swipe","name":"Comet Swipe","cost":[{"element":"Astral","amount":2}],"damage_element":"source_creature","base_damage":50,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[]},
@@ -156,7 +161,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":false}},
   "creature":{
     "stage":"Adult","evolves_from_id":"astral-comettail","hp":260,"withdrawal":2,"reward_value":1,
-    "weakness":{"element":"Volt","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{"id":"nebula-memory","name":"Nebula Memory","mode":"active","event":null,"timing":"own_turn","limit":{"scope":"turn","count":1,"owner":"controller"},"requirements":[],"costs":[],"steps":[{"op":"INSPECT_ZONE","player":"self","zone":"rewards","selection":{"min":1,"max":1,"filters":{}},"visibility":"controller_private","return_policy":"same_position","as":"inspected_reward"}]},
     "attacks":[
       {"id":"nebula-claw","name":"Nebula Claw","cost":[{"element":"Astral","amount":2}],"damage_element":"source_creature","base_damage":70,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[]},
@@ -176,7 +181,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":false}},
   "creature":{
     "stage":"Standalone","evolves_from_id":null,"hp":180,"withdrawal":2,"reward_value":1,
-    "weakness":{"element":"Volt","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{"id":"passing-orbit","name":"Passing Orbit","mode":"triggered","event":"moved_to_reserve","timing":"own_turn","limit":{"scope":"turn","count":1,"owner":"controller"},"requirements":{"all":[{"predicate":"source_is_self"},{"predicate":"event_origin_zone_is","zone":"vanguard"},{"predicate":"event_destination_zone_is","zone":"reserve"},{"predicate":"event_controller_is_self"}]},"costs":[],"steps":[{"op":"LOOK_TOP","player":"self","count":2,"as":"looked"},{"op":"RETURN_SET_TO_DECK_TOP","player":"self","cards":"$looked","order":"player_choice"}]},
     "attacks":[
       {"id":"comet-ray","name":"Comet Ray","cost":[{"element":"Astral","amount":2}],"damage_element":"source_creature","base_damage":60,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[]},
@@ -196,7 +201,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":false}},
   "creature":{
     "stage":"Standalone","evolves_from_id":null,"hp":170,"withdrawal":2,"reward_value":1,
-    "weakness":{"element":"Tide","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{"id":"forecast-shell","name":"Forecast Shell","mode":"triggered","event":"hidden_information_viewed","timing":"own_turn","limit":{"scope":"turn","count":1,"owner":"controller"},"requirements":{"all":[{"predicate":"event_controller_is_self"},{"any":[{"predicate":"event_zone_is","zone":"deck_top"},{"predicate":"event_zone_is","zone":"deck"}]}]},"costs":[],"steps":[{"op":"ADD_SHIELD","target":"$source_creature","amount":10,"source_contribution_cap":20,"source_key":"ability:forecast-shell"}]},
     "attacks":[
       {"id":"orbit-bash","name":"Orbit Bash","cost":[{"element":"Astral","amount":2}],"damage_element":"source_creature","base_damage":50,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[]},
@@ -216,7 +221,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":false}},
   "creature":{
     "stage":"Standalone","evolves_from_id":null,"hp":110,"withdrawal":1,"reward_value":1,
-    "weakness":{"element":"Shade","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{"id":"wide-eyes","name":"Wide Eyes","mode":"triggered","event":"hidden_information_viewed","timing":"own_turn","limit":{"scope":"turn","count":1,"owner":"controller"},"requirements":{"all":[{"predicate":"event_controller_is_self"}]},"costs":[],"steps":[{"op":"DRAW","player":"self","count":1},{"op":"CHOOSE_HAND_TO_DISCARD","player":"self","count":1}]},
     "attacks":[
       {"id":"prism-peck","name":"Prism Peck","cost":[{"element":"Astral","amount":1}],"damage_element":"source_creature","base_damage":30,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[]},
@@ -236,7 +241,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":false}},
   "creature":{
     "stage":"Standalone","evolves_from_id":null,"hp":200,"withdrawal":3,"reward_value":1,
-    "weakness":{"element":"Volt","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{"id":"star-current","name":"Star Current","mode":"triggered","event":"hidden_information_viewed","timing":"own_turn","limit":{"scope":"turn","count":1,"owner":"controller"},"requirements":{"all":[{"predicate":"event_controller_is_self"},{"any":[{"predicate":"event_zone_is","zone":"deck_top"},{"predicate":"event_zone_is","zone":"deck"}]}]},"costs":[],"steps":[{"op":"SET_WITHDRAWAL_MODIFIER","target":"$source_creature","delta":-1,"minimum":0,"duration":{"expires_on":["end_of_turn"],"max_uses":null}}]},
     "attacks":[
       {"id":"gravity-song","name":"Gravity Song","cost":[{"element":"Astral","amount":2}],"damage_element":"source_creature","base_damage":60,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[]},
@@ -256,7 +261,7 @@ The candidate record format intentionally shows the complete gameplay-bearing fa
   "prestige":{"starbound":{"enabled":true,"action_kind":"attack","action_id":"second-horizon","shared_usage_key":"starbound","consume":"legal_declaration_or_activation"}},
   "creature":{
     "stage":"Standalone","evolves_from_id":null,"hp":340,"withdrawal":2,"reward_value":2,
-    "weakness":{"element":"Shade","multiplier":2},"resistance":null,
+    "creature_types":[],"resistance":null,"matchup_override":null,
     "ability":{"id":"dream-cartographer","name":"Dream Cartographer","mode":"active","event":null,"timing":"own_turn","limit":{"scope":"turn","count":1,"owner":"controller"},"requirements":[],"costs":[],"steps":[{"op":"LOOK_TOP","player":"self","count":4,"as":"looked"},{"op":"CHOOSE_FROM_SET","source":"$looked","min":0,"max":1,"as":"bottom"},{"op":"MOVE_CARDS","player":"self","cards":"$bottom","to":"deck_bottom"},{"op":"RETURN_REMAINDER_TO_DECK_TOP","player":"self","source":"$looked","except":"$bottom","order":"player_choice"}]},
     "attacks":[
       {"id":"dream-ray","name":"Dream Ray","cost":[{"element":"Astral","amount":2}],"damage_element":"source_creature","base_damage":80,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[{"op":"LOOK_TOP","player":"self","count":2,"as":"looked"},{"op":"CHOOSE_FROM_SET","source":"$looked","min":1,"max":1,"as":"chosen"},{"op":"MOVE_CARDS","player":"self","cards":"$chosen","to":"hand"},{"op":"PUT_REMAINDER_ON_DECK_BOTTOM","player":"self","source":"$looked","except":"$chosen","order":"preserve"}]},
@@ -488,9 +493,13 @@ All 11 creatures now have:
 - explicit reward value;
 - exactly one named Ability;
 - at least one structured attack;
-- accepted per-creature Weakness ×2;
+- `creature_types: []` unless an explicit later type is accepted;
+- **no routine per-card Weakness field**;
 - `resistance: null`;
+- `matchup_override: null`;
 - explicit Starbound yes/no.
+
+**Weakness is resolved exclusively through the global matchup table.** The current mystical/combat chain is `Astral → Martial → Shade → Fairy → Underworld → Astral`; Martial is a Creature Type/trait and Fairy/Underworld are future full elements. Multiple matching keys still produce only one ×2 Weakness application, never ×4.
 
 Celestyr is normalized to **Standalone + Mythic trait**, reward value 2 and one-copy identity limit. It is the only Astral Starbound identity and references exactly one Starbound action: `second-horizon`.
 
@@ -506,7 +515,7 @@ These are absent from the exact current `Second Sky` starter recipe.
 
 ## Effect-language validation
 
-Every operation/predicate used by this batch is provided by the v0.2 base schema or Amendments A/B/C. The batch introduces **no new Astral-only operation** and no card-id runtime conditional.
+Every operation/predicate used by this batch is provided by the v0.2 base schema or accepted shared amendments. The batch introduces **no new Astral-only operation** and no card-id runtime conditional.
 
 Key former prototype debt now has a data-driven representation:
 
@@ -574,9 +583,11 @@ The stored prototype recipe label `Creature — Mythic` for Celestyr is implemen
 
 # 7. CP2-04A completion state
 
-**ASTRAL STRUCTURED CANDIDATE: COMPLETE — 24 / 24 IDENTITIES.**
+**ASTRAL STRUCTURED CANDIDATE: COMPLETE — 24 / 24 IDENTITIES — GLOBAL MATCHUP CORRECTION CONSOLIDATED.**
 
-This is a **candidate ledger**, not a production registry mutation. It proves that the accepted Astral package can be represented under the shared v0.2 grammar without card-name runtime branches.
+The original pre-correction routine per-card Weakness objects have been physically removed from this candidate. The repair projection is no longer needed to make the Astral candidate logically correct; it remains useful only as historical evidence of the correction.
+
+This is a **candidate ledger**, not a production registry mutation. It proves that the accepted Astral package can be represented under the shared v0.2 grammar without card-name runtime branches or duplicated Weakness data.
 
 Still intentionally deferred:
 
@@ -595,8 +606,4 @@ No provisional balance number is silently changed here.
 
 # 8. Next bounded action
 
-After this Astral ledger's **new exact head** passes the same migration replay + functional-smoke gate:
-
-**CP2-04B — Ember 24 read-only structure pass.**
-
-Use the accepted Ember audit, corrected weakness matrix and the exact same v0.2 schema authorities. If Ember exposes a genuinely generic schema gap, amend the shared schema before writing the Ember card ledger. Do not add an Ember-specific runtime exception and do not start registry/engine writes yet.
+**Consolidate the v0.2 base schema + Amendments A–O into one machine-readable validator/specification, then validate all eight Set One element candidates plus Prismatic Founder against that single owner.**
