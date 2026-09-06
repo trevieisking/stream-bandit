@@ -31,8 +31,11 @@
 - [x] Fairy + Underworld are future full elements completing the second matchup chain.
 - [x] All 8 Set One element design audits complete.
 - [x] All 8 Set One elemental Card Pass 2 structured candidate batches exist.
+- [x] Prismatic Founder has a final v0.2 structured candidate — identity 193/193.
 - [x] Astral pre-correction per-card Weakness data physically removed from the candidate source.
-- [ ] Final deterministic STRUCTURE reconciliation across all 193 identities — **IN PROGRESS**; hard invariants are now consolidated into one machine-readable validator owner, while full opcode/parameter consolidation and candidate-by-candidate validation remain open.
+- [x] All 193 structured identities machine-validated at the Card Pass 2 structural level.
+- [x] All 8 exact starters reconciled against canonical structured candidate IDs and copy limits.
+- [ ] Final deterministic STRUCTURE reconciliation across all 193 identities — **IN PROGRESS** only because full opcode/predicate/parameter grammar consolidation remains open. Candidate inventory, card envelopes, evolution links, HP, copy limits, Starbound/Mythic state and starter references are already validated.
 - [ ] AI Test Match balance.
 - [ ] Human balance / final numeric tuning.
 
@@ -52,6 +55,9 @@
 - [x] P — layered protection, damage-placement protection, Realm replacement and passive placement counterplay.
 - [x] Q — precision execution through exact damage thresholds such as exactly 60 damage.
 - [x] R — condition execution kept distinct from precision execution.
+- [x] S — remaining-HP execution/sweep + opponent-Reward comeback damage scaling.
+- [x] T — global matchup authority cleanup / stale per-card Weakness quarantine.
+- [x] U — generic distinct attached-Essence element queries/search for Prismatic and future multi-element designs.
 - [x] `tcg-design-control-toolbox-archetype.md` — control/toolbox/conversion-control philosophy captured from Trev's gameplay ideas.
 - [x] Astral candidate — corrected to zero routine per-card Weakness fields.
 - [x] Ember 24 candidate.
@@ -61,11 +67,20 @@
 - [x] Stone 24 candidate — zero per-card Weakness.
 - [x] Tide 24 candidate — zero per-card Weakness.
 - [x] Volt 24 candidate — zero per-card Weakness.
-- [x] **Machine-readable validator owner created:** `tcg-card-pass-2-validator-v0.2.json`.
-- [x] Hard invariants, global matchup chains, damage classes, protection layers, execution families and A–R authority map consolidated into that validator owner.
-- [ ] Full opcode / predicate / parameter schema consolidation into the validator owner.
-- [ ] Machine-validate all eight Set One element candidates + Founder against the consolidated owner.
-- [ ] Reconcile the 193-card total with exact starter references and freeze only after simulation + human balance.
+- [x] Prismatic Founder structured candidate.
+- [x] **Machine-readable validator owner:** `tcg-card-pass-2-validator-v0.2.json`.
+- [x] Hard invariants, global matchup chains, damage classes, protection layers, execution families and A–U authority map consolidated into that validator owner.
+- [x] Dedicated exact-card CI gate created: `.github/workflows/tcg-card-pass-2-validation.yml` + `tcg/tests/card-pass-2-validator.test.mjs`.
+- [x] TCG Card Pass 2 Validation #2 PASS on exact head `b4a1ea5c5ed78a8cae130bf5484242f2204e34ab`.
+- [x] 193 unique structured identities proved by CI.
+- [x] 8 × 24 elemental shape proved by CI: 11 Creature / 4 Essence / 9 Tactic per element.
+- [x] Evolution references, HP range, Mythic/Starbound rules, copy limits and zero routine Weakness proved by CI.
+- [x] Exact starter manifest `tcg-set-one-starters-v0.2.json` created and reconciled.
+- [x] Eight starter recipes proved by CI: 60 cards / 21 identities / 22 Creature / 18 Essence / 20 Tactic, no pack-only cards, one Mythic copy.
+- [x] Stone prototype ID drift normalized: live recipe `stone-mason-s-kit` → current candidate `stone-masons-kit`; quantity unchanged.
+- [ ] Full opcode / predicate / parameter schema consolidation into one machine-readable effect grammar owner.
+- [ ] Make CI prove every opcode/predicate used by the 193 candidates is declared by that grammar and required parameters are valid.
+- [ ] Freeze deterministic registry only after simulation + human balance and runtime parity.
 
 ---
 
@@ -132,7 +147,7 @@
 - [x] Defeat/winner/reward handoff foundation.
 - [x] Deterministic current Ally/Device interpreter.
 - [x] Generic schema paths exist for mechanics exposed by all eight Set One audits.
-- [x] Generic schema paths planned for vitality drain, damage placement/movement, selective attack walls, layered counterplay, precision execution and condition execution.
+- [x] Generic schema paths planned for vitality drain, damage placement/movement, selective attack walls, layered counterplay, precision execution, condition execution, remaining-HP sweep, comeback scaling and distinct-element resource queries.
 - [ ] Generic pending-choice/effect runtime — IN PROGRESS.
 - [ ] Remove remaining card-id/name runtime shortcuts as v0.2 becomes authority.
 - [ ] Hidden hand/deck/Reward choices.
@@ -207,7 +222,9 @@
 - [x] `b5cd76a0988c...` Migration Replay #186 PASS; paired smoke superseded/cancelled, not counted as pass.
 - [x] PASS — eight-element Card Pass checkpoint `030757555f684a577c0447ca336b6815067b2524`: Migration Replay #203.
 - [x] PASS — eight-element Card Pass checkpoint `030757555f684a577c0447ca336b6815067b2524`: Functional Smoke #221.
-- [ ] New exact-head CI must pass after the schema/validator/checklist additions before any promotion decision; these remain branch-only design/validation changes.
+- [x] PASS — TCG Card Pass 2 Validation #2 at `b4a1ea5c5ed78a8cae130bf5484242f2204e34ab`.
+- [ ] Fresh exact-head TCG validation must pass after grammar/checklist additions before the next structural checkpoint is considered closed.
+- [ ] Code Labs smoke/migration replay remain supporting repository checks, not substitutes for TCG card validation.
 - [ ] Two-account desktop/phone full battle.
 - [ ] Reconnect/private-state test.
 - [ ] Economy receipt/retry/duplicate tests.
@@ -219,27 +236,27 @@
 
 # 10. Exact next execution order
 
-1. **Complete full opcode / predicate / parameter consolidation inside `tcg-card-pass-2-validator-v0.2.json`.**
-2. Machine-validate Astral, Ember, Gale, Grove, Shade, Stone, Tide, Volt and Prismatic Founder against that one owner.
-3. Reconcile all 193 Set One identities with the eight exact 60-card starters.
-4. Finish unified effect + pending-choice runtime and remove card-name/card-id hacks.
-5. Repair deck validation/copy-limit drift.
-6. Freeze deterministic SB1 registry only after structural validation and simulation/human-balance gates.
-7. Structure the completed Fairy 24 and Underworld 24 future audits through the consolidated schema without blocking Set One private-alpha completion.
-8. Deploy matching TCG migrations/functions after Set One runtime gates pass.
-9. Collection + Deck Builder + renderer + battle UI.
-10. Trade Token duplicate conversion + Shop/pack opening.
-11. Battle Pass + dailies.
-12. AI Test Match + simulation + human balance.
-13. Real two-account battle + reconnect/security/economy tests.
-14. Release ladder only after all Set One gates pass.
+1. **Complete full opcode / predicate / parameter consolidation in one machine-readable v0.2 effect grammar owner and make CI enforce it.**
+2. Finish unified effect + pending-choice runtime and remove card-name/card-id hacks.
+3. Repair deck validation/copy-limit drift.
+4. Freeze deterministic SB1 registry only after runtime parity, structural validation and simulation/human-balance gates.
+5. Structure the completed Fairy 24 and Underworld 24 future audits through the same consolidated schema without blocking Set One private-alpha completion.
+6. Deploy matching TCG migrations/functions after Set One runtime gates pass.
+7. Collection + Deck Builder + renderer + battle UI.
+8. Trade Token duplicate conversion + Shop/pack opening.
+9. Battle Pass + dailies.
+10. AI Test Match + simulation + human balance.
+11. Real two-account battle + reconnect/security/economy tests.
+12. Release ladder only after all Set One gates pass.
 
 ---
 
 ## Checkpoint conclusion
 
-**All eight current Set One elements have deterministic Card Pass 2 candidate ledgers, and Astral's old per-card Weakness contradiction is physically repaired. Fairy and Underworld are fully designed as future 24-card element packages with exact 60-card starters.** The second chain is structurally complete at design level: `Astral → Martial → Shade → Fairy → Underworld → Astral`.
+**Set One now has 193 unique structured candidates and all eight exact 60-card starters are mechanically reconciled by dedicated TCG CI.** Astral's old per-card Weakness contradiction is physically repaired, Founder is identity 193/193, and the starter manifest resolves against current canonical Card Pass 2 IDs.
 
-The shared future-mechanics plan now covers vitality drain, damage movement/hostile transfer, rare Tide ranged placement, selective utility walls, layered protection/counterplay, precision exact-damage execution and separate condition-based execution. Trev's control/toolbox/conversion-control gameplay ideas are recorded as design inputs, not copied card identities.
+Fairy and Underworld remain fully designed as future 24-card element packages with exact 60-card starters. The second chain remains structurally complete at design level: `Astral → Martial → Shade → Fairy → Underworld → Astral`.
 
-The main build has now returned to Set One consolidation: **one machine-readable v0.2 validator owner exists; next is complete opcode/parameter consolidation and candidate-by-candidate validation.**
+The shared future-mechanics plan covers vitality drain, damage movement/hostile transfer, rare Tide ranged placement, selective utility walls, layered protection/counterplay, precision exact-damage execution, separate condition execution, low-remaining-HP sweep, Reward-progress comeback scaling and distinct attached-Essence element queries. Trev's control/toolbox/conversion-control gameplay ideas remain design inputs, not copied card identities.
+
+**Immediate remaining Card Pass 2 structural target: consolidate and CI-enforce the full opcode/predicate/parameter grammar.** After that the work moves directly into runtime interpreter parity and removal of card-specific shortcuts.
