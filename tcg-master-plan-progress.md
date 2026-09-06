@@ -2,7 +2,7 @@
 
 **Checkpoint date:** 2026-09-06  
 **Active implementation:** PR #549 — `feature/tcg-private-alpha-v0-5-source-recovery`  
-**Current implementation head before this checklist update:** `63f9d43b16a8ed29b3bd9810e82d7c24a49f9ff6`
+**Current implementation head before this checklist update:** `b8bb9fdff9435f7e33b8332c79d021cdb5646914`
 
 ## Authority
 
@@ -40,6 +40,7 @@
 - [x] I — public discard selection + healing packets/modifiers + aura selectors + damage-source binding + Weakness validator guard.
 - [x] J — server-random hidden sampling + opponent-deck inspection/reorder + delayed lifecycle action + control-condition replacement.
 - [x] K — prevention attribution/counters + threshold defence + Shield-source events + source-aware withdrawal-tax immunity.
+- [x] L — multi-Essence movement + movement participation + Shield transfer + actual-heal listeners + grouped searches + source-capped withdrawal tax.
 - [x] Astral candidate exists.
 - [ ] **REPAIR** — Astral physical candidate still contains stale per-card Weakness objects from before Trev's global-chain correction. Repair projection is correct, but source must be consolidated.
 - [x] Ember 24 candidate.
@@ -47,8 +48,8 @@
 - [x] Grove 24 candidate — zero per-card Weakness.
 - [x] Shade 24 candidate — zero per-card Weakness.
 - [x] Stone 24 candidate — zero per-card Weakness.
-- [ ] **NEXT — Tide 24**.
-- [ ] Volt 24.
+- [x] Tide 24 candidate — zero per-card Weakness.
+- [ ] **NEXT — Volt 24**.
 - [ ] Consolidated machine-readable v0.2 validator/spec.
 - [ ] Freeze final 193-card registry only after simulation + human balance.
 
@@ -97,6 +98,7 @@
 - [x] Grove heal/recycle/aura/reflect generic schema path.
 - [x] Shade hidden-information/control generic schema path.
 - [x] Stone threshold-defence/Shield/prevention/Relic generic schema path.
+- [x] Tide Essence-flow/Shield-transfer/actual-heal generic schema path.
 - [ ] Generic pending-choice engine — IN PROGRESS.
 - [ ] Remove remaining card-id/name runtime shortcuts as v0.2 becomes authority.
 - [ ] Hidden hand/deck/Reward choices.
@@ -181,23 +183,22 @@
 
 # 9. Exact next execution order
 
-1. Tide 24 STRUCTURE.
-2. Volt 24 STRUCTURE.
-3. Physically consolidate Astral to remove stale per-card Weakness.
-4. Consolidate base schema + A–K and any later element-proven amendments into one machine-readable validator/spec.
-5. Finish unified effect + pending-choice runtime and remove card-name/card-id hacks.
-6. Repair deck validation/copy-limit drift.
-7. Reconcile all 193 definitions with the 8 exact starters and freeze deterministic SB1 registry.
-8. Deploy matching TCG migrations/functions.
-9. Collection + Deck Builder + renderer + battle UI.
-10. Trade Token duplicate conversion + Shop/pack opening.
-11. Battle Pass + dailies.
-12. AI Test Match + simulation + human balance.
-13. Real two-account battle + reconnect/security/economy tests.
-14. Release ladder only after all gates pass.
+1. Volt 24 STRUCTURE.
+2. Physically consolidate Astral to remove stale per-card Weakness.
+3. Consolidate base schema + A–L and any later element-proven amendments into one machine-readable validator/spec.
+4. Finish unified effect + pending-choice runtime and remove card-name/card-id hacks.
+5. Repair deck validation/copy-limit drift.
+6. Reconcile all 193 definitions with the 8 exact starters and freeze deterministic SB1 registry.
+7. Deploy matching TCG migrations/functions.
+8. Collection + Deck Builder + renderer + battle UI.
+9. Trade Token duplicate conversion + Shop/pack opening.
+10. Battle Pass + dailies.
+11. AI Test Match + simulation + human balance.
+12. Real two-account battle + reconnect/security/economy tests.
+13. Release ladder only after all gates pass.
 
 ---
 
 ## Checkpoint conclusion
 
-Visible planning truth now includes Card Pass 2 through **Stone 24** and Amendments G–K. Trev's global Weakness-chain correction remains an explicit schema guard and every newly structured element since the correction contains zero routine per-card Weakness fields. The stale Astral physical-file contradiction remains a named repair item until removed.
+Visible planning truth now includes Card Pass 2 through **Tide 24** and Amendments G–L. Every newly structured element since Trev corrected Weakness contains zero routine per-card Weakness fields. Only the stale pre-correction Astral physical candidate remains to be consolidated after the final Volt batch.
