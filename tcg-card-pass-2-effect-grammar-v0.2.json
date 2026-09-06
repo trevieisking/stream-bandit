@@ -197,11 +197,17 @@
   ],
   "damage_formula_terms": ["conditional_add", "count_add", "multiply_count"],
   "count_sources": ["distinct_attached_essence_elements", "opponent_rewards_claimed"],
+  "validation_evidence": {
+    "workflow": "TCG Card Pass 2 Validation",
+    "run_number": 11,
+    "head_sha": "b04b7009646bc85a1b704aa27ece7af8960c9e2c",
+    "conclusion": "success"
+  },
   "completion": {
     "operation_names_consolidated": true,
     "predicate_names_consolidated": true,
     "required_parameter_contracts_declared": true,
-    "all_193_candidate_usage_ci_verified": false,
+    "all_193_candidate_usage_ci_verified": true,
     "runtime_interpreter_parity": false
   }
 }
