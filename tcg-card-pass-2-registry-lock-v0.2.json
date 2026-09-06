@@ -1,0 +1,33 @@
+{
+  "schema": "sb-tcg-registry-lock-v0.2",
+  "registry_id": "SB1-set-one-v0.2",
+  "card_schema": "sb-tcg-card-v0.2",
+  "effect_schema": "sb-tcg-effects-v0.2",
+  "card_count": 193,
+  "source_files": [
+    "tcg-card-pass-2-astral.md",
+    "tcg-card-pass-2-ember.md",
+    "tcg-card-pass-2-gale.md",
+    "tcg-card-pass-2-grove.md",
+    "tcg-card-pass-2-shade.md",
+    "tcg-card-pass-2-stone.md",
+    "tcg-card-pass-2-tide.md",
+    "tcg-card-pass-2-volt.md",
+    "tcg-card-pass-2-founder-structured.md"
+  ],
+  "source_counts": {
+    "tcg-card-pass-2-astral.md": 24,
+    "tcg-card-pass-2-ember.md": 24,
+    "tcg-card-pass-2-gale.md": 24,
+    "tcg-card-pass-2-grove.md": 24,
+    "tcg-card-pass-2-shade.md": 24,
+    "tcg-card-pass-2-stone.md": 24,
+    "tcg-card-pass-2-tide.md": 24,
+    "tcg-card-pass-2-volt.md": 24,
+    "tcg-card-pass-2-founder-structured.md": 1
+  },
+  "serialization": "JSON.stringify(buildSetOneRegistry(root), null, 2) + newline",
+  "sha256": "b1bc874a6d3707f5c93cd4067994a12111416da636cb15048d10e109829b1c00",
+  "runtime_authority": false,
+  "note": "Freezes the exact deterministic 193-card v0.2 registry serialization. Production legacy definition remains runtime authority until explicit runtime-parity cutover gates pass."
+}
