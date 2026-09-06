@@ -8,8 +8,10 @@ on:
       - .github/workflows/tcg-card-pass-2-validation.yml
       - tcg-card-pass-2-*.md
       - tcg-card-pass-2-*.json
+      - tcg-runtime-*.json
       - tcg-set-one-starters-v0.2.json
       - tcg/tests/**
+      - supabase/functions/tcg-tactic-actions/**
   workflow_dispatch:
 
 permissions:
@@ -37,3 +39,21 @@ jobs:
 
       - name: Validate Card Pass 2 candidates, eight exact starters and effect grammar
         run: node --test tcg/tests/card-pass-2-*.test.mjs
+
+  runtime-core:
+    name: v0.2 deterministic runtime core
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out reviewed head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Run v0.2 runtime core tests
+        run: deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-core.test.ts
