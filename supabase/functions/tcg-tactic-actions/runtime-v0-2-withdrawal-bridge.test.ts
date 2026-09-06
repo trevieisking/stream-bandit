@@ -1,4 +1,5 @@
 import { structuredRuntimeWithdrawalBaseCost } from "../_shared/tcg-match-withdrawal-v0-2.ts";
+import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
 
 function assertEquals(actual: unknown, expected: unknown, message = "values differ") {
   if (!Object.is(actual, expected)) throw new Error(`${message}: expected ${String(expected)}, got ${String(actual)}`);
@@ -32,7 +33,10 @@ function structuredEntry(cardId: string, definition: Record<string, unknown>) {
 }
 
 function stateWith(entries: Record<string, Record<string, unknown>>) {
-  return { card_index: entries } as Record<string, unknown>;
+  return {
+    runtime_registry_v0_2: runtimeV02SnapshotMarker(),
+    card_index: entries,
+  } as Record<string, unknown>;
 }
 
 function essence(cardId: string, continuous: Record<string, unknown>[]) {
@@ -143,7 +147,7 @@ Deno.test("structured Crushed increase is blocked by Granite only on a Stone tar
   );
 });
 
-Deno.test("mixed structured and legacy card indexes fail closed instead of mixing engines", () => {
+Deno.test("marked mixed structured and legacy card indexes fail closed instead of mixing engines", () => {
   const state = stateWith({
     "stone-test-creature": creatureEntry,
     "gale-breeze-essence": {
