@@ -7,6 +7,7 @@ import {
   SET_ONE_CANDIDATE_FILES,
   buildSetOneRegistry,
   serializeSetOneRegistry,
+  serializeSetOneRegistryStagingSql,
 } from '../../tcg-set-one-registry-builder-v0.2.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -77,4 +78,32 @@ test('every exact starter reference exists in the deterministic registry', () =>
   assert.ok(starterIds.size > 0, 'starter manifest must yield at least one card id');
   const missing = [...starterIds].filter((id) => !ids.has(id)).sort();
   assert.deepEqual(missing, []);
+});
+
+test('staging SQL is deterministic, exact-set fail-closed and preserves legacy runtime definitions', () => {
+  const registry = buildSetOneRegistry(root);
+  const first = serializeSetOneRegistryStagingSql(root);
+  const second = serializeSetOneRegistryStagingSql(root);
+  assert.equal(first, second, 'staging SQL must be deterministic');
+
+  const payloadRows = first.split('\n').filter((line) =>
+    line.startsWith('  (') && line.includes("::jsonb, 'sb-tcg-card-v0.2')")
+  );
+  assert.equal(payloadRows.length, 193, 'staging SQL must contain exactly 193 generated payload rows');
+
+  assert.match(first, /create temporary table tcg_set_one_v0_2_stage/i);
+  assert.match(first, /update public\.tcg_card_definitions cd/i);
+  assert.match(first, /set definition_v0_2 = s\.definition_v0_2/i);
+  assert.match(first, /definition_v0_2_rules_version = s\.definition_v0_2_rules_version/i);
+  assert.match(first, /tcg_set_one_v0_2_identity_set_mismatch/);
+  assert.match(first, /expected 193/);
+  assert.match(first, /\bexcept\b/i);
+
+  assert.doesNotMatch(first, /insert\s+into\s+public\.tcg_card_definitions/i, 'staging SQL must not insert registry rows');
+  assert.doesNotMatch(first, /set\s+definition\s*=/i, 'staging SQL must not overwrite the legacy runtime definition column');
+  assert.doesNotMatch(first, /set\s+rules_version\s*=/i, 'staging SQL must not overwrite the legacy runtime rules_version column');
+
+  for (const row of registry.definitions) {
+    assert.ok(first.includes(`'${row.card_id}'`), `staging SQL missing ${row.card_id}`);
+  }
 });
