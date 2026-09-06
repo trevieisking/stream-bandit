@@ -147,6 +147,8 @@
 - [x] Immutable 193-row shadow-registry migration materialized and byte-locked to builder output.
 - [x] Fresh/disposable PostgreSQL replay PASS for shadow schema + load on `aeeb593247abc2be32ce862617f8b1d95fccedd7` through Functional Smoke #291.
 - [x] Guarded match snapshot bridge: new matches preserve legacy `definition` authority while carrying exact frozen `definition_v0_2` snapshots beside it; inconsistent declared registry metadata or missing selected-deck v0.2 rows fail closed.
+- [x] Canonical runtime marker bridge: server installation stamps `runtime_registry_v0_2` only after every match-card sidecar is proven identical to the exact frozen shadow-registry definition; old initialized matches remain legacy-only.
+- [x] Guarded structured withdrawal bridge wired branch-only; marked v0.2 matches use generic continuous-effect data while no-marker legacy matches retain the prior fallback.
 - [ ] Economy/matchmaking/Arcade migrations not live.
 - [ ] v0.3 / tactic-actions not live.
 - [ ] Set One live/runtime registry still uses legacy English-effect definitions for current Special Essence rows; v0.2 structured registry must remain non-authoritative until runtime-parity gates pass.
@@ -177,8 +179,11 @@
 - [x] Runtime architecture boundary confirmed — structured flow is trigger/event → predicate/condition → generic action primitive → target; reusable primitives replace ordinary card-ID/English authority as parity lands.
 - [x] Runtime Pass B registry materialization/replay — frozen v0.2 shadow registry is source-controlled, byte-locked, server-only and replay-proven from zero while legacy runtime authority remains untouched.
 - [x] Runtime Pass B guarded snapshot boundary — `tcg_server_prepare_match` validates the frozen registry identity/digest, snapshots `definition_v0_2` beside the legacy definition for new matches, and preserves legacy-only matches; shared bridge validation fails closed if a marked structured snapshot is incomplete or inconsistent.
-- [ ] Runtime Pass B wiring — replace `tcg-match-actions` hard-coded Breeze/Root/Anchor/Granite/Whisper/Surge battle-math/lifecycle branches with generic structured owners through the guarded snapshot boundary; preserve legacy fallback until parity tests prove the swap.
-- [ ] Runtime Pass C — replace `parseAttack`, `attack_1`/`attack_2` and printed-English gameplay parsing with structured `creature.attacks[]` metadata and generic v0.2 steps.
+- [x] Runtime Pass B withdrawal wiring — marked v0.2 matches now resolve Breeze/Root/Anchor withdrawal modifiers plus Granite's Stone-only Crushed withdrawal-increase immunity through generic structured continuous effects. Legacy/no-marker matches retain the exact prior card-ID fallback; existing `withdrawal_cost_override` and lifecycle overrides remain unchanged. Exact head `e16aea5040b87f21fa28b519f47739114dbd786c` passed TCG Validation #65, Migration Replay #292 and Functional Smoke #310.
+- [ ] Runtime Pass B attack-damage wiring — replace Anchor incoming-attack-damage and Whisper condition-sensitive attack bonus card-ID branches with generic structured owners through the same marker/snapshot boundary.
+- [ ] Runtime Pass B Surge lifecycle wiring — replace Surge attach bonus/Aftermath discard card-ID ownership with generic listener/lifecycle state while preserving source-instance ownership.
+- [ ] Runtime Pass B wiring complete — remains open until attack-damage and Surge lifecycle sub-boxes above are green.
+- [ ] Runtime Pass C — replace `parseAttack`, `attack_1`/`attack_2` and printed-English gameplay parsing with structured `creature.attacks[]` metadata and generic v0.2 steps. A strict whole-file `deno check` currently exposes pre-existing `Cr | null` attack-target typing debt in this old path; repair it with the attack rewrite rather than mixing it into completed withdrawal semantics.
 - [ ] Runtime Pass D — route attack/Ability player selections through the generic private pending-choice owner and remove hard-coded unsupported-card lists.
 - [ ] Runtime Pass E — generic Ability/Essence/Relic/Realm listeners, continuous modifiers, existing-`Inst.uid` source-card-instance state and lifecycle expiry.
 - [ ] Runtime Pass F — remove remaining prototype field aliases and ordinary Set One card-id/name gameplay shortcuts only after structured parity is proven.
@@ -266,6 +271,7 @@
 - [x] PASS — immutable committed shadow-registry migration remains byte-identical to deterministic builder output: TCG Validation #45/#46.
 - [x] PASS — exact repaired head `aeeb593247abc2be32ce862617f8b1d95fccedd7`: Functional Smoke #291, including successful disposable database startup and reset/replay of every migration from zero.
 - [x] PASS — guarded v0.2 match snapshot boundary exact head `98441e8a7dddbee2047678cb3d0bd1caebe0a33e`: TCG Validation #52, Migration Replay #279 and Functional Smoke #297, including independent zero-state PostgreSQL replay and Deno/Node contract coverage.
+- [x] PASS — Runtime Pass B withdrawal wiring exact head `e16aea5040b87f21fa28b519f47739114dbd786c`: TCG Validation #65, Migration Replay #292 and Functional Smoke #310. TCG proof includes 23 Deno runtime/registry/withdrawal tests, focused withdrawal-module type checking and an exact materialized-wiring guard.
 - [x] Code Labs smoke/migration replay are supporting repository checks only, never substitutes for the TCG-specific validation gate; cancelled runs are not counted as PASS.
 - [ ] Full exact-head migration/smoke + TCG validation gate required again before merge/deployment after runtime integration changes.
 - [ ] Two-account desktop/phone full battle.
@@ -279,21 +285,20 @@
 
 # 10. Exact next execution order
 
-1. **Runtime Pass B withdrawal wiring:** consume the guarded match `definition_v0_2` snapshot in `tcg-match-actions` and replace only Breeze/Root/Anchor withdrawal math plus Granite withdrawal-increase immunity with generic structured continuous-effect owners; preserve the existing legacy path for matches without a valid v0.2 snapshot and prove parity before removing those card-ID branches.
-2. Runtime Pass B attack-damage wiring — replace Anchor incoming-damage and Whisper conditional-attack card-ID branches with the same structured snapshot/core.
-3. Runtime Pass B Surge lifecycle wiring — replace Surge attach bonus/Aftermath discard card-ID ownership with generic listener/lifecycle state while preserving source-instance ownership.
-4. Runtime Pass C — replace printed attack parsing and English `effect.includes(...)` gameplay with structured `creature.attacks[]`, damage formulas, target permissions and v0.2 steps.
-5. Runtime Pass D — unify attack/Ability choices with the server-owned private pending-choice engine.
-6. Runtime Pass E — add generic event/listener/continuous/lifecycle ownership for Abilities, Essence, Relics and Realms using existing `Inst.uid` as source-card-instance identity; add deterministic battle event tracing.
-7. Runtime Pass F — delete remaining prototype aliases and ordinary Set One card-id/name runtime authority only after parity tests prove replacements.
-8. Repair deck validation/copy-limit drift.
-9. Prove full two-player setup → victory, persisted result, stale/replay safety and reconnect/private-state recovery without manual DB intervention.
-10. Freeze deterministic live SB1 registry only after runtime parity, structural validation and simulation/human-balance gates.
-11. Deploy matching TCG migrations/functions only after exact-head TCG validation, migration replay, runtime smoke and player-facing gates pass.
-12. Collection + Deck Builder + premium data-driven renderer + one-screen battle UI.
-13. Trade Token duplicate conversion + Shop/pack opening + Battle Pass/dailies, then deterministic legal-move AI Test Match/simulation/human balance.
-14. Real two-account desktop/phone private-alpha test, then release ladder: private alpha → economy alpha → closed beta → public beta → live.
-15. Structure the completed Fairy 24 and Underworld 24 future audits through the same consolidated schema without blocking Set One private-alpha completion.
+1. **Runtime Pass B attack-damage wiring:** replace Anchor incoming-attack-damage and Whisper condition-sensitive attack bonus card-ID branches with generic structured continuous-effect owners through the validated runtime marker/snapshot boundary; preserve legacy fallback for no-marker matches and prove parity before deleting those two legacy shortcuts.
+2. Runtime Pass B Surge lifecycle wiring — replace Surge attach bonus/Aftermath discard card-ID ownership with generic listener/lifecycle state while preserving source-instance ownership.
+3. Runtime Pass C — replace printed attack parsing and English `effect.includes(...)` gameplay with structured `creature.attacks[]`, damage formulas, target permissions and v0.2 steps; resolve the existing attack-target `Cr | null` strict-typing debt as part of this rewrite.
+4. Runtime Pass D — unify attack/Ability choices with the server-owned private pending-choice engine.
+5. Runtime Pass E — add generic event/listener/continuous/lifecycle ownership for Abilities, Essence, Relics and Realms using existing `Inst.uid` as source-card-instance identity; add deterministic battle event tracing.
+6. Runtime Pass F — delete remaining prototype aliases and ordinary Set One card-id/name runtime authority only after parity tests prove replacements.
+7. Repair deck validation/copy-limit drift.
+8. Prove full two-player setup → victory, persisted result, stale/replay safety and reconnect/private-state recovery without manual DB intervention.
+9. Freeze deterministic live SB1 registry only after runtime parity, structural validation and simulation/human-balance gates.
+10. Deploy matching TCG migrations/functions only after exact-head TCG validation, migration replay, runtime smoke and player-facing gates pass.
+11. Collection + Deck Builder + premium data-driven renderer + one-screen battle UI.
+12. Trade Token duplicate conversion + Shop/pack opening + Battle Pass/dailies, then deterministic legal-move AI Test Match/simulation/human balance.
+13. Real two-account desktop/phone private-alpha test, then release ladder: private alpha → economy alpha → closed beta → public beta → live.
+14. Structure the completed Fairy 24 and Underworld 24 future audits through the same consolidated schema without blocking Set One private-alpha completion.
 
 ---
 
@@ -301,14 +306,14 @@
 
 **Set One structure is consolidated: 193 unique structured candidates, all eight exact 60-card starters, the single v0.2 opcode/predicate/required-parameter grammar owner, deterministic registry builder, frozen digest lock and dedicated TCG CI are green.** Astral's old per-card Weakness contradiction is physically repaired, Founder is identity 193/193, and the starter manifest resolves against current canonical Card Pass 2 IDs.
 
-**Runtime migration remains the active critical path, and the guarded structured-registry boundary is now proven.** Runtime Pass B has card-ID-free continuous-math primitives, the immutable replay-proven 193-card shadow registry, and a match-creation snapshot bridge that preserves legacy definitions while carrying the exact frozen v0.2 definitions beside them. A declared but inconsistent/incomplete v0.2 registry fails closed; legacy-only matches remain valid. No gameplay rule has been switched to v0.2 authority yet.
+**Runtime migration remains the active critical path, and the first real structured battle-math swap is now proven.** The frozen registry and server-stamped match marker are replay-safe; marked v0.2 matches now resolve Breeze, Root, Anchor withdrawal modifiers and Granite's Stone-only Crushed immunity through generic structured continuous effects. Legacy/no-marker matches preserve the old fallback, so existing private-alpha matches are not silently reinterpreted.
 
-**The guarded snapshot checkpoint is independently green:** exact head `98441e8a7dddbee2047678cb3d0bd1caebe0a33e` passed TCG Validation #52, Migration Replay #279 and Functional Smoke #297. Both replay workflows started disposable PostgreSQL and reset/replayed the full migration chain successfully. No production database workaround, live migration, merge or function deployment was used.
+**Runtime Pass B withdrawal is independently green:** exact head `e16aea5040b87f21fa28b519f47739114dbd786c` passed TCG Validation #65, Migration Replay #292 and Functional Smoke #310. Functional Smoke's Node, Deno and PostgreSQL replay jobs all passed. The TCG suite also permanently verifies that the guarded withdrawal wiring remains materialized. No production database change, live function deployment, merge or runtime-authority cutover was performed.
 
-**Dulst provided useful independent architecture confirmation, not code:** Stream Bandit's structured engine should keep explicit trigger/event, predicate, action and target boundaries; use existing per-copy `Inst.uid` for source-owned state; provide deterministic test injection/event traces; and later drive AI from enumerated legal moves plus simulation/scoring. These principles fit the existing v0.2 plan and reduce the need for card-specific runtime shortcuts.
+**A stricter whole-file Deno check exposed 14 pre-existing `Cr | null` errors in the old attack-target path, not the new withdrawal module.** All withdrawal/core tests remained green and the shared withdrawal module type-checks cleanly. That attack typing debt stays visible and is assigned to Runtime Pass C rather than being hidden or mixed into this completed box.
+
+**Dulst provided useful independent architecture confirmation, not code:** Stream Bandit's structured engine keeps explicit trigger/event, predicate, action and target boundaries; uses existing per-copy `Inst.uid` for source-owned state; plans deterministic test injection/event traces; and later drives AI from enumerated legal moves plus simulation/scoring.
 
 Fairy and Underworld remain fully designed as future 24-card element packages with exact 60-card starters. The second chain remains structurally complete at design level: `Astral → Martial → Shade → Fairy → Underworld → Astral`.
 
-The shared future-mechanics plan covers vitality drain, damage movement/hostile transfer, rare Tide ranged placement, selective utility walls, layered protection/counterplay, precision exact-damage execution, separate condition execution, low-remaining-HP sweep, Reward-progress comeback scaling and distinct attached-Essence element queries. Trev's control/toolbox/conversion-control gameplay ideas remain design inputs, not copied card identities.
-
-**Immediate next target: Runtime Pass B withdrawal wiring — use the validated match snapshot to replace Breeze/Root/Anchor withdrawal math plus Granite withdrawal-increase immunity with generic structured continuous effects, while preserving legacy fallback and proving exact parity before deleting those four card-ID shortcuts.**
+**Immediate next target: Runtime Pass B attack-damage wiring — move Anchor's incoming -10 damage and Whisper's +10 conditioned-opponent attack bonus from card-ID branches to the same validated structured snapshot/core, with legacy fallback retained until exact parity is proven.**
