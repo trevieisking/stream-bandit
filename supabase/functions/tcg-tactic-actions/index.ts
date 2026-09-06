@@ -1,4 +1,5 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { clearRuntimeCondition, hasRuntimeCondition, runtimeConditions } from "./runtime-v0-2-core.ts";
 
 const VERSION = "Stream Bandit TCG tactic actions v0.3";
 const EFFECT_SCHEMA = "sb-tcg-effects-v0.1";
@@ -121,14 +122,10 @@ function findCreature(state: any, ref: CreatureRef | null | undefined) {
   return null;
 }
 function conditions(cr: Cr) {
-  return (cr.conditions ||= { scorched: false, venomed: 0, control: null, modifier: null }) as any;
+  return runtimeConditions(cr);
 }
 function hasCondition(cr: Cr, condition?: string) {
-  const q = conditions(cr);
-  if (condition === "Scorched") return !!q.scorched;
-  if (condition === "Venomed") return Number(q.venomed || 0) > 0;
-  if (condition) return q.control === condition || q.modifier === condition;
-  return !!q.scorched || Number(q.venomed || 0) > 0 || !!q.control || !!q.modifier;
+  return hasRuntimeCondition(cr, condition);
 }
 function activeConditions(cr: Cr) {
   const q = conditions(cr);
@@ -140,11 +137,7 @@ function activeConditions(cr: Cr) {
   return out;
 }
 function clearCondition(cr: Cr, condition: string) {
-  const q = conditions(cr);
-  if (condition === "Scorched") q.scorched = false;
-  else if (condition === "Venomed") q.venomed = 0;
-  else if (q.control === condition) q.control = null;
-  else if (q.modifier === condition) q.modifier = null;
+  clearRuntimeCondition(cr, condition);
 }
 function clearOrdinaryConditions(cr: Cr) {
   cr.conditions = { scorched: false, venomed: 0, control: null, modifier: null };
