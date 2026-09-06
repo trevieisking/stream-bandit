@@ -18,6 +18,7 @@ on:
       - supabase/functions/_shared/tcg-runtime-registry-v0-2.ts
       - supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts
       - supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts
+      - supabase/functions/_shared/tcg-match-surge-lifecycle-v0-2.ts
       - supabase/functions/tcg-match-actions/**
       - supabase/functions/tcg-private-alpha-api/**
       - supabase/functions/tcg-tactic-actions/**
@@ -93,3 +94,6 @@ jobs:
 
       - name: Type-check structured attack-damage module and dependencies
         run: deno check supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts
+
+      - name: Type-check structured Surge lifecycle module and dependencies
+        run: deno check supabase/functions/_shared/tcg-match-surge-lifecycle-v0-2.ts
