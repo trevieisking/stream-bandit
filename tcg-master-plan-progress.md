@@ -14,6 +14,8 @@
 
 **Design-capture rule:** small gameplay ideas Trev raises during development are to be assessed and, when mechanically sound, recorded in this living plan/schema rather than left only in chat history.
 
+**Execution fence:** PR #549 is TCG-only. Code Labs may be used for read/inspection work, but Code Labs Writer is not part of the current TCG execution path. No unrelated Stream Bandit page, DJ, Web Builder or social-media work belongs in this lane.
+
 ---
 
 # 1. Rules / Set One
@@ -35,7 +37,7 @@
 - [x] Astral pre-correction per-card Weakness data physically removed from the candidate source.
 - [x] All 193 structured identities machine-validated at the Card Pass 2 structural level.
 - [x] All 8 exact starters reconciled against canonical structured candidate IDs and copy limits.
-- [ ] Final deterministic STRUCTURE reconciliation across all 193 identities — **IN PROGRESS** only because full opcode/predicate/parameter grammar consolidation remains open. Candidate inventory, card envelopes, evolution links, HP, copy limits, Starbound/Mythic state and starter references are already validated.
+- [x] Final deterministic STRUCTURE reconciliation across all 193 identities: card envelopes, evolution links, HP, copy limits, Starbound/Mythic state, starter references and the full opcode/predicate/required-parameter grammar are consolidated and CI-enforced. Runtime parity and balance remain separate later gates.
 - [ ] AI Test Match balance.
 - [ ] Human balance / final numeric tuning.
 
@@ -78,9 +80,9 @@
 - [x] Exact starter manifest `tcg-set-one-starters-v0.2.json` created and reconciled.
 - [x] Eight starter recipes proved by CI: 60 cards / 21 identities / 22 Creature / 18 Essence / 20 Tactic, no pack-only cards, one Mythic copy.
 - [x] Stone prototype ID drift normalized: live recipe `stone-mason-s-kit` → current candidate `stone-masons-kit`; quantity unchanged.
-- [ ] Full opcode / predicate / parameter schema consolidation into one machine-readable effect grammar owner.
-- [ ] Make CI prove every opcode/predicate used by the 193 candidates is declared by that grammar and required parameters are valid.
-- [ ] Freeze deterministic registry only after simulation + human balance and runtime parity.
+- [x] Full opcode / predicate / required-parameter schema consolidated into the single machine-readable owner `tcg-card-pass-2-effect-grammar-v0.2.json`.
+- [x] CI proves every opcode/predicate used by the 193 candidates is declared by that grammar and required opcode parameters are present.
+- [ ] Freeze deterministic registry only after runtime parity plus simulation/human-balance gates.
 
 ---
 
@@ -130,6 +132,7 @@
 - [x] `tcg-tactic-actions` candidate.
 - [ ] Economy/matchmaking/Arcade migrations not live.
 - [ ] v0.3 / tactic-actions not live.
+- [ ] Set One live/runtime registry still uses legacy English-effect definitions for current Special Essence rows; v0.2 structured registry source must be migrated/frozen before `tcg-match-actions` can safely consume `definition.essence.continuous` as authority.
 
 ## Repair
 
@@ -148,8 +151,17 @@
 - [x] Deterministic current Ally/Device interpreter.
 - [x] Generic schema paths exist for mechanics exposed by all eight Set One audits.
 - [x] Generic schema paths planned for vitality drain, damage placement/movement, selective attack walls, layered counterplay, precision execution, condition execution, remaining-HP sweep, comeback scaling and distinct-element resource queries.
-- [ ] Generic pending-choice/effect runtime — IN PROGRESS.
-- [ ] Remove remaining card-id/name runtime shortcuts as v0.2 becomes authority.
+- [x] Runtime 1A — `tcg-tactic-actions` condition read/clear semantics now reuse the tested shared `runtime-v0-2-core.ts` owner without changing v0.1 schema/auth/private-choice/atomic-commit behaviour.
+- [x] Runtime Pass A — every v0.2 grammar opcode and predicate is classified exactly once as implemented/partial/missing in `tcg-runtime-capabilities-v0.2.json`.
+- [x] Runtime Pass A CI — capability drift is blocked; partial predicates require explicit legacy-equivalent evidence; runtime parity cannot be claimed while partial/missing primitives remain.
+- [x] Runtime Pass B foundation — generic card-ID-free attached-Essence continuous numeric/source-blocking math exists in `runtime-v0-2-core.ts`, including fail-closed conditional predicate handling.
+- [x] Runtime Pass B foundation tests — Deno proves structured withdrawal modifiers, incoming attack damage modifiers, conditional attack modifiers and source-blocking immunity behaviour.
+- [ ] Runtime Pass B registry/wiring — migrate/freeze Set One v0.2 runtime registry source, then replace `tcg-match-actions` hard-coded Breeze/Root/Anchor/Granite/Whisper/Surge battle-math/lifecycle branches with generic structured owners.
+- [ ] Runtime Pass C — replace `parseAttack`, `attack_1`/`attack_2` and printed-English gameplay parsing with structured `creature.attacks[]` metadata and generic v0.2 steps.
+- [ ] Runtime Pass D — route attack/Ability player selections through the generic private pending-choice owner and remove hard-coded unsupported-card lists.
+- [ ] Runtime Pass E — generic Ability/Essence/Relic/Realm listeners, continuous modifiers, source-card-instance state and lifecycle expiry.
+- [ ] Runtime Pass F — remove remaining prototype field aliases and ordinary Set One card-id/name gameplay shortcuts only after structured parity is proven.
+- [ ] Generic pending-choice/effect runtime — IN PROGRESS through Runtime Passes C–E.
 - [ ] Hidden hand/deck/Reward choices.
 - [ ] Reconnect/resume.
 - [ ] Stale/replay/simultaneous command adversarial tests.
@@ -223,8 +235,11 @@
 - [x] PASS — eight-element Card Pass checkpoint `030757555f684a577c0447ca336b6815067b2524`: Migration Replay #203.
 - [x] PASS — eight-element Card Pass checkpoint `030757555f684a577c0447ca336b6815067b2524`: Functional Smoke #221.
 - [x] PASS — TCG Card Pass 2 Validation #2 at `b4a1ea5c5ed78a8cae130bf5484242f2204e34ab`.
-- [ ] Fresh exact-head TCG validation must pass after grammar/checklist additions before the next structural checkpoint is considered closed.
-- [ ] Code Labs smoke/migration replay remain supporting repository checks, not substitutes for TCG card validation.
+- [x] PASS — Runtime 1A exact head `546db5aeb2242c310dcba1412c7803be3e6cadb9`: TCG Validation #19, Migration Replay #246 and Functional Smoke #264.
+- [x] PASS — Runtime Pass A capability inventory/CI exact head `1564920974471f7be25940fb1c84342a776deee1`: TCG Validation #21, including Node structural/capability tests and Deno runtime-core tests.
+- [x] PASS — Runtime Pass B generic battle-math foundation exact head `8d3d562ea4d80a7d7e42454fd7e7bcd99988bf7f`: TCG Validation #23, including Set One structure/grammar validation and Deno runtime-core tests.
+- [x] Code Labs smoke/migration replay are supporting repository checks only, never substitutes for the TCG-specific validation gate; cancelled runs are not counted as PASS.
+- [ ] Full exact-head migration/smoke + TCG validation gate required again before merge/deployment after runtime integration changes.
 - [ ] Two-account desktop/phone full battle.
 - [ ] Reconnect/private-state test.
 - [ ] Economy receipt/retry/duplicate tests.
@@ -236,27 +251,30 @@
 
 # 10. Exact next execution order
 
-1. **Complete full opcode / predicate / parameter consolidation in one machine-readable v0.2 effect grammar owner and make CI enforce it.**
-2. Finish unified effect + pending-choice runtime and remove card-name/card-id hacks.
-3. Repair deck validation/copy-limit drift.
-4. Freeze deterministic SB1 registry only after runtime parity, structural validation and simulation/human-balance gates.
-5. Structure the completed Fairy 24 and Underworld 24 future audits through the same consolidated schema without blocking Set One private-alpha completion.
-6. Deploy matching TCG migrations/functions after Set One runtime gates pass.
-7. Collection + Deck Builder + renderer + battle UI.
-8. Trade Token duplicate conversion + Shop/pack opening.
-9. Battle Pass + dailies.
-10. AI Test Match + simulation + human balance.
-11. Real two-account battle + reconnect/security/economy tests.
-12. Release ladder only after all Set One gates pass.
+1. **Finish Runtime Pass B safely:** keep generic continuous battle math in the shared v0.2 core; migrate/freeze the Set One v0.2 runtime registry source; only then wire `tcg-match-actions` to structured Essence continuous/lifecycle metadata and remove the corresponding card-ID math shortcuts.
+2. Runtime Pass C — replace printed attack parsing and English `effect.includes(...)` gameplay with structured `creature.attacks[]`, damage formulas, target permissions and v0.2 steps.
+3. Runtime Pass D — unify attack/Ability choices with the server-owned private pending-choice engine.
+4. Runtime Pass E — add generic event/listener/continuous/lifecycle ownership for Abilities, Essence, Relics and Realms, preserving source-card-instance ownership where state belongs to the source card.
+5. Runtime Pass F — delete remaining prototype aliases and ordinary Set One card-id/name runtime authority only after parity tests prove replacements.
+6. Repair deck validation/copy-limit drift.
+7. Prove full two-player setup → victory, persisted result, stale/replay safety and reconnect/private-state recovery without manual DB intervention.
+8. Freeze deterministic SB1 registry only after runtime parity, structural validation and simulation/human-balance gates.
+9. Deploy matching TCG migrations/functions only after exact-head TCG validation, migration replay, runtime smoke and player-facing gates pass.
+10. Collection + Deck Builder + premium data-driven renderer + one-screen battle UI.
+11. Trade Token duplicate conversion + Shop/pack opening + Battle Pass/dailies, then AI Test Match/simulation/human balance.
+12. Real two-account desktop/phone private-alpha test, then release ladder: private alpha → economy alpha → closed beta → public beta → live.
+13. Structure the completed Fairy 24 and Underworld 24 future audits through the same consolidated schema without blocking Set One private-alpha completion.
 
 ---
 
 ## Checkpoint conclusion
 
-**Set One now has 193 unique structured candidates and all eight exact 60-card starters are mechanically reconciled by dedicated TCG CI.** Astral's old per-card Weakness contradiction is physically repaired, Founder is identity 193/193, and the starter manifest resolves against current canonical Card Pass 2 IDs.
+**Set One structure is now consolidated: 193 unique structured candidates, all eight exact 60-card starters, the single v0.2 opcode/predicate/required-parameter grammar owner and dedicated TCG CI are green.** Astral's old per-card Weakness contradiction is physically repaired, Founder is identity 193/193, and the starter manifest resolves against current canonical Card Pass 2 IDs.
+
+**Runtime migration is now the active critical path.** Runtime 1A is complete, Runtime Pass A operation/predicate inventory is CI-enforced, and the Runtime Pass B generic attached-Essence continuous-math foundation is Deno-tested without card IDs. The current live/runtime Set One definitions remain legacy English-effect shapes, so `tcg-match-actions` must not be rewired to `definition.essence.continuous` until the v0.2 registry source is deliberately migrated/frozen and proven.
 
 Fairy and Underworld remain fully designed as future 24-card element packages with exact 60-card starters. The second chain remains structurally complete at design level: `Astral → Martial → Shade → Fairy → Underworld → Astral`.
 
 The shared future-mechanics plan covers vitality drain, damage movement/hostile transfer, rare Tide ranged placement, selective utility walls, layered protection/counterplay, precision exact-damage execution, separate condition execution, low-remaining-HP sweep, Reward-progress comeback scaling and distinct attached-Essence element queries. Trev's control/toolbox/conversion-control gameplay ideas remain design inputs, not copied card identities.
 
-**Immediate remaining Card Pass 2 structural target: consolidate and CI-enforce the full opcode/predicate/parameter grammar.** After that the work moves directly into runtime interpreter parity and removal of card-specific shortcuts.
+**Immediate next target: complete Runtime Pass B registry/wiring without breaking the current private-alpha prototype, then move directly into Runtime Pass C structured attack metadata.**
