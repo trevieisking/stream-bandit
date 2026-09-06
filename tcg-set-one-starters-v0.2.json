@@ -1,0 +1,97 @@
+{
+  "manifest_id": "sb-tcg-set-one-starters-v0.2",
+  "status": "branch_validation_authority",
+  "source_note": "Copied read-only from the eight active tcg_starter_decks recipes, with card ids and quantities only. Prototype recipe_type labels are intentionally not authority.",
+  "expected": {
+    "starter_count": 8,
+    "cards_per_starter": 60,
+    "identities_per_starter": 21,
+    "creature_cards": 22,
+    "essence_cards": 18,
+    "tactic_cards": 20,
+    "mythic_copies_per_starter": 1,
+    "pack_only_allowed": false
+  },
+  "starters": [
+    {
+      "starter_id": "deck-astral-second-sky",
+      "element": "Astral",
+      "name": "Second Sky",
+      "cards": [
+        ["astral-stardot",3],["astral-orbitail",2],["astral-cosmarch",2],["astral-moonbit",3],["astral-comettail",2],["astral-nebulynx",2],["astral-starwhale",3],["astral-prismowl",2],["astral-orbitortoise",2],["astral-celestyr-dream-cartographer",1],
+        ["astral-basic-astral-essence",14],["astral-star-essence",2],["astral-orbit-essence",2],
+        ["astral-star-chart",3],["astral-future-draw",3],["astral-gravity-shift",2],["astral-cartographer-lyra",2],["astral-archivist-sol",2],["astral-orbit-ring",3],["astral-dreamglass",2],["astral-celestial-observatory",3]
+      ]
+    },
+    {
+      "starter_id": "deck-ember-ashrush",
+      "element": "Ember",
+      "name": "Ashrush",
+      "cards": [
+        ["ember-glowcub",3],["ember-bristleflare",2],["ember-furnacefang",2],["ember-coalfinch",3],["ember-sootwing",2],["ember-cindercrest",2],["ember-ashcobra",3],["ember-magmagecko",2],["ember-kilnback",2],["ember-pyrohorn-ash-crown",1],
+        ["ember-basic-ember-essence",14],["ember-smolder-essence",2],["ember-hearth-essence",2],
+        ["ember-kindling-cache",3],["ember-flash-forge",3],["ember-ember-salve",2],["ember-rhea-ashrunner",2],["ember-forgekeeper-bram",2],["ember-cinder-charm",3],["ember-heatguard-bracer",2],["ember-volcanic-caldera",3]
+      ]
+    },
+    {
+      "starter_id": "deck-gale-skyshift",
+      "element": "Gale",
+      "name": "Skyshift",
+      "cards": [
+        ["gale-driftlet",3],["gale-skyweaver",2],["gale-tempestalon",2],["gale-whiffin",3],["gale-slipwing",2],["gale-skyrend",2],["gale-cloudray",3],["gale-gustfox",2],["gale-pinionserpent",2],["gale-aeralith-storm-shepherd",1],
+        ["gale-basic-gale-essence",14],["gale-breeze-essence",2],["gale-draft-essence",2],
+        ["gale-tailwind-map",3],["gale-featherstep",3],["gale-clear-skies",2],["gale-pilot-sera",2],["gale-scout-zeph",2],["gale-wingclip-charm",3],["gale-pressure-compass",2],["gale-highwind-spires",3]
+      ]
+    },
+    {
+      "starter_id": "deck-grove-wildgrowth",
+      "element": "Grove",
+      "name": "Wildgrowth",
+      "cards": [
+        ["grove-budburrow",3],["grove-briarback",2],["grove-verdantusk",2],["grove-sporeling",3],["grove-capscout",2],["grove-myceliarch",2],["grove-thornmantis",3],["grove-mossram",2],["grove-vinecoil",2],["grove-elderbloom-first-canopy",1],
+        ["grove-basic-grove-essence",14],["grove-root-essence",2],["grove-bloom-essence",2],
+        ["grove-seed-satchel",3],["grove-spore-remedy",3],["grove-rootway-map",2],["grove-warden-fern",2],["grove-forager-nia",2],["grove-thorn-crown",3],["grove-sapstone-charm",2],["grove-elderwood-glade",3]
+      ]
+    },
+    {
+      "starter_id": "deck-shade-nightbind",
+      "element": "Shade",
+      "name": "Nightbind",
+      "cards": [
+        ["shade-gloamkin",3],["shade-duskstalker",2],["shade-noctivane",2],["shade-murkmite",3],["shade-veiljaw",2],["shade-hollowcrown",2],["shade-wispbat",3],["shade-umbraspider",2],["shade-nightmaw",2],["shade-umbravale-thought-hunter",1],
+        ["shade-basic-shade-essence",14],["shade-veil-essence",2],["shade-whisper-essence",2],
+        ["shade-veil-search",3],["shade-quiet-step",3],["shade-mind-cleanse",2],["shade-seer-nyx",2],["shade-broker-vale",2],["shade-gloom-locket",3],["shade-mirror-fang",2],["shade-hollow-midnight",3]
+      ]
+    },
+    {
+      "starter_id": "deck-stone-unbroken",
+      "element": "Stone",
+      "name": "Unbroken",
+      "cards": [
+        ["stone-gravibble",3],["stone-cragroller",2],["stone-monolithorn",2],["stone-flintkin",3],["stone-rampartusk",2],["stone-citadelhorn",2],["stone-shalejaw",3],["stone-boulderbug",2],["stone-quartzram",2],["stone-crowncrag-mountain-warden",1],
+        ["stone-basic-stone-essence",14],["stone-anchor-essence",2],["stone-fault-essence",2],
+        ["stone-mason-s-kit",3],["stone-quarry-search",3],["stone-reinforce",2],["stone-keeper-tor",2],["stone-surveyor-mina",2],["stone-bastion-plate",3],["stone-faultstone",2],["stone-ironcliff-citadel",3]
+      ]
+    },
+    {
+      "starter_id": "deck-tide-deep-current",
+      "element": "Tide",
+      "name": "Deep Current",
+      "cards": [
+        ["tide-puddlepip",3],["tide-rillrunner",2],["tide-tideroar",2],["tide-shellip",3],["tide-reefback",2],["tide-abyssalume",2],["tide-reefshell",3],["tide-mistmarten",2],["tide-surgefin",2],["tide-marevault-heart-of-tides",1],
+        ["tide-basic-tide-essence",14],["tide-flow-essence",2],["tide-calm-essence",2],
+        ["tide-current-map",3],["tide-recovery-spray",3],["tide-deepwater-search",2],["tide-marina-wayfinder",2],["tide-reef-medic-olan",2],["tide-tidal-lens",3],["tide-shellguard-pendant",2],["tide-moonlit-reef",3]
+      ]
+    },
+    {
+      "starter_id": "deck-volt-live-wire",
+      "element": "Volt",
+      "name": "Live Wire",
+      "cards": [
+        ["volt-staticub",3],["volt-arcprowler",2],["volt-stormmane",2],["volt-tinkit",3],["volt-coilclank",2],["volt-dynamozer",2],["volt-boltfang",3],["volt-sparkmoth",2],["volt-railhorn",2],["volt-stormcoil-living-circuit",1],
+        ["volt-basic-volt-essence",14],["volt-surge-essence",2],["volt-circuit-essence",2],
+        ["volt-circuit-scanner",3],["volt-quickcharge-cell",3],["volt-static-reset",2],["volt-engineer-vexa",2],["volt-courier-jett",2],["volt-arc-band",3],["volt-dynamo-lens",2],["volt-stormgrid-city",3]
+      ]
+    }
+  ]
+}
