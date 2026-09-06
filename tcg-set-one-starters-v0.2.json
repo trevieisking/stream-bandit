@@ -1,7 +1,7 @@
 {
   "manifest_id": "sb-tcg-set-one-starters-v0.2",
   "status": "branch_validation_authority",
-  "source_note": "Copied read-only from the eight active tcg_starter_decks recipes, with card ids and quantities only. Prototype recipe_type labels are intentionally not authority.",
+  "source_note": "Copied read-only from the eight active tcg_starter_decks recipes, with card ids and quantities only. Prototype recipe_type labels are intentionally not authority. Canonical Card Pass 2 ids supersede prototype id drift where a structured candidate has already normalized the identity.",
   "expected": {
     "starter_count": 8,
     "cards_per_starter": 60,
@@ -70,7 +70,7 @@
       "cards": [
         ["stone-gravibble",3],["stone-cragroller",2],["stone-monolithorn",2],["stone-flintkin",3],["stone-rampartusk",2],["stone-citadelhorn",2],["stone-shalejaw",3],["stone-boulderbug",2],["stone-quartzram",2],["stone-crowncrag-mountain-warden",1],
         ["stone-basic-stone-essence",14],["stone-anchor-essence",2],["stone-fault-essence",2],
-        ["stone-mason-s-kit",3],["stone-quarry-search",3],["stone-reinforce",2],["stone-keeper-tor",2],["stone-surveyor-mina",2],["stone-bastion-plate",3],["stone-faultstone",2],["stone-ironcliff-citadel",3]
+        ["stone-masons-kit",3],["stone-quarry-search",3],["stone-reinforce",2],["stone-keeper-tor",2],["stone-surveyor-mina",2],["stone-bastion-plate",3],["stone-faultstone",2],["stone-ironcliff-citadel",3]
       ]
     },
     {
