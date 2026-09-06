@@ -31,9 +31,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out reviewed head
+      - name: Check out reviewed PR head
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
           persist-credentials: true
 
       - name: Use Node.js 22
@@ -70,6 +72,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$TARGET"
           git commit -m "Materialize immutable TCG v0.2 shadow registry payload"
+          git fetch origin "$HEAD_REF"
+          git rebase "origin/$HEAD_REF"
           git push origin "HEAD:${HEAD_REF}"
 
   runtime-core:
