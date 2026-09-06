@@ -31,7 +31,8 @@
 - [x] Fairy + Underworld are future full elements completing the second matchup chain.
 - [x] All 8 Set One element design audits complete.
 - [x] All 8 Set One elemental Card Pass 2 structured candidate batches exist.
-- [ ] Final deterministic STRUCTURE reconciliation across all 193 identities — **IN PROGRESS** because Astral pre-correction Weakness data still needs physical consolidation and the shared schema needs one machine-readable owner.
+- [x] Astral pre-correction per-card Weakness data physically removed from the candidate source.
+- [ ] Final deterministic STRUCTURE reconciliation across all 193 identities — **IN PROGRESS**; hard invariants are now consolidated into one machine-readable validator owner, while full opcode/parameter consolidation and candidate-by-candidate validation remain open.
 - [ ] AI Test Match balance.
 - [ ] Human balance / final numeric tuning.
 
@@ -47,9 +48,12 @@
 - [x] L — multi-Essence movement + movement participation + Shield transfer + actual-heal listeners + grouped searches + source-capped withdrawal tax.
 - [x] M — temporary/borrowed Essence normalization + typed attack-cost floors + Device locks + post-resolution destination overrides.
 - [x] N — vitality drain / health stealing + effect damage + damage placement + damage movement + rare hostile transfer + ranged multi-target placement.
-- [x] **O — selective attacker-class protection / low-HP utility walls.** A small Creature may prevent all attack damage from a declared attacker class such as Mythic, Starbound or a Creature Type while remaining targetable and vulnerable to unmatched attackers, effect damage, conditions, damage placement/movement and other legal counterplay unless separately protected.
-- [x] Astral candidate exists.
-- [ ] **REPAIR — Astral source consolidation:** old Astral candidate physically contains stale routine per-card Weakness fields written before Trev corrected the system. The global-chain repair projection is correct; the candidate must be rewritten/consolidated so only the global matchup model remains.
+- [x] O — selective attacker-class protection / low-HP utility walls.
+- [x] P — layered protection, damage-placement protection, Realm replacement and passive placement counterplay.
+- [x] Q — precision execution through exact damage thresholds such as exactly 60 damage.
+- [x] R — condition execution kept distinct from precision execution.
+- [x] `tcg-design-control-toolbox-archetype.md` — control/toolbox/conversion-control philosophy captured from Trev's gameplay ideas.
+- [x] Astral candidate — corrected to zero routine per-card Weakness fields.
 - [x] Ember 24 candidate.
 - [x] Gale 24 candidate — zero per-card Weakness.
 - [x] Grove 24 candidate — zero per-card Weakness.
@@ -57,7 +61,10 @@
 - [x] Stone 24 candidate — zero per-card Weakness.
 - [x] Tide 24 candidate — zero per-card Weakness.
 - [x] Volt 24 candidate — zero per-card Weakness.
-- [ ] Consolidated machine-readable v0.2 validator/specification.
+- [x] **Machine-readable validator owner created:** `tcg-card-pass-2-validator-v0.2.json`.
+- [x] Hard invariants, global matchup chains, damage classes, protection layers, execution families and A–R authority map consolidated into that validator owner.
+- [ ] Full opcode / predicate / parameter schema consolidation into the validator owner.
+- [ ] Machine-validate all eight Set One element candidates + Founder against the consolidated owner.
 - [ ] Reconcile the 193-card total with exact starter references and freeze only after simulation + human balance.
 
 ---
@@ -74,12 +81,11 @@
 - [x] Rare hostile damage transfer supported through explicit `MOVE_DAMAGE` opt-in.
 - [x] Tide future ranged/sniper mechanic planned with explicit Reserve/field targeting.
 - [x] Rare apex future Tide effect planned: **place 120 damage on each of up to 2 different opposing creatures**, only behind a severe high-tier gate such as Starbound/once-per-match/high resource cost.
-- [x] **Low-HP utility-wall design pattern planned:** generally 40–120 HP, modest offence, but strategically valuable selective protection against a powerful attacker class. Broad permanent protection must have at least two practical counter routes documented in design audit.
-- [x] Fairy is a natural early home for selective wards; Astral may use foresight-style temporary wards; Stone may use narrower reduction rather than broad magical immunity.
-- [x] **Fairy current-rules design audit COMPLETE — 24/24 identities.**
-- [x] **Fairy exact 60-card starter `Gracebound` designed — 21 identities / 60 cards.**
-- [x] **Underworld current-rules design audit COMPLETE — 24/24 identities.**
-- [x] **Underworld exact 60-card starter `Debtbound` designed — 21 identities / 60 cards.**
+- [x] Low-HP utility-wall design pattern planned: generally 40–120 HP, modest offence, strategically valuable selective protection with practical counter routes.
+- [x] Fairy current-rules design audit COMPLETE — 24/24 identities.
+- [x] Fairy exact 60-card starter `Gracebound` designed — 21 identities / 60 cards.
+- [x] Underworld current-rules design audit COMPLETE — 24/24 identities.
+- [x] Underworld exact 60-card starter `Debtbound` designed — 21 identities / 60 cards.
 - [ ] During Fairy STRUCTURE/balance review, decide whether one existing low-HP Fairy identity should carry the first selective-protection utility-wall Ability; do not add a 25th identity merely to force the mechanic.
 - [ ] Structure Fairy 24 through the consolidated shared schema.
 - [ ] Structure Underworld 24 through the consolidated shared schema.
@@ -125,9 +131,8 @@
 - [x] Starbound attack-consumption foundation.
 - [x] Defeat/winner/reward handoff foundation.
 - [x] Deterministic current Ally/Device interpreter.
-- [x] Generic schema paths exist for mechanics exposed by all eight Set One audits: Gale alternate targeting/movement, Grove healing/recycling, Shade hidden information/control, Stone prevention/Shield, Tide current/Shield transfer and Volt temporary charge/Device sequencing.
-- [x] Future generic schema path planned for vitality drain, moving/placing damage and rare ranged multi-target placement.
-- [x] Future generic schema path planned for **selective incoming attack-damage protection filtered by attacker traits/classes**, with prevention occurring before Shield and without silently blocking non-damage attack effects.
+- [x] Generic schema paths exist for mechanics exposed by all eight Set One audits.
+- [x] Generic schema paths planned for vitality drain, damage placement/movement, selective attack walls, layered counterplay, precision execution and condition execution.
 - [ ] Generic pending-choice/effect runtime — IN PROGRESS.
 - [ ] Remove remaining card-id/name runtime shortcuts as v0.2 becomes authority.
 - [ ] Hidden hand/deck/Reward choices.
@@ -200,9 +205,9 @@
 - [x] `09bc7a3...` Functional Smoke #202 PASS.
 - [x] `4370385472c3...` Migration Replay #185 + Functional Smoke #203 PASS.
 - [x] `b5cd76a0988c...` Migration Replay #186 PASS; paired smoke superseded/cancelled, not counted as pass.
-- [x] **PASS — eight-element Card Pass checkpoint `030757555f684a577c0447ca336b6815067b2524`: Migration Replay #203.**
-- [x] **PASS — eight-element Card Pass checkpoint `030757555f684a577c0447ca336b6815067b2524`: Functional Smoke #221.**
-- [ ] New exact-head CI must pass after the future-plan/audit/schema/checklist additions before any promotion decision; these are branch design additions only.
+- [x] PASS — eight-element Card Pass checkpoint `030757555f684a577c0447ca336b6815067b2524`: Migration Replay #203.
+- [x] PASS — eight-element Card Pass checkpoint `030757555f684a577c0447ca336b6815067b2524`: Functional Smoke #221.
+- [ ] New exact-head CI must pass after the schema/validator/checklist additions before any promotion decision; these remain branch-only design/validation changes.
 - [ ] Two-account desktop/phone full battle.
 - [ ] Reconnect/private-state test.
 - [ ] Economy receipt/retry/duplicate tests.
@@ -214,28 +219,27 @@
 
 # 10. Exact next execution order
 
-1. **Physically consolidate Astral and remove the stale per-card Weakness fields.**
-2. Consolidate base schema + Amendments A–O into one machine-readable validator/specification.
-3. Validate all eight 24-card Set One element candidates plus Prismatic Founder / total 193 identity references against the consolidated schema and global matchup table.
+1. **Complete full opcode / predicate / parameter consolidation inside `tcg-card-pass-2-validator-v0.2.json`.**
+2. Machine-validate Astral, Ember, Gale, Grove, Shade, Stone, Tide, Volt and Prismatic Founder against that one owner.
+3. Reconcile all 193 Set One identities with the eight exact 60-card starters.
 4. Finish unified effect + pending-choice runtime and remove card-name/card-id hacks.
 5. Repair deck validation/copy-limit drift.
-6. Reconcile all 193 definitions with the 8 exact starters and freeze deterministic SB1 registry.
+6. Freeze deterministic SB1 registry only after structural validation and simulation/human-balance gates.
 7. Structure the completed Fairy 24 and Underworld 24 future audits through the consolidated schema without blocking Set One private-alpha completion.
-8. During Fairy STRUCTURE/balance, assess the first low-HP selective-protection utility wall against real matchup/counterplay simulations.
-9. Deploy matching TCG migrations/functions after Set One runtime gates pass.
-10. Collection + Deck Builder + renderer + battle UI.
-11. Trade Token duplicate conversion + Shop/pack opening.
-12. Battle Pass + dailies.
-13. AI Test Match + simulation + human balance.
-14. Real two-account battle + reconnect/security/economy tests.
-15. Release ladder only after all Set One gates pass.
+8. Deploy matching TCG migrations/functions after Set One runtime gates pass.
+9. Collection + Deck Builder + renderer + battle UI.
+10. Trade Token duplicate conversion + Shop/pack opening.
+11. Battle Pass + dailies.
+12. AI Test Match + simulation + human balance.
+13. Real two-account battle + reconnect/security/economy tests.
+14. Release ladder only after all Set One gates pass.
 
 ---
 
 ## Checkpoint conclusion
 
-**All eight current Set One elements have deterministic Card Pass 2 candidate ledgers. Fairy and Underworld are fully designed as future 24-card element packages with exact 60-card starters.** The second chain is structurally complete at design level: `Astral → Martial → Shade → Fairy → Underworld → Astral`.
+**All eight current Set One elements have deterministic Card Pass 2 candidate ledgers, and Astral's old per-card Weakness contradiction is physically repaired. Fairy and Underworld are fully designed as future 24-card element packages with exact 60-card starters.** The second chain is structurally complete at design level: `Astral → Martial → Shade → Fairy → Underworld → Astral`.
 
-The shared future-mechanics plan now also covers vitality drain, damage movement/hostile transfer, rare Tide ranged placement, and **Mimikyu-style low-stat utility value translated into Stream Bandit's own selective-protection system**: a small Creature may wall attack damage from a declared powerful attacker class while remaining answerable through unmatched attackers and non-attack routes.
+The shared future-mechanics plan now covers vitality drain, damage movement/hostile transfer, rare Tide ranged placement, selective utility walls, layered protection/counterplay, precision exact-damage execution and separate condition-based execution. Trev's control/toolbox/conversion-control gameplay ideas are recorded as design inputs, not copied card identities.
 
-The immediate Set One repair target remains the original Astral candidate written before Trev corrected Weakness.
+The main build has now returned to Set One consolidation: **one machine-readable v0.2 validator owner exists; next is complete opcode/parameter consolidation and candidate-by-candidate validation.**
