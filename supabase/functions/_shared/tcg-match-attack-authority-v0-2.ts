@@ -18,7 +18,7 @@ export type RuntimeAttackAuthority = LegacyAttackCompatibility & {
 
 export function resolveRuntimeAttackAuthority(
   state: Record<string, unknown>,
-  instanceOrId: unknown,
+  instanceOrId: string | { card_id?: unknown } | null | undefined,
   attackSlot: number,
   legacy: LegacyAttackCompatibility | null,
 ): RuntimeAttackAuthority | null {
