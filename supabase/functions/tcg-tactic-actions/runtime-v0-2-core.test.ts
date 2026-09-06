@@ -1,5 +1,6 @@
 import {
   applyRuntimeCondition,
+  applyRuntimeContinuousNumericModifiers,
   clearRuntimeCondition,
   dealRuntimeEffectDamage,
   discardRuntimeDeckTop,
@@ -8,6 +9,7 @@ import {
   moveRuntimeDamage,
   placeRuntimeDamage,
   recordRuntimeEvent,
+  runtimeContinuousBlocksSource,
   transferRuntimeShield,
 } from "./runtime-v0-2-core.ts";
 
@@ -75,6 +77,107 @@ Deno.test("Shield transfer caps at source amount and destination capacity", () =
   assert(moved === 15, "Shield transfer should stop at cap 60");
   assert(source.shield === 35, "source Shield mismatch");
   assert(destination.shield === 60, "destination Shield cap mismatch");
+});
+
+Deno.test("attached continuous withdrawal math is data-driven and respects filters and floor", () => {
+  const definitions: Record<string, any> = {
+    reducer_filtered: {
+      essence: { continuous: [{ kind: "withdrawal", target: "$attached_creature", amount: -1, minimum: 0, filters: { action_kind: "voluntary_withdrawal" } }] },
+    },
+    reducer: {
+      essence: { continuous: [{ kind: "withdrawal", target: "$attached_creature", mode: "delta", amount: -1, minimum: 0, filters: {} }] },
+    },
+    increaser: {
+      essence: { continuous: [{ kind: "withdrawal", target: "$attached_creature", amount: 1, minimum: 0, filters: {} }] },
+    },
+  };
+  const lookup = (instance: any) => definitions[instance.card_id];
+  const attachments = [
+    { uid: "a", card_id: "reducer_filtered" },
+    { uid: "b", card_id: "reducer" },
+    { uid: "c", card_id: "increaser" },
+  ];
+
+  const voluntary = applyRuntimeContinuousNumericModifiers(3, attachments, lookup, "withdrawal", { action_kind: "voluntary_withdrawal" });
+  assert(voluntary === 2, "structured voluntary withdrawal modifiers should compose to 2");
+
+  const otherAction = applyRuntimeContinuousNumericModifiers(3, attachments, lookup, "withdrawal", { action_kind: "forced_switch" });
+  assert(otherAction === 3, "action-kind filter should exclude only the filtered reducer");
+
+  const floored = applyRuntimeContinuousNumericModifiers(0, attachments.slice(0, 2), lookup, "withdrawal", { action_kind: "voluntary_withdrawal" });
+  assert(floored === 0, "withdrawal modifiers must respect the non-negative floor");
+});
+
+Deno.test("incoming attack damage modifiers apply from structured attached data", () => {
+  const definitions: Record<string, any> = {
+    armour: {
+      essence: { continuous: [{ kind: "incoming_attack_damage", target: "$attached_creature", amount: -10, filters: { source_controller: "opponent" } }] },
+    },
+  };
+  const lookup = (instance: any) => definitions[instance.card_id];
+  const attachments = [{ uid: "a", card_id: "armour" }];
+
+  const opposing = applyRuntimeContinuousNumericModifiers(80, attachments, lookup, "incoming_attack_damage", { source_controller: "opponent" });
+  assert(opposing === 70, "opposing attack damage should be reduced by structured armour");
+
+  const friendly = applyRuntimeContinuousNumericModifiers(80, attachments, lookup, "incoming_attack_damage", { source_controller: "self" });
+  assert(friendly === 80, "source-controller filter must fail closed for non-opponent damage");
+});
+
+Deno.test("conditional continuous modifiers fail closed without a server predicate evaluator", () => {
+  const definitions: Record<string, any> = {
+    pressure: {
+      essence: {
+        continuous: [{
+          kind: "attack_damage",
+          target: "$attached_creature",
+          when: { predicate: "target_has_any_condition", target: "$current_opponent_vanguard" },
+          amount: 10,
+          filters: { target_zone: "vanguard", target_controller: "opponent" },
+        }],
+      },
+    },
+  };
+  const lookup = (instance: any) => definitions[instance.card_id];
+  const attachments = [{ uid: "p", card_id: "pressure" }];
+  const baseContext = { target_zone: "vanguard", target_controller: "opponent" };
+
+  const noEvaluator = applyRuntimeContinuousNumericModifiers(100, attachments, lookup, "attack_damage", baseContext);
+  assert(noEvaluator === 100, "conditional modifier must not execute without server predicate authority");
+
+  const approved = applyRuntimeContinuousNumericModifiers(100, attachments, lookup, "attack_damage", {
+    ...baseContext,
+    evaluate_when: (when: any) => when?.predicate === "target_has_any_condition",
+  });
+  assert(approved === 110, "approved server predicate should activate structured attack modifier");
+
+  const wrongZone = applyRuntimeContinuousNumericModifiers(100, attachments, lookup, "attack_damage", {
+    target_zone: "reserve",
+    target_controller: "opponent",
+    evaluate_when: () => true,
+  });
+  assert(wrongZone === 100, "structured filter mismatch must fail closed");
+});
+
+Deno.test("source-blocking continuous effects require matching source and server predicate", () => {
+  const definitions: Record<string, any> = {
+    immunity: {
+      essence: {
+        continuous: [{
+          kind: "withdrawal_increase_immunity",
+          target: "$attached_creature",
+          when: { predicate: "target_element_is", target: "$attached_creature", element: "Stone" },
+          filters: { blocked_sources: ["opponent_card_effect", "opponent_condition"] },
+        }],
+      },
+    },
+  };
+  const lookup = (instance: any) => definitions[instance.card_id];
+  const attachments = [{ uid: "i", card_id: "immunity" }];
+
+  assert(!runtimeContinuousBlocksSource(attachments, lookup, "withdrawal_increase_immunity", "opponent_condition"), "conditional immunity must fail closed without evaluator");
+  assert(runtimeContinuousBlocksSource(attachments, lookup, "withdrawal_increase_immunity", "opponent_condition", { evaluate_when: () => true }), "matching blocked source should be rejected when predicate passes");
+  assert(!runtimeContinuousBlocksSource(attachments, lookup, "withdrawal_increase_immunity", "self_card_effect", { evaluate_when: () => true }), "unlisted source category must not be blocked");
 });
 
 Deno.test("source counters are deterministic state rather than card-name flags", () => {
