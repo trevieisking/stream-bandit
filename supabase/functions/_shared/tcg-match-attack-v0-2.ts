@@ -1,5 +1,12 @@
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 
+export type RuntimeV02AttackTargetPermission = {
+  controller: "self" | "opponent";
+  zone: "vanguard" | "reserve";
+  card_family: "Creature";
+  selection: "one";
+};
+
 export type RuntimeV02AttackMetadata = {
   id: string;
   name: string;
@@ -7,6 +14,7 @@ export type RuntimeV02AttackMetadata = {
   any: number;
   base_damage: number | null;
   damage_source: "base_damage" | "damage_formula.base" | null;
+  target_permissions: RuntimeV02AttackTargetPermission[];
 };
 
 function objectRecord(value: unknown): Record<string, unknown> | null {
@@ -22,9 +30,56 @@ function nonNegativeInteger(value: unknown, error: string): number {
   return value;
 }
 
+function attackTargetPermissions(
+  value: unknown,
+  attackId: string,
+): RuntimeV02AttackTargetPermission[] {
+  if (value === null || value === undefined) return [];
+  if (!Array.isArray(value)) {
+    throw new Error(`tcg_v0_2_attack_target_permissions_invalid:${attackId}`);
+  }
+
+  return value.map((rawPermission, index) => {
+    const permission = objectRecord(rawPermission);
+    if (!permission) {
+      throw new Error(`tcg_v0_2_attack_target_permission_invalid:${attackId}:${index}`);
+    }
+    const allowedKeys = new Set(["controller", "zone", "card_family", "selection"]);
+    const unsupportedKey = Object.keys(permission).find((key) => !allowedKeys.has(key));
+    if (unsupportedKey) {
+      throw new Error(`tcg_v0_2_attack_target_permission_field_unsupported:${attackId}:${unsupportedKey}`);
+    }
+
+    const controller = String(permission.controller || "").trim();
+    const zone = String(permission.zone || "").trim();
+    const cardFamily = String(permission.card_family || "").trim();
+    const selection = String(permission.selection || "").trim();
+
+    if (controller !== "self" && controller !== "opponent") {
+      throw new Error(`tcg_v0_2_attack_target_permission_controller_invalid:${attackId}`);
+    }
+    if (zone !== "vanguard" && zone !== "reserve") {
+      throw new Error(`tcg_v0_2_attack_target_permission_zone_invalid:${attackId}`);
+    }
+    if (cardFamily !== "Creature") {
+      throw new Error(`tcg_v0_2_attack_target_permission_family_invalid:${attackId}`);
+    }
+    if (selection !== "one") {
+      throw new Error(`tcg_v0_2_attack_target_permission_selection_invalid:${attackId}`);
+    }
+
+    return {
+      controller,
+      zone,
+      card_family: "Creature",
+      selection: "one",
+    };
+  });
+}
+
 /**
- * Returns the structured v0.2 attack identity, Essence cost and deterministic
- * baseline damage for a 1-based attack slot.
+ * Returns the structured v0.2 attack identity, Essence cost, deterministic
+ * baseline damage and additive attack-target permissions for a 1-based slot.
  *
  * Legacy-only matches deliberately return null so the existing text parser
  * remains the fallback until the v0.2 match snapshot is present. Once a match
@@ -89,5 +144,6 @@ export function structuredRuntimeAttackMetadata(
     any,
     base_damage: baseDamage,
     damage_source: damageSource,
+    target_permissions: attackTargetPermissions(attack.target_permissions, id),
   };
 }
