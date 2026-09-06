@@ -26,7 +26,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: tcg-card-pass-2-validation-${{ github.event.pull_request.number || github.ref }}
@@ -38,12 +38,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out reviewed PR head
+      - name: Check out reviewed head
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
 
       - name: Use Node.js 22
         uses: actions/setup-node@v4
@@ -53,24 +51,8 @@ jobs:
       - name: Validate Card Pass 2 candidates, eight exact starters and effect grammar
         run: node --test tcg/tests/card-pass-2-*.test.mjs
 
-      - name: Materialize guarded Runtime Pass B withdrawal wiring on this PR branch only
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref != 'main'
-        env:
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
-          TARGET: supabase/functions/tcg-match-actions/index.ts
-        run: |
-          node tcg-runtime-pass-b-withdrawal-wire.mjs
-          if git diff --quiet -- "$TARGET"; then
-            echo "Runtime Pass B withdrawal wiring already matches."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$TARGET"
-          git commit -m "Wire structured TCG v0.2 withdrawal math"
-          git fetch origin "$HEAD_REF"
-          git rebase "origin/$HEAD_REF"
-          git push origin "HEAD:${HEAD_REF}"
+      - name: Verify guarded Runtime Pass B withdrawal wiring is materialized
+        run: node tcg-runtime-pass-b-withdrawal-wire.mjs --check
 
       - name: Generate immutable Set One v0.2 shadow-registry migration payload
         run: node tcg-set-one-shadow-registry-builder-v0.2.mjs tcg-set-one-shadow-registry-v0.2.generated.sql
