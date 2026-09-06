@@ -16,6 +16,13 @@ const migrationPath = path.join(
   '20260906183000_tcg_v0_2_shadow_registry.sql',
 );
 const migration = fs.readFileSync(migrationPath, 'utf8');
+const loadMigrationPath = path.join(
+  root,
+  'supabase',
+  'migrations',
+  '20260906190000_tcg_v0_2_set_one_shadow_registry_load.sql',
+);
+const loadMigration = fs.readFileSync(loadMigrationPath, 'utf8');
 
 test('v0.2 shadow registry is additive, server-only and cannot become runtime authority', () => {
   assert.match(migration, /create table if not exists public\.tcg_registry_versions/i);
@@ -61,6 +68,7 @@ test('generated shadow-registry load is deterministic, exact-193 and locked to t
   const first = serializeSetOneShadowRegistrySql(root);
   const second = serializeSetOneShadowRegistrySql(root);
   assert.equal(first, second, 'shadow registry SQL must be deterministic');
+  assert.equal(loadMigration, first, 'committed shadow-registry migration must exactly equal deterministic builder output');
   assert.equal(registry.card_count, 193);
 
   const payloadRows = first.split('\n').filter((line) =>
