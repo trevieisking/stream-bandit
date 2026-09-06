@@ -1,0 +1,39 @@
+name: TCG Card Pass 2 Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/tcg-card-pass-2-validation.yml
+      - tcg-card-pass-2-*.md
+      - tcg-card-pass-2-*.json
+      - tcg-set-one-starters-v0.2.json
+      - tcg/tests/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tcg-card-pass-2-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  set-one-structure:
+    name: Set One 193-card structure and starter validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out reviewed head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate Card Pass 2 candidates and eight exact starters
+        run: node --test tcg/tests/card-pass-2-validator.test.mjs
