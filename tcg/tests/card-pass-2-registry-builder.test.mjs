@@ -17,7 +17,7 @@ function starterCardIds() {
   const ids = new Set();
   for (const starter of manifest.starters || []) {
     for (const entry of starter.cards || starter.decklist || []) {
-      const id = entry.card_id || entry.id;
+      const id = Array.isArray(entry) ? entry[0] : entry?.card_id || entry?.id;
       if (typeof id === 'string') ids.add(id);
     }
   }
@@ -73,6 +73,8 @@ test('registry serialization is deterministic and contains no generated timestam
 test('every exact starter reference exists in the deterministic registry', () => {
   const registry = buildSetOneRegistry(root);
   const ids = new Set(registry.definitions.map((row) => row.card_id));
-  const missing = [...starterCardIds()].filter((id) => !ids.has(id)).sort();
+  const starterIds = starterCardIds();
+  assert.ok(starterIds.size > 0, 'starter manifest must yield at least one card id');
+  const missing = [...starterIds].filter((id) => !ids.has(id)).sort();
   assert.deepEqual(missing, []);
 });
