@@ -30,11 +30,26 @@
       "tcg-card-pass-2-schema-amendment-p-layered-counterplay.md",
       "tcg-card-pass-2-schema-amendment-q-precision-execution.md",
       "tcg-card-pass-2-schema-amendment-r-condition-execution.md",
-      "tcg-card-pass-2-schema-amendment-s-threshold-sweep-comeback.md"
+      "tcg-card-pass-2-schema-amendment-s-threshold-sweep-comeback.md",
+      "tcg-card-pass-2-schema-amendment-t-matchup-authority-cleanup.md"
+    ],
+    "superseded_source_passages": [
+      {
+        "file": "tcg-card-pass-2-schema.md",
+        "topic": "routine per-card Weakness examples and prose",
+        "replacement": "global matchup table plus amendments E/I/T and this validator"
+      },
+      {
+        "file": "tcg-card-pass-2-founder.md",
+        "topic": "old per-creature comparative Weakness/Resistance matrix prose",
+        "replacement": "Prismatic neutral-by-default plus explicit resistance/matchup_override only"
+      }
     ]
   },
   "global_rules": {
     "set_one_elements": ["Astral", "Ember", "Gale", "Grove", "Shade", "Stone", "Tide", "Volt"],
+    "set_one_expected_elemental_identities": 192,
+    "set_one_expected_total_identities": 193,
     "future_full_elements": ["Fairy", "Underworld"],
     "creature_type_only": ["Martial"],
     "world_chain": ["Tide", "Ember", "Grove", "Gale", "Stone", "Volt", "Tide"],
@@ -45,6 +60,7 @@
     "routine_per_card_weakness_forbidden": true,
     "automatic_reverse_resistance": false,
     "resistance_default": null,
+    "prismatic_matchup_default": "neutral",
     "attack_element_default": "printed_attacking_creature_element",
     "printed_hp": {"min": 40, "max": 390},
     "starting_hand": 7,
@@ -242,11 +258,24 @@
     "tcg-card-pass-2-founder.md"
   ],
   "future_candidate_files": ["tcg-future-fairy-audit.md", "tcg-future-underworld-audit.md"],
+  "preflight": {
+    "elemental_candidate_files": 8,
+    "elemental_identities_expected": 192,
+    "elemental_candidate_shape": {"per_element_total": 24, "creature": 11, "essence": 4, "tactic": 9},
+    "elemental_candidate_document_validation": "pass",
+    "elemental_candidate_weakness_mode": "global_only",
+    "elemental_starter_recipe_shape": {"cards": 60, "distinct_identities": 21, "creature_cards": 22, "essence_cards": 18, "tactic_cards": 20},
+    "founder_design_authority_present": true,
+    "founder_machine_structured_candidate_ready": false,
+    "founder_blocker": "Founder current-rules design exists but still needs a final v0.2 structured record using neutral Prismatic matchup ownership before all 193 identities can be called machine validated."
+  },
   "completion": {
     "hard_invariants_consolidated": true,
     "amendment_authority_map_consolidated": true,
     "set_one_candidate_inventory_declared": true,
+    "elemental_192_document_preflight_complete": true,
     "full_opcode_predicate_parameter_schema_consolidated": false,
+    "founder_structured_candidate_complete": false,
     "all_set_one_candidates_machine_validated": false,
     "production_registry_frozen": false
   }
