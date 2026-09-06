@@ -31,7 +31,8 @@
       "tcg-card-pass-2-schema-amendment-q-precision-execution.md",
       "tcg-card-pass-2-schema-amendment-r-condition-execution.md",
       "tcg-card-pass-2-schema-amendment-s-threshold-sweep-comeback.md",
-      "tcg-card-pass-2-schema-amendment-t-matchup-authority-cleanup.md"
+      "tcg-card-pass-2-schema-amendment-t-matchup-authority-cleanup.md",
+      "tcg-card-pass-2-schema-amendment-u-distinct-element-queries.md"
     ],
     "superseded_source_passages": [
       {
@@ -214,7 +215,8 @@
     "condition_execution_supported": true,
     "precision_execution_supported": true,
     "remaining_hp_execution_supported": true,
-    "reward_progress_comeback_scaling_supported": true
+    "reward_progress_comeback_scaling_supported": true,
+    "distinct_attached_essence_element_queries_supported": true
   },
   "validation_errors": [
     "routine_per_card_weakness_present",
@@ -244,7 +246,9 @@
     "wrong_players_reward_progress_counted",
     "multi_target_120_without_high_tier_gate",
     "recursive_drain_or_listener_loop",
-    "card_specific_runtime_exception_required_for_candidate"
+    "card_specific_runtime_exception_required_for_candidate",
+    "duplicate_attached_essence_elements_counted_as_distinct",
+    "client_owned_distinct_element_query"
   ],
   "set_one_candidate_files": [
     "tcg-card-pass-2-astral.md",
@@ -255,8 +259,9 @@
     "tcg-card-pass-2-stone.md",
     "tcg-card-pass-2-tide.md",
     "tcg-card-pass-2-volt.md",
-    "tcg-card-pass-2-founder.md"
+    "tcg-card-pass-2-founder-structured.md"
   ],
+  "starter_manifest": "tcg-set-one-starters-v0.2.json",
   "future_candidate_files": ["tcg-future-fairy-audit.md", "tcg-future-underworld-audit.md"],
   "preflight": {
     "elemental_candidate_files": 8,
@@ -266,8 +271,17 @@
     "elemental_candidate_weakness_mode": "global_only",
     "elemental_starter_recipe_shape": {"cards": 60, "distinct_identities": 21, "creature_cards": 22, "essence_cards": 18, "tactic_cards": 20},
     "founder_design_authority_present": true,
-    "founder_machine_structured_candidate_ready": false,
-    "founder_blocker": "Founder current-rules design exists but still needs a final v0.2 structured record using neutral Prismatic matchup ownership before all 193 identities can be called machine validated."
+    "founder_machine_structured_candidate_ready": true,
+    "set_one_structured_identity_count": 193,
+    "set_one_unique_identity_count": 193,
+    "exact_starter_count": 8,
+    "exact_starters_reconciled": true,
+    "machine_validation": {
+      "workflow": "TCG Card Pass 2 Validation",
+      "run_number": 2,
+      "head_sha": "b4a1ea5c5ed78a8cae130bf5484242f2204e34ab",
+      "conclusion": "success"
+    }
   },
   "completion": {
     "hard_invariants_consolidated": true,
@@ -275,8 +289,9 @@
     "set_one_candidate_inventory_declared": true,
     "elemental_192_document_preflight_complete": true,
     "full_opcode_predicate_parameter_schema_consolidated": false,
-    "founder_structured_candidate_complete": false,
-    "all_set_one_candidates_machine_validated": false,
+    "founder_structured_candidate_complete": true,
+    "all_set_one_candidates_machine_validated": true,
+    "all_eight_exact_starters_reconciled": true,
     "production_registry_frozen": false
   }
 }
