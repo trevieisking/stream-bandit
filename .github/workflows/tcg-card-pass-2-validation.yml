@@ -13,9 +13,13 @@ on:
       - tcg-set-one-shadow-registry-builder-v0.2.mjs
       - tcg-set-one-starters-v0.2.json
       - tcg/tests/**
+      - supabase/functions/_shared/tcg-runtime-registry-v0-2.ts
+      - supabase/functions/tcg-match-actions/**
+      - supabase/functions/tcg-private-alpha-api/**
       - supabase/functions/tcg-tactic-actions/**
       - supabase/migrations/20260906183000_tcg_v0_2_shadow_registry.sql
       - supabase/migrations/20260906190000_tcg_v0_2_set_one_shadow_registry_load.sql
+      - supabase/migrations/20260906191500_tcg_match_v0_2_registry_snapshot_bridge.sql
   workflow_dispatch:
 
 permissions:
@@ -70,5 +74,5 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Run v0.2 runtime core tests
-        run: deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-core.test.ts
+      - name: Run v0.2 runtime core and registry bridge tests
+        run: deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-*.test.ts
