@@ -52,61 +52,73 @@ function locateCard(card, parts) {
 test('every used opcode is declared and satisfies its required parameter contract', () => {
   const declared = grammar.operations;
   const used = new Set();
+  const undeclared = new Map();
+  const parameterMismatches = [];
 
   for (const card of cards) {
     walk(card, (node, parts) => {
       if (typeof node.op !== 'string') return;
       used.add(node.op);
       const contract = declared[node.op];
-      assert.ok(contract, `${locateCard(card, parts)} uses undeclared opcode ${node.op}`);
+      if (!contract) {
+        if (!undeclared.has(node.op)) undeclared.set(node.op, locateCard(card, parts));
+        return;
+      }
       for (const field of contract.required ?? []) {
-        assert.ok(Object.hasOwn(node, field), `${locateCard(card, parts)} opcode ${node.op} missing required parameter ${field}`);
+        if (!Object.hasOwn(node, field)) parameterMismatches.push(`${locateCard(card, parts)} opcode ${node.op} missing required parameter ${field}`);
       }
     });
   }
 
   assert.ok(used.size > 0, 'expected at least one opcode in the 193-card candidate inventory');
+  const messages = [];
+  if (undeclared.size) messages.push(`undeclared opcodes:\n${[...undeclared.entries()].map(([op, where]) => `- ${op} @ ${where}`).join('\n')}`);
+  if (parameterMismatches.length) messages.push(`parameter mismatches:\n${parameterMismatches.map((entry) => `- ${entry}`).join('\n')}`);
+  assert.equal(messages.length, 0, messages.join('\n\n'));
 });
 
 test('every used predicate is declared by the v0.2 grammar', () => {
   const declared = new Set(grammar.predicates);
   const used = new Set();
+  const undeclared = new Map();
 
   for (const card of cards) {
     walk(card, (node, parts) => {
       if (typeof node.predicate !== 'string') return;
       used.add(node.predicate);
-      assert.ok(declared.has(node.predicate), `${locateCard(card, parts)} uses undeclared predicate ${node.predicate}`);
+      if (!declared.has(node.predicate) && !undeclared.has(node.predicate)) undeclared.set(node.predicate, locateCard(card, parts));
     });
   }
 
   assert.ok(used.size > 0, 'expected at least one predicate in the 193-card candidate inventory');
+  assert.equal(undeclared.size, 0, `undeclared predicates:\n${[...undeclared.entries()].map(([predicate, where]) => `- ${predicate} @ ${where}`).join('\n')}`);
 });
 
 test('conditions used by structured effects come from the locked condition registry', () => {
   const allowed = new Set(grammar.condition_names);
-  const conditionKeys = new Set(['condition']);
+  const invalid = [];
 
   for (const card of cards) {
     walk(card, (node, parts) => {
-      for (const key of conditionKeys) {
-        if (typeof node[key] !== 'string') continue;
-        const value = node[key];
-        if (value.startsWith('$')) continue;
-        if (allowed.has(value)) continue;
-        const isClearlyConditionContext =
-          typeof node.op === 'string' && ['APPLY_CONDITION', 'CLEAR_CONDITION', 'ADD_CONDITION_IMMUNITY'].includes(node.op) ||
-          typeof node.predicate === 'string' && node.predicate.includes('condition');
-        if (isClearlyConditionContext) assert.fail(`${locateCard(card, parts)} uses undeclared condition ${value}`);
-      }
+      if (typeof node.condition !== 'string') return;
+      const value = node.condition;
+      if (value.startsWith('$') || allowed.has(value)) return;
+      const isClearlyConditionContext =
+        typeof node.op === 'string' && ['APPLY_CONDITION', 'CLEAR_CONDITION', 'ADD_CONDITION_IMMUNITY'].includes(node.op) ||
+        typeof node.predicate === 'string' && node.predicate.includes('condition');
+      if (isClearlyConditionContext) invalid.push(`${locateCard(card, parts)} uses undeclared condition ${value}`);
     });
   }
+
+  assert.equal(invalid.length, 0, invalid.join('\n'));
 });
 
 test('runtime-bearing candidate structures contain no routine per-card Weakness authority', () => {
+  const violations = [];
   for (const card of cards) {
     walk(card, (node, parts) => {
-      assert.equal(Object.hasOwn(node, 'weakness'), false, `${locateCard(card, parts)} contains forbidden weakness field`);
+      if (Object.hasOwn(node, 'weakness')) violations.push(`${locateCard(card, parts)} contains forbidden weakness field`);
     });
   }
+  assert.equal(violations.length, 0, violations.join('\n'));
 });
