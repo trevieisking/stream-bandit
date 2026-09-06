@@ -82,3 +82,6 @@ jobs:
 
       - name: Run v0.2 runtime core and registry bridge tests
         run: deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-*.test.ts
+
+      - name: Type-check wired tcg-match-actions runtime
+        run: deno check supabase/functions/tcg-match-actions/index.ts
