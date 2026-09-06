@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   set-one-structure:
-    name: Set One 193-card structure and starter validation
+    name: Set One 193-card structure, starter and effect-grammar validation
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -35,5 +35,5 @@ jobs:
         with:
           node-version: 22
 
-      - name: Validate Card Pass 2 candidates and eight exact starters
-        run: node --test tcg/tests/card-pass-2-validator.test.mjs
+      - name: Validate Card Pass 2 candidates, eight exact starters and effect grammar
+        run: node --test tcg/tests/card-pass-2-*.test.mjs
