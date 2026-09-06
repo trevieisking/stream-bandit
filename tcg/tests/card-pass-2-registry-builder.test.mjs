@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -69,6 +70,8 @@ test('registry serialization is deterministic and contains no generated timestam
   assert.equal(first.includes('generated_at'), false);
   assert.equal(first.includes('created_at'), false);
   assert.equal(first.includes('updated_at'), false);
+  const digest = createHash('sha256').update(first).digest('hex');
+  console.log(`SET_ONE_REGISTRY_SHA256=${digest}`);
 });
 
 test('every exact starter reference exists in the deterministic registry', () => {
