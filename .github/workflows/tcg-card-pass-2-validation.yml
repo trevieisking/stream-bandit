@@ -10,12 +10,14 @@ on:
       - tcg-card-pass-2-*.json
       - tcg-runtime-*.json
       - tcg-runtime-pass-b-withdrawal-wire.mjs
+      - tcg-runtime-pass-b-attack-damage-wire.mjs
       - tcg-set-one-registry-builder-v0.2.mjs
       - tcg-set-one-shadow-registry-builder-v0.2.mjs
       - tcg-set-one-starters-v0.2.json
       - tcg/tests/**
       - supabase/functions/_shared/tcg-runtime-registry-v0-2.ts
       - supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts
+      - supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts
       - supabase/functions/tcg-match-actions/**
       - supabase/functions/tcg-private-alpha-api/**
       - supabase/functions/tcg-tactic-actions/**
@@ -26,7 +28,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: tcg-card-pass-2-validation-${{ github.event.pull_request.number || github.ref }}
@@ -38,10 +40,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out reviewed head
+      - name: Check out reviewed PR head
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
 
       - name: Use Node.js 22
         uses: actions/setup-node@v4
@@ -53,6 +56,22 @@ jobs:
 
       - name: Verify guarded Runtime Pass B withdrawal wiring is materialized
         run: node tcg-runtime-pass-b-withdrawal-wire.mjs --check
+
+      - name: Materialize guarded Runtime Pass B attack-damage wiring on this PR branch only
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feature/tcg-private-alpha-v0-5-source-recovery'
+        run: |
+          test "$GITHUB_HEAD_REF" = "feature/tcg-private-alpha-v0-5-source-recovery"
+          node tcg-runtime-pass-b-attack-damage-wire.mjs
+          if git diff --quiet -- supabase/functions/tcg-match-actions/index.ts; then
+            echo "Attack-damage wiring already materialized."
+            exit 0
+          fi
+          test "$(git status --porcelain | awk '{print $2}')" = "supabase/functions/tcg-match-actions/index.ts"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add supabase/functions/tcg-match-actions/index.ts
+          git commit -m "Wire structured attack damage runtime"
+          git push origin HEAD:"$GITHUB_HEAD_REF"
 
       - name: Generate immutable Set One v0.2 shadow-registry migration payload
         run: node tcg-set-one-shadow-registry-builder-v0.2.mjs tcg-set-one-shadow-registry-v0.2.generated.sql
@@ -85,3 +104,6 @@ jobs:
 
       - name: Type-check structured withdrawal module and dependencies
         run: deno check supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts
+
+      - name: Type-check structured attack-damage module and dependencies
+        run: deno check supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts
