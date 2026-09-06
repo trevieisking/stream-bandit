@@ -9,9 +9,12 @@ on:
       - tcg-card-pass-2-*.md
       - tcg-card-pass-2-*.json
       - tcg-runtime-*.json
+      - tcg-set-one-registry-builder-v0.2.mjs
+      - tcg-set-one-shadow-registry-builder-v0.2.mjs
       - tcg-set-one-starters-v0.2.json
       - tcg/tests/**
       - supabase/functions/tcg-tactic-actions/**
+      - supabase/migrations/20260906183000_tcg_v0_2_shadow_registry.sql
   workflow_dispatch:
 
 permissions:
@@ -39,6 +42,17 @@ jobs:
 
       - name: Validate Card Pass 2 candidates, eight exact starters and effect grammar
         run: node --test tcg/tests/card-pass-2-*.test.mjs
+
+      - name: Generate immutable Set One v0.2 shadow-registry migration payload
+        run: node tcg-set-one-shadow-registry-builder-v0.2.mjs tcg-set-one-shadow-registry-v0.2.generated.sql
+
+      - name: Upload immutable Set One v0.2 shadow-registry migration payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: tcg-set-one-shadow-registry-v0-2
+          path: tcg-set-one-shadow-registry-v0.2.generated.sql
+          if-no-files-found: error
+          retention-days: 1
 
   runtime-core:
     name: v0.2 deterministic runtime core
