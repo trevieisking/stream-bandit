@@ -20,6 +20,7 @@ on:
       - supabase/migrations/20260906183000_tcg_v0_2_shadow_registry.sql
       - supabase/migrations/20260906190000_tcg_v0_2_set_one_shadow_registry_load.sql
       - supabase/migrations/20260906191500_tcg_match_v0_2_registry_snapshot_bridge.sql
+      - supabase/migrations/20260906193000_tcg_match_v0_2_runtime_marker_bridge.sql
   workflow_dispatch:
 
 permissions:
