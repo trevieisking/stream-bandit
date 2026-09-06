@@ -3,9 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildSetOneRegistry } from '../../tcg-set-one-registry-builder-v0.2.mjs';
+import { serializeSetOneShadowRegistrySql } from '../../tcg-set-one-shadow-registry-builder-v0.2.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
+const registryLock = JSON.parse(fs.readFileSync(path.join(root, 'tcg-card-pass-2-registry-lock-v0.2.json'), 'utf8'));
 const migrationPath = path.join(
   root,
   'supabase',
@@ -51,4 +54,36 @@ test('v0.2 shadow registry remains replay-oriented and payload-free until the fr
   assert.match(migration, /drop trigger if exists tcg_card_definition_versions_updated_at/i);
   assert.doesNotMatch(migration, /insert\s+into\s+public\.tcg_registry_versions/i, 'schema migration must not silently declare a frozen registry');
   assert.doesNotMatch(migration, /insert\s+into\s+public\.tcg_card_definition_versions/i, 'schema migration must not silently stage card payloads');
+});
+
+test('generated shadow-registry load is deterministic, exact-193 and locked to the frozen digest', () => {
+  const registry = buildSetOneRegistry(root);
+  const first = serializeSetOneShadowRegistrySql(root);
+  const second = serializeSetOneShadowRegistrySql(root);
+  assert.equal(first, second, 'shadow registry SQL must be deterministic');
+  assert.equal(registry.card_count, 193);
+
+  const payloadRows = first.split('\n').filter((line) =>
+    line.startsWith('  (') && line.includes("'SB1-set-one-v0.2'") && line.includes('::jsonb)')
+  );
+  assert.equal(payloadRows.length, 193, 'shadow registry SQL must contain exactly 193 generated card rows');
+
+  assert.match(first, /insert into public\.tcg_registry_versions/i);
+  assert.match(first, /insert into public\.tcg_card_definition_versions/i);
+  assert.match(first, /on conflict \(registry_id\) do update/i);
+  assert.match(first, /on conflict \(registry_id, card_id\) do update/i);
+  assert.match(first, /tcg_v0_2_shadow_registry_row_count_mismatch/);
+  assert.match(first, /tcg_v0_2_shadow_registry_structured_row_mismatch/);
+  assert.ok(first.includes(registryLock.sha256), 'shadow registry SQL must carry the frozen registry digest');
+  assert.equal(registryLock.runtime_authority, false);
+  assert.match(first, /is_runtime_authority = false/i);
+  assert.doesNotMatch(first, /is_runtime_authority\s*=\s*true/i, 'generated load must never activate runtime authority');
+
+  assert.doesNotMatch(first, /insert\s+into\s+public\.tcg_card_definitions\b/i, 'generated load must not insert legacy runtime definitions');
+  assert.doesNotMatch(first, /update\s+public\.tcg_card_definitions\b/i, 'generated load must not update legacy runtime definitions');
+  assert.doesNotMatch(first, /delete\s+from\s+public\.tcg_card_definitions\b/i, 'generated load must not delete legacy runtime definitions');
+
+  for (const row of registry.definitions) {
+    assert.ok(first.includes(`'${row.card_id}'`), `shadow registry SQL missing ${row.card_id}`);
+  }
 });
