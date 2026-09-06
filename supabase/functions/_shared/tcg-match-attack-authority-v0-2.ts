@@ -1,4 +1,7 @@
-import { structuredRuntimeAttackMetadata } from "./tcg-match-attack-v0-2.ts";
+import {
+  structuredRuntimeAttackMetadata,
+  type RuntimeV02AttackTargetPermission,
+} from "./tcg-match-attack-v0-2.ts";
 
 export type LegacyAttackCompatibility = {
   name: string;
@@ -14,6 +17,7 @@ export type RuntimeAttackAuthority = LegacyAttackCompatibility & {
   id: string | null;
   metadata_source: "legacy" | "structured_v0_2";
   damage_source: "legacy" | "base_damage" | "damage_formula.base";
+  target_permissions: RuntimeV02AttackTargetPermission[];
 };
 
 export function resolveRuntimeAttackAuthority(
@@ -32,6 +36,7 @@ export function resolveRuntimeAttackAuthority(
       id: null,
       metadata_source: "legacy",
       damage_source: "legacy",
+      target_permissions: [],
     };
   }
 
@@ -53,5 +58,6 @@ export function resolveRuntimeAttackAuthority(
     damage: structured.base_damage,
     metadata_source: "structured_v0_2",
     damage_source: structured.damage_source,
+    target_permissions: structured.target_permissions.map((permission) => ({ ...permission })),
   };
 }
