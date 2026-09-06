@@ -2,7 +2,7 @@
 
 **Checkpoint date:** 2026-09-06  
 **Active implementation:** PR #549 — `feature/tcg-private-alpha-v0-5-source-recovery`  
-**Current implementation head before this checklist update:** `b8bb9fdff9435f7e33b8332c79d021cdb5646914`
+**Current implementation head before this checklist update:** `9f156a6da7250004467f0ec7d704e7f55d3bfff5`
 
 ## Authority
 
@@ -27,7 +27,8 @@
 - [x] World chain: `Tide → Ember → Grove → Gale → Stone → Volt → Tide`.
 - [x] Mystical/combat chain: `Astral → Martial → Shade → Fairy → Underworld → Astral`.
 - [x] All 8 element design audits complete.
-- [ ] Final deterministic STRUCTURE pass for all 193 identities — **IN PROGRESS**.
+- [x] **All 8 elemental Card Pass 2 structured candidate batches now exist.**
+- [ ] Final deterministic STRUCTURE reconciliation across all 193 identities — **IN PROGRESS** because Astral pre-correction Weakness data still needs physical consolidation and the shared schema needs one machine-readable owner.
 - [ ] AI Test Match balance.
 - [ ] Human balance / final numeric tuning.
 
@@ -35,23 +36,24 @@
 
 - [x] Base `sb-tcg-card-v0.2` / `sb-tcg-effects-v0.2`.
 - [x] Amendments A–F.
-- [x] G — generic alternate attack targets + target-zone damage modifier.
+- [x] G — alternate attack targets + target-zone damage modifier.
 - [x] H — switch counterpart bindings + real voluntary withdrawal + post-attack completion.
 - [x] I — public discard selection + healing packets/modifiers + aura selectors + damage-source binding + Weakness validator guard.
 - [x] J — server-random hidden sampling + opponent-deck inspection/reorder + delayed lifecycle action + control-condition replacement.
 - [x] K — prevention attribution/counters + threshold defence + Shield-source events + source-aware withdrawal-tax immunity.
 - [x] L — multi-Essence movement + movement participation + Shield transfer + actual-heal listeners + grouped searches + source-capped withdrawal tax.
+- [x] M — temporary/borrowed Essence normalization + typed attack-cost floors + Device locks + post-resolution destination overrides.
 - [x] Astral candidate exists.
-- [ ] **REPAIR** — Astral physical candidate still contains stale per-card Weakness objects from before Trev's global-chain correction. Repair projection is correct, but source must be consolidated.
+- [ ] **REPAIR — Astral source consolidation:** old Astral candidate physically contains stale routine per-card Weakness fields written before Trev corrected the system. The global-chain repair projection is correct; the candidate must be rewritten/consolidated so only the global matchup model remains.
 - [x] Ember 24 candidate.
-- [x] Gale 24 candidate.
+- [x] Gale 24 candidate — zero per-card Weakness.
 - [x] Grove 24 candidate — zero per-card Weakness.
 - [x] Shade 24 candidate — zero per-card Weakness.
 - [x] Stone 24 candidate — zero per-card Weakness.
 - [x] Tide 24 candidate — zero per-card Weakness.
-- [ ] **NEXT — Volt 24**.
-- [ ] Consolidated machine-readable v0.2 validator/spec.
-- [ ] Freeze final 193-card registry only after simulation + human balance.
+- [x] Volt 24 candidate — zero per-card Weakness.
+- [ ] Consolidated machine-readable v0.2 validator/specification.
+- [ ] Reconcile the 193-card total with exact starter references and freeze only after simulation + human balance.
 
 ---
 
@@ -93,13 +95,8 @@
 - [x] Starbound attack-consumption foundation.
 - [x] Defeat/winner/reward handoff foundation.
 - [x] Deterministic current Ally/Device interpreter.
-- [x] Skyrend target/penalty generic schema path.
-- [x] Gale movement/withdrawal generic schema path.
-- [x] Grove heal/recycle/aura/reflect generic schema path.
-- [x] Shade hidden-information/control generic schema path.
-- [x] Stone threshold-defence/Shield/prevention/Relic generic schema path.
-- [x] Tide Essence-flow/Shield-transfer/actual-heal generic schema path.
-- [ ] Generic pending-choice engine — IN PROGRESS.
+- [x] Generic schema paths now exist for the element-specific mechanics exposed by all eight audits: Gale alternate targeting/movement, Grove healing/recycling, Shade hidden information/control, Stone prevention/Shield, Tide current/Shield transfer and Volt temporary charge/Device sequencing.
+- [ ] Generic pending-choice/effect runtime — IN PROGRESS.
 - [ ] Remove remaining card-id/name runtime shortcuts as v0.2 becomes authority.
 - [ ] Hidden hand/deck/Reward choices.
 - [ ] Reconnect/resume.
@@ -171,7 +168,7 @@
 - [x] `09bc7a3...` Functional Smoke #202 PASS.
 - [x] `4370385472c3...` Migration Replay #185 + Functional Smoke #203 PASS.
 - [x] `b5cd76a0988c...` Migration Replay #186 PASS; paired smoke superseded/cancelled, not counted as pass.
-- [ ] Latest exact-head CI must complete successfully; superseded cancellations are neither pass nor gameplay failure.
+- [ ] **CURRENT:** newest exact-head CI after this eight-element checkpoint must complete successfully. Superseded cancellations are neither pass nor gameplay failure.
 - [ ] Two-account desktop/phone full battle.
 - [ ] Reconnect/private-state test.
 - [ ] Economy receipt/retry/duplicate tests.
@@ -183,9 +180,9 @@
 
 # 9. Exact next execution order
 
-1. Volt 24 STRUCTURE.
-2. Physically consolidate Astral to remove stale per-card Weakness.
-3. Consolidate base schema + A–L and any later element-proven amendments into one machine-readable validator/spec.
+1. **Physically consolidate Astral and remove the stale per-card Weakness fields.**
+2. Consolidate base schema + Amendments A–M into one machine-readable validator/specification.
+3. Validate all eight 24-card element candidates plus Prismatic Founder / total 193 identity references against the consolidated schema and global matchup table.
 4. Finish unified effect + pending-choice runtime and remove card-name/card-id hacks.
 5. Repair deck validation/copy-limit drift.
 6. Reconcile all 193 definitions with the 8 exact starters and freeze deterministic SB1 registry.
@@ -201,4 +198,4 @@
 
 ## Checkpoint conclusion
 
-Visible planning truth now includes Card Pass 2 through **Tide 24** and Amendments G–L. Every newly structured element since Trev corrected Weakness contains zero routine per-card Weakness fields. Only the stale pre-correction Astral physical candidate remains to be consolidated after the final Volt batch.
+**All eight current Set One elements now have deterministic Card Pass 2 candidate ledgers.** The global two-chain Weakness rule is enforced in every new batch and in schema validation. The one known historical contradiction is the original Astral candidate written before Trev corrected Weakness; that is now the immediate repair target rather than hidden behind an override note.
