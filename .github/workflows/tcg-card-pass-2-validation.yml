@@ -11,6 +11,7 @@ on:
       - tcg-runtime-*.json
       - tcg-runtime-pass-b-withdrawal-wire.mjs
       - tcg-runtime-pass-b-attack-damage-wire.mjs
+      - tcg-runtime-pass-b-surge-lifecycle-wire.mjs
       - tcg-set-one-registry-builder-v0.2.mjs
       - tcg-set-one-shadow-registry-builder-v0.2.mjs
       - tcg-set-one-starters-v0.2.json
@@ -29,7 +30,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: tcg-card-pass-2-validation-${{ github.event.pull_request.number || github.ref }}
@@ -41,10 +42,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out reviewed head
+      - name: Check out reviewed PR head
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Use Node.js 22
         uses: actions/setup-node@v4
@@ -59,6 +62,28 @@ jobs:
 
       - name: Verify guarded Runtime Pass B attack-damage wiring is materialized
         run: node tcg-runtime-pass-b-attack-damage-wire.mjs --check
+
+      - name: Materialize guarded Runtime Pass B Surge lifecycle wiring on this PR branch only
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref != 'main'
+        run: |
+          node tcg-runtime-pass-b-surge-lifecycle-wire.mjs
+          changed="$(git diff --name-only)"
+          if [ -z "$changed" ]; then
+            echo "Surge lifecycle wiring already materialized."
+            exit 0
+          fi
+          if [ "$changed" != "supabase/functions/tcg-match-actions/index.ts" ]; then
+            echo "Unexpected materializer output: $changed" >&2
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add supabase/functions/tcg-match-actions/index.ts
+          git diff --cached --quiet && exit 0
+          git commit -m "Wire structured Surge lifecycle"
+          git fetch origin "${{ github.event.pull_request.head.ref }}"
+          git rebase "origin/${{ github.event.pull_request.head.ref }}"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
 
       - name: Generate immutable Set One v0.2 shadow-registry migration payload
         run: node tcg-set-one-shadow-registry-builder-v0.2.mjs tcg-set-one-shadow-registry-v0.2.generated.sql
