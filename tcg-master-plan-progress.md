@@ -2,218 +2,201 @@
 
 **Checkpoint date:** 2026-09-06  
 **Active implementation:** PR #549 — `feature/tcg-private-alpha-v0-5-source-recovery`  
-**Current implementation head before this checklist update:** `dd7c1cd79f66cee503d7a68f38682248d9ccffb7`
+**Current implementation head before this checklist update:** `0f7d6201a8f6b61d39df5bf70a5670f25c726cb6`
 
-## Current authority
-
-This checklist is the operational companion to the living repo TCG master plan, current-rules audit ledgers and Card Pass 2 structure files.
-
-The 4 September 2026 Google Docs master plan is **historical scope/restart evidence only**. It must not overwrite Trev's later explicit corrections or the current repo rules.
-
-Authority order:
+## Authority
 
 1. Trev's latest explicit TCG corrections/decisions.
 2. Current repo master plan/current-rules audits and accepted Card Pass 2 amendments/candidates.
-3. Earlier locked rules that have not been superseded.
-4. The 4 September Google plan and old prototype registry only as historical/design evidence.
+3. Earlier locked rules not superseded.
+4. 4 Sep Google plan / old prototype only as historical evidence.
 
-Hard correction now enforced: ordinary Weakness is owned by the two global matchup chains, **not copied onto individual cards**. A routine per-card `weakness` object on an ordinary Set One Creature is a Card Pass validation defect.
-
-### Status legend
-
-- **DONE (branch)** — implemented in PR #549 source.
-- **LIVE** — present in connected Supabase production.
-- **IN PROGRESS** — implementation exists but full capability is incomplete.
-- **TODO** — not yet implemented to the master-plan definition.
-- **REPAIR** — known drift must be corrected before promotion.
+Hard rule: ordinary Weakness comes from the two global matchup chains. Routine per-card `weakness` on an ordinary Set One Creature is a validation defect.
 
 ---
 
-# 1. Rules, product and Set One
+# 1. Rules / Set One
 
-- [x] **DONE** — 8 Set One elements: Astral, Ember, Gale, Grove, Shade, Stone, Tide, Volt.
-- [x] **DONE** — 8 exact 60-card starter targets.
-- [x] **DONE** — Set One target = **193 gameplay identities**.
-- [x] **DONE** — Baby → Teen → Adult; Standalone valid; Mythic separate from stage; one evolution per stack per turn.
-- [x] **DONE** — printed Creature HP 40–390.
-- [x] **DONE** — Vanguard / 4 Reserve / 6 Reward Cards / real Essence / Tactics / Shield / conditions.
-- [x] **DONE** — Starbound separate from Mythic; one player-owned Starbound marker per match.
-- [x] **DONE** — world chain: `Tide → Ember → Grove → Gale → Stone → Volt → Tide`.
-- [x] **DONE** — mystical/combat chain: `Astral → Martial → Shade → Fairy → Underworld → Astral`.
-- [x] **DONE** — Martial is a Creature Type; Fairy/Underworld are future full elements.
-- [x] **DONE** — Set One design audits completed across all 8 elements.
-- [ ] **IN PROGRESS** — deterministic STRUCTURE pass for all 193 identities.
-- [ ] **TODO** — AI Test Match balance across all eight starters.
-- [ ] **TODO** — human balance and final numeric tuning.
+- [x] 8 elements: Astral, Ember, Gale, Grove, Shade, Stone, Tide, Volt.
+- [x] 8 exact 60-card starter targets.
+- [x] 193 Set One gameplay identities.
+- [x] Baby → Teen → Adult; Standalone valid; Mythic separate from stage.
+- [x] Printed HP 40–390.
+- [x] Vanguard / 4 Reserve / 6 Rewards / Essence / Tactics / Shield / conditions.
+- [x] Starbound separate from Mythic; one player-owned marker per match.
+- [x] World chain: `Tide → Ember → Grove → Gale → Stone → Volt → Tide`.
+- [x] Mystical/combat chain: `Astral → Martial → Shade → Fairy → Underworld → Astral`.
+- [x] All 8 element design audits complete.
+- [ ] Final deterministic STRUCTURE pass for all 193 identities — **IN PROGRESS**.
+- [ ] AI Test Match balance.
+- [ ] Human balance / final numeric tuning.
 
-## Card Pass 2 structure
+## Card Pass 2
 
-- [x] **DONE (branch)** — `sb-tcg-card-v0.2` / `sb-tcg-effects-v0.2` base schema.
-- [x] **DONE (branch)** — Amendments A–F.
-- [x] **DONE (branch)** — Amendment G: generic alternate attack target + target-zone damage modifier.
-- [x] **DONE (branch)** — Amendment H: switch counterpart bindings, real voluntary-withdrawal invocation/cost and post-attack completion timing.
-- [x] **DONE (branch)** — Amendment I: public discard selection, healing packets/modifiers, aura selectors, damage-source bindings and validator rejection of stale per-card Weakness.
-- [x] **DONE (branch)** — Astral structured candidate exists.
-- [ ] **REPAIR** — original Astral candidate physically still contains stale per-card Weakness objects from before Trev's global-chain correction. `tcg-card-pass-2-astral-matchup-repair.md` correctly overrides them, but the candidate itself must be consolidated so there is one unambiguous source.
-- [x] **DONE (branch)** — Ember 24 structured candidate; global matchup model used.
-- [x] **DONE (branch)** — Gale 24 structured candidate; global matchup model used.
-- [x] **DONE (branch)** — Grove 24 structured candidate; **zero ordinary per-card Weakness fields**.
-- [ ] **NEXT** — Shade 24 structured candidate.
-- [ ] **TODO** — Stone structured candidate.
-- [ ] **TODO** — Tide structured candidate.
-- [ ] **TODO** — Volt structured candidate.
-- [ ] **TODO** — consolidate base schema + amendments into one machine-readable validator/specification.
-- [ ] **TODO** — final 193-card registry migration/version freeze after deterministic simulation and human balance testing.
+- [x] Base `sb-tcg-card-v0.2` / `sb-tcg-effects-v0.2`.
+- [x] Amendments A–F.
+- [x] G — generic alternate attack targets + target-zone damage modifier.
+- [x] H — switch counterpart bindings + real voluntary withdrawal + post-attack completion.
+- [x] I — public discard selection + healing packets/modifiers + aura selectors + damage-source binding + Weakness validator guard.
+- [x] J — server-random hidden sampling + opponent-deck inspection/reorder + delayed lifecycle action + control-condition replacement.
+- [x] Astral candidate exists.
+- [ ] **REPAIR** — Astral physical candidate still contains stale per-card Weakness objects from before Trev's global-chain correction. Repair projection is correct, but source must be consolidated.
+- [x] Ember 24 candidate.
+- [x] Gale 24 candidate.
+- [x] Grove 24 candidate — zero per-card Weakness.
+- [x] Shade 24 candidate — zero per-card Weakness.
+- [ ] **NEXT — Stone 24**.
+- [ ] Tide 24.
+- [ ] Volt 24.
+- [ ] Consolidated machine-readable v0.2 validator/spec.
+- [ ] Freeze final 193-card registry only after simulation + human balance.
 
 ---
 
-# 2. Database, security and private-alpha foundation
+# 2. Database / private alpha
 
-## Already live in Supabase
+## LIVE
 
-- [x] **LIVE** — private-alpha foundation + security hardening.
-- [x] **LIVE** — atomic starter grant.
-- [x] **LIVE** — server deck-validation foundation.
-- [x] **LIVE** — private room lobby + join-code compatibility.
-- [x] **LIVE** — match shell/hidden state + atomic command commit.
-- [x] **LIVE** — card printings + TCG art bucket.
-- [x] **LIVE** — `tcg-private-alpha-api` deployed/JWT protected.
-- [x] **LIVE** — `tcg-match-actions` v0.1 deployed/JWT protected.
+- [x] Private-alpha foundation/security.
+- [x] Atomic starter grant.
+- [x] Deck-validation foundation.
+- [x] Private rooms + join codes.
+- [x] Match shell/hidden state + atomic command commit.
+- [x] Card printings + art bucket.
+- [x] `tcg-private-alpha-api` JWT-protected.
+- [x] `tcg-match-actions` v0.1 JWT-protected.
 
-## Branch-only, not live
+## Branch-only
 
-- [x] **DONE (branch)** — three-currency economy source.
-- [x] **DONE (branch)** — automatic matchmaking source.
-- [x] **DONE (branch)** — Arcade progression/reward receipts source.
-- [x] **DONE (branch)** — `tcg-match-actions` v0.3 candidate.
-- [x] **DONE (branch)** — `tcg-tactic-actions` candidate.
-- [ ] **NOT LIVE** — economy/copy migration.
-- [ ] **NOT LIVE** — matchmaking migration.
-- [ ] **NOT LIVE** — Arcade progression/reward migration.
-- [ ] **NOT LIVE** — `tcg-match-actions` v0.3.
-- [ ] **NOT LIVE** — `tcg-tactic-actions`.
+- [x] Three-currency economy source.
+- [x] Automatic matchmaking source.
+- [x] Arcade progression/reward receipts source.
+- [x] `tcg-match-actions` v0.3 candidate.
+- [x] `tcg-tactic-actions` candidate.
+- [ ] Economy/matchmaking/Arcade migrations not live.
+- [ ] v0.3 / tactic-actions not live.
 
-## Known database repair
+## Repair
 
-- [ ] **REPAIR** — `20260905105500_tcg_economy_and_copy_limit_alignment.sql` still contains superseded global one-Mythic-total and Legendary restrictions. Current rule: ordinary identity max 4, Mythic identity max 1, Essence separate allowance.
+- [ ] Economy/copy migration still contains obsolete global one-Mythic-total + Legendary restrictions. Current rule: ordinary identity max 4, Mythic identity max 1, Essence separate allowance.
 
 ---
 
 # 3. Server-authoritative battle engine
 
-- [x] **DONE (branch foundation)** — hidden canonical state + seat-private views.
-- [x] **DONE (branch foundation)** — nonce/revision idempotent command path.
-- [x] **DONE (branch)** — core play/evolve/Essence/Relic/Realm/turn paths.
-- [x] **DONE (branch)** — attack-cost parsing, damage, Shield, recoil/effect damage, major conditions.
-- [x] **DONE (branch)** — Starbound attack consumption foundation.
-- [x] **DONE (branch)** — defeat/winner/reward handoff foundation.
-- [x] **DONE (branch)** — deterministic Ally/Device interpreter for current structured Tactics.
-- [x] **DONE (schema)** — Skyrend Reserve targeting + -20 penalty represented generically.
-- [x] **DONE (schema)** — Gale movement/withdrawal handoffs represented generically.
-- [x] **DONE (schema)** — Grove healing, discard recycling, aura protection and reflected attack damage represented generically.
-- [ ] **IN PROGRESS** — generic pending-choice engine for remaining attacks/Abilities.
-- [ ] **REPAIR (runtime)** — remove remaining card-id/name shortcuts as v0.2 becomes authoritative, including old Gale/Grove prototype branches.
-- [ ] **TODO** — complete hidden hand/deck/Reward choices with private views.
-- [ ] **TODO** — reconnect/resume test.
-- [ ] **TODO** — stale/replay/simultaneous-command adversarial tests.
-- [ ] **TODO** — full two-player setup → battle → victory → persisted-result match with no manual DB intervention.
+- [x] Hidden canonical state + seat-private views.
+- [x] Nonce/revision idempotent command path.
+- [x] Core play/evolve/Essence/Relic/Realm/turn paths.
+- [x] Damage / Shield / recoil / effect damage / major conditions.
+- [x] Starbound attack-consumption foundation.
+- [x] Defeat/winner/reward handoff foundation.
+- [x] Deterministic current Ally/Device interpreter.
+- [x] Skyrend target/penalty has generic schema path.
+- [x] Gale movement/withdrawal has generic schema path.
+- [x] Grove heal/recycle/aura/reflect has generic schema path.
+- [x] Shade hidden-information/control mechanics have generic schema path.
+- [ ] Generic pending-choice engine — IN PROGRESS.
+- [ ] Remove remaining card-id/name runtime shortcuts as v0.2 becomes authority.
+- [ ] Hidden hand/deck/Reward choices.
+- [ ] Reconnect/resume.
+- [ ] Stale/replay/simultaneous command adversarial tests.
+- [ ] Full two-player setup → victory → persisted result without manual DB intervention.
 
 ---
 
-# 4. Modes, matchmaking and progression
+# 4. Modes / progression
 
-- [x] **DONE (branch)** — Arcade first normal non-ranked progression mode.
-- [x] **DONE (branch)** — automatic matchmaking SQL.
-- [x] **DONE (branch)** — private friend/test rooms do not farm normal Arcade rewards.
-- [x] **DONE (branch)** — XP/matches/wins/losses/streak fields.
-- [x] **DONE (branch)** — idempotent match reward receipts.
-- [ ] **TODO** — player-facing Arcade matchmaking UI.
-- [ ] **TODO** — Ranked.
-- [ ] **TODO** — player level/rank presentation.
-- [ ] **TODO** — deterministic AI Test Match bot using the same legal server action path.
-
----
-
-# 5. Economy, Collection and Deck Builder
-
-- [x] **DONE (rules)** — exactly 3 currencies: Battle Pass Tokens, Trade Tokens, Shop Coins.
-- [x] **DONE (rules)** — normal collection keep 4; Mythic keep 1.
-- [x] **DONE (rules)** — 200 Shop Coins per pack.
-- [x] **DONE (rules)** — 200 Battle Pass Tokens per tier.
-- [ ] **TODO** — duplicate conversion to Trade Tokens.
-- [ ] **TODO** — Collection UI.
-- [ ] **TODO** — Deck Builder UI/validation.
-- [ ] **TODO** — Shop/pack-opening transaction flow.
-- [ ] **TODO** — Trade Token spending/trading flow.
-- [ ] **TODO** — pack/box/sleeve/coin/special-edition presentation.
+- [x] Arcade first normal non-ranked mode.
+- [x] Automatic matchmaking source.
+- [x] Private rooms cannot farm normal Arcade rewards.
+- [x] XP / W-L / streak fields.
+- [x] Idempotent match reward receipts.
+- [ ] Arcade player UI.
+- [ ] Ranked.
+- [ ] Player level/rank UI.
+- [ ] Deterministic AI Test Match bot.
 
 ---
 
-# 6. Battle Pass and dailies
+# 5. Economy / collection
 
-- [x] **DONE (rules)** — 100 tiers.
-- [x] **DONE (rules)** — reward every tier.
-- [x] **DONE (rules)** — 3 daily achievements.
-- [ ] **TODO** — season/config + authoritative tier receipts.
-- [ ] **TODO** — 100-tier reward definition.
-- [ ] **TODO** — daily assignment/progress/reset.
-- [ ] **TODO** — Battle Pass/dailies UI.
+- [x] Battle Pass Tokens / Trade Tokens / Shop Coins only.
+- [x] Normal keep 4; Mythic keep 1.
+- [x] 200 Shop Coins per pack.
+- [x] 200 Battle Pass Tokens per tier.
+- [ ] Duplicate conversion → Trade Tokens.
+- [ ] Collection.
+- [ ] Deck Builder.
+- [ ] Shop / pack opening.
+- [ ] Trading / Trade Token spend.
+- [ ] Pack/box/sleeve/coin/special-edition presentation.
+
+---
+
+# 6. Battle Pass / dailies
+
+- [x] 100 tiers.
+- [x] Reward every tier.
+- [x] 3 daily achievements.
+- [ ] Season/config + claim receipts.
+- [ ] 100-tier reward table.
+- [ ] Daily assignment/progress/reset.
+- [ ] UI.
 
 ---
 
 # 7. Standalone product UI
 
-- [x] **DONE (plan)** — standalone TCG product using shared Stream Bandit auth, not Stream Bandit shell ownership.
-- [x] **DONE (branch)** — `tcg-master-plan.html`.
-- [x] **DONE (branch)** — `t.html` development lab.
-- [ ] **TODO** — public landing/sign-up/sign-in.
-- [ ] **TODO** — authenticated game home.
-- [ ] **TODO** — premium data-driven live card renderer.
-- [ ] **TODO** — one-screen card-first drag/drop battlefield; persistent End Turn only.
-- [ ] **TODO** — fullscreen + Esc.
-- [ ] **TODO** — Collection / Deck Builder / Shop / Battle Pass / Profile / Sets UI.
-- [ ] **TODO** — audio after deterministic gameplay is stable.
-- [ ] **TODO** — public How to Play / Rules / Sets SEO pages.
+- [x] Standalone TCG shell using shared auth.
+- [x] `tcg-master-plan.html`.
+- [x] `t.html` development lab.
+- [ ] Public landing/sign-in.
+- [ ] Authenticated game home.
+- [ ] Premium data-driven card renderer.
+- [ ] One-screen drag/drop battlefield; persistent End Turn only.
+- [ ] Fullscreen + Esc.
+- [ ] Collection / Deck Builder / Shop / Pass / Profile / Sets.
+- [ ] Audio after determinism.
+- [ ] Public How to Play / Rules / Sets SEO.
 
 ---
 
-# 8. Tests and release gates
+# 8. Tests / release gates
 
-Confirmed clean checkpoints:
-
-- [x] **PASS** — `09bc7a3...`: Migration Replay #184.
-- [x] **PASS** — `09bc7a3...`: Functional Smoke #202.
-- [x] **PASS** — Amendment G head `4370385472c3...`: Migration Replay #185 + Functional Smoke #203.
-- [x] **PASS** — Amendment H head `b5cd76a0988c...`: Migration Replay #186; the paired smoke run was superseded/cancelled by later pushes, not counted as PASS.
-- [ ] **CURRENT HEAD CHECK** — run exact-head CI after this checklist commit; cancelled superseded runs are not treated as gameplay failures or passes.
-- [ ] **TODO** — two-account desktop/phone complete battle.
-- [ ] **TODO** — reconnect/private-state test.
-- [ ] **TODO** — economy receipt/retry/duplicate tests.
-- [ ] **TODO** — AI simulation matrix.
-- [ ] **TODO** — human balance.
-- [ ] **TODO** — private alpha → economy alpha → closed beta → public beta → live.
+- [x] `09bc7a3...` Migration Replay #184 PASS.
+- [x] `09bc7a3...` Functional Smoke #202 PASS.
+- [x] `4370385472c3...` Migration Replay #185 + Functional Smoke #203 PASS.
+- [x] `b5cd76a0988c...` Migration Replay #186 PASS; paired smoke superseded/cancelled, not counted as pass.
+- [ ] Latest exact-head CI must complete successfully; superseded cancellations are neither pass nor gameplay failure.
+- [ ] Two-account desktop/phone full battle.
+- [ ] Reconnect/private-state test.
+- [ ] Economy receipt/retry/duplicate tests.
+- [ ] AI simulation matrix.
+- [ ] Human balance.
+- [ ] Private alpha → economy alpha → closed beta → public beta → live.
 
 ---
 
 # 9. Exact next execution order
 
-1. **Shade 24 Card Pass 2 structured candidate**.
-2. Continue **Stone → Tide → Volt** STRUCTURE batches.
-3. Consolidate the stale Astral candidate so per-card Weakness fields are physically removed and only the global matchup model remains.
-4. Consolidate base schema + Amendments A–I plus any later element-proven additions into one machine-readable validator/specification.
-5. Finish unified server-authoritative effect + pending-choice runtime and remove card-name/card-id hacks.
-6. Repair deck-validation/copy-limit drift before economy migration promotion.
-7. Reconcile all 193 definitions with exact starters and freeze deterministic SB1 registry version.
-8. Complete/deploy matching TCG migrations and Edge Functions.
-9. Collection + Deck Builder + premium renderer + battle UI.
-10. Trade Token duplicate conversion + Shop/pack opening.
-11. Battle Pass + dailies.
-12. AI Test Match + deterministic simulation + human balance.
-13. Real two-account desktop/phone battle + reconnect/security/economy receipt tests.
-14. Release ladder only after gates pass.
+1. Stone 24 STRUCTURE.
+2. Tide 24 STRUCTURE.
+3. Volt 24 STRUCTURE.
+4. Physically consolidate Astral to remove stale per-card Weakness.
+5. Consolidate base schema + A–J and any later element-proven amendments into one machine-readable validator/spec.
+6. Finish unified effect + pending-choice runtime and remove card-name/card-id hacks.
+7. Repair deck validation/copy-limit drift.
+8. Reconcile all 193 definitions with the 8 exact starters and freeze deterministic SB1 registry.
+9. Deploy matching TCG migrations/functions.
+10. Collection + Deck Builder + renderer + battle UI.
+11. Trade Token duplicate conversion + Shop/pack opening.
+12. Battle Pass + dailies.
+13. AI Test Match + simulation + human balance.
+14. Real two-account battle + reconnect/security/economy tests.
+15. Release ladder only after all gates pass.
 
 ---
 
-## Master-plan checkpoint conclusion
+## Checkpoint conclusion
 
-The visible ledger now includes Card Pass 2 through **Grove 24** plus Amendments G, H and I. Trev's global Weakness-chain correction is explicitly enforced as a schema validation rule. The known Astral physical-file drift is now visible as a repair item rather than being hidden behind an override document.
+Visible planning truth now includes Card Pass 2 through **Shade 24** and Amendments G–J. Trev's global Weakness-chain correction remains an explicit schema guard and the stale Astral physical-file contradiction remains a named repair item until removed.
