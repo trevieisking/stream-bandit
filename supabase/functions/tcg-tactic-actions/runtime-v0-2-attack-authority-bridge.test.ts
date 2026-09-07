@@ -72,6 +72,7 @@ Deno.test("legacy-only match preserves the exact legacy attack authority", () =>
   assertEquals(attack?.damage, legacyAttack.damage);
   assertEquals(attack?.effect, legacyAttack.effect);
   assertEquals(attack?.starbound, legacyAttack.starbound);
+  assertJsonEquals(attack?.target_permissions, []);
 });
 
 Deno.test("marked v0.2 match makes structured identity cost and fixed base authoritative", () => {
@@ -97,6 +98,32 @@ Deno.test("marked v0.2 match makes structured identity cost and fixed base autho
   assertJsonEquals(attack?.typed, { Ember: 2 });
   assertEquals(attack?.any, 1);
   assertEquals(attack?.damage, 70);
+  assertJsonEquals(attack?.target_permissions, []);
+});
+
+Deno.test("marked v0.2 Sky Rend propagates the frozen additional opponent Reserve permission", () => {
+  const state = stateWith({
+    "gale-skyrend": creatureEntry("gale-skyrend", [{
+      id: "sky-rend",
+      name: "Sky Rend",
+      cost: [{ element: "Gale", amount: 2 }, { element: "Any", amount: 1 }],
+      base_damage: 110,
+      damage_formula: null,
+      target_permissions: [{
+        controller: "opponent",
+        zone: "reserve",
+        card_family: "Creature",
+        selection: "one",
+      }],
+    }]),
+  });
+  const attack = resolveRuntimeAttackAuthority(state, "gale-skyrend", 1, legacy());
+  assertJsonEquals(attack?.target_permissions, [{
+    controller: "opponent",
+    zone: "reserve",
+    card_family: "Creature",
+    selection: "one",
+  }]);
 });
 
 Deno.test("marked v0.2 match preserves only legacy effect and Starbound compatibility fields", () => {
