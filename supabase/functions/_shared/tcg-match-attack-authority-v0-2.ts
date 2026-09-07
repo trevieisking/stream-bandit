@@ -110,6 +110,21 @@ function directConditionalWhenReady(when: RuntimeV02ConditionalAddWhen): boolean
     : directConditionalLeafReady(when);
 }
 
+function readyConditionalLeaf(predicate: RuntimeV02ConditionalAddLeafPredicate): boolean {
+  if (directConditionalLeafReady(predicate)) return true;
+  return predicate.predicate === "event_occurred" &&
+    predicate.event === "device_resolved" &&
+    predicate.controller === "self" &&
+    predicate.window === "current_turn" &&
+    predicate.min_count === 1;
+}
+
+function readyConditionalWhen(when: RuntimeV02ConditionalAddWhen): boolean {
+  return "any" in when
+    ? when.any.every((predicate) => readyConditionalLeaf(predicate))
+    : readyConditionalLeaf(when);
+}
+
 export function resolveRuntimeAttackAuthority(
   state: Record<string, unknown>,
   instanceOrId: string | { card_id?: unknown } | null | undefined,
@@ -197,12 +212,8 @@ export function evaluateRuntimeAttackCountAddFormula(
 }
 
 /**
- * Evaluates only the frozen conditional_add predicates that are already fully
- * represented by canonical declaration-time match state.
- *
- * Event-history predicates and temporary/borrowed attachment-kind predicates
- * deliberately return null so tcg-match-actions can preserve its legacy
- * compatibility branch until those separate runtime owners are proven.
+ * Evaluates only frozen conditional_add predicates whose truth is already fully
+ * represented by declaration-time canonical match state.
  */
 export function evaluateRuntimeAttackDirectConditionalAddFormula(
   attack: RuntimeAttackAuthority,
@@ -211,6 +222,39 @@ export function evaluateRuntimeAttackDirectConditionalAddFormula(
   if (attack.metadata_source !== "structured_v0_2") return null;
   if (attack.conditional_add_formula == null) return null;
   if (!attack.conditional_add_formula.terms.every((term) => directConditionalWhenReady(term.when))) {
+    return null;
+  }
+  if (!attack.id) {
+    throw new Error("tcg_v0_2_attack_conditional_add_authority_id_required");
+  }
+  if (attack.damage_source !== "damage_formula.base") {
+    throw new Error(
+      `tcg_v0_2_attack_conditional_add_authority_damage_source_invalid:${attack.id}:${attack.damage_source}`,
+    );
+  }
+  return evaluateStructuredRuntimeConditionalAddFormula(
+    attack.damage,
+    attack.conditional_add_formula,
+    context,
+    attack.id,
+  );
+}
+
+/**
+ * Runtime-C ready subset: declaration-time state predicates plus the canonical
+ * `device_resolved` current-turn signal materialized by tcg-tactic-actions.
+ *
+ * Reward/deck inspection, prevention, Essence movement and temporary/borrowed
+ * attachment predicates remain deliberately excluded until their own canonical
+ * runtime owners are proven.
+ */
+export function evaluateRuntimeAttackReadyConditionalAddFormula(
+  attack: RuntimeAttackAuthority,
+  context: RuntimeV02ConditionalAddEvaluationContext,
+): RuntimeV02ConditionalAddFormulaEvaluation | null {
+  if (attack.metadata_source !== "structured_v0_2") return null;
+  if (attack.conditional_add_formula == null) return null;
+  if (!attack.conditional_add_formula.terms.every((term) => readyConditionalWhen(term.when))) {
     return null;
   }
   if (!attack.id) {
