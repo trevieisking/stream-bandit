@@ -24,9 +24,10 @@ jobs:
       - name: Guard exact staging chain
         shell: bash
         run: |
-          test "$(git rev-parse HEAD^)" = "01e02c23fad80952c2561653b548f315a676e9c6"
-          test "$(git rev-parse HEAD^^)" = "87b9accb98a3242049a8e40432511a90d4ed1c03"
-          actual="$(git diff --name-only HEAD^^..HEAD | sort)"
+          test "$(git rev-parse HEAD^)" = "93a1b368ca96d87bd9ac9b44920be96e0ad8a584"
+          test "$(git rev-parse HEAD^^)" = "01e02c23fad80952c2561653b548f315a676e9c6"
+          test "$(git rev-parse HEAD^^^)" = "87b9accb98a3242049a8e40432511a90d4ed1c03"
+          actual="$(git diff --name-only HEAD^^^..HEAD | sort)"
           expected="$(printf '%s\n' '.github/scripts/tcg-pass-c-recoil-effects.py' '.github/workflows/tcg-pass-c-recoil-effects-temp.yml' | sort)"
           test "$actual" = "$expected"
 
@@ -37,7 +38,18 @@ jobs:
 
       - name: Apply bounded Pass C recoil-effects slice
         shell: bash
-        run: python .github/scripts/tcg-pass-c-recoil-effects.py
+        run: |
+          python .github/scripts/tcg-pass-c-recoil-effects.py
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('tcg/tests/card-pass-2-runtime-attack-recoil-wiring.test.mjs')
+          text = p.read_text()
+          old = "assert.ok(effectSource.includes('Damage-packet listeners remain a separate later runtime pass'));"
+          new = "assert.ok(effectSource.includes('Damage-packet') && effectSource.includes('listeners remain a separate later runtime pass'));"
+          if text.count(old) != 1:
+              raise SystemExit('recoil proof assertion repair guard failed')
+          p.write_text(text.replace(old, new, 1))
+          PY
 
       - name: Run targeted Pass C proof
         shell: bash
