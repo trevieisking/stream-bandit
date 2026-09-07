@@ -51,8 +51,8 @@ test('structured conditional_add suppresses matching state-local English bonuses
 
 test('canonical Device turn flag is adapted to device_resolved and suppresses only its matching English fallback', () => {
   assert.ok(
-    source.includes('current_turn_events:Number(flags.device_turn??-1)===Number(s.turn_seq||0)?[{event:"device_resolved",controller:"self"}]:[]'),
-    'Device turn flag must become the exact structured device_resolved event signal',
+    source.includes('current_turn_events:[...(Number(flags.device_turn??-1)===Number(s.turn_seq||0)?[{event:"device_resolved" as const,controller:"self" as const}]:[]),...hiddenInformationEvents]'),
+    'Device turn flag must remain part of the structured current-turn event input',
   );
   assert.ok(
     source.includes('if(conditionalAddEvaluation==null&&ef.includes("played a device this turn")'),
@@ -60,10 +60,9 @@ test('canonical Device turn flag is adapted to device_resolved and suppresses on
   );
 });
 
-test('other event/history English bonus fallbacks remain active until their event owners are wired', () => {
+test('remaining event/history English bonus fallbacks stay active until their event owners are wired', () => {
   const preserved = [
     'if(ef.includes("looked at a reward card this match")',
-    'if(ef.includes("looked at your deck this turn")',
     'if(ef.includes("prevented damage this turn")',
     'if(ef.includes("essence is discarded from this creature during this turn")',
   ];
@@ -74,6 +73,10 @@ test('other event/history English bonus fallbacks remain active until their even
       `unproven event/history fallback was prematurely suppressed: ${needle}`,
     );
   }
+  assert.ok(
+    source.includes('if(conditionalAddEvaluation==null&&ef.includes("looked at your deck this turn")'),
+    'Predicted Hit deck-view fallback must now be gated by structured conditional authority',
+  );
   assert.ok(source.includes('source_attached_essence_kinds:[]'), 'adapter must not invent temporary/borrowed attachment state');
 });
 
