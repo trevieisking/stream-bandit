@@ -131,7 +131,7 @@ Deno.test("Runtime-C ready authority still evaluates the previously proven direc
   );
 });
 
-Deno.test("unproven event-history predicates remain outside Runtime-C ready authority", () => {
+Deno.test("Bastion Quake prevention predicate is Runtime-C ready from canonical current-turn prevention events", () => {
   const authority = resolveRuntimeAttackAuthority(stateWith("stone-citadelhorn", {
     id: "bastion-quake",
     name: "Bastion Quake",
@@ -156,13 +156,13 @@ Deno.test("unproven event-history predicates remain outside Runtime-C ready auth
     },
   }), "stone-citadelhorn", 1, legacy());
   if (!authority) throw new Error("prevention authority required");
-  assertEquals(
-    evaluateRuntimeAttackReadyConditionalAddFormula(
-      authority,
-      context([{ event: "damage_prevented", target: "source_creature", prevention_kind: "shield" }]),
-    ),
-    null,
+  const evaluation = evaluateRuntimeAttackReadyConditionalAddFormula(
+    authority,
+    context([{ event: "damage_prevented", target: "source_creature", prevention_kind: "shield" }]),
   );
+  assertEquals(evaluation?.damage, 90);
+  assertEquals(evaluation?.terms[0].matched, true);
+  assertEquals(evaluation?.terms[0].contribution, 20);
 });
 
 Deno.test("temporary/borrowed Gridbreaker predicate is Runtime-C ready from declaration attachment state", () => {
