@@ -1,5 +1,7 @@
 import {
+  structuredRuntimeConditionalAddFormulaMetadata,
   structuredRuntimeCountAddFormulaMetadata,
+  type RuntimeV02ConditionalAddFormulaMetadata,
   type RuntimeV02CountAddFormulaMetadata,
 } from "./tcg-match-attack-formula-v0-2.ts";
 import { structuredRuntimeDistinctAttachedEssenceElements } from "./tcg-match-essence-query-v0-2.ts";
@@ -38,6 +40,7 @@ export type RuntimeV02AttackMetadata = {
   base_damage: number | null;
   damage_source: "base_damage" | "damage_formula.base" | null;
   count_add_formula: RuntimeV02CountAddFormulaMetadata | null;
+  conditional_add_formula: RuntimeV02ConditionalAddFormulaMetadata | null;
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
   starbound: boolean;
@@ -257,7 +260,8 @@ function structuredAttackStarbound(
 /**
  * Returns the structured v0.2 attack identity, Essence cost, deterministic
  * baseline damage, additive attack-target permissions, declaration requirement
- * metadata, count-add formula metadata and Starbound ownership for a 1-based slot.
+ * metadata, count-add/conditional-add formula metadata and Starbound ownership
+ * for a 1-based slot.
  *
  * Legacy-only matches deliberately return null so the existing text parser
  * remains the fallback until the v0.2 match snapshot is present. Once a match
@@ -315,6 +319,7 @@ export function structuredRuntimeAttackMetadata(
     damageSource = "damage_formula.base";
   }
   const countAddFormula = structuredRuntimeCountAddFormulaMetadata(attack.damage_formula, id);
+  const conditionalAddFormula = structuredRuntimeConditionalAddFormulaMetadata(attack.damage_formula, id);
 
   return {
     id,
@@ -324,6 +329,7 @@ export function structuredRuntimeAttackMetadata(
     base_damage: baseDamage,
     damage_source: damageSource,
     count_add_formula: countAddFormula,
+    conditional_add_formula: conditionalAddFormula,
     target_permissions: attackTargetPermissions(attack.target_permissions, id),
     requirements: attackRequirements(attack.requirements, id),
     starbound: structuredAttackStarbound(definition, creature, attacks, id),
