@@ -898,7 +898,7 @@ function executeUntilChoice(state: any) {
           from: "discard",
           target,
           effect_flags: step.flags || {},
-          attachment_kind: String(context.attachment_kind || "effect_generated"),
+          attachment_kind: String(step.attachment_kind || "effect_generated"),
         },
       });
       return;
