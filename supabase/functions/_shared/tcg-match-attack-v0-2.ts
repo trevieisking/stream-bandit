@@ -1,3 +1,7 @@
+import {
+  structuredRuntimeCountAddFormulaMetadata,
+  type RuntimeV02CountAddFormulaMetadata,
+} from "./tcg-match-attack-formula-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 
 export type RuntimeV02AttackTargetPermission = {
@@ -32,6 +36,7 @@ export type RuntimeV02AttackMetadata = {
   any: number;
   base_damage: number | null;
   damage_source: "base_damage" | "damage_formula.base" | null;
+  count_add_formula: RuntimeV02CountAddFormulaMetadata | null;
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
   starbound: boolean;
@@ -300,7 +305,7 @@ function structuredAttackStarbound(
 /**
  * Returns the structured v0.2 attack identity, Essence cost, deterministic
  * baseline damage, additive attack-target permissions, declaration requirement
- * metadata and Starbound ownership for a 1-based slot.
+ * metadata, count-add formula metadata and Starbound ownership for a 1-based slot.
  *
  * Legacy-only matches deliberately return null so the existing text parser
  * remains the fallback until the v0.2 match snapshot is present. Once a match
@@ -357,6 +362,7 @@ export function structuredRuntimeAttackMetadata(
     baseDamage = nonNegativeInteger(formula.base, `tcg_v0_2_attack_formula_base_invalid:${id}`);
     damageSource = "damage_formula.base";
   }
+  const countAddFormula = structuredRuntimeCountAddFormulaMetadata(attack.damage_formula, id);
 
   return {
     id,
@@ -365,6 +371,7 @@ export function structuredRuntimeAttackMetadata(
     any,
     base_damage: baseDamage,
     damage_source: damageSource,
+    count_add_formula: countAddFormula,
     target_permissions: attackTargetPermissions(attack.target_permissions, id),
     requirements: attackRequirements(attack.requirements, id),
     starbound: structuredAttackStarbound(definition, creature, attacks, id),
