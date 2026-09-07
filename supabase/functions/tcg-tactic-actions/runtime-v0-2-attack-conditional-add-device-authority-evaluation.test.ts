@@ -165,7 +165,7 @@ Deno.test("unproven event-history predicates remain outside Runtime-C ready auth
   );
 });
 
-Deno.test("temporary/borrowed Gridbreaker predicate remains outside Runtime-C ready authority", () => {
+Deno.test("temporary/borrowed Gridbreaker predicate is Runtime-C ready from declaration attachment state", () => {
   const authority = resolveRuntimeAttackAuthority(stateWith("volt-dynamozer", {
     id: "gridbreaker",
     name: "Gridbreaker",
@@ -186,11 +186,11 @@ Deno.test("temporary/borrowed Gridbreaker predicate remains outside Runtime-C re
     },
   }), "volt-dynamozer", 1, legacy());
   if (!authority) throw new Error("Gridbreaker authority required");
-  assertEquals(
-    evaluateRuntimeAttackReadyConditionalAddFormula(
-      authority,
-      context([], { source_attached_essence_kinds: ["temporary"] }),
-    ),
-    null,
+  const evaluation = evaluateRuntimeAttackReadyConditionalAddFormula(
+    authority,
+    context([], { source_attached_essence_kinds: ["temporary"] }),
   );
+  assertEquals(evaluation?.damage, 170);
+  assertEquals(evaluation?.terms[0].matched, true);
+  assertEquals(evaluation?.terms[0].contribution, 20);
 });
