@@ -1,0 +1,78 @@
+name: TCG Registry Regenerate Temporary
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/tcg-registry-regenerate-temp.yml
+      - tcg-card-pass-2-*.md
+      - tcg-card-pass-2-*.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tcg-registry-regenerate-temp-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regenerate:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feature/tcg-private-alpha-v0-5-source-recovery'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out exact PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Regenerate frozen Set One identity chain
+        shell: bash
+        run: |
+          set -euo pipefail
+          old_sha="$(node -e "const x=require('./tcg-card-pass-2-registry-lock-v0.2.json'); process.stdout.write(x.sha256)")"
+          new_sha="$(node tcg-set-one-registry-builder-v0.2.mjs | sha256sum | cut -d' ' -f1)"
+          test "$new_sha" = "8e2556604fd1757917ea60b7e9af8c0de717a69b72c7e37b0e2690abdcce430f"
+          OLD_SHA="$old_sha" NEW_SHA="$new_sha" node <<'NODE'
+          const fs = require('fs');
+          const cp = require('child_process');
+          const lockPath = 'tcg-card-pass-2-registry-lock-v0.2.json';
+          const lock = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
+          lock.sha256 = process.env.NEW_SHA;
+          fs.writeFileSync(lockPath, JSON.stringify(lock, null, 2) + '\n');
+          const output = cp.execFileSync('git', ['grep', '-l', process.env.OLD_SHA], { encoding: 'utf8' }).trim();
+          for (const file of output ? output.split('\n') : []) {
+            if (file === lockPath || file === '.github/workflows/tcg-registry-regenerate-temp.yml') continue;
+            const before = fs.readFileSync(file, 'utf8');
+            const after = before.split(process.env.OLD_SHA).join(process.env.NEW_SHA);
+            if (after !== before) fs.writeFileSync(file, after);
+          }
+          NODE
+          node tcg-set-one-shadow-registry-builder-v0.2.mjs supabase/migrations/20260906190000_tcg_v0_2_set_one_shadow_registry_load.sql
+          git diff --check
+
+      - name: Commit generated source artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add \
+            tcg-card-pass-2-registry-lock-v0.2.json \
+            supabase/functions/_shared/tcg-runtime-registry-v0-2.ts \
+            supabase/migrations/20260906190000_tcg_v0_2_set_one_shadow_registry_load.sql \
+            supabase/migrations/20260906191500_tcg_match_v0_2_registry_snapshot_bridge.sql \
+            supabase/migrations/20260906193000_tcg_match_v0_2_runtime_marker_bridge.sql \
+            tcg/tests
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "TCG: regenerate Bastion registry identity"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
