@@ -7,6 +7,7 @@ import { buildSetOneRegistry } from '../../tcg-set-one-registry-builder-v0.2.mjs
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
 
+// Bastion Quake is intentionally keyed to the immediately previous opponent personal turn.
 function eventOccurred(event, extra = {}) {
   return { predicate: 'event_occurred', event, ...extra };
 }
