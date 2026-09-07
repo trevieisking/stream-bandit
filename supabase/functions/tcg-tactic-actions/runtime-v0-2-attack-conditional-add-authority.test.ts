@@ -138,7 +138,8 @@ Deno.test("structured attack authority owns nested conditional_add event filters
     throw new Error("damage_prevented event required");
   }
 
-  firstWhen.filters.prevention_kind_any[0] = "mutated";
+  firstWhen.filters.prevention_kind_any.reverse();
+  assertEquals(firstWhen.filters.prevention_kind_any[0], "shield", "first authority copy should be mutable in isolation");
   assertEquals(
     secondWhen.filters.prevention_kind_any[0],
     "ability",
