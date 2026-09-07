@@ -85,6 +85,27 @@ Deno.test("attack-owned recoil is registry-driven and preserves Shield", () => {
   assertEquals(source.shield, 30, "recoil placement must not consume Shield in this Pass C slice");
 });
 
+Deno.test("Meltline Charge preserves its frozen 20 recoil amount", () => {
+  const state = stateWith([{
+    op: "DIRECT_DAMAGE",
+    target: "$source_creature",
+    amount: 20,
+    damage_class: "recoil",
+    source_attack_id: "meltline-charge",
+  }], "meltline-charge");
+  const source = creature();
+  const result = structuredRuntimeAfterDamageRecoilEffects(
+    state,
+    { card_id: "test-recoil-creature" },
+    1,
+    source,
+  );
+  assertEquals(result?.attack_id, "meltline-charge");
+  assertEquals(result?.effects[0].placed, 20);
+  assertEquals(source.damage, 25);
+  assertEquals(source.shield, 30);
+});
+
 Deno.test("non-recoil DIRECT_DAMAGE stays on later compatibility/listener authority", () => {
   const state = stateWith([{
     op: "DIRECT_DAMAGE",
