@@ -34,11 +34,11 @@ test('match attack path consumes current-turn hidden-information metadata as sel
     'hidden-information reader import missing',
   );
   assert.ok(
-    matchSource.includes('runtimeV02CurrentTurnHiddenInformationViews(s,seat as 1|2).map((entry)=>({event:"hidden_information_viewed",controller:"self",zone:entry.zone}))'),
+    matchSource.includes('runtimeV02CurrentTurnHiddenInformationViews(s,seat as 1|2).map((entry)=>({event:"hidden_information_viewed" as const,controller:"self" as const,zone:entry.zone}))'),
     'current-turn hidden-information views must be projected into structured attack events',
   );
   assert.ok(
-    matchSource.includes('current_turn_events:[...(Number(flags.device_turn??-1)===Number(s.turn_seq||0)?[{event:"device_resolved",controller:"self"}]:[]),...hiddenInformationEvents]'),
+    matchSource.includes('current_turn_events:[...(Number(flags.device_turn??-1)===Number(s.turn_seq||0)?[{event:"device_resolved" as const,controller:"self" as const}]:[]),...hiddenInformationEvents]'),
     'Device and hidden-information events must share the structured current-turn event input',
   );
   assert.ok(
