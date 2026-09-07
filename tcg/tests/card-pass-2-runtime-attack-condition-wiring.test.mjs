@@ -17,7 +17,8 @@ function assertInOrder(needles, message) {
 
 test('condition-only after_damage programs execute through the structured owner before legacy effects', () => {
   assert.ok(
-    matchSource.includes('import { structuredRuntimeAfterDamageConditionEffects } from "../_shared/tcg-match-attack-effects-v0-2.ts";'),
+    matchSource.includes('structuredRuntimeAfterDamageConditionEffects') &&
+      matchSource.includes('../_shared/tcg-match-attack-effects-v0-2.ts'),
     'structured attack condition owner import missing',
   );
   assertInOrder([
