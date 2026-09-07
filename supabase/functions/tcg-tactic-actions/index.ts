@@ -538,7 +538,7 @@ function executeUntilChoice(state: any) {
         max: bounds.max,
         mode: "select",
         options,
-        context: { apply: "set_var_cards", var_name: String(step.as || "chosen"), many: bounds.max !== 1 },
+        context: { apply: "set_var_cards", var_name: String(step.as || "chosen") },
       });
       return;
     }
@@ -898,7 +898,7 @@ function executeUntilChoice(state: any) {
           from: "discard",
           target,
           effect_flags: step.flags || {},
-          attachment_kind: String(step.attachment_kind || "effect_generated"),
+          attachment_kind: String(context.attachment_kind || "effect_generated"),
         },
       });
       return;
