@@ -119,7 +119,7 @@ Deno.test("Predicted Hit contributes zero without a current-turn deck view", () 
   assertEquals(result?.terms[0].contribution, 0);
 });
 
-Deno.test("Reward inspection remains outside Runtime-C ready authority", () => {
+Deno.test("Reward Arc accepts a canonical current-turn Reward inspection event", () => {
   const authority = resolveRuntimeAttackAuthority(stateWith("astral-comettail", {
     id: "reward-arc",
     name: "Reward Arc",
@@ -142,11 +142,11 @@ Deno.test("Reward inspection remains outside Runtime-C ready authority", () => {
     },
   }), "astral-comettail", 1, legacy());
   if (!authority) throw new Error("Reward Arc authority required");
-  assertEquals(
-    evaluateRuntimeAttackReadyConditionalAddFormula(
-      authority,
-      context([{ event: "reward_inspected", controller: "self" }]),
-    ),
-    null,
+  const result = evaluateRuntimeAttackReadyConditionalAddFormula(
+    authority,
+    context([{ event: "reward_inspected", controller: "self" }]),
   );
+  assertEquals(result?.damage, 80);
+  assertEquals(result?.terms[0].matched, true);
+  assertEquals(result?.terms[0].contribution, 20);
 });

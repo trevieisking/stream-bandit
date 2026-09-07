@@ -13,6 +13,7 @@ import {
   runtimeV02PreviousOpponentTurnDamagePreventionEvents,
 } from "./tcg-match-attack-damage-v0-2.ts";
 import { runtimeV02CurrentTurnEssenceMovements } from "./tcg-match-essence-movement-v0-2.ts";
+import { runtimeV02CurrentTurnRewardInspections } from "./tcg-match-reward-inspection-v0-2.ts";
 import type {
   RuntimeV02ConditionalAddFormulaMetadata,
   RuntimeV02ConditionalAddLeafPredicate,
@@ -138,6 +139,16 @@ function declarationSourceAttachedEssenceKinds(
   return [];
 }
 
+function formulaUsesRewardInspection(value: RuntimeV02ConditionalAddFormulaMetadata | null): boolean {
+  if (!value) return false;
+  return value.terms.some((term) => {
+    const predicates = "any" in term.when ? term.when.any : [term.when];
+    return predicates.some((predicate) =>
+      predicate.predicate === "event_occurred" && predicate.event === "reward_inspected"
+    );
+  });
+}
+
 function formulaUsesEssenceMovement(value: RuntimeV02ConditionalAddFormulaMetadata | null): boolean {
   if (!value) return false;
   return value.terms.some((term) => {
@@ -169,6 +180,12 @@ function declarationCurrentTurnEvents(
   formula: RuntimeV02ConditionalAddFormulaMetadata | null,
 ): RuntimeV02ConditionalAddEventSignal[] {
   const events: RuntimeV02ConditionalAddEventSignal[] = [];
+  if (formulaUsesRewardInspection(formula)) {
+    const seat = declarationSourceControllerSeat(state, instanceOrId);
+    if (seat && runtimeV02CurrentTurnRewardInspections(state, seat).length > 0) {
+      events.push({ event: "reward_inspected", controller: "self" });
+    }
+  }
   if (formulaUsesEssenceMovement(formula)) {
     const seat = declarationSourceControllerSeat(state, instanceOrId);
     if (seat) {
@@ -267,6 +284,12 @@ function readyConditionalLeaf(predicate: RuntimeV02ConditionalAddLeafPredicate):
   if (directConditionalLeafReady(predicate)) return true;
   if (predicate.predicate === "event_attack_source_has_attached_essence_kind") return true;
   if (predicate.predicate !== "event_occurred") return false;
+  if (
+    predicate.event === "reward_inspected" &&
+    predicate.controller === "self" &&
+    predicate.window === "current_turn" &&
+    predicate.min_count === 1
+  ) return true;
   if (
     predicate.event === "device_resolved" &&
     predicate.controller === "self" &&
@@ -425,11 +448,8 @@ export function evaluateRuntimeAttackDirectConditionalAddFormula(
 
 /**
  * Runtime-C ready subset: declaration-time state predicates plus canonical
- * current-turn Device-resolution, hidden deck-view, Essence-movement,
- * damage-prevention and attack-source attachment signals.
- *
- * Reward inspection remains deliberately excluded until its canonical runtime
- * owner is proven.
+ * current-turn Device-resolution, hidden deck-view, Reward-inspection,
+ * Essence-movement, damage-prevention and attack-source attachment signals.
  */
 export function evaluateRuntimeAttackReadyConditionalAddFormula(
   attack: RuntimeAttackAuthority,

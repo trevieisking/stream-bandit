@@ -62,7 +62,6 @@ test('canonical Device turn flag is adapted to device_resolved and suppresses on
 
 test('remaining event/history English bonus fallbacks stay active until their event owners are wired', () => {
   const preserved = [
-    'if(ef.includes("looked at a reward card this match")',
     'if(ef.includes("essence is discarded from this creature during this turn")',
   ];
   for (const needle of preserved) {
@@ -72,6 +71,10 @@ test('remaining event/history English bonus fallbacks stay active until their ev
       `unproven event/history fallback was prematurely suppressed: ${needle}`,
     );
   }
+  assert.ok(
+    source.includes('if(conditionalAddEvaluation==null&&ef.includes("looked at a reward card this match")'),
+    'Reward Arc legacy fallback must now be gated by structured conditional authority',
+  );
   assert.ok(
     source.includes('if(conditionalAddEvaluation==null&&ef.includes("looked at your deck this turn")'),
     'Predicted Hit deck-view fallback must now be gated by structured conditional authority',
