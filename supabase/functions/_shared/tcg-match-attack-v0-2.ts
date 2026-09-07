@@ -7,6 +7,13 @@ export type RuntimeV02AttackTargetPermission = {
   selection: "one";
 };
 
+export type RuntimeV02AttackRequirement = {
+  predicate: "attached_essence_distinct_element_count_at_least";
+  target: "$source_creature";
+  count: number;
+  allowed_elements: string[];
+};
+
 export type RuntimeV02AttackMetadata = {
   id: string;
   name: string;
@@ -15,6 +22,7 @@ export type RuntimeV02AttackMetadata = {
   base_damage: number | null;
   damage_source: "base_damage" | "damage_formula.base" | null;
   target_permissions: RuntimeV02AttackTargetPermission[];
+  requirements: RuntimeV02AttackRequirement[];
   starbound: boolean;
 };
 
@@ -26,6 +34,13 @@ function objectRecord(value: unknown): Record<string, unknown> | null {
 
 function nonNegativeInteger(value: unknown, error: string): number {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+    throw new Error(error);
+  }
+  return value;
+}
+
+function positiveInteger(value: unknown, error: string): number {
+  if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) {
     throw new Error(error);
   }
   return value;
@@ -74,6 +89,63 @@ function attackTargetPermissions(
       zone,
       card_family: "Creature",
       selection: "one",
+    };
+  });
+}
+
+function attackRequirements(
+  value: unknown,
+  attackId: string,
+): RuntimeV02AttackRequirement[] {
+  if (value === null || value === undefined) return [];
+  if (!Array.isArray(value)) {
+    throw new Error(`tcg_v0_2_attack_requirements_invalid:${attackId}`);
+  }
+
+  return value.map((rawRequirement, index) => {
+    const requirement = objectRecord(rawRequirement);
+    if (!requirement) {
+      throw new Error(`tcg_v0_2_attack_requirement_invalid:${attackId}:${index}`);
+    }
+    const allowedKeys = new Set(["predicate", "target", "count", "allowed_elements"]);
+    const unsupportedKey = Object.keys(requirement).find((key) => !allowedKeys.has(key));
+    if (unsupportedKey) {
+      throw new Error(`tcg_v0_2_attack_requirement_field_unsupported:${attackId}:${unsupportedKey}`);
+    }
+
+    const predicate = String(requirement.predicate || "").trim();
+    if (predicate !== "attached_essence_distinct_element_count_at_least") {
+      throw new Error(`tcg_v0_2_attack_requirement_predicate_unsupported:${attackId}:${predicate || "missing"}`);
+    }
+
+    const target = String(requirement.target || "").trim();
+    if (target !== "$source_creature") {
+      throw new Error(`tcg_v0_2_attack_requirement_target_invalid:${attackId}`);
+    }
+
+    const count = positiveInteger(
+      requirement.count,
+      `tcg_v0_2_attack_requirement_count_invalid:${attackId}`,
+    );
+    if (!Array.isArray(requirement.allowed_elements) || requirement.allowed_elements.length === 0) {
+      throw new Error(`tcg_v0_2_attack_requirement_allowed_elements_invalid:${attackId}`);
+    }
+    const allowedElements = requirement.allowed_elements.map((value, elementIndex) => {
+      const element = typeof value === "string" ? value.trim() : "";
+      if (!element) {
+        throw new Error(`tcg_v0_2_attack_requirement_allowed_element_invalid:${attackId}:${elementIndex}`);
+      }
+      return element;
+    });
+    if (new Set(allowedElements).size !== allowedElements.length) {
+      throw new Error(`tcg_v0_2_attack_requirement_allowed_elements_duplicate:${attackId}`);
+    }
+
+    return {
+      predicate: "attached_essence_distinct_element_count_at_least",
+      target: "$source_creature",
+      count,
+      allowed_elements: [...allowedElements],
     };
   });
 }
@@ -133,8 +205,8 @@ function structuredAttackStarbound(
 
 /**
  * Returns the structured v0.2 attack identity, Essence cost, deterministic
- * baseline damage, additive attack-target permissions and Starbound ownership
- * for a 1-based slot.
+ * baseline damage, additive attack-target permissions, declaration requirement
+ * metadata and Starbound ownership for a 1-based slot.
  *
  * Legacy-only matches deliberately return null so the existing text parser
  * remains the fallback until the v0.2 match snapshot is present. Once a match
@@ -200,6 +272,7 @@ export function structuredRuntimeAttackMetadata(
     base_damage: baseDamage,
     damage_source: damageSource,
     target_permissions: attackTargetPermissions(attack.target_permissions, id),
+    requirements: attackRequirements(attack.requirements, id),
     starbound: structuredAttackStarbound(definition, creature, attacks, id),
   };
 }
