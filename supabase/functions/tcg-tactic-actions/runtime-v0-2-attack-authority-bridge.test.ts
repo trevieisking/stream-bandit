@@ -165,7 +165,11 @@ Deno.test("formula attack uses only the structured formula baseline in C2a", () 
       base_damage: null,
       damage_formula: {
         base: 80,
-        terms: [{ kind: "conditional_add", amount: 30, when: { predicate: "target_has_condition" } }],
+        terms: [{
+          kind: "conditional_add",
+          amount: 30,
+          when: { predicate: "target_has_condition", condition: "Scorched" },
+        }],
       },
     }]),
   });
