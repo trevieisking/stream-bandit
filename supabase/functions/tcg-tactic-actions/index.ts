@@ -1,4 +1,5 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { recordRuntimeV02EssenceMovement } from "../_shared/tcg-match-essence-movement-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
 import { clearRuntimeCondition, hasRuntimeCondition, runtimeConditions } from "./runtime-v0-2-core.ts";
 
@@ -248,6 +249,15 @@ function creatureOptions(state: any, ownerSeat: number, controller: unknown, zon
     });
   }
   return out;
+}
+function moveSelectorMatches(state: any, item: { where: "vanguard" | "reserve"; cr: Cr }, selector: any) {
+  if (!selector || typeof selector !== "object") return true;
+  if (selector.fixed != null) throw new Error("move_attached_essence_fixed_selector_unsupported");
+  const zone = String(selector.zone || "field");
+  if (zone === "reserve" && item.where !== "reserve") return false;
+  if (zone === "vanguard" && item.where !== "vanguard") return false;
+  if (!["field", "reserve", "vanguard"].includes(zone)) throw new Error(`move_attached_essence_selector_zone_unsupported:${zone}`);
+  return matchesCreatureFilters(state, item, selector.filters);
 }
 function cardOptions(state: any, cards: Inst[], filters: any, ownerSeat: number) {
   return cards
@@ -755,10 +765,12 @@ function executeUntilChoice(state: any) {
       const creatures = allCreatures(player);
       const options: ChoiceOption[] = [];
       for (const source of creatures) {
+        if (!moveSelectorMatches(state, source, step.source_selector)) continue;
         for (const essence of source.cr.essence || []) {
-          if (step.filters?.element && String(definition(state, essence)?.element || "") !== String(step.filters.element)) continue;
+          if (step.element && String(definition(state, essence)?.element || "") !== String(step.element)) continue;
           for (const destination of creatures) {
-            if (!step.allow_same_destination && source.cr === destination.cr) continue;
+            if (!moveSelectorMatches(state, destination, step.destination_selector)) continue;
+            if (step.require_destination_different_creature !== false && source.cr === destination.cr) continue;
             const sourceRef = creatureRef(source.cr, ownerSeat);
             const destinationRef = creatureRef(destination.cr, ownerSeat);
             options.push({
@@ -782,7 +794,10 @@ function executeUntilChoice(state: any) {
         max: bounds.max,
         mode: "select",
         options,
-        context: { apply: "move_attached_essence" },
+        context: {
+          apply: "move_attached_essence",
+          source_action_id: `tactic:${effect.source_card_id}`,
+        },
       });
       return;
     }
@@ -980,12 +995,22 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
       const essenceUid = String(option.data.essence_uid);
       if (used.has(essenceUid)) throw new Error("same_essence_selected_twice");
       used.add(essenceUid);
-      const source = findCreature(state, option.data.source as CreatureRef);
-      const destination = findCreature(state, option.data.destination as CreatureRef);
+      const sourceRef = option.data.source as CreatureRef;
+      const destinationRef = option.data.destination as CreatureRef;
+      const source = findCreature(state, sourceRef);
+      const destination = findCreature(state, destinationRef);
       if (!source || !destination) throw new Error("essence_move_creature_missing");
       const essence = removeByUid(source.cr.essence, essenceUid);
       if (!essence) throw new Error("essence_move_source_missing");
       destination.cr.essence.push(essence);
+      recordRuntimeV02EssenceMovement(
+        state,
+        effect.owner_seat as 1 | 2,
+        sourceRef.anchor_uid,
+        destinationRef.anchor_uid,
+        essence,
+        String(context.source_action_id || `tactic:${effect.source_card_id}`),
+      );
     }
   } else if (apply === "attach_essence_from_zone") {
     const player = state.players[String(context.zone_seat)];

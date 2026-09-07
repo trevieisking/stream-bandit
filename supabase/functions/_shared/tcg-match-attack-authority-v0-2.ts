@@ -1,12 +1,14 @@
 import {
   evaluateStructuredRuntimeConditionalAddFormula,
   type RuntimeV02ConditionalAddEvaluationContext,
+  type RuntimeV02ConditionalAddEventSignal,
   type RuntimeV02ConditionalAddFormulaEvaluation,
 } from "./tcg-match-attack-conditional-add-evaluator-v0-2.ts";
 import {
   evaluateStructuredRuntimeCountAddFormula,
   type RuntimeV02CountAddFormulaEvaluation,
 } from "./tcg-match-attack-count-add-evaluator-v0-2.ts";
+import { runtimeV02CurrentTurnEssenceMovements } from "./tcg-match-essence-movement-v0-2.ts";
 import type {
   RuntimeV02ConditionalAddFormulaMetadata,
   RuntimeV02ConditionalAddLeafPredicate,
@@ -38,6 +40,7 @@ export type RuntimeAttackAuthority = LegacyAttackCompatibility & {
   count_add_formula: RuntimeV02CountAddFormulaMetadata | null;
   conditional_add_formula: RuntimeV02ConditionalAddFormulaMetadata | null;
   declaration_source_attached_essence_kinds?: Array<"temporary" | "borrowed">;
+  declaration_current_turn_events?: RuntimeV02ConditionalAddEventSignal[];
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
 };
@@ -48,13 +51,41 @@ function objectRecord(value: unknown): Record<string, unknown> | null {
     : null;
 }
 
+function sourceUid(
+  instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
+): string {
+  const source = objectRecord(instanceOrId);
+  return typeof source?.uid === "string" ? source.uid : "";
+}
+
+function declarationSourceControllerSeat(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
+): 1 | 2 | null {
+  const uid = sourceUid(instanceOrId);
+  if (!uid) return null;
+  const players = objectRecord(state.players);
+  if (!players) return null;
+  for (const seat of [1, 2] as const) {
+    const player = objectRecord(players[String(seat)]);
+    if (!player) continue;
+    const reserve = Array.isArray(player.reserve) ? player.reserve : [];
+    for (const rawCreature of [player.vanguard, ...reserve]) {
+      const creature = objectRecord(rawCreature);
+      if (!creature) continue;
+      const stack = Array.isArray(creature.stack) ? creature.stack : [];
+      if (stack.some((rawInstance) => objectRecord(rawInstance)?.uid === uid)) return seat;
+    }
+  }
+  return null;
+}
+
 function declarationSourceAttachedEssenceKinds(
   state: Record<string, unknown>,
   instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
 ): Array<"temporary" | "borrowed"> {
-  const source = objectRecord(instanceOrId);
-  const sourceUid = typeof source?.uid === "string" ? source.uid : "";
-  if (!sourceUid) return [];
+  const uid = sourceUid(instanceOrId);
+  if (!uid) return [];
 
   const players = objectRecord(state.players);
   if (!players) return [];
@@ -68,7 +99,7 @@ function declarationSourceAttachedEssenceKinds(
       const creature = objectRecord(rawCreature);
       if (!creature) continue;
       const stack = Array.isArray(creature.stack) ? creature.stack : [];
-      const isSource = stack.some((rawInstance) => objectRecord(rawInstance)?.uid === sourceUid);
+      const isSource = stack.some((rawInstance) => objectRecord(rawInstance)?.uid === uid);
       if (!isSource) continue;
 
       let temporary = false;
@@ -100,6 +131,31 @@ function declarationSourceAttachedEssenceKinds(
   }
 
   return [];
+}
+
+function formulaUsesEssenceMovement(value: RuntimeV02ConditionalAddFormulaMetadata | null): boolean {
+  if (!value) return false;
+  return value.terms.some((term) => {
+    const predicates = "any" in term.when ? term.when.any : [term.when];
+    return predicates.some((predicate) =>
+      predicate.predicate === "event_occurred" && predicate.event === "essence_moved"
+    );
+  });
+}
+
+function declarationCurrentTurnEvents(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
+  formula: RuntimeV02ConditionalAddFormulaMetadata | null,
+): RuntimeV02ConditionalAddEventSignal[] {
+  if (!formulaUsesEssenceMovement(formula)) return [];
+  const seat = declarationSourceControllerSeat(state, instanceOrId);
+  if (!seat) return [];
+  return runtimeV02CurrentTurnEssenceMovements(state, seat).map((entry) => ({
+    event: "essence_moved" as const,
+    controller: "self" as const,
+    element: entry.element,
+  }));
 }
 
 function cloneCountAddFormula(
@@ -181,11 +237,18 @@ function readyConditionalLeaf(predicate: RuntimeV02ConditionalAddLeafPredicate):
     predicate.window === "current_turn" &&
     predicate.min_count === 1
   ) return true;
-  return predicate.event === "hidden_information_viewed" &&
+  if (
+    predicate.event === "hidden_information_viewed" &&
     predicate.controller === "self" &&
     predicate.window === "current_turn" &&
     predicate.min_count === 1 &&
-    (predicate.filters.zone === "deck_top" || predicate.filters.zone === "deck");
+    (predicate.filters.zone === "deck_top" || predicate.filters.zone === "deck")
+  ) return true;
+  return predicate.event === "essence_moved" &&
+    predicate.controller === "self" &&
+    predicate.window === "current_turn" &&
+    predicate.min_count === 1 &&
+    predicate.filters.element === "Tide";
 }
 
 function readyConditionalWhen(when: RuntimeV02ConditionalAddWhen): boolean {
@@ -213,6 +276,7 @@ export function resolveRuntimeAttackAuthority(
       count_add_formula: null,
       conditional_add_formula: null,
       declaration_source_attached_essence_kinds: [],
+      declaration_current_turn_events: [],
       target_permissions: [],
       requirements: [],
     };
@@ -225,6 +289,7 @@ export function resolveRuntimeAttackAuthority(
     throw new Error(`tcg_v0_2_attack_baseline_damage_required:${structured.id}`);
   }
 
+  const conditionalAddFormula = cloneConditionalAddFormula(structured.conditional_add_formula);
   return {
     raw: legacy.raw,
     effect: legacy.effect,
@@ -237,8 +302,9 @@ export function resolveRuntimeAttackAuthority(
     metadata_source: "structured_v0_2",
     damage_source: structured.damage_source,
     count_add_formula: cloneCountAddFormula(structured.count_add_formula),
-    conditional_add_formula: cloneConditionalAddFormula(structured.conditional_add_formula),
+    conditional_add_formula: conditionalAddFormula,
     declaration_source_attached_essence_kinds: declarationSourceAttachedEssenceKinds(state, instanceOrId),
+    declaration_current_turn_events: declarationCurrentTurnEvents(state, instanceOrId, conditionalAddFormula),
     target_permissions: structured.target_permissions.map((permission) => ({ ...permission })),
     requirements: structured.requirements.map((requirement) => ({
       ...requirement,
@@ -313,10 +379,11 @@ export function evaluateRuntimeAttackDirectConditionalAddFormula(
 
 /**
  * Runtime-C ready subset: declaration-time state predicates plus canonical
- * current-turn Device-resolution, hidden deck-view and attack-source attachment signals.
+ * current-turn Device-resolution, hidden deck-view, Essence-movement and
+ * attack-source attachment signals.
  *
- * Reward inspection, prevention and Essence movement predicates remain deliberately
- * excluded until their own canonical runtime owners are proven.
+ * Reward inspection and prevention predicates remain deliberately excluded
+ * until their own canonical runtime owners are proven.
  */
 export function evaluateRuntimeAttackReadyConditionalAddFormula(
   attack: RuntimeAttackAuthority,
@@ -339,10 +406,18 @@ export function evaluateRuntimeAttackReadyConditionalAddFormula(
     ...context.source_attached_essence_kinds,
     ...(attack.declaration_source_attached_essence_kinds || []),
   ])];
+  const currentTurnEvents = [
+    ...context.current_turn_events,
+    ...(attack.declaration_current_turn_events || []),
+  ];
   return evaluateStructuredRuntimeConditionalAddFormula(
     attack.damage,
     attack.conditional_add_formula,
-    { ...context, source_attached_essence_kinds: sourceAttachedEssenceKinds },
+    {
+      ...context,
+      current_turn_events: currentTurnEvents,
+      source_attached_essence_kinds: sourceAttachedEssenceKinds,
+    },
     attack.id,
   );
 }
