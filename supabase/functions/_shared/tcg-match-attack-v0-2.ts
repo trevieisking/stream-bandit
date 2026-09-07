@@ -2,6 +2,7 @@ import {
   structuredRuntimeCountAddFormulaMetadata,
   type RuntimeV02CountAddFormulaMetadata,
 } from "./tcg-match-attack-formula-v0-2.ts";
+import { structuredRuntimeDistinctAttachedEssenceElements } from "./tcg-match-essence-query-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 
 export type RuntimeV02AttackTargetPermission = {
@@ -166,48 +167,6 @@ function attackRequirements(
   });
 }
 
-function structuredEssenceProvidedElements(
-  state: Record<string, unknown>,
-  rawInstance: unknown,
-): string[] {
-  const instance = objectRecord(rawInstance);
-  const cardId = String(instance?.card_id || "").trim();
-  if (!instance || !cardId) {
-    throw new Error("tcg_v0_2_attack_requirement_essence_instance_invalid");
-  }
-
-  const definition = runtimeV02Definition(state, { card_id: cardId });
-  if (!definition) {
-    throw new Error(`tcg_v0_2_attack_requirement_essence_definition_required:${cardId}`);
-  }
-  if (String(definition.card_family || "") !== "Essence") {
-    throw new Error(`tcg_v0_2_attack_requirement_attachment_not_essence:${cardId}`);
-  }
-  const essence = objectRecord(definition.essence);
-  if (!essence) {
-    throw new Error(`tcg_v0_2_attack_requirement_essence_metadata_required:${cardId}`);
-  }
-  if (!Array.isArray(essence.provides)) {
-    throw new Error(`tcg_v0_2_attack_requirement_essence_provides_required:${cardId}`);
-  }
-
-  return essence.provides.map((rawProvide, index) => {
-    const provide = objectRecord(rawProvide);
-    if (!provide) {
-      throw new Error(`tcg_v0_2_attack_requirement_essence_provide_invalid:${cardId}:${index}`);
-    }
-    const element = String(provide.element || "").trim();
-    if (!element) {
-      throw new Error(`tcg_v0_2_attack_requirement_essence_element_required:${cardId}:${index}`);
-    }
-    positiveInteger(
-      provide.amount,
-      `tcg_v0_2_attack_requirement_essence_amount_invalid:${cardId}:${index}`,
-    );
-    return element;
-  });
-}
-
 export function evaluateStructuredRuntimeAttackRequirements(
   state: Record<string, unknown>,
   rawSourceCreature: unknown,
@@ -218,29 +177,22 @@ export function evaluateStructuredRuntimeAttackRequirements(
   }
   if (requirements.length === 0) return { ok: true };
 
-  const sourceCreature = objectRecord(rawSourceCreature);
-  if (!sourceCreature || !Array.isArray(sourceCreature.essence)) {
-    throw new Error("tcg_v0_2_attack_requirement_source_essence_required");
-  }
-
   for (let index = 0; index < requirements.length; index += 1) {
     const requirement = requirements[index];
-    const allowed = new Set(requirement.allowed_elements);
-    const represented = new Set<string>();
+    const represented = structuredRuntimeDistinctAttachedEssenceElements(
+      state,
+      rawSourceCreature,
+      requirement.allowed_elements,
+      "tcg_v0_2_attack_requirement",
+    );
 
-    for (const attached of sourceCreature.essence) {
-      for (const element of structuredEssenceProvidedElements(state, attached)) {
-        if (allowed.has(element)) represented.add(element);
-      }
-    }
-
-    if (represented.size < requirement.count) {
+    if (represented.length < requirement.count) {
       return {
         ok: false,
         requirement_index: index,
         predicate: requirement.predicate,
         required: requirement.count,
-        actual: represented.size,
+        actual: represented.length,
         allowed_elements: [...requirement.allowed_elements],
       };
     }
