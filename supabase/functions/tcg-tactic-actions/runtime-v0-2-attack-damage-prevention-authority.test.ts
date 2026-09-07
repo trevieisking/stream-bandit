@@ -4,6 +4,7 @@ import {
 } from "../_shared/tcg-match-attack-authority-v0-2.ts";
 import {
   runtimeV02CurrentTurnDamagePreventionEvents,
+  runtimeV02PreviousOpponentTurnDamagePreventionEvents,
   structuredRuntimeIncomingAttackDamage,
   type RuntimeAttackDamageContext,
 } from "../_shared/tcg-match-attack-damage-v0-2.ts";
@@ -94,6 +95,8 @@ function state(options: { relic?: boolean; shield?: number; abilityLimit?: unkno
   };
   return {
     turn_seq: 7,
+    active_seat: 2,
+    personal_turns: { "1": 3, "2": 4 },
     runtime_registry_v0_2: runtimeV02SnapshotMarker(),
     players: {
       "1": { vanguard: creature, reserve: [] },
@@ -196,6 +199,62 @@ Deno.test("damage-prevention markers are current-turn only", () => {
   assertEquals(runtimeV02CurrentTurnDamagePreventionEvents(s, source).length, 1);
   s.turn_seq = 8;
   assertJsonEquals(runtimeV02CurrentTurnDamagePreventionEvents(s, source), []);
+});
+
+Deno.test("previous-opponent prevention becomes readable on the controller turn and survives controller extra turns", () => {
+  const s = state({ relic: true, shield: 20 });
+  const target = sourceCreature(s);
+  structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, attackContext);
+
+  assertJsonEquals(runtimeV02PreviousOpponentTurnDamagePreventionEvents(s, source), [], "opponent turn must not expose previous-opponent history to the defender yet");
+
+  s.turn_seq = 8;
+  s.active_seat = 1;
+  (s.personal_turns as any)["1"] = 4;
+  assertJsonEquals(runtimeV02PreviousOpponentTurnDamagePreventionEvents(s, source), [
+    { event: "damage_prevented", target: "source_creature", prevention_kind: "ability" },
+    { event: "damage_prevented", target: "source_creature", prevention_kind: "shield" },
+  ]);
+
+  s.turn_seq = 9;
+  (s.personal_turns as any)["1"] = 5;
+  assertJsonEquals(runtimeV02PreviousOpponentTurnDamagePreventionEvents(s, source), [
+    { event: "damage_prevented", target: "source_creature", prevention_kind: "ability" },
+    { event: "damage_prevented", target: "source_creature", prevention_kind: "shield" },
+  ], "controller extra turns must keep the same previous opponent turn");
+});
+
+Deno.test("previous-opponent prevention becomes stale when the opponent starts a later personal turn", () => {
+  const s = state({ relic: false, shield: 20 });
+  const target = sourceCreature(s);
+  structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, attackContext);
+
+  s.turn_seq = 8;
+  s.active_seat = 1;
+  (s.personal_turns as any)["1"] = 4;
+  assertEquals(runtimeV02PreviousOpponentTurnDamagePreventionEvents(s, source).length, 1);
+
+  s.turn_seq = 9;
+  s.active_seat = 2;
+  (s.personal_turns as any)["2"] = 5;
+  s.turn_seq = 10;
+  s.active_seat = 1;
+  (s.personal_turns as any)["1"] = 5;
+  assertJsonEquals(runtimeV02PreviousOpponentTurnDamagePreventionEvents(s, source), []);
+});
+
+Deno.test("self-sourced Shield prevention never becomes previous-opponent-turn history", () => {
+  const s = state({ relic: false, shield: 20 });
+  s.active_seat = 1;
+  const target = sourceCreature(s);
+  const selfContext: RuntimeAttackDamageContext = {
+    ...attackContext,
+    target_controller: "self",
+    source_controller: "self",
+  };
+  structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, selfContext);
+  assertEquals(runtimeV02CurrentTurnDamagePreventionEvents(s, source).length, 1);
+  assertJsonEquals(runtimeV02PreviousOpponentTurnDamagePreventionEvents(s, source), []);
 });
 
 Deno.test("limited or future self-Ability prevention shapes remain fail-closed", () => {
