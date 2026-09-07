@@ -1,4 +1,9 @@
 import {
+  evaluateStructuredRuntimeConditionalAddFormula,
+  type RuntimeV02ConditionalAddEvaluationContext,
+  type RuntimeV02ConditionalAddFormulaEvaluation,
+} from "./tcg-match-attack-conditional-add-evaluator-v0-2.ts";
+import {
   evaluateStructuredRuntimeCountAddFormula,
   type RuntimeV02CountAddFormulaEvaluation,
 } from "./tcg-match-attack-count-add-evaluator-v0-2.ts";
@@ -94,6 +99,17 @@ function cloneConditionalAddFormula(
   };
 }
 
+function directConditionalLeafReady(predicate: RuntimeV02ConditionalAddLeafPredicate): boolean {
+  return predicate.predicate !== "event_occurred" &&
+    predicate.predicate !== "event_attack_source_has_attached_essence_kind";
+}
+
+function directConditionalWhenReady(when: RuntimeV02ConditionalAddWhen): boolean {
+  return "any" in when
+    ? when.any.every((predicate) => directConditionalLeafReady(predicate))
+    : directConditionalLeafReady(when);
+}
+
 export function resolveRuntimeAttackAuthority(
   state: Record<string, unknown>,
   instanceOrId: string | { card_id?: unknown } | null | undefined,
@@ -176,6 +192,39 @@ export function evaluateRuntimeAttackCountAddFormula(
     player,
     attack.damage,
     attack.count_add_formula,
+    attack.id,
+  );
+}
+
+/**
+ * Evaluates only the frozen conditional_add predicates that are already fully
+ * represented by canonical declaration-time match state.
+ *
+ * Event-history predicates and temporary/borrowed attachment-kind predicates
+ * deliberately return null so tcg-match-actions can preserve its legacy
+ * compatibility branch until those separate runtime owners are proven.
+ */
+export function evaluateRuntimeAttackDirectConditionalAddFormula(
+  attack: RuntimeAttackAuthority,
+  context: RuntimeV02ConditionalAddEvaluationContext,
+): RuntimeV02ConditionalAddFormulaEvaluation | null {
+  if (attack.metadata_source !== "structured_v0_2") return null;
+  if (attack.conditional_add_formula == null) return null;
+  if (!attack.conditional_add_formula.terms.every((term) => directConditionalWhenReady(term.when))) {
+    return null;
+  }
+  if (!attack.id) {
+    throw new Error("tcg_v0_2_attack_conditional_add_authority_id_required");
+  }
+  if (attack.damage_source !== "damage_formula.base") {
+    throw new Error(
+      `tcg_v0_2_attack_conditional_add_authority_damage_source_invalid:${attack.id}:${attack.damage_source}`,
+    );
+  }
+  return evaluateStructuredRuntimeConditionalAddFormula(
+    attack.damage,
+    attack.conditional_add_formula,
+    context,
     attack.id,
   );
 }
