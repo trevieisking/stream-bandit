@@ -29,8 +29,16 @@ test('structured count_add damage replaces only its matching legacy Pyrohorn bon
     'legacy friendly-damaged Creature bonus must be gated by structured count_add authority',
   );
   assert.ok(
-    source.includes('const formulaBase=countAddEvaluation?.damage??atk.damage'),
-    'structured formula damage must become the attack damage baseline',
+    source.includes('const countFormulaBonus=countAddEvaluation?Math.max(0,countAddEvaluation.damage-atk.damage):0'),
+    'count_add contribution must remain independently calculated from its structured formula result',
+  );
+  assert.ok(
+    source.includes('const formulaBonus=countFormulaBonus+conditionalFormulaBonus'),
+    'count_add contribution must remain part of the combined structured formula bonus',
+  );
+  assert.ok(
+    source.includes('const formulaBase=atk.damage+formulaBonus'),
+    'combined structured formula damage must become the attack damage baseline',
   );
   assert.ok(
     source.includes('attackDamage(p.vanguard,target,s,formulaBase+bonus'),
@@ -38,7 +46,7 @@ test('structured count_add damage replaces only its matching legacy Pyrohorn bon
   );
 });
 
-test('attack event keeps structured formula contribution auditable', () => {
+test('attack event keeps structured count_add contribution auditable', () => {
   assert.ok(source.includes('formula_bonus_damage:formulaBonus'), 'formula bonus audit field missing');
   assert.ok(source.includes('bonus_damage:formulaBonus+bonus'), 'total bonus audit field missing');
   assert.ok(source.includes('structured_count_add:countAddEvaluation'), 'count_add evaluation audit payload missing');
