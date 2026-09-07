@@ -112,11 +112,18 @@ function directConditionalWhenReady(when: RuntimeV02ConditionalAddWhen): boolean
 
 function readyConditionalLeaf(predicate: RuntimeV02ConditionalAddLeafPredicate): boolean {
   if (directConditionalLeafReady(predicate)) return true;
-  return predicate.predicate === "event_occurred" &&
+  if (predicate.predicate !== "event_occurred") return false;
+  if (
     predicate.event === "device_resolved" &&
     predicate.controller === "self" &&
     predicate.window === "current_turn" &&
-    predicate.min_count === 1;
+    predicate.min_count === 1
+  ) return true;
+  return predicate.event === "hidden_information_viewed" &&
+    predicate.controller === "self" &&
+    predicate.window === "current_turn" &&
+    predicate.min_count === 1 &&
+    (predicate.filters.zone === "deck_top" || predicate.filters.zone === "deck");
 }
 
 function readyConditionalWhen(when: RuntimeV02ConditionalAddWhen): boolean {
@@ -241,10 +248,10 @@ export function evaluateRuntimeAttackDirectConditionalAddFormula(
 }
 
 /**
- * Runtime-C ready subset: declaration-time state predicates plus the canonical
- * `device_resolved` current-turn signal materialized by tcg-tactic-actions.
+ * Runtime-C ready subset: declaration-time state predicates plus canonical
+ * current-turn Device-resolution and hidden deck-view signals.
  *
- * Reward/deck inspection, prevention, Essence movement and temporary/borrowed
+ * Reward inspection, prevention, Essence movement and temporary/borrowed
  * attachment predicates remain deliberately excluded until their own canonical
  * runtime owners are proven.
  */
