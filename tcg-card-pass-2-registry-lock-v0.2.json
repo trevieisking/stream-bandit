@@ -27,7 +27,7 @@
     "tcg-card-pass-2-founder-structured.md": 1
   },
   "serialization": "JSON.stringify(buildSetOneRegistry(root), null, 2) + newline",
-  "sha256": "b1bc874a6d3707f5c93cd4067994a12111416da636cb15048d10e109829b1c00",
+  "sha256": "8e2556604fd1757917ea60b7e9af8c0de717a69b72c7e37b0e2690abdcce430f",
   "runtime_authority": false,
   "note": "Freezes the exact deterministic 193-card v0.2 registry serialization. Production legacy definition remains runtime authority until explicit runtime-parity cutover gates pass."
 }

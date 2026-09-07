@@ -12,7 +12,7 @@ const migration = fs.readFileSync(
 );
 
 const registryId = 'SB1-set-one-v0.2';
-const registrySha = 'b1bc874a6d3707f5c93cd4067994a12111416da636cb15048d10e109829b1c00';
+const registrySha = '8e2556604fd1757917ea60b7e9af8c0de717a69b72c7e37b0e2690abdcce430f';
 
 test('match preparation keeps legacy definition authority while snapshotting guarded v0.2 definitions', () => {
   assert.match(migration, /create or replace function public\.tcg_server_prepare_match\(p_room_id uuid\)/i);

@@ -4,7 +4,7 @@ export const TCG_RUNTIME_REGISTRY_V0_2 = Object.freeze({
   card_schema: "sb-tcg-card-v0.2",
   effect_schema: "sb-tcg-effects-v0.2",
   card_count: 193,
-  sha256: "b1bc874a6d3707f5c93cd4067994a12111416da636cb15048d10e109829b1c00",
+  sha256: "8e2556604fd1757917ea60b7e9af8c0de717a69b72c7e37b0e2690abdcce430f",
 });
 
 export type RuntimeRegistryMetadata = {

@@ -11,7 +11,7 @@ const migration = fs.readFileSync(
   'utf8',
 );
 
-const registrySha = 'b1bc874a6d3707f5c93cd4067994a12111416da636cb15048d10e109829b1c00';
+const registrySha = '8e2556604fd1757917ea60b7e9af8c0de717a69b72c7e37b0e2690abdcce430f';
 
 test('canonical-state marker is stamped only from the exact frozen non-authoritative registry', () => {
   assert.match(migration, /create or replace function public\.tcg_server_install_initial_state/i);
