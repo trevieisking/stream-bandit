@@ -36,7 +36,11 @@ function legacy(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function creatureEntry(cardId: string, attacks: Record<string, unknown>[]) {
+function creatureEntry(
+  cardId: string,
+  attacks: Record<string, unknown>[],
+  starbound: Record<string, unknown> = { enabled: false },
+) {
   return {
     card_id: cardId,
     definition: { id: cardId, attack_1: legacy().raw, attack_2: legacy().raw },
@@ -46,6 +50,7 @@ function creatureEntry(cardId: string, attacks: Record<string, unknown>[]) {
       id: cardId,
       name: cardId,
       card_family: "Creature",
+      prestige: { starbound },
       creature: { attacks },
     },
     definition_v0_2_rules_version: "sb-tcg-card-v0.2",
@@ -90,6 +95,7 @@ Deno.test("marked v0.2 match makes structured identity cost and fixed base autho
     typed: { Tide: 9 },
     any: 9,
     damage: 999,
+    starbound: true,
   }));
   assertEquals(attack?.metadata_source, "structured_v0_2");
   assertEquals(attack?.damage_source, "base_damage");
@@ -98,6 +104,7 @@ Deno.test("marked v0.2 match makes structured identity cost and fixed base autho
   assertJsonEquals(attack?.typed, { Ember: 2 });
   assertEquals(attack?.any, 1);
   assertEquals(attack?.damage, 70);
+  assertEquals(attack?.starbound, false);
   assertJsonEquals(attack?.target_permissions, []);
 });
 
@@ -126,8 +133,8 @@ Deno.test("marked v0.2 Sky Rend propagates the frozen additional opponent Reserv
   }]);
 });
 
-Deno.test("marked v0.2 match preserves only legacy effect and Starbound compatibility fields", () => {
-  const compat = legacy({ effect: "legacy compatibility effect", starbound: true });
+Deno.test("marked v0.2 match preserves legacy effect and raw text but uses structured Starbound authority", () => {
+  const compat = legacy({ effect: "legacy compatibility effect", starbound: false });
   const state = stateWith({
     "astral-test": creatureEntry("astral-test", [{
       id: "structured-star",
@@ -135,7 +142,13 @@ Deno.test("marked v0.2 match preserves only legacy effect and Starbound compatib
       cost: [{ element: "Astral", amount: 1 }],
       base_damage: 50,
       damage_formula: null,
-    }]),
+    }], {
+      enabled: true,
+      action_kind: "attack",
+      action_id: "structured-star",
+      shared_usage_key: "starbound",
+      consume: "legal_declaration_or_activation",
+    }),
   });
   const attack = resolveRuntimeAttackAuthority(state, "astral-test", 1, compat);
   assertEquals(attack?.effect, "legacy compatibility effect");

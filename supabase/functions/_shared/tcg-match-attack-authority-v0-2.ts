@@ -50,7 +50,7 @@ export function resolveRuntimeAttackAuthority(
   return {
     raw: legacy.raw,
     effect: legacy.effect,
-    starbound: legacy.starbound,
+    starbound: structured.starbound,
     id: structured.id,
     name: structured.name,
     typed: { ...structured.typed },
