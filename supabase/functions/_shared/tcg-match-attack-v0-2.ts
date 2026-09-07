@@ -14,6 +14,17 @@ export type RuntimeV02AttackRequirement = {
   allowed_elements: string[];
 };
 
+export type RuntimeV02AttackRequirementEvaluation =
+  | { ok: true }
+  | {
+    ok: false;
+    requirement_index: number;
+    predicate: RuntimeV02AttackRequirement["predicate"];
+    required: number;
+    actual: number;
+    allowed_elements: string[];
+  };
+
 export type RuntimeV02AttackMetadata = {
   id: string;
   name: string;
@@ -148,6 +159,89 @@ function attackRequirements(
       allowed_elements: [...allowedElements],
     };
   });
+}
+
+function structuredEssenceProvidedElements(
+  state: Record<string, unknown>,
+  rawInstance: unknown,
+): string[] {
+  const instance = objectRecord(rawInstance);
+  const cardId = String(instance?.card_id || "").trim();
+  if (!instance || !cardId) {
+    throw new Error("tcg_v0_2_attack_requirement_essence_instance_invalid");
+  }
+
+  const definition = runtimeV02Definition(state, { card_id: cardId });
+  if (!definition) {
+    throw new Error(`tcg_v0_2_attack_requirement_essence_definition_required:${cardId}`);
+  }
+  if (String(definition.card_family || "") !== "Essence") {
+    throw new Error(`tcg_v0_2_attack_requirement_attachment_not_essence:${cardId}`);
+  }
+  const essence = objectRecord(definition.essence);
+  if (!essence) {
+    throw new Error(`tcg_v0_2_attack_requirement_essence_metadata_required:${cardId}`);
+  }
+  if (!Array.isArray(essence.provides)) {
+    throw new Error(`tcg_v0_2_attack_requirement_essence_provides_required:${cardId}`);
+  }
+
+  return essence.provides.map((rawProvide, index) => {
+    const provide = objectRecord(rawProvide);
+    if (!provide) {
+      throw new Error(`tcg_v0_2_attack_requirement_essence_provide_invalid:${cardId}:${index}`);
+    }
+    const element = String(provide.element || "").trim();
+    if (!element) {
+      throw new Error(`tcg_v0_2_attack_requirement_essence_element_required:${cardId}:${index}`);
+    }
+    positiveInteger(
+      provide.amount,
+      `tcg_v0_2_attack_requirement_essence_amount_invalid:${cardId}:${index}`,
+    );
+    return element;
+  });
+}
+
+export function evaluateStructuredRuntimeAttackRequirements(
+  state: Record<string, unknown>,
+  rawSourceCreature: unknown,
+  requirements: RuntimeV02AttackRequirement[],
+): RuntimeV02AttackRequirementEvaluation {
+  if (!Array.isArray(requirements)) {
+    throw new Error("tcg_v0_2_attack_requirement_list_invalid");
+  }
+  if (requirements.length === 0) return { ok: true };
+
+  const sourceCreature = objectRecord(rawSourceCreature);
+  if (!sourceCreature || !Array.isArray(sourceCreature.essence)) {
+    throw new Error("tcg_v0_2_attack_requirement_source_essence_required");
+  }
+
+  for (let index = 0; index < requirements.length; index += 1) {
+    const requirement = requirements[index];
+    const allowed = new Set(requirement.allowed_elements);
+    const represented = new Set<string>();
+
+    for (const attached of sourceCreature.essence) {
+      for (const element of structuredEssenceProvidedElements(state, attached)) {
+        if (allowed.has(element)) represented.add(element);
+      }
+    }
+
+    if (represented.size < requirement.count) {
+      return {
+        ok: false,
+        requirement_index: index,
+        predicate: requirement.predicate,
+        required: requirement.count,
+        actual: represented.size,
+        allowed_elements: [...requirement.allowed_elements],
+      };
+    }
+  }
+
+  return { ok: true };
 }
 
 function structuredAttackStarbound(
