@@ -14,17 +14,17 @@ function assertInOrder(needles, message) {
   }
 }
 
-test('direct conditional_add snapshots final attack target state before legacy bonus parsing', () => {
+test('ready conditional_add snapshots final attack target state before legacy bonus parsing', () => {
   assert.ok(
-    source.includes('evaluateRuntimeAttackDirectConditionalAddFormula'),
-    'direct conditional_add evaluator import/call missing',
+    source.includes('evaluateRuntimeAttackReadyConditionalAddFormula'),
+    'ready conditional_add evaluator import/call missing',
   );
   assertInOrder([
     'if(cq.control==="Blinded")',
     'if(!target)return json({ok:false,version:VERSION,error:"legal_attack_target_required"},400)',
-    'const conditionalAddEvaluation=evaluateRuntimeAttackDirectConditionalAddFormula(atk,{',
+    'const conditionalAddEvaluation=evaluateRuntimeAttackReadyConditionalAddFormula(atk,{',
     'let bonus=0,ef=atk.effect.toLowerCase()',
-  ], 'direct conditional_add target snapshot ordering changed');
+  ], 'ready conditional_add target snapshot ordering changed');
   assert.ok(source.includes('source_conditions:activeConditions(p.vanguard)'), 'source condition context missing');
   assert.ok(source.includes('target_conditions:activeConditions(target)'), 'target condition context missing');
   assert.ok(source.includes('source_became_vanguard_this_turn:Number(p.vanguard.became_vanguard_turn??-1)===Number(s.turn_seq||0)'), 'Vanguard-move context missing');
@@ -33,7 +33,7 @@ test('direct conditional_add snapshots final attack target state before legacy b
   assert.ok(source.includes('source_has_relic:!!p.vanguard.relic'), 'source-Relic context missing');
 });
 
-test('direct structured conditional_add suppresses only matching state-local English bonuses', () => {
+test('structured conditional_add suppresses matching state-local English bonuses', () => {
   const guarded = [
     'if(conditionalAddEvaluation==null&&ef.includes("target is scorched")',
     'if(conditionalAddEvaluation==null&&ef.includes("target is venomed")',
@@ -49,9 +49,19 @@ test('direct structured conditional_add suppresses only matching state-local Eng
   }
 });
 
-test('event/history English bonus fallbacks remain active until their event owners are wired', () => {
+test('canonical Device turn flag is adapted to device_resolved and suppresses only its matching English fallback', () => {
+  assert.ok(
+    source.includes('current_turn_events:Number(flags.device_turn??-1)===Number(s.turn_seq||0)?[{event:"device_resolved",controller:"self"}]:[]'),
+    'Device turn flag must become the exact structured device_resolved event signal',
+  );
+  assert.ok(
+    source.includes('if(conditionalAddEvaluation==null&&ef.includes("played a device this turn")'),
+    'Device English bonus must be gated by structured conditional authority',
+  );
+});
+
+test('other event/history English bonus fallbacks remain active until their event owners are wired', () => {
   const preserved = [
-    'if(ef.includes("played a device this turn")',
     'if(ef.includes("looked at a reward card this match")',
     'if(ef.includes("looked at your deck this turn")',
     'if(ef.includes("prevented damage this turn")',
@@ -61,14 +71,13 @@ test('event/history English bonus fallbacks remain active until their event owne
     assert.ok(source.includes(needle), `event/history legacy fallback missing: ${needle}`);
     assert.ok(
       !source.includes(`if(conditionalAddEvaluation==null&&${needle.slice(3)}`),
-      `event/history fallback was prematurely suppressed: ${needle}`,
+      `unproven event/history fallback was prematurely suppressed: ${needle}`,
     );
   }
-  assert.ok(source.includes('current_turn_events:[]'), 'direct adapter must not invent event history');
-  assert.ok(source.includes('source_attached_essence_kinds:[]'), 'direct adapter must not invent temporary/borrowed attachment state');
+  assert.ok(source.includes('source_attached_essence_kinds:[]'), 'adapter must not invent temporary/borrowed attachment state');
 });
 
-test('count_add and direct conditional_add contributions combine without double counting', () => {
+test('count_add and ready conditional_add contributions combine without double counting', () => {
   assertInOrder([
     'const countFormulaBonus=countAddEvaluation?Math.max(0,countAddEvaluation.damage-atk.damage):0',
     'const conditionalFormulaBonus=conditionalAddEvaluation?Math.max(0,conditionalAddEvaluation.damage-atk.damage):0',
@@ -78,7 +87,7 @@ test('count_add and direct conditional_add contributions combine without double 
   ], 'combined structured formula damage pipeline changed');
 });
 
-test('attack audit records direct conditional_add evaluation separately', () => {
+test('attack audit records ready conditional_add evaluation separately', () => {
   assert.ok(source.includes('formula_bonus_damage:formulaBonus'), 'combined formula bonus audit missing');
   assert.ok(source.includes('structured_count_add:countAddEvaluation'), 'count_add audit missing');
   assert.ok(source.includes('structured_conditional_add:conditionalAddEvaluation'), 'conditional_add audit missing');
