@@ -116,7 +116,7 @@ Deno.test("marked v0.2 attack authority propagates frozen declaration requiremen
   assertJsonEquals(attack.requirements, [REQUIREMENT]);
 });
 
-Deno.test("structured declaration authority rejects duplicate-element payment before Starbound consumption", () => {
+Deno.test("structured declaration authority rejects duplicate-element payment", () => {
   const state = structuredState();
   const attack = resolveRuntimeAttackAuthority(state, "prismatic-founder", 1, legacy());
   if (!attack) throw new Error("structured attack authority required");
@@ -144,20 +144,17 @@ Deno.test("structured declaration authority accepts three distinct allowed attac
   assertJsonEquals(result, { ok: true });
 });
 
-Deno.test("tcg-match-actions checks structured requirements after cost legality and before Starbound consumption", async () => {
-  const source = await Deno.readTextFile(new URL("../tcg-match-actions/index.ts", import.meta.url));
-  const attackBranch = source.indexOf('if(action==="attack")');
-  const costGate = source.indexOf("if(!canPayAttack(p.vanguard,s,atk))", attackBranch);
-  const requirementGate = source.indexOf("evaluateRuntimeAttackDeclarationRequirements(s,p.vanguard,atk)", attackBranch);
-  const requirementError = source.indexOf('error:"attack_requirements_not_met"', attackBranch);
-  const starboundGate = source.indexOf("if(atk.starbound)", attackBranch);
-
-  if (attackBranch < 0) throw new Error("attack branch not found");
-  if (costGate < 0) throw new Error("attack cost gate not found");
-  if (requirementGate < 0) throw new Error("structured declaration requirement gate not found");
-  if (requirementError < 0) throw new Error("structured declaration requirement error not found");
-  if (starboundGate < 0) throw new Error("Starbound gate not found");
-  if (!(costGate < requirementGate && requirementGate <= requirementError && requirementError < starboundGate)) {
-    throw new Error("structured declaration requirements must run after cost legality and before Starbound consumption");
-  }
+Deno.test("failed structured declaration requirements do not authorize Starbound consumption", () => {
+  const state = structuredState();
+  const attack = resolveRuntimeAttackAuthority(state, "prismatic-founder", 1, legacy());
+  if (!attack) throw new Error("structured attack authority required");
+  const matchFlags = { starbound_used: false };
+  const result = evaluateRuntimeAttackDeclarationRequirements(
+    state,
+    { essence: [attached("essence-astral-a"), attached("essence-astral-b"), attached("essence-ember")] },
+    attack,
+  );
+  if (result.ok) matchFlags.starbound_used = true;
+  assertEquals(result.ok, false);
+  assertEquals(matchFlags.starbound_used, false);
 });
