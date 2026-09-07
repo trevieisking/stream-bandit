@@ -213,7 +213,7 @@
     "printed_english_parser_present": true,
     "card_id_gameplay_branches_present": true,
     "structured_attack_lookup_complete": false,
-    "generic_alternate_targeting_complete": false,
+    "generic_alternate_targeting_complete": true,
     "shared_pending_choice_for_attacks_complete": false
   },
   "completion": {
