@@ -37,9 +37,70 @@ export type RuntimeAttackAuthority = LegacyAttackCompatibility & {
   damage_source: "legacy" | "base_damage" | "damage_formula.base";
   count_add_formula: RuntimeV02CountAddFormulaMetadata | null;
   conditional_add_formula: RuntimeV02ConditionalAddFormulaMetadata | null;
+  declaration_source_attached_essence_kinds: Array<"temporary" | "borrowed">;
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
 };
+
+function objectRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function declarationSourceAttachedEssenceKinds(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
+): Array<"temporary" | "borrowed"> {
+  const source = objectRecord(instanceOrId);
+  const sourceUid = typeof source?.uid === "string" ? source.uid : "";
+  if (!sourceUid) return [];
+
+  const players = objectRecord(state.players);
+  if (!players) return [];
+
+  for (const rawPlayer of Object.values(players)) {
+    const player = objectRecord(rawPlayer);
+    if (!player) continue;
+    const reserve = Array.isArray(player.reserve) ? player.reserve : [];
+    const creatures = [player.vanguard, ...reserve];
+    for (const rawCreature of creatures) {
+      const creature = objectRecord(rawCreature);
+      if (!creature) continue;
+      const stack = Array.isArray(creature.stack) ? creature.stack : [];
+      const isSource = stack.some((rawInstance) => objectRecord(rawInstance)?.uid === sourceUid);
+      if (!isSource) continue;
+
+      let temporary = false;
+      let borrowed = false;
+      const essence = Array.isArray(creature.essence) ? creature.essence : [];
+      for (const rawEssence of essence) {
+        const instance = objectRecord(rawEssence);
+        if (!instance) continue;
+        if (instance.borrowed === true) borrowed = true;
+
+        const flags = objectRecord(instance.effect_flags);
+        const lifecycle = objectRecord(flags?.runtime_v0_2_attachment_lifecycle);
+        if (
+          lifecycle &&
+          lifecycle.source_uid === instance.uid &&
+          lifecycle.kind === "temporary" &&
+          lifecycle.expires === "controller_aftermath" &&
+          lifecycle.destination_on_expire === "discard"
+        ) {
+          temporary = true;
+        }
+      }
+
+      return [
+        ...(temporary ? ["temporary" as const] : []),
+        ...(borrowed ? ["borrowed" as const] : []),
+      ];
+    }
+  }
+
+  return [];
+}
 
 function cloneCountAddFormula(
   value: RuntimeV02CountAddFormulaMetadata | null,
@@ -112,6 +173,7 @@ function directConditionalWhenReady(when: RuntimeV02ConditionalAddWhen): boolean
 
 function readyConditionalLeaf(predicate: RuntimeV02ConditionalAddLeafPredicate): boolean {
   if (directConditionalLeafReady(predicate)) return true;
+  if (predicate.predicate === "event_attack_source_has_attached_essence_kind") return true;
   if (predicate.predicate !== "event_occurred") return false;
   if (
     predicate.event === "device_resolved" &&
@@ -134,7 +196,7 @@ function readyConditionalWhen(when: RuntimeV02ConditionalAddWhen): boolean {
 
 export function resolveRuntimeAttackAuthority(
   state: Record<string, unknown>,
-  instanceOrId: string | { card_id?: unknown } | null | undefined,
+  instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
   attackSlot: number,
   legacy: LegacyAttackCompatibility | null,
 ): RuntimeAttackAuthority | null {
@@ -150,6 +212,7 @@ export function resolveRuntimeAttackAuthority(
       damage_source: "legacy",
       count_add_formula: null,
       conditional_add_formula: null,
+      declaration_source_attached_essence_kinds: [],
       target_permissions: [],
       requirements: [],
     };
@@ -175,6 +238,7 @@ export function resolveRuntimeAttackAuthority(
     damage_source: structured.damage_source,
     count_add_formula: cloneCountAddFormula(structured.count_add_formula),
     conditional_add_formula: cloneConditionalAddFormula(structured.conditional_add_formula),
+    declaration_source_attached_essence_kinds: declarationSourceAttachedEssenceKinds(state, instanceOrId),
     target_permissions: structured.target_permissions.map((permission) => ({ ...permission })),
     requirements: structured.requirements.map((requirement) => ({
       ...requirement,
@@ -249,11 +313,10 @@ export function evaluateRuntimeAttackDirectConditionalAddFormula(
 
 /**
  * Runtime-C ready subset: declaration-time state predicates plus canonical
- * current-turn Device-resolution and hidden deck-view signals.
+ * current-turn Device-resolution, hidden deck-view and attack-source attachment signals.
  *
- * Reward inspection, prevention, Essence movement and temporary/borrowed
- * attachment predicates remain deliberately excluded until their own canonical
- * runtime owners are proven.
+ * Reward inspection, prevention and Essence movement predicates remain deliberately
+ * excluded until their own canonical runtime owners are proven.
  */
 export function evaluateRuntimeAttackReadyConditionalAddFormula(
   attack: RuntimeAttackAuthority,
@@ -272,10 +335,14 @@ export function evaluateRuntimeAttackReadyConditionalAddFormula(
       `tcg_v0_2_attack_conditional_add_authority_damage_source_invalid:${attack.id}:${attack.damage_source}`,
     );
   }
+  const sourceAttachedEssenceKinds = [...new Set([
+    ...context.source_attached_essence_kinds,
+    ...attack.declaration_source_attached_essence_kinds,
+  ])];
   return evaluateStructuredRuntimeConditionalAddFormula(
     attack.damage,
     attack.conditional_add_formula,
-    context,
+    { ...context, source_attached_essence_kinds: sourceAttachedEssenceKinds },
     attack.id,
   );
 }
