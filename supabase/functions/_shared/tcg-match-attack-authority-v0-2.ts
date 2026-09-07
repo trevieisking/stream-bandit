@@ -8,6 +8,7 @@ import {
   evaluateStructuredRuntimeCountAddFormula,
   type RuntimeV02CountAddFormulaEvaluation,
 } from "./tcg-match-attack-count-add-evaluator-v0-2.ts";
+import { runtimeV02CurrentTurnDamagePreventionEvents } from "./tcg-match-attack-damage-v0-2.ts";
 import { runtimeV02CurrentTurnEssenceMovements } from "./tcg-match-essence-movement-v0-2.ts";
 import type {
   RuntimeV02ConditionalAddFormulaMetadata,
@@ -143,19 +144,36 @@ function formulaUsesEssenceMovement(value: RuntimeV02ConditionalAddFormulaMetada
   });
 }
 
+function formulaUsesDamagePrevention(value: RuntimeV02ConditionalAddFormulaMetadata | null): boolean {
+  if (!value) return false;
+  return value.terms.some((term) => {
+    const predicates = "any" in term.when ? term.when.any : [term.when];
+    return predicates.some((predicate) =>
+      predicate.predicate === "event_occurred" && predicate.event === "damage_prevented"
+    );
+  });
+}
+
 function declarationCurrentTurnEvents(
   state: Record<string, unknown>,
   instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
   formula: RuntimeV02ConditionalAddFormulaMetadata | null,
 ): RuntimeV02ConditionalAddEventSignal[] {
-  if (!formulaUsesEssenceMovement(formula)) return [];
-  const seat = declarationSourceControllerSeat(state, instanceOrId);
-  if (!seat) return [];
-  return runtimeV02CurrentTurnEssenceMovements(state, seat).map((entry) => ({
-    event: "essence_moved" as const,
-    controller: "self" as const,
-    element: entry.element,
-  }));
+  const events: RuntimeV02ConditionalAddEventSignal[] = [];
+  if (formulaUsesEssenceMovement(formula)) {
+    const seat = declarationSourceControllerSeat(state, instanceOrId);
+    if (seat) {
+      events.push(...runtimeV02CurrentTurnEssenceMovements(state, seat).map((entry) => ({
+        event: "essence_moved" as const,
+        controller: "self" as const,
+        element: entry.element,
+      })));
+    }
+  }
+  if (formulaUsesDamagePrevention(formula)) {
+    events.push(...runtimeV02CurrentTurnDamagePreventionEvents(state, instanceOrId));
+  }
+  return events;
 }
 
 function cloneCountAddFormula(
@@ -243,6 +261,14 @@ function readyConditionalLeaf(predicate: RuntimeV02ConditionalAddLeafPredicate):
     predicate.window === "current_turn" &&
     predicate.min_count === 1 &&
     (predicate.filters.zone === "deck_top" || predicate.filters.zone === "deck")
+  ) return true;
+  if (
+    predicate.event === "damage_prevented" &&
+    predicate.window === "current_turn" &&
+    predicate.min_count === 1 &&
+    predicate.filters.target === "source_creature" &&
+    predicate.filters.prevention_kind_any.length > 0 &&
+    predicate.filters.prevention_kind_any.every((kind) => ["ability", "relic", "shield"].includes(kind))
   ) return true;
   return predicate.event === "essence_moved" &&
     predicate.controller === "self" &&
@@ -379,11 +405,11 @@ export function evaluateRuntimeAttackDirectConditionalAddFormula(
 
 /**
  * Runtime-C ready subset: declaration-time state predicates plus canonical
- * current-turn Device-resolution, hidden deck-view, Essence-movement and
- * attack-source attachment signals.
+ * current-turn Device-resolution, hidden deck-view, Essence-movement,
+ * damage-prevention and attack-source attachment signals.
  *
- * Reward inspection and prevention predicates remain deliberately excluded
- * until their own canonical runtime owners are proven.
+ * Reward inspection remains deliberately excluded until its canonical runtime
+ * owner is proven.
  */
 export function evaluateRuntimeAttackReadyConditionalAddFormula(
   attack: RuntimeAttackAuthority,
