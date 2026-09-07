@@ -87,14 +87,15 @@
     ]
   },
   "predicates": {
-    "implemented": [],
+    "implemented": [
+      "attached_essence_distinct_element_count_at_least"
+    ],
     "partial": [
       "reserve_count_at_least",
       "target_has_condition",
       "target_printed_hp_at_least"
     ],
     "missing": [
-      "attached_essence_distinct_element_count_at_least",
       "attached_essence_distinct_element_count_at_most",
       "attached_essence_distinct_element_count_equals",
       "attack_actual_damage_at_least",
