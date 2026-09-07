@@ -2,7 +2,12 @@ import {
   evaluateStructuredRuntimeCountAddFormula,
   type RuntimeV02CountAddFormulaEvaluation,
 } from "./tcg-match-attack-count-add-evaluator-v0-2.ts";
-import type { RuntimeV02CountAddFormulaMetadata } from "./tcg-match-attack-formula-v0-2.ts";
+import type {
+  RuntimeV02ConditionalAddFormulaMetadata,
+  RuntimeV02ConditionalAddLeafPredicate,
+  RuntimeV02ConditionalAddWhen,
+  RuntimeV02CountAddFormulaMetadata,
+} from "./tcg-match-attack-formula-v0-2.ts";
 import {
   evaluateStructuredRuntimeAttackRequirements,
   structuredRuntimeAttackMetadata,
@@ -26,6 +31,7 @@ export type RuntimeAttackAuthority = LegacyAttackCompatibility & {
   metadata_source: "legacy" | "structured_v0_2";
   damage_source: "legacy" | "base_damage" | "damage_formula.base";
   count_add_formula: RuntimeV02CountAddFormulaMetadata | null;
+  conditional_add_formula: RuntimeV02ConditionalAddFormulaMetadata | null;
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
 };
@@ -41,6 +47,49 @@ function cloneCountAddFormula(
       counter: term.counter.kind === "count_cards"
         ? { ...term.counter, filters: { ...term.counter.filters } }
         : { ...term.counter, allowed_elements: [...term.counter.allowed_elements] },
+    })),
+  };
+}
+
+function cloneConditionalLeaf(
+  value: RuntimeV02ConditionalAddLeafPredicate,
+): RuntimeV02ConditionalAddLeafPredicate {
+  if (value.predicate !== "event_occurred") return { ...value };
+  if (value.event === "hidden_information_viewed") {
+    return { ...value, filters: { ...value.filters } };
+  }
+  if (value.event === "damage_prevented") {
+    return {
+      ...value,
+      filters: {
+        target: value.filters.target,
+        prevention_kind_any: [...value.filters.prevention_kind_any],
+      },
+    };
+  }
+  if (value.event === "essence_moved") {
+    return { ...value, filters: { ...value.filters } };
+  }
+  return { ...value };
+}
+
+function cloneConditionalWhen(
+  value: RuntimeV02ConditionalAddWhen,
+): RuntimeV02ConditionalAddWhen {
+  return "any" in value
+    ? { any: value.any.map((predicate) => cloneConditionalLeaf(predicate)) }
+    : cloneConditionalLeaf(value);
+}
+
+function cloneConditionalAddFormula(
+  value: RuntimeV02ConditionalAddFormulaMetadata | null,
+): RuntimeV02ConditionalAddFormulaMetadata | null {
+  if (value == null) return null;
+  return {
+    snapshot: value.snapshot,
+    terms: value.terms.map((term) => ({
+      ...term,
+      when: cloneConditionalWhen(term.when),
     })),
   };
 }
@@ -62,6 +111,7 @@ export function resolveRuntimeAttackAuthority(
       metadata_source: "legacy",
       damage_source: "legacy",
       count_add_formula: null,
+      conditional_add_formula: null,
       target_permissions: [],
       requirements: [],
     };
@@ -86,6 +136,7 @@ export function resolveRuntimeAttackAuthority(
     metadata_source: "structured_v0_2",
     damage_source: structured.damage_source,
     count_add_formula: cloneCountAddFormula(structured.count_add_formula),
+    conditional_add_formula: cloneConditionalAddFormula(structured.conditional_add_formula),
     target_permissions: structured.target_permissions.map((permission) => ({ ...permission })),
     requirements: structured.requirements.map((requirement) => ({
       ...requirement,
