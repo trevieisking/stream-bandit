@@ -1,3 +1,4 @@
+import type { RuntimeV02CountAddFormulaMetadata } from "./tcg-match-attack-formula-v0-2.ts";
 import {
   evaluateStructuredRuntimeAttackRequirements,
   structuredRuntimeAttackMetadata,
@@ -20,9 +21,25 @@ export type RuntimeAttackAuthority = LegacyAttackCompatibility & {
   id: string | null;
   metadata_source: "legacy" | "structured_v0_2";
   damage_source: "legacy" | "base_damage" | "damage_formula.base";
+  count_add_formula: RuntimeV02CountAddFormulaMetadata | null;
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
 };
+
+function cloneCountAddFormula(
+  value: RuntimeV02CountAddFormulaMetadata | null,
+): RuntimeV02CountAddFormulaMetadata | null {
+  if (value == null) return null;
+  return {
+    snapshot: value.snapshot,
+    terms: value.terms.map((term) => ({
+      ...term,
+      counter: term.counter.kind === "count_cards"
+        ? { ...term.counter, filters: { ...term.counter.filters } }
+        : { ...term.counter, allowed_elements: [...term.counter.allowed_elements] },
+    })),
+  };
+}
 
 export function resolveRuntimeAttackAuthority(
   state: Record<string, unknown>,
@@ -40,6 +57,7 @@ export function resolveRuntimeAttackAuthority(
       id: null,
       metadata_source: "legacy",
       damage_source: "legacy",
+      count_add_formula: null,
       target_permissions: [],
       requirements: [],
     };
@@ -63,6 +81,7 @@ export function resolveRuntimeAttackAuthority(
     damage: structured.base_damage,
     metadata_source: "structured_v0_2",
     damage_source: structured.damage_source,
+    count_add_formula: cloneCountAddFormula(structured.count_add_formula),
     target_permissions: structured.target_permissions.map((permission) => ({ ...permission })),
     requirements: structured.requirements.map((requirement) => ({
       ...requirement,
