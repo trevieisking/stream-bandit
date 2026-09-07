@@ -37,7 +37,7 @@ export type RuntimeAttackAuthority = LegacyAttackCompatibility & {
   damage_source: "legacy" | "base_damage" | "damage_formula.base";
   count_add_formula: RuntimeV02CountAddFormulaMetadata | null;
   conditional_add_formula: RuntimeV02ConditionalAddFormulaMetadata | null;
-  declaration_source_attached_essence_kinds: Array<"temporary" | "borrowed">;
+  declaration_source_attached_essence_kinds?: Array<"temporary" | "borrowed">;
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
 };
@@ -337,7 +337,7 @@ export function evaluateRuntimeAttackReadyConditionalAddFormula(
   }
   const sourceAttachedEssenceKinds = [...new Set([
     ...context.source_attached_essence_kinds,
-    ...attack.declaration_source_attached_essence_kinds,
+    ...(attack.declaration_source_attached_essence_kinds || []),
   ])];
   return evaluateStructuredRuntimeConditionalAddFormula(
     attack.damage,
