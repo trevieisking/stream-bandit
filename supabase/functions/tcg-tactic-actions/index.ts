@@ -1,4 +1,5 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
 import { clearRuntimeCondition, hasRuntimeCondition, runtimeConditions } from "./runtime-v0-2-core.ts";
 
 const VERSION = "Stream Bandit TCG tactic actions v0.3";
@@ -506,6 +507,7 @@ function executeUntilChoice(state: any) {
       const player = state.players[String(seat)];
       const count = Math.min(Math.max(0, Number(step.count || 0)), player.deck.length);
       vars[String(step.as || "looked")] = player.deck.splice(0, count);
+      if (count > 0) recordRuntimeV02HiddenInformationView(state, seat as 1 | 2, "deck_top");
       effect.cursor++;
       continue;
     }
@@ -536,7 +538,7 @@ function executeUntilChoice(state: any) {
         max: bounds.max,
         mode: "select",
         options,
-        context: { apply: "set_var_cards", var_name: String(step.as || "chosen") },
+        context: { apply: "set_var_cards", var_name: String(step.as || "chosen"), many: bounds.max !== 1 },
       });
       return;
     }
@@ -562,6 +564,7 @@ function executeUntilChoice(state: any) {
       const player = state.players[String(seat)];
       const options = cardOptions(state, player.deck, step.selection?.filters, ownerSeat);
       const bounds = choiceBounds(step.selection, options.length, true);
+      recordRuntimeV02HiddenInformationView(state, seat as 1 | 2, "deck");
       setPending(state, effect, {
         seat: ownerSeat,
         kind: "search_deck",
