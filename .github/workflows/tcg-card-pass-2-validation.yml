@@ -52,19 +52,6 @@ jobs:
         with:
           node-version: 22
 
-      - name: Compute deterministic registry digest
-        id: registry_digest
-        shell: bash
-        run: echo "sha=$(node tcg-set-one-registry-builder-v0.2.mjs | sha256sum | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-
-      - name: Upload temporary registry digest marker
-        uses: actions/upload-artifact@v4
-        with:
-          name: registry-digest-${{ steps.registry_digest.outputs.sha }}
-          path: tcg-card-pass-2-registry-lock-v0.2.json
-          if-no-files-found: error
-          retention-days: 1
-
       - name: Validate Card Pass 2 candidates, eight exact starters and effect grammar
         run: node --test tcg/tests/card-pass-2-*.test.mjs
 
