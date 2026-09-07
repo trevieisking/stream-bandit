@@ -15,6 +15,7 @@ const wiredWithSurge = wired.replace('const structuredContext=', surgeBonus + 'c
 const legacyCall = 'const dmg=attackDamage(p.vanguard,target,s,atk.damage+bonus);';
 const wiredCall = 'const relation=targetSeat===seat?"self":"opponent";const dmg=attackDamage(p.vanguard,target,s,atk.damage+bonus,{target_zone:targetWhere,target_controller:relation,source_controller:relation});';
 const countAddWiredCall = 'const formulaBase=countAddEvaluation?.damage??atk.damage;const formulaBonus=Math.max(0,formulaBase-atk.damage);const relation=targetSeat===seat?"self":"opponent";const dmg=attackDamage(p.vanguard,target,s,formulaBase+bonus,{target_zone:targetWhere,target_controller:relation,source_controller:relation});';
+const combinedFormulaWiredCall = 'const countFormulaBonus=countAddEvaluation?Math.max(0,countAddEvaluation.damage-atk.damage):0;const conditionalFormulaBonus=conditionalAddEvaluation?Math.max(0,conditionalAddEvaluation.damage-atk.damage):0;const formulaBonus=countFormulaBonus+conditionalFormulaBonus;const formulaBase=atk.damage+formulaBonus;const relation=targetSeat===seat?"self":"opponent";const dmg=attackDamage(p.vanguard,target,s,formulaBase+bonus,{target_zone:targetWhere,target_controller:relation,source_controller:relation});';
 
 let next = source;
 if (!next.includes(bridgeImport)) {
@@ -26,10 +27,10 @@ if (next.includes(legacy)) next = next.replace(legacy, wired);
 else if (!next.includes(wired) && !next.includes(wiredWithSurge)) throw new Error('match_actions_attack_damage_function_changed');
 
 if (next.includes(legacyCall)) next = next.replace(legacyCall, wiredCall);
-else if (!next.includes(wiredCall) && !next.includes(countAddWiredCall)) throw new Error('match_actions_attack_damage_call_changed');
+else if (!next.includes(wiredCall) && !next.includes(countAddWiredCall) && !next.includes(combinedFormulaWiredCall)) throw new Error('match_actions_attack_damage_call_changed');
 
 const wiredVariants = [wired, wiredWithSurge].filter((candidate) => next.includes(candidate));
-const wiredCallVariants = [wiredCall, countAddWiredCall].filter((candidate) => next.includes(candidate));
+const wiredCallVariants = [wiredCall, countAddWiredCall, combinedFormulaWiredCall].filter((candidate) => next.includes(candidate));
 if (!next.includes(bridgeImport) || wiredVariants.length !== 1 || wiredCallVariants.length !== 1) throw new Error('match_actions_attack_damage_wiring_incomplete');
 if (next.indexOf(wiredVariants[0]) !== next.lastIndexOf(wiredVariants[0])) throw new Error('match_actions_attack_damage_wiring_duplicate');
 if (next.indexOf(wiredCallVariants[0]) !== next.lastIndexOf(wiredCallVariants[0])) throw new Error('match_actions_attack_damage_call_duplicate');
