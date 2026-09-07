@@ -30,6 +30,67 @@ export type RuntimeV02CountAddFormulaMetadata = {
   terms: RuntimeV02CountAddTerm[];
 };
 
+export type RuntimeV02ConditionalAddEventOccurredPredicate =
+  | {
+    predicate: "event_occurred";
+    event: "reward_inspected" | "device_resolved";
+    controller: "self";
+    window: "current_turn";
+    min_count: 1;
+  }
+  | {
+    predicate: "event_occurred";
+    event: "hidden_information_viewed";
+    controller: "self";
+    window: "current_turn";
+    min_count: 1;
+    filters: { zone: "deck_top" | "deck" };
+  }
+  | {
+    predicate: "event_occurred";
+    event: "damage_prevented";
+    window: "current_turn";
+    min_count: 1;
+    filters: {
+      target: "source_creature";
+      prevention_kind_any: ["ability", "relic", "shield"];
+    };
+  }
+  | {
+    predicate: "event_occurred";
+    event: "essence_moved";
+    controller: "self";
+    window: "current_turn";
+    min_count: 1;
+    filters: { element: "Tide" };
+  };
+
+export type RuntimeV02ConditionalAddLeafPredicate =
+  | { predicate: "source_has_condition"; condition: "Scorched" }
+  | { predicate: "target_has_condition"; condition: "Scorched" | "Venomed" | "Mindbound" }
+  | { predicate: "target_has_any_condition" }
+  | { predicate: "source_became_vanguard_this_turn" }
+  | { predicate: "reserve_count_at_least"; controller: "self"; count: 3 }
+  | { predicate: "hand_count_at_least"; player: "opponent"; count: 5 }
+  | { predicate: "source_has_relic" }
+  | RuntimeV02ConditionalAddEventOccurredPredicate
+  | { predicate: "event_attack_source_has_attached_essence_kind"; kind: "temporary" | "borrowed" };
+
+export type RuntimeV02ConditionalAddWhen =
+  | RuntimeV02ConditionalAddLeafPredicate
+  | { any: RuntimeV02ConditionalAddLeafPredicate[] };
+
+export type RuntimeV02ConditionalAddTerm = {
+  kind: "conditional_add";
+  amount: number;
+  when: RuntimeV02ConditionalAddWhen;
+};
+
+export type RuntimeV02ConditionalAddFormulaMetadata = {
+  snapshot: "legal_declaration";
+  terms: RuntimeV02ConditionalAddTerm[];
+};
+
 function objectRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
     ? value as Record<string, unknown>
@@ -208,5 +269,235 @@ export function structuredRuntimeCountAddFormulaMetadata(
   return {
     snapshot: "legal_declaration",
     terms: indexedCountAddTerms.map(({ rawTerm, index }) => countAddTerm(rawTerm, attackId, index)),
+  };
+}
+
+function conditionalEventOccurredPredicate(
+  value: Record<string, unknown>,
+  attackId: string,
+  termIndex: number,
+  predicatePath: string,
+): RuntimeV02ConditionalAddEventOccurredPredicate {
+  const event = String(value.event || "");
+  const prefix = `tcg_v0_2_attack_conditional_add_event:${attackId}:${termIndex}:${predicatePath}`;
+
+  if (event === "reward_inspected" || event === "device_resolved") {
+    rejectUnsupportedFields(value, ["predicate", "event", "controller", "window", "min_count"], `${prefix}_field_unsupported`);
+    if (String(value.controller || "") !== "self") throw new Error(`${prefix}_controller_invalid`);
+    if (String(value.window || "") !== "current_turn") throw new Error(`${prefix}_window_invalid`);
+    if (value.min_count !== 1) throw new Error(`${prefix}_min_count_invalid`);
+    return {
+      predicate: "event_occurred",
+      event,
+      controller: "self",
+      window: "current_turn",
+      min_count: 1,
+    };
+  }
+
+  if (event === "hidden_information_viewed") {
+    rejectUnsupportedFields(value, ["predicate", "event", "controller", "window", "min_count", "filters"], `${prefix}_field_unsupported`);
+    if (String(value.controller || "") !== "self") throw new Error(`${prefix}_controller_invalid`);
+    if (String(value.window || "") !== "current_turn") throw new Error(`${prefix}_window_invalid`);
+    if (value.min_count !== 1) throw new Error(`${prefix}_min_count_invalid`);
+    const filters = objectRecord(value.filters);
+    if (!filters) throw new Error(`${prefix}_filters_required`);
+    rejectUnsupportedFields(filters, ["zone"], `${prefix}_filter_unsupported`);
+    const zone = String(filters.zone || "");
+    if (zone !== "deck_top" && zone !== "deck") throw new Error(`${prefix}_zone_invalid`);
+    return {
+      predicate: "event_occurred",
+      event: "hidden_information_viewed",
+      controller: "self",
+      window: "current_turn",
+      min_count: 1,
+      filters: { zone },
+    };
+  }
+
+  if (event === "damage_prevented") {
+    rejectUnsupportedFields(value, ["predicate", "event", "window", "min_count", "filters"], `${prefix}_field_unsupported`);
+    if (String(value.window || "") !== "current_turn") throw new Error(`${prefix}_window_invalid`);
+    if (value.min_count !== 1) throw new Error(`${prefix}_min_count_invalid`);
+    const filters = objectRecord(value.filters);
+    if (!filters) throw new Error(`${prefix}_filters_required`);
+    rejectUnsupportedFields(filters, ["target", "prevention_kind_any"], `${prefix}_filter_unsupported`);
+    if (String(filters.target || "") !== "source_creature") throw new Error(`${prefix}_target_invalid`);
+    const kinds = filters.prevention_kind_any;
+    if (!Array.isArray(kinds) || kinds.length !== 3 || kinds[0] !== "ability" || kinds[1] !== "relic" || kinds[2] !== "shield") {
+      throw new Error(`${prefix}_prevention_kinds_invalid`);
+    }
+    return {
+      predicate: "event_occurred",
+      event: "damage_prevented",
+      window: "current_turn",
+      min_count: 1,
+      filters: {
+        target: "source_creature",
+        prevention_kind_any: ["ability", "relic", "shield"],
+      },
+    };
+  }
+
+  if (event === "essence_moved") {
+    rejectUnsupportedFields(value, ["predicate", "event", "controller", "window", "min_count", "filters"], `${prefix}_field_unsupported`);
+    if (String(value.controller || "") !== "self") throw new Error(`${prefix}_controller_invalid`);
+    if (String(value.window || "") !== "current_turn") throw new Error(`${prefix}_window_invalid`);
+    if (value.min_count !== 1) throw new Error(`${prefix}_min_count_invalid`);
+    const filters = objectRecord(value.filters);
+    if (!filters) throw new Error(`${prefix}_filters_required`);
+    rejectUnsupportedFields(filters, ["element"], `${prefix}_filter_unsupported`);
+    if (String(filters.element || "") !== "Tide") throw new Error(`${prefix}_element_invalid`);
+    return {
+      predicate: "event_occurred",
+      event: "essence_moved",
+      controller: "self",
+      window: "current_turn",
+      min_count: 1,
+      filters: { element: "Tide" },
+    };
+  }
+
+  throw new Error(`${prefix}_event_unsupported:${event || "missing"}`);
+}
+
+function conditionalLeafPredicate(
+  rawValue: unknown,
+  attackId: string,
+  termIndex: number,
+  predicatePath: string,
+): RuntimeV02ConditionalAddLeafPredicate {
+  const value = objectRecord(rawValue);
+  if (!value) {
+    throw new Error(`tcg_v0_2_attack_conditional_add_predicate_invalid:${attackId}:${termIndex}:${predicatePath}`);
+  }
+  const predicate = String(value.predicate || "");
+  const prefix = `tcg_v0_2_attack_conditional_add_predicate:${attackId}:${termIndex}:${predicatePath}`;
+
+  if (predicate === "event_occurred") {
+    return conditionalEventOccurredPredicate(value, attackId, termIndex, predicatePath);
+  }
+  if (predicate === "source_has_condition") {
+    rejectUnsupportedFields(value, ["predicate", "condition"], `${prefix}_field_unsupported`);
+    if (String(value.condition || "") !== "Scorched") throw new Error(`${prefix}_condition_invalid`);
+    return { predicate: "source_has_condition", condition: "Scorched" };
+  }
+  if (predicate === "target_has_condition") {
+    rejectUnsupportedFields(value, ["predicate", "condition"], `${prefix}_field_unsupported`);
+    const condition = String(value.condition || "");
+    if (condition !== "Scorched" && condition !== "Venomed" && condition !== "Mindbound") {
+      throw new Error(`${prefix}_condition_invalid`);
+    }
+    return { predicate: "target_has_condition", condition };
+  }
+  if (predicate === "target_has_any_condition") {
+    rejectUnsupportedFields(value, ["predicate"], `${prefix}_field_unsupported`);
+    return { predicate: "target_has_any_condition" };
+  }
+  if (predicate === "source_became_vanguard_this_turn") {
+    rejectUnsupportedFields(value, ["predicate"], `${prefix}_field_unsupported`);
+    return { predicate: "source_became_vanguard_this_turn" };
+  }
+  if (predicate === "reserve_count_at_least") {
+    rejectUnsupportedFields(value, ["predicate", "controller", "count"], `${prefix}_field_unsupported`);
+    if (String(value.controller || "") !== "self") throw new Error(`${prefix}_controller_invalid`);
+    if (value.count !== 3) throw new Error(`${prefix}_count_invalid`);
+    return { predicate: "reserve_count_at_least", controller: "self", count: 3 };
+  }
+  if (predicate === "hand_count_at_least") {
+    rejectUnsupportedFields(value, ["predicate", "player", "count"], `${prefix}_field_unsupported`);
+    if (String(value.player || "") !== "opponent") throw new Error(`${prefix}_player_invalid`);
+    if (value.count !== 5) throw new Error(`${prefix}_count_invalid`);
+    return { predicate: "hand_count_at_least", player: "opponent", count: 5 };
+  }
+  if (predicate === "source_has_relic") {
+    rejectUnsupportedFields(value, ["predicate"], `${prefix}_field_unsupported`);
+    return { predicate: "source_has_relic" };
+  }
+  if (predicate === "event_attack_source_has_attached_essence_kind") {
+    rejectUnsupportedFields(value, ["predicate", "kind"], `${prefix}_field_unsupported`);
+    const kind = String(value.kind || "");
+    if (kind !== "temporary" && kind !== "borrowed") throw new Error(`${prefix}_kind_invalid`);
+    return { predicate: "event_attack_source_has_attached_essence_kind", kind };
+  }
+
+  throw new Error(`${prefix}_unsupported:${predicate || "missing"}`);
+}
+
+function conditionalWhen(
+  rawValue: unknown,
+  attackId: string,
+  termIndex: number,
+): RuntimeV02ConditionalAddWhen {
+  const value = objectRecord(rawValue);
+  if (!value) throw new Error(`tcg_v0_2_attack_conditional_add_when_invalid:${attackId}:${termIndex}`);
+
+  if (Array.isArray(value.any)) {
+    rejectUnsupportedFields(value, ["any"], `tcg_v0_2_attack_conditional_add_when_field_unsupported:${attackId}:${termIndex}`);
+    if (value.any.length === 0) throw new Error(`tcg_v0_2_attack_conditional_add_any_empty:${attackId}:${termIndex}`);
+    return {
+      any: value.any.map((predicate, index) => conditionalLeafPredicate(predicate, attackId, termIndex, `any.${index}`)),
+    };
+  }
+
+  if ("all" in value || "not" in value) {
+    throw new Error(`tcg_v0_2_attack_conditional_add_composition_unsupported:${attackId}:${termIndex}`);
+  }
+  return conditionalLeafPredicate(value, attackId, termIndex, "leaf");
+}
+
+function conditionalAddTerm(
+  rawTerm: unknown,
+  attackId: string,
+  termIndex: number,
+): RuntimeV02ConditionalAddTerm {
+  const term = objectRecord(rawTerm);
+  if (!term) throw new Error(`tcg_v0_2_attack_conditional_add_term_invalid:${attackId}:${termIndex}`);
+  rejectUnsupportedFields(
+    term,
+    ["kind", "amount", "when"],
+    `tcg_v0_2_attack_conditional_add_term_field_unsupported:${attackId}:${termIndex}`,
+  );
+  if (String(term.kind || "") !== "conditional_add") {
+    throw new Error(`tcg_v0_2_attack_conditional_add_term_kind_invalid:${attackId}:${termIndex}`);
+  }
+  return {
+    kind: "conditional_add",
+    amount: positiveInteger(term.amount, `tcg_v0_2_attack_conditional_add_amount_invalid:${attackId}:${termIndex}`),
+    when: conditionalWhen(term.when, attackId, termIndex),
+  };
+}
+
+/**
+ * Normalizes only the conditional_add subset used by the frozen 193-card Set One.
+ *
+ * This is metadata authority only. It does not evaluate predicates or change
+ * attack damage. Predicate support is intentionally restricted to the exact
+ * Set One formula vocabulary; unsupported/future shapes fail closed.
+ */
+export function structuredRuntimeConditionalAddFormulaMetadata(
+  value: unknown,
+  attackId: string,
+): RuntimeV02ConditionalAddFormulaMetadata | null {
+  if (value === null || value === undefined) return null;
+  const formula = objectRecord(value);
+  if (!formula) throw new Error(`tcg_v0_2_attack_conditional_add_formula_invalid:${attackId}`);
+  if (!Array.isArray(formula.terms)) {
+    throw new Error(`tcg_v0_2_attack_conditional_add_formula_terms_invalid:${attackId}`);
+  }
+
+  const indexedTerms = formula.terms
+    .map((rawTerm, index) => ({ rawTerm, index, term: objectRecord(rawTerm) }))
+    .filter(({ term }) => String(term?.kind || "") === "conditional_add");
+  if (indexedTerms.length === 0) return null;
+
+  const snapshot = formula.snapshot == null ? "legal_declaration" : String(formula.snapshot);
+  if (snapshot !== "legal_declaration") {
+    throw new Error(`tcg_v0_2_attack_conditional_add_snapshot_unsupported:${attackId}:${snapshot}`);
+  }
+
+  return {
+    snapshot: "legal_declaration",
+    terms: indexedTerms.map(({ rawTerm, index }) => conditionalAddTerm(rawTerm, attackId, index)),
   };
 }
