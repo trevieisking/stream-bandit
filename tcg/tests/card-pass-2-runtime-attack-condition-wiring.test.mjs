@@ -48,6 +48,13 @@ test('every legacy English condition application is gated by structured ownershi
   }
 });
 
+test('Drenched compatibility fallback preserves its existing attacker-Shield requirement', () => {
+  assert.ok(
+    matchSource.includes('if(structuredConditionEffects==null&&ef.includes("becomes drenched")&&Number(p.vanguard.shield||0)>0)applyCondition(target,"Drenched",s)'),
+    'Drenched fallback lost its attacker-Shield requirement',
+  );
+});
+
 test('attack audit records structured condition ownership separately', () => {
   assert.ok(
     matchSource.includes('structured_after_damage_conditions:structuredConditionEffects'),
