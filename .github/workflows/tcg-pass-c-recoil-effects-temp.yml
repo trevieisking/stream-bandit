@@ -1,0 +1,63 @@
+name: TCG Pass C Recoil Effects Temporary
+
+on:
+  push:
+    branches:
+      - feature/tcg-private-alpha-v0-5-source-recovery
+    paths:
+      - .github/workflows/tcg-pass-c-recoil-effects-temp.yml
+
+permissions:
+  contents: write
+
+jobs:
+  pass-c-recoil-effects:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out exact branch head
+        uses: actions/checkout@v4
+        with:
+          ref: feature/tcg-private-alpha-v0-5-source-recovery
+          fetch-depth: 0
+
+      - name: Guard exact staging chain
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD^)" = "01e02c23fad80952c2561653b548f315a676e9c6"
+          test "$(git rev-parse HEAD^^)" = "87b9accb98a3242049a8e40432511a90d4ed1c03"
+          actual="$(git diff --name-only HEAD^^..HEAD | sort)"
+          expected="$(printf '%s\n' '.github/scripts/tcg-pass-c-recoil-effects.py' '.github/workflows/tcg-pass-c-recoil-effects-temp.yml' | sort)"
+          test "$actual" = "$expected"
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Apply bounded Pass C recoil-effects slice
+        shell: bash
+        run: python .github/scripts/tcg-pass-c-recoil-effects.py
+
+      - name: Run targeted Pass C proof
+        shell: bash
+        run: |
+          deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-recoil-effects.test.ts
+          deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-condition-effects.test.ts
+          deno check supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts
+          node --test tcg/tests/card-pass-2-runtime-attack-recoil-wiring.test.mjs
+          node --test tcg/tests/card-pass-2-runtime-attack-condition-wiring.test.mjs
+          node --test tcg/tests/card-pass-2-runtime-conditional-add-direct-wiring.test.mjs
+
+      - name: Freeze exact permanent file set and commit
+        shell: bash
+        run: |
+          git rm .github/scripts/tcg-pass-c-recoil-effects.py .github/workflows/tcg-pass-c-recoil-effects-temp.yml
+          actual="$(git status --short | sed 's/^...//' | sort)"
+          expected="$(printf '%s\n' '.github/scripts/tcg-pass-c-recoil-effects.py' '.github/workflows/tcg-pass-c-recoil-effects-temp.yml' 'supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts' 'supabase/functions/tcg-match-actions/index.ts' 'supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-recoil-effects.test.ts' 'tcg/tests/card-pass-2-runtime-attack-recoil-wiring.test.mjs' | sort)"
+          test "$actual" = "$expected"
+          git add -A
+          git config user.name "Trevor"
+          git config user.email "269324007+trevieisking@users.noreply.github.com"
+          git commit -m "TCG: structure attack recoil effects"
+          git push origin HEAD:feature/tcg-private-alpha-v0-5-source-recovery
