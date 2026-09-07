@@ -49,7 +49,7 @@ export type RuntimeV02ConditionalAddEventOccurredPredicate =
   | {
     predicate: "event_occurred";
     event: "damage_prevented";
-    window: "current_turn";
+    window: "current_turn" | "previous_opponent_turn";
     min_count: 1;
     filters: {
       target: "source_creature";
@@ -317,7 +317,8 @@ function conditionalEventOccurredPredicate(
 
   if (event === "damage_prevented") {
     rejectUnsupportedFields(value, ["predicate", "event", "window", "min_count", "filters"], `${prefix}_field_unsupported`);
-    if (String(value.window || "") !== "current_turn") throw new Error(`${prefix}_window_invalid`);
+    const window = String(value.window || "");
+    if (window !== "current_turn" && window !== "previous_opponent_turn") throw new Error(`${prefix}_window_invalid`);
     if (value.min_count !== 1) throw new Error(`${prefix}_min_count_invalid`);
     const filters = objectRecord(value.filters);
     if (!filters) throw new Error(`${prefix}_filters_required`);
@@ -330,7 +331,7 @@ function conditionalEventOccurredPredicate(
     return {
       predicate: "event_occurred",
       event: "damage_prevented",
-      window: "current_turn",
+      window: window as "current_turn" | "previous_opponent_turn",
       min_count: 1,
       filters: {
         target: "source_creature",

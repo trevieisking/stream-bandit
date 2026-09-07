@@ -8,7 +8,10 @@ import {
   evaluateStructuredRuntimeCountAddFormula,
   type RuntimeV02CountAddFormulaEvaluation,
 } from "./tcg-match-attack-count-add-evaluator-v0-2.ts";
-import { runtimeV02CurrentTurnDamagePreventionEvents } from "./tcg-match-attack-damage-v0-2.ts";
+import {
+  runtimeV02CurrentTurnDamagePreventionEvents,
+  runtimeV02PreviousOpponentTurnDamagePreventionEvents,
+} from "./tcg-match-attack-damage-v0-2.ts";
 import { runtimeV02CurrentTurnEssenceMovements } from "./tcg-match-essence-movement-v0-2.ts";
 import type {
   RuntimeV02ConditionalAddFormulaMetadata,
@@ -42,6 +45,7 @@ export type RuntimeAttackAuthority = LegacyAttackCompatibility & {
   conditional_add_formula: RuntimeV02ConditionalAddFormulaMetadata | null;
   declaration_source_attached_essence_kinds?: Array<"temporary" | "borrowed">;
   declaration_current_turn_events?: RuntimeV02ConditionalAddEventSignal[];
+  declaration_previous_opponent_turn_events?: RuntimeV02ConditionalAddEventSignal[];
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
 };
@@ -144,12 +148,17 @@ function formulaUsesEssenceMovement(value: RuntimeV02ConditionalAddFormulaMetada
   });
 }
 
-function formulaUsesDamagePrevention(value: RuntimeV02ConditionalAddFormulaMetadata | null): boolean {
+function formulaUsesDamagePrevention(
+  value: RuntimeV02ConditionalAddFormulaMetadata | null,
+  window: "current_turn" | "previous_opponent_turn",
+): boolean {
   if (!value) return false;
   return value.terms.some((term) => {
     const predicates = "any" in term.when ? term.when.any : [term.when];
     return predicates.some((predicate) =>
-      predicate.predicate === "event_occurred" && predicate.event === "damage_prevented"
+      predicate.predicate === "event_occurred" &&
+      predicate.event === "damage_prevented" &&
+      predicate.window === window
     );
   });
 }
@@ -170,10 +179,19 @@ function declarationCurrentTurnEvents(
       })));
     }
   }
-  if (formulaUsesDamagePrevention(formula)) {
+  if (formulaUsesDamagePrevention(formula, "current_turn")) {
     events.push(...runtimeV02CurrentTurnDamagePreventionEvents(state, instanceOrId));
   }
   return events;
+}
+
+function declarationPreviousOpponentTurnEvents(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
+  formula: RuntimeV02ConditionalAddFormulaMetadata | null,
+): RuntimeV02ConditionalAddEventSignal[] {
+  if (!formulaUsesDamagePrevention(formula, "previous_opponent_turn")) return [];
+  return runtimeV02PreviousOpponentTurnDamagePreventionEvents(state, instanceOrId);
 }
 
 function cloneCountAddFormula(
@@ -264,7 +282,7 @@ function readyConditionalLeaf(predicate: RuntimeV02ConditionalAddLeafPredicate):
   ) return true;
   if (
     predicate.event === "damage_prevented" &&
-    predicate.window === "current_turn" &&
+    (predicate.window === "current_turn" || predicate.window === "previous_opponent_turn") &&
     predicate.min_count === 1 &&
     predicate.filters.target === "source_creature" &&
     predicate.filters.prevention_kind_any.length > 0 &&
@@ -303,6 +321,7 @@ export function resolveRuntimeAttackAuthority(
       conditional_add_formula: null,
       declaration_source_attached_essence_kinds: [],
       declaration_current_turn_events: [],
+      declaration_previous_opponent_turn_events: [],
       target_permissions: [],
       requirements: [],
     };
@@ -331,6 +350,7 @@ export function resolveRuntimeAttackAuthority(
     conditional_add_formula: conditionalAddFormula,
     declaration_source_attached_essence_kinds: declarationSourceAttachedEssenceKinds(state, instanceOrId),
     declaration_current_turn_events: declarationCurrentTurnEvents(state, instanceOrId, conditionalAddFormula),
+    declaration_previous_opponent_turn_events: declarationPreviousOpponentTurnEvents(state, instanceOrId, conditionalAddFormula),
     target_permissions: structured.target_permissions.map((permission) => ({ ...permission })),
     requirements: structured.requirements.map((requirement) => ({
       ...requirement,
@@ -436,12 +456,17 @@ export function evaluateRuntimeAttackReadyConditionalAddFormula(
     ...context.current_turn_events,
     ...(attack.declaration_current_turn_events || []),
   ];
+  const previousOpponentTurnEvents = [
+    ...(context.previous_opponent_turn_events || []),
+    ...(attack.declaration_previous_opponent_turn_events || []),
+  ];
   return evaluateStructuredRuntimeConditionalAddFormula(
     attack.damage,
     attack.conditional_add_formula,
     {
       ...context,
       current_turn_events: currentTurnEvents,
+      previous_opponent_turn_events: previousOpponentTurnEvents,
       source_attached_essence_kinds: sourceAttachedEssenceKinds,
     },
     attack.id,

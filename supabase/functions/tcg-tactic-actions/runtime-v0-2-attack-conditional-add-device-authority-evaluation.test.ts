@@ -50,6 +50,7 @@ function context(events: Array<Record<string, unknown>> = [], overrides: Record<
     opponent_hand_count: 0,
     source_has_relic: false,
     current_turn_events: events,
+    previous_opponent_turn_events: [],
     source_attached_essence_kinds: [],
     ...overrides,
   } as any;
@@ -131,7 +132,7 @@ Deno.test("Runtime-C ready authority still evaluates the previously proven direc
   );
 });
 
-Deno.test("Bastion Quake prevention predicate is Runtime-C ready from canonical current-turn prevention events", () => {
+Deno.test("Bastion Quake previous-opponent prevention predicate is Runtime-C ready", () => {
   const authority = resolveRuntimeAttackAuthority(stateWith("stone-citadelhorn", {
     id: "bastion-quake",
     name: "Bastion Quake",
@@ -145,7 +146,7 @@ Deno.test("Bastion Quake prevention predicate is Runtime-C ready from canonical 
         when: {
           predicate: "event_occurred",
           event: "damage_prevented",
-          window: "current_turn",
+          window: "previous_opponent_turn",
           min_count: 1,
           filters: {
             target: "source_creature",
@@ -158,7 +159,7 @@ Deno.test("Bastion Quake prevention predicate is Runtime-C ready from canonical 
   if (!authority) throw new Error("prevention authority required");
   const evaluation = evaluateRuntimeAttackReadyConditionalAddFormula(
     authority,
-    context([{ event: "damage_prevented", target: "source_creature", prevention_kind: "shield" }]),
+    context([], { previous_opponent_turn_events: [{ event: "damage_prevented", target: "source_creature", prevention_kind: "shield" }] }),
   );
   assertEquals(evaluation?.damage, 90);
   assertEquals(evaluation?.terms[0].matched, true);

@@ -113,7 +113,7 @@ Deno.test("structured attack authority owns nested conditional_add event filters
         when: {
           predicate: "event_occurred",
           event: "damage_prevented",
-          window: "current_turn",
+          window: "previous_opponent_turn",
           min_count: 1,
           filters: {
             target: "source_creature",

@@ -35,7 +35,7 @@ const expected = [
   {
     card_id: 'stone-citadelhorn', attack_id: 'bastion-quake', amount: 20,
     when: eventOccurred('damage_prevented', {
-      window: 'current_turn', min_count: 1,
+      window: 'previous_opponent_turn', min_count: 1,
       filters: { target: 'source_creature', prevention_kind_any: ['ability', 'relic', 'shield'] },
     }),
   },

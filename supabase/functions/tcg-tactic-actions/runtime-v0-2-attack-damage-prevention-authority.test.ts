@@ -68,7 +68,7 @@ function bastionQuake() {
         when: {
           predicate: "event_occurred",
           event: "damage_prevented",
-          window: "current_turn",
+          window: "previous_opponent_turn",
           min_count: 1,
           filters: {
             target: "source_creature",
@@ -153,6 +153,7 @@ function evaluationContext() {
     opponent_hand_count: 0,
     source_has_relic: true,
     current_turn_events: [],
+    previous_opponent_turn_events: [],
     source_attached_essence_kinds: [],
   } as any;
 }
@@ -264,11 +265,14 @@ Deno.test("limited or future self-Ability prevention shapes remain fail-closed",
   assertJsonEquals(runtimeV02CurrentTurnDamagePreventionEvents(s, source), []);
 });
 
-Deno.test("Bastion Quake reads canonical prevention from its own creature and reaches 170", () => {
+Deno.test("Bastion Quake reads prevention from the previous opponent turn and reaches 170", () => {
   const s = state({ relic: true, shield: 0 });
   const target = sourceCreature(s);
   structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, attackContext);
-
+  s.active_seat = 1;
+  s.turn_seq = 8;
+  (s.personal_turns as any)["1"] = 4;
+  assertEquals(runtimeV02PreviousOpponentTurnDamagePreventionEvents(s, source).length, 1);
   const authority = resolveRuntimeAttackAuthority(s, source, 1, legacy());
   if (!authority) throw new Error("Bastion Quake authority required");
   const evaluation = evaluateRuntimeAttackReadyConditionalAddFormula(authority, evaluationContext());
@@ -277,12 +281,40 @@ Deno.test("Bastion Quake reads canonical prevention from its own creature and re
   assertEquals(evaluation?.terms[0].contribution, 20);
 });
 
-Deno.test("Bastion Quake remains structured and contributes zero without current-turn prevention", () => {
-  const s = state({ relic: true, shield: 0 });
+Deno.test("Bastion Quake previous-opponent prevention survives a controller extra turn", () => {
+  const s = state({ relic: false, shield: 20 });
+  const target = sourceCreature(s);
+  structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, attackContext);
+  s.active_seat = 1;
+  s.turn_seq = 9;
+  (s.personal_turns as any)["1"] = 5;
   const authority = resolveRuntimeAttackAuthority(s, source, 1, legacy());
   if (!authority) throw new Error("Bastion Quake authority required");
-  const evaluation = evaluateRuntimeAttackReadyConditionalAddFormula(authority, evaluationContext());
-  assertEquals(evaluation?.damage, 150);
-  assertEquals(evaluation?.terms[0].matched, false);
-  assertEquals(evaluation?.terms[0].contribution, 0);
+  assertEquals(evaluateRuntimeAttackReadyConditionalAddFormula(authority, evaluationContext())?.damage, 170);
+});
+
+Deno.test("Bastion Quake prevention expires when the opponent begins a newer personal turn", () => {
+  const s = state({ relic: false, shield: 20 });
+  const target = sourceCreature(s);
+  structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, attackContext);
+  (s.personal_turns as any)["2"] = 5;
+  s.active_seat = 1;
+  s.turn_seq = 10;
+  (s.personal_turns as any)["1"] = 4;
+  assertJsonEquals(runtimeV02PreviousOpponentTurnDamagePreventionEvents(s, source), []);
+  const authority = resolveRuntimeAttackAuthority(s, source, 1, legacy());
+  if (!authority) throw new Error("Bastion Quake authority required");
+  assertEquals(evaluateRuntimeAttackReadyConditionalAddFormula(authority, evaluationContext())?.damage, 150);
+});
+
+Deno.test("Bastion Quake does not treat self-sourced prevention as previous-opponent prevention", () => {
+  const s = state({ relic: false, shield: 20 });
+  s.active_seat = 1;
+  const target = sourceCreature(s);
+  const selfContext: RuntimeAttackDamageContext = { ...attackContext, target_controller: "self", source_controller: "self" };
+  structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, selfContext);
+  assertJsonEquals(runtimeV02PreviousOpponentTurnDamagePreventionEvents(s, source), []);
+  const authority = resolveRuntimeAttackAuthority(s, source, 1, legacy());
+  if (!authority) throw new Error("Bastion Quake authority required");
+  assertEquals(evaluateRuntimeAttackReadyConditionalAddFormula(authority, evaluationContext())?.damage, 150);
 });

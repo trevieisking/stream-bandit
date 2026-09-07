@@ -39,6 +39,7 @@ function context(
     opponent_hand_count: 0,
     source_has_relic: false,
     current_turn_events: [],
+    previous_opponent_turn_events: [],
     source_attached_essence_kinds: [],
     ...overrides,
   };
@@ -181,17 +182,6 @@ Deno.test("conditional_add evaluates exact current-turn event predicates and fil
       events: [{ event: "hidden_information_viewed", controller: "self", zone: "deck" }],
     },
     {
-      id: "bastion-quake",
-      when: {
-        predicate: "event_occurred",
-        event: "damage_prevented",
-        window: "current_turn",
-        min_count: 1,
-        filters: { target: "source_creature", prevention_kind_any: ["ability", "relic", "shield"] },
-      },
-      events: [{ event: "damage_prevented", target: "source_creature", prevention_kind: "shield" }],
-    },
-    {
       id: "deep-current",
       when: { predicate: "event_occurred", event: "essence_moved", controller: "self", window: "current_turn", min_count: 1, filters: { element: "Tide" } },
       events: [{ event: "essence_moved", controller: "self", element: "Tide" }],
@@ -213,6 +203,19 @@ Deno.test("conditional_add evaluates exact current-turn event predicates and fil
     assertEquals(result.damage, 90, `${item.id} damage`);
     assertEquals(result.terms[0].matched, true, `${item.id} matched`);
   }
+});
+
+Deno.test("conditional_add keeps previous-opponent prevention isolated from current-turn events", () => {
+  const prevention: RuntimeV02ConditionalAddWhen = {
+    predicate: "event_occurred",
+    event: "damage_prevented",
+    window: "previous_opponent_turn",
+    min_count: 1,
+    filters: { target: "source_creature", prevention_kind_any: ["ability", "relic", "shield"] },
+  };
+  const signal = { event: "damage_prevented" as const, target: "source_creature" as const, prevention_kind: "shield" as const };
+  assertEquals(evaluateStructuredRuntimeConditionalAddFormula(80, formula(prevention), context({ previous_opponent_turn_events: [signal] }), "previous-opponent").damage, 100);
+  assertEquals(evaluateStructuredRuntimeConditionalAddFormula(80, formula(prevention), context({ current_turn_events: [signal] }), "current-only").damage, 80);
 });
 
 Deno.test("conditional_add event predicates reject nonmatching event details", () => {

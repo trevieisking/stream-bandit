@@ -30,6 +30,7 @@ export type RuntimeV02ConditionalAddEvaluationContext = {
   opponent_hand_count: number;
   source_has_relic: boolean;
   current_turn_events: RuntimeV02ConditionalAddEventSignal[];
+  previous_opponent_turn_events?: RuntimeV02ConditionalAddEventSignal[];
   source_attached_essence_kinds: Array<"temporary" | "borrowed">;
 };
 
@@ -137,6 +138,10 @@ function normalizeContext(
   if (!Array.isArray(context.current_turn_events)) {
     throw new Error(`tcg_v0_2_attack_conditional_add_context_events_invalid:${attackId}`);
   }
+  const previousOpponentTurnEvents = context.previous_opponent_turn_events ?? [];
+  if (!Array.isArray(previousOpponentTurnEvents)) {
+    throw new Error(`tcg_v0_2_attack_conditional_add_context_previous_opponent_events_invalid:${attackId}`);
+  }
 
   return {
     source_conditions: stringList(
@@ -158,6 +163,7 @@ function normalizeContext(
     ),
     source_has_relic: context.source_has_relic,
     current_turn_events: context.current_turn_events.map((event, index) => normalizeEventSignal(event, attackId, index)),
+    previous_opponent_turn_events: previousOpponentTurnEvents.map((event, index) => normalizeEventSignal(event, attackId, index)),
     source_attached_essence_kinds: [...attachmentKinds],
   };
 }
@@ -166,7 +172,10 @@ function eventPredicateMatches(
   predicate: Extract<RuntimeV02ConditionalAddLeafPredicate, { predicate: "event_occurred" }>,
   context: RuntimeV02ConditionalAddEvaluationContext,
 ): boolean {
-  return context.current_turn_events.some((event) => {
+  const events = predicate.window === "previous_opponent_turn"
+    ? context.previous_opponent_turn_events || []
+    : context.current_turn_events;
+  return events.some((event) => {
     if (event.event !== predicate.event) return false;
 
     if (predicate.event === "reward_inspected" || predicate.event === "device_resolved") {

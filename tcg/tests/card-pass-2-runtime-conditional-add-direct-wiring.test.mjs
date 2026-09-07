@@ -63,7 +63,6 @@ test('canonical Device turn flag is adapted to device_resolved and suppresses on
 test('remaining event/history English bonus fallbacks stay active until their event owners are wired', () => {
   const preserved = [
     'if(ef.includes("looked at a reward card this match")',
-    'if(ef.includes("prevented damage this turn")',
     'if(ef.includes("essence is discarded from this creature during this turn")',
   ];
   for (const needle of preserved) {
@@ -76,6 +75,10 @@ test('remaining event/history English bonus fallbacks stay active until their ev
   assert.ok(
     source.includes('if(conditionalAddEvaluation==null&&ef.includes("looked at your deck this turn")'),
     'Predicted Hit deck-view fallback must now be gated by structured conditional authority',
+  );
+  assert.ok(
+    source.includes('if(conditionalAddEvaluation==null&&ef.includes("prevented damage this turn")'),
+    'Bastion Quake prevention fallback must now be gated by structured conditional authority',
   );
   assert.ok(source.includes('source_attached_essence_kinds:[]'), 'adapter must not invent temporary/borrowed attachment state');
 });

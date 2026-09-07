@@ -78,6 +78,13 @@ Deno.test("conditional_add metadata normalizes the exact frozen event predicates
       min_count: 1,
       filters: { target: "source_creature", prevention_kind_any: ["ability", "relic", "shield"] },
     },
+    {
+      predicate: "event_occurred",
+      event: "damage_prevented",
+      window: "previous_opponent_turn",
+      min_count: 1,
+      filters: { target: "source_creature", prevention_kind_any: ["ability", "relic", "shield"] },
+    },
     { predicate: "event_occurred", event: "essence_moved", controller: "self", window: "current_turn", min_count: 1, filters: { element: "Tide" } },
     { predicate: "event_occurred", event: "device_resolved", controller: "self", window: "current_turn", min_count: 1 },
   ];
