@@ -1,3 +1,7 @@
+import {
+  evaluateStructuredRuntimeCountAddFormula,
+  type RuntimeV02CountAddFormulaEvaluation,
+} from "./tcg-match-attack-count-add-evaluator-v0-2.ts";
 import type { RuntimeV02CountAddFormulaMetadata } from "./tcg-match-attack-formula-v0-2.ts";
 import {
   evaluateStructuredRuntimeAttackRequirements,
@@ -97,4 +101,30 @@ export function evaluateRuntimeAttackDeclarationRequirements(
 ): RuntimeV02AttackRequirementEvaluation {
   if (attack.metadata_source !== "structured_v0_2") return { ok: true };
   return evaluateStructuredRuntimeAttackRequirements(state, sourceCreature, attack.requirements);
+}
+
+export function evaluateRuntimeAttackCountAddFormula(
+  state: Record<string, unknown>,
+  sourceCreature: unknown,
+  player: unknown,
+  attack: RuntimeAttackAuthority,
+): RuntimeV02CountAddFormulaEvaluation | null {
+  if (attack.metadata_source !== "structured_v0_2") return null;
+  if (attack.count_add_formula == null) return null;
+  if (!attack.id) {
+    throw new Error("tcg_v0_2_attack_count_add_authority_id_required");
+  }
+  if (attack.damage_source !== "damage_formula.base") {
+    throw new Error(
+      `tcg_v0_2_attack_count_add_authority_damage_source_invalid:${attack.id}:${attack.damage_source}`,
+    );
+  }
+  return evaluateStructuredRuntimeCountAddFormula(
+    state,
+    sourceCreature,
+    player,
+    attack.damage,
+    attack.count_add_formula,
+    attack.id,
+  );
 }
