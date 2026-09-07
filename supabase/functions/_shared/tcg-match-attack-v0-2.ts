@@ -15,6 +15,7 @@ export type RuntimeV02AttackMetadata = {
   base_damage: number | null;
   damage_source: "base_damage" | "damage_formula.base" | null;
   target_permissions: RuntimeV02AttackTargetPermission[];
+  starbound: boolean;
 };
 
 function objectRecord(value: unknown): Record<string, unknown> | null {
@@ -77,9 +78,63 @@ function attackTargetPermissions(
   });
 }
 
+function structuredAttackStarbound(
+  definition: Record<string, unknown>,
+  creature: Record<string, unknown>,
+  attacks: unknown[],
+  attackId: string,
+): boolean {
+  const prestige = objectRecord(definition.prestige);
+  if (!prestige || prestige.starbound === null || prestige.starbound === undefined) return false;
+  const starbound = objectRecord(prestige.starbound);
+  if (!starbound) {
+    throw new Error(`tcg_v0_2_attack_starbound_metadata_invalid:${attackId}`);
+  }
+  if (typeof starbound.enabled !== "boolean") {
+    throw new Error(`tcg_v0_2_attack_starbound_enabled_required:${attackId}`);
+  }
+  if (!starbound.enabled) return false;
+
+  const actionKind = String(starbound.action_kind || "").trim();
+  const actionId = String(starbound.action_id || "").trim();
+  const sharedUsageKey = String(starbound.shared_usage_key || "").trim();
+  const consume = String(starbound.consume || "").trim();
+
+  if (actionKind !== "attack" && actionKind !== "ability") {
+    throw new Error(`tcg_v0_2_attack_starbound_action_kind_invalid:${attackId}`);
+  }
+  if (!actionId) {
+    throw new Error(`tcg_v0_2_attack_starbound_action_id_required:${attackId}`);
+  }
+  if (sharedUsageKey !== "starbound") {
+    throw new Error(`tcg_v0_2_attack_starbound_usage_key_invalid:${attackId}`);
+  }
+  if (consume !== "legal_declaration_or_activation") {
+    throw new Error(`tcg_v0_2_attack_starbound_consume_invalid:${attackId}`);
+  }
+
+  if (actionKind === "attack") {
+    const actionExists = attacks.some((rawAttack) => {
+      const candidate = objectRecord(rawAttack);
+      return candidate && String(candidate.id || "").trim() === actionId;
+    });
+    if (!actionExists) {
+      throw new Error(`tcg_v0_2_attack_starbound_action_missing:${actionId}`);
+    }
+    return actionId === attackId;
+  }
+
+  const ability = objectRecord(creature.ability);
+  if (!ability || String(ability.id || "").trim() !== actionId) {
+    throw new Error(`tcg_v0_2_attack_starbound_ability_missing:${actionId}`);
+  }
+  return false;
+}
+
 /**
  * Returns the structured v0.2 attack identity, Essence cost, deterministic
- * baseline damage and additive attack-target permissions for a 1-based slot.
+ * baseline damage, additive attack-target permissions and Starbound ownership
+ * for a 1-based slot.
  *
  * Legacy-only matches deliberately return null so the existing text parser
  * remains the fallback until the v0.2 match snapshot is present. Once a match
@@ -145,5 +200,6 @@ export function structuredRuntimeAttackMetadata(
     base_damage: baseDamage,
     damage_source: damageSource,
     target_permissions: attackTargetPermissions(attack.target_permissions, id),
+    starbound: structuredAttackStarbound(definition, creature, attacks, id),
   };
 }
