@@ -5,6 +5,7 @@ import fs from 'node:fs';
 const matchSource = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
 const authoritySource = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-authority-v0-2.ts', 'utf8');
 const rewardSource = fs.readFileSync('supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts', 'utf8');
+const capabilities = JSON.parse(fs.readFileSync('tcg-runtime-capabilities-v0.2.json', 'utf8'));
 
 function viewSlice() {
   const from = matchSource.indexOf('function makeView');
@@ -40,5 +41,12 @@ test('Reward Arc authority consumes only the canonical current-turn inspection l
   assert.ok(
     matchSource.includes('if(conditionalAddEvaluation==null&&ef.includes("looked at a reward card this match")'),
     'legacy Reward Arc fallback must be suppressed whenever structured authority evaluates',
+  );
+});
+
+test('bounded Reward owner does not claim generic INSPECT_ZONE interpreter parity', () => {
+  assert.ok(
+    capabilities.operations.missing.includes('INSPECT_ZONE'),
+    'narrow evolution Reward inspection must not be advertised as generic INSPECT_ZONE support',
   );
 });
