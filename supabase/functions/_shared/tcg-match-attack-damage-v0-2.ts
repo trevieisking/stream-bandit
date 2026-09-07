@@ -29,6 +29,7 @@ export type RuntimeAttackDamageContext = {
 };
 
 const DAMAGE_PREVENTION_MARKER = "runtime_v0_2_damage_prevention";
+const PREVIOUS_OPPONENT_PREVENTION_MARKER = "runtime_v0_2_previous_opponent_damage_prevention";
 const DAMAGE_PREVENTION_KINDS = new Set<RuntimeV02DamagePreventionKind>(["ability", "relic", "shield"]);
 
 function objectRecord(value: unknown): Record<string, unknown> | null {
@@ -75,6 +76,17 @@ function currentTurn(state: Record<string, unknown>): number {
   return turn;
 }
 
+function activeSeat(state: Record<string, unknown>): 1 | 2 | null {
+  return state.active_seat === 1 || state.active_seat === 2 ? state.active_seat : null;
+}
+
+function personalTurnCount(state: Record<string, unknown>, seat: 1 | 2): number | null {
+  const turns = objectRecord(state.personal_turns);
+  if (!turns) return null;
+  const value = turns[String(seat)];
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : null;
+}
+
 function preventionKinds(raw: unknown): RuntimeV02DamagePreventionKind[] {
   if (raw == null) return [];
   if (!Array.isArray(raw)) throw new Error("tcg_v0_2_damage_prevention_kinds_invalid");
@@ -89,11 +101,42 @@ function preventionKinds(raw: unknown): RuntimeV02DamagePreventionKind[] {
   return result;
 }
 
+function sourceUid(
+  instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
+): string {
+  const source = objectRecord(instanceOrId);
+  return typeof source?.uid === "string" ? source.uid : "";
+}
+
+function creatureControllerSeat(
+  state: Record<string, unknown>,
+  target: RuntimeAttackDamageCreature,
+): 1 | 2 | null {
+  const players = objectRecord(state.players);
+  if (!players) return null;
+  const stack = Array.isArray(target.stack) ? target.stack : [];
+  const targetUid = stack.length > 0 ? objectRecord(stack[stack.length - 1])?.uid : null;
+  for (const seat of [1, 2] as const) {
+    const player = objectRecord(players[String(seat)]);
+    if (!player) continue;
+    const reserve = Array.isArray(player.reserve) ? player.reserve : [];
+    for (const rawCreature of [player.vanguard, ...reserve]) {
+      if (rawCreature === target) return seat;
+      const creature = objectRecord(rawCreature);
+      if (!creature || typeof targetUid !== "string" || !targetUid) continue;
+      const creatureStack = Array.isArray(creature.stack) ? creature.stack : [];
+      if (creatureStack.some((rawInstance) => objectRecord(rawInstance)?.uid === targetUid)) return seat;
+    }
+  }
+  return null;
+}
+
 function recordRuntimeV02DamagePrevention(
   state: Record<string, unknown>,
   target: RuntimeAttackDamageCreature,
   kind: RuntimeV02DamagePreventionKind,
   amount: number,
+  context: RuntimeAttackDamageContext,
 ): void {
   if (!DAMAGE_PREVENTION_KINDS.has(kind)) {
     throw new Error(`tcg_v0_2_damage_prevention_kind_invalid:${kind}`);
@@ -107,13 +150,28 @@ function recordRuntimeV02DamagePrevention(
     : [];
   if (!kinds.includes(kind)) kinds.push(kind);
   target.flags[DAMAGE_PREVENTION_MARKER] = { turn_seq: turn, kinds };
-}
 
-function sourceUid(
-  instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
-): string {
-  const source = objectRecord(instanceOrId);
-  return typeof source?.uid === "string" ? source.uid : "";
+  if (context.source_controller !== "opponent") return;
+  const targetSeat = creatureControllerSeat(state, target);
+  const opponentSeat = targetSeat === 1 ? 2 : targetSeat === 2 ? 1 : null;
+  const active = activeSeat(state);
+  if (!opponentSeat || active !== opponentSeat) return;
+  const opponentPersonalTurn = personalTurnCount(state, opponentSeat);
+  if (opponentPersonalTurn == null) return;
+
+  const previous = objectRecord(target.flags[PREVIOUS_OPPONENT_PREVENTION_MARKER]);
+  const previousKinds = previous &&
+      Number(previous.opponent_seat) === opponentSeat &&
+      Number(previous.opponent_personal_turn) === opponentPersonalTurn
+    ? preventionKinds(previous.kinds)
+    : [];
+  if (!previousKinds.includes(kind)) previousKinds.push(kind);
+  target.flags[PREVIOUS_OPPONENT_PREVENTION_MARKER] = {
+    opponent_seat: opponentSeat,
+    opponent_personal_turn: opponentPersonalTurn,
+    turn_seq: turn,
+    kinds: previousKinds,
+  };
 }
 
 function creatureForSourceInstance(
@@ -146,6 +204,30 @@ export function runtimeV02CurrentTurnDamagePreventionEvents(
   if (!creature) return [];
   const marker = objectRecord(creature.flags?.[DAMAGE_PREVENTION_MARKER]);
   if (!marker || Number(marker.turn_seq) !== currentTurn(state)) return [];
+  return preventionKinds(marker.kinds).map((kind) => ({
+    event: "damage_prevented" as const,
+    target: "source_creature" as const,
+    prevention_kind: kind,
+  }));
+}
+
+export function runtimeV02PreviousOpponentTurnDamagePreventionEvents(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
+): RuntimeV02DamagePreventionEventSignal[] {
+  const creature = creatureForSourceInstance(state, instanceOrId);
+  if (!creature) return [];
+  const controller = creatureControllerSeat(state, creature);
+  if (!controller || activeSeat(state) !== controller) return [];
+  const opponentSeat = controller === 1 ? 2 : 1;
+  const opponentPersonalTurn = personalTurnCount(state, opponentSeat);
+  if (opponentPersonalTurn == null) return [];
+  const marker = objectRecord(creature.flags?.[PREVIOUS_OPPONENT_PREVENTION_MARKER]);
+  if (
+    !marker ||
+    Number(marker.opponent_seat) !== opponentSeat ||
+    Number(marker.opponent_personal_turn) !== opponentPersonalTurn
+  ) return [];
   return preventionKinds(marker.kinds).map((kind) => ({
     event: "damage_prevented" as const,
     target: "source_creature" as const,
@@ -272,7 +354,7 @@ export function structuredRuntimeIncomingAttackDamage(
   const ability = applyIncomingSelfAbilityDamage(state, target, value, context);
   value = ability.value;
   if (ability.prevented > 0) {
-    recordRuntimeV02DamagePrevention(state, target, "ability", ability.prevented);
+    recordRuntimeV02DamagePrevention(state, target, "ability", ability.prevented, context);
   }
 
   // Shield is consumed by the match owner immediately after this resolver returns.
@@ -280,7 +362,7 @@ export function structuredRuntimeIncomingAttackDamage(
   // changing the existing damage/Shield application order.
   const shieldPrevented = Math.min(Math.max(0, Number(target.shield || 0)), value);
   if (shieldPrevented > 0) {
-    recordRuntimeV02DamagePrevention(state, target, "shield", shieldPrevented);
+    recordRuntimeV02DamagePrevention(state, target, "shield", shieldPrevented, context);
   }
 
   return value;
