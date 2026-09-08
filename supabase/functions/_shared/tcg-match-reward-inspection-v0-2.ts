@@ -281,3 +281,48 @@ export function structuredRuntimeEvolutionRewardInspection(
   }
   return { inspected_count: cards.length, ability_id: abilityId };
 }
+
+/**
+ * Generic server-owned Reward inspection primitive for already-validated
+ * structured effects. It never moves Reward cards. Public state records only
+ * the current-turn inspection event; card identities remain in the existing
+ * controller-private Reward inspection view.
+ */
+export function runtimeV02InspectRewardPositions(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+  rawPositions: unknown,
+): RuntimeV02PrivateRewardInspectionView {
+  const chosen = positions(rawPositions);
+  const controller = seat(controllerSeat);
+  const players = objectRecord(state.players);
+  const player = objectRecord(players?.[String(controller)]);
+  const rewards = Array.isArray(player?.rewards) ? player.rewards : null;
+  if (!rewards) throw new Error("tcg_v0_2_reward_inspection_rewards_missing");
+
+  const cards = chosen.map((position, index) => {
+    if (position >= rewards.length) {
+      throw new Error(`tcg_v0_2_reward_inspection_position_out_of_range:${index}`);
+    }
+    const instance = objectRecord(rewards[position]);
+    const uid = typeof instance?.uid === "string" ? instance.uid : "";
+    const cardId = typeof instance?.card_id === "string" ? instance.card_id : "";
+    if (!uid || !cardId) throw new Error(`tcg_v0_2_reward_inspection_reward_invalid:${position}`);
+    return { position, uid, card_id: cardId };
+  });
+
+  if (cards.length > 0) {
+    recordRuntimeV02RewardInspection(state, controller);
+    state[PRIVATE_VIEW_KEY] = {
+      turn_seq: turnSeq(state),
+      controller_seat: controller,
+      cards: cards.map((card) => ({ ...card })),
+    };
+  }
+
+  return {
+    turn_seq: turnSeq(state),
+    controller_seat: controller,
+    cards: cards.map((card) => ({ ...card })),
+  };
+}
