@@ -49,7 +49,7 @@ test('attack-choice owner is private, anchor-bound and actual-heal authoritative
   assert.ok(!choiceSource.includes('heal_index'), 'structured attack choice must not trust legacy heal_index input');
 });
 
-test('match view and resolve command expose one reconnect-safe attack-choice path', () => {
+test('match view and resolve command expose one reconnect-safe attack-choice action with selected-heal kind routing', () => {
   assert.ok(matchSource.includes('pending_attack_choice:runtimeV02PendingAttackChoiceView(s.pending_attack_choice||null,viewerSeat as 1|2)'));
   assertInOrder([
     'if(action==="concede")',
@@ -58,7 +58,8 @@ test('match view and resolve command expose one reconnect-safe attack-choice pat
     'if(s.phase!=="play"||Number(s.active_seat)!==seat)',
   ], 'attack choice must resolve before ordinary play-phase gating');
   assert.ok(matchSource.includes('s.phase!=="attack_effect_resolution"'));
-  assert.ok(matchSource.includes('runtimeV02ResolveSelectedHealChoice(pending,seat as 1|2,String(body.choice_id||""),ids,friendlyFieldEntries(p,s),s)'));
+  assert.ok(matchSource.includes('const selectedPending=pending as RuntimeV02PendingAttackChoice'));
+  assert.ok(matchSource.includes('runtimeV02ResolveSelectedHealChoice(selectedPending,seat as 1|2,String(body.choice_id||""),ids,friendlyFieldEntries(p,s),s)'));
   assert.ok(matchSource.includes('delete s.pending_attack_choice'));
   assert.ok(matchSource.includes('commit("resolve_attack_choice"'));
 });
