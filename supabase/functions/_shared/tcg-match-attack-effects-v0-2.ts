@@ -7,7 +7,11 @@ import {
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
-import { recordRuntimeV02AttackSelfHealPackets } from "./tcg-match-attack-heal-packet-v0-2.ts";
+import {
+  recordRuntimeV02AttackHealEachPackets,
+  recordRuntimeV02AttackSelfHealPackets,
+  type RuntimeV02AttackHealEachPacketContext,
+} from "./tcg-match-attack-heal-packet-v0-2.ts";
 
 export type RuntimeV02AttackConditionTarget =
   | "$source_creature"
@@ -605,6 +609,7 @@ export type RuntimeV02AttackHealEachPhaseResult = {
   attack_id: string;
   phase: "after_damage";
   effects: RuntimeV02AttackHealEachEffectResult[];
+  emitted_packet_ids: string[];
 };
 
 function healEachCandidate(step: Record<string, unknown>): boolean {
@@ -642,15 +647,65 @@ function healEachPredicate(
   return { predicate: "reserve_count_at_least", controller: "self", count };
 }
 
+function healEachPacketContext(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown } | null | undefined,
+  friendlyReserve: Array<RuntimeCreature | null | undefined>,
+): RuntimeV02AttackHealEachPacketContext | null {
+  const players = objectRecord(state.players);
+  // Shared effect-unit tests intentionally omit the match envelope. Once a real
+  // match supplies players, HEAL_EACH must bind the exact attacking Vanguard
+  // and the exact controller-owned Reserve before any healing is applied.
+  if (!players) return null;
+  const sourceInstance = objectRecord(instanceOrId);
+  if (!sourceInstance) {
+    throw new Error("tcg_v0_2_attack_heal_each_packet_source_instance_required");
+  }
+  const uid = String(sourceInstance.uid || "").trim();
+  const cardId = String(sourceInstance.card_id || "").trim();
+  if (!uid || !cardId) {
+    throw new Error("tcg_v0_2_attack_heal_each_packet_source_identity_required");
+  }
+
+  const matches: Array<RuntimeV02AttackHealEachPacketContext> = [];
+  for (const controllerSeat of [1, 2] as const) {
+    const player = objectRecord(players[String(controllerSeat)]);
+    if (!player) throw new Error("tcg_v0_2_attack_heal_each_packet_player_missing");
+    if (!Array.isArray(player.reserve)) {
+      throw new Error("tcg_v0_2_attack_heal_each_packet_reserve_invalid");
+    }
+    if (player.reserve !== friendlyReserve) continue;
+    const sourceCreature = player.vanguard as RuntimeCreature | null | undefined;
+    const vanguard = objectRecord(sourceCreature);
+    if (!vanguard || !Array.isArray(vanguard.stack) || vanguard.stack.length === 0) continue;
+    const top = objectRecord(vanguard.stack[vanguard.stack.length - 1]);
+    if (!top) continue;
+    if (String(top.uid || "").trim() !== uid || String(top.card_id || "").trim() !== cardId) continue;
+    matches.push({
+      controller_seat: controllerSeat,
+      source_instance: { uid, card_id: cardId },
+      source_creature: sourceCreature as RuntimeCreature,
+      source_where: "vanguard",
+      source_index: null,
+      friendly_reserve: friendlyReserve,
+    });
+  }
+  if (matches.length !== 1) {
+    throw new Error("tcg_v0_2_attack_heal_each_packet_source_location_ambiguous");
+  }
+  return matches[0];
+}
+
 /**
  * Owns only deterministic structured v0.2 attack after-damage programs made
  * entirely from IF reserve_count_at_least(self) -> HEAL_EACH self Reserve
  * Creature steps.
  *
  * Selected-target healing, other zones/filters and mixed programs deliberately
- * remain on compatibility/choice authority. Every packet delegates to the same
- * healRuntimeDamage primitive used by Tactics and self-healing attacks.
- * after_heal_packet listeners remain a separate later runtime pass.
+ * remain on compatibility/choice authority. Every heal delegates to the same
+ * healRuntimeDamage primitive used by Tactics and self-healing attacks. This
+ * slice records one canonical after_heal_packet ID per Creature that actually
+ * healed; listener dispatch remains a separate deterministic lifecycle pass.
  */
 export function structuredRuntimeAfterDamageHealEachEffects(
   state: Record<string, unknown>,
@@ -732,6 +787,7 @@ export function structuredRuntimeAfterDamageHealEachEffects(
 
   if (normalized.some((step) => step == null)) return null;
 
+  const packetContext = healEachPacketContext(state, instanceOrId, friendlyReserve);
   const occupied = friendlyReserve
     .map((target, reserveIndex) => ({ target, reserveIndex }))
     .filter((entry): entry is { target: RuntimeCreature; reserveIndex: number } => entry.target != null);
@@ -758,7 +814,20 @@ export function structuredRuntimeAfterDamageHealEachEffects(
     };
   });
 
-  return { attack_id: attackId, phase: "after_damage", effects };
+  const result: RuntimeV02AttackHealEachPhaseResult = {
+    attack_id: attackId,
+    phase: "after_damage",
+    effects,
+    emitted_packet_ids: [],
+  };
+  if (packetContext) {
+    result.emitted_packet_ids = recordRuntimeV02AttackHealEachPackets(
+      state,
+      result,
+      packetContext,
+    ).map((packet) => packet.id);
+  }
+  return result;
 }
 
 export type RuntimeV02AttackSelectedHealChoice = {
