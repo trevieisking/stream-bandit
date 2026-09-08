@@ -87,6 +87,19 @@ Deno.test("Rushing Wake-style source_damaged self-heal is registry-driven", () =
   assertEquals(source.damage, 20);
 });
 
+Deno.test("structured self-heal reports only the damage actually removed", () => {
+  const state = stateWith([{
+    op: "IF",
+    when: { predicate: "source_damaged" },
+    then: [{ op: "HEAL", target: "$source_creature", amount: 10 }],
+  }], "rushing-wake");
+  const source = creature(5);
+  const result = structuredRuntimeAfterDamageSelfHealEffects(state, { card_id: "test-self-heal-creature" }, 1, source);
+  assertEquals(result?.effects[0].condition_met, true);
+  assertEquals(result?.effects[0].actual_heal, 5);
+  assertEquals(source.damage, 0);
+});
+
 Deno.test("source_damaged self-heal remains structurally owned when condition is false", () => {
   const state = stateWith([{
     op: "IF",
