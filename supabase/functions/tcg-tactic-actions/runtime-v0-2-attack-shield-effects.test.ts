@@ -73,6 +73,12 @@ Deno.test("shared Shield primitive preserves the 60 cap and reports actual gain"
   assertEquals(source.shield, 60);
 });
 
+Deno.test("shared Shield primitive preserves exact gain below the cap", () => {
+  const source = creature(15);
+  assertEquals(addRuntimeShield(source, 20), 20);
+  assertEquals(source.shield, 35);
+});
+
 Deno.test("Gravity Shell-style attack Shield gain is registry-driven", () => {
   const state = stateWith([{
     op: "ADD_SHIELD",
