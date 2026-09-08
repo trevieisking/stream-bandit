@@ -14,6 +14,14 @@ function count(source, needle) {
   return source.split(needle).length - 1;
 }
 
+function blockBetween(source, startNeedle, endNeedle) {
+  const start = source.indexOf(startNeedle);
+  assert.notEqual(start, -1, `missing start marker: ${startNeedle}`);
+  const end = source.indexOf(endNeedle, start + startNeedle.length);
+  assert.notEqual(end, -1, `missing end marker: ${endNeedle}`);
+  return source.slice(start, end);
+}
+
 test('one live heal-listener coordinator owns both attack and Ability resume receipts', () => {
   assert.ok(live.includes('export function runtimeV02BeginAttackHealListenerContinuation('));
   assert.ok(live.includes('export function runtimeV02ResolveAttackHealListenerChoice('));
@@ -45,12 +53,35 @@ test('Ability and attack resolvers validate distinct resume kinds before delegat
   assert.ok(live.slice(abilityStart).includes('"return_to_play"'));
 });
 
-test('selected-heal Ability owner remains the canonical packet producer while live listener wiring is still deliberately blocked', () => {
+test('Networked Growth live orchestration begins canonical Ability heal listeners while its semantic owner stays packet-only', () => {
+  const resolveAbility = blockBetween(match, 'if(action==="resolve_ability_choice")', 'if(action==="take_reward")');
   assert.ok(selectedHeal.includes('applyRuntimeV02HealPacket('));
   assert.equal(selectedHeal.includes('runtimeV02BeginAbilityHealListenerContinuation'), false, 'selected-heal semantic owner must not become listener orchestration owner');
   assert.equal(selectedHeal.includes('runtimeV02ResolveAbilityHealListenerChoice'), false, 'selected-heal semantic owner must not become listener choice owner');
-  assert.equal(match.includes('runtimeV02BeginAbilityHealListenerContinuation'), false, 'Networked Growth must remain not live-wired in this checkpoint');
-  assert.equal(match.includes('runtimeV02ResolveAbilityHealListenerChoice'), false, 'Ability listener resolution must remain outside match owner until the next bounded tick');
+  assert.ok(resolveAbility.includes('runtimeV02BeginAbilityHealListenerContinuation('));
+  assert.ok(resolveAbility.includes('pending_heal_listener_choice:true'));
+  assert.equal(resolveAbility.includes('scanDefeats('), false, 'active Ability completion must not enter attack defeat scanning');
+  assert.equal(resolveAbility.includes('aftermath('), false, 'active Ability completion must not run attack Aftermath');
+});
+
+test('match owner resumes Ability listener choices to play while attack listener choices keep defeat and Aftermath continuation', () => {
+  const resolveListener = blockBetween(match, 'if(action==="resolve_heal_listener_choice")', 'if(action==="resolve_ability_choice")');
+  assert.ok(resolveListener.includes('const resumeKind=String(s.pending_heal_listener_resume?.kind||"")'));
+  assert.ok(resolveListener.includes('if(resumeKind==="return_to_play")resolved=runtimeV02ResolveAbilityHealListenerChoice('));
+  assert.ok(resolveListener.includes('else if(resumeKind==="scan_defeats_then_aftermath")resolved=runtimeV02ResolveAttackHealListenerChoice('));
+
+  const playResumeStart = resolveListener.indexOf('if(resumeKind==="return_to_play"){s.phase="play"');
+  const attackResumeStart = resolveListener.indexOf('const n=scanDefeats()', playResumeStart);
+  assert.ok(playResumeStart >= 0 && attackResumeStart > playResumeStart, 'Ability play resume must precede the attack-only defeat path');
+  const playResume = resolveListener.slice(playResumeStart, attackResumeStart);
+  assert.ok(playResume.includes('s.phase="play"'));
+  assert.ok(playResume.includes('resume_kind:resumeKind'));
+  assert.equal(playResume.includes('scanDefeats('), false, 'return-to-play branch must not scan defeats');
+  assert.equal(playResume.includes('aftermath('), false, 'return-to-play branch must not execute Aftermath');
+
+  const attackResume = resolveListener.slice(attackResumeStart);
+  assert.ok(attackResume.includes('scanDefeats()'));
+  assert.ok(attackResume.includes('aftermath(resolved.resume_seat)'));
 });
 
 test('generic Ability heal listener resume owner contains no frozen Set One card authority', () => {
