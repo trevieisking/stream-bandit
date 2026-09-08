@@ -45,6 +45,30 @@ jobs:
       - name: Apply bounded Deep Current selected-heal slice
         run: python .github/scripts/tcg-pass-c-attack-selected-heal-patch.py
 
+      - name: Apply proven type-only corrections
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          choice = Path("supabase/functions/_shared/tcg-match-attack-choice-v0-2.ts")
+          text = choice.read_text()
+          old = "  choiceId = crypto.randomUUID(),"
+          new = "  choiceId: string = crypto.randomUUID(),"
+          if text.count(old) != 1:
+              raise SystemExit("expected exactly one choiceId type anchor")
+          choice.write_text(text.replace(old, new, 1))
+
+          match = Path("supabase/functions/tcg-match-actions/index.ts")
+          text = match.read_text()
+          old = 'return{where:x.where==="reserve"?"reserve":"vanguard",index:x.where==="reserve"?Number(x.index):null,creature:x.cr,anchor_uid:anchor,label:String(top(x.cr,s)?.name||"Creature")}'
+          new = 'return{where:(x.where==="reserve"?"reserve":"vanguard") as "reserve"|"vanguard",index:x.where==="reserve"?Number(x.index):null,creature:x.cr,anchor_uid:anchor,label:String(top(x.cr,s)?.name||"Creature")}'
+          if text.count(old) != 1:
+              raise SystemExit("expected exactly one friendlyFieldEntries type anchor")
+          match.write_text(text.replace(old, new, 1))
+          PY
+
       - name: Run full TCG proof before commit
         shell: bash
         run: |
