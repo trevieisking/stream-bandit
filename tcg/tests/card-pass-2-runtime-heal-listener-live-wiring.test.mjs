@@ -33,10 +33,11 @@ test('match owner exposes the heal choice only through the private viewer and ac
 });
 
 test('selected attack healing continues canonical packets before defeat scanning and Aftermath', () => {
-  const start = matchSource.indexOf('if(action==="resolve_attack_choice")');
+  const actionStart = matchSource.indexOf('if(action==="resolve_attack_choice")');
+  const selectedStart = matchSource.indexOf('const selectedPending=pending as RuntimeV02PendingAttackChoice', actionStart);
   const end = matchSource.indexOf('if(action==="resolve_heal_listener_choice")');
-  assert.ok(start >= 0 && end > start, 'selected-heal live action slice is missing');
-  const slice = matchSource.slice(start, end);
+  assert.ok(actionStart >= 0 && selectedStart > actionStart && end > selectedStart, 'selected-heal live action slice is missing');
+  const slice = matchSource.slice(selectedStart, end);
   const continuation = slice.indexOf('runtimeV02BeginAttackHealListenerContinuation(s,resolved.emitted_packet_ids');
   const defeatScan = slice.indexOf('const n=scanDefeats()');
   assert.ok(continuation >= 0, 'selected heal must hand emitted packets to the canonical continuation');
