@@ -45,7 +45,7 @@ jobs:
       - name: Apply bounded Deep Current selected-heal slice
         run: python .github/scripts/tcg-pass-c-attack-selected-heal-patch.py
 
-      - name: Apply proven type-only corrections
+      - name: Apply proven bounded corrections
         shell: bash
         run: |
           set -euo pipefail
@@ -67,6 +67,17 @@ jobs:
           if text.count(old) != 1:
               raise SystemExit("expected exactly one friendlyFieldEntries type anchor")
           match.write_text(text.replace(old, new, 1))
+
+          sibling = Path("tcg/tests/card-pass-2-runtime-attack-heal-each-wiring.test.mjs")
+          text = sibling.read_text()
+          old = '  assert.ok(matchSource.includes(\'if(ad?.id==="tide-tideroar"&&ef.includes("heal 30 from one friendly creature"))\'));'
+          new = '''  assert.ok(
+            matchSource.includes('if(structuredSelectedHealChoice==null&&ad?.id==="tide-tideroar"&&ef.includes("heal 30 from one friendly creature"))'),
+            'Deep Current fallback should now be gated by its own structured selected-heal owner',
+          );'''
+          if text.count(old) != 1:
+              raise SystemExit("expected exactly one legacy Deep Current sibling assertion")
+          sibling.write_text(text.replace(old, new, 1))
           PY
 
       - name: Run full TCG proof before commit
@@ -91,6 +102,7 @@ jobs:
             supabase/functions/_shared/tcg-match-attack-choice-v0-2.ts \
             supabase/functions/tcg-match-actions/index.ts \
             supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-selected-heal-choice.test.ts \
+            tcg/tests/card-pass-2-runtime-attack-heal-each-wiring.test.mjs \
             tcg/tests/card-pass-2-runtime-attack-selected-heal-wiring.test.mjs
           git config user.name "Stream Bandit TCG Guard"
           git config user.email "actions@users.noreply.github.com"
@@ -101,6 +113,7 @@ jobs:
             supabase/functions/_shared/tcg-match-attack-choice-v0-2.ts
             supabase/functions/tcg-match-actions/index.ts
             supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-selected-heal-choice.test.ts
+            tcg/tests/card-pass-2-runtime-attack-heal-each-wiring.test.mjs
             tcg/tests/card-pass-2-runtime-attack-selected-heal-wiring.test.mjs
           )
           test "${#net[@]}" -eq "${#expected[@]}"
