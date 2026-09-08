@@ -1,6 +1,6 @@
 import { healRuntimeDamage, type RuntimeCreature } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import type { RuntimeV02AttackSelectedHealChoice } from "./tcg-match-attack-effects-v0-2.ts";
-import { applyRuntimeV02AttackSelectedHealPacket } from "./tcg-match-attack-heal-packet-v0-2.ts";
+import { applyRuntimeV02AttackSelectedHealPacket } from "./tcg-match-attack-selected-heal-packet-v0-2.ts";
 
 export type RuntimeV02FriendlyFieldEntry = {
   where: "vanguard" | "reserve";
