@@ -41,8 +41,9 @@ Deno.test("after-heal dispatcher resolves Shellip and Symbiote while deferring M
   assertEquals(result.emitted_packet_ids, ["heal:12:2"]);
   assertEquals(p.vanguard.damage, 10); assertEquals(p.reserve[0].shield, 10);
   assertEquals((s.effect_events as any[]).map((event) => event.id), ["heal:12:1", "heal:12:2"]);
-  assertEquals(Object.values((symbiote.effect_flags as any).runtime_v0_2_listener_limits)[0].count, 1);
-  assertEquals(Object.values((shellip.effect_flags as any).runtime_v0_2_listener_limits)[0].count, 1);
+  const symLimit = Object.values((symbiote.effect_flags as any).runtime_v0_2_listener_limits)[0] as any;
+  const shellLimit = Object.values((shellip.effect_flags as any).runtime_v0_2_listener_limits)[0] as any;
+  assertEquals(symLimit.count, 1); assertEquals(shellLimit.count, 1);
   assertEquals(moonlit.effect_flags, undefined, "deferred Realm choice must not consume its limit early");
 });
 
