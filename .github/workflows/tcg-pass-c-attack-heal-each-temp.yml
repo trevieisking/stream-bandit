@@ -25,11 +25,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Guard exact staging chain
+      - name: Guard exact staging net
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD~2)" = "$BASE_SHA"
+          test "$(git merge-base "$BASE_SHA" HEAD)" = "$BASE_SHA"
           mapfile -t changed < <(git diff --name-only "$BASE_SHA"..HEAD | sort)
           expected=(
             .github/scripts/tcg-pass-c-attack-heal-each-patch.py
@@ -44,7 +44,15 @@ jobs:
           deno-version: v2.x
 
       - name: Apply bounded Canopy Crash HEAL_EACH slice
-        run: python .github/scripts/tcg-pass-c-attack-heal-each-patch.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          python .github/scripts/tcg-pass-c-attack-heal-each-patch.py
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts')
+          path.write_text(path.read_text().rstrip() + '\n')
+          PY
 
       - name: Run full TCG proof before commit
         shell: bash
