@@ -113,10 +113,10 @@ Deno.test("active own-turn one-Reward inspection descriptor is registry-driven a
     },
   );
 
-  const other = rewardInspectionAbility();
+  const other = rewardInspectionAbility() as any;
   other.steps = [
     { op: "DRAW", player: "self", count: 1 },
-    ...(other.steps as unknown[]),
+    ...other.steps,
   ];
   assertEquals(structuredRuntimeActiveAbilityRewardInspection(stateWith(other), { card_id: "test-active-inspector" }), null);
 });
