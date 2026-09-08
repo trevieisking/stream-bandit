@@ -58,6 +58,16 @@ export type RuntimeV02HealPacketResolution = {
   packet: RuntimeV02HealPacket | null;
 };
 
+type RuntimeV02ValidatedHealPacketEnvelope = {
+  turn: number;
+  active: RuntimeV02Seat;
+  source: RuntimeV02HealPacketSource;
+  target: RuntimeV02HealPacketTarget;
+  requested: number;
+  events: Record<string, unknown>[];
+  sequence: number;
+};
+
 const ACTION_KINDS = new Set<RuntimeV02HealActionKind>([
   "attack",
   "ability",
@@ -195,6 +205,60 @@ function validateTarget(raw: RuntimeV02HealPacketTarget): RuntimeV02HealPacketTa
   };
 }
 
+function requestedAmount(value: unknown): number {
+  const requested = Number(value);
+  if (!Number.isFinite(requested) || requested < 0) {
+    throw new Error("tcg_v0_2_heal_packet_amount_invalid");
+  }
+  return requested;
+}
+
+function verifiedActualAmount(value: unknown, requested: number): number {
+  const actual = Number(value);
+  if (!Number.isFinite(actual) || actual < 0 || actual > requested) {
+    throw new Error("tcg_v0_2_heal_packet_actual_amount_invalid");
+  }
+  return actual;
+}
+
+function validatedEnvelope(
+  state: Record<string, unknown>,
+  requested: number,
+  context: RuntimeV02HealPacketContext,
+): RuntimeV02ValidatedHealPacketEnvelope {
+  if (!objectRecord(state)) throw new Error("tcg_v0_2_heal_packet_state_invalid");
+  const turn = turnSeq(state);
+  const active = activeSeat(state);
+  const source = validateSource(context?.source);
+  const target = validateTarget(context?.target);
+  const events = eventStream(state);
+  const sequence = nextSequence(state);
+  return { turn, active, source, target, requested, events, sequence };
+}
+
+function appendVerifiedHealPacket(
+  state: Record<string, unknown>,
+  envelope: RuntimeV02ValidatedHealPacketEnvelope,
+  actual: number,
+): RuntimeV02HealPacket | null {
+  if (actual <= 0) return null;
+  const packet: RuntimeV02HealPacket = {
+    event: "after_heal_packet",
+    id: `heal:${envelope.turn}:${envelope.sequence}`,
+    sequence: envelope.sequence,
+    turn_seq: envelope.turn,
+    active_seat: envelope.active,
+    controller_seat: envelope.source.controller_seat,
+    requested_amount: envelope.requested,
+    actual_amount: actual,
+    source: envelope.source,
+    target: envelope.target,
+  };
+  state.runtime_v0_2_event_seq = envelope.sequence;
+  envelope.events.push(packet as unknown as Record<string, unknown>);
+  return packet;
+}
+
 function isHealPacket(value: unknown): value is RuntimeV02HealPacket {
   const event = objectRecord(value);
   return event?.event === "after_heal_packet" &&
@@ -205,14 +269,35 @@ function isHealPacket(value: unknown): value is RuntimeV02HealPacket {
 }
 
 /**
- * Canonical v0.2 heal-event boundary.
+ * Record one already-applied, server-verified v0.2 heal without changing damage.
+ *
+ * This is the bridge for authoritative runtime owners that already performed
+ * healing before the canonical heal-event boundary existed. The caller must
+ * supply the requested and actual amounts it just resolved. Impossible actual
+ * amounts fail closed, and positive healing uses the exact same packet builder
+ * as applyRuntimeV02HealPacket so there is only one event shape/sequence owner.
+ */
+export function recordRuntimeV02HealPacket(
+  state: Record<string, unknown>,
+  requestedAmountValue: number,
+  actualAmountValue: number,
+  context: RuntimeV02HealPacketContext,
+): RuntimeV02HealPacket | null {
+  if (!objectRecord(state)) throw new Error("tcg_v0_2_heal_packet_state_invalid");
+  const requested = requestedAmount(requestedAmountValue);
+  const actual = verifiedActualAmount(actualAmountValue, requested);
+  const envelope = validatedEnvelope(state, requested, context);
+  return appendVerifiedHealPacket(state, envelope, actual);
+}
+
+/**
+ * Canonical v0.2 heal-event boundary for owners that have not healed yet.
  *
  * The underlying damage mutation stays owned by healRuntimeDamage. This wrapper
- * adds only server-built event authority: a packet is persisted after a real
- * (actual > 0) heal with source/target instance identity and controller/action
- * metadata. Listener matching/execution is deliberately separate from this
- * primitive so nested triggers, limits and player choices can share one later
- * listener dispatcher without changing healing math.
+ * validates packet authority before changing the Creature, performs the heal,
+ * then persists the same canonical packet used by the record-only bridge.
+ * Listener matching/execution remains deliberately separate so nested triggers,
+ * limits and player choices share one deterministic listener dispatcher.
  */
 export function applyRuntimeV02HealPacket(
   state: Record<string, unknown>,
@@ -223,38 +308,12 @@ export function applyRuntimeV02HealPacket(
   if (!objectRecord(state)) throw new Error("tcg_v0_2_heal_packet_state_invalid");
   if (!objectRecord(targetCreature)) throw new Error("tcg_v0_2_heal_packet_target_creature_invalid");
 
-  const turn = turnSeq(state);
-  const active = activeSeat(state);
-  const source = validateSource(context?.source);
-  const target = validateTarget(context?.target);
-  const requested = Number(amount);
-  if (!Number.isFinite(requested) || requested < 0) {
-    throw new Error("tcg_v0_2_heal_packet_amount_invalid");
-  }
-
-  // Validate ledger/sequence before mutating the Creature so malformed state
-  // cannot leave a partially-applied heal behind.
-  const events = eventStream(state);
-  const sequence = nextSequence(state);
+  const requested = requestedAmount(amount);
+  // Validate ledger/sequence and all source/target authority before mutating the
+  // Creature so malformed state cannot leave a partially-applied heal behind.
+  const envelope = validatedEnvelope(state, requested, context);
   const actual = healRuntimeDamage(targetCreature, requested);
-  if (actual <= 0) {
-    return { requested_amount: requested, actual_heal: 0, packet: null };
-  }
-
-  const packet: RuntimeV02HealPacket = {
-    event: "after_heal_packet",
-    id: `heal:${turn}:${sequence}`,
-    sequence,
-    turn_seq: turn,
-    active_seat: active,
-    controller_seat: source.controller_seat,
-    requested_amount: requested,
-    actual_amount: actual,
-    source,
-    target,
-  };
-  state.runtime_v0_2_event_seq = sequence;
-  events.push(packet as unknown as Record<string, unknown>);
+  const packet = appendVerifiedHealPacket(state, envelope, actual);
   return { requested_amount: requested, actual_heal: actual, packet };
 }
 
