@@ -181,6 +181,17 @@ export function addRuntimeShield(
   return Math.max(0, next - Math.max(0, previous));
 }
 
+export function healRuntimeDamage(
+  creature: RuntimeCreature,
+  amount: number,
+): number {
+  const previous = Math.max(0, Number(creature.damage || 0));
+  const requested = Math.max(0, Number(amount || 0));
+  const next = Math.max(0, previous - requested);
+  creature.damage = next;
+  return previous - next;
+}
+
 export function moveRuntimeDamage(
   source: RuntimeCreature,
   destination: RuntimeCreature,

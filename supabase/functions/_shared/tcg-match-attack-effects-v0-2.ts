@@ -1,6 +1,7 @@
 import {
   addRuntimeShield,
   applyRuntimeCondition,
+  healRuntimeDamage,
   placeRuntimeDamage,
   type ApplyConditionMode,
   type RuntimeCreature,
@@ -343,6 +344,166 @@ export function structuredRuntimeAfterDamageShieldEffects(
       amount: step.amount,
       actual_gain: actualGain,
       shield_cap: 60 as const,
+    };
+  });
+
+  return { attack_id: attackId, phase: "after_damage", effects: resolved };
+}
+
+export type RuntimeV02AttackSelfHealPredicate =
+  | { predicate: "source_damaged" }
+  | { predicate: "source_has_shield_at_least"; value: number };
+
+export type RuntimeV02AttackSelfHealEffectResult = {
+  target: "$source_creature";
+  when: RuntimeV02AttackSelfHealPredicate;
+  amount: number;
+  condition_met: boolean;
+  actual_heal: number;
+};
+
+export type RuntimeV02AttackSelfHealPhaseResult = {
+  attack_id: string;
+  phase: "after_damage";
+  effects: RuntimeV02AttackSelfHealEffectResult[];
+};
+
+function selfHealCandidate(step: Record<string, unknown>): boolean {
+  if (String(step.op || "") !== "IF") return false;
+  const then = step.then;
+  if (!Array.isArray(then) || then.length === 0) return false;
+  return then.every((raw) => {
+    const item = objectRecord(raw);
+    return item != null && String(item.op || "") === "HEAL";
+  });
+}
+
+function selfHealPredicate(
+  raw: unknown,
+  attackId: string,
+  index: number,
+): RuntimeV02AttackSelfHealPredicate {
+  const when = objectRecord(raw);
+  if (!when) throw new Error(`tcg_v0_2_attack_self_heal_predicate_invalid:${attackId}:${index}`);
+  const predicate = String(when.predicate || "");
+  if (predicate === "source_damaged") {
+    rejectUnsupportedFields(
+      when,
+      ["predicate"],
+      `tcg_v0_2_attack_self_heal_predicate_field_unsupported:${attackId}:${index}`,
+    );
+    return { predicate: "source_damaged" };
+  }
+  if (predicate === "source_has_shield_at_least") {
+    rejectUnsupportedFields(
+      when,
+      ["predicate", "value"],
+      `tcg_v0_2_attack_self_heal_predicate_field_unsupported:${attackId}:${index}`,
+    );
+    const value = Number(when.value);
+    if (!Number.isFinite(value) || value <= 0) {
+      throw new Error(`tcg_v0_2_attack_self_heal_shield_threshold_invalid:${attackId}:${index}`);
+    }
+    return { predicate: "source_has_shield_at_least", value };
+  }
+  throw new Error(`tcg_v0_2_attack_self_heal_predicate_unsupported:${attackId}:${index}:${predicate}`);
+}
+
+function selfHealConditionMatches(
+  when: RuntimeV02AttackSelfHealPredicate,
+  sourceCreature: RuntimeCreature,
+): boolean {
+  if (when.predicate === "source_damaged") {
+    return Math.max(0, Number(sourceCreature.damage || 0)) > 0;
+  }
+  return Math.max(0, Number(sourceCreature.shield || 0)) >= when.value;
+}
+
+/**
+ * Owns only deterministic structured v0.2 attack after-damage programs made
+ * entirely from IF -> HEAL $source_creature steps using source_damaged or
+ * source_has_shield_at_least predicates.
+ *
+ * HEAL_EACH, selected-target healing and mixed programs deliberately remain on
+ * compatibility/choice authority. Healing itself delegates to healRuntimeDamage
+ * so Tactic, legacy match actions and structured attacks share one state owner.
+ * after_heal_packet listeners remain a later runtime pass; this slice preserves
+ * the existing state transition without pretending listener parity is complete.
+ */
+export function structuredRuntimeAfterDamageSelfHealEffects(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown } | null | undefined,
+  attackSlot: number,
+  sourceCreature: RuntimeCreature,
+): RuntimeV02AttackSelfHealPhaseResult | null {
+  const definition = runtimeV02Definition(state, instanceOrId);
+  if (!definition) return null;
+  if (String(definition.card_family || "") !== "Creature") {
+    throw new Error("tcg_v0_2_attack_self_heal_requires_creature");
+  }
+
+  const creature = objectRecord(definition.creature);
+  if (!creature) throw new Error("tcg_v0_2_attack_self_heal_creature_required");
+  const attacks = creature.attacks;
+  if (!Array.isArray(attacks)) throw new Error("tcg_v0_2_attack_self_heal_attacks_required");
+  if (!Number.isInteger(attackSlot) || attackSlot < 1 || attackSlot > attacks.length) {
+    throw new Error("tcg_v0_2_attack_self_heal_slot_invalid");
+  }
+
+  const attack = objectRecord(attacks[attackSlot - 1]);
+  if (!attack) throw new Error("tcg_v0_2_attack_self_heal_attack_invalid");
+  const attackId = typeof attack.id === "string" ? attack.id.trim() : "";
+  if (!attackId) throw new Error("tcg_v0_2_attack_self_heal_attack_id_required");
+  if (!Array.isArray(attack.after_damage)) {
+    throw new Error(`tcg_v0_2_attack_self_heal_after_damage_required:${attackId}`);
+  }
+  if (attack.after_damage.length === 0) return null;
+
+  const normalized = attack.after_damage.map((rawStep, index) => {
+    const step = objectRecord(rawStep);
+    if (!step) throw new Error(`tcg_v0_2_attack_self_heal_step_invalid:${attackId}:${index}`);
+    if (!selfHealCandidate(step)) return null;
+    rejectUnsupportedFields(
+      step,
+      ["op", "when", "then"],
+      `tcg_v0_2_attack_self_heal_step_field_unsupported:${attackId}:${index}`,
+    );
+    const then = step.then as unknown[];
+    if (then.length !== 1) {
+      throw new Error(`tcg_v0_2_attack_self_heal_then_count_unsupported:${attackId}:${index}`);
+    }
+    const heal = objectRecord(then[0]);
+    if (!heal) throw new Error(`tcg_v0_2_attack_self_heal_heal_step_invalid:${attackId}:${index}`);
+    rejectUnsupportedFields(
+      heal,
+      ["op", "target", "amount"],
+      `tcg_v0_2_attack_self_heal_heal_field_unsupported:${attackId}:${index}`,
+    );
+    if (String(heal.target || "") !== "$source_creature") {
+      throw new Error(`tcg_v0_2_attack_self_heal_target_unsupported:${attackId}:${index}`);
+    }
+    const amount = Number(heal.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new Error(`tcg_v0_2_attack_self_heal_amount_invalid:${attackId}:${index}`);
+    }
+    return {
+      when: selfHealPredicate(step.when, attackId, index),
+      amount,
+    };
+  });
+
+  if (normalized.some((step) => step == null)) return null;
+
+  const resolved = normalized.map((raw) => {
+    const step = raw!;
+    const conditionMet = selfHealConditionMatches(step.when, sourceCreature);
+    const actualHeal = conditionMet ? healRuntimeDamage(sourceCreature, step.amount) : 0;
+    return {
+      target: "$source_creature" as const,
+      when: step.when,
+      amount: step.amount,
+      condition_met: conditionMet,
+      actual_heal: actualHeal,
     };
   });
 
