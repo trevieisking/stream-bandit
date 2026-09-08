@@ -1,5 +1,6 @@
 import { healRuntimeDamage, type RuntimeCreature } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import type { RuntimeV02AttackSelectedHealChoice } from "./tcg-match-attack-effects-v0-2.ts";
+import { applyRuntimeV02AttackSelectedHealPacket } from "./tcg-match-attack-heal-packet-v0-2.ts";
 
 export type RuntimeV02FriendlyFieldEntry = {
   where: "vanguard" | "reserve";
@@ -39,6 +40,7 @@ export type RuntimeV02AttackSelectedHealResolution = {
   target_label: string;
   amount: number;
   actual_heal: number;
+  emitted_packet_ids: string[];
 };
 
 function validateDescriptor(descriptor: RuntimeV02AttackSelectedHealChoice): void {
@@ -112,12 +114,21 @@ export function runtimeV02PendingAttackChoiceView(
   };
 }
 
+/**
+ * Resolves the already-created private selected-heal choice. Metadata-only unit
+ * calls may omit state and retain the original healRuntimeDamage-only behavior.
+ * Live match resolution supplies canonical state, which re-binds the current
+ * Vanguard attack source and selected top-card anchor before healing through the
+ * canonical heal-packet boundary. That path heals exactly once and returns the
+ * emitted packet id for match audit; listener dispatch remains separate.
+ */
 export function runtimeV02ResolveSelectedHealChoice(
   choice: RuntimeV02PendingAttackChoice,
   seat: 1 | 2,
   choiceId: string,
   choiceIds: string[],
   entries: RuntimeV02FriendlyFieldEntry[],
+  state?: Record<string, unknown>,
 ): RuntimeV02AttackSelectedHealResolution {
   validateEntries(entries);
   if (choice.kind !== "select_damaged_friendly_creature_heal") {
@@ -138,7 +149,26 @@ export function runtimeV02ResolveSelectedHealChoice(
   if (Math.max(0, Number(entry.creature.damage || 0)) <= 0) {
     throw new Error("tcg_v0_2_attack_choice_target_not_damaged");
   }
-  const actualHeal = healRuntimeDamage(entry.creature, choice.amount);
+
+  const packetResolution = state
+    ? applyRuntimeV02AttackSelectedHealPacket(
+      state,
+      choice.attack_id,
+      choice.amount,
+      {
+        controller_seat: seat,
+        target_creature: entry.creature,
+        target_anchor_uid: entry.anchor_uid,
+        target_where: entry.where,
+        target_index: entry.index,
+      },
+    )
+    : null;
+  const actualHeal = packetResolution
+    ? packetResolution.actual_heal
+    : healRuntimeDamage(entry.creature, choice.amount);
+  const emittedPacketIds = packetResolution?.packet ? [packetResolution.packet.id] : [];
+
   return {
     attack_id: choice.attack_id,
     choice_id: choice.id,
@@ -149,5 +179,6 @@ export function runtimeV02ResolveSelectedHealChoice(
     target_label: entry.label || option.label || "Creature",
     amount: choice.amount,
     actual_heal: actualHeal,
+    emitted_packet_ids: emittedPacketIds,
   };
 }
