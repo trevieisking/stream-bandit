@@ -49,6 +49,8 @@ test('HEAL_EACH owner is deliberately narrow and keeps heal listeners for a late
   assert.ok(effectSource.includes('String(heal.zone || "") !== "reserve"'));
   assert.ok(effectSource.includes('["card_family"]'));
   assert.ok(effectSource.includes('String(filters.card_family || "") !== "Creature"'));
+  assert.ok(effectSource.includes('const conditionMet = occupied.length >= step.when.count;'));
+  assert.ok(effectSource.includes('reserve_index: reserveIndex'));
   assert.ok(effectSource.includes('after_heal_packet listeners remain a separate later runtime pass'));
 });
 
