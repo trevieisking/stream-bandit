@@ -75,5 +75,8 @@ test('frozen Set One has exactly one attack-owned Canopy Crash HEAL_EACH program
 test('Deep Current selected-target heal stays outside this deterministic owner', () => {
   assert.ok(tideSource.includes('"id":"deep-current","name":"Deep Current"'));
   assert.ok(tideSource.includes('"after_damage":[{"op":"SELECT_CREATURE","controller":"self","zone":"field","count":1,"filters":{"damaged":true},"as":"heal_target"},{"op":"HEAL","target":"$heal_target","amount":30}]'));
-  assert.ok(matchSource.includes('if(ad?.id==="tide-tideroar"&&ef.includes("heal 30 from one friendly creature"))'));
+  assert.ok(
+  matchSource.includes('if(structuredSelectedHealChoice==null&&ad?.id==="tide-tideroar"&&ef.includes("heal 30 from one friendly creature"))'),
+  'Deep Current fallback should now be gated by its own structured selected-heal owner',
+);
 });

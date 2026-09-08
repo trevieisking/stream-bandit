@@ -692,3 +692,117 @@ export function structuredRuntimeAfterDamageHealEachEffects(
 
   return { attack_id: attackId, phase: "after_damage", effects };
 }
+
+export type RuntimeV02AttackSelectedHealChoice = {
+  attack_id: string;
+  phase: "after_damage";
+  selection: {
+    controller: "self";
+    zone: "field";
+    count: 1;
+    filters: { damaged: true };
+    as: string;
+  };
+  heal: {
+    target: string;
+    amount: number;
+  };
+};
+
+/**
+ * Owns only the deterministic structured after-damage choice program:
+ * SELECT_CREATURE(self, field, exactly one damaged creature) followed by
+ * HEAL $selected. It describes the choice but deliberately does not select or
+ * heal a target; the revision-checked attack-choice owner performs that work.
+ *
+ * Mixed programs and other selectors remain outside this owner. Marked v0.2
+ * metadata that matches this program family but is malformed fails closed.
+ * after_heal_packet listeners remain a separate later lifecycle pass.
+ */
+export function structuredRuntimeAfterDamageSelectedHealChoice(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown } | null | undefined,
+  attackSlot: number,
+): RuntimeV02AttackSelectedHealChoice | null {
+  const definition = runtimeV02Definition(state, instanceOrId);
+  if (!definition) return null;
+  if (String(definition.card_family || "") !== "Creature") {
+    throw new Error("tcg_v0_2_attack_selected_heal_requires_creature");
+  }
+
+  const creature = objectRecord(definition.creature);
+  if (!creature) throw new Error("tcg_v0_2_attack_selected_heal_creature_required");
+  const attacks = creature.attacks;
+  if (!Array.isArray(attacks)) throw new Error("tcg_v0_2_attack_selected_heal_attacks_required");
+  if (!Number.isInteger(attackSlot) || attackSlot < 1 || attackSlot > attacks.length) {
+    throw new Error("tcg_v0_2_attack_selected_heal_slot_invalid");
+  }
+
+  const attack = objectRecord(attacks[attackSlot - 1]);
+  if (!attack) throw new Error("tcg_v0_2_attack_selected_heal_attack_invalid");
+  const attackId = typeof attack.id === "string" ? attack.id.trim() : "";
+  if (!attackId) throw new Error("tcg_v0_2_attack_selected_heal_attack_id_required");
+  if (!Array.isArray(attack.after_damage)) {
+    throw new Error(`tcg_v0_2_attack_selected_heal_after_damage_required:${attackId}`);
+  }
+  if (attack.after_damage.length !== 2) return null;
+
+  const select = objectRecord(attack.after_damage[0]);
+  const heal = objectRecord(attack.after_damage[1]);
+  if (!select || !heal) return null;
+  if (String(select.op || "") !== "SELECT_CREATURE" || String(heal.op || "") !== "HEAL") return null;
+
+  rejectUnsupportedFields(
+    select,
+    ["op", "controller", "zone", "count", "filters", "as"],
+    `tcg_v0_2_attack_selected_heal_select_field_unsupported:${attackId}`,
+  );
+  if (String(select.controller || "") !== "self") {
+    throw new Error(`tcg_v0_2_attack_selected_heal_controller_unsupported:${attackId}`);
+  }
+  if (String(select.zone || "") !== "field") {
+    throw new Error(`tcg_v0_2_attack_selected_heal_zone_unsupported:${attackId}`);
+  }
+  if (Number(select.count) !== 1 || !Number.isInteger(Number(select.count))) {
+    throw new Error(`tcg_v0_2_attack_selected_heal_count_unsupported:${attackId}`);
+  }
+  const filters = objectRecord(select.filters);
+  if (!filters) throw new Error(`tcg_v0_2_attack_selected_heal_filters_required:${attackId}`);
+  rejectUnsupportedFields(
+    filters,
+    ["damaged"],
+    `tcg_v0_2_attack_selected_heal_filter_field_unsupported:${attackId}`,
+  );
+  if (filters.damaged !== true) {
+    throw new Error(`tcg_v0_2_attack_selected_heal_damaged_filter_required:${attackId}`);
+  }
+  const variable = typeof select.as === "string" ? select.as.trim() : "";
+  if (!variable) throw new Error(`tcg_v0_2_attack_selected_heal_variable_required:${attackId}`);
+
+  rejectUnsupportedFields(
+    heal,
+    ["op", "target", "amount"],
+    `tcg_v0_2_attack_selected_heal_heal_field_unsupported:${attackId}`,
+  );
+  const target = `$${variable}`;
+  if (String(heal.target || "") !== target) {
+    throw new Error(`tcg_v0_2_attack_selected_heal_target_mismatch:${attackId}`);
+  }
+  const amount = Number(heal.amount);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error(`tcg_v0_2_attack_selected_heal_amount_invalid:${attackId}`);
+  }
+
+  return {
+    attack_id: attackId,
+    phase: "after_damage",
+    selection: {
+      controller: "self",
+      zone: "field",
+      count: 1,
+      filters: { damaged: true },
+      as: variable,
+    },
+    heal: { target, amount },
+  };
+}
