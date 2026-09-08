@@ -24,9 +24,10 @@ jobs:
       - name: Guard exact staging chain
         shell: bash
         run: |
-          test "$(git rev-parse HEAD^)" = "b2b9460d02c59b80a57b6d11e9430a1be706fa41"
-          test "$(git rev-parse HEAD^^)" = "55c88eec7ea7289ad09dc206aab311df3b70e799"
-          actual="$(git diff --name-only HEAD^^..HEAD | sort)"
+          test "$(git rev-parse HEAD^)" = "ab9b5d591fe5f46a22c120c6bbd8cac27d207215"
+          test "$(git rev-parse HEAD^^)" = "b2b9460d02c59b80a57b6d11e9430a1be706fa41"
+          test "$(git rev-parse HEAD^^^)" = "55c88eec7ea7289ad09dc206aab311df3b70e799"
+          actual="$(git diff --name-only HEAD^^^..HEAD | sort)"
           expected="$(printf '%s\n' '.github/scripts/tcg-pass-c-attack-shield.py' '.github/workflows/tcg-pass-c-attack-shield-temp.yml' | sort)"
           test "$actual" = "$expected"
 
@@ -37,7 +38,13 @@ jobs:
 
       - name: Apply bounded Pass C Shield slice
         shell: bash
-        run: python .github/scripts/tcg-pass-c-attack-shield.py
+        run: |
+          python .github/scripts/tcg-pass-c-attack-shield.py
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts')
+          p.write_text(p.read_text().rstrip() + '\n')
+          PY
 
       - name: Run full TCG proof before commit
         shell: bash
