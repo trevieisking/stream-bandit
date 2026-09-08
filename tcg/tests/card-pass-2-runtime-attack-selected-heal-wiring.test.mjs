@@ -43,6 +43,8 @@ test('attack-choice owner is private, anchor-bound and actual-heal authoritative
   assert.ok(choiceSource.includes('target_position_changed'));
   assert.ok(choiceSource.includes('target_not_damaged'));
   assert.ok(choiceSource.includes('const actualHeal = healRuntimeDamage(entry.creature, choice.amount)'));
+  assert.ok(!choiceSource.includes('heal_where'), 'structured attack choice must not trust legacy heal_where input');
+  assert.ok(!choiceSource.includes('heal_index'), 'structured attack choice must not trust legacy heal_index input');
 });
 
 test('match view and resolve command expose one reconnect-safe attack-choice path', () => {
