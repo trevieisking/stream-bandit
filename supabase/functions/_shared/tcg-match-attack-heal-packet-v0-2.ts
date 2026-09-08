@@ -109,9 +109,12 @@ function bindSource(
  * Converts already-resolved structured attack self-healing into canonical
  * after_heal_packet authority without changing Creature damage a second time.
  *
- * The binding is server-built from the canonical field object, exact top card
- * identity and v0.2 registry definition. Listener dispatch remains separate;
- * this adapter records only the authoritative packets produced by the attack.
+ * Metadata-only resolver calls deliberately return no packet authority until a
+ * real source-instance UID is supplied. Live match actions provide the exact
+ * top instance; explicit adapter tests may bind that instance in a later step.
+ * The binding is then server-built from the canonical field object, exact top
+ * card identity and v0.2 registry definition. Listener dispatch remains
+ * separate; this adapter records only authoritative packets from the attack.
  */
 export function recordRuntimeV02AttackSelfHealPackets(
   state: Record<string, unknown>,
@@ -124,6 +127,14 @@ export function recordRuntimeV02AttackSelfHealPackets(
   }
   const attackId = nonEmpty(result.attack_id, "tcg_v0_2_attack_heal_packet_attack_id_required");
   if (!Array.isArray(result.effects)) throw new Error("tcg_v0_2_attack_heal_packet_effects_invalid");
+  const sourceIdentity = objectRecord(context?.source_instance);
+  if (
+    !sourceIdentity ||
+    typeof sourceIdentity.uid !== "string" ||
+    !sourceIdentity.uid.trim()
+  ) {
+    return [];
+  }
   const source = bindSource(state, context);
   const packets: RuntimeV02HealPacket[] = [];
 
