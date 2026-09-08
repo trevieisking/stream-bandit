@@ -7,6 +7,7 @@ import {
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import { recordRuntimeV02AttackSelfHealPackets } from "./tcg-match-attack-heal-packet-v0-2.ts";
 
 export type RuntimeV02AttackConditionTarget =
   | "$source_creature"
@@ -366,6 +367,7 @@ export type RuntimeV02AttackSelfHealPhaseResult = {
   attack_id: string;
   phase: "after_damage";
   effects: RuntimeV02AttackSelfHealEffectResult[];
+  emitted_packet_ids: string[];
 };
 
 function selfHealCandidate(step: Record<string, unknown>): boolean {
@@ -419,6 +421,58 @@ function selfHealConditionMatches(
   return Math.max(0, Number(sourceCreature.shield || 0)) >= when.value;
 }
 
+function selfHealPacketContext(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown } | null | undefined,
+  sourceCreature: RuntimeCreature,
+) {
+  const players = objectRecord(state.players);
+  // Shared effect-unit tests intentionally exercise the resolver without a full
+  // match envelope. Real match states always carry players; once present, the
+  // source must bind to exactly one canonical battlefield location.
+  if (!players) return null;
+  const sourceInstance = objectRecord(instanceOrId);
+  if (!sourceInstance) {
+    throw new Error("tcg_v0_2_attack_self_heal_packet_source_instance_required");
+  }
+  const matches: Array<{
+    seat: 1 | 2;
+    where: "vanguard" | "reserve";
+    index: number | null;
+  }> = [];
+  for (const controllerSeat of [1, 2] as const) {
+    const player = objectRecord(players[String(controllerSeat)]);
+    if (!player) throw new Error("tcg_v0_2_attack_self_heal_packet_player_missing");
+    if (player.vanguard === sourceCreature) {
+      matches.push({ seat: controllerSeat, where: "vanguard", index: null });
+    }
+    if (player.reserve != null && !Array.isArray(player.reserve)) {
+      throw new Error("tcg_v0_2_attack_self_heal_packet_reserve_invalid");
+    }
+    if (Array.isArray(player.reserve)) {
+      for (let index = 0; index < player.reserve.length; index += 1) {
+        if (player.reserve[index] === sourceCreature) {
+          matches.push({ seat: controllerSeat, where: "reserve", index });
+        }
+      }
+    }
+  }
+  if (matches.length !== 1) {
+    throw new Error("tcg_v0_2_attack_self_heal_packet_source_location_ambiguous");
+  }
+  const found = matches[0];
+  return {
+    controller_seat: found.seat,
+    source_instance: {
+      uid: String(sourceInstance.uid || ""),
+      card_id: String(sourceInstance.card_id || ""),
+    },
+    source_creature: sourceCreature,
+    source_where: found.where,
+    source_index: found.index,
+  };
+}
+
 /**
  * Owns only deterministic structured v0.2 attack after-damage programs made
  * entirely from IF -> HEAL $source_creature steps using source_damaged or
@@ -427,8 +481,8 @@ function selfHealConditionMatches(
  * HEAL_EACH, selected-target healing and mixed programs deliberately remain on
  * compatibility/choice authority. Healing itself delegates to healRuntimeDamage
  * so Tactic, legacy match actions and structured attacks share one state owner.
- * after_heal_packet listeners remain a later runtime pass; this slice preserves
- * the existing state transition without pretending listener parity is complete.
+ * after_heal_packet listeners remain a later runtime pass for dispatch; this
+ * slice now records the canonical packet IDs without healing a second time.
  */
 export function structuredRuntimeAfterDamageSelfHealEffects(
   state: Record<string, unknown>,
@@ -507,7 +561,21 @@ export function structuredRuntimeAfterDamageSelfHealEffects(
     };
   });
 
-  return { attack_id: attackId, phase: "after_damage", effects: resolved };
+  const result: RuntimeV02AttackSelfHealPhaseResult = {
+    attack_id: attackId,
+    phase: "after_damage",
+    effects: resolved,
+    emitted_packet_ids: [],
+  };
+  const packetContext = selfHealPacketContext(state, instanceOrId, sourceCreature);
+  if (packetContext) {
+    result.emitted_packet_ids = recordRuntimeV02AttackSelfHealPackets(
+      state,
+      result,
+      packetContext,
+    ).map((packet) => packet.id);
+  }
+  return result;
 }
 
 export type RuntimeV02AttackHealEachPredicate = {
