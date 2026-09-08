@@ -1,8 +1,6 @@
 import {
-  applyRuntimeV02HealPacket,
   recordRuntimeV02HealPacket,
   type RuntimeV02HealPacket,
-  type RuntimeV02HealPacketResolution,
   type RuntimeV02Seat,
 } from "./tcg-match-heal-packet-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
@@ -24,14 +22,6 @@ export type RuntimeV02AttackHealEachPacketContext = RuntimeV02AttackSelfHealPack
   friendly_reserve: Array<RuntimeCreature | null | undefined>;
 };
 
-export type RuntimeV02AttackSelectedHealPacketContext = {
-  controller_seat: RuntimeV02Seat;
-  target_creature: RuntimeCreature;
-  target_anchor_uid: string;
-  target_where: "vanguard" | "reserve";
-  target_index: number | null;
-};
-
 type BoundSource = {
   seat: RuntimeV02Seat;
   where: "vanguard" | "reserve";
@@ -43,14 +33,6 @@ type BoundSource = {
 
 type BoundReserveTarget = {
   index: number;
-  uid: string;
-  card_id: string;
-  element: string;
-};
-
-type BoundFieldTarget = {
-  where: "vanguard" | "reserve";
-  index: number | null;
   uid: string;
   card_id: string;
   element: string;
@@ -178,66 +160,6 @@ function bindReserveTarget(
   }
   const element = nonEmpty(definition.element, "tcg_v0_2_attack_heal_each_packet_target_element_required");
   return { index, uid, card_id: cardId, element };
-}
-
-function bindFriendlyFieldTarget(
-  state: Record<string, unknown>,
-  controllerSeat: RuntimeV02Seat,
-  context: RuntimeV02AttackSelectedHealPacketContext,
-): BoundFieldTarget {
-  const players = objectRecord(state.players);
-  const player = objectRecord(players?.[String(controllerSeat)]);
-  if (!player) throw new Error("tcg_v0_2_attack_selected_heal_packet_player_missing");
-  const { where, index } = location(context?.target_where, context?.target_index);
-  let fieldCreature: unknown;
-  if (where === "vanguard") {
-    fieldCreature = player.vanguard;
-  } else {
-    if (!Array.isArray(player.reserve)) {
-      throw new Error("tcg_v0_2_attack_selected_heal_packet_reserve_invalid");
-    }
-    fieldCreature = player.reserve[index!];
-  }
-  if (!fieldCreature || fieldCreature !== context.target_creature) {
-    throw new Error("tcg_v0_2_attack_selected_heal_packet_target_binding_mismatch");
-  }
-  const creature = objectRecord(fieldCreature);
-  if (!creature || !Array.isArray(creature.stack) || creature.stack.length === 0) {
-    throw new Error("tcg_v0_2_attack_selected_heal_packet_target_stack_invalid");
-  }
-  const top = objectRecord(creature.stack[creature.stack.length - 1]);
-  if (!top) throw new Error("tcg_v0_2_attack_selected_heal_packet_target_top_invalid");
-  const uid = nonEmpty(top.uid, "tcg_v0_2_attack_selected_heal_packet_target_uid_required");
-  const anchor = nonEmpty(context.target_anchor_uid, "tcg_v0_2_attack_selected_heal_packet_target_anchor_required");
-  if (uid !== anchor) {
-    throw new Error("tcg_v0_2_attack_selected_heal_packet_target_anchor_mismatch");
-  }
-  const cardId = nonEmpty(top.card_id, "tcg_v0_2_attack_selected_heal_packet_target_card_id_required");
-  const definition = runtimeV02Definition(state, { card_id: cardId });
-  if (!definition || String(definition.card_family || "") !== "Creature") {
-    throw new Error("tcg_v0_2_attack_selected_heal_packet_target_definition_invalid");
-  }
-  const element = nonEmpty(definition.element, "tcg_v0_2_attack_selected_heal_packet_target_element_required");
-  return { where, index, uid, card_id: cardId, element };
-}
-
-function assertAttackOwnedBySource(
-  state: Record<string, unknown>,
-  source: BoundSource,
-  attackId: string,
-): void {
-  const definition = runtimeV02Definition(state, { card_id: source.card_id });
-  const creature = objectRecord(definition?.creature);
-  if (!creature || !Array.isArray(creature.attacks)) {
-    throw new Error("tcg_v0_2_attack_selected_heal_packet_source_attacks_invalid");
-  }
-  const ownsAttack = creature.attacks.some((rawAttack) => {
-    const attack = objectRecord(rawAttack);
-    return attack != null && String(attack.id || "") === attackId;
-  });
-  if (!ownsAttack) {
-    throw new Error("tcg_v0_2_attack_selected_heal_packet_source_attack_mismatch");
-  }
 }
 
 /**
@@ -411,72 +333,4 @@ export function recordRuntimeV02AttackHealEachPackets(
     if (packet) packets.push(packet);
   }
   return packets;
-}
-
-/**
- * Applies one selected friendly-Creature attack heal through the canonical heal
- * packet boundary. Source authority is derived from the controller's current
- * Vanguard and checked against the pending attack id; the chosen target is
- * rebound to the exact current field object and top-card anchor before healing.
- * The underlying damage change still has one owner: healRuntimeDamage inside
- * applyRuntimeV02HealPacket. Listener dispatch remains a separate lifecycle.
- */
-export function applyRuntimeV02AttackSelectedHealPacket(
-  state: Record<string, unknown>,
-  attackIdValue: string,
-  amount: number,
-  context: RuntimeV02AttackSelectedHealPacketContext,
-): RuntimeV02HealPacketResolution {
-  const attackId = nonEmpty(
-    attackIdValue,
-    "tcg_v0_2_attack_selected_heal_packet_attack_id_required",
-  );
-  const controllerSeat = seat(context?.controller_seat);
-  const players = objectRecord(state.players);
-  const player = objectRecord(players?.[String(controllerSeat)]);
-  if (!player) throw new Error("tcg_v0_2_attack_selected_heal_packet_player_missing");
-  const sourceCreatureRecord = objectRecord(player.vanguard);
-  if (!sourceCreatureRecord || !Array.isArray(sourceCreatureRecord.stack) || sourceCreatureRecord.stack.length === 0) {
-    throw new Error("tcg_v0_2_attack_selected_heal_packet_source_vanguard_required");
-  }
-  const sourceTop = objectRecord(sourceCreatureRecord.stack[sourceCreatureRecord.stack.length - 1]);
-  if (!sourceTop) throw new Error("tcg_v0_2_attack_selected_heal_packet_source_top_invalid");
-  const source = bindSource(state, {
-    controller_seat: controllerSeat,
-    source_instance: {
-      uid: nonEmpty(sourceTop.uid, "tcg_v0_2_attack_selected_heal_packet_source_uid_required"),
-      card_id: nonEmpty(sourceTop.card_id, "tcg_v0_2_attack_selected_heal_packet_source_card_id_required"),
-    },
-    source_creature: player.vanguard as RuntimeCreature,
-    source_where: "vanguard",
-    source_index: null,
-  });
-  assertAttackOwnedBySource(state, source, attackId);
-  const target = bindFriendlyFieldTarget(state, controllerSeat, context);
-
-  return applyRuntimeV02HealPacket(
-    state,
-    context.target_creature,
-    amount,
-    {
-      source: {
-        controller_seat: source.seat,
-        action_kind: "attack",
-        action_id: attackId,
-        card_effect: true,
-        card_uid: source.uid,
-        card_id: source.card_id,
-        creature_uid: source.uid,
-      },
-      target: {
-        controller_seat: source.seat,
-        creature_uid: target.uid,
-        card_uid: target.uid,
-        card_id: target.card_id,
-        element: target.element,
-        where: target.where,
-        index: target.index,
-      },
-    },
-  );
 }
