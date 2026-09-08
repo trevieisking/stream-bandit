@@ -46,7 +46,7 @@ test('selected-heal packet authority is generic and contains no Set One card ide
 });
 
 test('match action supplies canonical state and audits packet ids without becoming a packet owner', () => {
-  assert.ok(matchSource.includes('runtimeV02ResolveSelectedHealChoice(pending,seat as 1|2,String(body.choice_id||""),ids,friendlyFieldEntries(p,s),s)'));
+  assert.ok(matchSource.includes('runtimeV02ResolveSelectedHealChoice(selectedPending,seat as 1|2,String(body.choice_id||""),ids,friendlyFieldEntries(p,s),s)'));
   assert.ok(matchSource.includes('emitted_packet_ids:resolved.emitted_packet_ids'));
   assert.ok(!matchSource.includes('applyRuntimeV02AttackSelectedHealPacket'));
   assert.ok(!matchSource.includes('applyRuntimeV02HealPacket'));
