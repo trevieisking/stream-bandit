@@ -4,7 +4,7 @@ import fs from 'node:fs';
 
 const matchSource = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
 const choiceSource = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-choice-v0-2.ts', 'utf8');
-const adapterSource = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-heal-packet-v0-2.ts', 'utf8');
+const adapterSource = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-selected-heal-packet-v0-2.ts', 'utf8');
 const healPacketSource = fs.readFileSync('supabase/functions/_shared/tcg-match-heal-packet-v0-2.ts', 'utf8');
 
 function assertInOrder(source, needles, message) {
@@ -26,12 +26,12 @@ test('live selected-heal choice delegates to the canonical apply-and-record heal
 });
 
 test('selected-heal packet source and target are rebound from canonical battlefield authority before healing', () => {
-  assert.ok(adapterSource.includes('const sourceCreatureRecord = objectRecord(player.vanguard);'));
+  assert.ok(adapterSource.includes('const sourceCreature = objectRecord(player.vanguard);'));
   assert.ok(adapterSource.includes('assertAttackOwnedBySource(state, source, attackId);'));
   assert.ok(adapterSource.includes('fieldCreature !== context.target_creature'));
   assert.ok(adapterSource.includes('uid !== anchor'));
   assertInOrder(adapterSource, [
-    'const source = bindSource(state, {',
+    'const source = bindSource(state, controllerSeat);',
     'assertAttackOwnedBySource(state, source, attackId);',
     'const target = bindFriendlyFieldTarget(state, controllerSeat, context);',
     'return applyRuntimeV02HealPacket(',
