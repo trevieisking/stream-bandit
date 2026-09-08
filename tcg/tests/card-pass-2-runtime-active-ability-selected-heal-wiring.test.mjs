@@ -119,8 +119,8 @@ test('live match owner routes Reward and selected-heal active Abilities through 
   assert.ok(match.includes('active_ability_requires_runtime_owner'));
 });
 
-test('Myceliarch attack blocker remains intact because its separate discard-recycle attack choice is not part of Networked Growth live wiring', () => {
-  assert.ok(match.includes('||ad?.id==="grove-myceliarch"'));
+test('Networked Growth stays on its existing Ability facade while Mycelial Bloom uses a separate exact attack-only gate', () => {
+  assert.ok(match.includes('ad?.id==="grove-myceliarch"&&(slot!==2||structuredDiscardRecycleChoice==null)'));
   assert.ok(match.includes('attack_effect_requires_pending_choice_engine'));
   assert.equal(owner.includes('SELECT_CARDS'), false);
   assert.equal(owner.includes('MOVE_CARDS'), false);
