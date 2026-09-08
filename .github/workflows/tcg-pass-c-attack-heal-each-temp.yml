@@ -1,0 +1,84 @@
+name: TCG Pass C Attack HEAL_EACH Temporary
+
+on:
+  push:
+    branches:
+      - feature/tcg-private-alpha-v0-5-source-recovery
+    paths:
+      - .github/workflows/tcg-pass-c-attack-heal-each-temp.yml
+
+permissions:
+  contents: write
+
+jobs:
+  pass-c-attack-heal-each:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_SHA: db48f58fc004691cd0fd39f089d650998203b5cc
+      BRANCH: feature/tcg-private-alpha-v0-5-source-recovery
+    steps:
+      - name: Check out exact branch head
+        uses: actions/checkout@v4
+        with:
+          ref: feature/tcg-private-alpha-v0-5-source-recovery
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Guard exact staging chain
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD~2)" = "$BASE_SHA"
+          mapfile -t changed < <(git diff --name-only "$BASE_SHA"..HEAD | sort)
+          expected=(
+            .github/scripts/tcg-pass-c-attack-heal-each-patch.py
+            .github/workflows/tcg-pass-c-attack-heal-each-temp.yml
+          )
+          test "${#changed[@]}" -eq "${#expected[@]}"
+          diff -u <(printf '%s\n' "${expected[@]}" | sort) <(printf '%s\n' "${changed[@]}")
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Apply bounded Canopy Crash HEAL_EACH slice
+        run: python .github/scripts/tcg-pass-c-attack-heal-each-patch.py
+
+      - name: Run full TCG proof before commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-*.test.ts
+          deno check supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts
+          deno check supabase/functions/tcg-match-actions/index.ts
+          node --test tcg/tests/card-pass-2-*.test.mjs
+
+      - name: Freeze exact permanent file set and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/scripts/tcg-pass-c-attack-heal-each-patch.py
+          git rm .github/workflows/tcg-pass-c-attack-heal-each-temp.yml
+          git add \
+            supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts \
+            supabase/functions/tcg-match-actions/index.ts \
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-heal-each-effects.test.ts \
+            tcg/tests/card-pass-2-runtime-attack-heal-each-wiring.test.mjs
+          git config user.name "Stream Bandit TCG Guard"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -m "TCG: structure Canopy Crash Reserve healing"
+          mapfile -t net < <(git diff --name-only "$BASE_SHA"..HEAD | sort)
+          expected=(
+            supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts
+            supabase/functions/tcg-match-actions/index.ts
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-heal-each-effects.test.ts
+            tcg/tests/card-pass-2-runtime-attack-heal-each-wiring.test.mjs
+          )
+          test "${#net[@]}" -eq "${#expected[@]}"
+          diff -u <(printf '%s\n' "${expected[@]}" | sort) <(printf '%s\n' "${net[@]}")
+          git diff --check "$BASE_SHA"..HEAD
+          test -z "$(git status --porcelain)"
+          git push origin "HEAD:$BRANCH"
