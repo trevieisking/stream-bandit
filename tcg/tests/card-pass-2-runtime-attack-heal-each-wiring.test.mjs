@@ -42,7 +42,7 @@ test('legacy Canopy Crash English is gated and structured ownership is auditable
   );
 });
 
-test('HEAL_EACH owner is deliberately narrow and keeps heal listeners for a later pass', () => {
+test('HEAL_EACH owner stays narrow while packet recording remains separate from listener dispatch', () => {
   assert.ok(effectSource.includes('String(item.op || "") === "HEAL_EACH"'));
   assert.ok(effectSource.includes('["op", "controller", "zone", "filters", "amount"]'));
   assert.ok(effectSource.includes('String(heal.controller || "") !== "self"'));
@@ -51,7 +51,8 @@ test('HEAL_EACH owner is deliberately narrow and keeps heal listeners for a late
   assert.ok(effectSource.includes('String(filters.card_family || "") !== "Creature"'));
   assert.ok(effectSource.includes('const conditionMet = occupied.length >= step.when.count;'));
   assert.ok(effectSource.includes('reserve_index: reserveIndex'));
-  assert.ok(effectSource.includes('after_heal_packet listeners remain a separate later runtime pass'));
+  assert.ok(effectSource.includes('slice records one canonical after_heal_packet ID per Creature that actually'));
+  assert.ok(effectSource.includes('listener dispatch remains a separate deterministic lifecycle pass'));
 });
 
 test('frozen Set One has exactly one attack-owned Canopy Crash HEAL_EACH program', () => {
@@ -76,7 +77,7 @@ test('Deep Current selected-target heal stays outside this deterministic owner',
   assert.ok(tideSource.includes('"id":"deep-current","name":"Deep Current"'));
   assert.ok(tideSource.includes('"after_damage":[{"op":"SELECT_CREATURE","controller":"self","zone":"field","count":1,"filters":{"damaged":true},"as":"heal_target"},{"op":"HEAL","target":"$heal_target","amount":30}]'));
   assert.ok(
-  matchSource.includes('if(structuredSelectedHealChoice==null&&ad?.id==="tide-tideroar"&&ef.includes("heal 30 from one friendly creature"))'),
-  'Deep Current fallback should now be gated by its own structured selected-heal owner',
-);
+    matchSource.includes('if(structuredSelectedHealChoice==null&&ad?.id==="tide-tideroar"&&ef.includes("heal 30 from one friendly creature"))'),
+    'Deep Current fallback should now be gated by its own structured selected-heal owner',
+  );
 });
