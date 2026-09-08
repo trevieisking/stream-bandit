@@ -37,6 +37,24 @@ function card(uid: string, cardId: string) {
   return { uid, card_id: cardId };
 }
 
+function snapshotDefinition(id: string, name: string, cardFamily: string) {
+  return {
+    schema: "sb-tcg-card-v0.2",
+    effect_schema: "sb-tcg-effects-v0.2",
+    id,
+    name,
+    card_family: cardFamily,
+  };
+}
+
+function snapshotRow(definition: Record<string, unknown>) {
+  return {
+    card_id: definition.id,
+    definition_v0_2: definition,
+    definition_v0_2_rules_version: "sb-tcg-card-v0.2",
+  };
+}
+
 function stateWith(afterDamage: unknown[], deck = [card("alpha-1", "alpha"), card("beta-1", "beta"), card("gamma-1", "gamma")]) {
   const sourceCardId = "test-dream-ray-creature";
   return {
@@ -58,33 +76,25 @@ function stateWith(afterDamage: unknown[], deck = [card("alpha-1", "alpha"), car
       },
     },
     card_index: {
-      [sourceCardId]: {
-        card_id: sourceCardId,
-        definition_v0_2: {
-          schema: "sb-tcg-card-v0.2",
-          effect_schema: "sb-tcg-effects-v0.2",
-          id: sourceCardId,
-          name: "Test Dreamer",
-          card_family: "Creature",
-          creature: {
-            attacks: [{
-              id: "dream-ray-test",
-              name: "Dream Ray Test",
-              cost: [{ element: "Astral", amount: 2 }],
-              base_damage: 80,
-              damage_formula: null,
-              requirements: [],
-              on_declare: [],
-              before_damage: [],
-              after_damage: afterDamage,
-            }],
-          },
+      [sourceCardId]: snapshotRow({
+        ...snapshotDefinition(sourceCardId, "Test Dreamer", "Creature"),
+        creature: {
+          attacks: [{
+            id: "dream-ray-test",
+            name: "Dream Ray Test",
+            cost: [{ element: "Astral", amount: 2 }],
+            base_damage: 80,
+            damage_formula: null,
+            requirements: [],
+            on_declare: [],
+            before_damage: [],
+            after_damage: afterDamage,
+          }],
         },
-        definition_v0_2_rules_version: "sb-tcg-card-v0.2",
-      },
-      alpha: { definition_v0_2: { id: "alpha", name: "Alpha", card_family: "Tactic" } },
-      beta: { definition_v0_2: { id: "beta", name: "Beta", card_family: "Essence" } },
-      gamma: { definition_v0_2: { id: "gamma", name: "Gamma", card_family: "Creature" } },
+      }),
+      alpha: snapshotRow(snapshotDefinition("alpha", "Alpha", "Tactic")),
+      beta: snapshotRow(snapshotDefinition("beta", "Beta", "Essence")),
+      gamma: snapshotRow(snapshotDefinition("gamma", "Gamma", "Creature")),
     },
   } as Record<string, unknown>;
 }
