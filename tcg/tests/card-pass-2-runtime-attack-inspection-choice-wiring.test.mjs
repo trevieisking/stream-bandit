@@ -65,7 +65,7 @@ test('Nebulynx blocker is narrowed to Starfall Path slot 2 while malformed struc
   assert.ok(match.includes('runtimeV02ResolveAttackInspectionChoice'));
   assert.ok(match.includes('ad?.id==="astral-nebulynx"&&slot===2&&structuredInspectionChoice==null'));
   assert.equal(match.includes('||ad?.id==="astral-nebulynx"||'), false, 'whole-card Nebulynx blocker must be removed');
-  assert.ok(match.includes('||ad?.id==="grove-myceliarch"'));
+  assert.ok(match.includes('ad?.id==="grove-myceliarch"&&(slot!==2||structuredDiscardRecycleChoice==null)'));
 });
 
 test('inspection pending choice pauses after damage and before defeat scanning through the existing private viewer', () => {
@@ -116,5 +116,5 @@ test('existing private Reward viewer remains the player-view exposure boundary',
 });
 
 test('inspection choice refuses to overlap other post-damage private/heal continuations', () => {
-  assert.ok(match.includes('if(structuredInspectionChoice&&(structuredTopDeckCardChoice||pendingSelectedHeal||structuredHealPacketIds.length))throw new Error("tcg_v0_2_attack_inspection_choice_order_unsupported")'));
+  assert.ok(match.includes('if(structuredInspectionChoice&&(structuredDiscardRecycleChoice||structuredTopDeckCardChoice||pendingSelectedHeal||structuredHealPacketIds.length))throw new Error("tcg_v0_2_attack_inspection_choice_order_unsupported")'));
 });
