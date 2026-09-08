@@ -509,3 +509,186 @@ export function structuredRuntimeAfterDamageSelfHealEffects(
 
   return { attack_id: attackId, phase: "after_damage", effects: resolved };
 }
+
+export type RuntimeV02AttackHealEachPredicate = {
+  predicate: "reserve_count_at_least";
+  controller: "self";
+  count: number;
+};
+
+export type RuntimeV02AttackHealEachTargetResult = {
+  reserve_index: number;
+  actual_heal: number;
+};
+
+export type RuntimeV02AttackHealEachEffectResult = {
+  when: RuntimeV02AttackHealEachPredicate;
+  controller: "self";
+  zone: "reserve";
+  filters: { card_family: "Creature" };
+  amount: number;
+  condition_met: boolean;
+  target_count: number;
+  actual_heal_total: number;
+  targets: RuntimeV02AttackHealEachTargetResult[];
+};
+
+export type RuntimeV02AttackHealEachPhaseResult = {
+  attack_id: string;
+  phase: "after_damage";
+  effects: RuntimeV02AttackHealEachEffectResult[];
+};
+
+function healEachCandidate(step: Record<string, unknown>): boolean {
+  if (String(step.op || "") !== "IF") return false;
+  const then = step.then;
+  if (!Array.isArray(then) || then.length === 0) return false;
+  return then.every((raw) => {
+    const item = objectRecord(raw);
+    return item != null && String(item.op || "") === "HEAL_EACH";
+  });
+}
+
+function healEachPredicate(
+  raw: unknown,
+  attackId: string,
+  index: number,
+): RuntimeV02AttackHealEachPredicate {
+  const when = objectRecord(raw);
+  if (!when) throw new Error(`tcg_v0_2_attack_heal_each_predicate_invalid:${attackId}:${index}`);
+  rejectUnsupportedFields(
+    when,
+    ["predicate", "controller", "count"],
+    `tcg_v0_2_attack_heal_each_predicate_field_unsupported:${attackId}:${index}`,
+  );
+  if (String(when.predicate || "") !== "reserve_count_at_least") {
+    throw new Error(`tcg_v0_2_attack_heal_each_predicate_unsupported:${attackId}:${index}:${String(when.predicate || "")}`);
+  }
+  if (String(when.controller || "") !== "self") {
+    throw new Error(`tcg_v0_2_attack_heal_each_predicate_controller_unsupported:${attackId}:${index}`);
+  }
+  const count = Number(when.count);
+  if (!Number.isInteger(count) || count <= 0) {
+    throw new Error(`tcg_v0_2_attack_heal_each_count_invalid:${attackId}:${index}`);
+  }
+  return { predicate: "reserve_count_at_least", controller: "self", count };
+}
+
+/**
+ * Owns only deterministic structured v0.2 attack after-damage programs made
+ * entirely from IF reserve_count_at_least(self) -> HEAL_EACH self Reserve
+ * Creature steps.
+ *
+ * Selected-target healing, other zones/filters and mixed programs deliberately
+ * remain on compatibility/choice authority. Every packet delegates to the same
+ * healRuntimeDamage primitive used by Tactics and self-healing attacks.
+ * after_heal_packet listeners remain a separate later runtime pass.
+ */
+export function structuredRuntimeAfterDamageHealEachEffects(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown } | null | undefined,
+  attackSlot: number,
+  friendlyReserve: Array<RuntimeCreature | null | undefined>,
+): RuntimeV02AttackHealEachPhaseResult | null {
+  const definition = runtimeV02Definition(state, instanceOrId);
+  if (!definition) return null;
+  if (String(definition.card_family || "") !== "Creature") {
+    throw new Error("tcg_v0_2_attack_heal_each_requires_creature");
+  }
+  if (!Array.isArray(friendlyReserve)) {
+    throw new Error("tcg_v0_2_attack_heal_each_reserve_required");
+  }
+
+  const creature = objectRecord(definition.creature);
+  if (!creature) throw new Error("tcg_v0_2_attack_heal_each_creature_required");
+  const attacks = creature.attacks;
+  if (!Array.isArray(attacks)) throw new Error("tcg_v0_2_attack_heal_each_attacks_required");
+  if (!Number.isInteger(attackSlot) || attackSlot < 1 || attackSlot > attacks.length) {
+    throw new Error("tcg_v0_2_attack_heal_each_slot_invalid");
+  }
+
+  const attack = objectRecord(attacks[attackSlot - 1]);
+  if (!attack) throw new Error("tcg_v0_2_attack_heal_each_attack_invalid");
+  const attackId = typeof attack.id === "string" ? attack.id.trim() : "";
+  if (!attackId) throw new Error("tcg_v0_2_attack_heal_each_attack_id_required");
+  if (!Array.isArray(attack.after_damage)) {
+    throw new Error(`tcg_v0_2_attack_heal_each_after_damage_required:${attackId}`);
+  }
+  if (attack.after_damage.length === 0) return null;
+
+  const normalized = attack.after_damage.map((rawStep, index) => {
+    const step = objectRecord(rawStep);
+    if (!step) throw new Error(`tcg_v0_2_attack_heal_each_step_invalid:${attackId}:${index}`);
+    if (!healEachCandidate(step)) return null;
+    rejectUnsupportedFields(
+      step,
+      ["op", "when", "then"],
+      `tcg_v0_2_attack_heal_each_step_field_unsupported:${attackId}:${index}`,
+    );
+    const then = step.then as unknown[];
+    if (then.length !== 1) {
+      throw new Error(`tcg_v0_2_attack_heal_each_then_count_unsupported:${attackId}:${index}`);
+    }
+    const heal = objectRecord(then[0]);
+    if (!heal) throw new Error(`tcg_v0_2_attack_heal_each_heal_step_invalid:${attackId}:${index}`);
+    rejectUnsupportedFields(
+      heal,
+      ["op", "controller", "zone", "filters", "amount"],
+      `tcg_v0_2_attack_heal_each_heal_field_unsupported:${attackId}:${index}`,
+    );
+    if (String(heal.controller || "") !== "self") {
+      throw new Error(`tcg_v0_2_attack_heal_each_controller_unsupported:${attackId}:${index}`);
+    }
+    if (String(heal.zone || "") !== "reserve") {
+      throw new Error(`tcg_v0_2_attack_heal_each_zone_unsupported:${attackId}:${index}`);
+    }
+    const filters = objectRecord(heal.filters);
+    if (!filters) throw new Error(`tcg_v0_2_attack_heal_each_filters_required:${attackId}:${index}`);
+    rejectUnsupportedFields(
+      filters,
+      ["card_family"],
+      `tcg_v0_2_attack_heal_each_filter_field_unsupported:${attackId}:${index}`,
+    );
+    if (String(filters.card_family || "") !== "Creature") {
+      throw new Error(`tcg_v0_2_attack_heal_each_card_family_unsupported:${attackId}:${index}`);
+    }
+    const amount = Number(heal.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new Error(`tcg_v0_2_attack_heal_each_amount_invalid:${attackId}:${index}`);
+    }
+    return {
+      when: healEachPredicate(step.when, attackId, index),
+      amount,
+    };
+  });
+
+  if (normalized.some((step) => step == null)) return null;
+
+  const occupied = friendlyReserve
+    .map((target, reserveIndex) => ({ target, reserveIndex }))
+    .filter((entry): entry is { target: RuntimeCreature; reserveIndex: number } => entry.target != null);
+
+  const effects = normalized.map((raw) => {
+    const step = raw!;
+    const conditionMet = occupied.length >= step.when.count;
+    const targets = conditionMet
+      ? occupied.map(({ target, reserveIndex }) => ({
+        reserve_index: reserveIndex,
+        actual_heal: healRuntimeDamage(target, step.amount),
+      }))
+      : [];
+    return {
+      when: step.when,
+      controller: "self" as const,
+      zone: "reserve" as const,
+      filters: { card_family: "Creature" as const },
+      amount: step.amount,
+      condition_met: conditionMet,
+      target_count: targets.length,
+      actual_heal_total: targets.reduce((sum, target) => sum + target.actual_heal, 0),
+      targets,
+    };
+  });
+
+  return { attack_id: attackId, phase: "after_damage", effects };
+}
