@@ -183,7 +183,7 @@ export function runtimeV02CurrentTurnActiveAbilityUseCount(
     .reduce((sum, entry) => sum + entry.count, 0);
 }
 
-function recordActiveAbilityUse(
+export function runtimeV02RecordActiveAbilityUse(
   state: Record<string, unknown>,
   controllerSeat: 1 | 2,
   abilityId: string,
@@ -321,7 +321,7 @@ export function runtimeV02CreateActiveAbilityRewardChoice(
     anchor_card_id: card.card_id,
   }));
 
-  recordActiveAbilityUse(state, controller, descriptor.ability_id);
+  runtimeV02RecordActiveAbilityUse(state, controller, descriptor.ability_id);
   return {
     id: choiceId,
     seat: controller,
