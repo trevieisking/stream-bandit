@@ -1,0 +1,86 @@
+name: TCG Pass C Attack Selected Heal Temporary
+
+on:
+  push:
+    branches:
+      - feature/tcg-private-alpha-v0-5-source-recovery
+    paths:
+      - .github/workflows/tcg-pass-c-attack-selected-heal-temp.yml
+
+permissions:
+  contents: write
+
+jobs:
+  pass-c-attack-selected-heal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_SHA: c693095101872f8d5e347b9371c68119d5f5defe
+      BRANCH: feature/tcg-private-alpha-v0-5-source-recovery
+    steps:
+      - name: Check out exact branch head
+        uses: actions/checkout@v4
+        with:
+          ref: feature/tcg-private-alpha-v0-5-source-recovery
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Guard exact staging net
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git diff --name-only "$BASE_SHA"..HEAD | sort)
+          expected=(
+            .github/scripts/tcg-pass-c-attack-selected-heal-patch.py
+            .github/workflows/tcg-pass-c-attack-selected-heal-temp.yml
+          )
+          test "${#changed[@]}" -eq "${#expected[@]}"
+          diff -u <(printf '%s\n' "${expected[@]}" | sort) <(printf '%s\n' "${changed[@]}")
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Apply bounded Deep Current selected-heal slice
+        run: python .github/scripts/tcg-pass-c-attack-selected-heal-patch.py
+
+      - name: Run full TCG proof before commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-*.test.ts
+          deno check supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts
+          deno check supabase/functions/_shared/tcg-match-attack-choice-v0-2.ts
+          deno check supabase/functions/tcg-match-actions/index.ts
+          node --test tcg/tests/card-pass-2-*.test.mjs
+
+      - name: Freeze exact permanent file set and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/scripts/tcg-pass-c-attack-selected-heal-patch.py
+          git rm .github/workflows/tcg-pass-c-attack-selected-heal-temp.yml
+          git add \
+            supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts \
+            supabase/functions/_shared/tcg-match-attack-choice-v0-2.ts \
+            supabase/functions/tcg-match-actions/index.ts \
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-selected-heal-choice.test.ts \
+            tcg/tests/card-pass-2-runtime-attack-selected-heal-wiring.test.mjs
+          git config user.name "Stream Bandit TCG Guard"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -m "TCG: structure Deep Current selected healing"
+          mapfile -t net < <(git diff --name-only "$BASE_SHA"..HEAD | sort)
+          expected=(
+            supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts
+            supabase/functions/_shared/tcg-match-attack-choice-v0-2.ts
+            supabase/functions/tcg-match-actions/index.ts
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-selected-heal-choice.test.ts
+            tcg/tests/card-pass-2-runtime-attack-selected-heal-wiring.test.mjs
+          )
+          test "${#net[@]}" -eq "${#expected[@]}"
+          diff -u <(printf '%s\n' "${expected[@]}" | sort) <(printf '%s\n' "${net[@]}")
+          git diff --check "$BASE_SHA"..HEAD
+          test -z "$(git status --porcelain)"
+          git push origin "HEAD:$BRANCH"
