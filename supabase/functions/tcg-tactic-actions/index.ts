@@ -1,7 +1,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { recordRuntimeV02EssenceMovement } from "../_shared/tcg-match-essence-movement-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
-import { clearRuntimeCondition, hasRuntimeCondition, runtimeConditions } from "./runtime-v0-2-core.ts";
+import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, runtimeConditions } from "./runtime-v0-2-core.ts";
 
 const VERSION = "Stream Bandit TCG tactic actions v0.3";
 const EFFECT_SCHEMA = "sb-tcg-effects-v0.1";
@@ -144,9 +144,6 @@ function clearCondition(cr: Cr, condition: string) {
 function clearOrdinaryConditions(cr: Cr) {
   cr.conditions = { scorched: false, venomed: 0, control: null, modifier: null };
   cr.condition = null;
-}
-function addShield(cr: Cr, amount: number) {
-  cr.shield = Math.min(60, Math.max(0, Number(cr.shield || 0) + Math.max(0, amount)));
 }
 function heal(cr: Cr, amount: number) {
   cr.damage = Math.max(0, Number(cr.damage || 0) - Math.max(0, amount));
@@ -671,7 +668,7 @@ function executeUntilChoice(state: any) {
       const found = findCreature(state, ref);
       if (found) {
         if (op === "HEAL") heal(found.cr, Number(step.amount || 0));
-        else if (op === "ADD_SHIELD") addShield(found.cr, Number(step.amount || 0));
+        else if (op === "ADD_SHIELD") addRuntimeShield(found.cr, Number(step.amount || 0));
         else clearCondition(found.cr, String(step.condition || ""));
       }
       effect.cursor++;

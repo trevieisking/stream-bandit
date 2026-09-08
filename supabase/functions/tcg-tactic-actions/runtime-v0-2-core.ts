@@ -168,6 +168,19 @@ export function placeRuntimeDamage(creature: RuntimeCreature, amount: number): n
   return placed;
 }
 
+export function addRuntimeShield(
+  creature: RuntimeCreature,
+  amount: number,
+  shieldCap = 60,
+): number {
+  const previous = Number(creature.shield || 0);
+  const increment = Math.max(0, Number(amount || 0));
+  const cap = Math.max(0, Number(shieldCap || 0));
+  const next = Math.min(cap, Math.max(0, previous + increment));
+  creature.shield = next;
+  return Math.max(0, next - Math.max(0, previous));
+}
+
 export function moveRuntimeDamage(
   source: RuntimeCreature,
   destination: RuntimeCreature,

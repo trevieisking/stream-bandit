@@ -1,4 +1,5 @@
 import {
+  addRuntimeShield,
   applyRuntimeCondition,
   placeRuntimeDamage,
   type ApplyConditionMode,
@@ -257,4 +258,93 @@ export function structuredRuntimeAfterDamageRecoilEffects(
   });
 
   return { attack_id: attackId, phase: "after_damage", effects };
+}
+
+export type RuntimeV02AttackShieldEffectResult = {
+  target: "$source_creature";
+  amount: number;
+  actual_gain: number;
+  shield_cap: 60;
+};
+
+export type RuntimeV02AttackShieldPhaseResult = {
+  attack_id: string;
+  phase: "after_damage";
+  effects: RuntimeV02AttackShieldEffectResult[];
+};
+
+/**
+ * Owns only structured v0.2 attack after-damage programs made entirely from
+ * ADD_SHIELD instructions aimed at the source creature.
+ *
+ * Shield addition itself is delegated to addRuntimeShield so Tactic, legacy
+ * match actions and structured attacks share the same 60-Shield cap owner.
+ * shield_gained listeners remain a separate later runtime pass; this slice
+ * preserves the current state transition without claiming listener parity.
+ *
+ * Mixed programs deliberately return null so compatibility authority remains
+ * whole rather than partially executing a structured list.
+ */
+export function structuredRuntimeAfterDamageShieldEffects(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown } | null | undefined,
+  attackSlot: number,
+  sourceCreature: RuntimeCreature,
+): RuntimeV02AttackShieldPhaseResult | null {
+  const definition = runtimeV02Definition(state, instanceOrId);
+  if (!definition) return null;
+  if (String(definition.card_family || "") !== "Creature") {
+    throw new Error("tcg_v0_2_attack_shield_requires_creature");
+  }
+
+  const creature = objectRecord(definition.creature);
+  if (!creature) throw new Error("tcg_v0_2_attack_shield_creature_required");
+  const attacks = creature.attacks;
+  if (!Array.isArray(attacks)) throw new Error("tcg_v0_2_attack_shield_attacks_required");
+  if (!Number.isInteger(attackSlot) || attackSlot < 1 || attackSlot > attacks.length) {
+    throw new Error("tcg_v0_2_attack_shield_slot_invalid");
+  }
+
+  const attack = objectRecord(attacks[attackSlot - 1]);
+  if (!attack) throw new Error("tcg_v0_2_attack_shield_attack_invalid");
+  const attackId = typeof attack.id === "string" ? attack.id.trim() : "";
+  if (!attackId) throw new Error("tcg_v0_2_attack_shield_attack_id_required");
+  if (!Array.isArray(attack.after_damage)) {
+    throw new Error(`tcg_v0_2_attack_shield_after_damage_required:${attackId}`);
+  }
+  if (attack.after_damage.length === 0) return null;
+
+  const normalized = attack.after_damage.map((rawStep, index) => {
+    const step = objectRecord(rawStep);
+    if (!step) throw new Error(`tcg_v0_2_attack_shield_step_invalid:${attackId}:${index}`);
+    if (String(step.op || "") !== "ADD_SHIELD") return null;
+    rejectUnsupportedFields(
+      step,
+      ["op", "target", "amount"],
+      `tcg_v0_2_attack_shield_step_field_unsupported:${attackId}:${index}`,
+    );
+    if (String(step.target || "") !== "$source_creature") {
+      throw new Error(`tcg_v0_2_attack_shield_target_unsupported:${attackId}:${index}`);
+    }
+    const amount = Number(step.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new Error(`tcg_v0_2_attack_shield_amount_invalid:${attackId}:${index}`);
+    }
+    return { amount };
+  });
+
+  if (normalized.some((step) => step == null)) return null;
+
+  const resolved = normalized.map((raw) => {
+    const step = raw!;
+    const actualGain = addRuntimeShield(sourceCreature, step.amount);
+    return {
+      target: "$source_creature" as const,
+      amount: step.amount,
+      actual_gain: actualGain,
+      shield_cap: 60 as const,
+    };
+  });
+
+  return { attack_id: attackId, phase: "after_damage", effects: resolved };
 }
