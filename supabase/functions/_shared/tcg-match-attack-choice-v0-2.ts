@@ -18,6 +18,16 @@ export type RuntimeV02AttackSelectedHealChoiceOption = {
   index: number | null;
 };
 
+export type RuntimeV02PrivateAttackChoiceViewable = {
+  id: string;
+  seat: 1 | 2;
+  kind: string;
+  prompt: string;
+  min: number;
+  max: number;
+  options: Array<{ id: string; label: string }>;
+};
+
 export type RuntimeV02PendingAttackChoice = {
   id: string;
   seat: 1 | 2;
@@ -96,7 +106,7 @@ export function runtimeV02CreateSelectedHealChoice(
 }
 
 export function runtimeV02PendingAttackChoiceView(
-  choice: RuntimeV02PendingAttackChoice | null | undefined,
+  choice: RuntimeV02PrivateAttackChoiceViewable | null | undefined,
   viewerSeat: 1 | 2,
 ) {
   if (!choice) return null;
