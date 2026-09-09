@@ -31,7 +31,7 @@ function assertInOrder(source, needles, message) {
   let cursor = -1;
   for (const needle of needles) {
     const next = source.indexOf(needle, cursor + 1);
-    assert.notEqual(next, -1, `${message}: missing ${needle}`);
+    assert.notEqual(next, -1, `missing ${needle}`);
     assert.ok(next > cursor, `${message}: out of order ${needle}`);
     cursor = next;
   }
@@ -65,7 +65,8 @@ test('Nebulynx blocker is narrowed to Starfall Path slot 2 while malformed struc
   assert.ok(match.includes('runtimeV02ResolveAttackInspectionChoice'));
   assert.ok(match.includes('ad?.id==="astral-nebulynx"&&slot===2&&structuredInspectionChoice==null'));
   assert.equal(match.includes('||ad?.id==="astral-nebulynx"||'), false, 'whole-card Nebulynx blocker must be removed');
-  assert.ok(match.includes('ad?.id==="grove-myceliarch"&&(slot!==2||structuredDiscardRecycleChoice==null)'));
+  assert.ok(match.includes('ad?.id==="grove-myceliarch"&&slot===2&&structuredDiscardRecycleChoice==null'));
+  assert.equal(match.includes('ad?.id==="grove-myceliarch"&&(slot!==2||structuredDiscardRecycleChoice==null)'), false, 'inspection regression must not restore the old Colony Pulse blocker');
 });
 
 test('inspection pending choice pauses after damage and before defeat scanning through the existing private viewer', () => {
