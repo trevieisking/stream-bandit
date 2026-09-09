@@ -6,6 +6,7 @@ const matchSource = fs.readFileSync('supabase/functions/tcg-match-actions/index.
 const tacticSource = fs.readFileSync('supabase/functions/tcg-tactic-actions/index.ts', 'utf8');
 const coreSource = fs.readFileSync('supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts', 'utf8');
 const effectSource = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts', 'utf8');
+const healPacketSource = fs.readFileSync('supabase/functions/_shared/tcg-match-heal-packet-v0-2.ts', 'utf8');
 
 function assertInOrder(needles, message) {
   let cursor = -1;
@@ -43,7 +44,9 @@ test('healing has one shared primitive across match, tactic and structured attac
   assert.equal(matchSource.includes('function heal('), false, 'match local healing owner survived');
   assert.equal(tacticSource.includes('function heal('), false, 'tactic local healing owner survived');
   assert.ok(matchSource.includes('healRuntimeDamage('), 'match engine is not using shared healing primitive');
-  assert.ok(tacticSource.includes('healRuntimeDamage(found.cr, Number(step.amount || 0))'), 'tactic HEAL is not using shared primitive');
+  assert.ok(tacticSource.includes('healRuntimeDamage(found.cr, amount)'), 'legacy tactic heal fallback is not using shared primitive');
+  assert.ok(tacticSource.includes('applyRuntimeV02HealPacket(state, found.cr, amount'), 'v0.2 tactic heal is not using canonical packet owner');
+  assert.ok(healPacketSource.includes('healRuntimeDamage(targetCreature, requested)'), 'canonical heal-packet owner bypasses shared primitive');
   assert.ok(effectSource.includes('healRuntimeDamage(sourceCreature, step.amount)'), 'structured self-heal bypasses shared primitive');
 });
 
