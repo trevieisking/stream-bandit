@@ -1,8 +1,10 @@
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
 import {
   runtimeV02BeginAttackHealListenerContinuation,
+  runtimeV02BeginTacticHealListenerContinuation,
   runtimeV02PendingHealListenerChoiceView,
   runtimeV02ResolveAttackHealListenerChoice,
+  runtimeV02ResolveTacticHealListenerChoice,
   type RuntimeV02PendingHealListenerChoice,
 } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
 import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
@@ -172,6 +174,31 @@ function attackHeal(state: Record<string, unknown>, reserveIndex: number) {
   }).packet!;
 }
 
+function tacticHeal(state: Record<string, unknown>, reserveIndex: number) {
+  const player = (state.players as any)["1"];
+  const target = player.reserve[reserveIndex];
+  return applyRuntimeV02HealPacket(state, target, 10, {
+    source: {
+      controller_seat: 1,
+      action_kind: "tactic",
+      action_id: "effect-instance-1",
+      card_effect: true,
+      card_uid: "tactic-instance-uid",
+      card_id: "test-healing-tactic",
+      creature_uid: null,
+    },
+    target: {
+      controller_seat: 1,
+      creature_uid: target.stack[0].uid,
+      card_uid: target.stack[0].uid,
+      card_id: target.stack[0].card_id,
+      element: "Tide",
+      where: "reserve",
+      index: reserveIndex,
+    },
+  }).packet!;
+}
+
 function pending(state: Record<string, unknown>) {
   return state.pending_heal_listener_choice as RuntimeV02PendingHealListenerChoice;
 }
@@ -303,6 +330,38 @@ Deno.test("empty packet set completes without creating private resume state", ()
   const { s } = makeState();
   const result = runtimeV02BeginAttackHealListenerContinuation(s, [], 1);
   assertEquals(result, { status: "complete", continuation: null, pending_choice: null });
+  assertEquals(s.pending_heal_listener_choice, undefined);
+  assertEquals(s.pending_heal_listener_resume, undefined);
+});
+
+Deno.test("tactic heal facade uses its own resume kind and releases only after the canonical choice queue completes", () => {
+  const { s } = makeState();
+  const root = tacticHeal(s, 0);
+  assertEquals(root.source.action_kind, "tactic");
+  assertEquals(root.source.action_id, "effect-instance-1");
+  assertEquals(root.source.card_uid, "tactic-instance-uid");
+  assertEquals(root.source.creature_uid, null);
+
+  const flow = runtimeV02BeginTacticHealListenerContinuation(s, [root.id], 1);
+  assertEquals(flow.status, "player_choice_required");
+  assertEquals(s.pending_heal_listener_resume, {
+    kind: "resume_tactic_effect",
+    seat: 1,
+    turn_seq: 33,
+  });
+
+  const choice = pending(s);
+  assertThrows(
+    () => runtimeV02ResolveTacticHealListenerChoice(s, 2, choice.id, ["decline"]),
+    "heal_choice_not_yours",
+  );
+  assertEquals(pending(s).id, choice.id);
+
+  const resolved = runtimeV02ResolveTacticHealListenerChoice(s, 1, choice.id, ["decline"]);
+  assertEquals(resolved.accepted, false);
+  assertEquals(resolved.resume_ready, true);
+  assertEquals(resolved.resume_seat, 1);
+  assertEquals(resolved.pending_choice, null);
   assertEquals(s.pending_heal_listener_choice, undefined);
   assertEquals(s.pending_heal_listener_resume, undefined);
 });
