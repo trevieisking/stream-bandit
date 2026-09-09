@@ -64,6 +64,7 @@ test('match owner wires the generic discard recycle family, allows plain Colony 
   assert.ok(match.includes('runtimeV02ResolveAttackDiscardRecycleChoice'));
   assert.ok(match.includes('ad?.id==="grove-myceliarch"&&slot===2&&structuredDiscardRecycleChoice==null'));
   assert.equal(match.includes('ad?.id==="grove-myceliarch"&&(slot!==2||structuredDiscardRecycleChoice==null)'), false, 'plain Colony Pulse slot 1 must not be trapped by the Mycelial Bloom pending-choice guard');
+  assert.equal(match.includes('colony-pulse'), false, 'live match owner must not hard-code Colony Pulse by attack id');
   assert.ok(match.includes('ad?.id==="astral-nebulynx"&&slot===2&&structuredInspectionChoice==null'));
   assert.ok(match.includes('ad?.id==="astral-celestyr-dream-cartographer"&&slot===1&&structuredTopDeckCardChoice==null'));
 });
