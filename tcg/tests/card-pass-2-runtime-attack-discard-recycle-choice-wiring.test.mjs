@@ -45,12 +45,25 @@ test('frozen Set One inventory has exactly one attack in the discard recycle cho
   assert.deepEqual(matches, ['grove-myceliarch:mycelial-bloom']);
 });
 
-test('match owner wires the generic discard recycle family while keeping Grove scope narrow and Astral blockers intact', () => {
+test('Myceliarch Colony Pulse is a plain slot-1 attack while Mycelial Bloom alone owns the discard recycle choice', () => {
+  const registry = buildSetOneRegistry(root);
+  const row = registry.definitions.find((entry) => entry.card_id === 'grove-myceliarch');
+  assert.ok(row, 'missing frozen Grove Myceliarch definition');
+  const attacks = row.definition?.creature?.attacks || [];
+  assert.equal(attacks[0]?.id, 'colony-pulse');
+  assert.equal(attacks[0]?.base_damage, 70);
+  assert.deepEqual(attacks[0]?.after_damage, []);
+  assert.equal(matchesDiscardRecycleChoiceShape(attacks[0]), false);
+  assert.equal(attacks[1]?.id, 'mycelial-bloom');
+  assert.equal(matchesDiscardRecycleChoiceShape(attacks[1]), true);
+});
+
+test('match owner wires the generic discard recycle family, allows plain Colony Pulse and keeps Mycelial Bloom fail-closed', () => {
   assert.ok(match.includes('structuredRuntimeAfterDamageDiscardRecycleChoice'));
   assert.ok(match.includes('runtimeV02CreateAttackDiscardRecycleChoice'));
   assert.ok(match.includes('runtimeV02ResolveAttackDiscardRecycleChoice'));
-  assert.ok(match.includes('ad?.id==="grove-myceliarch"&&(slot!==2||structuredDiscardRecycleChoice==null)'));
-  assert.equal(match.includes('||ad?.id==="grove-myceliarch";'), false, 'blanket Myceliarch blocker must be replaced by the slot-2 structured gate');
+  assert.ok(match.includes('ad?.id==="grove-myceliarch"&&slot===2&&structuredDiscardRecycleChoice==null'));
+  assert.equal(match.includes('ad?.id==="grove-myceliarch"&&(slot!==2||structuredDiscardRecycleChoice==null)'), false, 'plain Colony Pulse slot 1 must not be trapped by the Mycelial Bloom pending-choice guard');
   assert.ok(match.includes('ad?.id==="astral-nebulynx"&&slot===2&&structuredInspectionChoice==null'));
   assert.ok(match.includes('ad?.id==="astral-celestyr-dream-cartographer"&&slot===1&&structuredTopDeckCardChoice==null'));
 });
