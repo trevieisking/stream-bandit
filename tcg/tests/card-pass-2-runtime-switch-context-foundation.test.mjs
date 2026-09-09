@@ -94,20 +94,73 @@ test('frozen Gale data proves Aeralith cannot safely bypass the shared switch-ev
   }
 });
 
-test('79b wires atomic switch events into the live match owner while preserving private state and separate tactic ownership', () => {
+test('frozen Gale tactics prove 79c needs self, opponent, repeated and counterpart-bound effect switches', () => {
+  const registry = buildSetOneRegistry(root);
+  const cyclone = findCard(registry, 'gale-cyclone-route');
+  const featherstep = findCard(registry, 'gale-featherstep');
+  const sera = findCard(registry, 'gale-pilot-sera');
+  assert.ok(cyclone && featherstep && sera, 'missing frozen Gale tactic switch definitions');
+
+  const cycloneSteps = cyclone.tactic?.program?.steps || [];
+  assert.equal(cycloneSteps[1]?.op, 'SWITCH_WITH_VANGUARD');
+  assert.equal(cycloneSteps[1]?.player, 'self');
+  assert.equal(cycloneSteps[1]?.action_kind, 'effect_switch');
+  const opponentOptional = cycloneSteps[2]?.then?.[0];
+  assert.equal(opponentOptional?.op, 'OPTIONAL');
+  assert.equal(opponentOptional?.steps?.[0]?.op, 'PROMPT_CHOSEN_PLAYER_TO_SELECT_RESERVE');
+  assert.equal(opponentOptional?.steps?.[0]?.player, 'opponent');
+  assert.equal(opponentOptional?.steps?.[1]?.op, 'SWITCH_WITH_VANGUARD');
+  assert.equal(opponentOptional?.steps?.[1]?.player, 'opponent');
+  assert.equal(opponentOptional?.steps?.[1]?.action_kind, 'effect_switch');
+
+  const featherSteps = featherstep.tactic?.program?.steps || [];
+  assert.equal(featherSteps[1]?.op, 'SWITCH_WITH_VANGUARD');
+  assert.equal(featherSteps[1]?.action_kind, 'effect_switch');
+  assert.equal(featherSteps[2]?.target, '$switch_incoming_vanguard');
+
+  const seraRepeat = sera.tactic?.program?.steps?.[0];
+  assert.equal(seraRepeat?.op, 'REPEAT_OPTIONAL');
+  assert.equal(seraRepeat?.max, 2);
+  assert.equal(seraRepeat?.steps?.[1]?.op, 'SWITCH_WITH_VANGUARD');
+  assert.equal(seraRepeat?.steps?.[1]?.action_kind, 'effect_switch');
+});
+
+test('79b match and 79c tactic paths share atomic switch events while preserving one tactic cursor and private choices', () => {
   assert.equal(match.includes('tcg-match-switch-context-v0-2.ts'), true, '79b match wiring must use the shared atomic switch owner');
-  assert.equal(tactic.includes('tcg-match-switch-context-v0-2.ts'), false, 'tactic switch ownership remains outside this bounded 79b match tick');
+  assert.equal(tactic.includes('tcg-match-switch-context-v0-2.ts'), true, '79c tactic wiring must use the same shared atomic switch owner');
+  assert.equal(tactic.includes('tcg-match-movement-listener-v0-2.ts'), true, '79c tactic wiring must use the shared movement listener continuation');
   assert.ok(match.includes('runtimeV02ApplyAtomicSwitch(s,seat,idx,{action_kind:"voluntary_withdrawal"'), 'voluntary withdrawal must use the atomic switch owner');
   assert.ok(match.includes('runtimeV02ApplyAtomicSwitch(s,seat,switchIndex,{action_kind:"attack"'), 'post-attack switch must use the atomic switch owner');
   assert.equal(match.includes('function switchWithReserve('), false, 'old direct match swap helper must not remain as a competing owner');
-  assert.ok(tactic.includes('function switchWithVanguard('), 'tactic switch helper remains a separate later-runtime owner in this tick');
+  assert.equal(tactic.includes('function switchWithVanguard('), false, '79c must remove the competing direct tactic swap helper');
   assert.equal(match.includes('gale-aeralith-storm-shepherd'), false, 'Aeralith must not require a new card-specific switch branch');
   assert.ok(match.includes('if(wantsSwitch&&body.switch_reserve_index!=null)'), 'attack switch remains optional when the frozen effect says it is optional');
-  assert.ok(match.includes('runtimeV02BeginMovementListenerContinuation(s,switched.events)'), 'atomic switch events must enter the generic movement listener continuation');
+  assert.ok(match.includes('runtimeV02BeginMovementListenerContinuation(s,switched.events)'), 'match atomic switch events must enter the generic movement listener continuation');
+
+  const switchStart = tactic.indexOf('if (op === "SWITCH_WITH_VANGUARD")');
+  const switchEnd = tactic.indexOf('if (op === "CHOOSE_PLAYER")', switchStart);
+  const switchBlock = tactic.slice(switchStart, switchEnd);
+  assert.ok(switchStart >= 0 && switchEnd > switchStart, '79c tactic switch block missing');
+  assert.ok(switchBlock.includes('playerSeat(ownerSeat, step.player || "self", vars)'), 'tactic switch must resolve self/opponent controller from structured data');
+  assert.ok(switchBlock.includes('runtimeV02ApplyAtomicSwitch(state, controllerSeat, Number(found.index), {'), 'tactic switch must call the atomic owner');
+  assert.ok(switchBlock.includes('action_kind: "effect_switch"'), 'tactic switches must be canonical effect_switch actions');
+  assert.ok(switchBlock.includes('source_action_id: effect.id'), 'switch context must retain the exact tactic effect action identity');
+  assert.ok(switchBlock.includes('source_card_uid: effect.source_card.uid'), 'switch context must retain the exact source card instance');
+  assert.ok(switchBlock.includes('vars.switch_outgoing_vanguard = outgoingRef'));
+  assert.ok(switchBlock.includes('vars.switch_incoming_vanguard = incomingRef'));
+  const cursorAdvance = switchBlock.indexOf('effect.cursor++');
+  const movementBegin = switchBlock.indexOf('runtimeV02BeginMovementListenerContinuation(state, switched.events)');
+  assert.ok(cursorAdvance >= 0 && movementBegin > cursorAdvance, 'tactic cursor must advance before movement listeners can pause, preventing switch replay');
+  assert.ok(switchBlock.includes('setTacticMovementResume(state, effect)'), 'movement choice must preserve the same tactic effect resume owner');
+  assert.ok(tactic.includes('runtimeV02ResolveMovementListenerChoice(state, seat as 1 | 2'), 'resolve_choice must resume the shared movement continuation');
+  assert.ok(tactic.includes('tcg_v0_2_tactic_effect_switch_movement_heal_resume_not_yet_supported'), 'future movement-heal widening must fail closed until its separate handoff is implemented');
 
   const matchView = match.slice(match.indexOf('function makeView('), match.indexOf('function views('));
+  const tacticView = tactic.slice(tactic.indexOf('function makeView('), tactic.indexOf('function views('));
   assert.equal(matchView.includes('runtime_v0_2_switch_ledger'), false, 'private switch ledger must never enter match player views');
-  assert.equal(tactic.includes('runtime_v0_2_switch_ledger'), false, 'tactic surface must not serialize the private ledger');
+  assert.equal(tacticView.includes('runtime_v0_2_switch_ledger'), false, 'private switch ledger must never enter tactic player views');
+  assert.ok(tacticView.includes('runtimeV02PendingMovementListenerChoiceView'), 'tactic view must expose only the seat-filtered movement choice');
+  assert.ok(tacticView.includes('runtimeV02PrivateMovementInspectionView'), 'tactic view must expose only the seat-filtered movement inspection');
 });
 
 test('switch foundation does not falsely claim listener or full runtime parity', () => {
