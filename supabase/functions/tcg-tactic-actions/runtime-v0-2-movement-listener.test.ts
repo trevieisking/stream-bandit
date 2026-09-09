@@ -1,185 +1,62 @@
 import assert from 'node:assert/strict';
 import {
-  runtimeV02BeginMovementListenerContinuation,
-  runtimeV02ResolveMovementListenerChoice,
-  runtimeV02PrivateMovementInspectionView,
-  runtimeV02PendingMovementListenerChoiceView,
+  runtimeV02BeginMovementListenerContinuation as begin,
+  runtimeV02ResolveMovementListenerChoice as resolve,
+  runtimeV02PrivateMovementInspectionView as privateView,
+  runtimeV02PendingMovementListenerChoiceView as pendingView,
 } from '../_shared/tcg-match-movement-listener-v0-2.ts';
-import { recordRuntimeV02EssenceAttachmentEvent } from '../_shared/tcg-match-essence-attachment-event-v0-2.ts';
+import { recordRuntimeV02EssenceAttachmentEvent as recordAttach } from '../_shared/tcg-match-essence-attachment-event-v0-2.ts';
+import { runtimeV02SnapshotMarker } from '../_shared/tcg-runtime-registry-v0-2.ts';
 
-type Any = any;
-const turn = 5;
-const duration1 = { expires_on: ['end_of_turn'], max_uses: 1, consume_on: 'legal_attack_declared' };
-const withdrawDuration1 = { expires_on: ['end_of_turn'], max_uses: 1, consume_on: 'legal_voluntary_withdrawal_declared' };
-function inst(uid:string, card_id:string){ return {uid, card_id}; }
-function cr(uid:string, card_id:string, opts:Any={}){ return {stack:[inst(uid,card_id)], essence:opts.essence||[], relic:opts.relic||null, damage:opts.damage||0, shield:0, conditions:{scorched:false,venomed:0,control:null,modifier:null}, flags:{}}; }
-function def(id:string, extra:Any={}) { return { name: extra.name || id, card_family: extra.card_family || 'Creature', element: extra.element || 'Gale', creature: extra.creature ?? {stage:'Standalone', withdrawal: extra.withdrawal ?? 1, ability: extra.ability || null}, essence: extra.essence ?? null, tactic: extra.tactic ?? null }; }
-function state(incoming:Any, outgoing:Any, defs:Record<string,Any>, opts:Any={}){
-  const opp = opts.opp || cr('opp','opp-card');
-  const p1reserve = [outgoing, ...(opts.reserveExtra||[]), null, null].slice(0,4);
-  const baseDefs:Record<string,Any> = {
-    'opp-card': def('opp-card',{element:'Stone'}),
-    'dummy-in': def('dummy-in',{element:'Gale'}),
-    'dummy-out': def('dummy-out',{element:'Gale'}),
-    ...defs,
-  };
-  for (const p of [opts.p1Deck||[], opts.p1Hand||[], opts.p2Deck||[], opts.p2Hand||[]]) for(const x of p) if(!baseDefs[x.card_id]) baseDefs[x.card_id]=def(x.card_id,{element:'Stone'});
-  for (const e of [...(incoming?.essence||[]), ...(outgoing?.essence||[]), ...((opts.reserveExtra||[]).flatMap((x:Any)=>x?.essence||[]))]) if(e && !baseDefs[e.card_id]) baseDefs[e.card_id]=def(e.card_id,{card_family:'Essence', element:'Tide', creature:null, essence:{listeners:[]}});
-  if(outgoing?.relic && !baseDefs[outgoing.relic.card_id]) baseDefs[outgoing.relic.card_id]=def(outgoing.relic.card_id,{card_family:'Tactic', creature:null, tactic:{subtype:'Relic',listeners:[]}});
-  const s:Any = {
-    turn_seq:turn, active_seat:1, runtime_registry_v0_2:{registry_id:'SB1-set-one-v0.2'},
-    card_index:Object.fromEntries(Object.entries(baseDefs).map(([id,d])=>[id,{definition_v0_2:d}])),
-    players:{
-      '1':{vanguard:incoming,reserve:p1reserve,deck:opts.p1Deck||[],hand:opts.p1Hand||[],discard:[],void:[],rewards:[]},
-      '2':{vanguard:opp,reserve:[null,null,null,null],deck:opts.p2Deck||[],hand:opts.p2Hand||[],discard:[],void:[],rewards:[]},
-    },
-    runtime_v0_2_switch_ledger:{contexts:[{switch_id:'switch:5:1',controller_seat:1,outgoing_vanguard_uid:outgoing.stack[0].uid,incoming_vanguard_uid:incoming.stack[0].uid,reserve_index:0,source_action_id:'test',source_card_uid:null,action_kind:'attack',turn_seq:turn}]},
-  };
-  if(opts.realm){ s.realm=opts.realm; if(!s.card_index[opts.realm.card.card_id]) s.card_index[opts.realm.card.card_id]={definition_v0_2:opts.realmDef}; }
-  return s;
+type A = any;
+const TURN=5, attackDuration={expires_on:['end_of_turn'],max_uses:1,consume_on:'legal_attack_declared'}, withdrawalDuration={expires_on:['end_of_turn'],max_uses:1,consume_on:'legal_voluntary_withdrawal_declared'};
+const inst=(uid:string,card_id:string)=>({uid,card_id});
+const cr=(uid:string,card_id:string,o:A={})=>({stack:[inst(uid,card_id)],essence:o.essence||[],relic:o.relic||null,damage:o.damage||0,shield:0,conditions:{scorched:false,venomed:0,control:null,modifier:null},flags:{}});
+const rawDef=(name:string,o:A={})=>({name,card_family:o.card_family||'Creature',element:o.element||'Gale',creature:o.creature??{stage:'Standalone',withdrawal:o.withdrawal??1,ability:o.ability||null},essence:o.essence??null,tactic:o.tactic??null});
+const v02=(id:string,d:A)=>({...d,id,schema:'sb-tcg-card-v0.2',effect_schema:'sb-tcg-effects-v0.2'});
+const ability=(event:string,id:string,requirements:A,steps:A[],limit:A={scope:'turn',count:1,owner:'card_instance'})=>({id,name:id,mode:'triggered',event,timing:'own_turn',limit,requirements,costs:[],steps});
+const event=(kind:'moved_to_reserve'|'became_vanguard',uid:string,action:'attack'|'effect_switch'|'voluntary_withdrawal'='attack',switchId='switch:5:1')=>({event:kind,subject_uid:uid,controller_seat:1,origin_zone:kind==='moved_to_reserve'?'vanguard':'reserve',destination_zone:kind==='moved_to_reserve'?'reserve':'vanguard',reserve_index:0,switch_id:switchId,source_action_id:'test',source_card_uid:null,action_kind:action,turn_seq:TURN});
+function state(incoming:A,outgoing:A,defs:Record<string,A>,o:A={}){
+  const opponent=o.opponent||cr('opp','opp-card'), allDefs:Record<string,A>={'opp-card':rawDef('Opp',{element:'Stone'}),'dummy-in':rawDef('In'),'dummy-out':rawDef('Out'),...defs};
+  for(const zone of [o.p1Deck||[],o.p1Hand||[],o.p2Deck||[],o.p2Hand||[]]) for(const x of zone) if(!allDefs[x.card_id]) allDefs[x.card_id]=rawDef(x.card_id,{element:'Stone'});
+  for(const e of [...(incoming?.essence||[]),...(outgoing?.essence||[]),...((o.extraReserve||[]).flatMap((x:A)=>x?.essence||[]))]) if(e&&!allDefs[e.card_id]) allDefs[e.card_id]=rawDef(e.card_id,{card_family:'Essence',element:'Tide',creature:null,essence:{listeners:[]}});
+  if(outgoing?.relic&&!allDefs[outgoing.relic.card_id]) allDefs[outgoing.relic.card_id]=rawDef(outgoing.relic.card_id,{card_family:'Tactic',creature:null,tactic:{subtype:'Relic',listeners:[]}});
+  const s:A={turn_seq:TURN,active_seat:1,runtime_registry_v0_2:runtimeV02SnapshotMarker(),card_index:Object.fromEntries(Object.entries(allDefs).map(([id,d])=>[id,{definition_v0_2:v02(id,d)}])),players:{'1':{vanguard:incoming,reserve:[outgoing,...(o.extraReserve||[]),null,null].slice(0,4),deck:o.p1Deck||[],hand:o.p1Hand||[],discard:[],void:[],rewards:[]},'2':{vanguard:opponent,reserve:[null,null,null,null],deck:o.p2Deck||[],hand:o.p2Hand||[],discard:[],void:[],rewards:[]}},runtime_v0_2_switch_ledger:{contexts:[{switch_id:'switch:5:1',controller_seat:1,outgoing_vanguard_uid:outgoing.stack[0].uid,incoming_vanguard_uid:incoming.stack[0].uid,reserve_index:0,source_action_id:'test',source_card_uid:null,action_kind:'attack',turn_seq:TURN}]}};
+  if(o.realm){s.realm=o.realm;s.card_index[o.realm.card.card_id]={definition_v0_2:v02(o.realm.card.card_id,o.realmDef)}} return s;
 }
-function ev(kind:'moved_to_reserve'|'became_vanguard', subject:string, action:'attack'|'effect_switch'|'voluntary_withdrawal'='attack', id='switch:5:1'):Any {
-  return {event:kind,subject_uid:subject,controller_seat:1,origin_zone:kind==='moved_to_reserve'?'vanguard':'reserve',destination_zone:kind==='moved_to_reserve'?'reserve':'vanguard',reserve_index:0,switch_id:id,source_action_id:'test',source_card_uid:null,action_kind:action,turn_seq:turn};
-}
-function ability(event:string,id:string,requirements:Any,steps:Any[],limit:Any={scope:'turn',count:1,owner:'card_instance'}){ return {id,name:id,mode:'triggered',event,timing:'own_turn',limit,requirements,costs:[],steps}; }
+const reqSource=(action?:string)=>({all:[{predicate:'event_subject_is_source'},...(action?[{predicate:'event_action_kind_is',action_kind:action}]:[]),{predicate:'event_controller_is_active_seat'}]});
 
-Deno.test("movement listener continuation covers all 20 frozen Set One switch listeners and fail-closed privacy", () => {
-// Skyweaver: draw -> private discard continuation.
-{
-  const incoming=cr('sky','gale-skyweaver'); const outgoing=cr('out','dummy-out');
-  const sky=ability('became_vanguard','crosswind',{all:[{predicate:'event_subject_is_source'},{predicate:'event_origin_zone_is',zone:'reserve'},{predicate:'event_destination_zone_is',zone:'vanguard'},{predicate:'event_controller_is_active_seat'}]},[{op:'DRAW',player:'self',count:1},{op:'CHOOSE_HAND_TO_DISCARD',player:'self',count:1}]);
-  const s=state(incoming,outgoing,{'gale-skyweaver':def('Skyweaver',{ability:sky})},{p1Deck:[inst('draw','draw-card')],p1Hand:[inst('hand','hand-card')]});
-  const flow=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','sky')]); assert.equal(flow.status,'player_choice_required'); assert.equal(s.players['1'].hand.length,2);
-  assert.deepEqual(runtimeV02PendingMovementListenerChoiceView(flow.pending_choice,2),{id:flow.pending_choice!.id,seat:1,kind:'discard_from_hand',waiting:true});
-  const resolved=runtimeV02ResolveMovementListenerChoice(s,1,flow.pending_choice!.id,[flow.pending_choice!.options[0].id]); assert.equal(resolved.status,'complete'); assert.equal(s.players['1'].discard.length,1);
-  const replay=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','sky')]); assert.equal(replay.processed_listener_keys.length,0); assert.equal(s.players['1'].hand.length,1);
-}
+Deno.test('all 20 frozen movement listeners resolve through one generic owner',()=>{
+  const covered=new Set<string>();
+  const mark=(id:string)=>covered.add(id);
 
-// Cometmanta: self top-2 stays in place until controller order choice.
-{
-  const incoming=cr('in','dummy-in'); const outgoing=cr('comet','astral-cometmanta');
-  const a=ability('moved_to_reserve','passing-orbit',{all:[{predicate:'source_is_self'},{predicate:'event_origin_zone_is',zone:'vanguard'},{predicate:'event_destination_zone_is',zone:'reserve'},{predicate:'event_controller_is_self'}]},[{op:'LOOK_TOP',player:'self',count:2,visibility:'controller_private',as:'looked'},{op:'RETURN_SET_TO_DECK_TOP',player:'self',cards:'$looked',order:'controller_choice'}],{scope:'turn',count:1,owner:'controller'});
-  const s=state(incoming,outgoing,{'astral-cometmanta':def('Cometmanta',{element:'Astral',ability:a})},{p1Deck:[inst('a','a'),inst('b','b'),inst('c','c')]});
-  const f=runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','comet')]); assert.equal(f.status,'player_choice_required'); assert.deepEqual(s.players['1'].deck.map((x:Any)=>x.uid),['a','b','c']);
-  assert.deepEqual(runtimeV02PrivateMovementInspectionView(s,1)!.cards.map(x=>x.uid),['a','b']); assert.equal(runtimeV02PrivateMovementInspectionView(s,2),null);
-  runtimeV02ResolveMovementListenerChoice(s,1,f.pending_choice!.id,[f.pending_choice!.options[1].id,f.pending_choice!.options[0].id]); assert.deepEqual(s.players['1'].deck.map((x:Any)=>x.uid),['b','a','c']);
-}
+  {const incoming=cr('sky','gale-skyweaver'),outgoing=cr('out','dummy-out'),a=ability('became_vanguard','crosswind',{all:[{predicate:'event_subject_is_source'},{predicate:'event_origin_zone_is',zone:'reserve'},{predicate:'event_destination_zone_is',zone:'vanguard'},{predicate:'event_controller_is_active_seat'}]},[{op:'DRAW',player:'self',count:1},{op:'CHOOSE_HAND_TO_DISCARD',player:'self',count:1}]);const s=state(incoming,outgoing,{'gale-skyweaver':rawDef('Skyweaver',{ability:a})},{p1Deck:[inst('draw','draw-card')],p1Hand:[inst('hand','hand-card')]});const f=begin(s,[event('became_vanguard','sky')]);assert.equal(f.status,'player_choice_required');assert.deepEqual(pendingView(f.pending_choice,2),{id:f.pending_choice!.id,seat:1,kind:'discard_from_hand',waiting:true});resolve(s,1,f.pending_choice!.id,[f.pending_choice!.options[0].id]);assert.equal(s.players['1'].discard.length,1);assert.equal(begin(s,[event('became_vanguard','sky')]).processed_listener_keys.length,0);mark('gale-skyweaver:crosswind');}
 
-// Wispbat: opponent top card is private and never moved.
-{
-  const incoming=cr('in','dummy-in'); const outgoing=cr('wisp','shade-wispbat');
-  const a=ability('moved_to_reserve','fade-echo',{all:[{predicate:'event_subject_is_source'},{predicate:'event_action_kind_is',action_kind:'attack'},{predicate:'event_controller_is_active_seat'}]},[{op:'INSPECT_ZONE',player:'opponent',zone:'deck_top',selection:{min:1,max:1,filters:{}},visibility:'controller_private',return_policy:'same_position',as:'echo'}]);
-  const s=state(incoming,outgoing,{'shade-wispbat':def('Wispbat',{element:'Shade',ability:a})},{p2Deck:[inst('secret','secret-card'),inst('next','next-card')]});
-  const f=runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','wisp')]); assert.equal(f.status,'complete'); assert.deepEqual(s.players['2'].deck.map((x:Any)=>x.uid),['secret','next']); assert.equal(runtimeV02PrivateMovementInspectionView(s,1)!.cards[0].uid,'secret'); assert.equal(runtimeV02PrivateMovementInspectionView(s,2),null);
-}
+  for(const cfg of [{card:'astral-cometmanta',uid:'comet',listener:'passing-orbit',kind:'moved_to_reserve' as const,player:'self',deck:'p1Deck',owner:1},{card:'shade-graveglider',uid:'grave',listener:'cold-read',kind:'became_vanguard' as const,player:'opponent',deck:'p2Deck',owner:2}]){const incoming=cfg.kind==='became_vanguard'?cr(cfg.uid,cfg.card):cr('in','dummy-in'),outgoing=cfg.kind==='moved_to_reserve'?cr(cfg.uid,cfg.card):cr('out','dummy-out');const requirements=cfg.kind==='moved_to_reserve'?{all:[{predicate:'source_is_self'},{predicate:'event_origin_zone_is',zone:'vanguard'},{predicate:'event_destination_zone_is',zone:'reserve'},{predicate:'event_controller_is_self'}]}:reqSource();const first=cfg.kind==='moved_to_reserve'?{op:'LOOK_TOP',player:cfg.player,count:2,visibility:'controller_private',as:'looked'}:{op:'INSPECT_ZONE',player:cfg.player,zone:'deck_top',selection:{min:2,max:2,filters:{}},visibility:'controller_private',return_policy:'same_position',as:'looked'};const a=ability(cfg.kind,cfg.listener,requirements,[first,{op:'RETURN_SET_TO_DECK_TOP',player:cfg.player,cards:'$looked',order:'controller_choice'}],cfg.kind==='moved_to_reserve'?{scope:'turn',count:1,owner:'controller'}:undefined);const opts:A={[cfg.deck]:[inst('a','a'),inst('b','b'),inst('c','c')]};const s=state(incoming,outgoing,{[cfg.card]:rawDef(cfg.card,{element:cfg.card.startsWith('astral')?'Astral':'Shade',ability:a})},opts);const f=begin(s,[event(cfg.kind,cfg.uid)]);assert.equal(f.status,'player_choice_required');assert.deepEqual(privateView(s,1)!.cards.map(x=>x.uid),['a','b']);assert.equal(privateView(s,2),null);resolve(s,1,f.pending_choice!.id,[f.pending_choice!.options[1].id,f.pending_choice!.options[0].id]);assert.deepEqual(s.players[String(cfg.owner)].deck.map((x:A)=>x.uid),['b','a','c']);mark(`${cfg.card}:${cfg.listener}`);}
 
-// Graveglider: opponent top 2 private reorder, deck unchanged before choice.
-{
-  const incoming=cr('grave','shade-graveglider'); const outgoing=cr('out','dummy-out');
-  const a=ability('became_vanguard','cold-read',{all:[{predicate:'event_subject_is_source'},{predicate:'event_controller_is_active_seat'}]},[{op:'INSPECT_ZONE',player:'opponent',zone:'deck_top',selection:{min:2,max:2,filters:{}},visibility:'controller_private',return_policy:'same_position',as:'looked'},{op:'RETURN_SET_TO_DECK_TOP',player:'opponent',cards:'$looked',order:'controller_choice'}]);
-  const s=state(incoming,outgoing,{'shade-graveglider':def('Graveglider',{element:'Shade',ability:a})},{p2Deck:[inst('g1','g1'),inst('g2','g2'),inst('g3','g3')]});
-  const f=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','grave')]); assert.equal(f.status,'player_choice_required'); assert.deepEqual(s.players['2'].deck.map((x:Any)=>x.uid),['g1','g2','g3']); assert.deepEqual(runtimeV02PrivateMovementInspectionView(s,1)!.cards.map(x=>x.uid),['g1','g2']);
-  runtimeV02ResolveMovementListenerChoice(s,1,f.pending_choice!.id,[f.pending_choice!.options[1].id,f.pending_choice!.options[0].id]); assert.deepEqual(s.players['2'].deck.map((x:Any)=>x.uid),['g2','g1','g3']);
-}
+  {const outgoing=cr('wisp','shade-wispbat'),a=ability('moved_to_reserve','fade-echo',reqSource('attack'),[{op:'INSPECT_ZONE',player:'opponent',zone:'deck_top',selection:{min:1,max:1,filters:{}},visibility:'controller_private',return_policy:'same_position',as:'echo'}]),s=state(cr('in','dummy-in'),outgoing,{'shade-wispbat':rawDef('Wispbat',{element:'Shade',ability:a})},{p2Deck:[inst('secret','secret'),inst('next','next')]});begin(s,[event('moved_to_reserve','wisp')]);assert.deepEqual(s.players['2'].deck.map((x:A)=>x.uid),['secret','next']);assert.equal(privateView(s,1)!.cards[0].uid,'secret');mark('shade-wispbat:fade-echo');}
 
-// Lanternsquid: optional Tide Essence move records canonical movement.
-{
-  const incoming=cr('lantern','tide-lanternsquid'); const outgoing=cr('out','dummy-out'); const tide=inst('tide-e','tide-basic'); const donor=cr('donor','donor-card',{essence:[tide]});
-  const a=ability('became_vanguard','deep-signal',{all:[{predicate:'event_subject_is_source'},{predicate:'event_controller_is_active_seat'}]},[{op:'MOVE_ATTACHED_ESSENCE',controller:'self',element:'Tide',count:{min:0,max:1},source_selector:{zone:'reserve',filters:{card_family:'Creature',exclude_source:true}},destination_selector:{fixed:'$source_creature'},require_destination_different_creature:true,as:'signal_move'}]);
-  const defs={'tide-lanternsquid':def('Lanternsquid',{element:'Tide',ability:a}), 'donor-card':def('Donor',{element:'Tide'}), 'tide-basic':def('Tide essence',{card_family:'Essence',element:'Tide',creature:null,essence:{listeners:[]}})};
-  const s=state(incoming,outgoing,defs,{reserveExtra:[donor]}); const f=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','lantern')]); assert.equal(f.status,'player_choice_required'); assert.equal(f.pending_choice!.kind,'move_attached_essence');
-  const r=runtimeV02ResolveMovementListenerChoice(s,1,f.pending_choice!.id,[f.pending_choice!.options[0].id]); assert.equal(r.status,'complete'); assert.equal(incoming.essence[0].uid,'tide-e'); assert.equal(donor.essence.length,0); assert.equal(s.essence_moves.length,1);
-}
+  for(const cfg of [{card:'ember-sootwing',id:'soot-glide',op:'heal',n:10},{card:'gale-cloudray',id:'cloudwake',op:'attack',n:10,action:'voluntary_withdrawal'},{card:'gale-slipwing',id:'slipstream-relay',op:'withdrawal',n:-1},{card:'tide-mistmarten',id:'mist-recovery',op:'heal',n:20}]){const outgoing=cr('src',cfg.card,{damage:30}),incoming=cr('in','incoming-card');let steps:A[];if(cfg.op==='heal')steps=[{op:'HEAL',target:'$source_creature',amount:cfg.n}];else if(cfg.op==='attack')steps=[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$switch_incoming_vanguard',amount:cfg.n,duration:attackDuration}];else steps=[{op:'SET_WITHDRAWAL_MODIFIER',target:'$switch_incoming_vanguard',mode:'delta',amount:cfg.n,minimum:0,duration:withdrawalDuration}];const action=cfg.action||'attack',a=ability('moved_to_reserve',cfg.id,reqSource(action),steps),s=state(incoming,outgoing,{[cfg.card]:rawDef(cfg.card,{element:cfg.card.startsWith('ember')?'Ember':cfg.card.startsWith('tide')?'Tide':'Gale',ability:a}),'incoming-card':rawDef('Incoming',{withdrawal:2})});const f=begin(s,[event('moved_to_reserve','src',action as A)]);if(cfg.op==='heal'){assert.equal(f.emitted_heal_packet_ids.length,1);assert.equal(outgoing.damage,30-cfg.n);}if(cfg.op==='attack')assert.equal((incoming.flags as A).lifecycle_attack_bonus.amount,10);if(cfg.op==='withdrawal')assert.equal((incoming.flags as A).lifecycle_withdrawal_cost.value,1);mark(`${cfg.card}:${cfg.id}`);}
 
-// Jetstream: exact hand-origin attachment event required; attachment-scope once.
-{
-  const jet=inst('jet','gale-jetstream-essence'); const incoming=cr('jet-target','jet-target-card',{essence:[jet]}); const outgoing=cr('out','dummy-out');
-  const listener={id:'jetstream-vanguard-window',event:'became_vanguard',requirements:{all:[{predicate:'event_subject_is_attached_creature'},{predicate:'event_occurred',event:'essence_attached',controller:'self',window:'current_turn',filters:{source_card_uid:'self',origin_zone:'hand'},min_count:1}]},limit:{scope:'attachment',count:1,owner:'attachment'},steps:[{op:'SET_WITHDRAWAL_MODIFIER',target:'$attached_creature',mode:'set',amount:0,minimum:0,duration:withdrawDuration1}]};
-  const defs={'jet-target-card':def('JetTarget',{element:'Gale',withdrawal:2}), 'gale-jetstream-essence':def('Jetstream',{card_family:'Essence',element:'Gale',creature:null,essence:{listeners:[listener]}})};
-  let s=state(incoming,outgoing,defs); let f=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','jet-target')]); assert.equal(f.processed_listener_keys.length,0); assert.equal((incoming.flags as Any).lifecycle_withdrawal_cost,undefined);
-  s=state(cr('jet-target','jet-target-card',{essence:[inst('jet','gale-jetstream-essence')]}),cr('out','dummy-out'),defs); recordRuntimeV02EssenceAttachmentEvent(s,1,'jet-target',s.players['1'].vanguard.essence[0],'hand','manual_essence','normal');
-  f=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','jet-target')]); assert.equal(f.processed_listener_keys.length,1); assert.equal(s.players['1'].vanguard.flags.lifecycle_withdrawal_cost.value,0);
-  s.runtime_v0_2_switch_ledger.contexts.push({...s.runtime_v0_2_switch_ledger.contexts[0],switch_id:'switch:5:2'}); const second=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','jet-target','effect_switch','switch:5:2')]); assert.equal(second.processed_listener_keys.length,0);
-}
+  {const relic=inst('compass','gale-pressure-compass'),outgoing=cr('src','out-card',{relic}),listener={id:'pressure-compass-draw',event:'moved_to_reserve',requirements:{all:[{predicate:'event_subject_is_attached_creature'},{predicate:'event_origin_zone_is',zone:'vanguard'},{predicate:'event_destination_zone_is',zone:'reserve'}]},limit:{scope:'turn',count:1,owner:'attachment'},steps:[{op:'DRAW',player:'self',count:1}]},s=state(cr('in','dummy-in'),outgoing,{'out-card':rawDef('Out'),'gale-pressure-compass':rawDef('Compass',{card_family:'Tactic',creature:null,tactic:{subtype:'Relic',listeners:[listener]}})},{p1Deck:[inst('draw','draw')]});begin(s,[event('moved_to_reserve','src')]);assert.equal(s.players['1'].hand[0].uid,'draw');mark('gale-pressure-compass:pressure-compass-draw');}
 
-// Caldera non-Ember voluntary withdrawal damage, but never on attack switch.
-{
-  const realm=inst('caldera','ember-volcanic-caldera'); const calderaDef=def('Caldera',{card_family:'Tactic',element:'Ember',creature:null,tactic:{subtype:'Realm',listeners:[{id:'caldera-nonember-withdrawal-damage',event:'moved_to_reserve',controller_scope:'any',requirements:{all:[{predicate:'event_action_kind_is',action_kind:'voluntary_withdrawal'},{not:{predicate:'event_subject_matches',filters:{element:'Ember'}}}]},limit:null,steps:[{op:'DIRECT_DAMAGE',target:'$event_subject',amount:10,damage_class:'effect'}]}]}});
-  let out=cr('out','stone-out'); let s=state(cr('in','dummy-in'),out,{'stone-out':def('Stone',{element:'Stone'})},{realm:{card:realm,owner_seat:2},realmDef:calderaDef}); runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','out','voluntary_withdrawal')]); assert.equal(out.damage,10);
-  out=cr('out','stone-out'); s=state(cr('in','dummy-in'),out,{'stone-out':def('Stone',{element:'Stone'})},{realm:{card:realm,owner_seat:2},realmDef:calderaDef}); runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','out','attack')]); assert.equal(out.damage,0);
-}
+  {const realm=inst('caldera','ember-volcanic-caldera'),listener={id:'caldera-nonember-withdrawal-damage',event:'moved_to_reserve',controller_scope:'any',requirements:{all:[{predicate:'event_action_kind_is',action_kind:'voluntary_withdrawal'},{not:{predicate:'event_subject_matches',filters:{element:'Ember'}}}]},limit:null,steps:[{op:'DIRECT_DAMAGE',target:'$event_subject',amount:10,damage_class:'effect'}]},realmDef=rawDef('Caldera',{card_family:'Tactic',element:'Ember',creature:null,tactic:{subtype:'Realm',listeners:[listener]}}),out=cr('src','stone-out'),s=state(cr('in','dummy-in'),out,{'stone-out':rawDef('Stone',{element:'Stone'})},{realm:{card:realm,owner_seat:2},realmDef});begin(s,[event('moved_to_reserve','src','voluntary_withdrawal')]);assert.equal(out.damage,10);mark('ember-volcanic-caldera:caldera-nonember-withdrawal-damage');}
 
-// Pressure Compass draw.
-{
-  const relic=inst('compass','gale-pressure-compass'); const outgoing=cr('out','out-card',{relic}); const incoming=cr('in','dummy-in');
-  const relicDef=def('Pressure Compass',{card_family:'Tactic',element:'Gale',creature:null,tactic:{subtype:'Relic',listeners:[{id:'pressure-compass-draw',event:'moved_to_reserve',requirements:{all:[{predicate:'event_subject_is_attached_creature'},{predicate:'event_origin_zone_is',zone:'vanguard'},{predicate:'event_destination_zone_is',zone:'reserve'}]},limit:{scope:'turn',count:1,owner:'attachment'},steps:[{op:'DRAW',player:'self',count:1}]}]}});
-  const s=state(incoming,outgoing,{'out-card':def('Out'), 'gale-pressure-compass':relicDef},{p1Deck:[inst('pcdraw','pcdraw')]}); runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','out')]); assert.equal(s.players['1'].hand[0].uid,'pcdraw');
-}
+  for(const [card,id,n] of [['ember-coalfinch','cinder-lift',10],['gale-driftlet','rising-draft',10],['gale-tempestalon','storm-entry',30],['volt-boltfang','live-hunt',20]] as const){const incoming=cr('src',card),a=ability('became_vanguard',id,reqSource(),[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$source_creature',amount:n,duration:attackDuration}]),s=state(incoming,cr('out','dummy-out'),{[card]:rawDef(card,{element:card.startsWith('ember')?'Ember':card.startsWith('volt')?'Volt':'Gale',ability:a})});begin(s,[event('became_vanguard','src')]);assert.equal((incoming.flags as A).lifecycle_attack_bonus.amount,n);mark(`${card}:${id}`);}
 
-// Cloudray attack bonus on voluntary withdrawal.
-{
-  const outgoing=cr('cloud','gale-cloudray'); const incoming=cr('in','incoming-card');
-  const a=ability('moved_to_reserve','cloudwake',{all:[{predicate:'event_subject_is_source'},{predicate:'event_action_kind_is',action_kind:'voluntary_withdrawal'},{predicate:'event_controller_is_active_seat'}]},[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$switch_incoming_vanguard',amount:10,duration:duration1}]);
-  const s=state(incoming,outgoing,{'gale-cloudray':def('Cloudray',{ability:a}), 'incoming-card':def('Incoming')}); runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','cloud','voluntary_withdrawal')]); assert.equal((incoming.flags as Any).lifecycle_attack_bonus.amount,10);
-}
+  for(const [card,id,condition] of [['ember-cindercrest','ash-mark','Scorched'],['shade-umbraspider','web-of-doubt','Dazed'],['volt-sparkmoth','flash-dust','Dazed']] as const){const incoming=cr('src',card),requirements=card==='ember-cindercrest'?reqSource():{all:[...reqSource().all,{predicate:'control_condition_slot_empty',target:'$current_opponent_vanguard'}]},target=card==='ember-cindercrest'?{controller:'opponent',zone:'vanguard'}:'$current_opponent_vanguard',a=ability('became_vanguard',id,requirements,[{op:'APPLY_CONDITION',target,condition,mode:'apply_if_empty'}]),s=state(incoming,cr('out','dummy-out'),{[card]:rawDef(card,{element:card.startsWith('ember')?'Ember':card.startsWith('shade')?'Shade':'Volt',ability:a})});begin(s,[event('became_vanguard','src')]);assert.equal(condition==='Scorched'?s.players['2'].vanguard.conditions.scorched:s.players['2'].vanguard.conditions.control,condition==='Scorched'?true:'Dazed');assert.equal(s.effect_events.at(-1).event,'condition_changed');mark(`${card}:${id}`);}
 
-// Slipwing withdrawal modifier on attack switch.
-{
-  const outgoing=cr('slip','gale-slipwing'); const incoming=cr('in','incoming-card');
-  const a=ability('moved_to_reserve','slipstream-relay',{all:[{predicate:'event_subject_is_source'},{predicate:'event_action_kind_is',action_kind:'attack'},{predicate:'event_controller_is_active_seat'}]},[{op:'SET_WITHDRAWAL_MODIFIER',target:'$switch_incoming_vanguard',mode:'delta',amount:-1,minimum:0,duration:withdrawDuration1}]);
-  const s=state(incoming,outgoing,{'gale-slipwing':def('Slipwing',{ability:a}), 'incoming-card':def('Incoming',{withdrawal:2})}); runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','slip','attack')]); assert.equal((incoming.flags as Any).lifecycle_withdrawal_cost.value,1);
-}
+  {const jet=inst('jet','gale-jetstream-essence'),incoming=cr('src','jet-target',{essence:[jet]}),listener={id:'jetstream-vanguard-window',event:'became_vanguard',requirements:{all:[{predicate:'event_subject_is_attached_creature'},{predicate:'event_occurred',event:'essence_attached',controller:'self',window:'current_turn',filters:{source_card_uid:'self',origin_zone:'hand'},min_count:1}]},limit:{scope:'attachment',count:1,owner:'attachment'},steps:[{op:'SET_WITHDRAWAL_MODIFIER',target:'$attached_creature',mode:'set',amount:0,minimum:0,duration:withdrawalDuration}]},defs={'jet-target':rawDef('Target',{withdrawal:2}),'gale-jetstream-essence':rawDef('Jetstream',{card_family:'Essence',element:'Gale',creature:null,essence:{listeners:[listener]}})},s=state(incoming,cr('out','dummy-out'),defs);assert.equal(begin(s,[event('became_vanguard','src')]).processed_listener_keys.length,0);recordAttach(s,1,'src',jet,'hand','manual_essence');assert.equal(begin(s,[event('became_vanguard','src')]).processed_listener_keys.length,1);assert.equal((incoming.flags as A).lifecycle_withdrawal_cost.value,0);mark('gale-jetstream-essence:jetstream-vanguard-window');}
 
-// Sootwing + Mistmarten use canonical heal packet source kind=ability.
-for (const [id,abilityId,amount] of [['ember-sootwing','soot-glide',10],['tide-mistmarten','mist-recovery',20]] as const) {
-  const outgoing=cr('heal-out',id,{damage:30}); const incoming=cr('in','dummy-in');
-  const req=id==='ember-sootwing'?{all:[{predicate:'event_subject_is_source'},{predicate:'event_origin_zone_is',zone:'vanguard'},{predicate:'event_destination_zone_is',zone:'reserve'},{predicate:'event_action_kind_is',action_kind:'attack'},{predicate:'event_controller_is_active_seat'}]}:{all:[{predicate:'event_subject_is_source'},{predicate:'event_action_kind_is',action_kind:'attack'},{predicate:'target_damaged',target:'$source_creature'}]};
-  const a=ability('moved_to_reserve',abilityId,req,[{op:'HEAL',target:'$source_creature',amount}]); const s=state(incoming,outgoing,{[id]:def(id,{element:id.startsWith('tide')?'Tide':'Ember',ability:a})}); const f=runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','heal-out','attack')]); assert.equal(f.emitted_heal_packet_ids.length,1); assert.equal(s.heal_packets[0].source.action_kind,'ability'); assert.equal(outgoing.damage,30-amount);
-}
+  {const tide=inst('tide','tide-basic'),donor=cr('donor','donor-card',{essence:[tide]}),incoming=cr('src','tide-lanternsquid'),a=ability('became_vanguard','deep-signal',reqSource(),[{op:'MOVE_ATTACHED_ESSENCE',controller:'self',element:'Tide',count:{min:0,max:1},source_selector:{zone:'reserve',filters:{card_family:'Creature',exclude_source:true}},destination_selector:{fixed:'$source_creature'},require_destination_different_creature:true,as:'signal_move'}]),s=state(incoming,cr('out','dummy-out'),{'tide-lanternsquid':rawDef('Lantern',{element:'Tide',ability:a}),'donor-card':rawDef('Donor',{element:'Tide'}),'tide-basic':rawDef('Tide',{card_family:'Essence',element:'Tide',creature:null,essence:{listeners:[]}})},{extraReserve:[donor]});const f=begin(s,[event('became_vanguard','src')]);resolve(s,1,f.pending_choice!.id,[f.pending_choice!.options[0].id]);assert.equal(incoming.essence[0].uid,'tide');assert.equal(donor.essence.length,0);mark('tide-lanternsquid:deep-signal');}
 
-// Became-Vanguard attack bonuses: Coalfinch, Driftlet, Tempestalon, Boltfang.
-for (const [id,abilityId,amount] of [['ember-coalfinch','cinder-lift',10],['gale-driftlet','rising-draft',10],['gale-tempestalon','storm-entry',30],['volt-boltfang','live-hunt',20]] as const) {
-  const incoming=cr('bonus',id); const outgoing=cr('out','dummy-out');
-  const req={all:[{predicate:'event_subject_is_source'},{predicate:'event_origin_zone_is',zone:'reserve'},{predicate:'event_controller_is_active_seat'}]};
-  const a=ability('became_vanguard',abilityId,req,[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$source_creature',amount,duration:duration1}]); const s=state(incoming,outgoing,{[id]:def(id,{element:id.startsWith('ember')?'Ember':id.startsWith('volt')?'Volt':'Gale',ability:a})}); runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','bonus')]); assert.equal((incoming.flags as Any).lifecycle_attack_bonus.amount,amount,id);
-}
+  {const incoming=cr('src','ember-coalfinch'),realm=inst('caldera','ember-volcanic-caldera'),listener={id:'caldera-ember-vanguard-pressure',event:'became_vanguard',controller_scope:'any',requirements:{all:[{predicate:'event_controller_is_active_seat'},{predicate:'event_subject_matches',filters:{card_family:'Creature',element:'Ember'}}]},limit:{scope:'turn',count:1,owner:'event_controller'},steps:[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$event_subject',amount:10,duration:attackDuration}]},s=state(incoming,cr('out','dummy-out'),{'ember-coalfinch':rawDef('Coal',{element:'Ember'})},{realm:{card:realm,owner_seat:2},realmDef:rawDef('Caldera',{card_family:'Tactic',element:'Ember',creature:null,tactic:{subtype:'Realm',listeners:[listener]}})});begin(s,[event('became_vanguard','src')]);assert.equal((incoming.flags as A).lifecycle_attack_bonus.amount,10);mark('ember-volcanic-caldera:caldera-ember-vanguard-pressure');}
 
-// Condition entrants: Cindercrest Scorched; Umbraspider/Sparkmoth Dazed, event trace recorded.
-for (const [id,abilityId,condition] of [['ember-cindercrest','ash-mark','Scorched'],['shade-umbraspider','web-of-doubt','Dazed'],['volt-sparkmoth','flash-dust','Dazed']] as const) {
-  const incoming=cr('cond',id); const outgoing=cr('out','dummy-out');
-  const req=id==='ember-cindercrest'?{all:[{predicate:'event_subject_is_source'},{predicate:'event_controller_is_active_seat'}]}:{all:[{predicate:'event_subject_is_source'},{predicate:'event_controller_is_active_seat'},{predicate:'control_condition_slot_empty',target:'$current_opponent_vanguard'}]};
-  const target=id==='ember-cindercrest'?{controller:'opponent',zone:'vanguard'}:'$current_opponent_vanguard';
-  const a=ability('became_vanguard',abilityId,req,[{op:'APPLY_CONDITION',target,condition,mode:'apply_if_empty'}]); const s=state(incoming,outgoing,{[id]:def(id,{element:id.startsWith('ember')?'Ember':id.startsWith('shade')?'Shade':'Volt',ability:a})}); runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','cond')]); if(condition==='Scorched') assert.equal(s.players['2'].vanguard.conditions.scorched,true); else assert.equal(s.players['2'].vanguard.conditions.control,'Dazed'); assert.equal(s.effect_events.at(-1).event,'condition_changed');
-}
+  const expected=['astral-cometmanta:passing-orbit','ember-sootwing:soot-glide','ember-volcanic-caldera:caldera-nonember-withdrawal-damage','gale-cloudray:cloudwake','gale-pressure-compass:pressure-compass-draw','gale-slipwing:slipstream-relay','shade-wispbat:fade-echo','tide-mistmarten:mist-recovery','ember-cindercrest:ash-mark','ember-coalfinch:cinder-lift','ember-volcanic-caldera:caldera-ember-vanguard-pressure','gale-driftlet:rising-draft','gale-jetstream-essence:jetstream-vanguard-window','gale-skyweaver:crosswind','gale-tempestalon:storm-entry','shade-graveglider:cold-read','shade-umbraspider:web-of-doubt','tide-lanternsquid:deep-signal','volt-boltfang:live-hunt','volt-sparkmoth:flash-dust'];assert.deepEqual([...covered].sort(),expected.sort());
+});
 
-// Caldera became-Vanguard stacks with Coalfinch (+20 total) and is controller_scope:any.
-{
-  const incoming=cr('coal','ember-coalfinch'); const outgoing=cr('out','dummy-out'); const coal=ability('became_vanguard','cinder-lift',{all:[{predicate:'event_subject_is_source'},{predicate:'event_origin_zone_is',zone:'reserve'},{predicate:'event_destination_zone_is',zone:'vanguard'},{predicate:'event_controller_is_active_seat'}]},[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$source_creature',amount:10,duration:duration1}]);
-  const realm=inst('caldera','ember-volcanic-caldera'); const realmDef=def('Caldera',{card_family:'Tactic',element:'Ember',creature:null,tactic:{subtype:'Realm',listeners:[{id:'caldera-ember-vanguard-pressure',event:'became_vanguard',controller_scope:'any',requirements:{all:[{predicate:'event_controller_is_active_seat'},{predicate:'event_subject_matches',filters:{card_family:'Creature',element:'Ember'}}]},limit:{scope:'turn',count:1,owner:'event_controller'},steps:[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$event_subject',amount:10,duration:duration1}]}]}});
-  const s=state(incoming,outgoing,{'ember-coalfinch':def('Coalfinch',{element:'Ember',ability:coal})},{realm:{card:realm,owner_seat:2},realmDef}); const f=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','coal')]); assert.equal(f.processed_listener_keys.length,2); assert.equal((incoming.flags as Any).lifecycle_attack_bonus.amount,20);
-}
-
-console.log('PASS movement listener representative matrix');
-
-// Fail closed: stale top-deck order, wrong chooser, stale turn, and legacy/no-marker no-op.
-{
-  const incoming=cr('grave2','shade-graveglider-2'); const outgoing=cr('out2','dummy-out');
-  const a=ability('became_vanguard','cold-read-2',{all:[{predicate:'event_subject_is_source'},{predicate:'event_controller_is_active_seat'}]},[{op:'INSPECT_ZONE',player:'opponent',zone:'deck_top',selection:{min:2,max:2,filters:{}},visibility:'controller_private',return_policy:'same_position',as:'looked'},{op:'RETURN_SET_TO_DECK_TOP',player:'opponent',cards:'$looked',order:'controller_choice'}]);
-  const s=state(incoming,outgoing,{'shade-graveglider-2':def('Graveglider2',{element:'Shade',ability:a})},{p2Deck:[inst('z1','z1'),inst('z2','z2'),inst('z3','z3')]});
-  const f=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','grave2')]);
-  assert.throws(()=>runtimeV02ResolveMovementListenerChoice(s,2,f.pending_choice!.id,f.pending_choice!.options.map(o=>o.id)),/choice_not_yours/);
-  s.players['2'].deck[0]=inst('tampered','tampered'); s.card_index.tampered={definition_v0_2:def('tampered')};
-  assert.throws(()=>runtimeV02ResolveMovementListenerChoice(s,1,f.pending_choice!.id,f.pending_choice!.options.map(o=>o.id)),/choice_deck_stale/);
-}
-{
-  const incoming=cr('legacy-in','legacy-card'); const outgoing=cr('legacy-out','dummy-out'); const a=ability('became_vanguard','legacy-listener',{all:[{predicate:'event_subject_is_source'}]},[{op:'DRAW',player:'self',count:1}]);
-  const s=state(incoming,outgoing,{'legacy-card':def('legacy',{ability:a})},{p1Deck:[inst('should-stay','stay')]}); delete s.runtime_registry_v0_2;
-  const f=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','legacy-in')]); assert.equal(f.status,'complete'); assert.equal(f.processed_listener_keys.length,0); assert.equal(s.players['1'].deck.length,1);
-}
-{
-  const incoming=cr('stale-in','stale-card'); const outgoing=cr('stale-out','dummy-out'); const a=ability('became_vanguard','stale-listener',{all:[{predicate:'event_subject_is_source'}]},[{op:'DRAW',player:'self',count:1}]);
-  const s=state(incoming,outgoing,{'stale-card':def('stale',{ability:a})}); const stale=ev('became_vanguard','stale-in'); stale.turn_seq=turn-1;
-  assert.throws(()=>runtimeV02BeginMovementListenerContinuation(s,[stale]),/event_turn_stale/);
-}
-console.log('PASS fail-closed movement cases');
+Deno.test('movement choices and legacy/stale paths fail closed',()=>{
+  const incoming=cr('grave','shade-graveglider'),a=ability('became_vanguard','cold-read',reqSource(),[{op:'INSPECT_ZONE',player:'opponent',zone:'deck_top',selection:{min:2,max:2,filters:{}},visibility:'controller_private',return_policy:'same_position',as:'looked'},{op:'RETURN_SET_TO_DECK_TOP',player:'opponent',cards:'$looked',order:'controller_choice'}]),s=state(incoming,cr('out','dummy-out'),{'shade-graveglider':rawDef('Grave',{element:'Shade',ability:a})},{p2Deck:[inst('a','a'),inst('b','b'),inst('c','c')]});const f=begin(s,[event('became_vanguard','grave')]);assert.throws(()=>resolve(s,2,f.pending_choice!.id,f.pending_choice!.options.map(o=>o.id)),/choice_not_yours/);s.players['2'].deck[0]=inst('tampered','tampered');s.card_index.tampered={definition_v0_2:v02('tampered',rawDef('tampered'))};assert.throws(()=>resolve(s,1,f.pending_choice!.id,f.pending_choice!.options.map(o=>o.id)),/choice_deck_stale/);
+  const legacy=state(cr('legacy','legacy-card'),cr('out2','dummy-out'),{'legacy-card':rawDef('Legacy',{ability:ability('became_vanguard','legacy',reqSource(),[{op:'DRAW',player:'self',count:1}])})},{p1Deck:[inst('stay','stay')]});delete legacy.runtime_registry_v0_2;assert.equal(begin(legacy,[event('became_vanguard','legacy')]).processed_listener_keys.length,0);assert.equal(legacy.players['1'].deck.length,1);
+  const stale=state(cr('stale','stale-card'),cr('out3','dummy-out'),{'stale-card':rawDef('Stale',{ability:ability('became_vanguard','stale',reqSource(),[{op:'DRAW',player:'self',count:1}])})});const e:A=event('became_vanguard','stale');e.turn_seq=TURN-1;assert.throws(()=>begin(stale,[e]),/event_turn_stale/);
 });
