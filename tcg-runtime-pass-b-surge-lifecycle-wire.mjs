@@ -11,6 +11,7 @@ const attackWired = 'function attackDamage(cr:Cr,target:Cr,s:any,base:number,ctx
 
 const attachLegacy = 'const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);\n   if(d.id===';
 const attachWired = 'const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);const structuredLifecycle=applyStructuredRuntimeEssenceAttachmentLifecycle(s,cr,x,String(td?.element||""),"hand",turn);void structuredLifecycle;\n   if(d.id===';
+const attachWired79b = 'const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);const structuredLifecycle=applyStructuredRuntimeEssenceAttachmentLifecycle(s,cr,x,String(td?.element||""),"hand",turn);if(structuredLifecycle!=null){const targetInst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!targetInst)throw new Error("tcg_v0_2_attachment_target_anchor_required");recordRuntimeV02EssenceAttachmentEvent(s,seat as 1|2,targetInst.uid,x,"hand","manual_essence")}\n   if(d.id===';
 
 const aftermathLegacy = 'const kept:Inst[]=[];for(const e of x.cr.essence||[]){const ef=(e.effect_flags||{}) as any;const generated=ef.discard_during_target_aftermath===true;const surge=x.where==="vanguard"&&e.card_id==="volt-surge-essence"&&Number(e.attached_turn??-1)===turn;if(generated||surge)owner.discard.push(e);else kept.push(e)}x.cr.essence=kept';
 const aftermathWired = 'clearStructuredRuntimeAttachmentAttackBonusesAtAftermath(s,x.cr,turn);const kept:Inst[]=[];for(const e of x.cr.essence||[]){const ef=(e.effect_flags||{}) as any;const generated=ef.discard_during_target_aftermath===true;const structuredDisposition=structuredRuntimeAftermathEssenceDisposition(s,e,turn);const legacySurge=structuredDisposition==null&&x.where==="vanguard"&&e.card_id==="volt-surge-essence"&&Number(e.attached_turn??-1)===turn;if(generated||structuredDisposition==="discard"||legacySurge)owner.discard.push(e);else kept.push(e)}x.cr.essence=kept';
@@ -25,15 +26,18 @@ if (next.includes(attackLegacy)) next = next.replace(attackLegacy, attackWired);
 else if (!next.includes(attackWired)) throw new Error('match_actions_surge_attack_damage_anchor_changed');
 
 if (next.includes(attachLegacy)) next = next.replace(attachLegacy, attachWired);
-else if (!next.includes(attachWired)) throw new Error('match_actions_surge_attach_anchor_changed');
+else if (!next.includes(attachWired) && !next.includes(attachWired79b)) throw new Error('match_actions_surge_attach_anchor_changed');
 
 if (next.includes(aftermathLegacy)) next = next.replace(aftermathLegacy, aftermathWired);
 else if (!next.includes(aftermathWired)) throw new Error('match_actions_surge_aftermath_anchor_changed');
 
-for (const required of [surgeImport, attackWired, attachWired, aftermathWired]) {
+for (const required of [surgeImport, attackWired, aftermathWired]) {
   if (!next.includes(required)) throw new Error('match_actions_surge_wiring_incomplete');
   if (next.indexOf(required) !== next.lastIndexOf(required)) throw new Error('match_actions_surge_wiring_duplicate');
 }
+const materializedAttach = next.includes(attachWired79b) ? attachWired79b : attachWired;
+if (!next.includes(materializedAttach)) throw new Error('match_actions_surge_wiring_incomplete');
+if (next.indexOf(materializedAttach) !== next.lastIndexOf(materializedAttach)) throw new Error('match_actions_surge_wiring_duplicate');
 
 if (process.argv.includes('--check')) {
   if (next !== source) throw new Error('match_actions_surge_wiring_not_materialized');
