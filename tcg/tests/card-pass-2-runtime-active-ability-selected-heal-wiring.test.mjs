@@ -120,7 +120,8 @@ test('live match owner routes Reward and selected-heal active Abilities through 
 });
 
 test('Networked Growth stays on its existing Ability facade while Mycelial Bloom uses a separate exact attack-only gate', () => {
-  assert.ok(match.includes('ad?.id==="grove-myceliarch"&&(slot!==2||structuredDiscardRecycleChoice==null)'));
+  assert.ok(match.includes('ad?.id==="grove-myceliarch"&&slot===2&&structuredDiscardRecycleChoice==null'));
+  assert.equal(match.includes('ad?.id==="grove-myceliarch"&&(slot!==2||structuredDiscardRecycleChoice==null)'), false, 'Mycelial Bloom gate must not block plain Colony Pulse');
   assert.ok(match.includes('attack_effect_requires_pending_choice_engine'));
   assert.equal(owner.includes('SELECT_CARDS'), false);
   assert.equal(owner.includes('MOVE_CARDS'), false);
