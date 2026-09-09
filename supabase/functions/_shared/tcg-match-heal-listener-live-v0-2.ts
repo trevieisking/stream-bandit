@@ -22,6 +22,7 @@ export type RuntimeV02HealListenerFlow = {
 export type RuntimeV02AttackHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02AbilityHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02MovementHealListenerFlow = RuntimeV02HealListenerFlow;
+export type RuntimeV02TacticHealListenerFlow = RuntimeV02HealListenerFlow;
 
 export type RuntimeV02AttackHealListenerChoiceResolution =
   RuntimeV02HealListenerChoiceResolution & {
@@ -41,10 +42,17 @@ export type RuntimeV02MovementHealListenerChoiceResolution =
     resume_seat: 1 | 2 | null;
   };
 
+export type RuntimeV02TacticHealListenerChoiceResolution =
+  RuntimeV02HealListenerChoiceResolution & {
+    resume_ready: boolean;
+    resume_seat: 1 | 2 | null;
+  };
+
 type RuntimeV02HealListenerResumeKind =
   | "scan_defeats_then_aftermath"
   | "scan_defeats_then_play"
-  | "return_to_play";
+  | "return_to_play"
+  | "resume_tactic_effect";
 
 type RuntimeV02HealListenerResume = {
   kind: RuntimeV02HealListenerResumeKind;
@@ -225,6 +233,25 @@ export function runtimeV02BeginMovementHealListenerContinuation(
 }
 
 /**
+ * Starts the same canonical after_heal_packet queue for a Tactic-owned heal.
+ * The shared coordinator owns listener execution and private choices only. The
+ * tactic interpreter keeps its own effect-id/cursor resume receipt, so this
+ * facade deliberately records only the generic seat/turn resume kind here.
+ */
+export function runtimeV02BeginTacticHealListenerContinuation(
+  state: Record<string, unknown>,
+  packetIds: string[],
+  tacticSeat: 1 | 2,
+): RuntimeV02TacticHealListenerFlow {
+  return beginHealListenerContinuation(
+    state,
+    packetIds,
+    tacticSeat,
+    "resume_tactic_effect",
+  );
+}
+
+/**
  * Resolves one private after-heal listener choice. If the choice owner resumes
  * into another deferred listener, the attack resume receipt is preserved. Only
  * when the entire canonical packet queue is clear is the receipt released back
@@ -284,5 +311,25 @@ export function runtimeV02ResolveMovementHealListenerChoice(
     choiceId,
     choiceIds,
     "scan_defeats_then_play",
+  );
+}
+
+/**
+ * Resolves a private after-heal listener choice for a Tactic-owned heal. Once
+ * the canonical queue is complete, the tactic owner receives only the actor
+ * seat; its own effect-id/cursor receipt decides the exact effect to resume.
+ */
+export function runtimeV02ResolveTacticHealListenerChoice(
+  state: Record<string, unknown>,
+  actorSeat: 1 | 2,
+  choiceId: string,
+  choiceIds: string[],
+): RuntimeV02TacticHealListenerChoiceResolution {
+  return resolveHealListenerChoiceWithResume(
+    state,
+    actorSeat,
+    choiceId,
+    choiceIds,
+    "resume_tactic_effect",
   );
 }
