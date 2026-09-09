@@ -220,3 +220,24 @@ Deno.test("missing outgoing or top-card anchors fail closed before ledger creati
   );
   assertEquals(JSON.stringify(s), beforeAnchor);
 });
+
+Deno.test("switch query results are detached copies and the private ledger stores instance identity, not card-definition identity", () => {
+  const s = state();
+  runtimeV02ApplyAtomicSwitch(s, 1, 0, {
+    action_kind: "attack",
+    source_action_id: "privacy-check",
+    source_card_uid: "outgoing-1",
+  });
+
+  const contexts = runtimeV02CurrentTurnSwitchContexts(s);
+  const events = runtimeV02CurrentTurnSwitchEvents(s);
+  contexts[0].source_action_id = "tampered";
+  events[0].subject_uid = "tampered";
+
+  assertEquals(runtimeV02CurrentTurnSwitchContexts(s)[0].source_action_id, "privacy-check");
+  assertEquals(runtimeV02CurrentTurnSwitchEvents(s)[0].subject_uid, "outgoing-1");
+  const ledger = JSON.stringify((s as any).runtime_v0_2_switch_ledger);
+  assertEquals(ledger.includes("creature-a"), false, "outgoing card-definition id leaked into switch ledger");
+  assertEquals(ledger.includes("creature-b"), false, "incoming card-definition id leaked into switch ledger");
+  assertEquals(ledger.includes("card_id"), false, "switch ledger must not store card-definition fields");
+});
