@@ -94,6 +94,18 @@ test('live match owner snapshots the threshold before damage, suppresses legacy 
   assert.ok(defeatScan > pendingReturn, 'defeat scanning must wait until the after-damage discard choice resolves');
 });
 
+test('resolved overcharge public receipt exposes only structural outcome and never the selected Essence identity', () => {
+  const branchStart = match.indexOf('if(pending.kind==="discard_attached_essence_then_condition")');
+  const branchEnd = match.indexOf('const selectedPending=pending as RuntimeV02PendingAttackChoice', branchStart);
+  assert.ok(branchStart >= 0 && branchEnd > branchStart, 'overcharge resolve branch missing');
+  const branch = match.slice(branchStart, branchEnd);
+  assert.ok(branch.includes('discarded_count:1'));
+  assert.ok(branch.includes('target_remained_after_damage:resolved.target_remained_after_damage'));
+  assert.ok(branch.includes('condition_applied:resolved.condition_applied'));
+  assert.equal(branch.includes('discarded_uid:'), false, 'public resolve receipt must not expose selected Essence UID');
+  assert.equal(branch.includes('discarded_card_id:'), false, 'public resolve receipt must not expose selected Essence card ID');
+});
+
 test('Arcade Lab routes structured attack choices to the match owner and keeps the old Stormmane pre-prompt legacy-only', () => {
   assert.ok(arcade.includes('function structuredDef(inst)'));
   assert.ok(arcade.includes('function structuredAttack(cr,slot)'));
