@@ -3,8 +3,8 @@ import {
   runtimeV02BeginMovementListenerContinuation as begin,
   runtimeV02ResolveMovementListenerChoice as resolve,
   runtimeV02PrivateMovementInspectionView as privateView,
-  type RuntimeV02SwitchMovementEvent,
 } from '../_shared/tcg-match-movement-listener-v0-2.ts';
+import type { RuntimeV02SwitchMovementEvent } from '../_shared/tcg-match-switch-context-v0-2.ts';
 import { recordRuntimeV02EssenceAttachmentEvent as recordAttach } from '../_shared/tcg-match-essence-attachment-event-v0-2.ts';
 import { runtimeV02SnapshotMarker } from '../_shared/tcg-runtime-registry-v0-2.ts';
 
