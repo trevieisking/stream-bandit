@@ -1,8 +1,11 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { recordRuntimeV02EssenceMovement } from "../_shared/tcg-match-essence-movement-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
+import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
+import { runtimeV02BeginTacticHealListenerContinuation, runtimeV02PendingHealListenerChoiceView, runtimeV02ResolveTacticHealListenerChoice, type RuntimeV02PendingHealListenerChoice } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
 import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context-v0-2.ts";
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
+import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
 
 const VERSION = "Stream Bandit TCG tactic actions v0.3";
@@ -124,6 +127,44 @@ function findCreature(state: any, ref: CreatureRef | null | undefined) {
     }
   }
   return null;
+}
+function applyTacticHeal(state: any, effect: EffectState, found: NonNullable<ReturnType<typeof findCreature>>, amount: number) {
+  if (state.runtime_registry_v0_2 == null) {
+    return { actual_heal: healRuntimeDamage(found.cr, amount), packet_id: null as string | null };
+  }
+  const sourceDefinition = runtimeV02Definition(state, effect.source_card);
+  if (!sourceDefinition) throw new Error("tcg_v0_2_tactic_heal_source_definition_required");
+  const sourceSeat = Number(effect.owner_seat);
+  if (sourceSeat !== 1 && sourceSeat !== 2) throw new Error("tcg_v0_2_tactic_heal_source_seat_invalid");
+  const targetSeat = Number(found.seat);
+  if (targetSeat !== 1 && targetSeat !== 2) throw new Error("tcg_v0_2_tactic_heal_target_seat_invalid");
+  const target = topInst(found.cr);
+  if (!target) throw new Error("tcg_v0_2_tactic_heal_target_top_required");
+  const targetDefinition = runtimeV02Definition(state, target);
+  if (!targetDefinition) throw new Error("tcg_v0_2_tactic_heal_target_definition_required");
+  const element = String(targetDefinition.element || "").trim();
+  if (!element) throw new Error("tcg_v0_2_tactic_heal_target_element_required");
+  const resolved = applyRuntimeV02HealPacket(state, found.cr, amount, {
+    source: {
+      controller_seat: sourceSeat,
+      action_kind: "tactic",
+      action_id: effect.id,
+      card_effect: true,
+      card_uid: effect.source_card.uid,
+      card_id: effect.source_card_id,
+      creature_uid: null,
+    },
+    target: {
+      controller_seat: targetSeat,
+      creature_uid: target.uid,
+      card_uid: target.uid,
+      card_id: target.card_id,
+      element,
+      where: found.where,
+      index: found.index,
+    },
+  });
+  return { actual_heal: resolved.actual_heal, packet_id: resolved.packet?.id || null };
 }
 function conditions(cr: Cr) {
   return runtimeConditions(cr);
@@ -346,6 +387,7 @@ function makeView(state: any, viewerSeat: number, revision: number) {
       count: state.pending_resolutions[0].count || null,
     } : null,
     pending_choice: choiceView(state.pending_choice || null, viewerSeat),
+    pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, viewerSeat as 1 | 2),
     pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, viewerSeat as 1 | 2),
     private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, viewerSeat as 1 | 2),
     result: state.result || null,
@@ -426,6 +468,13 @@ function moveCardsToDestination(state: any, seat: number, cards: Inst[], destina
   else if (destination === "deck_top") player.deck.unshift(...cards);
   else throw new Error(`unsupported_card_destination:${destination}`);
 }
+function healListenerAudit(flow: any) {
+  return {
+    status: flow.status,
+    processed_packet_ids: flow.continuation?.processed_packet_ids || [],
+    emitted_packet_ids: flow.continuation?.emitted_packet_ids || [],
+  };
+}
 function movementListenerAudit(flow: any) {
   return {
     status: flow.status,
@@ -446,6 +495,24 @@ function readTacticMovementResume(state: any, effect: EffectState) {
   if (String(raw.effect_id || "") !== effect.id) throw new Error("tcg_v0_2_tactic_movement_resume_stale_effect");
   if (Number(raw.owner_seat) !== effect.owner_seat) throw new Error("tcg_v0_2_tactic_movement_resume_owner_changed");
   if (Number(raw.turn_seq) !== Number(state.turn_seq || 0)) throw new Error("tcg_v0_2_tactic_movement_resume_turn_stale");
+  return raw;
+}
+function setTacticHealResume(state: any, effect: EffectState) {
+  if (state.pending_tactic_heal_resume != null) throw new Error("tcg_v0_2_tactic_heal_resume_already_pending");
+  state.pending_tactic_heal_resume = {
+    effect_id: effect.id,
+    owner_seat: effect.owner_seat,
+    cursor: effect.cursor,
+    turn_seq: Number(state.turn_seq || 0),
+  };
+}
+function readTacticHealResume(state: any, effect: EffectState) {
+  const raw = state.pending_tactic_heal_resume;
+  if (!raw || typeof raw !== "object") throw new Error("tcg_v0_2_tactic_heal_resume_required");
+  if (String(raw.effect_id || "") !== effect.id) throw new Error("tcg_v0_2_tactic_heal_resume_stale_effect");
+  if (Number(raw.owner_seat) !== effect.owner_seat) throw new Error("tcg_v0_2_tactic_heal_resume_owner_changed");
+  if (Number(raw.turn_seq) !== Number(state.turn_seq || 0)) throw new Error("tcg_v0_2_tactic_heal_resume_turn_stale");
+  if (Number(raw.cursor) !== effect.cursor) throw new Error("tcg_v0_2_tactic_heal_resume_cursor_changed");
   return raw;
 }
 function firstRequiredCreatureTargetAvailable(state: any, ownerSeat: number, steps: any[]) {
@@ -487,7 +554,7 @@ function executeUntilChoice(state: any) {
   const effect = state.effect_resolution as EffectState;
   if (!effect) throw new Error("effect_resolution_missing");
   let guard = 0;
-  while (!state.pending_choice && !state.pending_movement_listener_choice && effect.cursor < effect.steps.length) {
+  while (!state.pending_choice && !state.pending_heal_listener_choice && !state.pending_movement_listener_choice && effect.cursor < effect.steps.length) {
     if (++guard > 200) throw new Error("effect_resolution_guard");
     const step = effect.steps[effect.cursor] || {};
     const op = String(step.op || "");
@@ -665,12 +732,27 @@ function executeUntilChoice(state: any) {
       });
       return;
     }
-    if (op === "HEAL" || op === "ADD_SHIELD" || op === "CLEAR_CONDITION_IF_PRESENT" || op === "CLEAR_CONDITION") {
+    if (op === "HEAL") {
+      const ref = resolveVar(vars, step.target) as CreatureRef;
+      const found = findCreature(state, ref);
+      const packetIds: string[] = [];
+      if (found) {
+        const healed = applyTacticHeal(state, effect, found, Number(step.amount || 0));
+        if (healed.packet_id) packetIds.push(healed.packet_id);
+      }
+      effect.cursor++;
+      const healFlow = runtimeV02BeginTacticHealListenerContinuation(state, packetIds, ownerSeat as 1 | 2);
+      if (healFlow.status === "player_choice_required") {
+        setTacticHealResume(state, effect);
+        return;
+      }
+      continue;
+    }
+    if (op === "ADD_SHIELD" || op === "CLEAR_CONDITION_IF_PRESENT" || op === "CLEAR_CONDITION") {
       const ref = resolveVar(vars, step.target) as CreatureRef;
       const found = findCreature(state, ref);
       if (found) {
-        if (op === "HEAL") healRuntimeDamage(found.cr, Number(step.amount || 0));
-        else if (op === "ADD_SHIELD") addRuntimeShield(found.cr, Number(step.amount || 0));
+        if (op === "ADD_SHIELD") addRuntimeShield(found.cr, Number(step.amount || 0));
         else clearCondition(found.cr, String(step.condition || ""));
       }
       effect.cursor++;
@@ -678,11 +760,19 @@ function executeUntilChoice(state: any) {
     }
     if (op === "HEAL_EACH") {
       const refs = (resolveVar(vars, step.targets) || []) as CreatureRef[];
+      const packetIds: string[] = [];
       for (const ref of refs) {
         const found = findCreature(state, ref);
-        if (found) healRuntimeDamage(found.cr, Number(step.amount || 0));
+        if (!found) continue;
+        const healed = applyTacticHeal(state, effect, found, Number(step.amount || 0));
+        if (healed.packet_id) packetIds.push(healed.packet_id);
       }
       effect.cursor++;
+      const healFlow = runtimeV02BeginTacticHealListenerContinuation(state, packetIds, ownerSeat as 1 | 2);
+      if (healFlow.status === "player_choice_required") {
+        setTacticHealResume(state, effect);
+        return;
+      }
       continue;
     }
     if (op === "CHOOSE_AND_CLEAR_CONDITION") {
@@ -947,7 +1037,7 @@ function executeUntilChoice(state: any) {
     throw new Error(`unknown_effect_op:${op}`);
   }
 
-  if (!state.pending_choice && !state.pending_movement_listener_choice && effect.cursor >= effect.steps.length) finishEffect(state, effect);
+  if (!state.pending_choice && !state.pending_heal_listener_choice && !state.pending_movement_listener_choice && effect.cursor >= effect.steps.length) finishEffect(state, effect);
 }
 
 function applyPendingChoice(state: any, selected: ChoiceOption[]) {
@@ -1151,7 +1241,7 @@ Deno.serve(async (req) => {
       if (state.phase !== "play" || Number(state.active_seat) !== seat) {
         return json({ ok: false, version: VERSION, error: "not_active_player" }, 400);
       }
-      if (state.effect_resolution || state.pending_choice || state.pending_movement_listener_choice) {
+      if (state.effect_resolution || state.pending_choice || state.pending_heal_listener_choice || state.pending_movement_listener_choice || state.pending_tactic_heal_resume || state.pending_tactic_movement_resume) {
         return json({ ok: false, version: VERSION, error: "effect_resolution_already_pending" }, 409);
       }
 
@@ -1214,6 +1304,7 @@ Deno.serve(async (req) => {
         card_id: source.card_id,
         subtype,
         pending_choice: !!state.pending_choice,
+        pending_heal_listener_choice: !!state.pending_heal_listener_choice,
         pending_movement_listener_choice: !!state.pending_movement_listener_choice,
       });
       return json({
@@ -1221,6 +1312,7 @@ Deno.serve(async (req) => {
         version: VERSION,
         result,
         pending_choice: choiceView(state.pending_choice || null, seat),
+        pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
         pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
         private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
       });
@@ -1257,6 +1349,7 @@ Deno.serve(async (req) => {
           version: VERSION,
           result,
           pending_choice: null,
+          pending_heal_listener_choice: null,
           pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(resolved.pending_choice, seat as 1 | 2),
           private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
         });
@@ -1266,6 +1359,7 @@ Deno.serve(async (req) => {
       const result = await commit("resolve_tactic_movement_listener_choice", {
         seat,
         pending_choice: !!state.pending_choice,
+        pending_heal_listener_choice: !!state.pending_heal_listener_choice,
         pending_movement_listener_choice: !!state.pending_movement_listener_choice,
         movement_listener: movementAudit,
       });
@@ -1274,6 +1368,68 @@ Deno.serve(async (req) => {
         version: VERSION,
         result,
         pending_choice: choiceView(state.pending_choice || null, seat),
+        pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
+        pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
+        private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+      });
+    }
+
+    const healPending = state.pending_heal_listener_choice as RuntimeV02PendingHealListenerChoice | null;
+    if (healPending) {
+      if (!effect || state.phase !== "effect_resolution") {
+        return json({ ok: false, version: VERSION, error: "no_tactic_heal_choice_pending" }, 400);
+      }
+      let resolved;
+      try {
+        readTacticHealResume(state, effect);
+        const ids = Array.isArray(body.choice_ids) ? body.choice_ids.map((value: unknown) => String(value)) : [];
+        resolved = runtimeV02ResolveTacticHealListenerChoice(state, seat as 1 | 2, String(body.choice_id || ""), ids);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message === "tcg_v0_2_heal_choice_not_yours") return json({ ok: false, version: VERSION, error: message }, 403);
+        if (message === "tcg_v0_2_heal_choice_stale_id" || message.includes("_turn_stale") || message.includes("_stale_effect") || message.includes("_owner_changed") || message.includes("_cursor_changed")) return json({ ok: false, version: VERSION, error: message }, 409);
+        if (["tcg_v0_2_heal_choice_id_required", "tcg_v0_2_heal_choice_exactly_one_option_required", "tcg_v0_2_heal_choice_unknown_option"].includes(message) || message.startsWith("tcg_v0_2_tactic_heal_resume_") || message === "tcg_v0_2_heal_live_resume_kind_invalid" || message === "tcg_v0_2_heal_live_resume_required") return json({ ok: false, version: VERSION, error: message }, 400);
+        throw error;
+      }
+      const healAudit = {
+        status: resolved.pending_choice ? "player_choice_required" : "complete",
+        processed_packet_ids: resolved.continuation?.processed_packet_ids || [],
+        emitted_packet_ids: resolved.continuation?.emitted_packet_ids || [],
+      };
+      if (resolved.pending_choice) {
+        const result = await commit("resolve_tactic_heal_listener_choice", {
+          seat,
+          pending_choice: true,
+          heal_listener: healAudit,
+        });
+        return json({
+          ok: true,
+          version: VERSION,
+          result,
+          pending_choice: null,
+          pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(resolved.pending_choice, seat as 1 | 2),
+          pending_movement_listener_choice: null,
+          private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        });
+      }
+      if (!resolved.resume_ready || resolved.resume_seat == null || resolved.resume_seat !== effect.owner_seat) {
+        throw new Error("tcg_v0_2_tactic_heal_resume_not_ready");
+      }
+      delete state.pending_tactic_heal_resume;
+      executeUntilChoice(state);
+      const result = await commit("resolve_tactic_heal_listener_choice", {
+        seat,
+        pending_choice: !!state.pending_choice,
+        pending_heal_listener_choice: !!state.pending_heal_listener_choice,
+        pending_movement_listener_choice: !!state.pending_movement_listener_choice,
+        heal_listener: healAudit,
+      });
+      return json({
+        ok: true,
+        version: VERSION,
+        result,
+        pending_choice: choiceView(state.pending_choice || null, seat),
+        pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
         pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
         private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
       });
@@ -1297,6 +1453,7 @@ Deno.serve(async (req) => {
       kind: pending.kind,
       selected_count: selected.length,
       pending_choice: !!state.pending_choice,
+      pending_heal_listener_choice: !!state.pending_heal_listener_choice,
       pending_movement_listener_choice: !!state.pending_movement_listener_choice,
     });
     return json({
@@ -1304,6 +1461,7 @@ Deno.serve(async (req) => {
       version: VERSION,
       result,
       pending_choice: choiceView(state.pending_choice || null, seat),
+      pending_heal_listener_choice: runtimeV02PendingHealListenerChoiceView(state.pending_heal_listener_choice || null, seat as 1 | 2),
       pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
       private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
     });
