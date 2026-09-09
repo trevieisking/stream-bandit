@@ -94,16 +94,20 @@ test('frozen Gale data proves Aeralith cannot safely bypass the shared switch-ev
   }
 });
 
-test('the new switch ledger is private foundation only and is deliberately not wired into live switch call sites in this tick', () => {
-  assert.equal(match.includes('tcg-match-switch-context-v0-2.ts'), false, 'match wiring belongs to the next bounded tick');
-  assert.equal(tactic.includes('tcg-match-switch-context-v0-2.ts'), false, 'tactic wiring belongs to the next bounded tick');
-  assert.ok(match.includes('function switchWithReserve('));
-  assert.ok(tactic.includes('function switchWithVanguard('));
-  assert.ok(match.includes('gale-aeralith-storm-shepherd'), 'Aeralith migration debt must remain visible until listener-safe switch wiring lands');
+test('79b wires atomic switch events into the live match owner while preserving private state and separate tactic ownership', () => {
+  assert.equal(match.includes('tcg-match-switch-context-v0-2.ts'), true, '79b match wiring must use the shared atomic switch owner');
+  assert.equal(tactic.includes('tcg-match-switch-context-v0-2.ts'), false, 'tactic switch ownership remains outside this bounded 79b match tick');
+  assert.ok(match.includes('runtimeV02ApplyAtomicSwitch(s,seat,idx,{action_kind:"voluntary_withdrawal"'), 'voluntary withdrawal must use the atomic switch owner');
+  assert.ok(match.includes('runtimeV02ApplyAtomicSwitch(s,seat,switchIndex,{action_kind:"attack"'), 'post-attack switch must use the atomic switch owner');
+  assert.equal(match.includes('function switchWithReserve('), false, 'old direct match swap helper must not remain as a competing owner');
+  assert.ok(tactic.includes('function switchWithVanguard('), 'tactic switch helper remains a separate later-runtime owner in this tick');
+  assert.equal(match.includes('gale-aeralith-storm-shepherd'), false, 'Aeralith must not require a new card-specific switch branch');
+  assert.ok(match.includes('if(wantsSwitch&&body.switch_reserve_index!=null)'), 'attack switch remains optional when the frozen effect says it is optional');
+  assert.ok(match.includes('runtimeV02BeginMovementListenerContinuation(s,switched.events)'), 'atomic switch events must enter the generic movement listener continuation');
 
   const matchView = match.slice(match.indexOf('function makeView('), match.indexOf('function views('));
   assert.equal(matchView.includes('runtime_v0_2_switch_ledger'), false, 'private switch ledger must never enter match player views');
-  assert.equal(tactic.includes('runtime_v0_2_switch_ledger'), false, 'unwired tactic surface must not serialize the private ledger');
+  assert.equal(tactic.includes('runtime_v0_2_switch_ledger'), false, 'tactic surface must not serialize the private ledger');
 });
 
 test('switch foundation does not falsely claim listener or full runtime parity', () => {
