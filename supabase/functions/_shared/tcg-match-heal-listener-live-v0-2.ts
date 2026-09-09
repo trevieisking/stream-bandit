@@ -21,6 +21,7 @@ export type RuntimeV02HealListenerFlow = {
 
 export type RuntimeV02AttackHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02AbilityHealListenerFlow = RuntimeV02HealListenerFlow;
+export type RuntimeV02MovementHealListenerFlow = RuntimeV02HealListenerFlow;
 
 export type RuntimeV02AttackHealListenerChoiceResolution =
   RuntimeV02HealListenerChoiceResolution & {
@@ -34,8 +35,15 @@ export type RuntimeV02AbilityHealListenerChoiceResolution =
     resume_seat: 1 | 2 | null;
   };
 
+export type RuntimeV02MovementHealListenerChoiceResolution =
+  RuntimeV02HealListenerChoiceResolution & {
+    resume_ready: boolean;
+    resume_seat: 1 | 2 | null;
+  };
+
 type RuntimeV02HealListenerResumeKind =
   | "scan_defeats_then_aftermath"
+  | "scan_defeats_then_play"
   | "return_to_play";
 
 type RuntimeV02HealListenerResume = {
@@ -198,6 +206,25 @@ export function runtimeV02BeginAbilityHealListenerContinuation(
 }
 
 /**
+ * Starts the canonical after_heal_packet listener continuation for a heal that
+ * was emitted while resolving a Vanguard/Reserve movement listener. Movement
+ * itself never owns turn advance or Aftermath: once the canonical heal queue is
+ * clear, tcg-match-actions resumes by scanning defeats and returning to play.
+ */
+export function runtimeV02BeginMovementHealListenerContinuation(
+  state: Record<string, unknown>,
+  packetIds: string[],
+  movementSeat: 1 | 2,
+): RuntimeV02MovementHealListenerFlow {
+  return beginHealListenerContinuation(
+    state,
+    packetIds,
+    movementSeat,
+    "scan_defeats_then_play",
+  );
+}
+
+/**
  * Resolves one private after-heal listener choice. If the choice owner resumes
  * into another deferred listener, the attack resume receipt is preserved. Only
  * when the entire canonical packet queue is clear is the receipt released back
@@ -236,5 +263,26 @@ export function runtimeV02ResolveAbilityHealListenerChoice(
     choiceId,
     choiceIds,
     "return_to_play",
+  );
+}
+
+/**
+ * Resolves one private after-heal listener choice for movement-triggered heals.
+ * The shared coordinator remains the only choice/continuation owner; this thin
+ * facade validates movement's distinct resume receipt and hands the actor seat
+ * back to tcg-match-actions only after the complete packet queue is clear.
+ */
+export function runtimeV02ResolveMovementHealListenerChoice(
+  state: Record<string, unknown>,
+  actorSeat: 1 | 2,
+  choiceId: string,
+  choiceIds: string[],
+): RuntimeV02MovementHealListenerChoiceResolution {
+  return resolveHealListenerChoiceWithResume(
+    state,
+    actorSeat,
+    choiceId,
+    choiceIds,
+    "scan_defeats_then_play",
   );
 }
