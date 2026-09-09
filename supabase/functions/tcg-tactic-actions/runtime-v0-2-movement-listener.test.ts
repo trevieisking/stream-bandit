@@ -120,14 +120,14 @@ Deno.test("movement listener continuation covers all 20 frozen Set One switch li
 {
   const outgoing=cr('cloud','gale-cloudray'); const incoming=cr('in','incoming-card');
   const a=ability('moved_to_reserve','cloudwake',{all:[{predicate:'event_subject_is_source'},{predicate:'event_action_kind_is',action_kind:'voluntary_withdrawal'},{predicate:'event_controller_is_active_seat'}]},[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$switch_incoming_vanguard',amount:10,duration:duration1}]);
-  const s=state(incoming,outgoing,{'gale-cloudray':def('Cloudray',{ability:a}), 'incoming-card':def('Incoming')}); runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','cloud','voluntary_withdrawal')]); assert.equal(incoming.flags.lifecycle_attack_bonus.amount,10);
+  const s=state(incoming,outgoing,{'gale-cloudray':def('Cloudray',{ability:a}), 'incoming-card':def('Incoming')}); runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','cloud','voluntary_withdrawal')]); assert.equal((incoming.flags as Any).lifecycle_attack_bonus.amount,10);
 }
 
 // Slipwing withdrawal modifier on attack switch.
 {
   const outgoing=cr('slip','gale-slipwing'); const incoming=cr('in','incoming-card');
   const a=ability('moved_to_reserve','slipstream-relay',{all:[{predicate:'event_subject_is_source'},{predicate:'event_action_kind_is',action_kind:'attack'},{predicate:'event_controller_is_active_seat'}]},[{op:'SET_WITHDRAWAL_MODIFIER',target:'$switch_incoming_vanguard',mode:'delta',amount:-1,minimum:0,duration:withdrawDuration1}]);
-  const s=state(incoming,outgoing,{'gale-slipwing':def('Slipwing',{ability:a}), 'incoming-card':def('Incoming',{withdrawal:2})}); runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','slip','attack')]); assert.equal(incoming.flags.lifecycle_withdrawal_cost.value,1);
+  const s=state(incoming,outgoing,{'gale-slipwing':def('Slipwing',{ability:a}), 'incoming-card':def('Incoming',{withdrawal:2})}); runtimeV02BeginMovementListenerContinuation(s,[ev('moved_to_reserve','slip','attack')]); assert.equal((incoming.flags as Any).lifecycle_withdrawal_cost.value,1);
 }
 
 // Sootwing + Mistmarten use canonical heal packet source kind=ability.
@@ -141,7 +141,7 @@ for (const [id,abilityId,amount] of [['ember-sootwing','soot-glide',10],['tide-m
 for (const [id,abilityId,amount] of [['ember-coalfinch','cinder-lift',10],['gale-driftlet','rising-draft',10],['gale-tempestalon','storm-entry',30],['volt-boltfang','live-hunt',20]] as const) {
   const incoming=cr('bonus',id); const outgoing=cr('out','dummy-out');
   const req={all:[{predicate:'event_subject_is_source'},{predicate:'event_origin_zone_is',zone:'reserve'},{predicate:'event_controller_is_active_seat'}]};
-  const a=ability('became_vanguard',abilityId,req,[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$source_creature',amount,duration:duration1}]); const s=state(incoming,outgoing,{[id]:def(id,{element:id.startsWith('ember')?'Ember':id.startsWith('volt')?'Volt':'Gale',ability:a})}); runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','bonus')]); assert.equal(incoming.flags.lifecycle_attack_bonus.amount,amount,id);
+  const a=ability('became_vanguard',abilityId,req,[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$source_creature',amount,duration:duration1}]); const s=state(incoming,outgoing,{[id]:def(id,{element:id.startsWith('ember')?'Ember':id.startsWith('volt')?'Volt':'Gale',ability:a})}); runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','bonus')]); assert.equal((incoming.flags as Any).lifecycle_attack_bonus.amount,amount,id);
 }
 
 // Condition entrants: Cindercrest Scorched; Umbraspider/Sparkmoth Dazed, event trace recorded.
@@ -156,7 +156,7 @@ for (const [id,abilityId,condition] of [['ember-cindercrest','ash-mark','Scorche
 {
   const incoming=cr('coal','ember-coalfinch'); const outgoing=cr('out','dummy-out'); const coal=ability('became_vanguard','cinder-lift',{all:[{predicate:'event_subject_is_source'},{predicate:'event_origin_zone_is',zone:'reserve'},{predicate:'event_destination_zone_is',zone:'vanguard'},{predicate:'event_controller_is_active_seat'}]},[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$source_creature',amount:10,duration:duration1}]);
   const realm=inst('caldera','ember-volcanic-caldera'); const realmDef=def('Caldera',{card_family:'Tactic',element:'Ember',creature:null,tactic:{subtype:'Realm',listeners:[{id:'caldera-ember-vanguard-pressure',event:'became_vanguard',controller_scope:'any',requirements:{all:[{predicate:'event_controller_is_active_seat'},{predicate:'event_subject_matches',filters:{card_family:'Creature',element:'Ember'}}]},limit:{scope:'turn',count:1,owner:'event_controller'},steps:[{op:'ADD_ATTACK_DAMAGE_MODIFIER',target:'$event_subject',amount:10,duration:duration1}]}]}});
-  const s=state(incoming,outgoing,{'ember-coalfinch':def('Coalfinch',{element:'Ember',ability:coal})},{realm:{card:realm,owner_seat:2},realmDef}); const f=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','coal')]); assert.equal(f.processed_listener_keys.length,2); assert.equal(incoming.flags.lifecycle_attack_bonus.amount,20);
+  const s=state(incoming,outgoing,{'ember-coalfinch':def('Coalfinch',{element:'Ember',ability:coal})},{realm:{card:realm,owner_seat:2},realmDef}); const f=runtimeV02BeginMovementListenerContinuation(s,[ev('became_vanguard','coal')]); assert.equal(f.processed_listener_keys.length,2); assert.equal((incoming.flags as Any).lifecycle_attack_bonus.amount,20);
 }
 
 console.log('PASS movement listener representative matrix');
