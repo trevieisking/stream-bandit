@@ -1,6 +1,8 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { recordRuntimeV02EssenceMovement } from "../_shared/tcg-match-essence-movement-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
+import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context-v0-2.ts";
+import { runtimeV02BeginMovementListenerContinuation, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
 import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
 
 const VERSION = "Stream Bandit TCG tactic actions v0.3";
@@ -140,10 +142,6 @@ function activeConditions(cr: Cr) {
 }
 function clearCondition(cr: Cr, condition: string) {
   clearRuntimeCondition(cr, condition);
-}
-function clearOrdinaryConditions(cr: Cr) {
-  cr.conditions = { scorched: false, venomed: 0, control: null, modifier: null };
-  cr.condition = null;
 }
 function removeByUid(zone: Inst[], uid: string) {
   const index = zone.findIndex((inst) => inst.uid === uid);
@@ -348,6 +346,8 @@ function makeView(state: any, viewerSeat: number, revision: number) {
       count: state.pending_resolutions[0].count || null,
     } : null,
     pending_choice: choiceView(state.pending_choice || null, viewerSeat),
+    pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, viewerSeat as 1 | 2),
+    private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, viewerSeat as 1 | 2),
     result: state.result || null,
     log: (state.log || []).slice(-20),
     you: {
@@ -426,22 +426,27 @@ function moveCardsToDestination(state: any, seat: number, cards: Inst[], destina
   else if (destination === "deck_top") player.deck.unshift(...cards);
   else throw new Error(`unsupported_card_destination:${destination}`);
 }
-function switchWithVanguard(state: any, ref: CreatureRef) {
-  const found = findCreature(state, ref);
-  if (!found) throw new Error("switch_target_missing");
-  if (found.where === "vanguard") return { oldVanguard: ref, newVanguard: ref };
-  const player = found.player;
-  const old = player.vanguard as Cr | null;
-  const oldRef = old ? creatureRef(old, ref.seat) : null;
-  player.vanguard = found.cr;
-  player.reserve[Number(found.index)] = old;
-  if (old) clearOrdinaryConditions(old);
-  clearOrdinaryConditions(player.vanguard);
-  player.vanguard.became_vanguard_turn = Number(state.turn_seq || 0);
+function movementListenerAudit(flow: any) {
   return {
-    oldVanguard: oldRef,
-    newVanguard: creatureRef(player.vanguard, ref.seat),
+    status: flow.status,
+    processed_listener_keys: flow.processed_listener_keys || [],
+    emitted_heal_packet_ids: flow.emitted_heal_packet_ids || [],
   };
+}
+function setTacticMovementResume(state: any, effect: EffectState) {
+  state.pending_tactic_movement_resume = {
+    effect_id: effect.id,
+    owner_seat: effect.owner_seat,
+    turn_seq: Number(state.turn_seq || 0),
+  };
+}
+function readTacticMovementResume(state: any, effect: EffectState) {
+  const raw = state.pending_tactic_movement_resume;
+  if (!raw || typeof raw !== "object") throw new Error("tcg_v0_2_tactic_movement_resume_required");
+  if (String(raw.effect_id || "") !== effect.id) throw new Error("tcg_v0_2_tactic_movement_resume_stale_effect");
+  if (Number(raw.owner_seat) !== effect.owner_seat) throw new Error("tcg_v0_2_tactic_movement_resume_owner_changed");
+  if (Number(raw.turn_seq) !== Number(state.turn_seq || 0)) throw new Error("tcg_v0_2_tactic_movement_resume_turn_stale");
+  return raw;
 }
 function firstRequiredCreatureTargetAvailable(state: any, ownerSeat: number, steps: any[]) {
   const first = (steps || []).find((step: any) => String(step?.op || "") !== "");
@@ -482,7 +487,7 @@ function executeUntilChoice(state: any) {
   const effect = state.effect_resolution as EffectState;
   if (!effect) throw new Error("effect_resolution_missing");
   let guard = 0;
-  while (!state.pending_choice && effect.cursor < effect.steps.length) {
+  while (!state.pending_choice && !state.pending_movement_listener_choice && effect.cursor < effect.steps.length) {
     if (++guard > 200) throw new Error("effect_resolution_guard");
     const step = effect.steps[effect.cursor] || {};
     const op = String(step.op || "");
@@ -707,10 +712,29 @@ function executeUntilChoice(state: any) {
     }
     if (op === "SWITCH_WITH_VANGUARD") {
       const target = resolveVar(vars, step.target) as CreatureRef;
-      const result = switchWithVanguard(state, target);
-      if (step.as_moved_to_reserve && result.oldVanguard) vars[String(step.as_moved_to_reserve)] = result.oldVanguard;
-      if (step.as_moved_to_vanguard && result.newVanguard) vars[String(step.as_moved_to_vanguard)] = result.newVanguard;
+      const found = findCreature(state, target);
+      if (!found || found.where !== "reserve" || found.index == null) throw new Error("switch_target_reserve_missing");
+      const controllerSeat = playerSeat(ownerSeat, step.player || "self", vars);
+      if (found.seat !== controllerSeat) throw new Error("switch_target_controller_mismatch");
+      if (step.action_kind != null && String(step.action_kind) !== "effect_switch") throw new Error("tactic_switch_action_kind_must_be_effect_switch");
+      const switched = runtimeV02ApplyAtomicSwitch(state, controllerSeat, Number(found.index), {
+        action_kind: "effect_switch",
+        source_action_id: effect.id,
+        source_card_uid: effect.source_card.uid,
+      });
+      const outgoingRef = { kind: "creature", seat: controllerSeat, anchor_uid: switched.context.outgoing_vanguard_uid } satisfies CreatureRef;
+      const incomingRef = { kind: "creature", seat: controllerSeat, anchor_uid: switched.context.incoming_vanguard_uid } satisfies CreatureRef;
+      vars.switch_outgoing_vanguard = outgoingRef;
+      vars.switch_incoming_vanguard = incomingRef;
+      if (step.as_moved_to_reserve) vars[String(step.as_moved_to_reserve)] = outgoingRef;
+      if (step.as_moved_to_vanguard) vars[String(step.as_moved_to_vanguard)] = incomingRef;
       effect.cursor++;
+      const movementFlow = runtimeV02BeginMovementListenerContinuation(state, switched.events);
+      if ((movementFlow.emitted_heal_packet_ids || []).length) throw new Error("tcg_v0_2_tactic_effect_switch_movement_heal_resume_not_yet_supported");
+      if (movementFlow.status === "player_choice_required") {
+        setTacticMovementResume(state, effect);
+        return;
+      }
       continue;
     }
     if (op === "CHOOSE_PLAYER") {
@@ -923,7 +947,7 @@ function executeUntilChoice(state: any) {
     throw new Error(`unknown_effect_op:${op}`);
   }
 
-  if (!state.pending_choice && effect.cursor >= effect.steps.length) finishEffect(state, effect);
+  if (!state.pending_choice && !state.pending_movement_listener_choice && effect.cursor >= effect.steps.length) finishEffect(state, effect);
 }
 
 function applyPendingChoice(state: any, selected: ChoiceOption[]) {
@@ -1127,7 +1151,7 @@ Deno.serve(async (req) => {
       if (state.phase !== "play" || Number(state.active_seat) !== seat) {
         return json({ ok: false, version: VERSION, error: "not_active_player" }, 400);
       }
-      if (state.effect_resolution || state.pending_choice) {
+      if (state.effect_resolution || state.pending_choice || state.pending_movement_listener_choice) {
         return json({ ok: false, version: VERSION, error: "effect_resolution_already_pending" }, 409);
       }
 
@@ -1190,17 +1214,72 @@ Deno.serve(async (req) => {
         card_id: source.card_id,
         subtype,
         pending_choice: !!state.pending_choice,
+        pending_movement_listener_choice: !!state.pending_movement_listener_choice,
       });
       return json({
         ok: true,
         version: VERSION,
         result,
         pending_choice: choiceView(state.pending_choice || null, seat),
+        pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
+        private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+      });
+    }
+
+    const effect = state.effect_resolution as EffectState | null;
+    const movementPending = state.pending_movement_listener_choice as RuntimeV02PendingMovementListenerChoice | null;
+    if (movementPending) {
+      if (!effect || state.phase !== "effect_resolution") {
+        return json({ ok: false, version: VERSION, error: "no_tactic_movement_choice_pending" }, 400);
+      }
+      let resolved;
+      try {
+        readTacticMovementResume(state, effect);
+        const ids = Array.isArray(body.choice_ids) ? body.choice_ids.map((value: unknown) => String(value)) : [];
+        resolved = runtimeV02ResolveMovementListenerChoice(state, seat as 1 | 2, String(body.choice_id || ""), ids);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message === "tcg_v0_2_movement_listener_choice_not_yours") return json({ ok: false, version: VERSION, error: message }, 403);
+        if (message.includes("_stale") || message.includes("_source_missing") || message.includes("_turn_stale")) return json({ ok: false, version: VERSION, error: message }, 409);
+        if (message.startsWith("tcg_v0_2_movement_listener_choice_") || message.startsWith("tcg_v0_2_tactic_movement_resume_")) return json({ ok: false, version: VERSION, error: message }, 400);
+        throw error;
+      }
+      const movementAudit = movementListenerAudit(resolved);
+      if ((resolved.emitted_heal_packet_ids || []).length) throw new Error("tcg_v0_2_tactic_effect_switch_movement_heal_resume_not_yet_supported");
+      if (resolved.status === "player_choice_required") {
+        const result = await commit("resolve_tactic_movement_listener_choice", {
+          seat,
+          pending_choice: true,
+          movement_listener: movementAudit,
+        });
+        return json({
+          ok: true,
+          version: VERSION,
+          result,
+          pending_choice: null,
+          pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(resolved.pending_choice, seat as 1 | 2),
+          private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
+        });
+      }
+      delete state.pending_tactic_movement_resume;
+      executeUntilChoice(state);
+      const result = await commit("resolve_tactic_movement_listener_choice", {
+        seat,
+        pending_choice: !!state.pending_choice,
+        pending_movement_listener_choice: !!state.pending_movement_listener_choice,
+        movement_listener: movementAudit,
+      });
+      return json({
+        ok: true,
+        version: VERSION,
+        result,
+        pending_choice: choiceView(state.pending_choice || null, seat),
+        pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
+        private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
       });
     }
 
     const pending = state.pending_choice as PendingChoice | null;
-    const effect = state.effect_resolution as EffectState | null;
     if (!pending || !effect || state.phase !== "effect_resolution") {
       return json({ ok: false, version: VERSION, error: "no_effect_choice_pending" }, 400);
     }
@@ -1218,12 +1297,15 @@ Deno.serve(async (req) => {
       kind: pending.kind,
       selected_count: selected.length,
       pending_choice: !!state.pending_choice,
+      pending_movement_listener_choice: !!state.pending_movement_listener_choice,
     });
     return json({
       ok: true,
       version: VERSION,
       result,
       pending_choice: choiceView(state.pending_choice || null, seat),
+      pending_movement_listener_choice: runtimeV02PendingMovementListenerChoiceView(state.pending_movement_listener_choice || null, seat as 1 | 2),
+      private_movement_inspection: runtimeV02PrivateMovementInspectionView(state, seat as 1 | 2),
     });
   } catch (error) {
     return json({ ok: false, version: VERSION, error: error instanceof Error ? error.message : String(error) }, 500);
