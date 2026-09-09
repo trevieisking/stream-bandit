@@ -39,7 +39,6 @@ test('every legacy English condition application is gated by structured ownershi
     'becomes mindbound',
     'becomes crushed',
     'becomes drenched',
-    'becomes stunned',
   ];
   for (const fragment of fragments) {
     assert.ok(
@@ -47,6 +46,10 @@ test('every legacy English condition application is gated by structured ownershi
       `legacy condition fallback is not gated: ${fragment}`,
     );
   }
+  assert.ok(
+    matchSource.includes('if(structuredConditionEffects==null&&structuredOverchargeDiscard==null&&ef.includes("becomes stunned"))'),
+    'legacy Stunned fallback must be gated by both ordinary structured-condition and overcharge-family ownership',
+  );
 });
 
 test('Drenched compatibility fallback preserves its existing attacker-Shield requirement', () => {
