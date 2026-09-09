@@ -31,7 +31,7 @@ function assertInOrder(source, needles, message) {
   let cursor = -1;
   for (const needle of needles) {
     const next = source.indexOf(needle, cursor + 1);
-    assert.notEqual(next, -1, `missing ${needle}`);
+    assert.notEqual(next, -1, `${message}: missing ${needle}`);
     assert.ok(next > cursor, `${message}: out of order ${needle}`);
     cursor = next;
   }
