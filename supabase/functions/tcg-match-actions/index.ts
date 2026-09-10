@@ -1,7 +1,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { structuredRuntimeWithdrawalBaseCost } from "../_shared/tcg-match-withdrawal-v0-2.ts";
 import { structuredRuntimeIncomingAttackDamage, structuredRuntimeOutgoingAttackDamage } from "../_shared/tcg-match-attack-damage-v0-2.ts";
-import { applyStructuredRuntimeEssenceAttachmentLifecycle, clearStructuredRuntimeAttachmentAttackBonusesAtAftermath, structuredRuntimeAftermathEssenceDisposition, structuredRuntimeAttachmentAttackBonus } from "../_shared/tcg-match-surge-lifecycle-v0-2.ts";
+import { clearStructuredRuntimeAttachmentAttackBonusesAtAftermath, registerStructuredRuntimeEssenceAttachmentLifecycleState, structuredRuntimeAftermathEssenceDisposition, structuredRuntimeAttachmentAttackBonus } from "../_shared/tcg-match-surge-lifecycle-v0-2.ts";
 import { evaluateRuntimeAttackCountAddFormula, evaluateRuntimeAttackDeclarationRequirements, evaluateRuntimeAttackReadyConditionalAddFormula, resolveRuntimeAttackAuthority } from "../_shared/tcg-match-attack-authority-v0-2.ts";
 import { runtimeV02CurrentTurnHiddenInformationViews } from "../_shared/tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02PrivateRewardInspectionView, structuredRuntimeEvolutionRewardInspection } from "../_shared/tcg-match-reward-inspection-v0-2.ts";
@@ -17,7 +17,7 @@ import { runtimeV02BeginAbilityHealListenerContinuation, runtimeV02BeginAttackHe
 import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context-v0-2.ts";
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
 import { runtimeV02BeginEventListenerContinuation, runtimeV02CreateCreatureEnteredPlayEvent, runtimeV02CreateCreatureEvolvedEvent, runtimeV02PendingEventListenerChoiceView, runtimeV02PrivateEventInspectionView, runtimeV02ResolveEventListenerChoice, type RuntimeV02PendingEventListenerChoice } from "../_shared/tcg-match-event-listener-v0-2.ts";
-import { recordRuntimeV02EssenceAttachmentEvent } from "../_shared/tcg-match-essence-attachment-event-v0-2.ts";
+import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { addRuntimeShield, healRuntimeDamage } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 
 const VERSION="Stream Bandit TCG match actions v0.3";
@@ -86,10 +86,10 @@ Deno.serve(async(req)=>{
   const healListenerAudit=(flow:any)=>({status:flow.status,processed_packet_ids:flow.continuation?.processed_packet_ids||[],emitted_packet_ids:flow.continuation?.emitted_packet_ids||[]});
   const movementListenerAudit=(flow:any)=>({status:flow.status,processed_listener_keys:flow.processed_listener_keys||[],emitted_heal_packet_ids:flow.emitted_heal_packet_ids||[]});
   const eventListenerAudit=(flow:any)=>({status:flow.status,processed_listener_keys:flow.processed_listener_keys||[],emitted_heal_packet_ids:flow.emitted_heal_packet_ids||[],emitted_movement_event_count:flow.emitted_movement_events?.length||0});
-  const setEventResume=(kind:"play_creature"|"evolve",resumeSeat:number)=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_event_live_resume_seat_invalid");s.pending_event_listener_resume={kind,seat:resumeSeat,turn_seq:Number(s.turn_seq||0)}};
-  const readEventResume=()=>{const raw=s.pending_event_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_event_live_resume_required");const kind=String(raw.kind||"");if(kind!=="play_creature"&&kind!=="evolve")throw new Error("tcg_v0_2_event_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0);if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_event_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_event_live_resume_turn_stale");return{kind:kind as "play_creature"|"evolve",seat:resumeSeat as 1|2,turn_seq:resumeTurn}};
-  const setMovementResume=(kind:"withdrawal"|"attack"|"play_creature"|"evolve",resumeSeat:number,priorHealPacketIds:string[]=[] )=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Array.isArray(priorHealPacketIds))throw new Error("tcg_v0_2_movement_live_prior_heal_packets_invalid");s.pending_movement_listener_resume={kind,seat:resumeSeat,turn_seq:Number(s.turn_seq||0),prior_heal_packet_ids:[...priorHealPacketIds]}};
-  const readMovementResume=()=>{const raw=s.pending_movement_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_movement_live_resume_required");const kind=String(raw.kind||"");if(kind!=="withdrawal"&&kind!=="attack"&&kind!=="play_creature"&&kind!=="evolve")throw new Error("tcg_v0_2_movement_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0),priorHealPacketIds=Array.isArray(raw.prior_heal_packet_ids)?raw.prior_heal_packet_ids.map((x:any)=>String(x)):[];if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_movement_live_resume_turn_stale");return{kind,seat:resumeSeat as 1|2,turn_seq:resumeTurn,prior_heal_packet_ids:priorHealPacketIds}};
+  const setEventResume=(kind:"play_creature"|"evolve"|"attach_essence",resumeSeat:number)=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_event_live_resume_seat_invalid");s.pending_event_listener_resume={kind,seat:resumeSeat,turn_seq:Number(s.turn_seq||0)}};
+  const readEventResume=()=>{const raw=s.pending_event_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_event_live_resume_required");const kind=String(raw.kind||"");if(kind!=="play_creature"&&kind!=="evolve"&&kind!=="attach_essence")throw new Error("tcg_v0_2_event_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0);if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_event_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_event_live_resume_turn_stale");return{kind:kind as "play_creature"|"evolve"|"attach_essence",seat:resumeSeat as 1|2,turn_seq:resumeTurn}};
+  const setMovementResume=(kind:"withdrawal"|"attack"|"play_creature"|"evolve"|"attach_essence",resumeSeat:number,priorHealPacketIds:string[]=[] )=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Array.isArray(priorHealPacketIds))throw new Error("tcg_v0_2_movement_live_prior_heal_packets_invalid");s.pending_movement_listener_resume={kind,seat:resumeSeat,turn_seq:Number(s.turn_seq||0),prior_heal_packet_ids:[...priorHealPacketIds]}};
+  const readMovementResume=()=>{const raw=s.pending_movement_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_movement_live_resume_required");const kind=String(raw.kind||"");if(kind!=="withdrawal"&&kind!=="attack"&&kind!=="play_creature"&&kind!=="evolve"&&kind!=="attach_essence")throw new Error("tcg_v0_2_movement_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0),priorHealPacketIds=Array.isArray(raw.prior_heal_packet_ids)?raw.prior_heal_packet_ids.map((x:any)=>String(x)):[];if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_movement_live_resume_turn_stale");return{kind,seat:resumeSeat as 1|2,turn_seq:resumeTurn,prior_heal_packet_ids:priorHealPacketIds}};
 
   if(action==="concede"){if(s.phase==="complete")return json({ok:false,version:VERSION,error:"match_already_complete"},400);s.phase="complete";s.result={winner_seat:otherSeat,reasons:["opponent_conceded"]};log(`Seat ${seat} conceded.`);return json({version:VERSION,result:await commit("concede",{seat,winner_seat:otherSeat})})}
 
@@ -165,7 +165,7 @@ Deno.serve(async(req)=>{
    }
    delete s.pending_movement_listener_resume;
    const packetIds=[...resume.prior_heal_packet_ids,...resolved.emitted_heal_packet_ids];
-   if(resume.kind==="withdrawal"||resume.kind==="play_creature"||resume.kind==="evolve"){
+   if(resume.kind==="withdrawal"||resume.kind==="play_creature"||resume.kind==="evolve"||resume.kind==="attach_essence"){
     const movementHealFlow=runtimeV02BeginMovementHealListenerContinuation(s,packetIds,resume.seat),movementHealAudit=healListenerAudit(movementHealFlow);
     if(movementHealFlow.status==="player_choice_required"){
      s.phase="heal_listener_choice_resolution";
@@ -262,7 +262,34 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="attach_essence"){
-   const turn=Number(s.turn_seq||0);if(Number(flags.manual_essence_turn??-1)===turn)return json({ok:false,version:VERSION,error:"manual_essence_already_used_this_turn"},400);const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Essence")return json({ok:false,version:VERSION,error:"essence_card_required"},400);const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);const structuredLifecycle=applyStructuredRuntimeEssenceAttachmentLifecycle(s,cr,x,String(td?.element||""),"hand",turn);if(structuredLifecycle!=null){const targetInst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!targetInst)throw new Error("tcg_v0_2_attachment_target_anchor_required");recordRuntimeV02EssenceAttachmentEvent(s,seat as 1|2,targetInst.uid,x,"hand","manual_essence")}
+   const turn=Number(s.turn_seq||0);if(Number(flags.manual_essence_turn??-1)===turn)return json({ok:false,version:VERSION,error:"manual_essence_already_used_this_turn"},400);const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Essence")return json({ok:false,version:VERSION,error:"essence_card_required"},400);const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);const structuredAttachment=s.runtime_registry_v0_2!=null;
+   if(structuredAttachment){
+    const targetInst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!targetInst)throw new Error("tcg_v0_2_attachment_target_anchor_required");
+    registerStructuredRuntimeEssenceAttachmentLifecycleState(s,x,turn);
+    const routed=runtimeV02BeginExternalEssenceAttachmentRoute(s,seat as 1|2,targetInst.uid,x,"hand","manual_essence",{attachment_kind:"normal",phase:"play",action_kind:"manual_essence",destination_index:where==="reserve"?idx:null});
+    const eventFlow=routed.flow,eventAudit=eventListenerAudit(eventFlow);
+    log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);
+    if(eventFlow.status==="player_choice_required"){
+     setEventResume("attach_essence",seat);
+     s.phase="event_listener_choice_resolution";
+     return json({version:VERSION,result:await commit("attach_essence_pending_event_listener_choice",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d),event_listener:eventAudit,pending_event_listener_choice:true}),pending_event_listener_choice:runtimeV02PendingEventListenerChoiceView(eventFlow.pending_choice,seat as 1|2),private_event_inspection:runtimeV02PrivateEventInspectionView(s,seat as 1|2),private_reward_inspection:runtimeV02PrivateRewardInspectionView(s,seat as 1|2)});
+    }
+    const movementFlow=eventFlow.emitted_movement_events.length?runtimeV02BeginMovementListenerContinuation(s,eventFlow.emitted_movement_events):{status:"complete",processed_listener_keys:[],emitted_heal_packet_ids:[],pending_choice:null};
+    const movementAudit=movementListenerAudit(movementFlow);
+    if(movementFlow.status==="player_choice_required"){
+     setMovementResume("attach_essence",seat,eventFlow.emitted_heal_packet_ids);
+     s.phase="movement_listener_choice_resolution";
+     return json({version:VERSION,result:await commit("attach_essence_pending_movement_listener_choice",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d),event_listener:eventAudit,movement_listener:movementAudit,pending_movement_listener_choice:true}),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(movementFlow.pending_choice,seat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,seat as 1|2)});
+    }
+    const packetIds=[...eventFlow.emitted_heal_packet_ids,...movementFlow.emitted_heal_packet_ids];
+    const healFlow=runtimeV02BeginMovementHealListenerContinuation(s,packetIds,seat as 1|2),healAudit=healListenerAudit(healFlow);
+    if(healFlow.status==="player_choice_required"){
+     s.phase="heal_listener_choice_resolution";
+     return json({version:VERSION,result:await commit("attach_essence_pending_heal_listener_choice",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d),event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(healFlow.pending_choice,seat as 1|2)});
+    }
+    const n=scanDefeats();if(n>0)s.phase="resolution";else s.phase="play";
+    return json({version:VERSION,result:await commit("attach_essence",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d),event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit})});
+   }
    if(d.id==="ember-smolder-essence"&&cr.damage>0){cr.flags=cr.flags||{};cr.flags.next_attack_bonus=(Number((cr.flags as any).next_attack_bonus||0)+10)}else if(d.id==="ember-hearth-essence"&&cr.damage>0)healRuntimeDamage(cr,20);else if(d.id==="tide-calm-essence"&&td?.element==="Tide")healRuntimeDamage(cr,20);else if(d.id==="grove-bloom-essence"&&td?.element==="Grove"&&isEvolved(td))healRuntimeDamage(cr,20);else if(d.id==="stone-fault-essence"&&td?.element==="Stone")clearCond(cr,"Crushed");
    if(td?.id==="tide-puddlepip"&&d.element==="Tide"){cr.flags=cr.flags||{};const f=cr.flags as any;if(Number(f.freshwater_turn??-1)!==turn){f.freshwater_turn=turn;healRuntimeDamage(cr,10)}}
    log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);return json({version:VERSION,result:await commit("attach_essence",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d)})});
