@@ -7,7 +7,15 @@ import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
 import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
-import { runtimeConditions } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import { applyStructuredRuntimeEssenceAttachmentLifecycle } from "./tcg-match-surge-lifecycle-v0-2.ts";
+import { recordRuntimeV02EssenceAttachmentEvent } from "./tcg-match-essence-attachment-event-v0-2.ts";
+import {
+  addRuntimeShield,
+  applyRuntimeCondition,
+  dealRuntimeEffectDamage,
+  runtimeConditions,
+  type ApplyConditionMode,
+} from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 
 type Inst = {
   uid: string;
@@ -69,7 +77,7 @@ type CardRef = {
   uid: string;
   card_id: string;
   zone_owner_seat: 1 | 2;
-  zone: "deck" | "discard" | "rewards";
+  zone: "deck" | "discard" | "rewards" | "hand";
 };
 
 type CreatureRef = {
@@ -103,11 +111,13 @@ export type RuntimeV02PendingEventListenerChoice = {
     | "select_creature"
     | "select_cards"
     | "inspect_rewards"
-    | "clear_condition";
+    | "clear_condition"
+    | "order_cards"
+    | "attach_essence";
   prompt: string;
   min: number;
   max: number;
-  mode: "select";
+  mode: "select" | "order";
   options: Array<{
     id: string;
     label: string;
@@ -128,7 +138,7 @@ export type RuntimeV02PrivateEventInspectionView = {
   turn_seq: number;
   controller_seat: 1 | 2;
   zone_owner_seat: 1 | 2;
-  zone: "deck_top";
+  zone: "deck_top" | "hand";
   cards: Array<{ position: number; uid: string; card_id: string }>;
 };
 
@@ -468,6 +478,11 @@ function filtersMatch(
       return false;
     }
   }
+  if (filters.essence_subtype != null) {
+    const essence = objectRecord(definition.essence);
+    const subtype = essence?.subtype ?? definition.essence_subtype ?? definition.subtype;
+    if (String(subtype || "") !== String(filters.essence_subtype)) return false;
+  }
   return true;
 }
 
@@ -529,6 +544,28 @@ function targetField(
     }
   }
   throw new Error(`tcg_v0_2_event_listener_target_unsupported:${token}`);
+}
+
+function eventCount(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  name: string,
+  controller: 1 | 2,
+): number {
+  const turn = currentTurn(state);
+  const events = Array.isArray(state.effect_events)
+    ? state.effect_events as Record<string, unknown>[]
+    : [];
+  const recorded = events.filter((entry) => {
+    if (String(entry.event || "") !== name) return false;
+    if (Number(entry.turn_seq) !== turn) return false;
+    const seat = Number(entry.controller_seat ?? entry.seat);
+    return seat === controller;
+  }).length;
+  const flags = objectRecord(objectRecord(state.turn_flags)?.[String(controller)]);
+  const compatibility = name === "device_resolved" && Number(flags?.device_turn ?? -1) === turn ? 1 : 0;
+  void candidate;
+  return Math.max(recorded, compatibility);
 }
 
 function requirement(
@@ -630,6 +667,26 @@ function requirement(
         value.target,
       );
       return Number(target.cr.damage || 0) > 0;
+    }
+    case "hand_count_at_least": {
+      const seat = playerForToken(candidate, value.controller);
+      return (player(state, seat).hand as Inst[]).length >= Number(value.count || 0);
+    }
+    case "control_condition_slot_empty": {
+      const target = targetField(state, continuation, candidate, event, value.target);
+      return runtimeConditions(target.cr).control == null;
+    }
+    case "event_occurred": {
+      if (String(value.window || "") !== "current_turn") {
+        throw new Error("tcg_v0_2_event_listener_event_window_unsupported");
+      }
+      const name = requiredString(value.event, "tcg_v0_2_event_listener_event_name_required");
+      const controller = playerForToken(candidate, value.controller);
+      const minCount = Number(value.min_count ?? 1);
+      if (!Number.isInteger(minCount) || minCount < 1) {
+        throw new Error("tcg_v0_2_event_listener_event_min_count_invalid");
+      }
+      return eventCount(state, candidate, name, controller) >= minCount;
     }
     default:
       throw new Error(
@@ -838,6 +895,7 @@ function setPrivateInspection(
   state: Record<string, unknown>,
   controller: 1 | 2,
   zoneOwner: 1 | 2,
+  zone: "deck_top" | "hand",
   cards: CardRef[],
 ): void {
   const root = objectRecord(state[PRIVATE_INSPECTION_KEY]) || {};
@@ -845,7 +903,7 @@ function setPrivateInspection(
     turn_seq: currentTurn(state),
     controller_seat: controller,
     zone_owner_seat: zoneOwner,
-    zone: "deck_top",
+    zone,
     cards: cards.map((card, position) => ({
       position,
       uid: card.uid,
@@ -885,9 +943,49 @@ function inspectDeckTop(
       candidate.seat,
       "deck_top",
     );
-    setPrivateInspection(state, candidate.seat, ownerSeat, cards);
+    setPrivateInspection(state, candidate.seat, ownerSeat, "deck_top", cards);
   }
   return cards;
+}
+
+function randomSampleHiddenZone(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  step: Record<string, unknown>,
+): CardRef[] {
+  const ownerSeat = playerForToken(candidate, step.player);
+  if (String(step.zone || "") !== "hand") {
+    throw new Error("tcg_v0_2_event_listener_hidden_sample_zone_unsupported");
+  }
+  if (String(step.rng_owner || "") !== "match") {
+    throw new Error("tcg_v0_2_event_listener_hidden_sample_rng_owner_unsupported");
+  }
+  if (String(step.visibility || "") !== "controller_private") {
+    throw new Error("tcg_v0_2_event_listener_hidden_sample_visibility_unsupported");
+  }
+  const wanted = range(step.count);
+  const hand = player(state, ownerSeat).hand as Inst[];
+  if (hand.length < wanted.min) {
+    throw new Error("tcg_v0_2_event_listener_hidden_sample_unavailable");
+  }
+  const count = Math.min(wanted.max, hand.length);
+  const pool = hand.map((card) => ({
+    uid: requiredString(card.uid, "tcg_v0_2_event_listener_hidden_sample_uid_invalid"),
+    card_id: requiredString(card.card_id, "tcg_v0_2_event_listener_hidden_sample_card_id_invalid"),
+    zone_owner_seat: ownerSeat,
+    zone: "hand" as const,
+  }));
+  const sampled: CardRef[] = [];
+  while (sampled.length < count && pool.length) {
+    const random = new Uint32Array(1);
+    crypto.getRandomValues(random);
+    const index = random[0] % pool.length;
+    sampled.push(pool.splice(index, 1)[0]);
+  }
+  if (sampled.length) {
+    setPrivateInspection(state, candidate.seat, ownerSeat, "hand", sampled);
+  }
+  return sampled;
 }
 
 function installChoice(
@@ -972,6 +1070,19 @@ function creatureOptions(
     }));
 }
 
+function zoneCards(
+  state: Record<string, unknown>,
+  ownerSeat: 1 | 2,
+  zone: CardRef["zone"],
+): Inst[] {
+  const owner = player(state, ownerSeat);
+  if (zone === "deck") return owner.deck as Inst[];
+  if (zone === "discard") return owner.discard as Inst[];
+  if (zone === "hand") return owner.hand as Inst[];
+  if (zone === "rewards") return owner.rewards as Inst[];
+  throw new Error("tcg_v0_2_event_listener_card_zone_unsupported");
+}
+
 function cardOptions(
   state: Record<string, unknown>,
   candidate: Candidate,
@@ -982,11 +1093,11 @@ function cardOptions(
   data: Record<string, unknown>;
 }> {
   const ownerSeat = playerForToken(candidate, step.player);
-  const zone = String(step.zone || "");
-  if (zone !== "discard") {
+  const zone = String(step.zone || "") as CardRef["zone"];
+  if (zone !== "discard" && zone !== "hand") {
     throw new Error("tcg_v0_2_event_listener_card_zone_unsupported");
   }
-  const cards = player(state, ownerSeat).discard as Inst[];
+  const cards = zoneCards(state, ownerSeat, zone);
   const selection = objectRecord(step.selection);
   const filters = selection?.filters;
   return cards
@@ -999,7 +1110,7 @@ function cardOptions(
           uid: card.uid,
           card_id: card.card_id,
           zone_owner_seat: ownerSeat,
-          zone: "discard",
+          zone,
         } satisfies CardRef,
       },
     }));
@@ -1095,18 +1206,14 @@ function removeCardRef(
   state: Record<string, unknown>,
   ref: CardRef,
 ): Inst {
-  const owner = player(state, ref.zone_owner_seat);
-  const zone = ref.zone === "discard" ? owner.discard : owner.deck;
-  if (!Array.isArray(zone)) {
-    throw new Error("tcg_v0_2_event_listener_card_source_zone_missing");
-  }
-  const index = (zone as Inst[]).findIndex((card) =>
+  const zone = zoneCards(state, ref.zone_owner_seat, ref.zone);
+  const index = zone.findIndex((card) =>
     card.uid === ref.uid && card.card_id === ref.card_id
   );
   if (index < 0) {
     throw new Error("tcg_v0_2_event_listener_selected_card_stale");
   }
-  return (zone as Inst[]).splice(index, 1)[0];
+  return zone.splice(index, 1)[0];
 }
 
 function moveCards(
@@ -1147,25 +1254,29 @@ function returnRemainderToDeckTop(
   const exceptUids = new Set(except.map((card) => card.uid));
   const remainder = source.filter((card) => !exceptUids.has(card.uid));
   if (!remainder.length) return;
-  const ownerSeat = remainder[0].zone_owner_seat;
-  if (
-    remainder.some((card) =>
-      card.zone !== "deck" || card.zone_owner_seat !== ownerSeat
-    )
-  ) {
+  reorderDeckTop(state, remainder);
+}
+
+function reorderDeckTop(
+  state: Record<string, unknown>,
+  refs: CardRef[],
+): void {
+  if (!refs.length) return;
+  const ownerSeat = refs[0].zone_owner_seat;
+  if (refs.some((ref) => ref.zone !== "deck" || ref.zone_owner_seat !== ownerSeat)) {
     throw new Error("tcg_v0_2_event_listener_remainder_source_invalid");
   }
   const deck = player(state, ownerSeat).deck as Inst[];
   const byUid = new Map(deck.map((card) => [card.uid, card]));
-  const ordered = remainder.map((ref) => {
+  const ordered = refs.map((ref) => {
     const card = byUid.get(ref.uid);
     if (!card || card.card_id !== ref.card_id) {
       throw new Error("tcg_v0_2_event_listener_remainder_stale");
     }
     return card;
   });
-  const remainderUids = new Set(remainder.map((card) => card.uid));
-  const rest = deck.filter((card) => !remainderUids.has(card.uid));
+  const uids = new Set(refs.map((card) => card.uid));
+  const rest = deck.filter((card) => !uids.has(card.uid));
   deck.splice(0, deck.length, ...ordered, ...rest);
 }
 
@@ -1292,6 +1403,12 @@ function executeStep(
     );
   }
 
+  if (op === "RANDOM_SAMPLE_HIDDEN_ZONE") {
+    continuation.vars[String(step.as || "sampled")] = randomSampleHiddenZone(state, candidate, step);
+    continuation.step_cursor++;
+    return "continue";
+  }
+
   if (op === "CHOOSE_FROM_SET") {
     const source = cardRefsFromVar(continuation, step.source);
     const wanted = {
@@ -1389,6 +1506,45 @@ function executeStep(
     return "continue";
   }
 
+  if (op === "RETURN_SET_TO_DECK_TOP") {
+    if (String(step.order || "") !== "player_choice") {
+      throw new Error("tcg_v0_2_event_listener_set_order_unsupported");
+    }
+    const refs = cardRefsFromVar(continuation, step.cards);
+    if (refs.length <= 1) {
+      reorderDeckTop(state, refs);
+      continuation.step_cursor++;
+      return "continue";
+    }
+    const options = refs.map((card) => ({
+      id: `card:${card.uid}`,
+      label: cardName(state, card),
+      data: { ref: card },
+    }));
+    installChoice(state, continuation, candidate, event, {
+      seat: playerForToken(candidate, step.player),
+      kind: "order_cards",
+      prompt: "Choose card order",
+      min: options.length,
+      max: options.length,
+      mode: "order",
+      options,
+      context: { source: String(step.cards || "") },
+    });
+    return "choice";
+  }
+
+  if (op === "DRAW") {
+    const seat = playerForToken(candidate, step.player);
+    const owner = player(state, seat);
+    const deck = owner.deck as Inst[];
+    const hand = owner.hand as Inst[];
+    const count = Math.max(0, Number(step.count || 0));
+    hand.push(...deck.splice(0, Math.min(count, deck.length)));
+    continuation.step_cursor++;
+    return "continue";
+  }
+
   if (op === "HEAL") {
     const target = targetField(
       state,
@@ -1432,6 +1588,69 @@ function executeStep(
     }
     continuation.step_cursor++;
     return "continue";
+  }
+
+  if (op === "ADD_SHIELD") {
+    const target = targetField(state, continuation, candidate, event, step.target);
+    addRuntimeShield(target.cr, Math.max(0, numberValue(step.amount, "tcg_v0_2_event_listener_shield_amount_invalid")));
+    continuation.step_cursor++;
+    return "continue";
+  }
+
+  if (op === "DIRECT_DAMAGE") {
+    if (step.damage_class != null && String(step.damage_class) !== "effect") {
+      throw new Error("tcg_v0_2_event_listener_direct_damage_class_unsupported");
+    }
+    const target = targetField(state, continuation, candidate, event, step.target);
+    dealRuntimeEffectDamage(target.cr, Math.max(0, numberValue(step.amount, "tcg_v0_2_event_listener_direct_damage_amount_invalid")));
+    continuation.step_cursor++;
+    return "continue";
+  }
+
+  if (op === "APPLY_CONDITION") {
+    const target = targetField(state, continuation, candidate, event, step.target);
+    const condition = requiredString(step.condition, "tcg_v0_2_event_listener_condition_required");
+    const rawMode = String(step.mode || "apply");
+    if (!["apply", "apply_if_empty", "apply_if_empty_or_same", "replace"].includes(rawMode)) {
+      throw new Error("tcg_v0_2_event_listener_condition_mode_unsupported");
+    }
+    applyRuntimeCondition(target.cr, condition, currentTurn(state), rawMode as ApplyConditionMode);
+    continuation.step_cursor++;
+    return "continue";
+  }
+
+  if (op === "ATTACH_ESSENCE_FROM_ZONE") {
+    if (step.manual_attachment !== false) {
+      throw new Error("tcg_v0_2_event_listener_attachment_must_be_effect_driven");
+    }
+    const zone = String(step.zone || "");
+    if (zone !== "hand" && zone !== "discard") {
+      throw new Error("tcg_v0_2_event_listener_attachment_zone_unsupported");
+    }
+    const options = cardOptions(state, candidate, step);
+    const wanted = range(objectRecord(step.selection) || {});
+    if (options.length < wanted.min) {
+      throw new Error("tcg_v0_2_event_listener_attachment_choice_unavailable");
+    }
+    if (!options.length && wanted.min === 0) {
+      continuation.step_cursor++;
+      return "continue";
+    }
+    const target = targetField(state, continuation, candidate, event, step.target);
+    installChoice(state, continuation, candidate, event, {
+      seat: candidate.seat,
+      kind: "attach_essence",
+      prompt: "Choose Essence to attach",
+      min: wanted.min,
+      max: Math.min(wanted.max, options.length),
+      mode: "select",
+      options,
+      context: {
+        target: creatureRef(target),
+        attachment_state: step.attachment_state || null,
+      },
+    });
+    return "choice";
   }
 
   if (op === "SET_WITHDRAWAL_MODIFIER") {
@@ -1618,6 +1837,19 @@ function continueFlow(
   return complete;
 }
 
+function recordEvent(
+  state: Record<string, unknown>,
+  event: RuntimeV02EventListenerEvent,
+): void {
+  if (!structuredEnabled(state)) return;
+  const events = Array.isArray(state.effect_events)
+    ? state.effect_events as Record<string, unknown>[]
+    : (state.effect_events = []) as Record<string, unknown>[];
+  if (!events.some((entry) => entry.event_id === event.event_id)) {
+    events.push({ ...event });
+  }
+}
+
 export function runtimeV02CreateCreatureEnteredPlayEvent(
   state: Record<string, unknown>,
   controllerSeatRaw: number,
@@ -1658,14 +1890,53 @@ export function runtimeV02CreateCreatureEnteredPlayEvent(
     action_kind: "play_creature",
     turn_seq: turn,
   };
-  if (structuredEnabled(state)) {
-    const events = Array.isArray(state.effect_events)
-      ? state.effect_events as Record<string, unknown>[]
-      : (state.effect_events = []) as Record<string, unknown>[];
-    if (!events.some((entry) => entry.event_id === event.event_id)) {
-      events.push({ ...event });
-    }
+  recordEvent(state, event);
+  return { ...event };
+}
+
+export function runtimeV02CreateCreatureEvolvedEvent(
+  state: Record<string, unknown>,
+  controllerSeatRaw: number,
+  subjectUidRaw: unknown,
+  destinationZoneRaw: unknown,
+  destinationIndexRaw: number | null,
+): RuntimeV02EventListenerEvent {
+  const controllerSeat = normalizedSeat(controllerSeatRaw);
+  const turn = currentTurn(state);
+  const subjectUid = requiredString(subjectUidRaw, "tcg_v0_2_event_listener_subject_uid_required");
+  const destinationZone = String(destinationZoneRaw || "");
+  if (destinationZone !== "vanguard" && destinationZone !== "reserve") {
+    throw new Error("tcg_v0_2_event_listener_evolve_destination_zone_invalid");
   }
+  const destinationIndex = destinationZone === "reserve" ? Number(destinationIndexRaw) : null;
+  if (destinationZone === "reserve" && (!Number.isInteger(destinationIndex) || Number(destinationIndex) < 0 || Number(destinationIndex) > 3)) {
+    throw new Error("tcg_v0_2_event_listener_destination_index_invalid");
+  }
+  if (destinationZone === "vanguard" && destinationIndexRaw != null) {
+    throw new Error("tcg_v0_2_event_listener_vanguard_index_invalid");
+  }
+  const destination = allFields(state).find((field) =>
+    field.seat === controllerSeat && field.where === destinationZone &&
+    (destinationZone === "vanguard" || field.index === destinationIndex)
+  );
+  if (!destination || destination.top.uid !== subjectUid) {
+    throw new Error("tcg_v0_2_event_listener_subject_destination_mismatch");
+  }
+  const event: RuntimeV02EventListenerEvent = {
+    event_id: `creature-evolved:${turn}:${controllerSeat}:${subjectUid}`,
+    event: "creature_evolved",
+    subject_uid: subjectUid,
+    controller_seat: controllerSeat,
+    origin_zone: "hand",
+    destination_zone: destinationZone,
+    destination_index: destinationIndex,
+    phase: "build",
+    source_action_id: "evolve",
+    source_card_uid: subjectUid,
+    action_kind: "evolve",
+    turn_seq: turn,
+  };
+  recordEvent(state, event);
   return { ...event };
 }
 
@@ -1735,6 +2006,9 @@ function selectedOptions(
   }
   if (ids.length < pending.min || ids.length > pending.max) {
     throw new Error("tcg_v0_2_event_listener_choice_count_invalid");
+  }
+  if (pending.mode === "order" && ids.length !== pending.options.length) {
+    throw new Error("tcg_v0_2_event_listener_order_choice_incomplete");
   }
   const options = new Map(pending.options.map((option) => [option.id, option]));
   const selected = ids.map((id) => options.get(id));
@@ -1827,21 +2101,68 @@ export function runtimeV02ResolveEventListenerChoice(
       }
     } else {
       for (const ref of refs) {
-        const zone = ref.zone === "discard"
-          ? player(state, ref.zone_owner_seat).discard
-          : player(state, ref.zone_owner_seat).deck;
-        if (
-          !(zone as Inst[]).some((card) =>
-            card.uid === ref.uid && card.card_id === ref.card_id
-          )
-        ) {
-          throw new Error(
-            "tcg_v0_2_event_listener_choice_card_stale",
-          );
+        const zone = zoneCards(state, ref.zone_owner_seat, ref.zone);
+        if (!zone.some((card) => card.uid === ref.uid && card.card_id === ref.card_id)) {
+          throw new Error("tcg_v0_2_event_listener_choice_card_stale");
         }
       }
     }
     continuation.vars[String(pending.context.as || "selected_cards")] = refs;
+    continuation.step_cursor++;
+  } else if (pending.kind === "order_cards") {
+    const refs = selected.map((option) => option.data.ref as CardRef);
+    const source = cardRefsFromVar(continuation, pending.context.source);
+    const sourceUids = new Set(source.map((card) => card.uid));
+    if (refs.length !== source.length || refs.some((card) => !sourceUids.has(card.uid))) {
+      throw new Error("tcg_v0_2_event_listener_order_choice_stale");
+    }
+    reorderDeckTop(state, refs);
+    continuation.step_cursor++;
+  } else if (pending.kind === "attach_essence") {
+    const target = fieldFromRef(state, pending.context.target as CreatureRef);
+    if (!target) throw new Error("tcg_v0_2_event_listener_attachment_target_stale");
+    const attachmentState = objectRecord(pending.context.attachment_state);
+    if (attachmentState) {
+      if (
+        String(attachmentState.kind || "") !== "temporary" ||
+        String(attachmentState.expires || "") !== "controller_aftermath" ||
+        String(attachmentState.destination_on_expire || "") !== "discard"
+      ) {
+        throw new Error("tcg_v0_2_event_listener_attachment_state_unsupported");
+      }
+    }
+    for (const option of selected) {
+      const ref = option.data.ref as CardRef;
+      if (ref.zone !== "hand" && ref.zone !== "discard") {
+        throw new Error("tcg_v0_2_event_listener_attachment_zone_unsupported");
+      }
+      const inst = removeCardRef(state, ref);
+      inst.attached_turn = currentTurn(state);
+      if (attachmentState) {
+        inst.effect_flags = {
+          ...(inst.effect_flags || {}),
+          discard_during_target_aftermath: true,
+        };
+      }
+      target.cr.essence.push(inst);
+      applyStructuredRuntimeEssenceAttachmentLifecycle(
+        state,
+        target.cr,
+        inst,
+        String(target.def.element || ""),
+        ref.zone,
+        currentTurn(state),
+      );
+      recordRuntimeV02EssenceAttachmentEvent(
+        state,
+        candidate.seat,
+        target.top.uid,
+        inst,
+        ref.zone,
+        listenerId(candidate),
+        "effect_driven",
+      );
+    }
     continuation.step_cursor++;
   } else if (pending.kind === "inspect_rewards") {
     const positions = selected.map((option) => Number(option.data.position));
@@ -1927,13 +2248,14 @@ export function runtimeV02PrivateEventInspectionView(
     Number(raw.controller_seat) !== viewerSeat ||
     Number(raw.zone_owner_seat) !== 1 &&
       Number(raw.zone_owner_seat) !== 2 ||
-    raw.zone !== "deck_top" || !Array.isArray(raw.cards)
+    !["deck_top", "hand"].includes(String(raw.zone || "")) ||
+    !Array.isArray(raw.cards)
   ) return null;
   return {
     turn_seq: currentTurn(state),
     controller_seat: viewerSeat,
     zone_owner_seat: normalizedSeat(raw.zone_owner_seat),
-    zone: "deck_top",
+    zone: String(raw.zone) as "deck_top" | "hand",
     cards: raw.cards.map((cardRaw, index) => {
       const card = objectRecord(cardRaw);
       if (!card) {
