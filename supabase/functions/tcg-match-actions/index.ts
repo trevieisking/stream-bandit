@@ -16,6 +16,7 @@ import { runtimeV02CreateActiveAbilityLiveChoice, runtimeV02PendingActiveAbility
 import { runtimeV02BeginAbilityHealListenerContinuation, runtimeV02BeginAttackHealListenerContinuation, runtimeV02BeginMovementHealListenerContinuation, runtimeV02PendingHealListenerChoiceView, runtimeV02ResolveAbilityHealListenerChoice, runtimeV02ResolveAttackHealListenerChoice, runtimeV02ResolveMovementHealListenerChoice, type RuntimeV02PendingHealListenerChoice } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
 import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context-v0-2.ts";
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
+import { runtimeV02BeginEventListenerContinuation, runtimeV02CreateCreatureEnteredPlayEvent, runtimeV02PendingEventListenerChoiceView, runtimeV02PrivateEventInspectionView, runtimeV02ResolveEventListenerChoice, type RuntimeV02PendingEventListenerChoice } from "../_shared/tcg-match-event-listener-v0-2.ts";
 import { recordRuntimeV02EssenceAttachmentEvent } from "../_shared/tcg-match-essence-attachment-event-v0-2.ts";
 import { addRuntimeShield, healRuntimeDamage } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 
@@ -36,7 +37,7 @@ function allCr(p:any){const out:{where:string,index:number|null,cr:Cr}[]=[];if(p
 function friendlyFieldEntries(p:any,s:any){return allCr(p).map((x:any)=>{const inst=x.cr?.stack?.length?x.cr.stack[x.cr.stack.length-1]:null;const anchor=String(inst?.uid||"");if(!anchor)throw new Error("tcg_v0_2_attack_choice_anchor_required");return{where:(x.where==="reserve"?"reserve":"vanguard") as "reserve"|"vanguard",index:x.where==="reserve"?Number(x.index):null,creature:x.cr,anchor_uid:anchor,label:String(top(x.cr,s)?.name||"Creature")}})}
 function removeHand(p:any,uid:string){const k=p.hand.findIndex((x:Inst)=>x.uid===uid);if(k<0)return null;return p.hand.splice(k,1)[0] as Inst}
 function publicField(p:any){return{vanguard:p.vanguard,reserve:p.reserve,discard_count:p.discard.length,void_count:p.void.length,rewards_count:p.rewards.length,deck_count:p.deck.length,hand_count:p.hand.length}}
-function makeView(s:any,viewerSeat:number,revision:number){const own=s.players[String(viewerSeat)],opp=s.players[String(viewerSeat===1?2:1)];return{version:s.version,match_id:s.match_id,revision,phase:s.phase,toss_winner_seat:s.toss_winner_seat,first_player_seat:s.first_player_seat,setup_turn_seat:s.setup_turn_seat,active_seat:s.active_seat,turn_seq:s.turn_seq,personal_turns:s.personal_turns,setup_ready:s.setup_ready,realm:s.realm,turn_flags:s.turn_flags||{},pending_resolution:s.pending_resolutions?.[0]?{kind:s.pending_resolutions[0].kind,seat:s.pending_resolutions[0].seat,count:s.pending_resolutions[0].count||null}:null,pending_attack_choice:runtimeV02PendingAttackChoiceView(s.pending_attack_choice||null,viewerSeat as 1|2),pending_ability_choice:runtimeV02PendingActiveAbilityLiveChoiceView(s.pending_ability_choice||null,viewerSeat as 1|2),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(s.pending_heal_listener_choice||null,viewerSeat as 1|2),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(s.pending_movement_listener_choice||null,viewerSeat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,viewerSeat as 1|2),private_reward_inspection:runtimeV02PrivateRewardInspectionView(s,viewerSeat as 1|2),result:s.result||null,log:(s.log||[]).slice(-20),you:{seat:viewerSeat,user_id:own.user_id,hand:own.hand,deck_count:own.deck.length,rewards_count:own.rewards.length,vanguard:own.vanguard,reserve:own.reserve,discard:own.discard,void_count:own.void.length,mulligans:own.mulligans,deck_meta:own.deck_meta},opponent:{seat:opp.seat,user_id:opp.user_id,...publicField(opp),mulligans:opp.mulligans,deck_meta:{name:opp.deck_meta.name,primary_element:opp.deck_meta.primary_element}},card_index:s.card_index}}
+function makeView(s:any,viewerSeat:number,revision:number){const own=s.players[String(viewerSeat)],opp=s.players[String(viewerSeat===1?2:1)];return{version:s.version,match_id:s.match_id,revision,phase:s.phase,toss_winner_seat:s.toss_winner_seat,first_player_seat:s.first_player_seat,setup_turn_seat:s.setup_turn_seat,active_seat:s.active_seat,turn_seq:s.turn_seq,personal_turns:s.personal_turns,setup_ready:s.setup_ready,realm:s.realm,turn_flags:s.turn_flags||{},pending_resolution:s.pending_resolutions?.[0]?{kind:s.pending_resolutions[0].kind,seat:s.pending_resolutions[0].seat,count:s.pending_resolutions[0].count||null}:null,pending_attack_choice:runtimeV02PendingAttackChoiceView(s.pending_attack_choice||null,viewerSeat as 1|2),pending_ability_choice:runtimeV02PendingActiveAbilityLiveChoiceView(s.pending_ability_choice||null,viewerSeat as 1|2),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(s.pending_heal_listener_choice||null,viewerSeat as 1|2),pending_event_listener_choice:runtimeV02PendingEventListenerChoiceView(s.pending_event_listener_choice||null,viewerSeat as 1|2),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(s.pending_movement_listener_choice||null,viewerSeat as 1|2),private_event_inspection:runtimeV02PrivateEventInspectionView(s,viewerSeat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,viewerSeat as 1|2),private_reward_inspection:runtimeV02PrivateRewardInspectionView(s,viewerSeat as 1|2),result:s.result||null,log:(s.log||[]).slice(-20),you:{seat:viewerSeat,user_id:own.user_id,hand:own.hand,deck_count:own.deck.length,rewards_count:own.rewards.length,vanguard:own.vanguard,reserve:own.reserve,discard:own.discard,void_count:own.void.length,mulligans:own.mulligans,deck_meta:own.deck_meta},opponent:{seat:opp.seat,user_id:opp.user_id,...publicField(opp),mulligans:opp.mulligans,deck_meta:{name:opp.deck_meta.name,primary_element:opp.deck_meta.primary_element}},card_index:s.card_index}}
 function views(s:any,revision:number){return{p1:makeView(s,1,revision),p2:makeView(s,2,revision)}}
 function ensureFlags(s:any,seat:number){s.turn_flags=s.turn_flags||{};const k=String(seat);s.turn_flags[k]=s.turn_flags[k]||{};return s.turn_flags[k]}
 function conditions(cr:Cr){const q=(cr.conditions||={scorched:false,venomed:0,control:null,modifier:null}) as any;return q}
@@ -84,8 +85,11 @@ Deno.serve(async(req)=>{
   const continueResolution=()=>{if(queue().length)return;if(evaluateWinner())return;const resume=String(s.resume_after_resolution||"");s.resume_after_resolution=null;if(resume==="aftermath")aftermath(Number(s.active_seat));else if(resume==="turn_advance")advanceTurn();else{s.phase="play"}};
   const healListenerAudit=(flow:any)=>({status:flow.status,processed_packet_ids:flow.continuation?.processed_packet_ids||[],emitted_packet_ids:flow.continuation?.emitted_packet_ids||[]});
   const movementListenerAudit=(flow:any)=>({status:flow.status,processed_listener_keys:flow.processed_listener_keys||[],emitted_heal_packet_ids:flow.emitted_heal_packet_ids||[]});
-  const setMovementResume=(kind:"withdrawal"|"attack",resumeSeat:number)=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");s.pending_movement_listener_resume={kind,seat:resumeSeat,turn_seq:Number(s.turn_seq||0)}};
-  const readMovementResume=()=>{const raw=s.pending_movement_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_movement_live_resume_required");const kind=String(raw.kind||"");if(kind!=="withdrawal"&&kind!=="attack")throw new Error("tcg_v0_2_movement_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0);if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_movement_live_resume_turn_stale");return{kind,seat:resumeSeat as 1|2,turn_seq:resumeTurn}};
+  const eventListenerAudit=(flow:any)=>({status:flow.status,processed_listener_keys:flow.processed_listener_keys||[],emitted_heal_packet_ids:flow.emitted_heal_packet_ids||[],emitted_movement_event_count:flow.emitted_movement_events?.length||0});
+  const setEventResume=(resumeSeat:number)=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_event_live_resume_seat_invalid");s.pending_event_listener_resume={kind:"play_creature",seat:resumeSeat,turn_seq:Number(s.turn_seq||0)}};
+  const readEventResume=()=>{const raw=s.pending_event_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_event_live_resume_required");if(String(raw.kind||"")!=="play_creature")throw new Error("tcg_v0_2_event_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0);if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_event_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_event_live_resume_turn_stale");return{kind:"play_creature" as const,seat:resumeSeat as 1|2,turn_seq:resumeTurn}};
+  const setMovementResume=(kind:"withdrawal"|"attack"|"play_creature",resumeSeat:number,priorHealPacketIds:string[]=[] )=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Array.isArray(priorHealPacketIds))throw new Error("tcg_v0_2_movement_live_prior_heal_packets_invalid");s.pending_movement_listener_resume={kind,seat:resumeSeat,turn_seq:Number(s.turn_seq||0),prior_heal_packet_ids:[...priorHealPacketIds]}};
+  const readMovementResume=()=>{const raw=s.pending_movement_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_movement_live_resume_required");const kind=String(raw.kind||"");if(kind!=="withdrawal"&&kind!=="attack"&&kind!=="play_creature")throw new Error("tcg_v0_2_movement_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0),priorHealPacketIds=Array.isArray(raw.prior_heal_packet_ids)?raw.prior_heal_packet_ids.map((x:any)=>String(x)):[];if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_movement_live_resume_turn_stale");return{kind,seat:resumeSeat as 1|2,turn_seq:resumeTurn,prior_heal_packet_ids:priorHealPacketIds}};
 
   if(action==="concede"){if(s.phase==="complete")return json({ok:false,version:VERSION,error:"match_already_complete"},400);s.phase="complete";s.result={winner_seat:otherSeat,reasons:["opponent_conceded"]};log(`Seat ${seat} conceded.`);return json({version:VERSION,result:await commit("concede",{seat,winner_seat:otherSeat})})}
 
@@ -98,8 +102,85 @@ Deno.serve(async(req)=>{
    const selectedPending=pending as RuntimeV02PendingAttackChoice;let resolved;try{resolved=runtimeV02ResolveSelectedHealChoice(selectedPending,seat as 1|2,String(body.choice_id||""),ids,friendlyFieldEntries(p,s),s)}catch(error){const message=error instanceof Error?error.message:String(error);const status=message==="tcg_v0_2_attack_choice_not_yours"?403:message==="tcg_v0_2_attack_choice_stale_id"?409:400;return json({ok:false,version:VERSION,error:message},status)}delete s.pending_attack_choice;log(`Seat ${seat} healed ${resolved.actual_heal} damage from ${resolved.target_label} after ${selectedPending.attack_id}.`);const healListenerFlow=runtimeV02BeginAttackHealListenerContinuation(s,resolved.emitted_packet_ids,seat as 1|2),healAudit=healListenerAudit(healListenerFlow);if(healListenerFlow.status==="player_choice_required"){s.phase="heal_listener_choice_resolution";return json({version:VERSION,result:await commit("resolve_attack_choice",{seat,attack_id:selectedPending.attack_id,kind:selectedPending.kind,target_where:resolved.target_where,target_index:resolved.target_index,amount:resolved.amount,actual_heal:resolved.actual_heal,emitted_packet_ids:resolved.emitted_packet_ids,heal_listener:healAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(healListenerFlow.pending_choice,seat as 1|2)})}const n=scanDefeats();if(n>0){s.phase="resolution";s.resume_after_resolution="aftermath"}else aftermath(seat);return json({version:VERSION,result:await commit("resolve_attack_choice",{seat,attack_id:selectedPending.attack_id,kind:selectedPending.kind,target_where:resolved.target_where,target_index:resolved.target_index,amount:resolved.amount,actual_heal:resolved.actual_heal,emitted_packet_ids:resolved.emitted_packet_ids,heal_listener:healAudit})})
   }
 
+  if(action==="resolve_event_listener_choice"){
+   const pending=s.pending_event_listener_choice as RuntimeV02PendingEventListenerChoice|null;
+   if(s.phase!=="event_listener_choice_resolution"||!pending)return json({ok:false,version:VERSION,error:"no_event_listener_choice_pending"},400);
+   const ids=Array.isArray(body.choice_ids)?body.choice_ids.map((x:any)=>String(x)):[];
+   let resume;
+   let resolved;
+   try{
+    resume=readEventResume();
+    resolved=runtimeV02ResolveEventListenerChoice(s,seat as 1|2,String(body.choice_id||""),ids);
+   }catch(error){
+    const message=error instanceof Error?error.message:String(error);
+    if(message==="tcg_v0_2_event_listener_choice_not_yours")return json({ok:false,version:VERSION,error:message},403);
+    if(message.includes("_stale")||message.includes("_source_missing"))return json({ok:false,version:VERSION,error:message},409);
+    if(message.startsWith("tcg_v0_2_event_listener_choice_"))return json({ok:false,version:VERSION,error:message},400);
+    throw error;
+   }
+   const eventAudit=eventListenerAudit(resolved);
+   if(resolved.status==="player_choice_required"){
+    s.phase="event_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("resolve_event_listener_choice",{seat,pending_choice:true,resume_kind:resume.kind,event_listener:eventAudit}),pending_event_listener_choice:runtimeV02PendingEventListenerChoiceView(resolved.pending_choice,seat as 1|2),private_event_inspection:runtimeV02PrivateEventInspectionView(s,seat as 1|2),private_reward_inspection:runtimeV02PrivateRewardInspectionView(s,seat as 1|2)});
+   }
+   delete s.pending_event_listener_resume;
+   const movementFlow=resolved.emitted_movement_events.length?runtimeV02BeginMovementListenerContinuation(s,resolved.emitted_movement_events):{status:"complete",processed_listener_keys:[],emitted_heal_packet_ids:[],pending_choice:null};
+   const movementAudit=movementListenerAudit(movementFlow);
+   if(movementFlow.status==="player_choice_required"){
+    setMovementResume("play_creature",resume.seat,resolved.emitted_heal_packet_ids);
+    s.phase="movement_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("play_creature_pending_movement_listener_choice",{seat,event_listener:eventAudit,movement_listener:movementAudit,pending_movement_listener_choice:true}),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(movementFlow.pending_choice,seat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,seat as 1|2)});
+   }
+   const packetIds=[...resolved.emitted_heal_packet_ids,...movementFlow.emitted_heal_packet_ids];
+   const healFlow=runtimeV02BeginMovementHealListenerContinuation(s,packetIds,resume.seat);
+   const healAudit=healListenerAudit(healFlow);
+   if(healFlow.status==="player_choice_required"){
+    s.phase="heal_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("play_creature_pending_heal_listener_choice",{seat,event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(healFlow.pending_choice,seat as 1|2)});
+   }
+   const n=scanDefeats();if(n>0)s.phase="resolution";else s.phase="play";
+   return json({version:VERSION,result:await commit("resolve_event_listener_choice",{seat,pending_choice:false,resume_kind:resume.kind,event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit})});
+  }
+
   if(action==="resolve_movement_listener_choice"){
-   const pending=s.pending_movement_listener_choice as RuntimeV02PendingMovementListenerChoice|null;if(s.phase!=="movement_listener_choice_resolution"||!pending)return json({ok:false,version:VERSION,error:"no_movement_listener_choice_pending"},400);const ids=Array.isArray(body.choice_ids)?body.choice_ids.map((x:any)=>String(x)):[];let resume;let resolved;try{resume=readMovementResume();resolved=runtimeV02ResolveMovementListenerChoice(s,seat as 1|2,String(body.choice_id||""),ids)}catch(error){const message=error instanceof Error?error.message:String(error);if(message==="tcg_v0_2_movement_listener_choice_not_yours")return json({ok:false,version:VERSION,error:message},403);if(message.includes("_stale")||message.includes("_source_missing"))return json({ok:false,version:VERSION,error:message},409);if(message.startsWith("tcg_v0_2_movement_listener_choice_"))return json({ok:false,version:VERSION,error:message},400);throw error}const movementAudit=movementListenerAudit(resolved);if(resolved.status==="player_choice_required"){s.phase="movement_listener_choice_resolution";return json({version:VERSION,result:await commit("resolve_movement_listener_choice",{seat,pending_choice:true,resume_kind:resume.kind,movement_listener:movementAudit}),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(resolved.pending_choice,seat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,seat as 1|2)})}delete s.pending_movement_listener_resume;if(resume.kind==="withdrawal"){const movementHealFlow=runtimeV02BeginMovementHealListenerContinuation(s,resolved.emitted_heal_packet_ids,resume.seat),movementHealAudit=healListenerAudit(movementHealFlow);if(movementHealFlow.status==="player_choice_required"){s.phase="heal_listener_choice_resolution";return json({version:VERSION,result:await commit("movement_pending_heal_listener_choice",{seat,resume_kind:resume.kind,movement_listener:movementAudit,heal_listener:movementHealAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(movementHealFlow.pending_choice,seat as 1|2)})}const n=scanDefeats();if(n>0)s.phase="resolution";else s.phase="play";return json({version:VERSION,result:await commit("resolve_movement_listener_choice",{seat,pending_choice:false,resume_kind:resume.kind,movement_listener:movementAudit,heal_listener:movementHealAudit})})}const movementHealFlow=runtimeV02BeginAttackHealListenerContinuation(s,resolved.emitted_heal_packet_ids,resume.seat),movementHealAudit=healListenerAudit(movementHealFlow);if(movementHealFlow.status==="player_choice_required"){s.phase="heal_listener_choice_resolution";return json({version:VERSION,result:await commit("movement_pending_heal_listener_choice",{seat,resume_kind:resume.kind,movement_listener:movementAudit,heal_listener:movementHealAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(movementHealFlow.pending_choice,seat as 1|2)})}const n=scanDefeats();if(n>0){s.phase="resolution";s.resume_after_resolution="aftermath"}else aftermath(resume.seat);return json({version:VERSION,result:await commit("resolve_movement_listener_choice",{seat,pending_choice:false,resume_kind:resume.kind,movement_listener:movementAudit,heal_listener:movementHealAudit})})
+   const pending=s.pending_movement_listener_choice as RuntimeV02PendingMovementListenerChoice|null;
+   if(s.phase!=="movement_listener_choice_resolution"||!pending)return json({ok:false,version:VERSION,error:"no_movement_listener_choice_pending"},400);
+   const ids=Array.isArray(body.choice_ids)?body.choice_ids.map((x:any)=>String(x)):[];
+   let resume;
+   let resolved;
+   try{
+    resume=readMovementResume();
+    resolved=runtimeV02ResolveMovementListenerChoice(s,seat as 1|2,String(body.choice_id||""),ids);
+   }catch(error){
+    const message=error instanceof Error?error.message:String(error);
+    if(message==="tcg_v0_2_movement_listener_choice_not_yours")return json({ok:false,version:VERSION,error:message},403);
+    if(message.includes("_stale")||message.includes("_source_missing"))return json({ok:false,version:VERSION,error:message},409);
+    if(message.startsWith("tcg_v0_2_movement_listener_choice_"))return json({ok:false,version:VERSION,error:message},400);
+    throw error;
+   }
+   const movementAudit=movementListenerAudit(resolved);
+   if(resolved.status==="player_choice_required"){
+    s.phase="movement_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("resolve_movement_listener_choice",{seat,pending_choice:true,resume_kind:resume.kind,movement_listener:movementAudit}),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(resolved.pending_choice,seat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,seat as 1|2)});
+   }
+   delete s.pending_movement_listener_resume;
+   const packetIds=[...resume.prior_heal_packet_ids,...resolved.emitted_heal_packet_ids];
+   if(resume.kind==="withdrawal"||resume.kind==="play_creature"){
+    const movementHealFlow=runtimeV02BeginMovementHealListenerContinuation(s,packetIds,resume.seat),movementHealAudit=healListenerAudit(movementHealFlow);
+    if(movementHealFlow.status==="player_choice_required"){
+     s.phase="heal_listener_choice_resolution";
+     return json({version:VERSION,result:await commit("movement_pending_heal_listener_choice",{seat,resume_kind:resume.kind,movement_listener:movementAudit,heal_listener:movementHealAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(movementHealFlow.pending_choice,seat as 1|2)});
+    }
+    const n=scanDefeats();if(n>0)s.phase="resolution";else s.phase="play";
+    return json({version:VERSION,result:await commit("resolve_movement_listener_choice",{seat,pending_choice:false,resume_kind:resume.kind,movement_listener:movementAudit,heal_listener:movementHealAudit})});
+   }
+   const movementHealFlow=runtimeV02BeginAttackHealListenerContinuation(s,packetIds,resume.seat),movementHealAudit=healListenerAudit(movementHealFlow);
+   if(movementHealFlow.status==="player_choice_required"){
+    s.phase="heal_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("movement_pending_heal_listener_choice",{seat,resume_kind:resume.kind,movement_listener:movementAudit,heal_listener:movementHealAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(movementHealFlow.pending_choice,seat as 1|2)});
+   }
+   const n=scanDefeats();if(n>0){s.phase="resolution";s.resume_after_resolution="aftermath"}else aftermath(resume.seat);
+   return json({version:VERSION,result:await commit("resolve_movement_listener_choice",{seat,pending_choice:false,resume_kind:resume.kind,movement_listener:movementAudit,heal_listener:movementHealAudit})});
   }
 
   if(action==="resolve_heal_listener_choice"){
@@ -121,7 +202,35 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="play_creature"){
-   const uid=String(body.card_uid||""),idx=Number(body.reserve_index);if(!Number.isInteger(idx)||idx<0||idx>3||p.reserve[idx])return json({ok:false,version:VERSION,error:"empty_reserve_slot_required"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid);const d=inst?def(s,inst):null;if(!inst||!starterLegal(d))return json({ok:false,version:VERSION,error:"baby_standalone_or_mythic_required"},400);const x=removeHand(p,uid)!;p.reserve[idx]={stack:[x],essence:[],relic:null,damage:0,shield:0,condition:null,conditions:{scorched:false,venomed:0,control:null,modifier:null},flags:{},entered_turn:Number(s.turn_seq||0),evolved_turn:-1};log(`Seat ${seat} played ${d.name} to Reserve ${idx+1}.`);return json({version:VERSION,result:await commit("play_creature",{seat,reserve_index:idx,card_id:d.id})});
+   const uid=String(body.card_uid||""),idx=Number(body.reserve_index);
+   if(!Number.isInteger(idx)||idx<0||idx>3||p.reserve[idx])return json({ok:false,version:VERSION,error:"empty_reserve_slot_required"},400);
+   const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;
+   if(!inst||!starterLegal(d))return json({ok:false,version:VERSION,error:"baby_standalone_or_mythic_required"},400);
+   const x=removeHand(p,uid)!;
+   p.reserve[idx]={stack:[x],essence:[],relic:null,damage:0,shield:0,condition:null,conditions:{scorched:false,venomed:0,control:null,modifier:null},flags:{},entered_turn:Number(s.turn_seq||0),evolved_turn:-1};
+   log(`Seat ${seat} played ${d.name} to Reserve ${idx+1}.`);
+   const enteredEvent=runtimeV02CreateCreatureEnteredPlayEvent(s,seat,uid,idx);
+   const eventFlow=runtimeV02BeginEventListenerContinuation(s,[enteredEvent]),eventAudit=eventListenerAudit(eventFlow);
+   if(eventFlow.status==="player_choice_required"){
+    setEventResume(seat);
+    s.phase="event_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("play_creature_pending_event_listener_choice",{seat,reserve_index:idx,card_id:d.id,event_listener:eventAudit,pending_event_listener_choice:true}),pending_event_listener_choice:runtimeV02PendingEventListenerChoiceView(eventFlow.pending_choice,seat as 1|2),private_event_inspection:runtimeV02PrivateEventInspectionView(s,seat as 1|2),private_reward_inspection:runtimeV02PrivateRewardInspectionView(s,seat as 1|2)});
+   }
+   const movementFlow=eventFlow.emitted_movement_events.length?runtimeV02BeginMovementListenerContinuation(s,eventFlow.emitted_movement_events):{status:"complete",processed_listener_keys:[],emitted_heal_packet_ids:[],pending_choice:null};
+   const movementAudit=movementListenerAudit(movementFlow);
+   if(movementFlow.status==="player_choice_required"){
+    setMovementResume("play_creature",seat,eventFlow.emitted_heal_packet_ids);
+    s.phase="movement_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("play_creature_pending_movement_listener_choice",{seat,reserve_index:idx,card_id:d.id,event_listener:eventAudit,movement_listener:movementAudit,pending_movement_listener_choice:true}),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(movementFlow.pending_choice,seat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,seat as 1|2)});
+   }
+   const packetIds=[...eventFlow.emitted_heal_packet_ids,...movementFlow.emitted_heal_packet_ids];
+   const healFlow=runtimeV02BeginMovementHealListenerContinuation(s,packetIds,seat as 1|2),healAudit=healListenerAudit(healFlow);
+   if(healFlow.status==="player_choice_required"){
+    s.phase="heal_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("play_creature_pending_heal_listener_choice",{seat,reserve_index:idx,card_id:d.id,event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(healFlow.pending_choice,seat as 1|2)});
+   }
+   const n=scanDefeats();if(n>0)s.phase="resolution";else s.phase="play";
+   return json({version:VERSION,result:await commit("play_creature",{seat,reserve_index:idx,card_id:d.id,event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit})});
   }
 
   if(action==="evolve"){
