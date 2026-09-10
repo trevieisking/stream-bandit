@@ -158,8 +158,17 @@ function subjectMatches(snapshot: RuntimeV02EssenceAttachedEligibilitySnapshot, 
   if (filters.essence_subtype != null && snapshot.subject.essence_subtype !== String(filters.essence_subtype)) return false;
   return true;
 }
-function attachedTarget(value: unknown, error: string): void {
-  if (value != null && String(value) !== "$attached_creature") throw new Error(error);
+function targetReferenceMatchesSnapshot(
+  snapshot: RuntimeV02EssenceAttachedEligibilitySnapshot,
+  value: unknown,
+  context: RuntimeV02EssenceAttachedPredicateContext,
+  error: string,
+): boolean {
+  if (value == null || String(value) === "$attached_creature") return true;
+  if (String(value) === "$source_creature") {
+    return context.source_creature_uid === snapshot.target.uid;
+  }
+  throw new Error(error);
 }
 
 /** Captures every mutable fact used by frozen Set One essence_attached requirements. */
@@ -240,21 +249,41 @@ export function runtimeV02EssenceAttachedSnapshotPredicate(
     case "event_attachment_kind_is":
       return snapshot.event.attachment_kind === String(value.kind || "");
     case "target_element_is":
-      attachedTarget(value.target, "tcg_v0_2_attachment_snapshot_target_element_target_unsupported");
-      return snapshot.target.element === String(value.element || "");
+      return targetReferenceMatchesSnapshot(
+        snapshot,
+        value.target,
+        context,
+        "tcg_v0_2_attachment_snapshot_target_element_target_unsupported",
+      ) && snapshot.target.element === String(value.element || "");
     case "target_zone_is":
-      attachedTarget(value.target, "tcg_v0_2_attachment_snapshot_target_zone_target_unsupported");
-      return snapshot.target.zone === String(value.zone || "");
+      return targetReferenceMatchesSnapshot(
+        snapshot,
+        value.target,
+        context,
+        "tcg_v0_2_attachment_snapshot_target_zone_target_unsupported",
+      ) && snapshot.target.zone === String(value.zone || "");
     case "target_stage_in":
-      attachedTarget(value.target, "tcg_v0_2_attachment_snapshot_target_stage_target_unsupported");
       if (!Array.isArray(value.stages)) throw new Error("tcg_v0_2_attachment_snapshot_target_stages_invalid");
-      return value.stages.map(String).includes(snapshot.target.stage);
+      return targetReferenceMatchesSnapshot(
+        snapshot,
+        value.target,
+        context,
+        "tcg_v0_2_attachment_snapshot_target_stage_target_unsupported",
+      ) && value.stages.map(String).includes(snapshot.target.stage);
     case "target_has_condition":
-      attachedTarget(value.target, "tcg_v0_2_attachment_snapshot_target_condition_target_unsupported");
-      return snapshot.target.conditions.includes(String(value.condition || ""));
+      return targetReferenceMatchesSnapshot(
+        snapshot,
+        value.target,
+        context,
+        "tcg_v0_2_attachment_snapshot_target_condition_target_unsupported",
+      ) && snapshot.target.conditions.includes(String(value.condition || ""));
     case "target_damaged":
-      attachedTarget(value.target, "tcg_v0_2_attachment_snapshot_target_damaged_target_unsupported");
-      return snapshot.target.damaged;
+      return targetReferenceMatchesSnapshot(
+        snapshot,
+        value.target,
+        context,
+        "tcg_v0_2_attachment_snapshot_target_damaged_target_unsupported",
+      ) && snapshot.target.damaged;
     case "voluntary_withdrawal_legal_with_incoming":
       if (String(value.player || "self") !== "self" || String(value.incoming_target || "") !== "$attached_creature") {
         throw new Error("tcg_v0_2_attachment_snapshot_withdrawal_shape_unsupported");
