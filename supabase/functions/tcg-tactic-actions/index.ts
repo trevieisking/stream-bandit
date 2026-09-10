@@ -4,7 +4,7 @@ import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidd
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
 import { runtimeV02BeginTacticHealListenerContinuation, runtimeV02PendingHealListenerChoiceView, runtimeV02ResolveTacticHealListenerChoice, type RuntimeV02PendingHealListenerChoice } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
 import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context-v0-2.ts";
-import { runtimeV02BeginMovementListenerContinuation, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
+import { runtimeV02BeginMovementListenerContinuation, runtimeV02CreateEssenceMovedEvent, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
 
@@ -1047,6 +1047,7 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
   const context = pending.context || {};
   const apply = String(context.apply || "");
   const vars = effect.vars;
+  let movementFlow: ReturnType<typeof runtimeV02BeginMovementListenerContinuation> | null = null;
 
   if (apply === "set_var") {
     const values = selected.map((option) => option.data as CreatureRef);
@@ -1099,6 +1100,7 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
     if (found && selected[0]?.data?.condition) clearCondition(found.cr, String(selected[0].data.condition));
   } else if (apply === "move_attached_essence") {
     const used = new Set<string>();
+    const movementEvents: ReturnType<typeof runtimeV02CreateEssenceMovedEvent>[] = [];
     for (const option of selected) {
       const essenceUid = String(option.data.essence_uid);
       if (used.has(essenceUid)) throw new Error("same_essence_selected_twice");
@@ -1111,15 +1113,26 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
       const essence = removeByUid(source.cr.essence, essenceUid);
       if (!essence) throw new Error("essence_move_source_missing");
       destination.cr.essence.push(essence);
-      recordRuntimeV02EssenceMovement(
+      const sourceActionId = String(context.source_action_id || `tactic:${effect.source_card_id}`);
+      const movements = recordRuntimeV02EssenceMovement(
         state,
         effect.owner_seat as 1 | 2,
         sourceRef.anchor_uid,
         destinationRef.anchor_uid,
         essence,
-        String(context.source_action_id || `tactic:${effect.source_card_id}`),
+        sourceActionId,
       );
+      const movement = movements.find((entry) =>
+        entry.controller_seat === effect.owner_seat &&
+        entry.source_creature_uid === sourceRef.anchor_uid &&
+        entry.destination_creature_uid === destinationRef.anchor_uid &&
+        entry.essence_uid === essence.uid &&
+        entry.source_action_id === sourceActionId
+      );
+      if (!movement) throw new Error("tcg_v0_2_tactic_essence_movement_receipt_missing");
+      movementEvents.push(runtimeV02CreateEssenceMovedEvent(movement));
     }
+    movementFlow = runtimeV02BeginMovementListenerContinuation(state, movementEvents);
   } else if (apply === "attach_essence_from_zone") {
     const player = state.players[String(context.zone_seat)];
     const target = findCreature(state, context.target as CreatureRef);
@@ -1149,6 +1162,17 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
 
   delete state.pending_choice;
   effect.cursor++;
+  if (movementFlow?.status === "player_choice_required") {
+    setTacticMovementResume(state, effect);
+    return;
+  }
+  if (movementFlow && movementFlow.emitted_heal_packet_ids.length) {
+    const healFlow = runtimeV02BeginTacticHealListenerContinuation(state, movementFlow.emitted_heal_packet_ids, effect.owner_seat as 1 | 2);
+    if (healFlow.status === "player_choice_required") {
+      setTacticHealResume(state, effect);
+      return;
+    }
+  }
 }
 
 Deno.serve(async (req) => {
@@ -1337,8 +1361,8 @@ Deno.serve(async (req) => {
         throw error;
       }
       const movementAudit = movementListenerAudit(resolved);
-      if ((resolved.emitted_heal_packet_ids || []).length) throw new Error("tcg_v0_2_tactic_effect_switch_movement_heal_resume_not_yet_supported");
       if (resolved.status === "player_choice_required") {
+        if ((resolved.emitted_heal_packet_ids || []).length) throw new Error("tcg_v0_2_tactic_movement_choice_with_prior_heal_not_yet_supported");
         const result = await commit("resolve_tactic_movement_listener_choice", {
           seat,
           pending_choice: true,
@@ -1355,6 +1379,10 @@ Deno.serve(async (req) => {
         });
       }
       delete state.pending_tactic_movement_resume;
+      if ((resolved.emitted_heal_packet_ids || []).length) {
+        const healFlow = runtimeV02BeginTacticHealListenerContinuation(state, resolved.emitted_heal_packet_ids, effect.owner_seat as 1 | 2);
+        if (healFlow.status === "player_choice_required") setTacticHealResume(state, effect);
+      }
       executeUntilChoice(state);
       const result = await commit("resolve_tactic_movement_listener_choice", {
         seat,

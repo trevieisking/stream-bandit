@@ -2,13 +2,13 @@ import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 import { runtimeV02SwitchContextById, type RuntimeV02SwitchMovementEvent } from "./tcg-match-switch-context-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
-import { recordRuntimeV02EssenceMovement } from "./tcg-match-essence-movement-v0-2.ts";
+import { recordRuntimeV02EssenceMovement, type RuntimeV02EssenceMovement } from "./tcg-match-essence-movement-v0-2.ts";
 import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
 import {
   runtimeV02CurrentTurnEssenceAttachmentEvents,
   runtimeV02LatestEssenceAttachmentEventForSource,
 } from "./tcg-match-essence-attachment-event-v0-2.ts";
-import { applyRuntimeCondition, recordRuntimeEvent, runtimeConditions } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import { addRuntimeShield, applyRuntimeCondition, recordRuntimeEvent, runtimeConditions } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 
 type Inst = { uid: string; card_id: string; attached_turn?: number; effect_flags?: Record<string, unknown> };
 type Cr = {
@@ -24,7 +24,19 @@ type Cr = {
 };
 type Field = { seat: 1 | 2; where: "vanguard" | "reserve"; index: number | null; cr: Cr; top: Inst; def: Record<string, unknown> };
 type Candidate = { kind: "ability" | "essence" | "relic" | "realm"; source: Inst; seat: 1 | 2; field: Field | null; listener: Record<string, unknown> };
-type WorkItem = { event: RuntimeV02SwitchMovementEvent; source_uid: string; listener_id: string };
+export type RuntimeV02EssenceMovedEvent = {
+  event: "essence_moved";
+  movement_id: string;
+  controller_seat: 1 | 2;
+  source_creature_uid: string;
+  destination_creature_uid: string;
+  essence_uid: string;
+  element: string;
+  source_action_id: string;
+  turn_seq: number;
+};
+export type RuntimeV02MovementListenerEvent = RuntimeV02SwitchMovementEvent | RuntimeV02EssenceMovedEvent;
+type WorkItem = { event: RuntimeV02MovementListenerEvent; source_uid: string; listener_id: string };
 type CardRef = { uid: string; card_id: string; zone_owner_seat: 1 | 2 };
 type CreatureRef = { seat: 1 | 2; anchor_uid: string };
 
@@ -142,19 +154,30 @@ function structuredEnabled(state: Record<string, unknown>): boolean {
   const cardIndex = O(state.card_index); if (!cardIndex) return false;
   const first = Object.keys(cardIndex)[0]; return !!(first && runtimeV02Definition(state, first));
 }
+function isSwitchMovementEvent(event: RuntimeV02MovementListenerEvent): event is RuntimeV02SwitchMovementEvent { return event.event === "moved_to_reserve" || event.event === "became_vanguard"; }
+function isEssenceMovedEvent(event: RuntimeV02MovementListenerEvent): event is RuntimeV02EssenceMovedEvent { return event.event === "essence_moved"; }
+function movementEventId(event: RuntimeV02MovementListenerEvent): string { return isEssenceMovedEvent(event) ? event.movement_id : event.switch_id; }
+export function runtimeV02CreateEssenceMovedEvent(movement: RuntimeV02EssenceMovement): RuntimeV02EssenceMovedEvent {
+  const turn = Number(movement.turn_seq); if (!Number.isInteger(turn) || turn < 0) throw new Error("tcg_v0_2_movement_listener_essence_event_turn_invalid");
+  const controller = SEAT(movement.controller_seat, "tcg_v0_2_movement_listener_essence_event_controller_invalid");
+  const source = S(movement.source_creature_uid, "tcg_v0_2_movement_listener_essence_event_source_invalid"); const destination = S(movement.destination_creature_uid, "tcg_v0_2_movement_listener_essence_event_destination_invalid"); if (source === destination) throw new Error("tcg_v0_2_movement_listener_essence_event_same_creature");
+  const essence = S(movement.essence_uid, "tcg_v0_2_movement_listener_essence_event_uid_invalid"); const element = S(movement.element, "tcg_v0_2_movement_listener_essence_event_element_invalid"); const action = S(movement.source_action_id, "tcg_v0_2_movement_listener_essence_event_action_invalid");
+  const movementId = `essence-moved:${JSON.stringify([turn,controller,source,destination,essence,element,action])}`;
+  return { event: "essence_moved", movement_id: movementId, controller_seat: controller, source_creature_uid: source, destination_creature_uid: destination, essence_uid: essence, element, source_action_id: action, turn_seq: turn };
+}
 function targetOpponent(state: Record<string, unknown>, seat: 1 | 2): Field | null {
   const player = O(O(state.players)?.[String(seat === 1 ? 2 : 1)]); const cr = player?.vanguard as Cr | null | undefined;
   const top = cr ? topInst(cr) : null; return top ? fieldByUid(state, top.uid) : null;
 }
-function eventSubject(state: Record<string, unknown>, event: RuntimeV02SwitchMovementEvent): Field { const field = fieldByUid(state, event.subject_uid); if (!field) throw new Error("tcg_v0_2_movement_listener_event_subject_missing"); return field; }
-function eventMatchesFilters(state: Record<string, unknown>, event: RuntimeV02SwitchMovementEvent, filters: unknown): boolean {
-  const f = O(filters) || {}; const subject = eventSubject(state, event); const d = subject.def;
+function eventSubject(state: Record<string, unknown>, event: RuntimeV02MovementListenerEvent): Field { if (!isSwitchMovementEvent(event)) throw new Error("tcg_v0_2_movement_listener_event_subject_unsupported"); const field = fieldByUid(state, event.subject_uid); if (!field) throw new Error("tcg_v0_2_movement_listener_event_subject_missing"); return field; }
+function eventMatchesFilters(state: Record<string, unknown>, event: RuntimeV02MovementListenerEvent, filters: unknown): boolean {
+  if (!isSwitchMovementEvent(event)) return false; const f = O(filters) || {}; const subject = eventSubject(state, event); const d = subject.def;
   if (f.card_family != null && String(d.card_family || "") !== String(f.card_family)) return false;
   if (f.element != null && String(d.element || "") !== String(f.element)) return false;
   if (f.exclude_element != null && String(d.element || "") === String(f.exclude_element)) return false;
   return true;
 }
-function requirement(state: Record<string, unknown>, raw: unknown, candidate: Candidate, event: RuntimeV02SwitchMovementEvent): boolean {
+function requirement(state: Record<string, unknown>, raw: unknown, candidate: Candidate, event: RuntimeV02MovementListenerEvent): boolean {
   const value = O(raw); if (!value) throw new Error("tcg_v0_2_movement_listener_requirement_invalid");
   if (Object.hasOwn(value, "all")) { if (Object.keys(value).length !== 1) throw new Error("tcg_v0_2_movement_listener_all_invalid"); return LIST(value.all, "tcg_v0_2_movement_listener_all_invalid").every((item) => requirement(state, item, candidate, event)); }
   if (Object.hasOwn(value, "any")) { if (Object.keys(value).length !== 1) throw new Error("tcg_v0_2_movement_listener_any_invalid"); const items = LIST(value.any, "tcg_v0_2_movement_listener_any_invalid"); if (!items.length) throw new Error("tcg_v0_2_movement_listener_any_empty"); return items.some((item) => requirement(state, item, candidate, event)); }
@@ -162,14 +185,19 @@ function requirement(state: Record<string, unknown>, raw: unknown, candidate: Ca
   const predicate = S(value.predicate, "tcg_v0_2_movement_listener_predicate_required");
   switch (predicate) {
     case "source_is_self": return candidate.seat === event.controller_seat;
-    case "event_subject_is_source": return !!candidate.field && candidate.field.top.uid === event.subject_uid;
-    case "event_subject_is_attached_creature": return !!candidate.field && candidate.field.top.uid === event.subject_uid;
-    case "event_origin_zone_is": return event.origin_zone === String(value.zone || "");
-    case "event_destination_zone_is": return event.destination_zone === String(value.zone || "");
-    case "event_action_kind_is": return event.action_kind === String(value.action_kind || "");
+    case "source_controller_is_self": return candidate.seat === event.controller_seat;
+    case "event_subject_is_source": return isSwitchMovementEvent(event) && !!candidate.field && candidate.field.top.uid === event.subject_uid;
+    case "event_subject_is_attached_creature": return isSwitchMovementEvent(event) && !!candidate.field && candidate.field.top.uid === event.subject_uid;
+    case "event_origin_zone_is": return isSwitchMovementEvent(event) && event.origin_zone === String(value.zone || "");
+    case "event_destination_zone_is": return isSwitchMovementEvent(event) && event.destination_zone === String(value.zone || "");
+    case "event_action_kind_is": return isSwitchMovementEvent(event) && event.action_kind === String(value.action_kind || "");
     case "event_controller_is_active_seat": return event.controller_seat === Number(state.active_seat);
     case "event_controller_is_self": return event.controller_seat === candidate.seat;
     case "event_subject_matches": return eventMatchesFilters(state, event, value.filters);
+    case "essence_move_element_is": return isEssenceMovedEvent(event) && event.element === String(value.element || "");
+    case "essence_move_source_is_self": return isEssenceMovedEvent(event) && !!candidate.field && candidate.field.top.uid === event.source_creature_uid;
+    case "essence_move_destination_is_self": return isEssenceMovedEvent(event) && !!candidate.field && candidate.field.top.uid === event.destination_creature_uid;
+    case "essence_move_source_is_attached_creature": return isEssenceMovedEvent(event) && !!candidate.field && candidate.field.top.uid === event.source_creature_uid;
     case "target_damaged": {
       const target = String(value.target || "");
       if (target !== "$source_creature" && target !== "$attached_creature") throw new Error(`tcg_v0_2_movement_listener_target_damaged_unsupported:${target}`);
@@ -192,7 +220,7 @@ function requirement(state: Record<string, unknown>, raw: unknown, candidate: Ca
     default: throw new Error(`tcg_v0_2_movement_listener_predicate_unsupported:${predicate}`);
   }
 }
-function matches(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02SwitchMovementEvent): boolean {
+function matches(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02MovementListenerEvent): boolean {
   const timing = candidate.kind === "ability" ? String(candidate.listener.timing || "any") : "any";
   if (timing === "own_turn" && candidate.seat !== Number(state.active_seat)) return false;
   if (!["own_turn", "any", "passive"].includes(timing)) throw new Error(`tcg_v0_2_movement_listener_timing_unsupported:${timing}`);
@@ -207,10 +235,10 @@ function listenerState(state: Record<string, unknown>): { turn_seq: number; rece
   const receipts = O(raw.receipts); const limits = O(raw.limits); if (!receipts || !limits) throw new Error("tcg_v0_2_movement_listener_state_invalid");
   return raw as { turn_seq: number; receipts: Record<string, unknown>; limits: Record<string, unknown> };
 }
-function receiptKey(candidate: Candidate, event: RuntimeV02SwitchMovementEvent): string { return `${event.switch_id}:${event.event}:${candidate.source.uid}:${listenerId(candidate)}`; }
-function alreadyResolved(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02SwitchMovementEvent): boolean { return Object.hasOwn(listenerState(state).receipts, receiptKey(candidate, event)); }
-function markResolved(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02SwitchMovementEvent): void { listenerState(state).receipts[receiptKey(candidate, event)] = { switch_id: event.switch_id, event: event.event, source_uid: candidate.source.uid, listener_id: listenerId(candidate) }; }
-function limitKey(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02SwitchMovementEvent): { key: string; count: number; scope: string } | null {
+function receiptKey(candidate: Candidate, event: RuntimeV02MovementListenerEvent): string { return `${movementEventId(event)}:${event.event}:${candidate.source.uid}:${listenerId(candidate)}`; }
+function alreadyResolved(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02MovementListenerEvent): boolean { return Object.hasOwn(listenerState(state).receipts, receiptKey(candidate, event)); }
+function markResolved(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02MovementListenerEvent): void { const eventRef = isEssenceMovedEvent(event) ? { movement_id: event.movement_id } : { switch_id: event.switch_id }; listenerState(state).receipts[receiptKey(candidate, event)] = { ...eventRef, event: event.event, source_uid: candidate.source.uid, listener_id: listenerId(candidate) }; }
+function limitKey(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02MovementListenerEvent): { key: string; count: number; scope: string } | null {
   const limit = O(candidate.listener.limit); if (!limit) return null;
   const count = Number(limit.count); if (!Number.isInteger(count) || count < 1) throw new Error("tcg_v0_2_movement_listener_limit_count_invalid");
   const scope = String(limit.scope || ""); const owner = String(limit.owner || ""); let ownerKey = "";
@@ -244,7 +272,7 @@ function getContinuation(state: Record<string, unknown>): Continuation {
 function setContinuation(state: Record<string, unknown>, value: Continuation): void { state[CONTINUATION_KEY] = value as unknown as Record<string, unknown>; }
 function clearContinuation(state: Record<string, unknown>): void { delete state[CONTINUATION_KEY]; delete state[PENDING_KEY]; }
 function currentWork(continuation: Continuation): WorkItem | null { return continuation.work[continuation.work_index] || null; }
-function targetForToken(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02SwitchMovementEvent, raw: unknown): Field {
+function targetForToken(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02MovementListenerEvent, raw: unknown): Field {
   if (raw && typeof raw === "object" && !Array.isArray(raw)) {
     const selector = raw as Record<string, unknown>;
     const controller = String(selector.controller || ""); const zone = String(selector.zone || "");
@@ -258,6 +286,7 @@ function targetForToken(state: Record<string, unknown>, candidate: Candidate, ev
   if ((token === "$source_creature" || token === "$attached_creature") && candidate.field) return candidate.field;
   if (token === "$event_subject") return eventSubject(state, event);
   if (token === "$current_opponent_vanguard") { const found = targetOpponent(state, candidate.seat); if (found) return found; }
+  if (!isSwitchMovementEvent(event)) throw new Error(`tcg_v0_2_movement_listener_target_unsupported:${token}`);
   const switchContext = runtimeV02SwitchContextById(state, event.switch_id);
   if (!switchContext) throw new Error("tcg_v0_2_movement_listener_switch_context_missing");
   if (token === "$switch_incoming_vanguard") { const field = fieldByUid(state, switchContext.incoming_vanguard_uid); if (field) return field; }
@@ -305,9 +334,9 @@ function setWithdrawalModifier(state: Record<string, unknown>, target: Field, st
   const minimum = step.minimum == null ? 0 : N(step.minimum, "tcg_v0_2_movement_listener_withdrawal_modifier_minimum_invalid"); value = Math.max(minimum, value); flags.lifecycle_withdrawal_cost = { turn_seq: TURN(state), value: Math.max(0, value), expires: "end_of_turn" };
 }
 function directDamage(target: Field, amount: unknown): number { const n = Math.max(0, N(amount, "tcg_v0_2_movement_listener_direct_damage_amount_invalid")); target.cr.damage = Math.max(0, Number(target.cr.damage || 0)) + n; return n; }
-function applyCondition(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02SwitchMovementEvent, target: Field, step: Record<string, unknown>): void {
+function applyCondition(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02MovementListenerEvent, target: Field, step: Record<string, unknown>): void {
   const condition = S(step.condition, "tcg_v0_2_movement_listener_condition_required"); const mode = String(step.mode || "apply") as "apply" | "apply_if_empty" | "apply_if_empty_or_same" | "replace"; const result = applyRuntimeCondition(target.cr, condition, TURN(state), mode);
-  if (result.applied) recordRuntimeEvent(state, "condition_changed", { turn_seq: TURN(state), controller_seat: candidate.seat, target_controller_seat: target.seat, subject_uid: target.top.uid, condition, change_kind: mode === "replace" ? "replace" : "apply", source_event: event.event, source_switch_id: event.switch_id, source_listener_id: listenerId(candidate) });
+  if (result.applied) recordRuntimeEvent(state, "condition_changed", { turn_seq: TURN(state), controller_seat: candidate.seat, target_controller_seat: target.seat, subject_uid: target.top.uid, condition, change_kind: mode === "replace" ? "replace" : "apply", source_event: event.event, source_switch_id: isSwitchMovementEvent(event) ? event.switch_id : null, source_movement_id: isEssenceMovedEvent(event) ? event.movement_id : null, source_listener_id: listenerId(candidate) });
 }
 function buildMoveEssenceOptions(state: Record<string, unknown>, candidate: Candidate, step: Record<string, unknown>): Array<{ id: string; label: string; data: Record<string, unknown> }> {
   if (!candidate.field) throw new Error("tcg_v0_2_movement_listener_move_essence_source_field_required");
@@ -326,14 +355,22 @@ function buildMoveEssenceOptions(state: Record<string, unknown>, candidate: Cand
   return options;
 }
 function range(raw: unknown): { min: number; max: number } { if (typeof raw === "number") return { min: raw, max: raw }; const r = O(raw) || {}; return { min: Math.max(0, Number(r.min || 0)), max: Math.max(0, Number(r.max || 0)) }; }
-function applyMoveEssenceChoice(state: Record<string, unknown>, candidate: Candidate, selected: Array<{ data: Record<string, unknown> }>, sourceActionId: string): void {
+function recordedEssenceMovement(state: Record<string, unknown>, controllerSeat: 1 | 2, source: Field, destination: Field, essence: Inst, sourceActionId: string): RuntimeV02EssenceMovedEvent {
+  const movements = recordRuntimeV02EssenceMovement(state, controllerSeat, source.top.uid, destination.top.uid, essence, sourceActionId);
+  const movement = movements.find((entry) => entry.controller_seat === controllerSeat && entry.source_creature_uid === source.top.uid && entry.destination_creature_uid === destination.top.uid && entry.essence_uid === essence.uid && entry.source_action_id === sourceActionId);
+  if (!movement) throw new Error("tcg_v0_2_movement_listener_essence_movement_receipt_missing");
+  return runtimeV02CreateEssenceMovedEvent(movement);
+}
+function applyMoveEssenceChoice(state: Record<string, unknown>, candidate: Candidate, selected: Array<{ data: Record<string, unknown> }>, sourceActionId: string): RuntimeV02EssenceMovedEvent[] {
+  const events: RuntimeV02EssenceMovedEvent[] = [];
   for (const option of selected) {
     const source = fieldFromRef(state, option.data.source as unknown as CreatureRef); const destination = fieldFromRef(state, option.data.destination as unknown as CreatureRef); if (!source || !destination) throw new Error("tcg_v0_2_movement_listener_essence_move_creature_stale");
     const uid = S(option.data.essence_uid, "tcg_v0_2_movement_listener_essence_move_uid_invalid"); const index = source.cr.essence.findIndex((item) => item.uid === uid); if (index < 0) throw new Error("tcg_v0_2_movement_listener_essence_move_source_stale"); const essence = source.cr.essence.splice(index, 1)[0]; destination.cr.essence.push(essence);
-    recordRuntimeV02EssenceMovement(state, candidate.seat, source.top.uid, destination.top.uid, essence, sourceActionId);
+    events.push(recordedEssenceMovement(state, candidate.seat, source, destination, essence, sourceActionId));
   }
+  return events;
 }
-function executeStep(state: Record<string, unknown>, continuation: Continuation, candidate: Candidate, event: RuntimeV02SwitchMovementEvent, step: Record<string, unknown>): "continue" | "choice" {
+function executeStep(state: Record<string, unknown>, continuation: Continuation, candidate: Candidate, event: RuntimeV02MovementListenerEvent, step: Record<string, unknown>): "continue" | "choice" {
   const op = String(step.op || "");
   if (op === "DRAW") { const seat = playerForToken(candidate, step.player); const player = O(O(state.players)?.[String(seat)]); if (!player || !Array.isArray(player.deck) || !Array.isArray(player.hand)) throw new Error("tcg_v0_2_movement_listener_draw_zones_missing"); const count = Math.max(0, Number(step.count || 0)); (player.hand as Inst[]).push(...(player.deck as Inst[]).splice(0, Math.min(count, player.deck.length))); continuation.step_cursor++; return "continue"; }
   if (op === "CHOOSE_HAND_TO_DISCARD") { const seat = playerForToken(candidate, step.player); const player = O(O(state.players)?.[String(seat)]); if (!player || !Array.isArray(player.hand)) throw new Error("tcg_v0_2_movement_listener_hand_missing"); const wanted = range(step.count); const options = (player.hand as Inst[]).map((card) => ({ id: `card:${card.uid}`, label: cardName(state, card), data: { uid: card.uid, card_id: card.card_id } })); if (options.length < wanted.min) throw new Error("tcg_v0_2_movement_listener_discard_choice_unavailable"); choice(state, { seat, kind: "discard_from_hand", prompt: "Choose card to discard", min: wanted.min, max: Math.min(wanted.max, options.length), mode: "select", options, context: { zone_seat: seat } }); return "choice"; }
@@ -341,12 +378,22 @@ function executeStep(state: Record<string, unknown>, continuation: Continuation,
   if (op === "INSPECT_ZONE") { if (String(step.zone || "") !== "deck_top" || String(step.return_policy || "") !== "same_position" || String(step.visibility || "") !== "controller_private") throw new Error("tcg_v0_2_movement_listener_inspection_shape_unsupported"); const owner = playerForToken(candidate, step.player); const wanted = range(step.selection); const count = wanted.max; continuation.vars[String(step.as || "looked")] = inspectDeckTop(state, candidate, owner, count, wanted.min); continuation.step_cursor++; return "continue"; }
   if (op === "RETURN_SET_TO_DECK_TOP") { const cards = continuation.vars[String(step.cards || "").replace(/^\$/, "")] as CardRef[] | undefined; if (!Array.isArray(cards)) throw new Error("tcg_v0_2_movement_listener_order_set_missing"); const owner = playerForToken(candidate, step.player); const player = O(O(state.players)?.[String(owner)]); if (!player || !Array.isArray(player.deck)) throw new Error("tcg_v0_2_movement_listener_order_deck_missing"); const top = (player.deck as Inst[]).slice(0, cards.length); const expected = new Set(cards.map((card) => card.uid)); if (top.length !== cards.length || top.some((card) => !expected.has(card.uid))) throw new Error("tcg_v0_2_movement_listener_order_top_set_stale"); if (cards.length <= 1) { continuation.step_cursor++; return "continue"; } if (!String(step.order || "").includes("choice")) throw new Error("tcg_v0_2_movement_listener_order_mode_unsupported"); const options = cards.map((card) => ({ id: `card:${card.uid}`, label: cardName(state, card), data: { uid: card.uid, card_id: card.card_id, zone_owner_seat: owner } })); choice(state, { seat: candidate.seat, kind: "order_deck_top", prompt: "Choose card order", min: options.length, max: options.length, mode: "order", options, context: { zone_seat: owner, card_uids: cards.map((card) => card.uid) } }); return "choice"; }
   if (op === "HEAL") { const target = targetForToken(state, candidate, event, step.target); const amount = Math.max(0, N(step.amount, "tcg_v0_2_movement_listener_heal_amount_invalid")); const packet = applyRuntimeV02HealPacket(state, target.cr, amount, { source: { controller_seat: candidate.seat, action_kind: candidate.kind, action_id: listenerId(candidate), card_effect: true, card_uid: candidate.source.uid, card_id: candidate.source.card_id, creature_uid: candidate.field?.top.uid || null }, target: { controller_seat: target.seat, creature_uid: target.top.uid, card_uid: target.top.uid, card_id: target.top.card_id, element: S(target.def.element, "tcg_v0_2_movement_listener_heal_target_element_required"), where: target.where, index: target.index } }); if (packet.packet?.id) continuation.emitted_heal_packet_ids.push(packet.packet.id); continuation.step_cursor++; return "continue"; }
+  if (op === "ADD_SHIELD") { const target = targetForToken(state, candidate, event, step.target); addRuntimeShield(target.cr, Math.max(0, N(step.amount, "tcg_v0_2_movement_listener_shield_amount_invalid"))); continuation.step_cursor++; return "continue"; }
   if (op === "ADD_ATTACK_DAMAGE_MODIFIER") { addAttackModifier(state, targetForToken(state, candidate, event, step.target), step); continuation.step_cursor++; return "continue"; }
   if (op === "SET_WITHDRAWAL_MODIFIER") { setWithdrawalModifier(state, targetForToken(state, candidate, event, step.target), step); continuation.step_cursor++; return "continue"; }
   if (op === "DIRECT_DAMAGE") { directDamage(targetForToken(state, candidate, event, step.target), step.amount); continuation.step_cursor++; return "continue"; }
   if (op === "APPLY_CONDITION") { applyCondition(state, candidate, event, targetForToken(state, candidate, event, step.target), step); continuation.step_cursor++; return "continue"; }
   if (op === "MOVE_ATTACHED_ESSENCE") { const wanted = range(step.count); const options = buildMoveEssenceOptions(state, candidate, step); if (options.length < wanted.min) throw new Error("tcg_v0_2_movement_listener_essence_move_unavailable"); if (options.length === 0 && wanted.min === 0) { continuation.step_cursor++; return "continue"; } choice(state, { seat: candidate.seat, kind: "move_attached_essence", prompt: "Choose Essence move", min: wanted.min, max: Math.min(wanted.max, options.length), mode: "select", options, context: { source_action_id: `listener:${listenerId(candidate)}` } }); return "choice"; }
   throw new Error(`tcg_v0_2_movement_listener_step_unsupported:${op}`);
+}
+function appendEventWork(state: Record<string, unknown>, continuation: Continuation, events: RuntimeV02MovementListenerEvent[]): void {
+  const turnSeq = TURN(state);
+  for (const event of events) {
+    if (Number(event.turn_seq) !== turnSeq) throw new Error("tcg_v0_2_movement_listener_event_turn_stale");
+    if (!isSwitchMovementEvent(event) && !isEssenceMovedEvent(event)) throw new Error("tcg_v0_2_movement_listener_event_kind_invalid");
+    if (isEssenceMovedEvent(event)) { S(event.movement_id, "tcg_v0_2_movement_listener_essence_event_id_invalid"); S(event.source_creature_uid, "tcg_v0_2_movement_listener_essence_event_source_invalid"); S(event.destination_creature_uid, "tcg_v0_2_movement_listener_essence_event_destination_invalid"); S(event.essence_uid, "tcg_v0_2_movement_listener_essence_event_uid_invalid"); S(event.element, "tcg_v0_2_movement_listener_essence_event_element_invalid"); S(event.source_action_id, "tcg_v0_2_movement_listener_essence_event_action_invalid"); }
+    for (const candidate of collectCandidates(state, event.event)) continuation.work.push({ event: { ...event }, source_uid: candidate.source.uid, listener_id: listenerId(candidate) });
+  }
 }
 function continueFlow(state: Record<string, unknown>): RuntimeV02MovementListenerFlow {
   const continuation = getContinuation(state);
@@ -361,12 +408,11 @@ function continueFlow(state: Record<string, unknown>): RuntimeV02MovementListene
   const flow = { status: "complete" as const, processed_listener_keys: [...continuation.processed_listener_keys], emitted_heal_packet_ids: [...continuation.emitted_heal_packet_ids], pending_choice: null }; clearContinuation(state); return flow;
 }
 
-export function runtimeV02BeginMovementListenerContinuation(state: Record<string, unknown>, events: RuntimeV02SwitchMovementEvent[]): RuntimeV02MovementListenerFlow {
+export function runtimeV02BeginMovementListenerContinuation(state: Record<string, unknown>, events: RuntimeV02MovementListenerEvent[]): RuntimeV02MovementListenerFlow {
   if (state[CONTINUATION_KEY] != null || state[PENDING_KEY] != null) throw new Error("tcg_v0_2_movement_listener_continuation_already_pending");
   if (!structuredEnabled(state)) return { status: "complete", processed_listener_keys: [], emitted_heal_packet_ids: [], pending_choice: null };
-  if (!Array.isArray(events)) throw new Error("tcg_v0_2_movement_listener_events_required"); const turnSeq = TURN(state); const work: WorkItem[] = [];
-  for (const event of events) { if (Number(event.turn_seq) !== turnSeq) throw new Error("tcg_v0_2_movement_listener_event_turn_stale"); if (event.event !== "moved_to_reserve" && event.event !== "became_vanguard") throw new Error("tcg_v0_2_movement_listener_event_kind_invalid"); for (const candidate of collectCandidates(state, event.event)) work.push({ event: { ...event }, source_uid: candidate.source.uid, listener_id: listenerId(candidate) }); }
-  setContinuation(state, { turn_seq: turnSeq, work, work_index: 0, step_cursor: 0, vars: {}, processed_listener_keys: [], emitted_heal_packet_ids: [] }); return continueFlow(state);
+  if (!Array.isArray(events)) throw new Error("tcg_v0_2_movement_listener_events_required"); const continuation: Continuation = { turn_seq: TURN(state), work: [], work_index: 0, step_cursor: 0, vars: {}, processed_listener_keys: [], emitted_heal_packet_ids: [] };
+  appendEventWork(state, continuation, events); setContinuation(state, continuation); return continueFlow(state);
 }
 
 function selectedOptions(pendingChoice: RuntimeV02PendingMovementListenerChoice, ids: string[]): Array<{ id: string; label: string; data: Record<string, unknown> }> {
@@ -374,12 +420,12 @@ function selectedOptions(pendingChoice: RuntimeV02PendingMovementListenerChoice,
 }
 export function runtimeV02ResolveMovementListenerChoice(state: Record<string, unknown>, actorSeat: 1 | 2, choiceId: string, choiceIds: string[]): RuntimeV02MovementListenerFlow {
   const pendingChoice = pending(state); if (!pendingChoice) throw new Error("tcg_v0_2_movement_listener_choice_required"); if (pendingChoice.turn_seq !== TURN(state)) throw new Error("tcg_v0_2_movement_listener_choice_turn_stale"); if (pendingChoice.seat !== SEAT(actorSeat)) throw new Error("tcg_v0_2_movement_listener_choice_not_yours"); if (pendingChoice.id !== S(choiceId, "tcg_v0_2_movement_listener_choice_id_required")) throw new Error("tcg_v0_2_movement_listener_choice_stale_id");
-  const selected = selectedOptions(pendingChoice, choiceIds); const continuation = getContinuation(state); const work = currentWork(continuation); if (!work) throw new Error("tcg_v0_2_movement_listener_choice_work_missing"); const candidate = findCandidate(state, work);
+  const selected = selectedOptions(pendingChoice, choiceIds); const continuation = getContinuation(state); const work = currentWork(continuation); if (!work) throw new Error("tcg_v0_2_movement_listener_choice_work_missing"); const candidate = findCandidate(state, work); let generatedEvents: RuntimeV02EssenceMovedEvent[] = [];
   if (pendingChoice.kind === "discard_from_hand") { const seat = SEAT(pendingChoice.context.zone_seat); const player = O(O(state.players)?.[String(seat)]); if (!player || !Array.isArray(player.hand) || !Array.isArray(player.discard)) throw new Error("tcg_v0_2_movement_listener_choice_hand_zones_missing"); for (const option of selected) { const uid = S(option.data.uid, "tcg_v0_2_movement_listener_choice_card_uid_invalid"); const index = (player.hand as Inst[]).findIndex((card) => card.uid === uid); if (index < 0) throw new Error("tcg_v0_2_movement_listener_choice_hand_stale"); (player.discard as Inst[]).push((player.hand as Inst[]).splice(index, 1)[0]); } }
   else if (pendingChoice.kind === "order_deck_top") { const seat = SEAT(pendingChoice.context.zone_seat); const player = O(O(state.players)?.[String(seat)]); if (!player || !Array.isArray(player.deck)) throw new Error("tcg_v0_2_movement_listener_choice_deck_missing"); const expected = Array.isArray(pendingChoice.context.card_uids) ? pendingChoice.context.card_uids.map(String) : []; const top = (player.deck as Inst[]).slice(0, expected.length); if (top.length !== expected.length || new Set(top.map((card) => card.uid)).size !== expected.length || top.some((card) => !expected.includes(card.uid))) throw new Error("tcg_v0_2_movement_listener_choice_deck_stale"); const byUid = new Map(top.map((card) => [card.uid, card])); const ordered = selected.map((option) => byUid.get(S(option.data.uid, "tcg_v0_2_movement_listener_choice_card_uid_invalid"))!); (player.deck as Inst[]).splice(0, expected.length, ...ordered); }
-  else if (pendingChoice.kind === "move_attached_essence") applyMoveEssenceChoice(state, candidate, selected, S(pendingChoice.context.source_action_id, "tcg_v0_2_movement_listener_choice_source_action_required"));
+  else if (pendingChoice.kind === "move_attached_essence") generatedEvents = applyMoveEssenceChoice(state, candidate, selected, S(pendingChoice.context.source_action_id, "tcg_v0_2_movement_listener_choice_source_action_required"));
   else throw new Error("tcg_v0_2_movement_listener_choice_kind_unsupported");
-  delete state[PENDING_KEY]; continuation.step_cursor++; setContinuation(state, continuation); return continueFlow(state);
+  delete state[PENDING_KEY]; continuation.step_cursor++; if (generatedEvents.length) appendEventWork(state, continuation, generatedEvents); setContinuation(state, continuation); return continueFlow(state);
 }
 
 export function runtimeV02PendingMovementListenerChoiceView(raw: RuntimeV02PendingMovementListenerChoice | null | undefined, viewerSeat: 1 | 2): Record<string, unknown> | null {
