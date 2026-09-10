@@ -122,6 +122,43 @@ export function applyRuntimeV02AttachmentAttackDamageModifier(
   return amount;
 }
 
+/**
+ * Registers only the attachment lifecycle state owned by the Essence definition.
+ * Triggered `essence_attached` listener steps are deliberately excluded so the
+ * generic Runtime Pass E continuation remains their sole semantic owner.
+ */
+export function registerStructuredRuntimeEssenceAttachmentLifecycleState(
+  state: Record<string, unknown>,
+  attached: RuntimeLifecycleInstance,
+  turnSeq: number,
+): boolean | null {
+  const definition = runtimeV02Definition(state, attached);
+  if (!definition) return null;
+  if (String(definition.card_family || "") !== "Essence") {
+    throw new Error("tcg_v0_2_attachment_definition_not_essence");
+  }
+  const essence = objectRecord(definition.essence);
+  if (!essence) throw new Error("tcg_v0_2_attachment_essence_payload_required");
+  const lifecycle = objectRecord(essence.lifecycle);
+  const onAttach = objectRecord(lifecycle?.on_attach_set_state);
+  if (!onAttach) return false;
+  const kind = String(onAttach.kind || "");
+  const expires = String(onAttach.expires || "");
+  const destination = String(onAttach.destination_on_expire || "");
+  if (kind !== "temporary" || expires !== "controller_aftermath" || destination !== "discard") {
+    throw new Error("tcg_v0_2_attachment_lifecycle_unsupported");
+  }
+  attached.effect_flags ||= {};
+  attached.effect_flags.runtime_v0_2_attachment_lifecycle = {
+    source_uid: attached.uid,
+    kind,
+    expires,
+    destination_on_expire: destination,
+    attached_turn: turnSeq,
+  };
+  return true;
+}
+
 export function applyStructuredRuntimeEssenceAttachmentLifecycle(
   state: Record<string, unknown>,
   creature: RuntimeLifecycleCreature,
@@ -160,26 +197,11 @@ export function applyStructuredRuntimeEssenceAttachmentLifecycle(
     }
   }
 
-  let lifecycleRegistered = false;
-  const lifecycle = objectRecord(essence.lifecycle);
-  const onAttach = objectRecord(lifecycle?.on_attach_set_state);
-  if (onAttach) {
-    const kind = String(onAttach.kind || "");
-    const expires = String(onAttach.expires || "");
-    const destination = String(onAttach.destination_on_expire || "");
-    if (kind !== "temporary" || expires !== "controller_aftermath" || destination !== "discard") {
-      throw new Error("tcg_v0_2_attachment_lifecycle_unsupported");
-    }
-    attached.effect_flags ||= {};
-    attached.effect_flags.runtime_v0_2_attachment_lifecycle = {
-      source_uid: attached.uid,
-      kind,
-      expires,
-      destination_on_expire: destination,
-      attached_turn: turnSeq,
-    };
-    lifecycleRegistered = true;
-  }
+  const lifecycleRegistered = registerStructuredRuntimeEssenceAttachmentLifecycleState(
+    state,
+    attached,
+    turnSeq,
+  ) ?? false;
 
   return { attack_bonus: attackBonus, lifecycle_registered: lifecycleRegistered };
 }
