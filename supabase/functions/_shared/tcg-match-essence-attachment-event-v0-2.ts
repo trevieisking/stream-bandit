@@ -12,6 +12,29 @@ export type RuntimeV02EssenceAttachmentEvent = {
   source_action_id: string;
 };
 
+/**
+ * Structural adapter consumed by the shared Runtime Pass E listener engine.
+ * The attachment ledger remains the canonical receipt owner; this shape merely
+ * presents one immutable receipt as the generic `essence_attached` event.
+ */
+export type RuntimeV02EssenceAttachedListenerEvent = {
+  event_id: string;
+  event: "essence_attached";
+  subject_uid: string;
+  subject_card_id: string;
+  controller_seat: 1 | 2;
+  origin_zone: RuntimeV02EssenceAttachmentOriginZone;
+  destination_zone: "field";
+  destination_index: number | null;
+  phase: string;
+  source_action_id: string;
+  source_card_uid: string;
+  action_kind: string;
+  turn_seq: number;
+  attachment_target_uid: string;
+  attachment_kind: string;
+};
+
 const LEDGER_KEY = "runtime_v0_2_essence_attachment_events";
 
 type Ledger = { turn_seq: number; sequence: number; events: RuntimeV02EssenceAttachmentEvent[] };
@@ -95,6 +118,56 @@ export function recordRuntimeV02EssenceAttachmentEvent(
   current.events.push(event);
   save(state, current);
   return { ...event };
+}
+
+/**
+ * Converts the canonical attachment receipt into the generic Runtime Pass E
+ * event shape without re-recording the attachment or mutating match state.
+ * Eligibility is intentionally evaluated by the listener engine immediately
+ * when this event is enqueued; later listener mutations must not rewrite the
+ * original attachment receipt.
+ */
+export function runtimeV02CreateEssenceAttachedEvent(
+  attachment: RuntimeV02EssenceAttachmentEvent,
+  options: {
+    phase?: string;
+    action_kind?: string;
+    destination_index?: number | null;
+  } = {},
+): RuntimeV02EssenceAttachedListenerEvent {
+  const normalized = normalizeEvent(attachment, 0);
+  const phase = options.phase == null
+    ? "play"
+    : text(options.phase, "tcg_v0_2_attachment_listener_phase_invalid");
+  const actionKind = options.action_kind == null
+    ? "essence_attachment"
+    : text(options.action_kind, "tcg_v0_2_attachment_listener_action_kind_invalid");
+  const rawIndex = options.destination_index;
+  let destinationIndex: number | null = null;
+  if (rawIndex != null) {
+    const parsed = Number(rawIndex);
+    if (!Number.isInteger(parsed) || parsed < 0 || parsed > 3) {
+      throw new Error("tcg_v0_2_attachment_listener_destination_index_invalid");
+    }
+    destinationIndex = parsed;
+  }
+  return {
+    event_id: normalized.id,
+    event: "essence_attached",
+    subject_uid: normalized.source_card_uid,
+    subject_card_id: normalized.source_card_id,
+    controller_seat: normalized.controller_seat,
+    origin_zone: normalized.origin_zone,
+    destination_zone: "field",
+    destination_index: destinationIndex,
+    phase,
+    source_action_id: normalized.source_action_id,
+    source_card_uid: normalized.source_card_uid,
+    action_kind: actionKind,
+    turn_seq: normalized.turn_seq,
+    attachment_target_uid: normalized.target_creature_uid,
+    attachment_kind: normalized.attachment_kind,
+  };
 }
 
 export function runtimeV02CurrentTurnEssenceAttachmentEvents(
