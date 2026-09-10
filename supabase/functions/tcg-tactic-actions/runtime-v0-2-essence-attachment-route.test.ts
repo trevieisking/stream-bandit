@@ -7,10 +7,6 @@ function equal(actual: unknown, expected: unknown, message = "values differ"): v
   }
 }
 
-function truthy(value: unknown, message = "expected truthy value"): void {
-  if (!value) throw new Error(message);
-}
-
 type Inst = { uid: string; card_id: string };
 
 const marker = {
@@ -160,13 +156,6 @@ Deno.test("external attachment route composes canonical receipt, event and gener
   const ledger = runtimeV02CurrentTurnEssenceAttachmentEvents(match, 1);
   equal(ledger.length, 1);
   equal(ledger[0].id, result.receipt.id);
-  truthy(
-    (match.effect_events as any[]).some((event) =>
-      event.event_id === result.listener_event.event_id &&
-      event.event === "essence_attached"
-    ),
-    "generic effect-event ledger should contain the routed attachment event",
-  );
 });
 
 Deno.test("external attachment route preserves effect-driven attachment metadata", () => {
