@@ -81,10 +81,16 @@ Deno.test('essence_attached snapshot covers every frozen attachment predicate an
   yes({ predicate: 'target_stage_in', target: '$attached_creature', stages: ['Teen', 'Adult'] });
   yes({ predicate: 'target_has_condition', target: '$attached_creature', condition: 'Crushed' });
   yes({ predicate: 'target_damaged', target: '$attached_creature' });
+  yes({ predicate: 'target_damaged', target: '$source_creature' });
   yes({ predicate: 'voluntary_withdrawal_legal_with_incoming', player: 'self', incoming_target: '$attached_creature' });
 
   assert.equal(runtimeV02EssenceAttachedSnapshotPredicate(snapshot, { predicate: 'source_is_self' }, { ...context, source_uid: 'older-essence-uid' }), false);
   assert.equal(runtimeV02EssenceAttachedSnapshotPredicate(snapshot, { predicate: 'event_attachment_target_is_source' }, { ...context, source_creature_uid: 'other-uid' }), false);
+  assert.equal(runtimeV02EssenceAttachedSnapshotPredicate(
+    snapshot,
+    { predicate: 'target_damaged', target: '$source_creature' },
+    { ...context, source_creature_uid: 'other-uid' },
+  ), false);
 
   target.damage = 0;
   target.conditions = { scorched: false, venomed: 0, control: null, modifier: null };
@@ -98,6 +104,7 @@ Deno.test('essence_attached snapshot covers every frozen attachment predicate an
   yes({ predicate: 'target_zone_is', target: '$attached_creature', zone: 'reserve' });
   yes({ predicate: 'target_has_condition', target: '$attached_creature', condition: 'Crushed' });
   yes({ predicate: 'target_damaged', target: '$attached_creature' });
+  yes({ predicate: 'target_damaged', target: '$source_creature' });
   yes({ predicate: 'voluntary_withdrawal_legal_with_incoming', player: 'self', incoming_target: '$attached_creature' });
 });
 
