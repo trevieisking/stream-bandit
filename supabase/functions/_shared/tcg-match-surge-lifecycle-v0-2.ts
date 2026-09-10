@@ -70,6 +70,58 @@ function attackModifiers(creature: RuntimeLifecycleCreature): AttackModifier[] {
   return current as AttackModifier[];
 }
 
+export function applyRuntimeV02AttachmentAttackDamageModifier(
+  state: Record<string, unknown>,
+  creature: RuntimeLifecycleCreature,
+  sourceUidRaw: unknown,
+  amountRaw: unknown,
+  turnSeqRaw: unknown,
+  durationRaw: unknown,
+): number | null {
+  if (!structuredProbe(state)) return null;
+  const sourceUid = String(sourceUidRaw || "").trim();
+  if (!sourceUid) throw new Error("tcg_v0_2_attachment_listener_source_uid_invalid");
+  const amount = Number(amountRaw);
+  if (!Number.isFinite(amount)) throw new Error("tcg_v0_2_attachment_listener_amount_invalid");
+  if (amount < 0) throw new Error("tcg_v0_2_attachment_listener_amount_negative_unsupported");
+  const turnSeq = Number(turnSeqRaw);
+  if (!Number.isInteger(turnSeq) || turnSeq < 0) {
+    throw new Error("tcg_v0_2_attachment_listener_turn_seq_invalid");
+  }
+  const duration = objectRecord(durationRaw);
+  const expiresOn = Array.isArray(duration?.expires_on)
+    ? duration.expires_on.map((value) => String(value))
+    : [];
+  if (!expiresOn.includes("end_of_turn")) {
+    throw new Error("tcg_v0_2_attachment_listener_expiry_unsupported");
+  }
+  const rawMaxUses = duration?.max_uses;
+  const maxUses = rawMaxUses == null ? null : Number(rawMaxUses);
+  if (maxUses != null && (!Number.isInteger(maxUses) || maxUses < 1)) {
+    throw new Error("tcg_v0_2_attachment_listener_max_uses_invalid");
+  }
+  if (
+    duration?.consume_on != null &&
+    String(duration.consume_on) !== "legal_attack_declared"
+  ) {
+    throw new Error("tcg_v0_2_attachment_listener_consume_on_unsupported");
+  }
+  const modifiers = attackModifiers(creature);
+  const prior = modifiers.findIndex((item) =>
+    item.source_uid === sourceUid && item.turn_seq === turnSeq
+  );
+  const record: AttackModifier = {
+    source_uid: sourceUid,
+    amount,
+    turn_seq: turnSeq,
+    expires_on: expiresOn,
+    max_uses: maxUses,
+  };
+  if (prior >= 0) modifiers[prior] = record;
+  else modifiers.push(record);
+  return amount;
+}
+
 export function applyStructuredRuntimeEssenceAttachmentLifecycle(
   state: Record<string, unknown>,
   creature: RuntimeLifecycleCreature,
@@ -97,20 +149,14 @@ export function applyStructuredRuntimeEssenceAttachmentLifecycle(
         throw new Error("tcg_v0_2_attachment_listener_step_unsupported");
       }
       if (String(step.target || "") !== "$attached_creature") throw new Error("tcg_v0_2_attachment_listener_target_unsupported");
-      const amount = Number(step.amount);
-      if (!Number.isFinite(amount)) throw new Error("tcg_v0_2_attachment_listener_amount_invalid");
-      const duration = objectRecord(step.duration);
-      const expiresOn = Array.isArray(duration?.expires_on) ? duration?.expires_on.map((value) => String(value)) : [];
-      if (!expiresOn.includes("end_of_turn")) throw new Error("tcg_v0_2_attachment_listener_expiry_unsupported");
-      const rawMaxUses = duration?.max_uses;
-      const maxUses = rawMaxUses == null ? null : Number(rawMaxUses);
-      if (maxUses != null && (!Number.isInteger(maxUses) || maxUses < 1)) throw new Error("tcg_v0_2_attachment_listener_max_uses_invalid");
-      const modifiers = attackModifiers(creature);
-      const prior = modifiers.findIndex((item) => item.source_uid === attached.uid && item.turn_seq === turnSeq);
-      const record: AttackModifier = { source_uid: attached.uid, amount, turn_seq: turnSeq, expires_on: expiresOn, max_uses: maxUses };
-      if (prior >= 0) modifiers[prior] = record;
-      else modifiers.push(record);
-      attackBonus += amount;
+      attackBonus += applyRuntimeV02AttachmentAttackDamageModifier(
+        state,
+        creature,
+        attached.uid,
+        step.amount,
+        turnSeq,
+        step.duration,
+      ) ?? 0;
     }
   }
 
