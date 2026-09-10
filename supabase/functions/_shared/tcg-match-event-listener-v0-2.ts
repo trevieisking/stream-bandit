@@ -8,7 +8,15 @@ import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-inform
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
 import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
 import { applyStructuredRuntimeEssenceAttachmentLifecycle } from "./tcg-match-surge-lifecycle-v0-2.ts";
-import { recordRuntimeV02EssenceAttachmentEvent } from "./tcg-match-essence-attachment-event-v0-2.ts";
+import {
+  recordRuntimeV02EssenceAttachmentEvent,
+  type RuntimeV02EssenceAttachedListenerEvent,
+} from "./tcg-match-essence-attachment-event-v0-2.ts";
+import {
+  runtimeV02BuildEssenceAttachedTriggerPlan,
+  type RuntimeV02EssenceAttachedCandidateDescriptor,
+  type RuntimeV02FrozenEssenceAttachedWorkItem,
+} from "./tcg-match-essence-attachment-work-v0-2.ts";
 import {
   addRuntimeShield,
   applyRuntimeCondition,
@@ -56,6 +64,7 @@ export type RuntimeV02EventListenerEvent = {
   event_id: string;
   event: string;
   subject_uid: string;
+  subject_card_id?: string;
   controller_seat: 1 | 2;
   origin_zone: string;
   destination_zone: string;
@@ -65,12 +74,15 @@ export type RuntimeV02EventListenerEvent = {
   source_card_uid: string | null;
   action_kind: string;
   turn_seq: number;
+  attachment_target_uid?: string;
+  attachment_kind?: string;
 };
 
 type WorkItem = {
   event: RuntimeV02EventListenerEvent;
   source_uid: string;
   listener_id: string;
+  frozen_candidate?: RuntimeV02FrozenEssenceAttachedWorkItem;
 };
 
 type CardRef = {
@@ -386,10 +398,98 @@ function collectCandidates(
   return out;
 }
 
+function attachmentCandidateDescriptor(
+  candidate: Candidate,
+): RuntimeV02EssenceAttachedCandidateDescriptor {
+  return {
+    kind: candidate.kind,
+    source: {
+      uid: requiredString(
+        candidate.source.uid,
+        "tcg_v0_2_attachment_trigger_source_uid_required",
+      ),
+      card_id: requiredString(
+        candidate.source.card_id,
+        "tcg_v0_2_attachment_trigger_source_card_id_required",
+      ),
+    },
+    source_controller_seat: candidate.seat,
+    source_creature_uid: candidate.field?.top.uid || null,
+    listener: candidate.listener,
+  };
+}
+
+function essenceAttachedEvent(
+  event: RuntimeV02EventListenerEvent,
+): RuntimeV02EssenceAttachedListenerEvent {
+  if (event.event !== "essence_attached") {
+    throw new Error("tcg_v0_2_attachment_continuation_event_invalid");
+  }
+  const subjectCardId = requiredString(
+    event.subject_card_id,
+    "tcg_v0_2_attachment_continuation_subject_card_id_required",
+  );
+  const attachmentTargetUid = requiredString(
+    event.attachment_target_uid,
+    "tcg_v0_2_attachment_continuation_target_uid_required",
+  );
+  const attachmentKind = requiredString(
+    event.attachment_kind,
+    "tcg_v0_2_attachment_continuation_kind_required",
+  );
+  const sourceCardUid = requiredString(
+    event.source_card_uid,
+    "tcg_v0_2_attachment_continuation_source_card_uid_required",
+  );
+  if (sourceCardUid !== event.subject_uid) {
+    throw new Error("tcg_v0_2_attachment_continuation_subject_source_mismatch");
+  }
+  if (event.destination_zone !== "field") {
+    throw new Error("tcg_v0_2_attachment_continuation_destination_invalid");
+  }
+  return structuredClone({
+    ...event,
+    event: "essence_attached",
+    subject_card_id: subjectCardId,
+    source_card_uid: sourceCardUid,
+    attachment_target_uid: attachmentTargetUid,
+    attachment_kind: attachmentKind,
+  } as RuntimeV02EssenceAttachedListenerEvent);
+}
+
+function frozenCandidate(
+  state: Record<string, unknown>,
+  work: WorkItem,
+): Candidate | null {
+  const frozen = work.frozen_candidate;
+  if (!frozen) return null;
+  if (
+    frozen.source.uid !== work.source_uid ||
+    frozen.listener_id !== work.listener_id
+  ) {
+    throw new Error("tcg_v0_2_attachment_continuation_work_mismatch");
+  }
+  const field = frozen.source_creature_uid == null
+    ? null
+    : fieldByUid(state, frozen.source_creature_uid);
+  if (field && field.seat !== frozen.source_controller_seat) {
+    throw new Error("tcg_v0_2_attachment_continuation_source_seat_mismatch");
+  }
+  return {
+    kind: frozen.kind,
+    source: structuredClone(frozen.source),
+    seat: frozen.source_controller_seat,
+    field,
+    listener: structuredClone(frozen.listener),
+  };
+}
+
 function findCandidate(
   state: Record<string, unknown>,
   work: WorkItem,
 ): Candidate {
+  const frozen = frozenCandidate(state, work);
+  if (frozen) return frozen;
   const candidate = collectCandidates(state, work.event.event).find((item) =>
     item.source.uid === work.source_uid &&
     listenerId(item) === work.listener_id
@@ -1781,7 +1881,8 @@ function continueFlow(
     if (!continuation.program_loaded) {
       if (
         alreadyResolved(state, candidate, work.event) ||
-        !matches(state, continuation, candidate, work.event)
+        (!work.frozen_candidate &&
+          !matches(state, continuation, candidate, work.event))
       ) {
         continuation.work_index++;
         continuation.step_cursor = 0;
@@ -1969,6 +2070,23 @@ export function runtimeV02BeginEventListenerContinuation(
       !event.subject_uid
     ) {
       throw new Error("tcg_v0_2_event_listener_event_invalid");
+    }
+    if (event.event === "essence_attached") {
+      const attachmentEvent = essenceAttachedEvent(event);
+      const plan = runtimeV02BuildEssenceAttachedTriggerPlan(
+        state,
+        attachmentEvent,
+        collectCandidates(state, event.event).map(attachmentCandidateDescriptor),
+      );
+      for (const frozen of plan.work) {
+        work.push({
+          event: structuredClone(plan.snapshot.event),
+          source_uid: frozen.source.uid,
+          listener_id: frozen.listener_id,
+          frozen_candidate: structuredClone(frozen),
+        });
+      }
+      continue;
     }
     for (const candidate of collectCandidates(state, event.event)) {
       work.push({
