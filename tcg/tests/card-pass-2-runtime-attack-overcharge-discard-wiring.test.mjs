@@ -109,8 +109,9 @@ test('resolved overcharge public receipt exposes only structural outcome and nev
 test('Arcade Lab routes structured attack choices to the match owner and keeps the old Stormmane pre-prompt legacy-only', () => {
   assert.ok(arcade.includes('function structuredDef(inst)'));
   assert.ok(arcade.includes('function structuredAttack(cr,slot)'));
-  assert.ok(arcade.includes("v.pending_attack_choice||v.pending_choice"));
-  assert.ok(arcade.includes("battleAction('resolve_attack_choice'"));
+  assert.ok(arcade.includes("if(v.pending_attack_choice)return{pending:v.pending_attack_choice,owner:'match',action:'resolve_attack_choice'}"));
+  assert.ok(arcade.includes("if(route.owner==='tactic')await tacticAction(route.action"));
+  assert.ok(arcade.includes('else await battleAction(route.action'));
   assert.ok(arcade.includes("v.phase==='effect_resolution'||v.phase==='attack_effect_resolution'"));
   assert.ok(arcade.includes("if(!structured&&String(d.id||'')==='volt-stormmane'"));
 });
