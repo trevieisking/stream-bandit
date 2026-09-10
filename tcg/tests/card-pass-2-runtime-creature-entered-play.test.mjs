@@ -162,19 +162,22 @@ test('play_creature emits after placement and resumes the same command without r
   assert.ok(placement >= 0 && createEvent > placement);
   assert.ok(begin > createEvent);
   assert.ok(commit > begin);
-  assert.ok(play.includes('setEventResume(seat)'));
+  assert.ok(play.includes('setEventResume("play_creature",seat)'));
   assert.ok(play.includes('setMovementResume("play_creature"'));
   assert.ok(play.includes('runtimeV02BeginMovementHealListenerContinuation'));
 });
 
 test('unmarked matches retain the old play mutation while generic work fails closed to no-op', () => {
+  const recordStart = helper.indexOf('function recordEvent(');
   const createStart = helper.indexOf('export function runtimeV02CreateCreatureEnteredPlayEvent');
   const beginStart = helper.indexOf('export function runtimeV02BeginEventListenerContinuation');
   const resolveStart = helper.indexOf('export function runtimeV02ResolveEventListenerChoice');
-  assert.ok(createStart >= 0 && beginStart > createStart && resolveStart > beginStart);
+  assert.ok(recordStart >= 0 && createStart > recordStart && beginStart > createStart && resolveStart > beginStart);
+  const recordBlock = helper.slice(recordStart, createStart);
   const createBlock = helper.slice(createStart, beginStart);
   const beginBlock = helper.slice(beginStart, resolveStart);
-  assert.ok(createBlock.includes('if (structuredEnabled(state))'));
+  assert.ok(createBlock.includes('recordEvent(state, event)'));
+  assert.ok(recordBlock.includes('if (!structuredEnabled(state)) return;'));
   assert.ok(beginBlock.includes('if (!structuredEnabled(state))'));
   assert.ok(beginBlock.includes('processed_listener_keys: []'));
   assert.ok(beginBlock.includes('emitted_heal_packet_ids: []'));
