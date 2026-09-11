@@ -1,5 +1,5 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { recordRuntimeV02EssenceMovement } from "../_shared/tcg-match-essence-movement-v0-2.ts";
+import { applyRuntimeV02EssenceTransfer } from "../_shared/tcg-match-essence-movement-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
 import { runtimeV02BeginTacticHealListenerContinuation, runtimeV02PendingHealListenerChoiceView, runtimeV02ResolveTacticHealListenerChoice, type RuntimeV02PendingHealListenerChoice } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
@@ -202,7 +202,7 @@ function countRange(raw: any) {
   if (typeof raw === "number") return { min: raw, max: raw };
   return {
     min: Math.max(0, Number(raw?.min || 0)),
-    max: Math.max(0, Number(raw?.max || 0)),
+    max: Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(raw?.max || 0))),
   };
 }
 function choiceBounds(raw: any, optionCount: number, hiddenSearchCanFail = false) {
@@ -1110,27 +1110,25 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
       const source = findCreature(state, sourceRef);
       const destination = findCreature(state, destinationRef);
       if (!source || !destination) throw new Error("essence_move_creature_missing");
-      const essence = removeByUid(source.cr.essence, essenceUid);
-      if (!essence) throw new Error("essence_move_source_missing");
-      destination.cr.essence.push(essence);
       const sourceActionId = String(context.source_action_id || `tactic:${effect.source_card_id}`);
-      const movements = recordRuntimeV02EssenceMovement(
-        state,
-        effect.owner_seat as 1 | 2,
-        sourceRef.anchor_uid,
-        destinationRef.anchor_uid,
-        essence,
-        sourceActionId,
-      );
-      const movement = movements.find((entry) =>
-        entry.controller_seat === effect.owner_seat &&
-        entry.source_creature_uid === sourceRef.anchor_uid &&
-        entry.destination_creature_uid === destinationRef.anchor_uid &&
-        entry.essence_uid === essence.uid &&
-        entry.source_action_id === sourceActionId
-      );
-      if (!movement) throw new Error("tcg_v0_2_tactic_essence_movement_receipt_missing");
-      movementEvents.push(runtimeV02CreateEssenceMovedEvent(movement));
+      let transferred;
+      try {
+        transferred = applyRuntimeV02EssenceTransfer(
+          state,
+          effect.owner_seat as 1 | 2,
+          sourceRef.anchor_uid,
+          destinationRef.anchor_uid,
+          source.cr.essence,
+          destination.cr.essence,
+          essenceUid,
+          sourceActionId,
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message === "tcg_v0_2_essence_transfer_source_missing") throw new Error("essence_move_source_missing");
+        throw error;
+      }
+      movementEvents.push(runtimeV02CreateEssenceMovedEvent(transferred.movement));
     }
     movementFlow = runtimeV02BeginMovementListenerContinuation(state, movementEvents);
   } else if (apply === "attach_essence_from_zone") {
