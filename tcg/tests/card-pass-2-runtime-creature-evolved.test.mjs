@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
 const helper = fs.readFileSync(path.join(root, 'supabase/functions/_shared/tcg-match-event-listener-v0-2.ts'), 'utf8');
+const attachmentEngine = fs.readFileSync(path.join(root, 'supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts'), 'utf8');
 const match = fs.readFileSync(path.join(root, 'supabase/functions/tcg-match-actions/index.ts'), 'utf8');
 const load = fs.readFileSync(path.join(root, 'supabase/migrations/20260906190000_tcg_v0_2_set_one_shadow_registry_load.sql'), 'utf8');
 
@@ -61,9 +62,15 @@ test('evolved continuation is card-id-free and reuses canonical rule owners', ()
   for (const owner of [
     'applyRuntimeCondition','dealRuntimeEffectDamage','addRuntimeShield','applyRuntimeV02HealPacket',
     'runtimeV02InspectRewardPositions','recordRuntimeV02HiddenInformationView',
-    'registerStructuredRuntimeEssenceAttachmentLifecycleState','recordRuntimeV02EssenceAttachmentEvent',
-    'runtimeV02CreateEssenceAttachedEvent','runtimeV02BuildEssenceAttachedTriggerPlan',
+    'runtimeV02ApplyEssenceAttachmentTransaction','runtimeV02BuildEssenceAttachedTriggerPlan',
   ]) assert.ok(helper.includes(owner), `canonical owner not reused: ${owner}`);
+  for (const owner of [
+    'registerStructuredRuntimeEssenceAttachmentLifecycleState','recordRuntimeV02EssenceAttachmentEvent',
+    'runtimeV02CreateEssenceAttachedEvent',
+  ]) assert.ok(attachmentEngine.includes(owner), `attachment engine missing canonical owner: ${owner}`);
+  assert.equal(helper.includes('registerStructuredRuntimeEssenceAttachmentLifecycleState('), false, 'generic continuation must delegate attachment lifecycle mutation to Attachment Engine');
+  assert.equal(helper.includes('recordRuntimeV02EssenceAttachmentEvent('), false, 'generic continuation must delegate attachment receipt creation to Attachment Engine');
+  assert.equal(helper.includes('runtimeV02CreateEssenceAttachedEvent('), false, 'generic continuation must delegate attached-event creation to Attachment Engine');
   assert.equal(helper.includes('applyStructuredRuntimeEssenceAttachmentLifecycle('), false, 'generic continuation must not execute triggered attachment semantics through the narrow lifecycle owner');
   assert.ok(helper.includes('crypto.getRandomValues'));
   assert.ok(helper.includes('pending_event_listener_choice'));
