@@ -4,6 +4,7 @@ import fs from 'node:fs';
 
 const engine = fs.readFileSync('supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts', 'utf8');
 const overcharge = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts', 'utf8');
+const recycle = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-discard-recycle-choice-v0-2.ts', 'utf8');
 const match = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
 
 function functionSlice(source, start, end) {
@@ -97,5 +98,38 @@ test('structured Overcharge keeps effect identity while delegating physical move
     '.discard.push(',
   ]) {
     assert.equal(block.includes(forbidden), false, `Overcharge regained Card-Zone mutation authority: ${forbidden}`);
+  }
+});
+
+test('structured discard recycle keeps attack choice authority while delegating discard to deck-bottom movement to Card-Zone', () => {
+  assert.ok(recycle.includes('runtimeV02PreflightCardZoneTransfer'));
+  assert.ok(recycle.includes('runtimeV02CommitCardZoneTransfer'));
+  const block = functionSlice(
+    recycle,
+    'export function runtimeV02ResolveAttackDiscardRecycleChoice(',
+    'return { attack_id: choice.attack_id, choice_id: choice.id, selected_count: 1, moved_count: 1 };',
+  );
+
+  const preflightAt = block.indexOf('runtimeV02PreflightCardZoneTransfer(');
+  const commitAt = block.indexOf('runtimeV02CommitCardZoneTransfer(');
+  assert.ok(preflightAt >= 0 && commitAt > preflightAt, 'Discard recycle must commit only through Card-Zone after preflight');
+  assert.ok(block.includes('{ uid: option.uid, card_id: option.card_id }'));
+  assert.ok(block.includes('tcg_v0_2_attack_discard_recycle_choice_selected_card_changed'));
+  assert.ok(block.includes('cause: "effect"'));
+  assert.ok(block.includes('action_kind: "attack"'));
+  assert.ok(block.includes('source_action_id: choice.attack_id'));
+  assert.ok(block.includes('source_card_uid: choice.source_uid'));
+  assert.ok(block.includes('zone: "discard"'));
+  assert.ok(block.includes('zone: "deck"'));
+  assert.ok(block.includes('card_uids: [option.uid]'));
+  assert.ok(block.includes('destination_position: "bottom"'));
+
+  for (const forbidden of [
+    'discard.findIndex(',
+    'discard.splice(',
+    '(player.deck as unknown[]).push(',
+    'deck.push(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `Discard recycle regained Card-Zone mutation authority: ${forbidden}`);
   }
 });
