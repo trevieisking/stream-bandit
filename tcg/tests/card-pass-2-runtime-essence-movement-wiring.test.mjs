@@ -4,6 +4,7 @@ import fs from 'node:fs';
 
 const tacticSource = fs.readFileSync('supabase/functions/tcg-tactic-actions/index.ts', 'utf8');
 const movementSource = fs.readFileSync('supabase/functions/_shared/tcg-match-movement-listener-v0-2.ts', 'utf8');
+const essenceMovementSource = fs.readFileSync('supabase/functions/_shared/tcg-match-essence-movement-v0-2.ts', 'utf8');
 const authoritySource = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-authority-v0-2.ts', 'utf8');
 const matchSource = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
 const loadSource = fs.readFileSync('supabase/migrations/20260906190000_tcg_v0_2_set_one_shadow_registry_load.sql', 'utf8');
@@ -75,18 +76,38 @@ test('MOVE_ATTACHED_ESSENCE uses the frozen element and creature selectors', () 
   );
 });
 
-test('each applied movement records canonical current-turn movement metadata', () => {
+test('each applied movement delegates physical transfer and canonical receipt to the Essence movement engine', () => {
   assert.ok(
-    tacticSource.includes('import { recordRuntimeV02EssenceMovement } from "../_shared/tcg-match-essence-movement-v0-2.ts";'),
-    'movement recorder import missing',
+    essenceMovementSource.includes('export function applyRuntimeV02EssenceTransfer'),
+    'canonical Essence transfer owner missing',
+  );
+  assert.ok(
+    essenceMovementSource.includes('recordRuntimeV02EssenceMovement('),
+    'canonical Essence transfer owner must issue the movement receipt',
+  );
+  assert.ok(
+    tacticSource.includes('import { applyRuntimeV02EssenceTransfer } from "../_shared/tcg-match-essence-movement-v0-2.ts";'),
+    'tactic must import the canonical Essence transfer owner',
+  );
+  assert.ok(
+    movementSource.includes('applyRuntimeV02EssenceTransfer'),
+    'movement listener must import the canonical Essence transfer owner',
   );
   assert.ok(
     tacticSource.includes('source_action_id: `tactic:${effect.source_card_id}`'),
     'pending move must retain its stable source action id',
   );
-  assert.ok(
+  assert.ok(tacticSource.includes('applyRuntimeV02EssenceTransfer('), 'tactic move must delegate physical transfer');
+  assert.ok(movementSource.includes('applyRuntimeV02EssenceTransfer('), 'listener move must delegate physical transfer');
+  assert.equal(
     tacticSource.includes('recordRuntimeV02EssenceMovement('),
-    'applied move must write the canonical movement ledger',
+    false,
+    'tactic must not bypass the transfer owner to write movement receipts directly',
+  );
+  assert.equal(
+    movementSource.includes('recordRuntimeV02EssenceMovement('),
+    false,
+    'movement listener must not bypass the transfer owner to write movement receipts directly',
   );
 });
 
@@ -140,18 +161,20 @@ test('one movement-listener owner covers the full frozen essence_moved grammar w
   }
 });
 
-test('tactic Essence movement dispatches the canonical event after the move and before downstream heal resume', () => {
+test('tactic Essence movement dispatches the canonical engine receipt before downstream heal resume', () => {
   assert.ok(tacticSource.includes('runtimeV02CreateEssenceMovedEvent'));
-  assert.ok(tacticSource.includes('movementEvents.push(runtimeV02CreateEssenceMovedEvent(movement))'));
+  assert.ok(tacticSource.includes('movementEvents.push(runtimeV02CreateEssenceMovedEvent(transferred.movement))'));
   assert.ok(tacticSource.includes('movementFlow = runtimeV02BeginMovementListenerContinuation(state, movementEvents)'));
   const applyStart = tacticSource.indexOf('function applyPendingChoice');
   const applyEnd = tacticSource.indexOf('\nDeno.serve', applyStart);
   assert.ok(applyStart >= 0 && applyEnd > applyStart);
   const apply = tacticSource.slice(applyStart, applyEnd);
+  const transfer = apply.indexOf('transferred = applyRuntimeV02EssenceTransfer(');
+  const movementEvent = apply.indexOf('movementEvents.push(runtimeV02CreateEssenceMovedEvent(transferred.movement))');
   const movementBegin = apply.indexOf('movementFlow = runtimeV02BeginMovementListenerContinuation(state, movementEvents)');
   const cursorAdvance = apply.lastIndexOf('effect.cursor++;');
   const downstreamHeal = apply.indexOf('runtimeV02BeginTacticHealListenerContinuation(state, movementFlow.emitted_heal_packet_ids');
-  assert.ok(movementBegin >= 0 && cursorAdvance > movementBegin && downstreamHeal > cursorAdvance);
+  assert.ok(transfer >= 0 && movementEvent > transfer && movementBegin > movementEvent && cursorAdvance > movementBegin && downstreamHeal > cursorAdvance);
   assert.ok(apply.includes('setTacticMovementResume(state, effect)'));
   assert.ok(apply.includes('setTacticHealResume(state, effect)'));
 });
