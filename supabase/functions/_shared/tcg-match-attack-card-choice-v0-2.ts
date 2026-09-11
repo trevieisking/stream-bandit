@@ -1,5 +1,9 @@
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import {
+  runtimeV02ApplyCardZonePartitionTransfer,
+  type RuntimeV02CardZoneInstance,
+} from "./tcg-match-card-zone-engine-v0-2.ts";
 
 type RuntimeInst = { uid: string; card_id: string };
 
@@ -346,7 +350,8 @@ export function runtimeV02ResolveTopDeckCardChoice(
     "tcg_v0_2_attack_card_choice_source_vanguard_changed",
   );
 
-  const deck = player.deck as unknown[];
+  const deck = player.deck as RuntimeV02CardZoneInstance[];
+  const hand = player.hand as RuntimeV02CardZoneInstance[];
   if (deck.length < choice.top_cards.length) throw new Error("tcg_v0_2_attack_card_choice_top_set_changed");
   const currentTop = deck.slice(0, choice.top_cards.length).map((value, index) =>
     runtimeInst(value, `tcg_v0_2_attack_card_choice_current_top_invalid:${index}`)
@@ -357,21 +362,46 @@ export function runtimeV02ResolveTopDeckCardChoice(
   const chosenIndex = currentTop.findIndex((card) => card.uid === option.uid && card.card_id === option.card_id);
   if (chosenIndex < 0) throw new Error("tcg_v0_2_attack_card_choice_selected_card_changed");
 
-  const looked = (player.deck as unknown[]).splice(0, choice.top_cards.length).map((value, index) =>
-    runtimeInst(value, `tcg_v0_2_attack_card_choice_resolved_top_invalid:${index}`)
+  const partition = runtimeV02ApplyCardZonePartitionTransfer(deck, hand, {
+    cause: "effect",
+    action_kind: "attack",
+    source_action_id: choice.attack_id,
+    source_card_uid: choice.source_uid,
+    source: {
+      controller_seat: seat,
+      zone: "deck",
+      owner_card_uid: null,
+    },
+    destination: {
+      controller_seat: seat,
+      zone: "hand",
+      owner_card_uid: null,
+    },
+    source_window: {
+      position: "top",
+      card_uids: currentTop.map((card) => card.uid),
+    },
+    destination_card_uids: [option.uid],
+    source_remainder_position: "bottom",
+    destination_position: "bottom",
+  });
+  const chosen = runtimeInst(
+    partition.cards[0],
+    "tcg_v0_2_attack_card_choice_selected_card_changed",
   );
-  const chosen = looked[chosenIndex];
-  const remainder = looked.filter((_, index) => index !== chosenIndex);
-  (player.hand as unknown[]).push(chosen);
-  (player.deck as unknown[]).push(...remainder);
+  assertSameInst(
+    chosen,
+    { uid: option.uid, card_id: option.card_id },
+    "tcg_v0_2_attack_card_choice_selected_card_changed",
+  );
 
   return {
     attack_id: choice.attack_id,
     choice_id: choice.id,
     chosen_uid: chosen.uid,
     chosen_card_id: chosen.card_id,
-    looked_count: looked.length,
+    looked_count: currentTop.length,
     chosen_count: 1,
-    remainder_count: remainder.length,
+    remainder_count: partition.remainder.length,
   };
 }
