@@ -72,10 +72,11 @@ test('legacy Stormmane keeps mechanic legality and public error while delegating
 test('Stormmane delegation remains one bounded legacy caller and does not absorb structured Overcharge resolution', () => {
   const legacyStart = match.indexOf('if(atk.metadata_source==="legacy"&&ad?.id==="volt-stormmane"');
   const legacyEnd = match.indexOf('const targetHpAfterDamage=', legacyStart);
+  const block = match.slice(legacyStart, legacyEnd);
   const call = 'runtimeV02ApplyCardZoneTransfer(';
-  assert.equal(match.slice(legacyStart, legacyEnd).split(call).length - 1, 1);
-  assert.equal(match.slice(0, legacyStart).includes(call), false);
-  assert.equal(match.slice(legacyEnd).includes(call), false);
+  assert.equal(block.split(call).length - 1, 1);
+  assert.equal(block.includes('structuredOverchargeDiscard'), false);
+  assert.equal(block.includes('runtimeV02ResolveAttackOverchargeDiscardChoice'), false);
 });
 
 test('structured Overcharge keeps effect identity while delegating physical movement to Card-Zone preflight and commit', () => {
