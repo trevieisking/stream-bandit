@@ -1,9 +1,11 @@
 import {
+  runtimeV02ApplyCardZonePartitionTransfer,
   runtimeV02ApplyCardZoneTransfer,
   runtimeV02CommitCardZoneTransfer,
   runtimeV02PreflightCardZoneTransfer,
   type RuntimeV02CardZoneEndpoint,
   type RuntimeV02CardZoneInstance,
+  type RuntimeV02CardZonePartitionTransferRequest,
   type RuntimeV02CardZoneTransferRequest,
 } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 
@@ -49,6 +51,24 @@ function request(
     destination: endpoint("discard"),
     card_uids: cardUids,
     destination_position: destinationPosition,
+  };
+}
+
+function partitionRequest(
+  windowCardUids: string[],
+  destinationCardUids: string[],
+): RuntimeV02CardZonePartitionTransferRequest {
+  return {
+    cause: "effect",
+    action_kind: "attack",
+    source_action_id: "look-attack",
+    source_card_uid: "source-creature-1",
+    source: endpoint("deck"),
+    destination: endpoint("hand"),
+    source_window: { position: "top", card_uids: windowCardUids },
+    destination_card_uids: destinationCardUids,
+    source_remainder_position: "bottom",
+    destination_position: "bottom",
   };
 }
 
@@ -172,4 +192,122 @@ Deno.test("Card-Zone commit rejects stale exact-object snapshots before either z
 
   assertSame(source[0], replacement);
   assertEquals(discard, []);
+});
+
+Deno.test("Card-Zone partition atomically moves a chosen top-window card and preserves remainder order at source bottom", () => {
+  const first = card("alpha-1", "alpha");
+  const chosen = card("beta-1", "beta");
+  const outside = card("gamma-1", "gamma");
+  const existingHand = card("hand-1", "existing");
+  const deck = [first, chosen, outside];
+  const hand = [existingHand];
+
+  const result = runtimeV02ApplyCardZonePartitionTransfer(
+    deck,
+    hand,
+    partitionRequest([first.uid, chosen.uid], [chosen.uid]),
+  );
+
+  assertEquals(deck.map((entry) => entry.uid), [outside.uid, first.uid]);
+  assertEquals(hand.map((entry) => entry.uid), [existingHand.uid, chosen.uid]);
+  assertSame(deck[1], first, "partition remainder lost exact instance identity");
+  assertSame(hand[1], chosen, "partition destination card lost exact instance identity");
+  assertSame(result.cards[0], chosen, "partition result cloned chosen card");
+  assertSame(result.remainder[0], first, "partition result cloned remainder card");
+  assertEquals(result.receipt, {
+    schema: "sb-tcg-card-zone-partition-transfer-v0.2",
+    cause: "effect",
+    action_kind: "attack",
+    source_action_id: "look-attack",
+    source_card_uid: "source-creature-1",
+    source: endpoint("deck"),
+    destination: endpoint("hand"),
+    source_window_position: "top",
+    source_window_card_uids: [first.uid, chosen.uid],
+    destination_card_uids: [chosen.uid],
+    source_remainder_card_uids: [first.uid],
+    source_remainder_position: "bottom",
+    destination_position: "bottom",
+    moved_count: 1,
+    remainder_count: 1,
+  });
+});
+
+Deno.test("Card-Zone partition rejects source-window drift before either zone mutates", () => {
+  const first = card("alpha-1", "alpha");
+  const second = card("beta-1", "beta");
+  const outside = card("gamma-1", "gamma");
+  const deck = [second, first, outside];
+  const hand: RuntimeV02CardZoneInstance[] = [];
+
+  assertThrows(
+    () => runtimeV02ApplyCardZonePartitionTransfer(
+      deck,
+      hand,
+      partitionRequest([first.uid, second.uid], [second.uid]),
+    ),
+    "tcg_v0_2_card_zone_partition_window_changed",
+  );
+
+  assertEquals(deck.map((entry) => entry.uid), [second.uid, first.uid, outside.uid]);
+  assertEquals(hand, []);
+});
+
+Deno.test("Card-Zone partition rejects a destination selection outside the frozen source window before mutation", () => {
+  const first = card("alpha-1", "alpha");
+  const second = card("beta-1", "beta");
+  const outside = card("gamma-1", "gamma");
+  const deck = [first, second, outside];
+  const hand: RuntimeV02CardZoneInstance[] = [];
+
+  assertThrows(
+    () => runtimeV02ApplyCardZonePartitionTransfer(
+      deck,
+      hand,
+      partitionRequest([first.uid, second.uid], [outside.uid]),
+    ),
+    "tcg_v0_2_card_zone_partition_destination_outside_window",
+  );
+
+  assertEquals(deck.map((entry) => entry.uid), [first.uid, second.uid, outside.uid]);
+  assertEquals(hand, []);
+});
+
+Deno.test("Card-Zone partition rejects destination UID collisions before source or destination mutates", () => {
+  const first = card("alpha-1", "alpha");
+  const chosen = card("beta-1", "beta");
+  const outside = card("gamma-1", "gamma");
+  const collision = card(chosen.uid, "different-card-id");
+  const deck = [first, chosen, outside];
+  const hand = [collision];
+
+  assertThrows(
+    () => runtimeV02ApplyCardZonePartitionTransfer(
+      deck,
+      hand,
+      partitionRequest([first.uid, chosen.uid], [chosen.uid]),
+    ),
+    "tcg_v0_2_card_zone_destination_uid_collision",
+  );
+
+  assertEquals(deck.map((entry) => entry.uid), [first.uid, chosen.uid, outside.uid]);
+  assertSame(hand[0], collision);
+});
+
+Deno.test("Card-Zone partition supports a bottom source window without changing generic ownership semantics", () => {
+  const outside = card("alpha-1", "alpha");
+  const chosen = card("beta-1", "beta");
+  const remainder = card("gamma-1", "gamma");
+  const source = [outside, chosen, remainder];
+  const destination: RuntimeV02CardZoneInstance[] = [];
+  const requestFromBottom = partitionRequest([chosen.uid, remainder.uid], [chosen.uid]);
+  requestFromBottom.source_window.position = "bottom";
+  requestFromBottom.source_remainder_position = "top";
+
+  runtimeV02ApplyCardZonePartitionTransfer(source, destination, requestFromBottom);
+
+  assertEquals(source.map((entry) => entry.uid), [remainder.uid, outside.uid]);
+  assertEquals(destination.map((entry) => entry.uid), [chosen.uid]);
+  assertSame(source[0], remainder);
+  assertSame(destination[0], chosen);
 });
