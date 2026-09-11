@@ -5,6 +5,7 @@ import fs from 'node:fs';
 const randomization = fs.readFileSync('supabase/functions/_shared/tcg-match-randomization-engine-v0-2.ts', 'utf8');
 const privateAlpha = fs.readFileSync('supabase/functions/tcg-private-alpha-api/index.ts', 'utf8');
 const tactic = fs.readFileSync('supabase/functions/tcg-tactic-actions/index.ts', 'utf8');
+const matchActions = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
 
 function functionSlice(source, start, end) {
   const from = source.indexOf(start);
@@ -46,6 +47,25 @@ test('private-alpha opening deck, mulligan and toss delegate randomness to the s
   ]) {
     assert.equal(privateAlpha.includes(forbidden), false, `private-alpha regained duplicate randomness authority: ${forbidden}`);
   }
+});
+
+test('match-actions delegates in-battle random outcomes while preserving identity UUID generation', () => {
+  assert.ok(matchActions.includes('import { runtimeV02UniformRandomInt } from "../_shared/tcg-match-randomization-engine-v0-2.ts";'));
+
+  const coinBlock = functionSlice(matchActions, 'function coin(){', 'function maxHp');
+  assert.ok(coinBlock.includes('runtimeV02UniformRandomInt(2)'));
+  assert.equal(coinBlock.includes('crypto.getRandomValues'), false, 'coin outcomes must come from Randomization Engine');
+
+  const randomTargetBlock = functionSlice(
+    matchActions,
+    'if(attackControl.target_mode==="random_all_creatures"){',
+    'const targetSeat=resolvedTarget.seat',
+  );
+  assert.ok(randomTargetBlock.includes('poolSize=>runtimeV02UniformRandomInt(poolSize)'));
+  assert.equal(randomTargetBlock.includes('crypto.getRandomValues'), false, 'random target index must come from Randomization Engine');
+
+  assert.equal(matchActions.includes('crypto.getRandomValues('), false, 'match-actions must not regain raw gameplay RNG ownership');
+  assert.ok(matchActions.includes('function randomCodeSafe(){return crypto.randomUUID()}'), 'UUID identity generation must remain separate from gameplay randomness');
 });
 
 test('Tactic shuffle stays distinct from explicit deck-bottom movement', () => {
