@@ -204,7 +204,7 @@ test('private top-deck card choice keeps hidden/choice legality while Card-Zone 
 });
 
 test('tactic DRAW and DRAW_FIXED keep count/deckout authority while Card-Zone owns deck-top to hand movement', () => {
-  assert.ok(tactic.includes('import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";'));
+  assert.ok(tactic.includes('from "../_shared/tcg-match-card-zone-engine-v0-2.ts";'));
   const block = functionSlice(
     tactic,
     'if (op === "DRAW" || op === "DRAW_FIXED") {',
@@ -263,5 +263,42 @@ test('tactic DISCARD_HAND keeps target-player sequencing while Card-Zone owns wh
     'player.hand.splice(',
   ]) {
     assert.equal(block.includes(forbidden), false, `Tactic DISCARD_HAND regained Card-Zone mutation authority: ${forbidden}`);
+  }
+});
+
+test('tactic selected-hand choices keep choice legality and frozen identity while Card-Zone owns atomic hand movement', () => {
+  assert.ok(tactic.includes('runtimeV02PreflightCardZoneTransfer'));
+  assert.ok(tactic.includes('runtimeV02CommitCardZoneTransfer'));
+  const block = functionSlice(
+    tactic,
+    '} else if (apply === "hand_to_discard" || apply === "hand_to_bottom") {',
+    '} else if (apply === "search_deck") {',
+  );
+
+  const preflightAt = block.indexOf('runtimeV02PreflightCardZoneTransfer(');
+  const identityAt = block.indexOf('current.card_id !== String(option.data.card_id)');
+  const commitAt = block.indexOf('runtimeV02CommitCardZoneTransfer(');
+  assert.ok(preflightAt >= 0 && identityAt > preflightAt, 'selected-hand choices must verify frozen identity after Card-Zone preflight');
+  assert.ok(commitAt > identityAt, 'selected-hand choices must commit only after frozen identity validation');
+  assert.ok(block.includes('selected_hand_zone_seat_invalid'));
+  assert.ok(block.includes('selected_hand_card_missing'));
+  assert.ok(block.includes('selected_hand_card_changed'));
+  assert.ok(block.includes('const destinationKind = apply === "hand_to_discard" ? "discard" : "deck";'));
+  assert.ok(block.includes('cause: "effect"'));
+  assert.ok(block.includes('action_kind: "tactic"'));
+  assert.ok(block.includes('source_action_id: effect.id'));
+  assert.ok(block.includes('source_card_uid: effect.source_card.uid'));
+  assert.ok(block.includes('source: { controller_seat: zoneSeat as 1 | 2, zone: "hand", owner_card_uid: null }'));
+  assert.ok(block.includes('destination: { controller_seat: zoneSeat as 1 | 2, zone: destinationKind, owner_card_uid: null }'));
+  assert.ok(block.includes('card_uids: selectedUids'));
+  assert.ok(block.includes('destination_position: "bottom"'));
+
+  for (const forbidden of [
+    'removeByUid(player.hand',
+    'player.hand.splice(',
+    'player.discard.push(',
+    'player.deck.push(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `selected-hand resolver regained Card-Zone mutation authority: ${forbidden}`);
   }
 });
