@@ -6,6 +6,7 @@ const engine = fs.readFileSync('supabase/functions/_shared/tcg-match-card-zone-e
 const overcharge = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts', 'utf8');
 const recycle = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-discard-recycle-choice-v0-2.ts', 'utf8');
 const serverTop = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-server-top-deck-v0-2.ts', 'utf8');
+const topChoice = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-card-choice-v0-2.ts', 'utf8');
 const match = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
 
 function functionSlice(source, start, end) {
@@ -19,6 +20,7 @@ function functionSlice(source, start, end) {
 test('Card-Zone Engine is generic, card-id-free and cannot absorb specialist attachment destinations', () => {
   assert.ok(engine.includes('export function runtimeV02PreflightCardZoneTransfer'));
   assert.ok(engine.includes('export function runtimeV02ApplyCardZoneTransfer'));
+  assert.ok(engine.includes('export function runtimeV02ApplyCardZonePartitionTransfer'));
   assert.ok(engine.includes('tcg_v0_2_card_zone_specialist_destination_owned'));
   assert.ok(engine.includes('sourceZone.splice(0, sourceZone.length, ...remaining)'));
   assert.ok(engine.includes('destinationZone.push(...current.cards)'));
@@ -30,6 +32,10 @@ test('Card-Zone Engine is generic, card-id-free and cannot absorb specialist att
     'Storm Break',
     'gale-breeze-essence',
     'stone-anchor-essence',
+    'dream-ray',
+    'Dream Ray',
+    'mycelial-bloom',
+    'Mycelial Bloom',
   ]) {
     assert.equal(engine.includes(forbidden), false, `Card-Zone owner contains card/name authority: ${forbidden}`);
   }
@@ -160,5 +166,38 @@ test('server-only top-deck attack keeps inspection authority while delegating de
     'deck.splice(',
   ]) {
     assert.equal(block.includes(forbidden), false, `Server top-deck resolver regained Card-Zone mutation authority: ${forbidden}`);
+  }
+});
+
+test('private top-deck card choice keeps hidden/choice legality while Card-Zone owns the atomic chosen/remainder partition', () => {
+  assert.ok(topChoice.includes('recordRuntimeV02HiddenInformationView(state, seat, "deck_top")'));
+  const start = topChoice.indexOf('export function runtimeV02ResolveTopDeckCardChoice(');
+  assert.notEqual(start, -1, 'missing top-deck choice resolver');
+  const block = topChoice.slice(start);
+  const topSetAt = block.indexOf('const currentTop = deck.slice(');
+  const selectedAt = block.indexOf('const chosenIndex = currentTop.findIndex(');
+  const partitionAt = block.indexOf('runtimeV02ApplyCardZonePartitionTransfer(');
+  assert.ok(topSetAt >= 0 && selectedAt > topSetAt && partitionAt > selectedAt, 'top-set and selected identity checks must precede Card-Zone partition mutation');
+  assert.ok(block.includes('tcg_v0_2_attack_card_choice_top_set_changed'));
+  assert.ok(block.includes('tcg_v0_2_attack_card_choice_selected_card_changed'));
+  assert.ok(block.includes('cause: "effect"'));
+  assert.ok(block.includes('action_kind: "attack"'));
+  assert.ok(block.includes('source_action_id: choice.attack_id'));
+  assert.ok(block.includes('source_card_uid: choice.source_uid'));
+  assert.ok(block.includes('source_window: {'));
+  assert.ok(block.includes('position: "top"'));
+  assert.ok(block.includes('card_uids: currentTop.map((card) => card.uid)'));
+  assert.ok(block.includes('destination_card_uids: [option.uid]'));
+  assert.ok(block.includes('source_remainder_position: "bottom"'));
+  assert.ok(block.includes('destination_position: "bottom"'));
+
+  for (const forbidden of [
+    '(player.deck as unknown[]).splice(',
+    '(player.hand as unknown[]).push(',
+    '(player.deck as unknown[]).push(',
+    'deck.splice(',
+    'hand.push(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `Top-deck choice regained Card-Zone mutation authority: ${forbidden}`);
   }
 });
