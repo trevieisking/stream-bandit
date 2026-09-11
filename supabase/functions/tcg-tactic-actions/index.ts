@@ -1,5 +1,5 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
+import { runtimeV02ApplyCardZoneTransfer, runtimeV02CommitCardZoneTransfer, runtimeV02PreflightCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 import { applyRuntimeV02EssenceTransfer } from "../_shared/tcg-match-essence-movement-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
@@ -1087,15 +1087,37 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
   } else if (apply === "set_var_player") {
     vars[String(context.var_name)] = selected[0]?.data?.player || null;
   } else if (apply === "hand_to_discard" || apply === "hand_to_bottom") {
-    const player = state.players[String(context.zone_seat)];
-    const moved: Inst[] = [];
-    for (const option of selected) {
-      const inst = removeByUid(player.hand, String(option.data.uid));
-      if (!inst) throw new Error("selected_hand_card_missing");
-      moved.push(inst);
+    const zoneSeat = Number(context.zone_seat);
+    if (zoneSeat !== 1 && zoneSeat !== 2) throw new Error("selected_hand_zone_seat_invalid");
+    const player = state.players[String(zoneSeat)];
+    const destinationZone = (apply === "hand_to_discard" ? player.discard : player.deck) as Inst[];
+    const destinationKind = apply === "hand_to_discard" ? "discard" : "deck";
+    const selectedUids = selected.map((option) => String(option.data.uid));
+    let preflight;
+    try {
+      preflight = runtimeV02PreflightCardZoneTransfer(player.hand as Inst[], destinationZone, {
+        cause: "effect",
+        action_kind: "tactic",
+        source_action_id: effect.id,
+        source_card_uid: effect.source_card.uid,
+        source: { controller_seat: zoneSeat as 1 | 2, zone: "hand", owner_card_uid: null },
+        destination: { controller_seat: zoneSeat as 1 | 2, zone: destinationKind, owner_card_uid: null },
+        card_uids: selectedUids,
+        destination_position: "bottom",
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message.startsWith("tcg_v0_2_card_zone_selected_card_missing:")) throw new Error("selected_hand_card_missing");
+      throw error;
     }
-    if (apply === "hand_to_discard") player.discard.push(...moved);
-    else player.deck.push(...moved);
+    for (let index = 0; index < selected.length; index += 1) {
+      const option = selected[index];
+      const current = preflight.cards[index];
+      if (current.uid !== String(option.data.uid) || current.card_id !== String(option.data.card_id)) {
+        throw new Error("selected_hand_card_changed");
+      }
+    }
+    runtimeV02CommitCardZoneTransfer(player.hand as Inst[], destinationZone, preflight);
   } else if (apply === "search_deck") {
     const player = state.players[String(context.zone_seat)];
     const moved: Inst[] = [];
