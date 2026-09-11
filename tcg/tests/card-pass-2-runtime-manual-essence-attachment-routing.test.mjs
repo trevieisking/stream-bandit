@@ -8,6 +8,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
 const match = fs.readFileSync(path.join(root, 'supabase/functions/tcg-match-actions/index.ts'), 'utf8');
 const lifecycle = fs.readFileSync(path.join(root, 'supabase/functions/_shared/tcg-match-surge-lifecycle-v0-2.ts'), 'utf8');
+const engine = fs.readFileSync(path.join(root, 'supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts'), 'utf8');
 const route = fs.readFileSync(path.join(root, 'supabase/functions/_shared/tcg-match-essence-attachment-route-v0-2.ts'), 'utf8');
 
 function assertInOrder(source, needles, message) {
@@ -22,27 +23,41 @@ function assertInOrder(source, needles, message) {
 
 test('manual Essence attachment uses the canonical external attachment route in marked v0.2 matches', () => {
   assert.ok(match.includes('runtimeV02BeginExternalEssenceAttachmentRoute'));
-  assert.ok(match.includes('registerStructuredRuntimeEssenceAttachmentLifecycleState'));
-  assert.ok(route.includes('recordRuntimeV02EssenceAttachmentEvent('));
-  assert.ok(route.includes('runtimeV02CreateEssenceAttachedEvent('));
-  assert.ok(route.includes('runtimeV02BeginEventListenerContinuation(state, [listenerEvent])'));
+  assert.equal(match.includes('registerStructuredRuntimeEssenceAttachmentLifecycleState'), false);
+  assert.ok(route.includes('runtimeV02ApplyEssenceAttachmentTransaction('));
+  assert.ok(engine.includes('registerStructuredRuntimeEssenceAttachmentLifecycleState('));
+  assert.ok(engine.includes('recordRuntimeV02EssenceAttachmentEvent('));
+  assert.ok(engine.includes('runtimeV02CreateEssenceAttachedEvent('));
+  assert.ok(route.includes('runtimeV02BeginEventListenerContinuation(state, [transaction.listener_event])'));
 
   const start = match.indexOf('if(action==="attach_essence")');
   const end = match.indexOf('if(action==="attach_relic")', start);
   assert.ok(start >= 0 && end > start, 'manual attachment action block missing');
   const block = match.slice(start, end);
+  const legacyMutation = 'const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;';
+  const legacyAt = block.indexOf(legacyMutation);
+  assert.notEqual(legacyAt, -1, 'legacy fallback mutation must remain isolated after the structured return');
+  const structuredBlock = block.slice(0, legacyAt);
 
-  assertInOrder(block, [
-    'cr.essence.push(x)',
+  assertInOrder(structuredBlock, [
     'const structuredAttachment=s.runtime_registry_v0_2!=null',
-    'registerStructuredRuntimeEssenceAttachmentLifecycleState(s,x,turn)',
     'runtimeV02BeginExternalEssenceAttachmentRoute(',
+    'flags.manual_essence_turn=turn',
     'const eventFlow=routed.flow',
   ], 'marked manual attachment route');
-  assert.ok(block.includes('attachment_kind:"normal"'));
-  assert.ok(block.includes('action_kind:"manual_essence"'));
-  assert.ok(block.includes('destination_index:where==="reserve"?idx:null'));
-  assert.equal(block.includes('recordRuntimeV02EssenceAttachmentEvent('), false, 'match action must not bypass the canonical route helper');
+  assert.ok(structuredBlock.includes('targetInst.uid,uid,"hand","manual_essence"'));
+  assert.ok(structuredBlock.includes('attachment_kind:"normal"'));
+  assert.ok(structuredBlock.includes('action_kind:"manual_essence"'));
+  assert.ok(structuredBlock.includes('destination_index:where==="reserve"?idx:null'));
+  for (const forbidden of [
+    'removeHand(p,uid)',
+    'x.attached_turn=turn',
+    'cr.essence.push(x)',
+    'registerStructuredRuntimeEssenceAttachmentLifecycleState(',
+    'recordRuntimeV02EssenceAttachmentEvent(',
+  ]) {
+    assert.equal(structuredBlock.includes(forbidden), false, `match action bypasses canonical Attachment owner: ${forbidden}`);
+  }
 });
 
 test('manual attachment reuses event, movement and heal continuation owners and can resume private choices', () => {
@@ -69,9 +84,10 @@ test('card-specific manual attachment fallbacks are fenced to legacy matches', (
   const end = match.indexOf('if(action==="attach_relic")', start);
   const block = match.slice(start, end);
   const structuredStart = block.indexOf('if(structuredAttachment){');
+  const legacyMutation = block.indexOf('const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;');
   const legacyStart = block.indexOf('if(d.id==="ember-smolder-essence"');
-  assert.ok(structuredStart >= 0 && legacyStart > structuredStart, 'legacy fallback must follow the structured branch');
-  const structuredBlock = block.slice(structuredStart, legacyStart);
+  assert.ok(structuredStart >= 0 && legacyMutation > structuredStart && legacyStart > legacyMutation, 'legacy fallback must follow the completed structured branch');
+  const structuredBlock = block.slice(structuredStart, legacyMutation);
   for (const token of [
     'ember-smolder-essence',
     'ember-hearth-essence',
@@ -89,4 +105,6 @@ test('lifecycle-only registration is separated from triggered essence_attached l
   assert.ok(lifecycle.includes('export function registerStructuredRuntimeEssenceAttachmentLifecycleState('));
   assert.ok(lifecycle.includes('Triggered `essence_attached` listener steps are deliberately excluded'));
   assert.ok(lifecycle.includes('const lifecycleRegistered = registerStructuredRuntimeEssenceAttachmentLifecycleState('));
+  assert.ok(engine.includes('registerStructuredRuntimeEssenceAttachmentLifecycleState('));
+  assert.equal(match.includes('registerStructuredRuntimeEssenceAttachmentLifecycleState('), false);
 });
