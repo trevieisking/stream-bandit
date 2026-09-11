@@ -31,6 +31,19 @@ export type RuntimeV02AtomicSwitchResult = {
   events: [RuntimeV02SwitchMovementEvent, RuntimeV02SwitchMovementEvent];
 };
 
+export type RuntimeV02AtomicSwitchPreflight = {
+  controller_seat: 1 | 2;
+  outgoing_vanguard_uid: string;
+  incoming_vanguard_uid: string;
+  reserve_index: number;
+  source_action_id: string;
+  source_card_uid: string | null;
+  action_kind: RuntimeV02SwitchActionKind;
+  turn_seq: number;
+  next_sequence: number;
+  switch_id: string;
+};
+
 type RuntimeV02SwitchLedger = {
   turn_seq: number;
   sequence: number;
@@ -137,15 +150,14 @@ function cloneEvent(value: RuntimeV02SwitchMovementEvent): RuntimeV02SwitchMovem
 }
 
 /**
- * Canonical atomic Vanguard <-> Reserve switch primitive for Runtime v0.2.
+ * Non-mutating validation contract for the canonical Runtime v0.2 atomic switch.
  *
- * The operation validates both creatures and all switch metadata before any
- * battlefield mutation. One switch writes one private context plus the paired
- * moved_to_reserve / became_vanguard events required by Card Pass 2 Amendment H.
- * Listener dispatch deliberately remains a later owner: this primitive records
- * deterministic canonical event truth without pretending Runtime Pass E parity.
+ * This preflight performs every validation that can reject the switch, including
+ * existing-ledger validation, and predicts the deterministic switch id without
+ * creating the ledger or mutating either battlefield. Orchestrators can therefore
+ * validate a downstream switch before another owner commits an irreversible cost.
  */
-export function runtimeV02ApplyAtomicSwitch(
+export function runtimeV02PreflightAtomicSwitch(
   state: Record<string, unknown>,
   controllerSeatRaw: number,
   reserveIndex: number,
@@ -154,7 +166,7 @@ export function runtimeV02ApplyAtomicSwitch(
     source_action_id: string;
     source_card_uid?: string | null;
   },
-): RuntimeV02AtomicSwitchResult {
+): RuntimeV02AtomicSwitchPreflight {
   const controllerSeat = normalizedSeat(controllerSeatRaw);
   const turn = currentTurn(state);
   if (!Number.isInteger(reserveIndex) || reserveIndex < 0 || reserveIndex > 3) {
@@ -171,11 +183,10 @@ export function runtimeV02ApplyAtomicSwitch(
   const incomingUid = topUid(incoming, "tcg_v0_2_switch_incoming_anchor_missing");
   if (outgoingUid === incomingUid) throw new Error("tcg_v0_2_switch_anchor_collision");
 
-  const ledger = ensureLedger(state, turn);
-  const sequence = ledger.sequence + 1;
-  const switchId = `switch:${turn}:${sequence}`;
-  const context: RuntimeV02SwitchContext = {
-    switch_id: switchId,
+  const ledger = readLedger(state, turn);
+  const nextSequence = (ledger?.sequence || 0) + 1;
+
+  return {
     controller_seat: controllerSeat,
     outgoing_vanguard_uid: outgoingUid,
     incoming_vanguard_uid: incomingUid,
@@ -184,31 +195,79 @@ export function runtimeV02ApplyAtomicSwitch(
     source_card_uid: sourceCardUid,
     action_kind: actionKind,
     turn_seq: turn,
+    next_sequence: nextSequence,
+    switch_id: `switch:${turn}:${nextSequence}`,
+  };
+}
+
+/**
+ * Canonical atomic Vanguard <-> Reserve switch primitive for Runtime v0.2.
+ *
+ * The operation reuses the non-mutating preflight contract before any battlefield
+ * mutation. One switch writes one private context plus the paired moved_to_reserve /
+ * became_vanguard events required by Card Pass 2 Amendment H. Listener dispatch
+ * deliberately remains a later owner: this primitive records deterministic
+ * canonical event truth without pretending Runtime Pass E parity.
+ */
+export function runtimeV02ApplyAtomicSwitch(
+  state: Record<string, unknown>,
+  controllerSeatRaw: number,
+  reserveIndex: number,
+  input: {
+    action_kind: RuntimeV02SwitchActionKind;
+    source_action_id: string;
+    source_card_uid?: string | null;
+  },
+): RuntimeV02AtomicSwitchResult {
+  const preflight = runtimeV02PreflightAtomicSwitch(state, controllerSeatRaw, reserveIndex, input);
+  const controllerSeat = preflight.controller_seat;
+  const turn = preflight.turn_seq;
+  const player = playerForSeat(state, controllerSeat);
+  const reserve = player.reserve as unknown[];
+  const outgoing = creature(player.vanguard, "tcg_v0_2_switch_outgoing_vanguard_missing");
+  const incoming = creature(reserve[reserveIndex], "tcg_v0_2_switch_incoming_reserve_missing");
+
+  const ledger = ensureLedger(state, turn);
+  if (ledger.sequence + 1 !== preflight.next_sequence) {
+    throw new Error("tcg_v0_2_switch_preflight_stale");
+  }
+  const sequence = preflight.next_sequence;
+  const switchId = preflight.switch_id;
+  const context: RuntimeV02SwitchContext = {
+    switch_id: switchId,
+    controller_seat: controllerSeat,
+    outgoing_vanguard_uid: preflight.outgoing_vanguard_uid,
+    incoming_vanguard_uid: preflight.incoming_vanguard_uid,
+    reserve_index: reserveIndex,
+    source_action_id: preflight.source_action_id,
+    source_card_uid: preflight.source_card_uid,
+    action_kind: preflight.action_kind,
+    turn_seq: turn,
   };
   const movedToReserve: RuntimeV02SwitchMovementEvent = {
     event: "moved_to_reserve",
-    subject_uid: outgoingUid,
+    subject_uid: preflight.outgoing_vanguard_uid,
     controller_seat: controllerSeat,
     origin_zone: "vanguard",
     destination_zone: "reserve",
     reserve_index: reserveIndex,
     switch_id: switchId,
-    source_action_id: sourceActionId,
-    source_card_uid: sourceCardUid,
-    action_kind: actionKind,
+    source_action_id: preflight.source_action_id,
+    source_card_uid: preflight.source_card_uid,
+    action_kind: preflight.action_kind,
     turn_seq: turn,
   };
   const becameVanguard: RuntimeV02SwitchMovementEvent = {
     event: "became_vanguard",
-    subject_uid: incomingUid,
+    subject_uid: preflight.incoming_vanguard_uid,
     controller_seat: controllerSeat,
     origin_zone: "reserve",
     destination_zone: "vanguard",
     reserve_index: reserveIndex,
     switch_id: switchId,
-    source_action_id: sourceActionId,
-    source_card_uid: sourceCardUid,
-    action_kind: actionKind,
+    source_action_id: preflight.source_action_id,
+    source_card_uid: preflight.source_card_uid,
+    action_kind: preflight.action_kind,
     turn_seq: turn,
   };
 

@@ -2,6 +2,7 @@ import {
   runtimeV02ApplyAtomicSwitch,
   runtimeV02CurrentTurnSwitchContexts,
   runtimeV02CurrentTurnSwitchEvents,
+  runtimeV02PreflightAtomicSwitch,
   runtimeV02SwitchContextById,
 } from "../_shared/tcg-match-switch-context-v0-2.ts";
 
@@ -64,6 +65,68 @@ function state() {
 function player(s: Record<string, unknown>, seat: 1 | 2) {
   return (s.players as any)[String(seat)];
 }
+
+Deno.test("atomic switch preflight validates the complete switch without creating ledger or mutating battlefield", () => {
+  const s = state();
+  const before = JSON.stringify(s);
+  const preflight = runtimeV02PreflightAtomicSwitch(s, 1, 0, {
+    action_kind: "voluntary_withdrawal",
+    source_action_id: "withdraw",
+    source_card_uid: null,
+  });
+
+  assertEquals(preflight, {
+    controller_seat: 1,
+    outgoing_vanguard_uid: "outgoing-1",
+    incoming_vanguard_uid: "incoming-1",
+    reserve_index: 0,
+    source_action_id: "withdraw",
+    source_card_uid: null,
+    action_kind: "voluntary_withdrawal",
+    turn_seq: 12,
+    next_sequence: 1,
+    switch_id: "switch:12:1",
+  });
+  assertEquals(JSON.stringify(s), before, "switch preflight mutated canonical state");
+  assertEquals((s as any).runtime_v0_2_switch_ledger, undefined, "switch preflight created private ledger");
+});
+
+Deno.test("atomic switch preflight validates an existing ledger and predicts the next deterministic switch id without mutation", () => {
+  const s = state();
+  runtimeV02ApplyAtomicSwitch(s, 1, 0, {
+    action_kind: "attack",
+    source_action_id: "first-switch",
+  });
+  const before = JSON.stringify(s);
+
+  const preflight = runtimeV02PreflightAtomicSwitch(s, 1, 1, {
+    action_kind: "effect_switch",
+    source_action_id: "second-switch",
+  });
+
+  assertEquals(preflight.next_sequence, 2);
+  assertEquals(preflight.switch_id, "switch:12:2");
+  assertEquals(preflight.outgoing_vanguard_uid, "incoming-1");
+  assertEquals(preflight.incoming_vanguard_uid, "reserve-2");
+  assertEquals(JSON.stringify(s), before, "existing-ledger preflight mutated canonical state");
+});
+
+Deno.test("atomic switch preflight rejects malformed current-turn ledger without mutation", () => {
+  const s = state();
+  (s as any).runtime_v0_2_switch_ledger = {
+    turn_seq: 12,
+    sequence: -1,
+    contexts: [],
+    events: [],
+  };
+  const before = JSON.stringify(s);
+
+  assertThrows(
+    () => runtimeV02PreflightAtomicSwitch(s, 1, 0, { action_kind: "voluntary_withdrawal", source_action_id: "withdraw" }),
+    "tcg_v0_2_switch_ledger_invalid",
+  );
+  assertEquals(JSON.stringify(s), before, "failed switch preflight mutated canonical state");
+});
 
 Deno.test("atomic switch validates first, swaps once and records the Amendment H paired movement events", () => {
   const s = state();
@@ -198,6 +261,24 @@ Deno.test("invalid switch inputs fail before battlefield or private-ledger mutat
     const before = JSON.stringify(s);
     assertThrows(() => run(s), fragment);
     assertEquals(JSON.stringify(s), before, `state mutated before failing ${fragment}`);
+  }
+});
+
+Deno.test("preflight mirrors invalid switch failures without battlefield or ledger mutation", () => {
+  const cases: Array<[string, (s: Record<string, unknown>) => void]> = [
+    ["tcg_v0_2_switch_controller_seat_invalid", (s) => runtimeV02PreflightAtomicSwitch(s, 3, 0, { action_kind: "attack", source_action_id: "x" })],
+    ["tcg_v0_2_switch_reserve_index_invalid", (s) => runtimeV02PreflightAtomicSwitch(s, 1, 4, { action_kind: "attack", source_action_id: "x" })],
+    ["tcg_v0_2_switch_action_kind_invalid", (s) => runtimeV02PreflightAtomicSwitch(s, 1, 0, { action_kind: "invalid" as any, source_action_id: "x" })],
+    ["tcg_v0_2_switch_source_action_id_required", (s) => runtimeV02PreflightAtomicSwitch(s, 1, 0, { action_kind: "attack", source_action_id: "" })],
+    ["tcg_v0_2_switch_source_card_uid_invalid", (s) => runtimeV02PreflightAtomicSwitch(s, 1, 0, { action_kind: "attack", source_action_id: "x", source_card_uid: "" })],
+    ["tcg_v0_2_switch_incoming_reserve_missing", (s) => runtimeV02PreflightAtomicSwitch(s, 1, 3, { action_kind: "attack", source_action_id: "x" })],
+  ];
+
+  for (const [fragment, run] of cases) {
+    const s = state();
+    const before = JSON.stringify(s);
+    assertThrows(() => run(s), fragment);
+    assertEquals(JSON.stringify(s), before, `preflight mutated state before failing ${fragment}`);
   }
 });
 
