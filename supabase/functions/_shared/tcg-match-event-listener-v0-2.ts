@@ -7,7 +7,10 @@ import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
 import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
-import { registerStructuredRuntimeEssenceAttachmentLifecycleState } from "./tcg-match-surge-lifecycle-v0-2.ts";
+import {
+  applyRuntimeV02AttachmentAttackDamageModifier,
+  registerStructuredRuntimeEssenceAttachmentLifecycleState,
+} from "./tcg-match-surge-lifecycle-v0-2.ts";
 import {
   recordRuntimeV02EssenceAttachmentEvent,
   runtimeV02CreateEssenceAttachedEvent,
@@ -1704,6 +1707,29 @@ function executeStep(
     });
     if (packet.packet?.id) {
       continuation.emitted_heal_packet_ids.push(packet.packet.id);
+    }
+    continuation.step_cursor++;
+    return "continue";
+  }
+
+  if (op === "ADD_ATTACK_DAMAGE_MODIFIER") {
+    const target = targetField(
+      state,
+      continuation,
+      candidate,
+      event,
+      step.target,
+    );
+    const applied = applyRuntimeV02AttachmentAttackDamageModifier(
+      state,
+      target.cr,
+      candidate.source.uid,
+      step.amount,
+      currentTurn(state),
+      step.duration,
+    );
+    if (applied == null) {
+      throw new Error("tcg_v0_2_event_listener_attack_modifier_owner_unavailable");
     }
     continuation.step_cursor++;
     return "continue";
