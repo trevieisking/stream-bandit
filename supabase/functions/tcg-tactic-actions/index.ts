@@ -1152,16 +1152,39 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
       runtimeV02CommitCardZoneTransfer(player.deck as Inst[], player.hand as Inst[], preflight);
     }
   } else if (apply === "move_from_zone") {
-    const player = state.players[String(context.zone_seat)];
-    const zone = String(context.from) === "discard" ? player.discard : null;
-    if (!zone) throw new Error("selected_zone_unsupported");
-    const moved: Inst[] = [];
-    for (const option of selected) {
-      const inst = removeByUid(zone, String(option.data.uid));
-      if (!inst) throw new Error("selected_zone_card_missing");
-      moved.push(inst);
+    const zoneSeat = Number(context.zone_seat);
+    if (zoneSeat !== 1 && zoneSeat !== 2) throw new Error("selected_zone_seat_invalid");
+    if (String(context.from) !== "discard") throw new Error("selected_zone_unsupported");
+    if (String(context.destination) !== "deck_bottom") throw new Error("selected_zone_destination_unsupported");
+    const player = state.players[String(zoneSeat)];
+    if (selected.length > 0) {
+      const selectedUids = selected.map((option) => String(option.data.uid));
+      let preflight;
+      try {
+        preflight = runtimeV02PreflightCardZoneTransfer(player.discard as Inst[], player.deck as Inst[], {
+          cause: "effect",
+          action_kind: "tactic",
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source: { controller_seat: zoneSeat as 1 | 2, zone: "discard", owner_card_uid: null },
+          destination: { controller_seat: zoneSeat as 1 | 2, zone: "deck", owner_card_uid: null },
+          card_uids: selectedUids,
+          destination_position: "bottom",
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message.startsWith("tcg_v0_2_card_zone_selected_card_missing:")) throw new Error("selected_zone_card_missing");
+        throw error;
+      }
+      for (let index = 0; index < selected.length; index += 1) {
+        const option = selected[index];
+        const current = preflight.cards[index];
+        if (current.uid !== String(option.data.uid) || current.card_id !== String(option.data.card_id)) {
+          throw new Error("selected_zone_card_changed");
+        }
+      }
+      runtimeV02CommitCardZoneTransfer(player.discard as Inst[], player.deck as Inst[], preflight);
     }
-    moveCardsToDestination(state, Number(context.zone_seat), moved, String(context.destination));
   } else if (apply === "ordered_move") {
     const ordered: Inst[] = selected.map((option) => ({
       uid: String(option.data.uid),
