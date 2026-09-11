@@ -1145,7 +1145,7 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
     if ((targetSeat !== 1 && targetSeat !== 2) || (sourceSeat !== 1 && sourceSeat !== 2)) {
       throw new Error("tcg_v0_2_tactic_attachment_seat_invalid");
     }
-    const attachmentMovementEvents: ReturnType<typeof runtimeV02CreateEssenceMovedEvent>[] = [];
+    const attachmentMovementEvents: Parameters<typeof runtimeV02BeginMovementListenerContinuation>[1] = [];
     for (const option of selected) {
       const attachmentKind = String(context.attachment_kind || "effect_generated");
       const routed = runtimeV02BeginExternalEssenceAttachmentRoute(
