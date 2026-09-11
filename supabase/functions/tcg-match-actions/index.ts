@@ -1,7 +1,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { structuredRuntimeWithdrawalBaseCost } from "../_shared/tcg-match-withdrawal-v0-2.ts";
 import { structuredRuntimeIncomingAttackDamage, structuredRuntimeOutgoingAttackDamage } from "../_shared/tcg-match-attack-damage-v0-2.ts";
-import { clearStructuredRuntimeAttachmentAttackBonusesAtAftermath, registerStructuredRuntimeEssenceAttachmentLifecycleState, structuredRuntimeAftermathEssenceDisposition, structuredRuntimeAttachmentAttackBonus } from "../_shared/tcg-match-surge-lifecycle-v0-2.ts";
+import { clearStructuredRuntimeAttachmentAttackBonusesAtAftermath, structuredRuntimeAftermathEssenceDisposition, structuredRuntimeAttachmentAttackBonus } from "../_shared/tcg-match-surge-lifecycle-v0-2.ts";
 import { evaluateRuntimeAttackCountAddFormula, evaluateRuntimeAttackDeclarationRequirements, evaluateRuntimeAttackReadyConditionalAddFormula, resolveRuntimeAttackAuthority } from "../_shared/tcg-match-attack-authority-v0-2.ts";
 import { runtimeV02CurrentTurnHiddenInformationViews } from "../_shared/tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02PrivateRewardInspectionView, structuredRuntimeEvolutionRewardInspection } from "../_shared/tcg-match-reward-inspection-v0-2.ts";
@@ -264,11 +264,11 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="attach_essence"){
-   const turn=Number(s.turn_seq||0);if(Number(flags.manual_essence_turn??-1)===turn)return json({ok:false,version:VERSION,error:"manual_essence_already_used_this_turn"},400);const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Essence")return json({ok:false,version:VERSION,error:"essence_card_required"},400);const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);const structuredAttachment=s.runtime_registry_v0_2!=null;
+   const turn=Number(s.turn_seq||0);if(Number(flags.manual_essence_turn??-1)===turn)return json({ok:false,version:VERSION,error:"manual_essence_already_used_this_turn"},400);const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Essence")return json({ok:false,version:VERSION,error:"essence_card_required"},400);const td=top(cr,s);const structuredAttachment=s.runtime_registry_v0_2!=null;
    if(structuredAttachment){
     const targetInst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!targetInst)throw new Error("tcg_v0_2_attachment_target_anchor_required");
-    registerStructuredRuntimeEssenceAttachmentLifecycleState(s,x,turn);
-    const routed=runtimeV02BeginExternalEssenceAttachmentRoute(s,seat as 1|2,targetInst.uid,x,"hand","manual_essence",{attachment_kind:"normal",phase:"play",action_kind:"manual_essence",destination_index:where==="reserve"?idx:null});
+    const routed=runtimeV02BeginExternalEssenceAttachmentRoute(s,seat as 1|2,targetInst.uid,uid,"hand","manual_essence",{attachment_kind:"normal",phase:"play",action_kind:"manual_essence",destination_index:where==="reserve"?idx:null});
+    flags.manual_essence_turn=turn;
     const eventFlow=routed.flow,eventAudit=eventListenerAudit(eventFlow);
     log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);
     if(eventFlow.status==="player_choice_required"){
@@ -292,6 +292,7 @@ Deno.serve(async(req)=>{
     const n=scanDefeats();if(n>0)s.phase="resolution";else s.phase="play";
     return json({version:VERSION,result:await commit("attach_essence",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d),event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit})});
    }
+   const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;
    if(d.id==="ember-smolder-essence"&&cr.damage>0){cr.flags=cr.flags||{};cr.flags.next_attack_bonus=(Number((cr.flags as any).next_attack_bonus||0)+10)}else if(d.id==="ember-hearth-essence"&&cr.damage>0)healRuntimeDamage(cr,20);else if(d.id==="tide-calm-essence"&&td?.element==="Tide")healRuntimeDamage(cr,20);else if(d.id==="grove-bloom-essence"&&td?.element==="Grove"&&isEvolved(td))healRuntimeDamage(cr,20);else if(d.id==="stone-fault-essence"&&td?.element==="Stone")clearCond(cr,"Crushed");
    if(td?.id==="tide-puddlepip"&&d.element==="Tide"){cr.flags=cr.flags||{};const f=cr.flags as any;if(Number(f.freshwater_turn??-1)!==turn){f.freshwater_turn=turn;healRuntimeDamage(cr,10)}}
    log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);return json({version:VERSION,result:await commit("attach_essence",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d)})});
