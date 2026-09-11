@@ -46,6 +46,24 @@ export type RuntimeV02AttackMetadata = {
   starbound: boolean;
 };
 
+export type RuntimeV02AttackControlTargetMode =
+  | "declared"
+  | "random_all_creatures";
+
+export type RuntimeV02AttackBattlefieldTarget<TCreature = unknown> = {
+  seat: 1 | 2;
+  where: "vanguard" | "reserve";
+  index: number | null;
+  creature: TCreature;
+};
+
+export type RuntimeV02ResolvedAttackTarget<TCreature = unknown> =
+  RuntimeV02AttackBattlefieldTarget<TCreature> & {
+    target_mode: RuntimeV02AttackControlTargetMode;
+    randomized: boolean;
+    random_pool_index: number | null;
+  };
+
 function objectRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
     ? value as Record<string, unknown>
@@ -333,5 +351,127 @@ export function structuredRuntimeAttackMetadata(
     target_permissions: attackTargetPermissions(attack.target_permissions, id),
     requirements: attackRequirements(attack.requirements, id),
     starbound: structuredAttackStarbound(definition, creature, attacks, id),
+  };
+}
+
+function validatedAttackBattlefield<TCreature>(
+  battlefield: RuntimeV02AttackBattlefieldTarget<TCreature>[],
+): RuntimeV02AttackBattlefieldTarget<TCreature>[] {
+  if (!Array.isArray(battlefield)) {
+    throw new Error("tcg_v0_2_attack_target_battlefield_required");
+  }
+  const seen = new Set<string>();
+  const normalized = battlefield.map((entry) => {
+    if (!entry || (entry.seat !== 1 && entry.seat !== 2)) {
+      throw new Error("tcg_v0_2_attack_target_seat_invalid");
+    }
+    if (entry.where === "vanguard") {
+      if (entry.index !== null) {
+        throw new Error("tcg_v0_2_attack_target_vanguard_index_invalid");
+      }
+    } else if (entry.where === "reserve") {
+      if (!Number.isInteger(entry.index) || Number(entry.index) < 0 || Number(entry.index) > 3) {
+        throw new Error("tcg_v0_2_attack_target_reserve_index_invalid");
+      }
+    } else {
+      throw new Error("tcg_v0_2_attack_target_zone_invalid");
+    }
+    const key = `${entry.seat}:${entry.where}:${entry.index ?? "v"}`;
+    if (seen.has(key)) {
+      throw new Error("tcg_v0_2_attack_target_battlefield_duplicate");
+    }
+    seen.add(key);
+    return { ...entry };
+  });
+  normalized.sort((a, b) => {
+    if (a.seat !== b.seat) return a.seat - b.seat;
+    if (a.where !== b.where) return a.where === "vanguard" ? -1 : 1;
+    return Number(a.index ?? -1) - Number(b.index ?? -1);
+  });
+  return normalized;
+}
+
+/**
+ * Canonical structured attack-target owner.
+ *
+ * Attack owns target legality and target selection. Condition owners may return
+ * a target-mode request (for example Blinded => random_all_creatures), but they
+ * never choose a Creature themselves. Randomness is injected so callers/tests
+ * can audit the exact decision boundary.
+ */
+export function runtimeV02ResolveAttackTarget<TCreature>(
+  attackerSeat: 1 | 2,
+  targetPermissions: RuntimeV02AttackTargetPermission[],
+  battlefield: RuntimeV02AttackBattlefieldTarget<TCreature>[],
+  declaredReserveIndex: number | null,
+  targetMode: RuntimeV02AttackControlTargetMode,
+  randomIndex?: (poolSize: number) => number,
+): RuntimeV02ResolvedAttackTarget<TCreature> {
+  if (attackerSeat !== 1 && attackerSeat !== 2) {
+    throw new Error("tcg_v0_2_attack_target_attacker_seat_invalid");
+  }
+  if (!Array.isArray(targetPermissions)) {
+    throw new Error("tcg_v0_2_attack_target_permissions_required");
+  }
+  if (targetMode !== "declared" && targetMode !== "random_all_creatures") {
+    throw new Error("tcg_v0_2_attack_target_mode_invalid");
+  }
+  const fields = validatedAttackBattlefield(battlefield);
+  if (!fields.length) {
+    throw new Error("tcg_v0_2_attack_target_battlefield_empty");
+  }
+
+  if (targetMode === "random_all_creatures") {
+    if (!randomIndex) {
+      throw new Error("tcg_v0_2_attack_target_random_owner_required");
+    }
+    const index = randomIndex(fields.length);
+    if (!Number.isInteger(index) || index < 0 || index >= fields.length) {
+      throw new Error("tcg_v0_2_attack_target_random_index_invalid");
+    }
+    return {
+      ...fields[index],
+      target_mode: targetMode,
+      randomized: true,
+      random_pool_index: index,
+    };
+  }
+
+  const opponentSeat = attackerSeat === 1 ? 2 : 1;
+  if (declaredReserveIndex == null) {
+    const target = fields.find((entry) =>
+      entry.seat === opponentSeat && entry.where === "vanguard"
+    );
+    if (!target) throw new Error("tcg_v0_2_attack_target_opponent_vanguard_required");
+    return {
+      ...target,
+      target_mode: targetMode,
+      randomized: false,
+      random_pool_index: null,
+    };
+  }
+
+  if (!Number.isInteger(declaredReserveIndex) || declaredReserveIndex < 0 || declaredReserveIndex > 3) {
+    throw new Error("tcg_v0_2_attack_target_declared_reserve_index_invalid");
+  }
+  const reserveAllowed = targetPermissions.some((permission) =>
+    permission.controller === "opponent" &&
+    permission.zone === "reserve" &&
+    permission.card_family === "Creature" &&
+    permission.selection === "one"
+  );
+  if (!reserveAllowed) {
+    throw new Error("tcg_v0_2_attack_target_opponent_reserve_not_permitted");
+  }
+  const target = fields.find((entry) =>
+    entry.seat === opponentSeat && entry.where === "reserve" &&
+    entry.index === declaredReserveIndex
+  );
+  if (!target) throw new Error("tcg_v0_2_attack_target_opponent_reserve_required");
+  return {
+    ...target,
+    target_mode: targetMode,
+    randomized: false,
+    random_pool_index: null,
   };
 }
