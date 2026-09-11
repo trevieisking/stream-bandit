@@ -1,4 +1,5 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 import { applyRuntimeV02EssenceTransfer } from "../_shared/tcg-match-essence-movement-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
@@ -567,7 +568,19 @@ function executeUntilChoice(state: any) {
       const player = state.players[String(seat)];
       const count = Math.max(0, Number(step.count || 0));
       const available = Math.min(count, player.deck.length);
-      player.hand.push(...player.deck.splice(0, available));
+      if (available > 0) {
+        const drawUids = (player.deck as Inst[]).slice(0, available).map((inst) => inst.uid);
+        runtimeV02ApplyCardZoneTransfer(player.deck as Inst[], player.hand as Inst[], {
+          cause: "effect",
+          action_kind: "tactic",
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source: { controller_seat: seat as 1 | 2, zone: "deck", owner_card_uid: null },
+          destination: { controller_seat: seat as 1 | 2, zone: "hand", owner_card_uid: null },
+          card_uids: drawUids,
+          destination_position: "bottom",
+        });
+      }
       if (op === "DRAW_FIXED" && step.deckout_on_incomplete && available < count) state.deckout_loser = seat;
       effect.cursor++;
       continue;
