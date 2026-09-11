@@ -347,3 +347,52 @@ test('tactic SEARCH_DECK keeps hidden/search choice authority while Card-Zone ow
     assert.equal(block.includes(forbidden), false, `Tactic SEARCH_DECK regained Card-Zone mutation authority: ${forbidden}`);
   }
 });
+
+test('tactic ordinary-zone MOVE_CARDS keeps discard filtering and choice authority while Card-Zone owns atomic discard-to-deck-bottom movement', () => {
+  const choiceBlock = functionSlice(
+    tactic,
+    'if (op === "MOVE_CARDS" && step.selection && step.from) {',
+    'if (op === "MOVE_CARDS") {',
+  );
+  assert.ok(choiceBlock.includes('const zone = String(step.from) === "discard" ? player.discard : null;'));
+  assert.ok(choiceBlock.includes('if (!zone) throw new Error(`unsupported_move_source:${step.from}`);'));
+  assert.ok(choiceBlock.includes('cardOptions(state, zone, step.selection.filters, ownerSeat)'));
+  assert.ok(choiceBlock.includes('choiceBounds(step.selection, options.length, false)'));
+  assert.ok(choiceBlock.includes('apply: "move_from_zone"'));
+  assert.ok(choiceBlock.includes('from: step.from'));
+  assert.ok(choiceBlock.includes('destination: String(step.to || "hand")'));
+
+  const block = functionSlice(
+    tactic,
+    '} else if (apply === "move_from_zone") {',
+    '} else if (apply === "ordered_move") {',
+  );
+  const preflightAt = block.indexOf('runtimeV02PreflightCardZoneTransfer(');
+  const identityAt = block.indexOf('current.card_id !== String(option.data.card_id)');
+  const commitAt = block.indexOf('runtimeV02CommitCardZoneTransfer(');
+  assert.ok(preflightAt >= 0 && identityAt > preflightAt, 'ordinary-zone move identity must be checked after Card-Zone preflight');
+  assert.ok(commitAt > identityAt, 'ordinary-zone move must commit only after frozen identity validation');
+  assert.ok(block.includes('selected_zone_seat_invalid'));
+  assert.ok(block.includes('selected_zone_unsupported'));
+  assert.ok(block.includes('selected_zone_destination_unsupported'));
+  assert.ok(block.includes('if (selected.length > 0)'));
+  assert.ok(block.includes('selected_zone_card_missing'));
+  assert.ok(block.includes('selected_zone_card_changed'));
+  assert.ok(block.includes('cause: "effect"'));
+  assert.ok(block.includes('action_kind: "tactic"'));
+  assert.ok(block.includes('source_action_id: effect.id'));
+  assert.ok(block.includes('source_card_uid: effect.source_card.uid'));
+  assert.ok(block.includes('source: { controller_seat: zoneSeat as 1 | 2, zone: "discard", owner_card_uid: null }'));
+  assert.ok(block.includes('destination: { controller_seat: zoneSeat as 1 | 2, zone: "deck", owner_card_uid: null }'));
+  assert.ok(block.includes('card_uids: selectedUids'));
+  assert.ok(block.includes('destination_position: "bottom"'));
+
+  for (const forbidden of [
+    'removeByUid(zone',
+    'zone.splice(',
+    'player.deck.push(',
+    'moveCardsToDestination(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `ordinary-zone MOVE_CARDS resolver regained Card-Zone mutation authority: ${forbidden}`);
+  }
+});
