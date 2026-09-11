@@ -45,7 +45,9 @@ test('atomic switch context owner is card-id-free and records the exact shared A
     assert.ok(owner.includes(required), `switch owner missing ${required}`);
     assert.ok(amendment.includes(required), `Amendment H no longer requires ${required}`);
   }
-  assert.ok(owner.includes('switch:${turn}:${sequence}'));
+  assert.ok(owner.includes('switch:${turn}:${nextSequence}'));
+  assert.ok(owner.includes('export function runtimeV02PreflightAtomicSwitch('));
+  assert.ok(owner.includes('const preflight = runtimeV02PreflightAtomicSwitch(state, controllerSeatRaw, reserveIndex, input)'));
   assert.ok(owner.includes('runtime_v0_2_switch_ledger'));
 });
 
