@@ -30,6 +30,22 @@ type RuntimeV02AttachmentTarget = {
   index: number | null;
 };
 
+export type RuntimeV02EssenceAttachmentRouteOptions = {
+  attachment_kind?: string;
+  phase?: string;
+  action_kind?: string;
+  destination_index?: number | null;
+  source_owner_seat?: 1 | 2;
+  effect_flags?: Record<string, unknown>;
+};
+
+export type RuntimeV02EssenceAttachmentTransaction = {
+  receipt: RuntimeV02EssenceAttachmentEvent;
+  listener_event: RuntimeV02EssenceAttachedListenerEvent;
+  attached_card: RuntimeV02AttachmentInstance;
+  lifecycle_registered: boolean | null;
+};
+
 export type RuntimeV02ExternalEssenceAttachmentRoute = {
   receipt: RuntimeV02EssenceAttachmentEvent;
   listener_event: RuntimeV02EssenceAttachedListenerEvent;
@@ -139,12 +155,7 @@ function receiptAndEvent(
   sourceCard: RuntimeV02AttachmentInstance | { uid?: unknown; card_id?: unknown },
   originZone: RuntimeV02EssenceAttachmentOriginZone,
   sourceActionId: string,
-  options: {
-    attachment_kind?: string;
-    phase?: string;
-    action_kind?: string;
-    destination_index?: number | null;
-  },
+  options: RuntimeV02EssenceAttachmentRouteOptions,
 ): { receipt: RuntimeV02EssenceAttachmentEvent; listenerEvent: RuntimeV02EssenceAttachedListenerEvent } {
   const receipt = recordRuntimeV02EssenceAttachmentEvent(
     state,
@@ -163,23 +174,129 @@ function receiptAndEvent(
   return { receipt, listenerEvent };
 }
 
+function preflightReceiptAndEvent(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+  targetCreatureUid: string,
+  sourceCard: RuntimeV02AttachmentInstance,
+  originZone: RuntimeV02EssenceAttachmentOriginZone,
+  sourceActionId: string,
+  options: RuntimeV02EssenceAttachmentRouteOptions,
+): void {
+  const probe: Record<string, unknown> = { turn_seq: state.turn_seq };
+  if (state.runtime_v0_2_essence_attachment_events != null) {
+    probe.runtime_v0_2_essence_attachment_events = structuredClone(
+      state.runtime_v0_2_essence_attachment_events,
+    );
+  }
+  receiptAndEvent(
+    probe,
+    controllerSeat,
+    targetCreatureUid,
+    sourceCard,
+    originZone,
+    sourceActionId,
+    options,
+  );
+}
+
 /**
- * Canonical attachment route.
+ * Canonical physical attachment transaction.
  *
- * Passing a source-card UID selects the authoritative transaction path: this
- * owner resolves the canonical source zone and target creature from match
- * state, validates the Essence, sets attachment metadata/lifecycle, transfers
- * the exact instance, creates the attachment receipt/event, and begins the
- * existing generic event continuation.
+ * This is the single mutation operation for external and nested attachment
+ * producers. It resolves canonical zones from match state, validates before
+ * mutation, preserves the exact card instance, registers attachment lifecycle,
+ * records the canonical receipt and returns the immutable listener event.
+ * It deliberately does not start an event-listener continuation; callers that
+ * are already inside that continuation can append the returned event instead
+ * of recursively starting a second event engine.
+ */
+export function runtimeV02ApplyEssenceAttachmentTransaction(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+  targetCreatureUid: string,
+  sourceCardUid: string,
+  originZone: RuntimeV02EssenceAttachmentOriginZone,
+  sourceActionId: string,
+  options: RuntimeV02EssenceAttachmentRouteOptions = {},
+): RuntimeV02EssenceAttachmentTransaction {
+  const controller = seat(controllerSeat, "tcg_v0_2_attachment_route_controller_seat_invalid");
+  const currentTurn = turn(state);
+  const targetField = target(state, controller, targetCreatureUid);
+  if (options.destination_index !== undefined && options.destination_index !== targetField.index) {
+    throw new Error("tcg_v0_2_attachment_route_destination_index_mismatch");
+  }
+  const sourceOwner = options.source_owner_seat == null
+    ? controller
+    : seat(options.source_owner_seat, "tcg_v0_2_attachment_route_source_owner_seat_invalid");
+  const zone = sourceZone(state, sourceOwner, originZone);
+  const sourceUid = text(sourceCardUid, "tcg_v0_2_attachment_route_source_uid_required");
+  const sourceIndex = zone.findIndex((item) => item?.uid === sourceUid);
+  if (sourceIndex < 0) throw new Error("tcg_v0_2_attachment_route_source_missing");
+  const source = zone[sourceIndex];
+  if (!source?.card_id) throw new Error("tcg_v0_2_attachment_route_source_instance_invalid");
+  if (targetField.creature.essence.some((item) => item.uid === sourceUid)) {
+    throw new Error("tcg_v0_2_attachment_route_source_already_attached");
+  }
+  validateEssenceDefinition(state, source);
+
+  const resolvedOptions: RuntimeV02EssenceAttachmentRouteOptions = {
+    ...options,
+    destination_index: targetField.index,
+  };
+
+  // Validate lifecycle and receipt/event shape before touching canonical zones.
+  const lifecycleProbe = structuredClone(source);
+  registerStructuredRuntimeEssenceAttachmentLifecycleState(state, lifecycleProbe, currentTurn);
+  preflightReceiptAndEvent(
+    state,
+    controller,
+    targetCreatureUid,
+    source,
+    originZone,
+    sourceActionId,
+    resolvedOptions,
+  );
+
+  const attached = zone.splice(sourceIndex, 1)[0];
+  attached.attached_turn = currentTurn;
+  if (options.effect_flags != null) {
+    attached.effect_flags = {
+      ...(attached.effect_flags || {}),
+      ...structuredClone(options.effect_flags),
+    };
+  }
+  const lifecycleRegistered = registerStructuredRuntimeEssenceAttachmentLifecycleState(
+    state,
+    attached,
+    currentTurn,
+  );
+  targetField.creature.essence.push(attached);
+
+  const { receipt, listenerEvent } = receiptAndEvent(
+    state,
+    controller,
+    targetCreatureUid,
+    attached,
+    originZone,
+    sourceActionId,
+    resolvedOptions,
+  );
+  return {
+    receipt: { ...receipt },
+    listener_event: structuredClone(listenerEvent),
+    attached_card: attached,
+    lifecycle_registered: lifecycleRegistered,
+  };
+}
+
+/**
+ * Canonical external attachment route.
  *
- * Passing an already-attached source-card object preserves the older bridge
- * contract while existing callers are migrated. That compatibility path owns
- * receipt/event/continuation only and must be retired once every external
- * attachment caller uses the UID transaction path.
- *
- * Nested attachments created while an event-listener continuation is already
- * running must use this module's transaction semantics but append their event
- * to the existing continuation rather than recursively begin another one.
+ * UID callers use the physical transaction owner above and then begin the
+ * existing generic event continuation. The already-attached object form is a
+ * temporary compatibility bridge for callers not yet migrated; it owns only
+ * receipt/event/continuation and must disappear after migration completes.
  */
 export function runtimeV02BeginExternalEssenceAttachmentRoute(
   state: Record<string, unknown>,
@@ -188,14 +305,7 @@ export function runtimeV02BeginExternalEssenceAttachmentRoute(
   sourceCardOrUid: { uid?: unknown; card_id?: unknown } | string,
   originZone: RuntimeV02EssenceAttachmentOriginZone,
   sourceActionId: string,
-  options: {
-    attachment_kind?: string;
-    phase?: string;
-    action_kind?: string;
-    destination_index?: number | null;
-    source_owner_seat?: 1 | 2;
-    effect_flags?: Record<string, unknown>;
-  } = {},
+  options: RuntimeV02EssenceAttachmentRouteOptions = {},
 ): RuntimeV02ExternalEssenceAttachmentRoute {
   const controller = seat(controllerSeat, "tcg_v0_2_attachment_route_controller_seat_invalid");
 
@@ -217,62 +327,18 @@ export function runtimeV02BeginExternalEssenceAttachmentRoute(
     };
   }
 
-  const currentTurn = turn(state);
-  const targetField = target(state, controller, targetCreatureUid);
-  if (options.destination_index !== undefined && options.destination_index !== targetField.index) {
-    throw new Error("tcg_v0_2_attachment_route_destination_index_mismatch");
-  }
-  const sourceOwner = options.source_owner_seat == null
-    ? controller
-    : seat(options.source_owner_seat, "tcg_v0_2_attachment_route_source_owner_seat_invalid");
-  const zone = sourceZone(state, sourceOwner, originZone);
-  const sourceUid = text(sourceCardOrUid, "tcg_v0_2_attachment_route_source_uid_required");
-  const sourceIndex = zone.findIndex((item) => item?.uid === sourceUid);
-  if (sourceIndex < 0) throw new Error("tcg_v0_2_attachment_route_source_missing");
-  const source = zone[sourceIndex];
-  if (!source?.card_id) throw new Error("tcg_v0_2_attachment_route_source_instance_invalid");
-  if (targetField.creature.essence.some((item) => item.uid === sourceUid)) {
-    throw new Error("tcg_v0_2_attachment_route_source_already_attached");
-  }
-  validateEssenceDefinition(state, source);
-
-  // Validate lifecycle shape against a clone before mutating canonical zones.
-  const lifecycleProbe = structuredClone(source);
-  const lifecycleRegistered = registerStructuredRuntimeEssenceAttachmentLifecycleState(
-    state,
-    lifecycleProbe,
-    currentTurn,
-  );
-
-  const attached = zone.splice(sourceIndex, 1)[0];
-  attached.attached_turn = currentTurn;
-  if (options.effect_flags != null) {
-    attached.effect_flags = {
-      ...(attached.effect_flags || {}),
-      ...structuredClone(options.effect_flags),
-    };
-  }
-  registerStructuredRuntimeEssenceAttachmentLifecycleState(state, attached, currentTurn);
-  targetField.creature.essence.push(attached);
-
-  const { receipt, listenerEvent } = receiptAndEvent(
+  const transaction = runtimeV02ApplyEssenceAttachmentTransaction(
     state,
     controller,
     targetCreatureUid,
-    attached,
+    sourceCardOrUid,
     originZone,
     sourceActionId,
-    {
-      ...options,
-      destination_index: targetField.index,
-    },
+    options,
   );
-  const flow = runtimeV02BeginEventListenerContinuation(state, [listenerEvent]);
+  const flow = runtimeV02BeginEventListenerContinuation(state, [transaction.listener_event]);
   return {
-    receipt: { ...receipt },
-    listener_event: structuredClone(listenerEvent),
+    ...transaction,
     flow,
-    attached_card: attached,
-    lifecycle_registered: lifecycleRegistered,
   };
 }
