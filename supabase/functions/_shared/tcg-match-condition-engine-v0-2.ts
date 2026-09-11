@@ -115,23 +115,26 @@ export function clearRuntimeCondition(
   condition: string,
 ): boolean {
   const current = runtimeConditions(creature);
+  let cleared = false;
   if (condition === "Scorched" && current.scorched) {
     current.scorched = false;
-    return true;
-  }
-  if (condition === "Venomed" && current.venomed > 0) {
+    cleared = true;
+  } else if (condition === "Venomed" && current.venomed > 0) {
     current.venomed = 0;
-    return true;
-  }
-  if (current.control === condition) {
+    cleared = true;
+  } else if (current.control === condition) {
     current.control = null;
-    return true;
-  }
-  if (current.modifier === condition) {
+    cleared = true;
+  } else if (current.modifier === condition) {
     current.modifier = null;
-    return true;
+    cleared = true;
   }
-  return false;
+  if (cleared) {
+    // Compatibility shadow only. Canonical condition state is `conditions`,
+    // but older match snapshots can still carry the former scalar field.
+    creature.condition = null;
+  }
+  return cleared;
 }
 
 function activeConditionImmunity(
