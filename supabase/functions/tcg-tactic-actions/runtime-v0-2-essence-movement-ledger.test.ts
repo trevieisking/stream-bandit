@@ -1,4 +1,5 @@
 import {
+  applyRuntimeV02EssenceTransfer,
   recordRuntimeV02EssenceMovement,
   runtimeV02CurrentTurnEssenceMovements,
 } from "../_shared/tcg-match-essence-movement-v0-2.ts";
@@ -83,6 +84,93 @@ Deno.test("Essence-movement ledger records exact current-turn public movement me
       source_action_id: "tactic:tide-marina-wayfinder",
     }],
   );
+});
+
+Deno.test("Essence-movement owner atomically transfers one exact attachment and records its receipt", () => {
+  const state = legacyState(12);
+  const moved = { uid: "essence-1", card_id: "tide-basic-tide-essence", attached_turn: 4 };
+  const source = [moved, { uid: "essence-2", card_id: "volt-basic-volt-essence" }];
+  const destination = [{ uid: "essence-3", card_id: "tide-basic-tide-essence" }];
+
+  const resolved = applyRuntimeV02EssenceTransfer(
+    state,
+    1,
+    "source-creature",
+    "destination-creature",
+    source,
+    destination,
+    "essence-1",
+    "tactic:tide-marina-wayfinder",
+  );
+
+  assertEquals(resolved.essence, moved, "exact Essence instance must be preserved");
+  assertJsonEquals(source.map((item) => item.uid), ["essence-2"]);
+  assertJsonEquals(destination.map((item) => item.uid), ["essence-3", "essence-1"]);
+  assertJsonEquals(resolved.movement, {
+    turn_seq: 12,
+    controller_seat: 1,
+    source_creature_uid: "source-creature",
+    destination_creature_uid: "destination-creature",
+    essence_uid: "essence-1",
+    element: "Tide",
+    source_action_id: "tactic:tide-marina-wayfinder",
+  });
+  assertJsonEquals(runtimeV02CurrentTurnEssenceMovements(state, 1), [resolved.movement]);
+});
+
+Deno.test("Essence-movement owner fails closed before attachment mutation", () => {
+  const state = legacyState(14);
+  const source = [{ uid: "essence-1", card_id: "missing-essence-definition" }];
+  const destination = [{ uid: "essence-2", card_id: "volt-basic-volt-essence" }];
+  const sourceBefore = JSON.stringify(source);
+  const destinationBefore = JSON.stringify(destination);
+
+  assertThrows(
+    () => applyRuntimeV02EssenceTransfer(
+      state,
+      1,
+      "source-creature",
+      "destination-creature",
+      source,
+      destination,
+      "essence-1",
+      "tactic:test",
+    ),
+    "tcg_v0_2_essence_movement_essence_definition_required:missing-essence-definition",
+  );
+  assertEquals(JSON.stringify(source), sourceBefore);
+  assertEquals(JSON.stringify(destination), destinationBefore);
+  assertJsonEquals(runtimeV02CurrentTurnEssenceMovements(state, 1), []);
+});
+
+Deno.test("Essence-movement owner rejects a replayed receipt without moving the attachment", () => {
+  const state = legacyState(15);
+  const source = [{ uid: "essence-1", card_id: "tide-basic-tide-essence" }];
+  const destination: Array<{ uid: string; card_id: string }> = [];
+  recordRuntimeV02EssenceMovement(
+    state,
+    1,
+    "source-creature",
+    "destination-creature",
+    source[0],
+    "tactic:test",
+  );
+
+  assertThrows(
+    () => applyRuntimeV02EssenceTransfer(
+      state,
+      1,
+      "source-creature",
+      "destination-creature",
+      source,
+      destination,
+      "essence-1",
+      "tactic:test",
+    ),
+    "tcg_v0_2_essence_transfer_receipt_already_exists",
+  );
+  assertJsonEquals(source.map((item) => item.uid), ["essence-1"]);
+  assertJsonEquals(destination, []);
 });
 
 Deno.test("Essence-movement ledger de-duplicates the same applied move", () => {

@@ -10,6 +10,11 @@ export type RuntimeV02EssenceMovement = {
   source_action_id: string;
 };
 
+export type RuntimeV02EssenceTransferResult<T> = {
+  essence: T;
+  movement: RuntimeV02EssenceMovement;
+};
+
 const LEDGER_KEY = "runtime_essence_movements_v0_2";
 
 function objectRecord(value: unknown): Record<string, unknown> | null {
@@ -136,6 +141,91 @@ export function recordRuntimeV02EssenceMovement(
   }
   state[LEDGER_KEY] = current.map((entry) => ({ ...entry }));
   return current.map((entry) => ({ ...entry }));
+}
+
+export function applyRuntimeV02EssenceTransfer<T extends { uid: string; card_id: string }>(
+  state: Record<string, unknown>,
+  controllerSeat: 1 | 2,
+  sourceCreatureUid: string,
+  destinationCreatureUid: string,
+  sourceEssenceZone: T[],
+  destinationEssenceZone: T[],
+  essenceUid: string,
+  sourceActionId: string,
+): RuntimeV02EssenceTransferResult<T> {
+  if (!Array.isArray(sourceEssenceZone) || !Array.isArray(destinationEssenceZone)) {
+    throw new Error("tcg_v0_2_essence_transfer_zones_invalid");
+  }
+  if (sourceEssenceZone === destinationEssenceZone) {
+    throw new Error("tcg_v0_2_essence_transfer_same_zone");
+  }
+
+  const currentTurn = turnSeq(state);
+  const controller = seat(controllerSeat);
+  const source = nonEmpty(sourceCreatureUid, "tcg_v0_2_essence_movement_source_required");
+  const destination = nonEmpty(destinationCreatureUid, "tcg_v0_2_essence_movement_destination_required");
+  if (source === destination) throw new Error("tcg_v0_2_essence_movement_same_creature");
+  const requestedUid = nonEmpty(essenceUid, "tcg_v0_2_essence_transfer_essence_uid_required");
+  const action = nonEmpty(sourceActionId, "tcg_v0_2_essence_movement_source_action_required");
+
+  const sourceIndexes = sourceEssenceZone.reduce<number[]>((out, item, index) => {
+    if (item?.uid === requestedUid) out.push(index);
+    return out;
+  }, []);
+  if (sourceIndexes.length === 0) throw new Error("tcg_v0_2_essence_transfer_source_missing");
+  if (sourceIndexes.length > 1) throw new Error("tcg_v0_2_essence_transfer_source_ambiguous");
+  if (destinationEssenceZone.some((item) => item?.uid === requestedUid)) {
+    throw new Error("tcg_v0_2_essence_transfer_destination_duplicate");
+  }
+
+  const sourceIndex = sourceIndexes[0];
+  const essence = sourceEssenceZone[sourceIndex];
+  const instance = objectRecord(essence);
+  const actualUid = nonEmpty(instance?.uid, "tcg_v0_2_essence_movement_essence_uid_required");
+  if (actualUid !== requestedUid) throw new Error("tcg_v0_2_essence_transfer_source_identity_changed");
+
+  // Validate the complete receipt against an isolated ledger before mutating either attachment array.
+  // This keeps malformed state, missing definitions and replayed receipts fail-closed with zero movement.
+  const currentLedger = ledger(state);
+  if (currentLedger.some((entry) =>
+    entry.turn_seq === currentTurn &&
+    entry.controller_seat === controller &&
+    entry.source_creature_uid === source &&
+    entry.destination_creature_uid === destination &&
+    entry.essence_uid === requestedUid &&
+    entry.source_action_id === action
+  )) {
+    throw new Error("tcg_v0_2_essence_transfer_receipt_already_exists");
+  }
+  const validationState: Record<string, unknown> = {
+    ...state,
+    [LEDGER_KEY]: currentLedger.map((entry) => ({ ...entry })),
+  };
+  const validated = recordRuntimeV02EssenceMovement(
+    validationState,
+    controller,
+    source,
+    destination,
+    essence,
+    action,
+  );
+  const movement = validated.find((entry) =>
+    entry.controller_seat === controller &&
+    entry.source_creature_uid === source &&
+    entry.destination_creature_uid === destination &&
+    entry.essence_uid === requestedUid &&
+    entry.source_action_id === action
+  );
+  if (!movement) throw new Error("tcg_v0_2_essence_transfer_receipt_missing");
+  const validatedLedger = validationState[LEDGER_KEY];
+  if (!Array.isArray(validatedLedger)) throw new Error("tcg_v0_2_essence_transfer_ledger_missing");
+
+  const moved = sourceEssenceZone.splice(sourceIndex, 1)[0];
+  if (moved !== essence) throw new Error("tcg_v0_2_essence_transfer_source_identity_changed");
+  destinationEssenceZone.push(moved);
+  state[LEDGER_KEY] = validatedLedger.map((entry) => ({ ...(entry as Record<string, unknown>) }));
+
+  return { essence: moved, movement: { ...movement } };
 }
 
 export function runtimeV02CurrentTurnEssenceMovements(
