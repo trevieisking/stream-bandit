@@ -1,4 +1,8 @@
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import {
+  runtimeV02ApplyCardZoneTransfer,
+  type RuntimeV02CardZoneInstance,
+} from "./tcg-match-card-zone-engine-v0-2.ts";
 
 type RuntimeInst = { uid: string; card_id: string };
 
@@ -241,8 +245,8 @@ export function runtimeV02ResolveAfterDamageServerTopDeckConditionalMove(
     "tcg_v0_2_attack_server_top_deck_source_vanguard_changed",
   );
 
-  const deck = player.deck as unknown[];
-  const hand = player.hand as unknown[];
+  const deck = player.deck as RuntimeV02CardZoneInstance[];
+  const hand = player.hand as RuntimeV02CardZoneInstance[];
   if (deck.length === 0) {
     return { attack_id: descriptor.attack_id, inspected_count: 0, matched: false, moved_count: 0 };
   }
@@ -251,7 +255,26 @@ export function runtimeV02ResolveAfterDamageServerTopDeckConditionalMove(
   const topDefinition = runtimeV02Definition(state, topCard);
   if (!topDefinition) throw new Error("tcg_v0_2_attack_server_top_deck_top_definition_required");
   const matched = String(topDefinition.element || "") === descriptor.match_filters.element;
-  if (matched) hand.push(deck.shift());
+  if (matched) {
+    runtimeV02ApplyCardZoneTransfer(deck, hand, {
+      cause: "effect",
+      action_kind: "attack",
+      source_action_id: descriptor.attack_id,
+      source_card_uid: source.uid,
+      source: {
+        controller_seat: seat,
+        zone: "deck",
+        owner_card_uid: null,
+      },
+      destination: {
+        controller_seat: seat,
+        zone: "hand",
+        owner_card_uid: null,
+      },
+      card_uids: [topCard.uid],
+      destination_position: "bottom",
+    });
+  }
   return {
     attack_id: descriptor.attack_id,
     inspected_count: 1,
