@@ -1,4 +1,7 @@
-import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
+import {
+  runtimeV02ApplyEssenceAttachmentTransaction,
+  runtimeV02BeginExternalEssenceAttachmentRoute,
+} from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { runtimeV02CurrentTurnEssenceAttachmentEvents } from "../_shared/tcg-match-essence-attachment-event-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, message = "values differ"): void {
@@ -200,7 +203,37 @@ Deno.test("external attachment route preserves effect-driven attachment metadata
   equal(result.listener_event.action_kind, "effect_driven");
 });
 
-Deno.test("UID transaction path owns source removal, exact-instance attachment, lifecycle metadata and event dispatch", () => {
+Deno.test("transaction-only attachment owner mutates once and returns an event without starting a second continuation", () => {
+  const match = state({ preAttached: false, sourceZone: "hand" });
+  const player = (match.players as any)["1"];
+  const exactSource = player.hand[0];
+  const result = runtimeV02ApplyEssenceAttachmentTransaction(
+    match,
+    1,
+    "target-uid",
+    "essence-uid",
+    "hand",
+    "listener:test",
+    {
+      attachment_kind: "normal",
+      phase: "play",
+      action_kind: "listener_attachment",
+    },
+  );
+
+  equal(player.hand.length, 0);
+  equal(player.vanguard.essence.length, 1);
+  equal(player.vanguard.essence[0], exactSource);
+  equal(player.vanguard.essence[0].attached_turn, 9);
+  equal(result.attached_card, exactSource);
+  equal(result.listener_event.event, "essence_attached");
+  equal(result.listener_event.action_kind, "listener_attachment");
+  equal(player.vanguard.damage, 30, "transaction-only operation must not interpret the event itself");
+  equal((match as any).runtime_v0_2_event_listener_continuation, undefined);
+  equal((match as any).pending_event_listener_choice, undefined);
+});
+
+Deno.test("UID external route owns source removal, exact-instance attachment, lifecycle metadata and event dispatch", () => {
   const match = state({ preAttached: false, sourceZone: "hand" });
   const player = (match.players as any)["1"];
   const exactSource = player.hand[0];
@@ -257,6 +290,28 @@ Deno.test("UID transaction path resolves discard source and applies caller-decla
   equal(result.receipt.attachment_kind, "effect_generated");
   equal(player.vanguard.essence[0].effect_flags.discard_during_target_aftermath, true);
   equal(player.vanguard.essence[0].effect_flags.attachment_kind, "effect_generated");
+});
+
+Deno.test("transaction preflight fails before source mutation when listener-event metadata is invalid", () => {
+  const match = state({ preAttached: false, sourceZone: "hand" });
+  const player = (match.players as any)["1"];
+  const exactSource = player.hand[0];
+  throws(
+    () => runtimeV02ApplyEssenceAttachmentTransaction(
+      match,
+      1,
+      "target-uid",
+      "essence-uid",
+      "hand",
+      "manual_essence",
+      { attachment_kind: "normal", phase: "play", action_kind: "" },
+    ),
+    "tcg_v0_2_attachment_listener_action_kind_invalid",
+  );
+  equal(player.hand.length, 1);
+  equal(player.hand[0], exactSource);
+  equal(player.vanguard.essence.length, 0);
+  equal(runtimeV02CurrentTurnEssenceAttachmentEvents(match, 1).length, 0);
 });
 
 Deno.test("UID transaction path fails before source mutation when identity is stale", () => {
