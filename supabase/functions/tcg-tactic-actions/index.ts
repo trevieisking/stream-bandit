@@ -202,7 +202,7 @@ function countRange(raw: any) {
   if (typeof raw === "number") return { min: raw, max: raw };
   return {
     min: Math.max(0, Number(raw?.min || 0)),
-    max: Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(raw?.max || 0))),
+    max: Math.max(0, Number(raw?.max || 0)),
   };
 }
 function choiceBounds(raw: any, optionCount: number, hiddenSearchCanFail = false) {
