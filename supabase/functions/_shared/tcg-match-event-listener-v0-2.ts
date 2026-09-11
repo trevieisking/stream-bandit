@@ -7,15 +7,9 @@ import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
 import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
-import {
-  applyRuntimeV02AttachmentAttackDamageModifier,
-  registerStructuredRuntimeEssenceAttachmentLifecycleState,
-} from "./tcg-match-surge-lifecycle-v0-2.ts";
-import {
-  recordRuntimeV02EssenceAttachmentEvent,
-  runtimeV02CreateEssenceAttachedEvent,
-  type RuntimeV02EssenceAttachedListenerEvent,
-} from "./tcg-match-essence-attachment-event-v0-2.ts";
+import { applyRuntimeV02AttachmentAttackDamageModifier } from "./tcg-match-surge-lifecycle-v0-2.ts";
+import type { RuntimeV02EssenceAttachedListenerEvent } from "./tcg-match-essence-attachment-event-v0-2.ts";
+import { runtimeV02ApplyEssenceAttachmentTransaction } from "./tcg-match-essence-attachment-engine-v0-2.ts";
 import {
   runtimeV02BuildEssenceAttachedTriggerPlan,
   type RuntimeV02EssenceAttachedCandidateDescriptor,
@@ -2288,35 +2282,26 @@ export function runtimeV02ResolveEventListenerChoice(
       if (ref.zone !== "hand" && ref.zone !== "discard") {
         throw new Error("tcg_v0_2_event_listener_attachment_zone_unsupported");
       }
-      const inst = removeCardRef(state, ref);
-      inst.attached_turn = currentTurn(state);
-      if (attachmentState) {
-        inst.effect_flags = {
-          ...(inst.effect_flags || {}),
-          discard_during_target_aftermath: true,
-        };
-      }
-      target.cr.essence.push(inst);
-      registerStructuredRuntimeEssenceAttachmentLifecycleState(
-        state,
-        inst,
-        currentTurn(state),
-      );
-      const receipt = recordRuntimeV02EssenceAttachmentEvent(
+      const transaction = runtimeV02ApplyEssenceAttachmentTransaction(
         state,
         candidate.seat,
         target.top.uid,
-        inst,
+        ref.uid,
         ref.zone,
         listenerId(candidate),
-        attachmentState ? String(attachmentState.kind) : "normal",
+        {
+          attachment_kind: attachmentState ? String(attachmentState.kind) : "normal",
+          phase: work.event.phase,
+          action_kind: "effect_driven",
+          destination_index: target.where === "reserve" ? target.index : null,
+          source_owner_seat: ref.zone_owner_seat,
+          source_card_id: ref.card_id,
+          effect_flags: attachmentState
+            ? { discard_during_target_aftermath: true }
+            : undefined,
+        },
       );
-      const nestedEvent = runtimeV02CreateEssenceAttachedEvent(receipt, {
-        phase: work.event.phase,
-        action_kind: "effect_driven",
-        destination_index: target.where === "reserve" ? target.index : null,
-      });
-      continuation.work.push(...essenceAttachedWorkItems(state, nestedEvent));
+      continuation.work.push(...essenceAttachedWorkItems(state, transaction.listener_event));
     }
     continuation.step_cursor++;
   } else if (pending.kind === "inspect_rewards") {
