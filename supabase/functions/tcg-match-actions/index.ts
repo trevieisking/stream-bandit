@@ -22,6 +22,7 @@ import { runtimeV02BeginEventListenerContinuation, runtimeV02CreateCreatureEnter
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { runtimeV02ResolveAttackControlCondition, runtimeV02ResolveConditionAftermath } from "../_shared/tcg-match-condition-lifecycle-v0-2.ts";
 import { runtimeV02ResolveAttackTarget, type RuntimeV02AttackTargetPermission } from "../_shared/tcg-match-attack-v0-2.ts";
+import { runtimeV02UniformRandomInt } from "../_shared/tcg-match-randomization-engine-v0-2.ts";
 import { addRuntimeShield, healRuntimeDamage, placeRuntimeDamage } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 
 const VERSION="Stream Bandit TCG match actions v0.3";
@@ -53,7 +54,7 @@ function hasCondition(cr:Cr,c?:string){const q=conditions(cr);if(c==="Scorched")
 function isEvolved(d:any){return ["Teen","Adult"].includes(String(d?.stage||""))}
 function essenceProvides(d:any){return String(d?.element||"")}
 function randomCodeSafe(){return crypto.randomUUID()}
-function coin(){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%2===0?"heads":"tails"}
+function coin(){return runtimeV02UniformRandomInt(2)===0?"heads":"tails"}
 function maxHp(cr:Cr,s:any){return Math.max(0,Number(top(cr,s)?.hp||0))}
 function rewardValue(cr:Cr,s:any){const d=top(cr,s);const explicit=Number(d?.reward_value);if(Number.isFinite(explicit)&&explicit>0)return explicit;if(String(d?.form||d?.class||"")==="Titan"||String(d?.stage||"")==="Titan")return 3;if(String(d?.stage||"")==="Mythic"||(Array.isArray(d?.traits)&&d.traits.includes("Mythic")))return 2;return 1}
 function parseAttack(raw:string):ParsedAttack|null{const t=String(raw||"").trim();if(!t)return null;let cost="",name="",damage=0,effect="",starbound=false;let m=t.match(/^Starbound Power — ([^:]+):\s*(.*?) — (\d+)(?:;\s*(.*))?$/);if(m){starbound=true;name=m[1].trim();cost=m[2].trim();damage=Number(m[3]);effect=String(m[4]||"").trim()}else{m=t.match(/^(.*?) — (.*?) — (\d+)(?:;\s*(.*))?$/);if(!m)return null;cost=m[1].trim();name=m[2].trim();damage=Number(m[3]);effect=String(m[4]||"").trim()}const typed:Record<string,number>={};let any=0;for(const part of cost.split("+").map(x=>x.trim()).filter(Boolean)){const cm=part.match(/^(\d+)\s+([A-Za-z]+)$/);if(!cm)return null;const n=Number(cm[1]),e=cm[2];if(e.toLowerCase()==="any")any+=n;else typed[e]=(typed[e]||0)+n}return{name,raw:t,typed,any,damage,effect,starbound}}
@@ -343,7 +344,7 @@ Deno.serve(async(req)=>{
     throw error
    }
    if(attackControl.target_mode==="random_all_creatures"){
-    resolvedTarget=runtimeV02ResolveAttackTarget(seat as 1|2,targetPermissions,battlefield,declaredReserveIndex,attackControl.target_mode,poolSize=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%poolSize});
+    resolvedTarget=runtimeV02ResolveAttackTarget(seat as 1|2,targetPermissions,battlefield,declaredReserveIndex,attackControl.target_mode,poolSize=>runtimeV02UniformRandomInt(poolSize));
    }
    const targetSeat=resolvedTarget.seat,targetWhere=resolvedTarget.where,targetIndex=resolvedTarget.index,target=resolvedTarget.creature;
    if(resolvedTarget.randomized)randoms.push({condition:"Blinded",target_seat:targetSeat,target_where:targetWhere,target_index:targetIndex});
