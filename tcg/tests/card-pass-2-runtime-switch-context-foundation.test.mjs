@@ -8,6 +8,8 @@ import { buildSetOneRegistry } from '../../tcg-set-one-registry-builder-v0.2.mjs
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
 const owner = fs.readFileSync(path.join(root, 'supabase/functions/_shared/tcg-match-switch-context-v0-2.ts'), 'utf8');
+const paymentOwner = fs.readFileSync(path.join(root, 'supabase/functions/_shared/tcg-match-payment-v0-2.ts'), 'utf8');
+const withdrawalTransaction = fs.readFileSync(path.join(root, 'supabase/functions/_shared/tcg-match-withdrawal-transaction-v0-2.ts'), 'utf8');
 const match = fs.readFileSync(path.join(root, 'supabase/functions/tcg-match-actions/index.ts'), 'utf8');
 const tactic = fs.readFileSync(path.join(root, 'supabase/functions/tcg-tactic-actions/index.ts'), 'utf8');
 const amendment = fs.readFileSync(path.join(root, 'tcg-card-pass-2-schema-amendment-h.md'), 'utf8');
@@ -15,6 +17,13 @@ const capabilities = JSON.parse(fs.readFileSync(path.join(root, 'tcg-runtime-cap
 
 function findCard(registry, cardId) {
   return registry.definitions.find((entry) => entry.card_id === cardId)?.definition || null;
+}
+
+function functionSlice(source, start, end) {
+  const from = source.indexOf(start);
+  const to = source.indexOf(end, from);
+  assert.ok(from >= 0 && to > from, `missing source block: ${start}`);
+  return source.slice(from, to);
 }
 
 test('atomic switch context owner is card-id-free and records the exact shared Amendment H switch identity', () => {
@@ -131,7 +140,7 @@ test('79b match and 79c tactic paths share atomic switch events while preserving
   assert.equal(match.includes('tcg-match-switch-context-v0-2.ts'), true, '79b match wiring must use the shared atomic switch owner');
   assert.equal(tactic.includes('tcg-match-switch-context-v0-2.ts'), true, '79c tactic wiring must use the same shared atomic switch owner');
   assert.equal(tactic.includes('tcg-match-movement-listener-v0-2.ts'), true, '79c tactic wiring must use the shared movement listener continuation');
-  assert.ok(match.includes('runtimeV02ApplyAtomicSwitch(s,seat,idx,{action_kind:"voluntary_withdrawal"'), 'voluntary withdrawal must use the atomic switch owner');
+  assert.ok(match.includes('runtimeV02ApplyWithdrawalPaymentAndSwitch(s,seat as 1|2,idx,p.vanguard.essence,p.discard,uids,cost)'), 'voluntary withdrawal must use the accepted Payment + Atomic Switch transaction');
   assert.ok(match.includes('runtimeV02ApplyAtomicSwitch(s,seat,switchIndex,{action_kind:"attack"'), 'post-attack switch must use the atomic switch owner');
   assert.equal(match.includes('function switchWithReserve('), false, 'old direct match swap helper must not remain as a competing owner');
   assert.equal(tactic.includes('function switchWithVanguard('), false, '79c must remove the competing direct tactic swap helper');
@@ -163,6 +172,46 @@ test('79b match and 79c tactic paths share atomic switch events while preserving
   assert.equal(tacticView.includes('runtime_v0_2_switch_ledger'), false, 'private switch ledger must never enter tactic player views');
   assert.ok(tacticView.includes('runtimeV02PendingMovementListenerChoiceView'), 'tactic view must expose only the seat-filtered movement choice');
   assert.ok(tacticView.includes('runtimeV02PrivateMovementInspectionView'), 'tactic view must expose only the seat-filtered movement inspection');
+});
+
+test('Withdrawal dispatcher cannot regain attached-Essence payment or direct switch authority', () => {
+  assert.ok(match.includes('import { runtimeV02ApplyWithdrawalPaymentAndSwitch } from "../_shared/tcg-match-withdrawal-transaction-v0-2.ts";'));
+  const block = functionSlice(
+    match,
+    '  if(action==="withdraw"){',
+    '  if(action==="end_turn"){',
+  );
+
+  assert.ok(block.includes('runtimeV02ApplyWithdrawalPaymentAndSwitch('));
+  assert.ok(block.includes('const switched=transaction.switched'));
+  assert.ok(block.includes('message==="tcg_v0_2_payment_exact_amount_required"'));
+  assert.ok(block.includes('error:"exact_withdrawal_essence_payment_required",cost'));
+  assert.ok(block.includes('message.startsWith("tcg_v0_2_payment_source_missing:")'));
+  assert.ok(block.includes('error:"withdrawal_payment_not_attached"'));
+  assert.ok(block.includes('runtimeV02BeginMovementListenerContinuation(s,switched.events)'));
+  assert.ok(block.includes('runtimeV02BeginMovementHealListenerContinuation(s,movementFlow.emitted_heal_packet_ids'));
+
+  for (const forbidden of [
+    'new Set(uids)',
+    'p.vanguard.essence.some(',
+    'p.vanguard.essence.findIndex(',
+    'p.vanguard.essence.splice(',
+    'p.discard.push(p.vanguard.essence',
+    'runtimeV02ApplyAtomicSwitch(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `Withdrawal dispatcher regained owner authority: ${forbidden}`);
+  }
+
+  const switchPreflightAt = withdrawalTransaction.indexOf('runtimeV02PreflightAtomicSwitch(');
+  const paymentPreflightAt = withdrawalTransaction.indexOf('runtimeV02ValidateAttachedEssencePayment(');
+  const paymentApplyAt = withdrawalTransaction.indexOf('runtimeV02ApplyAttachedEssencePayment(');
+  const switchApplyAt = withdrawalTransaction.indexOf('runtimeV02ApplyAtomicSwitch(');
+  assert.ok(switchPreflightAt >= 0 && paymentPreflightAt > switchPreflightAt);
+  assert.ok(paymentApplyAt > paymentPreflightAt && switchApplyAt > paymentApplyAt);
+  assert.ok(paymentOwner.includes('const [essence] = sourceEssence.splice(index, 1)'));
+  assert.ok(paymentOwner.includes('discard.push(essence)'));
+  assert.equal(withdrawalTransaction.includes('sourceEssence.splice('), false);
+  assert.equal(withdrawalTransaction.includes('discard.push('), false);
 });
 
 test('switch foundation does not falsely claim listener or full runtime parity', () => {
