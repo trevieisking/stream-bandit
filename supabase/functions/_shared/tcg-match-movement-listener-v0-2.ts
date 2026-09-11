@@ -2,7 +2,7 @@ import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 import { runtimeV02SwitchContextById, type RuntimeV02SwitchMovementEvent } from "./tcg-match-switch-context-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
-import { recordRuntimeV02EssenceMovement, type RuntimeV02EssenceMovement } from "./tcg-match-essence-movement-v0-2.ts";
+import { applyRuntimeV02EssenceTransfer, type RuntimeV02EssenceMovement } from "./tcg-match-essence-movement-v0-2.ts";
 import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
 import {
   runtimeV02CurrentTurnEssenceAttachmentEvents,
@@ -355,18 +355,20 @@ function buildMoveEssenceOptions(state: Record<string, unknown>, candidate: Cand
   return options;
 }
 function range(raw: unknown): { min: number; max: number } { if (typeof raw === "number") return { min: raw, max: raw }; const r = O(raw) || {}; return { min: Math.max(0, Number(r.min || 0)), max: Math.max(0, Number(r.max || 0)) }; }
-function recordedEssenceMovement(state: Record<string, unknown>, controllerSeat: 1 | 2, source: Field, destination: Field, essence: Inst, sourceActionId: string): RuntimeV02EssenceMovedEvent {
-  const movements = recordRuntimeV02EssenceMovement(state, controllerSeat, source.top.uid, destination.top.uid, essence, sourceActionId);
-  const movement = movements.find((entry) => entry.controller_seat === controllerSeat && entry.source_creature_uid === source.top.uid && entry.destination_creature_uid === destination.top.uid && entry.essence_uid === essence.uid && entry.source_action_id === sourceActionId);
-  if (!movement) throw new Error("tcg_v0_2_movement_listener_essence_movement_receipt_missing");
-  return runtimeV02CreateEssenceMovedEvent(movement);
-}
 function applyMoveEssenceChoice(state: Record<string, unknown>, candidate: Candidate, selected: Array<{ data: Record<string, unknown> }>, sourceActionId: string): RuntimeV02EssenceMovedEvent[] {
   const events: RuntimeV02EssenceMovedEvent[] = [];
   for (const option of selected) {
     const source = fieldFromRef(state, option.data.source as unknown as CreatureRef); const destination = fieldFromRef(state, option.data.destination as unknown as CreatureRef); if (!source || !destination) throw new Error("tcg_v0_2_movement_listener_essence_move_creature_stale");
-    const uid = S(option.data.essence_uid, "tcg_v0_2_movement_listener_essence_move_uid_invalid"); const index = source.cr.essence.findIndex((item) => item.uid === uid); if (index < 0) throw new Error("tcg_v0_2_movement_listener_essence_move_source_stale"); const essence = source.cr.essence.splice(index, 1)[0]; destination.cr.essence.push(essence);
-    events.push(recordedEssenceMovement(state, candidate.seat, source, destination, essence, sourceActionId));
+    const uid = S(option.data.essence_uid, "tcg_v0_2_movement_listener_essence_move_uid_invalid");
+    let transferred;
+    try {
+      transferred = applyRuntimeV02EssenceTransfer(state, candidate.seat, source.top.uid, destination.top.uid, source.cr.essence, destination.cr.essence, uid, sourceActionId);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message === "tcg_v0_2_essence_transfer_source_missing") throw new Error("tcg_v0_2_movement_listener_essence_move_source_stale");
+      throw error;
+    }
+    events.push(runtimeV02CreateEssenceMovedEvent(transferred.movement));
   }
   return events;
 }
