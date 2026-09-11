@@ -5,6 +5,7 @@ import fs from 'node:fs';
 const engine = fs.readFileSync('supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts', 'utf8');
 const overcharge = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts', 'utf8');
 const recycle = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-discard-recycle-choice-v0-2.ts', 'utf8');
+const serverTop = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-server-top-deck-v0-2.ts', 'utf8');
 const match = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
 
 function functionSlice(source, start, end) {
@@ -131,5 +132,33 @@ test('structured discard recycle keeps attack choice authority while delegating 
     'deck.push(',
   ]) {
     assert.equal(block.includes(forbidden), false, `Discard recycle regained Card-Zone mutation authority: ${forbidden}`);
+  }
+});
+
+test('server-only top-deck attack keeps inspection authority while delegating deck-top to hand movement to Card-Zone', () => {
+  const start = serverTop.indexOf('export function runtimeV02ResolveAfterDamageServerTopDeckConditionalMove(');
+  assert.notEqual(start, -1, 'missing server top-deck resolver');
+  const block = serverTop.slice(start);
+  const inspectAt = block.indexOf('const topCard = runtimeInst(deck[0]');
+  const matchAt = block.indexOf('const matched = String(topDefinition.element');
+  const moveAt = block.indexOf('runtimeV02ApplyCardZoneTransfer(');
+  assert.ok(inspectAt >= 0 && matchAt > inspectAt && moveAt > matchAt, 'server inspection/filtering must remain before Card-Zone movement');
+  assert.ok(block.includes('descriptor.inspect.visibility !== "server_only"'));
+  assert.ok(block.includes('runtimeV02Definition(state, topCard)'));
+  assert.ok(block.includes('cause: "effect"'));
+  assert.ok(block.includes('action_kind: "attack"'));
+  assert.ok(block.includes('source_action_id: descriptor.attack_id'));
+  assert.ok(block.includes('source_card_uid: source.uid'));
+  assert.ok(block.includes('zone: "deck"'));
+  assert.ok(block.includes('zone: "hand"'));
+  assert.ok(block.includes('card_uids: [topCard.uid]'));
+  assert.ok(block.includes('destination_position: "bottom"'));
+
+  for (const forbidden of [
+    'hand.push(',
+    'deck.shift(',
+    'deck.splice(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `Server top-deck resolver regained Card-Zone mutation authority: ${forbidden}`);
   }
 });
