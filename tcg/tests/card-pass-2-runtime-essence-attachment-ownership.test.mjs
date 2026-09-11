@@ -6,6 +6,7 @@ const engine = fs.readFileSync('supabase/functions/_shared/tcg-match-essence-att
 const route = fs.readFileSync('supabase/functions/_shared/tcg-match-essence-attachment-route-v0-2.ts', 'utf8');
 const eventListener = fs.readFileSync('supabase/functions/_shared/tcg-match-event-listener-v0-2.ts', 'utf8');
 const tactic = fs.readFileSync('supabase/functions/tcg-tactic-actions/index.ts', 'utf8');
+const matchActions = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
 
 function functionSlice(source, start, end) {
   const from = source.indexOf(start);
@@ -87,5 +88,39 @@ test('Tactic discard attachment delegates external mutation and event dispatch t
     'runtimeV02CreateEssenceAttachedEvent(',
   ]) {
     assert.equal(block.includes(forbidden), false, `Tactic attachment path regained Attachment Engine authority: ${forbidden}`);
+  }
+});
+
+test('manual structured hand attachment delegates mutation and event dispatch to Attachment Route while legacy fallback stays isolated', () => {
+  assert.ok(matchActions.includes('import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";'));
+  assert.equal(
+    matchActions.includes('registerStructuredRuntimeEssenceAttachmentLifecycleState'),
+    false,
+    'Match Actions must not own structured Essence attachment lifecycle registration',
+  );
+
+  const block = functionSlice(
+    matchActions,
+    '  if(action==="attach_essence"){',
+    '  if(action==="attach_relic"){',
+  );
+  const legacyMutation = 'const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;';
+  const legacyAt = block.indexOf(legacyMutation);
+  assert.notEqual(legacyAt, -1, 'legacy fallback mutation must remain isolated until compatibility removal');
+
+  const structured = block.slice(0, legacyAt);
+  const routeAt = structured.indexOf('runtimeV02BeginExternalEssenceAttachmentRoute(');
+  const flagAt = structured.indexOf('flags.manual_essence_turn=turn;');
+  assert.notEqual(routeAt, -1, 'structured manual attachment must enter Attachment Route');
+  assert.ok(structured.includes('targetInst.uid,uid,"hand","manual_essence"'));
+  assert.ok(flagAt > routeAt, 'once-per-turn flag must be set only after the canonical attachment transaction succeeds');
+
+  for (const forbidden of [
+    'removeHand(p,uid)',
+    'x.attached_turn=turn',
+    'cr.essence.push(x)',
+    'registerStructuredRuntimeEssenceAttachmentLifecycleState(',
+  ]) {
+    assert.equal(structured.includes(forbidden), false, `manual structured path regained Attachment Engine authority: ${forbidden}`);
   }
 });
