@@ -588,7 +588,19 @@ function executeUntilChoice(state: any) {
     if (op === "DISCARD_HAND") {
       const seat = playerSeat(ownerSeat, step.player || "self", vars);
       const player = state.players[String(seat)];
-      player.discard.push(...player.hand.splice(0));
+      const discardUids = (player.hand as Inst[]).map((inst) => inst.uid);
+      if (discardUids.length > 0) {
+        runtimeV02ApplyCardZoneTransfer(player.hand as Inst[], player.discard as Inst[], {
+          cause: "effect",
+          action_kind: "tactic",
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source: { controller_seat: seat as 1 | 2, zone: "hand", owner_card_uid: null },
+          destination: { controller_seat: seat as 1 | 2, zone: "discard", owner_card_uid: null },
+          card_uids: discardUids,
+          destination_position: "bottom",
+        });
+      }
       effect.cursor++;
       continue;
     }
