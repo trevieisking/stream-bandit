@@ -234,3 +234,34 @@ test('tactic DRAW and DRAW_FIXED keep count/deckout authority while Card-Zone ow
     assert.equal(block.includes(forbidden), false, `Tactic draw regained Card-Zone mutation authority: ${forbidden}`);
   }
 });
+
+test('tactic DISCARD_HAND keeps target-player sequencing while Card-Zone owns whole-hand to discard movement', () => {
+  const block = functionSlice(
+    tactic,
+    'if (op === "DISCARD_HAND") {',
+    'if (op === "LOOK_TOP") {',
+  );
+
+  const seatAt = block.indexOf('const seat = playerSeat(ownerSeat, step.player || "self", vars);');
+  const snapshotAt = block.indexOf('const discardUids = (player.hand as Inst[]).map((inst) => inst.uid);');
+  const transferAt = block.indexOf('runtimeV02ApplyCardZoneTransfer(');
+  const cursorAt = block.indexOf('effect.cursor++;');
+  assert.ok(seatAt >= 0 && snapshotAt > seatAt && transferAt > snapshotAt, 'DISCARD_HAND must resolve target player and exact hand before Card-Zone movement');
+  assert.ok(cursorAt > transferAt, 'Tactic interpreter must retain sequencing after Card-Zone movement');
+  assert.ok(block.includes('if (discardUids.length > 0)'));
+  assert.ok(block.includes('cause: "effect"'));
+  assert.ok(block.includes('action_kind: "tactic"'));
+  assert.ok(block.includes('source_action_id: effect.id'));
+  assert.ok(block.includes('source_card_uid: effect.source_card.uid'));
+  assert.ok(block.includes('source: { controller_seat: seat as 1 | 2, zone: "hand", owner_card_uid: null }'));
+  assert.ok(block.includes('destination: { controller_seat: seat as 1 | 2, zone: "discard", owner_card_uid: null }'));
+  assert.ok(block.includes('card_uids: discardUids'));
+  assert.ok(block.includes('destination_position: "bottom"'));
+
+  for (const forbidden of [
+    'player.discard.push(',
+    'player.hand.splice(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `Tactic DISCARD_HAND regained Card-Zone mutation authority: ${forbidden}`);
+  }
+});
