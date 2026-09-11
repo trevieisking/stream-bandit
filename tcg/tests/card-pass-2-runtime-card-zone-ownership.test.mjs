@@ -302,3 +302,48 @@ test('tactic selected-hand choices keep choice legality and frozen identity whil
     assert.equal(block.includes(forbidden), false, `selected-hand resolver regained Card-Zone mutation authority: ${forbidden}`);
   }
 });
+
+test('tactic SEARCH_DECK keeps hidden/search choice authority while Card-Zone owns atomic selected deck-to-hand movement', () => {
+  const searchBlock = functionSlice(
+    tactic,
+    'if (op === "SEARCH_DECK") {',
+    'if (op === "SEARCH_DECK_GROUP") {',
+  );
+  assert.ok(searchBlock.includes('cardOptions(state, player.deck, step.selection?.filters, ownerSeat)'));
+  assert.ok(searchBlock.includes('choiceBounds(step.selection, options.length, true)'));
+  assert.ok(searchBlock.includes('recordRuntimeV02HiddenInformationView(state, seat as 1 | 2, "deck")'));
+  assert.ok(searchBlock.includes('reveal: step.reveal || null'));
+
+  const block = functionSlice(
+    tactic,
+    '} else if (apply === "search_deck") {',
+    '} else if (apply === "move_from_zone") {',
+  );
+  const preflightAt = block.indexOf('runtimeV02PreflightCardZoneTransfer(');
+  const identityAt = block.indexOf('current.card_id !== String(option.data.card_id)');
+  const commitAt = block.indexOf('runtimeV02CommitCardZoneTransfer(');
+  assert.ok(preflightAt >= 0 && identityAt > preflightAt, 'search result identity must be checked after Card-Zone preflight');
+  assert.ok(commitAt > identityAt, 'search movement must commit only after frozen identity validation');
+  assert.ok(block.includes('selected_deck_zone_seat_invalid'));
+  assert.ok(block.includes('tactic_search_destination_unsupported'));
+  assert.ok(block.includes('if (selected.length > 0)'));
+  assert.ok(block.includes('selected_deck_card_missing'));
+  assert.ok(block.includes('selected_deck_card_changed'));
+  assert.ok(block.includes('cause: "effect"'));
+  assert.ok(block.includes('action_kind: "tactic"'));
+  assert.ok(block.includes('source_action_id: effect.id'));
+  assert.ok(block.includes('source_card_uid: effect.source_card.uid'));
+  assert.ok(block.includes('source: { controller_seat: zoneSeat as 1 | 2, zone: "deck", owner_card_uid: null }'));
+  assert.ok(block.includes('destination: { controller_seat: zoneSeat as 1 | 2, zone: "hand", owner_card_uid: null }'));
+  assert.ok(block.includes('card_uids: selectedUids'));
+  assert.ok(block.includes('destination_position: "bottom"'));
+
+  for (const forbidden of [
+    'removeByUid(player.deck',
+    'player.deck.splice(',
+    'player.hand.push(',
+    'moveCardsToDestination(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `Tactic SEARCH_DECK regained Card-Zone mutation authority: ${forbidden}`);
+  }
+});
