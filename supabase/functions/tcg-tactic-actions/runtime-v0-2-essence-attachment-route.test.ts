@@ -149,12 +149,12 @@ function state(options: {
 }
 
 Deno.test("external attachment route composes canonical receipt, event and generic continuation", () => {
-  const match = state();
+  const match = state({ preAttached: false, sourceZone: "hand" });
   const result = runtimeV02BeginExternalEssenceAttachmentRoute(
     match,
     1,
     "target-uid",
-    { uid: "essence-uid", card_id: "test-tide-essence" },
+    "essence-uid",
     "hand",
     "manual_essence",
     {
@@ -180,12 +180,12 @@ Deno.test("external attachment route composes canonical receipt, event and gener
 });
 
 Deno.test("external attachment route preserves effect-driven attachment metadata", () => {
-  const match = state();
+  const match = state({ preAttached: false, sourceZone: "discard" });
   const result = runtimeV02BeginExternalEssenceAttachmentRoute(
     match,
     1,
     "target-uid",
-    { uid: "essence-uid", card_id: "test-tide-essence" },
+    "essence-uid",
     "discard",
     "test-effect",
     {
