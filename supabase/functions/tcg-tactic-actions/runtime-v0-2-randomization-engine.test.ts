@@ -82,18 +82,26 @@ Deno.test("in-place shuffle is deterministic under injection and preserves array
   assert(new Set(result).size === 4, "shuffle must preserve each exact object once");
 });
 
-Deno.test("shuffle validates injected indices before mutating", () => {
+Deno.test("shuffle validates the complete injected plan before mutating", () => {
   const a = { uid: "a" };
   const b = { uid: "b" };
-  const values = [a, b];
+  const c = { uid: "c" };
+  const values = [a, b, c];
+  const injected = [0, 2];
+  let cursor = 0;
   let message = "";
   try {
-    runtimeV02ShuffleInPlace(values, () => 2);
+    runtimeV02ShuffleInPlace(values, () => {
+      const value = injected[cursor];
+      cursor += 1;
+      return value;
+    });
   } catch (error) {
     message = error instanceof Error ? error.message : String(error);
   }
-  assertEquals(message, "tcg_v0_2_random_index_invalid", "out-of-range shuffle index must fail closed");
-  assert(values[0] === a && values[1] === b, "invalid index must not mutate the array");
+  assertEquals(cursor, 2, "late invalid index must be reached during preflight");
+  assertEquals(message, "tcg_v0_2_random_index_invalid", "late out-of-range shuffle index must fail closed");
+  assert(values[0] === a && values[1] === b && values[2] === c, "invalid shuffle plan must leave the entire array unchanged");
 });
 
 Deno.test("shuffled copy leaves source order untouched while preserving exact object identity", () => {
