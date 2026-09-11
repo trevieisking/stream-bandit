@@ -32,16 +32,23 @@ test('Essence Attachment Engine is the sole physical attachment transaction owne
   );
 });
 
-test('external Attachment Route orchestrates Engine then Event Listener without owning physical mutation', () => {
+test('external Attachment Route is UID-only and orchestrates Engine then Event Listener without owning attachment state', () => {
+  assert.ok(route.includes('RuntimeV02ExternalEssenceAttachmentRoute = RuntimeV02EssenceAttachmentTransaction & {'));
+  assert.ok(route.includes('sourceCardUid: string,'));
   assert.ok(route.includes('runtimeV02ApplyEssenceAttachmentTransaction('));
   assert.ok(route.includes('runtimeV02BeginEventListenerContinuation(state, [transaction.listener_event])'));
   for (const forbidden of [
+    '{ uid?: unknown; card_id?: unknown } | string',
+    'sourceCardOrUid',
+    'typeof sourceCardOrUid',
+    'recordRuntimeV02EssenceAttachmentEvent(',
+    'runtimeV02CreateEssenceAttachedEvent(',
     'zone.splice(sourceIndex, 1)',
     'attached.attached_turn =',
     'targetField.creature.essence.push(',
     'registerStructuredRuntimeEssenceAttachmentLifecycleState(',
   ]) {
-    assert.equal(route.includes(forbidden), false, `route regained physical attachment authority: ${forbidden}`);
+    assert.equal(route.includes(forbidden), false, `route regained compatibility or attachment authority: ${forbidden}`);
   }
 });
 
@@ -67,7 +74,7 @@ test('nested Event attachment delegates mutation to Attachment Engine and append
   }
 });
 
-test('Tactic discard attachment delegates external mutation and event dispatch to Attachment Route', () => {
+test('Tactic discard attachment delegates UID identity, mutation and event dispatch to Attachment Route', () => {
   assert.ok(tactic.includes('import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";'));
   const block = functionSlice(
     tactic,
@@ -75,6 +82,7 @@ test('Tactic discard attachment delegates external mutation and event dispatch t
     '} else if (apply === "repeat_optional") {',
   );
   assert.ok(block.includes('runtimeV02BeginExternalEssenceAttachmentRoute('));
+  assert.ok(block.includes('String(option.data.uid),'));
   assert.ok(block.includes('source_owner_seat: sourceSeat as 1 | 2'));
   assert.ok(block.includes('source_card_id: String(option.data.card_id)'));
   assert.ok(block.includes('attachmentHealPacketIds.push(...(routed.flow.emitted_heal_packet_ids || []))'));
@@ -91,7 +99,7 @@ test('Tactic discard attachment delegates external mutation and event dispatch t
   }
 });
 
-test('manual structured hand attachment delegates mutation and event dispatch to Attachment Route while legacy fallback stays isolated', () => {
+test('manual structured hand attachment delegates UID identity, mutation and event dispatch to Attachment Route while legacy fallback stays isolated', () => {
   assert.ok(matchActions.includes('import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";'));
   assert.equal(
     matchActions.includes('registerStructuredRuntimeEssenceAttachmentLifecycleState'),
