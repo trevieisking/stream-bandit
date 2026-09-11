@@ -8,6 +8,7 @@ const recycle = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-dis
 const serverTop = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-server-top-deck-v0-2.ts', 'utf8');
 const topChoice = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-card-choice-v0-2.ts', 'utf8');
 const match = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
+const tactic = fs.readFileSync('supabase/functions/tcg-tactic-actions/index.ts', 'utf8');
 
 function functionSlice(source, start, end) {
   const from = source.indexOf(start);
@@ -199,5 +200,37 @@ test('private top-deck card choice keeps hidden/choice legality while Card-Zone 
     'hand.push(',
   ]) {
     assert.equal(block.includes(forbidden), false, `Top-deck choice regained Card-Zone mutation authority: ${forbidden}`);
+  }
+});
+
+test('tactic DRAW and DRAW_FIXED keep count/deckout authority while Card-Zone owns deck-top to hand movement', () => {
+  assert.ok(tactic.includes('import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";'));
+  const block = functionSlice(
+    tactic,
+    'if (op === "DRAW" || op === "DRAW_FIXED") {',
+    'if (op === "DISCARD_HAND") {',
+  );
+
+  const availableAt = block.indexOf('const available = Math.min(count, player.deck.length);');
+  const topSelectionAt = block.indexOf('const drawUids = (player.deck as Inst[]).slice(0, available).map((inst) => inst.uid);');
+  const transferAt = block.indexOf('runtimeV02ApplyCardZoneTransfer(');
+  const deckoutAt = block.indexOf('if (op === "DRAW_FIXED" && step.deckout_on_incomplete && available < count) state.deckout_loser = seat;');
+  assert.ok(availableAt >= 0 && topSelectionAt > availableAt && transferAt > topSelectionAt, 'tactic draw count and top-card selection must precede Card-Zone movement');
+  assert.ok(deckoutAt > transferAt, 'DRAW_FIXED deckout rule must remain after the movement attempt');
+  assert.ok(block.includes('if (available > 0)'));
+  assert.ok(block.includes('cause: "effect"'));
+  assert.ok(block.includes('action_kind: "tactic"'));
+  assert.ok(block.includes('source_action_id: effect.id'));
+  assert.ok(block.includes('source_card_uid: effect.source_card.uid'));
+  assert.ok(block.includes('source: { controller_seat: seat as 1 | 2, zone: "deck", owner_card_uid: null }'));
+  assert.ok(block.includes('destination: { controller_seat: seat as 1 | 2, zone: "hand", owner_card_uid: null }'));
+  assert.ok(block.includes('card_uids: drawUids'));
+  assert.ok(block.includes('destination_position: "bottom"'));
+
+  for (const forbidden of [
+    'player.hand.push(',
+    'player.deck.splice(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `Tactic draw regained Card-Zone mutation authority: ${forbidden}`);
   }
 });
