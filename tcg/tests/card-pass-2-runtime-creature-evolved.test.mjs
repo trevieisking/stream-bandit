@@ -61,8 +61,10 @@ test('evolved continuation is card-id-free and reuses canonical rule owners', ()
   for (const owner of [
     'applyRuntimeCondition','dealRuntimeEffectDamage','addRuntimeShield','applyRuntimeV02HealPacket',
     'runtimeV02InspectRewardPositions','recordRuntimeV02HiddenInformationView',
-    'applyStructuredRuntimeEssenceAttachmentLifecycle','recordRuntimeV02EssenceAttachmentEvent',
+    'registerStructuredRuntimeEssenceAttachmentLifecycleState','recordRuntimeV02EssenceAttachmentEvent',
+    'runtimeV02CreateEssenceAttachedEvent','runtimeV02BuildEssenceAttachedTriggerPlan',
   ]) assert.ok(helper.includes(owner), `canonical owner not reused: ${owner}`);
+  assert.equal(helper.includes('applyStructuredRuntimeEssenceAttachmentLifecycle('), false, 'generic continuation must not execute triggered attachment semantics through the narrow lifecycle owner');
   assert.ok(helper.includes('crypto.getRandomValues'));
   assert.ok(helper.includes('pending_event_listener_choice'));
   assert.ok(helper.includes('runtime_v0_2_event_listener_continuation'));
