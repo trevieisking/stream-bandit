@@ -161,7 +161,7 @@ test('one movement-listener owner covers the full frozen essence_moved grammar w
   }
 });
 
-test('tactic Essence movement dispatches the canonical engine receipt before downstream heal resume', () => {
+test('tactic Essence movement dispatches the canonical engine receipt before the combined downstream heal handoff', () => {
   assert.ok(tacticSource.includes('runtimeV02CreateEssenceMovedEvent'));
   assert.ok(tacticSource.includes('movementEvents.push(runtimeV02CreateEssenceMovedEvent(transferred.movement))'));
   assert.ok(tacticSource.includes('movementFlow = runtimeV02BeginMovementListenerContinuation(state, movementEvents)'));
@@ -169,12 +169,19 @@ test('tactic Essence movement dispatches the canonical engine receipt before dow
   const applyEnd = tacticSource.indexOf('\nDeno.serve', applyStart);
   assert.ok(applyStart >= 0 && applyEnd > applyStart);
   const apply = tacticSource.slice(applyStart, applyEnd);
-  const transfer = apply.indexOf('transferred = applyRuntimeV02EssenceTransfer(');
-  const movementEvent = apply.indexOf('movementEvents.push(runtimeV02CreateEssenceMovedEvent(transferred.movement))');
-  const movementBegin = apply.indexOf('movementFlow = runtimeV02BeginMovementListenerContinuation(state, movementEvents)');
-  const cursorAdvance = apply.lastIndexOf('effect.cursor++;');
-  const downstreamHeal = apply.indexOf('runtimeV02BeginTacticHealListenerContinuation(state, movementFlow.emitted_heal_packet_ids');
-  assert.ok(transfer >= 0 && movementEvent > transfer && movementBegin > movementEvent && cursorAdvance > movementBegin && downstreamHeal > cursorAdvance);
+  const moveStart = apply.indexOf('} else if (apply === "move_attached_essence") {');
+  const attachStart = apply.indexOf('} else if (apply === "attach_essence_from_zone") {', moveStart);
+  assert.ok(moveStart >= 0 && attachStart > moveStart);
+  const moveBlock = apply.slice(moveStart, attachStart);
+  const transfer = moveBlock.indexOf('transferred = applyRuntimeV02EssenceTransfer(');
+  const movementEvent = moveBlock.indexOf('movementEvents.push(runtimeV02CreateEssenceMovedEvent(transferred.movement))');
+  const movementBegin = moveBlock.indexOf('movementFlow = runtimeV02BeginMovementListenerContinuation(state, movementEvents)');
+  assert.ok(transfer >= 0 && movementEvent > transfer && movementBegin > movementEvent);
+
+  const finalization = apply.indexOf('delete state.pending_choice;\n  effect.cursor++;\n  if (movementFlow?.status === "player_choice_required")', attachStart);
+  const healPacketMerge = apply.indexOf('const healPacketIds = [', finalization);
+  const downstreamHeal = apply.indexOf('runtimeV02BeginTacticHealListenerContinuation(state, healPacketIds', healPacketMerge);
+  assert.ok(finalization > attachStart && healPacketMerge > finalization && downstreamHeal > healPacketMerge);
   assert.ok(apply.includes('setTacticMovementResume(state, effect)'));
   assert.ok(apply.includes('setTacticHealResume(state, effect)'));
 });
