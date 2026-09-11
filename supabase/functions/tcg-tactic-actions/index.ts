@@ -1,5 +1,6 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { runtimeV02ApplyCardZoneTransfer, runtimeV02CommitCardZoneTransfer, runtimeV02PreflightCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
+import { runtimeV02ShuffleInPlace } from "../_shared/tcg-match-randomization-engine-v0-2.ts";
 import { applyRuntimeV02EssenceTransfer } from "../_shared/tcg-match-essence-movement-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
@@ -189,16 +190,6 @@ function clearCondition(cr: Cr, condition: string) {
 function removeByUid(zone: Inst[], uid: string) {
   const index = zone.findIndex((inst) => inst.uid === uid);
   return index >= 0 ? zone.splice(index, 1)[0] : null;
-}
-function shuffle<T>(values: T[]) {
-  const result = [...values];
-  for (let i = result.length - 1; i > 0; i--) {
-    const random = new Uint32Array(1);
-    crypto.getRandomValues(random);
-    const j = random[0] % (i + 1);
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
 }
 function countRange(raw: any) {
   if (typeof raw === "number") return { min: raw, max: raw };
@@ -698,7 +689,7 @@ function executeUntilChoice(state: any) {
     if (op === "SHUFFLE_DECK") {
       const seat = playerSeat(ownerSeat, step.player || "self", vars);
       const player = state.players[String(seat)];
-      player.deck = shuffle(player.deck);
+      runtimeV02ShuffleInPlace(player.deck as Inst[]);
       effect.cursor++;
       continue;
     }
