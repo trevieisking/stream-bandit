@@ -5,6 +5,7 @@ import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2
 import { runtimeV02BeginTacticHealListenerContinuation, runtimeV02PendingHealListenerChoiceView, runtimeV02ResolveTacticHealListenerChoice, type RuntimeV02PendingHealListenerChoice } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
 import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context-v0-2.ts";
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02CreateEssenceMovedEvent, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
+import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
 
@@ -1048,6 +1049,7 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
   const apply = String(context.apply || "");
   const vars = effect.vars;
   let movementFlow: ReturnType<typeof runtimeV02BeginMovementListenerContinuation> | null = null;
+  const attachmentHealPacketIds: string[] = [];
 
   if (apply === "set_var") {
     const values = selected.map((option) => option.data as CreatureRef);
@@ -1132,20 +1134,48 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
     }
     movementFlow = runtimeV02BeginMovementListenerContinuation(state, movementEvents);
   } else if (apply === "attach_essence_from_zone") {
-    const player = state.players[String(context.zone_seat)];
     const target = findCreature(state, context.target as CreatureRef);
     if (!target) throw new Error("essence_attachment_target_missing");
+    if (state.runtime_registry_v0_2 == null) throw new Error("tcg_v0_2_tactic_attachment_runtime_required");
     if (String(context.from || "") !== "discard") throw new Error("selected_essence_zone_unsupported");
+    const targetTop = topInst(target.cr);
+    if (!targetTop) throw new Error("tcg_v0_2_tactic_attachment_target_top_required");
+    const targetSeat = Number(target.seat);
+    const sourceSeat = Number(context.zone_seat);
+    if ((targetSeat !== 1 && targetSeat !== 2) || (sourceSeat !== 1 && sourceSeat !== 2)) {
+      throw new Error("tcg_v0_2_tactic_attachment_seat_invalid");
+    }
+    const attachmentMovementEvents: ReturnType<typeof runtimeV02CreateEssenceMovedEvent>[] = [];
     for (const option of selected) {
-      const inst = removeByUid(player.discard, String(option.data.uid));
-      if (!inst) throw new Error("selected_discard_essence_missing");
-      inst.attached_turn = Number(state.turn_seq || 0);
-      inst.effect_flags = {
-        ...(inst.effect_flags || {}),
-        ...(context.effect_flags || {}),
-        attachment_kind: String(context.attachment_kind || "effect_generated"),
-      };
-      target.cr.essence.push(inst);
+      const attachmentKind = String(context.attachment_kind || "effect_generated");
+      const routed = runtimeV02BeginExternalEssenceAttachmentRoute(
+        state,
+        targetSeat as 1 | 2,
+        targetTop.uid,
+        String(option.data.uid),
+        "discard",
+        `tactic:${effect.source_card_id}`,
+        {
+          attachment_kind: attachmentKind,
+          phase: "effect_resolution",
+          action_kind: "effect_driven",
+          destination_index: target.where === "reserve" ? target.index : null,
+          source_owner_seat: sourceSeat as 1 | 2,
+          source_card_id: String(option.data.card_id),
+          effect_flags: {
+            ...((context.effect_flags as Record<string, unknown> | undefined) || {}),
+            attachment_kind: attachmentKind,
+          },
+        },
+      );
+      if (routed.flow.status === "player_choice_required") {
+        throw new Error("tcg_v0_2_tactic_attachment_event_choice_not_yet_supported");
+      }
+      attachmentHealPacketIds.push(...(routed.flow.emitted_heal_packet_ids || []));
+      attachmentMovementEvents.push(...(routed.flow.emitted_movement_events || []));
+    }
+    if (attachmentMovementEvents.length) {
+      movementFlow = runtimeV02BeginMovementListenerContinuation(state, attachmentMovementEvents);
     }
   } else if (apply === "repeat_optional") {
     const count = Number(selected[0]?.data?.count || 0);
@@ -1161,11 +1191,16 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
   delete state.pending_choice;
   effect.cursor++;
   if (movementFlow?.status === "player_choice_required") {
+    if (attachmentHealPacketIds.length) throw new Error("tcg_v0_2_tactic_attachment_movement_choice_with_prior_heal_not_yet_supported");
     setTacticMovementResume(state, effect);
     return;
   }
-  if (movementFlow && movementFlow.emitted_heal_packet_ids.length) {
-    const healFlow = runtimeV02BeginTacticHealListenerContinuation(state, movementFlow.emitted_heal_packet_ids, effect.owner_seat as 1 | 2);
+  const healPacketIds = [
+    ...attachmentHealPacketIds,
+    ...(movementFlow?.emitted_heal_packet_ids || []),
+  ];
+  if (healPacketIds.length) {
+    const healFlow = runtimeV02BeginTacticHealListenerContinuation(state, healPacketIds, effect.owner_seat as 1 | 2);
     if (healFlow.status === "player_choice_required") {
       setTacticHealResume(state, effect);
       return;
