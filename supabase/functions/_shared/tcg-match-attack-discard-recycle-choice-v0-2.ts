@@ -1,4 +1,10 @@
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import {
+  runtimeV02CommitCardZoneTransfer,
+  runtimeV02PreflightCardZoneTransfer,
+  type RuntimeV02CardZoneInstance,
+  type RuntimeV02CardZoneTransferPreflight,
+} from "./tcg-match-card-zone-engine-v0-2.ts";
 
 type RuntimeInst = { uid: string; card_id: string };
 
@@ -345,13 +351,44 @@ export function runtimeV02ResolveAttackDiscardRecycleChoice(
     return { attack_id: choice.attack_id, choice_id: choice.id, selected_count: 0, moved_count: 0 };
   }
 
-  const discard = player.discard as unknown[];
-  const discardIndex = discard.findIndex((value) => {
-    const inst = runtimeInst(value, "tcg_v0_2_attack_discard_recycle_choice_current_discard_card_invalid");
-    return inst.uid === option.uid && inst.card_id === option.card_id;
-  });
-  if (discardIndex < 0) throw new Error("tcg_v0_2_attack_discard_recycle_choice_selected_card_changed");
-  const moved = discard.splice(discardIndex, 1)[0];
-  (player.deck as unknown[]).push(moved);
+  const discard = player.discard as RuntimeV02CardZoneInstance[];
+  const deck = player.deck as RuntimeV02CardZoneInstance[];
+  let transferPreflight: RuntimeV02CardZoneTransferPreflight<RuntimeV02CardZoneInstance>;
+  try {
+    transferPreflight = runtimeV02PreflightCardZoneTransfer(discard, deck, {
+      cause: "effect",
+      action_kind: "attack",
+      source_action_id: choice.attack_id,
+      source_card_uid: choice.source_uid,
+      source: {
+        controller_seat: seat,
+        zone: "discard",
+        owner_card_uid: null,
+      },
+      destination: {
+        controller_seat: seat,
+        zone: "deck",
+        owner_card_uid: null,
+      },
+      card_uids: [option.uid],
+      destination_position: "bottom",
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.startsWith("tcg_v0_2_card_zone_selected_card_missing:")) {
+      throw new Error("tcg_v0_2_attack_discard_recycle_choice_selected_card_changed");
+    }
+    throw error;
+  }
+  const moved = runtimeInst(
+    transferPreflight.cards[0],
+    "tcg_v0_2_attack_discard_recycle_choice_selected_card_invalid",
+  );
+  assertSameInst(
+    moved,
+    { uid: option.uid, card_id: option.card_id },
+    "tcg_v0_2_attack_discard_recycle_choice_selected_card_changed",
+  );
+  runtimeV02CommitCardZoneTransfer(discard, deck, transferPreflight);
   return { attack_id: choice.attack_id, choice_id: choice.id, selected_count: 1, moved_count: 1 };
 }
