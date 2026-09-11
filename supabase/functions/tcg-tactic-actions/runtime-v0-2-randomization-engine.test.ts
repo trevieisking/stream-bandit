@@ -111,6 +111,6 @@ Deno.test("shuffled copy leaves source order untouched while preserving exact ob
   });
 
   assert(source[0] === a && source[1] === b && source[2] === c, "source order must remain unchanged");
-  assert(shuffled !== source, "shuffled copy must return a distinct array");
+  assert(!Object.is(shuffled, source), "shuffled copy must return a distinct array");
   assert(shuffled[0] === b && shuffled[1] === c && shuffled[2] === a, "copy permutation mismatch");
 });
