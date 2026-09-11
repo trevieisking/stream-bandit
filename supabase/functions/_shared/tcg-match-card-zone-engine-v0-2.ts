@@ -46,10 +46,14 @@ export type RuntimeV02CardZoneTransferReceipt = {
 export type RuntimeV02CardZoneTransferPreflight<T extends RuntimeV02CardZoneInstance> = {
   cards: T[];
   receipt: RuntimeV02CardZoneTransferReceipt;
+  source_snapshot: T[];
+  destination_snapshot: T[];
 };
 
-export type RuntimeV02CardZoneTransferResult<T extends RuntimeV02CardZoneInstance> =
-  RuntimeV02CardZoneTransferPreflight<T>;
+export type RuntimeV02CardZoneTransferResult<T extends RuntimeV02CardZoneInstance> = {
+  cards: T[];
+  receipt: RuntimeV02CardZoneTransferReceipt;
+};
 
 const OWNER_REQUIRED_ZONES = new Set<RuntimeV02CardZoneKind>([
   "creature_stack",
@@ -175,7 +179,65 @@ export function runtimeV02PreflightCardZoneTransfer<T extends RuntimeV02CardZone
     return card;
   });
 
-  return { cards, receipt: normalizedReceipt(request, cardUids) };
+  return {
+    cards,
+    receipt: normalizedReceipt(request, cardUids),
+    source_snapshot: [...sourceZone],
+    destination_snapshot: [...destinationZone],
+  };
+}
+
+function requestFromReceipt(receipt: RuntimeV02CardZoneTransferReceipt): RuntimeV02CardZoneTransferRequest {
+  return {
+    cause: receipt.cause,
+    action_kind: receipt.action_kind,
+    source_action_id: receipt.source_action_id,
+    source_card_uid: receipt.source_card_uid,
+    source: { ...receipt.source },
+    destination: { ...receipt.destination },
+    card_uids: [...receipt.card_uids],
+    destination_position: receipt.destination_position,
+  };
+}
+
+function sameSnapshot<T extends RuntimeV02CardZoneInstance>(actual: T[], expected: T[]): boolean {
+  return actual.length === expected.length && actual.every((card, index) => Object.is(card, expected[index]));
+}
+
+/**
+ * Commits an already validated synchronous preflight. Exact zone snapshots are
+ * rechecked so effect-specific owners can validate their own frozen identity
+ * between Card-Zone preflight and Card-Zone mutation without taking mutation
+ * authority back from this engine.
+ */
+export function runtimeV02CommitCardZoneTransfer<T extends RuntimeV02CardZoneInstance>(
+  sourceZone: T[],
+  destinationZone: T[],
+  preflight: RuntimeV02CardZoneTransferPreflight<T>,
+): RuntimeV02CardZoneTransferResult<T> {
+  const current = runtimeV02PreflightCardZoneTransfer(
+    sourceZone,
+    destinationZone,
+    requestFromReceipt(preflight.receipt),
+  );
+  if (
+    !sameSnapshot(sourceZone, preflight.source_snapshot) ||
+    !sameSnapshot(destinationZone, preflight.destination_snapshot) ||
+    current.cards.some((card, index) => !Object.is(card, preflight.cards[index]))
+  ) {
+    throw new Error("tcg_v0_2_card_zone_preflight_stale");
+  }
+
+  const selected = new Set(current.receipt.card_uids);
+  const remaining = sourceZone.filter((card) => !selected.has(card.uid));
+  sourceZone.splice(0, sourceZone.length, ...remaining);
+  if (current.receipt.destination_position === "top") {
+    destinationZone.splice(0, 0, ...current.cards);
+  } else {
+    destinationZone.push(...current.cards);
+  }
+
+  return { cards: current.cards, receipt: current.receipt };
 }
 
 /**
@@ -188,15 +250,5 @@ export function runtimeV02ApplyCardZoneTransfer<T extends RuntimeV02CardZoneInst
   request: RuntimeV02CardZoneTransferRequest,
 ): RuntimeV02CardZoneTransferResult<T> {
   const preflight = runtimeV02PreflightCardZoneTransfer(sourceZone, destinationZone, request);
-  const selected = new Set(preflight.receipt.card_uids);
-  const remaining = sourceZone.filter((card) => !selected.has(card.uid));
-
-  sourceZone.splice(0, sourceZone.length, ...remaining);
-  if (preflight.receipt.destination_position === "top") {
-    destinationZone.splice(0, 0, ...preflight.cards);
-  } else {
-    destinationZone.push(...preflight.cards);
-  }
-
-  return preflight;
+  return runtimeV02CommitCardZoneTransfer(sourceZone, destinationZone, preflight);
 }

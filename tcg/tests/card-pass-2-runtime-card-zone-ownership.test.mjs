@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const engine = fs.readFileSync('supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts', 'utf8');
+const overcharge = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts', 'utf8');
 const match = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
 
 function functionSlice(source, start, end) {
@@ -18,7 +19,7 @@ test('Card-Zone Engine is generic, card-id-free and cannot absorb specialist att
   assert.ok(engine.includes('export function runtimeV02ApplyCardZoneTransfer'));
   assert.ok(engine.includes('tcg_v0_2_card_zone_specialist_destination_owned'));
   assert.ok(engine.includes('sourceZone.splice(0, sourceZone.length, ...remaining)'));
-  assert.ok(engine.includes('destinationZone.push(...preflight.cards)'));
+  assert.ok(engine.includes('destinationZone.push(...current.cards)'));
 
   for (const forbidden of [
     'volt-stormmane',
@@ -66,4 +67,35 @@ test('Stormmane delegation remains one bounded legacy caller and does not absorb
   assert.equal(match.slice(legacyStart, legacyEnd).split(call).length - 1, 1);
   assert.equal(match.slice(0, legacyStart).includes(call), false);
   assert.equal(match.slice(legacyEnd).includes(call), false);
+});
+
+test('structured Overcharge keeps effect identity while delegating physical movement to Card-Zone preflight and commit', () => {
+  assert.ok(overcharge.includes('runtimeV02PreflightCardZoneTransfer'));
+  assert.ok(overcharge.includes('runtimeV02CommitCardZoneTransfer'));
+  const block = functionSlice(
+    overcharge,
+    'const option = choice.options.find',
+    'let conditionApplied = false;',
+  );
+
+  const preflightAt = block.indexOf('runtimeV02PreflightCardZoneTransfer(');
+  const identityAt = block.indexOf('assertSameInst(selected, { uid: option.uid, card_id: option.card_id }');
+  const commitAt = block.indexOf('runtimeV02CommitCardZoneTransfer(');
+  assert.ok(preflightAt >= 0 && identityAt > preflightAt, 'Overcharge identity must be checked after Card-Zone preflight');
+  assert.ok(commitAt > identityAt, 'Card-Zone commit must wait for Overcharge frozen-identity validation');
+  assert.ok(block.includes('cause: "effect"'));
+  assert.ok(block.includes('zone: "attached_essence"'));
+  assert.ok(block.includes('zone: "discard"'));
+  assert.ok(block.includes('card_uids: [option.uid]'));
+  assert.ok(block.includes('destination_position: "bottom"'));
+
+  for (const forbidden of [
+    'essence.findIndex(',
+    'essence.splice(',
+    '(controller.discard as unknown[]).push(',
+    'discard.push(',
+    '.discard.push(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `Overcharge regained Card-Zone mutation authority: ${forbidden}`);
+  }
 });

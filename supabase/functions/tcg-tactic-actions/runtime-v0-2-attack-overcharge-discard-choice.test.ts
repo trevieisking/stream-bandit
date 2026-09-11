@@ -13,6 +13,10 @@ function assertEquals(actual: unknown, expected: unknown, message = "values diff
   }
 }
 
+function assertSame(actual: unknown, expected: unknown, message = "instances differ") {
+  if (!Object.is(actual, expected)) throw new Error(message);
+}
+
 function assertThrows(fn: () => unknown, fragment: string) {
   try {
     fn();
@@ -262,6 +266,7 @@ Deno.test("declaration threshold is snapshotted before damage and creates a priv
 
 Deno.test("resolution discards exactly the selected attached Essence then applies the condition when the target survived", () => {
   const state = stateWith(4);
+  const selected = (state.players as any)["1"].vanguard.essence[1];
   const descriptor = structuredRuntimeAfterDamageOverchargeDiscardCondition(state, { card_id: "test-overcharge-creature" }, 2)!;
   const pending = runtimeV02CreateAttackOverchargeDiscardChoice(
     state,
@@ -287,6 +292,7 @@ Deno.test("resolution discards exactly the selected attached Essence then applie
   });
   assertEquals((state.players as any)["1"].vanguard.essence.map((item: any) => item.uid), ["ess-1", "ess-3", "ess-4"]);
   assertEquals((state.players as any)["1"].discard.map((item: any) => item.uid), ["ess-2"]);
+  assertSame((state.players as any)["1"].discard[0], selected, "Overcharge discard lost exact Essence instance identity");
   assertEquals((state.players as any)["2"].vanguard.conditions.control, "Stunned");
 });
 
@@ -364,6 +370,13 @@ Deno.test("pending choice rejects wrong seat, stale id, turn, source, target and
   pair = base();
   (pair.state.players as any)["1"].vanguard.essence[0] = card("ess-replaced", "essence-1");
   assertThrows(() => runtimeV02ResolveAttackOverchargeDiscardChoice(pair.pending, 1, "choice-1", ["essence:ess-1"], pair.state), "selected_essence_changed");
+
+  pair = base();
+  const changedIdentity = card("ess-1", "different-essence");
+  (pair.state.players as any)["1"].vanguard.essence[0] = changedIdentity;
+  assertThrows(() => runtimeV02ResolveAttackOverchargeDiscardChoice(pair.pending, 1, "choice-1", ["essence:ess-1"], pair.state), "selected_essence_changed");
+  assertSame((pair.state.players as any)["1"].vanguard.essence[0], changedIdentity);
+  assertEquals((pair.state.players as any)["1"].discard, []);
 });
 
 Deno.test("malformed near-family programs fail closed while unrelated and legacy snapshots remain outside the owner", () => {

@@ -4,6 +4,12 @@ import {
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import {
+  runtimeV02CommitCardZoneTransfer,
+  runtimeV02PreflightCardZoneTransfer,
+  type RuntimeV02CardZoneInstance,
+  type RuntimeV02CardZoneTransferPreflight,
+} from "./tcg-match-card-zone-engine-v0-2.ts";
 
 type RuntimeInst = { uid: string; card_id: string };
 type RuntimeFieldWhere = "vanguard" | "reserve";
@@ -451,15 +457,42 @@ export function runtimeV02ResolveAttackOverchargeDiscardChoice(
 
   const option = choice.options.find((candidate) => candidate.id === choiceIds[0]);
   if (!option) throw new Error("tcg_v0_2_attack_overcharge_unknown_option");
-  const essence = sourceCreature.essence as unknown[];
-  const essenceIndex = essence.findIndex((raw) => objectRecord(raw)?.uid === option.uid);
-  if (essenceIndex < 0) throw new Error("tcg_v0_2_attack_overcharge_selected_essence_changed");
-  const selected = runtimeInst(essence[essenceIndex], "tcg_v0_2_attack_overcharge_selected_essence_invalid");
-  assertSameInst(selected, { uid: option.uid, card_id: option.card_id }, "tcg_v0_2_attack_overcharge_selected_essence_changed");
-
+  const essence = sourceCreature.essence as RuntimeV02CardZoneInstance[];
   const controller = playerForSeat(state, seat);
-  const [discardedRaw] = essence.splice(essenceIndex, 1);
-  (controller.discard as unknown[]).push(discardedRaw);
+  const discard = controller.discard as RuntimeV02CardZoneInstance[];
+  let transferPreflight: RuntimeV02CardZoneTransferPreflight<RuntimeV02CardZoneInstance>;
+  try {
+    transferPreflight = runtimeV02PreflightCardZoneTransfer(essence, discard, {
+      cause: "effect",
+      action_kind: "attack",
+      source_action_id: choice.attack_id,
+      source_card_uid: choice.source_uid,
+      source: {
+        controller_seat: seat,
+        zone: "attached_essence",
+        owner_card_uid: choice.source_uid,
+      },
+      destination: {
+        controller_seat: seat,
+        zone: "discard",
+        owner_card_uid: null,
+      },
+      card_uids: [option.uid],
+      destination_position: "bottom",
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.startsWith("tcg_v0_2_card_zone_selected_card_missing:")) {
+      throw new Error("tcg_v0_2_attack_overcharge_selected_essence_changed");
+    }
+    throw error;
+  }
+  const selected = runtimeInst(
+    transferPreflight.cards[0],
+    "tcg_v0_2_attack_overcharge_selected_essence_invalid",
+  );
+  assertSameInst(selected, { uid: option.uid, card_id: option.card_id }, "tcg_v0_2_attack_overcharge_selected_essence_changed");
+  runtimeV02CommitCardZoneTransfer(essence, discard, transferPreflight);
 
   let conditionApplied = false;
   let conditionPrevented = false;

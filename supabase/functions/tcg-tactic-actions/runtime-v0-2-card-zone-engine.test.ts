@@ -1,5 +1,6 @@
 import {
   runtimeV02ApplyCardZoneTransfer,
+  runtimeV02CommitCardZoneTransfer,
   runtimeV02PreflightCardZoneTransfer,
   type RuntimeV02CardZoneEndpoint,
   type RuntimeV02CardZoneInstance,
@@ -154,4 +155,21 @@ Deno.test("Card-Zone Engine cannot take over specialist attachment destinations"
 
   assertEquals(source, [selected]);
   assertEquals(destination, []);
+});
+
+Deno.test("Card-Zone commit rejects stale exact-object snapshots before either zone mutates", () => {
+  const selected = card("essence-1", "gale-breeze-essence");
+  const source = [selected];
+  const discard: RuntimeV02CardZoneInstance[] = [];
+  const preflight = runtimeV02PreflightCardZoneTransfer(source, discard, request([selected.uid]));
+  const replacement = card(selected.uid, selected.card_id);
+  source[0] = replacement;
+
+  assertThrows(
+    () => runtimeV02CommitCardZoneTransfer(source, discard, preflight),
+    "tcg_v0_2_card_zone_preflight_stale",
+  );
+
+  assertSame(source[0], replacement);
+  assertEquals(discard, []);
 });
