@@ -19,7 +19,7 @@ test('count_add snapshot is wired after declaration requirements and before Star
     'const requirementCheck=evaluateRuntimeAttackDeclarationRequirements(s,p.vanguard,atk)',
     'const countAddEvaluation=evaluateRuntimeAttackCountAddFormula(s,p.vanguard,p,atk)',
     'if(atk.starbound)',
-    'const cq=conditions(p.vanguard)',
+    'const attackControl=runtimeV02ResolveAttackControlCondition(p.vanguard',
   ], 'count_add legal-declaration snapshot ordering changed');
 });
 

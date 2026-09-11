@@ -171,8 +171,12 @@ test('Rillrunner one-use lifecycle bonus is consumed by every committed legal at
   assert.ok(attackStart >= 0);
   const attack = matchSource.slice(attackStart);
   assert.ok(attack.includes('s.resume_after_resolution="aftermath"'));
-  assert.ok(attack.includes('else aftermath(seat);return json({version:VERSION,result:await commit("attack_condition_failed"'));
-  assert.ok(attack.includes('if(cq.control==="Stunned")return json({ok:false,version:VERSION,error:"stunned_cannot_attack"},400)'));
+  const failedStart = attack.indexOf('if(attackControl.status==="failed"){');
+  const failedEnd = attack.indexOf('const structuredTopDeckCardChoice=', failedStart);
+  assert.ok(failedStart >= 0 && failedEnd > failedStart);
+  const failed = attack.slice(failedStart, failedEnd);
+  assert.match(failed, /else aftermath\(seat\);\s*return json\(\{version:VERSION,result:await commit\("attack_condition_failed"/);
+  assert.ok(attack.includes('if(attackControl.status==="blocked")return json({ok:false,version:VERSION,error:"stunned_cannot_attack"},400)'));
 });
 
 test('Deep Current authority consumes only the shared movement ledger at declaration', () => {

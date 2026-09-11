@@ -20,8 +20,8 @@ test('ready conditional_add snapshots final attack target state before legacy bo
     'ready conditional_add evaluator import/call missing',
   );
   assertInOrder([
-    'if(cq.control==="Blinded")',
-    'if(!target)return json({ok:false,version:VERSION,error:"legal_attack_target_required"},400)',
+    'if(attackControl.target_mode==="random_all_creatures")',
+    'const targetSeat=resolvedTarget.seat,targetWhere=resolvedTarget.where,targetIndex=resolvedTarget.index,target=resolvedTarget.creature',
     'const conditionalAddEvaluation=evaluateRuntimeAttackReadyConditionalAddFormula(atk,{',
     'let bonus=0,ef=atk.effect.toLowerCase()',
   ], 'ready conditional_add target snapshot ordering changed');
