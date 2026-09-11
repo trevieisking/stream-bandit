@@ -1,17 +1,10 @@
-export type RuntimeConditions = {
-  scorched: boolean;
-  venomed: number;
-  control: string | null;
-  modifier: string | null;
-};
+import type {
+  RuntimeV02ConditionCreature,
+  RuntimeV02ConditionState,
+} from "../_shared/tcg-match-condition-engine-v0-2.ts";
 
-export type RuntimeCreature = {
-  damage: number;
-  shield: number;
-  conditions?: RuntimeConditions | Record<string, unknown>;
-  condition?: string | null;
-  flags?: Record<string, unknown>;
-};
+export type RuntimeConditions = RuntimeV02ConditionState;
+export type RuntimeCreature = RuntimeV02ConditionCreature;
 
 export type RuntimeCardInstance = {
   uid: string;
@@ -48,9 +41,9 @@ export type RuntimeContinuousContext = Record<string, unknown> & {
   evaluate_when?: (when: unknown) => boolean;
 };
 
-// Compatibility facade: condition semantics live in the dedicated condition
-// engine. Existing callers may keep importing these names from runtime core
-// while the rest of the runtime is migrated domain-by-domain.
+// Compatibility facade: condition semantics and condition state types live in
+// the dedicated condition domain. Existing callers may keep importing these
+// names from runtime core while the runtime is migrated domain-by-domain.
 export {
   applyRuntimeCondition,
   clearRuntimeCondition,

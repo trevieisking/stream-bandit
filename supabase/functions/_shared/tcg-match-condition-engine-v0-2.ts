@@ -1,21 +1,37 @@
-import type {
-  RuntimeConditions,
-  RuntimeCreature,
-} from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+export type RuntimeV02ConditionState = {
+  scorched: boolean;
+  venomed: number;
+  control: string | null;
+  modifier: string | null;
+};
 
-const CONTROL_CONDITIONS = new Set([
-  "Stunned",
-  "Dazed",
-  "Rooted",
-  "Blinded",
-  "Mindbound",
-]);
-const MODIFIER_CONDITIONS = new Set([
-  "Silenced",
-  "Drenched",
-  "Crushed",
-]);
-const CONDITION_NAMES = new Set([
+export type RuntimeV02ConditionCreature = {
+  damage: number;
+  shield: number;
+  conditions?: RuntimeV02ConditionState | Record<string, unknown>;
+  condition?: string | null;
+  flags?: Record<string, unknown>;
+};
+
+export type RuntimeV02ConditionName =
+  | "Scorched"
+  | "Venomed"
+  | "Blinded"
+  | "Mindbound"
+  | "Dazed"
+  | "Stunned"
+  | "Rooted"
+  | "Silenced"
+  | "Crushed"
+  | "Drenched";
+
+export type ApplyConditionMode =
+  | "apply"
+  | "apply_if_empty"
+  | "apply_if_empty_or_same"
+  | "replace";
+
+export const runtimeV02ConditionNames = [
   "Scorched",
   "Venomed",
   "Blinded",
@@ -26,19 +42,35 @@ const CONDITION_NAMES = new Set([
   "Silenced",
   "Crushed",
   "Drenched",
+] as const satisfies readonly RuntimeV02ConditionName[];
+
+const CONDITION_NAMES = new Set<string>(runtimeV02ConditionNames);
+const CONTROL_CONDITIONS = new Set<string>([
+  "Stunned",
+  "Dazed",
+  "Rooted",
+  "Blinded",
+  "Mindbound",
+]);
+const MODIFIER_CONDITIONS = new Set<string>([
+  "Silenced",
+  "Drenched",
+  "Crushed",
 ]);
 
-export type ApplyConditionMode =
-  | "apply"
-  | "apply_if_empty"
-  | "apply_if_empty_or_same"
-  | "replace";
-
+/**
+ * Canonical condition-state normalizer. This deliberately preserves the
+ * current v0.2 slot model: Scorched and Venomed persist independently while
+ * control and modifier conditions each occupy one slot. Lifecycle behaviour
+ * lives in tcg-match-condition-lifecycle-v0-2.ts.
+ */
 export function runtimeConditions(
-  creature: RuntimeCreature,
-): RuntimeConditions {
-  const current = creature.conditions as Partial<RuntimeConditions> | undefined;
-  const normalized: RuntimeConditions = {
+  creature: RuntimeV02ConditionCreature,
+): RuntimeV02ConditionState {
+  const current = creature.conditions as
+    | Partial<RuntimeV02ConditionState>
+    | undefined;
+  const normalized: RuntimeV02ConditionState = {
     scorched: Boolean(current?.scorched),
     venomed: Math.max(0, Number(current?.venomed || 0)),
     control: current?.control ? String(current.control) : null,
@@ -48,8 +80,24 @@ export function runtimeConditions(
   return normalized;
 }
 
+export function activeRuntimeConditions(
+  creature: RuntimeV02ConditionCreature,
+): RuntimeV02ConditionName[] {
+  const current = runtimeConditions(creature);
+  const out: RuntimeV02ConditionName[] = [];
+  if (current.scorched) out.push("Scorched");
+  if (current.venomed > 0) out.push("Venomed");
+  if (current.control && CONDITION_NAMES.has(current.control)) {
+    out.push(current.control as RuntimeV02ConditionName);
+  }
+  if (current.modifier && CONDITION_NAMES.has(current.modifier)) {
+    out.push(current.modifier as RuntimeV02ConditionName);
+  }
+  return out;
+}
+
 export function hasRuntimeCondition(
-  creature: RuntimeCreature,
+  creature: RuntimeV02ConditionCreature,
   condition?: string,
 ): boolean {
   const current = runtimeConditions(creature);
@@ -63,7 +111,7 @@ export function hasRuntimeCondition(
 }
 
 export function clearRuntimeCondition(
-  creature: RuntimeCreature,
+  creature: RuntimeV02ConditionCreature,
   condition: string,
 ): boolean {
   const current = runtimeConditions(creature);
@@ -87,7 +135,7 @@ export function clearRuntimeCondition(
 }
 
 function activeConditionImmunity(
-  creature: RuntimeCreature,
+  creature: RuntimeV02ConditionCreature,
   condition: string,
   turnSeq: number,
 ): boolean {
@@ -104,7 +152,7 @@ function activeConditionImmunity(
 }
 
 export function applyRuntimeCondition(
-  creature: RuntimeCreature,
+  creature: RuntimeV02ConditionCreature,
   condition: string,
   turnSeq: number,
   mode: ApplyConditionMode = "apply",
