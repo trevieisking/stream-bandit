@@ -218,7 +218,7 @@ Deno.test("Arcprowler attaches only a Basic Volt Essence from hand without consu
   equal((state.players as any)["1"].reserve[0].essence[0].uid, "basic-uid");
   equal((state.turn_flags as any)["1"]?.manual_essence_turn, undefined);
   const events = runtimeV02CurrentTurnEssenceAttachmentEvents(state, 1);
-  equal(events.length, 1); equal(events[0].origin_zone, "hand"); equal(events[0].attachment_kind, "effect_driven");
+  equal(events.length, 1); equal(events[0].origin_zone, "hand"); equal(events[0].attachment_kind, "normal");
 });
 
 Deno.test("Coilclank requires a resolved Device this turn and marks its discard attachment temporary", () => {
@@ -234,5 +234,5 @@ Deno.test("Coilclank requires a resolved Device this turn and marks its discard 
   const attached = (state.players as any)["1"].reserve[0].essence[0];
   equal(attached.uid, "basic-b"); equal(attached.effect_flags.discard_during_target_aftermath, true);
   const events = runtimeV02CurrentTurnEssenceAttachmentEvents(state, 1);
-  equal(events.length, 1); equal(events[0].origin_zone, "discard");
+  equal(events.length, 1); equal(events[0].origin_zone, "discard"); equal(events[0].attachment_kind, "temporary");
 });
