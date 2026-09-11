@@ -7,9 +7,10 @@ import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
 import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
-import { applyStructuredRuntimeEssenceAttachmentLifecycle } from "./tcg-match-surge-lifecycle-v0-2.ts";
+import { registerStructuredRuntimeEssenceAttachmentLifecycleState } from "./tcg-match-surge-lifecycle-v0-2.ts";
 import {
   recordRuntimeV02EssenceAttachmentEvent,
+  runtimeV02CreateEssenceAttachedEvent,
   type RuntimeV02EssenceAttachedListenerEvent,
 } from "./tcg-match-essence-attachment-event-v0-2.ts";
 import {
@@ -455,6 +456,24 @@ function essenceAttachedEvent(
     attachment_target_uid: attachmentTargetUid,
     attachment_kind: attachmentKind,
   } as RuntimeV02EssenceAttachedListenerEvent);
+}
+
+function essenceAttachedWorkItems(
+  state: Record<string, unknown>,
+  event: RuntimeV02EventListenerEvent,
+): WorkItem[] {
+  const attachmentEvent = essenceAttachedEvent(event);
+  const plan = runtimeV02BuildEssenceAttachedTriggerPlan(
+    state,
+    attachmentEvent,
+    collectCandidates(state, attachmentEvent.event).map(attachmentCandidateDescriptor),
+  );
+  return plan.work.map((frozen) => ({
+    event: structuredClone(plan.snapshot.event),
+    source_uid: frozen.source.uid,
+    listener_id: frozen.listener_id,
+    frozen_candidate: structuredClone(frozen),
+  }));
 }
 
 function frozenCandidate(
@@ -2072,20 +2091,7 @@ export function runtimeV02BeginEventListenerContinuation(
       throw new Error("tcg_v0_2_event_listener_event_invalid");
     }
     if (event.event === "essence_attached") {
-      const attachmentEvent = essenceAttachedEvent(event);
-      const plan = runtimeV02BuildEssenceAttachedTriggerPlan(
-        state,
-        attachmentEvent,
-        collectCandidates(state, event.event).map(attachmentCandidateDescriptor),
-      );
-      for (const frozen of plan.work) {
-        work.push({
-          event: structuredClone(plan.snapshot.event),
-          source_uid: frozen.source.uid,
-          listener_id: frozen.listener_id,
-          frozen_candidate: structuredClone(frozen),
-        });
-      }
+      work.push(...essenceAttachedWorkItems(state, event));
       continue;
     }
     for (const candidate of collectCandidates(state, event.event)) {
@@ -2263,23 +2269,26 @@ export function runtimeV02ResolveEventListenerChoice(
         };
       }
       target.cr.essence.push(inst);
-      applyStructuredRuntimeEssenceAttachmentLifecycle(
+      registerStructuredRuntimeEssenceAttachmentLifecycleState(
         state,
-        target.cr,
         inst,
-        String(target.def.element || ""),
-        ref.zone,
         currentTurn(state),
       );
-      recordRuntimeV02EssenceAttachmentEvent(
+      const receipt = recordRuntimeV02EssenceAttachmentEvent(
         state,
         candidate.seat,
         target.top.uid,
         inst,
         ref.zone,
         listenerId(candidate),
-        "effect_driven",
+        attachmentState ? String(attachmentState.kind) : "normal",
       );
+      const nestedEvent = runtimeV02CreateEssenceAttachedEvent(receipt, {
+        phase: work.event.phase,
+        action_kind: "effect_driven",
+        destination_index: target.where === "reserve" ? target.index : null,
+      });
+      continuation.work.push(...essenceAttachedWorkItems(state, nestedEvent));
     }
     continuation.step_cursor++;
   } else if (pending.kind === "inspect_rewards") {
