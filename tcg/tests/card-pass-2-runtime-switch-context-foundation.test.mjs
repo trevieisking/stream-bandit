@@ -185,9 +185,9 @@ test('Withdrawal dispatcher cannot regain attached-Essence payment or direct swi
   assert.ok(block.includes('runtimeV02ApplyWithdrawalPaymentAndSwitch('));
   assert.ok(block.includes('const switched=transaction.switched'));
   assert.ok(block.includes('message==="tcg_v0_2_payment_exact_amount_required"'));
-  assert.ok(block.includes('error:"exact_withdrawal_essence_payment_required",cost'));
+  assert.ok(block.includes('error:"exact_withdrawal_essence_payment_required",cost},400'));
   assert.ok(block.includes('message.startsWith("tcg_v0_2_payment_source_missing:")'));
-  assert.ok(block.includes('error:"withdrawal_payment_not_attached"'));
+  assert.ok(block.includes('error:"withdrawal_payment_not_attached"},400'));
   assert.ok(block.includes('runtimeV02BeginMovementListenerContinuation(s,switched.events)'));
   assert.ok(block.includes('runtimeV02BeginMovementHealListenerContinuation(s,movementFlow.emitted_heal_packet_ids'));
 
