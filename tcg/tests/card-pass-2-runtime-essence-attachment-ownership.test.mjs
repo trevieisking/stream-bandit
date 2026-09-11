@@ -5,6 +5,7 @@ import fs from 'node:fs';
 const engine = fs.readFileSync('supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts', 'utf8');
 const route = fs.readFileSync('supabase/functions/_shared/tcg-match-essence-attachment-route-v0-2.ts', 'utf8');
 const eventListener = fs.readFileSync('supabase/functions/_shared/tcg-match-event-listener-v0-2.ts', 'utf8');
+const tactic = fs.readFileSync('supabase/functions/tcg-tactic-actions/index.ts', 'utf8');
 
 function functionSlice(source, start, end) {
   const from = source.indexOf(start);
@@ -62,5 +63,29 @@ test('nested Event attachment delegates mutation to Attachment Engine and append
     'runtimeV02CreateEssenceAttachedEvent(',
   ]) {
     assert.equal(block.includes(forbidden), false, `nested Event path regained Attachment Engine authority: ${forbidden}`);
+  }
+});
+
+test('Tactic discard attachment delegates external mutation and event dispatch to Attachment Route', () => {
+  assert.ok(tactic.includes('import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";'));
+  const block = functionSlice(
+    tactic,
+    '} else if (apply === "attach_essence_from_zone") {',
+    '} else if (apply === "repeat_optional") {',
+  );
+  assert.ok(block.includes('runtimeV02BeginExternalEssenceAttachmentRoute('));
+  assert.ok(block.includes('source_owner_seat: sourceSeat as 1 | 2'));
+  assert.ok(block.includes('source_card_id: String(option.data.card_id)'));
+  assert.ok(block.includes('attachmentHealPacketIds.push(...(routed.flow.emitted_heal_packet_ids || []))'));
+  assert.ok(block.includes('attachmentMovementEvents.push(...(routed.flow.emitted_movement_events || []))'));
+  assert.ok(block.includes('tcg_v0_2_tactic_attachment_event_choice_not_yet_supported'));
+  for (const forbidden of [
+    'removeByUid(player.discard',
+    'inst.attached_turn =',
+    'target.cr.essence.push(',
+    'recordRuntimeV02EssenceAttachmentEvent(',
+    'runtimeV02CreateEssenceAttachedEvent(',
+  ]) {
+    assert.equal(block.includes(forbidden), false, `Tactic attachment path regained Attachment Engine authority: ${forbidden}`);
   }
 });
