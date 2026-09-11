@@ -22,11 +22,15 @@ import {
   type RuntimeV02FrozenEssenceAttachedWorkItem,
 } from "./tcg-match-essence-attachment-work-v0-2.ts";
 import {
-  addRuntimeShield,
   applyRuntimeCondition,
-  dealRuntimeEffectDamage,
+  clearRuntimeCondition,
+  hasRuntimeCondition,
   runtimeConditions,
   type ApplyConditionMode,
+} from "./tcg-match-condition-engine-v0-2.ts";
+import {
+  addRuntimeShield,
+  dealRuntimeEffectDamage,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 
 type Inst = {
@@ -1402,19 +1406,6 @@ function reorderDeckTop(
   deck.splice(0, deck.length, ...ordered, ...rest);
 }
 
-function clearCondition(
-  target: Field,
-  condition: string,
-): void {
-  const conditions = runtimeConditions(target.cr);
-  if (condition === "Scorched") conditions.scorched = false;
-  else if (condition === "Venomed") conditions.venomed = 0;
-  else if (conditions.control === condition) conditions.control = null;
-  else if (conditions.modifier === condition) conditions.modifier = null;
-  else throw new Error("tcg_v0_2_event_listener_condition_stale");
-  target.cr.condition = null;
-}
-
 function executeStep(
   state: Record<string, unknown>,
   continuation: Continuation,
@@ -1764,6 +1755,19 @@ function executeStep(
     return "continue";
   }
 
+  if (op === "CLEAR_CONDITION") {
+    const target = targetField(state, continuation, candidate, event, step.target);
+    const condition = requiredString(
+      step.condition,
+      "tcg_v0_2_event_listener_condition_required",
+    );
+    if (!clearRuntimeCondition(target.cr, condition)) {
+      throw new Error("tcg_v0_2_event_listener_condition_stale");
+    }
+    continuation.step_cursor++;
+    return "continue";
+  }
+
   if (op === "ATTACH_ESSENCE_FROM_ZONE") {
     if (step.manual_attachment !== false) {
       throw new Error("tcg_v0_2_event_listener_attachment_must_be_effect_driven");
@@ -1862,19 +1866,17 @@ function executeStep(
       step.allowed,
       "tcg_v0_2_event_listener_clear_allowed_invalid",
     ).map(String);
-    const current = runtimeConditions(target.cr);
     const present = allowed.filter((condition) =>
-      (condition === "Scorched" && current.scorched) ||
-      (condition === "Venomed" && Number(current.venomed || 0) > 0) ||
-      current.control === condition ||
-      current.modifier === condition
+      hasRuntimeCondition(target.cr, condition)
     );
     if (!present.length) {
       continuation.step_cursor++;
       return "continue";
     }
     if (present.length === 1) {
-      clearCondition(target, present[0]);
+      if (!clearRuntimeCondition(target.cr, present[0])) {
+        throw new Error("tcg_v0_2_event_listener_condition_stale");
+      }
       continuation.step_cursor++;
       return "continue";
     }
@@ -2341,13 +2343,13 @@ export function runtimeV02ResolveEventListenerChoice(
         "tcg_v0_2_event_listener_choice_condition_target_stale",
       );
     }
-    clearCondition(
-      target,
-      requiredString(
-        selected[0]?.data.condition,
-        "tcg_v0_2_event_listener_choice_condition_invalid",
-      ),
+    const condition = requiredString(
+      selected[0]?.data.condition,
+      "tcg_v0_2_event_listener_choice_condition_invalid",
     );
+    if (!clearRuntimeCondition(target.cr, condition)) {
+      throw new Error("tcg_v0_2_event_listener_condition_stale");
+    }
     continuation.step_cursor++;
   } else {
     throw new Error(
