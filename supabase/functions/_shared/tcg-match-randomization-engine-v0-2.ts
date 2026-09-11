@@ -38,11 +38,16 @@ export function runtimeV02ShuffleInPlace<T>(
   values: T[],
   randomIndex: RuntimeV02RandomIndexSource = (maxExclusive) => runtimeV02UniformRandomInt(maxExclusive),
 ): T[] {
+  const swaps: Array<{ index: number; selectedIndex: number }> = [];
   for (let index = values.length - 1; index > 0; index -= 1) {
     const selectedIndex = randomIndex(index + 1);
     if (!Number.isInteger(selectedIndex) || selectedIndex < 0 || selectedIndex > index) {
       throw new Error("tcg_v0_2_random_index_invalid");
     }
+    swaps.push({ index, selectedIndex });
+  }
+
+  for (const { index, selectedIndex } of swaps) {
     [values[index], values[selectedIndex]] = [values[selectedIndex], values[index]];
   }
   return values;
