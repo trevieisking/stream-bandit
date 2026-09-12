@@ -19,8 +19,8 @@ test('setup distribution keeps setup timing/counts while delegating both Reward 
   assert.ok(block.includes('if(p1.deck.length<6||p2.deck.length<6)return json({ok:false,version:VERSION,error:"deck_depleted_before_rewards"},400)'));
   assert.ok(block.includes('if(ap.deck.length<7)return json({ok:false,version:VERSION,error:"deck_depleted_before_start_draw"},400)'));
   assert.ok(block.includes('const rewardOne=p1.deck.slice(0,6).map((x:Inst)=>x.uid)'));
-  assert.ok(block.includes('const rewardTwo=p2.deck.slice(0,6).map((x:Inst)=>x.uid)'));
-  assert.ok(block.includes('const drawUid=String(ap.deck[6]?.uid||"")'));
+  assert.ok(block.includes('rewardTwo=p2.deck.slice(0,6).map((x:Inst)=>x.uid)'));
+  assert.ok(block.includes('drawUid=String(ap.deck[6]?.uid||"")'));
   assert.ok(block.includes('runtimeV02ApplyCardZoneTransferBatch(['));
   assert.ok(block.includes('source_action_id:"setup_rewards"'));
   assert.ok(block.includes('destination:{controller_seat:1,zone:"rewards",owner_card_uid:null}'));
