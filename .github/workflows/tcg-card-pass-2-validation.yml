@@ -99,6 +99,9 @@ jobs:
       - name: Type-check Tactic interpreter and dependencies
         run: deno check supabase/functions/tcg-tactic-actions/index.ts
 
+      - name: Type-check Private Alpha setup API and dependencies
+        run: deno check supabase/functions/tcg-private-alpha-api/index.ts
+
       - name: Type-check structured withdrawal module and dependencies
         run: deno check supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts
 
