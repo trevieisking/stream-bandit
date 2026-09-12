@@ -77,7 +77,7 @@ test('evolved continuation is card-id-free and reuses canonical rule owners', ()
   assert.ok(helper.includes('runtime_v0_2_event_listener_continuation'));
 });
 
-test('evolve emits after stack mutation and uses one resumable generic continuation', () => {
+test('evolve emits after Creature-owner mutation and uses one resumable generic continuation', () => {
   assert.ok(match.includes('runtimeV02CreateCreatureEvolvedEvent'));
   assert.ok(match.includes('setEventResume("evolve",seat)'));
   assert.ok(match.includes('setMovementResume("evolve",seat,eventFlow.emitted_heal_packet_ids)'));
@@ -85,7 +85,11 @@ test('evolve emits after stack mutation and uses one resumable generic continuat
   const end = match.indexOf('if(action==="attach_essence")', start);
   assert.ok(start >= 0 && end > start);
   const block = match.slice(start, end);
-  assert.ok(block.indexOf('cr.stack.push(x)') < block.indexOf('runtimeV02CreateCreatureEvolvedEvent'));
+  const mutation = block.indexOf('runtimeV02EvolveCreatureFromHand(p,seat as 1|2,cr,uid,turn)');
+  const createEvent = block.indexOf('runtimeV02CreateCreatureEvolvedEvent');
+  assert.ok(mutation >= 0 && createEvent > mutation);
+  assert.equal(block.includes('cr.stack.push(x)'), false, 'dispatcher must not mutate Creature evolution stack directly');
+  assert.equal(block.includes('clearOrdinaryConditions(cr)'), false, 'dispatcher must not own evolution condition reset');
   assert.ok(block.includes('runtimeV02BeginEventListenerContinuation'));
   assert.ok(block.includes('runtimeV02BeginMovementHealListenerContinuation'));
   assert.ok(block.includes('if(!structuredEvolution)'));

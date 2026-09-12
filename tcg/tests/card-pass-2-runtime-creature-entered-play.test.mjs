@@ -145,7 +145,7 @@ test('the event continuation is card-id-free and reuses canonical owners', () =>
   assert.ok(helper.includes('step_cursor'));
 });
 
-test('play_creature emits after placement and resumes the same command without replay', () => {
+test('play_creature emits after Creature-owner placement and resumes the same command without replay', () => {
   assert.ok(match.includes('tcg-match-event-listener-v0-2.ts'));
   assert.ok(match.includes('pending_event_listener_choice:runtimeV02PendingEventListenerChoiceView'));
   assert.ok(match.includes('private_event_inspection:runtimeV02PrivateEventInspectionView'));
@@ -155,11 +155,13 @@ test('play_creature emits after placement and resumes the same command without r
   const playEnd = match.indexOf('if(action==="evolve")', playStart);
   assert.ok(playStart >= 0 && playEnd > playStart);
   const play = match.slice(playStart, playEnd);
-  const placement = play.indexOf('p.reserve[idx]={stack:[x]');
+  const placement = play.indexOf('runtimeV02PlaceCreatureFromHand(p,seat as 1|2,uid,"reserve",idx,{turn_seq:Number(s.turn_seq||0)})');
   const createEvent = play.indexOf('runtimeV02CreateCreatureEnteredPlayEvent');
   const begin = play.indexOf('runtimeV02BeginEventListenerContinuation');
   const commit = play.lastIndexOf('commit("play_creature"');
   assert.ok(placement >= 0 && createEvent > placement);
+  assert.equal(play.includes('p.reserve[idx]={stack:[x]'), false, 'play_creature must not construct Creature state directly');
+  assert.equal(play.includes('const x=removeHand(p,uid)!'), false, 'play_creature must not remove the Creature card directly');
   assert.ok(begin > createEvent);
   assert.ok(commit > begin);
   assert.ok(play.includes('setEventResume("play_creature",seat)'));
@@ -167,7 +169,7 @@ test('play_creature emits after placement and resumes the same command without r
   assert.ok(play.includes('runtimeV02BeginMovementHealListenerContinuation'));
 });
 
-test('unmarked matches retain the old play mutation while generic work fails closed to no-op', () => {
+test('unmarked matches retain the same play event mutation while generic work fails closed to no-op', () => {
   const recordStart = helper.indexOf('function recordEvent(');
   const createStart = helper.indexOf('export function runtimeV02CreateCreatureEnteredPlayEvent');
   const beginStart = helper.indexOf('export function runtimeV02BeginEventListenerContinuation');

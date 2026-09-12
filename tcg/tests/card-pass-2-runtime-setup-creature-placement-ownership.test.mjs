@@ -31,9 +31,12 @@ test('Setup keeps setup legality while Creature family owns specialist hand-to-b
 
 test('Creature family owns physical placement while Card-Zone remains excluded from specialist Creature destinations', () => {
   assert.ok(creature.includes('export function runtimeV02PlaceCreatureFromHand'));
+  assert.ok(creature.includes('export function runtimeV02EvolveCreatureFromHand'));
   assert.ok(creature.includes('player.hand.splice(handIndex, 1)'));
   assert.ok(creature.includes('if (where === "vanguard") player.vanguard = creature'));
   assert.ok(creature.includes('else player.reserve[destinationIndex!] = creature'));
+  assert.ok(creature.includes('creature.stack.push(card)'));
+  assert.ok(creature.includes('clearAllRuntimeConditions(creature)'));
   assert.ok(creature.includes('Card-Zone is intentionally not used because creature_stack is a specialist destination'));
 
   for (const forbidden of ['gale-whiffin','stone-pebblit','grove-bloomhare','Creature — Baby','Creature — Mythic']) {
@@ -41,11 +44,21 @@ test('Creature family owns physical placement while Card-Zone remains excluded f
   }
 });
 
-test('ordinary play_creature remains an explicit next caller instead of being falsely claimed complete', () => {
-  const start = match.indexOf('if(action==="play_creature")');
-  const end = match.indexOf('if(action==="evolve")', start);
-  assert.ok(start >= 0 && end > start);
-  const block = match.slice(start, end);
-  assert.ok(block.includes('p.reserve[idx]={stack:[x]'), 'ordinary play direct placement debt must stay visible until its own slice');
-  assert.equal(block.includes('runtimeV02PlaceCreatureFromHand('), false, 'this setup-only caller migration must not falsely claim ordinary play was migrated');
+test('ordinary play_creature and evolve delegate physical Creature lifecycle mutation to family #13', () => {
+  const playStart = match.indexOf('if(action==="play_creature")');
+  const evolveStart = match.indexOf('if(action==="evolve")', playStart);
+  const attachStart = match.indexOf('if(action==="attach_essence")', evolveStart);
+  assert.ok(playStart >= 0 && evolveStart > playStart && attachStart > evolveStart);
+  const play = match.slice(playStart, evolveStart);
+  const evolve = match.slice(evolveStart, attachStart);
+
+  assert.ok(play.includes('runtimeV02PlaceCreatureFromHand(p,seat as 1|2,uid,"reserve",idx,{turn_seq:Number(s.turn_seq||0)})'));
+  assert.equal(play.includes('p.reserve[idx]={stack:[x]'), false, 'ordinary play must not construct Reserve Creature state directly');
+  assert.equal(play.includes('const x=removeHand(p,uid)!'), false, 'ordinary play must not remove Creature cards from hand directly');
+
+  assert.ok(evolve.includes('runtimeV02EvolveCreatureFromHand(p,seat as 1|2,cr,uid,turn)'));
+  assert.equal(evolve.includes('cr.stack.push(x)'), false, 'evolve must not push onto Creature stacks directly');
+  assert.equal(evolve.includes('cr.evolved_turn=turn'), false, 'evolve lifecycle stamps belong to Creature family');
+  assert.equal(evolve.includes('cr.entered_turn=turn'), false, 'evolve lifecycle stamps belong to Creature family');
+  assert.equal(evolve.includes('clearOrdinaryConditions(cr)'), false, 'evolve condition reset must route through Creature -> Condition owners');
 });
