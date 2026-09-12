@@ -1,0 +1,112 @@
+name: TCG Card Pass 2 Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/tcg-card-pass-2-validation.yml
+      - tcg-card-pass-2-*.md
+      - tcg-card-pass-2-*.json
+      - tcg-runtime-*.json
+      - tcg-runtime-pass-b-withdrawal-wire.mjs
+      - tcg-runtime-pass-b-attack-damage-wire.mjs
+      - tcg-runtime-pass-b-surge-lifecycle-wire.mjs
+      - tcg-set-one-registry-builder-v0.2.mjs
+      - tcg-set-one-shadow-registry-builder-v0.2.mjs
+      - tcg-set-one-starters-v0.2.json
+      - tcg/tests/**
+      - supabase/functions/_shared/tcg-runtime-registry-v0-2.ts
+      - supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts
+      - supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts
+      - supabase/functions/_shared/tcg-match-surge-lifecycle-v0-2.ts
+      - supabase/functions/tcg-match-actions/**
+      - supabase/functions/tcg-private-alpha-api/**
+      - supabase/functions/tcg-tactic-actions/**
+      - supabase/migrations/20260906183000_tcg_v0_2_shadow_registry.sql
+      - supabase/migrations/20260906190000_tcg_v0_2_set_one_shadow_registry_load.sql
+      - supabase/migrations/20260906191500_tcg_match_v0_2_registry_snapshot_bridge.sql
+      - supabase/migrations/20260906193000_tcg_match_v0_2_runtime_marker_bridge.sql
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tcg-card-pass-2-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  set-one-structure:
+    name: Set One 193-card structure, starter and effect-grammar validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out reviewed head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate Card Pass 2 candidates, eight exact starters and effect grammar
+        run: node --test tcg/tests/card-pass-2-*.test.mjs
+
+      - name: Verify guarded Runtime Pass B withdrawal wiring is materialized
+        run: node tcg-runtime-pass-b-withdrawal-wire.mjs --check
+
+      - name: Verify guarded Runtime Pass B attack-damage wiring is materialized
+        run: node tcg-runtime-pass-b-attack-damage-wire.mjs --check
+
+      - name: Verify guarded Runtime Pass B Surge lifecycle wiring is materialized
+        run: node tcg-runtime-pass-b-surge-lifecycle-wire.mjs --check
+
+      - name: Generate immutable Set One v0.2 shadow-registry migration payload
+        run: node tcg-set-one-shadow-registry-builder-v0.2.mjs tcg-set-one-shadow-registry-v0.2.generated.sql
+
+      - name: Upload immutable Set One v0.2 shadow-registry migration payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: tcg-set-one-shadow-registry-v0-2
+          path: tcg-set-one-shadow-registry-v0.2.generated.sql
+          if-no-files-found: error
+          retention-days: 1
+
+  runtime-core:
+    name: v0.2 deterministic runtime core
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out reviewed head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Run v0.2 runtime core and registry bridge tests
+        run: deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-*.test.ts
+
+      - name: Type-check Match action dispatcher and dependencies
+        run: deno check supabase/functions/tcg-match-actions/index.ts
+
+      - name: Type-check Tactic interpreter and dependencies
+        run: deno check supabase/functions/tcg-tactic-actions/index.ts
+
+      - name: Type-check Private Alpha setup API and dependencies
+        run: deno check supabase/functions/tcg-private-alpha-api/index.ts
+
+      - name: Type-check structured withdrawal module and dependencies
+        run: deno check supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts
+
+      - name: Type-check structured attack-damage module and dependencies
+        run: deno check supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts
+
+      - name: Type-check structured Surge lifecycle module and dependencies
+        run: deno check supabase/functions/_shared/tcg-match-surge-lifecycle-v0-2.ts
