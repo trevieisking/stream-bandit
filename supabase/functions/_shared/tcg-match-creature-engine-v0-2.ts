@@ -115,13 +115,15 @@ function validateCandidate<T extends RuntimeV02CardZoneInstance>(
 export function runtimeV02ResolveDefeatedCreatures<T extends RuntimeV02CardZoneInstance>(
   candidates: readonly RuntimeV02DefeatedCreatureCandidate<T>[],
 ): RuntimeV02DefeatedCreaturesResult<T> {
-  if (!Array.isArray(candidates) || candidates.length < 1) {
+  if (!Array.isArray(candidates)) {
     throw new Error("tcg_v0_2_creature_defeat_candidates_required");
   }
+  const defeatCandidates: readonly RuntimeV02DefeatedCreatureCandidate<T>[] = candidates;
+  if (defeatCandidates.length < 1) throw new Error("tcg_v0_2_creature_defeat_candidates_required");
 
   const occupiedPositions = new Set<string>();
   const occupiedCreatures = new Set<RuntimeV02CreatureState<T>>();
-  const validated = candidates.map((candidate, index) => {
+  const validated = defeatCandidates.map((candidate, index) => {
     const details = validateCandidate(candidate, index);
     const positionKey = `${candidate.owner_seat}:${candidate.where}:${candidate.index ?? "vanguard"}`;
     if (occupiedPositions.has(positionKey) || occupiedCreatures.has(candidate.creature)) {
@@ -157,7 +159,7 @@ export function runtimeV02ResolveDefeatedCreatures<T extends RuntimeV02CardZoneI
     });
   };
 
-  candidates.forEach((candidate, index) => {
+  defeatCandidates.forEach((candidate, index) => {
     const details = validated[index];
     const stackUids = candidate.creature.stack.map((card) => card.uid);
     const essenceUids = candidate.creature.essence.map((card) => card.uid);
@@ -168,7 +170,7 @@ export function runtimeV02ResolveDefeatedCreatures<T extends RuntimeV02CardZoneI
   });
 
   const batch = runtimeV02ApplyCardZoneTransferBatch(operations);
-  candidates.forEach((candidate) => {
+  defeatCandidates.forEach((candidate) => {
     candidate.creature.relic = null;
     if (candidate.where === "vanguard") candidate.player.vanguard = null;
     else candidate.player.reserve[Number(candidate.index)] = null;
@@ -176,7 +178,7 @@ export function runtimeV02ResolveDefeatedCreatures<T extends RuntimeV02CardZoneI
 
   return {
     cards: batch.cards,
-    defeats: candidates.map((candidate, index) => ({
+    defeats: defeatCandidates.map((candidate, index) => ({
       owner_seat: candidate.owner_seat,
       where: candidate.where,
       index: candidate.index,
