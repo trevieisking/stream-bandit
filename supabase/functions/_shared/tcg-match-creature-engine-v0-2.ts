@@ -12,10 +12,36 @@ export type RuntimeV02CreatureState<T extends RuntimeV02CardZoneInstance> = {
   damage: number;
 };
 
+export type RuntimeV02PlacedCreatureState<T extends RuntimeV02CardZoneInstance> = RuntimeV02CreatureState<T> & {
+  shield: number;
+  condition: string | null;
+  flags: Record<string, unknown>;
+};
+
 export type RuntimeV02CreaturePlayerState<T extends RuntimeV02CardZoneInstance> = {
   vanguard: RuntimeV02CreatureState<T> | null;
   reserve: Array<RuntimeV02CreatureState<T> | null>;
   discard: T[];
+};
+
+export type RuntimeV02CreaturePlacementPlayerState<T extends RuntimeV02CardZoneInstance> = {
+  hand: T[];
+  vanguard: RuntimeV02CreatureState<T> | null;
+  reserve: Array<RuntimeV02CreatureState<T> | null>;
+};
+
+export type RuntimeV02CreaturePlacementReceipt = {
+  schema: "sb-tcg-creature-placement-v0.2";
+  controller_seat: 1 | 2;
+  where: "vanguard" | "reserve";
+  index: number | null;
+  card_uid: string;
+};
+
+export type RuntimeV02CreaturePlacementResult<T extends RuntimeV02CardZoneInstance> = {
+  card: T;
+  creature: RuntimeV02PlacedCreatureState<T>;
+  receipt: RuntimeV02CreaturePlacementReceipt;
 };
 
 export type RuntimeV02DefeatedCreatureCandidate<T extends RuntimeV02CardZoneInstance> = {
@@ -45,6 +71,71 @@ function requiredUid(value: unknown, error: string): string {
   const uid = typeof value === "string" ? value.trim() : "";
   if (!uid) throw new Error(error);
   return uid;
+}
+
+/**
+ * Creature/Evolution owner for specialist hand-to-battlefield placement.
+ * The caller owns phase, card legality and destination choice; this owner validates
+ * the exact source/destination identity and performs the physical Creature mutation.
+ * Card-Zone is intentionally not used because creature_stack is a specialist destination.
+ */
+export function runtimeV02PlaceCreatureFromHand<T extends RuntimeV02CardZoneInstance>(
+  player: RuntimeV02CreaturePlacementPlayerState<T>,
+  controllerSeat: 1 | 2,
+  cardUid: string,
+  where: "vanguard" | "reserve",
+  index: number | null,
+): RuntimeV02CreaturePlacementResult<T> {
+  if (!player || !Array.isArray(player.hand) || !Array.isArray(player.reserve)) {
+    throw new Error("tcg_v0_2_creature_placement_player_invalid");
+  }
+  if (controllerSeat !== 1 && controllerSeat !== 2) {
+    throw new Error("tcg_v0_2_creature_placement_controller_invalid");
+  }
+  const uid = requiredUid(cardUid, "tcg_v0_2_creature_placement_card_uid_required");
+  const handIndex = player.hand.findIndex((card) => card?.uid === uid);
+  if (handIndex < 0) throw new Error("tcg_v0_2_creature_placement_card_missing");
+
+  let destinationIndex: number | null = null;
+  if (where === "vanguard") {
+    if (index !== null) throw new Error("tcg_v0_2_creature_placement_vanguard_index_invalid");
+    if (player.vanguard) throw new Error("tcg_v0_2_creature_placement_destination_occupied");
+  } else if (where === "reserve") {
+    if (!Number.isInteger(index) || Number(index) < 0 || Number(index) > 3) {
+      throw new Error("tcg_v0_2_creature_placement_reserve_index_invalid");
+    }
+    destinationIndex = Number(index);
+    if (player.reserve[destinationIndex]) throw new Error("tcg_v0_2_creature_placement_destination_occupied");
+  } else {
+    throw new Error("tcg_v0_2_creature_placement_destination_invalid");
+  }
+
+  const card = player.hand[handIndex];
+  const creature: RuntimeV02PlacedCreatureState<T> = {
+    stack: [card],
+    essence: [],
+    relic: null,
+    damage: 0,
+    shield: 0,
+    condition: null,
+    flags: {},
+  };
+
+  player.hand.splice(handIndex, 1);
+  if (where === "vanguard") player.vanguard = creature;
+  else player.reserve[destinationIndex!] = creature;
+
+  return {
+    card,
+    creature,
+    receipt: {
+      schema: "sb-tcg-creature-placement-v0.2",
+      controller_seat: controllerSeat,
+      where,
+      index: destinationIndex,
+      card_uid: uid,
+    },
+  };
 }
 
 function validateCandidate<T extends RuntimeV02CardZoneInstance>(
