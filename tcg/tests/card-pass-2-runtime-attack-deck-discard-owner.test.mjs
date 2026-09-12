@@ -105,3 +105,27 @@ test('attack dispatcher preserves the accepted deck-discard event-to-heal owner 
     );
   }
 });
+
+test('legacy conditional deck-discard fallback keeps legacy semantics while Card-Zone owns physical movement', () => {
+  const attack = dispatcher.slice(dispatcher.indexOf('if(action==="attack")'));
+  const start = attack.indexOf('if(structuredDeckDiscard==null&&ef.includes("top 2 cards of the opponent\'s deck")&&hasCondition(target)){');
+  const end = attack.indexOf('if(atk.metadata_source==="legacy"&&ad?.id==="astral-cosmarch"', start);
+  assert.ok(start >= 0 && end > start, 'legacy deck-discard fallback block missing');
+  const legacyBlock = attack.slice(start, end);
+
+  assert.ok(legacyBlock.includes('const legacyDeckDiscardUids=opp.deck.slice(0,Math.min(2,opp.deck.length)).map((card:Inst)=>String(card.uid));'));
+  assert.ok(legacyBlock.includes('if(legacyDeckDiscardUids.length>0)runtimeV02ApplyCardZoneTransfer(opp.deck,opp.discard'));
+  assert.ok(legacyBlock.includes('cause:"effect"'));
+  assert.ok(legacyBlock.includes('action_kind:"attack"'));
+  assert.ok(legacyBlock.includes('source_action_id:String(atk.id||`attack-${slot}`)'));
+  assert.ok(legacyBlock.includes('source_card_uid:attackSourceCard.uid'));
+  assert.ok(legacyBlock.includes('source:{controller_seat:otherSeat as 1|2,zone:"deck",owner_card_uid:null}'));
+  assert.ok(legacyBlock.includes('destination:{controller_seat:otherSeat as 1|2,zone:"discard",owner_card_uid:null}'));
+  assert.ok(legacyBlock.includes('card_uids:legacyDeckDiscardUids'));
+  assert.ok(legacyBlock.includes('destination_position:"bottom"'));
+
+  assert.equal(legacyBlock.includes('runtimeV02CreateDeckCardsDiscardedEvent('), false, 'legacy fallback must not gain structured event semantics');
+  assert.equal(legacyBlock.includes('runtimeV02BeginEventListenerContinuation('), false, 'legacy fallback must not gain structured listener semantics');
+  assert.equal(legacyBlock.includes('opp.deck.shift('), false, 'legacy fallback regained direct deck mutation');
+  assert.equal(legacyBlock.includes('opp.discard.push('), false, 'legacy fallback regained direct discard mutation');
+});
