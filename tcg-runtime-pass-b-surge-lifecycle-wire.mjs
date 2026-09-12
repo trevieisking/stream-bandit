@@ -24,7 +24,8 @@ const attachmentEngineLifecycleCall = 'const lifecycleRegistered = registerStruc
 const attachmentRouteEngineCall = 'runtimeV02ApplyEssenceAttachmentTransaction(';
 
 const aftermathLegacy = 'const kept:Inst[]=[];for(const e of x.cr.essence||[]){const ef=(e.effect_flags||{}) as any;const generated=ef.discard_during_target_aftermath===true;const surge=x.where==="vanguard"&&e.card_id==="volt-surge-essence"&&Number(e.attached_turn??-1)===turn;if(generated||surge)owner.discard.push(e);else kept.push(e)}x.cr.essence=kept';
-const aftermathWired = 'clearStructuredRuntimeAttachmentAttackBonusesAtAftermath(s,x.cr,turn);const kept:Inst[]=[];for(const e of x.cr.essence||[]){const ef=(e.effect_flags||{}) as any;const generated=ef.discard_during_target_aftermath===true;const structuredDisposition=structuredRuntimeAftermathEssenceDisposition(s,e,turn);const legacySurge=structuredDisposition==null&&x.where==="vanguard"&&e.card_id==="volt-surge-essence"&&Number(e.attached_turn??-1)===turn;if(generated||structuredDisposition==="discard"||legacySurge)owner.discard.push(e);else kept.push(e)}x.cr.essence=kept';
+const aftermathDirectWired = 'clearStructuredRuntimeAttachmentAttackBonusesAtAftermath(s,x.cr,turn);const kept:Inst[]=[];for(const e of x.cr.essence||[]){const ef=(e.effect_flags||{}) as any;const generated=ef.discard_during_target_aftermath===true;const structuredDisposition=structuredRuntimeAftermathEssenceDisposition(s,e,turn);const legacySurge=structuredDisposition==null&&x.where==="vanguard"&&e.card_id==="volt-surge-essence"&&Number(e.attached_turn??-1)===turn;if(generated||structuredDisposition==="discard"||legacySurge)owner.discard.push(e);else kept.push(e)}x.cr.essence=kept';
+const aftermathCardZoneWired = 'clearStructuredRuntimeAttachmentAttackBonusesAtAftermath(s,x.cr,turn);const discardEssenceUids:string[]=[];for(const e of x.cr.essence||[]){const ef=(e.effect_flags||{}) as any;const generated=ef.discard_during_target_aftermath===true;const structuredDisposition=structuredRuntimeAftermathEssenceDisposition(s,e,turn);const legacySurge=structuredDisposition==null&&x.where==="vanguard"&&e.card_id==="volt-surge-essence"&&Number(e.attached_turn??-1)===turn;if(generated||structuredDisposition==="discard"||legacySurge)discardEssenceUids.push(e.uid)}if(discardEssenceUids.length){const ownerCardUid=String(x.cr.stack?.[x.cr.stack.length-1]?.uid||"");if(!ownerCardUid)throw new Error("tcg_v0_2_aftermath_essence_owner_required");runtimeV02ApplyCardZoneTransfer(x.cr.essence,owner.discard,{cause:"effect",action_kind:"aftermath",source_action_id:"aftermath_essence_disposition",source_card_uid:ownerCardUid,source:{controller_seat:who as 1|2,zone:"attached_essence",owner_card_uid:ownerCardUid},destination:{controller_seat:who as 1|2,zone:"discard",owner_card_uid:null},card_uids:discardEssenceUids,destination_position:"bottom"})}';
 
 let next = source;
 if (!next.includes(surgeImportEngineOwned)) {
@@ -61,10 +62,11 @@ if (!attachmentEngineSource.includes(attachmentEngineLifecycleCall)) {
   throw new Error('attachment_engine_surge_lifecycle_call_missing');
 }
 
-if (next.includes(aftermathLegacy)) next = next.replace(aftermathLegacy, aftermathWired);
-else if (!next.includes(aftermathWired)) throw new Error('match_actions_surge_aftermath_anchor_changed');
+if (next.includes(aftermathLegacy)) next = next.replace(aftermathLegacy, aftermathCardZoneWired);
+else if (next.includes(aftermathDirectWired)) next = next.replace(aftermathDirectWired, aftermathCardZoneWired);
+else if (!next.includes(aftermathCardZoneWired)) throw new Error('match_actions_surge_aftermath_anchor_changed');
 
-for (const required of [surgeImportEngineOwned, attackWired, aftermathWired, attachmentRouteImport, attachEngineBoundary, attachRouteCall]) {
+for (const required of [surgeImportEngineOwned, attackWired, aftermathCardZoneWired, attachmentRouteImport, attachEngineBoundary, attachRouteCall]) {
   if (!next.includes(required)) throw new Error('match_actions_surge_wiring_incomplete');
   if (next.indexOf(required) !== next.lastIndexOf(required)) throw new Error('match_actions_surge_wiring_duplicate');
 }
