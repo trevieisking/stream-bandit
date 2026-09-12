@@ -68,6 +68,7 @@ export type RuntimeV02EventListenerEvent = {
   subject_uid: string;
   subject_card_id?: string;
   controller_seat: 1 | 2;
+  source_controller_seat?: 1 | 2;
   origin_zone: string;
   destination_zone: string;
   destination_index: number | null;
@@ -745,6 +746,10 @@ function requirement(
       return event.action_kind === String(value.action_kind || "");
     case "event_controller_is_self":
       return event.controller_seat === candidate.seat;
+    case "event_controller_is_opponent":
+      return event.controller_seat === (candidate.seat === 1 ? 2 : 1);
+    case "source_controller_is_self":
+      return event.source_controller_seat === candidate.seat;
     case "event_controller_is_active_seat":
       return event.controller_seat === Number(state.active_seat);
     case "event_subject_matches":
