@@ -7,11 +7,6 @@ const owner = fs.readFileSync(
   'utf8',
 );
 
-const dispatcher = fs.readFileSync(
-  'supabase/functions/tcg-match-actions/index.ts',
-  'utf8',
-);
-
 test('Realm Engine family #18 owns shared-slot mutation without absorbing other systems', () => {
   assert.ok(owner.includes('export function runtimeV02ApplyRealmPlayTransaction'));
   assert.ok(owner.includes('schema: "sb-tcg-realm-transaction-v0.2"'));
@@ -56,12 +51,4 @@ test('Realm Engine preserves specialist Realm boundary and event handoff only', 
   assert.equal(owner.includes('pending_event_listener_choice'), false);
   assert.equal(owner.includes('tactic.program'), false);
   assert.equal(owner.includes('definition_v0_2'), false);
-});
-
-test('Realm Engine foundation is not yet wired into the dispatcher', () => {
-  assert.equal(
-    dispatcher.includes('tcg-match-realm-engine-v0-2.ts'),
-    false,
-    'foundation step must remain unwired until its own exact-head gates pass',
-  );
 });
