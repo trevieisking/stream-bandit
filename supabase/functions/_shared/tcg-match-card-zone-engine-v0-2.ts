@@ -55,6 +55,24 @@ export type RuntimeV02CardZoneTransferResult<T extends RuntimeV02CardZoneInstanc
   receipt: RuntimeV02CardZoneTransferReceipt;
 };
 
+export type RuntimeV02CardZoneTransferBatchOperation<T extends RuntimeV02CardZoneInstance> = {
+  source_zone: T[];
+  destination_zone: T[];
+  request: RuntimeV02CardZoneTransferRequest;
+};
+
+export type RuntimeV02CardZoneTransferBatchReceipt = {
+  schema: "sb-tcg-card-zone-transfer-batch-v0.2";
+  transfers: RuntimeV02CardZoneTransferReceipt[];
+  card_uids: string[];
+  count: number;
+};
+
+export type RuntimeV02CardZoneTransferBatchResult<T extends RuntimeV02CardZoneInstance> = {
+  cards: T[];
+  receipt: RuntimeV02CardZoneTransferBatchReceipt;
+};
+
 export type RuntimeV02CardZonePartitionTransferRequest = {
   cause: "effect" | "rule";
   action_kind: string;
@@ -291,6 +309,64 @@ export function runtimeV02ApplyCardZoneTransfer<T extends RuntimeV02CardZoneInst
 ): RuntimeV02CardZoneTransferResult<T> {
   const preflight = runtimeV02PreflightCardZoneTransfer(sourceZone, destinationZone, request);
   return runtimeV02CommitCardZoneTransfer(sourceZone, destinationZone, preflight);
+}
+
+/**
+ * Applies an ordered group of card-zone movements as one atomic transaction.
+ * Every operation runs against shallow working copies first. The real zones are
+ * updated only after the complete batch validates, so a later invalid transfer
+ * cannot leave earlier source or destination arrays partially mutated.
+ */
+export function runtimeV02ApplyCardZoneTransferBatch<T extends RuntimeV02CardZoneInstance>(
+  operations: readonly RuntimeV02CardZoneTransferBatchOperation<T>[],
+): RuntimeV02CardZoneTransferBatchResult<T> {
+  if (!Array.isArray(operations) || operations.length < 1) {
+    throw new Error("tcg_v0_2_card_zone_batch_operations_required");
+  }
+
+  const snapshots = new Map<T[], T[]>();
+  const workingZones = new Map<T[], T[]>();
+  const workingZone = (zone: T[], role: "source" | "destination", index: number): T[] => {
+    if (!Array.isArray(zone)) throw new Error(`tcg_v0_2_card_zone_batch_${role}_invalid:${index}`);
+    if (!snapshots.has(zone)) {
+      snapshots.set(zone, [...zone]);
+      workingZones.set(zone, [...zone]);
+    }
+    return workingZones.get(zone)!;
+  };
+
+  const cards: T[] = [];
+  const transfers: RuntimeV02CardZoneTransferReceipt[] = [];
+  for (let index = 0; index < operations.length; index += 1) {
+    const operation = operations[index];
+    if (!operation || typeof operation !== "object") {
+      throw new Error(`tcg_v0_2_card_zone_batch_operation_invalid:${index}`);
+    }
+    const result = runtimeV02ApplyCardZoneTransfer(
+      workingZone(operation.source_zone, "source", index),
+      workingZone(operation.destination_zone, "destination", index),
+      operation.request,
+    );
+    cards.push(...result.cards);
+    transfers.push(result.receipt);
+  }
+
+  for (const [zone, snapshot] of snapshots) {
+    if (!sameSnapshot(zone, snapshot)) throw new Error("tcg_v0_2_card_zone_batch_preflight_stale");
+  }
+  for (const [zone, next] of workingZones) {
+    zone.splice(0, zone.length, ...next);
+  }
+
+  return {
+    cards,
+    receipt: {
+      schema: "sb-tcg-card-zone-transfer-batch-v0.2",
+      transfers,
+      card_uids: cards.map((card) => card.uid),
+      count: cards.length,
+    },
+  };
 }
 
 /**

@@ -1,4 +1,5 @@
 import {
+  runtimeV02ApplyCardZoneTransferBatch,
   runtimeV02ApplyCardZonePartitionTransfer,
   runtimeV02ApplyCardZoneTransfer,
   runtimeV02CommitCardZoneTransfer,
@@ -192,6 +193,82 @@ Deno.test("Card-Zone commit rejects stale exact-object snapshots before either z
 
   assertSame(source[0], replacement);
   assertEquals(discard, []);
+});
+
+Deno.test("Card-Zone batch preserves operation order and exact identities across multiple source zones", () => {
+  const baby = card("baby-1", "baby");
+  const adult = card("adult-1", "adult");
+  const essence = card("essence-1", "essence");
+  const relic = card("relic-1", "relic");
+  const existing = card("discard-1", "existing");
+  const stack = [baby, adult];
+  const attachedEssence = [essence];
+  const attachedRelic = [relic];
+  const discard = [existing];
+  const owner = adult.uid;
+
+  const result = runtimeV02ApplyCardZoneTransferBatch([
+    {
+      source_zone: stack,
+      destination_zone: discard,
+      request: { ...request([baby.uid, adult.uid]), action_kind: "defeat", source_action_id: "defeated_creature", source: endpoint("creature_stack", owner) },
+    },
+    {
+      source_zone: attachedEssence,
+      destination_zone: discard,
+      request: { ...request([essence.uid]), action_kind: "defeat", source_action_id: "defeated_creature", source: endpoint("attached_essence", owner) },
+    },
+    {
+      source_zone: attachedRelic,
+      destination_zone: discard,
+      request: { ...request([relic.uid]), action_kind: "defeat", source_action_id: "defeated_creature", source: endpoint("attached_relic", owner) },
+    },
+  ]);
+
+  assertEquals(stack, []);
+  assertEquals(attachedEssence, []);
+  assertEquals(attachedRelic, []);
+  assertEquals(discard.map((entry) => entry.uid), [existing.uid, baby.uid, adult.uid, essence.uid, relic.uid]);
+  assertSame(discard[1], baby);
+  assertSame(discard[2], adult);
+  assertSame(discard[3], essence);
+  assertSame(discard[4], relic);
+  assertEquals(result.receipt.schema, "sb-tcg-card-zone-transfer-batch-v0.2");
+  assertEquals(result.receipt.card_uids, [baby.uid, adult.uid, essence.uid, relic.uid]);
+  assertEquals(result.receipt.count, 4);
+  assertEquals(result.receipt.transfers.length, 3);
+});
+
+Deno.test("Card-Zone batch rolls back every real zone when a later operation fails", () => {
+  const creature = card("creature-1", "creature");
+  const essence = card("essence-1", "essence");
+  const existing = card("discard-1", "existing");
+  const stack = [creature];
+  const attachedEssence = [essence];
+  const discard = [existing];
+
+  assertThrows(
+    () => runtimeV02ApplyCardZoneTransferBatch([
+      {
+        source_zone: stack,
+        destination_zone: discard,
+        request: { ...request([creature.uid]), action_kind: "defeat", source_action_id: "defeated_creature", source: endpoint("creature_stack", creature.uid) },
+      },
+      {
+        source_zone: attachedEssence,
+        destination_zone: discard,
+        request: { ...request(["missing-essence"]), action_kind: "defeat", source_action_id: "defeated_creature", source: endpoint("attached_essence", creature.uid) },
+      },
+    ]),
+    "tcg_v0_2_card_zone_selected_card_missing",
+  );
+
+  assertSame(stack[0], creature);
+  assertSame(attachedEssence[0], essence);
+  assertSame(discard[0], existing);
+  assertEquals(stack.length, 1);
+  assertEquals(attachedEssence.length, 1);
+  assertEquals(discard.length, 1);
 });
 
 Deno.test("Card-Zone partition atomically moves a chosen top-window card and preserves remainder order at source bottom", () => {

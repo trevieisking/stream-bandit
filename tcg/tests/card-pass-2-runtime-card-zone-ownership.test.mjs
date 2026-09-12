@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const engine = fs.readFileSync('supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts', 'utf8');
+const creatureEngine = fs.readFileSync('supabase/functions/_shared/tcg-match-creature-engine-v0-2.ts', 'utf8');
 const overcharge = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts', 'utf8');
 const recycle = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-discard-recycle-choice-v0-2.ts', 'utf8');
 const serverTop = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-server-top-deck-v0-2.ts', 'utf8');
@@ -21,6 +22,7 @@ function functionSlice(source, start, end) {
 test('Card-Zone Engine is generic, card-id-free and cannot absorb specialist attachment destinations', () => {
   assert.ok(engine.includes('export function runtimeV02PreflightCardZoneTransfer'));
   assert.ok(engine.includes('export function runtimeV02ApplyCardZoneTransfer'));
+  assert.ok(engine.includes('export function runtimeV02ApplyCardZoneTransferBatch'));
   assert.ok(engine.includes('export function runtimeV02ApplyCardZonePartitionTransfer'));
   assert.ok(engine.includes('tcg_v0_2_card_zone_specialist_destination_owned'));
   assert.ok(engine.includes('sourceZone.splice(0, sourceZone.length, ...remaining)'));
@@ -40,6 +42,36 @@ test('Card-Zone Engine is generic, card-id-free and cannot absorb specialist att
   ]) {
     assert.equal(engine.includes(forbidden), false, `Card-Zone owner contains card/name authority: ${forbidden}`);
   }
+});
+
+test('Creature/Evolution owns defeated-creature lifecycle while Card-Zone owns one atomic ordered transfer batch', () => {
+  assert.ok(creatureEngine.includes('runtimeV02ApplyCardZoneTransferBatch'));
+  assert.ok(creatureEngine.includes('export function runtimeV02ResolveDefeatedCreatures'));
+  assert.ok(creatureEngine.includes('"creature_stack"'));
+  assert.ok(creatureEngine.includes('"attached_essence"'));
+  assert.ok(creatureEngine.includes('"attached_relic"'));
+  assert.ok(creatureEngine.includes('candidate.creature.relic = null'));
+  assert.ok(creatureEngine.includes('candidate.player.vanguard = null'));
+  assert.ok(creatureEngine.includes('candidate.player.reserve[Number(candidate.index)] = null'));
+
+  for (const forbidden of [
+    '.discard.push(',
+    '.stack.splice(',
+    '.essence.splice(',
+  ]) {
+    assert.equal(creatureEngine.includes(forbidden), false, `Creature owner duplicated Card-Zone mutation authority: ${forbidden}`);
+  }
+
+  assert.ok(match.includes('import { runtimeV02ResolveDefeatedCreatures } from "../_shared/tcg-match-creature-engine-v0-2.ts";'));
+  const block = functionSlice(match, 'const scanDefeats=()=>', 'const advanceTurn=()=>');
+  const collectAt = block.indexOf('defeated.push(');
+  const resolveAt = block.indexOf('runtimeV02ResolveDefeatedCreatures(');
+  const rewardAt = block.indexOf('queue().push({kind:"take_reward"');
+  assert.ok(collectAt >= 0 && resolveAt > collectAt, 'scanDefeats must collect before delegating lifecycle');
+  assert.ok(rewardAt > resolveAt, 'Reward coordination must follow successful lifecycle resolution');
+  assert.ok(block.includes('max_hp:d.maxHp'));
+  assert.equal(match.includes('function safeDiscardCreature('), false);
+  assert.equal(block.includes('.discard.push('), false);
 });
 
 test('legacy Stormmane keeps mechanic legality and public error while delegating physical movement to Card-Zone Engine', () => {
