@@ -75,7 +75,7 @@ function stateFor(predicate: string): Record<string, unknown> {
     limit: null,
     requirements: { predicate },
     costs: [],
-    steps: [{ op: "DRAW_FIXED", player: "self", count: 0 }],
+    steps: [{ op: "DRAW", player: "self", count: 0 }],
   });
   const opponentDefinition = creatureDefinition(opponent.card_id, null);
   return {
