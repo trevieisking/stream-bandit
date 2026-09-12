@@ -13,7 +13,7 @@ function slice(source, start, end) {
 }
 
 test('opening hand and failed mulligan keep setup rules while delegating movement to Card-Zone and shuffle to Randomization', () => {
-  const block = slice(setup, 'function opening(', 'function creatureFrom');
+  const block = slice(setup, 'function opening(', 'function publicField');
 
   assert.ok(block.includes('function opening(deck0:Inst[],meta:Record<string,any>,seat:1|2)'));
   assert.ok(block.includes('const hand:Inst[]=[]'));
