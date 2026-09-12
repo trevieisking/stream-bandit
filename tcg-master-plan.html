@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Stream Bandit TCG — Master Plan & Progress</title>
+<style>
+:root{color-scheme:dark;--bg:#080b10;--panel:#111722;--panel2:#171f2d;--line:#2b3850;--text:#f5f8fc;--muted:#9eabc0;--green:#58d67b;--amber:#ffc857;--red:#ff7b72;--blue:#75a9ff;--purple:#bf9cff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07090d,#0e1420 42%,#080b10);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{width:min(1180px,calc(100% - 28px));margin:auto;padding:28px 0 64px}.hero,.card{border:1px solid var(--line);background:rgba(17,23,34,.96);border-radius:18px}.hero{padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.28)}h1{font-size:clamp(30px,5vw,50px);line-height:1.04;margin:4px 0 10px}h2{font-size:24px;margin:30px 0 12px}h3{font-size:17px;margin:0 0 8px}.kicker{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue)}.lead{font-size:17px;max-width:920px;color:#dbe3ef}.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.badge{border:1px solid var(--line);background:#0c1320;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:900}.good{color:var(--green)}.hold{color:var(--amber)}.bad{color:var(--red)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{grid-column:span 6;padding:18px}.wide{grid-column:1/-1}.third{grid-column:span 4}.stat{font-size:34px;font-weight:950;line-height:1;margin-bottom:7px}.muted{color:var(--muted)}.bar{height:12px;border-radius:999px;overflow:hidden;background:#0a1019;border:1px solid var(--line);margin:10px 0 6px}.bar>span{display:block;height:100%;background:linear-gradient(90deg,#5f93ff,#8ab4ff);width:var(--p)}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#c8d4e7}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.note{padding:12px 14px;border-left:4px solid var(--blue);border-radius:8px;background:#0d1624}.warning{border-left-color:var(--amber)}.danger{border-left-color:var(--red)}ul,ol{padding-left:20px;margin:8px 0}li+li{margin-top:5px}.stage{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.stage:last-child{border-bottom:0}.num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#1b2638;border:1px solid #364764;font-weight:900}.small{font-size:12px}.footer{margin-top:30px;color:var(--muted);font-size:12px}@media(max-width:780px){.card,.third{grid-column:1/-1}.hero{padding:20px}.wrap{width:min(100% - 18px,1180px)}table{font-size:13px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="hero">
+<div class="kicker">Stream Bandit TCG · live project control page</div>
+<h1>Master Plan & Progress</h1>
+<p class="lead">One plain-English source of truth for what is finished, what is safely branch-only, what still blocks a real two-player private alpha, and what must happen before production promotion.</p>
+<div class="badges"><span class="badge good">DESIGN / STRUCTURE: STRONG</span><span class="badge good">PR #549: ACTIVE</span><span class="badge good">LATEST PROVEN HEAD: 28ea5461</span><span class="badge hold">GAME PRODUCTION: HOLD</span><span class="badge">TCG ONLY</span></div>
+</section>
+
+<h2>Overall completion</h2>
+<section class="grid">
+<article class="card third"><div class="stat">66%</div><h3>Working overall completion</h3><div class="bar" style="--p:66%"><span></span></div><p class="muted">Weighted by remaining effort to reach a safe, usable private alpha. This is deliberately not equal-checkbox maths.</p></article>
+<article class="card third"><div class="stat">95%</div><h3>Rules + Set One structure</h3><div class="bar" style="--p:95%"><span></span></div><p class="muted">193 current identities, eight starters, schema, effect grammar, validator, registry builders and replay-safe shadow registry are established. Balance remains.</p></article>
+<article class="card third"><div class="stat">74%</div><h3>Battle runtime</h3><div class="bar" style="--p:74%"><span></span></div><p class="muted">Core authoritative battle plumbing is substantial. Count-add is structured, 10 state-local conditional attacks are structured, and the three Device-resolved Volt conditional attacks now consume canonical turn-state rather than English bonus parsing.</p></article>
+</section>
+<p class="note"><strong>Why 66% instead of simply counting ticks?</strong> The latest increase is earned by tested runtime behaviour: 13 of the 18 frozen conditional-add attacks now use deterministic structured battle evaluation. Five history/attachment cases remain fenced, and several later runtime/UI/release blocks are still large jobs.</p>
+
+<h2>Current source-of-truth state</h2>
+<section class="grid">
+<article class="card"><h3 class="good">Live today</h3><ul><li>Private-alpha foundation/security.</li><li>Atomic starter grant and deck-validation foundation.</li><li>Private rooms + join codes.</li><li>Match shell, hidden canonical state and atomic command commit.</li><li>Card printings + art bucket.</li><li><span class="mono">tcg-private-alpha-api</span> JWT-protected.</li><li><span class="mono">tcg-match-actions</span> production remains the older protected v0.1 baseline.</li></ul></article>
+<article class="card"><h3 class="hold">Branch-only on PR #549</h3><ul><li>Three-currency economy source.</li><li>Automatic matchmaking.</li><li>Arcade progression/reward receipts.</li><li><span class="mono">tcg-match-actions</span> v0.3 candidate.</li><li><span class="mono">tcg-tactic-actions</span> deterministic interpreter candidate.</li><li>Frozen v0.2 registry builders, shadow registry and match snapshot/runtime marker bridges.</li><li>Structured withdrawal, attack-damage, Surge lifecycle, declaration requirements and count-add formula integration.</li><li>Frozen conditional-add metadata/evaluator covers all 18 attacks; 13 are now battle-wired, including Relay Strike, Charged Tool and Copper Arc through the canonical Device-resolution turn flag.</li></ul></article>
+<article class="card wide"><h3>Exact development identity</h3><table><tr><th>Item</th><th>Current value</th></tr><tr><td>Repository</td><td class="mono">trevieisking/stream-bandit</td></tr><tr><td>TCG integration PR</td><td>#549 — open / draft / unmerged</td></tr><tr><td>TCG branch</td><td class="mono">feature/tcg-private-alpha-v0-5-source-recovery</td></tr><tr><td>Latest proven TCG head</td><td class="mono">28ea54617265640a5653a9840ba19407989ed78f</td></tr><tr><td>Exact-head proof</td><td>TCG Card Pass 2 Validation #131 PASS + Migration Replay #358 PASS + Functional Smoke #376 PASS after a transient Supabase CLI HTTP 504 was rerun cleanly.</td></tr><tr><td>Live dashboard base before this update</td><td class="mono">405584e70bf6fb02d79836f51b5978ebfe2194de</td></tr><tr><td>Production policy</td><td>Keep live rollback baseline until exact-head runtime + database + two-player gates pass.</td></tr></table></article>
+</section>
+
+<h2>Readiness by workstream</h2>
+<section class="card wide">
+<table>
+<tr><th>Workstream</th><th>Estimate</th><th>Meaning</th></tr>
+<tr><td>Rules / Set One / starter structure</td><td><strong>95%</strong></td><td>Design structure is nearly complete; AI and human balance/tuning remain.</td></tr>
+<tr><td>Database / private-alpha foundation</td><td><strong>82%</strong></td><td>Core live foundation exists and branch migrations replay cleanly; newer economy/matchmaking/runtime data is deliberately not live yet.</td></tr>
+<tr><td>Server-authoritative battle engine</td><td><strong>74%</strong></td><td>Core turn/damage/conditions/rewards and substantial structured runtime bridges exist. Thirteen frozen conditional attacks now execute through structured authority; five history/attachment cases remain.</td></tr>
+<tr><td>Modes / progression</td><td><strong>45%</strong></td><td>Arcade design and backend source exist; final player UI, ranked and AI Test Match remain.</td></tr>
+<tr><td>Economy / collection</td><td><strong>40%</strong></td><td>Three currencies and copy rules are decided; duplicate conversion, collection, deck builder, shop, trading and presentation remain.</td></tr>
+<tr><td>Battle Pass / dailies</td><td><strong>30%</strong></td><td>100 tiers / daily structure is decided; season data, receipts, assignments and UI remain.</td></tr>
+<tr><td>Standalone TCG UI</td><td><strong>20%</strong></td><td>Development shell/master-plan lab exists; final landing, game home, renderer, battlefield and product pages are still major work.</td></tr>
+<tr><td>Release / human verification</td><td><strong>55%</strong></td><td>Many exact-head CI gates are proven; final deployment, two-account battle, reconnect, economy receipt and simulation matrices remain.</td></tr>
+</table>
+</section>
+
+<h2>What is already locked</h2>
+<section class="grid">
+<article class="card"><h3>Core game</h3><ul><li>8 Set One elements: Astral, Ember, Gale, Grove, Shade, Stone, Tide, Volt.</li><li>193 Set One gameplay identities.</li><li>Eight exact 60-card starters.</li><li>Baby → Teen → Adult evolution; Standalone valid; Mythic separate.</li><li>Printed HP 40–390.</li><li>Vanguard + four Reserve + six Reward Cards.</li><li>Essence, Tactics, Shield and conditions.</li><li>First player cannot attack on first personal turn.</li><li>Starbound separate from Mythic.</li></ul></article>
+<article class="card"><h3>Product/economy</h3><ul><li>Exactly three currencies: Battle Pass Tokens, Trade Tokens, Shop Coins.</li><li>Normal cards keep up to four copies; Mythic keeps one.</li><li>Arcade is the first normal non-ranked mode.</li><li>Private rooms remain valid for friend/test battles and cannot farm normal Arcade rewards.</li><li>100-tier Battle Pass with a reward every tier.</li><li>Three daily achievements.</li><li>Standalone TCG product shell; shared Stream Bandit account identity.</li></ul></article>
+</section>
+
+<h2>Battle-engine status</h2>
+<section class="grid">
+<article class="card"><h3 class="good">Completed foundations</h3><ul><li>Hidden canonical state + seat-private views.</li><li>Nonce/revision idempotent command path.</li><li>Core play/evolve/Essence/Relic/Realm/turn paths.</li><li>Damage, Shield, recoil, effect damage and major conditions.</li><li>Starbound consumption foundation.</li><li>Defeat/winner/reward handoff.</li><li>Generic v0.2 runtime registry marker/snapshot boundary.</li><li>Structured withdrawal.</li><li>Structured attack damage / Surge lifecycle bridges.</li><li>Structured declaration requirements and count-add formula wiring, including no-double-count guard and audit payload.</li><li>Conditional-add metadata/evaluator covers all 18 frozen Set One conditional attacks; 13 now execute through structured battle authority.</li></ul></article>
+<article class="card"><h3 class="hold">Still required before real private-alpha confidence</h3><ul><li>Finish Runtime Pass C for the remaining five: Reward Arc, Predicted Hit, Bastion Quake, Deep Current and Gridbreaker. Their missing truth is reward/deck inspection, damage prevention, Tide Essence movement and temporary/borrowed attachment ownership.</li><li>Runtime Pass D: route attack/Ability selections through the generic private pending-choice owner.</li><li>Runtime Pass E: generic Ability / Essence / Relic / Realm listeners and source-instance lifecycle state.</li><li>Runtime Pass F: remove remaining ordinary Set One prototype aliases/card-ID shortcuts only after parity proof.</li><li>Battle Lab deterministic scenario injection + source/target instance event trace.</li><li>Hidden hand/deck/Reward choice completion.</li><li>Reconnect/resume and adversarial stale/replay/simultaneous-command tests.</li></ul></article>
+</section>
+
+<h2>Remaining build order</h2>
+<section class="card wide">
+<div class="stage"><div class="num">1</div><div><h3>Finish structured battle-runtime parity</h3><p class="muted">Complete the remaining Runtime Pass C event/attachment owners, then Runtime Passes D–F without breaking the protected v0.1 production baseline. Remove legacy English/card-ID authority only where the structured replacement is proven.</p></div></div>
+<div class="stage"><div class="num">2</div><div><h3>Repair the economy/copy migration rule</h3><p class="muted">Remove obsolete global one-Mythic-total / Legendary restrictions and preserve the current rule: ordinary identity max 4, Mythic identity max 1, Essence separate allowance.</p></div></div>
+<div class="stage"><div class="num">3</div><div><h3>Complete generic choices, reconnect and deterministic Battle Lab</h3><p class="muted">Finish private selections, reproducible scenarios, event tracing and recovery paths before relying on visual UI testing.</p></div></div>
+<div class="stage"><div class="num">4</div><div><h3>Build Test Deck Battle / AI Test Match</h3><p class="muted">Use the same legal server action path, seeded randomness and no hidden-information cheating. No rewards/rank/XP for QA matches.</p></div></div>
+<div class="stage"><div class="num">5</div><div><h3>Build the actual standalone player UI</h3><p class="muted">Public landing/sign-in, authenticated game home, premium card renderer, one-screen drag/drop battlefield, Collection, Deck Builder, Shop, Pass, Profile and Sets.</p></div></div>
+<div class="stage"><div class="num">6</div><div><h3>Promote private-alpha backend only after exact-head gates</h3><p class="muted">Apply the reviewed additive migrations and Edge Functions only when TCG Validation, migration replay and functional smoke all pass the exact candidate head.</p></div></div>
+<div class="stage"><div class="num">7</div><div><h3>Two-account real battle</h3><p class="muted">Desktop + phone: sign in, choose starter/deck, enter matchmaking/private battle, complete setup, play to victory and persist the result without manual database intervention.</p></div></div>
+<div class="stage"><div class="num">8</div><div><h3>Balance and production release</h3><p class="muted">AI simulation matrix, human balance tuning, reconnect/private-state tests, economy receipt/retry tests, final accessibility/mobile checks, then production promotion.</p></div></div>
+</section>
+
+<h2>Can the game be fully ready today?</h2>
+<section class="grid">
+<article class="card"><h3 class="good">What can be ready immediately</h3><p>The master-plan/control surface can stay live independently, and safe branch-only TCG ticks can continue one at a time with exact evidence.</p></article>
+<article class="card"><h3 class="hold">What should not be promised today</h3><p>A fully production-ready TCG. The remaining work includes substantial runtime event/choice/listener work, the final player-facing application, deployment gates and a genuine two-account complete battle. Those are engineering/release gates, not cosmetic polish.</p></article>
+</section>
+<p class="note warning"><strong>Practical target:</strong> first reach a boring, deterministic, complete two-player private-alpha battle. Collection, shop, ranked, Battle Pass polish and public SEO can then be layered without risking the battle engine.</p>
+
+<h2>Promotion rules</h2>
+<section class="grid">
+<article class="card"><h3 class="good">PROMOTE branch ticks</h3><p>When the exact bounded change, regression coverage and exact-head workflows are green.</p></article>
+<article class="card"><h3 class="hold">HOLD production</h3><p>Until runtime parity, exact-head database/function evidence and the full desktop/phone battle test pass together.</p></article>
+<article class="card wide"><h3>Safety boundary</h3><p>No TCG task may require unrelated Stream Bandit, DJ, Web Builder or social-media changes. No direct main runtime write. No production database/function deployment just because the integration branch is mergeable.</p></article>
+</section>
+
+<p class="footer">Checkpoint: 7 September 2026. Overall working completion: 66%. This page is a static project-status surface only: no JavaScript, no remote dependencies, no authentication logic, no database calls and no production gameplay authority.</p>
+</main>
+</body>
+</html>
