@@ -137,6 +137,26 @@ export function clearRuntimeCondition(
   return cleared;
 }
 
+/**
+ * Canonical whole-condition reset used only when a game rule says every
+ * ordinary condition leaves a Creature at once (for example evolution).
+ * The caller owns when that rule applies; Condition owns the state mutation.
+ */
+export function clearAllRuntimeConditions(
+  creature: RuntimeV02ConditionCreature,
+): boolean {
+  const current = runtimeConditions(creature);
+  const cleared = current.scorched || current.venomed > 0 ||
+    Boolean(current.control) || Boolean(current.modifier) ||
+    creature.condition != null;
+  current.scorched = false;
+  current.venomed = 0;
+  current.control = null;
+  current.modifier = null;
+  creature.condition = null;
+  return cleared;
+}
+
 function activeConditionImmunity(
   creature: RuntimeV02ConditionCreature,
   condition: string,

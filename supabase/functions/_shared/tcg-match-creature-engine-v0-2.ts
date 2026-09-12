@@ -4,6 +4,7 @@ import {
   type RuntimeV02CardZoneTransferBatchOperation,
   type RuntimeV02CardZoneTransferBatchReceipt,
 } from "./tcg-match-card-zone-engine-v0-2.ts";
+import { clearAllRuntimeConditions } from "./tcg-match-condition-engine-v0-2.ts";
 
 export type RuntimeV02CreatureState<T extends RuntimeV02CardZoneInstance> = {
   stack: T[];
@@ -15,7 +16,15 @@ export type RuntimeV02CreatureState<T extends RuntimeV02CardZoneInstance> = {
 export type RuntimeV02PlacedCreatureState<T extends RuntimeV02CardZoneInstance> = RuntimeV02CreatureState<T> & {
   shield: number;
   condition: string | null;
+  conditions?: {
+    scorched: boolean;
+    venomed: number;
+    control: string | null;
+    modifier: string | null;
+  };
   flags: Record<string, unknown>;
+  entered_turn?: number;
+  evolved_turn?: number;
 };
 
 export type RuntimeV02CreaturePlayerState<T extends RuntimeV02CardZoneInstance> = {
@@ -30,6 +39,10 @@ export type RuntimeV02CreaturePlacementPlayerState<T extends RuntimeV02CardZoneI
   reserve: Array<RuntimeV02CreatureState<T> | null>;
 };
 
+export type RuntimeV02CreaturePlacementContext = {
+  turn_seq: number;
+};
+
 export type RuntimeV02CreaturePlacementReceipt = {
   schema: "sb-tcg-creature-placement-v0.2";
   controller_seat: 1 | 2;
@@ -42,6 +55,33 @@ export type RuntimeV02CreaturePlacementResult<T extends RuntimeV02CardZoneInstan
   card: T;
   creature: RuntimeV02PlacedCreatureState<T>;
   receipt: RuntimeV02CreaturePlacementReceipt;
+};
+
+export type RuntimeV02EvolvableCreatureState<T extends RuntimeV02CardZoneInstance> = RuntimeV02CreatureState<T> & {
+  shield: number;
+  condition?: string | null;
+  conditions?: Record<string, unknown>;
+  flags?: Record<string, unknown>;
+  entered_turn?: number;
+  evolved_turn?: number;
+};
+
+export type RuntimeV02CreatureEvolutionPlayerState<T extends RuntimeV02CardZoneInstance> = {
+  hand: T[];
+};
+
+export type RuntimeV02CreatureEvolutionReceipt = {
+  schema: "sb-tcg-creature-evolution-v0.2";
+  controller_seat: 1 | 2;
+  card_uid: string;
+  turn_seq: number;
+  conditions_cleared: boolean;
+};
+
+export type RuntimeV02CreatureEvolutionResult<T extends RuntimeV02CardZoneInstance> = {
+  card: T;
+  creature: RuntimeV02EvolvableCreatureState<T>;
+  receipt: RuntimeV02CreatureEvolutionReceipt;
 };
 
 export type RuntimeV02DefeatedCreatureCandidate<T extends RuntimeV02CardZoneInstance> = {
@@ -73,11 +113,19 @@ function requiredUid(value: unknown, error: string): string {
   return uid;
 }
 
+function requiredTurn(value: unknown, error: string): number {
+  const turn = Number(value);
+  if (!Number.isInteger(turn) || turn < 0) throw new Error(error);
+  return turn;
+}
+
 /**
  * Creature/Evolution owner for specialist hand-to-battlefield placement.
  * The caller owns phase, card legality and destination choice; this owner validates
  * the exact source/destination identity and performs the physical Creature mutation.
  * Card-Zone is intentionally not used because creature_stack is a specialist destination.
+ * An optional in-play context stamps the canonical entry/evolution timing state while
+ * setup placement stays byte-semantically equivalent to the original setup shape.
  */
 export function runtimeV02PlaceCreatureFromHand<T extends RuntimeV02CardZoneInstance>(
   player: RuntimeV02CreaturePlacementPlayerState<T>,
@@ -85,6 +133,7 @@ export function runtimeV02PlaceCreatureFromHand<T extends RuntimeV02CardZoneInst
   cardUid: string,
   where: "vanguard" | "reserve",
   index: number | null,
+  context: RuntimeV02CreaturePlacementContext | null = null,
 ): RuntimeV02CreaturePlacementResult<T> {
   if (!player || !Array.isArray(player.hand) || !Array.isArray(player.reserve)) {
     throw new Error("tcg_v0_2_creature_placement_player_invalid");
@@ -110,6 +159,9 @@ export function runtimeV02PlaceCreatureFromHand<T extends RuntimeV02CardZoneInst
     throw new Error("tcg_v0_2_creature_placement_destination_invalid");
   }
 
+  const turn = context == null
+    ? null
+    : requiredTurn(context.turn_seq, "tcg_v0_2_creature_placement_turn_invalid");
   const card = player.hand[handIndex];
   const creature: RuntimeV02PlacedCreatureState<T> = {
     stack: [card],
@@ -120,6 +172,11 @@ export function runtimeV02PlaceCreatureFromHand<T extends RuntimeV02CardZoneInst
     condition: null,
     flags: {},
   };
+  if (turn != null) {
+    creature.conditions = { scorched: false, venomed: 0, control: null, modifier: null };
+    creature.entered_turn = turn;
+    creature.evolved_turn = -1;
+  }
 
   player.hand.splice(handIndex, 1);
   if (where === "vanguard") player.vanguard = creature;
@@ -134,6 +191,53 @@ export function runtimeV02PlaceCreatureFromHand<T extends RuntimeV02CardZoneInst
       where,
       index: destinationIndex,
       card_uid: uid,
+    },
+  };
+}
+
+/**
+ * Creature/Evolution owner for specialist hand-to-existing-stack evolution.
+ * The caller owns phase, stage/predecessor and timing legality. Creature owns the
+ * exact hand/stack mutation and lifecycle stamps; Condition owns the required
+ * whole-condition reset. Card-Zone remains excluded from creature_stack destinations.
+ */
+export function runtimeV02EvolveCreatureFromHand<T extends RuntimeV02CardZoneInstance>(
+  player: RuntimeV02CreatureEvolutionPlayerState<T>,
+  controllerSeat: 1 | 2,
+  creature: RuntimeV02EvolvableCreatureState<T>,
+  cardUid: string,
+  turnSeq: number,
+): RuntimeV02CreatureEvolutionResult<T> {
+  if (!player || !Array.isArray(player.hand)) {
+    throw new Error("tcg_v0_2_creature_evolution_player_invalid");
+  }
+  if (controllerSeat !== 1 && controllerSeat !== 2) {
+    throw new Error("tcg_v0_2_creature_evolution_controller_invalid");
+  }
+  if (!creature || !Array.isArray(creature.stack) || creature.stack.length < 1) {
+    throw new Error("tcg_v0_2_creature_evolution_stack_required");
+  }
+  const uid = requiredUid(cardUid, "tcg_v0_2_creature_evolution_card_uid_required");
+  const turn = requiredTurn(turnSeq, "tcg_v0_2_creature_evolution_turn_invalid");
+  const handIndex = player.hand.findIndex((card) => card?.uid === uid);
+  if (handIndex < 0) throw new Error("tcg_v0_2_creature_evolution_card_missing");
+
+  const card = player.hand[handIndex];
+  player.hand.splice(handIndex, 1);
+  creature.stack.push(card);
+  creature.evolved_turn = turn;
+  creature.entered_turn = turn;
+  const conditionsCleared = clearAllRuntimeConditions(creature);
+
+  return {
+    card,
+    creature,
+    receipt: {
+      schema: "sb-tcg-creature-evolution-v0.2",
+      controller_seat: controllerSeat,
+      card_uid: uid,
+      turn_seq: turn,
+      conditions_cleared: conditionsCleared,
     },
   };
 }
