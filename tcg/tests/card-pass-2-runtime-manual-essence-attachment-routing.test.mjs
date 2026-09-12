@@ -73,10 +73,18 @@ test('manual attachment reuses event, movement and heal continuation owners and 
     'runtimeV02BeginMovementHealListenerContinuation(',
     'scanDefeats()',
   ], 'manual attachment continuation chain');
-  assert.ok(match.includes('kind:"attack"|"play_creature"|"evolve"|"attach_essence"'));
-  assert.ok(match.includes('kind!=="attack"&&kind!=="play_creature"&&kind!=="evolve"&&kind!=="attach_essence"'));
-  assert.ok(match.includes('kind:"withdrawal"|"attack"|"play_creature"|"evolve"|"attach_essence"'));
-  assert.ok(match.includes('resume.kind==="withdrawal"||resume.kind==="play_creature"||resume.kind==="evolve"||resume.kind==="attach_essence"'));
+
+  const eventResumeStart = match.indexOf('const setEventResume=');
+  const movementResumeStart = match.indexOf('const setMovementResume=', eventResumeStart);
+  const resumeEnd = match.indexOf('if(action==="concede")', movementResumeStart);
+  assert.ok(eventResumeStart >= 0 && movementResumeStart > eventResumeStart && resumeEnd > movementResumeStart);
+  const eventResume = match.slice(eventResumeStart, movementResumeStart);
+  const movementResume = match.slice(movementResumeStart, resumeEnd);
+  assert.ok(eventResume.includes('"attach_essence"'));
+  assert.ok(eventResume.includes('kind!=="attach_essence"'));
+  assert.ok(movementResume.includes('"attach_essence"'));
+  assert.ok(movementResume.includes('kind!=="attach_essence"'));
+  assert.ok(match.includes('if(resume.kind!=="attack"){'));
 });
 
 test('card-specific manual attachment fallbacks are fenced to legacy matches', () => {
