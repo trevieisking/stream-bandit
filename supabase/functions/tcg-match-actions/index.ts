@@ -22,6 +22,7 @@ import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
 import { runtimeV02BeginEventListenerContinuation, runtimeV02CreateCreatureEnteredPlayEvent, runtimeV02CreateCreatureEvolvedEvent, runtimeV02PendingEventListenerChoiceView, runtimeV02PrivateEventInspectionView, runtimeV02ResolveEventListenerChoice, type RuntimeV02PendingEventListenerChoice } from "../_shared/tcg-match-event-listener-v0-2.ts";
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
+import { runtimeV02BeginRealmPlayRoute } from "../_shared/tcg-match-realm-route-v0-2.ts";
 import { runtimeV02ResolveAttackControlCondition, runtimeV02ResolveConditionAftermath } from "../_shared/tcg-match-condition-lifecycle-v0-2.ts";
 import { runtimeV02ResolveAttackTarget, type RuntimeV02AttackTargetPermission } from "../_shared/tcg-match-attack-v0-2.ts";
 import { runtimeV02UniformRandomInt } from "../_shared/tcg-match-randomization-engine-v0-2.ts";
@@ -93,10 +94,10 @@ Deno.serve(async(req)=>{
   const healListenerAudit=(flow:any)=>({status:flow.status,processed_packet_ids:flow.continuation?.processed_packet_ids||[],emitted_packet_ids:flow.continuation?.emitted_packet_ids||[]});
   const movementListenerAudit=(flow:any)=>({status:flow.status,processed_listener_keys:flow.processed_listener_keys||[],emitted_heal_packet_ids:flow.emitted_heal_packet_ids||[]});
   const eventListenerAudit=(flow:any)=>({status:flow.status,processed_listener_keys:flow.processed_listener_keys||[],emitted_heal_packet_ids:flow.emitted_heal_packet_ids||[],emitted_movement_event_count:flow.emitted_movement_events?.length||0});
-  const setEventResume=(kind:"attack"|"play_creature"|"evolve"|"attach_essence",resumeSeat:number)=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_event_live_resume_seat_invalid");s.pending_event_listener_resume={kind,seat:resumeSeat,turn_seq:Number(s.turn_seq||0)}};
-  const readEventResume=()=>{const raw=s.pending_event_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_event_live_resume_required");const kind=String(raw.kind||"");if(kind!=="attack"&&kind!=="play_creature"&&kind!=="evolve"&&kind!=="attach_essence")throw new Error("tcg_v0_2_event_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0);if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_event_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_event_live_resume_turn_stale");return{kind:kind as "attack"|"play_creature"|"evolve"|"attach_essence",seat:resumeSeat as 1|2,turn_seq:resumeTurn}};
-  const setMovementResume=(kind:"withdrawal"|"attack"|"play_creature"|"evolve"|"attach_essence",resumeSeat:number,priorHealPacketIds:string[]=[] )=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Array.isArray(priorHealPacketIds))throw new Error("tcg_v0_2_movement_live_prior_heal_packets_invalid");s.pending_movement_listener_resume={kind,seat:resumeSeat,turn_seq:Number(s.turn_seq||0),prior_heal_packet_ids:[...priorHealPacketIds]}};
-  const readMovementResume=()=>{const raw=s.pending_movement_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_movement_live_resume_required");const kind=String(raw.kind||"");if(kind!=="withdrawal"&&kind!=="attack"&&kind!=="play_creature"&&kind!=="evolve"&&kind!=="attach_essence")throw new Error("tcg_v0_2_movement_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0),priorHealPacketIds=Array.isArray(raw.prior_heal_packet_ids)?raw.prior_heal_packet_ids.map((x:any)=>String(x)):[];if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_movement_live_resume_turn_stale");return{kind,seat:resumeSeat as 1|2,turn_seq:resumeTurn,prior_heal_packet_ids:priorHealPacketIds}};
+  const setEventResume=(kind:"attack"|"play_creature"|"evolve"|"attach_essence"|"play_realm",resumeSeat:number)=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_event_live_resume_seat_invalid");s.pending_event_listener_resume={kind,seat:resumeSeat,turn_seq:Number(s.turn_seq||0)}};
+  const readEventResume=()=>{const raw=s.pending_event_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_event_live_resume_required");const kind=String(raw.kind||"");if(kind!=="attack"&&kind!=="play_creature"&&kind!=="evolve"&&kind!=="attach_essence"&&kind!=="play_realm")throw new Error("tcg_v0_2_event_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0);if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_event_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_event_live_resume_turn_stale");return{kind:kind as "attack"|"play_creature"|"evolve"|"attach_essence"|"play_realm",seat:resumeSeat as 1|2,turn_seq:resumeTurn}};
+  const setMovementResume=(kind:"withdrawal"|"attack"|"play_creature"|"evolve"|"attach_essence"|"play_realm",resumeSeat:number,priorHealPacketIds:string[]=[] )=>{if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Array.isArray(priorHealPacketIds))throw new Error("tcg_v0_2_movement_live_prior_heal_packets_invalid");s.pending_movement_listener_resume={kind,seat:resumeSeat,turn_seq:Number(s.turn_seq||0),prior_heal_packet_ids:[...priorHealPacketIds]}};
+  const readMovementResume=()=>{const raw=s.pending_movement_listener_resume;if(!raw||typeof raw!=="object")throw new Error("tcg_v0_2_movement_live_resume_required");const kind=String(raw.kind||"");if(kind!=="withdrawal"&&kind!=="attack"&&kind!=="play_creature"&&kind!=="evolve"&&kind!=="attach_essence"&&kind!=="play_realm")throw new Error("tcg_v0_2_movement_live_resume_kind_invalid");const resumeSeat=Number(raw.seat),resumeTurn=Number(raw.turn_seq),turn=Number(s.turn_seq||0),priorHealPacketIds=Array.isArray(raw.prior_heal_packet_ids)?raw.prior_heal_packet_ids.map((x:any)=>String(x)):[];if(resumeSeat!==1&&resumeSeat!==2)throw new Error("tcg_v0_2_movement_live_resume_seat_invalid");if(!Number.isInteger(resumeTurn)||resumeTurn!==turn)throw new Error("tcg_v0_2_movement_live_resume_turn_stale");return{kind,seat:resumeSeat as 1|2,turn_seq:resumeTurn,prior_heal_packet_ids:priorHealPacketIds}};
 
   if(action==="concede"){if(s.phase==="complete")return json({ok:false,version:VERSION,error:"match_already_complete"},400);s.phase="complete";s.result={winner_seat:otherSeat,reasons:["opponent_conceded"]};log(`Seat ${seat} conceded.`);return json({version:VERSION,result:await commit("concede",{seat,winner_seat:otherSeat})})}
 
@@ -172,7 +173,7 @@ Deno.serve(async(req)=>{
    }
    delete s.pending_movement_listener_resume;
    const packetIds=[...resume.prior_heal_packet_ids,...resolved.emitted_heal_packet_ids];
-   if(resume.kind==="withdrawal"||resume.kind==="play_creature"||resume.kind==="evolve"||resume.kind==="attach_essence"){
+   if(resume.kind!=="attack"){
     const movementHealFlow=runtimeV02BeginMovementHealListenerContinuation(s,packetIds,resume.seat),movementHealAudit=healListenerAudit(movementHealFlow);
     if(movementHealFlow.status==="player_choice_required"){
      s.phase="heal_listener_choice_resolution";
@@ -308,7 +309,32 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="play_realm"){
-   const turn=Number(s.turn_seq||0);if(Number(flags.realm_turn??-1)===turn)return json({ok:false,version:VERSION,error:"realm_already_played_this_turn"},400);const uid=String(body.card_uid||""),inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Tactic"||d.family!=="Realm")return json({ok:false,version:VERSION,error:"realm_card_required"},400);if(s.realm){const old=def(s,s.realm.card);if(old?.id===d.id)return json({ok:false,version:VERSION,error:"same_named_realm_cannot_replace_itself"},400);const owner=s.players[String(s.realm.owner_seat)];if(owner)owner.discard.push(s.realm.card)}s.realm={card:removeHand(p,uid)!,owner_seat:seat,played_turn:turn};flags.realm_turn=turn;log(`Seat ${seat} played Realm ${d.name}.`);return json({version:VERSION,result:await commit("play_realm",{seat,card_id:d.id})});
+   const uid=String(body.card_uid||""),inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;
+   if(!inst||!d||d.kind!=="Tactic"||d.family!=="Realm")return json({ok:false,version:VERSION,error:"realm_card_required"},400);
+   let routed;
+   try{routed=runtimeV02BeginRealmPlayRoute(s,seat as 1|2,inst,"play_realm",{phase:"play",action_kind:"realm"})}catch(error){const message=error instanceof Error?error.message:String(error);if(message==="tcg_v0_2_realm_already_played_this_turn")return json({ok:false,version:VERSION,error:"realm_already_played_this_turn"},400);if(message==="tcg_v0_2_realm_same_named_replacement_forbidden")return json({ok:false,version:VERSION,error:"same_named_realm_cannot_replace_itself"},400);throw error}
+   const eventFlow=routed.flow,eventAudit=eventListenerAudit(eventFlow),realmReplaced=routed.replacement_event!=null;
+   log(`Seat ${seat} played Realm ${d.name}.`);
+   if(eventFlow.status==="player_choice_required"){
+    setEventResume("play_realm",seat);
+    s.phase="event_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("play_realm_pending_event_listener_choice",{seat,card_id:d.id,realm_replaced:realmReplaced,event_listener:eventAudit,pending_event_listener_choice:true}),pending_event_listener_choice:runtimeV02PendingEventListenerChoiceView(eventFlow.pending_choice,seat as 1|2),private_event_inspection:runtimeV02PrivateEventInspectionView(s,seat as 1|2),private_reward_inspection:runtimeV02PrivateRewardInspectionView(s,seat as 1|2)});
+   }
+   const movementFlow=eventFlow.emitted_movement_events.length?runtimeV02BeginMovementListenerContinuation(s,eventFlow.emitted_movement_events):{status:"complete",processed_listener_keys:[],emitted_heal_packet_ids:[],pending_choice:null};
+   const movementAudit=movementListenerAudit(movementFlow);
+   if(movementFlow.status==="player_choice_required"){
+    setMovementResume("play_realm",seat,eventFlow.emitted_heal_packet_ids);
+    s.phase="movement_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("play_realm_pending_movement_listener_choice",{seat,card_id:d.id,realm_replaced:realmReplaced,event_listener:eventAudit,movement_listener:movementAudit,pending_movement_listener_choice:true}),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(movementFlow.pending_choice,seat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,seat as 1|2)});
+   }
+   const packetIds=[...eventFlow.emitted_heal_packet_ids,...movementFlow.emitted_heal_packet_ids];
+   const healFlow=runtimeV02BeginMovementHealListenerContinuation(s,packetIds,seat as 1|2),healAudit=healListenerAudit(healFlow);
+   if(healFlow.status==="player_choice_required"){
+    s.phase="heal_listener_choice_resolution";
+    return json({version:VERSION,result:await commit("play_realm_pending_heal_listener_choice",{seat,card_id:d.id,realm_replaced:realmReplaced,event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(healFlow.pending_choice,seat as 1|2)});
+   }
+   const n=scanDefeats();if(n>0)s.phase="resolution";else s.phase="play";
+   return json({version:VERSION,result:await commit("play_realm",{seat,card_id:d.id,realm_replaced:realmReplaced,event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit})});
   }
 
   if(action==="withdraw"){
