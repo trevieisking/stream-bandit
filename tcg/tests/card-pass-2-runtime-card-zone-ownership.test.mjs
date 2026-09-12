@@ -62,7 +62,7 @@ test('Creature/Evolution owns defeated-creature lifecycle while Card-Zone owns o
     assert.equal(creatureEngine.includes(forbidden), false, `Creature owner duplicated Card-Zone mutation authority: ${forbidden}`);
   }
 
-  assert.ok(match.includes('import { runtimeV02ResolveDefeatedCreatures } from "../_shared/tcg-match-creature-engine-v0-2.ts";'));
+  assert.match(match, /import \{[^}]*runtimeV02ResolveDefeatedCreatures[^}]*\} from "\.\.\/_shared\/tcg-match-creature-engine-v0-2\.ts";/);
   const block = functionSlice(match, 'const scanDefeats=()=>', 'const advanceTurn=()=>');
   const collectAt = block.indexOf('defeated.push(');
   const resolveAt = block.indexOf('runtimeV02ResolveDefeatedCreatures(');
