@@ -73,8 +73,8 @@ test('manual attachment reuses event, movement and heal continuation owners and 
     'runtimeV02BeginMovementHealListenerContinuation(',
     'scanDefeats()',
   ], 'manual attachment continuation chain');
-  assert.ok(match.includes('kind:"play_creature"|"evolve"|"attach_essence"'));
-  assert.ok(match.includes('kind!=="play_creature"&&kind!=="evolve"&&kind!=="attach_essence"'));
+  assert.ok(match.includes('kind:"attack"|"play_creature"|"evolve"|"attach_essence"'));
+  assert.ok(match.includes('kind!=="attack"&&kind!=="play_creature"&&kind!=="evolve"&&kind!=="attach_essence"'));
   assert.ok(match.includes('kind:"withdrawal"|"attack"|"play_creature"|"evolve"|"attach_essence"'));
   assert.ok(match.includes('resume.kind==="withdrawal"||resume.kind==="play_creature"||resume.kind==="evolve"||resume.kind==="attach_essence"'));
 });
