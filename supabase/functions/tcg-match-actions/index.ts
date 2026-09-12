@@ -3,6 +3,7 @@ import { structuredRuntimeWithdrawalBaseCost } from "../_shared/tcg-match-withdr
 import { runtimeV02ApplyWithdrawalPaymentAndSwitch } from "../_shared/tcg-match-withdrawal-transaction-v0-2.ts";
 import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 import { runtimeV02EvolveCreatureFromHand, runtimeV02PlaceCreatureFromHand, runtimeV02ResolveDefeatedCreatures } from "../_shared/tcg-match-creature-engine-v0-2.ts";
+import { runtimeV02AttachRelicFromHand } from "../_shared/tcg-match-relic-engine-v0-2.ts";
 import { structuredRuntimeIncomingAttackDamage, structuredRuntimeOutgoingAttackDamage } from "../_shared/tcg-match-attack-damage-v0-2.ts";
 import { clearStructuredRuntimeAttachmentAttackBonusesAtAftermath, structuredRuntimeAftermathEssenceDisposition, structuredRuntimeAttachmentAttackBonus } from "../_shared/tcg-match-surge-lifecycle-v0-2.ts";
 import { evaluateRuntimeAttackCountAddFormula, evaluateRuntimeAttackDeclarationRequirements, evaluateRuntimeAttackReadyConditionalAddFormula, resolveRuntimeAttackAuthority } from "../_shared/tcg-match-attack-authority-v0-2.ts";
@@ -304,7 +305,7 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="attach_relic"){
-   const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);if(cr.relic)return json({ok:false,version:VERSION,error:"creature_already_has_relic"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Tactic"||d.family!=="Relic")return json({ok:false,version:VERSION,error:"relic_card_required"},400);cr.relic=removeHand(p,uid)!;const td=top(cr,s);if(td?.id==="stone-flintkin")healRuntimeDamage(cr,10);log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);return json({version:VERSION,result:await commit("attach_relic",{seat,where,index:idx,card_id:d.id})});
+   const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);if(cr.relic)return json({ok:false,version:VERSION,error:"creature_already_has_relic"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Tactic"||d.family!=="Relic")return json({ok:false,version:VERSION,error:"relic_card_required"},400);const targetInst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!targetInst)throw new Error("tcg_v0_2_relic_attachment_target_anchor_required");runtimeV02AttachRelicFromHand(p,seat as 1|2,targetInst.uid,uid);const td=top(cr,s);if(td?.id==="stone-flintkin")healRuntimeDamage(cr,10);log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);return json({version:VERSION,result:await commit("attach_relic",{seat,where,index:idx,card_id:d.id})});
   }
 
   if(action==="play_realm"){
