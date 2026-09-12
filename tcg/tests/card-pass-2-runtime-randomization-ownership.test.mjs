@@ -37,7 +37,8 @@ test('Randomization Engine remains generic and owns only uniform choice/permutat
 test('private-alpha opening deck, mulligan and toss delegate randomness to the shared engine', () => {
   assert.ok(privateAlpha.includes('import { runtimeV02ShuffledCopy, runtimeV02UniformRandomInt } from "../_shared/tcg-match-randomization-engine-v0-2.ts";'));
   assert.ok(privateAlpha.includes('return runtimeV02ShuffledCopy(out)'));
-  assert.ok(privateAlpha.includes('deck=runtimeV02ShuffledCopy([...deck,...hand])'));
+  assert.ok(privateAlpha.includes('deck=runtimeV02ShuffledCopy(deck)'));
+  assert.equal(privateAlpha.includes('runtimeV02ShuffledCopy([...deck,...hand])'), false, 'Randomization must shuffle the already-restored deck instead of taking Card-Zone movement authority');
   assert.ok(privateAlpha.includes('const toss=runtimeV02UniformRandomInt(2)+1'));
 
   for (const forbidden of [
