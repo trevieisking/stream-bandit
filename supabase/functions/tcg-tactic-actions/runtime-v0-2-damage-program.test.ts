@@ -146,6 +146,7 @@ Deno.test("Damage Program DRAIN_VITALITY uses Shield, defeats target, queues Rew
     { kind: "promote", seat: 2 },
   ]);
   assertEquals((s.effect_events as any[]).map((event) => event.event), [
+    "creature_defeated",
     "effect_damage_dealt",
     "after_heal_packet",
     "vitality_drained",
