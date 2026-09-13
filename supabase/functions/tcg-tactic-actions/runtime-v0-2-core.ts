@@ -8,6 +8,7 @@ import {
   runtimeV02MoveDamage,
   runtimeV02PlaceDamage,
   runtimeV02TransferShield,
+  type RuntimeV02DamageCreature,
 } from "../_shared/tcg-match-damage-engine-v0-2.ts";
 
 export type RuntimeConditions = RuntimeV02ConditionState;
@@ -87,7 +88,7 @@ export function addRuntimeShield(
 }
 
 export function healRuntimeDamage(
-  creature: RuntimeCreature,
+  creature: RuntimeV02DamageCreature,
   amount: number,
 ): number {
   const previous = Math.max(0, Number(creature.damage || 0));
