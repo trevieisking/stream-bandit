@@ -69,7 +69,7 @@ Deno.test("shared Shield primitive preserves the 60 cap and reports actual gain"
   assertEquals(source.shield, 60);
   assertEquals(addRuntimeShield(source, 20), 0);
   assertEquals(source.shield, 60);
-  assertEquals(addRuntimeShield(source, -10), 0);
+  assertThrows(() => addRuntimeShield(source, -10), "tcg_v0_2_shield_amount_invalid");
   assertEquals(source.shield, 60);
 });
 
