@@ -60,7 +60,7 @@ test('atomic switch context owner is card-id-free and records the exact shared A
   assert.ok(owner.includes('runtime_v0_2_switch_ledger'));
 });
 
-test('foundation performs one atomic swap only after complete validation and preserves existing condition-clear semantics', () => {
+test('foundation performs one atomic swap only after complete validation and delegates condition clearing to Condition family #19', () => {
   const validateSeat = owner.indexOf('const controllerSeat = normalizedSeat(controllerSeatRaw)');
   const validateIncoming = owner.indexOf('const incoming = creature(reserve[reserveIndex]');
   const createLedger = owner.indexOf('const ledger = ensureLedger(state, turn)');
@@ -70,8 +70,10 @@ test('foundation performs one atomic swap only after complete validation and pre
   assert.ok(createLedger > validateIncoming, 'ledger must not be created before switch inputs are fully validated');
   assert.ok(mutateVanguard > createLedger, 'battlefield mutation must follow complete validation');
   assert.ok(appendContext > mutateVanguard, 'canonical context is appended only after the atomic swap');
-  assert.ok(owner.includes('clearOrdinaryConditions(outgoing)'));
-  assert.ok(owner.includes('clearOrdinaryConditions(incoming)'));
+  assert.ok(owner.includes('import { clearAllRuntimeConditions } from "./tcg-match-condition-engine-v0-2.ts";'));
+  assert.ok(owner.includes('clearAllRuntimeConditions(outgoing)'));
+  assert.ok(owner.includes('clearAllRuntimeConditions(incoming)'));
+  assert.equal(owner.includes('function clearOrdinaryConditions('), false, 'Battlefield Position must not duplicate Condition clearing authority');
   assert.ok(owner.includes('incoming.became_vanguard_turn = turn'));
 });
 
