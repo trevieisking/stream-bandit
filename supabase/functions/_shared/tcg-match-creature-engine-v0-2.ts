@@ -57,6 +57,20 @@ export type RuntimeV02CreaturePlacementResult<T extends RuntimeV02CardZoneInstan
   receipt: RuntimeV02CreaturePlacementReceipt;
 };
 
+export type RuntimeV02CreatureSetupReturnReceipt = {
+  schema: "sb-tcg-creature-setup-return-v0.2";
+  controller_seat: 1 | 2;
+  where: "vanguard" | "reserve";
+  index: number | null;
+  card_uid: string;
+};
+
+export type RuntimeV02CreatureSetupReturnResult<T extends RuntimeV02CardZoneInstance> = {
+  card: T;
+  receipt: RuntimeV02CreatureSetupReturnReceipt;
+  card_zone_batch: RuntimeV02CardZoneTransferBatchReceipt;
+};
+
 export type RuntimeV02EvolvableCreatureState<T extends RuntimeV02CardZoneInstance> = RuntimeV02CreatureState<T> & {
   shield: number;
   condition?: string | null;
@@ -192,6 +206,103 @@ export function runtimeV02PlaceCreatureFromHand<T extends RuntimeV02CardZoneInst
       index: destinationIndex,
       card_uid: uid,
     },
+  };
+}
+
+/**
+ * Creature/Evolution owner for undoing a setup-only battlefield placement.
+ * Setup owns whether returning is legal now. Creature owns the exact battlefield
+ * identity and lifecycle removal; Card-Zone owns the underlying creature_stack-to-hand
+ * card transfer. The setup shape must still be pristine so no attached or evolved state
+ * can be silently discarded by this operation.
+ */
+export function runtimeV02ReturnSetupCreatureToHand<T extends RuntimeV02CardZoneInstance>(
+  player: RuntimeV02CreaturePlacementPlayerState<T>,
+  controllerSeat: 1 | 2,
+  where: "vanguard" | "reserve",
+  index: number | null,
+): RuntimeV02CreatureSetupReturnResult<T> {
+  if (!player || !Array.isArray(player.hand) || !Array.isArray(player.reserve)) {
+    throw new Error("tcg_v0_2_creature_setup_return_player_invalid");
+  }
+  if (controllerSeat !== 1 && controllerSeat !== 2) {
+    throw new Error("tcg_v0_2_creature_setup_return_controller_invalid");
+  }
+
+  let creature: RuntimeV02CreatureState<T> | null = null;
+  let sourceIndex: number | null = null;
+  if (where === "vanguard") {
+    if (index !== null) throw new Error("tcg_v0_2_creature_setup_return_vanguard_index_invalid");
+    creature = player.vanguard;
+  } else if (where === "reserve") {
+    if (!Number.isInteger(index) || Number(index) < 0 || Number(index) > 3) {
+      throw new Error("tcg_v0_2_creature_setup_return_reserve_index_invalid");
+    }
+    sourceIndex = Number(index);
+    creature = player.reserve[sourceIndex];
+  } else {
+    throw new Error("tcg_v0_2_creature_setup_return_position_invalid");
+  }
+  if (!creature) throw new Error("tcg_v0_2_creature_setup_return_creature_missing");
+  if (!Array.isArray(creature.stack) || creature.stack.length !== 1) {
+    throw new Error("tcg_v0_2_creature_setup_return_stack_not_single");
+  }
+  if (!Array.isArray(creature.essence) || creature.essence.length !== 0) {
+    throw new Error("tcg_v0_2_creature_setup_return_essence_present");
+  }
+  if (creature.relic !== null) throw new Error("tcg_v0_2_creature_setup_return_relic_present");
+  if (Number(creature.damage || 0) !== 0) throw new Error("tcg_v0_2_creature_setup_return_damage_present");
+
+  const placed = creature as RuntimeV02PlacedCreatureState<T>;
+  const hasConditions = Boolean(
+    placed.conditions && (
+      placed.conditions.scorched ||
+      placed.conditions.venomed > 0 ||
+      placed.conditions.control ||
+      placed.conditions.modifier
+    )
+  );
+  if (
+    Number(placed.shield || 0) !== 0 ||
+    placed.condition != null ||
+    hasConditions ||
+    Object.keys(placed.flags || {}).length > 0 ||
+    placed.entered_turn != null ||
+    placed.evolved_turn != null
+  ) {
+    throw new Error("tcg_v0_2_creature_setup_return_state_not_pristine");
+  }
+
+  const card = creature.stack[0];
+  const uid = requiredUid(card?.uid, "tcg_v0_2_creature_setup_return_card_uid_required");
+  const batch = runtimeV02ApplyCardZoneTransferBatch([{
+    source_zone: creature.stack,
+    destination_zone: player.hand,
+    request: {
+      cause: "rule",
+      action_kind: "setup",
+      source_action_id: "setup_return",
+      source_card_uid: uid,
+      source: { controller_seat: controllerSeat, zone: "creature_stack", owner_card_uid: uid },
+      destination: { controller_seat: controllerSeat, zone: "hand", owner_card_uid: null },
+      card_uids: [uid],
+      destination_position: "bottom",
+    },
+  }]);
+
+  if (where === "vanguard") player.vanguard = null;
+  else player.reserve[sourceIndex!] = null;
+
+  return {
+    card,
+    receipt: {
+      schema: "sb-tcg-creature-setup-return-v0.2",
+      controller_seat: controllerSeat,
+      where,
+      index: sourceIndex,
+      card_uid: uid,
+    },
+    card_zone_batch: batch.receipt,
   };
 }
 

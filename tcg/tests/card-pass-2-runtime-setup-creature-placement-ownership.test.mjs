@@ -29,6 +29,24 @@ test('Setup keeps setup legality while Creature family owns specialist hand-to-b
   assert.equal(setup.includes('function creatureFrom('), false, 'duplicate setup Creature constructor must be removed');
 });
 
+test('Setup return keeps phase permission while Creature owns battlefield lifecycle and Card-Zone owns the card transfer', () => {
+  const block = slice(setup, 'if(action==="setup_return")', 'if(action==="setup_ready")');
+
+  assert.ok(setup.includes('runtimeV02ReturnSetupCreatureToHand'));
+  assert.ok(block.includes('if(state.phase!=="setup"||state.setup_turn_seat!==seat)'));
+  assert.ok(block.includes('runtimeV02ReturnSetupCreatureToHand(p,seat as 1|2,where as "vanguard"|"reserve",where==="reserve"?idx:null)'));
+  assert.ok(block.includes('setup_creature_not_found'));
+  assert.equal(block.includes('p.vanguard=null'), false, 'Setup must not clear Vanguard directly');
+  assert.equal(block.includes('p.reserve[idx]=null'), false, 'Setup must not clear Reserve directly');
+  assert.equal(block.includes('p.hand.push('), false, 'Setup must not return Creature cards to hand directly');
+
+  assert.ok(creature.includes('export function runtimeV02ReturnSetupCreatureToHand'));
+  assert.ok(creature.includes('source_action_id: "setup_return"'));
+  assert.ok(creature.includes('zone: "creature_stack"'));
+  assert.ok(creature.includes('zone: "hand"'));
+  assert.ok(creature.includes('runtimeV02ApplyCardZoneTransferBatch'));
+});
+
 test('Creature family owns physical placement while Card-Zone remains excluded from specialist Creature destinations', () => {
   assert.ok(creature.includes('export function runtimeV02PlaceCreatureFromHand'));
   assert.ok(creature.includes('export function runtimeV02EvolveCreatureFromHand'));

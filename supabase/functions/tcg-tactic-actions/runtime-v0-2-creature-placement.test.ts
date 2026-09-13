@@ -1,5 +1,6 @@
 import {
   runtimeV02PlaceCreatureFromHand,
+  runtimeV02ReturnSetupCreatureToHand,
   type RuntimeV02CreaturePlacementPlayerState,
 } from "../_shared/tcg-match-creature-engine-v0-2.ts";
 import type { RuntimeV02CardZoneInstance } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
@@ -73,6 +74,62 @@ Deno.test("Creature Engine owns exact hand-to-Vanguard placement without Card-Zo
   assertSame(state.vanguard?.stack[0], placed);
   assertEquals(result.receipt.where, "vanguard");
   assertEquals(result.receipt.index, null);
+});
+
+Deno.test("Creature Engine owns setup Reserve return while Card-Zone owns creature-stack to hand transfer", () => {
+  const placed = card("creature-1", "gale-whiffin");
+  const kept = card("hand-2", "gale-breeze-essence");
+  const state = player([placed, kept]);
+  runtimeV02PlaceCreatureFromHand(state, 1, placed.uid, "reserve", 2);
+
+  const result = runtimeV02ReturnSetupCreatureToHand(state, 1, "reserve", 2);
+
+  assertSame(result.card, placed);
+  assertEquals(state.hand.map((entry) => entry.uid), [kept.uid, placed.uid]);
+  assertEquals(state.reserve[2], null);
+  assertEquals(result.receipt, {
+    schema: "sb-tcg-creature-setup-return-v0.2",
+    controller_seat: 1,
+    where: "reserve",
+    index: 2,
+    card_uid: placed.uid,
+  });
+  assertEquals(result.card_zone_batch.count, 1);
+  assertEquals(result.card_zone_batch.transfers[0].source.zone, "creature_stack");
+  assertEquals(result.card_zone_batch.transfers[0].destination.zone, "hand");
+  assertEquals(result.card_zone_batch.transfers[0].source_action_id, "setup_return");
+});
+
+Deno.test("Creature Engine owns setup Vanguard return with the same specialist boundary", () => {
+  const placed = card("creature-1", "stone-pebblit");
+  const state = player([placed]);
+  runtimeV02PlaceCreatureFromHand(state, 2, placed.uid, "vanguard", null);
+
+  const result = runtimeV02ReturnSetupCreatureToHand(state, 2, "vanguard", null);
+
+  assertSame(result.card, placed);
+  assertEquals(state.hand.map((entry) => entry.uid), [placed.uid]);
+  assertEquals(state.vanguard, null);
+  assertEquals(result.receipt.where, "vanguard");
+  assertEquals(result.receipt.index, null);
+});
+
+Deno.test("setup return fails closed before mutation when battlefield state is no longer pristine", () => {
+  const placed = card("creature-1", "grove-spriglet");
+  const attached = card("essence-1", "grove-growth-essence");
+  const state = player([placed]);
+  const placement = runtimeV02PlaceCreatureFromHand(state, 1, placed.uid, "reserve", 0);
+  placement.creature.essence.push(attached);
+
+  assertThrows(
+    () => runtimeV02ReturnSetupCreatureToHand(state, 1, "reserve", 0),
+    "tcg_v0_2_creature_setup_return_essence_present",
+  );
+
+  assertSame(state.reserve[0], placement.creature);
+  assertEquals(state.hand, []);
+  assertEquals(placement.creature.stack.map((entry) => entry.uid), [placed.uid]);
+  assertEquals(placement.creature.essence.map((entry) => entry.uid), [attached.uid]);
 });
 
 Deno.test("Creature placement rejects an occupied destination before hand mutation", () => {
