@@ -2,6 +2,13 @@ import type {
   RuntimeV02ConditionCreature,
   RuntimeV02ConditionState,
 } from "../_shared/tcg-match-condition-engine-v0-2.ts";
+import {
+  runtimeV02AddShield,
+  runtimeV02DealEffectDamage,
+  runtimeV02MoveDamage,
+  runtimeV02PlaceDamage,
+  runtimeV02TransferShield,
+} from "../_shared/tcg-match-damage-engine-v0-2.ts";
 
 export type RuntimeConditions = RuntimeV02ConditionState;
 export type RuntimeCreature = RuntimeV02ConditionCreature;
@@ -52,23 +59,23 @@ export {
   type ApplyConditionMode,
 } from "../_shared/tcg-match-condition-engine-v0-2.ts";
 
+// Compatibility facade: Damage/Shield mutation authority lives in the
+// canonical owner #20 engine. Existing callers keep their historical return
+// shapes while all physical damage/shield mutation is delegated centrally.
 export function dealRuntimeEffectDamage(
   creature: RuntimeCreature,
   amount: number,
 ): { requested: number; shield_prevented: number; actual_hp_damage: number } {
-  const requested = Math.max(0, Number(amount || 0));
-  const shield = Math.max(0, Number(creature.shield || 0));
-  const shieldPrevented = Math.min(shield, requested);
-  const actual = requested - shieldPrevented;
-  creature.shield = shield - shieldPrevented;
-  creature.damage = Math.max(0, Number(creature.damage || 0)) + actual;
-  return { requested, shield_prevented: shieldPrevented, actual_hp_damage: actual };
+  const receipt = runtimeV02DealEffectDamage(creature, amount);
+  return {
+    requested: receipt.requested_amount,
+    shield_prevented: receipt.shield_prevented,
+    actual_hp_damage: receipt.actual_hp_damage,
+  };
 }
 
 export function placeRuntimeDamage(creature: RuntimeCreature, amount: number): number {
-  const placed = Math.max(0, Number(amount || 0));
-  creature.damage = Math.max(0, Number(creature.damage || 0)) + placed;
-  return placed;
+  return runtimeV02PlaceDamage(creature, amount).actual_damage_placed;
 }
 
 export function addRuntimeShield(
@@ -76,12 +83,7 @@ export function addRuntimeShield(
   amount: number,
   shieldCap = 60,
 ): number {
-  const previous = Number(creature.shield || 0);
-  const increment = Math.max(0, Number(amount || 0));
-  const cap = Math.max(0, Number(shieldCap || 0));
-  const next = Math.min(cap, Math.max(0, previous + increment));
-  creature.shield = next;
-  return Math.max(0, next - Math.max(0, previous));
+  return runtimeV02AddShield(creature, amount, shieldCap).actual_shield_gained;
 }
 
 export function healRuntimeDamage(
@@ -100,11 +102,7 @@ export function moveRuntimeDamage(
   destination: RuntimeCreature,
   amount: number,
 ): number {
-  const requested = Math.max(0, Number(amount || 0));
-  const movable = Math.min(Math.max(0, Number(source.damage || 0)), requested);
-  source.damage = Math.max(0, Number(source.damage || 0)) - movable;
-  destination.damage = Math.max(0, Number(destination.damage || 0)) + movable;
-  return movable;
+  return runtimeV02MoveDamage(source, destination, amount, { allow_partial: true }).actual_damage_moved;
 }
 
 export function transferRuntimeShield(
@@ -113,14 +111,7 @@ export function transferRuntimeShield(
   amount: number,
   shieldCap = 60,
 ): number {
-  const requested = Math.max(0, Number(amount || 0));
-  const sourceShield = Math.max(0, Number(source.shield || 0));
-  const destinationShield = Math.max(0, Number(destination.shield || 0));
-  const capacity = Math.max(0, Number(shieldCap || 0) - destinationShield);
-  const moved = Math.min(requested, sourceShield, capacity);
-  source.shield = sourceShield - moved;
-  destination.shield = destinationShield + moved;
-  return moved;
+  return runtimeV02TransferShield(source, destination, amount, shieldCap).actual_shield_transferred;
 }
 
 function runtimeWhenMatches(when: unknown, context: RuntimeContinuousContext): boolean {

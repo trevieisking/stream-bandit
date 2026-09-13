@@ -123,6 +123,12 @@ function eventStream(state: Record<string, unknown>): Record<string, unknown>[] 
   return state.effect_events as Record<string, unknown>[];
 }
 
+function validateEventStreamWithoutMutation(state: Record<string, unknown>) {
+  if (state.effect_events != null && !Array.isArray(state.effect_events)) {
+    throw new Error("tcg_v0_2_heal_packet_event_stream_invalid");
+  }
+}
+
 function nextSequence(state: Record<string, unknown>): number {
   const raw = state.runtime_v0_2_event_seq;
   if (raw == null) return 1;
@@ -266,6 +272,27 @@ function isHealPacket(value: unknown): value is RuntimeV02HealPacket {
     Number.isInteger(Number(event.sequence)) &&
     Number.isInteger(Number(event.turn_seq)) &&
     Number(event.actual_amount) > 0;
+}
+
+/**
+ * Non-mutating Heal #21 preflight for compound transactions such as vitality
+ * drain. It validates the maximum possible heal packet authority before another
+ * owner mutates HP, so malformed event/source/target state cannot leave a
+ * partially-applied damage transaction behind.
+ */
+export function preflightRuntimeV02HealPacket(
+  state: Record<string, unknown>,
+  amount: number,
+  context: RuntimeV02HealPacketContext,
+): void {
+  if (!objectRecord(state)) throw new Error("tcg_v0_2_heal_packet_state_invalid");
+  requestedAmount(amount);
+  turnSeq(state);
+  activeSeat(state);
+  validateSource(context?.source);
+  validateTarget(context?.target);
+  validateEventStreamWithoutMutation(state);
+  nextSequence(state);
 }
 
 /**

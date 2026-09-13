@@ -1,0 +1,130 @@
+{
+  "schema": "sb-tcg-element-packages-v0.2",
+  "status": "branch_candidate",
+  "purpose": "Single additive authority for full-element packages and their starter bindings. New full elements are introduced by adding one package record plus structured card source and starter recipe; battle engines continue to consume the generic card/effect schemas without element-name branches.",
+  "historical_snapshot": {
+    "element_count": 8,
+    "elemental_identity_count": 192,
+    "total_identity_count_with_founder": 193,
+    "starter_count": 8,
+    "note": "Reproducibility snapshot only. It is not the final whole-game roster."
+  },
+  "current_target": {
+    "full_element_count": 10,
+    "starter_count": 10,
+    "required_additions": ["Fairy", "Underworld"],
+    "preserve_existing_starters": true
+  },
+  "classification": {
+    "Martial": {
+      "kind": "creature_type",
+      "is_full_element": false
+    }
+  },
+  "package_contract": {
+    "identities": 24,
+    "creatures": 11,
+    "essence": 4,
+    "tactics": 9,
+    "pack_only": 3,
+    "starter_cards": 60,
+    "starter_identities": 21,
+    "starter_creature_cards": 22,
+    "starter_essence_cards": 18,
+    "starter_tactic_cards": 20,
+    "mythic_identities": 1,
+    "starbound_identities": 1
+  },
+  "set_anchor_sources": [
+    "tcg-card-pass-2-founder-structured.md"
+  ],
+  "packages": [
+    {
+      "package_id": "element-astral",
+      "element": "Astral",
+      "state": "structured",
+      "design_authority": "tcg-card-pass-2-astral.md",
+      "structured_candidate_file": "tcg-card-pass-2-astral.md",
+      "starter": {"starter_id": "deck-astral-second-sky", "name": "Second Sky", "state": "existing", "recipe_manifest": "tcg-set-one-starters-v0.2.json"}
+    },
+    {
+      "package_id": "element-ember",
+      "element": "Ember",
+      "state": "structured",
+      "design_authority": "tcg-card-pass-2-ember.md",
+      "structured_candidate_file": "tcg-card-pass-2-ember.md",
+      "starter": {"starter_id": "deck-ember-ashrush", "name": "Ashrush", "state": "existing", "recipe_manifest": "tcg-set-one-starters-v0.2.json"}
+    },
+    {
+      "package_id": "element-gale",
+      "element": "Gale",
+      "state": "structured",
+      "design_authority": "tcg-card-pass-2-gale.md",
+      "structured_candidate_file": "tcg-card-pass-2-gale.md",
+      "starter": {"starter_id": "deck-gale-skyshift", "name": "Skyshift", "state": "existing", "recipe_manifest": "tcg-set-one-starters-v0.2.json"}
+    },
+    {
+      "package_id": "element-grove",
+      "element": "Grove",
+      "state": "structured",
+      "design_authority": "tcg-card-pass-2-grove.md",
+      "structured_candidate_file": "tcg-card-pass-2-grove.md",
+      "starter": {"starter_id": "deck-grove-wildgrowth", "name": "Wildgrowth", "state": "existing", "recipe_manifest": "tcg-set-one-starters-v0.2.json"}
+    },
+    {
+      "package_id": "element-shade",
+      "element": "Shade",
+      "state": "structured",
+      "design_authority": "tcg-card-pass-2-shade.md",
+      "structured_candidate_file": "tcg-card-pass-2-shade.md",
+      "starter": {"starter_id": "deck-shade-nightbind", "name": "Nightbind", "state": "existing", "recipe_manifest": "tcg-set-one-starters-v0.2.json"}
+    },
+    {
+      "package_id": "element-stone",
+      "element": "Stone",
+      "state": "structured",
+      "design_authority": "tcg-card-pass-2-stone.md",
+      "structured_candidate_file": "tcg-card-pass-2-stone.md",
+      "starter": {"starter_id": "deck-stone-unbroken", "name": "Unbroken", "state": "existing", "recipe_manifest": "tcg-set-one-starters-v0.2.json"}
+    },
+    {
+      "package_id": "element-tide",
+      "element": "Tide",
+      "state": "structured",
+      "design_authority": "tcg-card-pass-2-tide.md",
+      "structured_candidate_file": "tcg-card-pass-2-tide.md",
+      "starter": {"starter_id": "deck-tide-deep-current", "name": "Deep Current", "state": "existing", "recipe_manifest": "tcg-set-one-starters-v0.2.json"}
+    },
+    {
+      "package_id": "element-volt",
+      "element": "Volt",
+      "state": "structured",
+      "design_authority": "tcg-card-pass-2-volt.md",
+      "structured_candidate_file": "tcg-card-pass-2-volt.md",
+      "starter": {"starter_id": "deck-volt-live-wire", "name": "Live Wire", "state": "existing", "recipe_manifest": "tcg-set-one-starters-v0.2.json"}
+    },
+    {
+      "package_id": "element-fairy",
+      "element": "Fairy",
+      "state": "designed_pending_structure",
+      "design_authority": "tcg-future-fairy-audit.md",
+      "structured_candidate_file": null,
+      "starter": {"starter_id": null, "name": "Gracebound", "state": "designed_pending_structure", "recipe_manifest": null}
+    },
+    {
+      "package_id": "element-underworld",
+      "element": "Underworld",
+      "state": "designed_pending_structure",
+      "design_authority": "tcg-future-underworld-audit.md",
+      "structured_candidate_file": null,
+      "starter": {"starter_id": null, "name": "Debtbound", "state": "designed_pending_structure", "recipe_manifest": null}
+    }
+  ],
+  "extension_contract": {
+    "new_full_element": "Add one package row and its structured candidate source; registry source discovery must not require a code edit.",
+    "new_starter_deck": "Bind the starter descriptor to the package, then add the exact recipe to starter authority; game runtime must not branch on starter name.",
+    "new_card_identity": "Add structured sb-tcg-card-v0.2 data to the owning package source; shared engines interpret the generic effect grammar.",
+    "new_creature_type": "Add type metadata through the creature/type authority without promoting it to a full Essence element.",
+    "new_mechanic": "Add or extend one canonical domain engine/opcode first, then express cards as data; do not create per-card helpers."
+  }
+}

@@ -1,7 +1,7 @@
 {
   "validator_id": "sb-tcg-validator-v0.2",
   "status": "branch_candidate",
-  "scope": "Set One card-structure validation plus future-capability grammar ownership",
+  "scope": "Card-structure validation plus extensible element-package and future-capability grammar ownership",
   "authority": {
     "order": [
       "latest_explicit_user_corrections",
@@ -11,6 +11,7 @@
       "historical_google_plan_as_non_authoritative_reference"
     ],
     "base_schema": "tcg-card-pass-2-schema.md",
+    "element_package_manifest": "tcg-element-packages-v0.2.json",
     "amendments": [
       "tcg-card-pass-2-schema-amendment-astral.md",
       "tcg-card-pass-2-schema-amendment-b.md",
@@ -47,11 +48,32 @@
       }
     ]
   },
+  "roster_authority": {
+    "current_source": "tcg-element-packages-v0.2.json",
+    "historical_snapshot_only": {
+      "full_elements": ["Astral", "Ember", "Gale", "Grove", "Shade", "Stone", "Tide", "Volt"],
+      "elemental_identities": 192,
+      "total_identities_with_founder": 193,
+      "starter_count": 8
+    },
+    "current_target": {
+      "full_elements": ["Astral", "Ember", "Gale", "Grove", "Shade", "Stone", "Tide", "Volt", "Fairy", "Underworld"],
+      "full_element_count": 10,
+      "elemental_starter_count": 10,
+      "required_additions": ["Fairy", "Underworld"],
+      "required_starters": ["Gracebound", "Debtbound"]
+    },
+    "creature_type_only": ["Martial"],
+    "extension_rule": "Add full elements, starters and structured card sources through the element-package manifest; do not add element-name branches to runtime engines."
+  },
   "global_rules": {
     "set_one_elements": ["Astral", "Ember", "Gale", "Grove", "Shade", "Stone", "Tide", "Volt"],
     "set_one_expected_elemental_identities": 192,
     "set_one_expected_total_identities": 193,
-    "future_full_elements": ["Fairy", "Underworld"],
+    "set_one_fields_are_historical_snapshot_only": true,
+    "current_required_full_elements": ["Fairy", "Underworld"],
+    "current_full_element_target": 10,
+    "current_elemental_starter_target": 10,
     "creature_type_only": ["Martial"],
     "world_chain": ["Tide", "Ember", "Grove", "Gale", "Stone", "Volt", "Tide"],
     "mystical_combat_chain": ["Astral", "Martial", "Shade", "Fairy", "Underworld", "Astral"],
@@ -250,7 +272,7 @@
     "duplicate_attached_essence_elements_counted_as_distinct",
     "client_owned_distinct_element_query"
   ],
-  "set_one_candidate_files": [
+  "historical_set_one_candidate_files": [
     "tcg-card-pass-2-astral.md",
     "tcg-card-pass-2-ember.md",
     "tcg-card-pass-2-gale.md",
@@ -261,9 +283,11 @@
     "tcg-card-pass-2-volt.md",
     "tcg-card-pass-2-founder-structured.md"
   ],
+  "element_package_manifest": "tcg-element-packages-v0.2.json",
   "starter_manifest": "tcg-set-one-starters-v0.2.json",
-  "future_candidate_files": ["tcg-future-fairy-audit.md", "tcg-future-underworld-audit.md"],
+  "current_required_design_files": ["tcg-future-fairy-audit.md", "tcg-future-underworld-audit.md"],
   "preflight": {
+    "snapshot_kind": "historical_eight_element_reproducibility",
     "elemental_candidate_files": 8,
     "elemental_identities_expected": 192,
     "elemental_candidate_shape": {"per_element_total": 24, "creature": 11, "essence": 4, "tactic": 9},
@@ -276,22 +300,29 @@
     "set_one_unique_identity_count": 193,
     "exact_starter_count": 8,
     "exact_starters_reconciled": true,
+    "current_full_element_target": 10,
+    "current_starter_target": 10,
+    "pending_structured_elements": ["Fairy", "Underworld"],
     "machine_validation": {
       "workflow": "TCG Card Pass 2 Validation",
       "run_number": 2,
       "head_sha": "b4a1ea5c5ed78a8cae130bf5484242f2204e34ab",
-      "conclusion": "success"
+      "conclusion": "success",
+      "scope": "historical eight-element snapshot only"
     }
   },
   "completion": {
     "hard_invariants_consolidated": true,
     "amendment_authority_map_consolidated": true,
-    "set_one_candidate_inventory_declared": true,
+    "historical_set_one_candidate_inventory_declared": true,
+    "element_package_manifest_current_roster_authority": true,
     "elemental_192_document_preflight_complete": true,
     "full_opcode_predicate_parameter_schema_consolidated": false,
     "founder_structured_candidate_complete": true,
-    "all_set_one_candidates_machine_validated": true,
-    "all_eight_exact_starters_reconciled": true,
+    "historical_set_one_candidates_machine_validated": true,
+    "all_eight_existing_starters_reconciled": true,
+    "all_ten_element_packages_structured": false,
+    "all_ten_starters_bound": false,
     "production_registry_frozen": false
   }
 }

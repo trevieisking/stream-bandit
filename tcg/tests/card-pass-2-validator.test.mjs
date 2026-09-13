@@ -3,22 +3,21 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  elementPackages,
+  loadElementPackageManifest,
+  starterDescriptors,
+  structuredElementPackages,
+} from '../../tcg-element-package-registry-v0.2.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
-
-const elementFiles = {
-  Astral: 'tcg-card-pass-2-astral.md',
-  Ember: 'tcg-card-pass-2-ember.md',
-  Gale: 'tcg-card-pass-2-gale.md',
-  Grove: 'tcg-card-pass-2-grove.md',
-  Shade: 'tcg-card-pass-2-shade.md',
-  Stone: 'tcg-card-pass-2-stone.md',
-  Tide: 'tcg-card-pass-2-tide.md',
-  Volt: 'tcg-card-pass-2-volt.md'
-};
-
-const founderFile = 'tcg-card-pass-2-founder-structured.md';
+const packageManifest = loadElementPackageManifest(root);
+const structuredPackages = structuredElementPackages(packageManifest);
+const elementFiles = Object.fromEntries(
+  structuredPackages.map((pkg) => [pkg.element, pkg.structured_candidate_file])
+);
+const founderFile = packageManifest.set_anchor_sources[0];
 const validator = JSON.parse(fs.readFileSync(path.join(root, 'tcg-card-pass-2-validator-v0.2.json'), 'utf8'));
 const starters = JSON.parse(fs.readFileSync(path.join(root, 'tcg-set-one-starters-v0.2.json'), 'utf8'));
 
@@ -81,8 +80,8 @@ function assertCreature(card) {
   if (isMythic(card)) {
     assert.equal(card.deck_limit?.scope, 'identity', `${card.id}: Mythic uses identity deck limit`);
     assert.equal(card.deck_limit?.max, 1, `${card.id}: Mythic identity max is 1`);
-    assert.equal(c.stage, 'Standalone', `${card.id}: current Set One Mythic must be Standalone, not a Mythic stage`);
-    assert.equal(c.reward_value, 2, `${card.id}: current Set One Mythic reward value must be 2`);
+    assert.equal(c.stage, 'Standalone', `${card.id}: current structured Mythic must be Standalone, not a Mythic stage`);
+    assert.equal(c.reward_value, 2, `${card.id}: current structured Mythic reward value must be 2`);
   } else {
     assert.equal(c.reward_value, 1, `${card.id}: ordinary Creature reward value must be 1`);
   }
@@ -106,30 +105,40 @@ function assertNonCreature(card) {
   }
 }
 
-test('consolidated validator carries current matchup authority', () => {
+test('consolidated validator preserves matchup invariants while package manifest owns the current roster target', () => {
   assert.equal(validator.validator_id, 'sb-tcg-validator-v0.2');
   assert.equal(validator.global_rules.routine_per_card_weakness_forbidden, true);
   assert.equal(validator.global_rules.weakness_multiplier, 2);
   assert.equal(validator.global_rules.weakness_applies_to, 'attack_damage_only');
   assert.equal(validator.global_rules.weakness_max_applications_per_attack, 1);
   assert.equal(validator.global_rules.prismatic_matchup_default, 'neutral');
-  assert.deepEqual(validator.global_rules.set_one_elements, Object.keys(elementFiles));
+
+  const historicalElements = elementPackages(packageManifest)
+    .slice(0, packageManifest.historical_snapshot.element_count)
+    .map((pkg) => pkg.element);
+  assert.deepEqual(validator.global_rules.set_one_elements, historicalElements, 'legacy set_one_elements must remain the frozen eight-element snapshot');
+  assert.equal(validator.global_rules.set_one_expected_elemental_identities, packageManifest.historical_snapshot.elemental_identity_count);
+  assert.equal(validator.global_rules.set_one_expected_total_identities, packageManifest.historical_snapshot.total_identity_count_with_founder);
+  assert.equal(packageManifest.current_target.full_element_count, 10);
+  assert.equal(packageManifest.current_target.starter_count, 10);
+  assert.deepEqual(packageManifest.current_target.required_additions, ['Fairy', 'Underworld']);
 });
 
-test('eight elemental candidates are exactly 24 identities with 11/4/9 shape', () => {
+test('every structured elemental package satisfies the reusable 24 identity / 11-4-9 contract', () => {
+  const expected = packageManifest.package_contract;
   for (const [element, cards] of Object.entries(cardsByElement)) {
-    assert.equal(cards.length, 24, `${element}: expected 24 structured cards, got ${cards.length}`);
-    assert.equal(countFamily(cards, 'Creature'), 11, `${element}: expected 11 Creatures`);
-    assert.equal(countFamily(cards, 'Essence'), 4, `${element}: expected 4 Essence`);
-    assert.equal(countFamily(cards, 'Tactic'), 9, `${element}: expected 9 Tactics`);
-    assert.equal(cards.filter((card) => card.pack_only === true).length, 3, `${element}: expected exactly 3 pack-only identities`);
-    assert.equal(cards.filter(isMythic).length, 1, `${element}: expected exactly one Mythic identity`);
-    assert.equal(cards.filter(starboundEnabled).length, 1, `${element}: expected exactly one Starbound identity`);
+    assert.equal(cards.length, expected.identities, `${element}: expected ${expected.identities} structured cards, got ${cards.length}`);
+    assert.equal(countFamily(cards, 'Creature'), expected.creatures, `${element}: expected ${expected.creatures} Creatures`);
+    assert.equal(countFamily(cards, 'Essence'), expected.essence, `${element}: expected ${expected.essence} Essence`);
+    assert.equal(countFamily(cards, 'Tactic'), expected.tactics, `${element}: expected ${expected.tactics} Tactics`);
+    assert.equal(cards.filter((card) => card.pack_only === true).length, expected.pack_only, `${element}: expected exactly ${expected.pack_only} pack-only identities`);
+    assert.equal(cards.filter(isMythic).length, expected.mythic_identities, `${element}: Mythic identity count mismatch`);
+    assert.equal(cards.filter(starboundEnabled).length, expected.starbound_identities, `${element}: Starbound identity count mismatch`);
     for (const card of cards) assert.equal(card.element, element, `${card.id}: element mismatch`);
   }
 });
 
-test('Founder supplies the 193rd structured identity and remains neutral by default', () => {
+test('Prismatic Founder anchor remains neutral by default', () => {
   assert.equal(founderCards.length, 1, `Founder file must contain exactly one structured card, got ${founderCards.length}`);
   const founder = founderCards[0];
   assert.equal(founder.id, 'prismatic-stream-bandit-prismatic-founder');
@@ -142,9 +151,11 @@ test('Founder supplies the 193rd structured identity and remains neutral by defa
   assert.equal(starboundEnabled(founder), true);
 });
 
-test('Set One has 193 unique structured identities', () => {
-  assert.equal(allCards.length, 193, `expected 193 structured identities, got ${allCards.length}`);
-  assert.equal(byId.size, 193, 'all Set One card ids must be unique');
+test('structured identity inventory is derived from package state while the historical 193 snapshot stays explicit', () => {
+  const expectedCurrent = structuredPackages.length * packageManifest.package_contract.identities + founderCards.length;
+  assert.equal(allCards.length, expectedCurrent, `expected ${expectedCurrent} current structured identities, got ${allCards.length}`);
+  assert.equal(byId.size, expectedCurrent, 'all current structured card ids must be unique');
+  assert.equal(packageManifest.historical_snapshot.total_identity_count_with_founder, 193, 'historical reproducibility snapshot changed unexpectedly');
 });
 
 test('all card envelopes and Creature invariants are structurally valid', () => {
@@ -181,15 +192,18 @@ test('normal non-Essence identity limits do not exceed four and Mythic identitie
   }
 });
 
-test('eight exact starters resolve against structured candidates and preserve 60/21/22/18/20 shape', () => {
-  const expected = starters.expected;
-  assert.equal(starters.starters.length, expected.starter_count, 'starter count mismatch');
-  assert.deepEqual(starters.starters.map((starter) => starter.element).sort(), Object.keys(elementFiles).sort());
+test('all currently bound elemental starters resolve against structured packages and preserve the shared starter shape', () => {
+  const expected = packageManifest.package_contract;
+  const boundStarters = starterDescriptors(packageManifest).filter((starter) => starter.state === 'existing' || starter.state === 'ready');
+  const boundElements = boundStarters.map((starter) => starter.element).sort();
+
+  assert.equal(starters.starters.length, boundStarters.length, 'bound starter count mismatch');
+  assert.deepEqual(starters.starters.map((starter) => starter.element).sort(), boundElements);
 
   for (const starter of starters.starters) {
-    assert.equal(starter.cards.length, expected.identities_per_starter, `${starter.name}: identity count mismatch`);
-    assert.equal(new Set(starter.cards.map(([id]) => id)).size, expected.identities_per_starter, `${starter.name}: duplicate identity rows`);
-    assert.equal(starter.cards.reduce((sum, [, qty]) => sum + qty, 0), expected.cards_per_starter, `${starter.name}: total cards mismatch`);
+    assert.equal(starter.cards.length, expected.starter_identities, `${starter.name}: identity count mismatch`);
+    assert.equal(new Set(starter.cards.map(([id]) => id)).size, expected.starter_identities, `${starter.name}: duplicate identity rows`);
+    assert.equal(starter.cards.reduce((sum, [, qty]) => sum + qty, 0), expected.starter_cards, `${starter.name}: total cards mismatch`);
 
     const familyTotals = { Creature: 0, Essence: 0, Tactic: 0 };
     let mythicCopies = 0;
@@ -206,11 +220,11 @@ test('eight exact starters resolve against structured candidates and preserve 60
     }
 
     assert.deepEqual(familyTotals, {
-      Creature: expected.creature_cards,
-      Essence: expected.essence_cards,
-      Tactic: expected.tactic_cards
+      Creature: expected.starter_creature_cards,
+      Essence: expected.starter_essence_cards,
+      Tactic: expected.starter_tactic_cards,
     }, `${starter.name}: family totals mismatch`);
-    assert.equal(mythicCopies, expected.mythic_copies_per_starter, `${starter.name}: Mythic copy count mismatch`);
+    assert.equal(mythicCopies, expected.mythic_identities, `${starter.name}: Mythic copy count mismatch`);
   }
 });
 

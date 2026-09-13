@@ -1,18 +1,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import {
+  loadElementPackageManifest,
+  registrySourceFiles,
+} from './tcg-element-package-registry-v0.2.mjs';
 
-export const SET_ONE_CANDIDATE_FILES = Object.freeze([
-  'tcg-card-pass-2-astral.md',
-  'tcg-card-pass-2-ember.md',
-  'tcg-card-pass-2-gale.md',
-  'tcg-card-pass-2-grove.md',
-  'tcg-card-pass-2-shade.md',
-  'tcg-card-pass-2-stone.md',
-  'tcg-card-pass-2-tide.md',
-  'tcg-card-pass-2-volt.md',
-  'tcg-card-pass-2-founder-structured.md',
-]);
+const moduleRoot = path.dirname(fileURLToPath(import.meta.url));
+
+// Compatibility export for callers/tests that still consume the frozen source list.
+// The list is now derived from the additive element-package manifest instead of
+// being duplicated in this builder.
+export const SET_ONE_CANDIDATE_FILES = Object.freeze(
+  registrySourceFiles(loadElementPackageManifest(moduleRoot)),
+);
 
 function extractStructuredCards(source, sourceFile) {
   const blocks = [...source.matchAll(/```json\s*([\s\S]*?)```/g)].map((match) => match[1].trim());
@@ -57,10 +58,11 @@ function sqlLiteral(value) {
 }
 
 export function buildSetOneRegistry(root = process.cwd()) {
+  const candidateFiles = registrySourceFiles(loadElementPackageManifest(root));
   const cards = [];
   const sourceCounts = {};
 
-  for (const sourceFile of SET_ONE_CANDIDATE_FILES) {
+  for (const sourceFile of candidateFiles) {
     const filePath = path.join(root, sourceFile);
     const source = fs.readFileSync(filePath, 'utf8');
     const extracted = extractStructuredCards(source, sourceFile);
@@ -85,7 +87,7 @@ export function buildSetOneRegistry(root = process.cwd()) {
     set_code: 'SB1',
     card_schema: 'sb-tcg-card-v0.2',
     effect_schema: 'sb-tcg-effects-v0.2',
-    source_files: [...SET_ONE_CANDIDATE_FILES],
+    source_files: [...candidateFiles],
     source_counts: sourceCounts,
     card_count: definitions.length,
     definitions,

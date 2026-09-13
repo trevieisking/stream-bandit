@@ -3,21 +3,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  loadElementPackageManifest,
+  registrySourceFiles,
+} from '../../tcg-element-package-registry-v0.2.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
-
-const candidateFiles = [
-  'tcg-card-pass-2-astral.md',
-  'tcg-card-pass-2-ember.md',
-  'tcg-card-pass-2-gale.md',
-  'tcg-card-pass-2-grove.md',
-  'tcg-card-pass-2-shade.md',
-  'tcg-card-pass-2-stone.md',
-  'tcg-card-pass-2-tide.md',
-  'tcg-card-pass-2-volt.md',
-  'tcg-card-pass-2-founder-structured.md'
-];
+const candidateFiles = registrySourceFiles(loadElementPackageManifest(root));
 
 const grammar = JSON.parse(fs.readFileSync(path.join(root, 'tcg-card-pass-2-effect-grammar-v0.2.json'), 'utf8'));
 
@@ -70,7 +63,7 @@ test('every used opcode is declared and satisfies its required parameter contrac
     });
   }
 
-  assert.ok(used.size > 0, 'expected at least one opcode in the 193-card candidate inventory');
+  assert.ok(used.size > 0, 'expected at least one opcode in the structured registry-source inventory');
   const messages = [];
   if (undeclared.size) messages.push(`undeclared opcodes:\n${[...undeclared.entries()].map(([op, where]) => `- ${op} @ ${where}`).join('\n')}`);
   if (parameterMismatches.length) messages.push(`parameter mismatches:\n${parameterMismatches.map((entry) => `- ${entry}`).join('\n')}`);
@@ -90,7 +83,7 @@ test('every used predicate is declared by the v0.2 grammar', () => {
     });
   }
 
-  assert.ok(used.size > 0, 'expected at least one predicate in the 193-card candidate inventory');
+  assert.ok(used.size > 0, 'expected at least one predicate in the structured registry-source inventory');
   assert.equal(undeclared.size, 0, `undeclared predicates:\n${[...undeclared.entries()].map(([predicate, where]) => `- ${predicate} @ ${where}`).join('\n')}`);
 });
 
