@@ -296,7 +296,7 @@ Deno.test("targeted-drain full preflight prevents partial Payment when source da
       defeatDescribe,
       "targeted-choice-5",
     ),
-    "source",
+    "creature_missing",
   );
   assertEquals((s.players["1"].vanguard as { damage: number }).damage, 275);
   assertEquals(runtimeV02CurrentTurnActiveAbilityUseCount(s, 1, ABILITY_ID), 0);
