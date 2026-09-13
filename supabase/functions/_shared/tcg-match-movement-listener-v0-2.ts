@@ -4,6 +4,7 @@ import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
 import { applyRuntimeV02EssenceTransfer, type RuntimeV02EssenceMovement } from "./tcg-match-essence-movement-v0-2.ts";
 import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
+import { runtimeV02ApplyCardZoneTransfer } from "./tcg-match-card-zone-engine-v0-2.ts";
 import {
   runtimeV02CurrentTurnEssenceAttachmentEvents,
   runtimeV02LatestEssenceAttachmentEventForSource,
@@ -389,7 +390,21 @@ function applyMoveEssenceChoice(state: Record<string, unknown>, candidate: Candi
 }
 function executeStep(state: Record<string, unknown>, continuation: Continuation, candidate: Candidate, event: RuntimeV02MovementListenerEvent, step: Record<string, unknown>): "continue" | "choice" {
   const op = String(step.op || "");
-  if (op === "DRAW") { const seat = playerForToken(candidate, step.player); const player = O(O(state.players)?.[String(seat)]); if (!player || !Array.isArray(player.deck) || !Array.isArray(player.hand)) throw new Error("tcg_v0_2_movement_listener_draw_zones_missing"); const count = Math.max(0, Number(step.count || 0)); (player.hand as Inst[]).push(...(player.deck as Inst[]).splice(0, Math.min(count, player.deck.length))); continuation.step_cursor++; return "continue"; }
+  if (op === "DRAW") {
+    const seat = playerForToken(candidate, step.player); const player = O(O(state.players)?.[String(seat)]);
+    if (!player || !Array.isArray(player.deck) || !Array.isArray(player.hand)) throw new Error("tcg_v0_2_movement_listener_draw_zones_missing");
+    const count = Math.max(0, Number(step.count || 0)); const drawCount = Math.min(count, player.deck.length);
+    if (drawCount > 0) {
+      const cardUids = (player.deck as Inst[]).slice(0, drawCount).map((card) => card.uid);
+      runtimeV02ApplyCardZoneTransfer(player.deck as Inst[], player.hand as Inst[], {
+        cause: "effect", action_kind: candidate.kind, source_action_id: `listener:${listenerId(candidate)}`, source_card_uid: candidate.source.uid,
+        source: { controller_seat: seat, zone: "deck", owner_card_uid: null },
+        destination: { controller_seat: seat, zone: "hand", owner_card_uid: null },
+        card_uids: cardUids, destination_position: "bottom",
+      });
+    }
+    continuation.step_cursor++; return "continue";
+  }
   if (op === "CHOOSE_HAND_TO_DISCARD") { const seat = playerForToken(candidate, step.player); const player = O(O(state.players)?.[String(seat)]); if (!player || !Array.isArray(player.hand)) throw new Error("tcg_v0_2_movement_listener_hand_missing"); const wanted = range(step.count); const options = (player.hand as Inst[]).map((card) => ({ id: `card:${card.uid}`, label: cardName(state, card), data: { uid: card.uid, card_id: card.card_id } })); if (options.length < wanted.min) throw new Error("tcg_v0_2_movement_listener_discard_choice_unavailable"); choice(state, { seat, kind: "discard_from_hand", prompt: "Choose card to discard", min: wanted.min, max: Math.min(wanted.max, options.length), mode: "select", options, context: { zone_seat: seat } }); return "choice"; }
   if (op === "LOOK_TOP") { const owner = playerForToken(candidate, step.player); const count = Math.max(0, Number(step.count || 0)); continuation.vars[String(step.as || "looked")] = inspectDeckTop(state, candidate, owner, count, 0); continuation.step_cursor++; return "continue"; }
   if (op === "INSPECT_ZONE") { if (String(step.zone || "") !== "deck_top" || String(step.return_policy || "") !== "same_position" || String(step.visibility || "") !== "controller_private") throw new Error("tcg_v0_2_movement_listener_inspection_shape_unsupported"); const owner = playerForToken(candidate, step.player); const wanted = range(step.selection); const count = wanted.max; continuation.vars[String(step.as || "looked")] = inspectDeckTop(state, candidate, owner, count, wanted.min); continuation.step_cursor++; return "continue"; }
@@ -438,7 +453,23 @@ function selectedOptions(pendingChoice: RuntimeV02PendingMovementListenerChoice,
 export function runtimeV02ResolveMovementListenerChoice(state: Record<string, unknown>, actorSeat: 1 | 2, choiceId: string, choiceIds: string[]): RuntimeV02MovementListenerFlow {
   const pendingChoice = pending(state); if (!pendingChoice) throw new Error("tcg_v0_2_movement_listener_choice_required"); if (pendingChoice.turn_seq !== TURN(state)) throw new Error("tcg_v0_2_movement_listener_choice_turn_stale"); if (pendingChoice.seat !== SEAT(actorSeat)) throw new Error("tcg_v0_2_movement_listener_choice_not_yours"); if (pendingChoice.id !== S(choiceId, "tcg_v0_2_movement_listener_choice_id_required")) throw new Error("tcg_v0_2_movement_listener_choice_stale_id");
   const selected = selectedOptions(pendingChoice, choiceIds); const continuation = getContinuation(state); const work = currentWork(continuation); if (!work) throw new Error("tcg_v0_2_movement_listener_choice_work_missing"); const candidate = findCandidate(state, work); let generatedEvents: RuntimeV02EssenceMovedEvent[] = [];
-  if (pendingChoice.kind === "discard_from_hand") { const seat = SEAT(pendingChoice.context.zone_seat); const player = O(O(state.players)?.[String(seat)]); if (!player || !Array.isArray(player.hand) || !Array.isArray(player.discard)) throw new Error("tcg_v0_2_movement_listener_choice_hand_zones_missing"); for (const option of selected) { const uid = S(option.data.uid, "tcg_v0_2_movement_listener_choice_card_uid_invalid"); const index = (player.hand as Inst[]).findIndex((card) => card.uid === uid); if (index < 0) throw new Error("tcg_v0_2_movement_listener_choice_hand_stale"); (player.discard as Inst[]).push((player.hand as Inst[]).splice(index, 1)[0]); } }
+  if (pendingChoice.kind === "discard_from_hand") {
+    const seat = SEAT(pendingChoice.context.zone_seat); const player = O(O(state.players)?.[String(seat)]);
+    if (!player || !Array.isArray(player.hand) || !Array.isArray(player.discard)) throw new Error("tcg_v0_2_movement_listener_choice_hand_zones_missing");
+    const selectedUids = selected.map((option) => {
+      const uid = S(option.data.uid, "tcg_v0_2_movement_listener_choice_card_uid_invalid");
+      if (!(player.hand as Inst[]).some((card) => card.uid === uid)) throw new Error("tcg_v0_2_movement_listener_choice_hand_stale");
+      return uid;
+    });
+    if (selectedUids.length > 0) {
+      runtimeV02ApplyCardZoneTransfer(player.hand as Inst[], player.discard as Inst[], {
+        cause: "effect", action_kind: candidate.kind, source_action_id: `listener:${listenerId(candidate)}`, source_card_uid: candidate.source.uid,
+        source: { controller_seat: seat, zone: "hand", owner_card_uid: null },
+        destination: { controller_seat: seat, zone: "discard", owner_card_uid: null },
+        card_uids: selectedUids, destination_position: "bottom",
+      });
+    }
+  }
   else if (pendingChoice.kind === "order_deck_top") { const seat = SEAT(pendingChoice.context.zone_seat); const player = O(O(state.players)?.[String(seat)]); if (!player || !Array.isArray(player.deck)) throw new Error("tcg_v0_2_movement_listener_choice_deck_missing"); const expected = Array.isArray(pendingChoice.context.card_uids) ? pendingChoice.context.card_uids.map(String) : []; const top = (player.deck as Inst[]).slice(0, expected.length); if (top.length !== expected.length || new Set(top.map((card) => card.uid)).size !== expected.length || top.some((card) => !expected.includes(card.uid))) throw new Error("tcg_v0_2_movement_listener_choice_deck_stale"); const byUid = new Map(top.map((card) => [card.uid, card])); const ordered = selected.map((option) => byUid.get(S(option.data.uid, "tcg_v0_2_movement_listener_choice_card_uid_invalid"))!); (player.deck as Inst[]).splice(0, expected.length, ...ordered); }
   else if (pendingChoice.kind === "move_attached_essence") generatedEvents = applyMoveEssenceChoice(state, candidate, selected, S(pendingChoice.context.source_action_id, "tcg_v0_2_movement_listener_choice_source_action_required"));
   else throw new Error("tcg_v0_2_movement_listener_choice_kind_unsupported");
