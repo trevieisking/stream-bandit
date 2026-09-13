@@ -2,7 +2,7 @@ import {
   runtimeV02BeginCardCostChoice,
   runtimeV02PendingCardCostChoiceView,
   runtimeV02ResumeCardCostChoice,
-} from "./tcg-match-card-cost-choice-v0-2.ts";
+} from "../_shared/tcg-match-card-cost-choice-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, label = "mismatch") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error(`${label}: ${JSON.stringify(actual)} != ${JSON.stringify(expected)}`);
