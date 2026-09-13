@@ -3,6 +3,7 @@ import {
   runtimeV02ResumeActionCostGate,
   runtimeV02StructuredActionAdditionalCosts,
 } from "../_shared/tcg-match-action-cost-gate-v0-2.ts";
+import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -14,10 +15,24 @@ function card(uid: string, card_id: string) {
 
 function baseState(definition: Record<string, unknown>) {
   const source = card("creature-1", "underworld-source");
+  const definitionV02 = {
+    schema: "sb-tcg-card-v0.2",
+    effect_schema: "sb-tcg-effects-v0.2",
+    id: "underworld-source",
+    name: "Underworld Source",
+    ...definition,
+  };
   return {
     turn_seq: 7,
     active_seat: 1,
-    _definition: definition,
+    runtime_registry_v0_2: runtimeV02SnapshotMarker(),
+    card_index: {
+      "underworld-source": {
+        card_id: "underworld-source",
+        definition_v0_2: definitionV02,
+        definition_v0_2_rules_version: "sb-tcg-card-v0.2",
+      },
+    },
     players: {
       "1": {
         vanguard: { stack: [source], essence: [], relic: null, damage: 0, shield: 0 },
