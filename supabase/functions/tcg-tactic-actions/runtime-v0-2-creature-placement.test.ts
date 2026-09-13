@@ -132,6 +132,23 @@ Deno.test("setup return fails closed before mutation when battlefield state is n
   assertEquals(placement.creature.essence.map((entry) => entry.uid), [attached.uid]);
 });
 
+Deno.test("setup return refuses a multi-card stack before Card-Zone or battlefield mutation", () => {
+  const baby = card("baby-1", "gale-whiffin");
+  const evolved = card("teen-1", "gale-skyweaver");
+  const state = player([baby]);
+  const placement = runtimeV02PlaceCreatureFromHand(state, 1, baby.uid, "reserve", 1);
+  placement.creature.stack.push(evolved);
+
+  assertThrows(
+    () => runtimeV02ReturnSetupCreatureToHand(state, 1, "reserve", 1),
+    "tcg_v0_2_creature_setup_return_stack_not_single",
+  );
+
+  assertSame(state.reserve[1], placement.creature);
+  assertEquals(state.hand, []);
+  assertEquals(placement.creature.stack.map((entry) => entry.uid), [baby.uid, evolved.uid]);
+});
+
 Deno.test("Creature placement rejects an occupied destination before hand mutation", () => {
   const existing = card("existing-1", "grove-spriglet");
   const incoming = card("incoming-1", "grove-bloomhare");
