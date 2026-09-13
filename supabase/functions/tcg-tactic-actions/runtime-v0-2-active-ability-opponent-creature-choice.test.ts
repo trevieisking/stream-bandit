@@ -103,8 +103,9 @@ Deno.test("Ability opponent-creature choice snapshots every opposing field Creat
 
   const controllerView = runtimeV02PendingActiveAbilityOpponentCreatureChoiceView(pending, 1);
   const opponentView = runtimeV02PendingActiveAbilityOpponentCreatureChoiceView(pending, 2);
-  assert(controllerView && "options" in controllerView, "controller options missing");
-  assertEquals(controllerView.options.length, 3);
+  const controllerOptions = controllerView && "options" in controllerView ? controllerView.options : null;
+  assert(Array.isArray(controllerOptions), "controller options missing");
+  assertEquals(controllerOptions.length, 3);
   assert(opponentView && "waiting" in opponentView && opponentView.waiting === true, "opponent view leaked choice options");
 });
 
