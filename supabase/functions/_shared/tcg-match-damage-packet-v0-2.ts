@@ -17,6 +17,7 @@ import {
   runtimeV02DamagePacketTargetField,
 } from "./tcg-match-damage-packet-source-v0-2.ts";
 import { runtimeV02ResolveBeforeDamagePacketInternal } from "./tcg-match-damage-packet-listener-v0-2.ts";
+import { runtimeV02ApplyDamageProtections } from "./tcg-match-damage-protection-v0-2.ts";
 
 export type {
   RuntimeV02BeforeDamagePacketResult,
@@ -54,6 +55,40 @@ function validateEventIds(state: Record<string, unknown>, packetId: string): voi
   }
 }
 
+function resolveBeforeDamagePacket(
+  state: Record<string, unknown>,
+  amount: number,
+  context: RuntimeV02DamagePacketContext,
+  lookup: RuntimeV02DamagePacketLookup,
+): RuntimeV02BeforeDamagePacketResult {
+  const packet = runtimeV02NormalizeDamagePacketContext(context);
+  const target = runtimeV02DamagePacketTargetField(state, packet, lookup);
+  const activeSeat = state.active_seat;
+  if (activeSeat !== 1 && activeSeat !== 2) {
+    throw new Error("tcg_v0_2_damage_packet_active_seat_invalid");
+  }
+  const stored = runtimeV02ApplyDamageProtections(target.cr, amount, {
+    turn_seq: runtimeV02DamageTurn(state),
+    active_seat: activeSeat,
+    source_controller_seat: packet.source_controller_seat,
+    target_controller_seat: packet.target_controller_seat,
+    target_creature_uid: packet.target_creature_uid,
+    damage_class: packet.damage_class,
+    packet_id: packet.packet_id,
+  });
+  const listeners = runtimeV02ResolveBeforeDamagePacketInternal(
+    state,
+    stored.final_amount,
+    packet,
+    lookup,
+  );
+  return {
+    ...listeners,
+    requested_amount: Number(amount),
+    modifications: [...stored.modifications, ...listeners.modifications],
+  };
+}
+
 export function runtimeV02PreflightBeforeDamagePacket(
   state: Record<string, unknown>,
   amount: number,
@@ -68,12 +103,7 @@ export function runtimeV02PreflightBeforeDamagePacket(
     runtimeV02DamageString(context?.packet_id, "tcg_v0_2_damage_packet_id_required"),
   );
   const clone = structuredClone(state) as Record<string, unknown>;
-  return runtimeV02ResolveBeforeDamagePacketInternal(
-    clone,
-    amount,
-    context,
-    lookup,
-  );
+  return resolveBeforeDamagePacket(clone, amount, context, lookup);
 }
 
 export function runtimeV02ResolveBeforeDamagePacket(
@@ -90,7 +120,7 @@ export function runtimeV02ResolveBeforeDamagePacket(
     runtimeV02DamageString(context?.packet_id, "tcg_v0_2_damage_packet_id_required"),
   );
   runtimeV02PreflightBeforeDamagePacket(state, amount, context, lookup);
-  return runtimeV02ResolveBeforeDamagePacketInternal(state, amount, context, lookup);
+  return resolveBeforeDamagePacket(state, amount, context, lookup);
 }
 
 export function runtimeV02ApplyEffectDamagePacket(
