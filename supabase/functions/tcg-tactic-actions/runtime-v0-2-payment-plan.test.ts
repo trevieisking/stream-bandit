@@ -1,4 +1,4 @@
-import { runtimeV02PlanCardCosts } from "./tcg-match-payment-plan-v0-2.ts";
+import { runtimeV02PlanCardCosts } from "../_shared/tcg-match-payment-plan-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, label = "mismatch") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {
