@@ -2,6 +2,10 @@ import {
   healRuntimeDamage,
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import {
+  runtimeV02ApplyBeforeHealModifiers,
+  type RuntimeV02BeforeHealContext,
+} from "./tcg-match-heal-before-v0-2.ts";
 
 export type RuntimeV02Seat = 1 | 2;
 
@@ -219,6 +223,14 @@ function requestedAmount(value: unknown): number {
   return requested;
 }
 
+function targetDamageBefore(targetCreature: RuntimeCreature): number {
+  const damage = Number((targetCreature as unknown as Record<string, unknown>).damage);
+  if (!Number.isFinite(damage) || damage < 0) {
+    throw new Error("tcg_v0_2_heal_packet_target_damage_invalid");
+  }
+  return damage;
+}
+
 function verifiedActualAmount(value: unknown, requested: number): number {
   const actual = Number(value);
   if (!Number.isFinite(actual) || actual < 0 || actual > requested) {
@@ -240,6 +252,22 @@ function validatedEnvelope(
   const events = eventStream(state);
   const sequence = nextSequence(state);
   return { turn, active, source, target, requested, events, sequence };
+}
+
+function beforeHealContext(
+  envelope: RuntimeV02ValidatedHealPacketEnvelope,
+): RuntimeV02BeforeHealContext {
+  return {
+    source: {
+      ...envelope.source,
+      // Card Pass 2 listener metadata uses `rule` for non-card rule healing,
+      // while the canonical packet source stores that same authority as `system`.
+      action_kind: envelope.source.card_effect
+        ? envelope.source.action_kind
+        : "rule",
+    },
+    target: { ...envelope.target },
+  };
 }
 
 function appendVerifiedHealPacket(
@@ -320,11 +348,11 @@ export function recordRuntimeV02HealPacket(
 /**
  * Canonical v0.2 heal-event boundary for owners that have not healed yet.
  *
- * The underlying damage mutation stays owned by healRuntimeDamage. This wrapper
- * validates packet authority before changing the Creature, performs the heal,
- * then persists the same canonical packet used by the record-only bridge.
- * Listener matching/execution remains deliberately separate so nested triggers,
- * limits and player choices share one deterministic listener dispatcher.
+ * Heal #21 validates all packet authority before changing damage, applies the
+ * generic `before_heal_packet` modifier phase, performs the heal through the
+ * existing damage primitive, then persists the canonical `after_heal_packet`.
+ * The legacy record-only bridge remains unchanged because its HP mutation has
+ * already occurred before it reaches this owner.
  */
 export function applyRuntimeV02HealPacket(
   state: Record<string, unknown>,
@@ -336,12 +364,25 @@ export function applyRuntimeV02HealPacket(
   if (!objectRecord(targetCreature)) throw new Error("tcg_v0_2_heal_packet_target_creature_invalid");
 
   const requested = requestedAmount(amount);
-  // Validate ledger/sequence and all source/target authority before mutating the
-  // Creature so malformed state cannot leave a partially-applied heal behind.
+  // Validate ledger/sequence and all source/target authority before the modifier
+  // phase consumes any once-per-turn listener state.
   const envelope = validatedEnvelope(state, requested, context);
-  const actual = healRuntimeDamage(targetCreature, requested);
+  const damageBefore = targetDamageBefore(targetCreature);
+  const modified = runtimeV02ApplyBeforeHealModifiers(
+    state,
+    requested,
+    damageBefore,
+    beforeHealContext(envelope),
+  ).modified_amount;
+  envelope.requested = requestedAmount(modified);
+
+  const actual = healRuntimeDamage(targetCreature, envelope.requested);
   const packet = appendVerifiedHealPacket(state, envelope, actual);
-  return { requested_amount: requested, actual_heal: actual, packet };
+  return {
+    requested_amount: envelope.requested,
+    actual_heal: actual,
+    packet,
+  };
 }
 
 export function runtimeV02CurrentTurnHealPackets(

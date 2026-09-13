@@ -18,6 +18,7 @@ import {
   type RuntimeV02HealPacketContext,
   type RuntimeV02HealActionKind,
 } from "./tcg-match-heal-packet-v0-2.ts";
+import { runtimeV02PreflightBeforeHealModifiers } from "./tcg-match-heal-before-v0-2.ts";
 import type { RuntimeV02CardZoneInstance } from "./tcg-match-card-zone-engine-v0-2.ts";
 import type { RuntimeV02CreatureState } from "./tcg-match-creature-engine-v0-2.ts";
 
@@ -302,6 +303,13 @@ export function runtimeV02ApplyDrainVitalityProgram<T extends RuntimeV02CardZone
   const healCap = nonNegativeAmount(request.heal_cap, "tcg_v0_2_damage_program_drain_heal_cap_invalid");
   const maximumHeal = Math.min(amount, healCap);
   const context = healContext(identity, healTarget);
+  const preflightHealTarget = resolveCreature(state, healTarget, "drain_heal_target");
+  runtimeV02PreflightBeforeHealModifiers(
+    state,
+    maximumHeal,
+    Number(preflightHealTarget.damage || 0),
+    context,
+  );
   preflightRuntimeV02HealPacket(state, maximumHeal, context);
   runtimeV02PreflightDefeatScan(state, request.defeat_describe);
 
