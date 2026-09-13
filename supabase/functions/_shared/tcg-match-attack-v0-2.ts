@@ -5,6 +5,12 @@ import {
   type RuntimeV02CountAddFormulaMetadata,
 } from "./tcg-match-attack-formula-v0-2.ts";
 import { structuredRuntimeDistinctAttachedEssenceElements } from "./tcg-match-essence-query-v0-2.ts";
+import {
+  evaluateRuntimeV02DamageHistoryCountRequirement,
+  normalizeRuntimeV02DamageHistoryCountRequirement,
+  type RuntimeV02DamageHistoryCountRequirement,
+  type RuntimeV02SourceRequirementContext,
+} from "./tcg-match-requirement-evaluator-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 
 export type RuntimeV02AttackTargetPermission = {
@@ -14,12 +20,16 @@ export type RuntimeV02AttackTargetPermission = {
   selection: "one";
 };
 
-export type RuntimeV02AttackRequirement = {
+type RuntimeV02AttachedEssenceAttackRequirement = {
   predicate: "attached_essence_distinct_element_count_at_least";
   target: "$source_creature";
   count: number;
   allowed_elements: string[];
 };
+
+export type RuntimeV02AttackRequirement =
+  | RuntimeV02AttachedEssenceAttackRequirement
+  | RuntimeV02DamageHistoryCountRequirement;
 
 export type RuntimeV02AttackRequirementEvaluation =
   | { ok: true }
@@ -29,7 +39,8 @@ export type RuntimeV02AttackRequirementEvaluation =
     predicate: RuntimeV02AttackRequirement["predicate"];
     required: number;
     actual: number;
-    allowed_elements: string[];
+    allowed_elements?: string[];
+    min_actual_damage?: number;
   };
 
 export type RuntimeV02AttackMetadata = {
@@ -145,15 +156,18 @@ function attackRequirements(
     if (!requirement) {
       throw new Error(`tcg_v0_2_attack_requirement_invalid:${attackId}:${index}`);
     }
+    const predicate = String(requirement.predicate || "").trim();
+    if (predicate === "damage_history_count_at_least") {
+      return normalizeRuntimeV02DamageHistoryCountRequirement(requirement);
+    }
+    if (predicate !== "attached_essence_distinct_element_count_at_least") {
+      throw new Error(`tcg_v0_2_attack_requirement_predicate_unsupported:${attackId}:${predicate || "missing"}`);
+    }
+
     const allowedKeys = new Set(["predicate", "target", "count", "allowed_elements"]);
     const unsupportedKey = Object.keys(requirement).find((key) => !allowedKeys.has(key));
     if (unsupportedKey) {
       throw new Error(`tcg_v0_2_attack_requirement_field_unsupported:${attackId}:${unsupportedKey}`);
-    }
-
-    const predicate = String(requirement.predicate || "").trim();
-    if (predicate !== "attached_essence_distinct_element_count_at_least") {
-      throw new Error(`tcg_v0_2_attack_requirement_predicate_unsupported:${attackId}:${predicate || "missing"}`);
     }
 
     const target = String(requirement.target || "").trim();
@@ -188,6 +202,37 @@ function attackRequirements(
   });
 }
 
+function damageHistoryRequirementContext(
+  state: Record<string, unknown>,
+  rawSourceCreature: unknown,
+): RuntimeV02SourceRequirementContext {
+  const creature = objectRecord(rawSourceCreature);
+  if (!creature || !Array.isArray(creature.stack) || creature.stack.length === 0) {
+    throw new Error("tcg_v0_2_attack_requirement_source_stack_required");
+  }
+  const top = objectRecord(creature.stack[creature.stack.length - 1]);
+  const sourceUid = typeof top?.uid === "string" ? top.uid.trim() : "";
+  if (!sourceUid) {
+    throw new Error("tcg_v0_2_attack_requirement_source_uid_required");
+  }
+  const players = objectRecord(state.players);
+  if (!players) throw new Error("tcg_v0_2_attack_requirement_players_required");
+  for (const seat of [1, 2] as const) {
+    const player = objectRecord(players[String(seat)]);
+    if (!player) continue;
+    const reserve = Array.isArray(player.reserve) ? player.reserve : [];
+    for (const rawFieldCreature of [player.vanguard, ...reserve]) {
+      const fieldCreature = objectRecord(rawFieldCreature);
+      const stack = fieldCreature && Array.isArray(fieldCreature.stack) ? fieldCreature.stack : [];
+      const fieldTop = stack.length ? objectRecord(stack[stack.length - 1]) : null;
+      if (fieldTop?.uid === sourceUid) {
+        return { source_creature_uid: sourceUid, source_controller_seat: seat };
+      }
+    }
+  }
+  throw new Error("tcg_v0_2_attack_requirement_source_controller_missing");
+}
+
 export function evaluateStructuredRuntimeAttackRequirements(
   state: Record<string, unknown>,
   rawSourceCreature: unknown,
@@ -200,6 +245,25 @@ export function evaluateStructuredRuntimeAttackRequirements(
 
   for (let index = 0; index < requirements.length; index += 1) {
     const requirement = requirements[index];
+    if (requirement.predicate === "damage_history_count_at_least") {
+      const evaluated = evaluateRuntimeV02DamageHistoryCountRequirement(
+        state,
+        requirement,
+        damageHistoryRequirementContext(state, rawSourceCreature),
+      );
+      if (!evaluated.matched) {
+        return {
+          ok: false,
+          requirement_index: index,
+          predicate: requirement.predicate,
+          required: evaluated.required_count,
+          actual: evaluated.actual_count,
+          min_actual_damage: requirement.min_actual_damage,
+        };
+      }
+      continue;
+    }
+
     const represented = structuredRuntimeDistinctAttachedEssenceElements(
       state,
       rawSourceCreature,
