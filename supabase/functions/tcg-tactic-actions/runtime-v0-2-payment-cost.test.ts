@@ -1,7 +1,7 @@
 import {
   runtimeV02ApplyDamageCardCost,
   runtimeV02ApplyHandDiscardCardCost,
-} from "./tcg-match-payment-cost-v0-2.ts";
+} from "../_shared/tcg-match-payment-cost-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, label = "mismatch") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error(`${label}: ${JSON.stringify(actual)} != ${JSON.stringify(expected)}`);
