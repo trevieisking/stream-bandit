@@ -14,6 +14,8 @@
   "operations": {
     "ADD_ATTACK_DAMAGE_MODIFIER": {"required": ["target", "amount", "duration"], "optional": []},
     "ADD_CONDITION_IMMUNITY": {"required": ["target", "condition", "duration"], "optional": []},
+    "ADD_CONDITION_PROTECTION": {"required": ["target", "duration"], "optional": ["condition_slot", "conditions", "source_controller", "card_effect_only"]},
+    "ADD_DAMAGE_PROTECTION": {"required": ["target", "damage_classes", "reduce_amount", "duration"], "optional": ["source_controller", "minimum"]},
     "ADD_INCOMING_ATTACK_DAMAGE_MODIFIER": {"required": ["target", "amount", "duration"], "optional": ["filters", "minimum_prevention_to_consume"]},
     "ADD_SHIELD": {"required": ["target", "amount"], "optional": ["source_key"]},
     "ADD_SHIELD_EACH": {"required": ["targets", "amount"], "optional": []},
