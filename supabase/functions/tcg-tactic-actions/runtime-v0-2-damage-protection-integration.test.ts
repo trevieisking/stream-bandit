@@ -1,5 +1,5 @@
-import { runtimeV02ApplyEffectDamagePacket, runtimeV02PreflightBeforeDamagePacket } from "./tcg-match-damage-packet-v0-2.ts";
-import { runtimeV02DamageProtectionCount, runtimeV02InstallDamageProtection } from "./tcg-match-damage-protection-v0-2.ts";
+import { runtimeV02ApplyEffectDamagePacket, runtimeV02PreflightBeforeDamagePacket } from "../_shared/tcg-match-damage-packet-v0-2.ts";
+import { runtimeV02DamageProtectionCount, runtimeV02InstallDamageProtection } from "../_shared/tcg-match-damage-protection-v0-2.ts";
 
 function equal(actual:unknown, expected:unknown, label='mismatch'){if(JSON.stringify(actual)!==JSON.stringify(expected))throw new Error(`${label}: ${JSON.stringify(actual)} != ${JSON.stringify(expected)}`)}
 const inst=(uid:string)=>({uid,card_id:uid});

@@ -2,7 +2,7 @@ import {
   runtimeV02ApplyDamageProtections,
   runtimeV02DamageProtectionCount,
   runtimeV02InstallDamageProtection,
-} from "./tcg-match-damage-protection-v0-2.ts";
+} from "../_shared/tcg-match-damage-protection-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, label="mismatch") { if (JSON.stringify(actual)!==JSON.stringify(expected)) throw new Error(`${label}: ${JSON.stringify(actual)} != ${JSON.stringify(expected)}`); }
 function install(cr:any, overrides:Record<string,unknown>={}) {

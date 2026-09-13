@@ -1,7 +1,7 @@
 import {
   runtimeV02AdaptCardCostEventForListener,
   runtimeV02AdaptCardCostEventsForListener,
-} from "./tcg-match-event-listener-cost-v0-2.ts";
+} from "../_shared/tcg-match-event-listener-cost-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, label = "mismatch") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error(`${label}: ${JSON.stringify(actual)} != ${JSON.stringify(expected)}`);

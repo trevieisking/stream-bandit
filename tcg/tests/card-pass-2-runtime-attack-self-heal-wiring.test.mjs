@@ -46,7 +46,7 @@ test('healing has one shared primitive across match, tactic and structured attac
   assert.ok(matchSource.includes('healRuntimeDamage('), 'match engine is not using shared healing primitive');
   assert.ok(tacticSource.includes('healRuntimeDamage(found.cr, amount)'), 'legacy tactic heal fallback is not using shared primitive');
   assert.ok(tacticSource.includes('applyRuntimeV02HealPacket(state, found.cr, amount'), 'v0.2 tactic heal is not using canonical packet owner');
-  assert.ok(healPacketSource.includes('healRuntimeDamage(targetCreature, requested)'), 'canonical heal-packet owner bypasses shared primitive');
+  assert.ok(healPacketSource.includes('healRuntimeDamage(targetCreature, envelope.requested)'), 'canonical heal-packet owner bypasses shared primitive');
   assert.ok(effectSource.includes('healRuntimeDamage(sourceCreature, step.amount)'), 'structured self-heal bypasses shared primitive');
 });
 

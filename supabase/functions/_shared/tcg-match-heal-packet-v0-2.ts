@@ -1,7 +1,5 @@
-import {
-  healRuntimeDamage,
-  type RuntimeCreature,
-} from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import { healRuntimeDamage } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import type { RuntimeV02DamageCreature } from "./tcg-match-damage-engine-v0-2.ts";
 import {
   runtimeV02ApplyBeforeHealModifiers,
   type RuntimeV02BeforeHealContext,
@@ -223,7 +221,7 @@ function requestedAmount(value: unknown): number {
   return requested;
 }
 
-function targetDamageBefore(targetCreature: RuntimeCreature): number {
+function targetDamageBefore(targetCreature: RuntimeV02DamageCreature): number {
   const damage = Number((targetCreature as unknown as Record<string, unknown>).damage);
   if (!Number.isFinite(damage) || damage < 0) {
     throw new Error("tcg_v0_2_heal_packet_target_damage_invalid");
@@ -356,7 +354,7 @@ export function recordRuntimeV02HealPacket(
  */
 export function applyRuntimeV02HealPacket(
   state: Record<string, unknown>,
-  targetCreature: RuntimeCreature,
+  targetCreature: RuntimeV02DamageCreature,
   amount: number,
   context: RuntimeV02HealPacketContext,
 ): RuntimeV02HealPacketResolution {

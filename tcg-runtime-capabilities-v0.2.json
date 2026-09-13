@@ -12,6 +12,8 @@
     "implemented": [
       "ADD_ATTACK_DAMAGE_MODIFIER",
       "ADD_CONDITION_IMMUNITY",
+      "ADD_CONDITION_PROTECTION",
+      "ADD_DAMAGE_PROTECTION",
       "ADD_SHIELD",
       "CHECK_DECKOUT_AFTER_RESOLUTION",
       "CHOOSE_AND_CLEAR_CONDITION",
@@ -88,7 +90,8 @@
   },
   "predicates": {
     "implemented": [
-      "attached_essence_distinct_element_count_at_least"
+      "attached_essence_distinct_element_count_at_least",
+      "defeat_history_count_at_least"
     ],
     "partial": [
       "reserve_count_at_least",

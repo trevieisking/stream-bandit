@@ -2,7 +2,7 @@ import {
   runtimeV02ConditionProtectionCount,
   runtimeV02ConsumeConditionProtection,
   runtimeV02InstallConditionProtection,
-} from "./tcg-match-condition-protection-v0-2.ts";
+} from "../_shared/tcg-match-condition-protection-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, label = "mismatch") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {

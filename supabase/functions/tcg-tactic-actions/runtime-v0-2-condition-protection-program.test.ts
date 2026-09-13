@@ -1,10 +1,10 @@
 import {
   runtimeV02ApplyConditionProtectionProgram,
-} from "./tcg-match-condition-protection-program-v0-2.ts";
+} from "../_shared/tcg-match-condition-protection-program-v0-2.ts";
 import {
   runtimeV02ConditionProtectionCount,
   runtimeV02ConsumeConditionProtection,
-} from "./tcg-match-condition-protection-v0-2.ts";
+} from "../_shared/tcg-match-condition-protection-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, label = "mismatch") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {

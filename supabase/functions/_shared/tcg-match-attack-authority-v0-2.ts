@@ -226,6 +226,14 @@ function cloneCountAddFormula(
   };
 }
 
+function cloneAttackRequirement(
+  value: RuntimeV02AttackRequirement,
+): RuntimeV02AttackRequirement {
+  return value.predicate === "attached_essence_distinct_element_count_at_least"
+    ? { ...value, allowed_elements: [...value.allowed_elements] }
+    : { ...value };
+}
+
 function cloneConditionalLeaf(
   value: RuntimeV02ConditionalAddLeafPredicate,
 ): RuntimeV02ConditionalAddLeafPredicate {
@@ -375,10 +383,7 @@ export function resolveRuntimeAttackAuthority(
     declaration_current_turn_events: declarationCurrentTurnEvents(state, instanceOrId, conditionalAddFormula),
     declaration_previous_opponent_turn_events: declarationPreviousOpponentTurnEvents(state, instanceOrId, conditionalAddFormula),
     target_permissions: structured.target_permissions.map((permission) => ({ ...permission })),
-    requirements: structured.requirements.map((requirement) => ({
-      ...requirement,
-      allowed_elements: [...requirement.allowed_elements],
-    })),
+    requirements: structured.requirements.map(cloneAttackRequirement),
   };
 }
 

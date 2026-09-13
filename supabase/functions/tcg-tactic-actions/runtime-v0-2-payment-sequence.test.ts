@@ -1,4 +1,4 @@
-import { runtimeV02ApplyCardCostSequence } from "./tcg-match-payment-sequence-v0-2.ts";
+import { runtimeV02ApplyCardCostSequence } from "../_shared/tcg-match-payment-sequence-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, label = "mismatch") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {

@@ -42,8 +42,11 @@ test('legacy Shield English is gated and structured ownership is auditable', () 
 });
 
 test('Shield addition has one shared 60-cap primitive across match and tactic engines', () => {
-  assert.ok(coreSource.includes('export function addRuntimeShield('), 'shared Shield primitive missing');
-  assert.ok(coreSource.includes('const next = Math.min(cap, Math.max(0, previous + increment));'));
+  assert.ok(coreSource.includes('export function addRuntimeShield('), 'shared Shield compatibility facade missing');
+  assert.ok(
+    coreSource.includes('return runtimeV02AddShield(creature, amount, shieldCap).actual_shield_gained;'),
+    'Shield compatibility facade bypasses canonical Damage/Shield owner #20',
+  );
   assert.equal(matchSource.includes('function addShield('), false, 'match local Shield owner survived');
   assert.equal(tacticSource.includes('function addShield('), false, 'tactic local Shield owner survived');
   assert.ok(matchSource.includes('addRuntimeShield('), 'match engine is not using shared Shield primitive');

@@ -55,7 +55,13 @@ test('legacy moveRuntimeDamage compatibility preserves partial movement through 
 test('MOVE_DAMAGE grammar matches binding Amendment N field names and opt-ins', () => {
   const contract = grammar.operations.MOVE_DAMAGE;
   assert.deepEqual(contract.required, ['from', 'to', 'amount']);
-  assert.deepEqual(contract.optional, ['allow_partial', 'allow_opposing_destination', 'as']);
+  assert.deepEqual(contract.optional, [
+    'allow_partial',
+    'minimum_moved',
+    'allow_opposing_destination',
+    'destination_damage_cap',
+    'as',
+  ]);
   assert.equal(contract.required.includes('source'), false);
   assert.equal(contract.required.includes('destination'), false);
 });

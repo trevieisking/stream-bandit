@@ -36,7 +36,7 @@ test('heal-packet owner is generic, actual-heal-only and separate from healing m
   const packetSource = readFileSync('supabase/functions/_shared/tcg-match-heal-packet-v0-2.ts', 'utf8');
   const coreSource = readFileSync('supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts', 'utf8');
 
-  assert.ok(packetSource.includes('healRuntimeDamage(targetCreature, requested)'));
+  assert.ok(packetSource.includes('healRuntimeDamage(targetCreature, envelope.requested)'));
   assert.ok(packetSource.includes('if (actual <= 0)'));
   assert.ok(packetSource.includes('event: "after_heal_packet"'));
   assert.ok(packetSource.includes('runtime_v0_2_event_seq'));
