@@ -82,6 +82,7 @@ function fixture(listener: AnyRecord = prismRibbonListener, turnSeq = 5) {
   };
   const state = {
     turn_seq: turnSeq,
+    active_seat: 2,
     players: {
       "1": { vanguard: target, reserve: [null, null, null, null] },
       "2": { vanguard: source, reserve: [null, null, null, null] },
