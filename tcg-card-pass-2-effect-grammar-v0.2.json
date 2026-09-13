@@ -1,9 +1,10 @@
 {
   "grammar_id": "sb-tcg-effects-v0.2",
   "status": "branch_candidate",
-  "purpose": "Single machine-readable opcode, predicate and parameter authority for Card Pass 2 candidates and the future deterministic runtime interpreter.",
+  "purpose": "Single machine-readable opcode, cost, predicate and parameter authority for Card Pass 2 candidates and the future deterministic runtime interpreter.",
   "parameter_policy": {
     "unknown_opcode": "reject",
+    "unknown_cost_kind": "reject",
     "unknown_predicate": "reject",
     "unknown_top_level_effect_field": "reject_when_runtime_owner_is_frozen",
     "context_variables_must_be_server_bound": true,
@@ -84,6 +85,24 @@
     "SWITCH_WITH_VANGUARD": {"required": ["player", "target"], "optional": ["action_kind", "as_switch"]},
     "TIMEFOLD": {"required": [], "optional": ["player", "scope", "duration", "limit_key"]},
     "TRANSFER_SHIELD": {"required": ["from", "to", "amount"], "optional": []}
+  },
+  "costs": {
+    "damage": {"required": ["target", "amount"], "optional": []},
+    "hand_discard": {"required": ["player", "count"], "optional": ["filters"]}
+  },
+  "cost_composition": {
+    "choice": {"required": ["options"], "optional": []},
+    "optional": {"required": ["costs", "as"], "optional": []}
+  },
+  "cost_policy": {
+    "top_level_form": "ordered_array",
+    "payment_owner": "payment",
+    "choice_owner": "action_owner",
+    "damage_mutation_owner": "damage",
+    "damage_defeat_owner": "defeat",
+    "hand_discard_mutation_owner": "card_zone",
+    "emit_event": "card_cost_paid",
+    "card_name_or_display_text_as_authority": false
   },
   "predicates": [
     "attached_essence_distinct_element_count_at_least",
