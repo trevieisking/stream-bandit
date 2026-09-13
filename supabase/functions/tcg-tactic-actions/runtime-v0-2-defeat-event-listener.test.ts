@@ -5,6 +5,7 @@ import {
   runtimeV02AdaptDefeatEventForListener,
   runtimeV02BeginDefeatEventListenerContinuation,
 } from "../_shared/tcg-match-event-listener-defeat-v0-2.ts";
+import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
 
 function equal(actual: unknown, expected: unknown, message = "values differ") {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {
@@ -15,17 +16,6 @@ function equal(actual: unknown, expected: unknown, message = "values differ") {
 function instance(uid: string, cardId: string) {
   return { uid, card_id: cardId };
 }
-
-const marker = {
-  registry_id: "SB1-set-one-v0.2",
-  set_code: "SB1",
-  card_schema: "sb-tcg-card-v0.2",
-  effect_schema: "sb-tcg-effects-v0.2",
-  card_count: 193,
-  registry_sha256: "test",
-  runtime_authority: false,
-  source: "test",
-};
 
 function creatureDefinition(
   id: string,
@@ -96,7 +86,7 @@ function stateForFriendlyDefeat() {
     turn_seq: 9,
     active_seat: 2,
     phase: "resolution",
-    runtime_registry_v0_2: { ...marker },
+    runtime_registry_v0_2: runtimeV02SnapshotMarker(),
     runtime_v0_2_event_seq: 0,
     effect_events: [],
     card_index: Object.fromEntries(definitions.map((definition) => [
