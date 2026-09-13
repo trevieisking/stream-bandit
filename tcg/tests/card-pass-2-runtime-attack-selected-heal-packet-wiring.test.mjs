@@ -21,7 +21,7 @@ test('live selected-heal choice delegates to the canonical apply-and-record heal
   assert.ok(choiceSource.includes('applyRuntimeV02AttackSelectedHealPacket('));
   assert.ok(adapterSource.includes('export function applyRuntimeV02AttackSelectedHealPacket('));
   assert.ok(adapterSource.includes('return applyRuntimeV02HealPacket('));
-  assert.ok(healPacketSource.includes('const actual = healRuntimeDamage(targetCreature, requested);'));
+  assert.ok(healPacketSource.includes('const actual = healRuntimeDamage(targetCreature, envelope.requested);'));
   assert.ok(choiceSource.includes('emitted_packet_ids: emittedPacketIds'));
 });
 
