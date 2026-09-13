@@ -1,3 +1,8 @@
+import {
+  normalizeRuntimeV02DamageHistoryCountRequirement,
+  type RuntimeV02DamageHistoryCountRequirement,
+} from "./tcg-match-requirement-evaluator-v0-2.ts";
+
 export type RuntimeV02CountCardsCounter = {
   kind: "count_cards";
   controller: "self";
@@ -73,6 +78,7 @@ export type RuntimeV02ConditionalAddLeafPredicate =
   | { predicate: "reserve_count_at_least"; controller: "self"; count: 3 }
   | { predicate: "hand_count_at_least"; player: "opponent"; count: 5 }
   | { predicate: "source_has_relic" }
+  | RuntimeV02DamageHistoryCountRequirement
   | RuntimeV02ConditionalAddEventOccurredPredicate
   | { predicate: "event_attack_source_has_attached_essence_kind"; kind: "temporary" | "borrowed" };
 
@@ -375,6 +381,9 @@ function conditionalLeafPredicate(
   const predicate = String(value.predicate || "");
   const prefix = `tcg_v0_2_attack_conditional_add_predicate:${attackId}:${termIndex}:${predicatePath}`;
 
+  if (predicate === "damage_history_count_at_least") {
+    return normalizeRuntimeV02DamageHistoryCountRequirement(value);
+  }
   if (predicate === "event_occurred") {
     return conditionalEventOccurredPredicate(value, attackId, termIndex, predicatePath);
   }
@@ -470,11 +479,10 @@ function conditionalAddTerm(
 }
 
 /**
- * Normalizes only the conditional_add subset used by the frozen 193-card Set One.
+ * Normalizes the conditional_add subset currently owned by the structured Attack engine.
  *
  * This is metadata authority only. It does not evaluate predicates or change
- * attack damage. Predicate support is intentionally restricted to the exact
- * Set One formula vocabulary; unsupported/future shapes fail closed.
+ * attack damage. Unsupported/future shapes still fail closed.
  */
 export function structuredRuntimeConditionalAddFormulaMetadata(
   value: unknown,

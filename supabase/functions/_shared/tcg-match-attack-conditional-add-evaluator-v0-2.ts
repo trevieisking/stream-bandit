@@ -22,6 +22,11 @@ export type RuntimeV02ConditionalAddEventSignal =
     element: string;
   };
 
+export type RuntimeV02ConditionalAddDamageHistoryEvidence = {
+  min_actual_damage: number;
+  actual_count: number;
+};
+
 export type RuntimeV02ConditionalAddEvaluationContext = {
   source_conditions: string[];
   target_conditions: string[];
@@ -32,6 +37,7 @@ export type RuntimeV02ConditionalAddEvaluationContext = {
   current_turn_events: RuntimeV02ConditionalAddEventSignal[];
   previous_opponent_turn_events?: RuntimeV02ConditionalAddEventSignal[];
   source_attached_essence_kinds: Array<"temporary" | "borrowed">;
+  damage_history_evidence?: RuntimeV02ConditionalAddDamageHistoryEvidence[];
 };
 
 export type RuntimeV02ConditionalAddTermEvaluation = {
@@ -57,6 +63,13 @@ function objectRecord(value: unknown): Record<string, unknown> | null {
 
 function nonNegativeInteger(value: unknown, error: string): number {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+    throw new Error(error);
+  }
+  return value;
+}
+
+function positiveInteger(value: unknown, error: string): number {
+  if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) {
     throw new Error(error);
   }
   return value;
@@ -112,6 +125,29 @@ function normalizeEventSignal(
   throw new Error(`${prefix}:event:${event || "missing"}`);
 }
 
+function normalizeDamageHistoryEvidence(
+  raw: unknown,
+  attackId: string,
+): RuntimeV02ConditionalAddDamageHistoryEvidence[] {
+  if (raw == null) return [];
+  if (!Array.isArray(raw)) {
+    throw new Error(`tcg_v0_2_attack_conditional_add_context_damage_history_invalid:${attackId}`);
+  }
+  return raw.map((entry, index) => {
+    const value = objectRecord(entry);
+    const prefix = `tcg_v0_2_attack_conditional_add_context_damage_history_invalid:${attackId}:${index}`;
+    if (!value) throw new Error(prefix);
+    const unsupported = Object.keys(value).find((key) =>
+      key !== "min_actual_damage" && key !== "actual_count"
+    );
+    if (unsupported) throw new Error(`${prefix}:field:${unsupported}`);
+    return {
+      min_actual_damage: positiveInteger(value.min_actual_damage, `${prefix}:min_actual_damage`),
+      actual_count: nonNegativeInteger(value.actual_count, `${prefix}:actual_count`),
+    };
+  });
+}
+
 function normalizeContext(
   raw: RuntimeV02ConditionalAddEvaluationContext,
   attackId: string,
@@ -165,6 +201,7 @@ function normalizeContext(
     current_turn_events: context.current_turn_events.map((event, index) => normalizeEventSignal(event, attackId, index)),
     previous_opponent_turn_events: previousOpponentTurnEvents.map((event, index) => normalizeEventSignal(event, attackId, index)),
     source_attached_essence_kinds: [...attachmentKinds],
+    damage_history_evidence: normalizeDamageHistoryEvidence(context.damage_history_evidence, attackId),
   };
 }
 
@@ -225,6 +262,12 @@ function leafMatches(
   if (predicate.predicate === "source_has_relic") {
     return context.source_has_relic;
   }
+  if (predicate.predicate === "damage_history_count_at_least") {
+    return (context.damage_history_evidence || []).some((entry) =>
+      entry.min_actual_damage === predicate.min_actual_damage &&
+      entry.actual_count >= predicate.count
+    );
+  }
   if (predicate.predicate === "event_occurred") {
     return eventPredicateMatches(predicate, context);
   }
@@ -248,11 +291,11 @@ function whenMatches(
 }
 
 /**
- * Pure deterministic evaluator for the frozen Set One conditional_add formula subset.
+ * Pure deterministic evaluator for the currently owned conditional_add formula subset.
  *
  * The caller owns construction of a declaration-time context from canonical match
  * state. This function deliberately does not read legacy English card text or
- * invent event history. That adapter/wiring remains a separate guarded runtime tick.
+ * invent event/history state. Domain owners provide normalized evidence instead.
  */
 export function evaluateStructuredRuntimeConditionalAddFormula(
   baseDamage: number,

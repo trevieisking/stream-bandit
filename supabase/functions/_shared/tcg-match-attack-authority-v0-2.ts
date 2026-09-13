@@ -1,5 +1,6 @@
 import {
   evaluateStructuredRuntimeConditionalAddFormula,
+  type RuntimeV02ConditionalAddDamageHistoryEvidence,
   type RuntimeV02ConditionalAddEvaluationContext,
   type RuntimeV02ConditionalAddEventSignal,
   type RuntimeV02ConditionalAddFormulaEvaluation,
@@ -27,6 +28,7 @@ import {
   type RuntimeV02AttackRequirementEvaluation,
   type RuntimeV02AttackTargetPermission,
 } from "./tcg-match-attack-v0-2.ts";
+import { evaluateRuntimeV02DamageHistoryCountRequirement } from "./tcg-match-requirement-evaluator-v0-2.ts";
 
 export type LegacyAttackCompatibility = {
   name: string;
@@ -47,6 +49,7 @@ export type RuntimeAttackAuthority = LegacyAttackCompatibility & {
   declaration_source_attached_essence_kinds?: Array<"temporary" | "borrowed">;
   declaration_current_turn_events?: RuntimeV02ConditionalAddEventSignal[];
   declaration_previous_opponent_turn_events?: RuntimeV02ConditionalAddEventSignal[];
+  declaration_damage_history_evidence?: RuntimeV02ConditionalAddDamageHistoryEvidence[];
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
 };
@@ -174,6 +177,47 @@ function formulaUsesDamagePrevention(
   });
 }
 
+function formulaDamageHistoryRequirements(
+  value: RuntimeV02ConditionalAddFormulaMetadata | null,
+): Array<Extract<RuntimeV02ConditionalAddLeafPredicate, { predicate: "damage_history_count_at_least" }>> {
+  if (!value) return [];
+  const requirements: Array<Extract<RuntimeV02ConditionalAddLeafPredicate, { predicate: "damage_history_count_at_least" }>> = [];
+  for (const term of value.terms) {
+    const predicates = "any" in term.when ? term.when.any : [term.when];
+    for (const predicate of predicates) {
+      if (predicate.predicate === "damage_history_count_at_least") requirements.push(predicate);
+    }
+  }
+  return requirements;
+}
+
+function declarationDamageHistoryEvidence(
+  state: Record<string, unknown>,
+  instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
+  formula: RuntimeV02ConditionalAddFormulaMetadata | null,
+): RuntimeV02ConditionalAddDamageHistoryEvidence[] {
+  const requirements = formulaDamageHistoryRequirements(formula);
+  if (requirements.length === 0) return [];
+
+  const uid = sourceUid(instanceOrId);
+  if (!uid) throw new Error("tcg_v0_2_attack_conditional_add_damage_history_source_uid_required");
+  const controllerSeat = declarationSourceControllerSeat(state, instanceOrId);
+  if (!controllerSeat) throw new Error("tcg_v0_2_attack_conditional_add_damage_history_source_controller_required");
+
+  const evidence = new Map<number, number>();
+  for (const requirement of requirements) {
+    const evaluated = evaluateRuntimeV02DamageHistoryCountRequirement(
+      state,
+      requirement,
+      { source_creature_uid: uid, source_controller_seat: controllerSeat },
+    );
+    evidence.set(requirement.min_actual_damage, evaluated.actual_count);
+  }
+  return [...evidence.entries()]
+    .sort(([left], [right]) => left - right)
+    .map(([min_actual_damage, actual_count]) => ({ min_actual_damage, actual_count }));
+}
+
 function declarationCurrentTurnEvents(
   state: Record<string, unknown>,
   instanceOrId: string | { card_id?: unknown; uid?: unknown } | null | undefined,
@@ -279,7 +323,8 @@ function cloneConditionalAddFormula(
 
 function directConditionalLeafReady(predicate: RuntimeV02ConditionalAddLeafPredicate): boolean {
   return predicate.predicate !== "event_occurred" &&
-    predicate.predicate !== "event_attack_source_has_attached_essence_kind";
+    predicate.predicate !== "event_attack_source_has_attached_essence_kind" &&
+    predicate.predicate !== "damage_history_count_at_least";
 }
 
 function directConditionalWhenReady(when: RuntimeV02ConditionalAddWhen): boolean {
@@ -290,6 +335,7 @@ function directConditionalWhenReady(when: RuntimeV02ConditionalAddWhen): boolean
 
 function readyConditionalLeaf(predicate: RuntimeV02ConditionalAddLeafPredicate): boolean {
   if (directConditionalLeafReady(predicate)) return true;
+  if (predicate.predicate === "damage_history_count_at_least") return true;
   if (predicate.predicate === "event_attack_source_has_attached_essence_kind") return true;
   if (predicate.predicate !== "event_occurred") return false;
   if (
@@ -353,6 +399,7 @@ export function resolveRuntimeAttackAuthority(
       declaration_source_attached_essence_kinds: [],
       declaration_current_turn_events: [],
       declaration_previous_opponent_turn_events: [],
+      declaration_damage_history_evidence: [],
       target_permissions: [],
       requirements: [],
     };
@@ -382,6 +429,7 @@ export function resolveRuntimeAttackAuthority(
     declaration_source_attached_essence_kinds: declarationSourceAttachedEssenceKinds(state, instanceOrId),
     declaration_current_turn_events: declarationCurrentTurnEvents(state, instanceOrId, conditionalAddFormula),
     declaration_previous_opponent_turn_events: declarationPreviousOpponentTurnEvents(state, instanceOrId, conditionalAddFormula),
+    declaration_damage_history_evidence: declarationDamageHistoryEvidence(state, instanceOrId, conditionalAddFormula),
     target_permissions: structured.target_permissions.map((permission) => ({ ...permission })),
     requirements: structured.requirements.map(cloneAttackRequirement),
   };
@@ -423,8 +471,8 @@ export function evaluateRuntimeAttackCountAddFormula(
 }
 
 /**
- * Evaluates only frozen conditional_add predicates whose truth is already fully
- * represented by declaration-time canonical match state.
+ * Evaluates only conditional_add predicates whose truth is already fully
+ * represented by the caller's declaration-time direct state.
  */
 export function evaluateRuntimeAttackDirectConditionalAddFormula(
   attack: RuntimeAttackAuthority,
@@ -452,9 +500,8 @@ export function evaluateRuntimeAttackDirectConditionalAddFormula(
 }
 
 /**
- * Runtime-C ready subset: declaration-time state predicates plus canonical
- * current-turn Device-resolution, hidden deck-view, Reward-inspection,
- * Essence-movement, damage-prevention and attack-source attachment signals.
+ * Ready structured subset: direct declaration state plus canonical current-turn
+ * event, attachment and Damage #20 history evidence captured by Attack authority.
  */
 export function evaluateRuntimeAttackReadyConditionalAddFormula(
   attack: RuntimeAttackAuthority,
@@ -485,6 +532,10 @@ export function evaluateRuntimeAttackReadyConditionalAddFormula(
     ...(context.previous_opponent_turn_events || []),
     ...(attack.declaration_previous_opponent_turn_events || []),
   ];
+  const damageHistoryEvidence = [
+    ...(context.damage_history_evidence || []),
+    ...(attack.declaration_damage_history_evidence || []),
+  ];
   return evaluateStructuredRuntimeConditionalAddFormula(
     attack.damage,
     attack.conditional_add_formula,
@@ -493,6 +544,7 @@ export function evaluateRuntimeAttackReadyConditionalAddFormula(
       current_turn_events: currentTurnEvents,
       previous_opponent_turn_events: previousOpponentTurnEvents,
       source_attached_essence_kinds: sourceAttachedEssenceKinds,
+      damage_history_evidence: damageHistoryEvidence,
     },
     attack.id,
   );
