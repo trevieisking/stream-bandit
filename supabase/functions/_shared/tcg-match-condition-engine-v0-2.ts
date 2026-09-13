@@ -1,3 +1,10 @@
+import {
+  runtimeV02ConsumeConditionProtection,
+  type RuntimeV02ConditionApplicationContext,
+  type RuntimeV02ConditionProtectionReceipt,
+  type RuntimeV02ConditionProtectionSlot,
+} from "./tcg-match-condition-protection-v0-2.ts";
+
 export type RuntimeV02ConditionState = {
   scorched: boolean;
   venomed: number;
@@ -31,6 +38,21 @@ export type ApplyConditionMode =
   | "apply_if_empty_or_same"
   | "replace";
 
+export type RuntimeV02ConditionApplyResult = {
+  applied: boolean;
+  prevented: boolean;
+  reason?: string;
+};
+
+export type RuntimeV02ConditionApplicationSourceContext = Omit<
+  RuntimeV02ConditionApplicationContext,
+  "new_application" | "condition" | "condition_slot"
+>;
+
+export type RuntimeV02ConditionApplyWithContextResult = RuntimeV02ConditionApplyResult & {
+  protection: RuntimeV02ConditionProtectionReceipt | null;
+};
+
 export const runtimeV02ConditionNames = [
   "Scorched",
   "Venomed",
@@ -57,6 +79,14 @@ const MODIFIER_CONDITIONS = new Set<string>([
   "Drenched",
   "Crushed",
 ]);
+
+export function runtimeV02ConditionSlot(condition: string): RuntimeV02ConditionProtectionSlot {
+  if (condition === "Scorched") return "scorched";
+  if (condition === "Venomed") return "venomed";
+  if (CONTROL_CONDITIONS.has(condition)) return "control";
+  if (MODIFIER_CONDITIONS.has(condition)) return "modifier";
+  throw new Error(`condition_slot_missing:${condition}`);
+}
 
 /**
  * Canonical condition-state normalizer. This deliberately preserves the
@@ -179,7 +209,7 @@ export function applyRuntimeCondition(
   condition: string,
   turnSeq: number,
   mode: ApplyConditionMode = "apply",
-): { applied: boolean; prevented: boolean; reason?: string } {
+): RuntimeV02ConditionApplyResult {
   if (!CONDITION_NAMES.has(condition)) {
     throw new Error(`unknown_condition:${condition}`);
   }
@@ -216,12 +246,10 @@ export function applyRuntimeCondition(
     return { applied: true, prevented: false };
   }
 
-  const slot = CONTROL_CONDITIONS.has(condition)
-    ? "control"
-    : MODIFIER_CONDITIONS.has(condition)
-    ? "modifier"
-    : null;
-  if (!slot) throw new Error(`condition_slot_missing:${condition}`);
+  const slot = runtimeV02ConditionSlot(condition);
+  if (slot !== "control" && slot !== "modifier") {
+    throw new Error(`condition_slot_missing:${condition}`);
+  }
   const previous = current[slot];
   if (mode === "apply_if_empty" && previous) {
     return {
@@ -251,4 +279,50 @@ export function applyRuntimeCondition(
   }
   current[slot] = condition;
   return { applied: true, prevented: false };
+}
+
+/**
+ * Context-aware condition application for structured v0.2 card effects.
+ * Existing callers keep `applyRuntimeCondition`; new structured routes use this
+ * entry point when source/controller context exists. Temporary protection is
+ * consumed only when the underlying condition application is otherwise legal
+ * and would newly add/replace that condition.
+ */
+export function applyRuntimeConditionWithContext(
+  creature: RuntimeV02ConditionCreature,
+  condition: string,
+  turnSeq: number,
+  mode: ApplyConditionMode,
+  sourceContext: RuntimeV02ConditionApplicationSourceContext,
+): RuntimeV02ConditionApplyWithContextResult {
+  if (Number(sourceContext.turn_seq) !== Number(turnSeq)) {
+    throw new Error("tcg_v0_2_condition_application_turn_mismatch");
+  }
+  if (!CONDITION_NAMES.has(condition)) throw new Error(`unknown_condition:${condition}`);
+
+  // Prove the ordinary condition owner would accept the operation first. This
+  // prevents a protection use from being consumed by an application that was
+  // already illegal because its slot was occupied or legacy immunity applied.
+  const previewCreature = structuredClone(creature) as RuntimeV02ConditionCreature;
+  const preview = applyRuntimeCondition(previewCreature, condition, turnSeq, mode);
+  if (!preview.applied || preview.prevented) return { ...preview, protection: null };
+
+  const newApplication = !hasRuntimeCondition(creature, condition);
+  const protection = runtimeV02ConsumeConditionProtection(creature, {
+    ...sourceContext,
+    turn_seq: turnSeq,
+    condition,
+    condition_slot: runtimeV02ConditionSlot(condition),
+    new_application: newApplication,
+  });
+  if (protection.prevented) {
+    return {
+      applied: false,
+      prevented: true,
+      reason: "condition_protection",
+      protection,
+    };
+  }
+
+  return { ...applyRuntimeCondition(creature, condition, turnSeq, mode), protection };
 }
