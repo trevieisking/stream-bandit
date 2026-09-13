@@ -3,6 +3,16 @@ import {
   type RuntimeV02DamageHistoryQuery,
 } from "./tcg-match-damage-history-query-v0-2.ts";
 
+export type RuntimeV02SourceDamagedRequirement = {
+  predicate: "source_damaged";
+};
+
+export type RuntimeV02SourceDamagedRequirementEvaluation = {
+  predicate: "source_damaged";
+  matched: boolean;
+  actual_damage: number;
+};
+
 export type RuntimeV02DamageHistoryCountRequirement = {
   predicate: "damage_history_count_at_least";
   target: "$source_creature";
@@ -76,6 +86,41 @@ function validatedContext(
       "tcg_v0_2_requirement_damage_history_source_uid_required",
     ),
     source_controller_seat: value.source_controller_seat,
+  };
+}
+
+export function normalizeRuntimeV02SourceDamagedRequirement(
+  raw: unknown,
+): RuntimeV02SourceDamagedRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_source_damaged_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate"],
+    "tcg_v0_2_requirement_source_damaged_field_unsupported",
+  );
+  if (value.predicate !== "source_damaged") {
+    throw new Error("tcg_v0_2_requirement_source_damaged_predicate_invalid");
+  }
+  return { predicate: "source_damaged" };
+}
+
+export function evaluateRuntimeV02SourceDamagedRequirement(
+  sourceCreature: unknown,
+  rawRequirement: RuntimeV02SourceDamagedRequirement,
+): RuntimeV02SourceDamagedRequirementEvaluation {
+  normalizeRuntimeV02SourceDamagedRequirement(rawRequirement);
+  const source = objectRecord(
+    sourceCreature,
+    "tcg_v0_2_requirement_source_damaged_source_invalid",
+  );
+  const damage = Number(source.damage ?? 0);
+  if (!Number.isFinite(damage) || damage < 0) {
+    throw new Error("tcg_v0_2_requirement_source_damaged_damage_invalid");
+  }
+  return {
+    predicate: "source_damaged",
+    matched: damage > 0,
+    actual_damage: damage,
   };
 }
 
