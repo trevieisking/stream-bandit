@@ -1,5 +1,5 @@
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
-import { runtimeV02SwitchContextById, type RuntimeV02SwitchMovementEvent } from "./tcg-match-switch-context-v0-2.ts";
+import { runtimeV02BattlefieldPositionContextById, type RuntimeV02BattlefieldPositionMovementEvent } from "./tcg-match-switch-context-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
 import { applyRuntimeV02EssenceTransfer, type RuntimeV02EssenceMovement } from "./tcg-match-essence-movement-v0-2.ts";
@@ -35,7 +35,7 @@ export type RuntimeV02EssenceMovedEvent = {
   source_action_id: string;
   turn_seq: number;
 };
-export type RuntimeV02MovementListenerEvent = RuntimeV02SwitchMovementEvent | RuntimeV02EssenceMovedEvent;
+export type RuntimeV02MovementListenerEvent = RuntimeV02BattlefieldPositionMovementEvent | RuntimeV02EssenceMovedEvent;
 type WorkItem = { event: RuntimeV02MovementListenerEvent; source_uid: string; listener_id: string };
 type CardRef = { uid: string; card_id: string; zone_owner_seat: 1 | 2 };
 type CreatureRef = { seat: 1 | 2; anchor_uid: string };
@@ -154,7 +154,7 @@ function structuredEnabled(state: Record<string, unknown>): boolean {
   const cardIndex = O(state.card_index); if (!cardIndex) return false;
   const first = Object.keys(cardIndex)[0]; return !!(first && runtimeV02Definition(state, first));
 }
-function isSwitchMovementEvent(event: RuntimeV02MovementListenerEvent): event is RuntimeV02SwitchMovementEvent { return event.event === "moved_to_reserve" || event.event === "became_vanguard"; }
+function isSwitchMovementEvent(event: RuntimeV02MovementListenerEvent): event is RuntimeV02BattlefieldPositionMovementEvent { return event.event === "moved_to_reserve" || event.event === "became_vanguard"; }
 function isEssenceMovedEvent(event: RuntimeV02MovementListenerEvent): event is RuntimeV02EssenceMovedEvent { return event.event === "essence_moved"; }
 function movementEventId(event: RuntimeV02MovementListenerEvent): string { return isEssenceMovedEvent(event) ? event.movement_id : event.switch_id; }
 export function runtimeV02CreateEssenceMovedEvent(movement: RuntimeV02EssenceMovement): RuntimeV02EssenceMovedEvent {
@@ -272,6 +272,19 @@ function getContinuation(state: Record<string, unknown>): Continuation {
 function setContinuation(state: Record<string, unknown>, value: Continuation): void { state[CONTINUATION_KEY] = value as unknown as Record<string, unknown>; }
 function clearContinuation(state: Record<string, unknown>): void { delete state[CONTINUATION_KEY]; delete state[PENDING_KEY]; }
 function currentWork(continuation: Continuation): WorkItem | null { return continuation.work[continuation.work_index] || null; }
+function positionContextForEvent(state: Record<string, unknown>, event: RuntimeV02MovementListenerEvent) {
+  if (!isSwitchMovementEvent(event)) throw new Error("tcg_v0_2_movement_listener_position_context_event_required");
+  const context = runtimeV02BattlefieldPositionContextById(state, event.switch_id);
+  if (!context) throw new Error("tcg_v0_2_movement_listener_switch_context_missing");
+  const player = O(O(state.players)?.[String(context.controller_seat)]); if (!player || !Array.isArray(player.reserve)) throw new Error("tcg_v0_2_movement_listener_switch_player_missing");
+  const vanguard = player.vanguard as Cr | null | undefined; const vanguardTop = vanguard ? topInst(vanguard) : null;
+  if (vanguardTop?.uid !== context.incoming_vanguard_uid) throw new Error("tcg_v0_2_movement_listener_switch_context_stale");
+  const reserveCreature = player.reserve[context.reserve_index] as Cr | null | undefined; const reserveTop = reserveCreature ? topInst(reserveCreature) : null;
+  if (context.outgoing_vanguard_uid == null) {
+    if (reserveCreature != null) throw new Error("tcg_v0_2_movement_listener_switch_context_stale");
+  } else if (reserveTop?.uid !== context.outgoing_vanguard_uid) throw new Error("tcg_v0_2_movement_listener_switch_context_stale");
+  return context;
+}
 function targetForToken(state: Record<string, unknown>, candidate: Candidate, event: RuntimeV02MovementListenerEvent, raw: unknown): Field {
   if (raw && typeof raw === "object" && !Array.isArray(raw)) {
     const selector = raw as Record<string, unknown>;
@@ -287,10 +300,12 @@ function targetForToken(state: Record<string, unknown>, candidate: Candidate, ev
   if (token === "$event_subject") return eventSubject(state, event);
   if (token === "$current_opponent_vanguard") { const found = targetOpponent(state, candidate.seat); if (found) return found; }
   if (!isSwitchMovementEvent(event)) throw new Error(`tcg_v0_2_movement_listener_target_unsupported:${token}`);
-  const switchContext = runtimeV02SwitchContextById(state, event.switch_id);
-  if (!switchContext) throw new Error("tcg_v0_2_movement_listener_switch_context_missing");
+  const switchContext = positionContextForEvent(state, event);
   if (token === "$switch_incoming_vanguard") { const field = fieldByUid(state, switchContext.incoming_vanguard_uid); if (field) return field; }
-  if (token === "$switch_outgoing_vanguard") { const field = fieldByUid(state, switchContext.outgoing_vanguard_uid); if (field) return field; }
+  if (token === "$switch_outgoing_vanguard") {
+    if (switchContext.outgoing_vanguard_uid == null) throw new Error("tcg_v0_2_movement_listener_switch_outgoing_unavailable");
+    const field = fieldByUid(state, switchContext.outgoing_vanguard_uid); if (field) return field;
+  }
   throw new Error(`tcg_v0_2_movement_listener_target_unsupported:${token}`);
 }
 function playerForToken(candidate: Candidate, token: unknown): 1 | 2 {
