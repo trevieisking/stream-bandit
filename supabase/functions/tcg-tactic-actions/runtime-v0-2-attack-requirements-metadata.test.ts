@@ -129,7 +129,10 @@ Deno.test("structured attack requirement arrays preserve server-owned copies of 
   };
   const metadata = structuredRuntimeAttackMetadata(stateWith([requirement]), "prismatic-founder", 1);
   const exposed = metadata?.requirements[0];
-  assertEquals(exposed?.count, 3);
+  if (exposed?.predicate !== "attached_essence_distinct_element_count_at_least") {
+    throw new Error("expected attached essence requirement");
+  }
+  assertEquals(exposed.count, 3);
   requirement.allowed_elements[0] = "ClientMutation";
-  assertEquals(exposed?.allowed_elements[0], "Astral");
+  assertEquals(exposed.allowed_elements[0], "Astral");
 });
