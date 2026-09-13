@@ -22,6 +22,7 @@ export type RuntimeV02HealListenerFlow = {
 export type RuntimeV02AttackHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02AbilityHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02MovementHealListenerFlow = RuntimeV02HealListenerFlow;
+export type RuntimeV02ResolutionMovementHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02TacticHealListenerFlow = RuntimeV02HealListenerFlow;
 
 export type RuntimeV02AttackHealListenerChoiceResolution =
@@ -42,6 +43,12 @@ export type RuntimeV02MovementHealListenerChoiceResolution =
     resume_seat: 1 | 2 | null;
   };
 
+export type RuntimeV02ResolutionMovementHealListenerChoiceResolution =
+  RuntimeV02HealListenerChoiceResolution & {
+    resume_ready: boolean;
+    resume_seat: 1 | 2 | null;
+  };
+
 export type RuntimeV02TacticHealListenerChoiceResolution =
   RuntimeV02HealListenerChoiceResolution & {
     resume_ready: boolean;
@@ -51,6 +58,7 @@ export type RuntimeV02TacticHealListenerChoiceResolution =
 type RuntimeV02HealListenerResumeKind =
   | "scan_defeats_then_aftermath"
   | "scan_defeats_then_play"
+  | "resume_resolution_queue"
   | "return_to_play"
   | "resume_tactic_effect";
 
@@ -233,6 +241,25 @@ export function runtimeV02BeginMovementHealListenerContinuation(
 }
 
 /**
+ * Starts the same canonical after_heal_packet listener continuation for heals
+ * emitted while a forced Vanguard promotion is inside the Defeat/Match-End
+ * resolution queue. This owner records only the distinct resume intent; it does
+ * not own the queue, phase, defeat scan or promotion itself.
+ */
+export function runtimeV02BeginResolutionMovementHealListenerContinuation(
+  state: Record<string, unknown>,
+  packetIds: string[],
+  movementSeat: 1 | 2,
+): RuntimeV02ResolutionMovementHealListenerFlow {
+  return beginHealListenerContinuation(
+    state,
+    packetIds,
+    movementSeat,
+    "resume_resolution_queue",
+  );
+}
+
+/**
  * Starts the same canonical after_heal_packet queue for a Tactic-owned heal.
  * The shared coordinator owns listener execution and private choices only. The
  * tactic interpreter keeps its own effect-id/cursor resume receipt, so this
@@ -311,6 +338,26 @@ export function runtimeV02ResolveMovementHealListenerChoice(
     choiceId,
     choiceIds,
     "scan_defeats_then_play",
+  );
+}
+
+/**
+ * Resolves one private after-heal listener choice raised by movement during the
+ * Defeat/Match-End resolution queue. Completion releases only the actor seat;
+ * tcg-match-actions remains responsible for resuming the existing queue.
+ */
+export function runtimeV02ResolveResolutionMovementHealListenerChoice(
+  state: Record<string, unknown>,
+  actorSeat: 1 | 2,
+  choiceId: string,
+  choiceIds: string[],
+): RuntimeV02ResolutionMovementHealListenerChoiceResolution {
+  return resolveHealListenerChoiceWithResume(
+    state,
+    actorSeat,
+    choiceId,
+    choiceIds,
+    "resume_resolution_queue",
   );
 }
 
