@@ -1,5 +1,5 @@
-import { runtimeV02ApplyDamageProtectionProgram } from "./tcg-match-damage-protection-program-v0-2.ts";
-import { runtimeV02ApplyDamageProtections, runtimeV02DamageProtectionCount } from "./tcg-match-damage-protection-v0-2.ts";
+import { runtimeV02ApplyDamageProtectionProgram } from "../_shared/tcg-match-damage-protection-program-v0-2.ts";
+import { runtimeV02ApplyDamageProtections, runtimeV02DamageProtectionCount } from "../_shared/tcg-match-damage-protection-v0-2.ts";
 function equal(a:unknown,e:unknown,l='mismatch'){if(JSON.stringify(a)!==JSON.stringify(e))throw new Error(`${l}: ${JSON.stringify(a)} != ${JSON.stringify(e)}`)}
 function throws(fn:()=>unknown,p:string){try{fn()}catch(e){const m=e instanceof Error?e.message:String(e);if(!m.includes(p))throw e;return}throw new Error(`expected ${p}`)}
 function fixture(){const creature:any={flags:{}};return{state:{turn_seq:5} as Record<string,unknown>,source:{controller_seat:1 as const,action_id:'ability:veil',card_uid:'source-uid',card_id:'generic-card',kind:'ability' as const},target:{controller_seat:1 as const,creature_uid:'target-uid',creature},creature,step:{op:'ADD_DAMAGE_PROTECTION',target:'$chosen_creature',damage_classes:['effect'],source_controller:'opponent',reduce_amount:30,minimum:0,duration:{expires_on:['start_of_controller_next_turn'],max_uses:1,consume_on:'matching_damage_packet_reduced'}}}}
