@@ -53,6 +53,7 @@ export type RuntimeV02DamagePacketCreature = RuntimeV02DamageCreature & {
   stack?: RuntimeV02DamagePacketInstance[];
   essence?: RuntimeV02DamagePacketInstance[];
   relic?: RuntimeV02DamagePacketInstance | null;
+  flags?: Record<string, unknown>;
 };
 export type RuntimeV02DamagePacketField = {
   seat: 1 | 2;
