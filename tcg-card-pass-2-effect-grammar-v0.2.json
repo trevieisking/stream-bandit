@@ -115,6 +115,7 @@
     "control_condition_present",
     "control_condition_slot_empty",
     "current_attack_damage_at_least",
+    "damage_history_count_at_least",
     "damage_packet_amount_at_least",
     "damage_packet_class_is",
     "damage_packet_condition_is",
