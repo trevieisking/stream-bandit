@@ -248,7 +248,12 @@ function targetRemainsAfterDamage<T extends RuntimeV02CardZoneInstance>(
 ): boolean {
   const creature = boundCreature(state, target);
   if (!creature) return false;
-  const description = defeatDescribe(creature as never);
+  const description = defeatDescribe(
+    creature as never,
+    target.controller_seat,
+    target.where,
+    target.index,
+  );
   const maxHp = Number(description.max_hp);
   if (!Number.isFinite(maxHp) || maxHp <= 0) {
     throw new Error("tcg_v0_2_attack_drain_target_max_hp_invalid");
