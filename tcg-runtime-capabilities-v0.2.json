@@ -91,6 +91,7 @@
   "predicates": {
     "implemented": [
       "attached_essence_distinct_element_count_at_least",
+      "damage_history_count_at_least",
       "defeat_history_count_at_least"
     ],
     "partial": [
