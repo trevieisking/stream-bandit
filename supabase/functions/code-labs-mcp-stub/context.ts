@@ -1,5 +1,5 @@
 import { Binding, rest, Row } from "./oauth.ts";
-import { githubRequest, verifyOwnerRepository } from "./github-authority.ts";
+import { verifyOwnerRepository } from "./github-authority.ts";
 export const VERSION = "Code Labs V104 tool-only workspace control V45 immutable proof";
 
 async function table(
@@ -37,11 +37,37 @@ export async function getContext(b: Binding, limit = 5) {
 
   const [projects, jobs, packets, tests, testHistory, audit, selectedTest] =
     await Promise.all([
-      table(b, "code_labs_projects", "id,site_name,site_url,repo,mode,created_at", cap),
-      table(b, "code_labs_jobs", "id,title,status,problem,created_at,started_at,completed_at", cap),
-      table(b, "code_labs_packets", "id,packet_type,packet_text,created_at", Math.min(cap, 10)),
-      table(b, "code_labs_test_runs", "id,filename,result,checked_count,total_count,created_at", cap, currentProjectFilter),
-      table(b, "code_labs_test_runs", "id,project_id,filename,result,checked_count,total_count,created_at", cap),
+      table(
+        b,
+        "code_labs_projects",
+        "id,site_name,site_url,repo,mode,created_at",
+        cap,
+      ),
+      table(
+        b,
+        "code_labs_jobs",
+        "id,title,status,problem,created_at,started_at,completed_at",
+        cap,
+      ),
+      table(
+        b,
+        "code_labs_packets",
+        "id,packet_type,packet_text,created_at",
+        Math.min(cap, 10),
+      ),
+      table(
+        b,
+        "code_labs_test_runs",
+        "id,filename,result,checked_count,total_count,created_at",
+        cap,
+        currentProjectFilter,
+      ),
+      table(
+        b,
+        "code_labs_test_runs",
+        "id,project_id,filename,result,checked_count,total_count,created_at",
+        cap,
+      ),
       table(b, "code_labs_audit_log", "id,action,created_at", cap),
       selectedTestId
         ? one(
@@ -63,7 +89,15 @@ export async function getContext(b: Binding, limit = 5) {
     wrote_github: false,
     opened_pr: false,
     deleted_anything: false,
-    reads: { projects, jobs, packets, selected_test: selectedTest, tests, test_history: testHistory, audit },
+    reads: {
+      projects,
+      jobs,
+      packets,
+      selected_test: selectedTest,
+      tests,
+      test_history: testHistory,
+      audit,
+    },
   };
 }
 function validUrl(raw: unknown) {
@@ -93,99 +127,22 @@ export async function readUrl(args: Row) {
     content_type: r.headers.get("content-type") || "",
     chars_total: source.length,
     chars_returned: Math.min(source.length, max),
-    source_text: source.length > max ? source.slice(0, max) + "\n...[trimmed]" : source,
+    source_text: source.length > max
+      ? source.slice(0, max) + "\n...[trimmed]"
+      : source,
   };
 }
-
-function encodeRef(branch: string) {
-  return branch.split("/").map(encodeURIComponent).join("/");
-}
-
-async function hashUtf8Text(value: string) {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(value),
-  );
-  return Array.from(
-    new Uint8Array(digest),
-    (byte) => byte.toString(16).padStart(2, "0"),
-  ).join("");
-}
-
-async function captureQuickWriteProof(authority: Row, path: string, branch: string, content: string) {
-  const repoPath = "/repos/" +
-    String(authority.repo || "").split("/").map(encodeURIComponent).join("/");
-  const baseRef = await githubRequest(
-    repoPath + "/git/ref/heads/" + encodeRef(String(authority.default_branch || "")),
-    authority.token,
-  );
-  const baseSha = String(baseRef?.object?.sha || "").toLowerCase();
-  if (!/^[a-f0-9]{40}$/.test(baseSha)) {
-    throw new Error("GitHub did not return immutable default-branch proof.");
-  }
-
-  let headSha = baseSha;
-  let branchExists = false;
-  try {
-    const headRef = await githubRequest(
-      repoPath + "/git/ref/heads/" + encodeRef(branch),
-      authority.token,
-    );
-    headSha = String(headRef?.object?.sha || "").toLowerCase();
-    if (!/^[a-f0-9]{40}$/.test(headSha)) {
-      throw new Error("GitHub did not return immutable working-branch proof.");
-    }
-    branchExists = true;
-  } catch (error) {
-    const message = String((error as Error)?.message || error || "");
-    if (!/status 404/i.test(message)) throw error;
-  }
-
-  const parentCommit = await githubRequest(
-    repoPath + "/git/commits/" + encodeURIComponent(headSha),
-    authority.token,
-  );
-  const parentTreeSha = String(parentCommit?.tree?.sha || "").toLowerCase();
-  if (!/^[a-f0-9]{40}$/.test(parentTreeSha)) {
-    throw new Error("GitHub did not return immutable target-tree proof.");
-  }
-  const tree = await githubRequest(
-    repoPath + "/git/trees/" + encodeURIComponent(parentTreeSha) + "?recursive=1",
-    authority.token,
-  );
-  if (tree?.truncated === true) {
-    throw new Error("GitHub returned a truncated target tree; Quick Write stopped safely.");
-  }
-  const entries = Array.isArray(tree?.tree) ? tree.tree : [];
-  const entry = entries.find((item: Row) => String(item?.path || "") === path) || null;
-  const blobSha = entry == null ? null : String(entry.sha || "").toLowerCase();
-  if (blobSha !== null && !/^[a-f0-9]{40}$/.test(blobSha)) {
-    throw new Error("GitHub did not return immutable target-blob proof.");
-  }
-
-  return {
-    expected_content_sha256: await hashUtf8Text(content),
-    expected_github_blob_sha: blobSha,
-    expected_github_blob_absent: entry == null,
-    github_base_branch: String(authority.default_branch || ""),
-    github_base_sha: baseSha,
-    github_head_branch: branch,
-    github_head_sha: headSha,
-    github_head_branch_sha: headSha,
-    github_branch_verified_at: new Date().toISOString(),
-    safety_note: JSON.stringify({
-      kind: "code-labs-quick-write-v1",
-      branch_existed_at_queue: branchExists,
-      exact_source_snapshot: true,
-    }),
-  };
-}
-
 export async function saveRequest(b: Binding, args: Row) {
-  const authority = await verifyOwnerRepository(b.owner_id, args.repo, { contents: "read" });
-  if (args.confirm_branch_pr_only !== true) throw new Error("confirm_branch_pr_only must be true");
+  const authority = await verifyOwnerRepository(b.owner_id, args.repo, {
+    contents: "read",
+  });
+  if (args.confirm_branch_pr_only !== true) {
+    throw new Error("confirm_branch_pr_only must be true");
+  }
   const content = String(args.content ?? "");
-  if (!content || content.length > 180000) throw new Error("content is required and must be under 180000 characters");
+  if (!content || content.length > 180000) {
+    throw new Error("content is required and must be under 180000 characters");
+  }
   const p = String(args.path || "").trim().replace(/^\/+/, "");
   if (
     !p || p.includes("..") || p.includes("\\") || p.startsWith(".") ||
@@ -195,10 +152,10 @@ export async function saveRequest(b: Binding, args: Row) {
   const branch = String(args.branch || "").trim();
   if (
     !/^[A-Za-z0-9._/-]{3,80}$/.test(branch) ||
-    ["main", "master", "gh-pages", "production", "live"].includes(branch.toLowerCase()) ||
-    branch.toLowerCase() === authority.default_branch.toLowerCase()
+    ["main", "master", "gh-pages", "production", "live"].includes(
+      branch.toLowerCase(),
+    ) || branch.toLowerCase() === authority.default_branch.toLowerCase()
   ) throw new Error("Unsafe branch");
-  const proof = await captureQuickWriteProof(authority, p, branch, content);
   const row = {
     requested_by: b.owner_id,
     repo: authority.repo,
@@ -206,7 +163,9 @@ export async function saveRequest(b: Binding, args: Row) {
     branch,
     action: args.action || "create_or_update_file",
     content,
-    commit_message: String(args.commit_message || "Code Labs safe write request"),
+    commit_message: String(
+      args.commit_message || "Code Labs safe write request",
+    ),
     pr_title: String(args.pr_title || "Code Labs safe write request"),
     pr_body: String(args.pr_body || ""),
     status: "queued",
@@ -214,7 +173,6 @@ export async function saveRequest(b: Binding, args: Row) {
     branch_pr_only: true,
     deletes_anything: false,
     requested_source: "code_labs_v104_tool_only",
-    ...proof,
   };
   const saved = await rest("code_labs_write_requests", {
     method: "POST",
