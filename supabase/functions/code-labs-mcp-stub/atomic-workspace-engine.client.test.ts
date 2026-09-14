@@ -396,7 +396,7 @@ Deno.test("Master Checklist projector: zero workflow runs and statuses are never
 
 Deno.test("Master Checklist projector: PASS-like checks without evidence stay HOLD", () => {
   const fixture = projectionFixture();
-  fixture.file.metadata.master_checklist_evidence.user_checks.desktop_visual_test_passed = { passed: true };
+  fixture.file.metadata.master_checklist_evidence.user_checks.desktop_visual_test_passed = { passed: true, evidence: "" };
   const projection = projectMasterChecklistEvidence(fixture);
   const desktop = projection.exact_checklist.items.find((entry: Record<string, unknown>) => entry.id === "Desktop visual test passed");
   assertEqual(desktop?.state, "HOLD", "A PASS-like manual value without bound evidence must not pass.");
