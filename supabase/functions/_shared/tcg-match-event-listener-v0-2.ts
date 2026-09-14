@@ -625,6 +625,26 @@ function filtersMatch(
   if (filters.damaged === true && Number(field?.cr.damage || 0) <= 0) {
     return false;
   }
+  if (filters.damage_at_least != null) {
+    const minimumDamage = filters.damage_at_least;
+    if (
+      typeof minimumDamage !== "number" ||
+      !Number.isInteger(minimumDamage) ||
+      minimumDamage < 0
+    ) {
+      throw new Error("tcg_v0_2_event_listener_damage_at_least_invalid");
+    }
+    if (!field) {
+      throw new Error(
+        "tcg_v0_2_event_listener_damage_at_least_creature_required",
+      );
+    }
+    const damage = Number(field.cr.damage ?? 0);
+    if (!Number.isFinite(damage) || damage < 0) {
+      throw new Error("tcg_v0_2_event_listener_creature_damage_invalid");
+    }
+    if (damage < minimumDamage) return false;
+  }
   if (
     filters.exclude_source === true && field?.top.uid === candidate?.source.uid
   ) {
