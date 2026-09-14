@@ -7,6 +7,7 @@ const movementSource = fs.readFileSync('supabase/functions/_shared/tcg-match-mov
 const essenceMovementSource = fs.readFileSync('supabase/functions/_shared/tcg-match-essence-movement-v0-2.ts', 'utf8');
 const authoritySource = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-authority-v0-2.ts', 'utf8');
 const matchSource = fs.readFileSync('supabase/functions/tcg-match-actions/index.ts', 'utf8');
+const aftermathSource = fs.readFileSync('supabase/functions/_shared/tcg-match-aftermath-v0-2.ts', 'utf8');
 const loadSource = fs.readFileSync('supabase/migrations/20260906190000_tcg_v0_2_set_one_shadow_registry_load.sql', 'utf8');
 
 function functionSlice(source, start, end) {
@@ -195,7 +196,9 @@ test('Rillrunner one-use lifecycle bonus is consumed by every committed legal at
   const aftermathEnd = matchSource.indexOf('const continueResolution=', aftermathStart);
   assert.ok(aftermathStart >= 0 && aftermathEnd > aftermathStart);
   const aftermath = matchSource.slice(aftermathStart, aftermathEnd);
-  assert.ok(aftermath.includes('if(cf.lifecycle_attack_bonus&&Number(cf.lifecycle_attack_bonus.turn_seq)===turn)delete cf.lifecycle_attack_bonus'));
+  assert.ok(aftermath.includes('runtimeV02ResolveAftermath(s,who as 1|2'));
+  assert.equal(aftermath.includes('lifecycle_attack_bonus'), false, 'dispatcher must not own Aftermath bonus cleanup');
+  assert.ok(aftermathSource.includes('clearCurrentTurnFlag(flags, "lifecycle_attack_bonus", turnSeq);'));
 
   const attackStart = matchSource.indexOf('if(action==="attack"){');
   assert.ok(attackStart >= 0);
