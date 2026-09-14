@@ -62,6 +62,18 @@ export type RuntimeV02SetupReadyResult =
       | "deck_depleted_before_start_draw";
   };
 
+export type RuntimeV02TerminalState = Record<string, unknown> & {
+  phase?: unknown;
+  players?: unknown;
+  deckout_loser?: unknown;
+  result?: unknown;
+};
+
+export type RuntimeV02TerminalReason =
+  | "all_rewards_taken"
+  | "opponent_has_no_creature"
+  | "opponent_deckout";
+
 function isSeat(value: unknown): value is RuntimeV02MatchFlowSeat {
   return value === 1 || value === 2;
 }
@@ -219,4 +231,72 @@ export function runtimeV02ApplySetupReady(
     active_seat: firstPlayerSeat,
     distribution,
   };
+}
+
+/**
+ * Canonical Match Flow owner for ordinary terminal-state evaluation.
+ *
+ * Reward movement, Creature defeat/removal and deck mutation remain owned by their
+ * specialist engines. Match Flow only reads the resulting public lifecycle facts
+ * and decides whether play continues, one seat wins, or simultaneous victory
+ * conditions require overtime. The reason-count tie rule deliberately preserves
+ * the accepted private-alpha behavior until an authoritative rule changes it.
+ */
+export function runtimeV02EvaluateWinner(
+  state: RuntimeV02TerminalState,
+): boolean {
+  if (!state || typeof state !== "object" || Array.isArray(state)) {
+    throw new Error("tcg_v0_2_match_flow_terminal_state_required");
+  }
+  const players = objectRecord(state.players);
+  const p1 = players ? objectRecord(players["1"]) : null;
+  const p2 = players ? objectRecord(players["2"]) : null;
+  if (!players || !p1 || !p2) {
+    throw new Error("tcg_v0_2_match_flow_terminal_players_required");
+  }
+
+  const reasons: Record<string, RuntimeV02TerminalReason[]> = {
+    "1": [],
+    "2": [],
+  };
+
+  for (const who of [1, 2] as const) {
+    const me = who === 1 ? p1 : p2;
+    const them = who === 1 ? p2 : p1;
+    const rewards = Array.isArray(me.rewards) ? me.rewards : [];
+    const opposingReserve = Array.isArray(them.reserve) ? them.reserve : [];
+
+    if (rewards.length === 0) {
+      reasons[String(who)].push("all_rewards_taken");
+    }
+    if (!them.vanguard && !opposingReserve.some(Boolean)) {
+      reasons[String(who)].push("opponent_has_no_creature");
+    }
+    if (Number(state.deckout_loser || 0) === (who === 1 ? 2 : 1)) {
+      reasons[String(who)].push("opponent_deckout");
+    }
+  }
+
+  const seatOneCount = reasons["1"].length;
+  const seatTwoCount = reasons["2"].length;
+  if (seatOneCount === 0 && seatTwoCount === 0) return false;
+
+  if (seatOneCount > seatTwoCount) {
+    state.phase = "complete";
+    state.result = { winner_seat: 1, reasons: reasons["1"] };
+    return true;
+  }
+  if (seatTwoCount > seatOneCount) {
+    state.phase = "complete";
+    state.result = { winner_seat: 2, reasons: reasons["2"] };
+    return true;
+  }
+
+  state.phase = "overtime_pending";
+  state.result = {
+    winner_seat: null,
+    reasons,
+    reason: "simultaneous_win_tie_requires_overtime",
+  };
+  return true;
 }
