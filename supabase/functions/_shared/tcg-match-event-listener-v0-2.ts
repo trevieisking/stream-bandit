@@ -30,6 +30,13 @@ import {
   evaluateRuntimeV02DamageHistoryCountRequirement,
   normalizeRuntimeV02DamageHistoryCountRequirement,
 } from "./tcg-match-requirement-evaluator-v0-2.ts";
+import type { RuntimeV02CardZoneInstance } from "./tcg-match-card-zone-engine-v0-2.ts";
+import type {
+  RuntimeV02DamageProgramCreatureRef,
+  RuntimeV02DamageProgramState,
+} from "./tcg-match-damage-program-v0-2.ts";
+import { runtimeV02ApplyEventListenerMoveDamage } from "./tcg-match-event-listener-move-damage-v0-2.ts";
+import { runtimeV02AdaptDefeatEventsForListener } from "./tcg-match-event-listener-defeat-event-v0-2.ts";
 
 type Inst = {
   uid: string;
@@ -515,6 +522,20 @@ function essenceAttachedWorkItems(
   }));
 }
 
+function eventWorkItems(
+  state: Record<string, unknown>,
+  event: RuntimeV02EventListenerEvent,
+): WorkItem[] {
+  if (event.event === "essence_attached") {
+    return essenceAttachedWorkItems(state, event);
+  }
+  return collectCandidates(state, event.event).map((candidate) => ({
+    event: { ...event },
+    source_uid: candidate.source.uid,
+    listener_id: listenerId(candidate),
+  }));
+}
+
 function frozenCandidate(
   state: Record<string, unknown>,
   work: WorkItem,
@@ -722,6 +743,22 @@ function targetField(
     }
   }
   throw new Error(`tcg_v0_2_event_listener_target_unsupported:${token}`);
+}
+
+function damageProgramCreatureRef(
+  field: Field,
+): RuntimeV02DamageProgramCreatureRef {
+  return {
+    controller_seat: field.seat,
+    where: field.where,
+    index: field.index,
+    anchor_uid: field.top.uid,
+    card_id: field.top.card_id,
+    element: requiredString(
+      field.def.element,
+      "tcg_v0_2_event_listener_move_damage_target_element_required",
+    ),
+  };
 }
 
 function eventCount(
@@ -1761,6 +1798,55 @@ function executeStep(
     return "continue";
   }
 
+  if (op === "MOVE_DAMAGE") {
+    const from = targetField(
+      state,
+      continuation,
+      candidate,
+      event,
+      step.from,
+    );
+    const to = targetField(
+      state,
+      continuation,
+      candidate,
+      event,
+      step.to,
+    );
+    const resolution = runtimeV02ApplyEventListenerMoveDamage<RuntimeV02CardZoneInstance>(
+      state as RuntimeV02DamageProgramState<RuntimeV02CardZoneInstance>,
+      {
+        source: {
+          event_id: event.event_id,
+          listener_id: listenerId(candidate),
+          step_index: continuation.step_cursor,
+          kind: candidate.kind,
+          controller_seat: candidate.seat,
+          source_card_uid: candidate.source.uid,
+          source_card_id: candidate.source.card_id,
+          source_creature_uid: candidate.field?.top.uid || null,
+        },
+        step,
+        from: damageProgramCreatureRef(from),
+        to: damageProgramCreatureRef(to),
+      },
+    );
+    if (resolution.result_variable) {
+      continuation.vars[resolution.result_variable] =
+        resolution.damage.receipt.actual_damage_moved;
+    }
+    for (
+      const defeatEvent of runtimeV02AdaptDefeatEventsForListener(
+        state,
+        resolution.damage.defeat.defeat_events,
+      )
+    ) {
+      continuation.work.push(...eventWorkItems(state, defeatEvent));
+    }
+    continuation.step_cursor++;
+    return "continue";
+  }
+
   if (op === "ADD_ATTACK_DAMAGE_MODIFIER") {
     const target = targetField(
       state,
@@ -2176,17 +2262,7 @@ export function runtimeV02BeginEventListenerContinuation(
     ) {
       throw new Error("tcg_v0_2_event_listener_event_invalid");
     }
-    if (event.event === "essence_attached") {
-      work.push(...essenceAttachedWorkItems(state, event));
-      continue;
-    }
-    for (const candidate of collectCandidates(state, event.event)) {
-      work.push({
-        event: { ...event },
-        source_uid: candidate.source.uid,
-        listener_id: listenerId(candidate),
-      });
-    }
+    work.push(...eventWorkItems(state, event));
   }
   setContinuation(state, {
     turn_seq: turn,
