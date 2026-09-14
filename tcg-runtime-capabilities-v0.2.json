@@ -27,6 +27,7 @@
       "DRAW_FIXED",
       "HEAL",
       "LOOK_TOP",
+      "MODIFY_CURRENT_ATTACK_DAMAGE",
       "MOVE_ATTACHED_ESSENCE",
       "MOVE_CARDS",
       "PROMPT_CHOSEN_PLAYER_TO_SELECT_RESERVE",
@@ -63,7 +64,6 @@
       "IF",
       "INCREMENT_SOURCE_COUNTER",
       "INSPECT_ZONE",
-      "MODIFY_CURRENT_ATTACK_DAMAGE",
       "MODIFY_CURRENT_DAMAGE_PACKET",
       "MODIFY_CURRENT_HEAL",
       "MODIFY_CURRENT_WITHDRAWAL_COST",
@@ -92,7 +92,8 @@
     "implemented": [
       "attached_essence_distinct_element_count_at_least",
       "damage_history_count_at_least",
-      "defeat_history_count_at_least"
+      "defeat_history_count_at_least",
+      "event_attack_source_is_self"
     ],
     "partial": [
       "reserve_count_at_least",
@@ -130,7 +131,6 @@
       "event_attack_id_is",
       "event_attack_source_attached_essence_count_at_least",
       "event_attack_source_has_attached_essence_kind",
-      "event_attack_source_is_self",
       "event_attack_target_controller_is_opponent",
       "event_attack_target_damaged",
       "event_attack_target_has_condition",

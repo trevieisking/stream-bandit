@@ -26,6 +26,10 @@ import {
   addRuntimeShield,
   dealRuntimeEffectDamage,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import {
+  evaluateRuntimeV02DamageHistoryCountRequirement,
+  normalizeRuntimeV02DamageHistoryCountRequirement,
+} from "./tcg-match-requirement-evaluator-v0-2.ts";
 
 type Inst = {
   uid: string;
@@ -79,6 +83,39 @@ export type RuntimeV02EventListenerEvent = {
   turn_seq: number;
   attachment_target_uid?: string;
   attachment_kind?: string;
+  attack_id?: string;
+  source_creature_uid?: string;
+  target_creature_uid?: string;
+  target_controller_seat?: 1 | 2;
+  target_zone?: "vanguard" | "reserve";
+};
+
+export type RuntimeV02AttackDeclaredDamageInput = {
+  action_id: string;
+  attack_id: string;
+  source_controller_seat: 1 | 2;
+  source_creature_uid: string;
+  target_controller_seat: 1 | 2;
+  target_creature_uid: string;
+  target_zone: "vanguard" | "reserve";
+  base_damage: number;
+};
+
+export type RuntimeV02AttackDeclaredDamageApplication = {
+  source_uid: string;
+  listener_id: string;
+  delta: number;
+  limit_consumed: boolean;
+  replayed: boolean;
+};
+
+export type RuntimeV02AttackDeclaredDamageResult = {
+  schema: "sb-tcg-attack-declared-damage-v0.2";
+  event: RuntimeV02EventListenerEvent;
+  base_damage: number;
+  damage_delta: number;
+  damage: number;
+  applications: RuntimeV02AttackDeclaredDamageApplication[];
 };
 
 type WorkItem = {
@@ -907,12 +944,14 @@ function markResolved(
   state: Record<string, unknown>,
   candidate: Candidate,
   event: RuntimeV02EventListenerEvent,
+  details: Record<string, unknown> = {},
 ): void {
   listenerState(state).receipts[receiptKey(candidate, event)] = {
     event_id: event.event_id,
     event: event.event,
     source_uid: candidate.source.uid,
     listener_id: listenerId(candidate),
+    ...details,
   };
 }
 
@@ -2420,5 +2459,308 @@ export function runtimeV02PrivateEventInspectionView(
         ),
       };
     }),
+  };
+}
+
+function containsCurrentAttackDamageModifier(raw: unknown): boolean {
+  if (Array.isArray(raw)) return raw.some(containsCurrentAttackDamageModifier);
+  const value = objectRecord(raw);
+  if (!value) return false;
+  if (value.op === "MODIFY_CURRENT_ATTACK_DAMAGE") return true;
+  return Object.values(value).some(containsCurrentAttackDamageModifier);
+}
+
+function attackDeclaredRequirement(
+  state: Record<string, unknown>,
+  raw: unknown,
+  candidate: Candidate,
+  input: RuntimeV02AttackDeclaredDamageInput,
+): boolean {
+  const value = objectRecord(raw);
+  if (!value) {
+    throw new Error("tcg_v0_2_attack_declared_listener_requirement_invalid");
+  }
+  if (Object.hasOwn(value, "all")) {
+    if (Object.keys(value).length !== 1) {
+      throw new Error("tcg_v0_2_attack_declared_listener_all_invalid");
+    }
+    return list(
+      value.all,
+      "tcg_v0_2_attack_declared_listener_all_invalid",
+    ).every((entry) => attackDeclaredRequirement(state, entry, candidate, input));
+  }
+  if (Object.hasOwn(value, "any")) {
+    if (Object.keys(value).length !== 1) {
+      throw new Error("tcg_v0_2_attack_declared_listener_any_invalid");
+    }
+    const entries = list(
+      value.any,
+      "tcg_v0_2_attack_declared_listener_any_invalid",
+    );
+    if (entries.length === 0) {
+      throw new Error("tcg_v0_2_attack_declared_listener_any_empty");
+    }
+    return entries.some((entry) =>
+      attackDeclaredRequirement(state, entry, candidate, input)
+    );
+  }
+  if (Object.hasOwn(value, "not")) {
+    if (Object.keys(value).length !== 1) {
+      throw new Error("tcg_v0_2_attack_declared_listener_not_invalid");
+    }
+    return !attackDeclaredRequirement(state, value.not, candidate, input);
+  }
+
+  const predicate = requiredString(
+    value.predicate,
+    "tcg_v0_2_attack_declared_listener_predicate_required",
+  );
+  if (predicate === "event_attack_source_is_self") {
+    if (Object.keys(value).some((key) => key !== "predicate")) {
+      throw new Error(
+        "tcg_v0_2_attack_declared_listener_source_predicate_field_unsupported",
+      );
+    }
+    return candidate.seat === input.source_controller_seat &&
+      candidate.field?.top.uid === input.source_creature_uid;
+  }
+  if (predicate === "damage_history_count_at_least") {
+    if (!candidate.field) {
+      throw new Error(
+        "tcg_v0_2_attack_declared_listener_damage_history_source_required",
+      );
+    }
+    const requirement = normalizeRuntimeV02DamageHistoryCountRequirement(value);
+    return evaluateRuntimeV02DamageHistoryCountRequirement(
+      state,
+      requirement,
+      {
+        source_creature_uid: candidate.field.top.uid,
+        source_controller_seat: candidate.seat,
+      },
+    ).matched;
+  }
+  throw new Error(
+    `tcg_v0_2_attack_declared_listener_predicate_unsupported:${predicate}`,
+  );
+}
+
+function attackDeclaredListenerMatches(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  input: RuntimeV02AttackDeclaredDamageInput,
+): boolean {
+  if (candidate.kind !== "ability") return false;
+  const timing = String(candidate.listener.timing || "");
+  if (timing !== "attack") {
+    throw new Error(
+      `tcg_v0_2_attack_declared_listener_timing_unsupported:${timing || "missing"}`,
+    );
+  }
+  const scope = candidate.listener.controller_scope;
+  if (scope != null && scope !== "self") {
+    throw new Error(
+      `tcg_v0_2_attack_declared_listener_controller_scope_unsupported:${String(scope)}`,
+    );
+  }
+  if (scope === "self" && candidate.seat !== input.source_controller_seat) {
+    return false;
+  }
+  return candidate.listener.requirements == null ||
+    attackDeclaredRequirement(
+      state,
+      candidate.listener.requirements,
+      candidate,
+      input,
+    );
+}
+
+function attackDeclaredDamageDelta(candidate: Candidate): number | null {
+  if (!containsCurrentAttackDamageModifier(candidate.listener.steps)) return null;
+  const costs = records(
+    candidate.listener.costs,
+    "tcg_v0_2_attack_declared_listener_costs_required",
+  );
+  if (costs.length !== 0) {
+    throw new Error("tcg_v0_2_attack_declared_listener_costs_unsupported");
+  }
+  const steps = records(
+    candidate.listener.steps,
+    "tcg_v0_2_attack_declared_listener_steps_required",
+  );
+  if (steps.length !== 1 || steps[0].op !== "MODIFY_CURRENT_ATTACK_DAMAGE") {
+    throw new Error("tcg_v0_2_attack_declared_listener_program_unsupported");
+  }
+  const step = steps[0];
+  const unsupported = Object.keys(step).find((key) =>
+    key !== "op" && key !== "delta"
+  );
+  if (unsupported) {
+    throw new Error(
+      `tcg_v0_2_attack_declared_listener_step_field_unsupported:${unsupported}`,
+    );
+  }
+  const delta = Number(step.delta);
+  if (!Number.isInteger(delta) || delta === 0) {
+    throw new Error("tcg_v0_2_attack_declared_listener_delta_invalid");
+  }
+  return delta;
+}
+
+function normalizedAttackDeclaredInput(
+  state: Record<string, unknown>,
+  raw: RuntimeV02AttackDeclaredDamageInput,
+): RuntimeV02AttackDeclaredDamageInput {
+  if (!raw || typeof raw !== "object") {
+    throw new Error("tcg_v0_2_attack_declared_listener_input_required");
+  }
+  const sourceControllerSeat = normalizedSeat(
+    raw.source_controller_seat,
+    "tcg_v0_2_attack_declared_listener_source_seat_invalid",
+  );
+  const targetControllerSeat = normalizedSeat(
+    raw.target_controller_seat,
+    "tcg_v0_2_attack_declared_listener_target_seat_invalid",
+  );
+  const sourceCreatureUid = requiredString(
+    raw.source_creature_uid,
+    "tcg_v0_2_attack_declared_listener_source_uid_required",
+  );
+  const targetCreatureUid = requiredString(
+    raw.target_creature_uid,
+    "tcg_v0_2_attack_declared_listener_target_uid_required",
+  );
+  const attackId = requiredString(
+    raw.attack_id,
+    "tcg_v0_2_attack_declared_listener_attack_id_required",
+  );
+  const actionId = requiredString(
+    raw.action_id,
+    "tcg_v0_2_attack_declared_listener_action_id_required",
+  );
+  const targetZone = String(raw.target_zone || "");
+  if (targetZone !== "vanguard" && targetZone !== "reserve") {
+    throw new Error("tcg_v0_2_attack_declared_listener_target_zone_invalid");
+  }
+  if (!Number.isInteger(raw.base_damage) || raw.base_damage < 0) {
+    throw new Error("tcg_v0_2_attack_declared_listener_base_damage_invalid");
+  }
+  if (Number(state.active_seat) !== sourceControllerSeat) {
+    throw new Error("tcg_v0_2_attack_declared_listener_source_not_active");
+  }
+
+  const source = fieldByUid(state, sourceCreatureUid);
+  if (
+    !source || source.seat !== sourceControllerSeat || source.where !== "vanguard"
+  ) {
+    throw new Error("tcg_v0_2_attack_declared_listener_source_mismatch");
+  }
+  const target = fieldByUid(state, targetCreatureUid);
+  if (
+    !target || target.seat !== targetControllerSeat || target.where !== targetZone
+  ) {
+    throw new Error("tcg_v0_2_attack_declared_listener_target_mismatch");
+  }
+
+  return {
+    action_id: actionId,
+    attack_id: attackId,
+    source_controller_seat: sourceControllerSeat,
+    source_creature_uid: sourceCreatureUid,
+    target_controller_seat: targetControllerSeat,
+    target_creature_uid: targetCreatureUid,
+    target_zone: targetZone,
+    base_damage: raw.base_damage,
+  };
+}
+
+/**
+ * Resolves the synchronous, no-choice attack_declared listener family that owns
+ * MODIFY_CURRENT_ATTACK_DAMAGE. The current accepted subset is intentionally
+ * narrow: a Creature Ability may gate the direct modifier with the canonical
+ * source-is-self and Damage #20 current-turn history predicates. Other current-
+ * attack programs fail closed instead of being partially interpreted.
+ */
+export function runtimeV02ResolveAttackDeclaredDamageListeners(
+  state: Record<string, unknown>,
+  rawInput: RuntimeV02AttackDeclaredDamageInput,
+): RuntimeV02AttackDeclaredDamageResult | null {
+  if (!structuredEnabled(state)) return null;
+  const input = normalizedAttackDeclaredInput(state, rawInput);
+  const source = fieldByUid(state, input.source_creature_uid)!;
+  const target = fieldByUid(state, input.target_creature_uid)!;
+  const event: RuntimeV02EventListenerEvent = {
+    event_id:
+      `attack-declared:${currentTurn(state)}:${input.source_creature_uid}:${input.action_id}`,
+    event: "attack_declared",
+    subject_uid: input.source_creature_uid,
+    subject_card_id: source.top.card_id,
+    controller_seat: input.source_controller_seat,
+    source_controller_seat: input.source_controller_seat,
+    origin_zone: source.where,
+    destination_zone: target.where,
+    destination_index: target.index,
+    phase: "attack",
+    source_action_id: input.action_id,
+    source_card_uid: source.top.uid,
+    action_kind: "attack",
+    turn_seq: currentTurn(state),
+    attack_id: input.attack_id,
+    source_creature_uid: input.source_creature_uid,
+    target_creature_uid: input.target_creature_uid,
+    target_controller_seat: input.target_controller_seat,
+    target_zone: input.target_zone,
+  };
+  recordEvent(state, event);
+
+  let damageDelta = 0;
+  const applications: RuntimeV02AttackDeclaredDamageApplication[] = [];
+  for (const candidate of collectCandidates(state, event.event)) {
+    if (!containsCurrentAttackDamageModifier(candidate.listener.steps)) continue;
+
+    const key = receiptKey(candidate, event);
+    if (alreadyResolved(state, candidate, event)) {
+      const prior = objectRecord(listenerState(state).receipts[key]);
+      const priorDelta = Number(prior?.attack_damage_delta);
+      if (!Number.isInteger(priorDelta) || priorDelta === 0) {
+        throw new Error("tcg_v0_2_attack_declared_listener_receipt_invalid");
+      }
+      damageDelta += priorDelta;
+      applications.push({
+        source_uid: candidate.source.uid,
+        listener_id: listenerId(candidate),
+        delta: priorDelta,
+        limit_consumed: false,
+        replayed: true,
+      });
+      continue;
+    }
+    if (!attackDeclaredListenerMatches(state, candidate, input)) continue;
+    const delta = attackDeclaredDamageDelta(candidate)!;
+
+    const limit = limitInfo(state, candidate, event);
+    if (limit && usedLimit(state, limit) >= limit.count) continue;
+    consumeLimit(state, limit);
+    damageDelta += delta;
+    markResolved(state, candidate, event, {
+      resolution_kind: "attack_declared_damage",
+      attack_damage_delta: delta,
+    });
+    applications.push({
+      source_uid: candidate.source.uid,
+      listener_id: listenerId(candidate),
+      delta,
+      limit_consumed: limit != null,
+      replayed: false,
+    });
+  }
+
+  return {
+    schema: "sb-tcg-attack-declared-damage-v0.2",
+    event: { ...event },
+    base_damage: input.base_damage,
+    damage_delta: damageDelta,
+    damage: Math.max(0, input.base_damage + damageDelta),
+    applications,
   };
 }

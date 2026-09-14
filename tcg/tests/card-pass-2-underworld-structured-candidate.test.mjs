@@ -4,6 +4,11 @@ import { readFileSync } from 'node:fs';
 const source = readFileSync(new URL('../../tcg-card-pass-2-underworld.md', import.meta.url), 'utf8');
 const grammar = JSON.parse(readFileSync(new URL('../../tcg-card-pass-2-effect-grammar-v0.2.json', import.meta.url), 'utf8'));
 const packages = JSON.parse(readFileSync(new URL('../../tcg-element-packages-v0.2.json', import.meta.url), 'utf8'));
+const capabilities = JSON.parse(readFileSync(new URL('../../tcg-runtime-capabilities-v0.2.json', import.meta.url), 'utf8'));
+const attackListenerOwner = readFileSync(
+  new URL('../../supabase/functions/_shared/tcg-match-event-listener-v0-2.ts', import.meta.url),
+  'utf8',
+);
 
 const blocks = [...source.matchAll(/```json\s*([\s\S]*?)```/g)].map((match) => JSON.parse(match[1]));
 assert.ok(blocks.length >= 3, 'Underworld candidate must contain Woundling, Scarjackal and Bloodbasilisk structured blocks');
@@ -80,7 +85,7 @@ assert.deepEqual(scarjackal.creature.attacks[0].cost, [{ element: 'Underworld', 
 assert.equal(scarjackal.creature.attacks[0].base_damage, 50);
 assert.deepEqual(scarjackal.creature.attacks[1].cost, [
   { element: 'Underworld', amount: 2 },
-  { element: 'any', amount: 1 },
+  { element: 'Any', amount: 1 },
 ]);
 assert.equal(scarjackal.creature.attacks[1].base_damage, 70);
 assert.deepEqual(scarjackal.creature.attacks[1].after_damage, [{
@@ -117,6 +122,22 @@ assert.deepEqual(bloodbasilisk.creature.attacks[1].damage_formula, {
     when: damageHistoryRequirement(1),
   }],
 });
+
+assert.ok(
+  attackListenerOwner.includes('export function runtimeV02ResolveAttackDeclaredDamageListeners('),
+  'generic current-attack damage-listener owner missing',
+);
+for (const cardSpecific of ['underworld-scarjackal', 'Scarjackal', 'blood-interest', 'Blood Interest']) {
+  assert.equal(
+    attackListenerOwner.includes(cardSpecific),
+    false,
+    `card-specific current-attack runtime branch forbidden: ${cardSpecific}`,
+  );
+}
+assert.ok(capabilities.operations.implemented.includes('MODIFY_CURRENT_ATTACK_DAMAGE'));
+assert.ok(!capabilities.operations.missing.includes('MODIFY_CURRENT_ATTACK_DAMAGE'));
+assert.ok(capabilities.predicates.implemented.includes('event_attack_source_is_self'));
+assert.ok(!capabilities.predicates.missing.includes('event_attack_source_is_self'));
 
 const underworldPackage = packages.packages.find((entry) => entry.element === 'Underworld');
 assert.ok(underworldPackage, 'Underworld package record missing');

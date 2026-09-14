@@ -78,7 +78,7 @@ This batch translates the accepted current-rules design in `tcg-future-underworl
     },
     "attacks":[
       {"id":"scar-bite","name":"Scar Bite","cost":[{"element":"Underworld","amount":2}],"damage_element":"source_creature","base_damage":50,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[]},
-      {"id":"siphon-fang","name":"Siphon Fang","cost":[{"element":"Underworld","amount":2},{"element":"any","amount":1}],"damage_element":"source_creature","base_damage":70,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[
+      {"id":"siphon-fang","name":"Siphon Fang","cost":[{"element":"Underworld","amount":2},{"element":"Any","amount":1}],"damage_element":"source_creature","base_damage":70,"damage_formula":null,"requirements":[],"on_declare":[],"before_damage":[],"after_damage":[
         {"op":"IF","when":{"predicate":"target_remains_in_play_after_damage"},"then":[
           {"op":"DRAIN_VITALITY","target":"$attack_target","amount":20,"heal_target":"$source_creature","heal_cap":20}
         ]}
@@ -90,7 +90,7 @@ This batch translates the accepted current-rules design in `tcg-future-underworl
 
 ### Runtime capability note
 
-`Blood Interest` uses the single Damage #20 history predicate. The 10-damage threshold is evaluated per canonical current-turn damage event and excludes wound transfer. `Siphon Fang` uses the existing generic Attack after-damage vitality-drain shape; Damage owns effect damage, Heal owns recovery and Defeat owns lifecycle consequences.
+`Blood Interest` uses the generic synchronous `attack_declared` damage-listener owner plus the single Damage #20 history predicate. The 10-damage threshold is evaluated per canonical current-turn damage event and excludes wound transfer; the card-instance turn limit is consumed through the shared event-listener receipt state. `Siphon Fang` uses the existing generic Attack after-damage vitality-drain shape; Damage owns effect damage, Heal owns recovery and Defeat owns lifecycle consequences.
 
 ---
 
