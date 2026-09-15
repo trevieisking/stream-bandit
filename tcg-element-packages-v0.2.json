@@ -1,18 +1,19 @@
 {
   "schema": "sb-tcg-element-packages-v0.2",
   "status": "branch_candidate",
-  "purpose": "Single additive authority for full-element packages and their starter bindings. New full elements are introduced by adding one package record plus structured card source and starter recipe; battle engines continue to consume the generic card/effect schemas without element-name branches.",
+  "purpose": "Single additive authority for launch full-element packages and their starter bindings. Future full elements remain concept-only until they have completed card designs, structured card source and a starter recipe; battle engines continue to consume the generic card/effect schemas without element-name branches.",
   "historical_snapshot": {
     "element_count": 8,
     "elemental_identity_count": 192,
     "total_identity_count_with_founder": 193,
     "starter_count": 8,
-    "note": "Reproducibility snapshot only. It is not the final whole-game roster."
+    "note": "This frozen eight-element / 193-identity snapshot is also the current launch roster. Future expansion concepts do not increase launch counts until their card designs and structured sources are complete."
   },
   "current_target": {
-    "full_element_count": 10,
-    "starter_count": 10,
-    "required_additions": ["Fairy", "Underworld"],
+    "full_element_count": 8,
+    "starter_count": 8,
+    "structured_identity_count": 193,
+    "required_additions": [],
     "preserve_existing_starters": true
   },
   "classification": {
@@ -102,26 +103,28 @@
       "design_authority": "tcg-card-pass-2-volt.md",
       "structured_candidate_file": "tcg-card-pass-2-volt.md",
       "starter": {"starter_id": "deck-volt-live-wire", "name": "Live Wire", "state": "existing", "recipe_manifest": "tcg-set-one-starters-v0.2.json"}
-    },
+    }
+  ],
+  "future_expansion_concepts": [
     {
-      "package_id": "element-fairy",
       "element": "Fairy",
-      "state": "designed_pending_structure",
-      "design_authority": "tcg-future-fairy-audit.md",
+      "state": "future_concept_only",
+      "planning_authority": "tcg-future-fairy-audit.md",
       "structured_candidate_file": null,
-      "starter": {"starter_id": null, "name": "Gracebound", "state": "designed_pending_structure", "recipe_manifest": null}
+      "starter_concept": {"name": "Gracebound", "recipe_manifest": null},
+      "launch_blocker": false
     },
     {
-      "package_id": "element-underworld",
       "element": "Underworld",
-      "state": "designed_pending_structure",
-      "design_authority": "tcg-future-underworld-audit.md",
+      "state": "future_concept_only",
+      "planning_authority": "tcg-future-underworld-audit.md",
       "structured_candidate_file": null,
-      "starter": {"starter_id": null, "name": "Debtbound", "state": "designed_pending_structure", "recipe_manifest": null}
+      "starter_concept": {"name": "Debtbound", "recipe_manifest": null},
+      "launch_blocker": false
     }
   ],
   "extension_contract": {
-    "new_full_element": "Add one package row and its structured candidate source; registry source discovery must not require a code edit.",
+    "new_full_element": "When a future concept has completed card designs, add one package row and its structured candidate source; registry source discovery must not require a code edit.",
     "new_starter_deck": "Bind the starter descriptor to the package, then add the exact recipe to starter authority; game runtime must not branch on starter name.",
     "new_card_identity": "Add structured sb-tcg-card-v0.2 data to the owning package source; shared engines interpret the generic effect grammar.",
     "new_creature_type": "Add type metadata through the creature/type authority without promoting it to a full Essence element.",

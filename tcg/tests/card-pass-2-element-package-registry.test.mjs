@@ -16,41 +16,46 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
 const manifest = loadElementPackageManifest(root);
 
-const existingElements = ['Astral', 'Ember', 'Gale', 'Grove', 'Shade', 'Stone', 'Tide', 'Volt'];
+const launchElements = ['Astral', 'Ember', 'Gale', 'Grove', 'Shade', 'Stone', 'Tide', 'Volt'];
 
-test('element-package manifest preserves eight current packages and adds Fairy + Underworld as current required packages', () => {
-  assert.equal(elementPackages(manifest).length, 10);
-  assert.deepEqual(elementPackages(manifest).map((pkg) => pkg.element), [
-    ...existingElements,
-    'Fairy',
-    'Underworld',
-  ]);
-  assert.deepEqual(pendingElementPackages(manifest).map((pkg) => pkg.element), ['Fairy', 'Underworld']);
-  assert.deepEqual(manifest.current_target.required_additions, ['Fairy', 'Underworld']);
+test('element-package manifest exposes exactly eight launch packages and preserves Fairy + Underworld as future concepts', () => {
+  assert.equal(elementPackages(manifest).length, 8);
+  assert.deepEqual(elementPackages(manifest).map((pkg) => pkg.element), launchElements);
+  assert.deepEqual(pendingElementPackages(manifest), []);
+  assert.equal(manifest.current_target.full_element_count, 8);
+  assert.equal(manifest.current_target.starter_count, 8);
+  assert.equal(manifest.current_target.structured_identity_count, 193);
+  assert.deepEqual(manifest.current_target.required_additions, []);
+  assert.deepEqual(manifest.future_expansion_concepts.map((entry) => entry.element), ['Fairy', 'Underworld']);
+  assert.ok(manifest.future_expansion_concepts.every((entry) => entry.state === 'future_concept_only'));
+  assert.ok(manifest.future_expansion_concepts.every((entry) => entry.structured_candidate_file === null));
+  assert.ok(manifest.future_expansion_concepts.every((entry) => entry.launch_blocker === false));
   assert.equal(manifest.classification.Martial.kind, 'creature_type');
   assert.equal(manifest.classification.Martial.is_full_element, false);
 });
 
-test('current frozen registry source discovery remains byte-order compatible with the existing eight plus Founder', () => {
-  assert.deepEqual(registryElementSourceFiles(manifest), existingElements.map((element) =>
+test('current launch registry source discovery remains byte-order compatible with the eight structured elements plus Founder', () => {
+  assert.deepEqual(registryElementSourceFiles(manifest), launchElements.map((element) =>
     `tcg-card-pass-2-${element.toLowerCase()}.md`
   ));
   assert.deepEqual(registrySourceFiles(manifest), [
-    ...existingElements.map((element) => `tcg-card-pass-2-${element.toLowerCase()}.md`),
+    ...launchElements.map((element) => `tcg-card-pass-2-${element.toLowerCase()}.md`),
     'tcg-card-pass-2-founder-structured.md',
   ]);
 });
 
-test('all ten full-element packages carry starter bindings, including Gracebound and Debtbound', () => {
+test('all eight launch packages carry existing starter bindings while future concepts do not claim launch recipes', () => {
   const starters = starterDescriptors(manifest);
-  assert.equal(starters.length, 10);
-  assert.equal(starters.find((entry) => entry.element === 'Fairy')?.name, 'Gracebound');
-  assert.equal(starters.find((entry) => entry.element === 'Underworld')?.name, 'Debtbound');
+  assert.equal(starters.length, 8);
   assert.equal(starters.filter((entry) => entry.state === 'existing').length, 8);
-  assert.equal(starters.filter((entry) => entry.state === 'designed_pending_structure').length, 2);
+  assert.deepEqual(starters.map((entry) => entry.element), launchElements);
+  assert.equal(manifest.future_expansion_concepts.find((entry) => entry.element === 'Fairy')?.starter_concept?.name, 'Gracebound');
+  assert.equal(manifest.future_expansion_concepts.find((entry) => entry.element === 'Fairy')?.starter_concept?.recipe_manifest, null);
+  assert.equal(manifest.future_expansion_concepts.find((entry) => entry.element === 'Underworld')?.starter_concept?.name, 'Debtbound');
+  assert.equal(manifest.future_expansion_concepts.find((entry) => entry.element === 'Underworld')?.starter_concept?.recipe_manifest, null);
 });
 
-test('adding another full element is data-only for package discovery', () => {
+test('adding a completed future full element is data-only for package discovery', () => {
   const synthetic = structuredClone(manifest);
   synthetic.current_target.full_element_count += 1;
   synthetic.current_target.starter_count += 1;
@@ -74,7 +79,7 @@ test('adding another full element is data-only for package discovery', () => {
   assert.equal(starterDescriptors(synthetic).at(-1).name, 'Aurora Test');
 });
 
-test('package contract carries the reusable 24-identity / exact-starter shape', () => {
+test('package contract carries the reusable 24-identity / exact-starter shape for future completed elements', () => {
   assert.deepEqual(manifest.package_contract, {
     identities: 24,
     creatures: 11,
