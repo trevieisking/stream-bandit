@@ -119,9 +119,12 @@ test('consolidated validator preserves matchup invariants while package manifest
   assert.deepEqual(validator.global_rules.set_one_elements, historicalElements, 'legacy set_one_elements must remain the frozen eight-element snapshot');
   assert.equal(validator.global_rules.set_one_expected_elemental_identities, packageManifest.historical_snapshot.elemental_identity_count);
   assert.equal(validator.global_rules.set_one_expected_total_identities, packageManifest.historical_snapshot.total_identity_count_with_founder);
-  assert.equal(packageManifest.current_target.full_element_count, 10);
-  assert.equal(packageManifest.current_target.starter_count, 10);
-  assert.deepEqual(packageManifest.current_target.required_additions, ['Fairy', 'Underworld']);
+  assert.equal(packageManifest.current_target.full_element_count, 8);
+  assert.equal(packageManifest.current_target.starter_count, 8);
+  assert.equal(packageManifest.current_target.structured_identity_count, 193);
+  assert.deepEqual(packageManifest.current_target.required_additions, []);
+  assert.deepEqual(packageManifest.future_expansion_concepts.map((entry) => entry.element), ['Fairy', 'Underworld']);
+  assert.ok(packageManifest.future_expansion_concepts.every((entry) => entry.launch_blocker === false));
 });
 
 test('every structured elemental package satisfies the reusable 24 identity / 11-4-9 contract', () => {

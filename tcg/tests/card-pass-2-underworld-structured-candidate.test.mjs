@@ -140,10 +140,14 @@ assert.ok(capabilities.predicates.implemented.includes('event_attack_source_is_s
 assert.ok(!capabilities.predicates.missing.includes('event_attack_source_is_self'));
 
 const underworldPackage = packages.packages.find((entry) => entry.element === 'Underworld');
-assert.ok(underworldPackage, 'Underworld package record missing');
-assert.equal(underworldPackage.state, 'designed_pending_structure', 'partial candidate must not promote Underworld package state');
-assert.equal(underworldPackage.structured_candidate_file, null, 'partial candidate must not become registry source');
-assert.equal(underworldPackage.starter.name, 'Debtbound');
-assert.equal(underworldPackage.starter.state, 'designed_pending_structure');
+assert.equal(underworldPackage, undefined, 'future Underworld concept must not be a launch package');
+const underworldConcept = packages.future_expansion_concepts.find((entry) => entry.element === 'Underworld');
+assert.ok(underworldConcept, 'Underworld future concept record missing');
+assert.equal(underworldConcept.state, 'future_concept_only');
+assert.equal(underworldConcept.planning_authority, 'tcg-future-underworld-audit.md');
+assert.equal(underworldConcept.structured_candidate_file, null, 'partial candidate must not become a launch registry source');
+assert.equal(underworldConcept.starter_concept.name, 'Debtbound');
+assert.equal(underworldConcept.starter_concept.recipe_manifest, null);
+assert.equal(underworldConcept.launch_blocker, false);
 
 console.log(`Underworld structured candidate checks passed for ${blocks.length} card block(s).`);
