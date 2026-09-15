@@ -35,10 +35,8 @@ declare
   v_total integer := 0;
   v_missing integer := 0;
   v_overcopies integer := 0;
+  v_mythic_overcopies integer := 0;
   v_element_mismatch integer := 0;
-  v_mythic_total integer := 0;
-  v_legendary_total integer := 0;
-  v_legendary_dup integer := 0;
   v_unknown integer := 0;
   v_errors jsonb := '[]'::jsonb;
 begin
@@ -64,16 +62,26 @@ begin
   where dc.deck_id = p_deck_id
     and coalesce(c.quantity,0) < dc.quantity;
 
-  select count(*)::int into v_overcopies
+  -- Deck-copy authority follows gameplay identity, not a global Mythic/Legendary count.
+  -- Essence uses its separate global allowance; ordinary non-Essence identities max at 4;
+  -- each Mythic identity maxes at 1.
+  select
+    (count(*) filter (where not x.essence and not x.mythic and x.qty > 4))::int,
+    (count(*) filter (where x.mythic and x.qty > 1))::int
+  into v_overcopies, v_mythic_overcopies
   from (
-    select cd.name, sum(dc.quantity)::int as qty,
-           bool_or(coalesce(cd.definition->>'recipe_type','') = 'Basic Essence') as basic_essence
+    select cd.card_id,
+           sum(dc.quantity)::int as qty,
+           bool_or(cd.card_family = 'Essence') as essence,
+           bool_or(
+             coalesce(cd.definition->>'recipe_type','') = 'Creature — Mythic'
+             or coalesce(cd.definition->'traits','[]'::jsonb) ? 'Mythic'
+           ) as mythic
     from public.tcg_deck_cards dc
     join public.tcg_card_definitions cd on cd.card_id = dc.card_id
     where dc.deck_id = p_deck_id
-    group by cd.name
-  ) x
-  where not x.basic_essence and x.qty > 4;
+    group by cd.card_id
+  ) x;
 
   select count(*)::int into v_element_mismatch
   from public.tcg_deck_cards dc
@@ -81,35 +89,12 @@ begin
   where dc.deck_id = p_deck_id
     and cd.element not in (v_deck.primary_element, coalesce(v_deck.secondary_element,v_deck.primary_element), 'Prismatic');
 
-  select coalesce(sum(dc.quantity),0)::int into v_mythic_total
-  from public.tcg_deck_cards dc
-  join public.tcg_card_definitions cd on cd.card_id = dc.card_id
-  where dc.deck_id = p_deck_id
-    and (
-      coalesce(cd.definition->>'recipe_type','') = 'Creature — Mythic'
-      or coalesce(cd.definition->'traits','[]'::jsonb) ? 'Mythic'
-    );
-
-  select coalesce(sum(dc.quantity),0)::int into v_legendary_total
-  from public.tcg_deck_cards dc
-  join public.tcg_card_definitions cd on cd.card_id = dc.card_id
-  where dc.deck_id = p_deck_id
-    and coalesce(cd.definition->'traits','[]'::jsonb) ? 'Legendary';
-
-  select count(*)::int into v_legendary_dup
-  from public.tcg_deck_cards dc
-  join public.tcg_card_definitions cd on cd.card_id = dc.card_id
-  where dc.deck_id = p_deck_id
-    and coalesce(cd.definition->'traits','[]'::jsonb) ? 'Legendary'
-    and dc.quantity > 1;
-
   if v_total <> 60 then v_errors := v_errors || jsonb_build_array('deck_must_contain_exactly_60_cards'); end if;
   if v_unknown > 0 then v_errors := v_errors || jsonb_build_array('deck_contains_unknown_or_inactive_card'); end if;
   if v_missing > 0 then v_errors := v_errors || jsonb_build_array('deck_exceeds_owned_card_quantities'); end if;
-  if v_overcopies > 0 then v_errors := v_errors || jsonb_build_array('deck_exceeds_four_copy_gameplay_name_limit'); end if;
+  if v_overcopies > 0 then v_errors := v_errors || jsonb_build_array('deck_exceeds_four_copy_identity_limit'); end if;
+  if v_mythic_overcopies > 0 then v_errors := v_errors || jsonb_build_array('deck_exceeds_one_copy_mythic_identity_limit'); end if;
   if v_element_mismatch > 0 then v_errors := v_errors || jsonb_build_array('deck_contains_cards_outside_declared_elements'); end if;
-  if v_mythic_total > 1 then v_errors := v_errors || jsonb_build_array('deck_exceeds_one_mythic_limit'); end if;
-  if v_legendary_total > 2 or v_legendary_dup > 0 then v_errors := v_errors || jsonb_build_array('deck_violates_legendary_limit'); end if;
 
   return jsonb_build_object(
     'ok', jsonb_array_length(v_errors)=0,
