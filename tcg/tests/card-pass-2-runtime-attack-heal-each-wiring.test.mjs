@@ -20,7 +20,7 @@ function assertInOrder(needles, message) {
 test('structured HEAL_EACH executes after attack damage and before its legacy fallback', () => {
   assert.ok(matchSource.includes('structuredRuntimeAfterDamageHealEachEffects'));
   assertInOrder([
-    'const dmg=attackDamage(p.vanguard,target,s,formulaBase+bonus',
+    'const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage',
     'const structuredConditionEffects=structuredRuntimeAfterDamageConditionEffects(',
     'const structuredRecoilEffects=structuredRuntimeAfterDamageRecoilEffects(',
     'const structuredShieldEffects=structuredRuntimeAfterDamageShieldEffects(',

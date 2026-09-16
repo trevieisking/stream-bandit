@@ -22,7 +22,7 @@ test('condition-only after_damage programs execute through the structured owner 
     'structured attack condition owner import missing',
   );
   assertInOrder([
-    'const dmg=attackDamage(p.vanguard,target,s,formulaBase+bonus',
+    'const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage',
     'const structuredConditionEffects=structuredRuntimeAfterDamageConditionEffects(',
     'if(structuredConditionEffects==null&&ef.includes("this creature becomes scorched"))',
     'const n=scanDefeats()',

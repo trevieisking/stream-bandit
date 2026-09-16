@@ -20,7 +20,7 @@ function assertInOrder(needles, message) {
 test('structured Shield gain executes after attack damage and before legacy Shield fallback', () => {
   assert.ok(matchSource.includes('structuredRuntimeAfterDamageShieldEffects'));
   assertInOrder([
-    'const dmg=attackDamage(p.vanguard,target,s,formulaBase+bonus',
+    'const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage',
     'const structuredConditionEffects=structuredRuntimeAfterDamageConditionEffects(',
     'const structuredRecoilEffects=structuredRuntimeAfterDamageRecoilEffects(',
     'const structuredShieldEffects=structuredRuntimeAfterDamageShieldEffects(',

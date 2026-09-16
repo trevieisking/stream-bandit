@@ -41,8 +41,10 @@ test('structured count_add damage replaces only its matching legacy Pyrohorn bon
     'combined structured formula damage must become the attack damage baseline',
   );
   assert.ok(
-    source.includes('attackDamage(p.vanguard,target,s,formulaBase+bonus'),
-    'damage pipeline must receive structured formula damage plus remaining legacy-only bonuses',
+    source.includes('const attackModifierConsumption=runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration(') &&
+      source.includes('const declaredAttackDamage=attackModifierConsumption?.damage??(formulaBase+bonus)') &&
+      source.includes('attackDamage(p.vanguard,target,s,declaredAttackDamage'),
+    'damage pipeline must pass structured formula damage plus remaining legacy-only bonuses through the canonical Attack modifier owner before final damage',
   );
 });
 

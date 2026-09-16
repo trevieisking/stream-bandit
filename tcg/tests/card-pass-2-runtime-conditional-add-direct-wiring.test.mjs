@@ -92,7 +92,9 @@ test('count_add and ready conditional_add contributions combine without double c
     'const conditionalFormulaBonus=conditionalAddEvaluation?Math.max(0,conditionalAddEvaluation.damage-atk.damage):0',
     'const formulaBonus=countFormulaBonus+conditionalFormulaBonus',
     'const formulaBase=atk.damage+formulaBonus',
-    'attackDamage(p.vanguard,target,s,formulaBase+bonus',
+    'const attackModifierConsumption=runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration(',
+    'const declaredAttackDamage=attackModifierConsumption?.damage??(formulaBase+bonus)',
+    'attackDamage(p.vanguard,target,s,declaredAttackDamage',
   ], 'combined structured formula damage pipeline changed');
 });
 

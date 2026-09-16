@@ -21,7 +21,7 @@ function assertInOrder(needles, message) {
 test('structured self-heal executes after attack damage and before English healing fallback', () => {
   assert.ok(matchSource.includes('structuredRuntimeAfterDamageSelfHealEffects'));
   assertInOrder([
-    'const dmg=attackDamage(p.vanguard,target,s,formulaBase+bonus',
+    'const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage',
     'const structuredConditionEffects=structuredRuntimeAfterDamageConditionEffects(',
     'const structuredRecoilEffects=structuredRuntimeAfterDamageRecoilEffects(',
     'const structuredShieldEffects=structuredRuntimeAfterDamageShieldEffects(',

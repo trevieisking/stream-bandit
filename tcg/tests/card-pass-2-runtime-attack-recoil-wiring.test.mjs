@@ -21,7 +21,7 @@ test('structured recoil executes after attack damage and before legacy recoil fa
     'structured recoil owner import/wiring missing',
   );
   assertInOrder([
-    'const dmg=attackDamage(p.vanguard,target,s,formulaBase+bonus',
+    'const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage',
     'const structuredConditionEffects=structuredRuntimeAfterDamageConditionEffects(',
     'const structuredRecoilEffects=structuredRuntimeAfterDamageRecoilEffects(',
     'if(structuredRecoilEffects==null&&ef.match(/place (\\d+) damage on this creature/))',
