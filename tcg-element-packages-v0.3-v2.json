@@ -1,0 +1,51 @@
+{
+  "schema": "sb-tcg-element-packages-v0.3-v2",
+  "recorded_at": "2026-09-16",
+  "purpose": "V2 target manifest for ten full elements while preserving the historical 8-element private-alpha runtime baseline.",
+  "historical_runtime_snapshot": {
+    "element_count": 8,
+    "elemental_identity_count": 192,
+    "total_identity_count_with_founder": 193,
+    "starter_count": 8
+  },
+  "v2_target": {
+    "full_element_count": 10,
+    "elemental_identity_count": 240,
+    "founder_identity_count": 1,
+    "total_identity_count": 241,
+    "starter_count": 10,
+    "starter_size": 60,
+    "owner_families": 40
+  },
+  "package_contract": {
+    "identities":24,
+    "creatures":11,
+    "essence":4,
+    "tactics":9,
+    "pack_only":3,
+    "starter_cards":60,
+    "starter_identities":21,
+    "starter_creature_cards":22,
+    "starter_essence_cards":18,
+    "starter_tactic_cards":20
+  },
+  "packages": [
+    {"element":"Astral","starter":"Second Sky","state":"canonical_structured_runtime","source":"tcg-card-pass-2-astral.md"},
+    {"element":"Ember","starter":"Ashrush","state":"canonical_structured_runtime","source":"tcg-card-pass-2-ember.md"},
+    {"element":"Fairy","starter":"Glimmerwish","state":"accepted_v2_design_schema_pending","source":"tcg-fairy-glimmerwish-v2-candidate.json","historical_design":"tcg-future-fairy-audit.md"},
+    {"element":"Gale","starter":"Skyshift","state":"canonical_structured_runtime","source":"tcg-card-pass-2-gale.md"},
+    {"element":"Grove","starter":"Wildgrowth","state":"canonical_structured_runtime","source":"tcg-card-pass-2-grove.md"},
+    {"element":"Shade","starter":"Nightbind","state":"canonical_structured_runtime","source":"tcg-card-pass-2-shade.md"},
+    {"element":"Stone","starter":"Unbroken","state":"canonical_structured_runtime","source":"tcg-card-pass-2-stone.md"},
+    {"element":"Tide","starter":"Deep Current","state":"canonical_structured_runtime","source":"tcg-card-pass-2-tide.md"},
+    {"element":"Underworld","starter":"Grave Pact","state":"accepted_v2_design_schema_pending","source":"tcg-underworld-grave-pact-v2-candidate.json","historical_design":"tcg-future-underworld-audit.md"},
+    {"element":"Volt","starter":"Live Wire","state":"canonical_structured_runtime","source":"tcg-card-pass-2-volt.md"}
+  ],
+  "extension_contract": {
+    "new_element":"Add data through this package model; do not add element-name branches to battle engines.",
+    "new_card":"Use canonical sb-tcg-card-v0.2/effect data and shared owners/opcodes.",
+    "new_starter":"Add exact recipe authority; runtime must not branch on starter name.",
+    "new_printing":"Add Card Printing / Art Metadata only; printing finish never changes gameplay identity."
+  },
+  "locked_next_operation": "Translate Fairy and Underworld accepted V2 design packages into exact canonical shared schema and validate the resulting 241-identity ten-package registry before runtime integration."
+}
