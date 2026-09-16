@@ -13,6 +13,14 @@ import {
   structuredRuntimeActiveAbilitySelectedHeal,
   type RuntimeV02PendingActiveAbilitySelectedHealChoice,
 } from "./tcg-match-active-ability-selected-heal-v0-2.ts";
+import {
+  runtimeV02BuildActiveAbilitySelectedModifierChoice,
+  runtimeV02PendingActiveAbilitySelectedModifierChoiceView,
+  runtimeV02ResolveActiveAbilitySelectedModifierChoice,
+  structuredRuntimeActiveAbilitySelectedModifier,
+  type RuntimeV02ActiveAbilitySelectedModifierResolution,
+  type RuntimeV02PendingActiveAbilitySelectedModifierChoice,
+} from "./tcg-match-active-ability-selected-modifier-v0-2.ts";
 
 type RuntimeFieldWhere = "vanguard" | "reserve";
 
@@ -24,7 +32,8 @@ type RuntimeV02ActiveAbilitySource = {
 
 export type RuntimeV02PendingActiveAbilityLiveChoice =
   | RuntimeV02PendingActiveAbilityChoice
-  | RuntimeV02PendingActiveAbilitySelectedHealChoice;
+  | RuntimeV02PendingActiveAbilitySelectedHealChoice
+  | RuntimeV02PendingActiveAbilitySelectedModifierChoice;
 
 export type RuntimeV02ActiveAbilityLiveResolution =
   | {
@@ -39,14 +48,13 @@ export type RuntimeV02ActiveAbilityLiveResolution =
     requested_heal: number;
     actual_heal: number;
     emitted_packet_ids: string[];
-  };
+  }
+  | RuntimeV02ActiveAbilitySelectedModifierResolution;
 
 /**
- * Creates one live active-Ability choice by delegating to the existing exact
- * family recognizers and semantic owners. Reward inspection continues through
- * its established owner. Selected healing performs its pure preflight first,
- * then consumes the same canonical once-per-turn receipt writer used by Reward
- * inspection before the pending choice is returned to tcg-match-actions.
+ * Creates one live active-Ability choice by delegating to exact family
+ * recognizers and semantic owners. Every family performs pure preflight before
+ * the same canonical once-per-turn receipt writer is consumed.
  */
 export function runtimeV02CreateActiveAbilityLiveChoice(
   state: Record<string, unknown>,
@@ -67,19 +75,35 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
   }
 
   const selectedHealDescriptor = structuredRuntimeActiveAbilitySelectedHeal(state, instance);
-  if (!selectedHealDescriptor) return null;
+  if (selectedHealDescriptor) {
+    const pending = runtimeV02BuildActiveAbilitySelectedHealChoice(
+      state,
+      controllerSeat,
+      selectedHealDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      selectedHealDescriptor.ability_id,
+    );
+    return pending;
+  }
 
-  const pending = runtimeV02BuildActiveAbilitySelectedHealChoice(
+  const selectedModifierDescriptor = structuredRuntimeActiveAbilitySelectedModifier(state, instance);
+  if (!selectedModifierDescriptor) return null;
+  const pending = runtimeV02BuildActiveAbilitySelectedModifierChoice(
     state,
     controllerSeat,
-    selectedHealDescriptor,
+    selectedModifierDescriptor,
     source,
     choiceId,
   );
   runtimeV02RecordActiveAbilityUse(
     state,
     controllerSeat,
-    selectedHealDescriptor.ability_id,
+    selectedModifierDescriptor.ability_id,
   );
   return pending;
 }
@@ -96,13 +120,16 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
   if (choice.kind === "heal_one_damaged_friendly_creature") {
     return runtimeV02PendingActiveAbilitySelectedHealChoiceView(choice, viewerSeat);
   }
+  if (choice.kind === "modify_one_friendly_creature") {
+    return runtimeV02PendingActiveAbilitySelectedModifierChoiceView(choice, viewerSeat);
+  }
   throw new Error("tcg_v0_2_active_ability_live_choice_kind_unsupported");
 }
 
 /**
  * Resolves one live active-Ability choice while preserving the semantic owner
- * for each family. The facade never runs heal listeners or changes match phase;
- * those remain tcg-match-actions orchestration responsibilities.
+ * for each family. The facade never owns Attack, Damage/Protection, heal
+ * listener or match-phase semantics.
  */
 export function runtimeV02ResolveActiveAbilityLiveChoice(
   choice: RuntimeV02PendingActiveAbilityLiveChoice,
@@ -141,6 +168,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
       actual_heal: resolved.actual_heal,
       emitted_packet_ids: resolved.emitted_packet_ids,
     };
+  }
+  if (choice.kind === "modify_one_friendly_creature") {
+    return runtimeV02ResolveActiveAbilitySelectedModifierChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
   }
   throw new Error("tcg_v0_2_active_ability_live_choice_kind_unsupported");
 }
