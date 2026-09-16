@@ -1,0 +1,138 @@
+name: TCG RC-02b2b Repair
+
+on:
+  push:
+    branches:
+      - repair/tcg-rc-02b2b-ea5f07b
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repair branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard immutable base and transport-only commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=ea5f07b5941abc982c051d9deeedcbd41435674a
+          test "$(git rev-parse HEAD^)" = "$BASE"
+          test "$(git diff --name-only "$BASE"..HEAD)" = ".github/workflows/tcg-rc-02b2b-repair.yml"
+
+      - name: Patch Damage Protection attack consumer
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected 1 exact match, got {count}")
+              return text.replace(old, new, 1)
+
+          attack_path = Path("supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts")
+          attack = attack_path.read_text()
+          attack = replace_once(
+              attack,
+              '} from "../tcg-tactic-actions/runtime-v0-2-core.ts";\nimport { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";\n',
+              '} from "../tcg-tactic-actions/runtime-v0-2-core.ts";\nimport { runtimeV02ApplyDamageProtections } from "./tcg-match-damage-protection-v0-2.ts";\nimport { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";\n',
+              "attack damage protection owner import",
+          )
+          attack = replace_once(
+              attack,
+              '''export type RuntimeAttackDamageContext = {\n  target_zone: string;\n  target_controller: "self" | "opponent";\n  source_controller: "self" | "opponent";\n  target_has_any_condition: boolean;\n};''',
+              '''export type RuntimeAttackDamageContext = {\n  target_zone: string;\n  target_controller: "self" | "opponent";\n  source_controller: "self" | "opponent";\n  target_has_any_condition: boolean;\n  source_controller_seat?: 1 | 2;\n  target_controller_seat?: 1 | 2;\n  target_creature_uid?: string;\n  packet_id?: string;\n};''',
+              "attack damage live identity context",
+          )
+          marker = '''  const ability = applyIncomingSelfAbilityDamage(state, target, value, context);\n  value = ability.value;\n  if (ability.prevented > 0) {\n    recordRuntimeV02DamagePrevention(state, target, "ability", ability.prevented, context);\n  }\n\n  // Shield is consumed by the match owner immediately after this resolver returns.'''
+          replacement = '''  const ability = applyIncomingSelfAbilityDamage(state, target, value, context);\n  value = ability.value;\n  if (ability.prevented > 0) {\n    recordRuntimeV02DamagePrevention(state, target, "ability", ability.prevented, context);\n  }\n\n  if (target.flags?.runtime_v0_2_damage_protections != null) {\n    const active = activeSeat(state);\n    const sourceSeat = context.source_controller_seat;\n    const targetSeat = context.target_controller_seat;\n    const targetUid = typeof context.target_creature_uid === "string"\n      ? context.target_creature_uid.trim()\n      : "";\n    const packetId = typeof context.packet_id === "string" ? context.packet_id.trim() : "";\n    if (!active || (sourceSeat !== 1 && sourceSeat !== 2) ||\n      (targetSeat !== 1 && targetSeat !== 2) || !targetUid || !packetId) {\n      throw new Error("tcg_v0_2_attack_damage_protection_context_required");\n    }\n    const stored = runtimeV02ApplyDamageProtections(target, value, {\n      turn_seq: currentTurn(state),\n      active_seat: active,\n      source_controller_seat: sourceSeat,\n      target_controller_seat: targetSeat,\n      target_creature_uid: targetUid,\n      damage_class: "attack",\n      packet_id: packetId,\n    });\n    for (const modification of stored.modifications) {\n      const prevented = Math.max(0, Number(modification.amount_before) - Number(modification.amount_after));\n      if (!(prevented > 0)) continue;\n      if (modification.source_kind === "ability" || modification.source_kind === "relic") {\n        recordRuntimeV02DamagePrevention(\n          state,\n          target,\n          modification.source_kind,\n          prevented,\n          context,\n        );\n      }\n    }\n    value = stored.final_amount;\n  }\n\n  // Shield is consumed by the match owner immediately after this resolver returns.'''
+          attack = replace_once(attack, marker, replacement, "stored attack protection delegation")
+          attack_path.write_text(attack)
+
+          match_path = Path("supabase/functions/tcg-match-actions/index.ts")
+          match = match_path.read_text()
+          match = replace_once(
+              match,
+              'ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent"})',
+              'ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent",source_controller_seat:1|2,target_controller_seat:1|2,target_creature_uid:string,packet_id:string})',
+              "match attack damage context type",
+          )
+          old_call = 'const declaredAttackDamage=attackModifierConsumption?.damage??(formulaBase+bonus);const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage,{target_zone:targetWhere,target_controller:relation,source_controller:relation});log(`Seat ${seat}\'s ${ad?.name||"Vanguard"} used ${atk.name} for ${dmg.dealt} damage (${dmg.blocked} Shield prevented).`);'
+          new_call = 'const declaredAttackDamage=attackModifierConsumption?.damage??(formulaBase+bonus);const targetCreatureUid=String(target.stack?.[target.stack.length-1]?.uid||"");if(!targetCreatureUid)throw new Error("tcg_v0_2_attack_damage_target_uid_required");const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage,{target_zone:targetWhere,target_controller:relation,source_controller:relation,source_controller_seat:seat as 1|2,target_controller_seat:targetSeat as 1|2,target_creature_uid:targetCreatureUid,packet_id:attackActionId});log(`Seat ${seat}\'s ${ad?.name||"Vanguard"} used ${atk.name} for ${dmg.dealt} damage (${dmg.blocked} Shield prevented).`);'
+          match = replace_once(match, old_call, new_call, "live attack protection identity wiring")
+          match_path.write_text(match)
+
+          deno_test_path = Path("supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-prevention-authority.test.ts")
+          deno_test = deno_test_path.read_text()
+          deno_test = replace_once(
+              deno_test,
+              'import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";\n',
+              'import { runtimeV02DamageProtectionCount, runtimeV02InstallDamageProtection } from "../_shared/tcg-match-damage-protection-v0-2.ts";\nimport { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";\n',
+              "attack prevention test protection imports",
+          )
+          deno_test = replace_once(
+              deno_test,
+              '''function sourceCreature(s: Record<string, unknown>) {\n  return (s.players as any)["1"].vanguard as any;\n}\n''',
+              '''function sourceCreature(s: Record<string, unknown>) {\n  return (s.players as any)["1"].vanguard as any;\n}\n\nfunction installStoredAttackProtection(s: Record<string, unknown>) {\n  const target = sourceCreature(s);\n  runtimeV02InstallDamageProtection(target, {\n    protection_id: "mountain-warden:7:citadelhorn-source",\n    source_action_id: "mountain-warden",\n    source_uid: "warden-source",\n    source_card_id: "stone-crowncrag-mountain-warden",\n    source_kind: "ability",\n    source_controller_seat: 1,\n    target_controller_seat: 1,\n    target_creature_uid: "citadelhorn-source",\n    installed_turn_seq: 7,\n    damage_classes: ["attack"],\n    source_controller: "opponent",\n    reduce_amount: 40,\n    minimum: 0,\n    max_uses: 1,\n    expires_on: "start_of_controller_next_turn",\n  });\n  return target;\n}\n\nconst storedAttackContext: RuntimeAttackDamageContext = {\n  ...attackContext,\n  source_controller_seat: 2,\n  target_controller_seat: 1,\n  target_creature_uid: "citadelhorn-source",\n  packet_id: "attack:7:2:test:citadelhorn-source",\n};\n''',
+              "attack prevention stored protection fixture",
+          )
+          deno_test += '''\n\nDeno.test("stored active-Ability attack protection is consumed by the live incoming attack boundary", () => {\n  const s = state({ relic: false });\n  const target = installStoredAttackProtection(s);\n  assertEquals(structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, storedAttackContext), 60);\n  assertEquals(runtimeV02DamageProtectionCount(target), 0, "successful prevention must consume the one use");\n  assertJsonEquals(runtimeV02CurrentTurnDamagePreventionEvents(s, source), [\n    { event: "damage_prevented", target: "source_creature", prevention_kind: "ability" },\n  ]);\n});\n\nDeno.test("zero incoming attack damage does not consume stored protection", () => {\n  const s = state({ relic: false });\n  const target = installStoredAttackProtection(s);\n  assertEquals(structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 0, storedAttackContext), 0);\n  assertEquals(runtimeV02DamageProtectionCount(target), 1);\n  assertJsonEquals(runtimeV02CurrentTurnDamagePreventionEvents(s, source), []);\n});\n\nDeno.test("stored attack protection fails closed without exact live packet identity", () => {\n  const s = state({ relic: false });\n  const target = installStoredAttackProtection(s);\n  let message = "";\n  try {\n    structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, attackContext);\n  } catch (error) {\n    message = error instanceof Error ? error.message : String(error);\n  }\n  assertEquals(message, "tcg_v0_2_attack_damage_protection_context_required");\n  assertEquals(runtimeV02DamageProtectionCount(target), 1, "failed context must not consume protection");\n});\n'''
+          deno_test_path.write_text(deno_test)
+
+          node_test_path = Path("tcg/tests/card-pass-2-runtime-damage-shield-owner.test.mjs")
+          node_test = node_test_path.read_text()
+          node_test = replace_once(
+              node_test,
+              '''const runtimeCore = fs.readFileSync(\n  path.join(root, 'supabase', 'functions', 'tcg-tactic-actions', 'runtime-v0-2-core.ts'),\n  'utf8',\n);\n''',
+              '''const runtimeCore = fs.readFileSync(\n  path.join(root, 'supabase', 'functions', 'tcg-tactic-actions', 'runtime-v0-2-core.ts'),\n  'utf8',\n);\nconst attackDamageOwner = fs.readFileSync(\n  path.join(root, 'supabase', 'functions', '_shared', 'tcg-match-attack-damage-v0-2.ts'),\n  'utf8',\n);\nconst matchActions = fs.readFileSync(\n  path.join(root, 'supabase', 'functions', 'tcg-match-actions', 'index.ts'),\n  'utf8',\n);\n''',
+              "damage owner live source fixtures",
+          )
+          node_test += '''\n\ntest('live attack damage delegates temporary reductions to Damage/Protection owner #20 before Shield', () => {\n  assert.match(attackDamageOwner, /from "\.\/tcg-match-damage-protection-v0-2\.ts"/);\n  assert.ok(attackDamageOwner.includes('runtimeV02ApplyDamageProtections(target, value, {'));\n  assert.ok(attackDamageOwner.includes('damage_class: "attack"'));\n  assert.ok(attackDamageOwner.includes('tcg_v0_2_attack_damage_protection_context_required'));\n  const protectionIndex = attackDamageOwner.indexOf('runtimeV02ApplyDamageProtections(target, value, {');\n  const shieldIndex = attackDamageOwner.indexOf('// Shield is consumed by the match owner immediately after this resolver returns.');\n  assert.ok(protectionIndex >= 0 && shieldIndex > protectionIndex, 'stored protection must resolve before Shield');\n  assert.match(\n    matchActions,\n    /source_controller_seat:seat as 1\|2,target_controller_seat:targetSeat as 1\|2,target_creature_uid:targetCreatureUid,packet_id:attackActionId/,\n    'live attack dispatcher must supply exact packet and battlefield identity to Damage/Protection',\n  );\n});\n'''
+          node_test_path.write_text(node_test)
+          PY
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Verify bounded Damage Protection attack wiring
+        shell: bash
+        run: |
+          set -euo pipefail
+          deno test --allow-env \
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-prevention-authority.test.ts \
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-damage-protection-integration.test.ts
+          node --test tcg/tests/card-pass-2-runtime-damage-shield-owner.test.mjs
+          deno check supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts
+          deno check supabase/functions/tcg-match-actions/index.ts
+
+      - name: Commit tested repair and remove transport workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=ea5f07b5941abc982c051d9deeedcbd41435674a
+          rm .github/workflows/tcg-rc-02b2b-repair.yml
+          git config user.name "Trevor"
+          git config user.email "269324007+trevieisking@users.noreply.github.com"
+          git add -A
+          mapfile -t STAGED < <(git diff --cached --name-only)
+          test "${#STAGED[@]}" -eq 5
+          git commit -m "fix(tcg): route attack protection through damage owner"
+          EXPECTED=$(printf '%s\n' \
+            supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts \
+            supabase/functions/tcg-match-actions/index.ts \
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-damage-prevention-authority.test.ts \
+            tcg/tests/card-pass-2-runtime-damage-shield-owner.test.mjs | sort)
+          ACTUAL=$(git diff --name-only "$BASE"..HEAD | sort)
+          printf '%s\n' "$ACTUAL"
+          test "$ACTUAL" = "$EXPECTED"
+          git push origin HEAD:repair/tcg-rc-02b2b-ea5f07b
