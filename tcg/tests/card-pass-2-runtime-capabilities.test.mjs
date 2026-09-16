@@ -3,14 +3,54 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  loadElementPackageManifest,
+  registrySourceFiles,
+} from '../../tcg-element-package-registry-v0.2.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
+const manifest = loadElementPackageManifest(root);
+const candidateFiles = registrySourceFiles(manifest);
 const grammar = JSON.parse(fs.readFileSync(path.join(root, 'tcg-card-pass-2-effect-grammar-v0.2.json'), 'utf8'));
 const capabilities = JSON.parse(fs.readFileSync(path.join(root, 'tcg-runtime-capabilities-v0.2.json'), 'utf8'));
 
 function sorted(values) {
   return [...values].sort((a, b) => a.localeCompare(b));
+}
+
+function extractCards(relativePath) {
+  const source = fs.readFileSync(path.join(root, relativePath), 'utf8');
+  const blocks = [...source.matchAll(/```json\s*([\s\S]*?)```/g)].map((match) => match[1].trim());
+  const cards = [];
+  for (const block of blocks) {
+    if (!block.includes('sb-tcg-card-v0.2')) continue;
+    const value = JSON.parse(block);
+    if (value && value.schema === 'sb-tcg-card-v0.2' && typeof value.id === 'string') cards.push(value);
+  }
+  return cards;
+}
+
+function walk(value, visitor) {
+  if (Array.isArray(value)) {
+    for (const entry of value) walk(entry, visitor);
+    return;
+  }
+  if (!value || typeof value !== 'object') return;
+  visitor(value);
+  for (const child of Object.values(value)) walk(child, visitor);
+}
+
+const release1Cards = candidateFiles.flatMap(extractCards);
+
+function usedStringValues(key) {
+  const used = new Set();
+  for (const card of release1Cards) {
+    walk(card, (node) => {
+      if (typeof node[key] === 'string') used.add(node[key]);
+    });
+  }
+  return used;
 }
 
 function classifiedExactlyOnce(groups, grammarValues, label) {
@@ -42,6 +82,46 @@ test('every v0.2 grammar operation is classified exactly once by runtime capabil
 test('every v0.2 grammar predicate is classified exactly once by runtime capability status', () => {
   classifiedExactlyOnce(capabilities.predicates, grammar.predicates || [], 'predicate');
   assert.equal(capabilities.completion.all_grammar_predicates_classified, true);
+});
+
+test('RC-02 Release 1 capability scope is derived from the canonical 8 / 193 / 8 package roster', () => {
+  assert.equal(manifest.current_target.full_element_count, 8);
+  assert.equal(manifest.current_target.structured_identity_count, 193);
+  assert.equal(manifest.current_target.starter_count, 8);
+  assert.deepEqual(manifest.current_target.required_additions, []);
+  assert.equal(release1Cards.length, 193);
+
+  const usedOperations = usedStringValues('op');
+  const usedPredicates = usedStringValues('predicate');
+  assert.equal(usedOperations.size, 61, 'Release 1 opcode inventory drift');
+  assert.equal(usedPredicates.size, 97, 'Release 1 predicate inventory drift');
+
+  const classifiedOperations = new Set([
+    ...(capabilities.operations?.implemented || []),
+    ...(capabilities.operations?.partial || []),
+    ...(capabilities.operations?.missing || []),
+  ]);
+  const classifiedPredicates = new Set([
+    ...(capabilities.predicates?.implemented || []),
+    ...(capabilities.predicates?.partial || []),
+    ...(capabilities.predicates?.missing || []),
+  ]);
+
+  assert.deepEqual(
+    sorted([...usedOperations].filter((value) => !classifiedOperations.has(value))),
+    [],
+    'Release 1 uses an operation missing from the capability inventory',
+  );
+  assert.deepEqual(
+    sorted([...usedPredicates].filter((value) => !classifiedPredicates.has(value))),
+    [],
+    'Release 1 uses a predicate missing from the capability inventory',
+  );
+
+  const grammarOnlyOperations = Object.keys(grammar.operations || {}).filter((value) => !usedOperations.has(value));
+  const grammarOnlyPredicates = (grammar.predicates || []).filter((value) => !usedPredicates.has(value));
+  assert.ok(grammarOnlyOperations.length > 0, 'expected future/unused grammar operations outside Release 1');
+  assert.ok(grammarOnlyPredicates.length > 0, 'expected future/unused grammar predicates outside Release 1');
 });
 
 test('partial predicate classifications carry explicit legacy-equivalent evidence', () => {
