@@ -76,6 +76,11 @@ jobs:
       - name: Run selected-modifier source contract
         run: node --test tcg/tests/card-pass-2-runtime-active-ability-selected-modifier-wiring.test.mjs
 
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
       - name: Run Active-Ability runtime family
         run: deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-*.test.ts
 
