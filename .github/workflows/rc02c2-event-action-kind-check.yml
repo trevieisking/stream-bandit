@@ -1,0 +1,127 @@
+name: RC-02c2 Event Action Kind Check
+
+on:
+  push:
+    branches:
+      - repair/tcg-rc02c2-event-action-kind-355c23e
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out isolated candidate
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard accepted parent and isolated scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          ACCEPTED=355c23ed611f8c15ec3348a86ae02e1fdd162173
+          test "$(git merge-base HEAD "$ACCEPTED")" = "$ACCEPTED"
+          git diff --name-only "$ACCEPTED"...HEAD | sort > /tmp/files.txt
+          cat > /tmp/allowed.txt <<'EOF'
+          .github/workflows/rc02c2-event-action-kind-check.yml
+          tcg-runtime-capabilities-v0.2.json
+          EOF
+          sort -o /tmp/allowed.txt /tmp/allowed.txt
+          comm -23 /tmp/files.txt /tmp/allowed.txt > /tmp/unexpected.txt
+          test ! -s /tmp/unexpected.txt || { cat /tmp/unexpected.txt; exit 1; }
+
+      - name: Prove frozen Release 1 predicate inventory and generic owner
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const expected = {
+            'tcg-card-pass-2-astral.md': 2,
+            'tcg-card-pass-2-ember.md': 2,
+            'tcg-card-pass-2-gale.md': 2,
+            'tcg-card-pass-2-grove.md': 0,
+            'tcg-card-pass-2-shade.md': 1,
+            'tcg-card-pass-2-stone.md': 0,
+            'tcg-card-pass-2-tide.md': 1,
+            'tcg-card-pass-2-volt.md': 0,
+          };
+          const needle = '"predicate":"event_action_kind_is"';
+          let total = 0;
+          for (const [file, want] of Object.entries(expected)) {
+            const source = fs.readFileSync(file, 'utf8');
+            const got = source.split(needle).length - 1;
+            if (got !== want) throw new Error(`${file}: expected ${want} event_action_kind_is uses, got ${got}`);
+            total += got;
+          }
+          if (total !== 8) throw new Error(`expected exactly 8 Release 1 event_action_kind_is uses, got ${total}`);
+
+          const owner = fs.readFileSync('supabase/functions/_shared/tcg-match-event-listener-v0-2.ts', 'utf8');
+          const exact = 'case "event_action_kind_is":\n      return event.action_kind === String(value.action_kind || "");';
+          if (!owner.includes(exact)) throw new Error('generic event_action_kind_is evaluator branch missing');
+          NODE
+
+      - name: Materialize exact predicate classification
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('tcg-runtime-capabilities-v0.2.json')
+          source = path.read_text()
+          predicate = 'event_action_kind_is'
+          implemented_anchor = '      "defeat_history_count_at_least",\n'
+          implemented_line = f'      "{predicate}",\n'
+          missing_line = f'      "{predicate}",\n'
+          already_implemented = implemented_anchor + implemented_line in source
+          still_missing = missing_line in source[source.index('    "missing": [', source.index('  "predicates":')):]
+          if already_implemented and not still_missing:
+              pass
+          else:
+              if source.count(implemented_anchor) != 1:
+                  raise SystemExit('event_action_kind_implemented_anchor_changed')
+              predicates_start = source.index('  "predicates":')
+              missing_start = source.index('    "missing": [', predicates_start)
+              missing_index = source.index(missing_line, missing_start)
+              if missing_index < 0:
+                  raise SystemExit('event_action_kind_missing_anchor_changed')
+              source = source.replace(implemented_anchor, implemented_anchor + implemented_line, 1)
+              source = source[:missing_index] + source[missing_index + len(missing_line):]
+          path.write_text(source)
+          PY
+
+      - name: Prove one classification and capability contract
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const c = JSON.parse(fs.readFileSync('tcg-runtime-capabilities-v0.2.json','utf8'));
+          const p = 'event_action_kind_is';
+          if ((c.predicates.implemented || []).filter(x => x === p).length !== 1) throw new Error('predicate must be implemented exactly once');
+          if ((c.predicates.partial || []).includes(p)) throw new Error('predicate remained partial');
+          if ((c.predicates.missing || []).includes(p)) throw new Error('predicate remained missing');
+          NODE
+          node --test tcg/tests/card-pass-2-runtime-capabilities.test.mjs
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Execute generic movement/event listener owner
+        run: deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-movement-listener.test.ts
+
+      - name: Type-check Event Listener owner
+        run: deno check supabase/functions/_shared/tcg-match-event-listener-v0-2.ts
+
+      - name: Commit tested predicate correction
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git diff --name-only)" = "tcg-runtime-capabilities-v0.2.json"
+          git config user.name "Stream Bandit RC-02c2 verifier"
+          git config user.email "actions@users.noreply.github.com"
+          git add tcg-runtime-capabilities-v0.2.json
+          git commit -m "chore(tcg): classify event action-kind predicate implemented"
+          git push origin HEAD:repair/tcg-rc02c2-event-action-kind-355c23e
