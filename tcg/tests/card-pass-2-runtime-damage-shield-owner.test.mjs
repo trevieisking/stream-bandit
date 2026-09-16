@@ -10,6 +10,14 @@ const runtimeCore = fs.readFileSync(
   path.join(root, 'supabase', 'functions', 'tcg-tactic-actions', 'runtime-v0-2-core.ts'),
   'utf8',
 );
+const attackDamageOwner = fs.readFileSync(
+  path.join(root, 'supabase', 'functions', '_shared', 'tcg-match-attack-damage-v0-2.ts'),
+  'utf8',
+);
+const matchActions = fs.readFileSync(
+  path.join(root, 'supabase', 'functions', 'tcg-match-actions', 'index.ts'),
+  'utf8',
+);
 const grammar = JSON.parse(
   fs.readFileSync(path.join(root, 'tcg-card-pass-2-effect-grammar-v0.2.json'), 'utf8'),
 );
@@ -70,4 +78,19 @@ test('DRAIN_VITALITY remains one generic grammar operation for the later owner w
   const contract = grammar.operations.DRAIN_VITALITY;
   assert.deepEqual(contract.required, ['target', 'amount']);
   assert.deepEqual(contract.optional, ['heal_target', 'heal_cap', 'as']);
+});
+
+test('live attack damage delegates temporary reductions to Damage/Protection owner #20 before Shield', () => {
+  assert.match(attackDamageOwner, /from "\.\/tcg-match-damage-protection-v0-2\.ts"/);
+  assert.ok(attackDamageOwner.includes('runtimeV02ApplyDamageProtections(target, value, {'));
+  assert.ok(attackDamageOwner.includes('damage_class: "attack"'));
+  assert.ok(attackDamageOwner.includes('tcg_v0_2_attack_damage_protection_context_required'));
+  const protectionIndex = attackDamageOwner.indexOf('runtimeV02ApplyDamageProtections(target, value, {');
+  const shieldIndex = attackDamageOwner.indexOf('// Shield is consumed by the match owner immediately after this resolver returns.');
+  assert.ok(protectionIndex >= 0 && shieldIndex > protectionIndex, 'stored protection must resolve before Shield');
+  assert.match(
+    matchActions,
+    /source_controller_seat:seat as 1\|2,target_controller_seat:targetSeat as 1\|2,target_creature_uid:targetCreatureUid,packet_id:attackActionId/,
+    'live attack dispatcher must supply exact packet and battlefield identity to Damage/Protection',
+  );
 });

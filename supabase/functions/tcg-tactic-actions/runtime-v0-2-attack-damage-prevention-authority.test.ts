@@ -8,6 +8,7 @@ import {
   structuredRuntimeIncomingAttackDamage,
   type RuntimeAttackDamageContext,
 } from "../_shared/tcg-match-attack-damage-v0-2.ts";
+import { runtimeV02DamageProtectionCount, runtimeV02InstallDamageProtection } from "../_shared/tcg-match-damage-protection-v0-2.ts";
 import { runtimeV02SnapshotMarker } from "../_shared/tcg-runtime-registry-v0-2.ts";
 
 function assertEquals(actual: unknown, expected: unknown, message = "values differ") {
@@ -131,6 +132,36 @@ function state(options: { relic?: boolean; shield?: number; abilityLimit?: unkno
 function sourceCreature(s: Record<string, unknown>) {
   return (s.players as any)["1"].vanguard as any;
 }
+
+function installStoredAttackProtection(s: Record<string, unknown>) {
+  const target = sourceCreature(s);
+  runtimeV02InstallDamageProtection(target, {
+    protection_id: "mountain-warden:7:citadelhorn-source",
+    source_action_id: "mountain-warden",
+    source_uid: "warden-source",
+    source_card_id: "stone-crowncrag-mountain-warden",
+    source_kind: "ability",
+    source_controller_seat: 1,
+    target_controller_seat: 1,
+    target_creature_uid: "citadelhorn-source",
+    installed_turn_seq: 7,
+    damage_classes: ["attack"],
+    source_controller: "opponent",
+    reduce_amount: 40,
+    minimum: 0,
+    max_uses: 1,
+    expires_on: "start_of_controller_next_turn",
+  });
+  return target;
+}
+
+const storedAttackContext: RuntimeAttackDamageContext = {
+  ...attackContext,
+  source_controller_seat: 2,
+  target_controller_seat: 1,
+  target_creature_uid: "citadelhorn-source",
+  packet_id: "attack:7:2:test:citadelhorn-source",
+};
 
 function legacy() {
   return {
@@ -317,4 +348,36 @@ Deno.test("Bastion Quake does not treat self-sourced prevention as previous-oppo
   const authority = resolveRuntimeAttackAuthority(s, source, 1, legacy());
   if (!authority) throw new Error("Bastion Quake authority required");
   assertEquals(evaluateRuntimeAttackReadyConditionalAddFormula(authority, evaluationContext())?.damage, 150);
+});
+
+
+Deno.test("stored active-Ability attack protection is consumed by the live incoming attack boundary", () => {
+  const s = state({ relic: false });
+  const target = installStoredAttackProtection(s);
+  assertEquals(structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, storedAttackContext), 60);
+  assertEquals(runtimeV02DamageProtectionCount(target), 0, "successful prevention must consume the one use");
+  assertJsonEquals(runtimeV02CurrentTurnDamagePreventionEvents(s, source), [
+    { event: "damage_prevented", target: "source_creature", prevention_kind: "ability" },
+  ]);
+});
+
+Deno.test("zero incoming attack damage does not consume stored protection", () => {
+  const s = state({ relic: false });
+  const target = installStoredAttackProtection(s);
+  assertEquals(structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 0, storedAttackContext), 0);
+  assertEquals(runtimeV02DamageProtectionCount(target), 1);
+  assertJsonEquals(runtimeV02CurrentTurnDamagePreventionEvents(s, source), []);
+});
+
+Deno.test("stored attack protection fails closed without exact live packet identity", () => {
+  const s = state({ relic: false });
+  const target = installStoredAttackProtection(s);
+  let message = "";
+  try {
+    structuredRuntimeIncomingAttackDamage(s, { essence: [] }, target, 100, attackContext);
+  } catch (error) {
+    message = error instanceof Error ? error.message : String(error);
+  }
+  assertEquals(message, "tcg_v0_2_attack_damage_protection_context_required");
+  assertEquals(runtimeV02DamageProtectionCount(target), 1, "failed context must not consume protection");
 });
