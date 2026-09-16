@@ -1,7 +1,7 @@
 # Stream Bandit TCG — Canonical Release Master Plan
 
-**Canonical checkpoint:** 2026-09-16 — control synchronization after accepted RC-02c3  
-**Accepted gameplay/capability baseline:** `086840853f34add8ac610e1a9764dd0a728fb05d`  
+**Canonical checkpoint:** 2026-09-16 — control synchronization after accepted RC-02c4  
+**Accepted gameplay/capability baseline:** `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`  
 **Integration lane:** PR #549 — `feature/tcg-private-alpha-v0-5-source-recovery`  
 **Execution ledger:** `tcg-master-plan-ledger.md`
 
@@ -70,11 +70,11 @@ Fairy and Underworld design/audit documents are preserved as expansion authority
 
 Accepted gameplay/capability baseline immediately before this control synchronization:
 
-- PR #549 head: `086840853f34add8ac610e1a9764dd0a728fb05d`.
+- PR #549 head: `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`.
 - Current `main` base: `e0a71e1b292b45373f2c4ba658a4f346f5c1c84c`.
 - PR: open, draft, mergeable, unmerged.
-- Merge candidate at RC-02c3 acceptance fence: `90bbf857b6459856a8577c78067e9095934760a8`.
-- Exact-head workflows: TCG Card Pass 2 Validation #564 SUCCESS; Migration Replay #793 SUCCESS; Functional Smoke #819 SUCCESS, including independent PostgreSQL replay from zero.
+- Merge candidate at RC-02c4 acceptance fence: `6507f350fb0b398d3b211c281b4ca3a9abe23b02`.
+- Exact-head workflows: TCG Card Pass 2 Validation #566 SUCCESS; Migration Replay #795 SUCCESS; Functional Smoke #821 SUCCESS, including independent PostgreSQL replay from zero.
 - Review threads: 0.
 - Legacy combined commit statuses: none found; absence is not counted as a PASS.
 - Complete PR inventory at the accepted baseline: 394 files.
@@ -93,6 +93,8 @@ Accepted G3 reconciliation chain now recorded as current evidence:
 - **RC-02c2** — `event_action_kind_is` predicate classification reconciled `missing → implemented` at `34d54a0573c677377cd54e7158bf7779378200d2`; GitHub source-of-truth comment #5701734004.
 - **Control sync revision 3** — master plan + ledger synchronized and validated at `eefe4afc294489fbcbb637712a732e3857110b28`; GitHub source-of-truth comment #5701883152.
 - **RC-02c3** — `event_controller_is_opponent` predicate classification reconciled `missing → implemented` at `086840853f34add8ac610e1a9764dd0a728fb05d`; exactly two Release 1 uses, both Shade Event Listener requirements: Nightmaw — Dread Hunger and Eclipse Essence — Eclipse Condition Heal. Generic Event Listener positive/negative controller semantics are covered by the committed controller-predicate Deno suite. Exact-head gates #564/#793/#819 all SUCCESS. GitHub source-of-truth comment #5702012161.
+- **Control sync revision 4** — master plan + ledger synchronized and validated at `4fd1a10fda98b33822767755a6df600febd366de`; exact-head gates #565/#794/#820 all SUCCESS; GitHub source-of-truth comment #5702112552.
+- **RC-02c4** — `source_controller_is_self` predicate classification reconciled `missing → implemented` at `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`; exactly eight Release 1 uses across Astral 2 / Shade 2 / Tide 3 / Volt 1, all Event Listener requirements owned by #28. Exact focused tests prove self/opponent source-controller semantics and independence from affected-controller predicates. Exact-head gates #566/#795/#821 all SUCCESS. GitHub source-of-truth comment #5702217085.
 
 Audited classifications deliberately **not** changed:
 
@@ -231,7 +233,7 @@ Rollback/demotion trigger: auth/security regression, state corruption, hidden-in
 
 Do not skip ahead and do not start a second slice while a prior slice is unresolved.
 
-1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c3 and pass exact-head CI together.
+1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c4 and pass exact-head CI together.
 2. **Continue RC-02 capability/owner closeout only** — one Release 1-used operation/predicate or one proven owner defect at a time.
 3. **After every accepted RC-02 slice, synchronize both control files and validate that control commit before choosing another slice.**
 4. **Close G3** only when the 193-card Release 1 inventory is fully reconciled against accepted owners/capabilities.
@@ -274,6 +276,6 @@ Old comments, old percentages, old capability labels, old branch state or a late
 
 Release gates: **G0 ✅ | G1 ✅ | G2 ✅ | G3 🔎 | G4 🔎 (execution hold until G3 closes) | G5 ☐ | G6 ☐ | G7 ☐**
 
-Current G3 control checkpoint: **RC-02b1 ✅ | RC-02b2a ✅ | RC-02b2b ✅ | RC-02b2 ✅ | RC-02c1 ✅ | RC-02c2 ✅ | RC-02c3 ✅ | next RC-02 slice blocked until this plan/ledger synchronization passes exact-head CI 🔒**
+Current G3 control checkpoint: **RC-02b1 ✅ | RC-02b2a ✅ | RC-02b2b ✅ | RC-02b2 ✅ | RC-02c1 ✅ | RC-02c2 ✅ | RC-02c3 ✅ | RC-02c4 ✅ | next RC-02 slice blocked until this plan/ledger synchronization passes exact-head CI 🔒**
 
 This is the only release progress meter. It deliberately does not translate the eight gates into a misleading implementation percentage.
