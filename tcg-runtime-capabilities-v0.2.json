@@ -93,6 +93,7 @@
       "attached_essence_distinct_element_count_at_least",
       "damage_history_count_at_least",
       "defeat_history_count_at_least",
+      "event_action_kind_is",
       "event_attack_source_is_self"
     ],
     "partial": [
@@ -124,7 +125,6 @@
       "essence_move_element_is",
       "essence_move_source_is_attached_creature",
       "essence_move_source_is_self",
-      "event_action_kind_is",
       "event_active_seat_is_controller",
       "event_attachment_kind_is",
       "event_attachment_target_is_source",
