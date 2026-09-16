@@ -1,7 +1,8 @@
 # Stream Bandit TCG — Master Plan Owner / Repair Ledger
 
 **Plan authority:** `tcg-master-plan-progress.md`  
-**Ledger revision:** 2 — 2026-09-16  
+**Ledger revision:** 3 — 2026-09-16  
+**Accepted gameplay/capability baseline:** `34d54a0573c677377cd54e7158bf7779378200d2`  
 **Baseline owner count:** 40 families  
 **Release lane:** PR #549
 
@@ -15,6 +16,8 @@
 - `⏭` = intentionally post-release and must not block Release 1.
 - A `✅` row is reopened only under the master-plan reopen rules.
 - Every repair must append an evidence entry under **Repair / promotion log**.
+- **Anti-drift control:** after any accepted implementation/classification/deployment slice, do not begin the next slice until both this ledger and `tcg-master-plan-progress.md` contain that accepted evidence and next allowed operation, and the resulting documentation/control commit has passed the exact-head GitHub fence.
+- `LOG` therefore means: append exact evidence here, synchronize the master plan, validate the control commit, then continue.
 
 ## 40 owner families — Release 1 reconciliation
 
@@ -33,25 +36,25 @@
 | 11 | Turn / Phase / Resolution Engine | `_shared/tcg-match-flow-engine-v0-2.ts`, `flow-turn`, `flow-resolution` | ✅ | Controllers request transitions; do not reintroduce competing direct phase/active-seat ownership. |
 | 12 | RNG Engine | `_shared/tcg-match-randomization-engine-v0-2.ts` | ✅ | RNG chooses randomness only; downstream owners apply movement/result. |
 | 13 | Creature / Evolution Engine | `_shared/tcg-match-creature-engine-v0-2.ts` | ✅ | Placement/evolution/defeat-related creature mutation stays here; callers sequence only. |
-| 14 | Attack Engine | `_shared/tcg-match-attack-*` family | 🔎 | Current dispatcher still contains legacy printed-attack/card-ID fallback code. Release criterion is not “delete every legacy line”; prove marked v0.2 launch matches resolve structured attack metadata and cannot select legacy fallback for the 193-card roster. Reconcile capability manifest and add/retain source-contract guard. |
-| 15 | Active Ability Engine | `_shared/tcg-match-active-ability-*` family + unified live route | ✅ | Unified dispatcher accepted at prior exact head. New Ability forms extend this family; no card-specific dispatcher branches. |
-| 16 | Tactic Engine | `tcg-tactic-actions/index.ts` + structured grammar | ✅ | Owner/source accepted. Production source parity is tracked under release-control RC-03, not reopened as an engine rewrite. |
+| 14 | Attack Engine | `_shared/tcg-match-attack-*` family | 🔎 | RC-02b1 and RC-02b2a accepted canonical attack-modifier consumption/production ownership. Remaining Release 1 closeout is broader: prove marked v0.2 launch attacks resolve structured attack metadata and cannot select legacy printed-English/card-ID fallback for the 193-card roster. Keep exact source-contract guards. |
+| 15 | Active Ability Engine | `_shared/tcg-match-active-ability-*` family + unified live route | ✅ | RC-02b2 accepted the generic selected-modifier private-choice family with no card-ID routing. Ash Crown delegates to Attack #14; Mountain Warden delegates to Damage/Protection #20. New Ability forms extend this family only. |
+| 16 | Tactic Engine | `tcg-tactic-actions/index.ts` + structured grammar | ✅ | Owner/source accepted. Production source parity is tracked under RC-03, not reopened as an engine rewrite. |
 | 17 | Relic Engine | `_shared/tcg-match-relic-engine-v0-2.ts` | ✅ | Relic attach/replace lifecycle remains here. |
 | 18 | Realm Engine | `_shared/tcg-match-realm-engine-v0-2.ts`, realm route/replaced-event owners | ✅ | Realm play/replace and replacement event stay in this family. |
 | 19 | Condition Engine | `_shared/tcg-match-condition-engine-v0-2.ts` + lifecycle/protection owners | ✅ | New condition semantics extend this owner. |
-| 20 | Damage / Shield Engine | `_shared/tcg-match-damage-*` family + protection/packet owners | 🔎 | Dispatcher/core still expose direct damage/shield adapters. Prove marked Release 1 effects route through canonical damage/packet/protection ownership; direct helpers may remain only as adapters/legacy compatibility. Update capability labels from tests. |
-| 21 | Heal Engine | `_shared/tcg-match-heal-*` packet/before/listener family | 🔎 | Prove all marked Release 1 healing that must emit/listen to heal packets uses canonical packet/listener flow. Raw heal helper must not bypass required listener semantics on marked launch paths. |
+| 20 | Damage / Shield Engine | `_shared/tcg-match-damage-*` family + protection/packet owners | 🔎 | RC-02b2b accepted ordinary attack-damage delegation into stored Damage/Protection before Shield, and RC-02b2 can install Mountain Warden generically. Broader closeout remains: prove every marked Release 1 damage/protection/packet shape routes through canonical ownership; direct helpers may remain only as adapters/legacy compatibility. |
+| 21 | Heal Engine | `_shared/tcg-match-heal-*` packet/before/listener family | 🔎 | Tactic and attack-wide HEAL/HEAL_EACH owners exist, but `HEAL_EACH` remains partial because First Canopy uses a selected-target family not yet proven equivalent. Prove all marked Release 1 healing that requires heal-packet/listener semantics before reclassifying. |
 | 22 | Essence Attachment Engine | `_shared/tcg-match-essence-attachment-*` family | ✅ | Physical attachment uses one transaction path; no structured competing mutation. |
 | 23 | Essence Movement Engine | `_shared/tcg-match-essence-movement-v0-2.ts` | ✅ | Movement listeners/tactics delegate physical transfer here. |
 | 24 | Essence Query / Selection Engine | `_shared/tcg-match-essence-query-v0-2.ts` | ✅ | Query/selection is non-mutating; movement/attachment remains with their owners. |
 | 25 | Cost Engine | action/ability/payment cost owners + withdrawal cost owner | ✅ | Cost computes legality/value; it does not consume resources. |
 | 26 | Payment Engine | `_shared/tcg-match-payment-*` family | ✅ | Payment consumes resources only after preflight. No caller-owned splice/discard payment path. |
 | 27 | Atomic Switch / Battlefield Position Engine | `_shared/tcg-match-switch-context-v0-2.ts` | ✅ | Vanguard/Reserve position mutation and switch context live here. |
-| 28 | Generic Event Listener Engine | `_shared/tcg-match-event-listener-*` family | ✅ | Listener engine orchestrates predicates/actions; nested mechanic mutation delegates to mechanic owner. |
-| 29 | Movement Listener Engine | `_shared/tcg-match-movement-listener-v0-2.ts` | ✅ | Listener continuation only; physical movement delegates. |
+| 28 | Generic Event Listener Engine | `_shared/tcg-match-event-listener-*` family | ✅ | RC-02c2 accepted generic `event_action_kind_is` Release 1 predicate coverage. Listener engine orchestrates predicates/actions; nested mechanic mutation delegates to mechanic owners. |
+| 29 | Movement Listener Engine | `_shared/tcg-match-movement-listener-v0-2.ts` | ✅ | Listener continuation only; physical movement delegates. RC-02c2 runtime proof exercised the real `voluntary_withdrawal` action-kind case through this path. |
 | 30 | Card-Zone / Draw / Shuffle / Discard Engine | `_shared/tcg-match-card-zone-engine-v0-2.ts` | ✅ | Own physical card-instance movement/order. RNG chooses random order; Hidden Information controls views. |
-| 31 | Card Search / Filter / Inspection Engine | specialized structured query/inspection owners + Card-Zone for mutation | 🔎 | Audit Release 1 search/inspection call sites. If they are non-mutating specialized queries, keep them in their domain owner. Any physical move after search must use Card-Zone. Create a new generic submodule only if exact duplicate search semantics are proven; do not invent owner #41. |
-| 32 | Reward Card Engine (in-match) | reward inspection + Card-Zone take/transfer ownership | ✅ | Reward inspection/choice and physical take remain separated; match-end economy reward is owner #36. |
+| 31 | Card Search / Filter / Inspection Engine | specialized structured query/inspection owners + Card-Zone for mutation | 🔎 | `INSPECT_ZONE` deliberately remains `missing`: current Reward inspection is bounded and does not prove generic zone-inspection parity. Audit Release 1 search/inspection call sites; any physical move after search must use Card-Zone. Do not invent owner #41. |
+| 32 | Reward Card Engine (in-match) | reward inspection + Card-Zone take/transfer ownership | ✅ | Reward inspection/choice and physical take remain separated; bounded Reward inspection must not be misreported as generic `INSPECT_ZONE`. Match-end economy reward is owner #36. |
 | 33 | Hidden Information / Private Visibility Engine | `_shared/tcg-match-hidden-information-v0-2.ts` + private views | ✅ | Two-user E2E must verify no opponent hidden data leak. |
 | 34 | Defeat / Match-End Engine | `_shared/tcg-match-defeat-*` + terminal Match Flow + commit completion | ✅ | Defeat determines battle lifecycle; SQL commit persists terminal result/reward receipt. No duplicate winner authority. |
 | 35 | Economy / Currency Ledger | player profile balances + server reward path | ✅ | For Release 1, match rewards are the only required currency writer. Before Shop/Trade/Pack spending launches, establish their transaction paths through this owner rather than direct balance updates. |
@@ -67,24 +70,24 @@ These rows are the only current cross-owner Release 1 closeout tasks. They preve
 
 | ID | Defect / gap | Exact fix/process | Acceptance evidence | State |
 |---|---|---|---|---|
-| RC-01 | Planning authority drift | Keep `tcg-master-plan-progress.md`, this ledger, PR description and element-package authority aligned on 8 / 193 / 8; Fairy/Underworld post-release. Older contradictory comments remain history only. | Exact doc diff + current package manifest | 🔎 current reconciliation |
-| RC-02 | Capability inventory is historical/stale relative to later owner work | Reconcile `tcg-runtime-capabilities-v0.2.json` against current source and exact tests. For each partial/missing op/predicate, first prove whether the 193-card launch roster uses it. Implement only launch-used gaps; move unused shapes to post-release debt. | Capability test + TCG Card Pass + owner source-contract tests | ☐ |
-| RC-03 | Production Edge source parity incomplete/uncertain | For all 3 TCG functions, pin accepted PR head, collect exact dependency closure, hash/identify files, compare readback, deploy only exact source where different, preserve JWT. Do not hand-copy shared engine graph. | Supabase deployed version/source readback + exact GitHub source identity | ☐ |
-| RC-04 | Real two-user production journey not yet proven | Execute the 20-step G5 journey. Every defect must cite one owner row and reproduction. | two users, full match complete, private views correct, exactly-once rewards/XP/currency | ☐ |
-| RC-05 | Final release fence not yet assembled at one head | Refresh PR metadata, changed files, review threads, exact-head workflows, DB parity, Edge parity and E2E at one immutable SHA. | all G0-G6 green at same head | ☐ |
-| RC-06 | Merge/live not yet performed | Merge only after RC-05; verify live source; run compact live smoke; record production identities. | merged SHA + live smoke + final ledger checkpoint | ☐ |
+| RC-01 | Planning authority drift | Keep `tcg-master-plan-progress.md`, this ledger, PR description and element-package authority aligned on 8 / 193 / 8; Fairy/Underworld post-release. After every accepted slice synchronize both control files and validate the sync commit before any next slice. | Exact 2-file control diff + current package manifest + exact-head CI | ✅ synchronized by ledger revision 3 once this control commit is accepted |
+| RC-02 | Capability inventory is historical/stale relative to later owner work | Reconcile `tcg-runtime-capabilities-v0.2.json` one Release 1-used shape at a time. Accepted so far: b1, b2a, b2b, b2, c1, c2. Preserve audited non-changes instead of re-discovering them. Continue only after this control sync passes CI. | Capability test + owner tests + TCG Card Pass + exact-head Migration/Smoke + synchronized log | 🔎 in progress |
+| RC-03 | Production Edge source parity incomplete/uncertain | After G3 closes, pin one accepted-and-synchronized head, collect exact dependency closure for all 3 TCG functions, compare/deploy/read back exact source, preserve JWT. Do not hand-copy shared engine graph. | Supabase deployed version/source readback + exact GitHub source identity | ☐ execution hold until G3 closes |
+| RC-04 | Real two-user production journey not yet proven | Execute the 20-step G5 journey after Edge parity. Every defect must cite one owner row and reproduction. | two users, full match complete, private views correct, exactly-once rewards/XP/currency | ☐ |
+| RC-05 | Final release fence not yet assembled at one head | Refresh PR metadata, changed files, review threads, exact-head workflows, DB parity, Edge parity and E2E at one immutable SHA. | all G0-G6 green at same synchronized head | ☐ |
+| RC-06 | Merge/live not yet performed | Merge only after RC-05; verify live source; run compact live smoke; record production identities. | merged SHA + live smoke + final plan/ledger checkpoint | ☐ |
 
 ## Standard repair transaction
 
 Every future defect uses one transaction:
 
-1. **PROVE** — exact head/environment/reproduction.
+1. **PROVE** — exact accepted-and-synchronized head/environment/reproduction.
 2. **OWNER** — choose one existing owner row.
 3. **PATCH** — smallest generic owner change; no unrelated cleanup.
 4. **TEST** — owner tests plus affected release gates.
 5. **ACCEPT** — exact diff/head review and promotion decision.
 6. **DEPLOY** — only if production parity is part of that accepted slice.
-7. **LOG** — append evidence below and update only the affected row/task.
+7. **LOG** — append exact evidence below, synchronize `tcg-master-plan-progress.md`, validate the documentation/control commit, and only then choose the next slice.
 
 If a problem cannot be assigned to a current owner, first prove that it is a distinct mechanic. Until that proof exists, do not create owner #41.
 
@@ -108,4 +111,77 @@ Reconciliation decisions:
 - capability manifest must be reconciled before it can be used as current runtime completeness evidence.
 - production parity and real two-user E2E remain genuine release blockers.
 
-Next allowed operation: **RC-02 capability/owner closeout only.** Do not start Fairy/Underworld or post-release product systems and do not merge/live-promote until later release gates authorize them.
+### 2026-09-16 — RC-02 accepted owner/capability sequence through c2
+
+Accepted exact-head chain:
+
+1. **RC-02b1 — Attack modifier live consumer connection**  
+   Accepted head: `da87b4c6e212317e38492f23c707c5862df13ffa`.  
+   Precise fix: canonical Attack #14 modifiers are applied at legal attack declaration, bound riders flush through the accepted effect path, and end-of-turn expiry is connected. Historical guard assertions were updated only where source-order assumptions changed.  
+   Result: Attack modifier owner is live in Match Actions; merge/main/production remained HOLD.
+
+2. **RC-02b2a — canonical attack-modifier producer ownership**  
+   Accepted head: `ea5f07b5941abc982c051d9deeedcbd41435674a`.  
+   Precise fix: legacy structured producers that wrote incompatible modifier records now delegate to Attack #14; the old Surge reader is prevented from double-counting canonical reusable modifiers.  
+   Result: one record schema/owner for structured attack modifiers; no card-ID special cases.
+
+3. **RC-02b2b — attack damage → Damage/Protection connection**  
+   Accepted head: `974a6edb66e8821ae7e3543ebd31bfa492c9449a`.  
+   Precise fix: ordinary live attack damage now consults canonical stored temporary Damage/Protection before Shield while preserving exact action/seat/target context.  
+   Result: Mountain Warden-style protection can be installed by the owner and actually consumed on positive prevented attack damage.
+
+4. **RC-02b2 — generic selected-modifier Active-Ability family**  
+   Accepted head: `29d92a7bb9df9385630ae9d8df67ef069a6e1eaa`.  
+   Precise fix: one card-ID-free private-choice family recognizes `SELECT_CREATURE → modifier` programs, reuses existing once-per-turn/choice receipts, revalidates stale targets on resolve, and delegates mutation to the canonical owner.  
+   Launch proof: Ash Crown → Attack #14; Mountain Warden → Damage/Protection #20.  
+   Exact-head gates: Card Pass #558, Migration #787, Smoke #813 SUCCESS.
+
+5. **RC-02c1 — incoming attack modifier capability classification**  
+   Accepted head: `355c23ed611f8c15ec3348a86ae02e1fdd162173`.  
+   Precise fix: `ADD_INCOMING_ATTACK_DAMAGE_MODIFIER` moved `missing → implemented` only after RC-02b2 proved the generic owner path.  
+   No runtime/card/rule/migration/production change.  
+   Exact-head gates: Card Pass #559, Migration #788, Smoke #814 SUCCESS.  
+   GitHub accepted checkpoint: comment #5701246613.
+
+6. **RC-02c2 — event action-kind predicate classification**  
+   Accepted head: `34d54a0573c677377cd54e7158bf7779378200d2`.  
+   Precise fix: `event_action_kind_is` moved `missing → implemented`.  
+   Release 1 inventory proof: 8 accepted uses across Astral, Ember, Gale, Shade and Tide; all are listener/trigger requirements.  
+   Generic owner proof: Event Listener requirement evaluator compares current event action kind; real movement/event-listener runtime suite executes the `voluntary_withdrawal` case.  
+   No runtime/card/rule/migration/production change.  
+   Exact-head gates: Card Pass #560, Migration #789, Smoke #815 SUCCESS.  
+   GitHub accepted checkpoint: comment #5701734004.
+
+### 2026-09-16 — audited capability non-changes
+
+These were explicitly audited and must not be rediscovered as if no decision exists:
+
+- **`INSPECT_ZONE` stays `missing`.** Current Reward inspection ownership is intentionally bounded. Existing Reward-card inspection does not prove generic `INSPECT_ZONE` grammar/runtime parity. Reopen only if a Release 1 generic inspection shape is proven and bound to owner #31/#32.
+- **`HEAL_EACH` stays `partial`.** Accepted tactic `HEAL_EACH` and attack-wide `HEAL_EACH` owners exist, but First Canopy adds a distinct selected-target shape (`SELECT_CREATURE` for 0–2 damaged field targets → `HEAL_EACH targets:$canopy_targets`). Do not classify implemented until that Release 1 family is proven through canonical Heal ownership.
+
+### 2026-09-16 — unrelated `main` advance reconciled
+
+During the RC-02c2 promotion fence, `main` advanced:
+
+- old observed base: `39943d5fe5090cd0c140d7706092874dc98d2530`
+- current base: `e0a71e1b292b45373f2c4ba658a4f346f5c1c84c`
+
+The new base commit is **Revert unsafe Buddy Canvas Quick Writer V244 sync** and changes only:
+
+- `code-labs/assets/buddy-canvas-assistant-sync-v124.js`
+
+It contains no TCG runtime, migration, Supabase function, capability manifest, master-plan or ledger change. GitHub recalculated PR #549 as mergeable, and RC-02c2 then passed fresh Card Pass #560, Migration #789 and Smoke #815 against the current base. Record this as unrelated repository drift, not a TCG defect.
+
+### 2026-09-16 — Ledger revision 3 control synchronization
+
+Purpose: close the bookkeeping gap that allowed accepted RC-02 work to outrun the canonical plan/ledger.
+
+This revision synchronizes:
+- accepted baseline through RC-02c2 at `34d54a0573c677377cd54e7158bf7779378200d2`;
+- owner rows #14, #15, #20, #21, #28, #29, #31 and #32 with current accepted evidence;
+- RC-01 anti-drift control;
+- RC-02 accepted sub-slice chain and audited non-changes;
+- unrelated current `main` base advance;
+- next allowed operation.
+
+**Next allowed operation after this two-file control commit itself passes exact-head Card Pass / Migration / Smoke and review/status fence:** continue **RC-02 capability/owner closeout only**, one Release 1-used shape at a time, starting from the synchronized head. Do not begin G4, Fairy/Underworld or post-release product systems yet.
