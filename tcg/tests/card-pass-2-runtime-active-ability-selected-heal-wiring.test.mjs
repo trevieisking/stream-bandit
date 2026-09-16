@@ -103,7 +103,8 @@ test('live match owner routes Reward and selected-heal active Abilities through 
   const useAbility = blockBetween(match, 'if(action==="use_ability")', 'if(action==="play_creature")');
   const resolveAbility = blockBetween(match, 'if(action==="resolve_ability_choice")', 'if(action==="take_reward")');
   assert.ok(match.includes('tcg-match-active-ability-live-v0-2.ts'));
-  assert.ok(useAbility.includes('runtimeV02CreateActiveAbilityLiveChoice('));
+  assert.ok(match.includes('tcg-match-active-ability-live-route-v0-2.ts'));
+  assert.ok(useAbility.includes('runtimeV02BeginActiveAbilityLiveRoute('));
   assert.ok(useAbility.includes('runtimeV02PendingActiveAbilityLiveChoiceView('));
   assert.ok(resolveAbility.includes('runtimeV02ResolveActiveAbilityLiveChoice('));
   assert.ok(resolveAbility.includes('resolved.kind==="heal_one_damaged_friendly_creature"'));

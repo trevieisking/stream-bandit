@@ -77,12 +77,12 @@ test('frozen Set One inventory has exactly one active Ability in the one-Reward 
 });
 
 test('match owner exposes one generic use_ability boundary after the active-player play gate', () => {
-  assert.ok(match.includes('runtimeV02CreateActiveAbilityLiveChoice'));
+  assert.ok(match.includes('runtimeV02BeginActiveAbilityLiveRoute'));
   assert.ok(match.includes('runtimeV02PendingActiveAbilityLiveChoiceView'));
   assertInOrder(match, [
     'if(s.phase!=="play"||Number(s.active_seat)!==seat)',
     'if(action==="use_ability")',
-    'runtimeV02CreateActiveAbilityLiveChoice(',
+    'runtimeV02BeginActiveAbilityLiveRoute(',
     's.pending_ability_choice=pending',
     's.phase="ability_effect_resolution"',
   ], 'active Ability activation lifecycle');
@@ -100,7 +100,7 @@ test('match owner exposes one generic use_ability boundary after the active-play
 });
 
 test('pending active Ability choice is viewer-owned and public activation receipt contains no Reward identity', () => {
-  assert.ok(match.includes('pending_ability_choice:runtimeV02PendingActiveAbilityLiveChoiceView(s.pending_ability_choice||null,viewerSeat as 1|2)'));
+  assert.ok(match.includes('pending_ability_choice:(s.pending_ability_choice?.kind==="select_one_opposing_creature"?runtimeV02PendingTargetedDrainActiveAbilityChoiceView(s.pending_ability_choice,viewerSeat as 1|2):runtimeV02PendingActiveAbilityLiveChoiceView(s.pending_ability_choice||null,viewerSeat as 1|2))'));
   assert.ok(activeLive.includes('return runtimeV02PendingActiveAbilityChoiceView(choice, viewerSeat)'));
   assert.equal(match.includes('runtime_active_ability_limits_v0_2'), false, 'private active Ability limit ledger must not be serialized by match view');
   const start = match.indexOf('if(action==="use_ability")');
