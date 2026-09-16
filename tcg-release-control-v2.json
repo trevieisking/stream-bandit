@@ -1,0 +1,46 @@
+{
+  "schema": "stream-bandit-tcg-release-control-v2",
+  "recorded_at": "2026-09-16",
+  "purpose": "Non-self-referential control record for the post-private-alpha ten-family battle-client and card-visual programme.",
+  "authority": {
+    "desired_behavior": "tcg-master-plan-progress-v2.md",
+    "audit_history": "tcg-master-plan-ledger-v2.md",
+    "battle_interaction": "tcg-battle-client-interaction-v1.json",
+    "card_visual_printing": "tcg-card-visual-printing-v1.json",
+    "ten_deck_blueprint": "tcg-ten-deck-product-blueprint-v1.json",
+    "historical_private_alpha_control": "tcg-release-control-v1.json",
+    "source_truth": "GitHub exact branch/PR/commit evidence and canonical TCG checkpoint comments",
+    "live_truth": "Supabase project xzxqfrvqdgkzwujbkdbk"
+  },
+  "historical_baseline": {
+    "main_sha": "bbde61a3dd50f93b64872a5bccfaec62e826be23",
+    "classification": "authenticated_private_alpha_test_baseline",
+    "elements": 8,
+    "structured_identities": 193,
+    "starter_decks": 8,
+    "owner_families": 40,
+    "note": "This remains historical live/source evidence and is not rewritten by V2 planning."
+  },
+  "v2_target": {
+    "elements": 10,
+    "element_families": ["Astral", "Ember", "Fairy", "Gale", "Grove", "Shade", "Stone", "Tide", "Underworld", "Volt"],
+    "starter_decks": 10,
+    "starter_deck_size": 60,
+    "structured_identity_total": "TBD_AFTER_COMPLETE_FAIRY_AND_UNDERWORLD_REGISTRIES",
+    "owner_families": 40,
+    "battle_client": "board_first_direct_manipulation",
+    "rarities": ["Basic", "Rare", "Extra Rare", "Mythic"],
+    "printing_finishes": ["Standard", "Shine", "Holo", "Full-Art Shine", "Alt-Art", "Signature Mythic"],
+    "artwork_on_every_printable_card": true
+  },
+  "change_policy": {
+    "no_false_live_claims": true,
+    "no_duplicate_browser_rules_engine": true,
+    "no_owner_41_without_proof": true,
+    "concept_art_is_not_rules_authority": true,
+    "structured_data_is_rules_authority": true,
+    "foil_or_alt_art_never_changes_gameplay_power": true,
+    "private_alpha_rollback_baseline_preserved": true
+  },
+  "next_operation": "Complete the exact ten-family structured card/deck inventory and normalize card presentation metadata before battle-client runtime implementation."
+}
