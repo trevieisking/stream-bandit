@@ -94,6 +94,7 @@
       "damage_history_count_at_least",
       "defeat_history_count_at_least",
       "event_action_kind_is",
+      "event_controller_is_opponent",
       "event_attack_source_is_self"
     ],
     "partial": [
@@ -139,7 +140,6 @@
       "event_condition_is",
       "event_condition_slot_is",
       "event_controller_is_active_seat",
-      "event_controller_is_opponent",
       "event_controller_is_self",
       "event_count_at_least",
       "event_destination_zone_is",
