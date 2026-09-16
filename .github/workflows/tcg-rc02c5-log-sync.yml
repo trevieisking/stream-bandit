@@ -17,139 +17,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Guard exact accepted parent and transport-only first commit
+      - name: Guard accepted base and transport-only scope
         env:
           BASE_SHA: af79a3c45db9a0c00406b44d1d0581aa1c8fb140
         run: |
-          test "$(git rev-parse HEAD^)" = "$BASE_SHA"
-          test "$(git diff --name-only "$BASE_SHA"...HEAD)" = ".github/workflows/tcg-rc02c5-log-sync.yml"
+          test "$(git merge-base HEAD "$BASE_SHA")" = "$BASE_SHA"
+          actual="$(git diff --name-only "$BASE_SHA"...HEAD | sort)"
+          expected="$(printf '%s\n' '.github/tcg-rc02c5-log-sync.py' '.github/workflows/tcg-rc02c5-log-sync.yml')"
+          test "$actual" = "$expected"
 
-      - name: Synchronize master plan and ledger through RC-02c5
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          plan_path = Path("tcg-master-plan-progress.md")
-          ledger_path = Path("tcg-master-plan-ledger.md")
-          plan = plan_path.read_text()
-          ledger = ledger_path.read_text()
-
-          def once(text, old, new, label):
-              count = text.count(old)
-              if count != 1:
-                  raise SystemExit(f"{label}: expected 1 anchor, found {count}")
-              return text.replace(old, new, 1)
-
-          # Master plan baseline and current evidence.
-          plan = once(
-              plan,
-              "**Canonical checkpoint:** 2026-09-16 — control synchronization after accepted RC-02c4  \n**Accepted gameplay/capability baseline:** `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`",
-              "**Canonical checkpoint:** 2026-09-16 — control synchronization after accepted RC-02c5  \n**Accepted gameplay/capability baseline:** `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`",
-              "plan header",
-          )
-          plan = once(plan, "- PR #549 head: `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`.", "- PR #549 head: `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`.", "plan head")
-          plan = once(plan, "- Merge candidate at RC-02c4 acceptance fence: `6507f350fb0b398d3b211c281b4ca3a9abe23b02`.", "- Merge candidate at RC-02c5 acceptance fence: `2550bbffa1816c003457abe4d1bd6e0696c9cf53`.", "plan merge candidate")
-          plan = once(plan, "- Exact-head workflows: TCG Card Pass 2 Validation #566 SUCCESS; Migration Replay #795 SUCCESS; Functional Smoke #821 SUCCESS, including independent PostgreSQL replay from zero.", "- Exact-head workflows: TCG Card Pass 2 Validation #568 SUCCESS; Migration Replay #797 SUCCESS; Functional Smoke #823 SUCCESS, including independent PostgreSQL replay from zero.", "plan workflows")
-          plan = once(plan, "- Complete PR inventory at the accepted baseline: 394 files.", "- Complete PR inventory at the accepted baseline: 395 files.", "plan inventory")
-
-          insert_marker = "\n\nAudited classifications deliberately **not** changed:"
-          insert_text = """
-- **Control sync revision 5** — master plan + ledger synchronized and validated at `fd8b3f155b44031a2681efd8988d13e2634a96f8`; exact-head gates #567/#796/#822 all SUCCESS; GitHub source-of-truth comment #5702311757.
-- **RC-02c5** — `event_attachment_kind_is` reconciled `missing → implemented` at `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`; exactly one Release 1 card uses the predicate: Volt Railhorn / Power Rail. Existing integration proves `temporary`; focused regression `runtime-v0-2-event-listener-attachment-kind.test.ts` proves `borrowed`, `temporary`, and nonmatching ordinary attachment semantics. Exact-head gates #568/#797/#823 all SUCCESS. GitHub source-of-truth comment #5702543035.
-"""
-          if "**RC-02c5**" in plan:
-              raise SystemExit("plan already contains RC-02c5")
-          plan = once(plan, insert_marker, "\n" + insert_text + insert_marker, "plan c5 insertion")
-
-          plan = once(
-              plan,
-              "\n\nRepository-drift note retained:",
-              "\n- `event_attachment_target_is_source` remains `missing`: Release 1 has four direct uses (Stone Gravibble, Stone Flintkin, Tide Puddlepip, Volt Railhorn). Essence-attached snapshot semantics are directly proven, but Flintkin uses `relic_attached` and the exact Event Listener continuation for that distinct launch path is not yet directly proven. Relic receipt ownership alone is insufficient to claim generic listener-predicate parity.\n\nRepository-drift note retained:",
-              "plan target-is-source non-change",
-          )
-          plan = once(plan, "1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c4 and pass exact-head CI together.", "1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c5 and pass exact-head CI together.", "plan locked order")
-          plan = once(
-              plan,
-              "| RC-02c4 ✅ | next RC-02 slice blocked until this revision-5 plan/ledger synchronization passes exact-head CI 🔒**",
-              "| RC-02c4 ✅ | RC-02c5 ✅ | next RC-02 slice blocked until this revision-6 plan/ledger synchronization passes exact-head CI 🔒**",
-              "plan progress",
-          )
-
-          # Ledger header and owner / task rows.
-          ledger = once(ledger, "**Ledger revision:** 5 — 2026-09-16  \n**Accepted gameplay/capability baseline:** `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`", "**Ledger revision:** 6 — 2026-09-16  \n**Accepted gameplay/capability baseline:** `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`", "ledger header")
-          ledger = once(
-              ledger,
-              "RC-02c4 accepted `source_controller_is_self` for eight launch uses across Astral, Shade, Tide and Volt, with direct positive/negative and mixed-controller regression proof. Listener actions still delegate mechanic mutation to mechanic owners.",
-              "RC-02c4 accepted `source_controller_is_self` for eight launch uses across Astral, Shade, Tide and Volt, with direct positive/negative and mixed-controller regression proof. RC-02c5 accepted `event_attachment_kind_is` for Volt Railhorn / Power Rail; temporary is integration-tested and a focused generic snapshot regression proves borrowed/temporary/ordinary discrimination. `event_attachment_target_is_source` remains missing because Flintkin's `relic_attached` listener continuation is not yet directly proven. Listener actions still delegate mechanic mutation to mechanic owners.",
-              "ledger owner 28",
-          )
-          ledger = once(ledger, "✅ synchronized through RC-02c4 once ledger revision 5 control commit is accepted", "✅ synchronized through RC-02c5 once ledger revision 6 control commit is accepted", "ledger RC01")
-          ledger = once(ledger, "Accepted so far: b1, b2a, b2b, b2, c1, c2, c3, c4.", "Accepted so far: b1, b2a, b2b, b2, c1, c2, c3, c4, c5.", "ledger RC02")
-          ledger = once(
-              ledger,
-              "\n\n### 2026-09-16 — unrelated `main` advance reconciled",
-              "\n- **`event_attachment_target_is_source` stays `missing`.** Release 1 has four direct uses: Stone Gravibble (`essence_attached`), Stone Flintkin (`relic_attached`), Tide Puddlepip (`essence_attached`) and Volt Railhorn (`essence_attached`). Essence snapshot handling is directly tested, but Flintkin's distinct `relic_attached` Event Listener continuation is not yet directly proven. Canonical Relic receipts alone do not prove the listener predicate path.\n\n### 2026-09-16 — unrelated `main` advance reconciled",
-              "ledger target-is-source non-change",
-          )
-
-          if "RC-02c5 attachment-kind predicate accepted" in ledger:
-              raise SystemExit("ledger already contains RC-02c5 log")
-          ledger += """
-
-### 2026-09-16 — RC-02c5 attachment-kind predicate accepted
-
-Accepted head: `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`.
-
-Precise reconciliation:
-- `event_attachment_kind_is`: **`missing → implemented`**.
-- owner: **#28 Generic Event Listener Engine / canonical essence-attachment eligibility snapshot**.
-- Release 1 direct-use proof: exactly one launch card — Volt Railhorn / Power Rail (`essence_attached`).
-- Power Rail accepts `temporary OR borrowed`; all other launch packages and Prismatic Founder contain zero direct uses.
-- existing Power Rail integration executes the `temporary` case.
-- new focused Deno regression `runtime-v0-2-event-listener-attachment-kind.test.ts` proves borrowed matches borrowed, borrowed does not match temporary, temporary matches temporary, and ordinary does not match borrowed.
-- a full roster audit found no Release 1 card/effect that creates a borrowed attachment; borrowed is retained as an accepted Power Rail alternative but now has direct generic predicate proof.
-- no runtime/card/rule/migration/production implementation changed.
-
-Explicit non-change:
-- `event_attachment_target_is_source` remains `missing` because Flintkin's `relic_attached` listener path is distinct from the directly tested Essence snapshot path and is not yet directly proven by the current Event Listener continuation tests.
-
-Exact-head evidence:
-- Card Pass #568 SUCCESS
-- Migration #797 SUCCESS, full zero-state replay
-- Smoke #823 SUCCESS, independent zero-state replay
-- review threads 0
-- combined statuses none found
-- complete PR inventory 395 files
-- GitHub source-of-truth comment #5702543035
-
-### 2026-09-16 — Ledger revision 6 control synchronization
-
-Purpose: complete mandatory `LOG` for RC-02c5 before any RC-02c6 audit.
-
-This revision synchronizes:
-- accepted baseline `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`;
-- owner #28 with accepted `event_attachment_kind_is` coverage;
-- the explicit `event_attachment_target_is_source` non-change tied to Flintkin's unproved `relic_attached` listener path;
-- RC-02 accepted chain through c5;
-- exact #568/#797/#823 evidence;
-- retained prior audited non-changes and repository/transport audit history;
-- next allowed operation.
-
-**Next allowed operation after this two-file control commit itself passes exact-head Card Pass / Migration / Smoke plus review/status fence:** continue **RC-02 capability/owner closeout only**, one Release 1-used shape at a time from the synchronized head. Do not begin G4, Fairy/Underworld or post-release product systems yet.
-"""
-
-          plan_path.write_text(plan)
-          ledger_path.write_text(ledger)
-          PY
+      - name: Apply synchronized control patch
+        run: python .github/tcg-rc02c5-log-sync.py
 
       - name: Commit final two-file synchronized tree and prove scope
         env:
           BASE_SHA: af79a3c45db9a0c00406b44d1d0581aa1c8fb140
         run: |
+          rm .github/tcg-rc02c5-log-sync.py
           rm .github/workflows/tcg-rc02c5-log-sync.yml
           git config user.name "Trevor"
           git config user.email "269324007+trevieisking@users.noreply.github.com"
-          git add tcg-master-plan-progress.md tcg-master-plan-ledger.md .github/workflows/tcg-rc02c5-log-sync.yml
+          git add -A
           git commit -m "docs(tcg): synchronize plan and ledger through RC-02c5"
           actual="$(git diff --name-only "$BASE_SHA"...HEAD | sort)"
           expected="$(printf '%s\n' 'tcg-master-plan-ledger.md' 'tcg-master-plan-progress.md')"
