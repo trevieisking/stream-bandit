@@ -1,27 +1,30 @@
 # Stream Bandit TCG — Canonical Release Master Plan
 
-**Canonical checkpoint:** 2026-09-16 — control synchronization after accepted RC-02c4  
-**Accepted gameplay/capability baseline:** `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`  
-**Integration lane:** PR #549 — `feature/tcg-private-alpha-v0-5-source-recovery`  
+**Canonical checkpoint:** 2026-09-16 — Release Control v1 / private-alpha baseline after accepted RC-02c5  
+**Accepted gameplay/capability baseline:** `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`  
+**Integration lane:** PR #549 — `feature/tcg-private-alpha-v0-5-source-recovery` → `main`  
+**Release control:** `tcg-release-control-v1.json`  
 **Execution ledger:** `tcg-master-plan-ledger.md`
 
 ## 0. Authority and anti-drift rule
 
-This file is the single current TCG release plan. The ledger is the execution/audit record for this plan. Older progress percentages, PR comments, checkpoint documents and prototype plans are historical evidence only when they conflict with this file at a newer accepted head.
+There are four distinct authorities; none may impersonate another:
 
-Authority order:
+1. **Desired behaviour:** this master plan defines Release 1 scope, architecture invariants and gates.
+2. **Source truth:** GitHub defines the exact code through reviewed source fingerprints and exact-head workflow evidence.
+3. **Live truth:** Supabase project `xzxqfrvqdgkzwujbkdbk` defines deployed database/function reality.
+4. **Audit truth:** `tcg-master-plan-ledger.md` is append-only history. `tcg-release-control-v1.json` binds current source fingerprints, external snapshot, gates and one next operation.
 
-1. Trev's latest explicit TCG decision.
-2. This canonical master plan and `tcg-master-plan-ledger.md` at the current accepted PR #549 head.
-3. Current GitHub source, exact-head tests and accepted PR comments for the same head.
-4. Current production Supabase database/function state.
-5. Older comments/checkpoints/prototype plans only as historical evidence.
+Trev's latest explicit decision outranks an older plan statement. When that happens, change policy here once, append the decision to the ledger once, and update the release manifest in the same commit.
 
-Conflict rule: if two sources disagree, do not create work from both. Record the conflict in the ledger, resolve it against the authority order above, then update the losing/stale source so it cannot reopen the same work later.
+**Non-circular checkpoint contract:**
 
-Progress rule: do not use old weighted completion percentages as release authority. Use the fixed release gates in this file. A completed gate is reopened only by new exact evidence tied to that gate.
-
-**Control synchronization rule:** no new implementation, capability reclassification, deployment or later release-gate slice may begin until the immediately preceding accepted slice is recorded in both this master plan and `tcg-master-plan-ledger.md`, and the documentation/control commit containing that record has passed the normal exact-head GitHub fence. `LOG` therefore means **log + synchronize both control files + validate that control commit**.
+- The plan changes only when scope, architecture, gate definitions or release policy changes.
+- Every release-significant source change updates `tcg-release-control-v1.json` and appends one ledger transaction in the **same commit**.
+- CI recomputes Git blob identities and all three Edge dependency closures. A source change without a matching manifest update fails.
+- Post-commit facts that cannot exist before the commit—workflow run IDs, deployed function versions, merge SHA and Pages proof—are written to one canonical PR comment containing `TCG-RELEASE-CONTROL-V1`.
+- Never create a commit merely to record that commit's own SHA or the workflows it triggered.
+- A completed gate reopens only under section 7, not because an older comment or percentage disagrees.
 
 ## 1. Release 1 scope — locked
 
@@ -62,28 +65,29 @@ Fairy and Underworld design/audit documents are preserved as expansion authority
 8. Match Flow owns phase/turn/resolution/terminal transitions. Callers request transitions.
 9. Marked v0.2 Release 1 matches must resolve launch gameplay through structured owners. Legacy fallbacks may remain only for explicitly unmarked/legacy matches; they are not release authority for new v0.2 matches.
 10. Production database migrations remain additive/replay-safe. Never rewrite applied migration history to make planning text look current.
-11. PR #549 is the only Release 1 integration lane. No unrelated Stream Bandit/DJ/Web Builder/social work enters this PR.
+11. PR #549 is the one-time private-alpha baseline integration into `main`. After it merges, every remaining repair uses a small owner-scoped PR from `main`; no unrelated Stream Bandit/DJ/Web Builder/social work enters a TCG PR.
 12. Protected Writer / Repo Desk / CG Repair Lab / Code God are not the default TCG execution path. Normal GitHub branch work + exact tests + Supabase parity remain preferred.
-13. A new accepted engine/capability slice is incomplete administratively until its exact evidence and next allowed operation are synchronized into both control files and that synchronization itself passes exact-head CI.
+13. A release-significant slice is complete only when its source, release-manifest fingerprints and ledger transaction land together and exact-head CI passes. External deploy/merge evidence then updates the canonical GitHub checkpoint comment.
 
 ## 3. Current evidence baseline
 
-Accepted gameplay/capability baseline immediately before this control synchronization:
+Accepted functional source checkpoint:
 
-- PR #549 head: `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`.
+- PR #549 head: `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`.
 - Current `main` base: `e0a71e1b292b45373f2c4ba658a4f346f5c1c84c`.
 - PR: open, draft, mergeable, unmerged.
-- Merge candidate at RC-02c4 acceptance fence: `6507f350fb0b398d3b211c281b4ca3a9abe23b02`.
-- Exact-head workflows: TCG Card Pass 2 Validation #566 SUCCESS; Migration Replay #795 SUCCESS; Functional Smoke #821 SUCCESS, including independent PostgreSQL replay from zero.
-- Review threads: 0.
-- Legacy combined commit statuses: none found; absence is not counted as a PASS.
-- Complete PR inventory at the accepted baseline: 394 files.
-- Launch package authority remains `tcg-element-packages-v0.2.json` = 8 launch elements, 193 structured identities, 8 starters, Fairy/Underworld `launch_blocker=false`.
-- Production DB contains all eight accepted post-20260904110527 TCG migrations through `20260906193000_tcg_match_v0_2_runtime_marker_bridge`.
-- Production registry proof remains `SB1-set-one-v0.2`, 193/193 structured rows, malformed 0, digest `8e2556604fd1757917ea60b7e9af8c0de717a69b72c7e37b0e2690abdcce430f`, runtime authority false until release gates finish.
-- Production Edge functions exist for all three TCG routes with JWT verification enabled: `tcg-private-alpha-api` v2, `tcg-match-actions` v1, `tcg-tactic-actions` v1. Exact accepted-head source parity is still G4 work; deployed existence/version is not parity proof.
+- Merge candidate: `2550bbffa1816c003457abe4d1bd6e0696c9cf53`.
+- Exact-head workflows: TCG Card Pass 2 Validation #568 SUCCESS; Migration Replay #797 SUCCESS; Functional Smoke #823 SUCCESS, including independent PostgreSQL replay from zero.
+- Review threads: 0. Legacy combined statuses: none found; absence is not counted as a PASS.
+- Complete PR inventory: 395 files, all TCG/workflow scope.
+- Launch authority remains 8 elements / 193 identities / 8 starters.
+- Production DB contains accepted TCG migrations through `20260906193000_tcg_match_v0_2_runtime_marker_bridge`.
+- Production registry remains `SB1-set-one-v0.2`, 193/193 structured rows, malformed 0, digest `8e2556604fd1757917ea60b7e9af8c0de717a69b72c7e37b0e2690abdcce430f`.
+- The authenticated test surface is `t.html` (blob `10e8dabd6ad7bedfc4f839a2f506a29cf9cb51a6`). It contains no service-role/private-key pattern and requires an approved signed-in Supabase session.
+- Production Edge functions are active with JWT verification, but are not at accepted source parity: private-alpha API v2 differs; match-actions v1 differs; tactic-actions v1 is missing Attack Modifier and has two differing shared sources.
+- Supabase security advisors report no TCG-specific WARN finding. The two TCG registry tables with RLS/no client policy remain server-only informational findings.
 
-Accepted G3 reconciliation chain now recorded as current evidence:
+Accepted G3 reconciliation chain now recorded as current evidence:Accepted G3 reconciliation chain now recorded as current evidence:
 
 - **RC-02b1** — Attack #14 modifier consumption/bound-rider/end-turn wiring accepted at `da87b4c6e212317e38492f23c707c5862df13ffa`.
 - **RC-02b2a** — existing structured attack-modifier producers collapsed onto canonical Attack #14 ownership accepted at `ea5f07b5941abc982c051d9deeedcbd41435674a`.
@@ -95,6 +99,8 @@ Accepted G3 reconciliation chain now recorded as current evidence:
 - **RC-02c3** — `event_controller_is_opponent` predicate classification reconciled `missing → implemented` at `086840853f34add8ac610e1a9764dd0a728fb05d`; exactly two Release 1 uses, both Shade Event Listener requirements: Nightmaw — Dread Hunger and Eclipse Essence — Eclipse Condition Heal. Generic Event Listener positive/negative controller semantics are covered by the committed controller-predicate Deno suite. Exact-head gates #564/#793/#819 all SUCCESS. GitHub source-of-truth comment #5702012161.
 - **Control sync revision 4** — master plan + ledger synchronized and validated at `4fd1a10fda98b33822767755a6df600febd366de`; exact-head gates #565/#794/#820 all SUCCESS; GitHub source-of-truth comment #5702112552.
 - **RC-02c4** — `source_controller_is_self` predicate classification reconciled `missing → implemented` at `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`; exactly eight Release 1 uses across Astral 2 / Shade 2 / Tide 3 / Volt 1, all Event Listener requirements owned by #28. Exact focused tests prove self/opponent source-controller semantics and independence from affected-controller predicates. Exact-head gates #566/#795/#821 all SUCCESS. GitHub source-of-truth comment #5702217085.
+- **Control sync revision 5** — plan + ledger synchronized and validated at `fd8b3f155b44031a2681efd8988d13e2634a96f8`; exact-head gates #567/#796/#822 all SUCCESS; GitHub source-of-truth comment #5702316329.
+- **RC-02c5** — `event_attachment_kind_is` reconciled `missing → implemented` at `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`; Railhorn Power Rail supplies the two launch uses (`temporary` or `borrowed`). The generic Essence Attachment eligibility owner is covered by positive and negative exact-kind tests. Exact-head gates #568/#797/#823 all SUCCESS.
 
 Audited classifications deliberately **not** changed:
 
@@ -143,7 +149,7 @@ Reopen only on missing migration, replay failure, schema mismatch or runtime DB 
 Purpose: stop historical inventories from recreating already-completed work and prove that every launch-used shape reaches exactly one canonical owner.
 
 Required process:
-1. Start only from the latest accepted-and-synchronized plan/ledger head. If the previous accepted slice has not been logged into both control files and their synchronization commit validated, **stop and synchronize first**.
+1. Start from the latest accepted release manifest and canonical GitHub checkpoint. If fingerprints, ledger transaction or exact-head evidence disagree, **stop and reconcile that one checkpoint first**.
 2. Audit the 40 owner rows in `tcg-master-plan-ledger.md` against the current PR source/tests.
 3. Treat an owner as accepted when its canonical module/DB owner exists and exact tests prove the Release 1 path uses it.
 4. Reconcile `tcg-runtime-capabilities-v0.2.json` from current source/tests. It is a capability inventory, not a completion percentage.
@@ -152,11 +158,11 @@ Required process:
    - If yes: bind it to exactly one owner row and make one bounded repair or evidence-backed classification correction.
 6. For legacy parser/card-ID fallbacks, prove new marked v0.2 matches cannot select those fallbacks for launch cards. Legacy compatibility branches may remain for old/unmarked matches.
 7. Add/retain source-contract tests that forbid duplicate mutation returning to an accepted owner.
-8. After acceptance, perform `LOG`: update both control files with exact SHA/tests/decision/remaining debt, validate that documentation/control commit, then choose the next slice.
+8. In the same source commit, update release-manifest fingerprints and append one ledger transaction. After CI, update the canonical GitHub checkpoint comment; do not create a self-referential documentation commit.
 
 Gate passes when all Release 1-used operations/predicates resolve through accepted owners and the capability manifest reflects current evidence.
 
-### G4 — Production Edge source parity — IN PROGRESS, EXECUTION HOLD UNTIL G3 CLOSES
+### G4 — Production Edge source parity — IN PROGRESS; REQUIRED BEFORE PRIVATE-ALPHA MERGE
 
 Target functions:
 - `tcg-private-alpha-api`
@@ -170,9 +176,20 @@ Required process for each function:
 4. Compare deployed source/version marker to the accepted GitHub source graph.
 5. If different, deploy the exact accepted closure with JWT verification preserved.
 6. Read production function metadata/source back and prove parity.
-7. Log deployed version and evidence in both control files.
+7. Record deployed version/readback in the canonical GitHub checkpoint comment. Update the manifest on the next source-bearing commit; do not create a commit solely to echo external state.
 
 Do not reimplement a function merely because production is behind; production mismatch is a deployment/parity problem until source evidence proves otherwise.
+
+### Private-alpha baseline lane — AUTHORIZED, NOT PUBLIC RELEASE
+
+Trev's latest decision authorizes PR #549 to establish a recoverable authenticated test baseline on `main` before G3/G5 are fully closed. This does **not** mark Release 1 complete and does not change G7.
+
+1. **PA-00:** freeze accepted source, install Release Control v1 and pass fresh exact-head CI.
+2. **PA-01:** deploy the exact 7-file / 84-file / 36-file Edge closures with JWT preserved; read back parity.
+3. **PA-02:** mark PR #549 ready and squash merge it to `main`.
+4. **PA-03:** create `release/tcg-private-alpha-v0.1` at the merged baseline for rollback/recovery.
+5. **PA-04:** verify GitHub Pages serves the merged `t.html` authenticated test route.
+6. **PA-05:** run the real two-user journey. Log any defect against one owner and fix it in a small PR from `main`.
 
 ### G5 — Real two-user production E2E — PENDING
 
@@ -205,7 +222,7 @@ A discovered defect is not a reason to invent another system. Log it against its
 ### G6 — Final exact-head acceptance fence — PENDING
 
 At one immutable PR head require:
-- PR open/draft state appropriate for final review, mergeable, unmerged before merge.
+- One immutable final-release source checkpoint on `main` or a bounded final-release PR; the earlier private-alpha baseline merge is not itself G7 acceptance.
 - TCG Card Pass 2 Validation SUCCESS.
 - Migration Replay SUCCESS.
 - Functional Smoke SUCCESS.
@@ -218,31 +235,30 @@ At one immutable PR head require:
 
 If the head changes, refresh this gate. Do not transfer PASS evidence from an older head.
 
-### G7 — Merge / live promotion / live smoke — PENDING
+### G7 — Release 1 public promotion / live smoke — PENDING
 
 Only after G0-G6 are green:
-1. recheck exact PR head and merge candidate;
-2. merge PR #549 to `main` using the repository's permitted merge path;
-3. verify production UI/game route is serving the merged source;
-4. run a compact live smoke: auth → deck → matchmaking/room → match load → legal command → state refresh → match completion/reward receipt;
-5. record final production identities/versions and release checkpoint in both control files.
+
+1. pin the exact accepted `main` source and matching Supabase versions;
+2. promote the authenticated test baseline to the intended Release 1 player entry point;
+3. run compact live smoke: auth → deck → matchmaking/room → match load → legal command → state refresh → match completion/reward receipt;
+4. record the immutable release checkpoint and rollback identity in the canonical GitHub comment and release manifest on the next source-bearing release commit.
 
 Rollback/demotion trigger: auth/security regression, state corruption, hidden-information leak, duplicate reward/currency award, inability to start/complete a match, or proven source/deployment mismatch.
 
 ## 5. Locked execution order from this checkpoint
 
-Do not skip ahead and do not start a second slice while a prior slice is unresolved.
+Only one current operation is allowed:
 
-1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c4 and pass exact-head CI together.
-2. **Continue RC-02 capability/owner closeout only** — one Release 1-used operation/predicate or one proven owner defect at a time.
-3. **After every accepted RC-02 slice, synchronize both control files and validate that control commit before choosing another slice.**
-4. **Close G3** only when the 193-card Release 1 inventory is fully reconciled against accepted owners/capabilities.
-5. **G4 Edge parity** — exact-source transport/deploy/readback for the three TCG functions.
-6. **G5 two-user E2E** — execute the full real journey and log defects by owner.
-7. **Bounded repairs only if E2E proves them** — one owner / one defect / one test fence at a time, followed by control synchronization.
-8. **G6 final exact-head gate** — all CI + reviews + DB + Edge + E2E green together.
-9. **G7 merge/live** — PR #549 → `main`, then live smoke and release checkpoint.
-10. **Post-release queue begins only after Release 1 is accepted** — Fairy, Underworld, Packs, Shop, Trading, Battle Pass and later content.
+1. **PA-00 now:** land Release Control v1 with RC-02c5 recorded; pass fresh Card Pass / Migration Replay / Functional Smoke on that exact head.
+2. **PA-01:** deploy and read back the exact accepted closures for `tcg-private-alpha-api`, `tcg-match-actions` and `tcg-tactic-actions`.
+3. **PA-02:** refresh PR head/mergeability, mark ready and squash merge PR #549 to `main`.
+4. **PA-03:** create the rollback branch at the merged baseline.
+5. **PA-04:** verify `https://trevieisking.github.io/stream-bandit/t.html` serves the merged authenticated test surface.
+6. **PA-05 / G5:** run the two-user journey and log defects by owner.
+7. Continue G3 only for a Release 1-used shape proven by the registry or E2E; use one small PR per owner repair.
+8. G6 then G7 remain the final public-release fence.
+9. Fairy, Underworld, Packs, Shop, Trading and Battle Pass remain post-release.
 
 ## 6. Mandatory repair process — every future fix
 
@@ -256,7 +272,7 @@ Use this sequence exactly:
 - **TEST:** owner unit/contract tests + TCG Card Pass/Smoke/Migration gates as applicable.
 - **ACCEPT:** exact diff/head review; no stale PASS evidence.
 - **DEPLOY:** only when production parity is part of that accepted slice and exact accepted source is transportable.
-- **LOG:** append exact evidence to the ledger, update this plan's current baseline/next allowed operation when materially changed, then validate the synchronized documentation/control commit. **Do not start the next slice until LOG is complete.**
+- **LOG:** in the same source commit, update release-manifest fingerprints and append one ledger transaction. Change this plan only for a material policy/scope/gate change. After CI or deployment, update the one canonical GitHub checkpoint comment.
 
 A failed test means HOLD for that slice, not a new architecture pass. A production mismatch means parity/deployment investigation first, not source rewriting.
 
@@ -274,8 +290,10 @@ Old comments, old percentages, old capability labels, old branch state or a late
 
 ## 8. Progress meter
 
-Release gates: **G0 ✅ | G1 ✅ | G2 ✅ | G3 🔎 | G4 🔎 (execution hold until G3 closes) | G5 ☐ | G6 ☐ | G7 ☐**
+Private-alpha baseline: **PA-00 🔎 | PA-01 ☐ | PA-02 ☐ | PA-03 ☐ | PA-04 ☐ | PA-05 ☐**
 
-Current G3 control checkpoint: **RC-02b1 ✅ | RC-02b2a ✅ | RC-02b2b ✅ | RC-02b2 ✅ | RC-02c1 ✅ | RC-02c2 ✅ | RC-02c3 ✅ | RC-02c4 ✅ | next RC-02 slice blocked until this plan/ledger synchronization passes exact-head CI 🔒**
+Release 1 gates: **G0 ✅ | G1 ✅ | G2 ✅ | G3 🔎 | G4 🔎 | G5 ☐ | G6 ☐ | G7 ☐**
 
-This is the only release progress meter. It deliberately does not translate the eight gates into a misleading implementation percentage.
+Accepted G3 chain: **RC-02b1 ✅ | RC-02b2a ✅ | RC-02b2b ✅ | RC-02b2 ✅ | RC-02c1 ✅ | RC-02c2 ✅ | RC-02c3 ✅ | RC-02c4 ✅ | RC-02c5 ✅**
+
+This meter separates “a recoverable test version exists” from “Release 1 is complete.” No percentage may override these gates.

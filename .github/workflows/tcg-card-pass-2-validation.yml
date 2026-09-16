@@ -9,6 +9,9 @@ on:
       - tcg-card-pass-2-*.md
       - tcg-card-pass-2-*.json
       - tcg-runtime-*.json
+      - tcg-release-control-v1.json
+      - tcg-master-plan-progress.md
+      - tcg-master-plan-ledger.md
       - tcg-runtime-pass-b-withdrawal-wire.mjs
       - tcg-runtime-pass-b-attack-damage-wire.mjs
       - tcg-runtime-pass-b-surge-lifecycle-wire.mjs

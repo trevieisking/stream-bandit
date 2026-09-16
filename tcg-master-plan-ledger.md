@@ -1,23 +1,24 @@
 # Stream Bandit TCG — Master Plan Owner / Repair Ledger
 
 **Plan authority:** `tcg-master-plan-progress.md`  
-**Ledger revision:** 5 — 2026-09-16  
-**Accepted gameplay/capability baseline:** `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`  
+**Release control:** `tcg-release-control-v1.json`  
+**Ledger revision:** 6 — 2026-09-16  
+**Accepted gameplay/capability baseline:** `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`  
 **Baseline owner count:** 40 families  
-**Release lane:** PR #549
+**Release lane:** PR #549 → private-alpha baseline on `main`
 
 ## Ledger rules
 
-- This ledger records execution; it does not create a second master plan.
-- One mechanic/state transition has one rightful owner.
-- Submodules inside an owner family are not extra owners.
-- `✅` = Release 1 owner/path accepted by current source/tests or production DB evidence.
+- This ledger is append-only execution history; it does not create a second master plan.
+- One mechanic/state transition has one rightful owner. Submodules inside an owner family are not extra owners.
+- `✅` = Release 1 owner/path accepted by exact source/tests or production evidence.
 - `🔎` = owner exists, but Release 1 closeout/source-contract proof remains.
 - `⏭` = intentionally post-release and must not block Release 1.
-- A `✅` row is reopened only under the master-plan reopen rules.
-- Every repair must append an evidence entry under **Repair / promotion log**.
-- **Anti-drift control:** after any accepted implementation/classification/deployment slice, do not begin the next slice until both this ledger and `tcg-master-plan-progress.md` contain that accepted evidence and next allowed operation, and the resulting documentation/control commit has passed the exact-head GitHub fence.
-- `LOG` therefore means: append exact evidence here, synchronize the master plan, validate the control commit, then continue.
+- A `✅` row reopens only under the master-plan reopen rules.
+- Every release-significant source commit must update `tcg-release-control-v1.json` fingerprints and append one transaction here in that same commit.
+- The master plan changes only for a material scope, architecture, gate or release-policy decision.
+- Post-commit workflow/deployment/merge/page facts update one canonical PR comment marked `TCG-RELEASE-CONTROL-V1`; they do not require a commit that tries to record itself.
+- After PR #549 creates the baseline, one owner-scoped change equals one small PR from `main`.
 
 ## 40 owner families — Release 1 reconciliation
 
@@ -50,7 +51,7 @@
 | 25 | Cost Engine | action/ability/payment cost owners + withdrawal cost owner | ✅ | Cost computes legality/value; it does not consume resources. |
 | 26 | Payment Engine | `_shared/tcg-match-payment-*` family | ✅ | Payment consumes resources only after preflight. No caller-owned splice/discard payment path. |
 | 27 | Atomic Switch / Battlefield Position Engine | `_shared/tcg-match-switch-context-v0-2.ts` | ✅ | Vanguard/Reserve position mutation and switch context live here. |
-| 28 | Generic Event Listener Engine | `_shared/tcg-match-event-listener-*` family | ✅ | RC-02c2 accepted generic `event_action_kind_is` coverage. RC-02c3 accepted `event_controller_is_opponent` for two Shade uses. RC-02c4 accepted `source_controller_is_self` for eight launch uses across Astral, Shade, Tide and Volt, with direct positive/negative and mixed-controller regression proof. Listener actions still delegate mechanic mutation to mechanic owners. |
+| 28 | Generic Event Listener Engine | `_shared/tcg-match-event-listener-*` family + Essence Attachment eligibility predicates | ✅ | RC-02c2 accepted `event_action_kind_is`; c3 accepted `event_controller_is_opponent`; c4 accepted `source_controller_is_self`; c5 accepted exact `event_attachment_kind_is` for Railhorn's `temporary` / `borrowed` branches. Listener predicates select eligibility only; mechanic mutation still delegates to its rightful owner. |
 | 29 | Movement Listener Engine | `_shared/tcg-match-movement-listener-v0-2.ts` | ✅ | Listener continuation only; physical movement delegates. RC-02c2 runtime proof exercised the real `voluntary_withdrawal` action-kind case through this path. |
 | 30 | Card-Zone / Draw / Shuffle / Discard Engine | `_shared/tcg-match-card-zone-engine-v0-2.ts` | ✅ | Own physical card-instance movement/order. RNG chooses random order; Hidden Information controls views. |
 | 31 | Card Search / Filter / Inspection Engine | specialized structured query/inspection owners + Card-Zone for mutation | 🔎 | `INSPECT_ZONE` deliberately remains `missing`: current Reward inspection is bounded and does not prove generic zone-inspection parity. Audit Release 1 search/inspection call sites; any physical move after search must use Card-Zone. Do not invent owner #41. |
@@ -66,16 +67,16 @@
 
 ## Release-control repair ledger
 
-These rows are the only current cross-owner Release 1 closeout tasks. They prevent old backlog text from becoming new work.
+These rows are the current cross-owner closeout map. The machine-readable exact state is `tcg-release-control-v1.json`.
 
 | ID | Defect / gap | Exact fix/process | Acceptance evidence | State |
 |---|---|---|---|---|
-| RC-01 | Planning authority drift | Keep `tcg-master-plan-progress.md`, this ledger, PR description and element-package authority aligned on 8 / 193 / 8; Fairy/Underworld post-release. After every accepted slice synchronize both control files and validate the sync commit before any next slice. | Exact 2-file control diff + current package manifest + exact-head CI | ✅ synchronized through RC-02c4 once ledger revision 5 control commit is accepted |
-| RC-02 | Capability inventory is historical/stale relative to later owner work | Reconcile `tcg-runtime-capabilities-v0.2.json` one Release 1-used shape at a time. Accepted so far: b1, b2a, b2b, b2, c1, c2, c3, c4. Preserve audited non-changes instead of re-discovering them. Continue only after this control sync passes CI. | Capability test + owner tests + TCG Card Pass + exact-head Migration/Smoke + synchronized log | 🔎 in progress |
-| RC-03 | Production Edge source parity incomplete/uncertain | After G3 closes, pin one accepted-and-synchronized head, collect exact dependency closure for all 3 TCG functions, compare/deploy/read back exact source, preserve JWT. Do not hand-copy shared engine graph. | Supabase deployed version/source readback + exact GitHub source identity | ☐ execution hold until G3 closes |
-| RC-04 | Real two-user production journey not yet proven | Execute the 20-step G5 journey after Edge parity. Every defect must cite one owner row and reproduction. | two users, full match complete, private views correct, exactly-once rewards/XP/currency | ☐ |
-| RC-05 | Final release fence not yet assembled at one head | Refresh PR metadata, changed files, review threads, exact-head workflows, DB parity, Edge parity and E2E at one immutable SHA. | all G0-G6 green at same synchronized head | ☐ |
-| RC-06 | Merge/live not yet performed | Merge only after RC-05; verify live source; run compact live smoke; record production identities. | merged SHA + live smoke + final plan/ledger checkpoint | ☐ |
+| RC-01 | Planning authority drift and self-referential control commits | Stable plan + append-only ledger + machine release manifest. Source fingerprints and ledger entry land with the source; post-commit facts live in one canonical GitHub comment. | Release-control test recomputes artifact blobs and all Edge closures. | 🔎 Release Control v1 commit awaiting its own exact-head CI |
+| RC-02 | Capability inventory is historical/stale relative to later owner work | Reconcile one Release 1-used shape at a time. Accepted through c5: b1, b2a, b2b, b2, c1, c2, c3, c4, c5. Preserve audited non-changes. | Capability test + owner tests + exact-head Card Pass/Migration/Smoke + one ledger transaction. | 🔎 in progress |
+| RC-03 | Production Edge source parity is false | Deploy exact manifest closures: private-alpha 7 files, match-actions 84, tactic-actions 36; preserve JWT; read back versions/source. | Supabase deployment/readback bound to manifest closure identities. | ☐ PA-01, next after control CI |
+| RC-04 | No stable live/test baseline | After Edge parity, squash merge PR #549, create rollback branch, and verify Pages `t.html`. This is private alpha, not G7. | Merge SHA + rollback ref + served page blob/route in canonical comment. | ☐ PA-02 through PA-04 |
+| RC-05 | Real journey not yet proven | Two authenticated users complete the G5 journey; every defect is assigned to one existing owner and repaired through a small PR from `main`. | Real session evidence + exactly-once reward + hidden-state checks. | ☐ PA-05 / G5 |
+| RC-06 | Final public release fence incomplete | G0-G6 green at one accepted `main` checkpoint; then G7 promotion/live smoke. | GitHub + Supabase + E2E checkpoint. | ☐ pending |
 
 ## Standard repair transaction
 
@@ -87,7 +88,7 @@ Every future defect uses one transaction:
 4. **TEST** — owner tests plus affected release gates.
 5. **ACCEPT** — exact diff/head review and promotion decision.
 6. **DEPLOY** — only if production parity is part of that accepted slice.
-7. **LOG** — append exact evidence below, synchronize `tcg-master-plan-progress.md`, validate the documentation/control commit, and only then choose the next slice.
+7. **LOG** — update release-manifest fingerprints and append this transaction in the same source commit; after CI/deploy, update the canonical GitHub checkpoint comment.
 
 If a problem cannot be assigned to a current owner, first prove that it is a distinct mechanic. Until that proof exists, do not create owner #41.
 
@@ -257,3 +258,47 @@ This revision synchronizes:
 - next allowed operation.
 
 **Next allowed operation after this two-file control commit itself passes exact-head Card Pass / Migration / Smoke plus review/status fence:** continue **RC-02 capability/owner closeout only**, one Release 1-used shape at a time from the synchronized head. Do not begin G4, Fairy/Underworld or post-release product systems yet.
+
+
+### 2026-09-16 — Ledger revision 6 / Release Control v1 / RC-02c5
+
+Latest accepted functional checkpoint:
+
+- source head: `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`
+- merge candidate observed before control commit: `2550bbffa1816c003457abe4d1bd6e0696c9cf53`
+- PR #549: open, draft, mergeable, unmerged
+- complete inventory: 395 changed files, all TCG/workflow scope
+- exact-head Card Pass #568, Migration Replay #797 and Functional Smoke #823: SUCCESS
+- review threads: 0; legacy combined statuses: none found
+
+RC-02c5 accepted:
+
+- `event_attachment_kind_is`: **missing → implemented**
+- owner: **#28 Generic Event Listener Engine**, using the canonical Essence Attachment eligibility snapshot
+- Release 1 use: Railhorn / Power Rail contains two exact accepted branches, `temporary` and `borrowed`
+- focused Deno proof covers positive exact-kind matches and negative cross-kind/ordinary cases
+- no production, migration or live source changed in RC-02c5
+
+Deployment truth measured before promotion:
+
+- `tcg-private-alpha-api` v2 differs from the accepted 7-file closure
+- `tcg-match-actions` v1 differs from the accepted 84-file closure
+- `tcg-tactic-actions` v1 has an exact entrypoint but is missing Attack Modifier and differs in Event Listener + Surge Lifecycle; accepted closure is 36 files
+- all three deployed functions remain ACTIVE with JWT verification
+- therefore **merge-only is BLOCKED as a playable release action**
+
+Control-loop repair accepted as policy:
+
+- the plan is stable policy, not a per-commit diary
+- this ledger is append-only history
+- `tcg-release-control-v1.json` carries machine-checkable source/closure fingerprints and exactly one next operation
+- source + manifest + ledger land together
+- one canonical PR comment marked `TCG-RELEASE-CONTROL-V1` records workflow/deploy/merge/page facts that only exist after a commit
+- no further commit may exist solely to name itself or echo its own CI
+- after PR #549 establishes the baseline, further work uses small owner-scoped PRs from `main`
+
+Latest explicit release decision:
+
+PR #549 may establish an authenticated **private-alpha test baseline** on `main` before final G3/G5/G6/G7 closeout. The order is fixed: control CI → exact Edge deploy/readback → squash merge → rollback branch → Pages `t.html` verification → two-user E2E. This is not public Release 1 promotion.
+
+**Current operation:** PA-00 only. Promotion remains HOLD until the revision-6 Release Control v1 commit passes fresh Card Pass / Migration Replay / Functional Smoke with zero unresolved review threads.
