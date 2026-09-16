@@ -1,0 +1,42 @@
+{
+  "schema": "stream-bandit-tcg-ten-deck-product-blueprint-v2",
+  "recorded_at": "2026-09-16",
+  "status": "canonical_v2_product_target",
+  "target": {
+    "elements": 10,
+    "elemental_identities": 240,
+    "prismatic_founder_identities": 1,
+    "total_gameplay_identities": 241,
+    "starter_decks": 10,
+    "starter_deck_size": 60,
+    "package_shape": {"identities":24,"creatures":11,"essence":4,"tactics":9,"pack_only":3}
+  },
+  "universal": {
+    "dedicated_artwork_on_every_printable_card": true,
+    "rarities": ["Basic","Rare","Extra Rare","Mythic"],
+    "printing_finishes": ["Standard","Shine","Holo","Full-Art Shine","Alt-Art","Signature Mythic"],
+    "creature_action_shapes": ["Ability + Attack 1","Attack 1 + Attack 2"],
+    "forbidden_creature_shape": "Ability + Attack 1 + Attack 2",
+    "named_numeric_properties_required": true,
+    "printing_finish_changes_gameplay": false
+  },
+  "families": [
+    {"element":"Astral","starter":"Second Sky","pack":"Astral Pack","signature_mythic":"Starfall Regent","package_state":"runtime_structured","identity_count":24,"starter_target":60},
+    {"element":"Ember","starter":"Ashrush","pack":"Ember Pack","signature_mythic":"Emberlord Pyrohorn","package_state":"runtime_structured","identity_count":24,"starter_target":60},
+    {"element":"Fairy","starter":"Glimmerwish","pack":"Fairy Pack","signature_mythic":"Moonpetal Empress","package_state":"design_accepted_schema_pending","identity_count":24,"starter_target":60,"candidate":"tcg-fairy-glimmerwish-v2-candidate.json"},
+    {"element":"Gale","starter":"Skyshift","pack":"Gale Pack","signature_mythic":"Aeralith","package_state":"runtime_structured","identity_count":24,"starter_target":60},
+    {"element":"Grove","starter":"Wildgrowth","pack":"Grove Pack","signature_mythic":"Ancient Thornmaw","package_state":"runtime_structured","identity_count":24,"starter_target":60},
+    {"element":"Shade","starter":"Nightbind","pack":"Shade Pack","signature_mythic":"Nightmaw","package_state":"runtime_structured","identity_count":24,"starter_target":60},
+    {"element":"Stone","starter":"Unbroken","pack":"Stone Pack","signature_mythic":"Mountain Warden","package_state":"runtime_structured","identity_count":24,"starter_target":60},
+    {"element":"Tide","starter":"Deep Current","pack":"Tide Pack","signature_mythic":"Abyssal Reef Sovereign","package_state":"runtime_structured","identity_count":24,"starter_target":60},
+    {"element":"Underworld","starter":"Grave Pact","pack":"Underworld Pack","signature_mythic":"Thanavor — Debtbound Sovereign","display_mythic":"Debtbound Sovereign","package_state":"design_accepted_schema_pending","identity_count":24,"starter_target":60,"candidate":"tcg-underworld-grave-pact-v2-candidate.json"},
+    {"element":"Volt","starter":"Live Wire","pack":"Volt Pack","signature_mythic":"Stormfang Apex","package_state":"runtime_structured","identity_count":24,"starter_target":60}
+  ],
+  "current_runtime_baseline": {
+    "elements":8,
+    "structured_identities":193,
+    "starters":8,
+    "note":"Fairy and Underworld design acceptance does not yet change production/runtime counts."
+  },
+  "next_operation": "Translate Fairy and Underworld accepted design candidates into canonical sb-tcg-card-v0.2/effect-opcode data, validate owner coverage, then build the deterministic 241-identity registry and 10-starter authority."
+}
