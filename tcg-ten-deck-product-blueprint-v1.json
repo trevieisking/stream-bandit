@@ -1,0 +1,120 @@
+{
+  "schema": "stream-bandit-tcg-ten-deck-product-blueprint-v1",
+  "recorded_at": "2026-09-16",
+  "status": "approved visual/deck-family direction; exact 60-card recipes and complete Fairy/Underworld registries still require structured-data completion",
+  "universal": {
+    "starter_deck_size": 60,
+    "dedicated_artwork_on_every_printable_card": true,
+    "rarities": ["Basic", "Rare", "Extra Rare", "Mythic"],
+    "printing_finishes": ["Standard", "Shine", "Holo", "Full-Art Shine", "Alt-Art", "Signature Mythic"],
+    "creature_action_shapes": ["Ability + Attack 1", "Attack 1 + Attack 2"],
+    "forbidden_creature_shape": "Ability + Attack 1 + Attack 2"
+  },
+  "families": [
+    {
+      "element": "Ember",
+      "starter": "Ashrush",
+      "pack": "Ember Pack",
+      "signature_mythic": "Emberlord Pyrohorn",
+      "playstyle": "burn, aggression, fast evolution, pressure",
+      "palette": ["volcanic orange", "ember red", "molten gold", "Stream Bandit blue accent"],
+      "showcase_cards": ["Cindercub", "Pyrolinx", "Volcarox", "Sparkfawn", "Flarehart", "Emberlord Pyrohorn", "Scorch Volley", "Ember Essence", "Ash Crown", "Scorched Arena"],
+      "exact_60_recipe_status": "existing Ember starter must be reconciled to V2 visual/action-slot contract"
+    },
+    {
+      "element": "Tide",
+      "starter": "Deep Current",
+      "pack": "Tide Pack",
+      "signature_mythic": "Abyssal Reef Sovereign",
+      "playstyle": "shielding, healing, resilience, tempo",
+      "palette": ["ocean blue", "turquoise", "silver", "moonlit water", "coral highlights"],
+      "showcase_cards": ["Azurawisp", "Reefshell", "Abyssguard", "Tidebud", "Moonlit Reef creature", "Abyssal Reef Sovereign", "Tidal Mend", "Tide Essence", "Pearl Sigil", "Moonlit Reef realm"],
+      "exact_60_recipe_status": "existing Tide starter must be reconciled to V2 visual/action-slot contract"
+    },
+    {
+      "element": "Grove",
+      "starter": "Wildgrowth",
+      "pack": "Grove Pack",
+      "signature_mythic": "Ancient Thornmaw",
+      "playstyle": "growth, sustain, healing, field control",
+      "palette": ["emerald", "jade", "moss", "bark", "bioluminescent green"],
+      "showcase_cards": ["Seedling", "Thorncub", "Thornmaw", "Canopyling", "First Canopy creature", "Ancient Thornmaw", "Rootbind", "Grove Essence", "Root Crown", "First Canopy realm"],
+      "exact_60_recipe_status": "existing Grove starter must be reconciled to V2 visual/action-slot contract"
+    },
+    {
+      "element": "Volt",
+      "starter": "Live Wire",
+      "pack": "Volt Pack",
+      "signature_mythic": "Stormfang Apex",
+      "playstyle": "speed, surge, quick pressure, punish",
+      "palette": ["electric yellow", "gold", "storm blue", "graphite", "lightning white"],
+      "showcase_cards": ["Sparkcub", "Boltfang", "Stormfang Apex", "Static Pup", "Railhorn", "Thunderjaw", "Surge Break", "Volt Essence", "Live Coil", "Storm Grid"],
+      "exact_60_recipe_status": "existing Volt starter must be reconciled to V2 visual/action-slot contract"
+    },
+    {
+      "element": "Stone",
+      "starter": "Unbroken",
+      "pack": "Stone Pack",
+      "signature_mythic": "Mountain Warden",
+      "playstyle": "defense, shielding, prevention, heavy finishers",
+      "palette": ["granite gray", "slate", "silver", "rune light", "deep blue accent"],
+      "showcase_cards": ["Pebblit", "Granishell", "Cragbeast", "Stonehorn", "Bastionback", "Mountain Warden", "Granite Stand", "Stone Essence", "Bastion Crest", "Granite Hold"],
+      "exact_60_recipe_status": "existing Stone starter must be reconciled to V2 visual/action-slot contract"
+    },
+    {
+      "element": "Gale",
+      "starter": "Skyshift",
+      "pack": "Gale Pack",
+      "signature_mythic": "Aeralith",
+      "playstyle": "switching, mobility, positioning, tempo",
+      "palette": ["sky blue", "white", "silver", "wind glow", "cloud gray"],
+      "showcase_cards": ["Driftlet", "Skyweaver", "Tempestalon", "Draftkin", "Crosswind", "Aeralith", "Slipstream Switch", "Gale Essence", "Tailwind Crest", "Open Skies"],
+      "exact_60_recipe_status": "existing Gale starter must be reconciled to V2 visual/action-slot contract"
+    },
+    {
+      "element": "Shade",
+      "starter": "Nightbind",
+      "pack": "Shade Pack",
+      "signature_mythic": "Nightmaw",
+      "playstyle": "debuffs, drain, disruption, shadow pressure",
+      "palette": ["violet", "black", "spectral blue", "moonlight", "purple flame"],
+      "showcase_cards": ["Wispbat", "Gloombite", "Nightmaw", "Umbrakit", "Dread Hunger", "Eclipse Fang", "Shadow Hex", "Shade Essence", "Umbral Fang", "Nightbind Hollow"],
+      "exact_60_recipe_status": "existing Shade starter must be reconciled to V2 visual/action-slot contract"
+    },
+    {
+      "element": "Astral",
+      "starter": "Second Sky",
+      "pack": "Astral Pack",
+      "signature_mythic": "Starfall Regent",
+      "playstyle": "prediction, search, choice, celestial burst",
+      "palette": ["cosmic blue", "violet", "prism light", "starlight", "aurora"],
+      "showcase_cards": ["Orbitling", "Starloom", "Starfall Regent", "Comet Kit", "Dreamglass", "Nebularch", "Prism Forecast", "Astral Essence", "Prism Halo", "Second Sky"],
+      "exact_60_recipe_status": "existing Astral starter must be reconciled to V2 visual/action-slot contract"
+    },
+    {
+      "element": "Fairy",
+      "starter": "Glimmerwish",
+      "pack": "Fairy Pack",
+      "signature_mythic": "Moonpetal Empress",
+      "playstyle": "cleanse, charm, support, buffs",
+      "palette": ["rose pink", "silver", "lavender", "moon petal", "sparkling light"],
+      "showcase_cards": ["Pixlet", "Glimmerspry", "Moonpetal Empress", "Wishbud", "Radiant Nymph", "Petalqueen", "Charm of Grace", "Fairy Essence", "Heartbloom Charm", "Silverpetal Grove"],
+      "exact_60_recipe_status": "TBD — full structured Fairy identity registry and exact starter recipe required"
+    },
+    {
+      "element": "Underworld",
+      "starter": "Grave Pact",
+      "pack": "Underworld Pack",
+      "signature_mythic": "Debtbound Sovereign",
+      "playstyle": "discard, revival, sacrifice, corruption, grave value",
+      "palette": ["necrotic teal", "charcoal", "bone gold", "spectral green", "haunted stone"],
+      "showcase_cards": ["Grimling", "Cryptjaw", "Debtbound Sovereign", "Mire Imp", "Graveshade", "Requiem Lord", "Grave Bargain", "Underworld Essence", "Soul Ledger", "Hollow Crypt"],
+      "exact_60_recipe_status": "TBD — full structured Underworld identity registry and exact starter recipe required"
+    }
+  ],
+  "pack_design": {
+    "one_elemental_pack_per_family": true,
+    "final_pack_size_and_odds_status": "TBD until Pack owner #37 implementation design is approved",
+    "principle": "Rarity odds and printing-finish odds are separate; a Shine/Holo printing must not change the underlying gameplay identity or rules."
+  }
+}
