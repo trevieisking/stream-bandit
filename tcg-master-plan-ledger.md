@@ -1,8 +1,8 @@
 # Stream Bandit TCG — Master Plan Owner / Repair Ledger
 
 **Plan authority:** `tcg-master-plan-progress.md`  
-**Ledger revision:** 5 — 2026-09-16  
-**Accepted gameplay/capability baseline:** `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`  
+**Ledger revision:** 6 — 2026-09-16  
+**Accepted gameplay/capability baseline:** `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`  
 **Baseline owner count:** 40 families  
 **Release lane:** PR #549
 
@@ -50,7 +50,7 @@
 | 25 | Cost Engine | action/ability/payment cost owners + withdrawal cost owner | ✅ | Cost computes legality/value; it does not consume resources. |
 | 26 | Payment Engine | `_shared/tcg-match-payment-*` family | ✅ | Payment consumes resources only after preflight. No caller-owned splice/discard payment path. |
 | 27 | Atomic Switch / Battlefield Position Engine | `_shared/tcg-match-switch-context-v0-2.ts` | ✅ | Vanguard/Reserve position mutation and switch context live here. |
-| 28 | Generic Event Listener Engine | `_shared/tcg-match-event-listener-*` family | ✅ | RC-02c2 accepted generic `event_action_kind_is` coverage. RC-02c3 accepted `event_controller_is_opponent` for two Shade uses. RC-02c4 accepted `source_controller_is_self` for eight launch uses across Astral, Shade, Tide and Volt, with direct positive/negative and mixed-controller regression proof. Listener actions still delegate mechanic mutation to mechanic owners. |
+| 28 | Generic Event Listener Engine | `_shared/tcg-match-event-listener-*` family | ✅ | RC-02c2 accepted generic `event_action_kind_is` coverage. RC-02c3 accepted `event_controller_is_opponent` for two Shade uses. RC-02c4 accepted `source_controller_is_self` for eight launch uses across Astral, Shade, Tide and Volt, with direct positive/negative and mixed-controller regression proof. RC-02c5 accepted `event_attachment_kind_is` for Volt Railhorn / Power Rail; temporary is integration-tested and a focused generic snapshot regression proves borrowed/temporary/ordinary discrimination. `event_attachment_target_is_source` remains missing because Flintkin's `relic_attached` listener continuation is not yet directly proven. Listener actions still delegate mechanic mutation to mechanic owners. |
 | 29 | Movement Listener Engine | `_shared/tcg-match-movement-listener-v0-2.ts` | ✅ | Listener continuation only; physical movement delegates. RC-02c2 runtime proof exercised the real `voluntary_withdrawal` action-kind case through this path. |
 | 30 | Card-Zone / Draw / Shuffle / Discard Engine | `_shared/tcg-match-card-zone-engine-v0-2.ts` | ✅ | Own physical card-instance movement/order. RNG chooses random order; Hidden Information controls views. |
 | 31 | Card Search / Filter / Inspection Engine | specialized structured query/inspection owners + Card-Zone for mutation | 🔎 | `INSPECT_ZONE` deliberately remains `missing`: current Reward inspection is bounded and does not prove generic zone-inspection parity. Audit Release 1 search/inspection call sites; any physical move after search must use Card-Zone. Do not invent owner #41. |
@@ -70,8 +70,8 @@ These rows are the only current cross-owner Release 1 closeout tasks. They preve
 
 | ID | Defect / gap | Exact fix/process | Acceptance evidence | State |
 |---|---|---|---|---|
-| RC-01 | Planning authority drift | Keep `tcg-master-plan-progress.md`, this ledger, PR description and element-package authority aligned on 8 / 193 / 8; Fairy/Underworld post-release. After every accepted slice synchronize both control files and validate the sync commit before any next slice. | Exact 2-file control diff + current package manifest + exact-head CI | ✅ synchronized through RC-02c4 once ledger revision 5 control commit is accepted |
-| RC-02 | Capability inventory is historical/stale relative to later owner work | Reconcile `tcg-runtime-capabilities-v0.2.json` one Release 1-used shape at a time. Accepted so far: b1, b2a, b2b, b2, c1, c2, c3, c4. Preserve audited non-changes instead of re-discovering them. Continue only after this control sync passes CI. | Capability test + owner tests + TCG Card Pass + exact-head Migration/Smoke + synchronized log | 🔎 in progress |
+| RC-01 | Planning authority drift | Keep `tcg-master-plan-progress.md`, this ledger, PR description and element-package authority aligned on 8 / 193 / 8; Fairy/Underworld post-release. After every accepted slice synchronize both control files and validate the sync commit before any next slice. | Exact 2-file control diff + current package manifest + exact-head CI | ✅ synchronized through RC-02c5 once ledger revision 6 control commit is accepted |
+| RC-02 | Capability inventory is historical/stale relative to later owner work | Reconcile `tcg-runtime-capabilities-v0.2.json` one Release 1-used shape at a time. Accepted so far: b1, b2a, b2b, b2, c1, c2, c3, c4, c5. Preserve audited non-changes instead of re-discovering them. Continue only after this control sync passes CI. | Capability test + owner tests + TCG Card Pass + exact-head Migration/Smoke + synchronized log | 🔎 in progress |
 | RC-03 | Production Edge source parity incomplete/uncertain | After G3 closes, pin one accepted-and-synchronized head, collect exact dependency closure for all 3 TCG functions, compare/deploy/read back exact source, preserve JWT. Do not hand-copy shared engine graph. | Supabase deployed version/source readback + exact GitHub source identity | ☐ execution hold until G3 closes |
 | RC-04 | Real two-user production journey not yet proven | Execute the 20-step G5 journey after Edge parity. Every defect must cite one owner row and reproduction. | two users, full match complete, private views correct, exactly-once rewards/XP/currency | ☐ |
 | RC-05 | Final release fence not yet assembled at one head | Refresh PR metadata, changed files, review threads, exact-head workflows, DB parity, Edge parity and E2E at one immutable SHA. | all G0-G6 green at same synchronized head | ☐ |
@@ -158,6 +158,7 @@ These were explicitly audited and must not be rediscovered as if no decision exi
 
 - **`INSPECT_ZONE` stays `missing`.** Current Reward inspection ownership is intentionally bounded. Existing Reward-card inspection does not prove generic `INSPECT_ZONE` grammar/runtime parity. Reopen only if a Release 1 generic inspection shape is proven and bound to owner #31/#32.
 - **`HEAL_EACH` stays `partial`.** Accepted tactic `HEAL_EACH` and attack-wide `HEAL_EACH` owners exist, but First Canopy adds a distinct selected-target shape (`SELECT_CREATURE` for 0–2 damaged field targets → `HEAL_EACH targets:$canopy_targets`). Do not classify implemented until that Release 1 family is proven through canonical Heal ownership.
+- **`event_attachment_target_is_source` stays `missing`.** Release 1 has four direct uses: Stone Gravibble (`essence_attached`), Stone Flintkin (`relic_attached`), Tide Puddlepip (`essence_attached`) and Volt Railhorn (`essence_attached`). Essence snapshot handling is directly tested, but Flintkin's distinct `relic_attached` Event Listener continuation is not yet directly proven. Canonical Relic receipts alone do not prove the listener predicate path.
 
 ### 2026-09-16 — unrelated `main` advance reconciled
 
@@ -254,6 +255,48 @@ This revision synchronizes:
 - RC-02 accepted chain through c4;
 - exact #566/#795/#821 verification;
 - unchanged 40-owner, Supabase and production boundaries;
+- next allowed operation.
+
+**Next allowed operation after this two-file control commit itself passes exact-head Card Pass / Migration / Smoke plus review/status fence:** continue **RC-02 capability/owner closeout only**, one Release 1-used shape at a time from the synchronized head. Do not begin G4, Fairy/Underworld or post-release product systems yet.
+
+
+### 2026-09-16 — RC-02c5 attachment-kind predicate accepted
+
+Accepted head: `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`.
+
+Precise reconciliation:
+- `event_attachment_kind_is`: **`missing → implemented`**.
+- owner: **#28 Generic Event Listener Engine / canonical essence-attachment eligibility snapshot**.
+- Release 1 direct-use proof: exactly one launch card — Volt Railhorn / Power Rail (`essence_attached`).
+- Power Rail accepts `temporary OR borrowed`; all other launch packages and Prismatic Founder contain zero direct uses.
+- existing Power Rail integration executes the `temporary` case.
+- new focused Deno regression `runtime-v0-2-event-listener-attachment-kind.test.ts` proves borrowed matches borrowed, borrowed does not match temporary, temporary matches temporary, and ordinary does not match borrowed.
+- a full roster audit found no Release 1 card/effect that creates a borrowed attachment; borrowed is retained as an accepted Power Rail alternative but now has direct generic predicate proof.
+- no runtime/card/rule/migration/production implementation changed.
+
+Explicit non-change:
+- `event_attachment_target_is_source` remains `missing` because Flintkin's `relic_attached` listener path is distinct from the directly tested Essence snapshot path and is not yet directly proven by the current Event Listener continuation tests.
+
+Exact-head evidence:
+- Card Pass #568 SUCCESS
+- Migration #797 SUCCESS, full zero-state replay
+- Smoke #823 SUCCESS, independent zero-state replay
+- review threads 0
+- combined statuses none found
+- complete PR inventory 395 files
+- GitHub source-of-truth comment #5702543035
+
+### 2026-09-16 — Ledger revision 6 control synchronization
+
+Purpose: complete mandatory `LOG` for RC-02c5 before any RC-02c6 audit.
+
+This revision synchronizes:
+- accepted baseline `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`;
+- owner #28 with accepted `event_attachment_kind_is` coverage;
+- the explicit `event_attachment_target_is_source` non-change tied to Flintkin's unproved `relic_attached` listener path;
+- RC-02 accepted chain through c5;
+- exact #568/#797/#823 evidence;
+- retained prior audited non-changes and repository/transport audit history;
 - next allowed operation.
 
 **Next allowed operation after this two-file control commit itself passes exact-head Card Pass / Migration / Smoke plus review/status fence:** continue **RC-02 capability/owner closeout only**, one Release 1-used shape at a time from the synchronized head. Do not begin G4, Fairy/Underworld or post-release product systems yet.

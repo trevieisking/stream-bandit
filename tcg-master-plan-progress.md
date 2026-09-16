@@ -1,7 +1,7 @@
 # Stream Bandit TCG — Canonical Release Master Plan
 
-**Canonical checkpoint:** 2026-09-16 — control synchronization after accepted RC-02c4  
-**Accepted gameplay/capability baseline:** `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`  
+**Canonical checkpoint:** 2026-09-16 — control synchronization after accepted RC-02c5  
+**Accepted gameplay/capability baseline:** `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`  
 **Integration lane:** PR #549 — `feature/tcg-private-alpha-v0-5-source-recovery`  
 **Execution ledger:** `tcg-master-plan-ledger.md`
 
@@ -70,14 +70,14 @@ Fairy and Underworld design/audit documents are preserved as expansion authority
 
 Accepted gameplay/capability baseline immediately before this control synchronization:
 
-- PR #549 head: `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`.
+- PR #549 head: `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`.
 - Current `main` base: `e0a71e1b292b45373f2c4ba658a4f346f5c1c84c`.
 - PR: open, draft, mergeable, unmerged.
-- Merge candidate at RC-02c4 acceptance fence: `6507f350fb0b398d3b211c281b4ca3a9abe23b02`.
-- Exact-head workflows: TCG Card Pass 2 Validation #566 SUCCESS; Migration Replay #795 SUCCESS; Functional Smoke #821 SUCCESS, including independent PostgreSQL replay from zero.
+- Merge candidate at RC-02c5 acceptance fence: `2550bbffa1816c003457abe4d1bd6e0696c9cf53`.
+- Exact-head workflows: TCG Card Pass 2 Validation #568 SUCCESS; Migration Replay #797 SUCCESS; Functional Smoke #823 SUCCESS, including independent PostgreSQL replay from zero.
 - Review threads: 0.
 - Legacy combined commit statuses: none found; absence is not counted as a PASS.
-- Complete PR inventory at the accepted baseline: 394 files.
+- Complete PR inventory at the accepted baseline: 395 files.
 - Launch package authority remains `tcg-element-packages-v0.2.json` = 8 launch elements, 193 structured identities, 8 starters, Fairy/Underworld `launch_blocker=false`.
 - Production DB contains all eight accepted post-20260904110527 TCG migrations through `20260906193000_tcg_match_v0_2_runtime_marker_bridge`.
 - Production registry proof remains `SB1-set-one-v0.2`, 193/193 structured rows, malformed 0, digest `8e2556604fd1757917ea60b7e9af8c0de717a69b72c7e37b0e2690abdcce430f`, runtime authority false until release gates finish.
@@ -95,11 +95,15 @@ Accepted G3 reconciliation chain now recorded as current evidence:
 - **RC-02c3** — `event_controller_is_opponent` predicate classification reconciled `missing → implemented` at `086840853f34add8ac610e1a9764dd0a728fb05d`; exactly two Release 1 uses, both Shade Event Listener requirements: Nightmaw — Dread Hunger and Eclipse Essence — Eclipse Condition Heal. Generic Event Listener positive/negative controller semantics are covered by the committed controller-predicate Deno suite. Exact-head gates #564/#793/#819 all SUCCESS. GitHub source-of-truth comment #5702012161.
 - **Control sync revision 4** — master plan + ledger synchronized and validated at `4fd1a10fda98b33822767755a6df600febd366de`; exact-head gates #565/#794/#820 all SUCCESS; GitHub source-of-truth comment #5702112552.
 - **RC-02c4** — `source_controller_is_self` predicate classification reconciled `missing → implemented` at `e822ba8e4d881b7e022f90248e1b1124f0a7a2c9`; exactly eight Release 1 uses across Astral 2 / Shade 2 / Tide 3 / Volt 1, all Event Listener requirements owned by #28. Exact focused tests prove self/opponent source-controller semantics and independence from affected-controller predicates. Exact-head gates #566/#795/#821 all SUCCESS. GitHub source-of-truth comment #5702217085.
+- **Control sync revision 5** — master plan + ledger synchronized and validated at `fd8b3f155b44031a2681efd8988d13e2634a96f8`; exact-head gates #567/#796/#822 all SUCCESS; GitHub source-of-truth comment #5702311757.
+- **RC-02c5** — `event_attachment_kind_is` reconciled `missing → implemented` at `af79a3c45db9a0c00406b44d1d0581aa1c8fb140`; exactly one Release 1 card uses the predicate: Volt Railhorn / Power Rail. Existing integration proves `temporary`; focused regression `runtime-v0-2-event-listener-attachment-kind.test.ts` proves `borrowed`, `temporary`, and nonmatching ordinary attachment semantics. Exact-head gates #568/#797/#823 all SUCCESS. GitHub source-of-truth comment #5702543035.
+
 
 Audited classifications deliberately **not** changed:
 
 - `INSPECT_ZONE` remains `missing`: current Reward inspection ownership is intentionally bounded and does not prove generic `INSPECT_ZONE` parity.
 - `HEAL_EACH` remains `partial`: Release 1 includes at least three shapes, including First Canopy `SELECT_CREATURE (0–2 damaged field targets) → HEAL_EACH targets:$canopy_targets`; accepted tactic and attack-wide heal owners do not yet prove that selected-target family.
+- `event_attachment_target_is_source` remains `missing`: Release 1 has four direct uses (Stone Gravibble, Stone Flintkin, Tide Puddlepip, Volt Railhorn). Essence-attached snapshot semantics are directly proven, but Flintkin uses `relic_attached` and the exact Event Listener continuation for that distinct launch path is not yet directly proven. Relic receipt ownership alone is insufficient to claim generic listener-predicate parity.
 
 Repository-drift note retained:
 
@@ -233,7 +237,7 @@ Rollback/demotion trigger: auth/security regression, state corruption, hidden-in
 
 Do not skip ahead and do not start a second slice while a prior slice is unresolved.
 
-1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c4 and pass exact-head CI together.
+1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c5 and pass exact-head CI together.
 2. **Continue RC-02 capability/owner closeout only** — one Release 1-used operation/predicate or one proven owner defect at a time.
 3. **After every accepted RC-02 slice, synchronize both control files and validate that control commit before choosing another slice.**
 4. **Close G3** only when the 193-card Release 1 inventory is fully reconciled against accepted owners/capabilities.
@@ -276,6 +280,6 @@ Old comments, old percentages, old capability labels, old branch state or a late
 
 Release gates: **G0 ✅ | G1 ✅ | G2 ✅ | G3 🔎 | G4 🔎 (execution hold until G3 closes) | G5 ☐ | G6 ☐ | G7 ☐**
 
-Current G3 control checkpoint: **RC-02b1 ✅ | RC-02b2a ✅ | RC-02b2b ✅ | RC-02b2 ✅ | RC-02c1 ✅ | RC-02c2 ✅ | RC-02c3 ✅ | RC-02c4 ✅ | next RC-02 slice blocked until this plan/ledger synchronization passes exact-head CI 🔒**
+Current G3 control checkpoint: **RC-02b1 ✅ | RC-02b2a ✅ | RC-02b2b ✅ | RC-02b2 ✅ | RC-02c1 ✅ | RC-02c2 ✅ | RC-02c3 ✅ | RC-02c4 ✅ | RC-02c5 ✅ | next RC-02 slice blocked until this revision-6 plan/ledger synchronization passes exact-head CI 🔒**
 
 This is the only release progress meter. It deliberately does not translate the eight gates into a misleading implementation percentage.
