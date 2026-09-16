@@ -1,0 +1,131 @@
+{
+  "schema": "stream-bandit-tcg-fairy-glimmerwish-v2-candidate-v1",
+  "recorded_at": "2026-09-16",
+  "status": "branch_candidate_for_v2_sync",
+  "element": "Fairy",
+  "starter": "Glimmerwish",
+  "pack": "Fairy Pack",
+  "signature_mythic": "Moonpetal Empress",
+  "design_lineage": {
+    "historical_mechanics_authority": "tcg-future-fairy-audit.md",
+    "v2_visual_and_product_authority": "tcg-ten-deck-product-blueprint-v1.json",
+    "visual_contract": "tcg-card-visual-printing-v1.json",
+    "note": "V2 preserves Fairy's completed protection, cleansing, graceful repositioning, healing amplification and damage-redistribution identity while adopting the approved Glimmerwish visual names and two-action-slot Creature contract."
+  },
+  "package_contract": {
+    "identities": 24,
+    "creatures": 11,
+    "essence": 4,
+    "tactics": 9,
+    "pack_only": 3,
+    "starter_cards": 60,
+    "starter_identities": 21,
+    "starter_creature_cards": 22,
+    "starter_essence_cards": 18,
+    "starter_tactic_cards": 20
+  },
+  "visual_rules": {
+    "dedicated_artwork_every_identity": true,
+    "creature_action_shapes": ["Ability + Attack 1", "Attack 1 + Attack 2"],
+    "forbidden_shape": "Ability + Attack 1 + Attack 2",
+    "all_visible_numbers_named": true,
+    "required_number_labels": ["HP", "Cost", "Attack Cost", "Damage", "Withdraw Cost", "Shield", "Heal"],
+    "rarities": ["Basic", "Rare", "Extra Rare", "Mythic"],
+    "printing_finishes": ["Standard", "Shine", "Holo", "Full-Art Shine", "Alt-Art", "Signature Mythic"],
+    "printing_rule": "Printing finish is cosmetic and never changes gameplay identity or rules."
+  },
+  "cards": [
+    {
+      "id":"fairy-pixlet","name":"Pixlet","family":"Creature","stage":"Baby","evolves_from":null,"rarity":"Basic","pack_only":false,"hp":60,"withdraw_cost":0,"action_shape":"Ability + Attack 1",
+      "ability":{"name":"Gentle Burden","text":"The first time during your turn another friendly creature would be healed by one of your card effects, you may move up to 10 damage from that creature to Pixlet instead of healing that moved amount."},
+      "attack_1":{"name":"Petal Strike","attack_cost":[{"element":"Fairy","amount":1}],"damage":20,"text":"Deal Damage 20."},
+      "artwork":"Small luminous fairy creature with petal wings and rose-pink moonlight."
+    },
+    {
+      "id":"fairy-glimmerspry","name":"Glimmerspry","family":"Creature","stage":"Teen","evolves_from":"fairy-pixlet","rarity":"Rare","pack_only":false,"hp":130,"withdraw_cost":1,"action_shape":"Ability + Attack 1",
+      "ability":{"name":"Shared Grace","text":"When Glimmerspry evolves, you may move up to 20 damage from 1 other friendly creature to Glimmerspry."},
+      "attack_1":{"name":"Kindred Leap","attack_cost":[{"element":"Fairy","amount":2}],"damage":60,"text":"After damage, heal 20 damage from another damaged friendly creature."},
+      "artwork":"Graceful winged fairy lynx leaping through sparkling ribbon light."
+    },
+    {
+      "id":"fairy-moonpetal-empress","name":"Moonpetal Empress","family":"Creature","stage":"Adult","evolves_from":"fairy-glimmerspry","rarity":"Mythic","pack_only":false,"deck_limit":1,"reward_value":2,"starbound":true,"hp":350,"withdraw_cost":2,"action_shape":"Ability + Attack 1",
+      "ability":{"name":"Crown of Grace","text":"Once during your turn, choose up to 2 damaged friendly Fairy creatures. Move up to 20 damage from each chosen creature to Moonpetal Empress, then heal 20 damage from Moonpetal Empress."},
+      "attack_1":{"name":"Grand Reversal","attack_cost":[{"element":"Fairy","amount":5}],"damage":160,"text":"Consume the shared Starbound marker on legal declaration. After damage, choose up to 2 damaged friendly creatures. From each chosen creature, you may move up to 30 damage to the opposing Vanguard. Then heal 30 damage from Moonpetal Empress."},
+      "artwork":"Regal moon-petal fairy empress with luminous antlers, silver-pink wings and a celestial crown."
+    },
+    {
+      "id":"fairy-wishbud","name":"Wishbud","family":"Creature","stage":"Baby","evolves_from":null,"rarity":"Basic","pack_only":false,"hp":50,"withdraw_cost":0,"action_shape":"Ability + Attack 1",
+      "ability":{"name":"Clear Dew","text":"When played from hand into an empty Reserve space during your Build phase, you may clear 1 modifier condition from your Vanguard."},
+      "attack_1":{"name":"Hope Bloom","attack_cost":[{"element":"Fairy","amount":1}],"damage":20,"text":"Deal Damage 20."},
+      "artwork":"Tiny leaf-winged wish spirit emerging from a glowing blossom."
+    },
+    {
+      "id":"fairy-radiant-nymph","name":"Radiant Nymph","family":"Creature","stage":"Teen","evolves_from":"fairy-wishbud","rarity":"Rare","pack_only":false,"hp":140,"withdraw_cost":1,"action_shape":"Ability + Attack 1",
+      "ability":{"name":"Halo Step","text":"When Radiant Nymph evolves, choose 1 friendly creature. Until the start of your next turn, the first opposing card effect that would newly apply a modifier condition to that creature fails."},
+      "attack_1":{"name":"Clean Arc","attack_cost":[{"element":"Fairy","amount":2}],"damage":60,"text":"After damage, you may clear 1 condition from another friendly creature."},
+      "artwork":"Radiant nymph with translucent floral wings crossing a moonlit waterfall."
+    },
+    {
+      "id":"fairy-petalqueen","name":"Petalqueen","family":"Creature","stage":"Adult","evolves_from":"fairy-radiant-nymph","rarity":"Extra Rare","pack_only":false,"hp":260,"withdraw_cost":1,"action_shape":"Ability + Attack 1",
+      "ability":{"name":"Seraphic Veil","text":"Once during your turn, choose 1 friendly Fairy creature. Until your next turn begins, the next opposing effect damage packet dealt to that creature is reduced by 30."},
+      "attack_1":{"name":"Purity Spiral","attack_cost":[{"element":"Fairy","amount":3}],"damage":110,"text":"After damage, if you cleared a condition from one of your creatures during this turn, heal 30 damage from 1 damaged friendly creature."},
+      "artwork":"Elegant antlered fairy queen surrounded by petal spirals and protective rose-silver light."
+    },
+    {
+      "id":"fairy-moondormouse","name":"Moondormouse","family":"Creature","stage":"Standalone","rarity":"Basic","pack_only":false,"hp":100,"withdraw_cost":0,"action_shape":"Ability + Attack 1",
+      "ability":{"name":"Moon Sip","text":"Once during your turn, if Moondormouse has damage, drain 10 vitality from the opposing Vanguard and heal Moondormouse by the actual HP damage drained."},
+      "attack_1":{"name":"Moonbeam","attack_cost":[{"element":"Fairy","amount":1}],"damage":30,"text":"Deal Damage 30."},
+      "artwork":"Small moonlit dormouse spirit resting in a silver flower."
+    },
+    {
+      "id":"fairy-crystaltoad","name":"Crystaltoad","family":"Creature","stage":"Standalone","rarity":"Rare","pack_only":false,"hp":180,"withdraw_cost":2,"action_shape":"Attack 1 + Attack 2",
+      "attack_1":{"name":"Crystal Bash","attack_cost":[{"element":"Fairy","amount":2}],"damage":60,"text":"Deal Damage 60."},
+      "attack_2":{"name":"Refraction","attack_cost":[{"element":"Fairy","amount":3}],"damage":90,"text":"If Crystaltoad has Shield, heal 20 damage from 1 other friendly creature."},
+      "artwork":"Prismatic crystal toad with faceted skin reflecting pink and blue fairy light."
+    },
+    {
+      "id":"fairy-silkray","name":"Silkray","family":"Creature","stage":"Standalone","rarity":"Rare","pack_only":false,"hp":130,"withdraw_cost":0,"action_shape":"Ability + Attack 1",
+      "ability":{"name":"Ribbon Current","text":"The first time during your turn Silkray becomes Vanguard from Reserve, you may move up to 20 damage from another friendly creature to Silkray. If damage moved, Silkray's next attack that turn deals 20 more damage."},
+      "attack_1":{"name":"Silk Slice","attack_cost":[{"element":"Fairy","amount":2}],"damage":60,"text":"Deal Damage 60."},
+      "artwork":"Ribbon-winged ray gliding through sparkling air currents above a luminous garden."
+    },
+    {
+      "id":"fairy-prismoth","name":"Prismoth","family":"Creature","stage":"Standalone","rarity":"Extra Rare","pack_only":true,"hp":120,"withdraw_cost":0,"action_shape":"Attack 1 + Attack 2",
+      "attack_1":{"name":"Mirror Wing","attack_cost":[{"element":"Fairy","amount":1}],"damage":30,"text":"Deal Damage 30."},
+      "attack_2":{"name":"Gleam Scatter","attack_cost":[{"element":"Fairy","amount":2}],"damage":60,"text":"Deal Damage 60."},
+      "artwork":"Large prism moth scattering mirrored shards of rainbow moonlight."
+    },
+    {
+      "id":"fairy-luminara","name":"Luminara","family":"Creature","stage":"Standalone","rarity":"Extra Rare","pack_only":false,"hp":250,"withdraw_cost":1,"action_shape":"Ability + Attack 1",
+      "ability":{"name":"Prismatic Burden","text":"Once during your turn, you may move up to 30 damage from one friendly creature to another friendly creature. At least 10 damage must move for the Ability to count as used."},
+      "attack_1":{"name":"Grace Reversal","attack_cost":[{"element":"Fairy","amount":3}],"damage":100,"text":"After damage, if Luminara has damage, you may move up to 20 damage from Luminara to the opposing Vanguard."},
+      "artwork":"Prismatic guardian spirit with layered glass-like wings and ribbons of enchanted light."
+    },
+    {"id":"fairy-basic-essence","name":"Fairy Essence","family":"Essence","subtype":"Basic Essence","rarity":"Basic","pack_only":false,"provides":[{"element":"Fairy","amount":1}],"text":"Provides 1 Fairy Essence while attached.","artwork":"Pink-silver essence crystal shaped like layered petals."},
+    {"id":"fairy-grace-essence","name":"Grace Essence","family":"Essence","subtype":"Special Essence","rarity":"Rare","pack_only":false,"provides":[{"element":"Fairy","amount":1}],"text":"When attached from hand to a damaged friendly Fairy creature, heal 20 damage from it.","artwork":"Soft rose-gold essence orb surrounded by healing ribbons."},
+    {"id":"fairy-halo-essence","name":"Halo Essence","family":"Essence","subtype":"Special Essence","rarity":"Rare","pack_only":false,"provides":[{"element":"Fairy","amount":1}],"text":"The first time during each turn the attached Fairy creature has a condition cleared by one of your card effects, gain Shield 10 on it.","artwork":"Silver halo encircling a luminous lavender essence shard."},
+    {"id":"fairy-mirror-essence","name":"Mirror Essence","family":"Essence","subtype":"Special Essence","rarity":"Extra Rare","pack_only":true,"provides":[{"element":"Fairy","amount":1}],"text":"The first time during each of your turns damage is moved away from the attached Fairy creature by one of your card effects, its next attack that turn deals 20 more damage.","artwork":"Mirror-faceted crystal reflecting many tiny fairy silhouettes."},
+    {"id":"fairy-charm-of-grace","name":"Charm of Grace","family":"Tactic","subtype":"Ally","rarity":"Rare","pack_only":false,"cost":3,"text":"Choose up to 2 damaged friendly Fairy creatures. Heal 20 damage from each.","artwork":"Two luminous fairy spirits joining hands inside a protective floral ring."},
+    {"id":"fairy-dancer-suri","name":"Dancer Suri","family":"Tactic","subtype":"Ally","rarity":"Rare","pack_only":false,"cost":3,"text":"Choose 1 friendly Fairy creature in Reserve and switch it with your Vanguard. Then you may move up to 20 damage from the creature moved to Reserve to the new Vanguard.","artwork":"Fairy dancer tracing a bright switch-path between two creatures."},
+    {"id":"fairy-archivist-faye","name":"Archivist Faye","family":"Tactic","subtype":"Ally","rarity":"Rare","pack_only":false,"cost":3,"text":"Look at the top 5 cards of your deck. Put up to 2 Fairy Creature or Fairy Essence cards among them into your hand. Put the rest on the bottom in any order.","artwork":"Moonlit archivist surrounded by floating crystal pages and card sigils."},
+    {"id":"fairy-graceful-exchange","name":"Graceful Exchange","family":"Tactic","subtype":"Device","rarity":"Rare","pack_only":false,"cost":2,"text":"Choose 2 friendly creatures. Move up to 30 damage from the first to the second.","artwork":"Two enchanted ribbons transferring light between paired creatures."},
+    {"id":"fairy-purity-bell","name":"Purity Bell","family":"Tactic","subtype":"Device","rarity":"Rare","pack_only":false,"cost":2,"text":"Choose 1 friendly creature with a condition. Clear 1 condition from it, then heal 20 damage from it.","artwork":"Crystal bell releasing cleansing rings of pink-white light."},
+    {"id":"fairy-reversal-waltz","name":"Reversal Waltz","family":"Tactic","subtype":"Device","rarity":"Extra Rare","pack_only":true,"cost":4,"text":"Choose 1 damaged friendly Fairy creature and the opposing Vanguard. Move up to 40 damage from the friendly creature to the opposing Vanguard. Play only once per turn and only if at least 20 damage can move.","artwork":"Spiral dance of mirrored petals reversing a stream of damage energy."},
+    {"id":"fairy-heartbloom-charm","name":"Heartbloom Charm","family":"Tactic","subtype":"Relic","rarity":"Rare","pack_only":false,"cost":2,"text":"The first time during each turn the attached Fairy creature is healed by a card effect, increase that actual healing by 10.","artwork":"Heart-shaped crystal charm blooming with pink petals and gold filigree."},
+    {"id":"fairy-prism-ribbon","name":"Prism Ribbon","family":"Tactic","subtype":"Relic","rarity":"Rare","pack_only":false,"cost":2,"text":"The first time during each turn the attached Fairy creature would receive effect damage, reduce that effect damage by 20.","artwork":"Prismatic ribbon relic looping around a small silver crown."},
+    {"id":"fairy-silverpetal-grove","name":"Silverpetal Grove","family":"Tactic","subtype":"Realm","rarity":"Extra Rare","pack_only":false,"cost":5,"text":"The first time during each player's own turn that player moves damage between two friendly creatures by a card effect, the destination creature gains Shield 10 after the move.","artwork":"Moonlit floating grove filled with silver petals, waterfalls and luminous fairy trees."}
+  ],
+  "pack_only_ids": ["fairy-prismoth","fairy-mirror-essence","fairy-reversal-waltz"],
+  "starter_recipe": {
+    "starter_id":"deck-fairy-glimmerwish","name":"Glimmerwish","cards":{
+      "fairy-pixlet":3,"fairy-glimmerspry":2,"fairy-moonpetal-empress":1,
+      "fairy-wishbud":3,"fairy-radiant-nymph":2,"fairy-petalqueen":2,
+      "fairy-moondormouse":3,"fairy-crystaltoad":2,"fairy-silkray":2,"fairy-luminara":2,
+      "fairy-basic-essence":14,"fairy-grace-essence":2,"fairy-halo-essence":2,
+      "fairy-charm-of-grace":3,"fairy-dancer-suri":3,"fairy-archivist-faye":2,
+      "fairy-graceful-exchange":2,"fairy-purity-bell":2,"fairy-heartbloom-charm":3,
+      "fairy-prism-ribbon":2,"fairy-silverpetal-grove":3
+    },
+    "checks":{"total_cards":60,"starter_identities":21,"creature_cards":22,"essence_cards":18,"tactic_cards":20,"pack_only_in_starter":0,"signature_mythic_copies":1}
+  }
+}
