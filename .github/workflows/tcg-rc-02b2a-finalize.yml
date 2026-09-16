@@ -1,0 +1,88 @@
+name: TCG RC-02b2a Finalize
+
+on:
+  push:
+    branches:
+      - repair/tcg-rc-02b2a-da87b4c
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repair branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard immutable base and transport-only history
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=da87b4c6e212317e38492f23c707c5862df13ffa
+          EXPECTED=$(printf '%s\n' \
+            .github/workflows/tcg-rc-02b2a-finalize.yml \
+            .github/workflows/tcg-rc-02b2a-repair.yml | sort)
+          ACTUAL=$(git diff --name-only "$BASE"..HEAD | sort)
+          test "$ACTUAL" = "$EXPECTED"
+
+      - name: Reproduce the already-tested patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          source = Path('.github/workflows/tcg-rc-02b2a-repair.yml').read_text()
+          start = "          python - <<'PY'\n"
+          end = "\n          PY\n\n      - name: Install Deno"
+          if source.count(start) != 1 or source.count(end) != 1:
+              raise SystemExit('repair_patch_transport_markers_changed')
+          script = source.split(start, 1)[1].split(end, 1)[0]
+          Path('/tmp/tcg-rc-02b2a-patch.py').write_text(textwrap.dedent(script))
+          PY
+          python /tmp/tcg-rc-02b2a-patch.py
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Verify bounded owner repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          deno test --allow-env \
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-modifier-engine.test.ts \
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener-attachment-attack-modifier.test.ts \
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-surge-lifecycle-bridge.test.ts
+          node --test tcg/tests/card-pass-2-runtime-attack-modifier-owner.test.mjs
+          deno check supabase/functions/_shared/tcg-match-surge-lifecycle-v0-2.ts
+          deno check supabase/functions/_shared/tcg-match-event-listener-v0-2.ts
+          deno check supabase/functions/tcg-match-actions/index.ts
+
+      - name: Commit tested five-file repair and remove transports
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=da87b4c6e212317e38492f23c707c5862df13ffa
+          rm .github/workflows/tcg-rc-02b2a-repair.yml .github/workflows/tcg-rc-02b2a-finalize.yml
+          git config user.name "Trevor"
+          git config user.email "269324007+trevieisking@users.noreply.github.com"
+          git add -A
+          mapfile -t STAGED < <(git diff --cached --name-only)
+          test "${#STAGED[@]}" -eq 7
+          git commit -m "fix(tcg): converge attack modifier producers"
+          EXPECTED=$(printf '%s\n' \
+            supabase/functions/_shared/tcg-match-event-listener-v0-2.ts \
+            supabase/functions/_shared/tcg-match-surge-lifecycle-v0-2.ts \
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener-attachment-attack-modifier.test.ts \
+            supabase/functions/tcg-tactic-actions/runtime-v0-2-surge-lifecycle-bridge.test.ts \
+            tcg/tests/card-pass-2-runtime-attack-modifier-owner.test.mjs | sort)
+          ACTUAL=$(git diff --name-only "$BASE"..HEAD | sort)
+          printf '%s\n' "$ACTUAL"
+          test "$ACTUAL" = "$EXPECTED"
+          git push origin HEAD:repair/tcg-rc-02b2a-da87b4c
