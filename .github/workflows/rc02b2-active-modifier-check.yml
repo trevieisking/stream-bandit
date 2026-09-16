@@ -1,4 +1,5 @@
 name: RC-02b2 Active Modifier Check
+# Re-run the already-materialized candidate; this temporary comment is removed with the verifier.
 
 on:
   push:
