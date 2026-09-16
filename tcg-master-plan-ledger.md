@@ -1,8 +1,8 @@
 # Stream Bandit TCG — Master Plan Owner / Repair Ledger
 
 **Plan authority:** `tcg-master-plan-progress.md`  
-**Ledger revision:** 3 — 2026-09-16  
-**Accepted gameplay/capability baseline:** `34d54a0573c677377cd54e7158bf7779378200d2`  
+**Ledger revision:** 4 — 2026-09-16  
+**Accepted gameplay/capability baseline:** `086840853f34add8ac610e1a9764dd0a728fb05d`  
 **Baseline owner count:** 40 families  
 **Release lane:** PR #549
 
@@ -50,7 +50,7 @@
 | 25 | Cost Engine | action/ability/payment cost owners + withdrawal cost owner | ✅ | Cost computes legality/value; it does not consume resources. |
 | 26 | Payment Engine | `_shared/tcg-match-payment-*` family | ✅ | Payment consumes resources only after preflight. No caller-owned splice/discard payment path. |
 | 27 | Atomic Switch / Battlefield Position Engine | `_shared/tcg-match-switch-context-v0-2.ts` | ✅ | Vanguard/Reserve position mutation and switch context live here. |
-| 28 | Generic Event Listener Engine | `_shared/tcg-match-event-listener-*` family | ✅ | RC-02c2 accepted generic `event_action_kind_is` Release 1 predicate coverage. Listener engine orchestrates predicates/actions; nested mechanic mutation delegates to mechanic owners. |
+| 28 | Generic Event Listener Engine | `_shared/tcg-match-event-listener-*` family | ✅ | RC-02c2 accepted generic `event_action_kind_is` Release 1 coverage. RC-02c3 accepted `event_controller_is_opponent` for the two Shade launch uses (Nightmaw and Eclipse Essence), with direct positive/negative controller regression proof. Listener engine orchestrates predicates/actions; nested mechanic mutation delegates to mechanic owners. |
 | 29 | Movement Listener Engine | `_shared/tcg-match-movement-listener-v0-2.ts` | ✅ | Listener continuation only; physical movement delegates. RC-02c2 runtime proof exercised the real `voluntary_withdrawal` action-kind case through this path. |
 | 30 | Card-Zone / Draw / Shuffle / Discard Engine | `_shared/tcg-match-card-zone-engine-v0-2.ts` | ✅ | Own physical card-instance movement/order. RNG chooses random order; Hidden Information controls views. |
 | 31 | Card Search / Filter / Inspection Engine | specialized structured query/inspection owners + Card-Zone for mutation | 🔎 | `INSPECT_ZONE` deliberately remains `missing`: current Reward inspection is bounded and does not prove generic zone-inspection parity. Audit Release 1 search/inspection call sites; any physical move after search must use Card-Zone. Do not invent owner #41. |
@@ -70,8 +70,8 @@ These rows are the only current cross-owner Release 1 closeout tasks. They preve
 
 | ID | Defect / gap | Exact fix/process | Acceptance evidence | State |
 |---|---|---|---|---|
-| RC-01 | Planning authority drift | Keep `tcg-master-plan-progress.md`, this ledger, PR description and element-package authority aligned on 8 / 193 / 8; Fairy/Underworld post-release. After every accepted slice synchronize both control files and validate the sync commit before any next slice. | Exact 2-file control diff + current package manifest + exact-head CI | ✅ synchronized by ledger revision 3 once this control commit is accepted |
-| RC-02 | Capability inventory is historical/stale relative to later owner work | Reconcile `tcg-runtime-capabilities-v0.2.json` one Release 1-used shape at a time. Accepted so far: b1, b2a, b2b, b2, c1, c2. Preserve audited non-changes instead of re-discovering them. Continue only after this control sync passes CI. | Capability test + owner tests + TCG Card Pass + exact-head Migration/Smoke + synchronized log | 🔎 in progress |
+| RC-01 | Planning authority drift | Keep `tcg-master-plan-progress.md`, this ledger, PR description and element-package authority aligned on 8 / 193 / 8; Fairy/Underworld post-release. After every accepted slice synchronize both control files and validate the sync commit before any next slice. | Exact 2-file control diff + current package manifest + exact-head CI | ✅ synchronized through RC-02c3 once ledger revision 4 control commit is accepted |
+| RC-02 | Capability inventory is historical/stale relative to later owner work | Reconcile `tcg-runtime-capabilities-v0.2.json` one Release 1-used shape at a time. Accepted so far: b1, b2a, b2b, b2, c1, c2, c3. Preserve audited non-changes instead of re-discovering them. Continue only after this control sync passes CI. | Capability test + owner tests + TCG Card Pass + exact-head Migration/Smoke + synchronized log | 🔎 in progress |
 | RC-03 | Production Edge source parity incomplete/uncertain | After G3 closes, pin one accepted-and-synchronized head, collect exact dependency closure for all 3 TCG functions, compare/deploy/read back exact source, preserve JWT. Do not hand-copy shared engine graph. | Supabase deployed version/source readback + exact GitHub source identity | ☐ execution hold until G3 closes |
 | RC-04 | Real two-user production journey not yet proven | Execute the 20-step G5 journey after Edge parity. Every defect must cite one owner row and reproduction. | two users, full match complete, private views correct, exactly-once rewards/XP/currency | ☐ |
 | RC-05 | Final release fence not yet assembled at one head | Refresh PR metadata, changed files, review threads, exact-head workflows, DB parity, Edge parity and E2E at one immutable SHA. | all G0-G6 green at same synchronized head | ☐ |
@@ -174,14 +174,49 @@ It contains no TCG runtime, migration, Supabase function, capability manifest, m
 
 ### 2026-09-16 — Ledger revision 3 control synchronization
 
-Purpose: close the bookkeeping gap that allowed accepted RC-02 work to outrun the canonical plan/ledger.
+Accepted synchronized head: `eefe4afc294489fbcbb637712a732e3857110b28`.
+
+The revision-3 control sync recorded accepted work through RC-02c2 and passed:
+- Card Pass #563 SUCCESS
+- Migration #792 SUCCESS
+- Smoke #818 SUCCESS
+- review threads 0
+- combined statuses none found
+
+During transport, an accidental branch-only `dummy` file appeared in commit `8135256f32e22205e17fe94f31d47fef9fb4c71b`. It was removed immediately in repaired tree `081a0677689165b06c732e47705303e867036de9`. `eefe4afc294489fbcbb637712a732e3857110b28` is a same-tree validation commit used to obtain a clean exact-head workflow set. Net compare from the prior accepted gameplay head contains only the master plan and ledger; `dummy` has zero residual presence. `main`, runtime source, migrations, Supabase and production were untouched. GitHub source-of-truth comment: #5701883152.
+
+### 2026-09-16 — RC-02c3 opponent event-controller predicate accepted
+
+Accepted head: `086840853f34add8ac610e1a9764dd0a728fb05d`.
+
+Precise reconciliation:
+- `event_controller_is_opponent`: **`missing → implemented`**.
+- owner: **#28 Generic Event Listener Engine**.
+- Release 1 roster proof: exactly two accepted uses, both Shade Event Listener requirements — Nightmaw / Dread Hunger and Eclipse Essence / Eclipse Condition Heal.
+- all other launch element packages and Prismatic Founder contain zero uses.
+- generic owner semantics: affected event controller is compared with the opposite of the listener controller.
+- committed controller-predicate Deno suite proves both positive and negative matching and keeps `source_controller_is_self` semantically distinct.
+- no runtime/card/rule/migration/production change.
+
+Exact-head evidence:
+- Card Pass #564 SUCCESS
+- Migration #793 SUCCESS, full zero-state replay
+- Smoke #819 SUCCESS, independent zero-state replay
+- review threads 0
+- combined statuses none found
+- complete PR inventory 394 files
+- GitHub source-of-truth comment #5702012161
+
+### 2026-09-16 — Ledger revision 4 control synchronization
+
+Purpose: complete mandatory `LOG` for RC-02c3 before any RC-02c4 audit.
 
 This revision synchronizes:
-- accepted baseline through RC-02c2 at `34d54a0573c677377cd54e7158bf7779378200d2`;
-- owner rows #14, #15, #20, #21, #28, #29, #31 and #32 with current accepted evidence;
-- RC-01 anti-drift control;
-- RC-02 accepted sub-slice chain and audited non-changes;
-- unrelated current `main` base advance;
+- accepted baseline `086840853f34add8ac610e1a9764dd0a728fb05d`;
+- owner #28 with accepted `event_controller_is_opponent` coverage;
+- RC-02 accepted chain through c3;
+- exact #564/#793/#819 evidence;
+- retained audited non-changes and transport/base-drift audit history;
 - next allowed operation.
 
-**Next allowed operation after this two-file control commit itself passes exact-head Card Pass / Migration / Smoke and review/status fence:** continue **RC-02 capability/owner closeout only**, one Release 1-used shape at a time, starting from the synchronized head. Do not begin G4, Fairy/Underworld or post-release product systems yet.
+**Next allowed operation after this two-file control commit itself passes exact-head Card Pass / Migration / Smoke plus review/status fence:** continue **RC-02 capability/owner closeout only**, one Release 1-used shape at a time from the synchronized head. Do not begin G4, Fairy/Underworld or post-release product systems yet.

@@ -1,7 +1,7 @@
 # Stream Bandit TCG — Canonical Release Master Plan
 
-**Canonical checkpoint:** 2026-09-16 — control synchronization after accepted RC-02c2  
-**Accepted gameplay/capability baseline:** `34d54a0573c677377cd54e7158bf7779378200d2`  
+**Canonical checkpoint:** 2026-09-16 — control synchronization after accepted RC-02c3  
+**Accepted gameplay/capability baseline:** `086840853f34add8ac610e1a9764dd0a728fb05d`  
 **Integration lane:** PR #549 — `feature/tcg-private-alpha-v0-5-source-recovery`  
 **Execution ledger:** `tcg-master-plan-ledger.md`
 
@@ -70,11 +70,11 @@ Fairy and Underworld design/audit documents are preserved as expansion authority
 
 Accepted gameplay/capability baseline immediately before this control synchronization:
 
-- PR #549 head: `34d54a0573c677377cd54e7158bf7779378200d2`.
+- PR #549 head: `086840853f34add8ac610e1a9764dd0a728fb05d`.
 - Current `main` base: `e0a71e1b292b45373f2c4ba658a4f346f5c1c84c`.
 - PR: open, draft, mergeable, unmerged.
-- Current merge candidate at the RC-02c2 acceptance fence: `4e1494c2c61182293581d6a39fe18d951c9ed59b`.
-- Exact-head workflows: TCG Card Pass 2 Validation #560 SUCCESS; Migration Replay #789 SUCCESS; Functional Smoke #815 SUCCESS, including independent PostgreSQL replay from zero.
+- Merge candidate at RC-02c3 acceptance fence: `90bbf857b6459856a8577c78067e9095934760a8`.
+- Exact-head workflows: TCG Card Pass 2 Validation #564 SUCCESS; Migration Replay #793 SUCCESS; Functional Smoke #819 SUCCESS, including independent PostgreSQL replay from zero.
 - Review threads: 0.
 - Legacy combined commit statuses: none found; absence is not counted as a PASS.
 - Complete PR inventory at the accepted baseline: 394 files.
@@ -91,18 +91,19 @@ Accepted G3 reconciliation chain now recorded as current evidence:
 - **RC-02b2** — card-ID-free selected-modifier Active-Ability family accepted at `29d92a7bb9df9385630ae9d8df67ef069a6e1eaa`; Ash Crown delegates to Attack #14 and Mountain Warden delegates to Damage/Protection #20.
 - **RC-02c1** — `ADD_INCOMING_ATTACK_DAMAGE_MODIFIER` capability classification reconciled `missing → implemented` at `355c23ed611f8c15ec3348a86ae02e1fdd162173`.
 - **RC-02c2** — `event_action_kind_is` predicate classification reconciled `missing → implemented` at `34d54a0573c677377cd54e7158bf7779378200d2`; GitHub source-of-truth comment #5701734004.
+- **Control sync revision 3** — master plan + ledger synchronized and validated at `eefe4afc294489fbcbb637712a732e3857110b28`; GitHub source-of-truth comment #5701883152.
+- **RC-02c3** — `event_controller_is_opponent` predicate classification reconciled `missing → implemented` at `086840853f34add8ac610e1a9764dd0a728fb05d`; exactly two Release 1 uses, both Shade Event Listener requirements: Nightmaw — Dread Hunger and Eclipse Essence — Eclipse Condition Heal. Generic Event Listener positive/negative controller semantics are covered by the committed controller-predicate Deno suite. Exact-head gates #564/#793/#819 all SUCCESS. GitHub source-of-truth comment #5702012161.
 
 Audited classifications deliberately **not** changed:
 
 - `INSPECT_ZONE` remains `missing`: current Reward inspection ownership is intentionally bounded and does not prove generic `INSPECT_ZONE` parity.
 - `HEAL_EACH` remains `partial`: Release 1 includes at least three shapes, including First Canopy `SELECT_CREATURE (0–2 damaged field targets) → HEAL_EACH targets:$canopy_targets`; accepted tactic and attack-wide heal owners do not yet prove that selected-target family.
 
-Base-branch drift resolved during RC-02c2:
+Repository-drift note retained:
 
-- `main` advanced from `39943d5fe5090cd0c140d7706092874dc98d2530` to `e0a71e1b292b45373f2c4ba658a4f346f5c1c84c`.
-- The new base is the Code Labs Buddy Canvas V244 rollback and changed only `code-labs/assets/buddy-canvas-assistant-sync-v124.js`.
-- No TCG runtime, migration, Supabase function, capability, master-plan or ledger source changed in that base advance.
-- GitHub recalculated PR #549 as mergeable and RC-02c2 then passed fresh exact-head CI against the current base.
+- `main` advanced from `39943d5fe5090cd0c140d7706092874dc98d2530` to `e0a71e1b292b45373f2c4ba658a4f346f5c1c84c` through the Code Labs Buddy Canvas V244 rollback.
+- That base advance changed no TCG runtime, migration, Supabase function, capability, master-plan or ledger source.
+- The prior control-sync transport incident is retained in the ledger/source-of-truth comment; its accidental `dummy` file has zero residual presence in the PR tree.
 
 ## 4. Fixed Release 1 gates
 
@@ -230,7 +231,7 @@ Rollback/demotion trigger: auth/security regression, state corruption, hidden-in
 
 Do not skip ahead and do not start a second slice while a prior slice is unresolved.
 
-1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c2 and pass exact-head CI together.
+1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c3 and pass exact-head CI together.
 2. **Continue RC-02 capability/owner closeout only** — one Release 1-used operation/predicate or one proven owner defect at a time.
 3. **After every accepted RC-02 slice, synchronize both control files and validate that control commit before choosing another slice.**
 4. **Close G3** only when the 193-card Release 1 inventory is fully reconciled against accepted owners/capabilities.
@@ -273,6 +274,6 @@ Old comments, old percentages, old capability labels, old branch state or a late
 
 Release gates: **G0 ✅ | G1 ✅ | G2 ✅ | G3 🔎 | G4 🔎 (execution hold until G3 closes) | G5 ☐ | G6 ☐ | G7 ☐**
 
-Current G3 control checkpoint: **RC-02b1 ✅ | RC-02b2a ✅ | RC-02b2b ✅ | RC-02b2 ✅ | RC-02c1 ✅ | RC-02c2 ✅ | next RC-02 slice blocked until this plan/ledger synchronization passes exact-head CI 🔒**
+Current G3 control checkpoint: **RC-02b1 ✅ | RC-02b2a ✅ | RC-02b2b ✅ | RC-02b2 ✅ | RC-02c1 ✅ | RC-02c2 ✅ | RC-02c3 ✅ | next RC-02 slice blocked until this plan/ledger synchronization passes exact-head CI 🔒**
 
 This is the only release progress meter. It deliberately does not translate the eight gates into a misleading implementation percentage.
