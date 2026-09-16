@@ -95,6 +95,7 @@
       "defeat_history_count_at_least",
       "event_action_kind_is",
       "event_controller_is_opponent",
+      "source_controller_is_self",
       "event_attack_source_is_self"
     ],
     "partial": [
@@ -176,7 +177,6 @@
       "shield_source_is_card_effect",
       "shield_target_is_self",
       "source_became_vanguard_this_turn",
-      "source_controller_is_self",
       "source_counter_at_least",
       "source_damaged",
       "source_element_is",
