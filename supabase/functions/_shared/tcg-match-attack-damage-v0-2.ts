@@ -3,6 +3,7 @@ import {
   type RuntimeCardInstance,
   type RuntimeContinuousEffect,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
+import { runtimeV02ApplyDamageProtections } from "./tcg-match-damage-protection-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 
 export type RuntimeV02DamagePreventionKind = "ability" | "relic" | "shield";
@@ -26,6 +27,10 @@ export type RuntimeAttackDamageContext = {
   target_controller: "self" | "opponent";
   source_controller: "self" | "opponent";
   target_has_any_condition: boolean;
+  source_controller_seat?: 1 | 2;
+  target_controller_seat?: 1 | 2;
+  target_creature_uid?: string;
+  packet_id?: string;
 };
 
 const DAMAGE_PREVENTION_MARKER = "runtime_v0_2_damage_prevention";
@@ -355,6 +360,43 @@ export function structuredRuntimeIncomingAttackDamage(
   value = ability.value;
   if (ability.prevented > 0) {
     recordRuntimeV02DamagePrevention(state, target, "ability", ability.prevented, context);
+  }
+
+  if (target.flags?.runtime_v0_2_damage_protections != null) {
+    const active = activeSeat(state);
+    const sourceSeat = context.source_controller_seat;
+    const targetSeat = context.target_controller_seat;
+    const targetUid = typeof context.target_creature_uid === "string"
+      ? context.target_creature_uid.trim()
+      : "";
+    const packetId = typeof context.packet_id === "string" ? context.packet_id.trim() : "";
+    if (!active || (sourceSeat !== 1 && sourceSeat !== 2) ||
+      (targetSeat !== 1 && targetSeat !== 2) || !targetUid || !packetId) {
+      throw new Error("tcg_v0_2_attack_damage_protection_context_required");
+    }
+    const stored = runtimeV02ApplyDamageProtections(target, value, {
+      turn_seq: currentTurn(state),
+      active_seat: active,
+      source_controller_seat: sourceSeat,
+      target_controller_seat: targetSeat,
+      target_creature_uid: targetUid,
+      damage_class: "attack",
+      packet_id: packetId,
+    });
+    for (const modification of stored.modifications) {
+      const prevented = Math.max(0, Number(modification.amount_before) - Number(modification.amount_after));
+      if (!(prevented > 0)) continue;
+      if (modification.source_kind === "ability" || modification.source_kind === "relic") {
+        recordRuntimeV02DamagePrevention(
+          state,
+          target,
+          modification.source_kind,
+          prevented,
+          context,
+        );
+      }
+    }
+    value = stored.final_amount;
   }
 
   // Shield is consumed by the match owner immediately after this resolver returns.
