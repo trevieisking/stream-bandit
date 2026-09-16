@@ -1859,6 +1859,8 @@ function executeStep(
       state,
       target.cr,
       candidate.source.uid,
+      listenerId(candidate),
+      target.top.uid,
       step.amount,
       currentTurn(state),
       step.duration,

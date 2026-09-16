@@ -2,6 +2,7 @@ import {
   runtimeV02BeginEventListenerContinuation,
   type RuntimeV02EventListenerEvent,
 } from "../_shared/tcg-match-event-listener-v0-2.ts";
+import { runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration } from "../_shared/tcg-match-attack-modifier-v0-2.ts";
 import { structuredRuntimeAttachmentAttackBonus } from "../_shared/tcg-match-surge-lifecycle-v0-2.ts";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -208,11 +209,21 @@ Deno.test("Smolder-style essence_attached listener delegates +10 next-attack sta
   equal(modifiers[0].source_uid, "smolder-uid", "modifier must bind exact Essence instance");
   equal(modifiers[0].amount, 10, "Smolder amount must remain +10");
   equal(modifiers[0].max_uses, 1, "Smolder must remain one-use");
+  equal(modifiers[0].schema, "sb-tcg-attack-damage-modifier-v0.2", "Smolder must use canonical Attack #14 record schema");
+  equal(modifiers[0].source_action_id, "smolder-attach-pressure", "Smolder must preserve exact listener action identity");
+  equal(modifiers[0].target_uid, "source-creature-uid", "Smolder must bind the exact target Creature");
   equal(
     structuredRuntimeAttachmentAttackBonus(state, (state.players as any)["1"].vanguard, 7),
-    10,
-    "attack owner must expose the stored +10 bonus",
+    0,
+    "legacy Surge reader must ignore canonical Attack #14 records",
   );
+  const consumed = runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration(
+    state,
+    (state.players as any)["1"].vanguard,
+    { consuming_action_id: "smolder-attack", target_uid: "source-creature-uid", turn_seq: 7, base_damage: 40 },
+  );
+  equal(consumed?.bonus_damage, 10, "canonical consumer must apply Smolder exactly once");
+  equal(consumed?.damage, 50, "Smolder canonical damage total mismatch");
 });
 
 Deno.test("Surge-style essence_attached listener delegates its full-turn +20 through the same attack modifier system", () => {
@@ -251,11 +262,25 @@ Deno.test("Surge-style essence_attached listener delegates its full-turn +20 thr
   equal(modifiers[0].source_uid, "surge-uid", "Surge modifier must bind exact Essence UID");
   equal(modifiers[0].amount, 20, "Surge amount must remain +20");
   equal(modifiers[0].max_uses, null, "Surge must remain reusable for the turn");
+  equal(modifiers[0].schema, "sb-tcg-attack-damage-modifier-v0.2", "Surge must use canonical Attack #14 record schema");
+  equal(modifiers[0].source_action_id, "surge-attach-burst", "Surge must preserve exact listener action identity");
   equal(
     structuredRuntimeAttachmentAttackBonus(state, (state.players as any)["1"].vanguard, 7),
-    20,
-    "attack owner must expose the stored +20 bonus",
+    0,
+    "legacy Surge reader must not double-count canonical reusable records",
   );
+  const firstAttack = runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration(
+    state,
+    (state.players as any)["1"].vanguard,
+    { consuming_action_id: "surge-attack-1", target_uid: "source-creature-uid", turn_seq: 7, base_damage: 40 },
+  );
+  const secondAttack = runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration(
+    state,
+    (state.players as any)["1"].vanguard,
+    { consuming_action_id: "surge-attack-2", target_uid: "source-creature-uid", turn_seq: 7, base_damage: 40 },
+  );
+  equal(firstAttack?.bonus_damage, 20, "Surge first attack bonus mismatch");
+  equal(secondAttack?.bonus_damage, 20, "Surge reusable bonus must remain exactly once on later attacks");
 });
 
 Deno.test("Power Rail-style Creature ability uses the same attack modifier owner and its once-per-turn card-instance limit", () => {
@@ -310,6 +335,8 @@ Deno.test("Power Rail-style Creature ability uses the same attack modifier owner
   const modifiers = modifierRecords(state);
   equal(modifiers.length, 1, "Power Rail must store only one modifier record");
   equal(modifiers[0].source_uid, "source-creature-uid", "Power Rail modifier source must be the Creature instance");
+  equal(modifiers[0].source_action_id, "power-rail", "Power Rail must preserve exact Ability action identity");
+  equal(modifiers[0].target_uid, "source-creature-uid", "Power Rail must bind its exact target Creature");
   equal(modifiers[0].amount, 20, "Power Rail amount must remain +20");
   equal(modifiers[0].max_uses, 1, "Power Rail must remain one-use");
 });

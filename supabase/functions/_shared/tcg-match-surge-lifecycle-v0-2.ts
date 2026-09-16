@@ -1,3 +1,4 @@
+import { runtimeV02InstallAttackDamageModifier } from "./tcg-match-attack-modifier-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 
 export type RuntimeLifecycleInstance = {
@@ -8,17 +9,11 @@ export type RuntimeLifecycleInstance = {
 };
 
 export type RuntimeLifecycleCreature = {
+  stack?: RuntimeLifecycleInstance[];
   essence?: RuntimeLifecycleInstance[];
   flags?: Record<string, unknown>;
 };
 
-type AttackModifier = {
-  source_uid: string;
-  amount: number;
-  turn_seq: number;
-  expires_on: string[];
-  max_uses: number | null;
-};
 
 function objectRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -57,69 +52,25 @@ function listenerRequirementsMatch(requirements: unknown, targetElement: string,
   return true;
 }
 
-function attackModifiers(creature: RuntimeLifecycleCreature): AttackModifier[] {
-  creature.flags ||= {};
-  const flags = creature.flags as Record<string, unknown>;
-  const current = flags.runtime_v0_2_attack_modifiers;
-  if (current == null) {
-    const fresh: AttackModifier[] = [];
-    flags.runtime_v0_2_attack_modifiers = fresh;
-    return fresh;
-  }
-  if (!Array.isArray(current)) throw new Error("tcg_v0_2_attack_modifiers_invalid");
-  return current as AttackModifier[];
-}
-
 export function applyRuntimeV02AttachmentAttackDamageModifier(
   state: Record<string, unknown>,
   creature: RuntimeLifecycleCreature,
   sourceUidRaw: unknown,
+  sourceActionIdRaw: unknown,
+  targetUidRaw: unknown,
   amountRaw: unknown,
   turnSeqRaw: unknown,
   durationRaw: unknown,
 ): number | null {
-  if (!structuredProbe(state)) return null;
-  const sourceUid = String(sourceUidRaw || "").trim();
-  if (!sourceUid) throw new Error("tcg_v0_2_attachment_listener_source_uid_invalid");
-  const amount = Number(amountRaw);
-  if (!Number.isFinite(amount)) throw new Error("tcg_v0_2_attachment_listener_amount_invalid");
-  if (amount < 0) throw new Error("tcg_v0_2_attachment_listener_amount_negative_unsupported");
-  const turnSeq = Number(turnSeqRaw);
-  if (!Number.isInteger(turnSeq) || turnSeq < 0) {
-    throw new Error("tcg_v0_2_attachment_listener_turn_seq_invalid");
-  }
-  const duration = objectRecord(durationRaw);
-  const expiresOn = Array.isArray(duration?.expires_on)
-    ? duration.expires_on.map((value) => String(value))
-    : [];
-  if (!expiresOn.includes("end_of_turn")) {
-    throw new Error("tcg_v0_2_attachment_listener_expiry_unsupported");
-  }
-  const rawMaxUses = duration?.max_uses;
-  const maxUses = rawMaxUses == null ? null : Number(rawMaxUses);
-  if (maxUses != null && (!Number.isInteger(maxUses) || maxUses < 1)) {
-    throw new Error("tcg_v0_2_attachment_listener_max_uses_invalid");
-  }
-  if (
-    duration?.consume_on != null &&
-    String(duration.consume_on) !== "legal_attack_declared"
-  ) {
-    throw new Error("tcg_v0_2_attachment_listener_consume_on_unsupported");
-  }
-  const modifiers = attackModifiers(creature);
-  const prior = modifiers.findIndex((item) =>
-    item.source_uid === sourceUid && item.turn_seq === turnSeq
-  );
-  const record: AttackModifier = {
-    source_uid: sourceUid,
-    amount,
-    turn_seq: turnSeq,
-    expires_on: expiresOn,
-    max_uses: maxUses,
-  };
-  if (prior >= 0) modifiers[prior] = record;
-  else modifiers.push(record);
-  return amount;
+  const installed = runtimeV02InstallAttackDamageModifier(state, creature, {
+    source_uid: sourceUidRaw,
+    source_action_id: sourceActionIdRaw,
+    target_uid: targetUidRaw,
+    amount: amountRaw,
+    turn_seq: turnSeqRaw,
+    duration: durationRaw,
+  });
+  return installed?.amount ?? null;
 }
 
 /**
@@ -173,6 +124,11 @@ export function applyStructuredRuntimeEssenceAttachmentLifecycle(
   const essence = objectRecord(definition.essence);
   if (!essence) throw new Error("tcg_v0_2_attachment_essence_payload_required");
 
+  const targetUid = creature.stack?.length
+    ? String(creature.stack[creature.stack.length - 1]?.uid || "").trim()
+    : "";
+  if (!targetUid) throw new Error("tcg_v0_2_attachment_listener_target_uid_required");
+
   let attackBonus = 0;
   const listeners = Array.isArray(essence.listeners) ? essence.listeners : [];
   for (const rawListener of listeners) {
@@ -190,6 +146,8 @@ export function applyStructuredRuntimeEssenceAttachmentLifecycle(
         state,
         creature,
         attached.uid,
+        String(listener.id || ""),
+        targetUid,
         step.amount,
         turnSeq,
         step.duration,
@@ -216,7 +174,12 @@ export function structuredRuntimeAttachmentAttackBonus(
   if (raw == null) return 0;
   if (!Array.isArray(raw)) throw new Error("tcg_v0_2_attack_modifiers_invalid");
   let total = 0;
-  for (const item of raw as AttackModifier[]) {
+  for (const rawItem of raw) {
+    const item = objectRecord(rawItem);
+    if (!item) throw new Error("tcg_v0_2_attack_modifier_record_invalid");
+    // Canonical Attack #14 records are consumed at legal declaration. This
+    // compatibility reader is legacy-only and must never apply them twice.
+    if (item.schema === "sb-tcg-attack-damage-modifier-v0.2") continue;
     if (Number(item.turn_seq) !== turnSeq) continue;
     if (!Array.isArray(item.expires_on) || !item.expires_on.includes("end_of_turn")) continue;
     const amount = Number(item.amount);
@@ -235,9 +198,19 @@ export function clearStructuredRuntimeAttachmentAttackBonusesAtAftermath(
   const raw = creature.flags?.runtime_v0_2_attack_modifiers;
   if (raw == null) return false;
   if (!Array.isArray(raw)) throw new Error("tcg_v0_2_attack_modifiers_invalid");
-  const kept = (raw as AttackModifier[]).filter((item) => Number(item.turn_seq) !== turnSeq || !Array.isArray(item.expires_on) || !item.expires_on.includes("end_of_turn"));
+  let removed = false;
+  const kept = raw.filter((rawItem) => {
+    const item = objectRecord(rawItem);
+    if (!item) throw new Error("tcg_v0_2_attack_modifier_record_invalid");
+    // Canonical records expire in Attack #14, not in this compatibility facade.
+    if (item.schema === "sb-tcg-attack-damage-modifier-v0.2") return true;
+    const shouldRemove = Number(item.turn_seq) === turnSeq &&
+      Array.isArray(item.expires_on) && item.expires_on.includes("end_of_turn");
+    if (shouldRemove) removed = true;
+    return !shouldRemove;
+  });
   (creature.flags as Record<string, unknown>).runtime_v0_2_attack_modifiers = kept;
-  return kept.length !== raw.length;
+  return removed;
 }
 
 export function structuredRuntimeAftermathEssenceDisposition(

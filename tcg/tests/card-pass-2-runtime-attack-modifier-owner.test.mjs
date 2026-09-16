@@ -119,3 +119,14 @@ test("Attack modifier owner is card-ID/name-free and does not recreate caller li
   assert.equal(owner.includes("next_attack_bonus"), false);
 });
 
+
+
+test("all structured attachment/listener modifier producers converge on Attack #14", () => {
+  const surge = fs.readFileSync("supabase/functions/_shared/tcg-match-surge-lifecycle-v0-2.ts", "utf8");
+  const listener = fs.readFileSync("supabase/functions/_shared/tcg-match-event-listener-v0-2.ts", "utf8");
+  assert.ok(surge.includes('runtimeV02InstallAttackDamageModifier'));
+  assert.equal(surge.includes('const fresh: AttackModifier[]'), false);
+  assert.equal(surge.includes('flags.runtime_v0_2_attack_modifiers = fresh'), false);
+  assert.ok(surge.includes('item.schema === "sb-tcg-attack-damage-modifier-v0.2"'));
+  assert.ok(listener.includes('candidate.source.uid,\n      listenerId(candidate),\n      target.top.uid,'));
+});

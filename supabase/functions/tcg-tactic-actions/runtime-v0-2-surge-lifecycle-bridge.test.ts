@@ -1,3 +1,4 @@
+import { runtimeV02ExpireAttackDamageModifiersAtEndOfTurn } from "../_shared/tcg-match-attack-modifier-v0-2.ts";
 import {
   applyStructuredRuntimeEssenceAttachmentLifecycle,
   clearStructuredRuntimeAttachmentAttackBonusesAtAftermath,
@@ -64,6 +65,10 @@ const basicDefinition = {
   tactic: null,
 };
 
+function targetCreature(uid = "target-creature-uid") {
+  return { stack: [{ uid, card_id: "test-target-creature" }], essence: [], flags: {} } as any;
+}
+
 function structuredState(extra: Record<string, any> = {}) {
   const definitions: Record<string, any> = {
     "volt-surge-essence": surgeDefinition,
@@ -91,7 +96,7 @@ function structuredState(extra: Record<string, any> = {}) {
 
 Deno.test("legacy-only match keeps Surge lifecycle resolver on legacy fallback", () => {
   const state: Record<string, unknown> = { card_index: { "volt-surge-essence": { definition: { id: "volt-surge-essence" } } } };
-  const creature: any = { essence: [], flags: {} };
+  const creature: any = targetCreature();
   const surge: any = { uid: "surge-1", card_id: "volt-surge-essence", attached_turn: 7 };
   const result = applyStructuredRuntimeEssenceAttachmentLifecycle(state, creature, surge, "Volt", "hand", 7);
   assert(result === null, "legacy match must stay on fallback");
@@ -101,7 +106,7 @@ Deno.test("legacy-only match keeps Surge lifecycle resolver on legacy fallback",
 
 Deno.test("structured Surge grants +20 on hand attachment to a Volt creature and owns state by Inst.uid", () => {
   const state = structuredState();
-  const creature: any = { essence: [], flags: {} };
+  const creature: any = targetCreature();
   const surge: any = { uid: "surge-uid-42", card_id: "volt-surge-essence", attached_turn: 12 };
   creature.essence.push(surge);
   const result = applyStructuredRuntimeEssenceAttachmentLifecycle(state, creature, surge, "Volt", "hand", 12);
@@ -113,12 +118,15 @@ Deno.test("structured Surge grants +20 on hand attachment to a Volt creature and
   const lifecycle = surge.effect_flags?.runtime_v0_2_attachment_lifecycle;
   assert(lifecycle?.source_uid === "surge-uid-42", "lifecycle state must be owned by the exact Surge instance uid");
   assert(lifecycle?.expires === "controller_aftermath" && lifecycle?.destination_on_expire === "discard", "lifecycle expiry mismatch");
-  assert(structuredRuntimeAttachmentAttackBonus(state, creature, 12) === 20, "structured attack should receive Surge +20");
+  assert(structuredRuntimeAttachmentAttackBonus(state, creature, 12) === 0, "legacy reader must ignore canonical Surge records");
+  assert(modifier?.schema === "sb-tcg-attack-damage-modifier-v0.2", "Surge must install the canonical Attack #14 schema");
+  assert(modifier?.source_action_id === "surge-attach-burst", "Surge must preserve its listener action id");
+  assert(modifier?.target_uid === "target-creature-uid", "Surge must bind the exact target Creature uid");
 });
 
 Deno.test("structured Surge on non-Volt target gets no burst but still remains temporary", () => {
   const state = structuredState();
-  const creature: any = { essence: [], flags: {} };
+  const creature: any = targetCreature();
   const surge: any = { uid: "surge-nonvolt", card_id: "volt-surge-essence", attached_turn: 3 };
   creature.essence.push(surge);
   const result = applyStructuredRuntimeEssenceAttachmentLifecycle(state, creature, surge, "Stone", "hand", 3);
@@ -129,20 +137,22 @@ Deno.test("structured Surge on non-Volt target gets no burst but still remains t
 
 Deno.test("structured Surge bonus expires and cleanup removes only current-turn modifiers", () => {
   const state = structuredState();
-  const creature: any = { essence: [], flags: {} };
+  const creature: any = targetCreature();
   const surge: any = { uid: "surge-clean", card_id: "volt-surge-essence", attached_turn: 9 };
   creature.essence.push(surge);
   applyStructuredRuntimeEssenceAttachmentLifecycle(state, creature, surge, "Volt", "hand", 9);
+  assert(structuredRuntimeAttachmentAttackBonus(state, creature, 9) === 0, "legacy reader must ignore current canonical Surge bonus");
+  assert(clearStructuredRuntimeAttachmentAttackBonusesAtAftermath(state, creature, 9) === false, "compatibility cleanup must leave canonical records to Attack #14");
+  const expiry = runtimeV02ExpireAttackDamageModifiersAtEndOfTurn(state, creature, 9);
+  assert(expiry?.removed_count === 1, "Attack #14 must expire the canonical Surge record");
   creature.flags.runtime_v0_2_attack_modifiers.push({ source_uid: "future", amount: 30, turn_seq: 10, expires_on: ["end_of_turn"], max_uses: null });
-  assert(structuredRuntimeAttachmentAttackBonus(state, creature, 9) === 20, "current turn Surge bonus mismatch");
-  assert(clearStructuredRuntimeAttachmentAttackBonusesAtAftermath(state, creature, 9) === true, "current-turn modifier should be cleared");
-  assert(structuredRuntimeAttachmentAttackBonus(state, creature, 9) === 0, "expired Surge bonus must not remain");
-  assert(structuredRuntimeAttachmentAttackBonus(state, creature, 10) === 30, "future-turn modifier must not be removed by earlier cleanup");
+  assert(structuredRuntimeAttachmentAttackBonus(state, creature, 10) === 30, "legacy future-turn compatibility record must remain readable");
+  assert(clearStructuredRuntimeAttachmentAttackBonusesAtAftermath(state, creature, 9) === false, "earlier compatibility cleanup must not remove a future legacy record");
 });
 
 Deno.test("structured Aftermath discards the exact Surge instance from any field zone only on its registered turn", () => {
   const state = structuredState();
-  const creature: any = { essence: [], flags: {} };
+  const creature: any = targetCreature();
   const surge: any = { uid: "reserve-surge", card_id: "volt-surge-essence", attached_turn: 22 };
   creature.essence.push(surge);
   applyStructuredRuntimeEssenceAttachmentLifecycle(state, creature, surge, "Volt", "hand", 22);
