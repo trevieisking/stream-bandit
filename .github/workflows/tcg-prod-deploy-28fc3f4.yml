@@ -1,0 +1,50 @@
+name: TCG Production Deploy 28fc3f4
+
+on:
+  push:
+    branches:
+      - deploy/tcg-prod-28fc3f4
+    paths:
+      - .github/workflows/tcg-prod-deploy-28fc3f4.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tcg-prod-deploy-28fc3f4
+  cancel-in-progress: false
+
+env:
+  SOURCE_SHA: 28fc3f46569b620ee7c30bb5a8fb5f05ea7b6834
+  TACTIC_INDEX_BLOB: cc59c8aab9497047eae8dbce2e6664c3b9d989f0
+  PROJECT_ID: xzxqfrvqdgkzwujbkdbk
+
+jobs:
+  deploy-tactic-actions:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Guard immutable accepted TCG source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "$SOURCE_SHA"
+          test "$(git diff --name-only "$SOURCE_SHA" HEAD)" = ".github/workflows/tcg-prod-deploy-28fc3f4.yml"
+          git diff --quiet "$SOURCE_SHA" HEAD -- supabase/functions supabase/migrations
+          test "$(git rev-parse "$SOURCE_SHA:supabase/functions/tcg-tactic-actions/index.ts")" = "$TACTIC_INDEX_BLOB"
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Deploy accepted TCG tactic actions
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase functions deploy tcg-tactic-actions --project-ref "$PROJECT_ID"
