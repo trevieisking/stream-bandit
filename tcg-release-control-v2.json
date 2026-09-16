@@ -1,13 +1,14 @@
 {
   "schema": "stream-bandit-tcg-release-control-v2",
   "recorded_at": "2026-09-16",
-  "purpose": "Non-self-referential control record for the post-private-alpha ten-family battle-client and card-visual programme.",
+  "purpose": "Non-self-referential control record for the post-private-alpha ten-family battle-client, visual-card and content-expansion programme.",
   "authority": {
-    "desired_behavior": "tcg-master-plan-progress-v2.md",
-    "audit_history": "tcg-master-plan-ledger-v2.md",
+    "desired_behavior": "tcg-master-plan-progress-v2.1.md",
+    "audit_history": "tcg-master-plan-ledger-v2.1.md",
     "battle_interaction": "tcg-battle-client-interaction-v1.json",
     "card_visual_printing": "tcg-card-visual-printing-v1.json",
-    "ten_deck_blueprint": "tcg-ten-deck-product-blueprint-v1.json",
+    "ten_deck_blueprint": "tcg-ten-deck-product-blueprint-v2.json",
+    "element_package_manifest": "tcg-element-packages-v0.3-v2.json",
     "historical_private_alpha_control": "tcg-release-control-v1.json",
     "source_truth": "GitHub exact branch/PR/commit evidence and canonical TCG checkpoint comments",
     "live_truth": "Supabase project xzxqfrvqdgkzwujbkdbk"
@@ -19,19 +20,33 @@
     "structured_identities": 193,
     "starter_decks": 8,
     "owner_families": 40,
-    "note": "This remains historical live/source evidence and is not rewritten by V2 planning."
+    "note": "Historical live/runtime truth remains unchanged until V2 schema/runtime integration is explicitly promoted."
+  },
+  "v2_design_merges": {
+    "battle_visual_authority": "29c689fe603d684d4b2cb53c29479f1a88633a79",
+    "underworld_grave_pact": "a61a9795e545ccc50c44e9f5b95c5b0d9e5cc173",
+    "fairy_glimmerwish": "16a745a3cf96f6caf00c34ad88896fb0dcca2a73"
   },
   "v2_target": {
     "elements": 10,
-    "element_families": ["Astral", "Ember", "Fairy", "Gale", "Grove", "Shade", "Stone", "Tide", "Underworld", "Volt"],
+    "element_families": ["Astral","Ember","Fairy","Gale","Grove","Shade","Stone","Tide","Underworld","Volt"],
+    "elemental_identity_total": 240,
+    "prismatic_founder_identity_total": 1,
+    "structured_identity_total_target": 241,
     "starter_decks": 10,
     "starter_deck_size": 60,
-    "structured_identity_total": "TBD_AFTER_COMPLETE_FAIRY_AND_UNDERWORLD_REGISTRIES",
     "owner_families": 40,
     "battle_client": "board_first_direct_manipulation",
-    "rarities": ["Basic", "Rare", "Extra Rare", "Mythic"],
-    "printing_finishes": ["Standard", "Shine", "Holo", "Full-Art Shine", "Alt-Art", "Signature Mythic"],
+    "rarities": ["Basic","Rare","Extra Rare","Mythic"],
+    "printing_finishes": ["Standard","Shine","Holo","Full-Art Shine","Alt-Art","Signature Mythic"],
     "artwork_on_every_printable_card": true
+  },
+  "content_state": {
+    "original_eight_packages": "canonical_structured_runtime",
+    "fairy": "24_identity_v2_design_accepted_schema_pending",
+    "underworld": "24_identity_v2_design_accepted_schema_pending",
+    "v2_g0_scope_design": "complete",
+    "v2_g1_structured_packages": "in_progress"
   },
   "change_policy": {
     "no_false_live_claims": true,
@@ -42,5 +57,5 @@
     "foil_or_alt_art_never_changes_gameplay_power": true,
     "private_alpha_rollback_baseline_preserved": true
   },
-  "next_operation": "Complete the exact ten-family structured card/deck inventory and normalize card presentation metadata before battle-client runtime implementation."
+  "next_operation": "Translate accepted Fairy and Underworld V2 design packages into exact sb-tcg-card-v0.2/effect-opcode data, validate them against the existing 40-owner capability model, then build and validate the deterministic 241-identity ten-package registry and ten exact starter authority before any runtime/live integration."
 }
