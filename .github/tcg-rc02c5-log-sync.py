@@ -44,7 +44,7 @@ plan = once(
 plan = once(plan, "1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c4 and pass exact-head CI together.", "1. **Control synchronization** — this master plan + ledger must record accepted work through RC-02c5 and pass exact-head CI together.", "plan locked order")
 plan = once(
     plan,
-    "| RC-02c4 ✅ | next RC-02 slice blocked until this revision-5 plan/ledger synchronization passes exact-head CI 🔒**",
+    "| RC-02c4 ✅ | next RC-02 slice blocked until this plan/ledger synchronization passes exact-head CI 🔒**",
     "| RC-02c4 ✅ | RC-02c5 ✅ | next RC-02 slice blocked until this revision-6 plan/ledger synchronization passes exact-head CI 🔒**",
     "plan progress",
 )
