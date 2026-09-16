@@ -1,0 +1,158 @@
+name: TCG RC-02b1 Attack Modifier Candidate
+
+on:
+  push:
+    branches:
+      - repair/tcg-rc02b1-attack-modifier-wire-25d7641
+
+permissions:
+  contents: write
+
+jobs:
+  build-candidate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repair branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard immutable bootstrap
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_base='25d7641aca351d64571d407d055a3588f1af041f'
+          test "$(git rev-parse HEAD^)" = "$expected_base"
+          mapfile -t changed < <(git diff --name-only "$expected_base" HEAD)
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = '.github/workflows/tcg-rc02b1-attack-modifier-wire.yml'
+
+      - name: Apply bounded Attack owner wiring
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('supabase/functions/tcg-match-actions/index.ts')
+          source = path.read_text()
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly one anchor, found {count}')
+              return text.replace(old, new, 1)
+
+          import_anchor = 'import { runtimeV02ResolveAttackTarget, type RuntimeV02AttackTargetPermission } from "../_shared/tcg-match-attack-v0-2.ts";'
+          source = replace_once(
+              source,
+              import_anchor,
+              import_anchor + '\n' +
+              'import { runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration, runtimeV02ExpireAttackDamageModifiersAtEndOfTurn } from "../_shared/tcg-match-attack-modifier-v0-2.ts";\n' +
+              'import { runtimeV02DealEffectDamage } from "../_shared/tcg-match-damage-engine-v0-2.ts";',
+              'attack modifier imports',
+          )
+
+          scan_anchor = '  const scanDefeats=()=>{const defeated:any[]=[];'
+          scan_replacement = '''  const flushAttackModifierRiders=()=>{const raw=s.pending_attack_modifier_riders;if(raw==null)return[];if(!Array.isArray(raw))throw new Error("tcg_v0_2_attack_modifier_rider_queue_invalid");const plans:{target:Cr;amount:number;modifier_id:string;rider_id:string}[]=[];for(const rider of raw){if(!rider||typeof rider!=="object"||rider.timing!=="after_attack_effects_before_defeat_scan")throw new Error("tcg_v0_2_attack_modifier_rider_invalid");const targetUid=String(rider.modifier_target_uid||"");let target:Cr|null=null;for(const who of [1,2]){for(const field of allCr(s.players[String(who)])){const inst=field.cr.stack?.[field.cr.stack.length-1];if(inst?.uid===targetUid){target=field.cr;break}}if(target)break}if(!target)throw new Error("tcg_v0_2_attack_modifier_rider_target_missing");if(!Array.isArray(rider.steps)||rider.steps.length<1)throw new Error("tcg_v0_2_attack_modifier_rider_steps_invalid");for(const step of rider.steps){if(!step||step.op!=="DIRECT_DAMAGE"||step.target!=="$modifier_target"||(step.damage_class!=null&&step.damage_class!=="effect"))throw new Error("tcg_v0_2_attack_modifier_rider_step_unsupported");const amount=Number(step.amount);if(!Number.isFinite(amount)||amount<0)throw new Error("tcg_v0_2_attack_modifier_rider_amount_invalid");plans.push({target,amount,modifier_id:String(rider.modifier_id||""),rider_id:String(rider.id||"")})}}const receipts=plans.map((plan)=>({modifier_id:plan.modifier_id,rider_id:plan.rider_id,...runtimeV02DealEffectDamage(plan.target,plan.amount)}));delete s.pending_attack_modifier_riders;return receipts};
+  const scanDefeats=()=>{const attackModifierRiderReceipts=flushAttackModifierRiders();if(attackModifierRiderReceipts.length)log(`Resolved ${attackModifierRiderReceipts.length} Attack modifier completion rider(s).`);const defeated:any[]=[];'''
+          source = replace_once(source, scan_anchor, scan_replacement, 'defeat-scan rider boundary')
+
+          aftermath_anchor = 'for(const plan of resolved.transfer_plans)runtimeV02ApplyCardZoneTransfer(plan.source_cards,owner.discard,plan.request);const n=scanDefeats();'
+          aftermath_replacement = 'for(const plan of resolved.transfer_plans)runtimeV02ApplyCardZoneTransfer(plan.source_cards,owner.discard,plan.request);const expiredAttackModifierIds=allCr(owner).flatMap((field)=>runtimeV02ExpireAttackDamageModifiersAtEndOfTurn(s,field.cr,Number(s.turn_seq||0))?.removed_modifier_ids||[]);if(expiredAttackModifierIds.length)log(`Expired ${expiredAttackModifierIds.length} unused Attack modifier(s) at end of turn.`);const n=scanDefeats();'
+          source = replace_once(source, aftermath_anchor, aftermath_replacement, 'end-turn modifier expiry')
+
+          damage_anchor = 'const formulaBase=atk.damage+formulaBonus;const relation=targetSeat===seat?"self":"opponent";const dmg=attackDamage(p.vanguard,target,s,formulaBase+bonus,{target_zone:targetWhere,target_controller:relation,source_controller:relation});'
+          damage_replacement = 'const formulaBase=atk.damage+formulaBonus;const relation=targetSeat===seat?"self":"opponent";const attackSourceUid=String(p.vanguard.stack?.[p.vanguard.stack.length-1]?.uid||"");if(!attackSourceUid)throw new Error("tcg_v0_2_attack_modifier_source_uid_required");const attackActionId=`attack:${Number(s.turn_seq||0)}:${seat}:${String(atk.id||slot)}:${attackSourceUid}`;const attackModifierConsumption=runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration(s,p.vanguard,{consuming_action_id:attackActionId,target_uid:attackSourceUid,turn_seq:Number(s.turn_seq||0),base_damage:formulaBase+bonus});if(attackModifierConsumption?.bound_riders.length){if(s.pending_attack_modifier_riders!=null){if(!Array.isArray(s.pending_attack_modifier_riders))throw new Error("tcg_v0_2_attack_modifier_rider_queue_invalid");if(s.pending_attack_modifier_riders.length)throw new Error("tcg_v0_2_attack_modifier_rider_queue_busy")}s.pending_attack_modifier_riders=structuredClone(attackModifierConsumption.bound_riders)}const declaredAttackDamage=attackModifierConsumption?.damage??(formulaBase+bonus);const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage,{target_zone:targetWhere,target_controller:relation,source_controller:relation});'
+          source = replace_once(source, damage_anchor, damage_replacement, 'legal attack declaration modifier consumption')
+
+          path.write_text(source)
+
+          test_path = Path('tcg/tests/card-pass-2-runtime-attack-modifier-live-wiring.test.mjs')
+          test_path.write_text(r'''import test from "node:test";
+          import assert from "node:assert/strict";
+          import fs from "node:fs";
+
+          const matchActions = fs.readFileSync("supabase/functions/tcg-match-actions/index.ts", "utf8");
+          const owner = fs.readFileSync("supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts", "utf8");
+
+          test("Attack #14 live path consumes the canonical modifier owner only after legal declaration setup", () => {
+            assert.ok(owner.includes("export function runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration("));
+            assert.ok(matchActions.includes("tcg-match-attack-modifier-v0-2.ts"));
+            const consume = matchActions.indexOf("runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration(s,p.vanguard");
+            const damage = matchActions.indexOf("const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage", consume);
+            assert.ok(consume > 0 && damage > consume, "canonical modifier consumption must feed final attack damage");
+            const block = matchActions.slice(consume, damage);
+            assert.ok(block.includes("base_damage:formulaBase+bonus"));
+            assert.ok(block.includes("target_uid:attackSourceUid"));
+            assert.ok(block.includes("attackModifierConsumption?.damage??(formulaBase+bonus)"));
+            assert.ok(block.includes("pending_attack_modifier_riders"));
+          });
+
+          test("Attack modifier completion riders flush atomically at the defeat-scan boundary through Damage owner", () => {
+            assert.ok(matchActions.includes("tcg-match-damage-engine-v0-2.ts"));
+            const start = matchActions.indexOf("const flushAttackModifierRiders=");
+            const end = matchActions.indexOf("const scanDefeats=", start);
+            assert.ok(start > 0 && end > start, "missing bounded completion-rider helper");
+            const helper = matchActions.slice(start, end);
+            assert.ok(helper.includes('rider.timing!=="after_attack_effects_before_defeat_scan"'));
+            assert.ok(helper.includes('step.op!=="DIRECT_DAMAGE"'));
+            assert.ok(helper.includes('step.target!=="$modifier_target"'));
+            assert.ok(helper.includes("runtimeV02DealEffectDamage(plan.target,plan.amount)"));
+            assert.ok(helper.includes("delete s.pending_attack_modifier_riders"));
+            for (const forbidden of ["ember-pyrohorn", "Ash Crown", "crownfire", "ashen-stampede"]) {
+              assert.equal(helper.includes(forbidden), false, `completion rider wiring must remain card-ID/name-free: ${forbidden}`);
+            }
+            assert.ok(matchActions.includes("const scanDefeats=()=>{const attackModifierRiderReceipts=flushAttackModifierRiders();"));
+          });
+
+          test("unused Attack modifiers expire through Attack #14 at end of turn", () => {
+            assert.ok(owner.includes("export function runtimeV02ExpireAttackDamageModifiersAtEndOfTurn("));
+            const aftermath = matchActions.indexOf("const aftermath=(who:number)=>");
+            const continuation = matchActions.indexOf("const continueResolution=", aftermath);
+            assert.ok(aftermath > 0 && continuation > aftermath);
+            const block = matchActions.slice(aftermath, continuation);
+            assert.ok(block.includes("runtimeV02ExpireAttackDamageModifiersAtEndOfTurn"));
+            assert.ok(block.indexOf("runtimeV02ExpireAttackDamageModifiersAtEndOfTurn") < block.indexOf("scanDefeats()"));
+          });
+
+          test("legacy matches preserve prior damage when the structured Attack modifier owner is inactive", () => {
+            assert.ok(owner.includes("if (!assertRuntimeV02MatchSnapshot(state)) return null;"));
+            assert.ok(matchActions.includes("attackModifierConsumption?.damage??(formulaBase+bonus)"));
+          });
+          '''.replace(/^          /gm, ''))
+          PY
+
+          rm .github/workflows/tcg-rc02b1-attack-modifier-wire.yml
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Verify candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test \
+            tcg/tests/card-pass-2-runtime-attack-modifier-owner.test.mjs \
+            tcg/tests/card-pass-2-runtime-attack-modifier-live-wiring.test.mjs
+          deno test supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-modifier-engine.test.ts
+          deno check supabase/functions/tcg-match-actions/index.ts
+          git diff --check
+          expected_base='25d7641aca351d64571d407d055a3588f1af041f'
+          mapfile -t changed < <(git diff --name-only "$expected_base" | sort)
+          test "${#changed[@]}" -eq 2
+          test "${changed[0]}" = 'supabase/functions/tcg-match-actions/index.ts'
+          test "${changed[1]}" = 'tcg/tests/card-pass-2-runtime-attack-modifier-live-wiring.test.mjs'
+
+      - name: Commit isolated candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix(tcg): wire canonical attack modifier owner'
+          git push origin HEAD:repair/tcg-rc02b1-attack-modifier-wire-25d7641
