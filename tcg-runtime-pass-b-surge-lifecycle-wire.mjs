@@ -19,6 +19,9 @@ const attachmentRouteImport = 'import { runtimeV02BeginExternalEssenceAttachment
 
 const attackLegacy = 'function attackDamage(cr:Cr,target:Cr,s:any,base:number,ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent"}){let n=Math.max(0,base);const af=(cr.flags||{}) as any;n+=Number(af.next_attack_bonus||0);af.next_attack_bonus=0;const lifecycle=af.lifecycle_attack_bonus;if(lifecycle&&Number(lifecycle.turn_seq)===Number(s.turn_seq||0)){n+=Math.max(0,Number(lifecycle.amount||0));const uses=Math.max(1,Number(lifecycle.uses||1));if(uses>1)lifecycle.uses=uses-1;else delete af.lifecycle_attack_bonus}const structuredContext={...ctx,target_has_any_condition:hasCondition(target)};const outgoing=structuredRuntimeOutgoingAttackDamage(s,cr,target,n,structuredContext);if(outgoing==null){for(const e of cr.essence||[])if(e.card_id==="shade-whisper-essence"&&hasCondition(target))n+=10}else n=outgoing;const q=conditions(target);if(q.modifier==="Crushed"){n+=20;q.modifier=null}const incoming=structuredRuntimeIncomingAttackDamage(s,cr,target,n,structuredContext);if(incoming==null){for(const e of target.essence||[])if(e.card_id==="stone-anchor-essence")n=Math.max(0,n-10)}else n=incoming;const shield=Math.max(0,Number(target.shield||0)),blocked=Math.min(shield,n);target.shield=shield-blocked;target.damage=Number(target.damage||0)+(n-blocked);return{dealt:n-blocked,blocked}}';
 const attackWired = 'function attackDamage(cr:Cr,target:Cr,s:any,base:number,ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent"}){let n=Math.max(0,base);const af=(cr.flags||{}) as any;n+=Number(af.next_attack_bonus||0);af.next_attack_bonus=0;const lifecycle=af.lifecycle_attack_bonus;if(lifecycle&&Number(lifecycle.turn_seq)===Number(s.turn_seq||0)){n+=Math.max(0,Number(lifecycle.amount||0));const uses=Math.max(1,Number(lifecycle.uses||1));if(uses>1)lifecycle.uses=uses-1;else delete af.lifecycle_attack_bonus}const structuredAttachmentBonus=structuredRuntimeAttachmentAttackBonus(s,cr,Number(s.turn_seq||0));if(structuredAttachmentBonus!=null)n+=structuredAttachmentBonus;const structuredContext={...ctx,target_has_any_condition:hasCondition(target)};const outgoing=structuredRuntimeOutgoingAttackDamage(s,cr,target,n,structuredContext);if(outgoing==null){for(const e of cr.essence||[])if(e.card_id==="shade-whisper-essence"&&hasCondition(target))n+=10}else n=outgoing;const q=conditions(target);if(q.modifier==="Crushed"){n+=20;q.modifier=null}const incoming=structuredRuntimeIncomingAttackDamage(s,cr,target,n,structuredContext);if(incoming==null){for(const e of target.essence||[])if(e.card_id==="stone-anchor-essence")n=Math.max(0,n-10)}else n=incoming;const shield=Math.max(0,Number(target.shield||0)),blocked=Math.min(shield,n);target.shield=shield-blocked;target.damage=Number(target.damage||0)+(n-blocked);return{dealt:n-blocked,blocked}}';
+const legacyAttackContext = 'ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent"}';
+const protectionAttackContext = 'ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent",source_controller_seat:1|2,target_controller_seat:1|2,target_creature_uid:string,packet_id:string}';
+const attackWiredWithProtection = attackWired.replace(legacyAttackContext, protectionAttackContext);
 
 const attachLegacy = 'const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);\n   if(d.id===';
 const attachEngineBoundary = 'const td=top(cr,s);const structuredAttachment=s.runtime_registry_v0_2!=null;\n   if(structuredAttachment){';
@@ -49,7 +52,7 @@ if (!next.includes(surgeImportAttackOnly)) {
 }
 
 if (next.includes(attackLegacy)) next = next.replace(attackLegacy, attackWired);
-else if (!next.includes(attackWired)) throw new Error('match_actions_surge_attack_damage_anchor_changed');
+else if (!next.includes(attackWired) && !next.includes(attackWiredWithProtection)) throw new Error('match_actions_surge_attack_damage_anchor_changed');
 
 // Essence attachment lifecycle authority moved out of Match Actions. Do not
 // re-materialize the historical direct helper path: verify the canonical
@@ -93,7 +96,9 @@ if (!aftermathSource.includes(aftermathOwnerDispositionCall)) {
   throw new Error('aftermath_owner_surge_disposition_delegate_missing');
 }
 
-for (const required of [surgeImportAttackOnly, attackWired, aftermathOwnerImport, aftermathOwnerDelegate, attachmentRouteImport, attachEngineBoundary, attachRouteCall]) {
+const attackWiredVariants = [attackWired, attackWiredWithProtection].filter((candidate) => next.includes(candidate));
+if (attackWiredVariants.length !== 1) throw new Error('match_actions_surge_attack_damage_variant_invalid');
+for (const required of [surgeImportAttackOnly, attackWiredVariants[0], aftermathOwnerImport, aftermathOwnerDelegate, attachmentRouteImport, attachEngineBoundary, attachRouteCall]) {
   if (!next.includes(required)) throw new Error('match_actions_surge_wiring_incomplete');
   if (next.indexOf(required) !== next.lastIndexOf(required)) throw new Error('match_actions_surge_wiring_duplicate');
 }
