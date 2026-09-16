@@ -74,20 +74,19 @@ jobs:
           implemented_anchor = '      "defeat_history_count_at_least",\n'
           implemented_line = f'      "{predicate}",\n'
           missing_line = f'      "{predicate}",\n'
+          predicates_start = source.index('  "predicates":')
+          missing_start = source.index('    "missing": [', predicates_start)
+          missing_index = source.find(missing_line, missing_start)
           already_implemented = implemented_anchor + implemented_line in source
-          still_missing = missing_line in source[source.index('    "missing": [', source.index('  "predicates":')):]
-          if already_implemented and not still_missing:
+          if already_implemented and missing_index < 0:
               pass
           else:
               if source.count(implemented_anchor) != 1:
                   raise SystemExit('event_action_kind_implemented_anchor_changed')
-              predicates_start = source.index('  "predicates":')
-              missing_start = source.index('    "missing": [', predicates_start)
-              missing_index = source.index(missing_line, missing_start)
               if missing_index < 0:
                   raise SystemExit('event_action_kind_missing_anchor_changed')
-              source = source.replace(implemented_anchor, implemented_anchor + implemented_line, 1)
               source = source[:missing_index] + source[missing_index + len(missing_line):]
+              source = source.replace(implemented_anchor, implemented_anchor + implemented_line, 1)
           path.write_text(source)
           PY
 
