@@ -8,7 +8,7 @@
 
 ## V2.3.4-001 — G0R-11 accepted baseline
 
-The implementation baseline for this revision is main `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`, produced by merged PR #565. G0R-11 validation workflow coverage is COMPLETE with TCG Validation run #571 / `35232546805` SUCCESS. Accepted G0R progress at this baseline: **1/11**.
+The implementation baseline for this revision was main `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`, produced by merged PR #565. G0R-11 validation workflow coverage is COMPLETE with TCG Validation run #571 / `35232546805` SUCCESS. Accepted G0R progress at that baseline: **1/11**.
 
 ## V2.3.4-002 — G0R-10 remains proven, not silently skipped
 
@@ -38,34 +38,58 @@ Commits:
 1. `ab754ebcbf381d90197185e5209ae47ea1d500b3` — additive replacement migration;
 2. `190c9c9e4bf07712571b978abbd3657f876febed` — focused expiry-boundary contract test.
 
-Exact PR diff at opening head:
+Exact PR diff:
 - 2 files;
 - +258 / -0;
 - `supabase/migrations/20260917142500_tcg_matchmaking_locked_room_lifetime.sql`;
 - `tcg/tests/card-pass-2-g0r-07-matchmaking-room-lifetime.test.mjs`.
 
-Opened draft PR #566, exact head `190c9c9e4bf07712571b978abbd3657f876febed`.
+Opened PR #566, exact head `190c9c9e4bf07712571b978abbd3657f876febed`.
 
-No existing room data is rewritten by the migration. No Supabase deployment, live change or production mutation occurred.
+No existing room data is rewritten by the migration. No Supabase deployment, live change or production mutation occurred during branch/PR implementation.
 
-## V2.3.4-005 — G0R-07 acceptance fence triggered
+## V2.3.4-005 — G0R-07 exact-head acceptance fence
 
-Exact-head workflows automatically triggered:
-- TCG Card Pass 2 Validation #574 / run `35233465142`;
-- Code Labs Migration Replay #799 / run `35233465044`;
-- Code Labs V50 Functional Smoke #825 / run `35233465614`.
+All exact-head required workflows completed successfully:
 
-At this checkpoint the lanes are pending/queued, so **G0R-07 remains HOLD for merge** and accepted G0R progress remains **1/11**.
+- **TCG Card Pass 2 Validation #574 / `35233465142` — SUCCESS**;
+- **Code Labs Migration Replay #799 / `35233465044` — SUCCESS**, including full disposable database reset/replay from zero;
+- **Code Labs V50 Functional Smoke #825 / `35233465614` — SUCCESS**, including Node, Deno and PostgreSQL replay smoke lanes.
 
-## Promotion state
+Additional final pre-merge evidence:
+- PR #566 head remained `190c9c9e4bf07712571b978abbd3657f876febed`;
+- PR mergeable = true;
+- PR review threads = 0;
+- exact diff remained 2 intended files / +258 / -0;
+- main remained `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00` immediately before merge;
+- legacy combined statuses returned none found; GitHub Actions exact-head runs above are the active validation evidence.
 
-- G0R-07 branch implementation: **PROMOTE ✅**
-- PR #566 merge: **HOLD 🔒**
-- main beyond accepted G0R-11 baseline: **HOLD 🔒**
-- Supabase/runtime/live/production: **HOLD 🔒 / unchanged**
+## V2.3.4-006 — G0R-07 promoted to main
+
+**Promotion decision:** **PROMOTE G0R-07 source repair to main ✅**.
+
+PR #566 was marked ready and merged with expected exact head `190c9c9e4bf07712571b978abbd3657f876febed`.
+
+- merge SHA: `fce98178f2234386da7be3aef02a8496fa24195a`;
+- new/current main: `fce98178f2234386da7be3aef02a8496fa24195a`;
+- merged PR: #566;
+- source repair state: COMPLETE;
+- accepted G0R source repairs: **2/11**.
+
+The source now preserves queue expiry for waiting rooms while keeping already matched `locked`/`in_match` rooms discoverable after their original queue expiry.
+
+**Important deployment boundary:** merging the migration to `main` does not itself apply it to the production Supabase database. Supabase/live remains unchanged and HOLD pending a separate deployment decision/evidence fence.
+
+## Promotion state after G0R-07
+
+- G0R-11 source repair: **COMPLETE ✅**
+- G0R-07 source repair: **COMPLETE ✅**
+- accepted G0R source repairs: **2/11**
+- G0R-10: **PROVEN / QUEUED 🟡**
+- Supabase/runtime/live/production promotion: **HOLD 🔒 / unchanged by this merge**
 - Code Labs Writer: **not invoked**
 - CG Repair Lab / Code God: **not invoked**
 
 ## Exact next operation
 
-Refresh all three PR #566 exact-head workflow conclusions. If any fails, repair the bounded branch. If all succeed, refresh review threads, PR metadata, diff and main, decide merge promotion, and then update the V2.3.4 plan/checklist/ledger before reporting acceptance.
+Refresh source from main `fce98178f2234386da7be3aef02a8496fa24195a` and implement exactly one next safe V2-G0R owner repair. Prefer an additive/replay-safe change that can be proven with current GitHub validation lanes over a risky full-file rewrite. Update plan/checklist/ledger before the next delivered work result.
