@@ -1,0 +1,77 @@
+{
+  "schema": "stream-bandit-tcg-card-visual-printing-v1.1",
+  "recorded_at": "2026-09-17",
+  "inherits": "tcg-card-visual-printing-v1.json",
+  "purpose": "Post-test visual consistency correction aligned to the final approved ten showcase families.",
+  "visual_authority": {
+    "approved_showcase_decks": [
+      "Ember/Ashrush",
+      "Tide/Deep Current",
+      "Grove/Wildgrowth",
+      "Volt/Live Wire",
+      "Stone/Unbroken",
+      "Gale/Skyshift",
+      "Shade/Nightbind",
+      "Astral/Second Sky",
+      "Fairy/Glimmerwish",
+      "Underworld/Grave Pact"
+    ],
+    "artwork_on_every_printable_card": true,
+    "concept_art_is_rules_authority": false,
+    "structured_card_data_is_rules_authority": true
+  },
+  "creature_card_header_correction": {
+    "top_left": "Cost + value when structured data defines a generic play/evolution cost",
+    "top_right": "Creature type / element badge",
+    "identity_band": ["card_name", "stage_or_classification", "HP + value"],
+    "hp_must_be_clearly_labelled": true,
+    "omit_cost_when_not_defined": true,
+    "invent_visual_cost_when_not_defined": false,
+    "supersedes": "v1 wording that placed HP itself in the top-left corner"
+  },
+  "creature_card_body": {
+    "art": "large dedicated card-specific artwork window",
+    "action_slot_count": 2,
+    "legal_action_slot_shapes": [
+      ["Ability", "Attack 1"],
+      ["Attack 1", "Attack 2"]
+    ],
+    "forbidden_action_slot_shape": ["Ability", "Attack 1", "Attack 2"],
+    "attack_fields": [
+      "Attack label",
+      "Attack name",
+      "Attack Cost label + Essence icons/types/count",
+      "Damage label + value",
+      "rules/effect text"
+    ],
+    "footer": ["Withdraw Cost + value", "rarity marker", "printing finish marker", "set/pack marker"]
+  },
+  "numeric_label_policy": {
+    "rule": "Every visible gameplay number must have a named property or a globally standardized labeled icon with accessible text.",
+    "required_examples": [
+      "HP 150",
+      "Cost 3",
+      "Attack Cost 2 Ember",
+      "Damage 60",
+      "Withdraw Cost 2",
+      "Shield 40",
+      "Heal 20"
+    ],
+    "floating_unlabeled_numbers_allowed": false
+  },
+  "rarity": {
+    "tiers": ["Basic", "Rare", "Extra Rare", "Mythic"],
+    "changes_gameplay_identity": false
+  },
+  "printing_finish": {
+    "variants": ["Standard", "Shine", "Holo", "Full-Art Shine", "Alt-Art", "Signature Mythic"],
+    "changes_gameplay_identity": false,
+    "owner": "Card Printing / Art Metadata #3"
+  },
+  "battle_renderer": {
+    "field_card_is_real_card_face": true,
+    "hover_or_tap_enlarges": true,
+    "runtime_text_generated_from_structured_data": true,
+    "finish_shader_layers_on_top_of_rarity_frame": true
+  }
+}
