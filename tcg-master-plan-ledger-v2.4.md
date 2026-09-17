@@ -6,7 +6,7 @@
 **Previous canonical ledger:** `tcg-master-plan-ledger-v2.3.md`  
 **Rebaseline main SHA:** `24fe6d0feff7c7298ffb474887ae8eef2dc8b44f`  
 **Owner-family baseline:** 40 gameplay owner families retained  
-**Ledger revision:** V2.4-1 — 2026-09-17  
+**Ledger revision:** V2.4-2 — 2026-09-17  
 **Release decision:** 🔒 HOLD public/live/production
 
 ## Ledger rules
@@ -417,6 +417,32 @@ Repository acceptance and live deployment are separate decisions.
 
 ---
 
+### V2.4-018 — Current V2 card-owned Attack click path behaviorally proven
+
+**State:** ✅ SOURCE-PATH PROOF / 🧪 real two-user Attack still required  
+**Checklist:** V2-ATTACK-SOURCE-01  
+**Pull request:** #573  
+**Behavioral-test head:** `fdf227159c2031fc1a1968bc3f624c93c80e6624`  
+**Validation:** TCG Card Pass 2 Validation #625 — SUCCESS
+
+The new executable browser harness runs the real `stream-bandit-tcg-v2-battle-controller.js` rather than only matching source text. It proves that a playable structured Creature card:
+
+- renders its card-owned Attack control;
+- binds the real click listener;
+- submits exactly one request to `tcg-match-actions`;
+- sends `action='attack'`, `attack_slot`, `match_id`, a unique `client_nonce` and the visible `expected_revision`;
+- recognizes a logical nested authoritative rejection even when the outer HTTP/result envelope is successful;
+- re-syncs authoritative match state after that rejection;
+- leaves the rejection reason visible to the player.
+
+This materially closes the source-test gap between “the wiring text exists” and “the current controller actually executes that wiring.”
+
+It does **not** close V2-ATTACK-01. Yesterday's exact rejected response was not persisted, so this transaction does not claim that the nested-result transport defect was the sole historical root cause. A fresh two-user V2 match must still prove an accepted Attack commit, payment/damage/effects and synchronized visible result.
+
+No runtime, game-rule, Edge Function, migration or Supabase change is part of this source-path proof.
+
+---
+
 ## Current progress board
 
 | Area | State | Release meaning |
@@ -424,6 +450,7 @@ Repository acceptance and live deployment are separate decisions.
 | V2.3 evergreen/extensible architecture | ✅ accepted | retained |
 | Current-main continuity | ✅ rebaselined | V2.4 is new canonical continuation |
 | Server/source foundations | 🧪 substantial | useful, not whole-match proof |
+| V2 Attack card-click transport | ✅ behaviorally proven in source | fresh two-user authoritative Attack still required |
 | Board-only active match route | ✅ source accepted | V2-SHELL-01A complete in source |
 | V2-ATTACK-01 | ⛔ open | blocks public/live |
 | Full two-user gameplay matrix | 📋 open | required release proof |
@@ -439,6 +466,6 @@ Repository acceptance and live deployment are separate decisions.
 
 ## Next ledger transaction
 
-After this docs/control slice is accepted, the next implementation transaction must be the exact **V2-ATTACK-01 evidence capture / smallest-proven-repair** lane.
+After this source-path proof is accepted, the next gameplay transaction remains the exact **V2-ATTACK-01 fresh two-user evidence capture / smallest-proven-repair** lane.
 
-Do not start a broad runtime rewrite and do not let Account/Friends work enter the battle controller.
+Do not start a broad runtime rewrite and do not let Account/Friends work enter the battle controller. If the fresh two-user Attack succeeds, capture and mark that E2E evidence before moving to the rest of MATCH-01 through MATCH-25. If it fails, capture the exact authoritative request/response/revision evidence before changing gameplay owners.
