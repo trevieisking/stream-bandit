@@ -96,30 +96,9 @@ Current V2.3.2 implementation state: **0/11 accepted repairs**.
 **State:** ACCEPTED CONTROL DECISION  
 **Runtime/live impact:** none
 
-Created `tcg-master-plan-checklist-v2.3.2.md` with stable IDs for:
+Created `tcg-master-plan-checklist-v2.3.2.md` with stable IDs for control/continuity, UX, release-client prohibitions, all eleven G0R defects, card controls, physical play, Attack/Ability/Withdraw/switch, damage/Rewards/promotion, private-choice overlays, premium renderer, owner invariants, V2-G1, V2-G1E, V2-G2, V2-G3, V2-G4, V2-G5, V2-G6, V2-G7 and LIVE.
 
-- control/continuity;
-- product UX;
-- forbidden release-client patterns;
-- all eleven G0R defects;
-- card-controller behavior;
-- direct physical-card play;
-- Attack/Ability/Withdraw/switch choreography;
-- damage counters/defeat/Rewards/promotion;
-- search/private-choice overlays;
-- premium renderer requirements;
-- architecture/owner invariants;
-- V2-G1 content authority;
-- V2-G1E generic extensibility;
-- V2-G2 renderer;
-- V2-G3 prototype restoration;
-- V2-G4 full battle choreography;
-- V2-G5 real two-user proof;
-- V2-G6 player systems;
-- V2-G7 release acceptance;
-- LIVE definition.
-
-**Checklist commit:** `03384eedba586d160f7f3433bce243c7f4a058e0`
+**Checklist initial commit:** `03384eedba586d160f7f3433bce243c7f4a058e0`
 
 Continuity rule now active: a material implementation change without its checklist checkpoint is not an accepted master-plan step.
 
@@ -127,10 +106,10 @@ Continuity rule now active: a material implementation change without its checkli
 
 ## V2.3.2-005 — Card layout correction locked
 
-**State:** REQUIREMENT LOCKED / AUTHORITY-FILE UPDATE TODO  
+**State:** REQUIREMENT LOCKED / VISUAL AUTHORITY CREATED  
 **Runtime/live impact:** none
 
-The current V2.3.1 visual-contract wording drifted from the explicit prototype/showcase instruction by moving HP out of the fixed top-left position.
+The V2.3.1 visual-contract wording drifted from the explicit prototype/showcase instruction by moving HP out of the fixed top-left position.
 
 The V2.3.2 decision is:
 
@@ -145,7 +124,10 @@ The V2.3.2 decision is:
 
 `HP top-left` and `no invented Creature Cost` are both mandatory and compatible.
 
-Pending control task: create corrected card visual authority and realign any conflicting authority pointer.
+**Corrected authority:** `tcg-card-visual-printing-v1.2.json`  
+**Commit:** `bd86254e66594d95e573d7a9203fbee058a4559b`
+
+Remaining control inconsistency: `tcg-v2-card-action-controller-v1.json` still points to `tcg-card-visual-printing-v1.1.json`. This is checklist `CTRL-006` and remains HOLD until safely realigned.
 
 ---
 
@@ -171,21 +153,47 @@ No later gate may erase or silently bypass an earlier incomplete release blocker
 
 ---
 
+## V2.3.2-007 — Control Gate 0 evidence checkpoint
+
+**State:** PARTIAL ACCEPTANCE / HOLD REMAINS  
+**Runtime/live impact:** none
+
+### Exact control evidence
+
+- control slice start: `b11330a802d4b8574eb5847b54c249b5ed43adfe`;
+- control slice exact five-file head reviewed: `bd86254e66594d95e573d7a9203fbee058a4559b`;
+- compare result: **5 commits ahead / 0 behind**;
+- files added: exactly 5;
+- no runtime, migration, registry, Edge Function, Supabase or live-page file changed in that five-file slice;
+- workflow runs on `bd86254e...`: **none found**;
+- combined commit statuses on `bd86254e...`: **none found**;
+- latest visible Codex review summary still references older commit `0596901`, therefore current control head lacks current review evidence;
+- exact card-controller inspection proves `authority.card_visual` still references `tcg-card-visual-printing-v1.1.json`.
+
+### Promotion decision
+
+- documentation/control branch work: **PROMOTE**;
+- PR #564 merge: **HOLD**;
+- `main`: **HOLD**;
+- runtime/Supabase/live/production: **HOLD**.
+
+### Checklist checkpoint
+
+The checklist was updated at commit `bbd74556adca616988a8736d10c74813ca1429fc` to record the completed control files, exact evidence, missing CI/status/review evidence and `CTRL-006` as the next exact task.
+
+### Next exact operation
+
+`CTRL-006` — safely realign `tcg-v2-card-action-controller-v1.json` from visual contract `v1.1` to `v1.2`, preserving all unrelated content, then refresh exact diff/review/workflow/status evidence and update this checklist/ledger before the next material result message.
+
+---
+
 ## Current checkpoint
 
 **Control Gate:** V2.3.2 Control Gate 0  
 **Control PR:** #564  
 **Branch:** `docs/tcg-v2-3-post-test-consistency`  
-**Latest accepted checklist commit entering this ledger write:** `03384eedba586d160f7f3433bce243c7f4a058e0`  
-**main remains:** `59ab7857522373a53de7d551c66f12c2e514e934` at the last refresh  
+**Exact PR head entering this ledger update:** `bbd74556adca616988a8736d10c74813ca1429fc`  
+**main last refreshed:** `59ab7857522373a53de7d551c66f12c2e514e934`  
 **Runtime/live mutation:** none  
-**Merge/live decision:** HOLD
-
-### Next exact operations
-
-1. create machine release/index authority pointing to V2.3.2 plan/checklist/ledger;
-2. create corrected card visual authority for HP top-left + no invented Cost;
-3. record controller visual-pointer inconsistency as resolved or still HOLD after exact inspection;
-4. exact diff review of the V2.3.2 control slice;
-5. refresh current review/CI/status evidence;
-6. update checklist/ledger with final Control Gate 0 head and next implementation item.
+**Merge/live decision:** HOLD  
+**Next checklist item:** `CTRL-006`
