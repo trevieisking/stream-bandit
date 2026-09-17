@@ -4,7 +4,7 @@
 **Previous canonical plan:** `tcg-master-plan-progress-v2.3.md`  
 **Previous ledger:** `tcg-master-plan-ledger-v2.3.md`  
 **Owner-family baseline:** 40  
-**Ledger revision:** V2.3.1-6 — 2026-09-17
+**Ledger revision:** V2.3.1-7 — 2026-09-17
 
 ## Rules
 
@@ -88,6 +88,7 @@ Machine-readable authority: `tcg-special-mechanic-names-v1.json`.
 
 - EX/current ex research pattern → **Ascendant Creature**
 - GX → **Sigilborn Creature**
+- generic multi-being identity → **Bonded Creature**
 - TAG TEAM GX → **Bonded Sigilborn**
 - V → **Exalted Creature**
 - VMAX → **Colossus Creature**
@@ -103,6 +104,8 @@ Machine-readable authority: `tcg-special-mechanic-names-v1.json`.
 - historical Mega EX evolve/end-turn pattern → **Ascension Evolution**
 
 Shared once-per-match presentation is **Signature Power**. Machine action kinds remain `attack` / `ability`; display labels are **Signature Attack** / **Signature Ability**.
+
+The names file's `descriptive_traits` are explicitly design shorthand, **not** machine capability IDs. Exact machine capabilities come only from `tcg-generic-mechanic-capabilities-v1.json` and are mapped during V2-G1E.
 
 These are labels/capability bundles, not one engine per label.
 
@@ -130,6 +133,8 @@ Place/move choreography:
 6. server validates/commits the operation;
 7. **destination defeat check occurs immediately after committed PLACE_DAMAGE/MOVE_DAMAGE before later listeners/follow-up targeting can act on that destination.**
 
+Grouped `PLACE_DAMAGE_MULTI` is one atomic multi-target placement operation: validate the whole target set, commit all placements, run an immediate batch defeat scan across all affected destinations, then resume later listeners/effects. No listener runs between individual grouped placements.
+
 Attack-generated counter choices still complete before automatic turn handoff, but each counter operation preserves its immediate defeat boundary. Turn-transition Condition counters use the same immediate defeat rule before next-player normal actions.
 
 Ordinary damage, placed counters, moved counters and Condition ticks remain semantically distinct. Weakness/Vulnerability, Resistance and Shield do not automatically change placed/moved counter amounts.
@@ -151,7 +156,7 @@ These corrections change no live gameplay, Supabase state, current card values o
 
 **State:** ✅ COMPLETE
 
-Confirmed retained authority includes prototype restoration, full video choreography, drag/drop/tap targeting, green Evolution targets, direct Essence/Relic/Realm/Tactic play, Realm persistence, card-owned Ability/Attack/Withdraw, active Ability normally once/turn, attack auto-end-turn, damage-counter placement/movement, immediate counter defeat boundaries, fixed/up-to precision, Condition ticks, ten visual families, 10/241/10 target, Fairy + Underworld, artwork/rarity/printing variants, original special-family names, global matchup Vulnerability, Evergreen/no age rotation, backward compatibility, future content/product extensibility and the 40-owner/no-owner-41 rule.
+Confirmed retained authority includes prototype restoration, full video choreography, drag/drop/tap targeting, green Evolution targets, direct Essence/Relic/Realm/Tactic play, Realm persistence, card-owned Ability/Attack/Withdraw, active Ability normally once/turn, attack auto-end-turn, damage-counter placement/movement, immediate single/grouped counter defeat boundaries, fixed/up-to precision, Condition ticks, ten visual families, 10/241/10 target, Fairy + Underworld, artwork/rarity/printing variants, original special-family names, global matchup Vulnerability, Evergreen/no age rotation, backward compatibility, future content/product extensibility and the 40-owner/no-owner-41 rule.
 
 ### V2.3.1-008 — Restart point
 
@@ -180,6 +185,7 @@ Authorities:
 Research coverage recorded:
 
 - Pokector coverage source indexes **174 English TCG sets** from Base through the 2026 Mega Evolution era;
+- the era table now accounts for all 174, including POP = 9 and NP / Nintendo Black Star Promos = 1;
 - historical mechanic-family baseline scan spans Base/Gym/Neo/e-Card/EX/DP/Platinum/HGSS/BW/XY/SM/SWSH/SV/Mega Evolution and special products;
 - Bulbapedia `Cards by effect` provides **54 broad effect categories** folded into the generic vocabulary;
 - broader card/Ability/Attack indexes remain ongoing per-card research sources;
@@ -222,13 +228,25 @@ Research additions follow: identify idea → try to compose existing capabilitie
 
 ### V2.3.1-012 — Second exact-head review precision repairs
 
-**State:** ✅ CORRECTED ON BRANCH / RE-REVIEW REQUIRED
+**State:** ✅ CORRECTED
 
-The refreshed review after mechanic-harvest work found four further documentation/control issues:
+The refreshed review after mechanic-harvest work found four documentation/control issues and all were repaired:
 
-1. `tcg-special-mechanic-rule-matrix-v1.1.md` had become an addendum that omitted V1 capability/renderer/owner details. It is now **self-contained**, preserving the complete V1 matrix plus V1.1 corrections.
-2. damage-counter ordering had later listeners before lethal defeat processing. The contract and master plan now require the **immediate destination defeat boundary after each committed PLACE_DAMAGE/MOVE_DAMAGE operation**.
-3. Signature Power used presentation labels in the machine `action_kinds` field. Machine identifiers are restored to `attack` / `ability`, with Signature Attack / Signature Ability stored separately as display labels.
-4. fixed MOVE_DAMAGE amounts were described like `up to` amounts. Fixed amounts now require the full legal amount; smaller values require explicit `up to` or partial semantics.
+1. `tcg-special-mechanic-rule-matrix-v1.1.md` is self-contained, preserving the complete V1 capability/renderer/owner details plus V1.1 corrections.
+2. damage-counter ordering uses the immediate destination defeat boundary after each committed PLACE_DAMAGE/MOVE_DAMAGE operation.
+3. Signature Power machine identifiers are `attack` / `ability`; Signature Attack / Signature Ability are display labels.
+4. fixed MOVE_DAMAGE amounts require the full legal amount; smaller values require explicit `up to` or partial semantics.
 
-No runtime, current registry, Supabase, migration, live page or production game state was changed by these repairs.
+### V2.3.1-013 — Third exact-head authority repairs
+
+**State:** ✅ CORRECTED / RE-REVIEW REQUIRED
+
+The next exact-head review found five more cross-file consistency issues. Repairs:
+
+1. **Nested design visual authority:** `tcg-v2-card-action-controller-v1.json` now treats Fairy/Underworld candidate files as `content_sources`, not visual authorities. The sole current renderer authority is `tcg-card-visual-printing-v1.1.json`; historical visual metadata inside design candidates cannot override it.
+2. **Bonded family completeness:** the canonical master plan, names authority and Release Control retain both generic **Bonded Creature** and narrower **Bonded Sigilborn**.
+3. **Capability vocabulary:** special-family `descriptive_traits` are explicitly non-ID design shorthand. Exact machine capability IDs come only from `tcg-generic-mechanic-capabilities-v1.json`; V2-G1E performs the mapping.
+4. **Grouped direct placement:** `PLACE_DAMAGE_MULTI` validates/commits its selected target group atomically, then runs an immediate batch defeat scan across all affected destinations before later listeners/follow-up effects.
+5. **Backward-compatible machine key:** Evergreen v1.1 restores stable `voidmarked_card` as the machine key while keeping **Riftmarked Card** as the player-facing name; `riftmarked_card` is retained as a compatibility alias/mapping.
+
+These are control/schema-authority repairs only. No runtime, current registry, Supabase, migration, live page or production gameplay state changed.
