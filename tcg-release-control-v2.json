@@ -1,12 +1,15 @@
 {
   "schema": "stream-bandit-tcg-release-control-v2",
   "recorded_at": "2026-09-17",
-  "purpose": "Non-self-referential control record for the post-private-alpha ten-family battle-client, visual-card and content-expansion programme, including the restored playable-prototype UX authority.",
+  "purpose": "Non-self-referential control record for the ten-family V2 baseline, restored playable-prototype UX, evergreen ownership policy and future content/mechanic extensibility programme.",
   "authority": {
-    "desired_behavior": "tcg-master-plan-progress-v2.2.md",
-    "audit_history": "tcg-master-plan-ledger-v2.2.md",
-    "previous_desired_behavior": "tcg-master-plan-progress-v2.1.md",
-    "previous_audit_history": "tcg-master-plan-ledger-v2.1.md",
+    "desired_behavior": "tcg-master-plan-progress-v2.3.md",
+    "audit_history": "tcg-master-plan-ledger-v2.3.md",
+    "previous_desired_behavior": "tcg-master-plan-progress-v2.2.md",
+    "previous_audit_history": "tcg-master-plan-ledger-v2.2.md",
+    "mechanic_heritage_research": "tcg-mechanic-heritage-research-v1.md",
+    "special_mechanic_rule_matrix": "tcg-special-mechanic-rule-matrix-v1.md",
+    "evergreen_extensibility": "tcg-evergreen-extensibility-v1.json",
     "battle_interaction": "tcg-battle-client-interaction-v1.json",
     "card_visual_printing": "tcg-card-visual-printing-v1.json",
     "card_controller": "tcg-v2-card-action-controller-v1.json",
@@ -30,7 +33,8 @@
     "underworld_grave_pact": "a61a9795e545ccc50c44e9f5b95c5b0d9e5cc173",
     "fairy_glimmerwish": "16a745a3cf96f6caf00c34ad88896fb0dcca2a73",
     "creature_card_controller": "019b029f344bac3c4efdc92480cdff5c9c2c5521",
-    "video_dragdrop_masterplan_sync": "77dc14a5af4101bfd06941243d142ce3f16cc120"
+    "video_dragdrop_masterplan_sync": "77dc14a5af4101bfd06941243d142ce3f16cc120",
+    "prototype_restoration_authority": "5a5609a7fa93b365eeaa7fb8da6a9ade6322944b"
   },
   "v2_target": {
     "elements": 10,
@@ -44,10 +48,11 @@
     "battle_client": "prototype_restored_board_first_direct_manipulation",
     "rarities": ["Basic","Rare","Extra Rare","Mythic"],
     "printing_finishes": ["Standard","Shine","Holo","Full-Art Shine","Alt-Art","Signature Mythic"],
-    "artwork_on_every_printable_card": true
+    "artwork_on_every_printable_card": true,
+    "note": "241 identities is the current V2 baseline target, not a permanent maximum. Future series are additive."
   },
   "prototype_restoration": {
-    "status": "canonical_v2_2_ux_authority",
+    "status": "canonical_v2_2_inherited_by_v2_3",
     "principle": "restore the approved playable one-screen physical-card prototype interaction rather than redesigning the battle UX around debug forms",
     "one_screen_battlefield": true,
     "physical_card_primary_controls": true,
@@ -60,8 +65,51 @@
     "attack_auto_ends_turn_after_resolution_and_aftermath": true,
     "keep_board_visible_during_choices_when_practical": true,
     "misclick_change_or_cancel_before_server_commit_when_practical": true,
-    "debug_form_release_battlefield_forbidden": true,
-    "pokemon_research_role": "interaction_category_reference_only_no_asset_or_brand_copy"
+    "debug_form_release_battlefield_forbidden": true
+  },
+  "evergreen_policy": {
+    "status": "canonical_v2_3_planning_authority",
+    "primary_format_working_name": "Evergreen",
+    "age_based_rotation": false,
+    "released_cards_remain_eligible_by_age": true,
+    "collection_ownership_persists": true,
+    "printing_history_persists": true,
+    "new_series_are_additive": true,
+    "optional_curated_formats_allowed": true,
+    "competitive_restriction_last_resort": true,
+    "restricted_card_should_remain_usable_in_suitable_private_practice_open_modes_when_safe": true,
+    "balance_order": [
+      "implementation_bug_fix",
+      "rules_errata_when_genuinely_required",
+      "future_counterplay",
+      "copy_limit_or_restricted_control",
+      "competitive_suspension_or_ban_last_resort"
+    ]
+  },
+  "future_extensibility": {
+    "status": "design_contract_accepted_runtime_proof_pending",
+    "pokemon_research_role": "general_mechanic category research plus supplied-card rule-pattern review only; no brand, asset, card-text, frame, UI or audio copying",
+    "working_special_classes": [
+      "Ascendant Creature",
+      "Colossus Creature",
+      "Signature Power",
+      "Bonded Creature",
+      "Convergence Creature",
+      "Gleam Creature",
+      "Prime Card",
+      "Voidmarked Card",
+      "Overform",
+      "Aspect Creature",
+      "Ascension Evolution"
+    ],
+    "new_series_must_be_data_driven": true,
+    "new_cards_use_content_registry_and_shared_effect_grammar": true,
+    "new_decks_use_recipe_and_legality_data": true,
+    "new_booster_packs_use_pack_recipes_not_new_edge_functions": true,
+    "collectible_coins_and_accessories_are_collection_cosmetic_data": true,
+    "gameplay_random_coin_flips_remain_randomization_owner": true,
+    "backward_compatibility_required": true,
+    "no_new_owner_without_new_state_transition_proof": true
   },
   "content_state": {
     "original_eight_packages": "canonical_structured_runtime",
@@ -69,8 +117,10 @@
     "underworld": "24_identity_v2_design_accepted_schema_pending",
     "v2_g0_scope_design": "complete",
     "v2_g1_structured_packages": "in_progress",
+    "v2_g1e_evergreen_extensibility_schema": "not_started",
     "v2_g2_full_card_renderer": "not_started",
-    "v2_g3_playable_prototype_restoration": "not_started"
+    "v2_g3_playable_prototype_restoration": "not_started",
+    "future_special_mechanic_series": "research_and_schema_target_only"
   },
   "change_policy": {
     "no_false_live_claims": true,
@@ -82,7 +132,12 @@
     "private_alpha_rollback_baseline_preserved": true,
     "prototype_usability_regression_is_not_progress": true,
     "one_clear_player_interaction_path": true,
-    "backend_complexity_must_not_be_exposed_as_player_complexity": true
+    "backend_complexity_must_not_be_exposed_as_player_complexity": true,
+    "no_age_based_rotation_in_primary_format": true,
+    "old_cards_remain_supported_by_age": true,
+    "future_schema_changes_require_backward_compatibility": true,
+    "new_series_do_not_require_series_name_runtime_branches": true,
+    "pokemon_names_art_text_frames_ui_audio_assets_must_not_be_copied": true
   },
-  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps, then prioritize the premium full-card renderer and restoration of the one-screen playable prototype Battle Client before unrelated product complexity."
+  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E evergreen/extensibility schema metadata before the premium renderer and restored one-screen Battle Client."
 }
