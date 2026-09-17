@@ -1,5 +1,9 @@
 import { Binding, rest } from "./oauth.ts";
-import { VERSION } from "./context.ts";
+import {
+  getContext,
+  MASTER_CHECKLIST_PROJECTION_VERSION,
+  VERSION,
+} from "./context.ts";
 import {
   getWorkspace,
   listActions as listActionsBase,
@@ -59,6 +63,7 @@ const TRANSACTIONAL_ACTIONS = new Set([
   "candidate.save",
   "candidate.accept",
   "test.record",
+  "checklist.persist_projection",
   "checkpoint.create",
   "workflow.advance",
   "workflow.reset",
@@ -200,6 +205,52 @@ async function workspaceContext(b: Binding) {
     ? snapshot.current
     : {};
   return { now: nowIso(), current, ...current };
+}
+
+async function prepareChecklistProjectionContext(b: Binding, args: Row) {
+  const expected = expectedVersion(args);
+  const snapshot: any = await getContext(b, 25);
+  const projection = snapshot?.master_checklist_projection;
+  const plan = snapshot?.reads?.master_plan;
+  if (!projection || typeof projection !== "object" || Array.isArray(projection)) {
+    throw new Error("The server-generated Master Checklist projection is required.");
+  }
+  if (!plan || typeof plan !== "object" || Array.isArray(plan)) {
+    throw new Error("The owner-scoped Master Plan record is required.");
+  }
+  if (
+    projection.version !== MASTER_CHECKLIST_PROJECTION_VERSION ||
+    projection.authority !== "read-only-evidence-projection" ||
+    projection.writer_authority !== false ||
+    projection.promotion_authority !== false
+  ) {
+    throw new Error("The Master Checklist projection authority is invalid.");
+  }
+  if (Number(projection.workspace_state_version) !== expected) {
+    throw new Error(
+      "The Master Checklist projection is stale. Read the workspace again before persisting it.",
+    );
+  }
+  const checklist = projection.exact_checklist;
+  if (!checklist || typeof checklist !== "object" || Array.isArray(checklist) || !Array.isArray(checklist.items)) {
+    throw new Error("The exact Master Checklist projection is incomplete.");
+  }
+  const planId = String(plan.id || "");
+  const planHash = String(plan.current_hash || "").toLowerCase();
+  if (
+    String(plan.filename || "") !== "code-labs/CODE-LABS-V1-PLAN.md" ||
+    !/^[a-f0-9]{64}$/.test(planHash) ||
+    String(checklist.plan_record_id || "") !== planId ||
+    String(checklist.source_hash || "").toLowerCase() !== planHash
+  ) {
+    throw new Error("The Master Checklist projection is not bound to the exact Master Plan.");
+  }
+  return {
+    now: nowIso(),
+    plan,
+    checklist_projection: projection,
+    expected_state_version: expected,
+  };
 }
 
 async function prepareFileIntakeContext(
@@ -436,7 +487,9 @@ async function repositoryEvidence(
 }
 
 async function atomicPayload(b: Binding, action: string, args: Row) {
-  let context = await workspaceContext(b);
+  let context = action === "checklist.persist_projection"
+    ? await prepareChecklistProjectionContext(b, args)
+    : await workspaceContext(b);
   if (action === "file.intake") {
     context = await prepareFileIntakeContext(b, args, context);
   } else if (action === "undo.execute") {
@@ -645,6 +698,7 @@ export function listActions() {
   const base: any = listActionsBase();
   const extra = [
     { action: "file.intake", requires_confirmation: false },
+    { action: "checklist.persist_projection", requires_confirmation: false },
     { action: "repo.prepare_handoff", requires_confirmation: false },
     { action: "cg_repair_lab.access", requires_confirmation: false },
     { action: "cg_repair_lab.analyze", requires_confirmation: false },

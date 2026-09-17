@@ -3,6 +3,7 @@ import {
   atomicRequestHash,
   canonicalJson,
 } from "./atomic-workspace-engine.ts";
+import { projectMasterChecklistEvidence } from "./context.ts";
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message);
@@ -263,4 +264,150 @@ Deno.test("evidence boundary: client tests do not claim database or deployment p
   assert(!evidence.database_integration, "These tests must not claim database transaction proof.");
   assert(!evidence.writer_integration, "These tests must not claim Writer runtime proof.");
   assert(!evidence.deployment_smoke_test, "These tests must not claim deployment proof.");
+});
+
+function projectionFixture() {
+  const planId = "11111111-1111-4111-8111-111111111111";
+  const fileId = "22222222-2222-4222-8222-222222222222";
+  const checkpointId = "33333333-3333-4333-8333-333333333333";
+  const receiptId = "44444444-4444-4444-8444-444444444444";
+  const sourceHash = "a".repeat(64);
+  const candidateHash = "b".repeat(64);
+  const planHash = "c".repeat(64);
+  const head = "d".repeat(40);
+  const operationId = "55555555-5555-4555-8555-555555555555";
+  const fencing = 17;
+  return {
+    workspace: { state_version: 81, workflow_step: "checklist-builder" },
+    project: {
+      id: "project-1",
+      repo: "trevieisking/stream-bandit",
+      metadata: {},
+    },
+    plan: {
+      id: planId,
+      filename: "code-labs/CODE-LABS-V1-PLAN.md",
+      current_hash: planHash,
+      metadata: {
+        plan_revision: "rev-81",
+        exact_checklist: {
+          checklist_id: "checklist-owner-81",
+          checklist_version: 4,
+        },
+      },
+    },
+    file: {
+      id: fileId,
+      current_hash: sourceHash,
+      metadata: {
+        candidate_hash: candidateHash,
+        repo_handoff: {
+          repo: "trevieisking/stream-bandit",
+          github_head_sha: head,
+        },
+        code_god_review: {
+          version: "V50-code-god-2-bounded-advisory",
+          scope_outcome: "BOUNDED_CHECKS_CLEAR",
+          trust_state: "HOLD_UNTRUSTED_ADVISORY",
+          authoritative: false,
+          github_head_sha: head,
+        },
+        master_checklist_evidence: {
+          github: {
+            repository: "trevieisking/stream-bandit",
+            pull_request: 554,
+            reviewed_head_sha: head,
+            workflow_run_count: 3,
+            combined_status_count: 2,
+            workflow_runs_passed: true,
+            combined_statuses_passed: true,
+            refresh: { performed: true, reviewed_head_sha: head },
+          },
+          workflow_checks: {
+            beginning_to_end_workflow_tested: { passed: true, evidence: "workflow receipt set" },
+            one_owner_per_responsibility_confirmed: { passed: true, evidence: "owner register" },
+            working_legacy_capability_preserved: { passed: true, evidence: "regression suite" },
+          },
+          user_checks: {
+            desktop_visual_test_passed: { passed: true, evidence: "user desktop check" },
+            mobile_visual_test_passed: { passed: true, evidence: "user mobile check" },
+            no_secret_value_exposed: { passed: true, evidence: "user secret check" },
+            user_approved_exact_visible_result: { passed: true, evidence: "user acceptance" },
+          },
+        },
+      },
+    },
+    test: { id: "test-1", result: "PASS" },
+    versions: [{
+      id: checkpointId,
+      file_id: fileId,
+      version_kind: "checkpoint",
+      operation_id: operationId,
+      fencing_token: fencing,
+    }],
+    receipts: [{
+      id: receiptId,
+      action: "checkpoint.create",
+      record_type: "version",
+      record_id: checkpointId,
+      operation_id: operationId,
+      fencing_token: fencing,
+    }],
+  };
+}
+
+Deno.test("Master Checklist projector: complete exact evidence can reach PASS without granting authority", () => {
+  const projection = projectMasterChecklistEvidence(projectionFixture());
+  assertEqual(projection.checklist_scope_state, "PASS", "A fully proven projection should be PASS.");
+  assertEqual(projection.writer_authority, false, "Projection must never grant Writer authority.");
+  assertEqual(projection.promotion_authority, false, "Projection must never grant promotion authority.");
+  assertEqual(projection.unresolved_count, 0, "A complete projection should have no unresolved checklist items.");
+  assertEqual(projection.exact_checklist.reviewed_pull_request, "554", "PR binding must be normalized into the exact checklist.");
+});
+
+Deno.test("Master Checklist projector: missing evidence fails closed and manual checks remain USER_CHECK", () => {
+  const projection = projectMasterChecklistEvidence({});
+  assertEqual(projection.checklist_scope_state, "HOLD", "Missing evidence must not become PASS.");
+  const desktop = projection.exact_checklist.items.find((entry: Record<string, unknown>) => entry.id === "Desktop visual test passed");
+  const workflows = projection.exact_checklist.items.find((entry: Record<string, unknown>) => entry.id === "workflow-runs");
+  assertEqual(desktop?.state, "USER_CHECK", "Desktop verification must remain an explicit user check.");
+  assertEqual(workflows?.state, "NOT_RUN", "Missing workflow runs must report NOT_RUN.");
+});
+
+Deno.test("Master Checklist projector: stale GitHub refresh head blocks the projection", () => {
+  const fixture = projectionFixture();
+  fixture.file.metadata.master_checklist_evidence.github.refresh.reviewed_head_sha = "e".repeat(40);
+  const projection = projectMasterChecklistEvidence(fixture);
+  assertEqual(projection.checklist_scope_state, "BLOCK", "A refresh bound to another head must block.");
+  assert(projection.blockers.includes("github-refresh"), "The blocker list must identify the stale GitHub refresh.");
+});
+
+Deno.test("Master Checklist projector: zero workflow runs and statuses are never converted to PASS", () => {
+  const fixture = projectionFixture();
+  fixture.file.metadata.master_checklist_evidence.github.workflow_run_count = 0;
+  fixture.file.metadata.master_checklist_evidence.github.combined_status_count = 0;
+  const projection = projectMasterChecklistEvidence(fixture);
+  const workflows = projection.exact_checklist.items.find((entry: Record<string, unknown>) => entry.id === "workflow-runs");
+  const statuses = projection.exact_checklist.items.find((entry: Record<string, unknown>) => entry.id === "combined-statuses");
+  assertEqual(workflows?.state, "NOT_RUN", "Zero workflow runs must remain NOT_RUN.");
+  assertEqual(statuses?.state, "NOT_RUN", "Zero combined statuses must remain NOT_RUN.");
+  assertEqual(projection.checklist_scope_state, "HOLD", "Missing GitHub gates must hold the checklist.");
+});
+
+Deno.test("Master Checklist projector: PASS-like checks without evidence stay HOLD", () => {
+  const fixture = projectionFixture();
+  fixture.file.metadata.master_checklist_evidence.user_checks.desktop_visual_test_passed = { passed: true, evidence: "" };
+  const projection = projectMasterChecklistEvidence(fixture);
+  const desktop = projection.exact_checklist.items.find((entry: Record<string, unknown>) => entry.id === "Desktop visual test passed");
+  assertEqual(desktop?.state, "HOLD", "A PASS-like manual value without bound evidence must not pass.");
+});
+
+Deno.test("Master Checklist projector: rollback PASS requires matching checkpoint and creation receipt identity", () => {
+  const fixture = projectionFixture();
+  fixture.receipts[0].operation_id = "66666666-6666-4666-8666-666666666666";
+  const projection = projectMasterChecklistEvidence(fixture);
+  const rollback = projection.exact_checklist.items.find((entry: Record<string, unknown>) => entry.id === "Rollback route confirmed");
+  const checkpoint = projection.exact_checklist.items.find((entry: Record<string, unknown>) => entry.id === "checkpoint-receipt");
+  assertEqual(rollback?.state, "NOT_RUN", "A mismatched checkpoint receipt must not prove rollback.");
+  assertEqual(checkpoint?.state, "NOT_RUN", "A mismatched receipt must fail the checkpoint evidence item.");
 });
