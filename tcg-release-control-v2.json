@@ -33,8 +33,11 @@
     "card_controller_points_to_card_visual_v1_1": true,
     "signature_power_machine_action_kinds": ["attack", "ability"],
     "signature_power_display_labels_separate_from_machine_ids": true,
+    "special_mechanic_names_machine_ids_match_canonical_action_kinds": true,
     "fixed_counter_amounts_are_distinct_from_up_to_partial_amounts": true,
-    "counter_operations_have_immediate_destination_defeat_boundary": true
+    "counter_operations_have_immediate_destination_defeat_boundary": true,
+    "mechanic_harvest_era_counts_sum_to_174": true,
+    "mechanic_harvest_example_recipe_uses_catalogued_ids": true
   },
   "historical_baseline": {
     "main_sha": "bbde61a3dd50f93b64872a5bccfaec62e826be23",
@@ -121,6 +124,8 @@
     "status": "living_research_and_schema_authority",
     "source_set_catalog": "Pokector English catalogue",
     "pokector_english_sets_coverage_source": 174,
+    "era_bucket_counts_sum_to": 174,
+    "reconciled_previously_missing_buckets": {"POP": 9, "NP_Nintendo_Black_Star_Promos": 1},
     "source_effect_taxonomy": "Bulbapedia Category:Cards by effect",
     "broad_effect_categories_harvested": 54,
     "historical_mechanic_family_baseline_scan": true,
@@ -138,7 +143,7 @@
     "status": "design_contract_accepted_runtime_proof_pending",
     "external_research_labels_are_player_facing": false,
     "stream_bandit_names_required": true,
-    "working_special_classes": ["Ascendant Creature","Sigilborn Creature","Bonded Sigilborn","Exalted Creature","Colossus Creature","Starforged Creature","Convergence Creature","Gleam Creature","Prime Card","Riftmarked Card","Overform","Ascension Form","Aspect Creature","Apex Ascendant","Ascension Evolution","Signature Power"],
+    "working_special_classes": ["Ascendant Creature","Sigilborn Creature","Bonded Creature","Bonded Sigilborn","Exalted Creature","Colossus Creature","Starforged Creature","Convergence Creature","Gleam Creature","Prime Card","Riftmarked Card","Overform","Ascension Form","Aspect Creature","Apex Ascendant","Ascension Evolution","Signature Power"],
     "signature_power": {
       "machine_action_kinds": ["attack", "ability"],
       "display_labels": {"attack": "Signature Attack", "ability": "Signature Ability"}
