@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - .github/workflows/tcg-card-pass-2-validation.yml
+      - tcg-*.md
+      - tcg-*.json
+      - tcg-*.mjs
       - tcg-card-pass-2-*.md
       - tcg-card-pass-2-*.json
       - tcg-runtime-*.json
@@ -19,6 +22,8 @@ on:
       - tcg-set-one-shadow-registry-builder-v0.2.mjs
       - tcg-set-one-starters-v0.2.json
       - tcg/tests/**
+      - supabase/functions/_shared/tcg-*.ts
+      - supabase/functions/tcg-*/**
       - supabase/functions/_shared/tcg-runtime-registry-v0-2.ts
       - supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts
       - supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts
@@ -26,6 +31,7 @@ on:
       - supabase/functions/tcg-match-actions/**
       - supabase/functions/tcg-private-alpha-api/**
       - supabase/functions/tcg-tactic-actions/**
+      - supabase/migrations/*tcg*.sql
       - supabase/migrations/20260906183000_tcg_v0_2_shadow_registry.sql
       - supabase/migrations/20260906190000_tcg_v0_2_set_one_shadow_registry_load.sql
       - supabase/migrations/20260906191500_tcg_match_v0_2_registry_snapshot_bridge.sql
