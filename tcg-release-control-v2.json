@@ -110,13 +110,7 @@
     "optional_curated_formats_allowed": true,
     "competitive_restriction_last_resort": true,
     "restricted_card_should_remain_usable_in_suitable_private_practice_open_modes_when_safe": true,
-    "balance_order": [
-      "implementation_bug_fix",
-      "rules_errata_when_genuinely_required",
-      "future_counterplay",
-      "copy_limit_or_restricted_control",
-      "competitive_suspension_or_ban_last_resort"
-    ]
+    "balance_order": ["implementation_bug_fix","rules_errata_when_genuinely_required","future_counterplay","copy_limit_or_restricted_control","competitive_suspension_or_ban_last_resort"]
   },
   "mechanic_harvest": {
     "status": "living_research_and_schema_authority",
@@ -139,24 +133,7 @@
     "status": "design_contract_accepted_runtime_proof_pending",
     "external_research_labels_are_player_facing": false,
     "stream_bandit_names_required": true,
-    "working_special_classes": [
-      "Ascendant Creature",
-      "Sigilborn Creature",
-      "Bonded Sigilborn",
-      "Exalted Creature",
-      "Colossus Creature",
-      "Starforged Creature",
-      "Convergence Creature",
-      "Gleam Creature",
-      "Prime Card",
-      "Riftmarked Card",
-      "Overform",
-      "Ascension Form",
-      "Aspect Creature",
-      "Apex Ascendant",
-      "Ascension Evolution",
-      "Signature Power"
-    ],
+    "working_special_classes": ["Ascendant Creature","Sigilborn Creature","Bonded Sigilborn","Exalted Creature","Colossus Creature","Starforged Creature","Convergence Creature","Gleam Creature","Prime Card","Riftmarked Card","Overform","Ascension Form","Aspect Creature","Apex Ascendant","Ascension Evolution","Signature Power"],
     "matchup_and_affinity": {
       "ordinary_vulnerability_source": "versioned global matchup snapshot",
       "working_vulnerability_label": "Vulnerability",
