@@ -14,57 +14,53 @@ A material implementation result is not accepted until this checklist/ledger cha
 
 | ID | State | Exact checkpoint |
 |---|---|---|
-| G0R-11 validation workflow coverage | **COMPLETE ✅** | PR #565 head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`; Validation #571 SUCCESS; merged main checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00` |
-| G0R-07 matchmaking room lifetime | **COMPLETE IN SOURCE ✅** | PR #566 head `190c9c9e4bf07712571b978abbd3657f876febed`; Validation #574 + Migration Replay #799 + Functional Smoke #825 SUCCESS; merged main `fce98178f2234386da7be3aef02a8496fa24195a`; Supabase/live still HOLD |
-| G0R-08 setup-legal deck validation | **IN PROGRESS 🔎** | PR #567 head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`; Validation #586 PASS; Migration Replay #800 PASS; Functional Smoke #826 Node+Deno PASS with PostgreSQL lane still running; review threads currently 0 |
-| G0R-10 Tactic subtype boundary | **PROVEN / QUEUED 🟡** | exact source proves `play_tactic` lacks Ally/Device allow-list; Relic/Realm have dedicated routes; no runtime patch accepted yet |
+| G0R-11 validation workflow coverage | **COMPLETE ✅** | PR #565; Validation #571 SUCCESS; merged checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00` |
+| G0R-07 matchmaking room lifetime | **COMPLETE IN SOURCE ✅** | PR #566; Validation #574 + Replay #799 + Smoke #825 SUCCESS; merged checkpoint `fce98178f2234386da7be3aef02a8496fa24195a`; Supabase/live HOLD |
+| G0R-08 setup-legal deck validation | **COMPLETE IN SOURCE ✅** | PR #567 head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`; Validation #586 + Replay #800 + Smoke #826 SUCCESS; merged main `042559e252cfa49ad425d9f57fa01a678b2a3fe9`; Supabase/live HOLD |
+| G0R-10 Tactic subtype boundary | **PROVEN / QUEUED 🟡** | only Ally/Device may enter one-shot `play_tactic`; Relic/Realm dedicated; no runtime patch yet |
 
-**Accepted G0R source repairs:** **2 / 11**.
+**Accepted G0R source repairs: 3 / 11 ✅**
 
-## G0R-07 — ACCEPTED SOURCE REPAIR
+## G0R-08 checklist — ACCEPTED SOURCE REPAIR
 
-- PR #566 reviewed head `190c9c9e4bf07712571b978abbd3657f876febed`.
-- Validation #574, Migration Replay #799 and Functional Smoke #825 all SUCCESS.
-- Review threads 0; merged main `fce98178f2234386da7be3aef02a8496fa24195a`.
-- Supabase/live deployment still HOLD.
-
-## G0R-08 checklist — ACTIVE SOURCE REPAIR
-
-| ID | Requirement | State | Evidence / acceptance |
+| ID | Requirement | State | Exact evidence |
 |---|---|---|---|
-| G0R08-01 | Current deck validator defect proven | COMPLETE | current validator lacks opening/setup eligibility check |
-| G0R08-02 | Exact opening eligibility vocabulary proven | COMPLETE | `Creature — Baby`, `Creature — Standalone`, `Creature — Mythic` |
-| G0R08-03 | Opening failure consequence proven | COMPLETE | opening loop can otherwise hit `opening_hand_mulligan_guard` |
-| G0R08-04 | Validator rejects zero opening-eligible Creature copies | IMPLEMENTED / PENDING FULL FENCE | `v_setup_eligible` + `deck_requires_setup_eligible_creature` |
-| G0R08-05 | Existing validation fence preserved | IMPLEMENTED / PENDING FULL FENCE | all existing error rules/strings retained |
-| G0R08-06 | Exact three recipe types synchronized with runtime | PASS ✅ | focused test passed in Validation #586 |
-| G0R08-07 | Additive migration only; no row rewrite | COMPLETE | `20260917143500_tcg_setup_legal_deck_validation.sql` |
-| G0R08-08 | Focused contract test | PASS ✅ | Validation #586 / run `35234474804` |
-| G0R08-09 | TCG Validation exact-head green | PASS ✅ | #586 / `35234474804` |
-| G0R08-10 | Migration Replay exact-head green | **PASS ✅** | #800 / `35234474906`; full disposable reset/replay from zero SUCCESS |
-| G0R08-11 | Functional Smoke exact-head green | IN PROGRESS 🔎 | #826 / `35234475267`; Node + Deno PASS; PostgreSQL replay smoke running |
-| G0R08-12 | No unresolved material review finding | CURRENTLY CLEAR | review threads = 0; final refresh required |
-| G0R08-13 | Exact PR diff remains intended two files | PASS at opening head | 2 files, +165 / -0 |
-| G0R08-14 | Merge to main | HOLD 🔒 | requires final Functional Smoke + immutable recheck |
-| G0R08-15 | Supabase/live deployment | HOLD 🔒 | separate deployment decision |
+| G0R08-01 | Current validator defect proven | COMPLETE | prior latest validator lacked setup eligibility check |
+| G0R08-02 | Exact setup vocabulary proven | COMPLETE | `Creature — Baby`, `Creature — Standalone`, `Creature — Mythic` from server runtime |
+| G0R08-03 | Opening failure consequence proven | COMPLETE | runtime otherwise can reach `opening_hand_mulligan_guard` |
+| G0R08-04 | Reject zero setup-eligible copies | COMPLETE ✅ | replacement validator adds `deck_requires_setup_eligible_creature` |
+| G0R08-05 | Preserve existing validation fence | COMPLETE ✅ | focused test verifies prior validation errors remain |
+| G0R08-06 | Recipe types synchronized with runtime | PASS ✅ | TCG Validation #586 |
+| G0R08-07 | Additive migration / no row rewrite | COMPLETE ✅ | `20260917143500_tcg_setup_legal_deck_validation.sql` |
+| G0R08-08 | Focused contract test | PASS ✅ | `card-pass-2-g0r-08-setup-legal-deck-validation.test.mjs` in Validation #586 |
+| G0R08-09 | TCG Validation exact-head | PASS ✅ | #586 / `35234474804` |
+| G0R08-10 | Migration Replay exact-head | PASS ✅ | #800 / `35234474906` full disposable reset/replay SUCCESS |
+| G0R08-11 | Functional Smoke exact-head | PASS ✅ | #826 / `35234475267` Node + Deno + PostgreSQL replay SUCCESS |
+| G0R08-12 | Review findings | PASS ✅ | 0 review threads at final pre-merge refresh |
+| G0R08-13 | Exact diff | PASS ✅ | 2 files / +165 / -0 |
+| G0R08-14 | Merge to main | **PROMOTE / COMPLETE ✅** | PR #567 merged with expected head; merge/main `042559e252cfa49ad425d9f57fa01a678b2a3fe9` |
+| G0R08-15 | Supabase/live deployment | HOLD 🔒 | source merge did not deploy migration to production |
 
 ## Exact G0R-08 identifiers
 
-- repository `trevieisking/stream-bandit`; PR #567; branch `fix/tcg-g0r-08-setup-legal-deck`
+- repository `trevieisking/stream-bandit`
+- branch `fix/tcg-g0r-08-setup-legal-deck`
+- PR #567
 - base main `fce98178f2234386da7be3aef02a8496fa24195a`
 - migration commit `2210eedfc3936561e3e6d49adb7f00e7d8861a6f`
-- exact PR head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`
+- reviewed PR head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`
+- merge/current main `042559e252cfa49ad425d9f57fa01a678b2a3fe9`
 - exact diff 2 files / +165 / -0
-- source/main impact so far none; Supabase/live impact none
-- Code Labs Writer / CG Repair Lab / Code God not invoked
+- Supabase/live impact: none from source merge
+- Code Labs Writer / CG Repair Lab / Code God: not invoked
 
 ## Inherited critical rules still locked
 
-- original playable prototype = UX truth: RESTORE, DO NOT REDESIGN;
-- 40-owner baseline; no owner #41 for a card/label/browser convenience;
-- every true Deck Search requires authoritative post-search shuffle and wording **Then shuffle your deck.**;
-- G0R-10 remains explicitly queued.
+- original playable prototype is UX truth: RESTORE, DO NOT REDESIGN;
+- 40-owner baseline, no owner #41 for one card/label/browser convenience;
+- every true Deck Search requires authoritative post-search shuffle with **Then shuffle your deck.**;
+- G0R-10 remains explicitly queued and cannot be lost.
 
 ## Exact next operation
 
-Finish Functional Smoke #826 on exact head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`. If green, refresh PR #567 review threads, exact diff/head and current main; decide source merge promotion and update plan/checklist/ledger before reporting. Supabase/live remains separate.
+Refresh current main `042559e252cfa49ad425d9f57fa01a678b2a3fe9` and implement exactly one next safe V2-G0R owner repair. Prefer additive/replay-safe work. Keep production Supabase/live separate until a later explicit deployment promotion fence.
