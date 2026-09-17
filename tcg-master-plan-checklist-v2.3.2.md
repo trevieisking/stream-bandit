@@ -36,33 +36,29 @@ Before sending a user-facing result for a material TCG work slice, record:
 
 If message delivery fails, a new chat starts, or tool context disappears, resume from the newest GitHub checklist/ledger checkpoint. Do not reconstruct the active step from memory alone.
 
-### Completion rule
-
-A source change without the checklist update is **not an accepted master-plan step**.
-
-A deployment/merge without the checklist's release evidence is **not a completed release gate**.
+A source change without the checklist update is **not an accepted master-plan step**. A deployment/merge without the checklist's release evidence is **not a completed release gate**.
 
 ---
 
 # A. Control & continuity
 
-| ID | Requirement | Requirement | Implementation / evidence |
+| ID | Requirement | Requirement state | Implementation / evidence |
 |---|---|---|---|
-| CTRL-001 | Master plan V2.3.2 explicitly locks release recovery + prototype restoration | LOCKED | COMPLETE — control file created on PR #564 |
-| CTRL-002 | Dedicated execution checklist exists and mirrors the master-plan gates | LOCKED | COMPLETE — this file |
-| CTRL-003 | Dedicated append-only V2.3.2 ledger records accepted work slices and next operation | LOCKED | TODO |
-| CTRL-004 | Machine release/index authority points at V2.3.2 plan + checklist + ledger | LOCKED | TODO |
-| CTRL-005 | Card visual authority is corrected to HP top-left without inventing Creature Cost | LOCKED | TODO |
-| CTRL-006 | Any controller/release authority pointer that conflicts with corrected visual authority is realigned | LOCKED | TODO |
-| CTRL-007 | Every material work-result message updates this checkpoint before delivery | LOCKED | ACTIVE PROCESS — begins with this control gate |
+| CTRL-001 | Master plan V2.3.2 explicitly locks release recovery + prototype restoration | LOCKED | COMPLETE — `tcg-master-plan-progress-v2.3.2.md`, commit `9b4ff3eb6bb86c07b0cd6c198e4ece7c026b57dc` |
+| CTRL-002 | Dedicated execution checklist exists and mirrors the master-plan gates | LOCKED | COMPLETE — this file, initial commit `03384eedba586d160f7f3433bce243c7f4a058e0` |
+| CTRL-003 | Dedicated append-only V2.3.2 ledger records accepted work slices and next operation | LOCKED | COMPLETE — `tcg-master-plan-ledger-v2.3.2.md`, commit `dd575ae765859bc9883befef98fee79dac5376f3` |
+| CTRL-004 | Machine release/index authority points at V2.3.2 plan + checklist + ledger | LOCKED | COMPLETE — `tcg-release-control-v2.1.json`, commit `64d437335344853c3b38155698b6ba304bdd90e4` |
+| CTRL-005 | Card visual authority is corrected to HP top-left without inventing Creature Cost | LOCKED | COMPLETE — `tcg-card-visual-printing-v1.2.json`, commit `bd86254e66594d95e573d7a9203fbee058a4559b` |
+| CTRL-006 | Any controller/release authority pointer that conflicts with corrected visual authority is realigned | LOCKED | HOLD — exact inspection proves `tcg-v2-card-action-controller-v1.json` still points at `tcg-card-visual-printing-v1.1.json`; do not forget or mark complete |
+| CTRL-007 | Every material work-result message updates this checkpoint before delivery | LOCKED | ACTIVE PROCESS — this update is the first enforced checkpoint |
 | CTRL-008 | Exact SHA/evidence, not memory, controls continuation after timeouts/new chats | LOCKED | ACTIVE PROCESS |
-| CTRL-009 | `main`, runtime, Supabase and live remain unchanged during this control-only gate | LOCKED | COMPLETE for current slice so far |
+| CTRL-009 | `main`, runtime, Supabase and live remain unchanged during this control-only gate | LOCKED | COMPLETE for this slice |
 
 ---
 
 # B. Product north star — original prototype online
 
-All items below are **requirements locked now**. Their implementation is verified later at V2-G2/G3/G4.
+All requirements below are locked. Implementation is verified later at V2-G2/G3/G4.
 
 | ID | Player/product requirement | Locked | Implementation |
 |---|---|---:|---:|
@@ -109,7 +105,7 @@ The deployed 193-card / 8-starter private-alpha baseline must be preserved while
 | G0R-02 | simultaneous-win/overtime lifecycle cannot dead-end | TODO | deterministic simultaneous terminal-state test reaches valid resolution |
 | G0R-03 | stale authoritative revision rejection propagates as failure/retry, not success | TODO | dispatcher tests for match/tactic/setup affected paths |
 | G0R-04 | canonical global elemental matchup multiplier applied exactly once to eligible attack damage | TODO | matchup fixtures prove expected damage and non-applicable cases |
-| G0R-05 | ineligible/pre-play concession cannot farm Arcade/match rewards | TODO | reward eligibility tests include early concession abuse case |
+| G0R-05 | ineligible/pre-play concession cannot farm Arcade/match rewards | TODO | reward eligibility tests include early-concession abuse case |
 | G0R-06 | private deck/card identities do not leak to opponent view before reveal | TODO | two-seat public/private view test |
 | G0R-07 | locked/in-match room remains discoverable despite original queue expiry | TODO | matchmaking expiry transition test |
 | G0R-08 | accepted deck always has legal setup recipe | TODO | validator + opening setup/mulligan fixtures |
@@ -125,7 +121,7 @@ The deployed 193-card / 8-starter private-alpha baseline must be preserved while
 - [ ] functional smoke green;
 - [ ] no unresolved material review finding on repaired head;
 - [ ] checklist + ledger updated with exact accepted SHA;
-- [ ] production deployment remains separate decision after exact evidence refresh.
+- [ ] production deployment remains a separate decision after exact evidence refresh.
 
 ---
 
@@ -216,22 +212,22 @@ The deployed 193-card / 8-starter private-alpha baseline must be preserved while
 
 | ID | Requirement | Locked | Implemented/verified |
 |---|---|---:|---:|
-| VIS-01 | HP top-left on ordinary Creature | ✅ | TODO — control contract correction pending CTRL-005 |
-| VIS-02 | Type/Element top-right | ✅ | TODO |
-| VIS-03 | name + stage/classification in upper header | ✅ | TODO |
+| VIS-01 | HP top-left on ordinary Creature | ✅ | CONTROL CONTRACT COMPLETE in v1.2; renderer TODO |
+| VIS-02 | Type/Element top-right | ✅ | CONTROL CONTRACT COMPLETE in v1.2; renderer TODO |
+| VIS-03 | name + stage/classification in upper header | ✅ | CONTROL CONTRACT COMPLETE in v1.2; renderer TODO |
 | VIS-04 | large dedicated artwork | ✅ | TODO |
-| VIS-05 | exactly two action slots below art | ✅ | TODO |
+| VIS-05 | exactly two action slots below art | ✅ | CONTROL CONTRACT COMPLETE; renderer TODO |
 | VIS-06 | Attack Cost explicitly labelled with Essence type/count | ✅ | TODO |
 | VIS-07 | Damage explicitly labelled | ✅ | TODO |
-| VIS-08 | Withdraw Cost bottom-right | ✅ | TODO |
-| VIS-09 | do not invent ordinary Creature play/evolution Cost | ✅ | TODO |
-| VIS-10 | every gameplay number has named property/accessible standardized label | ✅ | TODO |
+| VIS-08 | Withdraw Cost bottom-right | ✅ | CONTROL CONTRACT COMPLETE in v1.2; renderer TODO |
+| VIS-09 | do not invent ordinary Creature play/evolution Cost | ✅ | CONTROL CONTRACT COMPLETE in v1.2; renderer TODO |
+| VIS-10 | every gameplay number has named property/accessible standardized label | ✅ | CONTROL CONTRACT COMPLETE; renderer TODO |
 | VIS-11 | full card identity remains recognisable on battlefield | ✅ | TODO |
 | VIS-12 | hover/tap/hold enlarges readable card | ✅ | TODO |
 | VIS-13 | target proper artwork on every printable gameplay card | ✅ | TODO |
-| VIS-14 | Basic / Rare / Extra Rare / Mythic gameplay rarity tiers | ✅ | TODO |
-| VIS-15 | Standard / Shine / Holo / Full-Art Shine / Alt-Art / Signature Mythic finishes supported | ✅ | TODO |
-| VIS-16 | printing/finish never changes gameplay power | ✅ | TODO |
+| VIS-14 | Basic / Rare / Extra Rare / Mythic gameplay rarity tiers | ✅ | CONTROL CONTRACT COMPLETE; renderer TODO |
+| VIS-15 | Standard / Shine / Holo / Full-Art Shine / Alt-Art / Signature Mythic finishes supported | ✅ | CONTROL CONTRACT COMPLETE; renderer TODO |
+| VIS-16 | printing/finish never changes gameplay power | ✅ | CONTROL CONTRACT COMPLETE; renderer TODO |
 
 ---
 
@@ -281,8 +277,6 @@ The deployed 193-card / 8-starter private-alpha baseline must be preserved while
 
 # M. V2-G2 — Premium renderer
 
-**Pass only when structured cards render as the locked visual contract.**
-
 - [ ] VIS-01 through VIS-16 implemented and visually inspected.
 - [ ] no invented schema properties.
 - [ ] real structured rules drive visible card text/numbers.
@@ -295,15 +289,13 @@ The deployed 193-card / 8-starter private-alpha baseline must be preserved while
 
 **Gate state: TODO.**
 
-Pass only when a normal player can play through the board itself without developer controls.
-
 - [ ] UX-001 through UX-016 pass.
 - [ ] UX-F01 through UX-F07 absent from normal release gameplay.
 - [ ] CARD-CTRL-01 through CARD-CTRL-09 pass.
 - [ ] PLAY-01 through PLAY-08 pass.
 - [ ] ACT-01 through ACT-09 pass.
 - [ ] CHOICE-01 through CHOICE-06 pass.
-- [ ] DMG visual interaction requirements used where applicable.
+- [ ] applicable DMG interaction requirements pass.
 
 Core acceptance sentence:
 
@@ -377,8 +369,6 @@ All player systems must reuse canonical card identity/printing/ownership/deck au
 
 # R. V2-G7 — Release acceptance fence
 
-A release cannot be called LIVE until all mandatory evidence is bound to the exact promoted source.
-
 - [ ] all release-blocking checklist gates complete;
 - [ ] exact PR head recorded;
 - [ ] exact merge SHA recorded if merged;
@@ -419,22 +409,41 @@ LIVE requires all of the following:
 
 ---
 
-# T. Current checkpoint — Control Gate 0
+# T. Current checkpoint — V2.3.2 Control Gate 0
 
 **Decision:** PROMOTE documentation/control branch work only; HOLD merge/main/runtime/live.  
 **Control PR:** #564  
-**Starting reviewed head for V2.3.2 control work:** `b11330a802d4b8574eb5847b54c249b5ed43adfe`  
-**Master-plan V2.3.2 commit:** `9b4ff3eb6bb86c07b0cd6c198e4ece7c026b57dc`  
+**Branch:** `docs/tcg-v2-3-post-test-consistency`  
+**Starting reviewed head for this control slice:** `b11330a802d4b8574eb5847b54c249b5ed43adfe`  
+**Control slice before this checklist checkpoint:** `bd86254e66594d95e573d7a9203fbee058a4559b`  
+**Diff from start:** 5 commits ahead / 0 behind; exactly 5 new control files; no runtime file changed.  
+**Workflow runs on `bd86254...`:** none found.  
+**Combined statuses on `bd86254...`:** none found.  
+**Latest visible Codex review summary:** reviewed older commit `0596901`, not current control head.  
+**Exact controller inspection:** `tcg-v2-card-action-controller-v1.json` still points to visual `v1.1`; CTRL-006 therefore remains HOLD.  
 **Runtime/live changes in this slice:** none.
 
-### Control Gate 0 remaining
+### Files added in this recovery control slice
 
-- [x] create canonical V2.3.2 master-plan recovery/prototype lock;
-- [x] create dedicated V2.3.2 execution checklist;
-- [ ] create V2.3.2 append-only ledger/checkpoint record;
-- [ ] create/update machine release index to point at V2.3.2 authorities;
-- [ ] correct card visual authority to HP top-left + no invented Cost;
-- [ ] resolve/record any conflicting controller visual pointer;
-- [ ] exact diff review of this control slice;
-- [ ] refresh review/CI/status evidence;
-- [ ] record final Control Gate 0 accepted head and exact next operation.
+- `tcg-master-plan-progress-v2.3.2.md`
+- `tcg-master-plan-checklist-v2.3.2.md`
+- `tcg-master-plan-ledger-v2.3.2.md`
+- `tcg-release-control-v2.1.json`
+- `tcg-card-visual-printing-v1.2.json`
+
+### Control Gate 0 status
+
+- [x] canonical V2.3.2 recovery/prototype master plan created;
+- [x] dedicated V2.3.2 execution checklist created;
+- [x] V2.3.2 append-only ledger created;
+- [x] machine release/index authority created;
+- [x] card visual authority corrected to HP top-left + no invented Cost;
+- [ ] controller visual authority pointer realigned to v1.2 — **next exact control task**;
+- [x] exact 5-file diff reviewed from `b11330a...` to `bd86254...`;
+- [x] workflow/status evidence refreshed — none found, therefore merge remains HOLD;
+- [ ] current-head review evidence obtained after the V2.3.2 control changes;
+- [ ] final Control Gate 0 accepted head recorded after CTRL-006 and review evidence.
+
+### Next exact operation
+
+**CTRL-006:** safely realign `tcg-v2-card-action-controller-v1.json` from `tcg-card-visual-printing-v1.1.json` to `tcg-card-visual-printing-v1.2.json`, preserving every unrelated byte/field, then re-run exact diff/review/status checks and update this checklist before the next work-result message.
