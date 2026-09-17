@@ -4,7 +4,7 @@
 **Previous canonical plan:** `tcg-master-plan-progress-v2.3.md`  
 **Previous ledger:** `tcg-master-plan-ledger-v2.3.md`  
 **Owner-family baseline:** 40  
-**Ledger revision:** V2.3.1-4 — 2026-09-17
+**Ledger revision:** V2.3.1-5 — 2026-09-17
 
 ## Rules
 
@@ -130,9 +130,9 @@ Machine-readable authority: `tcg-damage-counter-interaction-v1.json`
 
 Review exposed four control-plane issues and all were addressed:
 
-1. `tcg-v2-card-action-controller-v1.json` now points to `tcg-card-visual-printing-v1.1.json` rather than the superseded visual v1 contract.
-2. `tcg-evergreen-extensibility-v1.1.json` is now a **self-contained** complete JSON authority rather than depending on undefined JSON inheritance semantics.
-3. visual/header language no longer implies that current ordinary Creatures have a generic play/evolution Cost.
+1. `tcg-v2-card-action-controller-v1.json` points to `tcg-card-visual-printing-v1.1.json` rather than the superseded visual v1 contract.
+2. `tcg-evergreen-extensibility-v1.1.json` is a **self-contained** complete JSON authority rather than depending on undefined JSON inheritance semantics.
+3. visual/header language does not imply that current ordinary Creatures have a generic play/evolution Cost.
 4. ordinary Vulnerability/weakness remains owned by the global matchup snapshot; exceptional Resistance/override data remains card-specific.
 
 These corrections change no live gameplay, Supabase state, current card values or matchup table.
@@ -197,8 +197,11 @@ Research coverage recorded:
 
 - Pokector coverage source indexes **174 English TCG sets** from Base through the 2026 Mega Evolution era;
 - historical mechanic-family scan completed as a baseline across Base/Gym/Neo/e-Card/EX/DP/Platinum/HGSS/BW/XY/SM/SWSH/SV/Mega Evolution and special products;
-- Bulbapedia `Cards by effect` provides 54 broad effect categories now folded into the generic mechanic vocabulary;
-- active/passive/triggered Ability heritage, Tool/Stadium/Supporter/Technical Machine-style rules, special resource cards, high-risk Reward classes, singleton rules, multi-card assembly, inherited attacks/Abilities, alternate forms/types, strategy tags and modern special classes are represented generically.
+- Bulbapedia `Cards by effect` provides **54 broad effect categories** now folded into the generic mechanic vocabulary;
+- broader Bulbapedia card indexes expose thousands of attacks/Abilities for ongoing per-card deep harvesting;
+- active/passive/triggered Ability heritage, Tool/Stadium/Supporter/Technical Machine-style rules, special resources, high-risk Reward classes, singleton rules, multi-card assembly, inherited attacks/Abilities, alternate forms/types, strategy tags and modern special classes are represented generically.
+
+Research source pointers are retained in the harvest files rather than copied into Stream Bandit gameplay content.
 
 Important honesty boundary:
 
@@ -226,3 +229,20 @@ Rules:
 - new sets grow the capability/card library rather than rotating ownership away.
 
 V2-G1E is not complete until a sample future series can be added using this catalog without rewriting old cards or adding series-specific runtime code.
+
+### V2.3.1-011 — Mechanic harvest remains a living research index
+
+**State:** 🔎 ONGOING BY DESIGN
+
+The catalog is expected to grow as more historical/current card text is studied.
+
+Research additions must follow this order:
+
+1. identify a reusable rule idea;
+2. check whether current generic capability IDs already compose it;
+3. if yes, record the example under existing capabilities;
+4. if no, define the smallest genuinely reusable new capability;
+5. do not implement it in runtime until V2-G1E owner/opcode/schema proof;
+6. never make older Stream Bandit cards invalid merely because the capability library grows.
+
+This lets future card/series design draw from decades of proven ideas while keeping Stream Bandit's Evergreen ownership promise and generic architecture intact.
