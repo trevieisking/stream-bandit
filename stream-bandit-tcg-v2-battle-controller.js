@@ -248,15 +248,17 @@
     state.busy = true;
     render();
     setStatus('Submitting card attack to the authoritative match engine…', 'busy');
+    let failure = '';
     try {
       await callEdge(API_MATCH, Object.assign(actionBase('attack'), { attack_slot: attackSlot }));
       await refreshMatch();
     } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
       await refreshMatch().catch(() => {});
-      setStatus(error instanceof Error ? error.message : String(error), 'error');
     } finally {
       state.busy = false;
       render();
+      if (failure) setStatus(failure, 'error');
     }
   }
 
