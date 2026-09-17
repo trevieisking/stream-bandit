@@ -1,13 +1,15 @@
 {
   "schema": "stream-bandit-tcg-release-control-v2",
   "recorded_at": "2026-09-17",
-  "purpose": "Non-self-referential control record for the ten-family V2 baseline, restored playable-prototype UX, evergreen ownership policy, future content/mechanic extensibility programme and completed post-test consistency audit.",
+  "purpose": "Non-self-referential control record for the ten-family V2 baseline, restored playable-prototype UX, evergreen ownership policy, future content/mechanic extensibility programme, living cross-era mechanic harvest and completed post-test consistency audit.",
   "authority": {
     "desired_behavior": "tcg-master-plan-progress-v2.3.1.md",
     "audit_history": "tcg-master-plan-ledger-v2.3.1.md",
     "previous_desired_behavior": "tcg-master-plan-progress-v2.3.md",
     "previous_audit_history": "tcg-master-plan-ledger-v2.3.md",
     "mechanic_heritage_research": "tcg-mechanic-heritage-research-v1.md",
+    "mechanic_harvest_index": "tcg-mechanic-harvest-index-v1.md",
+    "generic_mechanic_capability_catalog": "tcg-generic-mechanic-capabilities-v1.json",
     "special_mechanic_rule_matrix": "tcg-special-mechanic-rule-matrix-v1.1.md",
     "special_mechanic_names": "tcg-special-mechanic-names-v1.json",
     "evergreen_extensibility": "tcg-evergreen-extensibility-v1.1.json",
@@ -26,6 +28,7 @@
     "referenced_json_contracts_must_be_self_contained_without_validated_resolver": true,
     "evergreen_extensibility_v1_1_self_contained": true,
     "card_visual_v1_1_self_contained": true,
+    "generic_mechanic_catalog_v1_self_contained": true,
     "card_controller_points_to_card_visual_v1_1": true
   },
   "historical_baseline": {
@@ -115,6 +118,21 @@
       "competitive_suspension_or_ban_last_resort"
     ]
   },
+  "mechanic_harvest": {
+    "status": "living_research_and_schema_authority",
+    "pokector_english_sets_coverage_source": 174,
+    "broad_effect_categories_harvested": 54,
+    "historical_mechanic_family_baseline_scan": true,
+    "individual_card_text_deep_scan": "ongoing",
+    "indexed_does_not_mean_runtime_implemented": true,
+    "future_card_definitions_should_use_generic_capability_ids": true,
+    "capability_parameters_define_timing_targets_costs_values_and_zones": true,
+    "new_capability_requires_proof_existing_capabilities_cannot_compose_rule": true,
+    "card_name_runtime_branches_forbidden_when_catalog_can_express_rule": true,
+    "series_name_runtime_branches_forbidden": true,
+    "v2_g1e_owner_opcode_mapping_required": true,
+    "sample_future_series_without_old_card_rewrite_required_for_completion": true
+  },
   "future_extensibility": {
     "status": "design_contract_accepted_runtime_proof_pending",
     "external_research_labels_are_player_facing": false,
@@ -168,7 +186,7 @@
     "underworld": "24_identity_v2_design_accepted_schema_pending",
     "v2_g0_scope_design": "complete",
     "v2_g1_structured_packages": "in_progress",
-    "v2_g1e_evergreen_extensibility_schema": "not_started",
+    "v2_g1e_evergreen_extensibility_schema": "research_catalog_bound_runtime_proof_pending",
     "v2_g2_full_card_renderer": "not_started",
     "v2_g3_playable_prototype_restoration": "not_started",
     "future_special_mechanic_series": "research_and_schema_target_only"
@@ -191,7 +209,8 @@
     "external_research_brand_labels_do_not_ship_as_stream_bandit_names": true,
     "showcase_numbers_do_not_override_structured_rules": true,
     "ordinary_matchup_weakness_must_not_be_duplicated_per_card": true,
-    "damage_counter_totals_targets_and_timing_must_be_structured_and_server_authoritative": true
+    "damage_counter_totals_targets_and_timing_must_be_structured_and_server_authoritative": true,
+    "future_card_effects_should_compose_generic_capability_ids": true
   },
-  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E evergreen/extensibility schema metadata including original special-family names, canonical matchup ownership, exceptional affinity support and damage-counter placement/movement/timing before the premium renderer and restored one-screen Battle Client."
+  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E by mapping the living generic mechanic capability catalog to existing 40 owners/effect opcodes or one justified generic extension per genuinely missing primitive, with deterministic timing/zone/payment tests, before the premium renderer and restored one-screen Battle Client."
 }
