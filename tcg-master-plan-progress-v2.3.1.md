@@ -124,10 +124,7 @@ The working Stream Bandit names are:
 | current Mega-ex style | **Apex Ascendant** | high-stakes special evolution; normally 3 Rewards |
 | historical Mega EX evolve/end-turn pattern | **Ascension Evolution** | special evolution with optional immediate end-turn flag |
 
-The shared once-per-match special action remains **Signature Power**, expressed as either:
-
-- **Signature Attack**, or
-- **Signature Ability**.
+The shared once-per-match special action remains **Signature Power**. Machine action kinds remain the ordinary stable identifiers `attack` and `ability`; the player-facing labels are **Signature Attack** and **Signature Ability**.
 
 These are presentation/family labels, **not separate engines**. Runtime continues to compose generic capabilities such as `reward_value`, rule tags, evolution parent, shared match receipts, assembly recipe, inheritance, deck-group limits, zone replacement, position rules and ordinary Attack/Ability/effect opcodes.
 
@@ -137,12 +134,15 @@ These are presentation/family labels, **not separate engines**. Runtime continue
 
 Damage counters are part of the physical-card interaction model, not merely hidden arithmetic.
 
-### 5.1 Counter unit
+### 5.1 Counter unit and amount precision
 
 - base damage-counter unit = **10 damage**;
 - visible counter choices use **10-point increments**;
 - total/maximum comes from the exact resolving card/effect/Condition property;
-- browser never invents amount or legal targets.
+- browser never invents amount or legal targets;
+- a **fixed amount** must be applied in full when the operation is legal;
+- a smaller amount is selectable only when card/effect data explicitly says **up to N** or otherwise declares partial movement/placement, such as `allow_partial:true`;
+- the counter tray must visually distinguish a mandatory exact total from an optional/up-to maximum.
 
 ### 5.2 Placing damage counters
 
@@ -152,12 +152,13 @@ When a card/Ability/Attack says to place damage counters:
 2. battlefield remains visible;
 3. legal Creature targets highlight;
 4. damage-counter tray appears;
-5. counters begin at 10 and progress in 10-point increments up to the permitted amount;
+5. counters begin at 10 and progress in 10-point increments subject to the effect's fixed/up-to amount mode;
 6. player drags counters to legal targets, or uses tap/select accessibility equivalent;
-7. selected distribution and remaining amount stay visible;
+7. selected distribution and remaining required/optional amount stay visible;
 8. change/cancel is allowed before authoritative commit where practical;
 9. server validates and commits the exact legal distribution;
-10. counters visibly land on target cards.
+10. counters visibly land on target cards;
+11. **the destination defeat check runs immediately after the committed placement operation before later listeners, follow-up target selection or effects may act on that destination.**
 
 ### 5.3 Moving existing damage counters
 
@@ -169,26 +170,28 @@ When an effect says to move damage counters:
 4. player drags 10-point values from source to destination(s);
 5. source damage decreases by the exact moved amount;
 6. destination damage increases by the exact moved amount;
-7. move cannot exceed the effect limit or available source damage;
-8. source/destination changes commit atomically on the server.
+7. move cannot exceed available source damage or the effect's declared amount/maximum;
+8. fixed-amount movement requires the full legal fixed amount; smaller voluntary movement is legal only for explicit `up to`/partial semantics;
+9. source/destination changes commit atomically on the server;
+10. **the destination defeat check runs immediately after that atomic placement before later listeners/effects can treat the defeated Creature as still in play.**
 
 This is movement of existing damage, not newly dealt attack damage.
 
 ### 5.4 During attack resolution
 
-If an Attack requires counter placement/movement, that interaction resolves **before the turn hands over**:
+If an Attack requires counter placement/movement, that interaction resolves **before the turn hands over**, but every damage-counter operation still obeys its immediate defeat boundary:
 
 1. validate/pay Attack;
-2. resolve ordinary printed Attack effects and damage;
-3. resolve required counter placement/movement choices;
-4. resolve resulting Conditions/listeners;
-5. defeat scan;
-6. Reward/forced-promotion consequences;
-7. Aftermath;
-8. turn-transition checkpoint;
-9. next player's ordinary play.
+2. resolve ordinary printed Attack effects and ordinary damage using their canonical operation boundaries;
+3. resolve each required damage-counter placement/movement choice with its exact fixed/up-to amount semantics;
+4. commit that counter operation atomically;
+5. run the destination defeat boundary **immediately** after that operation;
+6. only then resolve later listeners, Conditions, follow-up targets or effects that remain legal after the defeated object has left play;
+7. resolve remaining Reward, forced-promotion and Aftermath consequences in the canonical resume order;
+8. enter the turn-transition checkpoint;
+9. begin the next player's ordinary play.
 
-The rule that **attacking ends the turn** remains unchanged; damage-counter allocation is part of completing the Attack first.
+The rule that **attacking ends the turn** remains unchanged; all attack-generated counter choices and their defeat consequences are part of completing the Attack before handoff.
 
 ### 5.5 Turn-based Conditions
 
@@ -197,7 +200,7 @@ A Condition may declare damage-counter ticks at the canonical turn-switch/checku
 - Condition badge/source pulses;
 - configured 10-point counters animate onto the affected Creature;
 - amount comes from the Condition property;
-- defeat scan follows counter application;
+- the immediate defeat boundary runs after counter application;
 - Reward/promotion consequences resolve before next-player ordinary actions;
 - not every Condition must deal damage.
 
@@ -241,6 +244,8 @@ The canonical inheritance chain now explicitly covers every accepted decision ma
 - active Ability normally once during your turn unless structured data says otherwise;
 - attack resolves fully then automatically ends turn;
 - interactive damage-counter placement/movement before attack handoff;
+- immediate defeat boundary after each committed damage-counter operation;
+- fixed vs up-to counter precision semantics;
 - turn-transition Condition damage counters;
 - search/private-choice overlays preserving board context;
 - Reward / defeat / promotion / victory presentation;
@@ -250,6 +255,7 @@ The canonical inheritance chain now explicitly covers every accepted decision ma
 - ownership/printing history preserved across future series;
 - future cards, attacks, Abilities, special forms/classes, elements, series, decks, booster packs, rarities, printings, alternate art, collectible coins/accessories and event formats remain data-driven;
 - researched external special-card families use original Stream Bandit working names;
+- stable machine action-kind identifiers remain separate from player-facing special-action labels;
 - global ordinary Vulnerability remains owned by the matchup snapshot; exceptional Resistance/overrides remain explicit structured data;
 - special rules split between visible card-facing data and global server-enforced family rules;
 - 40-owner architecture remains the starting authority;
@@ -305,6 +311,11 @@ Current baseline research has harvested:
 - support-card per-turn limits;
 - temporary/granted attacks;
 - Special Essence and modal card/resource rules;
+- zone-dependent card characteristics and special setup eligibility;
+- multiple/dynamic element forms;
+- attachment eligibility/expiry/multiple-attachment overrides;
+- draw prevention/modification and multi-outcome/simultaneous choices;
+- Condition checkup/recovery modification;
 - reward-risk classes;
 - once-per-match powers;
 - singleton/shared-group limits;
