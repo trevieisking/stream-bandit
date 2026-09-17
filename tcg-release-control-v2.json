@@ -17,9 +17,16 @@
     "card_controller": "tcg-v2-card-action-controller-v1.json",
     "ten_deck_blueprint": "tcg-ten-deck-product-blueprint-v2.json",
     "element_package_manifest": "tcg-element-packages-v0.3-v2.json",
+    "ordinary_matchup_authority": "tcg-card-pass-2-schema-amendment-e.md / cp2-matchups-v0.1",
     "historical_private_alpha_control": "tcg-release-control-v1.json",
     "source_truth": "GitHub exact branch/PR/commit evidence and canonical TCG checkpoint comments",
     "live_truth": "Supabase project xzxqfrvqdgkzwujbkdbk"
+  },
+  "authority_integrity": {
+    "referenced_json_contracts_must_be_self_contained_without_validated_resolver": true,
+    "evergreen_extensibility_v1_1_self_contained": true,
+    "card_visual_v1_1_self_contained": true,
+    "card_controller_points_to_card_visual_v1_1": true
   },
   "historical_baseline": {
     "main_sha": "bbde61a3dd50f93b64872a5bccfaec62e826be23",
@@ -75,14 +82,17 @@
     "status": "complete",
     "known_omissions_after_audit": 0,
     "corrected_card_header": {
-      "top_left": "Cost when structured cost exists",
+      "top_left_badge": "real structured header property or nonnumeric class/stage/special-rule badge",
+      "numeric_cost_allowed_only_when_schema_defines_it": true,
+      "current_ordinary_creature_generic_play_cost_exists": false,
       "top_right": "Element/type",
       "identity_band": "Name/stage plus clearly labelled HP",
       "structured_data_is_numeric_authority": true
     },
-    "damage_affinity_capability_reserved": true,
-    "working_affinity_labels": ["Vulnerability", "Resistance"],
-    "set_one_affinity_values_changed_by_this_control_update": false,
+    "ordinary_vulnerability_source": "global cp2-matchups-v0.1 snapshot",
+    "ordinary_per_card_weakness_objects_allowed": false,
+    "exceptional_resistance_or_matchup_override_may_be_card_data": true,
+    "set_one_matchup_values_changed_by_this_control_update": false,
     "original_special_family_names_locked": true,
     "damage_counter_interaction_locked": true
   },
@@ -127,10 +137,11 @@
       "Ascension Evolution",
       "Signature Power"
     ],
-    "damage_affinity_modifier": {
-      "reserved": true,
-      "working_labels": ["Vulnerability", "Resistance"],
-      "match_sources": ["element", "type", "rule_tag"],
+    "matchup_and_affinity": {
+      "ordinary_vulnerability_source": "versioned global matchup snapshot",
+      "working_vulnerability_label": "Vulnerability",
+      "exceptional_resistance_allowed": true,
+      "exceptional_matchup_override_allowed": true,
       "server_authoritative": true
     },
     "damage_counter_system": {
@@ -179,8 +190,8 @@
     "new_series_do_not_require_series_name_runtime_branches": true,
     "external_research_brand_labels_do_not_ship_as_stream_bandit_names": true,
     "showcase_numbers_do_not_override_structured_rules": true,
-    "damage_affinity_must_be_structured_and_server_authoritative": true,
+    "ordinary_matchup_weakness_must_not_be_duplicated_per_card": true,
     "damage_counter_totals_targets_and_timing_must_be_structured_and_server_authoritative": true
   },
-  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E evergreen/extensibility schema metadata including original special-family names, damage-affinity support and damage-counter placement/movement/timing before the premium renderer and restored one-screen Battle Client."
+  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E evergreen/extensibility schema metadata including original special-family names, canonical matchup ownership, exceptional affinity support and damage-counter placement/movement/timing before the premium renderer and restored one-screen Battle Client."
 }
