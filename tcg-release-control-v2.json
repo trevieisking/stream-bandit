@@ -1,12 +1,15 @@
 {
   "schema": "stream-bandit-tcg-release-control-v2",
-  "recorded_at": "2026-09-16",
-  "purpose": "Non-self-referential control record for the post-private-alpha ten-family battle-client, visual-card and content-expansion programme.",
+  "recorded_at": "2026-09-17",
+  "purpose": "Non-self-referential control record for the post-private-alpha ten-family battle-client, visual-card and content-expansion programme, including the restored playable-prototype UX authority.",
   "authority": {
-    "desired_behavior": "tcg-master-plan-progress-v2.1.md",
-    "audit_history": "tcg-master-plan-ledger-v2.1.md",
+    "desired_behavior": "tcg-master-plan-progress-v2.2.md",
+    "audit_history": "tcg-master-plan-ledger-v2.2.md",
+    "previous_desired_behavior": "tcg-master-plan-progress-v2.1.md",
+    "previous_audit_history": "tcg-master-plan-ledger-v2.1.md",
     "battle_interaction": "tcg-battle-client-interaction-v1.json",
     "card_visual_printing": "tcg-card-visual-printing-v1.json",
+    "card_controller": "tcg-v2-card-action-controller-v1.json",
     "ten_deck_blueprint": "tcg-ten-deck-product-blueprint-v2.json",
     "element_package_manifest": "tcg-element-packages-v0.3-v2.json",
     "historical_private_alpha_control": "tcg-release-control-v1.json",
@@ -25,7 +28,9 @@
   "v2_design_merges": {
     "battle_visual_authority": "29c689fe603d684d4b2cb53c29479f1a88633a79",
     "underworld_grave_pact": "a61a9795e545ccc50c44e9f5b95c5b0d9e5cc173",
-    "fairy_glimmerwish": "16a745a3cf96f6caf00c34ad88896fb0dcca2a73"
+    "fairy_glimmerwish": "16a745a3cf96f6caf00c34ad88896fb0dcca2a73",
+    "creature_card_controller": "019b029f344bac3c4efdc92480cdff5c9c2c5521",
+    "video_dragdrop_masterplan_sync": "77dc14a5af4101bfd06941243d142ce3f16cc120"
   },
   "v2_target": {
     "elements": 10,
@@ -36,17 +41,36 @@
     "starter_decks": 10,
     "starter_deck_size": 60,
     "owner_families": 40,
-    "battle_client": "board_first_direct_manipulation",
+    "battle_client": "prototype_restored_board_first_direct_manipulation",
     "rarities": ["Basic","Rare","Extra Rare","Mythic"],
     "printing_finishes": ["Standard","Shine","Holo","Full-Art Shine","Alt-Art","Signature Mythic"],
     "artwork_on_every_printable_card": true
+  },
+  "prototype_restoration": {
+    "status": "canonical_v2_2_ux_authority",
+    "principle": "restore the approved playable one-screen physical-card prototype interaction rather than redesigning the battle UX around debug forms",
+    "one_screen_battlefield": true,
+    "physical_card_primary_controls": true,
+    "desktop_drag_drop": true,
+    "touch_tap_destination_equivalent": true,
+    "green_legal_evolution_highlight": true,
+    "essence_drag_to_creature": true,
+    "realm_persists_until_replaced_or_effect_removed": true,
+    "active_ability_default_once_per_turn_unless_card_says_otherwise": true,
+    "attack_auto_ends_turn_after_resolution_and_aftermath": true,
+    "keep_board_visible_during_choices_when_practical": true,
+    "misclick_change_or_cancel_before_server_commit_when_practical": true,
+    "debug_form_release_battlefield_forbidden": true,
+    "pokemon_research_role": "interaction_category_reference_only_no_asset_or_brand_copy"
   },
   "content_state": {
     "original_eight_packages": "canonical_structured_runtime",
     "fairy": "24_identity_v2_design_accepted_schema_pending",
     "underworld": "24_identity_v2_design_accepted_schema_pending",
     "v2_g0_scope_design": "complete",
-    "v2_g1_structured_packages": "in_progress"
+    "v2_g1_structured_packages": "in_progress",
+    "v2_g2_full_card_renderer": "not_started",
+    "v2_g3_playable_prototype_restoration": "not_started"
   },
   "change_policy": {
     "no_false_live_claims": true,
@@ -55,7 +79,10 @@
     "concept_art_is_not_rules_authority": true,
     "structured_data_is_rules_authority": true,
     "foil_or_alt_art_never_changes_gameplay_power": true,
-    "private_alpha_rollback_baseline_preserved": true
+    "private_alpha_rollback_baseline_preserved": true,
+    "prototype_usability_regression_is_not_progress": true,
+    "one_clear_player_interaction_path": true,
+    "backend_complexity_must_not_be_exposed_as_player_complexity": true
   },
-  "next_operation": "Translate accepted Fairy and Underworld V2 design packages into exact sb-tcg-card-v0.2/effect-opcode data, validate them against the existing 40-owner capability model, then build and validate the deterministic 241-identity ten-package registry and ten exact starter authority before any runtime/live integration."
+  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps, then prioritize the premium full-card renderer and restoration of the one-screen playable prototype Battle Client before unrelated product complexity."
 }
