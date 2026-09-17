@@ -229,3 +229,45 @@ After this checklist lands:
 **Promotion decision:** G0R-11 branch patch **PROMOTE ✅**; PR merge/main/runtime/Supabase/live/production **HOLD 🔒**.
 
 **Exact next operation:** refresh PR #565 and fetch workflow runs + combined status for exact head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`. If validation fires and passes, update ledger/checklist to accept G0R-11 as **1/11**, then implement G0R-10 on its own bounded branch with owner-boundary tests.
+
+---
+
+# L. Accepted implementation checkpoint — G0R-11 COMPLETE
+
+**This section supersedes the in-progress G0R-11 state recorded in section K.**
+
+| Acceptance item | Result |
+|---|---|
+| PR | #565 `TCG G0R-11: broaden validation path coverage` |
+| Reviewed head | `5d8c8e9d882b769041db318a9ad14d55a4f0c63f` |
+| Exact diff | 1 file, +6 / -0 |
+| TCG Validation | run #571 / `35232546805` — **SUCCESS** |
+| Runtime-core job | **SUCCESS** |
+| Set One structure/starter/effect-grammar job | **SUCCESS** |
+| Dispatcher/API/type-check steps | **SUCCESS** |
+| Review threads | **0** |
+| Legacy combined statuses | none found; GitHub Actions run above is the exact validation evidence |
+| Merge | **PROMOTE ✅** |
+| Merge commit / current main | `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00` |
+| Runtime gameplay change | none |
+| Supabase/live deployment change | none |
+
+### G0R progress
+
+- **G0R-11 Validation workflow coverage — COMPLETE ✅**
+- **G0R accepted repairs — 1 / 11 ✅**
+- **G0R-10 Tactic subtype boundary — next bounded implementation slice 🔎**
+- Remaining G0R repairs — 10 total, including G0R-10.
+
+### Exact next operation
+
+1. refresh exact `main` `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00` and `tcg-tactic-actions` source;
+2. create a dedicated non-main G0R-10 branch;
+3. add the pre-mutation Ally/Device subtype guard while preserving dedicated Relic/Realm routes;
+4. add deterministic/static owner-boundary coverage proving Ally/Device accepted and Relic/Realm rejected before mutation;
+5. require the newly repaired validation workflow to fire and pass;
+6. update ledger + checklist before reporting the result.
+
+**Code Labs Writer:** not invoked.  
+**CG Repair Lab / Code God:** not invoked.  
+**Prototype authority / 40-owner architecture:** unchanged and locked.
