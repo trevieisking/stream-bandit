@@ -46,6 +46,7 @@ These items prove useful foundations exist. They do **not** tick V2-ATTACK-01 or
 - [x] **G0R-09 / PR #568** Private-room Ready write/count is serialized per room.
 - [x] **PR #569** Additive V2 board client can submit the existing generic `attack` intent from the active Creature card.
 - [x] **PR #570** V2 transport surfaces nested authoritative commit rejections instead of silently treating them as success.
+- [x] **V2-ATTACK-SOURCE-01 / PR #573** Exact-head Validation #625 executes the real V2 battle controller in a browser harness and proves a rendered card-owned Attack click submits exactly one authoritative `attack` payload with `attack_slot`, `match_id`, `client_nonce` and `expected_revision`; a nested authoritative rejection is re-synced and remains visibly surfaced. This is source-path proof only and does not retroactively identify yesterday's unpersisted rejection.
 - [x] **V2-SHELL-01A / PR #571** Active match page is a board-only authenticated route.
 - [ ] These source foundations have been re-proven together in a successful real two-user V2 match.
 
