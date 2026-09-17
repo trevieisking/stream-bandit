@@ -6,11 +6,16 @@
   "authority": {
     "battle_interaction": "tcg-battle-client-interaction-v1.json",
     "card_visual": "tcg-card-visual-printing-v1.1.json",
-    "fairy_design": "tcg-fairy-glimmerwish-v2-candidate.json",
-    "underworld_design": "tcg-underworld-grave-pact-v2-candidate.json",
     "card_schema": "sb-tcg-card-v0.2",
     "effect_schema": "sb-tcg-effects-v0.2",
     "server_dispatcher": "supabase/functions/tcg-match-actions/index.ts"
+  },
+  "content_sources": {
+    "fairy_design": "tcg-fairy-glimmerwish-v2-candidate.json",
+    "underworld_design": "tcg-underworld-grave-pact-v2-candidate.json",
+    "nested_design_visual_metadata_is_authoritative": false,
+    "visual_authority_always_resolves_from": "authority.card_visual",
+    "reason": "The accepted design candidates remain content/mechanic sources, but their historical visual-contract metadata does not override the canonical corrected visual v1.1 contract."
   },
   "rules": {
     "primary_control_surface": "creature_card_face",
