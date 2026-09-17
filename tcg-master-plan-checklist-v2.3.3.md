@@ -187,3 +187,45 @@ After this checklist lands:
 3. post the exact-head V2.3.3 checkpoint to PR #564;
 4. resume the locked V2-G0R implementation route on the next bounded technical slice;
 5. whenever Search behavior is touched, carry `SEARCH-01` through `SEARCH-T14` as mandatory acceptance criteria.
+
+---
+
+# K. Active implementation checkpoint — V2-G0R
+
+**Checkpoint state:** implementation has started; no G0R repair is accepted COMPLETE until its exact-head acceptance evidence passes.
+
+## G0R-10 — Tactic subtype boundary
+
+| Evidence item | State | Exact evidence |
+|---|---|---|
+| Defect reproduced in current source | COMPLETE | exact control head `856f76c9f7c6887e20d24ed2a3f592554f3fd7ee`, `supabase/functions/tcg-tactic-actions/index.ts` |
+| Canonical valid one-shot subtypes proven | COMPLETE | registry contains `Ally` + `Device`; dedicated routes exist for `Relic` + `Realm` |
+| Correct owner boundary | LOCKED | only Ally/Device may enter `play_tactic`; Relic/Realm remain dedicated-owner actions |
+| Runtime guard | TODO | next after G0R-11 trigger proof |
+| Deterministic boundary test | TODO | must prove Ally/Device remain legal and Relic/Realm are rejected before mutation |
+| Accepted repair | HOLD | no runtime patch accepted yet |
+
+## G0R-11 — Validation workflow coverage
+
+| Evidence item | State | Exact evidence |
+|---|---|---|
+| Existing path-filter defect proven | COMPLETE | exact main `59ab7857522373a53de7d551c66f12c2e514e934`; existing workflow covered named legacy files/shared modules/migrations only |
+| Dedicated implementation branch | COMPLETE | `fix/tcg-g0r-11-validation-coverage` from exact main |
+| Bounded patch | COMPLETE | `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`; exactly 1 file, +6/-0 |
+| Coverage added | COMPLETE | root `tcg-*` md/json/mjs, shared `tcg-*.ts`, all `tcg-*/**` function trees, all `*tcg*.sql` migrations |
+| Draft PR | COMPLETE | PR #565, head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`, base `main`, open/draft/unmerged |
+| Workflow-trigger proof | IN PROGRESS | fetch exact-head runs/statuses next |
+| Accepted repair | HOLD | requires fresh exact-head validation run and green result |
+
+**G0R accepted progress:** **0/11 COMPLETE; G0R-11 IN PROGRESS; G0R-10 proven/queued.**
+
+**Files changed in implementation branch:** `.github/workflows/tcg-card-pass-2-validation.yml` only.  
+**Production/live impact:** none.  
+**Supabase impact:** none.  
+**Main impact:** none.  
+**Code Labs Writer:** not invoked.  
+**CG Repair Lab / Code God:** not invoked.
+
+**Promotion decision:** G0R-11 branch patch **PROMOTE ✅**; PR merge/main/runtime/Supabase/live/production **HOLD 🔒**.
+
+**Exact next operation:** refresh PR #565 and fetch workflow runs + combined status for exact head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`. If validation fires and passes, update ledger/checklist to accept G0R-11 as **1/11**, then implement G0R-10 on its own bounded branch with owner-boundary tests.
