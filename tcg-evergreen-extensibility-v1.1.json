@@ -1,37 +1,194 @@
 {
   "schema": "stream-bandit-tcg-evergreen-extensibility-v1.1",
   "recorded_at": "2026-09-17",
-  "inherits": "tcg-evergreen-extensibility-v1.json",
-  "purpose": "Add post-test damage-affinity, original Stream Bandit special-family naming and damage-counter interaction capabilities while preserving the V2.3 evergreen/extensibility contract.",
-  "primary_format_policy": "unchanged_from_v1",
-  "content_extension_policy": "unchanged_from_v1",
-  "special_mechanic_policy": "generic_capabilities_with_original_stream_bandit_player_facing_names",
-  "special_mechanic_names_authority": "tcg-special-mechanic-names-v1.json",
-  "damage_counter_interaction_authority": "tcg-damage-counter-interaction-v1.json",
-  "added_required_rule_capabilities": [
-    "damage_affinity_modifier",
-    "place_damage_counters",
-    "move_damage_counters",
-    "turn_transition_condition_damage_counters"
+  "purpose": "Self-contained machine-readable planning contract for non-rotating ownership, extensible future series, composable special-card mechanics, damage affinity, original Stream Bandit special-family names and damage-counter interaction.",
+  "primary_format": {
+    "id": "evergreen",
+    "age_based_rotation": false,
+    "released_cards_remain_eligible_by_age": true,
+    "collection_ownership_persists": true,
+    "printing_history_persists": true,
+    "new_series_are_additive": true,
+    "optional_curated_event_formats_allowed": true,
+    "competitive_restriction_last_resort": true,
+    "restricted_card_should_remain_playable_in_suitable_private_practice_open_modes_when_safe": true
+  },
+  "balance_order": [
+    "implementation_bug_fix",
+    "rules_errata_when_genuinely_required",
+    "future_counterplay",
+    "copy_limit_or_restricted_control",
+    "competitive_suspension_or_ban_last_resort"
   ],
-  "damage_affinity_modifier": {
-    "working_player_labels": {
-      "amplification": "Vulnerability",
-      "reduction_or_prevention": "Resistance"
+  "content_extension_points": [
+    "card_identity",
+    "card_family",
+    "creature_class",
+    "attack",
+    "ability",
+    "trait_or_rule_tag",
+    "element",
+    "series",
+    "set",
+    "starter_deck",
+    "constructed_deck_recipe",
+    "booster_pack_recipe",
+    "pack_slot_and_odds_model",
+    "rarity",
+    "printing_finish",
+    "alternate_art",
+    "collectible_coin",
+    "deck_box",
+    "sleeve",
+    "realm",
+    "relic",
+    "tactic",
+    "essence",
+    "event_format"
+  ],
+  "working_special_mechanics": {
+    "ascendant_creature": {
+      "player_facing_name": "Ascendant Creature",
+      "description": "high-stakes Creature class normally worth two Rewards",
+      "default_reward_value": 2
     },
-    "match_source_by": ["element", "type", "rule_tag"],
-    "allowed_declared_modes": ["add", "subtract", "multiply", "prevent"],
-    "must_declare_value_or_formula": true,
-    "must_declare_damage_ordering": true,
+    "sigilborn_creature": {
+      "player_facing_name": "Sigilborn Creature",
+      "description": "high-stakes Creature class that may carry a Signature Power",
+      "default_reward_value": 2
+    },
+    "bonded_sigilborn": {
+      "player_facing_name": "Bonded Sigilborn",
+      "description": "bonded multi-being special Creature that may carry a Signature Power and extra-cost bonus",
+      "default_reward_value": 3
+    },
+    "exalted_creature": {
+      "player_facing_name": "Exalted Creature",
+      "description": "high-stakes Creature class normally worth two Rewards",
+      "default_reward_value": 2
+    },
+    "colossus_creature": {
+      "player_facing_name": "Colossus Creature",
+      "description": "extreme high-stakes evolved Creature normally worth three Rewards",
+      "default_reward_value": 3
+    },
+    "starforged_creature": {
+      "player_facing_name": "Starforged Creature",
+      "description": "special evolved Creature normally worth two Rewards that may carry a Signature Power",
+      "default_reward_value": 2
+    },
+    "signature_power": {
+      "player_facing_name": "Signature Power",
+      "description": "one shared once-per-match special Attack or Ability",
+      "scope": "controller_match",
+      "action_kinds": ["Signature Attack", "Signature Ability"]
+    },
+    "bonded_creature": {
+      "player_facing_name": "Bonded Creature",
+      "description": "multiple beings represented by one Creature identity"
+    },
+    "convergence_creature": {
+      "player_facing_name": "Convergence Creature",
+      "description": "assembled Creature formed from multiple component cards"
+    },
+    "gleam_creature": {
+      "player_facing_name": "Gleam Creature",
+      "description": "powerful one-per-deck special Creature",
+      "deck_group_limit": 1
+    },
+    "prime_card": {
+      "player_facing_name": "Prime Card",
+      "description": "one card total from a shared powerful support group per deck",
+      "deck_group_limit": 1
+    },
+    "riftmarked_card": {
+      "player_facing_name": "Riftmarked Card",
+      "description": "special singleton/group-limited card that may replace discard movement with movement to the Void"
+    },
+    "overform": {
+      "player_facing_name": "Overform",
+      "description": "upgrade/evolution that inherits configured actions/properties from the lower card"
+    },
+    "ascension_form": {
+      "player_facing_name": "Ascension Form",
+      "description": "overlay upgrade that inherits configured lower-card properties with selective overrides"
+    },
+    "aspect_creature": {
+      "player_facing_name": "Aspect Creature",
+      "description": "alternate form/type capable of carrying position-specific protection or rule changes"
+    },
+    "apex_ascendant": {
+      "player_facing_name": "Apex Ascendant",
+      "description": "high-stakes special evolution normally worth three Rewards",
+      "default_reward_value": 3
+    },
+    "ascension_evolution": {
+      "player_facing_name": "Ascension Evolution",
+      "description": "special evolution procedure capable of imposing additional timing such as immediate turn end"
+    }
+  },
+  "special_mechanic_names_authority": "tcg-special-mechanic-names-v1.json",
+  "required_rule_capabilities": [
+    "reward_value_override",
+    "global_once_per_match_receipt",
+    "once_per_turn_per_card_per_name_per_controller_limits",
+    "special_evolution_parent_requirement",
+    "ordinary_stage_special_class_evolution",
+    "optional_on_evolve_end_turn",
+    "counts_as_rule_tags",
+    "multi_character_identity",
+    "extra_cost_bonus_effect",
+    "multi_card_assembly",
+    "assembly_once_per_match_per_identity",
+    "component_vs_assembled_property_semantics",
+    "shared_deck_group_limit",
+    "per_identity_singleton_limit",
+    "no_evolution_flag",
+    "overlay_upgrade_retains_attachments_and_damage",
+    "inherit_attacks",
+    "inherit_abilities",
+    "selective_stat_type_property_override",
+    "transform_condition_cleanse",
+    "zone_replacement",
+    "void_out_of_play_zone",
+    "position_based_damage_prevention",
+    "special_class_targeting",
+    "dynamic_reserve_size_limit",
+    "attack_cooldown",
+    "ability_usage_receipt",
+    "attack_copy",
+    "reward_state_damage_scaling",
+    "generic_state_damage_scaling",
+    "reserve_splash_damage",
+    "damage_counter_placement",
+    "move_damage_counters",
+    "turn_transition_condition_damage_counters",
+    "conditional_prevention_and_reduction",
+    "damage_affinity_modifier",
+    "essence_move_attach_discard_recover",
+    "search_and_attach_from_deck_or_discard",
+    "dual_player_switch",
+    "realm_dependent_bonus_or_discard",
+    "condition_immunity_and_cleanse",
+    "trait_synergy",
+    "multiple_printings_one_gameplay_identity"
+  ],
+  "matchup_and_affinity": {
+    "ordinary_set_one_vulnerability_source": "versioned global matchup snapshot cp2-matchups-v0.1",
+    "ordinary_set_one_per_card_weakness_object_allowed": false,
+    "working_player_label_for_global_weakness_presentation": "Vulnerability",
+    "global_weakness_multiplier": 2,
+    "global_weakness_max_applications_per_attack": 1,
+    "exceptional_card_resistance_allowed": true,
+    "exceptional_matchup_override_allowed": true,
+    "exceptional_card_affinity_data_must_be_explicit": true,
     "server_authoritative": true,
     "browser_only_damage_math_forbidden": true,
-    "card_marker_required_when_active": true,
-    "accessible_text_required": true,
     "rarity_does_not_imply_affinity": true,
     "printing_finish_does_not_imply_affinity": true,
-    "special_class_does_not_imply_affinity": true,
-    "set_one_values_change_only_by_explicit_structured_card_data": true
+    "special_class_does_not_imply_affinity": true
   },
+  "damage_counter_interaction_authority": "tcg-damage-counter-interaction-v1.json",
   "damage_counter_model": {
     "base_unit_damage": 10,
     "values_use_10_point_increments": true,
@@ -45,29 +202,28 @@
     "defeat_scan_after_condition_counter_tick": true,
     "ordinary_damage_modifiers_do_not_automatically_modify_counter_placement": true
   },
-  "original_stream_bandit_working_families": [
-    "Ascendant Creature",
-    "Sigilborn Creature",
-    "Bonded Sigilborn",
-    "Exalted Creature",
-    "Colossus Creature",
-    "Starforged Creature",
-    "Convergence Creature",
-    "Gleam Creature",
-    "Prime Card",
-    "Riftmarked Card",
-    "Overform",
-    "Ascension Form",
-    "Aspect Creature",
-    "Apex Ascendant",
-    "Ascension Evolution",
-    "Signature Power"
-  ],
+  "originality_boundary": {
+    "copy_pokemon_names": false,
+    "copy_pokemon_card_text": false,
+    "copy_pokemon_art": false,
+    "copy_pokemon_card_frames": false,
+    "copy_pokemon_branded_ui": false,
+    "copy_pokemon_audio": false,
+    "copy_pokemon_assets": false,
+    "external_research_labels_are_player_facing": false,
+    "general_mechanic_category_research_allowed": true,
+    "stream_bandit_names_rules_art_and_ui_required": true
+  },
   "architecture": {
     "owner_family_baseline": 40,
-    "prefer_existing_damage_condition_defeat_reward_and_effect_owners": true,
-    "special_family_names_do_not_create_engines": true,
     "no_new_owner_without_new_state_transition_proof": true,
+    "special_mechanics_should_compose_existing_owners_and_effect_opcodes": true,
+    "special_family_names_do_not_create_engines": true,
+    "content_registry_must_not_hardcode_specific_series_names": true,
+    "pack_engine_must_use_data_driven_recipes": true,
+    "deck_engine_must_use_data_driven_legality_and_recipe_rules": true,
+    "printing_engine_separates_gameplay_identity_from_printing": true,
+    "prefer_existing_damage_condition_defeat_reward_and_effect_owners": true,
     "backward_compatibility_is_required": true
   }
 }
