@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.7';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const state = {
@@ -15,9 +15,6 @@
   };
 
   const $ = (id) => document.getElementById(id);
-  const esc = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  }[char]));
 
   function setStatus(message, kind) {
     const node = $('battleStatus');
@@ -94,6 +91,14 @@
     return data;
   }
 
+  function renderer() {
+    const value = window.StreamBanditTCGCardRendererV247;
+    if (!value || typeof value.renderKnownCard !== 'function' || typeof value.renderCardBack !== 'function') {
+      throw new Error('TCG card renderer V2.4.7 is unavailable.');
+    }
+    return value;
+  }
+
   function viewState() {
     return state.view && state.view.view_state ? state.view.view_state : null;
   }
@@ -133,10 +138,6 @@
       : null;
   }
 
-  function topDefinition(creature) {
-    return legacyDefinition(topInstance(creature)) || {};
-  }
-
   function cardAnchor(creature) {
     const instance = topInstance(creature);
     return instance ? String(instance.uid || '') : '';
@@ -149,50 +150,142 @@
       : [];
     return attacks.map((attack, index) => ({
       slot: Number(attack.slot || index + 1),
-      name: String(attack.name || ('Attack ' + (index + 1))),
-      damage: Number.isFinite(Number(attack.damage)) ? Number(attack.damage) : null
+      attack,
+      name: String(attack.name || ('Attack ' + (index + 1)))
     })).filter((attack) => attack.slot === 1 || attack.slot === 2);
+  }
+
+  function attachmentDescriptors(creature) {
+    if (!creature) return [];
+    const attachments = [];
+    const essence = Array.isArray(creature.essence) ? creature.essence : [];
+    essence.forEach((instance) => {
+      const definition = legacyDefinition(instance) || {};
+      const structured = structuredDefinition(instance) || {};
+      attachments.push({
+        family: 'Essence',
+        name: structured.name || definition.name || instance.card_id || 'Essence',
+        element: structured.element || definition.element || ''
+      });
+    });
+    if (creature.relic) {
+      const definition = legacyDefinition(creature.relic) || {};
+      const structured = structuredDefinition(creature.relic) || {};
+      attachments.push({
+        family: 'Relic',
+        name: structured.name || definition.name || creature.relic.card_id || 'Relic',
+        element: structured.element || definition.element || ''
+      });
+    }
+    return attachments;
+  }
+
+  function knownCard(instance, options) {
+    const opts = options || {};
+    if (!instance) return '<div class="sb-zone-empty">Empty</div>';
+    return renderer().renderKnownCard({
+      instance,
+      definition: legacyDefinition(instance) || {},
+      structured: structuredDefinition(instance),
+      creature: opts.creature || null,
+      attachments: opts.creature ? attachmentDescriptors(opts.creature) : [],
+      actions: opts.actions || [],
+      interactive: !!opts.interactive,
+      selected: !!opts.selected,
+      anchor: opts.anchor || '',
+      compact: !!opts.compact,
+      art: null
+    });
   }
 
   function creatureCard(creature, options) {
     const opts = options || {};
     if (!creature) return '<div class="sb-zone-empty">Empty</div>';
-    const definition = topDefinition(creature);
+    const instance = topInstance(creature);
     const anchor = cardAnchor(creature);
-    const maxHp = Math.max(0, Number(definition.hp || 0));
-    const damage = Math.max(0, Number(creature.damage || 0));
-    const remaining = Math.max(0, maxHp - damage);
     const selected = opts.primary && anchor && state.selectedAnchorUid === anchor;
-    const attacks = opts.primary ? attackSlots(creature) : [];
-    const canAct = !!opts.canAct;
-    const actionRows = attacks.map((attack) => (
-      '<button type="button" class="sb-card-action" data-card-intent="attack" data-attack-slot="' + attack.slot + '"' +
-      (canAct ? '' : ' disabled') + '>' +
-      '<span><strong>' + esc(attack.name) + '</strong><small>Attack ' + attack.slot + '</small></span>' +
-      '<span class="sb-damage">' + (attack.damage == null ? '—' : esc(attack.damage)) + '</span>' +
-      '</button>'
-    )).join('');
-    return '<article class="sb-card-control' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '"' +
-      (opts.primary ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"' : '') + '>' +
-      '<header><span class="sb-stage">' + esc(definition.stage || definition.kind || 'Creature') + '</span><span class="sb-element">' + esc(definition.element || '') + '</span></header>' +
-      '<h2>' + esc(definition.name || topInstance(creature)?.card_id || 'Creature') + '</h2>' +
-      '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
-      '<div class="sb-hp"><strong>HP ' + esc(remaining) + '/' + esc(maxHp) + '</strong><span>Damage ' + esc(damage) + '</span></div>' +
-      '<div class="sb-card-meta"><span>Essence ' + esc((creature.essence || []).length) + '</span><span>Shield ' + esc(creature.shield || 0) + '</span></div>' +
-      (opts.primary ? '<div class="sb-card-hint">' + (selected ? 'Choose an action on this card' : 'Tap/select this card') + '</div><div class="sb-card-actions">' + actionRows + '</div>' : '') +
-      '</article>';
-  }
-
-  function handCard(instance) {
-    const definition = legacyDefinition(instance) || {};
-    return '<article class="sb-hand-card"><strong>' + esc(definition.name || instance.card_id) + '</strong><small>' +
-      esc(definition.card_family || definition.kind || '') + '</small></article>';
+    const actions = opts.primary ? attackSlots(creature).map((entry) => ({
+      slot: entry.slot,
+      attack: entry.attack,
+      name: entry.name,
+      enabled: !!opts.canAct
+    })) : [];
+    return knownCard(instance, {
+      creature,
+      actions,
+      interactive: !!opts.primary,
+      selected,
+      anchor,
+      compact: false
+    });
   }
 
   function renderReserve(target, reserve, ownerLabel) {
     const node = $(target);
     if (!node) return;
-    node.innerHTML = [0, 1, 2, 3].map((index) => '<section class="sb-reserve-slot"><span>' + esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' + creatureCard(reserve && reserve[index], {}) + '</section>').join('');
+    node.innerHTML = [0, 1, 2, 3].map((index) =>
+      '<section class="sb-reserve-slot"><span class="sb-slot-label">' + ownerLabel + ' Reserve ' + (index + 1) + '</span>' +
+      creatureCard(reserve && reserve[index], {}) + '</section>'
+    ).join('');
+  }
+
+  function countValue(value) {
+    const count = Number(value || 0);
+    return Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
+  }
+
+  function renderDeck(target, count, label) {
+    const node = $(target);
+    if (!node) return;
+    const total = countValue(count);
+    node.innerHTML = total
+      ? renderer().renderCardBack({ label: label + ' deck', compact: false }) + '<span class="sb-count">' + total + '</span>'
+      : '<div class="sb-zone-empty">Deck empty · 0</div>';
+  }
+
+  function renderDiscard(target, count, label) {
+    const node = $(target);
+    if (!node) return;
+    const total = countValue(count);
+    node.innerHTML = total
+      ? renderer().renderCardBack({ label: label + ' discard', compact: false }) + '<span class="sb-count">' + total + '</span>'
+      : '<div class="sb-zone-empty">Discard empty · 0</div>';
+  }
+
+  function renderRewards(target, count, label) {
+    const node = $(target);
+    if (!node) return;
+    const remaining = Math.min(6, countValue(count));
+    node.innerHTML = Array.from({ length: 6 }, (_, index) => {
+      const active = index < remaining;
+      return '<div class="sb-reward-slot' + (active ? '' : ' is-claimed') + '">' +
+        (active ? renderer().renderCardBack({ label: label + ' Reward ' + (index + 1), compact: true }) : '') +
+        '</div>';
+    }).join('');
+  }
+
+  function renderOpponentHand(view) {
+    const count = countValue(view.opponent && view.opponent.hand_count);
+    const node = $('oppHand');
+    if (node) node.innerHTML = Array.from({ length: Math.min(count, 10) }, (_, index) =>
+      renderer().renderCardBack({ label: 'Opponent hand card ' + (index + 1), compact: true })
+    ).join('') || '<div class="sb-zone-empty">No cards</div>';
+    if ($('oppHandCount')) $('oppHandCount').textContent = String(count);
+  }
+
+  function renderYourHand(view) {
+    const hand = view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
+    const node = $('yourHand');
+    if (node) node.innerHTML = hand.map((instance) => knownCard(instance, { compact: true })).join('') || '<div class="sb-zone-empty">No cards in hand</div>';
+    if ($('yourHandCount')) $('yourHandCount').textContent = String(countValue(view.you && view.you.hand_count != null ? view.you.hand_count : hand.length));
+  }
+
+  function renderRealm(view) {
+    const node = $('realmSlot');
+    if (!node) return;
+    node.innerHTML = view.realm
+      ? knownCard(view.realm, { compact: false })
+      : '<div class="sb-zone-empty">No Realm in play</div>';
   }
 
   function render() {
@@ -206,7 +299,17 @@
     $('youVanguard').innerHTML = creatureCard(view.you && view.you.vanguard, { primary: true, canAct: canAttack });
     renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent');
     renderReserve('youReserve', view.you && view.you.reserve, 'Your');
-    $('yourHand').innerHTML = (view.you && Array.isArray(view.you.hand) ? view.you.hand : []).map(handCard).join('') || '<div class="sb-zone-empty">No cards in hand</div>';
+    renderRealm(view);
+
+    renderOpponentHand(view);
+    renderYourHand(view);
+    renderDeck('oppDeck', view.opponent && view.opponent.deck_count, 'Opponent');
+    renderRewards('oppRewards', view.opponent && view.opponent.rewards_count, 'Opponent');
+    renderDiscard('oppDiscard', view.opponent && view.opponent.discard_count, 'Opponent');
+    renderDeck('yourDeck', view.you && view.you.deck_count, 'Your');
+    renderRewards('yourRewards', view.you && view.you.rewards_count, 'Your');
+    renderDiscard('yourDiscard', view.you && view.you.discard_count, 'Your');
+
     $('turnPill').textContent = view.phase === 'complete' ? 'Match complete' : (yourTurn ? 'Your turn' : 'Opponent turn');
     $('revisionPill').textContent = 'Revision ' + revision();
     $('phasePill').textContent = String(view.phase || '—');
@@ -286,6 +389,7 @@
       state.matchId = new URLSearchParams(window.location.search).get('match_id') || '';
       $('controllerVersion').textContent = VERSION;
       if (!state.matchId) throw new Error('Open this battle surface from a match route containing ?match_id=<id>.');
+      renderer();
       await ensureClient();
       await refreshMatch();
       startPoll();
