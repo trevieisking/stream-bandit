@@ -27,7 +27,8 @@ This index exists to learn from three decades of creature-card-game design while
 
 Pokector's English catalogue currently indexes **174 sets** from Base Set through the 2026 Mega Evolution era.
 
-Source: https://pokector.com/pokemon-sets
+Grouped-era source: https://pokector.com/pokemon-sets  
+Browse source: https://pokector.com/sets
 
 Era coverage used by this research index:
 
@@ -37,8 +38,10 @@ Era coverage used by this research index:
 | Gym | 2 | ✅ indexed | 🔎 ongoing |
 | Neo | 4 | ✅ indexed | 🔎 ongoing |
 | e-Card | 3 | ✅ indexed | 🔎 ongoing |
+| NP / Nintendo Black Star Promos | 1 | ✅ indexed | 🔎 ongoing |
 | EX | 20 | ✅ indexed | 🔎 ongoing |
 | Diamond & Pearl | 8 | ✅ indexed | 🔎 ongoing |
+| POP | 9 | ✅ indexed | 🔎 ongoing |
 | Platinum | 4 | ✅ indexed | 🔎 ongoing |
 | HeartGold & SoulSilver | 6 | ✅ indexed | 🔎 ongoing |
 | Black & White | 13 | ✅ indexed | 🔎 ongoing |
@@ -49,7 +52,7 @@ Era coverage used by this research index:
 | Mega Evolution | 6 | ✅ indexed | 🔎 ongoing |
 | Other / promos / special products | 15 | ✅ indexed | 🔎 ongoing |
 
-The set catalogue is used as a **coverage checklist**, not copied into Stream Bandit content.
+**Coverage arithmetic:** the era rows above total exactly **174** sets. The set catalogue is used as a **coverage checklist**, not copied into Stream Bandit content.
 
 ### Effect-taxonomy sources
 
@@ -131,7 +134,7 @@ This table records the useful **rule idea**, not a plan to ship external brandin
 
 ### Stream Bandit working names already locked
 
-External labels remain research-only. Current working Stream Bandit presentation names are maintained in `tcg-special-mechanic-names-v1.json`, including Ascendant Creature, Sigilborn Creature, Bonded Sigilborn, Exalted Creature, Colossus Creature, Starforged Creature, Convergence Creature, Gleam Creature, Prime Card, Riftmarked Card, Overform, Ascension Form, Aspect Creature, Apex Ascendant, Ascension Evolution and Signature Power.
+External labels remain research-only. Current working Stream Bandit presentation names are maintained in `tcg-special-mechanic-names-v1.json`, including Ascendant Creature, Sigilborn Creature, Bonded Creature, Bonded Sigilborn, Exalted Creature, Colossus Creature, Starforged Creature, Convergence Creature, Gleam Creature, Prime Card, Riftmarked Card, Overform, Ascension Form, Aspect Creature, Apex Ascendant, Ascension Evolution and Signature Power.
 
 ---
 
@@ -418,7 +421,7 @@ When designing a future Stream Bandit card:
 
 Example future card recipe:
 
-`trigger.turn_start + search.deck + attach.essence + condition.apply + limit.once_per_turn`
+`trigger.turn_start + search.deck + essence.attach_from_deck + condition.apply + limit.once_per_turn`
 
 That should be one data recipe composed from generic capabilities, not five card-specific helpers.
 
