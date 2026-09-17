@@ -3,88 +3,60 @@
 **Date:** 2026-09-17  
 **Master plan:** `tcg-master-plan-progress-v2.3.4.md`  
 **Checklist:** `tcg-master-plan-checklist-v2.3.4.md`  
-**Release index:** `tcg-release-control-v2.3.json`  
-**Previous ledger:** `tcg-master-plan-ledger-v2.3.3.md`
+**Release index:** `tcg-release-control-v2.3.json`
 
-## V2.3.4-001 — G0R-11 accepted
+## Accepted source baseline
 
-PR #565 accepted validation workflow coverage. Accepted head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`; Validation #571 SUCCESS; merge checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`.
+- G0R-11 COMPLETE — PR #565; Validation #571; merge checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`.
+- G0R-07 COMPLETE — PR #566; Validation #574 / Replay #799 / Smoke #825; merge checkpoint `fce98178f2234386da7be3aef02a8496fa24195a`.
+- G0R-08 COMPLETE — PR #567; Validation #586 / Replay #800 / Smoke #826; merge/current main `042559e252cfa49ad425d9f57fa01a678b2a3fe9`.
+- Accepted G0R source repairs: **3/11**.
+- G0R-10 remains PROVEN / QUEUED and is not dropped.
 
-## V2.3.4-002 — G0R-10 remains proven / queued
+## V2.3.4-008 — G0R-09 defect proven
 
-Exact source proves `play_tactic` lacks the required one-shot Ally/Device subtype allow-list while Relic/Realm already have dedicated owner routes. No unsafe whole-file rewrite was forced. G0R-10 remains explicitly queued.
+Exact source `supabase/migrations/20260903225626_tcg_private_room_lobby.sql` at main `042559e252cfa49ad425d9f57fa01a678b2a3fe9` defines `tcg_server_set_room_ready` with this sequence:
+1. member check;
+2. deck validation;
+3. update this member's `ready` row;
+4. aggregate `member_count` and `ready_count`;
+5. return `all_ready=(v_count=2 and v_ready_count=2)`.
 
-## V2.3.4-003 — G0R-07 accepted
+There is no per-room lock around steps 3-4. Two simultaneous transactions can each update a different row and then count before the other uncommitted Ready row is visible, allowing both responses to report `all_ready=false`.
 
-PR #566 fixed matchmaking room lifetime. Reviewed head `190c9c9e4bf07712571b978abbd3657f876febed`; Validation #574, Migration Replay #799 and Functional Smoke #825 SUCCESS; review threads 0; merge checkpoint `fce98178f2234386da7be3aef02a8496fa24195a`. Supabase/live remained undeployed.
+The private-alpha API only calls `initialize(room)` when the Ready RPC response has `r?.all_ready`, so both false responses can leave an otherwise fully-ready room requiring another manual Ready action.
 
-## V2.3.4-004 — G0R-08 defect proven
+**Owner decision:** fix concurrency in the authoritative room Ready function, not in browser retry logic.
 
-At exact main `fce98178f2234386da7be3aef02a8496fa24195a`, latest `tcg_server_validate_deck` validated deck size, active IDs, ownership, copy limits and element membership but did not require any Creature that can legally begin setup.
+## V2.3.4-009 — G0R-09 bounded implementation
 
-The server-authoritative private-alpha setup runtime uses exactly three setup-legal recipe types:
-- `Creature — Baby`;
-- `Creature — Standalone`;
-- `Creature — Mythic`.
+Created branch `fix/tcg-g0r-09-ready-concurrency` from exact main `042559e252cfa49ad425d9f57fa01a678b2a3fe9`.
 
-Its opening loop mulligans until one appears and otherwise reaches `opening_hand_mulligan_guard`. The defect therefore belongs in deck validation rather than a browser workaround or weakened setup rule.
+Migration commit `4c08c8528677aef8a58955a91e1a05f7227f5854` adds `20260917144500_tcg_private_room_ready_concurrency.sql`:
+- additive `CREATE OR REPLACE` only;
+- retains member and deck-validation fences;
+- acquires a room-scoped transaction advisory lock immediately before Ready mutation + aggregate count;
+- lock key derives from `p_room_id::text || ':ready'`, so unrelated rooms do not share one global mutex;
+- preserves exact two-members/two-ready `all_ready` rule;
+- rewrites no existing data by itself.
 
-## V2.3.4-005 — G0R-08 bounded implementation
+Focused test/head commit `cc46b1fda04361105bc390c9efeddc8c475c6571` adds `tcg/tests/card-pass-2-g0r-09-private-room-ready-concurrency.test.mjs` and locks the mutation/count ordering, room-scoped transaction lock, preserved validation fences and private-alpha `r?.all_ready -> initialize(room)` dependency.
 
-Created branch `fix/tcg-g0r-08-setup-legal-deck` from exact main `fce98178f2234386da7be3aef02a8496fa24195a`.
+Exact diff from base:
+- 2 commits;
+- 2 files;
+- +105 / -0.
 
-Added migration commit `2210eedfc3936561e3e6d49adb7f00e7d8861a6f`:
-- `supabase/migrations/20260917143500_tcg_setup_legal_deck_validation.sql`;
-- copies current validator rules;
-- adds `v_setup_eligible` count using active structured card definitions and the exact three setup recipe types;
-- rejects zero eligible copies with `deck_requires_setup_eligible_creature`;
-- returns `setup_eligible_creature_copies` as validation evidence;
-- rewrites no production rows by itself.
+Draft PR #568 opened at exact head `cc46b1fda04361105bc390c9efeddc8c475c6571`.
 
-Added focused test/head commit `f612c450e911d1aa3cc3fdb37fd59c89c153236f`:
-- `tcg/tests/card-pass-2-g0r-08-setup-legal-deck-validation.test.mjs`;
-- binds validator recipe types to the private-alpha runtime and checks preservation of prior validator errors.
+## Promotion state
 
-Opened draft PR #567. Exact diff: 2 files / +165 / -0.
-
-## V2.3.4-006 — G0R-08 exact-head fence
-
-All required exact-head workflows completed successfully on `f612c450e911d1aa3cc3fdb37fd59c89c153236f`:
-- TCG Card Pass 2 Validation #586 / `35234474804` — SUCCESS;
-- Code Labs Migration Replay #800 / `35234474906` — SUCCESS, including full disposable reset/replay from zero;
-- Code Labs V50 Functional Smoke #826 / `35234475267` — SUCCESS, including Node, Deno and PostgreSQL replay smoke.
-
-Final pre-merge evidence:
-- PR #567 mergeable = true;
-- PR head unchanged `f612c450e911d1aa3cc3fdb37fd59c89c153236f`;
-- review threads = 0;
-- exact diff remained 2 intended files / +165 / -0;
-- main remained `fce98178f2234386da7be3aef02a8496fa24195a` immediately before merge;
-- combined legacy statuses returned none found; GitHub Actions exact-head runs above are authoritative.
-
-## V2.3.4-007 — G0R-08 promoted to main
-
-**Promotion decision: PROMOTE G0R-08 source repair ✅.**
-
-PR #567 was marked ready and merged using expected head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`.
-
-- merge SHA/current main: `042559e252cfa49ad425d9f57fa01a678b2a3fe9`;
-- G0R-08 source state: COMPLETE;
-- accepted G0R source repairs: **3/11**.
-
-Important boundary: source merge does **not** apply the new validator migration to production Supabase. Production/live deployment remains HOLD and requires a separate evidence/promotion decision.
-
-## Current promotion state
-
-- G0R-11 source: COMPLETE ✅
-- G0R-07 source: COMPLETE ✅
-- G0R-08 source: COMPLETE ✅
-- accepted G0R source repairs: **3/11**
-- G0R-10: PROVEN / QUEUED 🟡
-- Supabase/runtime/live/production: HOLD / not changed by G0R-08 source merge
-- Code Labs Writer: not invoked
-- CG Repair Lab / Code God: not invoked
+- G0R-09 branch implementation: **PROMOTE ✅**
+- PR #568 merge: **HOLD 🔒** pending exact-head workflows/reviews
+- main remains accepted at `042559e252cfa49ad425d9f57fa01a678b2a3fe9`
+- Supabase/runtime/live/production: HOLD / unchanged
+- Code Labs Writer / CG Repair Lab / Code God: not invoked
 
 ## Exact next operation
 
-Refresh source from main `042559e252cfa49ad425d9f57fa01a678b2a3fe9` and implement exactly one next safe V2-G0R owner repair. Prefer additive/replay-safe work while maintaining the prototype authority, 40-owner architecture and Deck Search invariant. Update plan/checklist/ledger before the next delivered work result.
+Refresh PR #568 exact-head workflow runs and review threads. Require TCG Validation, Migration Replay and Functional Smoke green. If any fails, repair only the bounded branch. If all succeed and the exact diff/head/main remain stable, make the source merge promotion decision and update plan/checklist/ledger before reporting acceptance.
