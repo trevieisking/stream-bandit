@@ -1,0 +1,74 @@
+{
+  "schema": "stream-bandit-tcg-damage-counter-interaction-v1",
+  "recorded_at": "2026-09-17",
+  "purpose": "Machine-readable planning contract for visual placement, movement and turn-transition use of damage counters in the restored Stream Bandit Battle Client.",
+  "counter_model": {
+    "base_unit_damage": 10,
+    "visible_counter_values": "10-point increments up to the exact maximum/remaining amount permitted by the resolving effect or property",
+    "server_authoritative": true,
+    "browser_may_not_invent_total_or_targets": true,
+    "damage_counter_placement_is_distinct_from_ordinary_attack_damage": true,
+    "damage_counter_movement_is_distinct_from_new_damage": true
+  },
+  "place_counters_interaction": {
+    "source_card_lifts_or_hovers": true,
+    "battlefield_remains_visible": true,
+    "legal_targets_highlight": true,
+    "counter_tray_appears": true,
+    "player_drags_counter_values_to_legal_targets": true,
+    "tap_select_equivalent_required": true,
+    "remaining_amount_visible": true,
+    "selected_distribution_visible_before_commit": true,
+    "change_or_cancel_before_server_commit_when_practical": true,
+    "commit_requires_effect_legal_distribution": true
+  },
+  "move_counters_interaction": {
+    "source_card_lifts_or_hovers": true,
+    "movable_existing_damage_is_visualized": true,
+    "legal_destinations_highlight": true,
+    "player_drags_counters_from_source_to_destination": true,
+    "source_damage_decreases_by_exact_moved_amount": true,
+    "destination_damage_increases_by_exact_moved_amount": true,
+    "total_moved_amount_cannot_exceed_effect_or_source_limit": true,
+    "server_commits_source_and_destination_atomically": true
+  },
+  "attack_resolution_order": [
+    "pay_and_validate_attack",
+    "resolve_printed_attack_effects_and_ordinary_damage",
+    "resolve_required_damage_counter_placement_or_movement_choices",
+    "resolve resulting conditions/listeners",
+    "defeat_scan",
+    "reward_and_forced_promotion_consequences",
+    "aftermath",
+    "turn_transition"
+  ],
+  "turn_transition_condition_counters": {
+    "supported": true,
+    "description": "A turn-based Condition may declare damage counters that are added at the canonical turn-switch/checkup checkpoint.",
+    "counter_unit_damage": 10,
+    "amount_is_condition_property": true,
+    "condition_badge_or_source_pulses_before_counters_land": true,
+    "counter_animation_uses_same_visual_counter_system": true,
+    "defeat_scan_runs_after_condition_counter_application": true,
+    "reward_and_promotion_consequences_resolve_before_next_player_normal_actions": true,
+    "not_every_condition_deals_damage": true
+  },
+  "modifier_separation": {
+    "ordinary_attack_damage_modifiers_apply_to_counter_placement_automatically": false,
+    "vulnerability_or_resistance_apply_to_counter_placement_automatically": false,
+    "shield_applies_to_counter_placement_automatically": false,
+    "effect_or_rules_schema_must_explicitly_declare_any_exception": true
+  },
+  "ownership": {
+    "damage_counter_state_and_packets": "existing Damage/effect ownership where applicable",
+    "turn_based_condition_schedule": "Condition/timing ownership",
+    "defeat_after_counter_application": "Defeat/Reward/Promotion canonical owners",
+    "ui_role": "visual input and animation only",
+    "new_owner_required_by_this_contract": false
+  },
+  "acceptance_examples": [
+    "place 30 damage counters: show legal target(s) and allow an exact 30 total in 10-point increments",
+    "move 50 existing damage: show source movable damage and allow an exact legal distribution up to 50",
+    "condition says place 10 damage at each turn switch: animate one 10 counter at every canonical turn-transition checkpoint while the Condition remains active"
+  ]
+}
