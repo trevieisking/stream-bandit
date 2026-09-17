@@ -33,6 +33,17 @@
     "up_to_amount_allows_smaller_total_only_when_explicit": true,
     "defeat_check_runs_immediately_after_each_committed_placement_operation": true
   },
+  "grouped_place_counters_interaction": {
+    "opcode": "PLACE_DAMAGE_MULTI",
+    "selection_and_amounts_are_validated_as_one_group": true,
+    "all_validated_target_placements_commit_as_one_atomic_effect_operation": true,
+    "no_listener_or_follow_up_targeting_runs_between_individual_target_placements": true,
+    "immediate_batch_defeat_scan_runs_after_all_grouped_placements_commit": true,
+    "batch_defeat_scan_covers_every_affected_destination": true,
+    "all_creatures_made_lethal_by_the_group_leave_play_before_later_listeners_or_follow_up_effects": true,
+    "reward_and_forced_promotion_consequences_resume_after_the_immediate_batch_defeat_boundary": true,
+    "reason": "Grouped placement must preserve one coherent multi-target effect while preventing later logic from acting on any target that the grouped operation made lethal."
+  },
   "move_counters_interaction": {
     "source_card_lifts_or_hovers": true,
     "movable_existing_damage_is_visualized": true,
@@ -49,7 +60,8 @@
   },
   "operation_level_defeat_boundary": {
     "required": true,
-    "rule": "Every committed PLACE_DAMAGE or MOVE_DAMAGE operation runs the destination defeat check immediately after the placement/state update and before later listeners, follow-up target selection, or effects are allowed to act on that destination.",
+    "single_target_rule": "Every committed PLACE_DAMAGE or MOVE_DAMAGE operation runs the destination defeat check immediately after the placement/state update and before later listeners, follow-up target selection, or effects are allowed to act on that destination.",
+    "grouped_rule": "PLACE_DAMAGE_MULTI validates and commits its full target set atomically, then immediately performs a batch defeat scan across every affected destination before any later listener, follow-up target selection, or effect resumes.",
     "reason": "A Creature made lethal by counter placement/movement must leave play before subsequent logic can treat it as a legal in-play target.",
     "attack_turn_handoff_still_waits_for_full_resolution": true
   },
@@ -57,8 +69,8 @@
     "pay_and_validate_attack",
     "resolve_printed_attack_effects_and_ordinary_damage_using_their_canonical_operation_boundaries",
     "resolve_required_damage_counter_placement_or_movement_choice",
-    "commit_each_counter_operation_atomically",
-    "run_immediate_destination_defeat_boundary_after_each_counter_operation",
+    "commit_single_target_counter_operation_or_full_grouped_placement_operation_atomically",
+    "run_immediate_single_destination_or_grouped_batch_defeat_boundary",
     "resolve_only_later_listeners_conditions_or_follow_up_effects_that_remain_legal_after_that_defeat_boundary",
     "resolve_remaining_reward_forced_promotion_and_aftermath_consequences_in_canonical_resume_order",
     "turn_transition"
@@ -89,6 +101,7 @@
   },
   "acceptance_examples": [
     "PLACE_DAMAGE fixed 30: legal distribution must total exactly 30 in 10-point increments before commit, then run the immediate defeat boundary.",
+    "PLACE_DAMAGE_MULTI: validate the full selected target group, commit all placements atomically, then immediately remove/process every destination made lethal before later listeners resume.",
     "MOVE_DAMAGE fixed 50: if 50 can legally be moved, the player must move exactly 50; a smaller amount is not a legal voluntary choice.",
     "MOVE_DAMAGE up to 50 or allow_partial=true: show legal 10-point choices up to the lower of 50 and available source damage; smaller legal totals are allowed.",
     "condition says place 10 damage at each turn switch: animate one 10 counter at every canonical turn-transition checkpoint while the Condition remains active, immediately check defeat, then resolve consequences before normal play."
