@@ -16,22 +16,19 @@ A material implementation result is not accepted until this checklist/ledger cha
 |---|---|---|
 | G0R-11 validation workflow coverage | **COMPLETE ✅** | PR #565 head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`; Validation #571 SUCCESS; merged main checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00` |
 | G0R-07 matchmaking room lifetime | **COMPLETE IN SOURCE ✅** | PR #566 head `190c9c9e4bf07712571b978abbd3657f876febed`; Validation #574 + Migration Replay #799 + Functional Smoke #825 SUCCESS; merged main `fce98178f2234386da7be3aef02a8496fa24195a`; Supabase/live still HOLD |
-| G0R-08 setup-legal deck validation | **IN PROGRESS 🔎** | PR #567 head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`; TCG Validation #586 PASS; Migration Replay #800 running; Functional Smoke #826 pending/running |
+| G0R-08 setup-legal deck validation | **IN PROGRESS 🔎** | PR #567 head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`; Validation #586 PASS; Migration Replay #800 full reset/replay running; Functional Smoke #826 Node+Deno PASS, PostgreSQL lane waiting; review threads currently 0 |
 | G0R-10 Tactic subtype boundary | **PROVEN / QUEUED 🟡** | exact source proves `play_tactic` lacks Ally/Device allow-list; Relic/Realm have dedicated routes; no runtime patch accepted yet |
 
 **Accepted G0R source repairs:** **2 / 11**.
 
-## G0R-07 checklist — ACCEPTED SOURCE REPAIR
+## G0R-07 — ACCEPTED SOURCE REPAIR
 
-| ID | Requirement | State | Evidence / acceptance |
-|---|---|---|---|
-| G0R07-01 | Exact source defect proven | COMPLETE | original matchmaking function gated matched retry/poll by queue expiry |
-| G0R07-02..07 | Waiting/matched lifetime semantics + additive repair | COMPLETE ✅ | PR #566 accepted source repair |
-| G0R07-08..11 | Focused test + Validation + Migration Replay + Functional Smoke | PASS ✅ | #574 / #799 / #825 |
-| G0R07-12 | Review findings | PASS ✅ | 0 threads final refresh |
-| G0R07-13 | Exact PR diff | PASS ✅ | 2 files, +258 / -0 |
-| G0R07-14 | Merge to main | COMPLETE ✅ | `fce98178f2234386da7be3aef02a8496fa24195a` |
-| G0R07-15 | Supabase/live deployment | HOLD 🔒 | not deployed by source merge |
+- PR #566 reviewed head `190c9c9e4bf07712571b978abbd3657f876febed`.
+- Exact diff 2 files / +258 / -0.
+- Validation #574, Migration Replay #799 and Functional Smoke #825 all SUCCESS.
+- Review threads 0.
+- Merged main `fce98178f2234386da7be3aef02a8496fa24195a`.
+- Supabase/live deployment still HOLD.
 
 ## G0R-08 checklist — ACTIVE SOURCE REPAIR
 
@@ -42,13 +39,13 @@ A material implementation result is not accepted until this checklist/ledger cha
 | G0R08-03 | Opening failure consequence proven | COMPLETE | opening loop otherwise reaches `opening_hand_mulligan_guard` |
 | G0R08-04 | Validator rejects zero opening-eligible Creature copies | IMPLEMENTED / PENDING FULL FENCE | migration adds `v_setup_eligible` + `deck_requires_setup_eligible_creature` |
 | G0R08-05 | Existing validation fence preserved | IMPLEMENTED / PENDING FULL FENCE | replacement retains all current validation error rules/strings |
-| G0R08-06 | Exact three recipe types stay synchronized with runtime | **PASS ✅** | focused test passed in TCG Validation #586 |
+| G0R08-06 | Exact three recipe types stay synchronized with runtime | PASS ✅ | focused test passed in Validation #586 |
 | G0R08-07 | Additive migration only; no row rewrite | COMPLETE | `20260917143500_tcg_setup_legal_deck_validation.sql` |
-| G0R08-08 | Focused contract test | **PASS ✅** | included in TCG Validation #586 / run `35234474804` |
-| G0R08-09 | TCG Validation exact-head green | **PASS ✅** | run #586 / `35234474804`; both Set One and deterministic runtime jobs SUCCESS |
-| G0R08-10 | Migration Replay exact-head green | **IN PROGRESS 🔎** | run #800 / `35234474906` |
-| G0R08-11 | Functional Smoke exact-head green | **PENDING / RUNNING 🔎** | run #826 / `35234475267` |
-| G0R08-12 | No unresolved material review finding | TODO | refresh after workflows |
+| G0R08-08 | Focused contract test | PASS ✅ | Validation #586 / run `35234474804` |
+| G0R08-09 | TCG Validation exact-head green | PASS ✅ | #586; Set One + deterministic runtime/type-check jobs SUCCESS |
+| G0R08-10 | Migration Replay exact-head green | IN PROGRESS 🔎 | #800 / `35234474906`; source contract + disposable DB startup PASS; full reset/replay running |
+| G0R08-11 | Functional Smoke exact-head green | IN PROGRESS 🔎 | #826 / `35234475267`; Node + Deno jobs PASS; PostgreSQL replay pending |
+| G0R08-12 | No unresolved material review finding | CURRENTLY CLEAR | PR #567 review threads = 0; final refresh still required |
 | G0R08-13 | Exact PR diff remains intended two files | PASS at opening head | 2 files, +165 / -0 |
 | G0R08-14 | Merge to main | HOLD 🔒 | requires full exact-head fence |
 | G0R08-15 | Supabase/live deployment | HOLD 🔒 | separate deployment decision |
@@ -67,8 +64,7 @@ A material implementation result is not accepted until this checklist/ledger cha
   - `tcg/tests/card-pass-2-g0r-08-setup-legal-deck-validation.test.mjs`
 - source/main impact so far: none; branch/PR only
 - Supabase/live impact: none
-- Code Labs Writer: not invoked
-- CG Repair Lab / Code God: not invoked
+- Code Labs Writer / CG Repair Lab / Code God: not invoked
 
 ## Inherited critical rules still locked
 
@@ -80,4 +76,4 @@ A material implementation result is not accepted until this checklist/ledger cha
 
 ## Exact next operation
 
-Finish Migration Replay #800 and Functional Smoke #826 on exact head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`. Fail closed on any failure. If both are green, refresh PR #567 review threads, exact diff/head and current main; then decide source merge promotion. Supabase/live remains separate.
+Finish Migration Replay #800 and Functional Smoke #826 on exact head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`. Fail closed on any failure. If both become green, refresh PR #567 review threads, exact diff/head and current main; then decide source merge promotion. Supabase/live remains separate.
