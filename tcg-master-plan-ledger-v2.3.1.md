@@ -4,7 +4,7 @@
 **Previous canonical plan:** `tcg-master-plan-progress-v2.3.md`  
 **Previous ledger:** `tcg-master-plan-ledger-v2.3.md`  
 **Owner-family baseline:** 40  
-**Ledger revision:** V2.3.1-5 — 2026-09-17
+**Ledger revision:** V2.3.1-6 — 2026-09-17
 
 ## Rules
 
@@ -41,7 +41,8 @@ Audit/correction scope ultimately covered:
 2. ordinary global matchup weakness vs exceptional card-specific Resistance/override;
 3. original Stream Bandit names for researched special families;
 4. physical damage-counter placement/movement and turn-transition Condition timing;
-5. authority-graph references and self-contained JSON control contracts.
+5. authority-graph references and self-contained JSON control contracts;
+6. living cross-era mechanic research and generic capability vocabulary.
 
 No additional post-test planning requirement is currently known.
 
@@ -75,11 +76,7 @@ Ordinary Set One-style weakness is owned by the versioned global matchup snapsho
 
 Working player-facing presentation may call that matchup **Vulnerability**, but engine ownership remains global.
 
-Exceptional future card data may explicitly define:
-
-- Resistance;
-- matchup override;
-- another reviewed card-specific damage-affinity modifier.
+Exceptional future card data may explicitly define Resistance, matchup override or another reviewed card-specific damage-affinity modifier.
 
 No existing Set One matchup value changes from this control update.
 
@@ -87,7 +84,7 @@ No existing Set One matchup value changes from this control update.
 
 **State:** ✅ LOCKED WORKING NAMES
 
-Machine-readable authority: `tcg-special-mechanic-names-v1.json`
+Machine-readable authority: `tcg-special-mechanic-names-v1.json`.
 
 - EX/current ex research pattern → **Ascendant Creature**
 - GX → **Sigilborn Creature**
@@ -105,7 +102,7 @@ Machine-readable authority: `tcg-special-mechanic-names-v1.json`
 - current Mega-ex → **Apex Ascendant**
 - historical Mega EX evolve/end-turn pattern → **Ascension Evolution**
 
-Shared once-per-match action name remains **Signature Power**, with Signature Attack / Signature Ability variants.
+Shared once-per-match presentation is **Signature Power**. Machine action kinds remain `attack` / `ability`; display labels are **Signature Attack** / **Signature Ability**.
 
 These are labels/capability bundles, not one engine per label.
 
@@ -113,27 +110,40 @@ These are labels/capability bundles, not one engine per label.
 
 **State:** ✅ LOCKED desired behaviour
 
-Machine-readable authority: `tcg-damage-counter-interaction-v1.json`
+Machine-readable authority: `tcg-damage-counter-interaction-v1.json`.
+
+Counter model:
 
 - base counter unit = **10 damage**;
-- visible counter values use 10-point increments up to the exact effect/property allowance;
-- placing counters: resolving card hovers, legal targets highlight, counter tray appears, player drags/taps exact distribution, server validates/commits;
-- moving counters: existing damage is transferred from source to legal destination(s) atomically;
-- attack-generated counter choices resolve before automatic turn handoff;
-- Conditions may declare counter ticks at the canonical turn-transition/checkup checkpoint;
-- defeat/Reward/promotion consequences from Condition counters resolve before next-player normal actions;
-- ordinary damage, placed counters, moved counters and Condition ticks remain semantically distinct.
+- fixed and `up to`/partial amount semantics are distinct;
+- fixed amount must be applied in full when legal;
+- smaller totals require explicit `up to`/partial permission;
+- MOVE_DAMAGE can never exceed available source damage.
 
-### V2.3.1-006 — Authority graph repaired after exact-head review
+Place/move choreography:
+
+1. resolving/source card hovers;
+2. board remains visible;
+3. legal targets highlight;
+4. counter tray appears;
+5. player drags/taps exact 10-point allocation;
+6. server validates/commits the operation;
+7. **destination defeat check occurs immediately after committed PLACE_DAMAGE/MOVE_DAMAGE before later listeners/follow-up targeting can act on that destination.**
+
+Attack-generated counter choices still complete before automatic turn handoff, but each counter operation preserves its immediate defeat boundary. Turn-transition Condition counters use the same immediate defeat rule before next-player normal actions.
+
+Ordinary damage, placed counters, moved counters and Condition ticks remain semantically distinct. Weakness/Vulnerability, Resistance and Shield do not automatically change placed/moved counter amounts.
+
+### V2.3.1-006 — Authority graph repaired after first exact-head review
 
 **State:** ✅ CORRECTED
 
-Review exposed four control-plane issues and all were addressed:
+First review exposed four control-plane issues and all were addressed:
 
-1. `tcg-v2-card-action-controller-v1.json` points to `tcg-card-visual-printing-v1.1.json` rather than the superseded visual v1 contract.
-2. `tcg-evergreen-extensibility-v1.1.json` is a **self-contained** complete JSON authority rather than depending on undefined JSON inheritance semantics.
-3. visual/header language does not imply that current ordinary Creatures have a generic play/evolution Cost.
-4. ordinary Vulnerability/weakness remains owned by the global matchup snapshot; exceptional Resistance/override data remains card-specific.
+1. card controller points to visual v1.1;
+2. evergreen v1.1 is self-contained;
+3. current ordinary Creatures receive no invented generic Cost;
+4. ordinary Vulnerability remains owned by global matchup snapshot while exceptional Resistance/overrides remain card-specific.
 
 These corrections change no live gameplay, Supabase state, current card values or matchup table.
 
@@ -141,33 +151,7 @@ These corrections change no live gameplay, Supabase state, current card values o
 
 **State:** ✅ COMPLETE
 
-Confirmed retained authority includes:
-
-- prototype restoration / one-screen board;
-- full video choreography;
-- all-card drag/drop/tap targeting;
-- green Evolution target glow;
-- Essence/Relic/Realm/Tactic direct play;
-- Realm persistence;
-- card-owned Ability/Attack/Withdraw;
-- active Ability normally once/turn;
-- attack auto-end-turn;
-- interactive damage counter placement/movement before attack handoff;
-- turn-transition Condition damage counters;
-- ten visual families;
-- 10 / 241 / 10 V2 target;
-- Fairy + Underworld;
-- artwork on every printable gameplay card;
-- rarity + cosmetic printing variants;
-- named numeric properties;
-- schema-honest card header;
-- original Stream Bandit special-mechanic family names;
-- global matchup Vulnerability + exceptional Resistance/overrides;
-- Evergreen/no age rotation;
-- backward compatibility;
-- future cards/attacks/Abilities/series/decks/packs/coins/accessories/events;
-- generic special-mechanic capability architecture;
-- 40-owner architecture / no owner #41 by label.
+Confirmed retained authority includes prototype restoration, full video choreography, drag/drop/tap targeting, green Evolution targets, direct Essence/Relic/Realm/Tactic play, Realm persistence, card-owned Ability/Attack/Withdraw, active Ability normally once/turn, attack auto-end-turn, damage-counter placement/movement, immediate counter defeat boundaries, fixed/up-to precision, Condition ticks, ten visual families, 10/241/10 target, Fairy + Underworld, artwork/rarity/printing variants, original special-family names, global matchup Vulnerability, Evergreen/no age rotation, backward compatibility, future content/product extensibility and the 40-owner/no-owner-41 rule.
 
 ### V2.3.1-008 — Restart point
 
@@ -188,7 +172,7 @@ Next:
 
 **State:** ✅ RESEARCH/SCHEMA AUTHORITY ADDED
 
-New authorities:
+Authorities:
 
 - `tcg-mechanic-harvest-index-v1.md`
 - `tcg-generic-mechanic-capabilities-v1.json`
@@ -196,53 +180,55 @@ New authorities:
 Research coverage recorded:
 
 - Pokector coverage source indexes **174 English TCG sets** from Base through the 2026 Mega Evolution era;
-- historical mechanic-family scan completed as a baseline across Base/Gym/Neo/e-Card/EX/DP/Platinum/HGSS/BW/XY/SM/SWSH/SV/Mega Evolution and special products;
-- Bulbapedia `Cards by effect` provides **54 broad effect categories** now folded into the generic mechanic vocabulary;
-- broader Bulbapedia card indexes expose thousands of attacks/Abilities for ongoing per-card deep harvesting;
-- active/passive/triggered Ability heritage, Tool/Stadium/Supporter/Technical Machine-style rules, special resources, high-risk Reward classes, singleton rules, multi-card assembly, inherited attacks/Abilities, alternate forms/types, strategy tags and modern special classes are represented generically.
+- historical mechanic-family baseline scan spans Base/Gym/Neo/e-Card/EX/DP/Platinum/HGSS/BW/XY/SM/SWSH/SV/Mega Evolution and special products;
+- Bulbapedia `Cards by effect` provides **54 broad effect categories** folded into the generic vocabulary;
+- broader card/Ability/Attack indexes remain ongoing per-card research sources;
+- active/passive/triggered Ability heritage, persistent attachments/fields, support-card limits, granted Attacks, Special Essence, modal card types, strategy tags, Reward classes, singleton limits, assembly, inheritance and alternate forms/types are represented generically.
 
-Research source pointers are retained in the harvest files rather than copied into Stream Bandit gameplay content.
+**Indexed does not mean implemented.** V2-G1E must map capability IDs to current owners/opcodes or one justified generic extension and prove deterministic tests.
 
-Important honesty boundary:
-
-- this is **not** a claim that every historical card text has been manually read;
-- individual-card deep harvesting remains ongoing;
-- an indexed capability is **not** runtime-complete until V2-G1E maps it to existing owners/opcodes or one justified generic extension and proves deterministic tests.
-
-### V2.3.1-010 — Future card definitions must compose generic capabilities
+### V2.3.1-010 — Future card definitions compose generic capabilities
 
 **State:** ✅ LOCKED DESIGN RULE
 
-Future Stream Bandit card design should use capability IDs from `tcg-generic-mechanic-capabilities-v1.json` plus structured parameters for timing, targets, costs, values and zones.
+Future card design uses capability IDs + structured parameters for timing, targets, costs, values and zones.
 
-Example recipe:
+Example:
 
 `trigger.turn_start + search.deck + essence.attach_from_deck + condition.apply + limit.once_per_turn`
 
-Rules:
+No card-name or series-name runtime branch is permitted when the generic vocabulary can express the effect. New capability IDs require proof that existing primitives cannot honestly compose the rule. Missing runtime support is implemented once, generically, and older card data remains backward compatible.
 
-- no card-name runtime branch when generic capabilities can express the effect;
-- no series-name runtime branch;
-- add a new capability ID only when existing capabilities cannot honestly compose the rule;
-- missing runtime support must be implemented once, generically;
-- old card data must remain backward compatible;
-- new sets grow the capability/card library rather than rotating ownership away.
-
-V2-G1E is not complete until a sample future series can be added using this catalog without rewriting old cards or adding series-specific runtime code.
-
-### V2.3.1-011 — Mechanic harvest remains a living research index
+### V2.3.1-011 — Mechanic harvest remains living research
 
 **State:** 🔎 ONGOING BY DESIGN
 
-The catalog is expected to grow as more historical/current card text is studied.
+The catalog grows as individual historical/current cards reveal genuinely reusable rule primitives.
 
-Research additions must follow this order:
+Latest explicit additions include:
 
-1. identify a reusable rule idea;
-2. check whether current generic capability IDs already compose it;
-3. if yes, record the example under existing capabilities;
-4. if no, define the smallest genuinely reusable new capability;
-5. do not implement it in runtime until V2-G1E owner/opcode/schema proof;
-6. never make older Stream Bandit cards invalid merely because the capability library grows.
+- `zone.characteristics_by_zone`;
+- `setup.special_play_eligibility`;
+- `setup.mulligan_eligibility_override`;
+- `form.multi_element`;
+- `form.dynamic_element_change`;
+- `condition.modify_checkup_or_recovery`;
+- `draw.prevent` / `draw.modify_count`;
+- `relic.eligibility_rule` / `relic.expire_at_timing`;
+- `realm.modify_condition_rule`;
+- `random.multi_outcome` / `effect.random_gate` / `choice.simultaneous_reveal`.
 
-This lets future card/series design draw from decades of proven ideas while keeping Stream Bandit's Evergreen ownership promise and generic architecture intact.
+Research additions follow: identify idea → try to compose existing capabilities → add smallest generic primitive only if necessary → defer runtime support until V2-G1E proof.
+
+### V2.3.1-012 — Second exact-head review precision repairs
+
+**State:** ✅ CORRECTED ON BRANCH / RE-REVIEW REQUIRED
+
+The refreshed review after mechanic-harvest work found four further documentation/control issues:
+
+1. `tcg-special-mechanic-rule-matrix-v1.1.md` had become an addendum that omitted V1 capability/renderer/owner details. It is now **self-contained**, preserving the complete V1 matrix plus V1.1 corrections.
+2. damage-counter ordering had later listeners before lethal defeat processing. The contract and master plan now require the **immediate destination defeat boundary after each committed PLACE_DAMAGE/MOVE_DAMAGE operation**.
+3. Signature Power used presentation labels in the machine `action_kinds` field. Machine identifiers are restored to `attack` / `ability`, with Signature Attack / Signature Ability stored separately as display labels.
+4. fixed MOVE_DAMAGE amounts were described like `up to` amounts. Fixed amounts now require the full legal amount; smaller values require explicit `up to` or partial semantics.
+
+No runtime, current registry, Supabase, migration, live page or production game state was changed by these repairs.
