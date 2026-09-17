@@ -210,3 +210,38 @@ Draft runtime-recovery PR opened:
 **Production/live impact:** none.
 
 **Exact next operation:** fetch PR #565 exact-head workflow runs/statuses and prove the repaired trigger fires. If green, mark G0R-11 accepted and update the checklist/ledger before advancing to the already-proven G0R-10 subtype guard.
+
+---
+
+# V2.3.3-007 — G0R-11 accepted and promoted to main
+
+**Reviewed PR:** #565.  
+**Reviewed head:** `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`.  
+**Exact diff:** 1 file, +6 / -0.  
+**Changed file:** `.github/workflows/tcg-card-pass-2-validation.yml`.
+
+Fresh exact-head acceptance evidence:
+
+- TCG Card Pass 2 Validation run **#571 / run 35232546805 — SUCCESS**;
+- `v0.2 deterministic runtime core` job — SUCCESS;
+- `Set One 193-card structure, starter and effect-grammar validation` job — SUCCESS;
+- Tactic interpreter type-check — SUCCESS;
+- Match dispatcher type-check — SUCCESS;
+- Private Alpha setup API type-check — SUCCESS;
+- current PR review threads — **0**;
+- combined legacy commit statuses — **none found** (GitHub Actions workflow evidence above is the active validation evidence);
+- PR mergeability immediately before promotion — `true`;
+- main immediately before merge — `59ab7857522373a53de7d551c66f12c2e514e934`.
+
+**Promotion decision:** **PROMOTE G0R-11 to main ✅**. This is CI/control infrastructure only and does not change runtime gameplay or deployed Supabase state.
+
+PR #565 was marked ready and merged with expected head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`.
+
+**Merge commit / new main:** `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`.
+
+**G0R accepted progress:** **1/11 COMPLETE** — G0R-11 validation workflow coverage accepted.  
+**Runtime/Supabase/live impact:** none.  
+**Code Labs Writer:** not invoked.  
+**CG Repair Lab / Code God:** not invoked.
+
+**Exact next operation:** implement the already-proven **G0R-10 Tactic subtype boundary** against refreshed main `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`, with a deterministic owner-boundary test proving `Ally`/`Device` remain legal and `Relic`/`Realm` are rejected before mutation.
