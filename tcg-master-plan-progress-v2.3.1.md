@@ -59,6 +59,8 @@ Never Ability + Attack 1 + Attack 2 together.
 
 `tcg-v2-card-action-controller-v1.json` points to the corrected self-contained visual contract so the control and rendering authority graph cannot drift back to the superseded header.
 
+The accepted Fairy and Underworld design candidate files remain **content/mechanic sources only**. Their historical nested visual-contract metadata is not renderer authority; all current visual resolution goes through `tcg-card-visual-printing-v1.1.json`.
+
 Future reviewed special families may request a different generic action renderer only through an explicit shared contract; never as a one-card exception.
 
 ---
@@ -110,7 +112,8 @@ The working Stream Bandit names are:
 |---|---|---|
 | historical EX / current ex style | **Ascendant Creature** | normally 2 Rewards; special rule class |
 | GX style | **Sigilborn Creature** | normally 2 Rewards; may carry a Signature Power |
-| TAG TEAM GX style | **Bonded Sigilborn** | bonded identity; normally 3 Rewards; optional extra-cost bonus |
+| generic multi-being identity | **Bonded Creature** | multiple beings represented by one Creature identity; no special Reward/Power implied by the name alone |
+| TAG TEAM GX style | **Bonded Sigilborn** | bonded identity; normally 3 Rewards; may carry a Signature Power and optional extra-cost bonus |
 | V style | **Exalted Creature** | normally 2 Rewards; special rule class |
 | VMAX style | **Colossus Creature** | special evolution; normally 3 Rewards |
 | VSTAR style | **Starforged Creature** | special evolution; normally 2 Rewards; may carry a Signature Power |
@@ -126,7 +129,7 @@ The working Stream Bandit names are:
 
 The shared once-per-match special action remains **Signature Power**. Machine action kinds remain the ordinary stable identifiers `attack` and `ability`; the player-facing labels are **Signature Attack** and **Signature Ability**.
 
-These are presentation/family labels, **not separate engines**. Runtime continues to compose generic capabilities such as `reward_value`, rule tags, evolution parent, shared match receipts, assembly recipe, inheritance, deck-group limits, zone replacement, position rules and ordinary Attack/Ability/effect opcodes.
+These are presentation/family labels, **not separate engines**. Machine definitions must compose exact capability IDs from `tcg-generic-mechanic-capabilities-v1.json`, such as `reward.value_override`, `tag.special_class`, `evolution.special_parent`, `signature.once_per_match_power`, `assembly.multi_component_creature`, `deck.shared_group_limit`, `zone.replacement` and the ordinary Attack/Ability/effect grammar. Descriptive family traits are not a second capability-ID vocabulary.
 
 ---
 
@@ -160,6 +163,19 @@ When a card/Ability/Attack says to place damage counters:
 10. counters visibly land on target cards;
 11. **the destination defeat check runs immediately after the committed placement operation before later listeners, follow-up target selection or effects may act on that destination.**
 
+### 5.2a Grouped multi-target placement
+
+For canonical grouped placement such as `PLACE_DAMAGE_MULTI`:
+
+1. validate the complete target set, distinct-target rule and amounts as one effect;
+2. commit all validated placements as **one atomic grouped operation**;
+3. do not run listeners or allow follow-up targeting between individual target placements;
+4. immediately run a **batch defeat scan across every affected destination** after the grouped placements commit;
+5. remove/process every Creature made lethal by the grouped operation before any later listener, follow-up target selection or effect resumes;
+6. then continue Reward/forced-promotion/resume processing in canonical order.
+
+This keeps one multi-target effect coherent without allowing later logic to act on a Creature the grouped operation has already defeated.
+
 ### 5.3 Moving existing damage counters
 
 When an effect says to move damage counters:
@@ -184,9 +200,9 @@ If an Attack requires counter placement/movement, that interaction resolves **be
 1. validate/pay Attack;
 2. resolve ordinary printed Attack effects and ordinary damage using their canonical operation boundaries;
 3. resolve each required damage-counter placement/movement choice with its exact fixed/up-to amount semantics;
-4. commit that counter operation atomically;
-5. run the destination defeat boundary **immediately** after that operation;
-6. only then resolve later listeners, Conditions, follow-up targets or effects that remain legal after the defeated object has left play;
+4. commit either the single-target counter operation or complete grouped placement operation atomically;
+5. run the single-destination or grouped batch defeat boundary **immediately** after that operation;
+6. only then resolve later listeners, Conditions, follow-up targets or effects that remain legal after defeated objects have left play;
 7. resolve remaining Reward, forced-promotion and Aftermath consequences in the canonical resume order;
 8. enter the turn-transition checkpoint;
 9. begin the next player's ordinary play.
@@ -210,6 +226,7 @@ The engine distinguishes:
 
 - ordinary Attack/effect damage;
 - place damage counters;
+- grouped multi-target placement;
 - move damage counters;
 - turn-transition Condition counter placement.
 
@@ -244,7 +261,8 @@ The canonical inheritance chain now explicitly covers every accepted decision ma
 - active Ability normally once during your turn unless structured data says otherwise;
 - attack resolves fully then automatically ends turn;
 - interactive damage-counter placement/movement before attack handoff;
-- immediate defeat boundary after each committed damage-counter operation;
+- immediate defeat boundary after each committed single-target damage-counter operation;
+- atomic grouped placement followed by immediate batch defeat boundary;
 - fixed vs up-to counter precision semantics;
 - turn-transition Condition damage counters;
 - search/private-choice overlays preserving board context;
@@ -254,7 +272,7 @@ The canonical inheritance chain now explicitly covers every accepted decision ma
 - primary all-cards Evergreen format with no age-based rotation;
 - ownership/printing history preserved across future series;
 - future cards, attacks, Abilities, special forms/classes, elements, series, decks, booster packs, rarities, printings, alternate art, collectible coins/accessories and event formats remain data-driven;
-- researched external special-card families use original Stream Bandit working names;
+- researched external special-card families use original Stream Bandit working names including the generic Bonded Creature and narrower Bonded Sigilborn families;
 - stable machine action-kind identifiers remain separate from player-facing special-action labels;
 - global ordinary Vulnerability remains owned by the matchup snapshot; exceptional Resistance/overrides remain explicit structured data;
 - special rules split between visible card-facing data and global server-enforced family rules;
