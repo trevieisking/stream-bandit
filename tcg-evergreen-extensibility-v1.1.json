@@ -1,0 +1,36 @@
+{
+  "schema": "stream-bandit-tcg-evergreen-extensibility-v1.1",
+  "recorded_at": "2026-09-17",
+  "inherits": "tcg-evergreen-extensibility-v1.json",
+  "purpose": "Add the post-test damage-affinity capability while preserving the V2.3 evergreen/extensibility contract.",
+  "primary_format_policy": "unchanged_from_v1",
+  "content_extension_policy": "unchanged_from_v1",
+  "special_mechanic_policy": "unchanged_from_v1",
+  "added_required_rule_capabilities": [
+    "damage_affinity_modifier"
+  ],
+  "damage_affinity_modifier": {
+    "working_player_labels": {
+      "amplification": "Vulnerability",
+      "reduction_or_prevention": "Resistance"
+    },
+    "match_source_by": ["element", "type", "rule_tag"],
+    "allowed_declared_modes": ["add", "subtract", "multiply", "prevent"],
+    "must_declare_value_or_formula": true,
+    "must_declare_damage_ordering": true,
+    "server_authoritative": true,
+    "browser_only_damage_math_forbidden": true,
+    "card_marker_required_when_active": true,
+    "accessible_text_required": true,
+    "rarity_does_not_imply_affinity": true,
+    "printing_finish_does_not_imply_affinity": true,
+    "special_class_does_not_imply_affinity": true,
+    "set_one_values_change_only_by_explicit_structured_card_data": true
+  },
+  "architecture": {
+    "owner_family_baseline": 40,
+    "prefer_existing_damage_and_effect_owners": true,
+    "no_new_owner_without_new_state_transition_proof": true,
+    "backward_compatibility_is_required": true
+  }
+}
