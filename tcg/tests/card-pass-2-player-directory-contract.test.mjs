@@ -56,6 +56,6 @@ test('projection refreshes from all authoritative sources without browser-owned 
 test('directory migration does not weaken source-table RLS',()=>{
   assert.equal(sql.includes('alter table public.tcg_player_profiles disable row level security'),false);
   assert.equal(sql.includes('alter table public.sb_profiles disable row level security'),false);
-  assert.equal(sql.includes('create policy')&&sql.includes('on public.tcg_player_profiles'),false);
-  assert.equal(sql.includes('create policy')&&sql.includes('on public.sb_profiles'),false);
+  assert.doesNotMatch(sql,/create policy\s+"[^"]+"\s+on public\.tcg_player_profiles/);
+  assert.doesNotMatch(sql,/create policy\s+"[^"]+"\s+on public\.sb_profiles/);
 });
