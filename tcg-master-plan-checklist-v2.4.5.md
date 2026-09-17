@@ -32,6 +32,18 @@
 - [ ] **DIRECTORY-SEC-CI-03** Functional Smoke succeeds at the repaired head, including PostgreSQL replay.
 - [ ] **DIRECTORY-SEC-REVIEW-01** Review threads remain zero or all material findings are resolved at the exact repaired head.
 
+### C.1 Non-final gate-attempt evidence
+
+Head `d6acd30936a4ecd580e53b408619568779f54589` exposed one regression-test false positive: the source-table RLS test matched unrelated `create policy` and source-table references in different parts of the migration. The migration itself was unchanged after that finding.
+
+Head `3b486fc59e39a71ad8942f642ce8d55e312ae646` corrected only that assertion (`tcg/tests/card-pass-2-player-directory-contract.test.mjs`, +2/-2):
+
+- TCG Card Pass 2 Validation #634 — SUCCESS;
+- Functional Smoke #830 — SUCCESS, including its zero-to-current PostgreSQL replay;
+- standalone Migration Replay #804 — CANCELLED before any job was created and therefore **not accepted as evidence**.
+
+These successes prove the repaired static contract and execute the unchanged migration from zero, but this checklist remains fail-closed until a fresh exact-head standalone Migration Replay also succeeds. This continuity-only checklist update intentionally creates a clean synchronization event after the prior workflow queue is empty; it does not change Directory migration/runtime behavior.
+
 ## D. Production deployment gates
 
 - [ ] **DIRECTORY-DEPLOY-01** Refresh immutable GitHub/Supabase evidence immediately before DDL.
@@ -50,4 +62,4 @@
 - [ ] Social write actions and notifications.
 - [ ] All inherited V2.4.1 gameplay/visual/end-to-end release gates.
 
-**Current decision:** repair source now; production deployment must wait for the repaired exact-head gates.
+**Current decision:** repaired source is proven by TCG + Functional Smoke, but production deployment remains blocked until the fresh exact-head standalone Migration Replay and review fence both pass.
