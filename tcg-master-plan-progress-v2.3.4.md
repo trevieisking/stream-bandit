@@ -9,7 +9,7 @@
 
 ## Non-negotiable authority
 
-The original playable prototype remains the player-experience source of truth: **RESTORE, DO NOT REDESIGN**. The established 40-owner server architecture remains the gameplay authority. No debug-form redesign, card-specific helper, duplicate owner or owner #41 is authorized by this checkpoint.
+The original playable prototype remains the **in-match player-interaction** source of truth: **RESTORE, DO NOT REDESIGN THE CARD TABLE**. The established 40-owner server architecture remains the gameplay authority. No debug-form redesign, card-specific helper, duplicate owner or owner #41 is authorized by this checkpoint.
 
 The browser interaction rule is explicit: **the card is the player control; the relevant canonical engine is the authority for the action initiated by that card.** Card tap/select/drag operations produce structured intents. The card/browser does not decide legality, costs, targets, damage, timing, listeners, state transitions, defeat resolution or Aftermath. Those rules remain owned by the canonical server engines. The browser renders authoritative returned state. A second browser rules engine is forbidden.
 
@@ -54,7 +54,7 @@ This checkpoint proves the player-control and transport boundary only. It does *
 
 - PR #569: `TCG V2: restore card-face attack control foundation`.
 - exact reviewed head: `ba1f5ef61439d24a4e91ae96272a5d046ae9d80c`.
-- merge/current implementation checkpoint: `e59ee73443ed085b04175a2339b2eac3f8f8d818`.
+- merge/current implementation checkpoint at acceptance: `e59ee73443ed085b04175a2339b2eac3f8f8d818`.
 - TCG Card Pass 2 Validation #608 / run `35241870575`: SUCCESS.
 - exact diff: 3 additive files / no deletions.
 - review threads: 0; combined legacy statuses: 0.
@@ -89,12 +89,26 @@ If this proof fails, repair the **exact failed seam or authoritative owner**. Do
 
 Until this gate passes: **Attack gameplay = HOLD / NOT COMPLETE**.
 
+### V2-ATTACK-00A — Authoritative commit rejection visibility: COMPLETE IN SOURCE ✅
+
+PR #570 removed one proven silent-failure path before the full two-user Attack proof:
+- reviewed head `f013637d5d6684117441deeb8a2057fab95f7454`;
+- TCG Card Pass 2 Validation #614 / run `35243998846`: SUCCESS;
+- exact diff: 2 files / +37 / -2; zero review threads;
+- source main after merge: `d331e93f75e8c5ce6345ac030651f44c37f78866`;
+- `tcg_server_commit_state` may return an authoritative logical rejection nested under an HTTP-200 Edge envelope;
+- the V2 controller now recognizes nested `result.ok === false`, shows the authoritative rejection reason and re-syncs the board instead of treating an unchanged state as success;
+- no Attack legality, damage, payment, target, RNG, listener or Aftermath logic moved into the browser;
+- no Edge Function, migration, database, Supabase or live deployment was changed by this source repair.
+
+This improves failure visibility but **does not complete V2-ATTACK-01**.
+
 ## V2 presentation audio — REQUIRED FOR RELEASE 🔊
 
 Background music and sound effects are mandatory release requirements. They are presentation systems, not gameplay-rule owners and do not create owner #41.
 
 ### Required audio behaviour
-- battle background music is present in the playable release;
+- game/menu and battle background music is present where appropriate in the playable release;
 - appropriate UI/gameplay SFX are present for material player-visible events, including card select/play, Attack declaration/impact, damage, Shield, heal, Ability, Evolution, Essence attachment, Tactic/Relic/Realm use, Reward, turn change, victory/defeat and rejected action feedback where appropriate;
 - music and SFX have user-accessible mute/unmute controls;
 - music and SFX volume are independently controllable where practical;
@@ -104,19 +118,97 @@ Background music and sound effects are mandatory release requirements. They are 
 - audio assets must be original to Stream Bandit, licensed for use, or otherwise rights-cleared;
 - reduced-motion/accessibility paths remain usable without relying on sound alone.
 
-**V2-AUDIO-01 status:** REQUIRED / PENDING. It need not block the immediate Attack repair/proof slice, but it **must pass before public/live release**.
+**V2-AUDIO-01 status:** REQUIRED / PENDING. It need not block the immediate route-shell/Attack proof slices, but it **must pass before public/live release**.
 
-## Exact next operation
+---
 
-1. refresh exact implementation `main` from `e59ee73443ed085b04175a2339b2eac3f8f8d818`;
-2. prove **V2-ATTACK-01** before expanding the action surface: reproduce a simple legal card-initiated Attack through the real V2 client/server contract and current structured card data;
-3. if the real path fails, identify the exact first failing seam (card definition → client intent → deployed/source dispatcher → owner validation → atomic commit → authoritative view refresh) and repair only that owner/integration boundary;
-4. require the successful proof to show damage/effect, Aftermath/turn progression and synchronized visible board state—not merely a 200 response or passing type-check;
-5. once Attack is genuinely accepted, extend the same card-as-control / engine-authoritative contract to **active Ability** using the generic `use_ability` route with board position (`where`, `index`);
-6. then implement reusable hand-card physical controls in bounded slices: Creature placement → Evolution target highlight/drop → Essence attachment → Relic → Realm → Ally/Device Tactic;
-7. keep drag/drop and tap/select accessibility paths equivalent; illegal or rejected intents return to authoritative board state with a visible reason;
-8. add V2-AUDIO-01 background music/SFX system before public/live release and gate release on working mute/volume/accessibility behaviour;
-9. require exact-head validation/review before each source merge and update plan/checklist/ledger/release index after every accepted slice;
-10. keep Supabase/live deployment separate from source implementation until a real two-user V2 end-to-end fence is ready.
+## Release product screen architecture — LOCKED 🎮
 
-G0R-10 remains explicitly queued and cannot be silently skipped before any live/public promotion that uses `play_tactic`.
+### Clarification: one-screen battle, not one-page product
+
+The original prototype's all-in-one page was acceptable as a prototype harness. It is **not** the release product architecture.
+
+`RESTORE, DO NOT REDESIGN` applies to the **active match/card-table interaction model**: direct cards, board visibility, drag/drop or tap/select equivalents, and engine-authoritative outcomes. It does not require the real game to keep prototype navigation, authentication, deck tools, matchmaking and the battlefield on one page.
+
+The release product must feel like a sequence of game screens with one clear responsibility each:
+
+1. **Landing / Account** — signed-out entry, Sign In, Create Account; signed-in state offers Continue/Enter Game and Sign Out.
+2. **Game Home / Main Menu** — Play, Collection, Deck Builder, Packs, Learn/Card Viewer, Progress/Season/Profile/Settings as separate destinations.
+3. **Play / Mode Select** — Ranked is a dedicated choice; future Casual/Private/Friends/Practice may exist as separate modes without contaminating Ranked.
+4. **Ranked** — deck selection/readiness where required plus one clear **Play** action.
+5. **Matchmaking** — searching/queue state only, with safe cancel/leave behaviour.
+6. **Opponent Found / Paired / Loading** — short transition that binds the authoritative `match_id` and prepares the board route.
+7. **Active Match** — **board-only game screen**. No global site/menu/dashboard/debug shell around the battlefield. Only match-safe HUD/settings such as turn/phase, mute/audio, accessibility and concede/leave controls may appear.
+8. **Match Result** — victory/defeat/rewards/result presentation with clean navigation back to Ranked, Play or Game Home.
+
+Collection, Deck Builder, Packs and other non-match systems remain their own screens/routes/modules. They may share visual components and authenticated state, but they do not render inside the active battlefield.
+
+### V2-SHELL-01 — Route-separated release game shell: REQUIRED / PENDING 🔒
+
+Acceptance requires:
+- landing/auth is separate from the signed-in game home;
+- game menu/product areas are separate from active match;
+- entering an active match leaves the menu shell and opens a board-only route;
+- direct URL/refresh on a match route can restore authenticated match context safely;
+- end-of-match returns through a result screen rather than dropping into a prototype/debug surface;
+- desktop and mobile/touch navigation remain usable;
+- shared auth/session state persists across screens without duplicating gameplay rules;
+- no new backend merely to achieve page separation; existing Stream Bandit auth/Supabase infrastructure is reused.
+
+### V2-MM-01 — Ranked automatic matchmaking: REQUIRED / PENDING 🔒
+
+The required Ranked player journey is:
+
+**Ranked → Play → Matchmaking → Opponent Found/Paired → Board**
+
+Ranked must not expose copy/paste pairing codes, room codes or manual join-code entry.
+
+Existing automatic matchmaking is the server authority and must be reused/adapted rather than replaced:
+- `tcg-private-alpha-api` owns the current `matchmake`, `leave_matchmaking`, `claim_room_match` and match-view/setup boundary;
+- `tcg-match-actions` owns authoritative in-match actions;
+- `tcg-tactic-actions` retains its dedicated Tactic action ownership;
+- existing database/RPC matchmaking owns queue serialization, validated deck admission and pair creation.
+
+An internal `join_code` may remain as opaque schema compatibility data if the existing room model requires it. **It is not player-facing Ranked UX and must never be displayed, copied, typed or required in Ranked.** Existing private-room/join-code capability may remain available for a future Friends/Private mode and must not be broken by Ranked work.
+
+V2-MM-01 acceptance requires two independently signed-in users to:
+1. select Ranked and press Play;
+2. enter the automatic queue through the existing matchmaking API;
+3. see a clear searching state and be able to cancel safely before pairing;
+4. be paired by the server without exchanging any code;
+5. resolve to the same authoritative match with opposite seats;
+6. see an opponent-found/paired transition;
+7. enter the board-only match route with the authoritative `match_id`;
+8. survive refresh/rejoin without creating a duplicate match or leaking opponent hidden information;
+9. leave/timeout safely according to server state;
+10. keep Private/Friends code flows separate from Ranked.
+
+### Existing Edge Function reuse — LOCKED
+
+The release client must **adapt and reuse the existing TCG Edge Functions**. Do not create a parallel TCG backend merely because the UI is split into screens.
+
+- `tcg-private-alpha-api` remains the setup/account/deck/matchmaking/match-view orchestration boundary and may be edited/versioned where the release journey proves a required contract change.
+- `tcg-match-actions` remains the match-action dispatcher and may be corrected where an exact authoritative gameplay seam is proven.
+- `tcg-tactic-actions` remains the Tactic action boundary and may be corrected where its exact owner contract requires it.
+- shared 40-owner engines remain the rules authority behind those functions.
+- page routing is presentation/orchestration; it does not create gameplay owner #41.
+
+Edge Function changes require the same rule as engine changes: **prove the exact deficiency first, then edit the existing function in place and preserve working contracts.**
+
+## Superseding exact next operation
+
+This section supersedes the earlier V2.3.4 `Exact next operation` ordering without erasing its requirements.
+
+1. Use accepted implementation main `d331e93f75e8c5ce6345ac030651f44c37f78866` (PR #570) as the current source baseline.
+2. Inventory current landing/auth, game-menu, TCG/product, matchmaking and battle pages/controllers before creating new files; reuse working screens/components where practical.
+3. Implement **V2-SHELL-01** as a bounded release-shell slice: Landing/Auth → Game Home → Play/Ranked → Matchmaking → Paired → board-only Match → Result.
+4. Implement **V2-MM-01** on that shell using the existing `tcg-private-alpha-api` automatic matchmaking actions/RPCs. Do not expose join codes in Ranked and do not break future Private/Friends code flows.
+5. Keep the board's original prototype interaction authority intact inside the board-only route: cards initiate structured intents and canonical engines resolve them.
+6. Use the resulting real two-user Ranked→Board journey to complete **V2-ATTACK-01**. A 200 response or unit test is insufficient; both players must visibly receive the same committed Attack result and turn progression.
+7. If Attack fails, identify the first exact failing card-data/client/Edge/engine/commit/view seam before coding and repair only that authoritative boundary.
+8. After Attack acceptance, extend the same card-as-control contract to active Ability, then Creature placement → Evolution → Essence → Relic → Realm → Ally/Device Tactic.
+9. Complete **V2-AUDIO-01** background music/SFX and mute/volume/accessibility controls before public/live release.
+10. Require exact-head validation/review after every bounded source slice and keep plan/checklist/ledger/release index synchronized.
+11. Keep Supabase deployment/live promotion separate until the complete real two-user release journey passes; G0R-10 remains queued and cannot be skipped before any live path using `play_tactic`.
+
+**Release UX definition:** the game is not accepted as release-ready merely because a prototype page can perform actions. A player must be able to enter through the real game screens, automatically find an opponent in Ranked, transition into a clean board-only match, play through the authoritative card-table interaction model, see synchronized outcomes, and leave through a result screen without encountering debug/prototype controls or manual pairing codes.
