@@ -22,9 +22,9 @@
 - [x] **V2.4-C02** Read the canonical V2.3 plan and V2.3 ledger that actually exist on current `main`.
 - [x] **V2.4-C03** Treat unmerged/stale PR #564 as research/planning evidence only, not as current-main authority.
 - [x] **V2.4-C04** Record that later PR descriptions referenced V2.3.3/V2.3.4 control filenames that are not present on current `main`; V2.4 normalizes continuity against files that are actually committed to `main`.
-- [ ] **V2.4-C05** V2.4 Master Plan written and cross-checked against this checklist.
-- [ ] **V2.4-C06** V2.4 Execution Ledger written and cross-checked against this checklist.
-- [ ] **V2.4-C07** Three-way Master Plan ↔ Ledger ↔ Checklist consistency check complete.
+- [x] **V2.4-C05** V2.4 Master Plan written and cross-checked against this checklist.
+- [x] **V2.4-C06** V2.4 Execution Ledger written and cross-checked against this checklist.
+- [x] **V2.4-C07** Three-way Master Plan ↔ Ledger ↔ Checklist consistency check complete.
 
 ---
 
