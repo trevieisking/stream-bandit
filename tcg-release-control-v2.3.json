@@ -1,7 +1,7 @@
 {
   "schema": "stream-bandit-tcg-release-control-v2.3",
   "recorded_at": "2026-09-17",
-  "status": "active_v2_prototype_restoration_control",
+  "status": "active_v2_release_shell_and_prototype_restoration_control",
   "repository": "trevieisking/stream-bandit",
   "authority": {
     "desired_behavior": "tcg-master-plan-progress-v2.3.4.md",
@@ -12,10 +12,13 @@
     "deck_search_integrity": "tcg-deck-search-integrity-v1.json",
     "repository_truth": "GitHub exact PR/branch/commit/workflow/review evidence",
     "live_truth": "Supabase deployed function/database state",
-    "player_experience_truth": "original playable Stream Bandit prototype"
+    "player_experience_truth": "original playable Stream Bandit prototype for in-match card-table interaction plus route-separated release game shell"
   },
   "architecture": {
-    "restore_do_not_redesign": true,
+    "restore_do_not_redesign_battle_table": true,
+    "prototype_all_in_one_product_shell_is_release_authority": false,
+    "release_product_uses_separate_game_screens": true,
+    "active_match_is_board_only_route": true,
     "owner_family_baseline": 40,
     "new_owner_for_ui_or_single_card_allowed": false,
     "new_owner_for_audio_presentation_allowed": false,
@@ -23,17 +26,19 @@
     "browser_rules_engine_duplicate_allowed": false,
     "card_is_primary_player_control": true,
     "card_is_rules_authority": false,
-    "card_action_rule": "card initiates structured intent; relevant canonical engine validates and resolves the action"
+    "card_action_rule": "card initiates structured intent; relevant canonical engine validates and resolves the action",
+    "reuse_existing_tcg_edge_functions": true,
+    "parallel_matchmaking_backend_allowed": false
   },
   "accepted_main": {
-    "sha": "e59ee73443ed085b04175a2339b2eac3f8f8d818",
+    "sha": "d331e93f75e8c5ce6345ac030651f44c37f78866",
     "accepted_g0r_source_repairs": 4,
     "complete_repairs": ["G0R-11", "G0R-07", "G0R-08", "G0R-09"],
-    "last_accepted_repair": "G0R-09 private-room Ready concurrency",
-    "last_accepted_v2_slice": "V2-UI-01 card-face Attack intent/control foundation",
-    "last_accepted_v2_pr": 569,
-    "last_accepted_v2_reviewed_head": "ba1f5ef61439d24a4e91ae96272a5d046ae9d80c",
-    "last_accepted_v2_validation_run": 35241870575
+    "last_accepted_repair": "V2-ATTACK-00A authoritative commit rejection visibility",
+    "last_accepted_v2_slice": "V2-UI-01 card-face Attack intent/control foundation plus V2-ATTACK-00A rejection-envelope hardening",
+    "last_accepted_v2_pr": 570,
+    "last_accepted_v2_reviewed_head": "f013637d5d6684117441deeb8a2057fab95f7454",
+    "last_accepted_v2_validation_run": 35243998846
   },
   "g0r": {
     "classification": "historical_private_alpha_hardening_and_reused_boundary_debt",
@@ -63,8 +68,22 @@
       "supabase_deployment_state": "HOLD_NOT_DEPLOYED"
     }
   },
+  "edge_function_reuse": {
+    "policy": "adapt existing TCG Edge Functions in place only when a release contract deficiency is proven; do not create a parallel TCG backend",
+    "tcg_private_alpha_api": {
+      "role": "setup_account_deck_matchmaking_match_view_orchestration",
+      "existing_ranked_actions": ["matchmake", "leave_matchmaking", "claim_room_match", "match_view", "match_state"]
+    },
+    "tcg_match_actions": {
+      "role": "authoritative_in_match_action_dispatcher_backed_by_canonical_owners"
+    },
+    "tcg_tactic_actions": {
+      "role": "dedicated_tactic_action_boundary"
+    }
+  },
   "prototype_restoration": {
     "state": "IN_PROGRESS",
+    "scope": "active match/card-table interaction; not prototype all-in-one navigation shell",
     "v2_ui_01": {
       "name": "card-face Attack intent/control foundation",
       "source_state": "COMPLETE",
@@ -79,6 +98,19 @@
       "legacy_t_html_changed": false,
       "supabase_changed": false,
       "rule": "active Creature card submits generic Attack intent; canonical engine remains authoritative"
+    },
+    "v2_attack_00a": {
+      "name": "authoritative commit rejection visibility",
+      "source_state": "COMPLETE",
+      "pr": 570,
+      "reviewed_head": "f013637d5d6684117441deeb8a2057fab95f7454",
+      "merge_sha": "d331e93f75e8c5ce6345ac030651f44c37f78866",
+      "validation_run": 35243998846,
+      "validation_conclusion": "success",
+      "changed_files": 2,
+      "rule": "nested authoritative result.ok=false is treated as rejection, reason is shown and board is re-synced; browser does not gain Attack rule authority",
+      "supabase_changed": false,
+      "gameplay_attack_complete": false
     },
     "v2_attack_01": {
       "name": "real playable Attack engine path",
@@ -103,13 +135,64 @@
       "completion_state": "NOT_COMPLETE"
     }
   },
+  "release_shell": {
+    "id": "V2-SHELL-01",
+    "state": "REQUIRED_PENDING",
+    "prototype_all_in_one_shell_allowed_for_release": false,
+    "active_match_board_only": true,
+    "screen_sequence": [
+      "landing_account",
+      "game_home",
+      "play_mode_select",
+      "ranked",
+      "matchmaking",
+      "opponent_found_paired_loading",
+      "board_only_active_match",
+      "match_result"
+    ],
+    "separate_product_areas": [
+      "collection",
+      "deck_builder",
+      "packs",
+      "learn_card_viewer",
+      "progress_season",
+      "profile_settings"
+    ],
+    "match_safe_hud_may_include": ["turn_phase", "audio", "accessibility", "concede_leave"],
+    "must_preserve_auth_session_across_routes": true,
+    "must_support_direct_match_refresh_rejoin": true,
+    "may_create_duplicate_gameplay_owner": false
+  },
+  "ranked_matchmaking": {
+    "id": "V2-MM-01",
+    "state": "REQUIRED_PENDING",
+    "player_journey": ["ranked", "play", "matchmaking", "opponent_found_paired", "board"],
+    "automatic_pairing_required": true,
+    "player_facing_join_or_pair_code_allowed": false,
+    "internal_join_code_may_remain_for_schema_compatibility": true,
+    "private_friend_code_flow_must_remain_separate": true,
+    "reuse_existing_matchmaking_api": true,
+    "required_proof": [
+      "two_independent_signed_in_users_enter_ranked_and_press_play",
+      "server_validates_deck_and_queues_both_users",
+      "searching_state_and_safe_cancel_work",
+      "server_pairs_users_without_code_exchange",
+      "both_users_resolve_same_match_with_opposite_seats",
+      "paired_transition_precedes_board",
+      "board_route_receives_authoritative_match_id",
+      "refresh_rejoin_does_not_duplicate_match",
+      "timeout_leave_state_is_safe",
+      "opponent_hidden_information_remains_protected"
+    ]
+  },
   "audio_release_requirement": {
     "id": "V2-AUDIO-01",
     "state": "REQUIRED_PENDING",
     "public_live_release_blocker": true,
     "gameplay_owner": false,
     "creates_owner_41": false,
-    "background_music_required": true,
+    "game_or_menu_background_music_required_where_appropriate": true,
+    "battle_background_music_required": true,
     "gameplay_and_ui_sfx_required": true,
     "required_controls": ["mute_unmute", "music_volume", "sfx_volume"],
     "respect_browser_autoplay_policy": true,
@@ -141,8 +224,19 @@
     "runtime_proof_pending": true
   },
   "next_operation": {
-    "primary": "prove V2-ATTACK-01 on exact main e59ee73443ed085b04175a2339b2eac3f8f8d818 before adding active Ability control",
-    "on_failure": "identify exact first failing seam and repair only canonical owner or integration boundary with deterministic regression proof",
+    "primary": "inventory existing auth/menu/TCG/matchmaking/battle pages at exact main d331e93f75e8c5ce6345ac030651f44c37f78866, then implement V2-SHELL-01 and V2-MM-01 as bounded source slices using existing TCG Edge Functions",
+    "screen_order": [
+      "landing_account",
+      "game_home",
+      "play_ranked",
+      "matchmaking",
+      "paired_loading",
+      "board_only_match",
+      "match_result"
+    ],
+    "ranked_rule": "automatic matchmaking only; no player-facing join/pair codes",
+    "after_shell_and_matchmaking": "use the real two-user Ranked-to-board journey to prove V2-ATTACK-01",
+    "on_attack_failure": "identify exact first failing seam and repair only canonical owner or integration boundary with deterministic regression proof",
     "after_attack": [
       "active_ability_card_control",
       "creature_placement_card_control",
@@ -152,10 +246,13 @@
       "realm_card_control",
       "ally_device_tactic_card_control"
     ],
-    "before_public_live": ["V2-AUDIO-01", "G0R-10 if play_tactic path is used", "real_two_user_v2_end_to_end_fence"]
+    "before_public_live": ["V2-AUDIO-01", "G0R-10 if play_tactic path is used", "real_two_user_route_separated_v2_end_to_end_fence"]
   },
   "promotion_state": {
     "v2_ui_01_source_merge": "PROMOTE_COMPLETE",
+    "v2_attack_00a_source_merge": "PROMOTE_COMPLETE",
+    "v2_shell_01": "HOLD_PENDING_IMPLEMENTATION",
+    "v2_mm_01": "HOLD_PENDING_IMPLEMENTATION",
     "v2_attack_01": "HOLD",
     "v2_audio_01": "HOLD_PENDING_IMPLEMENTATION",
     "main_source_checkpoint": "ACCEPTED",
