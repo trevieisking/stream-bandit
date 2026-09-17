@@ -54,6 +54,14 @@ test('V2 attack controller does not implement card-specific gameplay branches', 
   assert.ok(contract.forbidden_client_patterns.includes('duplicate_browser_rules_engine'));
 });
 
+test('V2 browser targeting is card/board based, never prompt or confirm based', () => {
+  assert.doesNotThrow(() => new Function(controller));
+  assert.doesNotMatch(controller, /\bprompt\s*\(/);
+  assert.doesNotMatch(controller, /\bconfirm\s*\(/);
+  assert.doesNotMatch(controller, /Math\.random\s*\(/);
+  assert.ok(contract.forbidden_client_patterns.includes('browser_prompt_for_gameplay_targeting'));
+});
+
 test('card selection is presentation-only and attack slots come from structured card data', () => {
   assert.match(controller, /data-card-anchor/);
   assert.match(controller, /data-card-intent="attack"/);
