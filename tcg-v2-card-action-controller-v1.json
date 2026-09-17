@@ -1,11 +1,11 @@
 {
   "schema": "stream-bandit-tcg-v2-card-action-controller-v1",
-  "recorded_at": "2026-09-16",
+  "recorded_at": "2026-09-17",
   "status": "v2_g1_candidate",
   "purpose": "Exact player-control binding for the 22 accepted Fairy and Underworld Creature designs. The real card face is the battle control surface; server owners remain authoritative.",
   "authority": {
     "battle_interaction": "tcg-battle-client-interaction-v1.json",
-    "card_visual": "tcg-card-visual-printing-v1.json",
+    "card_visual": "tcg-card-visual-printing-v1.1.json",
     "fairy_design": "tcg-fairy-glimmerwish-v2-candidate.json",
     "underworld_design": "tcg-underworld-grave-pact-v2-candidate.json",
     "card_schema": "sb-tcg-card-v0.2",
@@ -24,7 +24,8 @@
     "withdraw_client_action": "withdraw",
     "attack_slot_values": [1, 2],
     "withdraw_source": "selected_vanguard_card",
-    "reserve_ability_source_allowed": true
+    "reserve_ability_source_allowed": true,
+    "visual_header_rule": "Do not invent a generic Creature play/evolution Cost; render only structured header properties from tcg-card-visual-printing-v1.1.json."
   },
   "server_bindings": {
     "attack": {"action":"attack","body_fields":["attack_slot"],"source":"selected Vanguard card","definition_path":"creature.attacks[attack_slot-1]"},
@@ -43,7 +44,6 @@
     {"id":"fairy-silkray","element":"Fairy","name":"Silkray","rarity":"Rare","hp_label":"HP","hp":130,"withdraw_label":"Withdraw Cost","withdraw_cost":0,"action_shape":"Ability + Attack 1","ability":{"name":"Ribbon Current","activation":"triggered","client_action":null},"attacks":[{"slot":1,"label":"Attack 1","name":"Silk Slice","cost_label":"Attack Cost","cost":[{"element":"Fairy","amount":2}],"damage_label":"Damage","damage":60,"client_action":"attack"}]},
     {"id":"fairy-prismoth","element":"Fairy","name":"Prismoth","rarity":"Extra Rare","hp_label":"HP","hp":120,"withdraw_label":"Withdraw Cost","withdraw_cost":0,"action_shape":"Attack 1 + Attack 2","ability":null,"attacks":[{"slot":1,"label":"Attack 1","name":"Mirror Wing","cost_label":"Attack Cost","cost":[{"element":"Fairy","amount":1}],"damage_label":"Damage","damage":30,"client_action":"attack"},{"slot":2,"label":"Attack 2","name":"Gleam Scatter","cost_label":"Attack Cost","cost":[{"element":"Fairy","amount":2}],"damage_label":"Damage","damage":60,"client_action":"attack"}]},
     {"id":"fairy-luminara","element":"Fairy","name":"Luminara","rarity":"Extra Rare","hp_label":"HP","hp":250,"withdraw_label":"Withdraw Cost","withdraw_cost":1,"action_shape":"Ability + Attack 1","ability":{"name":"Prismatic Burden","activation":"active","client_action":"use_ability"},"attacks":[{"slot":1,"label":"Attack 1","name":"Grace Reversal","cost_label":"Attack Cost","cost":[{"element":"Fairy","amount":3}],"damage_label":"Damage","damage":100,"client_action":"attack"}]},
-
     {"id":"underworld-grimling","element":"Underworld","name":"Grimling","rarity":"Basic","hp_label":"HP","hp":70,"withdraw_label":"Withdraw Cost","withdraw_cost":1,"action_shape":"Ability + Attack 1","ability":{"name":"Little Siphon","activation":"active","client_action":"use_ability"},"attacks":[{"slot":1,"label":"Attack 1","name":"Bone Nip","cost_label":"Attack Cost","cost":[{"element":"Underworld","amount":1}],"damage_label":"Damage","damage":20,"client_action":"attack"}]},
     {"id":"underworld-cryptjaw","element":"Underworld","name":"Cryptjaw","rarity":"Rare","hp_label":"HP","hp":150,"withdraw_label":"Withdraw Cost","withdraw_cost":1,"action_shape":"Ability + Attack 1","ability":{"name":"Blood Interest","activation":"triggered","client_action":null},"attacks":[{"slot":1,"label":"Attack 1","name":"Shadow Bite","cost_label":"Attack Cost","cost":[{"element":"Underworld","amount":2},{"element":"Any","amount":1}],"damage_label":"Damage","damage":70,"client_action":"attack"}]},
     {"id":"underworld-debtbound-sovereign","element":"Underworld","name":"Debtbound Sovereign","rarity":"Mythic","hp_label":"HP","hp":370,"withdraw_label":"Withdraw Cost","withdraw_cost":3,"action_shape":"Ability + Attack 1","ability":{"name":"Sovereign Debt","activation":"active","client_action":"use_ability"},"attacks":[{"slot":1,"label":"Attack 1","name":"Final Collection","cost_label":"Attack Cost","cost":[{"element":"Underworld","amount":5}],"damage_label":"Damage","damage":170,"client_action":"attack"}]},
