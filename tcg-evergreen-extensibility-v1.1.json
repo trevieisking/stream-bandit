@@ -1,7 +1,9 @@
 {
   "schema": "stream-bandit-tcg-evergreen-extensibility-v1.1",
   "recorded_at": "2026-09-17",
-  "purpose": "Self-contained machine-readable planning contract for non-rotating ownership, extensible future series, composable special-card mechanics, damage affinity, original Stream Bandit special-family names and damage-counter interaction.",
+  "purpose": "Self-contained machine-readable planning contract for non-rotating ownership, extensible future series, composable special-card mechanics, damage affinity, original Stream Bandit special-family names, damage-counter interaction and the living generic mechanic harvest.",
+  "mechanic_harvest_index": "tcg-mechanic-harvest-index-v1.md",
+  "generic_capability_catalog": "tcg-generic-mechanic-capabilities-v1.json",
   "primary_format": {
     "id": "evergreen",
     "age_based_rotation": false,
@@ -173,6 +175,17 @@
     "trait_synergy",
     "multiple_printings_one_gameplay_identity"
   ],
+  "mechanic_catalog_policy": {
+    "future_card_definitions_should_reference_generic_capability_ids": true,
+    "capability_parameters_define_timing_targets_costs_values_and_zones": true,
+    "indexed_does_not_mean_implemented": true,
+    "owner_opcode_mapping_required_before_runtime_acceptance": true,
+    "missing_runtime_support_is_added_once_generically": true,
+    "card_name_runtime_branch_forbidden_when_catalog_can_express_rule": true,
+    "series_name_runtime_branch_forbidden": true,
+    "new_capability_requires_proof_existing_capabilities_cannot_compose_rule": true,
+    "individual_card_text_research_is_living_and_additive": true
+  },
   "matchup_and_affinity": {
     "ordinary_set_one_vulnerability_source": "versioned global matchup snapshot cp2-matchups-v0.1",
     "ordinary_set_one_per_card_weakness_object_allowed": false,
@@ -219,6 +232,7 @@
     "no_new_owner_without_new_state_transition_proof": true,
     "special_mechanics_should_compose_existing_owners_and_effect_opcodes": true,
     "special_family_names_do_not_create_engines": true,
+    "generic_capability_ids_are_preferred_over_card_helpers": true,
     "content_registry_must_not_hardcode_specific_series_names": true,
     "pack_engine_must_use_data_driven_recipes": true,
     "deck_engine_must_use_data_driven_legality_and_recipe_rules": true,
