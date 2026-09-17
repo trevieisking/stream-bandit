@@ -274,7 +274,7 @@ With these corrections, no additional post-test planning omission is currently k
 
 ## 8. Living Mechanic Harvest — future-card authority
 
-The master plan now explicitly delegates future cross-era mechanic research to:
+The master plan delegates future cross-era mechanic research to:
 
 - `tcg-mechanic-harvest-index-v1.md` — human research/coverage index;
 - `tcg-generic-mechanic-capabilities-v1.json` — machine-readable generic capability vocabulary.
@@ -285,13 +285,9 @@ The external set catalogue spans 174 English releases and the historical card co
 
 The target is a stable vocabulary of generic capabilities that future Stream Bandit cards can compose.
 
-Examples:
+Example capability recipe:
 
-- `trigger.turn_start`;
-- `search.deck`;
-- `essence.attach_from_deck`;
-- `condition.apply`;
-- `limit.once_per_turn`.
+`trigger.turn_start + search.deck + essence.attach_from_deck + condition.apply + limit.once_per_turn`
 
 A card using all five should be structured data composing those capabilities, not five one-off helpers.
 
@@ -304,7 +300,11 @@ Current baseline research has harvested:
 - major historical special-card mechanic families;
 - 54 broad effect categories;
 - active/passive/triggered Ability heritage;
+- Ability suppression/interruption and use receipts;
 - persistent attachment/field/support-card rules;
+- support-card per-turn limits;
+- temporary/granted attacks;
+- Special Essence and modal card/resource rules;
 - reward-risk classes;
 - once-per-match powers;
 - singleton/shared-group limits;
@@ -343,4 +343,10 @@ The extensibility architecture is not considered complete until a sample future 
 
 This is the mechanism that protects the Evergreen/no-age-rotation philosophy: new content grows the library instead of replacing it.
 
-**Checkpoint:** post-test master-plan consistency audit ✅ complete | living mechanic harvest ✅ bound to plan | per-card deep research 🔎 ongoing | V2-G1E runtime proof ☐.
+### 8.5 Research stays live
+
+The research index is intentionally appendable. As individual cards from Base through current/future sets reveal a rule idea that is not already representable, the smallest reusable capability is added to the index first. Runtime work follows only after V2-G1E proves owner/schema need.
+
+This allows Stream Bandit to keep learning from future card design without destabilising the core rules or making old cards obsolete.
+
+**Checkpoint:** post-test master-plan consistency audit ✅ complete | living mechanic harvest ✅ bound to plan | individual-card deep research 🔎 ongoing | V2-G1E runtime proof ☐.
