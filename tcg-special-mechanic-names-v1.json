@@ -20,6 +20,11 @@
       "primary_capabilities": ["special_rule_class", "reward_value_2_default", "signature_power_eligible"]
     },
     {
+      "research_family": "generic bonded multi-being identity",
+      "stream_bandit_name": "Bonded Creature",
+      "primary_capabilities": ["bonded_identity"]
+    },
+    {
       "research_family": "TAG TEAM GX style",
       "stream_bandit_name": "Bonded Sigilborn",
       "primary_capabilities": ["bonded_identity", "reward_value_3_default", "signature_power_eligible", "extra_cost_bonus_optional"]
@@ -88,7 +93,11 @@
   "shared_special_action_name": {
     "stream_bandit_name": "Signature Power",
     "scope": "controller_match",
-    "kinds": ["Signature Attack", "Signature Ability"],
+    "machine_action_kinds": ["attack", "ability"],
+    "display_labels": {
+      "attack": "Signature Attack",
+      "ability": "Signature Ability"
+    },
     "default_usage": "one shared use per player per match when a card/family declares this capability"
   },
   "separation_rules": [
