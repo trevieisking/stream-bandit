@@ -14,48 +14,62 @@ A material implementation result is not accepted until this checklist/ledger cha
 
 | ID | State | Exact checkpoint |
 |---|---|---|
-| G0R-11 validation workflow coverage | **COMPLETE ✅** | PR #565 head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`; Validation #571 / run `35232546805` SUCCESS; merged main `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00` |
+| G0R-11 validation workflow coverage | **COMPLETE ✅** | PR #565 head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`; Validation #571 / run `35232546805` SUCCESS; merged main checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00` |
+| G0R-07 matchmaking room lifetime | **COMPLETE IN SOURCE ✅** | PR #566 head `190c9c9e4bf07712571b978abbd3657f876febed`; all three acceptance workflows green; merged main `fce98178f2234386da7be3aef02a8496fa24195a`; Supabase/live deployment still HOLD |
 | G0R-10 Tactic subtype boundary | **PROVEN / QUEUED 🟡** | exact source proves `play_tactic` lacks Ally/Device allow-list; Relic/Realm have dedicated routes; no runtime patch accepted yet |
-| G0R-07 matchmaking room lifetime | **IN PROGRESS 🔎** | PR #566 head `190c9c9e4bf07712571b978abbd3657f876febed`; TCG Validation + independent Migration Replay green; Functional Smoke PostgreSQL lane still running |
 
-**Accepted G0R repairs:** **1 / 11**.
+**Accepted G0R source repairs:** **2 / 11**.
 
-## G0R-07 checklist
+## G0R-07 checklist — ACCEPTED SOURCE REPAIR
 
 | ID | Requirement | State | Evidence / acceptance |
 |---|---|---|---|
-| G0R07-01 | Exact source defect proven | COMPLETE | `20260905110000_tcg_automatic_matchmaking.sql`: idempotent room lookup gated `waiting`,`locked`,`in_match` by `expires_at > now()` |
-| G0R07-02 | Expired waiting queues still close | LOCKED | replacement migration preserves `status='waiting' and expires_at <= now()` cleanup |
-| G0R07-03 | Waiting-room reuse still requires unexpired queue lifetime | LOCKED | replacement predicate keeps `(r.status='waiting' and r.expires_at > now())` |
-| G0R07-04 | Locked rooms remain discoverable after queue expiry | IMPLEMENTED / PENDING FULL FENCE | replacement predicate includes `locked` independent of `expires_at` |
-| G0R07-05 | In-match rooms remain discoverable after queue expiry | IMPLEMENTED / PENDING FULL FENCE | replacement predicate includes `in_match` independent of `expires_at` |
-| G0R07-06 | Candidate opponents remain waiting + unexpired only | LOCKED | candidate lookup unchanged |
-| G0R07-07 | Repair is additive and does not rewrite existing room data | COMPLETE | new migration replaces function definition only |
-| G0R07-08 | Focused contract test protects waiting-vs-matched expiry boundary | **PASS ✅** | included in TCG Validation #574 / run `35233465142` SUCCESS |
-| G0R07-09 | TCG Validation exact-head green | **PASS ✅** | run #574 / `35233465142` completed SUCCESS on exact head |
-| G0R07-10 | Migration Replay exact-head green | **PASS ✅** | run #799 / `35233465044`; full disposable `supabase db reset --local --no-seed` replay SUCCESS |
-| G0R07-11 | Functional Smoke exact-head green | **IN PROGRESS 🔎** | run #825 / `35233465614`; Node + Deno PASS; PostgreSQL replay smoke currently running |
-| G0R07-12 | No unresolved material review finding | CURRENTLY CLEAR | PR #566 review threads currently 0; final refresh required before merge |
-| G0R07-13 | Exact PR diff remains two intended files | COMPLETE at opening head | 2 files, +258 / -0; migration + focused test only |
-| G0R07-14 | Merge to main | HOLD 🔒 | requires final Functional Smoke + fresh immutable recheck |
-| G0R07-15 | Supabase/live deployment | HOLD 🔒 | separate later decision; none performed |
+| G0R07-01 | Exact source defect proven | COMPLETE | original matchmaking function gated `waiting`,`locked`,`in_match` retry/poll by `expires_at > now()` |
+| G0R07-02 | Expired waiting queues still close | COMPLETE ✅ | replacement preserves `status='waiting' and expires_at <= now()` cleanup |
+| G0R07-03 | Waiting-room reuse still requires unexpired queue lifetime | COMPLETE ✅ | replacement keeps `(r.status='waiting' and r.expires_at > now())` |
+| G0R07-04 | Locked rooms remain discoverable after queue expiry | COMPLETE ✅ | replacement includes `locked` independent of queue expiry |
+| G0R07-05 | In-match rooms remain discoverable after queue expiry | COMPLETE ✅ | replacement includes `in_match` independent of queue expiry |
+| G0R07-06 | Candidate opponents remain waiting + unexpired only | COMPLETE ✅ | candidate lookup remains waiting + `expires_at > now()` |
+| G0R07-07 | Repair is additive and does not rewrite existing room data | COMPLETE ✅ | new migration replaces function definition only |
+| G0R07-08 | Focused contract test protects waiting-vs-matched expiry boundary | PASS ✅ | TCG Validation #574 / run `35233465142` SUCCESS |
+| G0R07-09 | TCG Validation exact-head green | PASS ✅ | #574 / `35233465142` SUCCESS |
+| G0R07-10 | Migration Replay exact-head green | PASS ✅ | #799 / `35233465044` SUCCESS, full disposable replay from zero |
+| G0R07-11 | Functional Smoke exact-head green | PASS ✅ | #825 / `35233465614` SUCCESS including PostgreSQL replay smoke |
+| G0R07-12 | No unresolved material review finding | PASS ✅ | review threads 0 at final pre-merge refresh |
+| G0R07-13 | Exact PR diff remains two intended files | PASS ✅ | 2 files, +258 / -0; migration + focused test only |
+| G0R07-14 | Merge to main | **PROMOTE / COMPLETE ✅** | PR #566 merged with expected head; merge/main `fce98178f2234386da7be3aef02a8496fa24195a` |
+| G0R07-15 | Supabase/live deployment | HOLD 🔒 | source repair is not yet a production deployment; no live mutation performed |
 
-## Exact implementation identifiers
+## Exact G0R-07 identifiers
 
 - repository: `trevieisking/stream-bandit`
 - branch: `fix/tcg-g0r-07-matchmaking-room-lifetime`
 - PR: #566
-- base main at branch creation: `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`
-- PR head: `190c9c9e4bf07712571b978abbd3657f876febed`
+- base main: `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`
+- reviewed PR head: `190c9c9e4bf07712571b978abbd3657f876febed`
+- merge/current main: `fce98178f2234386da7be3aef02a8496fa24195a`
 - migration commit: `ab754ebcbf381d90197185e5209ae47ea1d500b3`
 - test/head commit: `190c9c9e4bf07712571b978abbd3657f876febed`
 - files:
   - `supabase/migrations/20260917142500_tcg_matchmaking_locked_room_lifetime.sql`
   - `tcg/tests/card-pass-2-g0r-07-matchmaking-room-lifetime.test.mjs`
-- runtime/live impact so far: **none**
+- exact-head workflows:
+  - TCG Validation #574 / `35233465142` — SUCCESS
+  - Migration Replay #799 / `35233465044` — SUCCESS
+  - Functional Smoke #825 / `35233465614` — SUCCESS
+- legacy combined statuses: none found; exact GitHub Actions evidence above is authoritative
+- runtime/live impact: **source/main changed; Supabase/live deployment unchanged**
 - Code Labs Writer: **not invoked**
 - CG Repair Lab / Code God: **not invoked**
 
+## Inherited critical rules still locked
+
+- original playable prototype remains UX source of truth: RESTORE, DO NOT REDESIGN;
+- 40-owner baseline remains authoritative;
+- no owner #41 for a single card, label or browser convenience;
+- every true Deck Search requires authoritative post-search shuffle and player wording **Then shuffle your deck.**;
+- G0R-10 remains explicitly queued and may not be forgotten merely because another repair was completed.
+
 ## Exact next operation
 
-Finish exact-head Functional Smoke #825. Fail closed on any failure. If it finishes green, refresh review threads, PR metadata, exact diff and main; then make the G0R-07 merge promotion decision. Update this checklist/ledger again before delivering the accepted result.
+Refresh current main `fce98178f2234386da7be3aef02a8496fa24195a` and choose the next safest single V2-G0R owner repair from exact source. Prefer a bounded additive/replay-safe repair over a risky whole-file replacement. Keep Supabase/live separate until source stabilization and deployment evidence justify promotion.
