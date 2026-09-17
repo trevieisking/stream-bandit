@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.1';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const state = {
@@ -88,7 +88,9 @@
     });
     let data = {};
     try { data = await response.json(); } catch (_) { data = { ok: false, error: 'non_json_edge_response' }; }
-    if (!response.ok || data.ok === false) throw new Error(data.error || ('HTTP ' + response.status));
+    const nestedResult = data && data.result && typeof data.result === 'object' ? data.result : null;
+    const rejected = data && data.ok === false ? data : (nestedResult && nestedResult.ok === false ? nestedResult : null);
+    if (!response.ok || rejected) throw new Error((rejected && rejected.error) || data.error || ('HTTP ' + response.status));
     return data;
   }
 
