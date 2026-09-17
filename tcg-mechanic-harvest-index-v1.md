@@ -113,6 +113,22 @@ This table records the useful **rule idea**, not a plan to ship external brandin
 | current Mega Evolution ex | high-stakes special evolution with higher reward value independent from old evolve-end-turn rule |
 | alternate art / full art / shiny treatments | multiple cosmetic printings under one gameplay identity |
 
+### Extra reusable lessons harvested from deeper rule pages
+
+- active vs passive vs triggered Abilities remain one generic Ability system with timing metadata;
+- an activated Ability may be interrupted after declaration while still consuming its cost/use receipt when its rule says so;
+- strong support cards can share a per-turn play-limit group;
+- Realm persistence/replacement maps cleanly to the long-running persistent-field-card pattern;
+- Relics/Tactics can grant temporary or attached Attacks;
+- a card can have a modal second role, such as functioning as a Creature identity in one context and Essence/resource in another;
+- multi-card assembly must support variable component counts rather than hard-coding two or four pieces;
+- special cards may expose only selected characteristics while outside play;
+- strategy/faction tags are one generic tagging system, regardless of external era/theme;
+- explicit first-turn/evolution exceptions can exist without weakening the ordinary timing rules;
+- alternate element/type forms can preserve identity and evolution lineage;
+- one-per-name and one-per-shared-group are different deck-construction constraints;
+- Special Essence can carry extra effects, conditional values, type conversion or multi-element payment without requiring a new resource engine.
+
 ### Stream Bandit working names already locked
 
 External labels remain research-only. Current working Stream Bandit presentation names are maintained in `tcg-special-mechanic-names-v1.json`, including Ascendant Creature, Sigilborn Creature, Bonded Sigilborn, Exalted Creature, Colossus Creature, Starforged Creature, Convergence Creature, Gleam Creature, Prime Card, Riftmarked Card, Overform, Ascension Form, Aspect Creature, Apex Ascendant, Ascension Evolution and Signature Power.
@@ -416,7 +432,8 @@ That should be one data recipe composed from generic capabilities, not five card
 - ✅ major historical special-card mechanic families harvested;
 - ✅ 54 broad card-effect categories harvested into generic families;
 - ✅ active/passive/triggered Ability heritage harvested;
-- ✅ card-type heritage: attachment, persistent field, powerful per-turn support, granted attacks, Special Essence analogues;
+- ✅ attachment/persistent-field/per-turn-support/granted-attack/Special-Essence heritage harvested;
+- ✅ modal cards, strategy/faction tags, special stage/evolution exceptions and multi-part assembly patterns harvested;
 - ✅ high-risk Reward classes / singleton / assembly / inheritance / form / tag mechanics harvested;
 - ✅ original Stream Bandit working names separated from research provenance.
 
