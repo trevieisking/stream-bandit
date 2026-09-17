@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stream Bandit TCG — Battle V2</title>
+<link rel="icon" type="image/png" sizes="32x32" href="stream_bandit_stag_icon_32.png">
+<link rel="apple-touch-icon" href="apple_touch_icon_180.png">
+<meta name="theme-color" content="#050711">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#050711;--panel:#0e1327;--line:#ffffff22;--text:#f7f8ff;--muted:#aeb8d4;--good:#22d3a6;--cyan:#41e8ff;--pink:#ff2d85;--purple:#7c3cff;--warn:#ffb142;--bad:#ff4d6d}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 0,#7c3cff27,transparent 35%),radial-gradient(circle at 10% 100%,#22d3a61f,transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}button{font:inherit}.sb-battle{width:min(1560px,100%);margin:auto;padding:12px}.sb-hud{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--line);border-radius:20px;background:#0b1022e8;position:sticky;top:6px;z-index:20;backdrop-filter:blur(14px)}.sb-brand{font-weight:950;letter-spacing:-.02em}.sb-pills{display:flex;gap:6px;flex-wrap:wrap}.sb-pill{border:1px solid #ffffff26;border-radius:999px;padding:5px 9px;color:var(--muted);font-size:12px;font-weight:850}.sb-status{margin:9px 0;padding:9px 12px;border:1px solid #41e8ff44;border-radius:16px;background:#41e8ff13;color:#dffbff;font-weight:800}.sb-status[data-kind="error"]{border-color:#ff4d6d66;background:#ff4d6d15;color:#ffd7df}.sb-status[data-kind="ready"]{border-color:#22d3a666;background:#22d3a615;color:#d7fff1}.sb-status[data-kind="busy"]{border-color:#ffb14266;background:#ffb14214;color:#ffedbd}.sb-board{display:grid;gap:9px}.sb-side{border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,#0c1125,#12102a);padding:10px}.sb-side>header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.sb-side h1{font-size:15px;margin:0;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}.sb-field{display:grid;grid-template-columns:minmax(220px,340px) 1fr;gap:9px;align-items:start}.sb-vanguard-slot,.sb-reserve-slot{border:1px dashed #ffffff24;border-radius:18px;padding:7px;min-height:138px}.sb-vanguard-slot{border-style:solid;border-color:#22d3a654;background:#22d3a607}.sb-reserve{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:7px}.sb-reserve-slot>span,.sb-vanguard-slot>span{display:block;color:#8691b2;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}.sb-card-control,.sb-hand-card{border:1px solid #ffffff2b;border-radius:18px;background:linear-gradient(150deg,#171d36,#0f1327);padding:9px;box-shadow:0 8px 24px #0005;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;overflow:hidden}.sb-card-control header{display:flex;justify-content:space-between;gap:8px;color:#b9c6e6;font-size:10px;font-weight:900;text-transform:uppercase}.sb-card-control h2{font-size:16px;margin:7px 0;line-height:1.05}.sb-card-art{height:58px;border-radius:12px;background:linear-gradient(135deg,#22d3a620,#7c3cff2d,#ff2d851e);display:grid;place-items:center;font-size:30px;border:1px solid #ffffff16}.sb-hp,.sb-card-meta{display:flex;justify-content:space-between;gap:6px;align-items:center;margin-top:6px;font-size:11px}.sb-hp strong{color:#baf7df}.sb-card-meta{color:var(--muted)}.sb-card-control.is-primary{cursor:pointer}.sb-card-control.is-primary:hover,.sb-card-control.is-primary:focus-visible{transform:translateY(-2px);border-color:#41e8ff88;outline:none}.sb-card-control.is-selected{border-color:var(--good);box-shadow:0 0 0 2px #22d3a63d,0 12px 32px #0007}.sb-card-hint{margin-top:7px;border-top:1px solid #ffffff18;padding-top:6px;color:#b9c6e6;font-size:10px;font-weight:850}.sb-card-actions{display:none;gap:6px;margin-top:7px}.sb-card-control.is-selected .sb-card-actions{display:grid}.sb-card-action{width:100%;border:1px solid #ffffff24;border-radius:12px;padding:7px 8px;background:linear-gradient(135deg,#ff2d8527,#7c3cff35);color:white;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;text-align:left}.sb-card-action:disabled{opacity:.45;cursor:not-allowed}.sb-card-action strong,.sb-card-action small{display:block}.sb-card-action small{color:#c5cbe1;font-size:9px;margin-top:2px}.sb-damage{font-size:18px;font-weight:950;color:#fff}.sb-zone-empty{display:grid;place-items:center;min-height:92px;color:#697494;font-size:12px}.sb-hand-wrap{border:1px solid var(--line);border-radius:20px;padding:9px;background:#090e1f}.sb-hand-title{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#8f9abb;font-weight:900;margin:0 0 7px}.sb-hand{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px}.sb-hand-card{flex:0 0 132px;min-height:88px;display:flex;flex-direction:column;justify-content:space-between}.sb-hand-card strong{font-size:12px}.sb-hand-card small{color:var(--muted)}.sb-foot{text-align:center;color:#7782a3;font-size:10px;margin:8px 0 0}.sb-separator{height:1px;background:linear-gradient(90deg,transparent,#ffffff2a,transparent);margin:2px 0}
+@media(max-width:980px){.sb-field{grid-template-columns:1fr}.sb-reserve{grid-template-columns:repeat(4,minmax(105px,1fr));overflow-x:auto}.sb-reserve-slot{min-width:105px}.sb-vanguard-slot{max-width:340px;margin:auto;width:100%}}
+@media(max-width:640px){.sb-battle{padding:7px}.sb-hud{top:3px}.sb-side{padding:7px;border-radius:18px}.sb-reserve{grid-template-columns:repeat(4,112px)}.sb-card-control h2{font-size:14px}.sb-card-art{height:48px}}
+</style>
+</head>
+<body data-sb-tcg-v2-battle="card-control-v0-1">
+<main class="sb-battle">
+  <section class="sb-hud" aria-label="Battle status">
+    <div class="sb-brand">Stream Bandit TCG · Battle</div>
+    <div class="sb-pills"><span class="sb-pill" id="turnPill">Loading…</span><span class="sb-pill" id="phasePill">—</span><span class="sb-pill" id="revisionPill">Revision —</span></div>
+  </section>
+  <div class="sb-status" id="battleStatus">Loading authoritative battle state…</div>
+
+  <section class="sb-board" aria-label="One-screen battlefield">
+    <section class="sb-side" aria-label="Opponent field">
+      <header><h1>Opponent</h1></header>
+      <div class="sb-field">
+        <section class="sb-vanguard-slot"><span>Vanguard</span><div id="oppVanguard"></div></section>
+        <div class="sb-reserve" id="oppReserve"></div>
+      </div>
+    </section>
+
+    <div class="sb-separator"></div>
+
+    <section class="sb-side" aria-label="Your field">
+      <header><h1>Your field</h1></header>
+      <div class="sb-field">
+        <section class="sb-vanguard-slot"><span>Vanguard · Primary card control</span><div id="youVanguard"></div></section>
+        <div class="sb-reserve" id="youReserve"></div>
+      </div>
+    </section>
+
+    <section class="sb-hand-wrap" aria-label="Your hand">
+      <h1 class="sb-hand-title">Your hand · card controls will be enabled incrementally</h1>
+      <div class="sb-hand" id="yourHand"></div>
+    </section>
+  </section>
+
+  <p class="sb-foot"><span id="controllerVersion">Stream Bandit TCG V2 Battle Controller</span> · server-authoritative · card face is the control</p>
+</main>
+
+<script src="stream-bandit-shell-v6-24.js?v=tcg-v2-battle-v0-1"></script>
+<script src="stream-bandit-theme-projector-v7-12-156.js?v=tcg-v2-battle-v0-1"></script>
+<script src="stream-bandit-header-shell-v7-12-156.js?v=tcg-v2-battle-v0-1"></script>
+<script src="stream-bandit-footer-shell-v7-12-156.js?v=tcg-v2-battle-v0-1"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-1"></script>
+</body>
+</html>
