@@ -15,7 +15,7 @@ const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
 const flow = (id) => contract.required_flows.find((entry) => entry.id === id);
 
 test('V2 battle surface makes the creature card the primary control without replacing the old lab', () => {
-  assert.match(surface, /data-sb-tcg-v2-battle="card-control-v0-1"/);
+  assert.match(surface, /data-sb-tcg-v2-battle="board-only-v0-2"/);
   assert.match(surface, /id="youVanguard"/);
   assert.match(surface, /stream-bandit-tcg-v2-battle-controller\.js/);
   assert.doesNotMatch(surface, /Debug/i);
