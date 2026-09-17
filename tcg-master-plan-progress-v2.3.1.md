@@ -1,11 +1,13 @@
 # Stream Bandit TCG — Canonical Master Plan V2.3.1
 
 **Plan date:** 2026-09-17  
-**Status:** canonical post-test consistency layer over V2.3  
-**Inherits:** `tcg-master-plan-progress-v2.3.md` in full except where this file explicitly corrects card-header presentation, reconciles matchup/affinity ownership, locks original Stream Bandit special-mechanic names, and adds interactive damage-counter choreography  
+**Status:** canonical post-test consistency layer over V2.3 plus living cross-era mechanic-harvest authority  
+**Inherits:** `tcg-master-plan-progress-v2.3.md` in full except where this file explicitly corrects card-header presentation, reconciles matchup/affinity ownership, locks original Stream Bandit special-mechanic names, adds interactive damage-counter choreography and binds the living generic mechanic harvest  
 **Execution ledger:** `tcg-master-plan-ledger-v2.3.1.md`  
 **Card visual contract:** `tcg-card-visual-printing-v1.1.json`  
 **Evergreen/extensibility contract:** `tcg-evergreen-extensibility-v1.1.json`  
+**Mechanic harvest index:** `tcg-mechanic-harvest-index-v1.md`  
+**Generic mechanic capability catalog:** `tcg-generic-mechanic-capabilities-v1.json`  
 **Special mechanic matrix:** `tcg-special-mechanic-rule-matrix-v1.1.md`  
 **Special mechanic names:** `tcg-special-mechanic-names-v1.json`  
 **Damage counter interaction:** `tcg-damage-counter-interaction-v1.json`  
@@ -16,7 +18,7 @@
 
 ## 0. Purpose
 
-This layer closes the consistency gaps found by auditing every decision made after the real private-alpha game test and the approved ten showcase images.
+This layer closes the consistency gaps found by auditing every decision made after the real private-alpha game test and the approved ten showcase images, and adds a living cross-era mechanic library so future cards/series can reuse generic mechanics without invalidating old collections or adding one-off runtime helpers.
 
 Everything else from V2.3 remains unchanged and active.
 
@@ -55,7 +57,7 @@ Every ordinary Creature still uses exactly one of:
 
 Never Ability + Attack 1 + Attack 2 together.
 
-`tcg-v2-card-action-controller-v1.json` now points to the corrected self-contained visual contract so the control and rendering authority graph cannot drift back to the superseded header.
+`tcg-v2-card-action-controller-v1.json` points to the corrected self-contained visual contract so the control and rendering authority graph cannot drift back to the superseded header.
 
 Future reviewed special families may request a different generic action renderer only through an explicit shared contract; never as a one-card exception.
 
@@ -263,9 +265,82 @@ With these corrections, no additional post-test planning omission is currently k
 1. Finish Fairy + Underworld exact `sb-tcg-card-v0.2` translation.
 2. Validate deterministic 241-identity / ten-starter authority.
 3. Repair only proven generic dispatcher gaps.
-4. Prove V2-G1E evergreen/extensibility schema support, including original special-family labels, canonical matchup ownership, exceptional affinity metadata and damage-counter placement/movement metadata.
+4. Prove V2-G1E evergreen/extensibility schema support, including original special-family labels, canonical matchup ownership, exceptional affinity metadata, damage-counter placement/movement metadata and the generic mechanic capability catalog.
 5. Build the premium full-card renderer from the corrected schema-honest visual contract.
 6. Restore the one-screen playable Battle Client, including interactive damage-counter trays/dragging and turn-transition Condition counter animation.
 7. Run real two-user end-to-end.
 
-**Checkpoint:** post-test master-plan consistency audit ✅ complete.
+---
+
+## 8. Living Mechanic Harvest — future-card authority
+
+The master plan now explicitly delegates future cross-era mechanic research to:
+
+- `tcg-mechanic-harvest-index-v1.md` — human research/coverage index;
+- `tcg-generic-mechanic-capabilities-v1.json` — machine-readable generic capability vocabulary.
+
+### 8.1 Why this exists
+
+The external set catalogue spans 174 English releases and the historical card corpus contains thousands of unique attacks/Abilities/effect combinations. Stream Bandit must learn from that design history **without** building one engine per external era or one helper per card.
+
+The target is a stable vocabulary of generic capabilities that future Stream Bandit cards can compose.
+
+Examples:
+
+- `trigger.turn_start`;
+- `search.deck`;
+- `essence.attach_from_deck`;
+- `condition.apply`;
+- `limit.once_per_turn`.
+
+A card using all five should be structured data composing those capabilities, not five one-off helpers.
+
+### 8.2 Coverage rule
+
+The set index is a research checklist, not a copied card catalogue.
+
+Current baseline research has harvested:
+
+- major historical special-card mechanic families;
+- 54 broad effect categories;
+- active/passive/triggered Ability heritage;
+- persistent attachment/field/support-card rules;
+- reward-risk classes;
+- once-per-match powers;
+- singleton/shared-group limits;
+- multi-card assembly;
+- inherited actions/properties;
+- alternate forms/types;
+- faction/strategy tags;
+- direct defeat / extra turn / end-turn / first-turn exceptions;
+- damage-counter movement;
+- resource acceleration/denial/recovery;
+- search/draw/reveal/mill/reorder;
+- attack copying/granting/locking;
+- condition application/cleanse/immunity/ticks;
+- special zone replacement;
+- Realm/Relic/Tactic/Essence analogues;
+- printing/rarity/product variants.
+
+Individual-card text harvesting remains ongoing and may add a capability only when a genuinely new reusable rule primitive is proven.
+
+### 8.3 Indexed vs implemented
+
+**Indexed does not mean implemented.**
+
+V2-G1E must, for every capability ID:
+
+1. define exact parameters/timing/targets/costs/zones;
+2. map it to the existing 40 owners/effect opcodes where possible;
+3. prove deterministic tests for timing/payment/zone semantics;
+4. add one generic schema/dispatcher extension only if current owners cannot express the rule;
+5. forbid card-name and series-name runtime branches;
+6. preserve backward compatibility for older cards.
+
+### 8.4 Future-series acceptance test
+
+The extensibility architecture is not considered complete until a sample future series can add new cards, attacks, Abilities, tags, special classes, decks and booster recipes by composing catalogued capabilities **without** rewriting older card data or adding series-specific runtime branches.
+
+This is the mechanism that protects the Evergreen/no-age-rotation philosophy: new content grows the library instead of replacing it.
+
+**Checkpoint:** post-test master-plan consistency audit ✅ complete | living mechanic harvest ✅ bound to plan | per-card deep research 🔎 ongoing | V2-G1E runtime proof ☐.
