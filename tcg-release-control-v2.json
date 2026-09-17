@@ -1,17 +1,17 @@
 {
   "schema": "stream-bandit-tcg-release-control-v2",
   "recorded_at": "2026-09-17",
-  "purpose": "Non-self-referential control record for the ten-family V2 baseline, restored playable-prototype UX, evergreen ownership policy and future content/mechanic extensibility programme.",
+  "purpose": "Non-self-referential control record for the ten-family V2 baseline, restored playable-prototype UX, evergreen ownership policy, future content/mechanic extensibility programme and completed post-test consistency audit.",
   "authority": {
-    "desired_behavior": "tcg-master-plan-progress-v2.3.md",
-    "audit_history": "tcg-master-plan-ledger-v2.3.md",
-    "previous_desired_behavior": "tcg-master-plan-progress-v2.2.md",
-    "previous_audit_history": "tcg-master-plan-ledger-v2.2.md",
+    "desired_behavior": "tcg-master-plan-progress-v2.3.1.md",
+    "audit_history": "tcg-master-plan-ledger-v2.3.1.md",
+    "previous_desired_behavior": "tcg-master-plan-progress-v2.3.md",
+    "previous_audit_history": "tcg-master-plan-ledger-v2.3.md",
     "mechanic_heritage_research": "tcg-mechanic-heritage-research-v1.md",
-    "special_mechanic_rule_matrix": "tcg-special-mechanic-rule-matrix-v1.md",
-    "evergreen_extensibility": "tcg-evergreen-extensibility-v1.json",
+    "special_mechanic_rule_matrix": "tcg-special-mechanic-rule-matrix-v1.1.md",
+    "evergreen_extensibility": "tcg-evergreen-extensibility-v1.1.json",
     "battle_interaction": "tcg-battle-client-interaction-v1.json",
-    "card_visual_printing": "tcg-card-visual-printing-v1.json",
+    "card_visual_printing": "tcg-card-visual-printing-v1.1.json",
     "card_controller": "tcg-v2-card-action-controller-v1.json",
     "ten_deck_blueprint": "tcg-ten-deck-product-blueprint-v2.json",
     "element_package_manifest": "tcg-element-packages-v0.3-v2.json",
@@ -34,7 +34,8 @@
     "fairy_glimmerwish": "16a745a3cf96f6caf00c34ad88896fb0dcca2a73",
     "creature_card_controller": "019b029f344bac3c4efdc92480cdff5c9c2c5521",
     "video_dragdrop_masterplan_sync": "77dc14a5af4101bfd06941243d142ce3f16cc120",
-    "prototype_restoration_authority": "5a5609a7fa93b365eeaa7fb8da6a9ade6322944b"
+    "prototype_restoration_authority": "5a5609a7fa93b365eeaa7fb8da6a9ade6322944b",
+    "evergreen_extensibility_authority": "59ab7857522373a53de7d551c66f12c2e514e934"
   },
   "v2_target": {
     "elements": 10,
@@ -52,7 +53,7 @@
     "note": "241 identities is the current V2 baseline target, not a permanent maximum. Future series are additive."
   },
   "prototype_restoration": {
-    "status": "canonical_v2_2_inherited_by_v2_3",
+    "status": "canonical_v2_2_inherited_by_v2_3_1",
     "principle": "restore the approved playable one-screen physical-card prototype interaction rather than redesigning the battle UX around debug forms",
     "one_screen_battlefield": true,
     "physical_card_primary_controls": true,
@@ -67,8 +68,21 @@
     "misclick_change_or_cancel_before_server_commit_when_practical": true,
     "debug_form_release_battlefield_forbidden": true
   },
+  "post_test_consistency": {
+    "status": "complete",
+    "known_omissions_after_audit": 0,
+    "corrected_card_header": {
+      "top_left": "Cost when structured cost exists",
+      "top_right": "Element/type",
+      "identity_band": "Name/stage plus clearly labelled HP",
+      "structured_data_is_numeric_authority": true
+    },
+    "damage_affinity_capability_reserved": true,
+    "working_affinity_labels": ["Vulnerability", "Resistance"],
+    "set_one_affinity_values_changed_by_this_control_update": false
+  },
   "evergreen_policy": {
-    "status": "canonical_v2_3_planning_authority",
+    "status": "canonical_v2_3_inherited_by_v2_3_1",
     "primary_format_working_name": "Evergreen",
     "age_based_rotation": false,
     "released_cards_remain_eligible_by_age": true,
@@ -102,6 +116,12 @@
       "Aspect Creature",
       "Ascension Evolution"
     ],
+    "damage_affinity_modifier": {
+      "reserved": true,
+      "working_labels": ["Vulnerability", "Resistance"],
+      "match_sources": ["element", "type", "rule_tag"],
+      "server_authoritative": true
+    },
     "new_series_must_be_data_driven": true,
     "new_cards_use_content_registry_and_shared_effect_grammar": true,
     "new_decks_use_recipe_and_legality_data": true,
@@ -137,7 +157,9 @@
     "old_cards_remain_supported_by_age": true,
     "future_schema_changes_require_backward_compatibility": true,
     "new_series_do_not_require_series_name_runtime_branches": true,
-    "pokemon_names_art_text_frames_ui_audio_assets_must_not_be_copied": true
+    "pokemon_names_art_text_frames_ui_audio_assets_must_not_be_copied": true,
+    "showcase_numbers_do_not_override_structured_rules": true,
+    "damage_affinity_must_be_structured_and_server_authoritative": true
   },
-  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E evergreen/extensibility schema metadata before the premium renderer and restored one-screen Battle Client."
+  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E evergreen/extensibility schema metadata including damage-affinity support before the premium renderer and restored one-screen Battle Client."
 }
