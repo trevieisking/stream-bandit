@@ -4,7 +4,7 @@
 **Previous canonical plan:** `tcg-master-plan-progress-v2.3.md`  
 **Previous ledger:** `tcg-master-plan-ledger-v2.3.md`  
 **Owner-family baseline:** 40  
-**Ledger revision:** V2.3.1-3 — 2026-09-17
+**Ledger revision:** V2.3.1-4 — 2026-09-17
 
 ## Rules
 
@@ -14,6 +14,7 @@
 - No concept-art number becomes a gameplay rule unless structured data declares it.
 - External TCG mechanic names are research provenance only; Stream Bandit player-facing names are original.
 - JSON authority files referenced by Release Control must be self-contained unless a validated resolver explicitly defines inheritance semantics.
+- Mechanic research may expand the generic capability vocabulary; **indexed does not mean runtime-implemented** until V2-G1E proves owner/opcode/schema coverage.
 
 ---
 
@@ -178,7 +179,50 @@ Next:
 2. Underworld canonical schema;
 3. deterministic 241/10 authority;
 4. proven generic dispatcher gaps only;
-5. V2-G1E extensibility schema including matchup ownership, damage-counter metadata and original family labels;
+5. V2-G1E extensibility schema including matchup ownership, damage-counter metadata, original family labels and generic mechanic catalog;
 6. premium renderer;
 7. restored one-screen Battle Client;
 8. real two-user E2E.
+
+### V2.3.1-009 — Cross-era mechanic harvest bound to the master plan
+
+**State:** ✅ RESEARCH/SCHEMA AUTHORITY ADDED
+
+New authorities:
+
+- `tcg-mechanic-harvest-index-v1.md`
+- `tcg-generic-mechanic-capabilities-v1.json`
+
+Research coverage recorded:
+
+- Pokector coverage source indexes **174 English TCG sets** from Base through the 2026 Mega Evolution era;
+- historical mechanic-family scan completed as a baseline across Base/Gym/Neo/e-Card/EX/DP/Platinum/HGSS/BW/XY/SM/SWSH/SV/Mega Evolution and special products;
+- Bulbapedia `Cards by effect` provides 54 broad effect categories now folded into the generic mechanic vocabulary;
+- active/passive/triggered Ability heritage, Tool/Stadium/Supporter/Technical Machine-style rules, special resource cards, high-risk Reward classes, singleton rules, multi-card assembly, inherited attacks/Abilities, alternate forms/types, strategy tags and modern special classes are represented generically.
+
+Important honesty boundary:
+
+- this is **not** a claim that every historical card text has been manually read;
+- individual-card deep harvesting remains ongoing;
+- an indexed capability is **not** runtime-complete until V2-G1E maps it to existing owners/opcodes or one justified generic extension and proves deterministic tests.
+
+### V2.3.1-010 — Future card definitions must compose generic capabilities
+
+**State:** ✅ LOCKED DESIGN RULE
+
+Future Stream Bandit card design should use capability IDs from `tcg-generic-mechanic-capabilities-v1.json` plus structured parameters for timing, targets, costs, values and zones.
+
+Example recipe:
+
+`trigger.turn_start + search.deck + essence.attach_from_deck + condition.apply + limit.once_per_turn`
+
+Rules:
+
+- no card-name runtime branch when generic capabilities can express the effect;
+- no series-name runtime branch;
+- add a new capability ID only when existing capabilities cannot honestly compose the rule;
+- missing runtime support must be implemented once, generically;
+- old card data must remain backward compatible;
+- new sets grow the capability/card library rather than rotating ownership away.
+
+V2-G1E is not complete until a sample future series can be added using this catalog without rewriting old cards or adding series-specific runtime code.
