@@ -47,6 +47,6 @@ test('unowned TCG social writes remain visibly gated',()=>{
 test('search is bounded by the browser and server owner remains authoritative',()=>{
   assert.match(controller,/p_limit:\s*25/);
   assert.match(controller,/p_offset:\s*0/);
-  assert.match(controller,/autocomplete="off"/);
+  assert.match(players,/autocomplete="off"/);
   assert.match(controller,/textContent\s*=/,'rendering must use textContent for returned public strings');
 });
