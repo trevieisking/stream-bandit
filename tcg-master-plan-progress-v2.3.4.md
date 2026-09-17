@@ -11,7 +11,14 @@
 
 The original playable prototype remains the player-experience source of truth: **RESTORE, DO NOT REDESIGN**. The established 40-owner server architecture remains the gameplay authority. No debug-form redesign, card-specific helper, duplicate owner or owner #41 is authorized by this checkpoint.
 
-The browser interaction rule is now explicit: **the card is the player control, but the card/browser is not the rules authority**. Card tap/select/drag operations produce structured intents; canonical server owners validate legality, costs, targets, state transitions, damage, listeners, defeat resolution and aftermath; the browser then renders the authoritative returned state. A second browser rules engine is forbidden.
+The browser interaction rule is explicit: **the card is the player control; the relevant canonical engine is the authority for the action initiated by that card.** Card tap/select/drag operations produce structured intents. The card/browser does not decide legality, costs, targets, damage, timing, listeners, state transitions, defeat resolution or Aftermath. Those rules remain owned by the canonical server engines. The browser renders authoritative returned state. A second browser rules engine is forbidden.
+
+Examples of the boundary:
+- a Creature card initiates Attack or active Ability intent; Attack/Ability and their dependent canonical owners validate and resolve it;
+- an Essence card initiates attachment intent; the Essence/Card-Zone/payment boundaries remain authoritative;
+- an Evolution card initiates evolution intent; the Creature/Evolution owner validates the target and transition;
+- Relic, Realm, Ally and Device cards initiate their own structured action intents and resolve through their dedicated owners;
+- the card is never a substitute for the engine that owns the rule.
 
 The V2.3.3 Deck Search rule remains fully locked: every true `search.deck` has the mandatory authoritative postcondition `deck.shuffle`, with player-facing wording **Then shuffle your deck.**
 
@@ -41,7 +48,9 @@ G0R-10 remains explicitly queued. No existing accepted G0R repair is reverted.
 
 ## V2 prototype restoration — IN PROGRESS 🎴
 
-### V2-UI-01 — Card-face Attack control: COMPLETE IN SOURCE ✅
+### V2-UI-01 — Card-face Attack intent/control foundation: COMPLETE IN SOURCE ✅
+
+This checkpoint proves the player-control and transport boundary only. It does **not** prove that a real two-user Attack completes successfully.
 
 - PR #569: `TCG V2: restore card-face attack control foundation`.
 - exact reviewed head: `ba1f5ef61439d24a4e91ae96272a5d046ae9d80c`.
@@ -54,20 +63,60 @@ G0R-10 remains explicitly queued. No existing accepted G0R repair is reverted.
 - added focused `card-pass-2-v2-battle-card-control-attack` contract coverage.
 - selecting the active Vanguard card exposes its structured Attack slots on the card face.
 - Attack submits existing generic `attack` with `attack_slot`, `match_id`, fresh `client_nonce`, and `expected_revision`.
-- `tcg-match-actions` remains authoritative for legality, payment, target resolution, damage, effects, listeners, defeat scanning and aftermath.
+- `tcg-match-actions` and its canonical dependent owners remain authoritative for legality, payment, target resolution, damage, effects, listeners, defeat scanning and Aftermath.
 - no card-name browser branches, gameplay `prompt()` / `confirm()` targeting, browser damage/payment engine or browser RNG was introduced.
 - rejected actions refresh authoritative state and keep the server rejection reason visible.
 - historical `t.html` remains untouched.
 - Supabase, database, deployed Edge Functions, live and production were not changed.
 
+### V2-ATTACK-01 — Real playable Attack engine path: REQUIRED / PENDING 🔒
+
+The previous failed playable game test contained a user-observed product failure: an attempted Attack did not execute. That historical symptom is not treated as proof that every Attack sub-engine is broken, because current source includes an isolated HTTP-dispatch integration test that can commit damage and advance the turn through the real `tcg-match-actions` dispatcher. It **is** proof that we must not declare Attack complete from unit/type/contract tests alone.
+
+Attack is accepted only after a real V2 two-user journey proves all of the following on the same authoritative match:
+1. the active Creature card exposes an Attack from structured card data;
+2. the player initiates the Attack from that card;
+3. the intent reaches the canonical Attack route with the current revision/nonce fence;
+4. the canonical engines validate turn, legality, Attack cost and target requirements;
+5. the authoritative state commits the expected damage/effect outcome exactly once;
+6. Shield/Conditions/listeners/choices resolve when applicable without duplicate resolution;
+7. defeat scan, Reward/promotion and Aftermath occur in canonical order when applicable;
+8. successful Attack hands off/advances the turn exactly as the card/rules require;
+9. both clients refresh to the same committed result and visibly show the changed HP/damage/board/turn state;
+10. an illegal Attack is rejected with a visible reason and no authoritative mutation.
+
+If this proof fails, repair the **exact failed seam or authoritative owner**. Do not replace working Attack sub-engines merely because the old private-alpha game test failed, and do not hide an engine defect in browser workarounds.
+
+Until this gate passes: **Attack gameplay = HOLD / NOT COMPLETE**.
+
+## V2 presentation audio — REQUIRED FOR RELEASE 🔊
+
+Background music and sound effects are mandatory release requirements. They are presentation systems, not gameplay-rule owners and do not create owner #41.
+
+### Required audio behaviour
+- battle background music is present in the playable release;
+- appropriate UI/gameplay SFX are present for material player-visible events, including card select/play, Attack declaration/impact, damage, Shield, heal, Ability, Evolution, Essence attachment, Tactic/Relic/Realm use, Reward, turn change, victory/defeat and rejected action feedback where appropriate;
+- music and SFX have user-accessible mute/unmute controls;
+- music and SFX volume are independently controllable where practical;
+- browser autoplay restrictions are respected: audio begins only after a permitted user interaction and is never forced around platform policy;
+- mute/reduced/no-audio operation never changes legality, timers, randomization, state transitions or match outcome;
+- gameplay event/state is the source for presentation cues; sound never becomes rules authority;
+- audio assets must be original to Stream Bandit, licensed for use, or otherwise rights-cleared;
+- reduced-motion/accessibility paths remain usable without relying on sound alone.
+
+**V2-AUDIO-01 status:** REQUIRED / PENDING. It need not block the immediate Attack repair/proof slice, but it **must pass before public/live release**.
+
 ## Exact next operation
 
 1. refresh exact implementation `main` from `e59ee73443ed085b04175a2339b2eac3f8f8d818`;
-2. extend the same card-as-control / server-authoritative contract to **active Ability** using the existing generic `use_ability` route with board position (`where`, `index`);
-3. do not add card-name branches or a browser rules engine; server rejection remains the legality backstop;
-4. after Ability, implement reusable hand-card physical controls in bounded slices: Creature placement → Evolution target highlight/drop → Essence attachment → Relic → Realm → Ally/Device Tactic;
-5. keep drag/drop and tap/select accessibility paths equivalent; illegal or rejected intents return to authoritative board state with a visible reason;
-6. require exact-head validation/review before each source merge and update plan/checklist/ledger/release index after every accepted slice;
-7. keep Supabase/live deployment separate from source implementation until a real two-user V2 end-to-end fence is ready.
+2. prove **V2-ATTACK-01** before expanding the action surface: reproduce a simple legal card-initiated Attack through the real V2 client/server contract and current structured card data;
+3. if the real path fails, identify the exact first failing seam (card definition → client intent → deployed/source dispatcher → owner validation → atomic commit → authoritative view refresh) and repair only that owner/integration boundary;
+4. require the successful proof to show damage/effect, Aftermath/turn progression and synchronized visible board state—not merely a 200 response or passing type-check;
+5. once Attack is genuinely accepted, extend the same card-as-control / engine-authoritative contract to **active Ability** using the generic `use_ability` route with board position (`where`, `index`);
+6. then implement reusable hand-card physical controls in bounded slices: Creature placement → Evolution target highlight/drop → Essence attachment → Relic → Realm → Ally/Device Tactic;
+7. keep drag/drop and tap/select accessibility paths equivalent; illegal or rejected intents return to authoritative board state with a visible reason;
+8. add V2-AUDIO-01 background music/SFX system before public/live release and gate release on working mute/volume/accessibility behaviour;
+9. require exact-head validation/review before each source merge and update plan/checklist/ledger/release index after every accepted slice;
+10. keep Supabase/live deployment separate from source implementation until a real two-user V2 end-to-end fence is ready.
 
 G0R-10 remains explicitly queued and cannot be silently skipped before any live/public promotion that uses `play_tactic`.
