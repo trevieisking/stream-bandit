@@ -9,8 +9,10 @@
     "previous_audit_history": "tcg-master-plan-ledger-v2.3.md",
     "mechanic_heritage_research": "tcg-mechanic-heritage-research-v1.md",
     "special_mechanic_rule_matrix": "tcg-special-mechanic-rule-matrix-v1.1.md",
+    "special_mechanic_names": "tcg-special-mechanic-names-v1.json",
     "evergreen_extensibility": "tcg-evergreen-extensibility-v1.1.json",
     "battle_interaction": "tcg-battle-client-interaction-v1.json",
+    "damage_counter_interaction": "tcg-damage-counter-interaction-v1.json",
     "card_visual_printing": "tcg-card-visual-printing-v1.1.json",
     "card_controller": "tcg-v2-card-action-controller-v1.json",
     "ten_deck_blueprint": "tcg-ten-deck-product-blueprint-v2.json",
@@ -66,7 +68,8 @@
     "attack_auto_ends_turn_after_resolution_and_aftermath": true,
     "keep_board_visible_during_choices_when_practical": true,
     "misclick_change_or_cancel_before_server_commit_when_practical": true,
-    "debug_form_release_battlefield_forbidden": true
+    "debug_form_release_battlefield_forbidden": true,
+    "damage_counter_drag_or_tap_interaction": true
   },
   "post_test_consistency": {
     "status": "complete",
@@ -79,7 +82,9 @@
     },
     "damage_affinity_capability_reserved": true,
     "working_affinity_labels": ["Vulnerability", "Resistance"],
-    "set_one_affinity_values_changed_by_this_control_update": false
+    "set_one_affinity_values_changed_by_this_control_update": false,
+    "original_special_family_names_locked": true,
+    "damage_counter_interaction_locked": true
   },
   "evergreen_policy": {
     "status": "canonical_v2_3_inherited_by_v2_3_1",
@@ -102,24 +107,39 @@
   },
   "future_extensibility": {
     "status": "design_contract_accepted_runtime_proof_pending",
-    "pokemon_research_role": "general_mechanic category research plus supplied-card rule-pattern review only; no brand, asset, card-text, frame, UI or audio copying",
+    "external_research_labels_are_player_facing": false,
+    "stream_bandit_names_required": true,
     "working_special_classes": [
       "Ascendant Creature",
+      "Sigilborn Creature",
+      "Bonded Sigilborn",
+      "Exalted Creature",
       "Colossus Creature",
-      "Signature Power",
-      "Bonded Creature",
+      "Starforged Creature",
       "Convergence Creature",
       "Gleam Creature",
       "Prime Card",
-      "Voidmarked Card",
+      "Riftmarked Card",
       "Overform",
+      "Ascension Form",
       "Aspect Creature",
-      "Ascension Evolution"
+      "Apex Ascendant",
+      "Ascension Evolution",
+      "Signature Power"
     ],
     "damage_affinity_modifier": {
       "reserved": true,
       "working_labels": ["Vulnerability", "Resistance"],
       "match_sources": ["element", "type", "rule_tag"],
+      "server_authoritative": true
+    },
+    "damage_counter_system": {
+      "base_unit_damage": 10,
+      "place_counters": true,
+      "move_existing_counters": true,
+      "drag_or_tap_distribution": true,
+      "attack_counter_choices_resolve_before_turn_handoff": true,
+      "turn_transition_condition_ticks_supported": true,
       "server_authoritative": true
     },
     "new_series_must_be_data_driven": true,
@@ -157,9 +177,10 @@
     "old_cards_remain_supported_by_age": true,
     "future_schema_changes_require_backward_compatibility": true,
     "new_series_do_not_require_series_name_runtime_branches": true,
-    "pokemon_names_art_text_frames_ui_audio_assets_must_not_be_copied": true,
+    "external_research_brand_labels_do_not_ship_as_stream_bandit_names": true,
     "showcase_numbers_do_not_override_structured_rules": true,
-    "damage_affinity_must_be_structured_and_server_authoritative": true
+    "damage_affinity_must_be_structured_and_server_authoritative": true,
+    "damage_counter_totals_targets_and_timing_must_be_structured_and_server_authoritative": true
   },
-  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E evergreen/extensibility schema metadata including damage-affinity support before the premium renderer and restored one-screen Battle Client."
+  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E evergreen/extensibility schema metadata including original special-family names, damage-affinity support and damage-counter placement/movement/timing before the premium renderer and restored one-screen Battle Client."
 }
