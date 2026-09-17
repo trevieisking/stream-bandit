@@ -2,12 +2,17 @@
   "schema": "stream-bandit-tcg-evergreen-extensibility-v1.1",
   "recorded_at": "2026-09-17",
   "inherits": "tcg-evergreen-extensibility-v1.json",
-  "purpose": "Add the post-test damage-affinity capability while preserving the V2.3 evergreen/extensibility contract.",
+  "purpose": "Add post-test damage-affinity, original Stream Bandit special-family naming and damage-counter interaction capabilities while preserving the V2.3 evergreen/extensibility contract.",
   "primary_format_policy": "unchanged_from_v1",
   "content_extension_policy": "unchanged_from_v1",
-  "special_mechanic_policy": "unchanged_from_v1",
+  "special_mechanic_policy": "generic_capabilities_with_original_stream_bandit_player_facing_names",
+  "special_mechanic_names_authority": "tcg-special-mechanic-names-v1.json",
+  "damage_counter_interaction_authority": "tcg-damage-counter-interaction-v1.json",
   "added_required_rule_capabilities": [
-    "damage_affinity_modifier"
+    "damage_affinity_modifier",
+    "place_damage_counters",
+    "move_damage_counters",
+    "turn_transition_condition_damage_counters"
   ],
   "damage_affinity_modifier": {
     "working_player_labels": {
@@ -27,9 +32,41 @@
     "special_class_does_not_imply_affinity": true,
     "set_one_values_change_only_by_explicit_structured_card_data": true
   },
+  "damage_counter_model": {
+    "base_unit_damage": 10,
+    "values_use_10_point_increments": true,
+    "maximum_or_total_comes_from_resolving_property": true,
+    "place_and_move_are_distinct_from_ordinary_damage": true,
+    "interactive_drag_or_tap_distribution": true,
+    "server_authoritative_distribution": true,
+    "attack_generated_counter_choices_resolve_before_turn_handoff": true,
+    "condition_ticks_may_add_counters_at_turn_transition": true,
+    "condition_tick_amount_is_structured_property": true,
+    "defeat_scan_after_condition_counter_tick": true,
+    "ordinary_damage_modifiers_do_not_automatically_modify_counter_placement": true
+  },
+  "original_stream_bandit_working_families": [
+    "Ascendant Creature",
+    "Sigilborn Creature",
+    "Bonded Sigilborn",
+    "Exalted Creature",
+    "Colossus Creature",
+    "Starforged Creature",
+    "Convergence Creature",
+    "Gleam Creature",
+    "Prime Card",
+    "Riftmarked Card",
+    "Overform",
+    "Ascension Form",
+    "Aspect Creature",
+    "Apex Ascendant",
+    "Ascension Evolution",
+    "Signature Power"
+  ],
   "architecture": {
     "owner_family_baseline": 40,
-    "prefer_existing_damage_and_effect_owners": true,
+    "prefer_existing_damage_condition_defeat_reward_and_effect_owners": true,
+    "special_family_names_do_not_create_engines": true,
     "no_new_owner_without_new_state_transition_proof": true,
     "backward_compatibility_is_required": true
   }
