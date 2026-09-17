@@ -21,7 +21,11 @@ test('standalone pages reuse one shell, auth gate and platform chrome',async()=>
 
 test('Account and social families are separate real routes and unsafe writes stay gated',async()=>{
   for(const href of [...account,...social])await access(new URL(href,`file://${ROOT}/`));
-  for(const href of ['tcg-account-leave.html','tcg-account-delete.html','tcg-account-privacy.html','tcg-account-preferences.html','tcg-friend-requests.html','tcg-blocked.html']){const html=await read(href);assert.ok(html.includes('data-owner-state="gated"'));assert.ok(html.includes('aria-disabled="true"'));}
+  for(const href of ['tcg-account-leave.html','tcg-account-delete.html','tcg-account-preferences.html','tcg-friend-requests.html','tcg-blocked.html']){const html=await read(href);assert.ok(html.includes('data-owner-state="gated"'));assert.ok(html.includes('aria-disabled="true"'));}
+  const privacy=await read('tcg-account-privacy.html');
+  assert.ok(privacy.includes('id="tcgDirectoryPrivacySave"'));
+  assert.ok(privacy.includes('stream-bandit-tcg-player-directory-v2-4-6.js'));
+  assert.ok(privacy.includes('TCG-specific blocking remains gated'));
   const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.js');assert.ok(shell.includes('{key:"find",label:"Find Players",href:"tcg-players.html"}'));
 });
 
