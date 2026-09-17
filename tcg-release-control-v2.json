@@ -8,6 +8,7 @@
     "previous_desired_behavior": "tcg-master-plan-progress-v2.2.md",
     "previous_audit_history": "tcg-master-plan-ledger-v2.2.md",
     "mechanic_heritage_research": "tcg-mechanic-heritage-research-v1.md",
+    "special_mechanic_rule_matrix": "tcg-special-mechanic-rule-matrix-v1.md",
     "evergreen_extensibility": "tcg-evergreen-extensibility-v1.json",
     "battle_interaction": "tcg-battle-client-interaction-v1.json",
     "card_visual_printing": "tcg-card-visual-printing-v1.json",
@@ -87,7 +88,7 @@
   },
   "future_extensibility": {
     "status": "design_contract_accepted_runtime_proof_pending",
-    "pokemon_research_role": "general_mechanic_category_research_only_no_brand_asset_text_or_ui_copy",
+    "pokemon_research_role": "general_mechanic category research plus supplied-card rule-pattern review only; no brand, asset, card-text, frame, UI or audio copying",
     "working_special_classes": [
       "Ascendant Creature",
       "Colossus Creature",
