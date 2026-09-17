@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
+const renderer = fs.readFileSync(path.join(root, 'stream-bandit-tcg-card-renderer-v2-4-7.js'), 'utf8');
 const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-controller.js'), 'utf8');
 
 class FakeButton {
@@ -54,18 +55,32 @@ function playableView(revision = 41) {
     view_state: {
       phase: 'play',
       active_seat: 1,
+      realm: null,
       you: {
         seat: 1,
         vanguard: {
           stack: [{ uid: 'starwhale-1', card_id: 'astral-starwhale' }],
           damage: 0,
           essence: [{ uid: 'essence-1' }, { uid: 'essence-2' }],
-          shield: 0
+          relic: null,
+          shield: 0,
+          conditions: {}
         },
         reserve: [],
-        hand: []
+        hand: [],
+        hand_count: 0,
+        deck_count: 48,
+        discard_count: 0,
+        rewards_count: 6
       },
-      opponent: { vanguard: null, reserve: [] },
+      opponent: {
+        vanguard: null,
+        reserve: [],
+        hand_count: 0,
+        deck_count: 48,
+        discard_count: 0,
+        rewards_count: 6
+      },
       card_index: {
         'astral-starwhale': {
           definition: {
@@ -75,7 +90,14 @@ function playableView(revision = 41) {
             element: 'Astral'
           },
           definition_v0_2: {
+            name: 'Starwhale',
+            card_family: 'Creature',
+            element: 'Astral',
             creature: {
+              stage: 'Standalone',
+              hp: 120,
+              withdrawal: 1,
+              ability: null,
               attacks: [{ slot: 1, name: 'Gravity Song', damage: 40 }]
             }
           }
@@ -181,6 +203,7 @@ function makeHarness() {
     console
   };
 
+  vm.runInNewContext(renderer, context, { filename: 'stream-bandit-tcg-card-renderer-v2-4-7.js' });
   vm.runInNewContext(controller, context, { filename: 'stream-bandit-tcg-v2-battle-controller.js' });
   assert.equal(typeof domReady, 'function', 'controller must register its DOMContentLoaded boot');
 
