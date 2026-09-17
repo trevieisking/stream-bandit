@@ -155,3 +155,58 @@ This distinction is required to prevent the new anti-memory/search-integrity rul
 2. refresh exact PR head, workflow runs and combined status;
 3. post the exact-head checkpoint on PR #564;
 4. on the next implementation slice, resume the locked V2-G0R route while carrying `search.deck -> deck.shuffle` into every relevant Search/Card-Zone/Hidden Information/Shuffle design and test decision.
+
+---
+
+# V2.3.3-006 — V2-G0R implementation started: G0R-10 proven, G0R-11 safety prerequisite patched
+
+**Implementation session date:** 2026-09-17.
+
+**Canonical control head at session start:** PR #564 head `856f76c9f7c6887e20d24ed2a3f592554f3fd7ee`.
+
+**Current main baseline refreshed:** `59ab7857522373a53de7d551c66f12c2e514e934`.
+
+## G0R-10 source proof
+
+Exact-source inspection of `supabase/functions/tcg-tactic-actions/index.ts` proves `play_tactic` validates the outer `Tactic` family and effect schema but does not reject non-one-shot Tactic subtypes before resolution begins. Current structured Set One data proves the canonical Tactic subtype vocabulary includes `Ally`, `Device`, `Relic`, and `Realm`; separate Relic and Realm owner routes already exist.
+
+**Locked implementation boundary:** only `Ally` and `Device` may enter the one-shot `play_tactic` interpreter. `Relic` and `Realm` must remain owned by their dedicated routes. No new owner/helper is justified.
+
+G0R-10 remains **TODO / proven defect** until the runtime guard and deterministic boundary test land and pass exact-head validation.
+
+## G0R-11 prerequisite implementation
+
+The existing `.github/workflows/tcg-card-pass-2-validation.yml` path filter covered only named legacy control files, a handful of shared TCG modules and four explicit TCG migrations. This can skip validation for newer master-plan/control files, other shared TCG owners, future/current TCG Edge Function trees and other TCG migrations.
+
+A dedicated non-main implementation branch was created from exact main:
+
+- branch: `fix/tcg-g0r-11-validation-coverage`;
+- starting SHA: `59ab7857522373a53de7d551c66f12c2e514e934`;
+- patch commit: `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`;
+- exact diff: 1 file, +6 / -0;
+- file: `.github/workflows/tcg-card-pass-2-validation.yml`.
+
+Added coverage is intentionally additive and preserves every existing explicit path while adding:
+
+- root `tcg-*.md`;
+- root `tcg-*.json`;
+- root `tcg-*.mjs`;
+- shared `supabase/functions/_shared/tcg-*.ts`;
+- all `supabase/functions/tcg-*/**` trees;
+- all `supabase/migrations/*tcg*.sql` migrations.
+
+Draft runtime-recovery PR opened:
+
+- PR #565 — `TCG G0R-11: broaden validation path coverage`;
+- base: `main`;
+- head: `fix/tcg-g0r-11-validation-coverage`;
+- reviewed opening head: `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`;
+- changed files: 1;
+- additions/deletions: +6 / -0;
+- state: open, draft, unmerged.
+
+**Promotion state:** branch-only G0R-11 patch = **PROMOTE**. PR merge/main/runtime/Supabase/live/production = **HOLD** pending fresh exact-head CI trigger and green validation evidence.
+
+**Production/live impact:** none.
+
+**Exact next operation:** fetch PR #565 exact-head workflow runs/statuses and prove the repaired trigger fires. If green, mark G0R-11 accepted and update the checklist/ledger before advancing to the already-proven G0R-10 subtype guard.
