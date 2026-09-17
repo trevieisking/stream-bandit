@@ -18,28 +18,35 @@ The V2.3.3 Deck Search rule remains fully locked: every true `search.deck` has t
 - **G0R-11 — Validation workflow coverage: COMPLETE ✅**
   - merged PR #565;
   - accepted head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`;
-  - merge/current-main checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`;
-  - TCG Validation run #571 / `35232546805` SUCCESS;
-  - no runtime/Supabase/live behavior changed.
+  - merge checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`;
+  - TCG Validation run #571 / `35232546805` SUCCESS.
+- **G0R-07 — Matchmaking room lifetime: COMPLETE IN SOURCE ✅**
+  - merged PR #566;
+  - accepted head `190c9c9e4bf07712571b978abbd3657f876febed`;
+  - merge/current-main checkpoint `fce98178f2234386da7be3aef02a8496fa24195a`;
+  - TCG Validation #574 / `35233465142` SUCCESS;
+  - Migration Replay #799 / `35233465044` SUCCESS, including full disposable database reset/replay from zero;
+  - Functional Smoke #825 / `35233465614` SUCCESS;
+  - zero unresolved review threads at final pre-merge refresh;
+  - exact diff stayed 2 files: additive replacement migration + focused contract test;
+  - waiting rooms remain expiry-gated; `locked`/`in_match` rooms remain discoverable after original queue expiry.
+  - **Supabase/live is not yet changed by this source merge; deployment remains a separate HOLD decision.**
 - **G0R-10 — Tactic subtype boundary: PROVEN / QUEUED 🟡**
   - only Ally/Device may enter one-shot `play_tactic`;
   - Relic/Realm remain dedicated-owner actions;
   - runtime guard is not yet accepted.
-- **G0R-07 — Matchmaking room lifetime: IN PROGRESS 🔎**
-  - exact defect: retry/poll applied queue expiry to waiting + locked + in_match rooms;
-  - required rule: waiting rooms remain expiry-gated; locked/in_match rooms stay discoverable after original queue expiry;
-  - repair PR #566 exact head `190c9c9e4bf07712571b978abbd3657f876febed`;
-  - exact diff: additive replacement migration + focused contract test only;
-  - TCG Validation, Migration Replay and Functional Smoke have all triggered and are pending at this checkpoint.
 
-**Accepted G0R repairs:** **1 / 11**. G0R-07 does not become repair #2 until exact-head gates pass and a fresh promotion decision is made.
+**Accepted G0R source repairs:** **2 / 11**.
 
 ## Exact next operation
 
-1. wait only for the already-triggered exact-head PR #566 validation evidence;
-2. if any lane fails, repair G0R-07 on the same bounded branch and re-run the exact-head fence;
-3. if all required lanes are green and review evidence is clean, refresh PR/main identifiers and decide merge promotion;
-4. update this plan/checklist/ledger before reporting acceptance;
-5. then continue the next safest V2-G0R owner repair, retaining G0R-10 as a proven queued defect until a safe full-file mutation path is available.
+Continue exactly one bounded V2-G0R repair from refreshed main `fce98178f2234386da7be3aef02a8496fa24195a`.
 
-No Supabase deployment or live promotion is authorized by this checkpoint.
+Priority remains:
+1. use exact source evidence and the existing owner architecture;
+2. prefer additive/replay-safe fixes that do not risk working production data;
+3. keep G0R-10 explicitly queued until a safe byte-accurate mutation path for the large Tactic dispatcher is available;
+4. require the repaired TCG Validation trigger plus any relevant Migration Replay / Functional Smoke gates;
+5. update plan/checklist/ledger before each delivered implementation result.
+
+No Supabase deployment or live promotion is authorized merely by the G0R-07 source merge.
