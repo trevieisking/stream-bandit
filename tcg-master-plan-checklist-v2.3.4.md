@@ -22,6 +22,74 @@ Every material implementation result must leave the exact repository, PR/branch,
 
 **Accepted G0R source repairs: 4 / 11 ✅**
 
+## V2 authority rule — LOCKED
+
+| ID | Requirement | State |
+|---|---|---|
+| AUTH-01 | Cards are the primary player controls | LOCKED ✅ |
+| AUTH-02 | Each card action resolves through its appropriate canonical engine/owner | LOCKED ✅ |
+| AUTH-03 | Card/browser never becomes legality, damage, payment, RNG, timing or state-transition authority | LOCKED ✅ |
+| AUTH-04 | No duplicate browser rules engine | LOCKED ✅ |
+| AUTH-05 | No new owner #41 for UI, audio, one card or one label | LOCKED ✅ |
+
+## V2-UI-01 — Card-face Attack intent/control foundation
+
+| ID | Requirement | State | Evidence / acceptance |
+|---|---|---|---|
+| UI01-01 | Active Vanguard card is primary Attack control | COMPLETE ✅ | PR #569 source |
+| UI01-02 | Attack slots originate from structured card data | COMPLETE ✅ | V2 controller + focused contract |
+| UI01-03 | Client submits generic `attack` + `attack_slot` only | COMPLETE ✅ | no card-name Attack dispatcher added |
+| UI01-04 | `match_id` + fresh nonce + expected revision fence retained | COMPLETE ✅ | controller contract |
+| UI01-05 | Server remains rules authority | COMPLETE ✅ | no browser legality/payment/damage engine |
+| UI01-06 | Rejection refreshes authoritative state and retains visible reason | COMPLETE ✅ | V2 controller source |
+| UI01-07 | Exact-head validation | PASS ✅ | Validation #608 / run `35241870575` |
+| UI01-08 | Source merge | COMPLETE ✅ | PR #569 → main `e59ee73443ed085b04175a2339b2eac3f8f8d818` |
+| UI01-09 | Real two-user Attack gameplay proven | **NOT PART OF THIS CHECKPOINT** | moved to V2-ATTACK-01 |
+
+**Classification:** V2-UI-01 proves card→Attack intent/control wiring. It does **not** prove Attack gameplay complete.
+
+## V2-ATTACK-01 — Real playable Attack engine path — REQUIRED / PENDING 🔒
+
+Historical evidence includes a user-observed failed playable test in which Attack did not execute. Current source also contains isolated real-dispatch Attack tests that can commit damage and advance the turn. Therefore the correct state is **full path unproven**, not “all Attack code broken” and not “Attack complete.”
+
+| ID | Required proof | State |
+|---|---|---|
+| ATK01-01 | Real V2 two-user match reaches legal Attack state | PENDING 🔒 |
+| ATK01-02 | Active Creature card exposes correct structured Attack | PENDING 🔒 |
+| ATK01-03 | Card action reaches canonical Attack route once | PENDING 🔒 |
+| ATK01-04 | Engine validates turn + Attack cost + target legality | PENDING 🔒 |
+| ATK01-05 | Expected authoritative damage/effect commits exactly once | PENDING 🔒 |
+| ATK01-06 | Shield/Condition/listener/choice chain remains canonical | PENDING 🔒 |
+| ATK01-07 | Defeat → Reward/promotion → Aftermath order correct when applicable | PENDING 🔒 |
+| ATK01-08 | Successful Attack advances/hands off turn correctly | PENDING 🔒 |
+| ATK01-09 | Both players receive/render the same committed board result | PENDING 🔒 |
+| ATK01-10 | Illegal Attack rejects with visible reason and zero mutation | PENDING 🔒 |
+| ATK01-11 | Exact failing seam identified before any runtime correction | PENDING 🔒 |
+| ATK01-12 | Any correction stays in canonical owner/integration boundary, never browser workaround | PENDING 🔒 |
+| ATK01-13 | Focused deterministic regression coverage after any correction | PENDING 🔒 |
+| ATK01-14 | Exact-head Validation/review clean | PENDING 🔒 |
+
+**Attack gameplay status: HOLD / NOT COMPLETE.**
+
+## V2-AUDIO-01 — Background music + SFX — REQUIRED / PENDING 🔊
+
+| ID | Requirement | State |
+|---|---|---|
+| AUD-01 | Battle background music exists in release client | PENDING |
+| AUD-02 | Gameplay/UI SFX cover material visible actions/outcomes | PENDING |
+| AUD-03 | Attack declaration/impact + damage have SFX | PENDING |
+| AUD-04 | Ability/Evolution/Essence/Tactic/Relic/Realm/Reward/turn/end-state cues supported | PENDING |
+| AUD-05 | Mute/unmute available | PENDING |
+| AUD-06 | Music volume control | PENDING |
+| AUD-07 | SFX volume control | PENDING |
+| AUD-08 | Browser autoplay policy respected; audio starts only after permitted user gesture | PENDING |
+| AUD-09 | Audio cannot alter rules, RNG, timers, state or outcome | LOCKED ✅ |
+| AUD-10 | Audio cues are driven from authoritative/presentation events, not treated as rules authority | LOCKED ✅ |
+| AUD-11 | Audio assets original/licensed/rights-cleared | PENDING |
+| AUD-12 | Gameplay remains understandable when muted; no sound-only mandatory information | PENDING |
+| AUD-13 | No owner #41 created solely for audio presentation | LOCKED ✅ |
+| AUD-14 | Audio acceptance complete before public/live promotion | REQUIRED 🔒 |
+
 ## G0R-09 checklist — ACCEPTED SOURCE REPAIR
 
 | ID | Requirement | State | Evidence / acceptance |
@@ -42,22 +110,28 @@ Every material implementation result must leave the exact repository, PR/branch,
 | G0R09-14 | Merge to main | COMPLETE ✅ | PR #568 merged from expected head to `2bc55ecd6d626a465cd483ee2e889ceb6177c280` |
 | G0R09-15 | Supabase/live deployment | HOLD 🔒 | separate deployment decision; none performed |
 
-## Exact G0R-09 identifiers
+## Exact current identifiers
 
 - repository `trevieisking/stream-bandit`
-- PR #568 / branch `fix/tcg-g0r-09-ready-concurrency`
-- base main `042559e252cfa49ad425d9f57fa01a678b2a3fe9`
-- reviewed head `cc46b1fda04361105bc390c9efeddc8c475c6571`
-- merge/current-main checkpoint `2bc55ecd6d626a465cd483ee2e889ceb6177c280`
-- exact-head workflows: Validation #597 / `35235272269`; Replay #801 / `35235272316`; Smoke #827 / `35235272663` — all SUCCESS
-- combined legacy statuses: none found
-- runtime/live impact: source/main changed; Supabase/live unchanged
+- accepted implementation main `e59ee73443ed085b04175a2339b2eac3f8f8d818`
+- V2 card-control source PR #569 reviewed head `ba1f5ef61439d24a4e91ae96272a5d046ae9d80c`
+- PR #569 Validation #608 / `35241870575` — SUCCESS
+- historical accepted G0R repairs: 4/11
+- G0R-10: queued
+- Supabase/live/production: HOLD
 - Code Labs Writer / CG Repair Lab / Code God: not invoked
 
 ## Inherited critical rules still locked
 
-Original prototype = UX truth; 40-owner baseline; no owner #41 for one card/label/UI; every true Deck Search ends in authoritative shuffle with **Then shuffle your deck.**; G0R-10 remains explicitly queued and may not be forgotten.
+Original prototype = UX truth; 40-owner baseline; cards initiate actions while canonical engines own rules; no owner #41 for one card/label/UI/audio; every true Deck Search ends in authoritative shuffle with **Then shuffle your deck.**; G0R-10 remains explicitly queued and may not be forgotten.
 
 ## Exact next operation
 
-Refresh current main `2bc55ecd6d626a465cd483ee2e889ceb6177c280` and prove the next safest single V2-G0R defect from exact source. Prefer an additive/replay-safe owner repair over a risky whole-file replacement. Keep Supabase/live separate until source stabilization and deployment evidence justify promotion.
+1. Freeze current source main `e59ee73443ed085b04175a2339b2eac3f8f8d818` as the Attack-E2E investigation baseline.
+2. Prove V2-ATTACK-01 with the simplest legal structured Attack through the real card-control → server-owner → committed-state → visible-board path.
+3. If it fails, identify the exact first failing seam before coding and repair only that canonical owner/integration boundary.
+4. Require damage/effect + Aftermath/turn progression + synchronized board proof before marking Attack complete.
+5. After Attack acceptance, continue card-control slices: active Ability → Creature placement → Evolution → Essence → Relic → Realm → Ally/Device Tactic.
+6. Implement and prove V2-AUDIO-01 before public/live promotion.
+7. Keep G0R-10 queued and close it before live/public promotion using `play_tactic`.
+8. Keep Supabase/live deployment separate until the complete two-user V2 fence passes.
