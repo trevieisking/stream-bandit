@@ -1,0 +1,101 @@
+{
+  "schema": "stream-bandit-tcg-special-mechanic-names-v1",
+  "recorded_at": "2026-09-17",
+  "purpose": "Original Stream Bandit player-facing working names for special-mechanic families studied from historical/current external TCG patterns. Research labels remain provenance only and must not ship as Stream Bandit player-facing terminology.",
+  "originality_rule": {
+    "external_research_labels_are_player_facing": false,
+    "stream_bandit_names_required": true,
+    "engine_uses_generic_capabilities_not_brand_specific_engines": true,
+    "player_facing_names_may_be_refined_later_without_changing_capability_semantics": true
+  },
+  "working_names": [
+    {
+      "research_family": "historical EX / current ex style",
+      "stream_bandit_name": "Ascendant Creature",
+      "primary_capabilities": ["special_rule_class", "reward_value_2_default"]
+    },
+    {
+      "research_family": "GX style",
+      "stream_bandit_name": "Sigilborn Creature",
+      "primary_capabilities": ["special_rule_class", "reward_value_2_default", "signature_power_eligible"]
+    },
+    {
+      "research_family": "TAG TEAM GX style",
+      "stream_bandit_name": "Bonded Sigilborn",
+      "primary_capabilities": ["bonded_identity", "reward_value_3_default", "signature_power_eligible", "extra_cost_bonus_optional"]
+    },
+    {
+      "research_family": "V style",
+      "stream_bandit_name": "Exalted Creature",
+      "primary_capabilities": ["special_rule_class", "reward_value_2_default"]
+    },
+    {
+      "research_family": "VMAX style",
+      "stream_bandit_name": "Colossus Creature",
+      "primary_capabilities": ["special_evolution_parent", "reward_value_3_default", "high_stakes_form"]
+    },
+    {
+      "research_family": "VSTAR style",
+      "stream_bandit_name": "Starforged Creature",
+      "primary_capabilities": ["special_evolution_parent", "reward_value_2_default", "signature_power_eligible"]
+    },
+    {
+      "research_family": "V-UNION style",
+      "stream_bandit_name": "Convergence Creature",
+      "primary_capabilities": ["multi_card_assembly", "component_recipe", "assembled_battlefield_identity"]
+    },
+    {
+      "research_family": "Radiant style",
+      "stream_bandit_name": "Gleam Creature",
+      "primary_capabilities": ["special_rule_class", "shared_deck_group_limit_1"]
+    },
+    {
+      "research_family": "ACE SPEC style",
+      "stream_bandit_name": "Prime Card",
+      "primary_capabilities": ["shared_deck_group_limit_1", "support_card_family"]
+    },
+    {
+      "research_family": "Prism Star style",
+      "stream_bandit_name": "Riftmarked Card",
+      "primary_capabilities": ["singleton_or_group_limit", "zone_replacement_to_void_optional"]
+    },
+    {
+      "research_family": "LV.X style",
+      "stream_bandit_name": "Overform",
+      "primary_capabilities": ["overlay_upgrade", "inherit_attacks", "inherit_abilities", "retain_configured_state"]
+    },
+    {
+      "research_family": "BREAK style",
+      "stream_bandit_name": "Ascension Form",
+      "primary_capabilities": ["overlay_upgrade", "inherit_configured_lower_properties", "selective_stat_override"]
+    },
+    {
+      "research_family": "Tera style",
+      "stream_bandit_name": "Aspect Creature",
+      "primary_capabilities": ["alternate_form_or_element", "position_based_protection_optional", "rule_tag_targeting"]
+    },
+    {
+      "research_family": "current Mega-ex style",
+      "stream_bandit_name": "Apex Ascendant",
+      "primary_capabilities": ["special_evolution", "reward_value_3_default", "high_stakes_form"]
+    },
+    {
+      "research_family": "historical Mega EX evolve-and-end-turn pattern",
+      "stream_bandit_name": "Ascension Evolution",
+      "primary_capabilities": ["special_evolution", "optional_on_evolve_end_turn"]
+    }
+  ],
+  "shared_special_action_name": {
+    "stream_bandit_name": "Signature Power",
+    "scope": "controller_match",
+    "kinds": ["Signature Attack", "Signature Ability"],
+    "default_usage": "one shared use per player per match when a card/family declares this capability"
+  },
+  "separation_rules": [
+    "player-facing family label is not an engine owner",
+    "reward value is independent from rarity",
+    "printing finish is cosmetic and independent from special class",
+    "special evolution timing is independent from reward value",
+    "multiple families may compose the same generic capability owners"
+  ]
+}
