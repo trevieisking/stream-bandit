@@ -1,0 +1,65 @@
+{
+  "schema": "stream-bandit-tcg-release-control-v2.3",
+  "recorded_at": "2026-09-17",
+  "status": "active_g0r_implementation_control",
+  "repository": "trevieisking/stream-bandit",
+  "authority": {
+    "desired_behavior": "tcg-master-plan-progress-v2.3.4.md",
+    "execution_checklist": "tcg-master-plan-checklist-v2.3.4.md",
+    "audit_history": "tcg-master-plan-ledger-v2.3.4.md",
+    "previous_master_plan": "tcg-master-plan-progress-v2.3.3.md",
+    "previous_checklist": "tcg-master-plan-checklist-v2.3.3.md",
+    "deck_search_integrity": "tcg-deck-search-integrity-v1.json",
+    "repository_truth": "GitHub exact PR/branch/commit/workflow/review evidence",
+    "live_truth": "Supabase deployed function/database state",
+    "player_experience_truth": "original playable Stream Bandit prototype"
+  },
+  "architecture": {
+    "restore_do_not_redesign": true,
+    "owner_family_baseline": 40,
+    "new_owner_for_ui_or_single_card_allowed": false,
+    "server_authoritative": true,
+    "browser_rules_engine_duplicate_allowed": false
+  },
+  "accepted_main": {
+    "sha": "5cfd9a5ae509d9dd091b99db822e24eb2d64bf00",
+    "accepted_g0r_repairs": 1,
+    "last_accepted_repair": "G0R-11 validation workflow coverage"
+  },
+  "g0r": {
+    "required_repairs": 11,
+    "accepted_repairs": 1,
+    "complete": ["G0R-11"],
+    "proven_queued": ["G0R-10"],
+    "in_progress": ["G0R-07"],
+    "g0r_07": {
+      "pr": 566,
+      "branch": "fix/tcg-g0r-07-matchmaking-room-lifetime",
+      "head": "190c9c9e4bf07712571b978abbd3657f876febed",
+      "base_main": "5cfd9a5ae509d9dd091b99db822e24eb2d64bf00",
+      "changed_files": 2,
+      "rule": "waiting rooms remain expiry-gated; locked/in_match rooms remain discoverable after original queue expiry",
+      "validation_run": 35233465142,
+      "migration_replay_run": 35233465044,
+      "functional_smoke_run": 35233465614,
+      "acceptance_state": "HOLD_PENDING_EXACT_HEAD_WORKFLOWS"
+    }
+  },
+  "deck_search_rule": {
+    "true_search_deck_requires_shuffle": true,
+    "player_text": "Then shuffle your deck.",
+    "runtime_proof_pending": true
+  },
+  "promotion_state": {
+    "g0r_07_branch_patch": "PROMOTE",
+    "pr_566_merge": "HOLD",
+    "supabase": "HOLD",
+    "live": "HOLD",
+    "production": "HOLD"
+  },
+  "protected_tools": {
+    "code_labs_writer_invoked": false,
+    "cg_repair_lab_invoked": false,
+    "code_god_invoked": false
+  }
+}
