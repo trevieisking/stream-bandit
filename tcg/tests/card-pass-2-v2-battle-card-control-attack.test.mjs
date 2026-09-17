@@ -12,14 +12,17 @@ const contractPath = path.join(root, 'tcg-battle-client-interaction-v1.json');
 const controller = fs.readFileSync(controllerPath, 'utf8');
 const surface = fs.readFileSync(surfacePath, 'utf8');
 const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
+const flow = (id) => contract.required_flows.find((entry) => entry.id === id);
 
 test('V2 battle surface makes the creature card the primary control without replacing the old lab', () => {
   assert.match(surface, /data-sb-tcg-v2-battle="card-control-v0-1"/);
   assert.match(surface, /id="youVanguard"/);
   assert.match(surface, /stream-bandit-tcg-v2-battle-controller\.js/);
   assert.doesNotMatch(surface, /Debug/i);
-  assert.doesNotMatch(surface, /generic global attack/i);
-  assert.equal(contract.interaction_model.card_face_primary_control, true);
+  assert.ok(contract.input_modes.desktop.includes('click_select'));
+  assert.deepEqual(flow('creature_context').steps.slice(0, 3), ['select_creature', 'enlarge_card', 'show_ability_or_attack_slots']);
+  assert.ok(contract.forbidden_client_patterns.includes('generic_global_attack_buttons_as_primary_attack_ui'));
+  assert.ok(contract.forbidden_client_patterns.includes('debug_form_layout_as_release_battlefield'));
 });
 
 test('active Creature attack intent preserves the existing authoritative transport fence', () => {
@@ -30,7 +33,8 @@ test('active Creature attack intent preserves the existing authoritative transpo
   assert.match(controller, /client_nonce: crypto\.randomUUID\(\)/);
   assert.match(controller, /expected_revision: revision\(\)/);
   assert.match(controller, /await refreshMatch\(\)/);
-  assert.equal(contract.interaction_model.server_authoritative, true);
+  assert.equal(contract.authority.server_authoritative, true);
+  assert.ok(flow('attack').steps.includes('server_validate'));
 });
 
 test('V2 attack controller does not implement card-specific gameplay branches', () => {
@@ -47,6 +51,7 @@ test('V2 attack controller does not implement card-specific gameplay branches', 
   assert.doesNotMatch(controller, /if\s*\([^)]*(?:card_id|\.id)[^)]*===/i);
   assert.doesNotMatch(controller, /damage\s*[+\-*]=/i);
   assert.doesNotMatch(controller, /essence[^\n]{0,40}(?:pay|cost)[^\n]{0,40}(?:>=|<=|===)/i);
+  assert.ok(contract.forbidden_client_patterns.includes('duplicate_browser_rules_engine'));
 });
 
 test('card selection is presentation-only and attack slots come from structured card data', () => {
@@ -55,6 +60,5 @@ test('card selection is presentation-only and attack slots come from structured 
   assert.match(controller, /definition_v0_2/);
   assert.match(controller, /structured\.creature\.attacks/);
   assert.match(controller, /state\.selectedAnchorUid/);
-  assert.equal(contract.interaction_model.illegal_drop_behavior, 'snap_back');
-  assert.equal(contract.interaction_model.prevent_double_resolution, true);
+  assert.deepEqual(flow('attack').steps.slice(0, 3), ['select_vanguard', 'choose_attack_1_or_attack_2', 'show_attack_cost']);
 });
