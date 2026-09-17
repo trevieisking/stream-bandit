@@ -1,7 +1,7 @@
 {
   "schema": "stream-bandit-tcg-release-control-v2.3",
   "recorded_at": "2026-09-17",
-  "status": "active_g0r_implementation_control",
+  "status": "active_v2_prototype_restoration_control",
   "repository": "trevieisking/stream-bandit",
   "authority": {
     "desired_behavior": "tcg-master-plan-progress-v2.3.4.md",
@@ -18,20 +18,31 @@
     "restore_do_not_redesign": true,
     "owner_family_baseline": 40,
     "new_owner_for_ui_or_single_card_allowed": false,
+    "new_owner_for_audio_presentation_allowed": false,
     "server_authoritative": true,
-    "browser_rules_engine_duplicate_allowed": false
+    "browser_rules_engine_duplicate_allowed": false,
+    "card_is_primary_player_control": true,
+    "card_is_rules_authority": false,
+    "card_action_rule": "card initiates structured intent; relevant canonical engine validates and resolves the action"
   },
   "accepted_main": {
-    "sha": "2bc55ecd6d626a465cd483ee2e889ceb6177c280",
+    "sha": "e59ee73443ed085b04175a2339b2eac3f8f8d818",
     "accepted_g0r_source_repairs": 4,
     "complete_repairs": ["G0R-11", "G0R-07", "G0R-08", "G0R-09"],
-    "last_accepted_repair": "G0R-09 private-room Ready concurrency"
+    "last_accepted_repair": "G0R-09 private-room Ready concurrency",
+    "last_accepted_v2_slice": "V2-UI-01 card-face Attack intent/control foundation",
+    "last_accepted_v2_pr": 569,
+    "last_accepted_v2_reviewed_head": "ba1f5ef61439d24a4e91ae96272a5d046ae9d80c",
+    "last_accepted_v2_validation_run": 35241870575
   },
   "g0r": {
+    "classification": "historical_private_alpha_hardening_and_reused_boundary_debt",
     "required_repairs": 11,
     "accepted_source_repairs": 4,
     "complete": ["G0R-11", "G0R-07", "G0R-08", "G0R-09"],
     "proven_queued": ["G0R-10"],
+    "remaining_items_block_v2_start": false,
+    "remaining_items_block_when_boundary_reused_or_live_safety_requires": true,
     "g0r_09": {
       "pr": 568,
       "branch": "fix/tcg-g0r-09-ready-concurrency",
@@ -52,13 +63,101 @@
       "supabase_deployment_state": "HOLD_NOT_DEPLOYED"
     }
   },
+  "prototype_restoration": {
+    "state": "IN_PROGRESS",
+    "v2_ui_01": {
+      "name": "card-face Attack intent/control foundation",
+      "source_state": "COMPLETE",
+      "gameplay_attack_complete": false,
+      "pr": 569,
+      "reviewed_head": "ba1f5ef61439d24a4e91ae96272a5d046ae9d80c",
+      "merge_sha": "e59ee73443ed085b04175a2339b2eac3f8f8d818",
+      "validation_run": 35241870575,
+      "validation_conclusion": "success",
+      "changed_files": 3,
+      "deletions": 0,
+      "legacy_t_html_changed": false,
+      "supabase_changed": false,
+      "rule": "active Creature card submits generic Attack intent; canonical engine remains authoritative"
+    },
+    "v2_attack_01": {
+      "name": "real playable Attack engine path",
+      "state": "HOLD_PENDING_REAL_TWO_USER_PROOF",
+      "user_observed_failed_private_alpha_attack": true,
+      "user_observed_failure_description": "previous playable game test attempted Attack but Attack did not execute",
+      "current_source_isolated_dispatch_test_exists": true,
+      "current_source_isolated_dispatch_test": "tcg/tests/card-pass-2-runtime-attack-owner-wiring.test.mjs",
+      "isolated_test_implication": "core dispatcher can commit deterministic Attack cases; this does not prove the full browser/deployed/two-user path",
+      "must_prove": [
+        "structured_attack_visible_on_active_card",
+        "card_initiated_intent_reaches_canonical_attack_route_once",
+        "turn_cost_target_legality_validated_by_server",
+        "expected_damage_or_effect_commits_exactly_once",
+        "shield_condition_listener_choice_chain_remains_canonical",
+        "defeat_reward_promotion_aftermath_order_correct_when_applicable",
+        "successful_attack_advances_or_hands_off_turn_correctly",
+        "both_clients_render_same_committed_board_state",
+        "illegal_attack_rejects_visibly_without_mutation"
+      ],
+      "repair_policy": "prove exact first failing seam before coding; repair canonical engine or integration boundary; browser workaround forbidden",
+      "completion_state": "NOT_COMPLETE"
+    }
+  },
+  "audio_release_requirement": {
+    "id": "V2-AUDIO-01",
+    "state": "REQUIRED_PENDING",
+    "public_live_release_blocker": true,
+    "gameplay_owner": false,
+    "creates_owner_41": false,
+    "background_music_required": true,
+    "gameplay_and_ui_sfx_required": true,
+    "required_controls": ["mute_unmute", "music_volume", "sfx_volume"],
+    "respect_browser_autoplay_policy": true,
+    "audio_may_change_game_state": false,
+    "audio_may_change_rng": false,
+    "audio_may_change_match_timing": false,
+    "muted_gameplay_must_remain_understandable": true,
+    "assets_must_be_original_licensed_or_rights_cleared": true,
+    "minimum_cue_families": [
+      "card_select_or_play",
+      "attack_declare",
+      "attack_impact",
+      "damage",
+      "shield",
+      "heal",
+      "ability",
+      "evolution",
+      "essence_attach",
+      "tactic_relic_realm",
+      "reward",
+      "turn_change",
+      "victory_defeat",
+      "rejected_action_feedback"
+    ]
+  },
   "deck_search_rule": {
     "true_search_deck_requires_shuffle": true,
     "player_text": "Then shuffle your deck.",
     "runtime_proof_pending": true
   },
+  "next_operation": {
+    "primary": "prove V2-ATTACK-01 on exact main e59ee73443ed085b04175a2339b2eac3f8f8d818 before adding active Ability control",
+    "on_failure": "identify exact first failing seam and repair only canonical owner or integration boundary with deterministic regression proof",
+    "after_attack": [
+      "active_ability_card_control",
+      "creature_placement_card_control",
+      "evolution_card_control",
+      "essence_attachment_card_control",
+      "relic_card_control",
+      "realm_card_control",
+      "ally_device_tactic_card_control"
+    ],
+    "before_public_live": ["V2-AUDIO-01", "G0R-10 if play_tactic path is used", "real_two_user_v2_end_to_end_fence"]
+  },
   "promotion_state": {
-    "g0r_09_source_merge": "PROMOTE_COMPLETE",
+    "v2_ui_01_source_merge": "PROMOTE_COMPLETE",
+    "v2_attack_01": "HOLD",
+    "v2_audio_01": "HOLD_PENDING_IMPLEMENTATION",
     "main_source_checkpoint": "ACCEPTED",
     "supabase": "HOLD",
     "live": "HOLD",
