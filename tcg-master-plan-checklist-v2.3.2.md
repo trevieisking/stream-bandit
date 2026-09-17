@@ -46,11 +46,11 @@ A source change without the checklist update is **not an accepted master-plan st
 |---|---|---|---|
 | CTRL-001 | Master plan V2.3.2 explicitly locks release recovery + prototype restoration | LOCKED | COMPLETE — `tcg-master-plan-progress-v2.3.2.md`, commit `9b4ff3eb6bb86c07b0cd6c198e4ece7c026b57dc` |
 | CTRL-002 | Dedicated execution checklist exists and mirrors the master-plan gates | LOCKED | COMPLETE — this file, initial commit `03384eedba586d160f7f3433bce243c7f4a058e0` |
-| CTRL-003 | Dedicated append-only V2.3.2 ledger records accepted work slices and next operation | LOCKED | COMPLETE — `tcg-master-plan-ledger-v2.3.2.md`, commit `dd575ae765859bc9883befef98fee79dac5376f3` |
+| CTRL-003 | Dedicated append-only V2.3.2 ledger records accepted work slices and next operation | LOCKED | COMPLETE — `tcg-master-plan-ledger-v2.3.2.md`, latest evidence commit `b4e256715658e037dacd36064fb76aa7d2d1bf47` |
 | CTRL-004 | Machine release/index authority points at V2.3.2 plan + checklist + ledger | LOCKED | COMPLETE — `tcg-release-control-v2.1.json`, commit `64d437335344853c3b38155698b6ba304bdd90e4` |
 | CTRL-005 | Card visual authority is corrected to HP top-left without inventing Creature Cost | LOCKED | COMPLETE — `tcg-card-visual-printing-v1.2.json`, commit `bd86254e66594d95e573d7a9203fbee058a4559b` |
 | CTRL-006 | Any controller/release authority pointer that conflicts with corrected visual authority is realigned | LOCKED | HOLD — exact inspection proves `tcg-v2-card-action-controller-v1.json` still points at `tcg-card-visual-printing-v1.1.json`; do not forget or mark complete |
-| CTRL-007 | Every material work-result message updates this checkpoint before delivery | LOCKED | ACTIVE PROCESS — this update is the first enforced checkpoint |
+| CTRL-007 | Every material work-result message updates this checkpoint before delivery | LOCKED | ACTIVE PROCESS — enforced by this final checkpoint update |
 | CTRL-008 | Exact SHA/evidence, not memory, controls continuation after timeouts/new chats | LOCKED | ACTIVE PROCESS |
 | CTRL-009 | `main`, runtime, Supabase and live remain unchanged during this control-only gate | LOCKED | COMPLETE for this slice |
 
@@ -415,11 +415,14 @@ LIVE requires all of the following:
 **Control PR:** #564  
 **Branch:** `docs/tcg-v2-3-post-test-consistency`  
 **Starting reviewed head for this control slice:** `b11330a802d4b8574eb5847b54c249b5ed43adfe`  
-**Control slice before this checklist checkpoint:** `bd86254e66594d95e573d7a9203fbee058a4559b`  
-**Diff from start:** 5 commits ahead / 0 behind; exactly 5 new control files; no runtime file changed.  
+**Five-file recovery authority head:** `bd86254e66594d95e573d7a9203fbee058a4559b`  
+**Latest ledger evidence checkpoint before this final checklist commit:** `b4e256715658e037dacd36064fb76aa7d2d1bf47`  
+**Five-file diff from start:** 5 commits ahead / 0 behind; exactly 5 new control files; no runtime file changed.  
 **Workflow runs on `bd86254...`:** none found.  
 **Combined statuses on `bd86254...`:** none found.  
-**Latest visible Codex review summary:** reviewed older commit `0596901`, not current control head.  
+**Workflow runs on ledger head `b4e2567...`:** none found.  
+**Combined statuses on ledger head `b4e2567...`:** none found.  
+**Latest visible Codex review summary:** reviewed older commit `0596901`, not the V2.3.2 control head.  
 **Exact controller inspection:** `tcg-v2-card-action-controller-v1.json` still points to visual `v1.1`; CTRL-006 therefore remains HOLD.  
 **Runtime/live changes in this slice:** none.
 
@@ -435,14 +438,14 @@ LIVE requires all of the following:
 
 - [x] canonical V2.3.2 recovery/prototype master plan created;
 - [x] dedicated V2.3.2 execution checklist created;
-- [x] V2.3.2 append-only ledger created;
+- [x] V2.3.2 append-only ledger created and updated with this message's evidence;
 - [x] machine release/index authority created;
 - [x] card visual authority corrected to HP top-left + no invented Cost;
 - [ ] controller visual authority pointer realigned to v1.2 — **next exact control task**;
-- [x] exact 5-file diff reviewed from `b11330a...` to `bd86254...`;
+- [x] exact five-file recovery diff reviewed;
 - [x] workflow/status evidence refreshed — none found, therefore merge remains HOLD;
 - [ ] current-head review evidence obtained after the V2.3.2 control changes;
-- [ ] final Control Gate 0 accepted head recorded after CTRL-006 and review evidence.
+- [ ] final Control Gate 0 accepted head recorded after CTRL-006 and current review evidence.
 
 ### Next exact operation
 
