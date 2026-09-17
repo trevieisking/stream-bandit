@@ -93,6 +93,18 @@ V2.4.7 intentionally does not manufacture Ability/Withdraw/play/evolve/attach/ta
 - [ ] **V247-REVIEW-01** Review threads remain zero / material findings resolved.
 - [ ] **V247-DIFF-01** Final diff against `bd2f5b...` contains only renderer/tabletop/tests/continuity scope.
 
+### H.1 Proven pre-final candidate evidence
+
+Head `5955165017094b8df972a87c63440304410a2c9f` proved the V2.4.7 source behavior before this continuity-only synchronization commit:
+
+- TCG Card Pass 2 Validation #654 — SUCCESS, including Set One/card grammar and deterministic runtime-core lanes;
+- Code Labs V50 Functional Smoke #850 — SUCCESS, including Node source contracts, Deno engine/connector contracts and its zero-to-current PostgreSQL replay lane;
+- standalone Code Labs Migration Replay #824 — CANCELLED before any job existed because earlier sequential-commit workflow runs still occupied the queue, therefore not accepted as evidence;
+- bounded delta from accepted V2.4.6 parent: nine intended V2.4.7 files, nine commits ahead / zero behind;
+- no gameplay engine, Edge Function, migration, card definition, starter recipe or production Supabase byte changed.
+
+This checklist edit changes continuity text only. It deliberately creates one clean synchronization event after the obsolete workflow queue drained. **All three final gates remain unchecked until they pass together at the new exact head.**
+
 ## I. Inherited release gates remain open
 
 - [ ] Fresh real two-user **V2-ATTACK-01** on the release-shaped board.
