@@ -120,7 +120,9 @@
   },
   "mechanic_harvest": {
     "status": "living_research_and_schema_authority",
+    "source_set_catalog": "Pokector English catalogue",
     "pokector_english_sets_coverage_source": 174,
+    "source_effect_taxonomy": "Bulbapedia Category:Cards by effect",
     "broad_effect_categories_harvested": 54,
     "historical_mechanic_family_baseline_scan": true,
     "individual_card_text_deep_scan": "ongoing",
