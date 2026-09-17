@@ -22,31 +22,32 @@
     "browser_rules_engine_duplicate_allowed": false
   },
   "accepted_main": {
-    "sha": "042559e252cfa49ad425d9f57fa01a678b2a3fe9",
-    "accepted_g0r_source_repairs": 3,
-    "complete_repairs": ["G0R-11", "G0R-07", "G0R-08"],
-    "last_accepted_repair": "G0R-08 setup-legal deck validation"
+    "sha": "2bc55ecd6d626a465cd483ee2e889ceb6177c280",
+    "accepted_g0r_source_repairs": 4,
+    "complete_repairs": ["G0R-11", "G0R-07", "G0R-08", "G0R-09"],
+    "last_accepted_repair": "G0R-09 private-room Ready concurrency"
   },
   "g0r": {
     "required_repairs": 11,
-    "accepted_source_repairs": 3,
-    "complete": ["G0R-11", "G0R-07", "G0R-08"],
+    "accepted_source_repairs": 4,
+    "complete": ["G0R-11", "G0R-07", "G0R-08", "G0R-09"],
     "proven_queued": ["G0R-10"],
-    "g0r_08": {
-      "pr": 567,
-      "branch": "fix/tcg-g0r-08-setup-legal-deck",
-      "reviewed_head": "f612c450e911d1aa3cc3fdb37fd59c89c153236f",
-      "base_main": "fce98178f2234386da7be3aef02a8496fa24195a",
-      "merge_sha": "042559e252cfa49ad425d9f57fa01a678b2a3fe9",
+    "g0r_09": {
+      "pr": 568,
+      "branch": "fix/tcg-g0r-09-ready-concurrency",
+      "reviewed_head": "cc46b1fda04361105bc390c9efeddc8c475c6571",
+      "base_main": "042559e252cfa49ad425d9f57fa01a678b2a3fe9",
+      "merge_sha": "2bc55ecd6d626a465cd483ee2e889ceb6177c280",
       "changed_files": 2,
-      "rule": "validated decks require at least one active setup-legal Creature copy using the exact current server runtime recipe types",
-      "validation_run": 35234474804,
+      "rule": "Ready mutation and aggregate all-ready count are serialized per room while preserving membership, deck validation and the exact two-members/two-ready rule",
+      "validation_run": 35235272269,
       "validation_conclusion": "success",
-      "migration_replay_run": 35234474906,
+      "migration_replay_run": 35235272316,
       "migration_replay_conclusion": "success",
-      "functional_smoke_run": 35234475267,
+      "functional_smoke_run": 35235272663,
       "functional_smoke_conclusion": "success",
       "review_threads": 0,
+      "combined_statuses": 0,
       "source_acceptance_state": "COMPLETE",
       "supabase_deployment_state": "HOLD_NOT_DEPLOYED"
     }
@@ -57,7 +58,7 @@
     "runtime_proof_pending": true
   },
   "promotion_state": {
-    "g0r_08_source_merge": "PROMOTE_COMPLETE",
+    "g0r_09_source_merge": "PROMOTE_COMPLETE",
     "main_source_checkpoint": "ACCEPTED",
     "supabase": "HOLD",
     "live": "HOLD",
