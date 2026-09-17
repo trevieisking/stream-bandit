@@ -1,14 +1,22 @@
 {
   "schema": "stream-bandit-tcg-damage-counter-interaction-v1",
   "recorded_at": "2026-09-17",
-  "purpose": "Machine-readable planning contract for visual placement, movement and turn-transition use of damage counters in the restored Stream Bandit Battle Client.",
+  "purpose": "Machine-readable planning contract for visual placement, movement and turn-transition use of damage counters in the restored Stream Bandit Battle Client, aligned with canonical vitality/damage and precision-execution semantics.",
   "counter_model": {
     "base_unit_damage": 10,
-    "visible_counter_values": "10-point increments up to the exact maximum/remaining amount permitted by the resolving effect or property",
+    "visible_counter_values": "10-point increments constrained by the exact amount mode and remaining legal amount declared by the resolving effect or property",
     "server_authoritative": true,
     "browser_may_not_invent_total_or_targets": true,
     "damage_counter_placement_is_distinct_from_ordinary_attack_damage": true,
-    "damage_counter_movement_is_distinct_from_new_damage": true
+    "damage_counter_movement_is_distinct_from_new_damage": true,
+    "fixed_and_up_to_amounts_are_distinct": true
+  },
+  "amount_precision": {
+    "fixed_amount": "If the effect declares a fixed amount, the full legal amount must be selected/applied; the player may not voluntarily choose less merely to reach a preferred damage total.",
+    "up_to_amount": "If the effect explicitly says up to N, the player may select a smaller legal amount including zero when the underlying operation allows zero/no action.",
+    "allow_partial": "Partial movement/placement is legal only when the structured operation explicitly allows it, such as allow_partial=true or an equivalent up-to amount mode.",
+    "available_source_limit": "MOVE_DAMAGE can never remove more damage than actually exists on the source, even when the declared maximum is larger.",
+    "ui_requirement": "The counter tray must distinguish fixed required total from optional/up-to remaining total."
   },
   "place_counters_interaction": {
     "source_card_lifts_or_hovers": true,
@@ -20,7 +28,10 @@
     "remaining_amount_visible": true,
     "selected_distribution_visible_before_commit": true,
     "change_or_cancel_before_server_commit_when_practical": true,
-    "commit_requires_effect_legal_distribution": true
+    "commit_requires_effect_legal_distribution": true,
+    "fixed_amount_requires_exact_total_when_legal": true,
+    "up_to_amount_allows_smaller_total_only_when_explicit": true,
+    "defeat_check_runs_immediately_after_each_committed_placement_operation": true
   },
   "move_counters_interaction": {
     "source_card_lifts_or_hovers": true,
@@ -30,16 +41,26 @@
     "source_damage_decreases_by_exact_moved_amount": true,
     "destination_damage_increases_by_exact_moved_amount": true,
     "total_moved_amount_cannot_exceed_effect_or_source_limit": true,
-    "server_commits_source_and_destination_atomically": true
+    "fixed_amount_requires_exact_total_when_source_and_targets_make_it_legal": true,
+    "partial_or_smaller_total_requires_explicit_up_to_or_allow_partial_semantics": true,
+    "server_commits_source_and_destination_atomically": true,
+    "destination_defeat_check_runs_immediately_after_atomic_placement": true,
+    "cannot_target_creature_already_removed_from_play": true
+  },
+  "operation_level_defeat_boundary": {
+    "required": true,
+    "rule": "Every committed PLACE_DAMAGE or MOVE_DAMAGE operation runs the destination defeat check immediately after the placement/state update and before later listeners, follow-up target selection, or effects are allowed to act on that destination.",
+    "reason": "A Creature made lethal by counter placement/movement must leave play before subsequent logic can treat it as a legal in-play target.",
+    "attack_turn_handoff_still_waits_for_full_resolution": true
   },
   "attack_resolution_order": [
     "pay_and_validate_attack",
-    "resolve_printed_attack_effects_and_ordinary_damage",
-    "resolve_required_damage_counter_placement_or_movement_choices",
-    "resolve resulting conditions/listeners",
-    "defeat_scan",
-    "reward_and_forced_promotion_consequences",
-    "aftermath",
+    "resolve_printed_attack_effects_and_ordinary_damage_using_their_canonical_operation_boundaries",
+    "resolve_required_damage_counter_placement_or_movement_choice",
+    "commit_each_counter_operation_atomically",
+    "run_immediate_destination_defeat_boundary_after_each_counter_operation",
+    "resolve_only_later_listeners_conditions_or_follow_up_effects_that_remain_legal_after_that_defeat_boundary",
+    "resolve_remaining_reward_forced_promotion_and_aftermath_consequences_in_canonical_resume_order",
     "turn_transition"
   ],
   "turn_transition_condition_counters": {
@@ -49,7 +70,7 @@
     "amount_is_condition_property": true,
     "condition_badge_or_source_pulses_before_counters_land": true,
     "counter_animation_uses_same_visual_counter_system": true,
-    "defeat_scan_runs_after_condition_counter_application": true,
+    "defeat_check_runs_immediately_after_condition_counter_application": true,
     "reward_and_promotion_consequences_resolve_before_next_player_normal_actions": true,
     "not_every_condition_deals_damage": true
   },
@@ -67,8 +88,9 @@
     "new_owner_required_by_this_contract": false
   },
   "acceptance_examples": [
-    "place 30 damage counters: show legal target(s) and allow an exact 30 total in 10-point increments",
-    "move 50 existing damage: show source movable damage and allow an exact legal distribution up to 50",
-    "condition says place 10 damage at each turn switch: animate one 10 counter at every canonical turn-transition checkpoint while the Condition remains active"
+    "PLACE_DAMAGE fixed 30: legal distribution must total exactly 30 in 10-point increments before commit, then run the immediate defeat boundary.",
+    "MOVE_DAMAGE fixed 50: if 50 can legally be moved, the player must move exactly 50; a smaller amount is not a legal voluntary choice.",
+    "MOVE_DAMAGE up to 50 or allow_partial=true: show legal 10-point choices up to the lower of 50 and available source damage; smaller legal totals are allowed.",
+    "condition says place 10 damage at each turn switch: animate one 10 counter at every canonical turn-transition checkpoint while the Condition remains active, immediately check defeat, then resolve consequences before normal play."
   ]
 }
