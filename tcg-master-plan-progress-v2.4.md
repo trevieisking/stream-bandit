@@ -123,15 +123,16 @@ The project already has substantial TCG data and server-side machinery. This inc
 
 This is why the project should be repaired and completed, not rewritten as a second TCG backend.
 
-### 3.2 Recent accepted source foundations on main
+### 3.2 Recent accepted source foundations on main / active acceptance branch
 
-The following bounded source changes are accepted on current `main`:
+The following bounded source changes are accepted on current `main`, with the current PR #573 evidence pending repository promotion:
 
 - **PR #567 / G0R-08** — deck validation requires a setup-legal Creature;
 - **PR #568 / G0R-09** — private-room Ready mutation/count is serialized per room;
 - **PR #569** — V2 board client submits the existing generic `attack` intent from the active Creature card;
 - **PR #570** — nested authoritative commit rejections are surfaced rather than silently treated as success;
-- **PR #571 / V2-SHELL-01A** — active match is a board-only authenticated game route.
+- **PR #571 / V2-SHELL-01A** — active match is a board-only authenticated game route;
+- **PR #573 / V2-ATTACK-SOURCE-01** — exact-head Validation #625 behaviorally executes the real V2 controller and proves a rendered card-owned Attack click submits exactly one authoritative Attack payload with slot/match/revision/nonce, then re-syncs and visibly surfaces a nested authoritative rejection.
 
 These prove useful source foundations. They do not prove V2-ATTACK-01 or full match playability.
 
@@ -143,7 +144,9 @@ A real two-user V2 Attack must prove the complete path:
 
 `visible Creature card intent → server legality → cost/payment → target/choice resolution → exactly-one authoritative state commit → damage/effects/listeners → defeat/Reward/promotion/Aftermath where applicable → turn progression → synchronized state on both clients`
 
-Until that succeeds, public/live/production remains HOLD.
+The current client-side click/transport path is now behaviorally proven in source. Yesterday's exact authoritative rejection was not persisted, so that source proof does not retroactively establish the sole historical root cause.
+
+Until a fresh two-user Attack succeeds, public/live/production remains HOLD.
 
 ---
 
@@ -257,7 +260,22 @@ The Checklist is the executable acceptance board for these rows.
 
 V2-ATTACK-01 is the first release-critical gameplay lane.
 
-### Before changing code
+### Current source-path evidence
+
+`V2-ATTACK-SOURCE-01` is proven on PR #573 by TCG Card Pass 2 Validation #625 at behavioral-test head `fdf227159c2031fc1a1968bc3f624c93c80e6624`.
+
+The executable harness runs the real V2 controller and proves:
+
+- a structured Vanguard Attack renders as a card-owned control;
+- the rendered control binds the real click listener;
+- one click sends exactly one `action='attack'` request;
+- `attack_slot`, `match_id`, `client_nonce` and `expected_revision` are included;
+- an HTTP-success envelope containing a nested authoritative rejection is treated as failure;
+- the client re-syncs authoritative state and keeps that rejection visible.
+
+This closes a source-test gap only. It does not replace the required fresh two-user Attack commit proof.
+
+### Before changing gameplay code
 
 Capture from the next exact failure:
 
@@ -632,11 +650,12 @@ This order supersedes any earlier implication that the project could proceed dir
 
 ### Phase 1 — V2-ATTACK-01
 
-- reproduce/capture exact two-user Attack failure;
-- identify the smallest authoritative defect;
-- repair on a bounded branch;
-- run exact-head CI;
-- repeat two-user Attack proof until full path succeeds.
+- current V2 card-click transport source path behaviorally proven by V2-ATTACK-SOURCE-01;
+- run the fresh two-user Attack attempt through the current release-shaped V2 client;
+- capture the exact authoritative result whether success or failure;
+- identify and repair only the smallest authoritative defect if the attempt fails;
+- run exact-head CI after any repair;
+- repeat two-user Attack proof until the full path succeeds.
 
 ### Phase 2 — Core two-user gameplay matrix
 
@@ -721,6 +740,7 @@ After Attack passes, the remaining release gates still apply.
 - ✅ current-main continuity rebaselined;
 - ✅ system/engine ownership model retained;
 - ✅ substantial server/source foundations acknowledged;
+- ✅ current V2 card-owned Attack click/transport path behaviorally proven in source via V2-ATTACK-SOURCE-01 / PR #573 / Validation #625;
 - ✅ board-only active match source exists;
 - ✅ Account identity boundary defined;
 - ✅ TCG Player Directory requirements defined;
@@ -744,9 +764,9 @@ The project therefore retains a large amount of useful backend and engine work, 
 
 ---
 
-## 19. Immediate next operation after V2.4 docs acceptance
+## 19. Immediate next operation after V2-ATTACK-SOURCE-01 acceptance
 
-**One thing only:** return to `V2-ATTACK-01` evidence capture on the release-shaped two-user V2 path.
+**One thing only:** run a fresh `V2-ATTACK-01` attempt on the release-shaped two-user V2 path using the current card-owned Attack controls.
 
 Do not start another gameplay rewrite.
 
@@ -754,7 +774,7 @@ Do not move Account/Friends into the battle controller.
 
 Do not deploy Supabase changes without a proven need.
 
-Capture the exact failed Attack transaction first; then repair the owning layer and prove it end to end.
+For the next Attack click, capture the exact request/result/revision evidence. If it succeeds, record the authoritative Attack commit and both clients' synchronized visible result. If it fails, use the now-visible authoritative rejection to repair only its owning layer.
 
 ---
 
