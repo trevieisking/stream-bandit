@@ -8,88 +8,80 @@
 
 ## V2.3.4-001 — G0R-11 accepted baseline
 
-The implementation baseline for this revision was main `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`, produced by merged PR #565. G0R-11 validation workflow coverage is COMPLETE with TCG Validation run #571 / `35232546805` SUCCESS. Accepted G0R progress at that baseline: **1/11**.
+PR #565 accepted G0R-11 validation workflow coverage. Accepted head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`; TCG Validation #571 SUCCESS; merge checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`.
 
 ## V2.3.4-002 — G0R-10 remains proven, not silently skipped
 
-Exact source proves `play_tactic` lacks the required one-shot subtype allow-list. The canonical boundary remains: Ally/Device may use one-shot `play_tactic`; Relic/Realm use dedicated owner routes. Because the available direct GitHub safe-write path would require a high-risk full replacement of the large dispatcher file, this defect stays explicitly queued rather than being forced through an unsafe mutation. No runtime change was made for G0R-10.
+Exact source proves `play_tactic` lacks the required one-shot subtype allow-list. Canonical boundary: Ally/Device may use one-shot `play_tactic`; Relic/Realm use dedicated owner routes. No runtime change accepted yet because a safe byte-accurate mutation path for the large dispatcher is still preferred over a risky whole-file replacement.
 
-## V2.3.4-003 — G0R-07 defect proven
+## V2.3.4-003 — G0R-07 accepted
 
-Source: `supabase/migrations/20260905110000_tcg_automatic_matchmaking.sql` on exact main `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`.
+PR #566 repaired matchmaking room lifetime on source/main. Reviewed head `190c9c9e4bf07712571b978abbd3657f876febed`; exact diff 2 files / +258 / -0. Validation #574, Migration Replay #799 and Functional Smoke #825 all SUCCESS; review threads 0. Merge/current main `fce98178f2234386da7be3aef02a8496fa24195a`.
 
-The function correctly closes only expired `waiting` matchmaking rooms, but its idempotent retry/poll lookup then requires `expires_at > now()` across `waiting`, `locked`, and `in_match`. Therefore a matched player's room may disappear from polling after its original queue lifetime expires.
+Source rule now preserves queue expiry for waiting rooms while keeping locked/in_match rooms discoverable after original queue expiry. Production Supabase was not migrated by this source merge and remains a separate HOLD.
 
-Correct owner rule:
-- waiting rooms remain expiry-gated;
-- expired waiting entries still close;
-- opponent candidate selection remains waiting + unexpired;
-- locked/in_match rooms are already match containers and remain discoverable independent of the old queue expiry.
+Accepted G0R source repairs after this step: **2/11**.
 
-## V2.3.4-004 — G0R-07 bounded implementation
+## V2.3.4-004 — G0R-08 defect proven
 
-Promotion decision for branch-only repair: **PROMOTE ✅**.
+Exact current validator source: `supabase/migrations/20260905105500_tcg_economy_and_copy_limit_alignment.sql` at main `fce98178f2234386da7be3aef02a8496fa24195a`.
 
-Created from exact main:
-- branch `fix/tcg-g0r-07-matchmaking-room-lifetime`;
-- base `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`.
+The latest `tcg_server_validate_deck` validates exact 60-card count, active IDs, ownership quantities, copy limits and declared elements but has no requirement that the deck contain any Creature capable of legal opening/setup placement.
 
-Commits:
-1. `ab754ebcbf381d90197185e5209ae47ea1d500b3` — additive replacement migration;
-2. `190c9c9e4bf07712571b978abbd3657f876febed` — focused expiry-boundary contract test.
+Exact server-authoritative setup source: `supabase/functions/tcg-private-alpha-api/index.ts` at the same main SHA.
 
-Exact PR diff:
+Its `starterLegal` predicate accepts exactly:
+- `Creature — Baby`;
+- `Creature — Standalone`;
+- `Creature — Mythic`.
+
+The opening loop mulligans until the seven-card hand contains one of those and throws `opening_hand_mulligan_guard` after bounded retries if no legal opening hand can be generated. Therefore a validator-approved deck with zero such copies can enter matchmaking/room preparation but cannot reliably enter setup.
+
+**Decision:** repair G0R-08 at deck validation, not by weakening setup legality or adding a browser workaround.
+
+## V2.3.4-005 — G0R-08 bounded branch implementation
+
+**Branch-only promotion decision:** PROMOTE ✅.
+
+Created from exact main `fce98178f2234386da7be3aef02a8496fa24195a`:
+- branch `fix/tcg-g0r-08-setup-legal-deck`.
+
+Added migration:
+- `supabase/migrations/20260917143500_tcg_setup_legal_deck_validation.sql`;
+- commit `2210eedfc3936561e3e6d49adb7f00e7d8861a6f`.
+
+The migration copies the latest validator behavior and adds only:
+- `v_setup_eligible` copy count from active structured card definitions;
+- exact three recipe types matching `starterLegal`;
+- error `deck_requires_setup_eligible_creature` when count is zero;
+- `setup_eligible_creature_copies` in the validation result for evidence/diagnostics.
+
+Added focused test:
+- `tcg/tests/card-pass-2-g0r-08-setup-legal-deck-validation.test.mjs`;
+- head commit `f612c450e911d1aa3cc3fdb37fd59c89c153236f`.
+
+The test binds the validator's exact recipe-type vocabulary to the private-alpha runtime and checks that all pre-existing validator error strings remain present.
+
+Exact diff from base main:
+- 2 commits;
 - 2 files;
-- +258 / -0;
-- `supabase/migrations/20260917142500_tcg_matchmaking_locked_room_lifetime.sql`;
-- `tcg/tests/card-pass-2-g0r-07-matchmaking-room-lifetime.test.mjs`.
+- +165 / -0.
 
-Opened PR #566, exact head `190c9c9e4bf07712571b978abbd3657f876febed`.
+Draft PR #567 opened with exact head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`.
 
-No existing room data is rewritten by the migration. No Supabase deployment, live change or production mutation occurred during branch/PR implementation.
+At the first immediate post-open exact-head refresh, GitHub returned **no workflow runs yet**. This is not a PASS. PR merge/main/Supabase/live remain HOLD until the required workflow evidence appears and succeeds.
 
-## V2.3.4-005 — G0R-07 exact-head acceptance fence
+## Current promotion state
 
-All exact-head required workflows completed successfully:
-
-- **TCG Card Pass 2 Validation #574 / `35233465142` — SUCCESS**;
-- **Code Labs Migration Replay #799 / `35233465044` — SUCCESS**, including full disposable database reset/replay from zero;
-- **Code Labs V50 Functional Smoke #825 / `35233465614` — SUCCESS**, including Node, Deno and PostgreSQL replay smoke lanes.
-
-Additional final pre-merge evidence:
-- PR #566 head remained `190c9c9e4bf07712571b978abbd3657f876febed`;
-- PR mergeable = true;
-- PR review threads = 0;
-- exact diff remained 2 intended files / +258 / -0;
-- main remained `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00` immediately before merge;
-- legacy combined statuses returned none found; GitHub Actions exact-head runs above are the active validation evidence.
-
-## V2.3.4-006 — G0R-07 promoted to main
-
-**Promotion decision:** **PROMOTE G0R-07 source repair to main ✅**.
-
-PR #566 was marked ready and merged with expected exact head `190c9c9e4bf07712571b978abbd3657f876febed`.
-
-- merge SHA: `fce98178f2234386da7be3aef02a8496fa24195a`;
-- new/current main: `fce98178f2234386da7be3aef02a8496fa24195a`;
-- merged PR: #566;
-- source repair state: COMPLETE;
-- accepted G0R source repairs: **2/11**.
-
-The source now preserves queue expiry for waiting rooms while keeping already matched `locked`/`in_match` rooms discoverable after their original queue expiry.
-
-**Important deployment boundary:** merging the migration to `main` does not itself apply it to the production Supabase database. Supabase/live remains unchanged and HOLD pending a separate deployment decision/evidence fence.
-
-## Promotion state after G0R-07
-
-- G0R-11 source repair: **COMPLETE ✅**
-- G0R-07 source repair: **COMPLETE ✅**
+- G0R-11 source: COMPLETE ✅
+- G0R-07 source: COMPLETE ✅
+- G0R-08 branch implementation: PROMOTE ✅ / PR merge HOLD 🔒
 - accepted G0R source repairs: **2/11**
-- G0R-10: **PROVEN / QUEUED 🟡**
-- Supabase/runtime/live/production promotion: **HOLD 🔒 / unchanged by this merge**
-- Code Labs Writer: **not invoked**
-- CG Repair Lab / Code God: **not invoked**
+- G0R-10: PROVEN / QUEUED 🟡
+- Supabase/runtime/live/production: HOLD / unchanged by G0R-08 branch
+- Code Labs Writer: not invoked
+- CG Repair Lab / Code God: not invoked
 
 ## Exact next operation
 
-Refresh source from main `fce98178f2234386da7be3aef02a8496fa24195a` and implement exactly one next safe V2-G0R owner repair. Prefer an additive/replay-safe change that can be proven with current GitHub validation lanes over a risky full-file rewrite. Update plan/checklist/ledger before the next delivered work result.
+Refresh PR #567 exact-head workflow runs/statuses and review threads. Require TCG Validation, Migration Replay and Functional Smoke to run and pass against exact head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`; fail closed and repair the branch if any lane fails. If all evidence is green and the diff remains exactly two intended files, recheck main/head and decide source merge promotion. Update the plan/checklist/ledger before reporting that decision.
