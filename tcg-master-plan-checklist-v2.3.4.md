@@ -16,6 +16,7 @@ A material implementation result is not accepted until this checklist/ledger cha
 |---|---|---|
 | G0R-11 validation workflow coverage | **COMPLETE ✅** | PR #565 head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`; Validation #571 / run `35232546805` SUCCESS; merged main checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00` |
 | G0R-07 matchmaking room lifetime | **COMPLETE IN SOURCE ✅** | PR #566 head `190c9c9e4bf07712571b978abbd3657f876febed`; all three acceptance workflows green; merged main `fce98178f2234386da7be3aef02a8496fa24195a`; Supabase/live deployment still HOLD |
+| G0R-08 setup-legal deck validation | **SOURCE DEFECT PROVEN / IMPLEMENTATION NEXT 🔎** | exact main `fce98178f2234386da7be3aef02a8496fa24195a`; validator lacks opening-eligible Creature check while private-alpha runtime requires Baby/Standalone/Mythic |
 | G0R-10 Tactic subtype boundary | **PROVEN / QUEUED 🟡** | exact source proves `play_tactic` lacks Ally/Device allow-list; Relic/Realm have dedicated routes; no runtime patch accepted yet |
 
 **Accepted G0R source repairs:** **2 / 11**.
@@ -40,6 +41,25 @@ A material implementation result is not accepted until this checklist/ledger cha
 | G0R07-14 | Merge to main | **PROMOTE / COMPLETE ✅** | PR #566 merged with expected head; merge/main `fce98178f2234386da7be3aef02a8496fa24195a` |
 | G0R07-15 | Supabase/live deployment | HOLD 🔒 | source repair is not yet a production deployment; no live mutation performed |
 
+## G0R-08 checklist — ACTIVE SOURCE REPAIR
+
+| ID | Requirement | State | Evidence / acceptance |
+|---|---|---|---|
+| G0R08-01 | Current deck validator defect proven | COMPLETE | latest `tcg_server_validate_deck` checks 60 cards, ownership, active IDs, copy limits and elements but not opening/setup eligibility |
+| G0R08-02 | Exact opening eligibility vocabulary proven | COMPLETE | `tcg-private-alpha-api/index.ts` defines `starterLegal` as recipe type exactly `Creature — Baby`, `Creature — Standalone`, or `Creature — Mythic` |
+| G0R08-03 | Opening mulligan failure consequence proven | COMPLETE | runtime `opening()` loops until hand contains `starterLegal`, then throws `opening_hand_mulligan_guard` after bounded retries |
+| G0R08-04 | Validator must reject a deck with zero opening-eligible Creature copies | LOCKED | new validation error required before room/match acceptance |
+| G0R08-05 | Existing 60/ownership/copy-limit/element checks remain byte-for-behavior equivalent | LOCKED | additive replacement function must preserve all current validation rules |
+| G0R08-06 | Baby/Standalone/Mythic all count as legal setup identities | LOCKED | must use exact current runtime recipe-type values, not a broader guessed Creature rule |
+| G0R08-07 | Additive migration only; no production row rewrite | TODO | next implementation step |
+| G0R08-08 | Focused deterministic/static contract test | TODO | must prove zero-eligible rejection + exact three-type predicate + preserved current errors |
+| G0R08-09 | TCG Validation exact-head green | TODO | required after PR opens |
+| G0R08-10 | Migration Replay exact-head green | TODO | required after PR opens |
+| G0R08-11 | Functional Smoke exact-head green | TODO | required after PR opens |
+| G0R08-12 | No unresolved material review finding | TODO | final pre-merge refresh |
+| G0R08-13 | Merge to main | HOLD 🔒 | separate promotion after exact-head fence |
+| G0R08-14 | Supabase/live deployment | HOLD 🔒 | separate deployment decision; do not conflate with source merge |
+
 ## Exact G0R-07 identifiers
 
 - repository: `trevieisking/stream-bandit`
@@ -48,19 +68,8 @@ A material implementation result is not accepted until this checklist/ledger cha
 - base main: `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`
 - reviewed PR head: `190c9c9e4bf07712571b978abbd3657f876febed`
 - merge/current main: `fce98178f2234386da7be3aef02a8496fa24195a`
-- migration commit: `ab754ebcbf381d90197185e5209ae47ea1d500b3`
-- test/head commit: `190c9c9e4bf07712571b978abbd3657f876febed`
-- files:
-  - `supabase/migrations/20260917142500_tcg_matchmaking_locked_room_lifetime.sql`
-  - `tcg/tests/card-pass-2-g0r-07-matchmaking-room-lifetime.test.mjs`
-- exact-head workflows:
-  - TCG Validation #574 / `35233465142` — SUCCESS
-  - Migration Replay #799 / `35233465044` — SUCCESS
-  - Functional Smoke #825 / `35233465614` — SUCCESS
-- legacy combined statuses: none found; exact GitHub Actions evidence above is authoritative
+- exact-head workflows: Validation #574 SUCCESS; Migration Replay #799 SUCCESS; Functional Smoke #825 SUCCESS
 - runtime/live impact: **source/main changed; Supabase/live deployment unchanged**
-- Code Labs Writer: **not invoked**
-- CG Repair Lab / Code God: **not invoked**
 
 ## Inherited critical rules still locked
 
@@ -72,4 +81,4 @@ A material implementation result is not accepted until this checklist/ledger cha
 
 ## Exact next operation
 
-Refresh current main `fce98178f2234386da7be3aef02a8496fa24195a` and choose the next safest single V2-G0R owner repair from exact source. Prefer a bounded additive/replay-safe repair over a risky whole-file replacement. Keep Supabase/live separate until source stabilization and deployment evidence justify promotion.
+Create an isolated G0R-08 branch from current main `fce98178f2234386da7be3aef02a8496fa24195a`, add an additive replacement migration for the latest deck validator with the exact Baby/Standalone/Mythic opening-eligibility count/error, add a focused `card-pass-2` contract test, open a draft PR, and require TCG Validation + Migration Replay + Functional Smoke before any source merge promotion.
