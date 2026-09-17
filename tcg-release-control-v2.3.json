@@ -22,29 +22,29 @@
     "browser_rules_engine_duplicate_allowed": false
   },
   "accepted_main": {
-    "sha": "fce98178f2234386da7be3aef02a8496fa24195a",
-    "accepted_g0r_source_repairs": 2,
-    "complete_repairs": ["G0R-11", "G0R-07"],
-    "last_accepted_repair": "G0R-07 matchmaking room lifetime"
+    "sha": "042559e252cfa49ad425d9f57fa01a678b2a3fe9",
+    "accepted_g0r_source_repairs": 3,
+    "complete_repairs": ["G0R-11", "G0R-07", "G0R-08"],
+    "last_accepted_repair": "G0R-08 setup-legal deck validation"
   },
   "g0r": {
     "required_repairs": 11,
-    "accepted_source_repairs": 2,
-    "complete": ["G0R-11", "G0R-07"],
+    "accepted_source_repairs": 3,
+    "complete": ["G0R-11", "G0R-07", "G0R-08"],
     "proven_queued": ["G0R-10"],
-    "g0r_07": {
-      "pr": 566,
-      "branch": "fix/tcg-g0r-07-matchmaking-room-lifetime",
-      "reviewed_head": "190c9c9e4bf07712571b978abbd3657f876febed",
-      "base_main": "5cfd9a5ae509d9dd091b99db822e24eb2d64bf00",
-      "merge_sha": "fce98178f2234386da7be3aef02a8496fa24195a",
+    "g0r_08": {
+      "pr": 567,
+      "branch": "fix/tcg-g0r-08-setup-legal-deck",
+      "reviewed_head": "f612c450e911d1aa3cc3fdb37fd59c89c153236f",
+      "base_main": "fce98178f2234386da7be3aef02a8496fa24195a",
+      "merge_sha": "042559e252cfa49ad425d9f57fa01a678b2a3fe9",
       "changed_files": 2,
-      "rule": "waiting rooms remain expiry-gated; locked/in_match rooms remain discoverable after original queue expiry",
-      "validation_run": 35233465142,
+      "rule": "validated decks require at least one active setup-legal Creature copy using the exact current server runtime recipe types",
+      "validation_run": 35234474804,
       "validation_conclusion": "success",
-      "migration_replay_run": 35233465044,
+      "migration_replay_run": 35234474906,
       "migration_replay_conclusion": "success",
-      "functional_smoke_run": 35233465614,
+      "functional_smoke_run": 35234475267,
       "functional_smoke_conclusion": "success",
       "review_threads": 0,
       "source_acceptance_state": "COMPLETE",
@@ -57,7 +57,7 @@
     "runtime_proof_pending": true
   },
   "promotion_state": {
-    "g0r_07_source_merge": "PROMOTE_COMPLETE",
+    "g0r_08_source_merge": "PROMOTE_COMPLETE",
     "main_source_checkpoint": "ACCEPTED",
     "supabase": "HOLD",
     "live": "HOLD",
