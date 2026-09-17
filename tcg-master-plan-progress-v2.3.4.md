@@ -19,34 +19,39 @@ The V2.3.3 Deck Search rule remains fully locked: every true `search.deck` has t
   - merged PR #565;
   - accepted head `5d8c8e9d882b769041db318a9ad14d55a4f0c63f`;
   - merge checkpoint `5cfd9a5ae509d9dd091b99db822e24eb2d64bf00`;
-  - TCG Validation run #571 / `35232546805` SUCCESS.
+  - TCG Validation #571 SUCCESS.
 - **G0R-07 — Matchmaking room lifetime: COMPLETE IN SOURCE ✅**
   - merged PR #566;
   - accepted head `190c9c9e4bf07712571b978abbd3657f876febed`;
-  - merge/current-main checkpoint `fce98178f2234386da7be3aef02a8496fa24195a`;
-  - TCG Validation #574 / `35233465142` SUCCESS;
-  - Migration Replay #799 / `35233465044` SUCCESS;
-  - Functional Smoke #825 / `35233465614` SUCCESS;
-  - Supabase/live deployment remains a separate HOLD decision.
-- **G0R-08 — Setup-legal deck validation: IN PROGRESS 🔎**
-  - exact source proves the latest `tcg_server_validate_deck` does not require any opening/setup-legal Creature;
-  - exact private-alpha runtime defines setup legality as recipe type `Creature — Baby`, `Creature — Standalone`, or `Creature — Mythic` and the opening mulligan loop depends on at least one of those being drawable;
-  - dedicated branch `fix/tcg-g0r-08-setup-legal-deck` created from exact main `fce98178f2234386da7be3aef02a8496fa24195a`;
-  - additive validator migration + focused contract test landed on branch head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`;
-  - draft PR #567 opened with exactly 2 files / +165 / -0;
-  - exact-head workflow runs were none found at the first immediate post-open refresh, so merge remains HOLD until the normal GitHub Actions triggers appear and pass.
+  - merge checkpoint `fce98178f2234386da7be3aef02a8496fa24195a`;
+  - TCG Validation #574, Migration Replay #799 and Functional Smoke #825 SUCCESS.
+- **G0R-08 — Setup-legal deck validation: COMPLETE IN SOURCE ✅**
+  - merged PR #567;
+  - accepted head `f612c450e911d1aa3cc3fdb37fd59c89c153236f`;
+  - merge/current-main checkpoint `042559e252cfa49ad425d9f57fa01a678b2a3fe9`;
+  - exact diff stayed 2 files / +165 / -0;
+  - TCG Validation #586 / `35234474804` SUCCESS;
+  - Migration Replay #800 / `35234474906` SUCCESS;
+  - Functional Smoke #826 / `35234475267` SUCCESS;
+  - zero unresolved review threads at final pre-merge refresh;
+  - the validator now requires at least one active structured setup-legal Creature copy using the exact server-authoritative recipe types `Creature — Baby`, `Creature — Standalone`, or `Creature — Mythic`;
+  - all pre-existing validator checks remain preserved;
+  - **Supabase/live has not been migrated by this source merge and remains a separate HOLD decision.**
 - **G0R-10 — Tactic subtype boundary: PROVEN / QUEUED 🟡**
   - only Ally/Device may enter one-shot `play_tactic`;
   - Relic/Realm remain dedicated-owner actions;
   - runtime guard is not yet accepted.
 
-**Accepted G0R source repairs:** **2 / 11**. G0R-08 is not repair #3 until exact-head validation/replay/smoke and review evidence pass.
+**Accepted G0R source repairs:** **3 / 11**.
 
 ## Exact next operation
 
-1. refresh PR #567 exact-head workflow runs/statuses and review evidence;
-2. if validation has not triggered, diagnose the trigger rather than assuming PASS;
-3. if any lane fails, repair only the bounded G0R-08 branch;
-4. if TCG Validation, Migration Replay and Functional Smoke all pass and the diff remains exactly the migration + focused test, refresh main/head and decide source merge promotion;
-5. update plan/checklist/ledger before reporting acceptance;
-6. keep Supabase/live deployment separate and keep G0R-10 explicitly queued.
+Continue exactly one bounded V2-G0R repair from refreshed main `042559e252cfa49ad425d9f57fa01a678b2a3fe9`.
+
+Priorities remain:
+1. prove the exact current source defect and owner boundary before mutation;
+2. prefer additive/replay-safe repairs while they can move the project safely;
+3. keep G0R-10 explicitly queued until the large Tactic dispatcher can be changed through a safe byte-accurate path;
+4. require TCG Validation and any relevant Migration Replay / Functional Smoke gates;
+5. update plan/checklist/ledger before every delivered implementation result;
+6. keep Supabase/live deployment separate from source acceptance.
