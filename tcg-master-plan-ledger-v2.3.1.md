@@ -4,16 +4,16 @@
 **Previous canonical plan:** `tcg-master-plan-progress-v2.3.md`  
 **Previous ledger:** `tcg-master-plan-ledger-v2.3.md`  
 **Owner-family baseline:** 40  
-**Ledger revision:** V2.3.1-2 — 2026-09-17
+**Ledger revision:** V2.3.1-3 — 2026-09-17
 
 ## Rules
 
 - This ledger is append-only continuity over V2.3.
-- V2.3 remains historical evidence; V2.3.1 closes post-test consistency gaps only.
 - GitHub exact commit/PR/comment evidence remains repository truth.
 - Supabase remains live/deployed truth.
 - No concept-art number becomes a gameplay rule unless structured data declares it.
 - External TCG mechanic names are research provenance only; Stream Bandit player-facing names are original.
+- JSON authority files referenced by Release Control must be self-contained unless a validated resolver explicitly defines inheritance semantics.
 
 ---
 
@@ -34,65 +34,59 @@ Audit basis:
 - accepted card-controller contract;
 - supplied special-card examples and V2.3 rule matrix.
 
-Initial audit result found two explicit inconsistencies:
+Audit/correction scope ultimately covered:
 
-1. approved showcase Creature headers visually use Cost top-left + clearly labelled HP in the upper identity/header area, while the older written contract said HP top-left;
-2. type/element weakness/resistance-style damage affinity was visible in the supplied special-card examples but was not explicitly reserved in the V2.3 generic capability target.
+1. showcase header wording vs actual structured schema;
+2. ordinary global matchup weakness vs exceptional card-specific Resistance/override;
+3. original Stream Bandit names for researched special families;
+4. physical damage-counter placement/movement and turn-transition Condition timing;
+5. authority-graph references and self-contained JSON control contracts.
 
-Subsequent user clarification added two details that also belong in the consistency layer:
+No additional post-test planning requirement is currently known.
 
-3. researched special-card family labels must have original Stream Bandit names rather than shipping EX/GX/V/etc terminology;
-4. damage counters require their own physical drag/place/move interaction and turn-transition Condition timing contract.
-
-No other missing post-test planning requirement is currently known.
-
-### V2.3.1-002 — Showcase header reconciliation
+### V2.3.1-002 — Showcase header reconciled with real schema
 
 **State:** ✅ LOCKED
 
-Corrected renderer authority:
+The approved showcase composition is retained, but concept-art Cost values are not gameplay authority.
 
-- Cost badge top-left when structured Creature data defines that cost;
-- Element/type badge top-right;
-- name + stage/classification identity band;
-- HP clearly labelled in the upper identity/header area;
-- large art;
-- exactly two ordinary Creature action slots;
+Current `sb-tcg-card-v0.2` ordinary Creatures do not define a generic play/evolution Cost.
+
+Renderer authority is therefore:
+
+- top-left badge slot may show a real structured header property or nonnumeric class/stage/special-rule badge;
+- numeric `Cost` appears only when a card family truly defines that structured property;
+- current ordinary Creatures receive no invented Cost;
+- Element/type top-right;
+- name/stage + clearly labelled HP in upper identity area;
+- large artwork;
+- exactly two ordinary action slots;
 - Withdraw Cost bottom-right;
-- rarity/printing/set treatment in frame/footer.
+- rarity/printing/set markers in frame/footer.
 
-Concept-art values remain non-authoritative. If a Creature has no structured generic Cost, the renderer must omit that field rather than invent it.
+`tcg-card-visual-printing-v1.1.json` is self-contained and authoritative for this corrected renderer rule.
 
-### V2.3.1-003 — Damage-affinity capability reserved
+### V2.3.1-003 — Matchup/affinity ownership reconciled
 
-**State:** ✅ LOCKED planning capability
+**State:** ✅ LOCKED
 
-Working terminology:
+Ordinary Set One-style weakness is owned by the versioned global matchup snapshot (`cp2-matchups-v0.1`), not per-card `weakness` objects.
 
-- Vulnerability — configured incoming damage amplification;
-- Resistance — configured incoming damage reduction/prevention.
+Working player-facing presentation may call that matchup **Vulnerability**, but engine ownership remains global.
 
-Requirements:
+Exceptional future card data may explicitly define:
 
-- structured source matching by element/type/rule tag;
-- declared modifier mode/value;
-- deterministic damage-order interaction;
-- visible card marker + accessible text;
-- server-authoritative calculation;
-- no rarity/printing/special-class automatic assumption;
-- no Set One card behaviour changes without explicit structured data.
+- Resistance;
+- matchup override;
+- another reviewed card-specific damage-affinity modifier.
 
-The capability should first attempt to compose existing Damage/effect owners. No new owner is justified merely by reserving the concept.
+No existing Set One matchup value changes from this control update.
 
 ### V2.3.1-004 — Original special-family names locked as working canon
 
 **State:** ✅ LOCKED WORKING NAMES
 
-Machine-readable authority:
-
-- `tcg-special-mechanic-names-v1.json`
-
-Working mapping:
+Machine-readable authority: `tcg-special-mechanic-names-v1.json`
 
 - EX/current ex research pattern → **Ascendant Creature**
 - GX → **Sigilborn Creature**
@@ -112,71 +106,37 @@ Working mapping:
 
 Shared once-per-match action name remains **Signature Power**, with Signature Attack / Signature Ability variants.
 
-Important architecture rule:
-
-These names are player-facing/family labels only. They do not create one engine per label. Generic metadata/capabilities remain authoritative.
+These are labels/capability bundles, not one engine per label.
 
 ### V2.3.1-005 — Damage-counter interaction/timing locked
 
 **State:** ✅ LOCKED desired behaviour
 
-Machine-readable authority:
+Machine-readable authority: `tcg-damage-counter-interaction-v1.json`
 
-- `tcg-damage-counter-interaction-v1.json`
+- base counter unit = **10 damage**;
+- visible counter values use 10-point increments up to the exact effect/property allowance;
+- placing counters: resolving card hovers, legal targets highlight, counter tray appears, player drags/taps exact distribution, server validates/commits;
+- moving counters: existing damage is transferred from source to legal destination(s) atomically;
+- attack-generated counter choices resolve before automatic turn handoff;
+- Conditions may declare counter ticks at the canonical turn-transition/checkup checkpoint;
+- defeat/Reward/promotion consequences from Condition counters resolve before next-player normal actions;
+- ordinary damage, placed counters, moved counters and Condition ticks remain semantically distinct.
 
-Counter model:
+### V2.3.1-006 — Authority graph repaired after exact-head review
 
-- base unit = **10 damage**;
-- visible counter choices use 10-point increments up to the exact amount permitted by the card/effect/Condition property;
-- legal targets and totals come from server-authoritative effect data.
+**State:** ✅ CORRECTED
 
-Place-counter choreography:
+Review exposed four control-plane issues and all were addressed:
 
-1. resolving card lifts/hovers;
-2. board remains visible;
-3. legal targets highlight;
-4. counter tray appears;
-5. player drags 10-point counter values onto targets, with tap/select accessibility equivalent;
-6. selected distribution/remaining amount stays visible;
-7. change/cancel is allowed before server commit where practical;
-8. server validates and commits;
-9. counters visibly land.
+1. `tcg-v2-card-action-controller-v1.json` now points to `tcg-card-visual-printing-v1.1.json` rather than the superseded visual v1 contract.
+2. `tcg-evergreen-extensibility-v1.1.json` is now a **self-contained** complete JSON authority rather than depending on undefined JSON inheritance semantics.
+3. visual/header language no longer implies that current ordinary Creatures have a generic play/evolution Cost.
+4. ordinary Vulnerability/weakness remains owned by the global matchup snapshot; exceptional Resistance/override data remains card-specific.
 
-Move-counter choreography:
+These corrections change no live gameplay, Supabase state, current card values or matchup table.
 
-- source card lifts/hovers;
-- movable existing damage is visualized;
-- legal destinations highlight;
-- player drags counters from source to destination;
-- source and destination updates commit atomically;
-- moved amount cannot exceed the effect limit or available source damage.
-
-Attack ordering:
-
-- attack damage/effects;
-- required counter placement/movement choices;
-- listeners/Conditions;
-- defeat scan;
-- Rewards/promotion;
-- Aftermath;
-- turn-transition checkpoint;
-- next player's ordinary play.
-
-Therefore a counter allocation caused by an Attack resolves **before the automatic turn handoff**.
-
-Turn-based Condition rule:
-
-- a Condition may declare damage counters at each canonical turn-switch/checkup checkpoint;
-- configured amount is a Condition property;
-- 10-point counter animation is reused;
-- defeat/Reward/promotion consequences resolve before the next player's ordinary actions;
-- not every Condition must deal damage.
-
-Semantic separation is retained between ordinary damage, placing counters, moving counters and turn-transition Condition counters. Ordinary damage modifiers, Vulnerability/Resistance and Shield do not automatically alter placed/moved counters unless explicit structured rules say so.
-
-No new owner is justified by the interaction itself; browser remains presentation/input only.
-
-### V2.3.1-006 — Post-test coverage confirmed
+### V2.3.1-007 — Post-test coverage confirmed
 
 **State:** ✅ COMPLETE
 
@@ -199,16 +159,16 @@ Confirmed retained authority includes:
 - artwork on every printable gameplay card;
 - rarity + cosmetic printing variants;
 - named numeric properties;
-- corrected card header layout;
+- schema-honest card header;
 - original Stream Bandit special-mechanic family names;
+- global matchup Vulnerability + exceptional Resistance/overrides;
 - Evergreen/no age rotation;
 - backward compatibility;
 - future cards/attacks/Abilities/series/decks/packs/coins/accessories/events;
 - generic special-mechanic capability architecture;
-- Vulnerability/Resistance capability;
 - 40-owner architecture / no owner #41 by label.
 
-### V2.3.1-007 — Restart point unchanged
+### V2.3.1-008 — Restart point
 
 **State:** 🔎 V2-G1 remains active
 
@@ -218,7 +178,7 @@ Next:
 2. Underworld canonical schema;
 3. deterministic 241/10 authority;
 4. proven generic dispatcher gaps only;
-5. V2-G1E extensibility schema including damage-affinity + damage-counter interaction metadata + original family labels;
+5. V2-G1E extensibility schema including matchup ownership, damage-counter metadata and original family labels;
 6. premium renderer;
 7. restored one-screen Battle Client;
 8. real two-user E2E.
