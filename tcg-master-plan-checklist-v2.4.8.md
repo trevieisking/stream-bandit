@@ -44,6 +44,19 @@
 - [ ] **INTERACT-07** Complete selection cancellation across all rule choice families.
 - [ ] **INTERACT-09** Full Vanguard Ability/Attack/Withdraw card-context action family.
 
+## D.1 Proven repaired-candidate evidence
+
+Head `d14a1b46fe9b46b80106394a6b5f751ced900292` proved the repaired V2.4.8 implementation before this continuity-only synchronization commit:
+
+- TCG Card Pass 2 Validation #658 — SUCCESS, including the dedicated V2.4.8 browser/server ownership contract and deterministic runtime/type-check lanes;
+- Code Labs V50 Functional Smoke #854 — SUCCESS, including Node, Deno and zero-to-current PostgreSQL replay;
+- standalone Code Labs Migration Replay #828 — CANCELLED before accepted execution because the pre-repair #827 replay still occupied the workflow queue; it is not counted as a pass;
+- review threads: 0;
+- legacy combined-status entries: none found;
+- the repair from `d5c9afb3...` to `d14a1b46...` changed exactly one test file (+1/-1); V2.4.8 implementation bytes did not change.
+
+This checklist edit is continuity-only and exists to create one queue-clear synchronization head. All three final gates below remain unchecked until they pass together at that new exact head.
+
 ## E. Exact-head V2.4.8 gates
 
 - [ ] **V248-CI-01** TCG Card Pass 2 Validation succeeds at final exact head.
