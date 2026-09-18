@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG Card Renderer V2.4.7';
+  const VERSION = 'Stream Bandit TCG Card Renderer V2.4.10';
 
   function esc(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({
@@ -82,6 +82,20 @@
       '</button>';
   }
 
+  function contextActionMarkup(action) {
+    if (!action || typeof action !== 'object') return '';
+    const intent = String(action.intent || '');
+    if (!intent || intent === 'attack') return attackActionMarkup(action);
+    const label = String(action.label || 'Action');
+    const detail = String(action.detail || intent.replace(/_/g, ' '));
+    const disabled = action.enabled === false ? ' disabled' : '';
+    const where = action.where == null ? '' : ' data-action-where="' + esc(action.where) + '"';
+    const index = action.index == null ? '' : ' data-action-index="' + esc(action.index) + '"';
+    return '<button type="button" class="sb-card-action" data-card-intent="' + esc(intent) + '"' + where + index + disabled + '>' +
+      '<span><strong>' + esc(label) + '</strong><small>' + esc(detail) + '</small></span>' +
+      '</button>';
+  }
+
   function abilityMarkup(ability) {
     if (!ability || typeof ability !== 'object') return '';
     const name = String(ability.name || 'Ability');
@@ -146,7 +160,7 @@
     const compact = !!opts.compact;
     const anchor = String(opts.anchor || (instance && instance.uid) || '');
     const actions = Array.isArray(opts.actions) ? opts.actions : [];
-    const actionRows = actions.map(attackActionMarkup).filter(Boolean).join('');
+    const actionRows = actions.map(contextActionMarkup).filter(Boolean).join('');
     const classes = [
       'sb-tcg-card',
       'sb-card-family-' + family.toLowerCase(),

@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.9';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.10';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const state = {
@@ -204,17 +204,22 @@
     if (!creature) return '<div class="sb-zone-empty">Empty</div>';
     const instance = topInstance(creature);
     const anchor = cardAnchor(creature);
-    const selected = opts.primary && anchor && state.selectedAnchorUid === anchor;
-    const actions = opts.primary ? attackSlots(creature).map((entry) => ({
-      slot: entry.slot,
-      attack: entry.attack,
-      name: entry.name,
-      enabled: !!opts.canAct
-    })) : [];
+    const contextActions = Array.isArray(opts.contextActions) ? opts.contextActions : [];
+    const selected = anchor && state.selectedAnchorUid === anchor;
+    const actions = [];
+    if (opts.primary) {
+      actions.push(...attackSlots(creature).map((entry) => ({
+        slot: entry.slot,
+        attack: entry.attack,
+        name: entry.name,
+        enabled: !!opts.canAct
+      })));
+    }
+    actions.push(...contextActions);
     return knownCard(instance, {
       creature,
       actions,
-      interactive: !!opts.primary,
+      interactive: !!opts.primary || contextActions.length > 0,
       selected,
       anchor,
       compact: false
@@ -226,13 +231,48 @@
     if (!node) return;
     const opts = options || {};
     const handTarget = !!opts.handTarget;
+    const handTargetMode = String(opts.handTargetMode || 'play');
+    const setupReturn = !!opts.setupReturn;
     node.innerHTML = [0, 1, 2, 3].map((index) => {
+      const setupMode = handTarget && handTargetMode === 'setup';
       const targetAttrs = handTarget
-        ? ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
+        ? (setupMode
+          ? ' tabindex="0" role="button" data-setup-place-where="reserve" data-setup-place-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + ' during setup"'
+          : ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + '"')
         : '';
+      const creature = reserve && reserve[index];
+      const contextActions = setupReturn && creature ? [{
+        intent: 'setup_return',
+        label: 'Return to hand',
+        detail: 'Setup placement',
+        where: 'reserve',
+        index
+      }] : [];
       return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
-        ownerLabel + ' Reserve ' + (index + 1) + '</span>' + creatureCard(reserve && reserve[index], {}) + '</section>';
+        ownerLabel + ' Reserve ' + (index + 1) + '</span>' + creatureCard(creature, { contextActions }) + '</section>';
     }).join('');
+  }
+
+  function renderYourVanguard(creature, options) {
+    const node = $('youVanguard');
+    if (!node) return;
+    const opts = options || {};
+    const contextActions = opts.setupReturn && creature ? [{
+      intent: 'setup_return',
+      label: 'Return to hand',
+      detail: 'Setup Vanguard',
+      where: 'vanguard'
+    }] : [];
+    const card = creatureCard(creature, {
+      primary: !!opts.primary,
+      canAct: !!opts.canAct,
+      contextActions
+    });
+    if (opts.handTarget) {
+      node.innerHTML = '<div class="sb-vanguard-hand-target is-hand-target" tabindex="0" role="button" data-setup-place-where="vanguard" aria-label="Try selected hand card as your Vanguard during setup">' + card + '</div>';
+    } else {
+      node.innerHTML = card;
+    }
   }
 
   function countValue(value) {
@@ -294,6 +334,31 @@
     if ($('yourHandCount')) $('yourHandCount').textContent = String(countValue(view.you && view.you.hand_count != null ? view.you.hand_count : hand.length));
   }
 
+  function renderPhaseControls(view) {
+    const node = $('phaseControls');
+    if (!node) return;
+    const seat = Number(view.you && view.you.seat);
+    let markup = '';
+    if (view.phase === 'opening_choice') {
+      if (Number(view.toss_winner_seat) === seat) {
+        markup = '<span>Opening toss won. Choose turn order:</span>' +
+          '<button type="button" data-lifecycle-intent="opening_choice" data-choice="first">Go first</button>' +
+          '<button type="button" data-lifecycle-intent="opening_choice" data-choice="second">Go second</button>';
+      } else {
+        markup = '<span>Waiting for the toss winner to choose who goes first.</span>';
+      }
+    } else if (view.phase === 'setup') {
+      if (Number(view.setup_turn_seat) === seat) {
+        markup = '<span>Your setup turn. Place a Vanguard and any Reserve starters, then lock setup.</span>' +
+          '<button type="button" data-lifecycle-intent="setup_ready">Setup ready</button>';
+      } else {
+        markup = '<span>Waiting for the other player to finish setup.</span>';
+      }
+    }
+    node.innerHTML = markup;
+    node.hidden = !markup;
+  }
+
   function renderRealm(view, handTarget) {
     const node = $('realmSlot');
     if (!node) return;
@@ -320,31 +385,56 @@
   function render() {
     const view = viewState();
     if (!view) return;
-    const yourTurn = view.phase === 'play' && Number(view.active_seat) === Number(view.you && view.you.seat);
+    const seat = Number(view.you && view.you.seat);
+    const yourTurn = view.phase === 'play' && Number(view.active_seat) === seat;
+    const yourSetup = view.phase === 'setup' && Number(view.setup_turn_seat) === seat;
+    const yourOpeningChoice = view.phase === 'opening_choice' && Number(view.toss_winner_seat) === seat;
     const pending = !!(view.pending_attack_choice || view.pending_ability_choice || view.pending_event_listener_choice || view.pending_movement_listener_choice || view.pending_heal_listener_choice || view.pending_choice || view.pending_resolution);
     const canAttack = yourTurn && !pending && !state.busy;
     const canPlayFromHand = yourTurn && !pending && !state.busy;
+    const canSetup = yourSetup && !pending && !state.busy;
+    const canSelectFromHand = canPlayFromHand || canSetup;
+    const setupHandTarget = !!state.selectedHandUid && canSetup;
+    const playHandTarget = !!state.selectedHandUid && canPlayFromHand;
 
     $('oppVanguard').innerHTML = creatureCard(view.opponent && view.opponent.vanguard, {});
-    $('youVanguard').innerHTML = creatureCard(view.you && view.you.vanguard, { primary: true, canAct: canAttack });
+    renderYourVanguard(view.you && view.you.vanguard, {
+      primary: view.phase === 'play',
+      canAct: canAttack,
+      handTarget: setupHandTarget,
+      setupReturn: canSetup
+    });
     renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent');
-    renderReserve('youReserve', view.you && view.you.reserve, 'Your', { handTarget: !!state.selectedHandUid && canPlayFromHand });
-    renderRealm(view, !!state.selectedHandUid && canPlayFromHand);
+    renderReserve('youReserve', view.you && view.you.reserve, 'Your', {
+      handTarget: setupHandTarget || playHandTarget,
+      handTargetMode: canSetup ? 'setup' : 'play',
+      setupReturn: canSetup
+    });
+    renderRealm(view, playHandTarget);
 
     renderOpponentHand(view);
-    renderYourHand(view, canPlayFromHand);
+    renderYourHand(view, canSelectFromHand);
     renderDeck('oppDeck', view.opponent && view.opponent.deck_count, 'Opponent');
     renderRewards('oppRewards', view.opponent && view.opponent.rewards_count, 'Opponent');
     renderDiscard('oppDiscard', view.opponent && view.opponent.discard_count, 'Opponent');
     renderDeck('yourDeck', view.you && view.you.deck_count, 'Your');
     renderRewards('yourRewards', view.you && view.you.rewards_count, 'Your');
     renderDiscard('yourDiscard', view.you && view.you.discard_count, 'Your');
+    renderPhaseControls(view);
 
-    $('turnPill').textContent = view.phase === 'complete' ? 'Match complete' : (yourTurn ? 'Your turn' : 'Opponent turn');
+    if (view.phase === 'complete') $('turnPill').textContent = 'Match complete';
+    else if (view.phase === 'opening_choice') $('turnPill').textContent = yourOpeningChoice ? 'Your opening choice' : 'Opening choice';
+    else if (view.phase === 'setup') $('turnPill').textContent = yourSetup ? 'Your setup' : 'Opponent setup';
+    else $('turnPill').textContent = yourTurn ? 'Your turn' : 'Opponent turn';
     $('revisionPill').textContent = 'Revision ' + revision();
     $('phasePill').textContent = String(view.phase || '—');
 
     if (pending) setStatus('The board is authoritative. Resolve the pending server choice before another card action.', 'wait');
+    else if (view.phase === 'opening_choice' && yourOpeningChoice) setStatus('You won the opening toss. Choose whether to go first or second.', 'ready');
+    else if (view.phase === 'opening_choice') setStatus('Waiting for the toss winner to choose turn order.', 'wait');
+    else if (view.phase === 'setup' && canSetup && state.selectedHandUid) setStatus('Setup card selected. Choose your Vanguard or a Reserve position; the server validates starter and slot legality.', 'ready');
+    else if (view.phase === 'setup' && canSetup) setStatus('Your setup turn. Select a hand card to place, return a setup Creature from its card, or lock setup when ready.', 'ready');
+    else if (view.phase === 'setup') setStatus('Waiting for the other player to finish setup.', 'wait');
     else if (state.selectedHandUid && canPlayFromHand) setStatus('Hand card selected. Choose a Reserve position or the shared Realm slot; the server validates the destination and card legality.', 'ready');
     else if (yourTurn) setStatus('Your turn. Select a hand card for a board destination or your active Creature for its card actions.', 'ready');
     else setStatus('Board synced. Waiting for the opponent or the next server phase.', 'wait');
@@ -385,6 +475,47 @@
         await runAttackIntent(Number(button.dataset.attackSlot));
       });
     });
+    document.querySelectorAll('[data-card-intent="setup_return"]').forEach((button) => {
+      button.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        const where = String(button.dataset.actionWhere || '');
+        const index = button.dataset.actionIndex == null || button.dataset.actionIndex === ''
+          ? null
+          : Number(button.dataset.actionIndex);
+        await runSetupReturnIntent(where, index);
+      });
+    });
+    document.querySelectorAll('[data-lifecycle-intent="opening_choice"]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        await runOpeningChoiceIntent(String(button.dataset.choice || ''));
+      });
+    });
+    document.querySelectorAll('[data-lifecycle-intent="setup_ready"]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        await runSetupReadyIntent();
+      });
+    });
+    document.querySelectorAll('[data-setup-place-where]').forEach((target) => {
+      const activate = async () => {
+        const where = String(target.dataset.setupPlaceWhere || '');
+        const index = target.dataset.setupPlaceIndex == null || target.dataset.setupPlaceIndex === ''
+          ? null
+          : Number(target.dataset.setupPlaceIndex);
+        await runSetupPlaceIntent(state.selectedHandUid, where, index);
+      };
+      target.addEventListener('click', async (event) => {
+        if (event.target.closest('[data-card-intent], [data-card-anchor]')) return;
+        event.stopPropagation();
+        await activate();
+      });
+      target.addEventListener('keydown', async (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          event.stopPropagation();
+          await activate();
+        }
+      });
+    });
     document.querySelectorAll('[data-play-creature-reserve-index]').forEach((slot) => {
       const activate = async () => {
         await runPlayCreatureIntent(state.selectedHandUid, Number(slot.dataset.playCreatureReserveIndex));
@@ -417,6 +548,90 @@
         }
       });
     });
+  }
+
+  async function runOpeningChoiceIntent(choice) {
+    state.busy = true;
+    render();
+    setStatus('Submitting opening turn order to the authoritative setup owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_SETUP, Object.assign(actionBase('opening_choice'), { choice }));
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runSetupPlaceIntent(cardUid, where, index) {
+    if (!cardUid) throw new Error('Select a hand card first.');
+    state.busy = true;
+    render();
+    setStatus('Submitting setup placement to the authoritative setup owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_SETUP, Object.assign(actionBase('setup_place'), {
+        card_uid: cardUid,
+        where,
+        index
+      }));
+      state.selectedHandUid = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runSetupReturnIntent(where, index) {
+    state.busy = true;
+    render();
+    setStatus('Returning setup Creature through the authoritative setup owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_SETUP, Object.assign(actionBase('setup_return'), {
+        where,
+        index
+      }));
+      state.selectedAnchorUid = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runSetupReadyIntent() {
+    state.busy = true;
+    render();
+    setStatus('Locking setup through the authoritative match-flow owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_SETUP, actionBase('setup_ready'));
+      state.selectedHandUid = '';
+      state.selectedAnchorUid = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
   }
 
   async function runPlayRealmIntent(cardUid) {
