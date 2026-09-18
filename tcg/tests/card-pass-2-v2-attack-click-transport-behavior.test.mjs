@@ -47,6 +47,10 @@ class FakeNode {
   get innerHTML() {
     return this._innerHTML;
   }
+
+  closest() {
+    return null;
+  }
 }
 
 function playableView(revision = 41) {

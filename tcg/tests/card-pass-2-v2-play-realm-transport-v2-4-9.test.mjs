@@ -35,7 +35,7 @@ test('server remains sole owner of Realm family, timing, replacement and listene
   assert.match(branch, /runtimeV02BeginRealmPlayRoute/);
   assert.match(branch, /realm_already_played_this_turn/);
   assert.match(branch, /same_named_realm_cannot_replace_itself/);
-  assert.match(branch, /runtimeV02BeginEventListenerContinuation/);
+  assert.match(branch, /const eventFlow=routed\.flow/);
   assert.match(branch, /runtimeV02BeginMovementListenerContinuation/);
   assert.match(branch, /runtimeV02BeginMovementHealListenerContinuation/);
 });
