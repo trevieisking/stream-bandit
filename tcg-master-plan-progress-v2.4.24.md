@@ -58,7 +58,17 @@ No Match/Tactic/Setup runtime, renderer, database schema, migration or card-data
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff evidence are required.
 
-After acceptance:
-- canonical STATE-VIS-07 Reward count/claim state may close;
-- canonical STATE-VIS-11 defeat/KO + mandatory promotion may close for the resolution surface;
+Accepted behavior head: `37e06263ade6b7ee15a881ce39a230411dee2161`.
+
+Exact-head evidence:
+- TCG Card Pass 2 Validation #708 ✅
+- Migration Replay #878 ✅
+- Functional Smoke #904 ✅
+- review threads 0 ✅
+- legacy combined statuses 0 ✅
+- exact delta from V2.4.23 control-sync: 1 commit / 8 files, bounded to browser/CSS/cache/tests/V2.4.24 controls ✅
+
+Canonical effect:
+- STATE-VIS-07 Reward count/claim state ✅
+- STATE-VIS-11 defeat/KO + mandatory promotion resolution surface ✅
 - ORDER-05 remains open until the remaining board-visible state checklist is reconciled.
