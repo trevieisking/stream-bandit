@@ -33,11 +33,11 @@
 
 ## D. Exact-head acceptance
 
-- [ ] **V2419-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2419-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2419-CI-03** Functional Smoke succeeds.
-- [ ] **V2419-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2419-DIFF-01** diff stays bounded to battle browser/CSS/cache/tests/V2.4.19 controls.
+- [x] **V2419-CI-01** TCG Card Pass 2 Validation succeeds — #696 at accepted browser head `0ebe40be69223bb1ebc6df88c1bc5b1d1a0aa5e8`.
+- [x] **V2419-CI-02** Migration Replay succeeds from zero — #866.
+- [x] **V2419-CI-03** Functional Smoke succeeds — #892.
+- [x] **V2419-REVIEW-01** review threads remain zero / material findings resolved.
+- [x] **V2419-DIFF-01** diff stays bounded to battle browser/CSS/cache/tests/V2.4.19 controls; renderer and Supabase runtime unchanged.
 
 ## E. Master-plan interaction state
 
@@ -46,6 +46,6 @@
 - [x] **INTERACT-03** Essence.
 - [x] **INTERACT-04** Relic.
 - [x] **INTERACT-05** Realm.
-- [ ] **INTERACT-06** Tactic — browser candidate implemented; close only after D passes.
+- [x] **INTERACT-06** Tactic — server legality/owner fence + card-owned browser play + generic authoritative choice flow accepted.
 
-**Decision:** source candidate only until D passes. Supabase `tcg-tactic-actions` v4 remains the accepted/live server owner; merge / `main` / public / full-live remain HOLD.
+**Decision:** V2.4.19 ACCEPTED ✅ at `0ebe40be69223bb1ebc6df88c1bc5b1d1a0aa5e8`. INTERACT-06 Tactic is complete. Supabase `tcg-tactic-actions` v4 remains ACTIVE with no browser-slice redeploy required. Merge / `main` / public / full-live remain HOLD 🔒.

@@ -56,3 +56,25 @@ TCG #695 completed the full deterministic runtime/type-check lane successfully. 
 The product controller now renders the hidden Tactic choice panel before binding card controls. The harness's `getElementById` creates a fake node for every requested element, but `FakeNode` did not implement the standard DOM `replaceChildren()` method used to clear the hidden choice options. The simulated render therefore aborted before `bindCardControls()`, leaving the fake Attack button without a click listener.
 
 The repair adds only `FakeNode.replaceChildren()` to the test double. Attack source, Tactic source, renderer, server runtime and browser behavior are unchanged.
+
+
+## V2.4.19-008 — exact-head acceptance
+
+**State:** ✅ ACCEPTED
+
+Accepted browser head: `0ebe40be69223bb1ebc6df88c1bc5b1d1a0aa5e8`.
+
+Exact gates:
+- TCG Card Pass 2 Validation #696 ✅
+- Migration Replay #866 ✅
+- Functional Smoke #892 ✅
+- review threads: 0 ✅
+- legacy combined statuses: 0 ✅
+- renderer unchanged ✅
+- Supabase runtime unchanged ✅
+
+The V2.4.19 browser now consumes the live Tactic playability projection, exposes Play Tactic on the physical selected card only when server eligible, commits through `play_tactic`, and renders a generic authoritative choice panel for Tactic `pending_choice` plus effect-resolution movement/heal listener choices.
+
+The browser does not contain Tactic subtype routing, Ally timing, play-requirement, target/resource, unsupported-op, card-ID, effect-opcode or listener-ID gameplay rules.
+
+INTERACT-06 is complete. The canonical V2.4.1 interaction checklist now makes INTERACT-07 selection cancellation the next target.

@@ -59,3 +59,12 @@ The card renderer, Supabase runtime, database schema, migrations and card defini
 ## 6. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff evidence are required. Because V2.4.19 changes no Supabase runtime bytes, accepted `tcg-tactic-actions` v4 remains live without redeployment.
+
+
+## 7. Accepted checkpoint
+
+V2.4.19 is accepted at browser head `0ebe40be69223bb1ebc6df88c1bc5b1d1a0aa5e8` after TCG #696, Migration #866 and Functional Smoke #892 all succeeded.
+
+INTERACT-06 Tactic is complete. Supabase remains `tcg-tactic-actions` v4 ACTIVE with JWT verification preserved; no V2.4.19 server redeploy was required.
+
+**Next locked target from canonical V2.4.1:** INTERACT-07 — misclick/selection can be cancelled before authoritative commit where rules permit. Existing select-again toggle behavior must be proven first; add new code only if the current transport cannot satisfy the requirement safely.
