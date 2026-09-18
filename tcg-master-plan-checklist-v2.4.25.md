@@ -37,6 +37,8 @@
 
 ## E. Exact-head acceptance
 
+**Retry anchor:** prior source-control head `7b8463949051d9a24fbdfb70c34e9e75b782c890` passed TCG #722 and Functional #918; Migration #892 was cancelled by rapid-push concurrency before a job existed. This checklist-only commit intentionally retriggers the unchanged candidate for one exact-head three-gate decision.
+
 - [ ] **V2425-CI-01** TCG Card Pass 2 Validation succeeds.
 - [ ] **V2425-CI-02** Migration Replay succeeds from zero.
 - [ ] **V2425-CI-03** Functional Smoke succeeds.
