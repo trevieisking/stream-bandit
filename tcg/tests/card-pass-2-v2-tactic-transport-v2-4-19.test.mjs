@@ -79,7 +79,8 @@ test('Tactic-owned pending choices still submit resolve_choice to the Tactic own
 
 test('Tactic projection keeps precedence before generic Creature Realm fallback only when server eligible', () => {
   assert.match(controller, /const tacticMode = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode/);
-  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !tacticMode/);
+  assert.match(controller, /const directPlayMode = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !tacticMode/);
+  assert.match(controller, /state\.playProjectionUid === state\.selectedHandUid/);
   assert.match(controller, /runTacticPlayabilityProjection\(uid\)/);
   assert.match(controller, /actionBase\('play_creature'\)/);
   assert.match(controller, /actionBase\('play_realm'\)/);
