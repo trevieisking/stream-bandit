@@ -55,8 +55,12 @@ test('Withdrawal projection carries exact current cost, occupied Reserve anchors
   assert.match(plan, /withdrawal_already_used_this_turn/);
 });
 
-test('V2.4.22 is server seam only; browser Ability Withdraw controls are not added yet', () => {
-  assert.doesNotMatch(controller, /actionBase\('field_actions'\)/);
-  assert.doesNotMatch(controller, /data-card-intent="use_ability"/);
-  assert.doesNotMatch(controller, /data-card-intent="withdraw"/);
+test('later browser transport consumes field_actions without copying Ability or Withdrawal legality', () => {
+  assert.match(controller, /actionBase\('field_actions'\)/);
+  assert.match(controller, /data-card-intent="use_ability"/);
+  assert.match(controller, /data-card-intent="withdraw"/);
+  assert.doesNotMatch(controller, /runtimeV02BeginActiveAbilityLiveRoute/);
+  assert.doesNotMatch(controller, /withdrawalCost\(/);
+  assert.doesNotMatch(controller, /condition_prevents_withdrawal/);
+  assert.doesNotMatch(controller, /withdrawal_already_used_this_turn/);
 });

@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.19';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.23';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -27,7 +27,15 @@
     tacticProjectionUid: '',
     tacticEligible: false,
     tacticProjectionBusy: false,
-    tacticChoiceIds: [],
+    actionChoiceIds: [],
+    fieldActionRevision: -1,
+    fieldActionsBusy: false,
+    fieldActionError: '',
+    abilitySources: [],
+    fieldWithdraw: { eligible: false, reason: '', cost: null, legal_targets: [], payment_options: [] },
+    withdrawMode: false,
+    withdrawTargetIndex: null,
+    withdrawPaymentUids: [],
     busy: false,
     poll: null
   };
@@ -213,12 +221,81 @@
     state.tacticProjectionBusy = false;
   }
 
-  function tacticPendingChoice(view) {
+  function pendingActionChoice(view) {
     if (!view) return null;
-    if (view.pending_choice) return view.pending_choice;
-    if (view.phase === 'effect_resolution' && view.pending_movement_listener_choice) return view.pending_movement_listener_choice;
-    if (view.phase === 'effect_resolution' && view.pending_heal_listener_choice) return view.pending_heal_listener_choice;
+    if (view.pending_attack_choice) return { pending: view.pending_attack_choice, owner: 'match', action: 'resolve_attack_choice' };
+    if (view.pending_ability_choice) return { pending: view.pending_ability_choice, owner: 'match', action: 'resolve_ability_choice' };
+    if (view.pending_event_listener_choice) return { pending: view.pending_event_listener_choice, owner: 'match', action: 'resolve_event_listener_choice' };
+    if (view.pending_movement_listener_choice) {
+      return {
+        pending: view.pending_movement_listener_choice,
+        owner: view.phase === 'effect_resolution' ? 'tactic' : 'match',
+        action: view.phase === 'effect_resolution' ? 'resolve_choice' : 'resolve_movement_listener_choice'
+      };
+    }
+    if (view.pending_heal_listener_choice) {
+      return {
+        pending: view.pending_heal_listener_choice,
+        owner: view.phase === 'effect_resolution' ? 'tactic' : 'match',
+        action: view.phase === 'effect_resolution' ? 'resolve_choice' : 'resolve_heal_listener_choice'
+      };
+    }
+    if (view.pending_choice) return { pending: view.pending_choice, owner: 'tactic', action: 'resolve_choice' };
     return null;
+  }
+
+  function yourCreatureAt(view, where, index) {
+    if (!view || !view.you) return null;
+    if (where === 'vanguard') return view.you.vanguard || null;
+    if (where === 'reserve' && Number.isInteger(index) && index >= 0 && index <= 3) {
+      return Array.isArray(view.you.reserve) ? (view.you.reserve[index] || null) : null;
+    }
+    return null;
+  }
+
+  function fieldHasAnchor(view, anchorUid) {
+    if (!anchorUid || !view || !view.you) return false;
+    if (cardAnchor(view.you.vanguard) === anchorUid) return true;
+    const reserve = Array.isArray(view.you.reserve) ? view.you.reserve : [];
+    return reserve.some((creature) => cardAnchor(creature) === anchorUid);
+  }
+
+  function clearWithdrawMode() {
+    state.withdrawMode = false;
+    state.withdrawTargetIndex = null;
+    state.withdrawPaymentUids = [];
+  }
+
+  function clearFieldActionProjection() {
+    state.fieldActionRevision = -1;
+    state.fieldActionsBusy = false;
+    state.fieldActionError = '';
+    state.abilitySources = [];
+    state.fieldWithdraw = { eligible: false, reason: '', cost: null, legal_targets: [], payment_options: [] };
+  }
+
+  function fieldActionsFresh() {
+    return state.fieldActionRevision === revision();
+  }
+
+  function legalAbilitySource(where, index, anchorUid) {
+    if (!fieldActionsFresh() || !anchorUid) return false;
+    return state.abilitySources.some((source) =>
+      source &&
+      source.where === where &&
+      (where === 'vanguard' ? source.index === null : source.index === index) &&
+      source.anchor_uid === anchorUid
+    );
+  }
+
+  function legalWithdrawTarget(index) {
+    if (!fieldActionsFresh() || !Number.isInteger(index)) return false;
+    const view = viewState();
+    const creature = yourCreatureAt(view, 'reserve', index);
+    const anchor = cardAnchor(creature);
+    return !!anchor && state.fieldWithdraw.legal_targets.some((target) =>
+      target && target.reserve_index === index && target.anchor_uid === anchor
+    );
   }
 
   function attackSlots(creature) {
@@ -313,27 +390,36 @@
     const evolutionTargets = !!opts.evolutionTargets;
     const essenceTargets = !!opts.essenceTargets;
     const relicTargets = !!opts.relicTargets;
+    const abilityActions = !!opts.abilityActions;
+    const withdrawTargets = !!opts.withdrawTargets;
     node.innerHTML = [0, 1, 2, 3].map((index) => {
       const setupMode = handTarget && handTargetMode === 'setup';
       const creature = reserve && reserve[index];
       const evolutionTarget = evolutionTargets && !!creature && legalEvolutionTarget('reserve', index);
       const essenceTarget = essenceTargets && !!creature && legalEssenceTarget('reserve', index);
       const relicTarget = relicTargets && !!creature && legalRelicTarget('reserve', index);
+      const withdrawTarget = withdrawTargets && !!creature && legalWithdrawTarget(index);
       const targetAttrs = evolutionTarget
         ? ' tabindex="0" role="button" data-evolve-target-where="reserve" data-evolve-target-index="' + index + '" aria-label="Evolve selected card onto ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
         : (essenceTarget
           ? ' tabindex="0" role="button" data-essence-target-where="reserve" data-essence-target-index="' + index + '" aria-label="Attach selected Essence to ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
           : (relicTarget
             ? ' tabindex="0" role="button" data-relic-target-where="reserve" data-relic-target-index="' + index + '" aria-label="Attach selected Relic to ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
-            : (handTarget
+            : (withdrawTarget
+              ? ' tabindex="0" role="button" data-withdraw-target-index="' + index + '" aria-label="Choose ' + ownerLabel + ' Reserve ' + (index + 1) + ' as the server-projected Withdrawal target"'
+              : (handTarget
               ? (setupMode
                 ? ' tabindex="0" role="button" data-setup-place-where="reserve" data-setup-place-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + ' during setup"'
                 : ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + '"')
-              : '')));
-      const contextActions = setupReturn && creature ? [{
-        intent: 'setup_return', label: 'Return to hand', detail: 'Setup placement', where: 'reserve', index
-      }] : [];
-      return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + (essenceTarget ? ' is-essence-target' : '') + (relicTarget ? ' is-relic-target' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
+              : ''))));
+      const contextActions = [];
+      if (setupReturn && creature) {
+        contextActions.push({ intent: 'setup_return', label: 'Return to hand', detail: 'Setup placement', where: 'reserve', index });
+      }
+      if (abilityActions && creature && legalAbilitySource('reserve', index, cardAnchor(creature))) {
+        contextActions.push({ intent: 'use_ability', label: 'Use Ability', detail: 'Server-projected Active Ability', where: 'reserve', index });
+      }
+      return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + (essenceTarget ? ' is-essence-target' : '') + (relicTarget ? ' is-relic-target' : '') + (withdrawTarget ? ' is-withdraw-target' : '') + (withdrawTarget && state.withdrawTargetIndex === index ? ' is-withdraw-target-selected' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
         ownerLabel + ' Reserve ' + (index + 1) + '</span>' + creatureCard(creature, { contextActions }) + '</section>';
     }).join('');
   }
@@ -342,9 +428,22 @@
     const node = $('youVanguard');
     if (!node) return;
     const opts = options || {};
-    const contextActions = opts.setupReturn && creature ? [{
-      intent: 'setup_return', label: 'Return to hand', detail: 'Setup Vanguard', where: 'vanguard'
-    }] : [];
+    const contextActions = [];
+    if (opts.setupReturn && creature) {
+      contextActions.push({ intent: 'setup_return', label: 'Return to hand', detail: 'Setup Vanguard', where: 'vanguard' });
+    }
+    if (opts.abilityAction && creature && legalAbilitySource('vanguard', null, cardAnchor(creature))) {
+      contextActions.push({ intent: 'use_ability', label: 'Use Ability', detail: 'Server-projected Active Ability', where: 'vanguard' });
+    }
+    if (opts.withdrawAction && creature && state.fieldWithdraw.eligible === true) {
+      const cost = Number(state.fieldWithdraw.cost);
+      contextActions.push({
+        intent: 'withdraw',
+        label: 'Withdraw',
+        detail: 'Server cost ' + (Number.isInteger(cost) && cost >= 0 ? cost : '—') + ' Essence',
+        where: 'vanguard'
+      });
+    }
     const card = creatureCard(creature, { primary: !!opts.primary, canAct: !!opts.canAct, contextActions });
     const evolutionTarget = !!opts.evolutionTargets && !!creature && legalEvolutionTarget('vanguard', null);
     const essenceTarget = !!opts.essenceTargets && !!creature && legalEssenceTarget('vanguard', null);
@@ -454,33 +553,93 @@
     node.hidden = !markup;
   }
 
-  function renderTacticChoice(view) {
+  function renderActionChoice(view) {
     const panel = $('tacticChoicePanel');
     const prompt = $('tacticChoicePrompt');
     const rule = $('tacticChoiceRule');
     const optionsNode = $('tacticChoiceOptions');
     const submit = $('tacticChoiceSubmit');
-    if (!panel || !prompt || !rule || !optionsNode || !submit) return;
+    const cancel = $('actionChoiceCancel');
+    if (!panel || !prompt || !rule || !optionsNode || !submit || !cancel) return;
 
-    const pending = tacticPendingChoice(view);
-    if (!pending) {
-      panel.hidden = true;
-      state.tacticChoiceIds = [];
+    const route = pendingActionChoice(view);
+    const pending = route && route.pending ? route.pending : null;
+
+    if (!pending && state.withdrawMode) {
+      panel.hidden = false;
+      cancel.hidden = false;
+      cancel.onclick = () => {
+        clearWithdrawMode();
+        render();
+      };
+      submit.textContent = 'Confirm Withdraw';
+
+      const projected = state.fieldWithdraw || {};
+      const costRaw = Number(projected.cost);
+      const cost = Number.isInteger(costRaw) && costRaw >= 0 ? costRaw : 0;
+      const paymentOptions = Array.isArray(projected.payment_options) ? projected.payment_options : [];
+      const validIds = new Set(paymentOptions.map((option) => String(option && option.uid || '')).filter(Boolean));
+      state.withdrawPaymentUids = state.withdrawPaymentUids.filter((uid) => validIds.has(uid));
+      const targetReady = legalWithdrawTarget(state.withdrawTargetIndex);
+      if (!targetReady) state.withdrawTargetIndex = null;
+
+      prompt.textContent = 'Withdraw Vanguard';
+      rule.textContent = (targetReady ? 'Reserve ' + (state.withdrawTargetIndex + 1) + ' selected' : 'Choose a green Reserve target') +
+        ' · select exactly ' + cost + ' projected Essence.';
       optionsNode.replaceChildren();
-      submit.disabled = true;
-      submit.onclick = null;
+
+      paymentOptions.forEach((option) => {
+        const uid = String(option && option.uid || '');
+        if (!uid) return;
+        const selected = state.withdrawPaymentUids.includes(uid);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'sb-tactic-choice-option' + (selected ? ' is-selected' : '');
+        button.dataset.withdrawPaymentUid = uid;
+        button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        button.textContent = String(option && option.label || option && option.card_id || 'Essence');
+        button.onclick = () => {
+          const index = state.withdrawPaymentUids.indexOf(uid);
+          if (index >= 0) state.withdrawPaymentUids.splice(index, 1);
+          else if (state.withdrawPaymentUids.length < cost) state.withdrawPaymentUids.push(uid);
+          renderActionChoice(viewState());
+        };
+        optionsNode.appendChild(button);
+      });
+
+      submit.disabled = !targetReady || state.withdrawPaymentUids.length !== cost;
+      submit.onclick = submit.disabled ? null : async () => {
+        await runWithdrawIntent();
+      };
       return;
     }
 
-    panel.hidden = false;
-    const waiting = pending.waiting === true;
-    if (waiting) {
-      prompt.textContent = 'Waiting for the other player to resolve ' + String(pending.kind || 'the Tactic choice') + '.';
-      rule.textContent = 'The authoritative Tactic owner is waiting on the other seat.';
+    if (!pending) {
+      panel.hidden = true;
+      state.actionChoiceIds = [];
       optionsNode.replaceChildren();
       submit.disabled = true;
       submit.onclick = null;
-      state.tacticChoiceIds = [];
+      submit.textContent = 'Confirm choice';
+      cancel.hidden = true;
+      cancel.onclick = null;
+      return;
+    }
+
+    clearWithdrawMode();
+    panel.hidden = false;
+    cancel.hidden = true;
+    cancel.onclick = null;
+    submit.textContent = 'Confirm choice';
+
+    const waiting = pending.waiting === true;
+    if (waiting) {
+      prompt.textContent = 'Waiting for the other player to resolve ' + String(pending.kind || 'the card choice') + '.';
+      rule.textContent = 'The authoritative gameplay owner is waiting on the other seat.';
+      optionsNode.replaceChildren();
+      submit.disabled = true;
+      submit.onclick = null;
+      state.actionChoiceIds = [];
       return;
     }
 
@@ -496,18 +655,18 @@
         })).filter((option) => option.id)
       : [];
     const validIds = new Set(options.map((option) => option.id));
-    state.tacticChoiceIds = state.tacticChoiceIds.filter((id) => validIds.has(id));
+    state.actionChoiceIds = state.actionChoiceIds.filter((id) => validIds.has(id));
 
-    prompt.textContent = String(pending.prompt || pending.kind || 'Resolve Tactic choice');
+    prompt.textContent = String(pending.prompt || pending.kind || 'Resolve card choice');
     rule.textContent = 'Choose ' + min + ' to ' + max + (mode === 'order' ? ' in order.' : '.');
     optionsNode.replaceChildren();
 
     options.forEach((option) => {
-      const selectedIndex = state.tacticChoiceIds.indexOf(option.id);
+      const selectedIndex = state.actionChoiceIds.indexOf(option.id);
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'sb-tactic-choice-option' + (selectedIndex >= 0 ? ' is-selected' : '');
-      button.dataset.tacticChoiceId = option.id;
+      button.dataset.actionChoiceId = option.id;
       button.setAttribute('aria-pressed', selectedIndex >= 0 ? 'true' : 'false');
 
       const label = document.createElement('span');
@@ -522,22 +681,20 @@
       }
 
       button.onclick = () => {
-        const current = tacticPendingChoice(viewState());
+        const currentRoute = pendingActionChoice(viewState());
+        const current = currentRoute && currentRoute.pending ? currentRoute.pending : null;
         if (!current || current.waiting === true || String(current.id || '') !== String(pending.id || '')) return;
-        const existingIndex = state.tacticChoiceIds.indexOf(option.id);
-        if (existingIndex >= 0) {
-          state.tacticChoiceIds.splice(existingIndex, 1);
-        } else if (mode === 'order' || state.tacticChoiceIds.length < max) {
-          state.tacticChoiceIds.push(option.id);
-        }
-        renderTacticChoice(viewState());
+        const existingIndex = state.actionChoiceIds.indexOf(option.id);
+        if (existingIndex >= 0) state.actionChoiceIds.splice(existingIndex, 1);
+        else if (mode === 'order' || state.actionChoiceIds.length < max) state.actionChoiceIds.push(option.id);
+        renderActionChoice(viewState());
       };
       optionsNode.appendChild(button);
     });
 
-    submit.disabled = state.tacticChoiceIds.length < min || state.tacticChoiceIds.length > max;
+    submit.disabled = state.actionChoiceIds.length < min || state.actionChoiceIds.length > max;
     submit.onclick = submit.disabled ? null : async () => {
-      await runTacticChoiceIntent();
+      await runPendingChoiceIntent();
     };
   }
 
@@ -572,8 +729,10 @@
     const yourSetup = view.phase === 'setup' && Number(view.setup_turn_seat) === seat;
     const yourOpeningChoice = view.phase === 'opening_choice' && Number(view.toss_winner_seat) === seat;
     const pending = !!(view.pending_attack_choice || view.pending_ability_choice || view.pending_event_listener_choice || view.pending_movement_listener_choice || view.pending_heal_listener_choice || view.pending_choice || view.pending_resolution);
-    const canAttack = yourTurn && !pending && !state.busy;
-    const canPlayFromHand = yourTurn && !pending && !state.busy;
+    const projectedFieldActions = fieldActionsFresh();
+    const localWithdraw = state.withdrawMode && projectedFieldActions;
+    const canAttack = yourTurn && !pending && !state.busy && !localWithdraw;
+    const canPlayFromHand = yourTurn && !pending && !state.busy && !localWithdraw;
     const canSetup = yourSetup && !pending && !state.busy;
     const canSelectFromHand = canPlayFromHand || canSetup;
     const setupHandTarget = !!state.selectedHandUid && canSetup;
@@ -592,7 +751,9 @@
       evolutionTargets: evolutionMode,
       essenceTargets: essenceMode,
       relicTargets: relicMode,
-      setupReturn: canSetup
+      setupReturn: canSetup,
+      abilityAction: projectedFieldActions && yourTurn && !pending && !state.busy && !localWithdraw,
+      withdrawAction: projectedFieldActions && yourTurn && !pending && !state.busy && !localWithdraw
     });
     renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent');
     renderReserve('youReserve', view.you && view.you.reserve, 'Your', {
@@ -601,7 +762,9 @@
       evolutionTargets: evolutionMode,
       essenceTargets: essenceMode,
       relicTargets: relicMode,
-      setupReturn: canSetup
+      setupReturn: canSetup,
+      abilityActions: projectedFieldActions && yourTurn && !pending && !state.busy && !localWithdraw,
+      withdrawTargets: localWithdraw
     });
     renderRealm(view, playHandTarget);
 
@@ -614,7 +777,7 @@
     renderRewards('yourRewards', view.you && view.you.rewards_count, 'Your');
     renderDiscard('yourDiscard', view.you && view.you.discard_count, 'Your');
     renderPhaseControls(view);
-    renderTacticChoice(view);
+    renderActionChoice(view);
 
     if (view.phase === 'complete') $('turnPill').textContent = 'Match complete';
     else if (view.phase === 'opening_choice') $('turnPill').textContent = yourOpeningChoice ? 'Your opening choice' : 'Opening choice';
@@ -624,6 +787,11 @@
     $('phasePill').textContent = String(view.phase || '—');
 
     if (pending) setStatus('The board is authoritative. Resolve the pending server choice before another card action.', 'wait');
+    else if (state.withdrawMode) {
+      const cost = Number(state.fieldWithdraw && state.fieldWithdraw.cost);
+      setStatus('Withdraw selected. Choose a green Reserve target and exactly ' + (Number.isInteger(cost) && cost >= 0 ? cost : 0) + ' projected Essence, then confirm or cancel.', 'ready');
+    }
+    else if (yourTurn && state.fieldActionError) setStatus('Card-action projection unavailable: ' + state.fieldActionError, 'error');
     else if (view.phase === 'opening_choice' && yourOpeningChoice) setStatus('You won the opening toss. Choose whether to go first or second.', 'ready');
     else if (view.phase === 'opening_choice') setStatus('Waiting for the toss winner to choose turn order.', 'wait');
     else if (view.phase === 'setup' && canSetup && state.selectedHandUid) setStatus('Setup card selected. Choose your Vanguard or a Reserve position; the server validates starter and slot legality.', 'ready');
@@ -647,7 +815,7 @@
   function bindCardControls() {
     document.querySelectorAll('[data-card-anchor]').forEach((card) => {
       const select = () => {
-        if (state.busy) return;
+        if (state.busy || state.withdrawMode) return;
         const anchor = String(card.dataset.cardAnchor || '');
         if (anchor.startsWith('hand:')) {
           const uid = anchor.slice(5);
@@ -701,6 +869,20 @@
       button.addEventListener('click', async (event) => {
         event.stopPropagation();
         await runAttackIntent(Number(button.dataset.attackSlot));
+      });
+    });
+    document.querySelectorAll('[data-card-intent="use_ability"]').forEach((button) => {
+      button.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        const where = String(button.dataset.actionWhere || '');
+        const index = button.dataset.actionIndex == null || button.dataset.actionIndex === '' ? null : Number(button.dataset.actionIndex);
+        await runAbilityIntent(where, index);
+      });
+    });
+    document.querySelectorAll('[data-card-intent="withdraw"]').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        startWithdrawMode();
       });
     });
     document.querySelectorAll('[data-card-intent="setup_return"]').forEach((button) => {
@@ -816,6 +998,26 @@
       target.addEventListener('keydown', async (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault(); event.stopPropagation(); await activate();
+        }
+      });
+    });
+    document.querySelectorAll('[data-withdraw-target-index]').forEach((target) => {
+      const activate = () => {
+        const index = Number(target.dataset.withdrawTargetIndex);
+        if (!legalWithdrawTarget(index)) return;
+        state.withdrawTargetIndex = index;
+        render();
+      };
+      target.addEventListener('click', (event) => {
+        if (event.target.closest('[data-card-intent]')) return;
+        event.stopPropagation();
+        activate();
+      });
+      target.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          event.stopPropagation();
+          activate();
         }
       });
     });
@@ -1149,7 +1351,7 @@
         card_uid: cardUid
       }));
       state.selectedHandUid = '';
-      state.tacticChoiceIds = [];
+      state.actionChoiceIds = [];
       clearEvolutionProjection();
       clearEssenceProjection();
       clearRelicProjection();
@@ -1165,34 +1367,180 @@
     }
   }
 
-  async function runTacticChoiceIntent() {
-    const pending = tacticPendingChoice(viewState());
-    if (!pending || pending.waiting === true) throw new Error('No Tactic choice is yours to resolve.');
+  async function runPendingChoiceIntent() {
+    const route = pendingActionChoice(viewState());
+    const pending = route && route.pending ? route.pending : null;
+    if (!pending || pending.waiting === true) throw new Error('No authoritative card choice is yours to resolve.');
     const minRaw = Number(pending.min);
     const maxRaw = Number(pending.max);
     const min = Number.isInteger(minRaw) && minRaw >= 0 ? minRaw : 0;
     const max = Number.isInteger(maxRaw) && maxRaw >= min ? maxRaw : min;
-    const choiceIds = [...state.tacticChoiceIds];
+    const choiceIds = [...state.actionChoiceIds];
     if (choiceIds.length < min || choiceIds.length > max) throw new Error('Select the number of choices requested by the server.');
     state.busy = true;
     render();
-    setStatus('Submitting Tactic choice to the authoritative Tactic owner…', 'busy');
+    setStatus('Submitting card choice to the authoritative gameplay owner…', 'busy');
     let failure = '';
     try {
-      await callEdge(API_TACTIC, Object.assign(actionBase('resolve_choice'), {
+      const payload = Object.assign(actionBase(route.action), {
         choice_id: String(pending.id || ''),
         choice_ids: choiceIds
-      }));
-      state.tacticChoiceIds = [];
+      });
+      if (route.owner === 'tactic') await callEdge(API_TACTIC, payload);
+      else await callEdge(API_MATCH, payload);
+      state.actionChoiceIds = [];
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
-      state.tacticChoiceIds = choiceIds;
+      state.actionChoiceIds = choiceIds;
       await refreshMatch().catch(() => {});
     } finally {
       state.busy = false;
       render();
       if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runAbilityIntent(where, index) {
+    const view = viewState();
+    const creature = yourCreatureAt(view, where, index);
+    const anchor = cardAnchor(creature);
+    if (!legalAbilitySource(where, index, anchor)) throw new Error('That card is not in the server-projected Active Ability source list.');
+    state.busy = true;
+    render();
+    setStatus('Submitting Ability to the authoritative Ability owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, Object.assign(actionBase('use_ability'), { where, index }));
+      state.selectedAnchorUid = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  function startWithdrawMode() {
+    if (!fieldActionsFresh() || state.fieldWithdraw.eligible !== true) throw new Error('Withdrawal is not currently server-eligible.');
+    const view = viewState();
+    state.selectedHandUid = '';
+    state.selectedAnchorUid = cardAnchor(view && view.you && view.you.vanguard);
+    clearEvolutionProjection();
+    clearEssenceProjection();
+    clearRelicProjection();
+    clearTacticProjection();
+    state.withdrawMode = true;
+    state.withdrawTargetIndex = null;
+    state.withdrawPaymentUids = [];
+    render();
+  }
+
+  async function runWithdrawIntent() {
+    if (!state.withdrawMode || !fieldActionsFresh() || state.fieldWithdraw.eligible !== true) {
+      throw new Error('Withdrawal projection is no longer current.');
+    }
+    const targetIndex = Number(state.withdrawTargetIndex);
+    if (!legalWithdrawTarget(targetIndex)) throw new Error('Choose a server-projected Reserve target.');
+    const costRaw = Number(state.fieldWithdraw.cost);
+    const cost = Number.isInteger(costRaw) && costRaw >= 0 ? costRaw : 0;
+    const validPayments = new Set(state.fieldWithdraw.payment_options.map((option) => String(option && option.uid || '')).filter(Boolean));
+    const paymentUids = [...new Set(state.withdrawPaymentUids.map(String))];
+    if (paymentUids.length !== cost || paymentUids.some((uid) => !validPayments.has(uid))) {
+      throw new Error('Choose exactly the server-projected Withdrawal Essence payment.');
+    }
+
+    state.busy = true;
+    render();
+    setStatus('Submitting Withdrawal to the authoritative Withdrawal/Payment owners…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, Object.assign(actionBase('withdraw'), {
+        reserve_index: targetIndex,
+        discard_essence_uids: paymentUids
+      }));
+      clearWithdrawMode();
+      state.selectedAnchorUid = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runFieldActionProjection() {
+    const view = viewState();
+    const seat = Number(view && view.you && view.you.seat);
+    const canProject = view && view.phase === 'play' && Number(view.active_seat) === seat;
+    if (!canProject) {
+      clearFieldActionProjection();
+      clearWithdrawMode();
+      return;
+    }
+
+    const expectedRevision = revision();
+    state.fieldActionsBusy = true;
+    state.fieldActionError = '';
+    try {
+      const response = await callEdge(API_MATCH, actionBase('field_actions'));
+      if (revision() !== expectedRevision) return;
+      const projected = response && response.result && typeof response.result === 'object' ? response.result : {};
+      state.abilitySources = Array.isArray(projected.ability_sources)
+        ? projected.ability_sources.map((source) => ({
+            where: String(source && source.where || ''),
+            index: source && source.index == null ? null : Number(source.index),
+            anchor_uid: String(source && source.anchor_uid || '')
+          })).filter((source) =>
+            !!source.anchor_uid &&
+            ((source.where === 'vanguard' && source.index === null) ||
+             (source.where === 'reserve' && Number.isInteger(source.index) && source.index >= 0 && source.index <= 3))
+          )
+        : [];
+
+      const withdraw = projected && projected.withdraw && typeof projected.withdraw === 'object' ? projected.withdraw : {};
+      const costRaw = Number(withdraw.cost);
+      const cost = Number.isInteger(costRaw) && costRaw >= 0 ? costRaw : null;
+      const legalTargets = Array.isArray(withdraw.legal_targets)
+        ? withdraw.legal_targets.map((target) => ({
+            reserve_index: Number(target && target.reserve_index),
+            anchor_uid: String(target && target.anchor_uid || '')
+          })).filter((target) =>
+            Number.isInteger(target.reserve_index) && target.reserve_index >= 0 && target.reserve_index <= 3 && !!target.anchor_uid
+          )
+        : [];
+      const paymentOptions = Array.isArray(withdraw.payment_options)
+        ? withdraw.payment_options.map((option) => ({
+            uid: String(option && option.uid || ''),
+            card_id: String(option && option.card_id || ''),
+            label: String(option && option.label || option && option.card_id || 'Essence')
+          })).filter((option) => option.uid)
+        : [];
+
+      state.fieldWithdraw = {
+        eligible: withdraw.eligible === true,
+        reason: String(withdraw.reason || ''),
+        cost,
+        legal_targets: legalTargets,
+        payment_options: paymentOptions
+      };
+      state.fieldActionRevision = expectedRevision;
+      const validPayments = new Set(paymentOptions.map((option) => option.uid));
+      state.withdrawPaymentUids = state.withdrawPaymentUids.filter((uid) => validPayments.has(uid));
+      if (!legalWithdrawTarget(Number(state.withdrawTargetIndex))) state.withdrawTargetIndex = null;
+      if (state.fieldWithdraw.eligible !== true) clearWithdrawMode();
+    } catch (error) {
+      clearFieldActionProjection();
+      clearWithdrawMode();
+      state.fieldActionError = error instanceof Error ? error.message : String(error);
+    } finally {
+      state.fieldActionsBusy = false;
     }
   }
 
@@ -1275,7 +1623,7 @@
     state.view = response.view || response.result || null;
     if (!state.view) throw new Error('The authoritative match view was not returned.');
     const view = viewState();
-    if (state.selectedAnchorUid && view && view.you && cardAnchor(view.you.vanguard) !== state.selectedAnchorUid) state.selectedAnchorUid = '';
+    if (state.selectedAnchorUid && !fieldHasAnchor(view, state.selectedAnchorUid)) state.selectedAnchorUid = '';
     if (state.selectedHandUid && view && view.you) {
       const hand = Array.isArray(view.you.hand) ? view.you.hand : [];
       if (!hand.some((instance) => String(instance && instance.uid || '') === state.selectedHandUid)) {
@@ -1286,6 +1634,9 @@
         clearTacticProjection();
       }
     }
+    const pending = !!(view && (view.pending_attack_choice || view.pending_ability_choice || view.pending_event_listener_choice || view.pending_movement_listener_choice || view.pending_heal_listener_choice || view.pending_choice || view.pending_resolution));
+    if (!view || view.phase !== 'play' || Number(view.active_seat) !== Number(view.you && view.you.seat) || pending) clearWithdrawMode();
+    await runFieldActionProjection();
     render();
   }
 
