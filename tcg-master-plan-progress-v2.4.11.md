@@ -49,3 +49,29 @@ Fresh TCG Validation, Migration Replay, Functional Smoke, review-thread check, b
 ### Candidate repair note
 
 Initial V2.4.11 head `aa79924b...` exposed two integration defects only: the new legality type omitted existing runtime Creature fields required by downstream owners, and the immutable `tcg-match-actions` dependency closure still described the pre-engine 84-file graph. The repair widens only the TypeScript state shape and regenerates the existing release-control fingerprint for the final 85-file closure; Evolution gameplay rules are unchanged.
+
+
+## 6. Exact-head acceptance and deployment
+
+V2.4.11 source is accepted at exact PR head `a1d39bfb35edb7040e551a7a27ccfa326eb282cf`.
+
+Fresh exact-head evidence:
+
+- TCG Card Pass 2 Validation #669 — SUCCESS;
+- Code Labs Migration Replay #839 — SUCCESS from zero;
+- Code Labs V50 Functional Smoke #865 — SUCCESS, including independent PostgreSQL replay;
+- review threads — 0;
+- legacy combined-status entries — none found;
+- bounded V2.4.11 delta from `2d13fb08de349e4f1ca263d650885d6feab3d991` — 3 commits / 8 files.
+
+Production promotion was limited to the existing Supabase `tcg-match-actions` Edge Function only.
+
+**Deployed function:** version 3 / ACTIVE / `verify_jwt: true`.
+
+The deployed runtime-reachable entrypoint and new Evolution legality engine match the accepted GitHub source byte-for-byte.
+
+Supabase reports 84 source files against the 85-file repository source closure because `tcg-match-damage-packet-context-v0-2.ts` is reached only through TypeScript `import type` and is stripped by deployment packaging. This is the same pre-existing normalization pattern that left live v2 at 83 files against the earlier 84-file source closure. No runtime implementation is missing.
+
+No database/schema change, no new Edge Function, no PR merge, no `main`, GitHub Pages/public or full live release occurred.
+
+**Next target:** V2.4.12 — complete INTERACT-02 by wiring selected Evolution cards to the server-owned `evolve_targets` projection, visibly highlighting only returned legal stacks, and committing through the existing `evolve` action.

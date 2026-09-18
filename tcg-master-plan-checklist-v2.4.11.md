@@ -31,15 +31,15 @@
 
 ## D. Exact-head / deployment gates
 
-- [ ] **V2411-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2411-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2411-CI-03** Functional Smoke succeeds.
-- [ ] **V2411-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2411-DIFF-01** diff stays bounded to Evolution legality owner/action/tests/control docs plus the exact release-control dependency fingerprint required by the new shared module.
+- [x] **V2411-CI-01** TCG Card Pass 2 Validation #669 succeeded at `a1d39bfb35edb7040e551a7a27ccfa326eb282cf`.
+- [x] **V2411-CI-02** Migration Replay #839 succeeded from zero at `a1d39bfb35edb7040e551a7a27ccfa326eb282cf`.
+- [x] **V2411-CI-03** Functional Smoke #865 succeeded, including independent PostgreSQL replay, at `a1d39bfb35edb7040e551a7a27ccfa326eb282cf`.
+- [x] **V2411-REVIEW-01** review threads were 0 and legacy combined-status entries were none found.
+- [x] **V2411-DIFF-01** V2.4.11 stayed bounded to 3 commits / 8 intended files from continuity parent `2d13fb08de349e4f1ca263d650885d6feab3d991`.
 - [x] **V2411-REPAIR-01** runtime Creature type shape includes the existing stack/Essence/Relic/damage/Shield/condition fields required by downstream owners.
 - [x] **V2411-REPAIR-02** release-control `tcg-match-actions` closure is regenerated to the exact final dependency graph rather than weakening the closure gate.
-- [ ] **V2411-DEPLOY-01** exact accepted `tcg-match-actions` source is promoted in-place to the existing Supabase function with JWT verification preserved.
-- [ ] **V2411-DEPLOY-02** deployed function source/hash/version is re-read and matches the accepted source.
+- [x] **V2411-DEPLOY-01** accepted source was promoted in-place to existing Supabase `tcg-match-actions` version 3 with `verify_jwt: true`; no new function/schema change.
+- [x] **V2411-DEPLOY-02** deployed v3 entrypoint and Evolution legality engine were re-read and match accepted GitHub source byte-for-byte. Supabase omits the repository's type-only `tcg-match-damage-packet-context-v0-2.ts` from the runtime source package, yielding 84 deployed files from the 85-file source closure.
 
 ## E. Master-plan interaction state
 
@@ -52,4 +52,4 @@
 - [ ] **INTERACT-07** full cancellation.
 - [ ] **INTERACT-09** full Ability/Attack/Withdraw card context.
 
-**Decision:** candidate source only until D passes; Supabase/main/public/live remain unchanged.
+**Decision:** V2.4.11 source + existing-function deployment ACCEPTED ✅. PR merge / `main` / GitHub Pages/public / full live release remain HOLD 🔒.

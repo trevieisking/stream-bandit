@@ -54,3 +54,39 @@ After repaired exact-head CI succeeds, separately decide in-place Supabase promo
 ## Checkpoint
 
 PR/main/public/live production remain unchanged until the repaired head is validated.
+
+
+## V2.4.11-008 — exact-head acceptance
+
+**State:** ✅ ACCEPTED
+
+Exact head `a1d39bfb35edb7040e551a7a27ccfa326eb282cf` passed:
+
+- TCG #669;
+- Migration #839;
+- Functional #865;
+- 0 review threads;
+- no legacy combined-status entries.
+
+The complete V2.4.11 delta from `2d13fb08...` is 3 commits / 8 intended files.
+
+## V2.4.11-009 — in-place Supabase promotion
+
+**State:** ✅ ACCEPTED
+
+Existing `tcg-match-actions` was promoted in place to version 3. It remains ACTIVE with `verify_jwt: true`.
+
+Post-deploy verification proved:
+- deployed `functions/tcg-match-actions/index.ts` exactly matches accepted GitHub source;
+- deployed `functions/_shared/tcg-match-evolution-legality-v0-2.ts` exactly matches accepted GitHub source;
+- all 82 pre-existing live dependencies were compared to the accepted GitHub head before deployment and matched byte-for-byte;
+- the repository source closure contains 85 files while Supabase returns 84 deployed source files because `tcg-match-damage-packet-context-v0-2.ts` is referenced through TypeScript `import type` and stripped from the runtime package;
+- this normalization predates V2.4.11: live v2 was already 83 files against the prior 84-file source closure.
+
+No database/schema, new function, PR merge, `main`, public page or full-live promotion occurred.
+
+## V2.4.11 complete
+
+**INTERACT-02 server legality seam:** ✅  
+**Next:** V2.4.12 browser Evolution interaction using server `evolve_targets` + existing `evolve`.  
+**Release boundary:** PR merge/main/public/full-live remain HOLD.
