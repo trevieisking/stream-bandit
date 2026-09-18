@@ -98,18 +98,18 @@
 
 ## E. V2-VISUAL-02 — board-visible state
 
-- [ ] **STATE-VIS-01** Damage/current HP changes are visible.
+- [x] **STATE-VIS-01** Damage/current HP changes are visible.
 - [x] **STATE-VIS-02** Shield state is visible.
 - [x] **STATE-VIS-03** Conditions are visible.
 - [x] **STATE-VIS-04** Ability spent/locked state is visible where applicable.
-- [ ] **STATE-VIS-05** Legal targets highlight; illegal targets remain inactive.
-- [ ] **STATE-VIS-06** Evolution legal targets glow green.
+- [x] **STATE-VIS-05** Legal targets highlight; illegal targets remain inactive.
+- [x] **STATE-VIS-06** Evolution legal targets glow green.
 - [x] **STATE-VIS-07** Reward count/claim state is visible.
-- [ ] **STATE-VIS-08** Deck/Discard counts are visible.
-- [ ] **STATE-VIS-09** Active turn/phase is visible without dominating the table.
-- [ ] **STATE-VIS-10** Pending choice/search/listener state is visible while preserving battlefield context.
+- [x] **STATE-VIS-08** Deck/Discard counts are visible.
+- [x] **STATE-VIS-09** Active turn/phase is visible without dominating the table.
+- [x] **STATE-VIS-10** Pending choice/search/listener state is visible while preserving battlefield context.
 - [x] **STATE-VIS-11** Defeat/KO and mandatory promotion are visually expressed.
-- [ ] **STATE-VIS-12** Victory/defeat/result state is visually expressed.
+- [x] **STATE-VIS-12** Victory/defeat/result state is visually expressed.
 
 ---
 
@@ -172,7 +172,7 @@ Signed-in destinations remain:
 - [ ] **ORDER-02** Complete renderer/art inventory and choose smallest reusable V2-CARD-01 foundation.
 - [ ] **ORDER-03** Build correct tabletop zone skeleton.
 - [ ] **ORDER-04** Wire full-card rendering/art into board zones.
-- [ ] **ORDER-05** Wire direct card interactions and board-visible state.
+- [x] **ORDER-05** Wire direct card interactions and board-visible state.
 - [ ] **ORDER-06** Add animation/audio hooks and shell look/feel.
 - [ ] **ORDER-07** Resume fresh two-user V2-ATTACK-01 on the restored release-shaped board.
 - [ ] **ORDER-08** Execute inherited MATCH-01 through MATCH-25 release proof.
