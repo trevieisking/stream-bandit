@@ -13,6 +13,9 @@ test('secondary TCG routes use one bounded internal content feed instead of docu
   assert.ok(js.includes('main.classList.add("tcg-secondary-page")'));
   assert.ok(js.includes('feed.className="tcg-secondary-feed tcg-feed"'));
   assert.ok(js.includes('Array.from(main.children).forEach(child=>feed.appendChild(child))'));
+  assert.ok(js.includes('main.classList.add("has-subnav")'));
+  assert.match(css,/\.tcg-secondary-page\{[^}]*grid-template-rows:minmax\(0,1fr\)/);
+  assert.match(css,/\.tcg-secondary-page\.has-subnav\{[^}]*grid-template-rows:auto minmax\(0,1fr\)/);
   assert.match(css,/\.tcg-secondary-page\{[^}]*overflow:hidden/);
   assert.match(css,/\.tcg-secondary-feed\{[^}]*overflow:auto/);
 });

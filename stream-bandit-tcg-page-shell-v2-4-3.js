@@ -59,6 +59,7 @@ function mount(){
  const family=body.dataset.sbTcgFamily;
  if(family&&FAMILIES[family]){
   const sub=nav(FAMILIES[family].items,FAMILIES[family].label,body.dataset.sbTcgSubpage||"","tcg-subnav");
+  main.classList.add("has-subnav");
   main.insertBefore(sub,main.firstChild);
  }
 }
