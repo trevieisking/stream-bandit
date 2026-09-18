@@ -99,9 +99,9 @@
 ## E. V2-VISUAL-02 — board-visible state
 
 - [ ] **STATE-VIS-01** Damage/current HP changes are visible.
-- [ ] **STATE-VIS-02** Shield state is visible.
-- [ ] **STATE-VIS-03** Conditions are visible.
-- [ ] **STATE-VIS-04** Ability spent/locked state is visible where applicable.
+- [x] **STATE-VIS-02** Shield state is visible.
+- [x] **STATE-VIS-03** Conditions are visible.
+- [x] **STATE-VIS-04** Ability spent/locked state is visible where applicable.
 - [ ] **STATE-VIS-05** Legal targets highlight; illegal targets remain inactive.
 - [ ] **STATE-VIS-06** Evolution legal targets glow green.
 - [x] **STATE-VIS-07** Reward count/claim state is visible.
