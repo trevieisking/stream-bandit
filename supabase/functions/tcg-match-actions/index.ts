@@ -3,6 +3,7 @@ import { structuredRuntimeWithdrawalBaseCost } from "../_shared/tcg-match-withdr
 import { runtimeV02ApplyWithdrawalPaymentAndSwitch } from "../_shared/tcg-match-withdrawal-transaction-v0-2.ts";
 import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 import { runtimeV02EvolveCreatureFromHand, runtimeV02PlaceCreatureFromHand, runtimeV02ResolveDefeatedCreatures } from "../_shared/tcg-match-creature-engine-v0-2.ts";
+import { runtimeV02ListLegalEvolutionTargets, runtimeV02ValidateEvolutionDeclaration } from "../_shared/tcg-match-evolution-legality-v0-2.ts";
 import { runtimeV02AttachRelicFromHand } from "../_shared/tcg-match-relic-engine-v0-2.ts";
 import { structuredRuntimeIncomingAttackDamage, structuredRuntimeOutgoingAttackDamage } from "../_shared/tcg-match-attack-damage-v0-2.ts";
 import { structuredRuntimeAttachmentAttackBonus } from "../_shared/tcg-match-surge-lifecycle-v0-2.ts";
@@ -246,6 +247,18 @@ Deno.serve(async(req)=>{
 
   if(s.phase!=="play"||Number(s.active_seat)!==seat)return json({ok:false,version:VERSION,error:"not_active_player"},400);const flags=ensureFlags(s,seat);
 
+  if(action==="evolve_targets"){
+   const uid=String(body.card_uid||"");
+   const result=runtimeV02ListLegalEvolutionTargets(
+    p,
+    uid,
+    Number(s.turn_seq||0),
+    Number(s.personal_turns?.[String(seat)]||0),
+    (instance)=>def(s,instance),
+   );
+   return json({ok:true,version:VERSION,result});
+  }
+
   if(action==="use_ability"){
    const where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"ability_source_creature_not_found"},400);const source=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!source)return json({ok:false,version:VERSION,error:"ability_source_top_required"},400);let routed;try{routed=runtimeV02BeginActiveAbilityLiveRoute(s,seat as 1|2,{where:where as "vanguard"|"reserve",index:idx,instance:source},defeatDescribe)}catch(error){const message=error instanceof Error?error.message:String(error);const status=message.includes("turn_limit_reached")||message.includes("limit_reached")||message.includes("_changed")?409:400;return json({ok:false,version:VERSION,error:message},status)}if(!routed)return json({ok:false,version:VERSION,error:"active_ability_requires_runtime_owner"},400);
    if(routed.kind==="immediate"){const immediate=routed.immediate,resolution=immediate.resolution,healAudit=healListenerAudit(immediate.heal_listener);log(`Seat ${seat} used Ability ${resolution.ability_id} to drain ${resolution.actual_vitality_drained} vitality and heal ${resolution.actual_heal} damage.`);if(immediate.heal_listener.status==="player_choice_required"){s.phase="heal_listener_choice_resolution";return json({version:VERSION,result:await commit("ability_pending_heal_listener_choice",{seat,ability_id:resolution.ability_id,kind:resolution.kind,actual_vitality_drained:resolution.actual_vitality_drained,actual_heal:resolution.actual_heal,emitted_packet_ids:resolution.emitted_packet_ids,heal_listener:healAudit,resume_kind:immediate.resume_kind,resolution_queue_required:immediate.resolution_queue_required,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(immediate.heal_listener.pending_choice,seat as 1|2)})}if(immediate.resume_kind==="resume_resolution_queue"){s.phase="resolution";continueResolution()}else s.phase="play";return json({version:VERSION,result:await commit("ability_resolved",{seat,ability_id:resolution.ability_id,kind:resolution.kind,actual_vitality_drained:resolution.actual_vitality_drained,actual_heal:resolution.actual_heal,emitted_packet_ids:resolution.emitted_packet_ids,heal_listener:healAudit,resume_kind:immediate.resume_kind,resolution_queue_required:immediate.resolution_queue_required})})}
@@ -285,7 +298,19 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="evolve"){
-   if(Number(s.personal_turns?.[String(seat)]||0)<=1)return json({ok:false,version:VERSION,error:"evolution_locked_on_first_personal_turn"},400);const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null,prev=top(cr,s);if(!inst||!d||d.kind!=="Creature"||!["Teen","Adult"].includes(String(d.stage||"")))return json({ok:false,version:VERSION,error:"teen_or_adult_required"},400);if(String(d.evolves_from_id||"")!==String(prev?.id||""))return json({ok:false,version:VERSION,error:"evolution_predecessor_mismatch"},400);const turn=Number(s.turn_seq||0);if(Number(cr.entered_turn??0)>=turn)return json({ok:false,version:VERSION,error:"stack_entered_or_evolved_this_turn"},400);if(Number(cr.evolved_turn??-1)===turn)return json({ok:false,version:VERSION,error:"one_evolution_per_stack_per_turn"},400);const evolved=runtimeV02EvolveCreatureFromHand(p,seat as 1|2,cr,uid,turn),x=evolved.card;const structuredEvolution=s.runtime_registry_v0_2!=null;
+   const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),turn=Number(s.turn_seq||0);
+   const legality=runtimeV02ValidateEvolutionDeclaration(
+    p,
+    uid,
+    where as "vanguard"|"reserve",
+    idx,
+    turn,
+    Number(s.personal_turns?.[String(seat)]||0),
+    (instance)=>def(s,instance),
+   );
+   if(!legality.ok)return json({ok:false,version:VERSION,error:legality.error},400);
+   const cr=legality.creature,inst=legality.card,d=legality.definition as any,prev=legality.previous_definition as any;
+   const evolved=runtimeV02EvolveCreatureFromHand(p,seat as 1|2,cr,uid,turn),x=evolved.card;const structuredEvolution=s.runtime_registry_v0_2!=null;
    if(!structuredEvolution){let rewardInspection=null;try{rewardInspection=structuredRuntimeEvolutionRewardInspection(s,x,seat as 1|2,body.inspect_reward_positions)}catch(error){const message=error instanceof Error?error.message:String(error);if(message.startsWith("tcg_v0_2_reward_inspection_positions_")||message.startsWith("tcg_v0_2_reward_inspection_position_")||message.startsWith("tcg_v0_2_reward_inspection_count_invalid:"))return json({ok:false,version:VERSION,error:message},400);throw error}void rewardInspection;if(d.id==="tide-reefback"||d.id==="stone-cragroller")addRuntimeShield(cr,20);else if(d.id==="grove-briarback"&&p.reserve.filter(Boolean).length>=2)healRuntimeDamage(cr,30);else if(d.id==="shade-veiljaw"&&opp.vanguard){const q=conditions(opp.vanguard);if(!q.control)q.control="Dazed"}log(`Seat ${seat} evolved ${prev.name} into ${d.name}.`);return json({version:VERSION,result:await commit("evolve",{seat,where,index:idx,from_card_id:prev.id,to_card_id:d.id})})}
    log(`Seat ${seat} evolved ${prev.name} into ${d.name}.`);
    const evolvedEvent=runtimeV02CreateCreatureEvolvedEvent(s,seat,uid,where,idx);
