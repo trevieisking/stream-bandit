@@ -39,22 +39,22 @@
 
 **Retry anchor:** prior source-control head `7b8463949051d9a24fbdfb70c34e9e75b782c890` passed TCG #722 and Functional #918; Migration #892 was cancelled by rapid-push concurrency before a job existed. This checklist-only commit intentionally retriggers the unchanged candidate for one exact-head three-gate decision.
 
-- [ ] **V2425-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2425-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2425-CI-03** Functional Smoke succeeds.
-- [ ] **V2425-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2425-DIFF-01** diff stays bounded to browser/renderer/CSS/cache/tests/V2.4.25 controls.
+- [x] **V2425-CI-01** TCG Card Pass 2 Validation succeeds — #723 SUCCESS at accepted head `1e9f5355ef2db4cbcc3b74836100df451fbede54`.
+- [x] **V2425-CI-02** Migration Replay succeeds from zero — #893 SUCCESS.
+- [x] **V2425-CI-03** Functional Smoke succeeds — #919 SUCCESS.
+- [x] **V2425-REVIEW-01** review threads remain zero / material findings resolved — 0 review threads, 0 legacy combined statuses.
+- [x] **V2425-DIFF-01** diff stays bounded to browser/cache/tests/V2.4.25 controls — 7 files; no Match/Tactic/Setup runtime, schema, migration or card-data changes.
 
 ## F. Canonical effect after E passes
 
-- [ ] **STATE-VIS-01**
-- [ ] **STATE-VIS-02**
-- [ ] **STATE-VIS-03**
-- [ ] **STATE-VIS-04**
-- [ ] **STATE-VIS-06**
-- [ ] **STATE-VIS-08**
-- [ ] **STATE-VIS-09**
-- [ ] **STATE-VIS-10**
-- [ ] **STATE-VIS-12**
+- [x] **STATE-VIS-01**
+- [x] **STATE-VIS-02**
+- [x] **STATE-VIS-03**
+- [x] **STATE-VIS-04**
+- [x] **STATE-VIS-06**
+- [x] **STATE-VIS-08**
+- [x] **STATE-VIS-09**
+- [x] **STATE-VIS-10**
+- [x] **STATE-VIS-12**
 
 **Still open:** STATE-VIS-05 ordinary Creature/Realm legal-target projection. ORDER-05 remains open until that final Stage 3 state closes.
