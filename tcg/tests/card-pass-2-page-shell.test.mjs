@@ -34,6 +34,7 @@ test('V2.4.31 TCG routes use config-only bridge and can never boot the Stream Ba
   for(const href of tcgClientPages){
     const html=await read(href);
     assert.equal(html.includes('stream-bandit-shell-v6-24.js'),false,href+' must not boot the website shell');
+    assert.equal(html.includes('stream-bandit-theme-projector'),false,href+' must not load the website theme projector');
     assert.ok(html.includes('stream-bandit-tcg-config-v2-4-31.js'),href+' must load the config-only bridge');
   }
 });
