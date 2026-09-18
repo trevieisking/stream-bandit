@@ -44,3 +44,12 @@ TCG #679 showed three historical browser assertions that intentionally froze ear
 Those tests now retain their original ownership/transport guarantees while allowing the later V2.4.14 interaction layer: Essence legality is still forbidden from the browser, Evolution must not regress below V2.4.12, and Realm remains the generic fallback only after both server-projected Evolution and Essence modes decline the selected card.
 
 No production source, game rule, server runtime, card data or Supabase state changes in this repair.
+
+
+## V2.4.14-007 — exact-head gate concurrency retry
+
+**State:** 🔄 CONTROL-ONLY RETRY
+
+TCG #680 passed at the repaired candidate head. Migration #850 was cancelled before any job started because prior-head Migration #849 still occupied the serialized replay lane; #849 then completed successfully. GitHub does not permit retrying a run that never started.
+
+This control-only checkpoint retriggers all exact-head gates after the replay lane is clear. No browser implementation, gameplay rule, server runtime, database/schema, card data or Supabase deployment changes.
