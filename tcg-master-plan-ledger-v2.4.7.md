@@ -98,7 +98,7 @@ The existing Attack click behavior harness now loads the renderer before the con
 
 ## V2.4.7-009 — validation fence
 
-**State:** 🔄 FRESH EXACT-HEAD EVIDENCE REQUIRED
+**State:** ✅ ACCEPTED @ `0e8887730a4af6c47d69f7089644e977bc3036fb`
 
 Before source acceptance, the final V2.4.7 PR head must pass:
 
@@ -113,4 +113,5 @@ Before source acceptance, the final V2.4.7 PR head must pass:
 **PR:** #576 remains draft/unmerged.  
 **Supabase production:** no V2.4.7 database/Edge change is required or authorized.  
 **`main` / GitHub Pages / public/live:** HOLD.  
-**Next after acceptance:** wire the next smallest direct-card interaction owner contract on top of the release-shaped table, beginning with the interaction that can reuse an existing server command without creating browser rule authority; visual/art release gates remain explicit and independent.
+**Accepted exact head:** `0e8887730a4af6c47d69f7089644e977bc3036fb` — TCG #655, Migration Replay #825 and Functional Smoke #851 all SUCCESS; zero review threads; no legacy combined statuses.  
+**Next after acceptance:** V2.4.8 direct physical hand card → Reserve interaction through existing `play_creature`, with browser payload limited to `card_uid + reserve_index` plus the existing action envelope.

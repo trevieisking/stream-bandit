@@ -169,3 +169,9 @@ The complete exact PR head carrying V2.4.7 must pass fresh:
 5. bounded diff review against accepted parent `bd2f5b...`.
 
 Only then may V2.4.7 be accepted as PR source state. PR merge, `main` and public/live promotion remain separate later decisions.
+
+## 10. Exact-head acceptance checkpoint
+
+V2.4.7 source was accepted on PR #576 at exact head `0e8887730a4af6c47d69f7089644e977bc3036fb` after TCG Card Pass 2 Validation #655, Code Labs Migration Replay #825 and Code Labs V50 Functional Smoke #851 all succeeded, review threads were zero and no legacy combined-status entries were present. The later `bc721a31...` commit only synchronized the already-passed checklist and did not change V2.4.7 runtime/tabletop behavior.
+
+**Locked next slice:** V2.4.8 direct physical hand card → Reserve interaction through the existing server-owned `play_creature` command. Browser transport is limited to the existing action envelope plus `card_uid` and `reserve_index`; server gameplay owners retain all legality.

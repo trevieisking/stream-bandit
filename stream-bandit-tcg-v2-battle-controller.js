@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.7';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.8';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const state = {
@@ -10,6 +10,7 @@
     matchId: '',
     view: null,
     selectedAnchorUid: '',
+    selectedHandUid: '',
     busy: false,
     poll: null
   };
@@ -220,13 +221,18 @@
     });
   }
 
-  function renderReserve(target, reserve, ownerLabel) {
+  function renderReserve(target, reserve, ownerLabel, options) {
     const node = $(target);
     if (!node) return;
-    node.innerHTML = [0, 1, 2, 3].map((index) =>
-      '<section class="sb-reserve-slot"><span class="sb-slot-label">' + ownerLabel + ' Reserve ' + (index + 1) + '</span>' +
-      creatureCard(reserve && reserve[index], {}) + '</section>'
-    ).join('');
+    const opts = options || {};
+    const handTarget = !!opts.handTarget;
+    node.innerHTML = [0, 1, 2, 3].map((index) => {
+      const targetAttrs = handTarget
+        ? ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
+        : '';
+      return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
+        ownerLabel + ' Reserve ' + (index + 1) + '</span>' + creatureCard(reserve && reserve[index], {}) + '</section>';
+    }).join('');
   }
 
   function countValue(value) {
@@ -273,10 +279,18 @@
     if ($('oppHandCount')) $('oppHandCount').textContent = String(count);
   }
 
-  function renderYourHand(view) {
+  function renderYourHand(view, canPlayFromHand) {
     const hand = view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
     const node = $('yourHand');
-    if (node) node.innerHTML = hand.map((instance) => knownCard(instance, { compact: true })).join('') || '<div class="sb-zone-empty">No cards in hand</div>';
+    if (node) node.innerHTML = hand.map((instance) => {
+      const uid = String(instance && instance.uid || '');
+      return knownCard(instance, {
+        compact: true,
+        interactive: !!canPlayFromHand && !!uid,
+        selected: !!uid && state.selectedHandUid === uid,
+        anchor: 'hand:' + uid
+      });
+    }).join('') || '<div class="sb-zone-empty">No cards in hand</div>';
     if ($('yourHandCount')) $('yourHandCount').textContent = String(countValue(view.you && view.you.hand_count != null ? view.you.hand_count : hand.length));
   }
 
@@ -294,15 +308,16 @@
     const yourTurn = view.phase === 'play' && Number(view.active_seat) === Number(view.you && view.you.seat);
     const pending = !!(view.pending_attack_choice || view.pending_ability_choice || view.pending_event_listener_choice || view.pending_movement_listener_choice || view.pending_heal_listener_choice || view.pending_choice || view.pending_resolution);
     const canAttack = yourTurn && !pending && !state.busy;
+    const canPlayFromHand = yourTurn && !pending && !state.busy;
 
     $('oppVanguard').innerHTML = creatureCard(view.opponent && view.opponent.vanguard, {});
     $('youVanguard').innerHTML = creatureCard(view.you && view.you.vanguard, { primary: true, canAct: canAttack });
     renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent');
-    renderReserve('youReserve', view.you && view.you.reserve, 'Your');
+    renderReserve('youReserve', view.you && view.you.reserve, 'Your', { handTarget: !!state.selectedHandUid && canPlayFromHand });
     renderRealm(view);
 
     renderOpponentHand(view);
-    renderYourHand(view);
+    renderYourHand(view, canPlayFromHand);
     renderDeck('oppDeck', view.opponent && view.opponent.deck_count, 'Opponent');
     renderRewards('oppRewards', view.opponent && view.opponent.rewards_count, 'Opponent');
     renderDiscard('oppDiscard', view.opponent && view.opponent.discard_count, 'Opponent');
@@ -315,7 +330,8 @@
     $('phasePill').textContent = String(view.phase || '—');
 
     if (pending) setStatus('The board is authoritative. Resolve the pending server choice before another card action.', 'wait');
-    else if (yourTurn) setStatus('Your turn. Select your active Creature card; its legal card actions stay on the card face.', 'ready');
+    else if (state.selectedHandUid && canPlayFromHand) setStatus('Hand card selected. Choose a Reserve position; the server validates whether that card may be played there.', 'ready');
+    else if (yourTurn) setStatus('Your turn. Select a hand card for Reserve placement or your active Creature for its card actions.', 'ready');
     else setStatus('Board synced. Waiting for the opponent or the next server phase.', 'wait');
 
     bindCardControls();
@@ -326,7 +342,15 @@
       const select = () => {
         if (state.busy) return;
         const anchor = String(card.dataset.cardAnchor || '');
-        state.selectedAnchorUid = state.selectedAnchorUid === anchor ? '' : anchor;
+        if (anchor.startsWith('hand:')) {
+          const uid = anchor.slice(5);
+          if (!uid) return;
+          state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
+          state.selectedAnchorUid = '';
+        } else {
+          state.selectedAnchorUid = state.selectedAnchorUid === anchor ? '' : anchor;
+          state.selectedHandUid = '';
+        }
         render();
       };
       card.addEventListener('click', (event) => {
@@ -346,6 +370,46 @@
         await runAttackIntent(Number(button.dataset.attackSlot));
       });
     });
+    document.querySelectorAll('[data-play-creature-reserve-index]').forEach((slot) => {
+      const activate = async () => {
+        await runPlayCreatureIntent(state.selectedHandUid, Number(slot.dataset.playCreatureReserveIndex));
+      };
+      slot.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        await activate();
+      });
+      slot.addEventListener('keydown', async (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          event.stopPropagation();
+          await activate();
+        }
+      });
+    });
+  }
+
+  async function runPlayCreatureIntent(cardUid, reserveIndex) {
+    if (!cardUid) throw new Error('Select a hand card first.');
+    if (!Number.isInteger(reserveIndex) || reserveIndex < 0 || reserveIndex > 3) throw new Error('Invalid Reserve index.');
+    state.busy = true;
+    render();
+    setStatus('Submitting the selected hand card to the authoritative play_creature owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, Object.assign(actionBase('play_creature'), {
+        card_uid: cardUid,
+        reserve_index: reserveIndex
+      }));
+      state.selectedHandUid = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
   }
 
   async function runAttackIntent(attackSlot) {
@@ -374,6 +438,10 @@
     if (!state.view) throw new Error('The authoritative match view was not returned.');
     const view = viewState();
     if (state.selectedAnchorUid && view && view.you && cardAnchor(view.you.vanguard) !== state.selectedAnchorUid) state.selectedAnchorUid = '';
+    if (state.selectedHandUid && view && view.you) {
+      const hand = Array.isArray(view.you.hand) ? view.you.hand : [];
+      if (!hand.some((instance) => String(instance && instance.uid || '') === state.selectedHandUid)) state.selectedHandUid = '';
+    }
     render();
   }
 
