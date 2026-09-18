@@ -40,11 +40,14 @@ test('server remains sole owner of Realm family, timing, replacement and listene
   assert.match(branch, /runtimeV02BeginMovementHealListenerContinuation/);
 });
 
-test('selected hand card exposes the shared Realm slot without classifying the card in the browser', () => {
+test('selected non-Evolution hand card can expose the shared Realm slot without browser card-family classification', () => {
   assert.match(controller, /data-play-realm-target/);
   assert.match(controller, /runPlayRealmIntent\(state\.selectedHandUid\)/);
-  assert.match(controller, /const playHandTarget = !!state\.selectedHandUid && canPlayFromHand/);
+  assert.match(controller, /const selectedPlayCard = !!state\.selectedHandUid && canPlayFromHand/);
+  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode && !state\.evolutionProjectionBusy/);
   assert.match(controller, /renderRealm\(view,\s*playHandTarget\)/);
+  assert.match(controller, /actionBase\('evolve_targets'\)/);
+  assert.doesNotMatch(controller, /evolves_from_id/);
   assert.match(css, /\.sb-realm-slot\.is-hand-target/);
 });
 

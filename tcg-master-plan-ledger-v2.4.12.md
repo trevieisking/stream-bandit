@@ -37,3 +37,14 @@ Hold acceptance until fresh exact-head validation, migration replay, functional 
 ## Checkpoint
 
 Supabase `tcg-match-actions` v3 remains deployed and unchanged by this UI slice. PR merge/main/public/full-live remain HOLD.
+
+
+## V2.4.12-006 — first exact-head regression repair
+
+**State:** ✅ DETACHED REPAIR CANDIDATE
+
+TCG #671 exposed two stale historical source-shape assertions only:
+- the V2.4.9 Realm test froze the pre-Evolution `playHandTarget` declaration even though Realm transport itself remains intact;
+- the V2.4.10 Setup test froze exact `v2-4-10` cache identity even though later tabletop versions are expected to advance it.
+
+The repair updates only those historical tests to preserve their accepted behavioral contracts while allowing the V2.4.12 Evolution targeting layer. No controller, CSS, server, gameplay, database or Supabase source changes.

@@ -82,9 +82,11 @@ test('V2.4.10 preserves accepted play Creature, Realm and Attack transport paths
   assert.match(controller, /data-card-intent="attack"/);
 });
 
-test('changed battle assets advance cache identity together', () => {
-  assert.match(html, /data-sb-tcg-tabletop="v2-4-10"/);
-  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-10/);
-  assert.match(html, /stream-bandit-tcg-card-renderer-v2-4-7\.js\?v=2-4-10/);
-  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-10/);
+test('V2.4.10 setup delivery remains valid after later tabletop interaction versions advance cache identity', () => {
+  const marker = html.match(/data-sb-tcg-tabletop="v2-4-(\d+)"/);
+  assert.ok(marker, 'tabletop version marker missing');
+  assert.ok(Number(marker[1]) >= 10, 'tabletop must not regress below accepted V2.4.10 setup');
+  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-\d+/);
+  assert.match(html, /stream-bandit-tcg-card-renderer-v2-4-7\.js\?v=2-4-\d+/);
+  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-\d+/);
 });
