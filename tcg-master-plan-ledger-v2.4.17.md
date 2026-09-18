@@ -35,3 +35,11 @@ No effect interpreter, choice resolver, browser, database, schema or card-data c
 **State:** 🔄
 
 Hold Edge promotion and browser Tactic work until fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status, bounded-diff and release-control gates pass.
+
+## V2.4.17-006 — Arcade Lab action-contract rollover
+
+**State:** ✅ REPAIR CANDIDATE
+
+TCG #690 completed the full deterministic runtime/type-check lane successfully. The Set One Node lane failed only because `card-pass-2-arcade-lab-client-contract.test.mjs` froze the prior two-action Tactic whitelist.
+
+The historical contract now recognizes the same single `tcg-tactic-actions` owner with the additive read-only `play_tactic_legality` action while preserving `play_tactic` and `resolve_choice`. No runtime, browser, effect, schema or card-data source changes are part of this repair.
