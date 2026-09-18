@@ -43,7 +43,7 @@ Migration/Functional work on that head is allowed to finish for evidence, but Su
 
 **State:** ✅ DETACHED REPAIR CANDIDATE
 
-The repair adds the existing runtime Creature fields to the legality type/test fixture and regenerates the immutable release-control closure using final Git blob SHAs and the same SHA-256 algorithm enforced by `card-pass-2-release-control.test.mjs`. No Evolution rule or mutation behavior changes.
+The repair adds the existing runtime Creature fields to the legality type/test fixture and regenerates the immutable release-control closure using final Git blob SHAs and the same SHA-256 algorithm enforced by `card-pass-2-release-control.test.mjs`. TCG #668 then proved one final type-only mismatch: lifecycle turn stamps must be numeric, matching the existing Creature owner. The follow-up tightens only `entered_turn/evolved_turn/became_vanguard_turn` to optional numbers and refreshes the same closure fingerprint. No Evolution rule or mutation behavior changes.
 
 ## V2.4.11-007 — deployment fence
 

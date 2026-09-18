@@ -12,9 +12,9 @@ export type RuntimeV02EvolutionCreature<T extends RuntimeV02EvolutionInstance> =
   condition?: string | null;
   conditions?: Record<string, unknown>;
   flags?: Record<string, unknown>;
-  entered_turn?: unknown;
-  evolved_turn?: unknown;
-  became_vanguard_turn?: unknown;
+  entered_turn?: number;
+  evolved_turn?: number;
+  became_vanguard_turn?: number;
 };
 
 export type RuntimeV02EvolutionPlayer<T extends RuntimeV02EvolutionInstance> = {

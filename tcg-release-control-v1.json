@@ -90,7 +90,7 @@
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "b28b126b0df6eb8eca2e8bdb6d6208666249a233",
         "file_count": 85,
-        "closure_sha256": "7c1b345962713635eb1f961eed934ba86489b3d195b860163347b66f27378022",
+        "closure_sha256": "81aab35ac21c1f193ed4531456ad194c466f96ae86c7c50d1393a723b9457a42",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -310,7 +310,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-evolution-legality-v0-2.ts",
-            "git_blob_sha": "9014574c8f939e8dcaaa0c88eeb46c6a4e61431b"
+            "git_blob_sha": "2ada01bfd3187603480b3ef19826380c7e982487"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-flow-engine-v0-2.ts",
