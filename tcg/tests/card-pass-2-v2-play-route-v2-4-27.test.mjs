@@ -37,3 +37,15 @@ test('V2.4.27 starter fallback remains server-owned and Ranked stays gated',asyn
   assert.ok(html.includes('Coming Soon'));
   assert.ok(html.includes('data-owner-state="gated"'));
 });
+
+
+test('V2.4.29 does not mistake Auth Gate startup concurrency for an approval failure',async()=>{
+  const controller=await read('stream-bandit-tcg-play-controller-v2-4-27.js');
+  assert.ok(controller.includes('async function resolveAuthDecision()'));
+  assert.ok(controller.includes('let decision = await gate.enforce()'));
+  assert.ok(controller.includes("typeof gate.decide === 'function'"));
+  assert.ok(controller.includes('decision = await gate.decide()'));
+  assert.ok(controller.includes('snapshot && snapshot.lastDecision ? snapshot.lastDecision : null'));
+  assert.ok(controller.includes('const decision = await resolveAuthDecision()'));
+  assert.equal(controller.includes("profile.role === 'admin'"),false,'Play controller must not duplicate Auth Gate approval rules');
+});

@@ -173,6 +173,7 @@ Signed-in destinations remain:
 - [ ] **SHELL-VIS-02** Landing / Game Home / Ranked / Matchmaking / Opponent Found / Result screens visually aligned.
 - [ ] **SHELL-VIS-03** Collection / Deck Builder / Packs / Learn / Progress / Settings visually aligned as their implementation gates progress.
 - [ ] **SHELL-VIS-04** Loading/error/empty/reconnect states use the same design system.
+- [x] **PLAY-AUTH-01** Play must not treat the Auth Gate's temporary first-load null decision as an approval failure; deck loading waits for the existing authoritative gate decision without duplicating approval rules.
 
 ---
 
