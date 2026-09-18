@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.8';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.9';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const state = {
@@ -294,9 +294,24 @@
     if ($('yourHandCount')) $('yourHandCount').textContent = String(countValue(view.you && view.you.hand_count != null ? view.you.hand_count : hand.length));
   }
 
-  function renderRealm(view) {
+  function renderRealm(view, handTarget) {
     const node = $('realmSlot');
     if (!node) return;
+    const target = node.closest('.sb-realm-slot');
+    if (target) {
+      target.classList.toggle('is-hand-target', !!handTarget);
+      if (handTarget) {
+        target.setAttribute('tabindex', '0');
+        target.setAttribute('role', 'button');
+        target.setAttribute('data-play-realm-target', 'true');
+        target.setAttribute('aria-label', 'Try selected hand card in the shared Realm slot');
+      } else {
+        target.removeAttribute('tabindex');
+        target.removeAttribute('role');
+        target.removeAttribute('data-play-realm-target');
+        target.removeAttribute('aria-label');
+      }
+    }
     node.innerHTML = view.realm
       ? knownCard(view.realm, { compact: false })
       : '<div class="sb-zone-empty">No Realm in play</div>';
@@ -314,7 +329,7 @@
     $('youVanguard').innerHTML = creatureCard(view.you && view.you.vanguard, { primary: true, canAct: canAttack });
     renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent');
     renderReserve('youReserve', view.you && view.you.reserve, 'Your', { handTarget: !!state.selectedHandUid && canPlayFromHand });
-    renderRealm(view);
+    renderRealm(view, !!state.selectedHandUid && canPlayFromHand);
 
     renderOpponentHand(view);
     renderYourHand(view, canPlayFromHand);
@@ -330,8 +345,8 @@
     $('phasePill').textContent = String(view.phase || '—');
 
     if (pending) setStatus('The board is authoritative. Resolve the pending server choice before another card action.', 'wait');
-    else if (state.selectedHandUid && canPlayFromHand) setStatus('Hand card selected. Choose a Reserve position; the server validates whether that card may be played there.', 'ready');
-    else if (yourTurn) setStatus('Your turn. Select a hand card for Reserve placement or your active Creature for its card actions.', 'ready');
+    else if (state.selectedHandUid && canPlayFromHand) setStatus('Hand card selected. Choose a Reserve position or the shared Realm slot; the server validates the destination and card legality.', 'ready');
+    else if (yourTurn) setStatus('Your turn. Select a hand card for a board destination or your active Creature for its card actions.', 'ready');
     else setStatus('Board synced. Waiting for the opponent or the next server phase.', 'wait');
 
     bindCardControls();
@@ -386,6 +401,44 @@
         }
       });
     });
+    document.querySelectorAll('[data-play-realm-target]').forEach((target) => {
+      const activate = async () => {
+        await runPlayRealmIntent(state.selectedHandUid);
+      };
+      target.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        await activate();
+      });
+      target.addEventListener('keydown', async (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          event.stopPropagation();
+          await activate();
+        }
+      });
+    });
+  }
+
+  async function runPlayRealmIntent(cardUid) {
+    if (!cardUid) throw new Error('Select a hand card first.');
+    state.busy = true;
+    render();
+    setStatus('Submitting the selected hand card to the authoritative play_realm owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, Object.assign(actionBase('play_realm'), {
+        card_uid: cardUid
+      }));
+      state.selectedHandUid = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
   }
 
   async function runPlayCreatureIntent(cardUid, reserveIndex) {
