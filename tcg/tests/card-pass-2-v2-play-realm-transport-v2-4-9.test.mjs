@@ -43,7 +43,8 @@ test('server remains sole owner of Realm family, timing, replacement and listene
 test('selected hand card exposes the shared Realm slot without classifying the card in the browser', () => {
   assert.match(controller, /data-play-realm-target/);
   assert.match(controller, /runPlayRealmIntent\(state\.selectedHandUid\)/);
-  assert.match(controller, /renderRealm\(view,\s*!!state\.selectedHandUid\s*&&\s*canPlayFromHand\)/);
+  assert.match(controller, /const playHandTarget = !!state\.selectedHandUid && canPlayFromHand/);
+  assert.match(controller, /renderRealm\(view,\s*playHandTarget\)/);
   assert.match(css, /\.sb-realm-slot\.is-hand-target/);
 });
 
@@ -57,9 +58,11 @@ test('play_realm success and rejection both re-sync authoritative match state', 
   assert.match(fn, /catch \(error\)[\s\S]*await refreshMatch\(\)\.catch/);
 });
 
-test('V2.4.9 delivery advances changed battle assets and tabletop marker only', () => {
-  assert.match(html, /data-sb-tcg-tabletop="v2-4-9"/);
-  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-9/);
-  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-9/);
-  assert.match(html, /stream-bandit-tcg-card-renderer-v2-4-7\.js\?v=2-4-7/);
+test('V2.4.9 delivery contract remains valid after later tabletop versions advance cache identity', () => {
+  const marker = html.match(/data-sb-tcg-tabletop="v2-4-(\d+)"/);
+  assert.ok(marker, 'tabletop version marker missing');
+  assert.ok(Number(marker[1]) >= 9, 'tabletop must not regress below the accepted V2.4.9 surface');
+  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-\d+/);
+  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-\d+/);
+  assert.match(html, /stream-bandit-tcg-card-renderer-v2-4-7\.js\?v=2-4-\d+/);
 });
