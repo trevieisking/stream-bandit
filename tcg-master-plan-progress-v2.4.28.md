@@ -22,3 +22,14 @@
 
 ## Release boundary
 PR #576 remains draft/unmerged. main, Pages/public and full-live release remain HOLD until exact-head CI and human visual acceptance.
+
+
+## Source gate evidence
+- Visual/product source commit: `2fa4c64b29b60dac7ebba522420077d3a5cc6710`.
+- Test-alignment head: `18d41a62be6d226f9e31404b50ab04250432ce37`.
+- TCG Card Pass 2 Validation #746: SUCCESS.
+- Code Labs V50 Functional Smoke #942: SUCCESS, including PostgreSQL replay.
+- Standalone Migration Replay #915: SUCCESS on the immediately preceding test-only head; the exact-head #916 run was cancelled before jobs due workflow concurrency.
+- This control-sync commit exists specifically to obtain a fresh exact-head three-lane gate after the queue cleared.
+
+Human visual acceptance remains open; no merge/main/Pages/full-live promotion is implied.

@@ -13,3 +13,9 @@ Battle Pass becomes a required route and navigation destination. Its visual surf
 
 ## Release boundary
 PR #576 remains draft/unmerged. main/Pages/public/full-live remain HOLD until exact-head CI and human visual acceptance.
+
+
+## V2.4.28-005 — CI assertion alignment
+Initial visual source exposed three stale assertions: the historical blanket ban on match menus, the V2.4.26 CSS cache string, and literal Ranked copy. These were updated to the user-approved TCG-owned in-game menu, V2.4.28 visual CSS cache with unchanged V2.4.26 gameplay-controller cache, and the still-gated Coming Soon Ranked state. No gameplay/runtime product bytes changed in those corrections.
+
+At head `18d41a62be6d226f9e31404b50ab04250432ce37`, TCG Validation #746 and Functional Smoke #942 are green. A fresh control-sync head is required only to acquire a non-cancelled exact-head standalone Migration Replay after concurrency cleared.
