@@ -87,11 +87,11 @@ V2.4.7 intentionally does not manufacture Ability/Withdraw/play/evolve/attach/ta
 
 ## H. Exact-head gates for V2.4.7
 
-- [ ] **V247-CI-01** TCG Card Pass 2 Validation succeeds at final exact head.
-- [ ] **V247-CI-02** Code Labs Migration Replay succeeds from zero at final exact head.
-- [ ] **V247-CI-03** Code Labs V50 Functional Smoke succeeds at final exact head.
-- [ ] **V247-REVIEW-01** Review threads remain zero / material findings resolved.
-- [ ] **V247-DIFF-01** Final diff against `bd2f5b...` contains only renderer/tabletop/tests/continuity scope.
+- [x] **V247-CI-01** TCG Card Pass 2 Validation #655 succeeded at accepted exact head `0e8887730a4af6c47d69f7089644e977bc3036fb`.
+- [x] **V247-CI-02** Code Labs Migration Replay #825 succeeded from zero at accepted exact head `0e8887730a4af6c47d69f7089644e977bc3036fb`.
+- [x] **V247-CI-03** Code Labs V50 Functional Smoke #851 succeeded at accepted exact head `0e8887730a4af6c47d69f7089644e977bc3036fb`.
+- [x] **V247-REVIEW-01** Review threads were zero at accepted exact head `0e8887730a4af6c47d69f7089644e977bc3036fb`.
+- [x] **V247-DIFF-01** Final diff against `bd2f5b30109f0927a23f4c8e380548d447cf7678` contained exactly the intended V2.4.7 renderer/tabletop/tests/continuity scope.
 
 ### H.1 Proven pre-final candidate evidence
 
@@ -113,4 +113,4 @@ This checklist edit changes continuity text only. It deliberately creates one cl
 - [ ] release shell journey.
 - [ ] public/live deployment evidence and rollback point.
 
-**Current decision:** V2.4.7 source implementation is a branch candidate only until H passes. PR merge, `main`, public/live and production remain HOLD.
+**Current decision:** V2.4.7 source implementation was accepted at exact head `0e8887730a4af6c47d69f7089644e977bc3036fb`. This checklist synchronization is continuity-only. PR merge, `main`, public/live and production remain HOLD.
