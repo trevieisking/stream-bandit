@@ -48,3 +48,26 @@ V2.4.22 intentionally centralizes those unchanged authorities so read-only proje
 - Withdrawal authority tests now verify `withdrawalDeclaration` owns once-per-turn, condition and cost legality while real `withdraw` delegates to it before the unchanged Payment + Atomic Switch transaction.
 
 This repair changes tests/ledger only. The green Match runtime blob and release-control bytes remain unchanged.
+
+
+## V2.4.22-007 — exact-head acceptance and Match promotion
+
+**State:** ✅ ACCEPTED / EDGE PROMOTED
+
+Accepted runtime head: `b8b8bc0634f170c9ebc28faeb1b2d69eac7db4b5`.
+
+Exact gates:
+- TCG Card Pass 2 Validation #703 ✅
+- Migration Replay #873 ✅
+- Functional Smoke #899 ✅
+- review threads: 0 ✅
+- legacy combined statuses: 0 ✅
+- bounded V2.4.22 delta: one runtime file + tests/release-control/controls ✅
+
+Supabase promoted the existing `tcg-match-actions` function in place from v5 to **v6 / ACTIVE**, preserving `verify_jwt=true`.
+
+Deployment submitted the release-controlled Match packet with the accepted entrypoint and the historically tracked unreferenced damage-packet-context source. Supabase's deployed-file read-back still materializes 84 files and does not surface that unreferenced source; the accepted entrypoint itself matches GitHub byte-for-byte and contains `field_actions`, `beginActiveAbilityRoute` and `withdrawalDeclaration`.
+
+No new function, project, schema, migration or card-data source was created.
+
+INTERACT-09 now has its accepted/live server projection. Browser Ability/Withdraw card-context controls are the next target.

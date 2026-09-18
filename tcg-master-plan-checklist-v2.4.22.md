@@ -25,17 +25,17 @@
 
 ## C. Exact-head acceptance
 
-- [ ] **V2422-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2422-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2422-CI-03** Functional Smoke succeeds.
-- [ ] **V2422-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2422-DIFF-01** diff stays bounded to Match owner/test/release-control/V2.4.22 controls.
-- [ ] **V2422-DEPLOY-01** accepted Match entrypoint promoted in place with JWT verification preserved.
-- [ ] **V2422-DEPLOY-02** deployed Match entrypoint matches accepted GitHub bytes.
+- [x] **V2422-CI-01** TCG Card Pass 2 Validation succeeds — #703 at accepted head `b8b8bc0634f170c9ebc28faeb1b2d69eac7db4b5`.
+- [x] **V2422-CI-02** Migration Replay succeeds from zero — #873.
+- [x] **V2422-CI-03** Functional Smoke succeeds — #899.
+- [x] **V2422-REVIEW-01** review threads remain zero / material findings resolved.
+- [x] **V2422-DIFF-01** diff stays bounded to Match owner/test/release-control/V2.4.22 controls; one runtime file.
+- [x] **V2422-DEPLOY-01** accepted Match entrypoint promoted in place as `tcg-match-actions` v6 with JWT verification preserved.
+- [x] **V2422-DEPLOY-02** deployed Match entrypoint matches accepted GitHub bytes byte-for-byte.
 
 ## D. Master-plan interaction state
 
 - [x] **INTERACT-01…08** accepted.
-- [ ] **INTERACT-09** Vanguard Ability/Attack/Withdraw — Attack card-owned; server projection candidate for Ability/Withdraw; browser half remains.
+- [ ] **INTERACT-09** Vanguard Ability/Attack/Withdraw — Attack card-owned; Ability/Withdraw server projection accepted/live; browser half remains.
 
-**Decision:** source candidate only until C passes. Current Match v5 / main/public/full-live remain unchanged.
+**Decision:** V2.4.22 server projection ACCEPTED ✅ at `b8b8bc0634f170c9ebc28faeb1b2d69eac7db4b5`. Supabase `tcg-match-actions` v6 is ACTIVE with JWT verification preserved. INTERACT-09 remains open only for browser Ability/Withdraw card-context controls. Merge / `main` / public / full-live remain HOLD 🔒.

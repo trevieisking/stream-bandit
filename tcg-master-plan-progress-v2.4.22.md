@@ -50,3 +50,12 @@ No browser Ability/Withdraw control is added in V2.4.22. The next slice may cons
 ## 6. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status, bounded-diff and release-control evidence are required before in-place Match Edge promotion.
+
+
+## 7. Accepted checkpoint
+
+V2.4.22 is accepted at `b8b8bc0634f170c9ebc28faeb1b2d69eac7db4b5` after TCG #703, Migration #873 and Functional Smoke #899 all succeeded.
+
+Production `tcg-match-actions` is ACTIVE v6 with JWT verification preserved. The deployed entrypoint exactly matches accepted GitHub bytes and exposes the server-owned `field_actions` projection.
+
+**Next locked target:** V2.4.23 / INTERACT-09 browser Ability + Withdraw card-context actions. The browser may consume only `field_actions`; Attack remains unchanged; Ability must render on the projected source card; Withdraw must use projected cost/targets/payment options and the existing authoritative `withdraw` commit.
