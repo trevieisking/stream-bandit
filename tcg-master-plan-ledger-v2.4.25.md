@@ -12,15 +12,15 @@ Accepted renderer/controller source already proves HP/damage, Shield, Conditions
 
 ## V2.4.25-002 — Ability availability
 
-**State:** 🔄 SOURCE TARGET
+**State:** ✅ SOURCE CANDIDATE
 
-Add passive ready/locked presentation for printed active Abilities. The state must derive only from revision-current Match `field_actions.ability_sources`; no browser legality reason or once-per-turn rule may be added.
+Card-context ready/locked presentation is implemented for printed active Abilities. The state derives only from revision-current Match `field_actions.ability_sources`; no browser legality reason or once-per-turn rule was added.
 
 ## V2.4.25-003 — terminal result
 
-**State:** 🔄 SOURCE TARGET
+**State:** ✅ SOURCE CANDIDATE
 
-Render the already-authoritative Match `result` and overtime state without calculating win conditions in the browser.
+The board renders the already-authoritative Match `result` and overtime state without calculating win conditions in the browser.
 
 ## V2.4.25-004 — validation
 
