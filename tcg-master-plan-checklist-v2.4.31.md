@@ -23,10 +23,10 @@
 - [x] Document/body remain non-scrolling; bounded feeds remain the only scrolling surfaces.
 
 ## Gates
-- [ ] Exact-head TCG Validation passes.
-- [ ] Exact-head Migration Replay passes.
-- [ ] Exact-head Functional Smoke passes.
-- [ ] Unresolved review threads = 0.
+- [x] Exact-head TCG Validation passes.
+- [x] Exact-head Migration Replay passes.
+- [x] Exact-head Functional Smoke passes.
+- [x] Unresolved review threads = 0.
 - [ ] Human 100% screenshot shows no generic Stream Bandit header.
 - [ ] Human 25% screenshot keeps the TCG screen-filling without the capped mini-navigation.
 - [ ] Human Settings click remains inside `tcg-settings.html`.
