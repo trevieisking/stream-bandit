@@ -55,3 +55,26 @@ No production/runtime source changed in this repair.
 TCG #684 passed at the repaired candidate head. Migration #854 was cancelled before any job started because prior-head Migration #853 still occupied the serialized replay lane; #853 subsequently completed successfully.
 
 This control-only checkpoint retriggers the exact-head TCG / Migration / Functional gate trio after the replay lane is clear. Relic owner, Match Actions, release-control, gameplay rules, database/schema, card data and Supabase production are unchanged.
+
+
+## V2.4.15-008 — exact-head acceptance and in-place Edge promotion
+
+**State:** ✅ ACCEPTED / EDGE PROMOTED
+
+Accepted runtime head: `8303184c11518696ac9bcbdbf00b30d958f5e2df`.
+
+Exact gates all passed:
+- TCG Card Pass 2 Validation #686 ✅
+- Migration Replay #856 ✅
+- Functional Smoke #882 ✅
+- review threads: 0 ✅
+- legacy combined statuses: 0 ✅
+- release-control Relic owner and entrypoint fingerprints match accepted GitHub blobs ✅
+
+Supabase project `xzxqfrvqdgkzwujbkdbk` promoted the existing `tcg-match-actions` function in place from v4 to **v5 / ACTIVE**, with `verify_jwt=true` preserved.
+
+Deployment retained the already-working 84-file runtime bundle and replaced exactly the two runtime files changed since accepted V2.4.13: `functions/tcg-match-actions/index.ts` and `functions/_shared/tcg-match-relic-engine-v0-2.ts`. The existing runtime registry dependency was already present. Post-deploy read-back matched both accepted GitHub files byte-for-byte.
+
+No new Supabase project, branch, function, schema, migration, card-data rewrite or gameplay owner was created.
+
+V2.4.15 therefore closes the server legality half of INTERACT-04. Browser Relic selection/highlighting/commit is the next V2.4.16 target. PR merge, `main`, Pages/public and full-live remain HOLD.

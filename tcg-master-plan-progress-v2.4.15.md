@@ -35,3 +35,12 @@ No browser Relic transport is added in V2.4.15. The next browser slice may consu
 ## 5. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status, bounded-diff and release-control closure evidence are required before any in-place `tcg-match-actions` deployment.
+
+
+## 6. Accepted checkpoint
+
+V2.4.15 server legality/projection seam is accepted at runtime head `8303184c11518696ac9bcbdbf00b30d958f5e2df` after TCG #686, Migration #856 and Functional #882 all succeeded.
+
+Production `tcg-match-actions` is ACTIVE v5 with JWT verification preserved. Post-deploy read-back confirmed the deployed entrypoint and Relic owner exactly match accepted GitHub bytes.
+
+**Next locked target:** V2.4.16 / INTERACT-04 browser Relic interaction: selected hand card → server `attach_relic_targets(card_uid)` projection → only returned empty-Relic friendly Creature coordinates highlighted → existing `attach_relic` commit. Browser remains presentation-only.

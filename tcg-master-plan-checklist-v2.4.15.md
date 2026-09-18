@@ -24,21 +24,21 @@
 
 ## C. Exact-head acceptance
 
-- [ ] **V2415-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2415-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2415-CI-03** Functional Smoke succeeds.
-- [ ] **V2415-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2415-DIFF-01** diff stays bounded to Relic owner/dispatcher/tests/release-control/V2.4.15 controls.
-- [ ] **V2415-DEPLOY-01** accepted exact runtime delta is promoted in place with JWT verification preserved.
-- [ ] **V2415-DEPLOY-02** deployed entrypoint + Relic owner match accepted GitHub bytes.
+- [x] **V2415-CI-01** TCG Card Pass 2 Validation succeeds — #686 at accepted runtime head `8303184c11518696ac9bcbdbf00b30d958f5e2df`.
+- [x] **V2415-CI-02** Migration Replay succeeds from zero — #856.
+- [x] **V2415-CI-03** Functional Smoke succeeds — #882.
+- [x] **V2415-REVIEW-01** review threads remain zero / material findings resolved.
+- [x] **V2415-DIFF-01** diff stays bounded to Relic owner/dispatcher/tests/release-control/V2.4.15 controls.
+- [x] **V2415-DEPLOY-01** accepted exact runtime delta is promoted in place as Supabase `tcg-match-actions` v5 with JWT verification preserved.
+- [x] **V2415-DEPLOY-02** deployed entrypoint + Relic owner match accepted GitHub bytes byte-for-byte.
 
 ## D. Master-plan state
 
 - [x] **INTERACT-01** Creature placement.
 - [x] **INTERACT-02** Evolution.
 - [x] **INTERACT-03** Essence.
-- [ ] **INTERACT-04** Relic — server seam candidate implemented; browser half remains.
+- [ ] **INTERACT-04** Relic — server seam accepted/live; browser half remains the next target.
 - [x] **INTERACT-05** Realm.
 - [ ] **INTERACT-06** Tactic.
 
-**Decision:** candidate source only until C passes. Current Supabase v4 / merge / `main` / public / full-live remain unchanged.
+**Decision:** V2.4.15 server seam ACCEPTED ✅ at `8303184c11518696ac9bcbdbf00b30d958f5e2df`. Supabase `tcg-match-actions` v5 is ACTIVE with JWT verification preserved. INTERACT-04 remains open only for the V2.4.16 browser interaction. Merge / `main` / public / full-live remain HOLD 🔒.
