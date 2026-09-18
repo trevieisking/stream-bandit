@@ -88,9 +88,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "2c021dd7dd5f90d0fc616c4671f3f3ee63fc0bc3",
+        "entrypoint_git_blob_sha": "d60303f6c40ed53782b811e62482b57eac4d18fc",
         "file_count": 85,
-        "closure_sha256": "30c09a99b43fadadf9a278591f8dce0ed636cc113995089966ffcd321b9e2e97",
+        "closure_sha256": "d74461766c86b6d3f0897584848c4e2d530e9343c838bcb568a9ced597592c65",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -426,7 +426,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "2c021dd7dd5f90d0fc616c4671f3f3ee63fc0bc3"
+            "git_blob_sha": "d60303f6c40ed53782b811e62482b57eac4d18fc"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
@@ -438,7 +438,7 @@
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "cc59c8aab9497047eae8dbce2e6664c3b9d989f0",
         "file_count": 36,
-        "closure_sha256": "a8424d59dc68475182bdef97a9cd803e9d9d50fb1a6a8ad0ebbdbd0af8399e22",
+        "closure_sha256": "18bae27e3da25210d8c1685c0437a9bf424a8f09fe9ea3401b43a3d93de02544",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts",
@@ -486,7 +486,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts",
-            "git_blob_sha": "05c13dc92fee0fe8b9c583a07f7aed39d835621a"
+            "git_blob_sha": "93f7f955c22a892f6c9a988084023a7276e472ff"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-event-v0-2.ts",

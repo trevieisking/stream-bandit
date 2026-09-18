@@ -43,3 +43,15 @@ Hold branch acceptance and Supabase promotion until fresh exact-head CI, review/
 ## Checkpoint
 
 Supabase `tcg-match-actions` v3 remains deployed and unchanged. PR merge/main/public/full-live remain HOLD.
+
+
+## V2.4.13-007 — first exact-head integration repair
+
+**State:** ✅ DETACHED REPAIR CANDIDATE
+
+TCG #674 proved the new Essence legality itself type-checks and deterministic runtime passes, but two source-control contracts needed synchronization:
+
+1. the shared Essence Attachment engine also belongs to the `tcg-tactic-actions` dependency closure, so both affected release-control closure digests must be refreshed;
+2. accepted ownership tests preserve the explicit `targetInst.uid` handoff into the external Attachment Route. The structured branch now names the already server-validated anchor as `targetInst.uid` before routing, without reintroducing target legality.
+
+No Essence rule, mutation, listener, browser, database or legacy fallback behavior changes in this repair.
