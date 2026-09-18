@@ -35,7 +35,9 @@
 - [ ] **V2411-CI-02** Migration Replay succeeds from zero.
 - [ ] **V2411-CI-03** Functional Smoke succeeds.
 - [ ] **V2411-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2411-DIFF-01** diff stays bounded to Evolution legality owner/action/tests/control docs.
+- [ ] **V2411-DIFF-01** diff stays bounded to Evolution legality owner/action/tests/control docs plus the exact release-control dependency fingerprint required by the new shared module.
+- [x] **V2411-REPAIR-01** runtime Creature type shape includes the existing stack/Essence/Relic/damage/Shield/condition fields required by downstream owners.
+- [x] **V2411-REPAIR-02** release-control `tcg-match-actions` closure is regenerated to the exact final dependency graph rather than weakening the closure gate.
 - [ ] **V2411-DEPLOY-01** exact accepted `tcg-match-actions` source is promoted in-place to the existing Supabase function with JWT verification preserved.
 - [ ] **V2411-DEPLOY-02** deployed function source/hash/version is re-read and matches the accepted source.
 

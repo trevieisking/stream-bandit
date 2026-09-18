@@ -5,8 +5,16 @@ export type RuntimeV02EvolutionInstance = {
 
 export type RuntimeV02EvolutionCreature<T extends RuntimeV02EvolutionInstance> = {
   stack: T[];
+  essence: T[];
+  relic: T | null;
+  damage: number;
+  shield: number;
+  condition?: string | null;
+  conditions?: Record<string, unknown>;
+  flags?: Record<string, unknown>;
   entered_turn?: unknown;
   evolved_turn?: unknown;
+  became_vanguard_turn?: unknown;
 };
 
 export type RuntimeV02EvolutionPlayer<T extends RuntimeV02EvolutionInstance> = {

@@ -13,6 +13,13 @@ const definitions: Record<string, Record<string, unknown>> = {
 const def = (instance: Inst) => definitions[instance.card_id] ?? null;
 const creature = (uid: string, card_id: string, entered_turn = 1, evolved_turn = -1) => ({
   stack: [{ uid, card_id }],
+  essence: [],
+  relic: null,
+  damage: 0,
+  shield: 0,
+  condition: null,
+  conditions: { scorched: false, venomed: 0, control: null, modifier: null },
+  flags: {},
   entered_turn,
   evolved_turn,
 });

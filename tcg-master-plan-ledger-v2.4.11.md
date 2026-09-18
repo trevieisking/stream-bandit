@@ -29,12 +29,28 @@ A pure shared engine now projects legal targets and validates final declarations
 
 `evolve_targets(card_uid)` returns authoritative target coordinates/anchors without commit or mutation.
 
-## V2.4.11-005 — validation / deployment fence
+## V2.4.11-005 — first exact-head validation
+
+**State:** 🧪 REPAIR REQUIRED
+
+Initial PR head `aa79924b...` reached TCG #667. The game-rule design was not rejected; two integration contracts failed:
+1. the new Evolution legality state type was narrower than the existing runtime Creature shape used by Creature/Condition owners;
+2. release-control still fingerprinted the old 84-file `tcg-match-actions` closure although the new Evolution module correctly made it 85 files.
+
+Migration/Functional work on that head is allowed to finish for evidence, but Supabase deployment remains HOLD.
+
+## V2.4.11-006 — bounded repair
+
+**State:** ✅ DETACHED REPAIR CANDIDATE
+
+The repair adds the existing runtime Creature fields to the legality type/test fixture and regenerates the immutable release-control closure using final Git blob SHAs and the same SHA-256 algorithm enforced by `card-pass-2-release-control.test.mjs`. No Evolution rule or mutation behavior changes.
+
+## V2.4.11-007 — deployment fence
 
 **State:** 🔄
 
-Do not move the candidate onto the PR until V2.4.10 continuity gates are all green. After V2.4.11 exact-head CI succeeds, separately decide in-place Supabase promotion of `tcg-match-actions`. No database change is required.
+After repaired exact-head CI succeeds, separately decide in-place Supabase promotion of `tcg-match-actions`. No database change is required.
 
 ## Checkpoint
 
-PR/main/public/live production remain unchanged by this detached candidate.
+PR/main/public/live production remain unchanged until the repaired head is validated.

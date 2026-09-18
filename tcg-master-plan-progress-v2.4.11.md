@@ -44,4 +44,8 @@ After a safe deployment, V2.4.12 can wire the board to `evolve_targets` and the 
 
 ## 5. Validation
 
-Fresh TCG Validation, Migration Replay, Functional Smoke, review-thread check, bounded diff review and exact deployed-function identity are required before V2.4.11 acceptance.
+Fresh TCG Validation, Migration Replay, Functional Smoke, review-thread check, bounded diff review, exact release-control dependency closure and exact deployed-function identity are required before V2.4.11 acceptance.
+
+### Candidate repair note
+
+Initial V2.4.11 head `aa79924b...` exposed two integration defects only: the new legality type omitted existing runtime Creature fields required by downstream owners, and the immutable `tcg-match-actions` dependency closure still described the pre-engine 84-file graph. The repair widens only the TypeScript state shape and regenerates the existing release-control fingerprint for the final 85-file closure; Evolution gameplay rules are unchanged.
