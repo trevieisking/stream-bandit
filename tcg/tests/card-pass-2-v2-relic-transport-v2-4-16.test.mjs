@@ -40,7 +40,8 @@ test('Relic target activation commits through the existing attach_relic action',
 test('projection precedence preserves Evolution, Essence and Relic before later Tactic and generic fallback', () => {
   assert.match(controller, /const relicMode = selectedPlayCard && !evolutionMode && !essenceMode/);
   assert.match(controller, /const tacticMode = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode/);
-  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !tacticMode/);
+  assert.match(controller, /const directPlayMode = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !tacticMode/);
+  assert.match(controller, /state\.playProjectionUid === state\.selectedHandUid/);
   assert.match(controller, /runEvolutionTargetProjection\(uid\)/);
   assert.match(controller, /runEssenceTargetProjection\(uid\)/);
   assert.match(controller, /runRelicTargetProjection\(uid\)/);
