@@ -38,3 +38,23 @@ V2.4.9 does not claim Evolution, Essence, Relic, generic Tactic targeting, setup
 The final V2.4.9 exact head must freshly pass TCG Card Pass 2 Validation, Code Labs Migration Replay from zero, Code Labs V50 Functional Smoke, zero material review threads and bounded diff review against continuity parent `1896dae2...`.
 
 After acceptance, re-read the Master Plan and choose the next smallest direct-card interaction backed by an existing canonical server owner.
+
+
+## 7. Exact-head acceptance
+
+V2.4.9 source was accepted on PR #576 at exact head `0df1e34414b0acc9dbccb5a6a4f7707dd6263f5f`.
+
+Fresh same-head evidence:
+
+- TCG Card Pass 2 Validation #662 — SUCCESS;
+- Code Labs Migration Replay #832 — SUCCESS from zero;
+- Code Labs V50 Functional Smoke #858 — SUCCESS, including independent zero-to-current PostgreSQL replay;
+- review threads — 0;
+- legacy combined-status entries — none found;
+- bounded delta from continuity parent `1896dae20805cb700051eadbab301b844650f7a5` — 2 commits ahead / 0 behind / exactly 8 intended files.
+
+The accepted browser capability is limited to selected known hand card → shared Realm destination. Server `play_realm` retains all Realm family/timing/replacement/listener/defeat legality and mutation authority.
+
+**Release boundary:** accepted PR source state only. PR merge, `main`, GitHub Pages/public, live and production release remain HOLD.
+
+**Next planning instruction:** re-read the latest GitHub comments and Master Plan before choosing V2.4.10. GitHub comments remain source of truth for any locked next slice.

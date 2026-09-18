@@ -45,12 +45,22 @@ A dedicated Card Pass 2 contract proves payload minimality, server ownership, Re
 
 ## V2.4.9-007 — validation fence
 
-**State:** 🔄 FRESH EXACT-HEAD EVIDENCE REQUIRED
+**State:** ✅ ACCEPTED @ `0df1e34414b0acc9dbccb5a6a4f7707dd6263f5f`
 
 Before source acceptance, the final PR head must pass TCG Validation, Migration Replay from zero, Functional Smoke, zero material review threads and bounded diff review from `1896dae2...`.
+
+## V2.4.9-008 — exact-head acceptance
+
+**State:** ✅ ACCEPTED
+
+Exact head `0df1e34414b0acc9dbccb5a6a4f7707dd6263f5f` passed TCG Validation #662, Migration Replay #832 from zero and Functional Smoke #858 with an independent PostgreSQL replay. Review threads were zero, legacy combined statuses had no entries, and the bounded V2.4.9 delta contained exactly the intended Realm interaction/test/control scope.
+
+Initial head `20548e8...` exposed two test-contract mismatches only. Repair head `0df1e344...` changed only the Attack fake-DOM harness and the Realm ownership assertion; no controller/server/gameplay bytes changed in the repair.
 
 ## V2.4.9 checkpoint
 
 **PR:** #576 remains draft/unmerged.  
 **Supabase production:** no V2.4.9 database or Edge deployment is required.  
-**`main` / GitHub Pages / public/live:** HOLD.
+**Accepted exact head:** `0df1e34414b0acc9dbccb5a6a4f7707dd6263f5f`.  
+**`main` / GitHub Pages / public/live:** HOLD.  
+**Next:** re-read latest GitHub comments + Master Plan before selecting V2.4.10; comments are the source of truth for any locked next slice.
