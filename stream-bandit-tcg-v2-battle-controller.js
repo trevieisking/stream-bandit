@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.14';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.16';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const state = {
@@ -19,6 +19,10 @@
     essenceEligible: false,
     essenceTargets: [],
     essenceProjectionBusy: false,
+    relicProjectionUid: '',
+    relicEligible: false,
+    relicTargets: [],
+    relicProjectionBusy: false,
     busy: false,
     poll: null
   };
@@ -184,6 +188,20 @@
     );
   }
 
+  function clearRelicProjection() {
+    state.relicProjectionUid = '';
+    state.relicEligible = false;
+    state.relicTargets = [];
+    state.relicProjectionBusy = false;
+  }
+
+  function legalRelicTarget(where, index) {
+    const key = evolutionTargetKey(where, index);
+    return state.relicTargets.some((target) =>
+      target && evolutionTargetKey(target.where, target.index) === key
+    );
+  }
+
   function attackSlots(creature) {
     const structured = structuredDefinition(topInstance(creature));
     const attacks = structured && structured.creature && Array.isArray(structured.creature.attacks)
@@ -275,28 +293,28 @@
     const setupReturn = !!opts.setupReturn;
     const evolutionTargets = !!opts.evolutionTargets;
     const essenceTargets = !!opts.essenceTargets;
+    const relicTargets = !!opts.relicTargets;
     node.innerHTML = [0, 1, 2, 3].map((index) => {
       const setupMode = handTarget && handTargetMode === 'setup';
       const creature = reserve && reserve[index];
       const evolutionTarget = evolutionTargets && !!creature && legalEvolutionTarget('reserve', index);
       const essenceTarget = essenceTargets && !!creature && legalEssenceTarget('reserve', index);
+      const relicTarget = relicTargets && !!creature && legalRelicTarget('reserve', index);
       const targetAttrs = evolutionTarget
         ? ' tabindex="0" role="button" data-evolve-target-where="reserve" data-evolve-target-index="' + index + '" aria-label="Evolve selected card onto ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
         : (essenceTarget
           ? ' tabindex="0" role="button" data-essence-target-where="reserve" data-essence-target-index="' + index + '" aria-label="Attach selected Essence to ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
-          : (handTarget
-            ? (setupMode
-              ? ' tabindex="0" role="button" data-setup-place-where="reserve" data-setup-place-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + ' during setup"'
-              : ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + '"')
-            : ''));
+          : (relicTarget
+            ? ' tabindex="0" role="button" data-relic-target-where="reserve" data-relic-target-index="' + index + '" aria-label="Attach selected Relic to ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
+            : (handTarget
+              ? (setupMode
+                ? ' tabindex="0" role="button" data-setup-place-where="reserve" data-setup-place-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + ' during setup"'
+                : ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + '"')
+              : '')));
       const contextActions = setupReturn && creature ? [{
-        intent: 'setup_return',
-        label: 'Return to hand',
-        detail: 'Setup placement',
-        where: 'reserve',
-        index
+        intent: 'setup_return', label: 'Return to hand', detail: 'Setup placement', where: 'reserve', index
       }] : [];
-      return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + (essenceTarget ? ' is-essence-target' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
+      return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + (essenceTarget ? ' is-essence-target' : '') + (relicTarget ? ' is-relic-target' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
         ownerLabel + ' Reserve ' + (index + 1) + '</span>' + creatureCard(creature, { contextActions }) + '</section>';
     }).join('');
   }
@@ -306,22 +324,18 @@
     if (!node) return;
     const opts = options || {};
     const contextActions = opts.setupReturn && creature ? [{
-      intent: 'setup_return',
-      label: 'Return to hand',
-      detail: 'Setup Vanguard',
-      where: 'vanguard'
+      intent: 'setup_return', label: 'Return to hand', detail: 'Setup Vanguard', where: 'vanguard'
     }] : [];
-    const card = creatureCard(creature, {
-      primary: !!opts.primary,
-      canAct: !!opts.canAct,
-      contextActions
-    });
+    const card = creatureCard(creature, { primary: !!opts.primary, canAct: !!opts.canAct, contextActions });
     const evolutionTarget = !!opts.evolutionTargets && !!creature && legalEvolutionTarget('vanguard', null);
     const essenceTarget = !!opts.essenceTargets && !!creature && legalEssenceTarget('vanguard', null);
+    const relicTarget = !!opts.relicTargets && !!creature && legalRelicTarget('vanguard', null);
     if (evolutionTarget) {
       node.innerHTML = '<div class="sb-vanguard-hand-target is-evolution-target" tabindex="0" role="button" data-evolve-target-where="vanguard" aria-label="Evolve selected card onto your Vanguard">' + card + '</div>';
     } else if (essenceTarget) {
       node.innerHTML = '<div class="sb-vanguard-hand-target is-essence-target" tabindex="0" role="button" data-essence-target-where="vanguard" aria-label="Attach selected Essence to your Vanguard">' + card + '</div>';
+    } else if (relicTarget) {
+      node.innerHTML = '<div class="sb-vanguard-hand-target is-relic-target" tabindex="0" role="button" data-relic-target-where="vanguard" aria-label="Attach selected Relic to your Vanguard">' + card + '</div>';
     } else if (opts.handTarget) {
       node.innerHTML = '<div class="sb-vanguard-hand-target is-hand-target" tabindex="0" role="button" data-setup-place-where="vanguard" aria-label="Try selected hand card as your Vanguard during setup">' + card + '</div>';
     } else {
@@ -452,7 +466,8 @@
     const selectedPlayCard = !!state.selectedHandUid && canPlayFromHand;
     const evolutionMode = selectedPlayCard && state.evolutionProjectionUid === state.selectedHandUid && state.evolutionEligible;
     const essenceMode = selectedPlayCard && !evolutionMode && state.essenceProjectionUid === state.selectedHandUid && state.essenceEligible;
-    const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !state.evolutionProjectionBusy && !state.essenceProjectionBusy;
+    const relicMode = selectedPlayCard && !evolutionMode && !essenceMode && state.relicProjectionUid === state.selectedHandUid && state.relicEligible;
+    const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !state.evolutionProjectionBusy && !state.essenceProjectionBusy && !state.relicProjectionBusy;
 
     $('oppVanguard').innerHTML = creatureCard(view.opponent && view.opponent.vanguard, {});
     renderYourVanguard(view.you && view.you.vanguard, {
@@ -461,6 +476,7 @@
       handTarget: setupHandTarget,
       evolutionTargets: evolutionMode,
       essenceTargets: essenceMode,
+      relicTargets: relicMode,
       setupReturn: canSetup
     });
     renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent');
@@ -469,6 +485,7 @@
       handTargetMode: canSetup ? 'setup' : 'play',
       evolutionTargets: evolutionMode,
       essenceTargets: essenceMode,
+      relicTargets: relicMode,
       setupReturn: canSetup
     });
     renderRealm(view, playHandTarget);
@@ -496,11 +513,13 @@
     else if (view.phase === 'setup' && canSetup && state.selectedHandUid) setStatus('Setup card selected. Choose your Vanguard or a Reserve position; the server validates starter and slot legality.', 'ready');
     else if (view.phase === 'setup' && canSetup) setStatus('Your setup turn. Select a hand card to place, return a setup Creature from its card, or lock setup when ready.', 'ready');
     else if (view.phase === 'setup') setStatus('Waiting for the other player to finish setup.', 'wait');
-    else if (state.selectedHandUid && (state.evolutionProjectionBusy || state.essenceProjectionBusy) && canPlayFromHand) setStatus('Checking legal card destinations with the authoritative gameplay owners…', 'busy');
+    else if (state.selectedHandUid && (state.evolutionProjectionBusy || state.essenceProjectionBusy || state.relicProjectionBusy) && canPlayFromHand) setStatus('Checking legal card destinations with the authoritative gameplay owners…', 'busy');
     else if (state.selectedHandUid && canPlayFromHand && state.evolutionEligible && !state.evolutionTargets.length) setStatus('Evolution card selected. The server reports no legal Creature stack this turn.', 'wait');
     else if (state.selectedHandUid && canPlayFromHand && state.evolutionEligible) setStatus('Evolution card selected. Choose a green Creature stack; the server will revalidate before committing.', 'ready');
     else if (state.selectedHandUid && canPlayFromHand && state.essenceEligible && !state.essenceTargets.length) setStatus('Essence card selected. The server reports no legal Creature target this turn.', 'wait');
     else if (state.selectedHandUid && canPlayFromHand && state.essenceEligible) setStatus('Essence card selected. Choose a green Creature target; the server will revalidate before attaching.', 'ready');
+    else if (state.selectedHandUid && canPlayFromHand && state.relicEligible && !state.relicTargets.length) setStatus('Relic card selected. The server reports no Creature with an empty Relic slot.', 'wait');
+    else if (state.selectedHandUid && canPlayFromHand && state.relicEligible) setStatus('Relic card selected. Choose a green Creature target; the server will revalidate before attaching.', 'ready');
     else if (state.selectedHandUid && canPlayFromHand) setStatus('Hand card selected. Choose a Reserve position or the shared Realm slot; the server validates the destination and card legality.', 'ready');
     else if (yourTurn) setStatus('Your turn. Select a hand card for a board destination or your active Creature for its card actions.', 'ready');
     else setStatus('Board synced. Waiting for the opponent or the next server phase.', 'wait');
@@ -521,11 +540,13 @@
           state.selectedAnchorUid = '';
           clearEvolutionProjection();
           clearEssenceProjection();
+          clearRelicProjection();
           render();
           if (!deselect) {
             Promise.all([
               runEvolutionTargetProjection(uid),
-              runEssenceTargetProjection(uid)
+              runEssenceTargetProjection(uid),
+              runRelicTargetProjection(uid)
             ]).catch((error) => {
               setStatus(error instanceof Error ? error.message : String(error), 'error');
             });
@@ -536,6 +557,7 @@
         state.selectedHandUid = '';
         clearEvolutionProjection();
         clearEssenceProjection();
+        clearRelicProjection();
         render();
       };
       card.addEventListener('click', (event) => {
@@ -651,6 +673,23 @@
           event.preventDefault();
           event.stopPropagation();
           await activate();
+        }
+      });
+    });
+    document.querySelectorAll('[data-relic-target-where]').forEach((target) => {
+      const activate = async () => {
+        const where = String(target.dataset.relicTargetWhere || '');
+        const index = target.dataset.relicTargetIndex == null || target.dataset.relicTargetIndex === '' ? null : Number(target.dataset.relicTargetIndex);
+        await runRelicIntent(state.selectedHandUid, where, index);
+      };
+      target.addEventListener('click', async (event) => {
+        if (event.target.closest('[data-card-intent]')) return;
+        event.stopPropagation();
+        await activate();
+      });
+      target.addEventListener('keydown', async (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault(); event.stopPropagation(); await activate();
         }
       });
     });
@@ -808,6 +847,7 @@
       state.selectedHandUid = '';
       clearEvolutionProjection();
       clearEssenceProjection();
+      clearRelicProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -871,6 +911,65 @@
       state.selectedHandUid = '';
       clearEvolutionProjection();
       clearEssenceProjection();
+      clearRelicProjection();
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runRelicTargetProjection(cardUid) {
+    const view = viewState();
+    const seat = Number(view && view.you && view.you.seat);
+    const canProject = !!cardUid && view && view.phase === 'play' && Number(view.active_seat) === seat && !state.busy;
+    if (!canProject) return;
+    state.relicProjectionUid = cardUid;
+    state.relicProjectionBusy = true;
+    state.relicEligible = false;
+    state.relicTargets = [];
+    render();
+    try {
+      const response = await callEdge(API_MATCH, Object.assign(actionBase('attach_relic_targets'), { card_uid: cardUid }));
+      if (state.selectedHandUid !== cardUid) return;
+      const projected = response && response.result && typeof response.result === 'object' ? response.result : {};
+      state.relicProjectionUid = cardUid;
+      state.relicEligible = projected.eligible === true;
+      state.relicTargets = state.relicEligible && Array.isArray(projected.legal_targets)
+        ? projected.legal_targets.map((target) => ({
+            where: String(target && target.where || ''),
+            index: target && target.index == null ? null : Number(target.index),
+            anchor_uid: String(target && target.anchor_uid || '')
+          })).filter((target) =>
+            (target.where === 'vanguard' && target.index === null) ||
+            (target.where === 'reserve' && Number.isInteger(target.index) && target.index >= 0 && target.index <= 3)
+          )
+        : [];
+    } finally {
+      if (state.selectedHandUid === cardUid) {
+        state.relicProjectionBusy = false;
+        render();
+      }
+    }
+  }
+
+  async function runRelicIntent(cardUid, where, index) {
+    if (!cardUid) throw new Error('Select a Relic card first.');
+    if (!legalRelicTarget(where, index)) throw new Error('That Creature is not in the server-projected Relic target list.');
+    state.busy = true;
+    render();
+    setStatus('Submitting Relic attachment to the authoritative Relic owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, Object.assign(actionBase('attach_relic'), { card_uid: cardUid, where, index }));
+      state.selectedHandUid = '';
+      clearEvolutionProjection();
+      clearEssenceProjection();
+      clearRelicProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -895,6 +994,7 @@
       state.selectedHandUid = '';
       clearEvolutionProjection();
       clearEssenceProjection();
+      clearRelicProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -921,6 +1021,7 @@
       state.selectedHandUid = '';
       clearEvolutionProjection();
       clearEssenceProjection();
+      clearRelicProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -964,6 +1065,7 @@
         state.selectedHandUid = '';
         clearEvolutionProjection();
         clearEssenceProjection();
+        clearRelicProjection();
       }
     }
     render();

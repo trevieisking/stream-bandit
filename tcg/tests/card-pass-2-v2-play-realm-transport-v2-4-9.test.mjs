@@ -44,7 +44,7 @@ test('selected non-Evolution hand card can expose the shared Realm slot without 
   assert.match(controller, /data-play-realm-target/);
   assert.match(controller, /runPlayRealmIntent\(state\.selectedHandUid\)/);
   assert.match(controller, /const selectedPlayCard = !!state\.selectedHandUid && canPlayFromHand/);
-  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !state\.evolutionProjectionBusy && !state\.essenceProjectionBusy/);
+  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !state\.evolutionProjectionBusy && !state\.essenceProjectionBusy && !state\.relicProjectionBusy/);
   assert.match(controller, /renderRealm\(view,\s*playHandTarget\)/);
   assert.match(controller, /actionBase\('evolve_targets'\)/);
   assert.doesNotMatch(controller, /evolves_from_id/);

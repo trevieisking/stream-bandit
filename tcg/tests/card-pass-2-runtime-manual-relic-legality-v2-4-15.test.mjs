@@ -26,8 +26,10 @@ test('Match Actions delegates structured Relic projection and declaration legali
   assert.match(match, /td\?\.id==="stone-flintkin"/);
 });
 
-test('V2.4.15 is a server seam only and does not add browser Relic rules', () => {
-  assert.doesNotMatch(controller, /attach_relic_targets/);
-  assert.doesNotMatch(controller, /actionBase\('attach_relic'\)/);
+test('Relic legality stays server-side when the later browser transport consumes the projection', () => {
+  assert.match(controller, /actionBase\('attach_relic_targets'\)/);
+  assert.match(controller, /actionBase\('attach_relic'\)/);
   assert.doesNotMatch(controller, /subtype\s*===?\s*['"]Relic['"]/);
+  assert.doesNotMatch(controller, /creature_already_has_relic/);
+  assert.doesNotMatch(controller, /relic_card_required/);
 });

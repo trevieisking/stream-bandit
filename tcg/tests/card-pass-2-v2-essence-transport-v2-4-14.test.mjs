@@ -40,17 +40,20 @@ test('Essence target activation commits through the existing attach_essence acti
   assert.match(branch, /refreshMatch\(\)/);
 });
 
-test('Evolution keeps precedence and generic Creature Realm destinations remain fallback', () => {
+test('Evolution, Essence and later Relic projections keep precedence over generic Creature Realm fallback', () => {
   assert.match(controller, /const essenceMode = selectedPlayCard && !evolutionMode/);
-  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode/);
+  assert.match(controller, /const relicMode = selectedPlayCard && !evolutionMode && !essenceMode/);
+  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode/);
   assert.match(controller, /actionBase\('evolve'\)/);
   assert.match(controller, /actionBase\('play_creature'\)/);
   assert.match(controller, /actionBase\('play_realm'\)/);
 });
 
-test('battle cache identity advances to V2.4.14 without changing renderer identity', () => {
-  assert.match(html, /data-sb-tcg-tabletop="v2-4-14"/);
-  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-14/);
-  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-14/);
+test('V2.4.14 Essence delivery remains valid after later tabletop interaction versions advance cache identity', () => {
+  const marker = html.match(/data-sb-tcg-tabletop="v2-4-(\d+)"/);
+  assert.ok(marker, 'tabletop version marker missing');
+  assert.ok(Number(marker[1]) >= 14, 'tabletop must not regress below the accepted V2.4.14 Essence surface');
+  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-\d+/);
+  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-\d+/);
   assert.match(html, /stream-bandit-tcg-card-renderer-v2-4-7\.js\?v=2-4-10/);
 });
