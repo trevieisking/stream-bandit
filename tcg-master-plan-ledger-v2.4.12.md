@@ -48,3 +48,25 @@ TCG #671 exposed two stale historical source-shape assertions only:
 - the V2.4.10 Setup test froze exact `v2-4-10` cache identity even though later tabletop versions are expected to advance it.
 
 The repair updates only those historical tests to preserve their accepted behavioral contracts while allowing the V2.4.12 Evolution targeting layer. No controller, CSS, server, gameplay, database or Supabase source changes.
+
+
+## V2.4.12-007 — exact-head acceptance
+
+**State:** ✅ ACCEPTED
+
+Exact head `944e97879f2a6ccd4a91b035f0b141cd0366b219` passed TCG #672, Migration #842 and Functional #868 with 0 review threads and no legacy statuses.
+
+The accepted interaction is:
+`select/drag Evolution card → server evolve_targets → green returned stack → server evolve`.
+
+The browser contains no stage/predecessor/turn-lock Evolution rules.
+
+**INTERACT-02:** ✅  
+**STATE-VIS-05:** ✅ for Evolution legal-target projection.  
+**STATE-VIS-06:** ✅ green Evolution target highlighting.
+
+No Supabase deployment was performed or required; deployed `tcg-match-actions` v3 remains unchanged.
+
+## Next loop target
+
+Re-read canonical V2.4.1. Earliest unfinished direct-card target after INTERACT-02 is **INTERACT-03 Essence**.

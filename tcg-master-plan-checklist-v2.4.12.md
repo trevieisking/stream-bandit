@@ -30,21 +30,21 @@
 
 ## D. Exact-head gates
 
-- [ ] **V2412-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2412-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2412-CI-03** Functional Smoke succeeds.
-- [ ] **V2412-REVIEW-01** review threads remain zero / findings resolved.
-- [ ] **V2412-DIFF-01** diff remains bounded to controller/CSS/page cache/test/V2.4.12 controls.
+- [x] **V2412-CI-01** TCG Card Pass 2 Validation #672 succeeded at `944e97879f2a6ccd4a91b035f0b141cd0366b219`.
+- [x] **V2412-CI-02** Migration Replay #842 succeeded from zero at `944e97879f2a6ccd4a91b035f0b141cd0366b219`.
+- [x] **V2412-CI-03** Functional Smoke #868 succeeded, including independent PostgreSQL replay, at `944e97879f2a6ccd4a91b035f0b141cd0366b219`.
+- [x] **V2412-REVIEW-01** review threads were 0 and legacy combined-status entries were none found.
+- [x] **V2412-DIFF-01** final V2.4.12 delta remained bounded to 2 commits / 9 intended client/test/control files from `2d8b592c5d516ac4ac4bf3f7d1ee349b6c3fcdfc`.
 
 ## E. Master-plan state
 
 - [x] **INTERACT-01** Creature Vanguard/Reserve tap-select accepted.
-- [ ] **INTERACT-02** Evolution — candidate complete; exact-head gate pending.
-- [x] **STATE-VIS-05** legal-target highlight architecture now uses server-returned coordinates for Evolution.
-- [ ] **STATE-VIS-06** green Evolution target highlighting — candidate complete; exact-head gate pending.
+- [x] **INTERACT-02** Evolution tap/select path accepted end to end through server `evolve_targets` projection and existing `evolve` commit.
+- [x] **STATE-VIS-05** legal-target highlight architecture uses server-returned coordinates for Evolution.
+- [x] **STATE-VIS-06** green Evolution target highlighting accepted at exact head `944e97879f2a6ccd4a91b035f0b141cd0366b219`.
 - [ ] **INTERACT-03** Essence.
 - [ ] **INTERACT-04** Relic.
 - [x] **INTERACT-05** Realm.
 - [ ] **INTERACT-06** Tactic.
 
-**Decision:** candidate source only until D passes. Supabase v3 remains authoritative; merge/main/public/full-live HOLD.
+**Decision:** V2.4.12 source ACCEPTED ✅. Supabase v3 remains authoritative and unchanged; merge/main/public/full-live HOLD 🔒.
