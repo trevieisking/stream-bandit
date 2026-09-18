@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.12';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.14';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const state = {
@@ -15,6 +15,10 @@
     evolutionEligible: false,
     evolutionTargets: [],
     evolutionProjectionBusy: false,
+    essenceProjectionUid: '',
+    essenceEligible: false,
+    essenceTargets: [],
+    essenceProjectionBusy: false,
     busy: false,
     poll: null
   };
@@ -166,6 +170,20 @@
     );
   }
 
+  function clearEssenceProjection() {
+    state.essenceProjectionUid = '';
+    state.essenceEligible = false;
+    state.essenceTargets = [];
+    state.essenceProjectionBusy = false;
+  }
+
+  function legalEssenceTarget(where, index) {
+    const key = evolutionTargetKey(where, index);
+    return state.essenceTargets.some((target) =>
+      target && evolutionTargetKey(target.where, target.index) === key
+    );
+  }
+
   function attackSlots(creature) {
     const structured = structuredDefinition(topInstance(creature));
     const attacks = structured && structured.creature && Array.isArray(structured.creature.attacks)
@@ -256,17 +274,21 @@
     const handTargetMode = String(opts.handTargetMode || 'play');
     const setupReturn = !!opts.setupReturn;
     const evolutionTargets = !!opts.evolutionTargets;
+    const essenceTargets = !!opts.essenceTargets;
     node.innerHTML = [0, 1, 2, 3].map((index) => {
       const setupMode = handTarget && handTargetMode === 'setup';
       const creature = reserve && reserve[index];
       const evolutionTarget = evolutionTargets && !!creature && legalEvolutionTarget('reserve', index);
+      const essenceTarget = essenceTargets && !!creature && legalEssenceTarget('reserve', index);
       const targetAttrs = evolutionTarget
         ? ' tabindex="0" role="button" data-evolve-target-where="reserve" data-evolve-target-index="' + index + '" aria-label="Evolve selected card onto ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
-        : (handTarget
-          ? (setupMode
-            ? ' tabindex="0" role="button" data-setup-place-where="reserve" data-setup-place-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + ' during setup"'
-            : ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + '"')
-          : '');
+        : (essenceTarget
+          ? ' tabindex="0" role="button" data-essence-target-where="reserve" data-essence-target-index="' + index + '" aria-label="Attach selected Essence to ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
+          : (handTarget
+            ? (setupMode
+              ? ' tabindex="0" role="button" data-setup-place-where="reserve" data-setup-place-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + ' during setup"'
+              : ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + '"')
+            : ''));
       const contextActions = setupReturn && creature ? [{
         intent: 'setup_return',
         label: 'Return to hand',
@@ -274,7 +296,7 @@
         where: 'reserve',
         index
       }] : [];
-      return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
+      return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + (essenceTarget ? ' is-essence-target' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
         ownerLabel + ' Reserve ' + (index + 1) + '</span>' + creatureCard(creature, { contextActions }) + '</section>';
     }).join('');
   }
@@ -295,8 +317,11 @@
       contextActions
     });
     const evolutionTarget = !!opts.evolutionTargets && !!creature && legalEvolutionTarget('vanguard', null);
+    const essenceTarget = !!opts.essenceTargets && !!creature && legalEssenceTarget('vanguard', null);
     if (evolutionTarget) {
       node.innerHTML = '<div class="sb-vanguard-hand-target is-evolution-target" tabindex="0" role="button" data-evolve-target-where="vanguard" aria-label="Evolve selected card onto your Vanguard">' + card + '</div>';
+    } else if (essenceTarget) {
+      node.innerHTML = '<div class="sb-vanguard-hand-target is-essence-target" tabindex="0" role="button" data-essence-target-where="vanguard" aria-label="Attach selected Essence to your Vanguard">' + card + '</div>';
     } else if (opts.handTarget) {
       node.innerHTML = '<div class="sb-vanguard-hand-target is-hand-target" tabindex="0" role="button" data-setup-place-where="vanguard" aria-label="Try selected hand card as your Vanguard during setup">' + card + '</div>';
     } else {
@@ -426,7 +451,8 @@
     const setupHandTarget = !!state.selectedHandUid && canSetup;
     const selectedPlayCard = !!state.selectedHandUid && canPlayFromHand;
     const evolutionMode = selectedPlayCard && state.evolutionProjectionUid === state.selectedHandUid && state.evolutionEligible;
-    const playHandTarget = selectedPlayCard && !evolutionMode && !state.evolutionProjectionBusy;
+    const essenceMode = selectedPlayCard && !evolutionMode && state.essenceProjectionUid === state.selectedHandUid && state.essenceEligible;
+    const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !state.evolutionProjectionBusy && !state.essenceProjectionBusy;
 
     $('oppVanguard').innerHTML = creatureCard(view.opponent && view.opponent.vanguard, {});
     renderYourVanguard(view.you && view.you.vanguard, {
@@ -434,6 +460,7 @@
       canAct: canAttack,
       handTarget: setupHandTarget,
       evolutionTargets: evolutionMode,
+      essenceTargets: essenceMode,
       setupReturn: canSetup
     });
     renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent');
@@ -441,6 +468,7 @@
       handTarget: setupHandTarget || playHandTarget,
       handTargetMode: canSetup ? 'setup' : 'play',
       evolutionTargets: evolutionMode,
+      essenceTargets: essenceMode,
       setupReturn: canSetup
     });
     renderRealm(view, playHandTarget);
@@ -468,9 +496,11 @@
     else if (view.phase === 'setup' && canSetup && state.selectedHandUid) setStatus('Setup card selected. Choose your Vanguard or a Reserve position; the server validates starter and slot legality.', 'ready');
     else if (view.phase === 'setup' && canSetup) setStatus('Your setup turn. Select a hand card to place, return a setup Creature from its card, or lock setup when ready.', 'ready');
     else if (view.phase === 'setup') setStatus('Waiting for the other player to finish setup.', 'wait');
-    else if (state.selectedHandUid && state.evolutionProjectionBusy && canPlayFromHand) setStatus('Checking Evolution targets with the authoritative Creature/Evolution owner…', 'busy');
+    else if (state.selectedHandUid && (state.evolutionProjectionBusy || state.essenceProjectionBusy) && canPlayFromHand) setStatus('Checking legal card destinations with the authoritative gameplay owners…', 'busy');
     else if (state.selectedHandUid && canPlayFromHand && state.evolutionEligible && !state.evolutionTargets.length) setStatus('Evolution card selected. The server reports no legal Creature stack this turn.', 'wait');
     else if (state.selectedHandUid && canPlayFromHand && state.evolutionEligible) setStatus('Evolution card selected. Choose a green Creature stack; the server will revalidate before committing.', 'ready');
+    else if (state.selectedHandUid && canPlayFromHand && state.essenceEligible && !state.essenceTargets.length) setStatus('Essence card selected. The server reports no legal Creature target this turn.', 'wait');
+    else if (state.selectedHandUid && canPlayFromHand && state.essenceEligible) setStatus('Essence card selected. Choose a green Creature target; the server will revalidate before attaching.', 'ready');
     else if (state.selectedHandUid && canPlayFromHand) setStatus('Hand card selected. Choose a Reserve position or the shared Realm slot; the server validates the destination and card legality.', 'ready');
     else if (yourTurn) setStatus('Your turn. Select a hand card for a board destination or your active Creature for its card actions.', 'ready');
     else setStatus('Board synced. Waiting for the opponent or the next server phase.', 'wait');
@@ -490,15 +520,22 @@
           state.selectedHandUid = deselect ? '' : uid;
           state.selectedAnchorUid = '';
           clearEvolutionProjection();
+          clearEssenceProjection();
           render();
-          if (!deselect) runEvolutionTargetProjection(uid).catch((error) => {
-            setStatus(error instanceof Error ? error.message : String(error), 'error');
-          });
+          if (!deselect) {
+            Promise.all([
+              runEvolutionTargetProjection(uid),
+              runEssenceTargetProjection(uid)
+            ]).catch((error) => {
+              setStatus(error instanceof Error ? error.message : String(error), 'error');
+            });
+          }
           return;
         }
         state.selectedAnchorUid = state.selectedAnchorUid === anchor ? '' : anchor;
         state.selectedHandUid = '';
         clearEvolutionProjection();
+        clearEssenceProjection();
         render();
       };
       card.addEventListener('click', (event) => {
@@ -582,6 +619,27 @@
           ? null
           : Number(target.dataset.evolveTargetIndex);
         await runEvolutionIntent(state.selectedHandUid, where, index);
+      };
+      target.addEventListener('click', async (event) => {
+        if (event.target.closest('[data-card-intent]')) return;
+        event.stopPropagation();
+        await activate();
+      });
+      target.addEventListener('keydown', async (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          event.stopPropagation();
+          await activate();
+        }
+      });
+    });
+    document.querySelectorAll('[data-essence-target-where]').forEach((target) => {
+      const activate = async () => {
+        const where = String(target.dataset.essenceTargetWhere || '');
+        const index = target.dataset.essenceTargetIndex == null || target.dataset.essenceTargetIndex === ''
+          ? null
+          : Number(target.dataset.essenceTargetIndex);
+        await runEssenceIntent(state.selectedHandUid, where, index);
       };
       target.addEventListener('click', async (event) => {
         if (event.target.closest('[data-card-intent]')) return;
@@ -749,6 +807,70 @@
       }));
       state.selectedHandUid = '';
       clearEvolutionProjection();
+      clearEssenceProjection();
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runEssenceTargetProjection(cardUid) {
+    const view = viewState();
+    const seat = Number(view && view.you && view.you.seat);
+    const canProject = !!cardUid && view && view.phase === 'play' && Number(view.active_seat) === seat && !state.busy;
+    if (!canProject) return;
+    state.essenceProjectionUid = cardUid;
+    state.essenceProjectionBusy = true;
+    state.essenceEligible = false;
+    state.essenceTargets = [];
+    render();
+    try {
+      const response = await callEdge(API_MATCH, Object.assign(actionBase('attach_essence_targets'), {
+        card_uid: cardUid
+      }));
+      if (state.selectedHandUid !== cardUid) return;
+      const projected = response && response.result && typeof response.result === 'object' ? response.result : {};
+      state.essenceProjectionUid = cardUid;
+      state.essenceEligible = projected.eligible === true;
+      state.essenceTargets = state.essenceEligible && Array.isArray(projected.legal_targets)
+        ? projected.legal_targets.map((target) => ({
+            where: String(target && target.where || ''),
+            index: target && target.index == null ? null : Number(target.index),
+            anchor_uid: String(target && target.anchor_uid || '')
+          })).filter((target) =>
+            (target.where === 'vanguard' && target.index === null) ||
+            (target.where === 'reserve' && Number.isInteger(target.index) && target.index >= 0 && target.index <= 3)
+          )
+        : [];
+    } finally {
+      if (state.selectedHandUid === cardUid) {
+        state.essenceProjectionBusy = false;
+        render();
+      }
+    }
+  }
+
+  async function runEssenceIntent(cardUid, where, index) {
+    if (!cardUid) throw new Error('Select an Essence card first.');
+    if (!legalEssenceTarget(where, index)) throw new Error('That Creature is not in the server-projected Essence target list.');
+    state.busy = true;
+    render();
+    setStatus('Submitting Essence attachment to the authoritative Essence Attachment owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, Object.assign(actionBase('attach_essence'), {
+        card_uid: cardUid,
+        where,
+        index
+      }));
+      state.selectedHandUid = '';
+      clearEvolutionProjection();
+      clearEssenceProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -772,6 +894,7 @@
       }));
       state.selectedHandUid = '';
       clearEvolutionProjection();
+      clearEssenceProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -797,6 +920,7 @@
       }));
       state.selectedHandUid = '';
       clearEvolutionProjection();
+      clearEssenceProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -839,6 +963,7 @@
       if (!hand.some((instance) => String(instance && instance.uid || '') === state.selectedHandUid)) {
         state.selectedHandUid = '';
         clearEvolutionProjection();
+        clearEssenceProjection();
       }
     }
     render();
