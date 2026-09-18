@@ -35,3 +35,14 @@ Legacy fallback and Stone Flintkin compatibility are preserved. No browser trans
 **State:** 🔄
 
 Hold Supabase promotion and INTERACT-04 browser work until exact-head TCG Validation, Migration Replay, Functional Smoke, review/status, bounded-diff and release-control gates pass.
+
+
+## V2.4.15-006 — historical Relic ownership contract rollover
+
+**State:** ✅ REPAIR CANDIDATE
+
+TCG #683 completed the deterministic runtime suite and every Match/Tactic/private-alpha type-check successfully. The Set One Node lane failed only two historical assertions in `card-pass-2-runtime-relic-ownership.test.mjs`: the old contract forbade the Relic owner from containing Relic subtype legality at all and required the former single-symbol import syntax.
+
+Those assertions described the pre-V2.4.15 ownership split. They now protect the new canonical boundary instead: the Relic owner may own generic Tactic/Relic declaration legality, remains forbidden from card-ID-specific authority, and Match Actions imports/delegates all three Relic owner seams. Legacy dispatcher fallback and Flintkin compatibility checks remain protected.
+
+No production/runtime source changed in this repair.
