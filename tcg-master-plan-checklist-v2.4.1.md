@@ -149,6 +149,16 @@ Animation must remain projection only; authoritative server state survives refre
 
 ## H. Release shell look/feel
 
+### V2.4.28 approved TCG client visual authority
+- [x] **SHELL-VIS-PLAN-03** TCG routes render no generic Stream Bandit website header/search/account/footer chrome; shared Stream Bandit config/auth functions may remain non-visual dependencies.
+- [x] **SHELL-VIS-PLAN-04** Approved primary TCG client navigation is Battle · Decks · Collection · Battle Pass · Shop · Settings.
+- [x] **SHELL-VIS-PLAN-05** The TCG viewport itself never scrolls; card/deck/collection/shop/pack/reward/social feeds scroll only inside bounded internal panels.
+- [x] **SHELL-VIS-PLAN-06** Seven user-approved 1672×941 Play/Battle/Decks/Collection/Battle Pass/Shop/Settings references are immutable art-direction authority under `tcg-visual-authority-v2.4.28.md`.
+- [x] **BATTLE-PASS-PLAN-01** Battle Pass is a required player-facing route.
+- [ ] **BATTLE-PASS-IMPL-01** Define and prove the canonical progression/economy owner before XP, currencies, premium state, challenges or reward claims become authoritative.
+- [ ] **BATTLE-PASS-IMPL-02** Bind Battle Pass feeds and claims to that owner with no browser-owned reward economy.
+
+
 Inherited V2.4 route model remains:
 
 `Landing / Sign In → Game Home → Play / Ranked → Matchmaking → Opponent Found → Board-only Match → Result`

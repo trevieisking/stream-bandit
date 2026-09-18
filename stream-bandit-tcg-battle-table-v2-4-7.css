@@ -65,3 +65,16 @@ button{font:inherit}.sb-battle{width:min(1680px,100%);margin:auto;padding:10px}.
 .sb-reserve-slot.is-promotion-target{position:relative;cursor:pointer;border-color:#ffb84d99!important;background:#ffb84d10!important;box-shadow:inset 0 0 0 2px #ffb84d38,0 0 24px #ffb84d28}
 .sb-reserve-slot.is-promotion-target:after{content:"Promote";position:absolute;right:5px;bottom:4px;border:1px solid #ffb84d66;border-radius:999px;padding:2px 6px;background:#1c1307eb;color:#ffe4b5;font-size:7px;font-weight:950;pointer-events:none;z-index:3}
 .sb-reserve-slot.is-promotion-target:hover,.sb-reserve-slot.is-promotion-target:focus-visible,.sb-reserve-slot.is-promotion-selected{outline:none;border-color:#22d3a6!important;background:#22d3a618!important;box-shadow:inset 0 0 0 2px #22d3a650,0 0 32px #22d3a648}
+
+/* V2.4.28 approved fixed-client battle framing */
+html,body{height:100%;min-height:0;overflow:hidden}
+.sb-battle{width:100%;height:100dvh;max-width:none;margin:0;padding:6px;display:grid;grid-template-rows:58px auto auto auto minmax(0,1fr) auto;gap:5px;overflow:hidden}
+.sb-game-nav{display:grid;grid-template-columns:minmax(180px,1.7fr) repeat(6,minmax(72px,1fr));align-items:stretch;border:1px solid #58cfff66;border-radius:14px;background:linear-gradient(180deg,#061421ee,#020812ee);box-shadow:0 7px 28px #000b;overflow:hidden}
+.sb-game-nav a{display:flex;align-items:center;justify-content:center;text-decoration:none;color:#eaf8ff;text-transform:uppercase;font-size:10px;font-weight:950;letter-spacing:.08em;border-right:1px solid #54cfff28}
+.sb-game-nav a.is-active{background:linear-gradient(180deg,#126fbd,#073763);box-shadow:inset 0 -3px 0 #75e9ff,0 0 20px #39c7ff4d}
+.sb-game-brand{justify-content:flex-start!important;gap:8px;padding:4px 10px!important;text-transform:none!important}
+.sb-game-brand img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 0 9px #34c4ff88)}.sb-game-brand strong{font-family:Georgia,"Times New Roman",serif;font-size:15px;line-height:1}.sb-game-brand span{display:block;color:#60e9ff;letter-spacing:.25em;font-size:8px;margin-top:3px}
+.sb-hud{position:relative;top:auto;border-radius:11px;padding:5px 8px}.sb-status{margin:0;padding:5px 8px}.sb-phase-controls{margin:0;padding:5px 8px}
+.sb-table{min-height:0;height:100%;gap:4px;padding:6px;border-radius:18px;grid-template-rows:minmax(30px,.45fr) minmax(46px,.7fr) minmax(94px,1.5fr) minmax(36px,.55fr) minmax(94px,1.5fr) minmax(46px,.7fr) minmax(78px,1.1fr);overflow:hidden}
+.sb-zone-panel,.sb-hand-wrap,.sb-realm-slot{padding:4px;border-radius:11px}.sb-zone-label{margin-bottom:2px}.sb-reserve-slot,.sb-vanguard-slot{min-height:84px}.sb-card-art{height:40px}.sb-tcg-card{padding:5px;border-radius:11px}.sb-tcg-card h2{font-size:11px;margin:3px 0}.sb-hand{max-height:100%;overflow-x:auto;overflow-y:hidden}.sb-foot{margin:0}
+@media(max-height:760px){.sb-battle{grid-template-rows:50px auto auto auto minmax(0,1fr) auto}.sb-game-nav{border-radius:10px}.sb-game-nav a{font-size:8px}.sb-game-brand img{width:34px;height:34px}.sb-game-brand strong{font-size:12px}.sb-table{grid-template-rows:minmax(24px,.35fr) minmax(38px,.55fr) minmax(76px,1.35fr) minmax(30px,.45fr) minmax(76px,1.35fr) minmax(38px,.55fr) minmax(66px,1fr)}}

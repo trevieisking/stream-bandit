@@ -100,6 +100,31 @@
     return data;
   }
 
+  function renderDeckFeed(decks, selectedId) {
+    const feed = $('tcgDeckFeed');
+    if (!feed) return;
+    feed.innerHTML = '';
+    for (const deck of decks || []) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'tcg-deck-choice' + (String(deck.id) === String(selectedId || '') ? ' is-selected' : '');
+      button.dataset.deckId = String(deck.id || '');
+      const elements = deck.secondary_element ? String(deck.primary_element) + ' / ' + String(deck.secondary_element) : String(deck.primary_element || 'Unknown');
+      button.innerHTML = '<span aria-hidden="true"></span><span><strong></strong><small></small></span><b>60</b>';
+      button.querySelector('strong').textContent = String(deck.name || 'Deck');
+      button.querySelector('small').textContent = elements;
+      button.addEventListener('click', () => {
+        const select = $('tcgDeckSelect');
+        if (select) {
+          select.value = String(deck.id || '');
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        Array.from(feed.querySelectorAll('.tcg-deck-choice')).forEach((node) => node.classList.toggle('is-selected', node === button));
+      });
+      feed.appendChild(button);
+    }
+  }
+
   function option(select, value, label) {
     const node = document.createElement('option');
     node.value = value;
@@ -163,6 +188,7 @@
       if (starterPanel) starterPanel.hidden = false;
       setMatchControls(false);
       setStatus('Choose a starter deck before entering Quick Match.');
+      renderDeckFeed([], '');
       await loadStarters();
       return;
     }
@@ -180,11 +206,13 @@
     if (!select.value && data.length === 1) select.value = String(data[0].id);
 
     state.selectedDeckId = String(select.value || '');
+    renderDeckFeed(data, state.selectedDeckId);
     select.disabled = false;
     select.onchange = () => {
       state.selectedDeckId = String(select.value || '');
       const button = $('tcgQuickMatch');
       if (button) button.disabled = !state.selectedDeckId || state.queueBusy;
+      renderDeckFeed(data, state.selectedDeckId);
     };
     if (starterPanel) starterPanel.hidden = true;
     setMatchControls(true);
