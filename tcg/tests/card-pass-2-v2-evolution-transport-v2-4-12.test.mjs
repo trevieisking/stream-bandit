@@ -45,7 +45,8 @@ test('Evolution commits through the existing server action and revalidates targe
 
 test('Evolution mode suppresses generic Reserve and Realm hand targets without changing their transports', () => {
   assert.match(controller, /const evolutionMode = selectedPlayCard/);
-  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode/);
+  assert.match(controller, /const directPlayMode = selectedPlayCard && !evolutionMode/);
+  assert.match(controller, /state\.playProjectionUid === state\.selectedHandUid/);
   assert.match(controller, /actionBase\('play_creature'\)/);
   assert.match(controller, /actionBase\('play_realm'\)/);
 });
