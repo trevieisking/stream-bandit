@@ -79,3 +79,18 @@ The guard still required the pre-V2.4.13 inline sequence where `td=top(cr,s)` ap
 The guard now verifies the current canonical chain instead: structured branch → shared manual Essence legality delegate → validated target UID anchor → existing external Attachment Route → Attachment Engine → Surge lifecycle owner. Existing checks that forbid Match Actions from regaining attachment lifecycle authority remain unchanged.
 
 No gameplay rule, card data, browser behavior, database/schema, Edge deployment or legacy fallback behavior changes in this repair.
+
+
+## V2.4.13-010 — exact-head acceptance and in-place Edge promotion
+
+**State:** ✅ ACCEPTED / EDGE PROMOTED
+
+Accepted runtime head: `a9817ac760ac4082998e4da9a9c48f6789f41695`.
+
+Exact gates all passed: TCG Card Pass 2 Validation #677, Migration Replay #847, Functional Smoke #873; review threads remained zero and no legacy combined statuses were present.
+
+Supabase project `xzxqfrvqdgkzwujbkdbk` promoted the existing `tcg-match-actions` function in place from v3 to **v4 / ACTIVE**, with `verify_jwt=true` preserved. No project, branch, database migration or new Edge Function was created.
+
+Deployment used the already-working v3 runtime bundle and replaced exactly the two runtime files changed since accepted V2.4.11: `functions/tcg-match-actions/index.ts` and `functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts`. Post-deploy read-back matched both accepted GitHub files byte-for-byte. Deployed bundle remains 84 runtime files because the existing type-only dependency is stripped at runtime; release-control source closure remains 85 files.
+
+V2.4.13 therefore closes the server legality half of INTERACT-03. Browser Essence selection/highlighting/commit remains the next V2.4.14 target. PR merge, `main`, GitHub Pages/public and full-live release remain HOLD.

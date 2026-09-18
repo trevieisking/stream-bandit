@@ -32,13 +32,13 @@
 
 ## D. Exact-head / deployment gates
 
-- [ ] **V2413-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2413-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2413-CI-03** Functional Smoke succeeds.
-- [ ] **V2413-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2413-DIFF-01** diff stays bounded to Essence owner/dispatcher/tests/Runtime Pass B ownership guard/release-control/V2.4.13 controls.
-- [ ] **V2413-DEPLOY-01** accepted exact `tcg-match-actions` source is promoted in place with JWT verification preserved.
-- [ ] **V2413-DEPLOY-02** deployed entrypoint + Essence owner are re-read and match accepted GitHub source.
+- [x] **V2413-CI-01** TCG Card Pass 2 Validation succeeds — #677 on accepted runtime head `a9817ac760ac4082998e4da9a9c48f6789f41695`.
+- [x] **V2413-CI-02** Migration Replay succeeds from zero — #847.
+- [x] **V2413-CI-03** Functional Smoke succeeds — #873.
+- [x] **V2413-REVIEW-01** review threads remain zero / material findings resolved.
+- [x] **V2413-DIFF-01** diff stays bounded to Essence owner/dispatcher/tests/Runtime Pass B ownership guard/release-control/V2.4.13 controls.
+- [x] **V2413-DEPLOY-01** accepted exact `tcg-match-actions` runtime delta is promoted in place as Supabase v4 with JWT verification preserved.
+- [x] **V2413-DEPLOY-02** deployed entrypoint + Essence owner were re-read and match accepted GitHub source byte-for-byte.
 
 ## E. Master-plan state
 
@@ -49,4 +49,4 @@
 - [x] **INTERACT-05** Realm.
 - [ ] **INTERACT-06** Tactic.
 
-**Decision:** candidate source only until D passes. Current Supabase v3 / merge / main / public / full-live remain unchanged.
+**Decision:** V2.4.13 server seam ACCEPTED ✅. Supabase `tcg-match-actions` v4 is ACTIVE with JWT verification preserved. INTERACT-03 remains open only for the V2.4.14 browser interaction. PR merge / `main` / public / full-live remain HOLD 🔒.

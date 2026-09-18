@@ -42,3 +42,12 @@ No browser Essence legality is added in this slice. V2.4.14 will consume the ser
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff evidence are required before deciding an in-place update of the existing `tcg-match-actions` Edge Function.
 
 The Runtime Pass B Surge ownership guard must validate the current shared-legality → external Attachment Route → Attachment Engine → Surge lifecycle chain rather than freeze the historical pre-owner inline Match Actions source shape.
+
+
+## 6. Accepted checkpoint
+
+V2.4.13 server legality seam is accepted at runtime head `a9817ac760ac4082998e4da9a9c48f6789f41695` after TCG #677, Migration #847 and Functional #873 all succeeded.
+
+Production `tcg-match-actions` is ACTIVE v4 with JWT verification preserved. Post-deploy read-back confirmed the deployed entrypoint and Essence Attachment owner exactly match the accepted GitHub bytes.
+
+**Next locked target:** V2.4.14 / INTERACT-03 browser Essence interaction: selected hand card → server `attach_essence_targets(card_uid)` projection → only returned Creature coordinates highlighted → existing `attach_essence` commit. Browser remains presentation-only.
