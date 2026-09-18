@@ -39,3 +39,26 @@ V2.4.15 Relic server-seam, V2.4.14 Essence and V2.4.9 Realm regression tests are
 **State:** 🔄
 
 Hold INTERACT-04 acceptance until fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff gates pass.
+
+
+## V2.4.16-007 — exact-head acceptance
+
+**State:** ✅ ACCEPTED
+
+Accepted browser head: `ff2f42507e0ad104bc63aa2a227fbacd7e0949f2`.
+
+Exact gates all passed:
+- TCG Card Pass 2 Validation #688 ✅
+- Migration Replay #858 attempt 2 ✅
+- Functional Smoke #884 ✅
+- review threads: 0 ✅
+- legacy combined statuses: 0 ✅
+- bounded diff: battle browser/CSS/cache/tests/V2.4.16 controls only ✅
+
+Migration #858 attempt 1 failed before source replay because `supabase/setup-cli@v1` could not resolve the latest CLI release due to an upstream rate limit. Retrying the same exact-head job succeeded through CLI install, source replay, disposable database startup and zero-to-current replay; no workflow or product source repair was required.
+
+Supabase remains unchanged at the already-accepted `tcg-match-actions` **v5 / ACTIVE / verify_jwt=true** because V2.4.16 contains no server runtime bytes.
+
+INTERACT-04 Relic is now complete end-to-end: the Relic owner remains the sole legality authority; the battlefield asks for legal target coordinates, renders only those targets and commits through the existing `attach_relic` action.
+
+PR merge, `main`, public Pages and full-live release remain HOLD pending inherited E2E/release gates.

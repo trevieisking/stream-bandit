@@ -41,3 +41,12 @@ Setup, Attack, Ability, Realm, renderer, Supabase runtime and all card data rema
 ## 4. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff evidence are required. This is a browser/UI slice; Supabase v5 remains the accepted server seam and requires no V2.4.16 redeploy.
+
+
+## 5. Accepted checkpoint
+
+V2.4.16 is accepted at browser head `ff2f42507e0ad104bc63aa2a227fbacd7e0949f2` after TCG #688, Migration #858 attempt 2 and Functional Smoke #884 all succeeded.
+
+INTERACT-04 Relic is complete. Supabase remains `tcg-match-actions` v5 ACTIVE with JWT verification preserved; no V2.4.16 server redeploy was required.
+
+**Next Master Plan interaction target:** INTERACT-06 Tactic. Re-read the existing Tactic server owner/action contract before adding browser behavior; do not infer Tactic transport semantics from Relic/Realm alone.
