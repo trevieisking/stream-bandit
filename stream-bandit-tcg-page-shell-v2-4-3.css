@@ -226,3 +226,7 @@ main.tcg-page{gap:7px}
  .tcg-screen-title h1{font-size:36px}.tcg-client{grid-template-rows:66px minmax(0,1fr)}.tcg-client-brand img{width:52px;height:52px}.tcg-client-brand-copy strong{font-size:20px}
  .tcg-frame p{font-size:10px}.tcg-mode-card .tcg-btn{padding:7px 10px}.tcg-empty-art{min-height:110px}.tcg-reward{min-height:120px}
 }
+
+/* V2.4.30 final visual polish */
+.tcg-client-topbar{position:relative;overflow:hidden}
+.tcg-card-tile strong{padding-top:0!important}
