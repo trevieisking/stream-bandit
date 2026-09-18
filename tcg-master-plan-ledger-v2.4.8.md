@@ -62,7 +62,7 @@ A dedicated Card Pass 2 regression contract proves:
 
 ## V2.4.8-007 — validation fence
 
-**State:** 🔄 FRESH EXACT-HEAD EVIDENCE REQUIRED
+**State:** ✅ ACCEPTED @ `d218c946daf7fa1971f32589ca0a7dd5c7a655a1`
 
 Before V2.4.8 source acceptance, the final PR head must pass:
 
@@ -72,9 +72,18 @@ Before V2.4.8 source acceptance, the final PR head must pass:
 4. zero material review threads;
 5. bounded diff review from `bc721a31...`.
 
+## V2.4.8-008 — exact-head acceptance
+
+**State:** ✅ ACCEPTED
+
+Exact head `d218c946daf7fa1971f32589ca0a7dd5c7a655a1` passed TCG Validation #659, Migration Replay #829 from zero and Functional Smoke #855 with an independent PostgreSQL replay. Review threads were zero, legacy combined statuses had no entries, and the bounded V2.4.8 delta contained only the intended interaction/test/continuity scope.
+
+The accepted browser capability is limited to selecting a known local hand instance and submitting `card_uid + reserve_index` through the existing action envelope to server-owned `play_creature`. Server legality remains authoritative.
+
 ## V2.4.8 checkpoint
 
+**Accepted exact head:** `d218c946daf7fa1971f32589ca0a7dd5c7a655a1`.  
 **PR:** #576 remains draft/unmerged.  
 **Supabase production:** no V2.4.8 database or Edge deployment is required.  
 **`main` / GitHub Pages / public/live:** HOLD.  
-**Next after acceptance:** re-read the Master Plan and take the next smallest direct-card interaction backed by an existing canonical server owner.
+**Next after acceptance:** re-read the Master Plan now and take the next smallest direct-card interaction backed by an existing canonical server owner; do not infer legality in the browser.

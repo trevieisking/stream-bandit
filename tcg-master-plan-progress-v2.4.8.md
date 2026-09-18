@@ -73,3 +73,21 @@ The final V2.4.8 exact head must freshly pass:
 5. bounded diff review against continuity parent `bc721a31...`.
 
 After acceptance, re-read the Master Plan and choose the next smallest direct-card interaction that can reuse an existing canonical server owner without moving rules into the browser.
+
+
+## 7. Exact-head acceptance
+
+V2.4.8 source was accepted on PR #576 at exact head `d218c946daf7fa1971f32589ca0a7dd5c7a655a1`.
+
+Fresh same-head evidence:
+
+- TCG Card Pass 2 Validation #659 — SUCCESS;
+- Code Labs Migration Replay #829 — SUCCESS from zero;
+- Code Labs V50 Functional Smoke #855 — SUCCESS, including independent zero-to-current PostgreSQL replay;
+- review threads — 0;
+- legacy combined-status entries — none found;
+- bounded V2.4.8 delta from continuity parent `bc721a31ec1f5a48dd7910993177b402ab4d4fdf` — 3 commits ahead / 0 behind / exactly 8 intended files.
+
+This acceptance authorizes the V2.4.8 capability as PR source state only. PR merge, `main`, GitHub Pages/public, live and production release remain HOLD.
+
+**Next planning instruction:** re-read the accepted Master Plan and choose the next smallest direct-card interaction that reuses an existing canonical server command without moving gameplay legality into the browser.

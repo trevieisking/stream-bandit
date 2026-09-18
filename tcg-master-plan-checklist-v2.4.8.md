@@ -59,10 +59,10 @@ This checklist edit is continuity-only and exists to create one queue-clear sync
 
 ## E. Exact-head V2.4.8 gates
 
-- [ ] **V248-CI-01** TCG Card Pass 2 Validation succeeds at final exact head.
-- [ ] **V248-CI-02** Code Labs Migration Replay succeeds from zero at final exact head.
-- [ ] **V248-CI-03** Code Labs V50 Functional Smoke succeeds at final exact head.
-- [ ] **V248-REVIEW-01** Review threads remain zero / all material findings resolved.
-- [ ] **V248-DIFF-01** Final V2.4.8 diff is limited to direct-hand-placement presentation/transport, regression tests and continuity docs.
+- [x] **V248-CI-01** TCG Card Pass 2 Validation #659 succeeded at accepted exact head `d218c946daf7fa1971f32589ca0a7dd5c7a655a1`.
+- [x] **V248-CI-02** Code Labs Migration Replay #829 succeeded from zero at accepted exact head `d218c946daf7fa1971f32589ca0a7dd5c7a655a1`.
+- [x] **V248-CI-03** Code Labs V50 Functional Smoke #855 succeeded at accepted exact head `d218c946daf7fa1971f32589ca0a7dd5c7a655a1`, including PostgreSQL replay.
+- [x] **V248-REVIEW-01** Review threads were zero at accepted exact head `d218c946daf7fa1971f32589ca0a7dd5c7a655a1`.
+- [x] **V248-DIFF-01** Final V2.4.8 delta from `bc721a31ec1f5a48dd7910993177b402ab4d4fdf` was 3 commits ahead / 0 behind and exactly 8 intended interaction/test/continuity files.
 
-**Current decision:** V2.4.8 is a branch candidate until E passes. PR merge, `main`, public/live and production remain HOLD.
+**Current decision:** V2.4.8 source is ACCEPTED at exact head `d218c946daf7fa1971f32589ca0a7dd5c7a655a1`. This checklist synchronization is historical continuity only. PR merge, `main`, public/live and production remain HOLD.
