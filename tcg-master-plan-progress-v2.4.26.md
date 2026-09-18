@@ -63,3 +63,26 @@ After verified Match deployment:
 - V2-VISUAL-02 becomes 12/12;
 - ORDER-05 closes;
 - Stage 3 direct tabletop interaction + visible state is ready for focused human testing.
+
+## 6. Accepted checkpoint
+
+**Accepted source head:** `0665739589e6675700fd8fd1e68e38b1c55c1007`
+
+- TCG Card Pass 2 Validation #739 ✅
+- Migration Replay #909 ✅
+- Functional Smoke #935 ✅
+- review threads 0 ✅
+- legacy combined statuses 0 ✅
+- bounded V2.4.26 delta: 14 files; one runtime file; Match projection + browser/cache/tests/controls only ✅
+- promotion decision: PROMOTE Match only ✅
+- `tcg-match-actions` v6 → v7 ACTIVE, `verify_jwt=true` ✅
+- deployed entrypoint matches GitHub byte-for-byte and exposes `play_card_targets` ✅
+- Tactic v4 / Setup v3 / database migration tail unchanged ✅
+
+Canonical effect:
+- STATE-VIS-05 ✅
+- V2-VISUAL-02 = 12/12 ✅
+- ORDER-05 ✅
+- Stage 3 direct tabletop interaction + visible state is ready for focused human testing ✅
+
+Release boundary remains unchanged: PR draft/unmerged; `main`, public/Pages and full-live HOLD.
