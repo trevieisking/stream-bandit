@@ -41,15 +41,15 @@
 
 ## E. Exact-head gates
 
-- [ ] **V2410-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2410-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2410-CI-03** Functional Smoke succeeds including PostgreSQL replay.
-- [ ] **V2410-REVIEW-01** Review threads remain zero / material findings resolved.
-- [ ] **V2410-DIFF-01** Diff from `b5baf1dd...` stays bounded to setup-cycle presentation/transport, reusable action markup, tests and V2.4.10 controls.
+- [x] **V2410-CI-01** TCG Card Pass 2 Validation #665 succeeded at exact head `f9f12f9d4960a9dbc403a3bb50e23a24ee85f81a`.
+- [x] **V2410-CI-02** Migration Replay #835 succeeded from zero at exact head `f9f12f9d4960a9dbc403a3bb50e23a24ee85f81a`.
+- [x] **V2410-CI-03** Functional Smoke #861 succeeded at exact head `f9f12f9d4960a9dbc403a3bb50e23a24ee85f81a`, including independent PostgreSQL replay.
+- [x] **V2410-REVIEW-01** Review threads were zero; legacy combined statuses had no entries.
+- [x] **V2410-DIFF-01** Final delta from `b5baf1dde2d39fc45e93f41cd609d22af18808c2` was 2 commits ahead / 0 behind and exactly 9 intended files.
 
 ## F. Master-plan interaction state
 
-- [ ] **INTERACT-01** Creature from hand → Vanguard/Reserve accepted end-to-end through tap/select path.
+- [x] **INTERACT-01** Creature from hand → Vanguard/Reserve accepted end-to-end through tap/select path at `f9f12f9d4960a9dbc403a3bb50e23a24ee85f81a`.
 - [x] **INTERACT-05** Realm → Realm slot remains accepted from V2.4.9.
 - [ ] **INTERACT-02** Evolution.
 - [ ] **INTERACT-03** Essence.
@@ -58,4 +58,13 @@
 - [ ] **INTERACT-07** Full selection cancellation.
 - [ ] **INTERACT-09** Full Vanguard Ability/Attack/Withdraw.
 
-**Current decision:** candidate source only until E passes; merge/main/public/live/production remain HOLD.
+## G. Attack / Ability rule fence
+
+- [x] **RULE-ACTION-01** Attack remains a Vanguard card-context action.
+- [x] **RULE-ACTION-02** Legal Attack resolves damage/effects/choices/listeners/defeats first, then Aftermath and turn advance; special extra-turn effects may change the next active seat without making Attack non-terminal for the turn.
+- [x] **RULE-ACTION-03** All 19 current Set One manual active Abilities are `own_turn` and once per controller turn.
+- [x] **RULE-ACTION-04** Active Ability effect is card-defined; search/inspect/reorder, attach/move Essence, heal, switch, modifier, Shield and control effects are examples rather than universal choices.
+- [x] **RULE-ACTION-05** Triggered/continuous Abilities remain separate event/passive systems.
+- [x] **RULE-ACTION-06** GitHub match-action source matches deployed Supabase `tcg-match-actions` v2 byte-for-byte at acceptance.
+
+**Current decision:** V2.4.10 source is ACCEPTED at exact head `f9f12f9d4960a9dbc403a3bb50e23a24ee85f81a`. This synchronization commit is historical continuity only; merge/main/public/live/production remain HOLD.

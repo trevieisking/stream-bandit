@@ -40,10 +40,31 @@ Opening first/second and Setup Ready controls route directly to the existing pri
 
 ## V2.4.10-006 — validation fence
 
-**State:** 🔄 FRESH EXACT-HEAD EVIDENCE REQUIRED
+**State:** ✅ ACCEPTED @ `f9f12f9d4960a9dbc403a3bb50e23a24ee85f81a`
 
-Fresh TCG Validation, zero-to-current Migration Replay, Functional Smoke, review-thread check and bounded diff review are mandatory before acceptance.
+TCG #665, Migration #835 and Functional #861 all succeeded at the exact repaired head. Review threads were zero, legacy combined statuses had no entries, and the bounded V2.4.10 delta from `b5baf1dd...` was 2 commits / 9 intended files.
+
+## V2.4.10-007 — historical Realm regression repair
+
+**State:** ✅ ACCEPTED
+
+Initial head `783c66b0...` exposed only two stale V2.4.9 presentation assertions. Repair head `f9f12f9d...` modified one historical Realm regression test so later tabletop versions can advance cache identity while still proving the V2.4.9 Realm authority contract. No gameplay/controller/server bytes changed in the repair.
+
+## V2.4.10-008 — Attack / Ability rule fence
+
+**State:** ✅ EVIDENCE ACCEPTED
+
+GitHub `supabase/functions/tcg-match-actions/index.ts` matches deployed Supabase `tcg-match-actions` v2 byte-for-byte.
+
+Attack is card-context and turn-ending: full Attack damage/effects/choices/listeners and defeat-resolution complete before canonical Aftermath and turn advancement. Special extra-turn rules may alter who receives the next turn.
+
+All 19 current Set One manual active Abilities are `timing: own_turn` and exactly once per controller turn. Their effects are card-defined and include inspection/search/reorder, Essence attach/move, healing, switching, modifiers, Shield transfer, control replacement and related programs. Triggered/continuous Abilities are separate.
 
 ## V2.4.10 checkpoint
 
-PR #576 remains draft/unmerged. Production Supabase and `main` are unchanged.
+**Accepted exact head:** `f9f12f9d4960a9dbc403a3bb50e23a24ee85f81a`.  
+**INTERACT-01:** ✅ accepted through tap/select path.  
+**PR:** #576 remains draft/unmerged.  
+**Supabase production:** unchanged.  
+**`main` / GitHub Pages / public/live:** HOLD.  
+**Next:** re-read latest GitHub comments + canonical Master Plan before selecting V2.4.11.

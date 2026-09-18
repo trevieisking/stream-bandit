@@ -62,3 +62,35 @@ Drag/drop polish and generic legal-target highlighting remain separate visual/in
 ## 6. Validation
 
 The final exact head must freshly pass TCG Card Pass 2 Validation, Migration Replay from zero, Functional Smoke, zero material review threads and bounded diff review from `b5baf1dd...`.
+
+
+## 7. Exact-head acceptance
+
+V2.4.10 source was accepted on PR #576 at exact head `f9f12f9d4960a9dbc403a3bb50e23a24ee85f81a`.
+
+Fresh same-head evidence:
+
+- TCG Card Pass 2 Validation #665 — SUCCESS;
+- Code Labs Migration Replay #835 — SUCCESS from zero;
+- Code Labs V50 Functional Smoke #861 — SUCCESS, including independent zero-to-current PostgreSQL replay;
+- review threads — 0;
+- legacy combined-status entries — none found;
+- bounded delta from `b5baf1dde2d39fc45e93f41cd609d22af18808c2` — 2 commits ahead / 0 behind / exactly 9 intended files.
+
+The initial V2.4.10 head `783c66b0...` exposed two stale V2.4.9 regression pins only. Repair head `f9f12f9d...` changed one historical Realm test; gameplay/controller/server bytes did not change in that repair.
+
+**INTERACT-01 is accepted through the tap/select path:** opening/setup Vanguard and Reserve placement now join the already accepted ordinary-play Reserve path under server authority.
+
+### Attack / Ability rule clarification
+
+The current authoritative action model is:
+
+- **Attack is a Vanguard card-context action and is turn-ending.** A legal Attack completes its damage and attack-specific effects/choices/listeners first, resolves defeats/Rewards/promotions as required, then runs canonical Aftermath and advances the turn. A special rule such as Timefold may change which player receives the next turn without changing Attack's role as the turn-ending action.
+- **Manual active Abilities are once per controller turn in current Set One.** All 19 launch-set active Ability definitions are `timing: own_turn` with `limit.scope = turn`, `limit.count = 1`, `limit.owner = controller`.
+- Active Ability effect is defined by the card. Existing programs include deck/reward inspection and ordering, selecting cards/Creatures, attaching or moving Essence, healing, switching, attack/protection modifiers, Shield transfer and control-condition replacement. It is not one universal “search or attach” action.
+- Triggered and continuous Abilities remain separate event/passive systems.
+- GitHub match-action source at the accepted head matches deployed Supabase `tcg-match-actions` v2 byte-for-byte.
+
+**Release boundary:** accepted PR source state only. PR merge, `main`, GitHub Pages/public, live and production release remain HOLD.
+
+**Next planning instruction:** re-read the latest GitHub comments and canonical Master Plan before choosing V2.4.11.
