@@ -37,3 +37,12 @@ After exact-head acceptance and in-place Tactic Edge promotion, INTERACT-06 brow
 ## 5. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status, bounded-diff and release-control evidence are required before promotion.
+
+
+## 6. Accepted checkpoint
+
+V2.4.18 dedicated-owner fence is accepted at runtime head `2b7325c677cdc66cb6ab485fbf031d90190c78b0` after TCG #693, Migration #863 and Functional #889 all succeeded.
+
+Production `tcg-tactic-actions` is ACTIVE v4. Generic Tactic ownership is now **Ally + Device only**. Realm and Relic remain on their dedicated owners.
+
+**Next locked target:** V2.4.19 / INTERACT-06 browser Tactic interaction — server `play_tactic_legality(card_uid)` projection, card-owned Play Tactic action, existing `play_tactic` commit, and a generic server-driven `resolve_choice` panel for Tactic effect/heal/movement choices.

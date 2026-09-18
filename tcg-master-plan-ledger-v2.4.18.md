@@ -31,3 +31,26 @@ One runtime file changes. No browser, effect interpreter, database schema, migra
 **State:** 🔄
 
 Hold Edge promotion and browser Tactic work until fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff gates pass.
+
+
+## V2.4.18-005 — exact-head acceptance and in-place owner-fence promotion
+
+**State:** ✅ ACCEPTED / EDGE PROMOTED
+
+Accepted runtime head: `2b7325c677cdc66cb6ab485fbf031d90190c78b0`.
+
+Exact gates:
+- TCG Card Pass 2 Validation #693 ✅
+- Migration Replay #863 ✅
+- Functional Smoke #889 ✅
+- review threads: 0 ✅
+- legacy combined statuses: 0 ✅
+- bounded runtime change: +8 lines in one Tactic entrypoint ✅
+
+Supabase `tcg-tactic-actions` was promoted in place from v3 to **v4 / ACTIVE**, preserving `verify_jwt=true`. Post-deploy read-back matched the accepted GitHub entrypoint byte-for-byte.
+
+The live evaluator now accepts only Ally/Device and returns `tactic_subtype_uses_dedicated_owner` for Realm/Relic before generic Tactic play can mutate state.
+
+No new project, branch, Edge Function, schema, migration, card-data rewrite or effect interpreter was created.
+
+**Next target:** browser Tactic transport/choice surface, now safe to consume the server projection without stealing Realm/Relic ownership.
