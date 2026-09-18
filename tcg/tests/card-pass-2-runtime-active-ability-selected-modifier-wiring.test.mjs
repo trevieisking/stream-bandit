@@ -124,11 +124,15 @@ test('one live Active-Ability facade owns selected-modifier preflight, receipt, 
   assert.ok(live.includes('choice.kind === "modify_one_friendly_creature"'));
 });
 
-test('Match Actions remains orchestration-only for the selected-modifier family', () => {
+test('Match Actions remains orchestration-only for the selected-modifier family through the shared Ability route helper', () => {
+  const helperStart = match.indexOf('const beginActiveAbilityRoute=');
+  const helperEnd = match.indexOf('const projectAbilitySources=', helperStart);
+  const helper = match.slice(helperStart, helperEnd);
   const useStart = match.indexOf('if(action==="use_ability")');
   const useEnd = match.indexOf('if(action==="play_creature")', useStart);
   const useBlock = match.slice(useStart, useEnd);
-  assert.ok(useBlock.includes('runtimeV02BeginActiveAbilityLiveRoute('));
+  assert.ok(helper.includes('runtimeV02BeginActiveAbilityLiveRoute(state,controllerSeat'));
+  assert.ok(useBlock.includes('beginActiveAbilityRoute(s,seat as 1|2,where,idx)'));
   assert.ok(useBlock.includes('runtimeV02PendingActiveAbilityLiveChoiceView('));
   assert.equal(useBlock.includes('runtimeV02InstallAttackDamageModifier'), false);
   assert.equal(useBlock.includes('runtimeV02InstallDamageProtection'), false);

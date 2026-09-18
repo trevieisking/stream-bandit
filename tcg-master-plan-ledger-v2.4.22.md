@@ -35,3 +35,16 @@ One runtime file changes. No browser/renderer, database schema, migration or car
 **State:** 🔄
 
 Hold Match Edge promotion and browser action work until fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff gates pass.
+
+
+## V2.4.22-006 — historical Ability/Withdraw contract rollover
+
+**State:** ✅ REPAIR CANDIDATE
+
+TCG #702 completed the deterministic runtime and every Deno type-check successfully. Four Node assertions failed because historical tests froze the former inline placement of `runtimeV02BeginActiveAbilityLiveRoute` and Withdrawal declaration checks.
+
+V2.4.22 intentionally centralizes those unchanged authorities so read-only projection and final commit share the same server path:
+- Ability tests now verify the shared `beginActiveAbilityRoute` helper owns the canonical live-route call and real `use_ability` delegates to it.
+- Withdrawal authority tests now verify `withdrawalDeclaration` owns once-per-turn, condition and cost legality while real `withdraw` delegates to it before the unchanged Payment + Atomic Switch transaction.
+
+This repair changes tests/ledger only. The green Match runtime blob and release-control bytes remain unchanged.

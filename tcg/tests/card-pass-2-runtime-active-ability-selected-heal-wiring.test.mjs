@@ -99,12 +99,16 @@ test('selected-heal resolution emits canonical ability heal packets and exposes 
   assert.equal(owner.includes('runtimeV02BeginAbilityHealListenerContinuation'), false, 'pure selected-heal owner must not become live Ability orchestration');
 });
 
-test('live match owner routes Reward and selected-heal active Abilities through one generic facade', () => {
+test('live match owner routes Reward and selected-heal active Abilities through one shared generic facade', () => {
   const useAbility = blockBetween(match, 'if(action==="use_ability")', 'if(action==="play_creature")');
   const resolveAbility = blockBetween(match, 'if(action==="resolve_ability_choice")', 'if(action==="take_reward")');
+  const helperStart = match.indexOf('const beginActiveAbilityRoute=');
+  const helperEnd = match.indexOf('const projectAbilitySources=', helperStart);
+  const helper = match.slice(helperStart, helperEnd);
   assert.ok(match.includes('tcg-match-active-ability-live-v0-2.ts'));
   assert.ok(match.includes('tcg-match-active-ability-live-route-v0-2.ts'));
-  assert.ok(useAbility.includes('runtimeV02BeginActiveAbilityLiveRoute('));
+  assert.ok(helper.includes('runtimeV02BeginActiveAbilityLiveRoute(state,controllerSeat'));
+  assert.ok(useAbility.includes('beginActiveAbilityRoute(s,seat as 1|2,where,idx)'));
   assert.ok(useAbility.includes('runtimeV02PendingActiveAbilityLiveChoiceView('));
   assert.ok(resolveAbility.includes('runtimeV02ResolveActiveAbilityLiveChoice('));
   assert.ok(resolveAbility.includes('resolved.kind==="heal_one_damaged_friendly_creature"'));

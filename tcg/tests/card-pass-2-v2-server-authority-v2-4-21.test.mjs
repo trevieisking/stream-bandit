@@ -109,12 +109,17 @@ test('Attack declaration legality and target resolution remain server-owned befo
   assert.ok(cost >= 0 && requirements > cost && target > requirements && damage > target);
 });
 
-test('future Vanguard Ability and Withdraw interactions already terminate at canonical server owners', () => {
+test('future Vanguard Ability and Withdraw interactions terminate at shared canonical server owners', () => {
+  const abilityHelper = slice(match, 'const beginActiveAbilityRoute=', 'const projectAbilitySources=', 6000);
+  assert.match(abilityHelper, /runtimeV02BeginActiveAbilityLiveRoute\(state,controllerSeat/);
   const ability = slice(match, 'if(action==="use_ability")', 'if(action==="resolve_ability_choice")', 18000);
-  assert.match(ability, /runtimeV02BeginActiveAbilityLiveRoute/);
+  assert.match(ability, /beginActiveAbilityRoute\(s,seat as 1\|2,where,idx\)/);
 
+  const withdrawPlan = slice(match, 'const withdrawalDeclaration=', 'if(action==="field_actions")', 10000);
+  assert.match(withdrawPlan, /withdrawal_already_used_this_turn/);
+  assert.match(withdrawPlan, /condition_prevents_withdrawal/);
+  assert.match(withdrawPlan, /withdrawalCost\(p\.vanguard,s\)/);
   const withdraw = slice(match, 'if(action==="withdraw")', 'if(action==="attack")', 12000);
-  assert.match(withdraw, /withdrawal_already_used_this_turn/);
-  assert.match(withdraw, /condition_prevents_withdrawal/);
+  assert.match(withdraw, /withdrawalDeclaration\(body\.reserve_index,true\)/);
   assert.match(withdraw, /runtimeV02ApplyWithdrawalPaymentAndSwitch/);
 });
