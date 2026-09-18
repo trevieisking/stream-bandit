@@ -66,3 +66,16 @@ TCG #675 showed one remaining historical ownership assertion: the structured ext
 The declaration has already been validated by the shared Essence legality owner, so preserving this expression does not return legality to the dispatcher; it only keeps the accepted route contract visible. The match-actions release fingerprint is refreshed for the resulting entrypoint byte change.
 
 No Essence owner, rule, mutation, listener, legacy fallback, browser, database or card-data behavior changes.
+
+
+## V2.4.13-009 — stale Surge ownership guard repair
+
+**State:** ✅ REPAIR CANDIDATE
+
+TCG #676 passed all 428 Node regression tests and the deterministic v0.2 runtime core, then failed only the historical Runtime Pass B Surge source-shape guard with `match_actions_attachment_engine_boundary_missing`.
+
+The guard still required the pre-V2.4.13 inline sequence where `td=top(cr,s)` appeared immediately before the structured Attachment branch. V2.4.13 intentionally moved final manual Essence declaration legality into the existing Essence Attachment owner before entering that route, so the old exact-string boundary was stale.
+
+The guard now verifies the current canonical chain instead: structured branch → shared manual Essence legality delegate → validated target UID anchor → existing external Attachment Route → Attachment Engine → Surge lifecycle owner. Existing checks that forbid Match Actions from regaining attachment lifecycle authority remain unchanged.
+
+No gameplay rule, card data, browser behavior, database/schema, Edge deployment or legacy fallback behavior changes in this repair.

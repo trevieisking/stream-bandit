@@ -40,3 +40,5 @@ No browser Essence legality is added in this slice. V2.4.14 will consume the ser
 ## 5. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff evidence are required before deciding an in-place update of the existing `tcg-match-actions` Edge Function.
+
+The Runtime Pass B Surge ownership guard must validate the current shared-legality → external Attachment Route → Attachment Engine → Surge lifecycle chain rather than freeze the historical pre-owner inline Match Actions source shape.

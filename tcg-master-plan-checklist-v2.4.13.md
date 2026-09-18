@@ -28,6 +28,7 @@
 - [x] **ESSENCE-REG-03** no browser Essence targeting logic is added.
 - [x] **ESSENCE-REG-04** no DB/schema/card-data change is introduced.
 - [x] **ESSENCE-REG-05** release-control closure remains exact and at 85 source files.
+- [x] **ESSENCE-REG-06** Runtime Pass B Surge guard validates the canonical legality-owner → Attachment Route → Attachment Engine → Surge lifecycle chain without freezing the pre-owner inline dispatcher shape.
 
 ## D. Exact-head / deployment gates
 
@@ -35,7 +36,7 @@
 - [ ] **V2413-CI-02** Migration Replay succeeds from zero.
 - [ ] **V2413-CI-03** Functional Smoke succeeds.
 - [ ] **V2413-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2413-DIFF-01** diff stays bounded to Essence owner/dispatcher/tests/release-control/V2.4.13 controls.
+- [ ] **V2413-DIFF-01** diff stays bounded to Essence owner/dispatcher/tests/Runtime Pass B ownership guard/release-control/V2.4.13 controls.
 - [ ] **V2413-DEPLOY-01** accepted exact `tcg-match-actions` source is promoted in place with JWT verification preserved.
 - [ ] **V2413-DEPLOY-02** deployed entrypoint + Essence owner are re-read and match accepted GitHub source.
 
