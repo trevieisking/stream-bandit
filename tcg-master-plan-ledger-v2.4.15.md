@@ -46,3 +46,12 @@ TCG #683 completed the deterministic runtime suite and every Match/Tactic/privat
 Those assertions described the pre-V2.4.15 ownership split. They now protect the new canonical boundary instead: the Relic owner may own generic Tactic/Relic declaration legality, remains forbidden from card-ID-specific authority, and Match Actions imports/delegates all three Relic owner seams. Legacy dispatcher fallback and Flintkin compatibility checks remain protected.
 
 No production/runtime source changed in this repair.
+
+
+## V2.4.15-007 — exact-head gate concurrency retry
+
+**State:** 🔄 CONTROL-ONLY RETRY
+
+TCG #684 passed at the repaired candidate head. Migration #854 was cancelled before any job started because prior-head Migration #853 still occupied the serialized replay lane; #853 subsequently completed successfully.
+
+This control-only checkpoint retriggers the exact-head TCG / Migration / Functional gate trio after the replay lane is clear. Relic owner, Match Actions, release-control, gameplay rules, database/schema, card data and Supabase production are unchanged.
