@@ -231,3 +231,10 @@ In particular:
 - [ ] Rollback/recovery point recorded.
 
 **Current decision:** 🔒 **HOLD public/live/production.**
+
+
+### V2.4.32 repository-owned branding asset foundation
+- [x] **BRAND-ASSET-01** Approved Stream Bandit TCG elemental stag branding is stored inside the repository under `assets/tcg/branding/`.
+- [x] **BRAND-ASSET-02** Fixed-client top bar uses the optimized repository-owned emblem instead of the missing legacy stag-logo path.
+- [x] **BRAND-ASSET-03** Full logo and topbar emblem are registered in one `assets/tcg/tcg-art-manifest-v1.json` authority using host-relative paths compatible with GitHub Pages and IONOS.
+- [ ] **BRAND-ASSET-HUMAN-01** Human test confirms the new stag emblem renders in the top bar from the branch-hosted page.

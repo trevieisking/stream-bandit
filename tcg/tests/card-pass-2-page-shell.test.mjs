@@ -48,3 +48,16 @@ test('V2.4.31 Settings stays inside the TCG route namespace',async()=>{
   assert.equal(settings.includes('settings-platform-control-hub'),false);
   assert.equal(bridge.includes('settings-platform-control-hub'),false);
 });
+
+
+test('V2.4.32 uses repository-owned TCG branding assets with no legacy topbar logo path',async()=>{
+  const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.js');
+  const manifest=JSON.parse(await read('assets/tcg/tcg-art-manifest-v1.json'));
+  await access(new URL('assets/tcg/branding/stream-bandit-tcg-logo-v1.webp',`file://${ROOT}/`));
+  await access(new URL('assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp',`file://${ROOT}/`));
+  assert.ok(shell.includes('assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp'));
+  assert.equal(shell.includes('assets/stream-bandit-original-stag-logo-v7-12-7.svg'),false);
+  assert.equal(manifest.hosting.includes('GitHack dependency'),false);
+  assert.equal(manifest.branding.primary_logo.path,'assets/tcg/branding/stream-bandit-tcg-logo-v1.webp');
+  assert.equal(manifest.branding.topbar_emblem.path,'assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp');
+});

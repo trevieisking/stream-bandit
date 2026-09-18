@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-const VERSION="2.4.31";
+const VERSION="2.4.32";
 const PRIMARY=[
  {key:"battle",label:"Battle",href:"tcg-play.html"},
  {key:"decks",label:"Decks",href:"tcg-decks.html"},
@@ -43,7 +43,7 @@ function mount(){
  const client=document.createElement("div");client.className="tcg-client";
  const top=document.createElement("header");top.className="tcg-client-topbar";
  const brand=document.createElement("a");brand.className="tcg-client-brand";brand.href="tcg-play.html";
- brand.innerHTML='<img src="assets/stream-bandit-original-stag-logo-v7-12-7.svg" alt=""><span class="tcg-client-brand-copy"><strong>Stream Bandit</strong><span>TCG</span></span>';
+ brand.innerHTML='<img src="assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp" alt="Stream Bandit TCG elemental stag emblem" decoding="async" fetchpriority="high"><span class="tcg-client-brand-copy"><strong>Stream Bandit</strong><span>TCG</span></span>';
  top.appendChild(brand);top.appendChild(nav(PRIMARY,"Stream Bandit TCG",primaryKey(body),"tcg-client-nav"));
  const stage=document.createElement("section");stage.className="tcg-client-stage";
  main.parentNode.insertBefore(client,main);client.appendChild(top);client.appendChild(stage);stage.appendChild(main);
