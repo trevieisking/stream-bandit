@@ -180,6 +180,21 @@ function makeHarness() {
     }
 
     if (String(url).endsWith('/functions/v1/tcg-match-actions')) {
+      if (payload.action === 'field_actions') {
+        return {
+          ok: true,
+          status: 200,
+          async json() {
+            return {
+              ok: true,
+              result: {
+                ability_sources: [],
+                withdraw: { eligible: false, reason: 'fixture_no_withdraw', cost: null, legal_targets: [], payment_options: [] }
+              }
+            };
+          }
+        };
+      }
       return {
         ok: true,
         status: 200,
@@ -230,18 +245,17 @@ test('rendered V2 card Attack click posts authoritative Attack payload and surfa
   assert.equal(harness.document.attackButtons.length, 1, 'playable Vanguard should render one Attack control');
   await harness.document.attackButtons[0].triggerClick();
 
-  const attackRequests = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-match-actions'));
-  assert.equal(attackRequests.length, 1, 'one card click must submit exactly one Attack command');
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(attackRequests[0].payload)),
-    {
-      action: 'attack',
-      match_id: 'match-click-proof',
-      client_nonce: 'nonce-1',
-      expected_revision: 41,
-      attack_slot: 1
-    }
-  );
+  const matchRequests = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-match-actions'));
+  const attackRequests = matchRequests.filter((entry) => entry.payload && entry.payload.action === 'attack');
+  const projectionRequests = matchRequests.filter((entry) => entry.payload && entry.payload.action === 'field_actions');
+  assert.equal(attackRequests.length, 1, 'one card click must submit exactly one Attack mutation command');
+  assert.ok(projectionRequests.length >= 1, 'read-only field action projection may share the Match Edge endpoint');
+  const payload = JSON.parse(JSON.stringify(attackRequests[0].payload));
+  assert.equal(payload.action, 'attack');
+  assert.equal(payload.match_id, 'match-click-proof');
+  assert.match(payload.client_nonce, /^nonce-\d+$/);
+  assert.equal(payload.expected_revision, 41);
+  assert.equal(payload.attack_slot, 1);
 
   const status = harness.nodes.get('battleStatus');
   assert.equal(status.textContent, 'stale_revision', 'nested authoritative rejection must remain visible to the player');

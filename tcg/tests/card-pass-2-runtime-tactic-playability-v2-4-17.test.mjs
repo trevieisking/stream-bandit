@@ -48,7 +48,9 @@ test('later browser transport consumes V2.4.17 playability without taking Tactic
   assert.match(controller, /const API_TACTIC = 'tcg-tactic-actions'/);
   assert.match(controller, /actionBase\('play_tactic_legality'\)/);
   assert.match(controller, /actionBase\('play_tactic'\)/);
-  assert.match(controller, /actionBase\('resolve_choice'\)/);
+  assert.match(controller, /action: 'resolve_choice'/);
+  assert.match(controller, /actionBase\(route\.action\)/);
+  assert.match(controller, /route\.owner === 'tactic'/);
   for (const reason of [
     'first_player_cannot_play_ally_on_first_turn',
     'tactic_play_requirement_not_met',

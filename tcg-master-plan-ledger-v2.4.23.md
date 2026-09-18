@@ -53,3 +53,15 @@ No server runtime, renderer, database schema, migration or card-data file change
 **State:** 🔄
 
 Hold INTERACT-09 acceptance until fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff gates pass.
+
+
+## V2.4.23-008 — historical transport contract rollover
+
+**State:** ✅ REPAIR CANDIDATE
+
+TCG #705 completed the full deterministic runtime/type-check lane successfully. Exactly two Node assertions failed:
+
+1. V2.4.17 froze Tactic choice submission to literal `actionBase('resolve_choice')`; V2.4.23 intentionally routes the same server-projected action through generic `route.action`.
+2. The Attack click harness counted every `tcg-match-actions` request as an Attack command. V2.4.23 adds read-only `field_actions` projection calls on that same endpoint, so the harness must count only payloads where `action === 'attack'`.
+
+The repair changes tests/ledger only. Product/browser/server bytes remain unchanged. The Attack harness now returns a valid read-only projection fixture and still proves exactly one authoritative Attack mutation command is emitted per card click.
