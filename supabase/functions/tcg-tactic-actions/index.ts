@@ -330,6 +330,96 @@ function requiredEffectResourcesAvailable(state: any, ownerSeat: number, steps: 
   walk(steps);
   return ok;
 }
+
+type TacticPlayability =
+  | {
+      eligible: true;
+      card_uid: string;
+      status: 200;
+      player: any;
+      index: number;
+      source: Inst;
+      definition: any;
+      engine: any;
+      subtype: string;
+    }
+  | {
+      eligible: false;
+      card_uid: string;
+      status: 400 | 409;
+      reason: string;
+      unsupported_ops?: string[];
+    };
+
+function tacticPlayability(state: any, seat: number, rawUid: unknown): TacticPlayability {
+  const uid = String(rawUid || "").trim();
+  if (state.phase !== "play" || Number(state.active_seat) !== seat) {
+    return { eligible: false, card_uid: uid, status: 400, reason: "not_active_player" };
+  }
+  if (
+    state.effect_resolution ||
+    state.pending_choice ||
+    state.pending_heal_listener_choice ||
+    state.pending_movement_listener_choice ||
+    state.pending_tactic_heal_resume ||
+    state.pending_tactic_movement_resume
+  ) {
+    return { eligible: false, card_uid: uid, status: 409, reason: "effect_resolution_already_pending" };
+  }
+
+  const player = state.players[String(seat)];
+  const index = player.hand.findIndex((inst: Inst) => inst.uid === uid);
+  if (index < 0) {
+    return { eligible: false, card_uid: uid, status: 400, reason: "tactic_not_in_hand" };
+  }
+
+  const source = player.hand[index] as Inst;
+  const d = definition(state, source) || {};
+  const engine = d.engine_effects || null;
+  if (String(d.card_family || d.kind || "") !== "Tactic" || engine?.schema !== EFFECT_SCHEMA) {
+    return { eligible: false, card_uid: uid, status: 400, reason: "structured_tactic_required" };
+  }
+
+  const subtype = String(d.tactic_subtype || d.family || engine.subtype || "");
+  if (
+    subtype === "Ally" &&
+    Number(state.first_player_seat) === seat &&
+    Number(state.personal_turns?.[String(seat)] || 0) === 1
+  ) {
+    return { eligible: false, card_uid: uid, status: 400, reason: "first_player_cannot_play_ally_on_first_turn" };
+  }
+  if (!checkPlayRequirements(state, seat, engine.play_requirements || [])) {
+    return { eligible: false, card_uid: uid, status: 400, reason: "tactic_play_requirement_not_met" };
+  }
+  if (!firstRequiredCreatureTargetAvailable(state, seat, engine.steps || [])) {
+    return { eligible: false, card_uid: uid, status: 400, reason: "required_tactic_target_unavailable" };
+  }
+  if (!requiredEffectResourcesAvailable(state, seat, engine.steps || [])) {
+    return { eligible: false, card_uid: uid, status: 400, reason: "required_tactic_resource_unavailable" };
+  }
+  const unsupported = unsupportedOps(engine.steps || []);
+  if (unsupported.length) {
+    return {
+      eligible: false,
+      card_uid: uid,
+      status: 409,
+      reason: "tactic_lifecycle_contract_unsupported",
+      unsupported_ops: unsupported,
+    };
+  }
+
+  return {
+    eligible: true,
+    card_uid: uid,
+    status: 200,
+    player,
+    index,
+    source,
+    definition: d,
+    engine,
+    subtype,
+  };
+}
 function publicField(player: any) {
   return {
     vanguard: player.vanguard,
@@ -1321,7 +1411,7 @@ Deno.serve(async (req) => {
     }
     const action = String(body.action || "").trim();
     if (action === "ping") return json({ ok: true, version: VERSION, user_id: userId, effect_schema: EFFECT_SCHEMA });
-    if (!["play_tactic", "resolve_choice"].includes(action)) return json({ ok: false, version: VERSION, error: "unknown_action" }, 400);
+    if (!["play_tactic", "play_tactic_legality", "resolve_choice"].includes(action)) return json({ ok: false, version: VERSION, error: "unknown_action" }, 400);
 
     const matchId = String(body.match_id || "").trim();
     const nonce = String(body.client_nonce || "").trim();
@@ -1379,52 +1469,37 @@ Deno.serve(async (req) => {
       });
     };
 
+    if (action === "play_tactic_legality") {
+      const legality = tacticPlayability(state, seat, body.card_uid);
+      const result = legality.eligible
+        ? {
+            ok: true,
+            eligible: true,
+            card_uid: legality.card_uid,
+            subtype: legality.subtype,
+          }
+        : {
+            ok: true,
+            eligible: false,
+            card_uid: legality.card_uid,
+            reason: legality.reason,
+            ...(legality.unsupported_ops ? { unsupported_ops: legality.unsupported_ops } : {}),
+          };
+      return json({ ok: true, version: VERSION, result });
+    }
+
     if (action === "play_tactic") {
-      if (state.phase !== "play" || Number(state.active_seat) !== seat) {
-        return json({ ok: false, version: VERSION, error: "not_active_player" }, 400);
-      }
-      if (state.effect_resolution || state.pending_choice || state.pending_heal_listener_choice || state.pending_movement_listener_choice || state.pending_tactic_heal_resume || state.pending_tactic_movement_resume) {
-        return json({ ok: false, version: VERSION, error: "effect_resolution_already_pending" }, 409);
-      }
-
-      const player = state.players[String(seat)];
-      const uid = String(body.card_uid || "").trim();
-      const index = player.hand.findIndex((inst: Inst) => inst.uid === uid);
-      if (index < 0) return json({ ok: false, version: VERSION, error: "tactic_not_in_hand" }, 400);
-      const source = player.hand[index] as Inst;
-      const d = definition(state, source) || {};
-      const engine = d.engine_effects || null;
-      if (String(d.card_family || d.kind || "") !== "Tactic" || engine?.schema !== EFFECT_SCHEMA) {
-        return json({ ok: false, version: VERSION, error: "structured_tactic_required" }, 400);
-      }
-
-      const subtype = String(d.tactic_subtype || d.family || engine.subtype || "");
-      if (
-        subtype === "Ally" &&
-        Number(state.first_player_seat) === seat &&
-        Number(state.personal_turns?.[String(seat)] || 0) === 1
-      ) {
-        return json({ ok: false, version: VERSION, error: "first_player_cannot_play_ally_on_first_turn" }, 400);
-      }
-      if (!checkPlayRequirements(state, seat, engine.play_requirements || [])) {
-        return json({ ok: false, version: VERSION, error: "tactic_play_requirement_not_met" }, 400);
-      }
-      if (!firstRequiredCreatureTargetAvailable(state, seat, engine.steps || [])) {
-        return json({ ok: false, version: VERSION, error: "required_tactic_target_unavailable" }, 400);
-      }
-      if (!requiredEffectResourcesAvailable(state, seat, engine.steps || [])) {
-        return json({ ok: false, version: VERSION, error: "required_tactic_resource_unavailable" }, 400);
-      }
-      const unsupported = unsupportedOps(engine.steps || []);
-      if (unsupported.length) {
+      const legality = tacticPlayability(state, seat, body.card_uid);
+      if (!legality.eligible) {
         return json({
           ok: false,
           version: VERSION,
-          error: "tactic_lifecycle_contract_unsupported",
-          unsupported_ops: unsupported,
-        }, 409);
+          error: legality.reason,
+          ...(legality.unsupported_ops ? { unsupported_ops: legality.unsupported_ops } : {}),
+        }, legality.status);
       }
 
+      const { player, index, source, definition: d, engine, subtype } = legality;
       player.hand.splice(index, 1);
       state.phase = "effect_resolution";
       state.effect_resolution = {
