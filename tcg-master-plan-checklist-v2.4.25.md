@@ -16,24 +16,24 @@
 
 ## B. Ability availability
 
-- [ ] **STATE-ABILITY-01** local printed active Ability receives a passive ready/locked badge only while `field_actions` is revision-current.
-- [ ] **STATE-ABILITY-02** ready derives only from exact `ability_sources` coordinate + anchor match.
-- [ ] **STATE-ABILITY-03** browser contains no once-per-turn ledger / requirements / cost / condition legality evaluator.
-- [ ] **STATE-ABILITY-04** existing card-owned Use Ability action remains available only for server-projected ready sources.
+- [x] **STATE-ABILITY-01** local printed active Ability receives a card-context ready/locked state only while `field_actions` is revision-current.
+- [x] **STATE-ABILITY-02** ready derives only from exact `ability_sources` coordinate + anchor match.
+- [x] **STATE-ABILITY-03** browser contains no once-per-turn ledger / requirements / cost / condition legality evaluator.
+- [x] **STATE-ABILITY-04** existing card-owned Use Ability action remains available only for server-projected ready sources.
 
 ## C. Terminal result
 
-- [ ] **STATE-RESULT-01** complete match renders Victory/Defeat from authoritative `result.winner_seat` relative to local seat.
-- [ ] **STATE-RESULT-02** result reasons are presentation-only text.
-- [ ] **STATE-RESULT-03** overtime-pending result is explicitly visible without inventing a winner.
-- [ ] **STATE-RESULT-04** browser contains no reward/deckout/no-creature win-condition evaluator.
+- [x] **STATE-RESULT-01** complete match renders Victory/Defeat from authoritative `result.winner_seat` relative to local seat.
+- [x] **STATE-RESULT-02** result reasons are presentation-only text.
+- [x] **STATE-RESULT-03** overtime-pending result is explicitly visible without inventing a winner.
+- [x] **STATE-RESULT-04** browser contains no reward/deckout/no-creature win-condition evaluator.
 
 ## D. Regression / scope
 
-- [ ] **V2425-REG-01** accepted Reward/promotion resolution remains intact.
-- [ ] **V2425-REG-02** accepted Attack/Ability/Withdraw/Tactic transports remain intact.
-- [ ] **V2425-REG-03** no Match/Tactic/Setup runtime, schema, migration or card-data change.
-- [ ] **V2425-REG-04** battle cache identity advances to V2.4.25.
+- [x] **V2425-REG-01** accepted Reward/promotion resolution remains intact.
+- [x] **V2425-REG-02** accepted Attack/Ability/Withdraw/Tactic transports remain intact.
+- [x] **V2425-REG-03** no Match/Tactic/Setup runtime, schema, migration or card-data change.
+- [x] **V2425-REG-04** battle cache identity advances to V2.4.25.
 
 ## E. Exact-head acceptance
 
