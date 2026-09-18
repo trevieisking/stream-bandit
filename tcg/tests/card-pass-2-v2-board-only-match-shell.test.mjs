@@ -18,7 +18,8 @@ test('V2 active match is a board-only game route, not the site shell', () => {
 });
 
 test('board-only match reuses shared config and explicit existing authentication', () => {
-  assert.match(battle, /stream-bandit-shell-v6-24\.js/);
+  assert.match(battle, /stream-bandit-tcg-config-v2-4-31\.js/);
+  assert.doesNotMatch(battle, /stream-bandit-shell-v6-24\.js/);
   assert.match(battle, /stream-bandit-auth-gate-v7-13-001\.js/);
   assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js/);
 });
