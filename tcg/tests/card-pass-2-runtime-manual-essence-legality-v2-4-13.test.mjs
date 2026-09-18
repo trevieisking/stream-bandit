@@ -52,8 +52,11 @@ test('legacy unmarked Essence fallback remains present and card-specific compati
   assert.match(branch, /tide-puddlepip/);
 });
 
-test('manual Essence legality stays server-side with no browser transport added in this server seam', () => {
+test('manual Essence legality stays server-side when later browser transport consumes the projection', () => {
   const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-controller.js'), 'utf8');
-  assert.doesNotMatch(controller, /attach_essence_targets/);
-  assert.doesNotMatch(controller, /actionBase\('attach_essence'\)/);
+  assert.match(controller, /actionBase\('attach_essence_targets'\)/);
+  assert.match(controller, /actionBase\('attach_essence'\)/);
+  assert.doesNotMatch(controller, /manual_essence_turn/);
+  assert.doesNotMatch(controller, /manual_essence_already_used_this_turn/);
+  assert.doesNotMatch(controller, /card_family\s*===?\s*['"]Essence['"]/);
 });

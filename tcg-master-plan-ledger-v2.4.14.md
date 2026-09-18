@@ -33,3 +33,14 @@ Creature Reserve, Realm, setup, Evolution and Attack transports are preserved. N
 **State:** 🔄
 
 Hold acceptance until fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff gates pass.
+
+
+## V2.4.14-006 — historical regression contract rollover
+
+**State:** ✅ REPAIR CANDIDATE
+
+TCG #679 showed three historical browser assertions that intentionally froze earlier delivery states: V2.4.13 required no Essence browser transport, V2.4.12 required an exact cache marker, and V2.4.9 required the pre-Essence Realm fallback expression.
+
+Those tests now retain their original ownership/transport guarantees while allowing the later V2.4.14 interaction layer: Essence legality is still forbidden from the browser, Evolution must not regress below V2.4.12, and Realm remains the generic fallback only after both server-projected Evolution and Essence modes decline the selected card.
+
+No production source, game rule, server runtime, card data or Supabase state changes in this repair.
