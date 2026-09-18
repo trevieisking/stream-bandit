@@ -88,9 +88,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "d76feb3c49d92d21ebcf9e2d97e488c42833843c",
+        "entrypoint_git_blob_sha": "015cfef283c4ba4654f0e040e45a303a0cec4fab",
         "file_count": 85,
-        "closure_sha256": "1f6291ade04537da3612f0d33087921f119a26ddb07fd76b47d178ceb7b5ee74",
+        "closure_sha256": "3424305eb5c372965657b504dc7aece5bc4124338239084910e52f2a40097f9e",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -394,7 +394,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-relic-engine-v0-2.ts",
-            "git_blob_sha": "6e9e1435519a77794a4f999ab5a4b1a70fe5a759"
+            "git_blob_sha": "51252d5845edb7cafc6978e93d71d0fb0818786a"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
@@ -426,7 +426,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "d76feb3c49d92d21ebcf9e2d97e488c42833843c"
+            "git_blob_sha": "015cfef283c4ba4654f0e040e45a303a0cec4fab"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",

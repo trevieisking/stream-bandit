@@ -4,7 +4,11 @@ import { runtimeV02ApplyWithdrawalPaymentAndSwitch } from "../_shared/tcg-match-
 import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 import { runtimeV02EvolveCreatureFromHand, runtimeV02PlaceCreatureFromHand, runtimeV02ResolveDefeatedCreatures } from "../_shared/tcg-match-creature-engine-v0-2.ts";
 import { runtimeV02ListLegalEvolutionTargets, runtimeV02ValidateEvolutionDeclaration } from "../_shared/tcg-match-evolution-legality-v0-2.ts";
-import { runtimeV02AttachRelicFromHand } from "../_shared/tcg-match-relic-engine-v0-2.ts";
+import {
+  runtimeV02AttachRelicFromHand,
+  runtimeV02ListManualRelicAttachmentTargets,
+  runtimeV02ValidateManualRelicAttachmentDeclaration,
+} from "../_shared/tcg-match-relic-engine-v0-2.ts";
 import { structuredRuntimeIncomingAttackDamage, structuredRuntimeOutgoingAttackDamage } from "../_shared/tcg-match-attack-damage-v0-2.ts";
 import { structuredRuntimeAttachmentAttackBonus } from "../_shared/tcg-match-surge-lifecycle-v0-2.ts";
 import { evaluateRuntimeAttackCountAddFormula, evaluateRuntimeAttackDeclarationRequirements, evaluateRuntimeAttackReadyConditionalAddFormula, resolveRuntimeAttackAuthority } from "../_shared/tcg-match-attack-authority-v0-2.ts";
@@ -267,6 +271,13 @@ Deno.serve(async(req)=>{
    return json({ok:true,version:VERSION,result});
   }
 
+  if(action==="attach_relic_targets"){
+   const uid=String(body.card_uid||"");
+   if(s.runtime_registry_v0_2==null)return json({ok:true,version:VERSION,result:{ok:true,eligible:false,card_uid:uid,legal_targets:[],reason:"relic_card_required"}});
+   const result=runtimeV02ListManualRelicAttachmentTargets(s,seat as 1|2,uid);
+   return json({ok:true,version:VERSION,result});
+  }
+
   if(action==="use_ability"){
    const where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"ability_source_creature_not_found"},400);const source=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!source)return json({ok:false,version:VERSION,error:"ability_source_top_required"},400);let routed;try{routed=runtimeV02BeginActiveAbilityLiveRoute(s,seat as 1|2,{where:where as "vanguard"|"reserve",index:idx,instance:source},defeatDescribe)}catch(error){const message=error instanceof Error?error.message:String(error);const status=message.includes("turn_limit_reached")||message.includes("limit_reached")||message.includes("_changed")?409:400;return json({ok:false,version:VERSION,error:message},status)}if(!routed)return json({ok:false,version:VERSION,error:"active_ability_requires_runtime_owner"},400);
    if(routed.kind==="immediate"){const immediate=routed.immediate,resolution=immediate.resolution,healAudit=healListenerAudit(immediate.heal_listener);log(`Seat ${seat} used Ability ${resolution.ability_id} to drain ${resolution.actual_vitality_drained} vitality and heal ${resolution.actual_heal} damage.`);if(immediate.heal_listener.status==="player_choice_required"){s.phase="heal_listener_choice_resolution";return json({version:VERSION,result:await commit("ability_pending_heal_listener_choice",{seat,ability_id:resolution.ability_id,kind:resolution.kind,actual_vitality_drained:resolution.actual_vitality_drained,actual_heal:resolution.actual_heal,emitted_packet_ids:resolution.emitted_packet_ids,heal_listener:healAudit,resume_kind:immediate.resume_kind,resolution_queue_required:immediate.resolution_queue_required,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(immediate.heal_listener.pending_choice,seat as 1|2)})}if(immediate.resume_kind==="resume_resolution_queue"){s.phase="resolution";continueResolution()}else s.phase="play";return json({version:VERSION,result:await commit("ability_resolved",{seat,ability_id:resolution.ability_id,kind:resolution.kind,actual_vitality_drained:resolution.actual_vitality_drained,actual_heal:resolution.actual_heal,emitted_packet_ids:resolution.emitted_packet_ids,heal_listener:healAudit,resume_kind:immediate.resume_kind,resolution_queue_required:immediate.resolution_queue_required})})}
@@ -392,7 +403,21 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="attach_relic"){
-   const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);if(cr.relic)return json({ok:false,version:VERSION,error:"creature_already_has_relic"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Tactic"||d.family!=="Relic")return json({ok:false,version:VERSION,error:"relic_card_required"},400);const targetInst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!targetInst)throw new Error("tcg_v0_2_relic_attachment_target_anchor_required");runtimeV02AttachRelicFromHand(p,seat as 1|2,targetInst.uid,uid);const td=top(cr,s);if(td?.id==="stone-flintkin")healRuntimeDamage(cr,10);log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);return json({version:VERSION,result:await commit("attach_relic",{seat,where,index:idx,card_id:d.id})});
+   const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index);
+   const structuredRelic=s.runtime_registry_v0_2!=null;
+   if(structuredRelic){
+    const legality=runtimeV02ValidateManualRelicAttachmentDeclaration(s,seat as 1|2,uid,where,idx);
+    if(!legality.ok)return json({ok:false,version:VERSION,error:legality.error},400);
+    const cr=getCr(p,legality.where,legality.index)!;
+    const inst=p.hand.find((x:Inst)=>x.uid===uid)!;
+    const d=def(s,inst);
+    runtimeV02AttachRelicFromHand(p,seat as 1|2,legality.target_creature_uid,uid);
+    const td=top(cr,s);
+    if(td?.id==="stone-flintkin")healRuntimeDamage(cr,10);
+    log(`Seat ${seat} attached ${d?.name||inst.card_id} to ${td?.name||"a creature"}.`);
+    return json({version:VERSION,result:await commit("attach_relic",{seat,where:legality.where,index:legality.index,card_id:d?.id||inst.card_id})});
+   }
+   const cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);if(cr.relic)return json({ok:false,version:VERSION,error:"creature_already_has_relic"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Tactic"||d.family!=="Relic")return json({ok:false,version:VERSION,error:"relic_card_required"},400);const targetInst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!targetInst)throw new Error("tcg_v0_2_relic_attachment_target_anchor_required");runtimeV02AttachRelicFromHand(p,seat as 1|2,targetInst.uid,uid);const td=top(cr,s);if(td?.id==="stone-flintkin")healRuntimeDamage(cr,10);log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);return json({version:VERSION,result:await commit("attach_relic",{seat,where,index:idx,card_id:d.id})});
   }
 
   if(action==="play_realm"){
