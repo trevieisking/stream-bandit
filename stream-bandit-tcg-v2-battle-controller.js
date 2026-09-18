@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.23';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.24';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -36,6 +36,9 @@
     withdrawMode: false,
     withdrawTargetIndex: null,
     withdrawPaymentUids: [],
+    resolutionKey: '',
+    rewardPositions: [],
+    promotionReserveIndex: null,
     busy: false,
     poll: null
   };
@@ -274,6 +277,36 @@
     state.fieldWithdraw = { eligible: false, reason: '', cost: null, legal_targets: [], payment_options: [] };
   }
 
+  function resolutionDescriptor(view) {
+    if (!view || view.phase !== 'resolution' || !view.pending_resolution) return null;
+    const pending = view.pending_resolution;
+    const seat = Number(pending.seat);
+    const kind = String(pending.kind || '');
+    if ((seat !== 1 && seat !== 2) || (kind !== 'take_reward' && kind !== 'promote')) return null;
+    const countRaw = Number(pending.count);
+    return {
+      kind,
+      seat,
+      count: Number.isInteger(countRaw) && countRaw >= 0 ? countRaw : 0
+    };
+  }
+
+  function ownResolution(view) {
+    const pending = resolutionDescriptor(view);
+    const seat = Number(view && view.you && view.you.seat);
+    return pending && pending.seat === seat ? pending : null;
+  }
+
+  function syncResolutionSelection(view) {
+    const pending = resolutionDescriptor(view);
+    const key = pending ? [revision(), pending.kind, pending.seat, pending.count].join(':') : '';
+    if (state.resolutionKey !== key) {
+      state.resolutionKey = key;
+      state.rewardPositions = [];
+      state.promotionReserveIndex = null;
+    }
+  }
+
   function fieldActionsFresh() {
     return state.fieldActionRevision === revision();
   }
@@ -392,6 +425,7 @@
     const relicTargets = !!opts.relicTargets;
     const abilityActions = !!opts.abilityActions;
     const withdrawTargets = !!opts.withdrawTargets;
+    const promotionTargets = !!opts.promotionTargets;
     node.innerHTML = [0, 1, 2, 3].map((index) => {
       const setupMode = handTarget && handTargetMode === 'setup';
       const creature = reserve && reserve[index];
@@ -399,6 +433,7 @@
       const essenceTarget = essenceTargets && !!creature && legalEssenceTarget('reserve', index);
       const relicTarget = relicTargets && !!creature && legalRelicTarget('reserve', index);
       const withdrawTarget = withdrawTargets && !!creature && legalWithdrawTarget(index);
+      const promotionTarget = promotionTargets && !!creature;
       const targetAttrs = evolutionTarget
         ? ' tabindex="0" role="button" data-evolve-target-where="reserve" data-evolve-target-index="' + index + '" aria-label="Evolve selected card onto ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
         : (essenceTarget
@@ -407,11 +442,13 @@
             ? ' tabindex="0" role="button" data-relic-target-where="reserve" data-relic-target-index="' + index + '" aria-label="Attach selected Relic to ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
             : (withdrawTarget
               ? ' tabindex="0" role="button" data-withdraw-target-index="' + index + '" aria-label="Choose ' + ownerLabel + ' Reserve ' + (index + 1) + ' as the server-projected Withdrawal target"'
-              : (handTarget
+              : (promotionTarget
+                ? ' tabindex="0" role="button" data-promotion-reserve-index="' + index + '" aria-label="Select ' + ownerLabel + ' Reserve ' + (index + 1) + ' for mandatory promotion"'
+                : (handTarget
               ? (setupMode
                 ? ' tabindex="0" role="button" data-setup-place-where="reserve" data-setup-place-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + ' during setup"'
                 : ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + '"')
-              : ''))));
+              : '')))));
       const contextActions = [];
       if (setupReturn && creature) {
         contextActions.push({ intent: 'setup_return', label: 'Return to hand', detail: 'Setup placement', where: 'reserve', index });
@@ -419,7 +456,7 @@
       if (abilityActions && creature && legalAbilitySource('reserve', index, cardAnchor(creature))) {
         contextActions.push({ intent: 'use_ability', label: 'Use Ability', detail: 'Server-projected Active Ability', where: 'reserve', index });
       }
-      return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + (essenceTarget ? ' is-essence-target' : '') + (relicTarget ? ' is-relic-target' : '') + (withdrawTarget ? ' is-withdraw-target' : '') + (withdrawTarget && state.withdrawTargetIndex === index ? ' is-withdraw-target-selected' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
+      return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + (essenceTarget ? ' is-essence-target' : '') + (relicTarget ? ' is-relic-target' : '') + (withdrawTarget ? ' is-withdraw-target' : '') + (withdrawTarget && state.withdrawTargetIndex === index ? ' is-withdraw-target-selected' : '') + (promotionTarget ? ' is-promotion-target' : '') + (promotionTarget && state.promotionReserveIndex === index ? ' is-promotion-selected' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
         ownerLabel + ' Reserve ' + (index + 1) + '</span>' + creatureCard(creature, { contextActions }) + '</section>';
     }).join('');
   }
@@ -484,13 +521,19 @@
       : '<div class="sb-zone-empty">Discard empty · 0</div>';
   }
 
-  function renderRewards(target, count, label) {
+  function renderRewards(target, count, label, options) {
     const node = $(target);
     if (!node) return;
+    const opts = options || {};
+    const selectable = !!opts.selectable;
     const remaining = Math.min(6, countValue(count));
     node.innerHTML = Array.from({ length: 6 }, (_, index) => {
       const active = index < remaining;
-      return '<div class="sb-reward-slot' + (active ? '' : ' is-claimed') + '">' +
+      const selected = active && selectable && state.rewardPositions.includes(index);
+      const attrs = active && selectable
+        ? ' tabindex="0" role="button" data-reward-position="' + index + '" aria-pressed="' + (selected ? 'true' : 'false') + '" aria-label="Select face-down Reward position ' + (index + 1) + '"'
+        : '';
+      return '<div class="sb-reward-slot' + (active ? '' : ' is-claimed') + (active && selectable ? ' is-resolution-target' : '') + (selected ? ' is-resolution-selected' : '') + '"' + attrs + '>' +
         (active ? renderer().renderCardBack({ label: label + ' Reward ' + (index + 1), compact: true }) : '') +
         '</div>';
     }).join('');
@@ -532,6 +575,8 @@
     const node = $('phaseControls');
     if (!node) return;
     const seat = Number(view.you && view.you.seat);
+    const resolution = resolutionDescriptor(view);
+    const localResolution = ownResolution(view);
     let markup = '';
     if (view.phase === 'opening_choice') {
       if (Number(view.toss_winner_seat) === seat) {
@@ -547,6 +592,19 @@
           '<button type="button" data-lifecycle-intent="setup_ready">Setup ready</button>';
       } else {
         markup = '<span>Waiting for the other player to finish setup.</span>';
+      }
+    } else if (view.phase === 'resolution' && resolution) {
+      if (!localResolution) {
+        markup = '<span>Waiting for the other player to resolve ' + (resolution.kind === 'take_reward' ? 'Reward Cards' : 'mandatory promotion') + '.</span>';
+      } else if (localResolution.kind === 'take_reward') {
+        const count = localResolution.count;
+        const selected = state.rewardPositions.length;
+        markup = '<span>Take ' + count + ' Reward Card' + (count === 1 ? '' : 's') + ': select face-down Reward positions (' + selected + '/' + count + ').</span>' +
+          '<button type="button" data-resolution-intent="take_reward"' + (selected === count ? '' : ' disabled') + '>Take selected Reward' + (count === 1 ? '' : 's') + '</button>';
+      } else if (localResolution.kind === 'promote') {
+        const selected = Number.isInteger(state.promotionReserveIndex);
+        markup = '<span>Your Vanguard was defeated. Select a highlighted Reserve Creature for mandatory promotion.</span>' +
+          '<button type="button" data-resolution-intent="promote"' + (selected ? '' : ' disabled') + '>Confirm promotion</button>';
       }
     }
     node.innerHTML = markup;
@@ -728,6 +786,9 @@
     const yourTurn = view.phase === 'play' && Number(view.active_seat) === seat;
     const yourSetup = view.phase === 'setup' && Number(view.setup_turn_seat) === seat;
     const yourOpeningChoice = view.phase === 'opening_choice' && Number(view.toss_winner_seat) === seat;
+    const localResolution = ownResolution(view);
+    const rewardResolution = !!localResolution && localResolution.kind === 'take_reward';
+    const promotionResolution = !!localResolution && localResolution.kind === 'promote';
     const pending = !!(view.pending_attack_choice || view.pending_ability_choice || view.pending_event_listener_choice || view.pending_movement_listener_choice || view.pending_heal_listener_choice || view.pending_choice || view.pending_resolution);
     const projectedFieldActions = fieldActionsFresh();
     const localWithdraw = state.withdrawMode && projectedFieldActions;
@@ -764,7 +825,8 @@
       relicTargets: relicMode,
       setupReturn: canSetup,
       abilityActions: projectedFieldActions && yourTurn && !pending && !state.busy && !localWithdraw,
-      withdrawTargets: localWithdraw
+      withdrawTargets: localWithdraw,
+      promotionTargets: promotionResolution
     });
     renderRealm(view, playHandTarget);
 
@@ -774,7 +836,7 @@
     renderRewards('oppRewards', view.opponent && view.opponent.rewards_count, 'Opponent');
     renderDiscard('oppDiscard', view.opponent && view.opponent.discard_count, 'Opponent');
     renderDeck('yourDeck', view.you && view.you.deck_count, 'Your');
-    renderRewards('yourRewards', view.you && view.you.rewards_count, 'Your');
+    renderRewards('yourRewards', view.you && view.you.rewards_count, 'Your', { selectable: rewardResolution });
     renderDiscard('yourDiscard', view.you && view.you.discard_count, 'Your');
     renderPhaseControls(view);
     renderActionChoice(view);
@@ -782,11 +844,19 @@
     if (view.phase === 'complete') $('turnPill').textContent = 'Match complete';
     else if (view.phase === 'opening_choice') $('turnPill').textContent = yourOpeningChoice ? 'Your opening choice' : 'Opening choice';
     else if (view.phase === 'setup') $('turnPill').textContent = yourSetup ? 'Your setup' : 'Opponent setup';
+    else if (view.phase === 'resolution') $('turnPill').textContent = localResolution ? 'Your resolution' : 'Resolution';
     else $('turnPill').textContent = yourTurn ? 'Your turn' : 'Opponent turn';
     $('revisionPill').textContent = 'Revision ' + revision();
     $('phasePill').textContent = String(view.phase || '—');
 
-    if (pending) setStatus('The board is authoritative. Resolve the pending server choice before another card action.', 'wait');
+    if (view.phase === 'resolution' && localResolution && localResolution.kind === 'take_reward') {
+      setStatus('Reward resolution: choose exactly ' + localResolution.count + ' face-down Reward position' + (localResolution.count === 1 ? '' : 's') + ', then confirm.', 'ready');
+    }
+    else if (view.phase === 'resolution' && localResolution && localResolution.kind === 'promote') {
+      setStatus('Mandatory promotion: your Vanguard was defeated. Choose a highlighted Reserve Creature, then confirm.', 'ready');
+    }
+    else if (view.phase === 'resolution' && resolutionDescriptor(view)) setStatus('Waiting for the other player to finish mandatory resolution.', 'wait');
+    else if (pending) setStatus('The board is authoritative. Resolve the pending server choice before another card action.', 'wait');
     else if (state.withdrawMode) {
       const cost = Number(state.fieldWithdraw && state.fieldWithdraw.cost);
       setStatus('Withdraw selected. Choose a green Reserve target and exactly ' + (Number.isInteger(cost) && cost >= 0 ? cost : 0) + ' projected Essence, then confirm or cancel.', 'ready');
@@ -903,6 +973,61 @@
     document.querySelectorAll('[data-lifecycle-intent="setup_ready"]').forEach((button) => {
       button.addEventListener('click', async () => {
         await runSetupReadyIntent();
+      });
+    });
+    document.querySelectorAll('[data-resolution-intent="take_reward"]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        await runTakeRewardIntent();
+      });
+    });
+    document.querySelectorAll('[data-resolution-intent="promote"]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        await runPromotionIntent();
+      });
+    });
+    document.querySelectorAll('[data-reward-position]').forEach((reward) => {
+      const select = () => {
+        const pending = ownResolution(viewState());
+        if (!pending || pending.kind !== 'take_reward' || state.busy) return;
+        const position = Number(reward.dataset.rewardPosition);
+        if (!Number.isInteger(position) || position < 0) return;
+        const existing = state.rewardPositions.indexOf(position);
+        if (existing >= 0) state.rewardPositions.splice(existing, 1);
+        else if (state.rewardPositions.length < pending.count) state.rewardPositions.push(position);
+        render();
+      };
+      reward.addEventListener('click', (event) => {
+        event.stopPropagation();
+        select();
+      });
+      reward.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          event.stopPropagation();
+          select();
+        }
+      });
+    });
+    document.querySelectorAll('[data-promotion-reserve-index]').forEach((target) => {
+      const select = () => {
+        const pending = ownResolution(viewState());
+        if (!pending || pending.kind !== 'promote' || state.busy) return;
+        const index = Number(target.dataset.promotionReserveIndex);
+        if (!Number.isInteger(index) || index < 0 || index > 3) return;
+        state.promotionReserveIndex = state.promotionReserveIndex === index ? null : index;
+        render();
+      };
+      target.addEventListener('click', (event) => {
+        if (event.target.closest('[data-card-intent]')) return;
+        event.stopPropagation();
+        select();
+      });
+      target.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          event.stopPropagation();
+          select();
+        }
       });
     });
     document.querySelectorAll('[data-setup-place-where]').forEach((target) => {
@@ -1037,6 +1162,56 @@
         }
       });
     });
+  }
+
+  async function runTakeRewardIntent() {
+    const pending = ownResolution(viewState());
+    if (!pending || pending.kind !== 'take_reward') throw new Error('Reward resolution is not currently yours.');
+    const positions = [...new Set(state.rewardPositions)].sort((a, b) => a - b);
+    if (positions.length !== pending.count) throw new Error('Select exactly the Reward positions requested by the server.');
+    state.busy = true;
+    render();
+    setStatus('Submitting Reward selection to the authoritative Reward/Card-Zone owners…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, Object.assign(actionBase('take_reward'), { reward_positions: positions }));
+      state.rewardPositions = [];
+      state.resolutionKey = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runPromotionIntent() {
+    const pending = ownResolution(viewState());
+    const index = Number(state.promotionReserveIndex);
+    if (!pending || pending.kind !== 'promote') throw new Error('Mandatory promotion is not currently yours.');
+    const view = viewState();
+    const reserve = view && view.you && Array.isArray(view.you.reserve) ? view.you.reserve : [];
+    if (!Number.isInteger(index) || index < 0 || index > 3 || !reserve[index]) throw new Error('Select an occupied Reserve Creature to promote.');
+    state.busy = true;
+    render();
+    setStatus('Submitting mandatory promotion to the authoritative Defeat/Movement owners…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, Object.assign(actionBase('promote'), { reserve_index: index }));
+      state.promotionReserveIndex = null;
+      state.resolutionKey = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
   }
 
   async function runOpeningChoiceIntent(choice) {
@@ -1623,6 +1798,7 @@
     state.view = response.view || response.result || null;
     if (!state.view) throw new Error('The authoritative match view was not returned.');
     const view = viewState();
+    syncResolutionSelection(view);
     if (state.selectedAnchorUid && !fieldHasAnchor(view, state.selectedAnchorUid)) state.selectedAnchorUid = '';
     if (state.selectedHandUid && view && view.you) {
       const hand = Array.isArray(view.you.hand) ? view.you.hand : [];

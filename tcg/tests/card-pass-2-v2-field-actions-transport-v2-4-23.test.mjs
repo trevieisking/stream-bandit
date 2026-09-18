@@ -84,9 +84,11 @@ test('Reserve card selection persists by field anchor so projected Reserve Abili
   assert.match(controller, /if \(state\.selectedAnchorUid && !fieldHasAnchor\(view, state\.selectedAnchorUid\)\)/);
 });
 
-test('battle cache identity advances to V2.4.23 without changing renderer identity', () => {
-  assert.match(html, /data-sb-tcg-tabletop="v2-4-23"/);
-  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-23/);
-  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-23/);
+test('V2.4.23 field-action delivery remains accepted after later tabletop cache versions', () => {
+  const marker = html.match(/data-sb-tcg-tabletop="v2-4-(\d+)"/);
+  assert.ok(marker, 'tabletop version marker missing');
+  assert.ok(Number(marker[1]) >= 23, 'tabletop must not regress below V2.4.23');
+  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-\d+/);
+  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-\d+/);
   assert.match(html, /stream-bandit-tcg-card-renderer-v2-4-7\.js\?v=2-4-10/);
 });
