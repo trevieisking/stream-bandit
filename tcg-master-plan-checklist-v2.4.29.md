@@ -8,3 +8,6 @@
 - [ ] V2429-AUTH-07 Exact-head CI passes.
 - [ ] V2429-AUTH-08 Human signed-in deck-feed test passes on a same-origin/live-capable route.
 Decision boundary: browser startup sequencing only. No Auth Gate rewrite, DB/RLS change, Edge Function change, deck-rule change or economy change.
+
+- [x] V2429-LAYOUT-01 Legacy/secondary TCG routes are wrapped by the one shared client shell into a bounded internal content feed.
+- [x] V2429-LAYOUT-02 Document/body scrolling remains forbidden; no per-page scrolling helper is introduced.

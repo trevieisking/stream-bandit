@@ -47,6 +47,15 @@ function mount(){
  top.appendChild(brand);top.appendChild(nav(PRIMARY,"Stream Bandit TCG",primaryKey(body),"tcg-client-nav"));
  const stage=document.createElement("section");stage.className="tcg-client-stage";
  main.parentNode.insertBefore(client,main);client.appendChild(top);client.appendChild(stage);stage.appendChild(main);
+ const corePages=["play","decks","collection","battlepass","shop","settings"];
+ const page=body.dataset.sbTcgPage||"";
+ if(!corePages.includes(page)){
+   main.classList.add("tcg-secondary-page");
+   const feed=document.createElement("section");
+   feed.className="tcg-secondary-feed tcg-feed";
+   Array.from(main.children).forEach(child=>feed.appendChild(child));
+   main.appendChild(feed);
+ }
  const family=body.dataset.sbTcgFamily;
  if(family&&FAMILIES[family]){
   const sub=nav(FAMILIES[family].items,FAMILIES[family].label,body.dataset.sbTcgSubpage||"","tcg-subnav");

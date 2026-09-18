@@ -118,3 +118,7 @@ main.tcg-page{width:100%;height:100%;max-width:none;margin:0;min-height:0;overfl
   .tcg-client{grid-template-rows:64px minmax(0,1fr)}.tcg-client-brand img{width:48px;height:48px}.tcg-client-brand-copy strong{font-size:18px}
   .tcg-screen-title h1{font-size:30px}.tcg-screen-title p{display:none}.tcg-frame{padding:7px}.tcg-mode-card{padding:8px}.tcg-mode-card p{font-size:11px}
 }
+
+.tcg-secondary-page{display:grid!important;grid-template-rows:auto minmax(0,1fr)!important;gap:7px!important;min-height:0;overflow:hidden!important}
+.tcg-secondary-feed{min-height:0;overflow:auto!important;overscroll-behavior:contain;padding:2px 4px 8px}
+.tcg-secondary-feed>.tcg-hero{margin-bottom:8px}
