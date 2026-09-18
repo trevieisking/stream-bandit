@@ -28,10 +28,10 @@
 - [x] Match legality remains with the canonical server matchmaking/deck validation path.
 
 ## Acceptance
-- [ ] Exact-head TCG Validation passes.
-- [ ] Exact-head Migration Replay passes.
-- [ ] Exact-head Functional Smoke passes.
-- [ ] Unresolved review threads = 0.
+- [x] Exact-head TCG Validation passes — #753 SUCCESS.
+- [x] Exact-head Migration Replay passes — #923 SUCCESS.
+- [x] Exact-head Functional Smoke passes — #949 SUCCESS.
+- [x] Unresolved review threads = 0.
 - [ ] Human visual acceptance at target desktop viewport.
 - [ ] Human signed-in Play deck feed renders real owned deck counts.
 - [ ] ORDER-06 remains open for animation/audio hooks after visual acceptance.

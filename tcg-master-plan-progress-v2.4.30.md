@@ -27,3 +27,14 @@ V2.4.28 visual references remain immutable.
 ## Release boundary
 PR #576 stays draft/unmerged. main, Pages/public and full-live remain HOLD until exact-head CI plus human visual/gameplay acceptance.
 ORDER-06 remains open because animation/audio hooks are still outstanding even after this look/feel slice.
+
+
+## Exact-head automated acceptance
+Accepted product candidate: `ee7364396e3f8c7d16685c4d5cbd6772184c042c`
+- TCG Card Pass 2 Validation #753 — SUCCESS
+- Code Labs Migration Replay #923 — SUCCESS
+- Code Labs V50 Functional Smoke #949 — SUCCESS
+- unresolved review threads — 0
+- legacy combined statuses — none
+
+Human visual acceptance and signed-in owned-deck rendering remain deliberately open. No public/live promotion follows from automated acceptance alone.

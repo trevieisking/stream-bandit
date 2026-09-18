@@ -20,3 +20,7 @@ Shell look/feel receives a substantive implementation slice, but ORDER-06 is not
 
 ## Release boundary
 PR #576 draft only. No main/public/live/Supabase runtime promotion in this checkpoint.
+
+
+## V2.4.30-007 — Exact-head automated acceptance
+Product candidate `ee7364396e3f8c7d16685c4d5cbd6772184c042c` passed TCG Validation #753, Migration Replay #923 and Functional Smoke #949. PR #576 had zero unresolved review threads and no legacy combined statuses at review time. Human visual acceptance remains the next gate.
