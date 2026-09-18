@@ -69,3 +69,17 @@ After acceptance the canonical checklist may close:
 - STATE-VIS-12 Victory/defeat/result state.
 
 STATE-VIS-05 remains open until ordinary Creature/Realm target highlighting is fully server-projected. ORDER-05 therefore remains open at this slice.
+
+
+## 6. Accepted checkpoint
+
+**Accepted head:** `1e9f5355ef2db4cbcc3b74836100df451fbede54`
+
+- TCG Card Pass 2 Validation #723 ✅
+- Migration Replay #893 ✅
+- Functional Smoke #919 ✅
+- review threads 0 ✅
+- legacy combined statuses 0 ✅
+- 7-file bounded browser/cache/test/control delta; no server/runtime/schema/migration/card-data change ✅
+
+Canonical state after acceptance: V2-VISUAL-02 is 11/12; only STATE-VIS-05 ordinary Creature/Realm legal-target projection remains open.
