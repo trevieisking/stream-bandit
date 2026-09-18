@@ -34,6 +34,6 @@ test('V2.4.27 starter fallback remains server-owned and Ranked stays gated',asyn
   assert.ok(html.includes('id="tcgStarterPanel"'));
   assert.ok(controller.includes("action: 'choose_starter'"));
   assert.ok(controller.includes(".from('tcg_starter_decks')"));
-  assert.ok(html.includes('Ranked unavailable'));
+  assert.ok(html.includes('Coming Soon'));
   assert.ok(html.includes('data-owner-state="gated"'));
 });
