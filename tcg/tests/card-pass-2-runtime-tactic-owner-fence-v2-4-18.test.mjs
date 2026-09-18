@@ -33,8 +33,10 @@ test('projection and real play still share the same fenced evaluator', () => {
   assert.match(tactic.slice(play, play + 1600), /tacticPlayability\(state, seat, body\.card_uid\)/);
 });
 
-test('browser remains untouched until the dedicated Tactic browser slice', () => {
-  assert.doesNotMatch(controller, /API_TACTIC/);
-  assert.doesNotMatch(controller, /play_tactic_legality/);
-  assert.doesNotMatch(controller, /data-card-intent="play_tactic"/);
+test('later browser transport uses the fenced server route without duplicating subtype ownership', () => {
+  assert.match(controller, /const API_TACTIC = 'tcg-tactic-actions'/);
+  assert.match(controller, /play_tactic_legality/);
+  assert.match(controller, /intent: 'play_tactic'/);
+  assert.doesNotMatch(controller, /tactic_subtype_uses_dedicated_owner/);
+  assert.doesNotMatch(controller, /subtype\s*===?\s*['"](Ally|Device|Realm|Relic)['"]/);
 });

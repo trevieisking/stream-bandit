@@ -44,9 +44,18 @@ test('real Tactic mutation still starts only after shared playability succeeds',
   assert.match(tactic.slice(validate, remove), /if \(!legality\.eligible\)/);
 });
 
-test('V2.4.17 remains a server seam with no browser Tactic transport yet', () => {
-  assert.doesNotMatch(controller, /API_TACTIC/);
-  assert.doesNotMatch(controller, /play_tactic_legality/);
-  assert.doesNotMatch(controller, /actionBase\('play_tactic'\)/);
-  assert.doesNotMatch(controller, /actionBase\('resolve_choice'\)/);
+test('later browser transport consumes V2.4.17 playability without taking Tactic legality ownership', () => {
+  assert.match(controller, /const API_TACTIC = 'tcg-tactic-actions'/);
+  assert.match(controller, /actionBase\('play_tactic_legality'\)/);
+  assert.match(controller, /actionBase\('play_tactic'\)/);
+  assert.match(controller, /actionBase\('resolve_choice'\)/);
+  for (const reason of [
+    'first_player_cannot_play_ally_on_first_turn',
+    'tactic_play_requirement_not_met',
+    'required_tactic_target_unavailable',
+    'required_tactic_resource_unavailable',
+    'tactic_lifecycle_contract_unsupported',
+  ]) {
+    assert.doesNotMatch(controller, new RegExp(reason));
+  }
 });

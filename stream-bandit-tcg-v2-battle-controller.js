@@ -1,9 +1,10 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.16';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.19';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
+  const API_TACTIC = 'tcg-tactic-actions';
   const state = {
     client: null,
     session: null,
@@ -23,6 +24,10 @@
     relicEligible: false,
     relicTargets: [],
     relicProjectionBusy: false,
+    tacticProjectionUid: '',
+    tacticEligible: false,
+    tacticProjectionBusy: false,
+    tacticChoiceIds: [],
     busy: false,
     poll: null
   };
@@ -200,6 +205,20 @@
     return state.relicTargets.some((target) =>
       target && evolutionTargetKey(target.where, target.index) === key
     );
+  }
+
+  function clearTacticProjection() {
+    state.tacticProjectionUid = '';
+    state.tacticEligible = false;
+    state.tacticProjectionBusy = false;
+  }
+
+  function tacticPendingChoice(view) {
+    if (!view) return null;
+    if (view.pending_choice) return view.pending_choice;
+    if (view.phase === 'effect_resolution' && view.pending_movement_listener_choice) return view.pending_movement_listener_choice;
+    if (view.phase === 'effect_resolution' && view.pending_heal_listener_choice) return view.pending_heal_listener_choice;
+    return null;
   }
 
   function attackSlots(creature) {
@@ -392,11 +411,19 @@
     const node = $('yourHand');
     if (node) node.innerHTML = hand.map((instance) => {
       const uid = String(instance && instance.uid || '');
+      const tacticAction = !!uid && state.tacticProjectionUid === uid && state.tacticEligible
+        ? [{
+            intent: 'play_tactic',
+            label: 'Play Tactic',
+            detail: 'Server-authorized Tactic'
+          }]
+        : [];
       return knownCard(instance, {
         compact: true,
         interactive: !!canPlayFromHand && !!uid,
         selected: !!uid && state.selectedHandUid === uid,
-        anchor: 'hand:' + uid
+        anchor: 'hand:' + uid,
+        actions: tacticAction
       });
     }).join('') || '<div class="sb-zone-empty">No cards in hand</div>';
     if ($('yourHandCount')) $('yourHandCount').textContent = String(countValue(view.you && view.you.hand_count != null ? view.you.hand_count : hand.length));
@@ -425,6 +452,93 @@
     }
     node.innerHTML = markup;
     node.hidden = !markup;
+  }
+
+  function renderTacticChoice(view) {
+    const panel = $('tacticChoicePanel');
+    const prompt = $('tacticChoicePrompt');
+    const rule = $('tacticChoiceRule');
+    const optionsNode = $('tacticChoiceOptions');
+    const submit = $('tacticChoiceSubmit');
+    if (!panel || !prompt || !rule || !optionsNode || !submit) return;
+
+    const pending = tacticPendingChoice(view);
+    if (!pending) {
+      panel.hidden = true;
+      state.tacticChoiceIds = [];
+      optionsNode.replaceChildren();
+      submit.disabled = true;
+      submit.onclick = null;
+      return;
+    }
+
+    panel.hidden = false;
+    const waiting = pending.waiting === true;
+    if (waiting) {
+      prompt.textContent = 'Waiting for the other player to resolve ' + String(pending.kind || 'the Tactic choice') + '.';
+      rule.textContent = 'The authoritative Tactic owner is waiting on the other seat.';
+      optionsNode.replaceChildren();
+      submit.disabled = true;
+      submit.onclick = null;
+      state.tacticChoiceIds = [];
+      return;
+    }
+
+    const minRaw = Number(pending.min);
+    const maxRaw = Number(pending.max);
+    const min = Number.isInteger(minRaw) && minRaw >= 0 ? minRaw : 0;
+    const max = Number.isInteger(maxRaw) && maxRaw >= min ? maxRaw : min;
+    const mode = String(pending.mode || 'select');
+    const options = Array.isArray(pending.options)
+      ? pending.options.map((option) => ({
+          id: String(option && option.id || ''),
+          label: String(option && option.label || option && option.id || '')
+        })).filter((option) => option.id)
+      : [];
+    const validIds = new Set(options.map((option) => option.id));
+    state.tacticChoiceIds = state.tacticChoiceIds.filter((id) => validIds.has(id));
+
+    prompt.textContent = String(pending.prompt || pending.kind || 'Resolve Tactic choice');
+    rule.textContent = 'Choose ' + min + ' to ' + max + (mode === 'order' ? ' in order.' : '.');
+    optionsNode.replaceChildren();
+
+    options.forEach((option) => {
+      const selectedIndex = state.tacticChoiceIds.indexOf(option.id);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'sb-tactic-choice-option' + (selectedIndex >= 0 ? ' is-selected' : '');
+      button.dataset.tacticChoiceId = option.id;
+      button.setAttribute('aria-pressed', selectedIndex >= 0 ? 'true' : 'false');
+
+      const label = document.createElement('span');
+      label.textContent = option.label;
+      button.appendChild(label);
+
+      if (mode === 'order' && selectedIndex >= 0) {
+        const order = document.createElement('strong');
+        order.className = 'sb-tactic-choice-order';
+        order.textContent = String(selectedIndex + 1);
+        button.appendChild(order);
+      }
+
+      button.onclick = () => {
+        const current = tacticPendingChoice(viewState());
+        if (!current || current.waiting === true || String(current.id || '') !== String(pending.id || '')) return;
+        const existingIndex = state.tacticChoiceIds.indexOf(option.id);
+        if (existingIndex >= 0) {
+          state.tacticChoiceIds.splice(existingIndex, 1);
+        } else if (mode === 'order' || state.tacticChoiceIds.length < max) {
+          state.tacticChoiceIds.push(option.id);
+        }
+        renderTacticChoice(viewState());
+      };
+      optionsNode.appendChild(button);
+    });
+
+    submit.disabled = state.tacticChoiceIds.length < min || state.tacticChoiceIds.length > max;
+    submit.onclick = submit.disabled ? null : async () => {
+      await runTacticChoiceIntent();
+    };
   }
 
   function renderRealm(view, handTarget) {
@@ -467,7 +581,8 @@
     const evolutionMode = selectedPlayCard && state.evolutionProjectionUid === state.selectedHandUid && state.evolutionEligible;
     const essenceMode = selectedPlayCard && !evolutionMode && state.essenceProjectionUid === state.selectedHandUid && state.essenceEligible;
     const relicMode = selectedPlayCard && !evolutionMode && !essenceMode && state.relicProjectionUid === state.selectedHandUid && state.relicEligible;
-    const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !state.evolutionProjectionBusy && !state.essenceProjectionBusy && !state.relicProjectionBusy;
+    const tacticMode = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && state.tacticProjectionUid === state.selectedHandUid && state.tacticEligible;
+    const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !tacticMode && !state.evolutionProjectionBusy && !state.essenceProjectionBusy && !state.relicProjectionBusy && !state.tacticProjectionBusy;
 
     $('oppVanguard').innerHTML = creatureCard(view.opponent && view.opponent.vanguard, {});
     renderYourVanguard(view.you && view.you.vanguard, {
@@ -499,6 +614,7 @@
     renderRewards('yourRewards', view.you && view.you.rewards_count, 'Your');
     renderDiscard('yourDiscard', view.you && view.you.discard_count, 'Your');
     renderPhaseControls(view);
+    renderTacticChoice(view);
 
     if (view.phase === 'complete') $('turnPill').textContent = 'Match complete';
     else if (view.phase === 'opening_choice') $('turnPill').textContent = yourOpeningChoice ? 'Your opening choice' : 'Opening choice';
@@ -513,13 +629,14 @@
     else if (view.phase === 'setup' && canSetup && state.selectedHandUid) setStatus('Setup card selected. Choose your Vanguard or a Reserve position; the server validates starter and slot legality.', 'ready');
     else if (view.phase === 'setup' && canSetup) setStatus('Your setup turn. Select a hand card to place, return a setup Creature from its card, or lock setup when ready.', 'ready');
     else if (view.phase === 'setup') setStatus('Waiting for the other player to finish setup.', 'wait');
-    else if (state.selectedHandUid && (state.evolutionProjectionBusy || state.essenceProjectionBusy || state.relicProjectionBusy) && canPlayFromHand) setStatus('Checking legal card destinations with the authoritative gameplay owners…', 'busy');
+    else if (state.selectedHandUid && (state.evolutionProjectionBusy || state.essenceProjectionBusy || state.relicProjectionBusy || state.tacticProjectionBusy) && canPlayFromHand) setStatus('Checking legal card destinations with the authoritative gameplay owners…', 'busy');
     else if (state.selectedHandUid && canPlayFromHand && state.evolutionEligible && !state.evolutionTargets.length) setStatus('Evolution card selected. The server reports no legal Creature stack this turn.', 'wait');
     else if (state.selectedHandUid && canPlayFromHand && state.evolutionEligible) setStatus('Evolution card selected. Choose a green Creature stack; the server will revalidate before committing.', 'ready');
     else if (state.selectedHandUid && canPlayFromHand && state.essenceEligible && !state.essenceTargets.length) setStatus('Essence card selected. The server reports no legal Creature target this turn.', 'wait');
     else if (state.selectedHandUid && canPlayFromHand && state.essenceEligible) setStatus('Essence card selected. Choose a green Creature target; the server will revalidate before attaching.', 'ready');
     else if (state.selectedHandUid && canPlayFromHand && state.relicEligible && !state.relicTargets.length) setStatus('Relic card selected. The server reports no Creature with an empty Relic slot.', 'wait');
     else if (state.selectedHandUid && canPlayFromHand && state.relicEligible) setStatus('Relic card selected. Choose a green Creature target; the server will revalidate before attaching.', 'ready');
+    else if (state.selectedHandUid && canPlayFromHand && state.tacticEligible) setStatus('Tactic card selected. Use Play Tactic on the selected card; the server will revalidate before committing.', 'ready');
     else if (state.selectedHandUid && canPlayFromHand) setStatus('Hand card selected. Choose a Reserve position or the shared Realm slot; the server validates the destination and card legality.', 'ready');
     else if (yourTurn) setStatus('Your turn. Select a hand card for a board destination or your active Creature for its card actions.', 'ready');
     else setStatus('Board synced. Waiting for the opponent or the next server phase.', 'wait');
@@ -541,12 +658,14 @@
           clearEvolutionProjection();
           clearEssenceProjection();
           clearRelicProjection();
+          clearTacticProjection();
           render();
           if (!deselect) {
             Promise.all([
               runEvolutionTargetProjection(uid),
               runEssenceTargetProjection(uid),
-              runRelicTargetProjection(uid)
+              runRelicTargetProjection(uid),
+              runTacticPlayabilityProjection(uid)
             ]).catch((error) => {
               setStatus(error instanceof Error ? error.message : String(error), 'error');
             });
@@ -558,6 +677,7 @@
         clearEvolutionProjection();
         clearEssenceProjection();
         clearRelicProjection();
+        clearTacticProjection();
         render();
       };
       card.addEventListener('click', (event) => {
@@ -569,6 +689,12 @@
           event.preventDefault();
           select();
         }
+      });
+    });
+    document.querySelectorAll('[data-card-intent="play_tactic"]').forEach((button) => {
+      button.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        await runTacticIntent(state.selectedHandUid);
       });
     });
     document.querySelectorAll('[data-card-intent="attack"]').forEach((button) => {
@@ -848,6 +974,7 @@
       clearEvolutionProjection();
       clearEssenceProjection();
       clearRelicProjection();
+      clearTacticProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -912,6 +1039,7 @@
       clearEvolutionProjection();
       clearEssenceProjection();
       clearRelicProjection();
+      clearTacticProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -970,9 +1098,96 @@
       clearEvolutionProjection();
       clearEssenceProjection();
       clearRelicProjection();
+      clearTacticProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runTacticPlayabilityProjection(cardUid) {
+    const view = viewState();
+    const seat = Number(view && view.you && view.you.seat);
+    const canProject = !!cardUid && view && view.phase === 'play' && Number(view.active_seat) === seat && !state.busy;
+    if (!canProject) return;
+    state.tacticProjectionUid = cardUid;
+    state.tacticProjectionBusy = true;
+    state.tacticEligible = false;
+    render();
+    try {
+      const response = await callEdge(API_TACTIC, Object.assign(actionBase('play_tactic_legality'), {
+        card_uid: cardUid
+      }));
+      if (state.selectedHandUid !== cardUid) return;
+      const projected = response && response.result && typeof response.result === 'object' ? response.result : {};
+      state.tacticProjectionUid = cardUid;
+      state.tacticEligible = projected.eligible === true;
+    } finally {
+      if (state.selectedHandUid === cardUid) {
+        state.tacticProjectionBusy = false;
+        render();
+      }
+    }
+  }
+
+  async function runTacticIntent(cardUid) {
+    if (!cardUid) throw new Error('Select a hand card first.');
+    if (state.tacticProjectionUid !== cardUid || !state.tacticEligible) {
+      throw new Error('The selected card is not server-authorized for the generic Tactic owner.');
+    }
+    state.busy = true;
+    render();
+    setStatus('Submitting Tactic play to the authoritative Tactic owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_TACTIC, Object.assign(actionBase('play_tactic'), {
+        card_uid: cardUid
+      }));
+      state.selectedHandUid = '';
+      state.tacticChoiceIds = [];
+      clearEvolutionProjection();
+      clearEssenceProjection();
+      clearRelicProjection();
+      clearTacticProjection();
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runTacticChoiceIntent() {
+    const pending = tacticPendingChoice(viewState());
+    if (!pending || pending.waiting === true) throw new Error('No Tactic choice is yours to resolve.');
+    const minRaw = Number(pending.min);
+    const maxRaw = Number(pending.max);
+    const min = Number.isInteger(minRaw) && minRaw >= 0 ? minRaw : 0;
+    const max = Number.isInteger(maxRaw) && maxRaw >= min ? maxRaw : min;
+    const choiceIds = [...state.tacticChoiceIds];
+    if (choiceIds.length < min || choiceIds.length > max) throw new Error('Select the number of choices requested by the server.');
+    state.busy = true;
+    render();
+    setStatus('Submitting Tactic choice to the authoritative Tactic owner…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_TACTIC, Object.assign(actionBase('resolve_choice'), {
+        choice_id: String(pending.id || ''),
+        choice_ids: choiceIds
+      }));
+      state.tacticChoiceIds = [];
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      state.tacticChoiceIds = choiceIds;
       await refreshMatch().catch(() => {});
     } finally {
       state.busy = false;
@@ -995,6 +1210,7 @@
       clearEvolutionProjection();
       clearEssenceProjection();
       clearRelicProjection();
+      clearTacticProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -1022,6 +1238,7 @@
       clearEvolutionProjection();
       clearEssenceProjection();
       clearRelicProjection();
+      clearTacticProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -1066,6 +1283,7 @@
         clearEvolutionProjection();
         clearEssenceProjection();
         clearRelicProjection();
+        clearTacticProjection();
       }
     }
     render();

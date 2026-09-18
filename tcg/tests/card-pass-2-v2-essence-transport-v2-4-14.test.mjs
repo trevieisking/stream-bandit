@@ -40,10 +40,11 @@ test('Essence target activation commits through the existing attach_essence acti
   assert.match(branch, /refreshMatch\(\)/);
 });
 
-test('Evolution, Essence and later Relic projections keep precedence over generic Creature Realm fallback', () => {
+test('Evolution and Essence remain ahead of Relic and later Tactic before generic Creature Realm fallback', () => {
   assert.match(controller, /const essenceMode = selectedPlayCard && !evolutionMode/);
   assert.match(controller, /const relicMode = selectedPlayCard && !evolutionMode && !essenceMode/);
-  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode/);
+  assert.match(controller, /const tacticMode = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode/);
+  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !tacticMode/);
   assert.match(controller, /actionBase\('evolve'\)/);
   assert.match(controller, /actionBase\('play_creature'\)/);
   assert.match(controller, /actionBase\('play_realm'\)/);
