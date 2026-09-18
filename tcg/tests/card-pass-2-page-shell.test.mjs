@@ -57,7 +57,7 @@ test('V2.4.32 uses repository-owned TCG branding assets with no legacy topbar lo
   await access(new URL('assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp',`file://${ROOT}/`));
   assert.ok(shell.includes('assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp'));
   assert.equal(shell.includes('assets/stream-bandit-original-stag-logo-v7-12-7.svg'),false);
-  assert.equal(/https?:\\/\\/[^\\s]*githack/i.test(JSON.stringify(manifest)),false);
+  assert.equal(JSON.stringify(manifest).includes('raw.githack.com'),false);
   assert.equal(manifest.branding.primary_logo.path,'assets/tcg/branding/stream-bandit-tcg-logo-v1.webp');
   assert.equal(manifest.branding.topbar_emblem.path,'assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp');
 });
