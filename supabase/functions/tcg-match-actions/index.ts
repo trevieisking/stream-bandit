@@ -34,6 +34,7 @@ import { runtimeV02BeginEventListenerContinuation, runtimeV02CreateCreatureEnter
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { runtimeV02ListManualEssenceAttachmentTargets, runtimeV02ValidateManualEssenceAttachmentDeclaration } from "../_shared/tcg-match-essence-attachment-engine-v0-2.ts";
 import { runtimeV02BeginRealmPlayRoute } from "../_shared/tcg-match-realm-route-v0-2.ts";
+import { runtimeV02ApplyRealmPlayTransaction } from "../_shared/tcg-match-realm-engine-v0-2.ts";
 import { runtimeV02ResolveAttackControlCondition } from "../_shared/tcg-match-condition-lifecycle-v0-2.ts";
 import { runtimeV02ResolveAftermath } from "../_shared/tcg-match-aftermath-v0-2.ts";
 import { runtimeV02ResolveAttackTarget, type RuntimeV02AttackTargetPermission } from "../_shared/tcg-match-attack-v0-2.ts";
@@ -290,6 +291,30 @@ Deno.serve(async(req)=>{
   if(action==="field_actions"){
    const withdrawal=withdrawalDeclaration(null,false);
    return json({ok:true,version:VERSION,result:{ability_sources:projectAbilitySources(),withdraw:withdrawal.ok?{eligible:true,cost:withdrawal.cost,legal_targets:withdrawal.legal_targets,payment_options:withdrawal.payment_options}:{eligible:false,reason:withdrawal.error,cost:withdrawal.cost,legal_targets:withdrawal.legal_targets,payment_options:withdrawal.payment_options}}});
+  }
+
+  if(action==="play_card_targets"){
+   const uid=String(body.card_uid||""),inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;
+   const legalTargets:any[]=[];
+   if(inst&&starterLegal(d)){
+    for(let idx=0;idx<4;idx++){
+     if(p.reserve?.[idx])continue;
+     const playerClone=structuredClone(p);
+     runtimeV02PlaceCreatureFromHand(playerClone,seat as 1|2,uid,"reserve",idx,{turn_seq:Number(s.turn_seq||0)});
+     legalTargets.push({kind:"reserve",reserve_index:idx});
+    }
+   }else if(inst&&d?.kind==="Tactic"&&d?.family==="Realm"){
+    const stateClone=structuredClone(s),clonePlayer=stateClone.players[String(seat)],cloneInst=clonePlayer.hand.find((x:Inst)=>x.uid===uid);
+    if(!cloneInst)throw new Error("tcg_v0_2_direct_play_projection_hand_clone_missing");
+    try{
+     runtimeV02ApplyRealmPlayTransaction(stateClone,seat as 1|2,cloneInst,"play_realm_projection");
+     legalTargets.push({kind:"realm"});
+    }catch(error){
+     const message=error instanceof Error?error.message:String(error);
+     if(message!=="tcg_v0_2_realm_already_played_this_turn"&&message!=="tcg_v0_2_realm_same_named_replacement_forbidden")throw error;
+    }
+   }
+   return json({ok:true,version:VERSION,result:{card_uid:uid,eligible:legalTargets.length>0,legal_targets:legalTargets}});
   }
 
   if(action==="evolve_targets"){
