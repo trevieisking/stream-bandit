@@ -355,7 +355,7 @@ Deno.serve(async(req)=>{
     const inst=p.hand.find((x:Inst)=>x.uid===uid)!;
     const targetInst={uid:legality.target_creature_uid};
     const d=def(s,inst),td=top(cr,s);
-    const routed=runtimeV02BeginExternalEssenceAttachmentRoute(s,seat as 1|2,targetInst.uid,uid,"hand","manual_essence",{attachment_kind:"normal",phase:"play",action_kind:"manual_essence",destination_index:legality.index});
+    const routed=runtimeV02BeginExternalEssenceAttachmentRoute(s,seat as 1|2,targetInst.uid,uid,"hand","manual_essence",{attachment_kind:"normal",phase:"play",action_kind:"manual_essence",destination_index:where==="reserve"?idx:null});
     flags.manual_essence_turn=turn;
     const eventFlow=routed.flow,eventAudit=eventListenerAudit(eventFlow);
     log(`Seat ${seat} attached ${d?.name||inst.card_id} to ${td?.name||"a creature"}.`);

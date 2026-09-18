@@ -55,3 +55,14 @@ TCG #674 proved the new Essence legality itself type-checks and deterministic ru
 2. accepted ownership tests preserve the explicit `targetInst.uid` handoff into the external Attachment Route. The structured branch now names the already server-validated anchor as `targetInst.uid` before routing, without reintroducing target legality.
 
 No Essence rule, mutation, listener, browser, database or legacy fallback behavior changes in this repair.
+
+
+## V2.4.13-008 — final route-shape compatibility repair
+
+**State:** ✅ DETACHED REPAIR CANDIDATE
+
+TCG #675 showed one remaining historical ownership assertion: the structured external Attachment Route must retain the explicit option shape `destination_index:where==="reserve"?idx:null`.
+
+The declaration has already been validated by the shared Essence legality owner, so preserving this expression does not return legality to the dispatcher; it only keeps the accepted route contract visible. The match-actions release fingerprint is refreshed for the resulting entrypoint byte change.
+
+No Essence owner, rule, mutation, listener, legacy fallback, browser, database or card-data behavior changes.
