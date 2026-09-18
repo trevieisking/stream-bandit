@@ -59,3 +59,12 @@ No Match/Tactic/Setup runtime, renderer, database schema, migration or card-data
 ## 7. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff evidence are required. Supabase v6 remains unchanged for this browser slice.
+
+
+## 8. Accepted checkpoint
+
+V2.4.23 is accepted at `3840c79f9eef51fe1ae70f21cbbc86a55adadd57` after TCG #706, Migration #876 and Functional Smoke #902 all succeeded.
+
+The full canonical **INTERACT-01…09** family is now accepted. Match v6 and Tactic v4 remain unchanged because V2.4.23 is browser-only.
+
+**Next locked target:** V2.4.24 / Stage 3 board-visible resolution — authoritative `pending_resolution` → visible Reward claim and mandatory promotion controls using existing `take_reward` and `promote` owners. No reward-count, defeat, or promotion legality may be duplicated in the browser.

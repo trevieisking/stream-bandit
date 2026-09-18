@@ -115,15 +115,15 @@
 
 ## F. V2-INTERACT-01 — direct tabletop interaction
 
-- [ ] **INTERACT-01** Creature from hand can be dragged or tap-selected to legal Vanguard/Reserve destination.
-- [ ] **INTERACT-02** Evolution can be dragged/tap-selected to legal Creature stack with green highlighting.
-- [ ] **INTERACT-03** Essence can be dragged/tap-selected to legal Creature.
-- [ ] **INTERACT-04** Relic can be dragged/tap-selected to legal host.
-- [ ] **INTERACT-05** Realm can be dragged/tap-selected to Realm slot.
-- [ ] **INTERACT-06** Tactic launches structured board target/choice flow from the physical card.
-- [ ] **INTERACT-07** Misclick/selection can be cancelled before authoritative commit where rules permit.
-- [ ] **INTERACT-08** Server authority remains final legality authority for every interaction.
-- [ ] **INTERACT-09** Vanguard Ability/Attack/Withdraw remain card-context actions.
+- [x] **INTERACT-01** Creature from hand can be dragged or tap-selected to legal Vanguard/Reserve destination.
+- [x] **INTERACT-02** Evolution can be dragged/tap-selected to legal Creature stack with green highlighting.
+- [x] **INTERACT-03** Essence can be dragged/tap-selected to legal Creature.
+- [x] **INTERACT-04** Relic can be dragged/tap-selected to legal host.
+- [x] **INTERACT-05** Realm can be dragged/tap-selected to Realm slot.
+- [x] **INTERACT-06** Tactic launches structured board target/choice flow from the physical card.
+- [x] **INTERACT-07** Misclick/selection can be cancelled before authoritative commit where rules permit.
+- [x] **INTERACT-08** Server authority remains final legality authority for every interaction.
+- [x] **INTERACT-09** Vanguard Ability/Attack/Withdraw remain card-context actions.
 
 ---
 

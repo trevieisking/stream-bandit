@@ -352,3 +352,22 @@ Do not change gameplay rules merely to make the visual shell easier to build.
 Do not add another isolated debug control as the main product-development slice.
 
 Do not deploy Supabase unless a later exact visual/data integration gap proves a backend change is actually required.
+
+
+## 2026-09-18 — canonical INTERACT-01…09 synchronization
+
+**Accepted source head:** `3840c79f9eef51fe1ae70f21cbbc86a55adadd57`
+
+The per-slice V2.4.8 through V2.4.23 evidence now closes all nine direct-tabletop interaction entries in the canonical V2.4.1 checklist through the tap/select/accessibility path:
+
+- Creature placement;
+- Evolution;
+- Essence;
+- Relic;
+- Realm;
+- structured Tactic play/choices;
+- cancellation before commit where applicable;
+- server-final legality;
+- card-owned Ability/Attack/Withdraw.
+
+This does **not** close ORDER-05 because the same Stage 3 order item also requires remaining board-visible resolution/state feedback. The next target is V2.4.24 Reward claim + mandatory promotion under the existing Match owner.

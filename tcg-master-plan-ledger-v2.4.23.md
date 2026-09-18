@@ -65,3 +65,26 @@ TCG #705 completed the full deterministic runtime/type-check lane successfully. 
 2. The Attack click harness counted every `tcg-match-actions` request as an Attack command. V2.4.23 adds read-only `field_actions` projection calls on that same endpoint, so the harness must count only payloads where `action === 'attack'`.
 
 The repair changes tests/ledger only. Product/browser/server bytes remain unchanged. The Attack harness now returns a valid read-only projection fixture and still proves exactly one authoritative Attack mutation command is emitted per card click.
+
+
+## V2.4.23-009 — exact-head acceptance
+
+**State:** ✅ ACCEPTED
+
+Accepted browser head: `3840c79f9eef51fe1ae70f21cbbc86a55adadd57`.
+
+Fresh exact-head evidence:
+- TCG Card Pass 2 Validation #706 ✅
+- Migration Replay #876 ✅
+- Functional Smoke #902 ✅
+- review threads: 0 ✅
+- legacy combined statuses: 0 ✅
+- bounded delta: browser/CSS/cache/tests/V2.4.23 controls only; no server runtime or database source ✅
+
+The repair after #705 changed only two historical tests plus this ledger. Browser product bytes remained the original V2.4.23 candidate.
+
+Supabase remains `tcg-match-actions` v6 and `tcg-tactic-actions` v4, both ACTIVE with JWT verification preserved.
+
+INTERACT-09 is closed. The complete INTERACT-01…09 direct tabletop interaction family is now accepted through the tap/select/accessibility path with final server legality retained.
+
+The next canonical Stage 3 gap is not animation yet: board-visible resolution state remains incomplete. Match already exposes `pending_resolution` and owns `take_reward` / `promote`, while the V2 board has no resolution controls. V2.4.24 therefore targets Reward claim + mandatory promotion presentation/interaction.

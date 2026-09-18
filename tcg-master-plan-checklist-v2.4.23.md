@@ -32,15 +32,15 @@
 
 ## D. Exact-head acceptance
 
-- [ ] **V2423-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2423-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2423-CI-03** Functional Smoke succeeds.
-- [ ] **V2423-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2423-DIFF-01** diff stays bounded to battle browser/CSS/cache/tests/V2.4.23 controls.
+- [x] **V2423-CI-01** TCG Card Pass 2 Validation succeeds — #706 at accepted head `3840c79f9eef51fe1ae70f21cbbc86a55adadd57`.
+- [x] **V2423-CI-02** Migration Replay succeeds from zero — #876.
+- [x] **V2423-CI-03** Functional Smoke succeeds — #902.
+- [x] **V2423-REVIEW-01** review threads remain zero / material findings resolved.
+- [x] **V2423-DIFF-01** diff stays bounded to battle browser/CSS/cache/tests/V2.4.23 controls; no server runtime/database source changed.
 
 ## E. Master-plan interaction state
 
 - [x] **INTERACT-01…08** accepted.
-- [ ] **INTERACT-09** Vanguard Ability/Attack/Withdraw — source candidate complete; close after D passes.
+- [x] **INTERACT-09** Vanguard Ability/Attack/Withdraw — accepted as card-context actions under server projection/final legality.
 
-**Decision:** source candidate only until D passes. Supabase Match v6 / Tactic v4 / merge / `main` / public / full-live remain unchanged.
+**Decision:** V2.4.23 ACCEPTED ✅ at `3840c79f9eef51fe1ae70f21cbbc86a55adadd57`. INTERACT-09 and the full INTERACT-01…09 family are complete. Supabase remains Match v6 / Tactic v4 because this is a browser-only slice. Merge / `main` / public / full-live remain HOLD 🔒.
