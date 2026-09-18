@@ -44,7 +44,8 @@ test('Evolution and Essence remain ahead of Relic and later Tactic before generi
   assert.match(controller, /const essenceMode = selectedPlayCard && !evolutionMode/);
   assert.match(controller, /const relicMode = selectedPlayCard && !evolutionMode && !essenceMode/);
   assert.match(controller, /const tacticMode = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode/);
-  assert.match(controller, /const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !tacticMode/);
+  assert.match(controller, /const directPlayMode = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !tacticMode/);
+  assert.match(controller, /state\.playProjectionUid === state\.selectedHandUid/);
   assert.match(controller, /actionBase\('evolve'\)/);
   assert.match(controller, /actionBase\('play_creature'\)/);
   assert.match(controller, /actionBase\('play_realm'\)/);
