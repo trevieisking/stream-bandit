@@ -36,15 +36,15 @@
 
 ## E. Exact-head acceptance
 
-- [ ] **V2424-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2424-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2424-CI-03** Functional Smoke succeeds.
-- [ ] **V2424-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2424-DIFF-01** diff stays bounded to battle browser/CSS/cache/tests/V2.4.24 controls.
+- [x] **V2424-CI-01** TCG Card Pass 2 Validation succeeds — #708 SUCCESS at behavior head `37e06263ade6b7ee15a881ce39a230411dee2161`.
+- [x] **V2424-CI-02** Migration Replay succeeds from zero — #878 SUCCESS.
+- [x] **V2424-CI-03** Functional Smoke succeeds — #904 SUCCESS.
+- [x] **V2424-REVIEW-01** review threads remain zero / material findings resolved — 0 review threads, 0 legacy combined statuses.
+- [x] **V2424-DIFF-01** diff stays bounded to battle browser/CSS/cache/tests/V2.4.24 controls — exactly 1 commit / 8 files / 0 server-runtime, schema, migration or card-data changes.
 
 ## F. Canonical checklist effect
 
-- [ ] **STATE-VIS-07** Reward count/claim state — close only after E passes.
-- [ ] **STATE-VIS-11** Defeat/KO + mandatory promotion — close resolution-surface portion only after E passes.
+- [x] **STATE-VIS-07** Reward count/claim state — accepted after E passed.
+- [x] **STATE-VIS-11** Defeat/KO + mandatory promotion — accepted resolution surface after E passed.
 
-**Decision:** source candidate only until E passes. Supabase Match v6 / Tactic v4 / merge / `main` / public / full-live remain unchanged.
+**Decision:** ✅ ACCEPTED SOURCE. Behavior head `37e06263ade6b7ee15a881ce39a230411dee2161` passed all exact-head gates. Supabase Match v6 / Tactic v4 remain unchanged; merge / `main` / public / full-live remain HOLD.
