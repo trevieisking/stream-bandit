@@ -41,3 +41,20 @@ No product/browser/renderer/Edge/schema/migration/card-data changes are proposed
 **State:** 🔄
 
 Hold INTERACT-08 acceptance until fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff gates pass.
+
+
+## V2.4.21-007 — exact-head acceptance
+
+**State:** ✅ ACCEPTED
+
+Accepted head: `751890b9b20dd20e51ef474d7035d58ae8d07194`.
+
+Exact gates:
+- TCG Card Pass 2 Validation #700 ✅
+- Migration Replay #870 ✅
+- Functional Smoke #896 ✅
+- review threads: 0 ✅
+- legacy combined statuses: 0 ✅
+- bounded diff: one aggregate server-authority regression + three controls only ✅
+
+INTERACT-08 is complete. Browser projections remain advisory; final Setup, Creature, Evolution, Essence, Relic, Realm, Tactic and Attack actions all revalidate at their authoritative server owners. Active Ability and Withdrawal server routes are already canonical and remain the authority for the next browser slice.

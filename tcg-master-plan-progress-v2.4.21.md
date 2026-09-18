@@ -46,3 +46,12 @@ Attack is already card-context. Ability and Withdraw browser transport must be a
 ## 6. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff evidence are required.
+
+
+## 7. Accepted checkpoint
+
+V2.4.21 is accepted at `751890b9b20dd20e51ef474d7035d58ae8d07194`.
+
+INTERACT-08 server-final legality is complete with zero product/runtime changes.
+
+**Next locked target:** INTERACT-09 — Vanguard Ability/Attack/Withdraw remain card-context actions. Attack is already card-owned. Ability and Withdraw require a server-owned read-only action projection before browser controls are added; do not copy Arcade Lab metadata inference or manual Withdrawal-cost prompts.
