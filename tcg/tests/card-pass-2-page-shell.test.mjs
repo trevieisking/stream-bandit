@@ -12,7 +12,7 @@ test('V2.4.30 TCG-owned visual client assets exist and public pages keep shared 
   await access(new URL('assets/tcg-realm-client-backdrop-v2-4-30.svg',`file://${ROOT}/`));
   await access(new URL('assets/tcg-card-back-v2-4-30.svg',`file://${ROOT}/`));
   const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.js');
-  assert.ok(shell.includes('const VERSION="2.4.31"'));
+  assert.ok(shell.includes('const VERSION="2.4.32"'));
 });
 
 
@@ -57,7 +57,7 @@ test('V2.4.32 uses repository-owned TCG branding assets with no legacy topbar lo
   await access(new URL('assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp',`file://${ROOT}/`));
   assert.ok(shell.includes('assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp'));
   assert.equal(shell.includes('assets/stream-bandit-original-stag-logo-v7-12-7.svg'),false);
-  assert.equal(manifest.hosting.includes('GitHack dependency'),false);
+  assert.equal(/https?:\\/\\/[^\\s]*githack/i.test(JSON.stringify(manifest)),false);
   assert.equal(manifest.branding.primary_logo.path,'assets/tcg/branding/stream-bandit-tcg-logo-v1.webp');
   assert.equal(manifest.branding.topbar_emblem.path,'assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp');
 });
