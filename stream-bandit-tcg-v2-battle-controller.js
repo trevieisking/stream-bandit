@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.24';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.25';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -321,6 +321,38 @@
     );
   }
 
+  function printedActiveAbility(creature) {
+    const instance = topInstance(creature);
+    const structured = instance ? structuredDefinition(instance) : null;
+    const ability = structured && structured.creature && typeof structured.creature === 'object'
+      ? structured.creature.ability
+      : null;
+    return !!ability && typeof ability === 'object' && String(ability.mode || '').toLowerCase() === 'active';
+  }
+
+  function abilityContextAction(creature, where, index) {
+    if (!creature || !fieldActionsFresh() || !printedActiveAbility(creature)) return null;
+    const anchor = cardAnchor(creature);
+    if (!anchor) return null;
+    if (legalAbilitySource(where, index, anchor)) {
+      return {
+        intent: 'use_ability',
+        label: 'Use Ability',
+        detail: 'Ability ready · server projected',
+        where,
+        index
+      };
+    }
+    return {
+      intent: 'ability_status',
+      label: 'Ability locked',
+      detail: 'Not server-available now',
+      where,
+      index,
+      enabled: false
+    };
+  }
+
   function legalWithdrawTarget(index) {
     if (!fieldActionsFresh() || !Number.isInteger(index)) return false;
     const view = viewState();
@@ -453,8 +485,9 @@
       if (setupReturn && creature) {
         contextActions.push({ intent: 'setup_return', label: 'Return to hand', detail: 'Setup placement', where: 'reserve', index });
       }
-      if (abilityActions && creature && legalAbilitySource('reserve', index, cardAnchor(creature))) {
-        contextActions.push({ intent: 'use_ability', label: 'Use Ability', detail: 'Server-projected Active Ability', where: 'reserve', index });
+      if (abilityActions && creature) {
+        const abilityAction = abilityContextAction(creature, 'reserve', index);
+        if (abilityAction) contextActions.push(abilityAction);
       }
       return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + (essenceTarget ? ' is-essence-target' : '') + (relicTarget ? ' is-relic-target' : '') + (withdrawTarget ? ' is-withdraw-target' : '') + (withdrawTarget && state.withdrawTargetIndex === index ? ' is-withdraw-target-selected' : '') + (promotionTarget ? ' is-promotion-target' : '') + (promotionTarget && state.promotionReserveIndex === index ? ' is-promotion-selected' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
         ownerLabel + ' Reserve ' + (index + 1) + '</span>' + creatureCard(creature, { contextActions }) + '</section>';
@@ -469,8 +502,9 @@
     if (opts.setupReturn && creature) {
       contextActions.push({ intent: 'setup_return', label: 'Return to hand', detail: 'Setup Vanguard', where: 'vanguard' });
     }
-    if (opts.abilityAction && creature && legalAbilitySource('vanguard', null, cardAnchor(creature))) {
-      contextActions.push({ intent: 'use_ability', label: 'Use Ability', detail: 'Server-projected Active Ability', where: 'vanguard' });
+    if (opts.abilityAction && creature) {
+      const abilityAction = abilityContextAction(creature, 'vanguard', null);
+      if (abilityAction) contextActions.push(abilityAction);
     }
     if (opts.withdrawAction && creature && state.fieldWithdraw.eligible === true) {
       const cost = Number(state.fieldWithdraw.cost);
@@ -571,14 +605,50 @@
     if ($('yourHandCount')) $('yourHandCount').textContent = String(countValue(view.you && view.you.hand_count != null ? view.you.hand_count : hand.length));
   }
 
+  function resultReasonLabel(value) {
+    return String(value || '').replace(/_/g, ' ').replace(/[^A-Za-z0-9 -]/g, '').trim();
+  }
+
+  function resultDescriptor(view) {
+    if (!view || !view.result || typeof view.result !== 'object') return null;
+    const seat = Number(view.you && view.you.seat);
+    const winnerSeat = Number(view.result.winner_seat);
+    const reasons = Array.isArray(view.result.reasons)
+      ? view.result.reasons.map(resultReasonLabel).filter(Boolean)
+      : [];
+    const reason = resultReasonLabel(view.result.reason);
+    if (winnerSeat === 1 || winnerSeat === 2) {
+      return {
+        outcome: winnerSeat === seat ? 'Victory' : 'Defeat',
+        winner_seat: winnerSeat,
+        reasons
+      };
+    }
+    if (view.phase === 'overtime_pending') {
+      return {
+        outcome: 'Overtime pending',
+        winner_seat: null,
+        reasons: reason ? [reason] : []
+      };
+    }
+    return null;
+  }
+
   function renderPhaseControls(view) {
     const node = $('phaseControls');
     if (!node) return;
     const seat = Number(view.you && view.you.seat);
     const resolution = resolutionDescriptor(view);
     const localResolution = ownResolution(view);
+    const result = resultDescriptor(view);
     let markup = '';
-    if (view.phase === 'opening_choice') {
+    if (view.phase === 'complete' && result) {
+      markup = '<span data-match-result="complete"><strong>' + result.outcome + '</strong>' +
+        (result.reasons.length ? ' · ' + result.reasons.join(' · ') : ' · Match complete') + '</span>';
+    } else if (view.phase === 'overtime_pending' && result) {
+      markup = '<span data-match-result="overtime"><strong>Overtime pending</strong>' +
+        (result.reasons.length ? ' · ' + result.reasons.join(' · ') : '') + '</span>';
+    } else if (view.phase === 'opening_choice') {
       if (Number(view.toss_winner_seat) === seat) {
         markup = '<span>Opening toss won. Choose turn order:</span>' +
           '<button type="button" data-lifecycle-intent="opening_choice" data-choice="first">Go first</button>' +
@@ -842,6 +912,7 @@
     renderActionChoice(view);
 
     if (view.phase === 'complete') $('turnPill').textContent = 'Match complete';
+    else if (view.phase === 'overtime_pending') $('turnPill').textContent = 'Overtime pending';
     else if (view.phase === 'opening_choice') $('turnPill').textContent = yourOpeningChoice ? 'Your opening choice' : 'Opening choice';
     else if (view.phase === 'setup') $('turnPill').textContent = yourSetup ? 'Your setup' : 'Opponent setup';
     else if (view.phase === 'resolution') $('turnPill').textContent = localResolution ? 'Your resolution' : 'Resolution';
@@ -849,7 +920,14 @@
     $('revisionPill').textContent = 'Revision ' + revision();
     $('phasePill').textContent = String(view.phase || '—');
 
-    if (view.phase === 'resolution' && localResolution && localResolution.kind === 'take_reward') {
+    const terminalResult = resultDescriptor(view);
+    if (view.phase === 'complete' && terminalResult) {
+      setStatus(terminalResult.outcome + '. Match complete' + (terminalResult.reasons.length ? ' · ' + terminalResult.reasons.join(' · ') : '') + '.', 'ready');
+    }
+    else if (view.phase === 'overtime_pending' && terminalResult) {
+      setStatus('Overtime pending. The authoritative Match Flow owner has not declared a winner.', 'wait');
+    }
+    else if (view.phase === 'resolution' && localResolution && localResolution.kind === 'take_reward') {
       setStatus('Reward resolution: choose exactly ' + localResolution.count + ' face-down Reward position' + (localResolution.count === 1 ? '' : 's') + ', then confirm.', 'ready');
     }
     else if (view.phase === 'resolution' && localResolution && localResolution.kind === 'promote') {
