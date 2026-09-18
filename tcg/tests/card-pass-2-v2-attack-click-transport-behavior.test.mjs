@@ -48,6 +48,10 @@ class FakeNode {
     return this._innerHTML;
   }
 
+  replaceChildren(...children) {
+    this._innerHTML = children.map((child) => String(child && child.textContent || '')).join('');
+  }
+
   closest() {
     return null;
   }

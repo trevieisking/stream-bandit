@@ -45,3 +45,14 @@ No card renderer, Supabase runtime, schema, migration or card-data source change
 **State:** 🔄
 
 Hold INTERACT-06 acceptance until fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff gates pass.
+
+
+## V2.4.19-007 — Attack transport harness rollover
+
+**State:** ✅ REPAIR CANDIDATE
+
+TCG #695 completed the full deterministic runtime/type-check lane successfully. Its only failed Node subtest was the existing rendered Attack click harness.
+
+The product controller now renders the hidden Tactic choice panel before binding card controls. The harness's `getElementById` creates a fake node for every requested element, but `FakeNode` did not implement the standard DOM `replaceChildren()` method used to clear the hidden choice options. The simulated render therefore aborted before `bindCardControls()`, leaving the fake Attack button without a click listener.
+
+The repair adds only `FakeNode.replaceChildren()` to the test double. Attack source, Tactic source, renderer, server runtime and browser behavior are unchanged.
