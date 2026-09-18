@@ -41,3 +41,12 @@ V2.4.20 adds regression/evidence controls only:
 ## 5. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff evidence are required.
+
+
+## 6. Accepted checkpoint
+
+V2.4.20 is accepted at `872e9a82679eebfa9bf09fb21761d6b314b7f9e4`.
+
+INTERACT-07 selection cancellation is complete. No controller, renderer, Supabase runtime, schema, migration or card-data bytes changed.
+
+**Next locked target from canonical V2.4.1:** INTERACT-08 — server authority remains final legality authority for every interaction. Prove the projection/commit revalidation chain across setup, Creature, Evolution, Essence, Relic, Realm, Tactic and Attack before considering any code change.

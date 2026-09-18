@@ -24,11 +24,11 @@
 
 ## C. Exact-head acceptance
 
-- [ ] **V2420-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2420-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2420-CI-03** Functional Smoke succeeds.
-- [ ] **V2420-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2420-DIFF-01** diff is regression/evidence controls only.
+- [x] **V2420-CI-01** TCG Card Pass 2 Validation succeeds — #698 at accepted head `872e9a82679eebfa9bf09fb21761d6b314b7f9e4`.
+- [x] **V2420-CI-02** Migration Replay succeeds from zero — #868.
+- [x] **V2420-CI-03** Functional Smoke succeeds — #894.
+- [x] **V2420-REVIEW-01** review threads remain zero / material findings resolved.
+- [x] **V2420-DIFF-01** diff is regression/evidence controls only; zero product bytes changed.
 
 ## D. Master-plan interaction state
 
@@ -38,8 +38,8 @@
 - [x] **INTERACT-04** Relic.
 - [x] **INTERACT-05** Realm.
 - [x] **INTERACT-06** Tactic.
-- [ ] **INTERACT-07** Selection cancellation — implementation proven; close only after C passes.
+- [x] **INTERACT-07** Selection cancellation — pre-commit select/deselect path accepted.
 - [ ] **INTERACT-08** Server authority remains final legality authority.
 - [ ] **INTERACT-09** Vanguard Ability/Attack/Withdraw remain card-context actions.
 
-**Decision:** evidence candidate only until C passes. Main/public/full-live remain HOLD.
+**Decision:** V2.4.20 ACCEPTED ✅ at `872e9a82679eebfa9bf09fb21761d6b314b7f9e4`. INTERACT-07 is complete with zero product-byte change. Main/public/full-live remain HOLD 🔒.

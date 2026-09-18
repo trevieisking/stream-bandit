@@ -35,3 +35,20 @@ INTERACT-07 is explicitly pre-commit. Authoritative pending choices created afte
 **State:** 🔄
 
 No product code change is proposed. Hold acceptance until fresh exact-head gates prove the new regression contract alongside the unchanged product bytes.
+
+
+## V2.4.20-006 — exact-head acceptance
+
+**State:** ✅ ACCEPTED
+
+Accepted head: `872e9a82679eebfa9bf09fb21761d6b314b7f9e4`.
+
+Exact gates:
+- TCG Card Pass 2 Validation #698 ✅
+- Migration Replay #868 ✅
+- Functional Smoke #894 ✅
+- review threads: 0 ✅
+- legacy combined statuses: 0 ✅
+- bounded diff: one regression test + three controls only ✅
+
+INTERACT-07 is complete with no product code change. The accepted controller already provides cancellable pre-commit selection for hand and battlefield cards while keeping committed server continuations authoritative.
