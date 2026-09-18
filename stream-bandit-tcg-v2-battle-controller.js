@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.25';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.26';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -27,6 +27,9 @@
     tacticProjectionUid: '',
     tacticEligible: false,
     tacticProjectionBusy: false,
+    playProjectionUid: '',
+    playTargets: [],
+    playProjectionBusy: false,
     actionChoiceIds: [],
     fieldActionRevision: -1,
     fieldActionsBusy: false,
@@ -222,6 +225,24 @@
     state.tacticProjectionUid = '';
     state.tacticEligible = false;
     state.tacticProjectionBusy = false;
+  }
+
+  function clearPlayProjection() {
+    state.playProjectionUid = '';
+    state.playTargets = [];
+    state.playProjectionBusy = false;
+  }
+
+  function legalPlayCreatureTarget(index) {
+    if (state.playProjectionBusy || state.playProjectionUid !== state.selectedHandUid || !Number.isInteger(index)) return false;
+    return state.playTargets.some((target) =>
+      target && target.kind === 'reserve' && target.reserve_index === index
+    );
+  }
+
+  function legalPlayRealmTarget() {
+    if (state.playProjectionBusy || state.playProjectionUid !== state.selectedHandUid) return false;
+    return state.playTargets.some((target) => target && target.kind === 'realm');
   }
 
   function pendingActionChoice(view) {
@@ -450,7 +471,7 @@
     if (!node) return;
     const opts = options || {};
     const handTarget = !!opts.handTarget;
-    const handTargetMode = String(opts.handTargetMode || 'play');
+    const playCreatureTargets = !!opts.playCreatureTargets;
     const setupReturn = !!opts.setupReturn;
     const evolutionTargets = !!opts.evolutionTargets;
     const essenceTargets = !!opts.essenceTargets;
@@ -459,8 +480,8 @@
     const withdrawTargets = !!opts.withdrawTargets;
     const promotionTargets = !!opts.promotionTargets;
     node.innerHTML = [0, 1, 2, 3].map((index) => {
-      const setupMode = handTarget && handTargetMode === 'setup';
       const creature = reserve && reserve[index];
+      const playCreatureTarget = playCreatureTargets && !creature && legalPlayCreatureTarget(index);
       const evolutionTarget = evolutionTargets && !!creature && legalEvolutionTarget('reserve', index);
       const essenceTarget = essenceTargets && !!creature && legalEssenceTarget('reserve', index);
       const relicTarget = relicTargets && !!creature && legalRelicTarget('reserve', index);
@@ -476,11 +497,11 @@
               ? ' tabindex="0" role="button" data-withdraw-target-index="' + index + '" aria-label="Choose ' + ownerLabel + ' Reserve ' + (index + 1) + ' as the server-projected Withdrawal target"'
               : (promotionTarget
                 ? ' tabindex="0" role="button" data-promotion-reserve-index="' + index + '" aria-label="Select ' + ownerLabel + ' Reserve ' + (index + 1) + ' for mandatory promotion"'
-                : (handTarget
-              ? (setupMode
-                ? ' tabindex="0" role="button" data-setup-place-where="reserve" data-setup-place-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + ' during setup"'
-                : ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + '"')
-              : '')))));
+                : (playCreatureTarget
+                  ? ' tabindex="0" role="button" data-play-creature-reserve-index="' + index + '" aria-label="Play selected card to server-projected ' + ownerLabel + ' Reserve ' + (index + 1) + '"'
+                  : (handTarget
+                    ? ' tabindex="0" role="button" data-setup-place-where="reserve" data-setup-place-index="' + index + '" aria-label="Try selected hand card in ' + ownerLabel + ' Reserve ' + (index + 1) + ' during setup"'
+                    : ''))))));
       const contextActions = [];
       if (setupReturn && creature) {
         contextActions.push({ intent: 'setup_return', label: 'Return to hand', detail: 'Setup placement', where: 'reserve', index });
@@ -489,7 +510,7 @@
         const abilityAction = abilityContextAction(creature, 'reserve', index);
         if (abilityAction) contextActions.push(abilityAction);
       }
-      return '<section class="sb-reserve-slot' + (handTarget ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + (essenceTarget ? ' is-essence-target' : '') + (relicTarget ? ' is-relic-target' : '') + (withdrawTarget ? ' is-withdraw-target' : '') + (withdrawTarget && state.withdrawTargetIndex === index ? ' is-withdraw-target-selected' : '') + (promotionTarget ? ' is-promotion-target' : '') + (promotionTarget && state.promotionReserveIndex === index ? ' is-promotion-selected' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
+      return '<section class="sb-reserve-slot' + ((handTarget || playCreatureTarget) ? ' is-hand-target' : '') + (evolutionTarget ? ' is-evolution-target' : '') + (essenceTarget ? ' is-essence-target' : '') + (relicTarget ? ' is-relic-target' : '') + (withdrawTarget ? ' is-withdraw-target' : '') + (withdrawTarget && state.withdrawTargetIndex === index ? ' is-withdraw-target-selected' : '') + (promotionTarget ? ' is-promotion-target' : '') + (promotionTarget && state.promotionReserveIndex === index ? ' is-promotion-selected' : '') + '"' + targetAttrs + '><span class="sb-slot-label">' +
         ownerLabel + ' Reserve ' + (index + 1) + '</span>' + creatureCard(creature, { contextActions }) + '</section>';
     }).join('');
   }
@@ -826,17 +847,17 @@
     };
   }
 
-  function renderRealm(view, handTarget) {
+  function renderRealm(view, realmTarget) {
     const node = $('realmSlot');
     if (!node) return;
     const target = node.closest('.sb-realm-slot');
     if (target) {
-      target.classList.toggle('is-hand-target', !!handTarget);
-      if (handTarget) {
+      target.classList.toggle('is-hand-target', !!realmTarget);
+      if (realmTarget) {
         target.setAttribute('tabindex', '0');
         target.setAttribute('role', 'button');
         target.setAttribute('data-play-realm-target', 'true');
-        target.setAttribute('aria-label', 'Try selected hand card in the shared Realm slot');
+        target.setAttribute('aria-label', 'Play selected card to the server-projected shared Realm slot');
       } else {
         target.removeAttribute('tabindex');
         target.removeAttribute('role');
@@ -872,7 +893,11 @@
     const essenceMode = selectedPlayCard && !evolutionMode && state.essenceProjectionUid === state.selectedHandUid && state.essenceEligible;
     const relicMode = selectedPlayCard && !evolutionMode && !essenceMode && state.relicProjectionUid === state.selectedHandUid && state.relicEligible;
     const tacticMode = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && state.tacticProjectionUid === state.selectedHandUid && state.tacticEligible;
-    const playHandTarget = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !tacticMode && !state.evolutionProjectionBusy && !state.essenceProjectionBusy && !state.relicProjectionBusy && !state.tacticProjectionBusy;
+    const directPlayMode = selectedPlayCard && !evolutionMode && !essenceMode && !relicMode && !tacticMode &&
+      state.playProjectionUid === state.selectedHandUid && !state.playProjectionBusy &&
+      !state.evolutionProjectionBusy && !state.essenceProjectionBusy && !state.relicProjectionBusy && !state.tacticProjectionBusy;
+    const playCreatureTargets = directPlayMode && state.playTargets.some((target) => target && target.kind === 'reserve');
+    const playRealmTarget = directPlayMode && legalPlayRealmTarget();
 
     $('oppVanguard').innerHTML = creatureCard(view.opponent && view.opponent.vanguard, {});
     renderYourVanguard(view.you && view.you.vanguard, {
@@ -888,8 +913,8 @@
     });
     renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent');
     renderReserve('youReserve', view.you && view.you.reserve, 'Your', {
-      handTarget: setupHandTarget || playHandTarget,
-      handTargetMode: canSetup ? 'setup' : 'play',
+      handTarget: setupHandTarget,
+      playCreatureTargets,
       evolutionTargets: evolutionMode,
       essenceTargets: essenceMode,
       relicTargets: relicMode,
@@ -898,7 +923,7 @@
       withdrawTargets: localWithdraw,
       promotionTargets: promotionResolution
     });
-    renderRealm(view, playHandTarget);
+    renderRealm(view, playRealmTarget);
 
     renderOpponentHand(view);
     renderYourHand(view, canSelectFromHand);
@@ -945,7 +970,7 @@
     else if (view.phase === 'setup' && canSetup && state.selectedHandUid) setStatus('Setup card selected. Choose your Vanguard or a Reserve position; the server validates starter and slot legality.', 'ready');
     else if (view.phase === 'setup' && canSetup) setStatus('Your setup turn. Select a hand card to place, return a setup Creature from its card, or lock setup when ready.', 'ready');
     else if (view.phase === 'setup') setStatus('Waiting for the other player to finish setup.', 'wait');
-    else if (state.selectedHandUid && (state.evolutionProjectionBusy || state.essenceProjectionBusy || state.relicProjectionBusy || state.tacticProjectionBusy) && canPlayFromHand) setStatus('Checking legal card destinations with the authoritative gameplay owners…', 'busy');
+    else if (state.selectedHandUid && (state.evolutionProjectionBusy || state.essenceProjectionBusy || state.relicProjectionBusy || state.tacticProjectionBusy || state.playProjectionBusy) && canPlayFromHand) setStatus('Checking legal card destinations with the authoritative gameplay owners…', 'busy');
     else if (state.selectedHandUid && canPlayFromHand && state.evolutionEligible && !state.evolutionTargets.length) setStatus('Evolution card selected. The server reports no legal Creature stack this turn.', 'wait');
     else if (state.selectedHandUid && canPlayFromHand && state.evolutionEligible) setStatus('Evolution card selected. Choose a green Creature stack; the server will revalidate before committing.', 'ready');
     else if (state.selectedHandUid && canPlayFromHand && state.essenceEligible && !state.essenceTargets.length) setStatus('Essence card selected. The server reports no legal Creature target this turn.', 'wait');
@@ -953,7 +978,9 @@
     else if (state.selectedHandUid && canPlayFromHand && state.relicEligible && !state.relicTargets.length) setStatus('Relic card selected. The server reports no Creature with an empty Relic slot.', 'wait');
     else if (state.selectedHandUid && canPlayFromHand && state.relicEligible) setStatus('Relic card selected. Choose a green Creature target; the server will revalidate before attaching.', 'ready');
     else if (state.selectedHandUid && canPlayFromHand && state.tacticEligible) setStatus('Tactic card selected. Use Play Tactic on the selected card; the server will revalidate before committing.', 'ready');
-    else if (state.selectedHandUid && canPlayFromHand) setStatus('Hand card selected. Choose a Reserve position or the shared Realm slot; the server validates the destination and card legality.', 'ready');
+    else if (state.selectedHandUid && canPlayFromHand && directPlayMode && state.playTargets.length) setStatus('Hand card selected. Choose a highlighted server-projected board destination; the server will revalidate before committing.', 'ready');
+    else if (state.selectedHandUid && canPlayFromHand && state.playProjectionUid === state.selectedHandUid && !state.playProjectionBusy) setStatus('The server reports no legal direct board destination for the selected card.', 'wait');
+    else if (state.selectedHandUid && canPlayFromHand) setStatus('Checking the selected card with the authoritative gameplay owners…', 'busy');
     else if (yourTurn) setStatus('Your turn. Select a hand card for a board destination or your active Creature for its card actions.', 'ready');
     else setStatus('Board synced. Waiting for the opponent or the next server phase.', 'wait');
 
@@ -975,13 +1002,15 @@
           clearEssenceProjection();
           clearRelicProjection();
           clearTacticProjection();
+      clearPlayProjection();
           render();
           if (!deselect) {
             Promise.all([
               runEvolutionTargetProjection(uid),
               runEssenceTargetProjection(uid),
               runRelicTargetProjection(uid),
-              runTacticPlayabilityProjection(uid)
+              runTacticPlayabilityProjection(uid),
+              runPlayCardTargetProjection(uid)
             ]).catch((error) => {
               setStatus(error instanceof Error ? error.message : String(error), 'error');
             });
@@ -994,6 +1023,7 @@
         clearEssenceProjection();
         clearRelicProjection();
         clearTacticProjection();
+      clearPlayProjection();
         render();
       };
       card.addEventListener('click', (event) => {
@@ -1430,6 +1460,7 @@
       clearEssenceProjection();
       clearRelicProjection();
       clearTacticProjection();
+      clearPlayProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -1495,6 +1526,7 @@
       clearEssenceProjection();
       clearRelicProjection();
       clearTacticProjection();
+      clearPlayProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -1554,6 +1586,7 @@
       clearEssenceProjection();
       clearRelicProjection();
       clearTacticProjection();
+      clearPlayProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -1562,6 +1595,43 @@
       state.busy = false;
       render();
       if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runPlayCardTargetProjection(cardUid) {
+    const view = viewState();
+    const seat = Number(view && view.you && view.you.seat);
+    const canProject = !!cardUid && view && view.phase === 'play' && Number(view.active_seat) === seat && !state.busy;
+    if (!canProject) return;
+    state.playProjectionUid = cardUid;
+    state.playProjectionBusy = true;
+    state.playTargets = [];
+    render();
+    try {
+      const response = await callEdge(API_MATCH, Object.assign(actionBase('play_card_targets'), {
+        card_uid: cardUid
+      }));
+      if (state.selectedHandUid !== cardUid) return;
+      const projected = response && response.result && typeof response.result === 'object' ? response.result : {};
+      state.playProjectionUid = cardUid;
+      state.playTargets = Array.isArray(projected.legal_targets)
+        ? projected.legal_targets.map((target) => {
+            const kind = String(target && target.kind || '');
+            if (kind === 'realm') return { kind: 'realm' };
+            if (kind === 'reserve') {
+              const reserveIndex = Number(target && target.reserve_index);
+              if (Number.isInteger(reserveIndex) && reserveIndex >= 0 && reserveIndex <= 3) {
+                return { kind: 'reserve', reserve_index: reserveIndex };
+              }
+            }
+            return null;
+          }).filter(Boolean)
+        : [];
+    } finally {
+      if (state.selectedHandUid === cardUid) {
+        state.playProjectionBusy = false;
+        render();
+      }
     }
   }
 
@@ -1609,6 +1679,7 @@
       clearEssenceProjection();
       clearRelicProjection();
       clearTacticProjection();
+      clearPlayProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -1686,6 +1757,7 @@
     clearEssenceProjection();
     clearRelicProjection();
     clearTacticProjection();
+      clearPlayProjection();
     state.withdrawMode = true;
     state.withdrawTargetIndex = null;
     state.withdrawPaymentUids = [];
@@ -1799,6 +1871,7 @@
 
   async function runPlayRealmIntent(cardUid) {
     if (!cardUid) throw new Error('Select a hand card first.');
+    if (!legalPlayRealmTarget()) throw new Error('The shared Realm slot is not in the current server-projected direct-play target list.');
     state.busy = true;
     render();
     setStatus('Submitting the selected hand card to the authoritative play_realm owner…', 'busy');
@@ -1812,6 +1885,7 @@
       clearEssenceProjection();
       clearRelicProjection();
       clearTacticProjection();
+      clearPlayProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -1826,6 +1900,7 @@
   async function runPlayCreatureIntent(cardUid, reserveIndex) {
     if (!cardUid) throw new Error('Select a hand card first.');
     if (!Number.isInteger(reserveIndex) || reserveIndex < 0 || reserveIndex > 3) throw new Error('Invalid Reserve index.');
+    if (!legalPlayCreatureTarget(reserveIndex)) throw new Error('That Reserve slot is not in the current server-projected direct-play target list.');
     state.busy = true;
     render();
     setStatus('Submitting the selected hand card to the authoritative play_creature owner…', 'busy');
@@ -1840,6 +1915,7 @@
       clearEssenceProjection();
       clearRelicProjection();
       clearTacticProjection();
+      clearPlayProjection();
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -1886,6 +1962,7 @@
         clearEssenceProjection();
         clearRelicProjection();
         clearTacticProjection();
+      clearPlayProjection();
       }
     }
     const pending = !!(view && (view.pending_attack_choice || view.pending_ability_choice || view.pending_event_listener_choice || view.pending_movement_listener_choice || view.pending_heal_listener_choice || view.pending_choice || view.pending_resolution));
