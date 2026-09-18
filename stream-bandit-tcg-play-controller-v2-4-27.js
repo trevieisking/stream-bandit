@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG Play Controller V2.4.29';
+  const VERSION = 'Stream Bandit TCG Play Controller V2.4.30';
   const API_SETUP = 'tcg-private-alpha-api';
   const POLL_MS = 2000;
   const state = {
@@ -130,9 +130,11 @@
       button.className = 'tcg-deck-choice' + (String(deck.id) === String(selectedId || '') ? ' is-selected' : '');
       button.dataset.deckId = String(deck.id || '');
       const elements = deck.secondary_element ? String(deck.primary_element) + ' / ' + String(deck.secondary_element) : String(deck.primary_element || 'Unknown');
-      button.innerHTML = '<span aria-hidden="true"></span><span><strong></strong><small></small></span><b>60</b>';
+      button.innerHTML = '<span aria-hidden="true"></span><span><strong></strong><small></small></span><b></b>';
       button.querySelector('strong').textContent = String(deck.name || 'Deck');
       button.querySelector('small').textContent = elements;
+      const count = Number(deck.card_count);
+      button.querySelector('b').textContent = Number.isFinite(count) ? String(count) + ' cards' : '—';
       button.addEventListener('click', () => {
         const select = $('tcgDeckSelect');
         if (select) {
@@ -213,8 +215,20 @@
       return;
     }
 
+    const deckIds = data.map((deck) => deck.id).filter(Boolean);
+    const { data: deckCardRows, error: deckCardError } = deckIds.length
+      ? await client.from('tcg_deck_cards').select('deck_id,quantity').in('deck_id', deckIds)
+      : { data: [], error: null };
+    if (deckCardError) throw deckCardError;
+    const cardCounts = new Map();
+    for (const row of deckCardRows || []) {
+      const key = String(row.deck_id || '');
+      cardCounts.set(key, (cardCounts.get(key) || 0) + Number(row.quantity || 0));
+    }
+    const decks = data.map((deck) => Object.assign({}, deck, { card_count: cardCounts.get(String(deck.id)) || 0 }));
+
     option(select, '', 'Choose a deck…');
-    for (const deck of data) {
+    for (const deck of decks) {
       const elements = deck.secondary_element
         ? String(deck.primary_element) + ' / ' + String(deck.secondary_element)
         : String(deck.primary_element || 'Unknown');
@@ -222,17 +236,17 @@
     }
 
     const preferred = String(preferredDeckId || '').trim();
-    if (preferred && data.some((deck) => String(deck.id) === preferred)) select.value = preferred;
-    if (!select.value && data.length === 1) select.value = String(data[0].id);
+    if (preferred && decks.some((deck) => String(deck.id) === preferred)) select.value = preferred;
+    if (!select.value && decks.length === 1) select.value = String(decks[0].id);
 
     state.selectedDeckId = String(select.value || '');
-    renderDeckFeed(data, state.selectedDeckId);
+    renderDeckFeed(decks, state.selectedDeckId);
     select.disabled = false;
     select.onchange = () => {
       state.selectedDeckId = String(select.value || '');
       const button = $('tcgQuickMatch');
       if (button) button.disabled = !state.selectedDeckId || state.queueBusy;
-      renderDeckFeed(data, state.selectedDeckId);
+      renderDeckFeed(decks, state.selectedDeckId);
     };
     if (starterPanel) starterPanel.hidden = true;
     setMatchControls(true);

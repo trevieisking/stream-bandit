@@ -19,3 +19,24 @@ test('secondary TCG routes use one bounded internal content feed instead of docu
   assert.match(css,/\.tcg-secondary-page\{[^}]*overflow:hidden/);
   assert.match(css,/\.tcg-secondary-feed\{[^}]*overflow:auto/);
 });
+
+
+test('V2.4.30 owns its visual background and generic art-pending assets without global theme projection',async()=>{
+  const css=await read('stream-bandit-tcg-page-shell-v2-4-3.css');
+  const battleCss=await read('stream-bandit-tcg-battle-table-v2-4-7.css');
+  const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.js');
+  await access(new URL('assets/tcg-realm-client-backdrop-v2-4-30.svg',`file://${ROOT}/`));
+  await access(new URL('assets/tcg-card-back-v2-4-30.svg',`file://${ROOT}/`));
+  assert.ok(css.includes('assets/tcg-realm-client-backdrop-v2-4-30.svg'));
+  assert.ok(css.includes('assets/tcg-card-back-v2-4-30.svg'));
+  assert.ok(battleCss.includes('assets/tcg-realm-client-backdrop-v2-4-30.svg'));
+  assert.ok(battleCss.includes('assets/tcg-card-back-v2-4-30.svg'));
+  assert.ok(shell.includes('sbTcgVisualAuthority="v2-4-28"'));
+  assert.ok(shell.includes('sbTcgVisualImplementation="v2-4-30"'));
+  for(const p of core){
+    const html=await read(p);
+    assert.equal(html.includes('stream-bandit-theme-projector'),false,p+' must not load the global visual projector');
+    assert.ok(html.includes('stream-bandit-tcg-page-shell-v2-4-3.css?v=2-4-30'));
+    assert.ok(html.includes('stream-bandit-tcg-page-shell-v2-4-3.js?v=2-4-30'));
+  }
+});

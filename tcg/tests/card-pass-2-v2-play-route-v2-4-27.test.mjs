@@ -49,3 +49,12 @@ test('V2.4.29 does not mistake Auth Gate startup concurrency for an approval fai
   assert.ok(controller.includes('const decision = await resolveAuthDecision()'));
   assert.equal(controller.includes("profile.role === 'admin'"),false,'Play controller must not duplicate Auth Gate approval rules');
 });
+
+
+test('V2.4.30 deck row count is factual RLS data, not a hard-coded visual claim',async()=>{
+  const controller=await read('stream-bandit-tcg-play-controller-v2-4-27.js');
+  assert.ok(controller.includes(".from('tcg_deck_cards').select('deck_id,quantity').in('deck_id', deckIds)"));
+  assert.ok(controller.includes("cardCounts.set(key, (cardCounts.get(key) || 0) + Number(row.quantity || 0))"));
+  assert.ok(controller.includes("String(count) + ' cards'"));
+  assert.equal(controller.includes("<b>60</b>"),false);
+});

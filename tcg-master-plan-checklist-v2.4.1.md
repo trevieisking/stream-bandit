@@ -175,6 +175,13 @@ Signed-in destinations remain:
 - [ ] **SHELL-VIS-04** Loading/error/empty/reconnect states use the same design system.
 - [x] **PLAY-AUTH-01** Play must not treat the Auth Gate's temporary first-load null decision as an approval failure; deck loading waits for the existing authoritative gate decision without duplicating approval rules.
 
+### V2.4.30 approved-reference visual convergence
+- [x] **SHELL-VIS-PLAN-07** TCG pages own a reusable cinematic realm backdrop, cyan/gold ornamental frame language and generic Stream Bandit card-back/art-pending asset; no card identity is falsely given finished artwork.
+- [x] **SHELL-VIS-PLAN-08** TCG routes no longer load the global Stream Bandit theme projector; shared account/config/auth capability may remain without shared website visual authority.
+- [x] **SHELL-VIS-PLAN-09** Play deck rows display factual RLS-projected deck-card quantity instead of a hard-coded 60-card visual claim; legality remains server-owned.
+- [ ] **SHELL-VIS-HUMAN-01** Human visual acceptance confirms Play/Battle/Decks/Collection/Battle Pass/Shop/Settings converge acceptably on the seven locked V2.4.28 references at the target desktop viewport.
+- [ ] **CARD-ART-IMPL-01** Bind real approved per-card/printing artwork when an authoritative art source exists; generic card-back remains the explicit fallback until then.
+
 ---
 
 ## I. Corrected work order

@@ -78,3 +78,57 @@ html,body{height:100%;min-height:0;overflow:hidden}
 .sb-table{min-height:0;height:100%;gap:4px;padding:6px;border-radius:18px;grid-template-rows:minmax(30px,.45fr) minmax(46px,.7fr) minmax(94px,1.5fr) minmax(36px,.55fr) minmax(94px,1.5fr) minmax(46px,.7fr) minmax(78px,1.1fr);overflow:hidden}
 .sb-zone-panel,.sb-hand-wrap,.sb-realm-slot{padding:4px;border-radius:11px}.sb-zone-label{margin-bottom:2px}.sb-reserve-slot,.sb-vanguard-slot{min-height:84px}.sb-card-art{height:40px}.sb-tcg-card{padding:5px;border-radius:11px}.sb-tcg-card h2{font-size:11px;margin:3px 0}.sb-hand{max-height:100%;overflow-x:auto;overflow-y:hidden}.sb-foot{margin:0}
 @media(max-height:760px){.sb-battle{grid-template-rows:50px auto auto auto minmax(0,1fr) auto}.sb-game-nav{border-radius:10px}.sb-game-nav a{font-size:8px}.sb-game-brand img{width:34px;height:34px}.sb-game-brand strong{font-size:12px}.sb-table{grid-template-rows:minmax(24px,.35fr) minmax(38px,.55fr) minmax(76px,1.35fr) minmax(30px,.45fr) minmax(76px,1.35fr) minmax(38px,.55fr) minmax(66px,1fr)}}
+
+/* V2.4.30 approved-reference battle convergence */
+body{
+  background-color:#020611!important;
+  background-image:
+    linear-gradient(180deg,rgba(0,7,17,.05),rgba(0,4,12,.32) 58%,rgba(0,2,8,.7)),
+    url("assets/tcg-realm-client-backdrop-v2-4-30.svg")!important;
+  background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;
+}
+.sb-battle{background:linear-gradient(180deg,rgba(2,8,16,.08),rgba(2,8,16,.18));}
+.sb-game-nav{
+  width:min(96vw,1320px);justify-self:center;
+  border-color:#66dcff7a!important;border-radius:0 0 18px 18px!important;
+  background:linear-gradient(180deg,rgba(1,7,15,.95),rgba(3,14,27,.88))!important;
+  box-shadow:0 9px 32px #000b,inset 0 0 24px rgba(58,199,255,.11),0 0 0 1px rgba(217,169,75,.2)!important;
+  backdrop-filter:blur(10px);
+}
+.sb-game-nav a{font-family:Georgia,"Times New Roman",serif;letter-spacing:.09em;color:#e8f8ff;text-shadow:0 1px 2px #000}
+.sb-game-nav a.is-active{background:linear-gradient(180deg,rgba(18,126,216,.95),rgba(6,57,108,.92))!important;box-shadow:inset 0 -3px 0 #a8f7ff,0 0 24px rgba(41,183,255,.42)!important}
+.sb-game-brand img{width:46px!important;height:46px!important}.sb-game-brand strong{font-size:17px!important;text-shadow:0 0 9px #3ebeff}
+.sb-hud,.sb-status,.sb-phase-controls,.sb-tactic-choice{
+  border-color:#5fd8ff55!important;background:linear-gradient(180deg,rgba(3,13,25,.92),rgba(4,23,39,.88))!important;
+  box-shadow:inset 0 0 20px rgba(40,160,230,.07),0 7px 20px #0007;
+  backdrop-filter:blur(7px)
+}
+.sb-table{
+  border-color:#69dcff5c!important;border-radius:22px!important;
+  background:
+    linear-gradient(180deg,rgba(5,14,26,.54),rgba(6,18,31,.3) 48%,rgba(4,12,24,.58)),
+    radial-gradient(ellipse at center,rgba(51,174,255,.12),transparent 48%)!important;
+  box-shadow:inset 0 0 80px rgba(0,0,0,.48),0 14px 44px #0008,0 0 0 1px rgba(215,169,75,.15)!important;
+  backdrop-filter:blur(3px)
+}
+.sb-zone-panel,.sb-hand-wrap,.sb-realm-slot{
+  border-color:#5ccfff55!important;
+  background:linear-gradient(150deg,rgba(2,11,22,.9),rgba(4,24,41,.86))!important;
+  box-shadow:inset 0 0 18px rgba(53,184,255,.06),0 4px 10px #0006
+}
+.sb-field-row.is-opponent .sb-reserve-slot,.sb-field-row.is-opponent .sb-vanguard-slot{border-color:#ff617a52;background:linear-gradient(180deg,rgba(50,8,17,.34),rgba(4,14,25,.8))}
+.sb-field-row:not(.is-opponent) .sb-reserve-slot,.sb-field-row:not(.is-opponent) .sb-vanguard-slot{border-color:#58d8ff62;background:linear-gradient(180deg,rgba(6,40,68,.3),rgba(4,14,25,.82))}
+.sb-realm-slot{border-color:#8a72ff66!important;background:linear-gradient(135deg,rgba(81,52,181,.2),rgba(25,128,187,.12))!important}
+.sb-card-back{border-color:#d8ae5f88!important;background:
+  url("assets/tcg-card-back-v2-4-30.svg") center/cover no-repeat!important;
+  box-shadow:0 5px 14px #0008,0 0 0 1px rgba(84,218,255,.24)!important}
+.sb-card-back-mark,.sb-card-back small{display:none!important}
+.sb-tcg-card{border-color:#78dfff4f!important;background:linear-gradient(150deg,rgba(7,25,43,.96),rgba(4,12,24,.98))!important;box-shadow:0 8px 20px #0008,inset 0 0 18px rgba(45,179,255,.06)!important}
+.sb-tcg-card.is-selected{border-color:#75f0cf!important;box-shadow:0 0 0 2px rgba(50,227,177,.28),0 0 26px rgba(35,221,172,.2),0 12px 30px #0008!important}
+.sb-card-art{border-color:#68dfff4c!important;background:
+  radial-gradient(circle at 50% 42%,rgba(44,180,255,.18),transparent 45%),
+  url("assets/tcg-card-back-v2-4-30.svg") center/cover no-repeat!important}
+.sb-card-art img{position:relative;z-index:2}.sb-card-art span{position:relative;z-index:1;background:rgba(2,8,16,.66);border-radius:6px;color:#d7edf8!important}
+.sb-zone-label{color:#b4d4e5!important}.sb-count{border-color:#67d9ff45!important;background:rgba(3,18,31,.78)!important}
+.sb-phase-controls button,.sb-tactic-choice-submit{background:linear-gradient(180deg,#0d6bab,#074477)!important;border-color:#72e7ff80!important}
+@media(max-height:760px){.sb-game-brand img{width:36px!important;height:36px!important}.sb-game-brand strong{font-size:13px!important}}
