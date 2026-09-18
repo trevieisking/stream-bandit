@@ -39,3 +39,12 @@ Evolution remains higher-priority when its server projection claims the selected
 ## 4. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status and bounded-diff evidence are required. This is a browser/UI slice; no additional Supabase deployment is required unless source evidence reveals a server defect.
+
+
+## 5. Accepted checkpoint
+
+V2.4.14 is accepted at browser head `6a1dda89ede7bc4519f19f52d3bf9ce56b7ebf94` after TCG #681, Migration Replay #851 and Functional Smoke #877 all succeeded.
+
+INTERACT-03 Essence is complete: the server remains the sole legality owner while the battlefield provides direct selected-card → legal green Creature target → attach interaction. Supabase remains `tcg-match-actions` v4 ACTIVE with JWT verification preserved; no V2.4.14 server redeploy was required.
+
+The next target must be chosen by re-reading the synchronized Master Plan/Checklist and PR continuity after this accepted checkpoint; do not infer it from browser code alone.

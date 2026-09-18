@@ -23,19 +23,19 @@
 
 ## C. Exact-head acceptance
 
-- [ ] **V2414-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2414-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2414-CI-03** Functional Smoke succeeds.
-- [ ] **V2414-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2414-DIFF-01** diff stays bounded to battle browser/CSS/cache/test/V2.4.14 controls.
+- [x] **V2414-CI-01** TCG Card Pass 2 Validation succeeds — #681 at accepted browser head `6a1dda89ede7bc4519f19f52d3bf9ce56b7ebf94`.
+- [x] **V2414-CI-02** Migration Replay succeeds from zero — #851.
+- [x] **V2414-CI-03** Functional Smoke succeeds — #877.
+- [x] **V2414-REVIEW-01** review threads remain zero / material findings resolved.
+- [x] **V2414-DIFF-01** diff stays bounded to battle browser/CSS/cache/tests/V2.4.14 controls; no Supabase runtime, migration, schema or card-data files.
 
 ## D. Master-plan state
 
 - [x] **INTERACT-01** Creature placement.
 - [x] **INTERACT-02** Evolution.
-- [ ] **INTERACT-03** Essence — browser candidate implemented; close only after C passes.
+- [x] **INTERACT-03** Essence — server legality + direct browser interaction accepted.
 - [ ] **INTERACT-04** Relic.
 - [x] **INTERACT-05** Realm.
 - [ ] **INTERACT-06** Tactic.
 
-**Decision:** source candidate only until C passes. Supabase v4 remains the accepted server seam; merge / `main` / public / full-live remain HOLD.
+**Decision:** V2.4.14 ACCEPTED ✅ at `6a1dda89ede7bc4519f19f52d3bf9ce56b7ebf94`. INTERACT-03 Essence is complete. Supabase v4 remains the accepted/live server seam with no browser-slice redeploy required. Merge / `main` / public / full-live remain HOLD 🔒.

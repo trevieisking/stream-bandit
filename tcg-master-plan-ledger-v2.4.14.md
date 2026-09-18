@@ -53,3 +53,24 @@ No production source, game rule, server runtime, card data or Supabase state cha
 TCG #680 passed at the repaired candidate head. Migration #850 was cancelled before any job started because prior-head Migration #849 still occupied the serialized replay lane; #849 then completed successfully. GitHub does not permit retrying a run that never started.
 
 This control-only checkpoint retriggers all exact-head gates after the replay lane is clear. No browser implementation, gameplay rule, server runtime, database/schema, card data or Supabase deployment changes.
+
+
+## V2.4.14-008 — exact-head acceptance
+
+**State:** ✅ ACCEPTED
+
+Accepted browser head: `6a1dda89ede7bc4519f19f52d3bf9ce56b7ebf94`.
+
+Exact gates all passed:
+- TCG Card Pass 2 Validation #681 ✅
+- Migration Replay #851 ✅
+- Functional Smoke #877 ✅
+- review threads: 0 ✅
+- legacy combined statuses: 0 ✅
+- bounded diff: browser controller/CSS/cache marker/tests/V2.4.14 controls only ✅
+
+Supabase remained unchanged at the already-accepted `tcg-match-actions` **v4 / ACTIVE / verify_jwt=true** because this slice contains no server runtime change.
+
+INTERACT-03 Essence is now complete end-to-end: server owns family/timing/once-per-turn/target legality; browser asks for legal target coordinates, renders only those targets, then commits through the existing `attach_essence` action.
+
+PR merge, `main`, public Pages and full-live release remain HOLD pending the inherited release/E2E gates.
