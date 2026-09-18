@@ -59,7 +59,7 @@ test('browser does not decide whether a selected hand card is Creature/Baby/Stan
   const start = controller.indexOf('async function runPlayCreatureIntent');
   const end = controller.indexOf('async function runAttackIntent', start);
   const fn = controller.slice(start, end);
-  for (const forbidden of ['Creature', 'Baby', 'Standalone', 'Mythic', 'starterLegal', 'empty_reserve_slot_required']) {
+  for (const forbidden of ['Baby', 'Standalone', 'Mythic', 'starterLegal', 'empty_reserve_slot_required', 'card_family', '.kind']) {
     assert.equal(fn.includes(forbidden), false, 'browser play intent must not own ' + forbidden + ' legality');
   }
 });
