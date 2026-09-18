@@ -83,9 +83,11 @@ test('post-promotion movement/heal choices remain on the generic authoritative c
   assert.match(route, /resolve_heal_listener_choice/);
 });
 
-test('battle cache identity advances to V2.4.24 without changing renderer identity', () => {
-  assert.match(html, /data-sb-tcg-tabletop="v2-4-24"/);
-  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-24/);
-  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-24/);
+test('V2.4.24 resolution delivery remains accepted after later tabletop cache versions', () => {
+  const marker = html.match(/data-sb-tcg-tabletop="v2-4-(\d+)"/);
+  assert.ok(marker, 'tabletop version marker missing');
+  assert.ok(Number(marker[1]) >= 24, 'tabletop must not regress below V2.4.24');
+  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-\d+/);
+  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-\d+/);
   assert.match(html, /stream-bandit-tcg-card-renderer-v2-4-7\.js\?v=2-4-10/);
 });
