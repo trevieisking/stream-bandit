@@ -104,11 +104,11 @@
 - [ ] **STATE-VIS-04** Ability spent/locked state is visible where applicable.
 - [ ] **STATE-VIS-05** Legal targets highlight; illegal targets remain inactive.
 - [ ] **STATE-VIS-06** Evolution legal targets glow green.
-- [ ] **STATE-VIS-07** Reward count/claim state is visible.
+- [x] **STATE-VIS-07** Reward count/claim state is visible.
 - [ ] **STATE-VIS-08** Deck/Discard counts are visible.
 - [ ] **STATE-VIS-09** Active turn/phase is visible without dominating the table.
 - [ ] **STATE-VIS-10** Pending choice/search/listener state is visible while preserving battlefield context.
-- [ ] **STATE-VIS-11** Defeat/KO and mandatory promotion are visually expressed.
+- [x] **STATE-VIS-11** Defeat/KO and mandatory promotion are visually expressed.
 - [ ] **STATE-VIS-12** Victory/defeat/result state is visually expressed.
 
 ---
