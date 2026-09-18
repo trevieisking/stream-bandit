@@ -73,9 +73,11 @@ test('accepted visible-state surfaces retain counts phase and generic pending-ch
   assert.match(controller, /pending_choice/);
 });
 
-test('battle cache identity advances to V2.4.25 with the accepted renderer identity unchanged', () => {
-  assert.match(html, /data-sb-tcg-tabletop="v2-4-25"/);
-  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-25/);
-  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-25/);
+test('V2.4.25 visible-state delivery remains accepted after later tabletop cache versions', () => {
+  const marker = html.match(/data-sb-tcg-tabletop="v2-4-(\d+)"/);
+  assert.ok(marker, 'tabletop version marker missing');
+  assert.ok(Number(marker[1]) >= 25, 'tabletop must not regress below V2.4.25');
+  assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-\d+/);
+  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-\d+/);
   assert.match(html, /stream-bandit-tcg-card-renderer-v2-4-7\.js\?v=2-4-10/);
 });
