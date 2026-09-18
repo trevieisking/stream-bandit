@@ -148,7 +148,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;back
 }
 .tcg-client{z-index:2;grid-template-rows:clamp(76px,9.2vh,98px) minmax(0,1fr)}
 .tcg-client-topbar{
-  width:min(96vw,1320px);justify-self:center;margin-top:6px;height:calc(100% - 6px);
+  width:calc(100vw - 20px);max-width:none;justify-self:center;margin-top:6px;height:calc(100% - 6px);
   grid-template-columns:minmax(210px,310px) minmax(0,1fr);padding:4px 10px;
   border:1px solid #62d9ff70;border-radius:0 0 22px 22px;
   background:linear-gradient(180deg,rgba(1,7,15,.94),rgba(3,14,27,.86));
@@ -230,3 +230,23 @@ main.tcg-page{gap:7px}
 /* V2.4.30 final visual polish */
 .tcg-client-topbar{position:relative;overflow:hidden}
 .tcg-card-tile strong{padding-top:0!important}
+
+/* V2.4.31 browser-zoom resilience: keep the TCG client screen-filling at low zoom. */
+@media (max-resolution:.6dppx){
+  .tcg-client-topbar{width:calc(100vw - 20px);max-width:none}
+  .tcg-client-brand img{width:5.2vw;height:5.2vw}
+  .tcg-client-brand-copy strong{font-size:2.25vw}
+  .tcg-client-brand-copy span{font-size:.9vw}
+  .tcg-client-nav a{font-size:.95vw}
+  .tcg-client-nav a::before{font-size:1.9vw}
+  .tcg-client-stage{padding:.72vw 1.2vw 1vw}
+  .tcg-screen-title h1{font-size:6.3vh}
+  .tcg-screen-title p{font-size:.8vw}
+  .tcg-frame h2,.tcg-card h2,.tcg-panel h2{font-size:1.45vw}
+  .tcg-frame p,.tcg-card p,.tcg-panel p,.tcg-hero p{font-size:.88vw}
+  .tcg-btn{font-size:1vw;padding:.7vw 1vw}
+  .tcg-field label{font-size:.75vw}
+  .tcg-state{font-size:.76vw}
+  .tcg-deck-choice strong{font-size:1vw}
+  .tcg-deck-choice small,.tcg-deck-choice b{font-size:.68vw}
+}

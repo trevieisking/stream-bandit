@@ -36,7 +36,16 @@ test('V2.4.30 owns its visual background and generic art-pending assets without 
   for(const p of core){
     const html=await read(p);
     assert.equal(html.includes('stream-bandit-theme-projector'),false,p+' must not load the global visual projector');
-    assert.ok(html.includes('stream-bandit-tcg-page-shell-v2-4-3.css?v=2-4-30'));
-    assert.ok(html.includes('stream-bandit-tcg-page-shell-v2-4-3.js?v=2-4-30'));
+    assert.ok(html.includes('stream-bandit-tcg-page-shell-v2-4-3.css?v=2-4-31'));
+    assert.ok(html.includes('stream-bandit-tcg-page-shell-v2-4-3.js?v=2-4-31'));
   }
+});
+
+
+test('V2.4.31 removes the capped client width and preserves fixed-screen scale when browser zoom is low',async()=>{
+  const css=await read('stream-bandit-tcg-page-shell-v2-4-3.css');
+  assert.ok(css.includes('width:calc(100vw - 20px);max-width:none'));
+  assert.equal(css.includes('width:min(96vw,1320px)'),false);
+  assert.ok(css.includes('@media (max-resolution:.6dppx)'));
+  assert.ok(css.includes('.tcg-screen-title h1{font-size:6.3vh}'));
 });

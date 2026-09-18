@@ -12,5 +12,38 @@ test('V2.4.30 TCG-owned visual client assets exist and public pages keep shared 
   await access(new URL('assets/tcg-realm-client-backdrop-v2-4-30.svg',`file://${ROOT}/`));
   await access(new URL('assets/tcg-card-back-v2-4-30.svg',`file://${ROOT}/`));
   const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.js');
-  assert.ok(shell.includes('const VERSION="2.4.30"'));
+  assert.ok(shell.includes('const VERSION="2.4.31"'));
+});
+
+
+const tcgClientPages=[
+  'tcg-play.html','tcg-decks.html','tcg-collection.html','tcg-battle-pass.html','tcg-shop.html','tcg-settings.html',
+  'tcg-battle-v2.html','tcg-game-home.html','tcg-packs.html','tcg-progress.html','tcg-learn.html',
+  ...account,...social
+];
+
+test('V2.4.31 TCG routes use config-only bridge and can never boot the Stream Bandit website shell',async()=>{
+  const bridge=await read('stream-bandit-tcg-config-v2-4-31.js');
+  assert.ok(bridge.includes('StreamBanditSupabaseConfig'));
+  assert.equal(bridge.includes('stream-bandit-header-shell'),false);
+  assert.equal(bridge.includes('stream-bandit-footer-shell'),false);
+  assert.equal(bridge.includes('stream-bandit-theme-projector'),false);
+  assert.equal(bridge.includes('StreamBanditRoutes'),false);
+  assert.equal(bridge.includes('ensureFoundation'),false);
+  assert.equal(bridge.includes('loadScript('),false);
+  for(const href of tcgClientPages){
+    const html=await read(href);
+    assert.equal(html.includes('stream-bandit-shell-v6-24.js'),false,href+' must not boot the website shell');
+    assert.ok(html.includes('stream-bandit-tcg-config-v2-4-31.js'),href+' must load the config-only bridge');
+  }
+});
+
+test('V2.4.31 Settings stays inside the TCG route namespace',async()=>{
+  const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.js');
+  const settings=await read('tcg-settings.html');
+  const bridge=await read('stream-bandit-tcg-config-v2-4-31.js');
+  assert.ok(shell.includes('{key:"settings",label:"Settings",href:"tcg-settings.html"}'));
+  assert.equal(shell.includes('settings-platform-control-hub'),false);
+  assert.equal(settings.includes('settings-platform-control-hub'),false);
+  assert.equal(bridge.includes('settings-platform-control-hub'),false);
 });

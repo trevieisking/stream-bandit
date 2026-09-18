@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-const VERSION="2.4.30";
+const VERSION="2.4.31";
 const PRIMARY=[
  {key:"battle",label:"Battle",href:"tcg-play.html"},
  {key:"decks",label:"Decks",href:"tcg-decks.html"},
@@ -39,7 +39,7 @@ function mount(){
  const body=document.body,main=document.querySelector("main.tcg-page");
  if(!body||!main||body.dataset.sbTcgClientMounted==="1")return;
  body.dataset.sbTcgClientMounted="1";
- document.documentElement.dataset.sbTcgVisualAuthority="v2-4-28";document.documentElement.dataset.sbTcgVisualImplementation="v2-4-30";
+ document.documentElement.dataset.sbTcgVisualAuthority="v2-4-28";document.documentElement.dataset.sbTcgVisualImplementation="v2-4-30";document.documentElement.dataset.sbTcgShellIsolation="v2-4-31";
  const client=document.createElement("div");client.className="tcg-client";
  const top=document.createElement("header");top.className="tcg-client-topbar";
  const brand=document.createElement("a");brand.className="tcg-client-brand";brand.href="tcg-play.html";

@@ -182,6 +182,14 @@ Signed-in destinations remain:
 - [ ] **SHELL-VIS-HUMAN-01** Human visual acceptance confirms Play/Battle/Decks/Collection/Battle Pass/Shop/Settings converge acceptably on the seven locked V2.4.28 references at the target desktop viewport.
 - [ ] **CARD-ART-IMPL-01** Bind real approved per-card/printing artwork when an authoritative art source exists; generic card-back remains the explicit fallback until then.
 
+### V2.4.31 TCG shell isolation repair
+- [x] **SHELL-ISOLATION-01** Human screenshot proved the legacy `stream-bandit-shell-v6-24.js` still booted generic Stream Bandit header/route infrastructure from inside TCG pages.
+- [x] **SHELL-ISOLATION-02** Replace the legacy website shell dependency with a TCG config-only bridge exposing public Supabase client configuration and no website visuals/routes/helpers.
+- [x] **SHELL-ISOLATION-03** Settings navigation remains `tcg-settings.html` and the TCG bridge exposes no platform settings route alias.
+- [x] **SHELL-ISOLATION-04** Fixed TCG top bar removes the 1320px cap and includes low-browser-zoom viewport scaling while document/body scrolling remains forbidden.
+- [ ] **SHELL-ISOLATION-CI-01** Exact-head validation, migration replay and functional smoke pass after the isolation repair.
+- [ ] **SHELL-ISOLATION-HUMAN-01** Human test confirms generic Stream Bandit header is absent, Settings stays inside TCG and 100%/25% screenshots remain screen-filling.
+
 ---
 
 ## I. Corrected work order
