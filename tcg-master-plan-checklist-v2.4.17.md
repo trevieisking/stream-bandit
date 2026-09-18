@@ -25,13 +25,13 @@
 
 ## C. Exact-head acceptance
 
-- [ ] **V2417-CI-01** TCG Card Pass 2 Validation succeeds.
-- [ ] **V2417-CI-02** Migration Replay succeeds from zero.
-- [ ] **V2417-CI-03** Functional Smoke succeeds.
-- [ ] **V2417-REVIEW-01** review threads remain zero / material findings resolved.
-- [ ] **V2417-DIFF-01** diff stays bounded to Tactic owner/test/release-control/V2.4.17 controls.
-- [ ] **V2417-DEPLOY-01** accepted exact Tactic runtime delta is promoted in place with JWT verification preserved.
-- [ ] **V2417-DEPLOY-02** deployed Tactic entrypoint matches accepted GitHub bytes.
+- [x] **V2417-CI-01** TCG Card Pass 2 Validation succeeds — #691 at accepted runtime head `bd806873ddb053510d9a7bd3061c6b512e89583c`.
+- [x] **V2417-CI-02** Migration Replay succeeds from zero — #861.
+- [x] **V2417-CI-03** Functional Smoke succeeds — #887.
+- [x] **V2417-REVIEW-01** review threads remain zero / material findings resolved.
+- [x] **V2417-DIFF-01** diff stays bounded to Tactic owner/test/release-control/V2.4.17 controls; one runtime file only.
+- [x] **V2417-DEPLOY-01** accepted exact Tactic runtime delta is promoted in place as `tcg-tactic-actions` v3 with JWT verification preserved.
+- [x] **V2417-DEPLOY-02** deployed Tactic entrypoint matches accepted GitHub bytes byte-for-byte.
 
 ## D. Master-plan state
 
@@ -40,6 +40,6 @@
 - [x] **INTERACT-03** Essence.
 - [x] **INTERACT-04** Relic.
 - [x] **INTERACT-05** Realm.
-- [ ] **INTERACT-06** Tactic — server playability seam candidate implemented; browser half remains.
+- [ ] **INTERACT-06** Tactic — server playability seam accepted/live; browser half remains the next target.
 
-**Decision:** source candidate only until C passes. Current `tcg-tactic-actions` v2 / merge / `main` / public / full-live remain unchanged.
+**Decision:** V2.4.17 server seam ACCEPTED ✅ at `bd806873ddb053510d9a7bd3061c6b512e89583c`. Supabase `tcg-tactic-actions` v3 is ACTIVE with JWT verification preserved. INTERACT-06 remains open only for the browser interaction/choice surface. Merge / `main` / public / full-live remain HOLD 🔒.

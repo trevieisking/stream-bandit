@@ -43,3 +43,27 @@ Hold Edge promotion and browser Tactic work until fresh exact-head TCG Validatio
 TCG #690 completed the full deterministic runtime/type-check lane successfully. The Set One Node lane failed only because `card-pass-2-arcade-lab-client-contract.test.mjs` froze the prior two-action Tactic whitelist.
 
 The historical contract now recognizes the same single `tcg-tactic-actions` owner with the additive read-only `play_tactic_legality` action while preserving `play_tactic` and `resolve_choice`. No runtime, browser, effect, schema or card-data source changes are part of this repair.
+
+
+## V2.4.17-007 — exact-head acceptance and in-place Tactic promotion
+
+**State:** ✅ ACCEPTED / EDGE PROMOTED
+
+Accepted runtime head: `bd806873ddb053510d9a7bd3061c6b512e89583c`.
+
+Exact gates all passed:
+- TCG Card Pass 2 Validation #691 ✅
+- Migration Replay #861 ✅
+- Functional Smoke #887 ✅
+- review threads: 0 ✅
+- legacy combined statuses: 0 ✅
+- bounded V2.4.17 delta: 7 files, one runtime file ✅
+- release-control closure: 36 files, exact Tactic entrypoint blob ✅
+
+Supabase project `xzxqfrvqdgkzwujbkdbk` promoted the existing `tcg-tactic-actions` function in place from v2 to **v3 / ACTIVE**, with `verify_jwt=true` preserved.
+
+Deployment retained the accepted 36-file bundle and replaced exactly `functions/tcg-tactic-actions/index.ts`. Post-deploy read-back matched the accepted GitHub entrypoint byte-for-byte and confirmed both `play_tactic_legality` and the shared `tacticPlayability` evaluator are live.
+
+No new Supabase project, branch, function, schema, migration, card-data rewrite or effect interpreter was created.
+
+V2.4.17 therefore closes the server playability half of INTERACT-06. Browser card-owned Tactic play plus generic authoritative choice resolution is the next target. PR merge, `main`, Pages/public and full-live remain HOLD.

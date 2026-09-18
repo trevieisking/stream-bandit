@@ -41,3 +41,12 @@ No browser Tactic transport or choice UI is added in V2.4.17. The next browser s
 ## 5. Acceptance
 
 Fresh exact-head TCG Validation, Migration Replay, Functional Smoke, review/status, bounded-diff and release-control evidence are required before any in-place `tcg-tactic-actions` deployment.
+
+
+## 6. Accepted checkpoint
+
+V2.4.17 Tactic server playability seam is accepted at runtime head `bd806873ddb053510d9a7bd3061c6b512e89583c` after TCG #691, Migration #861 and Functional #887 all succeeded.
+
+Production `tcg-tactic-actions` is ACTIVE v3 with JWT verification preserved. Post-deploy read-back confirmed the deployed entrypoint exactly matches accepted GitHub bytes.
+
+**Next locked target:** V2.4.18 / INTERACT-06 browser Tactic interaction: selected hand card → server `play_tactic_legality(card_uid)` projection → card-owned Play Tactic action only when eligible → existing `play_tactic` commit → generic server-owned pending-choice panel using `resolve_choice`. Browser must not infer Tactic subtype, Ally restriction, play requirements, target/resource rules or effect choice semantics.
