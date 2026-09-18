@@ -381,6 +381,14 @@ function tacticPlayability(state: any, seat: number, rawUid: unknown): TacticPla
   }
 
   const subtype = String(d.tactic_subtype || d.family || engine.subtype || "");
+  if (subtype !== "Ally" && subtype !== "Device") {
+    return {
+      eligible: false,
+      card_uid: uid,
+      status: 400,
+      reason: "tactic_subtype_uses_dedicated_owner",
+    };
+  }
   if (
     subtype === "Ally" &&
     Number(state.first_player_seat) === seat &&
