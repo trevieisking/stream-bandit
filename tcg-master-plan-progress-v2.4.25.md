@@ -25,8 +25,8 @@ V2.4.25 does not rebuild those systems. It adds a regression contract that binds
 The existing Match v6 `field_actions` projection is the only legality authority used by the browser.
 
 For a local Creature with printed structured `mode: active` Ability, while the field-action projection is current:
-- exact projected source => visible `Ability ready`;
-- active Ability absent from the exact projection => visible `Ability locked`.
+- exact projected source => card-context `Ability ready`;
+- active Ability absent from the exact projection => card-context `Ability locked`.
 
 The browser does not inspect once-per-turn ledgers, requirements, costs or condition rules and does not guess a lock reason.
 
