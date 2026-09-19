@@ -62,3 +62,40 @@
   .tcg-product-mini{grid-template-columns:64px minmax(0,1fr)}
   .tcg-product-mini-art{width:64px;height:64px}
 }
+
+
+/* V2.4.48 human visual pass 2: full-image fitting for Play, Battle Pass and Shop. */
+/* Play: keep the Active Battle preview compact, but show the whole starter card art. */
+.tcg-side-stack>.tcg-frame:first-child .tcg-preview-art{height:37%;min-height:52px}
+.tcg-side-stack>.tcg-frame:first-child p{margin:3px 0}
+.tcg-product-mini{grid-template-columns:52px minmax(0,1fr);grid-template-areas:"title title" "art note";gap:5px;margin-top:4px;overflow:hidden}
+.tcg-product-mini h3{font-size:11px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tcg-product-mini-art{grid-area:art;width:52px;height:72px;min-height:0;aspect-ratio:.72;object-fit:contain;background:#020611;border-radius:7px}
+.tcg-product-mini small{grid-area:note;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:9px;line-height:1.15}
+
+/* Battle Pass: fit the complete launch showcase inside Season Status. */
+.tcg-product-pass-hero{grid-template-columns:minmax(170px,220px) minmax(0,1fr);gap:10px;margin-top:7px;align-items:center}
+.tcg-product-pass-art{width:100%;height:auto;max-height:96px;aspect-ratio:16/7;object-fit:contain;background:#020611;border-radius:9px}
+.tcg-product-pass-hero strong{display:block;font-size:13px;line-height:1.15}
+.tcg-product-pass-hero small{display:block;font-size:10px;line-height:1.2}
+
+/* Reward track: card-shaped art plus contained text; no vertical spill from a reward card. */
+.tcg-reward-rail{overflow-x:auto;overflow-y:hidden;align-items:stretch}
+.tcg-product-reward{height:100%;max-height:100%;min-height:0;overflow:hidden;justify-content:flex-start;gap:4px}
+.tcg-product-reward-art{width:100%;height:auto;aspect-ratio:.72;object-fit:cover;flex:0 0 auto;margin-bottom:2px}
+.tcg-product-reward strong,.tcg-product-reward span,.tcg-product-reward small{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+.tcg-product-reward strong{-webkit-line-clamp:2;font-size:12px;line-height:1.1}
+.tcg-product-reward span{-webkit-line-clamp:2;font-size:11px;line-height:1.15}
+.tcg-product-reward small{-webkit-line-clamp:2;font-size:9px;line-height:1.15;margin-top:auto}
+
+/* Shop: give the catalog showcase its own neat product frame and preserve the full composition. */
+.tcg-product-shop-tile{border:1px solid #6fdcff4d;border-radius:14px;padding:12px;background:linear-gradient(145deg,rgba(5,20,36,.78),rgba(2,10,20,.88));box-shadow:inset 0 0 24px rgba(35,111,172,.08)}
+.tcg-product-shop-tile .tcg-product-hero{grid-template-columns:minmax(240px,300px) minmax(0,1fr);align-items:center}
+.tcg-product-shop-tile .tcg-product-hero-art{width:100%;aspect-ratio:16/7;padding:6px;border-radius:12px;background:linear-gradient(180deg,#06162b,#020817);box-shadow:inset 0 0 18px rgba(126,232,255,.08)}
+.tcg-product-shop-tile .tcg-product-showcase{width:100%;height:100%;object-fit:contain;border-radius:8px}
+@media(max-width:780px){
+  .tcg-product-shop-tile .tcg-product-hero{grid-template-columns:1fr}
+  .tcg-product-pass-hero{grid-template-columns:minmax(140px,190px) minmax(0,1fr)}
+  .tcg-product-mini{grid-template-columns:46px minmax(0,1fr)}
+  .tcg-product-mini-art{width:46px;height:64px}
+}
