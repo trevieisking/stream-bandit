@@ -87,7 +87,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Prismowl
 - Starwhale
 - Celestyr — Dream Cartographer
+- Basic Astral Essence
 
-Material progress: **11/193**.
-Astral material progress: **11/24**.
-Next source-of-truth candidate at this checkpoint: **Basic Astral Essence** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **12/193**.
+Astral material progress: **12/24**.
+Next source-of-truth candidate at this checkpoint: **Star Essence** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
