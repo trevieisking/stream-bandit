@@ -21,8 +21,8 @@ Conversation memory, model memory and prior response text are not sufficient aut
 
 ## Current verified material truth
 
-Set One Standard/base PNG masters verified at canonical paths: **12/193**.
-Astral verified: **12/24**.
+Set One Standard/base PNG masters verified at canonical paths: **13/193**.
+Astral verified: **13/24**.
 
 Verified cards:
 - Stardot
@@ -37,8 +37,9 @@ Verified cards:
 - Starwhale
 - Celestyr — Dream Cartographer
 - Basic Astral Essence
+- Star Essence
 
-The current ledger sequence indicates `astral-star-essence` next, but the workflow requires a fresh GitHub preflight again immediately before its image is generated.
+The current ledger sequence indicates `astral-orbit-essence` next, but the workflow requires a fresh GitHub preflight again immediately before its image is generated.
 
 ## Rejected-candidate rule
 
