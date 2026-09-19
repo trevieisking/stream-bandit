@@ -98,7 +98,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Star Chart
 - Celestial Observatory
 - Dreamglass
+- Orbit Ring
 
-Material progress: **22/193**.
-Astral material progress: **22/24**.
-Next source-of-truth candidate at this checkpoint: **Orbit Ring** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **23/193**.
+Astral material progress: **23/24**.
+Next source-of-truth candidate at this checkpoint: **Parallax Window** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
