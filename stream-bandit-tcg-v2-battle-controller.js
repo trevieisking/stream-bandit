@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.3';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.4';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const state = {
@@ -283,7 +283,8 @@
       '<span class="sb-damage">' + (attack.damage == null ? '—' : esc(attack.damage)) + '</span>' +
       '</button>'
     )).join('');
-    return '<article class="sb-card-control' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '"' +
+    const cardId = String((topInstance(creature) && topInstance(creature).card_id) || '');
+    return '<article class="sb-tcg-card sb-card-control' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '" data-card-id="' + esc(cardId) + '"' +
       (opts.primary ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"' : '') + '>' +
       '<header><span class="sb-stage">' + esc(definition.stage || definition.kind || 'Creature') + '</span><span class="sb-element">' + esc(definition.element || '') + '</span></header>' +
       '<h2>' + esc(definition.name || topInstance(creature)?.card_id || 'Creature') + '</h2>' +
@@ -296,7 +297,10 @@
 
   function handCard(instance) {
     const definition = legacyDefinition(instance) || {};
-    return '<article class="sb-hand-card"><strong>' + esc(definition.name || instance.card_id) + '</strong><small>' +
+    const cardId = String(instance && instance.card_id || '');
+    return '<article class="sb-tcg-card sb-hand-card" data-card-id="' + esc(cardId) + '">' +
+      '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
+      '<strong>' + esc(definition.name || cardId) + '</strong><small>' +
       esc(definition.card_family || definition.kind || '') + '</small></article>';
   }
 
