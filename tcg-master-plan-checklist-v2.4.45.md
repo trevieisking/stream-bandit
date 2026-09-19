@@ -34,9 +34,10 @@
 - [x] Celestyr — Dream Cartographer.
 - [x] Basic Astral Essence.
 - [x] Star Essence.
-- [ ] Orbit Essence.
-- [ ] Set One Standard/base PNG masters complete: **13/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **13/24 -> 24/24**.
+- [x] Orbit Essence.
+- [ ] Nova Essence.
+- [ ] Set One Standard/base PNG masters complete: **14/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **14/24 -> 24/24**.
 - [ ] Final clean backgrounds complete: **0/8 -> 8/8**.
 
 ## Safety
