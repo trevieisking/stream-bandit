@@ -29,6 +29,7 @@ test('V2.4.46 Second Sky presentation is bound to the exact canonical starter re
 
 test('Second Sky product presentation is data-driven and does not own gameplay or economy mutation',async()=>{
   const src=await read('stream-bandit-tcg-product-presentation-v2-4-46.js');
+  new Function(src);
   for(const token of ['tcg-product-presentation-v1.json','tcg-set-one-starters-v0.2.json','tcg-art-production-ledger-v1.json','tcg-deck-accessory-ledger-v1.json','tcg-art-manifest.json']){
     assert.ok(src.includes(token),token);
   }
