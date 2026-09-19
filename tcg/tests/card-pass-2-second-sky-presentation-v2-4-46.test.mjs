@@ -114,3 +114,17 @@ test('human visual pass 3 gives Active Battle priority over empty Game Info spac
   assert.ok(product.includes('.tcg-side-stack>.tcg-frame:nth-child(3) .tcg-list'));
   assert.ok(product.includes('line-height:1.28;'));
 });
+
+test('mobile pass exposes the full navigation rail and complete collection grid',async()=>{
+  const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.css');
+  const product=await read('stream-bandit-tcg-product-presentation-v2-4-46.css');
+  assert.ok(shell.includes('V2.4.50 mobile acceptance: full rail plus vertically scrollable complete TCG surfaces.'));
+  assert.ok(shell.includes('grid-template-columns:repeat(3,minmax(0,1fr))'));
+  assert.ok(shell.includes('grid-template-rows:repeat(2,44px)'));
+  assert.ok(shell.includes('overflow-y:auto'));
+  assert.ok(shell.includes('.tcg-card-feed{'));
+  assert.ok(shell.includes('grid-template-columns:repeat(2,minmax(0,1fr))'));
+  assert.ok(product.includes('V2.4.50 mobile acceptance: readable complete card/product grids.'));
+  assert.ok(product.includes('.tcg-product-card-grid{'));
+  assert.ok(product.includes('grid-template-columns:repeat(2,minmax(0,1fr))'));
+});
