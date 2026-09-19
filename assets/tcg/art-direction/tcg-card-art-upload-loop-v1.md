@@ -95,7 +95,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Cartographer Lyra
 - Future Draw
 - Gravity Shift
+- Star Chart
 
-Material progress: **19/193**.
-Astral material progress: **19/24**.
-Next source-of-truth candidate at this checkpoint: **Star Chart** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **20/193**.
+Astral material progress: **20/24**.
+Next source-of-truth candidate at this checkpoint: **Celestial Observatory** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
