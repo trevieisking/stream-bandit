@@ -29,7 +29,7 @@ test('Battle v0.6 follows the recorded tabletop interaction layout without resto
 });
 
 test('phone battlefield gives the field full width and does not cover it with sticky chrome', () => {
-  assert.match(battle, /@media\(max-width:640px\)/);
+  assert.match(battle, /@media\(max-width:640px\), \(hover:none\) and \(pointer:coarse\)/);
   assert.match(battle, /overflow-y:auto/);
   assert.match(battle, /grid-template-areas:"rail-left rail-right" "field field"/);
   assert.match(battle, /\.sb-half>\.sb-field-core\{grid-area:field\}/);
@@ -37,7 +37,7 @@ test('phone battlefield gives the field full width and does not cover it with st
   assert.match(battle, /\.sb-player-strip\{[\s\S]*?position:relative;top:auto/);
   assert.match(battle, /\.sb-hand-wrap\{[\s\S]*?position:relative;bottom:auto/);
   assert.match(battle, /\.sb-realm\{display:none\}/);
-  assert.match(battle, /@media\(max-width:640px\) and \(orientation:landscape\)/);
+  assert.match(battle, /@media\(max-width:960px\) and \(orientation:landscape\), \(hover:none\) and \(pointer:coarse\) and \(orientation:landscape\)/);
   assert.match(battle, /scroll-snap-type:x proximity/);
 });
 
@@ -76,7 +76,7 @@ test('End Turn is a browser control for the existing tcg-match-actions lifecycle
 });
 
 test('phone setup selection scrolls toward the canonical destination instead of hiding it behind the hand', () => {
-  assert.match(controller, /window\.matchMedia\('\(max-width: 640px\)'\)\.matches/);
+  assert.match(controller, /window\.matchMedia\('\(max-width: 640px\), \(hover: none\) and \(pointer: coarse\)'\)\.matches/);
   assert.match(controller, /const target = hasVanguard \? \$\('youReserve'\) : \$\('youVanguardSlot'\)/);
   assert.match(controller, /target\.scrollIntoView\(\{ behavior: 'smooth', block: 'center' \}\)/);
 });
