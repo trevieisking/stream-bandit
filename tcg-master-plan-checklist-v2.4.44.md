@@ -20,8 +20,9 @@
 - [x] Cosmarch canonical PNG verified.
 - [x] Moonbit canonical PNG verified.
 - [x] Comettail canonical PNG verified.
-- [ ] Set One Standard/base PNG masters complete: **5/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **5/24 -> 24/24**.
+- [x] Nebulynx canonical PNG verified.
+- [ ] Set One Standard/base PNG masters complete: **6/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **6/24 -> 24/24**.
 - [ ] Final clean background masters complete: **0/8 -> 8/8**.
 
 ## Blueprint coverage retained
