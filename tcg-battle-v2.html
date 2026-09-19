@@ -302,7 +302,7 @@ button{font:inherit}
   .sb-zone-pile{min-height:52px}.sb-zone-pile b{font-size:14px}
   .sb-center-band{grid-template-columns:1fr 1.6fr 1fr}
 }
-@media(max-width:640px){
+@media(max-width:640px), (hover:none) and (pointer:coarse){
   :root{--card-w:min(27vw,112px);--active-w:min(42vw,160px)}
   html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .sb-battle{height:auto;min-height:100dvh;padding:0;background-attachment:scroll}
@@ -380,7 +380,7 @@ button{font:inherit}
   .sb-vanguard-slot{min-height:150px}
   .sb-hand-card{flex-basis:104px}
 }
-@media(max-width:640px) and (orientation:landscape){
+@media(max-width:960px) and (orientation:landscape), (hover:none) and (pointer:coarse) and (orientation:landscape){
   :root{--card-w:min(18vw,104px);--active-w:min(25vw,146px)}
   .sb-player-strip{min-height:44px;padding:4px 8px}
   .sb-half{padding:4px 6px}
