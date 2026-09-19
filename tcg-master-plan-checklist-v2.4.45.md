@@ -35,9 +35,10 @@
 - [x] Basic Astral Essence.
 - [x] Star Essence.
 - [x] Orbit Essence.
-- [ ] Nova Essence.
-- [ ] Set One Standard/base PNG masters complete: **14/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **14/24 -> 24/24**.
+- [x] Nova Essence.
+- [ ] Archivist Sol.
+- [ ] Set One Standard/base PNG masters complete: **15/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **15/24 -> 24/24**.
 - [ ] Final clean backgrounds complete: **0/8 -> 8/8**.
 
 ## Safety
