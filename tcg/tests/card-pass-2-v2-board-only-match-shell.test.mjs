@@ -10,7 +10,7 @@ const battle = fs.readFileSync(path.join(root, 'tcg-battle-v2.html'), 'utf8');
 const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-controller.js'), 'utf8');
 
 test('V2 active match is a true board-only full-viewport route', () => {
-  assert.match(battle, /data-sb-tcg-v2-battle="board-only-v0-3"/);
+  assert.match(battle, /data-sb-tcg-v2-battle="board-only-v0-4"/);
   assert.match(battle, /aria-label="One-screen battlefield"/);
   assert.match(battle, /height:100dvh/);
   assert.doesNotMatch(battle, /stream-bandit-header-shell/i);
