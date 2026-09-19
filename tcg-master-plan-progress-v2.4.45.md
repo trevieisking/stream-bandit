@@ -103,17 +103,20 @@ The first completed deck presentation is now wired on the PR branch using canoni
 - Second Sky sleeve, battle coin and deck-box artwork are still pending and must not be claimed complete.
 - No gameplay engine, card rules, database row, Edge Function, Supabase deployment, `main`, Pages/public or live release was changed by this presentation slice.
 
-## Second Sky human visual acceptance — PASS
+## Second Sky human visual acceptance — desktop PASS / mobile re-test pending
 
-Trevor completed the branch-preview visual review and accepted the current Second Sky presentation on exact head `7d15aec02ee76613a706e4ca491f6c091e57351b`.
+Trevor completed and passed the desktop branch-preview visual review on exact head `7d15aec02ee76613a706e4ca491f6c091e57351b`.
 
-Accepted surfaces:
-- Game Home;
-- Play, including the final Active Battle sidebar balance;
-- Decks;
-- Collection;
-- Shop;
-- Battle Pass;
-- shared top navigation rail.
+Kay's phone review then exposed a separate responsive-layout defect: the full top navigation rail was not visible and the Collection page could not expose all Astral cards reliably on a phone-sized viewport.
 
-The accepted visual pass is presentation-only. Second Sky accessory artwork is still pending, economy/Battle Pass ownership remains gated, and no merge/main/Pages/live promotion is implied by this visual acceptance.
+V2.4.50 therefore adds a mobile-only responsive path:
+- the six-item navigation becomes a fully visible 3 x 2 rail;
+- phone pages switch from fixed-screen clipping to vertical document scrolling;
+- Play/Core layouts stack to one column;
+- Collection/Deck card feeds become complete two-column mobile grids;
+- nested fixed feeds stop hiding lower content on phone;
+- desktop-approved layouts remain unchanged above the mobile breakpoint.
+
+Desktop acceptance remains valid. Overall cross-device human acceptance is **pending Kay/Trevor mobile re-test** of the V2.4.50 branch head.
+
+Second Sky accessory artwork is still pending, economy/Battle Pass ownership remains gated, and no merge/main/Pages/live promotion is implied by either visual review.
