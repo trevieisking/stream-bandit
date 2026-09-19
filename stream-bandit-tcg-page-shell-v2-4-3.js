@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-const VERSION="2.4.36";
+const VERSION="2.4.32";
 const PRIMARY=[
  {key:"battle",label:"Battle",href:"tcg-play.html"},
  {key:"decks",label:"Decks",href:"tcg-decks.html"},

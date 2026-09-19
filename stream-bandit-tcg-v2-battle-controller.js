@@ -123,14 +123,6 @@
     return data;
   }
 
-  function artResolver() {
-    const value = window.StreamBanditTCGArtResolverV2436;
-    if (!value || typeof value.ready !== 'function' || typeof value.cardArt !== 'function') {
-      throw new Error('TCG art resolver V2.4.36 is unavailable.');
-    }
-    return value;
-  }
-
   function renderer() {
     const value = window.StreamBanditTCGCardRendererV247;
     if (!value || typeof value.renderKnownCard !== 'function' || typeof value.renderCardBack !== 'function') {
@@ -1991,10 +1983,6 @@
       state.matchId = new URLSearchParams(window.location.search).get('match_id') || '';
       $('controllerVersion').textContent = VERSION;
       if (!state.matchId) throw new Error('Open this battle surface from a match route containing ?match_id=<id>.');
-      const art = artResolver();
-      await art.ready();
-      art.applyPageArt(document.body);
-      art.applyBranding(document);
       renderer();
       await ensureClient();
       await refreshMatch();

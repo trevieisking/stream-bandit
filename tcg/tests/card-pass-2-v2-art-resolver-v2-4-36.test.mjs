@@ -6,12 +6,14 @@ import {fileURLToPath} from 'node:url';
 const ROOT=fileURLToPath(new URL('../../',import.meta.url));
 const read=p=>readFile(new URL(p,`file://${ROOT}/`),'utf8');
 
-test('V2.4.36 exposes one reusable TCG art resolver',async()=>{
+test('V2.4.37 exposes one reusable presentation-only TCG art resolver',async()=>{
   const src=await read('stream-bandit-tcg-art-resolver-v2-4-36.js');
-  for(const token of ['tcg-art-manifest.json','tcg-card-art-intake-v1.json','cardArt','applyPageArt','applyBranding']){
+  for(const token of ['tcg-art-manifest.json','tcg-card-art-intake-v1.json','applyCardArt','applyPageArt','applyBranding','MutationObserver']){
     assert.ok(src.includes(token),token);
   }
   assert.equal(src.includes('gale-skyweaver.png'),false,'resolver must not hard-code individual card paths');
+  assert.equal(src.includes('tcg-match-actions'),false,'art owner must not own gameplay');
+  assert.equal(src.includes('tcg-private-alpha-api'),false,'art owner must not own setup/runtime API');
 });
 
 test('Set One art intake stays browser-friendly and canonical',async()=>{
@@ -42,33 +44,31 @@ test('approved repo-owned art targets exist and do not use GitHack',async()=>{
   }
 });
 
-test('page shell loads canonical art owner and brand source generically',async()=>{
+test('page shell loads the canonical art owner without changing accepted shell identity',async()=>{
   const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.js');
+  assert.ok(shell.includes('const VERSION="2.4.32"'));
   assert.ok(shell.includes('stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-36'));
-  assert.ok(shell.includes('data-sb-tcg-brand-art="primary"'));
   assert.ok(shell.includes('owner.applyPageArt(body)'));
   assert.ok(shell.includes('owner.applyBranding(document)'));
 });
 
-test('card renderer resolves by canonical card id with missing-art fallback',async()=>{
+test('art resolver decorates existing rendered cards instead of changing Card Renderer gameplay identity',async()=>{
+  const resolver=await read('stream-bandit-tcg-art-resolver-v2-4-36.js');
   const renderer=await read('stream-bandit-tcg-card-renderer-v2-4-7.js');
-  assert.ok(renderer.includes('StreamBanditTCGArtResolverV2436'));
-  assert.ok(renderer.includes('artOwner.cardArt(instance, structured, definition)'));
-  assert.ok(renderer.includes('data-sb-tcg-card-art="candidate"'));
-  assert.ok(renderer.includes('Artwork pending'));
+  assert.ok(resolver.includes("querySelectorAll('.sb-tcg-card[data-card-id]')"));
+  assert.ok(resolver.includes("card.querySelector('.sb-card-art')"));
+  assert.ok(resolver.includes("holder.replaceChildren(img)"));
+  assert.ok(renderer.includes("const VERSION = 'Stream Bandit TCG Card Renderer V2.4.10'"));
+  assert.equal(renderer.includes('StreamBanditTCGArtResolver'),false);
 });
 
-test('battle loads art owner before renderer and preserves standalone game chrome',async()=>{
+test('battle adds art owner alongside accepted controller and renderer cache contracts',async()=>{
   const html=await read('tcg-battle-v2.html');
-  const controller=await read('stream-bandit-tcg-v2-battle-controller.js');
   const resolverPos=html.indexOf('stream-bandit-tcg-art-resolver-v2-4-36.js');
-  const rendererPos=html.indexOf('stream-bandit-tcg-card-renderer-v2-4-7.js');
+  const rendererPos=html.indexOf('stream-bandit-tcg-card-renderer-v2-4-7.js?v=2-4-10');
   assert.ok(resolverPos>0&&rendererPos>resolverPos);
+  assert.ok(html.includes('stream-bandit-tcg-v2-battle-controller.js?v=2-4-26'));
   assert.ok(html.includes('data-sb-tcg-page="battle"'));
-  assert.ok(html.includes('data-sb-tcg-brand-art="primary"'));
-  assert.ok(controller.includes('await art.ready()'));
-  assert.ok(controller.includes('art.applyPageArt(document.body)'));
-  assert.ok(controller.includes('art.applyBranding(document)'));
   assert.equal(html.includes('stream-bandit-header-shell'),false);
   assert.equal(html.includes('stream-bandit-footer-shell'),false);
 });

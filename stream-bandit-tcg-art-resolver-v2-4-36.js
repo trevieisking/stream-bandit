@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const VERSION='2.4.36';
+const VERSION='2.4.37';
 const ART_MANIFEST='assets/tcg/tcg-art-manifest.json';
 const CARD_INTAKE='assets/tcg/cards/set-one/tcg-card-art-intake-v1.json';
 const PAGE_KEYS=Object.freeze({
@@ -21,7 +21,9 @@ let artManifest=null;
 let cardIntake=null;
 let cardIndex=new Map();
 let readyPromise=null;
-let fallbackInstalled=false;
+let observer=null;
+let eventHandlersInstalled=false;
+const failedCardIds=new Set();
 
 function absolute(path){
   return new URL(String(path||''),document.baseURI).href;
@@ -34,64 +36,6 @@ async function readJson(path){
   if(!response.ok) throw new Error('TCG art manifest unavailable: '+path+' (HTTP '+response.status+')');
   return response.json();
 }
-function installCardArtFallback(root){
-  if(fallbackInstalled)return;
-  fallbackInstalled=true;
-  const target=root&&root.addEventListener?root:document;
-  target.addEventListener('load',event=>{
-    const img=event.target;
-    if(!(img instanceof HTMLImageElement)||img.dataset.sbTcgCardArt!=='candidate')return;
-    const holder=img.closest('.sb-card-art');
-    if(!holder)return;
-    holder.dataset.artState='approved';
-    holder.classList.remove('is-candidate','is-missing');
-    holder.classList.add('is-approved');
-    img.dataset.sbTcgCardArt='approved';
-  },true);
-  target.addEventListener('error',event=>{
-    const img=event.target;
-    if(!(img instanceof HTMLImageElement)||img.dataset.sbTcgCardArt!=='candidate')return;
-    const holder=img.closest('.sb-card-art');
-    if(!holder)return;
-    holder.dataset.artState='missing';
-    holder.classList.remove('is-candidate','is-approved');
-    holder.classList.add('is-missing');
-    holder.replaceChildren(Object.assign(document.createElement('span'),{textContent:'Artwork pending'}));
-  },true);
-}
-function ready(){
-  if(!readyPromise){
-    readyPromise=Promise.all([readJson(ART_MANIFEST),readJson(CARD_INTAKE)]).then(([art,cards])=>{
-      artManifest=art&&typeof art==='object'?art:{};
-      cardIntake=cards&&typeof cards==='object'?cards:{};
-      const rows=Array.isArray(cardIntake.cards)?cardIntake.cards:[];
-      cardIndex=new Map(rows.filter(row=>row&&row.card_id).map(row=>[String(row.card_id),row]));
-      installCardArtFallback(document);
-      return api;
-    });
-  }
-  return readyPromise;
-}
-function cardId(instance,structured,definition){
-  return String(
-    (instance&&instance.card_id)||
-    (structured&&structured.id)||
-    (definition&&definition.id)||
-    ''
-  );
-}
-function cardArt(instance,structured,definition){
-  const id=cardId(instance,structured,definition);
-  if(!id)return null;
-  const entry=cardIndex.get(id);
-  if(!entry||!entry.expected_asset_path)return null;
-  return Object.freeze({
-    state:'candidate',
-    url:String(entry.expected_asset_path),
-    card_id:id,
-    artwork_status:String(entry.artwork_status||'missing')
-  });
-}
 function pageKey(body){
   const el=body||document.body;
   return PAGE_KEYS[String(el&&el.dataset&&el.dataset.sbTcgPage||'')]||'';
@@ -100,7 +44,11 @@ function pageArtPath(body){
   if(!artManifest)return '';
   const key=pageKey(body);
   if(key==='home')return String(artManifest.branding&&artManifest.branding.primary_key_art||'');
-  return String(artManifest.ui_reference&&artManifest.ui_reference[key]||'');
+  return String(
+    artManifest.ui_reference&&key&&artManifest.ui_reference[key]||
+    artManifest.branding&&artManifest.branding.primary_key_art||
+    ''
+  );
 }
 function applyPageArt(body){
   const el=body||document.body;
@@ -131,12 +79,110 @@ function applyBranding(root){
   const path=brandingPath();
   if(!path)return 0;
   const scope=root&&root.querySelectorAll?root:document;
-  const images=Array.from(scope.querySelectorAll('img[data-sb-tcg-brand-art]'));
+  const images=Array.from(scope.querySelectorAll(
+    'img[data-sb-tcg-brand-art],.tcg-client-brand img,.sb-game-brand img'
+  ));
   images.forEach(img=>{
     if(img.getAttribute('src')!==path)img.setAttribute('src',path);
     img.dataset.sbTcgBrandSource='canonical-manifest';
   });
   return images.length;
+}
+function cardEntry(cardId){
+  return cardIndex.get(String(cardId||''))||null;
+}
+function applyCardArt(root){
+  if(!cardIndex.size)return 0;
+  const scope=root&&root.querySelectorAll?root:document;
+  const cards=[];
+  if(scope.matches&&scope.matches('.sb-tcg-card[data-card-id]'))cards.push(scope);
+  cards.push(...Array.from(scope.querySelectorAll('.sb-tcg-card[data-card-id]')));
+  let changed=0;
+  cards.forEach(card=>{
+    const id=String(card.dataset.cardId||'');
+    if(!id||failedCardIds.has(id))return;
+    const entry=cardEntry(id);
+    if(!entry||!entry.expected_asset_path)return;
+    const holder=card.querySelector('.sb-card-art');
+    if(!holder)return;
+    if(holder.dataset.artState==='approved'&&!holder.querySelector('img[data-sb-tcg-card-art="candidate"]'))return;
+    if(holder.dataset.sbTcgResolvedCardId===id)return;
+    const name=String((card.querySelector('h2')&&card.querySelector('h2').textContent)||id);
+    const img=document.createElement('img');
+    img.src=String(entry.expected_asset_path);
+    img.alt=name+' artwork';
+    img.loading='lazy';
+    img.decoding='async';
+    img.dataset.sbTcgCardArt='candidate';
+    img.dataset.sbTcgCardId=id;
+    holder.replaceChildren(img);
+    holder.dataset.artState='candidate';
+    holder.dataset.sbTcgResolvedCardId=id;
+    holder.classList.remove('is-missing','is-placeholder','is-approved');
+    holder.classList.add('is-candidate');
+    changed+=1;
+  });
+  return changed;
+}
+function installImageEvents(){
+  if(eventHandlersInstalled)return;
+  eventHandlersInstalled=true;
+  document.addEventListener('load',event=>{
+    const img=event.target;
+    if(!(img instanceof HTMLImageElement)||img.dataset.sbTcgCardArt!=='candidate')return;
+    const holder=img.closest('.sb-card-art');
+    if(!holder)return;
+    holder.dataset.artState='approved';
+    holder.classList.remove('is-candidate','is-missing');
+    holder.classList.add('is-approved');
+    img.dataset.sbTcgCardArt='approved';
+  },true);
+  document.addEventListener('error',event=>{
+    const img=event.target;
+    if(!(img instanceof HTMLImageElement)||img.dataset.sbTcgCardArt!=='candidate')return;
+    const id=String(img.dataset.sbTcgCardId||'');
+    if(id)failedCardIds.add(id);
+    const holder=img.closest('.sb-card-art');
+    if(!holder)return;
+    holder.dataset.artState='missing';
+    holder.classList.remove('is-candidate','is-approved');
+    holder.classList.add('is-missing');
+    holder.replaceChildren(Object.assign(document.createElement('span'),{textContent:'Artwork pending'}));
+  },true);
+}
+function refreshPresentation(){
+  applyPageArt(document.body);
+  applyBranding(document);
+  applyCardArt(document);
+}
+function observe(){
+  if(observer||typeof MutationObserver!=='function')return;
+  let queued=false;
+  observer=new MutationObserver(()=>{
+    if(queued)return;
+    queued=true;
+    queueMicrotask(()=>{
+      queued=false;
+      applyBranding(document);
+      applyCardArt(document);
+    });
+  });
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+}
+function ready(){
+  if(!readyPromise){
+    readyPromise=Promise.all([readJson(ART_MANIFEST),readJson(CARD_INTAKE)]).then(([art,cards])=>{
+      artManifest=art&&typeof art==='object'?art:{};
+      cardIntake=cards&&typeof cards==='object'?cards:{};
+      const rows=Array.isArray(cardIntake.cards)?cardIntake.cards:[];
+      cardIndex=new Map(rows.filter(row=>row&&row.card_id).map(row=>[String(row.card_id),row]));
+      installImageEvents();
+      observe();
+      refreshPresentation();
+      return api;
+    });
+  }
+  return readyPromise;
 }
 function counts(){
   return Object.freeze({
@@ -144,15 +190,19 @@ function counts(){
     complete:Array.from(cardIndex.values()).filter(row=>row.artwork_status==='complete').length
   });
 }
+function boot(){
+  ready().catch(()=>{});
+}
 
 const api=Object.freeze({
   version:VERSION,
   ready,
-  cardArt,
   applyPageArt,
   applyBranding,
-  installCardArtFallback,
+  applyCardArt,
   counts
 });
 window.StreamBanditTCGArtResolverV2436=api;
+window.StreamBanditTCGArtResolverV2437=api;
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
