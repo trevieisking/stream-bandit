@@ -1,9 +1,10 @@
 (function(){
 'use strict';
 
-const VERSION='2.4.38';
+const VERSION='2.4.46';
 const ART_MANIFEST='assets/tcg/tcg-art-manifest.json';
 const CARD_INTAKE='assets/tcg/cards/set-one/tcg-card-art-intake-v1.json';
+const ART_PRODUCTION='assets/tcg/art-direction/tcg-art-production-ledger-v1.json';
 const PAGE_KEYS=Object.freeze({
   home:'home',
   play:'play',
@@ -19,6 +20,7 @@ const PAGE_KEYS=Object.freeze({
 
 let artManifest=null;
 let cardIntake=null;
+let artProduction=null;
 let cardIndex=new Map();
 let readyPromise=null;
 let observer=null;
@@ -46,11 +48,7 @@ function pageArtPath(body){
   const backgrounds=artManifest.runtime_backgrounds&&typeof artManifest.runtime_backgrounds==='object'
     ? artManifest.runtime_backgrounds
     : {};
-  return String(
-    (key&&backgrounds[key])||
-    backgrounds.default||
-    ''
-  );
+  return String((key&&backgrounds[key])||backgrounds.default||'');
 }
 function applyPageArt(body){
   const el=body||document.body;
@@ -81,14 +79,18 @@ function applyBranding(root){
   const path=brandingPath();
   if(!path)return 0;
   const scope=root&&root.querySelectorAll?root:document;
-  const images=Array.from(scope.querySelectorAll(
-    'img[data-sb-tcg-brand-art],.tcg-client-brand img,.sb-game-brand img'
-  ));
+  const images=Array.from(scope.querySelectorAll('img[data-sb-tcg-brand-art],.tcg-client-brand img,.sb-game-brand img'));
   images.forEach(img=>{
     if(img.getAttribute('src')!==path)img.setAttribute('src',path);
     img.dataset.sbTcgBrandSource='canonical-manifest';
   });
   return images.length;
+}
+function productionRows(){
+  const order=artProduction&&artProduction.card_art_batches&&Array.isArray(artProduction.card_art_batches.batch_order)
+    ? artProduction.card_art_batches.batch_order
+    : [];
+  return order.flatMap(batch=>Array.isArray(batch.cards)?batch.cards:[]);
 }
 function cardEntry(cardId){
   return cardIndex.get(String(cardId||''))||null;
@@ -104,7 +106,7 @@ function applyCardArt(root){
     const id=String(card.dataset.cardId||'');
     if(!id||failedCardIds.has(id))return;
     const entry=cardEntry(id);
-    if(!entry||!entry.expected_asset_path)return;
+    if(!entry||!entry.expected_asset_path||entry.artwork_status!=='approved')return;
     const holder=card.querySelector('.sb-card-art');
     if(!holder)return;
     if(holder.dataset.artState==='approved'&&!holder.querySelector('img[data-sb-tcg-card-art="candidate"]'))return;
@@ -173,11 +175,20 @@ function observe(){
 }
 function ready(){
   if(!readyPromise){
-    readyPromise=Promise.all([readJson(ART_MANIFEST),readJson(CARD_INTAKE)]).then(([art,cards])=>{
+    readyPromise=Promise.all([readJson(ART_MANIFEST),readJson(CARD_INTAKE),readJson(ART_PRODUCTION)]).then(([art,cards,production])=>{
       artManifest=art&&typeof art==='object'?art:{};
       cardIntake=cards&&typeof cards==='object'?cards:{};
-      const rows=Array.isArray(cardIntake.cards)?cardIntake.cards:[];
-      cardIndex=new Map(rows.filter(row=>row&&row.card_id).map(row=>[String(row.card_id),row]));
+      artProduction=production&&typeof production==='object'?production:{};
+      const metadata=new Map((Array.isArray(cardIntake.cards)?cardIntake.cards:[]).filter(row=>row&&row.card_id).map(row=>[String(row.card_id),row]));
+      cardIndex=new Map(productionRows().filter(row=>row&&row.card_id).map(row=>{
+        const meta=metadata.get(String(row.card_id))||{};
+        return [String(row.card_id),Object.assign({},meta,{
+          expected_asset_path:String(row.target_path||meta.expected_asset_path||''),
+          artwork_status:row.artwork_status==='approved'?'approved':'missing',
+          printing_id:row.printing_id||meta.printing_id||'',
+          artwork_id:row.artwork_id||meta.artwork_id||''
+        })];
+      }));
       installImageEvents();
       observe();
       refreshPresentation();
@@ -189,7 +200,7 @@ function ready(){
 function counts(){
   return Object.freeze({
     cards:cardIndex.size,
-    complete:Array.from(cardIndex.values()).filter(row=>row.artwork_status==='complete').length
+    complete:Array.from(cardIndex.values()).filter(row=>row.artwork_status==='approved').length
   });
 }
 function boot(){
@@ -207,5 +218,6 @@ const api=Object.freeze({
 window.StreamBanditTCGArtResolverV2436=api;
 window.StreamBanditTCGArtResolverV2437=api;
 window.StreamBanditTCGArtResolverV2438=api;
+window.StreamBanditTCGArtResolverV2446=api;
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
