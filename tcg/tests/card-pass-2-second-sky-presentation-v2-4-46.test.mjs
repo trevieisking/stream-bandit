@@ -78,3 +78,15 @@ test('product presentation registry keeps future deck expansion data-driven',asy
   assert.equal(registry.preview_policy.ownership_inference,false);
   assert.ok(registry.extension_rule.includes('starter_id'));
 });
+
+test('human visual pass keeps top rail labels visible and preserves card-shaped Battle Pass art',async()=>{
+  const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.css');
+  const product=await read('stream-bandit-tcg-product-presentation-v2-4-46.css');
+  assert.ok(shell.includes('V2.4.47 human visual acceptance: keep the top rail labels fully visible.'));
+  assert.ok(shell.includes('.tcg-client-topbar{overflow:visible}'));
+  assert.ok(shell.includes('.tcg-client-nav{height:auto;align-self:stretch;overflow:visible}'));
+  assert.ok(product.includes('V2.4.47 human visual acceptance: fit artwork to its presentation card instead of flattening it.'));
+  assert.ok(product.includes('.tcg-product-pass-art{width:100%;height:auto;aspect-ratio:16/9;object-fit:contain'));
+  assert.ok(product.includes('.tcg-product-reward-art{width:100%;height:auto;aspect-ratio:.72;object-fit:cover'));
+  assert.ok(product.includes('.tcg-product-mini-art{grid-area:art;width:78px;height:78px'));
+});
