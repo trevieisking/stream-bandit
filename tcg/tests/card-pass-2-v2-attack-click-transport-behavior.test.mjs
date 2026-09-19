@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
+const renderer = fs.readFileSync(path.join(root, 'stream-bandit-tcg-card-renderer-v2-4-7.js'), 'utf8');
 const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-controller.js'), 'utf8');
 
 class FakeButton {
@@ -46,6 +47,14 @@ class FakeNode {
   get innerHTML() {
     return this._innerHTML;
   }
+
+  replaceChildren(...children) {
+    this._innerHTML = children.map((child) => String(child && child.textContent || '')).join('');
+  }
+
+  closest() {
+    return null;
+  }
 }
 
 function playableView(revision = 41) {
@@ -54,18 +63,32 @@ function playableView(revision = 41) {
     view_state: {
       phase: 'play',
       active_seat: 1,
+      realm: null,
       you: {
         seat: 1,
         vanguard: {
           stack: [{ uid: 'starwhale-1', card_id: 'astral-starwhale' }],
           damage: 0,
           essence: [{ uid: 'essence-1' }, { uid: 'essence-2' }],
-          shield: 0
+          relic: null,
+          shield: 0,
+          conditions: {}
         },
         reserve: [],
-        hand: []
+        hand: [],
+        hand_count: 0,
+        deck_count: 48,
+        discard_count: 0,
+        rewards_count: 6
       },
-      opponent: { vanguard: null, reserve: [] },
+      opponent: {
+        vanguard: null,
+        reserve: [],
+        hand_count: 0,
+        deck_count: 48,
+        discard_count: 0,
+        rewards_count: 6
+      },
       card_index: {
         'astral-starwhale': {
           definition: {
@@ -75,7 +98,14 @@ function playableView(revision = 41) {
             element: 'Astral'
           },
           definition_v0_2: {
+            name: 'Starwhale',
+            card_family: 'Creature',
+            element: 'Astral',
             creature: {
+              stage: 'Standalone',
+              hp: 120,
+              withdrawal: 1,
+              ability: null,
               attacks: [{ slot: 1, name: 'Gravity Song', damage: 40 }]
             }
           }
@@ -150,6 +180,21 @@ function makeHarness() {
     }
 
     if (String(url).endsWith('/functions/v1/tcg-match-actions')) {
+      if (payload.action === 'field_actions') {
+        return {
+          ok: true,
+          status: 200,
+          async json() {
+            return {
+              ok: true,
+              result: {
+                ability_sources: [],
+                withdraw: { eligible: false, reason: 'fixture_no_withdraw', cost: null, legal_targets: [], payment_options: [] }
+              }
+            };
+          }
+        };
+      }
       return {
         ok: true,
         status: 200,
@@ -181,6 +226,7 @@ function makeHarness() {
     console
   };
 
+  vm.runInNewContext(renderer, context, { filename: 'stream-bandit-tcg-card-renderer-v2-4-7.js' });
   vm.runInNewContext(controller, context, { filename: 'stream-bandit-tcg-v2-battle-controller.js' });
   assert.equal(typeof domReady, 'function', 'controller must register its DOMContentLoaded boot');
 
@@ -199,18 +245,17 @@ test('rendered V2 card Attack click posts authoritative Attack payload and surfa
   assert.equal(harness.document.attackButtons.length, 1, 'playable Vanguard should render one Attack control');
   await harness.document.attackButtons[0].triggerClick();
 
-  const attackRequests = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-match-actions'));
-  assert.equal(attackRequests.length, 1, 'one card click must submit exactly one Attack command');
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(attackRequests[0].payload)),
-    {
-      action: 'attack',
-      match_id: 'match-click-proof',
-      client_nonce: 'nonce-1',
-      expected_revision: 41,
-      attack_slot: 1
-    }
-  );
+  const matchRequests = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-match-actions'));
+  const attackRequests = matchRequests.filter((entry) => entry.payload && entry.payload.action === 'attack');
+  const projectionRequests = matchRequests.filter((entry) => entry.payload && entry.payload.action === 'field_actions');
+  assert.equal(attackRequests.length, 1, 'one card click must submit exactly one Attack mutation command');
+  assert.ok(projectionRequests.length >= 1, 'read-only field action projection may share the Match Edge endpoint');
+  const payload = JSON.parse(JSON.stringify(attackRequests[0].payload));
+  assert.equal(payload.action, 'attack');
+  assert.equal(payload.match_id, 'match-click-proof');
+  assert.match(payload.client_nonce, /^nonce-\d+$/);
+  assert.equal(payload.expected_revision, 41);
+  assert.equal(payload.attack_slot, 1);
 
   const status = harness.nodes.get('battleStatus');
   assert.equal(status.textContent, 'stale_revision', 'nested authoritative rejection must remain visible to the player');

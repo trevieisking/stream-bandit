@@ -10,7 +10,7 @@
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07090d,#0e1420 42%,#080b10);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{width:min(1180px,calc(100% - 28px));margin:auto;padding:28px 0 64px}.hero,.card{border:1px solid var(--line);background:rgba(17,23,34,.96);border-radius:18px}.hero{padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.28)}h1{font-size:clamp(30px,5vw,50px);line-height:1.04;margin:4px 0 10px}h2{font-size:24px;margin:30px 0 12px}h3{font-size:17px;margin:0 0 8px}.kicker{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue)}.lead{font-size:17px;max-width:920px;color:#dbe3ef}.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.badge{border:1px solid var(--line);background:#0c1320;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:900}.good{color:var(--green)}.hold{color:var(--amber)}.bad{color:var(--red)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{grid-column:span 6;padding:18px}.wide{grid-column:1/-1}.third{grid-column:span 4}.stat{font-size:34px;font-weight:950;line-height:1;margin-bottom:7px}.muted{color:var(--muted)}.bar{height:12px;border-radius:999px;overflow:hidden;background:#0a1019;border:1px solid var(--line);margin:10px 0 6px}.bar>span{display:block;height:100%;background:linear-gradient(90deg,#5f93ff,#8ab4ff);width:var(--p)}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#c8d4e7}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.note{padding:12px 14px;border-left:4px solid var(--blue);border-radius:8px;background:#0d1624}.warning{border-left-color:var(--amber)}.danger{border-left-color:var(--red)}ul,ol{padding-left:20px;margin:8px 0}li+li{margin-top:5px}.stage{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.stage:last-child{border-bottom:0}.num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#1b2638;border:1px solid #364764;font-weight:900}.small{font-size:12px}.footer{margin-top:30px;color:var(--muted);font-size:12px}@media(max-width:780px){.card,.third{grid-column:1/-1}.hero{padding:20px}.wrap{width:min(100% - 18px,1180px)}table{font-size:13px}}
 </style>
 </head>
-<body>
+<body data-sb-tcg-visual-authority="v2-4-28">
 <main class="wrap">
 <section class="hero">
 <div class="kicker">Stream Bandit TCG · live project control page</div>
@@ -79,6 +79,20 @@
 <article class="card"><h3 class="hold">What should not be promised today</h3><p>A fully production-ready TCG. The remaining work includes substantial runtime event/choice/listener work, the final player-facing application, deployment gates and a genuine two-account complete battle. Those are engineering/release gates, not cosmetic polish.</p></article>
 </section>
 <p class="note warning"><strong>Practical target:</strong> first reach a boring, deterministic, complete two-player private-alpha battle. Collection, shop, ranked, Battle Pass polish and public SEO can then be layered without risking the battle engine.</p>
+
+
+<h2>First completed deck product preview + Battle Pass Season 1</h2>
+<section class="grid">
+<article class="card"><h3>Astral — Second Sky Shop preview</h3><ul><li>First completed-deck presentation gate opens when Astral Standard/base artwork reaches 24/24 and the existing Second Sky starter recipe is revalidated.</li><li>Use real approved card art plus the matching Second Sky card sleeves, battle coin and deck box already reserved in the accessory ledger.</li><li>Show the starter in Featured / Starter Decks as a branch-only visual product proof before economy activation.</li><li>Do not fabricate prices, currencies, pack odds, purchase receipts, grants or ownership state.</li><li>Starter accessories remain cosmetic only and never affect rules, randomness or deck legality.</li></ul></article>
+<article class="card"><h3>Set One — Season 1</h3><ul><li>Set One (SB1) is the first Battle Pass season identity.</li><li>The locked Battle Pass remains 100 tiers with a reward every tier plus three daily achievements.</li><li>Set One cards, packs, cosmetics and accessories may feed the season only through the future canonical progression/economy owner.</li><li>The season does not automatically grant all 193 Set One cards.</li><li>After the Astral 24/24 gate, produce a branch-only Season 1 preview beside the Second Sky Shop preview using real assets.</li></ul></article>
+</section>
+
+
+<h2>Second Sky integrated branch preview</h2>
+<section class="grid">
+<article class="card"><h3 class="good">Astral starter is presentation-ready</h3><ul><li><strong>Second Sky</strong> remains the canonical Astral starter at 60 cards / 21 identities.</li><li>All 21 starter identities now have approved Standard artwork; the complete Astral pool is 24/24.</li><li>The shared art resolver maps real rendered card IDs to canonical production-ledger media, including the existing Battle card renderer.</li><li>Game Home, Play, Decks, Collection and Shop now have branch-only Second Sky presentation surfaces.</li></ul></article>
+<article class="card"><h3>Set One — Season 1 preview</h3><ul><li>Battle Pass presentation now uses real Set One/Astral artwork while exact tier assignments remain unassigned.</li><li>Shop purchase, pricing, receipts, ownership and grants remain disabled until their canonical owners exist.</li><li>Second Sky sleeves, battle coin and deck-box artwork remain open production work.</li><li>A reusable starter-ID presentation registry keeps future completed deck products additive instead of page-specific.</li></ul></article>
+</section>
 
 <h2>Promotion rules</h2>
 <section class="grid">

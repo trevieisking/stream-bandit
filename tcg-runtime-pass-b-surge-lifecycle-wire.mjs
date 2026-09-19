@@ -24,7 +24,9 @@ const protectionAttackContext = 'ctx:{target_zone:string,target_controller:"self
 const attackWiredWithProtection = attackWired.replace(legacyAttackContext, protectionAttackContext);
 
 const attachLegacy = 'const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);\n   if(d.id===';
-const attachEngineBoundary = 'const td=top(cr,s);const structuredAttachment=s.runtime_registry_v0_2!=null;\n   if(structuredAttachment){';
+const attachEngineBoundary = 'const structuredAttachment=s.runtime_registry_v0_2!=null;\n   if(structuredAttachment){';
+const attachLegalityDelegate = 'runtimeV02ValidateManualEssenceAttachmentDeclaration(s,seat as 1|2,uid,where,idx)';
+const attachValidatedTargetAnchor = 'const targetInst={uid:legality.target_creature_uid};'
 const attachRouteCall = 'runtimeV02BeginExternalEssenceAttachmentRoute(s,seat as 1|2,targetInst.uid,uid,"hand","manual_essence"';
 const attachmentEngineLifecycleImport = 'import { registerStructuredRuntimeEssenceAttachmentLifecycleState } from "./tcg-match-surge-lifecycle-v0-2.ts";';
 const attachmentEngineLifecycleCall = 'const lifecycleRegistered = registerStructuredRuntimeEssenceAttachmentLifecycleState(';
@@ -60,6 +62,8 @@ else if (!next.includes(attackWired) && !next.includes(attackWiredWithProtection
 if (next.includes(attachLegacy)) throw new Error('match_actions_surge_attach_requires_attachment_engine_route');
 if (!next.includes(attachmentRouteImport)) throw new Error('match_actions_attachment_route_import_missing');
 if (!next.includes(attachEngineBoundary)) throw new Error('match_actions_attachment_engine_boundary_missing');
+if (!next.includes(attachLegalityDelegate)) throw new Error('match_actions_attachment_legality_delegate_missing');
+if (!next.includes(attachValidatedTargetAnchor)) throw new Error('match_actions_attachment_validated_target_anchor_missing');
 if (!next.includes(attachRouteCall)) throw new Error('match_actions_attachment_route_call_missing');
 if (next.includes('registerStructuredRuntimeEssenceAttachmentLifecycleState')) {
   throw new Error('match_actions_regained_attachment_lifecycle_authority');

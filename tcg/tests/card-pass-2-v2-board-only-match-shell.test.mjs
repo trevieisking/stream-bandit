@@ -18,14 +18,17 @@ test('V2 active match is a board-only game route, not the site shell', () => {
 });
 
 test('board-only match reuses shared config and explicit existing authentication', () => {
-  assert.match(battle, /stream-bandit-shell-v6-24\.js/);
+  assert.match(battle, /stream-bandit-tcg-config-v2-4-31\.js/);
+  assert.doesNotMatch(battle, /stream-bandit-shell-v6-24\.js/);
   assert.match(battle, /stream-bandit-auth-gate-v7-13-001\.js/);
   assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js/);
 });
 
-test('match page does not contain matchmaking, room-code, or menu controls', () => {
+test('match page has no matchmaking or room controls and uses only the approved TCG-owned game menu', () => {
   assert.doesNotMatch(battle, /joinCode|join code|createRoom|Matchmake|private room/i);
-  assert.doesNotMatch(battle, /Collection|Deck Builder|Packs|Main Menu/i);
+  assert.match(battle, /class="sb-game-nav"/);
+  for (const label of ['Battle','Decks','Collection','Battle Pass','Shop','Settings']) assert.ok(battle.includes('>'+label+'</a>'));
+  assert.doesNotMatch(battle, /siteHeader|siteFooter|Search Stream Bandit|Main Menu/i);
 });
 
 test('existing battle controller still binds the route to authoritative match identity', () => {
