@@ -1,23 +1,49 @@
 {
   "schema": "stream-bandit-tcg-release-control-v2",
   "recorded_at": "2026-09-17",
-  "purpose": "Non-self-referential control record for the ten-family V2 baseline, restored playable-prototype UX, evergreen ownership policy and future content/mechanic extensibility programme.",
+  "purpose": "Non-self-referential control record for the ten-family V2 baseline, restored playable-prototype UX, evergreen ownership policy, future content/mechanic extensibility programme, living cross-era mechanic harvest and completed post-test consistency audit.",
   "authority": {
-    "desired_behavior": "tcg-master-plan-progress-v2.3.md",
-    "audit_history": "tcg-master-plan-ledger-v2.3.md",
-    "previous_desired_behavior": "tcg-master-plan-progress-v2.2.md",
-    "previous_audit_history": "tcg-master-plan-ledger-v2.2.md",
+    "desired_behavior": "tcg-master-plan-progress-v2.3.1.md",
+    "audit_history": "tcg-master-plan-ledger-v2.3.1.md",
+    "previous_desired_behavior": "tcg-master-plan-progress-v2.3.md",
+    "previous_audit_history": "tcg-master-plan-ledger-v2.3.md",
     "mechanic_heritage_research": "tcg-mechanic-heritage-research-v1.md",
-    "special_mechanic_rule_matrix": "tcg-special-mechanic-rule-matrix-v1.md",
-    "evergreen_extensibility": "tcg-evergreen-extensibility-v1.json",
+    "mechanic_harvest_index": "tcg-mechanic-harvest-index-v1.md",
+    "generic_mechanic_capability_catalog": "tcg-generic-mechanic-capabilities-v1.json",
+    "special_mechanic_rule_matrix": "tcg-special-mechanic-rule-matrix-v1.1.md",
+    "special_mechanic_names": "tcg-special-mechanic-names-v1.json",
+    "evergreen_extensibility": "tcg-evergreen-extensibility-v1.1.json",
     "battle_interaction": "tcg-battle-client-interaction-v1.json",
-    "card_visual_printing": "tcg-card-visual-printing-v1.json",
+    "damage_counter_interaction": "tcg-damage-counter-interaction-v1.json",
+    "card_visual_printing": "tcg-card-visual-printing-v1.1.json",
     "card_controller": "tcg-v2-card-action-controller-v1.json",
     "ten_deck_blueprint": "tcg-ten-deck-product-blueprint-v2.json",
     "element_package_manifest": "tcg-element-packages-v0.3-v2.json",
+    "ordinary_matchup_authority": "tcg-card-pass-2-schema-amendment-e.md / cp2-matchups-v0.1",
     "historical_private_alpha_control": "tcg-release-control-v1.json",
     "source_truth": "GitHub exact branch/PR/commit evidence and canonical TCG checkpoint comments",
     "live_truth": "Supabase project xzxqfrvqdgkzwujbkdbk"
+  },
+  "authority_integrity": {
+    "referenced_json_contracts_must_be_self_contained_without_validated_resolver": true,
+    "evergreen_extensibility_v1_1_self_contained": true,
+    "card_visual_v1_1_self_contained": true,
+    "generic_mechanic_catalog_v1_self_contained": true,
+    "special_mechanic_rule_matrix_v1_1_self_contained": true,
+    "card_controller_points_to_card_visual_v1_1": true,
+    "card_controller_design_candidates_are_content_sources_not_visual_authorities": true,
+    "signature_power_machine_action_kinds": ["attack", "ability"],
+    "signature_power_display_labels_separate_from_machine_ids": true,
+    "special_mechanic_names_machine_ids_match_canonical_action_kinds": true,
+    "special_mechanic_descriptive_traits_are_not_capability_ids": true,
+    "exact_special_family_capability_mapping_is_v2_g1e_work": true,
+    "fixed_counter_amounts_are_distinct_from_up_to_partial_amounts": true,
+    "counter_operations_have_immediate_destination_defeat_boundary": true,
+    "grouped_place_damage_commits_atomically_then_runs_batch_defeat_boundary": true,
+    "evergreen_voidmarked_card_machine_key_preserved": true,
+    "riftmarked_card_is_player_facing_name_with_compatibility_alias": true,
+    "mechanic_harvest_era_counts_sum_to_174": true,
+    "mechanic_harvest_example_recipe_uses_catalogued_ids": true
   },
   "historical_baseline": {
     "main_sha": "bbde61a3dd50f93b64872a5bccfaec62e826be23",
@@ -34,7 +60,8 @@
     "fairy_glimmerwish": "16a745a3cf96f6caf00c34ad88896fb0dcca2a73",
     "creature_card_controller": "019b029f344bac3c4efdc92480cdff5c9c2c5521",
     "video_dragdrop_masterplan_sync": "77dc14a5af4101bfd06941243d142ce3f16cc120",
-    "prototype_restoration_authority": "5a5609a7fa93b365eeaa7fb8da6a9ade6322944b"
+    "prototype_restoration_authority": "5a5609a7fa93b365eeaa7fb8da6a9ade6322944b",
+    "evergreen_extensibility_authority": "59ab7857522373a53de7d551c66f12c2e514e934"
   },
   "v2_target": {
     "elements": 10,
@@ -52,7 +79,7 @@
     "note": "241 identities is the current V2 baseline target, not a permanent maximum. Future series are additive."
   },
   "prototype_restoration": {
-    "status": "canonical_v2_2_inherited_by_v2_3",
+    "status": "canonical_v2_2_inherited_by_v2_3_1",
     "principle": "restore the approved playable one-screen physical-card prototype interaction rather than redesigning the battle UX around debug forms",
     "one_screen_battlefield": true,
     "physical_card_primary_controls": true,
@@ -65,43 +92,67 @@
     "attack_auto_ends_turn_after_resolution_and_aftermath": true,
     "keep_board_visible_during_choices_when_practical": true,
     "misclick_change_or_cancel_before_server_commit_when_practical": true,
-    "debug_form_release_battlefield_forbidden": true
+    "debug_form_release_battlefield_forbidden": true,
+    "damage_counter_drag_or_tap_interaction": true
+  },
+  "post_test_consistency": {
+    "status": "complete",
+    "known_omissions_after_audit": 0,
+    "corrected_card_header": {
+      "top_left_badge": "real structured header property or nonnumeric class/stage/special-rule badge",
+      "numeric_cost_allowed_only_when_schema_defines_it": true,
+      "current_ordinary_creature_generic_play_cost_exists": false,
+      "top_right": "Element/type",
+      "identity_band": "Name/stage plus clearly labelled HP",
+      "structured_data_is_numeric_authority": true
+    },
+    "ordinary_vulnerability_source": "global cp2-matchups-v0.1 snapshot",
+    "ordinary_per_card_weakness_objects_allowed": false,
+    "exceptional_resistance_or_matchup_override_may_be_card_data": true,
+    "set_one_matchup_values_changed_by_this_control_update": false,
+    "original_special_family_names_locked": true,
+    "damage_counter_interaction_locked": true
   },
   "evergreen_policy": {
-    "status": "canonical_v2_3_planning_authority",
+    "status": "canonical_v2_3_inherited_by_v2_3_1",
     "primary_format_working_name": "Evergreen",
     "age_based_rotation": false,
     "released_cards_remain_eligible_by_age": true,
     "collection_ownership_persists": true,
     "printing_history_persists": true,
     "new_series_are_additive": true,
-    "optional_curated_formats_allowed": true,
+    "optional_curated_event_formats_allowed": true,
     "competitive_restriction_last_resort": true,
     "restricted_card_should_remain_usable_in_suitable_private_practice_open_modes_when_safe": true,
-    "balance_order": [
-      "implementation_bug_fix",
-      "rules_errata_when_genuinely_required",
-      "future_counterplay",
-      "copy_limit_or_restricted_control",
-      "competitive_suspension_or_ban_last_resort"
-    ]
+    "balance_order": ["implementation_bug_fix","rules_errata_when_genuinely_required","future_counterplay","copy_limit_or_restricted_control","competitive_suspension_or_ban_last_resort"]
+  },
+  "mechanic_harvest": {
+    "status": "living_research_and_schema_authority",
+    "source_set_catalog": "Pokector English catalogue",
+    "pokector_english_sets_coverage_source": 174,
+    "era_bucket_counts_sum_to": 174,
+    "reconciled_previously_missing_buckets": {"POP": 9, "NP_Nintendo_Black_Star_Promos": 1},
+    "source_effect_taxonomy": "Bulbapedia Category:Cards by effect",
+    "broad_effect_categories_harvested": 54,
+    "historical_mechanic_family_baseline_scan": true,
+    "individual_card_text_deep_scan": "ongoing",
+    "indexed_does_not_mean_runtime_implemented": true,
+    "future_card_definitions_should_use_generic_capability_ids": true,
+    "capability_parameters_define_timing_targets_costs_values_and_zones": true,
+    "new_capability_requires_proof_existing_capabilities_cannot_compose_rule": true,
+    "card_name_runtime_branches_forbidden_when_catalog_can_express_rule": true,
+    "series_name_runtime_branches_forbidden": true,
+    "v2_g1e_owner_opcode_mapping_required": true,
+    "sample_future_series_without_old_card_rewrite_required_for_completion": true
   },
   "future_extensibility": {
     "status": "design_contract_accepted_runtime_proof_pending",
-    "pokemon_research_role": "general_mechanic category research plus supplied-card rule-pattern review only; no brand, asset, card-text, frame, UI or audio copying",
-    "working_special_classes": [
-      "Ascendant Creature",
-      "Colossus Creature",
-      "Signature Power",
-      "Bonded Creature",
-      "Convergence Creature",
-      "Gleam Creature",
-      "Prime Card",
-      "Voidmarked Card",
-      "Overform",
-      "Aspect Creature",
-      "Ascension Evolution"
-    ],
+    "external_research_labels_are_player_facing": false,
+    "stream_bandit_names_required": true,
+    "working_special_classes": ["Ascendant Creature","Sigilborn Creature","Bonded Creature","Bonded Sigilborn","Exalted Creature","Colossus Creature","Starforged Creature","Convergence Creature","Gleam Creature","Prime Card","Riftmarked Card","Overform","Ascension Form","Aspect Creature","Apex Ascendant","Ascension Evolution","Signature Power"],
+    "signature_power": {"machine_action_kinds":["attack","ability"],"display_labels":{"attack":"Signature Attack","ability":"Signature Ability"}},
+    "matchup_and_affinity": {"ordinary_vulnerability_source":"versioned global matchup snapshot","working_vulnerability_label":"Vulnerability","exceptional_resistance_allowed":true,"exceptional_matchup_override_allowed":true,"server_authoritative":true},
+    "damage_counter_system": {"base_unit_damage":10,"place_counters":true,"move_existing_counters":true,"grouped_place_counters":true,"drag_or_tap_distribution":true,"fixed_amount_requires_full_legal_amount":true,"smaller_amount_requires_explicit_up_to_or_partial_semantics":true,"immediate_destination_defeat_boundary_after_each_operation":true,"grouped_placement_atomic_then_batch_defeat":true,"attack_counter_choices_resolve_before_turn_handoff":true,"turn_transition_condition_ticks_supported":true,"server_authoritative":true},
     "new_series_must_be_data_driven": true,
     "new_cards_use_content_registry_and_shared_effect_grammar": true,
     "new_decks_use_recipe_and_legality_data": true,
@@ -117,7 +168,7 @@
     "underworld": "24_identity_v2_design_accepted_schema_pending",
     "v2_g0_scope_design": "complete",
     "v2_g1_structured_packages": "in_progress",
-    "v2_g1e_evergreen_extensibility_schema": "not_started",
+    "v2_g1e_evergreen_extensibility_schema": "research_catalog_bound_runtime_proof_pending",
     "v2_g2_full_card_renderer": "not_started",
     "v2_g3_playable_prototype_restoration": "not_started",
     "future_special_mechanic_series": "research_and_schema_target_only"
@@ -137,7 +188,11 @@
     "old_cards_remain_supported_by_age": true,
     "future_schema_changes_require_backward_compatibility": true,
     "new_series_do_not_require_series_name_runtime_branches": true,
-    "pokemon_names_art_text_frames_ui_audio_assets_must_not_be_copied": true
+    "external_research_brand_labels_do_not_ship_as_stream_bandit_names": true,
+    "showcase_numbers_do_not_override_structured_rules": true,
+    "ordinary_matchup_weakness_must_not_be_duplicated_per_card": true,
+    "damage_counter_totals_targets_and_timing_must_be_structured_and_server_authoritative": true,
+    "future_card_effects_should_compose_generic_capability_ids": true
   },
-  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E evergreen/extensibility schema metadata before the premium renderer and restored one-screen Battle Client."
+  "next_operation": "Finish Fairy and Underworld exact sb-tcg-card-v0.2/effect-opcode translation, validate the deterministic 241-identity ten-starter authority and only proven generic dispatcher gaps; then prove V2-G1E by mapping the living generic mechanic capability catalog to existing 40 owners/effect opcodes or one justified generic extension per genuinely missing primitive, with deterministic timing/zone/payment tests, before the premium renderer and restored one-screen Battle Client."
 }

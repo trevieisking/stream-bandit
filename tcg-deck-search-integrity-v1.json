@@ -1,0 +1,72 @@
+{
+  "schema": "stream-bandit-tcg-deck-search-integrity-v1",
+  "recorded_at": "2026-09-17",
+  "status": "canonical_rule_contract_pending_runtime_proof",
+  "purpose": "Lock the invariant that every true Deck Search ends with an authoritative shuffle of the searched deck before ordinary resolution continues, preventing a search from giving usable future deck-order knowledge.",
+  "scope": {
+    "applies_to": [
+      "search.deck",
+      "any future capability whose player-facing rule is a true search of a deck"
+    ],
+    "does_not_automatically_apply_to": [
+      "draw.cards",
+      "reveal.top_deck",
+      "deck.reorder_top",
+      "deck.reorder_bottom",
+      "search.hand",
+      "search.discard",
+      "search.rewards"
+    ],
+    "distinction": "Looking at, revealing, or intentionally reordering a bounded top/bottom portion of a deck is not a Deck Search unless the structured rule explicitly invokes search.deck. Those mechanics preserve their own ordering semantics and shuffle only when their rule explicitly requires it."
+  },
+  "canonical_invariant": {
+    "every_true_deck_search_ends_with_shuffle": true,
+    "shuffle_even_if_zero_cards_selected_after_search_access": true,
+    "searched_deck_is_the_deck_that_must_shuffle": true,
+    "shuffle_before_later_unrelated_effects_or_normal_play_resume": true,
+    "player_facing_rule_text_required": true,
+    "own_deck_text": "Then shuffle your deck.",
+    "generic_or_opponent_deck_text": "Then shuffle that deck."
+  },
+  "resolution_order": [
+    "authoritative server validates that the effect is a legal Deck Search",
+    "server computes eligible search results without exposing source deck-position metadata the player does not need",
+    "player makes the permitted private selection",
+    "selected card or cards move to the structured destination when the effect says they leave the deck",
+    "canonical server-side Shuffle/Randomization owner shuffles the searched deck",
+    "only after the shuffle completes may later unrelated effects, listeners or ordinary play resume"
+  ],
+  "ordering_exception_rule": "If a future effect intentionally requires a selected card to become a known top/bottom card after the search, the structured sequence must say so explicitly: search/select, shuffle the searched deck, then perform the explicit post-shuffle top/bottom placement. A Deck Search may not silently preserve the pre-search order.",
+  "hidden_information": {
+    "search_ui_must_not_expose_original_deck_order": true,
+    "search_ui_should_present_only_legal_information_needed_for_the_choice": true,
+    "client_must_not_receive_source_position_metadata_unless_a_separate_rule_explicitly_requires_it": true,
+    "shuffle_is_server_authoritative": true,
+    "browser_side_shuffle_is_forbidden": true
+  },
+  "owner_boundaries": {
+    "Search": "validates and resolves the search requirement and eligible set",
+    "Hidden Information": "controls which card identities/information the searching player may see and what the opponent may see",
+    "Card-Zone": "owns movement of selected cards between deck and destination zones",
+    "Shuffle_Randomization": "owns the mandatory post-search shuffle and deterministic test seeding",
+    "rule": "Do not create a card-specific helper or duplicate search/shuffle engine for this invariant."
+  },
+  "machine_composition": {
+    "search.deck": {
+      "mandatory_postcondition": "deck.shuffle",
+      "postcondition_is_implicit_for_runtime_and_validation": true,
+      "postcondition_must_be_explicit_in_player_facing_rule_text": true,
+      "cannot_be_disabled_by_omission_from_individual_card_data": true
+    }
+  },
+  "minimum_acceptance_tests": [
+    "successful one-card Deck Search shuffles after selected card moves",
+    "successful multi-card Deck Search shuffles exactly once after all selected cards move",
+    "optional Deck Search that accesses the deck but selects zero still shuffles",
+    "Deck Search to hand preserves hidden-information boundaries then shuffles",
+    "Deck Search followed by another effect cannot observe the pre-search deck order",
+    "look/reveal top N does not auto-shuffle when no search.deck rule exists",
+    "explicit top/bottom reorder does not auto-shuffle unless its own rule says so",
+    "server-side shuffle is deterministic under test seed and non-client-authoritative in production"
+  ]
+}

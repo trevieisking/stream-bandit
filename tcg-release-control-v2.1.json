@@ -1,0 +1,120 @@
+{
+  "schema": "stream-bandit-tcg-release-control-v2.1",
+  "recorded_at": "2026-09-17",
+  "status": "control_only_hold_runtime_and_live",
+  "repository": "trevieisking/stream-bandit",
+  "control_pr": 564,
+  "control_branch": "docs/tcg-v2-3-post-test-consistency",
+  "recorded_parent_head": "dd575ae765859bc9883befef98fee79dac5376f3",
+  "authority": {
+    "desired_behavior": "tcg-master-plan-progress-v2.3.2.md",
+    "execution_checklist": "tcg-master-plan-checklist-v2.3.2.md",
+    "audit_history": "tcg-master-plan-ledger-v2.3.2.md",
+    "previous_master_plan": "tcg-master-plan-progress-v2.3.1.md",
+    "battle_interaction": "tcg-battle-client-interaction-v1.json",
+    "card_visual_target": "tcg-card-visual-printing-v1.2.json",
+    "card_action_controller": "tcg-v2-card-action-controller-v1.json",
+    "evergreen_extensibility": "tcg-evergreen-extensibility-v1.1.json",
+    "mechanic_harvest_index": "tcg-mechanic-harvest-index-v1.md",
+    "generic_mechanic_catalog": "tcg-generic-mechanic-capabilities-v1.json",
+    "special_mechanic_matrix": "tcg-special-mechanic-rule-matrix-v1.1.md",
+    "special_mechanic_names": "tcg-special-mechanic-names-v1.json",
+    "damage_counter_interaction": "tcg-damage-counter-interaction-v1.json",
+    "repository_truth": "GitHub exact PR/branch/commit/workflow/review evidence",
+    "live_truth": "Supabase deployed function/database state"
+  },
+  "continuity_contract": {
+    "checklist_update_required_before_material_work_result_message": true,
+    "ledger_checkpoint_required_for_accepted_slice": true,
+    "resume_after_timeout_from_latest_github_checkpoint": true,
+    "memory_alone_is_not_release_evidence": true,
+    "source_change_without_checklist_checkpoint_is_accepted": false
+  },
+  "historical_private_alpha_baseline": {
+    "merge_sha": "bbde61a3dd50f93b64872a5bccfaec62e826be23",
+    "classification": "authenticated_private_alpha_test_baseline_not_final_public_release",
+    "elements": 8,
+    "structured_identities": 193,
+    "starter_decks": 8,
+    "owner_families": 40
+  },
+  "v2_target": {
+    "elements": 10,
+    "structured_identities": 241,
+    "starter_decks": 10,
+    "owner_families_baseline": 40,
+    "primary_player_experience": "original_playable_prototype_restored_online",
+    "server_authoritative": true,
+    "evergreen_no_age_rotation_direction": true
+  },
+  "release_recovery_gate": {
+    "id": "V2-G0R",
+    "state": "HOLD",
+    "accepted_repairs": 0,
+    "required_repairs": 11,
+    "items": [
+      "G0R-01 reproducible registry/starter migration",
+      "G0R-02 simultaneous-win/overtime lifecycle",
+      "G0R-03 stale revision propagation",
+      "G0R-04 global matchup attack-damage application",
+      "G0R-05 concession/reward abuse prevention",
+      "G0R-06 hidden-information isolation",
+      "G0R-07 matchmaking locked/in-match room lifetime",
+      "G0R-08 setup-legal deck validation",
+      "G0R-09 private-room simultaneous Ready concurrency",
+      "G0R-10 Tactic subtype boundary",
+      "G0R-11 validation workflow coverage"
+    ]
+  },
+  "prototype_restoration": {
+    "rule": "RESTORE_DO_NOT_REDESIGN",
+    "one_screen_board": true,
+    "card_face_is_primary_control": true,
+    "desktop_drag_drop": true,
+    "touch_tap_select_equivalent": true,
+    "board_visible_during_choices": true,
+    "green_legal_evolution_targets": true,
+    "persistent_realm": true,
+    "attack_auto_end_turn_after_full_resolution": true,
+    "browser_prompt_gameplay_targeting_allowed": false,
+    "debug_form_release_battlefield_allowed": false,
+    "generic_global_attack_button_primary_ui_allowed": false,
+    "duplicate_browser_rules_engine_allowed": false
+  },
+  "card_visual_correction": {
+    "ordinary_creature_hp_top_left": true,
+    "type_element_top_right": true,
+    "withdraw_cost_bottom_right": true,
+    "action_slot_count": 2,
+    "legal_action_shapes": [
+      "Ability + Attack 1",
+      "Attack 1 + Attack 2"
+    ],
+    "invent_generic_creature_play_or_evolution_cost": false,
+    "artwork_target_every_printable_card": true,
+    "printing_changes_gameplay_power": false
+  },
+  "execution_order": [
+    "V2-G0R release recovery and runtime stabilisation",
+    "synchronise plan/checklist/ledger/release-control",
+    "V2-G1 Fairy and Underworld schema then deterministic 241/10",
+    "V2-G1E generic capability to owner/opcode proof",
+    "V2-G2 premium full-card renderer",
+    "V2-G3 original playable prototype restored online",
+    "V2-G4 full battle choreography",
+    "V2-G5 real two-authenticated-user end-to-end",
+    "V2-G6 player systems integration",
+    "V2-G7 exact-head release acceptance fence",
+    "LIVE"
+  ],
+  "promotion_state": {
+    "control_branch_updates": "PROMOTE",
+    "pr_merge": "HOLD",
+    "main": "HOLD",
+    "runtime": "HOLD",
+    "supabase": "HOLD",
+    "live": "HOLD",
+    "production": "HOLD"
+  },
+  "live_definition": "A real authenticated player can open Stream Bandit, choose/play a legal deck, complete a normal online match against another authenticated player through the one-screen card-table interface, without backend/debug terminology, with correct authoritative result, no private-information leakage, and no known release-blocking runtime defect."
+}
