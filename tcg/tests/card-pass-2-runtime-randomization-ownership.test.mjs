@@ -54,7 +54,7 @@ test('private-alpha opening deck, mulligan and toss delegate randomness to the s
 });
 
 test('match-actions delegates in-battle random outcomes while preserving identity UUID generation', () => {
-  assert.ok(matchActions.includes('import { runtimeV02UniformRandomInt } from "../_shared/tcg-match-randomization-engine-v0-2.ts";'));
+  assert.ok(matchActions.includes('import { runtimeV02FlipCoin, runtimeV02UniformRandomInt } from "../_shared/tcg-match-randomization-engine-v0-2.ts";'));
 
   assert.ok(matchActions.includes('runtimeV02FlipCoin'));
   assert.equal(matchActions.includes('function coin(){'), false, 'match-actions must not keep a second coin owner');

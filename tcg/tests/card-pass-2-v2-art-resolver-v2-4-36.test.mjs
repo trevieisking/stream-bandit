@@ -68,7 +68,9 @@ test('battle adds art owner alongside accepted controller and renderer cache con
   const resolverPos=html.indexOf('stream-bandit-tcg-art-resolver-v2-4-36.js');
   const rendererPos=html.indexOf('stream-bandit-tcg-card-renderer-v2-4-7.js?v=2-4-10');
   assert.ok(resolverPos>0&&rendererPos>resolverPos);
-  assert.ok(html.includes('stream-bandit-tcg-v2-battle-controller.js?v=2-4-26'));
+  const controllerCache=html.match(/stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-(\d+)/);
+  assert.ok(controllerCache,'battle controller cache identity missing');
+  assert.ok(Number(controllerCache[1])>=26,'battle controller cache identity regressed');
   assert.ok(html.includes('data-sb-tcg-page="battle"'));
   assert.equal(html.includes('stream-bandit-header-shell'),false);
   assert.equal(html.includes('stream-bandit-footer-shell'),false);

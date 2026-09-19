@@ -96,9 +96,13 @@ test('selected hand card launches direct projection alongside accepted specializ
   assert.match(binding, /runPlayCardTargetProjection\(uid\)/);
 });
 
-test('V2.4.30 visual cache identity advances without changing gameplay or renderer identity', () => {
-  assert.match(html, /data-sb-tcg-tabletop="v2-4-26"/);
+test('V2.4.30 visual cache identity remains compatible after later controller revisions', () => {
+  const marker=html.match(/data-sb-tcg-tabletop="v2-4-(\d+)"/);
+  const controllerCache=html.match(/stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-(\d+)/);
+  assert.ok(marker,'tabletop cache marker missing');
+  assert.ok(controllerCache,'controller cache identity missing');
+  assert.equal(marker[1],controllerCache[1],'tabletop marker and controller cache must advance together');
+  assert.ok(Number(marker[1])>=26,'tabletop/controller cache identity regressed');
   assert.match(html, /stream-bandit-tcg-battle-table-v2-4-7\.css\?v=2-4-30/);
-  assert.match(html, /stream-bandit-tcg-v2-battle-controller\.js\?v=2-4-26/);
   assert.match(html, /stream-bandit-tcg-card-renderer-v2-4-7\.js\?v=2-4-10/);
 });
