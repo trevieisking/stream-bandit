@@ -1,0 +1,30 @@
+{
+  "schema": "stream-bandit-tcg-product-presentation-v1",
+  "version": "1.0.0",
+  "recorded_at": "2026-09-19",
+  "authority": "Branch-safe player-facing product presentation registry. Gameplay, ownership, pricing and rewards remain with canonical server owners.",
+  "set_code": "SB1",
+  "featured_starter_ids": [
+    "deck-astral-second-sky"
+  ],
+  "shop_featured_starter_id": "deck-astral-second-sky",
+  "battle_pass": {
+    "season_id": "sb1-season-1",
+    "display_name": "Set One — Season 1",
+    "featured_starter_id": "deck-astral-second-sky",
+    "tier_count": 100,
+    "reward_every_tier": true,
+    "daily_achievement_count": 3,
+    "reward_assignment_state": "unassigned_canonical_owner_required"
+  },
+  "preview_policy": {
+    "require_complete_starter_art": true,
+    "purchase_state": "gated",
+    "ownership_inference": false,
+    "fake_prices_forbidden": true,
+    "fake_entitlements_forbidden": true,
+    "fake_reward_assignments_forbidden": true,
+    "gameplay_mutation": false
+  },
+  "extension_rule": "Add a future official starter_id here only after its canonical starter recipe exists and its required presentation art is complete. No page-specific code path is required."
+}
