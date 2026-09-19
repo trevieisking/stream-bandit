@@ -90,7 +90,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Basic Astral Essence
 - Star Essence
 - Orbit Essence
+- Nova Essence
 
-Material progress: **14/193**.
-Astral material progress: **14/24**.
-Next source-of-truth candidate at this checkpoint: **Nova Essence** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **15/193**.
+Astral material progress: **15/24**.
+Next source-of-truth candidate at this checkpoint: **Archivist Sol** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
