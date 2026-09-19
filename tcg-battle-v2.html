@@ -321,7 +321,8 @@ button{font:inherit}
   .sb-reserve-slot,.sb-vanguard-slot{min-height:0}
   .sb-reserve-slot .sb-card-control{width:min(var(--card-w),9.7dvh)}
   .sb-vanguard-slot .sb-card-control{width:min(var(--active-w),11.4dvh)}
-  .sb-card-wrap.is-selected .sb-card-actions{
+  .sb-card-wrap.is-selected .sb-card-actions,
+  .sb-card-wrap.has-setup-return .sb-card-actions{
     position:absolute;
     z-index:30;
     top:50%;
@@ -329,13 +330,15 @@ button{font:inherit}
     transform:translateY(-50%);
     width:min(250px,22vw)
   }
-  .sb-reserve-slot:nth-child(n+3) .sb-card-wrap.is-selected .sb-card-actions{
+  .sb-reserve-slot:nth-child(n+3) .sb-card-wrap.is-selected .sb-card-actions,
+  .sb-reserve-slot:nth-child(n+3) .sb-card-wrap.has-setup-return .sb-card-actions{
     left:auto;
     right:calc(100% + 10px)
   }
   .sb-hand-card{
-    width:min(var(--card-w),10dvh);
-    flex-basis:min(var(--card-w),10dvh)
+    height:calc(clamp(132px,17.2dvh,166px) - 34px);
+    width:auto;
+    flex:0 0 auto
   }
 }
 @media(max-width:640px), (hover:none) and (pointer:coarse){
