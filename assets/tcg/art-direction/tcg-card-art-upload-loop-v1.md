@@ -84,7 +84,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Nebulynx
 - Cometmanta
 - Orbitortoise
+- Prismowl
 
-Material progress: **8/193**.
-Astral material progress: **8/24**.
-Next source-of-truth candidate at this checkpoint: **Prismowl** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **9/193**.
+Astral material progress: **9/24**.
+Next source-of-truth candidate at this checkpoint: **Starwhale** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
