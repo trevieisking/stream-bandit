@@ -99,3 +99,51 @@
   .tcg-product-mini{grid-template-columns:46px minmax(0,1fr)}
   .tcg-product-mini-art{width:46px;height:64px}
 }
+
+
+/* V2.4.49 human visual pass 3: prioritize Active Battle and remove empty Game Info space. */
+body[data-sb-tcg-page="play"] .tcg-side-stack{
+  grid-template-rows:minmax(0,1.45fr) minmax(0,.72fr) minmax(0,.83fr);
+}
+body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:first-child{
+  padding:10px 12px;
+}
+body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:first-child .tcg-preview-art{
+  height:31%;
+  min-height:64px;
+}
+body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:first-child .tcg-product-mini{
+  grid-template-columns:58px minmax(0,1fr);
+  gap:7px;
+  margin-top:5px;
+}
+body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:first-child .tcg-product-mini-art{
+  width:58px;
+  height:80px;
+}
+body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:nth-child(2){
+  padding:9px 10px;
+}
+body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:nth-child(2) h2{
+  margin-bottom:3px;
+}
+body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:nth-child(3){
+  padding:9px 10px;
+}
+body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:nth-child(3) h2{
+  margin-bottom:3px;
+}
+body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:nth-child(3) .tcg-list{
+  margin:3px 0 0;
+  line-height:1.28;
+  font-size:clamp(10px,.78vw,13px);
+}
+@media(max-height:760px){
+  body[data-sb-tcg-page="play"] .tcg-side-stack{
+    grid-template-rows:minmax(0,1.5fr) minmax(0,.7fr) minmax(0,.8fr);
+  }
+  body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:first-child .tcg-product-mini-art{
+    width:52px;
+    height:72px;
+  }
+}
