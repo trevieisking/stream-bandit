@@ -87,11 +87,11 @@
 
 ### Implementation
 
-- [ ] **ART-IMPL-01** Inventory current artwork/image assets and existing art metadata.
+- [x] **ART-IMPL-01** Inventory current artwork/image assets and existing art metadata.
 - [ ] **ART-IMPL-02** Define/confirm canonical art asset reference field(s) and printing mapping.
 - [ ] **ART-IMPL-03** Wire approved art into the reusable renderer.
-- [ ] **ART-IMPL-04** Provide explicit safe development fallback for placeholder/missing art.
-- [ ] **ART-IMPL-05** Track release-visible cards with missing/placeholder art until cleared.
+- [x] **ART-IMPL-04** Provide explicit safe development fallback for placeholder/missing art.
+- [x] **ART-IMPL-05** Track release-visible cards with missing/placeholder art until cleared.
 - [ ] **ART-IMPL-06** Element/family visual treatments work for Astral, Ember, Gale, Grove, Shade, Stone, Tide and Volt while remaining data-driven for future content.
 
 ---
@@ -195,7 +195,7 @@ Signed-in destinations remain:
 ## I. Corrected work order
 
 - [x] **ORDER-01** V2.4.1 supersedes the V2.4 wording that made another Attack attempt the only immediate development operation.
-- [ ] **ORDER-02** Complete renderer/art inventory and choose smallest reusable V2-CARD-01 foundation.
+- [x] **ORDER-02** Complete renderer/art inventory and choose smallest reusable V2-CARD-01 foundation.
 - [ ] **ORDER-03** Build correct tabletop zone skeleton.
 - [ ] **ORDER-04** Wire full-card rendering/art into board zones.
 - [x] **ORDER-05** Wire direct card interactions and board-visible state.
@@ -238,3 +238,17 @@ In particular:
 - [x] **BRAND-ASSET-02** Fixed-client top bar uses the optimized repository-owned emblem instead of the missing legacy stag-logo path.
 - [x] **BRAND-ASSET-03** Full logo and topbar emblem are registered in one `assets/tcg/tcg-art-manifest-v1.json` authority using host-relative paths compatible with GitHub Pages and IONOS.
 - [ ] **BRAND-ASSET-HUMAN-01** Human test confirms the new stag emblem renders in the top bar from the branch-hosted page.
+
+
+### V2.4.38 canonical art foundation and runtime/reference separation
+- [x] **ART-ASSET-01** User-uploaded TCG artwork is classified under repository-owned `assets/tcg/` folders without altering the original uploaded image blobs.
+- [x] **ART-ASSET-02** `assets/tcg/tcg-art-manifest.json` is the stable repository-relative art-path authority for GitHub Pages and IONOS hosting.
+- [x] **ART-ASSET-03** Set One has a canonical 193-card art intake map keyed by card ID with exact per-card destination paths and missing-art tracking.
+- [x] **ART-ASSET-04** Set One art storage is split by set/element so GitHub browser directory truncation cannot turn one card-art folder into an unmaintainable 1,000+ file list.
+- [x] **ART-ASSET-05** One presentation-only Art Resolver owns background/branding/card-art projection; it contains no gameplay API ownership and no per-card-name branches.
+- [x] **ART-ASSET-06** Missing individual card artwork remains an explicit `Artwork pending` state and cannot block battle boot.
+- [x] **ART-ASSET-07** Accepted Card Renderer and Battle Controller remain byte-identical to the pre-art accepted gameplay blobs.
+- [x] **ART-ASSET-08** Full-screen Play/Battle/Decks/Collection/Battle Pass/Shop/Settings compositions remain immutable visual references only; runtime CSS backgrounds use clean background masters and never flatten those reference screens behind live controls.
+- [x] **ART-ASSET-CI-01** Product head `2f0c884dc66e5a2dfc4c59f08b7217c52027f763` passed TCG Validation #773, Migration Replay #943 and Functional Smoke #969.
+- [ ] **ART-ASSET-HUMAN-01** Human branch-hosted visual check confirms the repo-owned stag/logo and clean runtime backdrop render correctly at 100% and 25% browser zoom.
+- [ ] **CARD-ART-SET-ONE-01** Set One individual card artwork reaches 193/193 approved assets; current intake remains 0/193 until real per-card art is uploaded and approved.
