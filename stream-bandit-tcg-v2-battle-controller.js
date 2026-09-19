@@ -603,7 +603,7 @@
         state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
         state.overlayKey = '';
         render();
-        if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px)').matches) {
+        if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches) {
           window.requestAnimationFrame(() => {
             const current = viewState();
             const hasVanguard = !!(current && current.you && current.you.vanguard);
