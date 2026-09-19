@@ -41,7 +41,7 @@ function ensureArtResolver(){
  if(artLoader)return artLoader;
  artLoader=new Promise((resolve,reject)=>{
   const script=document.createElement("script");
-  script.src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-36";
+  script.src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46";
   script.async=true;
   script.onload=()=>window.StreamBanditTCGArtResolverV2436?resolve(window.StreamBanditTCGArtResolverV2436):reject(new Error("TCG art resolver did not register."));
   script.onerror=()=>reject(new Error("TCG art resolver failed to load."));
