@@ -302,6 +302,42 @@ button{font:inherit}
   .sb-zone-pile{min-height:52px}.sb-zone-pile b{font-size:14px}
   .sb-center-band{grid-template-columns:1fr 1.6fr 1fr}
 }
+@media(min-width:641px) and (hover:hover) and (pointer:fine){
+  .sb-board{
+    grid-template-rows:auto minmax(0,1fr) minmax(68px,auto) minmax(0,1fr) clamp(132px,17.2dvh,166px)
+  }
+  .sb-half{overflow:hidden}
+  .sb-field-core{
+    display:grid;
+    grid-template-rows:minmax(0,1fr) minmax(0,1.18fr);
+    align-items:stretch;
+    justify-content:stretch;
+    gap:6px
+  }
+  .sb-half-you .sb-field-core{
+    grid-template-rows:minmax(0,1.18fr) minmax(0,1fr)
+  }
+  .sb-reserve,.sb-vanguard-line{height:100%;min-height:0}
+  .sb-reserve-slot,.sb-vanguard-slot{min-height:0}
+  .sb-reserve-slot .sb-card-control{width:min(var(--card-w),9.7dvh)}
+  .sb-vanguard-slot .sb-card-control{width:min(var(--active-w),11.4dvh)}
+  .sb-card-wrap.is-selected .sb-card-actions{
+    position:absolute;
+    z-index:30;
+    top:50%;
+    left:calc(100% + 10px);
+    transform:translateY(-50%);
+    width:min(250px,22vw)
+  }
+  .sb-reserve-slot:nth-child(n+3) .sb-card-wrap.is-selected .sb-card-actions{
+    left:auto;
+    right:calc(100% + 10px)
+  }
+  .sb-hand-card{
+    width:min(var(--card-w),10dvh);
+    flex-basis:min(var(--card-w),10dvh)
+  }
+}
 @media(max-width:640px), (hover:none) and (pointer:coarse){
   :root{--card-w:min(27vw,112px);--active-w:min(42vw,160px)}
   html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -394,7 +430,7 @@ button{font:inherit}
 }
 </style>
 </head>
-<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-6">
+<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-7">
 <main class="sb-battle">
   <section class="sb-board" aria-label="One-screen battlefield">
     <header class="sb-player-strip" aria-label="Opponent">
