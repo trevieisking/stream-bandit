@@ -84,3 +84,21 @@ When the first full starter-deck art package is complete, use the real approved 
 - After the Astral 24/24 deck-art gate, create a branch-only Battle Pass Season 1 visual preview beside the Second Sky Shop preview so the player-facing presentation can be reviewed with real assets.
 
 Second Sky product-preview gate is now open because Astral artwork reached **24/24**; starter recipe revalidation and accessory/product-preview work remain separate next steps.
+
+## Second Sky integrated presentation checkpoint
+
+The first completed deck presentation is now wired on the PR branch using canonical owners and real Astral artwork.
+
+- Canonical deck: **Astral — Second Sky** (`deck-astral-second-sky`).
+- Repository recipe revalidated: **60 cards / 21 identities**.
+- Live Supabase corroboration: active Second Sky starter remains **60 cards**, rules version `set-one-v0.6.1`, signature effect **Timefold**.
+- All 21 identities used by Second Sky have approved repository artwork.
+- Full Astral Set One pool is **24/24**; Cometmanta, Nova Essence and Parallax Window remain Astral pool cards outside the 60-card starter recipe.
+- The shared art resolver now consumes canonical production-ledger `target_path` records, so approved Astral artwork can appear on existing rendered cards, including the battle renderer, without adding gameplay authority.
+- Printing/art intake metadata is synchronized to the canonical `card_id -> printing_id -> artwork_id -> /standard/<artwork_id>.png` chain.
+- A reusable product-presentation registry now selects featured starters by `starter_id`; future completed deck products can be added without new page-specific deck branches.
+- Branch-only presentation now covers Game Home, Play, Decks, Collection, Shop and Battle Pass; Battle receives the same card art through the shared resolver.
+- Shop remains preview-only: no fake prices, purchases, receipts, grants or ownership.
+- **Set One — Season 1** remains presentation-only until canonical progression/economy owners assign actual tiers/rewards/entitlements.
+- Second Sky sleeve, battle coin and deck-box artwork are still pending and must not be claimed complete.
+- No gameplay engine, card rules, database row, Edge Function, Supabase deployment, `main`, Pages/public or live release was changed by this presentation slice.
