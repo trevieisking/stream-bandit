@@ -90,7 +90,7 @@
   "card_art_batches": {
     "set_code": "SB1",
     "total_card_identities": 193,
-    "total_base_art_approved": 0,
+    "total_base_art_approved": 5,
     "first_batch": {
       "id": "SB1-ASTRAL-CREATURES-01",
       "element": "Astral",
@@ -203,7 +203,7 @@
             "artwork_id": "sb1-astral-stardot-standard-art-v1",
             "target_path": "assets/tcg/cards/set-one/astral/astral-stardot/standard/sb1-astral-stardot-standard-art-v1.png",
             "brief": "Tiny youthful astral scout with a bright star-core and sparse orbital dust; curious, light-footed, simple silhouette; establish the Stardot -> Orbitail -> Cosmarch lineage.",
-            "artwork_status": "missing"
+            "artwork_status": "approved"
           },
           {
             "card_id": "astral-orbitail",
@@ -211,7 +211,7 @@
             "artwork_id": "sb1-astral-orbitail-standard-art-v1",
             "target_path": "assets/tcg/cards/set-one/astral/astral-orbitail/standard/sb1-astral-orbitail-standard-art-v1.png",
             "brief": "Teen evolution of Stardot; same recognizable core features, longer orbit-tracing tail/ribbons and controlled celestial motion; visual emphasis on prediction and ordered paths.",
-            "artwork_status": "missing"
+            "artwork_status": "approved"
           },
           {
             "card_id": "astral-cosmarch",
@@ -219,7 +219,7 @@
             "artwork_id": "sb1-astral-cosmarch-standard-art-v1",
             "target_path": "assets/tcg/cards/set-one/astral/astral-cosmarch/standard/sb1-astral-cosmarch-standard-art-v1.png",
             "brief": "Adult culmination of the Stardot line; confident constellation navigator with broad orbital geometry and chart-like star markings; powerful but elegant, future-reading theme.",
-            "artwork_status": "missing"
+            "artwork_status": "approved"
           },
           {
             "card_id": "astral-moonbit",
@@ -227,7 +227,7 @@
             "artwork_id": "sb1-astral-moonbit-standard-art-v1",
             "target_path": "assets/tcg/cards/set-one/astral/astral-moonbit/standard/sb1-astral-moonbit-standard-art-v1.png",
             "brief": "Small lunar creature with crescent highlights and soft moon-glow; observant pose and secret/reward-glimpse mood; establish the Moonbit -> Comettail -> Nebulynx lineage.",
-            "artwork_status": "missing"
+            "artwork_status": "approved"
           },
           {
             "card_id": "astral-comettail",
@@ -235,7 +235,7 @@
             "artwork_id": "sb1-astral-comettail-standard-art-v1",
             "target_path": "assets/tcg/cards/set-one/astral/astral-comettail/standard/sb1-astral-comettail-standard-art-v1.png",
             "brief": "Teen evolution of Moonbit; clearly related face/body language, now with a luminous comet tail and sweeping reward-arc motion; more agile and confident.",
-            "artwork_status": "missing"
+            "artwork_status": "approved"
           },
           {
             "card_id": "astral-nebulynx",
