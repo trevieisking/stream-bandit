@@ -6,9 +6,9 @@ import {fileURLToPath} from 'node:url';
 const ROOT=fileURLToPath(new URL('../../',import.meta.url));
 const read=p=>readFile(new URL(p,`file://${ROOT}/`),'utf8');
 
-test('V2.4.38 exposes one reusable presentation-only TCG art resolver',async()=>{
+test('V2.4.46 exposes one reusable presentation-only TCG art resolver',async()=>{
   const src=await read('stream-bandit-tcg-art-resolver-v2-4-36.js');
-  for(const token of ['tcg-art-manifest.json','tcg-card-art-intake-v1.json','applyCardArt','applyPageArt','applyBranding','MutationObserver']){
+  for(const token of ['tcg-art-manifest.json','tcg-card-art-intake-v1.json','tcg-art-production-ledger-v1.json','productionRows','applyCardArt','applyPageArt','applyBranding','MutationObserver']){
     assert.ok(src.includes(token),token);
   }
   assert.equal(src.includes('gale-skyweaver.png'),false,'resolver must not hard-code individual card paths');
@@ -16,27 +16,33 @@ test('V2.4.38 exposes one reusable presentation-only TCG art resolver',async()=>
   assert.equal(src.includes('tcg-private-alpha-api'),false,'art owner must not own setup/runtime API');
 });
 
-test('Set One art intake stays browser-friendly and canonical',async()=>{
+test('Set One intake binds canonical printing paths and Astral is 24/24 complete',async()=>{
   const intake=JSON.parse(await read('assets/tcg/cards/set-one/tcg-card-art-intake-v1.json'));
   assert.equal(intake.card_count,193);
   assert.equal(new Set(intake.cards.map(card=>card.card_id)).size,193);
   const counts={};
   for(const card of intake.cards){
-    assert.equal(card.expected_filename,`${card.card_id}.png`);
-    assert.ok(card.expected_asset_path.endsWith('/'+card.card_id+'.png'));
+    assert.equal(card.expected_filename,card.expected_asset_path.split('/').pop(),card.card_id);
+    assert.ok(card.expected_asset_path.includes('/'+card.card_id+'/standard/'),card.expected_asset_path);
+    assert.ok(card.expected_filename.endsWith('-art-v1.png'),card.expected_filename);
     counts[card.element]=(counts[card.element]||0)+1;
   }
+  assert.equal(intake.cards.filter(card=>card.element==='Astral'&&card.artwork_status==='complete').length,24);
+  assert.equal(intake.artwork_complete,24);
+  assert.equal(intake.artwork_missing,169);
   assert.ok(Math.max(...Object.values(counts))<1000,'no Set One element folder may approach GitHub browser 1000-entry truncation');
 });
 
 test('approved repo-owned art targets exist and do not use GitHack',async()=>{
   const manifest=JSON.parse(await read('assets/tcg/tcg-art-manifest.json'));
+  const production=JSON.parse(await read('assets/tcg/art-direction/tcg-art-production-ledger-v1.json'));
   const paths=[
     manifest.branding.primary_key_art,
     ...Object.values(manifest.runtime_backgrounds),
     ...Object.values(manifest.ui_reference),
     ...Object.values(manifest.showcases.launch),
-    ...Object.values(manifest.showcases.future)
+    ...Object.values(manifest.showcases.future),
+    ...production.card_art_batches.batch_order.flatMap(batch=>batch.cards.filter(card=>card.artwork_status==='approved').map(card=>card.target_path))
   ];
   for(const path of paths){
     assert.equal(/^https?:/i.test(path),false,path);
@@ -59,6 +65,7 @@ test('art resolver decorates existing rendered cards instead of changing Card Re
   assert.ok(resolver.includes("querySelectorAll('.sb-tcg-card[data-card-id]')"));
   assert.ok(resolver.includes("card.querySelector('.sb-card-art')"));
   assert.ok(resolver.includes("holder.replaceChildren(img)"));
+  assert.ok(resolver.includes("row.target_path"));
   assert.ok(renderer.includes("const VERSION = 'Stream Bandit TCG Card Renderer V2.4.10'"));
   assert.equal(renderer.includes('StreamBanditTCGArtResolver'),false);
 });
@@ -75,7 +82,6 @@ test('battle adds art owner alongside accepted controller and renderer cache con
   assert.equal(html.includes('stream-bandit-header-shell'),false);
   assert.equal(html.includes('stream-bandit-footer-shell'),false);
 });
-
 
 test('runtime backgrounds never reuse flattened UI reference compositions',async()=>{
   const manifest=JSON.parse(await read('assets/tcg/tcg-art-manifest.json'));
