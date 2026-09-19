@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.4';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const state = {
@@ -10,6 +10,8 @@
     matchId: '',
     view: null,
     selectedAnchorUid: '',
+    opponentProfileId: '',
+    opponentProfile: null,
     busy: false,
     poll: null
   };
@@ -48,10 +50,30 @@
     return false;
   }
 
+  async function resolveAuthDecision() {
+    if (!(await waitForGate())) throw new Error('Stream Bandit auth gate is unavailable.');
+    const gate = window.StreamBanditAuthGate;
+    let decision = await gate.enforce();
+    // Auth Gate boot may already be inside enforce(); while it is running the
+    // established helper returns its last decision, which is temporarily null
+    // on first load. Reuse the same authoritative gate owner instead of
+    // misclassifying that startup window as an approval failure.
+    if (!decision && typeof gate.decide === 'function') {
+      decision = await gate.decide();
+    }
+    if (!decision && typeof gate.state === 'function') {
+      for (let attempt = 0; attempt < 40 && !decision; attempt += 1) {
+        const snapshot = gate.state();
+        decision = snapshot && snapshot.lastDecision ? snapshot.lastDecision : null;
+        if (!decision) await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+    }
+    return decision;
+  }
+
   async function ensureClient() {
     if (state.client) return state.client;
-    if (!(await waitForGate())) throw new Error('Stream Bandit auth gate is unavailable.');
-    const decision = await window.StreamBanditAuthGate.enforce();
+    const decision = await resolveAuthDecision();
     if (!decision || !decision.allowed) throw new Error('Sign in with an approved Stream Bandit account to battle.');
     const config = shellConfig();
     if (!config.url || !config.key) throw new Error('Supabase public configuration is unavailable.');
@@ -72,6 +94,96 @@
 
   function endpoint(slug) {
     return String(shellConfig().url || '').replace(/\/$/, '') + '/functions/v1/' + slug;
+  }
+
+  function opponentLabel(profile) {
+    const value = profile || {};
+    return String(value.display_name || value.username || value.channel_name || 'Opponent').trim() || 'Opponent';
+  }
+
+  function opponentHandle(profile) {
+    const value = profile || {};
+    if (value.username) return '@' + String(value.username).trim();
+    if (value.channel_name) return String(value.channel_name).trim();
+    return 'Matched player';
+  }
+
+  function safeAvatarUrl(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    try {
+      const parsed = new URL(raw, window.location.href);
+      return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.href : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function renderOpponentProfile() {
+    const profile = state.opponentProfile || null;
+    const label = opponentLabel(profile);
+    const handle = opponentHandle(profile);
+    const name = $('oppName');
+    const handleNode = $('oppHandle');
+    const fallback = $('oppAvatarFallback');
+    const frame = $('oppAvatarFrame');
+    const image = $('oppAvatar');
+    if (name) name.textContent = label;
+    if (handleNode) handleNode.textContent = handle;
+    const initials = label.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part.charAt(0).toUpperCase()).join('') || 'VS';
+    if (fallback) fallback.textContent = initials;
+    const avatar = safeAvatarUrl(profile && profile.avatar_url);
+    if (!frame || !image || !fallback) return;
+    if (!avatar) {
+      frame.hidden = true;
+      fallback.hidden = false;
+      if (typeof image.removeAttribute === 'function') image.removeAttribute('src');
+      else image.src = '';
+      image.alt = '';
+      return;
+    }
+    image.onload = () => {
+      frame.hidden = false;
+      fallback.hidden = true;
+    };
+    image.onerror = () => {
+      frame.hidden = true;
+      fallback.hidden = false;
+      image.removeAttribute('src');
+    };
+    image.alt = label + ' profile picture';
+    image.src = avatar;
+  }
+
+  async function syncOpponentProfile(opponentUserId) {
+    const id = String(opponentUserId || '').trim();
+    if (!id) {
+      state.opponentProfileId = '';
+      state.opponentProfile = null;
+      renderOpponentProfile();
+      return;
+    }
+    if (id === state.opponentProfileId) {
+      renderOpponentProfile();
+      return;
+    }
+    state.opponentProfileId = id;
+    state.opponentProfile = null;
+    renderOpponentProfile();
+    try {
+      const client = await ensureClient();
+      const result = await client
+        .from('sb_profiles')
+        .select('id,username,display_name,channel_name,avatar_url')
+        .eq('id', id)
+        .maybeSingle();
+      if (!result.error && result.data && String(result.data.id || '') === id) {
+        state.opponentProfile = result.data;
+      }
+    } catch (_) {
+      state.opponentProfile = null;
+    }
+    renderOpponentProfile();
   }
 
   async function callEdge(slug, payload) {
@@ -172,7 +284,8 @@
       '<span class="sb-damage">' + (attack.damage == null ? '—' : esc(attack.damage)) + '</span>' +
       '</button>'
     )).join('');
-    return '<article class="sb-card-control' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '"' +
+    const cardId = String((topInstance(creature) && topInstance(creature).card_id) || '');
+    return '<article class="sb-tcg-card sb-card-control' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '" data-card-id="' + esc(cardId) + '"' +
       (opts.primary ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"' : '') + '>' +
       '<header><span class="sb-stage">' + esc(definition.stage || definition.kind || 'Creature') + '</span><span class="sb-element">' + esc(definition.element || '') + '</span></header>' +
       '<h2>' + esc(definition.name || topInstance(creature)?.card_id || 'Creature') + '</h2>' +
@@ -185,7 +298,10 @@
 
   function handCard(instance) {
     const definition = legacyDefinition(instance) || {};
-    return '<article class="sb-hand-card"><strong>' + esc(definition.name || instance.card_id) + '</strong><small>' +
+    const cardId = String(instance && instance.card_id || '');
+    return '<article class="sb-tcg-card sb-hand-card" data-card-id="' + esc(cardId) + '">' +
+      '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
+      '<strong>' + esc(definition.name || cardId) + '</strong><small>' +
       esc(definition.card_family || definition.kind || '') + '</small></article>';
   }
 
@@ -198,6 +314,7 @@
   function render() {
     const view = viewState();
     if (!view) return;
+    renderOpponentProfile();
     const yourTurn = view.phase === 'play' && Number(view.active_seat) === Number(view.you && view.you.seat);
     const pending = !!(view.pending_attack_choice || view.pending_ability_choice || view.pending_event_listener_choice || view.pending_movement_listener_choice || view.pending_heal_listener_choice || view.pending_choice || view.pending_resolution);
     const canAttack = yourTurn && !pending && !state.busy;
@@ -272,6 +389,7 @@
     const view = viewState();
     if (state.selectedAnchorUid && view && view.you && cardAnchor(view.you.vanguard) !== state.selectedAnchorUid) state.selectedAnchorUid = '';
     render();
+    syncOpponentProfile(view && view.opponent && view.opponent.user_id).catch(() => {});
   }
 
   function startPoll() {
@@ -284,7 +402,6 @@
   async function boot() {
     try {
       state.matchId = new URLSearchParams(window.location.search).get('match_id') || '';
-      $('controllerVersion').textContent = VERSION;
       if (!state.matchId) throw new Error('Open this battle surface from a match route containing ?match_id=<id>.');
       await ensureClient();
       await refreshMatch();
