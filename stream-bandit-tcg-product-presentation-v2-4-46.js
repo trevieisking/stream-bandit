@@ -127,13 +127,15 @@ function mountHome(){
 function mountPlay(){
   const stack=document.querySelector('.tcg-side-stack');
   if(!stack||stack.querySelector('[data-sb-second-sky]'))return;
-  const article=document.createElement('article');
-  article.className='tcg-frame tcg-product-mini';
-  article.dataset.sbSecondSky='play';
-  article.innerHTML='<h2>Starter Preview · '+esc(model.starter.name)+'</h2>'+
+  const article=stack.querySelector('.tcg-frame');
+  if(!article)return;
+  const preview=document.createElement('div');
+  preview.className='tcg-product-mini';
+  preview.dataset.sbSecondSky='play';
+  preview.innerHTML='<h3>Starter Preview · '+esc(model.starter.name)+'</h3>'+
     img(model.signature&&model.signature.art_path,model.signature?model.signature.name+' artwork':'Second Sky artwork','tcg-product-mini-art')+
-    '<p>Astral starter presentation is ready. Matchmaking still uses only the server-owned legal deck selected above.</p>';
-  stack.prepend(article);
+    '<small>Presentation only · matchmaking still uses the server-owned legal deck selected on the left.</small>';
+  article.appendChild(preview);
 }
 function mountDecks(){
   const feed=document.querySelector('.tcg-core-layout > section.tcg-detail-panel .tcg-card-feed');
@@ -193,7 +195,7 @@ function mountBattlePass(){
     rail.dataset.sbSecondSky='1';
     const samples=model.pool.slice(0,12);
     rail.innerHTML=samples.map((card,index)=>
-      '<article class="tcg-reward'+(index%3===0?' premium':'')+'">'+
+      '<article class="tcg-reward tcg-product-reward'+(index%3===0?' premium':'')+'">'+
       img(card.art_path,card.name+' artwork','tcg-product-reward-art')+
       '<strong>Season 1 Preview</strong><span>'+esc(card.name)+'</span><small>Presentation sample · tier not assigned</small></article>'
     ).join('');
