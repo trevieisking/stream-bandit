@@ -86,6 +86,16 @@
 - [x] Desktop human visual acceptance of Second Sky surfaces — Trevor PASS on exact head `7d15aec02ee76613a706e4ca491f6c091e57351b`.
 - [x] Add V2.4.50 mobile responsive shell: full 3 x 2 navigation rail, vertical page scrolling and stacked core layouts.
 - [x] Add complete two-column mobile Collection/Deck card grids so all approved Astral identities remain reachable.
-- [ ] Mobile human visual acceptance of Second Sky surfaces — Kay/Trevor re-test pending.
-- [ ] Overall cross-device Second Sky visual acceptance.
+- [x] Mobile human visual acceptance of Second Sky surfaces — Kay PASS after V2.4.50 phone repair.
+- [x] Overall cross-device Second Sky visual acceptance — Trevor desktop PASS + Kay mobile PASS.
 - [ ] Main/Pages/live release only after inherited end-to-end release gates.
+
+
+## Canonical deck presentation + daily cadence
+- [x] Lock Second Sky desktop layout as the presentation baseline for future completed launch decks.
+- [x] Lock V2.4.50 mobile layout: six-item 3 x 2 rail, vertical page scroll, stacked panels and two-column card grids.
+- [x] Lock artwork-fit rule: future art must preserve its focal subject inside accepted card/product/reward containers on desktop and phone.
+- [x] Lock Play Active Battle, Decks, Collection, Shop and Battle Pass presentation patterns for reuse.
+- [x] Set working cadence target to **one completed launch deck per working day**, without bypassing source truth, CI or human acceptance.
+- [x] Confirm next canonical starter is **Ember — Ashrush** (`deck-ember-ashrush`).
+- [ ] Begin Ember/Ashrush artwork only after a fresh repository pre-generation source-of-truth read.
