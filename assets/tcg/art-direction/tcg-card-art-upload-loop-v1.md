@@ -89,7 +89,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Celestyr — Dream Cartographer
 - Basic Astral Essence
 - Star Essence
+- Orbit Essence
 
-Material progress: **13/193**.
-Astral material progress: **13/24**.
-Next source-of-truth candidate at this checkpoint: **Orbit Essence** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **14/193**.
+Astral material progress: **14/24**.
+Next source-of-truth candidate at this checkpoint: **Nova Essence** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
