@@ -25,7 +25,7 @@ If a generated image materially contradicts the bound brief, that candidate is r
 After an upload is verified and control truth is synchronized, the workflow returns to the GitHub preflight. The next-card identity is never merely carried over from the prior turn.
 
 ## 034 — Current material checkpoint
-Nineteen canonical Standard/base PNGs are verified: Stardot, Orbitail, Cosmarch, Moonbit, Comettail, Nebulynx, Cometmanta, Orbitortoise, Prismowl, Starwhale, Celestyr — Dream Cartographer, Basic Astral Essence and Star Essence.
+Twenty canonical Standard/base PNGs are verified: Stardot, Orbitail, Cosmarch, Moonbit, Comettail, Nebulynx, Cometmanta, Orbitortoise, Prismowl, Starwhale, Celestyr — Dream Cartographer, Basic Astral Essence and Star Essence.
 
 Cartographer Lyra is verified at its canonical repository path.
 
@@ -33,9 +33,11 @@ Future Draw is verified at its canonical repository path.
 
 Gravity Shift is verified at its canonical repository path.
 
-Current progress: **19/193 Set One**, **19/24 Astral**.
+Star Chart is verified at its canonical repository path.
 
-At this checkpoint the ledger sequence identifies Star Chart next, subject to a fresh pre-generation GitHub read.
+Current progress: **20/193 Set One**, **20/24 Astral**.
+
+At this checkpoint the ledger sequence identifies Celestial Observatory next, subject to a fresh pre-generation GitHub read.
 
 ## 035 — Release boundary
 This authority change is artwork/control-plane only. It changes no gameplay engine, rules, database, Supabase deployment, main/live/public release state.
