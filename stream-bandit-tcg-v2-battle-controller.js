@@ -294,7 +294,7 @@
       ? '<button type="button" class="sb-card-action setup-return" data-setup-return="' + esc(opts.setupReturn.where) + '" data-setup-index="' + esc(opts.setupReturn.index == null ? '' : opts.setupReturn.index) + '"><span><strong>Return to hand</strong><small>Adjust setup</small></span><span>↩</span></button>'
       : '';
     const cardId = String((topInstance(creature) && topInstance(creature).card_id) || '');
-    return '<div class="sb-card-wrap' + (selected ? ' is-selected' : '') + '">' +
+    return '<div class="sb-card-wrap' + (selected ? ' is-selected' : '') + (opts.setupReturn ? ' has-setup-return' : '') + '">' +
       '<article class="sb-tcg-card sb-card-control' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '" data-card-id="' + esc(cardId) + '"' +
       (opts.primary ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"' : '') + '>' +
       '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
@@ -701,7 +701,6 @@
     }
     if (view && view.phase !== 'setup') state.selectedHandUid = '';
 
-    state.overlayKey = '';
     render();
     syncOpponentProfile(view && view.opponent && view.opponent.user_id).catch(() => {});
   }
