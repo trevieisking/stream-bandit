@@ -2,8 +2,8 @@
 'use strict';
 
 const VERSION='2.4.46';
-const ACTIVE_STARTER_ID='deck-astral-second-sky';
 const SOURCES=Object.freeze({
+  presentation:'assets/tcg/products/tcg-product-presentation-v1.json',
   starters:'tcg-set-one-starters-v0.2.json',
   intake:'assets/tcg/cards/set-one/tcg-card-art-intake-v1.json',
   production:'assets/tcg/art-direction/tcg-art-production-ledger-v1.json',
@@ -33,9 +33,11 @@ function flattenProduction(production){
     card_family:batch.card_family
   },card)));
 }
-function buildModel(starters,intake,production,accessories,art){
-  const starter=(starters.starters||[]).find(item=>item.starter_id===ACTIVE_STARTER_ID);
-  if(!starter)throw new Error('Second Sky starter is unavailable.');
+function buildModel(presentation,starters,intake,production,accessories,art){
+  const featuredIds=Array.isArray(presentation&&presentation.featured_starter_ids)?presentation.featured_starter_ids:[];
+  const activeStarterId=String(featuredIds[0]||'');
+  const starter=(starters.starters||[]).find(item=>item.starter_id===activeStarterId);
+  if(!starter)throw new Error('Featured starter is unavailable.');
   const metaById=new Map((intake.cards||[]).map(card=>[String(card.card_id),card]));
   const productionRows=flattenProduction(production);
   const productionById=new Map(productionRows.map(card=>[String(card.card_id),card]));
@@ -76,6 +78,7 @@ function buildModel(starters,intake,production,accessories,art){
   const total=recipe.reduce((sum,card)=>sum+card.quantity,0);
   const signature=recipe.find(card=>card.quantity===1&&card.card_family==='Creature')||recipe[0]||null;
   return Object.freeze({
+    presentation:Object.freeze(Object.assign({},presentation)),
     starter:Object.freeze(Object.assign({},starter)),
     recipe:Object.freeze(recipe),
     pool:Object.freeze(pool),
@@ -117,21 +120,21 @@ function accessoryMarkup(){
 }
 function mountHome(){
   const grid=document.querySelector('.tcg-grid');
-  if(!grid||grid.querySelector('[data-sb-second-sky]'))return;
+  if(!grid||grid.querySelector('[data-sb-featured-starter]'))return;
   const article=document.createElement('article');
   article.className='tcg-card tcg-product-feature tcg-product-feature-wide';
-  article.dataset.sbSecondSky='home';
+  article.dataset.sbFeaturedStarter='home';
   article.innerHTML=deckHero()+'<div class="tcg-actions"><a class="tcg-btn" href="tcg-decks.html">View Second Sky</a><a class="tcg-btn secondary" href="tcg-shop.html">Shop Preview</a></div>';
   grid.prepend(article);
 }
 function mountPlay(){
   const stack=document.querySelector('.tcg-side-stack');
-  if(!stack||stack.querySelector('[data-sb-second-sky]'))return;
+  if(!stack||stack.querySelector('[data-sb-featured-starter]'))return;
   const article=stack.querySelector('.tcg-frame');
   if(!article)return;
   const preview=document.createElement('div');
   preview.className='tcg-product-mini';
-  preview.dataset.sbSecondSky='play';
+  preview.dataset.sbFeaturedStarter='play';
   preview.innerHTML='<h3>Starter Preview · '+esc(model.starter.name)+'</h3>'+
     img(model.signature&&model.signature.art_path,model.signature?model.signature.name+' artwork':'Second Sky artwork','tcg-product-mini-art')+
     '<small>Presentation only · matchmaking still uses the server-owned legal deck selected on the left.</small>';
@@ -139,15 +142,15 @@ function mountPlay(){
 }
 function mountDecks(){
   const feed=document.querySelector('.tcg-core-layout > section.tcg-detail-panel .tcg-card-feed');
-  if(!feed||feed.dataset.sbSecondSky==='1')return;
-  feed.dataset.sbSecondSky='1';
+  if(!feed||feed.dataset.sbFeaturedStarter==='1')return;
+  feed.dataset.sbFeaturedStarter='1';
   feed.innerHTML='<div class="tcg-product-inline-note"><strong>Official Starter Preview · '+esc(model.starter.name)+'</strong><span>This is the exact canonical 60-card recipe; it does not create or save a deck in your account.</span></div>'+
     '<div class="tcg-product-card-grid">'+model.recipe.map(card=>cardTile(card,card.quantity)).join('')+'</div>';
 }
 function mountCollection(){
   const feed=document.getElementById('tcgCollectionFeed');
-  if(!feed||feed.dataset.sbSecondSky==='1')return;
-  feed.dataset.sbSecondSky='1';
+  if(!feed||feed.dataset.sbFeaturedStarter==='1')return;
+  feed.dataset.sbFeaturedStarter='1';
   const panel=feed.closest('.tcg-detail-panel');
   const h2=panel&&panel.querySelector('h2');
   const p=panel&&panel.querySelector('p');
@@ -157,8 +160,8 @@ function mountCollection(){
 }
 function mountShop(){
   const center=document.querySelector('.tcg-core-layout > section.tcg-detail-panel .tcg-card-feed');
-  if(center&&center.dataset.sbSecondSky!=='1'){
-    center.dataset.sbSecondSky='1';
+  if(center&&center.dataset.sbFeaturedStarter!=='1'){
+    center.dataset.sbFeaturedStarter='1';
     center.innerHTML='<article class="tcg-product-shop-tile">'+deckHero()+
       '<p>Official starter product preview. Purchase state, prices and entitlement receipts remain gated to the canonical economy owner.</p>'+
       '</article>';
@@ -166,8 +169,8 @@ function mountShop(){
   const panels=Array.from(document.querySelectorAll('.tcg-core-layout > aside.tcg-detail-panel'));
   const detail=panels[panels.length-1];
   const feed=detail&&detail.querySelector('.tcg-feed');
-  if(feed&&feed.dataset.sbSecondSky!=='1'){
-    feed.dataset.sbSecondSky='1';
+  if(feed&&feed.dataset.sbFeaturedStarter!=='1'){
+    feed.dataset.sbFeaturedStarter='1';
     feed.innerHTML=img(model.signature&&model.signature.art_path,model.signature?model.signature.name+' artwork':'Second Sky artwork','tcg-product-detail-art')+
       '<h3>'+esc(model.starter.name)+'</h3>'+
       '<p>'+esc(model.starter.element)+' starter · '+esc(model.total)+' cards · matching accessory bundle.</p>'+
@@ -177,22 +180,22 @@ function mountShop(){
 }
 function mountBattlePass(){
   const state=document.querySelector('.tcg-state');
-  if(state)state.innerHTML='<strong>Set One — Season 1</strong><br>Visual presentation preview is active. Tier assignments, progression values and entitlements remain unpublished and server-owned.';
+  if(state){const season=model.presentation&&model.presentation.battle_pass||{};state.innerHTML='<strong>'+esc(season.display_name||'Set One — Season 1')+'</strong><br>Visual presentation preview is active. Tier assignments, progression values and entitlements remain unpublished and server-owned.';
   const topGrid=document.querySelector('.tcg-grid');
-  if(topGrid&&!topGrid.querySelector('[data-sb-second-sky]')){
+  if(topGrid&&!topGrid.querySelector('[data-sb-featured-starter]')){
     const status=topGrid.querySelector('.tcg-frame');
     if(status){
       const hero=document.createElement('div');
       hero.className='tcg-product-pass-hero';
-      hero.dataset.sbSecondSky='battlepass';
+      hero.dataset.sbFeaturedStarter='battlepass';
       hero.innerHTML=img(model.showcase,model.starter.name+' showcase','tcg-product-pass-art')+
         '<div><strong>Featured launch starter · '+esc(model.starter.name)+'</strong><small>Astral is the first completed Set One art package.</small></div>';
       status.appendChild(hero);
     }
   }
   const rail=document.querySelector('.tcg-reward-rail');
-  if(rail&&rail.dataset.sbSecondSky!=='1'){
-    rail.dataset.sbSecondSky='1';
+  if(rail&&rail.dataset.sbFeaturedStarter!=='1'){
+    rail.dataset.sbFeaturedStarter='1';
     const samples=model.pool.slice(0,12);
     rail.innerHTML=samples.map((card,index)=>
       '<article class="tcg-reward tcg-product-reward'+(index%3===0?' premium':'')+'">'+
@@ -215,6 +218,7 @@ function mount(){
 function ready(){
   if(!readyPromise){
     readyPromise=Promise.all([
+      readJson(SOURCES.presentation),
       readJson(SOURCES.starters),
       readJson(SOURCES.intake),
       readJson(SOURCES.production),
