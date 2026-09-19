@@ -117,6 +117,33 @@ V2.4.50 therefore adds a mobile-only responsive path:
 - nested fixed feeds stop hiding lower content on phone;
 - desktop-approved layouts remain unchanged above the mobile breakpoint.
 
-Desktop acceptance remains valid. Overall cross-device human acceptance is **pending Kay/Trevor mobile re-test** of the V2.4.50 branch head.
+Desktop acceptance remains valid. Kay then re-tested V2.4.50 on phone and **passed the repaired mobile layout**. Overall cross-device Second Sky visual acceptance is now **PASS**.
 
 Second Sky accessory artwork is still pending, economy/Battle Pass ownership remains gated, and no merge/main/Pages/live promotion is implied by either visual review.
+
+
+## Canonical deck presentation template
+
+The accepted **Astral — Second Sky** presentation is now the visual/layout baseline for the remaining launch decks.
+
+Reuse these presentation rules for every later completed deck unless a specific element needs a content-driven variation:
+- desktop top rail: complete six-control rail, compact and unclipped;
+- desktop pages: Game Home, Play, Decks, Collection, Shop and Battle Pass use the accepted panel proportions and artwork-fit rules;
+- Play: Active Battle gets priority over low-information sidebar space and shows a full card-shaped deck preview;
+- Decks: exact starter recipe is shown as the canonical deck preview;
+- Collection: complete element card pool must be reachable and visually consistent;
+- Shop: featured starter uses the neat framed showcase/product treatment;
+- Battle Pass: launch showcase fits its panel and reward-card content remains contained;
+- mobile top rail: fully visible 3 x 2 grid;
+- mobile pages: vertical document scrolling, stacked core layouts and complete two-column card grids;
+- raw artwork must be composed so the important subject survives these accepted desktop/mobile crops and card-shaped containers.
+
+## One-deck-per-day production cadence
+
+Working cadence target: **one completed launch deck per working day**, using the same source-of-truth loop and human acceptance gates as Second Sky. The cadence never overrides correctness, CI or visual acceptance.
+
+Canonical next starter from the current Set One starter registry:
+- **Ember — Ashrush** (`deck-ember-ashrush`).
+
+Each deck follows:
+`fresh GitHub card-art preflight -> generate/upload/verify all required art -> canonical starter/pool wiring -> desktop preview -> mobile preview -> human PASS -> exact-head CI -> promotion decision -> checkpoint -> next deck`.
