@@ -25,7 +25,7 @@ If a generated image materially contradicts the bound brief, that candidate is r
 After an upload is verified and control truth is synchronized, the workflow returns to the GitHub preflight. The next-card identity is never merely carried over from the prior turn.
 
 ## 034 — Current material checkpoint
-Twenty-three canonical Standard/base PNGs are verified: Stardot, Orbitail, Cosmarch, Moonbit, Comettail, Nebulynx, Cometmanta, Orbitortoise, Prismowl, Starwhale, Celestyr — Dream Cartographer, Basic Astral Essence and Star Essence.
+Twenty-four canonical Standard/base PNGs are verified: Stardot, Orbitail, Cosmarch, Moonbit, Comettail, Nebulynx, Cometmanta, Orbitortoise, Prismowl, Starwhale, Celestyr — Dream Cartographer, Basic Astral Essence and Star Essence.
 
 Cartographer Lyra is verified at its canonical repository path.
 
@@ -35,9 +35,9 @@ Gravity Shift is verified at its canonical repository path.
 
 Star Chart is verified at its canonical repository path.
 
-Current progress: **23/193 Set One**, **23/24 Astral**.
+Current progress: **24/193 Set One**, **24/24 Astral**.
 
-At this checkpoint the ledger sequence identifies Parallax Window next, subject to a fresh pre-generation GitHub read.
+At this checkpoint the ledger sequence records Astral Standard/base artwork complete at 24/24, subject to a fresh pre-generation GitHub read.
 
 ## 035 — Release boundary
 This authority change is artwork/control-plane only. It changes no gameplay engine, rules, database, Supabase deployment, main/live/public release state.
@@ -54,3 +54,7 @@ After Astral reaches 24/24 and the Second Sky accessory art required for present
 Dreamglass is verified at its canonical repository path.
 
 Orbit Ring is verified at its canonical repository path.
+
+Parallax Window is verified at its canonical repository path.
+
+Astral Standard/base artwork is complete at 24/24. The Second Sky product-preview gate is now open, subject to starter recipe and accessory revalidation.
