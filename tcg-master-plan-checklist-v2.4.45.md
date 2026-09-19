@@ -42,9 +42,10 @@
 - [x] Gravity Shift.
 - [x] Star Chart.
 - [x] Celestial Observatory.
-- [ ] Dreamglass.
-- [ ] Set One Standard/base PNG masters complete: **21/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **21/24 -> 24/24**.
+- [x] Dreamglass.
+- [ ] Orbit Ring.
+- [ ] Set One Standard/base PNG masters complete: **22/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **22/24 -> 24/24**.
 - [ ] Final clean backgrounds complete: **0/8 -> 8/8**.
 
 ## Safety
