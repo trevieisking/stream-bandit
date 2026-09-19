@@ -46,10 +46,11 @@ test('desktop battlefield gives Vanguard and Reserves independent height-bounded
   assert.match(battle, /grid-template-rows:auto minmax\(0,1fr\) minmax\(68px,auto\) minmax\(0,1fr\) clamp\(132px,17\.2dvh,166px\)/);
   assert.match(battle, /\.sb-field-core\{[\s\S]*?grid-template-rows:minmax\(0,1fr\) minmax\(0,1\.18fr\)/);
   assert.match(battle, /\.sb-half-you \.sb-field-core\{[\s\S]*?grid-template-rows:minmax\(0,1\.18fr\) minmax\(0,1fr\)/);
-  assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{width:min\(var\(--card-w\),9\.7dvh\)\}/);
-  assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{width:min\(var\(--active-w\),11\.4dvh\)\}/);
-  assert.match(battle, /\.sb-card-wrap\.is-selected \.sb-card-actions,[\s\S]*?\.sb-card-wrap\.has-setup-return \.sb-card-actions\{[\s\S]*?position:absolute;[\s\S]*?left:calc\(100% \+ 10px\)/);
-  assert.match(battle, /\.sb-reserve-slot:nth-child\(n\+3\) \.sb-card-wrap\.is-selected \.sb-card-actions,[\s\S]*?\.sb-reserve-slot:nth-child\(n\+3\) \.sb-card-wrap\.has-setup-return \.sb-card-actions\{[\s\S]*?right:calc\(100% \+ 10px\)/);
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-wrap,[\s\S]*?\.sb-vanguard-slot \.sb-card-wrap\{[\s\S]*?height:100%;[\s\S]*?place-items:center/);
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-control,[\s\S]*?\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto;[\s\S]*?max-width:calc\(100% - 8px\)/);
+  assert.match(battle, /\.sb-card-wrap\.is-selected \.sb-card-actions\{[\s\S]*?position:absolute;[\s\S]*?left:calc\(100% \+ 10px\)/);
+  assert.match(battle, /\.sb-reserve-slot:nth-child\(n\+3\) \.sb-card-wrap\.is-selected \.sb-card-actions\{[\s\S]*?right:calc\(100% \+ 10px\)/);
+  assert.match(battle, /\.sb-card-wrap\.has-setup-return \.sb-card-actions\{[\s\S]*?position:absolute;[\s\S]*?bottom:5px;[\s\S]*?left:50%;[\s\S]*?width:min\(120px,calc\(100% - 10px\)\)/);
   assert.match(battle, /\.sb-hand-card\{[\s\S]*?height:calc\(clamp\(132px,17\.2dvh,166px\) - 34px\);[\s\S]*?width:auto;[\s\S]*?flex:0 0 auto/);
 });
 
