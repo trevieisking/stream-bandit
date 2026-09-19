@@ -90,3 +90,16 @@ test('human visual pass keeps top rail labels visible and preserves card-shaped 
   assert.ok(product.includes('.tcg-product-reward-art{width:100%;height:auto;aspect-ratio:.72;object-fit:cover'));
   assert.ok(product.includes('.tcg-product-mini-art{grid-area:art;width:78px;height:78px'));
 });
+
+test('human visual pass 2 compacts the rail and contains Play, Battle Pass and Shop artwork',async()=>{
+  const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.css');
+  const product=await read('stream-bandit-tcg-product-presentation-v2-4-46.css');
+  assert.ok(shell.includes('V2.4.48 human visual pass 2: compact the top rail to the brand-card height without clipping controls.'));
+  assert.ok(shell.includes('.tcg-client-nav{height:72px;align-self:center;overflow:visible}'));
+  assert.ok(product.includes('V2.4.48 human visual pass 2: full-image fitting for Play, Battle Pass and Shop.'));
+  assert.ok(product.includes('.tcg-product-mini-art{grid-area:art;width:52px;height:72px;min-height:0;aspect-ratio:.72;object-fit:contain'));
+  assert.ok(product.includes('.tcg-product-pass-art{width:100%;height:auto;max-height:96px;aspect-ratio:16/7;object-fit:contain'));
+  assert.ok(product.includes('.tcg-reward-rail{overflow-x:auto;overflow-y:hidden;align-items:stretch}'));
+  assert.ok(product.includes('.tcg-product-reward{height:100%;max-height:100%;min-height:0;overflow:hidden'));
+  assert.ok(product.includes('.tcg-product-shop-tile .tcg-product-showcase{width:100%;height:100%;object-fit:contain'));
+});
