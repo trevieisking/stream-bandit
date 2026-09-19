@@ -65,8 +65,8 @@
 - [ ] Produce/verify Second Sky sleeve, battle coin and deck-box art for the product preview.
 - [x] Build a branch-only Shop preview using real approved Second Sky assets.
 - [x] Build a branch-only **Set One — Season 1** Battle Pass preview using real Set One assets.
-- [ ] Keep purchase, price, currency, entitlement, reward-grant and progression values gated to canonical economy/Battle Pass owners.
-- [ ] Do not imply that the Battle Pass automatically grants all 193 Set One cards.
+- [x] Keep purchase, price, currency, entitlement, reward-grant and progression values gated to canonical economy/Battle Pass owners.
+- [x] Do not imply that the Battle Pass automatically grants all 193 Set One cards.
 
 ## Second Sky runtime/presentation integration
 - [x] Shared runtime art resolver reads canonical production-ledger target paths.
@@ -83,5 +83,5 @@
 - [ ] Produce/verify Second Sky Card Sleeve Set artwork.
 - [ ] Produce/verify Second Sky Battle Coin artwork.
 - [ ] Produce/verify Second Sky Deck Box artwork.
-- [ ] Human visual acceptance of Second Sky surfaces.
+- [x] Human visual acceptance of Second Sky surfaces — Trevor PASS on exact head `7d15aec02ee76613a706e4ca491f6c091e57351b`.
 - [ ] Main/Pages/live release only after inherited end-to-end release gates.
