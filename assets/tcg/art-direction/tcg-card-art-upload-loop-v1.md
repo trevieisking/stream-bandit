@@ -97,7 +97,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Gravity Shift
 - Star Chart
 - Celestial Observatory
+- Dreamglass
 
-Material progress: **21/193**.
-Astral material progress: **21/24**.
-Next source-of-truth candidate at this checkpoint: **Dreamglass** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **22/193**.
+Astral material progress: **22/24**.
+Next source-of-truth candidate at this checkpoint: **Orbit Ring** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
