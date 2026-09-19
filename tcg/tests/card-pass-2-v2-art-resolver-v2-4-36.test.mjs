@@ -54,7 +54,7 @@ test('approved repo-owned art targets exist and do not use GitHack',async()=>{
 test('page shell loads the canonical art owner without changing accepted shell identity',async()=>{
   const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.js');
   assert.ok(shell.includes('const VERSION="2.4.32"'));
-  assert.ok(shell.includes('stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-36'));
+  assert.ok(shell.includes('stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46'));
   assert.ok(shell.includes('owner.applyPageArt(body)'));
   assert.ok(shell.includes('owner.applyBranding(document)'));
 });
