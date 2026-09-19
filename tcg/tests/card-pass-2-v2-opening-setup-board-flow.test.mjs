@@ -65,6 +65,16 @@ test('browser setup guidance does not replace the server legality owner', () => 
   assert.doesNotMatch(controller, /first_player_seat\s*=/);
 });
 
+test('toss reveal is stable between polling refreshes and setup placements can be corrected', () => {
+  assert.match(battle, /\.sb-card-wrap\.has-setup-return \.sb-card-actions\{display:grid/);
+  assert.match(controller, /opts\.setupReturn \? ' has-setup-return' : ''/);
+  assert.match(controller, /data-setup-return=/);
+  const refreshStart = controller.indexOf('async function refreshMatch()');
+  const pollStart = controller.indexOf('function startPoll()', refreshStart);
+  const refreshBody = controller.slice(refreshStart, pollStart);
+  assert.doesNotMatch(refreshBody, /state\.overlayKey\s*=\s*''/);
+});
+
 test('recorded interaction contract still requires the same opening and board grammar', () => {
   assert.equal(contract.board.opponent_position, 'top');
   assert.equal(contract.board.player_position, 'bottom');
