@@ -93,7 +93,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Nova Essence
 - Archivist Sol
 - Cartographer Lyra
+- Future Draw
 
-Material progress: **17/193**.
-Astral material progress: **17/24**.
-Next source-of-truth candidate at this checkpoint: **Future Draw** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **18/193**.
+Astral material progress: **18/24**.
+Next source-of-truth candidate at this checkpoint: **Gravity Shift** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
