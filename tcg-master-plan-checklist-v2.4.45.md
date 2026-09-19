@@ -41,9 +41,10 @@
 - [x] Future Draw.
 - [x] Gravity Shift.
 - [x] Star Chart.
-- [ ] Celestial Observatory.
-- [ ] Set One Standard/base PNG masters complete: **20/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **20/24 -> 24/24**.
+- [x] Celestial Observatory.
+- [ ] Dreamglass.
+- [ ] Set One Standard/base PNG masters complete: **21/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **21/24 -> 24/24**.
 - [ ] Final clean backgrounds complete: **0/8 -> 8/8**.
 
 ## Safety
@@ -53,3 +54,14 @@
 - [x] No user commit counted until canonical path is verified.
 - [x] No gameplay/runtime/database/Supabase change.
 - [x] No Code Labs Writer / Repo Desk / CG Repair Lab / Code God.
+
+## First deck Shop + Battle Pass preview
+- [x] Lock first preview deck identity to **Astral — Second Sky**.
+- [x] Lock **Set One (SB1)** as **Battle Pass Season 1** identity.
+- [ ] Reach Astral Standard/base artwork **24/24**.
+- [ ] Confirm the existing Second Sky 60-card starter recipe remains valid at the preview head.
+- [ ] Produce/verify Second Sky sleeve, battle coin and deck-box art for the product preview.
+- [ ] Build a branch-only Shop preview using real approved Second Sky assets.
+- [ ] Build a branch-only **Set One — Season 1** Battle Pass preview using real Set One assets.
+- [ ] Keep purchase, price, currency, entitlement, reward-grant and progression values gated to canonical economy/Battle Pass owners.
+- [ ] Do not imply that the Battle Pass automatically grants all 193 Set One cards.
