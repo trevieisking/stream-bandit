@@ -39,7 +39,7 @@ button{font:inherit}
 .sb-card-control,.sb-hand-card{border:1px solid #ffffff2b;border-radius:18px;background:linear-gradient(150deg,#171d36,#0f1327);padding:9px;box-shadow:0 8px 24px #0005;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;overflow:hidden}
 .sb-card-control header{display:flex;justify-content:space-between;gap:8px;color:#b9c6e6;font-size:10px;font-weight:900;text-transform:uppercase}
 .sb-card-control h2{font-size:16px;margin:7px 0;line-height:1.05}
-.sb-card-art{height:58px;border-radius:12px;background:linear-gradient(135deg,#22d3a620,#7c3cff2d,#ff2d851e);display:grid;place-items:center;font-size:30px;border:1px solid #ffffff16}
+.sb-card-art{height:88px;border-radius:12px;background:linear-gradient(135deg,#22d3a620,#7c3cff2d,#ff2d851e);display:grid;place-items:center;font-size:30px;border:1px solid #ffffff16;overflow:hidden}.sb-card-art img{width:100%;height:100%;object-fit:cover;object-position:center;border-radius:11px;display:block}
 .sb-hp,.sb-card-meta{display:flex;justify-content:space-between;gap:6px;align-items:center;margin-top:6px;font-size:11px}
 .sb-hp strong{color:#baf7df}
 .sb-card-meta{color:var(--muted)}
@@ -63,10 +63,10 @@ button{font:inherit}
 .sb-hand-card small{color:var(--muted)}
 .sb-separator{height:1px;background:linear-gradient(90deg,transparent,#55d9ff44,transparent)}
 @media(max-width:980px){.sb-field{grid-template-columns:1fr}.sb-reserve{grid-template-columns:repeat(4,minmax(105px,1fr));overflow-x:auto}.sb-reserve-slot{min-width:105px}.sb-vanguard-slot{max-width:340px;width:100%}.sb-match-meta{min-width:0;max-width:48%}}
-@media(max-width:640px){.sb-battle{padding:5px}.sb-board{gap:5px;grid-template-rows:minmax(0,1fr) 1px minmax(0,1fr) minmax(86px,.56fr)}.sb-side{padding:7px;border-radius:16px}.sb-side-header{gap:6px}.sb-player-avatar{width:36px;height:36px;min-width:36px}.sb-player-copy strong{font-size:12px}.sb-player-copy small{font-size:8px}.sb-match-meta{max-width:52%}.sb-status{font-size:8px;padding:4px 6px}.sb-pill{font-size:8px;padding:3px 6px}.sb-reserve{grid-template-columns:repeat(4,108px)}.sb-card-control h2{font-size:13px}.sb-card-art{height:44px}.sb-vanguard-slot,.sb-reserve-slot{min-height:112px}}
+@media(max-width:640px){html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}.sb-battle{height:auto;min-height:100dvh;padding:5px}.sb-board{height:auto;min-height:100dvh;gap:5px;grid-template-rows:auto 1px auto auto}.sb-side{min-height:0;overflow:visible;padding:7px;border-radius:16px}.sb-side-header{gap:6px}.sb-player-avatar{width:36px;height:36px;min-width:36px}.sb-player-copy strong{font-size:12px}.sb-player-copy small{font-size:8px}.sb-match-meta{max-width:52%}.sb-status{font-size:8px;padding:4px 6px}.sb-pill{font-size:8px;padding:3px 6px}.sb-reserve{grid-template-columns:repeat(4,108px)}.sb-card-control h2{font-size:13px}.sb-card-art{height:110px}.sb-card-art img{width:100%;height:100%;object-fit:cover;object-position:center;border-radius:10px;display:block}.sb-vanguard-slot,.sb-reserve-slot{min-height:112px}.sb-hand-wrap{min-height:132px;overflow:visible}.sb-hand{height:auto;min-height:104px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity}.sb-hand-card{scroll-snap-align:start}}
 </style>
 </head>
-<body data-sb-tcg-v2-battle="board-only-v0-3">
+<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4">
 <main class="sb-battle">
   <section class="sb-board" aria-label="One-screen battlefield">
     <section class="sb-side" aria-label="Opponent field">
@@ -108,7 +108,8 @@ button{font:inherit}
 </main>
 
 <script src="stream-bandit-tcg-config-v2-4-31.js?v=2-4-31"></script>
-<script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-3"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-3"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-4"></script>
+<script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-4"></script>
 </body>
 </html>
