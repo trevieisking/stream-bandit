@@ -1,0 +1,483 @@
+{
+  "schema": "stream-bandit-tcg-deck-accessory-ledger-v1",
+  "version": "1.1.0",
+  "recorded_at": "2026-09-19",
+  "authority": "Stream Bandit TCG official deck accessory identity and artwork ledger",
+  "source_starter_registry": "tcg-set-one-starters-v0.2.json",
+  "scope": {
+    "current_launch_starters": 8,
+    "accessories_per_official_deck_product": 3,
+    "current_launch_accessory_slots": 24,
+    "current_artworks_approved": 0,
+    "current_artworks_missing": 24
+  },
+  "accessory_types": [
+    {
+      "id": "sleeve_set",
+      "label": "Card Sleeve Set",
+      "purpose": "Defines the visible back/sleeve treatment for cards.",
+      "gameplay_effect": false
+    },
+    {
+      "id": "battle_coin",
+      "label": "Battle Coin",
+      "purpose": "Deck-themed visual coin for coin/toss presentation where shown.",
+      "gameplay_effect": false,
+      "randomness_effect": false,
+      "result_face_contract": {
+        "heads": "front",
+        "tails": "back"
+      }
+    },
+    {
+      "id": "deck_box",
+      "label": "Deck Box",
+      "purpose": "Deck/collection/shop cosmetic container presentation.",
+      "gameplay_effect": false
+    }
+  ],
+  "ownership_policy": {
+    "official_starter_deck_includes_matching_sleeve_set": true,
+    "official_starter_deck_includes_matching_battle_coin": true,
+    "official_starter_deck_includes_matching_deck_box": true,
+    "grant_is_idempotent": true,
+    "existing_starter_owners_require_owner_safe_backfill": true,
+    "custom_user_built_deck_creates_new_accessory_identity": false,
+    "custom_user_built_deck_uses_owned_accessories": true,
+    "duplicate_shop_purchase_of_owned_accessory": false,
+    "unowned_accessory_shop_availability_required": true,
+    "full_theme_accessory_bundle_may_also_be_listed": true,
+    "prices_and_currency_require_canonical_economy_owner": true
+  },
+  "safety_policy": {
+    "battle_coin_never_affects_server_randomness": true,
+    "sleeve_never_reveals_hidden_card_identity": true,
+    "deck_box_never_changes_deck_legality_or_capacity": true,
+    "accessory_ownership_never_changes_gameplay_rules": true,
+    "battle_coin_visual_face_follows_server_result": true,
+    "battle_coin_client_never_generates_result": true
+  },
+  "shop_contract": {
+    "required_categories": [
+      "Card Sleeves",
+      "Battle Coins",
+      "Deck Boxes",
+      "Accessory Bundles"
+    ],
+    "catalog_identity": "accessory_id",
+    "artwork_identity": "artwork_id",
+    "owned_items_must_be_recognized": true,
+    "fake_browser_prices_forbidden": true,
+    "purchase_grants_require_canonical_economy_owner": true
+  },
+  "future_starter_rule": {
+    "every_future_official_starter_or_deck_product_must_define_same_three_accessory_types": true,
+    "examples_when_promoted": [
+      "Fairy / Glimmerwish",
+      "Underworld / Grave Pact"
+    ],
+    "note": "Future concepts do not become launch/runtime products merely because the accessory rule is reserved for them."
+  },
+  "bundles": [
+    {
+      "starter_id": "deck-astral-second-sky",
+      "element": "Astral",
+      "deck_name": "Second Sky",
+      "bundle_id": "sb1-accessory-bundle-astral-second-sky",
+      "grant_policy": "official_starter_deck_includes_once",
+      "shop_policy": "each_unowned_accessory_must_be_obtainable_from_in_game_shop",
+      "accessories": [
+        {
+          "accessory_type": "sleeve_set",
+          "accessory_id": "sb1-sleeves-astral-second-sky",
+          "label": "Second Sky Card Sleeve Set",
+          "artwork_id": "sb1-sleeves-astral-second-sky-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/astral/second-sky/sleeves/sb1-sleeves-astral-second-sky-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "card_back"
+        },
+        {
+          "accessory_type": "battle_coin",
+          "accessory_id": "sb1-battle-coin-astral-second-sky",
+          "label": "Second Sky Battle Coin",
+          "artwork_id": "sb1-battle-coin-astral-second-sky-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/astral/second-sky/battle-coin/sb1-battle-coin-astral-second-sky-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "randomness_effect": false,
+          "visual_role": "coin_toss_cosmetic"
+        },
+        {
+          "accessory_type": "deck_box",
+          "accessory_id": "sb1-deck-box-astral-second-sky",
+          "label": "Second Sky Deck Box",
+          "artwork_id": "sb1-deck-box-astral-second-sky-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/astral/second-sky/deck-box/sb1-deck-box-astral-second-sky-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "deck_collection_cosmetic"
+        }
+      ]
+    },
+    {
+      "starter_id": "deck-ember-ashrush",
+      "element": "Ember",
+      "deck_name": "Ashrush",
+      "bundle_id": "sb1-accessory-bundle-ember-ashrush",
+      "grant_policy": "official_starter_deck_includes_once",
+      "shop_policy": "each_unowned_accessory_must_be_obtainable_from_in_game_shop",
+      "accessories": [
+        {
+          "accessory_type": "sleeve_set",
+          "accessory_id": "sb1-sleeves-ember-ashrush",
+          "label": "Ashrush Card Sleeve Set",
+          "artwork_id": "sb1-sleeves-ember-ashrush-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/ember/ashrush/sleeves/sb1-sleeves-ember-ashrush-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "card_back"
+        },
+        {
+          "accessory_type": "battle_coin",
+          "accessory_id": "sb1-battle-coin-ember-ashrush",
+          "label": "Ashrush Battle Coin",
+          "artwork_id": "sb1-battle-coin-ember-ashrush-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/ember/ashrush/battle-coin/sb1-battle-coin-ember-ashrush-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "randomness_effect": false,
+          "visual_role": "coin_toss_cosmetic"
+        },
+        {
+          "accessory_type": "deck_box",
+          "accessory_id": "sb1-deck-box-ember-ashrush",
+          "label": "Ashrush Deck Box",
+          "artwork_id": "sb1-deck-box-ember-ashrush-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/ember/ashrush/deck-box/sb1-deck-box-ember-ashrush-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "deck_collection_cosmetic"
+        }
+      ]
+    },
+    {
+      "starter_id": "deck-gale-skyshift",
+      "element": "Gale",
+      "deck_name": "Skyshift",
+      "bundle_id": "sb1-accessory-bundle-gale-skyshift",
+      "grant_policy": "official_starter_deck_includes_once",
+      "shop_policy": "each_unowned_accessory_must_be_obtainable_from_in_game_shop",
+      "accessories": [
+        {
+          "accessory_type": "sleeve_set",
+          "accessory_id": "sb1-sleeves-gale-skyshift",
+          "label": "Skyshift Card Sleeve Set",
+          "artwork_id": "sb1-sleeves-gale-skyshift-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/gale/skyshift/sleeves/sb1-sleeves-gale-skyshift-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "card_back"
+        },
+        {
+          "accessory_type": "battle_coin",
+          "accessory_id": "sb1-battle-coin-gale-skyshift",
+          "label": "Skyshift Battle Coin",
+          "artwork_id": "sb1-battle-coin-gale-skyshift-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/gale/skyshift/battle-coin/sb1-battle-coin-gale-skyshift-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "randomness_effect": false,
+          "visual_role": "coin_toss_cosmetic"
+        },
+        {
+          "accessory_type": "deck_box",
+          "accessory_id": "sb1-deck-box-gale-skyshift",
+          "label": "Skyshift Deck Box",
+          "artwork_id": "sb1-deck-box-gale-skyshift-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/gale/skyshift/deck-box/sb1-deck-box-gale-skyshift-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "deck_collection_cosmetic"
+        }
+      ]
+    },
+    {
+      "starter_id": "deck-grove-wildgrowth",
+      "element": "Grove",
+      "deck_name": "Wildgrowth",
+      "bundle_id": "sb1-accessory-bundle-grove-wildgrowth",
+      "grant_policy": "official_starter_deck_includes_once",
+      "shop_policy": "each_unowned_accessory_must_be_obtainable_from_in_game_shop",
+      "accessories": [
+        {
+          "accessory_type": "sleeve_set",
+          "accessory_id": "sb1-sleeves-grove-wildgrowth",
+          "label": "Wildgrowth Card Sleeve Set",
+          "artwork_id": "sb1-sleeves-grove-wildgrowth-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/grove/wildgrowth/sleeves/sb1-sleeves-grove-wildgrowth-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "card_back"
+        },
+        {
+          "accessory_type": "battle_coin",
+          "accessory_id": "sb1-battle-coin-grove-wildgrowth",
+          "label": "Wildgrowth Battle Coin",
+          "artwork_id": "sb1-battle-coin-grove-wildgrowth-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/grove/wildgrowth/battle-coin/sb1-battle-coin-grove-wildgrowth-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "randomness_effect": false,
+          "visual_role": "coin_toss_cosmetic"
+        },
+        {
+          "accessory_type": "deck_box",
+          "accessory_id": "sb1-deck-box-grove-wildgrowth",
+          "label": "Wildgrowth Deck Box",
+          "artwork_id": "sb1-deck-box-grove-wildgrowth-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/grove/wildgrowth/deck-box/sb1-deck-box-grove-wildgrowth-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "deck_collection_cosmetic"
+        }
+      ]
+    },
+    {
+      "starter_id": "deck-shade-nightbind",
+      "element": "Shade",
+      "deck_name": "Nightbind",
+      "bundle_id": "sb1-accessory-bundle-shade-nightbind",
+      "grant_policy": "official_starter_deck_includes_once",
+      "shop_policy": "each_unowned_accessory_must_be_obtainable_from_in_game_shop",
+      "accessories": [
+        {
+          "accessory_type": "sleeve_set",
+          "accessory_id": "sb1-sleeves-shade-nightbind",
+          "label": "Nightbind Card Sleeve Set",
+          "artwork_id": "sb1-sleeves-shade-nightbind-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/shade/nightbind/sleeves/sb1-sleeves-shade-nightbind-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "card_back"
+        },
+        {
+          "accessory_type": "battle_coin",
+          "accessory_id": "sb1-battle-coin-shade-nightbind",
+          "label": "Nightbind Battle Coin",
+          "artwork_id": "sb1-battle-coin-shade-nightbind-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/shade/nightbind/battle-coin/sb1-battle-coin-shade-nightbind-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "randomness_effect": false,
+          "visual_role": "coin_toss_cosmetic"
+        },
+        {
+          "accessory_type": "deck_box",
+          "accessory_id": "sb1-deck-box-shade-nightbind",
+          "label": "Nightbind Deck Box",
+          "artwork_id": "sb1-deck-box-shade-nightbind-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/shade/nightbind/deck-box/sb1-deck-box-shade-nightbind-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "deck_collection_cosmetic"
+        }
+      ]
+    },
+    {
+      "starter_id": "deck-stone-unbroken",
+      "element": "Stone",
+      "deck_name": "Unbroken",
+      "bundle_id": "sb1-accessory-bundle-stone-unbroken",
+      "grant_policy": "official_starter_deck_includes_once",
+      "shop_policy": "each_unowned_accessory_must_be_obtainable_from_in_game_shop",
+      "accessories": [
+        {
+          "accessory_type": "sleeve_set",
+          "accessory_id": "sb1-sleeves-stone-unbroken",
+          "label": "Unbroken Card Sleeve Set",
+          "artwork_id": "sb1-sleeves-stone-unbroken-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/stone/unbroken/sleeves/sb1-sleeves-stone-unbroken-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "card_back"
+        },
+        {
+          "accessory_type": "battle_coin",
+          "accessory_id": "sb1-battle-coin-stone-unbroken",
+          "label": "Unbroken Battle Coin",
+          "artwork_id": "sb1-battle-coin-stone-unbroken-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/stone/unbroken/battle-coin/sb1-battle-coin-stone-unbroken-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "randomness_effect": false,
+          "visual_role": "coin_toss_cosmetic"
+        },
+        {
+          "accessory_type": "deck_box",
+          "accessory_id": "sb1-deck-box-stone-unbroken",
+          "label": "Unbroken Deck Box",
+          "artwork_id": "sb1-deck-box-stone-unbroken-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/stone/unbroken/deck-box/sb1-deck-box-stone-unbroken-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "deck_collection_cosmetic"
+        }
+      ]
+    },
+    {
+      "starter_id": "deck-tide-deep-current",
+      "element": "Tide",
+      "deck_name": "Deep Current",
+      "bundle_id": "sb1-accessory-bundle-tide-deep-current",
+      "grant_policy": "official_starter_deck_includes_once",
+      "shop_policy": "each_unowned_accessory_must_be_obtainable_from_in_game_shop",
+      "accessories": [
+        {
+          "accessory_type": "sleeve_set",
+          "accessory_id": "sb1-sleeves-tide-deep-current",
+          "label": "Deep Current Card Sleeve Set",
+          "artwork_id": "sb1-sleeves-tide-deep-current-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/tide/deep-current/sleeves/sb1-sleeves-tide-deep-current-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "card_back"
+        },
+        {
+          "accessory_type": "battle_coin",
+          "accessory_id": "sb1-battle-coin-tide-deep-current",
+          "label": "Deep Current Battle Coin",
+          "artwork_id": "sb1-battle-coin-tide-deep-current-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/tide/deep-current/battle-coin/sb1-battle-coin-tide-deep-current-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "randomness_effect": false,
+          "visual_role": "coin_toss_cosmetic"
+        },
+        {
+          "accessory_type": "deck_box",
+          "accessory_id": "sb1-deck-box-tide-deep-current",
+          "label": "Deep Current Deck Box",
+          "artwork_id": "sb1-deck-box-tide-deep-current-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/tide/deep-current/deck-box/sb1-deck-box-tide-deep-current-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "deck_collection_cosmetic"
+        }
+      ]
+    },
+    {
+      "starter_id": "deck-volt-live-wire",
+      "element": "Volt",
+      "deck_name": "Live Wire",
+      "bundle_id": "sb1-accessory-bundle-volt-live-wire",
+      "grant_policy": "official_starter_deck_includes_once",
+      "shop_policy": "each_unowned_accessory_must_be_obtainable_from_in_game_shop",
+      "accessories": [
+        {
+          "accessory_type": "sleeve_set",
+          "accessory_id": "sb1-sleeves-volt-live-wire",
+          "label": "Live Wire Card Sleeve Set",
+          "artwork_id": "sb1-sleeves-volt-live-wire-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/volt/live-wire/sleeves/sb1-sleeves-volt-live-wire-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "card_back"
+        },
+        {
+          "accessory_type": "battle_coin",
+          "accessory_id": "sb1-battle-coin-volt-live-wire",
+          "label": "Live Wire Battle Coin",
+          "artwork_id": "sb1-battle-coin-volt-live-wire-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/volt/live-wire/battle-coin/sb1-battle-coin-volt-live-wire-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "randomness_effect": false,
+          "visual_role": "coin_toss_cosmetic"
+        },
+        {
+          "accessory_type": "deck_box",
+          "accessory_id": "sb1-deck-box-volt-live-wire",
+          "label": "Live Wire Deck Box",
+          "artwork_id": "sb1-deck-box-volt-live-wire-art-v1",
+          "artwork_revision": 1,
+          "asset_path": "assets/tcg/accessories/set-one/volt/live-wire/deck-box/sb1-deck-box-volt-live-wire-art-v1.png",
+          "artwork_status": "missing",
+          "ownership_status": "not_implemented",
+          "shop_state": "required_when_economy_owner_exists",
+          "gameplay_effect": false,
+          "visual_role": "deck_collection_cosmetic"
+        }
+      ]
+    }
+  ]
+}
