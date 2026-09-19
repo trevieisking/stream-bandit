@@ -28,9 +28,10 @@
 - [x] Comettail.
 - [x] Nebulynx.
 - [x] Cometmanta.
-- [ ] Orbitortoise.
-- [ ] Set One Standard/base PNG masters complete: **7/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **7/24 -> 24/24**.
+- [x] Orbitortoise.
+- [ ] Prismowl.
+- [ ] Set One Standard/base PNG masters complete: **8/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **8/24 -> 24/24**.
 - [ ] Final clean backgrounds complete: **0/8 -> 8/8**.
 
 ## Safety
