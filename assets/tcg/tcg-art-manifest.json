@@ -1,5 +1,5 @@
 {
-  "version": "3",
+  "version": "4",
   "authority": "Stream Bandit TCG canonical art manifest",
   "hosting": "repository-relative assets; GitHub Pages and IONOS compatible; no GitHack dependency",
   "policy": {
@@ -19,7 +19,9 @@
       "fairy",
       "underworld"
     ],
-    "runtime_background_rule": "Only clean background masters may be used as runtime CSS backgrounds. Full-screen UI reference compositions remain visual authority only and must never be flattened behind live controls."
+    "runtime_background_rule": "Only clean background masters may be used as runtime CSS backgrounds. Full-screen UI reference compositions remain visual authority only and must never be flattened behind live controls.",
+    "printing_identity_rule": "Gameplay resolves by card_id; collectible ownership/pulls resolve by printing_id; exact media resolves by artwork_id.",
+    "variant_rule": "Rarity, foil/finish and alternate artwork may create multiple collectible printings of the same gameplay card without changing its rules."
   },
   "branding": {
     "primary_key_art": "assets/tcg/branding/eightfold-prismatic-stag-key-art-v1.png",
@@ -60,5 +62,6 @@
     "battle_pass": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
     "shop": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
     "settings": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
-  }
+  },
+  "printing_art_ledger": "assets/tcg/cards/tcg-printing-art-ledger-v1.json"
 }

@@ -88,7 +88,7 @@
 ### Implementation
 
 - [x] **ART-IMPL-01** Inventory current artwork/image assets and existing art metadata.
-- [ ] **ART-IMPL-02** Define/confirm canonical art asset reference field(s) and printing mapping.
+- [x] **ART-IMPL-02** Define/confirm canonical art asset reference field(s) and printing mapping.
 - [ ] **ART-IMPL-03** Wire approved art into the reusable renderer.
 - [x] **ART-IMPL-04** Provide explicit safe development fallback for placeholder/missing art.
 - [x] **ART-IMPL-05** Track release-visible cards with missing/placeholder art until cleared.
@@ -252,3 +252,26 @@ In particular:
 - [x] **ART-ASSET-CI-01** Product head `2f0c884dc66e5a2dfc4c59f08b7217c52027f763` passed TCG Validation #773, Migration Replay #943 and Functional Smoke #969.
 - [ ] **ART-ASSET-HUMAN-01** Human branch-hosted visual check confirms the repo-owned stag/logo and clean runtime backdrop render correctly at 100% and 25% browser zoom.
 - [ ] **CARD-ART-SET-ONE-01** Set One individual card artwork reaches 193/193 approved assets; current intake remains 0/193 until real per-card art is uploaded and approved.
+
+
+### V2.4.39 collectible printing / artwork identity authority
+- [x] **PRINT-IDENTITY-01** Lock the three-level identity chain: `card_id` = gameplay identity, `printing_id` = collectible version, `artwork_id` = exact media asset/revision.
+- [x] **PRINT-IDENTITY-02** Reuse the existing `tcg_card_printings` owner; do not create a competing card/printing authority.
+- [x] **PRINT-IDENTITY-03** Add repository authority `assets/tcg/cards/tcg-printing-art-ledger-v1.json` with deterministic printing/artwork IDs and paths.
+- [x] **PRINT-IDENTITY-04** Seed deterministic Standard/base printing slots for all 193 Set One card identities without falsely claiming artwork exists.
+- [x] **PRINT-IDENTITY-05** Preserve existing rarity tiers: Basic · Rare · Extra Rare · Mythic; rarity is collectible/acquisition metadata and does not alter the card's gameplay identity.
+- [x] **PRINT-IDENTITY-06** Preserve existing finish families: Standard · Shine · Holo · Full-Art Shine · Alt-Art · Signature Mythic; finish/art variants do not alter gameplay identity.
+- [x] **PRINT-IDENTITY-07** Collection ownership distinguishes `printing_id`; battle/runtime rules resolve through `card_id`.
+- [x] **PRINT-IDENTITY-08** Pack, Battle Pass, Shop, reward, promo and event sources must award/reference `printing_id`, never fabricate separate gameplay rules for cosmetic variants.
+- [x] **PRINT-IDENTITY-09** Artwork path contract is set/element/card/edition scoped so browser directories stay maintainable and multiple variants of the same card remain organised.
+- [x] **PRINT-IDENTITY-10** Artwork revisions may increment `artwork_id` without changing `printing_id`; a truly distinct collectible variant receives a new edition/printing ID.
+- [x] **PRINT-IDENTITY-11** New series may introduce genuinely new `card_id` rules/mechanics; print variants inside a series remain cosmetic unless explicitly promoted as new gameplay identities.
+- [ ] **PRINT-IMPL-01** Assign approved per-printing rarity/source/finish metadata as real products/rewards are designed; do not invent these values in advance.
+- [ ] **PRINT-IMPL-02** Upload and approve individual Set One base artwork: 0/193 → 193/193.
+- [ ] **PRINT-IMPL-03** Add optional Shine/Holo/Full-Art/Alt-Art/Signature printings only when their artwork/reward source is actually approved.
+- [ ] **PRINT-IMPL-04** Bind Collection to owned `printing_id` records and display artwork/finish/rarity from printing metadata.
+- [ ] **PRINT-IMPL-05** Bind pack opening to canonical pack pools that award exact `printing_id` values.
+- [ ] **PRINT-IMPL-06** Bind Battle Pass/Shop/reward grants to the same printing owner after their canonical progression/economy owners are proven.
+- [ ] **CREATURE-TAXONOMY-01** Define/approve reusable creature-type taxonomy separately from printing cosmetics; artwork/rarity/finish must never masquerade as gameplay creature type.
+- [x] **PRINT-HUMAN-01** Human visual review on 2026-09-19 accepts the repo-owned TCG logo/topbar branding.
+- [ ] **BACKGROUND-HUMAN-01** Current clean realm backdrop remains a temporary runtime fallback; final background-only artwork is still outstanding and must not be confused with the locked full-screen UI reference compositions.
