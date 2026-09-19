@@ -1,0 +1,53 @@
+{
+  "version": "2",
+  "authority": "Stream Bandit TCG canonical art manifest",
+  "hosting": "repository-relative assets; GitHub Pages and IONOS compatible; no GitHack dependency",
+  "policy": {
+    "preserve_original_bytes": true,
+    "ui_reference_rule": "Full-screen UI compositions are locked visual references for rebuilding interactive DOM/CSS. They are not flattened interactive runtime screens.",
+    "launch_elements": [
+      "astral",
+      "ember",
+      "gale",
+      "grove",
+      "shade",
+      "stone",
+      "tide",
+      "volt"
+    ],
+    "future_concepts": [
+      "fairy",
+      "underworld"
+    ]
+  },
+  "branding": {
+    "primary_key_art": "assets/tcg/branding/eightfold-prismatic-stag-key-art-v1.png",
+    "legacy_logo": "assets/tcg/branding/stream-bandit-tcg-logo-v1.webp",
+    "legacy_topbar_emblem": "assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp"
+  },
+  "showcases": {
+    "launch": {
+      "astral": "assets/tcg/showcases/launch/astral-second-sky-starter-showcase-v1.png",
+      "ember": "assets/tcg/showcases/launch/ember-ashrush-starter-showcase-v1.png",
+      "gale": "assets/tcg/showcases/launch/gale-skyshift-starter-showcase-v1.png",
+      "grove": "assets/tcg/showcases/launch/grove-wildgrowth-starter-showcase-v1.png",
+      "shade": "assets/tcg/showcases/launch/shade-nightbind-starter-showcase-v1.png",
+      "stone": "assets/tcg/showcases/launch/stone-unbroken-starter-showcase-v1.png",
+      "tide": "assets/tcg/showcases/launch/tide-deep-current-starter-showcase-v1.png",
+      "volt": "assets/tcg/showcases/launch/volt-live-wire-starter-showcase-v1.png"
+    },
+    "future": {
+      "fairy": "assets/tcg/showcases/future/fairy-glimmerwish-starter-showcase-v1.png",
+      "underworld": "assets/tcg/showcases/future/underworld-grave-pact-starter-showcase-v1.png"
+    }
+  },
+  "ui_reference": {
+    "play": "assets/tcg/ui/reference/play-client-reference-v1.png",
+    "battle": "assets/tcg/ui/reference/battle-client-reference-v1.png",
+    "decks": "assets/tcg/ui/reference/decks-client-reference-v1.png",
+    "collection": "assets/tcg/ui/reference/collection-client-reference-v1.png",
+    "battle_pass": "assets/tcg/ui/reference/battle-pass-client-reference-v1.png",
+    "shop": "assets/tcg/ui/reference/shop-client-reference-v1.png",
+    "settings": "assets/tcg/ui/reference/settings-client-reference-v1.png"
+  }
+}
