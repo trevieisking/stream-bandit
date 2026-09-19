@@ -103,3 +103,14 @@ test('human visual pass 2 compacts the rail and contains Play, Battle Pass and S
   assert.ok(product.includes('.tcg-product-reward{height:100%;max-height:100%;min-height:0;overflow:hidden'));
   assert.ok(product.includes('.tcg-product-shop-tile .tcg-product-showcase{width:100%;height:100%;object-fit:contain'));
 });
+
+test('human visual pass 3 gives Active Battle priority over empty Game Info space',async()=>{
+  const product=await read('stream-bandit-tcg-product-presentation-v2-4-46.css');
+  assert.ok(product.includes('V2.4.49 human visual pass 3: prioritize Active Battle and remove empty Game Info space.'));
+  assert.ok(product.includes('grid-template-rows:minmax(0,1.45fr) minmax(0,.72fr) minmax(0,.83fr)'));
+  assert.ok(product.includes('.tcg-side-stack>.tcg-frame:first-child .tcg-product-mini-art'));
+  assert.ok(product.includes('width:58px;'));
+  assert.ok(product.includes('height:80px;'));
+  assert.ok(product.includes('.tcg-side-stack>.tcg-frame:nth-child(3) .tcg-list'));
+  assert.ok(product.includes('line-height:1.28;'));
+});
