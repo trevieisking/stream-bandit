@@ -90,7 +90,7 @@
   "card_art_batches": {
     "set_code": "SB1",
     "total_card_identities": 193,
-    "total_base_art_approved": 10,
+    "total_base_art_approved": 11,
     "first_batch": {
       "id": "SB1-ASTRAL-CREATURES-01",
       "element": "Astral",
@@ -194,7 +194,7 @@
         "rarity_assignment_status": "unassigned_pending_content_approval",
         "finish": "standard",
         "status": "production_blueprint_complete_art_missing",
-        "approved_art_count": 10,
+        "approved_art_count": 11,
         "design_language": "Deep indigo/cosmic-blue Astral palette; luminous starlight, orbit lines, constellations and dreamlike depth. Evolution lines must visibly read as the same lineage. Keep silhouettes distinct at compact card size.",
         "cards": [
           {
@@ -283,7 +283,7 @@
             "artwork_id": "sb1-astral-celestyr-dream-cartographer-standard-art-v1",
             "target_path": "assets/tcg/cards/set-one/astral/astral-celestyr-dream-cartographer/standard/sb1-astral-celestyr-dream-cartographer-standard-art-v1.png",
             "brief": "Mythic dream cartographer framed by living constellation maps, horizon folds and time-bending star paths; premium focal composition with unmistakable mythic presence, without baking rarity text into the raw art.",
-            "artwork_status": "missing"
+            "artwork_status": "approved"
           }
         ]
       },
@@ -2265,7 +2265,7 @@
     "counts_by_element": {
       "Astral": {
         "blueprint_ready": 24,
-        "approved_art": 10,
+        "approved_art": 11,
         "target": 24
       },
       "Ember": {
@@ -2312,7 +2312,7 @@
     "counts_by_family": {
       "Creature": {
         "blueprint_ready": 89,
-        "approved_art": 10,
+        "approved_art": 11,
         "target": 89
       },
       "Essence": {
