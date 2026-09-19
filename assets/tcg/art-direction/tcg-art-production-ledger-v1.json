@@ -90,7 +90,7 @@
   "card_art_batches": {
     "set_code": "SB1",
     "total_card_identities": 193,
-    "total_base_art_approved": 5,
+    "total_base_art_approved": 6,
     "first_batch": {
       "id": "SB1-ASTRAL-CREATURES-01",
       "element": "Astral",
@@ -243,7 +243,7 @@
             "artwork_id": "sb1-astral-nebulynx-standard-art-v1",
             "target_path": "assets/tcg/cards/set-one/astral/astral-nebulynx/standard/sb1-astral-nebulynx-standard-art-v1.png",
             "brief": "Adult cosmic lynx; nebula-textured mane/fur, starfield eyes and a strong feline silhouette; should visually combine lunar secrecy, reward awareness and starfall power.",
-            "artwork_status": "missing"
+            "artwork_status": "approved"
           },
           {
             "card_id": "astral-cometmanta",
