@@ -61,9 +61,27 @@
 - [x] Lock first preview deck identity to **Astral — Second Sky**.
 - [x] Lock **Set One (SB1)** as **Battle Pass Season 1** identity.
 - [x] Reach Astral Standard/base artwork **24/24**.
-- [ ] Confirm the existing Second Sky 60-card starter recipe remains valid at the preview head.
+- [x] Confirm the existing Second Sky 60-card starter recipe remains valid at the preview head (60 cards / 21 identities).
 - [ ] Produce/verify Second Sky sleeve, battle coin and deck-box art for the product preview.
-- [ ] Build a branch-only Shop preview using real approved Second Sky assets.
-- [ ] Build a branch-only **Set One — Season 1** Battle Pass preview using real Set One assets.
+- [x] Build a branch-only Shop preview using real approved Second Sky assets.
+- [x] Build a branch-only **Set One — Season 1** Battle Pass preview using real Set One assets.
 - [ ] Keep purchase, price, currency, entitlement, reward-grant and progression values gated to canonical economy/Battle Pass owners.
 - [ ] Do not imply that the Battle Pass automatically grants all 193 Set One cards.
+
+## Second Sky runtime/presentation integration
+- [x] Shared runtime art resolver reads canonical production-ledger target paths.
+- [x] Astral 24/24 printing/intake metadata is synchronized to canonical Standard artwork paths.
+- [x] Second Sky exact 60-card / 21-identity recipe is presentation authority.
+- [x] Game Home preview wired.
+- [x] Play preview wired without replacing server-owned deck selection/matchmaking.
+- [x] Decks exact-recipe preview wired without browser deck mutation.
+- [x] Collection Astral 24-card visual preview wired without ownership inference.
+- [x] Shop featured Second Sky preview wired with purchase disabled.
+- [x] Battle Pass Set One — Season 1 visual preview wired with tiers/rewards unassigned.
+- [x] Existing battle renderer receives approved Astral art through the shared art resolver.
+- [x] Product presentation is driven by an extensible starter-id registry rather than card/deck-specific page branches.
+- [ ] Produce/verify Second Sky Card Sleeve Set artwork.
+- [ ] Produce/verify Second Sky Battle Coin artwork.
+- [ ] Produce/verify Second Sky Deck Box artwork.
+- [ ] Human visual acceptance of Second Sky surfaces.
+- [ ] Main/Pages/live release only after inherited end-to-end release gates.
