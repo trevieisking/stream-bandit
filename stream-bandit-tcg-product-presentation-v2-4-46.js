@@ -180,7 +180,7 @@ function mountShop(){
 }
 function mountBattlePass(){
   const state=document.querySelector('.tcg-state');
-  if(state){const season=model.presentation&&model.presentation.battle_pass||{};state.innerHTML='<strong>'+esc(season.display_name||'Set One — Season 1')+'</strong><br>Visual presentation preview is active. Tier assignments, progression values and entitlements remain unpublished and server-owned.';
+  if(state){const season=model.presentation&&model.presentation.battle_pass||{};state.innerHTML='<strong>'+esc(season.display_name||'Set One — Season 1')+'</strong><br>Visual presentation preview is active. Tier assignments, progression values and entitlements remain unpublished and server-owned.';}
   const topGrid=document.querySelector('.tcg-grid');
   if(topGrid&&!topGrid.querySelector('[data-sb-featured-starter]')){
     const status=topGrid.querySelector('.tcg-frame');
@@ -206,7 +206,7 @@ function mountBattlePass(){
 }
 function mount(){
   if(!model||!model.complete)return;
-  document.documentElement.dataset.sbTcgProductPresentation='second-sky-v1';
+  document.documentElement.dataset.sbTcgProductPresentation='featured-starter-v1';
   const page=String(document.body&&document.body.dataset.sbTcgPage||'');
   if(page==='home')mountHome();
   else if(page==='play')mountPlay();
