@@ -90,7 +90,7 @@
   "card_art_batches": {
     "set_code": "SB1",
     "total_card_identities": 193,
-    "total_base_art_approved": 17,
+    "total_base_art_approved": 18,
     "first_batch": {
       "id": "SB1-ASTRAL-CREATURES-01",
       "element": "Astral",
@@ -346,7 +346,7 @@
         "rarity_assignment_status": "unassigned_pending_content_approval",
         "finish": "standard",
         "status": "production_blueprint_complete_art_missing",
-        "approved_art_count": 2,
+        "approved_art_count": 3,
         "design_language": "Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes.",
         "cards": [
           {
@@ -373,7 +373,7 @@
             "printing_id": "sb1-astral-future-draw-standard",
             "artwork_id": "sb1-astral-future-draw-standard-art-v1",
             "target_path": "assets/tcg/cards/set-one/astral/astral-future-draw/standard/sb1-astral-future-draw-standard-art-v1.png",
-            "artwork_status": "missing",
+            "artwork_status": "approved",
             "brief": "Future Draw: Astral Tactic artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
           },
           {
@@ -2265,7 +2265,7 @@
     "counts_by_element": {
       "Astral": {
         "blueprint_ready": 24,
-        "approved_art": 17,
+        "approved_art": 18,
         "target": 24
       },
       "Ember": {
@@ -2322,7 +2322,7 @@
       },
       "Tactic": {
         "blueprint_ready": 72,
-        "approved_art": 2,
+        "approved_art": 3,
         "target": 72
       }
     },
