@@ -263,3 +263,20 @@ main.tcg-page{gap:7px}
   .tcg-client-nav a{padding:3px 1px 5px;font-size:9px}
   .tcg-client-nav a::before{font-size:18px}
 }
+
+
+/* V2.4.48 human visual pass 2: compact the top rail to the brand-card height without clipping controls. */
+.tcg-client{grid-template-rows:84px minmax(0,1fr)}
+.tcg-client-topbar{height:84px;overflow:visible}
+.tcg-client-brand img{width:70px;height:70px}
+.tcg-client-nav{height:72px;align-self:center;overflow:visible}
+.tcg-client-nav a{gap:1px;padding:4px 2px 5px;font-size:clamp(9px,.85vw,12px);line-height:1}
+.tcg-client-nav a::before{font-size:clamp(18px,1.65vw,24px);line-height:1}
+@media(max-height:760px){
+  .tcg-client{grid-template-rows:70px minmax(0,1fr)}
+  .tcg-client-topbar{height:70px}
+  .tcg-client-brand img{width:56px;height:56px}
+  .tcg-client-nav{height:60px}
+  .tcg-client-nav a{padding:2px 1px 4px;font-size:8px}
+  .tcg-client-nav a::before{font-size:17px}
+}
