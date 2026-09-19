@@ -90,7 +90,7 @@
   "card_art_batches": {
     "set_code": "SB1",
     "total_card_identities": 193,
-    "total_base_art_approved": 6,
+    "total_base_art_approved": 7,
     "first_batch": {
       "id": "SB1-ASTRAL-CREATURES-01",
       "element": "Astral",
@@ -251,7 +251,7 @@
             "artwork_id": "sb1-astral-cometmanta-standard-art-v1",
             "target_path": "assets/tcg/cards/set-one/astral/astral-cometmanta/standard/sb1-astral-cometmanta-standard-art-v1.png",
             "brief": "Standalone celestial manta gliding through high-altitude starlight; broad readable wings, comet wake and passing-orbit motion; pack-only identity should feel special without changing gameplay.",
-            "artwork_status": "missing"
+            "artwork_status": "approved"
           },
           {
             "card_id": "astral-orbitortoise",
