@@ -19,9 +19,9 @@
 - [x] Orbitail canonical PNG verified.
 - [x] Cosmarch canonical PNG verified.
 - [x] Moonbit canonical PNG verified.
-- [ ] Comettail canonical PNG verified.
-- [ ] Set One Standard/base PNG masters complete: **4/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **4/24 -> 24/24**.
+- [x] Comettail canonical PNG verified.
+- [ ] Set One Standard/base PNG masters complete: **5/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **5/24 -> 24/24**.
 - [ ] Final clean background masters complete: **0/8 -> 8/8**.
 
 ## Blueprint coverage retained
