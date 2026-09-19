@@ -1,9 +1,9 @@
 {
   "schema": "stream-bandit-tcg-art-production-ledger-v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "recorded_at": "2026-09-19",
   "authority": "Stream Bandit TCG background and card-art production blueprint",
-  "source_checkpoint": "PR #576 V2.4.41 accepted head 85fe3cc6f289bc4bfa6d8d0cdeb5cdfbb2eef4f2",
+  "source_checkpoint": "PR #576 V2.4.42 accepted head 661cc6f13695c70fde95c9cd744f897a21111973",
   "identity_chain": "card_id -> printing_id -> artwork_id",
   "production_rules": {
     "repository_owned_assets": true,
@@ -178,6 +178,2154 @@
           "brief": "Mythic dream cartographer framed by living constellation maps, horizon folds and time-bending star paths; premium focal composition with unmistakable mythic presence, without baking rarity text into the raw art."
         }
       ]
-    }
+    },
+    "total_batches": 25,
+    "blueprint_batches_complete": 25,
+    "production_ready_card_count": 193,
+    "set_one_blueprint_complete": true,
+    "actual_art_completion": false,
+    "batch_order": [
+      {
+        "sequence": 1,
+        "id": "SB1-ASTRAL-CREATURES-01",
+        "element": "Astral",
+        "card_family": "Creature",
+        "count": 11,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Deep indigo/cosmic-blue Astral palette; luminous starlight, orbit lines, constellations and dreamlike depth. Evolution lines must visibly read as the same lineage. Keep silhouettes distinct at compact card size.",
+        "cards": [
+          {
+            "card_id": "astral-stardot",
+            "printing_id": "sb1-astral-stardot-standard",
+            "artwork_id": "sb1-astral-stardot-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-stardot/standard/sb1-astral-stardot-standard-art-v1.png",
+            "brief": "Tiny youthful astral scout with a bright star-core and sparse orbital dust; curious, light-footed, simple silhouette; establish the Stardot -> Orbitail -> Cosmarch lineage.",
+            "artwork_status": "missing"
+          },
+          {
+            "card_id": "astral-orbitail",
+            "printing_id": "sb1-astral-orbitail-standard",
+            "artwork_id": "sb1-astral-orbitail-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-orbitail/standard/sb1-astral-orbitail-standard-art-v1.png",
+            "brief": "Teen evolution of Stardot; same recognizable core features, longer orbit-tracing tail/ribbons and controlled celestial motion; visual emphasis on prediction and ordered paths.",
+            "artwork_status": "missing"
+          },
+          {
+            "card_id": "astral-cosmarch",
+            "printing_id": "sb1-astral-cosmarch-standard",
+            "artwork_id": "sb1-astral-cosmarch-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-cosmarch/standard/sb1-astral-cosmarch-standard-art-v1.png",
+            "brief": "Adult culmination of the Stardot line; confident constellation navigator with broad orbital geometry and chart-like star markings; powerful but elegant, future-reading theme.",
+            "artwork_status": "missing"
+          },
+          {
+            "card_id": "astral-moonbit",
+            "printing_id": "sb1-astral-moonbit-standard",
+            "artwork_id": "sb1-astral-moonbit-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-moonbit/standard/sb1-astral-moonbit-standard-art-v1.png",
+            "brief": "Small lunar creature with crescent highlights and soft moon-glow; observant pose and secret/reward-glimpse mood; establish the Moonbit -> Comettail -> Nebulynx lineage.",
+            "artwork_status": "missing"
+          },
+          {
+            "card_id": "astral-comettail",
+            "printing_id": "sb1-astral-comettail-standard",
+            "artwork_id": "sb1-astral-comettail-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-comettail/standard/sb1-astral-comettail-standard-art-v1.png",
+            "brief": "Teen evolution of Moonbit; clearly related face/body language, now with a luminous comet tail and sweeping reward-arc motion; more agile and confident.",
+            "artwork_status": "missing"
+          },
+          {
+            "card_id": "astral-nebulynx",
+            "printing_id": "sb1-astral-nebulynx-standard",
+            "artwork_id": "sb1-astral-nebulynx-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-nebulynx/standard/sb1-astral-nebulynx-standard-art-v1.png",
+            "brief": "Adult cosmic lynx; nebula-textured mane/fur, starfield eyes and a strong feline silhouette; should visually combine lunar secrecy, reward awareness and starfall power.",
+            "artwork_status": "missing"
+          },
+          {
+            "card_id": "astral-cometmanta",
+            "printing_id": "sb1-astral-cometmanta-standard",
+            "artwork_id": "sb1-astral-cometmanta-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-cometmanta/standard/sb1-astral-cometmanta-standard-art-v1.png",
+            "brief": "Standalone celestial manta gliding through high-altitude starlight; broad readable wings, comet wake and passing-orbit motion; pack-only identity should feel special without changing gameplay.",
+            "artwork_status": "missing"
+          },
+          {
+            "card_id": "astral-orbitortoise",
+            "printing_id": "sb1-astral-orbitortoise-standard",
+            "artwork_id": "sb1-astral-orbitortoise-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-orbitortoise/standard/sb1-astral-orbitortoise-standard-art-v1.png",
+            "brief": "Standalone astral tortoise with an orbital-ring shell and gravity-field glow; sturdy central silhouette, defensive forecast/shield visual language.",
+            "artwork_status": "missing"
+          },
+          {
+            "card_id": "astral-prismowl",
+            "printing_id": "sb1-astral-prismowl-standard",
+            "artwork_id": "sb1-astral-prismowl-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-prismowl/standard/sb1-astral-prismowl-standard-art-v1.png",
+            "brief": "Prismatic owl with oversized luminous eyes refracting hidden starlight; clean wing silhouette and spectral highlights; insight/observation is the visual story.",
+            "artwork_status": "missing"
+          },
+          {
+            "card_id": "astral-starwhale",
+            "printing_id": "sb1-astral-starwhale-standard",
+            "artwork_id": "sb1-astral-starwhale-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-starwhale/standard/sb1-astral-starwhale-standard-art-v1.png",
+            "brief": "Massive starfield whale swimming through a cosmic current; gravitational wake, calm scale and deep-space grandeur; readable silhouette even when cropped small.",
+            "artwork_status": "missing"
+          },
+          {
+            "card_id": "astral-celestyr-dream-cartographer",
+            "printing_id": "sb1-astral-celestyr-dream-cartographer-standard",
+            "artwork_id": "sb1-astral-celestyr-dream-cartographer-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-celestyr-dream-cartographer/standard/sb1-astral-celestyr-dream-cartographer-standard-art-v1.png",
+            "brief": "Mythic dream cartographer framed by living constellation maps, horizon folds and time-bending star paths; premium focal composition with unmistakable mythic presence, without baking rarity text into the raw art.",
+            "artwork_status": "missing"
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "id": "SB1-ASTRAL-ESSENCE-01",
+        "element": "Astral",
+        "card_family": "Essence",
+        "count": 4,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes.",
+        "cards": [
+          {
+            "card_id": "astral-basic-astral-essence",
+            "card_name": "Basic Astral Essence",
+            "printing_id": "sb1-astral-basic-astral-essence-standard",
+            "artwork_id": "sb1-astral-basic-astral-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-basic-astral-essence/standard/sb1-astral-basic-astral-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Basic Astral Essence: clean Astral Essence artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-star-essence",
+            "card_name": "Star Essence",
+            "printing_id": "sb1-astral-star-essence-standard",
+            "artwork_id": "sb1-astral-star-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-star-essence/standard/sb1-astral-star-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Star Essence: clean Astral Essence artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-orbit-essence",
+            "card_name": "Orbit Essence",
+            "printing_id": "sb1-astral-orbit-essence-standard",
+            "artwork_id": "sb1-astral-orbit-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-orbit-essence/standard/sb1-astral-orbit-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Orbit Essence: clean Astral Essence artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-nova-essence",
+            "card_name": "Nova Essence",
+            "printing_id": "sb1-astral-nova-essence-standard",
+            "artwork_id": "sb1-astral-nova-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-nova-essence/standard/sb1-astral-nova-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Nova Essence: clean Astral Essence artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "id": "SB1-ASTRAL-TACTICS-01",
+        "element": "Astral",
+        "card_family": "Tactic",
+        "count": 9,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes.",
+        "cards": [
+          {
+            "card_id": "astral-archivist-sol",
+            "card_name": "Archivist Sol",
+            "printing_id": "sb1-astral-archivist-sol-standard",
+            "artwork_id": "sb1-astral-archivist-sol-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-archivist-sol/standard/sb1-astral-archivist-sol-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Archivist Sol: Astral Tactic artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-cartographer-lyra",
+            "card_name": "Cartographer Lyra",
+            "printing_id": "sb1-astral-cartographer-lyra-standard",
+            "artwork_id": "sb1-astral-cartographer-lyra-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-cartographer-lyra/standard/sb1-astral-cartographer-lyra-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Cartographer Lyra: Astral Tactic artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-future-draw",
+            "card_name": "Future Draw",
+            "printing_id": "sb1-astral-future-draw-standard",
+            "artwork_id": "sb1-astral-future-draw-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-future-draw/standard/sb1-astral-future-draw-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Future Draw: Astral Tactic artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-gravity-shift",
+            "card_name": "Gravity Shift",
+            "printing_id": "sb1-astral-gravity-shift-standard",
+            "artwork_id": "sb1-astral-gravity-shift-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-gravity-shift/standard/sb1-astral-gravity-shift-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Gravity Shift: Astral Tactic artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-star-chart",
+            "card_name": "Star Chart",
+            "printing_id": "sb1-astral-star-chart-standard",
+            "artwork_id": "sb1-astral-star-chart-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-star-chart/standard/sb1-astral-star-chart-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Star Chart: Astral Tactic artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-celestial-observatory",
+            "card_name": "Celestial Observatory",
+            "printing_id": "sb1-astral-celestial-observatory-standard",
+            "artwork_id": "sb1-astral-celestial-observatory-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-celestial-observatory/standard/sb1-astral-celestial-observatory-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Celestial Observatory: Astral Tactic artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-dreamglass",
+            "card_name": "Dreamglass",
+            "printing_id": "sb1-astral-dreamglass-standard",
+            "artwork_id": "sb1-astral-dreamglass-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-dreamglass/standard/sb1-astral-dreamglass-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Dreamglass: Astral Tactic artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-orbit-ring",
+            "card_name": "Orbit Ring",
+            "printing_id": "sb1-astral-orbit-ring-standard",
+            "artwork_id": "sb1-astral-orbit-ring-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-orbit-ring/standard/sb1-astral-orbit-ring-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Orbit Ring: Astral Tactic artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "astral-parallax-window",
+            "card_name": "Parallax Window",
+            "printing_id": "sb1-astral-parallax-window-standard",
+            "artwork_id": "sb1-astral-parallax-window-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/astral/astral-parallax-window/standard/sb1-astral-parallax-window-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Parallax Window: Astral Tactic artwork. Deep indigo/cosmic-blue palette; luminous starlight, orbit geometry, constellations and dreamlike depth. Elegant celestial motion with strong compact silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "id": "SB1-EMBER-CREATURES-01",
+        "element": "Ember",
+        "card_family": "Creature",
+        "count": 11,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter.",
+        "cards": [
+          {
+            "card_id": "ember-glowcub",
+            "card_name": "Glowcub",
+            "printing_id": "sb1-ember-glowcub-standard",
+            "artwork_id": "sb1-ember-glowcub-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-glowcub/standard/sb1-ember-glowcub-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Glowcub: Baby Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Establish a distinct, reusable silhouette. Ability-name cue: Warm Blood. Attack-name motion cues: Spark Pounce. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-bristleflare",
+            "card_name": "Bristleflare",
+            "printing_id": "sb1-ember-bristleflare-standard",
+            "artwork_id": "sb1-ember-bristleflare-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-bristleflare/standard/sb1-ember-bristleflare-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Bristleflare: Teen Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Preserve recognizable lineage motifs from glowcub while advancing the form. Ability-name cue: Heat Up. Attack-name motion cues: Ember Claw / Reckless Rush. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-furnacefang",
+            "card_name": "Furnacefang",
+            "printing_id": "sb1-ember-furnacefang-standard",
+            "artwork_id": "sb1-ember-furnacefang-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-furnacefang/standard/sb1-ember-furnacefang-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Furnacefang: Adult Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Preserve recognizable lineage motifs from bristleflare while advancing the form. Ability-name cue: Controlled Burn. Attack-name motion cues: Furnace Bite / Meltline Charge. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-coalfinch",
+            "card_name": "Coalfinch",
+            "printing_id": "sb1-ember-coalfinch-standard",
+            "artwork_id": "sb1-ember-coalfinch-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-coalfinch/standard/sb1-ember-coalfinch-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Coalfinch: Baby Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Establish a distinct, reusable silhouette. Ability-name cue: Cinder Lift. Attack-name motion cues: Cinder Peck. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-sootwing",
+            "card_name": "Sootwing",
+            "printing_id": "sb1-ember-sootwing-standard",
+            "artwork_id": "sb1-ember-sootwing-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-sootwing/standard/sb1-ember-sootwing-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Sootwing: Teen Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Preserve recognizable lineage motifs from coalfinch while advancing the form. Ability-name cue: Soot Glide. Attack-name motion cues: Soot Dive / Flash Wing. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-cindercrest",
+            "card_name": "Cindercrest",
+            "printing_id": "sb1-ember-cindercrest-standard",
+            "artwork_id": "sb1-ember-cindercrest-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-cindercrest/standard/sb1-ember-cindercrest-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Cindercrest: Adult Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Preserve recognizable lineage motifs from sootwing while advancing the form. Ability-name cue: Ash Mark. Attack-name motion cues: Fireline Sweep / Cinder Spiral. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-ashcobra",
+            "card_name": "Ashcobra",
+            "printing_id": "sb1-ember-ashcobra-standard",
+            "artwork_id": "sb1-ember-ashcobra-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-ashcobra/standard/sb1-ember-ashcobra-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Ashcobra: Standalone Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Establish a distinct, reusable silhouette. Ability-name cue: Ash Scent. Attack-name motion cues: Coal Fang / Ashcoil. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-kilnback",
+            "card_name": "Kilnback",
+            "printing_id": "sb1-ember-kilnback-standard",
+            "artwork_id": "sb1-ember-kilnback-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-kilnback/standard/sb1-ember-kilnback-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Kilnback: Standalone Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Establish a distinct, reusable silhouette. Ability-name cue: Furnace Hide. Attack-name motion cues: Kiln Ram / Overheat. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-magmagecko",
+            "card_name": "Magmagecko",
+            "printing_id": "sb1-ember-magmagecko-standard",
+            "artwork_id": "sb1-ember-magmagecko-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-magmagecko/standard/sb1-ember-magmagecko-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Magmagecko: Standalone Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Establish a distinct, reusable silhouette. Ability-name cue: Ember Feed. Attack-name motion cues: Lava Flick. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-cinderburrow",
+            "card_name": "Cinderburrow",
+            "printing_id": "sb1-ember-cinderburrow-standard",
+            "artwork_id": "sb1-ember-cinderburrow-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-cinderburrow/standard/sb1-ember-cinderburrow-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Cinderburrow: Standalone Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Establish a distinct, reusable silhouette. Ability-name cue: Ash Tunnel. Attack-name motion cues: Burrow Burst. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-pyrohorn-ash-crown",
+            "card_name": "Pyrohorn — Ash Crown",
+            "printing_id": "sb1-ember-pyrohorn-ash-crown-standard",
+            "artwork_id": "sb1-ember-pyrohorn-ash-crown-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-pyrohorn-ash-crown/standard/sb1-ember-pyrohorn-ash-crown-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Pyrohorn — Ash Crown: Standalone Ember Creature. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Establish a distinct, reusable silhouette. Ability-name cue: Ash Crown. Attack-name motion cues: Crownfire / Ashen Stampede. Give it premium mythic presence without baking rarity text into the art. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "id": "SB1-EMBER-ESSENCE-01",
+        "element": "Ember",
+        "card_family": "Essence",
+        "count": 4,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter.",
+        "cards": [
+          {
+            "card_id": "ember-basic-ember-essence",
+            "card_name": "Basic Ember Essence",
+            "printing_id": "sb1-ember-basic-ember-essence-standard",
+            "artwork_id": "sb1-ember-basic-ember-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-basic-ember-essence/standard/sb1-ember-basic-ember-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Basic Ember Essence: clean Ember Essence artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-hearth-essence",
+            "card_name": "Hearth Essence",
+            "printing_id": "sb1-ember-hearth-essence-standard",
+            "artwork_id": "sb1-ember-hearth-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-hearth-essence/standard/sb1-ember-hearth-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Hearth Essence: clean Ember Essence artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-smolder-essence",
+            "card_name": "Smolder Essence",
+            "printing_id": "sb1-ember-smolder-essence-standard",
+            "artwork_id": "sb1-ember-smolder-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-smolder-essence/standard/sb1-ember-smolder-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Smolder Essence: clean Ember Essence artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-wildfire-essence",
+            "card_name": "Wildfire Essence",
+            "printing_id": "sb1-ember-wildfire-essence-standard",
+            "artwork_id": "sb1-ember-wildfire-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-wildfire-essence/standard/sb1-ember-wildfire-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Wildfire Essence: clean Ember Essence artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "id": "SB1-EMBER-TACTICS-01",
+        "element": "Ember",
+        "card_family": "Tactic",
+        "count": 9,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter.",
+        "cards": [
+          {
+            "card_id": "ember-ashen-gamble",
+            "card_name": "Ashen Gamble",
+            "printing_id": "sb1-ember-ashen-gamble-standard",
+            "artwork_id": "sb1-ember-ashen-gamble-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-ashen-gamble/standard/sb1-ember-ashen-gamble-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Ashen Gamble: Ember Tactic artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-cinder-charm",
+            "card_name": "Cinder Charm",
+            "printing_id": "sb1-ember-cinder-charm-standard",
+            "artwork_id": "sb1-ember-cinder-charm-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-cinder-charm/standard/sb1-ember-cinder-charm-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Cinder Charm: Ember Tactic artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-ember-salve",
+            "card_name": "Ember Salve",
+            "printing_id": "sb1-ember-ember-salve-standard",
+            "artwork_id": "sb1-ember-ember-salve-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-ember-salve/standard/sb1-ember-ember-salve-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Ember Salve: Ember Tactic artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-flash-forge",
+            "card_name": "Flash Forge",
+            "printing_id": "sb1-ember-flash-forge-standard",
+            "artwork_id": "sb1-ember-flash-forge-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-flash-forge/standard/sb1-ember-flash-forge-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Flash Forge: Ember Tactic artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-forgekeeper-bram",
+            "card_name": "Forgekeeper Bram",
+            "printing_id": "sb1-ember-forgekeeper-bram-standard",
+            "artwork_id": "sb1-ember-forgekeeper-bram-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-forgekeeper-bram/standard/sb1-ember-forgekeeper-bram-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Forgekeeper Bram: Ember Tactic artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-heatguard-bracer",
+            "card_name": "Heatguard Bracer",
+            "printing_id": "sb1-ember-heatguard-bracer-standard",
+            "artwork_id": "sb1-ember-heatguard-bracer-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-heatguard-bracer/standard/sb1-ember-heatguard-bracer-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Heatguard Bracer: Ember Tactic artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-kindling-cache",
+            "card_name": "Kindling Cache",
+            "printing_id": "sb1-ember-kindling-cache-standard",
+            "artwork_id": "sb1-ember-kindling-cache-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-kindling-cache/standard/sb1-ember-kindling-cache-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Kindling Cache: Ember Tactic artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-rhea-ashrunner",
+            "card_name": "Rhea Ashrunner",
+            "printing_id": "sb1-ember-rhea-ashrunner-standard",
+            "artwork_id": "sb1-ember-rhea-ashrunner-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-rhea-ashrunner/standard/sb1-ember-rhea-ashrunner-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Rhea Ashrunner: Ember Tactic artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "ember-volcanic-caldera",
+            "card_name": "Volcanic Caldera",
+            "printing_id": "sb1-ember-volcanic-caldera-standard",
+            "artwork_id": "sb1-ember-volcanic-caldera-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/ember/ember-volcanic-caldera/standard/sb1-ember-volcanic-caldera-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Volcanic Caldera: Ember Tactic artwork. Charcoal and molten-orange palette; ember sparks, forge glow, flame ribbons and heat-haze motion. Energetic silhouettes without visual clutter. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "id": "SB1-GALE-CREATURES-01",
+        "element": "Gale",
+        "card_family": "Creature",
+        "count": 11,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction.",
+        "cards": [
+          {
+            "card_id": "gale-driftlet",
+            "card_name": "Driftlet",
+            "printing_id": "sb1-gale-driftlet-standard",
+            "artwork_id": "sb1-gale-driftlet-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-driftlet/standard/sb1-gale-driftlet-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Driftlet: Baby Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Establish a distinct, reusable silhouette. Ability-name cue: Rising Draft. Attack-name motion cues: Puff Strike. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-skyweaver",
+            "card_name": "Skyweaver",
+            "printing_id": "sb1-gale-skyweaver-standard",
+            "artwork_id": "sb1-gale-skyweaver-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-skyweaver/standard/sb1-gale-skyweaver-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Skyweaver: Teen Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Preserve recognizable lineage motifs from driftlet while advancing the form. Ability-name cue: Crosswind. Attack-name motion cues: Crosswind Cut / Lift Away. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-tempestalon",
+            "card_name": "Tempestalon",
+            "printing_id": "sb1-gale-tempestalon-standard",
+            "artwork_id": "sb1-gale-tempestalon-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-tempestalon/standard/sb1-gale-tempestalon-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Tempestalon: Adult Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Preserve recognizable lineage motifs from skyweaver while advancing the form. Ability-name cue: Storm Entry. Attack-name motion cues: Talon Gust / Tempest Dive. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-whiffin",
+            "card_name": "Whiffin",
+            "printing_id": "sb1-gale-whiffin-standard",
+            "artwork_id": "sb1-gale-whiffin-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-whiffin/standard/sb1-gale-whiffin-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Whiffin: Baby Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Establish a distinct, reusable silhouette. Ability-name cue: Featherdraft. Attack-name motion cues: Breeze Peck. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-slipwing",
+            "card_name": "Slipwing",
+            "printing_id": "sb1-gale-slipwing-standard",
+            "artwork_id": "sb1-gale-slipwing-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-slipwing/standard/sb1-gale-slipwing-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Slipwing: Teen Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Preserve recognizable lineage motifs from whiffin while advancing the form. Ability-name cue: Slipstream Relay. Attack-name motion cues: Slip Cut / Backdraft. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-skyrend",
+            "card_name": "Skyrend",
+            "printing_id": "sb1-gale-skyrend-standard",
+            "artwork_id": "sb1-gale-skyrend-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-skyrend/standard/sb1-gale-skyrend-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Skyrend: Adult Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Preserve recognizable lineage motifs from slipwing while advancing the form. Ability-name cue: Open Sky Hunter. Attack-name motion cues: Razorwind / Sky Rend. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-cloudray",
+            "card_name": "Cloudray",
+            "printing_id": "sb1-gale-cloudray-standard",
+            "artwork_id": "sb1-gale-cloudray-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-cloudray/standard/sb1-gale-cloudray-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Cloudray: Standalone Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Establish a distinct, reusable silhouette. Ability-name cue: Cloudwake. Attack-name motion cues: Wing Sweep / Cloud Crash. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-gustfox",
+            "card_name": "Gustfox",
+            "printing_id": "sb1-gale-gustfox-standard",
+            "artwork_id": "sb1-gale-gustfox-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-gustfox/standard/sb1-gale-gustfox-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Gustfox: Standalone Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Establish a distinct, reusable silhouette. Ability-name cue: Quickstep. Attack-name motion cues: Gust Bite / Tailwind Strike. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-pinionserpent",
+            "card_name": "Pinionserpent",
+            "printing_id": "sb1-gale-pinionserpent-standard",
+            "artwork_id": "sb1-gale-pinionserpent-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-pinionserpent/standard/sb1-gale-pinionserpent-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Pinionserpent: Standalone Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Establish a distinct, reusable silhouette. Ability-name cue: Wind Coil. Attack-name motion cues: Coil Gust / Blindside Spiral. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-zephyrhare",
+            "card_name": "Zephyrhare",
+            "printing_id": "sb1-gale-zephyrhare-standard",
+            "artwork_id": "sb1-gale-zephyrhare-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-zephyrhare/standard/sb1-gale-zephyrhare-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Zephyrhare: Standalone Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Establish a distinct, reusable silhouette. Ability-name cue: Windbound Leap. Attack-name motion cues: Zephyr Kick. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-aeralith-storm-shepherd",
+            "card_name": "Aeralith — Storm Shepherd",
+            "printing_id": "sb1-gale-aeralith-storm-shepherd-standard",
+            "artwork_id": "sb1-gale-aeralith-storm-shepherd-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-aeralith-storm-shepherd/standard/sb1-gale-aeralith-storm-shepherd-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Aeralith — Storm Shepherd: Standalone Gale Creature. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Establish a distinct, reusable silhouette. Ability-name cue: Storm Shepherd. Attack-name motion cues: Shepherd Wind / Eye of the Storm. Give it premium mythic presence without baking rarity text into the art. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "id": "SB1-GALE-ESSENCE-01",
+        "element": "Gale",
+        "card_family": "Essence",
+        "count": 4,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction.",
+        "cards": [
+          {
+            "card_id": "gale-basic-gale-essence",
+            "card_name": "Basic Gale Essence",
+            "printing_id": "sb1-gale-basic-gale-essence-standard",
+            "artwork_id": "sb1-gale-basic-gale-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-basic-gale-essence/standard/sb1-gale-basic-gale-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Basic Gale Essence: clean Gale Essence artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-breeze-essence",
+            "card_name": "Breeze Essence",
+            "printing_id": "sb1-gale-breeze-essence-standard",
+            "artwork_id": "sb1-gale-breeze-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-breeze-essence/standard/sb1-gale-breeze-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Breeze Essence: clean Gale Essence artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-draft-essence",
+            "card_name": "Draft Essence",
+            "printing_id": "sb1-gale-draft-essence-standard",
+            "artwork_id": "sb1-gale-draft-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-draft-essence/standard/sb1-gale-draft-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Draft Essence: clean Gale Essence artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-jetstream-essence",
+            "card_name": "Jetstream Essence",
+            "printing_id": "sb1-gale-jetstream-essence-standard",
+            "artwork_id": "sb1-gale-jetstream-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-jetstream-essence/standard/sb1-gale-jetstream-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Jetstream Essence: clean Gale Essence artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "id": "SB1-GALE-TACTICS-01",
+        "element": "Gale",
+        "card_family": "Tactic",
+        "count": 9,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction.",
+        "cards": [
+          {
+            "card_id": "gale-clear-skies",
+            "card_name": "Clear Skies",
+            "printing_id": "sb1-gale-clear-skies-standard",
+            "artwork_id": "sb1-gale-clear-skies-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-clear-skies/standard/sb1-gale-clear-skies-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Clear Skies: Gale Tactic artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-cyclone-route",
+            "card_name": "Cyclone Route",
+            "printing_id": "sb1-gale-cyclone-route-standard",
+            "artwork_id": "sb1-gale-cyclone-route-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-cyclone-route/standard/sb1-gale-cyclone-route-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Cyclone Route: Gale Tactic artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-featherstep",
+            "card_name": "Featherstep",
+            "printing_id": "sb1-gale-featherstep-standard",
+            "artwork_id": "sb1-gale-featherstep-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-featherstep/standard/sb1-gale-featherstep-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Featherstep: Gale Tactic artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-highwind-spires",
+            "card_name": "Highwind Spires",
+            "printing_id": "sb1-gale-highwind-spires-standard",
+            "artwork_id": "sb1-gale-highwind-spires-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-highwind-spires/standard/sb1-gale-highwind-spires-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Highwind Spires: Gale Tactic artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-pilot-sera",
+            "card_name": "Pilot Sera",
+            "printing_id": "sb1-gale-pilot-sera-standard",
+            "artwork_id": "sb1-gale-pilot-sera-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-pilot-sera/standard/sb1-gale-pilot-sera-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Pilot Sera: Gale Tactic artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-pressure-compass",
+            "card_name": "Pressure Compass",
+            "printing_id": "sb1-gale-pressure-compass-standard",
+            "artwork_id": "sb1-gale-pressure-compass-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-pressure-compass/standard/sb1-gale-pressure-compass-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Pressure Compass: Gale Tactic artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-scout-zeph",
+            "card_name": "Scout Zeph",
+            "printing_id": "sb1-gale-scout-zeph-standard",
+            "artwork_id": "sb1-gale-scout-zeph-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-scout-zeph/standard/sb1-gale-scout-zeph-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Scout Zeph: Gale Tactic artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-tailwind-map",
+            "card_name": "Tailwind Map",
+            "printing_id": "sb1-gale-tailwind-map-standard",
+            "artwork_id": "sb1-gale-tailwind-map-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-tailwind-map/standard/sb1-gale-tailwind-map-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Tailwind Map: Gale Tactic artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "gale-wingclip-charm",
+            "card_name": "Wingclip Charm",
+            "printing_id": "sb1-gale-wingclip-charm-standard",
+            "artwork_id": "sb1-gale-wingclip-charm-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/gale/gale-wingclip-charm/standard/sb1-gale-wingclip-charm-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Wingclip Charm: Gale Tactic artwork. Clear cyan and storm-blue palette; bright cloud light, wind ribbons, high-altitude depth and storm motion. Airy silhouettes with readable direction. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "id": "SB1-GROVE-CREATURES-01",
+        "element": "Grove",
+        "card_family": "Creature",
+        "count": 11,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail.",
+        "cards": [
+          {
+            "card_id": "grove-budburrow",
+            "card_name": "Budburrow",
+            "printing_id": "sb1-grove-budburrow-standard",
+            "artwork_id": "sb1-grove-budburrow-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-budburrow/standard/sb1-grove-budburrow-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Budburrow: Baby Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Establish a distinct, reusable silhouette. Ability-name cue: Root Nest. Attack-name motion cues: Sprout Jab. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-briarback",
+            "card_name": "Briarback",
+            "printing_id": "sb1-grove-briarback-standard",
+            "artwork_id": "sb1-grove-briarback-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-briarback/standard/sb1-grove-briarback-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Briarback: Teen Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Preserve recognizable lineage motifs from budburrow while advancing the form. Ability-name cue: Growing Wall. Attack-name motion cues: Briar Ram / Thorn Rush. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-verdantusk",
+            "card_name": "Verdantusk",
+            "printing_id": "sb1-grove-verdantusk-standard",
+            "artwork_id": "sb1-grove-verdantusk-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-verdantusk/standard/sb1-grove-verdantusk-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Verdantusk: Adult Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Preserve recognizable lineage motifs from briarback while advancing the form. Ability-name cue: Full Canopy. Attack-name motion cues: Rooted Charge / Canopy Crash. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-sporeling",
+            "card_name": "Sporeling",
+            "printing_id": "sb1-grove-sporeling-standard",
+            "artwork_id": "sb1-grove-sporeling-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-sporeling/standard/sb1-grove-sporeling-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Sporeling: Baby Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Establish a distinct, reusable silhouette. Ability-name cue: Spore Feed. Attack-name motion cues: Puff Tap. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-capscout",
+            "card_name": "Capscout",
+            "printing_id": "sb1-grove-capscout-standard",
+            "artwork_id": "sb1-grove-capscout-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-capscout/standard/sb1-grove-capscout-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Capscout: Teen Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Preserve recognizable lineage motifs from sporeling while advancing the form. Ability-name cue: Fungal Forage. Attack-name motion cues: Spore Shot / Fungal Burst. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-myceliarch",
+            "card_name": "Myceliarch",
+            "printing_id": "sb1-grove-myceliarch-standard",
+            "artwork_id": "sb1-grove-myceliarch-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-myceliarch/standard/sb1-grove-myceliarch-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Myceliarch: Adult Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Preserve recognizable lineage motifs from capscout while advancing the form. Ability-name cue: Networked Growth. Attack-name motion cues: Colony Pulse / Mycelial Bloom. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-thornmantis",
+            "card_name": "Thornmantis",
+            "printing_id": "sb1-grove-thornmantis-standard",
+            "artwork_id": "sb1-grove-thornmantis-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-thornmantis/standard/sb1-grove-thornmantis-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Thornmantis: Standalone Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Establish a distinct, reusable silhouette. Ability-name cue: Briar Instinct. Attack-name motion cues: Vine Lash / Thorn Cut. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-mossram",
+            "card_name": "Mossram",
+            "printing_id": "sb1-grove-mossram-standard",
+            "artwork_id": "sb1-grove-mossram-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-mossram/standard/sb1-grove-mossram-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Mossram: Standalone Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Establish a distinct, reusable silhouette. Ability-name cue: Moss Guard. Attack-name motion cues: Moss Bash / Ramroot. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-vinecoil",
+            "card_name": "Vinecoil",
+            "printing_id": "sb1-grove-vinecoil-standard",
+            "artwork_id": "sb1-grove-vinecoil-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-vinecoil/standard/sb1-grove-vinecoil-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Vinecoil: Standalone Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Establish a distinct, reusable silhouette. Ability-name cue: Binding Growth. Attack-name motion cues: Coil Snap. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-bloomhare",
+            "card_name": "Bloomhare",
+            "printing_id": "sb1-grove-bloomhare-standard",
+            "artwork_id": "sb1-grove-bloomhare-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-bloomhare/standard/sb1-grove-bloomhare-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Bloomhare: Standalone Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Establish a distinct, reusable silhouette. Ability-name cue: Spring Growth. Attack-name motion cues: Petal Kick. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-elderbloom-first-canopy",
+            "card_name": "Elderbloom — First Canopy",
+            "printing_id": "sb1-grove-elderbloom-first-canopy-standard",
+            "artwork_id": "sb1-grove-elderbloom-first-canopy-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-elderbloom-first-canopy/standard/sb1-grove-elderbloom-first-canopy-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Elderbloom — First Canopy: Standalone Grove Creature. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Establish a distinct, reusable silhouette. Ability-name cue: First Canopy. Attack-name motion cues: Ancient Bough / Forest Awakening. Give it premium mythic presence without baking rarity text into the art. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "id": "SB1-GROVE-ESSENCE-01",
+        "element": "Grove",
+        "card_family": "Essence",
+        "count": 4,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail.",
+        "cards": [
+          {
+            "card_id": "grove-basic-grove-essence",
+            "card_name": "Basic Grove Essence",
+            "printing_id": "sb1-grove-basic-grove-essence-standard",
+            "artwork_id": "sb1-grove-basic-grove-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-basic-grove-essence/standard/sb1-grove-basic-grove-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Basic Grove Essence: clean Grove Essence artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-bloom-essence",
+            "card_name": "Bloom Essence",
+            "printing_id": "sb1-grove-bloom-essence-standard",
+            "artwork_id": "sb1-grove-bloom-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-bloom-essence/standard/sb1-grove-bloom-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Bloom Essence: clean Grove Essence artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-root-essence",
+            "card_name": "Root Essence",
+            "printing_id": "sb1-grove-root-essence-standard",
+            "artwork_id": "sb1-grove-root-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-root-essence/standard/sb1-grove-root-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Root Essence: clean Grove Essence artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-symbiote-essence",
+            "card_name": "Symbiote Essence",
+            "printing_id": "sb1-grove-symbiote-essence-standard",
+            "artwork_id": "sb1-grove-symbiote-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-symbiote-essence/standard/sb1-grove-symbiote-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Symbiote Essence: clean Grove Essence artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "id": "SB1-GROVE-TACTICS-01",
+        "element": "Grove",
+        "card_family": "Tactic",
+        "count": 9,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail.",
+        "cards": [
+          {
+            "card_id": "grove-canopy-call",
+            "card_name": "Canopy Call",
+            "printing_id": "sb1-grove-canopy-call-standard",
+            "artwork_id": "sb1-grove-canopy-call-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-canopy-call/standard/sb1-grove-canopy-call-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Canopy Call: Grove Tactic artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-elderwood-glade",
+            "card_name": "Elderwood Glade",
+            "printing_id": "sb1-grove-elderwood-glade-standard",
+            "artwork_id": "sb1-grove-elderwood-glade-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-elderwood-glade/standard/sb1-grove-elderwood-glade-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Elderwood Glade: Grove Tactic artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-forager-nia",
+            "card_name": "Forager Nia",
+            "printing_id": "sb1-grove-forager-nia-standard",
+            "artwork_id": "sb1-grove-forager-nia-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-forager-nia/standard/sb1-grove-forager-nia-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Forager Nia: Grove Tactic artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-rootway-map",
+            "card_name": "Rootway Map",
+            "printing_id": "sb1-grove-rootway-map-standard",
+            "artwork_id": "sb1-grove-rootway-map-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-rootway-map/standard/sb1-grove-rootway-map-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Rootway Map: Grove Tactic artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-sapstone-charm",
+            "card_name": "Sapstone Charm",
+            "printing_id": "sb1-grove-sapstone-charm-standard",
+            "artwork_id": "sb1-grove-sapstone-charm-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-sapstone-charm/standard/sb1-grove-sapstone-charm-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Sapstone Charm: Grove Tactic artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-seed-satchel",
+            "card_name": "Seed Satchel",
+            "printing_id": "sb1-grove-seed-satchel-standard",
+            "artwork_id": "sb1-grove-seed-satchel-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-seed-satchel/standard/sb1-grove-seed-satchel-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Seed Satchel: Grove Tactic artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-spore-remedy",
+            "card_name": "Spore Remedy",
+            "printing_id": "sb1-grove-spore-remedy-standard",
+            "artwork_id": "sb1-grove-spore-remedy-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-spore-remedy/standard/sb1-grove-spore-remedy-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Spore Remedy: Grove Tactic artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-thorn-crown",
+            "card_name": "Thorn Crown",
+            "printing_id": "sb1-grove-thorn-crown-standard",
+            "artwork_id": "sb1-grove-thorn-crown-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-thorn-crown/standard/sb1-grove-thorn-crown-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Thorn Crown: Grove Tactic artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "grove-warden-fern",
+            "card_name": "Warden Fern",
+            "printing_id": "sb1-grove-warden-fern-standard",
+            "artwork_id": "sb1-grove-warden-fern-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/grove/grove-warden-fern/standard/sb1-grove-warden-fern-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Warden Fern: Grove Tactic artwork. Emerald and moss palette; warm shafts of light, roots, leaves, spores and living growth. Organic silhouettes with tactile natural detail. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 13,
+        "id": "SB1-SHADE-CREATURES-01",
+        "element": "Shade",
+        "card_family": "Creature",
+        "count": 11,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale.",
+        "cards": [
+          {
+            "card_id": "shade-gloamkin",
+            "card_name": "Gloamkin",
+            "printing_id": "sb1-shade-gloamkin-standard",
+            "artwork_id": "sb1-shade-gloamkin-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-gloamkin/standard/sb1-shade-gloamkin-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Gloamkin: Baby Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Establish a distinct, reusable silhouette. Ability-name cue: Gloom Glimpse. Attack-name motion cues: Gloom Tap. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-duskstalker",
+            "card_name": "Duskstalker",
+            "printing_id": "sb1-shade-duskstalker-standard",
+            "artwork_id": "sb1-shade-duskstalker-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-duskstalker/standard/sb1-shade-duskstalker-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Duskstalker: Teen Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Preserve recognizable lineage motifs from gloamkin while advancing the form. Ability-name cue: Hidden Tell. Attack-name motion cues: Dusk Claw / Hidden Step. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-noctivane",
+            "card_name": "Noctivane",
+            "printing_id": "sb1-shade-noctivane-standard",
+            "artwork_id": "sb1-shade-noctivane-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-noctivane/standard/sb1-shade-noctivane-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Noctivane: Adult Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Preserve recognizable lineage motifs from duskstalker while advancing the form. Ability-name cue: Night Reading. Attack-name motion cues: Nocturne Slash / Dark Forecast. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-murkmite",
+            "card_name": "Murkmite",
+            "printing_id": "sb1-shade-murkmite-standard",
+            "artwork_id": "sb1-shade-murkmite-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-murkmite/standard/sb1-shade-murkmite-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Murkmite: Baby Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Establish a distinct, reusable silhouette. Ability-name cue: Murk Sense. Attack-name motion cues: Murk Nip. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-veiljaw",
+            "card_name": "Veiljaw",
+            "printing_id": "sb1-shade-veiljaw-standard",
+            "artwork_id": "sb1-shade-veiljaw-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-veiljaw/standard/sb1-shade-veiljaw-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Veiljaw: Teen Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Preserve recognizable lineage motifs from murkmite while advancing the form. Ability-name cue: Frayed Thought. Attack-name motion cues: Veil Bite / Thought Rend. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-hollowcrown",
+            "card_name": "Hollowcrown",
+            "printing_id": "sb1-shade-hollowcrown-standard",
+            "artwork_id": "sb1-shade-hollowcrown-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-hollowcrown/standard/sb1-shade-hollowcrown-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Hollowcrown: Adult Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Preserve recognizable lineage motifs from veiljaw while advancing the form. Ability-name cue: Hollow Command. Attack-name motion cues: Hollow Lash / Crowned Nightmare. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-wispbat",
+            "card_name": "Wispbat",
+            "printing_id": "sb1-shade-wispbat-standard",
+            "artwork_id": "sb1-shade-wispbat-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-wispbat/standard/sb1-shade-wispbat-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Wispbat: Standalone Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Establish a distinct, reusable silhouette. Ability-name cue: Fade Echo. Attack-name motion cues: Wisp Bite / Fade Strike. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-umbraspider",
+            "card_name": "Umbraspider",
+            "printing_id": "sb1-shade-umbraspider-standard",
+            "artwork_id": "sb1-shade-umbraspider-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-umbraspider/standard/sb1-shade-umbraspider-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Umbraspider: Standalone Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Establish a distinct, reusable silhouette. Ability-name cue: Web of Doubt. Attack-name motion cues: Shadow Fang. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-nightmaw",
+            "card_name": "Nightmaw",
+            "printing_id": "sb1-shade-nightmaw-standard",
+            "artwork_id": "sb1-shade-nightmaw-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-nightmaw/standard/sb1-shade-nightmaw-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Nightmaw: Standalone Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Establish a distinct, reusable silhouette. Ability-name cue: Dread Hunger. Attack-name motion cues: Night Bite / Dread Crush. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-graveglider",
+            "card_name": "Graveglider",
+            "printing_id": "sb1-shade-graveglider-standard",
+            "artwork_id": "sb1-shade-graveglider-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-graveglider/standard/sb1-shade-graveglider-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Graveglider: Standalone Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Establish a distinct, reusable silhouette. Ability-name cue: Cold Read. Attack-name motion cues: Gloom Glide. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-umbravale-thought-hunter",
+            "card_name": "Umbravale — Thought Hunter",
+            "printing_id": "sb1-shade-umbravale-thought-hunter-standard",
+            "artwork_id": "sb1-shade-umbravale-thought-hunter-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-umbravale-thought-hunter/standard/sb1-shade-umbravale-thought-hunter-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Umbravale — Thought Hunter: Standalone Shade Creature. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Establish a distinct, reusable silhouette. Ability-name cue: Thought Hunter. Attack-name motion cues: Veil Pierce / Mind Eclipse. Give it premium mythic presence without baking rarity text into the art. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 14,
+        "id": "SB1-SHADE-ESSENCE-01",
+        "element": "Shade",
+        "card_family": "Essence",
+        "count": 4,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale.",
+        "cards": [
+          {
+            "card_id": "shade-basic-shade-essence",
+            "card_name": "Basic Shade Essence",
+            "printing_id": "sb1-shade-basic-shade-essence-standard",
+            "artwork_id": "sb1-shade-basic-shade-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-basic-shade-essence/standard/sb1-shade-basic-shade-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Basic Shade Essence: clean Shade Essence artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-veil-essence",
+            "card_name": "Veil Essence",
+            "printing_id": "sb1-shade-veil-essence-standard",
+            "artwork_id": "sb1-shade-veil-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-veil-essence/standard/sb1-shade-veil-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Veil Essence: clean Shade Essence artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-whisper-essence",
+            "card_name": "Whisper Essence",
+            "printing_id": "sb1-shade-whisper-essence-standard",
+            "artwork_id": "sb1-shade-whisper-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-whisper-essence/standard/sb1-shade-whisper-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Whisper Essence: clean Shade Essence artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-eclipse-essence",
+            "card_name": "Eclipse Essence",
+            "printing_id": "sb1-shade-eclipse-essence-standard",
+            "artwork_id": "sb1-shade-eclipse-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-eclipse-essence/standard/sb1-shade-eclipse-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Eclipse Essence: clean Shade Essence artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 15,
+        "id": "SB1-SHADE-TACTICS-01",
+        "element": "Shade",
+        "card_family": "Tactic",
+        "count": 9,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale.",
+        "cards": [
+          {
+            "card_id": "shade-broker-vale",
+            "card_name": "Broker Vale",
+            "printing_id": "sb1-shade-broker-vale-standard",
+            "artwork_id": "sb1-shade-broker-vale-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-broker-vale/standard/sb1-shade-broker-vale-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Broker Vale: Shade Tactic artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-false-memory",
+            "card_name": "False Memory",
+            "printing_id": "sb1-shade-false-memory-standard",
+            "artwork_id": "sb1-shade-false-memory-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-false-memory/standard/sb1-shade-false-memory-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "False Memory: Shade Tactic artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-gloom-locket",
+            "card_name": "Gloom Locket",
+            "printing_id": "sb1-shade-gloom-locket-standard",
+            "artwork_id": "sb1-shade-gloom-locket-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-gloom-locket/standard/sb1-shade-gloom-locket-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Gloom Locket: Shade Tactic artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-hollow-midnight",
+            "card_name": "Hollow Midnight",
+            "printing_id": "sb1-shade-hollow-midnight-standard",
+            "artwork_id": "sb1-shade-hollow-midnight-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-hollow-midnight/standard/sb1-shade-hollow-midnight-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Hollow Midnight: Shade Tactic artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-mind-cleanse",
+            "card_name": "Mind Cleanse",
+            "printing_id": "sb1-shade-mind-cleanse-standard",
+            "artwork_id": "sb1-shade-mind-cleanse-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-mind-cleanse/standard/sb1-shade-mind-cleanse-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Mind Cleanse: Shade Tactic artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-mirror-fang",
+            "card_name": "Mirror Fang",
+            "printing_id": "sb1-shade-mirror-fang-standard",
+            "artwork_id": "sb1-shade-mirror-fang-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-mirror-fang/standard/sb1-shade-mirror-fang-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Mirror Fang: Shade Tactic artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-quiet-step",
+            "card_name": "Quiet Step",
+            "printing_id": "sb1-shade-quiet-step-standard",
+            "artwork_id": "sb1-shade-quiet-step-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-quiet-step/standard/sb1-shade-quiet-step-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Quiet Step: Shade Tactic artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-seer-nyx",
+            "card_name": "Seer Nyx",
+            "printing_id": "sb1-shade-seer-nyx-standard",
+            "artwork_id": "sb1-shade-seer-nyx-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-seer-nyx/standard/sb1-shade-seer-nyx-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Seer Nyx: Shade Tactic artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "shade-veil-search",
+            "card_name": "Veil Search",
+            "printing_id": "sb1-shade-veil-search-standard",
+            "artwork_id": "sb1-shade-veil-search-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/shade/shade-veil-search/standard/sb1-shade-veil-search-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Veil Search: Shade Tactic artwork. Black-violet and moonlit-silver palette; restrained mist, fractured reflections and controlled shadow. Mysterious silhouettes that remain legible at card scale. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 16,
+        "id": "SB1-STONE-CREATURES-01",
+        "element": "Stone",
+        "card_family": "Creature",
+        "count": 11,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass.",
+        "cards": [
+          {
+            "card_id": "stone-gravibble",
+            "card_name": "Gravibble",
+            "printing_id": "sb1-stone-gravibble-standard",
+            "artwork_id": "sb1-stone-gravibble-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-gravibble/standard/sb1-stone-gravibble-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Gravibble: Baby Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Establish a distinct, reusable silhouette. Ability-name cue: Pebble Guard. Attack-name motion cues: Pebble Bump. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-cragroller",
+            "card_name": "Cragroller",
+            "printing_id": "sb1-stone-cragroller-standard",
+            "artwork_id": "sb1-stone-cragroller-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-cragroller/standard/sb1-stone-cragroller-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Cragroller: Teen Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Preserve recognizable lineage motifs from gravibble while advancing the form. Ability-name cue: Rolling Guard. Attack-name motion cues: Crag Roll / Weight Drop. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-monolithorn",
+            "card_name": "Monolithorn",
+            "printing_id": "sb1-stone-monolithorn-standard",
+            "artwork_id": "sb1-stone-monolithorn-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-monolithorn/standard/sb1-stone-monolithorn-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Monolithorn: Adult Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Preserve recognizable lineage motifs from cragroller while advancing the form. Ability-name cue: Standing Stone. Attack-name motion cues: Monolith Ram / Mountain Fall. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-flintkin",
+            "card_name": "Flintkin",
+            "printing_id": "sb1-stone-flintkin-standard",
+            "artwork_id": "sb1-stone-flintkin-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-flintkin/standard/sb1-stone-flintkin-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Flintkin: Baby Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Establish a distinct, reusable silhouette. Ability-name cue: Layered Hide. Attack-name motion cues: Flint Tap. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-rampartusk",
+            "card_name": "Rampartusk",
+            "printing_id": "sb1-stone-rampartusk-standard",
+            "artwork_id": "sb1-stone-rampartusk-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-rampartusk/standard/sb1-stone-rampartusk-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Rampartusk: Teen Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Preserve recognizable lineage motifs from flintkin while advancing the form. Ability-name cue: Rampart Plating. Attack-name motion cues: Rampart Push / Wall Break. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-citadelhorn",
+            "card_name": "Citadelhorn",
+            "printing_id": "sb1-stone-citadelhorn-standard",
+            "artwork_id": "sb1-stone-citadelhorn-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-citadelhorn/standard/sb1-stone-citadelhorn-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Citadelhorn: Adult Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Preserve recognizable lineage motifs from rampartusk while advancing the form. Ability-name cue: Fortress Heart. Attack-name motion cues: Citadel Charge / Bastion Quake. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-shalejaw",
+            "card_name": "Shalejaw",
+            "printing_id": "sb1-stone-shalejaw-standard",
+            "artwork_id": "sb1-stone-shalejaw-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-shalejaw/standard/sb1-stone-shalejaw-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Shalejaw: Standalone Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Establish a distinct, reusable silhouette. Ability-name cue: Tough Bite. Attack-name motion cues: Shale Crunch. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-boulderbug",
+            "card_name": "Boulderbug",
+            "printing_id": "sb1-stone-boulderbug-standard",
+            "artwork_id": "sb1-stone-boulderbug-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-boulderbug/standard/sb1-stone-boulderbug-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Boulderbug: Standalone Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Establish a distinct, reusable silhouette. Ability-name cue: Compact Shell. Attack-name motion cues: Stone Pinch / Boulder Roll. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-quartzram",
+            "card_name": "Quartzram",
+            "printing_id": "sb1-stone-quartzram-standard",
+            "artwork_id": "sb1-stone-quartzram-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-quartzram/standard/sb1-stone-quartzram-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Quartzram: Standalone Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Establish a distinct, reusable silhouette. Ability-name cue: Prismatic Bulwark. Attack-name motion cues: Quartz Bash / Prism Ram. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-obsidianox",
+            "card_name": "Obsidianox",
+            "printing_id": "sb1-stone-obsidianox-standard",
+            "artwork_id": "sb1-stone-obsidianox-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-obsidianox/standard/sb1-stone-obsidianox-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Obsidianox: Standalone Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Establish a distinct, reusable silhouette. Ability-name cue: Glass Armour. Attack-name motion cues: Obsidian Charge. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-crowncrag-mountain-warden",
+            "card_name": "Crowncrag — Mountain Warden",
+            "printing_id": "sb1-stone-crowncrag-mountain-warden-standard",
+            "artwork_id": "sb1-stone-crowncrag-mountain-warden-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-crowncrag-mountain-warden/standard/sb1-stone-crowncrag-mountain-warden-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Crowncrag — Mountain Warden: Standalone Stone Creature. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Establish a distinct, reusable silhouette. Ability-name cue: Mountain Warden. Attack-name motion cues: Warden Slam / Crown of Stone. Give it premium mythic presence without baking rarity text into the art. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 17,
+        "id": "SB1-STONE-ESSENCE-01",
+        "element": "Stone",
+        "card_family": "Essence",
+        "count": 4,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass.",
+        "cards": [
+          {
+            "card_id": "stone-basic-stone-essence",
+            "card_name": "Basic Stone Essence",
+            "printing_id": "sb1-stone-basic-stone-essence-standard",
+            "artwork_id": "sb1-stone-basic-stone-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-basic-stone-essence/standard/sb1-stone-basic-stone-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Basic Stone Essence: clean Stone Essence artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-anchor-essence",
+            "card_name": "Anchor Essence",
+            "printing_id": "sb1-stone-anchor-essence-standard",
+            "artwork_id": "sb1-stone-anchor-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-anchor-essence/standard/sb1-stone-anchor-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Anchor Essence: clean Stone Essence artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-fault-essence",
+            "card_name": "Fault Essence",
+            "printing_id": "sb1-stone-fault-essence-standard",
+            "artwork_id": "sb1-stone-fault-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-fault-essence/standard/sb1-stone-fault-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Fault Essence: clean Stone Essence artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-granite-essence",
+            "card_name": "Granite Essence",
+            "printing_id": "sb1-stone-granite-essence-standard",
+            "artwork_id": "sb1-stone-granite-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-granite-essence/standard/sb1-stone-granite-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Granite Essence: clean Stone Essence artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 18,
+        "id": "SB1-STONE-TACTICS-01",
+        "element": "Stone",
+        "card_family": "Tactic",
+        "count": 9,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass.",
+        "cards": [
+          {
+            "card_id": "stone-bastion-plate",
+            "card_name": "Bastion Plate",
+            "printing_id": "sb1-stone-bastion-plate-standard",
+            "artwork_id": "sb1-stone-bastion-plate-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-bastion-plate/standard/sb1-stone-bastion-plate-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Bastion Plate: Stone Tactic artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-faultstone",
+            "card_name": "Faultstone",
+            "printing_id": "sb1-stone-faultstone-standard",
+            "artwork_id": "sb1-stone-faultstone-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-faultstone/standard/sb1-stone-faultstone-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Faultstone: Stone Tactic artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-ironcliff-citadel",
+            "card_name": "Ironcliff Citadel",
+            "printing_id": "sb1-stone-ironcliff-citadel-standard",
+            "artwork_id": "sb1-stone-ironcliff-citadel-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-ironcliff-citadel/standard/sb1-stone-ironcliff-citadel-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Ironcliff Citadel: Stone Tactic artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-keeper-tor",
+            "card_name": "Keeper Tor",
+            "printing_id": "sb1-stone-keeper-tor-standard",
+            "artwork_id": "sb1-stone-keeper-tor-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-keeper-tor/standard/sb1-stone-keeper-tor-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Keeper Tor: Stone Tactic artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-masons-kit",
+            "card_name": "Mason's Kit",
+            "printing_id": "sb1-stone-masons-kit-standard",
+            "artwork_id": "sb1-stone-masons-kit-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-masons-kit/standard/sb1-stone-masons-kit-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Mason's Kit: Stone Tactic artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-quarry-search",
+            "card_name": "Quarry Search",
+            "printing_id": "sb1-stone-quarry-search-standard",
+            "artwork_id": "sb1-stone-quarry-search-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-quarry-search/standard/sb1-stone-quarry-search-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Quarry Search: Stone Tactic artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-reinforce",
+            "card_name": "Reinforce",
+            "printing_id": "sb1-stone-reinforce-standard",
+            "artwork_id": "sb1-stone-reinforce-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-reinforce/standard/sb1-stone-reinforce-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Reinforce: Stone Tactic artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-reversal-seal",
+            "card_name": "Reversal Seal",
+            "printing_id": "sb1-stone-reversal-seal-standard",
+            "artwork_id": "sb1-stone-reversal-seal-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-reversal-seal/standard/sb1-stone-reversal-seal-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Reversal Seal: Stone Tactic artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "stone-surveyor-mina",
+            "card_name": "Surveyor Mina",
+            "printing_id": "sb1-stone-surveyor-mina-standard",
+            "artwork_id": "sb1-stone-surveyor-mina-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/stone/stone-surveyor-mina/standard/sb1-stone-surveyor-mina-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Surveyor Mina: Stone Tactic artwork. Slate, granite and quartz palette with restrained ochre/gold; monumental weight, carved geometry and mineral light. Solid silhouettes and grounded mass. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 19,
+        "id": "SB1-TIDE-CREATURES-01",
+        "element": "Tide",
+        "card_family": "Creature",
+        "count": 11,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth.",
+        "cards": [
+          {
+            "card_id": "tide-puddlepip",
+            "card_name": "Puddlepip",
+            "printing_id": "sb1-tide-puddlepip-standard",
+            "artwork_id": "sb1-tide-puddlepip-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-puddlepip/standard/sb1-tide-puddlepip-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Puddlepip: Baby Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Establish a distinct, reusable silhouette. Ability-name cue: Freshwater Coat. Attack-name motion cues: Bubble Bump. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-rillrunner",
+            "card_name": "Rillrunner",
+            "printing_id": "sb1-tide-rillrunner-standard",
+            "artwork_id": "sb1-tide-rillrunner-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-rillrunner/standard/sb1-tide-rillrunner-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Rillrunner: Teen Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Preserve recognizable lineage motifs from puddlepip while advancing the form. Ability-name cue: Running Current. Attack-name motion cues: Current Dash / Rushing Wake. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-tideroar",
+            "card_name": "Tideroar",
+            "printing_id": "sb1-tide-tideroar-standard",
+            "artwork_id": "sb1-tide-tideroar-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-tideroar/standard/sb1-tide-tideroar-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Tideroar: Adult Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Preserve recognizable lineage motifs from rillrunner while advancing the form. Ability-name cue: Current Keeper. Attack-name motion cues: Breakwater Roar / Deep Current. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-shellip",
+            "card_name": "Shellip",
+            "printing_id": "sb1-tide-shellip-standard",
+            "artwork_id": "sb1-tide-shellip-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-shellip/standard/sb1-tide-shellip-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Shellip: Baby Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Establish a distinct, reusable silhouette. Ability-name cue: Tidepool Shell. Attack-name motion cues: Shell Tap. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-reefback",
+            "card_name": "Reefback",
+            "printing_id": "sb1-tide-reefback-standard",
+            "artwork_id": "sb1-tide-reefback-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-reefback/standard/sb1-tide-reefback-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Reefback: Teen Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Preserve recognizable lineage motifs from shellip while advancing the form. Ability-name cue: Reef Guard. Attack-name motion cues: Coral Press / Guarded Surge. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-abyssalume",
+            "card_name": "Abyssalume",
+            "printing_id": "sb1-tide-abyssalume-standard",
+            "artwork_id": "sb1-tide-abyssalume-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-abyssalume/standard/sb1-tide-abyssalume-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Abyssalume: Adult Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Preserve recognizable lineage motifs from reefback while advancing the form. Ability-name cue: Lantern Shelter. Attack-name motion cues: Lantern Pulse / Abyssal Break. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-reefshell",
+            "card_name": "Reefshell",
+            "printing_id": "sb1-tide-reefshell-standard",
+            "artwork_id": "sb1-tide-reefshell-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-reefshell/standard/sb1-tide-reefshell-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Reefshell: Standalone Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Establish a distinct, reusable silhouette. Ability-name cue: Breakwater Current. Attack-name motion cues: Tidal Push. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-mistmarten",
+            "card_name": "Mistmarten",
+            "printing_id": "sb1-tide-mistmarten-standard",
+            "artwork_id": "sb1-tide-mistmarten-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-mistmarten/standard/sb1-tide-mistmarten-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Mistmarten: Standalone Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Establish a distinct, reusable silhouette. Ability-name cue: Mist Recovery. Attack-name motion cues: Mist Dart / Vanish Wake. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-surgefin",
+            "card_name": "Surgefin",
+            "printing_id": "sb1-tide-surgefin-standard",
+            "artwork_id": "sb1-tide-surgefin-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-surgefin/standard/sb1-tide-surgefin-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Surgefin: Standalone Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Establish a distinct, reusable silhouette. Ability-name cue: Undertow Supply. Attack-name motion cues: Fin Slash / Surge Cut. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-lanternsquid",
+            "card_name": "Lanternsquid",
+            "printing_id": "sb1-tide-lanternsquid-standard",
+            "artwork_id": "sb1-tide-lanternsquid-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-lanternsquid/standard/sb1-tide-lanternsquid-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Lanternsquid: Standalone Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Establish a distinct, reusable silhouette. Ability-name cue: Deep Signal. Attack-name motion cues: Lantern Jet. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-marevault-heart-of-tides",
+            "card_name": "Marevault — Heart of Tides",
+            "printing_id": "sb1-tide-marevault-heart-of-tides-standard",
+            "artwork_id": "sb1-tide-marevault-heart-of-tides-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-marevault-heart-of-tides/standard/sb1-tide-marevault-heart-of-tides-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Marevault — Heart of Tides: Standalone Tide Creature. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Establish a distinct, reusable silhouette. Ability-name cue: Heart of Tides. Attack-name motion cues: Mooncurrent / Tidal Vault. Give it premium mythic presence without baking rarity text into the art. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 20,
+        "id": "SB1-TIDE-ESSENCE-01",
+        "element": "Tide",
+        "card_family": "Essence",
+        "count": 4,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth.",
+        "cards": [
+          {
+            "card_id": "tide-basic-tide-essence",
+            "card_name": "Basic Tide Essence",
+            "printing_id": "sb1-tide-basic-tide-essence-standard",
+            "artwork_id": "sb1-tide-basic-tide-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-basic-tide-essence/standard/sb1-tide-basic-tide-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Basic Tide Essence: clean Tide Essence artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-calm-essence",
+            "card_name": "Calm Essence",
+            "printing_id": "sb1-tide-calm-essence-standard",
+            "artwork_id": "sb1-tide-calm-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-calm-essence/standard/sb1-tide-calm-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Calm Essence: clean Tide Essence artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-flow-essence",
+            "card_name": "Flow Essence",
+            "printing_id": "sb1-tide-flow-essence-standard",
+            "artwork_id": "sb1-tide-flow-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-flow-essence/standard/sb1-tide-flow-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Flow Essence: clean Tide Essence artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-brine-essence",
+            "card_name": "Brine Essence",
+            "printing_id": "sb1-tide-brine-essence-standard",
+            "artwork_id": "sb1-tide-brine-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-brine-essence/standard/sb1-tide-brine-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Brine Essence: clean Tide Essence artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 21,
+        "id": "SB1-TIDE-TACTICS-01",
+        "element": "Tide",
+        "card_family": "Tactic",
+        "count": 9,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth.",
+        "cards": [
+          {
+            "card_id": "tide-current-map",
+            "card_name": "Current Map",
+            "printing_id": "sb1-tide-current-map-standard",
+            "artwork_id": "sb1-tide-current-map-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-current-map/standard/sb1-tide-current-map-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Current Map: Tide Tactic artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-deepwater-search",
+            "card_name": "Deepwater Search",
+            "printing_id": "sb1-tide-deepwater-search-standard",
+            "artwork_id": "sb1-tide-deepwater-search-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-deepwater-search/standard/sb1-tide-deepwater-search-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Deepwater Search: Tide Tactic artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-marina-wayfinder",
+            "card_name": "Marina Wayfinder",
+            "printing_id": "sb1-tide-marina-wayfinder-standard",
+            "artwork_id": "sb1-tide-marina-wayfinder-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-marina-wayfinder/standard/sb1-tide-marina-wayfinder-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Marina Wayfinder: Tide Tactic artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-moonlit-reef",
+            "card_name": "Moonlit Reef",
+            "printing_id": "sb1-tide-moonlit-reef-standard",
+            "artwork_id": "sb1-tide-moonlit-reef-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-moonlit-reef/standard/sb1-tide-moonlit-reef-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Moonlit Reef: Tide Tactic artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-recovery-spray",
+            "card_name": "Recovery Spray",
+            "printing_id": "sb1-tide-recovery-spray-standard",
+            "artwork_id": "sb1-tide-recovery-spray-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-recovery-spray/standard/sb1-tide-recovery-spray-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Recovery Spray: Tide Tactic artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-reef-medic-olan",
+            "card_name": "Reef Medic Olan",
+            "printing_id": "sb1-tide-reef-medic-olan-standard",
+            "artwork_id": "sb1-tide-reef-medic-olan-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-reef-medic-olan/standard/sb1-tide-reef-medic-olan-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Reef Medic Olan: Tide Tactic artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-shellguard-pendant",
+            "card_name": "Shellguard Pendant",
+            "printing_id": "sb1-tide-shellguard-pendant-standard",
+            "artwork_id": "sb1-tide-shellguard-pendant-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-shellguard-pendant/standard/sb1-tide-shellguard-pendant-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Shellguard Pendant: Tide Tactic artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-tidal-lens",
+            "card_name": "Tidal Lens",
+            "printing_id": "sb1-tide-tidal-lens-standard",
+            "artwork_id": "sb1-tide-tidal-lens-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-tidal-lens/standard/sb1-tide-tidal-lens-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Tidal Lens: Tide Tactic artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "tide-undertow-net",
+            "card_name": "Undertow Net",
+            "printing_id": "sb1-tide-undertow-net-standard",
+            "artwork_id": "sb1-tide-undertow-net-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/tide/tide-undertow-net/standard/sb1-tide-undertow-net-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Undertow Net: Tide Tactic artwork. Deep ocean blue and teal palette; pearl highlights, bioluminescent aqua and flowing current shapes. Fluid silhouettes with clear underwater depth. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 22,
+        "id": "SB1-VOLT-CREATURES-01",
+        "element": "Volt",
+        "card_family": "Creature",
+        "count": 11,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes.",
+        "cards": [
+          {
+            "card_id": "volt-staticub",
+            "card_name": "Staticub",
+            "printing_id": "sb1-volt-staticub-standard",
+            "artwork_id": "sb1-volt-staticub-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-staticub/standard/sb1-volt-staticub-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Staticub: Baby Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Establish a distinct, reusable silhouette. Ability-name cue: Static Primer. Attack-name motion cues: Static Nip. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-arcprowler",
+            "card_name": "Arcprowler",
+            "printing_id": "sb1-volt-arcprowler-standard",
+            "artwork_id": "sb1-volt-arcprowler-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-arcprowler/standard/sb1-volt-arcprowler-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Arcprowler: Teen Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Preserve recognizable lineage motifs from staticub while advancing the form. Ability-name cue: Charge Relay. Attack-name motion cues: Arc Pounce / Relay Strike. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-stormmane",
+            "card_name": "Stormmane",
+            "printing_id": "sb1-volt-stormmane-standard",
+            "artwork_id": "sb1-volt-stormmane-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-stormmane/standard/sb1-volt-stormmane-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Stormmane: Adult Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Preserve recognizable lineage motifs from arcprowler while advancing the form. Ability-name cue: Live Circuit. Attack-name motion cues: Thunder Claw / Storm Break. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-tinkit",
+            "card_name": "Tinkit",
+            "printing_id": "sb1-volt-tinkit-standard",
+            "artwork_id": "sb1-volt-tinkit-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-tinkit/standard/sb1-volt-tinkit-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Tinkit: Baby Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Establish a distinct, reusable silhouette. Ability-name cue: Salvage Spark. Attack-name motion cues: Tiny Zap. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-coilclank",
+            "card_name": "Coilclank",
+            "printing_id": "sb1-volt-coilclank-standard",
+            "artwork_id": "sb1-volt-coilclank-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-coilclank/standard/sb1-volt-coilclank-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Coilclank: Teen Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Preserve recognizable lineage motifs from tinkit while advancing the form. Ability-name cue: Charge Capacitor. Attack-name motion cues: Coil Bash / Charged Tool. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-dynamozer",
+            "card_name": "Dynamozer",
+            "printing_id": "sb1-volt-dynamozer-standard",
+            "artwork_id": "sb1-volt-dynamozer-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-dynamozer/standard/sb1-volt-dynamozer-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Dynamozer: Adult Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Preserve recognizable lineage motifs from coilclank while advancing the form. Ability-name cue: Overcharge Engine. Attack-name motion cues: Dynamo Crash / Gridbreaker. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-boltfang",
+            "card_name": "Boltfang",
+            "printing_id": "sb1-volt-boltfang-standard",
+            "artwork_id": "sb1-volt-boltfang-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-boltfang/standard/sb1-volt-boltfang-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Boltfang: Standalone Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Establish a distinct, reusable silhouette. Ability-name cue: Live Hunt. Attack-name motion cues: Quick Bite / Lightning Hunt. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-sparkmoth",
+            "card_name": "Sparkmoth",
+            "printing_id": "sb1-volt-sparkmoth-standard",
+            "artwork_id": "sb1-volt-sparkmoth-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-sparkmoth/standard/sb1-volt-sparkmoth-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Sparkmoth: Standalone Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Establish a distinct, reusable silhouette. Ability-name cue: Flash Dust. Attack-name motion cues: Spark Wing. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-railhorn",
+            "card_name": "Railhorn",
+            "printing_id": "sb1-volt-railhorn-standard",
+            "artwork_id": "sb1-volt-railhorn-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-railhorn/standard/sb1-volt-railhorn-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Railhorn: Standalone Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Establish a distinct, reusable silhouette. Ability-name cue: Power Rail. Attack-name motion cues: Rail Ram / Line Surge. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-copperkite",
+            "card_name": "Copperkite",
+            "printing_id": "sb1-volt-copperkite-standard",
+            "artwork_id": "sb1-volt-copperkite-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-copperkite/standard/sb1-volt-copperkite-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Copperkite: Standalone Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Establish a distinct, reusable silhouette. Ability-name cue: Conductive Wing. Attack-name motion cues: Copper Arc. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-stormcoil-living-circuit",
+            "card_name": "Stormcoil — Living Circuit",
+            "printing_id": "sb1-volt-stormcoil-living-circuit-standard",
+            "artwork_id": "sb1-volt-stormcoil-living-circuit-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-stormcoil-living-circuit/standard/sb1-volt-stormcoil-living-circuit-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Stormcoil — Living Circuit: Standalone Volt Creature. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Establish a distinct, reusable silhouette. Ability-name cue: Living Circuit. Attack-name motion cues: Circuit Lash / Chainstorm. Give it premium mythic presence without baking rarity text into the art. Use names only as visual/motion cues, not rules authority. Center-safe focal subject; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 23,
+        "id": "SB1-VOLT-ESSENCE-01",
+        "element": "Volt",
+        "card_family": "Essence",
+        "count": 4,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes.",
+        "cards": [
+          {
+            "card_id": "volt-basic-volt-essence",
+            "card_name": "Basic Volt Essence",
+            "printing_id": "sb1-volt-basic-volt-essence-standard",
+            "artwork_id": "sb1-volt-basic-volt-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-basic-volt-essence/standard/sb1-volt-basic-volt-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Basic Volt Essence: clean Volt Essence artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-circuit-essence",
+            "card_name": "Circuit Essence",
+            "printing_id": "sb1-volt-circuit-essence-standard",
+            "artwork_id": "sb1-volt-circuit-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-circuit-essence/standard/sb1-volt-circuit-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Circuit Essence: clean Volt Essence artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-surge-essence",
+            "card_name": "Surge Essence",
+            "printing_id": "sb1-volt-surge-essence-standard",
+            "artwork_id": "sb1-volt-surge-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-surge-essence/standard/sb1-volt-surge-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Surge Essence: clean Volt Essence artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-pulse-essence",
+            "card_name": "Pulse Essence",
+            "printing_id": "sb1-volt-pulse-essence-standard",
+            "artwork_id": "sb1-volt-pulse-essence-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-pulse-essence/standard/sb1-volt-pulse-essence-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Pulse Essence: clean Volt Essence artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Build a single collectible energy-object or elemental phenomenon around the identity name, with a strong center-safe focal shape. No creature portrait, card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 24,
+        "id": "SB1-VOLT-TACTICS-01",
+        "element": "Volt",
+        "card_family": "Tactic",
+        "count": 9,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes.",
+        "cards": [
+          {
+            "card_id": "volt-arc-band",
+            "card_name": "Arc Band",
+            "printing_id": "sb1-volt-arc-band-standard",
+            "artwork_id": "sb1-volt-arc-band-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-arc-band/standard/sb1-volt-arc-band-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Arc Band: Volt Tactic artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-blackout-pulse",
+            "card_name": "Blackout Pulse",
+            "printing_id": "sb1-volt-blackout-pulse-standard",
+            "artwork_id": "sb1-volt-blackout-pulse-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-blackout-pulse/standard/sb1-volt-blackout-pulse-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Blackout Pulse: Volt Tactic artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-circuit-scanner",
+            "card_name": "Circuit Scanner",
+            "printing_id": "sb1-volt-circuit-scanner-standard",
+            "artwork_id": "sb1-volt-circuit-scanner-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-circuit-scanner/standard/sb1-volt-circuit-scanner-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Circuit Scanner: Volt Tactic artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-courier-jett",
+            "card_name": "Courier Jett",
+            "printing_id": "sb1-volt-courier-jett-standard",
+            "artwork_id": "sb1-volt-courier-jett-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-courier-jett/standard/sb1-volt-courier-jett-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Courier Jett: Volt Tactic artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-dynamo-lens",
+            "card_name": "Dynamo Lens",
+            "printing_id": "sb1-volt-dynamo-lens-standard",
+            "artwork_id": "sb1-volt-dynamo-lens-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-dynamo-lens/standard/sb1-volt-dynamo-lens-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Dynamo Lens: Volt Tactic artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-engineer-vexa",
+            "card_name": "Engineer Vexa",
+            "printing_id": "sb1-volt-engineer-vexa-standard",
+            "artwork_id": "sb1-volt-engineer-vexa-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-engineer-vexa/standard/sb1-volt-engineer-vexa-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Engineer Vexa: Volt Tactic artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-quickcharge-cell",
+            "card_name": "Quickcharge Cell",
+            "printing_id": "sb1-volt-quickcharge-cell-standard",
+            "artwork_id": "sb1-volt-quickcharge-cell-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-quickcharge-cell/standard/sb1-volt-quickcharge-cell-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Quickcharge Cell: Volt Tactic artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-static-reset",
+            "card_name": "Static Reset",
+            "printing_id": "sb1-volt-static-reset-standard",
+            "artwork_id": "sb1-volt-static-reset-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-static-reset/standard/sb1-volt-static-reset-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Static Reset: Volt Tactic artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          },
+          {
+            "card_id": "volt-stormgrid-city",
+            "card_name": "Stormgrid City",
+            "printing_id": "sb1-volt-stormgrid-city-standard",
+            "artwork_id": "sb1-volt-stormgrid-city-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/volt/volt-stormgrid-city/standard/sb1-volt-stormgrid-city-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Stormgrid City: Volt Tactic artwork. Electric cobalt and violet palette with neon-yellow/copper accents; clean arcs, conductive geometry and kinetic circuit energy. Fast readable silhouettes. Interpret the identity name as one focused character, place, relic, action or atmospheric moment; do not infer or encode gameplay text. Center-safe composition; no card frame, UI, labels or rules text."
+          }
+        ]
+      },
+      {
+        "sequence": 25,
+        "id": "SB1-PRISMATIC-CREATURES-01",
+        "element": "Prismatic",
+        "card_family": "Creature",
+        "count": 1,
+        "rarity_assignment_status": "unassigned_pending_content_approval",
+        "finish": "standard",
+        "status": "production_blueprint_complete_art_missing",
+        "approved_art_count": 0,
+        "design_language": "Full-spectrum prismatic light over dark enchanted depth with restrained cyan and gold. The eight launch elements should feel unified rather than visually noisy.",
+        "cards": [
+          {
+            "card_id": "prismatic-stream-bandit-prismatic-founder",
+            "card_name": "Stream Bandit — Prismatic Founder",
+            "printing_id": "sb1-prismatic-stream-bandit-prismatic-founder-standard",
+            "artwork_id": "sb1-prismatic-stream-bandit-prismatic-founder-standard-art-v1",
+            "target_path": "assets/tcg/cards/set-one/prismatic/prismatic-stream-bandit-prismatic-founder/standard/sb1-prismatic-stream-bandit-prismatic-founder-standard-art-v1.png",
+            "artwork_status": "missing",
+            "brief": "Stream Bandit — Prismatic Founder: singular Standalone Mythic focal creature unifying all eight launch-element energies in a dark enchanted realm. Full-spectrum prismatic light stays controlled with cyan/gold accents and an unmistakable founder silhouette. Bandit's Current, Founder's Mark and Total Convergence are visual/motion cues only, never baked rules text. Center-safe; no card frame, UI, labels or rarity text."
+          }
+        ]
+      }
+    ],
+    "counts_by_element": {
+      "Astral": {
+        "blueprint_ready": 24,
+        "approved_art": 0,
+        "target": 24
+      },
+      "Ember": {
+        "blueprint_ready": 24,
+        "approved_art": 0,
+        "target": 24
+      },
+      "Gale": {
+        "blueprint_ready": 24,
+        "approved_art": 0,
+        "target": 24
+      },
+      "Grove": {
+        "blueprint_ready": 24,
+        "approved_art": 0,
+        "target": 24
+      },
+      "Shade": {
+        "blueprint_ready": 24,
+        "approved_art": 0,
+        "target": 24
+      },
+      "Stone": {
+        "blueprint_ready": 24,
+        "approved_art": 0,
+        "target": 24
+      },
+      "Tide": {
+        "blueprint_ready": 24,
+        "approved_art": 0,
+        "target": 24
+      },
+      "Volt": {
+        "blueprint_ready": 24,
+        "approved_art": 0,
+        "target": 24
+      },
+      "Prismatic": {
+        "blueprint_ready": 1,
+        "approved_art": 0,
+        "target": 1
+      }
+    },
+    "counts_by_family": {
+      "Creature": {
+        "blueprint_ready": 89,
+        "approved_art": 0,
+        "target": 89
+      },
+      "Essence": {
+        "blueprint_ready": 32,
+        "approved_art": 0,
+        "target": 32
+      },
+      "Tactic": {
+        "blueprint_ready": 72,
+        "approved_art": 0,
+        "target": 72
+      }
+    },
+    "next_material_gate": "Create and approve real PNG masters against these exact artwork_id/target_path records; do not mark artwork complete from a brief alone."
   }
 }
