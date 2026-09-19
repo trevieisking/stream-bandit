@@ -1,5 +1,30 @@
+import type { RuntimeV02CoinSide } from "./tcg-match-randomization-engine-v0-2.ts";
+
 export type RuntimeV02MatchFlowSeat = 1 | 2;
 export type RuntimeV02OpeningChoice = "first" | "second";
+
+export type RuntimeV02OpeningCoinCallState = Record<string, unknown> & {
+  phase?: unknown;
+  coin_call_seat?: unknown;
+  coin_call?: unknown;
+  coin_result?: unknown;
+  toss_winner_seat?: unknown;
+  log?: unknown;
+};
+
+export type RuntimeV02OpeningCoinCallResult =
+  | {
+    ok: true;
+    coin_call: RuntimeV02CoinSide;
+    coin_result: RuntimeV02CoinSide;
+    toss_winner_seat: RuntimeV02MatchFlowSeat;
+  }
+  | {
+    ok: false;
+    error: "opening_coin_call_not_allowed" | "coin_call_must_be_heads_or_tails";
+  };
+
+export type RuntimeV02CoinFlip = () => RuntimeV02CoinSide;
 
 export type RuntimeV02OpeningChoiceState = Record<string, unknown> & {
   phase?: unknown;
@@ -82,6 +107,70 @@ function objectRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
     ? value as Record<string, unknown>
     : null;
+}
+
+/**
+ * Canonical Match Flow owner for the opening coin call and authoritative toss.
+ *
+ * The caller selects only heads or tails. The injected Randomization owner supplies
+ * exactly one server result after all request validation succeeds. Match Flow owns
+ * the lifecycle transition and winner derivation; the client and cosmetic coin own
+ * no randomness. Invalid calls are non-mutating and do not consume a random draw.
+ */
+export function runtimeV02ApplyOpeningCoinCall(
+  state: RuntimeV02OpeningCoinCallState,
+  controllerSeat: RuntimeV02MatchFlowSeat,
+  rawCall: unknown,
+  flipCoin?: RuntimeV02CoinFlip,
+): RuntimeV02OpeningCoinCallResult {
+  if (
+    !state ||
+    typeof state !== "object" ||
+    Array.isArray(state) ||
+    !isSeat(controllerSeat) ||
+    state.phase !== "opening_coin_call" ||
+    state.coin_call_seat !== controllerSeat ||
+    state.toss_winner_seat != null
+  ) {
+    return { ok: false, error: "opening_coin_call_not_allowed" };
+  }
+
+  const call = typeof rawCall === "string" ? rawCall.toLowerCase() : "";
+  if (call !== "heads" && call !== "tails") {
+    return { ok: false, error: "coin_call_must_be_heads_or_tails" };
+  }
+  if (!Array.isArray(state.log)) {
+    throw new Error("tcg_v0_2_match_flow_log_required");
+  }
+  if (typeof flipCoin !== "function") {
+    throw new Error("tcg_v0_2_match_flow_coin_flip_required");
+  }
+
+  const result = flipCoin();
+  if (result !== "heads" && result !== "tails") {
+    throw new Error("tcg_v0_2_match_flow_coin_result_invalid");
+  }
+
+  const tossWinnerSeat: RuntimeV02MatchFlowSeat = result === call
+    ? controllerSeat
+    : controllerSeat === 1
+    ? 2
+    : 1;
+
+  state.coin_call = call;
+  state.coin_result = result;
+  state.toss_winner_seat = tossWinnerSeat;
+  state.phase = "opening_choice";
+  state.log.push(
+    `Seat ${controllerSeat} called ${call}. Coin landed ${result}. Seat ${tossWinnerSeat} won the opening toss.`,
+  );
+
+  return {
+    ok: true,
+    coin_call: call,
+    coin_result: result,
+    toss_winner_seat: tossWinnerSeat,
+  };
 }
 
 /**

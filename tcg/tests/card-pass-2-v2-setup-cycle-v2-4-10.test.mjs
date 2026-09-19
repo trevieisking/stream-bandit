@@ -20,6 +20,7 @@ function actionBranch(action, nextAction) {
 }
 
 test('V2.4.10 setup browser transports are thin server-authoritative intents', () => {
+  assert.match(controller, /actionBase\('opening_coin_call'\)/);
   assert.match(controller, /actionBase\('opening_choice'\)/);
   assert.match(controller, /actionBase\('setup_place'\)/);
   assert.match(controller, /actionBase\('setup_return'\)/);
@@ -34,10 +35,13 @@ test('V2.4.10 setup browser transports are thin server-authoritative intents', (
 });
 
 test('private-alpha remains sole setup legality and lifecycle owner', () => {
+  const coin = actionBranch('opening_coin_call', 'opening_choice');
   const opening = actionBranch('opening_choice', 'setup_place');
   const place = actionBranch('setup_place', 'setup_return');
   const ret = actionBranch('setup_return', 'setup_ready');
   const ready = actionBranch('setup_ready', null);
+  assert.match(coin, /runtimeV02ApplyOpeningCoinCall/);
+  assert.match(coin, /runtimeV02FlipCoin/);
   assert.match(opening, /runtimeV02ApplyOpeningChoice/);
   assert.match(place, /starterLegal\(meta\)/);
   assert.match(place, /vanguard_occupied/);
@@ -53,6 +57,9 @@ test('private-alpha remains sole setup legality and lifecycle owner', () => {
 test('setup destinations and lifecycle controls are board/card based', () => {
   assert.match(controller, /data-setup-place-where="vanguard"/);
   assert.match(controller, /data-setup-place-where="reserve"/);
+  assert.match(controller, /data-lifecycle-intent="opening_coin_call"/);
+  assert.match(controller, /data-coin-call="heads"/);
+  assert.match(controller, /data-coin-call="tails"/);
   assert.match(controller, /data-lifecycle-intent="opening_choice"/);
   assert.match(controller, /data-lifecycle-intent="setup_ready"/);
   assert.match(controller, /data-card-intent="setup_return"/);

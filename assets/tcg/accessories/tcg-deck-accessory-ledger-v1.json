@@ -1,6 +1,6 @@
 {
   "schema": "stream-bandit-tcg-deck-accessory-ledger-v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "recorded_at": "2026-09-19",
   "authority": "Stream Bandit TCG official deck accessory identity and artwork ledger",
   "source_starter_registry": "tcg-set-one-starters-v0.2.json",
@@ -23,7 +23,11 @@
       "label": "Battle Coin",
       "purpose": "Deck-themed visual coin for coin/toss presentation where shown.",
       "gameplay_effect": false,
-      "randomness_effect": false
+      "randomness_effect": false,
+      "result_face_contract": {
+        "heads": "front",
+        "tails": "back"
+      }
     },
     {
       "id": "deck_box",
@@ -49,7 +53,9 @@
     "battle_coin_never_affects_server_randomness": true,
     "sleeve_never_reveals_hidden_card_identity": true,
     "deck_box_never_changes_deck_legality_or_capacity": true,
-    "accessory_ownership_never_changes_gameplay_rules": true
+    "accessory_ownership_never_changes_gameplay_rules": true,
+    "battle_coin_visual_face_follows_server_result": true,
+    "battle_coin_client_never_generates_result": true
   },
   "shop_contract": {
     "required_categories": [

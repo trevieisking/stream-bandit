@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.26';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2 / Tabletop V2.4.41';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -655,6 +655,18 @@
     return null;
   }
 
+  function coinResultMarkup(view) {
+    const side = view && view.coin_result === 'heads'
+      ? 'heads'
+      : view && view.coin_result === 'tails'
+      ? 'tails'
+      : '';
+    if (!side) return '';
+    const face = side === 'heads' ? 'front' : 'back';
+    return '<span class="sb-tcg-coin-result" data-coin-side="' + side + '" aria-label="Coin landed ' + side + ', ' + face + ' face">' +
+      '<strong>' + side.toUpperCase() + '</strong> · ' + face + '</span>';
+  }
+
   function renderPhaseControls(view) {
     const node = $('phaseControls');
     if (!node) return;
@@ -669,13 +681,22 @@
     } else if (view.phase === 'overtime_pending' && result) {
       markup = '<span data-match-result="overtime"><strong>Overtime pending</strong>' +
         (result.reasons.length ? ' · ' + result.reasons.join(' · ') : '') + '</span>';
+    } else if (view.phase === 'opening_coin_call') {
+      if (Number(view.coin_call_seat) === seat) {
+        markup = '<span>Call the opening toss:</span>' +
+          '<button type="button" data-lifecycle-intent="opening_coin_call" data-coin-call="heads">Heads</button>' +
+          '<button type="button" data-lifecycle-intent="opening_coin_call" data-coin-call="tails">Tails</button>';
+      } else {
+        markup = '<span>Waiting for the other player to call Heads or Tails.</span>';
+      }
     } else if (view.phase === 'opening_choice') {
+      const coinResult = coinResultMarkup(view);
       if (Number(view.toss_winner_seat) === seat) {
-        markup = '<span>Opening toss won. Choose turn order:</span>' +
+        markup = coinResult + '<span>Opening toss won. Choose turn order:</span>' +
           '<button type="button" data-lifecycle-intent="opening_choice" data-choice="first">Go first</button>' +
           '<button type="button" data-lifecycle-intent="opening_choice" data-choice="second">Go second</button>';
       } else {
-        markup = '<span>Waiting for the toss winner to choose who goes first.</span>';
+        markup = coinResult + '<span>Waiting for the toss winner to choose who goes first.</span>';
       }
     } else if (view.phase === 'setup') {
       if (Number(view.setup_turn_seat) === seat) {
@@ -1073,6 +1094,11 @@
         await runSetupReturnIntent(where, index);
       });
     });
+    document.querySelectorAll('[data-lifecycle-intent="opening_coin_call"]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        await runOpeningCoinCallIntent(String(button.dataset.coinCall || ''));
+      });
+    });
     document.querySelectorAll('[data-lifecycle-intent="opening_choice"]').forEach((button) => {
       button.addEventListener('click', async () => {
         await runOpeningChoiceIntent(String(button.dataset.choice || ''));
@@ -1311,6 +1337,25 @@
       await callEdge(API_MATCH, Object.assign(actionBase('promote'), { reserve_index: index }));
       state.promotionReserveIndex = null;
       state.resolutionKey = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runOpeningCoinCallIntent(coinCall) {
+    if (coinCall !== 'heads' && coinCall !== 'tails') throw new Error('Choose Heads or Tails.');
+    state.busy = true;
+    render();
+    setStatus('Calling the server-authoritative opening coin toss…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_SETUP, Object.assign(actionBase('opening_coin_call'), { coin_call: coinCall }));
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
