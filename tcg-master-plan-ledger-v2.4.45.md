@@ -25,7 +25,7 @@ If a generated image materially contradicts the bound brief, that candidate is r
 After an upload is verified and control truth is synchronized, the workflow returns to the GitHub preflight. The next-card identity is never merely carried over from the prior turn.
 
 ## 034 — Current material checkpoint
-Twenty canonical Standard/base PNGs are verified: Stardot, Orbitail, Cosmarch, Moonbit, Comettail, Nebulynx, Cometmanta, Orbitortoise, Prismowl, Starwhale, Celestyr — Dream Cartographer, Basic Astral Essence and Star Essence.
+Twenty-one canonical Standard/base PNGs are verified: Stardot, Orbitail, Cosmarch, Moonbit, Comettail, Nebulynx, Cometmanta, Orbitortoise, Prismowl, Starwhale, Celestyr — Dream Cartographer, Basic Astral Essence and Star Essence.
 
 Cartographer Lyra is verified at its canonical repository path.
 
@@ -35,9 +35,18 @@ Gravity Shift is verified at its canonical repository path.
 
 Star Chart is verified at its canonical repository path.
 
-Current progress: **20/193 Set One**, **20/24 Astral**.
+Current progress: **21/193 Set One**, **21/24 Astral**.
 
-At this checkpoint the ledger sequence identifies Celestial Observatory next, subject to a fresh pre-generation GitHub read.
+At this checkpoint the ledger sequence identifies Dreamglass next, subject to a fresh pre-generation GitHub read.
 
 ## 035 — Release boundary
 This authority change is artwork/control-plane only. It changes no gameplay engine, rules, database, Supabase deployment, main/live/public release state.
+
+## 036 — First completed deck product preview
+The first complete player-facing deck product preview is **Astral — Second Sky**. The preview gate opens when Astral Standard/base artwork reaches 24/24 and the existing starter recipe is revalidated. The Shop preview must use real approved card art plus the matching Second Sky sleeves, battle coin and deck box from the existing accessory ledger. It remains branch-only and economy-gated until canonical pricing, purchase, receipt and ownership owners exist.
+
+## 037 — Set One is Battle Pass Season 1
+**Set One (SB1)** is the first Battle Pass season identity: **Set One — Season 1**. The already-locked 100-tier / reward-every-tier structure remains. Exact reward assignments, free/premium split, token costs, receipts, progression values and entitlements stay unassigned until the canonical Battle Pass/economy owners implement them. This season identity does not automatically grant all 193 Set One cards.
+
+## 038 — Coordinated first-deck presentation review
+After Astral reaches 24/24 and the Second Sky accessory art required for presentation exists, review a branch-only **Shop starter-deck preview** and **Battle Pass Season 1 preview** together. This is a visual/product checkpoint only and must not alter gameplay, randomness, ownership, deck legality, prices, currency balances or grants.
