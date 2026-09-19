@@ -199,6 +199,7 @@ button{font:inherit}
 }
 .sb-phase-action.alt{background:linear-gradient(145deg,#3c1e62,#722b76)}
 .sb-phase-action.ready{border-color:#35e2ad77;background:linear-gradient(145deg,#0c5b48,#118d68)}
+.sb-phase-action.end-turn{border-color:#ffd56a88;background:linear-gradient(145deg,#61420c,#a36d13);box-shadow:0 0 18px #ffd56a1a}
 .sb-phase-action:disabled{opacity:.42;cursor:not-allowed}
 .sb-coin{
   width:42px;height:42px;min-width:42px;border-radius:50%;
@@ -301,52 +302,99 @@ button{font:inherit}
   .sb-zone-pile{min-height:52px}.sb-zone-pile b{font-size:14px}
   .sb-center-band{grid-template-columns:1fr 1.6fr 1fr}
 }
-@media(max-width:640px){
-  :root{--card-w:min(19.5vw,82px);--active-w:min(34vw,142px)}
+@media(max-width:640px), (hover:none) and (pointer:coarse){
+  :root{--card-w:min(27vw,112px);--active-w:min(42vw,160px)}
   html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .sb-battle{height:auto;min-height:100dvh;padding:0;background-attachment:scroll}
   .sb-board{
     height:auto;min-height:100dvh;overflow:visible;border-radius:0;border-left:0;border-right:0;
-    grid-template-rows:auto auto auto auto auto;gap:0
+    display:flex;flex-direction:column;gap:0
   }
-  .sb-player-strip{min-height:50px;padding:6px 8px;position:sticky;top:0;z-index:20;background:#031018f4}
-  .sb-player-avatar{width:34px;height:34px;min-width:34px}.sb-player-copy strong{font-size:12px}.sb-player-copy small{font-size:8px}
-  .sb-match-meta{max-width:51%}.sb-pill{font-size:7px;padding:3px 5px}
-  .sb-half{grid-template-columns:48px minmax(0,1fr) 48px;gap:4px;padding:7px 4px;min-height:310px}
-  .sb-field-core{gap:8px}
-  .sb-reserve{gap:3px}
-  .sb-reserve-slot{padding:3px;border-radius:10px}
-  .sb-reserve-slot>span,.sb-vanguard-slot>span{font-size:6px;top:3px;left:4px}
-  .sb-vanguard-slot{width:min(100%,190px);padding:5px;border-radius:13px}
-  .sb-side-rail{gap:4px}
-  .sb-zone-pile{min-height:48px;padding:3px;border-radius:9px;font-size:6px}.sb-zone-pile b{font-size:11px}
-  .sb-reward-stack{max-width:42px;gap:1px}.sb-reward-card{width:12px;border-radius:2px}
+  .sb-player-strip{
+    min-height:48px;padding:6px 8px;position:relative;top:auto;z-index:6;
+    background:#031018f2
+  }
+  .sb-player-avatar{width:34px;height:34px;min-width:34px}
+  .sb-player-copy strong{font-size:12px}.sb-player-copy small{font-size:8px}
+  .sb-match-meta{max-width:54%;gap:3px}.sb-pill{font-size:7px;padding:3px 5px}
+  .sb-half{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-areas:"rail-left rail-right" "field field";
+    gap:5px;padding:6px;min-height:0
+  }
+  .sb-half>.sb-side-rail:first-child{grid-area:rail-left}
+  .sb-half>.sb-field-core{grid-area:field}
+  .sb-half>.sb-side-rail:last-child{grid-area:rail-right}
+  .sb-side-rail{min-width:0;flex-direction:row;justify-content:stretch;gap:4px}
+  .sb-zone-pile{
+    flex:1 1 0;min-width:0;min-height:42px;padding:3px 4px;border-radius:9px;
+    font-size:6px
+  }
+  .sb-zone-pile b{font-size:11px}
+  .sb-reward-stack{max-width:46px;gap:1px}.sb-reward-card{width:12px;border-radius:2px}
+  .sb-field-core{width:100%;gap:7px}
+  .sb-reserve{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+  .sb-reserve-slot{min-height:132px;padding:5px;border-radius:11px}
+  .sb-reserve-slot>span,.sb-vanguard-slot>span{font-size:6px;top:4px;left:5px}
+  .sb-vanguard-line{min-height:170px}
+  .sb-vanguard-slot{width:min(100%,210px);min-height:160px;padding:5px;border-radius:13px}
   .sb-center-band{
-    grid-template-columns:1fr;
-    gap:5px;padding:6px;
-    position:relative
+    grid-template-columns:1fr;gap:3px;padding:5px 6px;position:relative;
+    border-top:1px solid #55e7ff24;border-bottom:1px solid #55e7ff24
   }
-  .sb-center-band>.sb-realm{order:1}.sb-center-band>.sb-phase-panel{order:2}.sb-center-band>.sb-status{order:3}
-  .sb-phase-card{padding:8px;gap:8px}.sb-phase-copy strong{font-size:11px}.sb-phase-copy small{font-size:8px}
-  .sb-coin{width:38px;height:38px;min-width:38px}
+  .sb-realm{display:none}
+  .sb-phase-panel{min-height:0}
+  .sb-phase-card{
+    width:100%;padding:7px 8px;gap:7px;border-radius:12px;box-shadow:none;
+    justify-content:space-between;flex-wrap:wrap;text-align:left
+  }
+  .sb-phase-copy{flex:1 1 170px}
+  .sb-phase-copy strong{font-size:11px}.sb-phase-copy small{font-size:8px}
+  .sb-phase-actions{flex:0 0 auto;margin-left:auto}
+  .sb-phase-action{min-height:38px;padding:8px 12px;font-size:9px}
+  .sb-status{
+    padding:3px 5px;border:0;background:transparent!important;
+    font-size:7.5px;text-align:center
+  }
+  .sb-coin{width:36px;height:36px;min-width:36px}.sb-coin img{width:21px;height:21px}
   .sb-card-control,.sb-hand-card{border-radius:9px}
-  .sb-card-art{border-radius:8px}.sb-card-name{font-size:7px;bottom:19px}.sb-card-head,.sb-card-foot{font-size:5.8px}
-  .sb-card-wrap.is-selected .sb-card-actions{display:grid}
+  .sb-card-art{border-radius:8px}
+  .sb-card-name{font-size:7.5px;bottom:20px}
+  .sb-card-head,.sb-card-foot{font-size:5.8px}
+  .sb-card-wrap.is-selected .sb-card-actions,.sb-card-wrap.has-setup-return .sb-card-actions{display:grid}
   .sb-card-actions{width:min(260px,86vw)}
-  .sb-hand-wrap{min-height:150px;overflow:visible;padding:6px 6px 10px;position:sticky;bottom:0;z-index:18;background:#020a10f4;box-shadow:0 -10px 30px #0008}
-  .sb-hand{height:auto;min-height:116px;overflow-x:auto;overflow-y:hidden}
-  .sb-hand-card{flex-basis:102px}
-  .sb-hand-help{font-size:7px;max-width:48%}
+  .sb-hand-wrap{
+    min-height:0;overflow:visible;padding:6px 6px 10px;position:relative;bottom:auto;z-index:4;
+    background:#020a10f4;box-shadow:none
+  }
+  .sb-hand-bar{margin-bottom:4px}
+  .sb-hand-title{font-size:8px}.sb-hand-help{font-size:7px;max-width:52%}
+  .sb-hand{height:auto;min-height:132px;overflow-x:auto;overflow-y:hidden;align-items:flex-start}
+  .sb-hand-card{flex-basis:112px}
 }
 @media(max-width:420px){
-  :root{--card-w:min(19vw,72px);--active-w:min(36vw,132px)}
-  .sb-half{grid-template-columns:43px minmax(0,1fr) 43px;min-height:292px}
-  .sb-zone-pile{font-size:5.5px}.sb-zone-pile b{font-size:10px}
+  :root{--card-w:min(28vw,104px);--active-w:min(48vw,154px)}
+  .sb-reserve-slot{min-height:120px}
+  .sb-vanguard-line{min-height:158px}
+  .sb-vanguard-slot{min-height:150px}
+  .sb-hand-card{flex-basis:104px}
+}
+@media(max-width:960px) and (orientation:landscape), (hover:none) and (pointer:coarse) and (orientation:landscape){
+  :root{--card-w:min(18vw,104px);--active-w:min(25vw,146px)}
+  .sb-player-strip{min-height:44px;padding:4px 8px}
+  .sb-half{padding:4px 6px}
+  .sb-reserve{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+  .sb-reserve-slot{min-height:112px}
+  .sb-vanguard-line{min-height:145px}
+  .sb-vanguard-slot{min-height:138px}
+  .sb-phase-card{padding:5px 7px}
+  .sb-hand{min-height:118px}
   .sb-hand-card{flex-basis:96px}
 }
 </style>
 </head>
-<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-5">
+<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-6">
 <main class="sb-battle">
   <section class="sb-board" aria-label="One-screen battlefield">
     <header class="sb-player-strip" aria-label="Opponent">
@@ -413,8 +461,8 @@ button{font:inherit}
 </main>
 
 <script src="stream-bandit-tcg-config-v2-4-31.js?v=2-4-31"></script>
-<script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-5"></script>
+<script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-6"></script>
 <script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-5"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-6"></script>
 </body>
 </html>

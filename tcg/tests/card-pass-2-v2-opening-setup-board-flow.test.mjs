@@ -8,10 +8,11 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
 const battle = fs.readFileSync(path.join(root, 'tcg-battle-v2.html'), 'utf8');
 const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-controller.js'), 'utf8');
+const matchActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-match-actions', 'index.ts'), 'utf8');
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-interaction-v1.json'), 'utf8'));
 
-test('Battle v0.5 follows the recorded tabletop interaction layout without restoring a site shell', () => {
-  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-5"/);
+test('Battle v0.6 follows the recorded tabletop interaction layout without restoring a site shell', () => {
+  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-6"/);
   assert.match(battle, /id="oppReserve"/);
   assert.match(battle, /id="oppVanguard"/);
   assert.match(battle, /id="youVanguard"/);
@@ -27,12 +28,16 @@ test('Battle v0.5 follows the recorded tabletop interaction layout without resto
   assert.doesNotMatch(battle, /stream-bandit-theme-projector/i);
 });
 
-test('phone portrait keeps the board usable without requiring rotation', () => {
-  assert.match(battle, /@media\(max-width:640px\)/);
+test('phone battlefield gives the field full width and does not cover it with sticky chrome', () => {
+  assert.match(battle, /@media\(max-width:640px\), \(hover:none\) and \(pointer:coarse\)/);
   assert.match(battle, /overflow-y:auto/);
-  assert.match(battle, /grid-template-columns:48px minmax\(0,1fr\) 48px/);
-  assert.match(battle, /--active-w:min\(34vw,142px\)/);
-  assert.match(battle, /\.sb-hand-wrap\{min-height:150px;overflow:visible/);
+  assert.match(battle, /grid-template-areas:"rail-left rail-right" "field field"/);
+  assert.match(battle, /\.sb-half>\.sb-field-core\{grid-area:field\}/);
+  assert.match(battle, /\.sb-reserve\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(battle, /\.sb-player-strip\{[\s\S]*?position:relative;top:auto/);
+  assert.match(battle, /\.sb-hand-wrap\{[\s\S]*?position:relative;bottom:auto/);
+  assert.match(battle, /\.sb-realm\{display:none\}/);
+  assert.match(battle, /@media\(max-width:960px\) and \(orientation:landscape\), \(hover:none\) and \(pointer:coarse\) and \(orientation:landscape\)/);
   assert.match(battle, /scroll-snap-type:x proximity/);
 });
 
@@ -46,15 +51,34 @@ test('opening toss is rendered from authoritative toss_winner_seat and never ran
   assert.doesNotMatch(controller, /crypto\.getRandomValues\s*\(/);
 });
 
-test('opening setup uses the existing server setup actions and card-zone destinations', () => {
+test('opening setup uses the existing server setup actions and guides Vanguard before Reserves', () => {
   assert.match(controller, /data-setup-hand-uid/);
-  assert.match(controller, /data-setup-destination="reserve"/);
   assert.match(controller, /dataset\.setupDestination = 'vanguard'/);
+  assert.match(controller, /yourSetup && hasVanguard && !creature && state\.selectedHandUid/);
+  assert.match(controller, /selected — tap Your Vanguard first/);
+  assert.match(controller, /Choose your Vanguard Creature first/);
   assert.match(controller, /runAuthoritativeSetupAction\('setup_place'/);
   assert.match(controller, /runAuthoritativeSetupAction\('setup_return'/);
   assert.match(controller, /runAuthoritativeSetupAction\('setup_ready'/);
   assert.match(controller, /client_nonce: crypto\.randomUUID\(\)/);
   assert.match(controller, /expected_revision: revision\(\)/);
+});
+
+test('End Turn is a browser control for the existing tcg-match-actions lifecycle owner', () => {
+  assert.match(matchActions, /if\(action==="end_turn"\)\{/);
+  assert.match(matchActions, /aftermath\(seat\);return json\(\{version:VERSION,result:await commit\("end_turn",\{seat\}\)\}\)/);
+  assert.match(controller, /data-end-turn="1"/);
+  assert.match(controller, /async function runEndTurn\(\)/);
+  assert.match(controller, /view\.phase !== 'play'/);
+  assert.match(controller, /Number\(view\.active_seat\) !== youSeat/);
+  assert.match(controller, /hasPendingAction\(view\)/);
+  assert.match(controller, /await callEdge\(API_MATCH, actionBase\('end_turn'\)\)/);
+});
+
+test('phone setup selection scrolls toward the canonical destination instead of hiding it behind the hand', () => {
+  assert.match(controller, /window\.matchMedia\('\(max-width: 640px\), \(hover: none\) and \(pointer: coarse\)'\)\.matches/);
+  assert.match(controller, /const target = hasVanguard \? \$\('youReserve'\) : \$\('youVanguardSlot'\)/);
+  assert.match(controller, /target\.scrollIntoView\(\{ behavior: 'smooth', block: 'center' \}\)/);
 });
 
 test('browser setup guidance does not replace the server legality owner', () => {
@@ -66,7 +90,7 @@ test('browser setup guidance does not replace the server legality owner', () => 
 });
 
 test('toss reveal is stable between polling refreshes and setup placements can be corrected', () => {
-  assert.match(battle, /\.sb-card-wrap\.has-setup-return \.sb-card-actions\{display:grid/);
+  assert.match(battle, /\.sb-card-wrap\.has-setup-return \.sb-card-actions/);
   assert.match(controller, /opts\.setupReturn \? ' has-setup-return' : ''/);
   assert.match(controller, /data-setup-return=/);
   const refreshStart = controller.indexOf('async function refreshMatch()');

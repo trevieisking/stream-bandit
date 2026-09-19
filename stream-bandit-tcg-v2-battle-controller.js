@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.5';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.6';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const SETUP_RECIPES = new Set(['Creature — Baby', 'Creature — Standalone', 'Creature — Mythic']);
@@ -334,9 +334,10 @@
     if (!node) return;
     const view = viewState();
     const yourSetup = !!(own && view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
+    const hasVanguard = !!(view && view.you && view.you.vanguard);
     node.innerHTML = [0, 1, 2, 3].map((index) => {
       const creature = reserve && reserve[index];
-      const destination = yourSetup && !creature && state.selectedHandUid
+      const destination = yourSetup && hasVanguard && !creature && state.selectedHandUid
         ? ' data-setup-destination="reserve" data-setup-index="' + index + '"'
         : '';
       const legalClass = destination ? ' sb-setup-destination is-legal' : '';
@@ -368,6 +369,20 @@
     return instance ? String(definition.name || instance.card_id || 'Selected card') : '';
   }
 
+  function hasPendingAction(view) {
+    return !!(
+      view && (
+        view.pending_attack_choice ||
+        view.pending_ability_choice ||
+        view.pending_event_listener_choice ||
+        view.pending_movement_listener_choice ||
+        view.pending_heal_listener_choice ||
+        view.pending_choice ||
+        view.pending_resolution
+      )
+    );
+  }
+
   function renderVanguardSetupTarget() {
     const view = viewState();
     const slot = $('youVanguardSlot');
@@ -392,7 +407,9 @@
     const youSeat = Number(view.you && view.you.seat);
     const phase = String(view.phase || '');
     const selectedName = selectedSetupName();
-    const key = [phase, revision(), view.toss_winner_seat, view.setup_turn_seat, state.selectedHandUid, !!(view.you && view.you.vanguard), view.result && view.result.winner_seat].join(':');
+    const pending = hasPendingAction(view);
+    const yourTurn = phase === 'play' && Number(view.active_seat) === youSeat;
+    const key = [phase, revision(), view.toss_winner_seat, view.setup_turn_seat, state.selectedHandUid, !!(view.you && view.you.vanguard), pending, yourTurn, view.result && view.result.winner_seat].join(':');
     if (key === state.overlayKey) return;
     state.overlayKey = key;
 
@@ -417,10 +434,26 @@
         '<div class="sb-phase-card">' +
         '<div class="sb-phase-copy"><strong>' + (yourSetup ? 'Set your opening field' : 'Opponent is setting their opening field') + '</strong>' +
         '<small>' + (yourSetup
-          ? (selectedName ? selectedName + ' selected — tap Vanguard or a Reserve slot.' : 'Tap an eligible opening Creature in your hand, then tap its board slot.')
+          ? (!hasVanguard
+            ? (selectedName ? selectedName + ' selected — tap Your Vanguard first.' : 'Choose an eligible Creature for Your Vanguard first.')
+            : (selectedName ? selectedName + ' selected — tap an open Reserve slot, or confirm your setup.' : 'Vanguard ready. Add optional Reserves or confirm your setup.'))
           : 'Your board stays visible while the server waits for their setup.') + '</small></div>' +
         (yourSetup
           ? '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-setup-ready="1"' + (hasVanguard ? '' : ' disabled') + '>Confirm Setup</button></div>'
+          : '') +
+        '</div>';
+      return;
+    }
+
+    if (phase === 'play') {
+      node.innerHTML =
+        '<div class="sb-phase-card sb-turn-card">' +
+        '<div class="sb-phase-copy"><strong>' + (yourTurn ? 'Your turn' : 'Opponent turn') + '</strong>' +
+        '<small>' + (yourTurn
+          ? (pending ? 'Resolve the current server choice before ending your turn.' : 'Use your card controls, or pass without attacking.')
+          : 'Your field stays synced while the opponent acts.') + '</small></div>' +
+        (yourTurn
+          ? '<div class="sb-phase-actions"><button type="button" class="sb-phase-action end-turn" data-end-turn="1"' + ((pending || state.busy) ? ' disabled' : '') + '>End Turn</button></div>'
           : '') +
         '</div>';
       return;
@@ -449,15 +482,7 @@
 
     const youSeat = Number(view.you && view.you.seat);
     const yourTurn = view.phase === 'play' && Number(view.active_seat) === youSeat;
-    const pending = !!(
-      view.pending_attack_choice ||
-      view.pending_ability_choice ||
-      view.pending_event_listener_choice ||
-      view.pending_movement_listener_choice ||
-      view.pending_heal_listener_choice ||
-      view.pending_choice ||
-      view.pending_resolution
-    );
+    const pending = hasPendingAction(view);
     const canAttack = yourTurn && !pending && !state.busy;
     const yourSetup = view.phase === 'setup' && Number(view.setup_turn_seat) === youSeat;
 
@@ -503,7 +528,12 @@
 
     const help = $('handHelp');
     if (help) {
-      if (yourSetup) help.textContent = state.selectedHandUid ? 'Now tap Vanguard or an open Reserve slot.' : 'Tap an eligible opening Creature.';
+      if (yourSetup) {
+        const hasVanguard = !!(view.you && view.you.vanguard);
+        help.textContent = !hasVanguard
+          ? (state.selectedHandUid ? 'Now tap Your Vanguard.' : 'Choose your Vanguard Creature first.')
+          : (state.selectedHandUid ? 'Now tap an open Reserve slot.' : 'Add optional Reserves or confirm setup.');
+      }
       else if (view.phase === 'opening_choice') help.textContent = 'Opening hand dealt by the server.';
       else help.textContent = 'Select cards directly from your hand.';
     }
@@ -520,7 +550,7 @@
     } else if (pending) {
       setStatus('The board is authoritative. Resolve the pending server choice before another card action.', 'wait');
     } else if (yourTurn) {
-      setStatus('Your turn. Select your Vanguard; legal card actions stay attached to the card.', 'ready');
+      setStatus('Your turn. Use your card controls, attack if legal, or End Turn to pass.', 'ready');
     } else {
       setStatus('Board synced. Waiting for the opponent or the next server phase.', 'wait');
     }
@@ -573,6 +603,16 @@
         state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
         state.overlayKey = '';
         render();
+        if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches) {
+          window.requestAnimationFrame(() => {
+            const current = viewState();
+            const hasVanguard = !!(current && current.you && current.you.vanguard);
+            const target = hasVanguard ? $('youReserve') : $('youVanguardSlot');
+            if (target && typeof target.scrollIntoView === 'function') {
+              target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          });
+        }
       };
       card.addEventListener('click', select);
       card.addEventListener('keydown', (event) => {
@@ -606,6 +646,12 @@
     document.querySelectorAll('[data-setup-ready]').forEach((button) => {
       button.addEventListener('click', async () => {
         if (!button.disabled) await runSetupReady();
+      });
+    });
+
+    document.querySelectorAll('[data-end-turn]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        if (!button.disabled) await runEndTurn();
       });
     });
 
@@ -662,6 +708,37 @@
 
   async function runSetupReady() {
     await runAuthoritativeSetupAction('setup_ready', {}, 'Locking your opening field through the server Match Flow owner…');
+  }
+
+  async function runEndTurn() {
+    const view = viewState();
+    const youSeat = Number(view && view.you && view.you.seat);
+    if (
+      !view ||
+      view.phase !== 'play' ||
+      Number(view.active_seat) !== youSeat ||
+      hasPendingAction(view) ||
+      state.busy
+    ) return;
+
+    state.busy = true;
+    state.overlayKey = '';
+    render();
+    setStatus('Ending your turn through the authoritative turn lifecycle…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, actionBase('end_turn'));
+      state.selectedAnchorUid = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
   }
 
   async function runAttackIntent(attackSlot) {
