@@ -29,7 +29,7 @@ test('V2.4.46 Second Sky presentation is bound to the exact canonical starter re
 
 test('Second Sky product presentation is data-driven and does not own gameplay or economy mutation',async()=>{
   const src=await read('stream-bandit-tcg-product-presentation-v2-4-46.js');
-  for(const token of ['deck-astral-second-sky','tcg-set-one-starters-v0.2.json','tcg-art-production-ledger-v1.json','tcg-deck-accessory-ledger-v1.json','tcg-art-manifest.json']){
+  for(const token of ['tcg-product-presentation-v1.json','tcg-set-one-starters-v0.2.json','tcg-art-production-ledger-v1.json','tcg-deck-accessory-ledger-v1.json','tcg-art-manifest.json']){
     assert.ok(src.includes(token),token);
   }
   assert.equal(src.includes('supabase.from('),false);
@@ -60,4 +60,17 @@ test('Second Sky keeps its matching cosmetic accessory contract without fabricat
   assert.deepEqual(bundle.accessories.map(x=>x.accessory_type),['sleeve_set','battle_coin','deck_box']);
   assert.ok(bundle.accessories.every(x=>x.ownership_status==='not_implemented'));
   assert.ok(bundle.accessories.every(x=>x.gameplay_effect===false));
+});
+
+test('product presentation registry keeps future deck expansion data-driven',async()=>{
+  const registry=JSON.parse(await read('assets/tcg/products/tcg-product-presentation-v1.json'));
+  assert.equal(registry.schema,'stream-bandit-tcg-product-presentation-v1');
+  assert.deepEqual(registry.featured_starter_ids,['deck-astral-second-sky']);
+  assert.equal(registry.shop_featured_starter_id,'deck-astral-second-sky');
+  assert.equal(registry.battle_pass.display_name,'Set One — Season 1');
+  assert.equal(registry.battle_pass.tier_count,100);
+  assert.equal(registry.battle_pass.reward_assignment_state,'unassigned_canonical_owner_required');
+  assert.equal(registry.preview_policy.gameplay_mutation,false);
+  assert.equal(registry.preview_policy.ownership_inference,false);
+  assert.ok(registry.extension_rule.includes('starter_id'));
 });
