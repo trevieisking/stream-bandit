@@ -91,7 +91,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Star Essence
 - Orbit Essence
 - Nova Essence
+- Archivist Sol
 
-Material progress: **15/193**.
-Astral material progress: **15/24**.
-Next source-of-truth candidate at this checkpoint: **Archivist Sol** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **16/193**.
+Astral material progress: **16/24**.
+Next source-of-truth candidate at this checkpoint: **Cartographer Lyra** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
