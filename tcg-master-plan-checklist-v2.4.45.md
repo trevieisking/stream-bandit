@@ -40,9 +40,10 @@
 - [x] Cartographer Lyra.
 - [x] Future Draw.
 - [x] Gravity Shift.
-- [ ] Star Chart.
-- [ ] Set One Standard/base PNG masters complete: **19/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **19/24 -> 24/24**.
+- [x] Star Chart.
+- [ ] Celestial Observatory.
+- [ ] Set One Standard/base PNG masters complete: **20/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **20/24 -> 24/24**.
 - [ ] Final clean backgrounds complete: **0/8 -> 8/8**.
 
 ## Safety
