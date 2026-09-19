@@ -289,3 +289,10 @@ main.tcg-page{gap:7px}
   .tcg-product-card-grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
   .tcg-product-card{min-height:145px}
 }
+
+.tcg-card-feed>.tcg-product-card-grid{grid-column:1/-1;width:100%}
+.tcg-product-shop-tile{grid-column:1/-1}
+.tcg-product-reward::before{display:none}
+.tcg-product-mini{display:grid;gap:6px;margin-top:7px}
+.tcg-product-mini h3{margin:0;font-size:13px}
+.tcg-product-mini small{color:var(--tcg-muted);line-height:1.25}
