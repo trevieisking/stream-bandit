@@ -54,7 +54,7 @@ test('approved repo-owned art targets exist and do not use GitHack',async()=>{
 test('page shell loads the canonical art owner without changing accepted shell identity',async()=>{
   const shell=await read('stream-bandit-tcg-page-shell-v2-4-3.js');
   assert.ok(shell.includes('const VERSION="2.4.32"'));
-  assert.ok(shell.includes('stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46'));
+  assert.ok(shell.includes('stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-36'));
   assert.ok(shell.includes('owner.applyPageArt(body)'));
   assert.ok(shell.includes('owner.applyBranding(document)'));
 });
@@ -72,6 +72,7 @@ test('art resolver decorates existing rendered cards instead of changing Card Re
 
 test('battle adds art owner alongside accepted controller and renderer cache contracts',async()=>{
   const html=await read('tcg-battle-v2.html');
+  assert.ok(html.includes('stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46'));
   const resolverPos=html.indexOf('stream-bandit-tcg-art-resolver-v2-4-36.js');
   const rendererPos=html.indexOf('stream-bandit-tcg-card-renderer-v2-4-7.js?v=2-4-10');
   assert.ok(resolverPos>0&&rendererPos>resolverPos);
