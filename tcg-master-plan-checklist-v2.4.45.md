@@ -38,9 +38,10 @@
 - [x] Nova Essence.
 - [x] Archivist Sol.
 - [x] Cartographer Lyra.
-- [ ] Future Draw.
-- [ ] Set One Standard/base PNG masters complete: **17/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **17/24 -> 24/24**.
+- [x] Future Draw.
+- [ ] Gravity Shift.
+- [ ] Set One Standard/base PNG masters complete: **18/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **18/24 -> 24/24**.
 - [ ] Final clean backgrounds complete: **0/8 -> 8/8**.
 
 ## Safety
