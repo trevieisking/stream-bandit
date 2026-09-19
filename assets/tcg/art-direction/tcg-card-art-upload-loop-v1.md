@@ -88,7 +88,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Starwhale
 - Celestyr — Dream Cartographer
 - Basic Astral Essence
+- Star Essence
 
-Material progress: **12/193**.
-Astral material progress: **12/24**.
-Next source-of-truth candidate at this checkpoint: **Star Essence** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **13/193**.
+Astral material progress: **13/24**.
+Next source-of-truth candidate at this checkpoint: **Orbit Essence** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
