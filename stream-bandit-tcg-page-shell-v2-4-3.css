@@ -280,3 +280,140 @@ main.tcg-page{gap:7px}
   .tcg-client-nav a{padding:2px 1px 4px;font-size:8px}
   .tcg-client-nav a::before{font-size:17px}
 }
+
+
+/* V2.4.50 mobile acceptance: full rail plus vertically scrollable complete TCG surfaces. */
+@media(max-width:720px){
+  html{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
+  body{
+    position:static;
+    width:100%;
+    height:auto;
+    min-height:100dvh;
+    overflow-x:hidden;
+    overflow-y:auto;
+  }
+  .tcg-client{
+    height:auto;
+    min-height:100dvh;
+    grid-template-rows:auto minmax(0,1fr);
+    overflow:visible;
+  }
+  .tcg-client-topbar{
+    position:sticky;
+    top:0;
+    z-index:40;
+    width:100%;
+    height:auto;
+    min-height:0;
+    margin:0;
+    padding:5px 7px 7px;
+    grid-template-columns:1fr;
+    grid-template-rows:auto auto;
+    gap:5px;
+    border-radius:0 0 16px 16px;
+    overflow:visible;
+  }
+  .tcg-client-brand{
+    height:48px;
+    justify-content:center;
+    padding:0 6px;
+  }
+  .tcg-client-brand img{width:44px;height:44px}
+  .tcg-client-brand-copy strong{font-size:20px;line-height:.9}
+  .tcg-client-brand-copy span{display:block;font-size:8px;letter-spacing:.28em;margin-top:4px}
+  .tcg-client-nav{
+    width:100%;
+    height:auto;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-rows:repeat(2,44px);
+    gap:2px;
+    align-self:auto;
+    overflow:visible;
+    border-radius:11px;
+  }
+  .tcg-client-nav a{
+    min-height:44px;
+    gap:0;
+    padding:3px 1px;
+    border-right:1px solid #4ecaff26;
+    border-bottom:1px solid #4ecaff26;
+    font-size:8px;
+    letter-spacing:.05em;
+    line-height:1;
+  }
+  .tcg-client-nav a:nth-child(3n){border-right:0}
+  .tcg-client-nav a:nth-child(n+4){border-bottom:0}
+  .tcg-client-nav a::before{font-size:17px;line-height:1}
+  .tcg-client-stage{
+    min-height:0;
+    overflow:visible;
+    padding:8px;
+  }
+  main.tcg-page,
+  .tcg-screen{
+    height:auto;
+    min-height:0;
+    overflow:visible;
+  }
+  .tcg-screen-title{padding:3px 6px 7px}
+  .tcg-screen-title h1{font-size:34px}
+  .tcg-screen-title p{display:block;margin-top:5px;font-size:8px;letter-spacing:.16em}
+  .tcg-grid,
+  .tcg-play-layout,
+  .tcg-core-layout{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+    overflow:visible;
+  }
+  .tcg-play-layout,
+  .tcg-core-layout{flex:none}
+  .tcg-mode-grid{grid-template-columns:1fr;min-height:0}
+  .tcg-side-stack{
+    grid-template-columns:1fr;
+    grid-template-rows:none!important;
+    grid-auto-rows:auto;
+    gap:8px;
+    overflow:visible;
+  }
+  .tcg-list-panel,
+  .tcg-detail-panel,
+  .tcg-deck-panel{
+    display:grid;
+    grid-template-rows:auto!important;
+    min-height:0;
+  }
+  .tcg-frame,
+  .tcg-card,
+  .tcg-panel,
+  .tcg-hero{overflow:visible}
+  .tcg-feed,
+  .tcg-secondary-feed{
+    max-height:none;
+    overflow:visible!important;
+    scrollbar-gutter:auto;
+  }
+  .tcg-card-feed{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    padding-right:0;
+    overflow:visible!important;
+  }
+  .tcg-mode-card{min-height:330px}
+  .tcg-mode-art{min-height:190px}
+  .tcg-reward-rail{
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    max-width:100%;
+  }
+}
+@media(max-width:420px){
+  .tcg-client-brand{justify-content:flex-start}
+  .tcg-client-brand-copy strong{font-size:18px}
+  .tcg-client-nav{grid-template-rows:repeat(2,42px)}
+  .tcg-client-nav a{min-height:42px;font-size:7.5px}
+  .tcg-client-nav a::before{font-size:16px}
+  .tcg-card-feed{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
