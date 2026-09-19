@@ -137,7 +137,8 @@
     if (!avatar) {
       frame.hidden = true;
       fallback.hidden = false;
-      image.removeAttribute('src');
+      if (typeof image.removeAttribute === 'function') image.removeAttribute('src');
+      else image.src = '';
       image.alt = '';
       return;
     }
