@@ -21,8 +21,8 @@ Conversation memory, model memory and prior response text are not sufficient aut
 
 ## Current verified material truth
 
-Set One Standard/base PNG masters verified at canonical paths: **7/193**.
-Astral verified: **7/24**.
+Set One Standard/base PNG masters verified at canonical paths: **8/193**.
+Astral verified: **8/24**.
 
 Verified cards:
 - Stardot
@@ -32,8 +32,9 @@ Verified cards:
 - Comettail
 - Nebulynx
 - Cometmanta
+- Orbitortoise
 
-The current ledger sequence indicates `astral-orbitortoise` next, but the workflow requires a fresh GitHub preflight again immediately before its image is generated.
+The current ledger sequence indicates `astral-prismowl` next, but the workflow requires a fresh GitHub preflight again immediately before its image is generated.
 
 ## Rejected-candidate rule
 
