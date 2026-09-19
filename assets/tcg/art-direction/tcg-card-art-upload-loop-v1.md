@@ -99,7 +99,10 @@ Verified canonical Set One Standard/base PNG masters present:
 - Celestial Observatory
 - Dreamglass
 - Orbit Ring
+- Parallax Window
 
-Material progress: **23/193**.
-Astral material progress: **23/24**.
-Next source-of-truth candidate at this checkpoint: **Parallax Window** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **24/193**.
+Astral material progress: **24/24**.
+Next source-of-truth candidate at this checkpoint: **Glowcub** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+
+Astral Standard/base artwork is now complete at **24/24**.
