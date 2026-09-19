@@ -102,3 +102,18 @@ The first completed deck presentation is now wired on the PR branch using canoni
 - **Set One — Season 1** remains presentation-only until canonical progression/economy owners assign actual tiers/rewards/entitlements.
 - Second Sky sleeve, battle coin and deck-box artwork are still pending and must not be claimed complete.
 - No gameplay engine, card rules, database row, Edge Function, Supabase deployment, `main`, Pages/public or live release was changed by this presentation slice.
+
+## Second Sky human visual acceptance — PASS
+
+Trevor completed the branch-preview visual review and accepted the current Second Sky presentation on exact head `7d15aec02ee76613a706e4ca491f6c091e57351b`.
+
+Accepted surfaces:
+- Game Home;
+- Play, including the final Active Battle sidebar balance;
+- Decks;
+- Collection;
+- Shop;
+- Battle Pass;
+- shared top navigation rail.
+
+The accepted visual pass is presentation-only. Second Sky accessory artwork is still pending, economy/Battle Pass ownership remains gated, and no merge/main/Pages/live promotion is implied by this visual acceptance.
