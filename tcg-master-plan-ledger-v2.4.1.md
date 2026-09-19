@@ -352,3 +352,45 @@ Do not change gameplay rules merely to make the visual shell easier to build.
 Do not add another isolated debug control as the main product-development slice.
 
 Do not deploy Supabase unless a later exact visual/data integration gap proves a backend change is actually required.
+
+
+## 2026-09-18 — canonical INTERACT-01…09 synchronization
+
+**Accepted source head:** `3840c79f9eef51fe1ae70f21cbbc86a55adadd57`
+
+The per-slice V2.4.8 through V2.4.23 evidence now closes all nine direct-tabletop interaction entries in the canonical V2.4.1 checklist through the tap/select/accessibility path:
+
+- Creature placement;
+- Evolution;
+- Essence;
+- Relic;
+- Realm;
+- structured Tactic play/choices;
+- cancellation before commit where applicable;
+- server-final legality;
+- card-owned Ability/Attack/Withdraw.
+
+This does **not** close ORDER-05 because the same Stage 3 order item also requires remaining board-visible resolution/state feedback. The next target is V2.4.24 Reward claim + mandatory promotion under the existing Match owner.
+
+
+---
+
+## 2026-09-19 — V2.4.40 official deck accessory authority
+
+**Decision:** every official starter/deck product carries a themed three-piece cosmetic set:
+
+1. Card Sleeve Set / card-back treatment;
+2. Battle Coin cosmetic;
+3. Deck Box cosmetic.
+
+**Repository authority:** `assets/tcg/accessories/tcg-deck-accessory-ledger-v1.json`.
+
+The eight active Set One starters map one-to-one to eight accessory bundles (24 launch accessory slots total). Every accessory has an exact `accessory_id`, `artwork_id` and repository target path.
+
+Starter ownership semantics are idempotent: acquiring the official deck ensures its matching trio once. Existing starter owners must be backfilled when the owner is implemented. A custom user-built deck does not create a new accessory identity; it may use cosmetics already owned by the player.
+
+Shop policy is locked: unowned themed sleeves, battle coins and deck boxes must be obtainable in the in-game Shop once the canonical economy/catalog owner exists. Owned accessories are recognised and duplicate purchase/grant is blocked. No price/currency is fabricated in browser code.
+
+Battle Coin safety is explicit: cosmetic only, no influence on server-authoritative toss/randomness or match outcome.
+
+Future official starter/deck products inherit the same three-accessory contract. This does not promote Fairy or Underworld into the current eight-deck launch/runtime baseline.

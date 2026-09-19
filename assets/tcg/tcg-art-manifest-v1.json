@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "authority": "Stream Bandit TCG branding",
+  "hosting": "repository-relative assets; no GitHack dependency",
+  "branding": {
+    "primary_logo": {
+      "path": "assets/tcg/branding/stream-bandit-tcg-logo-v1.webp",
+      "mime": "image/webp",
+      "width": 640,
+      "height": 480,
+      "use": "primary game logo / splash / marketing"
+    },
+    "topbar_emblem": {
+      "path": "assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp",
+      "mime": "image/webp",
+      "width": 256,
+      "height": 256,
+      "use": "TCG fixed client top bar"
+    }
+  }
+}

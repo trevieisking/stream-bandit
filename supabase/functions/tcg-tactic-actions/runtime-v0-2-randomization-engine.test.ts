@@ -1,4 +1,5 @@
 import {
+  runtimeV02FlipCoin,
   runtimeV02ShuffleInPlace,
   runtimeV02ShuffledCopy,
   runtimeV02UniformRandomInt,
@@ -13,6 +14,19 @@ function assertEquals<T>(actual: T, expected: T, message: string) {
     throw new Error(`${message}: expected ${String(expected)}, received ${String(actual)}`);
   }
 }
+
+Deno.test("coin flips stay stateless and map every independent two-way draw to heads or tails", () => {
+  assertEquals(runtimeV02FlipCoin(() => 0), "heads", "zero must map to heads");
+  assertEquals(runtimeV02FlipCoin(() => 1), "tails", "one must map to tails");
+  assertEquals(runtimeV02FlipCoin(() => 0xfffffffe), "heads", "even uint32 must map to heads");
+  assertEquals(runtimeV02FlipCoin(() => 0xffffffff), "tails", "odd uint32 must map to tails");
+
+  const values = [0, 0, 1, 1, 0];
+  let cursor = 0;
+  const results = values.map(() => runtimeV02FlipCoin(() => values[cursor++]));
+  assertEquals(results.join(","), "heads,heads,tails,tails,heads", "coin owner must never streak-correct or alternate results");
+  assertEquals(cursor, values.length, "each flip must consume exactly one accepted two-way draw");
+});
 
 Deno.test("randomization engine uses rejection sampling before modulo reduction", () => {
   const values = [0xffffffff, 5];

@@ -1,12 +1,27 @@
 import {
   runtimeV02ApplyOpeningChoice,
+  runtimeV02ApplyOpeningCoinCall,
   runtimeV02ApplySetupReady,
   type RuntimeV02OpeningChoiceState,
+  type RuntimeV02OpeningCoinCallState,
   type RuntimeV02SetupReadyState,
 } from "../_shared/tcg-match-flow-engine-v0-2.ts";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
+}
+
+function coinState(overrides: Record<string, unknown> = {}): RuntimeV02OpeningCoinCallState {
+  return {
+    phase: "opening_coin_call",
+    coin_call_seat: 1,
+    coin_call: null,
+    coin_result: null,
+    toss_winner_seat: null,
+    marker: "untouched",
+    log: ["Match created. Seat 1 must call heads or tails for the opening toss."],
+    ...overrides,
+  };
 }
 
 function baseState(overrides: Record<string, unknown> = {}): RuntimeV02OpeningChoiceState {
@@ -50,6 +65,64 @@ function setupState(
     ...overrides,
   };
 }
+
+Deno.test("Match Flow resolves a correct opening coin call and advances only to turn-order choice", () => {
+  const state = coinState();
+  let calls = 0;
+  const result = runtimeV02ApplyOpeningCoinCall(state, 1, "HEADS", () => {
+    calls += 1;
+    return "heads";
+  });
+  assert(result.ok, "opening coin call was rejected");
+  assert(calls === 1, "opening coin call must consume exactly one server flip");
+  assert(result.coin_call === "heads" && result.coin_result === "heads", "coin result contract changed");
+  assert(result.toss_winner_seat === 1, "matching caller did not win the toss");
+  assert(state.phase === "opening_choice", "coin result did not advance to turn-order choice");
+  assert(state.coin_call === "heads" && state.coin_result === "heads", "public coin state not stored");
+  assert(state.toss_winner_seat === 1, "toss winner state mismatch");
+  assert(state.marker === "untouched", "unrelated coin-call state changed");
+  const log = state.log as string[];
+  assert(log.at(-1) === "Seat 1 called heads. Coin landed heads. Seat 1 won the opening toss.", "coin log changed");
+});
+
+Deno.test("Match Flow gives the other seat the toss when the caller misses", () => {
+  const state = coinState();
+  const result = runtimeV02ApplyOpeningCoinCall(state, 1, "tails", () => "heads");
+  assert(result.ok, "valid miss was rejected");
+  assert(result.toss_winner_seat === 2, "opposing seat did not win a missed call");
+  assert(state.coin_call === "tails" && state.coin_result === "heads", "call/result state mismatch");
+});
+
+Deno.test("Match Flow rejects invalid coin calls before consuming randomness or mutating", () => {
+  for (const [state, controller, call] of [
+    [coinState(), 2, "heads"],
+    [coinState(), 1, "edge"],
+    [coinState({ phase: "opening_choice" }), 1, "heads"],
+  ] as const) {
+    const before = JSON.stringify(state);
+    let calls = 0;
+    const result = runtimeV02ApplyOpeningCoinCall(state, controller as 1 | 2, call, () => {
+      calls += 1;
+      return "heads";
+    });
+    assert(!result.ok, "illegal opening coin call was accepted");
+    assert(calls === 0, "rejected opening coin call consumed randomness");
+    assert(JSON.stringify(state) === before, "rejected opening coin call mutated state");
+  }
+});
+
+Deno.test("Match Flow fails closed on an invalid injected coin result without mutating", () => {
+  const state = coinState();
+  const before = JSON.stringify(state);
+  let message = "";
+  try {
+    runtimeV02ApplyOpeningCoinCall(state, 1, "heads", (() => "edge") as never);
+  } catch (error) {
+    message = error instanceof Error ? error.message : String(error);
+  }
+  assert(message === "tcg_v0_2_match_flow_coin_result_invalid", "invalid coin result error changed");
+  assert(JSON.stringify(state) === before, "invalid injected coin result mutated state");
+});
 
 Deno.test("Match Flow opening choice lets toss winner Seat 1 choose first", () => {
   const state = baseState();

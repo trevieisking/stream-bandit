@@ -87,43 +87,43 @@
 
 ### Implementation
 
-- [ ] **ART-IMPL-01** Inventory current artwork/image assets and existing art metadata.
-- [ ] **ART-IMPL-02** Define/confirm canonical art asset reference field(s) and printing mapping.
+- [x] **ART-IMPL-01** Inventory current artwork/image assets and existing art metadata.
+- [x] **ART-IMPL-02** Define/confirm canonical art asset reference field(s) and printing mapping.
 - [ ] **ART-IMPL-03** Wire approved art into the reusable renderer.
-- [ ] **ART-IMPL-04** Provide explicit safe development fallback for placeholder/missing art.
-- [ ] **ART-IMPL-05** Track release-visible cards with missing/placeholder art until cleared.
+- [x] **ART-IMPL-04** Provide explicit safe development fallback for placeholder/missing art.
+- [x] **ART-IMPL-05** Track release-visible cards with missing/placeholder art until cleared.
 - [ ] **ART-IMPL-06** Element/family visual treatments work for Astral, Ember, Gale, Grove, Shade, Stone, Tide and Volt while remaining data-driven for future content.
 
 ---
 
 ## E. V2-VISUAL-02 — board-visible state
 
-- [ ] **STATE-VIS-01** Damage/current HP changes are visible.
-- [ ] **STATE-VIS-02** Shield state is visible.
-- [ ] **STATE-VIS-03** Conditions are visible.
-- [ ] **STATE-VIS-04** Ability spent/locked state is visible where applicable.
-- [ ] **STATE-VIS-05** Legal targets highlight; illegal targets remain inactive.
-- [ ] **STATE-VIS-06** Evolution legal targets glow green.
-- [ ] **STATE-VIS-07** Reward count/claim state is visible.
-- [ ] **STATE-VIS-08** Deck/Discard counts are visible.
-- [ ] **STATE-VIS-09** Active turn/phase is visible without dominating the table.
-- [ ] **STATE-VIS-10** Pending choice/search/listener state is visible while preserving battlefield context.
-- [ ] **STATE-VIS-11** Defeat/KO and mandatory promotion are visually expressed.
-- [ ] **STATE-VIS-12** Victory/defeat/result state is visually expressed.
+- [x] **STATE-VIS-01** Damage/current HP changes are visible.
+- [x] **STATE-VIS-02** Shield state is visible.
+- [x] **STATE-VIS-03** Conditions are visible.
+- [x] **STATE-VIS-04** Ability spent/locked state is visible where applicable.
+- [x] **STATE-VIS-05** Legal targets highlight; illegal targets remain inactive.
+- [x] **STATE-VIS-06** Evolution legal targets glow green.
+- [x] **STATE-VIS-07** Reward count/claim state is visible.
+- [x] **STATE-VIS-08** Deck/Discard counts are visible.
+- [x] **STATE-VIS-09** Active turn/phase is visible without dominating the table.
+- [x] **STATE-VIS-10** Pending choice/search/listener state is visible while preserving battlefield context.
+- [x] **STATE-VIS-11** Defeat/KO and mandatory promotion are visually expressed.
+- [x] **STATE-VIS-12** Victory/defeat/result state is visually expressed.
 
 ---
 
 ## F. V2-INTERACT-01 — direct tabletop interaction
 
-- [ ] **INTERACT-01** Creature from hand can be dragged or tap-selected to legal Vanguard/Reserve destination.
-- [ ] **INTERACT-02** Evolution can be dragged/tap-selected to legal Creature stack with green highlighting.
-- [ ] **INTERACT-03** Essence can be dragged/tap-selected to legal Creature.
-- [ ] **INTERACT-04** Relic can be dragged/tap-selected to legal host.
-- [ ] **INTERACT-05** Realm can be dragged/tap-selected to Realm slot.
-- [ ] **INTERACT-06** Tactic launches structured board target/choice flow from the physical card.
-- [ ] **INTERACT-07** Misclick/selection can be cancelled before authoritative commit where rules permit.
-- [ ] **INTERACT-08** Server authority remains final legality authority for every interaction.
-- [ ] **INTERACT-09** Vanguard Ability/Attack/Withdraw remain card-context actions.
+- [x] **INTERACT-01** Creature from hand can be dragged or tap-selected to legal Vanguard/Reserve destination.
+- [x] **INTERACT-02** Evolution can be dragged/tap-selected to legal Creature stack with green highlighting.
+- [x] **INTERACT-03** Essence can be dragged/tap-selected to legal Creature.
+- [x] **INTERACT-04** Relic can be dragged/tap-selected to legal host.
+- [x] **INTERACT-05** Realm can be dragged/tap-selected to Realm slot.
+- [x] **INTERACT-06** Tactic launches structured board target/choice flow from the physical card.
+- [x] **INTERACT-07** Misclick/selection can be cancelled before authoritative commit where rules permit.
+- [x] **INTERACT-08** Server authority remains final legality authority for every interaction.
+- [x] **INTERACT-09** Vanguard Ability/Attack/Withdraw remain card-context actions.
 
 ---
 
@@ -149,6 +149,16 @@ Animation must remain projection only; authoritative server state survives refre
 
 ## H. Release shell look/feel
 
+### V2.4.28 approved TCG client visual authority
+- [x] **SHELL-VIS-PLAN-03** TCG routes render no generic Stream Bandit website header/search/account/footer chrome; shared Stream Bandit config/auth functions may remain non-visual dependencies.
+- [x] **SHELL-VIS-PLAN-04** Approved primary TCG client navigation is Battle · Decks · Collection · Battle Pass · Shop · Settings.
+- [x] **SHELL-VIS-PLAN-05** The TCG viewport itself never scrolls; card/deck/collection/shop/pack/reward/social feeds scroll only inside bounded internal panels.
+- [x] **SHELL-VIS-PLAN-06** Seven user-approved 1672×941 Play/Battle/Decks/Collection/Battle Pass/Shop/Settings references are immutable art-direction authority under `tcg-visual-authority-v2.4.28.md`.
+- [x] **BATTLE-PASS-PLAN-01** Battle Pass is a required player-facing route.
+- [ ] **BATTLE-PASS-IMPL-01** Define and prove the canonical progression/economy owner before XP, currencies, premium state, challenges or reward claims become authoritative.
+- [ ] **BATTLE-PASS-IMPL-02** Bind Battle Pass feeds and claims to that owner with no browser-owned reward economy.
+
+
 Inherited V2.4 route model remains:
 
 `Landing / Sign In → Game Home → Play / Ranked → Matchmaking → Opponent Found → Board-only Match → Result`
@@ -163,16 +173,32 @@ Signed-in destinations remain:
 - [ ] **SHELL-VIS-02** Landing / Game Home / Ranked / Matchmaking / Opponent Found / Result screens visually aligned.
 - [ ] **SHELL-VIS-03** Collection / Deck Builder / Packs / Learn / Progress / Settings visually aligned as their implementation gates progress.
 - [ ] **SHELL-VIS-04** Loading/error/empty/reconnect states use the same design system.
+- [x] **PLAY-AUTH-01** Play must not treat the Auth Gate's temporary first-load null decision as an approval failure; deck loading waits for the existing authoritative gate decision without duplicating approval rules.
+
+### V2.4.30 approved-reference visual convergence
+- [x] **SHELL-VIS-PLAN-07** TCG pages own a reusable cinematic realm backdrop, cyan/gold ornamental frame language and generic Stream Bandit card-back/art-pending asset; no card identity is falsely given finished artwork.
+- [x] **SHELL-VIS-PLAN-08** TCG routes no longer load the global Stream Bandit theme projector; shared account/config/auth capability may remain without shared website visual authority.
+- [x] **SHELL-VIS-PLAN-09** Play deck rows display factual RLS-projected deck-card quantity instead of a hard-coded 60-card visual claim; legality remains server-owned.
+- [ ] **SHELL-VIS-HUMAN-01** Human visual acceptance confirms Play/Battle/Decks/Collection/Battle Pass/Shop/Settings converge acceptably on the seven locked V2.4.28 references at the target desktop viewport.
+- [ ] **CARD-ART-IMPL-01** Bind real approved per-card/printing artwork when an authoritative art source exists; generic card-back remains the explicit fallback until then.
+
+### V2.4.31 TCG shell isolation repair
+- [x] **SHELL-ISOLATION-01** Human screenshot proved the legacy `stream-bandit-shell-v6-24.js` still booted generic Stream Bandit header/route infrastructure from inside TCG pages.
+- [x] **SHELL-ISOLATION-02** Replace the legacy website shell dependency with a TCG config-only bridge exposing public Supabase client configuration and no website visuals/routes/helpers.
+- [x] **SHELL-ISOLATION-03** Settings navigation remains `tcg-settings.html` and the TCG bridge exposes no platform settings route alias.
+- [x] **SHELL-ISOLATION-04** Fixed TCG top bar removes the 1320px cap and includes low-browser-zoom viewport scaling while document/body scrolling remains forbidden.
+- [ ] **SHELL-ISOLATION-CI-01** Exact-head validation, migration replay and functional smoke pass after the isolation repair.
+- [ ] **SHELL-ISOLATION-HUMAN-01** Human test confirms generic Stream Bandit header is absent, Settings stays inside TCG and 100%/25% screenshots remain screen-filling.
 
 ---
 
 ## I. Corrected work order
 
 - [x] **ORDER-01** V2.4.1 supersedes the V2.4 wording that made another Attack attempt the only immediate development operation.
-- [ ] **ORDER-02** Complete renderer/art inventory and choose smallest reusable V2-CARD-01 foundation.
+- [x] **ORDER-02** Complete renderer/art inventory and choose smallest reusable V2-CARD-01 foundation.
 - [ ] **ORDER-03** Build correct tabletop zone skeleton.
 - [ ] **ORDER-04** Wire full-card rendering/art into board zones.
-- [ ] **ORDER-05** Wire direct card interactions and board-visible state.
+- [x] **ORDER-05** Wire direct card interactions and board-visible state.
 - [ ] **ORDER-06** Add animation/audio hooks and shell look/feel.
 - [ ] **ORDER-07** Resume fresh two-user V2-ATTACK-01 on the restored release-shaped board.
 - [ ] **ORDER-08** Execute inherited MATCH-01 through MATCH-25 release proof.
@@ -205,3 +231,69 @@ In particular:
 - [ ] Rollback/recovery point recorded.
 
 **Current decision:** 🔒 **HOLD public/live/production.**
+
+
+### V2.4.32 repository-owned branding asset foundation
+- [x] **BRAND-ASSET-01** Approved Stream Bandit TCG elemental stag branding is stored inside the repository under `assets/tcg/branding/`.
+- [x] **BRAND-ASSET-02** Fixed-client top bar uses the optimized repository-owned emblem instead of the missing legacy stag-logo path.
+- [x] **BRAND-ASSET-03** Full logo and topbar emblem are registered in one `assets/tcg/tcg-art-manifest-v1.json` authority using host-relative paths compatible with GitHub Pages and IONOS.
+- [ ] **BRAND-ASSET-HUMAN-01** Human test confirms the new stag emblem renders in the top bar from the branch-hosted page.
+
+
+### V2.4.38 canonical art foundation and runtime/reference separation
+- [x] **ART-ASSET-01** User-uploaded TCG artwork is classified under repository-owned `assets/tcg/` folders without altering the original uploaded image blobs.
+- [x] **ART-ASSET-02** `assets/tcg/tcg-art-manifest.json` is the stable repository-relative art-path authority for GitHub Pages and IONOS hosting.
+- [x] **ART-ASSET-03** Set One has a canonical 193-card art intake map keyed by card ID with exact per-card destination paths and missing-art tracking.
+- [x] **ART-ASSET-04** Set One art storage is split by set/element so GitHub browser directory truncation cannot turn one card-art folder into an unmaintainable 1,000+ file list.
+- [x] **ART-ASSET-05** One presentation-only Art Resolver owns background/branding/card-art projection; it contains no gameplay API ownership and no per-card-name branches.
+- [x] **ART-ASSET-06** Missing individual card artwork remains an explicit `Artwork pending` state and cannot block battle boot.
+- [x] **ART-ASSET-07** Accepted Card Renderer and Battle Controller remain byte-identical to the pre-art accepted gameplay blobs.
+- [x] **ART-ASSET-08** Full-screen Play/Battle/Decks/Collection/Battle Pass/Shop/Settings compositions remain immutable visual references only; runtime CSS backgrounds use clean background masters and never flatten those reference screens behind live controls.
+- [x] **ART-ASSET-CI-01** Product head `2f0c884dc66e5a2dfc4c59f08b7217c52027f763` passed TCG Validation #773, Migration Replay #943 and Functional Smoke #969.
+- [ ] **ART-ASSET-HUMAN-01** Human branch-hosted visual check confirms the repo-owned stag/logo and clean runtime backdrop render correctly at 100% and 25% browser zoom.
+- [ ] **CARD-ART-SET-ONE-01** Set One individual card artwork reaches 193/193 approved assets; current intake remains 0/193 until real per-card art is uploaded and approved.
+
+
+### V2.4.39 collectible printing / artwork identity authority
+- [x] **PRINT-IDENTITY-01** Lock the three-level identity chain: `card_id` = gameplay identity, `printing_id` = collectible version, `artwork_id` = exact media asset/revision.
+- [x] **PRINT-IDENTITY-02** Reuse the existing `tcg_card_printings` owner; do not create a competing card/printing authority.
+- [x] **PRINT-IDENTITY-03** Add repository authority `assets/tcg/cards/tcg-printing-art-ledger-v1.json` with deterministic printing/artwork IDs and paths.
+- [x] **PRINT-IDENTITY-04** Seed deterministic Standard/base printing slots for all 193 Set One card identities without falsely claiming artwork exists.
+- [x] **PRINT-IDENTITY-05** Preserve existing rarity tiers: Basic · Rare · Extra Rare · Mythic; rarity is collectible/acquisition metadata and does not alter the card's gameplay identity.
+- [x] **PRINT-IDENTITY-06** Preserve existing finish families: Standard · Shine · Holo · Full-Art Shine · Alt-Art · Signature Mythic; finish/art variants do not alter gameplay identity.
+- [x] **PRINT-IDENTITY-07** Collection ownership distinguishes `printing_id`; battle/runtime rules resolve through `card_id`.
+- [x] **PRINT-IDENTITY-08** Pack, Battle Pass, Shop, reward, promo and event sources must award/reference `printing_id`, never fabricate separate gameplay rules for cosmetic variants.
+- [x] **PRINT-IDENTITY-09** Artwork path contract is set/element/card/edition scoped so browser directories stay maintainable and multiple variants of the same card remain organised.
+- [x] **PRINT-IDENTITY-10** Artwork revisions may increment `artwork_id` without changing `printing_id`; a truly distinct collectible variant receives a new edition/printing ID.
+- [x] **PRINT-IDENTITY-11** New series may introduce genuinely new `card_id` rules/mechanics; print variants inside a series remain cosmetic unless explicitly promoted as new gameplay identities.
+- [ ] **PRINT-IMPL-01** Assign approved per-printing rarity/source/finish metadata as real products/rewards are designed; do not invent these values in advance.
+- [ ] **PRINT-IMPL-02** Upload and approve individual Set One base artwork: 0/193 → 193/193.
+- [ ] **PRINT-IMPL-03** Add optional Shine/Holo/Full-Art/Alt-Art/Signature printings only when their artwork/reward source is actually approved.
+- [ ] **PRINT-IMPL-04** Bind Collection to owned `printing_id` records and display artwork/finish/rarity from printing metadata.
+- [ ] **PRINT-IMPL-05** Bind pack opening to canonical pack pools that award exact `printing_id` values.
+- [ ] **PRINT-IMPL-06** Bind Battle Pass/Shop/reward grants to the same printing owner after their canonical progression/economy owners are proven.
+- [ ] **CREATURE-TAXONOMY-01** Define/approve reusable creature-type taxonomy separately from printing cosmetics; artwork/rarity/finish must never masquerade as gameplay creature type.
+- [x] **PRINT-HUMAN-01** Human visual review on 2026-09-19 accepts the repo-owned TCG logo/topbar branding.
+- [ ] **BACKGROUND-HUMAN-01** Current clean realm backdrop remains a temporary runtime fallback; final background-only artwork is still outstanding and must not be confused with the locked full-screen UI reference compositions.
+
+
+### V2.4.40 official deck accessory / Shop authority
+- [x] **DECK-ACCESSORY-PLAN-01** Every official starter/deck product includes one matching Card Sleeve Set, one cosmetic Battle Coin and one Deck Box.
+- [x] **DECK-ACCESSORY-PLAN-02** Current eight launch starters receive deterministic bundle/accessory/artwork identities in `assets/tcg/accessories/tcg-deck-accessory-ledger-v1.json`.
+- [x] **DECK-ACCESSORY-PLAN-03** Card sleeves define card-back presentation only and never reveal hidden card identity or change rules.
+- [x] **DECK-ACCESSORY-PLAN-04** Battle Coins are cosmetic presentation only and can never influence server-authoritative toss/randomness or match outcome.
+- [x] **DECK-ACCESSORY-PLAN-05** Deck Boxes are collection/deck presentation only and never alter deck size, legality or storage rules.
+- [x] **DECK-ACCESSORY-PLAN-06** A custom user-built deck does not manufacture a new cosmetic identity; it selects from accessories the player already owns.
+- [x] **DECK-ACCESSORY-PLAN-07** Official starter/deck grant is idempotent: owning/acquiring the deck ensures the three matching accessories exactly once.
+- [x] **DECK-ACCESSORY-PLAN-08** Existing owners must receive an owner-safe backfill when accessory ownership is implemented; no existing starter owner should be forced to repurchase the included trio.
+- [x] **SHOP-ACCESSORY-PLAN-01** Shop reserves explicit Card Sleeves · Battle Coins · Deck Boxes · Accessory Bundles categories.
+- [x] **SHOP-ACCESSORY-PLAN-02** Each themed accessory the player does not own must be obtainable through the in-game Shop once the canonical economy owner is proven.
+- [x] **SHOP-ACCESSORY-PLAN-03** Shop recognises owned accessories and blocks duplicate purchase/grant rather than charging for an already-owned cosmetic.
+- [x] **SHOP-ACCESSORY-PLAN-04** Prices/currency/discounts remain undefined until the canonical economy/catalog owner is implemented; browser placeholders must not fabricate them.
+- [x] **ACCESSORY-ART-01** Each accessory has a deterministic `accessory_id`, `artwork_id`, artwork revision and repository-relative target path.
+- [x] **ACCESSORY-FUTURE-01** Every future promoted official starter/deck product inherits the same three-accessory rule; reserving this rule does not promote Fairy/Underworld to launch/runtime.
+- [ ] **ACCESSORY-IMPL-01** Implement canonical accessory ownership/grant tables or equivalent owner after schema/economy design is proven.
+- [ ] **ACCESSORY-IMPL-02** Backfill the included accessory trio to existing owners of the eight active starters.
+- [ ] **ACCESSORY-IMPL-03** Bind Deck Builder/Collection to owned Sleeve / Battle Coin / Deck Box selection without duplicating owner state in the browser.
+- [ ] **ACCESSORY-IMPL-04** Bind Shop catalog/grants to `accessory_id` through the canonical economy owner.
+- [ ] **ACCESSORY-ART-02** Create and approve 24 launch accessory artworks: 8 sleeves + 8 battle coins + 8 deck boxes.

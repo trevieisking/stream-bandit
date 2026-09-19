@@ -1,5 +1,6 @@
 export type RuntimeV02RandomUint32Source = () => number;
 export type RuntimeV02RandomIndexSource = (maxExclusive: number) => number;
+export type RuntimeV02CoinSide = "heads" | "tails";
 
 const UINT32_RANGE = 0x100000000;
 const UINT32_MAX = UINT32_RANGE - 1;
@@ -32,6 +33,12 @@ export function runtimeV02UniformRandomInt(
     if (value < acceptanceLimit) return value % maxExclusive;
   }
   throw new Error("tcg_v0_2_random_rejection_guard");
+}
+
+export function runtimeV02FlipCoin(
+  source: RuntimeV02RandomUint32Source = runtimeV02SecureRandomUint32,
+): RuntimeV02CoinSide {
+  return runtimeV02UniformRandomInt(2, source) === 0 ? "heads" : "tails";
 }
 
 export function runtimeV02ShuffleInPlace<T>(
