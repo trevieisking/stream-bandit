@@ -44,9 +44,9 @@
 - [x] Celestial Observatory.
 - [x] Dreamglass.
 - [x] Orbit Ring.
-- [ ] Parallax Window.
-- [ ] Set One Standard/base PNG masters complete: **23/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **23/24 -> 24/24**.
+- [x] Parallax Window.
+- [ ] Set One Standard/base PNG masters complete: **24/193 -> 193/193**.
+- [x] Astral Standard/base PNG masters complete: **24/24**.
 - [ ] Final clean backgrounds complete: **0/8 -> 8/8**.
 
 ## Safety
@@ -60,7 +60,7 @@
 ## First deck Shop + Battle Pass preview
 - [x] Lock first preview deck identity to **Astral — Second Sky**.
 - [x] Lock **Set One (SB1)** as **Battle Pass Season 1** identity.
-- [ ] Reach Astral Standard/base artwork **24/24**.
+- [x] Reach Astral Standard/base artwork **24/24**.
 - [ ] Confirm the existing Second Sky 60-card starter recipe remains valid at the preview head.
 - [ ] Produce/verify Second Sky sleeve, battle coin and deck-box art for the product preview.
 - [ ] Build a branch-only Shop preview using real approved Second Sky assets.
