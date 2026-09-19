@@ -1,0 +1,183 @@
+{
+  "schema": "stream-bandit-tcg-art-production-ledger-v1",
+  "version": "1.0.0",
+  "recorded_at": "2026-09-19",
+  "authority": "Stream Bandit TCG background and card-art production blueprint",
+  "source_checkpoint": "PR #576 V2.4.41 accepted head 85fe3cc6f289bc4bfa6d8d0cdeb5cdfbb2eef4f2",
+  "identity_chain": "card_id -> printing_id -> artwork_id",
+  "production_rules": {
+    "repository_owned_assets": true,
+    "preserve_uploaded_original_bytes": true,
+    "raw_art_contains_card_ui_text": false,
+    "raw_art_contains_card_frame": false,
+    "screenshots_are_visual_reference_only": true,
+    "runtime_backgrounds_require_clean_background_only_master": true,
+    "gameplay_rules_unchanged_by_art": true,
+    "rarity_finish_and_alt_art_do_not_change_card_id": true,
+    "standard_base_art_first": true,
+    "variants_only_after_base_art_or_explicit_content_approval": true,
+    "target_master_px": {
+      "width": 1672,
+      "height": 941
+    },
+    "crop_rule": "Keep the focal subject inside the central safe area so the same master survives Battle/Collection/Deck compact object-fit:cover crops."
+  },
+  "uploaded_original_archive": {
+    "total_original_pngs": 18,
+    "classified_without_recompression": true,
+    "branding_key_art": 1,
+    "launch_showcases": 8,
+    "future_showcases": 2,
+    "ui_references": 7,
+    "temporary_upload_folder_clear": true
+  },
+  "background_production": {
+    "current_fallback": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
+    "final_backgrounds_approved": 0,
+    "final_backgrounds_target": 8,
+    "style_direction": "Dark enchanted realm; floating-world depth; cyan/prismatic energy with restrained gold; atmospheric rather than busy; no baked navigation, buttons, labels, card frames or page copy.",
+    "slots": [
+      {
+        "id": "default",
+        "status": "missing_final",
+        "target_path": "assets/tcg/backgrounds/default/tcg-default-background-art-v1.png",
+        "current_fallback": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
+      },
+      {
+        "id": "play",
+        "status": "missing_final",
+        "target_path": "assets/tcg/backgrounds/play/tcg-play-background-art-v1.png",
+        "current_fallback": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
+      },
+      {
+        "id": "battle",
+        "status": "missing_final",
+        "target_path": "assets/tcg/backgrounds/battle/tcg-battle-background-art-v1.png",
+        "current_fallback": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
+      },
+      {
+        "id": "decks",
+        "status": "missing_final",
+        "target_path": "assets/tcg/backgrounds/decks/tcg-decks-background-art-v1.png",
+        "current_fallback": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
+      },
+      {
+        "id": "collection",
+        "status": "missing_final",
+        "target_path": "assets/tcg/backgrounds/collection/tcg-collection-background-art-v1.png",
+        "current_fallback": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
+      },
+      {
+        "id": "battle_pass",
+        "status": "missing_final",
+        "target_path": "assets/tcg/backgrounds/battle-pass/tcg-battle-pass-background-art-v1.png",
+        "current_fallback": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
+      },
+      {
+        "id": "shop",
+        "status": "missing_final",
+        "target_path": "assets/tcg/backgrounds/shop/tcg-shop-background-art-v1.png",
+        "current_fallback": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
+      },
+      {
+        "id": "settings",
+        "status": "missing_final",
+        "target_path": "assets/tcg/backgrounds/settings/tcg-settings-background-art-v1.png",
+        "current_fallback": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
+      }
+    ]
+  },
+  "card_art_batches": {
+    "set_code": "SB1",
+    "total_card_identities": 193,
+    "total_base_art_approved": 0,
+    "first_batch": {
+      "id": "SB1-ASTRAL-CREATURES-01",
+      "element": "Astral",
+      "card_family": "Creature",
+      "count": 11,
+      "rarity_assignment_status": "unassigned_pending_content_approval",
+      "finish": "standard",
+      "design_language": "Deep indigo/cosmic-blue Astral palette; luminous starlight, orbit lines, constellations and dreamlike depth. Evolution lines must visibly read as the same lineage. Keep silhouettes distinct at compact card size.",
+      "cards": [
+        {
+          "card_id": "astral-stardot",
+          "printing_id": "sb1-astral-stardot-standard",
+          "artwork_id": "sb1-astral-stardot-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-stardot/standard/sb1-astral-stardot-standard-art-v1.png",
+          "brief": "Tiny youthful astral scout with a bright star-core and sparse orbital dust; curious, light-footed, simple silhouette; establish the Stardot -> Orbitail -> Cosmarch lineage."
+        },
+        {
+          "card_id": "astral-orbitail",
+          "printing_id": "sb1-astral-orbitail-standard",
+          "artwork_id": "sb1-astral-orbitail-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-orbitail/standard/sb1-astral-orbitail-standard-art-v1.png",
+          "brief": "Teen evolution of Stardot; same recognizable core features, longer orbit-tracing tail/ribbons and controlled celestial motion; visual emphasis on prediction and ordered paths."
+        },
+        {
+          "card_id": "astral-cosmarch",
+          "printing_id": "sb1-astral-cosmarch-standard",
+          "artwork_id": "sb1-astral-cosmarch-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-cosmarch/standard/sb1-astral-cosmarch-standard-art-v1.png",
+          "brief": "Adult culmination of the Stardot line; confident constellation navigator with broad orbital geometry and chart-like star markings; powerful but elegant, future-reading theme."
+        },
+        {
+          "card_id": "astral-moonbit",
+          "printing_id": "sb1-astral-moonbit-standard",
+          "artwork_id": "sb1-astral-moonbit-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-moonbit/standard/sb1-astral-moonbit-standard-art-v1.png",
+          "brief": "Small lunar creature with crescent highlights and soft moon-glow; observant pose and secret/reward-glimpse mood; establish the Moonbit -> Comettail -> Nebulynx lineage."
+        },
+        {
+          "card_id": "astral-comettail",
+          "printing_id": "sb1-astral-comettail-standard",
+          "artwork_id": "sb1-astral-comettail-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-comettail/standard/sb1-astral-comettail-standard-art-v1.png",
+          "brief": "Teen evolution of Moonbit; clearly related face/body language, now with a luminous comet tail and sweeping reward-arc motion; more agile and confident."
+        },
+        {
+          "card_id": "astral-nebulynx",
+          "printing_id": "sb1-astral-nebulynx-standard",
+          "artwork_id": "sb1-astral-nebulynx-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-nebulynx/standard/sb1-astral-nebulynx-standard-art-v1.png",
+          "brief": "Adult cosmic lynx; nebula-textured mane/fur, starfield eyes and a strong feline silhouette; should visually combine lunar secrecy, reward awareness and starfall power."
+        },
+        {
+          "card_id": "astral-cometmanta",
+          "printing_id": "sb1-astral-cometmanta-standard",
+          "artwork_id": "sb1-astral-cometmanta-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-cometmanta/standard/sb1-astral-cometmanta-standard-art-v1.png",
+          "brief": "Standalone celestial manta gliding through high-altitude starlight; broad readable wings, comet wake and passing-orbit motion; pack-only identity should feel special without changing gameplay."
+        },
+        {
+          "card_id": "astral-orbitortoise",
+          "printing_id": "sb1-astral-orbitortoise-standard",
+          "artwork_id": "sb1-astral-orbitortoise-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-orbitortoise/standard/sb1-astral-orbitortoise-standard-art-v1.png",
+          "brief": "Standalone astral tortoise with an orbital-ring shell and gravity-field glow; sturdy central silhouette, defensive forecast/shield visual language."
+        },
+        {
+          "card_id": "astral-prismowl",
+          "printing_id": "sb1-astral-prismowl-standard",
+          "artwork_id": "sb1-astral-prismowl-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-prismowl/standard/sb1-astral-prismowl-standard-art-v1.png",
+          "brief": "Prismatic owl with oversized luminous eyes refracting hidden starlight; clean wing silhouette and spectral highlights; insight/observation is the visual story."
+        },
+        {
+          "card_id": "astral-starwhale",
+          "printing_id": "sb1-astral-starwhale-standard",
+          "artwork_id": "sb1-astral-starwhale-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-starwhale/standard/sb1-astral-starwhale-standard-art-v1.png",
+          "brief": "Massive starfield whale swimming through a cosmic current; gravitational wake, calm scale and deep-space grandeur; readable silhouette even when cropped small."
+        },
+        {
+          "card_id": "astral-celestyr-dream-cartographer",
+          "printing_id": "sb1-astral-celestyr-dream-cartographer-standard",
+          "artwork_id": "sb1-astral-celestyr-dream-cartographer-standard-art-v1",
+          "target_path": "assets/tcg/cards/set-one/astral/astral-celestyr-dream-cartographer/standard/sb1-astral-celestyr-dream-cartographer-standard-art-v1.png",
+          "brief": "Mythic dream cartographer framed by living constellation maps, horizon folds and time-bending star paths; premium focal composition with unmistakable mythic presence, without baking rarity text into the raw art."
+        }
+      ]
+    }
+  }
+}

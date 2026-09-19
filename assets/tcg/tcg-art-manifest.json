@@ -1,5 +1,5 @@
 {
-  "version": "5",
+  "version": "6",
   "authority": "Stream Bandit TCG canonical art manifest",
   "hosting": "repository-relative assets; GitHub Pages and IONOS compatible; no GitHack dependency",
   "policy": {
@@ -65,5 +65,6 @@
     "settings": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
   },
   "printing_art_ledger": "assets/tcg/cards/tcg-printing-art-ledger-v1.json",
-  "accessory_art_ledger": "assets/tcg/accessories/tcg-deck-accessory-ledger-v1.json"
+  "accessory_art_ledger": "assets/tcg/accessories/tcg-deck-accessory-ledger-v1.json",
+  "art_production_ledger": "assets/tcg/art-direction/tcg-art-production-ledger-v1.json"
 }
