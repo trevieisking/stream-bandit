@@ -21,8 +21,8 @@ Conversation memory, model memory and prior response text are not sufficient aut
 
 ## Current verified material truth
 
-Set One Standard/base PNG masters verified at canonical paths: **23/193**.
-Astral verified: **23/24**.
+Set One Standard/base PNG masters verified at canonical paths: **24/193**.
+Astral verified: **24/24**.
 
 Verified cards:
 - Stardot
@@ -48,8 +48,9 @@ Verified cards:
 - Celestial Observatory
 - Dreamglass
 - Orbit Ring
+- Parallax Window
 
-The current ledger sequence indicates `astral-parallax-window` next, but the workflow requires a fresh GitHub preflight again immediately before its image is generated.
+Astral Standard/base artwork is complete at **24/24**., but the workflow requires a fresh GitHub preflight again immediately before its image is generated.
 
 ## Rejected-candidate rule
 
@@ -81,3 +82,5 @@ When the first full starter-deck art package is complete, use the real approved 
 - This decision does **not** mean all 193 Set One cards are automatically granted by the pass.
 - Exact free/premium track assignments, tier rewards, token costs, receipts, progression values and entitlement rules remain unassigned until the canonical Battle Pass/economy systems own them.
 - After the Astral 24/24 deck-art gate, create a branch-only Battle Pass Season 1 visual preview beside the Second Sky Shop preview so the player-facing presentation can be reviewed with real assets.
+
+Second Sky product-preview gate is now open because Astral artwork reached **24/24**; starter recipe revalidation and accessory/product-preview work remain separate next steps.
