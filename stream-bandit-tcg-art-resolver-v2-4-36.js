@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const VERSION='2.4.37';
+const VERSION='2.4.38';
 const ART_MANIFEST='assets/tcg/tcg-art-manifest.json';
 const CARD_INTAKE='assets/tcg/cards/set-one/tcg-card-art-intake-v1.json';
 const PAGE_KEYS=Object.freeze({
@@ -43,10 +43,12 @@ function pageKey(body){
 function pageArtPath(body){
   if(!artManifest)return '';
   const key=pageKey(body);
-  if(key==='home')return String(artManifest.branding&&artManifest.branding.primary_key_art||'');
+  const backgrounds=artManifest.runtime_backgrounds&&typeof artManifest.runtime_backgrounds==='object'
+    ? artManifest.runtime_backgrounds
+    : {};
   return String(
-    artManifest.ui_reference&&key&&artManifest.ui_reference[key]||
-    artManifest.branding&&artManifest.branding.primary_key_art||
+    (key&&backgrounds[key])||
+    backgrounds.default||
     ''
   );
 }
@@ -204,5 +206,6 @@ const api=Object.freeze({
 });
 window.StreamBanditTCGArtResolverV2436=api;
 window.StreamBanditTCGArtResolverV2437=api;
+window.StreamBanditTCGArtResolverV2438=api;
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

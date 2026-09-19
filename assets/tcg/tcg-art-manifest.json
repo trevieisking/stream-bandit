@@ -1,5 +1,5 @@
 {
-  "version": "2",
+  "version": "3",
   "authority": "Stream Bandit TCG canonical art manifest",
   "hosting": "repository-relative assets; GitHub Pages and IONOS compatible; no GitHack dependency",
   "policy": {
@@ -18,7 +18,8 @@
     "future_concepts": [
       "fairy",
       "underworld"
-    ]
+    ],
+    "runtime_background_rule": "Only clean background masters may be used as runtime CSS backgrounds. Full-screen UI reference compositions remain visual authority only and must never be flattened behind live controls."
   },
   "branding": {
     "primary_key_art": "assets/tcg/branding/eightfold-prismatic-stag-key-art-v1.png",
@@ -49,5 +50,15 @@
     "battle_pass": "assets/tcg/ui/reference/battle-pass-client-reference-v1.png",
     "shop": "assets/tcg/ui/reference/shop-client-reference-v1.png",
     "settings": "assets/tcg/ui/reference/settings-client-reference-v1.png"
+  },
+  "runtime_backgrounds": {
+    "default": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
+    "play": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
+    "battle": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
+    "decks": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
+    "collection": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
+    "battle_pass": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
+    "shop": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
+    "settings": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
   }
 }

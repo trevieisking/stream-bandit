@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 const ROOT=fileURLToPath(new URL('../../',import.meta.url));
 const read=p=>readFile(new URL(p,`file://${ROOT}/`),'utf8');
 
-test('V2.4.37 exposes one reusable presentation-only TCG art resolver',async()=>{
+test('V2.4.38 exposes one reusable presentation-only TCG art resolver',async()=>{
   const src=await read('stream-bandit-tcg-art-resolver-v2-4-36.js');
   for(const token of ['tcg-art-manifest.json','tcg-card-art-intake-v1.json','applyCardArt','applyPageArt','applyBranding','MutationObserver']){
     assert.ok(src.includes(token),token);
@@ -33,6 +33,7 @@ test('approved repo-owned art targets exist and do not use GitHack',async()=>{
   const manifest=JSON.parse(await read('assets/tcg/tcg-art-manifest.json'));
   const paths=[
     manifest.branding.primary_key_art,
+    ...Object.values(manifest.runtime_backgrounds),
     ...Object.values(manifest.ui_reference),
     ...Object.values(manifest.showcases.launch),
     ...Object.values(manifest.showcases.future)
@@ -71,4 +72,17 @@ test('battle adds art owner alongside accepted controller and renderer cache con
   assert.ok(html.includes('data-sb-tcg-page="battle"'));
   assert.equal(html.includes('stream-bandit-header-shell'),false);
   assert.equal(html.includes('stream-bandit-footer-shell'),false);
+});
+
+
+test('runtime backgrounds never reuse flattened UI reference compositions',async()=>{
+  const manifest=JSON.parse(await read('assets/tcg/tcg-art-manifest.json'));
+  const resolver=await read('stream-bandit-tcg-art-resolver-v2-4-36.js');
+  const refs=new Set(Object.values(manifest.ui_reference));
+  for(const [key,path] of Object.entries(manifest.runtime_backgrounds)){
+    assert.equal(refs.has(path),false,key+' runtime background must not be a flattened UI reference');
+  }
+  assert.equal(resolver.includes('artManifest.ui_reference&&key&&artManifest.ui_reference[key]'),false);
+  assert.ok(resolver.includes('artManifest.runtime_backgrounds'));
+  assert.ok(resolver.includes('backgrounds.default'));
 });
