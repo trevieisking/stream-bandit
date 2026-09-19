@@ -25,11 +25,11 @@ If a generated image materially contradicts the bound brief, that candidate is r
 After an upload is verified and control truth is synchronized, the workflow returns to the GitHub preflight. The next-card identity is never merely carried over from the prior turn.
 
 ## 034 — Current material checkpoint
-Eight canonical Standard/base PNGs are verified: Stardot, Orbitail, Cosmarch, Moonbit, Comettail, Nebulynx, Cometmanta and Orbitortoise.
+Nine canonical Standard/base PNGs are verified: Stardot, Orbitail, Cosmarch, Moonbit, Comettail, Nebulynx, Cometmanta, Orbitortoise and Prismowl.
 
-Current progress: **8/193 Set One**, **8/24 Astral**.
+Current progress: **9/193 Set One**, **9/24 Astral**.
 
-At this checkpoint the ledger sequence identifies Prismowl next, subject to a fresh pre-generation GitHub read.
+At this checkpoint the ledger sequence identifies Starwhale next, subject to a fresh pre-generation GitHub read.
 
 ## 035 — Release boundary
 This authority change is artwork/control-plane only. It changes no gameplay engine, rules, database, Supabase deployment, main/live/public release state.
