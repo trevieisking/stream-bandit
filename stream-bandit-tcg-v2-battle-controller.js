@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.2.1';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const state = {
@@ -48,10 +48,30 @@
     return false;
   }
 
+  async function resolveAuthDecision() {
+    if (!(await waitForGate())) throw new Error('Stream Bandit auth gate is unavailable.');
+    const gate = window.StreamBanditAuthGate;
+    let decision = await gate.enforce();
+    // Auth Gate boot may already be inside enforce(); while it is running the
+    // established helper returns its last decision, which is temporarily null
+    // on first load. Reuse the same authoritative gate owner instead of
+    // misclassifying that startup window as an approval failure.
+    if (!decision && typeof gate.decide === 'function') {
+      decision = await gate.decide();
+    }
+    if (!decision && typeof gate.state === 'function') {
+      for (let attempt = 0; attempt < 40 && !decision; attempt += 1) {
+        const snapshot = gate.state();
+        decision = snapshot && snapshot.lastDecision ? snapshot.lastDecision : null;
+        if (!decision) await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+    }
+    return decision;
+  }
+
   async function ensureClient() {
     if (state.client) return state.client;
-    if (!(await waitForGate())) throw new Error('Stream Bandit auth gate is unavailable.');
-    const decision = await window.StreamBanditAuthGate.enforce();
+    const decision = await resolveAuthDecision();
     if (!decision || !decision.allowed) throw new Error('Sign in with an approved Stream Bandit account to battle.');
     const config = shellConfig();
     if (!config.url || !config.key) throw new Error('Supabase public configuration is unavailable.');
