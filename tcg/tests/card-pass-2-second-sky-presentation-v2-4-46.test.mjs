@@ -47,6 +47,9 @@ test('Second Sky presentation is visible across core product surfaces while batt
   for(const page of pages){
     const html=await read(page);
     assert.ok(html.includes('stream-bandit-tcg-product-presentation-v2-4-46.js?v=2-4-46'),page);
+    assert.ok(html.includes('stream-bandit-tcg-product-presentation-v2-4-46.css?v=2-4-46'),page);
+    assert.ok(html.includes('stream-bandit-tcg-page-shell-v2-4-3.css?v=2-4-31'),page);
+    assert.ok(html.includes('stream-bandit-tcg-page-shell-v2-4-3.js?v=2-4-31'),page);
   }
   const battle=await read('tcg-battle-v2.html');
   assert.ok(battle.includes('stream-bandit-tcg-art-resolver-v2-4-36.js'));
