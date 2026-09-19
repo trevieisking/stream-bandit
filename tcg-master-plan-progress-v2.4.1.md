@@ -495,3 +495,26 @@ The first implementation should produce a genuine Stream Bandit full-card + corr
 Do not spend the next main development slice adding another isolated debug control to the scaffold.
 
 **Current release decision:** 🔒 **HOLD public/live/production.**
+
+
+---
+
+## V2.4.40 — official deck accessories and Shop collection depth
+
+Every official starter/deck product now has a locked cosmetic product rule: the deck includes one matching Card Sleeve Set, one cosmetic Battle Coin and one Deck Box.
+
+The eight active launch starters therefore reserve 24 accessory identities. Exact collectible and artwork identities live in `assets/tcg/accessories/tcg-deck-accessory-ledger-v1.json`.
+
+This increases collection/shop depth without creating gameplay variants:
+- sleeves affect card-back presentation only;
+- battle coins are cosmetic and never affect authoritative randomness;
+- deck boxes affect presentation only;
+- custom user-built decks do not auto-create bespoke accessory records.
+
+When accessory ownership is implemented, starter acquisition must idempotently ensure all three matching cosmetics. Existing starter owners require a safe backfill. If a player does not own an accessory, the in-game Shop must make it obtainable through the canonical economy/catalog owner. Owned accessories must not be sold/granted as accidental duplicates.
+
+Shop-visible categories are reserved now: Card Sleeves, Battle Coins, Deck Boxes and Accessory Bundles. Prices/currency remain open until the real economy owner exists.
+
+Future promoted official deck products inherit this rule automatically. Fairy / Glimmerwish and Underworld / Grave Pact remain future concepts; this accessory rule does not promote them to launch/runtime.
+
+**Artwork state:** 0/24 launch accessory artworks approved. Identity/path planning is complete; art creation remains open.

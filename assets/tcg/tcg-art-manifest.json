@@ -1,5 +1,5 @@
 {
-  "version": "4",
+  "version": "5",
   "authority": "Stream Bandit TCG canonical art manifest",
   "hosting": "repository-relative assets; GitHub Pages and IONOS compatible; no GitHack dependency",
   "policy": {
@@ -21,7 +21,8 @@
     ],
     "runtime_background_rule": "Only clean background masters may be used as runtime CSS backgrounds. Full-screen UI reference compositions remain visual authority only and must never be flattened behind live controls.",
     "printing_identity_rule": "Gameplay resolves by card_id; collectible ownership/pulls resolve by printing_id; exact media resolves by artwork_id.",
-    "variant_rule": "Rarity, foil/finish and alternate artwork may create multiple collectible printings of the same gameplay card without changing its rules."
+    "variant_rule": "Rarity, foil/finish and alternate artwork may create multiple collectible printings of the same gameplay card without changing its rules.",
+    "accessory_identity_rule": "Official deck products own a themed sleeve/card-back set, cosmetic battle coin and deck box. accessory_id is collectible identity; artwork_id is exact media identity. Accessories never alter gameplay."
   },
   "branding": {
     "primary_key_art": "assets/tcg/branding/eightfold-prismatic-stag-key-art-v1.png",
@@ -63,5 +64,6 @@
     "shop": "assets/tcg-realm-client-backdrop-v2-4-30.svg",
     "settings": "assets/tcg-realm-client-backdrop-v2-4-30.svg"
   },
-  "printing_art_ledger": "assets/tcg/cards/tcg-printing-art-ledger-v1.json"
+  "printing_art_ledger": "assets/tcg/cards/tcg-printing-art-ledger-v1.json",
+  "accessory_art_ledger": "assets/tcg/accessories/tcg-deck-accessory-ledger-v1.json"
 }

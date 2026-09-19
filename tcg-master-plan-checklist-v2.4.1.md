@@ -275,3 +275,25 @@ In particular:
 - [ ] **CREATURE-TAXONOMY-01** Define/approve reusable creature-type taxonomy separately from printing cosmetics; artwork/rarity/finish must never masquerade as gameplay creature type.
 - [x] **PRINT-HUMAN-01** Human visual review on 2026-09-19 accepts the repo-owned TCG logo/topbar branding.
 - [ ] **BACKGROUND-HUMAN-01** Current clean realm backdrop remains a temporary runtime fallback; final background-only artwork is still outstanding and must not be confused with the locked full-screen UI reference compositions.
+
+
+### V2.4.40 official deck accessory / Shop authority
+- [x] **DECK-ACCESSORY-PLAN-01** Every official starter/deck product includes one matching Card Sleeve Set, one cosmetic Battle Coin and one Deck Box.
+- [x] **DECK-ACCESSORY-PLAN-02** Current eight launch starters receive deterministic bundle/accessory/artwork identities in `assets/tcg/accessories/tcg-deck-accessory-ledger-v1.json`.
+- [x] **DECK-ACCESSORY-PLAN-03** Card sleeves define card-back presentation only and never reveal hidden card identity or change rules.
+- [x] **DECK-ACCESSORY-PLAN-04** Battle Coins are cosmetic presentation only and can never influence server-authoritative toss/randomness or match outcome.
+- [x] **DECK-ACCESSORY-PLAN-05** Deck Boxes are collection/deck presentation only and never alter deck size, legality or storage rules.
+- [x] **DECK-ACCESSORY-PLAN-06** A custom user-built deck does not manufacture a new cosmetic identity; it selects from accessories the player already owns.
+- [x] **DECK-ACCESSORY-PLAN-07** Official starter/deck grant is idempotent: owning/acquiring the deck ensures the three matching accessories exactly once.
+- [x] **DECK-ACCESSORY-PLAN-08** Existing owners must receive an owner-safe backfill when accessory ownership is implemented; no existing starter owner should be forced to repurchase the included trio.
+- [x] **SHOP-ACCESSORY-PLAN-01** Shop reserves explicit Card Sleeves · Battle Coins · Deck Boxes · Accessory Bundles categories.
+- [x] **SHOP-ACCESSORY-PLAN-02** Each themed accessory the player does not own must be obtainable through the in-game Shop once the canonical economy owner is proven.
+- [x] **SHOP-ACCESSORY-PLAN-03** Shop recognises owned accessories and blocks duplicate purchase/grant rather than charging for an already-owned cosmetic.
+- [x] **SHOP-ACCESSORY-PLAN-04** Prices/currency/discounts remain undefined until the canonical economy/catalog owner is implemented; browser placeholders must not fabricate them.
+- [x] **ACCESSORY-ART-01** Each accessory has a deterministic `accessory_id`, `artwork_id`, artwork revision and repository-relative target path.
+- [x] **ACCESSORY-FUTURE-01** Every future promoted official starter/deck product inherits the same three-accessory rule; reserving this rule does not promote Fairy/Underworld to launch/runtime.
+- [ ] **ACCESSORY-IMPL-01** Implement canonical accessory ownership/grant tables or equivalent owner after schema/economy design is proven.
+- [ ] **ACCESSORY-IMPL-02** Backfill the included accessory trio to existing owners of the eight active starters.
+- [ ] **ACCESSORY-IMPL-03** Bind Deck Builder/Collection to owned Sleeve / Battle Coin / Deck Box selection without duplicating owner state in the browser.
+- [ ] **ACCESSORY-IMPL-04** Bind Shop catalog/grants to `accessory_id` through the canonical economy owner.
+- [ ] **ACCESSORY-ART-02** Create and approve 24 launch accessory artworks: 8 sleeves + 8 battle coins + 8 deck boxes.
