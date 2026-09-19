@@ -31,9 +31,10 @@
 - [x] Orbitortoise.
 - [x] Prismowl.
 - [x] Starwhale.
-- [ ] Celestyr — Dream Cartographer.
-- [ ] Set One Standard/base PNG masters complete: **10/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **10/24 -> 24/24**.
+- [x] Celestyr — Dream Cartographer.
+- [ ] Basic Astral Essence.
+- [ ] Set One Standard/base PNG masters complete: **11/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **11/24 -> 24/24**.
 - [ ] Final clean backgrounds complete: **0/8 -> 8/8**.
 
 ## Safety
