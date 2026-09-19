@@ -84,3 +84,13 @@ Trevor's desktop visual PASS on exact head `7d15aec02ee76613a706e4ca491f6c091e57
 V2.4.50 introduces a mobile-only responsive presentation contract: a visible 3 x 2 navigation rail, vertically scrollable phone pages, single-column core layouts and complete two-column card grids. This changes presentation only; gameplay, ownership, economy, database, Edge Function and Supabase runtime authority remain unchanged.
 
 Cross-device Second Sky visual acceptance is reopened until Kay/Trevor pass the repaired phone layout.
+
+
+## 046 — Cross-device Second Sky visual PASS
+Kay re-tested the V2.4.50 phone layout and passed it. Trevor's desktop PASS and Kay's mobile PASS together close the Second Sky cross-device presentation gate. The accepted baseline includes the complete desktop six-control rail, mobile 3 x 2 rail, vertical phone scrolling, stacked mobile core pages, complete two-column mobile card grids and the accepted Play/Decks/Collection/Shop/Battle Pass artwork-fit behaviour.
+
+## 047 — Canonical deck-presentation template
+Second Sky is the reusable visual/layout baseline for later completed launch decks. Future deck art should be composed to survive the same desktop and mobile card/product containers: strong center-safe focal subject, readable silhouette, no critical detail placed only at extreme crop edges. Page-specific deck branches are not required; the starter-ID presentation registry remains the extension point.
+
+## 048 — One-deck-per-day working cadence
+The working production target is one completed launch deck per working day. This is a cadence target, never a reason to skip the locked source preflight, canonical upload verification, desktop/mobile human review, exact-head CI, or promotion controller. The next starter identity in the current registry is **Ember — Ashrush** (`deck-ember-ashrush`).
