@@ -11,8 +11,8 @@ const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-
 const matchActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-match-actions', 'index.ts'), 'utf8');
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-interaction-v1.json'), 'utf8'));
 
-test('Battle v0.6 follows the recorded tabletop interaction layout without restoring a site shell', () => {
-  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-6"/);
+test('Battle v0.7 follows the recorded tabletop interaction layout without restoring a site shell', () => {
+  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-7"/);
   assert.match(battle, /id="oppReserve"/);
   assert.match(battle, /id="oppVanguard"/);
   assert.match(battle, /id="youVanguard"/);
@@ -40,6 +40,19 @@ test('phone battlefield gives the field full width and does not cover it with st
   assert.match(battle, /@media\(max-width:960px\) and \(orientation:landscape\), \(hover:none\) and \(pointer:coarse\) and \(orientation:landscape\)/);
   assert.match(battle, /scroll-snap-type:x proximity/);
 });
+
+test('desktop battlefield gives Vanguard and Reserves independent height-bounded rows', () => {
+  assert.match(battle, /@media\(min-width:641px\) and \(hover:hover\) and \(pointer:fine\)/);
+  assert.match(battle, /grid-template-rows:auto minmax\(0,1fr\) minmax\(68px,auto\) minmax\(0,1fr\) clamp\(132px,17\.2dvh,166px\)/);
+  assert.match(battle, /\.sb-field-core\{[\s\S]*?grid-template-rows:minmax\(0,1fr\) minmax\(0,1\.18fr\)/);
+  assert.match(battle, /\.sb-half-you \.sb-field-core\{[\s\S]*?grid-template-rows:minmax\(0,1\.18fr\) minmax\(0,1fr\)/);
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{width:min\(var\(--card-w\),9\.7dvh\)\}/);
+  assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{width:min\(var\(--active-w\),11\.4dvh\)\}/);
+  assert.match(battle, /\.sb-card-wrap\.is-selected \.sb-card-actions\{[\s\S]*?position:absolute;[\s\S]*?left:calc\(100% \+ 10px\)/);
+  assert.match(battle, /\.sb-reserve-slot:nth-child\(n\+3\) \.sb-card-wrap\.is-selected \.sb-card-actions\{[\s\S]*?right:calc\(100% \+ 10px\)/);
+  assert.match(battle, /\.sb-hand-card\{[\s\S]*?width:min\(var\(--card-w\),10dvh\);[\s\S]*?flex-basis:min\(var\(--card-w\),10dvh\)/);
+});
+
 
 test('opening toss is rendered from authoritative toss_winner_seat and never randomized in browser', () => {
   assert.match(controller, /Number\(view\.toss_winner_seat\) === youSeat/);
