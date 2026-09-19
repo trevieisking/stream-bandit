@@ -30,6 +30,23 @@ test('board-only match uses the dedicated TCG config bridge without the Stream B
   assert.doesNotMatch(battle, /stream-bandit-theme-projector/i);
 });
 
+test('phone battle scrolls vertically instead of trapping the board inside one viewport', () => {
+  assert.match(battle, /@media\(max-width:640px\)/);
+  assert.match(battle, /overflow-y:auto/);
+  assert.match(battle, /-webkit-overflow-scrolling:touch/);
+  assert.match(battle, /\.sb-battle\{height:auto;min-height:100dvh/);
+  assert.match(battle, /\.sb-board\{height:auto;min-height:100dvh/);
+});
+
+test('battle cards are wired to the canonical TCG art resolver', () => {
+  assert.match(battle, /stream-bandit-tcg-art-resolver-v2-4-36\.js/);
+  assert.match(battle, /data-sb-tcg-page="battle"/);
+  assert.match(controller, /class="sb-tcg-card sb-card-control/);
+  assert.match(controller, /class="sb-tcg-card sb-hand-card"/);
+  assert.match(controller, /data-card-id="/);
+  assert.match(controller, /class="sb-card-art"/);
+});
+
 test('paired battle startup waits for a completed auth decision before rejecting the player', () => {
   assert.match(controller, /async function resolveAuthDecision\(\)/);
   assert.match(controller, /decision = await gate\.decide\(\)/);
