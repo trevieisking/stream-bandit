@@ -94,7 +94,8 @@ Verified canonical Set One Standard/base PNG masters present:
 - Archivist Sol
 - Cartographer Lyra
 - Future Draw
+- Gravity Shift
 
-Material progress: **18/193**.
-Astral material progress: **18/24**.
-Next source-of-truth candidate at this checkpoint: **Gravity Shift** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
+Material progress: **19/193**.
+Astral material progress: **19/24**.
+Next source-of-truth candidate at this checkpoint: **Star Chart** — but Step 1 must re-read GitHub again immediately before generating or accepting its image.
