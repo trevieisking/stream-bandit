@@ -15,12 +15,21 @@ test('V2 active match is a board-only game route, not the site shell', () => {
   assert.doesNotMatch(battle, /stream-bandit-header-shell/i);
   assert.doesNotMatch(battle, /stream-bandit-footer-shell/i);
   assert.doesNotMatch(battle, /id="siteHeader"|id="siteFooter"/i);
+  assert.doesNotMatch(battle, /stream-bandit-shell-v6-24\.js/);
+  assert.doesNotMatch(battle, /stream-bandit-theme-projector/i);
 });
 
-test('board-only match reuses shared config and explicit existing authentication', () => {
-  assert.match(battle, /stream-bandit-shell-v6-24\.js/);
+test('board-only match uses the dedicated TCG config bridge and existing authentication owner', () => {
+  assert.match(battle, /stream-bandit-tcg-config-v2-4-31\.js/);
   assert.match(battle, /stream-bandit-auth-gate-v7-13-001\.js/);
   assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js/);
+});
+
+test('paired battle startup waits for a completed auth decision before rejecting the player', () => {
+  assert.match(controller, /async function resolveAuthDecision\(\)/);
+  assert.match(controller, /decision = await gate\.decide\(\)/);
+  assert.match(controller, /snapshot && snapshot\.lastDecision/);
+  assert.match(controller, /const decision = await resolveAuthDecision\(\)/);
 });
 
 test('match page does not contain matchmaking, room-code, or menu controls', () => {
