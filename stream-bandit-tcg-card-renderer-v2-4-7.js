@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG Card Renderer V2.4.10';
+  const VERSION = 'Stream Bandit TCG Card Renderer V2.4.36';
 
   function esc(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({
@@ -41,11 +41,15 @@
   }
 
   function artMarkup(art, name) {
-    const state = art && art.state === 'approved' && art.url
+    const hasUrl = !!(art && art.url);
+    const state = hasUrl && art.state === 'approved'
       ? 'approved'
-      : (art && art.state === 'placeholder' ? 'placeholder' : 'missing');
-    if (state === 'approved') {
-      return '<div class="sb-card-art" data-art-state="approved"><img src="' + esc(art.url) + '" alt="' + esc(name) + ' artwork"></div>';
+      : (hasUrl && art.state === 'candidate'
+        ? 'candidate'
+        : (art && art.state === 'placeholder' ? 'placeholder' : 'missing'));
+    if (state === 'approved' || state === 'candidate') {
+      const candidate = state === 'candidate' ? ' data-sb-tcg-card-art="candidate"' : '';
+      return '<div class="sb-card-art is-' + state + '" data-art-state="' + state + '"><img src="' + esc(art.url) + '" alt="' + esc(name) + ' artwork"' + candidate + ' loading="lazy" decoding="async"></div>';
     }
     const label = state === 'placeholder' ? 'Development artwork' : 'Artwork pending';
     return '<div class="sb-card-art is-' + state + '" data-art-state="' + state + '" aria-label="' + esc(label) + '"><span>' + esc(label) + '</span></div>';
@@ -172,11 +176,15 @@
       ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"'
       : '';
     const ability = family === 'Creature' ? creatureDef.ability : null;
+    const artOwner = window.StreamBanditTCGArtResolverV2436;
+    const resolvedArt = opts.art || (artOwner && typeof artOwner.cardArt === 'function'
+      ? artOwner.cardArt(instance, structured, definition)
+      : null);
 
     return '<article class="' + classes + '" data-card-family="' + esc(family) + '" data-card-id="' + esc(instance && instance.card_id) + '"' + interactiveAttrs + '>' +
       '<header class="sb-card-topline"><span class="sb-stage">' + esc(stage) + '</span><span class="sb-element">' + esc(element) + '</span></header>' +
       '<h2>' + esc(name) + '</h2>' +
-      artMarkup(opts.art, name) +
+      artMarkup(resolvedArt, name) +
       (family === 'Creature' ? creatureStatsMarkup(opts.creature || {}, creatureDef) : '') +
       (family === 'Creature' ? conditionsMarkup(opts.creature && opts.creature.conditions) : '') +
       abilityMarkup(ability) +

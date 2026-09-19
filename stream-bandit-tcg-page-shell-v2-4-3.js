@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-const VERSION="2.4.32";
+const VERSION="2.4.36";
 const PRIMARY=[
  {key:"battle",label:"Battle",href:"tcg-play.html"},
  {key:"decks",label:"Decks",href:"tcg-decks.html"},
@@ -35,6 +35,26 @@ function nav(items,label,current,className){
   if(item.key===current){a.classList.add("is-active");a.setAttribute("aria-current","page")}el.appendChild(a)});
  return el;
 }
+let artLoader=null;
+function ensureArtResolver(){
+ if(window.StreamBanditTCGArtResolverV2436)return Promise.resolve(window.StreamBanditTCGArtResolverV2436);
+ if(artLoader)return artLoader;
+ artLoader=new Promise((resolve,reject)=>{
+  const script=document.createElement("script");
+  script.src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-36";
+  script.async=true;
+  script.onload=()=>window.StreamBanditTCGArtResolverV2436?resolve(window.StreamBanditTCGArtResolverV2436):reject(new Error("TCG art resolver did not register."));
+  script.onerror=()=>reject(new Error("TCG art resolver failed to load."));
+  document.head.appendChild(script);
+ });
+ return artLoader;
+}
+function applyCanonicalArt(body){
+ ensureArtResolver().then(owner=>owner.ready().then(()=>owner)).then(owner=>{
+  owner.applyPageArt(body);
+  owner.applyBranding(document);
+ }).catch(()=>{});
+}
 function mount(){
  const body=document.body,main=document.querySelector("main.tcg-page");
  if(!body||!main||body.dataset.sbTcgClientMounted==="1")return;
@@ -43,7 +63,7 @@ function mount(){
  const client=document.createElement("div");client.className="tcg-client";
  const top=document.createElement("header");top.className="tcg-client-topbar";
  const brand=document.createElement("a");brand.className="tcg-client-brand";brand.href="tcg-play.html";
- brand.innerHTML='<img src="assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp" alt="Stream Bandit TCG elemental stag emblem" decoding="async" fetchpriority="high"><span class="tcg-client-brand-copy"><strong>Stream Bandit</strong><span>TCG</span></span>';
+ brand.innerHTML='<img data-sb-tcg-brand-art="primary" src="assets/tcg/branding/stream-bandit-tcg-emblem-v1.webp" alt="Stream Bandit TCG elemental stag emblem" decoding="async" fetchpriority="high"><span class="tcg-client-brand-copy"><strong>Stream Bandit</strong><span>TCG</span></span>';
  top.appendChild(brand);top.appendChild(nav(PRIMARY,"Stream Bandit TCG",primaryKey(body),"tcg-client-nav"));
  const stage=document.createElement("section");stage.className="tcg-client-stage";
  main.parentNode.insertBefore(client,main);client.appendChild(top);client.appendChild(stage);stage.appendChild(main);
@@ -57,6 +77,7 @@ function mount(){
    main.appendChild(feed);
  }
  const family=body.dataset.sbTcgFamily;
+ applyCanonicalArt(body);
  if(family&&FAMILIES[family]){
   const sub=nav(FAMILIES[family].items,FAMILIES[family].label,body.dataset.sbTcgSubpage||"","tcg-subnav");
   main.classList.add("has-subnav");
