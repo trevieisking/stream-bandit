@@ -21,8 +21,8 @@ Conversation memory, model memory and prior response text are not sufficient aut
 
 ## Current verified material truth
 
-Set One Standard/base PNG masters verified at canonical paths: **20/193**.
-Astral verified: **20/24**.
+Set One Standard/base PNG masters verified at canonical paths: **21/193**.
+Astral verified: **21/24**.
 
 Verified cards:
 - Stardot
@@ -45,8 +45,9 @@ Verified cards:
 - Future Draw
 - Gravity Shift
 - Star Chart
+- Celestial Observatory
 
-The current ledger sequence indicates `astral-celestial-observatory` next, but the workflow requires a fresh GitHub preflight again immediately before its image is generated.
+The current ledger sequence indicates `astral-dreamglass` next, but the workflow requires a fresh GitHub preflight again immediately before its image is generated.
 
 ## Rejected-candidate rule
 
@@ -55,3 +56,26 @@ A generated candidate that materially conflicts with the locked brief is rejecte
 ## Safety / release boundary
 
 No gameplay, runtime, database, Supabase, `main`, public Pages, live or production authority is changed by V2.4.45.
+
+## First completed deck product-preview gate
+
+When the first full starter-deck art package is complete, use the real approved assets to build a branch-only product preview before moving to the next deck presentation milestone.
+
+- First preview deck: **Astral — Second Sky**.
+- Trigger: Astral Standard/base art reaches **24/24** and the existing starter recipe remains valid.
+- Preview surfaces: Shop Featured / Starter Decks plus a coordinated Battle Pass Season 1 preview.
+- The shop preview must show the actual starter product identity, representative approved card art, and its matching **Second Sky Card Sleeve Set**, **Second Sky Battle Coin**, and **Second Sky Deck Box**.
+- Official starter ownership continues to include the matching sleeves, battle coin and deck box once; unowned accessories remain individually obtainable from the in-game Shop per the accessory ledger.
+- The preview is visual/product proof only until the canonical economy owner provides prices, purchase receipts, grants and ownership state. Do not fabricate prices, currencies, odds or grants.
+- No preview may change gameplay, deck legality, randomness, card ownership or economy balances.
+
+## Battle Pass Season 1 authority
+
+**Set One (SB1) is the first Stream Bandit TCG Battle Pass season identity.**
+
+- Season display identity: **Set One — Season 1**.
+- Existing locked structure remains **100 tiers with a reward every tier** and three daily achievements.
+- Set One cards, packs, cosmetics and deck accessories may be used as the Season 1 visual/reward pool only through the future progression/economy owner.
+- This decision does **not** mean all 193 Set One cards are automatically granted by the pass.
+- Exact free/premium track assignments, tier rewards, token costs, receipts, progression values and entitlement rules remain unassigned until the canonical Battle Pass/economy systems own them.
+- After the Astral 24/24 deck-art gate, create a branch-only Battle Pass Season 1 visual preview beside the Second Sky Shop preview so the player-facing presentation can be reviewed with real assets.
