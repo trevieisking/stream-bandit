@@ -48,9 +48,9 @@ test('desktop battlefield gives Vanguard and Reserves independent height-bounded
   assert.match(battle, /\.sb-half-you \.sb-field-core\{[\s\S]*?grid-template-rows:minmax\(0,1\.18fr\) minmax\(0,1fr\)/);
   assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{width:min\(var\(--card-w\),9\.7dvh\)\}/);
   assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{width:min\(var\(--active-w\),11\.4dvh\)\}/);
-  assert.match(battle, /\.sb-card-wrap\.is-selected \.sb-card-actions\{[\s\S]*?position:absolute;[\s\S]*?left:calc\(100% \+ 10px\)/);
-  assert.match(battle, /\.sb-reserve-slot:nth-child\(n\+3\) \.sb-card-wrap\.is-selected \.sb-card-actions\{[\s\S]*?right:calc\(100% \+ 10px\)/);
-  assert.match(battle, /\.sb-hand-card\{[\s\S]*?width:min\(var\(--card-w\),10dvh\);[\s\S]*?flex-basis:min\(var\(--card-w\),10dvh\)/);
+  assert.match(battle, /\.sb-card-wrap\.is-selected \.sb-card-actions,[\s\S]*?\.sb-card-wrap\.has-setup-return \.sb-card-actions\{[\s\S]*?position:absolute;[\s\S]*?left:calc\(100% \+ 10px\)/);
+  assert.match(battle, /\.sb-reserve-slot:nth-child\(n\+3\) \.sb-card-wrap\.is-selected \.sb-card-actions,[\s\S]*?\.sb-reserve-slot:nth-child\(n\+3\) \.sb-card-wrap\.has-setup-return \.sb-card-actions\{[\s\S]*?right:calc\(100% \+ 10px\)/);
+  assert.match(battle, /\.sb-hand-card\{[\s\S]*?height:calc\(clamp\(132px,17\.2dvh,166px\) - 34px\);[\s\S]*?width:auto;[\s\S]*?flex:0 0 auto/);
 });
 
 
