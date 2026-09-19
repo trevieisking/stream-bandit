@@ -30,9 +30,10 @@
 - [x] Cometmanta.
 - [x] Orbitortoise.
 - [x] Prismowl.
-- [ ] Starwhale.
-- [ ] Set One Standard/base PNG masters complete: **9/193 -> 193/193**.
-- [ ] Astral Standard/base PNG masters complete: **9/24 -> 24/24**.
+- [x] Starwhale.
+- [ ] Celestyr — Dream Cartographer.
+- [ ] Set One Standard/base PNG masters complete: **10/193 -> 193/193**.
+- [ ] Astral Standard/base PNG masters complete: **10/24 -> 24/24**.
 - [ ] Final clean backgrounds complete: **0/8 -> 8/8**.
 
 ## Safety
