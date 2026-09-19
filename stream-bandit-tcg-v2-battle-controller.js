@@ -1,19 +1,23 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.4';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.5';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
+  const SETUP_RECIPES = new Set(['Creature — Baby', 'Creature — Standalone', 'Creature — Mythic']);
+
   const state = {
     client: null,
     session: null,
     matchId: '',
     view: null,
     selectedAnchorUid: '',
+    selectedHandUid: '',
     opponentProfileId: '',
     opponentProfile: null,
     busy: false,
-    poll: null
+    poll: null,
+    overlayKey: ''
   };
 
   const $ = (id) => document.getElementById(id);
@@ -54,13 +58,7 @@
     if (!(await waitForGate())) throw new Error('Stream Bandit auth gate is unavailable.');
     const gate = window.StreamBanditAuthGate;
     let decision = await gate.enforce();
-    // Auth Gate boot may already be inside enforce(); while it is running the
-    // established helper returns its last decision, which is temporarily null
-    // on first load. Reuse the same authoritative gate owner instead of
-    // misclassifying that startup window as an approval failure.
-    if (!decision && typeof gate.decide === 'function') {
-      decision = await gate.decide();
-    }
+    if (!decision && typeof gate.decide === 'function') decision = await gate.decide();
     if (!decision && typeof gate.state === 'function') {
       for (let attempt = 0; attempt < 40 && !decision; attempt += 1) {
         const snapshot = gate.state();
@@ -149,7 +147,8 @@
     image.onerror = () => {
       frame.hidden = true;
       fallback.hidden = false;
-      image.removeAttribute('src');
+      if (typeof image.removeAttribute === 'function') image.removeAttribute('src');
+      else image.src = '';
     };
     image.alt = label + ' profile picture';
     image.src = avatar;
@@ -177,9 +176,7 @@
         .select('id,username,display_name,channel_name,avatar_url')
         .eq('id', id)
         .maybeSingle();
-      if (!result.error && result.data && String(result.data.id || '') === id) {
-        state.opponentProfile = result.data;
-      }
+      if (!result.error && result.data && String(result.data.id || '') === id) state.opponentProfile = result.data;
     } catch (_) {
       state.opponentProfile = null;
     }
@@ -239,6 +236,15 @@
     return row && row.definition_v0_2 ? row.definition_v0_2 : null;
   }
 
+  function recipeType(instance) {
+    const definition = legacyDefinition(instance) || {};
+    return String(definition.recipe_type || definition.recipeType || '');
+  }
+
+  function setupCandidate(instance) {
+    return SETUP_RECIPES.has(recipeType(instance));
+  }
+
   function topInstance(creature) {
     return creature && Array.isArray(creature.stack) && creature.stack.length
       ? creature.stack[creature.stack.length - 1]
@@ -277,62 +283,251 @@
     const selected = opts.primary && anchor && state.selectedAnchorUid === anchor;
     const attacks = opts.primary ? attackSlots(creature) : [];
     const canAct = !!opts.canAct;
-    const actionRows = attacks.map((attack) => (
+    const attackRows = attacks.map((attack) => (
       '<button type="button" class="sb-card-action" data-card-intent="attack" data-attack-slot="' + attack.slot + '"' +
       (canAct ? '' : ' disabled') + '>' +
       '<span><strong>' + esc(attack.name) + '</strong><small>Attack ' + attack.slot + '</small></span>' +
       '<span class="sb-damage">' + (attack.damage == null ? '—' : esc(attack.damage)) + '</span>' +
       '</button>'
     )).join('');
+    const setupReturn = opts.setupReturn
+      ? '<button type="button" class="sb-card-action setup-return" data-setup-return="' + esc(opts.setupReturn.where) + '" data-setup-index="' + esc(opts.setupReturn.index == null ? '' : opts.setupReturn.index) + '"><span><strong>Return to hand</strong><small>Adjust setup</small></span><span>↩</span></button>'
+      : '';
     const cardId = String((topInstance(creature) && topInstance(creature).card_id) || '');
-    return '<article class="sb-tcg-card sb-card-control' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '" data-card-id="' + esc(cardId) + '"' +
+    return '<div class="sb-card-wrap' + (selected ? ' is-selected' : '') + (opts.setupReturn ? ' has-setup-return' : '') + '">' +
+      '<article class="sb-tcg-card sb-card-control' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '" data-card-id="' + esc(cardId) + '"' +
       (opts.primary ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"' : '') + '>' +
-      '<header><span class="sb-stage">' + esc(definition.stage || definition.kind || 'Creature') + '</span><span class="sb-element">' + esc(definition.element || '') + '</span></header>' +
-      '<h2>' + esc(definition.name || topInstance(creature)?.card_id || 'Creature') + '</h2>' +
       '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
-      '<div class="sb-hp"><strong>HP ' + esc(remaining) + '/' + esc(maxHp) + '</strong><span>Damage ' + esc(damage) + '</span></div>' +
-      '<div class="sb-card-meta"><span>Essence ' + esc((creature.essence || []).length) + '</span><span>Shield ' + esc(creature.shield || 0) + '</span></div>' +
-      (opts.primary ? '<div class="sb-card-hint">' + (selected ? 'Choose an action on this card' : 'Tap/select this card') + '</div><div class="sb-card-actions">' + actionRows + '</div>' : '') +
-      '</article>';
+      '<div class="sb-card-head"><span>' + esc(definition.stage || definition.kind || 'Creature') + '</span><span>' + esc(definition.element || '') + '</span></div>' +
+      '<div class="sb-card-name">' + esc(definition.name || (topInstance(creature) && topInstance(creature).card_id) || 'Creature') + '</div>' +
+      '<div class="sb-card-foot"><span>HP ' + esc(remaining) + '/' + esc(maxHp) + '</span><span>E ' + esc((creature.essence || []).length) + ' · S ' + esc(creature.shield || 0) + '</span></div>' +
+      '</article>' +
+      '<div class="sb-card-actions">' + attackRows + setupReturn + '</div>' +
+      '</div>';
   }
 
   function handCard(instance) {
     const definition = legacyDefinition(instance) || {};
     const cardId = String(instance && instance.card_id || '');
-    return '<article class="sb-tcg-card sb-hand-card" data-card-id="' + esc(cardId) + '">' +
+    const uid = String(instance && instance.uid || '');
+    const view = viewState();
+    const yourSetup = !!(view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
+    const candidate = yourSetup && setupCandidate(instance);
+    const selected = candidate && state.selectedHandUid === uid;
+    return '<article class="sb-tcg-card sb-hand-card' + (candidate ? ' is-setup-candidate' : '') + (selected ? ' is-setup-selected' : '') + '" data-card-id="' + esc(cardId) + '"' +
+      (candidate ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-setup-hand-uid="' + esc(uid) + '"' : '') + '>' +
       '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
-      '<strong>' + esc(definition.name || cardId) + '</strong><small>' +
-      esc(definition.card_family || definition.kind || '') + '</small></article>';
+      '<div class="sb-card-head"><span>' + esc(definition.card_family || definition.kind || '') + '</span><span>' + esc(definition.element || '') + '</span></div>' +
+      '<div class="sb-card-name">' + esc(definition.name || cardId) + '</div>' +
+      '<div class="sb-card-foot"><span>' + esc(recipeType(instance) || 'Card') + '</span><span></span></div>' +
+      '</article>';
   }
 
-  function renderReserve(target, reserve, ownerLabel) {
+  function setupReturnOptions(where, index) {
+    const view = viewState();
+    const yourSetup = !!(view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
+    return yourSetup ? { where, index } : null;
+  }
+
+  function renderReserve(target, reserve, ownerLabel, own) {
     const node = $(target);
     if (!node) return;
-    node.innerHTML = [0, 1, 2, 3].map((index) => '<section class="sb-reserve-slot"><span>' + esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' + creatureCard(reserve && reserve[index], {}) + '</section>').join('');
+    const view = viewState();
+    const yourSetup = !!(own && view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
+    node.innerHTML = [0, 1, 2, 3].map((index) => {
+      const creature = reserve && reserve[index];
+      const destination = yourSetup && !creature && state.selectedHandUid
+        ? ' data-setup-destination="reserve" data-setup-index="' + index + '"'
+        : '';
+      const legalClass = destination ? ' sb-setup-destination is-legal' : '';
+      return '<section class="sb-reserve-slot' + legalClass + '"' + destination + '><span>' + esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' +
+        creatureCard(creature, { setupReturn: own && creature ? setupReturnOptions('reserve', index) : null }) +
+        '</section>';
+    }).join('');
+  }
+
+  function renderRewardStack(target, count) {
+    const node = $(target);
+    if (!node) return;
+    const safe = Math.max(0, Math.min(6, Number(count || 0)));
+    node.innerHTML = Array.from({ length: 6 }, (_, index) =>
+      '<span class="sb-reward-card' + (index >= safe ? ' is-empty' : '') + '" aria-hidden="true"></span>'
+    ).join('');
+  }
+
+  function setText(id, value) {
+    const node = $(id);
+    if (node) node.textContent = String(value == null ? '—' : value);
+  }
+
+  function selectedSetupName() {
+    const view = viewState();
+    const hand = view && view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
+    const instance = hand.find((row) => String(row.uid || '') === state.selectedHandUid);
+    const definition = instance ? legacyDefinition(instance) || {} : {};
+    return instance ? String(definition.name || instance.card_id || 'Selected card') : '';
+  }
+
+  function renderVanguardSetupTarget() {
+    const view = viewState();
+    const slot = $('youVanguardSlot');
+    if (!slot) return;
+    const yourSetup = !!(view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
+    const empty = !(view && view.you && view.you.vanguard);
+    const legal = !!(yourSetup && empty && state.selectedHandUid);
+    slot.className = 'sb-vanguard-slot' + (legal ? ' sb-setup-destination is-legal' : '');
+    if (legal) {
+      slot.dataset.setupDestination = 'vanguard';
+      slot.dataset.setupIndex = '';
+    } else {
+      delete slot.dataset.setupDestination;
+      delete slot.dataset.setupIndex;
+    }
+  }
+
+  function renderOverlay() {
+    const node = $('battleOverlay');
+    const view = viewState();
+    if (!node || !view) return;
+    const youSeat = Number(view.you && view.you.seat);
+    const phase = String(view.phase || '');
+    const selectedName = selectedSetupName();
+    const key = [phase, revision(), view.toss_winner_seat, view.setup_turn_seat, state.selectedHandUid, !!(view.you && view.you.vanguard), view.result && view.result.winner_seat].join(':');
+    if (key === state.overlayKey) return;
+    state.overlayKey = key;
+
+    if (phase === 'opening_choice') {
+      const won = Number(view.toss_winner_seat) === youSeat;
+      node.innerHTML =
+        '<div class="sb-phase-card">' +
+        '<div class="sb-coin" aria-label="Server-authoritative opening toss"><img src="stream_bandit_stag_icon_32.png" alt=""></div>' +
+        '<div class="sb-phase-copy"><strong>' + (won ? 'You won the opening toss' : 'Opponent won the opening toss') + '</strong>' +
+        '<small>' + (won ? 'Choose who takes the first turn.' : 'The toss winner is choosing who takes the first turn.') + '</small></div>' +
+        (won
+          ? '<div class="sb-phase-actions"><button type="button" class="sb-phase-action" data-opening-choice="first">Go First</button><button type="button" class="sb-phase-action alt" data-opening-choice="second">Go Second</button></div>'
+          : '') +
+        '</div>';
+      return;
+    }
+
+    if (phase === 'setup') {
+      const yourSetup = Number(view.setup_turn_seat) === youSeat;
+      const hasVanguard = !!(view.you && view.you.vanguard);
+      node.innerHTML =
+        '<div class="sb-phase-card">' +
+        '<div class="sb-phase-copy"><strong>' + (yourSetup ? 'Set your opening field' : 'Opponent is setting their opening field') + '</strong>' +
+        '<small>' + (yourSetup
+          ? (selectedName ? selectedName + ' selected — tap Vanguard or a Reserve slot.' : 'Tap an eligible opening Creature in your hand, then tap its board slot.')
+          : 'Your board stays visible while the server waits for their setup.') + '</small></div>' +
+        (yourSetup
+          ? '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-setup-ready="1"' + (hasVanguard ? '' : ' disabled') + '>Confirm Setup</button></div>'
+          : '') +
+        '</div>';
+      return;
+    }
+
+    if (phase === 'complete') {
+      const winnerSeat = Number(view.result && view.result.winner_seat);
+      const won = winnerSeat && winnerSeat === youSeat;
+      const reasons = view.result && Array.isArray(view.result.reasons) ? view.result.reasons.join(' · ') : '';
+      node.innerHTML =
+        '<div class="sb-phase-card">' +
+        '<div class="sb-phase-copy"><strong class="sb-result-title ' + (won ? 'sb-result-win' : 'sb-result-loss') + '">' + (won ? 'VICTORY' : 'DEFEAT') + '</strong>' +
+        '<small>' + esc(reasons || 'Match complete') + '</small></div>' +
+        '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-result-continue="1">Continue</button></div>' +
+        '</div>';
+      return;
+    }
+
+    node.innerHTML = '';
   }
 
   function render() {
     const view = viewState();
     if (!view) return;
     renderOpponentProfile();
-    const yourTurn = view.phase === 'play' && Number(view.active_seat) === Number(view.you && view.you.seat);
-    const pending = !!(view.pending_attack_choice || view.pending_ability_choice || view.pending_event_listener_choice || view.pending_movement_listener_choice || view.pending_heal_listener_choice || view.pending_choice || view.pending_resolution);
+
+    const youSeat = Number(view.you && view.you.seat);
+    const yourTurn = view.phase === 'play' && Number(view.active_seat) === youSeat;
+    const pending = !!(
+      view.pending_attack_choice ||
+      view.pending_ability_choice ||
+      view.pending_event_listener_choice ||
+      view.pending_movement_listener_choice ||
+      view.pending_heal_listener_choice ||
+      view.pending_choice ||
+      view.pending_resolution
+    );
     const canAttack = yourTurn && !pending && !state.busy;
+    const yourSetup = view.phase === 'setup' && Number(view.setup_turn_seat) === youSeat;
 
     $('oppVanguard').innerHTML = creatureCard(view.opponent && view.opponent.vanguard, {});
-    $('youVanguard').innerHTML = creatureCard(view.you && view.you.vanguard, { primary: true, canAct: canAttack });
-    renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent');
-    renderReserve('youReserve', view.you && view.you.reserve, 'Your');
-    $('yourHand').innerHTML = (view.you && Array.isArray(view.you.hand) ? view.you.hand : []).map(handCard).join('') || '<div class="sb-zone-empty">No cards in hand</div>';
-    $('turnPill').textContent = view.phase === 'complete' ? 'Match complete' : (yourTurn ? 'Your turn' : 'Opponent turn');
-    $('revisionPill').textContent = 'Revision ' + revision();
-    $('phasePill').textContent = String(view.phase || '—');
+    $('youVanguard').innerHTML = creatureCard(view.you && view.you.vanguard, {
+      primary: view.phase === 'play',
+      canAct: canAttack,
+      setupReturn: view.you && view.you.vanguard ? setupReturnOptions('vanguard', null) : null
+    });
+    renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent', false);
+    renderReserve('youReserve', view.you && view.you.reserve, 'Your', true);
+    renderVanguardSetupTarget();
 
-    if (pending) setStatus('The board is authoritative. Resolve the pending server choice before another card action.', 'wait');
-    else if (yourTurn) setStatus('Your turn. Select your active Creature card; its legal card actions stay on the card face.', 'ready');
-    else setStatus('Board synced. Waiting for the opponent or the next server phase.', 'wait');
+    const hand = view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
+    $('yourHand').innerHTML = hand.map(handCard).join('') || '<div class="sb-zone-empty">No cards in hand</div>';
 
+    renderRewardStack('oppRewards', view.opponent && view.opponent.rewards_count);
+    renderRewardStack('yourRewards', view.you && view.you.rewards_count);
+    setText('oppHandCount', view.opponent && view.opponent.hand_count);
+    setText('oppDeck', view.opponent && view.opponent.deck_count);
+    setText('oppDiscard', view.opponent && view.opponent.discard_count);
+    setText('yourDeck', view.you && view.you.deck_count);
+    setText('yourDiscard', view.you && Array.isArray(view.you.discard) ? view.you.discard.length : 0);
+    setText('yourMulligans', view.you && view.you.mulligans);
+
+    const realm = $('realmPill');
+    if (realm) {
+      const realmValue = view.realm && typeof view.realm === 'object'
+        ? (view.realm.name || view.realm.card_name || 'Realm')
+        : (view.realm || 'Stream Bandit TCG');
+      realm.textContent = String(realmValue);
+    }
+
+    const turnPill = $('turnPill');
+    if (turnPill) {
+      if (view.phase === 'opening_choice') turnPill.textContent = 'Opening toss';
+      else if (view.phase === 'setup') turnPill.textContent = yourSetup ? 'Your setup' : 'Opponent setup';
+      else if (view.phase === 'complete') turnPill.textContent = 'Match complete';
+      else turnPill.textContent = yourTurn ? 'Your turn' : 'Opponent turn';
+    }
+    setText('revisionPill', 'Revision ' + revision());
+    setText('phasePill', String(view.phase || '—'));
+
+    const help = $('handHelp');
+    if (help) {
+      if (yourSetup) help.textContent = state.selectedHandUid ? 'Now tap Vanguard or an open Reserve slot.' : 'Tap an eligible opening Creature.';
+      else if (view.phase === 'opening_choice') help.textContent = 'Opening hand dealt by the server.';
+      else help.textContent = 'Select cards directly from your hand.';
+    }
+
+    if (state.busy) setStatus('Waiting for the authoritative server…', 'busy');
+    else if (view.phase === 'opening_choice') {
+      if (Number(view.toss_winner_seat) === youSeat) setStatus('Server toss complete. Choose whether to go first or second.', 'ready');
+      else setStatus('Server toss complete. Waiting for the toss winner to choose first or second.', 'wait');
+    } else if (view.phase === 'setup') {
+      if (yourSetup) setStatus('Your setup turn. Place a Vanguard, optionally place Reserves, then confirm.', 'ready');
+      else setStatus('Opponent setup in progress. Your board remains synced.', 'wait');
+    } else if (view.phase === 'complete') {
+      setStatus('Match complete.', 'ready');
+    } else if (pending) {
+      setStatus('The board is authoritative. Resolve the pending server choice before another card action.', 'wait');
+    } else if (yourTurn) {
+      setStatus('Your turn. Select your Vanguard; legal card actions stay attached to the card.', 'ready');
+    } else {
+      setStatus('Board synced. Waiting for the opponent or the next server phase.', 'wait');
+    }
+
+    renderOverlay();
     bindCardControls();
+    bindPhaseControls();
   }
 
   function bindCardControls() {
@@ -341,6 +536,7 @@
         if (state.busy) return;
         const anchor = String(card.dataset.cardAnchor || '');
         state.selectedAnchorUid = state.selectedAnchorUid === anchor ? '' : anchor;
+        state.overlayKey = '';
         render();
       };
       card.addEventListener('click', (event) => {
@@ -354,6 +550,7 @@
         }
       });
     });
+
     document.querySelectorAll('[data-card-intent="attack"]').forEach((button) => {
       button.addEventListener('click', async (event) => {
         event.stopPropagation();
@@ -362,9 +559,115 @@
     });
   }
 
+  function bindPhaseControls() {
+    document.querySelectorAll('[data-opening-choice]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        await runOpeningChoice(String(button.dataset.openingChoice || ''));
+      });
+    });
+
+    document.querySelectorAll('[data-setup-hand-uid]').forEach((card) => {
+      const select = () => {
+        if (state.busy) return;
+        const uid = String(card.dataset.setupHandUid || '');
+        state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
+        state.overlayKey = '';
+        render();
+      };
+      card.addEventListener('click', select);
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          select();
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-setup-destination]').forEach((slot) => {
+      slot.addEventListener('click', async () => {
+        if (!state.selectedHandUid || state.busy) return;
+        await runSetupPlace(
+          state.selectedHandUid,
+          String(slot.dataset.setupDestination || ''),
+          slot.dataset.setupIndex === '' || slot.dataset.setupIndex == null ? null : Number(slot.dataset.setupIndex)
+        );
+      });
+    });
+
+    document.querySelectorAll('[data-setup-return]').forEach((button) => {
+      button.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        const where = String(button.dataset.setupReturn || '');
+        const raw = button.dataset.setupIndex;
+        await runSetupReturn(where, raw === '' || raw == null ? null : Number(raw));
+      });
+    });
+
+    document.querySelectorAll('[data-setup-ready]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        if (!button.disabled) await runSetupReady();
+      });
+    });
+
+    document.querySelectorAll('[data-result-continue]').forEach((button) => {
+      button.addEventListener('click', () => {
+        window.location.href = 'tcg-play.html';
+      });
+    });
+  }
+
+  async function runAuthoritativeSetupAction(action, extra, busyMessage) {
+    state.busy = true;
+    state.overlayKey = '';
+    render();
+    setStatus(busyMessage, 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_SETUP, Object.assign(actionBase(action), extra || {}));
+      state.selectedHandUid = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runOpeningChoice(choice) {
+    if (choice !== 'first' && choice !== 'second') return;
+    await runAuthoritativeSetupAction(
+      'opening_choice',
+      { choice },
+      'Submitting the toss winner\'s first/second choice to the server…'
+    );
+  }
+
+  async function runSetupPlace(cardUid, where, index) {
+    if (!cardUid || (where !== 'vanguard' && where !== 'reserve')) return;
+    const payload = { card_uid: cardUid, where };
+    if (where === 'reserve') payload.index = index;
+    await runAuthoritativeSetupAction('setup_place', payload, 'Placing the selected Creature through the server setup owner…');
+  }
+
+  async function runSetupReturn(where, index) {
+    if (where !== 'vanguard' && where !== 'reserve') return;
+    const payload = { where };
+    if (where === 'reserve') payload.index = index;
+    await runAuthoritativeSetupAction('setup_return', payload, 'Returning the setup Creature to your hand…');
+  }
+
+  async function runSetupReady() {
+    await runAuthoritativeSetupAction('setup_ready', {}, 'Locking your opening field through the server Match Flow owner…');
+  }
+
   async function runAttackIntent(attackSlot) {
     if (attackSlot !== 1 && attackSlot !== 2) throw new Error('Invalid attack slot.');
     state.busy = true;
+    state.overlayKey = '';
     render();
     setStatus('Submitting card attack to the authoritative match engine…', 'busy');
     let failure = '';
@@ -376,6 +679,7 @@
       await refreshMatch().catch(() => {});
     } finally {
       state.busy = false;
+      state.overlayKey = '';
       render();
       if (failure) setStatus(failure, 'error');
     }
@@ -387,7 +691,16 @@
     state.view = response.view || response.result || null;
     if (!state.view) throw new Error('The authoritative match view was not returned.');
     const view = viewState();
-    if (state.selectedAnchorUid && view && view.you && cardAnchor(view.you.vanguard) !== state.selectedAnchorUid) state.selectedAnchorUid = '';
+
+    if (state.selectedAnchorUid && view && view.you && cardAnchor(view.you.vanguard) !== state.selectedAnchorUid) {
+      state.selectedAnchorUid = '';
+    }
+    if (state.selectedHandUid) {
+      const hand = view && view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
+      if (!hand.some((row) => String(row.uid || '') === state.selectedHandUid)) state.selectedHandUid = '';
+    }
+    if (view && view.phase !== 'setup') state.selectedHandUid = '';
+
     render();
     syncOpponentProfile(view && view.opponent && view.opponent.user_id).catch(() => {});
   }
@@ -396,7 +709,7 @@
     if (state.poll) clearInterval(state.poll);
     state.poll = setInterval(() => {
       if (!state.busy) refreshMatch().catch((error) => setStatus(error instanceof Error ? error.message : String(error), 'error'));
-    }, 3000);
+    }, 2000);
   }
 
   async function boot() {
