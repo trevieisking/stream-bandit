@@ -250,3 +250,16 @@ main.tcg-page{gap:7px}
   .tcg-deck-choice strong{font-size:1vw}
   .tcg-deck-choice small,.tcg-deck-choice b{font-size:.68vw}
 }
+
+
+/* V2.4.47 human visual acceptance: keep the top rail labels fully visible. */
+.tcg-client{grid-template-rows:clamp(86px,10vh,104px) minmax(0,1fr)}
+.tcg-client-topbar{overflow:visible}
+.tcg-client-nav{height:auto;align-self:stretch;overflow:visible}
+.tcg-client-nav a{gap:2px;padding:5px 2px 7px;line-height:1}
+.tcg-client-nav a::before{line-height:1;flex:0 0 auto}
+@media(max-height:760px){
+  .tcg-client{grid-template-rows:72px minmax(0,1fr)}
+  .tcg-client-nav a{padding:3px 1px 5px;font-size:9px}
+  .tcg-client-nav a::before{font-size:18px}
+}
