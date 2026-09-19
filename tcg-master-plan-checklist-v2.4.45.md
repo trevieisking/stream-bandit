@@ -83,5 +83,9 @@
 - [ ] Produce/verify Second Sky Card Sleeve Set artwork.
 - [ ] Produce/verify Second Sky Battle Coin artwork.
 - [ ] Produce/verify Second Sky Deck Box artwork.
-- [x] Human visual acceptance of Second Sky surfaces — Trevor PASS on exact head `7d15aec02ee76613a706e4ca491f6c091e57351b`.
+- [x] Desktop human visual acceptance of Second Sky surfaces — Trevor PASS on exact head `7d15aec02ee76613a706e4ca491f6c091e57351b`.
+- [x] Add V2.4.50 mobile responsive shell: full 3 x 2 navigation rail, vertical page scrolling and stacked core layouts.
+- [x] Add complete two-column mobile Collection/Deck card grids so all approved Astral identities remain reachable.
+- [ ] Mobile human visual acceptance of Second Sky surfaces — Kay/Trevor re-test pending.
+- [ ] Overall cross-device Second Sky visual acceptance.
 - [ ] Main/Pages/live release only after inherited end-to-end release gates.
