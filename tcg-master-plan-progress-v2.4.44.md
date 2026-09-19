@@ -22,13 +22,13 @@ Verified canonical Standard/base PNG masters present on PR #576:
 - `astral-cosmarch`
 - `astral-moonbit`
 
-Set One material artwork progress: **4/193**.
+Set One material artwork progress: **5/193**.
 
-Astral material artwork progress: **4/24**.
+Astral material artwork progress: **5/24**.
 
-Next card: `astral-comettail`.
+Next card: `astral-nebulynx`.
 
-Comettail may have a generated candidate image in the conversation, but it is not counted until its GitHub path is created, verified, the image is uploaded, and the canonical PNG path is verified.
+Comettail is verified at its canonical PNG path. Nebulynx is the next card and is not counted until its GitHub path is created, verified, the image is uploaded, and the canonical PNG path is verified.
 
 ## Blueprint truth remains unchanged
 
