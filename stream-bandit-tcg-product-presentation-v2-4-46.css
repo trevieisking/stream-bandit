@@ -41,3 +41,24 @@
 .tcg-product-mini{display:grid;gap:6px;margin-top:7px}
 .tcg-product-mini h3{margin:0;font-size:13px}
 .tcg-product-mini small{color:var(--tcg-muted);line-height:1.25}
+
+
+/* V2.4.47 human visual acceptance: fit artwork to its presentation card instead of flattening it. */
+.tcg-product-pass-hero{grid-template-columns:minmax(150px,34%) minmax(0,1fr)}
+.tcg-product-pass-art{width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:#020611}
+.tcg-product-reward-art{width:100%;height:auto;aspect-ratio:.72;object-fit:cover;background:#020611}
+.tcg-product-reward{justify-content:flex-start;gap:5px}
+.tcg-product-reward strong{margin-top:2px}
+.tcg-product-mini{
+  grid-template-columns:78px minmax(0,1fr);
+  grid-template-areas:"title title" "art note";
+  align-items:center;
+}
+.tcg-product-mini h3{grid-area:title}
+.tcg-product-mini-art{grid-area:art;width:78px;height:78px;min-height:0;aspect-ratio:1;object-fit:cover;margin:0}
+.tcg-product-mini small{grid-area:note;align-self:center}
+@media(max-width:780px){
+  .tcg-product-pass-hero{grid-template-columns:minmax(120px,36%) minmax(0,1fr)}
+  .tcg-product-mini{grid-template-columns:64px minmax(0,1fr)}
+  .tcg-product-mini-art{width:64px;height:64px}
+}
