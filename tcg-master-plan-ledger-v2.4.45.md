@@ -181,3 +181,13 @@ Attached Essence and Attack cost presentation reuse the same generic element-orb
 
 ## 075 — Essence compression is measured against rendered card width
 The implementation chooses expanded versus counted Essence presentation by comparing the expanded rail's rendered width with the rail's available card width. It does not use a gameplay count threshold. Every authoritative re-render recalculates the rail, so attachment removal can reduce the count or return the rail to individual-orb mode.
+
+
+## 076 — Phone drag is transport, never gameplay authority
+Touch drag only selects an existing hand-card UID, highlights existing destinations and delegates a legal drop to the same `runSetupPlace` / `runPlayHandTarget` functions used by tap mode. It may not define a separate mobile legality, payment, Creature, Essence, Relic or evolution engine.
+
+## 077 — Hold activation preserves phone scrolling
+Coarse-touch drag activates only after a deliberate short hold. Movement before activation cancels the drag gesture so the hand/page can still scroll normally. Once the hold has activated card dragging, the active gesture may prevent scrolling until drop/cancel.
+
+## 078 — Setup slots must be discoverable before touch selection
+Eligible empty setup locations expose their destination coordinates during the player's setup turn even before a hand card is selected. Their legal highlight remains conditional on a selected eligible Creature. This lets touch drag discover a destination without re-rendering away the held DOM card and does not change server setup legality.
