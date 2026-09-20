@@ -1303,3 +1303,39 @@ Remaining active Ability IF programs:
 3. Marevault — Heart of Tides: `essence_move_count_at_least -> SELECT_CREATURE -> HEAL`.
 
 Exact-head Card Pass after the release-control refresh remains the acceptance gate for V2.4.72. Main/live remain untouched.
+
+## V2.4.73 — Noctivane / Night Reading active Ability IF source closeout
+
+The first remaining active Ability IF family is now implemented through generic owners.
+
+### Generic ownership added
+
+- **Card-Zone within-zone reorder**: `runtimeV02ApplyCardZoneReorder` owns exact-instance same-zone reordering such as opponent deck top -> deck bottom. This avoids effect-local array mutation and preserves Card-Zone authority.
+- **Active Ability IF**: `runtimeV02EvaluateActiveAbilityIf` delegates `all/any/not` composition to the shared predicate-tree owner and currently supports the frozen active-Ability leaves `selected_count_at_least`, `target_damaged`, and `essence_move_count_at_least`.
+- **Scheduled Action lifecycle**: `runtimeV02ScheduleAction` / `runtimeV02ResolveControllerAftermathScheduledActions` own deferred `controller_aftermath_finished` actions. Current Release 1 scheduled execution supports `DRAW_FIXED` and delegates physical deck -> hand movement to Card-Zone. Incomplete fixed draw records deckout for Match Flow to resolve.
+- **Deck-reading active Ability family**: a card-ID-free adapter recognizes inspect opponent deck-top -> optional choose -> deck-bottom reorder -> selected-count IF -> scheduled fixed draw.
+
+### Night Reading execution
+
+For the frozen Noctivane program:
+1. Match opens an authoritative private `pending_ability_choice`.
+2. Only the controller sees the inspected top-card identity; the opponent sees a waiting choice.
+3. Selecting the card moves that exact instance to deck bottom through Card-Zone reorder.
+4. Shared Active Ability IF evaluates `selected_count_at_least($bottom,1)`.
+5. If true, a deferred opponent `DRAW_FIXED 1` is scheduled for `controller_aftermath_finished`.
+6. Immediately before canonical turn advance, Match resolves that controller-aftermath schedule; Card-Zone performs any draw, deckout is recorded if incomplete, then Match Flow retains terminal/turn authority.
+7. Public Match receipts expose only selection/movement/schedule counts/booleans, never the privately inspected card identity.
+
+The generic Battle `pending_ability_choice` transport is reused; no Noctivane-specific browser control exists.
+
+### Evidence
+
+Card Pass #1291 on the first combined Night Reading head proved the new scheduled-action tests were discovered. It exposed one Match union exhaustiveness error plus stale release-control; both are repaired. Release-control now reflects:
+- `tcg-private-alpha-api`: **8 files**, digest `92913c762cb3660fd92523ef0580e4afb5870588caae04ca6c48cefbffdec434`;
+- `tcg-match-actions`: **96 files**, digest `89326ab368dbd8f9af435c27d0bbe8f493aaa23466c78a502c13d7dd234d5348`;
+- `tcg-tactic-actions`: **40 files**, digest `5ff943f5d62ee53f5621ba1cbe539e0362b8473ef832c33c036241db1c82cc26`.
+
+The Setup digest independently matches #1291's CI-computed value. A post-repair exact-head Card Pass has not yet attached, so Night Reading remains **source-complete / CI-pending** rather than accepted.
+
+Ability IF source/accounting progress: **7 / 9**.
+Next exact target: Tide — Surgefin / Undertow Supply.
