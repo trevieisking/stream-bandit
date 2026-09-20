@@ -3,7 +3,12 @@ import { structuredRuntimeWithdrawalBaseCost } from "../_shared/tcg-match-withdr
 import { runtimeV02ApplyWithdrawalPaymentAndSwitch } from "../_shared/tcg-match-withdrawal-transaction-v0-2.ts";
 import { runtimeV02ApplyCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 import { runtimeV02EvolveCreatureFromHand, runtimeV02PlaceCreatureFromHand, runtimeV02ResolveDefeatedCreatures } from "../_shared/tcg-match-creature-engine-v0-2.ts";
-import { runtimeV02AttachRelicFromHand } from "../_shared/tcg-match-relic-engine-v0-2.ts";
+import { runtimeV02ListLegalEvolutionTargets, runtimeV02ValidateEvolutionDeclaration } from "../_shared/tcg-match-evolution-legality-v0-2.ts";
+import {
+  runtimeV02AttachRelicFromHand,
+  runtimeV02ListManualRelicAttachmentTargets,
+  runtimeV02ValidateManualRelicAttachmentDeclaration,
+} from "../_shared/tcg-match-relic-engine-v0-2.ts";
 import { structuredRuntimeIncomingAttackDamage, structuredRuntimeOutgoingAttackDamage } from "../_shared/tcg-match-attack-damage-v0-2.ts";
 import { structuredRuntimeAttachmentAttackBonus } from "../_shared/tcg-match-surge-lifecycle-v0-2.ts";
 import { evaluateRuntimeAttackCountAddFormula, evaluateRuntimeAttackDeclarationRequirements, evaluateRuntimeAttackReadyConditionalAddFormula, resolveRuntimeAttackAuthority } from "../_shared/tcg-match-attack-authority-v0-2.ts";
@@ -27,7 +32,9 @@ import { runtimeV02ApplyAtomicSwitch, runtimeV02ApplyForcedPromotion } from "../
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
 import { runtimeV02BeginEventListenerContinuation, runtimeV02CreateCreatureEnteredPlayEvent, runtimeV02CreateCreatureEvolvedEvent, runtimeV02PendingEventListenerChoiceView, runtimeV02PrivateEventInspectionView, runtimeV02ResolveEventListenerChoice, type RuntimeV02PendingEventListenerChoice } from "../_shared/tcg-match-event-listener-v0-2.ts";
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
+import { runtimeV02ListManualEssenceAttachmentTargets, runtimeV02ValidateManualEssenceAttachmentDeclaration } from "../_shared/tcg-match-essence-attachment-engine-v0-2.ts";
 import { runtimeV02BeginRealmPlayRoute } from "../_shared/tcg-match-realm-route-v0-2.ts";
+import { runtimeV02ApplyRealmPlayTransaction } from "../_shared/tcg-match-realm-engine-v0-2.ts";
 import { runtimeV02ResolveAttackControlCondition } from "../_shared/tcg-match-condition-lifecycle-v0-2.ts";
 import { runtimeV02ResolveAftermath } from "../_shared/tcg-match-aftermath-v0-2.ts";
 import { runtimeV02ResolveAttackTarget, type RuntimeV02AttackTargetPermission } from "../_shared/tcg-match-attack-v0-2.ts";
@@ -94,7 +101,8 @@ Deno.serve(async(req)=>{
   const commit=async(eventType:string,payload:any)=>{const next=revision+1;const vv=views(s,next);return await rpc("tcg_server_commit_state",{p_match_id:matchId,p_actor_user_id:userId,p_client_nonce:nonce,p_expected_revision:revision,p_command_type:action,p_new_state:s,p_player_one_id:s.players["1"].user_id,p_player_one_view:vv.p1,p_player_two_id:s.players["2"].user_id,p_player_two_view:vv.p2,p_event_type:eventType,p_public_payload:payload||{}})};
   const log=(m:string)=>{s.log=s.log||[];s.log.push(m)};
   const queue=()=>{s.pending_resolutions=s.pending_resolutions||[];return s.pending_resolutions as any[]};
-  const defeatDescribe=(creature:any)=>({max_hp:maxHp(creature,s),reward_value:rewardValue(creature,s),label:String(top(creature,s)?.name||"Creature")});
+  const defeatDescribeFor=(state:any)=>(creature:any)=>({max_hp:maxHp(creature,state),reward_value:rewardValue(creature,state),label:String(top(creature,state)?.name||"Creature")});
+  const defeatDescribe=defeatDescribeFor(s);
   const flushAttackModifierRiders=()=>{const raw=s.pending_attack_modifier_riders;if(raw==null)return[];if(!Array.isArray(raw))throw new Error("tcg_v0_2_attack_modifier_rider_queue_invalid");const plans:{target:Cr;amount:number;modifier_id:string;rider_id:string}[]=[];for(const rider of raw){if(!rider||typeof rider!=="object"||rider.timing!=="after_attack_effects_before_defeat_scan")throw new Error("tcg_v0_2_attack_modifier_rider_invalid");const targetUid=String(rider.modifier_target_uid||"");let target:Cr|null=null;for(const who of [1,2]){for(const field of allCr(s.players[String(who)])){const inst=field.cr.stack?.[field.cr.stack.length-1];if(inst?.uid===targetUid){target=field.cr;break}}if(target)break}if(!target)throw new Error("tcg_v0_2_attack_modifier_rider_target_missing");if(!Array.isArray(rider.steps)||rider.steps.length<1)throw new Error("tcg_v0_2_attack_modifier_rider_steps_invalid");for(const step of rider.steps){if(!step||step.op!=="DIRECT_DAMAGE"||step.target!=="$modifier_target"||(step.damage_class!=null&&step.damage_class!=="effect"))throw new Error("tcg_v0_2_attack_modifier_rider_step_unsupported");const amount=Number(step.amount);if(!Number.isFinite(amount)||amount<0)throw new Error("tcg_v0_2_attack_modifier_rider_amount_invalid");plans.push({target,amount,modifier_id:String(rider.modifier_id||""),rider_id:String(rider.id||"")})}}const receipts=plans.map((plan)=>({modifier_id:plan.modifier_id,rider_id:plan.rider_id,...runtimeV02DealEffectDamage(plan.target,plan.amount)}));delete s.pending_attack_modifier_riders;return receipts};
   const scanDefeats=()=>{const attackModifierRiderReceipts=flushAttackModifierRiders();if(attackModifierRiderReceipts.length)log(`Resolved ${attackModifierRiderReceipts.length} Attack modifier completion rider(s).`);const defeated:any[]=[];for(const who of [1,2]){const owner=s.players[String(who)];for(const x of allCr(owner)){const hp=maxHp(x.cr,s);if(hp>0&&Number(x.cr.damage||0)>=hp)defeated.push({ownerSeat:who,...x,maxHp:hp,reward:rewardValue(x.cr,s),name:top(x.cr,s)?.name||"Creature"})}}if(defeated.length>0)runtimeV02ResolveDefeatedCreatures(defeated.map((d:any)=>({owner_seat:d.ownerSeat as 1|2,player:s.players[String(d.ownerSeat)],where:d.where as "vanguard"|"reserve",index:d.index,creature:d.cr,max_hp:d.maxHp})));for(const d of defeated){const receiver=d.ownerSeat===1?2:1;const available=s.players[String(receiver)].rewards?.length||0;if(available>0)queue().push({kind:"take_reward",seat:receiver,count:Math.min(d.reward,available),source:d.name});log(`${d.name} was defeated.`)}for(const who of [1,2]){const owner=s.players[String(who)];if(!owner.vanguard&&(owner.reserve||[]).some(Boolean))queue().push({kind:"promote",seat:who})}return defeated.length};
   const advanceTurn=()=>runtimeV02AdvanceTurn(s,(plan)=>{const np=s.players[String(plan.controller_seat)];runtimeV02ApplyCardZoneTransfer(np.deck,np.hand,{cause:"rule",action_kind:"turn",source_action_id:plan.source_action_id,source_card_uid:null,source:{controller_seat:plan.controller_seat,zone:"deck",owner_card_uid:null},destination:{controller_seat:plan.controller_seat,zone:"hand",owner_card_uid:null},card_uids:[plan.card_uid],destination_position:"bottom"})});
@@ -246,8 +254,97 @@ Deno.serve(async(req)=>{
 
   if(s.phase!=="play"||Number(s.active_seat)!==seat)return json({ok:false,version:VERSION,error:"not_active_player"},400);const flags=ensureFlags(s,seat);
 
+  const beginActiveAbilityRoute=(state:any,controllerSeat:1|2,where:string,index:number|null)=>{
+   const player=state.players[String(controllerSeat)],cr=getCr(player,where,index);if(!cr)throw new Error("ability_source_creature_not_found");const source=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!source)throw new Error("ability_source_top_required");
+   return runtimeV02BeginActiveAbilityLiveRoute(state,controllerSeat,{where:where as "vanguard"|"reserve",index,instance:source},defeatDescribeFor(state));
+  };
+  const projectAbilitySources=()=>{
+   const out:any[]=[];
+   for(const field of allCr(p)){
+    const instance=field.cr?.stack?.length?field.cr.stack[field.cr.stack.length-1]:null;if(!instance?.uid)continue;
+    const simulation=structuredClone(s);
+    try{
+     const routed=beginActiveAbilityRoute(simulation,seat as 1|2,String(field.where),field.index==null?null:Number(field.index));
+     if(routed)out.push({where:field.where==="reserve"?"reserve":"vanguard",index:field.where==="reserve"?Number(field.index):null,anchor_uid:String(instance.uid)});
+    }catch(_error){}
+   }
+   return out;
+  };
+  const withdrawalDeclaration=(rawIndex:any,requireTarget:boolean):any=>{
+   const turn=Number(s.turn_seq||0);
+   if(Number(flags.withdraw_turn??-1)===turn)return{ok:false,error:"withdrawal_already_used_this_turn",cost:null,legal_targets:[],payment_options:[]};
+   if(!p.vanguard)return{ok:false,error:"vanguard_required",cost:null,legal_targets:[],payment_options:[]};
+   const cq=conditions(p.vanguard);if(cq.control==="Stunned"||cq.control==="Rooted")return{ok:false,error:"condition_prevents_withdrawal",cost:null,legal_targets:[],payment_options:[]};
+   const legalTargets=(p.reserve||[]).map((cr:any,index:number)=>{if(!cr)return null;const inst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;return inst?.uid?{reserve_index:index,anchor_uid:String(inst.uid)}:null}).filter(Boolean);
+   if(!legalTargets.length)return{ok:false,error:"legal_reserve_required",cost:null,legal_targets:[],payment_options:[]};
+   const cost=withdrawalCost(p.vanguard,s);
+   const paymentOptions=(p.vanguard.essence||[]).map((entry:any)=>({uid:String(entry.uid||""),card_id:String(entry.card_id||""),label:String(def(s,entry)?.name||entry.card_id||"Essence")})).filter((entry:any)=>entry.uid);
+   if(cost>paymentOptions.length)return{ok:false,error:"exact_withdrawal_essence_payment_required",cost,legal_targets:legalTargets,payment_options:paymentOptions};
+   let reserveIndex:null|number=null;
+   if(requireTarget){
+    const idx=Number(rawIndex);if(!Number.isInteger(idx)||idx<0||idx>3||!p.reserve?.[idx])return{ok:false,error:"legal_reserve_required",cost,legal_targets:legalTargets,payment_options:paymentOptions};
+    reserveIndex=idx;
+   }
+   return{ok:true,error:null,cost,legal_targets:legalTargets,payment_options:paymentOptions,reserve_index:reserveIndex};
+  };
+
+  if(action==="field_actions"){
+   const withdrawal=withdrawalDeclaration(null,false);
+   return json({ok:true,version:VERSION,result:{ability_sources:projectAbilitySources(),withdraw:withdrawal.ok?{eligible:true,cost:withdrawal.cost,legal_targets:withdrawal.legal_targets,payment_options:withdrawal.payment_options}:{eligible:false,reason:withdrawal.error,cost:withdrawal.cost,legal_targets:withdrawal.legal_targets,payment_options:withdrawal.payment_options}}});
+  }
+
+  if(action==="play_card_targets"){
+   const uid=String(body.card_uid||""),inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;
+   const legalTargets:any[]=[];
+   if(inst&&starterLegal(d)){
+    for(let idx=0;idx<4;idx++){
+     if(p.reserve?.[idx])continue;
+     const playerClone=structuredClone(p);
+     runtimeV02PlaceCreatureFromHand(playerClone,seat as 1|2,uid,"reserve",idx,{turn_seq:Number(s.turn_seq||0)});
+     legalTargets.push({kind:"reserve",reserve_index:idx});
+    }
+   }else if(inst&&d?.kind==="Tactic"&&d?.family==="Realm"){
+    const stateClone=structuredClone(s),clonePlayer=stateClone.players[String(seat)],cloneInst=clonePlayer.hand.find((x:Inst)=>x.uid===uid);
+    if(!cloneInst)throw new Error("tcg_v0_2_direct_play_projection_hand_clone_missing");
+    try{
+     runtimeV02ApplyRealmPlayTransaction(stateClone,seat as 1|2,cloneInst,"play_realm_projection");
+     legalTargets.push({kind:"realm"});
+    }catch(error){
+     const message=error instanceof Error?error.message:String(error);
+     if(message!=="tcg_v0_2_realm_already_played_this_turn"&&message!=="tcg_v0_2_realm_same_named_replacement_forbidden")throw error;
+    }
+   }
+   return json({ok:true,version:VERSION,result:{card_uid:uid,eligible:legalTargets.length>0,legal_targets:legalTargets}});
+  }
+
+  if(action==="evolve_targets"){
+   const uid=String(body.card_uid||"");
+   const result=runtimeV02ListLegalEvolutionTargets(
+    p,
+    uid,
+    Number(s.turn_seq||0),
+    Number(s.personal_turns?.[String(seat)]||0),
+    (instance)=>def(s,instance),
+   );
+   return json({ok:true,version:VERSION,result});
+  }
+
+  if(action==="attach_essence_targets"){
+   const uid=String(body.card_uid||"");
+   if(s.runtime_registry_v0_2==null)return json({ok:true,version:VERSION,result:{ok:true,eligible:false,card_uid:uid,legal_targets:[],reason:"essence_card_required"}});
+   const result=runtimeV02ListManualEssenceAttachmentTargets(s,seat as 1|2,uid);
+   return json({ok:true,version:VERSION,result});
+  }
+
+  if(action==="attach_relic_targets"){
+   const uid=String(body.card_uid||"");
+   if(s.runtime_registry_v0_2==null)return json({ok:true,version:VERSION,result:{ok:true,eligible:false,card_uid:uid,legal_targets:[],reason:"relic_card_required"}});
+   const result=runtimeV02ListManualRelicAttachmentTargets(s,seat as 1|2,uid);
+   return json({ok:true,version:VERSION,result});
+  }
+
   if(action==="use_ability"){
-   const where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"ability_source_creature_not_found"},400);const source=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!source)return json({ok:false,version:VERSION,error:"ability_source_top_required"},400);let routed;try{routed=runtimeV02BeginActiveAbilityLiveRoute(s,seat as 1|2,{where:where as "vanguard"|"reserve",index:idx,instance:source},defeatDescribe)}catch(error){const message=error instanceof Error?error.message:String(error);const status=message.includes("turn_limit_reached")||message.includes("limit_reached")||message.includes("_changed")?409:400;return json({ok:false,version:VERSION,error:message},status)}if(!routed)return json({ok:false,version:VERSION,error:"active_ability_requires_runtime_owner"},400);
+   const where=String(body.where||""),idx=body.index==null?null:Number(body.index);let routed;try{routed=beginActiveAbilityRoute(s,seat as 1|2,where,idx)}catch(error){const message=error instanceof Error?error.message:String(error);const status=message.includes("turn_limit_reached")||message.includes("limit_reached")||message.includes("_changed")?409:400;return json({ok:false,version:VERSION,error:message},status)}if(!routed)return json({ok:false,version:VERSION,error:"active_ability_requires_runtime_owner"},400);
    if(routed.kind==="immediate"){const immediate=routed.immediate,resolution=immediate.resolution,healAudit=healListenerAudit(immediate.heal_listener);log(`Seat ${seat} used Ability ${resolution.ability_id} to drain ${resolution.actual_vitality_drained} vitality and heal ${resolution.actual_heal} damage.`);if(immediate.heal_listener.status==="player_choice_required"){s.phase="heal_listener_choice_resolution";return json({version:VERSION,result:await commit("ability_pending_heal_listener_choice",{seat,ability_id:resolution.ability_id,kind:resolution.kind,actual_vitality_drained:resolution.actual_vitality_drained,actual_heal:resolution.actual_heal,emitted_packet_ids:resolution.emitted_packet_ids,heal_listener:healAudit,resume_kind:immediate.resume_kind,resolution_queue_required:immediate.resolution_queue_required,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(immediate.heal_listener.pending_choice,seat as 1|2)})}if(immediate.resume_kind==="resume_resolution_queue"){s.phase="resolution";continueResolution()}else s.phase="play";return json({version:VERSION,result:await commit("ability_resolved",{seat,ability_id:resolution.ability_id,kind:resolution.kind,actual_vitality_drained:resolution.actual_vitality_drained,actual_heal:resolution.actual_heal,emitted_packet_ids:resolution.emitted_packet_ids,heal_listener:healAudit,resume_kind:immediate.resume_kind,resolution_queue_required:immediate.resolution_queue_required})})}
    if(routed.kind==="targeted_drain_choice"){const pending=routed.targeted_drain.pending_choice;s.pending_ability_choice=pending;s.phase="ability_effect_resolution";return json({version:VERSION,result:await commit("ability_pending_choice",{seat,ability_id:pending.ability_id,kind:pending.kind,creature_selection_count:1,pending:true}),pending_ability_choice:runtimeV02PendingTargetedDrainActiveAbilityChoiceView(pending,seat as 1|2)})}
    const pending=routed.choice;s.pending_ability_choice=pending;s.phase="ability_effect_resolution";const selectionAudit=pending.kind==="inspect_one_reward"?{reward_selection_count:1}:{creature_selection_count:1};return json({version:VERSION,result:await commit("ability_pending_choice",{seat,ability_id:pending.ability_id,kind:pending.kind,...selectionAudit,pending:true}),pending_ability_choice:runtimeV02PendingActiveAbilityLiveChoiceView(pending,seat as 1|2)})
@@ -285,7 +382,19 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="evolve"){
-   if(Number(s.personal_turns?.[String(seat)]||0)<=1)return json({ok:false,version:VERSION,error:"evolution_locked_on_first_personal_turn"},400);const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null,prev=top(cr,s);if(!inst||!d||d.kind!=="Creature"||!["Teen","Adult"].includes(String(d.stage||"")))return json({ok:false,version:VERSION,error:"teen_or_adult_required"},400);if(String(d.evolves_from_id||"")!==String(prev?.id||""))return json({ok:false,version:VERSION,error:"evolution_predecessor_mismatch"},400);const turn=Number(s.turn_seq||0);if(Number(cr.entered_turn??0)>=turn)return json({ok:false,version:VERSION,error:"stack_entered_or_evolved_this_turn"},400);if(Number(cr.evolved_turn??-1)===turn)return json({ok:false,version:VERSION,error:"one_evolution_per_stack_per_turn"},400);const evolved=runtimeV02EvolveCreatureFromHand(p,seat as 1|2,cr,uid,turn),x=evolved.card;const structuredEvolution=s.runtime_registry_v0_2!=null;
+   const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),turn=Number(s.turn_seq||0);
+   const legality=runtimeV02ValidateEvolutionDeclaration(
+    p,
+    uid,
+    where as "vanguard"|"reserve",
+    idx,
+    turn,
+    Number(s.personal_turns?.[String(seat)]||0),
+    (instance)=>def(s,instance),
+   );
+   if(!legality.ok)return json({ok:false,version:VERSION,error:legality.error},400);
+   const cr=legality.creature,inst=legality.card,d=legality.definition as any,prev=legality.previous_definition as any;
+   const evolved=runtimeV02EvolveCreatureFromHand(p,seat as 1|2,cr,uid,turn),x=evolved.card;const structuredEvolution=s.runtime_registry_v0_2!=null;
    if(!structuredEvolution){let rewardInspection=null;try{rewardInspection=structuredRuntimeEvolutionRewardInspection(s,x,seat as 1|2,body.inspect_reward_positions)}catch(error){const message=error instanceof Error?error.message:String(error);if(message.startsWith("tcg_v0_2_reward_inspection_positions_")||message.startsWith("tcg_v0_2_reward_inspection_position_")||message.startsWith("tcg_v0_2_reward_inspection_count_invalid:"))return json({ok:false,version:VERSION,error:message},400);throw error}void rewardInspection;if(d.id==="tide-reefback"||d.id==="stone-cragroller")addRuntimeShield(cr,20);else if(d.id==="grove-briarback"&&p.reserve.filter(Boolean).length>=2)healRuntimeDamage(cr,30);else if(d.id==="shade-veiljaw"&&opp.vanguard){const q=conditions(opp.vanguard);if(!q.control)q.control="Dazed"}log(`Seat ${seat} evolved ${prev.name} into ${d.name}.`);return json({version:VERSION,result:await commit("evolve",{seat,where,index:idx,from_card_id:prev.id,to_card_id:d.id})})}
    log(`Seat ${seat} evolved ${prev.name} into ${d.name}.`);
    const evolvedEvent=runtimeV02CreateCreatureEvolvedEvent(s,seat,uid,where,idx);
@@ -313,34 +422,45 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="attach_essence"){
-   const turn=Number(s.turn_seq||0);if(Number(flags.manual_essence_turn??-1)===turn)return json({ok:false,version:VERSION,error:"manual_essence_already_used_this_turn"},400);const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Essence")return json({ok:false,version:VERSION,error:"essence_card_required"},400);const td=top(cr,s);const structuredAttachment=s.runtime_registry_v0_2!=null;
+   const turn=Number(s.turn_seq||0),uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index);
+   const structuredAttachment=s.runtime_registry_v0_2!=null;
    if(structuredAttachment){
-    const targetInst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!targetInst)throw new Error("tcg_v0_2_attachment_target_anchor_required");
+    const legality=runtimeV02ValidateManualEssenceAttachmentDeclaration(s,seat as 1|2,uid,where,idx);
+    if(!legality.ok)return json({ok:false,version:VERSION,error:legality.error},400);
+    const cr=getCr(p,legality.where,legality.index)!;
+    const inst=p.hand.find((x:Inst)=>x.uid===uid)!;
+    const targetInst={uid:legality.target_creature_uid};
+    const d=def(s,inst),td=top(cr,s);
     const routed=runtimeV02BeginExternalEssenceAttachmentRoute(s,seat as 1|2,targetInst.uid,uid,"hand","manual_essence",{attachment_kind:"normal",phase:"play",action_kind:"manual_essence",destination_index:where==="reserve"?idx:null});
     flags.manual_essence_turn=turn;
     const eventFlow=routed.flow,eventAudit=eventListenerAudit(eventFlow);
-    log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);
+    log(`Seat ${seat} attached ${d?.name||inst.card_id} to ${td?.name||"a creature"}.`);
     if(eventFlow.status==="player_choice_required"){
      setEventResume("attach_essence",seat);
      s.phase="event_listener_choice_resolution";
-     return json({version:VERSION,result:await commit("attach_essence_pending_event_listener_choice",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d),event_listener:eventAudit,pending_event_listener_choice:true}),pending_event_listener_choice:runtimeV02PendingEventListenerChoiceView(eventFlow.pending_choice,seat as 1|2),private_event_inspection:runtimeV02PrivateEventInspectionView(s,seat as 1|2),private_reward_inspection:runtimeV02PrivateRewardInspectionView(s,seat as 1|2)});
+     return json({version:VERSION,result:await commit("attach_essence_pending_event_listener_choice",{seat,where:legality.where,index:legality.index,card_id:d?.id||inst.card_id,provides:essenceProvides(d),event_listener:eventAudit,pending_event_listener_choice:true}),pending_event_listener_choice:runtimeV02PendingEventListenerChoiceView(eventFlow.pending_choice,seat as 1|2),private_event_inspection:runtimeV02PrivateEventInspectionView(s,seat as 1|2),private_reward_inspection:runtimeV02PrivateRewardInspectionView(s,seat as 1|2)});
     }
     const movementFlow=eventFlow.emitted_movement_events.length?runtimeV02BeginMovementListenerContinuation(s,eventFlow.emitted_movement_events):{status:"complete",processed_listener_keys:[],emitted_heal_packet_ids:[],pending_choice:null};
     const movementAudit=movementListenerAudit(movementFlow);
     if(movementFlow.status==="player_choice_required"){
      setMovementResume("attach_essence",seat,eventFlow.emitted_heal_packet_ids);
      s.phase="movement_listener_choice_resolution";
-     return json({version:VERSION,result:await commit("attach_essence_pending_movement_listener_choice",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d),event_listener:eventAudit,movement_listener:movementAudit,pending_movement_listener_choice:true}),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(movementFlow.pending_choice,seat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,seat as 1|2)});
+     return json({version:VERSION,result:await commit("attach_essence_pending_movement_listener_choice",{seat,where:legality.where,index:legality.index,card_id:d?.id||inst.card_id,provides:essenceProvides(d),event_listener:eventAudit,movement_listener:movementAudit,pending_movement_listener_choice:true}),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(movementFlow.pending_choice,seat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,seat as 1|2)});
     }
     const packetIds=[...eventFlow.emitted_heal_packet_ids,...movementFlow.emitted_heal_packet_ids];
     const healFlow=runtimeV02BeginMovementHealListenerContinuation(s,packetIds,seat as 1|2),healAudit=healListenerAudit(healFlow);
     if(healFlow.status==="player_choice_required"){
      s.phase="heal_listener_choice_resolution";
-     return json({version:VERSION,result:await commit("attach_essence_pending_heal_listener_choice",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d),event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(healFlow.pending_choice,seat as 1|2)});
+     return json({version:VERSION,result:await commit("attach_essence_pending_heal_listener_choice",{seat,where:legality.where,index:legality.index,card_id:d?.id||inst.card_id,provides:essenceProvides(d),event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(healFlow.pending_choice,seat as 1|2)});
     }
     const n=scanDefeats();if(n>0)s.phase="resolution";else s.phase="play";
-    return json({version:VERSION,result:await commit("attach_essence",{seat,where,index:idx,card_id:d.id,provides:essenceProvides(d),event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit})});
+    return json({version:VERSION,result:await commit("attach_essence",{seat,where:legality.where,index:legality.index,card_id:d?.id||inst.card_id,provides:essenceProvides(d),event_listener:eventAudit,movement_listener:movementAudit,heal_listener:healAudit})});
    }
+
+   if(Number(flags.manual_essence_turn??-1)===turn)return json({ok:false,version:VERSION,error:"manual_essence_already_used_this_turn"},400);
+   const cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);
+   const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Essence")return json({ok:false,version:VERSION,error:"essence_card_required"},400);
+   const td=top(cr,s);
    const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;
    if(d.id==="ember-smolder-essence"&&cr.damage>0){cr.flags=cr.flags||{};cr.flags.next_attack_bonus=(Number((cr.flags as any).next_attack_bonus||0)+10)}else if(d.id==="ember-hearth-essence"&&cr.damage>0)healRuntimeDamage(cr,20);else if(d.id==="tide-calm-essence"&&td?.element==="Tide")healRuntimeDamage(cr,20);else if(d.id==="grove-bloom-essence"&&td?.element==="Grove"&&isEvolved(td))healRuntimeDamage(cr,20);else if(d.id==="stone-fault-essence"&&td?.element==="Stone")clearCond(cr,"Crushed");
    if(td?.id==="tide-puddlepip"&&d.element==="Tide"){cr.flags=cr.flags||{};const f=cr.flags as any;if(Number(f.freshwater_turn??-1)!==turn){f.freshwater_turn=turn;healRuntimeDamage(cr,10)}}
@@ -348,7 +468,21 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="attach_relic"){
-   const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index),cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);if(cr.relic)return json({ok:false,version:VERSION,error:"creature_already_has_relic"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Tactic"||d.family!=="Relic")return json({ok:false,version:VERSION,error:"relic_card_required"},400);const targetInst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!targetInst)throw new Error("tcg_v0_2_relic_attachment_target_anchor_required");runtimeV02AttachRelicFromHand(p,seat as 1|2,targetInst.uid,uid);const td=top(cr,s);if(td?.id==="stone-flintkin")healRuntimeDamage(cr,10);log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);return json({version:VERSION,result:await commit("attach_relic",{seat,where,index:idx,card_id:d.id})});
+   const uid=String(body.card_uid||""),where=String(body.where||""),idx=body.index==null?null:Number(body.index);
+   const structuredRelic=s.runtime_registry_v0_2!=null;
+   if(structuredRelic){
+    const legality=runtimeV02ValidateManualRelicAttachmentDeclaration(s,seat as 1|2,uid,where,idx);
+    if(!legality.ok)return json({ok:false,version:VERSION,error:legality.error},400);
+    const cr=getCr(p,legality.where,legality.index)!;
+    const inst=p.hand.find((x:Inst)=>x.uid===uid)!;
+    const d=def(s,inst);
+    runtimeV02AttachRelicFromHand(p,seat as 1|2,legality.target_creature_uid,uid);
+    const td=top(cr,s);
+    if(td?.id==="stone-flintkin")healRuntimeDamage(cr,10);
+    log(`Seat ${seat} attached ${d?.name||inst.card_id} to ${td?.name||"a creature"}.`);
+    return json({version:VERSION,result:await commit("attach_relic",{seat,where:legality.where,index:legality.index,card_id:d?.id||inst.card_id})});
+   }
+   const cr=getCr(p,where,idx);if(!cr)return json({ok:false,version:VERSION,error:"target_creature_not_found"},400);if(cr.relic)return json({ok:false,version:VERSION,error:"creature_already_has_relic"},400);const inst=p.hand.find((x:Inst)=>x.uid===uid),d=inst?def(s,inst):null;if(!inst||!d||d.kind!=="Tactic"||d.family!=="Relic")return json({ok:false,version:VERSION,error:"relic_card_required"},400);const targetInst=cr.stack?.length?cr.stack[cr.stack.length-1]:null;if(!targetInst)throw new Error("tcg_v0_2_relic_attachment_target_anchor_required");runtimeV02AttachRelicFromHand(p,seat as 1|2,targetInst.uid,uid);const td=top(cr,s);if(td?.id==="stone-flintkin")healRuntimeDamage(cr,10);log(`Seat ${seat} attached ${d.name} to ${td?.name||"a creature"}.`);return json({version:VERSION,result:await commit("attach_relic",{seat,where,index:idx,card_id:d.id})});
   }
 
   if(action==="play_realm"){
@@ -381,7 +515,7 @@ Deno.serve(async(req)=>{
   }
 
   if(action==="withdraw"){
-   const turn=Number(s.turn_seq||0);if(Number(flags.withdraw_turn??-1)===turn)return json({ok:false,version:VERSION,error:"withdrawal_already_used_this_turn"},400);if(!p.vanguard)return json({ok:false,version:VERSION,error:"vanguard_required"},400);const cq=conditions(p.vanguard);if(cq.control==="Stunned"||cq.control==="Rooted")return json({ok:false,version:VERSION,error:"condition_prevents_withdrawal"},400);const idx=Number(body.reserve_index);if(!Number.isInteger(idx)||idx<0||idx>3||!p.reserve?.[idx])return json({ok:false,version:VERSION,error:"legal_reserve_required"},400);const cost=withdrawalCost(p.vanguard,s);const uids=Array.isArray(body.discard_essence_uids)?body.discard_essence_uids.map((x:any)=>String(x)):[];let transaction;try{transaction=runtimeV02ApplyWithdrawalPaymentAndSwitch(s,seat as 1|2,idx,p.vanguard.essence,p.discard,uids,cost)}catch(error){const message=error instanceof Error?error.message:String(error);if(message==="tcg_v0_2_payment_exact_amount_required")return json({ok:false,version:VERSION,error:"exact_withdrawal_essence_payment_required",cost},400);if(message.startsWith("tcg_v0_2_payment_source_missing:"))return json({ok:false,version:VERSION,error:"withdrawal_payment_not_attached"},400);throw error}const switched=transaction.switched;flags.withdraw_turn=turn;log(`Seat ${seat} withdrew to Reserve ${idx+1}, paying ${cost} Essence.`);const movementFlow=runtimeV02BeginMovementListenerContinuation(s,switched.events),movementAudit=movementListenerAudit(movementFlow);if(movementFlow.status==="player_choice_required"){setMovementResume("withdrawal",seat);s.phase="movement_listener_choice_resolution";return json({version:VERSION,result:await commit("withdraw_pending_movement_listener_choice",{seat,reserve_index:idx,cost,movement_listener:movementAudit,pending_movement_listener_choice:true}),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(movementFlow.pending_choice,seat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,seat as 1|2)})}const movementHealFlow=runtimeV02BeginMovementHealListenerContinuation(s,movementFlow.emitted_heal_packet_ids,seat as 1|2),movementHealAudit=healListenerAudit(movementHealFlow);if(movementHealFlow.status==="player_choice_required"){s.phase="heal_listener_choice_resolution";return json({version:VERSION,result:await commit("withdraw_pending_heal_listener_choice",{seat,reserve_index:idx,cost,movement_listener:movementAudit,heal_listener:movementHealAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(movementHealFlow.pending_choice,seat as 1|2)})}const n=scanDefeats();if(n>0)s.phase="resolution";else s.phase="play";return json({version:VERSION,result:await commit("withdraw",{seat,reserve_index:idx,cost,movement_listener:movementAudit,heal_listener:movementHealAudit})});
+   const turn=Number(s.turn_seq||0),plan=withdrawalDeclaration(body.reserve_index,true);if(!plan.ok)return json({ok:false,version:VERSION,error:plan.error,...(plan.cost==null?{}:{cost:plan.cost})},400);const idx=Number(plan.reserve_index),cost=Number(plan.cost),uids=Array.isArray(body.discard_essence_uids)?body.discard_essence_uids.map((x:any)=>String(x)):[];let transaction;try{transaction=runtimeV02ApplyWithdrawalPaymentAndSwitch(s,seat as 1|2,idx,p.vanguard.essence,p.discard,uids,cost)}catch(error){const message=error instanceof Error?error.message:String(error);if(message==="tcg_v0_2_payment_exact_amount_required")return json({ok:false,version:VERSION,error:"exact_withdrawal_essence_payment_required",cost},400);if(message.startsWith("tcg_v0_2_payment_source_missing:"))return json({ok:false,version:VERSION,error:"withdrawal_payment_not_attached"},400);throw error}const switched=transaction.switched;flags.withdraw_turn=turn;log(`Seat ${seat} withdrew to Reserve ${idx+1}, paying ${cost} Essence.`);const movementFlow=runtimeV02BeginMovementListenerContinuation(s,switched.events),movementAudit=movementListenerAudit(movementFlow);if(movementFlow.status==="player_choice_required"){setMovementResume("withdrawal",seat);s.phase="movement_listener_choice_resolution";return json({version:VERSION,result:await commit("withdraw_pending_movement_listener_choice",{seat,reserve_index:idx,cost,movement_listener:movementAudit,pending_movement_listener_choice:true}),pending_movement_listener_choice:runtimeV02PendingMovementListenerChoiceView(movementFlow.pending_choice,seat as 1|2),private_movement_inspection:runtimeV02PrivateMovementInspectionView(s,seat as 1|2)})}const movementHealFlow=runtimeV02BeginMovementHealListenerContinuation(s,movementFlow.emitted_heal_packet_ids,seat as 1|2),movementHealAudit=healListenerAudit(movementHealFlow);if(movementHealFlow.status==="player_choice_required"){s.phase="heal_listener_choice_resolution";return json({version:VERSION,result:await commit("withdraw_pending_heal_listener_choice",{seat,reserve_index:idx,cost,movement_listener:movementAudit,heal_listener:movementHealAudit,pending_heal_listener_choice:true}),pending_heal_listener_choice:runtimeV02PendingHealListenerChoiceView(movementHealFlow.pending_choice,seat as 1|2)})}const n=scanDefeats();if(n>0)s.phase="resolution";else s.phase="play";return json({version:VERSION,result:await commit("withdraw",{seat,reserve_index:idx,cost,movement_listener:movementAudit,heal_listener:movementHealAudit})});
   }
 
   if(action==="end_turn"){
