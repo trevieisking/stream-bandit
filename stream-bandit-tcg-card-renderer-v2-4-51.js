@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const VERSION='2.4.51';
+const VERSION='2.4.53';
 const REGISTRY='assets/tcg/cards/set-one/tcg-card-display-registry-v1.json';
 let readyPromise=null;
 let registry=null;
@@ -30,6 +30,79 @@ function costText(cost){
     return (amount==null?0:amount)+' '+element;
   }).join(' + ');
 }
+const ELEMENT_ORDER=['Astral','Ember','Gale','Grove','Shade','Stone','Tide','Volt','Any'];
+const ELEMENT_MARKS=Object.freeze({
+  Astral:'✦',
+  Ember:'✹',
+  Gale:'↟',
+  Grove:'❧',
+  Shade:'◐',
+  Stone:'◆',
+  Tide:'≈',
+  Volt:'ϟ',
+  Any:'•'
+});
+function elementName(value){
+  const raw=String(value||'Any').trim();
+  const match=ELEMENT_ORDER.find(name=>name.toLowerCase()===raw.toLowerCase());
+  return match||raw||'Any';
+}
+function elementKey(value){
+  return elementName(value).toLowerCase().replace(/[^a-z0-9]+/g,'-')||'any';
+}
+function elementMark(value){
+  const name=elementName(value);
+  return ELEMENT_MARKS[name]||name.slice(0,2).toUpperCase();
+}
+function normalizeEssenceUnits(units){
+  const totals=new Map();
+  for(const raw of Array.isArray(units)?units:[]){
+    const element=elementName(raw&&raw.element);
+    const count=Math.max(0,Math.floor(Number(raw&&raw.count)||0));
+    if(!count)continue;
+    totals.set(element,(totals.get(element)||0)+count);
+  }
+  return [...totals.entries()]
+    .map(([element,count])=>({element,count}))
+    .sort((a,b)=>{
+      const ai=ELEMENT_ORDER.indexOf(a.element),bi=ELEMENT_ORDER.indexOf(b.element);
+      if(ai!==bi)return (ai<0?999:ai)-(bi<0?999:bi);
+      return a.element.localeCompare(b.element);
+    });
+}
+function essenceOrbMarkup(element,count,mode){
+  const name=elementName(element);
+  const numeric=Math.max(1,Math.floor(Number(count)||1));
+  const counted=mode==='counted';
+  return '<span class="sb-essence-orb sb-essence--'+esc(elementKey(name))+(counted?' is-counted':'')+
+    '" data-essence-element="'+esc(name)+'"'+(counted?' data-essence-count="'+esc(numeric)+'"':'')+
+    ' title="'+esc(name+(counted?' × '+numeric:' Essence'))+'" aria-label="'+esc(name+(counted?' Essence '+numeric:' Essence'))+'">'+
+    (counted?'<strong>'+esc(numeric)+'</strong>':'<span aria-hidden="true">'+esc(elementMark(name))+'</span>')+
+    '</span>';
+}
+function essenceRailMarkup(units){
+  const rows=normalizeEssenceUnits(units);
+  if(!rows.length)return '';
+  const expanded=rows.map(row=>Array.from({length:row.count},()=>essenceOrbMarkup(row.element,1,'single')).join('')).join('');
+  const counted=rows.map(row=>essenceOrbMarkup(row.element,row.count,'counted')).join('');
+  const label='Attached Essence: '+rows.map(row=>row.count+' '+row.element).join(', ');
+  return '<div class="sb-card-essence-rail" data-essence-rail role="group" aria-label="'+esc(label)+'">'+
+    '<span class="sb-card-essence-expanded" data-essence-expanded>'+expanded+'</span>'+
+    '<span class="sb-card-essence-counted" data-essence-counted>'+counted+'</span>'+
+    '</div>';
+}
+function costOrbsMarkup(cost){
+  const rows=normalizeEssenceUnits((Array.isArray(cost)?cost:[]).map(part=>({
+    element:String(part&&part.element||'Any'),
+    count:num(part&&part.amount)||0
+  })));
+  if(!rows.length)return '<span class="sb-card-cost-text">No Essence</span>';
+  const label='Attack Cost: '+rows.map(row=>row.count+' '+row.element).join(', ');
+  return '<span class="sb-card-cost-orbs" aria-label="'+esc(label)+'">'+
+    rows.map(row=>essenceOrbMarkup(row.element,row.count,'counted')).join('')+
+    '</span>';
+}
+
 function damageText(attack){
   if(!attack)return '—';
   const direct=num(attack.base_damage);
@@ -216,7 +289,7 @@ function attackMarkup(attack,index,options){
     : '';
   const stateMeta=ready?'Ready':(reason||'');
   return '<'+tag+' class="sb-card-rule sb-card-attack'+(ready?' is-ready':'')+(disabled?' is-disabled':'')+'" data-card-attack-slot="'+slot+'"'+attrs+'>'+
-    '<div class="sb-card-rule-head"><span class="sb-card-cost">'+esc(costText(attack.cost))+'</span><strong>'+esc(attack.name||('Attack '+slot))+'</strong><span class="sb-card-damage">'+esc(damageText(attack))+'</span></div>'+
+    '<div class="sb-card-rule-head"><span class="sb-card-cost">'+costOrbsMarkup(attack.cost)+'</span><strong>'+esc(attack.name||('Attack '+slot))+'</strong><span class="sb-card-damage">'+esc(damageText(attack))+'</span></div>'+
     '<div class="sb-card-rule-meta">'+(stateMeta?esc(stateMeta)+' · ':'')+'Attack '+slot+' · Ends Turn</div>'+
     (effect?'<p>'+esc(effect)+'</p>':'')+
     '</'+tag+'>';
@@ -262,7 +335,7 @@ function renderCard(cardOrId,options){
   const withdrawMarkup=withdrawal!=null?'<span class="sb-card-withdraw"><small>WITHDRAW</small><strong>'+withdrawal+'</strong></span>':'';
   return '<article class="sb-card-face sb-card-face--'+esc(mode)+' sb-card-element--'+esc(String(record.element||'neutral').toLowerCase())+'" data-card-id="'+esc(record.card_id)+'" data-card-family="'+esc(family)+'" data-artwork-state="'+esc(printing.artwork_status||'missing')+'">'+
     '<header class="sb-card-header">'+leftTop+'<div class="sb-card-identity"><h3>'+esc(record.name)+'</h3><small>'+esc(family+' — '+subtype)+'</small></div><span class="sb-card-element"><strong>'+esc(record.element||'Neutral')+'</strong><small>ENERGY TYPE</small></span></header>'+
-    '<div class="sb-card-art">'+artMarkup(record)+'</div>'+
+    '<div class="sb-card-art">'+artMarkup(record)+essenceRailMarkup(opts.attachedEssenceUnits)+'</div>'+
     '<div class="sb-card-rules">'+rules+'</div>'+
     '<footer class="sb-card-footer">'+rewardMarkup+'<span class="sb-card-print"><strong>'+esc(printing.set_code||'SB1')+'</strong><small>'+esc(human(printing.finish_family||'standard'))+'</small></span><span class="sb-card-rarity"><small>RARITY</small><strong>'+esc(rarity)+'</strong>'+withdrawMarkup+'</span></footer>'+
     '</article>';
@@ -292,6 +365,6 @@ function ready(){
   return readyPromise;
 }
 function getCard(id){return byId.get(String(id||''))||null;}
-const api=Object.freeze({version:VERSION,ready,renderCard,hydrate,getCard,getRegistry:()=>registry,damageText,costText,stepsSummary});
+const api=Object.freeze({version:VERSION,ready,renderCard,hydrate,getCard,getRegistry:()=>registry,damageText,costText,stepsSummary,normalizeEssenceUnits,essenceRailMarkup,costOrbsMarkup});
 window.StreamBanditTCGCardRendererV2451=api;
 })();
