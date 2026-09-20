@@ -328,7 +328,13 @@ button{font:inherit}
   transform:translateY(-5px)
 }
 .sb-hand-card.is-dragging{opacity:.72;transform:translateY(-7px) scale(1.02)}
+.sb-hand-card.is-touch-dragging{opacity:.84;box-shadow:0 0 0 2px #55e7ff55,0 0 26px #55e7ff35,0 12px 28px #0009}
 .sb-play-destination{transition:border-color .15s ease,box-shadow .15s ease,background .15s ease}
+.sb-play-destination.is-touch-drag-over,.sb-setup-destination.is-touch-drag-over{
+  border-color:#55e7ffff!important;
+  box-shadow:inset 0 0 0 2px #55e7ff42,0 0 34px #55e7ff52!important;
+  background:#0b53612e!important
+}
 .sb-play-destination.is-play-legal{
   cursor:pointer;
   border-color:#ffd56ab8!important;
@@ -642,6 +648,6 @@ button{font:inherit}
 <script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-6"></script>
 <script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
 <script src="stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-53"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-12-essence-rail"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-13-touch-drag"></script>
 </body>
 </html>
