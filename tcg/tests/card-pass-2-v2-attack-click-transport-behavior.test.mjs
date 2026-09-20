@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
 const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-controller.js'), 'utf8');
+const cardRenderer = fs.readFileSync(path.join(root, 'stream-bandit-tcg-card-renderer-v2-4-51.js'), 'utf8');
+const displayRegistry = JSON.parse(fs.readFileSync(path.join(root, 'assets', 'tcg', 'cards', 'set-one', 'tcg-card-display-registry-v1.json'), 'utf8'));
 
 class FakeButton {
   constructor(slot) {
@@ -57,7 +59,7 @@ function playableView(revision = 41) {
       you: {
         seat: 1,
         vanguard: {
-          stack: [{ uid: 'starwhale-1', card_id: 'astral-starwhale' }],
+          stack: [{ uid: 'stardot-1', card_id: 'astral-stardot' }],
           damage: 0,
           essence: [{ uid: 'essence-1' }, { uid: 'essence-2' }],
           shield: 0
@@ -67,16 +69,18 @@ function playableView(revision = 41) {
       },
       opponent: { vanguard: null, reserve: [] },
       card_index: {
-        'astral-starwhale': {
+        'astral-stardot': {
           definition: {
-            name: 'Starwhale',
-            hp: 120,
-            stage: 'Creature',
+            name: 'Stardot',
+            hp: 50,
+            stage: 'Baby',
             element: 'Astral'
           },
           definition_v0_2: {
+            card_family: 'Creature',
             creature: {
-              attacks: [{ slot: 1, name: 'Gravity Song', damage: 40 }]
+              hp: 50,
+              attacks: [{ id: 'star-ping', name: 'Star Ping', cost: [{ element: 'Astral', amount: 1 }], base_damage: 20, damage_formula: null, requirements: [], on_declare: [], before_damage: [], after_damage: [] }]
             }
           }
         }
@@ -88,6 +92,7 @@ function playableView(revision = 41) {
 function makeHarness() {
   const nodes = new Map();
   const document = {
+    baseURI: 'https://example.test/tcg-battle-v2.html',
     attackButtons: [],
     getElementById(id) {
       if (!nodes.has(id)) nodes.set(id, new FakeNode(id, document));
@@ -134,7 +139,10 @@ function makeHarness() {
   };
 
   let matchViewCalls = 0;
-  async function fetch(url, options) {
+  async function fetch(url, options = {}) {
+    if (String(url).endsWith('/assets/tcg/cards/set-one/tcg-card-display-registry-v1.json')) {
+      return { ok: true, status: 200, async json() { return displayRegistry; } };
+    }
     const payload = JSON.parse(options.body || '{}');
     requests.push({ url: String(url), options, payload });
 
@@ -181,6 +189,7 @@ function makeHarness() {
     console
   };
 
+  vm.runInNewContext(cardRenderer, context, { filename: 'stream-bandit-tcg-card-renderer-v2-4-51.js' });
   vm.runInNewContext(controller, context, { filename: 'stream-bandit-tcg-v2-battle-controller.js' });
   assert.equal(typeof domReady, 'function', 'controller must register its DOMContentLoaded boot');
 
@@ -199,14 +208,16 @@ test('rendered V2 card Attack click posts authoritative Attack payload and surfa
   assert.equal(harness.document.attackButtons.length, 1, 'playable Vanguard should render one Attack control');
   await harness.document.attackButtons[0].triggerClick();
 
-  const attackRequests = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-match-actions'));
+  const attackRequests = harness.requests.filter((entry) =>
+    entry.url.endsWith('/functions/v1/tcg-match-actions') && entry.payload.action === 'attack'
+  );
   assert.equal(attackRequests.length, 1, 'one card click must submit exactly one Attack command');
   assert.deepEqual(
     JSON.parse(JSON.stringify(attackRequests[0].payload)),
     {
       action: 'attack',
       match_id: 'match-click-proof',
-      client_nonce: 'nonce-1',
+      client_nonce: 'nonce-2',
       expected_revision: 41,
       attack_slot: 1
     }
