@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..', '..');
 const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-controller.js'), 'utf8');
+const cardRenderer = fs.readFileSync(path.join(root, 'stream-bandit-tcg-card-renderer-v2-4-51.js'), 'utf8');
+const displayRegistry = JSON.parse(fs.readFileSync(path.join(root, 'assets', 'tcg', 'cards', 'set-one', 'tcg-card-display-registry-v1.json'), 'utf8'));
 
 class FakeClassList {
   constructor() { this.values = new Set(); }
@@ -83,7 +85,7 @@ function playableView(revision = 17) {
           relic: null
         },
         reserve: [null, null, null, null],
-        hand: [{ uid: 'essence-hand-1', card_id: 'astral-cosmic-essence' }],
+        hand: [{ uid: 'essence-hand-1', card_id: 'astral-basic-astral-essence' }],
         discard: [],
         rewards_count: 6,
         deck_count: 52,
@@ -110,10 +112,10 @@ function playableView(revision = 17) {
           },
           definition_v0_2: { creature: { attacks: [] } }
         },
-        'astral-cosmic-essence': {
+        'astral-basic-astral-essence': {
           definition: {
-            id: 'astral-cosmic-essence',
-            name: 'Cosmic Essence',
+            id: 'astral-basic-astral-essence',
+            name: 'Basic Astral Essence',
             kind: 'Essence',
             card_family: 'Essence',
             element: 'Astral'
@@ -127,6 +129,7 @@ function playableView(revision = 17) {
 function makeHarness() {
   const nodes = new Map();
   const document = {
+    baseURI: 'https://example.test/tcg-battle-v2.html',
     playHandCards: [],
     getElementById(id) {
       if (!nodes.has(id)) nodes.set(id, new FakeNode(id, document));
@@ -167,7 +170,10 @@ function makeHarness() {
   };
 
   let viewCalls = 0;
-  async function fetch(url, options) {
+  async function fetch(url, options = {}) {
+    if (String(url).endsWith('/assets/tcg/cards/set-one/tcg-card-display-registry-v1.json')) {
+      return { ok: true, status: 200, async json() { return displayRegistry; } };
+    }
     const payload = JSON.parse(options.body || '{}');
     requests.push({ url: String(url), payload });
 
@@ -211,6 +217,7 @@ function makeHarness() {
     console
   };
 
+  vm.runInNewContext(cardRenderer, context, { filename: 'stream-bandit-tcg-card-renderer-v2-4-51.js' });
   vm.runInNewContext(controller, context, { filename: 'stream-bandit-tcg-v2-battle-controller.js' });
   assert.equal(typeof domReady, 'function');
 
@@ -237,14 +244,16 @@ test('play-phase Essence click then Vanguard click submits authoritative attach_
 
   await vanguardSlot.click();
 
-  const matchRequests = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-match-actions'));
+  const matchRequests = harness.requests.filter((entry) =>
+    entry.url.endsWith('/functions/v1/tcg-match-actions') && entry.payload.action === 'attach_essence'
+  );
   assert.equal(matchRequests.length, 1, 'one target click must submit exactly one match command');
   assert.deepEqual(
     JSON.parse(JSON.stringify(matchRequests[0].payload)),
     {
       action: 'attach_essence',
       match_id: 'match-play-bind-proof',
-      client_nonce: 'nonce-1',
+      client_nonce: 'nonce-2',
       expected_revision: 17,
       card_uid: 'essence-hand-1',
       where: 'vanguard'
