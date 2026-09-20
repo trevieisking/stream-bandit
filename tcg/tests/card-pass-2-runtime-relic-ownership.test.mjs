@@ -21,6 +21,9 @@ test('Relic family owns specialist hand-to-attached_relic mutation without card-
   assert.ok(relic.includes('tcg_v0_2_relic_attachment_destination_occupied'));
   assert.ok(relic.includes('event_name: "relic_attached"'));
   assert.ok(relic.includes('Card-Zone intentionally rejects attached_relic'));
+  assert.ok(relic.includes('runtimeV02Definition(state, source)'));
+  assert.ok(relic.includes('String(tactic?.subtype || "") !== "Relic"'));
+  assert.ok(relic.includes('runtimeV02ValidateManualRelicAttachmentDeclaration'));
 
   for (const forbidden of [
     'stone-flintkin',
@@ -28,7 +31,6 @@ test('Relic family owns specialist hand-to-attached_relic mutation without card-
     'shellguard-pendant',
     'gloom-locket',
     'arc-band',
-    'Relic"',
   ]) {
     assert.equal(relic.includes(forbidden), false, `Relic owner contains card/subtype legality authority: ${forbidden}`);
   }
@@ -42,8 +44,11 @@ test('Card-Zone explicitly reserves attached_relic as a specialist destination',
 
 test('attach_relic delegates physical mutation to Relic while preserving legality and temporary Flintkin compatibility', () => {
   const block = slice(match, 'if(action==="attach_relic")', 'if(action==="play_realm")');
-  assert.ok(match.includes('import { runtimeV02AttachRelicFromHand } from "../_shared/tcg-match-relic-engine-v0-2.ts";'));
-  assert.ok(block.includes('d.family!=="Relic"'), 'dispatcher must retain Relic legality');
+  assert.ok(match.includes('runtimeV02AttachRelicFromHand,'));
+  assert.ok(match.includes('runtimeV02ValidateManualRelicAttachmentDeclaration,'));
+  assert.ok(match.includes('from "../_shared/tcg-match-relic-engine-v0-2.ts";'));
+  assert.ok(block.includes('runtimeV02ValidateManualRelicAttachmentDeclaration('), 'structured dispatcher must delegate Relic legality');
+  assert.ok(block.includes('d.family!=="Relic"'), 'legacy dispatcher must retain Relic legality');
   assert.ok(block.includes('creature_already_has_relic'), 'dispatcher must preserve public occupied-slot error');
   assert.ok(block.includes('runtimeV02AttachRelicFromHand(p,seat as 1|2,targetInst.uid,uid)'));
   assert.equal(block.includes('cr.relic=removeHand(p,uid)!'), false, 'dispatcher must not mutate Relic attachment directly');
