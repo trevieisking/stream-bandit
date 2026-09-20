@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.17-hand-peek-inspect';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.18-server-projected-actions';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -24,7 +24,9 @@
     busy: false,
     poll: null,
     overlayKey: '',
-    fieldActions: null
+    fieldActions: null,
+    handActionProjection: null,
+    selectedWithdrawEssenceUids: []
   };
 
   const $ = (id) => document.getElementById(id);
@@ -36,7 +38,61 @@
     const node = $('battleStatus');
     if (!node) return;
     node.dataset.kind = kind || 'info';
+    if ((kind || 'info') !== 'error') delete node.dataset.errorCode;
     node.textContent = message;
+  }
+
+  function friendlyActionMessage(code) {
+    const raw = String(code || '').trim();
+    const messages = {
+      manual_essence_already_used_this_turn: 'You already attached your 1 manual Essence this turn. You can attach another next turn.',
+      required_tactic_target_unavailable: 'This Tactic has no valid target right now.',
+      required_tactic_resource_unavailable: 'This Tactic does not have the required resource available right now.',
+      first_player_cannot_play_ally_on_first_turn: 'The first player cannot play an Ally on their first turn.',
+      tactic_play_requirement_not_met: 'This Tactic\'s play requirement is not met right now.',
+      tactic_lifecycle_contract_unsupported: 'This Tactic is not available in the current rules runtime yet.',
+      structured_tactic_required: 'This card is not currently playable as a structured Tactic.',
+      effect_resolution_already_pending: 'Finish the current card choice before playing another card.',
+      attack_essence_cost_not_met: 'Needs more matching Essence for this Attack.',
+      attack_requirements_not_met: 'This Attack\'s requirements are not met right now.',
+      first_player_cannot_attack_on_first_personal_turn: 'The first player cannot attack on their first turn.',
+      only_final_vanguard_may_attack_this_turn: 'Only the final Vanguard for this turn may attack.',
+      stunned_cannot_attack: 'This Vanguard cannot attack while Stunned.',
+      starbound_power_already_used: 'The Starbound power has already been used this match.',
+      extra_turn_chain_blocked: 'This Attack is blocked during the current extra-turn chain.',
+      realm_already_played_this_turn: 'You already played a Realm this turn.',
+      same_named_realm_cannot_replace_itself: 'That Realm is already active.',
+      withdrawal_already_used_this_turn: 'You already withdrew this turn.',
+      condition_prevents_withdrawal: 'This Vanguard cannot Withdraw while Stunned or Rooted.',
+      legal_reserve_required: 'You need an occupied Reserve Creature to Withdraw into.',
+      exact_withdrawal_essence_payment_required: 'You do not have enough attached Essence to pay this Withdraw cost.',
+      withdrawal_payment_not_attached: 'Withdraw payment must use Essence attached to your Vanguard.',
+      vanguard_required: 'A Vanguard is required for this action.',
+      stale_revision: 'The board changed before that action completed. The latest state has been refreshed.',
+      not_active_player: 'Wait for your turn before using this action.',
+      target_creature_not_found: 'That Creature is no longer a legal target.',
+      creature_already_has_relic: 'That Creature already has a Relic.',
+      evolution_locked_on_first_personal_turn: 'You cannot evolve on your first personal turn.',
+      stack_entered_or_evolved_this_turn: 'That Creature entered play or evolved this turn and cannot evolve again yet.',
+      one_evolution_per_stack_per_turn: 'That Creature has already evolved this turn.',
+      evolution_predecessor_mismatch: 'This Evolution does not match that Creature.',
+      no_legal_card_target: 'This card has no legal destination right now.'
+    };
+    if (messages[raw]) return messages[raw];
+    if (/^tcg_v0_2_/i.test(raw)) return 'That action is not available in the current game state.';
+    if (/^[a-z0-9_:-]+$/i.test(raw) && raw.includes('_')) {
+      const words = raw.replace(/^tcg_v0_2_/, '').replaceAll('_', ' ').replaceAll(':', ' ');
+      return words.charAt(0).toUpperCase() + words.slice(1) + '.';
+    }
+    return raw || 'That action could not be completed.';
+  }
+
+  function setActionFailure(code) {
+    const raw = String(code || 'unknown_action_error');
+    const node = $('battleStatus');
+    if (node) node.dataset.errorCode = raw;
+    try { console.warn('[Stream Bandit TCG action rejected]', raw); } catch (_) {}
+    setStatus(friendlyActionMessage(raw), 'error');
   }
 
   function shellConfig() {
@@ -225,6 +281,120 @@
       client_nonce: crypto.randomUUID(),
       expected_revision: revision()
     };
+  }
+
+  function handProjectionKey(uid, intent) {
+    return String(revision()) + ':' + String(uid || '') + ':' + String(intent || '');
+  }
+
+  function currentHandProjection() {
+    const instance = selectedHandInstance();
+    if (!instance) return null;
+    const uid = String(instance.uid || '');
+    const intent = handIntent(instance);
+    const projection = state.handActionProjection;
+    return projection && projection.key === handProjectionKey(uid, intent) ? projection : null;
+  }
+
+  function projectionTargetLegal(projection, where, index) {
+    if (!projection || projection.eligible !== true) return false;
+    const targets = Array.isArray(projection.legal_targets) ? projection.legal_targets : [];
+    return targets.some((target) => {
+      if (String(target && target.kind || '') === 'realm') return where === 'realm';
+      const targetWhere = String(target && target.where || '');
+      if (targetWhere === 'vanguard') return where === 'vanguard';
+      if (targetWhere === 'reserve') {
+        const targetIndex = target.index == null ? Number(target.reserve_index) : Number(target.index);
+        return where === 'reserve' && Number(index) === targetIndex;
+      }
+      if (target && target.reserve_index != null) {
+        return where === 'reserve' && Number(index) === Number(target.reserve_index);
+      }
+      return false;
+    });
+  }
+
+  async function fetchHandActionProjection(instance) {
+    if (!instance || !instance.uid) return null;
+    const uid = String(instance.uid || '');
+    const intent = handIntent(instance);
+    if (!intent) return null;
+    let endpointName = API_MATCH;
+    let action = '';
+    if (intent === 'play_creature' || intent === 'play_realm') action = 'play_card_targets';
+    else if (intent === 'evolve') action = 'evolve_targets';
+    else if (intent === 'attach_essence') action = 'attach_essence_targets';
+    else if (intent === 'attach_relic') action = 'attach_relic_targets';
+    else if (intent === 'play_tactic') {
+      endpointName = API_TACTIC;
+      action = 'play_tactic_preview';
+    }
+    if (!action) return null;
+    const key = handProjectionKey(uid, intent);
+    const cached = state.handActionProjection;
+    if (cached && cached.key === key && cached.loading !== true) return cached;
+    state.handActionProjection = { key, uid, intent, loading: true, eligible: false, reason: null, legal_targets: [] };
+    const response = await callEdge(endpointName, Object.assign(actionBase(action), { card_uid: uid }));
+    const result = response && response.result && typeof response.result === 'object' ? response.result : {};
+    const projection = {
+      key,
+      uid,
+      intent,
+      loading: false,
+      eligible: result.eligible === true,
+      reason: result.reason ? String(result.reason) : null,
+      legal_targets: Array.isArray(result.legal_targets) ? result.legal_targets : [],
+      subtype: result.subtype ? String(result.subtype) : ''
+    };
+    if (key === handProjectionKey(uid, intent)) state.handActionProjection = projection;
+    return projection;
+  }
+
+  async function primeSelectedHandProjection(uid) {
+    const view = viewState();
+    if (!activePlayTurn(view)) return;
+    const hand = view && view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
+    const instance = hand.find((row) => String(row.uid || '') === String(uid || '')) || null;
+    if (!instance) return;
+    try {
+      const projection = await fetchHandActionProjection(instance);
+      if (String(state.selectedHandUid || '') !== String(uid || '')) return;
+      render();
+      if (projection && projection.eligible === false && projection.reason) {
+        setStatus(friendlyActionMessage(projection.reason), 'wait');
+      }
+    } catch (error) {
+      const raw = error instanceof Error ? error.message : String(error);
+      if (String(state.selectedHandUid || '') === String(uid || '')) setActionFailure(raw);
+    }
+  }
+
+  async function preflightSelectedHandAction(instance, intent, where, index) {
+    let projection;
+    try {
+      projection = await fetchHandActionProjection(instance);
+    } catch (error) {
+      setActionFailure(error instanceof Error ? error.message : String(error));
+      return false;
+    }
+    if (!projection || projection.eligible !== true) {
+      setActionFailure(projection && projection.reason ? projection.reason : 'no_legal_card_target');
+      render();
+      return false;
+    }
+    if (['play_creature', 'evolve', 'attach_essence', 'attach_relic'].includes(intent)) {
+      if (!projectionTargetLegal(projection, where, index)) {
+        setActionFailure(projection.reason || 'no_legal_card_target');
+        render();
+        return false;
+      }
+    }
+    if (intent === 'play_realm' && !projectionTargetLegal(projection, 'realm', null)) {
+      setActionFailure(projection.reason || 'no_legal_card_target');
+      render();
+      return false;
+    }
+    return true;
   }
 
   function cardRow(instance) {
