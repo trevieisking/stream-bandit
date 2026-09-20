@@ -576,3 +576,22 @@ Dedicated Deno coverage proves nested composition, short-circuit behavior, malfo
 TCG Card Pass 2 Validation **#1143 PASS** on exact source head c14cac7fc4bd655f62dc0d180fe594138ebbbfc4.
 
 IF remains **not complete**. The next implementation loop must migrate existing predicate consumers onto the shared tree and then cover every Release 1 IF leaf/context before the capability may move to implemented.
+
+
+## V2.4.57 implementation B — Event Listener boolean composition unified
+
+The Event Listener owner previously carried a second recursive implementation of all / any / not.
+
+That duplicate composition logic has now been removed. Event Listener:
+- delegates all boolean tree composition to tcg-match-predicate-tree-v0-2.ts;
+- retains its existing event-specific leaf evaluator and exact semantics;
+- retains current fail-closed unsupported-leaf behavior;
+- changes no listener timing, event, pending-choice, limit, mutation or card-specific semantics.
+
+The new shared predicate-tree file is now part of both Match Actions and Tactic Actions exact dependency closures. Release Control fingerprints were updated rather than weakening the drift guard:
+- tcg-match-actions closure: **86 files**;
+- tcg-tactic-actions closure: **37 files**.
+
+TCG Card Pass 2 Validation **#1149 PASS** at exact fingerprinted source head 0a3f0f8d869d7e88cc9233f4121fb99526e38c92.
+
+Next implementation target: extract/reuse Release 1 leaf predicate semantics that occur in more than one execution family, beginning with the smallest high-confidence state predicates. Generic IF remains incomplete until every launch IF context is covered.
