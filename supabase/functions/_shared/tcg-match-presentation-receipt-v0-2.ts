@@ -19,11 +19,13 @@ function seat(value: unknown): RuntimeV02PresentationSeat | null {
 }
 
 function finite(value: unknown): number | null {
+  if (value == null || value === "") return null;
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
 }
 
 function nonNegativeInt(value: unknown): number | null {
+  if (value == null || value === "") return null;
   const number = Number(value);
   return Number.isInteger(number) && number >= 0 ? number : null;
 }
