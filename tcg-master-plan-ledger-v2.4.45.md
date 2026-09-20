@@ -323,3 +323,10 @@ An authoritative Condition application/clear/replace/prevention and an authorita
 
 ## 117 — Interrupted animations never block state recovery
 Reconnect/refresh renders the latest authoritative snapshot immediately. A partially displayed shuffle/draw/discard/Reward animation has no gameplay receipt and may be abandoned without changing match state.
+
+
+## 118 — Previous-opponent event requirements use canonical turn ownership
+A Tactic/event requirement that names `previous_opponent_turn` delegates to shared event history plus canonical turn-owner history. Numeric previous-turn arithmetic is forbidden because Release 1 includes extra-turn capability. Stone — Reversal Seal is the current Release 1 consumer.
+
+## 119 — Tactic play requirements are structurally complete before program execution
+The frozen Release 1 registry contains 18 Tactics with explicit play requirements. Their current families — reserve count, legal card availability and event occurrence — now resolve through shared owners. This does not imply every Tactic program opcode is implemented; program execution remains the next independent gate.
