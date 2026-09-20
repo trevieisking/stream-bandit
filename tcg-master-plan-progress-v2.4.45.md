@@ -308,3 +308,19 @@ The branch now contains deterministic browser-side evidence for the remaining no
 - coarse-touch long-hold/drop emits the same existing `attach_essence` action shape as tap mode, while a separate coarse-touch tap test remains functional.
 
 These are automated source claims only. Trevor/Kay device acceptance is still required. After exact-head CI validates this packet, the next non-human checklist target is **V2.4.52 active Ability capability projection: usable -> glow -> authoritative use -> projection disappears**.
+
+
+## V2.4.52 implementation D — active Ability projection proof assembled
+
+The previously open automated Ability-capability gate now has both server and browser behavior evidence on the branch:
+
+- the real Match action owner projects a currently usable active Ability through `field_actions.ability_sources`;
+- a real generic immediate active Ability is exercised through `use_ability`, consumes its once-per-turn limit and returns to play;
+- a subsequent authoritative `field_actions` projection no longer includes that Ability source;
+- the Battle controller/browser regression fixture proves the first projection renders **ABILITY READY** as a clickable card-owned control;
+- clicking that card-owned Ability sends exactly one existing `use_ability` command;
+- after the refreshed empty capability projection, **ABILITY READY** and the clickable Ability control disappear.
+
+No renderer-owned Ability legality was added. Server capability remains the only source of the glow/ready state.
+
+Once exact-head CI passes, all currently listed non-human V2.4.52/V2.4.53 interaction gates are complete. The loop must then stop at the explicit Trevor/Kay real-device Battle gate before any promotion or decorative-board pass.
