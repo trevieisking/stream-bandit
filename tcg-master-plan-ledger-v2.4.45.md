@@ -366,4 +366,36 @@ Attack and Ability presentation follows the authoritative sequence: source activ
 
 ## 131 — Animation interruption is never a gameplay fault
 Reduced-motion mode, dropped frames, navigation, refresh or reconnect may skip unfinished effects. The newest authoritative snapshot always wins immediately; no animation has a gameplay receipt or permission to replay mutations.
+## 132 — External TCG footage is interaction grammar, never Stream Bandit rules or assets
+Reference footage may teach viewport composition, physical-card motion, inspection, target highlighting, choice overlays and causal feedback. It may not import external artwork, branding, card frames, names, card identities, proprietary assets or gameplay rules.
+
+## 133 — One Battle Presentation / Choreography Engine owns visual sequencing
+Release 1 uses one generic presentation owner for movement, choices and effect feedback. Card IDs do not own bespoke gameplay presentation branches when the same event/effect family can be reused.
+
+## 134 — The tabletop remains spatially stable during inspection and resolution
+Vanguard, Reserve, Realm, Deck, Discard, Rewards and hand remain anchored to their canonical zones. Full-card inspection and effect overlays are separate presentation layers and do not physically relocate source cards.
+
+## 135 — Physical card movement should explain authoritative zone changes
+When a physical card changes an authorized visible zone, presentation should show the movement where practical: Deck -> hand, hand -> field, field -> Discard, Reward -> hand, return to Deck, evolution stack, switch/promotion and attachment changes.
+
+## 136 — Choice overlays are authoritative N-of-M surfaces
+Reward, search, optional and other multi-card choices use one generic overlay driven by server-authorized options, exact selection bounds, legal targets and continuation identity. Browser prompts and free-form debug choice controls are not Release 1 interaction UI.
+
+## 137 — Target highlighting is a projection of server legality
+A glowing/highlighted destination means the authoritative owner currently exposes that destination as legal. The browser may render that fact but may not independently infer or expand target legality.
+
+## 138 — Combat and Ability feedback follows source-to-result causality
+Presentation preserves the logical order source activation -> target/choice -> payment -> effect/impact -> state delta -> listeners/Conditions/Defeat/Reward -> continuation. Visual effects may be shortened but cannot reverse or fabricate this sequence.
+
+## 139 — Hidden zones remain physically present without identity leakage
+Deck, opponent hand and unrevealed Rewards remain visible as face-down physical objects/counts. Search and other private-choice presentation is viewer-specific and never leaks identities outside Hidden Information authority.
+
+## 140 — Desktop and touch have semantic parity
+Desktop drag/drop and phone hold-drag/tap fallback may differ as gestures, but both consume the same authoritative options, submit the same actions and receive the same presentation semantics.
+
+## 141 — Presentation pacing never outranks authoritative state
+Animation queues are disposable. Newer authoritative state, reconnect, refresh or reduced-motion mode may cancel/shorten queued cues. The rendered state must converge immediately on the server snapshot.
+
+## 142 — Player-facing completion includes comprehensibility
+A Release 1 mechanic is not visually accepted merely because the mutation succeeded. The player must be able to identify the important source, target/movement and resulting state change without relying on raw diagnostic text.
 
