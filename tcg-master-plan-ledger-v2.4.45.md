@@ -167,3 +167,10 @@ The threshold for switching from individual tiny orbs to counted orbs is determi
 
 ## 071 — V2.4.53 does not displace the card/Attack priority
 Essence-orb compression, mobile drag parity and other micro-interactions are required polish within the current playable-card slice. They do not overtake the primary sequence: canonical card visuals/readability -> real Attack/damage/reward lifecycle -> cross-device interaction acceptance -> final board decoration.
+
+
+## 072 — Counted Essence activates only when the rail exceeds its card bounds
+The counted-orb presentation has **no fixed Essence-number trigger**. Individual orbs remain visible for as long as the rail fits within the card's allocated Essence area. Compression begins only when rendering the current authoritative units individually would breach those card parameters.
+
+## 073 — Compression counts each Essence type separately
+When compression is active, each element present receives its own orb and its own current numeric count. Different elements are never summed into one generic total. The displayed number is dynamic authoritative state, not a predetermined value or threshold. A prior use of `12` was an illustrative example only and is not a rule.
