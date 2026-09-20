@@ -341,13 +341,13 @@
 - [x] Surveyor Mina and Recovery Spray IF programs are executable through already-supported downstream opcodes.
 - [ ] Cyclone Route IF branch still requires generic Tactic OPTIONAL.
 - [ ] False Memory IF branch still requires RANDOM_SAMPLE_HIDDEN_ZONE.
-- [ ] Reversal Seal IF branch still requires ADD_SHIELD_EACH.
+- [x] Reversal Seal IF branch: generic ADD_SHIELD_EACH is implemented through the existing Shield owner and covered by frozen-registry/source-contract tests; included in Card Pass #1229 SUCCESS.
 - [ ] Blackout Pulse IF branch still requires APPLY_CONDITION.
 - [ ] Do not mark all six Tactic IF cards fully executable until those four downstream operation gaps close.
 ## V2.4.59 — visible special effects + search/attach/shuffle choreography
 - [x] Lock the Release 1 rule that important authoritative card movement, Attack, Ability and state changes require visible player-facing feedback; effects are not optional decoration.
 - [x] Lock the effects layer as generic event/effect choreography, not card-ID-specific branches, so future cards/moves/Abilities/Conditions can reuse it.
-- [ ] Add one presentation mapper from authoritative state/event/result packets to reusable movement/effect cues without creating another gameplay owner.
+- [x] Add one presentation mapper from authoritative state/event/result packets to reusable movement/effect cues without creating another gameplay owner.
 - [ ] Visibly animate deck -> hand draw, hand/field/discard/Reward movement, returns-to-deck, evolution, switching/promotion, Essence/Relic attach/remove and other Release 1 card-zone transitions.
 - [ ] Add clear generic Attack choreography: source activation/wind-up -> target -> payment if applicable -> impact -> damage/Shield/heal/Condition/listener/Defeat/Reward feedback -> authoritative continuation.
 - [ ] Add clear active-Ability and triggered/listener choreography, including usable/fired state and visible resulting deltas.
@@ -391,12 +391,23 @@
 - [x] Load the choreography owner before the Battle controller and allow the controller to consume future `view.presentation` envelopes.
 - [x] Add Deno tests for envelope validation/viewer filtering/data-driven selection counts.
 - [x] Add Node tests for cue ordering, duplicate suppression, stale-revision cancellation and Battle wiring.
-- [ ] Exact-head TCG Card Pass 2 gate for the V2.4.61 source foundation; #1221 is currently queued/pending on source candidate `28828717b301168920452e27f704ca212543eade`.
-- [ ] Bind canonical match commit/view persistence to viewer-filtered presentation receipts without adding presentation data to gameplay legality/state ownership.
-- [ ] First real receipt producer: canonical Attack result/continuation, including source activation, target focus, impact, damage/Shield delta, Defeat/Reward and continuation.
+- [x] Exact-head TCG Card Pass 2 gate for the presentation foundation + server receipt integration: #1229 SUCCESS on `52b33b4bd204a0c9dc86b64b4790b24d8a992baa`.
+- [x] Bind canonical match commit/view persistence to viewer-filtered presentation receipts without adding presentation data to gameplay legality/state ownership.
+- [x] First real receipt producer: canonical Attack result/continuation, including source activation, target focus, impact, damage/Shield delta, Reward/promotion and turn continuation from authoritative commit data.
 - [ ] Add the reusable Stream Bandit eight-element FX skin map; element metadata changes presentation only and never card rules.
 - [ ] Add compact accessible resolution ribbon generated from the same cue queue for complex chains.
 - [ ] Add opponent private-choice mirror using only public-safe search/choice facts.
 - [ ] Add safe micro-cue coalescing/backlog protection without hiding the final authoritative state.
 - [ ] Bind visible DOM motion/impact handlers only after the server receipt path is green.
+
+## V2.4.62 — server receipt maker / Release 1 truth correction
+- [x] Create generic server Match presentation receipt maker keyed by committed event family, not card ID.
+- [x] Persist one separately viewer-filtered receipt in each player view at the canonical commit boundary.
+- [x] Cover Attack, Ability, play/evolve/attach/Realm, Withdraw/promotion, Reward, End Turn and Concede event families with reusable cues.
+- [x] Keep hidden Reward movement count-visible but identity-free.
+- [x] Prove private choice cues are visible only to the authorized seat while the opponent receives public-safe progress feedback.
+- [x] Refresh exact Match Edge dependency closure from 87 to 89 files and preserve the release-control guard.
+- [x] Card Pass 2 #1229 SUCCESS on exact head `52b33b4bd204a0c9dc86b64b4790b24d8a992baa`.
+- [x] Correct stale Reversal Seal truth: ADD_SHIELD_EACH already exists generically and is covered by source-contract tests.
+- [ ] Next runtime blocker: implement the next genuinely missing Release 1 Tactic IF downstream opcode after comparing OPTIONAL, RANDOM_SAMPLE_HIDDEN_ZONE and APPLY_CONDITION against existing owners.
 
