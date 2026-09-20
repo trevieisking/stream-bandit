@@ -484,3 +484,43 @@ The passing gate includes:
 - all inherited 193-card/runtime tests and Deno type/runtime checks.
 
 The subsequent checklist/progress synchronization is documentation-only and therefore creates one final exact head requiring routine Card Pass validation. Human Trevor/Kay visual acceptance remains open and static/main promotion remains HOLD.
+
+
+## V2.4.56 — Kay 25-minute Battle evidence and server-projected action repair
+
+Kay's 25-minute Battle recording was reviewed against production command/state history from the same real match.
+
+### What the recording actually proves
+The visible red messages included repeated:
+- `required_tactic_target_unavailable`;
+- `manual_essence_already_used_this_turn`.
+
+Those errors were real, but they did **not** represent one jammed server. Production history from the same match shows:
+- a Realm successfully committed and became authoritative;
+- multiple later Attacks committed successfully;
+- Essence attachment, Creature play, Relic play, Reward and promotion paths continued to execute.
+
+The defect therefore split into presentation/interaction ownership gaps rather than a replacement Attack or Realm engine.
+
+### Root causes
+1. Battle classified hand-card intents locally but did not ask the existing server target projections before offering a destination.
+2. Tactics had final server legality but no read-only playability projection for the client.
+3. Withdraw already had complete server projection/execution but the Battle client exposed no Withdraw control at all.
+4. Realm was authoritative but responsive Battle CSS hid the Realm presentation area, making a successful Realm look unusable.
+5. Raw implementation error codes were sent straight to the player's red status surface.
+
+### V2.4.56 source repair
+- `tcg-tactic-actions` now owns a read-only `play_tactic_preview` action and real `play_tactic` reuses the same generic playability helper.
+- Battle preflights Creature/Realm/Evolution/Essence/Relic/Tactic actions through their existing authoritative owners before sending the real mutation.
+- In-flight preflight is deduplicated so rapid phone interaction does not issue duplicate read-only checks.
+- Known legality codes are translated to useful instructions while the original code is retained as diagnostic evidence.
+- Withdraw UI is generated solely from `field_actions.withdraw`, including exact attached-Essence payment options and legal Reserve destinations.
+- Active Realm remains visible on compact/touch layouts, resolves its canonical card name and opens the shared inspector.
+- Attack remains server-projected through `field_actions.attacks`; no Attack rule moved into the browser.
+
+### Automated checkpoint
+TCG Card Pass 2 Validation **#1138 PASS** on source candidate head `29e3ba5aa0259814563a0d8227a48c08a6e67a1e`.
+
+The green run includes inherited Attack, Ability, Essence-orb, touch-drag, tap-fallback and runtime/type checks plus new projected-action/Withdraw/Realm/Tactic-preview guards.
+
+The Tactic preview is an Edge API addition, so the branch is not ready for Trevor/Kay retest until the exact green Tactic source is promoted in place with JWT settings preserved. Static/main promotion remains HOLD.
