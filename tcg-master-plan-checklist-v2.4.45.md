@@ -516,3 +516,20 @@
 - [ ] Active Ability IF remaining: Surgefin / Undertow Supply.
 - [ ] Active Ability IF remaining: Marevault / Heart of Tides.
 
+## V2.4.73 — Night Reading active Ability IF
+- [x] Add Card-Zone-owned exact-instance within-zone reorder for top/bottom effects.
+- [x] Add shared Active Ability IF leaf adapter over the common predicate-tree owner.
+- [x] Add server-owned scheduled-action lifecycle for `controller_aftermath_finished` + `DRAW_FIXED`.
+- [x] Recognize the frozen inspect -> optional choose -> deck-bottom -> IF -> schedule family without card-ID branches.
+- [x] Keep inspected opponent deck-top identity controller-private.
+- [x] Route optional top-card bottom move through Card-Zone reorder.
+- [x] Route `selected_count_at_least` through shared Active Ability IF.
+- [x] Resolve scheduled fixed draw before canonical turn advance and leave terminal/deckout authority with Match Flow.
+- [x] Reuse generic `pending_ability_choice` Battle transport; no Noctivane-specific client rule.
+- [x] Public resolve receipt exposes structural counts/boolean only; no inspected card UID/card ID.
+- [x] Refresh all affected Edge closures: Setup 8 / Match 96 / Tactic 40.
+- [x] Ability IF source/accounting progress: **7 / 9**.
+- [ ] Exact-head Card Pass must validate the post-repair Night Reading head before V2.4.73 is accepted.
+- [ ] Next active Ability IF: Surgefin / Undertow Supply.
+- [ ] Remaining active Ability IF after Surgefin: Marevault / Heart of Tides.
+
