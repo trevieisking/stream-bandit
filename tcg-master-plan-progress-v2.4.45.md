@@ -275,7 +275,7 @@ The first V2.4.53 implementation target is now present on the branch.
 - A browser-transport regression fixture now proves a successful authoritative `attach_essence` refresh changes the Creature from no rail to an Astral Essence rail.
 - Human desktop/mobile readability remains pending and no promotion is implied.
 
-Next implementation target after this source slice validates is **phone/tablet pointer-driven hand-card drag/drop**, while preserving the existing tap-select fallback and exact server action payloads.
+Next implementation target after this source slice validates is **phone/tablet pointer/touch-safe hand-card drag/drop**, while preserving the existing tap-select fallback and exact server action payloads.
 
 
 ## V2.4.53 implementation B — phone/tablet touch drag source complete
