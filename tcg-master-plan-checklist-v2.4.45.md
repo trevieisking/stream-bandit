@@ -344,3 +344,21 @@
 - [ ] Reversal Seal IF branch still requires ADD_SHIELD_EACH.
 - [ ] Blackout Pulse IF branch still requires APPLY_CONDITION.
 - [ ] Do not mark all six Tactic IF cards fully executable until those four downstream operation gaps close.
+## V2.4.59 — visible special effects + search/attach/shuffle choreography
+- [x] Lock the Release 1 rule that important authoritative card movement, Attack, Ability and state changes require visible player-facing feedback; effects are not optional decoration.
+- [x] Lock the effects layer as generic event/effect choreography, not card-ID-specific branches, so future cards/moves/Abilities/Conditions can reuse it.
+- [ ] Add one presentation mapper from authoritative state/event/result packets to reusable movement/effect cues without creating another gameplay owner.
+- [ ] Visibly animate deck -> hand draw, hand/field/discard/Reward movement, returns-to-deck, evolution, switching/promotion, Essence/Relic attach/remove and other Release 1 card-zone transitions.
+- [ ] Add clear generic Attack choreography: source activation/wind-up -> target -> payment if applicable -> impact -> damage/Shield/heal/Condition/listener/Defeat/Reward feedback -> authoritative continuation.
+- [ ] Add clear active-Ability and triggered/listener choreography, including usable/fired state and visible resulting deltas.
+- [ ] Add private deck-search overlay driven only by the authoritative pending-choice/search options and Hidden Information visibility.
+- [ ] For an effect that requires/selects N cards, show the authoritative live selection count (for the cited three-card ability: 0/3 -> 3/3); do not hard-code 3 as a global search rule.
+- [ ] For search-and-attach effects, show only server-projected legal Adult Creature/Creature attachment targets and visually assign each chosen Essence card to its authoritative target.
+- [ ] After authoritative resolution, animate chosen searched cards to their Creature attachment/Essence rails, return unchosen inspected cards to the deck representation, then show the authoritative shuffle effect.
+- [ ] Keep opponent search information private: show only permitted public search/attachment/shuffle feedback unless the authoritative rule explicitly reveals card identities.
+- [ ] Make shuffle animation cosmetic only; RNG/shuffle owner determines order and the client never reconstructs, predicts or replays the permutation.
+- [ ] Support reduced-motion/accessibility equivalents that preserve event meaning without requiring full motion.
+- [ ] Reconnect/refresh test: interrupt any movement/search/attack animation and prove the client immediately renders the newest authoritative snapshot with no replay-owned mutation.
+- [ ] Automated test: generic three-card search example renders a server-bound selection counter, legal assignment targets, attachment results and post-resolution shuffle without browser legality/randomness.
+- [ ] Trevor/Kay Battle acceptance: visible card movement, Attack impact, Ability feedback and at least one search/select/attach/shuffle sequence are understandable on desktop and phone without hidden-information leakage.
+
