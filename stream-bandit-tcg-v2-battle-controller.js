@@ -758,6 +758,116 @@
     return null;
   }
 
+  function withdrawProjection() {
+    return state.fieldActions && state.fieldActions.withdraw && typeof state.fieldActions.withdraw === 'object'
+      ? state.fieldActions.withdraw
+      : null;
+  }
+
+  function syncWithdrawPaymentSelection() {
+    const projection = withdrawProjection();
+    if (!projection || projection.eligible !== true) {
+      state.selectedWithdrawEssenceUids = [];
+      return;
+    }
+    const allowed = new Set((Array.isArray(projection.payment_options) ? projection.payment_options : []).map((row) => String(row && row.uid || '')).filter(Boolean));
+    const cost = Math.max(0, Number(projection.cost || 0));
+    state.selectedWithdrawEssenceUids = state.selectedWithdrawEssenceUids
+      .map((uid) => String(uid || ''))
+      .filter((uid) => allowed.has(uid))
+      .slice(0, cost);
+  }
+
+  function withdrawPanelMarkup(isOwnVanguard) {
+    if (!isOwnVanguard) return '';
+    const view = viewState();
+    if (!activePlayTurn(view)) {
+      return '<div class="sb-withdraw-panel is-disabled"><strong>Withdraw</strong><small>Available during your turn.</small></div>';
+    }
+    const projection = withdrawProjection();
+    if (!projection) {
+      return '<div class="sb-withdraw-panel is-disabled"><strong>Withdraw</strong><small>Checking server eligibility…</small></div>';
+    }
+    if (projection.eligible !== true) {
+      return '<div class="sb-withdraw-panel is-disabled"><strong>Withdraw</strong><small>' +
+        esc(friendlyActionMessage(projection.reason || 'no_legal_card_target')) + '</small></div>';
+    }
+    const cost = Math.max(0, Number(projection.cost || 0));
+    const paymentOptions = Array.isArray(projection.payment_options) ? projection.payment_options : [];
+    const legalTargets = Array.isArray(projection.legal_targets) ? projection.legal_targets : [];
+    const selected = new Set(state.selectedWithdrawEssenceUids);
+    const paymentReady = state.selectedWithdrawEssenceUids.length === cost;
+    const paymentLabel = cost === 0
+      ? '<small class="sb-withdraw-note">No Essence payment required.</small>'
+      : '<small class="sb-withdraw-note">Choose exactly ' + esc(cost) + ' attached Essence to discard.</small>';
+    const payment = cost === 0 ? '' :
+      '<div class="sb-withdraw-payments">' + paymentOptions.map((option) => {
+        const uid = String(option && option.uid || '');
+        const on = selected.has(uid);
+        return '<button type="button" class="sb-withdraw-chip' + (on ? ' is-selected' : '') +
+          '" data-withdraw-essence-uid="' + esc(uid) + '" aria-pressed="' + (on ? 'true' : 'false') + '">' +
+          esc(String(option && option.label || option && option.card_id || 'Essence')) + '</button>';
+      }).join('') + '</div>';
+    const targets = '<div class="sb-withdraw-targets">' + legalTargets.map((target) => {
+      const index = Number(target && target.reserve_index);
+      return '<button type="button" class="sb-withdraw-target" data-withdraw-target-index="' + esc(index) + '"' +
+        (paymentReady ? '' : ' disabled') + '>Withdraw → Reserve ' + esc(index + 1) + '</button>';
+    }).join('') + '</div>';
+    return '<div class="sb-withdraw-panel"><div class="sb-withdraw-head"><strong>Withdraw</strong><span>Cost ' + esc(cost) +
+      ' Essence</span></div>' + paymentLabel + payment + targets + '</div>';
+  }
+
+  function toggleWithdrawEssence(uid) {
+    const projection = withdrawProjection();
+    if (!projection || projection.eligible !== true) return;
+    const cost = Math.max(0, Number(projection.cost || 0));
+    const allowed = new Set((Array.isArray(projection.payment_options) ? projection.payment_options : []).map((row) => String(row && row.uid || '')).filter(Boolean));
+    const value = String(uid || '');
+    if (!allowed.has(value) || cost <= 0) return;
+    const current = [...state.selectedWithdrawEssenceUids];
+    const found = current.indexOf(value);
+    if (found >= 0) current.splice(found, 1);
+    else if (cost === 1) current.splice(0, current.length, value);
+    else if (current.length < cost) current.push(value);
+    state.selectedWithdrawEssenceUids = current;
+    render();
+  }
+
+  async function runWithdraw(reserveIndex) {
+    const view = viewState();
+    const projection = withdrawProjection();
+    const cost = projection ? Math.max(0, Number(projection.cost || 0)) : 0;
+    const legal = projection && Array.isArray(projection.legal_targets)
+      ? projection.legal_targets.some((target) => Number(target && target.reserve_index) === Number(reserveIndex))
+      : false;
+    if (!activePlayTurn(view) || !projection || projection.eligible !== true || !legal || state.selectedWithdrawEssenceUids.length !== cost) {
+      setActionFailure(projection && projection.reason ? projection.reason : 'exact_withdrawal_essence_payment_required');
+      return;
+    }
+    state.busy = true;
+    state.overlayKey = '';
+    render();
+    setStatus('Withdrawing through the authoritative movement and payment owners…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, Object.assign(actionBase('withdraw'), {
+        reserve_index: Number(reserveIndex),
+        discard_essence_uids: [...state.selectedWithdrawEssenceUids]
+      }));
+      state.selectedWithdrawEssenceUids = [];
+      state.selectedAnchorUid = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setActionFailure(failure);
+    }
+  }
+
   function renderSelectedCardInspector(view, canAct) {
     const node = $('cardInspector');
     if (!node) return;
@@ -782,6 +892,8 @@
       ownField = inspected.owner === 'you';
       where = String(inspected.where || '');
       index = inspected.index == null ? null : Number(inspected.index);
+    } else if (inspected.kind === 'realm') {
+      instance = view && view.realm && view.realm.card ? view.realm.card : null;
     }
 
     if (!instance) {
@@ -811,6 +923,7 @@
       '<section class="sb-card-inspector-panel" role="dialog" aria-modal="true" aria-label="' + esc(cardNameById(cardId) || 'Card') + ' card details">' +
       '<button type="button" class="sb-card-inspector-close" data-card-inspector-close="1" aria-label="Close card details">×</button>' +
       '<div class="sb-card-inspector-card">' + face + (creature ? liveCreatureStatus(creature, cardId, essenceUnits) : '') + '</div>' +
+      withdrawPanelMarkup(isOwnVanguard) +
       '</section>';
   }
 
@@ -1224,10 +1337,14 @@
 
     const realm = $('realmPill');
     if (realm) {
-      const realmValue = view.realm && typeof view.realm === 'object'
-        ? (view.realm.name || view.realm.card_name || 'Realm')
-        : (view.realm || 'Stream Bandit TCG');
-      realm.textContent = String(realmValue);
+      const realmCardId = view.realm && view.realm.card ? String(view.realm.card.card_id || '') : '';
+      const realmValue = realmCardId ? cardNameById(realmCardId) : 'No active Realm';
+      realm.textContent = realmCardId ? 'Realm · ' + String(realmValue) : 'Realm · none';
+      realm.classList.toggle('is-active', !!realmCardId);
+      realm.tabIndex = realmCardId ? 0 : -1;
+      realm.setAttribute('role', realmCardId ? 'button' : 'status');
+      realm.setAttribute('aria-label', realmCardId ? 'Inspect active Realm ' + String(realmValue) : 'No active Realm');
+      realm.dataset.realmCardId = realmCardId;
     }
 
     const turnPill = $('turnPill');
@@ -1535,6 +1652,42 @@
         await runAbilityIntent(where, index);
       });
     });
+
+    document.querySelectorAll('[data-withdraw-essence-uid]').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (state.busy) return;
+        toggleWithdrawEssence(String(button.dataset.withdrawEssenceUid || ''));
+      });
+    });
+
+    document.querySelectorAll('[data-withdraw-target-index]').forEach((button) => {
+      button.addEventListener('click', async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (state.busy || button.disabled) return;
+        await runWithdraw(Number(button.dataset.withdrawTargetIndex));
+      });
+    });
+
+    const realmPill = $('realmPill');
+    if (realmPill) {
+      realmPill.onclick = () => {
+        const view = viewState();
+        if (state.busy || !(view && view.realm && view.realm.card)) return;
+        state.inspectedCard = { kind: 'realm' };
+        state.selectedAnchorUid = '';
+        state.overlayKey = '';
+        render();
+      };
+      realmPill.onkeydown = (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          realmPill.onclick();
+        }
+      };
+    }
 
     document.querySelectorAll('[data-play-hand-uid]').forEach((card) => {
       const select = () => {
@@ -2184,13 +2337,16 @@
     );
     if (!eligible) {
       state.fieldActions = null;
+      state.selectedWithdrawEssenceUids = [];
       return;
     }
     try {
       const response = await callEdge(API_MATCH, actionBase('field_actions'));
       state.fieldActions = response && response.result && typeof response.result === 'object' ? response.result : null;
+      syncWithdrawPaymentSelection();
     } catch (_) {
       state.fieldActions = null;
+      state.selectedWithdrawEssenceUids = [];
     }
   }
 
