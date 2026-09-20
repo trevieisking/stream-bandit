@@ -174,7 +174,7 @@
 - [x] Automated test: when compressed, every Essence type keeps its own counted orb and numeric total; different element totals are never merged.
 - [x] Automated test: Attack-cost orb presentation and attached-resource orb presentation use the same canonical element identities.
 - [x] Automated test: coarse-touch drag uses the same intent/action payload as tap mode and contains no duplicate gameplay legality.
-- [ ] Exact-head TCG Card Pass 2 Validation PASS after V2.4.53 implementation.
+- [x] Exact-head TCG Card Pass 2 Validation PASS after V2.4.53 implementation.
 - [ ] Trevor desktop PASS: drag/drop still works and board geometry is unchanged.
 - [ ] Kay phone PASS: finger drag/drop works for a playable hand card to a legal destination.
 - [ ] Kay phone PASS: tap-select -> destination still works as fallback.
