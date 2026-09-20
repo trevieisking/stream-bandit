@@ -178,6 +178,7 @@
 - [x] Clarify Attack timing in card presentation: **Turn ends after full resolution**. A non-lethal Attack proceeds straight through Aftermath/turn advance; a lethal Attack pauses that continuation for Defeat -> Reward -> required promotion, then resumes the same end-of-turn path.
 - [x] Keep server-blocked Attacks inspectable without dispatch: clicking a blocked Attack explains the authoritative reason (including insufficient matching Essence) and never sends an Attack command.
 - [x] Keep the battlefield Vanguard anchored while opening a separate readable desktop card inspector; selecting a Creature must not physically relocate/jump the source card.
+- [x] Fix the human-video client freeze where Vanguard/Essence interaction raised `cardNameById is not defined`; define the shared card-name resolver in the Battle controller and regression-guard the inspector so a browser exception cannot stall the active player's turn.
 - [ ] Trevor desktop PASS: drag/drop still works and board geometry is unchanged.
 - [ ] Kay phone PASS: finger drag/drop works for a playable hand card to a legal destination.
 - [ ] Kay phone PASS: tap-select -> destination still works as fallback.
