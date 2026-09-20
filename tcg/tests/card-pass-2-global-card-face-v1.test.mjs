@@ -63,6 +63,12 @@ for(const token of ['HP</small><strong>170','Orbitortoise','Astral','Forecast Sh
 }
 assert.ok(!orbitHtml.includes('data-card-intent="ability"'),'triggered Ability must not become a manual button');
 
+const notReadyHtml=renderer.renderCard(orbit,{mode:'battle',interactiveAttacks:true,attackStates:{1:{eligible:false,reason:'attack_essence_cost_not_met'},2:{eligible:true,reason:null}}});
+assert.ok(notReadyHtml.includes('Needs more matching Essence'));
+assert.ok(notReadyHtml.includes('Ready · Attack 2 · Ends Turn'));
+assert.ok(notReadyHtml.includes('data-attack-slot="1" disabled'));
+assert.ok(notReadyHtml.includes('data-attack-slot="2"'));
+
 const noArt=structuredClone(orbit);
 noArt.printing.artwork_status='missing';
 const noArtHtml=renderer.renderCard(noArt,{mode:'full'});
