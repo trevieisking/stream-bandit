@@ -373,7 +373,8 @@ button{font:inherit}
   .sb-zone-pile{min-height:52px}.sb-zone-pile b{font-size:14px}
   .sb-center-band{grid-template-columns:1fr 1.6fr 1fr}
 }
-@media(min-width:641px) and (hover:hover) and (pointer:fine){
+/* Wide battle surfaces must fit full 5:7 cards even on hybrid/touch-capable desktop hardware. Phone/coarse layout below remains the later override. */
+@media(min-width:641px){
   .sb-board{
     grid-template-rows:auto minmax(0,1fr) minmax(68px,auto) minmax(0,1fr) clamp(132px,17.2dvh,166px)
   }
