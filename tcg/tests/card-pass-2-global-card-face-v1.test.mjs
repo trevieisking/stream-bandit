@@ -75,8 +75,11 @@ assert.ok(essenceRailHtml.includes('data-essence-rail'));
 assert.ok(essenceRailHtml.includes('aria-label="Attached Essence: 3 Astral, 2 Tide"'));
 assert.ok(essenceRailHtml.includes('data-essence-element="Astral" data-essence-count="3"'));
 assert.ok(essenceRailHtml.includes('data-essence-element="Tide" data-essence-count="2"'));
-assert.equal((essenceRailHtml.match(/data-essence-element="Astral"/g)||[]).length,4,'expanded Astral orbs plus one counted Astral fallback must exist');
-assert.equal((essenceRailHtml.match(/data-essence-element="Tide"/g)||[]).length,3,'expanded Tide orbs plus one counted Tide fallback must exist');
+const railStart=essenceRailHtml.indexOf('data-essence-rail');
+const railEnd=essenceRailHtml.indexOf('</div>',railStart);
+const railOnly=essenceRailHtml.slice(railStart,railEnd);
+assert.equal((railOnly.match(/data-essence-element="Astral"/g)||[]).length,4,'expanded Astral orbs plus one counted Astral fallback must exist');
+assert.equal((railOnly.match(/data-essence-element="Tide"/g)||[]).length,3,'expanded Tide orbs plus one counted Tide fallback must exist');
 assert.ok(orbitHtml.includes('aria-label="Attack Cost: 2 Astral"'),'Attack cost must use the same element identity system as attached Essence');
 
 const notReadyHtml=renderer.renderCard(orbit,{mode:'battle',interactiveAttacks:true,attackStates:{1:{eligible:false,reason:'attack_essence_cost_not_met'},2:{eligible:true,reason:null}}});
