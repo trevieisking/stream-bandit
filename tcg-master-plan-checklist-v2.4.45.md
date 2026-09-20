@@ -326,3 +326,21 @@
 - [x] Refresh the exact Tactic Edge closure to include shared event-history + turn-history dependencies.
 - [x] TCG Card Pass 2 Validation **#1200 PASS** on exact source/manifest head `9de2db520b593624c0a12e4be6186e23470eaa72`.
 - [x] All 18 frozen Release 1 Tactics with explicit play requirements now have structured requirement ownership.
+
+
+### V2.4.57 implementation I — generic Tactic IF control flow
+- [x] Inventory frozen Release 1 Tactic-program IF usage: **6 IF instances / 6 Tactics**.
+- [x] Confirm the six predicate meanings: reserve_count_at_least, hand_count_at_least, legal_card_available, target_printed_hp_at_least, target_has_condition, modifier_condition_slot_empty.
+- [x] Route Tactic IF boolean composition through the shared predicate-tree owner.
+- [x] Keep Tactic-specific leaf resolution data-driven with zero launch card-ID/name branches.
+- [x] Reuse shared reserve-count and legal-card requirement semantics.
+- [x] Preserve current target/condition owners for Tactic target predicates.
+- [x] Splice selected then/else steps into the same resumable effect cursor; no second Tactic interpreter.
+- [x] Frozen-registry/source-contract tests bind all six Tactic IF cards and predicate inventory.
+- [x] TCG Card Pass 2 Validation **#1207 PASS** at exact source/manifest head `bf4dcca6ceb8c56540fdee2dfec17d59731650e2`.
+- [x] Surveyor Mina and Recovery Spray IF programs are executable through already-supported downstream opcodes.
+- [ ] Cyclone Route IF branch still requires generic Tactic OPTIONAL.
+- [ ] False Memory IF branch still requires RANDOM_SAMPLE_HIDDEN_ZONE.
+- [ ] Reversal Seal IF branch still requires ADD_SHIELD_EACH.
+- [ ] Blackout Pulse IF branch still requires APPLY_CONDITION.
+- [ ] Do not mark all six Tactic IF cards fully executable until those four downstream operation gaps close.
