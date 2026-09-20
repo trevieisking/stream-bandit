@@ -213,3 +213,19 @@ Selecting the Vanguard may open a larger readable card context, but the original
 
 ## 084 — Client exceptions cannot masquerade as a server turn deadlock
 A paired Battle may legitimately show **Opponent turn** on one device and **Your turn** on the active player's device while both are on the same authoritative revision. If the active player then cannot act and the browser displays a JavaScript exception, treat that as a client-render/interaction failure unless server evidence proves otherwise. The Battle controller must define every helper used by card inspection/fallback rendering; the stable inspector's card-name lookup is now a local resolver backed by the shared renderer or authoritative `card_index`. No server engine, turn owner or match state may be altered to compensate for a client ReferenceError.
+
+
+## 085 — Successful turn advance always returns to play
+The canonical Match Flow Turn owner must set `phase = "play"` whenever an ordinary turn successfully advances after its Card-Zone draw. This is required both for ordinary End Turn and for a suspended lethal-Attack continuation. Terminal and deckout routes retain their own complete-state behavior. The dispatcher may not patch the phase separately.
+
+## 086 — Reward and forced promotion suspend one Attack end-turn continuation
+A lethal Attack does not create a second turn rule. Attack resolution pauses the same end-turn continuation for Defeat -> Reward Card taking -> required Vanguard promotion. Once that queue is empty, Aftermath and the canonical Turn owner advance the seat, draw and return the phase to `play`. Human evidence at revisions 26-28 proved Attack/Reward/promotion committed while the missing Turn phase transition left the match in `resolution`.
+
+## 087 — Full card readability belongs to inspection, not permanent battlefield scale
+The Battle board may use compact canonical card previews so the whole tabletop fits at normal browser zoom. Compact field cards retain artwork, identity and live status/Essence information; full Ability/Attack/rule text opens through the shared canonical card inspector. The original field card remains anchored in its zone while inspected.
+
+## 088 — Hand is a bottom horizontal interaction rail
+The player hand is a fixed bottom-edge horizontal tray that does not increase page height. Desktop and touch devices may scroll the tray left/right when the hand exceeds available width. A hand card can be clicked/tapped to read, while drag/drop uses the existing setup/play/evolve/Essence/Relic destinations and server commands. Tap-select -> destination remains an equal fallback.
+
+## 089 — External TCG footage is interaction reference only
+User-supplied footage of another TCG may establish interaction grammar such as whole-board viewport, compact field cards, click-to-read inspection, horizontal hand browsing and drag/drop. Stream Bandit must not copy the external game's artwork, branding, proprietary card designs, names or assets. Stream Bandit's existing card renderer, board identity and server-owned rules remain authoritative.
