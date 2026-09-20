@@ -207,3 +207,53 @@ test('Tactic choice transport keeps OPTIONAL private to the configured chooser s
   assert.match(tacticSource,/if \(Number\(pending\.seat\) !== seat\) return json\(\{ ok: false, version: VERSION, error: "effect_choice_not_yours" \}, 403\)/);
 });
 
+test('all frozen Tactic OPTIONAL consumers use the generic choice path',()=>{
+  const found=[];
+  const walk=(card,steps)=>{
+    for(const step of steps||[]){
+      if(!step||typeof step!=='object') continue;
+      if(step.op==='OPTIONAL') found.push({card:card.id,step});
+      walk(card,step.then);
+      walk(card,step.else);
+      walk(card,step.steps);
+      walk(card,step.else_steps);
+    }
+  };
+  for(const card of cards()) if(card.tactic?.program?.steps) walk(card,card.tactic.program.steps);
+  assert.deepEqual(found.map(({card})=>card).sort(),[
+    'gale-cyclone-route',
+    'shade-false-memory',
+    'shade-quiet-step',
+  ]);
+  const falseMemory=found.find(({card})=>card==='shade-false-memory')?.step;
+  assert.deepEqual(falseMemory?.else_steps?.map((step)=>step.op),['DRAW']);
+  const quietStep=found.find(({card})=>card==='shade-quiet-step')?.step;
+  assert.deepEqual(quietStep?.steps?.map((step)=>step.op),['CHOOSE_AND_CLEAR_CONTROL_CONDITION']);
+});
+
+test('generic Tactic OPTIONAL supports both yes steps and no else_steps',()=>{
+  const start=tacticSource.indexOf('if (op === "OPTIONAL")');
+  const end=tacticSource.indexOf('if (op === "REPEAT_OPTIONAL")',start);
+  const block=tacticSource.slice(start,end);
+  assert.match(block,/const optionalElseSteps = Array\.isArray\(step\.else_steps\) \? step\.else_steps : \[\]/);
+  assert.match(block,/else_steps: optionalElseSteps/);
+
+  const applyStart=tacticSource.indexOf('apply === "optional_steps"');
+  const applyEnd=tacticSource.indexOf('apply === "repeat_optional"',applyStart);
+  const applyBlock=tacticSource.slice(applyStart,applyEnd);
+  assert.match(applyBlock,/const branch = use \? context\.steps : context\.else_steps/);
+  assert.match(applyBlock,/effect\.steps\.splice\(effect\.cursor, 1, \.\.\.chosen\)/);
+});
+
+test('Quiet Step control-condition alias reuses the generic condition-choice owner',()=>{
+  const start=tacticSource.indexOf('if (op === "CHOOSE_AND_CLEAR_CONDITION" || op === "CHOOSE_AND_CLEAR_CONTROL_CONDITION")');
+  const end=tacticSource.indexOf('if (op === "SWITCH_WITH_VANGUARD")',start);
+  assert.ok(start>=0&&end>start);
+  const block=tacticSource.slice(start,end);
+  assert.match(block,/activeConditions\(found\.cr\)/);
+  assert.match(block,/op === "CHOOSE_AND_CLEAR_CONTROL_CONDITION" \|\| step\.condition_slot === "control"/);
+  assert.match(block,/choiceBounds\(step\.count == null \? 1 : step\.count, options\.length, false\)/);
+  assert.match(block,/context: \{ apply: "clear_condition", target: ref \}/);
+  assert.doesNotMatch(block,/shade-quiet-step/);
+});
+
