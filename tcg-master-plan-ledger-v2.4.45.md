@@ -157,3 +157,13 @@ The current coarse-touch Battle client sets playable hand cards to `draggable="f
 
 ## 068 — Board decoration is a final presentation pass
 Trevor/Kay have accepted the Battle layout geometry. Realm/background/table decoration is deliberately deferred until the playable interaction chain has passed: card readability -> attachment -> Attack/damage -> defeat/Reward -> result/quit plus phone drag/drop. Decoration may not alter rules, slots, zones, touch targets or server ownership.
+
+
+## 069 — Essence overflow collapses to one counted orb per element
+When attached Essence would visually crowd a Creature card, repeated units of the same element collapse to **one orb of that element with the numeric count inside it**. Example: twelve Astral units display as one Astral orb containing `12`. If multiple elements are attached, each element keeps its own counted orb (for example Astral `7` + Tide `5`) so type information is never lost.
+
+## 070 — Counted-orb compression is responsive presentation only
+The threshold for switching from individual tiny orbs to counted orbs is determined by available card space/responsive layout, not by gameplay rules. The underlying authoritative Essence instances and `provides` values remain unchanged. A counted orb is only a compact view of those units.
+
+## 071 — V2.4.53 does not displace the card/Attack priority
+Essence-orb compression, mobile drag parity and other micro-interactions are required polish within the current playable-card slice. They do not overtake the primary sequence: canonical card visuals/readability -> real Attack/damage/reward lifecycle -> cross-device interaction acceptance -> final board decoration.
