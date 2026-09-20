@@ -25,6 +25,21 @@ export type RuntimeV02SourceHasShieldAtLeastRequirementEvaluation = {
   actual_shield: number;
 };
 
+export type RuntimeV02LegalCardAvailableRequirement = {
+  predicate: "legal_card_available";
+  controller: string;
+  zone: string;
+  filters: Record<string, unknown>;
+};
+
+export type RuntimeV02LegalCardAvailableRequirementEvaluation = {
+  predicate: "legal_card_available";
+  matched: boolean;
+  controller: string;
+  zone: string;
+  candidate_count: number;
+};
+
 export type RuntimeV02ReserveCountAtLeastRequirement = {
   predicate: "reserve_count_at_least";
   controller: string;
@@ -112,6 +127,72 @@ function validatedContext(
       "tcg_v0_2_requirement_damage_history_source_uid_required",
     ),
     source_controller_seat: value.source_controller_seat,
+  };
+}
+
+export function normalizeRuntimeV02LegalCardAvailableRequirement(
+  raw: unknown,
+): RuntimeV02LegalCardAvailableRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_legal_card_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate", "controller", "zone", "filters"],
+    "tcg_v0_2_requirement_legal_card_field_unsupported",
+  );
+  if (value.predicate !== "legal_card_available") {
+    throw new Error("tcg_v0_2_requirement_legal_card_predicate_invalid");
+  }
+  const controller = value.controller == null
+    ? "self"
+    : requiredString(
+      value.controller,
+      "tcg_v0_2_requirement_legal_card_controller_invalid",
+    );
+  const zone = requiredString(
+    value.zone,
+    "tcg_v0_2_requirement_legal_card_zone_invalid",
+  );
+  const allowedZones = new Set([
+    "field",
+    "vanguard",
+    "reserve",
+    "hand",
+    "deck",
+    "discard",
+    "rewards",
+  ]);
+  if (!allowedZones.has(zone)) {
+    throw new Error("tcg_v0_2_requirement_legal_card_zone_unsupported");
+  }
+  const filters = value.filters == null
+    ? {}
+    : objectRecord(
+      value.filters,
+      "tcg_v0_2_requirement_legal_card_filters_invalid",
+    );
+  return {
+    predicate: "legal_card_available",
+    controller,
+    zone,
+    filters: { ...filters },
+  };
+}
+
+export function evaluateRuntimeV02LegalCardAvailableRequirement(
+  candidateCount: unknown,
+  rawRequirement: RuntimeV02LegalCardAvailableRequirement,
+): RuntimeV02LegalCardAvailableRequirementEvaluation {
+  const requirement = normalizeRuntimeV02LegalCardAvailableRequirement(rawRequirement);
+  const count = Number(candidateCount);
+  if (!Number.isInteger(count) || count < 0) {
+    throw new Error("tcg_v0_2_requirement_legal_card_candidate_count_invalid");
+  }
+  return {
+    predicate: "legal_card_available",
+    matched: count > 0,
+    controller: requirement.controller,
+    zone: requirement.zone,
+    candidate_count: count,
   };
 }
 
