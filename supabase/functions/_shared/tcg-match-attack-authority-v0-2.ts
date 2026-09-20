@@ -405,7 +405,7 @@ export function resolveRuntimeAttackAuthority(
     };
   }
 
-  if (!legacy) {
+  if (!legacy && structured.legacy_compatibility_required) {
     throw new Error(`tcg_v0_2_attack_legacy_compatibility_required:${structured.id}`);
   }
   if (structured.base_damage == null || structured.damage_source == null) {
@@ -414,8 +414,8 @@ export function resolveRuntimeAttackAuthority(
 
   const conditionalAddFormula = cloneConditionalAddFormula(structured.conditional_add_formula);
   return {
-    raw: legacy.raw,
-    effect: legacy.effect,
+    raw: legacy?.raw || "",
+    effect: legacy?.effect || "",
     starbound: structured.starbound,
     id: structured.id,
     name: structured.name,
