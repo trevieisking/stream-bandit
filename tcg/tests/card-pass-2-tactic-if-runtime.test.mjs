@@ -161,3 +161,49 @@ test('Tactic APPLY_CONDITION delegates mode and mutation to the shared Condition
   assert.doesNotMatch(block,/volt-blackout-pulse/);
 });
 
+test('Cyclone Route IF branch uses generic resumable Tactic OPTIONAL',()=>{
+  const card=cards().find((entry)=>entry.id==='gale-cyclone-route');
+  assert.ok(card?.tactic?.program?.steps);
+  const optional=[];
+  const walk=(steps)=>{
+    for(const step of steps||[]){
+      if(!step||typeof step!=='object') continue;
+      if(step.op==='OPTIONAL') optional.push(step);
+      walk(step.then);
+      walk(step.else);
+      walk(step.steps);
+    }
+  };
+  walk(card.tactic.program.steps);
+  assert.equal(optional.length,1);
+  assert.equal(optional[0].player,'self');
+  assert.equal(optional[0].steps?.[0]?.op,'PROMPT_CHOSEN_PLAYER_TO_SELECT_RESERVE');
+  assert.equal(optional[0].steps?.[1]?.op,'SWITCH_WITH_VANGUARD');
+});
+
+test('Tactic OPTIONAL reuses pending-choice seat authority and the same effect cursor',()=>{
+  const start=tacticSource.indexOf('if (op === "OPTIONAL")');
+  const end=tacticSource.indexOf('if (op === "REPEAT_OPTIONAL")',start);
+  assert.ok(start>=0&&end>start);
+  const block=tacticSource.slice(start,end);
+  assert.match(block,/playerSeat\(ownerSeat, step\.player \|\| "self", vars\)/);
+  assert.match(block,/kind: "optional"/);
+  assert.match(block,/id: "optional:yes"/);
+  assert.match(block,/id: "optional:no"/);
+  assert.match(block,/context: \{ apply: "optional_steps", steps: optionalSteps \}/);
+  assert.doesNotMatch(block,/gale-cyclone-route/);
+
+  const applyStart=tacticSource.indexOf('apply === "optional_steps"');
+  const applyEnd=tacticSource.indexOf('apply === "repeat_optional"',applyStart);
+  assert.ok(applyStart>=0&&applyEnd>applyStart);
+  const applyBlock=tacticSource.slice(applyStart,applyEnd);
+  assert.match(applyBlock,/selected\[0\]\?\.data\?\.use === true/);
+  assert.match(applyBlock,/effect\.steps\.splice\(effect\.cursor, 1, \.\.\.chosen\)/);
+  assert.match(applyBlock,/delete state\.pending_choice/);
+});
+
+test('Tactic choice transport keeps OPTIONAL private to the configured chooser seat',()=>{
+  assert.match(tacticSource,/if \(Number\(choice\.seat\) !== viewerSeat\) \{[\s\S]*waiting: true/);
+  assert.match(tacticSource,/if \(Number\(pending\.seat\) !== seat\) return json\(\{ ok: false, version: VERSION, error: "effect_choice_not_yours" \}, 403\)/);
+});
+
