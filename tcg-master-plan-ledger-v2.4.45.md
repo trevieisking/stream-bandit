@@ -209,3 +209,7 @@ When authoritative Attack capability says an Attack is blocked, the card may rem
 
 ## 083 — Creature inspection must not relocate the battlefield source card
 Selecting the Vanguard may open a larger readable card context, but the original battlefield card remains anchored in its Vanguard slot. Desktop readability uses a separate inspector copy of the same canonical card face and the same card-owned Attack/Ability controls. Phone/coarse-touch layout remains on its accepted in-board presentation unless separately approved.
+
+
+## 084 — Client exceptions cannot masquerade as a server turn deadlock
+A paired Battle may legitimately show **Opponent turn** on one device and **Your turn** on the active player's device while both are on the same authoritative revision. If the active player then cannot act and the browser displays a JavaScript exception, treat that as a client-render/interaction failure unless server evidence proves otherwise. The Battle controller must define every helper used by card inspection/fallback rendering; the stable inspector's card-name lookup is now a local resolver backed by the shared renderer or authoritative `card_index`. No server engine, turn owner or match state may be altered to compensate for a client ReferenceError.
