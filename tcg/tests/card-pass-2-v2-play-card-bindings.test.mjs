@@ -19,7 +19,7 @@ test('Battle keeps the tabletop zones while using bounded field geometry and ins
   assert.match(battle, /data-sb-tcg-play-bindings="v0-11-server-projected-actions"/);
   assert.match(battle, /data-sb-tcg-card-face="v1"/);
   assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-18-server-projected-actions/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-19-choreography-foundation/);
   assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.18-server-projected-actions/);
   assert.match(controller, /mode: 'compact'/);
   assert.match(controller, /data-inspect-hand-uid=/);
