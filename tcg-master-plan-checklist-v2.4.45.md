@@ -367,8 +367,8 @@
 - [x] Lock the principle that external footage contributes interaction grammar only; Stream Bandit keeps its own art, rules, names, card identities and terminology.
 - [x] Lock one generic Battle Presentation / Choreography Engine rather than card-ID-specific effects or a second browser rules engine.
 - [x] Lock six presentation responsibilities: Zone Motion, Choice Overlay, Combat/Ability FX, Deck/Hidden-Zone Presentation, Stable Inspector and Pacing/Recovery.
-- [ ] Define the authoritative presentation-envelope schema consumed by the choreography engine: source anchor, effect family, viewer visibility, card/zone movements, legal choice anchors, state deltas, continuation identity and ordering.
-- [ ] Implement the generic presentation queue so one authoritative resolution can produce an ordered visual sequence while the latest server snapshot always remains truth.
+- [x] Define the authoritative presentation-envelope schema consumed by the choreography engine: source anchor, effect family, viewer visibility, card/zone movements, legal choice anchors, state deltas, continuation identity and ordering.
+- [x] Implement the generic presentation queue so one authoritative resolution can produce an ordered visual sequence while the latest server snapshot always remains truth.
 - [ ] Bind Deck shuffle/deal/draw/return/discard/Reward events to Zone Motion.
 - [ ] Bind Creature play/evolution/switch/promotion and Essence/Relic attach/remove/payment to Zone Motion.
 - [ ] Bind Reward, search, optional and other Release 1 multi-card choices to one server-count-bound Choice Overlay.
@@ -382,4 +382,21 @@
 - [ ] Test that refresh/reconnect during every major effect family skips stale choreography and converges immediately on authoritative state.
 - [ ] Test that no choreography branch can submit gameplay mutations, calculate legality, choose RNG outcomes or retain hidden information beyond the viewer-authorized envelope.
 - [ ] Trevor/Kay acceptance: complete Battle can be followed visually without relying on debug text to understand draws, plays, Attacks, Abilities, Conditions, Rewards, searches, shuffles and turn handoff.
+## V2.4.61 — presentation receipt / queue foundation
+- [x] Add shared `tcg-presentation-envelope-v1` schema with generic cue family, source/target anchors, movement, state delta, choice count/targets, continuation, audience and intensity.
+- [x] Add server-side viewer filtering so seat-private cues can be removed before another viewer receives a receipt.
+- [x] Add one browser Battle choreography queue with deterministic ordering and no gameplay mutation API.
+- [x] Suppress duplicate `receipt_id` playback so normal polling cannot replay the same animation.
+- [x] Cancel/drop stale queued choreography when a newer authoritative revision arrives.
+- [x] Load the choreography owner before the Battle controller and allow the controller to consume future `view.presentation` envelopes.
+- [x] Add Deno tests for envelope validation/viewer filtering/data-driven selection counts.
+- [x] Add Node tests for cue ordering, duplicate suppression, stale-revision cancellation and Battle wiring.
+- [ ] Exact-head TCG Card Pass 2 gate for the V2.4.61 source foundation; #1221 is currently queued/pending on source candidate `28828717b301168920452e27f704ca212543eade`.
+- [ ] Bind canonical match commit/view persistence to viewer-filtered presentation receipts without adding presentation data to gameplay legality/state ownership.
+- [ ] First real receipt producer: canonical Attack result/continuation, including source activation, target focus, impact, damage/Shield delta, Defeat/Reward and continuation.
+- [ ] Add the reusable Stream Bandit eight-element FX skin map; element metadata changes presentation only and never card rules.
+- [ ] Add compact accessible resolution ribbon generated from the same cue queue for complex chains.
+- [ ] Add opponent private-choice mirror using only public-safe search/choice facts.
+- [ ] Add safe micro-cue coalescing/backlog protection without hiding the final authoritative state.
+- [ ] Bind visible DOM motion/impact handlers only after the server receipt path is green.
 
