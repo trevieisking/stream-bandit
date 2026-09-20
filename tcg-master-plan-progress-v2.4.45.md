@@ -595,3 +595,18 @@ The new shared predicate-tree file is now part of both Match Actions and Tactic 
 TCG Card Pass 2 Validation **#1149 PASS** at exact fingerprinted source head 0a3f0f8d869d7e88cc9233f4121fb99526e38c92.
 
 Next implementation target: extract/reuse Release 1 leaf predicate semantics that occur in more than one execution family, beginning with the smallest high-confidence state predicates. Generic IF remains incomplete until every launch IF context is covered.
+
+
+## V2.4.57 implementation C — shared source_damaged leaf meaning
+
+The first repeated Release 1 leaf semantic is now consolidated.
+
+source_damaged was already owned by the shared Requirement evaluator for Active Ability requirements, while Attack conditional self-heal independently checked source Creature damage.
+
+Attack now preserves its own IF program/shape validation but delegates the meaning of source_damaged to evaluateRuntimeV02SourceDamagedRequirement.
+
+This removes one duplicate rule without moving Attack sequencing or healing authority.
+
+TCG Card Pass 2 Validation **#1155 PASS** on exact fingerprinted source head a69ecef888cee4a1d3a2a2a65ca9cd3ec5abc5b7.
+
+The broad Release 1 predicate-leaf task remains open; each repeated leaf is reconciled separately before generic IF is declared complete.
