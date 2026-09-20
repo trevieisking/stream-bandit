@@ -10,7 +10,9 @@ import { runtimeV02BeginMovementListenerContinuation, runtimeV02CreateEssenceMov
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import {
+  evaluateRuntimeV02LegalCardAvailableRequirement,
   evaluateRuntimeV02ReserveCountAtLeastRequirement,
+  normalizeRuntimeV02LegalCardAvailableRequirement,
   normalizeRuntimeV02ReserveCountAtLeastRequirement,
 } from "../_shared/tcg-match-requirement-evaluator-v0-2.ts";
 import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
@@ -257,9 +259,19 @@ function matchesCardFilters(state: any, inst: Inst, filters: any, ownerSeat: num
 function matchesCreatureFilters(state: any, item: { cr: Cr }, filters: any) {
   if (!filters || typeof filters !== "object") return true;
   const d = topDef(item.cr, state) || {};
+  if (filters.card_family && String(filters.card_family) !== "Creature") return false;
   if (filters.element && String(d.element || "") !== String(filters.element)) return false;
   if (filters.damaged === true && Number(item.cr.damage || 0) <= 0) return false;
-  if (Array.isArray(filters.has_any_condition) && !filters.has_any_condition.some((c: string) => hasCondition(item.cr, c))) return false;
+
+  const conditionList = Array.isArray(filters.has_any_condition)
+    ? filters.has_any_condition
+    : Array.isArray(filters.conditions_any)
+    ? filters.conditions_any
+    : Array.isArray(filters.condition_any_of)
+    ? filters.condition_any_of
+    : null;
+  if (conditionList && !conditionList.some((condition: string) => hasCondition(item.cr, condition))) return false;
+  if (filters.has_any_condition === true && activeConditions(item.cr).length < 1) return false;
   return true;
 }
 function creatureOptions(state: any, ownerSeat: number, controller: unknown, zone: unknown, filters: any) {
@@ -521,6 +533,29 @@ function firstRequiredCreatureTargetAvailable(state: any, ownerSeat: number, ste
 }
 function checkPlayRequirements(state: any, ownerSeat: number, requirements: any[]) {
   for (const requirement of requirements || []) {
+    if (requirement?.predicate === "legal_card_available") {
+      const normalized = normalizeRuntimeV02LegalCardAvailableRequirement(requirement);
+      const seat = playerSeat(ownerSeat, normalized.controller, {});
+      const player = state.players[String(seat)];
+      if (!player) return false;
+      let candidateCount = 0;
+      if (["field", "vanguard", "reserve"].includes(normalized.zone)) {
+        candidateCount = creatureOptions(
+          state,
+          ownerSeat,
+          normalized.controller,
+          normalized.zone,
+          normalized.filters,
+        ).length;
+      } else {
+        const zone = player[normalized.zone];
+        if (!Array.isArray(zone)) return false;
+        candidateCount = cardOptions(state, zone as Inst[], normalized.filters, ownerSeat).length;
+      }
+      if (!evaluateRuntimeV02LegalCardAvailableRequirement(candidateCount, normalized).matched) return false;
+      continue;
+    }
+
     let normalized;
     if (requirement?.predicate === "reserve_count_at_least") {
       normalized = normalizeRuntimeV02ReserveCountAtLeastRequirement(requirement);
