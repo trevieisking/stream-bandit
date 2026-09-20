@@ -195,3 +195,7 @@ Eligible empty setup locations expose their destination coordinates during the p
 
 ## 079 — Automated V2.4.53 proof does not replace device acceptance
 Regression tests may prove authoritative refresh behavior, layout-driven compression, per-element grouping and command transport parity. They do not mark Trevor desktop or Kay phone visual/gesture checks complete. Exact-head CI closes the automated slice only; human cross-device gates remain separately required.
+
+
+## 080 — Ability glow is a capability projection, not a card-side guess
+A manual active Ability may glow/pulse only when the authoritative `field_actions.ability_sources` projection contains that exact field source anchor. `use_ability` consumes/changes authoritative state; the next projection removes the glow when the Ability is no longer usable. Triggered Abilities remain non-manual.
