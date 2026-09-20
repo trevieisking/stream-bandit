@@ -11,6 +11,28 @@ const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-
 const cardRenderer = fs.readFileSync(path.join(root, 'stream-bandit-tcg-card-renderer-v2-4-51.js'), 'utf8');
 const displayRegistry = JSON.parse(fs.readFileSync(path.join(root, 'assets', 'tcg', 'cards', 'set-one', 'tcg-card-display-registry-v1.json'), 'utf8'));
 
+class FakeFieldCard {
+  constructor() {
+    this.dataset = {
+      inspectFieldOwner: 'you',
+      inspectFieldWhere: 'vanguard',
+      inspectFieldIndex: '',
+      cardAnchor: 'stardot-1'
+    };
+    this.listeners = new Map();
+  }
+
+  addEventListener(type, listener) {
+    this.listeners.set(type, listener);
+  }
+
+  async triggerClick() {
+    const listener = this.listeners.get('click');
+    assert.equal(typeof listener, 'function', 'compact Vanguard must bind inspect click');
+    return listener({ target: { closest() { return null; } } });
+  }
+}
+
 class FakeButton {
   constructor(slot) {
     this.dataset = { attackSlot: String(slot) };
@@ -39,10 +61,16 @@ class FakeNode {
 
   set innerHTML(value) {
     this._innerHTML = String(value);
-    if (this.id !== 'youVanguard') return;
-    const slots = [...this._innerHTML.matchAll(/data-card-intent="attack" data-attack-slot="(\d+)"/g)]
-      .map((match) => Number(match[1]));
-    this.document.attackButtons = slots.map((slot) => new FakeButton(slot));
+    if (this.id === 'youVanguard') {
+      this.document.fieldCards = this._innerHTML.includes('data-inspect-field-owner="you"')
+        ? [new FakeFieldCard()]
+        : [];
+    }
+    if (this.id === 'cardInspector') {
+      const slots = [...this._innerHTML.matchAll(/data-card-intent="attack" data-attack-slot="(\d+)"/g)]
+        .map((match) => Number(match[1]));
+      this.document.attackButtons = slots.map((slot) => new FakeButton(slot));
+    }
   }
 
   get innerHTML() {
@@ -94,12 +122,14 @@ function makeHarness() {
   const document = {
     baseURI: 'https://example.test/tcg-battle-v2.html',
     attackButtons: [],
+    fieldCards: [],
     getElementById(id) {
       if (!nodes.has(id)) nodes.set(id, new FakeNode(id, document));
       return nodes.get(id);
     },
     querySelectorAll(selector) {
       if (selector === '[data-card-intent="attack"]') return document.attackButtons;
+      if (selector === '[data-inspect-field-owner]') return document.fieldCards;
       if (selector === '[data-card-anchor]') return [];
       return [];
     }
@@ -206,7 +236,10 @@ test('rendered V2 card Attack click posts authoritative Attack payload and surfa
   const harness = makeHarness();
   await harness.boot();
 
-  assert.equal(harness.document.attackButtons.length, 1, 'playable Vanguard should render one Attack control');
+  assert.equal(harness.document.attackButtons.length, 0, 'compact Vanguard must not permanently consume board space with Attack rows');
+  assert.equal(harness.document.fieldCards.length, 1, 'compact Vanguard must remain inspectable');
+  await harness.document.fieldCards[0].triggerClick();
+  assert.equal(harness.document.attackButtons.length, 1, 'full inspector must render the authoritative Attack control');
   await harness.document.attackButtons[0].triggerClick();
 
   const attackRequests = harness.requests.filter((entry) =>
