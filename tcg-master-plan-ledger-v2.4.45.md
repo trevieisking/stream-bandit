@@ -242,3 +242,25 @@ The shared card renderer exposes one canonical `inspect` presentation mode for c
 
 ## 093 — Decks, Collection and Battle Pass share read-only card inspection
 Canonical card tiles in Decks and Collection and card-backed Battle Pass reward samples open the same shared inspect face. These non-Battle surfaces are read-only presentation: inspection does not infer or mutate deck ownership, collection ownership, season progression, entitlement, reward claiming or economy state.
+
+
+## 094 — Red legality codes are not proof of a server deadlock
+A visible server rejection must be correlated with authoritative command/state history before game rules are changed. The V2.4.56 paired recording contained repeated legality rejections while the same match continued to commit Realm, Essence, Attack, Reward and promotion actions. Browser UX must distinguish an unavailable action from a stalled server.
+
+## 095 — Hand action availability is server-projected
+Battle may classify a hand card for presentation, but legal destinations and current playability come from existing authoritative projections: `play_card_targets`, `evolve_targets`, `attach_essence_targets`, `attach_relic_targets`, and Tactic-owner `play_tactic_preview`. The real mutation command validates again. The browser may not become a competing legality engine.
+
+## 096 — Tactic preview and Tactic play share one legality helper
+`tcg-tactic-actions` owns both read-only Tactic playability projection and final Tactic execution. `play_tactic_preview` performs no mutation/commit and reuses the same generic playability helper as `play_tactic`, including first-player Ally restrictions, play requirements, required targets/resources and supported lifecycle opcodes.
+
+## 097 — One manual Essence per turn must be explained before mutation
+The existing manual-Essence rule remains unchanged. When the server projects `manual_essence_already_used_this_turn`, Battle explains that the player already used their one manual attachment and does not send a doomed attachment command. This is UX around an existing rule, not a new Essence rule.
+
+## 098 — Withdraw is a server-projected card action
+Withdraw belongs to the existing Match/Withdrawal/Payment/Switch owners. Battle reads `field_actions.withdraw` for eligibility, exact cost, attached-Essence payment options and legal Reserve targets. The browser submits only the chosen server-projected payment UIDs and Reserve index; it does not calculate cost or legality.
+
+## 099 — Realm state must remain visibly legible
+A successfully played Realm cannot disappear merely because the responsive tabletop hides decorative space. Battle keeps the authoritative active Realm visible by canonical card name and makes it inspectable. Realm placement/replacement remains entirely server-owned.
+
+## 100 — Player-facing errors and diagnostic codes are separate
+Known machine legality codes are translated into concise player guidance. The raw code remains available in diagnostic state/console evidence. A user should see what action is required, not an implementation identifier such as `required_tactic_target_unavailable`.
