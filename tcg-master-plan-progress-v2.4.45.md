@@ -1005,4 +1005,78 @@ The known downstream blockers for the six Release 1 Tactic IF programs are now r
 2. **False Memory — RANDOM_SAMPLE_HIDDEN_ZONE**
 
 Reversal Seal (`ADD_SHIELD_EACH`) and Blackout Pulse (`APPLY_CONDITION`) are closed.
+## V2.4.64 — generic Tactic OPTIONAL parity accepted
+
+The frozen Release 1 Tactic inventory contains **three** `OPTIONAL` consumers:
+- Gale — Cyclone Route;
+- Shade — False Memory;
+- Shade — Quiet Step.
+
+V2.4.64 routes all three through the existing authoritative Tactic pending-choice + resumable-cursor owner.
+
+### Generic OPTIONAL contract
+- chooser seat is resolved from structured `step.player`;
+- the server creates the Yes / No choice;
+- the non-chooser receives only the existing waiting view;
+- wrong-seat resolution remains rejected by the existing `effect_choice_not_yours` guard;
+- choosing Yes splices `steps` into the same effect cursor;
+- choosing No splices `else_steps` when present;
+- no second Tactic interpreter or card-ID branch exists.
+
+The audit also exposed Shade — Quiet Step's compatibility spelling `CHOOSE_AND_CLEAR_CONTROL_CONDITION`. It now aliases the existing generic `CHOOSE_AND_CLEAR_CONDITION` owner with the control slot forced and an exact-one default when count is omitted. Condition selection/mutation authority is unchanged.
+
+## V2.4.65 — server-only hidden-zone random sampling accepted
+
+The frozen Set One contains three `RANDOM_SAMPLE_HIDDEN_ZONE` consumers overall:
+- Shade — Duskstalker triggered Ability;
+- Shade — Umbravale — Thought Hunter active Ability;
+- Shade — False Memory Tactic.
+
+The shared primitive is intentionally **non-destructive** because Ability consumers inspect/sample without necessarily moving cards.
+
+New shared owner:
+`supabase/functions/_shared/tcg-match-hidden-zone-sample-v0-2.ts`
+
+It:
+- delegates random index generation to the authoritative v0.2 RNG owner;
+- samples without replacement;
+- never reorders or mutates the source hidden zone;
+- validates requested count and RNG indexes;
+- contains no visibility policy or card identity rules.
+
+### Tactic adapter
+False Memory's Tactic path is deliberately narrow and fail-closed:
+- opponent hand only;
+- exact count only for the frozen Tactic shape;
+- `rng_owner=match`;
+- `visibility=server_only`;
+- sampled instances are stored in private effect variables with source provenance;
+- the following generic `MOVE_CARDS` honors its structured `player` field and delegates physical movement by exact UIDs to Card-Zone;
+- the randomly sampled card becomes public only after the authoritative move reaches public Discard;
+- no browser RNG and no False Memory card-ID branch exist.
+
+The audit also corrected a generic `MOVE_CARDS` issue: no-selection movement now respects the declared `step.player` before fallback ownership, which is required for opponent-zone effects.
+
+### Validation
+TCG Card Pass 2 Validation **#1250 SUCCESS** on exact head `93c169b63423ef029bf7cbd071eb4e09c27bd74d`.
+
+The accepted gate covers:
+- all three frozen Tactic OPTIONAL consumers;
+- Yes / No / `else_steps` cursor semantics;
+- Quiet Step control-condition compatibility alias;
+- non-destructive hidden-zone sampler tests;
+- False Memory server-only provenance + Card-Zone movement source contracts;
+- Tactic Edge type-check;
+- exact Tactic dependency closure expanded **39 -> 40 files** for the new shared sampler.
+
+### Tactic IF closeout
+All six frozen Release 1 Tactic IF programs now have executable generic downstream paths:
+- Cyclone Route — OPTIONAL ✅
+- False Memory — RANDOM_SAMPLE_HIDDEN_ZONE + OPTIONAL ✅
+- Reversal Seal — ADD_SHIELD_EACH ✅
+- Surveyor Mina ✅
+- Recovery Spray ✅
+- Blackout Pulse — APPLY_CONDITION ✅
+
+The next Master Plan gate is **generic Attack IF execution across all 13 frozen Attack IF instances**.
 
