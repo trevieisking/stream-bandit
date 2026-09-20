@@ -292,3 +292,7 @@ A shared predicate tree does not automatically create shared leaf semantics. Rep
 
 ## 108 — Source Shield threshold is a shared state predicate
 source_has_shield_at_least means the source Creature's current Shield is at least the positive configured threshold. That semantic belongs to the shared Requirement evaluator; Attack, Ability and continuous owners may orchestrate it but must not redefine the comparison.
+
+
+## 109 — Tactic play requirements follow the frozen predicate grammar
+Release 1 structured Tactics use predicate records for play requirements. Compatibility-only uppercase operation names may be accepted as input, but they must translate into the same shared predicate semantics and may not remain a second rules path.
