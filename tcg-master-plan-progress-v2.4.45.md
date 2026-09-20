@@ -258,3 +258,21 @@ This overflow refinement is a readability detail inside the existing priority, n
 4. final board decoration only after the above passes.
 
 **V2.4.53 acceptance boundary:** source planning is complete only when progress/ledger/checklist/interaction-contract agree. Implementation is accepted only after Trevor/Kay prove on real devices that attached Essence orbs update correctly and Kay can physically drag/drop playable cards with a finger as well as use the tap fallback.
+
+
+## V2.4.53 implementation A — authoritative Essence rail source complete
+
+The first V2.4.53 implementation target is now present on the branch.
+
+- The shared card renderer owns one reusable Essence-orb primitive for both attached resources and Attack costs.
+- Battle derives attached resource units only from each Creature's authoritative `essence` instances plus the structured Essence `provides` definition already available to the viewer.
+- The renderer receives only derived `{ element, count }` presentation data; it does not decide attachment legality, payment or Attack legality.
+- Individual element orbs are rendered while the rail fits. The Battle controller measures the actual rendered rail against its allocated card width and switches to counted-per-element mode only when the rail would overflow.
+- Different elements remain separate in counted mode.
+- Removing an attachment naturally removes its contribution because every Battle refresh rebuilds the rail from the latest authoritative Creature state.
+- Attack costs now use the same element-orb identity system, so required Essence and attached Essence are visually comparable.
+- Existing HP / Shield / numeric Essence companion status remains during this pass.
+- A browser-transport regression fixture now proves a successful authoritative `attach_essence` refresh changes the Creature from no rail to an Astral Essence rail.
+- Human desktop/mobile readability remains pending and no promotion is implied.
+
+Next implementation target after this source slice validates is **phone/tablet pointer-driven hand-card drag/drop**, while preserving the existing tap-select fallback and exact server action payloads.
