@@ -92,3 +92,4 @@ button.sb-card-rule:hover,button.sb-card-rule:focus-visible{
  outline:none;background:linear-gradient(90deg,rgba(58,208,255,.08),rgba(99,255,214,.08));
 }
 button.sb-card-rule:disabled{cursor:not-allowed}
+button.sb-card-rule[aria-disabled="true"]{cursor:help}
