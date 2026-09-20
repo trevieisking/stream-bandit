@@ -835,7 +835,7 @@ export type RuntimeV02AttackSelectedHealChoice = {
   phase: "after_damage";
   selection: {
     controller: "self";
-    zone: "field";
+    zone: "field" | "reserve";
     count: 1;
     filters: { damaged: true };
     as: string;
@@ -848,8 +848,9 @@ export type RuntimeV02AttackSelectedHealChoice = {
 
 /**
  * Owns only the deterministic structured after-damage choice program:
- * SELECT_CREATURE(self, field, exactly one damaged creature) followed by
- * HEAL $selected. It describes the choice but deliberately does not select or
+ * SELECT_CREATURE(self, field|reserve, exactly one damaged creature) followed by
+ * HEAL $selected. The zone stays part of the descriptor so the choice owner can
+ * preserve a Reserve-only selector without adding card-specific routing. It describes the choice but deliberately does not select or
  * heal a target; the revision-checked attack-choice owner performs that work.
  *
  * Mixed programs and other selectors remain outside this owner. Marked v0.2
@@ -897,7 +898,8 @@ export function structuredRuntimeAfterDamageSelectedHealChoice(
   if (String(select.controller || "") !== "self") {
     throw new Error(`tcg_v0_2_attack_selected_heal_controller_unsupported:${attackId}`);
   }
-  if (String(select.zone || "") !== "field") {
+  const selectionZone = String(select.zone || "");
+  if (selectionZone !== "field" && selectionZone !== "reserve") {
     throw new Error(`tcg_v0_2_attack_selected_heal_zone_unsupported:${attackId}`);
   }
   if (Number(select.count) !== 1 || !Number.isInteger(Number(select.count))) {
@@ -935,7 +937,7 @@ export function structuredRuntimeAfterDamageSelectedHealChoice(
     phase: "after_damage",
     selection: {
       controller: "self",
-      zone: "field",
+      zone: selectionZone as "field" | "reserve",
       count: 1,
       filters: { damaged: true },
       as: variable,
