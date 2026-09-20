@@ -488,4 +488,15 @@ Attached-Essence-count and attached-Essence-kind RECORD_EVENT predicates are gen
 
 ## 174 — Specialized Attack flows migrate by consuming generic evidence
 A specialized effect owner may remain responsible for its mutation while its IF/event decision moves onto shared predicate/event evidence. Migration must not duplicate the mutation path.
+## 175 — Conditional Attack Condition programs have one generic IF-to-Condition owner
+Nested after-damage programs composed only of IF / APPLY_CONDITION / REPLACE_CONTROL_CONDITION use one generic owner. Mixed effect families remain with their own owners until migrated.
+
+## 176 — Attack Condition mutation is protection-aware
+Generic conditional Attack Conditions use applyRuntimeConditionWithContext, preserving Condition immunity/protection and source/controller context instead of bypassing the shared Condition lifecycle.
+
+## 177 — Direct and conditional Condition ownership are mutually exclusive
+The existing direct structured Condition owner has first claim. The conditional IF owner runs only when direct ownership returns null. Printed-English compatibility runs only when both structured owners return null.
+
+## 178 — Chainstorm consumes shared declaration evidence
+Chainstorm's event_occurred(current_action) predicate reads the action-local event map created by the generic declaration owner. Its card identity does not own event detection.
 
