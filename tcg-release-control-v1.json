@@ -1,7 +1,7 @@
 {
   "schema": "stream-bandit-tcg-release-control-v1",
   "control_revision": 1,
-  "recorded_at": "2026-09-16",
+  "recorded_at": "2026-09-20",
   "purpose": "Non-self-referential source, deployment, merge, rollback and progress checkpoint for the Stream Bandit TCG private-alpha baseline.",
   "authority": {
     "desired_behavior": "tcg-master-plan-progress.md",
@@ -88,8 +88,8 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "b2eba0e02a948a920cf151b849189fd61dd3a86a",
-        "file_count": 84,
+        "entrypoint_git_blob_sha": "f000fcb4ba4c4a6589fd86100ec8e0a5adc72718",
+        "file_count": 85,
         "closure_sha256": "cbb2633f126c1993f291dcc81c96503bec7714315f8e827774b5cfe8488b9893",
         "files": [
           {
@@ -146,7 +146,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-authority-v0-2.ts",
-            "git_blob_sha": "93794bc381c0c7fbdd1d0162a0959a0209a2f8d8"
+            "git_blob_sha": "ee0ab7e0911083008626ff3571ee24c7aefbb6ee"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-card-choice-v0-2.ts",
@@ -154,7 +154,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-choice-v0-2.ts",
-            "git_blob_sha": "488bbaf37659219b8936a20f8a1a89e86e55b8cf"
+            "git_blob_sha": "73ae7c24870359ddcd36e39d609a11720068b577"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-conditional-add-evaluator-v0-2.ts",
@@ -178,7 +178,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
-            "git_blob_sha": "4bd8492cd82943e89d88108ae801460b4dfa42f6"
+            "git_blob_sha": "1e37c7833d5c86ed1e49f4cf2aea65fdbf025295"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-formula-v0-2.ts",
@@ -210,7 +210,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-v0-2.ts",
-            "git_blob_sha": "d5c7cd0f8b0c0bca7205470a716700447e974182"
+            "git_blob_sha": "8a0250ee68797259e3569fd8e6db282c13c46da1"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-card-cost-choice-v0-2.ts",
@@ -274,7 +274,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-engine-v0-2.ts",
-            "git_blob_sha": "05c13dc92fee0fe8b9c583a07f7aed39d835621a"
+            "git_blob_sha": "93f7f955c22a892f6c9a988084023a7276e472ff"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-event-v0-2.ts",
@@ -307,6 +307,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
             "git_blob_sha": "0253d39ba21b3bf36b141fbecac4bdbbe952fd19"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-evolution-legality-v0-2.ts",
+            "git_blob_sha": "2ada01bfd3187603480b3ef19826380c7e982487"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-flow-engine-v0-2.ts",
@@ -390,7 +394,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-relic-engine-v0-2.ts",
-            "git_blob_sha": "6e9e1435519a77794a4f999ab5a4b1a70fe5a759"
+            "git_blob_sha": "51252d5845edb7cafc6978e93d71d0fb0818786a"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
@@ -422,7 +426,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "b2eba0e02a948a920cf151b849189fd61dd3a86a"
+            "git_blob_sha": "f000fcb4ba4c4a6589fd86100ec8e0a5adc72718"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
