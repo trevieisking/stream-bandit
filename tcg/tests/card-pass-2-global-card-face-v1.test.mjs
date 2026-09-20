@@ -54,7 +54,7 @@ const sandbox={window:{},document:{baseURI:'https://example.invalid/'},URL};
 vm.runInNewContext(source,sandbox,{filename:'stream-bandit-tcg-card-renderer-v2-4-51.js'});
 const renderer=sandbox.window.StreamBanditTCGCardRendererV2451;
 assert.ok(renderer);
-assert.equal(renderer.version,'2.4.53');
+assert.equal(renderer.version,'2.4.55');
 
 const orbit=registry.records.find(x=>x.card_id==='astral-orbitortoise');
 assert.ok(orbit);
@@ -63,6 +63,10 @@ for(const token of ['HP</small><strong>170','Orbitortoise','Astral','Forecast Sh
   assert.ok(orbitHtml.includes(token),`Orbitortoise face missing ${token}`);
 }
 assert.ok(!orbitHtml.includes('data-card-intent="ability"'),'triggered Ability must not become a manual button');
+
+const inspectHtml=renderer.renderCard(orbit,{mode:'inspect'});
+assert.ok(inspectHtml.includes('sb-card-face--inspect'),'inspect mode must use the canonical readable inspection face');
+assert.ok(inspectHtml.includes('Orbit Bash')&&inspectHtml.includes('Gravity Shell'),'inspect mode must retain all structured move rows');
 
 const essenceRailHtml=renderer.renderCard(orbit,{
   mode:'battle',
@@ -125,5 +129,8 @@ assert.ok(battleController.includes('required > available'));
 const presentation=read('stream-bandit-tcg-product-presentation-v2-4-46.js');
 assert.ok(presentation.includes('data-sb-tcg-render-card'));
 assert.ok(presentation.includes('StreamBanditTCGCardRendererV2451'));
+assert.ok(presentation.includes('data-sb-tcg-inspect-card'));
+assert.ok(presentation.includes("renderCard(cardId,{mode:'inspect'})"));
+assert.ok(presentation.includes('function bindInspection(owner)'));
 
 console.log('Global card face v1 PASS: 193 identities, shared card renderer, Ability/Attack readiness and attached Essence-orb presentation verified.');
