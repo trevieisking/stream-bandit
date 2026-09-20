@@ -25,6 +25,20 @@ export type RuntimeV02SourceHasShieldAtLeastRequirementEvaluation = {
   actual_shield: number;
 };
 
+export type RuntimeV02ReserveCountAtLeastRequirement = {
+  predicate: "reserve_count_at_least";
+  controller: string;
+  count: number;
+};
+
+export type RuntimeV02ReserveCountAtLeastRequirementEvaluation = {
+  predicate: "reserve_count_at_least";
+  matched: boolean;
+  controller: string;
+  required_count: number;
+  actual_count: number;
+};
+
 export type RuntimeV02DamageHistoryCountRequirement = {
   predicate: "damage_history_count_at_least";
   target: "$source_creature";
@@ -98,6 +112,52 @@ function validatedContext(
       "tcg_v0_2_requirement_damage_history_source_uid_required",
     ),
     source_controller_seat: value.source_controller_seat,
+  };
+}
+
+export function normalizeRuntimeV02ReserveCountAtLeastRequirement(
+  raw: unknown,
+): RuntimeV02ReserveCountAtLeastRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_reserve_count_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate", "controller", "count"],
+    "tcg_v0_2_requirement_reserve_count_field_unsupported",
+  );
+  if (value.predicate !== "reserve_count_at_least") {
+    throw new Error("tcg_v0_2_requirement_reserve_count_predicate_invalid");
+  }
+  const controller = value.controller == null
+    ? "self"
+    : requiredString(
+      value.controller,
+      "tcg_v0_2_requirement_reserve_count_controller_invalid",
+    );
+  return {
+    predicate: "reserve_count_at_least",
+    controller,
+    count: positiveInteger(
+      value.count,
+      "tcg_v0_2_requirement_reserve_count_threshold_invalid",
+    ),
+  };
+}
+
+export function evaluateRuntimeV02ReserveCountAtLeastRequirement(
+  reserve: unknown,
+  rawRequirement: RuntimeV02ReserveCountAtLeastRequirement,
+): RuntimeV02ReserveCountAtLeastRequirementEvaluation {
+  const requirement = normalizeRuntimeV02ReserveCountAtLeastRequirement(rawRequirement);
+  if (!Array.isArray(reserve)) {
+    throw new Error("tcg_v0_2_requirement_reserve_count_zone_invalid");
+  }
+  const actual = reserve.filter(Boolean).length;
+  return {
+    predicate: "reserve_count_at_least",
+    matched: actual >= requirement.count,
+    controller: requirement.controller,
+    required_count: requirement.count,
+    actual_count: actual,
   };
 }
 
