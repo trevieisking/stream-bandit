@@ -288,7 +288,7 @@ Deno.test("the turn-scoped listener becomes available again only with new-turn d
   assertEquals(next.damage, 70);
 });
 
-Deno.test("a mixed or nested current-attack modifier program fails closed", () => {
+Deno.test("triggered Ability IF source_damaged gates the current-attack modifier without spending the limit when false", () => {
   const match = state({
     sourceSteps: [{
       op: "IF",
@@ -296,10 +296,55 @@ Deno.test("a mixed or nested current-attack modifier program fails closed", () =
       then: [{ op: "MODIFY_CURRENT_ATTACK_DAMAGE", delta: 20 }],
     }],
   });
-  assertThrows(
-    () => runtimeV02ResolveAttackDeclaredDamageListeners(match, input()),
-    "tcg_v0_2_attack_declared_listener_program_unsupported",
+  const first = runtimeV02ResolveAttackDeclaredDamageListeners(match, input());
+  if (!first) throw new Error("structured attack-declared result required");
+  assertEquals(first.damage_delta, 0);
+  assertEquals(first.applications, []);
+
+  (match.players as any)["1"].vanguard.damage = 10;
+  const second = runtimeV02ResolveAttackDeclaredDamageListeners(
+    match,
+    input({ action_id: "attack-action-2" }),
   );
+  if (!second) throw new Error("structured attack-declared result required");
+  assertEquals(second.damage_delta, 20);
+  assertEquals(second.damage, 70);
+  assertEquals(second.applications[0].limit_consumed, true);
+});
+
+Deno.test("triggered Ability IF can read authoritative attack-target damage", () => {
+  const match = state({
+    sourceSteps: [{
+      op: "IF",
+      when: { predicate: "event_attack_target_damaged" },
+      then: [{ op: "MODIFY_CURRENT_ATTACK_DAMAGE", delta: 10 }],
+    }],
+  });
+  (match.players as any)["2"].vanguard.damage = 30;
+  const result = runtimeV02ResolveAttackDeclaredDamageListeners(match, input());
+  if (!result) throw new Error("structured attack-declared result required");
+  assertEquals(result.damage_delta, 10);
+  assertEquals(result.damage, 60);
+});
+
+Deno.test("triggered Ability IF any-composition reads authoritative target Condition state", () => {
+  const match = state({
+    sourceSteps: [{
+      op: "IF",
+      when: {
+        any: [
+          { predicate: "event_attack_target_has_condition", condition: "Venomed" },
+          { predicate: "event_attack_target_has_condition", condition: "Rooted" },
+        ],
+      },
+      then: [{ op: "MODIFY_CURRENT_ATTACK_DAMAGE", delta: 10 }],
+    }],
+  });
+  (match.players as any)["2"].vanguard.conditions.venomed = 10;
+  const result = runtimeV02ResolveAttackDeclaredDamageListeners(match, input());
+  if (!result) throw new Error("structured attack-declared result required");
+  assertEquals(result.damage_delta, 10);
+  assertEquals(result.damage, 60);
 });
 
 Deno.test("legacy snapshots remain outside the structured current-attack owner", () => {
