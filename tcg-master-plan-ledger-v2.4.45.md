@@ -330,3 +330,10 @@ A Tactic/event requirement that names `previous_opponent_turn` delegates to shar
 
 ## 119 — Tactic play requirements are structurally complete before program execution
 The frozen Release 1 registry contains 18 Tactics with explicit play requirements. Their current families — reserve count, legal card availability and event occurrence — now resolve through shared owners. This does not imply every Tactic program opcode is implemented; program execution remains the next independent gate.
+
+
+## 120 — Tactic IF is control flow, not effect authority
+The Tactic interpreter may evaluate a shared predicate tree and splice the chosen then/else steps into its existing effect cursor. IF itself does not own Shield, Condition, hidden sampling or Optional-choice mutation. Those downstream operations remain with their rightful owners and must fail closed until implemented.
+
+## 121 — A green IF does not imply every IF card is complete
+A Release 1 Tactic with a working IF predicate is still incomplete when its selected branch contains an unsupported opcode. Current post-IF blockers are Cyclone Route OPTIONAL, False Memory RANDOM_SAMPLE_HIDDEN_ZONE, Reversal Seal ADD_SHIELD_EACH and Blackout Pulse APPLY_CONDITION. Surveyor Mina and Recovery Spray have no remaining downstream IF-branch opcode gap.
