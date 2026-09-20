@@ -95,10 +95,10 @@ test('End Turn is a browser control for the existing tcg-match-actions lifecycle
   assert.match(controller, /await callEdge\(API_MATCH, actionBase\('end_turn'\)\)/);
 });
 
-test('phone setup selection scrolls toward the canonical destination instead of hiding it behind the hand', () => {
-  assert.match(controller, /window\.matchMedia\('\(max-width: 640px\), \(hover: none\) and \(pointer: coarse\)'\)\.matches/);
-  assert.match(controller, /const target = hasVanguard \? \$\('youReserve'\) : \$\('youVanguardSlot'\)/);
-  assert.match(controller, /target\.scrollIntoView\(\{ behavior: 'smooth', block: 'center' \}\)/);
+test('phone setup keeps destinations visible and scrolls only the horizontal hand rail', () => {
+  assert.doesNotMatch(controller, /scrollIntoView\(/);
+  assert.match(controller, /Setup destinations remain visible in the one-viewport tabletop/);
+  assert.match(battle, /\.sb-hand\{[\s\S]*?overflow-x:auto;overflow-y:hidden/);
 });
 
 test('browser setup guidance does not replace the server legality owner', () => {
