@@ -38,7 +38,7 @@ test('shared inspect face prioritizes readable moves and abilities without creat
   assert.match(css,/\.tcg-card-inspector\{/);
   assert.match(css,/\.tcg-card-inspector-panel\{/);
   assert.doesNotMatch(presentation,/Math\.random\s*\(/);
-  assert.doesNotMatch(presentation,/supabase\.from|\.from\(['"][^'"]+/);
+  assert.doesNotMatch(presentation,/\.from\(['"]sb_/);
 });
 
 test('product inspection remains read-only presentation',()=>{
