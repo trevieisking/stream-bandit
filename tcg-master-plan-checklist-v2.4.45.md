@@ -280,6 +280,7 @@
 - [x] Migrate existing Event Listener boolean composition onto the shared predicate-tree owner without changing leaf semantics. **Card Pass #1149 PASS** with exact Edge closure fingerprints refreshed.
 - [ ] Build/reuse shared Release 1 predicate leaf semantics where multiple runtime families need the same meaning.
 - [x] First shared leaf consolidation: source_damaged now has one Requirement-evaluator meaning reused by Active Ability and Attack IF; **Card Pass #1155 PASS**.
+- [x] Shared source_has_shield_at_least meaning added to the Requirement evaluator and reused by Attack IF; **Card Pass #1163 PASS**.
 - [ ] Wire generic IF through Tactic execution for every Release 1 Tactic IF shape.
 - [ ] Wire generic IF through Attack execution for every Release 1 Attack IF shape.
 - [ ] Wire generic IF through Active/triggered Ability execution for every Release 1 Ability IF shape.
