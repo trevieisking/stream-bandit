@@ -44,7 +44,9 @@ test('wide battle card fit is viewport-driven and does not depend on mouse point
   assert.doesNotMatch(battle, /@media\(min-width:641px\) and \(hover:hover\) and \(pointer:fine\)/);
   assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{[\s\S]*?width:min\(var\(--card-w\),10\.36dvh\);[\s\S]*?height:auto/);
   assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?width:min\(var\(--active-w\),11\.79dvh\);[\s\S]*?height:auto/);
-  assert.match(battle, /\.sb-card-control-shell\.is-selected\{[\s\S]*?width:min\(330px,33vw,40dvh\)/);
+  assert.match(battle, /\.sb-card-control-shell\.is-selected\{[\s\S]*?position:relative/);
+  assert.match(battle, /\.sb-card-inspector-panel\{[\s\S]*?width:min\(330px,33vw,40dvh\)/);
+  assert.match(battle, /\.sb-card-inspector\{display:none!important\}/);
   assert.match(battle, /Phone\/coarse layout below remains the later override/);
 });
 
