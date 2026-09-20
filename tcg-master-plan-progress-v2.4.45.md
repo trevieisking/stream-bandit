@@ -796,4 +796,53 @@ Different effect families may use distinct visual treatments, but all remain dri
 ### Acceptance boundary
 
 V2.4.59 is now part of Release 1 presentation acceptance. A rule/effect may be server-correct but still fail the player-facing gate if its important resolution is effectively invisible.
+## V2.4.60 — video-comparison interaction grammar + Presentation Choreography architecture
+
+The most recent Stream Bandit Trevor/Kay recordings were compared with the two external TCG/Pokémon interaction-reference recordings already retained in the Battle interaction authority.
+
+Detailed comparison: `tcg-video-interaction-comparison-v1.md`.
+
+### Design conclusion
+
+The useful lesson from the external TCG footage is **interaction grammar, not game design**.
+
+Stream Bandit should keep its own:
+- card frame and artwork;
+- eight launch elements;
+- Vanguard / Reserve / Reward / Realm vocabulary;
+- structured 193-card rules;
+- existing authoritative Match, Card-Zone, RNG, Hidden Information, Attack, Ability, Condition, Essence, Payment, Defeat/Reward and other engines.
+
+What should become similar is the player's ability to **see and understand the authoritative result**:
+- whole stable tabletop at normal zoom;
+- compact board cards + full inspection on demand;
+- bottom-edge physical hand;
+- legal-target highlighting;
+- visible card travel between zones;
+- focused card-selection overlays;
+- obvious Attack/Ability source -> target -> impact -> result order;
+- face-down physical representation of hidden zones;
+- mobile gesture parity without a mobile rules engine.
+
+### New presentation owner
+
+V2.4.60 defines one reusable **Battle Presentation / Choreography Engine**.
+
+It consumes authoritative events/state deltas/pending choices/result envelopes and emits disposable presentation cues. It owns no legality or gameplay mutation.
+
+Its reusable presentation families are:
+1. **Zone Motion** — draw/deal/play/discard/return/Reward/evolve/switch/promotion/attach/remove/payment.
+2. **Choice Overlay** — server-bound N-of-M Reward/search/target/optional/private choices.
+3. **Combat / Ability FX** — source activation, target focus, payment, travel/wind-up, impact, damage, Shield, heal, Condition, listener, defeat, Reward and continuation.
+4. **Deck / Hidden-Zone Presentation** — face-down Deck, shuffle, opponent hand, Rewards, public Discard and viewer-specific reveal.
+5. **Stable Inspector** — readable canonical copy while the source stays anchored.
+6. **Pacing / Recovery** — reduced motion and immediate convergence on the newest authoritative snapshot.
+
+### Video-derived priority
+
+The next presentation build should not be isolated decorative effects. It should implement the generic choreography owner first, then bind Release 1 events to it.
+
+That preserves extensibility for future cards, moves, Abilities, Conditions, rules and new sets while preventing hundreds of per-card animations.
+
+External footage remains interaction reference only; no Pokémon artwork, branding, card designs, names or proprietary assets are to be copied.
 
