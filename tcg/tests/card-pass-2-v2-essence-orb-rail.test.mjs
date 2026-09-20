@@ -88,7 +88,9 @@ function matchView(revision,attached){
 
 function makeHarness(){
   const nodes=new Map();
+  let authoritativeAttached=false;
   const document={
+    rails:[],
     baseURI:'https://example.test/tcg-battle-v2.html',
     playHandCards:[],
     getElementById(id){if(!nodes.has(id))nodes.set(id,new FakeNode(id,document));return nodes.get(id);},
@@ -119,13 +121,14 @@ function makeHarness(){
     requests.push({url:String(url),payload});
     if(String(url).endsWith('/functions/v1/tcg-private-alpha-api')){
       viewCalls+=1;
-      return {ok:true,status:200,async json(){return {ok:true,view:matchView(viewCalls>1?18:17,viewCalls>1)};}};
+      return {ok:true,status:200,async json(){return {ok:true,view:matchView(viewCalls>1?18:17,authoritativeAttached)};}};
     }
     if(String(url).endsWith('/functions/v1/tcg-match-actions')){
       if(payload.action==='field_actions'){
         return {ok:true,status:200,async json(){return {ok:true,result:{ability_sources:[],attacks:[],withdraw:{eligible:false}}};}};
       }
       if(payload.action==='attach_essence'){
+        authoritativeAttached=true;
         return {ok:true,status:200,async json(){return {ok:true,result:{ok:true}};}};
       }
     }
@@ -139,7 +142,12 @@ function makeHarness(){
   vm.runInNewContext(rendererSource,context,{filename:'stream-bandit-tcg-card-renderer-v2-4-51.js'});
   vm.runInNewContext(controller,context,{filename:'stream-bandit-tcg-v2-battle-controller.js'});
   assert.equal(typeof domReady,'function');
-  return {document,nodes,requests,async boot(){await domReady();}};
+  return {
+    document,nodes,requests,
+    controllerApi:window.StreamBanditTCGV2BattleController,
+    setAuthoritativeAttached(value){authoritativeAttached=!!value;},
+    async boot(){await domReady();}
+  };
 }
 
 test('authoritative Essence attachment appears as an element orb on refreshed Creature card',async()=>{
@@ -166,4 +174,30 @@ test('authoritative Essence attachment appears as an element orb on refreshed Cr
   assert.match(after,/data-essence-element="Astral"/);
   assert.match(after,/data-essence-count="1"/);
   assert.match(after,/Essence <strong>1<\/strong>/);
+
+  h.setAuthoritativeAttached(false);
+  await h.controllerApi.refresh();
+  const removed=h.nodes.get('youVanguard').innerHTML;
+  assert.doesNotMatch(removed,/data-essence-rail/,'authoritative removal must remove the visual rail on refresh');
+  assert.match(removed,/Essence <strong>0<\/strong>/);
+});
+
+
+test('Essence rail compression is driven by rendered overflow and can expand again',async()=>{
+  const h=makeHarness();
+  const rail={
+    clientWidth:80,
+    classList:new FakeClassList(),
+    querySelector(selector){
+      if(selector==='[data-essence-expanded]')return {scrollWidth:120};
+      return null;
+    }
+  };
+  h.document.rails=[rail];
+  await h.boot();
+  assert.equal(rail.classList.contains('is-compressed'),true,'rail wider than available card space must compress');
+
+  rail.querySelector=(selector)=>selector==='[data-essence-expanded]'?{scrollWidth:60}:null;
+  await h.controllerApi.refresh();
+  assert.equal(rail.classList.contains('is-compressed'),false,'rail must expand again when authoritative presentation fits');
 });
