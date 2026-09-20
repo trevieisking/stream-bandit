@@ -661,3 +661,22 @@ Discard-zone Basic Essence checks continue through the existing card selector.
 TCG Card Pass 2 Validation **#1179 PASS** on exact fingerprinted source head 0ee6c1dd96660cfde3927b339cdcf5b9b1910839.
 
 Seventeen of the eighteen frozen Tactics with explicit play requirements are now covered by their current structured requirement family. The final one is Stone — Reversal Seal using event_occurred for a creature defeat during the previous opponent turn.
+
+
+## V2.4.57 implementation G — canonical turn-owner history
+
+Stone — Reversal Seal requires an event from the previous opponent turn. Release 1 also contains Astral Celestyr — Dream Cartographer with TIMEFOLD, so previous opponent turn cannot safely mean current turn minus one once extra turns exist.
+
+Added a canonical append-only turn-owner history used by Match Flow:
+- opening playable turn records its owner;
+- ordinary turn advance records the new owner;
+- deckout turn start records the new owner before terminal evaluation;
+- repeated same turn/owner writes are idempotent;
+- conflicting ownership and out-of-order insertion fail closed;
+- legacy private-alpha states without explicit history reconstruct ordinary alternating ownership from first_player_seat.
+
+The previous-opponent query walks explicit ownership history rather than subtracting a turn number. A test proves turn ownership 1 → 2 → 1 → 1 resolves Player 1's previous opponent turn as turn 2.
+
+TCG Card Pass 2 Validation **#1189 PASS** on exact source head b30cc8baee0bef938c7a764f37c7319d138fd52b.
+
+Next target: shared event_occured/event history evaluation for Stone — Reversal Seal using this canonical window owner.
