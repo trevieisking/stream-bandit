@@ -40,8 +40,8 @@ Deno.test("turn history appends canonical ownership and is idempotent for the sa
   equal(runtimeV02TurnOwnerAt(state, 2), 2);
 });
 
-Deno.test("turn history rejects conflicting or out-of-order ownership", () => {
-  const state: Record<string, unknown> = {
+Deno.test("turn history rejects conflicting or genuinely out-of-order ownership", () => {
+  const conflictState: Record<string, unknown> = {
     first_player_seat: 1,
     turn_seq: 2,
     turn_owner_history: [
@@ -50,11 +50,20 @@ Deno.test("turn history rejects conflicting or out-of-order ownership", () => {
     ],
   };
   throws(
-    () => runtimeV02RecordTurnOwner(state, 2, 1),
+    () => runtimeV02RecordTurnOwner(conflictState, 2, 1),
     "tcg_v0_2_turn_history_owner_conflict",
   );
+
+  const gapState: Record<string, unknown> = {
+    first_player_seat: 1,
+    turn_seq: 3,
+    turn_owner_history: [
+      { turn_seq: 1, active_seat: 1 },
+      { turn_seq: 3, active_seat: 1 },
+    ],
+  };
   throws(
-    () => runtimeV02RecordTurnOwner(state, 1, 1),
+    () => runtimeV02RecordTurnOwner(gapState, 2, 2),
     "tcg_v0_2_turn_history_append_only",
   );
 });
