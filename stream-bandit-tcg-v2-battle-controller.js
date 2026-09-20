@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.8';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.9';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -28,11 +28,41 @@
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[char]));
 
+  function friendlyErrorMessage(message) {
+    const raw = String(message || '');
+    const code = raw.split(':')[0];
+    const messages = {
+      manual_essence_already_used_this_turn: 'You can manually attach only 1 Essence each turn.',
+      attack_essence_cost_not_met: 'That Creature does not have enough attached Essence for this attack.',
+      first_player_cannot_attack_on_first_personal_turn: "The first player can't attack on their first turn.",
+      not_active_player: 'Wait for your turn before playing that action.',
+      evolution_locked_on_first_personal_turn: "You can't evolve on your first turn.",
+      stack_entered_or_evolved_this_turn: "That Creature entered play or evolved this turn, so it can't evolve again yet.",
+      creature_already_has_relic: 'That Creature already has a Relic attached.',
+      realm_already_played_this_turn: 'You have already played a Realm this turn.',
+      same_named_realm_cannot_replace_itself: 'That Realm cannot replace another copy of itself.',
+      stunned_cannot_attack: 'This Vanguard is Stunned and cannot attack.',
+      attack_requirements_not_met: "This attack's requirements are not met.",
+      legal_attack_target_required: 'That attack has no legal target right now.',
+      legal_opposing_reserve_target_required: 'Choose a legal opposing Reserve target for this attack.',
+      match_already_complete: 'This match has already ended.',
+      tcg_v0_2_attack_legacy_compatibility_required: "That attack's structured effect is not ready in this battle build yet."
+    };
+    return messages[code] || 'That action could not be completed. Try another legal move.';
+  }
+
   function setStatus(message, kind) {
     const node = $('battleStatus');
     if (!node) return;
+    const raw = String(message == null ? '' : message);
     node.dataset.kind = kind || 'info';
-    node.textContent = message;
+    if (kind === 'error') {
+      node.dataset.errorCode = raw;
+      node.textContent = friendlyErrorMessage(raw);
+    } else {
+      delete node.dataset.errorCode;
+      node.textContent = raw;
+    }
   }
 
   function shellConfig() {
@@ -248,6 +278,13 @@
     return SETUP_RECIPES.has(recipeType(instance));
   }
 
+  function touchPrimaryInput() {
+    return !!(
+      window.matchMedia &&
+      window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches
+    );
+  }
+
   function activePlayTurn(view) {
     return !!(
       view &&
@@ -298,6 +335,80 @@
     const instance = selectedHandInstance();
     const definition = instance ? (legacyDefinition(instance) || {}) : {};
     return instance ? String(definition.name || instance.card_id || 'Selected card') : '';
+  }
+
+  function cardNameById(cardId) {
+    const view = viewState();
+    const row = view && view.card_index ? view.card_index[String(cardId || '')] : null;
+    const structured = row && row.definition_v0_2 ? row.definition_v0_2 : null;
+    const legacy = row ? (row.definition || row) : null;
+    return String((structured && structured.name) || (legacy && legacy.name) || cardId || 'Creature');
+  }
+
+  function formatAttackCost(attack) {
+    if (!attack || !Array.isArray(attack.cost)) return '';
+    return attack.cost.map((part) => {
+      const amount = Number(part && part.amount);
+      const element = String(part && part.element || '');
+      return (Number.isFinite(amount) ? amount : 0) + (element ? ' ' + element : '');
+    }).filter(Boolean).join(' + ');
+  }
+
+  function structuredAttackDamage(attack) {
+    if (!attack) return null;
+    if (Number.isFinite(Number(attack.base_damage))) return Number(attack.base_damage);
+    const formula = attack.damage_formula && typeof attack.damage_formula === 'object' ? attack.damage_formula : null;
+    if (formula && Number.isFinite(Number(formula.base))) return Number(formula.base);
+    if (Number.isFinite(Number(attack.damage))) return Number(attack.damage);
+    return null;
+  }
+
+  function selectedHandSummary() {
+    const instance = selectedHandInstance();
+    if (!instance) return '';
+    const structured = structuredDefinition(instance) || {};
+    const legacy = legacyDefinition(instance) || {};
+    const family = String(structured.card_family || legacy.card_family || legacy.kind || '');
+    if (family === 'Creature') {
+      const creature = structured.creature || {};
+      const parts = [];
+      if (creature.stage) parts.push(String(creature.stage) + ' Creature');
+      if (Number.isFinite(Number(creature.hp))) parts.push('HP ' + Number(creature.hp));
+      if (Number.isFinite(Number(creature.withdrawal))) parts.push('Withdraw ' + Number(creature.withdrawal));
+      if (creature.evolves_from_id) parts.push('Evolves from ' + cardNameById(creature.evolves_from_id));
+      if (creature.ability && creature.ability.name) {
+        parts.push('Ability: ' + String(creature.ability.name) + (creature.ability.mode ? ' (' + String(creature.ability.mode) + ')' : ''));
+      }
+      const attacks = Array.isArray(creature.attacks) ? creature.attacks : [];
+      if (attacks.length) {
+        parts.push('Attacks: ' + attacks.map((attack) => {
+          const cost = formatAttackCost(attack);
+          const damage = structuredAttackDamage(attack);
+          return String(attack.name || 'Attack') +
+            (cost ? ' — ' + cost : '') +
+            (damage == null ? '' : ' — ' + damage + ' damage');
+        }).join('; '));
+      }
+      return parts.join(' · ');
+    }
+    if (family === 'Essence') {
+      const essence = structured.essence || {};
+      const provides = Array.isArray(essence.provides)
+        ? essence.provides.map((part) => String(part.amount || 0) + ' ' + String(part.element || '')).join(' + ')
+        : '';
+      return [
+        String(essence.subtype || 'Essence') + ' Essence',
+        provides ? 'Provides ' + provides : '',
+        'Manual attachment: once per turn'
+      ].filter(Boolean).join(' · ');
+    }
+    if (family === 'Tactic') {
+      const tactic = structured.tactic || {};
+      const subtype = String(tactic.subtype || legacy.family || 'Tactic');
+      return subtype + ' Tactic · Tap Play ' + (subtype.toLowerCase() === 'realm' ? 'Realm' : 'Tactic') +
+        ' to resolve its server-owned effect';
+    }
+    return family || 'Card';
   }
 
   function ownCreatureAt(where, index) {
@@ -384,7 +495,8 @@
     return attacks.map((attack, index) => ({
       slot: Number(attack.slot || index + 1),
       name: String(attack.name || ('Attack ' + (index + 1))),
-      damage: Number.isFinite(Number(attack.damage)) ? Number(attack.damage) : null
+      cost: formatAttackCost(attack),
+      damage: structuredAttackDamage(attack)
     })).filter((attack) => attack.slot === 1 || attack.slot === 2);
   }
 
@@ -402,8 +514,9 @@
     const attackRows = attacks.map((attack) => (
       '<button type="button" class="sb-card-action" data-card-intent="attack" data-attack-slot="' + attack.slot + '"' +
       (canAct ? '' : ' disabled') + '>' +
-      '<span><strong>' + esc(attack.name) + '</strong><small>Attack ' + attack.slot + '</small></span>' +
-      '<span class="sb-damage">' + (attack.damage == null ? '—' : esc(attack.damage)) + '</span>' +
+      '<span><strong>' + esc(attack.name) + '</strong><small>' +
+      (attack.cost ? esc(attack.cost) + ' Essence · ' : '') + 'Attack ' + attack.slot + ' · ends turn</small></span>' +
+      '<span class="sb-damage">' + (attack.damage == null ? '—' : esc(attack.damage) + ' DMG') + '</span>' +
       '</button>'
     )).join('');
     const setupReturn = opts.setupReturn
@@ -444,7 +557,8 @@
     } else if (playPlayable) {
       attributes =
         ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') +
-        '" data-play-hand-uid="' + esc(uid) + '" data-play-intent="' + esc(playIntent) + '" draggable="true"';
+        '" data-play-hand-uid="' + esc(uid) + '" data-play-intent="' + esc(playIntent) +
+        '" draggable="' + (touchPrimaryInput() ? 'false' : 'true') + '"';
     }
     return '<article class="sb-tcg-card sb-hand-card' + classes + '" data-card-id="' + esc(cardId) + '"' + attributes + '>' +
       '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
@@ -652,9 +766,16 @@
     }
 
     if (phase === 'play') {
+      const selectedSummary = selectedHandSummary();
       const selectedCopy = yourTurn && selectedName
-        ? selectedName + ' selected — ' + playInstruction(selectedIntent)
-        : (yourTurn ? 'Select or drag a card from your hand, use your field controls, or pass.' : 'Your field stays synced while the opponent acts.');
+        ? selectedName + ' selected' +
+          (selectedSummary ? ' — ' + selectedSummary : '') +
+          ' — ' + playInstruction(selectedIntent)
+        : (yourTurn
+          ? (touchPrimaryInput()
+            ? 'Tap a card, read its details, then tap the glowing destination. Dragging is not required.'
+            : 'Click or drag a card from your hand, use your field controls, or pass.')
+          : 'Your field stays synced while the opponent acts.');
       const directButton = yourTurn && selectedHandUidSafe() && directHandIntent(selectedIntent)
         ? '<button type="button" class="sb-phase-action ready" data-play-direct="' + esc(selectedIntent) + '">' +
           (selectedIntent === 'play_realm' ? 'Play Realm' : 'Play Tactic') + '</button>'
@@ -747,7 +868,9 @@
           : (state.selectedHandUid ? 'Now tap an open Reserve slot.' : 'Add optional Reserves or confirm setup.');
       }
       else if (view.phase === 'opening_choice') help.textContent = 'Opening hand dealt by the server.';
-      else help.textContent = 'Select cards directly from your hand.';
+      else if (yourTurn && touchPrimaryInput()) help.textContent = 'Tap card → read details → tap the glowing destination. No dragging needed.';
+      else if (yourTurn) help.textContent = 'Click or drag a card, then use the highlighted destination.';
+      else help.textContent = 'Your hand stays visible while the opponent acts.';
     }
 
     if (state.busy) setStatus('Waiting for the authoritative server…', 'busy');
@@ -819,7 +942,7 @@
         state.selectedAnchorUid = '';
         state.overlayKey = '';
         render();
-        if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches) {
+        if (state.selectedHandUid && touchPrimaryInput()) {
           window.requestAnimationFrame(() => {
             const intent = selectedHandIntent();
             const target = intent === 'play_creature' ? $('youReserve') : $('youVanguardSlot');
@@ -908,7 +1031,7 @@
         state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
         state.overlayKey = '';
         render();
-        if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches) {
+        if (state.selectedHandUid && touchPrimaryInput()) {
           window.requestAnimationFrame(() => {
             const current = viewState();
             const hasVanguard = !!(current && current.you && current.you.vanguard);
