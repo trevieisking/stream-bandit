@@ -7,7 +7,10 @@ import {
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
-import { evaluateRuntimeV02SourceDamagedRequirement } from "./tcg-match-requirement-evaluator-v0-2.ts";
+import {
+  evaluateRuntimeV02SourceDamagedRequirement,
+  evaluateRuntimeV02SourceHasShieldAtLeastRequirement,
+} from "./tcg-match-requirement-evaluator-v0-2.ts";
 import {
   recordRuntimeV02AttackHealEachPackets,
   recordRuntimeV02AttackSelfHealPackets,
@@ -423,7 +426,7 @@ function selfHealConditionMatches(
   if (when.predicate === "source_damaged") {
     return evaluateRuntimeV02SourceDamagedRequirement(sourceCreature, when).matched;
   }
-  return Math.max(0, Number(sourceCreature.shield || 0)) >= when.value;
+  return evaluateRuntimeV02SourceHasShieldAtLeastRequirement(sourceCreature, when).matched;
 }
 
 function selfHealPacketContext(
