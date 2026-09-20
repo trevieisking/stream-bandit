@@ -231,3 +231,13 @@ test('rendered V2 card Attack click posts authoritative Attack payload and surfa
   const viewRequests = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-private-alpha-api'));
   assert.equal(viewRequests.length, 2, 'failed Attack must re-sync authoritative match state once after the initial load');
 });
+
+
+test('blocked Attack remains inspectable, explains insufficient Essence, and never disguises resolution timing', () => {
+  assert.match(cardRenderer, /data-attack-blocked-reason=/);
+  assert.match(cardRenderer, /Needs more matching Essence/);
+  assert.match(cardRenderer, /Turn ends after full resolution/);
+  assert.match(controller, /Attack blocked —/);
+  assert.match(controller, /Attach more matching Essence until the Attack cost orbs are covered/);
+  assert.match(controller, /if \(blockedReason\) \{[\s\S]*?setStatus\([\s\S]*?return;[\s\S]*?\}[\s\S]*?await runAttackIntent/);
+});
