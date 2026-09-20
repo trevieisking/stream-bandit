@@ -8,8 +8,30 @@ const match=fs.readFileSync('supabase/functions/tcg-match-actions/index.ts','utf
 const battle=fs.readFileSync('stream-bandit-tcg-v2-battle-controller.js','utf8');
 
 test('Slipwing Backdraft is the frozen conditional Reserve-switch Attack shape',()=>{
-  assert.match(gale,/"id":"gale-slipwing"/);
-  assert.match(gale,/"id":"backdraft","name":"Backdraft"[sS]*?"op":"IF","when":{"predicate":"reserve_count_at_least","controller":"self","count":1}[sS]*?"op":"SELECT_CREATURE","controller":"self","zone":"reserve","count":1,"filters":{},"as":"switch_target"[sS]*?"op":"SWITCH_WITH_VANGUARD","player":"self","target":"\$switch_target","action_kind":"attack"/);
+  const cards=[];
+  for(const match of gale.matchAll(/```json\\s*([\\s\\S]*?)```/g)){
+    cards.push(JSON.parse(match[1]));
+  }
+  const slipwing=cards.find((card)=>card.id==='gale-slipwing');
+  assert.ok(slipwing,'missing frozen Slipwing');
+  const backdraft=slipwing.creature?.attacks?.find((attack)=>attack.id==='backdraft');
+  assert.ok(backdraft,'missing frozen Backdraft');
+  assert.equal(backdraft.after_damage?.length,1);
+  const branch=backdraft.after_damage[0];
+  assert.equal(branch.op,'IF');
+  assert.deepEqual(branch.when,{predicate:'reserve_count_at_least',controller:'self',count:1});
+  assert.equal(branch.then?.[0]?.op,'SELECT_CREATURE');
+  assert.equal(branch.then?.[0]?.controller,'self');
+  assert.equal(branch.then?.[0]?.zone,'reserve');
+  assert.equal(branch.then?.[0]?.count,1);
+  assert.deepEqual(branch.then?.[0]?.filters,{});
+  assert.equal(branch.then?.[0]?.as,'switch_target');
+  assert.deepEqual(branch.then?.[1],{
+    op:'SWITCH_WITH_VANGUARD',
+    player:'self',
+    target:'$switch_target',
+    action_kind:'attack',
+  });
 });
 
 test('Attack Reserve switch owner delegates IF and movement to existing shared owners',()=>{
