@@ -845,4 +845,80 @@ The next presentation build should not be isolated decorative effects. It should
 That preserves extensibility for future cards, moves, Abilities, Conditions, rules and new sets while preventing hundreds of per-card animations.
 
 External footage remains interaction reference only; no Pokémon artwork, branding, card designs, names or proprietary assets are to be copied.
+## V2.4.61 — authoritative visual receipts + choreography foundation
+
+V2.4.60 established the interaction architecture. V2.4.61 begins the implementation with a deliberately inert foundation before any card-specific visual effect is allowed.
+
+### Source foundation
+
+New shared runtime contract:
+- `supabase/functions/_shared/tcg-match-presentation-envelope-v0-2.ts`
+- schema: `tcg-presentation-envelope-v1`
+- generic cue fields cover ordered effect family, source/target anchors, card-zone movement, state deltas, N-of-M choice metadata, continuation identity, viewer audience and presentation intensity;
+- viewer filtering removes seat-private cues before another player's client may receive them;
+- the schema has no legality evaluator, damage calculator, RNG seed, target chooser or mutation authority.
+
+New browser owner:
+- `stream-bandit-tcg-battle-presentation-v1.js`
+- one revision-bound disposable queue;
+- deterministic cue ordering;
+- duplicate `receipt_id` suppression so two-second polling cannot replay the same effect;
+- a newer authoritative revision invalidates stale queued choreography;
+- reduced-motion mode collapses timing while retaining cue order/information;
+- Battle loads the presentation owner before the existing authoritative controller;
+- the controller consumes future viewer-safe `view.presentation` envelopes and broadcasts generic presentation cues without creating gameplay state.
+
+New automated proofs:
+- Deno coverage for deterministic ordering, viewer filtering, invalid-family rejection and data-driven selection counts;
+- Node coverage for ordered queueing, duplicate-receipt suppression, stale-revision cancellation and Battle/controller integration.
+
+Source candidate before documentation sync: `28828717b301168920452e27f704ca212543eade`.
+TCG Card Pass 2 run #1221 is queued/pending for that exact source candidate and is not yet counted as a green checkpoint.
+
+### New design rules adopted from the comparison
+
+#### 1. Authoritative visual receipt instead of snapshot guessing
+The preferred long-term binding is for the authoritative action/continuation owner to project a small viewer-filtered visual receipt into each persisted player view at commit time.
+
+That receipt says **what actually happened**. The client must not attempt to deduce hidden searches, RNG, target legality or complex listener order by comparing two snapshots.
+
+#### 2. Three presentation intensity tiers
+Generic cues support:
+- **micro** — common rapid actions such as ordinary draw/attach/status tick;
+- **standard** — play/evolve/switch/Ability/ordinary Attack steps;
+- **hero** — decisive impact such as defeat, major Reward resolution, match-ending result or another explicitly projected pivotal event.
+
+Intensity changes pacing/emphasis only. It never changes gameplay order or outcome.
+
+#### 3. Stream Bandit element FX language
+Where a public effect has an element, the same generic effect family may receive an element skin:
+- Astral — stellar/orbit glyph motion;
+- Ember — heat/spark motion;
+- Gale — wind/arc motion;
+- Grove — growth/leaf/vine motion;
+- Shade — shadow/veil motion;
+- Stone — weight/shock/dust motion;
+- Tide — wave/ripple motion;
+- Volt — pulse/arc/electric motion.
+
+The element skin is presentation metadata, never a card-ID branch. Meaning must not depend on colour alone; glyph/shape/text/reduced-motion equivalents remain required.
+
+#### 4. Resolution ribbon / causal breadcrumb
+Complex chains may expose a compact temporary accessible breadcrumb generated from the same receipt queue, for example:
+
+`Attack → 80 damage → Stunned → Defeat → Reward 1`
+
+The ribbon is explanation only. It cannot create, delay or reorder the authoritative chain.
+
+#### 5. Private-choice mirror
+When one player is in a private search/choice, the opponent should receive a neutral public-safe cue such as “Opponent is choosing cards” or “Opponent is searching their deck” where the rules permit that fact to be public. No private identities/options are mirrored.
+
+#### 6. Animation backlog protection
+If polling/reconnect reveals a newer authoritative revision, stale choreography is disposable. Repeated low-importance micro cues may later be visually coalesced for pacing, but only after the full underlying authoritative result is already committed and represented.
+
+### Next implementation target
+
+After the foundation source receives a green exact-head gate, bind the canonical match commit/view path to viewer-filtered presentation receipts, beginning with the existing Attack result payload because it already owns source, target, damage/Shield result, pending choice, Defeat/Reward continuation and turn aftermath evidence.
+
+Visible DOM motion is intentionally **not** marked complete yet.
 
