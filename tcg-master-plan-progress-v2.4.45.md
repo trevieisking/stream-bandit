@@ -351,3 +351,16 @@ This closes every currently listed **automated** V2.4.52/V2.4.53 interaction gat
 - phone touch-drag transport + tap fallback through the same authoritative actions.
 
 The checklist update that records this PASS is documentation-only and creates one final exact head requiring routine validation. After that, the branch is at the mandatory **real two-device acceptance boundary**. No additional code claim may substitute for Trevor/Kay seeing these behaviors in an actual match.
+
+
+## Trevor/Kay human Battle checkpoint — first strike, KO proof and blocked-Attack clarity
+
+The real two-player test now proves several items that automation could not:
+- Trevor completed a legal Attack that visibly placed damage and defeated Kay's Creature — the first real KO is accepted evidence.
+- Explicit Quit Match/concession returned both players to the expected result/matchmaking flow.
+- A later Attack attempt was correctly blocked because the current Vanguard did not have enough matching Essence; the video shows this is a legitimate server-owned legality result rather than an Attack-engine failure.
+- The card copy **Ends Turn** was too terse: the authoritative lifecycle actually ends the turn only after the Attack's full resolution chain. Non-lethal damage goes straight to Aftermath/turn advance; lethal damage first performs Defeat -> Reward -> required promotion, then resumes that same end-turn continuation.
+- The desktop selected-card implementation physically moved the source Vanguard into a fixed overlay, producing the visible "jumping" Trevor reported. The source card now remains anchored and a separate stable inspector renders the same canonical card face for readable Attack/Ability interaction.
+- Blocked Attack rows remain inspectable and explain the projected reason without dispatching an Attack command.
+
+The remaining lethal acceptance gate is not the KO itself; it is the now-repaired visible **Reward selection -> Reward to hand -> required promotion -> automatic turn handoff** chain. Ability-ready human proof and the remaining phone gesture checks are still open. Main/live promotion remains on HOLD until those visible gates pass.
