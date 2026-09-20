@@ -421,4 +421,15 @@ The opponent may be told that a search/choice is in progress only when that fact
 
 ## 150 — Stale animation backlog is disposable
 A newer authoritative revision, reconnect or refresh may cancel old presentation cues. Repeated low-importance cues may be coalesced for pacing in a later visual layer, but the latest committed match snapshot and all rule outcomes remain complete and immediate.
+## 151 — Presentation receipts are created at the canonical commit boundary
+A successful Match mutation projects presentation from the same committed event type, public payload and authoritative post-mutation state immediately before player views are persisted. This is the single server receipt-maker boundary for Match actions.
+
+## 152 — Persisted player views receive separately filtered presentation
+Player 1 and Player 2 views are not given one unfiltered receipt to interpret locally. The server filters the receipt for each viewer first, preserving Hidden Information before persistence and transport.
+
+## 153 — Presentation dependency closure is release-controlled
+The presentation envelope and receipt-maker modules are part of the exact `tcg-match-actions` Edge dependency closure. Any future receipt dependency must update the release-control closure rather than bypassing or weakening the fingerprint guard.
+
+## 154 — Reversal Seal ADD_SHIELD_EACH is generic runtime capability, not a card exception
+Release 1 `ADD_SHIELD_EACH` resolves one-or-many Creature refs then delegates each actual Shield mutation to the existing Shield owner. Reversal Seal is a registry consumer of that generic operation and must not own a card-specific runtime branch.
 
