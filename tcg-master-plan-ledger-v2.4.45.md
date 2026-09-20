@@ -174,3 +174,10 @@ The counted-orb presentation has **no fixed Essence-number trigger**. Individual
 
 ## 073 — Compression counts each Essence type separately
 When compression is active, each element present receives its own orb and its own current numeric count. Different elements are never summed into one generic total. The displayed number is dynamic authoritative state, not a predetermined value or threshold. A prior use of `12` was an illustrative example only and is not a rule.
+
+
+## 074 — One shared element-orb primitive owns resource presentation
+Attached Essence and Attack cost presentation reuse the same generic element-orb renderer. Battle supplies authoritative attached-unit totals; the card renderer supplies only visual element identity and layout. No card-ID-specific Essence UI branch is permitted.
+
+## 075 — Essence compression is measured against rendered card width
+The implementation chooses expanded versus counted Essence presentation by comparing the expanded rail's rendered width with the rail's available card width. It does not use a gameplay count threshold. Every authoritative re-render recalculates the rail, so attachment removal can reduce the count or return the rail to individual-orb mode.
