@@ -90,7 +90,7 @@
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "f000fcb4ba4c4a6589fd86100ec8e0a5adc72718",
         "file_count": 86,
-        "closure_sha256": "d70a3d9abe3755a7d67e511f5cbfebd12d47ad9e5617db0c6fe495f8c6a64d4f",
+        "closure_sha256": "d8403b5c119db546f7730588319c0126ce060446260d6b583f84a46ddfbbae3b",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -178,7 +178,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
-            "git_blob_sha": "ef15dc3ae7fcc802bebf14ce371c3d9d78ca7b38"
+            "git_blob_sha": "d346f6b06a4ff255494a36b05f41b37e219576bf"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-formula-v0-2.ts",
@@ -402,7 +402,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
-            "git_blob_sha": "417fb3e883f7492de4b6b40afe29226f6cea117a"
+            "git_blob_sha": "11a3761f033c9246382266aa34336a4362e8d0d1"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts",
@@ -442,7 +442,7 @@
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "4fe4d9e0dc901ad8b35d43d67fc9645c4868c4e2",
         "file_count": 37,
-        "closure_sha256": "23c2dc76cdb8702ffc2e8e558a3db807068f008d2f5be062302de1334835b5fc",
+        "closure_sha256": "c3836bdc99f0e7a09d34e2cd6412d68b81184ebbbf54654f4c20c56d4717f762",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts",
@@ -562,7 +562,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
-            "git_blob_sha": "417fb3e883f7492de4b6b40afe29226f6cea117a"
+            "git_blob_sha": "11a3761f033c9246382266aa34336a4362e8d0d1"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts",
