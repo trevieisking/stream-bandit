@@ -15,6 +15,10 @@ import {
   normalizeRuntimeV02LegalCardAvailableRequirement,
   normalizeRuntimeV02ReserveCountAtLeastRequirement,
 } from "../_shared/tcg-match-requirement-evaluator-v0-2.ts";
+import {
+  runtimeV02EvaluatePredicateTree,
+  type RuntimeV02PredicateLeaf,
+} from "../_shared/tcg-match-predicate-tree-v0-2.ts";
 import { evaluateRuntimeV02EventOccurredRequirement } from "../_shared/tcg-match-event-history-query-v0-2.ts";
 import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
 
@@ -525,6 +529,131 @@ function readTacticHealResume(state: any, effect: EffectState) {
   if (Number(raw.cursor) !== effect.cursor) throw new Error("tcg_v0_2_tactic_heal_resume_cursor_changed");
   return raw;
 }
+function tacticCreatureTarget(
+  state: any,
+  ownerSeat: number,
+  vars: Record<string, unknown>,
+  token: unknown,
+) {
+  if (token === "$current_friendly_vanguard") {
+    const cr = state.players?.[String(ownerSeat)]?.vanguard as Cr | null | undefined;
+    return cr ? { seat: ownerSeat, where: "vanguard" as const, index: null, cr } : null;
+  }
+  if (token === "$current_opponent_vanguard") {
+    const seat = ownerSeat === 1 ? 2 : 1;
+    const cr = state.players?.[String(seat)]?.vanguard as Cr | null | undefined;
+    return cr ? { seat, where: "vanguard" as const, index: null, cr } : null;
+  }
+  const resolved = resolveVar(vars, token) as CreatureRef | null | undefined;
+  return findCreature(state, resolved);
+}
+
+function legalCardCandidateCount(
+  state: any,
+  ownerSeat: number,
+  requirement: ReturnType<typeof normalizeRuntimeV02LegalCardAvailableRequirement>,
+) {
+  const seat = playerSeat(ownerSeat, requirement.controller, {});
+  const player = state.players[String(seat)];
+  if (!player) return 0;
+  if (["field", "vanguard", "reserve"].includes(requirement.zone)) {
+    return creatureOptions(
+      state,
+      ownerSeat,
+      requirement.controller,
+      requirement.zone,
+      requirement.filters,
+    ).length;
+  }
+  const zone = player[requirement.zone];
+  if (!Array.isArray(zone)) return 0;
+  return cardOptions(state, zone as Inst[], requirement.filters, ownerSeat).length;
+}
+
+type TacticPredicateContext = {
+  state: any;
+  ownerSeat: number;
+  vars: Record<string, unknown>;
+};
+
+function tacticPredicateLeaf(
+  leaf: RuntimeV02PredicateLeaf,
+  context: TacticPredicateContext,
+): boolean {
+  const { state, ownerSeat, vars } = context;
+  const predicate = String(leaf.predicate || "");
+
+  if (predicate === "reserve_count_at_least") {
+    const normalized = normalizeRuntimeV02ReserveCountAtLeastRequirement(leaf);
+    const seat = playerSeat(ownerSeat, normalized.controller, vars);
+    return evaluateRuntimeV02ReserveCountAtLeastRequirement(
+      state.players[String(seat)]?.reserve,
+      normalized,
+    ).matched;
+  }
+
+  if (predicate === "hand_count_at_least") {
+    const seat = playerSeat(
+      ownerSeat,
+      leaf.player ?? leaf.controller ?? "self",
+      vars,
+    );
+    const hand = state.players[String(seat)]?.hand;
+    const count = Number(leaf.count);
+    if (!Array.isArray(hand)) throw new Error("tcg_v0_2_tactic_if_hand_missing");
+    if (!Number.isInteger(count) || count < 1) throw new Error("tcg_v0_2_tactic_if_hand_count_invalid");
+    return hand.length >= count;
+  }
+
+  if (predicate === "legal_card_available") {
+    const normalized = normalizeRuntimeV02LegalCardAvailableRequirement(leaf);
+    return evaluateRuntimeV02LegalCardAvailableRequirement(
+      legalCardCandidateCount(state, ownerSeat, normalized),
+      normalized,
+    ).matched;
+  }
+
+  if (predicate === "target_printed_hp_at_least") {
+    const target = tacticCreatureTarget(state, ownerSeat, vars, leaf.target);
+    if (!target) return false;
+    const def = topDef(target.cr, state) || {};
+    const hp = Number(def.creature?.hp ?? def.hp ?? 0);
+    const threshold = Number(leaf.value);
+    if (!Number.isFinite(hp) || hp < 0) throw new Error("tcg_v0_2_tactic_if_target_hp_invalid");
+    if (!Number.isFinite(threshold) || threshold <= 0) throw new Error("tcg_v0_2_tactic_if_target_hp_threshold_invalid");
+    return hp >= threshold;
+  }
+
+  if (predicate === "target_has_condition") {
+    const target = tacticCreatureTarget(state, ownerSeat, vars, leaf.target);
+    if (!target) return false;
+    const condition = String(leaf.condition || "").trim();
+    if (!condition) throw new Error("tcg_v0_2_tactic_if_condition_required");
+    return hasCondition(target.cr, condition);
+  }
+
+  if (predicate === "modifier_condition_slot_empty") {
+    const target = tacticCreatureTarget(state, ownerSeat, vars, leaf.target);
+    if (!target) return false;
+    return conditions(target.cr).modifier == null;
+  }
+
+  throw new Error(`tcg_v0_2_tactic_if_predicate_unsupported:${predicate}`);
+}
+
+function evaluateTacticIf(
+  state: any,
+  ownerSeat: number,
+  vars: Record<string, unknown>,
+  raw: unknown,
+): boolean {
+  return runtimeV02EvaluatePredicateTree(
+    raw,
+    { state, ownerSeat, vars },
+    tacticPredicateLeaf,
+  );
+}
+
 function firstRequiredCreatureTargetAvailable(state: any, ownerSeat: number, steps: any[]) {
   const first = (steps || []).find((step: any) => String(step?.op || "") !== "");
   if (!first || first.op !== "SELECT_CREATURE") return true;
@@ -547,23 +676,7 @@ function checkPlayRequirements(state: any, ownerSeat: number, requirements: any[
 
     if (requirement?.predicate === "legal_card_available") {
       const normalized = normalizeRuntimeV02LegalCardAvailableRequirement(requirement);
-      const seat = playerSeat(ownerSeat, normalized.controller, {});
-      const player = state.players[String(seat)];
-      if (!player) return false;
-      let candidateCount = 0;
-      if (["field", "vanguard", "reserve"].includes(normalized.zone)) {
-        candidateCount = creatureOptions(
-          state,
-          ownerSeat,
-          normalized.controller,
-          normalized.zone,
-          normalized.filters,
-        ).length;
-      } else {
-        const zone = player[normalized.zone];
-        if (!Array.isArray(zone)) return false;
-        candidateCount = cardOptions(state, zone as Inst[], normalized.filters, ownerSeat).length;
-      }
+      const candidateCount = legalCardCandidateCount(state, ownerSeat, normalized);
       if (!evaluateRuntimeV02LegalCardAvailableRequirement(candidateCount, normalized).matched) return false;
       continue;
     }
@@ -1072,7 +1185,15 @@ function executeUntilChoice(state: any) {
       });
       return;
     }
-    if (op === "IF_CONDITION") {
+    if (op === "IF") {
+      const matched = evaluateTacticIf(state, ownerSeat, vars, step.when);
+      const branch = matched
+        ? (Array.isArray(step.then) ? step.then : [])
+        : (Array.isArray(step.else) ? step.else : []);
+      effect.steps.splice(effect.cursor, 1, ...branch);
+      continue;
+    }
+        if (op === "IF_CONDITION") {
       const ref = resolveVar(vars, step.target) as CreatureRef;
       const found = findCreature(state, ref);
       const branch = found && hasCondition(found.cr, String(step.condition || "")) ? step.then : step.else;
