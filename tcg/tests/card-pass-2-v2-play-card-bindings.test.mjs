@@ -10,6 +10,7 @@ const root = path.resolve(here, '..', '..');
 const battle = fs.readFileSync(path.join(root, 'tcg-battle-v2.html'), 'utf8');
 const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-controller.js'), 'utf8');
 const matchActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-match-actions', 'index.ts'), 'utf8');
+const evolutionOwner = fs.readFileSync(path.join(root, 'supabase', 'functions', '_shared', 'tcg-match-evolution-legality-v0-2.ts'), 'utf8');
 const tacticActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-tactic-actions', 'index.ts'), 'utf8');
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-interaction-v1.json'), 'utf8'));
 
@@ -64,9 +65,11 @@ test('evolution selection is a UI candidate only and server validates predecesso
   assert.match(controller, /intent === 'evolve'/);
   assert.match(controller, /definition\.evolves_from_id/);
   assert.match(controller, /'evolve',[\s\S]*?\{ card_uid: cardUid, where \}/);
-  assert.match(matchActions, /evolution_predecessor_mismatch/);
-  assert.match(matchActions, /evolution_locked_on_first_personal_turn/);
-  assert.match(matchActions, /stack_entered_or_evolved_this_turn/);
+  assert.match(matchActions, /runtimeV02ValidateEvolutionDeclaration/);
+  assert.match(evolutionOwner, /evolution_predecessor_mismatch/);
+  assert.match(evolutionOwner, /evolution_locked_on_first_personal_turn/);
+  assert.match(evolutionOwner, /stack_entered_or_evolved_this_turn/);
+  assert.match(evolutionOwner, /one_evolution_per_stack_per_turn/);
 });
 
 test('Essence and Relic attach through existing match-action owners', () => {
