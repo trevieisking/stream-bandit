@@ -446,7 +446,7 @@
 - [x] Delegate card_matches filter semantics to the existing card/filter owner boundary.
 - [x] Prove the Attack IF owner has no mutation authority and no launch card identity.
 - [x] TCG Card Pass 2 Validation #1255 SUCCESS on exact head `00d5f8a7aec223dcd8c5a336d27046ac7d1ad3b7`.
-- [ ] Migrate each frozen Attack IF effect family onto this common predicate owner without double execution.
+- [x] Migrate each frozen Attack IF effect family onto this common predicate owner without double execution; all 13 frozen Attack IF instances are source-migrated.
 - [ ] Close the parent “generic Attack IF execution” box only after all 13 instances are proven executable without printed-English/card-ID fallback.
 ## V2.4.67 — Attack declaration current-action events
 - [x] Inventory Release 1 Attack on_declare: exactly two RECORD_EVENT steps.
@@ -458,7 +458,7 @@
 - [x] Preserve the existing overcharge pending-choice / discard / Condition owner.
 - [x] Expand exact Match Edge dependency closure 89 -> 90 files.
 - [x] TCG Card Pass 2 Validation #1265 SUCCESS on exact head `fb494fedd43851acc4302b4e6d1327715214c689`.
-- [ ] Migrate Chainstorm's event_occurred IF leaf to consume the same event map through the shared Attack IF owner.
+- [x] Migrate Chainstorm's event_occurred IF leaf to consume the same event map through the shared Attack IF owner; accepted in V2.4.68.
 ## V2.4.68 — conditional Condition Attack IF migration
 - [x] Identify the exact conditional-Condition family: 5 IF instances / 4 cards.
 - [x] Add one generic nested IF -> Condition owner; reject mixed heal/discard/switch programs.
@@ -484,5 +484,17 @@
 - [x] Rebuild exact 92-file Match Edge closure from the current Git tree; digest `2b3cac54083c9cd07e94661b157d6719e4ea3007543665a141d8baaede2ffcfe`.
 - [x] Attack IF shared-owner migration count is now **10 / 13** frozen IF instances.
 - [x] TCG Card Pass 2 Validation #1284 SUCCESS on accepted source/manifest head `e542a0060266502d1cb74a93a618a9bb8032a0ed`; V2.4.69 accepted.
-- [ ] Remaining Attack IF: Slipwing Backdraft switch IF + Stormmane Storm Break outer current-action event IF + nested target-survival IF.
+- [x] Slipwing Backdraft switch IF + Stormmane Storm Break outer current-action event IF + nested target-survival IF are source-migrated through shared Attack IF in V2.4.70/V2.4.71.
+
+## V2.4.70 / V2.4.71 — final Attack IF source closeout
+- [x] Backdraft reserve-count IF delegates to shared Attack IF.
+- [x] Backdraft creates an authoritative private exact-one Reserve switch choice; browser does not invent the original Attack switch target.
+- [x] Backdraft choice resolution delegates the actual field mutation to Atomic Switch and existing Movement/Heal listener continuation owners.
+- [x] Battle client routes generic `pending_attack_choice` to Match `resolve_attack_choice` through the existing server-choice overlay.
+- [x] Storm Break outer current-action event IF delegates to shared Attack IF using the declaration-event map.
+- [x] Storm Break nested target-remains-in-play IF delegates to shared Attack IF using authoritative post-primary-damage state.
+- [x] Preserve existing Storm Break attached-Essence discard / Card-Zone / Condition mutation ownership.
+- [x] Attack IF source migration count: **13 / 13** frozen Release 1 instances.
+- [x] Match Edge release-control closure: **93 files**, digest `0daefbf978518e78751ec327f49a88e7f66122d930a1eee98028e4902b7514b6`.
+- [ ] Exact-head Card Pass must validate the current post-repair branch before the parent “generic Attack IF execution” acceptance box closes.
 
