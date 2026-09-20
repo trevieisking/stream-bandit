@@ -683,6 +683,22 @@ button.sb-reward-card{padding:0;appearance:none;-webkit-appearance:none;cursor:p
   .sb-card-inspector-card{max-height:92dvh;overflow:visible;border-radius:12px}
   .sb-card-inspector-close{right:-6px;top:-6px;width:29px;height:29px;font-size:18px}
 }
+
+.sb-choreography-layer{
+  position:fixed;
+  inset:0;
+  z-index:90;
+  pointer-events:none;
+  display:grid;
+  place-items:center;
+  padding:18px;
+  font-weight:900;
+  text-align:center
+}
+.sb-choreography-layer[hidden]{display:none}
+.sb-choreography-layer:not([hidden]){
+  background:radial-gradient(circle at center,rgba(8,18,30,.08),rgba(2,8,15,0) 55%)
+}
 </style>
 <link rel="stylesheet" href="stream-bandit-tcg-card-renderer-v2-4-51.css?v=2-4-55">
 <style>
@@ -864,12 +880,12 @@ button.sb-reward-card{padding:0;appearance:none;-webkit-appearance:none;cursor:p
   </section>
 </main>
 
-<div class="sb-card-inspector" id="cardInspector" hidden></div>
+<div class="sb-card-inspector" id="cardInspector" hidden></div>\n<div class="sb-choreography-layer" id="battleChoreography" hidden aria-live="polite"></div>
 
 <script src="stream-bandit-tcg-config-v2-4-31.js?v=2-4-31"></script>
 <script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-6"></script>
 <script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
 <script src="stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-55"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-18-server-projected-actions"></script>
+<script src="stream-bandit-tcg-battle-presentation-v1.js?v=1-0-choreography-foundation"></script>\n<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-19-choreography-foundation"></script>
 </body>
 </html>
