@@ -13,6 +13,7 @@ const SOURCES=Object.freeze({
 
 let readyPromise=null;
 let model=null;
+let rendererPromise=null;
 
 function esc(value){
   return String(value==null?'':value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -93,11 +94,32 @@ function img(path,alt,className){
   if(!path)return '<div class="tcg-product-art-missing" aria-label="Artwork pending">Artwork pending</div>';
   return '<img class="'+esc(className||'')+'" src="'+esc(path)+'" alt="'+esc(alt)+'" loading="lazy" decoding="async">';
 }
+function ensureRenderer(){
+  if(window.StreamBanditTCGCardRendererV2451)return Promise.resolve(window.StreamBanditTCGCardRendererV2451);
+  if(rendererPromise)return rendererPromise;
+  rendererPromise=new Promise((resolve,reject)=>{
+    if(!document.querySelector('link[data-sb-card-renderer-css]')){
+      const css=document.createElement('link');
+      css.rel='stylesheet';
+      css.href='stream-bandit-tcg-card-renderer-v2-4-51.css?v=2-4-51';
+      css.dataset.sbCardRendererCss='1';
+      document.head.appendChild(css);
+    }
+    const script=document.createElement('script');
+    script.src='stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-51';
+    script.async=true;
+    script.onload=()=>window.StreamBanditTCGCardRendererV2451
+      ? resolve(window.StreamBanditTCGCardRendererV2451)
+      : reject(new Error('TCG card renderer did not register.'));
+    script.onerror=()=>reject(new Error('TCG card renderer failed to load.'));
+    document.head.appendChild(script);
+  });
+  return rendererPromise;
+}
 function cardTile(card,quantity){
   const qty=quantity?'<span class="tcg-product-qty">×'+esc(quantity)+'</span>':'';
-  return '<article class="tcg-product-card" data-card-id="'+esc(card.card_id)+'">'+
-    img(card.art_path,card.name+' artwork','tcg-product-card-art')+
-    '<div class="tcg-product-card-copy"><strong>'+esc(card.name)+'</strong><small>'+esc(card.card_family)+'</small></div>'+qty+
+  return '<article class="tcg-product-card tcg-product-card-face" data-card-id="'+esc(card.card_id)+'">'+
+    '<div data-sb-tcg-render-card="'+esc(card.card_id)+'" data-sb-tcg-card-mode="compact"></div>'+qty+
     '</article>';
 }
 function deckHero(){
@@ -214,6 +236,7 @@ function mount(){
   else if(page==='collection')mountCollection();
   else if(page==='shop')mountShop();
   else if(page==='battlepass')mountBattlePass();
+  ensureRenderer().then(owner=>owner.ready().then(()=>owner)).then(owner=>owner.hydrate(document)).catch(()=>{});
 }
 function ready(){
   if(!readyPromise){
