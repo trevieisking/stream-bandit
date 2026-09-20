@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.19-choreography-foundation';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.20-server-attack-choice-route';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -607,6 +607,7 @@
   function currentServerChoice(view) {
     if (!view) return null;
     if (view.pending_choice) return { source: 'tactic', endpoint: API_TACTIC, action: 'resolve_choice', choice: view.pending_choice };
+    if (view.pending_attack_choice) return { source: 'match', endpoint: API_MATCH, action: 'resolve_attack_choice', choice: view.pending_attack_choice };
     if (view.phase === 'effect_resolution' && view.pending_movement_listener_choice) {
       return { source: 'tactic', endpoint: API_TACTIC, action: 'resolve_choice', choice: view.pending_movement_listener_choice };
     }
