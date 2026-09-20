@@ -282,6 +282,7 @@
 - [x] First shared leaf consolidation: source_damaged now has one Requirement-evaluator meaning reused by Active Ability and Attack IF; **Card Pass #1155 PASS**.
 - [x] Shared source_has_shield_at_least meaning added to the Requirement evaluator and reused by Attack IF; **Card Pass #1163 PASS**.
 - [x] Repair all 5 Release 1 Tactic play requirements using reserve_count_at_least; predicate and legacy forms share one evaluator; **Card Pass #1171 PASS**.
+- [x] Repair all 12 Release 1 Tactics using legal_card_available; reuse existing card/Creature selectors and shared candidate-existence semantics; **Card Pass #1179 PASS**.
 - [ ] Wire generic IF through Tactic execution for every Release 1 Tactic IF shape.
 - [ ] Wire generic IF through Attack execution for every Release 1 Attack IF shape.
 - [ ] Wire generic IF through Active/triggered Ability execution for every Release 1 Ability IF shape.
