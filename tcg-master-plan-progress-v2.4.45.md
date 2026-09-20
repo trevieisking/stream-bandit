@@ -337,3 +337,17 @@ TCG Card Pass 2 Validation **#1040** passed at source head `e3e5b00053ef5665b13c
 The subsequent checklist/progress synchronization changes documentation only, so a fresh exact-head validation is still required before the branch checkpoint is called fully current.
 
 **Next target boundary:** the remaining Battle acceptance items are now real Trevor/Kay device checks. Do not replace them with more automation, do not decorate the board yet, and do not promote. The next actionable step after final exact-head CI is to present this branch for the explicit two-device test: real Attack/damage/reward, Ability glow/use, Essence rail, phone drag/tap and Quit Match.
+
+
+## V2.4.53 synchronized automated checkpoint — #1041 PASS
+
+TCG Card Pass 2 Validation **#1041** passed on synchronized implementation/docs head `7e51f9be1f7a4a101bd2e2f4a805088dbd4bb5b1`.
+
+This closes every currently listed **automated** V2.4.52/V2.4.53 interaction gate:
+- Attack readiness/damage/turn advance and lethal Reward queue;
+- explicit concession/result routing;
+- active Ability server projection -> card glow -> use -> projection disappears;
+- attached Essence element rail, measured overflow compression/re-expansion and removal refresh;
+- phone touch-drag transport + tap fallback through the same authoritative actions.
+
+The checklist update that records this PASS is documentation-only and creates one final exact head requiring routine validation. After that, the branch is at the mandatory **real two-device acceptance boundary**. No additional code claim may substitute for Trevor/Kay seeing these behaviors in an actual match.
