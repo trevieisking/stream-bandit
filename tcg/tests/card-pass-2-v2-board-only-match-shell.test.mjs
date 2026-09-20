@@ -78,7 +78,7 @@ test('battle settings exposes only explicit server concession and terminal resul
   assert.match(battle, /Quit Match is a concession/);
   assert.match(controller, /async function runConcede\(\)/);
   assert.match(controller, /callEdge\(API_MATCH, actionBase\('concede'\)\)/);
-  assert.match(controller, /window\.confirm\('Quit this match\? This is a concession: you lose and your opponent wins\.'\)/);
+  assert.doesNotMatch(controller, /\bconfirm\s*\(/);
   assert.doesNotMatch(controller, /beforeunload[\s\S]{0,500}concede/);
   assert.match(controller, />Back to Matchmaking<\/button>/);
   assert.match(controller, /window\.location\.href = 'tcg-play\.html'/);
