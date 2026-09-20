@@ -20,7 +20,7 @@ test('Battle keeps the accepted v0.7 geometry and v0.8 play bindings while addin
   assert.match(battle, /data-sb-tcg-card-face="v1"/);
   assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
   assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-13-touch-drag/);
-  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.13-touch-drag/);
+  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\\.14-resolution-ui/);
 });
 
 test('play-phase hand cards become selectable and desktop-draggable without changing setup binding', () => {
