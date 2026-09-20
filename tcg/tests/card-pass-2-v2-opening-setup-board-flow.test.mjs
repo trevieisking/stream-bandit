@@ -11,8 +11,8 @@ const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-
 const matchActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-match-actions', 'index.ts'), 'utf8');
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-interaction-v1.json'), 'utf8'));
 
-test('Battle v0.7 follows the recorded tabletop interaction layout without restoring a site shell', () => {
-  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-7"/);
+test('Battle compact tabletop follows the recorded interaction layout without restoring a site shell', () => {
+  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-8-compact"/);
   assert.match(battle, /id="oppReserve"/);
   assert.match(battle, /id="oppVanguard"/);
   assert.match(battle, /id="youVanguard"/);
@@ -28,16 +28,15 @@ test('Battle v0.7 follows the recorded tabletop interaction layout without resto
   assert.doesNotMatch(battle, /stream-bandit-theme-projector/i);
 });
 
-test('phone battlefield gives the field full width and does not cover it with sticky chrome', () => {
+test('phone battlefield keeps all zones visible while the bottom hand is a horizontal card tray', () => {
   assert.match(battle, /@media\(max-width:640px\), \(hover:none\) and \(pointer:coarse\)/);
-  assert.match(battle, /overflow-y:auto/);
-  assert.match(battle, /grid-template-areas:"rail-left rail-right" "field field"/);
+  assert.match(battle, /grid-template-areas:"rail-left field rail-right"/);
   assert.match(battle, /\.sb-half>\.sb-field-core\{grid-area:field\}/);
-  assert.match(battle, /\.sb-reserve\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-  assert.match(battle, /\.sb-player-strip\{[\s\S]*?position:relative;top:auto/);
-  assert.match(battle, /\.sb-hand-wrap\{[\s\S]*?position:relative;bottom:auto/);
+  assert.match(battle, /\.sb-reserve\{height:100%;min-height:0;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(battle, /\.sb-player-strip\{min-height:0;height:44px/);
+  assert.match(battle, /\.sb-hand-wrap\{[\s\S]*?height:126px;min-height:0;overflow:hidden/);
+  assert.match(battle, /\.sb-hand\{[\s\S]*?height:103px[\s\S]*?overflow-x:auto;overflow-y:hidden/);
   assert.match(battle, /\.sb-realm\{display:none\}/);
-  assert.match(battle, /@media\(max-width:960px\) and \(orientation:landscape\), \(hover:none\) and \(pointer:coarse\) and \(orientation:landscape\)/);
   assert.match(battle, /scroll-snap-type:x proximity/);
 });
 
@@ -51,11 +50,11 @@ test('desktop battlefield gives Vanguard and Reserves independent height-bounded
   assert.match(battle, /\.sb-reserve-slot,\.sb-vanguard-slot\{[\s\S]*?height:100%;[\s\S]*?min-height:0/);
   assert.match(battle, /#oppVanguard,#youVanguard\{[\s\S]*?width:100%;[\s\S]*?height:100%;[\s\S]*?display:grid;[\s\S]*?place-items:center/);
   assert.match(battle, /\.sb-reserve-slot \.sb-card-wrap,[\s\S]*?\.sb-vanguard-slot \.sb-card-wrap\{[\s\S]*?height:100%;[\s\S]*?place-items:center/);
-  assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{[\s\S]*?width:min\(var\(--card-w\),10\.36dvh\);[\s\S]*?height:auto;[\s\S]*?max-height:calc\(100% - 8px\)/);
-  assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?width:min\(var\(--active-w\),11\.79dvh\);[\s\S]*?height:auto;[\s\S]*?max-height:calc\(100% - 8px\)/);
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto;[\s\S]*?max-height:calc\(100% - 8px\)/);
+  assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto;[\s\S]*?max-height:calc\(100% - 8px\)/);
   assert.match(battle, /\.sb-card-wrap\.is-selected \.sb-card-actions\{[\s\S]*?position:absolute;[\s\S]*?bottom:4px;[\s\S]*?left:50%;[\s\S]*?width:min\(180px,calc\(100% - 10px\)\);[\s\S]*?max-height:calc\(100% - 8px\);[\s\S]*?overflow-y:auto/);
   assert.match(battle, /\.sb-card-wrap\.has-setup-return \.sb-card-actions\{[\s\S]*?position:absolute;[\s\S]*?bottom:5px;[\s\S]*?left:50%;[\s\S]*?width:min\(120px,calc\(100% - 10px\)\)/);
-  assert.match(battle, /\.sb-hand-card\{[\s\S]*?width:min\(clamp\(94px,8vw,126px\),10\.8dvh\);[\s\S]*?height:auto;[\s\S]*?max-height:100%;[\s\S]*?flex:0 0 auto/);
+  assert.match(battle, /\.sb-hand-card\{[\s\S]*?height:100%;[\s\S]*?width:auto;[\s\S]*?max-height:100%;[\s\S]*?flex:0 0 auto/);
   assert.match(battle, /\.sb-card-control-shell\.is-selected\{[\s\S]*?position:relative/);
   assert.match(battle, /\.sb-card-inspector-panel\{[\s\S]*?width:min\(330px,33vw,40dvh\);[\s\S]*?max-height:78dvh/);
 });
