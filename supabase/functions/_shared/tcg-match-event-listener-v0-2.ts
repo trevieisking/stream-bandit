@@ -1,5 +1,9 @@
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 import {
+  runtimeV02EvaluatePredicateTree,
+  type RuntimeV02PredicateLeaf,
+} from "./tcg-match-predicate-tree-v0-2.ts";
+import {
   runtimeV02ApplyAtomicSwitch,
   type RuntimeV02SwitchMovementEvent,
 } from "./tcg-match-switch-context-v0-2.ts";
@@ -783,40 +787,18 @@ function eventCount(
   return Math.max(recorded, compatibility);
 }
 
-function requirement(
-  state: Record<string, unknown>,
-  continuation: Continuation,
-  raw: unknown,
-  candidate: Candidate,
-  event: RuntimeV02EventListenerEvent,
-): boolean {
-  const value = objectRecord(raw);
-  if (!value) throw new Error("tcg_v0_2_event_listener_requirement_invalid");
-  if (Object.hasOwn(value, "all")) {
-    if (Object.keys(value).length !== 1) {
-      throw new Error("tcg_v0_2_event_listener_all_invalid");
-    }
-    return list(value.all, "tcg_v0_2_event_listener_all_invalid").every((
-      item,
-    ) => requirement(state, continuation, item, candidate, event));
-  }
-  if (Object.hasOwn(value, "any")) {
-    if (Object.keys(value).length !== 1) {
-      throw new Error("tcg_v0_2_event_listener_any_invalid");
-    }
-    const items = list(value.any, "tcg_v0_2_event_listener_any_invalid");
-    if (!items.length) throw new Error("tcg_v0_2_event_listener_any_empty");
-    return items.some((item) =>
-      requirement(state, continuation, item, candidate, event)
-    );
-  }
-  if (Object.hasOwn(value, "not")) {
-    if (Object.keys(value).length !== 1) {
-      throw new Error("tcg_v0_2_event_listener_not_invalid");
-    }
-    return !requirement(state, continuation, value.not, candidate, event);
-  }
+type RuntimeV02EventListenerRequirementContext = {
+  state: Record<string, unknown>;
+  continuation: Continuation;
+  candidate: Candidate;
+  event: RuntimeV02EventListenerEvent;
+};
 
+function requirementLeaf(
+  value: RuntimeV02PredicateLeaf,
+  context: RuntimeV02EventListenerRequirementContext,
+): boolean {
+  const { state, continuation, candidate, event } = context;
   const predicate = requiredString(
     value.predicate,
     "tcg_v0_2_event_listener_predicate_required",
@@ -912,6 +894,20 @@ function requirement(
         `tcg_v0_2_event_listener_predicate_unsupported:${predicate}`,
       );
   }
+}
+
+function requirement(
+  state: Record<string, unknown>,
+  continuation: Continuation,
+  raw: unknown,
+  candidate: Candidate,
+  event: RuntimeV02EventListenerEvent,
+): boolean {
+  return runtimeV02EvaluatePredicateTree(
+    raw,
+    { state, continuation, candidate, event },
+    requirementLeaf,
+  );
 }
 
 function matches(
