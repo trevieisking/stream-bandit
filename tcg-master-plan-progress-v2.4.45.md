@@ -174,3 +174,35 @@ Astral remains the first complete proof set because all **24/24** Astral Standar
 The remaining **169** Set One identities do not wait for artwork before becoming readable card faces: their structured rules/stats must render now with the same placeholder-art card system.
 
 **Artwork production pause:** do not begin Ember/Ashrush image generation until the global card-face renderer has passed Astral desktop/mobile Battle + Collection/Deck readability and missing-art placeholder tests. This priority change does not alter card rules, deck legality, economy, ownership or Supabase authority.
+
+
+## V2.4.52 — attack, defeat/reward, explicit quit and post-match lifecycle lock
+
+The first real two-player Battle test proved that setup/coin-toss/board presentation can pass while the actual play loop is still not accepted. From this checkpoint onward, **an attack is not considered implemented until damage visibly lands and the complete server lifecycle finishes**.
+
+Locked Battle lifecycle:
+- a legal Attack is chosen from the real Vanguard card face;
+- the canonical server Attack owner validates Essence/requirements/conditions/targets;
+- the server places the resulting damage automatically — the browser never asks the player to type or place damage;
+- after any required Attack effect/listener/choice resolution, the Attack ends the attacking player's turn automatically;
+- if damage or an Attack effect defeats a Creature, canonical Defeat removes it and immediately queues the proper Reward Card resolution for the opposing player;
+- Reward taking, forced Vanguard promotion, terminal winner evaluation and turn progression remain server-owned and occur in that order;
+- the first real cross-device acceptance test must prove **Attack -> visible damage -> defeat when applicable -> Reward resolution -> turn/result state**, not merely that an Attack button can be clicked.
+
+Explicit match exit:
+- Battle has one small settings/cog control;
+- **Quit Match** is an explicit concession, not a pause: the quitting player receives the loss and the opponent receives the win;
+- concession must use the existing authoritative `concede` match command and may not be simulated in browser state;
+- ordinary browser reload/navigation is not treated as a concession; an unfinished match can still resume from authoritative state unless the player explicitly chooses Quit Match;
+- after a terminal win/loss screen, the only continuation destination is `tcg-play.html` with no carried `match_id`; the player must press **Find Opponent** again for a new match.
+
+Card interaction clarity:
+- the Orbitortoise reference supplied by Trevor on 20 September 2026 remains the visual baseline for **every card face**;
+- all current and future cards use the same full trading-card structure and remain ready for approved art without changing gameplay data;
+- active Abilities visibly glow/pulse only while the authoritative server says they can be activated, and the glow stops after use/limit consumption;
+- triggered Abilities remain readable but never masquerade as manual buttons;
+- Attack rows visibly distinguish Ready from blocked states and explain common blockers such as insufficient Essence;
+- Essence attachment is tap-first on touch: select the Essence card, then tap a highlighted legal creature; drag remains optional desktop convenience;
+- successful attachment is reflected by the refreshed authoritative creature state, including attached Essence count/effects.
+
+**Acceptance boundary:** anything after Attack remains unaccepted until a real two-user test has actually placed damage on a Creature. Automated tests may prove the server lifecycle and browser transport, but they do not replace the final Trevor/Kay visible Battle pass.
