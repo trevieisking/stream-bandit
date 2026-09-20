@@ -147,3 +147,30 @@ Canonical next starter from the current Set One starter registry:
 
 Each deck follows:
 `fresh GitHub card-art preflight -> generate/upload/verify all required art -> canonical starter/pool wiring -> desktop preview -> mobile preview -> human PASS -> exact-head CI -> promotion decision -> checkpoint -> next deck`.
+
+
+## V2.4.51 priority override — canonical global card face before more artwork
+
+Card readability/playability is now the immediate TCG priority ahead of Ember/Ashrush image production.
+
+The accepted visual direction is the Orbitortoise canonical card-face reference:
+- https://chatgpt.com/s/m_6aafc9a916c88191b0f63b164d1923cc
+
+Locked player-facing card contract:
+- one shared card renderer across Battle, hand, Collection, Decks, Shop, packs/rewards and Battle Pass previews;
+- Creature HP sits at the top-left beside the name;
+- element / energy type sits at the top-right;
+- large artwork occupies the upper card area;
+- Ability and every canonical Attack remain readable on the card face;
+- Reward Cards sit at the bottom-left;
+- rarity sits at the bottom-right with Withdraw directly beneath it;
+- cards without approved artwork use the same complete frame with an Artwork Pending window and remain fully readable/playable;
+- active Ability glow is server-authoritative from existing field-actions capability data; triggered Abilities are displayed but never exposed as manual-use buttons;
+- legal/illegal Attack state is explicit on the Attack row and Attack transport remains server-owned;
+- raw artwork remains separate from the frame/rules UI so future printings, finishes and alternate art do not duplicate gameplay authority.
+
+Astral remains the first complete proof set because all **24/24** Astral Standard/base artworks already exist at canonical GitHub paths. Those existing images must be fitted/cropped through the shared renderer rather than regenerated merely to match the frame.
+
+The remaining **169** Set One identities do not wait for artwork before becoming readable card faces: their structured rules/stats must render now with the same placeholder-art card system.
+
+**Artwork production pause:** do not begin Ember/Ashrush image generation until the global card-face renderer has passed Astral desktop/mobile Battle + Collection/Deck readability and missing-art placeholder tests. This priority change does not alter card rules, deck legality, economy, ownership or Supabase authority.
