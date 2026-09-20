@@ -108,3 +108,23 @@ test('Creature availability filters cover the frozen Release 1 condition aliases
   assert.match(filters,/filters\.has_any_condition === true/);
   assert.match(filters,/activeConditions\(item\.cr\)\.length < 1/);
 });
+
+
+test('frozen Release 1 has exactly one previous-opponent event-gated Tactic play requirement',()=>{
+  const found=cards()
+    .filter(card=>Array.isArray(card.tactic?.play_requirements)&&card.tactic.play_requirements.some(req=>req?.predicate==='event_occurred'&&req?.window==='previous_opponent_turn'))
+    .map(card=>card.id)
+    .sort();
+  assert.deepEqual(found,['stone-reversal-seal']);
+});
+
+test('Tactic event play requirements reuse the shared event-history owner',()=>{
+  const gate=tacticSource.slice(
+    tacticSource.indexOf('function checkPlayRequirements('),
+    tacticSource.indexOf('type TacticPlayability'),
+  );
+  assert.match(gate,/requirement\?\.predicate === "event_occurred"/);
+  assert.match(gate,/evaluateRuntimeV02EventOccurredRequirement\(/);
+  assert.match(gate,/eventControllerSeat = playerSeat\(ownerSeat, requirement\.controller \|\| "self", \{\}\)/);
+  assert.doesNotMatch(gate,/turn_seq\s*-\s*1/,'Tactic event window must not use arithmetic previous-turn ownership');
+});
