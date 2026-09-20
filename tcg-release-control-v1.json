@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "897e211a7d70010cf66d1149647dc78ec01eabd3",
+        "entrypoint_git_blob_sha": "13b4afbefe18a90d155b65e8476ded41383428de",
         "file_count": 92,
-        "closure_sha256": "35b0e5def41269bc97e7064bae235d8fc7f56f259597b57f7800b9cb748e732d",
+        "closure_sha256": "2b3cac54083c9cd07e94661b157d6719e4ea3007543665a141d8baaede2ffcfe",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -178,7 +178,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-deck-discard-v0-2.ts",
-            "git_blob_sha": "1a2bba1cbd87979592afdf6769f1d63358fea1c5"
+            "git_blob_sha": "9431cadfc49e6f5d0e2ddf850742720d8c9ad49b"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-declaration-events-v0-2.ts",
@@ -190,7 +190,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
-            "git_blob_sha": "d346f6b06a4ff255494a36b05f41b37e219576bf"
+            "git_blob_sha": "9813d0c260d42052e9040ebfe4c410552a83638c"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-formula-v0-2.ts",
@@ -222,7 +222,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-server-top-deck-v0-2.ts",
-            "git_blob_sha": "49966e7af62c0df32d549f4351a4b87c51c614d2"
+            "git_blob_sha": "9b5bbb3ac46b733be796316e0ebe4e2e5c7f8c14"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-v0-2.ts",
@@ -458,7 +458,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "897e211a7d70010cf66d1149647dc78ec01eabd3"
+            "git_blob_sha": "13b4afbefe18a90d155b65e8476ded41383428de"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
