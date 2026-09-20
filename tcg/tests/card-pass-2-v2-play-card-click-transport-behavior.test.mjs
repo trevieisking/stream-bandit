@@ -187,11 +187,15 @@ function makeHarness() {
     }
 
     if (String(url).endsWith('/functions/v1/tcg-match-actions')) {
-      return {
-        ok: true,
-        status: 200,
-        async json() { return { ok: true, result: { ok: false, error: 'stale_revision' } }; }
-      };
+      if (payload.action === 'field_actions') {
+        return { ok: true, status: 200, async json() { return { ok: true, result: { ability_sources: [], attacks: [], withdraw: { eligible: false } } }; } };
+      }
+      if (payload.action === 'attach_essence_targets') {
+        return { ok: true, status: 200, async json() { return { ok: true, result: { ok: true, eligible: true, card_uid: payload.card_uid, legal_targets: [{ where: 'vanguard', index: null, anchor_uid: 'vanguard-anchor' }] } }; } };
+      }
+      if (payload.action === 'attach_essence') {
+        return { ok: true, status: 200, async json() { return { ok: true, result: { ok: false, error: 'stale_revision' } }; } };
+      }
     }
 
     throw new Error('Unexpected fetch: ' + url);
@@ -253,7 +257,7 @@ test('play-phase Essence click then Vanguard click submits authoritative attach_
     {
       action: 'attach_essence',
       match_id: 'match-play-bind-proof',
-      client_nonce: 'nonce-2',
+      client_nonce: 'nonce-3',
       expected_revision: 17,
       card_uid: 'essence-hand-1',
       where: 'vanguard'
@@ -261,7 +265,8 @@ test('play-phase Essence click then Vanguard click submits authoritative attach_
   );
 
   const status = harness.nodes.get('battleStatus');
-  assert.equal(status.textContent, 'stale_revision', 'authoritative rejection must remain visible after the attempted play');
+  assert.equal(status.textContent, 'The board changed before that action completed. The latest state has been refreshed.', 'authoritative rejection must become useful player guidance');
+  assert.equal(status.dataset.errorCode, 'stale_revision');
   assert.equal(status.dataset.kind, 'error');
 
   const viewRequests = harness.requests.filter((entry) => entry.url.endsWith('/functions/v1/tcg-private-alpha-api'));
