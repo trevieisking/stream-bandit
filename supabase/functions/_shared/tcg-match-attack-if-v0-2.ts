@@ -10,6 +10,7 @@ import {
 import {
   activeRuntimeConditions,
   runtimeConditions,
+  type RuntimeV02ConditionCreature,
 } from "./tcg-match-condition-engine-v0-2.ts";
 
 export type RuntimeV02AttackIfCardMatcher = (
@@ -19,7 +20,7 @@ export type RuntimeV02AttackIfCardMatcher = (
 
 export type RuntimeV02AttackIfContext = {
   source_creature: unknown;
-  attack_target: unknown;
+  attack_target: RuntimeV02ConditionCreature;
   self_reserve: unknown[];
   opponent_reserve: unknown[];
   variables?: Record<string, unknown>;
