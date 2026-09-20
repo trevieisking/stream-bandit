@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const VERSION='2.4.53';
+const VERSION='2.4.55';
 const REGISTRY='assets/tcg/cards/set-one/tcg-card-display-registry-v1.json';
 let readyPromise=null;
 let registry=null;
