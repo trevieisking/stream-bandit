@@ -18,7 +18,7 @@ test('stable card inspector has an in-controller card-name resolver and cannot c
   assert.match(controller, /function cardNameById\(cardId\)/);
   assert.match(controller, /const renderer = cardRenderer\(\)/);
   assert.match(controller, /const row = view && view\.card_index && id \? view\.card_index\[id\] : null/);
-  assert.match(controller, /aria-label="' \+ esc\(cardNameById\(cardId\) \|\| 'Vanguard'\) \+ ' card details"/);
+  assert.match(controller, /aria-label="' \+ esc\(cardNameById\(cardId\) \|\| 'Card'\) \+ ' card details"/);
 });
 
 test('pending take_reward is a real face-down Reward selection flow, not a generic deadlock', () => {
@@ -60,13 +60,14 @@ test('completed knockout resolution returns to the existing Aftermath and turn-a
   assert.match(matchActions, /advanceTurn\(\)\};/);
 });
 
-test('wide Battle cards are height-bounded at normal browser zoom and selected Vanguard can open a readable canonical face', () => {
-  assert.match(battle, /width:min\(var\(--card-w\),10\.36dvh\)/);
-  assert.match(battle, /width:min\(var\(--active-w\),11\.79dvh\)/);
-  assert.match(battle, /width:min\(clamp\(94px,8vw,126px\),10\.8dvh\)/);
-  assert.match(battle, /\.sb-card-control-shell\.is-selected\{[\s\S]*?position:relative/);
+test('compact Battle cards fill their board slots while click opens one readable canonical inspector', () => {
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto/);
+  assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto/);
+  assert.match(controller, /renderCardFace\(cardId, \{[\s\S]*?mode: 'compact'/);
   assert.match(battle, /id="cardInspector"/);
   assert.match(battle, /\.sb-card-inspector-panel\{[\s\S]*?width:min\(330px,33vw,40dvh\)/);
   assert.match(controller, /function renderSelectedCardInspector\(view, canAct\)/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-15-stable-card-focus/);
+  assert.match(controller, /inspected\.kind === 'hand'/);
+  assert.match(controller, /inspected\.kind === 'field'/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-16-compact-tabletop/);
 });
