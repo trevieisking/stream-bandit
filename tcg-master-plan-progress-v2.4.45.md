@@ -364,3 +364,21 @@ The real two-player test now proves several items that automation could not:
 - Blocked Attack rows remain inspectable and explain the projected reason without dispatching an Attack command.
 
 The remaining lethal acceptance gate is not the KO itself; it is the now-repaired visible **Reward selection -> Reward to hand -> required promotion -> automatic turn handoff** chain. Ability-ready human proof and the remaining phone gesture checks are still open. Main/live promotion remains on HOLD until those visible gates pass.
+
+
+## Trevor/Kay paired-video checkpoint — client exception, not server deadlock
+
+The synchronized Trevor desktop / Kay phone recordings from 20 September 2026 show both clients on the same authoritative **Revision 9** while Trevor sees **Opponent turn** and Kay sees **Your turn**. That is the correct complementary view of the same active seat, so the server had advanced the match rather than deadlocking.
+
+The actual stop begins when the Battle client displays `cardNameById is not defined`. Kay reaches her turn, selects Basic Astral Essence and then cannot complete the expected interaction; Trevor continues to see the board waiting for the opponent. The same client error later becomes visible on Trevor's screen as polling/rendering continues.
+
+Root cause: the new stable desktop card inspector referenced `cardNameById` without defining that helper in the Battle controller. The renderer normally masked the older fallback reference, but selecting the Vanguard exercised the inspector call directly and raised a ReferenceError.
+
+Repair:
+- define one generic `cardNameById(cardId)` resolver inside the Battle controller;
+- prefer the shared card renderer's registry record when available;
+- fall back to the authoritative match-view `card_index`;
+- keep the match/turn server owners unchanged;
+- regression-test that the inspector resolver is present before human retest.
+
+This checkpoint does **not** mark the remaining Reward/promotion/Ability/touch human gates complete. It only removes the proven client exception that prevented the active player from continuing.
