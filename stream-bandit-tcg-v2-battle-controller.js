@@ -1048,6 +1048,148 @@
     await runAuthoritativeSetupAction('setup_ready', {}, 'Locking your opening field through the server Match Flow owner…');
   }
 
+  async function runPlayCommand(endpointName, action, payload, busyMessage) {
+    const view = viewState();
+    if (!activePlayTurn(view)) return;
+    state.busy = true;
+    state.overlayKey = '';
+    render();
+    setStatus(busyMessage, 'busy');
+    let failure = '';
+    try {
+      await callEdge(endpointName, Object.assign(actionBase(action), payload || {}));
+      state.selectedHandUid = '';
+      state.selectedChoiceIds = [];
+      state.pendingChoiceId = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runPlayHandTarget(where, index) {
+    const view = viewState();
+    const instance = selectedHandInstance();
+    const intent = selectedHandIntent();
+    const creature = ownCreatureAt(where, index);
+    if (!instance || !playTargetLegal(where, index, creature)) return;
+    const cardUid = String(instance.uid || '');
+    if (!cardUid) return;
+
+    if (intent === 'play_creature') {
+      await runPlayCommand(
+        API_MATCH,
+        'play_creature',
+        { card_uid: cardUid, reserve_index: Number(index) },
+        'Playing the selected Creature through the authoritative Creature owner…'
+      );
+      return;
+    }
+
+    if (intent === 'evolve') {
+      const payload = { card_uid: cardUid, where };
+      if (where === 'reserve') payload.index = Number(index);
+      await runPlayCommand(
+        API_MATCH,
+        'evolve',
+        payload,
+        'Evolving the selected Creature through the authoritative Creature owner…'
+      );
+      return;
+    }
+
+    if (intent === 'attach_essence') {
+      const payload = { card_uid: cardUid, where };
+      if (where === 'reserve') payload.index = Number(index);
+      await runPlayCommand(
+        API_MATCH,
+        'attach_essence',
+        payload,
+        'Attaching Essence through the authoritative Essence attachment route…'
+      );
+      return;
+    }
+
+    if (intent === 'attach_relic') {
+      const payload = { card_uid: cardUid, where };
+      if (where === 'reserve') payload.index = Number(index);
+      await runPlayCommand(
+        API_MATCH,
+        'attach_relic',
+        payload,
+        'Attaching Relic through the authoritative Relic owner…'
+      );
+    }
+  }
+
+  async function runDirectHandPlay(requestedIntent) {
+    const instance = selectedHandInstance();
+    const intent = selectedHandIntent();
+    if (!instance || intent !== requestedIntent || !directHandIntent(intent)) return;
+    const cardUid = String(instance.uid || '');
+    if (!cardUid) return;
+    if (intent === 'play_realm') {
+      await runPlayCommand(
+        API_MATCH,
+        'play_realm',
+        { card_uid: cardUid },
+        'Playing Realm through the authoritative Realm owner…'
+      );
+      return;
+    }
+    if (intent === 'play_tactic') {
+      await runPlayCommand(
+        API_TACTIC,
+        'play_tactic',
+        { card_uid: cardUid },
+        'Playing Tactic through the authoritative Tactic interpreter…'
+      );
+    }
+  }
+
+  async function runServerChoice() {
+    const view = viewState();
+    const routed = currentServerChoice(view);
+    const choice = routed && routed.choice;
+    if (!routed || !choice || choice.waiting || state.busy) return;
+    const ids = [...state.selectedChoiceIds];
+    const min = Math.max(0, Number(choice.min || 0));
+    const max = Math.max(min, Number(choice.max == null ? min : choice.max));
+    if (ids.length < min || ids.length > max) return;
+
+    state.busy = true;
+    state.overlayKey = '';
+    render();
+    setStatus('Resolving the server choice…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(
+        routed.endpoint,
+        Object.assign(actionBase(routed.action), {
+          choice_id: String(choice.id || ''),
+          choice_ids: ids
+        })
+      );
+      state.selectedChoiceIds = [];
+      state.pendingChoiceId = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
   async function runEndTurn() {
     const view = viewState();
     const youSeat = Number(view && view.you && view.you.seat);
@@ -1114,7 +1256,13 @@
       const hand = view && view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
       if (!hand.some((row) => String(row.uid || '') === state.selectedHandUid)) state.selectedHandUid = '';
     }
-    if (view && view.phase !== 'setup') state.selectedHandUid = '';
+    if (view) {
+      const youSeat = Number(view.you && view.you.seat);
+      const mayKeepHandSelection =
+        view.phase === 'setup' ||
+        (view.phase === 'play' && Number(view.active_seat) === youSeat && !hasPendingAction(view));
+      if (!mayKeepHandSelection) state.selectedHandUid = '';
+    }
 
     render();
     syncOpponentProfile(view && view.opponent && view.opponent.user_id).catch(() => {});
