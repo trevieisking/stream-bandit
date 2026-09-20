@@ -112,14 +112,14 @@
 - [x] Lock Artwork Pending cards as fully readable/playable card faces.
 - [x] Lock active-Ability glow to authoritative server capability data; triggered Abilities are never manual buttons.
 - [x] Pause Ember/Ashrush artwork until renderer acceptance.
-- [ ] Generate a deterministic browser display registry from all **193** SB1 structured identities plus printing/art metadata.
-- [ ] Implement the shared full/battle/hand/compact card renderer with no card-ID-specific branches.
-- [ ] Fit all **24/24 Astral** approved images into the shared renderer without baking rules text into the image bytes.
-- [ ] Prove the remaining **169** missing-art identities render complete Artwork Pending card faces with correct structured data.
-- [ ] Replace Battle placeholder cards with the shared real card face while preserving accepted board geometry.
-- [ ] Make active Ability availability visibly glow from server `field_actions.ability_sources` and route use through existing `use_ability`.
-- [ ] Show every canonical Attack row with Essence cost, damage/formula display and readable effect summary; legality remains server-owned.
-- [ ] Collection and Deck previews use the same renderer rather than artwork-only tiles.
+- [x] Generate a deterministic browser display registry from all **193** SB1 structured identities plus printing/art metadata.
+- [x] Implement the shared full/battle/hand/compact card renderer with no card-ID-specific branches.
+- [x] Fit all **24/24 Astral** approved images into the shared renderer without baking rules text into the image bytes.
+- [x] Prove the remaining **169** missing-art identities render complete Artwork Pending card faces with correct structured data.
+- [x] Replace Battle placeholder cards with the shared real card face while preserving accepted board geometry.
+- [x] Make active Ability availability visibly glow from server `field_actions.ability_sources` and route use through existing `use_ability`.
+- [x] Show every canonical Attack row with Essence cost, damage/formula display and readable effect summary; legality remains server-owned.
+- [x] Collection and Deck previews use the same renderer rather than artwork-only tiles.
 - [ ] Desktop human readability PASS for Astral Battle + Collection + Decks.
 - [ ] Mobile/coarse-touch human readability PASS for Astral Battle + Collection + Decks.
 - [ ] Exact-head TCG Card Pass 2 Validation PASS.
