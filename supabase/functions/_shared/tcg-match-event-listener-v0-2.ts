@@ -2669,23 +2669,74 @@ function attackDeclaredListenerMatches(
     );
 }
 
-function attackDeclaredDamageDelta(candidate: Candidate): number | null {
-  if (!containsCurrentAttackDamageModifier(candidate.listener.steps)) return null;
-  const costs = records(
-    candidate.listener.costs,
-    "tcg_v0_2_attack_declared_listener_costs_required",
+type RuntimeV02AttackDeclaredIfContext = {
+  state: Record<string, unknown>;
+  candidate: Candidate;
+  input: RuntimeV02AttackDeclaredDamageInput;
+};
+
+function attackDeclaredIfLeaf(
+  value: RuntimeV02PredicateLeaf,
+  context: RuntimeV02AttackDeclaredIfContext,
+): boolean {
+  const { state, candidate, input } = context;
+  const predicate = requiredString(
+    value.predicate,
+    "tcg_v0_2_attack_declared_if_predicate_required",
   );
-  if (costs.length !== 0) {
-    throw new Error("tcg_v0_2_attack_declared_listener_costs_unsupported");
+  const target = fieldByUid(state, input.target_creature_uid);
+  if (!target) throw new Error("tcg_v0_2_attack_declared_if_target_missing");
+
+  switch (predicate) {
+    case "source_damaged":
+      if (Object.keys(value).some((key) => key !== "predicate")) {
+        throw new Error("tcg_v0_2_attack_declared_if_source_damaged_field_unsupported");
+      }
+      if (!candidate.field) {
+        throw new Error("tcg_v0_2_attack_declared_if_source_required");
+      }
+      return Number(candidate.field.cr.damage || 0) > 0;
+    case "event_attack_target_damaged":
+      if (Object.keys(value).some((key) => key !== "predicate")) {
+        throw new Error("tcg_v0_2_attack_declared_if_target_damaged_field_unsupported");
+      }
+      return Number(target.cr.damage || 0) > 0;
+    case "event_attack_target_has_condition": {
+      const unsupported = Object.keys(value).find((key) =>
+        key !== "predicate" && key !== "condition"
+      );
+      if (unsupported) {
+        throw new Error(
+          `tcg_v0_2_attack_declared_if_target_condition_field_unsupported:${unsupported}`,
+        );
+      }
+      const condition = requiredString(
+        value.condition,
+        "tcg_v0_2_attack_declared_if_target_condition_required",
+      );
+      return hasRuntimeCondition(target.cr, condition);
+    }
+    default:
+      throw new Error(
+        `tcg_v0_2_attack_declared_if_predicate_unsupported:${predicate}`,
+      );
   }
-  const steps = records(
-    candidate.listener.steps,
-    "tcg_v0_2_attack_declared_listener_steps_required",
+}
+
+function attackDeclaredIfMatches(
+  state: Record<string, unknown>,
+  raw: unknown,
+  candidate: Candidate,
+  input: RuntimeV02AttackDeclaredDamageInput,
+): boolean {
+  return runtimeV02EvaluatePredicateTree(
+    raw,
+    { state, candidate, input },
+    attackDeclaredIfLeaf,
   );
-  if (steps.length !== 1 || steps[0].op !== "MODIFY_CURRENT_ATTACK_DAMAGE") {
-    throw new Error("tcg_v0_2_attack_declared_listener_program_unsupported");
-  }
-  const step = steps[0];
+}
+
+function directAttackDeclaredModifierDelta(step: Record<string, unknown>): number {
   const unsupported = Object.keys(step).find((key) =>
     key !== "op" && key !== "delta"
   );
@@ -2699,6 +2750,63 @@ function attackDeclaredDamageDelta(candidate: Candidate): number | null {
     throw new Error("tcg_v0_2_attack_declared_listener_delta_invalid");
   }
   return delta;
+}
+
+function attackDeclaredProgramDelta(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  input: RuntimeV02AttackDeclaredDamageInput,
+  rawSteps: unknown,
+): number | null {
+  const steps = records(
+    rawSteps,
+    "tcg_v0_2_attack_declared_listener_steps_required",
+  );
+  if (steps.length === 0) return null;
+  if (steps.length !== 1) {
+    throw new Error("tcg_v0_2_attack_declared_listener_program_unsupported");
+  }
+  const step = steps[0];
+  if (step.op === "MODIFY_CURRENT_ATTACK_DAMAGE") {
+    return directAttackDeclaredModifierDelta(step);
+  }
+  if (step.op !== "IF") {
+    throw new Error("tcg_v0_2_attack_declared_listener_program_unsupported");
+  }
+
+  const unsupported = Object.keys(step).find((key) =>
+    key !== "op" && key !== "when" && key !== "then" && key !== "else"
+  );
+  if (unsupported) {
+    throw new Error(
+      `tcg_v0_2_attack_declared_listener_if_field_unsupported:${unsupported}`,
+    );
+  }
+  const branch = attackDeclaredIfMatches(state, step.when, candidate, input)
+    ? step.then ?? []
+    : step.else ?? [];
+  return attackDeclaredProgramDelta(state, candidate, input, branch);
+}
+
+function attackDeclaredDamageDelta(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  input: RuntimeV02AttackDeclaredDamageInput,
+): number | null {
+  if (!containsCurrentAttackDamageModifier(candidate.listener.steps)) return null;
+  const costs = records(
+    candidate.listener.costs,
+    "tcg_v0_2_attack_declared_listener_costs_required",
+  );
+  if (costs.length !== 0) {
+    throw new Error("tcg_v0_2_attack_declared_listener_costs_unsupported");
+  }
+  return attackDeclaredProgramDelta(
+    state,
+    candidate,
+    input,
+    candidate.listener.steps,
+  );
 }
 
 function normalizedAttackDeclaredInput(
@@ -2816,21 +2924,30 @@ export function runtimeV02ResolveAttackDeclaredDamageListeners(
     if (alreadyResolved(state, candidate, event)) {
       const prior = objectRecord(listenerState(state).receipts[key]);
       const priorDelta = Number(prior?.attack_damage_delta);
-      if (!Number.isInteger(priorDelta) || priorDelta === 0) {
+      if (!Number.isInteger(priorDelta)) {
         throw new Error("tcg_v0_2_attack_declared_listener_receipt_invalid");
       }
-      damageDelta += priorDelta;
-      applications.push({
-        source_uid: candidate.source.uid,
-        listener_id: listenerId(candidate),
-        delta: priorDelta,
-        limit_consumed: false,
-        replayed: true,
-      });
+      if (priorDelta !== 0) {
+        damageDelta += priorDelta;
+        applications.push({
+          source_uid: candidate.source.uid,
+          listener_id: listenerId(candidate),
+          delta: priorDelta,
+          limit_consumed: false,
+          replayed: true,
+        });
+      }
       continue;
     }
     if (!attackDeclaredListenerMatches(state, candidate, input)) continue;
-    const delta = attackDeclaredDamageDelta(candidate)!;
+    const delta = attackDeclaredDamageDelta(state, candidate, input);
+    if (delta == null) {
+      markResolved(state, candidate, event, {
+        resolution_kind: "attack_declared_damage",
+        attack_damage_delta: 0,
+      });
+      continue;
+    }
 
     const limit = limitInfo(state, candidate, event);
     if (limit && usedLimit(state, limit) >= limit.count) continue;
