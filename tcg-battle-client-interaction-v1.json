@@ -224,6 +224,21 @@
         "back_to_matchmaking",
         "require_new_find_opponent"
       ]
+    },
+    {
+      "id": "search_attach_shuffle",
+      "steps": [
+        "server_open_private_search_choice",
+        "show_authorized_eligible_cards_and_authoritative_selection_count",
+        "select_cards",
+        "show_server_projected_legal_attachment_targets",
+        "assign_selected_cards_to_targets",
+        "server_commit",
+        "animate_chosen_cards_to_creature_attachments",
+        "animate_unchosen_cards_back_to_deck_representation",
+        "animate_authoritative_shuffle",
+        "render_latest_authoritative_state"
+      ]
     }
   ],
   "visual_feedback": [
@@ -245,7 +260,14 @@
     "full_card_inspector_without_board_reflow",
     "horizontal_hand_scroll_position",
     "bottom_edge_hand_peek_fan",
-    "shared_read_only_card_inspector_on_decks_collection_battlepass"
+    "shared_read_only_card_inspector_on_decks_collection_battlepass",
+    "generic_card_zone_movement_effects",
+    "attack_windup_impact_and_result_effects",
+    "ability_and_listener_resolution_effects",
+    "private_search_selection_counter",
+    "searched_card_assignment_to_legal_targets",
+    "post_search_return_and_shuffle_effect",
+    "reduced_motion_equivalent_feedback"
   ],
   "forbidden_client_patterns": [
     "browser_prompt_for_gameplay_targeting",
@@ -306,5 +328,59 @@
     "battle_pass_scope": "card-backed reward samples only; no progression entitlement or economy authority",
     "deck_scope": "canonical deck recipe preview only; no deck ownership mutation",
     "collection_scope": "card preview only; no collection ownership inference"
+  },
+  "special_effects": {
+    "schema": "tcg-battle-special-effects-v1",
+    "authority": "presentation_only_from_authoritative_state_events_pending_choices_and_results",
+    "extensibility": "generic_event_and_effect_families_not_card_id_branches",
+    "reduced_motion_required": true,
+    "reconnect_rule": "drop_unfinished_animation_and_render_latest_authoritative_snapshot",
+    "movement_families": [
+      "deck_to_hand_draw",
+      "opening_deal",
+      "discard",
+      "return_to_deck",
+      "reward_take",
+      "play_creature",
+      "evolve",
+      "switch",
+      "forced_promotion",
+      "attach_essence",
+      "attach_relic",
+      "remove_attachment"
+    ],
+    "combat_effect_families": [
+      "attack_windup",
+      "target_focus",
+      "payment",
+      "impact",
+      "damage",
+      "shield_delta",
+      "heal",
+      "condition",
+      "listener_trigger",
+      "defeat",
+      "reward_followup",
+      "turn_continuation"
+    ],
+    "search_attach_shuffle": {
+      "source": "authoritative_search_or_pending_choice",
+      "private_search_overlay": true,
+      "selection_count": "authoritative_required_or_maximum_count",
+      "example_three_card_display": [
+        "0/3",
+        "1/3",
+        "2/3",
+        "3/3"
+      ],
+      "hard_code_three_globally": false,
+      "targets": "server_projected_legal_adult_creature_or_creature_targets",
+      "chosen_cards": "animate_to_authoritative_creature_attachment_or_essence_rail",
+      "unchosen_cards": "return_to_face_down_deck_representation",
+      "shuffle_after_resolution": true,
+      "shuffle_order_owner": "authoritative_rng_or_shuffle_engine",
+      "client_may_reconstruct_permutation": false,
+      "opponent_view": "public_safe_search_attachment_shuffle_feedback_without_private_card_identity_unless_explicitly_revealed"
+    }
   }
 }
