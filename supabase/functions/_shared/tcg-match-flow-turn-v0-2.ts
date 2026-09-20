@@ -3,6 +3,7 @@ import {
   type RuntimeV02MatchFlowSeat,
   type RuntimeV02TerminalState,
 } from "./tcg-match-flow-engine-v0-2.ts";
+import { runtimeV02RecordTurnOwner } from "./tcg-match-turn-history-v0-2.ts";
 
 export type RuntimeV02TurnAdvanceState = RuntimeV02TerminalState & {
   phase?: unknown;
@@ -122,6 +123,7 @@ export function runtimeV02AdvanceTurn(
     state.active_seat = nextSeat;
     state.turn_seq = nextTurn;
     personalTurns[String(nextSeat)] = nextPersonalTurn;
+    runtimeV02RecordTurnOwner(state, nextTurn, nextSeat);
     state.deckout_loser = nextSeat;
     runtimeV02EvaluateWinner(state);
     return {
@@ -147,6 +149,7 @@ export function runtimeV02AdvanceTurn(
   state.active_seat = nextSeat;
   state.turn_seq = nextTurn;
   personalTurns[String(nextSeat)] = nextPersonalTurn;
+  runtimeV02RecordTurnOwner(state, nextTurn, nextSeat);
   state.phase = "play";
   state.log.push(`Seat ${nextSeat} begins personal turn ${nextPersonalTurn}.`);
 
