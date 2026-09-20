@@ -751,3 +751,49 @@ This closes **Tactic IF control flow**, but not every card program downstream of
 - Blackout Pulse is blocked by APPLY_CONDITION.
 
 The next bounded implementation target is ADD_SHIELD_EACH because it is the smallest missing operation that unlocks a complete frozen Tactic program.
+## V2.4.59 — visible resolution choreography + deck-search / attach / shuffle feedback
+
+V2.4.58 established that authoritative zone movement must be visible. V2.4.59 extends that rule into a complete **resolution-choreography contract**: every meaningful card movement, Attack, Ability and state-changing effect must have clear player-facing feedback so players can see what the server resolved instead of inferring it from counters or text after the fact.
+
+### Global special-effects contract
+
+Battle presentation must visibly communicate, where applicable:
+- card movement between deck, hand, field, discard, Reward and other public/authorized zones;
+- shuffles, deals, draws, discards, returns-to-deck and searches;
+- Creature play, evolution, Vanguard/Reserve switching and forced promotion;
+- Essence/Relic attachment, removal, movement and payment;
+- Attack wind-up/targeting, impact, damage, Shield change, healing and defeat;
+- active Ability activation and triggered/listener resolution;
+- Condition apply/clear/replace/prevent events;
+- Reward selection/take and other suspended-resolution continuations.
+
+Effects are **presentation over authoritative owners**. The client consumes the server-approved state transition, pending choice or event/result packet and visualizes it. Animation must never decide legality, random order, targets, amounts, card identities, payment, or the resulting state.
+
+The effects layer must be extensible by event/effect type rather than card ID so future cards, moves, Abilities, Conditions and rules can reuse the same choreography system.
+
+### Search-deck → select → attach → return → shuffle contract
+
+For an effect such as the cited Ability that searches the deck for **3** eligible Essence/Energy cards, attaches the selected cards to legal Adult Creature target(s), returns the remainder and then shuffles:
+
+1. The server opens the authoritative search/pending-choice context and supplies the eligible private options, required/maximum selection count and legal attachment targets.
+2. The searching player sees a large private search overlay/grid with the eligible canonical card faces and a live count such as **0/3, 1/3, 2/3, 3/3** for this specific three-card effect.
+3. The number is never hard-coded globally. Other effects display their own authoritative required/maximum count.
+4. Selected Essence cards visibly lift/focus and can be assigned to only the server-projected legal Adult Creature/Creature target(s). Target highlighting is presentation of server legality, not a browser rule.
+5. On authoritative resolution, chosen cards visibly travel from the search/deck context to the relevant Creature attachment/Essence rail.
+6. Eligible cards that were inspected but not chosen visibly return to the face-down deck representation without leaking their identities to the opponent.
+7. The deck then performs a visible shuffle effect **after the authoritative effect says the deck is shuffled**. The browser never chooses or reconstructs the permutation.
+8. The opponent sees only information permitted by Hidden Information — for a private search this is normally a neutral search-in-progress / attachment / shuffle presentation, not the searched card identities unless the rule explicitly reveals them.
+9. If the authoritative effect resolves fewer cards because of insufficient eligible cards, targets or another rule, the animation follows the actual result rather than forcing the printed maximum.
+10. Refresh/reconnect skips unfinished choreography and renders the latest authoritative attachments, deck count, hand/field state and pending choice.
+
+### Attack and Ability effects
+
+Attack and Ability presentation must make causal order legible:
+**source activates → legal target/choice → cost/payment where applicable → effect travel/wind-up → impact/state delta → listener/Condition/Defeat/Reward follow-up → continuation/turn result**.
+
+Different effect families may use distinct visual treatments, but all remain driven by generic event/effect identities and authoritative result packets. Reduced-motion/accessibility mode may shorten or replace motion with fades/highlights while preserving the same information.
+
+### Acceptance boundary
+
+V2.4.59 is now part of Release 1 presentation acceptance. A rule/effect may be server-correct but still fail the player-facing gate if its important resolution is effectively invisible.
+
