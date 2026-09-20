@@ -233,7 +233,7 @@ test('play-phase Essence click then Vanguard click submits authoritative attach_
 
   const vanguardSlot = harness.nodes.get('youVanguardSlot');
   assert.equal(vanguardSlot.dataset.playWhere, 'vanguard');
-  assert.equal(vanguardSlot.classList.values.has('is-play-legal'), true, 'selected Essence must highlight own Vanguard as a candidate');
+  assert.match(vanguardSlot.className, /is-play-legal/, 'selected Essence must highlight own Vanguard as a candidate');
 
   await vanguardSlot.click();
 
