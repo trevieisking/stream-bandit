@@ -180,9 +180,13 @@ test('server-only top-deck attack keeps inspection authority while delegating de
   assert.notEqual(start, -1, 'missing server top-deck resolver');
   const block = serverTop.slice(start);
   const inspectAt = block.indexOf('const topCard = runtimeInst(deck[0]');
-  const matchAt = block.indexOf('const matched = String(topDefinition.element');
+  const definitionAt = block.indexOf('const topDefinition = runtimeV02Definition(state, topCard)');
+  const matchAt = block.indexOf('const matched = runtimeV02EvaluateAttackIf(');
   const moveAt = block.indexOf('runtimeV02ApplyCardZoneTransfer(');
-  assert.ok(inspectAt >= 0 && matchAt > inspectAt && moveAt > matchAt, 'server inspection/filtering must remain before Card-Zone movement');
+  assert.ok(
+    inspectAt >= 0 && definitionAt > inspectAt && matchAt > definitionAt && moveAt > matchAt,
+    'server inspection -> shared Attack IF filtering -> Card-Zone movement order changed',
+  );
   assert.ok(block.includes('descriptor.inspect.visibility !== "server_only"'));
   assert.ok(block.includes('runtimeV02Definition(state, topCard)'));
   assert.ok(block.includes('cause: "effect"'));
