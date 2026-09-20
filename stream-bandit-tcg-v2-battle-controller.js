@@ -332,22 +332,35 @@
     if (!action) return null;
     const key = handProjectionKey(uid, intent);
     const cached = state.handActionProjection;
-    if (cached && cached.key === key && cached.loading !== true) return cached;
-    state.handActionProjection = { key, uid, intent, loading: true, eligible: false, reason: null, legal_targets: [] };
-    const response = await callEdge(endpointName, Object.assign(actionBase(action), { card_uid: uid }));
-    const result = response && response.result && typeof response.result === 'object' ? response.result : {};
-    const projection = {
-      key,
-      uid,
-      intent,
-      loading: false,
-      eligible: result.eligible === true,
-      reason: result.reason ? String(result.reason) : null,
-      legal_targets: Array.isArray(result.legal_targets) ? result.legal_targets : [],
-      subtype: result.subtype ? String(result.subtype) : ''
-    };
-    if (key === handProjectionKey(uid, intent)) state.handActionProjection = projection;
-    return projection;
+    if (cached && cached.key === key) {
+      if (cached.loading === true && cached.promise) return await cached.promise;
+      if (cached.loading !== true) return cached;
+    }
+    const pending = { key, uid, intent, loading: true, eligible: false, reason: null, legal_targets: [], promise: null };
+    const promise = (async () => {
+      const response = await callEdge(endpointName, Object.assign(actionBase(action), { card_uid: uid }));
+      const result = response && response.result && typeof response.result === 'object' ? response.result : {};
+      const projection = {
+        key,
+        uid,
+        intent,
+        loading: false,
+        eligible: result.eligible === true,
+        reason: result.reason ? String(result.reason) : null,
+        legal_targets: Array.isArray(result.legal_targets) ? result.legal_targets : [],
+        subtype: result.subtype ? String(result.subtype) : ''
+      };
+      if (state.handActionProjection && state.handActionProjection.key === key) state.handActionProjection = projection;
+      return projection;
+    })();
+    pending.promise = promise;
+    state.handActionProjection = pending;
+    try {
+      return await promise;
+    } catch (error) {
+      if (state.handActionProjection && state.handActionProjection.key === key) state.handActionProjection = null;
+      throw error;
+    }
   }
 
   async function primeSelectedHandProjection(uid) {
