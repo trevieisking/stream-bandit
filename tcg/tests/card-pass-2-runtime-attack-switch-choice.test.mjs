@@ -9,7 +9,7 @@ const battle=fs.readFileSync('stream-bandit-tcg-v2-battle-controller.js','utf8')
 
 test('Slipwing Backdraft is the frozen conditional Reserve-switch Attack shape',()=>{
   const cards=[];
-  for(const match of gale.matchAll(/```json\\s*([\\s\\S]*?)```/g)){
+  for(const match of gale.matchAll(/```json\s*([\s\S]*?)```/g)){
     cards.push(JSON.parse(match[1]));
   }
   const slipwing=cards.find((card)=>card.id==='gale-slipwing');
