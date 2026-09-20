@@ -188,3 +188,32 @@ body[data-sb-tcg-page="play"] .tcg-side-stack>.tcg-frame:nth-child(3) .tcg-list{
     height:88px;
   }
 }
+
+
+/* V2.4.51 canonical card-face integration */
+.tcg-product-card.tcg-product-card-face{
+  display:block;
+  min-height:0;
+  overflow:visible;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+}
+.tcg-product-card.tcg-product-card-face>[data-sb-tcg-render-card]{
+  width:100%;
+}
+.tcg-product-card.tcg-product-card-face .sb-card-face{
+  width:100%;
+}
+.tcg-product-card.tcg-product-card-face .tcg-product-qty{
+  z-index:8;
+  top:5px;
+  right:5px;
+}
+.tcg-card-feed>.tcg-product-card-grid{
+  align-items:start;
+}
+@media(max-width:720px){
+  .tcg-product-card.tcg-product-card-face{min-width:0}
+  .tcg-product-card.tcg-product-card-face .sb-card-face{width:100%}
+}
