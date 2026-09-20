@@ -169,23 +169,34 @@ function abilityMarkup(ability,options){
   if(!ability)return '';
   const active=String(ability.mode||'')==='active';
   const ready=!!(options&&options.abilityReady&&active);
+  const interactive=!!(ready&&options&&options.interactiveAbility);
   const body=stepsSummary(ability.steps,3);
   const trigger=active?'Active Ability':('Triggered · '+human(ability.event||ability.timing||'event'));
-  return '<section class="sb-card-rule sb-card-ability'+(ready?' is-ready':'')+'" data-card-ability-mode="'+esc(ability.mode||'')+'">'+
+  const tag=interactive?'button':'section';
+  const attrs=interactive
+    ? ' type="button" data-card-intent="ability" data-ability-where="'+esc(options.abilityWhere||'')+'" data-ability-index="'+esc(options.abilityIndex==null?'':options.abilityIndex)+'"'
+    : '';
+  return '<'+tag+' class="sb-card-rule sb-card-ability'+(ready?' is-ready':'')+'" data-card-ability-mode="'+esc(ability.mode||'')+'"'+attrs+'>'+
     '<div class="sb-card-rule-head"><span class="sb-card-rule-tag">'+(ready?'ABILITY READY':'ABILITY')+'</span><strong>'+esc(ability.name||'Ability')+'</strong></div>'+
     '<div class="sb-card-rule-meta">'+esc(trigger)+'</div>'+
     (body?'<p>'+esc(body)+'</p>':'')+
-    '</section>';
+    '</'+tag+'>';
 }
 function attackMarkup(attack,index,options){
   const effect=attackEffectSummary(attack);
-  const ready=Array.isArray(options&&options.readyAttackSlots)&&options.readyAttackSlots.includes(index+1);
-  const disabled=Array.isArray(options&&options.disabledAttackSlots)&&options.disabledAttackSlots.includes(index+1);
-  return '<section class="sb-card-rule sb-card-attack'+(ready?' is-ready':'')+(disabled?' is-disabled':'')+'" data-card-attack-slot="'+(index+1)+'">'+
-    '<div class="sb-card-rule-head"><span class="sb-card-cost">'+esc(costText(attack.cost))+'</span><strong>'+esc(attack.name||('Attack '+(index+1)))+'</strong><span class="sb-card-damage">'+esc(damageText(attack))+'</span></div>'+
-    '<div class="sb-card-rule-meta">Attack '+(index+1)+' · Ends Turn</div>'+
+  const slot=index+1;
+  const ready=Array.isArray(options&&options.readyAttackSlots)&&options.readyAttackSlots.includes(slot);
+  const disabled=Array.isArray(options&&options.disabledAttackSlots)&&options.disabledAttackSlots.includes(slot);
+  const interactive=!!(options&&options.interactiveAttacks);
+  const tag=interactive?'button':'section';
+  const attrs=interactive
+    ? ' type="button" data-card-intent="attack" data-attack-slot="'+slot+'"'+(disabled?' disabled':'')
+    : '';
+  return '<'+tag+' class="sb-card-rule sb-card-attack'+(ready?' is-ready':'')+(disabled?' is-disabled':'')+'" data-card-attack-slot="'+slot+'"'+attrs+'>'+
+    '<div class="sb-card-rule-head"><span class="sb-card-cost">'+esc(costText(attack.cost))+'</span><strong>'+esc(attack.name||('Attack '+slot))+'</strong><span class="sb-card-damage">'+esc(damageText(attack))+'</span></div>'+
+    '<div class="sb-card-rule-meta">Attack '+slot+' · Ends Turn</div>'+
     (effect?'<p>'+esc(effect)+'</p>':'')+
-    '</section>';
+    '</'+tag+'>';
 }
 function creatureRules(record,options){
   const creature=record.definition&&record.definition.creature||{};
