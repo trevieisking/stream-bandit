@@ -285,12 +285,13 @@ function attackMarkup(attack,index,options){
   const interactive=!!(options&&options.interactiveAttacks);
   const tag=interactive?'button':'section';
   const attrs=interactive
-    ? ' type="button" data-card-intent="attack" data-attack-slot="'+slot+'"'+(disabled?' disabled':'')
+    ? ' type="button" data-card-intent="attack" data-attack-slot="'+slot+'"'+
+      (disabled?' aria-disabled="true" data-attack-blocked-reason="'+esc(reason||'Attack is not currently legal')+'"':'')
     : '';
   const stateMeta=ready?'Ready':(reason||'');
   return '<'+tag+' class="sb-card-rule sb-card-attack'+(ready?' is-ready':'')+(disabled?' is-disabled':'')+'" data-card-attack-slot="'+slot+'"'+attrs+'>'+
     '<div class="sb-card-rule-head"><span class="sb-card-cost">'+costOrbsMarkup(attack.cost)+'</span><strong>'+esc(attack.name||('Attack '+slot))+'</strong><span class="sb-card-damage">'+esc(damageText(attack))+'</span></div>'+
-    '<div class="sb-card-rule-meta">'+(stateMeta?esc(stateMeta)+' · ':'')+'Attack '+slot+' · Ends Turn</div>'+
+    '<div class="sb-card-rule-meta">'+(stateMeta?esc(stateMeta)+' · ':'')+'Attack '+slot+' · Turn ends after full resolution</div>'+
     (effect?'<p>'+esc(effect)+'</p>':'')+
     '</'+tag+'>';
 }
