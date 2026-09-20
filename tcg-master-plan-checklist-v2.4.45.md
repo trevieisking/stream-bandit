@@ -185,3 +185,31 @@
 - [ ] Trevor/Kay PASS: attached Essence colors/counts are readable on every occupied Creature and update immediately when Essence leaves.
 - [ ] Final board decoration/art polish only after these interaction gates and the V2.4.52 real Attack/damage gate pass.
 - [ ] Promotion decision remains HOLD until V2.4.52 + V2.4.53 human gates pass.
+
+
+## V2.4.54 — compact tabletop + lethal Attack handoff correction
+- [x] Record Trevor/Kay human evidence that lethal Attack -> Reward take -> forced promotion reached a synchronized authoritative Revision but remained stuck in `phase=resolution` instead of returning to `play`.
+- [x] Confirm from authoritative database command/event history that Attack, Reward take and promotion all committed successfully before the stall; do not misdiagnose the completed commands as browser transport failures.
+- [x] Fix the canonical Match Flow Turn owner so a successful ordinary turn advance explicitly sets `phase = "play"`; terminal/deckout branches remain unchanged.
+- [x] Regression-test the exact lethal continuation boundary: start in `resolution` -> advance next seat/draw -> finish in `play`.
+- [x] Preserve Card-Zone as the physical turn-start draw owner and Match Flow as the lifecycle/phase owner.
+- [x] Treat the supplied reference videos 3/4 as **interaction/layout reference only**, never as permission to copy external artwork, branding, card identities or visual assets.
+- [x] Lock Battle to **normal browser zoom** as the acceptance target; players must not need 50% zoom to see the whole tabletop and hand.
+- [x] Lock in-play Creature cards to compact artwork/status previews that remain in their board slots.
+- [x] Lock tap/click on a compact field card to open a separate full canonical Stream Bandit card inspector without moving/reflowing the source card.
+- [x] Lock the player hand to a fixed bottom horizontal card tray that never makes the whole board taller.
+- [x] Lock phone hand navigation to left/right horizontal swipe/scroll.
+- [x] Lock hand-card tap/click to readable inspection while preserving the already-approved tap-select -> highlighted-destination fallback after closing the inspector.
+- [x] Lock direct desktop/phone drag/drop from hand to the existing legal board destinations and existing server actions; no duplicate layout-specific gameplay owner.
+- [x] Implement compact field-card rendering through the existing shared card renderer `compact` mode.
+- [x] Implement compact hand-card rendering plus one shared full inspector for hand/field cards.
+- [x] Implement one-viewport phone tabletop composition with four Reserve slots, Vanguard, side piles, battle-flow strip and horizontal hand visible without page-height expansion.
+- [x] Keep attached Essence rail / HP / live status visible on compact occupied field cards.
+- [ ] Exact-head TCG Card Pass 2 Validation PASS after V2.4.54 implementation/docs synchronization.
+- [ ] Deploy only the proven Match Flow Turn phase-return repair to the existing live `tcg-match-actions` function after exact-head evidence is green.
+- [ ] Trevor desktop PASS at default/100% zoom: whole battlefield + hand visible; no browser zoom-out required.
+- [ ] Trevor desktop PASS: click field/hand card -> readable inspector; source card stays anchored; drag/drop still works.
+- [ ] Kay phone PASS: whole battlefield + bottom hand visible in one viewport; hand scrolls left/right.
+- [ ] Kay phone PASS: tap hand card -> readable inspector; close -> tap fallback remains possible; long-hold drag/drop still works.
+- [ ] Trevor/Kay real two-user PASS: lethal Attack -> Reward(s) to hand -> required promotion -> phase returns to play -> active player switches automatically.
+- [ ] Promotion to main/live remains HOLD until V2.4.52–V2.4.54 human acceptance is complete.
