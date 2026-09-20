@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.11-card-face';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.12-essence-rail';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -410,18 +410,79 @@
       esc(cardNameById(cardId) || cardId || 'Card') + '</strong><small>Card renderer loading</small></div></article>';
   }
 
-  function liveCreatureStatus(creature, cardId) {
+  const ESSENCE_ELEMENT_ORDER = ['Astral', 'Ember', 'Gale', 'Grove', 'Shade', 'Stone', 'Tide', 'Volt', 'Any'];
+
+  function normalizeEssenceElement(value) {
+    const raw = String(value || 'Any').trim();
+    const match = ESSENCE_ELEMENT_ORDER.find((name) => name.toLowerCase() === raw.toLowerCase());
+    return match || raw || 'Any';
+  }
+
+  function attachedEssenceUnits(creature) {
+    const attached = Array.isArray(creature && creature.essence) ? creature.essence : [];
+    const totals = new Map();
+    const renderer = cardRenderer();
+    for (const instance of attached) {
+      if (!instance || !instance.card_id) continue;
+      let definition = structuredDefinition(instance);
+      if (!definition && renderer && typeof renderer.getCard === 'function') {
+        const record = renderer.getCard(String(instance.card_id || ''));
+        definition = record && record.definition ? record.definition : null;
+      }
+      const essence = definition && definition.essence && typeof definition.essence === 'object'
+        ? definition.essence
+        : null;
+      const provides = essence && Array.isArray(essence.provides) ? essence.provides : [];
+      if (provides.length) {
+        for (const part of provides) {
+          const element = normalizeEssenceElement(part && part.element);
+          const amount = Math.max(0, Math.floor(Number(part && part.amount) || 0));
+          if (!amount) continue;
+          totals.set(element, (totals.get(element) || 0) + amount);
+        }
+        continue;
+      }
+      const legacy = legacyDefinition(instance) || {};
+      const element = normalizeEssenceElement(legacy.element || legacy.energy_type || 'Any');
+      totals.set(element, (totals.get(element) || 0) + 1);
+    }
+    return [...totals.entries()]
+      .map(([element, count]) => ({ element, count }))
+      .sort((a, b) => {
+        const ai = ESSENCE_ELEMENT_ORDER.indexOf(a.element);
+        const bi = ESSENCE_ELEMENT_ORDER.indexOf(b.element);
+        if (ai !== bi) return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+        return a.element.localeCompare(b.element);
+      });
+  }
+
+  function liveCreatureStatus(creature, cardId, essenceUnits) {
     const structured = structuredDefinition(topInstance(creature)) || {};
     const maxHp = Math.max(0, Number(structured.creature && structured.creature.hp || 0));
     const damage = Math.max(0, Number(creature && creature.damage || 0));
     const remaining = Math.max(0, maxHp - damage);
-    const essenceCount = Array.isArray(creature && creature.essence) ? creature.essence.length : 0;
+    const unitTotal = (Array.isArray(essenceUnits) ? essenceUnits : []).reduce((sum, row) => sum + Math.max(0, Number(row && row.count) || 0), 0);
+    const sourceCount = Array.isArray(creature && creature.essence) ? creature.essence.length : 0;
+    const essenceCount = unitTotal || sourceCount;
     const shield = Math.max(0, Number(creature && creature.shield || 0));
     return '<div class="sb-card-live-status" data-card-id="' + esc(cardId) + '">' +
       '<span>HP <strong>' + esc(remaining) + '/' + esc(maxHp) + '</strong></span>' +
       '<span>Essence <strong>' + esc(essenceCount) + '</strong></span>' +
       '<span>Shield <strong>' + esc(shield) + '</strong></span>' +
       '</div>';
+  }
+
+  function syncEssenceRailCompression() {
+    document.querySelectorAll('[data-essence-rail]').forEach((rail) => {
+      if (!rail || !rail.classList) return;
+      rail.classList.remove('is-compressed');
+      const expanded = typeof rail.querySelector === 'function'
+        ? rail.querySelector('[data-essence-expanded]')
+        : null;
+      const available = Number(rail.clientWidth || 0);
+      const required = Number(expanded && expanded.scrollWidth || 0);
+      if (available > 0 && required > available) rail.classList.add('is-compressed');
+    });
   }
 
   function attackStatesFor(canAct) {
@@ -453,6 +514,7 @@
     const cardId = String(instance && instance.card_id || '');
     const abilityReady = !!(opts.own && abilityReadyFor(opts.where, opts.index, creature));
     const interactiveAttacks = !!opts.primary;
+    const essenceUnits = attachedEssenceUnits(creature);
     const face = renderCardFace(cardId, {
       mode: 'battle',
       abilityReady,
@@ -460,7 +522,8 @@
       abilityWhere: opts.where || '',
       abilityIndex: opts.index,
       interactiveAttacks,
-      attackStates: interactiveAttacks ? attackStatesFor(!!opts.canAct) : null
+      attackStates: interactiveAttacks ? attackStatesFor(!!opts.canAct) : null,
+      attachedEssenceUnits: essenceUnits
     });
     const setupReturn = opts.setupReturn
       ? '<button type="button" class="sb-card-action setup-return" data-setup-return="' + esc(opts.setupReturn.where) + '" data-setup-index="' + esc(opts.setupReturn.index == null ? '' : opts.setupReturn.index) + '"><span><strong>Return to hand</strong><small>Adjust setup</small></span><span>↩</span></button>'
@@ -468,7 +531,7 @@
     return '<div class="sb-card-wrap' + (selected ? ' is-selected' : '') + (opts.setupReturn ? ' has-setup-return' : '') + '">' +
       '<div class="sb-card-control sb-card-control-shell' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '"' +
       (opts.primary ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"' : '') + '>' +
-      face + liveCreatureStatus(creature, cardId) +
+      face + liveCreatureStatus(creature, cardId, essenceUnits) +
       '</div>' +
       (setupReturn ? '<div class="sb-card-actions">' + setupReturn + '</div>' : '') +
       '</div>';
@@ -831,6 +894,10 @@
     renderOverlay();
     bindCardControls();
     bindPhaseControls();
+    syncEssenceRailCompression();
+    if (typeof window.requestAnimationFrame === 'function') {
+      window.requestAnimationFrame(syncEssenceRailCompression);
+    }
   }
 
   function syncPlayTargetDom() {
