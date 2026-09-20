@@ -54,6 +54,7 @@ const sandbox={window:{},document:{baseURI:'https://example.invalid/'},URL};
 vm.runInNewContext(source,sandbox,{filename:'stream-bandit-tcg-card-renderer-v2-4-51.js'});
 const renderer=sandbox.window.StreamBanditTCGCardRendererV2451;
 assert.ok(renderer);
+assert.equal(renderer.version,'2.4.53');
 
 const orbit=registry.records.find(x=>x.card_id==='astral-orbitortoise');
 assert.ok(orbit);
@@ -62,6 +63,21 @@ for(const token of ['HP</small><strong>170','Orbitortoise','Astral','Forecast Sh
   assert.ok(orbitHtml.includes(token),`Orbitortoise face missing ${token}`);
 }
 assert.ok(!orbitHtml.includes('data-card-intent="ability"'),'triggered Ability must not become a manual button');
+
+const essenceRailHtml=renderer.renderCard(orbit,{
+  mode:'battle',
+  attachedEssenceUnits:[
+    {element:'Astral',count:3},
+    {element:'Tide',count:2},
+  ],
+});
+assert.ok(essenceRailHtml.includes('data-essence-rail'));
+assert.ok(essenceRailHtml.includes('aria-label="Attached Essence: 3 Astral, 2 Tide"'));
+assert.ok(essenceRailHtml.includes('data-essence-element="Astral" data-essence-count="3"'));
+assert.ok(essenceRailHtml.includes('data-essence-element="Tide" data-essence-count="2"'));
+assert.equal((essenceRailHtml.match(/data-essence-element="Astral"/g)||[]).length,4,'expanded Astral orbs plus one counted Astral fallback must exist');
+assert.equal((essenceRailHtml.match(/data-essence-element="Tide"/g)||[]).length,3,'expanded Tide orbs plus one counted Tide fallback must exist');
+assert.ok(orbitHtml.includes('aria-label="Attack Cost: 2 Astral"'),'Attack cost must use the same element identity system as attached Essence');
 
 const notReadyHtml=renderer.renderCard(orbit,{mode:'battle',interactiveAttacks:true,attackStates:{1:{eligible:false,reason:'attack_essence_cost_not_met'},2:{eligible:true,reason:null}}});
 assert.ok(notReadyHtml.includes('Needs more matching Essence'));
@@ -96,9 +112,14 @@ assert.ok(battleController.includes("actionBase('field_actions')"));
 assert.ok(battleController.includes("actionBase('use_ability')"));
 assert.ok(battleController.includes('StreamBanditTCGCardRendererV2451'));
 assert.ok(battleController.includes('sb-hand-card-shell'));
+assert.ok(battleController.includes('function attachedEssenceUnits'));
+assert.ok(battleController.includes('essence.provides'));
+assert.ok(battleController.includes('attachedEssenceUnits: essenceUnits'));
+assert.ok(battleController.includes("document.querySelectorAll('[data-essence-rail]')"));
+assert.ok(battleController.includes('required > available'));
 
 const presentation=read('stream-bandit-tcg-product-presentation-v2-4-46.js');
 assert.ok(presentation.includes('data-sb-tcg-render-card'));
 assert.ok(presentation.includes('StreamBanditTCGCardRendererV2451'));
 
-console.log('Global card face v1 PASS: 193 identities, 24 approved-art, 169 Artwork Pending, shared renderer and battle Ability wiring verified.');
+console.log('Global card face v1 PASS: 193 identities, shared card renderer, Ability/Attack readiness and attached Essence-orb presentation verified.');
