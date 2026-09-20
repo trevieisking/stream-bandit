@@ -24,7 +24,7 @@ const protectionAttackContext = 'ctx:{target_zone:string,target_controller:"self
 const attackWiredWithProtection = attackWired.replace(legacyAttackContext, protectionAttackContext);
 
 const attachLegacy = 'const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);\n   if(d.id===';
-const attachEngineBoundary = 'const td=top(cr,s);const structuredAttachment=s.runtime_registry_v0_2!=null;\n   if(structuredAttachment){';
+const attachEngineBoundary = 'const structuredAttachment=s.runtime_registry_v0_2!=null;\n   if(structuredAttachment){';
 const attachRouteCall = 'runtimeV02BeginExternalEssenceAttachmentRoute(s,seat as 1|2,targetInst.uid,uid,"hand","manual_essence"';
 const attachmentEngineLifecycleImport = 'import { registerStructuredRuntimeEssenceAttachmentLifecycleState } from "./tcg-match-surge-lifecycle-v0-2.ts";';
 const attachmentEngineLifecycleCall = 'const lifecycleRegistered = registerStructuredRuntimeEssenceAttachmentLifecycleState(';
