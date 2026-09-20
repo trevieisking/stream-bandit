@@ -459,4 +459,16 @@
 - [x] Expand exact Match Edge dependency closure 89 -> 90 files.
 - [x] TCG Card Pass 2 Validation #1265 SUCCESS on exact head `fb494fedd43851acc4302b4e6d1327715214c689`.
 - [ ] Migrate Chainstorm's event_occurred IF leaf to consume the same event map through the shared Attack IF owner.
+## V2.4.68 — conditional Condition Attack IF migration
+- [x] Identify the exact conditional-Condition family: 5 IF instances / 4 cards.
+- [x] Add one generic nested IF -> Condition owner; reject mixed heal/discard/switch programs.
+- [x] Route every IF decision through the shared Attack IF evaluator.
+- [x] Route Condition mutation through applyRuntimeConditionWithContext so protection/immunity remain authoritative.
+- [x] Support nested IF and REPLACE_CONTROL_CONDITION without card-ID branches.
+- [x] Consume Chainstorm declaration evidence from the generic attackActionEvents map.
+- [x] Keep the old direct structured Condition owner first and legacy English fallback last to prevent duplicate application.
+- [x] Expand exact Match Edge closure 90 -> 92 files.
+- [x] TCG Card Pass 2 Validation #1274 SUCCESS on exact head `cab1a7daa29e8d129050dcde71e69eebe4f50b65`.
+- [x] Attack IF migration count: **5 / 13** instances now route through the shared IF owner.
+- [ ] Next: migrate the bounded self-heal / heal-each / deck-discard / top-deck IF owners onto the shared Attack IF evaluator.
 
