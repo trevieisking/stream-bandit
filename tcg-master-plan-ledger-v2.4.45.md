@@ -280,3 +280,7 @@ Boolean structure (all, any, not) belongs to tcg-match-predicate-tree-v0-2.ts. T
 
 ## 105 — Generic IF is not complete until every Release 1 context is covered
 The shared predicate tree is foundation only. IF remains incomplete until all 29 frozen Release 1 IF instances can execute through structured owners across Attack, Ability and Tactic/listener contexts without printed-English or card-ID gameplay fallback.
+
+
+## 106 — Event Listener no longer owns boolean-tree syntax
+Event Listener keeps authoritative meanings for its event-context leaf predicates, but all / any / not composition is delegated to the shared predicate-tree owner. This migration is behavior-preserving and does not make Event Listener the global owner of those leaf predicates in Attack, Ability or Tactic contexts.
