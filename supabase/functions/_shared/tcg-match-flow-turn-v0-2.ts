@@ -5,6 +5,7 @@ import {
 } from "./tcg-match-flow-engine-v0-2.ts";
 
 export type RuntimeV02TurnAdvanceState = RuntimeV02TerminalState & {
+  phase?: unknown;
   active_seat?: unknown;
   turn_seq?: unknown;
   personal_turns?: unknown;
@@ -146,6 +147,7 @@ export function runtimeV02AdvanceTurn(
   state.active_seat = nextSeat;
   state.turn_seq = nextTurn;
   personalTurns[String(nextSeat)] = nextPersonalTurn;
+  state.phase = "play";
   state.log.push(`Seat ${nextSeat} begins personal turn ${nextPersonalTurn}.`);
 
   return {
