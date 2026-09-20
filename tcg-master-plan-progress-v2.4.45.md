@@ -324,3 +324,16 @@ The previously open automated Ability-capability gate now has both server and br
 No renderer-owned Ability legality was added. Server capability remains the only source of the glow/ready state.
 
 Once exact-head CI passes, all currently listed non-human V2.4.52/V2.4.53 interaction gates are complete. The loop must then stop at the explicit Trevor/Kay real-device Battle gate before any promotion or decorative-board pass.
+
+
+## V2.4.53 automated interaction gate — source PASS at run #1040
+
+TCG Card Pass 2 Validation **#1040** passed at source head `e3e5b00053ef5665b13ca6aeba5cc8c0b185ee28`, including:
+- attached Essence add/remove + measured compression/re-expansion;
+- per-element counted overflow and shared Attack-cost identity;
+- coarse-touch drag command parity + tap fallback;
+- server active-Ability capability consumption and browser glow disappearance.
+
+The subsequent checklist/progress synchronization changes documentation only, so a fresh exact-head validation is still required before the branch checkpoint is called fully current.
+
+**Next target boundary:** the remaining Battle acceptance items are now real Trevor/Kay device checks. Do not replace them with more automation, do not decorate the board yet, and do not promote. The next actionable step after final exact-head CI is to present this branch for the explicit two-device test: real Attack/damage/reward, Ability glow/use, Essence rail, phone drag/tap and Quit Match.
