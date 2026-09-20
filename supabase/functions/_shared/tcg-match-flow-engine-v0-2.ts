@@ -1,3 +1,5 @@
+import { runtimeV02RecordTurnOwner } from "./tcg-match-turn-history-v0-2.ts";
+
 export type RuntimeV02MatchFlowSeat = 1 | 2;
 export type RuntimeV02OpeningChoice = "first" | "second";
 
@@ -221,6 +223,7 @@ export function runtimeV02ApplySetupReady(
   state.active_seat = firstPlayerSeat;
   state.turn_seq = 1;
   personalTurns[String(firstPlayerSeat)] = 1;
+  runtimeV02RecordTurnOwner(state, 1, firstPlayerSeat);
   state.log.push(
     `Seat 2 setup locked. Seat ${firstPlayerSeat} begins turn 1 and draws.`,
   );
