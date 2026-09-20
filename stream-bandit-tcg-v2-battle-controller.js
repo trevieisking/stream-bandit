@@ -378,20 +378,23 @@
       return false;
     }
     if (!projection || projection.eligible !== true) {
-      setActionFailure(projection && projection.reason ? projection.reason : 'no_legal_card_target');
+      const reason = projection && projection.reason ? projection.reason : 'no_legal_card_target';
       render();
+      setActionFailure(reason);
       return false;
     }
     if (['play_creature', 'evolve', 'attach_essence', 'attach_relic'].includes(intent)) {
       if (!projectionTargetLegal(projection, where, index)) {
-        setActionFailure(projection.reason || 'no_legal_card_target');
+        const reason = projection.reason || 'no_legal_card_target';
         render();
+        setActionFailure(reason);
         return false;
       }
     }
     if (intent === 'play_realm' && !projectionTargetLegal(projection, 'realm', null)) {
-      setActionFailure(projection.reason || 'no_legal_card_target');
+      const reason = projection.reason || 'no_legal_card_target';
       render();
+      setActionFailure(reason);
       return false;
     }
     return true;
