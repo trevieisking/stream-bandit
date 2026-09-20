@@ -136,8 +136,8 @@
 - [x] Lock Attack Ready/blocked presentation to server-projected readiness, including insufficient-Essence explanation.
 - [x] Lock touch Essence flow: tap Essence -> tap highlighted Creature; desktop drag is optional only.
 - [x] Lock the Trevor-supplied Orbitortoise card as the global card-face layout reference for current/future identities.
-- [ ] Add the small Battle settings/cog control and wire **Quit Match** through authoritative `concede`.
-- [ ] Rename terminal continuation to **Back to Matchmaking** and prove it returns to `tcg-play.html` without `match_id`.
+- [x] Add the small Battle settings/cog control and wire **Quit Match** through authoritative `concede`.
+- [x] Rename terminal continuation to **Back to Matchmaking** and prove it returns to `tcg-play.html` without `match_id`.
 - [ ] Automated Attack journey proves legal Attack -> exact damage -> automatic turn advance/draw.
 - [ ] Automated defeat journey proves lethal Attack -> Creature removed -> Reward resolution queued.
 - [ ] Automated concession journey proves quitter loss / opponent win and no unrelated state mutation.
