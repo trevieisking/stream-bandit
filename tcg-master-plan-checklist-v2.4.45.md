@@ -436,4 +436,16 @@
 - [x] TCG Card Pass 2 Validation #1250 SUCCESS on exact head `93c169b63423ef029bf7cbd071eb4e09c27bd74d`.
 - [x] All six frozen Release 1 Tactic IF programs now have generic executable downstream paths.
 - [ ] Next Master Plan runtime gate: generic Attack IF execution for all 13 frozen Attack IF instances.
+## V2.4.66 — shared Attack IF predicate foundation
+- [x] Inventory the frozen Release 1 Attack IF set: 13 IF instances / 11 cards.
+- [x] Inventory the exact eight Attack IF predicate families.
+- [x] Add one read-only Attack IF evaluator over the shared predicate-tree owner.
+- [x] Reuse shared source_damaged / source_has_shield_at_least / reserve_count_at_least semantics.
+- [x] Reuse shared Condition state for control-slot-empty and target-has-any-condition.
+- [x] Accept caller-owned current-action event evidence; do not create a second event log.
+- [x] Delegate card_matches filter semantics to the existing card/filter owner boundary.
+- [x] Prove the Attack IF owner has no mutation authority and no launch card identity.
+- [x] TCG Card Pass 2 Validation #1255 SUCCESS on exact head `00d5f8a7aec223dcd8c5a336d27046ac7d1ad3b7`.
+- [ ] Migrate each frozen Attack IF effect family onto this common predicate owner without double execution.
+- [ ] Close the parent “generic Attack IF execution” box only after all 13 instances are proven executable without printed-English/card-ID fallback.
 
