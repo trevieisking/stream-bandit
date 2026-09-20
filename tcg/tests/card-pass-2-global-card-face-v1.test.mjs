@@ -84,7 +84,7 @@ assert.ok(orbitHtml.includes('aria-label="Attack Cost: 2 Astral"'),'Attack cost 
 
 const notReadyHtml=renderer.renderCard(orbit,{mode:'battle',interactiveAttacks:true,attackStates:{1:{eligible:false,reason:'attack_essence_cost_not_met'},2:{eligible:true,reason:null}}});
 assert.ok(notReadyHtml.includes('Needs more matching Essence'));
-assert.ok(notReadyHtml.includes('Ready · Attack 2 · Ends Turn'));
+assert.ok(notReadyHtml.includes('Ready · Attack 2 · Turn ends after full resolution'));
 assert.ok(notReadyHtml.includes('data-attack-slot="1" disabled'));
 assert.ok(notReadyHtml.includes('data-attack-slot="2"'));
 
