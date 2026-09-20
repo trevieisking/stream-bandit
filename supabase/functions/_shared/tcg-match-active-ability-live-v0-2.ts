@@ -15,6 +15,14 @@ import {
   type RuntimeV02PendingActiveAbilityDeckReadingChoice,
 } from "./tcg-match-active-ability-deck-reading-v0-2.ts";
 import {
+  runtimeV02CreateActiveAbilitySupplyChoice,
+  runtimeV02PendingActiveAbilitySupplyChoiceView,
+  runtimeV02ResolveActiveAbilitySupplyChoice,
+  structuredRuntimeActiveAbilitySupply,
+  type RuntimeV02ActiveAbilitySupplyChoiceResolution,
+  type RuntimeV02PendingActiveAbilitySupplyChoice,
+} from "./tcg-match-active-ability-supply-v0-2.ts";
+import {
   runtimeV02BuildActiveAbilitySelectedHealChoice,
   runtimeV02PendingActiveAbilitySelectedHealChoiceView,
   runtimeV02ResolveActiveAbilitySelectedHealChoice,
@@ -39,12 +47,14 @@ type RuntimeV02ActiveAbilitySource = {
 };
 
 export type RuntimeV02PendingActiveAbilityLiveChoice =
+  | RuntimeV02PendingActiveAbilitySupplyChoice
   | RuntimeV02PendingActiveAbilityDeckReadingChoice
   | RuntimeV02PendingActiveAbilityChoice
   | RuntimeV02PendingActiveAbilitySelectedHealChoice
   | RuntimeV02PendingActiveAbilitySelectedModifierChoice;
 
 export type RuntimeV02ActiveAbilityLiveResolution =
+  | RuntimeV02ActiveAbilitySupplyChoiceResolution
   | RuntimeV02ActiveAbilityDeckReadingResolution
   | {
     kind: "inspect_one_reward";
@@ -73,6 +83,23 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
   choiceId: string = crypto.randomUUID(),
 ): RuntimeV02PendingActiveAbilityLiveChoice | null {
   const instance = source.instance as { card_id?: unknown } | null | undefined;
+  const supplyDescriptor = structuredRuntimeActiveAbilitySupply(state, instance);
+  if (supplyDescriptor) {
+    const pending = runtimeV02CreateActiveAbilitySupplyChoice(
+      state,
+      controllerSeat,
+      supplyDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      supplyDescriptor.ability_id,
+    );
+    return pending;
+  }
+
   const deckReadingDescriptor = structuredRuntimeActiveAbilityDeckReading(state, instance);
   if (deckReadingDescriptor) {
     const pending = runtimeV02CreateActiveAbilityDeckReadingChoice(
@@ -141,6 +168,9 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
   viewerSeat: 1 | 2,
 ) {
   if (!choice) return null;
+  if (choice.kind === "select_reserve_target_and_optional_discard_essence") {
+    return runtimeV02PendingActiveAbilitySupplyChoiceView(choice, viewerSeat);
+  }
   if (choice.kind === "inspect_opponent_deck_top_then_optional_bottom") {
     return runtimeV02PendingActiveAbilityDeckReadingChoiceView(choice, viewerSeat);
   }
@@ -168,6 +198,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
   choiceIds: string[],
   state: Record<string, unknown>,
 ): RuntimeV02ActiveAbilityLiveResolution {
+  if (choice.kind === "select_reserve_target_and_optional_discard_essence") {
+    return runtimeV02ResolveActiveAbilitySupplyChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
+  }
   if (choice.kind === "inspect_opponent_deck_top_then_optional_bottom") {
     return runtimeV02ResolveActiveAbilityDeckReadingChoice(
       choice,
