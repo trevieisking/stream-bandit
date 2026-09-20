@@ -1343,11 +1343,13 @@
       const realmCardId = view.realm && view.realm.card ? String(view.realm.card.card_id || '') : '';
       const realmValue = realmCardId ? cardNameById(realmCardId) : 'No active Realm';
       realm.textContent = realmCardId ? 'Realm · ' + String(realmValue) : 'Realm · none';
-      realm.classList.toggle('is-active', !!realmCardId);
+      if (realm.classList && typeof realm.classList.toggle === 'function') realm.classList.toggle('is-active', !!realmCardId);
       realm.tabIndex = realmCardId ? 0 : -1;
-      realm.setAttribute('role', realmCardId ? 'button' : 'status');
-      realm.setAttribute('aria-label', realmCardId ? 'Inspect active Realm ' + String(realmValue) : 'No active Realm');
-      realm.dataset.realmCardId = realmCardId;
+      if (typeof realm.setAttribute === 'function') {
+        realm.setAttribute('role', realmCardId ? 'button' : 'status');
+        realm.setAttribute('aria-label', realmCardId ? 'Inspect active Realm ' + String(realmValue) : 'No active Realm');
+      }
+      if (realm.dataset) realm.dataset.realmCardId = realmCardId;
     }
 
     const turnPill = $('turnPill');
