@@ -1,10 +1,11 @@
 {
   "schema": "stream-bandit-tcg-battle-client-interaction-v1",
-  "recorded_at": "2026-09-16",
+  "recorded_at": "2026-09-20",
   "authority": {
     "reference_video": "Dar match up test deck(1).mp4",
     "purpose": "Interaction choreography reference only; Stream Bandit retains original names, art, rules, card identities and UI design.",
-    "server_authoritative": true
+    "server_authoritative": true,
+    "cross_device_observation": "Trevor desktop native drag/drop worked; Kay phone coarse-touch drag/drop did not. V2.4.53 requires pointer/touch drag parity while retaining tap fallback."
   },
   "board": {
     "opponent_position": "top",
@@ -18,66 +19,182 @@
     "board_remains_visible_during_choices": true
   },
   "input_modes": {
-    "desktop": ["hover_inspect", "click_select", "drag_drop"],
-    "touch": ["tap_inspect", "tap_select", "tap_destination"],
-    "accessibility": ["reduced_motion", "keyboard_focus", "text_legality_reason"]
+    "desktop": [
+      "hover_inspect",
+      "click_select",
+      "drag_drop"
+    ],
+    "touch": [
+      "tap_inspect",
+      "tap_select",
+      "tap_destination",
+      "drag_drop"
+    ],
+    "accessibility": [
+      "reduced_motion",
+      "keyboard_focus",
+      "text_legality_reason"
+    ],
+    "touch_drag_transport": "pointer_events_or_equivalent_touch_safe_gesture_not_native_html5_only",
+    "touch_tap_fallback_required": true
   },
   "required_flows": [
     {
       "id": "opening_setup",
-      "steps": ["opening_choice", "opening_hand", "place_vanguard", "place_reserves", "confirm_setup", "install_rewards"]
+      "steps": [
+        "opening_choice",
+        "opening_hand",
+        "place_vanguard",
+        "place_reserves",
+        "confirm_setup",
+        "install_rewards"
+      ]
     },
     {
       "id": "play_creature",
-      "steps": ["select_or_drag_hand_card", "highlight_legal_slots", "choose_slot", "server_validate", "animate_card_to_board"]
+      "steps": [
+        "select_or_drag_hand_card",
+        "highlight_legal_slots",
+        "choose_slot_by_drop_or_tap",
+        "server_validate",
+        "animate_card_to_board"
+      ]
     },
     {
       "id": "evolve_creature",
-      "steps": ["select_or_drag_evolution", "highlight_legal_lower_stages", "choose_target", "server_validate", "animate_stack"]
+      "steps": [
+        "select_or_drag_evolution",
+        "highlight_legal_lower_stages",
+        "choose_target_by_drop_or_tap",
+        "server_validate",
+        "animate_stack"
+      ]
     },
     {
       "id": "attach_essence",
-      "steps": ["select_or_drag_essence", "highlight_legal_creatures", "choose_target", "server_validate_payment_or_attachment", "animate_attachment"]
+      "steps": [
+        "select_or_drag_essence",
+        "highlight_legal_creatures",
+        "choose_target_by_drop_or_tap",
+        "server_validate_payment_or_attachment",
+        "animate_attachment",
+        "render_attached_element_orbs"
+      ]
     },
     {
       "id": "play_tactic",
-      "steps": ["select_tactic", "show_effect_preview", "highlight_legal_targets", "resolve_private_choice_if_needed", "server_commit", "animate_effect"]
+      "steps": [
+        "select_tactic",
+        "show_effect_preview",
+        "highlight_legal_targets",
+        "resolve_private_choice_if_needed",
+        "server_commit",
+        "animate_effect"
+      ]
     },
     {
       "id": "search_or_select",
-      "steps": ["keep_board_visible", "open_card_carousel_or_grid", "show_requirement_and_selected_count", "select_cards", "confirm", "server_commit", "return_to_board"]
+      "steps": [
+        "keep_board_visible",
+        "open_card_carousel_or_grid",
+        "show_requirement_and_selected_count",
+        "select_cards",
+        "confirm",
+        "server_commit",
+        "return_to_board"
+      ]
     },
     {
       "id": "creature_context",
-      "steps": ["select_creature", "enlarge_card", "show_ability_or_attack_slots", "show_withdraw", "show_legality_reason_for_locked_actions"]
+      "steps": [
+        "select_creature",
+        "enlarge_card",
+        "show_ability_or_attack_slots",
+        "show_withdraw",
+        "show_legality_reason_for_locked_actions"
+      ]
     },
     {
       "id": "attack",
-      "steps": ["select_vanguard", "choose_attack_1_or_attack_2", "show_attack_cost", "choose_target_if_required", "server_validate", "animate_payment", "animate_attack", "show_damage_shield_condition_listener_results", "scan_defeat_and_aftermath"]
+      "steps": [
+        "select_vanguard",
+        "choose_attack_1_or_attack_2",
+        "show_attack_cost",
+        "choose_target_if_required",
+        "server_validate",
+        "animate_payment",
+        "animate_attack",
+        "show_damage_shield_condition_listener_results",
+        "scan_defeat_and_aftermath"
+      ]
     },
     {
       "id": "ability",
-      "steps": ["select_creature", "choose_ability", "show_cost_and_legal_targets", "server_validate", "resolve_choices", "animate_effect", "show_once_per_turn_or_cooldown_state"]
+      "steps": [
+        "select_creature",
+        "choose_ability",
+        "show_cost_and_legal_targets",
+        "server_validate",
+        "resolve_choices",
+        "animate_effect",
+        "show_once_per_turn_or_cooldown_state"
+      ]
     },
     {
       "id": "voluntary_withdraw",
-      "steps": ["select_vanguard", "choose_withdraw", "show_withdraw_cost", "highlight_legal_reserve_replacements", "choose_replacement", "server_preflight", "animate_payment", "animate_vanguard_to_reserve", "animate_reserve_to_vanguard", "emit_switch_context"]
+      "steps": [
+        "select_vanguard",
+        "choose_withdraw",
+        "show_withdraw_cost",
+        "highlight_legal_reserve_replacements",
+        "choose_replacement",
+        "server_preflight",
+        "animate_payment",
+        "animate_vanguard_to_reserve",
+        "animate_reserve_to_vanguard",
+        "emit_switch_context"
+      ]
     },
     {
       "id": "effect_switch",
-      "steps": ["show_source_card_or_effect", "highlight_legal_switch_targets", "choose_if_optional", "server_resolve", "reuse_board_switch_animation", "preserve_effect_action_kind"]
+      "steps": [
+        "show_source_card_or_effect",
+        "highlight_legal_switch_targets",
+        "choose_if_optional",
+        "server_resolve",
+        "reuse_board_switch_animation",
+        "preserve_effect_action_kind"
+      ]
     },
     {
       "id": "forced_promotion",
-      "steps": ["defeat_animation", "highlight_legal_reserve_promotions", "choose_replacement", "server_resolve", "animate_to_vanguard"]
+      "steps": [
+        "defeat_animation",
+        "highlight_legal_reserve_promotions",
+        "choose_replacement",
+        "server_resolve",
+        "animate_to_vanguard"
+      ]
     },
     {
       "id": "reward_take",
-      "steps": ["open_reward_overlay", "show_face_down_reward_positions", "choose_required_count", "server_commit", "animate_rewards_to_hand_or_destination"]
+      "steps": [
+        "open_reward_overlay",
+        "show_face_down_reward_positions",
+        "choose_required_count",
+        "server_commit",
+        "animate_rewards_to_hand_or_destination"
+      ]
     },
     {
       "id": "terminal",
-      "steps": ["show_final_state", "show_victory_or_defeat", "show_match_rewards_once", "offer_rematch_or_exit"]
+      "steps": [
+        "show_final_state",
+        "show_victory_or_defeat",
+        "show_match_rewards_once",
+        "back_to_matchmaking",
+        "require_new_find_opponent"
+      ]
     }
   ],
   "visual_feedback": [
@@ -87,18 +204,42 @@
     "damage_number_and_hp_delta",
     "shield_delta",
     "condition_badge_and_timer",
-    "attached_essence_visual_stack",
     "relic_attachment_badge",
     "realm_presence",
     "listener_or_trigger_notice",
     "turn_banner",
-    "opponent_thinking_or_choice_state"
+    "opponent_thinking_or_choice_state",
+    "attached_essence_element_orb_rail",
+    "attack_cost_element_orbs",
+    "touch_drag_legal_destination_glow"
   ],
   "forbidden_client_patterns": [
     "browser_prompt_for_gameplay_targeting",
     "duplicate_browser_rules_engine",
     "generic_global_attack_buttons_as_primary_attack_ui",
     "hidden_opponent_card_leak",
-    "debug_form_layout_as_release_battlefield"
-  ]
+    "debug_form_layout_as_release_battlefield",
+    "touch_drag_with_duplicate_client_legality_engine"
+  ],
+  "essence_visibility": {
+    "source_of_truth": "authoritative_creature_attached_essence_plus_structured_provides",
+    "display": "tiny_element_orb_rail_on_creature",
+    "represents": "effective_payable_essence_units",
+    "element_identity": [
+      "Astral",
+      "Ember",
+      "Gale",
+      "Grove",
+      "Shade",
+      "Stone",
+      "Tide",
+      "Volt"
+    ],
+    "color_plus_glyph_required": true,
+    "group_same_element_overflow_as_multiplier": true,
+    "remove_when_authoritative_attachment_leaves": true,
+    "browser_resource_authority": false,
+    "compare_directly_with_attack_cost_orbs": true,
+    "hidden_information_rule": "render_only_attached_essence_information_exposed_by_the_viewer_authorized_match_view"
+  }
 }
