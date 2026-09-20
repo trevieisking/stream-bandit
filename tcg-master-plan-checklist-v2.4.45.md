@@ -141,7 +141,7 @@
 - [x] Automated Attack journey proves legal Attack -> exact damage -> automatic turn advance/draw.
 - [x] Automated defeat journey proves lethal Attack -> Creature removed -> Reward resolution queued.
 - [x] Automated concession journey proves quitter loss / opponent win and no unrelated state mutation.
-- [ ] Automated active Ability projection proves usable -> glow eligible -> use -> projection disappears.
+- [x] Automated active Ability projection proves usable -> glow eligible -> use -> projection disappears.
 - [x] Exact-head TCG Card Pass 2 Validation PASS after V2.4.52.
 - [ ] Trevor/Kay real two-user PASS: at least one Attack visibly places damage.
 - [ ] Trevor/Kay real two-user PASS: lethal damage visibly triggers Reward handling and subsequent state.
@@ -170,10 +170,10 @@
 - [x] Implement effective-unit/multi-element grouping from canonical structured Essence `provides`, using one counted orb per element when the individual-orb rail would crowd the card.
 - [x] Implement phone/tablet pointer/touch-safe hand-card drag/drop transport for setup/play/evolve/Essence/Relic legal destinations.
 - [x] Keep tap-select -> tap highlighted destination fully working after touch-drag implementation.
-- [ ] Automated test: attaching Essence adds the correct element orb(s); compression starts only when the rendered rail would exceed its allocated card bounds; discard/removal can expand or reduce the rail again from authoritative state.
-- [ ] Automated test: when compressed, every Essence type keeps its own counted orb and numeric total; different element totals are never merged.
-- [ ] Automated test: Attack-cost orb presentation and attached-resource orb presentation use the same canonical element identities.
-- [ ] Automated test: coarse-touch drag uses the same intent/action payload as tap mode and contains no duplicate gameplay legality.
+- [x] Automated test: attaching Essence adds the correct element orb(s); compression starts only when the rendered rail would exceed its allocated card bounds; discard/removal can expand or reduce the rail again from authoritative state.
+- [x] Automated test: when compressed, every Essence type keeps its own counted orb and numeric total; different element totals are never merged.
+- [x] Automated test: Attack-cost orb presentation and attached-resource orb presentation use the same canonical element identities.
+- [x] Automated test: coarse-touch drag uses the same intent/action payload as tap mode and contains no duplicate gameplay legality.
 - [ ] Exact-head TCG Card Pass 2 Validation PASS after V2.4.53 implementation.
 - [ ] Trevor desktop PASS: drag/drop still works and board geometry is unchanged.
 - [ ] Kay phone PASS: finger drag/drop works for a playable hand card to a legal destination.
