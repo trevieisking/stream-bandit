@@ -290,6 +290,10 @@
     return instance ? handIntent(instance) : '';
   }
 
+  function selectedHandUidSafe() {
+    return selectedHandInstance() ? state.selectedHandUid : '';
+  }
+
   function selectedHandName() {
     const instance = selectedHandInstance();
     const definition = instance ? (legacyDefinition(instance) || {}) : {};
@@ -547,12 +551,73 @@
     if (!node || !view) return;
     const youSeat = Number(view.you && view.you.seat);
     const phase = String(view.phase || '');
-    const selectedName = selectedSetupName();
+    const selectedName = selectedHandName();
+    const selectedIntent = selectedHandIntent();
     const pending = hasPendingAction(view);
     const yourTurn = phase === 'play' && Number(view.active_seat) === youSeat;
-    const key = [phase, revision(), view.toss_winner_seat, view.setup_turn_seat, state.selectedHandUid, !!(view.you && view.you.vanguard), pending, yourTurn, view.result && view.result.winner_seat].join(':');
+    const serverChoice = currentServerChoice(view);
+
+    if (serverChoice && serverChoice.choice && !serverChoice.choice.waiting) {
+      const choiceId = String(serverChoice.choice.id || '');
+      if (state.pendingChoiceId !== choiceId) {
+        state.pendingChoiceId = choiceId;
+        state.selectedChoiceIds = [];
+      }
+    } else if (!serverChoice) {
+      state.pendingChoiceId = '';
+      state.selectedChoiceIds = [];
+    }
+
+    const key = [
+      phase,
+      revision(),
+      view.toss_winner_seat,
+      view.setup_turn_seat,
+      state.selectedHandUid,
+      state.pendingChoiceId,
+      state.selectedChoiceIds.join(','),
+      !!(view.you && view.you.vanguard),
+      pending,
+      yourTurn,
+      view.result && view.result.winner_seat
+    ].join(':');
     if (key === state.overlayKey) return;
     state.overlayKey = key;
+
+    if (serverChoice && serverChoice.choice) {
+      const choice = serverChoice.choice;
+      if (choice.waiting) {
+        node.innerHTML =
+          '<div class="sb-phase-card">' +
+          '<div class="sb-phase-copy"><strong>Opponent choice</strong><small>Waiting for the other player to resolve the server choice.</small></div>' +
+          '</div>';
+        return;
+      }
+      const options = Array.isArray(choice.options) ? choice.options : [];
+      const selected = new Set(state.selectedChoiceIds);
+      const optionHtml = options.map((option) => {
+        const id = String(option.id || '');
+        const on = selected.has(id);
+        const order = state.selectedChoiceIds.indexOf(id);
+        return '<button type="button" class="sb-choice-option' + (on ? ' is-selected' : '') +
+          '" data-server-choice-option="' + esc(id) + '" aria-pressed="' + (on ? 'true' : 'false') + '">' +
+          (order >= 0 && String(choice.mode || '') === 'order' ? '<b>' + (order + 1) + '</b> ' : '') +
+          esc(option.label || id) + '</button>';
+      }).join('');
+      const min = Math.max(0, Number(choice.min || 0));
+      const max = Math.max(min, Number(choice.max == null ? min : choice.max));
+      const count = state.selectedChoiceIds.length;
+      const canConfirm = count >= min && count <= max;
+      node.innerHTML =
+        '<div class="sb-phase-card sb-choice-card">' +
+        '<div class="sb-phase-copy"><strong>' + esc(choice.prompt || 'Choose') + '</strong>' +
+        '<small>Select ' + esc(min) + (max !== min ? '–' + esc(max) : '') + ' option' + (max === 1 ? '' : 's') + '. The server remains authoritative.</small></div>' +
+        '<div class="sb-choice-options">' + optionHtml + '</div>' +
+        '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-server-choice-confirm="1"' +
+        (canConfirm ? '' : ' disabled') + '>Confirm</button></div>' +
+        '</div>';
+      return;
+    }
 
     if (phase === 'opening_choice') {
       const won = Number(view.toss_winner_seat) === youSeat;
@@ -587,14 +652,20 @@
     }
 
     if (phase === 'play') {
+      const selectedCopy = yourTurn && selectedName
+        ? selectedName + ' selected — ' + playInstruction(selectedIntent)
+        : (yourTurn ? 'Select or drag a card from your hand, use your field controls, or pass.' : 'Your field stays synced while the opponent acts.');
+      const directButton = yourTurn && selectedHandUidSafe() && directHandIntent(selectedIntent)
+        ? '<button type="button" class="sb-phase-action ready" data-play-direct="' + esc(selectedIntent) + '">' +
+          (selectedIntent === 'play_realm' ? 'Play Realm' : 'Play Tactic') + '</button>'
+        : '';
       node.innerHTML =
         '<div class="sb-phase-card sb-turn-card">' +
         '<div class="sb-phase-copy"><strong>' + (yourTurn ? 'Your turn' : 'Opponent turn') + '</strong>' +
-        '<small>' + (yourTurn
-          ? (pending ? 'Resolve the current server choice before ending your turn.' : 'Use your card controls, or pass without attacking.')
-          : 'Your field stays synced while the opponent acts.') + '</small></div>' +
+        '<small>' + (pending ? 'Resolve the current server choice before another action.' : selectedCopy) + '</small></div>' +
         (yourTurn
-          ? '<div class="sb-phase-actions"><button type="button" class="sb-phase-action end-turn" data-end-turn="1"' + ((pending || state.busy) ? ' disabled' : '') + '>End Turn</button></div>'
+          ? '<div class="sb-phase-actions">' + directButton +
+            '<button type="button" class="sb-phase-action end-turn" data-end-turn="1"' + ((pending || state.busy) ? ' disabled' : '') + '>End Turn</button></div>'
           : '') +
         '</div>';
       return;
