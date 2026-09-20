@@ -49,8 +49,13 @@ test('HEAL_EACH owner stays narrow while packet recording remains separate from 
   assert.ok(effectSource.includes('String(heal.zone || "") !== "reserve"'));
   assert.ok(effectSource.includes('["card_family"]'));
   assert.ok(effectSource.includes('String(filters.card_family || "") !== "Creature"'));
-  assert.ok(effectSource.includes('const conditionMet = occupied.length >= step.when.count;'));
-  assert.ok(effectSource.includes('reserve_index: reserveIndex'));
+  const start = effectSource.indexOf('export function structuredRuntimeAfterDamageHealEachEffects(');
+  const end = effectSource.indexOf('export type RuntimeV02AttackSelectedHealChoice', start);
+  const block = effectSource.slice(start, end);
+  assert.ok(block.includes('const conditionMet = runtimeV02EvaluateAttackIf(step.when'));
+  assert.ok(block.includes('self_reserve: friendlyReserve'));
+  assert.ok(block.includes('reserve_index: reserveIndex'));
+  assert.equal(block.includes('occupied.length >= step.when.count'), false, 'HEAL_EACH must not reimplement reserve_count_at_least semantics');
   assert.ok(effectSource.includes('slice records one canonical after_heal_packet ID per Creature that actually'));
   assert.ok(effectSource.includes('listener dispatch remains a separate deterministic lifecycle pass'));
 });
