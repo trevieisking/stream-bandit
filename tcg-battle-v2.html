@@ -163,7 +163,7 @@ button{font:inherit}
   transition:border-color .15s ease,box-shadow .15s ease,background .15s ease
 }
 .sb-half-opponent .sb-vanguard-slot{border-color:#ff6f9270;background:radial-gradient(circle at center,#ff4e9c10,transparent 65%)}
-.sb-setup-destination.is-legal{
+.sb-setup-destination.is-legal,.sb-resolution-destination.is-legal{
   cursor:pointer;
   border-color:#ffd56aaa;
   box-shadow:0 0 0 2px #ffd56a22,0 0 24px #ffd56a25;
@@ -189,6 +189,10 @@ button{font:inherit}
   box-shadow:0 2px 5px #0009
 }
 .sb-reward-card.is-empty{opacity:.14}
+button.sb-reward-card{padding:0;appearance:none;-webkit-appearance:none;cursor:pointer}
+.sb-reward-card.is-selectable{border-color:#ffd56aaa;box-shadow:0 0 0 1px #ffd56a22,0 2px 7px #0009}
+.sb-reward-card.is-selectable:hover,.sb-reward-card.is-selectable:focus-visible{outline:none;border-color:#ffe69b;box-shadow:0 0 0 2px #ffd56a38,0 0 12px #ffd56a2b}
+.sb-reward-card.is-selected{transform:translateY(-3px);border-color:#35e2ad;box-shadow:0 0 0 2px #35e2ad40,0 0 12px #35e2ad35}
 .sb-center-band{
   position:relative;z-index:5;
   display:grid;
@@ -412,11 +416,20 @@ button{font:inherit}
     min-height:0;
     place-items:center
   }
-  .sb-reserve-slot .sb-card-control,
-  .sb-vanguard-slot .sb-card-control{
-    height:calc(100% - 8px);
-    width:auto;
+  /* Wide-board cards are bounded by viewport height, not board width or pointer type.
+     This keeps the full 5:7 face inside its row at 100% browser zoom. */
+  .sb-reserve-slot .sb-card-control{
+    width:min(var(--card-w),10.36dvh);
+    height:auto;
     max-width:calc(100% - 8px);
+    max-height:calc(100% - 8px);
+    flex:0 0 auto
+  }
+  .sb-vanguard-slot .sb-card-control{
+    width:min(var(--active-w),11.79dvh);
+    height:auto;
+    max-width:calc(100% - 8px);
+    max-height:calc(100% - 8px);
     flex:0 0 auto
   }
   .sb-card-wrap.is-selected .sb-card-actions{
@@ -442,10 +455,30 @@ button{font:inherit}
     width:min(120px,calc(100% - 10px))
   }
   .sb-hand-card{
-    height:100%;
+    width:min(clamp(94px,8vw,126px),10.8dvh);
+    height:auto;
     max-height:100%;
-    width:auto;
     flex:0 0 auto
+  }
+
+  /* Selecting your Vanguard opens the same canonical card face at a readable size.
+     Attack/Ability buttons remain the original card-owned controls. */
+  .sb-card-control-shell.is-selected{
+    position:fixed;
+    z-index:120;
+    left:50%;
+    top:50%;
+    width:min(330px,33vw,40dvh);
+    height:auto;
+    max-width:88vw;
+    max-height:70dvh;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 0 1px #55e7ff88,0 24px 80px #000d,0 0 38px #35e2ad2a
+  }
+  .sb-card-control-shell.is-selected>.sb-card-face{
+    width:100%;
+    height:auto;
+    aspect-ratio:5/7
   }
 }
 @media(max-width:640px), (hover:none) and (pointer:coarse){
@@ -649,6 +682,6 @@ button{font:inherit}
 <script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-6"></script>
 <script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
 <script src="stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-53"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-13-touch-drag"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-14-resolution-ui"></script>
 </body>
 </html>
