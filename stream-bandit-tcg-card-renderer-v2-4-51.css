@@ -78,9 +78,30 @@
 .sb-card-reward,.sb-card-set,.sb-card-print,.sb-card-rarity,.sb-card-withdraw{display:grid}.sb-card-reward strong,.sb-card-rarity>strong{font-family:Georgia,"Times New Roman",serif;font-size:13px}.sb-card-print{justify-items:center}.sb-card-print strong{font-size:8px}.sb-card-rarity{justify-items:end}.sb-card-withdraw{margin-top:2px;justify-items:end}.sb-card-withdraw strong{font-size:9px}
 .sb-card-face--compact{--sb-card-radius:11px}.sb-card-face--compact .sb-card-rules{display:none}.sb-card-face--compact{grid-template-rows:auto minmax(0,1fr) auto}.sb-card-face--compact .sb-card-header{min-height:34px;padding:5px}.sb-card-face--compact .sb-card-hp{min-width:35px;min-height:28px}.sb-card-face--compact .sb-card-hp strong{font-size:13px}.sb-card-face--compact .sb-card-identity h3{font-size:11px}.sb-card-face--compact .sb-card-footer{padding:4px 5px}
 .sb-card-face--hand .sb-card-rules{max-height:38%}.sb-card-face--battle .sb-card-rules{max-height:46%}
+/* Inspect mode is the canonical readable card face used outside the tiny tabletop footprint.
+   It keeps artwork prominent while allocating more of the physical card to complete move/Ability rows. */
+.sb-card-face--inspect{
+ grid-template-rows:auto minmax(0,.78fr) minmax(0,1.42fr) auto;
+ --sb-card-radius:15px
+}
+.sb-card-face--inspect .sb-card-header{min-height:46px;padding:7px 8px}
+.sb-card-face--inspect .sb-card-art{min-height:0}
+.sb-card-face--inspect .sb-card-rules{max-height:none;overflow-y:auto;padding:7px 8px}
+.sb-card-face--inspect .sb-card-rule{padding:6px 4px}
+.sb-card-face--inspect .sb-card-rule-head strong{font-size:11px}
+.sb-card-face--inspect .sb-card-rule p{font-size:8.2px;line-height:1.32}
+.sb-card-face--inspect .sb-card-rule-tag{font-size:6.4px}
+.sb-card-face--inspect .sb-card-damage{font-size:16px}
+.sb-card-face--inspect .sb-card-footer{padding:4px 6px 5px}
 .sb-card-face--battle.is-selected,.sb-card-face--hand.is-selected{box-shadow:inset 0 0 0 2px rgba(107,240,214,.34),0 0 22px rgba(66,218,230,.28),0 12px 30px rgba(0,0,0,.48)}
 @media(max-width:720px),(hover:none) and (pointer:coarse){
  .sb-card-header{gap:4px;padding:5px}.sb-card-hp{min-width:36px;min-height:29px}.sb-card-hp strong{font-size:13px}.sb-card-identity h3{font-size:11px}.sb-card-element strong{font-size:7px}.sb-card-rules{padding:4px}.sb-card-rule{padding:3px 2px}.sb-card-rule p{font-size:6.4px}.sb-card-rule-head strong{font-size:8.5px}.sb-card-damage{font-size:12px}
+ .sb-card-face--inspect .sb-card-header{min-height:42px;padding:6px}
+ .sb-card-face--inspect .sb-card-rules{padding:5px 6px}
+ .sb-card-face--inspect .sb-card-rule{padding:4px 3px}
+ .sb-card-face--inspect .sb-card-rule p{font-size:7.3px;line-height:1.3}
+ .sb-card-face--inspect .sb-card-rule-head strong{font-size:9.6px}
+ .sb-card-face--inspect .sb-card-damage{font-size:14px}
  .sb-card-essence-rail{left:4px;right:4px;bottom:4px;padding:2px 3px}.sb-essence-orb{width:10px;height:10px;font-size:5px}.sb-essence-orb.is-counted,.sb-card-cost-orbs .sb-essence-orb{width:12px;height:12px;font-size:6px}
 }
 
