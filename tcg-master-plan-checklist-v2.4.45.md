@@ -285,7 +285,7 @@
 - [x] Repair all 12 Release 1 Tactics using legal_card_available; reuse existing card/Creature selectors and shared candidate-existence semantics; **Card Pass #1179 PASS**.
 - [x] Add canonical turn-owner history before previous_opponent_turn/event history support; opening, ordinary and deckout turn starts record ownership; same-seat extra turns resolve correctly; **Card Pass #1189 PASS**.
 - [x] Wire generic IF through Tactic execution for every Release 1 Tactic IF shape. All six frozen Tactic IF programs and downstream opcodes pass Card Pass #1250 on `93c169b63423ef029bf7cbd071eb4e09c27bd74d`.
-- [ ] Wire generic IF through Attack execution for every Release 1 Attack IF shape.
+- [x] Wire generic IF through Attack execution for every Release 1 Attack IF shape; 13/13 accepted by Card Pass #1288 on `8db9ac8da165aac56e06ffc466a7892749eb75a1`.
 - [ ] Wire generic IF through Active/triggered Ability execution for every Release 1 Ability IF shape.
 - [ ] Prove all 29 Release 1 IF instances are executable without printed-English/card-ID fallback.
 - [ ] Reconcile IF + its proven Release 1 predicate classifications in tcg-runtime-capabilities-v0.2.json.
@@ -435,7 +435,7 @@
 - [x] Expand exact Tactic Edge dependency closure 39 -> 40 files for the new shared sampler.
 - [x] TCG Card Pass 2 Validation #1250 SUCCESS on exact head `93c169b63423ef029bf7cbd071eb4e09c27bd74d`.
 - [x] All six frozen Release 1 Tactic IF programs now have generic executable downstream paths.
-- [ ] Next Master Plan runtime gate: generic Attack IF execution for all 13 frozen Attack IF instances.
+- [x] Generic Attack IF execution for all 13 frozen Attack IF instances; accepted by Card Pass #1288.
 ## V2.4.66 — shared Attack IF predicate foundation
 - [x] Inventory the frozen Release 1 Attack IF set: 13 IF instances / 11 cards.
 - [x] Inventory the exact eight Attack IF predicate families.
@@ -447,7 +447,7 @@
 - [x] Prove the Attack IF owner has no mutation authority and no launch card identity.
 - [x] TCG Card Pass 2 Validation #1255 SUCCESS on exact head `00d5f8a7aec223dcd8c5a336d27046ac7d1ad3b7`.
 - [x] Migrate each frozen Attack IF effect family onto this common predicate owner without double execution; all 13 frozen Attack IF instances are source-migrated.
-- [ ] Close the parent “generic Attack IF execution” box only after all 13 instances are proven executable without printed-English/card-ID fallback.
+- [x] Parent generic Attack IF execution gate closed: all 13 instances proven executable without printed-English/card-ID decision fallback by Card Pass #1288.
 ## V2.4.67 — Attack declaration current-action events
 - [x] Inventory Release 1 Attack on_declare: exactly two RECORD_EVENT steps.
 - [x] Add one card-ID-free declaration-event collector for the two frozen predicate shapes.
@@ -496,5 +496,23 @@
 - [x] Preserve existing Storm Break attached-Essence discard / Card-Zone / Condition mutation ownership.
 - [x] Attack IF source migration count: **13 / 13** frozen Release 1 instances.
 - [x] Match Edge release-control closure: **93 files**, digest `0daefbf978518e78751ec327f49a88e7f66122d930a1eee98028e4902b7514b6`.
-- [ ] Exact-head Card Pass must validate the current post-repair branch before the parent “generic Attack IF execution” acceptance box closes.
+- [x] Card Pass #1288 SUCCESS on exact head `8db9ac8da165aac56e06ffc466a7892749eb75a1`; parent Attack IF gate accepted.
+
+## V2.4.72 — Ability IF inventory + triggered execution
+- [x] Reconcile all Release 1 IF nodes directly from the eight frozen Set One files: **29 total = 7 Tactic + 13 Attack + 9 Ability**.
+- [x] Credit existing generic Event Listener IF execution for Cinderburrow / Ash Tunnel.
+- [x] Credit existing generic Event Listener IF execution for Briarback / Growing Wall.
+- [x] Credit existing generic Event Listener IF execution for Bloomhare / Spring Growth.
+- [x] Extend the existing attack-declared modifier owner to execute structured IF wrappers through shared predicate-tree composition.
+- [x] Furnacefang / Controlled Burn: `source_damaged -> +20 current Attack damage`.
+- [x] Ashcobra / Ash Scent: `event_attack_target_damaged -> +10 current Attack damage`.
+- [x] Thornmantis / Briar Instinct: `any(Venomed, Rooted target Condition) -> +10 current Attack damage`.
+- [x] Prove IF-false attack-declared Ability resolution does not consume the once-per-turn use.
+- [x] Card Pass #1289: new Ability IF runtime tests + all Deno/type-check jobs SUCCESS; only pre-refresh Match release-control digest failed.
+- [x] Refresh exact 93-file Match closure to CI-computed digest `1fbfb54a7d1fd39b0f6c660adcf9013452d2b3a169cd47b07eab0c7808de0b76`.
+- [x] Ability IF source/accounting progress: **6 / 9**.
+- [ ] Exact-head Card Pass must validate the refreshed closure before V2.4.72 is accepted.
+- [ ] Active Ability IF remaining: Noctivane / Night Reading.
+- [ ] Active Ability IF remaining: Surgefin / Undertow Supply.
+- [ ] Active Ability IF remaining: Marevault / Heart of Tides.
 
