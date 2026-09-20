@@ -1,7 +1,9 @@
 import {
+  evaluateRuntimeV02LegalCardAvailableRequirement,
   evaluateRuntimeV02ReserveCountAtLeastRequirement,
   evaluateRuntimeV02SourceDamagedRequirement,
   evaluateRuntimeV02SourceHasShieldAtLeastRequirement,
+  normalizeRuntimeV02LegalCardAvailableRequirement,
   normalizeRuntimeV02ReserveCountAtLeastRequirement,
   normalizeRuntimeV02SourceHasShieldAtLeastRequirement,
 } from "../_shared/tcg-match-requirement-evaluator-v0-2.ts";
@@ -94,5 +96,49 @@ Deno.test("reserve-count normalization defaults controller to self and fails clo
       { predicate: "reserve_count_at_least", controller: "self", count: 1 },
     ),
     "tcg_v0_2_requirement_reserve_count_zone_invalid",
+  );
+});
+
+
+Deno.test("shared legal-card availability predicate owns candidate existence only", () => {
+  const requirement = normalizeRuntimeV02LegalCardAvailableRequirement({
+    predicate: "legal_card_available",
+    controller: "self",
+    zone: "field",
+    filters: { card_family: "Creature", element: "Ember" },
+  });
+  const none = evaluateRuntimeV02LegalCardAvailableRequirement(0, requirement);
+  equal(none.matched, false);
+  equal(none.candidate_count, 0);
+
+  const one = evaluateRuntimeV02LegalCardAvailableRequirement(1, requirement);
+  equal(one.matched, true);
+  equal(one.zone, "field");
+  equal(one.controller, "self");
+});
+
+Deno.test("legal-card availability normalization validates zone and shape without owning filters", () => {
+  const normalized = normalizeRuntimeV02LegalCardAvailableRequirement({
+    predicate: "legal_card_available",
+    zone: "discard",
+    filters: { card_family: "Essence" },
+  });
+  equal(normalized.controller, "self");
+  equal(normalized.zone, "discard");
+
+  throws(
+    () => normalizeRuntimeV02LegalCardAvailableRequirement({
+      predicate: "legal_card_available",
+      zone: "void",
+      filters: {},
+    }),
+    "tcg_v0_2_requirement_legal_card_zone_unsupported",
+  );
+  throws(
+    () => evaluateRuntimeV02LegalCardAvailableRequirement(
+      -1,
+      { predicate: "legal_card_available", controller: "self", zone: "field", filters: {} },
+    ),
+    "tcg_v0_2_requirement_legal_card_candidate_count_invalid",
   );
 });
