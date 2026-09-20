@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "f000fcb4ba4c4a6589fd86100ec8e0a5adc72718",
-        "file_count": 87,
-        "closure_sha256": "08a075465b06159d814bdba65a36151570837f5eac2438e3b305cd3a9f75ee9c",
+        "entrypoint_git_blob_sha": "7e17d449543836afd891c036a142ab42dff89437",
+        "file_count": 89,
+        "closure_sha256": "eafc47f296ff308aea19a2f0eedca479c82107fe18ecbaa335c0806806698d7c",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -385,6 +385,14 @@
             "git_blob_sha": "31740aac5ddb6f89c3c2a658014d91081e5dd0b1"
           },
           {
+            "path": "supabase/functions/_shared/tcg-match-presentation-envelope-v0-2.ts",
+            "git_blob_sha": "fe51a86816523dd841e5a7146f2cfaba711cd65b"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-presentation-receipt-v0-2.ts",
+            "git_blob_sha": "ff663b91f3561f49f2fa94c7831cb37120261cf6"
+          },
+          {
             "path": "supabase/functions/_shared/tcg-match-randomization-engine-v0-2.ts",
             "git_blob_sha": "949ed0f99e0b37a39639423ceee60d8b68fab32d"
           },
@@ -438,7 +446,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "f000fcb4ba4c4a6589fd86100ec8e0a5adc72718"
+            "git_blob_sha": "7e17d449543836afd891c036a142ab42dff89437"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
