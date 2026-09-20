@@ -1119,4 +1119,35 @@ The green gate proves:
 - all Edge type-checks remain green.
 
 This is the **predicate/control-flow foundation only**. The Master Plan box “generic Attack IF execution for every Release 1 Attack IF shape” remains open until all 13 instances route their selected branches through existing authoritative effect owners without printed-English fallback or duplicate execution.
+## V2.4.67 — generic Attack declaration current-action events
+
+Release 1 Attack `on_declare` contains exactly **two** operations and both are structured `RECORD_EVENT`:
+- Volt — Stormmane / Storm Break: record `storm-break-overcharged` when source attached Essence count >= 4;
+- Volt — Stormcoil — Living Circuit / Chainstorm: record `chainstorm-borrowed` when source has attached borrowed Essence.
+
+New shared owner:
+`supabase/functions/_shared/tcg-match-attack-declaration-events-v0-2.ts`
+
+It:
+- reads only structured `on_declare`;
+- owns the two frozen declaration predicate shapes;
+- returns an action-local event-count map;
+- does not persist a second event history;
+- reuses the Attack-authority attached-Essence-kind query;
+- is card-ID-free and fail-closed on unsupported declaration operations/predicates.
+
+### First migration
+The canonical Match Attack dispatcher now creates `attackActionEvents` once after structured Attack authority is resolved.
+
+Storm Break's existing overcharge choice flow now tests:
+`attackActionEvents[structuredOverchargeDiscard.event] >= 1`
+
+instead of calling the old bespoke threshold boolean in the dispatcher.
+
+Chainstorm will consume the same event map through the shared Attack IF evaluator in the conditional-Condition migration.
+
+### Validation
+TCG Card Pass 2 Validation **#1265 SUCCESS** on exact head `fb494fedd43851acc4302b4e6d1327715214c689`.
+
+The exact Match Edge release-control closure expanded **89 -> 90 files** for the new declaration-event owner and includes the refreshed Attack-authority + Match entrypoint blobs.
 
