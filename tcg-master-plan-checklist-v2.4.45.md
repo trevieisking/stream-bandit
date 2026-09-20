@@ -277,7 +277,7 @@
 - [x] Add one shared v0.2 predicate-tree owner for all / any / not / leaf delegation with fail-closed validation.
 - [x] Add deterministic Deno tests for nested evaluation, short-circuiting, malformed shapes and bounded recursion.
 - [x] Exact-head TCG Card Pass 2 Validation **#1143 PASS** for predicate-tree foundation.
-- [ ] Migrate existing Event Listener boolean composition onto the shared predicate-tree owner without changing leaf semantics.
+- [x] Migrate existing Event Listener boolean composition onto the shared predicate-tree owner without changing leaf semantics. **Card Pass #1149 PASS** with exact Edge closure fingerprints refreshed.
 - [ ] Build/reuse shared Release 1 predicate leaf semantics where multiple runtime families need the same meaning.
 - [ ] Wire generic IF through Tactic execution for every Release 1 Tactic IF shape.
 - [ ] Wire generic IF through Attack execution for every Release 1 Attack IF shape.
