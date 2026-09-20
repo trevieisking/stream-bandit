@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.16-compact-tabletop';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.17-hand-peek-inspect';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -624,7 +624,7 @@
     const abilityReady = isOwnVanguard && abilityReadyFor('vanguard', null, creature);
     const essenceUnits = creature ? attachedEssenceUnits(creature) : [];
     const face = renderCardFace(cardId, {
-      mode: 'battle',
+      mode: 'inspect',
       abilityReady,
       interactiveAbility: !!abilityReady,
       abilityWhere: isOwnVanguard ? 'vanguard' : '',
