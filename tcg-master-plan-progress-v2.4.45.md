@@ -1263,3 +1263,43 @@ The existing overcharge owner still owns the attached-Essence discard choice, Ca
 - Current release-control digest after the Attack IF closeout source is `0daefbf978518e78751ec327f49a88e7f66122d930a1eee98028e4902b7514b6`.
 
 CI note: Card Pass #1285 proved the new Backdraft owner module itself green. #1287 validated an earlier combined head and exposed stale type/test guards; those exact failures have since been repaired on the branch. The connector has not yet attached a Card Pass run to the current post-repair head, so **Attack IF exact-head acceptance remains open**. No merge/live promotion is implied.
+
+## V2.4.72 — Ability IF inventory + triggered-Ability IF execution
+
+Release 1 structured IF inventory is now reconciled directly from all eight frozen Set One Card Pass files:
+
+- Tactic IF instances: **7** across six Tactic programs;
+- Attack IF instances: **13**;
+- Ability IF instances: **9**;
+- total Release 1 IF instances: **29**.
+
+### Attack IF acceptance
+
+TCG Card Pass 2 Validation **#1288 SUCCESS** on exact head `8db9ac8da165aac56e06ffc466a7892749eb75a1` closes the Attack IF gate. All **13 / 13** frozen Attack IF instances are executable through the shared Attack IF owner without printed-English/card-ID decision fallback.
+
+### Ability IF audit
+
+Three triggered build/evolution Ability IF programs were already executable through the generic Event Listener IF path and shared predicate-tree composition:
+- Cinderburrow — Ash Tunnel: `legal_card_available -> SELECT_CREATURE -> HEAL`;
+- Briarback — Growing Wall: `reserve_count_at_least -> HEAL`;
+- Bloomhare — Spring Growth: `all(friendly_other_creature_matches, target_damaged) -> HEAL`.
+
+Existing deterministic Event Listener tests already prove those paths, including canonical Heal packet emission.
+
+Three attack-declared triggered Ability IF programs were the next genuine gap:
+- Furnacefang — Controlled Burn: `source_damaged -> MODIFY_CURRENT_ATTACK_DAMAGE(+20)`;
+- Ashcobra — Ash Scent: `event_attack_target_damaged -> MODIFY_CURRENT_ATTACK_DAMAGE(+10)`;
+- Thornmantis — Briar Instinct: `any(event_attack_target_has_condition(Venomed), event_attack_target_has_condition(Rooted)) -> MODIFY_CURRENT_ATTACK_DAMAGE(+10)`.
+
+The existing synchronous attack-declared listener owner now accepts a structured IF wrapper around its existing current-Attack modifier mutation. IF composition delegates to the shared predicate-tree owner; source damage, target damage and target Condition state come from authoritative field state. An IF-false branch records a zero-delta resolution without consuming the once-per-turn Ability use.
+
+TCG Card Pass #1289 proved the new Ability IF runtime tests and all Deno/type-check jobs **SUCCESS**. Its only failing job was release-control drift caused by the changed Event Listener blob. The exact 93-file Match closure was then refreshed to the CI-computed digest:
+`1fbfb54a7d1fd39b0f6c660adcf9013452d2b3a169cd47b07eab0c7808de0b76`.
+
+Current Ability IF source/accounting status: **6 / 9**.
+Remaining active Ability IF programs:
+1. Noctivane — Night Reading: `selected_count_at_least -> SCHEDULE_ACTION`;
+2. Surgefin — Undertow Supply: `target_damaged -> HEAL`;
+3. Marevault — Heart of Tides: `essence_move_count_at_least -> SELECT_CREATURE -> HEAL`.
+
+Exact-head Card Pass after the release-control refresh remains the acceptance gate for V2.4.72. Main/live remain untouched.
