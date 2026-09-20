@@ -1081,10 +1081,6 @@
   async function runConcede() {
     const view = viewState();
     if (!view || view.phase === 'complete' || state.busy) return;
-    const confirmed = typeof window.confirm !== 'function' ||
-      window.confirm('Quit this match? This is a concession: you lose and your opponent wins.');
-    if (!confirmed) return;
-
     state.busy = true;
     state.overlayKey = '';
     const settings = $('battleSettings');
