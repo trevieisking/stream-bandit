@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.14-resolution-ui';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.15-stable-card-focus';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -561,6 +561,41 @@
       '</div>';
   }
 
+  function renderSelectedCardInspector(view, canAct) {
+    const node = $('cardInspector');
+    if (!node) return;
+    const creature = view && view.you ? view.you.vanguard : null;
+    const anchor = cardAnchor(creature);
+    const selected = !!(anchor && state.selectedAnchorUid === anchor);
+    if (!selected || !creature) {
+      node.hidden = true;
+      node.innerHTML = '';
+      return;
+    }
+
+    const instance = topInstance(creature);
+    const cardId = String(instance && instance.card_id || '');
+    const abilityReady = abilityReadyFor('vanguard', null, creature);
+    const essenceUnits = attachedEssenceUnits(creature);
+    const face = renderCardFace(cardId, {
+      mode: 'battle',
+      abilityReady,
+      interactiveAbility: abilityReady,
+      abilityWhere: 'vanguard',
+      abilityIndex: null,
+      interactiveAttacks: true,
+      attackStates: attackStatesFor(!!canAct),
+      attachedEssenceUnits: essenceUnits
+    });
+    node.hidden = false;
+    node.innerHTML =
+      '<button type="button" class="sb-card-inspector-backdrop" data-card-inspector-close="1" aria-label="Close card details"></button>' +
+      '<section class="sb-card-inspector-panel" role="dialog" aria-modal="true" aria-label="' + esc(cardNameById(cardId) || 'Vanguard') + ' card details">' +
+      '<button type="button" class="sb-card-inspector-close" data-card-inspector-close="1" aria-label="Close card details">×</button>' +
+      '<div class="sb-card-inspector-card">' + face + liveCreatureStatus(creature, cardId, essenceUnits) + '</div>' +
+      '</section>';
+  }
+
   function touchPrimaryInput() {
     return !!(
       window.matchMedia &&
@@ -955,6 +990,7 @@
     renderReserve('oppReserve', view.opponent && view.opponent.reserve, 'Opponent', false);
     renderReserve('youReserve', view.you && view.you.reserve, 'Your', true);
     renderVanguardSetupTarget();
+    renderSelectedCardInspector(view, canAttack);
 
     const hand = view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
     $('yourHand').innerHTML = hand.map(handCard).join('') || '<div class="sb-zone-empty">No cards in hand</div>';
@@ -1201,6 +1237,16 @@
   }
 
   function bindCardControls() {
+    document.querySelectorAll('[data-card-inspector-close]').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        if (event && typeof event.preventDefault === 'function') event.preventDefault();
+        if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
+        state.selectedAnchorUid = '';
+        state.overlayKey = '';
+        render();
+      });
+    });
+
     document.querySelectorAll('[data-card-anchor]').forEach((card) => {
       const select = () => {
         if (state.busy) return;
@@ -1224,6 +1270,14 @@
     document.querySelectorAll('[data-card-intent="attack"]').forEach((button) => {
       button.addEventListener('click', async (event) => {
         event.stopPropagation();
+        const blockedReason = String(button.dataset.attackBlockedReason || '');
+        if (blockedReason) {
+          const guidance = blockedReason === 'Needs more matching Essence'
+            ? ' Attach more matching Essence until the Attack cost orbs are covered.'
+            : '';
+          setStatus('Attack blocked — ' + blockedReason + '.' + guidance, 'wait');
+          return;
+        }
         await runAttackIntent(Number(button.dataset.attackSlot));
       });
     });
@@ -1851,6 +1905,7 @@
     let failure = '';
     try {
       await callEdge(API_MATCH, Object.assign(actionBase('attack'), { attack_slot: attackSlot }));
+      state.selectedAnchorUid = '';
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
