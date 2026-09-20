@@ -1198,6 +1198,24 @@ function executeUntilChoice(state: any) {
       });
       return;
     }
+    if (op === "OPTIONAL") {
+      const chooserSeat = playerSeat(ownerSeat, step.player || "self", vars);
+      const optionalSteps = Array.isArray(step.steps) ? step.steps : [];
+      setPending(state, effect, {
+        seat: chooserSeat,
+        kind: "optional",
+        prompt: String(step.prompt || "Use optional effect?"),
+        min: 1,
+        max: 1,
+        mode: "select",
+        options: [
+          { id: "optional:yes", label: "Yes", data: { use: true } },
+          { id: "optional:no", label: "No", data: { use: false } },
+        ],
+        context: { apply: "optional_steps", steps: optionalSteps },
+      });
+      return;
+    }
     if (op === "REPEAT_OPTIONAL") {
       const min = Math.max(0, Number(step.min || 0));
       const max = Math.max(min, Number(step.max || 0));
