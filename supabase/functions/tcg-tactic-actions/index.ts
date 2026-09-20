@@ -20,7 +20,7 @@ import {
   type RuntimeV02PredicateLeaf,
 } from "../_shared/tcg-match-predicate-tree-v0-2.ts";
 import { evaluateRuntimeV02EventOccurredRequirement } from "../_shared/tcg-match-event-history-query-v0-2.ts";
-import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
+import { addRuntimeShield, applyRuntimeCondition, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions, type ApplyConditionMode } from "./runtime-v0-2-core.ts";
 
 const VERSION = "Stream Bandit TCG tactic actions v0.4";
 const EFFECT_SCHEMA = "sb-tcg-effects-v0.1";
@@ -1020,6 +1020,20 @@ function executeUntilChoice(state: any) {
         const found = findCreature(state, ref);
         if (found) addRuntimeShield(found.cr, amount);
       }
+      effect.cursor++;
+      continue;
+    }
+    if (op === "APPLY_CONDITION") {
+      const ref = resolveVar(vars, step.target) as CreatureRef;
+      const found = findCreature(state, ref);
+      if (!found) throw new Error("condition_target_missing");
+      const condition = String(step.condition || "").trim();
+      if (!condition) throw new Error("tcg_v0_2_tactic_condition_required");
+      const rawMode = String(step.mode || "apply");
+      if (!["apply", "apply_if_empty", "apply_if_empty_or_same", "replace"].includes(rawMode)) {
+        throw new Error("tcg_v0_2_tactic_condition_mode_unsupported");
+      }
+      applyRuntimeCondition(found.cr, condition, Number(state.turn_seq || 0), rawMode as ApplyConditionMode);
       effect.cursor++;
       continue;
     }
