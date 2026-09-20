@@ -182,19 +182,42 @@ function abilityMarkup(ability,options){
     (body?'<p>'+esc(body)+'</p>':'')+
     '</'+tag+'>';
 }
+function attackReasonText(reason){
+  switch(String(reason||'')){
+    case 'attack_essence_cost_not_met': return 'Needs more matching Essence';
+    case 'attack_requirements_not_met': return 'Attack requirement not met';
+    case 'first_player_cannot_attack_on_first_personal_turn': return 'Cannot attack on the first personal turn';
+    case 'only_final_vanguard_may_attack_this_turn': return 'Only the final Vanguard may attack';
+    case 'starbound_power_already_used': return 'Starbound already used this match';
+    case 'extra_turn_chain_blocked': return 'Extra-turn chain blocks this attack';
+    case 'stunned_cannot_attack': return 'Stunned — cannot attack';
+    case 'not_active_player': return 'Wait for your turn';
+    case 'attack_readiness_unavailable': return 'Checking attack readiness';
+    default: return reason ? human(reason) : '';
+  }
+}
 function attackMarkup(attack,index,options){
   const effect=attackEffectSummary(attack);
   const slot=index+1;
-  const ready=Array.isArray(options&&options.readyAttackSlots)&&options.readyAttackSlots.includes(slot);
-  const disabled=Array.isArray(options&&options.disabledAttackSlots)&&options.disabledAttackSlots.includes(slot);
+  const projected=options&&options.attackStates&&options.attackStates[slot]
+    ? options.attackStates[slot]
+    : null;
+  const ready=projected
+    ? projected.eligible===true
+    : Array.isArray(options&&options.readyAttackSlots)&&options.readyAttackSlots.includes(slot);
+  const disabled=projected
+    ? projected.eligible!==true
+    : Array.isArray(options&&options.disabledAttackSlots)&&options.disabledAttackSlots.includes(slot);
+  const reason=projected&&projected.reason?attackReasonText(projected.reason):'';
   const interactive=!!(options&&options.interactiveAttacks);
   const tag=interactive?'button':'section';
   const attrs=interactive
     ? ' type="button" data-card-intent="attack" data-attack-slot="'+slot+'"'+(disabled?' disabled':'')
     : '';
+  const stateMeta=ready?'Ready':(reason||'');
   return '<'+tag+' class="sb-card-rule sb-card-attack'+(ready?' is-ready':'')+(disabled?' is-disabled':'')+'" data-card-attack-slot="'+slot+'"'+attrs+'>'+
     '<div class="sb-card-rule-head"><span class="sb-card-cost">'+esc(costText(attack.cost))+'</span><strong>'+esc(attack.name||('Attack '+slot))+'</strong><span class="sb-card-damage">'+esc(damageText(attack))+'</span></div>'+
-    '<div class="sb-card-rule-meta">Attack '+slot+' · Ends Turn</div>'+
+    '<div class="sb-card-rule-meta">'+(stateMeta?esc(stateMeta)+' · ':'')+'Attack '+slot+' · Ends Turn</div>'+
     (effect?'<p>'+esc(effect)+'</p>':'')+
     '</'+tag+'>';
 }
