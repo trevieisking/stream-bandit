@@ -55,6 +55,7 @@ export type RuntimeV02AttackMetadata = {
   target_permissions: RuntimeV02AttackTargetPermission[];
   requirements: RuntimeV02AttackRequirement[];
   starbound: boolean;
+  legacy_compatibility_required: boolean;
 };
 
 export type RuntimeV02AttackControlTargetMode =
@@ -402,6 +403,10 @@ export function structuredRuntimeAttackMetadata(
   }
   const countAddFormula = structuredRuntimeCountAddFormulaMetadata(attack.damage_formula, id);
   const conditionalAddFormula = structuredRuntimeConditionalAddFormulaMetadata(attack.damage_formula, id);
+  const effectWindows = [attack.on_declare, attack.before_damage, attack.after_damage];
+  const legacyCompatibilityRequired = !effectWindows.every((window) =>
+    Array.isArray(window) && window.length === 0
+  );
 
   return {
     id,
@@ -415,6 +420,7 @@ export function structuredRuntimeAttackMetadata(
     target_permissions: attackTargetPermissions(attack.target_permissions, id),
     requirements: attackRequirements(attack.requirements, id),
     starbound: structuredAttackStarbound(definition, creature, attacks, id),
+    legacy_compatibility_required: legacyCompatibilityRequired,
   };
 }
 
