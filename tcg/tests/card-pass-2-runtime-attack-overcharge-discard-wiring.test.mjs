@@ -43,6 +43,8 @@ test('overcharge discard/condition attack owner is data-driven and card-id-free'
   }
   assert.ok(owner.includes('structuredRuntimeAfterDamageOverchargeDiscardCondition'));
   assert.ok(owner.includes('runtimeV02AttackOverchargeTriggered'));
+  assert.ok(owner.includes('runtimeV02EvaluateAttackIf(descriptor.outer_when, context)'));
+  assert.ok(owner.includes('runtimeV02EvaluateAttackIf(descriptor.survive_when, ifContext)'));
   assert.ok(owner.includes('runtimeV02CreateAttackOverchargeDiscardChoice'));
   assert.ok(owner.includes('runtimeV02ResolveAttackOverchargeDiscardChoice'));
 });
@@ -74,25 +76,29 @@ test('Stormmane Thunder Claw stays plain while Storm Break preserves its exact f
   assert.equal(matchesOverchargeDiscardCondition(attacks[1]), true);
 });
 
-test('live match owner snapshots the threshold before damage, suppresses legacy English authority for structured matches and resolves after damage', () => {
+test('live match owner captures declaration evidence then evaluates both Storm Break IF decisions after primary damage', () => {
   assert.ok(match.includes('tcg-match-attack-overcharge-discard-choice-v0-2.ts'));
   assert.ok(match.includes('const structuredOverchargeDiscard=structuredRuntimeAfterDamageOverchargeDiscardCondition('));
   assert.ok(match.includes('const attackActionEvents=runtimeV02CollectAttackDeclarationEvents('));
-  assert.ok(match.includes('const structuredOverchargeTriggered=structuredOverchargeDiscard?Number(attackActionEvents[structuredOverchargeDiscard.event]||0)>=1:false;'));
+  assert.ok(match.includes('const overchargeIfContext={source_creature:p.vanguard,attack_target:target'));
+  assert.ok(match.includes('const structuredOverchargeTriggered=structuredOverchargeDiscard?runtimeV02AttackOverchargeTriggered(structuredOverchargeDiscard,overchargeIfContext):false;'));
+  assert.ok(match.includes('runtimeV02CreateAttackOverchargeDiscardChoice(s,seat as 1|2,structuredOverchargeDiscard'));
+  assert.equal(match.includes('Number(attackActionEvents[structuredOverchargeDiscard.event]||0)>=1'), false, 'dispatcher must not bypass shared Attack IF for current-action event');
   assert.ok(match.includes('structuredOverchargeDiscard==null&&ef.includes("becomes stunned")'));
   assert.ok(match.includes('atk.metadata_source==="legacy"&&ef.includes("4 or more essence")'));
   assert.ok(match.includes('atk.metadata_source==="legacy"&&ad?.id==="volt-stormmane"'));
   assert.equal(match.includes('if(ad?.id==="volt-stormmane"&&'), false, 'marked v0.2 Stormmane must not pass through the old whole-card fallback');
 
   const declaration = match.indexOf('const attackActionEvents=runtimeV02CollectAttackDeclarationEvents(');
-  const snapshot = match.indexOf('const structuredOverchargeTriggered=');
-  assert.ok(declaration >= 0 && declaration < snapshot, 'generic declaration events must exist before overcharge trigger projection');
-  const damage = match.indexOf('const dmg=attackDamage(', snapshot);
-  const createPending = match.indexOf('runtimeV02CreateAttackOverchargeDiscardChoice(', damage);
+  const damage = match.indexOf('const dmg=attackDamage(', declaration);
+  const context = match.indexOf('const overchargeIfContext=', damage);
+  const decision = match.indexOf('const structuredOverchargeTriggered=', context);
+  const createPending = match.indexOf('runtimeV02CreateAttackOverchargeDiscardChoice(', decision);
   const pendingReturn = match.indexOf('if(pendingOverchargeDiscard)', createPending);
   const defeatScan = match.indexOf('const n=scanDefeats()', pendingReturn);
-  assert.ok(snapshot >= 0 && damage > snapshot, 'overcharge threshold must be snapshotted before attack damage');
-  assert.ok(createPending > damage, 'discard choice must be created only after attack damage');
+  assert.ok(declaration >= 0 && damage > declaration, 'declaration event evidence must be captured before primary damage');
+  assert.ok(context > damage && decision > context, 'shared IF context and decision must use the authoritative post-damage state');
+  assert.ok(createPending > decision, 'discard choice must be created only after shared IF decisions');
   assert.ok(pendingReturn > createPending, 'pending attack choice must be surfaced after creation');
   assert.ok(defeatScan > pendingReturn, 'defeat scanning must wait until the after-damage discard choice resolves');
 });
