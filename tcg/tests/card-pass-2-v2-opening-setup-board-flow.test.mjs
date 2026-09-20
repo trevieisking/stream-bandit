@@ -11,8 +11,8 @@ const controller = fs.readFileSync(path.join(root, 'stream-bandit-tcg-v2-battle-
 const matchActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-match-actions', 'index.ts'), 'utf8');
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-interaction-v1.json'), 'utf8'));
 
-test('Battle v0.6 follows the recorded tabletop interaction layout without restoring a site shell', () => {
-  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-6"/);
+test('Battle v0.7 follows the recorded tabletop interaction layout without restoring a site shell', () => {
+  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-7"/);
   assert.match(battle, /id="oppReserve"/);
   assert.match(battle, /id="oppVanguard"/);
   assert.match(battle, /id="youVanguard"/);
@@ -40,6 +40,22 @@ test('phone battlefield gives the field full width and does not cover it with st
   assert.match(battle, /@media\(max-width:960px\) and \(orientation:landscape\), \(hover:none\) and \(pointer:coarse\) and \(orientation:landscape\)/);
   assert.match(battle, /scroll-snap-type:x proximity/);
 });
+
+test('desktop battlefield gives Vanguard and Reserves independent height-bounded rows', () => {
+  assert.match(battle, /@media\(min-width:641px\) and \(hover:hover\) and \(pointer:fine\)/);
+  assert.match(battle, /grid-template-rows:auto minmax\(0,1fr\) minmax\(68px,auto\) minmax\(0,1fr\) clamp\(132px,17\.2dvh,166px\)/);
+  assert.match(battle, /\.sb-field-core\{[\s\S]*?grid-template-rows:minmax\(0,1fr\) minmax\(0,1\.18fr\)/);
+  assert.match(battle, /\.sb-half-you \.sb-field-core\{[\s\S]*?grid-template-rows:minmax\(0,1\.18fr\) minmax\(0,1fr\)/);
+  assert.match(battle, /\.sb-reserve,\.sb-vanguard-line\{[\s\S]*?height:100%;[\s\S]*?align-items:stretch/);
+  assert.match(battle, /\.sb-reserve-slot,\.sb-vanguard-slot\{[\s\S]*?height:100%;[\s\S]*?min-height:0/);
+  assert.match(battle, /#oppVanguard,#youVanguard\{[\s\S]*?width:100%;[\s\S]*?height:100%;[\s\S]*?display:grid;[\s\S]*?place-items:center/);
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-wrap,[\s\S]*?\.sb-vanguard-slot \.sb-card-wrap\{[\s\S]*?height:100%;[\s\S]*?place-items:center/);
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-control,[\s\S]*?\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto;[\s\S]*?max-width:calc\(100% - 8px\)/);
+  assert.match(battle, /\.sb-card-wrap\.is-selected \.sb-card-actions\{[\s\S]*?position:absolute;[\s\S]*?bottom:4px;[\s\S]*?left:50%;[\s\S]*?width:min\(180px,calc\(100% - 10px\)\);[\s\S]*?max-height:calc\(100% - 8px\);[\s\S]*?overflow-y:auto/);
+  assert.match(battle, /\.sb-card-wrap\.has-setup-return \.sb-card-actions\{[\s\S]*?position:absolute;[\s\S]*?bottom:5px;[\s\S]*?left:50%;[\s\S]*?width:min\(120px,calc\(100% - 10px\)\)/);
+  assert.match(battle, /\.sb-hand-card\{[\s\S]*?height:100%;[\s\S]*?max-height:100%;[\s\S]*?width:auto;[\s\S]*?flex:0 0 auto/);
+});
+
 
 test('opening toss is rendered from authoritative toss_winner_seat and never randomized in browser', () => {
   assert.match(controller, /Number\(view\.toss_winner_seat\) === youSeat/);
