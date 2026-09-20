@@ -13,6 +13,18 @@ export type RuntimeV02SourceDamagedRequirementEvaluation = {
   actual_damage: number;
 };
 
+export type RuntimeV02SourceHasShieldAtLeastRequirement = {
+  predicate: "source_has_shield_at_least";
+  value: number;
+};
+
+export type RuntimeV02SourceHasShieldAtLeastRequirementEvaluation = {
+  predicate: "source_has_shield_at_least";
+  matched: boolean;
+  required_shield: number;
+  actual_shield: number;
+};
+
 export type RuntimeV02DamageHistoryCountRequirement = {
   predicate: "damage_history_count_at_least";
   target: "$source_creature";
@@ -121,6 +133,46 @@ export function evaluateRuntimeV02SourceDamagedRequirement(
     predicate: "source_damaged",
     matched: damage > 0,
     actual_damage: damage,
+  };
+}
+
+export function normalizeRuntimeV02SourceHasShieldAtLeastRequirement(
+  raw: unknown,
+): RuntimeV02SourceHasShieldAtLeastRequirement {
+  const value = objectRecord(raw, "tcg_v0_2_requirement_source_shield_invalid");
+  rejectUnsupportedFields(
+    value,
+    ["predicate", "value"],
+    "tcg_v0_2_requirement_source_shield_field_unsupported",
+  );
+  if (value.predicate !== "source_has_shield_at_least") {
+    throw new Error("tcg_v0_2_requirement_source_shield_predicate_invalid");
+  }
+  const threshold = Number(value.value);
+  if (!Number.isFinite(threshold) || threshold <= 0) {
+    throw new Error("tcg_v0_2_requirement_source_shield_value_invalid");
+  }
+  return { predicate: "source_has_shield_at_least", value: threshold };
+}
+
+export function evaluateRuntimeV02SourceHasShieldAtLeastRequirement(
+  sourceCreature: unknown,
+  rawRequirement: RuntimeV02SourceHasShieldAtLeastRequirement,
+): RuntimeV02SourceHasShieldAtLeastRequirementEvaluation {
+  const requirement = normalizeRuntimeV02SourceHasShieldAtLeastRequirement(rawRequirement);
+  const source = objectRecord(
+    sourceCreature,
+    "tcg_v0_2_requirement_source_shield_source_invalid",
+  );
+  const shield = Number(source.shield ?? 0);
+  if (!Number.isFinite(shield) || shield < 0) {
+    throw new Error("tcg_v0_2_requirement_source_shield_amount_invalid");
+  }
+  return {
+    predicate: "source_has_shield_at_least",
+    matched: shield >= requirement.value,
+    required_shield: requirement.value,
+    actual_shield: shield,
   };
 }
 
