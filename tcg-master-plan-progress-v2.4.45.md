@@ -1079,4 +1079,44 @@ All six frozen Release 1 Tactic IF programs now have executable generic downstre
 - Blackout Pulse — APPLY_CONDITION ✅
 
 The next Master Plan gate is **generic Attack IF execution across all 13 frozen Attack IF instances**.
+## V2.4.66 — shared Attack IF predicate foundation
+
+The frozen Release 1 Attack inventory contains **13 IF instances across 11 cards**.
+
+The eight predicate families are:
+- `card_matches`;
+- `control_condition_slot_empty`;
+- `event_occurred` with `current_action`;
+- `reserve_count_at_least`;
+- `source_damaged`;
+- `source_has_shield_at_least`;
+- `target_has_any_condition`;
+- `target_remains_in_play_after_damage`.
+
+New shared read-only owner:
+`supabase/functions/_shared/tcg-match-attack-if-v0-2.ts`
+
+It:
+- routes boolean composition through the shared predicate-tree owner;
+- reuses the shared Requirement evaluator for source damage, source Shield and reserve-count semantics;
+- reuses the shared Condition engine for target Condition-slot/active-Condition state;
+- consumes caller-owned current-action event evidence rather than creating a parallel event log;
+- delegates `card_matches` card/filter meaning to the caller because card-selection/filter ownership remains separate;
+- performs no damage, healing, Condition mutation, card movement, switching or RNG;
+- contains no launch card identity.
+
+### Validation
+TCG Card Pass 2 Validation **#1255 SUCCESS** on exact head `00d5f8a7aec223dcd8c5a336d27046ac7d1ad3b7`.
+
+The green gate proves:
+- exact inventory: 13 Attack IF instances / 11 cards / eight predicate families;
+- nested `all` composition;
+- source-state leaf reuse;
+- target Condition/survival leaves are read-only;
+- current-action event leaf consumes supplied event evidence;
+- card_matches delegates to caller filter ownership;
+- unknown predicates/event windows fail closed;
+- all Edge type-checks remain green.
+
+This is the **predicate/control-flow foundation only**. The Master Plan box “generic Attack IF execution for every Release 1 Attack IF shape” remains open until all 13 instances route their selected branches through existing authoritative effect owners without printed-English fallback or duplicate execution.
 
