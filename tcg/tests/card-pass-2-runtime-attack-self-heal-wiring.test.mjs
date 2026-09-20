@@ -50,13 +50,15 @@ test('healing has one shared primitive across match, tactic and structured attac
   assert.ok(effectSource.includes('healRuntimeDamage(sourceCreature, step.amount)'), 'structured self-heal bypasses shared primitive');
 });
 
-test('Attack source_damaged IF delegates its leaf meaning to the shared Requirement evaluator', () => {
+test('Attack source state IF leaves delegate to the shared Requirement evaluator', () => {
   assert.ok(effectSource.includes('evaluateRuntimeV02SourceDamagedRequirement(sourceCreature, when).matched'));
+  assert.ok(effectSource.includes('evaluateRuntimeV02SourceHasShieldAtLeastRequirement(sourceCreature, when).matched'));
   const helper = effectSource.slice(
     effectSource.indexOf('function selfHealConditionMatches('),
     effectSource.indexOf('function selfHealPacketContext('),
   );
   assert.equal(helper.includes('Number(sourceCreature.damage'), false, 'Attack must not reimplement source_damaged semantics');
+  assert.equal(helper.includes('Number(sourceCreature.shield'), false, 'Attack must not reimplement source Shield threshold semantics');
 });
 
 test('self-heal owner is deliberately narrow and leaves packet listeners for later', () => {
