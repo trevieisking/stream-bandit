@@ -38,13 +38,16 @@ test('phone battle scrolls vertically instead of trapping the board inside one v
   assert.match(battle, /\.sb-board\s*\{[\s\S]*?height:auto;min-height:100dvh/);
 });
 
-test('battle cards are wired to the canonical TCG art resolver', () => {
+test('battle cards are wired to the canonical shared card renderer and repository art sources', () => {
   assert.match(battle, /stream-bandit-tcg-art-resolver-v2-4-36\.js/);
+  assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
+  assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.css/);
   assert.match(battle, /data-sb-tcg-page="battle"/);
-  assert.match(controller, /class="sb-tcg-card sb-card-control/);
-  assert.match(controller, /class="sb-tcg-card sb-hand-card/);
-  assert.match(controller, /data-card-id="/);
-  assert.match(controller, /class="sb-card-art"/);
+  assert.match(battle, /data-sb-tcg-card-face="v1"/);
+  assert.match(controller, /StreamBanditTCGCardRendererV2451/);
+  assert.match(controller, /renderCardFace\(cardId/);
+  assert.match(controller, /sb-card-control-shell/);
+  assert.match(controller, /sb-hand-card-shell/);
 });
 
 test('paired battle startup waits for a completed auth decision before rejecting the player', () => {
