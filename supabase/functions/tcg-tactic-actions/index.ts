@@ -1,6 +1,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { runtimeV02ApplyCardZoneTransfer, runtimeV02CommitCardZoneTransfer, runtimeV02PreflightCardZoneTransfer } from "../_shared/tcg-match-card-zone-engine-v0-2.ts";
 import { runtimeV02ShuffleInPlace } from "../_shared/tcg-match-randomization-engine-v0-2.ts";
+import { runtimeV02RandomSampleHiddenZone } from "../_shared/tcg-match-hidden-zone-sample-v0-2.ts";
 import { applyRuntimeV02EssenceTransfer } from "../_shared/tcg-match-essence-movement-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidden-information-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
@@ -837,6 +838,37 @@ function executeUntilChoice(state: any) {
       effect.cursor++;
       continue;
     }
+    if (op === "RANDOM_SAMPLE_HIDDEN_ZONE") {
+      const targetSeat = playerSeat(ownerSeat, step.player || "self", vars);
+      const targetPlayer = state.players[String(targetSeat)];
+      if (!targetPlayer) throw new Error("tcg_v0_2_tactic_hidden_sample_player_missing");
+      if (String(step.rng_owner || "match") !== "match") {
+        throw new Error("tcg_v0_2_tactic_hidden_sample_rng_owner_unsupported");
+      }
+      if (String(step.visibility || "") !== "server_only") {
+        throw new Error("tcg_v0_2_tactic_hidden_sample_visibility_unsupported");
+      }
+      if (String(step.zone || "") !== "hand") {
+        throw new Error("tcg_v0_2_tactic_hidden_sample_zone_unsupported");
+      }
+      const range = countRange(step.count);
+      if (range.min !== range.max) {
+        throw new Error("tcg_v0_2_tactic_hidden_sample_count_range_unsupported");
+      }
+      const varName = String(step.as || "sampled").trim();
+      if (!varName) throw new Error("tcg_v0_2_tactic_hidden_sample_var_required");
+      const sampled = runtimeV02RandomSampleHiddenZone(targetPlayer.hand as Inst[], range.min);
+      vars[varName] = sampled;
+      const provenance = (
+        vars.__hidden_sample_sources && typeof vars.__hidden_sample_sources === "object"
+          ? vars.__hidden_sample_sources
+          : {}
+      ) as Record<string, { seat: number; zone: string }>;
+      provenance[varName] = { seat: targetSeat, zone: "hand" };
+      vars.__hidden_sample_sources = provenance;
+      effect.cursor++;
+      continue;
+    }
     if (op === "LOOK_TOP") {
       const seat = playerSeat(ownerSeat, step.player || "self", vars);
       const player = state.players[String(seat)];
@@ -961,8 +993,59 @@ function executeUntilChoice(state: any) {
     }
     if (op === "MOVE_CARDS") {
       const cards = (resolveVar(vars, step.cards) || []) as Inst[];
-      const seat = step.owner ? playerSeat(ownerSeat, step.owner, vars) : ownerSeat;
-      moveCardsToDestination(state, seat, cards, String(step.to || "hand"));
+      const destinationSeat = step.player
+        ? playerSeat(ownerSeat, step.player, vars)
+        : step.owner
+        ? playerSeat(ownerSeat, step.owner, vars)
+        : ownerSeat;
+      const token = typeof step.cards === "string" && step.cards.startsWith("$")
+        ? step.cards.slice(1)
+        : "";
+      const provenanceMap = (
+        vars.__hidden_sample_sources && typeof vars.__hidden_sample_sources === "object"
+          ? vars.__hidden_sample_sources
+          : {}
+      ) as Record<string, { seat: number; zone: string }>;
+      const provenance = token ? provenanceMap[token] : null;
+      if (provenance) {
+        if (Number(provenance.seat) !== destinationSeat) {
+          throw new Error("tcg_v0_2_tactic_hidden_sample_move_controller_mismatch");
+        }
+        if (String(provenance.zone || "") !== "hand") {
+          throw new Error("tcg_v0_2_tactic_hidden_sample_move_source_unsupported");
+        }
+        const player = state.players[String(destinationSeat)];
+        const destination = String(step.to || "hand");
+        let destinationZone: Inst[];
+        let destinationPosition: "top" | "bottom" = "bottom";
+        if (destination === "hand") destinationZone = player.hand;
+        else if (destination === "discard") destinationZone = player.discard;
+        else if (destination === "deck_bottom") destinationZone = player.deck;
+        else if (destination === "deck_top") {
+          destinationZone = player.deck;
+          destinationPosition = "top";
+        } else throw new Error(`unsupported_card_destination:${destination}`);
+        const cardUids = cards.map((card) => String(card.uid));
+        if (cardUids.length > 0) {
+          runtimeV02ApplyCardZoneTransfer(player.hand as Inst[], destinationZone, {
+            cause: "effect",
+            action_kind: "tactic",
+            source_action_id: effect.id,
+            source_card_uid: effect.source_card.uid,
+            source: { controller_seat: destinationSeat as 1 | 2, zone: "hand", owner_card_uid: null },
+            destination: {
+              controller_seat: destinationSeat as 1 | 2,
+              zone: destination === "deck_bottom" || destination === "deck_top" ? "deck" : destination,
+              owner_card_uid: null,
+            },
+            card_uids: cardUids,
+            destination_position: destinationPosition,
+          });
+        }
+        delete provenanceMap[token];
+      } else {
+        moveCardsToDestination(state, destinationSeat, cards, String(step.to || "hand"));
+      }
       effect.cursor++;
       continue;
     }
