@@ -9,6 +9,10 @@ import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02CreateEssenceMovedEvent, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
+import {
+  evaluateRuntimeV02ReserveCountAtLeastRequirement,
+  normalizeRuntimeV02ReserveCountAtLeastRequirement,
+} from "../_shared/tcg-match-requirement-evaluator-v0-2.ts";
 import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
 
 const VERSION = "Stream Bandit TCG tactic actions v0.4";
@@ -517,12 +521,21 @@ function firstRequiredCreatureTargetAvailable(state: any, ownerSeat: number, ste
 }
 function checkPlayRequirements(state: any, ownerSeat: number, requirements: any[]) {
   for (const requirement of requirements || []) {
-    if (requirement?.op === "RESERVE_COUNT_AT_LEAST") {
-      const seat = playerSeat(ownerSeat, requirement.player || "self", {});
-      if (reserveCount(state.players[String(seat)]) < Number(requirement.count || 0)) return false;
+    let normalized;
+    if (requirement?.predicate === "reserve_count_at_least") {
+      normalized = normalizeRuntimeV02ReserveCountAtLeastRequirement(requirement);
+    } else if (requirement?.op === "RESERVE_COUNT_AT_LEAST") {
+      normalized = normalizeRuntimeV02ReserveCountAtLeastRequirement({
+        predicate: "reserve_count_at_least",
+        controller: requirement.player || "self",
+        count: requirement.count,
+      });
     } else {
       return false;
     }
+    const seat = playerSeat(ownerSeat, normalized.controller, {});
+    const reserve = state.players[String(seat)]?.reserve;
+    if (!evaluateRuntimeV02ReserveCountAtLeastRequirement(reserve, normalized).matched) return false;
   }
   return true;
 }
