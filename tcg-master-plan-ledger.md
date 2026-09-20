@@ -302,3 +302,44 @@ Latest explicit release decision:
 PR #549 may establish an authenticated **private-alpha test baseline** on `main` before final G3/G5/G6/G7 closeout. The order is fixed: control CI → exact Edge deploy/readback → squash merge → rollback branch → Pages `t.html` verification → two-user E2E. This is not public Release 1 promotion.
 
 **Current operation:** PA-00 only. Promotion remains HOLD until the revision-6 Release Control v1 commit passes fresh Card Pass / Migration Replay / Functional Smoke with zero unresolved review threads.
+
+### 2026-09-20 — PR #590 Battle v0.9 candidate transaction (HOLD)
+
+Candidate scope is bounded to issue #589 and starts from live/main `1f948708f1eceb7989d6e2af152ae57222a32fa2`.
+
+Human full-match evidence `Desktop 2026.09.20 - 11.37.08.02.mp4` proved:
+- v0.8 normal card placement / Essence selection is operating;
+- Gloom Tap reaches the canonical Attack owner but is rejected by the legacy-compatibility guard;
+- Gloom Tap presentation reads the wrong structured damage field and displays a dash instead of its canonical 20 damage;
+- the correct once-per-turn manual Essence rejection is exposed as a raw engine identifier;
+- phone play needs an explicit tap-first explanation rather than depending on drag/drop;
+- Battle needs an explicit forfeit control while ordinary close/reload must preserve match state.
+
+Candidate runtime repair remains inside owner **#14 Attack Engine**:
+- structured attack metadata now marks whether legacy compatibility is still required;
+- legacy text may be absent only when `on_declare`, `before_damage`, and `after_damage` are all explicitly empty;
+- effect-bearing or malformed structured attacks remain fail-closed;
+- no card-ID special case was added;
+- Match targeting, condition, damage, defeat, Reward and Aftermath owners remain unchanged.
+
+Candidate Battle presentation/control repair:
+- preserves `tabletop-v0-7` and v0.8 play bindings;
+- adds a compact cog with explicit `Quit Match -> confirm`;
+- confirmed quit delegates to existing `tcg-match-actions: concede`;
+- no unload/disconnect path sends `concede`;
+- adds structured Attack cost/damage presentation, friendly error copy, selected-card summaries, and phone-first tap guidance.
+
+Release-control source fingerprint transaction:
+- `tcg-match-actions` closure count remains **84**;
+- closure SHA-256 becomes `adb338b82d366d83fff2072d0109bfc4b7acdaba0e59233747a559b525225368`;
+- changed closure blobs are only:
+  - `tcg-match-attack-authority-v0-2.ts` -> `ee0ab7e0911083008626ff3571ee24c7aefbb6ee`;
+  - `tcg-match-attack-v0-2.ts` -> `8a4193e6639c8138baf758c759ce46482c936ad7`.
+
+Initial exact-head Validation #967:
+- deterministic runtime/type-check job: **SUCCESS**;
+- Set One job: **FAIL**, with only expected candidate-control/test drift (release-control closure fingerprint plus stale v0.8 UI assertions and one over-specific new event-payload assertion);
+- no new runtime/type-check defect was reported.
+
+**Acceptance state remains HOLD.** This entry does not advance the accepted ledger revision-6 gameplay/capability baseline. No Supabase deployment, `main` merge, Pages promotion or live source change has occurred. Fresh exact-head validation and review are required after the corrective control/test commit.
+
