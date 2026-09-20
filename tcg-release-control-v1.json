@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "7e17d449543836afd891c036a142ab42dff89437",
-        "file_count": 89,
-        "closure_sha256": "eafc47f296ff308aea19a2f0eedca479c82107fe18ecbaa335c0806806698d7c",
+        "entrypoint_git_blob_sha": "507daa32680a0ec6ab8c25a70a4b09adca317cd0",
+        "file_count": 90,
+        "closure_sha256": "d880f51c15c4c0c23a7c428738cdda4555ecf168f77d90c633b95f6d26304559",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -150,7 +150,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-authority-v0-2.ts",
-            "git_blob_sha": "ee0ab7e0911083008626ff3571ee24c7aefbb6ee"
+            "git_blob_sha": "e68e0a4f1433864a178497caa52811f1d0b22e24"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-card-choice-v0-2.ts",
@@ -175,6 +175,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-attack-deck-discard-v0-2.ts",
             "git_blob_sha": "1a2bba1cbd87979592afdf6769f1d63358fea1c5"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-attack-declaration-events-v0-2.ts",
+            "git_blob_sha": "791f5100f9a51b08609cdd1242993280805a8589"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-discard-recycle-choice-v0-2.ts",
@@ -446,7 +450,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "7e17d449543836afd891c036a142ab42dff89437"
+            "git_blob_sha": "507daa32680a0ec6ab8c25a70a4b09adca317cd0"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
