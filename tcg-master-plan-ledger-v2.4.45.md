@@ -544,3 +544,21 @@ If the triggered Ability's requirements match but its nested IF branch does not 
 
 ## 193 — Ability IF leaves read authoritative source/target state
 `source_damaged`, `event_attack_target_damaged` and `event_attack_target_has_condition` are evaluated from the bound authoritative field source/target for the current attack declaration. Browser state and printed English never decide these leaves.
+
+## 194 — Same-zone card reorder belongs to Card-Zone
+Effects that move an exact card within one authoritative zone, including deck top -> deck bottom, use the Card-Zone reorder primitive. Effect adapters must not splice/reconstruct authoritative zone arrays themselves.
+
+## 195 — Active Ability IF uses the shared predicate-tree owner
+Active Ability conditional programs delegate boolean composition to the common predicate-tree engine. The Active Ability IF adapter owns only its authoritative leaf context and may not become a second generic predicate-composition implementation.
+
+## 196 — Scheduled actions are lifecycle records, not delayed browser commands
+A structured `SCHEDULE_ACTION` is stored server-side with owner, trigger, source identity and structured steps. The client neither schedules nor replays it.
+
+## 197 — controller_aftermath_finished resolves before ordinary turn advance
+Deferred actions with trigger `controller_aftermath_finished` resolve after the controller's Aftermath/resolution queue has finished and immediately before canonical Match Flow turn advance. Any resulting deckout is visible to Match Flow before seat rotation.
+
+## 198 — Night Reading hidden identity remains controller-private
+The inspected opponent deck-top identity may be shown only to the Ability controller. Opponent/public receipts expose structural counts and waiting state, never the inspected card UID/card ID unless another rule explicitly reveals it.
+
+## 199 — Night Reading optional selection controls scheduling through Ability IF
+Declining the optional inspected-card bottom move leaves the deck order unchanged and causes `selected_count_at_least` to fail, so no deferred draw is scheduled. Selecting exactly one card reorders it through Card-Zone and schedules the deferred draw.
