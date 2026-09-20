@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.8';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.10-card-face';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -20,7 +20,8 @@
     opponentProfile: null,
     busy: false,
     poll: null,
-    overlayKey: ''
+    overlayKey: '',
+    fieldActions: null
   };
 
   const $ = (id) => document.getElementById(id);
@@ -388,42 +389,73 @@
     })).filter((attack) => attack.slot === 1 || attack.slot === 2);
   }
 
+  function cardRenderer() {
+    return window.StreamBanditTCGCardRendererV2451 || null;
+  }
+
+  function abilityReadyFor(where, index, creature) {
+    const anchor = cardAnchor(creature);
+    if (!anchor || !state.fieldActions || !Array.isArray(state.fieldActions.ability_sources)) return false;
+    return state.fieldActions.ability_sources.some((source) =>
+      String(source && source.anchor_uid || '') === anchor &&
+      String(source && source.where || '') === String(where || '') &&
+      (String(where || '') !== 'reserve' || Number(source && source.index) === Number(index))
+    );
+  }
+
+  function renderCardFace(cardId, options) {
+    const renderer = cardRenderer();
+    if (renderer && typeof renderer.renderCard === 'function') return renderer.renderCard(cardId, options || {});
+    return '<article class="sb-card-face sb-card-face--missing"><div class="sb-card-art-pending"><strong>' +
+      esc(cardNameById(cardId) || cardId || 'Card') + '</strong><small>Card renderer loading</small></div></article>';
+  }
+
+  function liveCreatureStatus(creature, cardId) {
+    const structured = structuredDefinition(topInstance(creature)) || {};
+    const maxHp = Math.max(0, Number(structured.creature && structured.creature.hp || 0));
+    const damage = Math.max(0, Number(creature && creature.damage || 0));
+    const remaining = Math.max(0, maxHp - damage);
+    const essenceCount = Array.isArray(creature && creature.essence) ? creature.essence.length : 0;
+    const shield = Math.max(0, Number(creature && creature.shield || 0));
+    return '<div class="sb-card-live-status" data-card-id="' + esc(cardId) + '">' +
+      '<span>HP <strong>' + esc(remaining) + '/' + esc(maxHp) + '</strong></span>' +
+      '<span>Essence <strong>' + esc(essenceCount) + '</strong></span>' +
+      '<span>Shield <strong>' + esc(shield) + '</strong></span>' +
+      '</div>';
+  }
+
   function creatureCard(creature, options) {
     const opts = options || {};
     if (!creature) return '<div class="sb-zone-empty">Empty</div>';
-    const definition = topDefinition(creature);
     const anchor = cardAnchor(creature);
-    const maxHp = Math.max(0, Number(definition.hp || 0));
-    const damage = Math.max(0, Number(creature.damage || 0));
-    const remaining = Math.max(0, maxHp - damage);
-    const selected = opts.primary && anchor && state.selectedAnchorUid === anchor;
-    const attacks = opts.primary ? attackSlots(creature) : [];
-    const canAct = !!opts.canAct;
-    const attackRows = attacks.map((attack) => (
-      '<button type="button" class="sb-card-action" data-card-intent="attack" data-attack-slot="' + attack.slot + '"' +
-      (canAct ? '' : ' disabled') + '>' +
-      '<span><strong>' + esc(attack.name) + '</strong><small>Attack ' + attack.slot + '</small></span>' +
-      '<span class="sb-damage">' + (attack.damage == null ? '—' : esc(attack.damage)) + '</span>' +
-      '</button>'
-    )).join('');
+    const selected = !!(opts.primary && anchor && state.selectedAnchorUid === anchor);
+    const instance = topInstance(creature);
+    const cardId = String(instance && instance.card_id || '');
+    const abilityReady = !!(opts.own && abilityReadyFor(opts.where, opts.index, creature));
+    const interactiveAttacks = !!opts.primary;
+    const face = renderCardFace(cardId, {
+      mode: 'battle',
+      abilityReady,
+      interactiveAbility: abilityReady && !!opts.own,
+      abilityWhere: opts.where || '',
+      abilityIndex: opts.index,
+      interactiveAttacks,
+      disabledAttackSlots: interactiveAttacks && !opts.canAct ? [1, 2] : [],
+      readyAttackSlots: opts.canAct && interactiveAttacks ? [1, 2] : []
+    });
     const setupReturn = opts.setupReturn
       ? '<button type="button" class="sb-card-action setup-return" data-setup-return="' + esc(opts.setupReturn.where) + '" data-setup-index="' + esc(opts.setupReturn.index == null ? '' : opts.setupReturn.index) + '"><span><strong>Return to hand</strong><small>Adjust setup</small></span><span>↩</span></button>'
       : '';
-    const cardId = String((topInstance(creature) && topInstance(creature).card_id) || '');
     return '<div class="sb-card-wrap' + (selected ? ' is-selected' : '') + (opts.setupReturn ? ' has-setup-return' : '') + '">' +
-      '<article class="sb-tcg-card sb-card-control' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '" data-card-id="' + esc(cardId) + '"' +
+      '<div class="sb-card-control sb-card-control-shell' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '"' +
       (opts.primary ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"' : '') + '>' +
-      '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
-      '<div class="sb-card-head"><span>' + esc(definition.stage || definition.kind || 'Creature') + '</span><span>' + esc(definition.element || '') + '</span></div>' +
-      '<div class="sb-card-name">' + esc(definition.name || (topInstance(creature) && topInstance(creature).card_id) || 'Creature') + '</div>' +
-      '<div class="sb-card-foot"><span>HP ' + esc(remaining) + '/' + esc(maxHp) + '</span><span>E ' + esc((creature.essence || []).length) + ' · S ' + esc(creature.shield || 0) + '</span></div>' +
-      '</article>' +
-      '<div class="sb-card-actions">' + attackRows + setupReturn + '</div>' +
+      face + liveCreatureStatus(creature, cardId) +
+      '</div>' +
+      (setupReturn ? '<div class="sb-card-actions">' + setupReturn + '</div>' : '') +
       '</div>';
   }
 
   function handCard(instance) {
-    const definition = legacyDefinition(instance) || {};
     const cardId = String(instance && instance.card_id || '');
     const uid = String(instance && instance.uid || '');
     const view = viewState();
@@ -444,14 +476,12 @@
     } else if (playPlayable) {
       attributes =
         ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') +
-        '" data-play-hand-uid="' + esc(uid) + '" data-play-intent="' + esc(playIntent) + '" draggable="true"';
+        '" data-play-hand-uid="' + esc(uid) + '" data-play-intent="' + esc(playIntent) +
+        '" draggable="' + (touchPrimaryInput() ? 'false' : 'true') + '"';
     }
-    return '<article class="sb-tcg-card sb-hand-card' + classes + '" data-card-id="' + esc(cardId) + '"' + attributes + '>' +
-      '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
-      '<div class="sb-card-head"><span>' + esc(definition.card_family || definition.kind || '') + '</span><span>' + esc(definition.element || '') + '</span></div>' +
-      '<div class="sb-card-name">' + esc(definition.name || cardId) + '</div>' +
-      '<div class="sb-card-foot"><span>' + esc(recipeType(instance) || 'Card') + '</span><span></span></div>' +
-      '</article>';
+    return '<div class="sb-hand-card sb-hand-card-shell' + classes + '" data-card-id="' + esc(cardId) + '"' + attributes + '>' +
+      renderCardFace(cardId, { mode: 'hand' }) +
+      '</div>';
   }
 
   function setupReturnOptions(where, index) {
@@ -480,7 +510,7 @@
         (playLegal ? ' sb-play-destination is-play-legal' : '');
       return '<section class="sb-reserve-slot' + legalClass + '"' + setupDestination + playDestination + '><span>' +
         esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' +
-        creatureCard(creature, { setupReturn: own && creature ? setupReturnOptions('reserve', index) : null }) +
+        creatureCard(creature, { own, where: 'reserve', index, setupReturn: own && creature ? setupReturnOptions('reserve', index) : null }) +
         '</section>';
     }).join('');
   }
@@ -698,8 +728,11 @@
     const canAttack = yourTurn && !pending && !state.busy;
     const yourSetup = view.phase === 'setup' && Number(view.setup_turn_seat) === youSeat;
 
-    $('oppVanguard').innerHTML = creatureCard(view.opponent && view.opponent.vanguard, {});
+    $('oppVanguard').innerHTML = creatureCard(view.opponent && view.opponent.vanguard, { own: false, where: 'vanguard', index: null });
     $('youVanguard').innerHTML = creatureCard(view.you && view.you.vanguard, {
+      own: true,
+      where: 'vanguard',
+      index: null,
       primary: view.phase === 'play',
       canAct: canAttack,
       setupReturn: view.you && view.you.vanguard ? setupReturnOptions('vanguard', null) : null
@@ -808,6 +841,17 @@
       button.addEventListener('click', async (event) => {
         event.stopPropagation();
         await runAttackIntent(Number(button.dataset.attackSlot));
+      });
+    });
+
+    document.querySelectorAll('[data-card-intent="ability"]').forEach((button) => {
+      button.addEventListener('click', async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const where = String(button.dataset.abilityWhere || '');
+        const rawIndex = String(button.dataset.abilityIndex || '');
+        const index = rawIndex === '' ? null : Number(rawIndex);
+        await runAbilityIntent(where, index);
       });
     });
 
@@ -1221,6 +1265,38 @@
     }
   }
 
+  async function runAbilityIntent(where, index) {
+    const view = viewState();
+    const youSeat = Number(view && view.you && view.you.seat);
+    if (
+      !view ||
+      view.phase !== 'play' ||
+      Number(view.active_seat) !== youSeat ||
+      hasPendingAction(view) ||
+      state.busy ||
+      !['vanguard', 'reserve'].includes(String(where || ''))
+    ) return;
+    state.busy = true;
+    state.overlayKey = '';
+    render();
+    setStatus('Using the selected card Ability through the authoritative match engine…', 'busy');
+    let failure = '';
+    try {
+      const payload = Object.assign(actionBase('use_ability'), { where: String(where) });
+      if (where === 'reserve') payload.index = Number(index);
+      await callEdge(API_MATCH, payload);
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
   async function runAttackIntent(attackSlot) {
     if (attackSlot !== 1 && attackSlot !== 2) throw new Error('Invalid attack slot.');
     state.busy = true;
@@ -1239,6 +1315,27 @@
       state.overlayKey = '';
       render();
       if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function refreshFieldActions() {
+    const view = viewState();
+    const youSeat = Number(view && view.you && view.you.seat);
+    const eligible = !!(
+      view &&
+      view.phase === 'play' &&
+      Number(view.active_seat) === youSeat &&
+      !hasPendingAction(view)
+    );
+    if (!eligible) {
+      state.fieldActions = null;
+      return;
+    }
+    try {
+      const response = await callEdge(API_MATCH, actionBase('field_actions'));
+      state.fieldActions = response && response.result && typeof response.result === 'object' ? response.result : null;
+    } catch (_) {
+      state.fieldActions = null;
     }
   }
 
@@ -1264,6 +1361,7 @@
       if (!mayKeepHandSelection) state.selectedHandUid = '';
     }
 
+    await refreshFieldActions();
     render();
     syncOpponentProfile(view && view.opponent && view.opponent.user_id).catch(() => {});
   }
@@ -1280,6 +1378,9 @@
       state.matchId = new URLSearchParams(window.location.search).get('match_id') || '';
       if (!state.matchId) throw new Error('Open this battle surface from a match route containing ?match_id=<id>.');
       await ensureClient();
+      const renderer = cardRenderer();
+      if (!renderer || typeof renderer.ready !== 'function') throw new Error('The shared TCG card renderer is unavailable.');
+      await renderer.ready();
       await refreshMatch();
       startPoll();
     } catch (error) {
