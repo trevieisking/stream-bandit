@@ -14,13 +14,23 @@ const evolutionOwner = fs.readFileSync(path.join(root, 'supabase', 'functions', 
 const tacticActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-tactic-actions', 'index.ts'), 'utf8');
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-interaction-v1.json'), 'utf8'));
 
-test('Battle keeps the accepted v0.7 geometry and v0.8 play bindings while adding the shared card-face bridge', () => {
-  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-7"/);
-  assert.match(battle, /data-sb-tcg-play-bindings="v0-8"/);
+test('Battle keeps the tabletop zones while using compact v0.8 geometry and inspect-drag bindings', () => {
+  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-8-compact"/);
+  assert.match(battle, /data-sb-tcg-play-bindings="v0-9-inspect-drag"/);
   assert.match(battle, /data-sb-tcg-card-face="v1"/);
   assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-15-stable-card-focus/);
-  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.15-stable-card-focus/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-16-compact-tabletop/);
+  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.16-compact-tabletop/);
+  assert.match(controller, /mode: 'compact'/);
+  assert.match(controller, /data-inspect-hand-uid=/);
+  assert.match(controller, /data-inspect-field-owner=/);
+});
+
+test('hand card click reads the card while drag/drop remains the authoritative play transport', () => {
+  assert.match(controller, /state\.inspectedCard = \{ kind: 'hand', uid \}/);
+  assert.match(controller, /renderCardFace\(cardId, \{ mode: 'compact' \}\)/);
+  assert.match(controller, /state\.inspectedCard = null;[\s\S]*?card\.classList\.add\('is-dragging'/);
+  assert.match(battle, /\.sb-hand\{[\s\S]*?overflow-x:auto;overflow-y:hidden/);
 });
 
 test('play-phase hand cards become selectable and desktop-draggable without changing setup binding', () => {
