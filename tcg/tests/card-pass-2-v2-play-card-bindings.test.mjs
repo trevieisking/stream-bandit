@@ -13,17 +13,19 @@ const matchActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 't
 const tacticActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-tactic-actions', 'index.ts'), 'utf8');
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-interaction-v1.json'), 'utf8'));
 
-test('Battle v0.8 keeps the accepted v0.7 layout and adds a separate play-binding marker', () => {
+test('Battle keeps the accepted v0.7 geometry and v0.8 play bindings while adding the shared card-face bridge', () => {
   assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-7"/);
   assert.match(battle, /data-sb-tcg-play-bindings="v0-8"/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-8/);
-  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.8/);
+  assert.match(battle, /data-sb-tcg-card-face="v1"/);
+  assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-10-card-face/);
+  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.10-card-face/);
 });
 
 test('play-phase hand cards become selectable and desktop-draggable without changing setup binding', () => {
   assert.match(controller, /data-play-hand-uid=/);
   assert.match(controller, /data-play-intent=/);
-  assert.match(controller, /draggable="true"/);
+  assert.match(controller, /draggable="' \+ \(touchPrimaryInput\(\) \? 'false' : 'true'\) \+ '"/);
   assert.match(controller, /addEventListener\('dragstart'/);
   assert.match(controller, /addEventListener\('dragover'/);
   assert.match(controller, /addEventListener\('drop'/);
