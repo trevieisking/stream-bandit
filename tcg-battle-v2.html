@@ -507,6 +507,36 @@ button{font:inherit}
 }
 </style>
 <link rel="stylesheet" href="stream-bandit-tcg-card-renderer-v2-4-51.css?v=2-4-51">
+<style>
+/* V0.10 shared card-face bridge: preserve accepted board geometry while the real card face owns presentation/actions. */
+.sb-card-control-shell,.sb-hand-card-shell{
+  background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;
+}
+.sb-card-control-shell>.sb-card-face,.sb-hand-card-shell>.sb-card-face{width:100%;height:100%}
+.sb-card-control-shell.is-selected>.sb-card-face,
+.sb-hand-card-shell.is-play-selected>.sb-card-face,
+.sb-hand-card-shell.is-setup-selected>.sb-card-face{
+  box-shadow:0 0 0 2px #35e2ad66,0 0 24px #35e2ad2f,0 10px 28px #0008;
+}
+.sb-hand-card-shell.is-play-selected>.sb-card-face,
+.sb-hand-card-shell.is-setup-selected>.sb-card-face{box-shadow:0 0 0 2px #ffd56a66,0 0 24px #ffd56a35,0 10px 28px #0008}
+.sb-card-live-status{
+  position:absolute;z-index:10;left:6px;right:6px;top:44%;
+  display:flex;justify-content:center;gap:4px;pointer-events:none;
+}
+.sb-card-live-status span{padding:2px 4px;border-radius:999px;background:#020712d9;border:1px solid #9fddff44;color:#dff7ff;font-size:5.5px;line-height:1}
+.sb-card-live-status strong{font-size:6px}
+.sb-card-control-shell .sb-card-rule[data-card-intent],
+.sb-card-control-shell [data-card-intent]{pointer-events:auto}
+.sb-hand-card-shell{padding:0}
+.sb-hand-card-shell>.sb-card-face{pointer-events:none}
+.sb-hand-card-shell.is-play-candidate>.sb-card-face,.sb-hand-card-shell.is-setup-candidate>.sb-card-face{pointer-events:none}
+@media(max-width:720px),(hover:none) and (pointer:coarse){
+  .sb-card-live-status{left:3px;right:3px;gap:2px}
+  .sb-card-live-status span{font-size:5px;padding:2px 3px}
+  .sb-card-live-status strong{font-size:5.4px}
+}
+</style>
 </head>
 <body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-7" data-sb-tcg-play-bindings="v0-8" data-sb-tcg-card-face="v1">
 <main class="sb-battle">
