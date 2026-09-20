@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.10-card-face';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.11-card-face';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -735,7 +735,7 @@
         '<div class="sb-phase-card">' +
         '<div class="sb-phase-copy"><strong class="sb-result-title ' + (won ? 'sb-result-win' : 'sb-result-loss') + '">' + (won ? 'VICTORY' : 'DEFEAT') + '</strong>' +
         '<small>' + esc(reasons || 'Match complete') + '</small></div>' +
-        '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-result-continue="1">Continue</button></div>' +
+        '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-result-continue="1">Back to Matchmaking</button></div>' +
         '</div>';
       return;
     }
@@ -796,6 +796,8 @@
     }
     setText('revisionPill', 'Revision ' + revision());
     setText('phasePill', String(view.phase || '—'));
+    const quitButton = $('quitMatchButton');
+    if (quitButton) quitButton.disabled = state.busy || view.phase === 'complete';
 
     const help = $('handHelp');
     if (help) {
@@ -1063,11 +1065,49 @@
       });
     });
 
+    document.querySelectorAll('[data-concede]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        if (!button.disabled) await runConcede();
+      });
+    });
+
     document.querySelectorAll('[data-result-continue]').forEach((button) => {
       button.addEventListener('click', () => {
         window.location.href = 'tcg-play.html';
       });
     });
+  }
+
+  async function runConcede() {
+    const view = viewState();
+    if (!view || view.phase === 'complete' || state.busy) return;
+    const confirmed = typeof window.confirm !== 'function' ||
+      window.confirm('Quit this match? This is a concession: you lose and your opponent wins.');
+    if (!confirmed) return;
+
+    state.busy = true;
+    state.overlayKey = '';
+    const settings = $('battleSettings');
+    if (settings) settings.open = false;
+    render();
+    setStatus('Conceding this match through the authoritative server…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, actionBase('concede'));
+      state.selectedHandUid = '';
+      state.selectedAnchorUid = '';
+      state.selectedChoiceIds = [];
+      state.pendingChoiceId = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
   }
 
   async function runAuthoritativeSetupAction(action, extra, busyMessage) {
