@@ -131,7 +131,7 @@ The small Battle cog owns a single destructive action: **Quit Match**. It calls 
 Victory/Defeat ends the match. The result action returns to `tcg-play.html` without a match id; no old match is resumed and the player must select **Find Opponent** for another opponent.
 
 ## 060 — Interaction-state clarity
-The canonical card face is also the control surface. Active Abilities pulse/glow only while server capability projection says they are usable and stop after use. Attack rows show server-projected readiness/block reasons. Essence attachment remains tap-first on phones: select the card, then a highlighted legal Creature; optional drag is desktop convenience only.
+The canonical card face is also the control surface. Active Abilities pulse/glow only while server capability projection says they are usable and stop after use. Attack rows show server-projected readiness/block reasons. On phones/tablets, card play and Essence attachment support finger drag/drop **and** the equal tap-select -> highlighted-destination fallback. Both paths reuse the same authoritative server actions.
 
 ## 061 — Orbitortoise layout applies globally
 The Trevor-supplied Orbitortoise image remains the reference structure for all card types/surfaces: identity/HP/type header, large artwork window, readable Ability/Attack/effect area and lower metadata/footer. Missing art uses the same finished frame with an Artwork Pending window so every identity is game-ready before its final PNG arrives.
@@ -141,7 +141,7 @@ The Trevor-supplied Orbitortoise image remains the reference structure for all c
 Every battlefield Creature exposes its authoritative attached Essence as tiny colored sphere/orb/pip markers attached visually to that Creature. The display exists so players can read resource availability without remembering a hidden count. It is derived from authoritative attached Essence plus structured `provides`; it does not create client-side resource authority.
 
 ## 063 — Essence orbs represent effective payable units
-The resource rail represents effective Essence units available from attached sources. Element color/glyph comes from the canonical Stream Bandit element identity. Multi-unit providers produce the equivalent visible quantity; constrained layouts may group identical units as `orb ×N` but may not hide the total. The Attack's printed/canonical cost remains visible beside the Attack for direct visual comparison.
+The resource rail represents effective Essence units available from attached sources. Element color/glyph comes from the canonical Stream Bandit element identity. Multi-unit providers produce the equivalent visible quantity. Individual unit orbs remain visible while the rail fits; only rendered overflow compresses the rail to one counted orb **per element**, with that element's current total inside the orb. The Attack's printed/canonical cost remains visible beside the Attack for direct visual comparison.
 
 ## 064 — Essence removal removes its visual resource immediately
 Discard, expiry, movement, removal or any authoritative loss of attached Essence removes the corresponding orb contribution on the next authoritative Battle render. The browser may not keep stale attachment pips after the server state changes.
@@ -149,8 +149,8 @@ Discard, expiry, movement, removal or any authoritative loss of attached Essence
 ## 065 — Element color never stands alone
 Astral, Ember, Gale, Grove, Shade, Stone, Tide and Volt use their canonical element palette, but every Essence orb also exposes the element glyph/mark and accessible text. Resource readability may not depend on color vision alone.
 
-## 066 — V2.4.53 supersedes desktop-only drag in ledger 060
-Ledger 060 remains historical evidence for the tap fallback, but its statement that drag is desktop-only is superseded. Phone/tablet now require finger drag/drop **and** retain tap-select -> highlighted destination. Both paths submit the same authoritative server command and legality remains server-owned.
+## 066 — Phone/tablet drag and tap share one gameplay path
+Phone/tablet require finger drag/drop **and** retain tap-select -> highlighted destination. Both paths submit the same authoritative server command and legality remains server-owned; ledger 060 is synchronized to this current rule.
 
 ## 067 — Touch drag requires pointer-safe transport
 The current coarse-touch Battle client sets playable hand cards to `draggable="false"`, which explains Kay's observed inability to drag on phone. Mobile parity must use a Pointer Events/touch-safe gesture path rather than depending exclusively on native HTML5 drag/drop. It must preserve page scrolling outside an active card drag and must not change the accepted board geometry.
@@ -160,7 +160,7 @@ Trevor/Kay have accepted the Battle layout geometry. Realm/background/table deco
 
 
 ## 069 — Essence overflow collapses to one counted orb per element
-When attached Essence would visually crowd a Creature card, repeated units of the same element collapse to **one orb of that element with the numeric count inside it**. Example: twelve Astral units display as one Astral orb containing `12`. If multiple elements are attached, each element keeps its own counted orb (for example Astral `7` + Tide `5`) so type information is never lost.
+When the rendered individual Essence rail would exceed its allocated card bounds, repeated units collapse to **one orb per element with that element's live numeric count inside it**. The count is always whatever authoritative state currently provides; no particular number triggers compression. If multiple elements are attached, each element keeps its own counted orb so type information is never lost.
 
 ## 070 — Counted-orb compression is responsive presentation only
 The threshold for switching from individual tiny orbs to counted orbs is determined by available card space/responsive layout, not by gameplay rules. The underlying authoritative Essence instances and `provides` values remain unchanged. A counted orb is only a compact view of those units.
