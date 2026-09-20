@@ -11,7 +11,8 @@
       "Video Project 5.mp4"
     ],
     "layout_reference_scope": "Interaction and viewport composition only: whole-board visibility, compact field cards, click/tap inspection, bottom horizontal hand and drag/drop. Stream Bandit retains original art, styling, card identities, terminology and rules.",
-    "human_layout_finding": "Trevor required 50% browser zoom to see the previous full-rule cards with the whole board; the reference interaction model proves full rules should open on inspection rather than permanently consume battlefield/hand space."
+    "human_layout_finding": "Trevor required 50% browser zoom to see the previous full-rule cards with the whole board; the reference interaction model proves full rules should open on inspection rather than permanently consume battlefield/hand space.",
+    "human_layout_finding_v2_4_55": "Trevor desktop and Kay phone V2.4.54 recordings confirmed the whole board can fit, but height-filled Vanguard cards dominate the table and full tiny hand cards are hard to recognize. The accepted correction is bounded field cards plus a larger bottom-edge peek/fan hand."
   },
   "board": {
     "opponent_position": "top",
@@ -24,12 +25,15 @@
     "hand_position": "bottom_edge",
     "board_remains_visible_during_choices": true,
     "normal_browser_zoom_required": true,
-    "field_card_presentation": "compact_art_status_preview",
-    "full_card_presentation": "click_or_tap_opens_separate_canonical_inspector",
-    "hand_behavior": "fixed_bottom_horizontal_scroll_without_growing_board",
-    "mobile_hand_behavior": "swipe_left_right_horizontal_card_tray",
+    "field_card_presentation": "bounded_compact_art_status_preview",
+    "full_card_presentation": "click_or_tap_opens_shared_inspect_face_with_moves_and_abilities",
+    "hand_behavior": "bottom_edge_peek_fan_horizontal_scroll",
+    "mobile_hand_behavior": "larger_cards_partially_clipped_below_bottom_rail_swipe_left_right",
     "viewport_contract": "entire_battlefield_plus_hand_visible_in_one_device_viewport_at_normal_zoom",
-    "source_card_stays_in_slot_during_inspection": true
+    "source_card_stays_in_slot_during_inspection": true,
+    "field_card_scale": "bounded_by_viewport_height_not_slot_fill",
+    "hand_card_visibility": "show_upper_identity_and_art_in_rail; full card only in inspector",
+    "hand_cards_may_extend_below_visible_rail": true
   },
   "input_modes": {
     "desktop": [
@@ -56,8 +60,8 @@
     "mobile_rules_engine": false,
     "tap_fallback_preserved": true,
     "hand_click_behavior": "inspect_card_and_preserve_selection_for_tap_fallback",
-    "hand_drag_behavior": "drag_directly_to_existing_legal_destination_using_existing_server_action",
-    "field_click_behavior": "inspect_compact_card_without_relocating_source",
+    "hand_drag_behavior": "drag_peek_card_directly_to_existing_legal_destination_using_existing_server_action",
+    "field_click_behavior": "inspect_bounded_compact_card_without_relocating_source",
     "mobile_page_scroll_required": false,
     "mobile_hand_horizontal_scroll_required": true
   },
@@ -239,7 +243,9 @@
     "touch_drag_legal_destination_glow",
     "compact_field_card_art_status_preview",
     "full_card_inspector_without_board_reflow",
-    "horizontal_hand_scroll_position"
+    "horizontal_hand_scroll_position",
+    "bottom_edge_hand_peek_fan",
+    "shared_read_only_card_inspector_on_decks_collection_battlepass"
   ],
   "forbidden_client_patterns": [
     "browser_prompt_for_gameplay_targeting",
@@ -287,5 +293,18 @@
     "real_attack_damage_turn_reward_lifecycle",
     "essence_visibility_and_cross_device_input_parity",
     "final_board_decoration"
-  ]
+  ],
+  "non_battle_card_inspection": {
+    "pages": [
+      "decks",
+      "collection",
+      "battlepass"
+    ],
+    "source": "shared_card_renderer",
+    "mode": "inspect",
+    "read_only": true,
+    "battle_pass_scope": "card-backed reward samples only; no progression entitlement or economy authority",
+    "deck_scope": "canonical deck recipe preview only; no deck ownership mutation",
+    "collection_scope": "card preview only; no collection ownership inference"
+  }
 }
