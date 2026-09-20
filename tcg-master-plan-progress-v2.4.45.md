@@ -423,3 +423,47 @@ The implementation uses Stream Bandit's existing shared card renderer and rules 
 - The existing touch-safe long-hold drag and tap fallback remain routed to the same existing server actions.
 
 Exact-head CI and two-device human acceptance are still required. Main/static live remains untouched.
+
+
+## V2.4.55 paired-video checkpoint — bounded field cards + hand peek + inspect everywhere
+
+Trevor's desktop recording `Desktop 2026.09.20 - 18.22.38.08.mp4` and Kay's phone recording `WhatsApp Video 2026-09-20 at 18.30.29.mp4` were reviewed against the earlier supplied TCG interaction reference.
+
+### Human visual finding
+V2.4.54 solved the previous need to zoom the browser out just to see the board, but its final presentation overcorrected in two places:
+- occupied Vanguard/Reserve cards were changed from bounded card objects into height-filled cards, making the active Creature visually dominate the tabletop;
+- the player's hand became a strip of complete but very small cards, which preserved every edge of the card at the cost of recognizability and the physical-card feel shown in the accepted interaction reference.
+
+The corrected presentation contract is therefore:
+- in-play cards stay bounded compact previews inside their zones;
+- the whole battlefield stays visible at normal/default browser zoom;
+- hand cards are larger and deliberately **peek/fan from the bottom edge**, so the card bottoms may continue below the visible hand mask;
+- the hand scrolls/swipes horizontally;
+- clicking/tapping any hand/field card opens the readable canonical inspection face;
+- drag/drop and tap-select -> destination continue to use the existing authoritative gameplay commands.
+
+### Shared inspection finding
+The existing Battle inspector direction is accepted, but the complete move/Ability area needs more room than the old Battle face allocated. V2.4.55 introduces one shared renderer `inspect` mode with a larger rules/move region.
+
+The same read-only inspection interaction now applies outside Battle:
+- **Decks** canonical card recipe tiles;
+- **Collection** canonical card tiles;
+- card-backed **Battle Pass** reward samples.
+
+Only Battle adds live authoritative Attack/active-Ability controls and current Creature state. Decks/Collection/Battle Pass inspection remains presentation-only and cannot create deck ownership, collection ownership, progression, entitlement or economy authority.
+
+### V2.4.55 source implementation
+- shared card renderer internal version moves to 2.4.55 and exposes the `sb-card-face--inspect` presentation class through the existing generic renderer mode;
+- inspect CSS gives complete Ability/Attack/move rows substantially more room while retaining the same card data/artwork;
+- Battle inspector now renders `mode: "inspect"`;
+- desktop and phone field cards return to bounded viewport-driven widths rather than slot-height fill;
+- desktop Battle hand uses larger overlapping cards that continue below the smaller hand rail;
+- phone/coarse Battle hand uses 152px cards inside a 76px visible hand viewport, producing the intended bottom-edge peek while preserving horizontal swipe;
+- Decks, Collection and Battle Pass use one shared read-only modal inspector backed by the canonical renderer;
+- keyboard Enter/Space inspection and Escape close behavior are included on non-Battle pages;
+- new regression coverage binds the V2.4.55 geometry and verifies product-page inspection does not introduce database/gameplay mutation.
+
+### Code Labs evidence boundary
+Code Labs Forge was checked read-only because the user explicitly requested it. The current Code Labs workspace is still synchronized to the historical PR #549 workstream, not PR #591/current V2.4.55 head. Scan Labs also failed closed because the repository exceeds its bounded source-byte limit. No stale Code Labs record was repurposed and no CG Repair Lab, Code God, Writer or Repo Desk path was entered. For this visual slice, GitHub exact-head source and fresh TCG validation remain the current evidence authority.
+
+The previously deployed `tcg-match-actions` v9 lethal-handoff repair remains live and is not part of this visual source change. Main/static live remains untouched. Exact-head CI and Trevor/Kay cross-device acceptance are still required before static promotion.
