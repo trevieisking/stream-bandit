@@ -89,8 +89,8 @@
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "f000fcb4ba4c4a6589fd86100ec8e0a5adc72718",
-        "file_count": 85,
-        "closure_sha256": "811064feeff89021aea648cdbf80ba847709ca2097595f704c3461788bc58f9a",
+        "file_count": 86,
+        "closure_sha256": "b97a706ef61ff7c56c8b1f71b0f14b1bebe16c9eb3a1c38dff0481ba371ab914",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -306,7 +306,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "0253d39ba21b3bf36b141fbecac4bdbbe952fd19"
+            "git_blob_sha": "22e71d0865702cde501d6bdf974bd92327956095"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-evolution-legality-v0-2.ts",
@@ -377,6 +377,10 @@
             "git_blob_sha": "2e105fdc4b6a641e0fbaaf9366263a308e4387c8"
           },
           {
+            "path": "supabase/functions/_shared/tcg-match-predicate-tree-v0-2.ts",
+            "git_blob_sha": "31740aac5ddb6f89c3c2a658014d91081e5dd0b1"
+          },
+          {
             "path": "supabase/functions/_shared/tcg-match-randomization-engine-v0-2.ts",
             "git_blob_sha": "949ed0f99e0b37a39639423ceee60d8b68fab32d"
           },
@@ -437,8 +441,8 @@
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "4fe4d9e0dc901ad8b35d43d67fc9645c4868c4e2",
-        "file_count": 36,
-        "closure_sha256": "73e742dead2460ef9a6f3c9bc60168b1fadf778ab16312feca6d428f21a9b55f",
+        "file_count": 37,
+        "closure_sha256": "23c2dc76cdb8702ffc2e8e558a3db807068f008d2f5be062302de1334835b5fc",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts",
@@ -514,7 +518,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "0253d39ba21b3bf36b141fbecac4bdbbe952fd19"
+            "git_blob_sha": "22e71d0865702cde501d6bdf974bd92327956095"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",
@@ -547,6 +551,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-movement-listener-v0-2.ts",
             "git_blob_sha": "47931670e667c447f68609fcdb52da999156bc74"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-predicate-tree-v0-2.ts",
+            "git_blob_sha": "31740aac5ddb6f89c3c2a658014d91081e5dd0b1"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-randomization-engine-v0-2.ts",
