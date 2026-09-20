@@ -124,3 +124,28 @@
 - [ ] Mobile/coarse-touch human readability PASS for Astral Battle + Collection + Decks.
 - [ ] Exact-head TCG Card Pass 2 Validation PASS.
 - [ ] Promotion decision before merge/main/live.
+
+
+## V2.4.52 — real Attack / result / quit acceptance
+- [x] Lock Attack as a server-owned action that automatically places damage and ends the attacking player's turn after its required effect/resolution chain.
+- [x] Lock Creature defeat -> opponent Reward Card resolution -> required promotion -> Match Flow continuation.
+- [x] Lock explicit **Quit Match** as server `concede`: quitter loses, opponent wins.
+- [x] Lock reload/navigation as resumable rather than an automatic concession.
+- [x] Lock terminal result continuation to fresh `tcg-play.html` matchmaking with no carried match id.
+- [x] Lock active Ability glow/pulse to server capability projection and disappearance after use/limit consumption.
+- [x] Lock Attack Ready/blocked presentation to server-projected readiness, including insufficient-Essence explanation.
+- [x] Lock touch Essence flow: tap Essence -> tap highlighted Creature; desktop drag is optional only.
+- [x] Lock the Trevor-supplied Orbitortoise card as the global card-face layout reference for current/future identities.
+- [ ] Add the small Battle settings/cog control and wire **Quit Match** through authoritative `concede`.
+- [ ] Rename terminal continuation to **Back to Matchmaking** and prove it returns to `tcg-play.html` without `match_id`.
+- [ ] Automated Attack journey proves legal Attack -> exact damage -> automatic turn advance/draw.
+- [ ] Automated defeat journey proves lethal Attack -> Creature removed -> Reward resolution queued.
+- [ ] Automated concession journey proves quitter loss / opponent win and no unrelated state mutation.
+- [ ] Automated active Ability projection proves usable -> glow eligible -> use -> projection disappears.
+- [ ] Exact-head TCG Card Pass 2 Validation PASS after V2.4.52.
+- [ ] Trevor/Kay real two-user PASS: at least one Attack visibly places damage.
+- [ ] Trevor/Kay real two-user PASS: lethal damage visibly triggers Reward handling and subsequent state.
+- [ ] Trevor/Kay real two-user PASS: Ability usable glow appears and disappears after activation.
+- [ ] Trevor/Kay real two-user PASS: phone tap Essence attachment succeeds without drag.
+- [ ] Trevor/Kay real two-user PASS: Quit Match gives quitter DEFEAT, opponent VICTORY, then both can return to fresh matchmaking.
+- [ ] Promotion decision only after the real two-user post-Attack gate is complete.
