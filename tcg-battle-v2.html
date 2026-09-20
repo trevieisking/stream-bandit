@@ -86,7 +86,54 @@ button{font:inherit}
 .sb-player-copy{min-width:0}
 .sb-player-copy strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
 .sb-player-copy small{display:block;color:#8da9bc;font-size:10px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-match-meta{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.sb-match-meta{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.sb-battle-cog{
+  width:30px;height:30px;min-width:30px;border-radius:50%;
+  display:grid;place-items:center;
+  border:1px solid #55e7ff55;background:#071923;color:#dffaff;
+  font-size:15px;line-height:1;cursor:pointer;
+  box-shadow:0 0 16px #55e7ff16
+}
+.sb-battle-cog:hover,.sb-battle-cog:focus-visible{border-color:#55e7ffaa;box-shadow:0 0 0 2px #55e7ff18,0 0 18px #55e7ff22}
+.sb-battle-menu{
+  position:fixed;inset:0;z-index:120;
+  display:flex;justify-content:flex-end;align-items:flex-start;
+  padding:68px 14px 14px;
+  background:linear-gradient(180deg,#0005,#0009);
+  backdrop-filter:blur(5px)
+}
+.sb-battle-menu[hidden]{display:none}
+.sb-battle-menu-card{
+  width:min(330px,calc(100vw - 20px));
+  border:1px solid #55e7ff55;border-radius:16px;
+  background:#03131df7;color:#e8f8ff;
+  padding:12px;box-shadow:0 22px 60px #000c,0 0 26px #55e7ff12
+}
+.sb-battle-menu-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sb-battle-menu-head strong{font-size:13px}
+.sb-battle-menu-close{
+  width:30px;height:30px;border:1px solid #ffffff22;border-radius:50%;
+  background:#06121a;color:#d9edf8;font-size:16px;cursor:pointer
+}
+.sb-battle-menu-copy{margin:8px 0;color:#93adbf;font-size:10px;line-height:1.45}
+.sb-battle-menu-action{
+  width:100%;min-height:42px;border-radius:11px;border:1px solid #ff6e8175;
+  background:linear-gradient(145deg,#55121e,#8d1e30);color:#fff;
+  font-size:10px;font-weight:950;cursor:pointer
+}
+.sb-quit-confirm{
+  margin-top:9px;padding:9px;border:1px solid #ff6e8155;border-radius:11px;
+  background:#260810
+}
+.sb-quit-confirm[hidden]{display:none}
+.sb-quit-confirm strong{display:block;color:#ffdbe1;font-size:11px}
+.sb-quit-confirm p{margin:4px 0 8px;color:#d7aab2;font-size:9px;line-height:1.4}
+.sb-quit-confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sb-quit-confirm-actions button{
+  min-height:38px;border-radius:9px;border:1px solid #ffffff24;
+  background:#0b1c25;color:#e8f8ff;font-size:9px;font-weight:900;cursor:pointer
+}
+.sb-quit-confirm-actions .is-danger{border-color:#ff6e8175;background:#78192a}
 .sb-pill{
   border:1px solid #ffffff22;border-radius:999px;background:#020b12c9;
   color:#a9bdce;padding:4px 8px;font-size:9px;font-weight:900;letter-spacing:.03em
@@ -429,7 +476,11 @@ button{font:inherit}
   }
   .sb-player-avatar{width:34px;height:34px;min-width:34px}
   .sb-player-copy strong{font-size:12px}.sb-player-copy small{font-size:8px}
-  .sb-match-meta{max-width:54%;gap:3px}.sb-pill{font-size:7px;padding:3px 5px}
+  .sb-match-meta{max-width:58%;gap:3px}.sb-pill{font-size:7px;padding:3px 5px}
+  .sb-battle-cog{width:30px;height:30px;min-width:30px;font-size:14px}
+  .sb-battle-menu{padding:56px 6px 10px}
+  .sb-battle-menu-card{width:min(320px,calc(100vw - 12px))}
+
   .sb-half{
     display:grid;
     grid-template-columns:minmax(0,1fr) minmax(0,1fr);
@@ -507,7 +558,7 @@ button{font:inherit}
 }
 </style>
 </head>
-<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-7" data-sb-tcg-play-bindings="v0-8">
+<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-7" data-sb-tcg-play-bindings="v0-8" data-sb-tcg-battle-controls="v0-9">
 <main class="sb-battle">
   <section class="sb-board" aria-label="One-screen battlefield">
     <header class="sb-player-strip" aria-label="Opponent">
@@ -520,6 +571,7 @@ button{font:inherit}
         <span class="sb-pill" id="turnPill">Loading…</span>
         <span class="sb-pill" id="phasePill">—</span>
         <span class="sb-pill" id="revisionPill">Revision —</span>
+        <button type="button" class="sb-battle-cog" id="battleMenuButton" aria-label="Battle menu" aria-expanded="false" aria-controls="battleMenu">⚙</button>
       </div>
     </header>
 
@@ -573,9 +625,28 @@ button{font:inherit}
   </section>
 </main>
 
+<div class="sb-battle-menu" id="battleMenu" hidden>
+  <section class="sb-battle-menu-card" role="dialog" aria-modal="true" aria-labelledby="battleMenuTitle">
+    <div class="sb-battle-menu-head">
+      <strong id="battleMenuTitle">Battle menu</strong>
+      <button type="button" class="sb-battle-menu-close" data-battle-menu-close="1" aria-label="Close battle menu">×</button>
+    </div>
+    <p class="sb-battle-menu-copy">Closing or reloading the page does not end this match. You can return and continue from the authoritative match state.</p>
+    <button type="button" class="sb-battle-menu-action" id="quitMatchButton">Quit Match</button>
+    <div class="sb-quit-confirm" id="quitMatchConfirm" hidden>
+      <strong>Forfeit this match?</strong>
+      <p>Quitting ends the match immediately. You lose and your opponent wins.</p>
+      <div class="sb-quit-confirm-actions">
+        <button type="button" data-quit-cancel="1">Keep Playing</button>
+        <button type="button" class="is-danger" data-quit-confirm="1">Confirm Quit</button>
+      </div>
+    </div>
+  </section>
+</div>
+
 <script src="stream-bandit-tcg-config-v2-4-31.js?v=2-4-31"></script>
 <script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-6"></script>
 <script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-8"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-9"></script>
 </body>
 </html>
