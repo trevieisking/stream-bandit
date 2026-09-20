@@ -7,6 +7,14 @@ import {
   type RuntimeV02PendingActiveAbilityChoice,
 } from "./tcg-match-active-ability-choice-v0-2.ts";
 import {
+  runtimeV02CreateActiveAbilityDeckReadingChoice,
+  runtimeV02PendingActiveAbilityDeckReadingChoiceView,
+  runtimeV02ResolveActiveAbilityDeckReadingChoice,
+  structuredRuntimeActiveAbilityDeckReading,
+  type RuntimeV02ActiveAbilityDeckReadingResolution,
+  type RuntimeV02PendingActiveAbilityDeckReadingChoice,
+} from "./tcg-match-active-ability-deck-reading-v0-2.ts";
+import {
   runtimeV02BuildActiveAbilitySelectedHealChoice,
   runtimeV02PendingActiveAbilitySelectedHealChoiceView,
   runtimeV02ResolveActiveAbilitySelectedHealChoice,
@@ -31,11 +39,13 @@ type RuntimeV02ActiveAbilitySource = {
 };
 
 export type RuntimeV02PendingActiveAbilityLiveChoice =
+  | RuntimeV02PendingActiveAbilityDeckReadingChoice
   | RuntimeV02PendingActiveAbilityChoice
   | RuntimeV02PendingActiveAbilitySelectedHealChoice
   | RuntimeV02PendingActiveAbilitySelectedModifierChoice;
 
 export type RuntimeV02ActiveAbilityLiveResolution =
+  | RuntimeV02ActiveAbilityDeckReadingResolution
   | {
     kind: "inspect_one_reward";
     ability_id: string;
@@ -63,6 +73,23 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
   choiceId: string = crypto.randomUUID(),
 ): RuntimeV02PendingActiveAbilityLiveChoice | null {
   const instance = source.instance as { card_id?: unknown } | null | undefined;
+  const deckReadingDescriptor = structuredRuntimeActiveAbilityDeckReading(state, instance);
+  if (deckReadingDescriptor) {
+    const pending = runtimeV02CreateActiveAbilityDeckReadingChoice(
+      state,
+      controllerSeat,
+      deckReadingDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      deckReadingDescriptor.ability_id,
+    );
+    return pending;
+  }
+
   const rewardDescriptor = structuredRuntimeActiveAbilityRewardInspection(state, instance);
   if (rewardDescriptor) {
     return runtimeV02CreateActiveAbilityRewardChoice(
@@ -114,6 +141,9 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
   viewerSeat: 1 | 2,
 ) {
   if (!choice) return null;
+  if (choice.kind === "inspect_opponent_deck_top_then_optional_bottom") {
+    return runtimeV02PendingActiveAbilityDeckReadingChoiceView(choice, viewerSeat);
+  }
   if (choice.kind === "inspect_one_reward") {
     return runtimeV02PendingActiveAbilityChoiceView(choice, viewerSeat);
   }
@@ -138,6 +168,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
   choiceIds: string[],
   state: Record<string, unknown>,
 ): RuntimeV02ActiveAbilityLiveResolution {
+  if (choice.kind === "inspect_opponent_deck_top_then_optional_bottom") {
+    return runtimeV02ResolveActiveAbilityDeckReadingChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
+  }
   if (choice.kind === "inspect_one_reward") {
     const resolved = runtimeV02ResolveActiveAbilityRewardChoice(
       choice,
