@@ -103,12 +103,12 @@ function ensureRenderer(){
     if(!document.querySelector('link[data-sb-card-renderer-css]')){
       const css=document.createElement('link');
       css.rel='stylesheet';
-      css.href='stream-bandit-tcg-card-renderer-v2-4-51.css?v=2-4-51';
+      css.href='stream-bandit-tcg-card-renderer-v2-4-51.css?v=2-4-55';
       css.dataset.sbCardRendererCss='1';
       document.head.appendChild(css);
     }
     const script=document.createElement('script');
-    script.src='stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-51';
+    script.src='stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-55';
     script.async=true;
     script.onload=()=>window.StreamBanditTCGCardRendererV2451
       ? resolve(window.StreamBanditTCGCardRendererV2451)
