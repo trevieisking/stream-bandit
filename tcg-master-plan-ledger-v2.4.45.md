@@ -264,3 +264,19 @@ A successfully played Realm cannot disappear merely because the responsive table
 
 ## 100 — Player-facing errors and diagnostic codes are separate
 Known machine legality codes are translated into concise player guidance. The raw code remains available in diagnostic state/console evidence. A user should see what action is required, not an implementation identifier such as `required_tactic_target_unavailable`.
+
+
+## 101 — Full Release 1 runtime completion precedes the next full human Battle gate
+Human Battle remains essential acceptance evidence, but it is no longer the immediate next loop while the 193-card launch registry still consumes capabilities classified partial/missing. Automation and owner-level source work continue first. The next full Trevor/Kay two-device journey starts only after Release 1-used capability reconciliation is complete.
+
+## 102 — Release 1 capability scope is usage-driven
+A grammar operation/predicate becomes a Release 1 blocker only when the frozen 193-card launch registry actually uses it. Future-only grammar, Fairy, Underworld, Packs, Shop, Trading and Battle Pass capability must not expand the launch runtime-completion queue.
+
+## 103 — Capability labels require current owner evidence
+tcg-runtime-capabilities-v0.2.json is an inventory, not source authority. A missing or partial label may be stale after later owner work. Before coding, inspect current generic source/tests and the exact usage context. Reclassify only when the existing owner proves the full Release 1-used shape; otherwise repair that rightful owner.
+
+## 104 — Predicate-tree composition has one shared owner
+Boolean structure (all, any, not) belongs to tcg-match-predicate-tree-v0-2.ts. The tree owner never interprets gameplay semantics. Each mechanic supplies an authoritative leaf evaluator for its context. No Attack/Ability/Tactic/listener route may create another independent boolean composition grammar.
+
+## 105 — Generic IF is not complete until every Release 1 context is covered
+The shared predicate tree is foundation only. IF remains incomplete until all 29 frozen Release 1 IF instances can execute through structured owners across Attack, Ability and Tactic/listener contexts without printed-English or card-ID gameplay fallback.
