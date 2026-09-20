@@ -304,3 +304,22 @@ The shared requirement layer owns only the predicate envelope and candidate-coun
 
 ## 111 — Previous opponent turn is ownership-based, not arithmetic
 Any rule that refers to a previous opponent turn must resolve from canonical turn ownership history. It may not assume turn_seq - 1 because Release 1 includes TIMEFOLD and therefore same-seat extra turns. Match Flow is the only ordinary turn-history writer; future extra-turn owners must append through the same history owner.
+
+
+## 112 — Card-zone movement must be legible but never authoritative in the browser
+Deck shuffle, deal, draw, discard and Reward movement are rendered from authoritative state/events. RNG continues to own shuffle order and Card-Zone continues to own physical movement. Client animation may explain a transition but may not determine or replay the mutation.
+
+## 113 — Hidden zones have physical presence without identity leakage
+Opponent deck, opponent hand and face-down Rewards may be visually represented as card backs and counts. Their identities remain governed by Hidden Information. A face-down card back is presentation, not permission to inspect the card.
+
+## 114 — Public discard inspection follows Hidden Information
+Discard is a visible pile. Read-only inspection is allowed only for cards/zones that the authoritative visibility model exposes. The inspector cannot become a shortcut around private/hidden information.
+
+## 115 — Reward selection is a server-count-bound overlay
+When Defeat requires Reward taking, Battle presents a large face-down Reward-selection overlay. The required selection count and eligible positions come from the existing pending Reward owner. Reward values 1, 2 and 3 are generic data, not hard-coded Creature identities. Selection moves the chosen authoritative cards to hand, then resumes the same suspended resolution continuation.
+
+## 116 — Conditions and Abilities require visible state feedback
+An authoritative Condition application/clear/replace/prevention and an authoritative Ability usable/fired transition must be visible on the relevant card/field. Presentation may animate or highlight the event, but Condition/Event Listener/Ability owners remain the sole legality/state authority.
+
+## 117 — Interrupted animations never block state recovery
+Reconnect/refresh renders the latest authoritative snapshot immediately. A partially displayed shuffle/draw/discard/Reward animation has no gameplay receipt and may be abandoned without changing match state.
