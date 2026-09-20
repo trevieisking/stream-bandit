@@ -300,3 +300,7 @@ Release 1 structured Tactics use predicate records for play requirements. Compat
 
 ## 110 — legal_card_available delegates selection, not card rules
 The shared requirement layer owns only the predicate envelope and candidate-count meaning. Zone traversal and card/Creature filter matching stay with the existing selector owners. A legal-card requirement is true only when those owners return at least one candidate; the requirement evaluator must not invent a parallel card-search engine.
+
+
+## 111 — Previous opponent turn is ownership-based, not arithmetic
+Any rule that refers to a previous opponent turn must resolve from canonical turn ownership history. It may not assume turn_seq - 1 because Release 1 includes TIMEFOLD and therefore same-seat extra turns. Match Flow is the only ordinary turn-history writer; future extra-turn owners must append through the same history owner.
