@@ -448,9 +448,9 @@
       },
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
-        "entrypoint_git_blob_sha": "36d769e919626e7fb6a028916cc84ba4f77323fd",
-        "file_count": 37,
-        "closure_sha256": "e5c92ff21ea8aed37b7192471c1266c5ab02c26b8e48685e7ec9aa0e0fc88cf5",
+        "entrypoint_git_blob_sha": "8cc510a60a5b8d7afd1eb551f29b7189a8553527",
+        "file_count": 39,
+        "closure_sha256": "44a077d6046d6755f9a9cd8b0ae0f1e00f5a04317f50477bf4511610c8ec8eac",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts",
@@ -515,6 +515,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-essence-movement-v0-2.ts",
             "git_blob_sha": "f66aef8b0f883278b6d1be2c281b8bd5c5d5f543"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-event-history-query-v0-2.ts",
+            "git_blob_sha": "5b4ee28676398a39295b400445b46ae441a090f1"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-defeat-event-v0-2.ts",
@@ -585,6 +589,10 @@
             "git_blob_sha": "d9862606b0add28a5494c9c7853f4ee0c114c406"
           },
           {
+            "path": "supabase/functions/_shared/tcg-match-turn-history-v0-2.ts",
+            "git_blob_sha": "409177483e637982844620bb850bef6bd84e475f"
+          },
+          {
             "path": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
             "git_blob_sha": "4dbf7ee6f2e3cfaded47060655c406110a3aea1f"
           },
@@ -594,7 +602,7 @@
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/index.ts",
-            "git_blob_sha": "36d769e919626e7fb6a028916cc84ba4f77323fd"
+            "git_blob_sha": "8cc510a60a5b8d7afd1eb551f29b7189a8553527"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
