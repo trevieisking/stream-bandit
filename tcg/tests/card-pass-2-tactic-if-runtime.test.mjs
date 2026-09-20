@@ -107,3 +107,30 @@ test('Tactic IF reuses existing shared requirement semantics where already canon
   assert.match(leaf,/normalizeRuntimeV02LegalCardAvailableRequirement/);
   assert.match(leaf,/evaluateRuntimeV02LegalCardAvailableRequirement/);
 });
+
+
+test('Reversal Seal is the only frozen Tactic program using ADD_SHIELD_EACH',()=>{
+  const found=[];
+  const walk=(card,steps)=>{
+    for(const step of steps||[]){
+      if(!step||typeof step!=='object') continue;
+      if(step.op==='ADD_SHIELD_EACH') found.push(card.id);
+      walk(card,step.then);
+      walk(card,step.else);
+      walk(card,step.steps);
+    }
+  };
+  for(const card of cards()) if(card.tactic?.program?.steps) walk(card,card.tactic.program.steps);
+  assert.deepEqual(found,['stone-reversal-seal']);
+});
+
+test('Tactic ADD_SHIELD_EACH delegates each resolved target to the existing Shield owner',()=>{
+  const start=tacticSource.indexOf('if (op === "ADD_SHIELD_EACH")');
+  const end=tacticSource.indexOf('if (op === "ADD_SHIELD" ||',start);
+  assert.ok(start>=0&&end>start);
+  const block=tacticSource.slice(start,end);
+  assert.match(block,/resolveVar\(vars, step\.targets\)/);
+  assert.match(block,/Array\.isArray\(resolved\)/);
+  assert.match(block,/addRuntimeShield\(found\.cr, amount\)/);
+  assert.doesNotMatch(block,/stone-reversal-seal/);
+});
