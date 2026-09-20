@@ -202,7 +202,51 @@ Card interaction clarity:
 - active Abilities visibly glow/pulse only while the authoritative server says they can be activated, and the glow stops after use/limit consumption;
 - triggered Abilities remain readable but never masquerade as manual buttons;
 - Attack rows visibly distinguish Ready from blocked states and explain common blockers such as insufficient Essence;
-- Essence attachment is tap-first on touch: select the Essence card, then tap a highlighted legal creature; drag remains optional desktop convenience;
+- Essence attachment always retains tap-select -> highlighted-destination as a reliable touch/accessibility fallback; V2.4.53 additionally requires real touch drag/drop parity on phones rather than desktop-only drag;
 - successful attachment is reflected by the refreshed authoritative creature state, including attached Essence count/effects.
 
 **Acceptance boundary:** anything after Attack remains unaccepted until a real two-user test has actually placed damage on a Creature. Automated tests may prove the server lifecycle and browser transport, but they do not replace the final Trevor/Kay visible Battle pass.
+
+
+## V2.4.53 — visible Essence resource orbs + phone drag/drop parity
+
+Trevor/Kay's first real cross-device Battle pass adds two player-readability requirements without changing any gameplay authority or the accepted board geometry.
+
+### Attached Essence must be visible on the Creature
+
+Every Creature on the battlefield must show a compact **attached Essence orb rail** directly with that Creature so the player never has to remember how much Essence is attached.
+
+Locked presentation contract:
+- attached Essence is represented by tiny **sphere/orb/pip** markers, visually similar to small energy balls;
+- each visible resource unit uses the canonical element identity/color already owned by Stream Bandit's element palette: Astral, Ember, Gale, Grove, Shade, Stone, Tide and Volt;
+- color is not the only signal: every orb also carries the canonical element glyph/mark and an accessible element label;
+- the rail is derived only from the authoritative Creature's attached `essence` instances plus their structured `provides` data; the browser does not maintain a second Essence count;
+- the visual represents the **effective payable Essence units**. A source that provides more than one unit contributes the corresponding units; if space is constrained, same-element units may collapse to `orb ×N` but the total may never be hidden;
+- the Attack row continues to show its required Essence orbs/cost beside the Attack. A player can therefore compare **attached colored orbs** with **required colored orbs** on the same card without mental bookkeeping;
+- when an Essence is discarded, removed, moved, expired or otherwise no longer attached in authoritative state, every orb contributed by that source disappears on the next authoritative render;
+- when Essence changes element/value through a canonical rule, the displayed resource rail follows the server-authoritative effective value;
+- both players may see only the attached-Essence information exposed by the public match view; this visual must never reveal hidden card identity or private information;
+- the orb rail must not cover HP, artwork, Ability text, Attack text, Reward Cards, rarity or Withdrawal. It belongs to live Battle status around/on the card, not baked into artwork.
+
+The existing numeric `Essence N` status may remain as an accessibility/count companion during implementation, but the final Battle readability gate requires the colored orb rail. The orb rail is presentation only: payment, attachment, discard and Attack-cost validation remain owned by the existing Essence / Payment / Attack engines.
+
+### Phone drag/drop is required, not optional
+
+Kay's phone test proved the current coarse-touch client cannot drag a hand card even though desktop drag/drop works. Source inspection confirms the current Battle controller deliberately renders playable hand cards with `draggable="false"` on coarse-touch input, so this is a real client-interaction gap rather than a server rules failure.
+
+V2.4.53 supersedes the desktop-only drag portion of V2.4.52:
+- desktop keeps click/select and drag/drop;
+- phone/tablet must support **finger drag/drop** from a playable hand card to a legal board destination;
+- tap-select -> tap highlighted destination remains fully supported as an equal fallback and accessibility path;
+- touch drag/drop must use a pointer/touch-safe gesture path rather than relying only on native HTML5 drag events, because native drag transport is not dependable on coarse-touch mobile browsers;
+- drag start selects the same authoritative hand-card intent used by tap selection;
+- legal destinations highlight while dragging; illegal destinations do not accept the drop and show the same legality explanation used by tap mode;
+- dropping calls the exact same existing server command as tap mode (`play_creature`, `evolve`, `attach_essence`, `attach_relic`, etc.); no mobile rules engine is permitted;
+- scrolling must remain possible when the gesture is not an active card drag;
+- the accepted Trevor desktop and Kay phone board layout/slot geometry must not move merely to add drag support.
+
+### Final Battle decoration remains last
+
+The accepted tabletop geometry is frozen while gameplay interaction is made genuinely playable. Final board decoration/background/realm polish is a **later presentation-only pass** after Attack, Essence visibility, phone drag/drop, card readability and result/quit flows have passed cross-device play. Decoration may improve atmosphere but may not relocate zones, obscure cards, reduce touch targets or create gameplay authority.
+
+**V2.4.53 acceptance boundary:** source planning is complete only when progress/ledger/checklist/interaction-contract agree. Implementation is accepted only after Trevor/Kay prove on real devices that attached Essence orbs update correctly and Kay can physically drag/drop playable cards with a finger as well as use the tap fallback.
