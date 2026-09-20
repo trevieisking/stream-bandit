@@ -1181,3 +1181,49 @@ TCG Card Pass 2 Validation **#1274 SUCCESS** on exact head `cab1a7daa29e8d129050
 
 The exact Match Edge dependency closure is now **92 files**, adding the shared Attack IF and conditional-Condition modules.
 
+## V2.4.69 — bounded Attack IF owners migrated onto the shared evaluator
+
+The next five frozen Attack IF instances have now moved from owner-local predicate decisions onto `runtimeV02EvaluateAttackIf` while preserving their existing mutation owners:
+
+- Tide — Rillrunner / Rushing Wake: `source_damaged -> HEAL`;
+- Tide — Reefback / Guarded Surge: `source_has_shield_at_least -> HEAL`;
+- Grove — Verdantusk / Canopy Crash: `reserve_count_at_least -> HEAL_EACH`;
+- Shade — Nightmaw / Dread Crush: `target_has_any_condition -> DISCARD_DECK_TOP`;
+- Astral — Cosmarch / Known Horizon: `card_matches -> MOVE_CARDS`.
+
+### Ownership preserved
+
+- self-heal and HEAL_EACH still use the existing Attack effect owner and canonical Heal packet/lifecycle owners;
+- Nightmaw still uses the Attack Deck-Discard owner, Card-Zone for physical deck -> discard movement, then the existing Event -> Movement -> Heal listener chain;
+- Known Horizon still keeps server-only top-deck inspection in its bounded owner and uses Card-Zone for deck -> hand movement;
+- only the IF decision moved to the shared Attack IF evaluator;
+- no card-ID branch was added.
+
+The deck-discard resolver now receives the authoritative target Creature instead of a precomputed boolean so `target_has_any_condition` is evaluated by the same shared Condition/Attack IF path as other consumers.
+
+### Regression repair
+
+The migration correctly invalidated older source-contract tests that expected direct predicate code. Those guards have been updated to assert the new ownership boundary instead:
+- HEAL_EACH -> shared Attack IF;
+- self-heal -> shared Attack IF -> Requirement evaluator;
+- server top-deck -> inspect -> shared Attack IF -> Card-Zone;
+- deck-discard listener-chain test -> actual target Creature state.
+
+TCG Card Pass #1283 proved all Deno/runtime/type-check jobs green after those test repairs. Its only remaining failure was the stale Match Edge release-control digest.
+
+The exact Match Edge dependency closure remains **92 files** and has been rebuilt from the current Git tree. Its independently verified SHA-256 is:
+`2b3cac54083c9cd07e94661b157d6719e4ea3007543665a141d8baaede2ffcfe`.
+
+### Current Attack IF progress
+
+- V2.4.68 conditional Condition family: **5 / 13** ✅
+- V2.4.69 bounded heal / HEAL_EACH / deck-discard / top-deck family: **+5**
+- current total routed through shared Attack IF: **10 / 13**
+
+Remaining frozen Attack IF instances:
+1. Gale — Slipwing / Backdraft: reserve-count IF -> selected Reserve switch;
+2. Volt — Stormmane / Storm Break outer `event_occurred(current_action)` IF -> attached-Essence discard;
+3. Volt — Stormmane / Storm Break nested target-survival IF -> Stunned.
+
+Exact-head Card Pass validation after the release-control refresh remains pending; the source is not promoted or merged while that gate is open.
+
