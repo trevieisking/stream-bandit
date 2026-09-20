@@ -1,9 +1,10 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.6';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.8';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
+  const API_TACTIC = 'tcg-tactic-actions';
   const SETUP_RECIPES = new Set(['Creature — Baby', 'Creature — Standalone', 'Creature — Mythic']);
 
   const state = {
@@ -13,6 +14,8 @@
     view: null,
     selectedAnchorUid: '',
     selectedHandUid: '',
+    selectedChoiceIds: [],
+    pendingChoiceId: '',
     opponentProfileId: '',
     opponentProfile: null,
     busy: false,
