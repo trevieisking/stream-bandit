@@ -294,3 +294,17 @@ The second V2.4.53 implementation target is now present on the branch without cr
 - A coarse-touch browser regression fixture proves long-press drag of Basic Astral Essence to the Vanguard emits exactly one authoritative `attach_essence` command, while a separate coarse-touch tap test proves the fallback still emits the same command.
 
 Human Kay-phone finger-drag acceptance remains pending. The next source target after exact-head validation is the remaining **V2.4.53 automated rail compression/removal proof**, followed by any still-open non-human Battle acceptance evidence before returning the build to Trevor/Kay.
+
+
+## V2.4.53 implementation C — automated Essence/touch evidence assembled
+
+The branch now contains deterministic browser-side evidence for the remaining non-human V2.4.53 claims:
+
+- authoritative Essence attachment refresh adds the correct element rail;
+- a later authoritative state with the attachment removed removes the rail and returns the companion count to zero;
+- the real compression routine is exercised with measured expanded width greater than available rail width and then with a fitting width, proving compression and re-expansion are layout-driven;
+- mixed-element counted fallbacks remain per-element rather than becoming one total;
+- Attack-cost and attached-resource orbs reuse the same element renderer;
+- coarse-touch long-hold/drop emits the same existing `attach_essence` action shape as tap mode, while a separate coarse-touch tap test remains functional.
+
+These are automated source claims only. Trevor/Kay device acceptance is still required. After exact-head CI validates this packet, the next non-human checklist target is **V2.4.52 active Ability capability projection: usable -> glow -> authoritative use -> projection disappears**.
