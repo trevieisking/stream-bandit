@@ -229,3 +229,16 @@ The player hand is a fixed bottom-edge horizontal tray that does not increase pa
 
 ## 089 — External TCG footage is interaction reference only
 User-supplied footage of another TCG may establish interaction grammar such as whole-board viewport, compact field cards, click-to-read inspection, horizontal hand browsing and drag/drop. Stream Bandit must not copy the external game's artwork, branding, proprietary card designs, names or assets. Stream Bandit's existing card renderer, board identity and server-owned rules remain authoritative.
+
+
+## 090 — Battlefield cards are bounded previews
+In-play Creature cards are compact canonical previews whose size is bounded by the viewport and card slot, not stretched to fill the entire available row height. Vanguard may be visually emphasized over Reserve, but neither may dominate the tabletop. Full rules remain available through inspection.
+
+## 091 — Hand is a bottom-edge peek/fan rail
+The Battle hand deliberately behaves like a physical hand of cards rather than a grid of miniature complete cards. Cards may extend below the visible bottom hand mask so their upper identity/art area remains large enough to recognize. The rail scrolls horizontally on desktop and touch; selected/dragged cards may rise or scale slightly. This is presentation only and does not change card-zone ownership.
+
+## 092 — Inspect mode owns complete card readability
+The shared card renderer exposes one canonical `inspect` presentation mode for complete readable card context. Inspect mode preserves the same card identity, artwork and structured data while allocating more area to Ability/Attack/move rows than compact battlefield/hand previews. Battle may add authoritative live controls/status to this face; inspection itself never becomes a second rules engine.
+
+## 093 — Decks, Collection and Battle Pass share read-only card inspection
+Canonical card tiles in Decks and Collection and card-backed Battle Pass reward samples open the same shared inspect face. These non-Battle surfaces are read-only presentation: inspection does not infer or mutate deck ownership, collection ownership, season progression, entitlement, reward claiming or economy state.
