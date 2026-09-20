@@ -30,12 +30,13 @@ test('board-only match uses the dedicated TCG config bridge without the Stream B
   assert.doesNotMatch(battle, /stream-bandit-theme-projector/i);
 });
 
-test('phone battle keeps the full tabletop in one viewport while the hand scrolls horizontally', () => {
-  assert.match(battle, /V0\.16 compact tabletop/);
+test('phone battle keeps the full tabletop in one viewport with a horizontal bottom-edge hand peek rail', () => {
+  assert.match(battle, /V0\.17 compact tabletop/);
   assert.match(battle, /html,body\{height:100%;min-height:0;overflow:hidden\}/);
   assert.match(battle, /\.sb-battle\{height:100dvh;min-height:0;[\s\S]*?overflow:hidden/);
-  assert.match(battle, /\.sb-board\{[\s\S]*?height:100dvh;min-height:0;overflow:hidden[\s\S]*?grid-template-rows:44px minmax\(0,1fr\) 64px minmax\(0,1fr\) 126px/);
-  assert.match(battle, /\.sb-hand\{[\s\S]*?overflow-x:auto;overflow-y:hidden[\s\S]*?-webkit-overflow-scrolling:touch/);
+  assert.match(battle, /\.sb-board\{[\s\S]*?height:100dvh;min-height:0;overflow:hidden[\s\S]*?grid-template-rows:44px minmax\(0,1fr\) 64px minmax\(0,1fr\) 94px/);
+  assert.match(battle, /\.sb-hand\{[\s\S]*?height:76px[\s\S]*?overflow-x:auto;overflow-y:hidden[\s\S]*?-webkit-overflow-scrolling:touch/);
+  assert.match(battle, /\.sb-hand-card\{[\s\S]*?height:152px[\s\S]*?margin-right:-14px/);
   assert.match(battle, /\.sb-card-inspector\{display:grid!important;padding:8px\}/);
   assert.match(battle, /\.sb-card-inspector\[hidden\]\{display:none!important\}/);
 });
@@ -44,11 +45,11 @@ test('phone battle keeps the full tabletop in one viewport while the hand scroll
 test('wide battle card fit is viewport-driven and does not depend on mouse pointer classification', () => {
   assert.match(battle, /@media\(min-width:641px\)\{/);
   assert.doesNotMatch(battle, /@media\(min-width:641px\) and \(hover:hover\) and \(pointer:fine\)/);
-  assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto/);
-  assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto/);
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{[\s\S]*?width:min\(var\(--card-w\),10\.36dvh\);[\s\S]*?height:auto/);
+  assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?width:min\(var\(--active-w\),11\.79dvh\);[\s\S]*?height:auto/);
   assert.match(battle, /\.sb-card-control-shell\.is-selected\{[\s\S]*?position:relative/);
-  assert.match(battle, /\.sb-card-inspector-panel\{[\s\S]*?width:min\(330px,33vw,40dvh\)/);
-  assert.match(battle, /Full rules\/art inspection is a separate overlay/);
+  assert.match(battle, /\.sb-card-inspector-panel\{[\s\S]*?width:min\(390px,36vw,48dvh\)/);
+  assert.match(battle, /field cards remain physical-card previews but are bounded by viewport height/);
 });
 
 test('battle cards are wired to the canonical shared card renderer and repository art sources', () => {
