@@ -60,14 +60,15 @@ test('completed knockout resolution returns to the existing Aftermath and turn-a
   assert.match(matchActions, /advanceTurn\(\)\};/);
 });
 
-test('compact Battle cards fill their board slots while click opens one readable canonical inspector', () => {
-  assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto/);
-  assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto/);
+test('bounded Battle cards keep the board calm while click opens the readable inspect face', () => {
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-control\{[\s\S]*?width:min\(var\(--card-w\),10\.36dvh\);[\s\S]*?height:auto/);
+  assert.match(battle, /\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?width:min\(var\(--active-w\),11\.79dvh\);[\s\S]*?height:auto/);
   assert.match(controller, /renderCardFace\(cardId, \{[\s\S]*?mode: 'compact'/);
+  assert.match(controller, /renderCardFace\(cardId, \{[\s\S]*?mode: 'inspect'/);
   assert.match(battle, /id="cardInspector"/);
-  assert.match(battle, /\.sb-card-inspector-panel\{[\s\S]*?width:min\(330px,33vw,40dvh\)/);
+  assert.match(battle, /\.sb-card-inspector-panel\{[\s\S]*?width:min\(390px,36vw,48dvh\)/);
   assert.match(controller, /function renderSelectedCardInspector\(view, canAct\)/);
   assert.match(controller, /inspected\.kind === 'hand'/);
   assert.match(controller, /inspected\.kind === 'field'/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-16-compact-tabletop/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-17-hand-peek-inspect/);
 });
