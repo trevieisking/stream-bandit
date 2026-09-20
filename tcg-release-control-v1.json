@@ -90,7 +90,7 @@
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "f000fcb4ba4c4a6589fd86100ec8e0a5adc72718",
         "file_count": 86,
-        "closure_sha256": "333d7787787899be97056335286a0ac8422259e0901e13cf9cc887bdd7960297",
+        "closure_sha256": "8cae55bb102265fa82ffa170e90806d69972a428624fbb860fe5e6595ad5727c",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -402,7 +402,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
-            "git_blob_sha": "5b36483679e7f65090678ce1e4e7c168a4e2ea75"
+            "git_blob_sha": "36efb1bdf777ea3b63546e033055cf16addb17e7"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts",
@@ -440,9 +440,9 @@
       },
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
-        "entrypoint_git_blob_sha": "ec38ebab7cabd5ea9532dfd3606b841057fb52d8",
+        "entrypoint_git_blob_sha": "36d769e919626e7fb6a028916cc84ba4f77323fd",
         "file_count": 37,
-        "closure_sha256": "1ff5b056fc15a4bc7f1ca136f2dcfbd01c134fe37adff9d13791de6fa517b366",
+        "closure_sha256": "e5c92ff21ea8aed37b7192471c1266c5ab02c26b8e48685e7ec9aa0e0fc88cf5",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts",
@@ -562,7 +562,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
-            "git_blob_sha": "5b36483679e7f65090678ce1e4e7c168a4e2ea75"
+            "git_blob_sha": "36efb1bdf777ea3b63546e033055cf16addb17e7"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts",
@@ -586,7 +586,7 @@
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/index.ts",
-            "git_blob_sha": "ec38ebab7cabd5ea9532dfd3606b841057fb52d8"
+            "git_blob_sha": "36d769e919626e7fb6a028916cc84ba4f77323fd"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
