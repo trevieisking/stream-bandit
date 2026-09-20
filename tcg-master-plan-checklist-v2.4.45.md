@@ -134,7 +134,7 @@
 - [x] Lock terminal result continuation to fresh `tcg-play.html` matchmaking with no carried match id.
 - [x] Lock active Ability glow/pulse to server capability projection and disappearance after use/limit consumption.
 - [x] Lock Attack Ready/blocked presentation to server-projected readiness, including insufficient-Essence explanation.
-- [x] Lock touch Essence flow: tap Essence -> tap highlighted Creature; desktop drag is optional only.
+- [x] Lock touch Essence fallback: tap Essence -> tap highlighted Creature; V2.4.53 additionally requires phone/tablet finger drag/drop.
 - [x] Lock the Trevor-supplied Orbitortoise card as the global card-face layout reference for current/future identities.
 - [x] Add the small Battle settings/cog control and wire **Quit Match** through authoritative `concede`.
 - [x] Rename terminal continuation to **Back to Matchmaking** and prove it returns to `tcg-play.html` without `match_id`.
@@ -149,3 +149,32 @@
 - [ ] Trevor/Kay real two-user PASS: phone tap Essence attachment succeeds without drag.
 - [ ] Trevor/Kay real two-user PASS: Quit Match gives quitter DEFEAT, opponent VICTORY, then both can return to fresh matchmaking.
 - [ ] Promotion decision only after the real two-user post-Attack gate is complete.
+
+
+## V2.4.53 — Essence orb readability + mobile drag/drop
+- [x] Lock attached Essence as tiny colored sphere/orb/pip markers on the Creature in Battle.
+- [x] Lock orb identity to canonical Astral/Ember/Gale/Grove/Shade/Stone/Tide/Volt element palette plus element glyph/accessibility label.
+- [x] Lock orb quantity to authoritative effective payable Essence units from attached sources / structured `provides`, never a browser-owned counter.
+- [x] Lock same-element overflow to explicit grouping such as `orb ×N` rather than hiding resource quantity.
+- [x] Lock orb removal to authoritative discard/removal/movement/expiry of the attached source.
+- [x] Lock Attack cost display beside Attack so required colored Essence can be compared directly with attached colored Essence.
+- [x] Preserve the existing server-owned Essence/Payment/Attack engines; visual orbs are presentation only.
+- [x] Record the proven phone gap: current coarse-touch Battle hand cards disable native drag transport.
+- [x] Supersede desktop-only drag: phone/tablet must support finger drag/drop and keep tap-select -> destination as a fallback.
+- [x] Lock mobile drag transport to pointer/touch-safe gesture handling with the same server commands as tap/desktop.
+- [x] Freeze Trevor/Kay accepted Battle board geometry while adding interaction parity.
+- [x] Defer decorative board/realm polish until core playable cross-device Battle acceptance is complete.
+- [ ] Implement authoritative attached-Essence orb rail on own and opponent Creature cards without leaking private information.
+- [ ] Implement effective-unit/multi-element grouping from canonical structured Essence `provides`.
+- [ ] Implement phone/tablet pointer-driven hand-card drag/drop for setup/play/evolve/Essence/Relic legal destinations.
+- [ ] Keep tap-select -> tap highlighted destination fully working after touch-drag implementation.
+- [ ] Automated test: attaching Essence adds the correct element orb(s); discard/removal removes them.
+- [ ] Automated test: Attack-cost orb presentation and attached-resource orb presentation use the same canonical element identities.
+- [ ] Automated test: coarse-touch drag uses the same intent/action payload as tap mode and contains no duplicate gameplay legality.
+- [ ] Exact-head TCG Card Pass 2 Validation PASS after V2.4.53 implementation.
+- [ ] Trevor desktop PASS: drag/drop still works and board geometry is unchanged.
+- [ ] Kay phone PASS: finger drag/drop works for a playable hand card to a legal destination.
+- [ ] Kay phone PASS: tap-select -> destination still works as fallback.
+- [ ] Trevor/Kay PASS: attached Essence colors/counts are readable on every occupied Creature and update immediately when Essence leaves.
+- [ ] Final board decoration/art polish only after these interaction gates and the V2.4.52 real Attack/damage gate pass.
+- [ ] Promotion decision remains HOLD until V2.4.52 + V2.4.53 human gates pass.
