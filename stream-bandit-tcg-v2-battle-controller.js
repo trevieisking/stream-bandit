@@ -352,13 +352,15 @@
   }
 
   function playInstruction(intent) {
-    if (intent === 'play_creature') return 'Drop or tap an empty Reserve slot.';
-    if (intent === 'evolve') return 'Drop or tap the matching Creature to evolve it.';
-    if (intent === 'attach_essence') return 'Drop or tap one of your Creatures to attach this Essence.';
-    if (intent === 'attach_relic') return 'Drop or tap a Creature without a Relic.';
+    const touch = touchPrimaryInput();
+    const lead = touch ? 'Hold then drag to, or tap,' : 'Drop or tap';
+    if (intent === 'play_creature') return lead + ' an empty Reserve slot.';
+    if (intent === 'evolve') return lead + ' the matching Creature to evolve it.';
+    if (intent === 'attach_essence') return lead + ' one of your Creatures to attach this Essence.';
+    if (intent === 'attach_relic') return lead + ' a Creature without a Relic.';
     if (intent === 'play_realm') return 'Use Play Realm to send this card to the authoritative Realm owner.';
     if (intent === 'play_tactic') return 'Use Play Tactic; any required server choice will appear here.';
-    return 'Select a playable card.';
+    return touch ? 'Tap a playable card, or hold it to drag.' : 'Select a playable card.';
   }
 
   function currentServerChoice(view) {
@@ -785,8 +787,12 @@
         '<div class="sb-phase-copy"><strong>' + (yourSetup ? 'Set your opening field' : 'Opponent is setting their opening field') + '</strong>' +
         '<small>' + (yourSetup
           ? (!hasVanguard
-            ? (selectedName ? selectedName + ' selected — tap Your Vanguard first.' : 'Choose an eligible Creature for Your Vanguard first.')
-            : (selectedName ? selectedName + ' selected — tap an open Reserve slot, or confirm your setup.' : 'Vanguard ready. Add optional Reserves or confirm your setup.'))
+            ? (selectedName
+              ? selectedName + (touchPrimaryInput() ? ' selected — hold-drag to Your Vanguard, or tap Your Vanguard.' : ' selected — tap Your Vanguard first.')
+              : 'Choose an eligible Creature for Your Vanguard first.')
+            : (selectedName
+              ? selectedName + (touchPrimaryInput() ? ' selected — hold-drag to an open Reserve slot, or tap it; then confirm your setup.' : ' selected — tap an open Reserve slot, or confirm your setup.')
+              : 'Vanguard ready. Add optional Reserves or confirm your setup.'))
           : 'Your board stays visible while the server waits for their setup.') + '</small></div>' +
         (yourSetup
           ? '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-setup-ready="1"' + (hasVanguard ? '' : ' disabled') + '>Confirm Setup</button></div>'
@@ -798,7 +804,11 @@
     if (phase === 'play') {
       const selectedCopy = yourTurn && selectedName
         ? selectedName + ' selected — ' + playInstruction(selectedIntent)
-        : (yourTurn ? 'Select or drag a card from your hand, use your field controls, or pass.' : 'Your field stays synced while the opponent acts.');
+        : (yourTurn
+          ? (touchPrimaryInput()
+            ? 'Tap a card, or hold then drag it to a highlighted destination; field controls remain available.'
+            : 'Select or drag a card from your hand, use your field controls, or pass.')
+          : 'Your field stays synced while the opponent acts.');
       const directButton = yourTurn && selectedHandUidSafe() && directHandIntent(selectedIntent)
         ? '<button type="button" class="sb-phase-action ready" data-play-direct="' + esc(selectedIntent) + '">' +
           (selectedIntent === 'play_realm' ? 'Play Realm' : 'Play Tactic') + '</button>'
