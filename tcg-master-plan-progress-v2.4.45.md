@@ -921,4 +921,45 @@ If polling/reconnect reveals a newer authoritative revision, stale choreography 
 After the foundation source receives a green exact-head gate, bind the canonical match commit/view path to viewer-filtered presentation receipts, beginning with the existing Attack result payload because it already owns source, target, damage/Shield result, pending choice, Defeat/Reward continuation and turn aftermath evidence.
 
 Visible DOM motion is intentionally **not** marked complete yet.
+## V2.4.62 — authoritative server presentation receipt maker accepted
+
+The V2.4.61 choreography foundation is now connected to the canonical Match commit path.
+
+### Accepted implementation
+
+- `runtimeV02BuildMatchPresentationReceipt` maps authoritative committed event families into generic presentation cues.
+- Every successful `tcg-match-actions` commit builds one deterministic receipt bound to the **new authoritative revision**.
+- The same base receipt is filtered separately through `runtimeV02PresentationEnvelopeForViewer(..., 1|2)` before the two persisted player views are written.
+- The browser receives the receipt inside its normal authoritative `view_state.presentation`; it does not infer the event from snapshot differences.
+- Receipt families currently cover Attack/Attack continuation, Ability/Ability choice, Creature play, Evolution, Essence/Relic attachment, Realm play, Withdraw, forced promotion, Reward take, End Turn and Concede.
+- Attack receipts carry source activation -> target focus -> wind-up -> impact -> damage -> Shield delta -> Reward/promotion/turn continuation when those facts are present in the authoritative post-commit state.
+- Private choice cues are seat-scoped while the opponent receives only public-safe in-progress feedback.
+- Reward movement deliberately records count/source/destination without hidden Reward card UIDs.
+- Receipt identity is deterministic from committed revision + event type; it carries no RNG seed and no browser legality predicates.
+- Match Edge release-control dependency closure intentionally expanded from **87 -> 89 files** to include the presentation envelope and receipt maker; exact file hashes and closure digest were refreshed rather than weakening the release-control guard.
+
+### Validation
+
+TCG Card Pass 2 Validation **#1229 SUCCESS** on exact head `52b33b4bd204a0c9dc86b64b4790b24d8a992baa`.
+
+The successful gate includes:
+- deterministic runtime tests for receipt ordering and viewer filtering;
+- Deno/type-check of the Match dispatcher plus its new presentation dependencies;
+- Node source-contract proof that the canonical commit creates the receipt before player views are persisted;
+- hidden Reward identity guard;
+- event-family/no-card-ID/no-RNG guard;
+- corrected Battle controller version assertions;
+- exact 89-file Match Edge dependency closure proof.
+
+### Runtime audit correction
+
+The earlier V2.4.57 checklist still listed Stone — Reversal Seal's `ADD_SHIELD_EACH` as missing. Current source and tests prove that is stale:
+
+- the Tactic interpreter owns a generic `ADD_SHIELD_EACH` branch;
+- it resolves one-or-many target refs;
+- each target delegates to the existing `addRuntimeShield` owner;
+- no Reversal Seal/card-ID branch exists;
+- the frozen registry test proves Reversal Seal is the Release 1 Tactic consumer.
+
+Therefore Reversal Seal's post-IF opcode blocker is closed. The remaining known Tactic IF downstream gaps are **OPTIONAL**, **RANDOM_SAMPLE_HIDDEN_ZONE** and **APPLY_CONDITION**.
 
