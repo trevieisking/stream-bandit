@@ -190,7 +190,9 @@ test('Tactic OPTIONAL reuses pending-choice seat authority and the same effect c
   assert.match(block,/kind: "optional"/);
   assert.match(block,/id: "optional:yes"/);
   assert.match(block,/id: "optional:no"/);
-  assert.match(block,/context: \{ apply: "optional_steps", steps: optionalSteps \}/);
+  assert.match(block,/apply: "optional_steps"/);
+  assert.match(block,/steps: optionalSteps/);
+  assert.match(block,/else_steps: optionalElseSteps/);
   assert.doesNotMatch(block,/gale-cyclone-route/);
 
   const applyStart=tacticSource.indexOf('apply === "optional_steps"');
