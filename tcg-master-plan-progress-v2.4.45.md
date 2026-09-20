@@ -382,3 +382,44 @@ Repair:
 - regression-test that the inspector resolver is present before human retest.
 
 This checkpoint does **not** mark the remaining Reward/promotion/Ability/touch human gates complete. It only removes the proven client exception that prevented the active player from continuing.
+
+
+## V2.4.54 human-video and database checkpoint — lethal handoff + compact tabletop
+
+Four user-supplied recordings were reviewed together: Trevor's current desktop Battle, Kay's current phone Battle and two interaction/layout reference recordings.
+
+### Lethal lifecycle finding
+The real Stream Bandit match shows the complete pre-stall chain:
+- Revision 26: a legal lethal Attack commits;
+- Revision 27: the attacker takes exactly one required face-down Reward Card;
+- Revision 28: the defeated Vanguard's controller promotes a Reserve Creature;
+- both clients then remain synchronized on Revision 28 with the replacement Vanguard visible, but the match stays in `phase=resolution` and no next turn begins.
+
+Authoritative database history independently confirms the corresponding `attack`, `take_reward` and `promote` commands all applied successfully and no turn-advance event followed before the later concession.
+
+Source inspection identifies the lifecycle defect in the canonical Match Flow Turn owner: `runtimeV02AdvanceTurn` rotates `active_seat`, increments turn counters and delegates the draw but did not set the ordinary successful phase back to `play`. Normal End Turn masked this because it enters Turn from `play`; lethal Attack continuation enters Turn from `resolution`. V2.4.54 fixes that owner, not the browser and not a second Attack path.
+
+### Layout/readability finding
+Trevor's desktop recording demonstrates that the existing full-rule card faces still require browser zoom around 50% to see the complete board/card composition. That fails the normal-zoom acceptance standard.
+
+The two reference recordings establish a better interaction grammar:
+- keep the entire battle board visible at normal zoom;
+- render in-play cards as compact recognizable art/status objects;
+- tap/click a card to open its readable full card view;
+- keep the player's hand at the bottom edge instead of expanding the page;
+- browse an overflowing phone hand horizontally left/right;
+- drag a hand card directly to a legal board destination;
+- preserve a tap-based fallback for accessibility/touch reliability.
+
+The implementation uses Stream Bandit's existing shared card renderer and rules only: field/hand previews use `compact` mode and the full inspector uses the canonical Battle card face. No external visual assets or card designs are copied.
+
+### V2.4.54 source implementation
+- Match Flow Turn successful advance now returns `phase` to `play`.
+- New unit/static proof covers the exact resolution -> next-turn -> play transition while Card-Zone still owns the draw.
+- Battlefield cards use compact renderer mode and remain anchored in their zones.
+- Hand cards use compact renderer mode in a horizontal bottom tray.
+- One generic inspector reads hand, own-field and opponent-field cards; only the own Vanguard exposes authoritative Attack/active-Ability controls.
+- Phone/coarse layout is returned to a one-viewport tabletop instead of growing vertically with the hand.
+- The existing touch-safe long-hold drag and tap fallback remain routed to the same existing server actions.
+
+Exact-head CI and two-device human acceptance are still required. Main/static live remains untouched.
