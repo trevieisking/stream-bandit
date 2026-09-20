@@ -83,6 +83,16 @@
       "behavior": "render the complete real card face with an element-themed Artwork Pending window",
       "hide_rules_or_actions": false,
       "gameplay_blocked": false
+    },
+    "attached_essence": {
+      "display": "tiny element-colored orb rail in Battle",
+      "source": "authoritative attached essence instances + structured essence.provides visible in the viewer match state",
+      "normal_layout": "individual resource-unit orbs while the rail fits inside its allocated card bounds",
+      "overflow_layout": "one counted orb per present element only when the rendered rail would overflow",
+      "fixed_count_threshold": false,
+      "different_elements_never_merged": true,
+      "removed_attachment_disappears_on_authoritative_refresh": true,
+      "rules_authority": false
     }
   },
   "numeric_label_policy": {
@@ -218,7 +228,9 @@
     "triggered_ability_state": "display rules text but never present as a manual activation button",
     "attack_state": "each canonical attack row stays visible; legal/ready state is visually explicit and insufficient Essence must explain the shortfall",
     "attack_resolution": "Attack transport remains server-owned; the card renderer never decides legality or damage",
-    "missing_artwork": "same complete card face with Artwork Pending window; card remains readable and playable"
+    "missing_artwork": "same complete card face with Artwork Pending window; card remains readable and playable",
+    "attached_essence_state": "render attached effective Essence as element orbs on the Creature; compress by measured card-space overflow only",
+    "attack_cost_state": "render required Essence with the same element-orb identity system used by attached resources"
   },
   "global_renderer": {
     "one_renderer_for_all_card_surfaces": true,
