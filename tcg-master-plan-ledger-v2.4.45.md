@@ -512,3 +512,20 @@ The Deck-Discard owner evaluates `target_has_any_condition` from the actual Atta
 ## 182 — Server-only card inspection precedes shared card_matches and Card-Zone movement
 For bounded top-deck Attack flows, hidden inspection remains server-side, `card_matches` is evaluated through shared Attack IF with caller-owned card-filter semantics, and any resulting movement remains Card-Zone-owned.
 
+## 183 — Mandatory post-Attack switch choices are server-owned
+When a structured Attack requires selecting a friendly Reserve Creature and switching it with the Vanguard, the Match owner creates a private exact-one pending Attack choice. The browser must not preselect or invent the Reserve target in the original Attack request.
+
+## 184 — Attack switch mutation remains Atomic Switch-owned
+The bounded Attack switch-choice adapter owns recognition, validation and choice transport only. The actual Vanguard/Reserve mutation, condition clearing and movement-event emission remain with the canonical Atomic Switch owner.
+
+## 185 — Generic Battle choice UI must route Match Attack choices
+`pending_attack_choice` is a first-class server choice in the Battle client. It uses the same generic choice overlay/selection-count transport as other server-owned choices and returns only the authoritative option IDs to `resolve_attack_choice`.
+
+## 186 — Storm Break IF decisions use shared current-action evidence
+Storm Break's outer `event_occurred(current_action)` decision is evaluated by shared Attack IF from the declaration-event map. The dispatcher must not recreate the decision with a direct event-count boolean.
+
+## 187 — Post-damage target survival is an IF input, not a later mutation guess
+The target-survival result is computed from authoritative post-primary-damage state, supplied to shared Attack IF, and frozen into the suspended overcharge choice before player input. Later listeners or UI state must not redefine whether that nested IF matched.
+
+## 188 — Attack IF source parity and CI acceptance are separate gates
+All 13 frozen Release 1 Attack IF instances may be source-migrated before an exact-head workflow run exists. Source completion may be recorded, but the parent accepted/green gate remains open until Card Pass validates the post-repair head.
