@@ -94,3 +94,22 @@ Second Sky is the reusable visual/layout baseline for later completed launch dec
 
 ## 048 — One-deck-per-day working cadence
 The working production target is one completed launch deck per working day. This is a cadence target, never a reason to skip the locked source preflight, canonical upload verification, desktop/mobile human review, exact-head CI, or promotion controller. The next starter identity in the current registry is **Ember — Ashrush** (`deck-ember-ashrush`).
+
+
+## 049 — Canonical global card-face priority
+Card readability and playability now take priority over the next deck-art batch. Ember/Ashrush generation is paused until one shared renderer makes every current Set One identity readable on its real card face, including identities whose artwork is still missing.
+
+## 050 — Canonical visual reference
+The accepted Orbitortoise reference is https://chatgpt.com/s/m_6aafc9a916c88191b0f63b164d1923cc . It is visual authority for frame/layout only. Structured card data remains the sole rules/stat authority and may not be overridden by numbers or text baked into concept art.
+
+## 051 — Creature card placement contract
+Creature cards place HP at the top-left beside the name, element/energy type at the top-right, large art in the upper window, Ability plus every canonical Attack in the rules area, Reward Cards at bottom-left, and rarity at bottom-right with Withdraw directly beneath rarity. The prior two-row visual restriction is superseded when a Creature canonically has an Ability plus two Attacks.
+
+## 052 — Missing-art cards are real playable cards
+Missing artwork never hides or delays gameplay identity. The same renderer must show the complete frame, stats, rules, Ability/Attack rows, footer and an element-themed Artwork Pending window. Missing art is presentation state only, not legality state.
+
+## 053 — One renderer / server-owned legality
+Battle, hand, Collection, Decks, Shop, pack/reward and Battle Pass card surfaces use one shared renderer with full/battle/hand/compact modes. Active Ability glow comes only from authoritative server capability projection; triggered Abilities are not manual buttons. Attack legality/damage/effects remain server-owned. No card-ID-specific renderer or browser rules engine is permitted.
+
+## 054 — Astral first proof set
+Astral is the first renderer acceptance set because its 24/24 Standard/base artworks already exist at canonical GitHub paths. Existing Astral image bytes are fitted/cropped into the canonical card window; they are not regenerated merely to embed frames or rule text.
