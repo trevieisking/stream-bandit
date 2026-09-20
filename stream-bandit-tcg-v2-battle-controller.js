@@ -488,6 +488,8 @@
     const view = viewState();
     if (!activePlayTurn(view) || !state.selectedHandUid) return false;
     const intent = selectedHandIntent();
+    const projection = currentHandProjection();
+    if (projection && projection.loading !== true) return projectionTargetLegal(projection, where, index);
     if (intent === 'play_creature') return where === 'reserve' && !creature;
     if (intent === 'attach_essence') return !!creature;
     if (intent === 'attach_relic') return !!creature && !creature.relic;
@@ -1544,9 +1546,11 @@
         const uid = String(card.dataset.playHandUid || '');
         state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
         state.selectedAnchorUid = '';
-        state.inspectedCard = { kind: 'hand', uid };
+        state.inspectedCard = state.selectedHandUid ? { kind: 'hand', uid } : null;
+        state.handActionProjection = null;
         state.overlayKey = '';
         render();
+        if (state.selectedHandUid) primeSelectedHandProjection(uid);
         // The compact tabletop keeps every destination in the viewport; only the hand rail scrolls.
       };
 
@@ -1565,7 +1569,9 @@
         state.selectedHandUid = String(card.dataset.playHandUid || '');
         state.selectedAnchorUid = '';
         state.inspectedCard = null;
+        state.handActionProjection = null;
         state.overlayKey = '';
+        primeSelectedHandProjection(state.selectedHandUid);
         card.classList.add('is-dragging', 'is-play-selected');
         if (event.dataTransfer) {
           event.dataTransfer.effectAllowed = 'move';
@@ -1807,7 +1813,7 @@
       state.busy = false;
       state.overlayKey = '';
       render();
-      if (failure) setStatus(failure, 'error');
+      if (failure) setActionFailure(failure);
     }
   }
 
@@ -1828,7 +1834,7 @@
       state.busy = false;
       state.overlayKey = '';
       render();
-      if (failure) setStatus(failure, 'error');
+      if (failure) setActionFailure(failure);
     }
   }
 
@@ -1880,7 +1886,7 @@
       state.busy = false;
       state.overlayKey = '';
       render();
-      if (failure) setStatus(failure, 'error');
+      if (failure) setActionFailure(failure);
     }
   }
 
@@ -1888,10 +1894,10 @@
     const view = viewState();
     const instance = selectedHandInstance();
     const intent = selectedHandIntent();
-    const creature = ownCreatureAt(where, index);
-    if (!instance || !playTargetLegal(where, index, creature)) return;
+    if (!instance || !intent || !activePlayTurn(view)) return;
     const cardUid = String(instance.uid || '');
     if (!cardUid) return;
+    if (!(await preflightSelectedHandAction(instance, intent, where, index))) return;
 
     if (intent === 'play_creature') {
       await runPlayCommand(
@@ -1945,6 +1951,7 @@
     if (!instance || intent !== requestedIntent || !directHandIntent(intent)) return;
     const cardUid = String(instance.uid || '');
     if (!cardUid) return;
+    if (!(await preflightSelectedHandAction(instance, intent, intent === 'play_realm' ? 'realm' : null, null))) return;
     if (intent === 'play_realm') {
       await runPlayCommand(
         API_MATCH,
@@ -1999,7 +2006,7 @@
       state.busy = false;
       state.overlayKey = '';
       render();
-      if (failure) setStatus(failure, 'error');
+      if (failure) setActionFailure(failure);
     }
   }
 
@@ -2039,7 +2046,7 @@
       state.busy = false;
       state.overlayKey = '';
       render();
-      if (failure) setStatus(failure, 'error');
+      if (failure) setActionFailure(failure);
     }
   }
 
@@ -2076,7 +2083,7 @@
       state.busy = false;
       state.overlayKey = '';
       render();
-      if (failure) setStatus(failure, 'error');
+      if (failure) setActionFailure(failure);
     }
   }
 
@@ -2108,7 +2115,7 @@
       state.busy = false;
       state.overlayKey = '';
       render();
-      if (failure) setStatus(failure, 'error');
+      if (failure) setActionFailure(failure);
     }
   }
 
@@ -2140,7 +2147,7 @@
       state.busy = false;
       state.overlayKey = '';
       render();
-      if (failure) setStatus(failure, 'error');
+      if (failure) setActionFailure(failure);
     }
   }
 
@@ -2162,7 +2169,7 @@
       state.busy = false;
       state.overlayKey = '';
       render();
-      if (failure) setStatus(failure, 'error');
+      if (failure) setActionFailure(failure);
     }
   }
 
@@ -2199,14 +2206,20 @@
     }
     if (state.selectedHandUid) {
       const hand = view && view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
-      if (!hand.some((row) => String(row.uid || '') === state.selectedHandUid)) state.selectedHandUid = '';
+      if (!hand.some((row) => String(row.uid || '') === state.selectedHandUid)) {
+        state.selectedHandUid = '';
+        state.handActionProjection = null;
+      }
     }
     if (view) {
       const youSeat = Number(view.you && view.you.seat);
       const mayKeepHandSelection =
         view.phase === 'setup' ||
         (view.phase === 'play' && Number(view.active_seat) === youSeat && !hasPendingAction(view));
-      if (!mayKeepHandSelection) state.selectedHandUid = '';
+      if (!mayKeepHandSelection) {
+        state.selectedHandUid = '';
+        state.handActionProjection = null;
+      }
     }
 
     await refreshFieldActions();
@@ -2217,7 +2230,7 @@
   function startPoll() {
     if (state.poll) clearInterval(state.poll);
     state.poll = setInterval(() => {
-      if (!state.busy) refreshMatch().catch((error) => setStatus(error instanceof Error ? error.message : String(error), 'error'));
+      if (!state.busy) refreshMatch().catch((error) => setActionFailure(error instanceof Error ? error.message : String(error)));
     }, 2000);
   }
 
@@ -2232,7 +2245,7 @@
       await refreshMatch();
       startPoll();
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : String(error), 'error');
+      setActionFailure(error instanceof Error ? error.message : String(error));
     }
   }
 
