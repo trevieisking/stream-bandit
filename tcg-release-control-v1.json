@@ -456,9 +456,9 @@
       },
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
-        "entrypoint_git_blob_sha": "1bc3d27c38c43a302727b9b0731b55dbbf7fd62e",
+        "entrypoint_git_blob_sha": "1dc83c940c8372758040546e701e1828dde01f96",
         "file_count": 39,
-        "closure_sha256": "910f8a4b7afdba06fb61841ac9154bf7a4f27999216c7c6f6de0f8235b2ba4a7",
+        "closure_sha256": "1b8ebe754dbb5eaed83485b7b753807be7fa5bf717ef13f7fdba8b909b9afbba",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts",
@@ -610,7 +610,7 @@
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/index.ts",
-            "git_blob_sha": "1bc3d27c38c43a302727b9b0731b55dbbf7fd62e"
+            "git_blob_sha": "1dc83c940c8372758040546e701e1828dde01f96"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
