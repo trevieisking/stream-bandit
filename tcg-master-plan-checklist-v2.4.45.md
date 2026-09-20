@@ -483,6 +483,6 @@
 - [x] TCG Card Pass #1283: deterministic runtime core + all Edge type-checks SUCCESS; only the pre-refresh release-control digest failed.
 - [x] Rebuild exact 92-file Match Edge closure from the current Git tree; digest `2b3cac54083c9cd07e94661b157d6719e4ea3007543665a141d8baaede2ffcfe`.
 - [x] Attack IF shared-owner migration count is now **10 / 13** frozen IF instances.
-- [ ] Exact-head TCG Card Pass must pass with the refreshed release-control manifest before V2.4.69 is accepted.
+- [x] TCG Card Pass 2 Validation #1284 SUCCESS on accepted source/manifest head `e542a0060266502d1cb74a93a618a9bb8032a0ed`; V2.4.69 accepted.
 - [ ] Remaining Attack IF: Slipwing Backdraft switch IF + Stormmane Storm Break outer current-action event IF + nested target-survival IF.
 
