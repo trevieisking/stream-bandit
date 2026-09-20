@@ -221,7 +221,7 @@ Locked presentation contract:
 - each visible resource unit uses the canonical element identity/color already owned by Stream Bandit's element palette: Astral, Ember, Gale, Grove, Shade, Stone, Tide and Volt;
 - color is not the only signal: every orb also carries the canonical element glyph/mark and an accessible element label;
 - the rail is derived only from the authoritative Creature's attached `essence` instances plus their structured `provides` data; the browser does not maintain a second Essence count;
-- the visual represents the **effective payable Essence units**. A source that provides more than one unit contributes the corresponding units; if space is constrained, same-element units may collapse to `orb ×N` but the total may never be hidden;
+- the visual represents the **effective payable Essence units**. A source that provides more than one unit contributes the corresponding units. While space allows, units may appear as individual tiny orbs; when repeated units would crowd the card, each element collapses to **one element-colored orb with the numeric total printed inside it** — for example one Astral orb showing `12`. Mixed elements remain separate counted orbs, e.g. Astral `7` + Tide `5`; the total may never be hidden;
 - the Attack row continues to show its required Essence orbs/cost beside the Attack. A player can therefore compare **attached colored orbs** with **required colored orbs** on the same card without mental bookkeeping;
 - when an Essence is discarded, removed, moved, expired or otherwise no longer attached in authoritative state, every orb contributed by that source disappears on the next authoritative render;
 - when Essence changes element/value through a canonical rule, the displayed resource rail follows the server-authoritative effective value;
@@ -248,5 +248,13 @@ V2.4.53 supersedes the desktop-only drag portion of V2.4.52:
 ### Final Battle decoration remains last
 
 The accepted tabletop geometry is frozen while gameplay interaction is made genuinely playable. Final board decoration/background/realm polish is a **later presentation-only pass** after Attack, Essence visibility, phone drag/drop, card readability and result/quit flows have passed cross-device play. Decoration may improve atmosphere but may not relocate zones, obscure cards, reduce touch targets or create gameplay authority.
+
+### Priority remains card visuals + real Attack playability
+
+This overflow refinement is a readability detail inside the existing priority, not a new detour. Current order stays:
+1. canonical card visuals/readability;
+2. real Attack -> damage -> turn/reward lifecycle;
+3. visible Essence counts/orbs and phone drag parity as part of making those cards genuinely playable;
+4. final board decoration only after the above passes.
 
 **V2.4.53 acceptance boundary:** source planning is complete only when progress/ledger/checklist/interaction-contract agree. Implementation is accepted only after Trevor/Kay prove on real devices that attached Essence orbs update correctly and Kay can physically drag/drop playable cards with a finger as well as use the tap fallback.
