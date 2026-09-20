@@ -166,8 +166,8 @@
 - [x] Defer decorative board/realm polish until core playable cross-device Battle acceptance is complete.
 - [x] Reconfirm priority: canonical card visuals + real Attack/damage lifecycle remain ahead of final board decoration; counted Essence orbs are part of that playable-card readability work.
 - [x] Clarify that any numeric examples used during design discussion are illustrative only; the compression trigger is available card space, not a particular Essence count.
-- [ ] Implement authoritative attached-Essence orb rail on own and opponent Creature cards without leaking private information.
-- [ ] Implement effective-unit/multi-element grouping from canonical structured Essence `provides`, using one counted orb per element when the individual-orb rail would crowd the card.
+- [x] Implement authoritative attached-Essence orb rail on own and opponent Creature cards without leaking private information.
+- [x] Implement effective-unit/multi-element grouping from canonical structured Essence `provides`, using one counted orb per element when the individual-orb rail would crowd the card.
 - [ ] Implement phone/tablet pointer-driven hand-card drag/drop for setup/play/evolve/Essence/Relic legal destinations.
 - [ ] Keep tap-select -> tap highlighted destination fully working after touch-drag implementation.
 - [ ] Automated test: attaching Essence adds the correct element orb(s); compression starts only when the rendered rail would exceed its allocated card bounds; discard/removal can expand or reduce the rail again from authoritative state.
