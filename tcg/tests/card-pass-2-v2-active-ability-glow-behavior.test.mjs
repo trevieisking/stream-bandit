@@ -24,6 +24,15 @@ class FakeClassList{
     this.values.add(value);return true;
   }
 }
+class FakeFieldCard{
+  constructor(){this.dataset={inspectFieldOwner:'you',inspectFieldWhere:'vanguard',inspectFieldIndex:'',cardAnchor:'active-source-1'};this.listeners=new Map();}
+  addEventListener(type,fn){this.listeners.set(type,fn);}
+  async click(){
+    const fn=this.listeners.get('click');
+    assert.equal(typeof fn,'function','compact active-Ability Vanguard must bind inspect click');
+    return fn({target:{closest(){return null;}}});
+  }
+}
 class FakeAbilityButton{
   constructor(where,index){this.dataset={abilityWhere:where,abilityIndex:index};this.listeners=new Map();this.disabled=false;}
   addEventListener(type,fn){this.listeners.set(type,fn);}
@@ -43,6 +52,9 @@ class FakeNode{
   set innerHTML(value){
     this._innerHTML=String(value);
     if(this.id==='youVanguard'){
+      this.document.fieldCards=this._innerHTML.includes('data-inspect-field-owner="you"')?[new FakeFieldCard()]:[];
+    }
+    if(this.id==='cardInspector'){
       const match=this._innerHTML.match(/data-card-intent="ability" data-ability-where="([^"]*)" data-ability-index="([^"]*)"/);
       this.document.abilityButtons=match?[new FakeAbilityButton(match[1],match[2])]:[];
     }
@@ -80,10 +92,11 @@ function makeHarness(){
   const nodes=new Map();
   const document={
     baseURI:'https://example.test/tcg-battle-v2.html',
-    abilityButtons:[],
+    abilityButtons:[],fieldCards:[],
     getElementById(id){if(!nodes.has(id))nodes.set(id,new FakeNode(id,document));return nodes.get(id);},
     querySelectorAll(selector){
       if(selector==='[data-card-intent="ability"]')return document.abilityButtons;
+      if(selector==='[data-inspect-field-owner]')return document.fieldCards;
       if(selector==='[data-essence-rail]')return [];
       return [];
     }
@@ -141,7 +154,12 @@ test('server capability makes active Ability glow/clickable, then refreshed proj
   const h=makeHarness();
   await h.boot();
 
-  const before=h.nodes.get('youVanguard').innerHTML;
+  const compactBefore=h.nodes.get('youVanguard').innerHTML;
+  assert.doesNotMatch(compactBefore,/ABILITY READY/,'compact board card keeps full rules out of the tabletop');
+  assert.equal(h.document.fieldCards.length,1);
+  await h.document.fieldCards[0].click();
+
+  const before=h.nodes.get('cardInspector').innerHTML;
   assert.match(before,/ABILITY READY/);
   assert.equal(h.document.abilityButtons.length,1);
 
@@ -151,7 +169,7 @@ test('server capability makes active Ability glow/clickable, then refreshed proj
   assert.equal(uses.length,1);
   assert.equal(uses[0].payload.where,'vanguard');
 
-  const after=h.nodes.get('youVanguard').innerHTML;
+  const after=h.nodes.get('cardInspector').innerHTML;
   assert.doesNotMatch(after,/ABILITY READY/);
   assert.equal(h.document.abilityButtons.length,0,'used active Ability must stop presenting as a clickable ready control');
 });
