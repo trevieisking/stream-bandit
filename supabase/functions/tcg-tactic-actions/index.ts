@@ -11,7 +11,7 @@ import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-ma
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
 
-const VERSION = "Stream Bandit TCG tactic actions v0.3";
+const VERSION = "Stream Bandit TCG tactic actions v0.4";
 const EFFECT_SCHEMA = "sb-tcg-effects-v0.1";
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -526,6 +526,73 @@ function checkPlayRequirements(state: any, ownerSeat: number, requirements: any[
   }
   return true;
 }
+type TacticPlayability =
+  | {
+      eligible: true;
+      reason: null;
+      index: number;
+      source: Inst;
+      definition: any;
+      engine: any;
+      subtype: string;
+      unsupported_ops: string[];
+    }
+  | {
+      eligible: false;
+      reason: string;
+      index: number;
+      source: Inst | null;
+      definition: any;
+      engine: any;
+      subtype: string;
+      unsupported_ops: string[];
+    };
+
+function tacticPlayability(state: any, seat: number, uidValue: unknown): TacticPlayability {
+  const uid = String(uidValue || "").trim();
+  if (state.phase !== "play" || Number(state.active_seat) !== seat) {
+    return { eligible: false, reason: "not_active_player", index: -1, source: null, definition: null, engine: null, subtype: "", unsupported_ops: [] };
+  }
+  if (state.effect_resolution || state.pending_choice || state.pending_heal_listener_choice || state.pending_movement_listener_choice || state.pending_tactic_heal_resume || state.pending_tactic_movement_resume) {
+    return { eligible: false, reason: "effect_resolution_already_pending", index: -1, source: null, definition: null, engine: null, subtype: "", unsupported_ops: [] };
+  }
+
+  const player = state.players[String(seat)];
+  const index = player.hand.findIndex((inst: Inst) => inst.uid === uid);
+  if (index < 0) {
+    return { eligible: false, reason: "tactic_not_in_hand", index, source: null, definition: null, engine: null, subtype: "", unsupported_ops: [] };
+  }
+
+  const source = player.hand[index] as Inst;
+  const d = definition(state, source) || {};
+  const engine = d.engine_effects || null;
+  const subtype = String(d.tactic_subtype || d.family || engine?.subtype || "");
+  if (String(d.card_family || d.kind || "") !== "Tactic" || engine?.schema !== EFFECT_SCHEMA) {
+    return { eligible: false, reason: "structured_tactic_required", index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  if (
+    subtype === "Ally" &&
+    Number(state.first_player_seat) === seat &&
+    Number(state.personal_turns?.[String(seat)] || 0) === 1
+  ) {
+    return { eligible: false, reason: "first_player_cannot_play_ally_on_first_turn", index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  if (!checkPlayRequirements(state, seat, engine.play_requirements || [])) {
+    return { eligible: false, reason: "tactic_play_requirement_not_met", index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  if (!firstRequiredCreatureTargetAvailable(state, seat, engine.steps || [])) {
+    return { eligible: false, reason: "required_tactic_target_unavailable", index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  if (!requiredEffectResourcesAvailable(state, seat, engine.steps || [])) {
+    return { eligible: false, reason: "required_tactic_resource_unavailable", index, source, definition: d, engine, subtype, unsupported_ops: [] };
+  }
+  const unsupported = unsupportedOps(engine.steps || []);
+  if (unsupported.length) {
+    return { eligible: false, reason: "tactic_lifecycle_contract_unsupported", index, source, definition: d, engine, subtype, unsupported_ops: unsupported };
+  }
+  return { eligible: true, reason: null, index, source, definition: d, engine, subtype, unsupported_ops: [] };
+}
+
 function log(state: any, message: string) {
   state.log ||= [];
   state.log.push(message);
@@ -1321,7 +1388,7 @@ Deno.serve(async (req) => {
     }
     const action = String(body.action || "").trim();
     if (action === "ping") return json({ ok: true, version: VERSION, user_id: userId, effect_schema: EFFECT_SCHEMA });
-    if (!["play_tactic", "resolve_choice"].includes(action)) return json({ ok: false, version: VERSION, error: "unknown_action" }, 400);
+    if (!["play_tactic", "play_tactic_preview", "resolve_choice"].includes(action)) return json({ ok: false, version: VERSION, error: "unknown_action" }, 400);
 
     const matchId = String(body.match_id || "").trim();
     const nonce = String(body.client_nonce || "").trim();
@@ -1379,52 +1446,35 @@ Deno.serve(async (req) => {
       });
     };
 
+    if (action === "play_tactic_preview") {
+      const preview = tacticPlayability(state, seat, body.card_uid);
+      return json({
+        ok: true,
+        version: VERSION,
+        result: {
+          card_uid: String(body.card_uid || "").trim(),
+          eligible: preview.eligible,
+          reason: preview.reason,
+          subtype: preview.subtype,
+          unsupported_ops: preview.unsupported_ops,
+        },
+      });
+    }
+
     if (action === "play_tactic") {
-      if (state.phase !== "play" || Number(state.active_seat) !== seat) {
-        return json({ ok: false, version: VERSION, error: "not_active_player" }, 400);
-      }
-      if (state.effect_resolution || state.pending_choice || state.pending_heal_listener_choice || state.pending_movement_listener_choice || state.pending_tactic_heal_resume || state.pending_tactic_movement_resume) {
-        return json({ ok: false, version: VERSION, error: "effect_resolution_already_pending" }, 409);
-      }
-
-      const player = state.players[String(seat)];
-      const uid = String(body.card_uid || "").trim();
-      const index = player.hand.findIndex((inst: Inst) => inst.uid === uid);
-      if (index < 0) return json({ ok: false, version: VERSION, error: "tactic_not_in_hand" }, 400);
-      const source = player.hand[index] as Inst;
-      const d = definition(state, source) || {};
-      const engine = d.engine_effects || null;
-      if (String(d.card_family || d.kind || "") !== "Tactic" || engine?.schema !== EFFECT_SCHEMA) {
-        return json({ ok: false, version: VERSION, error: "structured_tactic_required" }, 400);
-      }
-
-      const subtype = String(d.tactic_subtype || d.family || engine.subtype || "");
-      if (
-        subtype === "Ally" &&
-        Number(state.first_player_seat) === seat &&
-        Number(state.personal_turns?.[String(seat)] || 0) === 1
-      ) {
-        return json({ ok: false, version: VERSION, error: "first_player_cannot_play_ally_on_first_turn" }, 400);
-      }
-      if (!checkPlayRequirements(state, seat, engine.play_requirements || [])) {
-        return json({ ok: false, version: VERSION, error: "tactic_play_requirement_not_met" }, 400);
-      }
-      if (!firstRequiredCreatureTargetAvailable(state, seat, engine.steps || [])) {
-        return json({ ok: false, version: VERSION, error: "required_tactic_target_unavailable" }, 400);
-      }
-      if (!requiredEffectResourcesAvailable(state, seat, engine.steps || [])) {
-        return json({ ok: false, version: VERSION, error: "required_tactic_resource_unavailable" }, 400);
-      }
-      const unsupported = unsupportedOps(engine.steps || []);
-      if (unsupported.length) {
+      const playability = tacticPlayability(state, seat, body.card_uid);
+      if (!playability.eligible) {
+        const status = playability.reason === "effect_resolution_already_pending" || playability.reason === "tactic_lifecycle_contract_unsupported" ? 409 : 400;
         return json({
           ok: false,
           version: VERSION,
-          error: "tactic_lifecycle_contract_unsupported",
-          unsupported_ops: unsupported,
-        }, 409);
+          error: playability.reason,
+          ...(playability.unsupported_ops.length ? { unsupported_ops: playability.unsupported_ops } : {}),
+        }, status);
       }
 
+      const player = state.players[String(seat)];
+      const { index, source, definition: d, engine, subtype } = playability;
       player.hand.splice(index, 1);
       state.phase = "effect_resolution";
       state.effect_resolution = {
