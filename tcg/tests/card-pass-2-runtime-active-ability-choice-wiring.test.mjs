@@ -81,16 +81,25 @@ test('match owner exposes one generic use_ability boundary after the active-play
   assert.ok(match.includes('runtimeV02PendingActiveAbilityLiveChoiceView'));
   assertInOrder(match, [
     'if(s.phase!=="play"||Number(s.active_seat)!==seat)',
+    'const beginActiveAbilityRoute=',
     'if(action==="use_ability")',
-    'runtimeV02BeginActiveAbilityLiveRoute(',
+    'routed=beginActiveAbilityRoute(',
     's.pending_ability_choice=pending',
     's.phase="ability_effect_resolution"',
   ], 'active Ability activation lifecycle');
+
+  const helperStart = match.indexOf('const beginActiveAbilityRoute=');
+  const helperEnd = match.indexOf('const projectAbilitySources', helperStart);
+  assert.ok(helperStart >= 0 && helperEnd > helperStart);
+  const helper = match.slice(helperStart, helperEnd);
+  assert.ok(helper.includes('getCr(player,where,index)'));
+  assert.ok(helper.includes('cr.stack[cr.stack.length-1]'));
+  assert.ok(helper.includes('runtimeV02BeginActiveAbilityLiveRoute('));
+
   const start = match.indexOf('if(action==="use_ability")');
   const end = match.indexOf('if(action==="play_creature")', start);
   const block = match.slice(start, end);
-  assert.ok(block.includes('getCr(p,where,idx)'));
-  assert.ok(block.includes('cr.stack[cr.stack.length-1]'));
+  assert.ok(block.includes('beginActiveAbilityRoute('));
   assert.ok(block.includes('active_ability_requires_runtime_owner'));
   assert.equal(block.includes('structuredRuntimeActiveAbilityRewardInspection'), false, 'match command must not bypass the live facade for Reward recognition');
   assert.equal(block.includes('runtimeV02CreateActiveAbilityRewardChoice'), false, 'match command must not bypass the live facade for Reward choice creation');
