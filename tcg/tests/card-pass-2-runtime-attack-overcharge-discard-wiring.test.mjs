@@ -77,13 +77,16 @@ test('Stormmane Thunder Claw stays plain while Storm Break preserves its exact f
 test('live match owner snapshots the threshold before damage, suppresses legacy English authority for structured matches and resolves after damage', () => {
   assert.ok(match.includes('tcg-match-attack-overcharge-discard-choice-v0-2.ts'));
   assert.ok(match.includes('const structuredOverchargeDiscard=structuredRuntimeAfterDamageOverchargeDiscardCondition('));
-  assert.ok(match.includes('const structuredOverchargeTriggered=structuredOverchargeDiscard?runtimeV02AttackOverchargeTriggered('));
+  assert.ok(match.includes('const attackActionEvents=runtimeV02CollectAttackDeclarationEvents('));
+  assert.ok(match.includes('const structuredOverchargeTriggered=structuredOverchargeDiscard?Number(attackActionEvents[structuredOverchargeDiscard.event]||0)>=1:false;'));
   assert.ok(match.includes('structuredOverchargeDiscard==null&&ef.includes("becomes stunned")'));
   assert.ok(match.includes('atk.metadata_source==="legacy"&&ef.includes("4 or more essence")'));
   assert.ok(match.includes('atk.metadata_source==="legacy"&&ad?.id==="volt-stormmane"'));
   assert.equal(match.includes('if(ad?.id==="volt-stormmane"&&'), false, 'marked v0.2 Stormmane must not pass through the old whole-card fallback');
 
+  const declaration = match.indexOf('const attackActionEvents=runtimeV02CollectAttackDeclarationEvents(');
   const snapshot = match.indexOf('const structuredOverchargeTriggered=');
+  assert.ok(declaration >= 0 && declaration < snapshot, 'generic declaration events must exist before overcharge trigger projection');
   const damage = match.indexOf('const dmg=attackDamage(', snapshot);
   const createPending = match.indexOf('runtimeV02CreateAttackOverchargeDiscardChoice(', damage);
   const pendingReturn = match.indexOf('if(pendingOverchargeDiscard)', createPending);
