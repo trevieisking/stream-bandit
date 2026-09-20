@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.13-touch-drag';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.14-resolution-ui';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -16,6 +16,8 @@
     selectedHandUid: '',
     selectedChoiceIds: [],
     pendingChoiceId: '',
+    selectedRewardPositions: [],
+    pendingResolutionKey: '',
     opponentProfileId: '',
     opponentProfile: null,
     busy: false,
@@ -605,8 +607,18 @@
     const node = $(target);
     if (!node) return;
     const view = viewState();
-    const yourSetup = !!(own && view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
+    const youSeat = Number(view && view.you && view.you.seat);
+    const yourSetup = !!(own && view && view.phase === 'setup' && Number(view.setup_turn_seat) === youSeat);
     const hasVanguard = !!(view && view.you && view.you.vanguard);
+    const yourPromotion = !!(
+      own &&
+      view &&
+      view.phase === 'resolution' &&
+      view.pending_resolution &&
+      String(view.pending_resolution.kind || '') === 'promote' &&
+      Number(view.pending_resolution.seat) === youSeat &&
+      !hasVanguard
+    );
     node.innerHTML = [0, 1, 2, 3].map((index) => {
       const creature = reserve && reserve[index];
       const setupAvailable = !!(yourSetup && hasVanguard && !creature);
@@ -618,24 +630,63 @@
       const playDestination = own
         ? ' data-play-where="reserve" data-play-index="' + index + '"'
         : '';
+      const promotionLegal = !!(yourPromotion && creature);
+      const promotionDestination = promotionLegal ? ' data-promote-index="' + index + '"' : '';
       const legalClass =
         (setupAvailable ? ' sb-setup-destination' : '') +
         (setupLegal ? ' is-legal' : '') +
-        (playLegal ? ' sb-play-destination is-play-legal' : '');
-      return '<section class="sb-reserve-slot' + legalClass + '"' + setupDestination + playDestination + '><span>' +
+        (playLegal ? ' sb-play-destination is-play-legal' : '') +
+        (promotionLegal ? ' sb-resolution-destination is-legal' : '');
+      return '<section class="sb-reserve-slot' + legalClass + '"' + setupDestination + playDestination + promotionDestination + '><span>' +
         esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' +
         creatureCard(creature, { own, where: 'reserve', index, setupReturn: own && creature ? setupReturnOptions('reserve', index) : null }) +
         '</section>';
     }).join('');
   }
 
-  function renderRewardStack(target, count) {
+  function pendingResolutionKey(view) {
+    const pending = view && view.pending_resolution;
+    if (!pending) return '';
+    return [
+      String(pending.kind || ''),
+      Number(pending.seat || 0),
+      Number(pending.count || 0),
+      Number(view.you && view.you.rewards_count || 0),
+      Number(view.opponent && view.opponent.rewards_count || 0)
+    ].join(':');
+  }
+
+  function syncPendingResolutionSelection(view) {
+    const key = pendingResolutionKey(view);
+    if (key === state.pendingResolutionKey) return;
+    state.pendingResolutionKey = key;
+    state.selectedRewardPositions = [];
+  }
+
+  function renderRewardStack(target, count, own) {
     const node = $(target);
     if (!node) return;
+    const view = viewState();
     const safe = Math.max(0, Math.min(6, Number(count || 0)));
-    node.innerHTML = Array.from({ length: 6 }, (_, index) =>
-      '<span class="sb-reward-card' + (index >= safe ? ' is-empty' : '') + '" aria-hidden="true"></span>'
-    ).join('');
+    const youSeat = Number(view && view.you && view.you.seat);
+    const pending = view && view.pending_resolution;
+    const selectable = !!(
+      own &&
+      pending &&
+      String(pending.kind || '') === 'take_reward' &&
+      Number(pending.seat) === youSeat
+    );
+    const selected = new Set(state.selectedRewardPositions);
+    node.innerHTML = Array.from({ length: 6 }, (_, index) => {
+      const empty = index >= safe;
+      if (selectable && !empty) {
+        const on = selected.has(index);
+        return '<button type="button" class="sb-reward-card is-selectable' + (on ? ' is-selected' : '') +
+          '" data-reward-position="' + index + '" aria-pressed="' + (on ? 'true' : 'false') +
+          '" aria-label="Reward Card ' + (index + 1) + '"></button>';
+      }
+      return '<span class="sb-reward-card' + (empty ? ' is-empty' : '') + '" aria-hidden="true"></span>';
+    }).join('');
   }
 
   function setText(id, value) {
@@ -722,6 +773,8 @@
       state.selectedHandUid,
       state.pendingChoiceId,
       state.selectedChoiceIds.join(','),
+      state.pendingResolutionKey,
+      state.selectedRewardPositions.join(','),
       !!(view.you && view.you.vanguard),
       pending,
       yourTurn,
@@ -762,6 +815,43 @@
         '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-server-choice-confirm="1"' +
         (canConfirm ? '' : ' disabled') + '>Confirm</button></div>' +
         '</div>';
+      return;
+    }
+
+    const resolution = view.pending_resolution || null;
+    if (resolution) {
+      const resolutionSeat = Number(resolution.seat || 0);
+      const yours = resolutionSeat === youSeat;
+      const kind = String(resolution.kind || '');
+      if (kind === 'take_reward') {
+        const required = Math.max(0, Number(resolution.count || 0));
+        const selectedCount = state.selectedRewardPositions.length;
+        node.innerHTML =
+          '<div class="sb-phase-card sb-choice-card">' +
+          '<div class="sb-phase-copy"><strong>' + (yours ? 'Take Reward Card' + (required === 1 ? '' : 's') : 'Opponent Reward choice') + '</strong>' +
+          '<small>' + (yours
+            ? 'Select exactly ' + esc(required) + ' face-down Reward Card' + (required === 1 ? '' : 's') + ' from your Reward pile. The selected card' + (required === 1 ? '' : 's') + ' move to your hand, then resolution continues.'
+            : 'Waiting for the opponent to take ' + esc(required) + ' Reward Card' + (required === 1 ? '' : 's') + '.') + '</small></div>' +
+          (yours
+            ? '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-take-reward-confirm="1"' +
+              (selectedCount === required ? '' : ' disabled') + '>Take ' + esc(required) + ' Reward' + (required === 1 ? '' : 's') + '</button></div>'
+            : '') +
+          '</div>';
+        return;
+      }
+      if (kind === 'promote') {
+        node.innerHTML =
+          '<div class="sb-phase-card">' +
+          '<div class="sb-phase-copy"><strong>' + (yours ? 'Choose your new Vanguard' : 'Opponent promotion') + '</strong>' +
+          '<small>' + (yours
+            ? 'Your Vanguard was defeated. Select one highlighted Reserve Creature to promote to Vanguard.'
+            : 'Waiting for the opponent to promote one of their Reserve Creatures to Vanguard.') + '</small></div>' +
+          '</div>';
+        return;
+      }
+      node.innerHTML =
+        '<div class="sb-phase-card"><div class="sb-phase-copy"><strong>Resolving match state</strong>' +
+        '<small>The authoritative server is resolving ' + esc(kind || 'the pending action') + '.</small></div></div>';
       return;
     }
 
@@ -845,6 +935,7 @@
     const view = viewState();
     if (!view) return;
     renderOpponentProfile();
+    syncPendingResolutionSelection(view);
 
     const youSeat = Number(view.you && view.you.seat);
     const yourTurn = view.phase === 'play' && Number(view.active_seat) === youSeat;
@@ -868,8 +959,8 @@
     const hand = view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
     $('yourHand').innerHTML = hand.map(handCard).join('') || '<div class="sb-zone-empty">No cards in hand</div>';
 
-    renderRewardStack('oppRewards', view.opponent && view.opponent.rewards_count);
-    renderRewardStack('yourRewards', view.you && view.you.rewards_count);
+    renderRewardStack('oppRewards', view.opponent && view.opponent.rewards_count, false);
+    renderRewardStack('yourRewards', view.you && view.you.rewards_count, true);
     setText('oppHandCount', view.opponent && view.opponent.hand_count);
     setText('oppDeck', view.opponent && view.opponent.deck_count);
     setText('oppDiscard', view.opponent && view.opponent.discard_count);
@@ -890,6 +981,7 @@
       if (view.phase === 'opening_choice') turnPill.textContent = 'Opening toss';
       else if (view.phase === 'setup') turnPill.textContent = yourSetup ? 'Your setup' : 'Opponent setup';
       else if (view.phase === 'complete') turnPill.textContent = 'Match complete';
+      else if (view.phase === 'resolution') turnPill.textContent = 'Resolution';
       else turnPill.textContent = yourTurn ? 'Your turn' : 'Opponent turn';
     }
     setText('revisionPill', 'Revision ' + revision());
@@ -918,6 +1010,17 @@
       else setStatus('Opponent setup in progress. Your board remains synced.', 'wait');
     } else if (view.phase === 'complete') {
       setStatus('Match complete.', 'ready');
+    } else if (view.pending_resolution) {
+      const resolution = view.pending_resolution;
+      const yours = Number(resolution.seat) === youSeat;
+      const kind = String(resolution.kind || '');
+      if (kind === 'take_reward') {
+        setStatus(yours ? 'Choose the required Reward Card(s), then confirm.' : 'Waiting for the opponent to take Reward Card(s).', yours ? 'ready' : 'wait');
+      } else if (kind === 'promote') {
+        setStatus(yours ? 'Choose a highlighted Reserve Creature to become your Vanguard.' : 'Waiting for the opponent to promote a Reserve Creature.', yours ? 'ready' : 'wait');
+      } else {
+        setStatus('The authoritative server is resolving the pending match action.', 'wait');
+      }
     } else if (pending) {
       setStatus('The board is authoritative. Resolve the pending server choice before another card action.', 'wait');
     } else if (yourTurn) {
@@ -1295,6 +1398,44 @@
       });
     });
 
+    document.querySelectorAll('[data-reward-position]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const view = viewState();
+        const pending = view && view.pending_resolution;
+        const youSeat = Number(view && view.you && view.you.seat);
+        if (
+          state.busy ||
+          !pending ||
+          String(pending.kind || '') !== 'take_reward' ||
+          Number(pending.seat) !== youSeat
+        ) return;
+        const required = Math.max(0, Number(pending.count || 0));
+        const position = Number(button.dataset.rewardPosition);
+        if (!Number.isInteger(position) || position < 0) return;
+        const current = [...state.selectedRewardPositions];
+        const existing = current.indexOf(position);
+        if (existing >= 0) current.splice(existing, 1);
+        else if (required === 1) current.splice(0, current.length, position);
+        else if (current.length < required) current.push(position);
+        state.selectedRewardPositions = current;
+        state.overlayKey = '';
+        render();
+      });
+    });
+
+    document.querySelectorAll('[data-take-reward-confirm]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        if (!button.disabled) await runTakeReward();
+      });
+    });
+
+    document.querySelectorAll('[data-promote-index]').forEach((slot) => {
+      slot.addEventListener('click', async (event) => {
+        if (state.busy || event.target.closest('[data-card-intent],[data-setup-return]')) return;
+        await runPromote(Number(slot.dataset.promoteIndex));
+      });
+    });
+
     document.querySelectorAll('[data-server-choice-option]').forEach((button) => {
       button.addEventListener('click', () => {
         const view = viewState();
@@ -1519,6 +1660,85 @@
         { card_uid: cardUid },
         'Playing Tactic through the authoritative Tactic interpreter…'
       );
+    }
+  }
+
+  async function runTakeReward() {
+    const view = viewState();
+    const pending = view && view.pending_resolution;
+    const youSeat = Number(view && view.you && view.you.seat);
+    const required = Math.max(0, Number(pending && pending.count || 0));
+    const positions = [...state.selectedRewardPositions];
+    if (
+      !view ||
+      !pending ||
+      String(pending.kind || '') !== 'take_reward' ||
+      Number(pending.seat) !== youSeat ||
+      positions.length !== required ||
+      state.busy
+    ) return;
+
+    state.busy = true;
+    state.overlayKey = '';
+    render();
+    setStatus('Moving the selected Reward Card(s) to your hand…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(
+        API_MATCH,
+        Object.assign(actionBase('take_reward'), { reward_positions: positions })
+      );
+      state.selectedRewardPositions = [];
+      state.pendingResolutionKey = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runPromote(reserveIndex) {
+    const view = viewState();
+    const pending = view && view.pending_resolution;
+    const youSeat = Number(view && view.you && view.you.seat);
+    const reserve = view && view.you && Array.isArray(view.you.reserve) ? view.you.reserve : [];
+    if (
+      !view ||
+      !pending ||
+      String(pending.kind || '') !== 'promote' ||
+      Number(pending.seat) !== youSeat ||
+      !Number.isInteger(reserveIndex) ||
+      reserveIndex < 0 ||
+      reserveIndex > 3 ||
+      !reserve[reserveIndex] ||
+      state.busy
+    ) return;
+
+    state.busy = true;
+    state.overlayKey = '';
+    render();
+    setStatus('Promoting the selected Reserve Creature to Vanguard…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(
+        API_MATCH,
+        Object.assign(actionBase('promote'), { reserve_index: reserveIndex })
+      );
+      state.pendingResolutionKey = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setStatus(failure, 'error');
     }
   }
 
