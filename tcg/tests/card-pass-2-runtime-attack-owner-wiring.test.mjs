@@ -156,6 +156,17 @@ async function fieldActions(state) {
   return { status: response.status, body: await response.json(), commits: current.commits };
 }
 
+async function useAbility(state, where = "vanguard", index = null) {
+  const original = structuredClone(state);
+  current = { state, commits: [] };
+  const response = await handler(new Request("http://local.test/tcg-match-actions", {
+    method: "POST", headers: { Authorization: "Bearer local-test", "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "use_ability", match_id: "test-match", client_nonce: "ability-command", expected_revision: 5, where, index }),
+  }));
+  assert.deepEqual(state, original, "Ability handler must work on a private snapshot until atomic commit");
+  return { status: response.status, body: await response.json(), commits: current.commits };
+}
+
 test("structured: field_actions reports exact Attack readiness and enough Essence resolves the same Attack", async () => {
   const state = fixture();
   state.card_index["test-creature"].definition_v0_2.creature.attacks[0].cost = [{ element: "Astral", amount: 2 }];
@@ -199,6 +210,50 @@ test("structured: field_actions reports exact Attack readiness and enough Essenc
   assert.equal(next.turn_seq, 5, "Attack Aftermath must advance the canonical turn sequence");
   assert.equal(next.players[2].hand.length, 1, "the next player receives the canonical turn-start draw");
   assert.equal(next.players[2].deck.length, 0);
+});
+
+test("structured: active Ability projection is usable, commits once, then disappears after turn-limit consumption", async () => {
+  const state = fixture();
+  const definition = state.card_index["test-creature"].definition_v0_2;
+  definition.element = "Shade";
+  definition.creature.ability = {
+    id: "test-drain",
+    name: "Test Drain",
+    mode: "active",
+    event: null,
+    timing: "own_turn",
+    limit: { scope: "turn", count: 1, owner: "controller" },
+    requirements: { all: [{ predicate: "source_damaged" }] },
+    costs: [],
+    steps: [{
+      op: "DRAIN_VITALITY",
+      target: "$current_opponent_vanguard",
+      amount: 10,
+      heal_target: "$source_creature",
+      heal_cap: 10,
+      as: "drained"
+    }]
+  };
+  state.players[1].vanguard.damage = 20;
+
+  const before = await fieldActions(state);
+  assert.equal(before.status, 200, JSON.stringify(before.body));
+  assert.deepEqual(before.body.result.ability_sources, [
+    { where: "vanguard", index: null, anchor_uid: "v1" },
+  ], "field_actions must expose exactly the currently usable active Ability");
+
+  const used = await useAbility(state);
+  assert.equal(used.status, 200, JSON.stringify(used.body));
+  assert.equal(used.commits.length, 1);
+  assert.equal(used.commits[0].p_event_type, "ability_resolved");
+  const next = used.commits[0].p_new_state;
+  assert.equal(next.phase, "play", "immediate Ability returns to play");
+  assert.equal(next.players[2].vanguard.damage, 10);
+  assert.equal(next.players[1].vanguard.damage, 10);
+
+  const after = await fieldActions(next);
+  assert.equal(after.status, 200, JSON.stringify(after.body));
+  assert.deepEqual(after.body.result.ability_sources, [], "once-per-turn Ability must disappear from server capability projection after use");
 });
 
 test("structured: lethal Attack removes the Creature and queues the opponent Reward before promotion", async () => {
