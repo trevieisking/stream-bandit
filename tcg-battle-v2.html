@@ -294,6 +294,45 @@ button{font:inherit}
   scrollbar-width:thin;scroll-snap-type:x proximity
 }
 .sb-hand-card{flex:0 0 clamp(94px,8vw,126px);scroll-snap-align:start}
+.sb-hand-card.is-play-candidate{cursor:grab}
+.sb-hand-card.is-play-candidate:active{cursor:grabbing}
+.sb-hand-card.is-play-selected{
+  border-color:#ffd56a;
+  box-shadow:0 0 0 2px #ffd56a38,0 0 24px #ffd56a2b,0 10px 28px #0008;
+  transform:translateY(-5px)
+}
+.sb-hand-card.is-dragging{opacity:.72;transform:translateY(-7px) scale(1.02)}
+.sb-play-destination{transition:border-color .15s ease,box-shadow .15s ease,background .15s ease}
+.sb-play-destination.is-play-legal{
+  cursor:pointer;
+  border-color:#ffd56ab8!important;
+  box-shadow:inset 0 0 0 2px #ffd56a22,0 0 26px #ffd56a28;
+  background:#3b2d0929!important
+}
+.sb-choice-card{align-items:flex-start}
+.sb-choice-options{
+  display:flex;
+  flex:1 1 260px;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:5px
+}
+.sb-choice-option{
+  border:1px solid #55e7ff45;
+  border-radius:10px;
+  padding:7px 9px;
+  background:#061923;
+  color:#dff8ff;
+  font-size:9px;
+  font-weight:850;
+  cursor:pointer
+}
+.sb-choice-option.is-selected{
+  border-color:#ffd56aaa;
+  background:#3d2c0c;
+  box-shadow:0 0 0 1px #ffd56a2d,0 0 14px #ffd56a20
+}
+.sb-choice-option b{color:#ffd56a}
 .sb-result-title{font-size:22px!important;letter-spacing:.08em}
 .sb-result-win{color:#ffe391}.sb-result-loss{color:#ff9ab1}
 @media(max-width:1100px){
@@ -468,7 +507,7 @@ button{font:inherit}
 }
 </style>
 </head>
-<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-7">
+<body data-sb-tcg-page="battle" data-sb-tcg-v2-battle="board-only-v0-4" data-sb-tcg-battle-layout="tabletop-v0-7" data-sb-tcg-play-bindings="v0-8">
 <main class="sb-battle">
   <section class="sb-board" aria-label="One-screen battlefield">
     <header class="sb-player-strip" aria-label="Opponent">
@@ -537,6 +576,6 @@ button{font:inherit}
 <script src="stream-bandit-tcg-config-v2-4-31.js?v=2-4-31"></script>
 <script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-6"></script>
 <script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-6"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-8"></script>
 </body>
 </html>

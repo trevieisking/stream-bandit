@@ -1,9 +1,10 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.6';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.8';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
+  const API_TACTIC = 'tcg-tactic-actions';
   const SETUP_RECIPES = new Set(['Creature — Baby', 'Creature — Standalone', 'Creature — Mythic']);
 
   const state = {
@@ -13,6 +14,8 @@
     view: null,
     selectedAnchorUid: '',
     selectedHandUid: '',
+    selectedChoiceIds: [],
+    pendingChoiceId: '',
     opponentProfileId: '',
     opponentProfile: null,
     busy: false,
@@ -245,6 +248,119 @@
     return SETUP_RECIPES.has(recipeType(instance));
   }
 
+  function activePlayTurn(view) {
+    return !!(
+      view &&
+      view.phase === 'play' &&
+      Number(view.active_seat) === Number(view.you && view.you.seat) &&
+      !hasPendingAction(view) &&
+      !state.busy
+    );
+  }
+
+  function handIntent(instance) {
+    const definition = legacyDefinition(instance) || {};
+    const kind = String(definition.kind || definition.card_family || '');
+    const family = String(definition.family || definition.tactic_subtype || '');
+    const stage = String(definition.stage || '');
+    if (kind === 'Creature') {
+      if (['Baby', 'Standalone', 'Mythic'].includes(stage)) return 'play_creature';
+      if (['Teen', 'Adult'].includes(stage)) return 'evolve';
+    }
+    if (kind === 'Essence') return 'attach_essence';
+    if (kind === 'Tactic' && family === 'Relic') return 'attach_relic';
+    if (kind === 'Tactic' && family === 'Realm') return 'play_realm';
+    if (kind === 'Tactic' || String(definition.card_family || '') === 'Tactic') return 'play_tactic';
+    return '';
+  }
+
+  function selectedHandInstance() {
+    const view = viewState();
+    const hand = view && view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
+    return hand.find((row) => String(row.uid || '') === state.selectedHandUid) || null;
+  }
+
+  function selectedHandDefinition() {
+    const instance = selectedHandInstance();
+    return instance ? (legacyDefinition(instance) || {}) : {};
+  }
+
+  function selectedHandIntent() {
+    const instance = selectedHandInstance();
+    return instance ? handIntent(instance) : '';
+  }
+
+  function selectedHandUidSafe() {
+    return selectedHandInstance() ? state.selectedHandUid : '';
+  }
+
+  function selectedHandName() {
+    const instance = selectedHandInstance();
+    const definition = instance ? (legacyDefinition(instance) || {}) : {};
+    return instance ? String(definition.name || instance.card_id || 'Selected card') : '';
+  }
+
+  function ownCreatureAt(where, index) {
+    const view = viewState();
+    if (!view || !view.you) return null;
+    if (where === 'vanguard') return view.you.vanguard || null;
+    if (where === 'reserve' && Number.isInteger(index) && index >= 0 && index < 4) {
+      return Array.isArray(view.you.reserve) ? (view.you.reserve[index] || null) : null;
+    }
+    return null;
+  }
+
+  function playTargetLegal(where, index, creature) {
+    const view = viewState();
+    if (!activePlayTurn(view) || !state.selectedHandUid) return false;
+    const intent = selectedHandIntent();
+    if (intent === 'play_creature') return where === 'reserve' && !creature;
+    if (intent === 'attach_essence') return !!creature;
+    if (intent === 'attach_relic') return !!creature && !creature.relic;
+    if (intent === 'evolve') {
+      if (!creature) return false;
+      const definition = selectedHandDefinition();
+      const prior = topDefinition(creature) || {};
+      return String(definition.evolves_from_id || '') === String(prior.id || topInstance(creature)?.card_id || '');
+    }
+    return false;
+  }
+
+  function directHandIntent(intent) {
+    return intent === 'play_realm' || intent === 'play_tactic';
+  }
+
+  function playInstruction(intent) {
+    if (intent === 'play_creature') return 'Drop or tap an empty Reserve slot.';
+    if (intent === 'evolve') return 'Drop or tap the matching Creature to evolve it.';
+    if (intent === 'attach_essence') return 'Drop or tap one of your Creatures to attach this Essence.';
+    if (intent === 'attach_relic') return 'Drop or tap a Creature without a Relic.';
+    if (intent === 'play_realm') return 'Use Play Realm to send this card to the authoritative Realm owner.';
+    if (intent === 'play_tactic') return 'Use Play Tactic; any required server choice will appear here.';
+    return 'Select a playable card.';
+  }
+
+  function currentServerChoice(view) {
+    if (!view) return null;
+    if (view.pending_choice) return { source: 'tactic', endpoint: API_TACTIC, action: 'resolve_choice', choice: view.pending_choice };
+    if (view.phase === 'effect_resolution' && view.pending_movement_listener_choice) {
+      return { source: 'tactic', endpoint: API_TACTIC, action: 'resolve_choice', choice: view.pending_movement_listener_choice };
+    }
+    if (view.phase === 'effect_resolution' && view.pending_heal_listener_choice) {
+      return { source: 'tactic', endpoint: API_TACTIC, action: 'resolve_choice', choice: view.pending_heal_listener_choice };
+    }
+    if (view.pending_event_listener_choice) {
+      return { source: 'match', endpoint: API_MATCH, action: 'resolve_event_listener_choice', choice: view.pending_event_listener_choice };
+    }
+    if (view.pending_movement_listener_choice) {
+      return { source: 'match', endpoint: API_MATCH, action: 'resolve_movement_listener_choice', choice: view.pending_movement_listener_choice };
+    }
+    if (view.pending_heal_listener_choice) {
+      return { source: 'match', endpoint: API_MATCH, action: 'resolve_heal_listener_choice', choice: view.pending_heal_listener_choice };
+    }
+    return null;
+  }
+
   function topInstance(creature) {
     return creature && Array.isArray(creature.stack) && creature.stack.length
       ? creature.stack[creature.stack.length - 1]
@@ -312,10 +428,25 @@
     const uid = String(instance && instance.uid || '');
     const view = viewState();
     const yourSetup = !!(view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
-    const candidate = yourSetup && setupCandidate(instance);
-    const selected = candidate && state.selectedHandUid === uid;
-    return '<article class="sb-tcg-card sb-hand-card' + (candidate ? ' is-setup-candidate' : '') + (selected ? ' is-setup-selected' : '') + '" data-card-id="' + esc(cardId) + '"' +
-      (candidate ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-setup-hand-uid="' + esc(uid) + '"' : '') + '>' +
+    const setupPlayable = yourSetup && setupCandidate(instance);
+    const playIntent = activePlayTurn(view) ? handIntent(instance) : '';
+    const playPlayable = !!playIntent;
+    const selected = (setupPlayable || playPlayable) && state.selectedHandUid === uid;
+    const classes =
+      (setupPlayable ? ' is-setup-candidate' : '') +
+      (playPlayable ? ' is-play-candidate' : '') +
+      (selected ? (yourSetup ? ' is-setup-selected' : ' is-play-selected') : '');
+    let attributes = '';
+    if (setupPlayable) {
+      attributes =
+        ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') +
+        '" data-setup-hand-uid="' + esc(uid) + '"';
+    } else if (playPlayable) {
+      attributes =
+        ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') +
+        '" data-play-hand-uid="' + esc(uid) + '" data-play-intent="' + esc(playIntent) + '" draggable="true"';
+    }
+    return '<article class="sb-tcg-card sb-hand-card' + classes + '" data-card-id="' + esc(cardId) + '"' + attributes + '>' +
       '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
       '<div class="sb-card-head"><span>' + esc(definition.card_family || definition.kind || '') + '</span><span>' + esc(definition.element || '') + '</span></div>' +
       '<div class="sb-card-name">' + esc(definition.name || cardId) + '</div>' +
@@ -337,11 +468,18 @@
     const hasVanguard = !!(view && view.you && view.you.vanguard);
     node.innerHTML = [0, 1, 2, 3].map((index) => {
       const creature = reserve && reserve[index];
-      const destination = yourSetup && hasVanguard && !creature && state.selectedHandUid
+      const setupDestination = yourSetup && hasVanguard && !creature && state.selectedHandUid
         ? ' data-setup-destination="reserve" data-setup-index="' + index + '"'
         : '';
-      const legalClass = destination ? ' sb-setup-destination is-legal' : '';
-      return '<section class="sb-reserve-slot' + legalClass + '"' + destination + '><span>' + esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' +
+      const playLegal = !!(own && playTargetLegal('reserve', index, creature));
+      const playDestination = own
+        ? ' data-play-where="reserve" data-play-index="' + index + '"'
+        : '';
+      const legalClass =
+        (setupDestination ? ' sb-setup-destination is-legal' : '') +
+        (playLegal ? ' sb-play-destination is-play-legal' : '');
+      return '<section class="sb-reserve-slot' + legalClass + '"' + setupDestination + playDestination + '><span>' +
+        esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' +
         creatureCard(creature, { setupReturn: own && creature ? setupReturnOptions('reserve', index) : null }) +
         '</section>';
     }).join('');
@@ -388,16 +526,23 @@
     const slot = $('youVanguardSlot');
     if (!slot) return;
     const yourSetup = !!(view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
-    const empty = !(view && view.you && view.you.vanguard);
-    const legal = !!(yourSetup && empty && state.selectedHandUid);
-    slot.className = 'sb-vanguard-slot' + (legal ? ' sb-setup-destination is-legal' : '');
-    if (legal) {
+    const creature = view && view.you ? view.you.vanguard : null;
+    const empty = !creature;
+    const setupLegal = !!(yourSetup && empty && state.selectedHandUid);
+    const playLegal = playTargetLegal('vanguard', null, creature);
+    slot.className =
+      'sb-vanguard-slot' +
+      (setupLegal ? ' sb-setup-destination is-legal' : '') +
+      (playLegal ? ' sb-play-destination is-play-legal' : '');
+    if (setupLegal) {
       slot.dataset.setupDestination = 'vanguard';
       slot.dataset.setupIndex = '';
     } else {
       delete slot.dataset.setupDestination;
       delete slot.dataset.setupIndex;
     }
+    slot.dataset.playWhere = 'vanguard';
+    slot.dataset.playIndex = '';
   }
 
   function renderOverlay() {
@@ -406,12 +551,73 @@
     if (!node || !view) return;
     const youSeat = Number(view.you && view.you.seat);
     const phase = String(view.phase || '');
-    const selectedName = selectedSetupName();
+    const selectedName = selectedHandName();
+    const selectedIntent = selectedHandIntent();
     const pending = hasPendingAction(view);
     const yourTurn = phase === 'play' && Number(view.active_seat) === youSeat;
-    const key = [phase, revision(), view.toss_winner_seat, view.setup_turn_seat, state.selectedHandUid, !!(view.you && view.you.vanguard), pending, yourTurn, view.result && view.result.winner_seat].join(':');
+    const serverChoice = currentServerChoice(view);
+
+    if (serverChoice && serverChoice.choice && !serverChoice.choice.waiting) {
+      const choiceId = String(serverChoice.choice.id || '');
+      if (state.pendingChoiceId !== choiceId) {
+        state.pendingChoiceId = choiceId;
+        state.selectedChoiceIds = [];
+      }
+    } else if (!serverChoice) {
+      state.pendingChoiceId = '';
+      state.selectedChoiceIds = [];
+    }
+
+    const key = [
+      phase,
+      revision(),
+      view.toss_winner_seat,
+      view.setup_turn_seat,
+      state.selectedHandUid,
+      state.pendingChoiceId,
+      state.selectedChoiceIds.join(','),
+      !!(view.you && view.you.vanguard),
+      pending,
+      yourTurn,
+      view.result && view.result.winner_seat
+    ].join(':');
     if (key === state.overlayKey) return;
     state.overlayKey = key;
+
+    if (serverChoice && serverChoice.choice) {
+      const choice = serverChoice.choice;
+      if (choice.waiting) {
+        node.innerHTML =
+          '<div class="sb-phase-card">' +
+          '<div class="sb-phase-copy"><strong>Opponent choice</strong><small>Waiting for the other player to resolve the server choice.</small></div>' +
+          '</div>';
+        return;
+      }
+      const options = Array.isArray(choice.options) ? choice.options : [];
+      const selected = new Set(state.selectedChoiceIds);
+      const optionHtml = options.map((option) => {
+        const id = String(option.id || '');
+        const on = selected.has(id);
+        const order = state.selectedChoiceIds.indexOf(id);
+        return '<button type="button" class="sb-choice-option' + (on ? ' is-selected' : '') +
+          '" data-server-choice-option="' + esc(id) + '" aria-pressed="' + (on ? 'true' : 'false') + '">' +
+          (order >= 0 && String(choice.mode || '') === 'order' ? '<b>' + (order + 1) + '</b> ' : '') +
+          esc(option.label || id) + '</button>';
+      }).join('');
+      const min = Math.max(0, Number(choice.min || 0));
+      const max = Math.max(min, Number(choice.max == null ? min : choice.max));
+      const count = state.selectedChoiceIds.length;
+      const canConfirm = count >= min && count <= max;
+      node.innerHTML =
+        '<div class="sb-phase-card sb-choice-card">' +
+        '<div class="sb-phase-copy"><strong>' + esc(choice.prompt || 'Choose') + '</strong>' +
+        '<small>Select ' + esc(min) + (max !== min ? '–' + esc(max) : '') + ' option' + (max === 1 ? '' : 's') + '. The server remains authoritative.</small></div>' +
+        '<div class="sb-choice-options">' + optionHtml + '</div>' +
+        '<div class="sb-phase-actions"><button type="button" class="sb-phase-action ready" data-server-choice-confirm="1"' +
+        (canConfirm ? '' : ' disabled') + '>Confirm</button></div>' +
+        '</div>';
+      return;
+    }
 
     if (phase === 'opening_choice') {
       const won = Number(view.toss_winner_seat) === youSeat;
@@ -446,14 +652,20 @@
     }
 
     if (phase === 'play') {
+      const selectedCopy = yourTurn && selectedName
+        ? selectedName + ' selected — ' + playInstruction(selectedIntent)
+        : (yourTurn ? 'Select or drag a card from your hand, use your field controls, or pass.' : 'Your field stays synced while the opponent acts.');
+      const directButton = yourTurn && selectedHandUidSafe() && directHandIntent(selectedIntent)
+        ? '<button type="button" class="sb-phase-action ready" data-play-direct="' + esc(selectedIntent) + '">' +
+          (selectedIntent === 'play_realm' ? 'Play Realm' : 'Play Tactic') + '</button>'
+        : '';
       node.innerHTML =
         '<div class="sb-phase-card sb-turn-card">' +
         '<div class="sb-phase-copy"><strong>' + (yourTurn ? 'Your turn' : 'Opponent turn') + '</strong>' +
-        '<small>' + (yourTurn
-          ? (pending ? 'Resolve the current server choice before ending your turn.' : 'Use your card controls, or pass without attacking.')
-          : 'Your field stays synced while the opponent acts.') + '</small></div>' +
+        '<small>' + (pending ? 'Resolve the current server choice before another action.' : selectedCopy) + '</small></div>' +
         (yourTurn
-          ? '<div class="sb-phase-actions"><button type="button" class="sb-phase-action end-turn" data-end-turn="1"' + ((pending || state.busy) ? ' disabled' : '') + '>End Turn</button></div>'
+          ? '<div class="sb-phase-actions">' + directButton +
+            '<button type="button" class="sb-phase-action end-turn" data-end-turn="1"' + ((pending || state.busy) ? ' disabled' : '') + '>End Turn</button></div>'
           : '') +
         '</div>';
       return;
@@ -560,6 +772,17 @@
     bindPhaseControls();
   }
 
+  function syncPlayTargetDom() {
+    document.querySelectorAll('[data-play-where]').forEach((target) => {
+      const where = String(target.dataset.playWhere || '');
+      const raw = target.dataset.playIndex;
+      const index = raw === '' || raw == null ? null : Number(raw);
+      const legal = playTargetLegal(where, index, ownCreatureAt(where, index));
+      target.classList.toggle('sb-play-destination', !!state.selectedHandUid);
+      target.classList.toggle('is-play-legal', legal);
+    });
+  }
+
   function bindCardControls() {
     document.querySelectorAll('[data-card-anchor]').forEach((card) => {
       const select = () => {
@@ -585,6 +808,88 @@
       button.addEventListener('click', async (event) => {
         event.stopPropagation();
         await runAttackIntent(Number(button.dataset.attackSlot));
+      });
+    });
+
+    document.querySelectorAll('[data-play-hand-uid]').forEach((card) => {
+      const select = () => {
+        if (state.busy) return;
+        const uid = String(card.dataset.playHandUid || '');
+        state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
+        state.selectedAnchorUid = '';
+        state.overlayKey = '';
+        render();
+        if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches) {
+          window.requestAnimationFrame(() => {
+            const intent = selectedHandIntent();
+            const target = intent === 'play_creature' ? $('youReserve') : $('youVanguardSlot');
+            if (target && typeof target.scrollIntoView === 'function') {
+              target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          });
+        }
+      };
+
+      card.addEventListener('click', select);
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          select();
+        }
+      });
+      card.addEventListener('dragstart', (event) => {
+        if (state.busy) {
+          event.preventDefault();
+          return;
+        }
+        state.selectedHandUid = String(card.dataset.playHandUid || '');
+        state.selectedAnchorUid = '';
+        state.overlayKey = '';
+        card.classList.add('is-dragging', 'is-play-selected');
+        if (event.dataTransfer) {
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', state.selectedHandUid);
+          event.dataTransfer.setData('application/x-stream-bandit-card', state.selectedHandUid);
+        }
+        syncPlayTargetDom();
+      });
+      card.addEventListener('dragend', () => {
+        card.classList.remove('is-dragging');
+        syncPlayTargetDom();
+      });
+    });
+
+    document.querySelectorAll('[data-play-where]').forEach((target) => {
+      const where = String(target.dataset.playWhere || '');
+      const raw = target.dataset.playIndex;
+      const index = raw === '' || raw == null ? null : Number(raw);
+
+      target.addEventListener('dragover', (event) => {
+        if (!playTargetLegal(where, index, ownCreatureAt(where, index))) return;
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+      });
+
+      target.addEventListener('drop', async (event) => {
+        event.preventDefault();
+        if (state.busy) return;
+        const uid = event.dataTransfer
+          ? String(event.dataTransfer.getData('application/x-stream-bandit-card') || event.dataTransfer.getData('text/plain') || '')
+          : '';
+        if (uid) state.selectedHandUid = uid;
+        if (!playTargetLegal(where, index, ownCreatureAt(where, index))) {
+          state.overlayKey = '';
+          render();
+          return;
+        }
+        await runPlayHandTarget(where, index);
+      });
+
+      target.addEventListener('click', async (event) => {
+        if (!state.selectedHandUid || state.busy) return;
+        if (event.target.closest('[data-card-intent],[data-setup-return]')) return;
+        if (!playTargetLegal(where, index, ownCreatureAt(where, index))) return;
+        await runPlayHandTarget(where, index);
       });
     });
   }
@@ -649,6 +954,39 @@
       });
     });
 
+    document.querySelectorAll('[data-play-direct]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        if (!button.disabled) await runDirectHandPlay(String(button.dataset.playDirect || ''));
+      });
+    });
+
+    document.querySelectorAll('[data-server-choice-option]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const view = viewState();
+        const routed = currentServerChoice(view);
+        const choice = routed && routed.choice;
+        if (!choice || choice.waiting) return;
+        const id = String(button.dataset.serverChoiceOption || '');
+        const current = [...state.selectedChoiceIds];
+        const existing = current.indexOf(id);
+        if (existing >= 0) current.splice(existing, 1);
+        else {
+          const max = Math.max(1, Number(choice.max || 1));
+          if (max === 1) current.splice(0, current.length, id);
+          else if (current.length < max) current.push(id);
+        }
+        state.selectedChoiceIds = current;
+        state.overlayKey = '';
+        render();
+      });
+    });
+
+    document.querySelectorAll('[data-server-choice-confirm]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        if (!button.disabled) await runServerChoice();
+      });
+    });
+
     document.querySelectorAll('[data-end-turn]').forEach((button) => {
       button.addEventListener('click', async () => {
         if (!button.disabled) await runEndTurn();
@@ -708,6 +1046,148 @@
 
   async function runSetupReady() {
     await runAuthoritativeSetupAction('setup_ready', {}, 'Locking your opening field through the server Match Flow owner…');
+  }
+
+  async function runPlayCommand(endpointName, action, payload, busyMessage) {
+    const view = viewState();
+    if (!activePlayTurn(view)) return;
+    state.busy = true;
+    state.overlayKey = '';
+    render();
+    setStatus(busyMessage, 'busy');
+    let failure = '';
+    try {
+      await callEdge(endpointName, Object.assign(actionBase(action), payload || {}));
+      state.selectedHandUid = '';
+      state.selectedChoiceIds = [];
+      state.pendingChoiceId = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
+  }
+
+  async function runPlayHandTarget(where, index) {
+    const view = viewState();
+    const instance = selectedHandInstance();
+    const intent = selectedHandIntent();
+    const creature = ownCreatureAt(where, index);
+    if (!instance || !playTargetLegal(where, index, creature)) return;
+    const cardUid = String(instance.uid || '');
+    if (!cardUid) return;
+
+    if (intent === 'play_creature') {
+      await runPlayCommand(
+        API_MATCH,
+        'play_creature',
+        { card_uid: cardUid, reserve_index: Number(index) },
+        'Playing the selected Creature through the authoritative Creature owner…'
+      );
+      return;
+    }
+
+    if (intent === 'evolve') {
+      const payload = { card_uid: cardUid, where };
+      if (where === 'reserve') payload.index = Number(index);
+      await runPlayCommand(
+        API_MATCH,
+        'evolve',
+        payload,
+        'Evolving the selected Creature through the authoritative Creature owner…'
+      );
+      return;
+    }
+
+    if (intent === 'attach_essence') {
+      const payload = { card_uid: cardUid, where };
+      if (where === 'reserve') payload.index = Number(index);
+      await runPlayCommand(
+        API_MATCH,
+        'attach_essence',
+        payload,
+        'Attaching Essence through the authoritative Essence attachment route…'
+      );
+      return;
+    }
+
+    if (intent === 'attach_relic') {
+      const payload = { card_uid: cardUid, where };
+      if (where === 'reserve') payload.index = Number(index);
+      await runPlayCommand(
+        API_MATCH,
+        'attach_relic',
+        payload,
+        'Attaching Relic through the authoritative Relic owner…'
+      );
+    }
+  }
+
+  async function runDirectHandPlay(requestedIntent) {
+    const instance = selectedHandInstance();
+    const intent = selectedHandIntent();
+    if (!instance || intent !== requestedIntent || !directHandIntent(intent)) return;
+    const cardUid = String(instance.uid || '');
+    if (!cardUid) return;
+    if (intent === 'play_realm') {
+      await runPlayCommand(
+        API_MATCH,
+        'play_realm',
+        { card_uid: cardUid },
+        'Playing Realm through the authoritative Realm owner…'
+      );
+      return;
+    }
+    if (intent === 'play_tactic') {
+      await runPlayCommand(
+        API_TACTIC,
+        'play_tactic',
+        { card_uid: cardUid },
+        'Playing Tactic through the authoritative Tactic interpreter…'
+      );
+    }
+  }
+
+  async function runServerChoice() {
+    const view = viewState();
+    const routed = currentServerChoice(view);
+    const choice = routed && routed.choice;
+    if (!routed || !choice || choice.waiting || state.busy) return;
+    const ids = [...state.selectedChoiceIds];
+    const min = Math.max(0, Number(choice.min || 0));
+    const max = Math.max(min, Number(choice.max == null ? min : choice.max));
+    if (ids.length < min || ids.length > max) return;
+
+    state.busy = true;
+    state.overlayKey = '';
+    render();
+    setStatus('Resolving the server choice…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(
+        routed.endpoint,
+        Object.assign(actionBase(routed.action), {
+          choice_id: String(choice.id || ''),
+          choice_ids: ids
+        })
+      );
+      state.selectedChoiceIds = [];
+      state.pendingChoiceId = '';
+      await refreshMatch();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      state.overlayKey = '';
+      render();
+      if (failure) setStatus(failure, 'error');
+    }
   }
 
   async function runEndTurn() {
@@ -776,7 +1256,13 @@
       const hand = view && view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
       if (!hand.some((row) => String(row.uid || '') === state.selectedHandUid)) state.selectedHandUid = '';
     }
-    if (view && view.phase !== 'setup') state.selectedHandUid = '';
+    if (view) {
+      const youSeat = Number(view.you && view.you.seat);
+      const mayKeepHandSelection =
+        view.phase === 'setup' ||
+        (view.phase === 'play' && Number(view.active_seat) === youSeat && !hasPendingAction(view));
+      if (!mayKeepHandSelection) state.selectedHandUid = '';
+    }
 
     render();
     syncOpponentProfile(view && view.opponent && view.opponent.user_id).catch(() => {});
