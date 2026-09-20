@@ -422,6 +422,34 @@
     ],
     "stable_tabletop": true,
     "desktop_touch_semantic_parity": true,
-    "latest_authoritative_snapshot_wins": true
+    "latest_authoritative_snapshot_wins": true,
+    "receipt_schema": "tcg-presentation-envelope-v1",
+    "receipt_runtime_owner": "authoritative_action_or_continuation_projects_viewer_filtered_receipt_at_commit",
+    "receipt_replay_key": "receipt_id_plus_authoritative_revision",
+    "stale_receipt_rule": "newer_authoritative_revision_cancels_older_queued_choreography",
+    "intensity_tiers": [
+      "micro",
+      "standard",
+      "hero"
+    ],
+    "resolution_ribbon": "accessible_temporary_causal_breadcrumb_from_same_receipt_queue",
+    "private_choice_mirror": "public_safe_in_progress_feedback_only_no_private_card_identity",
+    "backlog_rule": "stale_cues_disposable_micro_cues_may_be_coalesced_later_latest_snapshot_always_wins"
+  },
+  "stream_bandit_element_fx_language": {
+    "authority": "presentation_only_from_public_structured_element_metadata",
+    "not_card_id_specific": true,
+    "color_only_forbidden": true,
+    "reduced_motion_equivalent_required": true,
+    "elements": {
+      "Astral": "stellar_orbit_glyph_motion",
+      "Ember": "heat_spark_motion",
+      "Gale": "wind_arc_motion",
+      "Grove": "growth_leaf_vine_motion",
+      "Shade": "shadow_veil_motion",
+      "Stone": "weight_shock_dust_motion",
+      "Tide": "wave_ripple_motion",
+      "Volt": "pulse_arc_electric_motion"
+    }
   }
 }
