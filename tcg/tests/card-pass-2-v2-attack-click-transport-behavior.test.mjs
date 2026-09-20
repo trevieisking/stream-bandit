@@ -33,6 +33,11 @@ class FakeNode {
     this.dataset = {};
     this.textContent = '';
     this._innerHTML = '';
+    this.listeners = new Map();
+  }
+
+  addEventListener(type, listener) {
+    this.listeners.set(type, listener);
   }
 
   set innerHTML(value) {
