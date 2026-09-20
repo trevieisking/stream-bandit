@@ -44,3 +44,12 @@
 @media(max-width:720px),(hover:none) and (pointer:coarse){
  .sb-card-header{gap:4px;padding:5px}.sb-card-hp{min-width:36px;min-height:29px}.sb-card-hp strong{font-size:13px}.sb-card-identity h3{font-size:11px}.sb-card-element strong{font-size:7px}.sb-card-rules{padding:4px}.sb-card-rule{padding:3px 2px}.sb-card-rule p{font-size:6.4px}.sb-card-rule-head strong{font-size:8.5px}.sb-card-damage{font-size:12px}
 }
+
+button.sb-card-rule{
+ display:block;width:100%;margin:0;border-left:0;border-right:0;border-top:0;border-radius:0;
+ color:inherit;background:transparent;text-align:left;font:inherit;cursor:pointer;
+}
+button.sb-card-rule:hover,button.sb-card-rule:focus-visible{
+ outline:none;background:linear-gradient(90deg,rgba(58,208,255,.08),rgba(99,255,214,.08));
+}
+button.sb-card-rule:disabled{cursor:not-allowed}
