@@ -610,3 +610,16 @@ This removes one duplicate rule without moving Attack sequencing or healing auth
 TCG Card Pass 2 Validation **#1155 PASS** on exact fingerprinted source head a69ecef888cee4a1d3a2a2a65ca9cd3ec5abc5b7.
 
 The broad Release 1 predicate-leaf task remains open; each repeated leaf is reconciled separately before generic IF is declared complete.
+
+
+## V2.4.57 implementation D — shared source_has_shield_at_least leaf meaning
+
+Release 1 uses source_has_shield_at_least on Quartzram, Reefback and Abyssalume.
+
+The shared Requirement evaluator now owns the exact source Shield threshold meaning and validation. Attack conditional self-heal delegates to that evaluator instead of directly comparing source Creature Shield.
+
+This preserves Attack sequencing and leaves continuous/Active Ability orchestration for their later generic routes while guaranteeing they can reuse the same leaf meaning.
+
+TCG Card Pass 2 Validation **#1163 PASS** on exact fingerprinted source head 76b409309f41167db6d273bd8d6df2921beb5e3b.
+
+Next proven mismatch: Release 1 Tactic play requirements use lower-case predicate reserve_count_at_least, while the current Tactic gate still recognizes only an older RESERVE_COUNT_AT_LEAST op shape. That mismatch is now the next repair target.
