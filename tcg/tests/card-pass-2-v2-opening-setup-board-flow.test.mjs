@@ -129,6 +129,13 @@ test('recorded interaction contract still requires the same opening and board gr
   assert.equal(contract.board.show_discard_pile, true);
   assert.equal(contract.board.hand_position, 'bottom_edge');
   assert.equal(contract.board.board_remains_visible_during_choices, true);
+  assert.equal(contract.board.normal_browser_zoom_required, true);
+  assert.equal(contract.board.field_card_presentation, 'compact_art_status_preview');
+  assert.equal(contract.board.full_card_presentation, 'click_or_tap_opens_separate_canonical_inspector');
+  assert.equal(contract.board.hand_behavior, 'fixed_bottom_horizontal_scroll_without_growing_board');
+  assert.equal(contract.board.mobile_hand_behavior, 'swipe_left_right_horizontal_card_tray');
+  assert.equal(contract.board.viewport_contract, 'entire_battlefield_plus_hand_visible_in_one_device_viewport_at_normal_zoom');
+  assert.equal(contract.input_modes.mobile_hand_horizontal_scroll_required, true);
   const opening = contract.required_flows.find((flow) => flow.id === 'opening_setup');
   assert.deepEqual(opening.steps, ['opening_choice', 'opening_hand', 'place_vanguard', 'place_reserves', 'confirm_setup', 'install_rewards']);
 });
