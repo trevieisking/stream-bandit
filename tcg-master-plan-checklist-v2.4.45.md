@@ -448,4 +448,15 @@
 - [x] TCG Card Pass 2 Validation #1255 SUCCESS on exact head `00d5f8a7aec223dcd8c5a336d27046ac7d1ad3b7`.
 - [ ] Migrate each frozen Attack IF effect family onto this common predicate owner without double execution.
 - [ ] Close the parent “generic Attack IF execution” box only after all 13 instances are proven executable without printed-English/card-ID fallback.
+## V2.4.67 — Attack declaration current-action events
+- [x] Inventory Release 1 Attack on_declare: exactly two RECORD_EVENT steps.
+- [x] Add one card-ID-free declaration-event collector for the two frozen predicate shapes.
+- [x] Reuse the shared Attack source attached-Essence-kind query.
+- [x] Keep current-action events action-local; do not create duplicate persistent history.
+- [x] Create attackActionEvents once in the canonical Attack dispatcher.
+- [x] Migrate Storm Break overcharge trigger to consume the generic event map.
+- [x] Preserve the existing overcharge pending-choice / discard / Condition owner.
+- [x] Expand exact Match Edge dependency closure 89 -> 90 files.
+- [x] TCG Card Pass 2 Validation #1265 SUCCESS on exact head `fb494fedd43851acc4302b4e6d1327715214c689`.
+- [ ] Migrate Chainstorm's event_occurred IF leaf to consume the same event map through the shared Attack IF owner.
 
