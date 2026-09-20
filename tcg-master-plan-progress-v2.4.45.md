@@ -276,3 +276,21 @@ The first V2.4.53 implementation target is now present on the branch.
 - Human desktop/mobile readability remains pending and no promotion is implied.
 
 Next implementation target after this source slice validates is **phone/tablet pointer-driven hand-card drag/drop**, while preserving the existing tap-select fallback and exact server action payloads.
+
+
+## V2.4.53 implementation B — phone/tablet touch drag source complete
+
+The second V2.4.53 implementation target is now present on the branch without creating a mobile gameplay owner.
+
+- Coarse-touch playable hand cards now bind a touch-safe hold-and-drag gesture while native HTML5 drag remains available on fine-pointer desktop.
+- A short hold deliberately activates card dragging; ordinary movement before activation cancels the drag path so normal phone scrolling remains available.
+- Drag activation selects the same existing hand-card UID used by tap mode.
+- The gesture discovers the existing setup/play destination elements and calls the existing legality hints only for visual highlighting.
+- A legal drop delegates to the **same existing action functions** as tap mode: `runSetupPlace` for setup or `runPlayHandTarget` for play/evolve/Essence/Relic.
+- No mobile rules engine, mobile Essence route, alternate Creature placement path or duplicate server payload was introduced.
+- Setup destinations are now discoverable before selection so a held phone card can be dragged directly to an open legal setup slot; legality highlighting still appears only when a card is actually selected/held.
+- Tap-select -> highlighted destination remains bound and available as the equal fallback/accessibility path.
+- The accepted Trevor/Kay Battle board geometry is unchanged.
+- A coarse-touch browser regression fixture proves long-press drag of Basic Astral Essence to the Vanguard emits exactly one authoritative `attach_essence` command, while a separate coarse-touch tap test proves the fallback still emits the same command.
+
+Human Kay-phone finger-drag acceptance remains pending. The next source target after exact-head validation is the remaining **V2.4.53 automated rail compression/removal proof**, followed by any still-open non-human Battle acceptance evidence before returning the build to Trevor/Kay.
