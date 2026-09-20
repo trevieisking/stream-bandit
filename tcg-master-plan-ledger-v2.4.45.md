@@ -477,4 +477,15 @@ Attack IF resolves the structured variable reference but delegates card/filter m
 
 ## 170 — Attack IF foundation is not Attack effect parity
 A green predicate evaluator does not imply HEAL, Condition, switch, discard, MOVE_CARDS or other selected branches execute generically. The parent Attack IF gate remains open until branch effects are migrated and proven.
+## 171 — Attack declaration RECORD_EVENT has one action-local owner
+Release 1 Attack on_declare event production is evaluated once from structured declaration data and returns an in-memory current-action event-count map.
+
+## 172 — Attack declaration events do not create a second event-history system
+The action-local map exists only for the current Attack resolution. Persistent turn/history queries remain with the canonical event-history owner.
+
+## 173 — Storm Break and Chainstorm share declaration-event semantics
+Attached-Essence-count and attached-Essence-kind RECORD_EVENT predicates are generic declaration shapes. Storm Break and Chainstorm are registry consumers and must not own separate event booleans.
+
+## 174 — Specialized Attack flows migrate by consuming generic evidence
+A specialized effect owner may remain responsible for its mutation while its IF/event decision moves onto shared predicate/event evidence. Migration must not duplicate the mutation path.
 
