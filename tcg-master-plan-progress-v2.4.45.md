@@ -707,3 +707,21 @@ Animations are disposable presentation. If a browser refreshes/reconnects halfwa
 
 ### Test-order decision retained
 Kay's additional phone recording `Screen_Recording_20260920_193339_Chrome.mp4` is retained as evidence for the later cross-device gate. Release 1 runtime capability closeout remains the current implementation priority before another long Trevor/Kay Battle acceptance session.
+
+
+## V2.4.57 implementation H — shared previous-opponent event requirement
+
+The final frozen Tactic play-requirement family is now covered.
+
+Stone — Reversal Seal uses:
+`event_occurred(creature_defeated, controller:self, window:previous_opponent_turn, min_count:1)`.
+
+Tactic playability now resolves the requested event controller seat and delegates the entire event/window count to the shared event-history owner. Previous-opponent lookup uses canonical turn-owner history, so a same-seat extra turn cannot make the client/runtime incorrectly inspect the immediately previous numeric turn.
+
+Dedicated Deno coverage proves a turn ownership chain **1 → 2 → 1 → 1** still resolves Player 1's previous opponent turn as turn 2 and counts only matching controller events on that turn.
+
+The Tactic Edge closure expanded from 37 to **39 files** because the entrypoint now directly depends on event-history and turn-history. Release Control was refreshed rather than weakening the closure guard.
+
+TCG Card Pass 2 Validation **#1200 PASS** on exact source/manifest head `9de2db520b593624c0a12e4be6186e23470eaa72`.
+
+Result: all **18** frozen Release 1 Tactics with explicit play requirements are now covered by current structured requirement families. The next runtime target is generic `IF` execution inside Tactic programs.
