@@ -296,3 +296,7 @@ source_has_shield_at_least means the source Creature's current Shield is at leas
 
 ## 109 — Tactic play requirements follow the frozen predicate grammar
 Release 1 structured Tactics use predicate records for play requirements. Compatibility-only uppercase operation names may be accepted as input, but they must translate into the same shared predicate semantics and may not remain a second rules path.
+
+
+## 110 — legal_card_available delegates selection, not card rules
+The shared requirement layer owns only the predicate envelope and candidate-count meaning. Zone traversal and card/Creature filter matching stay with the existing selector owners. A legal-card requirement is true only when those owners return at least one candidate; the requirement evaluator must not invent a parallel card-search engine.
