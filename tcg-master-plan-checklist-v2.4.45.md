@@ -361,4 +361,25 @@
 - [ ] Reconnect/refresh test: interrupt any movement/search/attack animation and prove the client immediately renders the newest authoritative snapshot with no replay-owned mutation.
 - [ ] Automated test: generic three-card search example renders a server-bound selection counter, legal assignment targets, attachment results and post-resolution shuffle without browser legality/randomness.
 - [ ] Trevor/Kay Battle acceptance: visible card movement, Attack impact, Ability feedback and at least one search/select/attach/shuffle sequence are understandable on desktop and phone without hidden-information leakage.
+## V2.4.60 — video-comparison interaction grammar / choreography architecture
+- [x] Compare the recent Trevor desktop and Kay phone Battle evidence with the retained external TCG/Pokémon interaction-reference recordings.
+- [x] Record the evidence set and detailed comparison in `tcg-video-interaction-comparison-v1.md`.
+- [x] Lock the principle that external footage contributes interaction grammar only; Stream Bandit keeps its own art, rules, names, card identities and terminology.
+- [x] Lock one generic Battle Presentation / Choreography Engine rather than card-ID-specific effects or a second browser rules engine.
+- [x] Lock six presentation responsibilities: Zone Motion, Choice Overlay, Combat/Ability FX, Deck/Hidden-Zone Presentation, Stable Inspector and Pacing/Recovery.
+- [ ] Define the authoritative presentation-envelope schema consumed by the choreography engine: source anchor, effect family, viewer visibility, card/zone movements, legal choice anchors, state deltas, continuation identity and ordering.
+- [ ] Implement the generic presentation queue so one authoritative resolution can produce an ordered visual sequence while the latest server snapshot always remains truth.
+- [ ] Bind Deck shuffle/deal/draw/return/discard/Reward events to Zone Motion.
+- [ ] Bind Creature play/evolution/switch/promotion and Essence/Relic attach/remove/payment to Zone Motion.
+- [ ] Bind Reward, search, optional and other Release 1 multi-card choices to one server-count-bound Choice Overlay.
+- [ ] Bind Attack and active/triggered Ability result packets to Combat/Ability FX.
+- [ ] Bind Condition apply/clear/replace/prevent and listener/trigger feedback to generic effect families.
+- [ ] Keep Deck, opponent hand and unrevealed Rewards physically visible as card backs/counts without revealing private identities.
+- [ ] Keep public Discard visibly populated and inspectable through authoritative Hidden Information.
+- [ ] Preserve the accepted bounded field-card + bottom peek/fan hand + full inspector geometry while adding effects.
+- [ ] Desktop and phone must consume the same presentation semantics; only gesture/layout treatment may differ.
+- [ ] Add reduced-motion equivalents for every required information-bearing animation.
+- [ ] Test that refresh/reconnect during every major effect family skips stale choreography and converges immediately on authoritative state.
+- [ ] Test that no choreography branch can submit gameplay mutations, calculate legality, choose RNG outcomes or retain hidden information beyond the viewer-authorized envelope.
+- [ ] Trevor/Kay acceptance: complete Battle can be followed visually without relying on debug text to understand draws, plays, Attacks, Abilities, Conditions, Rewards, searches, shuffles and turn handoff.
 
