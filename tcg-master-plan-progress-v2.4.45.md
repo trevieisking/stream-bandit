@@ -1150,4 +1150,34 @@ Chainstorm will consume the same event map through the shared Attack IF evaluato
 TCG Card Pass 2 Validation **#1265 SUCCESS** on exact head `fb494fedd43851acc4302b4e6d1327715214c689`.
 
 The exact Match Edge release-control closure expanded **89 -> 90 files** for the new declaration-event owner and includes the refreshed Attack-authority + Match entrypoint blobs.
+## V2.4.68 — conditional Condition Attack IF family migrated
+
+Five frozen Attack IF instances across four cards now execute through the shared Attack IF predicate owner and shared Condition engine:
+- Grove — Elderbloom — First Canopy / Forest Awakening: outer reserve+survival IF plus nested control-slot IF;
+- Shade — Umbravale — Thought Hunter / Mind Eclipse;
+- Tide — Abyssalume / Abyssal Break;
+- Volt — Stormcoil — Living Circuit / Chainstorm.
+
+New generic owner:
+`supabase/functions/_shared/tcg-match-attack-conditional-condition-v0-2.ts`
+
+It only claims after-damage programs whose reachable operations are:
+- `IF`;
+- `APPLY_CONDITION`;
+- `REPLACE_CONTROL_CONDITION`;
+
+and only when at least one IF exists. Direct condition-only programs remain with the existing direct structured Condition owner.
+
+### Ownership
+- IF decisions route through `runtimeV02EvaluateAttackIf`;
+- actual Condition mutation routes through `applyRuntimeConditionWithContext`;
+- Condition protection/immunity remains authoritative;
+- `REPLACE_CONTROL_CONDITION` maps to the shared `replace` mode after validating the structured replacement shape;
+- Chainstorm's `event_occurred(current_action)` consumes the V2.4.67 `attackActionEvents` map;
+- the dispatcher uses direct structured Condition ownership first, then conditional structured ownership, then legacy compatibility only if neither claims the attack.
+
+### Validation
+TCG Card Pass 2 Validation **#1274 SUCCESS** on exact head `cab1a7daa29e8d129050dcde71e69eebe4f50b65`.
+
+The exact Match Edge dependency closure is now **92 files**, adding the shared Attack IF and conditional-Condition modules.
 
