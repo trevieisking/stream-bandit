@@ -15,6 +15,7 @@ import {
   normalizeRuntimeV02LegalCardAvailableRequirement,
   normalizeRuntimeV02ReserveCountAtLeastRequirement,
 } from "../_shared/tcg-match-requirement-evaluator-v0-2.ts";
+import { evaluateRuntimeV02EventOccurredRequirement } from "../_shared/tcg-match-event-history-query-v0-2.ts";
 import { addRuntimeShield, clearRuntimeCondition, hasRuntimeCondition, healRuntimeDamage, runtimeConditions } from "./runtime-v0-2-core.ts";
 
 const VERSION = "Stream Bandit TCG tactic actions v0.4";
@@ -533,6 +534,17 @@ function firstRequiredCreatureTargetAvailable(state: any, ownerSeat: number, ste
 }
 function checkPlayRequirements(state: any, ownerSeat: number, requirements: any[]) {
   for (const requirement of requirements || []) {
+    if (requirement?.predicate === "event_occurred") {
+      const eventControllerSeat = playerSeat(ownerSeat, requirement.controller || "self", {});
+      if (!evaluateRuntimeV02EventOccurredRequirement(
+        state,
+        ownerSeat,
+        eventControllerSeat,
+        requirement,
+      ).matched) return false;
+      continue;
+    }
+
     if (requirement?.predicate === "legal_card_available") {
       const normalized = normalizeRuntimeV02LegalCardAvailableRequirement(requirement);
       const seat = playerSeat(ownerSeat, normalized.controller, {});
