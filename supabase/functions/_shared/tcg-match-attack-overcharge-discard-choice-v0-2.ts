@@ -4,6 +4,7 @@ import {
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import { runtimeV02EvaluateAttackIf, type RuntimeV02AttackIfContext } from "./tcg-match-attack-if-v0-2.ts";
 import {
   runtimeV02CommitCardZoneTransfer,
   runtimeV02PreflightCardZoneTransfer,
@@ -19,6 +20,14 @@ export type RuntimeV02AttackOverchargeDiscardDescriptor = {
   phase: "after_damage";
   event: string;
   threshold: number;
+  outer_when: {
+    predicate: "event_occurred";
+    event: string;
+    controller: "self";
+    window: "current_action";
+    min_count: 1;
+  };
+  survive_when: { predicate: "target_remains_in_play_after_damage" };
   discard: { min: 1; max: 1 };
   condition: {
     target: "$attack_target";
@@ -310,6 +319,14 @@ export function structuredRuntimeAfterDamageOverchargeDiscardCondition(
     phase: "after_damage",
     event,
     threshold,
+    outer_when: {
+      predicate: "event_occurred",
+      event,
+      controller: "self",
+      window: "current_action",
+      min_count: 1,
+    },
+    survive_when: { predicate: "target_remains_in_play_after_damage" },
     discard: { min: 1, max: 1 },
     condition: { target: "$attack_target", condition: conditionName, mode },
   };
@@ -317,15 +334,12 @@ export function structuredRuntimeAfterDamageOverchargeDiscardCondition(
 
 export function runtimeV02AttackOverchargeTriggered(
   descriptor: RuntimeV02AttackOverchargeDiscardDescriptor,
-  sourceCreature: RuntimeCreature & Record<string, unknown>,
+  context: RuntimeV02AttackIfContext,
 ): boolean {
   if (!Number.isInteger(descriptor.threshold) || descriptor.threshold < 1) {
     throw new Error("tcg_v0_2_attack_overcharge_descriptor_threshold_invalid");
   }
-  if (!Array.isArray(sourceCreature.essence)) {
-    throw new Error("tcg_v0_2_attack_overcharge_source_essence_invalid");
-  }
-  return sourceCreature.essence.length >= descriptor.threshold;
+  return runtimeV02EvaluateAttackIf(descriptor.outer_when, context);
 }
 
 export function runtimeV02CreateAttackOverchargeDiscardChoice(
@@ -334,11 +348,12 @@ export function runtimeV02CreateAttackOverchargeDiscardChoice(
   descriptor: RuntimeV02AttackOverchargeDiscardDescriptor,
   sourceInstance: unknown,
   target: RuntimeV02AttackTargetBinding,
-  targetRemainedAfterDamage: boolean,
-  triggeredAtDeclaration: boolean,
+  ifContext: RuntimeV02AttackIfContext,
   choiceId: string = crypto.randomUUID(),
 ): RuntimeV02PendingAttackOverchargeDiscardChoice | null {
+  const triggeredAtDeclaration = runtimeV02AttackOverchargeTriggered(descriptor, ifContext);
   if (!triggeredAtDeclaration) return null;
+  const targetRemainedAfterDamage = runtimeV02EvaluateAttackIf(descriptor.survive_when, ifContext);
   if (!choiceId) throw new Error("tcg_v0_2_attack_overcharge_choice_id_required");
   if (state.active_seat !== seat) throw new Error("tcg_v0_2_attack_overcharge_active_seat_mismatch");
   const turn = currentTurn(state);
