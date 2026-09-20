@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.18-server-projected-actions';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.19-choreography-foundation';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -26,7 +26,9 @@
     overlayKey: '',
     fieldActions: null,
     handActionProjection: null,
-    selectedWithdrawEssenceUids: []
+    selectedWithdrawEssenceUids: [],
+    presentation: null,
+    presentationFlush: null
   };
 
   const $ = (id) => document.getElementById(id);
@@ -264,6 +266,54 @@
     const rejected = data && data.ok === false ? data : (nestedResult && nestedResult.ok === false ? nestedResult : null);
     if (!response.ok || rejected) throw new Error((rejected && rejected.error) || data.error || ('HTTP ' + response.status));
     return data;
+  }
+
+  function presentationEngine() {
+    if (state.presentation) return state.presentation;
+    const api = window.StreamBanditTCGBattlePresentation;
+    if (!api || typeof api.create !== 'function') return null;
+    state.presentation = api.create();
+    return state.presentation;
+  }
+
+  function presentAuthoritativeCue(cue, context) {
+    if (!cue || typeof cue !== 'object') return;
+    const host = $('battleChoreography');
+    if (host) {
+      host.dataset.family = String(cue.family || '');
+      host.dataset.intensity = String(cue.intensity || 'standard');
+      const label = String(cue.label || '').trim();
+      host.textContent = label;
+      host.hidden = !label;
+    }
+    try {
+      window.dispatchEvent(new CustomEvent('stream-bandit-tcg:presentation-cue', {
+        detail: { cue, context }
+      }));
+    } catch (_) {}
+  }
+
+  function syncPresentation(view) {
+    const engine = presentationEngine();
+    if (!engine) return;
+    engine.syncRevision(revision());
+    const envelope = view && view.presentation && typeof view.presentation === 'object'
+      ? view.presentation
+      : null;
+    if (envelope) engine.ingest(envelope);
+    if (state.presentationFlush) return;
+    state.presentationFlush = engine.flush(presentAuthoritativeCue)
+      .catch(() => {})
+      .finally(() => {
+        state.presentationFlush = null;
+        const host = $('battleChoreography');
+        if (host) {
+          host.hidden = true;
+          host.textContent = '';
+          delete host.dataset.family;
+          delete host.dataset.intensity;
+        }
+      });
   }
 
   function viewState() {
@@ -2396,6 +2446,7 @@
       }
     }
 
+    syncPresentation(view);
     await refreshFieldActions();
     render();
     syncOpponentProfile(view && view.opponent && view.opponent.user_id).catch(() => {});
