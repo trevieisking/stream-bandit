@@ -16,11 +16,11 @@ const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-i
 
 test('Battle keeps the tabletop zones while using bounded field geometry and inspect-drag hand-peek bindings', () => {
   assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-9-hand-peek"/);
-  assert.match(battle, /data-sb-tcg-play-bindings="v0-10-inspect-drag-peek"/);
+  assert.match(battle, /data-sb-tcg-play-bindings="v0-11-server-projected-actions"/);
   assert.match(battle, /data-sb-tcg-card-face="v1"/);
   assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-17-hand-peek-inspect/);
-  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.17-hand-peek-inspect/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-18-server-projected-actions/);
+  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.18-server-projected-actions/);
   assert.match(controller, /mode: 'compact'/);
   assert.match(controller, /data-inspect-hand-uid=/);
   assert.match(controller, /data-inspect-field-owner=/);
