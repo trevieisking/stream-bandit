@@ -455,6 +455,13 @@
       '</div>';
   }
 
+  function touchPrimaryInput() {
+    return !!(
+      window.matchMedia &&
+      window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    );
+  }
+
   function handCard(instance) {
     const cardId = String(instance && instance.card_id || '');
     const uid = String(instance && instance.uid || '');
