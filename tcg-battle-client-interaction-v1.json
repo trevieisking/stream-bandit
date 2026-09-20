@@ -5,7 +5,13 @@
     "reference_video": "Dar match up test deck(1).mp4",
     "purpose": "Interaction choreography reference only; Stream Bandit retains original names, art, rules, card identities and UI design.",
     "server_authoritative": true,
-    "cross_device_observation": "Trevor desktop native drag/drop worked; Kay phone coarse-touch drag/drop did not. V2.4.53 requires pointer/touch drag parity while retaining tap fallback."
+    "cross_device_observation": "Trevor desktop native drag/drop worked; Kay phone coarse-touch drag/drop did not. V2.4.53 requires pointer/touch drag parity while retaining tap fallback.",
+    "layout_reference_videos": [
+      "WhatsApp Video 2026-09-20 at 17.52.36(1).mp4",
+      "Video Project 5.mp4"
+    ],
+    "layout_reference_scope": "Interaction and viewport composition only: whole-board visibility, compact field cards, click/tap inspection, bottom horizontal hand and drag/drop. Stream Bandit retains original art, styling, card identities, terminology and rules.",
+    "human_layout_finding": "Trevor required 50% browser zoom to see the previous full-rule cards with the whole board; the reference interaction model proves full rules should open on inspection rather than permanently consume battlefield/hand space."
   },
   "board": {
     "opponent_position": "top",
@@ -16,7 +22,14 @@
     "show_deck_pile": true,
     "show_discard_pile": true,
     "hand_position": "bottom_edge",
-    "board_remains_visible_during_choices": true
+    "board_remains_visible_during_choices": true,
+    "normal_browser_zoom_required": true,
+    "field_card_presentation": "compact_art_status_preview",
+    "full_card_presentation": "click_or_tap_opens_separate_canonical_inspector",
+    "hand_behavior": "fixed_bottom_horizontal_scroll_without_growing_board",
+    "mobile_hand_behavior": "swipe_left_right_horizontal_card_tray",
+    "viewport_contract": "entire_battlefield_plus_hand_visible_in_one_device_viewport_at_normal_zoom",
+    "source_card_stays_in_slot_during_inspection": true
   },
   "input_modes": {
     "desktop": [
@@ -41,7 +54,12 @@
     "touch_drag_setup_owner": "runSetupPlace",
     "touch_drag_play_owner": "runPlayHandTarget",
     "mobile_rules_engine": false,
-    "tap_fallback_preserved": true
+    "tap_fallback_preserved": true,
+    "hand_click_behavior": "inspect_card_and_preserve_selection_for_tap_fallback",
+    "hand_drag_behavior": "drag_directly_to_existing_legal_destination_using_existing_server_action",
+    "field_click_behavior": "inspect_compact_card_without_relocating_source",
+    "mobile_page_scroll_required": false,
+    "mobile_hand_horizontal_scroll_required": true
   },
   "required_flows": [
     {
@@ -58,7 +76,8 @@
     {
       "id": "play_creature",
       "steps": [
-        "select_or_drag_hand_card",
+        "tap_or_click_hand_card_to_inspect",
+        "close_inspector_with_selection_preserved_for_tap_fallback_or_drag_card_directly",
         "highlight_legal_slots",
         "choose_slot_by_drop_or_tap",
         "server_validate",
@@ -112,8 +131,9 @@
     {
       "id": "creature_context",
       "steps": [
-        "select_creature",
-        "enlarge_card",
+        "tap_or_click_compact_field_card",
+        "keep_source_card_anchored_in_its_board_slot",
+        "open_full_canonical_card_inspector",
         "show_ability_or_attack_slots",
         "show_withdraw",
         "show_legality_reason_for_locked_actions"
@@ -216,7 +236,10 @@
     "opponent_thinking_or_choice_state",
     "attached_essence_element_orb_rail",
     "attack_cost_element_orbs",
-    "touch_drag_legal_destination_glow"
+    "touch_drag_legal_destination_glow",
+    "compact_field_card_art_status_preview",
+    "full_card_inspector_without_board_reflow",
+    "horizontal_hand_scroll_position"
   ],
   "forbidden_client_patterns": [
     "browser_prompt_for_gameplay_targeting",
