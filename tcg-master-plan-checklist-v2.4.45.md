@@ -122,7 +122,7 @@
 - [x] Collection and Deck previews use the same renderer rather than artwork-only tiles.
 - [ ] Desktop human readability PASS for Astral Battle + Collection + Decks.
 - [ ] Mobile/coarse-touch human readability PASS for Astral Battle + Collection + Decks.
-- [ ] Exact-head TCG Card Pass 2 Validation PASS.
+- [x] Exact-head TCG Card Pass 2 Validation PASS.
 - [ ] Promotion decision before merge/main/live.
 
 
@@ -138,11 +138,11 @@
 - [x] Lock the Trevor-supplied Orbitortoise card as the global card-face layout reference for current/future identities.
 - [x] Add the small Battle settings/cog control and wire **Quit Match** through authoritative `concede`.
 - [x] Rename terminal continuation to **Back to Matchmaking** and prove it returns to `tcg-play.html` without `match_id`.
-- [ ] Automated Attack journey proves legal Attack -> exact damage -> automatic turn advance/draw.
-- [ ] Automated defeat journey proves lethal Attack -> Creature removed -> Reward resolution queued.
-- [ ] Automated concession journey proves quitter loss / opponent win and no unrelated state mutation.
+- [x] Automated Attack journey proves legal Attack -> exact damage -> automatic turn advance/draw.
+- [x] Automated defeat journey proves lethal Attack -> Creature removed -> Reward resolution queued.
+- [x] Automated concession journey proves quitter loss / opponent win and no unrelated state mutation.
 - [ ] Automated active Ability projection proves usable -> glow eligible -> use -> projection disappears.
-- [ ] Exact-head TCG Card Pass 2 Validation PASS after V2.4.52.
+- [x] Exact-head TCG Card Pass 2 Validation PASS after V2.4.52.
 - [ ] Trevor/Kay real two-user PASS: at least one Attack visibly places damage.
 - [ ] Trevor/Kay real two-user PASS: lethal damage visibly triggers Reward handling and subsequent state.
 - [ ] Trevor/Kay real two-user PASS: Ability usable glow appears and disappears after activation.
