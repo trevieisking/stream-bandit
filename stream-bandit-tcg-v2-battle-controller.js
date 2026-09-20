@@ -1123,6 +1123,67 @@
     });
   }
 
+  function setBattleMenuOpen(open) {
+    const menu = $('battleMenu');
+    const button = $('battleMenuButton');
+    if (!menu || !button) return;
+    menu.hidden = !open;
+    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    const confirm = $('quitMatchConfirm');
+    if (confirm && !open) confirm.hidden = true;
+  }
+
+  function bindBattleMenu() {
+    const menuButton = $('battleMenuButton');
+    if (menuButton) menuButton.addEventListener('click', () => setBattleMenuOpen(true));
+    document.querySelectorAll('[data-battle-menu-close]').forEach((button) => {
+      button.addEventListener('click', () => setBattleMenuOpen(false));
+    });
+    const quitButton = $('quitMatchButton');
+    const confirm = $('quitMatchConfirm');
+    if (quitButton && confirm) {
+      quitButton.addEventListener('click', () => {
+        confirm.hidden = false;
+      });
+    }
+    document.querySelectorAll('[data-quit-cancel]').forEach((button) => {
+      button.addEventListener('click', () => {
+        if (confirm) confirm.hidden = true;
+      });
+    });
+    document.querySelectorAll('[data-quit-confirm]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        await runConcede();
+      });
+    });
+  }
+
+  async function runConcede() {
+    const view = viewState();
+    if (!view || state.busy) return;
+    if (view.phase === 'complete') {
+      window.location.href = 'tcg-play.html';
+      return;
+    }
+    state.busy = true;
+    setStatus('Quitting the match. This counts as a loss and awards your opponent the win…', 'busy');
+    let failure = '';
+    try {
+      await callEdge(API_MATCH, actionBase('concede'));
+      window.location.href = 'tcg-play.html';
+      return;
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+      await refreshMatch().catch(() => {});
+    } finally {
+      state.busy = false;
+      if (failure) {
+        setBattleMenuOpen(true);
+        setStatus(failure, 'error');
+      }
+    }
+  }
+
   async function runAuthoritativeSetupAction(action, extra, busyMessage) {
     state.busy = true;
     state.overlayKey = '';
@@ -1403,6 +1464,7 @@
       state.matchId = new URLSearchParams(window.location.search).get('match_id') || '';
       if (!state.matchId) throw new Error('Open this battle surface from a match route containing ?match_id=<id>.');
       await ensureClient();
+      bindBattleMenu();
       await refreshMatch();
       startPoll();
     } catch (error) {
