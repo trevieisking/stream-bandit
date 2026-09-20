@@ -485,22 +485,22 @@ export function runtimeV02ApplyCardZonePartitionTransfer<T extends RuntimeV02Car
 }
 
 export type RuntimeV02CardZoneReorderRequest = {
-  cause: RuntimeV02CardZoneTransferCause;
+  cause: "effect" | "rule";
   action_kind: string;
   source_action_id: string;
   source_card_uid: string | null;
-  zone: RuntimeV02CardZoneRef;
+  zone: RuntimeV02CardZoneEndpoint;
   card_uids: string[];
   destination_position: "top" | "bottom";
 };
 
 export type RuntimeV02CardZoneReorderReceipt = {
   schema: "sb-tcg-card-zone-reorder-v0.2";
-  cause: RuntimeV02CardZoneTransferCause;
+  cause: "effect" | "rule";
   action_kind: string;
   source_action_id: string;
   source_card_uid: string | null;
-  zone: RuntimeV02CardZoneRef;
+  zone: RuntimeV02CardZoneEndpoint;
   card_uids: string[];
   destination_position: "top" | "bottom";
   count: number;
@@ -516,7 +516,8 @@ export function runtimeV02ApplyCardZoneReorder<T extends RuntimeV02CardZoneInsta
   zoneCards: T[],
   request: RuntimeV02CardZoneReorderRequest,
 ): { cards: T[]; receipt: RuntimeV02CardZoneReorderReceipt } {
-  validateZone(zoneCards, "reorder");
+  validateZone(zoneCards, "source");
+  validateEndpoint(request.zone, "source");
   if (!Array.isArray(request.card_uids) || request.card_uids.length < 1) {
     throw new Error("tcg_v0_2_card_zone_reorder_card_uids_required");
   }
@@ -554,7 +555,7 @@ export function runtimeV02ApplyCardZoneReorder<T extends RuntimeV02CardZoneInsta
       source_card_uid: request.source_card_uid == null
         ? null
         : requiredString(request.source_card_uid, "tcg_v0_2_card_zone_reorder_source_card_uid_invalid"),
-      zone: normalizedZoneRef(request.zone, "reorder"),
+      zone: { ...request.zone },
       card_uids: [...cardUids],
       destination_position: request.destination_position,
       count: cards.length,
