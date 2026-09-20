@@ -15,6 +15,7 @@ class FakeClassList{
   constructor(){this.values=new Set();}
   add(...values){values.forEach(v=>this.values.add(v));}
   remove(...values){values.forEach(v=>this.values.delete(v));}
+  contains(value){return this.values.has(value);}
   toggle(value,force){
     if(force===true){this.values.add(value);return true;}
     if(force===false){this.values.delete(value);return false;}
@@ -97,6 +98,7 @@ function makeHarness(){
     querySelectorAll(selector){
       if(selector==='[data-play-hand-uid]')return document.playHandCards;
       if(selector==='[data-play-where]')return [...nodes.values()].filter(node=>node.dataset&&node.dataset.playWhere);
+      if(selector==='[data-essence-rail]')return document.rails;
       return [];
     }
   };
