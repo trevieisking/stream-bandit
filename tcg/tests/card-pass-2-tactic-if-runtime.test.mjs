@@ -134,3 +134,30 @@ test('Tactic ADD_SHIELD_EACH delegates each resolved target to the existing Shie
   assert.match(block,/addRuntimeShield\(found\.cr, amount\)/);
   assert.doesNotMatch(block,/stone-reversal-seal/);
 });
+
+test('Blackout Pulse is the frozen Tactic IF consumer of APPLY_CONDITION',()=>{
+  const found=[];
+  const walk=(card,steps)=>{
+    for(const step of steps||[]){
+      if(!step||typeof step!=='object') continue;
+      if(step.op==='APPLY_CONDITION') found.push(card.id);
+      walk(card,step.then);
+      walk(card,step.else);
+      walk(card,step.steps);
+    }
+  };
+  for(const card of cards()) if(card.tactic?.program?.steps) walk(card,card.tactic.program.steps);
+  assert.deepEqual(found,['volt-blackout-pulse']);
+});
+
+test('Tactic APPLY_CONDITION delegates mode and mutation to the shared Condition owner',()=>{
+  const start=tacticSource.indexOf('if (op === "APPLY_CONDITION")');
+  const end=tacticSource.indexOf('if (op === "ADD_SHIELD" ||',start);
+  assert.ok(start>=0&&end>start);
+  const block=tacticSource.slice(start,end);
+  assert.match(block,/resolveVar\(vars, step\.target\)/);
+  assert.match(block,/\["apply", "apply_if_empty", "apply_if_empty_or_same", "replace"\]/);
+  assert.match(block,/applyRuntimeCondition\(found\.cr, condition, Number\(state\.turn_seq \|\| 0\), rawMode as ApplyConditionMode\)/);
+  assert.doesNotMatch(block,/volt-blackout-pulse/);
+});
+
