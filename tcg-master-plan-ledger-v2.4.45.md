@@ -440,4 +440,27 @@ Tactic `APPLY_CONDITION` accepts the same generic modes already used by other ru
 
 ## 157 — Blackout Pulse is a consumer, not a runtime owner
 Volt — Blackout Pulse supplies structured IF + `APPLY_CONDITION` data. Its card identity must never appear in the generic Tactic condition adapter.
+## 158 — Tactic OPTIONAL reuses the existing pending-choice and effect-cursor owner
+OPTIONAL is a server-owned Yes/No choice. The selected branch is spliced into the same resumable Tactic cursor; OPTIONAL does not create a second interpreter or continuation model.
+
+## 159 — OPTIONAL else_steps are first-class generic branch semantics
+A No choice may execute structured `else_steps` when supplied. Absence of `else_steps` means an empty No branch. This behavior is data-driven and not tied to False Memory.
+
+## 160 — Control-condition choice compatibility aliases the generic condition-choice owner
+`CHOOSE_AND_CLEAR_CONTROL_CONDITION` is accepted as a compatibility spelling of the shared condition-choice operation with the control slot constrained. Quiet Step remains a consumer, never an owner.
+
+## 161 — Hidden-zone random sampling is non-destructive
+The shared hidden-zone sampler chooses distinct instances without reordering or removing the source zone. Later movement, if any, must be an independent authoritative Card-Zone operation.
+
+## 162 — Hidden-zone sampling RNG belongs to the shared match RNG owner
+Sampling delegates random index selection to the canonical v0.2 randomization engine. Browsers, presentation receipts and card identities never supply the random result.
+
+## 163 — Private hidden-sample provenance stays server-side until movement
+When a Tactic samples a hidden source, its source controller/zone provenance stays in private effect state. A later MOVE_CARDS may use that provenance to move exact sampled UIDs through Card-Zone; the provenance itself is never a player-view permission.
+
+## 164 — MOVE_CARDS honors the structured player controller
+Generic no-selection MOVE_CARDS resolves `step.player` before fallback ownership. Cross-controller effects must not silently move cards into the Tactic owner's zones.
+
+## 165 — False Memory is a consumer, not a random-sampling owner
+False Memory supplies structured opponent-hand sample + later public discard data. It owns no RNG, hidden-information or Card-Zone runtime branch.
 
