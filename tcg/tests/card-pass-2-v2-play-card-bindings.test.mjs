@@ -59,7 +59,7 @@ test('hand intents map only to existing authoritative server owners', () => {
     assert.match(matchActions, new RegExp('action===["\\\']' + action + '["\\\']'));
     assert.match(controller, new RegExp("['\\\"]" + action + "['\\\"]"));
   }
-  assert.match(tacticActions, /\["play_tactic", "resolve_choice"\]/);
+  assert.match(tacticActions, /\["play_tactic", "play_tactic_preview", "resolve_choice"\]/);
   assert.match(controller, /const API_TACTIC = 'tcg-tactic-actions'/);
   assert.match(controller, /runPlayCommand\(\s*API_TACTIC,\s*'play_tactic'/);
 });
