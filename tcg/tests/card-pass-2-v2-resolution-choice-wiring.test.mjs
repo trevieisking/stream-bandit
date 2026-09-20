@@ -70,5 +70,5 @@ test('bounded Battle cards keep the board calm while click opens the readable in
   assert.match(controller, /function renderSelectedCardInspector\(view, canAct\)/);
   assert.match(controller, /inspected\.kind === 'hand'/);
   assert.match(controller, /inspected\.kind === 'field'/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-19-choreography-foundation/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-20-server-attack-choice-route/);
 });
