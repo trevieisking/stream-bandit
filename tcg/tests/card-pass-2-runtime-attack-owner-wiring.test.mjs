@@ -162,6 +162,15 @@ test("structured: field_actions reports exact Attack readiness and enough Essenc
   state.card_index["test-astral-essence"] = {
     card_id: "test-astral-essence",
     definition: { id: "test-astral-essence", name: "Test Astral Essence", kind: "Essence", element: "Astral" },
+    definition_v0_2: {
+      schema: "sb-tcg-card-v0.2",
+      effect_schema: "sb-tcg-effects-v0.2",
+      id: "test-astral-essence",
+      name: "Test Astral Essence",
+      card_family: "Essence",
+      element: "Astral",
+      essence: { subtype: "Basic", provides: [{ element: "Astral", amount: 1 }], listeners: [] },
+    },
   };
 
   const insufficient = await fieldActions(state);
