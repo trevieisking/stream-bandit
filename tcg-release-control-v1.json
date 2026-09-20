@@ -53,8 +53,8 @@
       "tcg-private-alpha-api": {
         "entrypoint": "supabase/functions/tcg-private-alpha-api/index.ts",
         "entrypoint_git_blob_sha": "9cc488f3eb9e33b4f45edfab584cfb21db388406",
-        "file_count": 7,
-        "closure_sha256": "733214c64c00f5184e1663ce7d6524363d7a637e5b2df8c3b0ad91ff83e5ecf6",
+        "file_count": 8,
+        "closure_sha256": "c85bd82c113f820005e3d98475593c9432f38546a9ac1150a9abe224a88290a3",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
@@ -74,11 +74,15 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-flow-engine-v0-2.ts",
-            "git_blob_sha": "6c3bb4c5bd5c38d4c838b764aa153332dcc26972"
+            "git_blob_sha": "39d5a4f7d03d4340404c3e96f017f21d85528123"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-randomization-engine-v0-2.ts",
             "git_blob_sha": "949ed0f99e0b37a39639423ceee60d8b68fab32d"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-turn-history-v0-2.ts",
+            "git_blob_sha": "409177483e637982844620bb850bef6bd84e475f"
           },
           {
             "path": "supabase/functions/tcg-private-alpha-api/index.ts",
@@ -89,8 +93,8 @@
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "f000fcb4ba4c4a6589fd86100ec8e0a5adc72718",
-        "file_count": 86,
-        "closure_sha256": "8cae55bb102265fa82ffa170e90806d69972a428624fbb860fe5e6595ad5727c",
+        "file_count": 87,
+        "closure_sha256": "08a075465b06159d814bdba65a36151570837f5eac2438e3b305cd3a9f75ee9c",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -314,7 +318,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-flow-engine-v0-2.ts",
-            "git_blob_sha": "6c3bb4c5bd5c38d4c838b764aa153332dcc26972"
+            "git_blob_sha": "39d5a4f7d03d4340404c3e96f017f21d85528123"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-flow-resolution-v0-2.ts",
@@ -322,7 +326,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-flow-turn-v0-2.ts",
-            "git_blob_sha": "fb21f49eadfb2a326cc8ec7ecdf515f54fee36a0"
+            "git_blob_sha": "16bb82d954592ace54ec05056ac4e3af3cd406e4"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",
@@ -415,6 +419,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-switch-context-v0-2.ts",
             "git_blob_sha": "d9862606b0add28a5494c9c7853f4ee0c114c406"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-turn-history-v0-2.ts",
+            "git_blob_sha": "409177483e637982844620bb850bef6bd84e475f"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-withdrawal-transaction-v0-2.ts",
