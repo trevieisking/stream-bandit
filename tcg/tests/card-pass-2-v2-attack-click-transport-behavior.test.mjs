@@ -181,6 +181,7 @@ function makeHarness() {
         return 'nonce-' + nonceCounter;
       }
     },
+    URL,
     URLSearchParams,
     setTimeout,
     clearTimeout,
