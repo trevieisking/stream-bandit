@@ -524,3 +524,55 @@ TCG Card Pass 2 Validation **#1138 PASS** on source candidate head `29e3ba5aa025
 The green run includes inherited Attack, Ability, Essence-orb, touch-drag, tap-fallback and runtime/type checks plus new projected-action/Withdraw/Realm/Tactic-preview guards.
 
 The Tactic preview is an Edge API addition, so the branch is not ready for Trevor/Kay retest until the exact green Tactic source is promoted in place with JWT settings preserved. Static/main promotion remains HOLD.
+
+
+## V2.4.57 — Release 1 implementation-before-human-E2E reset
+
+Trevor's 20 September paired Battle review changes the execution order, not the Release 1 scope.
+
+The readable Battle surface is now useful enough to expose real rule/runtime gaps. The next acceptance loop must therefore stop treating Trevor/Kay device play as the immediate next gate while Release 1-used v0.2 capability parity remains incomplete.
+
+### Locked execution rule
+Before the next full Trevor/Kay Battle acceptance pass:
+1. audit all operations/predicates actually used by the frozen 193-card Release 1 registry;
+2. reconcile stale capability labels against current generic owners/tests;
+3. implement every genuinely missing/partial Release 1-used capability through its rightful shared owner;
+4. keep future-only grammar/Fairy/Underworld/product-layer capability out of the Release 1 blocker set;
+5. run exact-head automation after each bounded owner slice;
+6. only then return to the full two-device G5 journey.
+
+Human recordings remain valuable defect evidence, but no human failure may be treated as surprising when the corresponding launch capability is still knowingly incomplete.
+
+### Fresh 193-card capability audit
+The frozen nine Card Pass 2 sources parse to exactly **193 unique cards**, using **61 effect operations** and **97 predicates**.
+
+The current capability manifest contains both genuinely incomplete Release 1-used shapes and stale missing/partial labels whose current owner already exists. Therefore the runtime capability manifest must be reconciled from current source/tests before any missing label is used to justify new code.
+
+### First proven foundational gap — generic predicate tree / IF
+Release 1 contains **29 generic IF instances across 27 cards and all eight launch elements**.
+
+Current source has fragmented predicate evaluation:
+- Event Listener owns a local recursive predicate tree;
+- Attack families own multiple specialized conditional evaluators;
+- the shared Requirement evaluator is intentionally narrow;
+- Tactic still contains compatibility-only IF_CONDITION / IF_VANGUARD_PRINTED_HP_AT_LEAST branches.
+
+A shared generic v0.2 boolean predicate-tree owner did not exist.
+
+### V2.4.57 implementation A — shared predicate-tree foundation
+Added supabase/functions/_shared/tcg-match-predicate-tree-v0-2.ts.
+
+It owns only:
+- deterministic all;
+- deterministic any;
+- deterministic not;
+- fail-closed leaf delegation;
+- bounded recursion.
+
+It deliberately owns **no gameplay predicate semantics**. Attack, Ability, Tactic, listener and other mechanic owners remain responsible for evaluating their own authoritative leaf context.
+
+Dedicated Deno coverage proves nested composition, short-circuit behavior, malformed-tree rejection and depth protection.
+
+TCG Card Pass 2 Validation **#1143 PASS** on exact source head c14cac7fc4bd655f62dc0d180fe594138ebbbfc4.
+
+IF remains **not complete**. The next implementation loop must migrate existing predicate consumers onto the shared tree and then cover every Release 1 IF leaf/context before the capability may move to implemented.
