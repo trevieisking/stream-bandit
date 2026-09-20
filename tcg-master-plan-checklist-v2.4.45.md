@@ -315,3 +315,14 @@
 - [ ] Add later human acceptance: both devices can identify shuffle, deal, draw, discard, Reward selection and condition/Ability changes without relying on raw logs/counters.
 - [ ] Deckout acceptance remains server-owned: after runtime closeout, a pass-only two-user test may verify repeated draws end through the canonical deckout/terminal owner while the visual deck count reaches zero.
 - [ ] These presentation requirements do **not** move the next human Battle gate forward; Release 1 runtime capability closeout remains first.
+
+
+### V2.4.57 implementation H — previous-opponent event Tactic requirement
+- [x] Confirm Stone — Reversal Seal is the only frozen Release 1 Tactic using `event_occurred` with `previous_opponent_turn`.
+- [x] Reuse canonical turn-owner history so extra turns cannot break previous-opponent resolution.
+- [x] Route the Tactic play gate through the shared event-history predicate owner; no `turn_seq - 1` arithmetic and no card-ID exception.
+- [x] Add Deno proof that ownership history 1 → 2 → 1 → 1 resolves Player 1's previous opponent turn as turn 2.
+- [x] Add frozen-registry/source-contract proof for Reversal Seal wiring.
+- [x] Refresh the exact Tactic Edge closure to include shared event-history + turn-history dependencies.
+- [x] TCG Card Pass 2 Validation **#1200 PASS** on exact source/manifest head `9de2db520b593624c0a12e4be6186e23470eaa72`.
+- [x] All 18 frozen Release 1 Tactics with explicit play requirements now have structured requirement ownership.
