@@ -1,4 +1,5 @@
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
+import type { RuntimeV02ConditionCreature } from "./tcg-match-condition-engine-v0-2.ts";
 import { runtimeV02EvaluateAttackIf } from "./tcg-match-attack-if-v0-2.ts";
 import {
   runtimeV02ApplyAtomicSwitch,
@@ -77,6 +78,17 @@ function runtimeInst(value: unknown, code: string): RuntimeInst {
     uid: requiredString(row.uid, `${code}:uid`),
     card_id: requiredString(row.card_id, `${code}:card_id`),
   };
+}
+
+function conditionCreature(value: unknown, code: string): RuntimeV02ConditionCreature {
+  const row = objectRecord(value);
+  if (!row) throw new Error(code);
+  const damage = Number(row.damage ?? 0);
+  const shield = Number(row.shield ?? 0);
+  if (!Number.isFinite(damage) || damage < 0 || !Number.isFinite(shield) || shield < 0) {
+    throw new Error(`${code}:state`);
+  }
+  return row as RuntimeV02ConditionCreature;
 }
 
 function playerForSeat(
@@ -239,9 +251,13 @@ export function runtimeV02CreateAttackReserveSwitchChoice(
   );
 
   const reserve = player.reserve as unknown[];
+  const sourceCreature = conditionCreature(
+    player.vanguard,
+    "tcg_v0_2_attack_switch_source_creature_invalid",
+  );
   const predicateMatched = runtimeV02EvaluateAttackIf(descriptor.when, {
-    source_creature: objectRecord(player.vanguard) ?? { damage: 0, shield: 0 },
-    attack_target: objectRecord(player.vanguard) ?? { damage: 0, shield: 0 },
+    source_creature: sourceCreature,
+    attack_target: sourceCreature,
     self_reserve: reserve,
     opponent_reserve: [],
     variables: {},
