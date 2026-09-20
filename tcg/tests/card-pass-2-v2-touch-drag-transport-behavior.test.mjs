@@ -154,6 +154,9 @@ function makeHarness(){
       if(payload.action==='field_actions'){
         return {ok:true,status:200,async json(){return {ok:true,result:{ability_sources:[],attacks:[],withdraw:{eligible:false}}};}};
       }
+      if(payload.action==='attach_essence_targets'){
+        return {ok:true,status:200,async json(){return {ok:true,result:{ok:true,eligible:true,card_uid:payload.card_uid,legal_targets:[{where:'vanguard',index:null,anchor_uid:'vanguard-anchor'}]}};}};
+      }
       if(payload.action==='attach_essence'){
         return {ok:true,status:200,async json(){return {ok:true,result:{ok:true}};}};
       }
@@ -205,7 +208,7 @@ test('coarse-touch long-press drag submits the same authoritative Essence attach
   assert.deepEqual(JSON.parse(JSON.stringify(attach[0].payload)),{
     action:'attach_essence',
     match_id:'touch-drag-proof',
-    client_nonce:'nonce-2',
+    client_nonce:'nonce-3',
     expected_revision:17,
     card_uid:'essence-hand-1',
     where:'vanguard'
