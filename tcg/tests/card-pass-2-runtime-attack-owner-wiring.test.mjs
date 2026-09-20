@@ -134,6 +134,17 @@ async function attack(state, { random = [], ...body } = {}) {
   return { status: response.status, body: await response.json(), commits: current.commits };
 }
 
+async function concede(state) {
+  const original = structuredClone(state);
+  current = { state, commits: [] };
+  const response = await handler(new Request("http://local.test/tcg-match-actions", {
+    method: "POST", headers: { Authorization: "Bearer local-test", "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "concede", match_id: "test-match", client_nonce: "concede-command", expected_revision: 5 }),
+  }));
+  assert.deepEqual(state, original, "concession must work on a private snapshot until atomic commit");
+  return { status: response.status, body: await response.json(), commits: current.commits };
+}
+
 async function fieldActions(state) {
   const original = structuredClone(state);
   current = { state, commits: [] };
@@ -173,7 +184,46 @@ test("structured: field_actions reports exact Attack readiness and enough Essenc
   const result = await attack(state);
   assert.equal(result.status, 200, JSON.stringify(result.body));
   assert.equal(result.commits.length, 1);
-  assert.equal(result.commits[0].p_new_state.players[2].vanguard.damage, 20);
+  const next = result.commits[0].p_new_state;
+  assert.equal(next.players[2].vanguard.damage, 20, "Attack must place exact damage automatically");
+  assert.equal(next.active_seat, 2, "a completed Attack must end the attacking player's turn");
+  assert.equal(next.turn_seq, 5, "Attack Aftermath must advance the canonical turn sequence");
+  assert.equal(next.players[2].hand.length, 1, "the next player receives the canonical turn-start draw");
+  assert.equal(next.players[2].deck.length, 0);
+});
+
+test("structured: lethal Attack removes the Creature and queues the opponent Reward before promotion", async () => {
+  const state = fixture();
+  state.players[2].vanguard.damage = 80;
+  const result = await attack(state);
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  assert.equal(result.commits.length, 1);
+  const next = result.commits[0].p_new_state;
+  assert.equal(next.phase, "resolution");
+  assert.equal(next.players[2].vanguard, null, "lethal damage must remove the defeated Vanguard");
+  assert.deepEqual(next.pending_resolutions.map(({ kind, seat, count }) => ({ kind, seat, count: count ?? null })), [
+    { kind: "take_reward", seat: 1, count: 1 },
+    { kind: "promote", seat: 2, count: null },
+  ]);
+  assert.equal(next.active_seat, 1, "turn must not advance until Reward/promotion resolution completes");
+  assert.equal(next.resume_after_resolution, "aftermath");
+});
+
+test("explicit concession makes the quitter lose and the opponent win without pretending to play another action", async () => {
+  const state = fixture();
+  const beforeRewards = structuredClone(state.players[1].rewards);
+  const beforeDeck = structuredClone(state.players[1].deck);
+  const result = await concede(state);
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  assert.equal(result.commits.length, 1);
+  const commit = result.commits[0];
+  const next = commit.p_new_state;
+  assert.equal(commit.p_event_type, "concede");
+  assert.equal(next.phase, "complete");
+  assert.deepEqual(next.result, { winner_seat: 2, reasons: ["opponent_conceded"] });
+  assert.deepEqual(next.players[1].rewards, beforeRewards);
+  assert.deepEqual(next.players[1].deck, beforeDeck);
+  assert.deepEqual(next.pending_resolutions, []);
 });
 
 for (const structured of [true, false]) {
