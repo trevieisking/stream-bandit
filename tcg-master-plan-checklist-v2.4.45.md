@@ -264,3 +264,26 @@
 - [ ] Trevor/Kay PASS: active Realm stays visibly named and opens inspection.
 - [ ] Trevor/Kay PASS: own Vanguard inspector exposes Withdraw; exact Essence payment + Reserve target completes one authoritative switch.
 - [ ] Main/static live promotion remains HOLD until V2.4.52–V2.4.56 human acceptance is complete.
+
+
+## V2.4.57 — complete Release 1 runtime before next full Battle acceptance
+- [x] Change execution order: do not make Trevor/Kay full Battle acceptance the next target while Release 1-used runtime capability parity is knowingly incomplete.
+- [x] Preserve Release 1 scope: 8 launch elements / 193 identities / 8 starters; Fairy, Underworld and product-layer future work remain outside this runtime-completion gate.
+- [x] Parse the frozen nine Card Pass 2 sources and confirm exactly **193 unique cards**.
+- [x] Inventory actual Release 1 structured usage: **61 operations / 97 predicates**.
+- [x] Prove capability manifest contains stale labels as well as genuine gaps; do not blindly implement by label.
+- [x] Identify generic IF as a genuine foundational gap: **29 instances / 27 cards / all 8 elements**.
+- [x] Prove current predicate logic is fragmented across Event Listener, Attack special evaluators, narrow Requirement evaluation and Tactic compatibility branches.
+- [x] Add one shared v0.2 predicate-tree owner for all / any / not / leaf delegation with fail-closed validation.
+- [x] Add deterministic Deno tests for nested evaluation, short-circuiting, malformed shapes and bounded recursion.
+- [x] Exact-head TCG Card Pass 2 Validation **#1143 PASS** for predicate-tree foundation.
+- [ ] Migrate existing Event Listener boolean composition onto the shared predicate-tree owner without changing leaf semantics.
+- [ ] Build/reuse shared Release 1 predicate leaf semantics where multiple runtime families need the same meaning.
+- [ ] Wire generic IF through Tactic execution for every Release 1 Tactic IF shape.
+- [ ] Wire generic IF through Attack execution for every Release 1 Attack IF shape.
+- [ ] Wire generic IF through Active/triggered Ability execution for every Release 1 Ability IF shape.
+- [ ] Prove all 29 Release 1 IF instances are executable without printed-English/card-ID fallback.
+- [ ] Reconcile IF + its proven Release 1 predicate classifications in tcg-runtime-capabilities-v0.2.json.
+- [ ] Continue operation/predicate audit until **every Release 1-used partial/missing capability** is either implemented or proven already implemented by the rightful owner.
+- [ ] Only after Release 1 runtime capability closeout return to Trevor/Kay full two-device G5 Battle acceptance.
+- [ ] Main/static live promotion remains HOLD until runtime closeout + G5 + final release gates.
