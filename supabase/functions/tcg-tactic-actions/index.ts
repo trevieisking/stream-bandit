@@ -326,6 +326,7 @@ function unsupportedOps(steps: any[]): string[] {
       if (op === "ADD_CONDITION_IMMUNITY" && !["end_of_turn", "aftermath"].includes(String(step.expires || "aftermath"))) unsupported.add("ADD_CONDITION_IMMUNITY_EXPIRY");
       if (op === "ATTACH_ESSENCE_FROM_ZONE" && String(step.from || "") !== "discard") unsupported.add("ATTACH_ESSENCE_FROM_ZONE_SOURCE");
       if (Array.isArray(step?.steps)) walk(step.steps);
+      if (Array.isArray(step?.else_steps)) walk(step.else_steps);
       if (Array.isArray(step?.then)) walk(step.then);
       if (Array.isArray(step?.else)) walk(step.else);
     }
@@ -344,6 +345,7 @@ function requiredEffectResourcesAvailable(state: any, ownerSeat: number, steps: 
         if (cardOptions(state, zone, step.selection?.filters, ownerSeat).length < range.min) ok = false;
       }
       if (Array.isArray(step?.steps)) walk(step.steps);
+      if (Array.isArray(step?.else_steps)) walk(step.else_steps);
       if (Array.isArray(step?.then)) walk(step.then);
       if (Array.isArray(step?.else)) walk(step.else);
     }
@@ -1064,19 +1066,21 @@ function executeUntilChoice(state: any) {
       }
       continue;
     }
-    if (op === "CHOOSE_AND_CLEAR_CONDITION") {
+    if (op === "CHOOSE_AND_CLEAR_CONDITION" || op === "CHOOSE_AND_CLEAR_CONTROL_CONDITION") {
       const ref = resolveVar(vars, step.target) as CreatureRef;
       const found = findCreature(state, ref);
       if (!found) throw new Error("condition_target_missing");
       let allowed = activeConditions(found.cr);
       if (Array.isArray(step.allowed)) allowed = allowed.filter((condition) => step.allowed.includes(condition));
-      if (step.condition_slot === "control") allowed = allowed.filter((condition) => conditions(found.cr).control === condition);
+      if (op === "CHOOSE_AND_CLEAR_CONTROL_CONDITION" || step.condition_slot === "control") {
+        allowed = allowed.filter((condition) => conditions(found.cr).control === condition);
+      }
       const options = allowed.map((condition) => ({
         id: `condition:${condition}`,
         label: condition,
         data: { condition },
       }));
-      const bounds = choiceBounds(step.count, options.length, false);
+      const bounds = choiceBounds(step.count == null ? 1 : step.count, options.length, false);
       setPending(state, effect, {
         seat: ownerSeat,
         kind: "clear_condition",
@@ -1201,6 +1205,7 @@ function executeUntilChoice(state: any) {
     if (op === "OPTIONAL") {
       const chooserSeat = playerSeat(ownerSeat, step.player || "self", vars);
       const optionalSteps = Array.isArray(step.steps) ? step.steps : [];
+      const optionalElseSteps = Array.isArray(step.else_steps) ? step.else_steps : [];
       setPending(state, effect, {
         seat: chooserSeat,
         kind: "optional",
@@ -1212,7 +1217,11 @@ function executeUntilChoice(state: any) {
           { id: "optional:yes", label: "Yes", data: { use: true } },
           { id: "optional:no", label: "No", data: { use: false } },
         ],
-        context: { apply: "optional_steps", steps: optionalSteps },
+        context: {
+          apply: "optional_steps",
+          steps: optionalSteps,
+          else_steps: optionalElseSteps,
+        },
       });
       return;
     }
@@ -1562,7 +1571,8 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
     }
   } else if (apply === "optional_steps") {
     const use = selected[0]?.data?.use === true;
-    const chosen = use ? structuredClone((context.steps as any[]) || []) : [];
+    const branch = use ? context.steps : context.else_steps;
+    const chosen = structuredClone((Array.isArray(branch) ? branch : []) as any[]);
     effect.steps.splice(effect.cursor, 1, ...chosen);
     delete state.pending_choice;
     return;
