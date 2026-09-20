@@ -35,8 +35,13 @@
       "keyboard_focus",
       "text_legality_reason"
     ],
-    "touch_drag_transport": "pointer_events_or_equivalent_touch_safe_gesture_not_native_html5_only",
-    "touch_tap_fallback_required": true
+    "touch_drag_transport": "touch_safe_hold_and_drag_gesture_with_existing_server_actions",
+    "touch_tap_fallback_required": true,
+    "touch_drag_activation": "short_hold_then_drag; movement_before_activation_cancels_to_preserve_scrolling",
+    "touch_drag_setup_owner": "runSetupPlace",
+    "touch_drag_play_owner": "runPlayHandTarget",
+    "mobile_rules_engine": false,
+    "tap_fallback_preserved": true
   },
   "required_flows": [
     {
