@@ -641,3 +641,23 @@ The shared Requirement evaluator now owns occupied Reserve count versus threshol
 TCG Card Pass 2 Validation **#1171 PASS** on exact fingerprinted source head 59d388ae6e9c784324cd33aa18e38a1a8e770fa9.
 
 The remaining Tactic play-requirement families are 12 legal_card_available uses and 1 event_occurred use.
+
+
+## V2.4.57 implementation F — Release 1 legal-card Tactic requirements
+
+Twelve frozen Release 1 Tactics use legal_card_available play requirements.
+
+The shared Requirement evaluator now owns validation of the predicate envelope plus the rule that at least one legal candidate must exist. Tactic continues to use its existing cardOptions and creatureOptions selectors to determine the authoritative candidates for the requested controller, zone and filters.
+
+The Creature selector was extended only for filter vocabulary already present in frozen Release 1 play requirements:
+- card_family Creature;
+- damaged;
+- conditions_any;
+- condition_any_of;
+- boolean has_any_condition.
+
+Discard-zone Basic Essence checks continue through the existing card selector.
+
+TCG Card Pass 2 Validation **#1179 PASS** on exact fingerprinted source head 0ee6c1dd96660cfde3927b339cdcf5b9b1910839.
+
+Seventeen of the eighteen frozen Tactics with explicit play requirements are now covered by their current structured requirement family. The final one is Stone — Reversal Seal using event_occurred for a creature defeat during the previous opponent turn.
