@@ -7,10 +7,7 @@ import {
   type RuntimeCreature,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
-import {
-  evaluateRuntimeV02SourceDamagedRequirement,
-  evaluateRuntimeV02SourceHasShieldAtLeastRequirement,
-} from "./tcg-match-requirement-evaluator-v0-2.ts";
+import { runtimeV02EvaluateAttackIf } from "./tcg-match-attack-if-v0-2.ts";
 import {
   recordRuntimeV02AttackHealEachPackets,
   recordRuntimeV02AttackSelfHealPackets,
@@ -419,16 +416,6 @@ function selfHealPredicate(
   throw new Error(`tcg_v0_2_attack_self_heal_predicate_unsupported:${attackId}:${index}:${predicate}`);
 }
 
-function selfHealConditionMatches(
-  when: RuntimeV02AttackSelfHealPredicate,
-  sourceCreature: RuntimeCreature,
-): boolean {
-  if (when.predicate === "source_damaged") {
-    return evaluateRuntimeV02SourceDamagedRequirement(sourceCreature, when).matched;
-  }
-  return evaluateRuntimeV02SourceHasShieldAtLeastRequirement(sourceCreature, when).matched;
-}
-
 function selfHealPacketContext(
   state: Record<string, unknown>,
   instanceOrId: string | { card_id?: unknown } | null | undefined,
@@ -558,7 +545,16 @@ export function structuredRuntimeAfterDamageSelfHealEffects(
 
   const resolved = normalized.map((raw) => {
     const step = raw!;
-    const conditionMet = selfHealConditionMatches(step.when, sourceCreature);
+    const conditionMet = runtimeV02EvaluateAttackIf(step.when, {
+      source_creature: sourceCreature,
+      attack_target: sourceCreature,
+      self_reserve: [],
+      opponent_reserve: [],
+      variables: {},
+      current_action_events: {},
+      target_remains_in_play_after_damage: false,
+      card_matches: () => false,
+    });
     const actualHeal = conditionMet ? healRuntimeDamage(sourceCreature, step.amount) : 0;
     return {
       target: "$source_creature" as const,
@@ -798,7 +794,17 @@ export function structuredRuntimeAfterDamageHealEachEffects(
 
   const effects = normalized.map((raw) => {
     const step = raw!;
-    const conditionMet = occupied.length >= step.when.count;
+    const predicateSource = packetContext?.source_creature ?? ({ damage: 0, shield: 0 } as RuntimeCreature);
+    const conditionMet = runtimeV02EvaluateAttackIf(step.when, {
+      source_creature: predicateSource,
+      attack_target: predicateSource,
+      self_reserve: friendlyReserve,
+      opponent_reserve: [],
+      variables: {},
+      current_action_events: {},
+      target_remains_in_play_after_damage: false,
+      card_matches: () => false,
+    });
     const targets = conditionMet
       ? occupied.map(({ target, reserveIndex }) => ({
         reserve_index: reserveIndex,
