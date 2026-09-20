@@ -205,8 +205,8 @@
 - [x] Implement compact hand-card rendering plus one shared full inspector for hand/field cards.
 - [x] Implement one-viewport phone tabletop composition with four Reserve slots, Vanguard, side piles, battle-flow strip and horizontal hand visible without page-height expansion.
 - [x] Keep attached Essence rail / HP / live status visible on compact occupied field cards.
-- [ ] Exact-head TCG Card Pass 2 Validation PASS after V2.4.54 implementation/docs synchronization.
-- [ ] Deploy only the proven Match Flow Turn phase-return repair to the existing live `tcg-match-actions` function after exact-head evidence is green.
+- [x] Exact-head TCG Card Pass 2 Validation PASS after V2.4.54 implementation/docs synchronization — **#1091 PASS**.
+- [x] Deploy only the proven Match Flow Turn phase-return repair to the existing live `tcg-match-actions` function after exact-head evidence is green — **v9 ACTIVE**, JWT preserved.
 - [ ] Trevor desktop PASS at default/100% zoom: whole battlefield + hand visible; no browser zoom-out required.
 - [ ] Trevor desktop PASS: click field/hand card -> readable inspector; source card stays anchored; drag/drop still works.
 - [ ] Kay phone PASS: whole battlefield + bottom hand visible in one viewport; hand scrolls left/right.
@@ -229,7 +229,7 @@
 - [x] Make card-backed **Battle Pass** reward samples inspectable through the shared read-only card inspector.
 - [x] Keep non-Battle card inspection presentation-only: no fabricated deck ownership, collection ownership, Battle Pass progression, entitlement or economy authority.
 - [x] Add automated coverage for shared inspect mode, product-page inspection, bounded field-card scale and the bottom hand peek/fan rail.
-- [ ] Exact-head TCG Card Pass 2 Validation PASS after V2.4.55 implementation/docs synchronization.
+- [x] Exact-head TCG Card Pass 2 Validation PASS after V2.4.55 implementation/docs synchronization — source candidate head `33e68f158e309a442ca1c6ab1d08d319cddfd9e9`, **#1116 PASS**.
 - [ ] Trevor desktop PASS at default/100% zoom: Vanguard/Reserve cards no longer dominate the table and the larger hand visibly peeks below the bottom rail.
 - [ ] Trevor desktop PASS: horizontal hand browse + click-to-inspect + drag/drop all remain usable.
 - [ ] Kay phone PASS: whole battlefield remains visible while larger hand cards peek below the bottom edge and swipe left/right.
