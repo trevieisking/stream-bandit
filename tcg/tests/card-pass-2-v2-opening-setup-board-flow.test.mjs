@@ -42,7 +42,8 @@ test('phone battlefield gives the field full width and does not cover it with st
 });
 
 test('desktop battlefield gives Vanguard and Reserves independent height-bounded rows', () => {
-  assert.match(battle, /@media\(min-width:641px\) and \(hover:hover\) and \(pointer:fine\)/);
+  assert.match(battle, /@media\(min-width:641px\)\{/);
+  assert.doesNotMatch(battle, /@media\(min-width:641px\) and \(hover:hover\) and \(pointer:fine\)/);
   assert.match(battle, /grid-template-rows:auto minmax\(0,1fr\) minmax\(68px,auto\) minmax\(0,1fr\) clamp\(132px,17\.2dvh,166px\)/);
   assert.match(battle, /\.sb-field-core\{[\s\S]*?grid-template-rows:minmax\(0,1fr\) minmax\(0,1\.18fr\)/);
   assert.match(battle, /\.sb-half-you \.sb-field-core\{[\s\S]*?grid-template-rows:minmax\(0,1\.18fr\) minmax\(0,1fr\)/);
