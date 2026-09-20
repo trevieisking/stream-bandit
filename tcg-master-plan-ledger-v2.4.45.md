@@ -500,3 +500,15 @@ The existing direct structured Condition owner has first claim. The conditional 
 ## 178 — Chainstorm consumes shared declaration evidence
 Chainstorm's event_occurred(current_action) predicate reads the action-local event map created by the generic declaration owner. Its card identity does not own event detection.
 
+## 179 — Bounded Attack effect owners must consume shared IF semantics
+A specialized Attack mutation owner may remain narrow, but its Release 1 IF decision must delegate to the shared Attack IF evaluator once that predicate family is supported. Owner-local copies of reserve-count, source-damage, source-Shield, target-Condition or card-match semantics are not authoritative.
+
+## 180 — Predicate migration does not transfer mutation ownership
+Moving an IF decision to the shared evaluator does not move Heal, HEAL_EACH, Deck-Discard, Card-Zone or listener authority. The established mutation/lifecycle owner remains responsible for the selected branch.
+
+## 181 — Deck-discard IF receives authoritative target state, not a caller boolean
+The Deck-Discard owner evaluates `target_has_any_condition` from the actual Attack target Creature through shared Attack IF/Condition state. Dispatchers must not precompute and pass an alternate boolean interpretation.
+
+## 182 — Server-only card inspection precedes shared card_matches and Card-Zone movement
+For bounded top-deck Attack flows, hidden inspection remains server-side, `card_matches` is evaluated through shared Attack IF with caller-owned card-filter semantics, and any resulting movement remains Card-Zone-owned.
+
