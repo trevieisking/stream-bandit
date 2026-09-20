@@ -143,11 +143,11 @@
 - [x] Automated concession journey proves quitter loss / opponent win and no unrelated state mutation.
 - [x] Automated active Ability projection proves usable -> glow eligible -> use -> projection disappears.
 - [x] Exact-head TCG Card Pass 2 Validation PASS after V2.4.52.
-- [ ] Trevor/Kay real two-user PASS: at least one Attack visibly places damage.
-- [ ] Trevor/Kay real two-user PASS: lethal damage visibly triggers Reward handling and subsequent state.
+- [x] Trevor/Kay real two-user PASS: at least one Attack visibly places damage.
+- [ ] Trevor/Kay real two-user PASS: lethal damage visibly triggers Reward handling and subsequent state. **Human evidence already proves the lethal KO itself and entry into Reward resolution; face-down Reward selection -> hand -> promotion/turn continuation still requires retest.**
 - [ ] Trevor/Kay real two-user PASS: Ability usable glow appears and disappears after activation.
 - [ ] Trevor/Kay real two-user PASS: phone tap Essence attachment succeeds without drag.
-- [ ] Trevor/Kay real two-user PASS: Quit Match gives quitter DEFEAT, opponent VICTORY, then both can return to fresh matchmaking.
+- [x] Trevor/Kay real two-user PASS: Quit Match gives quitter DEFEAT, opponent VICTORY, then both can return to fresh matchmaking.
 - [ ] Promotion decision only after the real two-user post-Attack gate is complete.
 
 
@@ -175,6 +175,9 @@
 - [x] Automated test: Attack-cost orb presentation and attached-resource orb presentation use the same canonical element identities.
 - [x] Automated test: coarse-touch drag uses the same intent/action payload as tap mode and contains no duplicate gameplay legality.
 - [x] Exact-head TCG Card Pass 2 Validation PASS after V2.4.53 implementation.
+- [x] Clarify Attack timing in card presentation: **Turn ends after full resolution**. A non-lethal Attack proceeds straight through Aftermath/turn advance; a lethal Attack pauses that continuation for Defeat -> Reward -> required promotion, then resumes the same end-of-turn path.
+- [x] Keep server-blocked Attacks inspectable without dispatch: clicking a blocked Attack explains the authoritative reason (including insufficient matching Essence) and never sends an Attack command.
+- [x] Keep the battlefield Vanguard anchored while opening a separate readable desktop card inspector; selecting a Creature must not physically relocate/jump the source card.
 - [ ] Trevor desktop PASS: drag/drop still works and board geometry is unchanged.
 - [ ] Kay phone PASS: finger drag/drop works for a playable hand card to a legal destination.
 - [ ] Kay phone PASS: tap-select -> destination still works as fallback.
