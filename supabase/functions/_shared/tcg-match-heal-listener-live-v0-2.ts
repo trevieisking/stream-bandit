@@ -24,6 +24,7 @@ export type RuntimeV02AbilityHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02MovementHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02ResolutionMovementHealListenerFlow = RuntimeV02HealListenerFlow;
 export type RuntimeV02TacticHealListenerFlow = RuntimeV02HealListenerFlow;
+export type RuntimeV02ActiveAbilityEffectHealListenerFlow = RuntimeV02HealListenerFlow;
 
 export type RuntimeV02AttackHealListenerChoiceResolution =
   RuntimeV02HealListenerChoiceResolution & {
@@ -55,12 +56,19 @@ export type RuntimeV02TacticHealListenerChoiceResolution =
     resume_seat: 1 | 2 | null;
   };
 
+export type RuntimeV02ActiveAbilityEffectHealListenerChoiceResolution =
+  RuntimeV02HealListenerChoiceResolution & {
+    resume_ready: boolean;
+    resume_seat: 1 | 2 | null;
+  };
+
 type RuntimeV02HealListenerResumeKind =
   | "scan_defeats_then_aftermath"
   | "scan_defeats_then_play"
   | "resume_resolution_queue"
   | "return_to_play"
-  | "resume_tactic_effect";
+  | "resume_tactic_effect"
+  | "resume_active_ability_effect";
 
 type RuntimeV02HealListenerResume = {
   kind: RuntimeV02HealListenerResumeKind;
@@ -222,6 +230,25 @@ export function runtimeV02BeginAbilityHealListenerContinuation(
 }
 
 /**
+ * Starts the canonical heal-listener queue for packets emitted by a nested
+ * listener while an active Ability program still has authoritative steps to
+ * resume. Completion returns to the active-Ability continuation owner, not
+ * directly to ordinary play.
+ */
+export function runtimeV02BeginActiveAbilityEffectHealListenerContinuation(
+  state: Record<string, unknown>,
+  packetIds: string[],
+  abilitySeat: 1 | 2,
+): RuntimeV02ActiveAbilityEffectHealListenerFlow {
+  return beginHealListenerContinuation(
+    state,
+    packetIds,
+    abilitySeat,
+    "resume_active_ability_effect",
+  );
+}
+
+/**
  * Starts the canonical after_heal_packet listener continuation for a heal that
  * was emitted while resolving a Vanguard/Reserve movement listener. Movement
  * itself never owns turn advance or Aftermath: once the canonical heal queue is
@@ -317,6 +344,21 @@ export function runtimeV02ResolveAbilityHealListenerChoice(
     choiceId,
     choiceIds,
     "return_to_play",
+  );
+}
+
+export function runtimeV02ResolveActiveAbilityEffectHealListenerChoice(
+  state: Record<string, unknown>,
+  actorSeat: 1 | 2,
+  choiceId: string,
+  choiceIds: string[],
+): RuntimeV02ActiveAbilityEffectHealListenerChoiceResolution {
+  return resolveHealListenerChoiceWithResume(
+    state,
+    actorSeat,
+    choiceId,
+    choiceIds,
+    "resume_active_ability_effect",
   );
 }
 
