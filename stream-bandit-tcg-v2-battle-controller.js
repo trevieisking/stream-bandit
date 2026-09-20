@@ -424,6 +424,26 @@
       '</div>';
   }
 
+  function attackStatesFor(canAct) {
+    const fallbackReason = canAct ? 'attack_readiness_unavailable' : 'not_active_player';
+    const out = {
+      1: { eligible: false, reason: fallbackReason },
+      2: { eligible: false, reason: fallbackReason }
+    };
+    const rows = state.fieldActions && Array.isArray(state.fieldActions.attacks)
+      ? state.fieldActions.attacks
+      : [];
+    for (const row of rows) {
+      const slot = Number(row && row.slot);
+      if (slot !== 1 && slot !== 2) continue;
+      out[slot] = {
+        eligible: row && row.eligible === true,
+        reason: row && row.reason ? String(row.reason) : null
+      };
+    }
+    return out;
+  }
+
   function creatureCard(creature, options) {
     const opts = options || {};
     if (!creature) return '<div class="sb-zone-empty">Empty</div>';
@@ -440,8 +460,7 @@
       abilityWhere: opts.where || '',
       abilityIndex: opts.index,
       interactiveAttacks,
-      disabledAttackSlots: interactiveAttacks && !opts.canAct ? [1, 2] : [],
-      readyAttackSlots: opts.canAct && interactiveAttacks ? [1, 2] : []
+      attackStates: interactiveAttacks ? attackStatesFor(!!opts.canAct) : null
     });
     const setupReturn = opts.setupReturn
       ? '<button type="button" class="sb-card-action setup-return" data-setup-return="' + esc(opts.setupReturn.where) + '" data-setup-index="' + esc(opts.setupReturn.index == null ? '' : opts.setupReturn.index) + '"><span><strong>Return to hand</strong><small>Adjust setup</small></span><span>↩</span></button>'
