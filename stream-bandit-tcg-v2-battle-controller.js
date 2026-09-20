@@ -772,6 +772,17 @@
     bindPhaseControls();
   }
 
+  function syncPlayTargetDom() {
+    document.querySelectorAll('[data-play-where]').forEach((target) => {
+      const where = String(target.dataset.playWhere || '');
+      const raw = target.dataset.playIndex;
+      const index = raw === '' || raw == null ? null : Number(raw);
+      const legal = playTargetLegal(where, index, ownCreatureAt(where, index));
+      target.classList.toggle('sb-play-destination', !!state.selectedHandUid);
+      target.classList.toggle('is-play-legal', legal);
+    });
+  }
+
   function bindCardControls() {
     document.querySelectorAll('[data-card-anchor]').forEach((card) => {
       const select = () => {
@@ -797,6 +808,88 @@
       button.addEventListener('click', async (event) => {
         event.stopPropagation();
         await runAttackIntent(Number(button.dataset.attackSlot));
+      });
+    });
+
+    document.querySelectorAll('[data-play-hand-uid]').forEach((card) => {
+      const select = () => {
+        if (state.busy) return;
+        const uid = String(card.dataset.playHandUid || '');
+        state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
+        state.selectedAnchorUid = '';
+        state.overlayKey = '';
+        render();
+        if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches) {
+          window.requestAnimationFrame(() => {
+            const intent = selectedHandIntent();
+            const target = intent === 'play_creature' ? $('youReserve') : $('youVanguardSlot');
+            if (target && typeof target.scrollIntoView === 'function') {
+              target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          });
+        }
+      };
+
+      card.addEventListener('click', select);
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          select();
+        }
+      });
+      card.addEventListener('dragstart', (event) => {
+        if (state.busy) {
+          event.preventDefault();
+          return;
+        }
+        state.selectedHandUid = String(card.dataset.playHandUid || '');
+        state.selectedAnchorUid = '';
+        state.overlayKey = '';
+        card.classList.add('is-dragging', 'is-play-selected');
+        if (event.dataTransfer) {
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', state.selectedHandUid);
+          event.dataTransfer.setData('application/x-stream-bandit-card', state.selectedHandUid);
+        }
+        syncPlayTargetDom();
+      });
+      card.addEventListener('dragend', () => {
+        card.classList.remove('is-dragging');
+        syncPlayTargetDom();
+      });
+    });
+
+    document.querySelectorAll('[data-play-where]').forEach((target) => {
+      const where = String(target.dataset.playWhere || '');
+      const raw = target.dataset.playIndex;
+      const index = raw === '' || raw == null ? null : Number(raw);
+
+      target.addEventListener('dragover', (event) => {
+        if (!playTargetLegal(where, index, ownCreatureAt(where, index))) return;
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+      });
+
+      target.addEventListener('drop', async (event) => {
+        event.preventDefault();
+        if (state.busy) return;
+        const uid = event.dataTransfer
+          ? String(event.dataTransfer.getData('application/x-stream-bandit-card') || event.dataTransfer.getData('text/plain') || '')
+          : '';
+        if (uid) state.selectedHandUid = uid;
+        if (!playTargetLegal(where, index, ownCreatureAt(where, index))) {
+          state.overlayKey = '';
+          render();
+          return;
+        }
+        await runPlayHandTarget(where, index);
+      });
+
+      target.addEventListener('click', async (event) => {
+        if (!state.selectedHandUid || state.busy) return;
+        if (event.target.closest('[data-card-intent],[data-setup-return]')) return;
+        if (!playTargetLegal(where, index, ownCreatureAt(where, index))) return;
+        await runPlayHandTarget(where, index);
       });
     });
   }
@@ -858,6 +951,39 @@
     document.querySelectorAll('[data-setup-ready]').forEach((button) => {
       button.addEventListener('click', async () => {
         if (!button.disabled) await runSetupReady();
+      });
+    });
+
+    document.querySelectorAll('[data-play-direct]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        if (!button.disabled) await runDirectHandPlay(String(button.dataset.playDirect || ''));
+      });
+    });
+
+    document.querySelectorAll('[data-server-choice-option]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const view = viewState();
+        const routed = currentServerChoice(view);
+        const choice = routed && routed.choice;
+        if (!choice || choice.waiting) return;
+        const id = String(button.dataset.serverChoiceOption || '');
+        const current = [...state.selectedChoiceIds];
+        const existing = current.indexOf(id);
+        if (existing >= 0) current.splice(existing, 1);
+        else {
+          const max = Math.max(1, Number(choice.max || 1));
+          if (max === 1) current.splice(0, current.length, id);
+          else if (current.length < max) current.push(id);
+        }
+        state.selectedChoiceIds = current;
+        state.overlayKey = '';
+        render();
+      });
+    });
+
+    document.querySelectorAll('[data-server-choice-confirm]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        if (!button.disabled) await runServerChoice();
       });
     });
 
