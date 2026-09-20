@@ -135,3 +135,25 @@ The canonical card face is also the control surface. Active Abilities pulse/glow
 
 ## 061 — Orbitortoise layout applies globally
 The Trevor-supplied Orbitortoise image remains the reference structure for all card types/surfaces: identity/HP/type header, large artwork window, readable Ability/Attack/effect area and lower metadata/footer. Missing art uses the same finished frame with an Artwork Pending window so every identity is game-ready before its final PNG arrives.
+
+
+## 062 — Attached Essence has a visible element-orb rail
+Every battlefield Creature exposes its authoritative attached Essence as tiny colored sphere/orb/pip markers attached visually to that Creature. The display exists so players can read resource availability without remembering a hidden count. It is derived from authoritative attached Essence plus structured `provides`; it does not create client-side resource authority.
+
+## 063 — Essence orbs represent effective payable units
+The resource rail represents effective Essence units available from attached sources. Element color/glyph comes from the canonical Stream Bandit element identity. Multi-unit providers produce the equivalent visible quantity; constrained layouts may group identical units as `orb ×N` but may not hide the total. The Attack's printed/canonical cost remains visible beside the Attack for direct visual comparison.
+
+## 064 — Essence removal removes its visual resource immediately
+Discard, expiry, movement, removal or any authoritative loss of attached Essence removes the corresponding orb contribution on the next authoritative Battle render. The browser may not keep stale attachment pips after the server state changes.
+
+## 065 — Element color never stands alone
+Astral, Ember, Gale, Grove, Shade, Stone, Tide and Volt use their canonical element palette, but every Essence orb also exposes the element glyph/mark and accessible text. Resource readability may not depend on color vision alone.
+
+## 066 — V2.4.53 supersedes desktop-only drag in ledger 060
+Ledger 060 remains historical evidence for the tap fallback, but its statement that drag is desktop-only is superseded. Phone/tablet now require finger drag/drop **and** retain tap-select -> highlighted destination. Both paths submit the same authoritative server command and legality remains server-owned.
+
+## 067 — Touch drag requires pointer-safe transport
+The current coarse-touch Battle client sets playable hand cards to `draggable="false"`, which explains Kay's observed inability to drag on phone. Mobile parity must use a Pointer Events/touch-safe gesture path rather than depending exclusively on native HTML5 drag/drop. It must preserve page scrolling outside an active card drag and must not change the accepted board geometry.
+
+## 068 — Board decoration is a final presentation pass
+Trevor/Kay have accepted the Battle layout geometry. Realm/background/table decoration is deliberately deferred until the playable interaction chain has passed: card readability -> attachment -> Attack/damage -> defeat/Reward -> result/quit plus phone drag/drop. Decoration may not alter rules, slots, zones, touch targets or server ownership.
