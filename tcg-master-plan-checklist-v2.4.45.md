@@ -155,7 +155,7 @@
 - [x] Lock attached Essence as tiny colored sphere/orb/pip markers on the Creature in Battle.
 - [x] Lock orb identity to canonical Astral/Ember/Gale/Grove/Shade/Stone/Tide/Volt element palette plus element glyph/accessibility label.
 - [x] Lock orb quantity to authoritative effective payable Essence units from attached sources / structured `provides`, never a browser-owned counter.
-- [x] Lock overflow compression: repeated units of one element become one element-colored orb with the numeric count **inside the orb** (for example Astral `12`).
+- [x] Lock overflow compression to card bounds only: individual orbs remain until the Essence rail would overflow its allocated card area; then each element becomes one counted orb with that element's live numeric total inside it. No fixed Essence count triggers compression.
 - [x] Lock orb removal to authoritative discard/removal/movement/expiry of the attached source.
 - [x] Lock Attack cost display beside Attack so required colored Essence can be compared directly with attached colored Essence.
 - [x] Preserve the existing server-owned Essence/Payment/Attack engines; visual orbs are presentation only.
@@ -165,12 +165,13 @@
 - [x] Freeze Trevor/Kay accepted Battle board geometry while adding interaction parity.
 - [x] Defer decorative board/realm polish until core playable cross-device Battle acceptance is complete.
 - [x] Reconfirm priority: canonical card visuals + real Attack/damage lifecycle remain ahead of final board decoration; counted Essence orbs are part of that playable-card readability work.
+- [x] Clarify that any numeric examples used during design discussion are illustrative only; the compression trigger is available card space, not a particular Essence count.
 - [ ] Implement authoritative attached-Essence orb rail on own and opponent Creature cards without leaking private information.
 - [ ] Implement effective-unit/multi-element grouping from canonical structured Essence `provides`, using one counted orb per element when the individual-orb rail would crowd the card.
 - [ ] Implement phone/tablet pointer-driven hand-card drag/drop for setup/play/evolve/Essence/Relic legal destinations.
 - [ ] Keep tap-select -> tap highlighted destination fully working after touch-drag implementation.
-- [ ] Automated test: attaching Essence adds the correct element orb(s); repeated same-element units collapse to one numbered orb when space requires it; discard/removal updates/removes the count.
-- [ ] Automated test: mixed-element overflow stays separated by element (for example Astral `7` + Tide `5`) rather than collapsing to one ambiguous total.
+- [ ] Automated test: attaching Essence adds the correct element orb(s); compression starts only when the rendered rail would exceed its allocated card bounds; discard/removal can expand or reduce the rail again from authoritative state.
+- [ ] Automated test: when compressed, every Essence type keeps its own counted orb and numeric total; different element totals are never merged.
 - [ ] Automated test: Attack-cost orb presentation and attached-resource orb presentation use the same canonical element identities.
 - [ ] Automated test: coarse-touch drag uses the same intent/action payload as tap mode and contains no duplicate gameplay legality.
 - [ ] Exact-head TCG Card Pass 2 Validation PASS after V2.4.53 implementation.
