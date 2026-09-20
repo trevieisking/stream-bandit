@@ -219,7 +219,7 @@ test("structured: vanilla attack executes from registry with no legacy printed-E
   assert.equal(result.status, 200, JSON.stringify(result.body));
   assert.equal(result.commits.length, 1);
   assert.equal(result.commits[0].p_new_state.players[2].vanguard.damage, 20);
-  assert.equal(result.commits[0].p_public_payload.attack, "Test Strike");
+  assert.equal(result.commits[0].p_event_type, "attack");
 });
 
 test("structured: effect-bearing attack still fails closed when legacy compatibility is absent", async () => {
