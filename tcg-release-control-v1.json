@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "637eb8f3238d48e99672832b2d084f46f3860887",
+        "entrypoint_git_blob_sha": "68f6ba374220027caa81c8534133d7b8a8dcd7b1",
         "file_count": 93,
-        "closure_sha256": "541daf860b7fe7c24da3e632ab9ee9b8a31e87f6000c9167b6e92943461ea13d",
+        "closure_sha256": "d18d6f0f788c25b798c802976b49b54252df01fdf131e038b0062aab61f40bb3",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -214,7 +214,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts",
-            "git_blob_sha": "cc2c0706b4c192bdf07cbecdb421412c37a171c9"
+            "git_blob_sha": "66af6a43e47bb0932b001d8f30a9471a099fce99"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-selected-heal-packet-v0-2.ts",
@@ -462,7 +462,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "637eb8f3238d48e99672832b2d084f46f3860887"
+            "git_blob_sha": "68f6ba374220027caa81c8534133d7b8a8dcd7b1"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
