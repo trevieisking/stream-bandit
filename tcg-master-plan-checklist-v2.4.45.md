@@ -470,5 +470,19 @@
 - [x] Expand exact Match Edge closure 90 -> 92 files.
 - [x] TCG Card Pass 2 Validation #1274 SUCCESS on exact head `cab1a7daa29e8d129050dcde71e69eebe4f50b65`.
 - [x] Attack IF migration count: **5 / 13** instances now route through the shared IF owner.
-- [ ] Next: migrate the bounded self-heal / heal-each / deck-discard / top-deck IF owners onto the shared Attack IF evaluator.
+- [x] Migrate the bounded self-heal / HEAL_EACH / deck-discard / server-top-deck IF owners onto the shared Attack IF evaluator; source migration complete in V2.4.69.
+
+## V2.4.69 — bounded Attack IF owner migration
+- [x] Route Rillrunner source_damaged self-heal through shared Attack IF.
+- [x] Route Reefback source_has_shield_at_least self-heal through shared Attack IF.
+- [x] Route Verdantusk reserve_count_at_least HEAL_EACH through shared Attack IF.
+- [x] Route Nightmaw target_has_any_condition deck-discard through shared Attack IF using the actual authoritative target Creature.
+- [x] Route Cosmarch Known Horizon card_matches through shared Attack IF while keeping server-only inspection/filter ownership and Card-Zone movement.
+- [x] Preserve existing Heal/Heal Packet, Deck-Discard, Card-Zone, Event/Movement/Heal listener and hidden-inspection owners; no duplicate mutation engine.
+- [x] Update stale regression guards to assert the shared Attack IF ownership boundary.
+- [x] TCG Card Pass #1283: deterministic runtime core + all Edge type-checks SUCCESS; only the pre-refresh release-control digest failed.
+- [x] Rebuild exact 92-file Match Edge closure from the current Git tree; digest `2b3cac54083c9cd07e94661b157d6719e4ea3007543665a141d8baaede2ffcfe`.
+- [x] Attack IF shared-owner migration count is now **10 / 13** frozen IF instances.
+- [ ] Exact-head TCG Card Pass must pass with the refreshed release-control manifest before V2.4.69 is accepted.
+- [ ] Remaining Attack IF: Slipwing Backdraft switch IF + Stormmane Storm Break outer current-action event IF + nested target-survival IF.
 
