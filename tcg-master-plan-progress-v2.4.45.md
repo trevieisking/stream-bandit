@@ -962,4 +962,47 @@ The earlier V2.4.57 checklist still listed Stone — Reversal Seal's `ADD_SHIELD
 - the frozen registry test proves Reversal Seal is the Release 1 Tactic consumer.
 
 Therefore Reversal Seal's post-IF opcode blocker is closed. The remaining known Tactic IF downstream gaps are **OPTIONAL**, **RANDOM_SAMPLE_HIDDEN_ZONE** and **APPLY_CONDITION**.
+## V2.4.63 — generic Tactic APPLY_CONDITION closes Blackout Pulse IF branch
+
+Fresh Release 1 owner audit showed that Condition mutation already has one canonical shared owner:
+`tcg-match-condition-engine-v0-2.ts`.
+
+Event Listener already delegates structured `APPLY_CONDITION` to that owner, including the generic modes:
+- `apply`
+- `apply_if_empty`
+- `apply_if_empty_or_same`
+- `replace`
+
+V2.4.63 adds the missing Tactic interpreter adapter only:
+- resolve the existing authoritative Creature reference;
+- validate the generic condition + mode;
+- call `applyRuntimeCondition(..., current turn, mode)`;
+- advance the same resumable Tactic effect cursor.
+
+No new Condition rules were created and there is no Blackout Pulse/card-ID branch.
+
+### Frozen Release 1 consumer
+
+**Volt — Blackout Pulse** remains data-only:
+- its generic IF checks whether the opponent Vanguard modifier slot is empty or already Silenced;
+- its selected branch applies **Silenced** with `apply_if_empty_or_same`;
+- Device play-lock remains the following independent effect step.
+
+### Validation
+
+TCG Card Pass 2 Validation **#1234 SUCCESS** on exact head `ecd3d86ce060f5e3349b0af202a9393c58bbb36e`.
+
+The gate proves:
+- Blackout Pulse is the frozen Tactic IF consumer of this Tactic `APPLY_CONDITION` path;
+- the interpreter delegates to shared `applyRuntimeCondition`;
+- all supported generic modes remain explicit;
+- no launch-card identity branch exists;
+- Tactic Edge type-check passes;
+- the exact 39-file Tactic dependency closure and refreshed entrypoint fingerprint pass.
+
+The known downstream blockers for the six Release 1 Tactic IF programs are now reduced to:
+1. **Cyclone Route — OPTIONAL**
+2. **False Memory — RANDOM_SAMPLE_HIDDEN_ZONE**
+
+Reversal Seal (`ADD_SHIELD_EACH`) and Blackout Pulse (`APPLY_CONDITION`) are closed.
 
