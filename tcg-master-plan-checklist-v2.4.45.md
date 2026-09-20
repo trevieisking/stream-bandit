@@ -213,3 +213,26 @@
 - [ ] Kay phone PASS: tap hand card -> readable inspector; close -> tap fallback remains possible; long-hold drag/drop still works.
 - [ ] Trevor/Kay real two-user PASS: lethal Attack -> Reward(s) to hand -> required promotion -> phase returns to play -> active player switches automatically.
 - [ ] Promotion to main/live remains HOLD until V2.4.52–V2.4.54 human acceptance is complete.
+
+
+## V2.4.55 — hand peek/fan + inspect everywhere
+- [x] Review Trevor desktop and Kay phone V2.4.54 recordings against the earlier supplied TCG interaction reference.
+- [x] Record the V2.4.54 visual regression: slot-height-filled Vanguard cards dominate the tabletop even though the whole board now fits at normal zoom.
+- [x] Restore bounded in-play card sizing so Vanguard/Reserve cards read as board pieces rather than filling their available rows.
+- [x] Lock the Battle hand to a **bottom-edge peek/fan rail**: larger cards deliberately continue below the visible hand mask instead of shrinking into complete tiny cards.
+- [x] Lock desktop and phone hand browsing to horizontal scroll/swipe with overlapping/negative card spacing where required.
+- [x] Keep click/tap hand inspection and existing drag/drop plus tap-select -> destination transport; presentation changes must not create another gameplay path.
+- [x] Add shared renderer **inspect mode** with substantially more card area dedicated to complete Ability/Attack/move rows.
+- [x] Use the shared inspect face for Battle hand/field inspection while preserving live authoritative Attack/active-Ability controls only on the player's own Vanguard.
+- [x] Make canonical card tiles on **Decks** inspectable through the shared read-only card inspector.
+- [x] Make canonical card tiles on **Collection** inspectable through the shared read-only card inspector.
+- [x] Make card-backed **Battle Pass** reward samples inspectable through the shared read-only card inspector.
+- [x] Keep non-Battle card inspection presentation-only: no fabricated deck ownership, collection ownership, Battle Pass progression, entitlement or economy authority.
+- [x] Add automated coverage for shared inspect mode, product-page inspection, bounded field-card scale and the bottom hand peek/fan rail.
+- [ ] Exact-head TCG Card Pass 2 Validation PASS after V2.4.55 implementation/docs synchronization.
+- [ ] Trevor desktop PASS at default/100% zoom: Vanguard/Reserve cards no longer dominate the table and the larger hand visibly peeks below the bottom rail.
+- [ ] Trevor desktop PASS: horizontal hand browse + click-to-inspect + drag/drop all remain usable.
+- [ ] Kay phone PASS: whole battlefield remains visible while larger hand cards peek below the bottom edge and swipe left/right.
+- [ ] Kay phone PASS: inspected card shows complete/readable moves/Abilities and touch drag + tap fallback still work.
+- [ ] Human PASS on Decks, Collection and card-backed Battle Pass rewards: tap/click opens the same readable read-only inspection face.
+- [ ] Main/static live promotion remains HOLD until the V2.4.52–V2.4.55 human acceptance gates are complete.
