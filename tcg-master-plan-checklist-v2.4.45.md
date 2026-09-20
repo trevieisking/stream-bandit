@@ -342,8 +342,8 @@
 - [ ] Cyclone Route IF branch still requires generic Tactic OPTIONAL.
 - [ ] False Memory IF branch still requires RANDOM_SAMPLE_HIDDEN_ZONE.
 - [x] Reversal Seal IF branch: generic ADD_SHIELD_EACH is implemented through the existing Shield owner and covered by frozen-registry/source-contract tests; included in Card Pass #1229 SUCCESS.
-- [ ] Blackout Pulse IF branch still requires APPLY_CONDITION.
-- [ ] Do not mark all six Tactic IF cards fully executable until those four downstream operation gaps close.
+- [x] Blackout Pulse IF branch: generic Tactic APPLY_CONDITION delegates to the shared Condition owner; Card Pass #1234 SUCCESS on `ecd3d86ce060f5e3349b0af202a9393c58bbb36e`.
+- [ ] Do not mark all six Tactic IF cards fully executable until the two remaining downstream gaps close: Cyclone Route OPTIONAL and False Memory RANDOM_SAMPLE_HIDDEN_ZONE.
 ## V2.4.59 — visible special effects + search/attach/shuffle choreography
 - [x] Lock the Release 1 rule that important authoritative card movement, Attack, Ability and state changes require visible player-facing feedback; effects are not optional decoration.
 - [x] Lock the effects layer as generic event/effect choreography, not card-ID-specific branches, so future cards/moves/Abilities/Conditions can reuse it.
@@ -409,5 +409,15 @@
 - [x] Refresh exact Match Edge dependency closure from 87 to 89 files and preserve the release-control guard.
 - [x] Card Pass 2 #1229 SUCCESS on exact head `52b33b4bd204a0c9dc86b64b4790b24d8a992baa`.
 - [x] Correct stale Reversal Seal truth: ADD_SHIELD_EACH already exists generically and is covered by source-contract tests.
-- [ ] Next runtime blocker: implement the next genuinely missing Release 1 Tactic IF downstream opcode after comparing OPTIONAL, RANDOM_SAMPLE_HIDDEN_ZONE and APPLY_CONDITION against existing owners.
+- [x] Owner comparison complete: APPLY_CONDITION was the smallest genuine gap and now delegates to the shared Condition engine; #1234 SUCCESS. Next blocker: generic Tactic OPTIONAL.
+
+## V2.4.63 — generic Tactic APPLY_CONDITION
+- [x] Confirm Blackout Pulse is the frozen Tactic IF consumer of Tactic-program APPLY_CONDITION.
+- [x] Reuse the shared Condition engine; do not create Tactic-specific condition slot/replacement rules.
+- [x] Support the existing generic modes: apply / apply_if_empty / apply_if_empty_or_same / replace.
+- [x] Resolve the structured target through the existing Creature-ref machinery and advance the same Tactic cursor.
+- [x] Add source-contract proof that the branch calls shared applyRuntimeCondition and contains no Blackout Pulse/card-ID exception.
+- [x] Refresh the exact Tactic Edge entrypoint fingerprint and 39-file dependency closure.
+- [x] TCG Card Pass 2 Validation #1234 SUCCESS on exact head `ecd3d86ce060f5e3349b0af202a9393c58bbb36e`.
+- [ ] Next: implement generic Tactic OPTIONAL through the existing pending-choice/cursor owner, then re-run exact-head validation.
 
