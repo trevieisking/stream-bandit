@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.12-essence-rail';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.13-touch-drag';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -327,6 +327,26 @@
     return false;
   }
 
+  function setupTargetLegal(where, index) {
+    const view = viewState();
+    if (
+      !view ||
+      view.phase !== 'setup' ||
+      Number(view.setup_turn_seat) !== Number(view.you && view.you.seat) ||
+      !state.selectedHandUid
+    ) return false;
+    const instance = selectedHandInstance();
+    if (!instance || !setupCandidate(instance)) return false;
+    if (where === 'vanguard') return !(view.you && view.you.vanguard);
+    if (where === 'reserve') {
+      if (!(view.you && view.you.vanguard)) return false;
+      if (!Number.isInteger(index) || index < 0 || index >= 4) return false;
+      const reserve = Array.isArray(view.you && view.you.reserve) ? view.you.reserve : [];
+      return !reserve[index];
+    }
+    return false;
+  }
+
   function directHandIntent(intent) {
     return intent === 'play_realm' || intent === 'play_tactic';
   }
@@ -587,15 +607,18 @@
     const hasVanguard = !!(view && view.you && view.you.vanguard);
     node.innerHTML = [0, 1, 2, 3].map((index) => {
       const creature = reserve && reserve[index];
-      const setupDestination = yourSetup && hasVanguard && !creature && state.selectedHandUid
+      const setupAvailable = !!(yourSetup && hasVanguard && !creature);
+      const setupDestination = setupAvailable
         ? ' data-setup-destination="reserve" data-setup-index="' + index + '"'
         : '';
+      const setupLegal = !!(setupAvailable && state.selectedHandUid && setupTargetLegal('reserve', index));
       const playLegal = !!(own && playTargetLegal('reserve', index, creature));
       const playDestination = own
         ? ' data-play-where="reserve" data-play-index="' + index + '"'
         : '';
       const legalClass =
-        (setupDestination ? ' sb-setup-destination is-legal' : '') +
+        (setupAvailable ? ' sb-setup-destination' : '') +
+        (setupLegal ? ' is-legal' : '') +
         (playLegal ? ' sb-play-destination is-play-legal' : '');
       return '<section class="sb-reserve-slot' + legalClass + '"' + setupDestination + playDestination + '><span>' +
         esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' +
@@ -647,13 +670,15 @@
     const yourSetup = !!(view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
     const creature = view && view.you ? view.you.vanguard : null;
     const empty = !creature;
-    const setupLegal = !!(yourSetup && empty && state.selectedHandUid);
+    const setupAvailable = !!(yourSetup && empty);
+    const setupLegal = !!(setupAvailable && state.selectedHandUid && setupTargetLegal('vanguard', null));
     const playLegal = playTargetLegal('vanguard', null, creature);
     slot.className =
       'sb-vanguard-slot' +
-      (setupLegal ? ' sb-setup-destination is-legal' : '') +
+      (setupAvailable ? ' sb-setup-destination' : '') +
+      (setupLegal ? ' is-legal' : '') +
       (playLegal ? ' sb-play-destination is-play-legal' : '');
-    if (setupLegal) {
+    if (setupAvailable) {
       slot.dataset.setupDestination = 'vanguard';
       slot.dataset.setupIndex = '';
     } else {
@@ -911,6 +936,157 @@
     });
   }
 
+  function syncSetupTargetDom() {
+    document.querySelectorAll('[data-setup-destination]').forEach((target) => {
+      const where = String(target.dataset.setupDestination || '');
+      const raw = target.dataset.setupIndex;
+      const index = raw === '' || raw == null ? null : Number(raw);
+      target.classList.toggle('is-legal', setupTargetLegal(where, index));
+    });
+  }
+
+  function clearTouchDragHover() {
+    document.querySelectorAll('.is-touch-drag-over').forEach((node) => {
+      if (node && node.classList) node.classList.remove('is-touch-drag-over');
+    });
+  }
+
+  function touchPoint(event, changed) {
+    const list = changed ? event && event.changedTouches : event && event.touches;
+    const point = list && list.length ? list[0] : null;
+    return point ? { x: Number(point.clientX), y: Number(point.clientY) } : null;
+  }
+
+  function touchDropTarget(mode, x, y) {
+    if (!document.elementFromPoint) return null;
+    const hit = document.elementFromPoint(x, y);
+    if (!hit || typeof hit.closest !== 'function') return null;
+    return hit.closest(mode === 'setup' ? '[data-setup-destination]' : '[data-play-where]');
+  }
+
+  function touchTargetCoordinates(target, mode) {
+    if (!target || !target.dataset) return null;
+    if (mode === 'setup') {
+      const where = String(target.dataset.setupDestination || '');
+      const raw = target.dataset.setupIndex;
+      return { where, index: raw === '' || raw == null ? null : Number(raw) };
+    }
+    const where = String(target.dataset.playWhere || '');
+    const raw = target.dataset.playIndex;
+    return { where, index: raw === '' || raw == null ? null : Number(raw) };
+  }
+
+  function touchTargetLegal(target, mode) {
+    const coords = touchTargetCoordinates(target, mode);
+    if (!coords) return false;
+    if (mode === 'setup') return setupTargetLegal(coords.where, coords.index);
+    return playTargetLegal(coords.where, coords.index, ownCreatureAt(coords.where, coords.index));
+  }
+
+  function bindTouchHandDrag(card, mode) {
+    if (!touchPrimaryInput() || !card || typeof card.addEventListener !== 'function') return;
+    if (mode === 'play' && directHandIntent(String(card.dataset.playIntent || ''))) return;
+    const uid = String(mode === 'setup' ? card.dataset.setupHandUid || '' : card.dataset.playHandUid || '');
+    if (!uid) return;
+
+    let gesture = null;
+    const holdMs = 170;
+    const cancelDistance = 10;
+
+    const clearTimer = () => {
+      if (gesture && gesture.timer) {
+        clearTimeout(gesture.timer);
+        gesture.timer = null;
+      }
+    };
+
+    const cleanupVisuals = () => {
+      clearTouchDragHover();
+      if (card.classList) card.classList.remove('is-dragging', 'is-touch-dragging');
+      if (typeof card.removeAttribute === 'function') card.removeAttribute('aria-grabbed');
+    };
+
+    const cancelGesture = (rerender) => {
+      clearTimer();
+      const wasActive = !!(gesture && gesture.active);
+      gesture = null;
+      cleanupVisuals();
+      if (wasActive && rerender) {
+        state.overlayKey = '';
+        render();
+      }
+    };
+
+    const activate = () => {
+      if (!gesture || gesture.active || state.busy) return;
+      gesture.active = true;
+      gesture.timer = null;
+      state.selectedHandUid = uid;
+      state.selectedAnchorUid = '';
+      state.overlayKey = '';
+      if (card.classList) card.classList.add('is-dragging', 'is-touch-dragging', mode === 'setup' ? 'is-setup-selected' : 'is-play-selected');
+      if (typeof card.setAttribute === 'function') card.setAttribute('aria-grabbed', 'true');
+      if (mode === 'setup') syncSetupTargetDom();
+      else syncPlayTargetDom();
+      setStatus('Drag the selected card to a highlighted legal destination, or release and use tap mode.', 'ready');
+    };
+
+    card.addEventListener('touchstart', (event) => {
+      if (state.busy || gesture || !event.touches || event.touches.length !== 1) return;
+      const point = touchPoint(event, false);
+      if (!point) return;
+      gesture = {
+        startX: point.x,
+        startY: point.y,
+        active: false,
+        timer: setTimeout(activate, holdMs)
+      };
+    }, { passive: true });
+
+    card.addEventListener('touchmove', (event) => {
+      if (!gesture) return;
+      const point = touchPoint(event, false);
+      if (!point) return;
+      if (!gesture.active) {
+        const dx = point.x - gesture.startX;
+        const dy = point.y - gesture.startY;
+        if (Math.hypot(dx, dy) > cancelDistance) cancelGesture(false);
+        return;
+      }
+      if (event.cancelable) event.preventDefault();
+      clearTouchDragHover();
+      const target = touchDropTarget(mode, point.x, point.y);
+      if (target && touchTargetLegal(target, mode) && target.classList) target.classList.add('is-touch-drag-over');
+    }, { passive: false });
+
+    card.addEventListener('touchend', async (event) => {
+      if (!gesture) return;
+      clearTimer();
+      if (!gesture.active) {
+        gesture = null;
+        return;
+      }
+      if (event.cancelable) event.preventDefault();
+      const point = touchPoint(event, true);
+      const target = point ? touchDropTarget(mode, point.x, point.y) : null;
+      const legal = !!(target && touchTargetLegal(target, mode));
+      const coords = legal ? touchTargetCoordinates(target, mode) : null;
+      card.__sbTouchDragSuppressClick = true;
+      cleanupVisuals();
+      gesture = null;
+
+      if (legal && coords) {
+        if (mode === 'setup') await runSetupPlace(uid, coords.where, coords.index);
+        else await runPlayHandTarget(coords.where, coords.index);
+        return;
+      }
+      state.overlayKey = '';
+      render();
+    }, { passive: false });
+
+    card.addEventListener('touchcancel', () => cancelGesture(true), { passive: true });
+  }
+
   function bindCardControls() {
     document.querySelectorAll('[data-card-anchor]').forEach((card) => {
       const select = () => {
@@ -952,6 +1128,10 @@
 
     document.querySelectorAll('[data-play-hand-uid]').forEach((card) => {
       const select = () => {
+        if (card.__sbTouchDragSuppressClick) {
+          card.__sbTouchDragSuppressClick = false;
+          return;
+        }
         if (state.busy) return;
         const uid = String(card.dataset.playHandUid || '');
         state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
@@ -996,6 +1176,7 @@
         card.classList.remove('is-dragging');
         syncPlayTargetDom();
       });
+      bindTouchHandDrag(card, 'play');
     });
 
     document.querySelectorAll('[data-play-where]').forEach((target) => {
@@ -1042,6 +1223,10 @@
 
     document.querySelectorAll('[data-setup-hand-uid]').forEach((card) => {
       const select = () => {
+        if (card.__sbTouchDragSuppressClick) {
+          card.__sbTouchDragSuppressClick = false;
+          return;
+        }
         if (state.busy) return;
         const uid = String(card.dataset.setupHandUid || '');
         state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
@@ -1065,6 +1250,7 @@
           select();
         }
       });
+      bindTouchHandDrag(card, 'setup');
     });
 
     document.querySelectorAll('[data-setup-destination]').forEach((slot) => {
