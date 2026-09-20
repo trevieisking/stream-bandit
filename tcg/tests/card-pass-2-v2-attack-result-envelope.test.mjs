@@ -23,7 +23,7 @@ test('V2 transport treats nested authoritative commit rejection as failure', () 
 
 test('Attack rejection re-syncs authoritative state and preserves visible reason', () => {
   assert.match(controller, /failure = error instanceof Error \? error\.message : String\(error\);\s*await refreshMatch\(\)\.catch\(\(\) => \{\}\);/s);
-  assert.match(controller, /if \(failure\) setStatus\(failure, 'error'\);/);
+  assert.match(controller, /if \(failure\) setActionFailure\(failure\);/);
 });
 
 test('repair remains transport-only and does not move Attack rules into browser', () => {
