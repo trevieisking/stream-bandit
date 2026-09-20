@@ -623,3 +623,21 @@ This preserves Attack sequencing and leaves continuous/Active Ability orchestrat
 TCG Card Pass 2 Validation **#1163 PASS** on exact fingerprinted source head 76b409309f41167db6d273bd8d6df2921beb5e3b.
 
 Next proven mismatch: Release 1 Tactic play requirements use lower-case predicate reserve_count_at_least, while the current Tactic gate still recognizes only an older RESERVE_COUNT_AT_LEAST op shape. That mismatch is now the next repair target.
+
+
+## V2.4.57 implementation E — Release 1 reserve-gated Tactic requirements
+
+A frozen-registry audit found 18 Release 1 Tactics with play requirements. Five use reserve_count_at_least:
+- Gale — Cyclone Route;
+- Gale — Featherstep;
+- Grove — Warden Fern;
+- Shade — Quiet Step;
+- Volt — Courier Jett.
+
+The Tactic play gate previously recognized only an older RESERVE_COUNT_AT_LEAST op shape even though the frozen cards use the predicate grammar.
+
+The shared Requirement evaluator now owns occupied Reserve count versus threshold. Tactic resolves the controller token and delegates the comparison. The older uppercase form is retained as compatibility input but is translated through the same predicate owner.
+
+TCG Card Pass 2 Validation **#1171 PASS** on exact fingerprinted source head 59d388ae6e9c784324cd33aa18e38a1a8e770fa9.
+
+The remaining Tactic play-requirement families are 12 legal_card_available uses and 1 event_occurred use.
