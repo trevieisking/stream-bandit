@@ -199,3 +199,13 @@ Regression tests may prove authoritative refresh behavior, layout-driven compres
 
 ## 080 — Ability glow is a capability projection, not a card-side guess
 A manual active Ability may glow/pulse only when the authoritative `field_actions.ability_sources` projection contains that exact field source anchor. `use_ability` consumes/changes authoritative state; the next projection removes the glow when the Ability is no longer usable. Triggered Abilities remain non-manual.
+
+
+## 081 — Attack end-turn is a continuation, not a competing rule
+The Attack rule remains one lifecycle: a legal Attack resolves damage/effects, then the attacking player's turn ends **after the full required resolution chain**. If no Creature is defeated, the path proceeds directly to Aftermath/turn advance. If a Creature is defeated, the same end-turn continuation pauses for Defeat -> Reward Card taking -> any required Vanguard promotion, then resumes. Reward handling is therefore conditional on defeat, never on ordinary non-lethal damage.
+
+## 082 — Blocked Attack explanation is presentation-only
+When authoritative Attack capability says an Attack is blocked, the card may remain clickable only to explain that server-projected reason. Insufficient Essence must read clearly as **Needs more matching Essence** and may point the player back to the Attack cost orbs and attached Essence rail. A blocked explanatory click must not submit an Attack command or recreate legality in the browser.
+
+## 083 — Creature inspection must not relocate the battlefield source card
+Selecting the Vanguard may open a larger readable card context, but the original battlefield card remains anchored in its Vanguard slot. Desktop readability uses a separate inspector copy of the same canonical card face and the same card-owned Attack/Ability controls. Phone/coarse-touch layout remains on its accepted in-board presentation unless separately approved.
