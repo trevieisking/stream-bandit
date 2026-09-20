@@ -236,3 +236,31 @@
 - [ ] Kay phone PASS: inspected card shows complete/readable moves/Abilities and touch drag + tap fallback still work.
 - [ ] Human PASS on Decks, Collection and card-backed Battle Pass rewards: tap/click opens the same readable read-only inspection face.
 - [ ] Main/static live promotion remains HOLD until the V2.4.52–V2.4.55 human acceptance gates are complete.
+
+
+## V2.4.56 — server-projected action clarity + Withdraw/Realm repair
+- [x] Review Kay's 25-minute paired Battle recording `Video Project 8.mp4` frame-by-frame for action failures and red server messages.
+- [x] Correlate the recording with authoritative production match command/state history before changing rules.
+- [x] Confirm the recording is **not** one global server deadlock: Realm and multiple Attacks committed successfully later in the same match.
+- [x] Record repeated raw client errors visible in the recording: `required_tactic_target_unavailable` and `manual_essence_already_used_this_turn`.
+- [x] Confirm Realm play is already server-owned and committed successfully; repair visibility/feedback rather than creating another Realm engine.
+- [x] Confirm Withdraw is already fully projected/executed by `tcg-match-actions` but had **no Battle client control**.
+- [x] Confirm the Battle client was not consuming existing `play_card_targets`, `evolve_targets`, `attach_essence_targets` and `attach_relic_targets` projections before offering destinations.
+- [x] Add one read-only `play_tactic_preview` action to the existing Tactic owner and make real `play_tactic` reuse the exact same playability helper.
+- [x] Preflight Creature/Realm/Evolution/Essence/Relic/Tactic hand actions through their existing authoritative owners before mutation.
+- [x] Deduplicate in-flight hand preflight so rapid selection + destination interaction shares one read-only projection request.
+- [x] Translate known server legality codes into useful player guidance while retaining the raw code in diagnostics.
+- [x] Render Withdraw from `field_actions.withdraw` only: exact cost, server payment options and legal Reserve targets.
+- [x] Submit Withdraw only through existing server `withdraw` with exact `reserve_index` + selected attached-Essence UIDs; browser calculates no Withdraw legality.
+- [x] Keep the active Realm visible on compact/mobile Battle layouts and resolve its canonical card name from `view.realm.card.card_id`.
+- [x] Make the active Realm inspectable through the same canonical read-only card inspector.
+- [x] Preserve Attack ownership/readiness in `field_actions.attacks`; insufficient Essence remains a server-projected block, now explained clearly.
+- [x] Refresh the guarded Tactic Edge dependency closure fingerprint after the intentional owner extension.
+- [x] Exact-head source candidate TCG Card Pass 2 Validation **#1138 PASS**.
+- [ ] Deploy only the exact green `tcg-tactic-actions` preview extension with JWT configuration preserved, after fresh deployment evidence.
+- [ ] Kay phone PASS: unusable Tactic is explained before mutation; no raw red `required_tactic_target_unavailable` message.
+- [ ] Kay phone PASS: second manual Essence attempt is explained as the one-per-turn rule before mutation.
+- [ ] Kay phone PASS: legal Attack becomes clearly available once its server-projected Essence requirement is met.
+- [ ] Trevor/Kay PASS: active Realm stays visibly named and opens inspection.
+- [ ] Trevor/Kay PASS: own Vanguard inspector exposes Withdraw; exact Essence payment + Reserve target completes one authoritative switch.
+- [ ] Main/static live promotion remains HOLD until V2.4.52–V2.4.56 human acceptance is complete.
