@@ -113,3 +113,25 @@ Battle, hand, Collection, Decks, Shop, pack/reward and Battle Pass card surfaces
 
 ## 054 — Astral first proof set
 Astral is the first renderer acceptance set because its 24/24 Standard/base artworks already exist at canonical GitHub paths. Existing Astral image bytes are fitted/cropped into the canonical card window; they are not regenerated merely to embed frames or rule text.
+
+
+## 055 — Attack means damage plus automatic turn completion
+A legal Attack is not accepted merely because its control fires. The server must calculate and place damage automatically, resolve required Attack follow-up work, then end the attacking player's turn. Browser code displays readiness and submits intent only; it never owns damage or turn progression.
+
+## 056 — Defeat immediately owns Reward resolution
+A Creature reduced to zero remaining HP is processed by canonical Defeat. The opposing player receives the defeated Creature's Reward value through the existing Reward queue, followed by any required forced Vanguard promotion and Match Flow continuation. No browser shortcut or card-specific KO dispatcher is allowed.
+
+## 057 — Post-Attack human acceptance reopened
+No Trevor/Kay test has yet visibly completed a real Attack that placed damage. Therefore damage, KO/Reward flow and all later Battle lifecycle remain **human-test pending** even where automated runtime tests already exist.
+
+## 058 — Explicit Quit Match is concession
+The small Battle cog owns a single destructive action: **Quit Match**. It calls the existing server `concede` command. The quitter loses; the opponent wins. Closing/reloading the page is not automatically a loss because authoritative matches must remain resumable unless the user explicitly concedes.
+
+## 059 — Terminal result returns only to fresh matchmaking
+Victory/Defeat ends the match. The result action returns to `tcg-play.html` without a match id; no old match is resumed and the player must select **Find Opponent** for another opponent.
+
+## 060 — Interaction-state clarity
+The canonical card face is also the control surface. Active Abilities pulse/glow only while server capability projection says they are usable and stop after use. Attack rows show server-projected readiness/block reasons. Essence attachment remains tap-first on phones: select the card, then a highlighted legal Creature; optional drag is desktop convenience only.
+
+## 061 — Orbitortoise layout applies globally
+The Trevor-supplied Orbitortoise image remains the reference structure for all card types/surfaces: identity/HP/type header, large artwork window, readable Ability/Attack/effect area and lower metadata/footer. Missing art uses the same finished frame with an Artwork Pending window so every identity is game-ready before its final PNG arrives.
