@@ -91,6 +91,32 @@ button{font:inherit}
   border:1px solid #ffffff22;border-radius:999px;background:#020b12c9;
   color:#a9bdce;padding:4px 8px;font-size:9px;font-weight:900;letter-spacing:.03em
 }
+.sb-battle-settings{position:relative}
+.sb-battle-settings>summary{
+  list-style:none;width:29px;height:29px;display:grid;place-items:center;cursor:pointer;
+  border:1px solid #ffffff2e;border-radius:50%;background:#020b12e6;color:#dff8ff;
+  font-size:15px;line-height:1;box-shadow:0 4px 12px #0006
+}
+.sb-battle-settings>summary::-webkit-details-marker{display:none}
+.sb-battle-settings>summary:hover,.sb-battle-settings>summary:focus-visible{
+  outline:none;border-color:#55e7ff88;box-shadow:0 0 0 2px #55e7ff1d,0 5px 14px #0008
+}
+.sb-battle-settings[open]>summary{border-color:#55e7ffaa;color:#fff}
+.sb-battle-settings-menu{
+  position:absolute;z-index:80;right:0;top:35px;width:min(230px,80vw);
+  display:grid;gap:7px;padding:9px;border:1px solid #55e7ff42;border-radius:12px;
+  background:#031019f7;box-shadow:0 16px 38px #000c
+}
+.sb-battle-settings-menu strong{font-size:11px}
+.sb-battle-settings-menu small{font-size:8px;line-height:1.35;color:#91aabd}
+.sb-quit-match{
+  min-height:36px;border:1px solid #ff668077;border-radius:9px;padding:7px 10px;
+  background:linear-gradient(145deg,#581522,#8a1d31);color:#fff;font-weight:950;
+  font-size:9px;cursor:pointer
+}
+.sb-quit-match:hover,.sb-quit-match:focus-visible{outline:none;border-color:#ff9bad;box-shadow:0 0 14px #ff66802c}
+.sb-quit-match:disabled{opacity:.42;cursor:not-allowed}
+
 .sb-half{
   position:relative;z-index:2;min-height:0;
   display:grid;
@@ -551,6 +577,14 @@ button{font:inherit}
         <span class="sb-pill" id="turnPill">Loading…</span>
         <span class="sb-pill" id="phasePill">—</span>
         <span class="sb-pill" id="revisionPill">Revision —</span>
+        <details class="sb-battle-settings" id="battleSettings">
+          <summary aria-label="Match settings" title="Match settings">⚙</summary>
+          <div class="sb-battle-settings-menu">
+            <strong>Match Settings</strong>
+            <small>Quit Match is a concession. You lose this match and your opponent wins.</small>
+            <button class="sb-quit-match" id="quitMatchButton" type="button" data-concede="1">Quit Match</button>
+          </div>
+        </details>
       </div>
     </header>
 
@@ -608,6 +642,6 @@ button{font:inherit}
 <script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-6"></script>
 <script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
 <script src="stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-51"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-10-card-face"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-11-card-face"></script>
 </body>
 </html>
