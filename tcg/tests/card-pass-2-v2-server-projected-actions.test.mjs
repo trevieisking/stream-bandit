@@ -42,7 +42,7 @@ test('manual Essence and unusable Tactics become friendly projected guidance ins
   assert.match(controller,/setActionFailure\(code\)/);
   assert.match(controller,/console\.warn\('\[Stream Bandit TCG action rejected\]'/);
   assert.match(controller,/node\.dataset\.errorCode = raw/);
-  assert.match(controller,/projection && projection\.eligible !== true/);
+  assert.match(controller,/!projection \|\| projection\.eligible !== true/);
 });
 
 test('Withdraw is rendered only from server field_actions projection and submits exact server-owned payment/target data',()=>{
