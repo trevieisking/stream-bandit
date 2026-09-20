@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.15-stable-card-focus';
+  const VERSION = 'Stream Bandit TCG V2 Battle Controller v0.16-compact-tabletop';
   const API_SETUP = 'tcg-private-alpha-api';
   const API_MATCH = 'tcg-match-actions';
   const API_TACTIC = 'tcg-tactic-actions';
@@ -14,6 +14,7 @@
     view: null,
     selectedAnchorUid: '',
     selectedHandUid: '',
+    inspectedCard: null,
     selectedChoiceIds: [],
     pendingChoiceId: '',
     selectedRewardPositions: [],
@@ -550,63 +551,94 @@
     const selected = !!(opts.primary && anchor && state.selectedAnchorUid === anchor);
     const instance = topInstance(creature);
     const cardId = String(instance && instance.card_id || '');
-    const abilityReady = !!(opts.own && abilityReadyFor(opts.where, opts.index, creature));
-    const interactiveAttacks = !!opts.primary;
     const essenceUnits = attachedEssenceUnits(creature);
     const face = renderCardFace(cardId, {
-      mode: 'battle',
-      abilityReady,
-      interactiveAbility: abilityReady && !!opts.own,
-      abilityWhere: opts.where || '',
-      abilityIndex: opts.index,
-      interactiveAttacks,
-      attackStates: interactiveAttacks ? attackStatesFor(!!opts.canAct) : null,
+      mode: 'compact',
       attachedEssenceUnits: essenceUnits
     });
+    const inspectOwner = opts.own ? 'you' : 'opponent';
+    const inspectIndex = opts.index == null ? '' : String(opts.index);
+    const inspectAttrs =
+      ' tabindex="0" role="button" data-inspect-field-owner="' + inspectOwner +
+      '" data-inspect-field-where="' + esc(opts.where || '') +
+      '" data-inspect-field-index="' + esc(inspectIndex) + '"';
     const setupReturn = opts.setupReturn
       ? '<button type="button" class="sb-card-action setup-return" data-setup-return="' + esc(opts.setupReturn.where) + '" data-setup-index="' + esc(opts.setupReturn.index == null ? '' : opts.setupReturn.index) + '"><span><strong>Return to hand</strong><small>Adjust setup</small></span><span>↩</span></button>'
       : '';
     return '<div class="sb-card-wrap' + (selected ? ' is-selected' : '') + (opts.setupReturn ? ' has-setup-return' : '') + '">' +
       '<div class="sb-card-control sb-card-control-shell' + (selected ? ' is-selected' : '') + (opts.primary ? ' is-primary' : '') + '"' +
-      (opts.primary ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"' : '') + '>' +
+      inspectAttrs +
+      (opts.primary ? ' aria-pressed="' + (selected ? 'true' : 'false') + '" data-card-anchor="' + esc(anchor) + '"' : '') + '>' +
       face + liveCreatureStatus(creature, cardId, essenceUnits) +
       '</div>' +
       (setupReturn ? '<div class="sb-card-actions">' + setupReturn + '</div>' : '') +
       '</div>';
   }
 
+  function inspectedFieldCreature(view, inspected) {
+    if (!view || !inspected || inspected.kind !== 'field') return null;
+    const player = inspected.owner === 'opponent' ? view.opponent : view.you;
+    if (!player) return null;
+    if (inspected.where === 'vanguard') return player.vanguard || null;
+    if (inspected.where === 'reserve' && Number.isInteger(inspected.index) && inspected.index >= 0 && inspected.index < 4) {
+      return Array.isArray(player.reserve) ? (player.reserve[inspected.index] || null) : null;
+    }
+    return null;
+  }
+
   function renderSelectedCardInspector(view, canAct) {
     const node = $('cardInspector');
     if (!node) return;
-    const creature = view && view.you ? view.you.vanguard : null;
-    const anchor = cardAnchor(creature);
-    const selected = !!(anchor && state.selectedAnchorUid === anchor);
-    if (!selected || !creature) {
+    const inspected = state.inspectedCard;
+    if (!inspected) {
       node.hidden = true;
       node.innerHTML = '';
       return;
     }
 
-    const instance = topInstance(creature);
-    const cardId = String(instance && instance.card_id || '');
-    const abilityReady = abilityReadyFor('vanguard', null, creature);
-    const essenceUnits = attachedEssenceUnits(creature);
+    let instance = null;
+    let creature = null;
+    let ownField = false;
+    let where = '';
+    let index = null;
+    if (inspected.kind === 'hand') {
+      const hand = view && view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
+      instance = hand.find((row) => String(row.uid || '') === String(inspected.uid || '')) || null;
+    } else if (inspected.kind === 'field') {
+      creature = inspectedFieldCreature(view, inspected);
+      instance = topInstance(creature);
+      ownField = inspected.owner === 'you';
+      where = String(inspected.where || '');
+      index = inspected.index == null ? null : Number(inspected.index);
+    }
+
+    if (!instance) {
+      state.inspectedCard = null;
+      node.hidden = true;
+      node.innerHTML = '';
+      return;
+    }
+
+    const cardId = String(instance.card_id || '');
+    const isOwnVanguard = !!(creature && ownField && where === 'vanguard');
+    const abilityReady = isOwnVanguard && abilityReadyFor('vanguard', null, creature);
+    const essenceUnits = creature ? attachedEssenceUnits(creature) : [];
     const face = renderCardFace(cardId, {
       mode: 'battle',
       abilityReady,
-      interactiveAbility: abilityReady,
-      abilityWhere: 'vanguard',
+      interactiveAbility: !!abilityReady,
+      abilityWhere: isOwnVanguard ? 'vanguard' : '',
       abilityIndex: null,
-      interactiveAttacks: true,
-      attackStates: attackStatesFor(!!canAct),
+      interactiveAttacks: isOwnVanguard,
+      attackStates: isOwnVanguard ? attackStatesFor(!!canAct) : null,
       attachedEssenceUnits: essenceUnits
     });
     node.hidden = false;
     node.innerHTML =
       '<button type="button" class="sb-card-inspector-backdrop" data-card-inspector-close="1" aria-label="Close card details"></button>' +
-      '<section class="sb-card-inspector-panel" role="dialog" aria-modal="true" aria-label="' + esc(cardNameById(cardId) || 'Vanguard') + ' card details">' +
+      '<section class="sb-card-inspector-panel" role="dialog" aria-modal="true" aria-label="' + esc(cardNameById(cardId) || 'Card') + ' card details">' +
       '<button type="button" class="sb-card-inspector-close" data-card-inspector-close="1" aria-label="Close card details">×</button>' +
-      '<div class="sb-card-inspector-card">' + face + liveCreatureStatus(creature, cardId, essenceUnits) + '</div>' +
+      '<div class="sb-card-inspector-card">' + face + (creature ? liveCreatureStatus(creature, cardId, essenceUnits) : '') + '</div>' +
       '</section>';
   }
 
@@ -641,8 +673,8 @@
         '" data-play-hand-uid="' + esc(uid) + '" data-play-intent="' + esc(playIntent) +
         '" draggable="' + (touchPrimaryInput() ? 'false' : 'true') + '"';
     }
-    return '<div class="sb-hand-card sb-hand-card-shell' + classes + '" data-card-id="' + esc(cardId) + '"' + attributes + '>' +
-      renderCardFace(cardId, { mode: 'hand' }) +
+    return '<div class="sb-hand-card sb-hand-card-shell' + classes + '" data-card-id="' + esc(cardId) + '" data-inspect-hand-uid="' + esc(uid) + '"' + attributes + '>' +
+      renderCardFace(cardId, { mode: 'compact' }) +
       '</div>';
   }
 
@@ -1186,6 +1218,7 @@
       gesture.timer = null;
       state.selectedHandUid = uid;
       state.selectedAnchorUid = '';
+      state.inspectedCard = null;
       state.overlayKey = '';
       if (card.classList) card.classList.add('is-dragging', 'is-touch-dragging', mode === 'setup' ? 'is-setup-selected' : 'is-play-selected');
       if (typeof card.setAttribute === 'function') card.setAttribute('aria-grabbed', 'true');
@@ -1255,28 +1288,35 @@
       button.addEventListener('click', (event) => {
         if (event && typeof event.preventDefault === 'function') event.preventDefault();
         if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
+        state.inspectedCard = null;
         state.selectedAnchorUid = '';
         state.overlayKey = '';
         render();
       });
     });
 
-    document.querySelectorAll('[data-card-anchor]').forEach((card) => {
-      const select = () => {
+    document.querySelectorAll('[data-inspect-field-owner]').forEach((card) => {
+      const inspect = () => {
         if (state.busy) return;
-        const anchor = String(card.dataset.cardAnchor || '');
-        state.selectedAnchorUid = state.selectedAnchorUid === anchor ? '' : anchor;
+        const owner = String(card.dataset.inspectFieldOwner || '');
+        const where = String(card.dataset.inspectFieldWhere || '');
+        const rawIndex = String(card.dataset.inspectFieldIndex || '');
+        const index = rawIndex === '' ? null : Number(rawIndex);
+        state.inspectedCard = { kind: 'field', owner, where, index };
+        state.selectedAnchorUid = owner === 'you' && where === 'vanguard'
+          ? String(card.dataset.cardAnchor || '')
+          : '';
         state.overlayKey = '';
         render();
       };
       card.addEventListener('click', (event) => {
-        if (event.target.closest('[data-card-intent]')) return;
-        select();
+        if (event.target.closest('[data-card-intent],[data-setup-return]')) return;
+        inspect();
       });
       card.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          select();
+          inspect();
         }
       });
     });
@@ -1317,6 +1357,7 @@
         const uid = String(card.dataset.playHandUid || '');
         state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
         state.selectedAnchorUid = '';
+        state.inspectedCard = { kind: 'hand', uid };
         state.overlayKey = '';
         render();
         if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches) {
@@ -1344,6 +1385,7 @@
         }
         state.selectedHandUid = String(card.dataset.playHandUid || '');
         state.selectedAnchorUid = '';
+        state.inspectedCard = null;
         state.overlayKey = '';
         card.classList.add('is-dragging', 'is-play-selected');
         if (event.dataTransfer) {
@@ -1396,6 +1438,26 @@
   }
 
   function bindPhaseControls() {
+    document.querySelectorAll('[data-inspect-hand-uid]').forEach((card) => {
+      if (card.hasAttribute && (card.hasAttribute('data-play-hand-uid') || card.hasAttribute('data-setup-hand-uid'))) return;
+      card.addEventListener('click', () => {
+        if (state.busy) return;
+        state.inspectedCard = { kind: 'hand', uid: String(card.dataset.inspectHandUid || '') };
+        state.overlayKey = '';
+        render();
+      });
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          if (state.busy) return;
+          state.inspectedCard = { kind: 'hand', uid: String(card.dataset.inspectHandUid || '') };
+          state.overlayKey = '';
+          render();
+        }
+      });
+    });
+
+
     document.querySelectorAll('[data-opening-choice]').forEach((button) => {
       button.addEventListener('click', async () => {
         await runOpeningChoice(String(button.dataset.openingChoice || ''));
@@ -1411,6 +1473,7 @@
         if (state.busy) return;
         const uid = String(card.dataset.setupHandUid || '');
         state.selectedHandUid = state.selectedHandUid === uid ? '' : uid;
+        state.inspectedCard = { kind: 'hand', uid };
         state.overlayKey = '';
         render();
         if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches) {
@@ -1866,6 +1929,7 @@
     try {
       await callEdge(API_MATCH, actionBase('end_turn'));
       state.selectedAnchorUid = '';
+      state.inspectedCard = null;
       await refreshMatch();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
