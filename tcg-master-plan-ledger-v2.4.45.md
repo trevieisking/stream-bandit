@@ -288,3 +288,7 @@ Event Listener keeps authoritative meanings for its event-context leaf predicate
 
 ## 107 — Shared leaf semantics are migrated one predicate at a time
 A shared predicate tree does not automatically create shared leaf semantics. Repeated leaf meanings are consolidated only when current contexts prove they are semantically identical. source_damaged is the first accepted case: Active Ability and Attack now reuse the same Requirement-evaluator meaning while retaining their separate orchestration.
+
+
+## 108 — Source Shield threshold is a shared state predicate
+source_has_shield_at_least means the source Creature's current Shield is at least the positive configured threshold. That semantic belongs to the shared Requirement evaluator; Attack, Ability and continuous owners may orchestrate it but must not redefine the comparison.
