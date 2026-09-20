@@ -14,6 +14,13 @@ test('Battle controller remains valid JavaScript after resolution UI wiring', ()
   assert.doesNotThrow(() => new Function(controller));
 });
 
+test('stable card inspector has an in-controller card-name resolver and cannot call an undefined helper', () => {
+  assert.match(controller, /function cardNameById\(cardId\)/);
+  assert.match(controller, /const renderer = cardRenderer\(\)/);
+  assert.match(controller, /const row = view && view\.card_index && id \? view\.card_index\[id\] : null/);
+  assert.match(controller, /aria-label="' \+ esc\(cardNameById\(cardId\) \|\| 'Vanguard'\) \+ ' card details"/);
+});
+
 test('pending take_reward is a real face-down Reward selection flow, not a generic deadlock', () => {
   assert.match(controller, /view\.pending_resolution/);
   assert.match(controller, /String\(pending\.kind \|\| ''\) === 'take_reward'/);
