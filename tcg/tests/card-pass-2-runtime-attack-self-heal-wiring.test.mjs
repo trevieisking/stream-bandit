@@ -6,6 +6,7 @@ const matchSource = fs.readFileSync('supabase/functions/tcg-match-actions/index.
 const tacticSource = fs.readFileSync('supabase/functions/tcg-tactic-actions/index.ts', 'utf8');
 const coreSource = fs.readFileSync('supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts', 'utf8');
 const effectSource = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts', 'utf8');
+const attackIfSource = fs.readFileSync('supabase/functions/_shared/tcg-match-attack-if-v0-2.ts', 'utf8');
 const healPacketSource = fs.readFileSync('supabase/functions/_shared/tcg-match-heal-packet-v0-2.ts', 'utf8');
 
 function assertInOrder(needles, message) {
@@ -50,15 +51,15 @@ test('healing has one shared primitive across match, tactic and structured attac
   assert.ok(effectSource.includes('healRuntimeDamage(sourceCreature, step.amount)'), 'structured self-heal bypasses shared primitive');
 });
 
-test('Attack source state IF leaves delegate to the shared Requirement evaluator', () => {
-  assert.ok(effectSource.includes('evaluateRuntimeV02SourceDamagedRequirement(sourceCreature, when).matched'));
-  assert.ok(effectSource.includes('evaluateRuntimeV02SourceHasShieldAtLeastRequirement(sourceCreature, when).matched'));
-  const helper = effectSource.slice(
-    effectSource.indexOf('function selfHealConditionMatches('),
-    effectSource.indexOf('function selfHealPacketContext('),
-  );
-  assert.equal(helper.includes('Number(sourceCreature.damage'), false, 'Attack must not reimplement source_damaged semantics');
-  assert.equal(helper.includes('Number(sourceCreature.shield'), false, 'Attack must not reimplement source Shield threshold semantics');
+test('Attack source state IF leaves delegate through the shared Attack IF owner to the Requirement evaluator', () => {
+  assert.ok(attackIfSource.includes('evaluateRuntimeV02SourceDamagedRequirement('));
+  assert.ok(attackIfSource.includes('evaluateRuntimeV02SourceHasShieldAtLeastRequirement('));
+  const start = effectSource.indexOf('export function structuredRuntimeAfterDamageSelfHealEffects(');
+  const end = effectSource.indexOf('export type RuntimeV02AttackHealEachPredicate', start);
+  const block = effectSource.slice(start, end);
+  assert.ok(block.includes('const conditionMet = runtimeV02EvaluateAttackIf(step.when'));
+  assert.equal(block.includes('Number(sourceCreature.damage'), false, 'self-heal owner must not reimplement source_damaged semantics');
+  assert.equal(block.includes('Number(sourceCreature.shield'), false, 'self-heal owner must not reimplement source Shield threshold semantics');
 });
 
 test('self-heal owner is deliberately narrow and leaves packet listeners for later', () => {
