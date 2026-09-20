@@ -56,7 +56,9 @@ export type RuntimeV02AttackSelectedHealResolution = {
 function validateDescriptor(descriptor: RuntimeV02AttackSelectedHealChoice): void {
   if (descriptor.phase !== "after_damage") throw new Error("tcg_v0_2_attack_choice_phase_unsupported");
   if (descriptor.selection.controller !== "self") throw new Error("tcg_v0_2_attack_choice_controller_unsupported");
-  if (descriptor.selection.zone !== "field") throw new Error("tcg_v0_2_attack_choice_zone_unsupported");
+  if (descriptor.selection.zone !== "field" && descriptor.selection.zone !== "reserve") {
+    throw new Error("tcg_v0_2_attack_choice_zone_unsupported");
+  }
   if (descriptor.selection.count !== 1) throw new Error("tcg_v0_2_attack_choice_count_unsupported");
   if (descriptor.selection.filters.damaged !== true) throw new Error("tcg_v0_2_attack_choice_damaged_filter_required");
   if (!descriptor.selection.as || descriptor.heal.target !== `$${descriptor.selection.as}`) {
@@ -83,7 +85,10 @@ export function runtimeV02CreateSelectedHealChoice(
   validateEntries(entries);
   if (!choiceId) throw new Error("tcg_v0_2_attack_choice_id_required");
 
-  const legal = entries.filter((entry) => Math.max(0, Number(entry.creature.damage || 0)) > 0);
+  const zoneEntries = descriptor.selection.zone === "reserve"
+    ? entries.filter((entry) => entry.where === "reserve")
+    : entries;
+  const legal = zoneEntries.filter((entry) => Math.max(0, Number(entry.creature.damage || 0)) > 0);
   if (!legal.length) return null;
   const options = legal.map((entry) => ({
     id: `creature:${seat}:${entry.anchor_uid}`,
@@ -97,7 +102,9 @@ export function runtimeV02CreateSelectedHealChoice(
     seat,
     kind: "select_damaged_friendly_creature_heal",
     attack_id: descriptor.attack_id,
-    prompt: "Choose a damaged friendly creature",
+    prompt: descriptor.selection.zone === "reserve"
+      ? "Choose a damaged friendly Reserve creature"
+      : "Choose a damaged friendly creature",
     min: 1,
     max: 1,
     amount: descriptor.heal.amount,
