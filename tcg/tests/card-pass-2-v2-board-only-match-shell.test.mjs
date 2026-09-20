@@ -38,6 +38,14 @@ test('phone battle scrolls vertically instead of trapping the board inside one v
   assert.match(battle, /\.sb-board\s*\{[\s\S]*?height:auto;min-height:100dvh/);
 });
 
+
+test('wide battle card fit is viewport-driven and does not depend on mouse pointer classification', () => {
+  assert.match(battle, /@media\(min-width:641px\)\{/);
+  assert.doesNotMatch(battle, /@media\(min-width:641px\) and \(hover:hover\) and \(pointer:fine\)/);
+  assert.match(battle, /\.sb-reserve-slot \.sb-card-control,[\s\S]*?\.sb-vanguard-slot \.sb-card-control\{[\s\S]*?height:calc\(100% - 8px\);[\s\S]*?width:auto/);
+  assert.match(battle, /Phone\/coarse layout below remains the later override/);
+});
+
 test('battle cards are wired to the canonical shared card renderer and repository art sources', () => {
   assert.match(battle, /stream-bandit-tcg-art-resolver-v2-4-36\.js/);
   assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
