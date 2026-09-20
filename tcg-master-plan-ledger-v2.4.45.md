@@ -284,3 +284,7 @@ The shared predicate tree is foundation only. IF remains incomplete until all 29
 
 ## 106 — Event Listener no longer owns boolean-tree syntax
 Event Listener keeps authoritative meanings for its event-context leaf predicates, but all / any / not composition is delegated to the shared predicate-tree owner. This migration is behavior-preserving and does not make Event Listener the global owner of those leaf predicates in Attack, Ability or Tactic contexts.
+
+
+## 107 — Shared leaf semantics are migrated one predicate at a time
+A shared predicate tree does not automatically create shared leaf semantics. Repeated leaf meanings are consolidated only when current contexts prove they are semantically identical. source_damaged is the first accepted case: Active Ability and Attack now reuse the same Requirement-evaluator meaning while retaining their separate orchestration.
