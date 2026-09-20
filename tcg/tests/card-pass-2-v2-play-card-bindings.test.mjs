@@ -45,12 +45,12 @@ test('play-phase hand cards become selectable and desktop-draggable without chan
   assert.match(battle, /\.sb-play-destination\.is-play-legal/);
 });
 
-test('touch and click use the same selected-card to destination transport path', () => {
+test('touch and click use the same selected-card path without moving the one-viewport board', () => {
   assert.match(controller, /document\.querySelectorAll\('\[data-play-hand-uid\]'/);
   assert.match(controller, /document\.querySelectorAll\('\[data-play-where\]'/);
   assert.match(controller, /await runPlayHandTarget\(where, index\)/);
-  assert.match(controller, /window\.matchMedia\('\(max-width: 640px\), \(hover: none\) and \(pointer: coarse\)'\)\.matches/);
-  assert.match(controller, /scrollIntoView\(\{ behavior: 'smooth', block: 'center' \}\)/);
+  assert.doesNotMatch(controller, /scrollIntoView\(/);
+  assert.match(battle, /\.sb-hand\{[\s\S]*?overflow-x:auto;overflow-y:hidden/);
 });
 
 test('hand intents map only to existing authoritative server owners', () => {
