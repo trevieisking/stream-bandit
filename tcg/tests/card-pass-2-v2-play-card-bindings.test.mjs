@@ -14,13 +14,13 @@ const evolutionOwner = fs.readFileSync(path.join(root, 'supabase', 'functions', 
 const tacticActions = fs.readFileSync(path.join(root, 'supabase', 'functions', 'tcg-tactic-actions', 'index.ts'), 'utf8');
 const contract = JSON.parse(fs.readFileSync(path.join(root, 'tcg-battle-client-interaction-v1.json'), 'utf8'));
 
-test('Battle keeps the tabletop zones while using compact v0.8 geometry and inspect-drag bindings', () => {
-  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-8-compact"/);
-  assert.match(battle, /data-sb-tcg-play-bindings="v0-9-inspect-drag"/);
+test('Battle keeps the tabletop zones while using bounded field geometry and inspect-drag hand-peek bindings', () => {
+  assert.match(battle, /data-sb-tcg-battle-layout="tabletop-v0-9-hand-peek"/);
+  assert.match(battle, /data-sb-tcg-play-bindings="v0-10-inspect-drag-peek"/);
   assert.match(battle, /data-sb-tcg-card-face="v1"/);
   assert.match(battle, /stream-bandit-tcg-card-renderer-v2-4-51\.js/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-16-compact-tabletop/);
-  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.16-compact-tabletop/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-17-hand-peek-inspect/);
+  assert.match(controller, /Stream Bandit TCG V2 Battle Controller v0\.17-hand-peek-inspect/);
   assert.match(controller, /mode: 'compact'/);
   assert.match(controller, /data-inspect-hand-uid=/);
   assert.match(controller, /data-inspect-field-owner=/);
@@ -31,6 +31,7 @@ test('hand card click reads the card while drag/drop remains the authoritative p
   assert.match(controller, /renderCardFace\(cardId, \{ mode: 'compact' \}\)/);
   assert.match(controller, /state\.inspectedCard = null;[\s\S]*?card\.classList\.add\('is-dragging'/);
   assert.match(battle, /\.sb-hand\{[\s\S]*?overflow-x:auto;overflow-y:hidden/);
+  assert.match(battle, /\.sb-hand-card\{[\s\S]*?height:152px[\s\S]*?margin-right:-14px/);
 });
 
 test('play-phase hand cards become selectable and desktop-draggable without changing setup binding', () => {
