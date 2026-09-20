@@ -424,10 +424,25 @@
     const uid = String(instance && instance.uid || '');
     const view = viewState();
     const yourSetup = !!(view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
-    const candidate = yourSetup && setupCandidate(instance);
-    const selected = candidate && state.selectedHandUid === uid;
-    return '<article class="sb-tcg-card sb-hand-card' + (candidate ? ' is-setup-candidate' : '') + (selected ? ' is-setup-selected' : '') + '" data-card-id="' + esc(cardId) + '"' +
-      (candidate ? ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') + '" data-setup-hand-uid="' + esc(uid) + '"' : '') + '>' +
+    const setupPlayable = yourSetup && setupCandidate(instance);
+    const playIntent = activePlayTurn(view) ? handIntent(instance) : '';
+    const playPlayable = !!playIntent;
+    const selected = (setupPlayable || playPlayable) && state.selectedHandUid === uid;
+    const classes =
+      (setupPlayable ? ' is-setup-candidate' : '') +
+      (playPlayable ? ' is-play-candidate' : '') +
+      (selected ? (yourSetup ? ' is-setup-selected' : ' is-play-selected') : '');
+    let attributes = '';
+    if (setupPlayable) {
+      attributes =
+        ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') +
+        '" data-setup-hand-uid="' + esc(uid) + '"';
+    } else if (playPlayable) {
+      attributes =
+        ' tabindex="0" role="button" aria-pressed="' + (selected ? 'true' : 'false') +
+        '" data-play-hand-uid="' + esc(uid) + '" data-play-intent="' + esc(playIntent) + '" draggable="true"';
+    }
+    return '<article class="sb-tcg-card sb-hand-card' + classes + '" data-card-id="' + esc(cardId) + '"' + attributes + '>' +
       '<div class="sb-card-art" aria-hidden="true">🎴</div>' +
       '<div class="sb-card-head"><span>' + esc(definition.card_family || definition.kind || '') + '</span><span>' + esc(definition.element || '') + '</span></div>' +
       '<div class="sb-card-name">' + esc(definition.name || cardId) + '</div>' +
