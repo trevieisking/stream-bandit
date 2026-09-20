@@ -1225,5 +1225,5 @@ Remaining frozen Attack IF instances:
 2. Volt — Stormmane / Storm Break outer `event_occurred(current_action)` IF -> attached-Essence discard;
 3. Volt — Stormmane / Storm Break nested target-survival IF -> Stunned.
 
-Exact-head Card Pass validation after the release-control refresh remains pending; the source is not promoted or merged while that gate is open.
+TCG Card Pass 2 Validation **#1284 SUCCESS** on accepted source/manifest head `e542a0060266502d1cb74a93a618a9bb8032a0ed`. V2.4.69 is accepted. Main/live remain untouched.
 
