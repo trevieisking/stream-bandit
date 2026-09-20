@@ -85,14 +85,20 @@ test('frozen Release 1 has exactly twelve Tactics gated by legal_card_available'
 });
 
 test('Tactic legal-card play requirements reuse existing selectors and shared candidate-existence semantics',()=>{
+  const helper=tacticSource.slice(
+    tacticSource.indexOf('function legalCardCandidateCount('),
+    tacticSource.indexOf('type TacticPredicateContext'),
+  );
+  assert.match(helper,/creatureOptions\(/);
+  assert.match(helper,/cardOptions\(/);
+
   const gate=tacticSource.slice(
     tacticSource.indexOf('function checkPlayRequirements('),
     tacticSource.indexOf('type TacticPlayability'),
   );
   assert.match(gate,/requirement\?\.predicate === "legal_card_available"/);
   assert.match(gate,/normalizeRuntimeV02LegalCardAvailableRequirement\(requirement\)/);
-  assert.match(gate,/creatureOptions\(/);
-  assert.match(gate,/cardOptions\(/);
+  assert.match(gate,/legalCardCandidateCount\(state, ownerSeat, normalized\)/);
   assert.match(gate,/evaluateRuntimeV02LegalCardAvailableRequirement\(candidateCount, normalized\)\.matched/);
 });
 
