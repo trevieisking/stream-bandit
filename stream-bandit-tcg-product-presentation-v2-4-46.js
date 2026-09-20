@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const VERSION='2.4.46';
+const VERSION='2.4.55';
 const SOURCES=Object.freeze({
   presentation:'assets/tcg/products/tcg-product-presentation-v1.json',
   starters:'tcg-set-one-starters-v0.2.json',
@@ -14,6 +14,8 @@ const SOURCES=Object.freeze({
 let readyPromise=null;
 let model=null;
 let rendererPromise=null;
+let inspectorRenderer=null;
+let inspectorHost=null;
 
 function esc(value){
   return String(value==null?'':value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -116,9 +118,66 @@ function ensureRenderer(){
   });
   return rendererPromise;
 }
+function ensureInspectorHost(){
+  if(inspectorHost&&document.body&&document.body.contains(inspectorHost))return inspectorHost;
+  inspectorHost=document.createElement('div');
+  inspectorHost.className='tcg-card-inspector';
+  inspectorHost.hidden=true;
+  inspectorHost.innerHTML=
+    '<button type="button" class="tcg-card-inspector-backdrop" data-sb-tcg-inspector-close="1" aria-label="Close card inspection"></button>'+
+    '<section class="tcg-card-inspector-panel" role="dialog" aria-modal="true" aria-label="Card inspection">'+
+    '<button type="button" class="tcg-card-inspector-close" data-sb-tcg-inspector-close="1" aria-label="Close card inspection">×</button>'+
+    '<div class="tcg-card-inspector-card" data-sb-tcg-inspector-card></div>'+
+    '</section>';
+  document.body.appendChild(inspectorHost);
+  return inspectorHost;
+}
+function closeInspector(){
+  const host=ensureInspectorHost();
+  host.hidden=true;
+  const slot=host.querySelector('[data-sb-tcg-inspector-card]');
+  if(slot)slot.innerHTML='';
+}
+function openInspector(cardId){
+  if(!inspectorRenderer||!cardId)return;
+  const record=typeof inspectorRenderer.getCard==='function'?inspectorRenderer.getCard(cardId):null;
+  if(!record)return;
+  const host=ensureInspectorHost();
+  const panel=host.querySelector('.tcg-card-inspector-panel');
+  const slot=host.querySelector('[data-sb-tcg-inspector-card]');
+  if(panel)panel.setAttribute('aria-label',(record.name||'Card')+' inspection');
+  if(slot)slot.innerHTML=inspectorRenderer.renderCard(cardId,{mode:'inspect'});
+  host.hidden=false;
+}
+function bindInspection(owner){
+  inspectorRenderer=owner;
+  ensureInspectorHost();
+  if(document.documentElement.dataset.sbTcgCardInspectionBound==='1')return;
+  document.documentElement.dataset.sbTcgCardInspectionBound='1';
+  document.addEventListener('click',event=>{
+    const target=event.target&&typeof event.target.closest==='function'?event.target:null;
+    if(!target)return;
+    const close=target.closest('[data-sb-tcg-inspector-close]');
+    if(close){event.preventDefault();closeInspector();return;}
+    const trigger=target.closest('[data-sb-tcg-inspect-card]');
+    if(!trigger)return;
+    event.preventDefault();
+    openInspector(String(trigger.dataset.sbTcgInspectCard||trigger.dataset.cardId||''));
+  });
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&inspectorHost&&!inspectorHost.hidden){event.preventDefault();closeInspector();return;}
+    if(event.key!=='Enter'&&event.key!==' ')return;
+    const target=event.target&&typeof event.target.closest==='function'?event.target:null;
+    const trigger=target&&target.closest('[data-sb-tcg-inspect-card]');
+    if(!trigger)return;
+    event.preventDefault();
+    openInspector(String(trigger.dataset.sbTcgInspectCard||trigger.dataset.cardId||''));
+  });
+}
+
 function cardTile(card,quantity){
   const qty=quantity?'<span class="tcg-product-qty">×'+esc(quantity)+'</span>':'';
-  return '<article class="tcg-product-card tcg-product-card-face" data-card-id="'+esc(card.card_id)+'">'+
+  return '<article class="tcg-product-card tcg-product-card-face" data-card-id="'+esc(card.card_id)+'" data-sb-tcg-inspect-card="'+esc(card.card_id)+'" tabindex="0" role="button" aria-label="Inspect '+esc(card.name)+'">'+
     '<div data-sb-tcg-render-card="'+esc(card.card_id)+'" data-sb-tcg-card-mode="compact"></div>'+qty+
     '</article>';
 }
@@ -220,9 +279,9 @@ function mountBattlePass(){
     rail.dataset.sbFeaturedStarter='1';
     const samples=model.pool.slice(0,12);
     rail.innerHTML=samples.map((card,index)=>
-      '<article class="tcg-reward tcg-product-reward'+(index%3===0?' premium':'')+'">'+
+      '<article class="tcg-reward tcg-product-reward'+(index%3===0?' premium':'')+'" data-card-id="'+esc(card.card_id)+'" data-sb-tcg-inspect-card="'+esc(card.card_id)+'" tabindex="0" role="button" aria-label="Inspect '+esc(card.name)+'">'+
       img(card.art_path,card.name+' artwork','tcg-product-reward-art')+
-      '<strong>Season 1 Preview</strong><span>'+esc(card.name)+'</span><small>Presentation sample · tier not assigned</small></article>'
+      '<strong>Season 1 Preview</strong><span>'+esc(card.name)+'</span><small>Tap or click to inspect · tier not assigned</small></article>'
     ).join('');
   }
 }
@@ -236,7 +295,7 @@ function mount(){
   else if(page==='collection')mountCollection();
   else if(page==='shop')mountShop();
   else if(page==='battlepass')mountBattlePass();
-  ensureRenderer().then(owner=>owner.ready().then(()=>owner)).then(owner=>owner.hydrate(document)).catch(()=>{});
+  ensureRenderer().then(owner=>owner.ready().then(()=>owner)).then(owner=>{owner.hydrate(document);bindInspection(owner);return owner;}).catch(()=>{});
 }
 function ready(){
   if(!readyPromise){
