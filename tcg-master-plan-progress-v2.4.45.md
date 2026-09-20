@@ -680,3 +680,30 @@ The previous-opponent query walks explicit ownership history rather than subtrac
 TCG Card Pass 2 Validation **#1189 PASS** on exact source head b30cc8baee0bef938c7a764f37c7319d138fd52b.
 
 Next target: shared event_occured/event history evaluation for Stone — Reversal Seal using this canonical window owner.
+
+
+## V2.4.58 — visible zone-state presentation requirements captured
+
+Trevor added a second presentation pass after the readable-board tests. These requirements are now part of Release 1 Battle communication, not optional decoration.
+
+### Authoritative visual movement contract
+A player should see the important physical-card consequences of the server state:
+- both decks remain visible as face-down piles with count;
+- every authoritative shuffle receives a visible shuffle effect;
+- opening deal visibly moves face-down cards into hand/Reward zones;
+- ordinary draw visibly travels from deck to hand;
+- the drawing player sees the resulting canonical hand face, while the opponent sees only a face-down hand card/count;
+- discard is a visible pile and is inspectable only to the extent Hidden Information says that zone/card is public;
+- movement into discard is visibly represented;
+- Reward selection uses a large overlay bound to the exact server-required count and eligible face-down Reward positions;
+- ordinary Creature reward values 1, 2 and 3 are supported generically;
+- selected Rewards visibly travel to hand before the existing suspended defeat/turn continuation resumes;
+- condition changes and Ability readiness/firing receive explicit card/field feedback.
+
+All of this is **presentation over authoritative owners**. RNG owns shuffle order. Card-Zone owns movement. Hidden Information owns visibility. Defeat/Reward owns required Reward count. Ability/Event Listener/Condition owners determine whether a state exists. The browser may animate those facts but may not recreate them.
+
+### Resilience rule
+Animations are disposable presentation. If a browser refreshes/reconnects halfway through one, the client must immediately render the current authoritative state rather than attempting to replay a stale animation as gameplay.
+
+### Test-order decision retained
+Kay's additional phone recording `Screen_Recording_20260920_193339_Chrome.mp4` is retained as evidence for the later cross-device gate. Release 1 runtime capability closeout remains the current implementation priority before another long Trevor/Kay Battle acceptance session.
