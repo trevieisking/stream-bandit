@@ -270,6 +270,52 @@ Deno.serve(async(req)=>{
    }
    return out;
   };
+  const projectAttackActions=()=>{
+   const out:any[]=[];
+   if(!p.vanguard)return out;
+   const source=p.vanguard.stack?.length?p.vanguard.stack[p.vanguard.stack.length-1]:null;
+   if(!source?.uid)return out;
+   const ad=top(p.vanguard,s);
+   for(const slot of [1,2]){
+    const raw=String(ad?.[`attack_${slot}`]||"");
+    const legacyAttack=parseAttack(raw);
+    let atk;
+    try{atk=resolveRuntimeAttackAuthority(s,source,slot,legacyAttack)}catch(error){
+     const message=error instanceof Error?error.message:String(error);
+     if(message==="tcg_v0_2_attack_slot_invalid"||message.startsWith("tcg_v0_2_attack_slot_invalid:"))continue;
+     out.push({slot,id:null,name:`Attack ${slot}`,eligible:false,reason:message});
+     continue;
+    }
+    if(!atk)continue;
+    let reason:string|null=null;
+    if(Number(s.first_player_seat)===seat&&Number(s.personal_turns?.[String(seat)]||0)<=1)reason="first_player_cannot_attack_on_first_personal_turn";
+    const eligibility=flags.lifecycle_attack_eligibility;
+    if(!reason&&eligibility&&Number(eligibility.turn_seq)===Number(s.turn_seq||0)&&String(eligibility.mode)==="final_vanguard_only"){
+     const anchor=String(eligibility.anchor_uid||"");
+     if(!anchor||!(p.vanguard.stack||[]).some((x:Inst)=>x.uid===anchor))reason="only_final_vanguard_may_attack_this_turn";
+    }
+    if(!reason&&!canPayAttack(p.vanguard,s,atk))reason="attack_essence_cost_not_met";
+    if(!reason){
+     const requirementCheck=evaluateRuntimeAttackDeclarationRequirements(s,p.vanguard,atk);
+     if(!requirementCheck.ok)reason="attack_requirements_not_met";
+    }
+    if(!reason&&atk.starbound&&p.match_flags?.starbound_used)reason="starbound_power_already_used";
+    if(!reason&&atk.starbound&&s.timefold_lock_seat!=null)reason="extra_turn_chain_blocked";
+    if(!reason&&conditions(p.vanguard).control==="Stunned")reason="stunned_cannot_attack";
+    out.push({
+     slot,
+     id:atk.id,
+     name:atk.name,
+     eligible:reason==null,
+     reason,
+     typed:{...atk.typed},
+     any:atk.any,
+     base_damage:atk.damage,
+     damage_source:atk.damage_source
+    });
+   }
+   return out;
+  };
   const withdrawalDeclaration=(rawIndex:any,requireTarget:boolean):any=>{
    const turn=Number(s.turn_seq||0);
    if(Number(flags.withdraw_turn??-1)===turn)return{ok:false,error:"withdrawal_already_used_this_turn",cost:null,legal_targets:[],payment_options:[]};
@@ -290,7 +336,7 @@ Deno.serve(async(req)=>{
 
   if(action==="field_actions"){
    const withdrawal=withdrawalDeclaration(null,false);
-   return json({ok:true,version:VERSION,result:{ability_sources:projectAbilitySources(),withdraw:withdrawal.ok?{eligible:true,cost:withdrawal.cost,legal_targets:withdrawal.legal_targets,payment_options:withdrawal.payment_options}:{eligible:false,reason:withdrawal.error,cost:withdrawal.cost,legal_targets:withdrawal.legal_targets,payment_options:withdrawal.payment_options}}});
+   return json({ok:true,version:VERSION,result:{ability_sources:projectAbilitySources(),attacks:projectAttackActions(),withdraw:withdrawal.ok?{eligible:true,cost:withdrawal.cost,legal_targets:withdrawal.legal_targets,payment_options:withdrawal.payment_options}:{eligible:false,reason:withdrawal.error,cost:withdrawal.cost,legal_targets:withdrawal.legal_targets,payment_options:withdrawal.payment_options}}});
   }
 
   if(action==="play_card_targets"){
