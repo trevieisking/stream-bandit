@@ -57,6 +57,9 @@ test('wide Battle cards are height-bounded at normal browser zoom and selected V
   assert.match(battle, /width:min\(var\(--card-w\),10\.36dvh\)/);
   assert.match(battle, /width:min\(var\(--active-w\),11\.79dvh\)/);
   assert.match(battle, /width:min\(clamp\(94px,8vw,126px\),10\.8dvh\)/);
-  assert.match(battle, /\.sb-card-control-shell\.is-selected\{[\s\S]*?position:fixed[\s\S]*?width:min\(330px,33vw,40dvh\)/);
-  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-14-resolution-ui/);
+  assert.match(battle, /\.sb-card-control-shell\.is-selected\{[\s\S]*?position:relative/);
+  assert.match(battle, /id="cardInspector"/);
+  assert.match(battle, /\.sb-card-inspector-panel\{[\s\S]*?width:min\(330px,33vw,40dvh\)/);
+  assert.match(controller, /function renderSelectedCardInspector\(view, canAct\)/);
+  assert.match(battle, /stream-bandit-tcg-v2-battle-controller\.js\?v=0-15-stable-card-focus/);
 });
