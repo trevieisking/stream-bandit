@@ -236,10 +236,25 @@
       "Volt"
     ],
     "color_plus_glyph_required": true,
-    "group_same_element_overflow_as_multiplier": true,
     "remove_when_authoritative_attachment_leaves": true,
     "browser_resource_authority": false,
     "compare_directly_with_attack_cost_orbs": true,
-    "hidden_information_rule": "render_only_attached_essence_information_exposed_by_the_viewer_authorized_match_view"
-  }
+    "hidden_information_rule": "render_only_attached_essence_information_exposed_by_the_viewer_authorized_match_view",
+    "unit_layout": {
+      "normal": "individual_tiny_orbs_while_space_allows",
+      "overflow": "one_counted_orb_per_element",
+      "count_position": "inside_orb",
+      "example_same_element": "Astral orb with 12 inside",
+      "example_mixed_elements": "Astral orb 7 + Tide orb 5",
+      "never_merge_different_elements_into_one_total": true,
+      "responsive_presentation_only": true
+    },
+    "group_same_element_overflow_as_counted_orb": true
+  },
+  "priority_order": [
+    "canonical_card_visuals_and_readability",
+    "real_attack_damage_turn_reward_lifecycle",
+    "essence_visibility_and_cross_device_input_parity",
+    "final_board_decoration"
+  ]
 }
