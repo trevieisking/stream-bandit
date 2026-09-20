@@ -1227,3 +1227,39 @@ Remaining frozen Attack IF instances:
 
 TCG Card Pass 2 Validation **#1284 SUCCESS** on accepted source/manifest head `e542a0060266502d1cb74a93a618a9bb8032a0ed`. V2.4.69 is accepted. Main/live remain untouched.
 
+## V2.4.70 / V2.4.71 — Attack IF source closeout: Backdraft + Storm Break
+
+The final three frozen Release 1 Attack IF instances are now routed through the shared Attack IF predicate owner in branch source.
+
+### V2.4.70 — Gale / Slipwing / Backdraft
+
+Backdraft's structured after-damage program is:
+`reserve_count_at_least(self,1) -> SELECT_CREATURE(self reserve, exactly 1) -> SWITCH_WITH_VANGUARD(action_kind=attack)`.
+
+A new card-ID-free bounded owner, `tcg-match-attack-switch-choice-v0-2.ts`, now:
+- recognizes only that structured switch family;
+- evaluates the reserve-count IF through `runtimeV02EvaluateAttackIf`;
+- opens a private authoritative `pending_attack_choice` listing occupied legal Reserve anchors;
+- resolves the player's exact-one selection through the existing Atomic Switch owner;
+- resumes through the existing Movement Listener -> Heal Listener -> Aftermath continuation;
+- never reads a browser-supplied switch target during the original Attack declaration.
+
+The Battle client now routes generic `pending_attack_choice` through its existing server-choice overlay to `resolve_attack_choice`. This also exposes the already-existing Match Attack choice families through one common transport rather than a Backdraft-only control.
+
+### V2.4.71 — Volt / Stormmane / Storm Break
+
+Storm Break's remaining nested IF decisions now use the same shared evaluator:
+- outer `event_occurred(current_action)` consumes the authoritative action-local declaration-event map;
+- nested `target_remains_in_play_after_damage` consumes the authoritative primary-damage survival snapshot.
+
+The existing overcharge owner still owns the attached-Essence discard choice, Card-Zone transfer and Condition application. The IF migration does not duplicate those mutations.
+
+### Attack IF source status
+
+- Tactic IF: 6 / 6 generic executable paths already accepted.
+- Attack IF: **13 / 13 frozen instances now routed through shared Attack IF in source**.
+- No launch card identity was added to either generic owner.
+- Match Edge dependency closure is **93 files** after the Backdraft choice owner.
+- Current release-control digest after the Attack IF closeout source is `0daefbf978518e78751ec327f49a88e7f66122d930a1eee98028e4902b7514b6`.
+
+CI note: Card Pass #1285 proved the new Backdraft owner module itself green. #1287 validated an earlier combined head and exposed stale type/test guards; those exact failures have since been repaired on the branch. The connector has not yet attached a Card Pass run to the current post-repair head, so **Attack IF exact-head acceptance remains open**. No merge/live promotion is implied.
