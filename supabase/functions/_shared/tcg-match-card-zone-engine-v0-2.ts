@@ -483,3 +483,82 @@ export function runtimeV02ApplyCardZonePartitionTransfer<T extends RuntimeV02Car
     },
   };
 }
+
+export type RuntimeV02CardZoneReorderRequest = {
+  cause: RuntimeV02CardZoneTransferCause;
+  action_kind: string;
+  source_action_id: string;
+  source_card_uid: string | null;
+  zone: RuntimeV02CardZoneRef;
+  card_uids: string[];
+  destination_position: "top" | "bottom";
+};
+
+export type RuntimeV02CardZoneReorderReceipt = {
+  schema: "sb-tcg-card-zone-reorder-v0.2";
+  cause: RuntimeV02CardZoneTransferCause;
+  action_kind: string;
+  source_action_id: string;
+  source_card_uid: string | null;
+  zone: RuntimeV02CardZoneRef;
+  card_uids: string[];
+  destination_position: "top" | "bottom";
+  count: number;
+};
+
+/**
+ * Reorders exact existing instances within one authoritative zone.
+ * This is the Card-Zone-owned primitive for effects such as "move the inspected
+ * top card to the bottom of that same deck". It never clones card instances and
+ * never permits an unknown/duplicate uid.
+ */
+export function runtimeV02ApplyCardZoneReorder<T extends RuntimeV02CardZoneInstance>(
+  zoneCards: T[],
+  request: RuntimeV02CardZoneReorderRequest,
+): { cards: T[]; receipt: RuntimeV02CardZoneReorderReceipt } {
+  validateZone(zoneCards, "reorder");
+  if (!Array.isArray(request.card_uids) || request.card_uids.length < 1) {
+    throw new Error("tcg_v0_2_card_zone_reorder_card_uids_required");
+  }
+  const cardUids = request.card_uids.map((value, index) =>
+    requiredString(value, `tcg_v0_2_card_zone_reorder_card_uid_invalid:${index}`)
+  );
+  if (new Set(cardUids).size !== cardUids.length) {
+    throw new Error("tcg_v0_2_card_zone_reorder_card_uid_duplicate");
+  }
+  if (request.destination_position !== "top" && request.destination_position !== "bottom") {
+    throw new Error("tcg_v0_2_card_zone_reorder_destination_position_invalid");
+  }
+
+  const byUid = new Map(zoneCards.map((card) => [card.uid, card] as const));
+  const cards = cardUids.map((uid) => {
+    const card = byUid.get(uid);
+    if (!card) throw new Error(`tcg_v0_2_card_zone_reorder_selected_card_missing:${uid}`);
+    return card;
+  });
+  const selected = new Set(cardUids);
+  const remainder = zoneCards.filter((card) => !selected.has(card.uid));
+  if (request.destination_position === "top") {
+    zoneCards.splice(0, zoneCards.length, ...cards, ...remainder);
+  } else {
+    zoneCards.splice(0, zoneCards.length, ...remainder, ...cards);
+  }
+
+  return {
+    cards,
+    receipt: {
+      schema: "sb-tcg-card-zone-reorder-v0.2",
+      cause: request.cause,
+      action_kind: requiredString(request.action_kind, "tcg_v0_2_card_zone_reorder_action_kind_required"),
+      source_action_id: requiredString(request.source_action_id, "tcg_v0_2_card_zone_reorder_source_action_id_required"),
+      source_card_uid: request.source_card_uid == null
+        ? null
+        : requiredString(request.source_card_uid, "tcg_v0_2_card_zone_reorder_source_card_uid_invalid"),
+      zone: normalizedZoneRef(request.zone, "reorder"),
+      card_uids: [...cardUids],
+      destination_position: request.destination_position,
+      count: cards.length,
+    },
+  };
+}
+
