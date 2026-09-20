@@ -71,6 +71,20 @@ test('match page does not contain matchmaking, room-code, or out-of-match menu c
   assert.doesNotMatch(battle, /Main Menu|Create New Deck|Find Opponent/i);
 });
 
+test('battle settings exposes only explicit server concession and terminal results return to fresh matchmaking', () => {
+  assert.match(battle, /id="battleSettings"/);
+  assert.match(battle, /data-concede="1"/);
+  assert.match(battle, />Quit Match<\/button>/);
+  assert.match(battle, /Quit Match is a concession/);
+  assert.match(controller, /async function runConcede\(\)/);
+  assert.match(controller, /callEdge\(API_MATCH, actionBase\('concede'\)\)/);
+  assert.match(controller, /window\.confirm\('Quit this match\? This is a concession: you lose and your opponent wins\.'\)/);
+  assert.doesNotMatch(controller, /beforeunload[\s\S]{0,500}concede/);
+  assert.match(controller, />Back to Matchmaking<\/button>/);
+  assert.match(controller, /window\.location\.href = 'tcg-play\.html'/);
+  assert.doesNotMatch(controller, /data-result-continue[\s\S]{0,500}match_id/);
+});
+
 test('existing battle controller still binds the route to authoritative match identity', () => {
   assert.match(controller, /new URLSearchParams\(window\.location\.search\)\.get\('match_id'\)/);
   assert.match(controller, /callEdge\(API_SETUP, \{ action: 'match_view', match_id: state\.matchId \}\)/);
