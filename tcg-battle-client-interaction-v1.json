@@ -241,12 +241,15 @@
     "compare_directly_with_attack_cost_orbs": true,
     "hidden_information_rule": "render_only_attached_essence_information_exposed_by_the_viewer_authorized_match_view",
     "unit_layout": {
-      "normal": "individual_tiny_orbs_while_space_allows",
-      "overflow": "one_counted_orb_per_element",
+      "normal": "individual_tiny_orbs_while_the_rail_fits_inside_allocated_card_bounds",
+      "compression_trigger": "rendered_essence_rail_would_breach_allocated_card_parameters",
+      "compression_threshold": "dynamic_layout_measurement_not_a_fixed_essence_count",
+      "overflow": "one_counted_orb_per_present_element",
       "count_position": "inside_orb",
-      "example_same_element": "Astral orb with 12 inside",
-      "example_mixed_elements": "Astral orb 7 + Tide orb 5",
+      "count_value": "current_authoritative_total_for_that_element",
+      "keep_different_elements_separate": true,
       "never_merge_different_elements_into_one_total": true,
+      "can_expand_back_to_individual_orbs_when_space_allows": true,
       "responsive_presentation_only": true
     },
     "group_same_element_overflow_as_counted_orb": true
