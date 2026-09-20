@@ -248,6 +248,115 @@
     return SETUP_RECIPES.has(recipeType(instance));
   }
 
+  function activePlayTurn(view) {
+    return !!(
+      view &&
+      view.phase === 'play' &&
+      Number(view.active_seat) === Number(view.you && view.you.seat) &&
+      !hasPendingAction(view) &&
+      !state.busy
+    );
+  }
+
+  function handIntent(instance) {
+    const definition = legacyDefinition(instance) || {};
+    const kind = String(definition.kind || definition.card_family || '');
+    const family = String(definition.family || definition.tactic_subtype || '');
+    const stage = String(definition.stage || '');
+    if (kind === 'Creature') {
+      if (['Baby', 'Standalone', 'Mythic'].includes(stage)) return 'play_creature';
+      if (['Teen', 'Adult'].includes(stage)) return 'evolve';
+    }
+    if (kind === 'Essence') return 'attach_essence';
+    if (kind === 'Tactic' && family === 'Relic') return 'attach_relic';
+    if (kind === 'Tactic' && family === 'Realm') return 'play_realm';
+    if (kind === 'Tactic' || String(definition.card_family || '') === 'Tactic') return 'play_tactic';
+    return '';
+  }
+
+  function selectedHandInstance() {
+    const view = viewState();
+    const hand = view && view.you && Array.isArray(view.you.hand) ? view.you.hand : [];
+    return hand.find((row) => String(row.uid || '') === state.selectedHandUid) || null;
+  }
+
+  function selectedHandDefinition() {
+    const instance = selectedHandInstance();
+    return instance ? (legacyDefinition(instance) || {}) : {};
+  }
+
+  function selectedHandIntent() {
+    const instance = selectedHandInstance();
+    return instance ? handIntent(instance) : '';
+  }
+
+  function selectedHandName() {
+    const instance = selectedHandInstance();
+    const definition = instance ? (legacyDefinition(instance) || {}) : {};
+    return instance ? String(definition.name || instance.card_id || 'Selected card') : '';
+  }
+
+  function ownCreatureAt(where, index) {
+    const view = viewState();
+    if (!view || !view.you) return null;
+    if (where === 'vanguard') return view.you.vanguard || null;
+    if (where === 'reserve' && Number.isInteger(index) && index >= 0 && index < 4) {
+      return Array.isArray(view.you.reserve) ? (view.you.reserve[index] || null) : null;
+    }
+    return null;
+  }
+
+  function playTargetLegal(where, index, creature) {
+    const view = viewState();
+    if (!activePlayTurn(view) || !state.selectedHandUid) return false;
+    const intent = selectedHandIntent();
+    if (intent === 'play_creature') return where === 'reserve' && !creature;
+    if (intent === 'attach_essence') return !!creature;
+    if (intent === 'attach_relic') return !!creature && !creature.relic;
+    if (intent === 'evolve') {
+      if (!creature) return false;
+      const definition = selectedHandDefinition();
+      const prior = topDefinition(creature) || {};
+      return String(definition.evolves_from_id || '') === String(prior.id || topInstance(creature)?.card_id || '');
+    }
+    return false;
+  }
+
+  function directHandIntent(intent) {
+    return intent === 'play_realm' || intent === 'play_tactic';
+  }
+
+  function playInstruction(intent) {
+    if (intent === 'play_creature') return 'Drop or tap an empty Reserve slot.';
+    if (intent === 'evolve') return 'Drop or tap the matching Creature to evolve it.';
+    if (intent === 'attach_essence') return 'Drop or tap one of your Creatures to attach this Essence.';
+    if (intent === 'attach_relic') return 'Drop or tap a Creature without a Relic.';
+    if (intent === 'play_realm') return 'Use Play Realm to send this card to the authoritative Realm owner.';
+    if (intent === 'play_tactic') return 'Use Play Tactic; any required server choice will appear here.';
+    return 'Select a playable card.';
+  }
+
+  function currentServerChoice(view) {
+    if (!view) return null;
+    if (view.pending_choice) return { source: 'tactic', endpoint: API_TACTIC, action: 'resolve_choice', choice: view.pending_choice };
+    if (view.phase === 'effect_resolution' && view.pending_movement_listener_choice) {
+      return { source: 'tactic', endpoint: API_TACTIC, action: 'resolve_choice', choice: view.pending_movement_listener_choice };
+    }
+    if (view.phase === 'effect_resolution' && view.pending_heal_listener_choice) {
+      return { source: 'tactic', endpoint: API_TACTIC, action: 'resolve_choice', choice: view.pending_heal_listener_choice };
+    }
+    if (view.pending_event_listener_choice) {
+      return { source: 'match', endpoint: API_MATCH, action: 'resolve_event_listener_choice', choice: view.pending_event_listener_choice };
+    }
+    if (view.pending_movement_listener_choice) {
+      return { source: 'match', endpoint: API_MATCH, action: 'resolve_movement_listener_choice', choice: view.pending_movement_listener_choice };
+    }
+    if (view.pending_heal_listener_choice) {
+      return { source: 'match', endpoint: API_MATCH, action: 'resolve_heal_listener_choice', choice: view.pending_heal_listener_choice };
+    }
+    return null;
+  }
+
   function topInstance(creature) {
     return creature && Array.isArray(creature.stack) && creature.stack.length
       ? creature.stack[creature.stack.length - 1]
