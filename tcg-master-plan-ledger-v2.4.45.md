@@ -463,4 +463,18 @@ Generic no-selection MOVE_CARDS resolves `step.player` before fallback ownership
 
 ## 165 — False Memory is a consumer, not a random-sampling owner
 False Memory supplies structured opponent-hand sample + later public discard data. It owns no RNG, hidden-information or Card-Zone runtime branch.
+## 166 — Attack IF boolean composition has one shared read-only owner
+All Release 1 Attack IF trees must evaluate through the shared predicate-tree composition and the Attack IF leaf adapter. Effect mutation remains with existing mechanic owners.
+
+## 167 — Attack IF leaf semantics reuse existing shared state owners
+Source damage, source Shield and reserve count reuse the Requirement evaluator; target Condition state reuses the Condition engine. Attack IF may not redefine those meanings.
+
+## 168 — current_action event evidence is caller-owned
+The Attack IF evaluator may test supplied current-action event counts but does not record those events itself. Attack declaration/event ownership remains a separate authoritative phase.
+
+## 169 — card_matches remains a selection/filter boundary
+Attack IF resolves the structured variable reference but delegates card/filter matching to the caller's canonical card-definition/filter semantics. The IF owner does not become a card-search engine.
+
+## 170 — Attack IF foundation is not Attack effect parity
+A green predicate evaluator does not imply HEAL, Condition, switch, discard, MOVE_CARDS or other selected branches execute generically. The parent Attack IF gate remains open until branch effects are migrated and proven.
 
