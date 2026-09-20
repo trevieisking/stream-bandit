@@ -1302,6 +1302,23 @@
         const where = String(card.dataset.inspectFieldWhere || '');
         const rawIndex = String(card.dataset.inspectFieldIndex || '');
         const index = rawIndex === '' ? null : Number(rawIndex);
+        const view = viewState();
+        const youSeat = Number(view && view.you && view.you.seat);
+        const pendingPromotion = !!(
+          owner === 'you' &&
+          where === 'reserve' &&
+          view &&
+          view.phase === 'resolution' &&
+          view.pending_resolution &&
+          String(view.pending_resolution.kind || '') === 'promote' &&
+          Number(view.pending_resolution.seat) === youSeat
+        );
+        const selectedPlayDestination = !!(
+          owner === 'you' &&
+          state.selectedHandUid &&
+          playTargetLegal(where, index, ownCreatureAt(where, index))
+        );
+        if (pendingPromotion || selectedPlayDestination) return;
         state.inspectedCard = { kind: 'field', owner, where, index };
         state.selectedAnchorUid = owner === 'you' && where === 'vanguard'
           ? String(card.dataset.cardAnchor || '')
@@ -1360,15 +1377,7 @@
         state.inspectedCard = { kind: 'hand', uid };
         state.overlayKey = '';
         render();
-        if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches) {
-          window.requestAnimationFrame(() => {
-            const intent = selectedHandIntent();
-            const target = intent === 'play_creature' ? $('youReserve') : $('youVanguardSlot');
-            if (target && typeof target.scrollIntoView === 'function') {
-              target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          });
-        }
+        // The compact tabletop keeps every destination in the viewport; only the hand rail scrolls.
       };
 
       card.addEventListener('click', select);
@@ -1476,16 +1485,7 @@
         state.inspectedCard = { kind: 'hand', uid };
         state.overlayKey = '';
         render();
-        if (state.selectedHandUid && window.matchMedia && window.matchMedia('(max-width: 640px), (hover: none) and (pointer: coarse)').matches) {
-          window.requestAnimationFrame(() => {
-            const current = viewState();
-            const hasVanguard = !!(current && current.you && current.you.vanguard);
-            const target = hasVanguard ? $('youReserve') : $('youVanguardSlot');
-            if (target && typeof target.scrollIntoView === 'function') {
-              target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          });
-        }
+        // Setup destinations remain visible in the one-viewport tabletop; no page auto-scroll is required.
       };
       card.addEventListener('click', select);
       card.addEventListener('keydown', (event) => {
