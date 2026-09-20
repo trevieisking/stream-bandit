@@ -1,6 +1,8 @@
 import {
+  evaluateRuntimeV02ReserveCountAtLeastRequirement,
   evaluateRuntimeV02SourceDamagedRequirement,
   evaluateRuntimeV02SourceHasShieldAtLeastRequirement,
+  normalizeRuntimeV02ReserveCountAtLeastRequirement,
   normalizeRuntimeV02SourceHasShieldAtLeastRequirement,
 } from "../_shared/tcg-match-requirement-evaluator-v0-2.ts";
 
@@ -53,5 +55,44 @@ Deno.test("source Shield threshold normalization fails closed on malformed shape
       { predicate: "source_has_shield_at_least", value: 1 },
     ),
     "tcg_v0_2_requirement_source_shield_amount_invalid",
+  );
+});
+
+
+Deno.test("shared reserve-count predicate counts only occupied Reserve slots", () => {
+  const requirement = normalizeRuntimeV02ReserveCountAtLeastRequirement({
+    predicate: "reserve_count_at_least",
+    controller: "self",
+    count: 2,
+  });
+  const below = evaluateRuntimeV02ReserveCountAtLeastRequirement([{}, null, null, null], requirement);
+  equal(below.matched, false);
+  equal(below.actual_count, 1);
+  equal(below.required_count, 2);
+
+  const exact = evaluateRuntimeV02ReserveCountAtLeastRequirement([{}, {}, null, null], requirement);
+  equal(exact.matched, true);
+  equal(exact.controller, "self");
+});
+
+Deno.test("reserve-count normalization defaults controller to self and fails closed", () => {
+  const normalized = normalizeRuntimeV02ReserveCountAtLeastRequirement({
+    predicate: "reserve_count_at_least",
+    count: 1,
+  });
+  equal(normalized.controller, "self");
+  throws(
+    () => normalizeRuntimeV02ReserveCountAtLeastRequirement({
+      predicate: "reserve_count_at_least",
+      count: 0,
+    }),
+    "tcg_v0_2_requirement_reserve_count_threshold_invalid",
+  );
+  throws(
+    () => evaluateRuntimeV02ReserveCountAtLeastRequirement(
+      {},
+      { predicate: "reserve_count_at_least", controller: "self", count: 1 },
+    ),
+    "tcg_v0_2_requirement_reserve_count_zone_invalid",
   );
 });
