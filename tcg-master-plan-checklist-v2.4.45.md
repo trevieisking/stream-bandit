@@ -292,3 +292,26 @@
 - [ ] Continue operation/predicate audit until **every Release 1-used partial/missing capability** is either implemented or proven already implemented by the rightful owner.
 - [ ] Only after Release 1 runtime capability closeout return to Trevor/Kay full two-device G5 Battle acceptance.
 - [ ] Main/static live promotion remains HOLD until runtime closeout + G5 + final release gates.
+
+
+## V2.4.58 — visible card-zone state + authoritative Battle motion
+- [x] Record Kay's additional phone recording `Screen_Recording_20260920_193339_Chrome.mp4` as deferred human evidence for the next full Battle acceptance pass; do not use it to bypass Release 1 runtime closeout.
+- [x] Lock presentation rule: authoritative card-zone/state changes must be visually understandable without requiring the player to infer what happened from counters alone.
+- [ ] Render both players' decks as visible **face-down card piles** with count; never expose hidden card identities.
+- [ ] Trigger a clear deck **shuffle animation/effect every time the authoritative RNG/Card-Zone path records a shuffle**; animation is presentation-only and cannot reorder cards client-side.
+- [ ] Opening setup/deal must visibly move face-down cards from deck to hand/Rewards before settling into their authoritative zones.
+- [ ] Ordinary draw must visibly move one face-down card from deck toward hand; the drawing player then sees the canonical face-up hand card while the opponent sees only face-down hand presence/count.
+- [ ] Render opponent hand as count-correct face-down card backs at the opponent edge; no hidden identity leakage.
+- [ ] Render discard as a visible pile and allow read-only inspection of cards whose visibility is public/authorized by Hidden Information; no hidden-zone bypass.
+- [ ] Animate visible card movement into discard when the authoritative Card-Zone owner moves a card there.
+- [ ] Reward taking must open a prominent large-screen overlay showing the exact authoritative required count and eligible face-down Reward positions.
+- [ ] Reward overlay must support ordinary reward values **1 / 2 / 3** from the defeated Creature's authoritative reward value and require exactly the server-owned selection count.
+- [ ] Selected Reward cards move visibly from Reward zone to the winner's hand, then the suspended Attack/Defeat continuation resumes.
+- [ ] Conditions must have a clear visible field/card state indicator when authoritatively applied, replaced, cleared or prevented.
+- [ ] Triggered/active Abilities that fire or become usable must have a clear visual state/feedback tied to authoritative listener/capability output; animation must not invent legality.
+- [ ] Zone movement/shuffle/draw/discard/Reward animation must consume authoritative events/state deltas and never become a second mutation engine.
+- [ ] Reconnect/refresh must reconstruct the final authoritative board immediately even if an animation was interrupted.
+- [ ] Add automated presentation/source guards for deck backs, shuffle/draw motion hooks, discard inspection visibility fences, opponent hidden hand, Reward overlay count binding and condition/Ability indicators.
+- [ ] Add later human acceptance: both devices can identify shuffle, deal, draw, discard, Reward selection and condition/Ability changes without relying on raw logs/counters.
+- [ ] Deckout acceptance remains server-owned: after runtime closeout, a pass-only two-user test may verify repeated draws end through the canonical deckout/terminal owner while the visual deck count reaches zero.
+- [ ] These presentation requirements do **not** move the next human Battle gate forward; Release 1 runtime capability closeout remains first.
