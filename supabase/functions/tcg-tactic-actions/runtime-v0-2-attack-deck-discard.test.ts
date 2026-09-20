@@ -131,7 +131,7 @@ Deno.test("structured attack deck discard preserves top order and object identit
     1,
     descriptor,
     { uid: "source-uid", card_id: "test-deck-discarder" },
-    true,
+    { damage: 0, shield: 0, conditions: { scorched: true, venomed: 0, control: null, modifier: null } },
   );
 
   equal(result.condition_met, true);
@@ -165,7 +165,7 @@ Deno.test("structured attack deck discard does nothing when target condition is 
     1,
     descriptor,
     { uid: "source-uid", card_id: "test-deck-discarder" },
-    false,
+    { damage: 0, shield: 0, conditions: { scorched: false, venomed: 0, control: null, modifier: null } },
   );
   equal(result.condition_met, false);
   equal(result.moved_count, 0);
@@ -189,7 +189,7 @@ Deno.test("structured attack deck discard moves only available cards and never c
     1,
     descriptor,
     { uid: "source-uid", card_id: "test-deck-discarder" },
-    true,
+    { damage: 0, shield: 0, conditions: { scorched: false, venomed: 1, control: null, modifier: null } },
   );
   equal(result.moved_count, 1);
   equal((current.players as any)["2"].deck.length, 0);
