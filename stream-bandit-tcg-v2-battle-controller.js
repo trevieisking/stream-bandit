@@ -464,11 +464,18 @@
     const hasVanguard = !!(view && view.you && view.you.vanguard);
     node.innerHTML = [0, 1, 2, 3].map((index) => {
       const creature = reserve && reserve[index];
-      const destination = yourSetup && hasVanguard && !creature && state.selectedHandUid
+      const setupDestination = yourSetup && hasVanguard && !creature && state.selectedHandUid
         ? ' data-setup-destination="reserve" data-setup-index="' + index + '"'
         : '';
-      const legalClass = destination ? ' sb-setup-destination is-legal' : '';
-      return '<section class="sb-reserve-slot' + legalClass + '"' + destination + '><span>' + esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' +
+      const playLegal = !!(own && playTargetLegal('reserve', index, creature));
+      const playDestination = own
+        ? ' data-play-where="reserve" data-play-index="' + index + '"'
+        : '';
+      const legalClass =
+        (setupDestination ? ' sb-setup-destination is-legal' : '') +
+        (playLegal ? ' sb-play-destination is-play-legal' : '');
+      return '<section class="sb-reserve-slot' + legalClass + '"' + setupDestination + playDestination + '><span>' +
+        esc(ownerLabel) + ' Reserve ' + (index + 1) + '</span>' +
         creatureCard(creature, { setupReturn: own && creature ? setupReturnOptions('reserve', index) : null }) +
         '</section>';
     }).join('');
@@ -515,16 +522,23 @@
     const slot = $('youVanguardSlot');
     if (!slot) return;
     const yourSetup = !!(view && view.phase === 'setup' && Number(view.setup_turn_seat) === Number(view.you && view.you.seat));
-    const empty = !(view && view.you && view.you.vanguard);
-    const legal = !!(yourSetup && empty && state.selectedHandUid);
-    slot.className = 'sb-vanguard-slot' + (legal ? ' sb-setup-destination is-legal' : '');
-    if (legal) {
+    const creature = view && view.you ? view.you.vanguard : null;
+    const empty = !creature;
+    const setupLegal = !!(yourSetup && empty && state.selectedHandUid);
+    const playLegal = playTargetLegal('vanguard', null, creature);
+    slot.className =
+      'sb-vanguard-slot' +
+      (setupLegal ? ' sb-setup-destination is-legal' : '') +
+      (playLegal ? ' sb-play-destination is-play-legal' : '');
+    if (setupLegal) {
       slot.dataset.setupDestination = 'vanguard';
       slot.dataset.setupIndex = '';
     } else {
       delete slot.dataset.setupDestination;
       delete slot.dataset.setupIndex;
     }
+    slot.dataset.playWhere = 'vanguard';
+    slot.dataset.playIndex = '';
   }
 
   function renderOverlay() {
