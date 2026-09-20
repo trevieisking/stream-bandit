@@ -191,3 +191,7 @@ Coarse-touch drag activates only after a deliberate short hold. Movement before 
 
 ## 078 — Setup slots must be discoverable before touch selection
 Eligible empty setup locations expose their destination coordinates during the player's setup turn even before a hand card is selected. Their legal highlight remains conditional on a selected eligible Creature. This lets touch drag discover a destination without re-rendering away the held DOM card and does not change server setup legality.
+
+
+## 079 — Automated V2.4.53 proof does not replace device acceptance
+Regression tests may prove authoritative refresh behavior, layout-driven compression, per-element grouping and command transport parity. They do not mark Trevor desktop or Kay phone visual/gesture checks complete. Exact-head CI closes the automated slice only; human cross-device gates remain separately required.
