@@ -529,3 +529,18 @@ The target-survival result is computed from authoritative post-primary-damage st
 
 ## 188 — Attack IF source parity and CI acceptance are separate gates
 All 13 frozen Release 1 Attack IF instances may be source-migrated before an exact-head workflow run exists. Source completion may be recorded, but the parent accepted/green gate remains open until Card Pass validates the post-repair head.
+
+## 189 — Release 1 IF inventory is 29 exact instances
+The frozen eight-element Set One definitions contain 29 structured IF nodes: 7 Tactic IF instances, 13 Attack IF instances and 9 Ability IF instances. Program count and IF-node count must not be conflated.
+
+## 190 — Generic Event Listener already owns build/evolution Ability IF execution
+Triggered Ability programs that enter the ordinary Event Listener continuation use the shared predicate tree for IF composition. Existing Cinderburrow, Briarback and Bloomhare IF programs therefore remain Event Listener-owned; no separate Ability IF engine should duplicate those mutations.
+
+## 191 — Attack-declared Ability IF wraps the existing modifier owner
+For synchronous `attack_declared` triggered Abilities, IF decides whether the existing current-Attack damage modifier is applied. The listener owner may recursively evaluate IF wrappers, but it must not create a second Attack/Damage mutation engine.
+
+## 192 — False triggered-Ability IF does not spend a once-per-turn use
+If the triggered Ability's requirements match but its nested IF branch does not select a current-Attack modifier, the event is resolved as a zero-delta no-op and the Ability's per-turn use is not consumed.
+
+## 193 — Ability IF leaves read authoritative source/target state
+`source_damaged`, `event_attack_target_damaged` and `event_attack_target_has_condition` are evaluated from the bound authoritative field source/target for the current attack declaration. Browser state and printed English never decide these leaves.
