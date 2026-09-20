@@ -70,9 +70,10 @@ test('opening toss is rendered from authoritative toss_winner_seat and never ran
 test('opening setup uses the existing server setup actions and guides Vanguard before Reserves', () => {
   assert.match(controller, /data-setup-hand-uid/);
   assert.match(controller, /dataset\.setupDestination = 'vanguard'/);
-  assert.match(controller, /yourSetup && hasVanguard && !creature && state\.selectedHandUid/);
+  assert.match(controller, /const setupAvailable = !!\(yourSetup && hasVanguard && !creature\)/);
+  assert.match(controller, /setupLegal = !!\(setupAvailable && state\.selectedHandUid && setupTargetLegal\('reserve', index\)\)/);
   assert.match(controller, /selected — tap Your Vanguard first/);
-  assert.match(controller, /Choose your Vanguard Creature first/);
+  assert.match(controller, /Choose an eligible Creature for Your Vanguard first/);
   assert.match(controller, /runAuthoritativeSetupAction\('setup_place'/);
   assert.match(controller, /runAuthoritativeSetupAction\('setup_return'/);
   assert.match(controller, /runAuthoritativeSetupAction\('setup_ready'/);
