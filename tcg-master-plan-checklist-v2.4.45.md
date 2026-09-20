@@ -284,7 +284,7 @@
 - [x] Repair all 5 Release 1 Tactic play requirements using reserve_count_at_least; predicate and legacy forms share one evaluator; **Card Pass #1171 PASS**.
 - [x] Repair all 12 Release 1 Tactics using legal_card_available; reuse existing card/Creature selectors and shared candidate-existence semantics; **Card Pass #1179 PASS**.
 - [x] Add canonical turn-owner history before previous_opponent_turn/event history support; opening, ordinary and deckout turn starts record ownership; same-seat extra turns resolve correctly; **Card Pass #1189 PASS**.
-- [ ] Wire generic IF through Tactic execution for every Release 1 Tactic IF shape.
+- [x] Wire generic IF through Tactic execution for every Release 1 Tactic IF shape. All six frozen Tactic IF programs and downstream opcodes pass Card Pass #1250 on `93c169b63423ef029bf7cbd071eb4e09c27bd74d`.
 - [ ] Wire generic IF through Attack execution for every Release 1 Attack IF shape.
 - [ ] Wire generic IF through Active/triggered Ability execution for every Release 1 Ability IF shape.
 - [ ] Prove all 29 Release 1 IF instances are executable without printed-English/card-ID fallback.
@@ -339,11 +339,11 @@
 - [x] Frozen-registry/source-contract tests bind all six Tactic IF cards and predicate inventory.
 - [x] TCG Card Pass 2 Validation **#1207 PASS** at exact source/manifest head `bf4dcca6ceb8c56540fdee2dfec17d59731650e2`.
 - [x] Surveyor Mina and Recovery Spray IF programs are executable through already-supported downstream opcodes.
-- [ ] Cyclone Route IF branch still requires generic Tactic OPTIONAL.
-- [ ] False Memory IF branch still requires RANDOM_SAMPLE_HIDDEN_ZONE.
+- [x] Cyclone Route IF branch: generic server-owned OPTIONAL uses the existing pending-choice + same-cursor continuation; Card Pass #1250 SUCCESS on `93c169b63423ef029bf7cbd071eb4e09c27bd74d`.
+- [x] False Memory IF branch: server-only RANDOM_SAMPLE_HIDDEN_ZONE delegates RNG to the shared non-destructive sampler and later movement to Card-Zone; Card Pass #1250 SUCCESS on `93c169b63423ef029bf7cbd071eb4e09c27bd74d`.
 - [x] Reversal Seal IF branch: generic ADD_SHIELD_EACH is implemented through the existing Shield owner and covered by frozen-registry/source-contract tests; included in Card Pass #1229 SUCCESS.
 - [x] Blackout Pulse IF branch: generic Tactic APPLY_CONDITION delegates to the shared Condition owner; Card Pass #1234 SUCCESS on `ecd3d86ce060f5e3349b0af202a9393c58bbb36e`.
-- [ ] Do not mark all six Tactic IF cards fully executable until the two remaining downstream gaps close: Cyclone Route OPTIONAL and False Memory RANDOM_SAMPLE_HIDDEN_ZONE.
+- [x] All six frozen Release 1 Tactic IF cards are executable through generic downstream owners; final downstream closeout Card Pass #1250 SUCCESS on `93c169b63423ef029bf7cbd071eb4e09c27bd74d`.
 ## V2.4.59 — visible special effects + search/attach/shuffle choreography
 - [x] Lock the Release 1 rule that important authoritative card movement, Attack, Ability and state changes require visible player-facing feedback; effects are not optional decoration.
 - [x] Lock the effects layer as generic event/effect choreography, not card-ID-specific branches, so future cards/moves/Abilities/Conditions can reuse it.
@@ -419,5 +419,21 @@
 - [x] Add source-contract proof that the branch calls shared applyRuntimeCondition and contains no Blackout Pulse/card-ID exception.
 - [x] Refresh the exact Tactic Edge entrypoint fingerprint and 39-file dependency closure.
 - [x] TCG Card Pass 2 Validation #1234 SUCCESS on exact head `ecd3d86ce060f5e3349b0af202a9393c58bbb36e`.
-- [ ] Next: implement generic Tactic OPTIONAL through the existing pending-choice/cursor owner, then re-run exact-head validation.
+- [x] Generic Tactic OPTIONAL complete for Cyclone Route, False Memory and Quiet Step, including False Memory else_steps and Quiet Step control-condition compatibility alias; included in #1250 SUCCESS.
+
+## V2.4.64 / V2.4.65 — Tactic IF downstream closeout
+- [x] Inventory every frozen Tactic OPTIONAL consumer: Cyclone Route, False Memory, Quiet Step.
+- [x] Route OPTIONAL through the existing server pending-choice / same-effect-cursor owner.
+- [x] Support generic Yes `steps` and No `else_steps`.
+- [x] Keep chooser-seat privacy and wrong-seat rejection in the existing choice owner.
+- [x] Alias CHOOSE_AND_CLEAR_CONTROL_CONDITION to the generic condition-choice owner with control-slot restriction and exact-one default.
+- [x] Add shared non-destructive RANDOM_SAMPLE_HIDDEN_ZONE primitive over canonical match RNG.
+- [x] Keep the False Memory Tactic sample server-only and exact-count/fail-closed.
+- [x] Preserve private sampled-source provenance until the later movement step.
+- [x] Make generic no-selection MOVE_CARDS honor structured `step.player`.
+- [x] Delegate hidden sampled hand -> Discard movement by exact UID to Card-Zone; do not duplicate/remove cards locally.
+- [x] Expand exact Tactic Edge dependency closure 39 -> 40 files for the new shared sampler.
+- [x] TCG Card Pass 2 Validation #1250 SUCCESS on exact head `93c169b63423ef029bf7cbd071eb4e09c27bd74d`.
+- [x] All six frozen Release 1 Tactic IF programs now have generic executable downstream paths.
+- [ ] Next Master Plan runtime gate: generic Attack IF execution for all 13 frozen Attack IF instances.
 
