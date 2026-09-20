@@ -1005,6 +1005,24 @@ function executeUntilChoice(state: any) {
       }
       continue;
     }
+    if (op === "ADD_SHIELD_EACH") {
+      const resolved = resolveVar(vars, step.targets);
+      const refs = Array.isArray(resolved)
+        ? resolved
+        : resolved == null
+        ? []
+        : [resolved];
+      const amount = Number(step.amount);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        throw new Error("tcg_v0_2_tactic_add_shield_each_amount_invalid");
+      }
+      for (const ref of refs as CreatureRef[]) {
+        const found = findCreature(state, ref);
+        if (found) addRuntimeShield(found.cr, amount);
+      }
+      effect.cursor++;
+      continue;
+    }
     if (op === "ADD_SHIELD" || op === "CLEAR_CONDITION_IF_PRESENT" || op === "CLEAR_CONDITION") {
       const ref = resolveVar(vars, step.target) as CreatureRef;
       const found = findCreature(state, ref);
