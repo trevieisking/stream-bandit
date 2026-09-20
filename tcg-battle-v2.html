@@ -461,28 +461,39 @@ button.sb-reward-card{padding:0;appearance:none;-webkit-appearance:none;cursor:p
     flex:0 0 auto
   }
 
-  /* Selecting your Vanguard opens the same canonical card face at a readable size.
-     Attack/Ability buttons remain the original card-owned controls. */
+  /* The original Vanguard remains anchored in its battlefield slot.
+     Readable card context is rendered in a separate stable inspector below. */
   .sb-card-control-shell.is-selected{
-    position:fixed;
-    z-index:120;
-    left:50%;
-    top:50%;
-    width:min(330px,33vw,40dvh);
-    height:auto;
-    max-width:88vw;
-    max-height:70dvh;
-    transform:translate(-50%,-50%);
-    box-shadow:0 0 0 1px #55e7ff88,0 24px 80px #000d,0 0 38px #35e2ad2a
-  }
-  .sb-card-control-shell.is-selected>.sb-card-face{
-    width:100%;
-    height:auto;
-    aspect-ratio:5/7
+    position:relative;
+    z-index:8
   }
 }
+.sb-card-inspector[hidden]{display:none}
+.sb-card-inspector{
+  position:fixed;inset:0;z-index:140;display:grid;place-items:center;padding:18px;
+  pointer-events:none
+}
+.sb-card-inspector-backdrop{
+  position:absolute;inset:0;border:0;margin:0;padding:0;background:#010711b8;
+  backdrop-filter:blur(2px);pointer-events:auto;cursor:default
+}
+.sb-card-inspector-panel{
+  position:relative;z-index:2;width:min(330px,33vw,40dvh);max-width:88vw;max-height:78dvh;
+  pointer-events:auto;filter:drop-shadow(0 24px 50px #000d)
+}
+.sb-card-inspector-card{position:relative;width:100%}
+.sb-card-inspector-card>.sb-card-face{width:100%;height:auto;aspect-ratio:5/7}
+.sb-card-inspector-card>.sb-card-live-status{top:44%}
+.sb-card-inspector-close{
+  position:absolute;z-index:12;right:-10px;top:-10px;width:32px;height:32px;border-radius:50%;
+  border:1px solid #8de9ff88;background:#061522;color:#fff;font-size:20px;font-weight:900;
+  display:grid;place-items:center;cursor:pointer;box-shadow:0 5px 18px #000a
+}
+.sb-card-inspector-close:hover,.sb-card-inspector-close:focus-visible{outline:none;border-color:#c8f6ff;box-shadow:0 0 0 2px #55e7ff38,0 5px 18px #000a}
+
 @media(max-width:640px), (hover:none) and (pointer:coarse){
   :root{--card-w:min(27vw,112px);--active-w:min(42vw,160px)}
+  .sb-card-inspector{display:none!important}
   html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .sb-battle{height:auto;min-height:100dvh;padding:0;background-attachment:scroll}
   .sb-board{
@@ -678,10 +689,12 @@ button.sb-reward-card{padding:0;appearance:none;-webkit-appearance:none;cursor:p
   </section>
 </main>
 
+<div class="sb-card-inspector" id="cardInspector" hidden></div>
+
 <script src="stream-bandit-tcg-config-v2-4-31.js?v=2-4-31"></script>
 <script src="stream-bandit-auth-gate-v7-13-001.js?v=tcg-v2-battle-v0-6"></script>
 <script src="stream-bandit-tcg-art-resolver-v2-4-36.js?v=2-4-46"></script>
 <script src="stream-bandit-tcg-card-renderer-v2-4-51.js?v=2-4-53"></script>
-<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-14-resolution-ui"></script>
+<script src="stream-bandit-tcg-v2-battle-controller.js?v=0-15-stable-card-focus"></script>
 </body>
 </html>
