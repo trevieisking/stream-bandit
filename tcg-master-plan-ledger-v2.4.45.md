@@ -336,7 +336,7 @@ The frozen Release 1 registry contains 18 Tactics with explicit play requirement
 The Tactic interpreter may evaluate a shared predicate tree and splice the chosen then/else steps into its existing effect cursor. IF itself does not own Shield, Condition, hidden sampling or Optional-choice mutation. Those downstream operations remain with their rightful owners and must fail closed until implemented.
 
 ## 121 — A green IF does not imply every IF card is complete
-A Release 1 Tactic with a working IF predicate is still incomplete when its selected branch contains an unsupported opcode. Current post-IF blockers are Cyclone Route OPTIONAL, False Memory RANDOM_SAMPLE_HIDDEN_ZONE, Reversal Seal ADD_SHIELD_EACH and Blackout Pulse APPLY_CONDITION. Surveyor Mina and Recovery Spray have no remaining downstream IF-branch opcode gap.
+A Release 1 Tactic with a working IF predicate is still incomplete when its selected branch contains an unsupported opcode. Current post-IF blockers are Cyclone Route OPTIONAL and False Memory RANDOM_SAMPLE_HIDDEN_ZONE. Reversal Seal ADD_SHIELD_EACH and Blackout Pulse APPLY_CONDITION are now implemented generically. Surveyor Mina and Recovery Spray also have no remaining downstream IF-branch opcode gap.
 ## 122 — Every meaningful authoritative resolution needs legible feedback
 Release 1 presentation must make important card movement, Attack, Ability and state-changing outcomes visible. A server-correct mutation can still fail the player-facing gate when the player cannot tell what moved, triggered, changed or resolved.
 
@@ -432,4 +432,12 @@ The presentation envelope and receipt-maker modules are part of the exact `tcg-m
 
 ## 154 — Reversal Seal ADD_SHIELD_EACH is generic runtime capability, not a card exception
 Release 1 `ADD_SHIELD_EACH` resolves one-or-many Creature refs then delegates each actual Shield mutation to the existing Shield owner. Reversal Seal is a registry consumer of that generic operation and must not own a card-specific runtime branch.
+## 155 — Tactic APPLY_CONDITION delegates to the shared Condition owner
+The Tactic interpreter may resolve a Creature reference and transport the structured condition request, but the actual Condition mutation belongs to `applyRuntimeCondition` in the shared Condition engine.
+
+## 156 — Condition application modes are shared grammar
+Tactic `APPLY_CONDITION` accepts the same generic modes already used by other runtime owners: `apply`, `apply_if_empty`, `apply_if_empty_or_same`, and `replace`. Tactics may not create alternate slot/replacement semantics.
+
+## 157 — Blackout Pulse is a consumer, not a runtime owner
+Volt — Blackout Pulse supplies structured IF + `APPLY_CONDITION` data. Its card identity must never appear in the generic Tactic condition adapter.
 
