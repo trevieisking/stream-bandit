@@ -1560,6 +1560,12 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
     if (attachmentMovementEvents.length) {
       movementFlow = runtimeV02BeginMovementListenerContinuation(state, attachmentMovementEvents);
     }
+  } else if (apply === "optional_steps") {
+    const use = selected[0]?.data?.use === true;
+    const chosen = use ? structuredClone((context.steps as any[]) || []) : [];
+    effect.steps.splice(effect.cursor, 1, ...chosen);
+    delete state.pending_choice;
+    return;
   } else if (apply === "repeat_optional") {
     const count = Number(selected[0]?.data?.count || 0);
     const repeated: any[] = [];
