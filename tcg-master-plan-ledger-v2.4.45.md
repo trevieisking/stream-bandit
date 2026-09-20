@@ -337,3 +337,33 @@ The Tactic interpreter may evaluate a shared predicate tree and splice the chose
 
 ## 121 — A green IF does not imply every IF card is complete
 A Release 1 Tactic with a working IF predicate is still incomplete when its selected branch contains an unsupported opcode. Current post-IF blockers are Cyclone Route OPTIONAL, False Memory RANDOM_SAMPLE_HIDDEN_ZONE, Reversal Seal ADD_SHIELD_EACH and Blackout Pulse APPLY_CONDITION. Surveyor Mina and Recovery Spray have no remaining downstream IF-branch opcode gap.
+## 122 — Every meaningful authoritative resolution needs legible feedback
+Release 1 presentation must make important card movement, Attack, Ability and state-changing outcomes visible. A server-correct mutation can still fail the player-facing gate when the player cannot tell what moved, triggered, changed or resolved.
+
+## 123 — Special effects are a projection, never a gameplay owner
+The effects layer consumes authoritative state deltas, pending choices and event/result packets. It may animate source, target, movement and result, but it never chooses legality, amounts, targets, random order, payments or final state.
+
+## 124 — Effect choreography is generic and extensible
+Visual effects are keyed by reusable event/effect families — movement, search, shuffle, attach, attack, heal, damage, Shield, Condition, switch, evolve, defeat, Reward and listener/Ability activity — rather than card IDs. New cards and rules should plug into these families without creating per-card UI engines.
+
+## 125 — Deck search is a private server-count-bound choice surface
+A deck-search overlay receives its eligible options and selection limits from the authoritative search/pending-choice owner. The searching player may inspect only the cards they are authorized to inspect. A three-card effect displays 0/3 through 3/3 because that effect says three; the UI never treats three as a universal search constant.
+
+## 126 — Search attachment targets come from existing legality owners
+When searched Essence/Energy cards may attach to Adult Creature/Creature targets, the client highlights only server-projected legal destinations. Assigning a selected card to a target is choice transport; Attachment/Essence/Requirement owners remain authoritative.
+
+## 127 — Chosen searched cards attach before the visual shuffle
+For search -> attach -> shuffle effects, authoritative chosen cards are shown moving to their Creature attachment/Essence rails, inspected-but-unchosen cards return to the deck representation, and the visible shuffle follows the server's shuffle step. Presentation order mirrors the canonical effect sequence.
+
+## 128 — Shuffle visuals never expose or recreate permutation
+RNG/shuffle authority determines the resulting deck order. The animation may mix/fan/cut card backs, but it must not know, predict, preserve or reveal the actual hidden permutation beyond the authoritative state available to the viewer.
+
+## 129 — Public and private choreography are viewer-specific
+The searching player may receive private eligible card identities and assignment controls. The opponent receives only the public-safe representation of a search, attachment or shuffle unless a rule explicitly reveals identities. Hidden Information remains authoritative throughout animation.
+
+## 130 — Attack and Ability choreography preserves causal order
+Attack and Ability presentation follows the authoritative sequence: source activation -> legal target/choice -> payment/cost where applicable -> effect/impact -> state deltas -> listeners/Conditions/Defeat/Reward -> continuation. Visual timing may be shortened, but must not reorder gameplay semantics.
+
+## 131 — Animation interruption is never a gameplay fault
+Reduced-motion mode, dropped frames, navigation, refresh or reconnect may skip unfinished effects. The newest authoritative snapshot always wins immediately; no animation has a gameplay receipt or permission to replay mutations.
+
