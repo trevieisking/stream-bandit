@@ -725,3 +725,29 @@ The Tactic Edge closure expanded from 37 to **39 files** because the entrypoint 
 TCG Card Pass 2 Validation **#1200 PASS** on exact source/manifest head `9de2db520b593624c0a12e4be6186e23470eaa72`.
 
 Result: all **18** frozen Release 1 Tactics with explicit play requirements are now covered by current structured requirement families. The next runtime target is generic `IF` execution inside Tactic programs.
+
+
+## V2.4.57 implementation I — generic IF reaches the Tactic interpreter
+
+The frozen Release 1 registry contains exactly six Tactic-program IF instances:
+- Gale — Cyclone Route;
+- Shade — False Memory;
+- Stone — Reversal Seal;
+- Stone — Surveyor Mina;
+- Tide — Recovery Spray;
+- Volt — Blackout Pulse.
+
+Tactic now delegates all/any/not composition to the shared predicate-tree owner, resolves its six Release 1 leaf meanings from current authoritative state/selectors, and replaces the IF instruction in-place with the selected then/else branch. Pending-choice semantics remain on the existing single Tactic effect cursor.
+
+No launch card identity is referenced by the IF adapter.
+
+TCG Card Pass 2 Validation **#1207 PASS** on exact source/manifest head `bf4dcca6ceb8c56540fdee2dfec17d59731650e2`.
+
+This closes **Tactic IF control flow**, but not every card program downstream of IF:
+- Surveyor Mina and Recovery Spray use already-supported branch opcodes and are now structurally runnable.
+- Cyclone Route is blocked by generic OPTIONAL.
+- False Memory is blocked by RANDOM_SAMPLE_HIDDEN_ZONE.
+- Reversal Seal is blocked by ADD_SHIELD_EACH.
+- Blackout Pulse is blocked by APPLY_CONDITION.
+
+The next bounded implementation target is ADD_SHIELD_EACH because it is the smallest missing operation that unlocks a complete frozen Tactic program.
