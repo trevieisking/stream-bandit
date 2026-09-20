@@ -398,4 +398,27 @@ Animation queues are disposable. Newer authoritative state, reconnect, refresh o
 
 ## 142 — Player-facing completion includes comprehensibility
 A Release 1 mechanic is not visually accepted merely because the mutation succeeded. The player must be able to identify the important source, target/movement and resulting state change without relying on raw diagnostic text.
+## 143 — Authoritative visual receipts are preferred over client snapshot inference
+Complex presentation should be driven by a receipt projected by the authoritative action/continuation owner at commit time. Snapshot comparison may help render final state but must not guess hidden choices, RNG, target legality or listener ordering.
+
+## 144 — Presentation receipts are viewer-filtered before consumption
+A receipt may contain public cues and seat-private cues internally, but each persisted player view receives only the cues authorized for that viewer. The browser never becomes the Hidden Information filter.
+
+## 145 — Receipt identity makes presentation idempotent
+Each presentation receipt is bound to an authoritative revision and stable receipt ID. Polling the same match view must not replay the same effect. A newer authoritative revision invalidates older queued choreography.
+
+## 146 — Presentation intensity is pacing metadata only
+Micro, standard and hero tiers control emphasis/timing only. They never alter effect order, legality, amounts, random results or continuation.
+
+## 147 — Element FX skins are generic Stream Bandit presentation
+Astral, Ember, Gale, Grove, Shade, Stone, Tide and Volt may each apply a reusable visual skin to generic cue families. Element styling is keyed by public structured element metadata, never by individual card ID, and must remain understandable without colour alone.
+
+## 148 — Resolution breadcrumbs mirror authority instead of replacing it
+A temporary accessible resolution ribbon may summarize a complex authoritative cue chain such as Attack -> damage -> Condition -> Defeat -> Reward. It is generated from the same receipt and cannot create, delay or reorder gameplay.
+
+## 149 — Private choices may have a public-safe opponent mirror
+The opponent may be told that a search/choice is in progress only when that fact is public. Card identities, eligible options, assignments and other private details remain absent unless the authoritative visibility rule explicitly reveals them.
+
+## 150 — Stale animation backlog is disposable
+A newer authoritative revision, reconnect or refresh may cancel old presentation cues. Repeated low-importance cues may be coalesced for pacing in a later visual layer, but the latest committed match snapshot and all rule outcomes remain complete and immediate.
 
