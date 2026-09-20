@@ -382,5 +382,46 @@
       "client_may_reconstruct_permutation": false,
       "opponent_view": "public_safe_search_attachment_shuffle_feedback_without_private_card_identity_unless_explicitly_revealed"
     }
+  },
+  "reference_comparison_v2_4_60": {
+    "evidence": [
+      "WhatsApp Video 2026-09-20 at 17.52.36(1).mp4",
+      "Video Project 5.mp4",
+      "Desktop 2026.09.20 - 18.22.38.08.mp4",
+      "WhatsApp Video 2026-09-20 at 18.30.29.mp4",
+      "Screen_Recording_20260920_193339_Chrome.mp4"
+    ],
+    "external_reference_scope": "interaction_grammar_only_no_external_assets_rules_names_or_card_designs",
+    "conclusion": "stream_bandit_keeps_authoritative_rules_and_adds_generic_presentation_choreography"
+  },
+  "presentation_choreography_engine": {
+    "authority": "presentation_only",
+    "gameplay_owner": false,
+    "generic_not_card_id_specific": true,
+    "systems": [
+      "zone_motion",
+      "choice_overlay",
+      "combat_ability_fx",
+      "deck_hidden_zone_presentation",
+      "stable_inspector",
+      "pacing_recovery"
+    ],
+    "consumes": [
+      "authoritative_state_delta",
+      "authoritative_event_or_result_packet",
+      "authoritative_pending_choice",
+      "viewer_visibility_projection"
+    ],
+    "forbidden": [
+      "calculate_legality",
+      "choose_rng",
+      "choose_damage_or_heal_amount",
+      "invent_targets",
+      "retain_private_identity_beyond_authorized_view",
+      "submit_gameplay_mutation_from_animation"
+    ],
+    "stable_tabletop": true,
+    "desktop_touch_semantic_parity": true,
+    "latest_authoritative_snapshot_wins": true
   }
 }
