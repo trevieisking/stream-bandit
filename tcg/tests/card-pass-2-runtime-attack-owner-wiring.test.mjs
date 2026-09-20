@@ -134,6 +134,48 @@ async function attack(state, { random = [], ...body } = {}) {
   return { status: response.status, body: await response.json(), commits: current.commits };
 }
 
+async function fieldActions(state) {
+  const original = structuredClone(state);
+  current = { state, commits: [] };
+  const response = await handler(new Request("http://local.test/tcg-match-actions", {
+    method: "POST", headers: { Authorization: "Bearer local-test", "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "field_actions", match_id: "test-match", client_nonce: "field-actions", expected_revision: 5 }),
+  }));
+  assert.deepEqual(state, original, "field action projection must not mutate the authoritative snapshot");
+  return { status: response.status, body: await response.json(), commits: current.commits };
+}
+
+test("structured: field_actions reports exact Attack readiness and enough Essence resolves the same Attack", async () => {
+  const state = fixture();
+  state.card_index["test-creature"].definition_v0_2.creature.attacks[0].cost = [{ element: "Astral", amount: 2 }];
+  state.card_index["test-astral-essence"] = {
+    card_id: "test-astral-essence",
+    definition: { id: "test-astral-essence", name: "Test Astral Essence", kind: "Essence", element: "Astral" },
+  };
+
+  const insufficient = await fieldActions(state);
+  assert.equal(insufficient.status, 200, JSON.stringify(insufficient.body));
+  assert.equal(insufficient.commits.length, 0);
+  assert.deepEqual(insufficient.body.result.attacks.map(({ slot, eligible, reason }) => ({ slot, eligible, reason })), [
+    { slot: 1, eligible: false, reason: "attack_essence_cost_not_met" },
+  ]);
+
+  state.players[1].vanguard.essence.push(
+    { uid: "essence-1", card_id: "test-astral-essence" },
+    { uid: "essence-2", card_id: "test-astral-essence" },
+  );
+  const ready = await fieldActions(state);
+  assert.equal(ready.status, 200, JSON.stringify(ready.body));
+  assert.deepEqual(ready.body.result.attacks.map(({ slot, eligible, reason }) => ({ slot, eligible, reason })), [
+    { slot: 1, eligible: true, reason: null },
+  ]);
+
+  const result = await attack(state);
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  assert.equal(result.commits.length, 1);
+  assert.equal(result.commits[0].p_new_state.players[2].vanguard.damage, 20);
+});
+
 for (const structured of [true, false]) {
   const mode = structured ? "structured" : "legacy";
 
