@@ -417,6 +417,20 @@
     return window.StreamBanditTCGCardRendererV2451 || null;
   }
 
+  function cardNameById(cardId) {
+    const id = String(cardId || '');
+    const renderer = cardRenderer();
+    if (renderer && typeof renderer.getCard === 'function') {
+      const record = renderer.getCard(id);
+      if (record && record.name) return String(record.name);
+      if (record && record.definition && record.definition.name) return String(record.definition.name);
+    }
+    const view = viewState();
+    const row = view && view.card_index && id ? view.card_index[id] : null;
+    const legacy = row ? (row.definition || row) : null;
+    return String((legacy && legacy.name) || (row && row.name) || id || 'Card');
+  }
+
   function abilityReadyFor(where, index, creature) {
     const anchor = cardAnchor(creature);
     if (!anchor || !state.fieldActions || !Array.isArray(state.fieldActions.ability_sources)) return false;
