@@ -235,5 +235,7 @@ test('touch drag reuses existing setup/play command owners and contains no alter
   assert.match(controller,/await runSetupPlace\(uid, coords\.where, coords\.index\)/);
   assert.match(controller,/playTargetLegal\(coords\.where, coords\.index/);
   assert.match(controller,/setupTargetLegal\(coords\.where, coords\.index\)/);
+  assert.match(controller,/Hold then drag to, or tap,/);
+  assert.match(controller,/hold then drag it to a highlighted destination/);
   assert.doesNotMatch(controller,/mobileRulesEngine|touchRulesEngine|mobileAttachEssence/);
 });
