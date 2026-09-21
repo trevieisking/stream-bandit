@@ -677,3 +677,18 @@ A card-specific branch that is explicitly gated to unmarked legacy snapshots doe
 ## 237 — Do not rewrite a green structured owner solely to remove legacy compatibility debt
 Capability reconciliation must prefer proven current ownership over unnecessary runtime churn. Legacy-only cleanup is a separate compatibility decision and must not be conflated with Release 1 structured engine completion.
 
+## 238 — Attack declaration RECORD_EVENT has one generic Release 1 owner
+Structured Attack `on_declare` `RECORD_EVENT` steps are evaluated by the Attack declaration-event owner from registry data. Match consumes the resulting action-local event counts; card IDs and printed English are not declaration-event authority.
+
+## 239 — Attack-source Essence declaration predicates read authoritative attachment state
+`event_attack_source_attached_essence_count_at_least` reads the current authoritative source Creature attachment count. `event_attack_source_has_attached_essence_kind` delegates attachment-kind classification to the shared Attack authority query. Browser state does not decide either predicate.
+
+## 240 — False declaration predicates emit no synthetic event
+When a structured declaration predicate does not match, the action-local event map remains unchanged. Unsupported declaration operations, predicate names, fields or Essence kinds fail closed rather than degrading to printed-English interpretation.
+
+## 241 — Action-local declaration events feed later shared Attack IF decisions
+Storm Break and Chainstorm may consume their declaration evidence later in the same Attack through shared `event_occurred(current_action)` IF evaluation. The declaration owner records evidence only; it does not duplicate Attack IF or downstream effect mutation.
+
+## 242 — Nightmaw deck-top discard is the next used-operation audit
+The frozen Set One has exactly one `DISCARD_DECK_TOP` consumer, Shade — Nightmaw / Dread Crush. Existing evidence indicates the structured Attack Deck-Discard owner already delegates its physical deck -> discard movement to Card-Zone and emits the canonical deck-discard event; capability status must be reconciled only after exact owner/test evidence is confirmed.
+
