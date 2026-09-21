@@ -1829,3 +1829,93 @@ Stone — Bastion Plate / Bastion Plate Use: `INCREMENT_SOURCE_COUNTER`.
 
 The frozen inventory contains exactly one consumer and the primitive `incrementRuntimeSourceCounter` already exists, but the shared Event Listener currently has no `INCREMENT_SOURCE_COUNTER` opcode dispatch. V2.4.86 must wire that structured listener operation generically to the existing counter primitive, preserving listener-source instance ownership and the following `source_counter_at_least` IF / scheduled-discard sequence.
 
+## V2.4.86 — accepted damage-prevented attached-Relic listener family
+
+The Release 1 Relic prevention family is now executable end-to-end through existing canonical owners, without card-ID dispatch and without adding an owner family.
+
+### Frozen family
+
+Incoming attached-Relic attack-damage modifiers:
+- Shade — Gloom Locket: -10 when the opposing attacker has a condition and the attached target is Shade.
+- Stone — Bastion Plate: -20 from opposing attack damage.
+- Tide — Shellguard Pendant: -20 from opposing attack damage, one actual prevention per attachment.
+
+`damage_prevented` attached-Relic listeners:
+- Bastion Plate: attached-source/target prevention predicates -> increment card-instance `prevention_uses` -> after 3 uses schedule source discard after the attack finishes.
+- Shellguard Pendant: same prevention predicates with one-use attachment listener limit -> schedule source discard after the attack finishes.
+
+### Canonical ownership
+
+**Attack Damage owner**
+`supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts`
+now evaluates generic attached-Relic `incoming_attack_damage` continuous effects and returns exact prevention details while preserving the compatibility scalar API. It supports the frozen opponent-source filters, condition/element filters and attachment-scoped one-use consumption without any launch-card identity branches.
+
+**Event Listener owner**
+`supabase/functions/_shared/tcg-match-event-listener-v0-2.ts`
+now receives exact `damage_prevented` events and generically owns:
+- `prevention_target_is_attached_creature`;
+- `prevention_source_is_attached_card`;
+- `prevention_amount_at_least`;
+- card-instance counter lookup/increment for declared Tactic counters;
+- `INCREMENT_SOURCE_COUNTER`;
+- `source_counter_at_least` at the Bastion listener consumer;
+- turn-scoped attachment listener limits;
+- attachment-scoped attachment listener limits;
+- `SCHEDULE_SOURCE_DISCARD` orchestration.
+
+**Scheduled Action owner**
+`supabase/functions/_shared/tcg-match-scheduled-action-v0-2.ts`
+now accepts the generic `after_attack_finished` trigger and returns a source-discard plan. It does not physically mutate attached Relics.
+
+**Relic owner**
+`supabase/functions/_shared/tcg-match-relic-engine-v0-2.ts`
+owns exact attached-Relic -> discard mutation, including unique source identity, scalar-slot validation, destination collision preflight and exact instance preservation.
+
+**Match orchestration**
+`supabase/functions/tcg-match-actions/index.ts`
+turns detailed attack prevention into Event Listener events and drains due after-attack Scheduled Action plans before defeat scan. Physical Relic discard is delegated back to the Relic owner.
+
+The canonical owner-family count remains **40**.
+
+### Regression evidence
+
+Added:
+- `runtime-v0-2-relic-damage-prevention-listener.test.ts`;
+- `card-pass-2-relic-damage-prevention-runtime.test.mjs`.
+
+The existing deck-discard ownership guard was made semantic rather than relying on the first Event Listener call in the attack dispatcher. Runtime Pass B Attack Damage and Surge guard scripts were likewise updated to recognize the detailed Attack Damage compatibility bridge while retaining their ownership and duplicate-wiring assertions.
+
+### Release-control evidence
+
+Match Edge closure:
+- 102 files;
+- SHA-256 `9dc39ff55b849b76ffbf1593c3ea30d2c1a886d7b050c86a962b1c2cb65eb68c`.
+
+Tactic Edge closure:
+- 41 files;
+- SHA-256 `9a33a92624e4ac058f9c0ee12200344a67479fb7f97c5e2aa43283c5be45ad65`.
+
+TCG Card Pass 2 Validation **#1420 SUCCESS** on exact complete source/runtime head
+`9d3bf34346de60559d1952826e6c2bf078f9acc7`.
+
+`tcg-runtime-capabilities-v0.2.json` now classifies as **implemented**:
+- `INCREMENT_SOURCE_COUNTER`;
+- `SCHEDULE_SOURCE_DISCARD`;
+- `prevention_target_is_attached_creature`;
+- `prevention_source_is_attached_card`;
+- `prevention_amount_at_least`.
+
+`source_counter_at_least` was already labeled implemented; V2.4.86 supplies executable evidence for its sole frozen attached-Relic listener consumer.
+
+Release-control capability-manifest fingerprint is
+`b0033085bfce1a529730f25e985e085c4f466754`.
+
+TCG Card Pass 2 Validation **#1422 SUCCESS** on exact capability-reconciled head
+`f1aa770437a5a1618c1e8886928561cd3a60dd92`.
+
+### Next exact runtime target
+
+Grove — Sapstone Charm / `MODIFY_CURRENT_HEAL`.
+
+The frozen family has one consumer. Read-only preflight proves Heal owner #21 already contains the complete generic `before_heal_packet` path: target-attached predicate, source-action-kind predicate, turn-scoped attachment limit, `MODIFY_CURRENT_HEAL` validation/application, and invocation before HP mutation inside the canonical Heal Packet owner. V2.4.87 should therefore be capability reconciliation only if exact-head evidence remains aligned.
+
