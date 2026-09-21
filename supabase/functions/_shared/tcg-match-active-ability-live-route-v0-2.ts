@@ -1,4 +1,9 @@
 import {
+  runtimeV02ExecuteActiveAbilityConditionReplacement,
+  type RuntimeV02ActiveAbilityConditionReplacementResolution,
+  type RuntimeV02ActiveAbilityConditionReplacementState,
+} from "./tcg-match-active-ability-condition-replacement-v0-2.ts";
+import {
   runtimeV02ExecuteActiveAbilityHiddenSample,
   type RuntimeV02ActiveAbilityHiddenSampleResolution,
 } from "./tcg-match-active-ability-hidden-sample-v0-2.ts";
@@ -24,6 +29,10 @@ export type RuntimeV02ActiveAbilityLiveRouteResult<
   | {
     kind: "hidden_sample";
     hidden_sample: RuntimeV02ActiveAbilityHiddenSampleResolution;
+  }
+  | {
+    kind: "condition_replacement";
+    condition_replacement: RuntimeV02ActiveAbilityConditionReplacementResolution<T>;
   }
   | {
     kind: "immediate";
@@ -69,6 +78,19 @@ export function runtimeV02BeginActiveAbilityLiveRoute<
     source,
   );
   if (hiddenSample) return { kind: "hidden_sample", hidden_sample: hiddenSample };
+
+  const conditionReplacement = runtimeV02ExecuteActiveAbilityConditionReplacement(
+    state as unknown as RuntimeV02ActiveAbilityConditionReplacementState<T>,
+    controllerSeat,
+    source,
+    defeatDescribe,
+  );
+  if (conditionReplacement) {
+    return {
+      kind: "condition_replacement",
+      condition_replacement: conditionReplacement,
+    };
+  }
 
   const immediate = runtimeV02BeginImmediateActiveAbilityLiveRoute(
     state,
