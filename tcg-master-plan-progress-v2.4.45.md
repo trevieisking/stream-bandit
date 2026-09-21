@@ -1629,3 +1629,42 @@ Release-control capability-manifest fingerprint is refreshed to blob
 
 Continue the usage-driven Release 1 operation audit. Prefer the next smallest real gap or stale classification that can be proven without disturbing working compatibility paths; do not rewrite a working generic owner merely to remove a legacy-only fallback.
 
+## V2.4.81 — accepted Attack declaration event capability reconciliation
+
+The frozen Release 1 Attack `on_declare` inventory contains exactly two structured steps:
+- Volt — Stormmane / Storm Break;
+- Volt — Stormcoil — Living Circuit / Chainstorm.
+
+Both steps are `RECORD_EVENT` and the complete predicate inventory is exactly:
+- `event_attack_source_attached_essence_count_at_least`;
+- `event_attack_source_has_attached_essence_kind`.
+
+No runtime implementation was required.
+
+`tcg-match-attack-declaration-events-v0-2.ts` already owns the full frozen family:
+- it resolves structured Attack definitions from the registry;
+- it evaluates attached-Essence count directly from authoritative source Creature attachments;
+- attached-Essence kind queries delegate to the shared Attack authority query;
+- it emits action-local event counts only when the structured predicate matches;
+- it fails closed on unsupported declaration operations, predicates, fields and Essence kinds;
+- it contains no Stormmane/Stormcoil/card-name dispatch.
+
+Runtime tests prove both predicate shapes, false/no-event behavior and fail-closed handling. Frozen-family tests prove there are exactly two Release 1 `on_declare` steps and both are owned by this family.
+
+`tcg-runtime-capabilities-v0.2.json` now classifies as **implemented**:
+- operation `RECORD_EVENT`;
+- predicate `event_attack_source_attached_essence_count_at_least`;
+- predicate `event_attack_source_has_attached_essence_kind`.
+
+Release-control capability-manifest fingerprint is
+`c4ef4855a334fee0f9fc3d611b4b0de2f0eff471`.
+
+TCG Card Pass 2 Validation **#1381 SUCCESS** on exact reconciled head
+`97eca40fe4ea0c991da3077f9bfbca8a2539f3d4`.
+
+### Next exact runtime target
+
+Reconcile `DISCARD_DECK_TOP`.
+
+The frozen inventory contains exactly one Release 1 consumer, Shade — Nightmaw / Dread Crush, and the existing generic Attack Deck-Discard owner already recognizes the structured target-condition -> public opponent deck-top discard family, delegates the physical movement to Card-Zone, and hands the resulting `deck_cards_discarded` event into the established Event -> Movement -> Heal listener chain.
+
