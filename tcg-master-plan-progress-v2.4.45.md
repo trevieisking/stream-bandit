@@ -1384,3 +1384,47 @@ Exact-head Card Pass **#1306 SUCCESS** on `c37660dd4c712055ca027caf18a036684de89
 
 Ability IF source/accounting progress: **8 / 9**.
 Final active Ability IF target: Tide — Marevault / Heart of Tides.
+
+## V2.4.75 — Marevault / Heart of Tides + Release 1 IF closeout
+
+The final frozen Release 1 Ability IF is now executable through generic owners and exact-head validation is green.
+
+### Heart of Tides ownership
+
+- `tcg-match-active-ability-essence-redistribution-v0-2.ts` recognizes the generic family:
+  `MOVE_ATTACHED_ESSENCE(0..N) -> IF(essence_move_count_at_least) -> SELECT_CREATURE(participated_in_moves + filters) -> HEAL`.
+- Movement options are derived from authoritative friendly field state and attached Essence identity; no card ID owns the movement rule.
+- The existing Essence Movement engine remains the only mutation/receipt owner for attachment-to-attachment transfer.
+- The full selected movement set is preflighted against a cloned authoritative state before any real mutation, preventing partial multi-move application.
+- A single Essence instance cannot satisfy more than one selected movement.
+- The IF consumes exact movement receipts through shared Active Ability IF rather than reconstructing movement count from browser state.
+- A threshold heal target must be currently legal, damaged, match the structured element filter and have participated in one of the selected movements.
+- Healing remains canonical Ability Heal packet + existing after-heal listener orchestration.
+- Public Match receipts expose movement count / IF result / heal amounts only; raw Essence identities, movement receipts and heal-target UID stay out of the public payload.
+
+### Heart of Tides evidence
+
+TCG Card Pass #1310 proved the generic redistribution owner before live wiring.
+The integrated slice then exposed only:
+1. a descriptor-range TypeScript narrowing issue, repaired by keeping `min/max` descriptor-driven; and
+2. the expected Match Edge dependency closure expansion from 98 -> 99 files.
+
+Release-control on exact accepted head:
+- Setup: **8 files**, `92913c762cb3660fd92523ef0580e4afb5870588caae04ca6c48cefbffdec434`;
+- Match: **99 files**, `d9c5f8ee7283e60563fc5e700c302d858374d311eaa7e4178ef26db2eb67289e`;
+- Tactic: **40 files**, `b23e7d6c2c6142087d01fac47ad2ed03664ac5467a008a9553bd413ad9c4ba3a`.
+
+TCG Card Pass 2 Validation **#1319 SUCCESS** on exact head
+`148bcc1164c05cd6c523b8fc3566f748705f5c15`.
+
+### Release 1 IF closeout
+
+Frozen Set One IF inventory is now fully executable through structured generic owners:
+- Tactic IF: **7 / 7 instances** across six Tactic programs;
+- Attack IF: **13 / 13 instances**;
+- Ability IF: **9 / 9 instances**;
+- total: **29 / 29 IF instances**.
+
+No remaining Release 1 IF decision requires printed-English or card-ID fallback.
+
+The next Master Plan runtime target is the capability reconciliation/audit: update `tcg-runtime-capabilities-v0.2.json` to reflect proven IF/predicate ownership, then continue the Release 1 operation/predicate audit until every used partial/missing capability is implemented or proven already owned.
