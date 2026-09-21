@@ -48,6 +48,7 @@
       "SEARCH_DECK_GROUP",
       "SELECT_CREATURE",
       "SHUFFLE_DECK",
+      "SHUFFLE_ZONE_INTO_DECK",
       "SWITCH_WITH_VANGUARD"
     ],
     "partial": [
@@ -82,7 +83,6 @@
       "SET_ATTACK_COST_FLOOR",
       "SET_DEVICE_PLAY_LOCK",
       "SET_RESOLVING_CARD_DESTINATION",
-      "SHUFFLE_ZONE_INTO_DECK",
       "SUPPRESS_ABILITY",
       "TIMEFOLD",
       "TRANSFER_SHIELD"
@@ -346,6 +346,31 @@
       "caller": "supabase/functions/_shared/tcg-match-active-ability-deck-reading-v0-2.ts",
       "trigger": "controller_aftermath_finished",
       "nested_step": "DRAW_FIXED"
+    },
+    "release1_shuffle_zone_into_deck_v2_4_84": {
+      "accepted_head": "99e09efd1fab4380e30822bb23dc573a480b79db",
+      "card_pass_run": 1398,
+      "operation": "SHUFFLE_ZONE_INTO_DECK",
+      "consumers": [
+        {
+          "card_id": "astral-archivist-sol",
+          "step": 0,
+          "player": "self",
+          "zone": "hand",
+          "visibility": "owner_private"
+        },
+        {
+          "card_id": "astral-archivist-sol",
+          "step": 1,
+          "player": "opponent",
+          "zone": "hand",
+          "visibility": "owner_private"
+        }
+      ],
+      "dispatcher": "supabase/functions/tcg-tactic-actions/index.ts",
+      "movement_owner": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
+      "randomization_owner": "supabase/functions/_shared/tcg-match-randomization-engine-v0-2.ts",
+      "tactic_closure_sha256": "d8ff415928c85b9ea2bec5168eaa1154c6c4e423a58c0a24b818db51c3cebf73"
     }
   }
 }
