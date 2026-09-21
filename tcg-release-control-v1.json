@@ -514,7 +514,7 @@
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "45c0ccd58ee2a85cfe08a9b9f1b1e663b47eff7f",
         "file_count": 41,
-        "closure_sha256": "1b74f09a6f1e60c000c6a8138335f5ac01038e8bea45287900f2296ee48794cd",
+        "closure_sha256": "a1793729e2efc333bc20f1a14ec711d416b607db79bb4de3096b118ab4b83bd6",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts",
