@@ -68,7 +68,8 @@ type RuntimeV02HealListenerResumeKind =
   | "resume_resolution_queue"
   | "return_to_play"
   | "resume_tactic_effect"
-  | "resume_active_ability_effect";
+  | "resume_active_ability_effect"
+  | "resume_attack_program";
 
 type RuntimeV02HealListenerResume = {
   kind: RuntimeV02HealListenerResumeKind;
@@ -210,6 +211,24 @@ export function runtimeV02BeginAttackHealListenerContinuation(
 }
 
 /**
+ * Continues a mixed Attack effect program after one of its canonical Heal
+ * Packet boundaries. Completion returns to the program continuation owner
+ * rather than ending the attack.
+ */
+export function runtimeV02BeginAttackProgramHealListenerContinuation(
+  state: Record<string, unknown>,
+  packetIds: string[],
+  attackSeat: 1 | 2,
+): RuntimeV02AttackHealListenerFlow {
+  return beginHealListenerContinuation(
+    state,
+    packetIds,
+    attackSeat,
+    "resume_attack_program",
+  );
+}
+
+/**
  * Starts the exact same canonical after_heal_packet listener continuation for
  * an active-Ability heal boundary. If a private listener choice is required,
  * the shared resume receipt records only that tcg-match-actions must return the
@@ -323,6 +342,21 @@ export function runtimeV02ResolveAttackHealListenerChoice(
     choiceId,
     choiceIds,
     "scan_defeats_then_aftermath",
+  );
+}
+
+export function runtimeV02ResolveAttackProgramHealListenerChoice(
+  state: Record<string, unknown>,
+  actorSeat: 1 | 2,
+  choiceId: string,
+  choiceIds: string[],
+): RuntimeV02AttackHealListenerChoiceResolution {
+  return resolveHealListenerChoiceWithResume(
+    state,
+    actorSeat,
+    choiceId,
+    choiceIds,
+    "resume_attack_program",
   );
 }
 

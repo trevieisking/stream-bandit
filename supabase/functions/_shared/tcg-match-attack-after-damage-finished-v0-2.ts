@@ -438,6 +438,12 @@ export function structuredRuntimeAttackAfterDamageFinishedProgram(
     attack.id,
     "tcg_v0_2_attack_after_finished_attack_id_required",
   );
+  if (
+    attack.after_damage != null &&
+    (!Array.isArray(attack.after_damage) || attack.after_damage.length !== 0)
+  ) {
+    return null;
+  }
   const steps = attack.after_damage_finished;
   if (!Array.isArray(steps) || steps.length !== 4) return null;
   const move = objectRecord(steps[0]);
