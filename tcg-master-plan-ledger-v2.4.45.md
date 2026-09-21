@@ -737,3 +737,15 @@ Archive Reset is the sole frozen Release 1 consumer, but runtime recognition is 
 ## 257 — Quiet Step control-condition clear is the next used-operation reconciliation
 The frozen Set One has exactly one `CHOOSE_AND_CLEAR_CONTROL_CONDITION` consumer, Shade — Quiet Step. Existing Tactic runtime aliases this structured operation to the generic condition-choice flow and filters legal options to the control slot before canonical clear mutation; capability status should be reconciled only after exact-head evidence confirms that accepted path.
 
+## 258 — Control-condition clearing is a specialization of generic Condition choice
+`CHOOSE_AND_CLEAR_CONTROL_CONDITION` shares the ordinary server-owned condition-choice transport but constrains legal options to the target Creature's control slot. It does not require a separate card or condition engine.
+
+## 259 — Selected control-condition clearing remains canonical Condition-owned
+Tactic may select the condition and preserve choice authority, but physical Condition-state mutation delegates through `clearRuntimeCondition` to the shared Condition engine. The Tactic compatibility facade is not a second mutation owner.
+
+## 260 — Quiet Step is a consumer, not control-clear dispatch authority
+Quiet Step is the sole frozen Release 1 consumer, but runtime recognition is operation/target/slot-driven and contains no Quiet Step/card-ID/name branch.
+
+## 261 — Bastion Plate source-counter increment is the next real runtime gap
+The frozen Set One has exactly one `INCREMENT_SOURCE_COUNTER` consumer, Stone — Bastion Plate. A generic counter primitive exists, but the Event Listener dispatcher has no opcode branch. The repair must bind listener-source identity generically and preserve the subsequent `source_counter_at_least` IF and source-discard lifecycle.
+
