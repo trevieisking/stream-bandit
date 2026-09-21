@@ -829,3 +829,23 @@
 - [x] Card Pass **#1459 SUCCESS** on exact capability-reconciled head `69d6f8074fc6c3da96bdcd32b5b52ca5e10871b1`.
 - [ ] V2.4.91: reconcile Pilot Sera `SET_ATTACK_ELIGIBILITY` only after proving exact frozen grammar + final-Vanguard enforcement + turn expiry/reset.
 
+
+
+## V2.4.91 — Pilot Sera Attack Eligibility closeout
+- [x] Freeze `SET_ATTACK_ELIGIBILITY` to exactly one Release 1 consumer: Gale / Pilot Sera.
+- [x] Freeze grammar to `scope: controller_turn / rule: only_final_vanguard_may_attack`.
+- [x] Add one canonical Attack Eligibility owner instead of leaving Tactic + Match lifecycle parsing duplicated.
+- [x] Install the final-Vanguard anchor only after Pilot Sera's repeated optional switches finish.
+- [x] Make `field_actions` Attack projection and authoritative `attack` use the same block-reason owner.
+- [x] Preserve eligibility when the anchored Creature evolves in place.
+- [x] Block a different Vanguard after a later same-turn switch.
+- [x] Prove controller-seat isolation.
+- [x] Prove turn change expires the controller-turn rule.
+- [x] Keep Pilot Sera as data only; add no card-ID dispatch and no owner family.
+- [x] Match Edge closure = 104 files / `8651b93e05cac1e995575563ecfef5e618f4e4348d016d51d8e04dd25f71333f`.
+- [x] Tactic Edge closure = 42 files / `3deacabefcaf906388cf32dfbb347ac4b5484fd62554ac0c6f779b5817bcec91`.
+- [x] Card Pass **#1468 SUCCESS** on source/runtime accepted head `ccb995b99131c2292e79d84a4bd0ba415c0564de`.
+- [x] Move `SET_ATTACK_ELIGIBILITY` from partial to implemented.
+- [x] Refresh capability fingerprint to `99955f0f5cff5fed252ad737f4020fb178d89353`.
+- [x] Card Pass **#1472 SUCCESS** on exact capability-reconciled head `f913b23bcc7064258a18fe1011a877ed5679c95f`.
+- [ ] V2.4.92: centralize `SET_WITHDRAWAL_MODIFIER` lifecycle ownership across Event Listener, Tactic and Ability producers; preserve Withdrawal/Payment/Atomic Switch ownership.
