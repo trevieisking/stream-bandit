@@ -6,6 +6,7 @@ import {
   runtimeV02ResolveEventListenerChoice,
 } from "../_shared/tcg-match-event-listener-v0-2.ts";
 import { runtimeV02PrivateRewardInspectionView } from "../_shared/tcg-match-reward-inspection-v0-2.ts";
+import { runtimeV02ResolveWithdrawalModifierCost } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";
 
 function assert(
   condition: unknown,
@@ -264,10 +265,18 @@ Deno.test("creature-entered Whiffin installs one source-agnostic withdrawal modi
   const state = baseState(source);
   const result = begin(state);
   equal(result.status, "complete");
-  equal(
-    (state.players as any)["1"].vanguard.flags.lifecycle_withdrawal_cost.value,
+  const vanguard = (state.players as any)["1"].vanguard;
+  const resolved = runtimeV02ResolveWithdrawalModifierCost(
+    state,
+    vanguard,
     1,
+    "Gale",
+    2,
   );
+  equal(resolved.cost, 1);
+  equal(resolved.applications.length, 1);
+  equal(resolved.consumable_modifier_ids.length, 1);
+  equal(vanguard.flags.lifecycle_withdrawal_cost, undefined);
   equal(result.processed_listener_keys.length, 1);
 });
 
