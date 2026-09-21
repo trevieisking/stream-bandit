@@ -32,6 +32,7 @@
       "DRAW_FIXED",
       "HEAL",
       "IF",
+      "INCREMENT_SOURCE_COUNTER",
       "LOOK_TOP",
       "MODIFY_CURRENT_ATTACK_DAMAGE",
       "MOVE_ATTACHED_ESSENCE",
@@ -45,6 +46,7 @@
       "RETURN_REMAINDER_TO_DECK_TOP",
       "RETURN_SET_TO_DECK_TOP",
       "SCHEDULE_ACTION",
+      "SCHEDULE_SOURCE_DISCARD",
       "SEARCH_DECK",
       "SEARCH_DECK_GROUP",
       "SELECT_CREATURE",
@@ -67,7 +69,6 @@
       "DEFEAT_EACH_MATCHING",
       "DEFEAT_TARGET_IF",
       "DIRECT_DAMAGE",
-      "INCREMENT_SOURCE_COUNTER",
       "INSPECT_ZONE",
       "MODIFY_CURRENT_DAMAGE_PACKET",
       "MODIFY_CURRENT_HEAL",
@@ -78,7 +79,6 @@
       "PERFORM_VOLUNTARY_WITHDRAWAL",
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
-      "SCHEDULE_SOURCE_DISCARD",
       "SELECT_CARDS",
       "SET_ATTACK_COST_FLOOR",
       "SET_DEVICE_PLAY_LOCK",
@@ -110,6 +110,9 @@
       "hand_count_at_least",
       "legal_card_available",
       "modifier_condition_slot_empty",
+      "prevention_amount_at_least",
+      "prevention_source_is_attached_card",
+      "prevention_target_is_attached_creature",
       "reserve_count_at_least",
       "selected_count_at_least",
       "source_controller_is_self",
@@ -175,9 +178,6 @@
       "heal_packet_target_is_self",
       "heal_source_is_card_effect",
       "heal_target_element_is",
-      "prevention_amount_at_least",
-      "prevention_source_is_attached_card",
-      "prevention_target_is_attached_creature",
       "shield_actual_gain_at_least",
       "shield_source_is_card_effect",
       "shield_target_is_self",
@@ -386,6 +386,56 @@
       "dispatcher": "supabase/functions/tcg-tactic-actions/index.ts",
       "mutation_owner": "supabase/functions/_shared/tcg-match-condition-engine-v0-2.ts",
       "compatibility_facade": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts"
+    },
+    "release1_damage_prevented_relic_listener_v2_4_86": {
+      "accepted_head": "9d3bf34346de60559d1952826e6c2bf078f9acc7",
+      "card_pass_run": 1420,
+      "operations": [
+        "INCREMENT_SOURCE_COUNTER",
+        "SCHEDULE_SOURCE_DISCARD"
+      ],
+      "predicates": [
+        "prevention_target_is_attached_creature",
+        "prevention_source_is_attached_card",
+        "prevention_amount_at_least",
+        "source_counter_at_least"
+      ],
+      "consumers": {
+        "incoming_relic_damage": [
+          "shade-gloom-locket",
+          "stone-bastion-plate",
+          "tide-shellguard-pendant"
+        ],
+        "damage_prevented_listeners": [
+          "stone-bastion-plate",
+          "tide-shellguard-pendant"
+        ],
+        "source_counter": [
+          "stone-bastion-plate"
+        ],
+        "scheduled_source_discard": [
+          "stone-bastion-plate",
+          "tide-shellguard-pendant"
+        ]
+      },
+      "owners": {
+        "attack_damage": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "scheduled_action": "supabase/functions/_shared/tcg-match-scheduled-action-v0-2.ts",
+        "relic": "supabase/functions/_shared/tcg-match-relic-engine-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "release_closures": {
+        "match_actions": {
+          "file_count": 102,
+          "sha256": "9dc39ff55b849b76ffbf1593c3ea30d2c1a886d7b050c86a962b1c2cb65eb68c"
+        },
+        "tactic_actions": {
+          "file_count": 41,
+          "sha256": "9a33a92624e4ac058f9c0ee12200344a67479fb7f97c5e2aa43283c5be45ad65"
+        }
+      },
+      "note": "source_counter_at_least was already labeled implemented; V2.4.86 supplies executable evidence for its sole frozen attached-Relic listener consumer."
     }
   }
 }
