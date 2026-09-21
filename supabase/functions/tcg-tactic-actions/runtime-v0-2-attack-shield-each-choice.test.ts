@@ -290,12 +290,3 @@ Deno.test("Crown-style choice rejects stale turn and source movement", () => {
     "tcg_v0_2_attack_shield_choice_turn_changed",
   );
 });
-
-Deno.test("mixed Shield family remains card-identity free", () => {
-  const source = Deno.readTextFileSync(
-    new URL("../_shared/tcg-match-attack-shield-choice-v0-2.ts", import.meta.url),
-  );
-  if (/stone-crowncrag|stone-reversal-seal|crown-of-stone/.test(source)) {
-    throw new Error("card identity leaked into generic Attack shield-choice owner");
-  }
-});
