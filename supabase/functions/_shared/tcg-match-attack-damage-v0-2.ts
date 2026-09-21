@@ -4,6 +4,10 @@ import {
   type RuntimeContinuousEffect,
 } from "../tcg-tactic-actions/runtime-v0-2-core.ts";
 import { runtimeV02ApplyDamageProtections } from "./tcg-match-damage-protection-v0-2.ts";
+import {
+  evaluateRuntimeV02SourceDamagedRequirement,
+  evaluateRuntimeV02SourceHasShieldAtLeastRequirement,
+} from "./tcg-match-requirement-evaluator-v0-2.ts";
 import { runtimeV02Definition } from "./tcg-runtime-registry-v0-2.ts";
 
 export type RuntimeV02DamagePreventionKind = "ability" | "relic" | "shield";
@@ -18,6 +22,7 @@ export type RuntimeAttackDamageCreature = {
   stack?: RuntimeCardInstance[];
   essence?: RuntimeCardInstance[];
   relic?: RuntimeCardInstance | null;
+  damage?: number;
   shield?: number;
   flags?: Record<string, unknown>;
 };
@@ -27,6 +32,8 @@ export type RuntimeAttackDamageContext = {
   target_controller: "self" | "opponent";
   source_controller: "self" | "opponent";
   target_has_any_condition: boolean;
+  attack_id?: string;
+  current_opponent_vanguard_control_condition?: string | null;
   source_controller_seat?: 1 | 2;
   target_controller_seat?: 1 | 2;
   target_creature_uid?: string;
@@ -240,6 +247,69 @@ export function runtimeV02PreviousOpponentTurnDamagePreventionEvents(
   }));
 }
 
+function outgoingSelfAbilityEffects(
+  state: Record<string, unknown>,
+  source: RuntimeAttackDamageCreature,
+): RuntimeContinuousEffect[] {
+  const stack = Array.isArray(source.stack) ? source.stack : [];
+  const top = stack[stack.length - 1];
+  if (!top) return [];
+  const definition = runtimeV02Definition(state, top);
+  const creature = objectRecord(definition?.creature);
+  const ability = objectRecord(creature?.ability);
+  if (!ability || String(ability.mode || "") !== "continuous" || ability.limit != null) return [];
+  const continuous = Array.isArray(ability.continuous) ? ability.continuous : [];
+  return continuous
+    .map((value) => objectRecord(value) as RuntimeContinuousEffect | null)
+    .filter((value): value is RuntimeContinuousEffect => Boolean(value))
+    .filter((effect) =>
+      String(effect.kind || "") === "attack_damage" &&
+      String(effect.target || "") === "$source_creature" &&
+      effect.limit == null &&
+      effect.consume_when == null
+    );
+}
+
+function outgoingSelfAbilityWhenMatches(
+  when: unknown,
+  source: RuntimeAttackDamageCreature,
+  context: RuntimeAttackDamageContext,
+): boolean {
+  if (when == null) return true;
+  const predicate = objectRecord(when);
+  if (!predicate) return false;
+  const name = String(predicate.predicate || "");
+  if (name === "source_damaged") {
+    return evaluateRuntimeV02SourceDamagedRequirement(
+      source,
+      predicate as { predicate: "source_damaged" },
+    ).matched;
+  }
+  if (name === "source_has_shield_at_least") {
+    return evaluateRuntimeV02SourceHasShieldAtLeastRequirement(
+      source,
+      predicate as { predicate: "source_has_shield_at_least"; value: number },
+    ).matched;
+  }
+  if (name === "control_condition_present") {
+    const allowed = new Set(["predicate", "target"]);
+    const extra = Object.keys(predicate).find((field) => !allowed.has(field));
+    if (extra) {
+      throw new Error(
+        `tcg_v0_2_attack_damage_control_condition_field_unsupported:${extra}`,
+      );
+    }
+    if (predicate.target !== "$current_opponent_vanguard") {
+      throw new Error(
+        "tcg_v0_2_attack_damage_control_condition_target_unsupported",
+      );
+    }
+    return typeof context.current_opponent_vanguard_control_condition === "string" &&
+      context.current_opponent_vanguard_control_condition.trim().length > 0;
+  }
+  return false;
+}
+
 function incomingSelfAbilityEffects(
   state: Record<string, unknown>,
   target: RuntimeAttackDamageCreature,
@@ -286,6 +356,31 @@ function continuousFiltersMatch(
   return true;
 }
 
+function applyOutgoingSelfAbilityDamage(
+  state: Record<string, unknown>,
+  source: RuntimeAttackDamageCreature,
+  baseValue: number,
+  context: RuntimeAttackDamageContext,
+): number {
+  let value = Math.max(0, Number(baseValue || 0));
+  for (const effect of outgoingSelfAbilityEffects(state, source)) {
+    if (!outgoingSelfAbilityWhenMatches(effect.when, source, context)) continue;
+    if (!continuousFiltersMatch(effect.filters, context)) continue;
+    const amount = Number(effect.amount);
+    if (!Number.isFinite(amount)) continue;
+    const mode = effect.mode == null ? "delta" : String(effect.mode);
+    if (mode === "set") value = amount;
+    else if (mode === "delta") value += amount;
+    else continue;
+    const minimum = Number(effect.minimum);
+    if (Number.isFinite(minimum)) value = Math.max(value, minimum);
+    const maximum = Number(effect.maximum);
+    if (Number.isFinite(maximum)) value = Math.min(value, maximum);
+    value = Math.max(0, value);
+  }
+  return value;
+}
+
 function applyIncomingSelfAbilityDamage(
   state: Record<string, unknown>,
   target: RuntimeAttackDamageCreature,
@@ -323,7 +418,7 @@ export function structuredRuntimeOutgoingAttackDamage(
   if (!structuredRuntimeProbe(state, attacker, target)) return null;
   const attachments = Array.isArray(attacker.essence) ? attacker.essence : [];
   const definitionLookup = (instance: RuntimeCardInstance) => runtimeV02Definition(state, instance);
-  return applyRuntimeContinuousNumericModifiers(
+  let value = applyRuntimeContinuousNumericModifiers(
     baseValue,
     attachments,
     definitionLookup,
@@ -331,10 +426,13 @@ export function structuredRuntimeOutgoingAttackDamage(
     {
       target_zone: context.target_zone,
       target_controller: context.target_controller,
+      attack_id: context.attack_id,
       evaluate_when: (when: unknown) => attackWhenMatches(when, context),
     },
     0,
   );
+  value = applyOutgoingSelfAbilityDamage(state, attacker, value, context);
+  return value;
 }
 
 export function structuredRuntimeIncomingAttackDamage(
