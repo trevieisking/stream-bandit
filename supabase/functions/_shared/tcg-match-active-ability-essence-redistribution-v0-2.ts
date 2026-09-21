@@ -89,40 +89,31 @@ export type RuntimeV02ActiveAbilityEssenceRedistributionHealOption = {
 };
 
 export type RuntimeV02PendingActiveAbilityEssenceRedistributionChoice = {
-  id: string;
-  seat: Seat;
-  kind: "redistribute_attached_essence_then_conditional_heal";
-  ability_id: string;
-  prompt: string;
-  min: number;
-  max: number;
-  turn_seq: number;
-  source_where: FieldWhere;
-  source_index: number | null;
-  source_uid: string;
-  source_card_id: string;
-  move_element: string;
-  move_min: number;
-  move_max: number;
-  move_var: string;
-  when: RuntimeV02ActiveAbilityEssenceRedistributionDescriptor["when"];
-  heal: RuntimeV02ActiveAbilityEssenceRedistributionDescriptor["heal"];
-  move_options: RuntimeV02ActiveAbilityEssenceRedistributionMoveOption[];
-  heal_options: RuntimeV02ActiveAbilityEssenceRedistributionHealOption[];
+  id:string; seat:Seat; kind:"redistribute_attached_essence_then_conditional_heal"; stage:"moves"|"heal";
+  ability_id:string; prompt:string; min:number; max:number; turn_seq:number;
+  source_where:FieldWhere; source_index:number|null; source_uid:string; source_card_id:string;
+  move_element:string; move_min:number; move_max:number; move_var:string;
+  when:RuntimeV02ActiveAbilityEssenceRedistributionDescriptor["when"];
+  heal:RuntimeV02ActiveAbilityEssenceRedistributionDescriptor["heal"];
+  move_options:RuntimeV02ActiveAbilityEssenceRedistributionMoveOption[];
+  heal_options:RuntimeV02ActiveAbilityEssenceRedistributionHealOption[];
+  movement_receipts:RuntimeV02EssenceMovement[];
 };
-
-export type RuntimeV02ActiveAbilityEssenceRedistributionResolution = {
-  kind: "redistribute_attached_essence_then_conditional_heal";
-  ability_id: string;
-  choice_id: string;
-  movement_count: number;
-  movement_receipts: RuntimeV02EssenceMovement[];
-  if_matched: boolean;
-  heal_target_uid: string | null;
-  requested_heal: number;
-  actual_heal: number;
-  emitted_packet_ids: string[];
+export type RuntimeV02ActiveAbilityEssenceRedistributionResume = {
+  kind:"redistribution_after_movement"; turn_seq:number; seat:Seat; ability_id:string;
+  source_where:FieldWhere; source_index:number|null; source_uid:string; source_card_id:string;
+  move_element:string; move_min:number; move_max:number; move_var:string;
+  when:RuntimeV02ActiveAbilityEssenceRedistributionDescriptor["when"];
+  heal:RuntimeV02ActiveAbilityEssenceRedistributionDescriptor["heal"];
+  movement_receipts:RuntimeV02EssenceMovement[];
 };
+export type RuntimeV02ActiveAbilityEssenceRedistributionResumeResolution = {
+  kind:"redistribution_after_movement"; ability_id:string; movement_count:number; if_matched:boolean;
+  pending_choice:RuntimeV02PendingActiveAbilityEssenceRedistributionChoice|null;
+};
+export type RuntimeV02ActiveAbilityEssenceRedistributionResolution =
+ | {kind:"redistribute_attached_essence_then_conditional_heal";stage:"moves_resolved";ability_id:string;choice_id:string;movement_count:number;movement_receipts:RuntimeV02EssenceMovement[];resume:RuntimeV02ActiveAbilityEssenceRedistributionResume;emitted_packet_ids:[]}
+ | {kind:"redistribute_attached_essence_then_conditional_heal";stage:"heal_resolved";ability_id:string;choice_id:string;movement_count:number;if_matched:true;heal_target_uid:string;requested_heal:number;actual_heal:number;emitted_packet_ids:string[]};
 
 function objectRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -337,38 +328,10 @@ function legalMoveOptions(
   return out.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-function legalHealOptions(
-  state: Record<string, unknown>,
-  seat: Seat,
-  element: string,
-): RuntimeV02ActiveAbilityEssenceRedistributionHealOption[] {
-  return fields(state, seat)
-    .filter((field) =>
-      String(field.def.element || "") === element &&
-      Number(field.creature.damage || 0) > 0
-    )
-    .map((field) => ({
-      id: `heal:${field.top.uid}`,
-      kind: "heal_target" as const,
-      label: `Heal ${fieldLabel(field)}`,
-      anchor_uid: field.top.uid,
-      card_id: field.top.card_id,
-      where: field.where,
-      index: field.index,
-    }))
-    .sort((a, b) => a.id.localeCompare(b.id));
+function legalHealOptions(state:Record<string,unknown>,seat:Seat,element:string,participants:Set<string>):RuntimeV02ActiveAbilityEssenceRedistributionHealOption[]{
+ return fields(state,seat).filter((field)=>participants.has(field.top.uid)&&String(field.def.element||"")===element&&Number(field.creature.damage||0)>0).map((field)=>({id:`heal:${field.top.uid}`,kind:"heal_target" as const,label:`Heal ${fieldLabel(field)}`,anchor_uid:field.top.uid,card_id:field.top.card_id,where:field.where,index:field.index})).sort((x,y)=>x.id.localeCompare(y.id));
 }
-
-function movementParticipants(
-  moves: RuntimeV02ActiveAbilityEssenceRedistributionMoveOption[],
-): Set<string> {
-  return new Set(
-    moves.flatMap((move) => [
-      move.source_anchor_uid,
-      move.destination_anchor_uid,
-    ]),
-  );
-}
+function movementReceiptParticipants(moves:RuntimeV02EssenceMovement[]):Set<string>{return new Set(moves.flatMap((move)=>[move.source_creature_uid,move.destination_creature_uid]))}
 
 function preflightMoves(
   state: Record<string, unknown>,
@@ -528,346 +491,52 @@ export function structuredRuntimeActiveAbilityEssenceRedistribution(
   };
 }
 
-export function runtimeV02CreateActiveAbilityEssenceRedistributionChoice(
-  state: Record<string, unknown>,
-  controllerSeat: Seat,
-  descriptor: RuntimeV02ActiveAbilityEssenceRedistributionDescriptor,
-  source: { where: FieldWhere; index: number | null; instance: unknown },
-  choiceId: string = crypto.randomUUID(),
-): RuntimeV02PendingActiveAbilityEssenceRedistributionChoice {
-  if (Number(state.active_seat) !== controllerSeat) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_not_active_seat",
-    );
-  }
-  if (
-    runtimeV02CurrentTurnActiveAbilityUseCount(
-      state,
-      controllerSeat,
-      descriptor.ability_id,
-    ) >= descriptor.limit.count
-  ) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_limit_reached",
-    );
-  }
-  const sourceInstance = inst(
-    source.instance,
-    "tcg_v0_2_active_ability_redistribution_source_invalid",
-  );
-  same(
-    sourceTop(state, controllerSeat, source.where, source.index),
-    sourceInstance,
-    "tcg_v0_2_active_ability_redistribution_source_changed",
-  );
-
-  const moveOptions = legalMoveOptions(
-    state,
-    controllerSeat,
-    descriptor.move.element,
-  );
-  const healOptions = legalHealOptions(
-    state,
-    controllerSeat,
-    descriptor.heal.target_element,
-  );
-
-  return {
-    id: requiredString(
-      choiceId,
-      "tcg_v0_2_active_ability_redistribution_choice_id_required",
-    ),
-    seat: controllerSeat,
-    kind: "redistribute_attached_essence_then_conditional_heal",
-    ability_id: descriptor.ability_id,
-    prompt: "Choose up to the allowed Essence moves; if the threshold is met, also choose one eligible participating Creature to heal",
-    min: descriptor.move.min,
-    max: descriptor.move.max + 1,
-    turn_seq: currentTurn(state),
-    source_where: source.where,
-    source_index: source.index,
-    source_uid: sourceInstance.uid,
-    source_card_id: sourceInstance.card_id,
-    move_element: descriptor.move.element,
-    move_min: descriptor.move.min,
-    move_max: descriptor.move.max,
-    move_var: descriptor.move.as,
-    when: structuredClone(descriptor.when),
-    heal: structuredClone(descriptor.heal),
-    move_options: moveOptions,
-    heal_options: healOptions,
-  };
+export function runtimeV02CreateActiveAbilityEssenceRedistributionChoice(state:Record<string,unknown>,controllerSeat:Seat,descriptor:RuntimeV02ActiveAbilityEssenceRedistributionDescriptor,source:{where:FieldWhere;index:number|null;instance:unknown},choiceId:string=crypto.randomUUID()):RuntimeV02PendingActiveAbilityEssenceRedistributionChoice{
+ if(Number(state.active_seat)!==controllerSeat)throw new Error("tcg_v0_2_active_ability_redistribution_not_active_seat");
+ if(runtimeV02CurrentTurnActiveAbilityUseCount(state,controllerSeat,descriptor.ability_id)>=descriptor.limit.count)throw new Error("tcg_v0_2_active_ability_redistribution_limit_reached");
+ const sourceInstance=inst(source.instance,"tcg_v0_2_active_ability_redistribution_source_invalid");
+ same(sourceTop(state,controllerSeat,source.where,source.index),sourceInstance,"tcg_v0_2_active_ability_redistribution_source_changed");
+ return{id:requiredString(choiceId,"tcg_v0_2_active_ability_redistribution_choice_id_required"),seat:controllerSeat,kind:"redistribute_attached_essence_then_conditional_heal",stage:"moves",ability_id:descriptor.ability_id,prompt:"Choose up to the allowed attached Essence moves",min:descriptor.move.min,max:descriptor.move.max,turn_seq:currentTurn(state),source_where:source.where,source_index:source.index,source_uid:sourceInstance.uid,source_card_id:sourceInstance.card_id,move_element:descriptor.move.element,move_min:descriptor.move.min,move_max:descriptor.move.max,move_var:descriptor.move.as,when:structuredClone(descriptor.when),heal:structuredClone(descriptor.heal),move_options:legalMoveOptions(state,controllerSeat,descriptor.move.element),heal_options:[],movement_receipts:[]};
 }
-
-export function runtimeV02PendingActiveAbilityEssenceRedistributionChoiceView(
-  choice: RuntimeV02PendingActiveAbilityEssenceRedistributionChoice | null | undefined,
-  viewerSeat: Seat,
-) {
-  if (!choice) return null;
-  if (choice.seat !== viewerSeat) {
-    return {
-      id: choice.id,
-      seat: choice.seat,
-      kind: choice.kind,
-      waiting: true,
-    };
-  }
-  return {
-    id: choice.id,
-    seat: choice.seat,
-    kind: choice.kind,
-    prompt: choice.prompt,
-    min: choice.min,
-    max: choice.max,
-    options: [
-      ...choice.move_options.map((option) => ({
-        id: option.id,
-        label: option.label,
-        kind: option.kind,
-      })),
-      ...choice.heal_options.map((option) => ({
-        id: option.id,
-        label: option.label,
-        kind: option.kind,
-      })),
-    ],
-  };
+export function runtimeV02PendingActiveAbilityEssenceRedistributionChoiceView(choice:RuntimeV02PendingActiveAbilityEssenceRedistributionChoice|null|undefined,viewerSeat:Seat){
+ if(!choice)return null;if(choice.seat!==viewerSeat)return{id:choice.id,seat:choice.seat,kind:choice.kind,waiting:true};
+ const options=choice.stage==="moves"?choice.move_options.map((o)=>({id:o.id,label:o.label,kind:o.kind})):choice.heal_options.map((o)=>({id:o.id,label:o.label,kind:o.kind}));
+ return{id:choice.id,seat:choice.seat,kind:choice.kind,stage:choice.stage,prompt:choice.prompt,min:choice.min,max:choice.max,options};
 }
-
-export function runtimeV02ResolveActiveAbilityEssenceRedistributionChoice(
-  choice: RuntimeV02PendingActiveAbilityEssenceRedistributionChoice,
-  controllerSeat: Seat,
-  choiceId: string,
-  choiceIds: string[],
-  state: Record<string, unknown>,
-): RuntimeV02ActiveAbilityEssenceRedistributionResolution {
-  if (choice.kind !== "redistribute_attached_essence_then_conditional_heal") {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_choice_kind_invalid",
-    );
-  }
-  if (choice.seat !== controllerSeat) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_choice_not_yours",
-    );
-  }
-  if (!choiceId || choice.id !== choiceId) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_choice_stale_id",
-    );
-  }
-  if (
-    !Array.isArray(choiceIds) ||
-    new Set(choiceIds).size !== choiceIds.length
-  ) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_choice_ids_invalid",
-    );
-  }
-  if (currentTurn(state) !== choice.turn_seq) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_turn_changed",
-    );
-  }
-  if (Number(state.active_seat) !== controllerSeat) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_active_seat_changed",
-    );
-  }
-  same(
-    sourceTop(
-      state,
-      controllerSeat,
-      choice.source_where,
-      choice.source_index,
-    ),
-    { uid: choice.source_uid, card_id: choice.source_card_id },
-    "tcg_v0_2_active_ability_redistribution_source_changed",
-  );
-
-  const moveById = new Map(choice.move_options.map((option) => [option.id, option]));
-  const healById = new Map(choice.heal_options.map((option) => [option.id, option]));
-  const selectedMoves = choiceIds
-    .map((id) => moveById.get(id))
-    .filter((option): option is RuntimeV02ActiveAbilityEssenceRedistributionMoveOption => Boolean(option))
-    .sort((a, b) => a.id.localeCompare(b.id));
-  const selectedHeals = choiceIds
-    .map((id) => healById.get(id))
-    .filter((option): option is RuntimeV02ActiveAbilityEssenceRedistributionHealOption => Boolean(option));
-
-  if (selectedMoves.length + selectedHeals.length !== choiceIds.length) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_unknown_option",
-    );
-  }
-  const threshold = Number(choice.when.count);
-  if (
-    selectedMoves.length < choice.move_min ||
-    selectedMoves.length > choice.move_max ||
-    selectedHeals.length > 1
-  ) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_choice_shape_invalid",
-    );
-  }
-  if (new Set(selectedMoves.map((move) => move.essence_uid)).size !== selectedMoves.length) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_essence_reused",
-    );
-  }
-
-  const thresholdMatched = selectedMoves.length >= threshold;
-  if (!thresholdMatched && selectedHeals.length !== 0) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_heal_without_threshold",
-    );
-  }
-
-  const participants = movementParticipants(selectedMoves);
-  if (thresholdMatched) {
-    if (selectedHeals.length !== 1) {
-      throw new Error(
-        "tcg_v0_2_active_ability_redistribution_heal_target_required",
-      );
-    }
-    const heal = selectedHeals[0];
-    if (!participants.has(heal.anchor_uid)) {
-      throw new Error(
-        "tcg_v0_2_active_ability_redistribution_heal_target_not_participant",
-      );
-    }
-    const current = fieldByAnchor(state, controllerSeat, heal.anchor_uid);
-    if (
-      !current ||
-      current.top.card_id !== heal.card_id ||
-      String(current.def.element || "") !== choice.heal.target_element ||
-      Number(current.creature.damage || 0) <= 0
-    ) {
-      throw new Error(
-        "tcg_v0_2_active_ability_redistribution_heal_target_changed",
-      );
-    }
-  }
-
-  const currentMoveIds = new Set(
-    legalMoveOptions(state, controllerSeat, choice.move_element)
-      .map((option) => option.id),
-  );
-  for (const move of selectedMoves) {
-    if (!currentMoveIds.has(move.id)) {
-      throw new Error(
-        "tcg_v0_2_active_ability_redistribution_move_changed",
-      );
-    }
-  }
-
-  preflightMoves(
-    state,
-    controllerSeat,
-    selectedMoves,
-    choice.ability_id,
-  );
-
-  const movementReceipts: RuntimeV02EssenceMovement[] = [];
-  for (const move of selectedMoves) {
-    const source = fieldByAnchor(
-      state,
-      controllerSeat,
-      move.source_anchor_uid,
-    );
-    const destination = fieldByAnchor(
-      state,
-      controllerSeat,
-      move.destination_anchor_uid,
-    );
-    if (!source || !destination) {
-      throw new Error(
-        "tcg_v0_2_active_ability_redistribution_move_field_changed",
-      );
-    }
-    const applied = applyRuntimeV02EssenceTransfer(
-      state,
-      controllerSeat,
-      move.source_anchor_uid,
-      move.destination_anchor_uid,
-      source.creature.essence,
-      destination.creature.essence,
-      move.essence_uid,
-      choice.ability_id,
-    );
-    movementReceipts.push(applied.movement);
-  }
-
-  const ifMatched = runtimeV02EvaluateActiveAbilityIf(choice.when, {
-    sets: {},
-    creatures: {},
-    essence_moves: { [choice.move_var]: movementReceipts },
-  });
-  if (ifMatched !== thresholdMatched) {
-    throw new Error(
-      "tcg_v0_2_active_ability_redistribution_if_mismatch",
-    );
-  }
-
-  let healTargetUid: string | null = null;
-  let actualHeal = 0;
-  let emittedPacketIds: string[] = [];
-  if (ifMatched) {
-    const selected = selectedHeals[0];
-    const target = fieldByAnchor(
-      state,
-      controllerSeat,
-      selected.anchor_uid,
-    );
-    if (!target) {
-      throw new Error(
-        "tcg_v0_2_active_ability_redistribution_heal_target_changed",
-      );
-    }
-    const context: RuntimeV02HealPacketContext = {
-      source: {
-        controller_seat: controllerSeat,
-        action_kind: "ability",
-        action_id: choice.ability_id,
-        card_effect: true,
-        card_uid: choice.source_uid,
-        card_id: choice.source_card_id,
-        creature_uid: choice.source_uid,
-      },
-      target: {
-        controller_seat: controllerSeat,
-        creature_uid: target.top.uid,
-        card_uid: target.top.uid,
-        card_id: target.top.card_id,
-        element: requiredString(
-          target.def.element,
-          "tcg_v0_2_active_ability_redistribution_target_element_required",
-        ),
-        where: target.where,
-        index: target.where === "reserve" ? target.index : null,
-      },
-    };
-    const healed = applyRuntimeV02HealPacket(
-      state,
-      target.creature,
-      choice.heal.amount,
-      context,
-    );
-    healTargetUid = target.top.uid;
-    actualHeal = healed.actual_heal;
-    emittedPacketIds = healed.packet ? [healed.packet.id] : [];
-  }
-
-  return {
-    kind: choice.kind,
-    ability_id: choice.ability_id,
-    choice_id: choice.id,
-    movement_count: movementReceipts.length,
-    movement_receipts: movementReceipts.map((movement) => ({ ...movement })),
-    if_matched: ifMatched,
-    heal_target_uid: healTargetUid,
-    requested_heal: ifMatched ? choice.heal.amount : 0,
-    actual_heal: actualHeal,
-    emitted_packet_ids: emittedPacketIds,
-  };
+function validateChoiceEnvelope(choice:RuntimeV02PendingActiveAbilityEssenceRedistributionChoice,controllerSeat:Seat,choiceId:string,choiceIds:string[],state:Record<string,unknown>):void{
+ if(choice.kind!=="redistribute_attached_essence_then_conditional_heal")throw new Error("tcg_v0_2_active_ability_redistribution_choice_kind_invalid");
+ if(choice.seat!==controllerSeat)throw new Error("tcg_v0_2_active_ability_redistribution_choice_not_yours");
+ if(!choiceId||choice.id!==choiceId)throw new Error("tcg_v0_2_active_ability_redistribution_choice_stale_id");
+ if(!Array.isArray(choiceIds)||new Set(choiceIds).size!==choiceIds.length)throw new Error("tcg_v0_2_active_ability_redistribution_choice_ids_invalid");
+ if(currentTurn(state)!==choice.turn_seq)throw new Error("tcg_v0_2_active_ability_redistribution_turn_changed");
+ if(Number(state.active_seat)!==controllerSeat)throw new Error("tcg_v0_2_active_ability_redistribution_active_seat_changed");
+ same(sourceTop(state,controllerSeat,choice.source_where,choice.source_index),{uid:choice.source_uid,card_id:choice.source_card_id},"tcg_v0_2_active_ability_redistribution_source_changed");
+}
+export function runtimeV02ResolveActiveAbilityEssenceRedistributionChoice(choice:RuntimeV02PendingActiveAbilityEssenceRedistributionChoice,controllerSeat:Seat,choiceId:string,choiceIds:string[],state:Record<string,unknown>):RuntimeV02ActiveAbilityEssenceRedistributionResolution{
+ validateChoiceEnvelope(choice,controllerSeat,choiceId,choiceIds,state);
+ if(choice.stage==="moves"){
+  const byId=new Map(choice.move_options.map((o)=>[o.id,o])),moves=choiceIds.map((id)=>byId.get(id)).filter((o):o is RuntimeV02ActiveAbilityEssenceRedistributionMoveOption=>Boolean(o)).sort((x,y)=>x.id.localeCompare(y.id));
+  if(moves.length!==choiceIds.length)throw new Error("tcg_v0_2_active_ability_redistribution_unknown_option");
+  if(moves.length<choice.move_min||moves.length>choice.move_max)throw new Error("tcg_v0_2_active_ability_redistribution_choice_shape_invalid");
+  if(new Set(moves.map((move)=>move.essence_uid)).size!==moves.length)throw new Error("tcg_v0_2_active_ability_redistribution_essence_reused");
+  const current=new Set(legalMoveOptions(state,controllerSeat,choice.move_element).map((o)=>o.id));for(const move of moves)if(!current.has(move.id))throw new Error("tcg_v0_2_active_ability_redistribution_move_changed");
+  preflightMoves(state,controllerSeat,moves,choice.ability_id);
+  const receipts:RuntimeV02EssenceMovement[]=[];for(const move of moves){const source=fieldByAnchor(state,controllerSeat,move.source_anchor_uid),destination=fieldByAnchor(state,controllerSeat,move.destination_anchor_uid);if(!source||!destination)throw new Error("tcg_v0_2_active_ability_redistribution_move_field_changed");receipts.push(applyRuntimeV02EssenceTransfer(state,controllerSeat,move.source_anchor_uid,move.destination_anchor_uid,source.creature.essence,destination.creature.essence,move.essence_uid,choice.ability_id).movement)}
+  const resume:RuntimeV02ActiveAbilityEssenceRedistributionResume={kind:"redistribution_after_movement",turn_seq:choice.turn_seq,seat:controllerSeat,ability_id:choice.ability_id,source_where:choice.source_where,source_index:choice.source_index,source_uid:choice.source_uid,source_card_id:choice.source_card_id,move_element:choice.move_element,move_min:choice.move_min,move_max:choice.move_max,move_var:choice.move_var,when:structuredClone(choice.when),heal:structuredClone(choice.heal),movement_receipts:receipts.map((x)=>({...x}))};
+  return{kind:choice.kind,stage:"moves_resolved",ability_id:choice.ability_id,choice_id:choice.id,movement_count:receipts.length,movement_receipts:receipts.map((x)=>({...x})),resume,emitted_packet_ids:[]};
+ }
+ if(choice.stage!=="heal")throw new Error("tcg_v0_2_active_ability_redistribution_choice_stage_invalid");if(choiceIds.length!==1)throw new Error("tcg_v0_2_active_ability_redistribution_choice_shape_invalid");
+ const participants=movementReceiptParticipants(choice.movement_receipts),currentOptions=legalHealOptions(state,controllerSeat,choice.heal.target_element,participants),selected=currentOptions.find((o)=>o.id===choiceIds[0]);
+ if(!selected||!choice.heal_options.some((o)=>o.id===selected.id))throw new Error("tcg_v0_2_active_ability_redistribution_heal_target_changed");
+ const target=fieldByAnchor(state,controllerSeat,selected.anchor_uid);if(!target||target.top.card_id!==selected.card_id)throw new Error("tcg_v0_2_active_ability_redistribution_heal_target_changed");
+ const context:RuntimeV02HealPacketContext={source:{controller_seat:controllerSeat,action_kind:"ability",action_id:choice.ability_id,card_effect:true,card_uid:choice.source_uid,card_id:choice.source_card_id,creature_uid:choice.source_uid},target:{controller_seat:controllerSeat,creature_uid:target.top.uid,card_uid:target.top.uid,card_id:target.top.card_id,element:requiredString(target.def.element,"tcg_v0_2_active_ability_redistribution_target_element_required"),where:target.where,index:target.where==="reserve"?target.index:null}};
+ const healed=applyRuntimeV02HealPacket(state,target.creature,choice.heal.amount,context);return{kind:choice.kind,stage:"heal_resolved",ability_id:choice.ability_id,choice_id:choice.id,movement_count:choice.movement_receipts.length,if_matched:true,heal_target_uid:target.top.uid,requested_heal:choice.heal.amount,actual_heal:healed.actual_heal,emitted_packet_ids:healed.packet?[healed.packet.id]:[]};
+}
+export function runtimeV02ResumeActiveAbilityEssenceRedistribution(state:Record<string,unknown>,resume:RuntimeV02ActiveAbilityEssenceRedistributionResume,choiceId:string=crypto.randomUUID()):RuntimeV02ActiveAbilityEssenceRedistributionResumeResolution{
+ if(currentTurn(state)!==resume.turn_seq)throw new Error("tcg_v0_2_active_ability_redistribution_turn_changed");if(Number(state.active_seat)!==resume.seat)throw new Error("tcg_v0_2_active_ability_redistribution_active_seat_changed");
+ same(sourceTop(state,resume.seat,resume.source_where,resume.source_index),{uid:resume.source_uid,card_id:resume.source_card_id},"tcg_v0_2_active_ability_redistribution_source_changed");
+ const matched=runtimeV02EvaluateActiveAbilityIf(resume.when,{sets:{},creatures:{},essence_moves:{[resume.move_var]:resume.movement_receipts.map((x)=>({...x}))}});
+ if(!matched)return{kind:resume.kind,ability_id:resume.ability_id,movement_count:resume.movement_receipts.length,if_matched:false,pending_choice:null};
+ const participants=movementReceiptParticipants(resume.movement_receipts),heals=legalHealOptions(state,resume.seat,resume.heal.target_element,participants);if(!heals.length)return{kind:resume.kind,ability_id:resume.ability_id,movement_count:resume.movement_receipts.length,if_matched:true,pending_choice:null};
+ return{kind:resume.kind,ability_id:resume.ability_id,movement_count:resume.movement_receipts.length,if_matched:true,pending_choice:{id:requiredString(choiceId,"tcg_v0_2_active_ability_redistribution_choice_id_required"),seat:resume.seat,kind:"redistribute_attached_essence_then_conditional_heal",stage:"heal",ability_id:resume.ability_id,prompt:"Choose one damaged participating Creature to heal",min:1,max:1,turn_seq:resume.turn_seq,source_where:resume.source_where,source_index:resume.source_index,source_uid:resume.source_uid,source_card_id:resume.source_card_id,move_element:resume.move_element,move_min:resume.move_min,move_max:resume.move_max,move_var:resume.move_var,when:structuredClone(resume.when),heal:structuredClone(resume.heal),move_options:[],heal_options:heals,movement_receipts:resume.movement_receipts.map((x)=>({...x}))}};
 }
