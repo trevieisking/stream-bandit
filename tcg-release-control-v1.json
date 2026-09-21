@@ -521,8 +521,8 @@
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "acac81d1d5a39c2b6a6a9508d9bf4e8973cba9e6",
-        "file_count": 42,
-        "closure_sha256": "677102419b2dd5e07426c53b58dcb6365985d8e0aab798781ff59959efcd0828",
+        "file_count": 43,
+        "closure_sha256": "45bb40d0caf00dbce9e1450c768998fd296b6f8a2ecf786fb28774dedce9d84b",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -679,6 +679,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-withdrawal-modifier-v0-2.ts",
             "git_blob_sha": "18502072b357cd6ca3a7f5b2ffa7dbd2c6344d33"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
+            "git_blob_sha": "4dbf7ee6f2e3cfaded47060655c406110a3aea1f"
           },
           {
             "path": "supabase/functions/_shared/tcg-runtime-registry-v0-2.ts",
