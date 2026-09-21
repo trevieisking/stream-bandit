@@ -627,3 +627,17 @@
 - [x] TCG Card Pass 2 Validation **#1371 SUCCESS** on exact reconciled head `d370d0db839456f8e2c83dab247fcd5d0802e315`.
 - [ ] Next target: migrate Volt — Stormmane structured `DISCARD_ATTACHED_ESSENCE` away from the remaining legacy card-ID Match branch into a generic Attack operation owner.
 
+## V2.4.80 — Storm Break attached-Essence discard reconciliation
+- [x] Re-audit the frozen `DISCARD_ATTACHED_ESSENCE` inventory: exactly one Release 1 consumer, Volt — Stormmane / Storm Break.
+- [x] Confirm the existing overcharge-discard Attack owner is card-ID-free and already recognizes the complete structured Storm Break family.
+- [x] Confirm exact-one attached-Essence choice is server-owned and private.
+- [x] Confirm selected attachment -> discard mutation preflights/commits through Card-Zone and preserves exact instance identity.
+- [x] Confirm outer current-action event IF and nested target-survival IF remain shared Attack-IF-owned.
+- [x] Confirm Stunned application remains canonical Condition-owned.
+- [x] Confirm public overcharge resolution receipt does not expose selected Essence identity.
+- [x] Confirm marked v0.2 Stormmane is guarded away from the legacy `volt-stormmane` fallback.
+- [x] Preserve the legacy-only branch for unmarked snapshot compatibility; do not rewrite working v0.2 runtime merely to delete compatibility debt.
+- [x] Move `DISCARD_ATTACHED_ESSENCE` from missing to implemented in `tcg-runtime-capabilities-v0.2.json`.
+- [x] Refresh release-control capability fingerprint to `12c08d16cb5789a138cb9812be48c3e7e2e288e3`.
+- [ ] Continue the Release 1 used-operation/predicate audit with the next proven stale classification or smallest genuine generic-owner gap.
+
