@@ -508,7 +508,7 @@
       },
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
-        "entrypoint_git_blob_sha": "b973344040c714df78d6b6dddc54a6a59a2e573c",
+        "entrypoint_git_blob_sha": "45c0ccd58ee2a85cfe08a9b9f1b1e663b47eff7f",
         "file_count": 40,
         "closure_sha256": "21ccd20aac1b91d00ec0a79278d75927f5c1b355b84dc148dfec677257dacec1",
         "files": [
@@ -666,7 +666,7 @@
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/index.ts",
-            "git_blob_sha": "b973344040c714df78d6b6dddc54a6a59a2e573c"
+            "git_blob_sha": "45c0ccd58ee2a85cfe08a9b9f1b1e663b47eff7f"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
