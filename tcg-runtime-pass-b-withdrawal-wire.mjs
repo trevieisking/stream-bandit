@@ -16,11 +16,30 @@ if (!next.includes(bridgeImport)) {
   next = next.replace(importAnchor, importAnchor + bridgeImport);
 }
 
-if (next.includes(legacy)) next = next.replace(legacy, wired);
-else if (!next.includes(wired)) throw new Error('match_actions_withdrawal_function_changed');
+const lifecycleImport = 'import { runtimeV02ConsumeWithdrawalModifiers, runtimeV02ResolveWithdrawalModifierCost } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";\\n';
+const lifecycleFunction = 'function withdrawalCostPlan(cr:Cr,s:any,controllerSeat:1|2)';
+const lifecycleStructuredBase = 'const structured=structuredRuntimeWithdrawalBaseCost(s,cr,n,String(d?.element||""),crushed)';
+const lifecycleResolve = 'runtimeV02ResolveWithdrawalModifierCost(s,cr,controllerSeat,String(d?.element||""),n)';
 
-if (!next.includes(bridgeImport) || !next.includes(wired)) throw new Error('match_actions_withdrawal_wiring_incomplete');
-if (next.indexOf(wired) !== next.lastIndexOf(wired)) throw new Error('match_actions_withdrawal_wiring_duplicate');
+if (next.includes(legacy)) next = next.replace(legacy, wired);
+const passBWired = next.includes(wired);
+const lifecycleWired =
+  next.includes(lifecycleImport) &&
+  next.includes(lifecycleFunction) &&
+  next.includes(lifecycleStructuredBase) &&
+  next.includes(lifecycleResolve);
+if (!passBWired && !lifecycleWired) throw new Error('match_actions_withdrawal_function_changed');
+
+if (!next.includes(bridgeImport)) throw new Error('match_actions_withdrawal_wiring_incomplete');
+if (passBWired && next.indexOf(wired) !== next.lastIndexOf(wired)) throw new Error('match_actions_withdrawal_wiring_duplicate');
+if (lifecycleWired) {
+  if (next.indexOf(lifecycleFunction) !== next.lastIndexOf(lifecycleFunction)) {
+    throw new Error('match_actions_withdrawal_lifecycle_duplicate');
+  }
+  if (next.indexOf(lifecycleResolve) !== next.lastIndexOf(lifecycleResolve)) {
+    throw new Error('match_actions_withdrawal_lifecycle_resolver_duplicate');
+  }
+}
 
 if (process.argv.includes('--check')) {
   if (next !== source) throw new Error('match_actions_withdrawal_wiring_not_materialized');
