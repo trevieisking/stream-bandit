@@ -647,3 +647,21 @@ Structured `filters.attack_id` is evaluated against the resolved structured Atta
 ## 227 — Hollow Command blocks global control-condition capability closeout
 Thought Hunter and Murkmite now have executable `control_condition_present` paths, but Hollowcrown / Hollow Command remains without a structured active-Ability `REPLACE_CONTROL_CONDITION` owner. Global predicate/operation capability classification must remain open until that family is implemented and exact-head validated.
 
+## 228 — Active Ability condition replacement is shape-owned, not card-owned
+Own-turn active Abilities whose structured program requires an existing opponent-Vanguard control condition and then performs `REPLACE_CONTROL_CONDITION` are recognized by one generic Active Ability condition-replacement owner. Card ID, printed English and browser logic are not dispatch authority.
+
+## 229 — Condition replacement preflights before once-per-turn mutation
+The complete legal activation is executed against an isolated authoritative clone before the real activation receipt is written. Requirement or source-state failure cannot partially consume the once-per-turn use.
+
+## 230 — Condition prevention occurs after legal Ability activation
+Once an active Ability has passed requirements and the canonical activation owner permits it, the Ability use is spent even if the canonical Condition owner later prevents the requested condition because of immunity/protection. Prevention does not rewind a legal activation receipt.
+
+## 231 — REPLACE_CONTROL_CONDITION has one Condition mutation owner across Ability and Attack
+Hollow Command and Mind Eclipse may be orchestrated by different runtime families, but both delegate the actual control-slot replacement/protection semantics to `applyRuntimeConditionWithContext(..., "replace", ...)`. No second replacement engine is permitted.
+
+## 232 — control_condition_present is globally implemented only after all three frozen consumers
+Release 1 `control_condition_present` is accepted only because Thought Hunter, Murkmite and Hollowcrown are each executable through their rightful generic owner. One consumer family alone is insufficient evidence.
+
+## 233 — Stormmane attached-Essence discard must leave legacy card-ID Match dispatch
+The frozen structured `DISCARD_ATTACHED_ESSENCE` operation has exactly one Release 1 consumer, Volt — Stormmane / Storm Break. Its mutation must remain Card-Zone-owned, but recognition/choice must move into a generic structured Attack operation owner so Match no longer dispatches gameplay by `volt-stormmane`.
+
