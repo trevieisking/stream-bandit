@@ -14,6 +14,12 @@ const wiredWithSurge = wired.replace('const structuredContext=', surgeBonus + 'c
 const legacyContextType = 'ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent"}';
 const protectionContextType = 'ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent",source_controller_seat:1|2,target_controller_seat:1|2,target_creature_uid:string,packet_id:string}';
 const wiredWithSurgeAndProtection = wiredWithSurge.replace(legacyContextType, protectionContextType);
+const creatureContinuousContextType = 'ctx:{target_zone:string,target_controller:"self"|"opponent",source_controller:"self"|"opponent",source_controller_seat:1|2,target_controller_seat:1|2,target_creature_uid:string,packet_id:string,attack_id:string}';
+const legacyStructuredContext = 'const structuredContext={...ctx,target_has_any_condition:hasCondition(target)};';
+const creatureContinuousStructuredContext = 'const sourceOpponentSeat=ctx.source_controller_seat===1?2:1;const currentOpponentVanguard=s.players?.[String(sourceOpponentSeat)]?.vanguard;const structuredContext={...ctx,target_has_any_condition:hasCondition(target),current_opponent_vanguard_control_condition:currentOpponentVanguard?runtimeConditions(currentOpponentVanguard).control:null};';
+const wiredWithCreatureContinuous = wiredWithSurgeAndProtection
+  .replace(protectionContextType, creatureContinuousContextType)
+  .replace(legacyStructuredContext, creatureContinuousStructuredContext);
 
 const legacyCall = 'const dmg=attackDamage(p.vanguard,target,s,atk.damage+bonus);';
 const wiredCall = 'const relation=targetSeat===seat?"self":"opponent";const dmg=attackDamage(p.vanguard,target,s,atk.damage+bonus,{target_zone:targetWhere,target_controller:relation,source_controller:relation});';
@@ -21,6 +27,10 @@ const countAddWiredCall = 'const formulaBase=countAddEvaluation?.damage??atk.dam
 const combinedFormulaWiredCall = 'const countFormulaBonus=countAddEvaluation?Math.max(0,countAddEvaluation.damage-atk.damage):0;const conditionalFormulaBonus=conditionalAddEvaluation?Math.max(0,conditionalAddEvaluation.damage-atk.damage):0;const formulaBonus=countFormulaBonus+conditionalFormulaBonus;const formulaBase=atk.damage+formulaBonus;const relation=targetSeat===seat?"self":"opponent";const dmg=attackDamage(p.vanguard,target,s,formulaBase+bonus,{target_zone:targetWhere,target_controller:relation,source_controller:relation});';
 const attackModifierOwnerWiredCall = 'const declaredAttackDamage=attackModifierConsumption?.damage??(formulaBase+bonus);const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage,{target_zone:targetWhere,target_controller:relation,source_controller:relation});';
 const attackProtectionOwnerWiredCall = 'const declaredAttackDamage=attackModifierConsumption?.damage??(formulaBase+bonus);const targetCreatureUid=String(target.stack?.[target.stack.length-1]?.uid||"");if(!targetCreatureUid)throw new Error("tcg_v0_2_attack_damage_target_uid_required");const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage,{target_zone:targetWhere,target_controller:relation,source_controller:relation,source_controller_seat:seat as 1|2,target_controller_seat:targetSeat as 1|2,target_creature_uid:targetCreatureUid,packet_id:attackActionId});';
+const attackCreatureContinuousOwnerWiredCall = attackProtectionOwnerWiredCall.replace(
+  'packet_id:attackActionId});',
+  'packet_id:attackActionId,attack_id:String(atk.id||`attack-${slot}`)});',
+);
 
 let next = source;
 if (!next.includes(bridgeImport)) {
@@ -29,13 +39,13 @@ if (!next.includes(bridgeImport)) {
 }
 
 if (next.includes(legacy)) next = next.replace(legacy, wired);
-else if (!next.includes(wired) && !next.includes(wiredWithSurge) && !next.includes(wiredWithSurgeAndProtection)) throw new Error('match_actions_attack_damage_function_changed');
+else if (!next.includes(wired) && !next.includes(wiredWithSurge) && !next.includes(wiredWithSurgeAndProtection) && !next.includes(wiredWithCreatureContinuous)) throw new Error('match_actions_attack_damage_function_changed');
 
 if (next.includes(legacyCall)) next = next.replace(legacyCall, wiredCall);
-else if (!next.includes(wiredCall) && !next.includes(countAddWiredCall) && !next.includes(combinedFormulaWiredCall) && !next.includes(attackModifierOwnerWiredCall) && !next.includes(attackProtectionOwnerWiredCall)) throw new Error('match_actions_attack_damage_call_changed');
+else if (!next.includes(wiredCall) && !next.includes(countAddWiredCall) && !next.includes(combinedFormulaWiredCall) && !next.includes(attackModifierOwnerWiredCall) && !next.includes(attackProtectionOwnerWiredCall) && !next.includes(attackCreatureContinuousOwnerWiredCall)) throw new Error('match_actions_attack_damage_call_changed');
 
-const wiredVariants = [wired, wiredWithSurge, wiredWithSurgeAndProtection].filter((candidate) => next.includes(candidate));
-const wiredCallVariants = [wiredCall, countAddWiredCall, combinedFormulaWiredCall, attackModifierOwnerWiredCall, attackProtectionOwnerWiredCall].filter((candidate) => next.includes(candidate));
+const wiredVariants = [wired, wiredWithSurge, wiredWithSurgeAndProtection, wiredWithCreatureContinuous].filter((candidate) => next.includes(candidate));
+const wiredCallVariants = [wiredCall, countAddWiredCall, combinedFormulaWiredCall, attackModifierOwnerWiredCall, attackProtectionOwnerWiredCall, attackCreatureContinuousOwnerWiredCall].filter((candidate) => next.includes(candidate));
 if (!next.includes(bridgeImport) || wiredVariants.length !== 1 || wiredCallVariants.length !== 1) throw new Error('match_actions_attack_damage_wiring_incomplete');
 if (next.indexOf(wiredVariants[0]) !== next.lastIndexOf(wiredVariants[0])) throw new Error('match_actions_attack_damage_wiring_duplicate');
 if (next.indexOf(wiredCallVariants[0]) !== next.lastIndexOf(wiredCallVariants[0])) throw new Error('match_actions_attack_damage_call_duplicate');
