@@ -9,6 +9,7 @@ import {
 } from "./tcg-match-switch-context-v0-2.ts";
 import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
+import { runtimeV02RandomSampleHiddenZone } from "./tcg-match-hidden-zone-sample-v0-2.ts";
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
 import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
 import { applyRuntimeV02AttachmentAttackDamageModifier } from "./tcg-match-surge-lifecycle-v0-2.ts";
@@ -1186,19 +1187,18 @@ function randomSampleHiddenZone(
     throw new Error("tcg_v0_2_event_listener_hidden_sample_unavailable");
   }
   const count = Math.min(wanted.max, hand.length);
-  const pool = hand.map((card) => ({
-    uid: requiredString(card.uid, "tcg_v0_2_event_listener_hidden_sample_uid_invalid"),
-    card_id: requiredString(card.card_id, "tcg_v0_2_event_listener_hidden_sample_card_id_invalid"),
+  const sampled = runtimeV02RandomSampleHiddenZone(hand, count).map((card) => ({
+    uid: requiredString(
+      card.uid,
+      "tcg_v0_2_event_listener_hidden_sample_uid_invalid",
+    ),
+    card_id: requiredString(
+      card.card_id,
+      "tcg_v0_2_event_listener_hidden_sample_card_id_invalid",
+    ),
     zone_owner_seat: ownerSeat,
     zone: "hand" as const,
   }));
-  const sampled: CardRef[] = [];
-  while (sampled.length < count && pool.length) {
-    const random = new Uint32Array(1);
-    crypto.getRandomValues(random);
-    const index = random[0] % pool.length;
-    sampled.push(pool.splice(index, 1)[0]);
-  }
   if (sampled.length) {
     setPrivateInspection(state, candidate.seat, ownerSeat, "hand", sampled);
   }
