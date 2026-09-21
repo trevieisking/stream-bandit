@@ -722,3 +722,18 @@ Match must resolve due `controller_aftermath_finished` actions after the control
 ## 252 — Archivist Sol hand-to-deck shuffle is the next real runtime gap
 Archive Reset is the sole frozen `SHUFFLE_ZONE_INTO_DECK` family. Tactic already has canonical Card-Zone and Randomization dependencies but does not yet parse this opcode. The repair must generically move all exact requested hand cards into that same player's deck through Card-Zone, then shuffle the resulting deck through Randomization, with owner-private semantics and no Archivist Sol branch.
 
+## 253 — SHUFFLE_ZONE_INTO_DECK is Tactic orchestration over Card-Zone + Randomization
+The Tactic interpreter owns recognition/sequencing of the structured operation only. Exact hand -> deck movement remains Card-Zone-owned and resulting deck permutation remains Randomization-owned. No third shuffle or zone owner is permitted.
+
+## 254 — Frozen hand-to-deck shuffle visibility is owner-private
+Release 1 `SHUFFLE_ZONE_INTO_DECK` accepts only `zone: "hand"` with `visibility: "owner_private"`. The operation must not expose opponent hand identities in public receipts or browser-owned state.
+
+## 255 — Empty hand does not suppress the deck shuffle
+A legal structured hand-to-deck shuffle with zero cards in hand performs no Card-Zone transfer but still runs the canonical deck shuffle. Empty source-zone state is not an error for this family.
+
+## 256 — Archivist Sol is a consumer, never shuffle authority
+Archive Reset is the sole frozen Release 1 consumer, but runtime recognition is shape-driven by operation/player/zone/visibility. Card ID and printed English are not dispatch authority.
+
+## 257 — Quiet Step control-condition clear is the next used-operation reconciliation
+The frozen Set One has exactly one `CHOOSE_AND_CLEAR_CONTROL_CONDITION` consumer, Shade — Quiet Step. Existing Tactic runtime aliases this structured operation to the generic condition-choice flow and filters legal options to the control slot before canonical clear mutation; capability status should be reconciled only after exact-head evidence confirms that accepted path.
+
