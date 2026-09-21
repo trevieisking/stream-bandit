@@ -719,3 +719,33 @@
 - [x] TCG Card Pass 2 Validation **#1405 SUCCESS** on exact reconciled head `29bda755c8d49c7ce6295e927c5080e62f34c1e7`.
 - [ ] Next runtime repair: wire Bastion Plate `INCREMENT_SOURCE_COUNTER` generically in Event Listener to the existing source-counter primitive.
 
+## V2.4.86 — damage-prevented attached-Relic listener family closeout
+- [x] Prove the frozen incoming attached-Relic attack-damage family is exactly Gloom Locket, Bastion Plate and Shellguard Pendant.
+- [x] Prove the frozen `damage_prevented` attached-Relic listener family is exactly Bastion Plate and Shellguard Pendant.
+- [x] Keep incoming Relic reduction generic and card-ID-free in Attack Damage.
+- [x] Preserve Shellguard's one-use attachment continuous-effect consumption only when actual prevention is at least 1.
+- [x] Emit exact prevention source/target/amount identity from Attack Damage without replacing the existing aggregate prevention-history marker.
+- [x] Add generic Event Listener support for the three frozen prevention predicates.
+- [x] Store Bastion `prevention_uses` on the exact Relic card instance according to its declared counter schema.
+- [x] Execute `INCREMENT_SOURCE_COUNTER` generically.
+- [x] Execute Bastion's existing `source_counter_at_least` IF against the exact source instance.
+- [x] Support turn-scoped attachment listener limits without taking ownership away from Event Listener.
+- [x] Support attachment-scoped attachment listener limits for Shellguard.
+- [x] Execute `SCHEDULE_SOURCE_DISCARD` by delegating timing to Scheduled Action.
+- [x] Extend Scheduled Action with `after_attack_finished` source-discard planning while preserving existing aftermath draw actions.
+- [x] Add exact attached-Relic -> discard mutation to the Relic owner with preflight and identity preservation.
+- [x] Drain due source-discard plans at the canonical attack-completion boundary before defeat scan.
+- [x] Add deterministic Bastion/Shellguard/Gloom lifecycle coverage.
+- [x] Add frozen Set One family and no-card-ID runtime guard.
+- [x] Preserve the accepted attack deck-discard owner chain through semantic rather than first-occurrence source ordering.
+- [x] Preserve Runtime Pass B Attack Damage and Surge ownership gates with the detailed compatibility bridge.
+- [x] Match Edge closure = 102 files / `9dc39ff55b849b76ffbf1593c3ea30d2c1a886d7b050c86a962b1c2cb65eb68c`.
+- [x] Tactic Edge closure = 41 files / `9a33a92624e4ac058f9c0ee12200344a67479fb7f97c5e2aa43283c5be45ad65`.
+- [x] Card Pass **#1420 SUCCESS** on source/runtime head `9d3bf34346de60559d1952826e6c2bf078f9acc7`.
+- [x] Move `INCREMENT_SOURCE_COUNTER` and `SCHEDULE_SOURCE_DISCARD` from missing to implemented.
+- [x] Move all three frozen `prevention_*` predicates from missing to implemented.
+- [x] Preserve `source_counter_at_least` as implemented and add its exact Bastion consumer evidence.
+- [x] Refresh capability fingerprint to `b0033085bfce1a529730f25e985e085c4f466754`.
+- [x] Card Pass **#1422 SUCCESS** on exact capability-reconciled head `f1aa770437a5a1618c1e8886928561cd3a60dd92`.
+- [ ] Next target: reconcile Grove Sapstone Charm `MODIFY_CURRENT_HEAL` against Heal owner #21's existing before-heal modifier path.
+
