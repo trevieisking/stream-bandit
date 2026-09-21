@@ -12,8 +12,22 @@ export type RuntimeV02RelicCreature<T extends RuntimeV02RelicInstance = RuntimeV
 
 export type RuntimeV02RelicPlayerState<T extends RuntimeV02RelicInstance = RuntimeV02RelicInstance> = {
   hand: T[];
+  discard?: T[];
   vanguard: RuntimeV02RelicCreature<T> | null;
   reserve: Array<RuntimeV02RelicCreature<T> | null>;
+};
+
+export type RuntimeV02RelicDiscardReceipt = {
+  schema: "sb-tcg-relic-discard-v0.2";
+  event_name: "relic_discarded";
+  controller_seat: 1 | 2;
+  target_creature_uid: string;
+  source_card_uid: string;
+  source_card_id: string;
+  origin_zone: "attached_relic";
+  destination_zone: "discard";
+  where: "vanguard" | "reserve";
+  index: number | null;
 };
 
 export type RuntimeV02RelicAttachmentReceipt = {
@@ -280,3 +294,74 @@ export function runtimeV02AttachRelicFromHand<T extends RuntimeV02RelicInstance>
     },
   };
 }
+
+/**
+ * Canonical attached-Relic -> discard mutation.
+ *
+ * The Relic owner resolves the scalar attached slot and exact card identity before
+ * mutation. This is the inverse specialist boundary of runtimeV02AttachRelicFromHand;
+ * Card-Zone remains the general array-zone owner and is not asked to manufacture an
+ * array facade for the scalar attached_relic slot.
+ */
+export function runtimeV02DiscardAttachedRelic<T extends RuntimeV02RelicInstance>(
+  player: RuntimeV02RelicPlayerState<T>,
+  controllerSeat: 1 | 2,
+  sourceCardUid: string,
+): { discarded_card: T; receipt: RuntimeV02RelicDiscardReceipt } {
+  if (!player || !Array.isArray(player.reserve) || player.reserve.length < 4 || !Array.isArray(player.discard)) {
+    throw new Error("tcg_v0_2_relic_discard_player_invalid");
+  }
+  if (controllerSeat !== 1 && controllerSeat !== 2) {
+    throw new Error("tcg_v0_2_relic_discard_controller_invalid");
+  }
+  const sourceUid = requiredString(sourceCardUid, "tcg_v0_2_relic_discard_source_uid_required");
+  const matches: Array<{
+    creature: RuntimeV02RelicCreature<T>;
+    where: "vanguard" | "reserve";
+    index: number | null;
+    anchor_uid: string;
+    relic: T;
+  }> = [];
+  const candidates: Array<["vanguard" | "reserve", number | null, RuntimeV02RelicCreature<T> | null | undefined]> = [
+    ["vanguard", null, player.vanguard],
+    ...[0, 1, 2, 3].map((index) => ["reserve", index, player.reserve[index]] as ["reserve", number, RuntimeV02RelicCreature<T> | null | undefined]),
+  ];
+  for (const [where, index, creature] of candidates) {
+    if (!creature?.relic || creature.relic.uid !== sourceUid) continue;
+    if (!Array.isArray(creature.stack) || creature.stack.length < 1) {
+      throw new Error("tcg_v0_2_relic_discard_creature_stack_required");
+    }
+    const top = creature.stack[creature.stack.length - 1];
+    const anchorUid = requiredString(top?.uid, "tcg_v0_2_relic_discard_target_uid_required");
+    requiredString(top?.card_id, "tcg_v0_2_relic_discard_target_card_id_required");
+    requiredString(creature.relic.card_id, "tcg_v0_2_relic_discard_source_card_id_required");
+    matches.push({ creature, where, index, anchor_uid: anchorUid, relic: creature.relic });
+  }
+  if (matches.length < 1) throw new Error("tcg_v0_2_relic_discard_source_missing");
+  if (matches.length > 1) throw new Error("tcg_v0_2_relic_discard_source_ambiguous");
+  const found = matches[0];
+  if (player.discard.some((card) => card?.uid === sourceUid)) {
+    throw new Error("tcg_v0_2_relic_discard_destination_uid_collision");
+  }
+
+  // Every identity/destination check above completes before either real zone mutates.
+  found.creature.relic = null;
+  player.discard.push(found.relic);
+
+  return {
+    discarded_card: found.relic,
+    receipt: {
+      schema: "sb-tcg-relic-discard-v0.2",
+      event_name: "relic_discarded",
+      controller_seat: controllerSeat,
+      target_creature_uid: found.anchor_uid,
+      source_card_uid: sourceUid,
+      source_card_id: found.relic.card_id,
+      origin_zone: "attached_relic",
+      destination_zone: "discard",
+      where: found.where,
+      index: found.index,
+    },
+  };
+}
+
