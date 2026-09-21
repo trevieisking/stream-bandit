@@ -72,7 +72,8 @@ test('evolved continuation is card-id-free and reuses canonical rule owners', ()
   assert.equal(helper.includes('recordRuntimeV02EssenceAttachmentEvent('), false, 'generic continuation must delegate attachment receipt creation to Attachment Engine');
   assert.equal(helper.includes('runtimeV02CreateEssenceAttachedEvent('), false, 'generic continuation must delegate attached-event creation to Attachment Engine');
   assert.equal(helper.includes('applyStructuredRuntimeEssenceAttachmentLifecycle('), false, 'generic continuation must not execute triggered attachment semantics through the narrow lifecycle owner');
-  assert.ok(helper.includes('crypto.getRandomValues'));
+  assert.ok(helper.includes('runtimeV02RandomSampleHiddenZone('), 'generic evolved continuation must delegate hidden sampling to the shared Hidden-Zone RNG owner');
+  assert.equal(helper.includes('crypto.getRandomValues'), false, 'generic evolved continuation must not own its own hidden-zone RNG loop');
   assert.ok(helper.includes('pending_event_listener_choice'));
   assert.ok(helper.includes('runtime_v0_2_event_listener_continuation'));
 });
