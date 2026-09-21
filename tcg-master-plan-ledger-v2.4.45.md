@@ -749,3 +749,30 @@ Quiet Step is the sole frozen Release 1 consumer, but runtime recognition is ope
 ## 261 — Bastion Plate source-counter increment is the next real runtime gap
 The frozen Set One has exactly one `INCREMENT_SOURCE_COUNTER` consumer, Stone — Bastion Plate. A generic counter primitive exists, but the Event Listener dispatcher has no opcode branch. The repair must bind listener-source identity generically and preserve the subsequent `source_counter_at_least` IF and source-discard lifecycle.
 
+## 262 — attached-Relic incoming attack reduction belongs to Attack Damage
+Structured Relic `continuous` entries with `kind: "incoming_attack_damage"` and `target: "$attached_creature"` are evaluated by the canonical Attack Damage owner. Relic/card identity is data, never dispatch authority. Existing Essence/Creature/temporary-protection ownership remains intact.
+
+## 263 — exact damage prevention and historical prevention are separate evidence forms
+Attack Damage may emit exact prevention details for live listener dispatch while preserving the existing aggregate prevention-history marker used by prior-turn event formulas. Adding exact listener evidence must not delete or redefine historical query evidence.
+
+## 264 — attachment-scoped one-use Relic effects live on the Relic instance
+A frozen continuous effect whose limit is `scope: attachment / owner: attachment` stores consumption on the exact attached Relic instance and consumes only after the effect actually prevents damage. It is not a turn flag and must not be recreated as a Match helper.
+
+## 265 — Relic card-instance counters live on the source card instance
+A Tactic counter declared with `owner: "card_instance"` is read and mutated on that exact Tactic/Relic instance. Creature flags are not a valid substitute for attached-card counter ownership.
+
+## 266 — Event Listener owns damage-prevented listener orchestration
+The generic Event Listener owns `damage_prevented` predicate evaluation, listener limits, card-instance counter steps, IF branching and the act of scheduling later work. It does not own physical Relic removal or attack-damage arithmetic.
+
+## 267 — after_attack_finished timing belongs to Scheduled Action
+`SCHEDULE_SOURCE_DISCARD` creates server-owned lifecycle work in the existing Scheduled Action owner. Event Listener does not create an ad-hoc timing queue, and Match does not encode a card-specific delayed-discard flag.
+
+## 268 — physical attached-Relic removal belongs to Relic
+The scalar `attached_relic` slot is specialist Relic state. Exact attached Relic -> discard mutation, uniqueness checks and destination collision preflight belong to the Relic owner rather than forcing Card-Zone to manufacture an array facade for the scalar slot.
+
+## 269 — Match only orchestrates the attack-finished boundary
+Match converts Attack Damage prevention details into Event Listener events and invokes due Scheduled Action work at the existing attack-completion boundary before defeat scan. It delegates both timing semantics and physical Relic mutation to their owners.
+
+## 270 — Sapstone Charm is the next used-operation reconciliation
+The frozen Set One has exactly one `MODIFY_CURRENT_HEAL` consumer, Grove — Sapstone Charm. Heal owner #21 already owns the before-heal predicates, turn-scoped attachment limit, modifier validation/application and pre-HP-mutation packet boundary; capability status may move only after the exact reconciled head remains green.
+
