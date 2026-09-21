@@ -4,6 +4,7 @@ import fs from "node:fs";
 
 const matchActions = fs.readFileSync("supabase/functions/tcg-match-actions/index.ts", "utf8");
 const owner = fs.readFileSync("supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts", "utf8");
+const damageOwner = fs.readFileSync("supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts", "utf8");
 
 test("Attack #14 live path consumes the canonical modifier owner only after legal declaration setup", () => {
   assert.ok(owner.includes("export function runtimeV02ConsumeAttackDamageModifiersOnLegalDeclaration("));
@@ -49,3 +50,30 @@ test("legacy matches preserve prior damage when structured Attack modifier owner
   assert.ok(owner.includes("if (!assertRuntimeV02MatchSnapshot(state)) return null;"));
   assert.ok(matchActions.includes("attackModifierConsumption?.damage??(formulaBase+bonus)"));
 });
+
+test("Creature continuous outgoing Attack damage stays generic and Match-owned", () => {
+  assert.ok(damageOwner.includes("function outgoingSelfAbilityEffects("));
+  assert.ok(damageOwner.includes("evaluateRuntimeV02SourceDamagedRequirement("));
+  assert.ok(damageOwner.includes("evaluateRuntimeV02SourceHasShieldAtLeastRequirement("));
+  assert.ok(damageOwner.includes('name === "control_condition_present"'));
+  assert.ok(damageOwner.includes('predicate.target !== "$current_opponent_vanguard"'));
+  assert.ok(damageOwner.includes("current_opponent_vanguard_control_condition"));
+  assert.ok(damageOwner.includes("attack_id: context.attack_id"));
+
+  assert.ok(matchActions.includes("runtimeConditions(currentOpponentVanguard).control"));
+  assert.ok(matchActions.includes("attack_id:String(atk.id||"));
+  assert.ok(matchActions.includes("current_opponent_vanguard_control_condition"));
+
+  for (const forbidden of [
+    "ember-glowcub",
+    "shade-murkmite",
+    "stone-quartzram",
+    "warm-blood",
+    "murk-sense",
+    "prismatic-bulwark",
+  ]) {
+    assert.equal(damageOwner.includes(forbidden), false, "Attack Damage owner must remain card-ID/name-free: " + forbidden);
+    assert.equal(matchActions.includes(forbidden), false, "Match wiring must remain card-ID/name-free: " + forbidden);
+  }
+});
+
