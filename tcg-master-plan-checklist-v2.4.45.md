@@ -530,7 +530,7 @@
 - [x] Refresh all affected Edge closures: Setup 8 / Match 96 / Tactic 40.
 - [x] Ability IF source/accounting progress: **7 / 9**.
 - [ ] Exact-head Card Pass must validate the post-repair Night Reading head before V2.4.73 is accepted.
-- [x] Surgefin / Undertow Supply source-complete in V2.4.74; deterministic runtime core and wiring tests pass, exact-head Card Pass acceptance pending.
+- [x] Surgefin / Undertow Supply complete and accepted in V2.4.74; Card Pass #1306 SUCCESS.
 - [ ] Remaining active Ability IF after Surgefin: Marevault / Heart of Tides.
 
 ## V2.4.74 — Surgefin / Undertow Supply active Ability IF
@@ -548,6 +548,6 @@
 - [x] Card Pass #1305 deterministic runtime core + Surgefin tests SUCCESS; only stale 96-file Match closure failed.
 - [x] Refresh release-control to Setup 8 / Match 98 / Tactic 40.
 - [x] Ability IF source/accounting progress: **8 / 9**.
-- [ ] Card Pass #1306 must accept current exact head `c37660dd4c712055ca027caf18a036684de89e09`.
+- [x] Card Pass #1306 SUCCESS on exact head `c37660dd4c712055ca027caf18a036684de89e09`; Surgefin / Undertow Supply accepted.
 - [ ] Final active Ability IF: Marevault / Heart of Tides.
 
