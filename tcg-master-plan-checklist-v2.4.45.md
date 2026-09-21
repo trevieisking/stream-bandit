@@ -530,6 +530,24 @@
 - [x] Refresh all affected Edge closures: Setup 8 / Match 96 / Tactic 40.
 - [x] Ability IF source/accounting progress: **7 / 9**.
 - [ ] Exact-head Card Pass must validate the post-repair Night Reading head before V2.4.73 is accepted.
-- [ ] Next active Ability IF: Surgefin / Undertow Supply.
+- [x] Surgefin / Undertow Supply source-complete in V2.4.74; deterministic runtime core and wiring tests pass, exact-head Card Pass acceptance pending.
 - [ ] Remaining active Ability IF after Surgefin: Marevault / Heart of Tides.
+
+## V2.4.74 — Surgefin / Undertow Supply active Ability IF
+- [x] Recognize the generic optional discard-Essence -> Reserve target -> attach -> target-damaged IF -> Heal family without card-ID branches.
+- [x] Project one authoritative private choice with exactly one legal target and zero-or-one eligible Essence.
+- [x] Keep physical discard -> attachment mutation in the canonical Essence Attachment owner.
+- [x] Add generic active-Ability continuation receipt across nested Event / Movement / Heal listener choices.
+- [x] Add `resume_active_ability_effect` Heal Listener resume intent.
+- [x] Evaluate `target_damaged` after nested attachment listeners complete using shared Active Ability IF.
+- [x] Emit canonical Ability Heal packet only when the IF matches.
+- [x] Prove optional zero-Essence path remains legal when requirements were satisfied.
+- [x] Prove exact selected Essence instance reaches the target without cloning.
+- [x] Prove opponent/public choice view does not expose private option identities.
+- [x] Prove Match public receipt does not publish selected Essence UID/card ID.
+- [x] Card Pass #1305 deterministic runtime core + Surgefin tests SUCCESS; only stale 96-file Match closure failed.
+- [x] Refresh release-control to Setup 8 / Match 98 / Tactic 40.
+- [x] Ability IF source/accounting progress: **8 / 9**.
+- [ ] Card Pass #1306 must accept current exact head `c37660dd4c712055ca027caf18a036684de89e09`.
+- [ ] Final active Ability IF: Marevault / Heart of Tides.
 
