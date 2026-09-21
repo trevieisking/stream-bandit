@@ -31,6 +31,14 @@ import {
   type RuntimeV02PendingActiveAbilitySupplyChoice,
 } from "./tcg-match-active-ability-supply-v0-2.ts";
 import {
+  runtimeV02CreateActiveAbilitySupplyAttachmentChoice,
+  runtimeV02PendingActiveAbilitySupplyAttachmentChoiceView,
+  runtimeV02ResolveActiveAbilitySupplyAttachmentChoice,
+  structuredRuntimeActiveAbilitySupplyAttachment,
+  type RuntimeV02ActiveAbilitySupplyAttachmentResolution,
+  type RuntimeV02PendingActiveAbilitySupplyAttachmentChoice,
+} from "./tcg-match-active-ability-supply-attachment-v0-2.ts";
+import {
   runtimeV02BuildActiveAbilitySelectedHealChoice,
   runtimeV02BuildActiveAbilitySelectedHealEachChoice,
   runtimeV02PendingActiveAbilitySelectedHealChoiceView,
@@ -63,6 +71,7 @@ type RuntimeV02ActiveAbilitySource = {
 export type RuntimeV02PendingActiveAbilityLiveChoice =
   | RuntimeV02PendingActiveAbilityEssenceRedistributionChoice
   | RuntimeV02PendingActiveAbilitySupplyChoice
+  | RuntimeV02PendingActiveAbilitySupplyAttachmentChoice
   | RuntimeV02PendingActiveAbilityDeckReadingChoice
   | RuntimeV02PendingActiveAbilityChoice
   | RuntimeV02PendingActiveAbilitySelectedHealChoice
@@ -72,6 +81,7 @@ export type RuntimeV02PendingActiveAbilityLiveChoice =
 export type RuntimeV02ActiveAbilityLiveResolution =
   | RuntimeV02ActiveAbilityEssenceRedistributionResolution
   | RuntimeV02ActiveAbilitySupplyChoiceResolution
+  | RuntimeV02ActiveAbilitySupplyAttachmentResolution
   | RuntimeV02ActiveAbilityDeckReadingResolution
   | {
     kind: "inspect_one_reward";
@@ -131,6 +141,26 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
       state,
       controllerSeat,
       supplyDescriptor.ability_id,
+    );
+    return pending;
+  }
+
+  const supplyAttachmentDescriptor = structuredRuntimeActiveAbilitySupplyAttachment(
+    state,
+    instance,
+  );
+  if (supplyAttachmentDescriptor) {
+    const pending = runtimeV02CreateActiveAbilitySupplyAttachmentChoice(
+      state,
+      controllerSeat,
+      supplyAttachmentDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      supplyAttachmentDescriptor.ability_id,
     );
     return pending;
   }
@@ -229,6 +259,9 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
   if (choice.kind === "select_reserve_target_and_optional_discard_essence") {
     return runtimeV02PendingActiveAbilitySupplyChoiceView(choice, viewerSeat);
   }
+  if (choice.kind === "select_discard_essence_then_friendly_target") {
+    return runtimeV02PendingActiveAbilitySupplyAttachmentChoiceView(choice, viewerSeat);
+  }
   if (choice.kind === "inspect_opponent_deck_top_then_optional_bottom") {
     return runtimeV02PendingActiveAbilityDeckReadingChoiceView(choice, viewerSeat);
   }
@@ -273,6 +306,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
   }
   if (choice.kind === "select_reserve_target_and_optional_discard_essence") {
     return runtimeV02ResolveActiveAbilitySupplyChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
+  }
+  if (choice.kind === "select_discard_essence_then_friendly_target") {
+    return runtimeV02ResolveActiveAbilitySupplyAttachmentChoice(
       choice,
       controllerSeat,
       choiceId,
