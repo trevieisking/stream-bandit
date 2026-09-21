@@ -32,6 +32,7 @@
       "DRAW",
       "DRAW_FIXED",
       "HEAL",
+      "HEAL_EACH",
       "IF",
       "INCREMENT_SOURCE_COUNTER",
       "LOOK_TOP",
@@ -62,8 +63,7 @@
     ],
     "partial": [
       "ATTACH_ESSENCE_FROM_ZONE",
-      "CHOOSE_FROM_SET",
-      "HEAL_EACH"
+      "CHOOSE_FROM_SET"
     ],
     "missing": [
       "APPLY_CONDITION",
@@ -692,6 +692,67 @@
         }
       },
       "note": "One structured Withdrawal-modifier lifecycle owner now serves triggered Event Listener and Tactic producers; Match resolves/consumes it and Aftermath expires it. No card-ID dispatch, no new owner family, and Payment/Atomic Switch ownership are unchanged."
+    },
+    "release1_heal_each_all_consumer_parity_v2_4_93": {
+      "accepted_head": "60ea34dfe7bf23663e7903df99b47f254afc4eae",
+      "card_pass_run": 1488,
+      "operation": "HEAL_EACH",
+      "frozen_consumers": [
+        {
+          "card_id": "grove-verdantusk",
+          "surface": "Attack after_damage"
+        },
+        {
+          "card_id": "grove-elderbloom-first-canopy",
+          "surface": "active Ability"
+        },
+        {
+          "card_id": "tide-marevault-heart-of-tides",
+          "surface": "Attack after_damage_finished mixed program"
+        },
+        {
+          "card_id": "tide-reef-medic-olan",
+          "surface": "Tactic"
+        }
+      ],
+      "owners": {
+        "attack_after_damage": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
+        "active_ability_selected_heal": "supabase/functions/_shared/tcg-match-active-ability-selected-heal-v0-2.ts",
+        "mixed_attack_after_damage_finished": "supabase/functions/_shared/tcg-match-attack-after-damage-finished-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "heal_packet": "supabase/functions/_shared/tcg-match-heal-packet-v0-2.ts",
+        "heal_listener_live": "supabase/functions/_shared/tcg-match-heal-listener-live-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "heal_each_owner": "all HEAL_EACH mutations delegate to canonical Heal Packet ownership",
+        "private_choice_transport": "existing generic server-owned min/max/options choice transport",
+        "multi_target_preflight": "all selected targets are rebound before any multi-target heal mutation",
+        "movement_boundary": "Marevault Essence moves complete canonical Movement Listener handling before HEAL_EACH selection",
+        "heal_listener_boundary": "HEAL_EACH packets complete canonical after_heal_packet listeners before later mixed-program steps",
+        "optional_switch": "Marevault final optional switch delegates to Atomic Switch",
+        "card_id_dispatch": false
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-heal-each-effects.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-heal-each-packet-wiring.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-active-ability-heal-each.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-after-damage-finished.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-heal-listener-live.test.ts",
+        "tcg/tests/card-pass-2-active-ability-heal-each.test.mjs",
+        "tcg/tests/card-pass-2-attack-after-damage-finished.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 106,
+          "sha256": "fba619ffb652ab1365a4b290b15069379f7f6678cf4e17491da01a3bfe90293e"
+        },
+        "tactic_actions": {
+          "file_count": 43,
+          "sha256": "df7154b1d85c37dfc1c36f2aba500dea2a369a0c92173ab181689853b3b209f2"
+        }
+      },
+      "note": "Verdantusk Attack, Elderbloom active Ability, Marevault mixed after-damage-finished Attack and Reef Medic Olan Tactic now execute HEAL_EACH through canonical Heal Packet/listener ownership. No second Heal engine and no new owner family."
     }
   }
 }
