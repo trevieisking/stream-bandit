@@ -1795,3 +1795,37 @@ Reconcile `CHOOSE_AND_CLEAR_CONTROL_CONDITION`.
 
 The frozen Release 1 inventory contains exactly one consumer, Shade — Quiet Step. The existing generic Tactic condition-choice branch already aliases `CHOOSE_AND_CLEAR_CONTROL_CONDITION` to the canonical condition-choice/clear flow and has a frozen regression guard. V2.4.85 should be capability reconciliation only if exact evidence remains aligned.
 
+## V2.4.85 — accepted Quiet Step control-condition clear capability reconciliation
+
+The frozen Release 1 `CHOOSE_AND_CLEAR_CONTROL_CONDITION` inventory contains exactly one consumer:
+- Shade — Quiet Step.
+
+No runtime implementation was required.
+
+The existing generic Tactic condition-choice path already owns the complete frozen shape:
+- resolves `$switch_outgoing_vanguard` from the accepted effect-switch variable binding;
+- enumerates current canonical Condition state through the Condition facade;
+- when the operation is `CHOOSE_AND_CLEAR_CONTROL_CONDITION`, filters legal options to the target Creature's current control slot only;
+- defaults to exactly one selected control condition when `count` is omitted;
+- creates the ordinary server-owned pending condition choice;
+- selected resolution delegates `clear_condition` through the Tactic compatibility facade to `clearRuntimeCondition`;
+- `runtime-v0-2-core.ts` re-exports `clearRuntimeCondition` directly from the canonical shared Condition engine;
+- contains no Quiet Step/card-ID/name dispatch.
+
+The frozen regression in `card-pass-2-tactic-if-runtime.test.mjs` already proves the generic alias, control-slot filtering, default choice bound and no card-specific authority.
+
+`tcg-runtime-capabilities-v0.2.json` now classifies
+`CHOOSE_AND_CLEAR_CONTROL_CONDITION` as **implemented**.
+
+Release-control capability-manifest fingerprint is
+`5464eb9ff86ae65e777a4d6004833bbce0e17475`.
+
+TCG Card Pass 2 Validation **#1405 SUCCESS** on exact reconciled head
+`29bda755c8d49c7ce6295e927c5080e62f34c1e7`.
+
+### Next exact runtime target
+
+Stone — Bastion Plate / Bastion Plate Use: `INCREMENT_SOURCE_COUNTER`.
+
+The frozen inventory contains exactly one consumer and the primitive `incrementRuntimeSourceCounter` already exists, but the shared Event Listener currently has no `INCREMENT_SOURCE_COUNTER` opcode dispatch. V2.4.86 must wire that structured listener operation generically to the existing counter primitive, preserving listener-source instance ownership and the following `source_counter_at_least` IF / scheduled-discard sequence.
+
