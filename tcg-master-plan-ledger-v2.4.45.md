@@ -601,3 +601,15 @@ After the movement threshold is met and a legal participating damaged Creature i
 
 ## 212 — Release 1 IF closeout is 29 / 29
 The frozen Set One contains 29 structured IF instances: 7 Tactic, 13 Attack and 9 Ability. All 29 now have executable structured paths through generic owners, with exact-head Card Pass evidence; printed-English/card-ID IF decision fallback is no longer required for Release 1.
+
+## 213 — Capability status follows executable owner evidence
+A capability may move to `implemented` only when a generic structured runtime path exists for the accepted Release 1 shape and is backed by source/tests. A stale historical test must be updated rather than forcing the capability ledger to remain false.
+
+## 214 — Bounded-owner narrowness does not imply global capability absence
+A specialized owner may remain intentionally narrow even after another shared owner establishes global structured parity for the same operation or predicate. Regression tests must distinguish owner scope from global capability status.
+
+## 215 — IF predicate classification is evidence-bound
+The 20 predicate families consumed by the accepted 29 Release 1 IF instances are classified implemented from their exact accepted Tactic/Attack/Ability owner evidence. This does not automatically promote unrelated predicates.
+
+## 216 — Capability-manifest changes are release-control fingerprinted
+Every capability-ledger classification change must refresh the release-control capability-manifest blob fingerprint and pass exact-head Card Pass before the reconciliation is accepted.
