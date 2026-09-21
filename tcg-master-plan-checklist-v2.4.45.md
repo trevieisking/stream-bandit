@@ -749,3 +749,21 @@
 - [x] Card Pass **#1422 SUCCESS** on exact capability-reconciled head `f1aa770437a5a1618c1e8886928561cd3a60dd92`.
 - [ ] Next target: reconcile Grove Sapstone Charm `MODIFY_CURRENT_HEAL` against Heal owner #21's existing before-heal modifier path.
 
+## V2.4.87 — Sapstone Charm / before-heal capability reconciliation closeout
+- [x] Prove frozen `MODIFY_CURRENT_HEAL` inventory is exactly one consumer: Grove / Sapstone Charm.
+- [x] Prove `heal_packet_target_is_attached_creature` is Sapstone-only in the frozen set.
+- [x] Audit every frozen `heal_packet_source_action_kind_is` consumer, including Symbiote Essence.
+- [x] Prove Before-Heal owner already evaluates Sapstone target/source predicates generically.
+- [x] Prove Before-Heal owner already enforces the turn-scoped attachment limit.
+- [x] Prove Before-Heal owner already validates/applies `MODIFY_CURRENT_HEAL` with bounded delta semantics.
+- [x] Prove Heal Packet applies the modifier before HP mutation and persists the modified requested amount.
+- [x] Prove After-Heal Listener owner already executes Symbiote's attack/ability source-action-kind filter generically.
+- [x] Reuse existing attachment/listener state; add no helper and no owner family.
+- [x] Card Pass **#1425 SUCCESS** on exact pre-reconciliation head `a9e4bf3cc9b863ab238ac8cd18b00c7cfcab2c6a`.
+- [x] Move `MODIFY_CURRENT_HEAL` from missing to implemented.
+- [x] Move `heal_packet_target_is_attached_creature` from missing to implemented.
+- [x] Move `heal_packet_source_action_kind_is` from missing to implemented after proving all frozen consumers.
+- [x] Refresh capability fingerprint to `1b66b2a8455d5ad17535cf7dda2d57db4fea009e`.
+- [x] Card Pass **#1427 SUCCESS** on exact capability-reconciled head `0f11dad02f9835733e6046f8f827ba1775f4b275`.
+- [ ] Next target: `ADD_SHIELD_EACH` Attack/Tactic parity for Crowncrag + Reversal Seal.
+
