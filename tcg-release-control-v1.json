@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "bbedfb937fbbb485aeb1e83ba66583741870f338",
-        "file_count": 102,
-        "closure_sha256": "9dc39ff55b849b76ffbf1593c3ea30d2c1a886d7b050c86a962b1c2cb65eb68c",
+        "entrypoint_git_blob_sha": "ed4f299504ab477fa89f506386ca37f317999061",
+        "file_count": 103,
+        "closure_sha256": "82806497b93b6d4e81cd9ff53b68fca8e74c9bc4688d0dddeac4e2bb2d5344e9",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -251,6 +251,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-attack-server-top-deck-v0-2.ts",
             "git_blob_sha": "9b5bbb3ac46b733be796316e0ebe4e2e5c7f8c14"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-attack-shield-choice-v0-2.ts",
+            "git_blob_sha": "01514decbf44b7d5b165285c7de7a4ecf10fa202"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-switch-choice-v0-2.ts",
@@ -498,7 +502,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "bbedfb937fbbb485aeb1e83ba66583741870f338"
+            "git_blob_sha": "ed4f299504ab477fa89f506386ca37f317999061"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
