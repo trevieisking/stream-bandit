@@ -28,6 +28,12 @@ const creatureContinuousStructuredContext = 'const sourceOpponentSeat=ctx.source
 const attackWiredWithCreatureContinuous = attackWiredWithProtection
   .replace(protectionAttackContext, creatureContinuousAttackContext)
   .replace(legacyStructuredContext, creatureContinuousStructuredContext);
+const detailedAttackMarkers = [
+  'const structuredAttachmentBonus=structuredRuntimeAttachmentAttackBonus(s,cr,Number(s.turn_seq||0));if(structuredAttachmentBonus!=null)n+=structuredAttachmentBonus;',
+  'structuredRuntimeIncomingAttackDamageDetailed(s,cr,target,n,structuredContext)',
+  'return{dealt:n-blocked,blocked,preventions}',
+];
+const detailedAttackWired = detailedAttackMarkers.every((marker) => source.includes(marker));
 
 const attachLegacy = 'const x=removeHand(p,uid)!;x.attached_turn=turn;cr.essence.push(x);flags.manual_essence_turn=turn;const td=top(cr,s);\n   if(d.id===';
 const attachEngineBoundary = 'const structuredAttachment=s.runtime_registry_v0_2!=null;\n   if(structuredAttachment){';
@@ -58,7 +64,7 @@ if (!next.includes(surgeImportAttackOnly)) {
 }
 
 if (next.includes(attackLegacy)) next = next.replace(attackLegacy, attackWired);
-else if (!next.includes(attackWired) && !next.includes(attackWiredWithProtection) && !next.includes(attackWiredWithCreatureContinuous)) throw new Error('match_actions_surge_attack_damage_anchor_changed');
+else if (!next.includes(attackWired) && !next.includes(attackWiredWithProtection) && !next.includes(attackWiredWithCreatureContinuous) && !detailedAttackWired) throw new Error('match_actions_surge_attack_damage_anchor_changed');
 
 // Essence attachment lifecycle authority moved out of Match Actions. Do not
 // re-materialize the historical direct helper path: verify the canonical
@@ -103,10 +109,20 @@ if (!aftermathSource.includes(aftermathOwnerDispositionCall)) {
 }
 
 const attackWiredVariants = [attackWired, attackWiredWithProtection, attackWiredWithCreatureContinuous].filter((candidate) => next.includes(candidate));
-if (attackWiredVariants.length !== 1) throw new Error('match_actions_surge_attack_damage_variant_invalid');
-for (const required of [surgeImportAttackOnly, attackWiredVariants[0], aftermathOwnerImport, aftermathOwnerDelegate, attachmentRouteImport, attachEngineBoundary, attachRouteCall]) {
+const attackVariantCount = attackWiredVariants.length + (detailedAttackWired ? 1 : 0);
+if (attackVariantCount !== 1) throw new Error('match_actions_surge_attack_damage_variant_invalid');
+for (const required of [surgeImportAttackOnly, aftermathOwnerImport, aftermathOwnerDelegate, attachmentRouteImport, attachEngineBoundary, attachRouteCall]) {
   if (!next.includes(required)) throw new Error('match_actions_surge_wiring_incomplete');
   if (next.indexOf(required) !== next.lastIndexOf(required)) throw new Error('match_actions_surge_wiring_duplicate');
+}
+if (attackWiredVariants.length === 1 && next.indexOf(attackWiredVariants[0]) !== next.lastIndexOf(attackWiredVariants[0])) {
+  throw new Error('match_actions_surge_wiring_duplicate');
+}
+if (detailedAttackWired) {
+  for (const marker of detailedAttackMarkers) {
+    if (!next.includes(marker)) throw new Error('match_actions_surge_detailed_attack_wiring_incomplete');
+    if (next.indexOf(marker) !== next.lastIndexOf(marker)) throw new Error('match_actions_surge_detailed_attack_wiring_duplicate');
+  }
 }
 
 if (process.argv.includes('--check')) {
