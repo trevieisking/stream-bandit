@@ -85,7 +85,8 @@ test('generic active hidden-sample owner stays card-id-free and delegates RNG/co
 test('Duskstalker remains Event Listener-owned and False Memory remains Tactic-interpreter-owned',()=>{
   assert.match(eventListener,/RANDOM_SAMPLE_HIDDEN_ZONE/);
   assert.match(eventListener,/runtimeV02RandomSampleHiddenZone\(/);
-  assert.match(eventListener,/visibility !== "controller_private"/);
+  assert.match(eventListener,/controller_private/);
+  assert.match(eventListener,/tcg_v0_2_event_listener_hidden_sample_visibility_unsupported/);
   assert.match(tactic,/case"RANDOM_SAMPLE_HIDDEN_ZONE"/);
   assert.match(tactic,/runtimeV02RandomSampleHiddenZone\(/);
   assert.match(tactic,/visibility\)!=="server_only"/);
