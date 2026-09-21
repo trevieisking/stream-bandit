@@ -629,3 +629,21 @@ One working consumer does not promote a predicate globally. `control_condition_p
 ## 221 — Murkmite control-condition bonus belongs in the shared outgoing Attack-damage predicate adapter
 Murkmite's continuous Attack-damage bonus is data-driven and already reaches the shared outgoing Attack-damage modifier path. The missing work is only support for the structured `control_condition_present` leaf against authoritative opponent Vanguard Condition state; no Murkmite/card-ID branch or second Attack engine is permitted.
 
+## 222 — Rule 221 is corrected by the complete Creature-continuous audit
+Rule 221 correctly located Murkmite in the outgoing Attack-damage domain but overstated the pre-existing execution path. The accepted V2.4.78 audit proved that the shared outgoing owner collected attached-Essence continuous effects only. Creature-owned continuous `attack_damage` required a new generic lane inside the same Attack Damage owner.
+
+## 223 — Source-Creature continuous outgoing Attack damage has one generic owner
+Glowcub, Murkmite, Quartzram and future cards using the same structured Creature Ability continuous `attack_damage` family are discovered from metadata by the Attack Damage engine. Match and card IDs do not own per-card modifier logic.
+
+## 224 — Existing predicate owners must be reused inside continuous Attack damage
+`source_damaged` and `source_has_shield_at_least` are evaluated by the canonical Requirement evaluator. Attack Damage may adapt authoritative context but must not fork their semantics.
+
+## 225 — Current-opponent-Vanguard predicates are independent of the chosen attack target
+A predicate targeting `$current_opponent_vanguard` reads the opponent Vanguard's authoritative state even when the attack itself legally targets a Reserve. Attack-target context must never be substituted for explicit Vanguard context.
+
+## 226 — Creature continuous Attack filters bind to canonical attack IDs
+Structured `filters.attack_id` is evaluated against the resolved structured Attack ID supplied by Match. Card names, slots and English parsing are not alternate filter authority.
+
+## 227 — Hollow Command blocks global control-condition capability closeout
+Thought Hunter and Murkmite now have executable `control_condition_present` paths, but Hollowcrown / Hollow Command remains without a structured active-Ability `REPLACE_CONTROL_CONDITION` owner. Global predicate/operation capability classification must remain open until that family is implemented and exact-head validated.
+
