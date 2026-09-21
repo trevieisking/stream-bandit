@@ -665,3 +665,15 @@ Release 1 `control_condition_present` is accepted only because Thought Hunter, M
 ## 233 — Stormmane attached-Essence discard must leave legacy card-ID Match dispatch
 The frozen structured `DISCARD_ATTACHED_ESSENCE` operation has exactly one Release 1 consumer, Volt — Stormmane / Storm Break. Its mutation must remain Card-Zone-owned, but recognition/choice must move into a generic structured Attack operation owner so Match no longer dispatches gameplay by `volt-stormmane`.
 
+## 234 — Rule 233 is corrected by the Storm Break owner audit
+Rule 233 correctly requires v0.2 Stormmane gameplay to be generic, but it incorrectly implied that the structured discard still depended on the legacy card-ID Match branch. The accepted owner audit proves marked v0.2 Stormmane already routes through the card-ID-free overcharge-discard Attack owner; the remaining `volt-stormmane` branch is legacy-only compatibility.
+
+## 235 — DISCARD_ATTACHED_ESSENCE is implemented for the complete Release 1 shape
+The frozen Set One has exactly one `DISCARD_ATTACHED_ESSENCE` consumer. Storm Break's exact-one attached-Essence selection, validation and sequencing are owned by the generic overcharge-discard Attack family, while physical attachment -> discard movement remains Card-Zone-owned.
+
+## 236 — Legacy compatibility branches do not invalidate structured capability parity
+A card-specific branch that is explicitly gated to unmarked legacy snapshots does not make the corresponding marked v0.2 capability missing when all frozen structured consumers are already served by generic owners. Such compatibility code may remain until legacy support is deliberately retired.
+
+## 237 — Do not rewrite a green structured owner solely to remove legacy compatibility debt
+Capability reconciliation must prefer proven current ownership over unnecessary runtime churn. Legacy-only cleanup is a separate compatibility decision and must not be conflated with Release 1 structured engine completion.
+
