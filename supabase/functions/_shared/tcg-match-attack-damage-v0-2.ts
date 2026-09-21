@@ -18,6 +18,17 @@ export type RuntimeV02DamagePreventionEventSignal = {
   prevention_kind: RuntimeV02DamagePreventionKind;
 };
 
+export type RuntimeV02DamagePreventionDetail = {
+  prevention_kind: RuntimeV02DamagePreventionKind;
+  amount: number;
+  source_uid: string | null;
+  source_card_id: string | null;
+  source_controller_seat: 1 | 2 | null;
+  target_creature_uid: string;
+  target_controller_seat: 1 | 2 | null;
+  packet_id: string | null;
+};
+
 export type RuntimeAttackDamageCreature = {
   stack?: RuntimeCardInstance[];
   essence?: RuntimeCardInstance[];
@@ -32,6 +43,8 @@ export type RuntimeAttackDamageContext = {
   target_controller: "self" | "opponent";
   source_controller: "self" | "opponent";
   target_has_any_condition: boolean;
+  attacker_has_any_condition?: boolean;
+  target_element?: string;
   attack_id?: string;
   current_opponent_vanguard_control_condition?: string | null;
   source_controller_seat?: 1 | 2;
@@ -408,6 +421,138 @@ function applyIncomingSelfAbilityDamage(
   return { value, prevented };
 }
 
+const RELIC_CONTINUOUS_USAGE_KEY = "runtime_v0_2_relic_continuous_uses";
+
+function relicContinuousEffects(
+  state: Record<string, unknown>,
+  target: RuntimeAttackDamageCreature,
+): Array<{ source: RuntimeCardInstance; effect: RuntimeContinuousEffect }> {
+  const source = target.relic;
+  if (!source) return [];
+  const definition = runtimeV02Definition(state, source);
+  const tactic = objectRecord(definition?.tactic);
+  if (!tactic || String(tactic.subtype || "") !== "Relic") return [];
+  const continuous = Array.isArray(tactic.continuous) ? tactic.continuous : [];
+  return continuous
+    .map((value) => objectRecord(value) as RuntimeContinuousEffect | null)
+    .filter((value): value is RuntimeContinuousEffect => Boolean(value))
+    .filter((effect) =>
+      String(effect.kind || "") === "incoming_attack_damage" &&
+      String(effect.target || "") === "$attached_creature"
+    )
+    .map((effect) => ({ source, effect }));
+}
+
+function relicContinuousUsage(
+  source: RuntimeCardInstance,
+  effectId: string,
+): number {
+  const flags = (
+    source.effect_flags && typeof source.effect_flags === "object" && !Array.isArray(source.effect_flags)
+      ? source.effect_flags
+      : (source.effect_flags = {})
+  ) as Record<string, unknown>;
+  const rawLedger = objectRecord(flags[RELIC_CONTINUOUS_USAGE_KEY]) || {};
+  const raw = rawLedger[effectId] ?? 0;
+  const count = Number(raw);
+  if (!Number.isInteger(count) || count < 0) {
+    throw new Error("tcg_v0_2_attack_damage_relic_usage_invalid");
+  }
+  return count;
+}
+
+function consumeRelicContinuousUsage(
+  source: RuntimeCardInstance,
+  effectId: string,
+): void {
+  const flags = (
+    source.effect_flags && typeof source.effect_flags === "object" && !Array.isArray(source.effect_flags)
+      ? source.effect_flags
+      : (source.effect_flags = {})
+  ) as Record<string, unknown>;
+  const ledger = objectRecord(flags[RELIC_CONTINUOUS_USAGE_KEY]) || {};
+  ledger[effectId] = relicContinuousUsage(source, effectId) + 1;
+  flags[RELIC_CONTINUOUS_USAGE_KEY] = ledger;
+}
+
+function relicContinuousLimit(
+  source: RuntimeCardInstance,
+  effect: RuntimeContinuousEffect,
+): { effect_id: string; count: number; used: number } | null {
+  const limit = objectRecord(effect.limit);
+  if (!limit) {
+    if (effect.consume_when != null) {
+      throw new Error("tcg_v0_2_attack_damage_relic_consume_without_limit");
+    }
+    return null;
+  }
+  if (
+    String(limit.scope || "") !== "attachment" ||
+    String(limit.owner || "") !== "attachment"
+  ) {
+    throw new Error("tcg_v0_2_attack_damage_relic_limit_unsupported");
+  }
+  const count = Number(limit.count);
+  if (!Number.isInteger(count) || count < 1) {
+    throw new Error("tcg_v0_2_attack_damage_relic_limit_count_invalid");
+  }
+  if (String(effect.consume_when || "") !== "prevention_amount_at_least_1") {
+    throw new Error("tcg_v0_2_attack_damage_relic_consume_unsupported");
+  }
+  const effectId = String(effect.id || "").trim();
+  if (!effectId) throw new Error("tcg_v0_2_attack_damage_relic_effect_id_required");
+  return { effect_id: effectId, count, used: relicContinuousUsage(source, effectId) };
+}
+
+function applyIncomingRelicDamage(
+  state: Record<string, unknown>,
+  target: RuntimeAttackDamageCreature,
+  baseValue: number,
+  context: RuntimeAttackDamageContext,
+): { value: number; preventions: RuntimeV02DamagePreventionDetail[] } {
+  let value = Math.max(0, Number(baseValue || 0));
+  const preventions: RuntimeV02DamagePreventionDetail[] = [];
+  for (const { source, effect } of relicContinuousEffects(state, target)) {
+    if (effect.when != null) {
+      throw new Error("tcg_v0_2_attack_damage_relic_when_unsupported");
+    }
+    if (!continuousFiltersMatch(effect.filters, context)) continue;
+    const limit = relicContinuousLimit(source, effect);
+    if (limit && limit.used >= limit.count) continue;
+    const rawAmount = Number(effect.amount);
+    if (!Number.isFinite(rawAmount)) {
+      throw new Error("tcg_v0_2_attack_damage_relic_amount_invalid");
+    }
+    const mode = effect.mode == null ? "delta" : String(effect.mode);
+    if (mode !== "delta") {
+      throw new Error("tcg_v0_2_attack_damage_relic_mode_unsupported");
+    }
+    const before = value;
+    value += rawAmount;
+    const minimum = Number(effect.minimum);
+    if (Number.isFinite(minimum)) value = Math.max(value, minimum);
+    const maximum = Number(effect.maximum);
+    if (Number.isFinite(maximum)) value = Math.min(value, maximum);
+    value = Math.max(0, value);
+    const prevented = Math.max(0, before - value);
+    if (!(prevented > 0)) continue;
+    if (limit) consumeRelicContinuousUsage(source, limit.effect_id);
+    const targetUid = String(context.target_creature_uid || target.stack?.[target.stack.length - 1]?.uid || "").trim();
+    if (!targetUid) throw new Error("tcg_v0_2_attack_damage_relic_target_uid_required");
+    preventions.push({
+      prevention_kind: "relic",
+      amount: prevented,
+      source_uid: String(source.uid || "").trim() || null,
+      source_card_id: String(source.card_id || "").trim() || null,
+      source_controller_seat: context.target_controller_seat ?? null,
+      target_creature_uid: targetUid,
+      target_controller_seat: context.target_controller_seat ?? null,
+      packet_id: typeof context.packet_id === "string" && context.packet_id.trim() ? context.packet_id.trim() : null,
+    });
+  }
+  return { value, preventions };
+}
+
 export function structuredRuntimeOutgoingAttackDamage(
   state: Record<string, unknown>,
   attacker: RuntimeAttackDamageCreature,
@@ -435,14 +580,15 @@ export function structuredRuntimeOutgoingAttackDamage(
   return value;
 }
 
-export function structuredRuntimeIncomingAttackDamage(
+export function structuredRuntimeIncomingAttackDamageDetailed(
   state: Record<string, unknown>,
   attacker: RuntimeAttackDamageCreature,
   target: RuntimeAttackDamageCreature,
   baseValue: number,
   context: RuntimeAttackDamageContext,
-): number | null {
+): { amount: number; preventions: RuntimeV02DamagePreventionDetail[] } | null {
   if (!structuredRuntimeProbe(state, attacker, target)) return null;
+  const preventions: RuntimeV02DamagePreventionDetail[] = [];
   const attachments = Array.isArray(target.essence) ? target.essence : [];
   const definitionLookup = (instance: RuntimeCardInstance) => runtimeV02Definition(state, instance);
   let value = applyRuntimeContinuousNumericModifiers(
@@ -458,6 +604,27 @@ export function structuredRuntimeIncomingAttackDamage(
   value = ability.value;
   if (ability.prevented > 0) {
     recordRuntimeV02DamagePrevention(state, target, "ability", ability.prevented, context);
+    const source = target.stack?.[target.stack.length - 1] || null;
+    const targetUid = String(context.target_creature_uid || source?.uid || "").trim();
+    if (targetUid) {
+      preventions.push({
+        prevention_kind: "ability",
+        amount: ability.prevented,
+        source_uid: source?.uid ? String(source.uid) : null,
+        source_card_id: source?.card_id ? String(source.card_id) : null,
+        source_controller_seat: context.target_controller_seat ?? null,
+        target_creature_uid: targetUid,
+        target_controller_seat: context.target_controller_seat ?? null,
+        packet_id: typeof context.packet_id === "string" && context.packet_id.trim() ? context.packet_id.trim() : null,
+      });
+    }
+  }
+
+  const relic = applyIncomingRelicDamage(state, target, value, context);
+  value = relic.value;
+  for (const prevention of relic.preventions) {
+    preventions.push(prevention);
+    recordRuntimeV02DamagePrevention(state, target, "relic", prevention.amount, context);
   }
 
   if (target.flags?.runtime_v0_2_damage_protections != null) {
@@ -492,6 +659,18 @@ export function structuredRuntimeIncomingAttackDamage(
           prevented,
           context,
         );
+        preventions.push({
+          prevention_kind: modification.source_kind,
+          amount: prevented,
+          source_uid: String(modification.source_uid || "").trim() || null,
+          source_card_id: String(modification.source_card_id || "").trim() || null,
+          source_controller_seat: modification.controller_seat === 1 || modification.controller_seat === 2
+            ? modification.controller_seat
+            : null,
+          target_creature_uid: targetUid,
+          target_controller_seat: targetSeat,
+          packet_id: packetId,
+        });
       }
     }
     value = stored.final_amount;
@@ -503,7 +682,31 @@ export function structuredRuntimeIncomingAttackDamage(
   const shieldPrevented = Math.min(Math.max(0, Number(target.shield || 0)), value);
   if (shieldPrevented > 0) {
     recordRuntimeV02DamagePrevention(state, target, "shield", shieldPrevented, context);
+    const targetUid = String(context.target_creature_uid || target.stack?.[target.stack.length - 1]?.uid || "").trim();
+    if (targetUid) {
+      preventions.push({
+        prevention_kind: "shield",
+        amount: shieldPrevented,
+        source_uid: null,
+        source_card_id: null,
+        source_controller_seat: context.target_controller_seat ?? null,
+        target_creature_uid: targetUid,
+        target_controller_seat: context.target_controller_seat ?? null,
+        packet_id: typeof context.packet_id === "string" && context.packet_id.trim() ? context.packet_id.trim() : null,
+      });
+    }
   }
 
-  return value;
+  return { amount: value, preventions };
+}
+
+export function structuredRuntimeIncomingAttackDamage(
+  state: Record<string, unknown>,
+  attacker: RuntimeAttackDamageCreature,
+  target: RuntimeAttackDamageCreature,
+  baseValue: number,
+  context: RuntimeAttackDamageContext,
+): number | null {
+  const result = structuredRuntimeIncomingAttackDamageDetailed(state, attacker, target, baseValue, context);
+  return result == null ? null : result.amount;
 }
