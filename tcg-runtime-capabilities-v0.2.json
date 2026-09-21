@@ -37,6 +37,7 @@
       "PROMPT_CHOSEN_PLAYER_TO_SELECT_RESERVE",
       "PUT_REMAINDER_ON_DECK_BOTTOM",
       "RANDOM_SAMPLE_HIDDEN_ZONE",
+      "RECORD_EVENT",
       "REPEAT_OPTIONAL",
       "REPLACE_CONTROL_CONDITION",
       "RETURN_REMAINDER_TO_DECK_TOP",
@@ -75,7 +76,6 @@
       "PERFORM_VOLUNTARY_WITHDRAWAL",
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
-      "RECORD_EVENT",
       "SCHEDULE_ACTION",
       "SCHEDULE_SOURCE_DISCARD",
       "SELECT_CARDS",
@@ -99,6 +99,8 @@
       "essence_move_count_at_least",
       "event_action_kind_is",
       "event_attachment_kind_is",
+      "event_attack_source_attached_essence_count_at_least",
+      "event_attack_source_has_attached_essence_kind",
       "event_attack_source_is_self",
       "event_attack_target_damaged",
       "event_attack_target_has_condition",
@@ -144,8 +146,6 @@
       "event_active_seat_is_controller",
       "event_attachment_target_is_source",
       "event_attack_id_is",
-      "event_attack_source_attached_essence_count_at_least",
-      "event_attack_source_has_attached_essence_kind",
       "event_attack_target_controller_is_opponent",
       "event_attack_target_zone_is",
       "event_change_kind_in",
@@ -299,6 +299,24 @@
       "owner": "supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts",
       "mutation_owner": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
       "compatibility_note": "legacy-only Stormmane fallback remains for unmarked snapshots; marked v0.2 Stormmane uses the generic structured owner"
+    },
+    "release1_attack_declaration_events_v2_4_81": {
+      "accepted_head": "0489e85fcbe7ad2da12a1aea8939e1776661dd20",
+      "card_pass_run": 1379,
+      "operation": "RECORD_EVENT",
+      "consumers": [
+        {
+          "card_id": "volt-stormmane",
+          "attack_id": "storm-break",
+          "predicate": "event_attack_source_attached_essence_count_at_least"
+        },
+        {
+          "card_id": "volt-stormcoil-living-circuit",
+          "attack_id": "chainstorm",
+          "predicate": "event_attack_source_has_attached_essence_kind"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-attack-declaration-events-v0-2.ts"
     }
   }
 }
