@@ -792,3 +792,17 @@
 - [x] Card Pass **#1440 SUCCESS** on exact capability-reconciled head `5da730d086d817faa71a6a0cc1ee21160cec2fd2`.
 - [ ] Next target: Ember Heatguard Bracer `MODIFY_CURRENT_DAMAGE_PACKET` operation reconciliation; audit shared damage-packet predicates across all consumers before promoting those predicates.
 
+## V2.4.89 — Heatguard damage-packet modifier reconciliation closeout
+- [x] Prove frozen `MODIFY_CURRENT_DAMAGE_PACKET` inventory is exactly Ember / Heatguard Bracer.
+- [x] Prove Damage Packet Listener already discovers structured before-damage attachment listeners generically.
+- [x] Prove Heatguard target/class/condition requirements are supported by Damage owner #20.
+- [x] Prove turn-scoped attachment limit ownership and once-per-turn consumption.
+- [x] Prove `MODIFY_CURRENT_DAMAGE_PACKET` delta/minimum application is generic and packet-local.
+- [x] Prove Damage Packet owner records canonical before/after packet evidence.
+- [x] Reuse existing Damage owners; add no card-ID dispatch, helper or owner family.
+- [x] Preserve shared damage-packet predicates as separately gated where other frozen consumers exist.
+- [x] Move `MODIFY_CURRENT_DAMAGE_PACKET` from missing to implemented.
+- [x] Refresh capability fingerprint to `9f858522a544b1098fe7457f4472d122c91e8630`.
+- [x] Card Pass **#1445 SUCCESS** on exact capability-reconciled head `46e44d58e0b4b57b9b5c2aff6d2b5cfd00f65680`.
+- [ ] Next target: Highwind Spires `before_voluntary_withdrawal_cost -> MODIFY_CURRENT_WITHDRAWAL_COST`; treat as a real implementation gap unless a canonical existing listener owner is proved.
+
