@@ -1524,3 +1524,71 @@ TCG Card Pass 2 Validation **#1358 SUCCESS** on exact head
 Shade — Hollowcrown / Hollow Command.
 
 Current audit proves no existing active-Ability runtime module recognizes either `REPLACE_CONTROL_CONDITION` or Hollow Command's `control_condition_present` requirement. Build that family through the existing Active Ability + Condition owners without a Hollowcrown/card-ID branch, then reassess whether `control_condition_present` and `REPLACE_CONTROL_CONDITION` can move to implemented globally.
+
+## V2.4.79 — accepted Hollow Command condition-replacement family + capability reconciliation
+
+Shade — Hollowcrown / Hollow Command is now executable through generic structured owners.
+
+### Hollow Command ownership
+
+The frozen contract is:
+- own-turn active Ability;
+- once per turn;
+- zero additional costs;
+- current opponent Vanguard must already have a control condition;
+- that existing control condition must not already be Mindbound;
+- replace the control slot with Mindbound.
+
+`tcg-match-active-ability-condition-replacement-v0-2.ts` now owns this generic family:
+- recognition is shape-driven from structured Ability metadata, never Hollowcrown/card ID;
+- the complete activation is preflighted on a cloned authoritative state before the real once-per-turn receipt is written;
+- active-seat / source binding / once-per-turn ownership remains with the existing Active Ability activation-cost owner;
+- the requirement reads canonical opponent-Vanguard control state;
+- the actual mutation delegates to `applyRuntimeConditionWithContext(..., "replace", ...)`, preserving Condition immunity/protection ownership;
+- an illegal empty/already-Mindbound target state fails before consuming the Ability use;
+- a legal activation prevented by Condition protection still consumes the once-per-turn use because activation was permitted before Condition prevention resolved;
+- no Damage, Heal, player-choice or browser-owned condition mutation path was added.
+
+The single Active Ability live router exposes this as its own `condition_replacement` family. Match records only structural/public replacement and prevention data.
+
+### Frozen capability inventory
+
+Release 1 has exactly three `control_condition_present` consumers:
+- Shade — Murkmite / Murk Sense continuous Attack-damage modifier;
+- Shade — Hollowcrown / Hollow Command active Ability;
+- Shade — Umbravale — Thought Hunter active hidden-sample requirement.
+
+Release 1 has exactly two `REPLACE_CONTROL_CONDITION` consumers:
+- Hollowcrown / Hollow Command active Ability;
+- Thought Hunter / Mind Eclipse conditional after-damage Attack program.
+
+All five consumer paths are now proven through generic owners. Mind Eclipse already routes through the existing conditional-Condition Attack owner, which delegates replacement to the same canonical Condition engine.
+
+### Release-control / CI evidence
+
+The Match Edge closure expanded from 101 -> 102 files to include the new condition-replacement owner.
+
+Accepted Match closure:
+- condition-replacement owner blob: `ec40e106d28ff89bf72b31891f57e3450815fc15`;
+- Active Ability live-router blob: `9a9accf5d9c3be27c7a97046e7651ac5217da14d`;
+- Match Actions blob: `0641a97f47543cc6932a003b92a1e0d024be8d6d`;
+- closure SHA-256: `5e931b3692c3b5b36915adea48870fb48595152abeb0ab7c343bc3dfa8ac2ce1`.
+
+Card Pass #1369 proved the complete runtime/source closure before capability reconciliation.
+
+`tcg-runtime-capabilities-v0.2.json` now classifies:
+- predicate `control_condition_present` as **implemented**;
+- operation `REPLACE_CONTROL_CONDITION` as **implemented**.
+
+The capability manifest is fingerprinted by release control at blob
+`880b6395d55da7bdfa241609cabd1446a02d34ae`.
+
+TCG Card Pass 2 Validation **#1371 SUCCESS** on exact reconciled head
+`d370d0db839456f8e2c83dab247fcd5d0802e315`.
+
+### Next exact runtime target
+
+Continue the Release 1 operation audit with `DISCARD_ATTACHED_ESSENCE` / Volt — Stormmane.
+
+Current source evidence shows one frozen structured consumer but Match still contains a legacy Stormmane card-ID branch that performs the attached-Essence -> discard Card-Zone transfer. The next pass must replace that card-specific fallback with a generic structured Attack operation owner while preserving Card-Zone mutation/event ownership and existing Storm Break IF/target-survival sequencing.
+
