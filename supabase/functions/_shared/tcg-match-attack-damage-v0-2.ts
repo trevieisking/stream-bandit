@@ -537,7 +537,8 @@ function applyIncomingRelicDamage(
     const prevented = Math.max(0, before - value);
     if (!(prevented > 0)) continue;
     if (limit) consumeRelicContinuousUsage(source, limit.effect_id);
-    const targetUid = String(context.target_creature_uid || target.stack?.[target.stack.length - 1]?.uid || "").trim();
+    const targetTop = Array.isArray(target.stack) && target.stack.length > 0 ? target.stack[target.stack.length - 1] : null;
+    const targetUid = String(context.target_creature_uid || targetTop?.uid || "").trim();
     if (!targetUid) throw new Error("tcg_v0_2_attack_damage_relic_target_uid_required");
     preventions.push({
       prevention_kind: "relic",
@@ -604,7 +605,7 @@ export function structuredRuntimeIncomingAttackDamageDetailed(
   value = ability.value;
   if (ability.prevented > 0) {
     recordRuntimeV02DamagePrevention(state, target, "ability", ability.prevented, context);
-    const source = target.stack?.[target.stack.length - 1] || null;
+    const source = Array.isArray(target.stack) && target.stack.length > 0 ? target.stack[target.stack.length - 1] : null;
     const targetUid = String(context.target_creature_uid || source?.uid || "").trim();
     if (targetUid) {
       preventions.push({
