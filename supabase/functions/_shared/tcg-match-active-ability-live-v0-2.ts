@@ -15,6 +15,14 @@ import {
   type RuntimeV02PendingActiveAbilityDeckReadingChoice,
 } from "./tcg-match-active-ability-deck-reading-v0-2.ts";
 import {
+  runtimeV02CreateActiveAbilityEssenceRedistributionChoice,
+  runtimeV02PendingActiveAbilityEssenceRedistributionChoiceView,
+  runtimeV02ResolveActiveAbilityEssenceRedistributionChoice,
+  structuredRuntimeActiveAbilityEssenceRedistribution,
+  type RuntimeV02ActiveAbilityEssenceRedistributionResolution,
+  type RuntimeV02PendingActiveAbilityEssenceRedistributionChoice,
+} from "./tcg-match-active-ability-essence-redistribution-v0-2.ts";
+import {
   runtimeV02CreateActiveAbilitySupplyChoice,
   runtimeV02PendingActiveAbilitySupplyChoiceView,
   runtimeV02ResolveActiveAbilitySupplyChoice,
@@ -47,6 +55,7 @@ type RuntimeV02ActiveAbilitySource = {
 };
 
 export type RuntimeV02PendingActiveAbilityLiveChoice =
+  | RuntimeV02PendingActiveAbilityEssenceRedistributionChoice
   | RuntimeV02PendingActiveAbilitySupplyChoice
   | RuntimeV02PendingActiveAbilityDeckReadingChoice
   | RuntimeV02PendingActiveAbilityChoice
@@ -54,6 +63,7 @@ export type RuntimeV02PendingActiveAbilityLiveChoice =
   | RuntimeV02PendingActiveAbilitySelectedModifierChoice;
 
 export type RuntimeV02ActiveAbilityLiveResolution =
+  | RuntimeV02ActiveAbilityEssenceRedistributionResolution
   | RuntimeV02ActiveAbilitySupplyChoiceResolution
   | RuntimeV02ActiveAbilityDeckReadingResolution
   | {
@@ -83,6 +93,23 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
   choiceId: string = crypto.randomUUID(),
 ): RuntimeV02PendingActiveAbilityLiveChoice | null {
   const instance = source.instance as { card_id?: unknown } | null | undefined;
+  const redistributionDescriptor = structuredRuntimeActiveAbilityEssenceRedistribution(state, instance);
+  if (redistributionDescriptor) {
+    const pending = runtimeV02CreateActiveAbilityEssenceRedistributionChoice(
+      state,
+      controllerSeat,
+      redistributionDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      redistributionDescriptor.ability_id,
+    );
+    return pending;
+  }
+
   const supplyDescriptor = structuredRuntimeActiveAbilitySupply(state, instance);
   if (supplyDescriptor) {
     const pending = runtimeV02CreateActiveAbilitySupplyChoice(
@@ -168,6 +195,9 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
   viewerSeat: 1 | 2,
 ) {
   if (!choice) return null;
+  if (choice.kind === "redistribute_attached_essence_then_conditional_heal") {
+    return runtimeV02PendingActiveAbilityEssenceRedistributionChoiceView(choice, viewerSeat);
+  }
   if (choice.kind === "select_reserve_target_and_optional_discard_essence") {
     return runtimeV02PendingActiveAbilitySupplyChoiceView(choice, viewerSeat);
   }
@@ -198,6 +228,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
   choiceIds: string[],
   state: Record<string, unknown>,
 ): RuntimeV02ActiveAbilityLiveResolution {
+  if (choice.kind === "redistribute_attached_essence_then_conditional_heal") {
+    return runtimeV02ResolveActiveAbilityEssenceRedistributionChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
+  }
   if (choice.kind === "select_reserve_target_and_optional_discard_essence") {
     return runtimeV02ResolveActiveAbilitySupplyChoice(
       choice,
