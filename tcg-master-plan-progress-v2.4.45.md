@@ -1668,3 +1668,38 @@ Reconcile `DISCARD_DECK_TOP`.
 
 The frozen inventory contains exactly one Release 1 consumer, Shade — Nightmaw / Dread Crush, and the existing generic Attack Deck-Discard owner already recognizes the structured target-condition -> public opponent deck-top discard family, delegates the physical movement to Card-Zone, and hands the resulting `deck_cards_discarded` event into the established Event -> Movement -> Heal listener chain.
 
+## V2.4.82 — accepted Nightmaw deck-top discard capability reconciliation
+
+The frozen Release 1 `DISCARD_DECK_TOP` inventory contains exactly one consumer:
+- Shade — Nightmaw / Dread Crush.
+
+No runtime implementation was required.
+
+`tcg-match-attack-deck-discard-v0-2.ts` already owns the generic structured family:
+- shared Attack IF evaluates `target_has_any_condition` against the authoritative attack target;
+- when false, no deck mutation or deck-discard event is produced;
+- when true, the owner selects only the available top N opponent-deck cards;
+- exact deck -> discard movement delegates to Card-Zone and preserves top order / exact instance identity;
+- moving fewer than requested because the deck is short is legal and does not create deckout inside this owner;
+- successful movement emits the structural `deck_cards_discarded` handoff;
+- Match preserves the accepted Deck-Discard Event -> Event Listener -> Movement Listener -> Heal Listener continuation order;
+- malformed structured family variants fail closed;
+- the owner and live dispatcher contain no Nightmaw/card-name routing.
+
+A legacy printed-English fallback remains singular and guarded behind the absence of the structured owner; it does not define marked v0.2 Nightmaw semantics.
+
+`tcg-runtime-capabilities-v0.2.json` now classifies
+`DISCARD_DECK_TOP` as **implemented**.
+
+Release-control capability-manifest fingerprint is
+`856ff589ca74faf88f61d106910671ee1b7af233`.
+
+TCG Card Pass 2 Validation **#1386 SUCCESS** on exact reconciled head
+`55d2e1c87db956d19c6a08b20a6a3c41ab7eb528`.
+
+### Next exact runtime target
+
+Reconcile `SCHEDULE_ACTION`.
+
+The frozen Release 1 inventory contains exactly one consumer, Shade — Noctivane / Night Reading. V2.4.73 already accepted a generic Active Ability deck-reading owner that delegates deferred-action storage/execution to `tcg-match-scheduled-action-v0-2.ts`, Card-Zone owns the eventual fixed draw, and Match resolves the schedule at the controller-AFTERMATH boundary before canonical turn advance.
+
