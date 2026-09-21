@@ -1984,3 +1984,96 @@ Frozen inventory has exactly two consumers:
 
 Read-only preflight proves the Tactic interpreter already executes `ADD_SHIELD_EACH` generically, covering the Reversal Seal shape. The first Attack-owner audit found no matching `ADD_SHIELD_EACH` handler, so V2.4.88 must prove and, if required, repair **Attack/Tactic parity** without duplicating Shield ownership.
 
+## V2.4.88 — accepted ADD_SHIELD_EACH Attack/Tactic parity
+
+The frozen `ADD_SHIELD_EACH` operation is now executable across both of its Release 1 consumers without card-ID routing and without adding an owner family.
+
+### Frozen inventory
+
+Exactly two consumers:
+- Stone / Crowncrag — Mountain Warden, attack `Crown of Stone`;
+- Stone / Reversal Seal, Tactic IF branch.
+
+### Canonical ownership
+
+**Tactic interpreter**
+`supabase/functions/tcg-tactic-actions/index.ts`
+already resolved `ADD_SHIELD_EACH` generically from a variable-backed Creature selection and delegated every real gain to the existing `addRuntimeShield` 60-cap primitive. Reversal Seal required no source change.
+
+**Attack shield-choice specialist**
+`supabase/functions/_shared/tcg-match-attack-shield-choice-v0-2.ts`
+now owns the generic mixed Attack program shape:
+`ADD_SHIELD $source_creature -> SELECT_CREATURE self/field min..max -> ADD_SHIELD_EACH selected`.
+
+It:
+- validates the complete three-step shape before mutation;
+- supports optional 0..N selection;
+- evaluates generic `element` and `exclude_source` filters;
+- binds the exact source Vanguard instance and turn;
+- rebinds every selected field position before mutation;
+- preflights all selected targets before any selected-target Shield mutation;
+- delegates every Shield gain to `addRuntimeShield`.
+
+**Match orchestration**
+`supabase/functions/tcg-match-actions/index.ts`
+reuses the existing private `pending_attack_choice` transport for the new multi-select kind, preserves the canonical pure `ADD_SHIELD` ordering anchor, and delegates resolution to the specialist.
+
+The existing pure Attack Shield owner remains whole-program-only and still returns `null` for mixed programs. The canonical owner-family count remains **40**.
+
+### Regression evidence
+
+Added:
+- `runtime-v0-2-attack-shield-each-choice.test.ts`;
+- `card-pass-2-shield-each-parity.test.mjs`.
+
+Coverage proves:
+- Crown-style mixed program parsing is generic;
+- source Shield resolves before the optional selection;
+- only legal filtered targets are exposed;
+- zero, one or two targets are legal according to declared bounds;
+- all target anchors are rebound before mutation;
+- the shared 60-Shield cap remains authoritative;
+- frozen inventory is exactly Crowncrag + Reversal Seal;
+- the Tactic and Attack routes are both card-ID-free.
+
+TCG Card Pass 2 Validation **#1436** proved the complete deterministic runtime suite and all type-checks green after the implementation/test corrections; its sole remaining failure was expected release-control closure drift.
+
+### Release-control evidence
+
+Match Edge closure now:
+- 103 files;
+- entrypoint blob `ed4f299504ab477fa89f506386ca37f317999061`;
+- Attack shield-choice blob `01514decbf44b7d5b165285c7de7a4ecf10fa202`;
+- SHA-256 `3e288b0c448d1456f508ff680a0153bded59a118c403ebbbdf0e6a57fe76edcc`.
+
+Tactic Edge closure remains:
+- 41 files;
+- SHA-256 `9a33a92624e4ac058f9c0ee12200344a67479fb7f97c5e2aa43283c5be45ad65`.
+
+TCG Card Pass 2 Validation **#1438 SUCCESS** on exact source/runtime + release-control head
+`0d875a926b6cb23740ca7f3a2a3ca84b93e24913`.
+
+### Capability reconciliation
+
+`ADD_SHIELD_EACH` is now classified **implemented**.
+
+Capability-manifest fingerprint:
+`e0751516e3687601095f88f68e0a8d5e706b68b7`.
+
+TCG Card Pass 2 Validation **#1440 SUCCESS** on exact capability-reconciled head
+`5da730d086d817faa71a6a0cc1ee21160cec2fd2`.
+
+### Next exact runtime target — V2.4.89
+
+Ember / Heatguard Bracer — `MODIFY_CURRENT_DAMAGE_PACKET`.
+
+Read-only preflight proves Damage owner #20 already:
+- collects `before_damage_packet` attachment listeners;
+- evaluates Heatguard's target/class/condition requirements;
+- enforces turn-scoped attachment limits;
+- validates and applies `MODIFY_CURRENT_DAMAGE_PACKET` delta/minimum semantics;
+- records before/after packet evidence;
+- already has a deterministic Heatguard recoil-contract test.
+
+Therefore the operation itself is expected to be reconciliation-only. Shared `damage_packet_*` predicates will remain unpromoted until every frozen consumer, including Thorn Crown's after-damage listener family, is separately proved.
+
