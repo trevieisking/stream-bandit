@@ -806,3 +806,15 @@ A used operation can be accepted while predicates that happen to appear in the s
 ## 280 — voluntary Withdrawal cost listeners must sit before Payment
 A `before_voluntary_withdrawal_cost` listener, if implemented, must modify the canonical payable Withdrawal cost before exact attached-Essence payment preflight/commit. It must not alter Payment Engine semantics, bypass the once-per-turn Withdrawal gate or create a second Atomic Switch/transaction owner.
 
+## 281 — voluntary Withdrawal current-cost listeners sit between Withdrawal and Payment
+Withdrawal computes the canonical base cost first. A synchronous `before_voluntary_withdrawal_cost` Event Listener may then modify only the packet-local payable cost. Payment receives that resolved integer and keeps exact attached-Essence ownership. Atomic Switch remains downstream and unchanged.
+
+## 282 — action projection may execute mutable listener logic only on cloned match state
+If authoritative UI projection needs the same once-per-turn listener semantics as a command, the projection must run the canonical resolver against `structuredClone(state)` or an equivalently isolated copy. Read-only projection must never consume receipts, listener limits, event history or card-instance state in the authoritative match.
+
+## 283 — current-cost opcode grammar must not grow beyond frozen data
+`MODIFY_CURRENT_WITHDRAWAL_COST` currently owns only `delta` and `minimum` in Release 1. Runtime validation must fail closed on undeclared fields rather than silently inventing future semantics. Future card grammar may extend this through an explicit master-plan revision, not accidental permissiveness.
+
+## 284 — Pilot Sera is the next partial-operation reconciliation target
+The frozen Release 1 has exactly one `SET_ATTACK_ELIGIBILITY` consumer: Gale — Pilot Sera. Existing Tactic runtime writes a turn-scoped final-Vanguard anchor and Match already checks that anchor before Attack. V2.4.91 may move the capability from partial only after exact `controller_turn / only_final_vanguard_may_attack` grammar, repeated-switch final-anchor behavior and turn expiry/reset are proven end-to-end.
+
