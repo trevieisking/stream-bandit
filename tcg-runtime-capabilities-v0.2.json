@@ -36,6 +36,7 @@
       "INCREMENT_SOURCE_COUNTER",
       "LOOK_TOP",
       "MODIFY_CURRENT_ATTACK_DAMAGE",
+      "MODIFY_CURRENT_DAMAGE_PACKET",
       "MODIFY_CURRENT_HEAL",
       "MOVE_ATTACHED_ESSENCE",
       "MOVE_CARDS",
@@ -71,7 +72,6 @@
       "DEFEAT_TARGET_IF",
       "DIRECT_DAMAGE",
       "INSPECT_ZONE",
-      "MODIFY_CURRENT_DAMAGE_PACKET",
       "MODIFY_CURRENT_WITHDRAWAL_COST",
       "MOVE_DAMAGE",
       "MOVE_ZONE_POSITION",
@@ -508,6 +508,36 @@
         "Tactic interpreter owns ADD_SHIELD_EACH generically through the shared Shield primitive"
       ],
       "note": "Attack/Tactic parity is complete without card-ID dispatch. Crowncrag uses the generic Attack private-choice specialist; Reversal Seal remains on the existing Tactic interpreter path; both delegate Shield mutation to addRuntimeShield."
+    },
+    "release1_heatguard_damage_packet_modifier_v2_4_89": {
+      "accepted_head": "5a1d94b769812a045ec276b9a15a1ec17ddeb77e",
+      "card_pass_run": 1443,
+      "operation": "MODIFY_CURRENT_DAMAGE_PACKET",
+      "consumers": [
+        "ember-heatguard-bracer"
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-damage-packet-listener-v0-2.ts",
+      "packet_owner": "supabase/functions/_shared/tcg-match-damage-packet-v0-2.ts",
+      "deterministic_evidence": [
+        "Damage #20 generic packet owner also satisfies existing Heatguard recoil contract",
+        "Damage #20 attachment packet modifier consumes once per turn"
+      ],
+      "semantics": {
+        "event": "before_damage_packet",
+        "delta": -10,
+        "minimum": 0,
+        "limit": {
+          "scope": "turn",
+          "count": 1,
+          "owner": "attachment"
+        }
+      },
+      "shared_predicates_not_promoted": [
+        "damage_packet_target_is_attached_creature",
+        "damage_packet_class_is",
+        "damage_packet_condition_is"
+      ],
+      "note": "No runtime source change is required. Damage owner #20 already executes the frozen Heatguard modifier generically. Shared damage-packet predicates remain separately gated because they have other frozen consumers."
     }
   }
 }
