@@ -73,6 +73,12 @@ for (const marker of [
     throw new Error(`event-listener withdrawal-cost marker missing: ${marker}`);
   }
 }
+if (!listener.includes('!["op", "delta", "minimum"].includes(key)')) {
+  throw new Error("withdrawal-cost opcode must accept only grammar-declared delta + minimum");
+}
+if (listener.includes('["op", "delta", "minimum", "maximum"]')) {
+  throw new Error("withdrawal-cost opcode must not widen into undeclared maximum");
+}
 
 for (const marker of [
   "runtimeV02ResolveVoluntaryWithdrawalCostListeners",

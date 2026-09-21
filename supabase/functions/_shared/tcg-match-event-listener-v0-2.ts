@@ -3289,7 +3289,6 @@ function voluntaryWithdrawalCostModifier(
 ): {
   delta: number;
   minimum: number;
-  maximum: number | null;
 } | null {
   const steps = records(
     raw,
@@ -3309,7 +3308,7 @@ function voluntaryWithdrawalCostModifier(
     throw new Error("tcg_v0_2_withdrawal_cost_listener_program_unsupported");
   }
   const unsupported = Object.keys(step).find((key) =>
-    !["op", "delta", "minimum", "maximum"].includes(key)
+    !["op", "delta", "minimum"].includes(key)
   );
   if (unsupported) {
     throw new Error(
@@ -3324,14 +3323,7 @@ function voluntaryWithdrawalCostModifier(
   if (!Number.isInteger(minimum) || minimum < 0) {
     throw new Error("tcg_v0_2_withdrawal_cost_listener_minimum_invalid");
   }
-  const maximum = step.maximum == null ? null : Number(step.maximum);
-  if (
-    maximum != null &&
-    (!Number.isInteger(maximum) || maximum < minimum)
-  ) {
-    throw new Error("tcg_v0_2_withdrawal_cost_listener_maximum_invalid");
-  }
-  return { delta, minimum, maximum };
+  return { delta, minimum };
 }
 
 /**
@@ -3415,8 +3407,7 @@ export function runtimeV02ResolveVoluntaryWithdrawalCostListeners(
     if (limit && usedLimit(state, limit) >= limit.count) continue;
 
     const before = cost;
-    let after = Math.max(modifier.minimum, before + modifier.delta, 0);
-    if (modifier.maximum != null) after = Math.min(after, modifier.maximum);
+    const after = Math.max(modifier.minimum, before + modifier.delta, 0);
     const appliedDelta = after - before;
 
     consumeLimit(state, limit);
