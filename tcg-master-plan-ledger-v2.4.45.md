@@ -850,3 +850,25 @@ A modifier declared to expire on `target_controller_aftermath_started` remains v
 
 ## 294 — HEAL_EACH capability requires all four frozen execution surfaces
 `HEAL_EACH` remains partial until Verdantusk Attack, Elderbloom active Ability, Marevault after-damage-finished Attack and Reef Medic Olan Tactic all execute through canonical Heal/Heal Packet/listener ownership. Existing Attack/Tactic success cannot be stretched into Ability or after-damage-finished acceptance.
+
+
+## 295 — HEAL_EACH is Heal Packet/listener semantics, not a second Heal engine
+Attack, active Ability, mixed Attack programs and Tactic may each orchestrate `HEAL_EACH`, but every physical heal mutation must pass through the canonical Heal Packet owner and every emitted packet must preserve the canonical after-heal listener boundary.
+
+## 296 — multi-target HEAL_EACH preflights the complete selected set
+Before a multi-target HEAL_EACH mutates the first target, the resolver must rebind every selected Creature against current field position, current top-card identity and declared filters. A stale later target must fail the choice before any earlier selected target is healed.
+
+## 297 — mixed after-damage-finished Attack programs preserve operation order across listeners
+A mixed program such as Essence movement -> HEAL_EACH -> optional switch may pause for player choice and nested listeners, but its declared operation order is authoritative. Movement Listener completes before heal selection; Heal Listener completes before later switch; resume receipts are server-owned.
+
+## 298 — mixed Attack choices reuse the generic private server choice transport
+A new structured Attack program may emit the existing server-owned `pending_attack_choice` shape with min/max/options. The Battle client renders and submits that generic choice state; it does not identify Marevault or decide program rules.
+
+## 299 — after-damage-finished specialists cannot compete with ordinary after_damage owners
+The V2.4.93 mixed Attack owner claims only its exact frozen `after_damage_finished` operation family and returns null when ordinary `after_damage` is non-empty. Future cards with both families require an explicit master-plan ownership revision rather than accidental double execution.
+
+## 300 — SELECT_CARDS is the next cross-surface selection-unblocker
+Frozen Release 1 has seven `SELECT_CARDS` consumers across Event Listener, Attack, active Ability and Tactic surfaces. Event Listener and the Myceliarch Attack specialist already own their families; V2.4.94 must close missing active-Ability/Tactic selection transport generically before dependent Essence-attachment programs can be completed.
+
+## 301 — SELECT_CARDS selection authority is not Card-Zone mutation authority
+`SELECT_CARDS` owns server-private legal option generation, min/max validation, selected identity/zone revalidation and variable binding. Any later physical zone mutation remains with Card-Zone or the specialist owner invoked by the following operation.

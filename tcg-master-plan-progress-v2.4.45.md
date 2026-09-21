@@ -2317,3 +2317,100 @@ Read-only preflight proves:
 - Marevault's mixed `MOVE_ATTACHED_ESSENCE -> SELECT_CREATURE -> HEAL_EACH -> OPTIONAL switch` `after_damage_finished` program is outside the existing after-damage HEAL_EACH owner.
 
 Therefore V2.4.93 is a real parity target. The repair must reuse the canonical Heal/Heal Packet/listener owners and existing private-choice transports, remain operation-shaped and card-ID-free, and must not create a second Heal engine.
+
+
+## V2.4.93 — accepted HEAL_EACH all-consumer parity
+
+`HEAL_EACH` is now fully implemented across every frozen Release 1 execution surface while preserving one canonical Heal Packet / Heal Listener mutation chain.
+
+### Frozen Release 1 inventory
+
+Exactly four consumers use `HEAL_EACH`:
+- Grove / Verdantusk — Attack `after_damage`;
+- Grove / Elderbloom — First Canopy — active Ability;
+- Tide / Marevault — Heart of Tides — mixed Attack `after_damage_finished`;
+- Tide / Reef Medic Olan — Tactic.
+
+### Canonical ownership
+
+Existing accepted paths remain authoritative:
+- Verdantusk Attack executes through the structured Attack HEAL_EACH owner;
+- Reef Medic Olan executes through the generic Tactic interpreter;
+- every physical heal delegates to the canonical Heal Packet owner and then the canonical after-heal listener chain.
+
+V2.4.93 closed the two missing surfaces without creating a second Heal engine:
+
+#### Elderbloom active Ability
+- the existing Active-Ability Selected-Heal system was generalized operation-first for
+  `SELECT_CREATURE self field 0..2 damaged -> HEAL_EACH`;
+- it reuses the existing private choice transport and once-per-turn active-Ability receipt;
+- every selected target is rebound before the first heal mutation so a stale later target cannot partially mutate an earlier target;
+- every selected heal emits the canonical Heal Packet and continues through the existing Heal Listener owner;
+- runtime dispatch contains no Elderbloom/card-ID branch.
+
+#### Marevault mixed after-damage-finished Attack
+`supabase/functions/_shared/tcg-match-attack-after-damage-finished-v0-2.ts` owns the exact frozen mixed program shape:
+
+`MOVE_ATTACHED_ESSENCE -> SELECT_CREATURE -> HEAL_EACH -> OPTIONAL SWITCH_WITH_VANGUARD`.
+
+It is orchestration only:
+- Essence movement delegates to the existing Essence Movement owner;
+- Movement Listener completes before the heal selection is offered;
+- HEAL_EACH delegates every mutation to Heal Packet;
+- Heal Listener completes before the later optional switch;
+- optional switch delegates to Atomic Switch;
+- existing generic `pending_attack_choice` min/max/options transport is reused, so no Battle-client rules patch was required;
+- the mixed owner returns compatibility authority when ordinary `after_damage` is non-empty, preventing competing partial ownership.
+
+### Validation / release evidence
+
+Elderbloom selected-HEAL_EACH source/runtime was proven on exact head
+`eba5eb0ac6490eb1efc9d2653d758c6edac53c9c` by Card Pass **#1484 SUCCESS**.
+
+The mixed Marevault owner was first proved in isolation on
+`b4319c73dc02b8e2c60db244bcd7c5d69d660cb1` by Card Pass **#1486 SUCCESS**.
+
+Complete V2.4.93 source/runtime + release-control acceptance:
+- exact head: `60ea34dfe7bf23663e7903df99b47f254afc4eae`;
+- Card Pass **#1488 SUCCESS**;
+- deterministic runtime tests and all Match/Tactic/setup/Withdrawal/Attack/Surge type-checks green;
+- Set One structure/effect grammar and all guarded Runtime Pass B checks green.
+
+Exact Edge closures:
+- Match: 106 files / `fba619ffb652ab1365a4b290b15069379f7f6678cf4e17491da01a3bfe90293e`;
+- Tactic: 43 files / `df7154b1d85c37dfc1c36f2aba500dea2a369a0c92173ab181689853b3b209f2`.
+
+Capability reconciliation:
+- `HEAL_EACH` moved from **partial** to **implemented**;
+- capability blob: `2e5596630d16932c7ebfc6dcff0fbc9f370da290`;
+- exact capability-reconciled head:
+  `fec2fb546a976ab67003acc4133d7fc3f5fe9a69`;
+- Card Pass **#1489 SUCCESS**.
+
+The canonical owner-family count remains **40**. No database migration, Supabase Edge deployment, main merge or live promotion was performed.
+
+### Next exact runtime target — V2.4.94
+
+`SELECT_CARDS` all-surface selection ownership and resume parity.
+
+Frozen Release 1 has exactly seven consumers:
+- Grove / Capscout — triggered Creature ability;
+- Grove / Myceliarch — Attack `after_damage`;
+- Grove / Forager Nia — Tactic;
+- Tide / Surgefin — active Ability;
+- Volt / Tinkit — triggered Creature ability;
+- Volt / Stormcoil — Living Circuit — active Ability;
+- Volt / Quickcharge Cell — Tactic.
+
+Read-only preflight proves this is the highest-leverage current unblocker:
+- Event Listener already owns generic triggered `SELECT_CARDS` choice/revalidation, covering the Capscout/Tinkit family;
+- the existing Attack Discard-Recycle specialist already owns Myceliarch's exact `SELECT_CARDS -> MOVE_CARDS` family;
+- active-Ability owners do not yet expose generic `SELECT_CARDS`;
+- the Tactic interpreter does not yet execute the frozen `SELECT_CARDS` operation;
+- Surgefin, Living Circuit and Quickcharge continue afterward into the still-partial `ATTACH_ESSENCE_FROM_ZONE` family, so that downstream attachment capability remains a separate later target.
+
+V2.4.94 must therefore add/reuse one generic private card-selection transport for the missing active-Ability and Tactic surfaces, preserve Event Listener and Attack specialist ownership, revalidate selected card identity/zone before continuation, and remain card-ID-free. It must not create a second Card-Zone engine.
+
+Deferred rather than falsely promoted:
+- `ATTACH_ESSENCE_FROM_ZONE` remains partial because several consumers are still blocked by `SELECT_CARDS` and Magmagecko also requires missing `DIRECT_DAMAGE`;
+- `CHOOSE_FROM_SET` remains partial because at least Noctivane is upstream-blocked by missing `INSPECT_ZONE`.

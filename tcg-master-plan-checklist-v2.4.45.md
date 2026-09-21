@@ -877,3 +877,32 @@
 - [x] Refresh capability fingerprint to `9b33834f794be37a9814b9f6bbb9a6dee37c58d8`.
 - [x] Card Pass **#1481 SUCCESS** on exact capability-reconciled head `45164fad24d17037a58102d305996d755722425a`.
 - [ ] V2.4.93: close `HEAL_EACH` parity across Verdantusk Attack, Elderbloom active Ability, Marevault mixed after-damage-finished Attack and Reef Medic Olan Tactic without duplicating Heal ownership.
+
+
+## V2.4.93 — HEAL_EACH all-consumer parity closeout
+- [x] Freeze `HEAL_EACH` inventory to exactly Verdantusk, Elderbloom — First Canopy, Marevault — Heart of Tides and Reef Medic Olan.
+- [x] Preserve Verdantusk on the existing structured Attack HEAL_EACH owner.
+- [x] Preserve Reef Medic Olan on the generic Tactic HEAL_EACH route.
+- [x] Generalize the existing Active-Ability Selected-Heal owner for bounded `SELECT_CREATURE -> HEAL_EACH`.
+- [x] Reuse the existing active-Ability private choice and once-per-turn receipt.
+- [x] Rebind every Elderbloom-style selected target before the first heal mutation.
+- [x] Route every active-Ability HEAL_EACH mutation through canonical Heal Packet + Heal Listener ownership.
+- [x] Add one operation-shaped mixed Attack owner for Marevault's `after_damage_finished` grammar.
+- [x] Delegate mixed-program Essence moves to the existing Essence Movement owner.
+- [x] Complete Movement Listener handling before the mixed-program HEAL_EACH selection.
+- [x] Route mixed-program HEAL_EACH through canonical Heal Packet + Heal Listener ownership.
+- [x] Complete Heal Listener handling before the mixed program's optional switch.
+- [x] Delegate the optional mixed-program switch to Atomic Switch.
+- [x] Reuse the generic `pending_attack_choice` min/max/options browser transport; add no card-specific client rule.
+- [x] Make the mixed owner return compatibility authority when ordinary `after_damage` is non-empty.
+- [x] Keep Elderbloom and Marevault as data; add no card-ID/name dispatch.
+- [x] Card Pass **#1484 SUCCESS** on Elderbloom source/runtime head `eba5eb0ac6490eb1efc9d2653d758c6edac53c9c`.
+- [x] Card Pass **#1486 SUCCESS** on isolated mixed Attack owner head `b4319c73dc02b8e2c60db244bcd7c5d69d660cb1`.
+- [x] Match Edge closure = 106 files / `fba619ffb652ab1365a4b290b15069379f7f6678cf4e17491da01a3bfe90293e`.
+- [x] Tactic Edge closure = 43 files / `df7154b1d85c37dfc1c36f2aba500dea2a369a0c92173ab181689853b3b209f2`.
+- [x] Card Pass **#1488 SUCCESS** on exact complete source/runtime + release-control head `60ea34dfe7bf23663e7903df99b47f254afc4eae`.
+- [x] Move `HEAL_EACH` from partial to implemented.
+- [x] Refresh capability fingerprint to `2e5596630d16932c7ebfc6dcff0fbc9f370da290`.
+- [x] Card Pass **#1489 SUCCESS** on exact capability-reconciled head `fec2fb546a976ab67003acc4133d7fc3f5fe9a69`.
+- [x] Preserve canonical owner-family count 40 and leave main/live Supabase untouched.
+- [ ] V2.4.94: close `SELECT_CARDS` selection/resume ownership across all seven frozen consumer surfaces without duplicating Card-Zone ownership.
