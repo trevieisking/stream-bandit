@@ -692,3 +692,18 @@ Storm Break and Chainstorm may consume their declaration evidence later in the s
 ## 242 — Nightmaw deck-top discard is the next used-operation audit
 The frozen Set One has exactly one `DISCARD_DECK_TOP` consumer, Shade — Nightmaw / Dread Crush. Existing evidence indicates the structured Attack Deck-Discard owner already delegates its physical deck -> discard movement to Card-Zone and emits the canonical deck-discard event; capability status must be reconciled only after exact owner/test evidence is confirmed.
 
+## 243 — Attack deck-top discard is a structured owner family, not a card rule
+Release 1 `DISCARD_DECK_TOP` is owned by the generic Attack Deck-Discard family. Nightmaw is the sole frozen consumer but is not runtime dispatch authority.
+
+## 244 — Attack deck discard delegates physical mutation to Card-Zone
+The Deck-Discard owner decides structured eligibility/count/reveal semantics only. Exact opponent deck -> discard movement, card identity and ordering are Card-Zone-owned.
+
+## 245 — Deck-discard effect exhaustion is not draw-deckout
+Moving all remaining cards from a deck to discard because of an effect does not itself assign a deckout loser. Deckout remains with the rules that explicitly require an incomplete draw/deckout result.
+
+## 246 — deck_cards_discarded is a continuation handoff
+A successful structured Attack deck discard emits the canonical `deck_cards_discarded` event handoff. Event Listener, Movement Listener and Heal Listener remain separate downstream owners and must preserve their accepted ordering.
+
+## 247 — Noctivane SCHEDULE_ACTION is the next used-operation audit
+Night Reading is the sole frozen `SCHEDULE_ACTION` consumer. Existing V2.4.73 evidence indicates the deferred action is server-owned, resolves at `controller_aftermath_finished`, delegates physical draw movement to Card-Zone, and runs before canonical turn advance; capability classification must be reconciled against that accepted owner.
+
