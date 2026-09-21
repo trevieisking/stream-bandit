@@ -7,6 +7,7 @@ import { recordRuntimeV02HiddenInformationView } from "../_shared/tcg-match-hidd
 import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2.ts";
 import { runtimeV02BeginTacticHealListenerContinuation, runtimeV02PendingHealListenerChoiceView, runtimeV02ResolveTacticHealListenerChoice, type RuntimeV02PendingHealListenerChoice } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
 import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context-v0-2.ts";
+import { runtimeV02InstallAttackEligibilityRule, runtimeV02NormalizeAttackEligibilityRule } from "../_shared/tcg-match-attack-eligibility-v0-2.ts";
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02CreateEssenceMovedEvent, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
@@ -322,7 +323,13 @@ function unsupportedOps(steps: any[]): string[] {
     for (const step of items || []) {
       const op = String(step?.op || "");
       if (op === "ADD_ATTACK_DAMAGE_MODIFIER" && String(step.expires || "end_of_turn") !== "end_of_turn") unsupported.add("ADD_ATTACK_DAMAGE_MODIFIER_EXPIRY");
-      if (op === "SET_ATTACK_ELIGIBILITY" && String(step.expires || "end_of_turn") !== "end_of_turn") unsupported.add("SET_ATTACK_ELIGIBILITY_EXPIRY");
+      if (op === "SET_ATTACK_ELIGIBILITY") {
+        try {
+          runtimeV02NormalizeAttackEligibilityRule(step);
+        } catch {
+          unsupported.add("SET_ATTACK_ELIGIBILITY_GRAMMAR");
+        }
+      }
       if (op === "SET_WITHDRAWAL_COST" && !["end_of_turn", "aftermath"].includes(String(step.expires || "end_of_turn"))) unsupported.add("SET_WITHDRAWAL_COST_EXPIRY");
       if (op === "ADD_CONDITION_IMMUNITY" && !["end_of_turn", "aftermath"].includes(String(step.expires || "aftermath"))) unsupported.add("ADD_CONDITION_IMMUNITY_EXPIRY");
       if (op === "ATTACH_ESSENCE_FROM_ZONE" && String(step.from || "") !== "discard") unsupported.add("ATTACH_ESSENCE_FROM_ZONE_SOURCE");
@@ -1419,18 +1426,13 @@ function executeUntilChoice(state: any) {
       continue;
     }
     if (op === "SET_ATTACK_ELIGIBILITY") {
-      const targetSeat = playerSeat(ownerSeat, step.player || "self", vars);
-      const player = state.players[String(targetSeat)];
-      const anchor = topInst(player?.vanguard || null)?.uid || "";
-      if (!anchor) throw new Error("attack_eligibility_vanguard_missing");
-      state.turn_flags ||= {};
-      state.turn_flags[String(targetSeat)] ||= {};
-      state.turn_flags[String(targetSeat)].lifecycle_attack_eligibility = {
-        turn_seq: Number(state.turn_seq || 0),
-        mode: String(step.mode || "final_vanguard_only"),
-        anchor_uid: anchor,
-        expires: String(step.expires || "end_of_turn"),
-      };
+      const player = state.players[String(ownerSeat)];
+      runtimeV02InstallAttackEligibilityRule(
+        state,
+        ownerSeat,
+        player?.vanguard || null,
+        step,
+      );
       effect.cursor++;
       continue;
     }
