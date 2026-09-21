@@ -12,13 +12,22 @@ export type RuntimeV02ScheduledDrawFixedStep = {
   deckout_on_incomplete: boolean;
 };
 
+export type RuntimeV02ScheduledSourceDiscardStep = {
+  op: "DISCARD_SOURCE";
+  source_zone: "attached_relic";
+};
+
+export type RuntimeV02ScheduledActionStep =
+  | RuntimeV02ScheduledDrawFixedStep
+  | RuntimeV02ScheduledSourceDiscardStep;
+
 export type RuntimeV02ScheduledActionInput = {
   owner_seat: Seat;
   source_action_id: string;
   source_card_uid: string;
-  trigger: "controller_aftermath_finished";
+  trigger: "controller_aftermath_finished" | "after_attack_finished";
   match_must_be_active: boolean;
-  steps: RuntimeV02ScheduledDrawFixedStep[];
+  steps: RuntimeV02ScheduledActionStep[];
 };
 
 export type RuntimeV02ScheduledActionEntry = RuntimeV02ScheduledActionInput & {
@@ -88,32 +97,44 @@ function player(state: RuntimeState, who: Seat): RuntimePlayer {
   return raw as unknown as RuntimePlayer;
 }
 
-function normalizeStep(raw: unknown, index: number): RuntimeV02ScheduledDrawFixedStep {
+function normalizeStep(raw: unknown, index: number): RuntimeV02ScheduledActionStep {
   const step = objectRecord(raw);
-  if (!step || step.op !== "DRAW_FIXED") {
-    throw new Error(`tcg_v0_2_scheduled_action_step_unsupported:${index}`);
+  if (!step) throw new Error(`tcg_v0_2_scheduled_action_step_unsupported:${index}`);
+  if (step.op === "DRAW_FIXED") {
+    const allowed = new Set(["op", "player", "count", "deckout_on_incomplete"]);
+    const extra = Object.keys(step).find((key) => !allowed.has(key));
+    if (extra) {
+      throw new Error(`tcg_v0_2_scheduled_action_step_field_unsupported:${index}:${extra}`);
+    }
+    if (step.player !== "self" && step.player !== "opponent") {
+      throw new Error(`tcg_v0_2_scheduled_action_player_token_invalid:${index}`);
+    }
+    const count = Number(step.count);
+    if (!Number.isInteger(count) || count < 1) {
+      throw new Error(`tcg_v0_2_scheduled_action_draw_count_invalid:${index}`);
+    }
+    if (typeof step.deckout_on_incomplete !== "boolean") {
+      throw new Error(`tcg_v0_2_scheduled_action_deckout_flag_invalid:${index}`);
+    }
+    return {
+      op: "DRAW_FIXED",
+      player: step.player,
+      count,
+      deckout_on_incomplete: step.deckout_on_incomplete,
+    };
   }
-  const allowed = new Set(["op", "player", "count", "deckout_on_incomplete"]);
-  const extra = Object.keys(step).find((key) => !allowed.has(key));
-  if (extra) {
-    throw new Error(`tcg_v0_2_scheduled_action_step_field_unsupported:${index}:${extra}`);
+  if (step.op === "DISCARD_SOURCE") {
+    const allowed = new Set(["op", "source_zone"]);
+    const extra = Object.keys(step).find((key) => !allowed.has(key));
+    if (extra) {
+      throw new Error(`tcg_v0_2_scheduled_action_step_field_unsupported:${index}:${extra}`);
+    }
+    if (step.source_zone !== "attached_relic") {
+      throw new Error(`tcg_v0_2_scheduled_action_discard_source_zone_unsupported:${index}`);
+    }
+    return { op: "DISCARD_SOURCE", source_zone: "attached_relic" };
   }
-  if (step.player !== "self" && step.player !== "opponent") {
-    throw new Error(`tcg_v0_2_scheduled_action_player_token_invalid:${index}`);
-  }
-  const count = Number(step.count);
-  if (!Number.isInteger(count) || count < 1) {
-    throw new Error(`tcg_v0_2_scheduled_action_draw_count_invalid:${index}`);
-  }
-  if (typeof step.deckout_on_incomplete !== "boolean") {
-    throw new Error(`tcg_v0_2_scheduled_action_deckout_flag_invalid:${index}`);
-  }
-  return {
-    op: "DRAW_FIXED",
-    player: step.player,
-    count,
-    deckout_on_incomplete: step.deckout_on_incomplete,
-  };
+  throw new Error(`tcg_v0_2_scheduled_action_step_unsupported:${index}`);
 }
 
 function ledger(state: RuntimeState): RuntimeV02ScheduledActionEntry[] {
@@ -141,7 +162,7 @@ export function runtimeV02ScheduleAction(
     input.source_card_uid,
     "tcg_v0_2_scheduled_action_source_card_uid_required",
   );
-  if (input.trigger !== "controller_aftermath_finished") {
+  if (input.trigger !== "controller_aftermath_finished" && input.trigger !== "after_attack_finished") {
     throw new Error("tcg_v0_2_scheduled_action_trigger_unsupported");
   }
   if (typeof input.match_must_be_active !== "boolean") {
@@ -151,6 +172,18 @@ export function runtimeV02ScheduleAction(
     throw new Error("tcg_v0_2_scheduled_action_steps_required");
   }
   const steps = input.steps.map(normalizeStep);
+  if (
+    input.trigger === "controller_aftermath_finished" &&
+    steps.some((step) => step.op !== "DRAW_FIXED")
+  ) {
+    throw new Error("tcg_v0_2_scheduled_action_aftermath_step_unsupported");
+  }
+  if (
+    input.trigger === "after_attack_finished" &&
+    steps.some((step) => step.op !== "DISCARD_SOURCE")
+  ) {
+    throw new Error("tcg_v0_2_scheduled_action_after_attack_step_unsupported");
+  }
   if (!id) throw new Error("tcg_v0_2_scheduled_action_id_required");
 
   const entry: RuntimeV02ScheduledActionEntry = {
@@ -158,7 +191,7 @@ export function runtimeV02ScheduleAction(
     owner_seat: owner,
     source_action_id: sourceActionId,
     source_card_uid: sourceCardUid,
-    trigger: "controller_aftermath_finished",
+    trigger: input.trigger,
     match_must_be_active: input.match_must_be_active,
     steps,
     scheduled_turn_seq: turnSeq(state),
@@ -216,6 +249,9 @@ export function runtimeV02ResolveControllerAftermathScheduledActions(
     }
 
     for (const step of entry.steps.map(normalizeStep)) {
+      if (step.op !== "DRAW_FIXED") {
+        throw new Error("tcg_v0_2_scheduled_action_aftermath_step_unsupported");
+      }
       const targetSeat: Seat = step.player === "self"
         ? controller
         : controller === 1 ? 2 : 1;
@@ -266,3 +302,71 @@ export function runtimeV02ResolveControllerAftermathScheduledActions(
   state[LEDGER_KEY] = keep.map((entry) => structuredClone(entry));
   return resolved;
 }
+
+export type RuntimeV02AfterAttackScheduledActionResolution = {
+  id: string;
+  owner_seat: Seat;
+  source_action_id: string;
+  executed: boolean;
+  skipped_match_inactive: boolean;
+  source_discards: Array<{
+    controller_seat: Seat;
+    source_card_uid: string;
+    source_zone: "attached_relic";
+  }>;
+};
+
+/**
+ * Resolve lifecycle work whose exact trigger is after_attack_finished.
+ *
+ * This owner decides only trigger/turn/source timing. The returned discard plan is
+ * intentionally physical-mutation-free so Match can delegate attached Relic removal
+ * to the canonical Relic owner.
+ */
+export function runtimeV02ResolveAfterAttackFinishedScheduledActions(
+  state: RuntimeState,
+): RuntimeV02AfterAttackScheduledActionResolution[] {
+  const turn = turnSeq(state);
+  const current = ledger(state);
+  const keep: RuntimeV02ScheduledActionEntry[] = [];
+  const resolved: RuntimeV02AfterAttackScheduledActionResolution[] = [];
+
+  for (const entry of current) {
+    if (entry.trigger !== "after_attack_finished" || entry.scheduled_turn_seq !== turn) {
+      keep.push(entry);
+      continue;
+    }
+
+    const resolution: RuntimeV02AfterAttackScheduledActionResolution = {
+      id: entry.id,
+      owner_seat: entry.owner_seat,
+      source_action_id: entry.source_action_id,
+      executed: false,
+      skipped_match_inactive: false,
+      source_discards: [],
+    };
+
+    if (entry.match_must_be_active && !activeMatch(state)) {
+      resolution.skipped_match_inactive = true;
+      resolved.push(resolution);
+      continue;
+    }
+
+    for (const step of entry.steps.map(normalizeStep)) {
+      if (step.op !== "DISCARD_SOURCE") {
+        throw new Error("tcg_v0_2_scheduled_action_after_attack_step_unsupported");
+      }
+      resolution.source_discards.push({
+        controller_seat: entry.owner_seat,
+        source_card_uid: entry.source_card_uid,
+        source_zone: step.source_zone,
+      });
+    }
+    resolution.executed = true;
+    resolved.push(resolution);
+  }
+
+  state[LEDGER_KEY] = keep.map((entry) => structuredClone(entry));
+  return resolved;
+}
+
