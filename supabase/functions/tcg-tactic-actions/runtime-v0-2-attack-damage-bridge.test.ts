@@ -50,6 +50,26 @@ function essence(cardId: string, continuous: Record<string, unknown>[]) {
   });
 }
 
+function continuousCreature(
+  cardId: string,
+  abilityId: string,
+  continuous: Record<string, unknown>[],
+) {
+  return structuredEntry(cardId, {
+    card_family: "Creature",
+    creature: {
+      withdrawal: 1,
+      ability: {
+        id: abilityId,
+        mode: "continuous",
+        timing: "passive",
+        limit: null,
+        continuous,
+      },
+    },
+  });
+}
+
 const whisper = essence("shade-whisper-essence", [{
   id: "whisper-conditioned-pressure",
   kind: "attack_damage",
@@ -86,6 +106,36 @@ const opponentVanguardConditioned: RuntimeAttackDamageContext = {
   source_controller: "opponent",
   target_has_any_condition: true,
 };
+
+const glowcub = continuousCreature("ember-glowcub", "warm-blood", [{
+  id: "warm-blood-spark-pounce",
+  kind: "attack_damage",
+  target: "$source_creature",
+  when: { predicate: "source_damaged" },
+  amount: 10,
+  filters: { attack_id: "spark-pounce" },
+}]);
+
+const murkmite = continuousCreature("shade-murkmite", "murk-sense", [{
+  id: "murk-sense-murk-nip",
+  kind: "attack_damage",
+  target: "$source_creature",
+  when: {
+    predicate: "control_condition_present",
+    target: "$current_opponent_vanguard",
+  },
+  amount: 10,
+  filters: { attack_id: "murk-nip" },
+}]);
+
+const quartzram = continuousCreature("stone-quartzram", "prismatic-bulwark", [{
+  id: "prismatic-bulwark-prism-ram",
+  kind: "attack_damage",
+  target: "$source_creature",
+  when: { predicate: "source_has_shield_at_least", value: 1 },
+  amount: 20,
+  filters: { attack_id: "prism-ram" },
+}]);
 
 Deno.test("legacy-only match keeps attack-damage resolver on legacy fallback", () => {
   const state = {
@@ -178,3 +228,150 @@ Deno.test("marked mixed structured and legacy card indexes fail closed instead o
     "tcg_v0_2_snapshot_definition_missing:shade-whisper-essence",
   );
 });
+
+Deno.test("Creature-owned continuous outgoing Attack damage is generic across Release 1 predicates", () => {
+  const state = markedState({
+    "ember-glowcub": glowcub,
+    "shade-murkmite": murkmite,
+    "stone-quartzram": quartzram,
+    "stone-test-target": targetEntry,
+  });
+  const target = {
+    stack: [{ uid: "target", card_id: "stone-test-target" }],
+    essence: [],
+    damage: 0,
+    shield: 0,
+  };
+
+  const baseContext: RuntimeAttackDamageContext = {
+    target_zone: "reserve",
+    target_controller: "opponent",
+    source_controller: "opponent",
+    target_has_any_condition: false,
+    current_opponent_vanguard_control_condition: null,
+  };
+
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "glow", card_id: "ember-glowcub" }],
+        essence: [],
+        damage: 10,
+        shield: 0,
+      },
+      target,
+      20,
+      { ...baseContext, attack_id: "spark-pounce" },
+    ),
+    30,
+    "Glowcub should use canonical source_damaged evaluation",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "glow", card_id: "ember-glowcub" }],
+        essence: [],
+        damage: 0,
+        shield: 0,
+      },
+      target,
+      20,
+      { ...baseContext, attack_id: "spark-pounce" },
+    ),
+    20,
+    "Glowcub should not gain damage while undamaged",
+  );
+
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "murk", card_id: "shade-murkmite" }],
+        essence: [],
+        damage: 0,
+        shield: 0,
+      },
+      target,
+      20,
+      {
+        ...baseContext,
+        attack_id: "murk-nip",
+        current_opponent_vanguard_control_condition: "Blinded",
+      },
+    ),
+    30,
+    "Murkmite should read current opponent Vanguard control state, not the attacked zone",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "murk", card_id: "shade-murkmite" }],
+        essence: [],
+        damage: 0,
+        shield: 0,
+      },
+      target,
+      20,
+      { ...baseContext, attack_id: "murk-nip" },
+    ),
+    20,
+    "Murkmite should not gain damage without a control condition",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "murk", card_id: "shade-murkmite" }],
+        essence: [],
+        damage: 0,
+        shield: 0,
+      },
+      target,
+      20,
+      {
+        ...baseContext,
+        attack_id: "other-attack",
+        current_opponent_vanguard_control_condition: "Blinded",
+      },
+    ),
+    20,
+    "Creature continuous filters must bind to the exact attack id",
+  );
+
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "quartz", card_id: "stone-quartzram" }],
+        essence: [],
+        damage: 0,
+        shield: 10,
+      },
+      target,
+      20,
+      { ...baseContext, attack_id: "prism-ram" },
+    ),
+    40,
+    "Quartzram should use canonical source_has_shield_at_least evaluation",
+  );
+  assertEquals(
+    structuredRuntimeOutgoingAttackDamage(
+      state,
+      {
+        stack: [{ uid: "quartz", card_id: "stone-quartzram" }],
+        essence: [],
+        damage: 0,
+        shield: 0,
+      },
+      target,
+      20,
+      { ...baseContext, attack_id: "prism-ram" },
+    ),
+    20,
+    "Quartzram should not gain damage without Shield",
+  );
+});
+
