@@ -286,8 +286,8 @@
 - [x] Add canonical turn-owner history before previous_opponent_turn/event history support; opening, ordinary and deckout turn starts record ownership; same-seat extra turns resolve correctly; **Card Pass #1189 PASS**.
 - [x] Wire generic IF through Tactic execution for every Release 1 Tactic IF shape. All six frozen Tactic IF programs and downstream opcodes pass Card Pass #1250 on `93c169b63423ef029bf7cbd071eb4e09c27bd74d`.
 - [x] Wire generic IF through Attack execution for every Release 1 Attack IF shape; 13/13 accepted by Card Pass #1288 on `8db9ac8da165aac56e06ffc466a7892749eb75a1`.
-- [ ] Wire generic IF through Active/triggered Ability execution for every Release 1 Ability IF shape.
-- [ ] Prove all 29 Release 1 IF instances are executable without printed-English/card-ID fallback.
+- [x] Wire generic IF through Active/triggered Ability execution for every Release 1 Ability IF shape; 9/9 Ability IF instances accepted by Card Pass #1319.
+- [x] Prove all 29 Release 1 IF instances are executable without printed-English/card-ID fallback; 7 Tactic + 13 Attack + 9 Ability.
 - [ ] Reconcile IF + its proven Release 1 predicate classifications in tcg-runtime-capabilities-v0.2.json.
 - [ ] Continue operation/predicate audit until **every Release 1-used partial/missing capability** is either implemented or proven already implemented by the rightful owner.
 - [ ] Only after Release 1 runtime capability closeout return to Trevor/Kay full two-device G5 Battle acceptance.
@@ -511,10 +511,10 @@
 - [x] Card Pass #1289: new Ability IF runtime tests + all Deno/type-check jobs SUCCESS; only pre-refresh Match release-control digest failed.
 - [x] Refresh exact 93-file Match closure to CI-computed digest `1fbfb54a7d1fd39b0f6c660adcf9013452d2b3a169cd47b07eab0c7808de0b76`.
 - [x] Ability IF source/accounting progress: **6 / 9**.
-- [ ] Exact-head Card Pass must validate the refreshed closure before V2.4.72 is accepted.
-- [ ] Active Ability IF remaining: Noctivane / Night Reading.
-- [ ] Active Ability IF remaining: Surgefin / Undertow Supply.
-- [ ] Active Ability IF remaining: Marevault / Heart of Tides.
+- [x] Later exact-head validation through Card Pass #1306/#1319 supersedes the V2.4.72 pending closure gate; triggered Ability IF paths remain green.
+- [x] Noctivane / Night Reading complete through the generic deck-reading / scheduled-action family; retained green through Card Pass #1306 and #1319.
+- [x] Surgefin / Undertow Supply complete and accepted by Card Pass #1306.
+- [x] Marevault / Heart of Tides complete and accepted by Card Pass #1319.
 
 ## V2.4.73 — Night Reading active Ability IF
 - [x] Add Card-Zone-owned exact-instance within-zone reorder for top/bottom effects.
@@ -529,9 +529,9 @@
 - [x] Public resolve receipt exposes structural counts/boolean only; no inspected card UID/card ID.
 - [x] Refresh all affected Edge closures: Setup 8 / Match 96 / Tactic 40.
 - [x] Ability IF source/accounting progress: **7 / 9**.
-- [ ] Exact-head Card Pass must validate the post-repair Night Reading head before V2.4.73 is accepted.
+- [x] Night Reading retained green through later exact-head Card Pass #1306 and #1319; V2.4.73 accepted.
 - [x] Surgefin / Undertow Supply complete and accepted in V2.4.74; Card Pass #1306 SUCCESS.
-- [ ] Remaining active Ability IF after Surgefin: Marevault / Heart of Tides.
+- [x] Marevault / Heart of Tides complete and accepted in V2.4.75 / Card Pass #1319.
 
 ## V2.4.74 — Surgefin / Undertow Supply active Ability IF
 - [x] Recognize the generic optional discard-Essence -> Reserve target -> attach -> target-damaged IF -> Heal family without card-ID branches.
@@ -549,5 +549,23 @@
 - [x] Refresh release-control to Setup 8 / Match 98 / Tactic 40.
 - [x] Ability IF source/accounting progress: **8 / 9**.
 - [x] Card Pass #1306 SUCCESS on exact head `c37660dd4c712055ca027caf18a036684de89e09`; Surgefin / Undertow Supply accepted.
-- [ ] Final active Ability IF: Marevault / Heart of Tides.
+- [x] Final active Ability IF Marevault / Heart of Tides accepted by Card Pass #1319; Ability IF total 9/9.
+
+## V2.4.75 — Heart of Tides + Release 1 IF closeout
+- [x] Recognize generic attached-Essence redistribution -> movement-count IF -> participating damaged Creature -> Heal family without card-ID branches.
+- [x] Enumerate authoritative exact Essence/source/destination movement options from current friendly field state.
+- [x] Keep exact attachment mutation + movement receipts in the existing Essence Movement owner.
+- [x] Preflight the complete selected multi-move sequence on cloned authoritative state before first real mutation.
+- [x] Reject reuse of the same Essence instance across two selected moves.
+- [x] Route `essence_move_count_at_least` through shared Active Ability IF using exact local movement receipts.
+- [x] Require threshold heal target to be damaged, match structured element filters and participate in selected movements.
+- [x] Route Heal through canonical Ability Heal packets + existing after-heal listener continuation.
+- [x] Reuse generic `pending_ability_choice` transport; no Marevault-specific browser rule.
+- [x] Public Match receipt exposes structural movement/heal data only; no raw Essence UID, movement receipt or heal-target UID.
+- [x] Refresh release-control to Setup **8** / Match **99** / Tactic **40** files.
+- [x] TCG Card Pass 2 Validation **#1319 SUCCESS** on exact head `148bcc1164c05cd6c523b8fc3566f748705f5c15`.
+- [x] Ability IF execution: **9 / 9** frozen instances.
+- [x] Release 1 IF execution: **29 / 29** frozen instances = 7 Tactic + 13 Attack + 9 Ability.
+- [ ] Next runtime gate: reconcile IF + proven predicate classifications in `tcg-runtime-capabilities-v0.2.json`.
+- [ ] Continue operation/predicate audit until every Release 1-used partial/missing capability is implemented or proven already implemented.
 
