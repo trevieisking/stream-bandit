@@ -579,3 +579,16 @@
 - [x] TCG Card Pass 2 Validation **#1326 SUCCESS** on exact head `5b1eedcee6eb6893e7c8395fd5ab3f814f52ab33`.
 - [ ] Next operation audit: reconcile already-implemented Event Listener / Tactic / bounded Attack opcodes before adding new engine code.
 
+## V2.4.77 — hidden-zone sampling owner parity + capability reconciliation
+- [x] Prove the frozen Release 1 inventory contains exactly three `RANDOM_SAMPLE_HIDDEN_ZONE` consumers: Duskstalker, Thought Hunter and False Memory.
+- [x] Route Duskstalker Event Listener sampling through the shared non-destructive Hidden-Zone sampler / Match RNG owner.
+- [x] Route Thought Hunter active Ability sampling through the generic active hidden-sample owner with controller-private inspection.
+- [x] Keep False Memory in the Tactic interpreter while delegating random selection to the same shared Hidden-Zone sampler and preserving server-only identity.
+- [x] Remove stale source-format assumptions from ownership/privacy regression tests without weakening the semantic assertions.
+- [x] TCG Card Pass 2 Validation **#1346 SUCCESS** on source/test head `fff845a874c570fabbe1bc16ff07ed528ba5a12a`.
+- [x] Move `RANDOM_SAMPLE_HIDDEN_ZONE` from missing to implemented in `tcg-runtime-capabilities-v0.2.json`.
+- [x] Refresh release-control capability-manifest fingerprint to `230757a376b67516c48fe6cf1f85b401b9539c98`.
+- [x] TCG Card Pass 2 Validation **#1348 SUCCESS** on exact reconciled head `cb69519eed59de3700190c11245a5e395187fc77`.
+- [ ] Next predicate target: implement the missing Murkmite `control_condition_present` path in the shared continuous outgoing Attack-damage predicate adapter.
+- [ ] Audit Hollowcrown's active condition-replacement use of `control_condition_present` before changing that predicate's global capability status.
+
