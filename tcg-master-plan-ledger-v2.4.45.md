@@ -785,3 +785,15 @@ A predicate may be shared across multiple event owners. `heal_packet_source_acti
 ## 273 — ADD_SHIELD_EACH requires Attack/Tactic parity
 Frozen `ADD_SHIELD_EACH` has exactly two Release 1 consumers: Crowncrag's Attack `after_damage` program and Reversal Seal's Tactic IF branch. The Tactic interpreter already executes the operation generically. Capability must remain missing until the Attack consumer is proven through the canonical Attack/Shield owners or repaired without card-ID dispatch.
 
+## 274 — mixed Attack choice programs remain whole-program specialist ownership
+A mixed structured Attack program must not be partially executed by a narrow owner. The Crowncrag family is owned as one operation-shaped sequence — source Shield, bounded Creature selection, then Shield-each — while the existing pure `ADD_SHIELD` owner remains whole-program-only and returns compatibility authority for unrelated mixed shapes.
+
+## 275 — optional multi-target Attack choices preflight every selected target before mutation
+For a private Attack choice with min/max selection bounds, the resolver must rebind the exact source, current turn, every selected field position and current top-card identity, then re-evaluate declared filters for the complete selected set before mutating any selected target. A stale later selection must not leave an earlier selected target partially mutated.
+
+## 276 — ADD_SHIELD_EACH parity shares one Shield mutation owner
+Release 1 `ADD_SHIELD_EACH` is implemented only when both frozen consumers are proven: Crowncrag through the Attack shield-choice specialist and Reversal Seal through the Tactic interpreter. Both paths delegate actual Shield mutation and the 60-Shield cap to `addRuntimeShield`; neither path owns an alternate cap or card-specific Shield rule.
+
+## 277 — damage-packet operation truth is narrower than shared predicate truth
+Heatguard Bracer's `MODIFY_CURRENT_DAMAGE_PACKET` may be reconciled from Damage owner #20 once its exact before-damage contract is proven. Shared `damage_packet_*` predicates must not be promoted from Heatguard evidence alone when other frozen consumers, including after-damage listeners such as Thorn Crown, still require separate owner evidence.
+
