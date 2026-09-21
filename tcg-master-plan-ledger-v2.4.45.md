@@ -776,3 +776,12 @@ Match converts Attack Damage prevention details into Event Listener events and i
 ## 270 — Sapstone Charm is the next used-operation reconciliation
 The frozen Set One has exactly one `MODIFY_CURRENT_HEAL` consumer, Grove — Sapstone Charm. Heal owner #21 already owns the before-heal predicates, turn-scoped attachment limit, modifier validation/application and pre-HP-mutation packet boundary; capability status may move only after the exact reconciled head remains green.
 
+## 271 — before-heal mutation belongs to Heal #21
+`before_heal_packet` amount modification is owned by the canonical Before-Heal / Heal Packet chain. The modifier phase validates listener authority before mutation, applies requested-heal changes before HP mutation, and persists the modified requested amount in the canonical packet. Tactic/Attack/Ability owners emit heal intent; they do not reimplement Sapstone math.
+
+## 272 — capability predicates are accepted only after every frozen consumer is proved
+A predicate may be shared across multiple event owners. `heal_packet_source_action_kind_is` is therefore classified implemented only after both Sapstone's before-heal use and Symbiote Essence's after-heal use are proven through their canonical owners. One passing consumer is not sufficient capability evidence.
+
+## 273 — ADD_SHIELD_EACH requires Attack/Tactic parity
+Frozen `ADD_SHIELD_EACH` has exactly two Release 1 consumers: Crowncrag's Attack `after_damage` program and Reversal Seal's Tactic IF branch. The Tactic interpreter already executes the operation generically. Capability must remain missing until the Attack consumer is proven through the canonical Attack/Shield owners or repaired without card-ID dispatch.
+
