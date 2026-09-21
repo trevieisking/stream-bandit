@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "0641a97f47543cc6932a003b92a1e0d024be8d6d",
+        "entrypoint_git_blob_sha": "bbedfb937fbbb485aeb1e83ba66583741870f338",
         "file_count": 102,
-        "closure_sha256": "5e931b3692c3b5b36915adea48870fb48595152abeb0ab7c343bc3dfa8ac2ce1",
+        "closure_sha256": "9dc39ff55b849b76ffbf1593c3ea30d2c1a886d7b050c86a962b1c2cb65eb68c",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -202,7 +202,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-damage-v0-2.ts",
-            "git_blob_sha": "c263c8242aaaeabb37def0fb152efdc537236930"
+            "git_blob_sha": "c1010e1d039f33e518861acce8a5df4cb731eb96"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-attack-deck-discard-v0-2.ts",
@@ -354,7 +354,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "4a2e914eb9b09b94891a444101f661c8935bddd3"
+            "git_blob_sha": "d312b6352e96a00b6c72a15828f5e3178c4b07c5"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-evolution-legality-v0-2.ts",
@@ -458,7 +458,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-relic-engine-v0-2.ts",
-            "git_blob_sha": "51252d5845edb7cafc6978e93d71d0fb0818786a"
+            "git_blob_sha": "c553e71598d03da132b1a821d6321894bcf95d54"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-requirement-evaluator-v0-2.ts",
@@ -470,7 +470,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-scheduled-action-v0-2.ts",
-            "git_blob_sha": "a5b26edb4f2cf2b62f5c36d8df0ebe85f7cdea12"
+            "git_blob_sha": "d000ca55aaad2e14406f74eab89b147acf8e20ca"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-surge-lifecycle-v0-2.ts",
@@ -498,7 +498,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "0641a97f47543cc6932a003b92a1e0d024be8d6d"
+            "git_blob_sha": "bbedfb937fbbb485aeb1e83ba66583741870f338"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
@@ -509,8 +509,8 @@
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "45c0ccd58ee2a85cfe08a9b9f1b1e663b47eff7f",
-        "file_count": 40,
-        "closure_sha256": "d8ff415928c85b9ea2bec5168eaa1154c6c4e423a58c0a24b818db51c3cebf73",
+        "file_count": 41,
+        "closure_sha256": "9a33a92624e4ac058f9c0ee12200344a67479fb7f97c5e2aa43283c5be45ad65",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-modifier-v0-2.ts",
@@ -590,7 +590,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
-            "git_blob_sha": "4a2e914eb9b09b94891a444101f661c8935bddd3"
+            "git_blob_sha": "d312b6352e96a00b6c72a15828f5e3178c4b07c5"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",
@@ -643,6 +643,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts",
             "git_blob_sha": "d2a71b766acb872b7a8a70e9400ffcd31710cc7f"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-scheduled-action-v0-2.ts",
+            "git_blob_sha": "d000ca55aaad2e14406f74eab89b147acf8e20ca"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-surge-lifecycle-v0-2.ts",
