@@ -705,3 +705,17 @@
 - [x] TCG Card Pass 2 Validation **#1400 SUCCESS** on exact capability-reconciled head `fb7a552acffead9da53ca60a33db5c97de66e242`.
 - [ ] Next target: reconcile Quiet Step `CHOOSE_AND_CLEAR_CONTROL_CONDITION` against the existing generic Tactic condition-choice/clear owner.
 
+## V2.4.85 — Quiet Step control-condition clear reconciliation
+- [x] Prove the frozen `CHOOSE_AND_CLEAR_CONTROL_CONDITION` inventory has exactly one Release 1 consumer: Shade — Quiet Step.
+- [x] Confirm the generic Tactic condition-choice branch recognizes the operation without card-ID/name dispatch.
+- [x] Confirm `$switch_outgoing_vanguard` is the accepted effect-switch outgoing Creature binding.
+- [x] Filter legal choices to the current control-condition slot only.
+- [x] Preserve default exact-one selection when `count` is omitted.
+- [x] Preserve server-owned pending-choice seat authority.
+- [x] Confirm selected resolution delegates through `clearRuntimeCondition` to the canonical shared Condition engine.
+- [x] Confirm the existing frozen regression guards the alias, control-slot filtering and generic ownership.
+- [x] Move `CHOOSE_AND_CLEAR_CONTROL_CONDITION` from missing to implemented.
+- [x] Refresh release-control capability fingerprint to `5464eb9ff86ae65e777a4d6004833bbce0e17475`.
+- [x] TCG Card Pass 2 Validation **#1405 SUCCESS** on exact reconciled head `29bda755c8d49c7ce6295e927c5080e62f34c1e7`.
+- [ ] Next runtime repair: wire Bastion Plate `INCREMENT_SOURCE_COUNTER` generically in Event Listener to the existing source-counter primitive.
+
