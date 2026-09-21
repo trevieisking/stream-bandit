@@ -101,6 +101,9 @@ export type RuntimeV02PendingActiveAbilityEssenceRedistributionChoice = {
   source_index: number | null;
   source_uid: string;
   source_card_id: string;
+  move_element: string;
+  move_min: number;
+  move_max: number;
   move_var: string;
   when: RuntimeV02ActiveAbilityEssenceRedistributionDescriptor["when"];
   heal: RuntimeV02ActiveAbilityEssenceRedistributionDescriptor["heal"];
@@ -585,6 +588,9 @@ export function runtimeV02CreateActiveAbilityEssenceRedistributionChoice(
     source_index: source.index,
     source_uid: sourceInstance.uid,
     source_card_id: sourceInstance.card_id,
+    move_element: descriptor.move.element,
+    move_min: descriptor.move.min,
+    move_max: descriptor.move.max,
     move_var: descriptor.move.as,
     when: structuredClone(descriptor.when),
     heal: structuredClone(descriptor.heal),
@@ -694,10 +700,10 @@ export function runtimeV02ResolveActiveAbilityEssenceRedistributionChoice(
       "tcg_v0_2_active_ability_redistribution_unknown_option",
     );
   }
-  const moveLimit = Number(choice.when.count);
+  const threshold = Number(choice.when.count);
   if (
-    selectedMoves.length < choice.min ||
-    selectedMoves.length > moveLimit ||
+    selectedMoves.length < choice.move_min ||
+    selectedMoves.length > choice.move_max ||
     selectedHeals.length > 1
   ) {
     throw new Error(
@@ -710,7 +716,7 @@ export function runtimeV02ResolveActiveAbilityEssenceRedistributionChoice(
     );
   }
 
-  const thresholdMatched = selectedMoves.length >= moveLimit;
+  const thresholdMatched = selectedMoves.length >= threshold;
   if (!thresholdMatched && selectedHeals.length !== 0) {
     throw new Error(
       "tcg_v0_2_active_ability_redistribution_heal_without_threshold",
@@ -744,14 +750,7 @@ export function runtimeV02ResolveActiveAbilityEssenceRedistributionChoice(
   }
 
   const currentMoveIds = new Set(
-    legalMoveOptions(state, controllerSeat, choice.move_options[0]?.essence_card_id
-      ? requiredString(
-        definition(state, { uid: choice.move_options[0].essence_uid, card_id: choice.move_options[0].essence_card_id }).element,
-        "tcg_v0_2_active_ability_redistribution_move_element_required",
-      )
-      : choice.move_options.length === 0
-      ? ""
-      : "")
+    legalMoveOptions(state, controllerSeat, choice.move_element)
       .map((option) => option.id),
   );
   for (const move of selectedMoves) {
