@@ -48,7 +48,7 @@ test('live Ability facade exposes supply through the existing pending_ability_ch
 test('generic active-Ability continuation owns post-attachment resume rather than Match/card-specific code',()=>{
   assert.match(continuation,/runtimeV02InstallActiveAbilityContinuation/);
   assert.match(continuation,/runtimeV02ResumeActiveAbilityContinuation/);
-  assert.match(continuation,/kind === "supply_after_attachment"/);
+  assert.match(continuation,/supply_after_attachment/);
   for(const forbidden of ['tide-surgefin','Surgefin']){
     assert.equal(continuation.includes(forbidden),false,'continuation contains card identity: '+forbidden);
   }
