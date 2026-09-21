@@ -89,7 +89,7 @@ test('Duskstalker remains Event Listener-owned and False Memory remains Tactic-i
   assert.match(eventListener,/tcg_v0_2_event_listener_hidden_sample_visibility_unsupported/);
   assert.match(tactic,/if\s*\(\s*op\s*===\s*["']RANDOM_SAMPLE_HIDDEN_ZONE["']\s*\)/);
   assert.match(tactic,/runtimeV02RandomSampleHiddenZone\(/);
-  assert.match(tactic,/visibility\)!=="server_only"/);
+  assert.match(tactic,/String\(\s*step\.visibility\s*\|\|\s*""\s*\)\s*!==\s*"server_only"/);
 });
 
 test('active live route executes generic hidden sample before unrelated active families',()=>{
