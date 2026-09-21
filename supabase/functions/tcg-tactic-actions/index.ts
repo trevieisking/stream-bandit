@@ -960,6 +960,35 @@ function executeUntilChoice(state: any) {
       effect.steps.splice(effect.cursor, 1, ...generated);
       continue;
     }
+    if (op === "SHUFFLE_ZONE_INTO_DECK") {
+      const seat = playerSeat(ownerSeat, step.player || "self", vars);
+      if (String(step.zone || "") !== "hand") {
+        throw new Error(`unsupported_shuffle_zone:${step.zone}`);
+      }
+      if (String(step.visibility || "") !== "owner_private") {
+        throw new Error(`unsupported_shuffle_zone_visibility:${step.visibility}`);
+      }
+      const player = state.players[String(seat)];
+      if (!player || !Array.isArray(player.hand) || !Array.isArray(player.deck)) {
+        throw new Error("tcg_v0_2_tactic_shuffle_zone_player_invalid");
+      }
+      const handUids = (player.hand as Inst[]).map((inst) => inst.uid);
+      if (handUids.length > 0) {
+        runtimeV02ApplyCardZoneTransfer(player.hand as Inst[], player.deck as Inst[], {
+          cause: "effect",
+          action_kind: "tactic",
+          source_action_id: effect.id,
+          source_card_uid: effect.source_card.uid,
+          source: { controller_seat: seat as 1 | 2, zone: "hand", owner_card_uid: null },
+          destination: { controller_seat: seat as 1 | 2, zone: "deck", owner_card_uid: null },
+          card_uids: handUids,
+          destination_position: "bottom",
+        });
+      }
+      runtimeV02ShuffleInPlace(player.deck as Inst[]);
+      effect.cursor++;
+      continue;
+    }
     if (op === "SHUFFLE_DECK") {
       const seat = playerSeat(ownerSeat, step.player || "self", vars);
       const player = state.players[String(seat)];
