@@ -42,6 +42,7 @@ import type {
 } from "./tcg-match-damage-program-v0-2.ts";
 import { runtimeV02ApplyEventListenerMoveDamage } from "./tcg-match-event-listener-move-damage-v0-2.ts";
 import { runtimeV02AdaptDefeatEventsForListener } from "./tcg-match-event-listener-defeat-event-v0-2.ts";
+import { runtimeV02ScheduleAction } from "./tcg-match-scheduled-action-v0-2.ts";
 
 type Inst = {
   uid: string;
@@ -100,7 +101,73 @@ export type RuntimeV02EventListenerEvent = {
   target_creature_uid?: string;
   target_controller_seat?: 1 | 2;
   target_zone?: "vanguard" | "reserve";
+  prevention_kind?: "ability" | "relic" | "shield";
+  prevention_amount?: number;
 };
+
+export type RuntimeV02DamagePreventedEventInput = {
+  turn_seq: number;
+  action_id: string;
+  packet_id: string;
+  prevention_kind: "ability" | "relic" | "shield";
+  amount: number;
+  source_uid: string | null;
+  source_controller_seat: 1 | 2 | null;
+  target_creature_uid: string;
+  target_controller_seat: 1 | 2;
+};
+
+export function runtimeV02CreateDamagePreventedEvent(
+  input: RuntimeV02DamagePreventedEventInput,
+): RuntimeV02EventListenerEvent {
+  const turn = Number(input.turn_seq);
+  if (!Number.isInteger(turn) || turn < 0) {
+    throw new Error("tcg_v0_2_damage_prevented_event_turn_invalid");
+  }
+  const actionId = requiredString(input.action_id, "tcg_v0_2_damage_prevented_event_action_required");
+  const packetId = requiredString(input.packet_id, "tcg_v0_2_damage_prevented_event_packet_required");
+  const targetUid = requiredString(input.target_creature_uid, "tcg_v0_2_damage_prevented_event_target_required");
+  const amount = Number(input.amount);
+  if (!Number.isFinite(amount) || !(amount > 0)) {
+    throw new Error("tcg_v0_2_damage_prevented_event_amount_invalid");
+  }
+  if (!["ability", "relic", "shield"].includes(input.prevention_kind)) {
+    throw new Error("tcg_v0_2_damage_prevented_event_kind_invalid");
+  }
+  if (input.target_controller_seat !== 1 && input.target_controller_seat !== 2) {
+    throw new Error("tcg_v0_2_damage_prevented_event_target_seat_invalid");
+  }
+  if (
+    input.source_controller_seat != null &&
+    input.source_controller_seat !== 1 &&
+    input.source_controller_seat !== 2
+  ) {
+    throw new Error("tcg_v0_2_damage_prevented_event_source_seat_invalid");
+  }
+  const sourceUid = input.source_uid == null ? null : requiredString(
+    input.source_uid,
+    "tcg_v0_2_damage_prevented_event_source_uid_invalid",
+  );
+  return {
+    event_id: `damage-prevented:${packetId}:${input.prevention_kind}:${sourceUid || "rule"}`,
+    event: "damage_prevented",
+    subject_uid: targetUid,
+    controller_seat: input.target_controller_seat,
+    source_controller_seat: input.source_controller_seat ?? undefined,
+    origin_zone: "field",
+    destination_zone: "field",
+    destination_index: null,
+    phase: "attack_damage",
+    source_action_id: actionId,
+    source_card_uid: sourceUid,
+    action_kind: "attack",
+    turn_seq: turn,
+    target_creature_uid: targetUid,
+    target_controller_seat: input.target_controller_seat,
+    prevention_kind: input.prevention_kind,
+    prevention_amount: amount,
+  };
+}
 
 export type RuntimeV02AttackDeclaredDamageInput = {
   action_id: string;
@@ -795,6 +862,71 @@ type RuntimeV02EventListenerRequirementContext = {
   event: RuntimeV02EventListenerEvent;
 };
 
+const CARD_COUNTER_KEY = "runtime_v0_2_card_instance_counters";
+const ATTACHMENT_LIMIT_KEY = "runtime_v0_2_attachment_listener_limits";
+
+function sourceCounterSpec(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  rawCounterId: unknown,
+): { id: string; initial: number; max: number | null } {
+  const counterId = requiredString(rawCounterId, "tcg_v0_2_event_listener_source_counter_id_required");
+  const definition = runtimeV02Definition(state, candidate.source);
+  const tactic = objectRecord(definition?.tactic);
+  const counters = Array.isArray(tactic?.counters) ? tactic.counters : [];
+  const raw = counters.map(objectRecord).find((counter) => counter?.id === counterId) || null;
+  if (!raw) throw new Error("tcg_v0_2_event_listener_source_counter_definition_missing");
+  if (String(raw.owner || "") !== "card_instance") {
+    throw new Error("tcg_v0_2_event_listener_source_counter_owner_unsupported");
+  }
+  const initial = Number(raw.initial ?? 0);
+  if (!Number.isInteger(initial) || initial < 0) {
+    throw new Error("tcg_v0_2_event_listener_source_counter_initial_invalid");
+  }
+  const max = raw.max == null ? null : Number(raw.max);
+  if (max != null && (!Number.isInteger(max) || max < initial)) {
+    throw new Error("tcg_v0_2_event_listener_source_counter_max_invalid");
+  }
+  return { id: counterId, initial, max };
+}
+
+function sourceCounterValue(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  rawCounterId: unknown,
+): number {
+  const spec = sourceCounterSpec(state, candidate, rawCounterId);
+  const flags = candidate.source.effect_flags || {};
+  const ledger = objectRecord(flags[CARD_COUNTER_KEY]) || {};
+  const raw = ledger[spec.id];
+  if (raw == null) return spec.initial;
+  const value = Number(raw);
+  if (!Number.isInteger(value) || value < 0 || (spec.max != null && value > spec.max)) {
+    throw new Error("tcg_v0_2_event_listener_source_counter_state_invalid");
+  }
+  return value;
+}
+
+function incrementSourceCounter(
+  state: Record<string, unknown>,
+  candidate: Candidate,
+  rawCounterId: unknown,
+  rawAmount: unknown,
+): number {
+  const spec = sourceCounterSpec(state, candidate, rawCounterId);
+  const amount = Number(rawAmount);
+  if (!Number.isInteger(amount) || amount < 1) {
+    throw new Error("tcg_v0_2_event_listener_source_counter_increment_invalid");
+  }
+  const current = sourceCounterValue(state, candidate, spec.id);
+  const next = spec.max == null ? current + amount : Math.min(spec.max, current + amount);
+  candidate.source.effect_flags ||= {};
+  const ledger = objectRecord(candidate.source.effect_flags[CARD_COUNTER_KEY]) || {};
+  ledger[spec.id] = next;
+  candidate.source.effect_flags[CARD_COUNTER_KEY] = ledger;
+  return next;
+}
+
 function requirementLeaf(
   value: RuntimeV02PredicateLeaf,
   context: RuntimeV02EventListenerRequirementContext,
@@ -827,6 +959,27 @@ function requirementLeaf(
       return event.controller_seat === (candidate.seat === 1 ? 2 : 1);
     case "source_controller_is_self":
       return event.source_controller_seat === candidate.seat;
+    case "prevention_target_is_attached_creature":
+      return !!candidate.field &&
+        candidate.field.top.uid === event.subject_uid;
+    case "prevention_source_is_attached_card":
+      return event.source_card_uid != null &&
+        candidate.source.uid === event.source_card_uid;
+    case "prevention_amount_at_least": {
+      const minimum = Number(value.value);
+      if (!Number.isFinite(minimum) || minimum < 0) {
+        throw new Error("tcg_v0_2_event_listener_prevention_amount_invalid");
+      }
+      const amount = Number(event.prevention_amount);
+      return Number.isFinite(amount) && amount >= minimum;
+    }
+    case "source_counter_at_least": {
+      const minimum = Number(value.value);
+      if (!Number.isInteger(minimum) || minimum < 0) {
+        throw new Error("tcg_v0_2_event_listener_source_counter_threshold_invalid");
+      }
+      return sourceCounterValue(state, candidate, value.counter_id) >= minimum;
+    }
     case "event_controller_is_active_seat":
       return event.controller_seat === Number(state.active_seat);
     case "event_subject_matches":
@@ -1009,41 +1162,71 @@ function markResolved(
   };
 }
 
+type RuntimeV02EventListenerLimitInfo = {
+  key: string;
+  count: number;
+  scope: "turn" | "attachment";
+  source: Inst | null;
+};
+
 function limitInfo(
   state: Record<string, unknown>,
   candidate: Candidate,
   event: RuntimeV02EventListenerEvent,
-): { key: string; count: number } | null {
+): RuntimeV02EventListenerLimitInfo | null {
   const limit = objectRecord(candidate.listener.limit);
   if (!limit) return null;
   const count = Number(limit.count);
   if (!Number.isInteger(count) || count < 1) {
     throw new Error("tcg_v0_2_event_listener_limit_count_invalid");
   }
-  if (String(limit.scope || "") !== "turn") {
-    throw new Error("tcg_v0_2_event_listener_limit_scope_unsupported");
-  }
+  const scope = String(limit.scope || "");
   const owner = String(limit.owner || "");
-  const ownerKey = owner === "card_instance"
-    ? `card:${candidate.source.uid}`
-    : owner === "controller"
-    ? `controller:${candidate.seat}`
-    : owner === "event_controller"
-    ? `event-controller:${event.controller_seat}`
-    : null;
-  if (!ownerKey) {
-    throw new Error(
-      `tcg_v0_2_event_listener_limit_owner_unsupported:${owner}`,
-    );
+  if (scope === "turn") {
+    const ownerKey = owner === "card_instance"
+      ? `card:${candidate.source.uid}`
+      : owner === "attachment"
+      ? `attachment:${candidate.source.uid}`
+      : owner === "controller"
+      ? `controller:${candidate.seat}`
+      : owner === "event_controller"
+      ? `event-controller:${event.controller_seat}`
+      : null;
+    if (!ownerKey) {
+      throw new Error(`tcg_v0_2_event_listener_limit_owner_unsupported:${owner}`);
+    }
+    return { key: `${listenerId(candidate)}:${ownerKey}`, count, scope: "turn", source: null };
   }
-  return { key: `${listenerId(candidate)}:${ownerKey}`, count };
+  if (scope === "attachment" && owner === "attachment") {
+    if (!candidate.field || (candidate.kind !== "relic" && candidate.kind !== "essence")) {
+      throw new Error("tcg_v0_2_event_listener_attachment_limit_source_invalid");
+    }
+    return {
+      key: `${listenerId(candidate)}:attachment:${candidate.source.uid}:target:${candidate.field.top.uid}`,
+      count,
+      scope: "attachment",
+      source: candidate.source,
+    };
+  }
+  throw new Error("tcg_v0_2_event_listener_limit_scope_unsupported");
 }
 
 function usedLimit(
   state: Record<string, unknown>,
-  info: { key: string; count: number } | null,
+  info: RuntimeV02EventListenerLimitInfo | null,
 ): number {
   if (!info) return 0;
+  if (info.scope === "attachment") {
+    const flags = info.source?.effect_flags || {};
+    const limits = objectRecord(flags[ATTACHMENT_LIMIT_KEY]) || {};
+    const raw = limits[info.key];
+    if (raw == null) return 0;
+    const count = Number(raw);
+    if (!Number.isInteger(count) || count < 0) {
+      throw new Error("tcg_v0_2_event_listener_limit_state_invalid");
+    }
+    return count;
+  }
   const raw = objectRecord(listenerState(state).limits[info.key]);
   if (!raw || Number(raw.turn_seq) !== currentTurn(state)) return 0;
   const count = Number(raw.count);
@@ -1055,12 +1238,20 @@ function usedLimit(
 
 function consumeLimit(
   state: Record<string, unknown>,
-  info: { key: string; count: number } | null,
+  info: RuntimeV02EventListenerLimitInfo | null,
 ): void {
   if (!info) return;
   const used = usedLimit(state, info);
   if (used >= info.count) {
     throw new Error("tcg_v0_2_event_listener_limit_already_consumed");
+  }
+  if (info.scope === "attachment") {
+    if (!info.source) throw new Error("tcg_v0_2_event_listener_attachment_limit_source_invalid");
+    info.source.effect_flags ||= {};
+    const limits = objectRecord(info.source.effect_flags[ATTACHMENT_LIMIT_KEY]) || {};
+    limits[info.key] = used + 1;
+    info.source.effect_flags[ATTACHMENT_LIMIT_KEY] = limits;
+    return;
   }
   listenerState(state).limits[info.key] = {
     count: used + 1,
@@ -1505,6 +1696,39 @@ function executeStep(
   step: Record<string, unknown>,
 ): "continue" | "choice" {
   const op = String(step.op || "");
+
+  if (op === "INCREMENT_SOURCE_COUNTER") {
+    incrementSourceCounter(state, candidate, step.counter_id, step.amount);
+    continuation.step_cursor++;
+    return "continue";
+  }
+
+  if (op === "SCHEDULE_SOURCE_DISCARD") {
+    if (
+      String(step.timing || "") !== "after_attack_finished" ||
+      String(step.source || "") !== "$listener_source"
+    ) {
+      throw new Error("tcg_v0_2_event_listener_source_discard_shape_unsupported");
+    }
+    if (candidate.kind !== "relic" || !candidate.field) {
+      throw new Error("tcg_v0_2_event_listener_source_discard_relic_required");
+    }
+    const id = `event-listener-source-discard:${event.event_id}:${candidate.source.uid}:${listenerId(candidate)}`;
+    runtimeV02ScheduleAction(
+      state as any,
+      {
+        owner_seat: candidate.seat,
+        source_action_id: listenerId(candidate),
+        source_card_uid: candidate.source.uid,
+        trigger: "after_attack_finished",
+        match_must_be_active: true,
+        steps: [{ op: "DISCARD_SOURCE", source_zone: "attached_relic" }],
+      },
+      id,
+    );
+    continuation.step_cursor++;
+    return "continue";
+  }
 
   if (op === "IF") {
     const branch = requirement(
