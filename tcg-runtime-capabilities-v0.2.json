@@ -24,6 +24,7 @@
       "CLEAR_CONDITION",
       "CLEAR_CONDITION_IF_PRESENT",
       "DISCARD_ATTACHED_ESSENCE",
+      "DISCARD_DECK_TOP",
       "DISCARD_HAND",
       "DRAIN_VITALITY",
       "DRAW",
@@ -64,7 +65,6 @@
       "DEFEAT_EACH_MATCHING",
       "DEFEAT_TARGET_IF",
       "DIRECT_DAMAGE",
-      "DISCARD_DECK_TOP",
       "INCREMENT_SOURCE_COUNTER",
       "INSPECT_ZONE",
       "MODIFY_CURRENT_DAMAGE_PACKET",
@@ -317,6 +317,20 @@
         }
       ],
       "owner": "supabase/functions/_shared/tcg-match-attack-declaration-events-v0-2.ts"
+    },
+    "release1_discard_deck_top_v2_4_82": {
+      "accepted_head": "bc1dbf623ba665b9acf78dd99b54b637d9d8829a",
+      "card_pass_run": 1384,
+      "operation": "DISCARD_DECK_TOP",
+      "consumers": [
+        {
+          "card_id": "shade-nightmaw",
+          "attack_id": "dread-crush"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-attack-deck-discard-v0-2.ts",
+      "movement_owner": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
+      "event": "deck_cards_discarded"
     }
   }
 }
