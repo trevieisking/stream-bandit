@@ -707,3 +707,18 @@ A successful structured Attack deck discard emits the canonical `deck_cards_disc
 ## 247 — Noctivane SCHEDULE_ACTION is the next used-operation audit
 Night Reading is the sole frozen `SCHEDULE_ACTION` consumer. Existing V2.4.73 evidence indicates the deferred action is server-owned, resolves at `controller_aftermath_finished`, delegates physical draw movement to Card-Zone, and runs before canonical turn advance; capability classification must be reconciled against that accepted owner.
 
+## 248 — Scheduled actions are server lifecycle records
+A structured `SCHEDULE_ACTION` does not execute in the browser and does not rely on a client timer. It records an authoritative deferred action with owner seat, source action/card identity, trigger, turn and exact nested steps.
+
+## 249 — Scheduled action trigger matching is exact
+A scheduled action resolves only for its recorded controller, recorded turn and supported trigger. A different controller's Aftermath leaves it queued; a terminal match may consume a match-active-only schedule without mutation.
+
+## 250 — Scheduled fixed draws keep Card-Zone and deckout ownership
+When a scheduled action executes `DRAW_FIXED`, Card-Zone owns exact deck -> hand movement. The scheduled-action owner only decides the requested count and incomplete-draw deckout result.
+
+## 251 — Controller-AFTERMATH schedules resolve before turn advance
+Match must resolve due `controller_aftermath_finished` actions after the controller's Aftermath work and before canonical turn advance. The deferred lifecycle must never be replayed or reordered by presentation code.
+
+## 252 — Archivist Sol hand-to-deck shuffle is the next real runtime gap
+Archive Reset is the sole frozen `SHUFFLE_ZONE_INTO_DECK` family. Tactic already has canonical Card-Zone and Randomization dependencies but does not yet parse this opcode. The repair must generically move all exact requested hand cards into that same player's deck through Card-Zone, then shuffle the resulting deck through Randomization, with owner-private semantics and no Archivist Sol branch.
+
