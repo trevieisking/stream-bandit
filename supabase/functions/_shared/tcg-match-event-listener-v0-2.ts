@@ -15,6 +15,7 @@ import { runtimeV02InstallWithdrawalModifier } from "./tcg-match-withdrawal-modi
 import { applyRuntimeV02AttachmentAttackDamageModifier } from "./tcg-match-surge-lifecycle-v0-2.ts";
 import type { RuntimeV02EssenceAttachedListenerEvent } from "./tcg-match-essence-attachment-event-v0-2.ts";
 import { runtimeV02ApplyEssenceAttachmentTransaction } from "./tcg-match-essence-attachment-engine-v0-2.ts";
+import { runtimeV02NormalizeEffectAttachmentState } from "./tcg-match-essence-attachment-state-v0-2.ts";
 import {
   runtimeV02BuildEssenceAttachedTriggerPlan,
   type RuntimeV02EssenceAttachedCandidateDescriptor,
@@ -2573,16 +2574,9 @@ export function runtimeV02ResolveEventListenerChoice(
   } else if (pending.kind === "attach_essence") {
     const target = fieldFromRef(state, pending.context.target as CreatureRef);
     if (!target) throw new Error("tcg_v0_2_event_listener_attachment_target_stale");
-    const attachmentState = objectRecord(pending.context.attachment_state);
-    if (attachmentState) {
-      if (
-        String(attachmentState.kind || "") !== "temporary" ||
-        String(attachmentState.expires || "") !== "controller_aftermath" ||
-        String(attachmentState.destination_on_expire || "") !== "discard"
-      ) {
-        throw new Error("tcg_v0_2_event_listener_attachment_state_unsupported");
-      }
-    }
+    const attachmentState = runtimeV02NormalizeEffectAttachmentState(
+      pending.context.attachment_state,
+    );
     for (const option of selected) {
       const ref = option.data.ref as CardRef;
       if (ref.zone !== "hand" && ref.zone !== "discard") {
@@ -2596,15 +2590,13 @@ export function runtimeV02ResolveEventListenerChoice(
         ref.zone,
         listenerId(candidate),
         {
-          attachment_kind: attachmentState ? String(attachmentState.kind) : "normal",
+          attachment_kind: attachmentState.transaction.attachment_kind,
           phase: work.event.phase,
           action_kind: "effect_driven",
           destination_index: target.where === "reserve" ? target.index : null,
           source_owner_seat: ref.zone_owner_seat,
           source_card_id: ref.card_id,
-          effect_flags: attachmentState
-            ? { discard_during_target_aftermath: true }
-            : undefined,
+          effect_flags: attachmentState.transaction.effect_flags,
         },
       );
       continuation.work.push(...essenceAttachedWorkItems(state, transaction.listener_event));
