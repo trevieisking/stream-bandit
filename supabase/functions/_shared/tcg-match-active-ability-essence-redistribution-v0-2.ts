@@ -94,7 +94,7 @@ export type RuntimeV02PendingActiveAbilityEssenceRedistributionChoice = {
   kind: "redistribute_attached_essence_then_conditional_heal";
   ability_id: string;
   prompt: string;
-  min: 0;
+  min: number;
   max: number;
   turn_seq: number;
   source_where: FieldWhere;
