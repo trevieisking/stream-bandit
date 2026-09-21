@@ -1592,3 +1592,40 @@ Continue the Release 1 operation audit with `DISCARD_ATTACHED_ESSENCE` / Volt �
 
 Current source evidence shows one frozen structured consumer but Match still contains a legacy Stormmane card-ID branch that performs the attached-Essence -> discard Card-Zone transfer. The next pass must replace that card-specific fallback with a generic structured Attack operation owner while preserving Card-Zone mutation/event ownership and existing Storm Break IF/target-survival sequencing.
 
+## V2.4.80 — accepted Storm Break attached-Essence discard capability reconciliation
+
+The post-V2.4.79 audit corrected the initial next-target assumption.
+
+The frozen Release 1 inventory contains exactly one `DISCARD_ATTACHED_ESSENCE` consumer:
+- Volt — Stormmane / Storm Break.
+
+No new runtime implementation was required.
+
+### Existing generic owner proof
+
+`tcg-match-attack-overcharge-discard-choice-v0-2.ts` already owns the complete structured Storm Break family:
+- declaration evidence is captured from structured `RECORD_EVENT`;
+- the outer current-action IF is evaluated by the shared Attack IF owner;
+- the actual attached-Essence discard is exposed as a private server-owned exact-one choice;
+- choice resolution preflights and commits the exact attached-Essence -> discard mutation through Card-Zone;
+- exact instance identity is preserved;
+- the nested target-survival IF is evaluated from authoritative post-damage state;
+- the resulting Stunned application delegates to canonical Condition ownership;
+- public receipts expose structural outcome only, never the selected Essence UID/card ID.
+
+The owner is data-driven and contains no Stormmane/card-name authority. Frozen-family tests prove Storm Break is the only Release 1 attack matching this structured family.
+
+The remaining `atk.metadata_source === "legacy" && ad?.id === "volt-stormmane"` Match branch is compatibility-only for unmarked legacy snapshots. Marked v0.2 Stormmane is explicitly guarded away from that fallback and already uses the generic structured owner. Removing the legacy-only branch would risk breaking preserved raw-legacy compatibility and is not required for v0.2 capability parity.
+
+### Capability reconciliation
+
+`tcg-runtime-capabilities-v0.2.json` now classifies operation
+`DISCARD_ATTACHED_ESSENCE` as **implemented**.
+
+Release-control capability-manifest fingerprint is refreshed to blob
+`12c08d16cb5789a138cb9812be48c3e7e2e288e3`.
+
+### Next exact runtime target
+
+Continue the usage-driven Release 1 operation audit. Prefer the next smallest real gap or stale classification that can be proven without disturbing working compatibility paths; do not rewrite a working generic owner merely to remove a legacy-only fallback.
+
