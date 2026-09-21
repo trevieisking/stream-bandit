@@ -767,3 +767,28 @@
 - [x] Card Pass **#1427 SUCCESS** on exact capability-reconciled head `0f11dad02f9835733e6046f8f827ba1775f4b275`.
 - [ ] Next target: `ADD_SHIELD_EACH` Attack/Tactic parity for Crowncrag + Reversal Seal.
 
+## V2.4.88 — ADD_SHIELD_EACH Attack/Tactic parity closeout
+- [x] Prove frozen `ADD_SHIELD_EACH` inventory is exactly Crowncrag + Reversal Seal.
+- [x] Preserve Reversal Seal on the existing generic Tactic interpreter path.
+- [x] Prove the existing Tactic route resolves variable-backed target sets and delegates every gain to `addRuntimeShield`.
+- [x] Keep the existing pure Attack `ADD_SHIELD` owner whole-program-only.
+- [x] Add a generic Attack specialist for `ADD_SHIELD source -> SELECT_CREATURE -> ADD_SHIELD_EACH selected`.
+- [x] Keep the Attack specialist card-ID-free.
+- [x] Support optional 0..N friendly field selection with declared min/max bounds.
+- [x] Support generic `element` and `exclude_source` selection filters.
+- [x] Bind the exact source Vanguard instance and current turn before mutation.
+- [x] Rebind all selected targets and recheck legality before any selected-target Shield mutation.
+- [x] Delegate source and selected-target Shield gain to the shared 60-cap `addRuntimeShield` owner.
+- [x] Reuse the existing private `pending_attack_choice` transport; add no parallel UI/rules engine.
+- [x] Preserve existing HEAL_EACH, self-heal and pure Shield ordering guards.
+- [x] Add deterministic Crown-style multi-select/staleness tests.
+- [x] Add frozen Set One Attack/Tactic parity and no-card-ID structure guard.
+- [x] Card Pass **#1436** proves all deterministic runtime tests and type-checks green before closure rebinding.
+- [x] Match Edge closure = 103 files / `3e288b0c448d1456f508ff680a0153bded59a118c403ebbbdf0e6a57fe76edcc`.
+- [x] Tactic Edge closure remains 41 files / `9a33a92624e4ac058f9c0ee12200344a67479fb7f97c5e2aa43283c5be45ad65`.
+- [x] Card Pass **#1438 SUCCESS** on exact source/runtime + release-control head `0d875a926b6cb23740ca7f3a2a3ca84b93e24913`.
+- [x] Move `ADD_SHIELD_EACH` from missing to implemented.
+- [x] Refresh capability fingerprint to `e0751516e3687601095f88f68e0a8d5e706b68b7`.
+- [x] Card Pass **#1440 SUCCESS** on exact capability-reconciled head `5da730d086d817faa71a6a0cc1ee21160cec2fd2`.
+- [ ] Next target: Ember Heatguard Bracer `MODIFY_CURRENT_DAMAGE_PACKET` operation reconciliation; audit shared damage-packet predicates across all consumers before promoting those predicates.
+
