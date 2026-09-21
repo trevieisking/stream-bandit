@@ -1742,3 +1742,56 @@ both owner-private, followed by fixed draws of 5 for each player and final decko
 
 Current Tactic runtime owns `SHUFFLE_DECK` but has no `SHUFFLE_ZONE_INTO_DECK` opcode branch. V2.4.84 must add one generic Tactic operation that moves all exact cards from the requested hand into that same player's deck through Card-Zone and then shuffles the resulting deck through the canonical Randomization engine. No Archivist Sol/card-ID branch, no identity exposure, and no duplicate zone/random owner.
 
+## V2.4.84 — accepted Archivist Sol hand-to-deck shuffle runtime family
+
+Astral — Archivist Sol / Archive Reset now executes its frozen two-step hand-to-deck shuffle family through existing canonical owners.
+
+### Frozen family
+
+Release 1 contains exactly two `SHUFFLE_ZONE_INTO_DECK` steps, both on Archivist Sol:
+1. self hand -> own deck, owner-private;
+2. opponent hand -> opponent deck, owner-private.
+
+They are followed by fixed draws of 5 for self and opponent, then the existing post-resolution deckout check.
+
+### Generic Tactic runtime ownership
+
+`supabase/functions/tcg-tactic-actions/index.ts` now recognizes `SHUFFLE_ZONE_INTO_DECK` generically:
+- resolves the requested player through the existing Tactic player-seat owner;
+- currently accepts only the frozen Release 1 `zone: "hand"` shape and fails closed on any other source zone;
+- requires `visibility: "owner_private"` and never exposes shuffled hand identities;
+- captures every exact current hand instance UID;
+- delegates hand -> same-player deck movement to Card-Zone;
+- preserves exact card instance identity;
+- still shuffles the deck when the hand is empty;
+- delegates resulting deck permutation to `runtimeV02ShuffleInPlace` in the canonical Randomization engine;
+- contains no Archivist Sol/card-ID/name dispatch and adds no helper/owner family.
+
+The existing `DRAW_FIXED` steps continue to delegate exact deck -> hand movement to Card-Zone and apply incomplete-draw deckout semantics. `CHECK_DECKOUT_AFTER_RESOLUTION` remains the final terminal check.
+
+### Regression + release-control evidence
+
+Added frozen-family/wiring regression:
+`tcg/tests/card-pass-2-tactic-shuffle-zone-into-deck-runtime.test.mjs`.
+
+The Tactic Edge dependency set remains 40 files; only the entrypoint blob changed:
+- Tactic entrypoint blob: `45c0ccd58ee2a85cfe08a9b9f1b1e663b47eff7f`;
+- closure SHA-256: `d8ff415928c85b9ea2bec5168eaa1154c6c4e423a58c0a24b818db51c3cebf73`.
+
+Card Pass **#1398 SUCCESS** proved the complete source/runtime family before capability reconciliation.
+
+`tcg-runtime-capabilities-v0.2.json` now classifies
+`SHUFFLE_ZONE_INTO_DECK` as **implemented**.
+
+Release-control capability-manifest fingerprint is
+`04aab8f975d4e582791fbc550f7ee427f6e3988d`.
+
+TCG Card Pass 2 Validation **#1400 SUCCESS** on exact capability-reconciled head
+`fb7a552acffead9da53ca60a33db5c97de66e242`.
+
+### Next exact runtime target
+
+Reconcile `CHOOSE_AND_CLEAR_CONTROL_CONDITION`.
+
+The frozen Release 1 inventory contains exactly one consumer, Shade — Quiet Step. The existing generic Tactic condition-choice branch already aliases `CHOOSE_AND_CLEAR_CONTROL_CONDITION` to the canonical condition-choice/clear flow and has a frozen regression guard. V2.4.85 should be capability reconciliation only if exact evidence remains aligned.
+
