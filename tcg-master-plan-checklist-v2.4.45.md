@@ -806,3 +806,26 @@
 - [x] Card Pass **#1445 SUCCESS** on exact capability-reconciled head `46e44d58e0b4b57b9b5c2aff6d2b5cfd00f65680`.
 - [ ] Next target: Highwind Spires `before_voluntary_withdrawal_cost -> MODIFY_CURRENT_WITHDRAWAL_COST`; treat as a real implementation gap unless a canonical existing listener owner is proved.
 
+## V2.4.90 — Highwind voluntary-withdrawal current-cost closeout
+- [x] Freeze the Release 1 `before_voluntary_withdrawal_cost` family to exactly Highwind Spires.
+- [x] Freeze `MODIFY_CURRENT_WITHDRAWAL_COST` to exactly one Release 1 consumer.
+- [x] Freeze `event_active_seat_is_controller` to that same Highwind listener.
+- [x] Preserve Withdrawal as canonical base-cost owner.
+- [x] Resolve the current-cost listener after base cost and before Payment.
+- [x] Keep Realm discovery, scope, predicate tree, turn limit and receipts in Event Listener.
+- [x] Keep opcode grammar exact to `op + delta + minimum`; reject undeclared `maximum`.
+- [x] Make field-action cost projection use the same resolver on a cloned state so previews cannot consume the listener.
+- [x] Keep authoritative withdrawal resolution on real match state.
+- [x] Preserve exact attached-Essence Payment ownership.
+- [x] Preserve Atomic Switch ownership and transaction preflight.
+- [x] Add deterministic active/inactive-seat, once-per-turn, next-turn reset, zero-floor and preview-isolation coverage.
+- [x] Add frozen Set One inventory + no-card-ID runtime guard.
+- [x] Match Edge closure = 103 files / `c8d1b9180312565b25fe29c522e5454fe867074ea423c43cb6e046886116f404`.
+- [x] Tactic Edge closure = 41 files / `a1793729e2efc333bc20f1a14ec711d416b607db79bb4de3096b118ab4b83bd6`.
+- [x] Card Pass **#1457 SUCCESS** on exact source/runtime head `558b007ff66bab4bfd7515d049c2a0c2105434c0`.
+- [x] Move `MODIFY_CURRENT_WITHDRAWAL_COST` from missing to implemented.
+- [x] Move `event_active_seat_is_controller` from missing to implemented.
+- [x] Refresh capability fingerprint to `fb01a78198a18155f55bbc395330ce0d3299aad4`.
+- [x] Card Pass **#1459 SUCCESS** on exact capability-reconciled head `69d6f8074fc6c3da96bdcd32b5b52ca5e10871b1`.
+- [ ] V2.4.91: reconcile Pilot Sera `SET_ATTACK_ELIGIBILITY` only after proving exact frozen grammar + final-Vanguard enforcement + turn expiry/reset.
+
