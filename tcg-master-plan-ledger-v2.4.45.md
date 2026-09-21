@@ -580,3 +580,24 @@ For supply-family effects, `target_damaged` is evaluated after the selected Esse
 
 ## 205 — Supply-family public receipts do not reveal selected hidden-zone identities
 Public receipts may expose selected Essence count, target field slot and listener/heal audit. They do not expose the selected discard Essence UID/card ID unless another rule makes that identity public.
+
+## 206 — Attached-Essence redistribution remains Essence Movement-owned
+Active Ability orchestration may enumerate legal source/destination combinations, but exact attached-Essence transfer and movement receipts remain with `applyRuntimeV02EssenceTransfer`. Ability adapters must not splice attachment arrays directly.
+
+## 207 — Multi-move Ability transactions preflight before first mutation
+When one Ability selection contains multiple Essence moves, the complete selected sequence is executed against an isolated authoritative clone before any real move occurs. A stale or illegal later move must fail the whole selection without partially applying an earlier move.
+
+## 208 — One Essence instance cannot satisfy multiple moves in one resolution
+A single attached Essence UID may appear in at most one selected redistribution move for the same Ability resolution. Movement count is receipt count, not option count or browser intent.
+
+## 209 — participated_in_moves is receipt-derived
+A Creature satisfies `participated_in_moves` only when its authoritative anchor UID appears as the source or destination of a selected, successfully preflighted movement receipt for that Ability resolution.
+
+## 210 — Essence-move-count Ability IF consumes exact movement receipts
+`essence_move_count_at_least` receives the server-owned movement receipt set through the shared Active Ability IF context. The browser, printed English and aggregate current-turn movement history do not decide this local IF.
+
+## 211 — Redistribution healing remains Heal Packet-owned
+After the movement threshold is met and a legal participating damaged Creature is selected, the Ability adapter invokes the canonical Ability Heal packet owner. Before-heal modifiers and after-heal listeners remain unchanged.
+
+## 212 — Release 1 IF closeout is 29 / 29
+The frozen Set One contains 29 structured IF instances: 7 Tactic, 13 Attack and 9 Ability. All 29 now have executable structured paths through generic owners, with exact-head Card Pass evidence; printed-English/card-ID IF decision fallback is no longer required for Release 1.
