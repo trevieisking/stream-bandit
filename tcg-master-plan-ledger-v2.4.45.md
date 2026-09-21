@@ -613,3 +613,19 @@ The 20 predicate families consumed by the accepted 29 Release 1 IF instances are
 
 ## 216 — Capability-manifest changes are release-control fingerprinted
 Every capability-ledger classification change must refresh the release-control capability-manifest blob fingerprint and pass exact-head Card Pass before the reconciliation is accepted.
+
+## 217 — Hidden-zone random sampling has one Release 1 RNG owner
+Duskstalker, Thought Hunter and False Memory all delegate exact hidden-zone random sampling to the shared non-destructive Hidden-Zone sampler and canonical Match RNG owner. Event Listener, active Ability and Tactic remain orchestration/visibility consumers rather than independent RNG owners.
+
+## 218 — Hidden-sample visibility stays family-appropriate
+Triggered and active Ability hidden samples may expose controller-private inspection only through their existing private viewer boundary. False Memory's sample remains server-only until a later authoritative Card-Zone movement makes any resulting discard public. Capability parity never authorizes browser visibility.
+
+## 219 — Ownership regression tests assert semantics, not source formatting
+A regression guard may prove that a shared owner is still called and that privacy/error boundaries remain present, but it must not require obsolete minified/switch-case spelling when the same semantic owner is preserved.
+
+## 220 — Global predicate capability requires every Release 1 consumer family
+One working consumer does not promote a predicate globally. `control_condition_present` remains open until Thought Hunter, Murkmite and Hollowcrown are all proven through their rightful generic runtime owners.
+
+## 221 — Murkmite control-condition bonus belongs in the shared outgoing Attack-damage predicate adapter
+Murkmite's continuous Attack-damage bonus is data-driven and already reaches the shared outgoing Attack-damage modifier path. The missing work is only support for the structured `control_condition_present` leaf against authoritative opponent Vanguard Condition state; no Murkmite/card-ID branch or second Attack engine is permitted.
+
