@@ -607,3 +607,23 @@
 - [ ] Next target: implement Hollowcrown / Hollow Command as a generic active Ability `control_condition_present` → `REPLACE_CONTROL_CONDITION` family through canonical Condition ownership.
 - [ ] Only after Hollowcrown is proven, reassess global capability status for `control_condition_present` and `REPLACE_CONTROL_CONDITION`.
 
+## V2.4.79 — Hollow Command + control-condition capability closeout
+- [x] Prove Hollowcrown / Hollow Command is an own-turn, once-per-turn, zero-cost active Ability that requires an existing non-Mindbound opponent-Vanguard control condition.
+- [x] Add one generic active-Ability condition-replacement owner; no Hollowcrown/card-ID dispatch.
+- [x] Preflight the full activation on cloned authoritative state before the real once-per-turn receipt is written.
+- [x] Reuse the Active Ability activation-cost owner for active-seat/source binding/turn-limit semantics.
+- [x] Reuse the canonical Condition engine for `replace`, immunity and protection semantics.
+- [x] Reject empty-control-slot and already-Mindbound requirements before consuming the Ability use.
+- [x] Preserve legal-activation turn consumption when Condition protection prevents the requested Mindbound replacement.
+- [x] Route the family through the single Active Ability live router and Match without Damage/Heal/player-choice duplication.
+- [x] Prove the frozen `control_condition_present` inventory is exactly Murkmite, Hollowcrown and Thought Hunter.
+- [x] Prove the frozen `REPLACE_CONTROL_CONDITION` inventory is exactly Hollow Command and Mind Eclipse.
+- [x] Prove Mind Eclipse remains generic Attack conditional-Condition-owned and delegates replacement to Condition.
+- [x] Refresh Match closure to 102 files / `5e931b3692c3b5b36915adea48870fb48595152abeb0ab7c343bc3dfa8ac2ce1`.
+- [x] Card Pass **#1369 SUCCESS** on complete Hollow Command source/closure head `fdef1ac7fa8099222079373aa31c0509235d7efb`.
+- [x] Move `control_condition_present` from missing to implemented in `tcg-runtime-capabilities-v0.2.json`.
+- [x] Move `REPLACE_CONTROL_CONDITION` from missing to implemented in `tcg-runtime-capabilities-v0.2.json`.
+- [x] Refresh release-control capability fingerprint to `880b6395d55da7bdfa241609cabd1446a02d34ae`.
+- [x] TCG Card Pass 2 Validation **#1371 SUCCESS** on exact reconciled head `d370d0db839456f8e2c83dab247fcd5d0802e315`.
+- [ ] Next target: migrate Volt — Stormmane structured `DISCARD_ATTACHED_ESSENCE` away from the remaining legacy card-ID Match branch into a generic Attack operation owner.
+
