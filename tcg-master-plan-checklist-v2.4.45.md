@@ -670,3 +670,19 @@
 - [x] TCG Card Pass 2 Validation **#1386 SUCCESS** on exact reconciled head `55d2e1c87db956d19c6a08b20a6a3c41ab7eb528`.
 - [ ] Next target: reconcile Noctivane / Night Reading `SCHEDULE_ACTION` against the accepted scheduled-action lifecycle owner.
 
+## V2.4.83 — Noctivane scheduled-action capability reconciliation
+- [x] Prove the frozen Release 1 `SCHEDULE_ACTION` inventory has exactly one consumer: Noctivane / Night Reading.
+- [x] Confirm the generic deck-reading owner recognizes the inspect -> optional bottom -> IF -> schedule family without card-ID/name authority.
+- [x] Confirm Hidden Information owns the private opponent deck-top inspection record.
+- [x] Confirm optional exact deck reorder delegates to Card-Zone.
+- [x] Confirm shared Active Ability IF owns `selected_count_at_least`.
+- [x] Confirm deferred action storage/execution is server-owned by `tcg-match-scheduled-action-v0-2.ts`.
+- [x] Confirm schedule trigger is controller-specific, same-turn `controller_aftermath_finished`.
+- [x] Confirm terminal-match guard skips mutation while consuming the due schedule.
+- [x] Confirm nested `DRAW_FIXED` delegates movement to Card-Zone and owns incomplete-draw deckout semantics.
+- [x] Confirm Match resolves due schedules before canonical turn advance.
+- [x] Move `SCHEDULE_ACTION` from missing to implemented.
+- [x] Refresh release-control capability fingerprint to `c900277c1a576e2de33c795914a45a676c1e8067`.
+- [x] TCG Card Pass 2 Validation **#1391 SUCCESS** on exact reconciled head `1583af90051d837ef3b4d2b500b05359c9c4ec19`.
+- [ ] Next runtime repair: implement generic Tactic `SHUFFLE_ZONE_INTO_DECK` for Archivist Sol / Archive Reset through Card-Zone + Randomization ownership.
+
