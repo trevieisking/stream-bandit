@@ -94,7 +94,7 @@
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "ed4f299504ab477fa89f506386ca37f317999061",
         "file_count": 103,
-        "closure_sha256": "82806497b93b6d4e81cd9ff53b68fca8e74c9bc4688d0dddeac4e2bb2d5344e9",
+        "closure_sha256": "3e288b0c448d1456f508ff680a0153bded59a118c403ebbbdf0e6a57fe76edcc",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
