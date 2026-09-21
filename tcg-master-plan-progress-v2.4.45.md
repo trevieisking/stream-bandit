@@ -2144,3 +2144,49 @@ Frozen schema requires:
 
 First-pass exact-head audit found no matching listener execution in the current Withdrawal base-cost or Withdrawal transaction owners. V2.4.90 is therefore treated as a **real implementation target** until a canonical existing owner is proven otherwise. The fix must integrate with Withdrawal/Cost ownership and must not duplicate Payment or Atomic Switch.
 
+## V2.4.90 — accepted Highwind voluntary-withdrawal current-cost listener
+
+Gale — Highwind Spires is now executable through the existing Withdrawal / Event Listener / Payment / Atomic Switch ownership chain with no card-identity dispatch and no new owner family.
+
+### Frozen family
+Exactly one Release 1 consumer uses this family:
+- `gale-highwind-spires`
+- event: `before_voluntary_withdrawal_cost`
+- predicate: `event_active_seat_is_controller`
+- limit: `turn / count 1 / owner event_controller`
+- operation: `MODIFY_CURRENT_WITHDRAWAL_COST`
+- modifier: `delta -1 / minimum 0`.
+
+### Canonical ownership
+- Withdrawal computes the canonical base voluntary-withdrawal cost.
+- Event Listener owns Realm discovery, controller scope, predicate evaluation, turn-limit/receipt state and the packet-local current-cost modifier.
+- Match invokes the synchronous current-cost listener after base cost is known and before Payment. Read-only `field_actions` projection runs the same resolver on `structuredClone(state)`, so merely viewing legal actions cannot consume the once-per-turn listener.
+- Payment still validates/commits exact attached-Essence payment.
+- Atomic Switch still owns the Vanguard/Reserve transaction.
+
+The opcode grammar remains exact to Release 1: `op + delta + minimum`; undeclared `maximum` widening is rejected.
+
+### Regression / release evidence
+- deterministic lifecycle: `runtime-v0-2-withdrawal-cost-listener.test.ts`;
+- frozen inventory and no-card-ID guard: `card-pass-2-withdrawal-cost-listener.test.mjs`;
+- Match Edge closure: 103 files / `c8d1b9180312565b25fe29c522e5454fe867074ea423c43cb6e046886116f404`;
+- Tactic Edge closure: 41 files / `a1793729e2efc333bc20f1a14ec711d416b607db79bb4de3096b118ab4b83bd6`;
+- source/runtime exact-head Card Pass **#1457 SUCCESS** on `558b007ff66bab4bfd7515d049c2a0c2105434c0`;
+- capability-reconciled Card Pass **#1459 SUCCESS** on `69d6f8074fc6c3da96bdcd32b5b52ca5e10871b1`;
+- capability blob: `fb01a78198a18155f55bbc395330ce0d3299aad4`.
+
+`MODIFY_CURRENT_WITHDRAWAL_COST` and `event_active_seat_is_controller` are now classified **implemented**.
+
+The canonical owner-family count remains **40**. Main/live Supabase remains untouched by V2.4.90.
+
+### Next exact runtime target — V2.4.91
+Gale — Pilot Sera / `SET_ATTACK_ELIGIBILITY`.
+
+Read-only preflight shows:
+- frozen Release 1 has exactly one `SET_ATTACK_ELIGIBILITY` consumer, Pilot Sera;
+- the Tactic interpreter already executes the operation and stores a turn-scoped final-Vanguard anchor;
+- Match already enforces `lifecycle_attack_eligibility.mode === "final_vanguard_only"` before Attack;
+- capability truth still labels `SET_ATTACK_ELIGIBILITY` partial.
+
+V2.4.91 therefore begins as reconciliation proof. It must verify the exact frozen `scope: controller_turn / rule: only_final_vanguard_may_attack` grammar, expiry/reset semantics and the complete Pilot Sera repeated-switch -> final-Vanguard attack restriction before moving the capability label.
+
