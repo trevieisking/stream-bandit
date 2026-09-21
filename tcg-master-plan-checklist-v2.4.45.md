@@ -288,7 +288,7 @@
 - [x] Wire generic IF through Attack execution for every Release 1 Attack IF shape; 13/13 accepted by Card Pass #1288 on `8db9ac8da165aac56e06ffc466a7892749eb75a1`.
 - [x] Wire generic IF through Active/triggered Ability execution for every Release 1 Ability IF shape; 9/9 Ability IF instances accepted by Card Pass #1319.
 - [x] Prove all 29 Release 1 IF instances are executable without printed-English/card-ID fallback; 7 Tactic + 13 Attack + 9 Ability.
-- [ ] Reconcile IF + its proven Release 1 predicate classifications in tcg-runtime-capabilities-v0.2.json.
+- [x] Reconcile IF + its proven Release 1 predicate classifications in tcg-runtime-capabilities-v0.2.json; accepted by Card Pass #1326.
 - [ ] Continue operation/predicate audit until **every Release 1-used partial/missing capability** is either implemented or proven already implemented by the rightful owner.
 - [ ] Only after Release 1 runtime capability closeout return to Trevor/Kay full two-device G5 Battle acceptance.
 - [ ] Main/static live promotion remains HOLD until runtime closeout + G5 + final release gates.
@@ -566,6 +566,16 @@
 - [x] TCG Card Pass 2 Validation **#1319 SUCCESS** on exact head `148bcc1164c05cd6c523b8fc3566f748705f5c15`.
 - [x] Ability IF execution: **9 / 9** frozen instances.
 - [x] Release 1 IF execution: **29 / 29** frozen instances = 7 Tactic + 13 Attack + 9 Ability.
-- [ ] Next runtime gate: reconcile IF + proven predicate classifications in `tcg-runtime-capabilities-v0.2.json`.
+- [x] Reconcile IF + proven predicate classifications in `tcg-runtime-capabilities-v0.2.json`; Card Pass #1326 SUCCESS.
 - [ ] Continue operation/predicate audit until every Release 1-used partial/missing capability is implemented or proven already implemented.
+
+## V2.4.76 — IF capability-manifest reconciliation
+- [x] Move global `IF` operation capability to implemented from 29/29 accepted runtime evidence.
+- [x] Move all 20 predicate families consumed by those 29 IF instances to implemented.
+- [x] Remove obsolete partial predicate legacy-equivalent entries after accepted generic migration.
+- [x] Remove obsolete narrow-IF legacy operation note.
+- [x] Update stale bounded Storm Break / Known Horizon guards so owner narrowness is independent of global capability truth.
+- [x] Refresh release-control capability-manifest fingerprint to `daf061a5e539e5880be428256c68d46060ac391e`.
+- [x] TCG Card Pass 2 Validation **#1326 SUCCESS** on exact head `5b1eedcee6eb6893e7c8395fd5ab3f814f52ab33`.
+- [ ] Next operation audit: reconcile already-implemented Event Listener / Tactic / bounded Attack opcodes before adding new engine code.
 
