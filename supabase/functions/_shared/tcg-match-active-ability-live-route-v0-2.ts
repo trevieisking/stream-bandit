@@ -1,4 +1,8 @@
 import {
+  runtimeV02ExecuteActiveAbilityHiddenSample,
+  type RuntimeV02ActiveAbilityHiddenSampleResolution,
+} from "./tcg-match-active-ability-hidden-sample-v0-2.ts";
+import {
   runtimeV02CreateActiveAbilityLiveChoice,
   type RuntimeV02PendingActiveAbilityLiveChoice,
 } from "./tcg-match-active-ability-live-v0-2.ts";
@@ -17,6 +21,10 @@ import type { RuntimeV02DefeatDescribe } from "./tcg-match-defeat-engine-v0-2.ts
 export type RuntimeV02ActiveAbilityLiveRouteResult<
   T extends RuntimeV02CardZoneInstance,
 > =
+  | {
+    kind: "hidden_sample";
+    hidden_sample: RuntimeV02ActiveAbilityHiddenSampleResolution;
+  }
   | {
     kind: "immediate";
     immediate: RuntimeV02ImmediateActiveAbilityLiveRouteResult<T>;
@@ -55,6 +63,13 @@ export function runtimeV02BeginActiveAbilityLiveRoute<
   defeatDescribe: RuntimeV02DefeatDescribe<T>,
   choiceId: string = crypto.randomUUID(),
 ): RuntimeV02ActiveAbilityLiveRouteResult<T> | null {
+  const hiddenSample = runtimeV02ExecuteActiveAbilityHiddenSample(
+    state as Record<string, unknown>,
+    controllerSeat,
+    source,
+  );
+  if (hiddenSample) return { kind: "hidden_sample", hidden_sample: hiddenSample };
+
   const immediate = runtimeV02BeginImmediateActiveAbilityLiveRoute(
     state,
     controllerSeat,
