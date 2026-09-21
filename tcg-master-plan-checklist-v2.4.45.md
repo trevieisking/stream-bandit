@@ -686,3 +686,22 @@
 - [x] TCG Card Pass 2 Validation **#1391 SUCCESS** on exact reconciled head `1583af90051d837ef3b4d2b500b05359c9c4ec19`.
 - [ ] Next runtime repair: implement generic Tactic `SHUFFLE_ZONE_INTO_DECK` for Archivist Sol / Archive Reset through Card-Zone + Randomization ownership.
 
+## V2.4.84 — Archivist Sol SHUFFLE_ZONE_INTO_DECK runtime closeout
+- [x] Prove the frozen Release 1 `SHUFFLE_ZONE_INTO_DECK` inventory is exactly Archivist Sol / Archive Reset steps 0 and 1.
+- [x] Confirm both frozen steps are owner-private hand -> same-player deck operations, one for self and one for opponent.
+- [x] Add one generic Tactic dispatcher branch; no Archivist Sol/card-ID/name routing.
+- [x] Fail closed on unsupported source zone or visibility shape.
+- [x] Move every exact current hand instance through Card-Zone into that same player's deck.
+- [x] Preserve exact instance identity and avoid browser-owned/card-cloning mutation.
+- [x] Shuffle the resulting deck through the canonical Randomization engine.
+- [x] Preserve legal empty-hand behavior by still shuffling the existing deck.
+- [x] Preserve the following fixed-draw / deckout sequence unchanged.
+- [x] Add frozen-family/wiring regression `card-pass-2-tactic-shuffle-zone-into-deck-runtime.test.mjs`.
+- [x] Refresh Tactic Edge entrypoint blob to `45c0ccd58ee2a85cfe08a9b9f1b1e663b47eff7f`.
+- [x] Refresh Tactic 40-file closure to `d8ff415928c85b9ea2bec5168eaa1154c6c4e423a58c0a24b818db51c3cebf73`.
+- [x] Card Pass **#1398 SUCCESS** on complete source/runtime head `99e09efd1fab4380e30822bb23dc573a480b79db`.
+- [x] Move `SHUFFLE_ZONE_INTO_DECK` from missing to implemented in `tcg-runtime-capabilities-v0.2.json`.
+- [x] Refresh release-control capability fingerprint to `04aab8f975d4e582791fbc550f7ee427f6e3988d`.
+- [x] TCG Card Pass 2 Validation **#1400 SUCCESS** on exact capability-reconciled head `fb7a552acffead9da53ca60a33db5c97de66e242`.
+- [ ] Next target: reconcile Quiet Step `CHOOSE_AND_CLEAR_CONTROL_CONDITION` against the existing generic Tactic condition-choice/clear owner.
+
