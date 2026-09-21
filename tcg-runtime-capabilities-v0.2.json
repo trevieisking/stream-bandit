@@ -38,6 +38,7 @@
       "MODIFY_CURRENT_ATTACK_DAMAGE",
       "MODIFY_CURRENT_DAMAGE_PACKET",
       "MODIFY_CURRENT_HEAL",
+      "MODIFY_CURRENT_WITHDRAWAL_COST",
       "MOVE_ATTACHED_ESSENCE",
       "MOVE_CARDS",
       "PROMPT_CHOSEN_PLAYER_TO_SELECT_RESERVE",
@@ -72,7 +73,6 @@
       "DEFEAT_TARGET_IF",
       "DIRECT_DAMAGE",
       "INSPECT_ZONE",
-      "MODIFY_CURRENT_WITHDRAWAL_COST",
       "MOVE_DAMAGE",
       "MOVE_ZONE_POSITION",
       "OPTIONAL",
@@ -98,6 +98,7 @@
       "defeat_history_count_at_least",
       "essence_move_count_at_least",
       "event_action_kind_is",
+      "event_active_seat_is_controller",
       "event_attachment_kind_is",
       "event_attack_source_attached_essence_count_at_least",
       "event_attack_source_has_attached_essence_kind",
@@ -148,7 +149,6 @@
       "essence_move_element_is",
       "essence_move_source_is_attached_creature",
       "essence_move_source_is_self",
-      "event_active_seat_is_controller",
       "event_attachment_target_is_source",
       "event_attack_id_is",
       "event_attack_target_controller_is_opponent",
@@ -538,6 +538,51 @@
         "damage_packet_condition_is"
       ],
       "note": "No runtime source change is required. Damage owner #20 already executes the frozen Heatguard modifier generically. Shared damage-packet predicates remain separately gated because they have other frozen consumers."
+    },
+    "release1_highwind_voluntary_withdrawal_cost_v2_4_90": {
+      "accepted_head": "558b007ff66bab4bfd7515d049c2a0c2105434c0",
+      "card_pass_run": 1457,
+      "operation": "MODIFY_CURRENT_WITHDRAWAL_COST",
+      "predicates": [
+        "event_active_seat_is_controller"
+      ],
+      "frozen_consumers": [
+        "gale-highwind-spires"
+      ],
+      "event": "before_voluntary_withdrawal_cost",
+      "listener_id": "highwind-first-withdrawal",
+      "owners": {
+        "base_cost": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
+        "listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "payment_and_switch": "supabase/functions/_shared/tcg-match-withdrawal-transaction-v0-2.ts",
+        "orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "controller_scope": "any",
+        "limit": {
+          "scope": "turn",
+          "count": 1,
+          "owner": "event_controller"
+        },
+        "modifier": {
+          "delta": -1,
+          "minimum": 0
+        },
+        "preview": "field_actions resolves on structuredClone(state), so presentation cannot consume authoritative listener state",
+        "authoritative": "withdraw resolves the listener after canonical base cost and before exact Payment/Atomic Switch transaction",
+        "grammar": "MODIFY_CURRENT_WITHDRAWAL_COST accepts exactly op + delta + minimum for the frozen Release 1 shape"
+      },
+      "release_closures": {
+        "match_actions": {
+          "file_count": 103,
+          "sha256": "c8d1b9180312565b25fe29c522e5454fe867074ea423c43cb6e046886116f404"
+        },
+        "tactic_actions": {
+          "file_count": 41,
+          "sha256": "a1793729e2efc333bc20f1a14ec711d416b607db79bb4de3096b118ab4b83bd6"
+        }
+      },
+      "note": "No Highwind identity dispatch and no new owner family; Payment and Atomic Switch ownership are unchanged."
     }
   }
 }
