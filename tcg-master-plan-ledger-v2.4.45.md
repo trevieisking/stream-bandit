@@ -562,3 +562,21 @@ The inspected opponent deck-top identity may be shown only to the Ability contro
 
 ## 199 — Night Reading optional selection controls scheduling through Ability IF
 Declining the optional inspected-card bottom move leaves the deck order unchanged and causes `selected_count_at_least` to fail, so no deferred draw is scheduled. Selecting exactly one card reorders it through Card-Zone and schedules the deferred draw.
+
+## 200 — Effect-driven discard Essence attachment remains Attachment Engine-owned
+An active Ability may select an eligible discard Essence, but physical removal, exact-instance attachment, attachment receipts and `essence_attached` listener creation remain with the canonical Essence Attachment route.
+
+## 201 — Active Ability continuation survives nested listener choices
+If an active Ability mutates state and that mutation opens Event, Movement or Heal listener choices before the Ability's remaining steps execute, the unfinished Ability is represented by a server-side continuation receipt. Browser choice state must never become the Ability program counter.
+
+## 202 — Nested Ability listener healing resumes the Ability, not ordinary Play
+The Heal Listener coordinator uses `resume_active_ability_effect` when packets originate from nested listeners inside an unfinished active Ability. Only after that listener queue clears may Match resume the active-Ability continuation.
+
+## 203 — Supply-family player choice preserves sequential structured semantics
+A combined private choice UI may present the optional Essence and mandatory target together, but server validation must preserve the original program constraints: exactly one legal target and zero or one eligible Essence.
+
+## 204 — Active Ability IF observes post-listener authoritative target state
+For supply-family effects, `target_damaged` is evaluated after the selected Essence attachment and all listener continuations have completed. It must not be frozen from pre-attachment browser state.
+
+## 205 — Supply-family public receipts do not reveal selected hidden-zone identities
+Public receipts may expose selected Essence count, target field slot and listener/heal audit. They do not expose the selected discard Essence UID/card ID unless another rule makes that identity public.
