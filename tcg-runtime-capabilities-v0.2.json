@@ -37,6 +37,7 @@
       "PUT_REMAINDER_ON_DECK_BOTTOM",
       "RANDOM_SAMPLE_HIDDEN_ZONE",
       "REPEAT_OPTIONAL",
+      "REPLACE_CONTROL_CONDITION",
       "RETURN_REMAINDER_TO_DECK_TOP",
       "RETURN_SET_TO_DECK_TOP",
       "SEARCH_DECK",
@@ -75,7 +76,6 @@
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
       "RECORD_EVENT",
-      "REPLACE_CONTROL_CONDITION",
       "SCHEDULE_ACTION",
       "SCHEDULE_SOURCE_DISCARD",
       "SELECT_CARDS",
@@ -92,6 +92,7 @@
     "implemented": [
       "attached_essence_distinct_element_count_at_least",
       "card_matches",
+      "control_condition_present",
       "control_condition_slot_empty",
       "damage_history_count_at_least",
       "defeat_history_count_at_least",
@@ -126,7 +127,6 @@
       "attack_actual_damage_at_least",
       "attack_source_is_attached_creature",
       "attack_target_is_opponent_vanguard",
-      "control_condition_present",
       "current_attack_damage_at_least",
       "damage_packet_amount_at_least",
       "damage_packet_class_is",
@@ -254,6 +254,36 @@
         "target_has_condition",
         "target_printed_hp_at_least",
         "target_remains_in_play_after_damage"
+      ]
+    },
+    "release1_control_condition_replace_v2_4_79": {
+      "accepted_head": "fdef1ac7fa8099222079373aa31c0509235d7efb",
+      "card_pass_run": 1369,
+      "operation": "REPLACE_CONTROL_CONDITION",
+      "operation_consumers": [
+        {
+          "id": "shade-hollowcrown",
+          "path": "creature.ability.steps.0"
+        },
+        {
+          "id": "shade-umbravale-thought-hunter",
+          "path": "creature.attacks.1.after_damage.0.then.0"
+        }
+      ],
+      "predicate": "control_condition_present",
+      "predicate_consumers": [
+        {
+          "id": "shade-murkmite",
+          "path": "creature.ability.continuous.0.when"
+        },
+        {
+          "id": "shade-hollowcrown",
+          "path": "creature.ability.requirements.all.0"
+        },
+        {
+          "id": "shade-umbravale-thought-hunter",
+          "path": "creature.ability.requirements.all.0"
+        }
       ]
     }
   }
