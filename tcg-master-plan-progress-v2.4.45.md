@@ -1380,7 +1380,7 @@ Release-control is refreshed on current exact head `c37660dd4c712055ca027caf18a0
 - Match: **98 files**, `89dd8281cdd596083a2bc65ddc6760ac5cda4716fc25691e084962fd8a30fb63`;
 - Tactic: **40 files**, `b23e7d6c2c6142087d01fac47ad2ed03664ac5467a008a9553bd413ad9c4ba3a`.
 
-Exact-head Card Pass #1306 is in progress. Surgefin is therefore **source-complete / runtime-tested / exact-head acceptance pending**.
+Exact-head Card Pass **#1306 SUCCESS** on `c37660dd4c712055ca027caf18a036684de89e09` accepted the Surgefin / Undertow Supply slice. Surgefin is **source-complete / runtime-tested / exact-head accepted**.
 
 Ability IF source/accounting progress: **8 / 9**.
 Final active Ability IF target: Tide — Marevault / Heart of Tides.
