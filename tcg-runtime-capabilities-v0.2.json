@@ -55,6 +55,7 @@
       "SEARCH_DECK_GROUP",
       "SELECT_CREATURE",
       "SET_ATTACK_ELIGIBILITY",
+      "SET_WITHDRAWAL_MODIFIER",
       "SHUFFLE_DECK",
       "SHUFFLE_ZONE_INTO_DECK",
       "SWITCH_WITH_VANGUARD"
@@ -62,8 +63,7 @@
     "partial": [
       "ATTACH_ESSENCE_FROM_ZONE",
       "CHOOSE_FROM_SET",
-      "HEAL_EACH",
-      "SET_WITHDRAWAL_MODIFIER"
+      "HEAL_EACH"
     ],
     "missing": [
       "APPLY_CONDITION",
@@ -631,6 +631,67 @@
         }
       },
       "note": "Pilot Sera remains data only. Tactic and Match no longer interpret lifecycle_attack_eligibility fields directly; no new owner family, database change, deployment or live write is required."
+    },
+    "release1_withdrawal_modifier_lifecycle_v2_4_92": {
+      "accepted_head": "e8bb4026e3950d6cec947feb241655c7eedc9524",
+      "card_pass_run": 1480,
+      "operation": "SET_WITHDRAWAL_MODIFIER",
+      "frozen_consumers": [
+        "astral-starwhale",
+        "gale-featherstep",
+        "gale-jetstream-essence",
+        "gale-pinionserpent",
+        "gale-slipwing",
+        "gale-whiffin",
+        "stone-keeper-tor",
+        "tide-undertow-net",
+        "volt-copperkite"
+      ],
+      "owners": {
+        "withdrawal_modifier": "supabase/functions/_shared/tcg-match-withdrawal-modifier-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "withdrawal_base": "supabase/functions/_shared/tcg-match-withdrawal-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts",
+        "aftermath": "supabase/functions/_shared/tcg-match-aftermath-v0-2.ts",
+        "payment_and_switch": "supabase/functions/_shared/tcg-match-withdrawal-transaction-v0-2.ts"
+      },
+      "semantics": {
+        "modes": [
+          "set",
+          "delta"
+        ],
+        "amount": "integer or frozen target_has_condition case formula",
+        "minimum_floor": true,
+        "maximum_after_this_source": true,
+        "source_category": true,
+        "withdrawal_increase_immunity": "opponent-card-effect increases honor canonical attached-Essence immunity",
+        "expires_on": [
+          "end_of_turn",
+          "controller_aftermath",
+          "target_controller_aftermath_started"
+        ],
+        "one_use": "max_uses + legal_voluntary_withdrawal_declared consumption",
+        "failed_transaction": "request-local mutation is not persisted when Payment/Atomic Switch fails"
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-withdrawal-modifier.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts",
+        "tcg/tests/card-pass-2-withdrawal-modifier-runtime.test.mjs",
+        "tcg/tests/card-pass-2-runtime-creature-entered-play.test.mjs",
+        "tcg-runtime-pass-b-withdrawal-wire.mjs --check"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 105,
+          "sha256": "4a48a1c2de811cef3303f0408baf513823737d33477e071313dcb025a847bfba"
+        },
+        "tactic_actions": {
+          "file_count": 43,
+          "sha256": "45bb40d0caf00dbce9e1450c768998fd296b6f8a2ecf786fb28774dedce9d84b"
+        }
+      },
+      "note": "One structured Withdrawal-modifier lifecycle owner now serves triggered Event Listener and Tactic producers; Match resolves/consumes it and Aftermath expires it. No card-ID dispatch, no new owner family, and Payment/Atomic Switch ownership are unchanged."
     }
   }
 }
