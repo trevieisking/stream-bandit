@@ -629,8 +629,8 @@ export function runtimeV02ResumeActiveAbilitySupply(
   };
   const healed = applyRuntimeV02HealPacket(
     state,
-    resume.heal_amount,
     found.creature,
+    resume.heal_amount,
     context,
   );
   return {
