@@ -10,6 +10,7 @@ import {
   structuredRuntimeAftermathEssenceDisposition,
   type RuntimeLifecycleInstance,
 } from "./tcg-match-surge-lifecycle-v0-2.ts";
+import { runtimeV02ExpireWithdrawalModifiersAtAftermath } from "./tcg-match-withdrawal-modifier-v0-2.ts";
 
 export type RuntimeV02AftermathCard = RuntimeLifecycleInstance & {
   uid: string;
@@ -105,6 +106,7 @@ export function runtimeV02ResolveAftermath(
   if (!owner) throw new Error("tcg_v0_2_aftermath_player_required");
 
   const turnSeq = Number(state.turn_seq || 0);
+  runtimeV02ExpireWithdrawalModifiersAtAftermath(state, seat);
   const logMessages: string[] = [];
   const transferPlans: RuntimeV02AftermathTransferPlan[] = [];
   let conditionResult: RuntimeV02ConditionAftermathResult | null = null;

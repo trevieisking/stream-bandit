@@ -11,7 +11,7 @@ import { applyRuntimeV02HealPacket } from "./tcg-match-heal-packet-v0-2.ts";
 import { recordRuntimeV02HiddenInformationView } from "./tcg-match-hidden-information-v0-2.ts";
 import { runtimeV02RandomSampleHiddenZone } from "./tcg-match-hidden-zone-sample-v0-2.ts";
 import { runtimeV02InspectRewardPositions } from "./tcg-match-reward-inspection-v0-2.ts";
-import { structuredRuntimeWithdrawalBaseCost } from "./tcg-match-withdrawal-v0-2.ts";
+import { runtimeV02InstallWithdrawalModifier } from "./tcg-match-withdrawal-modifier-v0-2.ts";
 import { applyRuntimeV02AttachmentAttackDamageModifier } from "./tcg-match-surge-lifecycle-v0-2.ts";
 import type { RuntimeV02EssenceAttachedListenerEvent } from "./tcg-match-essence-attachment-event-v0-2.ts";
 import { runtimeV02ApplyEssenceAttachmentTransaction } from "./tcg-match-essence-attachment-engine-v0-2.ts";
@@ -1552,92 +1552,6 @@ function cardOptions(
     }));
 }
 
-function validateDuration(
-  step: Record<string, unknown>,
-): void {
-  const duration = objectRecord(step.duration);
-  if (
-    !duration || !Array.isArray(duration.expires_on) ||
-    !duration.expires_on.map(String).includes("end_of_turn")
-  ) {
-    throw new Error(
-      "tcg_v0_2_event_listener_withdrawal_modifier_expiry_unsupported",
-    );
-  }
-  if (
-    duration.max_uses != null &&
-    (!Number.isInteger(Number(duration.max_uses)) ||
-      Number(duration.max_uses) < 1)
-  ) {
-    throw new Error(
-      "tcg_v0_2_event_listener_withdrawal_modifier_max_uses_invalid",
-    );
-  }
-}
-
-function baseWithdrawalCost(
-  state: Record<string, unknown>,
-  target: Field,
-): number {
-  const creature = objectRecord(target.def.creature);
-  const printed = Number(
-    creature?.withdrawal ?? target.def.withdrawal ?? target.def.withdraw ?? 0,
-  );
-  if (!Number.isFinite(printed) || printed < 0) {
-    throw new Error(
-      "tcg_v0_2_event_listener_withdrawal_printed_invalid",
-    );
-  }
-  const conditions = runtimeConditions(target.cr);
-  const structured = structuredRuntimeWithdrawalBaseCost(
-    state,
-    target.cr,
-    printed,
-    String(target.def.element || ""),
-    conditions.modifier === "Crushed",
-  );
-  return structured == null ? printed : structured;
-}
-
-function setWithdrawalModifier(
-  state: Record<string, unknown>,
-  target: Field,
-  step: Record<string, unknown>,
-): void {
-  validateDuration(step);
-  target.cr.flags ||= {};
-  const flags = target.cr.flags as Record<string, unknown>;
-  const prior = objectRecord(flags.lifecycle_withdrawal_cost);
-  let value = prior && Number(prior.turn_seq) === currentTurn(state)
-    ? Number(prior.value)
-    : baseWithdrawalCost(state, target);
-  const mode = String(step.mode || "delta");
-  if (mode === "set") {
-    value = numberValue(
-      step.amount,
-      "tcg_v0_2_event_listener_withdrawal_modifier_amount_invalid",
-    );
-  } else if (mode === "delta") {
-    value += numberValue(
-      step.amount ?? step.delta,
-      "tcg_v0_2_event_listener_withdrawal_modifier_delta_invalid",
-    );
-  } else {
-    throw new Error(
-      `tcg_v0_2_event_listener_withdrawal_modifier_mode_unsupported:${mode}`,
-    );
-  }
-  const minimum = step.minimum == null ? 0 : numberValue(
-    step.minimum,
-    "tcg_v0_2_event_listener_withdrawal_modifier_minimum_invalid",
-  );
-  flags.lifecycle_withdrawal_cost = {
-    turn_seq: currentTurn(state),
-    value: Math.max(minimum, value, 0),
-    expires: "end_of_turn",
-  };
-}
-
 function removeCardRef(
   state: Record<string, unknown>,
   ref: CardRef,
@@ -2197,17 +2111,19 @@ function executeStep(
   }
 
   if (op === "SET_WITHDRAWAL_MODIFIER") {
-    setWithdrawalModifier(
+    const target = targetField(
       state,
-      targetField(
-        state,
-        continuation,
-        candidate,
-        event,
-        step.target,
-      ),
-      step,
+      continuation,
+      candidate,
+      event,
+      step.target,
     );
+    runtimeV02InstallWithdrawalModifier(state, target.cr, step, {
+      source_controller_seat: candidate.seat,
+      target_controller_seat: target.seat,
+      source_card_uid: candidate.source.uid,
+      source_action_id: listenerId(candidate),
+    });
     continuation.step_cursor++;
     return "continue";
   }

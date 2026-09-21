@@ -8,6 +8,7 @@ import { applyRuntimeV02HealPacket } from "../_shared/tcg-match-heal-packet-v0-2
 import { runtimeV02BeginTacticHealListenerContinuation, runtimeV02PendingHealListenerChoiceView, runtimeV02ResolveTacticHealListenerChoice, type RuntimeV02PendingHealListenerChoice } from "../_shared/tcg-match-heal-listener-live-v0-2.ts";
 import { runtimeV02ApplyAtomicSwitch } from "../_shared/tcg-match-switch-context-v0-2.ts";
 import { runtimeV02InstallAttackEligibilityRule, runtimeV02NormalizeAttackEligibilityRule } from "../_shared/tcg-match-attack-eligibility-v0-2.ts";
+import { runtimeV02InstallWithdrawalModifier } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02CreateEssenceMovedEvent, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
@@ -1396,6 +1397,18 @@ function executeUntilChoice(state: any) {
         uses: Math.max(1, Number(step.uses || 1)),
         expires: String(step.expires || "end_of_turn"),
       };
+      effect.cursor++;
+      continue;
+    }
+    if (op === "SET_WITHDRAWAL_MODIFIER") {
+      const found = tacticCreatureTarget(state, ownerSeat, vars, step.target);
+      if (!found) throw new Error("withdrawal_modifier_target_missing");
+      runtimeV02InstallWithdrawalModifier(state, found.cr, step, {
+        source_controller_seat: ownerSeat as 1 | 2,
+        target_controller_seat: found.seat as 1 | 2,
+        source_card_uid: effect.source_card.uid,
+        source_action_id: effect.id,
+      });
       effect.cursor++;
       continue;
     }
