@@ -2236,3 +2236,84 @@ Read-only preflight proves the current capability is genuinely partial:
 - frozen cards require set/delta forms, formula amounts, multiple expiry boundaries, source-aware caps and opponent-turn persistence.
 
 V2.4.92 must therefore create one canonical Withdrawal-modifier lifecycle owner and make Event Listener, Tactic and Ability producers delegate to it. It must not create a second Withdrawal, Payment or Atomic Switch engine, and it must remain card-ID-free.
+
+
+## V2.4.92 — accepted Withdrawal modifier lifecycle ownership
+
+`SET_WITHDRAWAL_MODIFIER` is now fully implemented through one canonical structured lifecycle owner instead of separate Event Listener and Tactic flag mutation.
+
+### Frozen Release 1 inventory
+
+Exactly nine consumers use `SET_WITHDRAWAL_MODIFIER`:
+- Astral / Starwhale;
+- Gale / Featherstep;
+- Gale / Jetstream Essence;
+- Gale / Pinionserpent;
+- Gale / Slipwing;
+- Gale / Whiffin;
+- Stone / Keeper Tor;
+- Tide / Undertow Net;
+- Volt / Copperkite.
+
+### Canonical ownership
+
+`supabase/functions/_shared/tcg-match-withdrawal-modifier-v0-2.ts` now owns:
+- set and delta modifier records;
+- integer and frozen conditional amount formula evaluation;
+- minimum floor and `maximum_after_this_source`;
+- source category semantics;
+- Granite-style opponent Withdrawal-increase immunity;
+- `end_of_turn`, `controller_aftermath` and `target_controller_aftermath_started` expiry;
+- one-use `legal_voluntary_withdrawal_declared` consumption.
+
+Producer/consumer split:
+- Event Listener installs triggered Creature/Essence modifiers through the shared owner;
+- Tactic installs structured Tactic modifiers through the same owner;
+- Match resolves lifecycle modifiers after canonical base/continuous Withdrawal calculation and before the packet-local Highwind current-cost listener;
+- authoritative legal withdrawal consumes one-use lifecycle records;
+- Aftermath expires declared lifecycle records at the correct boundary;
+- Payment + Atomic Switch remain owned by `tcg-match-withdrawal-transaction-v0-2.ts`.
+
+No frozen card identity is runtime dispatch authority. The legacy Tactic `SET_WITHDRAWAL_COST` compatibility route remains for legacy snapshots but is not structured v0.2 authority.
+
+### Validation / release evidence
+
+Source/runtime + release-control accepted head:
+`e8bb4026e3950d6cec947feb241655c7eedc9524`.
+
+TCG Card Pass 2 Validation **#1480 SUCCESS**:
+- 537 Node validation tests;
+- deterministic runtime tests;
+- Match, Tactic, setup, Withdrawal, Attack and Surge type-checks;
+- Runtime Pass B Withdrawal, Attack Damage and Surge guarded wiring checks.
+
+Exact Edge closures:
+- Match: 105 files / `4a48a1c2de811cef3303f0408baf513823737d33477e071313dcb025a847bfba`;
+- Tactic: 43 files / `45bb40d0caf00dbce9e1450c768998fd296b6f8a2ecf786fb28774dedce9d84b`.
+
+Capability reconciliation:
+- `SET_WITHDRAWAL_MODIFIER` moved from **partial** to **implemented**;
+- capability blob: `9b33834f794be37a9814b9f6bbb9a6dee37c58d8`;
+- exact capability-reconciled head:
+  `45164fad24d17037a58102d305996d755722425a`;
+- Card Pass **#1481 SUCCESS**.
+
+Owner-family count remains **40**. No database migration, Supabase Edge deployment, main merge or live promotion was performed.
+
+### Next exact runtime target — V2.4.93
+
+`HEAL_EACH` all-consumer parity.
+
+Frozen Release 1 has exactly four consumers:
+- Grove / Verdantusk — Attack `after_damage`;
+- Grove / Elderbloom — First Canopy — active Ability;
+- Tide / Marevault — Heart of Tides — mixed Attack `after_damage_finished`;
+- Tide / Reef Medic Olan — Tactic.
+
+Read-only preflight proves:
+- Verdantusk already has a structured Attack HEAL_EACH owner and canonical heal-packet/listener wiring;
+- Reef Medic Olan already executes through Tactic HEAL_EACH and canonical heal packets;
+- Elderbloom's `SELECT_CREATURE -> HEAL_EACH` active-Ability shape is not executed by the current active-Ability owners;
+- Marevault's mixed `MOVE_ATTACHED_ESSENCE -> SELECT_CREATURE -> HEAL_EACH -> OPTIONAL switch` `after_damage_finished` program is outside the existing after-damage HEAL_EACH owner.
+
+Therefore V2.4.93 is a real parity target. The repair must reuse the canonical Heal/Heal Packet/listener owners and existing private-choice transports, remain operation-shaped and card-ID-free, and must not create a second Heal engine.

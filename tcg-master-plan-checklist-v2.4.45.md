@@ -849,3 +849,31 @@
 - [x] Refresh capability fingerprint to `99955f0f5cff5fed252ad737f4020fb178d89353`.
 - [x] Card Pass **#1472 SUCCESS** on exact capability-reconciled head `f913b23bcc7064258a18fe1011a877ed5679c95f`.
 - [ ] V2.4.92: centralize `SET_WITHDRAWAL_MODIFIER` lifecycle ownership across Event Listener, Tactic and Ability producers; preserve Withdrawal/Payment/Atomic Switch ownership.
+
+
+## V2.4.92 — Withdrawal modifier lifecycle closeout
+- [x] Freeze `SET_WITHDRAWAL_MODIFIER` inventory to exactly nine Release 1 consumers.
+- [x] Add one canonical structured Withdrawal-modifier lifecycle owner.
+- [x] Support frozen set/delta modifier modes.
+- [x] Support frozen integer and target-condition case amount forms.
+- [x] Support minimum floor and `maximum_after_this_source`.
+- [x] Preserve source-category semantics and canonical Granite opponent-increase immunity.
+- [x] Support `end_of_turn`, `controller_aftermath` and `target_controller_aftermath_started` expiry.
+- [x] Support one-use consumption on legal voluntary Withdrawal declaration.
+- [x] Make Event Listener delegate structured modifier installation.
+- [x] Make Tactic delegate structured modifier installation.
+- [x] Preserve legacy `SET_WITHDRAWAL_COST` compatibility without making it v0.2 authority.
+- [x] Make Match resolve shared lifecycle modifiers after base/continuous Withdrawal and before Highwind current-cost listener.
+- [x] Consume one-use lifecycle modifiers only on authoritative legal declaration.
+- [x] Expire lifecycle modifiers at canonical Aftermath boundaries.
+- [x] Preserve Payment and Atomic Switch ownership unchanged.
+- [x] Preserve no-card-ID dispatch and owner-family count 40.
+- [x] Rebind old Whiffin/static ownership regression checks to the canonical owner.
+- [x] Reconcile the guarded Runtime Pass B Withdrawal wire check to the canonical lifecycle supersession without weakening its structured-ownership assertions.
+- [x] Match Edge closure = 105 files / `4a48a1c2de811cef3303f0408baf513823737d33477e071313dcb025a847bfba`.
+- [x] Tactic Edge closure = 43 files / `45bb40d0caf00dbce9e1450c768998fd296b6f8a2ecf786fb28774dedce9d84b`.
+- [x] Card Pass **#1480 SUCCESS** on exact source/runtime + release-control head `e8bb4026e3950d6cec947feb241655c7eedc9524`.
+- [x] Move `SET_WITHDRAWAL_MODIFIER` from partial to implemented.
+- [x] Refresh capability fingerprint to `9b33834f794be37a9814b9f6bbb9a6dee37c58d8`.
+- [x] Card Pass **#1481 SUCCESS** on exact capability-reconciled head `45164fad24d17037a58102d305996d755722425a`.
+- [ ] V2.4.93: close `HEAL_EACH` parity across Verdantusk Attack, Elderbloom active Ability, Marevault mixed after-damage-finished Attack and Reef Medic Olan Tactic without duplicating Heal ownership.

@@ -834,3 +834,19 @@ Release 1 uses `SET_WITHDRAWAL_MODIFIER` from multiple producer families. Event 
 
 ## 289 — Withdrawal modifier duration and source semantics are gameplay state
 Frozen withdrawal modifiers include end-of-turn, controller-aftermath and target-controller-aftermath boundaries, one-use declarations, source-aware caps and formula amounts. These semantics cannot be reduced to a same-turn scalar or presentation helper; they must be represented and consumed by the canonical server-side lifecycle owner.
+
+
+## 290 — Withdrawal modifier producers delegate; they do not own lifecycle state
+Triggered Event Listener programs and Tactic programs may request `SET_WITHDRAWAL_MODIFIER`, but one shared Withdrawal-modifier owner validates and stores the structured lifecycle record. Producer families must not create parallel scalar flag semantics for v0.2 cards.
+
+## 291 — one-use Withdrawal modifiers are consumed by legal declaration authority
+A `max_uses` modifier with `consume_on: legal_voluntary_withdrawal_declared` is consumed only by the authoritative legal Withdrawal declaration path. Presentation projection uses cloned state. A later Payment or Atomic Switch failure cannot persist that request-local consumption.
+
+## 292 — Withdrawal increases respect canonical source immunity
+A structured modifier that would increase a target's Withdrawal cost must pass the existing continuous `withdrawal_increase_immunity` owner. Source category is evaluated from the target's perspective; an opposing card effect cannot bypass Granite-style immunity by entering through a new producer route.
+
+## 293 — target-controller aftermath expiry happens at Aftermath start
+A modifier declared to expire on `target_controller_aftermath_started` remains valid through the target controller's playable turn and is removed when that controller's Aftermath begins. Match projection and turn-number heuristics must not expire it earlier.
+
+## 294 — HEAL_EACH capability requires all four frozen execution surfaces
+`HEAL_EACH` remains partial until Verdantusk Attack, Elderbloom active Ability, Marevault after-damage-finished Attack and Reef Medic Olan Tactic all execute through canonical Heal/Heal Packet/listener ownership. Existing Attack/Tactic success cannot be stretched into Ability or after-damage-finished acceptance.
