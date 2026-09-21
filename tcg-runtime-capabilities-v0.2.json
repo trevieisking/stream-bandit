@@ -54,6 +54,7 @@
       "SEARCH_DECK",
       "SEARCH_DECK_GROUP",
       "SELECT_CREATURE",
+      "SET_ATTACK_ELIGIBILITY",
       "SHUFFLE_DECK",
       "SHUFFLE_ZONE_INTO_DECK",
       "SWITCH_WITH_VANGUARD"
@@ -62,7 +63,6 @@
       "ATTACH_ESSENCE_FROM_ZONE",
       "CHOOSE_FROM_SET",
       "HEAL_EACH",
-      "SET_ATTACK_ELIGIBILITY",
       "SET_WITHDRAWAL_MODIFIER"
     ],
     "missing": [
@@ -583,6 +583,56 @@
         }
       },
       "note": "No Highwind identity dispatch and no new owner family; Payment and Atomic Switch ownership are unchanged."
+    }
+  },
+  "reconciliation": {
+    "release1_pilot_sera_attack_eligibility_v2_4_91": {
+      "accepted_head": "ccb995b99131c2292e79d84a4bd0ba415c0564de",
+      "card_pass_run": 1468,
+      "operation": "SET_ATTACK_ELIGIBILITY",
+      "frozen_consumers": [
+        "gale-pilot-sera"
+      ],
+      "frozen_shape": {
+        "prefix": {
+          "op": "REPEAT_OPTIONAL",
+          "max": 2
+        },
+        "eligibility": {
+          "op": "SET_ATTACK_ELIGIBILITY",
+          "scope": "controller_turn",
+          "rule": "only_final_vanguard_may_attack"
+        }
+      },
+      "owners": {
+        "attack_eligibility": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "attack_projection_and_command": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "grammar": "SET_ATTACK_ELIGIBILITY accepts exactly op + scope + rule for the frozen Release 1 shape",
+        "installation": "after Pilot Sera's repeated optional switches resolve, the shared owner anchors the final current Vanguard Creature",
+        "enforcement": "field_actions projection and authoritative attack both call the same shared block-reason owner",
+        "evolution": "the anchored Creature remains eligible when evolved because its anchor uid remains in the Vanguard stack",
+        "later_same_turn_switch": "a different Vanguard is blocked from attacking for that controller turn",
+        "expiry": "turn_seq change expires the controller-turn receipt semantically",
+        "controller_scope": "receipt ownership is per controller seat"
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-eligibility.test.ts",
+        "tcg/tests/card-pass-2-attack-eligibility-runtime.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 104,
+          "sha256": "8651b93e05cac1e995575563ecfef5e618f4e4348d016d51d8e04dd25f71333f"
+        },
+        "tactic_actions": {
+          "file_count": 42,
+          "sha256": "3deacabefcaf906388cf32dfbb347ac4b5484fd62554ac0c6f779b5817bcec91"
+        }
+      },
+      "note": "Pilot Sera remains data only. Tactic and Match no longer interpret lifecycle_attack_eligibility fields directly; no new owner family, database change, deployment or live write is required."
     }
   }
 }
