@@ -1703,3 +1703,42 @@ Reconcile `SCHEDULE_ACTION`.
 
 The frozen Release 1 inventory contains exactly one consumer, Shade — Noctivane / Night Reading. V2.4.73 already accepted a generic Active Ability deck-reading owner that delegates deferred-action storage/execution to `tcg-match-scheduled-action-v0-2.ts`, Card-Zone owns the eventual fixed draw, and Match resolves the schedule at the controller-AFTERMATH boundary before canonical turn advance.
 
+## V2.4.83 — accepted Noctivane scheduled-action capability reconciliation
+
+The frozen Release 1 `SCHEDULE_ACTION` inventory contains exactly one consumer:
+- Shade — Noctivane / Night Reading.
+
+No new runtime implementation was required.
+
+V2.4.73 already accepted the complete generic ownership chain:
+- the active Ability deck-reading owner recognizes the frozen inspect -> optional bottom -> IF -> scheduled-action shape without Noctivane/card-ID dispatch;
+- controller-private opponent deck-top inspection is recorded by Hidden Information;
+- exact optional deck-top -> deck-bottom reordering delegates to Card-Zone;
+- shared Active Ability IF evaluates `selected_count_at_least`;
+- `runtimeV02ScheduleAction` records the deferred action in the server-owned scheduled-action ledger;
+- only the matching controller / matching turn / `controller_aftermath_finished` trigger resolves it;
+- terminal-match guard consumes the schedule without mutation when required;
+- nested `DRAW_FIXED` delegates exact deck -> hand movement to Card-Zone and applies deckout only when the fixed draw is incomplete;
+- Match resolves controller-AFTERMATH schedules before canonical turn advance;
+- public receipts expose structural schedule outcome only, not hidden inspected card identity.
+
+`tcg-runtime-capabilities-v0.2.json` now classifies
+`SCHEDULE_ACTION` as **implemented**.
+
+Release-control capability-manifest fingerprint is
+`c900277c1a576e2de33c795914a45a676c1e8067`.
+
+TCG Card Pass 2 Validation **#1391 SUCCESS** on exact reconciled head
+`1583af90051d837ef3b4d2b500b05359c9c4ec19`.
+
+### Next exact runtime target
+
+Astral — Archivist Sol / Archive Reset.
+
+The frozen program contains two `SHUFFLE_ZONE_INTO_DECK` steps:
+1. self hand -> own deck;
+2. opponent hand -> opponent deck;
+both owner-private, followed by fixed draws of 5 for each player and final deckout check.
+
+Current Tactic runtime owns `SHUFFLE_DECK` but has no `SHUFFLE_ZONE_INTO_DECK` opcode branch. V2.4.84 must add one generic Tactic operation that moves all exact cards from the requested hand into that same player's deck through Card-Zone and then shuffles the resulting deck through the canonical Randomization engine. No Archivist Sol/card-ID branch, no identity exposure, and no duplicate zone/random owner.
+
