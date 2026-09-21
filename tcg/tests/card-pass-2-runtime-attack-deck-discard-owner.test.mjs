@@ -67,12 +67,11 @@ test('attack dispatcher preserves the accepted deck-discard event-to-heal owner 
   );
 
   const attack = dispatcher.slice(dispatcher.indexOf('if(action==="attack")'));
-  const orderedCalls = [
-    'runtimeV02ResolveAfterDamageDeckDiscard(',
-    'runtimeV02CreateDeckCardsDiscardedEvent(',
-    'runtimeV02BeginEventListenerContinuation(',
-    'runtimeV02BeginAttackHealListenerContinuation(',
-  ].map((call) => attack.indexOf(call));
+  const resolveIndex = attack.indexOf('runtimeV02ResolveAfterDamageDeckDiscard(');
+  const eventCreateIndex = attack.indexOf('runtimeV02CreateDeckCardsDiscardedEvent(', resolveIndex);
+  const eventListenerIndex = attack.indexOf('runtimeV02BeginEventListenerContinuation(', eventCreateIndex);
+  const healListenerIndex = attack.indexOf('runtimeV02BeginAttackHealListenerContinuation(', eventListenerIndex);
+  const orderedCalls = [resolveIndex, eventCreateIndex, eventListenerIndex, healListenerIndex];
   assert.ok(orderedCalls.every((index) => index >= 0), orderedCalls.join(','));
   assert.deepEqual([...orderedCalls].sort((a, b) => a - b), orderedCalls);
 
