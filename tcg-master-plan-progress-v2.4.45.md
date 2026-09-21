@@ -2190,3 +2190,49 @@ Read-only preflight shows:
 
 V2.4.91 therefore begins as reconciliation proof. It must verify the exact frozen `scope: controller_turn / rule: only_final_vanguard_may_attack` grammar, expiry/reset semantics and the complete Pilot Sera repeated-switch -> final-Vanguard attack restriction before moving the capability label.
 
+
+
+## V2.4.91 — accepted Pilot Sera Attack Eligibility reconciliation
+
+Gale — Pilot Sera now uses one canonical Attack Eligibility owner for both projection and authoritative Attack enforcement. The frozen card remains data only; no card-ID dispatch and no new owner family were introduced.
+
+### Frozen family
+Exactly one Release 1 consumer uses `SET_ATTACK_ELIGIBILITY`:
+- `gale-pilot-sera`
+- after `REPEAT_OPTIONAL max:2` effect switches
+- `scope: controller_turn`
+- `rule: only_final_vanguard_may_attack`.
+
+### Canonical ownership
+- `supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts` owns grammar normalization, final-Vanguard anchor installation, current-turn validity and Attack block-reason evaluation.
+- Tactic installs the rule only after Pilot Sera's preceding optional switches resolve.
+- Match `field_actions` projection and authoritative `attack` command call the same Attack Eligibility owner.
+- Creature evolution preserves eligibility because the anchored Creature identity remains in the Vanguard stack; a later same-turn switch to a different Creature is blocked.
+- Turn change expires the controller-turn receipt semantically.
+
+### Regression / release evidence
+- deterministic owner lifecycle: `runtime-v0-2-attack-eligibility.test.ts`;
+- frozen inventory + no-card-ID guard: `card-pass-2-attack-eligibility-runtime.test.mjs`;
+- Match Edge closure: 104 files / `8651b93e05cac1e995575563ecfef5e618f4e4348d016d51d8e04dd25f71333f`;
+- Tactic Edge closure: 42 files / `3deacabefcaf906388cf32dfbb347ac4b5484fd62554ac0c6f779b5817bcec91`;
+- source/runtime accepted head `ccb995b99131c2292e79d84a4bd0ba415c0564de` / Card Pass **#1468 SUCCESS**;
+- exact capability-reconciled PR head `f913b23bcc7064258a18fe1011a877ed5679c95f` / Card Pass **#1472 SUCCESS**;
+- capability blob `99955f0f5cff5fed252ad737f4020fb178d89353`.
+
+`SET_ATTACK_ELIGIBILITY` is now classified **implemented**.
+
+The canonical owner-family count remains **40**. Main/live Supabase remains untouched by V2.4.91.
+
+### Next exact runtime target — V2.4.92
+
+`SET_WITHDRAWAL_MODIFIER` lifecycle ownership reconciliation.
+
+Read-only preflight proves the current capability is genuinely partial:
+- frozen Release 1 has exactly nine consumers across triggered Creature abilities, an Essence listener and Tactic programs;
+- Event Listener currently writes `flags.lifecycle_withdrawal_cost` itself;
+- Tactic still owns a separate legacy `SET_WITHDRAWAL_COST` write path and does not execute the v0.2 opcode;
+- active-Ability structured routes do not execute `SET_WITHDRAWAL_MODIFIER`;
+- Match already consumes `lifecycle_withdrawal_cost`, but only as a same-`turn_seq` scalar;
+- frozen cards require set/delta forms, formula amounts, multiple expiry boundaries, source-aware caps and opponent-turn persistence.
+
+V2.4.92 must therefore create one canonical Withdrawal-modifier lifecycle owner and make Event Listener, Tactic and Ability producers delegate to it. It must not create a second Withdrawal, Payment or Atomic Switch engine, and it must remain card-ID-free.
