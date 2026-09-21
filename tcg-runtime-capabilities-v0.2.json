@@ -16,6 +16,7 @@
       "ADD_DAMAGE_PROTECTION",
       "ADD_INCOMING_ATTACK_DAMAGE_MODIFIER",
       "ADD_SHIELD",
+      "ADD_SHIELD_EACH",
       "CHECK_DECKOUT_AFTER_RESOLUTION",
       "CHOOSE_AND_CLEAR_CONDITION",
       "CHOOSE_AND_CLEAR_CONTROL_CONDITION",
@@ -63,7 +64,6 @@
       "SET_WITHDRAWAL_MODIFIER"
     ],
     "missing": [
-      "ADD_SHIELD_EACH",
       "APPLY_CONDITION",
       "ATTACH_ESSENCE_FROM_SELECTION",
       "DEAL_EFFECT_DAMAGE",
@@ -469,6 +469,45 @@
         "source instance turn limits block a second trigger and reset next turn"
       ],
       "note": "No runtime source change is required. Existing Heal #21 and after-heal listener owners already execute the complete frozen semantics generically."
+    },
+    "release1_shield_each_attack_tactic_parity_v2_4_88": {
+      "accepted_head": "0d875a926b6cb23740ca7f3a2a3ca84b93e24913",
+      "card_pass_run": 1438,
+      "operation": "ADD_SHIELD_EACH",
+      "consumers": {
+        "attack": [
+          "stone-crowncrag-mountain-warden"
+        ],
+        "tactic": [
+          "stone-reversal-seal"
+        ]
+      },
+      "owners": {
+        "attack_shield_choice": "supabase/functions/_shared/tcg-match-attack-shield-choice-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "shield_primitive": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts"
+      },
+      "release_closures": {
+        "match_actions": {
+          "file_count": 103,
+          "sha256": "3e288b0c448d1456f508ff680a0153bded59a118c403ebbbdf0e6a57fe76edcc"
+        },
+        "tactic_actions": {
+          "file_count": 41,
+          "sha256": "9a33a92624e4ac058f9c0ee12200344a67479fb7f97c5e2aa43283c5be45ad65"
+        }
+      },
+      "evidence": [
+        "Crown-style mixed after-damage Shield program is parsed generically",
+        "Crown-style begin applies source Shield and exposes only legal filtered targets",
+        "Crown-style multi-select resolves up to two targets through the shared Shield cap",
+        "Crown-style optional choice accepts zero selected targets",
+        "Crown-style resolution rebinds every selected target before any target Shield mutation",
+        "frozen ADD_SHIELD_EACH inventory is exactly Crowncrag plus Reversal Seal",
+        "Tactic interpreter owns ADD_SHIELD_EACH generically through the shared Shield primitive"
+      ],
+      "note": "Attack/Tactic parity is complete without card-ID dispatch. Crowncrag uses the generic Attack private-choice specialist; Reversal Seal remains on the existing Tactic interpreter path; both delegate Shield mutation to addRuntimeShield."
     }
   }
 }
