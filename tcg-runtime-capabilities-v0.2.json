@@ -583,9 +583,7 @@
         }
       },
       "note": "No Highwind identity dispatch and no new owner family; Payment and Atomic Switch ownership are unchanged."
-    }
-  },
-  "reconciliation": {
+    },
     "release1_pilot_sera_attack_eligibility_v2_4_91": {
       "accepted_head": "ccb995b99131c2292e79d84a4bd0ba415c0564de",
       "card_pass_run": 1468,
