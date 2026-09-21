@@ -797,3 +797,12 @@ Release 1 `ADD_SHIELD_EACH` is implemented only when both frozen consumers are p
 ## 277 — damage-packet operation truth is narrower than shared predicate truth
 Heatguard Bracer's `MODIFY_CURRENT_DAMAGE_PACKET` may be reconciled from Damage owner #20 once its exact before-damage contract is proven. Shared `damage_packet_*` predicates must not be promoted from Heatguard evidence alone when other frozen consumers, including after-damage listeners such as Thorn Crown, still require separate owner evidence.
 
+## 278 — current damage-packet mutation belongs to Damage owner #20
+`MODIFY_CURRENT_DAMAGE_PACKET` is packet-local mutation owned by the canonical Damage Packet Listener before HP/Shield application. It validates the current packet listener, applies bounded delta semantics, records modification evidence and consumes the declared listener limit. Match/Tactic/Attack owners must not independently subtract Heatguard values.
+
+## 279 — operation capability and predicate capability may close independently
+A used operation can be accepted while predicates that happen to appear in the same consumer remain missing. Shared predicates must be proven across every frozen consumer and event timing before they move to implemented; operation evidence must not be stretched into unrelated predicate acceptance.
+
+## 280 — voluntary Withdrawal cost listeners must sit before Payment
+A `before_voluntary_withdrawal_cost` listener, if implemented, must modify the canonical payable Withdrawal cost before exact attached-Essence payment preflight/commit. It must not alter Payment Engine semantics, bypass the once-per-turn Withdrawal gate or create a second Atomic Switch/transaction owner.
+
