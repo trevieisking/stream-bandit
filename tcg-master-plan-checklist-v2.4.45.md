@@ -656,3 +656,17 @@
 - [x] Progress-document head retained green in TCG Card Pass **#1382 SUCCESS** on `b61b3cfde168247099cae652c49d4acb12c49260`.
 - [ ] Next target: reconcile Shade — Nightmaw / Dread Crush `DISCARD_DECK_TOP` against the existing generic Attack Deck-Discard + Card-Zone owner.
 
+## V2.4.82 — Nightmaw deck-top discard capability reconciliation
+- [x] Prove the frozen Release 1 `DISCARD_DECK_TOP` inventory has exactly one consumer: Nightmaw / Dread Crush.
+- [x] Confirm the existing Attack Deck-Discard owner is card-ID/name-free.
+- [x] Confirm the shared Attack IF owns `target_has_any_condition` evaluation.
+- [x] Confirm false IF leaves deck/discard unchanged and emits no deck-discard event.
+- [x] Confirm true IF moves only available top cards through Card-Zone while preserving exact instance identity/order.
+- [x] Confirm deck exhaustion from this effect does not independently create deckout.
+- [x] Confirm successful movement emits the canonical `deck_cards_discarded` handoff.
+- [x] Confirm live continuation order remains Deck-Discard Event -> Event Listener -> Movement Listener -> Heal Listener.
+- [x] Move `DISCARD_DECK_TOP` from missing to implemented.
+- [x] Refresh release-control capability fingerprint to `856ff589ca74faf88f61d106910671ee1b7af233`.
+- [x] TCG Card Pass 2 Validation **#1386 SUCCESS** on exact reconciled head `55d2e1c87db956d19c6a08b20a6a3c41ab7eb528`.
+- [ ] Next target: reconcile Noctivane / Night Reading `SCHEDULE_ACTION` against the accepted scheduled-action lifecycle owner.
+
