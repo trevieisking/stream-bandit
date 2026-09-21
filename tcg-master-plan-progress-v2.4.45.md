@@ -1489,3 +1489,38 @@ Current evidence is deliberately split:
 - Hollowcrown uses the same predicate in a separate active condition-replacement family and must be audited independently before any global capability classification changes.
 
 Therefore `control_condition_present` remains open and the next implementation pass targets the Murkmite continuous Attack-damage consumer first.
+
+## V2.4.78 — accepted Creature-owned continuous outgoing Attack-damage family
+
+The usage-driven audit found exactly three frozen Release 1 Creature Ability continuous `attack_damage` effects:
+- Ember — Glowcub / Warm Blood: `source_damaged` + exact `spark-pounce` filter;
+- Shade — Murkmite / Murk Sense: `control_condition_present` on `$current_opponent_vanguard` + exact `murk-nip` filter;
+- Stone — Quartzram / Prismatic Bulwark: `source_has_shield_at_least` + exact `prism-ram` filter.
+
+The deeper source audit corrected the initial V2.4.77 assumption: the pre-existing outgoing Attack Damage owner collected attached-Essence continuous modifiers only, so Creature-owned outgoing modifiers did not yet reach that owner.
+
+### Accepted owner repair
+
+`tcg-match-attack-damage-v0-2.ts` now owns one generic source-Creature continuous outgoing Attack-damage lane:
+- source Creature continuous effects are discovered from structured Creature Ability metadata, never card IDs;
+- `source_damaged` and `source_has_shield_at_least` delegate to the existing canonical Requirement evaluator;
+- `control_condition_present` reads authoritative current-opponent-Vanguard control state supplied by Match;
+- exact `attack_id` is supplied by Match so structured filters remain data-driven;
+- the current-opponent-Vanguard condition is independent of the actual selected attack target, so Murkmite remains correct when a legal attack targets a Reserve;
+- attached-Essence outgoing damage modifiers and all incoming-damage / Damage-Protection ownership remain unchanged.
+
+Behavioral tests cover all three frozen Creature consumers and the no-card-ID live-wiring guard. Runtime Pass B attack-damage and Surge materialization guards were extended with the exact fourth canonical Match damage-function shape rather than bypassed.
+
+Release-control Match closure is now:
+- Attack Damage blob: `c263c8242aaaeabb37def0fb152efdc537236930`;
+- Match Actions blob: `e9b5b89d002be10f92908866e93ceec6cc5e5aa8`;
+- closure SHA-256: `8ad4b33ea35d5f9273609b5866176a2cf4a2050e9f1caea64c953549432de3ab`.
+
+TCG Card Pass 2 Validation **#1358 SUCCESS** on exact head
+`56acfa6ca8c2e6930cea6a9c14a1de1feb0c7c8d`.
+
+### Next exact runtime target
+
+Shade — Hollowcrown / Hollow Command.
+
+Current audit proves no existing active-Ability runtime module recognizes either `REPLACE_CONTROL_CONDITION` or Hollow Command's `control_condition_present` requirement. Build that family through the existing Active Ability + Condition owners without a Hollowcrown/card-ID branch, then reassess whether `control_condition_present` and `REPLACE_CONTROL_CONDITION` can move to implemented globally.
