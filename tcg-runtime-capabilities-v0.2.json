@@ -43,6 +43,7 @@
       "REPLACE_CONTROL_CONDITION",
       "RETURN_REMAINDER_TO_DECK_TOP",
       "RETURN_SET_TO_DECK_TOP",
+      "SCHEDULE_ACTION",
       "SEARCH_DECK",
       "SEARCH_DECK_GROUP",
       "SELECT_CREATURE",
@@ -76,7 +77,6 @@
       "PERFORM_VOLUNTARY_WITHDRAWAL",
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
-      "SCHEDULE_ACTION",
       "SCHEDULE_SOURCE_DISCARD",
       "SELECT_CARDS",
       "SET_ATTACK_COST_FLOOR",
@@ -331,6 +331,21 @@
       "owner": "supabase/functions/_shared/tcg-match-attack-deck-discard-v0-2.ts",
       "movement_owner": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
       "event": "deck_cards_discarded"
+    },
+    "release1_schedule_action_v2_4_83": {
+      "accepted_head": "4b70aecf96e7cbe70fc04ca7da04d644e298f823",
+      "card_pass_run": 1389,
+      "operation": "SCHEDULE_ACTION",
+      "consumers": [
+        {
+          "card_id": "shade-noctivane",
+          "ability_id": "night-reading"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-scheduled-action-v0-2.ts",
+      "caller": "supabase/functions/_shared/tcg-match-active-ability-deck-reading-v0-2.ts",
+      "trigger": "controller_aftermath_finished",
+      "nested_step": "DRAW_FIXED"
     }
   }
 }
