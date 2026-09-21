@@ -1919,3 +1919,68 @@ Grove — Sapstone Charm / `MODIFY_CURRENT_HEAL`.
 
 The frozen family has one consumer. Read-only preflight proves Heal owner #21 already contains the complete generic `before_heal_packet` path: target-attached predicate, source-action-kind predicate, turn-scoped attachment limit, `MODIFY_CURRENT_HEAL` validation/application, and invocation before HP mutation inside the canonical Heal Packet owner. V2.4.87 should therefore be capability reconciliation only if exact-head evidence remains aligned.
 
+## V2.4.87 — accepted Sapstone Charm / before-heal capability reconciliation
+
+V2.4.87 required **no runtime source repair**. The existing Heal #21 owners already execute the complete frozen semantics generically; the capability manifest was stale.
+
+### Frozen inventory
+
+- `MODIFY_CURRENT_HEAL`: exactly one frozen consumer — Grove / Sapstone Charm.
+- `heal_packet_target_is_attached_creature`: exactly one frozen consumer — Sapstone Charm.
+- `heal_packet_source_action_kind_is`: frozen consumers are Sapstone Charm and Grove / Symbiote Essence.
+
+### Existing canonical ownership proved
+
+**Before-Heal owner**
+`supabase/functions/_shared/tcg-match-heal-before-v0-2.ts`
+already:
+- collects attached Relic/Essence/ability before-heal candidates generically;
+- evaluates `heal_packet_target_is_attached_creature`;
+- evaluates `heal_packet_source_action_kind_is`, including Sapstone's NOT rule exclusion;
+- enforces turn-scoped attachment limits;
+- validates and applies `MODIFY_CURRENT_HEAL` delta/minimum/maximum;
+- consumes the once-per-turn attachment limit only when the modifier is actually eligible.
+
+**Heal Packet owner**
+`supabase/functions/_shared/tcg-match-heal-packet-v0-2.ts`
+already invokes the before-heal modifier phase after packet authority validation and before HP mutation, then persists the modified requested amount in the canonical packet.
+
+**After-Heal Listener owner**
+`supabase/functions/_shared/tcg-match-heal-listener-dispatch-v0-2.ts`
+already evaluates `heal_packet_source_action_kind_is` for Symbiote Essence's attack/ability filter, with attachment-scoped turn limits and nested Heal Packet emission.
+
+No card-name or card-ID dispatch is required. The canonical owner-family count remains **40**.
+
+### Deterministic evidence
+
+TCG Card Pass 2 Validation **#1425 SUCCESS** on exact pre-reconciliation head
+`a9e4bf3cc9b863ab238ac8cd18b00c7cfcab2c6a`
+contained passing tests for:
+- `before-heal owner applies Sapstone-style attachment modifier once per turn`;
+- `Heal #21 applies before-heal modifier before HP mutation and records modified requested amount`;
+- `after-heal dispatcher resolves Shellip and Symbiote while deferring Moonlit`;
+- `source instance turn limits block a second trigger and reset next turn`.
+
+### Capability reconciliation
+
+`tcg-runtime-capabilities-v0.2.json` now classifies as **implemented**:
+- `MODIFY_CURRENT_HEAL`;
+- `heal_packet_target_is_attached_creature`;
+- `heal_packet_source_action_kind_is`.
+
+Capability-manifest fingerprint is now
+`1b66b2a8455d5ad17535cf7dda2d57db4fea009e`.
+
+TCG Card Pass 2 Validation **#1427 SUCCESS** on exact capability-reconciled head
+`0f11dad02f9835733e6046f8f827ba1775f4b275`.
+
+### Next exact runtime target — V2.4.88
+
+`ADD_SHIELD_EACH`.
+
+Frozen inventory has exactly two consumers:
+- Stone / Crowncrag — Mountain Warden: Attack `after_damage` fortify up to two selected friendly Stone Creatures;
+- Stone / Reversal Seal: Tactic IF branch shield on an optional selected Stone Creature.
+
+Read-only preflight proves the Tactic interpreter already executes `ADD_SHIELD_EACH` generically, covering the Reversal Seal shape. The first Attack-owner audit found no matching `ADD_SHIELD_EACH` handler, so V2.4.88 must prove and, if required, repair **Attack/Tactic parity** without duplicating Shield ownership.
+
