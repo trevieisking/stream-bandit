@@ -18,6 +18,7 @@
       "ADD_SHIELD",
       "CHECK_DECKOUT_AFTER_RESOLUTION",
       "CHOOSE_AND_CLEAR_CONDITION",
+      "CHOOSE_AND_CLEAR_CONTROL_CONDITION",
       "CHOOSE_HAND_TO_DECK_BOTTOM",
       "CHOOSE_HAND_TO_DISCARD",
       "CHOOSE_PLAYER",
@@ -62,7 +63,6 @@
       "ADD_SHIELD_EACH",
       "APPLY_CONDITION",
       "ATTACH_ESSENCE_FROM_SELECTION",
-      "CHOOSE_AND_CLEAR_CONTROL_CONDITION",
       "DEAL_EFFECT_DAMAGE",
       "DEFEAT_EACH_MATCHING",
       "DEFEAT_TARGET_IF",
@@ -371,6 +371,21 @@
       "movement_owner": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
       "randomization_owner": "supabase/functions/_shared/tcg-match-randomization-engine-v0-2.ts",
       "tactic_closure_sha256": "d8ff415928c85b9ea2bec5168eaa1154c6c4e423a58c0a24b818db51c3cebf73"
+    },
+    "release1_choose_clear_control_condition_v2_4_85": {
+      "accepted_head": "e37f0f14dd789544c32213252ed85301736c15fb",
+      "card_pass_run": 1403,
+      "operation": "CHOOSE_AND_CLEAR_CONTROL_CONDITION",
+      "consumers": [
+        {
+          "card_id": "shade-quiet-step",
+          "tactic_program_path": "steps.2.steps.0",
+          "target": "$switch_outgoing_vanguard"
+        }
+      ],
+      "dispatcher": "supabase/functions/tcg-tactic-actions/index.ts",
+      "mutation_owner": "supabase/functions/_shared/tcg-match-condition-engine-v0-2.ts",
+      "compatibility_facade": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts"
     }
   }
 }
