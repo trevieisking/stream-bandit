@@ -23,6 +23,7 @@
       "CHOOSE_PLAYER",
       "CLEAR_CONDITION",
       "CLEAR_CONDITION_IF_PRESENT",
+      "DISCARD_ATTACHED_ESSENCE",
       "DISCARD_HAND",
       "DRAIN_VITALITY",
       "DRAW",
@@ -62,7 +63,6 @@
       "DEFEAT_EACH_MATCHING",
       "DEFEAT_TARGET_IF",
       "DIRECT_DAMAGE",
-      "DISCARD_ATTACHED_ESSENCE",
       "DISCARD_DECK_TOP",
       "INCREMENT_SOURCE_COUNTER",
       "INSPECT_ZONE",
@@ -285,6 +285,20 @@
           "path": "creature.ability.requirements.all.0"
         }
       ]
+    },
+    "release1_discard_attached_essence_v2_4_80": {
+      "accepted_head": "d370d0db839456f8e2c83dab247fcd5d0802e315",
+      "card_pass_run": 1371,
+      "operation": "DISCARD_ATTACHED_ESSENCE",
+      "consumers": [
+        {
+          "card_id": "volt-stormmane",
+          "attack_id": "storm-break"
+        }
+      ],
+      "owner": "supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts",
+      "mutation_owner": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts",
+      "compatibility_note": "legacy-only Stormmane fallback remains for unmarked snapshots; marked v0.2 Stormmane uses the generic structured owner"
     }
   }
 }
