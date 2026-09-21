@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "0fb4387dee7b0c0a92142df1ded8856447859fb4",
-        "file_count": 99,
-        "closure_sha256": "d9c5f8ee7283e60563fc5e700c302d858374d311eaa7e4178ef26db2eb67289e",
+        "entrypoint_git_blob_sha": "68009d7d129663f624463bf55572f15b9a83440d",
+        "file_count": 101,
+        "closure_sha256": "ea3e695621833b5e5b56db1c337a7a0b57b9cf6cd13669ead6061c50f4f35ebe",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -110,7 +110,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-continuation-v0-2.ts",
-            "git_blob_sha": "d03138a3c83fe3f1b844f3dc7b3ab81b8f2677be"
+            "git_blob_sha": "2d5c904ecc686798602220f5d05d2f5f23f1833a"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-deck-reading-v0-2.ts",
@@ -118,7 +118,11 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-essence-redistribution-v0-2.ts",
-            "git_blob_sha": "1568dfe75b47b323b6abbe630398ac66b614955b"
+            "git_blob_sha": "fcb2f20f1390996728818ffa3d665c3f0f3c519d"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-active-ability-hidden-sample-v0-2.ts",
+            "git_blob_sha": "314c26b3a0acc4983c9a246a8aa8db3076186a06"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-if-v0-2.ts",
@@ -130,7 +134,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-live-route-v0-2.ts",
-            "git_blob_sha": "2b25654bcccad742011b6238c51ee57343b93416"
+            "git_blob_sha": "95d5ab34ac0758664da65ca35fc8d32d180cfa22"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
@@ -393,6 +397,10 @@
             "git_blob_sha": "55165535de230b8b96ca58929016546ca693c1ed"
           },
           {
+            "path": "supabase/functions/_shared/tcg-match-hidden-zone-sample-v0-2.ts",
+            "git_blob_sha": "ca7ec1375295f31fda02e591212b36eb4bda86ed"
+          },
+          {
             "path": "supabase/functions/_shared/tcg-match-movement-listener-v0-2.ts",
             "git_blob_sha": "47931670e667c447f68609fcdb52da999156bc74"
           },
@@ -486,7 +494,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "0fb4387dee7b0c0a92142df1ded8856447859fb4"
+            "git_blob_sha": "68009d7d129663f624463bf55572f15b9a83440d"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
