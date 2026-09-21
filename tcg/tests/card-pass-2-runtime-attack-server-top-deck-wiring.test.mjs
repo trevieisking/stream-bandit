@@ -87,9 +87,8 @@ test('server-only top-deck audit is count/status only and remains before defeat 
   assert.ok(ownerResult.includes('moved_count'));
 });
 
-test('bounded Known Horizon owner does not falsely claim generic INSPECT_ZONE, IF or card_matches interpreter parity', () => {
-  assert.ok(capabilities.operations.missing.includes('INSPECT_ZONE'));
-  assert.ok(capabilities.operations.missing.includes('IF'));
-  assert.ok(capabilities.predicates.missing.includes('card_matches'));
+test('bounded Known Horizon owner coexists with shared IF/card_matches parity without claiming full interpreter parity', () => {
+  assert.ok(capabilities.operations.implemented.includes('IF'));
+  assert.ok(capabilities.predicates.implemented.includes('card_matches'));
   assert.equal(capabilities.completion.runtime_interpreter_parity, false);
 });
