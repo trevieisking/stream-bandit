@@ -1462,3 +1462,30 @@ TCG Card Pass 2 Validation **#1326 SUCCESS** on exact head
 Next audit target: reconcile stale Release 1 operation classifications against
 their actual generic owners, starting with operations already proven in the
 Event Listener / Tactic / bounded Attack paths before writing any new engine.
+
+## V2.4.77 — accepted hidden-zone sampling owner parity + capability reconciliation
+
+The frozen Release 1 hidden-sample inventory contains exactly three `RANDOM_SAMPLE_HIDDEN_ZONE` consumers:
+- Shade — Duskstalker: triggered Ability through Event Listener;
+- Shade — Umbravale — Thought Hunter: active Ability through the generic hidden-sample owner;
+- Shade — False Memory: Tactic interpreter.
+
+All three now delegate random selection to the shared non-destructive Hidden-Zone sampler / canonical Match RNG owner. Event Listener and active-Ability paths preserve controller-private visibility; False Memory keeps its server-only sample until later public Card-Zone movement. No card-ID-specific RNG or browser-owned randomization was added.
+
+The final stale ownership guards were made formatting-independent rather than preserving obsolete source spelling. Card Pass #1346 proved the source/test repair on `fff845a874c570fabbe1bc16ff07ed528ba5a12a`.
+
+`tcg-runtime-capabilities-v0.2.json` now classifies operation `RANDOM_SAMPLE_HIDDEN_ZONE` as **implemented**. Release-control capability-manifest fingerprint was refreshed to blob `230757a376b67516c48fe6cf1f85b401b9539c98`.
+
+TCG Card Pass 2 Validation **#1348 SUCCESS** on exact reconciled head
+`cb69519eed59de3700190c11245a5e395187fc77`.
+
+### Next exact runtime target
+
+Continue the usage-driven predicate audit with `control_condition_present`.
+
+Current evidence is deliberately split:
+- Thought Hunter already evaluates `control_condition_present` through its generic active hidden-sample requirement owner and canonical Condition state;
+- Murkmite's continuous outgoing Attack-damage path is **not yet complete**: the shared outgoing Attack-damage predicate adapter currently recognizes only `target_has_any_condition`, so Murkmite's `control_condition_present` condition would not match there;
+- Hollowcrown uses the same predicate in a separate active condition-replacement family and must be audited independently before any global capability classification changes.
+
+Therefore `control_condition_present` remains open and the next implementation pass targets the Murkmite continuous Attack-damage consumer first.
