@@ -818,3 +818,19 @@ If authoritative UI projection needs the same once-per-turn listener semantics a
 ## 284 — Pilot Sera is the next partial-operation reconciliation target
 The frozen Release 1 has exactly one `SET_ATTACK_ELIGIBILITY` consumer: Gale — Pilot Sera. Existing Tactic runtime writes a turn-scoped final-Vanguard anchor and Match already checks that anchor before Attack. V2.4.91 may move the capability from partial only after exact `controller_turn / only_final_vanguard_may_attack` grammar, repeated-switch final-anchor behavior and turn expiry/reset are proven end-to-end.
 
+
+
+## 285 — Attack Eligibility is a shared Attack owner, not Tactic or Match policy
+`SET_ATTACK_ELIGIBILITY` grammar, final-Vanguard anchoring, turn validity and declaration block reasons belong to one shared Attack Eligibility owner. Tactic may install the frozen rule and Match may query it, but neither owns a second interpretation of the lifecycle state.
+
+## 286 — final-Vanguard eligibility binds Creature identity rather than one card face
+Pilot Sera's final-Vanguard rule follows the current Vanguard Creature stack identity. Evolving that Creature in place must not invalidate the rule, while switching to a different Creature in the same controller turn must block Attack.
+
+## 287 — controller-turn Attack Eligibility expires by turn authority
+A `controller_turn` Attack Eligibility receipt is valid only for its recorded controller and `turn_seq`. Turn advancement expires it semantically; browser projection must not recreate or extend it.
+
+## 288 — SET_WITHDRAWAL_MODIFIER must have one lifecycle owner
+Release 1 uses `SET_WITHDRAWAL_MODIFIER` from multiple producer families. Event Listener, Tactic and Ability code must not each mutate `lifecycle_withdrawal_cost` independently. V2.4.92 must centralize installation/evaluation under Withdrawal lifecycle ownership while preserving the existing Payment and Atomic Switch owners.
+
+## 289 — Withdrawal modifier duration and source semantics are gameplay state
+Frozen withdrawal modifiers include end-of-turn, controller-aftermath and target-controller-aftermath boundaries, one-use declarations, source-aware caps and formula amounts. These semantics cannot be reduced to a same-turn scalar or presentation helper; they must be represented and consumed by the canonical server-side lifecycle owner.
