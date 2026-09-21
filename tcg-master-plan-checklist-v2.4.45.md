@@ -641,3 +641,18 @@
 - [x] Refresh release-control capability fingerprint to `12c08d16cb5789a138cb9812be48c3e7e2e288e3`.
 - [ ] Continue the Release 1 used-operation/predicate audit with the next proven stale classification or smallest genuine generic-owner gap.
 
+## V2.4.81 — Attack declaration event capability reconciliation
+- [x] Prove the frozen Release 1 Attack `on_declare` inventory contains exactly two steps: Storm Break and Chainstorm.
+- [x] Prove both frozen steps are structured `RECORD_EVENT`.
+- [x] Prove the complete frozen declaration-predicate inventory is exactly `event_attack_source_attached_essence_count_at_least` and `event_attack_source_has_attached_essence_kind`.
+- [x] Confirm the existing Attack declaration-event owner is registry-driven and card-ID/name-free.
+- [x] Confirm attached-Essence count is read from authoritative source-Creature attachments.
+- [x] Confirm attached-Essence kind delegates to the shared Attack authority query.
+- [x] Confirm false predicates emit no action-local event and malformed operations/predicates fail closed.
+- [x] Move `RECORD_EVENT` from missing to implemented in `tcg-runtime-capabilities-v0.2.json`.
+- [x] Move both frozen declaration predicates from missing to implemented.
+- [x] Refresh release-control capability fingerprint to `c4ef4855a334fee0f9fc3d611b4b0de2f0eff471`.
+- [x] TCG Card Pass 2 Validation **#1381 SUCCESS** on exact reconciled source/capability head `97eca40fe4ea0c991da3077f9bfbca8a2539f3d4`.
+- [x] Progress-document head retained green in TCG Card Pass **#1382 SUCCESS** on `b61b3cfde168247099cae652c49d4acb12c49260`.
+- [ ] Next target: reconcile Shade — Nightmaw / Dread Crush `DISCARD_DECK_TOP` against the existing generic Attack Deck-Discard + Card-Zone owner.
+
