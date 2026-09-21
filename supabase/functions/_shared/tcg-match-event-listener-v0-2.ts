@@ -197,6 +197,32 @@ export type RuntimeV02AttackDeclaredDamageResult = {
   applications: RuntimeV02AttackDeclaredDamageApplication[];
 };
 
+export type RuntimeV02VoluntaryWithdrawalCostInput = {
+  controller_seat: 1 | 2;
+  source_creature_uid: string;
+  base_cost: number;
+  action_id?: string;
+};
+
+export type RuntimeV02VoluntaryWithdrawalCostApplication = {
+  source_uid: string;
+  listener_id: string;
+  before_cost: number;
+  requested_delta: number;
+  applied_delta: number;
+  after_cost: number;
+  limit_consumed: boolean;
+  replayed: boolean;
+};
+
+export type RuntimeV02VoluntaryWithdrawalCostResult = {
+  schema: "sb-tcg-voluntary-withdrawal-cost-v0.2";
+  event: RuntimeV02EventListenerEvent;
+  base_cost: number;
+  cost: number;
+  applications: RuntimeV02VoluntaryWithdrawalCostApplication[];
+};
+
 type WorkItem = {
   event: RuntimeV02EventListenerEvent;
   source_uid: string;
@@ -982,6 +1008,8 @@ function requirementLeaf(
     }
     case "event_controller_is_active_seat":
       return event.controller_seat === Number(state.active_seat);
+    case "event_active_seat_is_controller":
+      return Number(state.active_seat) === event.controller_seat;
     case "event_subject_matches":
       return filtersMatch(eventSubject(state, event).def, value.filters);
     case "reserve_count_at_least": {
@@ -3199,3 +3227,226 @@ export function runtimeV02ResolveAttackDeclaredDamageListeners(
     applications,
   };
 }
+
+function synchronousEventListenerContinuation(
+  state: Record<string, unknown>,
+): Continuation {
+  return {
+    turn_seq: currentTurn(state),
+    work: [],
+    work_index: 0,
+    program_loaded: false,
+    program: [],
+    step_cursor: 0,
+    vars: {},
+    processed_listener_keys: [],
+    emitted_heal_packet_ids: [],
+    emitted_movement_events: [],
+  };
+}
+
+function normalizedVoluntaryWithdrawalCostInput(
+  state: Record<string, unknown>,
+  raw: RuntimeV02VoluntaryWithdrawalCostInput,
+): RuntimeV02VoluntaryWithdrawalCostInput {
+  if (!raw || typeof raw !== "object") {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_input_required");
+  }
+  const controllerSeat = normalizedSeat(
+    raw.controller_seat,
+    "tcg_v0_2_withdrawal_cost_listener_controller_invalid",
+  );
+  const sourceCreatureUid = requiredString(
+    raw.source_creature_uid,
+    "tcg_v0_2_withdrawal_cost_listener_source_required",
+  );
+  const source = fieldByUid(state, sourceCreatureUid);
+  if (
+    !source || source.seat !== controllerSeat || source.where !== "vanguard"
+  ) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_source_mismatch");
+  }
+  const baseCost = Number(raw.base_cost);
+  if (!Number.isInteger(baseCost) || baseCost < 0) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_base_cost_invalid");
+  }
+  const actionId = raw.action_id == null
+    ? "withdraw"
+    : requiredString(
+      raw.action_id,
+      "tcg_v0_2_withdrawal_cost_listener_action_invalid",
+    );
+  return {
+    controller_seat: controllerSeat,
+    source_creature_uid: sourceCreatureUid,
+    base_cost: baseCost,
+    action_id: actionId,
+  };
+}
+
+function voluntaryWithdrawalCostModifier(
+  raw: unknown,
+): {
+  delta: number;
+  minimum: number;
+  maximum: number | null;
+} | null {
+  const steps = records(
+    raw,
+    "tcg_v0_2_withdrawal_cost_listener_steps_required",
+  );
+  if (steps.length === 0) return null;
+  if (
+    !steps.some((step) =>
+      String(step.op || "") === "MODIFY_CURRENT_WITHDRAWAL_COST"
+    )
+  ) return null;
+  if (steps.length !== 1) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_program_unsupported");
+  }
+  const step = steps[0];
+  if (String(step.op || "") !== "MODIFY_CURRENT_WITHDRAWAL_COST") {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_program_unsupported");
+  }
+  const unsupported = Object.keys(step).find((key) =>
+    !["op", "delta", "minimum", "maximum"].includes(key)
+  );
+  if (unsupported) {
+    throw new Error(
+      `tcg_v0_2_withdrawal_cost_listener_step_field_unsupported:${unsupported}`,
+    );
+  }
+  const delta = Number(step.delta);
+  if (!Number.isInteger(delta) || delta === 0) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_delta_invalid");
+  }
+  const minimum = step.minimum == null ? 0 : Number(step.minimum);
+  if (!Number.isInteger(minimum) || minimum < 0) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_minimum_invalid");
+  }
+  const maximum = step.maximum == null ? null : Number(step.maximum);
+  if (
+    maximum != null &&
+    (!Number.isInteger(maximum) || maximum < minimum)
+  ) {
+    throw new Error("tcg_v0_2_withdrawal_cost_listener_maximum_invalid");
+  }
+  return { delta, minimum, maximum };
+}
+
+/**
+ * Resolves synchronous before_voluntary_withdrawal_cost listeners after the
+ * canonical Withdrawal base cost is known and before Payment validates the
+ * attached-Essence payment. Match may run this against a cloned state for
+ * read-only field-action projection; only the authoritative withdraw command
+ * persists the listener receipt/turn-limit consumption.
+ */
+export function runtimeV02ResolveVoluntaryWithdrawalCostListeners(
+  state: Record<string, unknown>,
+  rawInput: RuntimeV02VoluntaryWithdrawalCostInput,
+): RuntimeV02VoluntaryWithdrawalCostResult | null {
+  if (!structuredEnabled(state)) return null;
+  const input = normalizedVoluntaryWithdrawalCostInput(state, rawInput);
+  const source = fieldByUid(state, input.source_creature_uid)!;
+  const event: RuntimeV02EventListenerEvent = {
+    event_id:
+      `withdrawal-cost:${currentTurn(state)}:${input.controller_seat}:${input.source_creature_uid}`,
+    event: "before_voluntary_withdrawal_cost",
+    subject_uid: input.source_creature_uid,
+    subject_card_id: source.top.card_id,
+    controller_seat: input.controller_seat,
+    source_controller_seat: input.controller_seat,
+    origin_zone: "vanguard",
+    destination_zone: "reserve",
+    destination_index: null,
+    phase: "play",
+    source_action_id: String(input.action_id || "withdraw"),
+    source_card_uid: source.top.uid,
+    action_kind: "voluntary_withdrawal",
+    turn_seq: currentTurn(state),
+    source_creature_uid: input.source_creature_uid,
+  };
+  recordEvent(state, event);
+
+  let cost = input.base_cost;
+  const applications: RuntimeV02VoluntaryWithdrawalCostApplication[] = [];
+  const continuation = synchronousEventListenerContinuation(state);
+
+  for (const candidate of collectCandidates(state, event.event)) {
+    const modifier = voluntaryWithdrawalCostModifier(candidate.listener.steps);
+    if (!modifier) continue;
+
+    const key = receiptKey(candidate, event);
+    if (alreadyResolved(state, candidate, event)) {
+      const prior = objectRecord(listenerState(state).receipts[key]);
+      const priorDelta = Number(prior?.withdrawal_cost_applied_delta);
+      const priorRequestedDelta = Number(prior?.withdrawal_cost_requested_delta);
+      if (
+        !Number.isInteger(priorDelta) ||
+        !Number.isInteger(priorRequestedDelta)
+      ) {
+        throw new Error("tcg_v0_2_withdrawal_cost_listener_receipt_invalid");
+      }
+      const before = cost;
+      cost = Math.max(0, before + priorDelta);
+      applications.push({
+        source_uid: candidate.source.uid,
+        listener_id: listenerId(candidate),
+        before_cost: before,
+        requested_delta: priorRequestedDelta,
+        applied_delta: priorDelta,
+        after_cost: cost,
+        limit_consumed: false,
+        replayed: true,
+      });
+      continue;
+    }
+
+    if (
+      !matches(
+        state,
+        continuation,
+        candidate,
+        event,
+      )
+    ) continue;
+
+    const limit = limitInfo(state, candidate, event);
+    if (limit && usedLimit(state, limit) >= limit.count) continue;
+
+    const before = cost;
+    let after = Math.max(modifier.minimum, before + modifier.delta, 0);
+    if (modifier.maximum != null) after = Math.min(after, modifier.maximum);
+    const appliedDelta = after - before;
+
+    consumeLimit(state, limit);
+    markResolved(state, candidate, event, {
+      resolution_kind: "voluntary_withdrawal_cost",
+      withdrawal_cost_requested_delta: modifier.delta,
+      withdrawal_cost_applied_delta: appliedDelta,
+      withdrawal_cost_before: before,
+      withdrawal_cost_after: after,
+    });
+
+    cost = after;
+    applications.push({
+      source_uid: candidate.source.uid,
+      listener_id: listenerId(candidate),
+      before_cost: before,
+      requested_delta: modifier.delta,
+      applied_delta: appliedDelta,
+      after_cost: after,
+      limit_consumed: limit != null,
+      replayed: false,
+    });
+  }
+
+  return {
+    schema: "sb-tcg-voluntary-withdrawal-cost-v0.2",
+    event: { ...event },
+    base_cost: input.base_cost,
+    cost,
+    applications,
+  };
+}
+
