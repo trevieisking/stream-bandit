@@ -35,6 +35,7 @@
       "INCREMENT_SOURCE_COUNTER",
       "LOOK_TOP",
       "MODIFY_CURRENT_ATTACK_DAMAGE",
+      "MODIFY_CURRENT_HEAL",
       "MOVE_ATTACHED_ESSENCE",
       "MOVE_CARDS",
       "PROMPT_CHOSEN_PLAYER_TO_SELECT_RESERVE",
@@ -71,7 +72,6 @@
       "DIRECT_DAMAGE",
       "INSPECT_ZONE",
       "MODIFY_CURRENT_DAMAGE_PACKET",
-      "MODIFY_CURRENT_HEAL",
       "MODIFY_CURRENT_WITHDRAWAL_COST",
       "MOVE_DAMAGE",
       "MOVE_ZONE_POSITION",
@@ -108,6 +108,8 @@
       "event_occurred",
       "friendly_other_creature_matches",
       "hand_count_at_least",
+      "heal_packet_source_action_kind_is",
+      "heal_packet_target_is_attached_creature",
       "legal_card_available",
       "modifier_condition_slot_empty",
       "prevention_amount_at_least",
@@ -170,10 +172,8 @@
       "hand_contains",
       "heal_actual_amount_at_least",
       "heal_controller_is_active_seat",
-      "heal_packet_source_action_kind_is",
       "heal_packet_source_is_attached_creature",
       "heal_packet_target_controller_is_self",
-      "heal_packet_target_is_attached_creature",
       "heal_packet_target_is_not_source",
       "heal_packet_target_is_self",
       "heal_source_is_card_effect",
@@ -436,6 +436,39 @@
         }
       },
       "note": "source_counter_at_least was already labeled implemented; V2.4.86 supplies executable evidence for its sole frozen attached-Relic listener consumer."
+    },
+    "release1_before_heal_modifier_v2_4_87": {
+      "accepted_head": "a9e4bf3cc9b863ab238ac8cd18b00c7cfcab2c6a",
+      "card_pass_run": 1425,
+      "operation": "MODIFY_CURRENT_HEAL",
+      "predicates": [
+        "heal_packet_target_is_attached_creature",
+        "heal_packet_source_action_kind_is"
+      ],
+      "consumers": {
+        "MODIFY_CURRENT_HEAL": [
+          "grove-sapstone-charm"
+        ],
+        "heal_packet_target_is_attached_creature": [
+          "grove-sapstone-charm"
+        ],
+        "heal_packet_source_action_kind_is": [
+          "grove-sapstone-charm",
+          "grove-symbiote-essence"
+        ]
+      },
+      "owners": {
+        "before_heal": "supabase/functions/_shared/tcg-match-heal-before-v0-2.ts",
+        "heal_packet": "supabase/functions/_shared/tcg-match-heal-packet-v0-2.ts",
+        "after_heal_listener": "supabase/functions/_shared/tcg-match-heal-listener-dispatch-v0-2.ts"
+      },
+      "deterministic_tests": [
+        "before-heal owner applies Sapstone-style attachment modifier once per turn",
+        "Heal #21 applies before-heal modifier before HP mutation and records modified requested amount",
+        "after-heal dispatcher resolves Shellip and Symbiote while deferring Moonlit",
+        "source instance turn limits block a second trigger and reset next turn"
+      ],
+      "note": "No runtime source change is required. Existing Heal #21 and after-heal listener owners already execute the complete frozen semantics generically."
     }
   }
 }
