@@ -87,7 +87,7 @@ test('Duskstalker remains Event Listener-owned and False Memory remains Tactic-i
   assert.match(eventListener,/runtimeV02RandomSampleHiddenZone\(/);
   assert.match(eventListener,/controller_private/);
   assert.match(eventListener,/tcg_v0_2_event_listener_hidden_sample_visibility_unsupported/);
-  assert.match(tactic,/case"RANDOM_SAMPLE_HIDDEN_ZONE"/);
+  assert.match(tactic,/if\s*\(\s*op\s*===\s*["']RANDOM_SAMPLE_HIDDEN_ZONE["']\s*\)/);
   assert.match(tactic,/runtimeV02RandomSampleHiddenZone\(/);
   assert.match(tactic,/visibility\)!=="server_only"/);
 });
