@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "d893600932f2652bf20489b7967275692d9ece2c",
-        "file_count": 98,
-        "closure_sha256": "89dd8281cdd596083a2bc65ddc6760ac5cda4716fc25691e084962fd8a30fb63",
+        "entrypoint_git_blob_sha": "0fb4387dee7b0c0a92142df1ded8856447859fb4",
+        "file_count": 99,
+        "closure_sha256": "d9c5f8ee7283e60563fc5e700c302d858374d311eaa7e4178ef26db2eb67289e",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -117,6 +117,10 @@
             "git_blob_sha": "ef24a37c0affbb215be8feca7f5da53f0357a56b"
           },
           {
+            "path": "supabase/functions/_shared/tcg-match-active-ability-essence-redistribution-v0-2.ts",
+            "git_blob_sha": "1568dfe75b47b323b6abbe630398ac66b614955b"
+          },
+          {
             "path": "supabase/functions/_shared/tcg-match-active-ability-if-v0-2.ts",
             "git_blob_sha": "651adac6e20c087c73510d7922e5ed568768cb0a"
           },
@@ -130,7 +134,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
-            "git_blob_sha": "1f798f553538eb0e29f77ffe07a828170637b7a6"
+            "git_blob_sha": "0fb762ed2e00ca692fcfc14846635f1ee8efd554"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-opponent-creature-choice-v0-2.ts",
@@ -482,7 +486,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "d893600932f2652bf20489b7967275692d9ece2c"
+            "git_blob_sha": "0fb4387dee7b0c0a92142df1ded8856447859fb4"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
