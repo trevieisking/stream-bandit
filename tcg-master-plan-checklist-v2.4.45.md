@@ -592,3 +592,18 @@
 - [ ] Next predicate target: implement the missing Murkmite `control_condition_present` path in the shared continuous outgoing Attack-damage predicate adapter.
 - [ ] Audit Hollowcrown's active condition-replacement use of `control_condition_present` before changing that predicate's global capability status.
 
+## V2.4.78 — Creature-owned continuous outgoing Attack damage
+- [x] Audit all frozen Release 1 Creature Ability continuous `attack_damage` consumers: Glowcub, Murkmite and Quartzram.
+- [x] Correct the earlier assumption that Murkmite already reached the attachment-only outgoing continuous collector.
+- [x] Add one generic source-Creature continuous outgoing Attack-damage lane to the existing Attack Damage owner.
+- [x] Reuse canonical `source_damaged` and `source_has_shield_at_least` Requirement evaluators.
+- [x] Evaluate Murkmite's `control_condition_present` against authoritative current-opponent-Vanguard control state.
+- [x] Keep the opponent-Vanguard predicate independent of the selected attack target.
+- [x] Supply exact structured `attack_id` context so all three continuous filters remain data-driven.
+- [x] Prove Glowcub, Murkmite and Quartzram behavior with runtime tests and card-ID-free wiring guards.
+- [x] Extend guarded Runtime Pass B attack-damage and Surge verifiers with the exact new canonical Match damage shape.
+- [x] Refresh Match release-control closure to `8ad4b33ea35d5f9273609b5866176a2cf4a2050e9f1caea64c953549432de3ab`.
+- [x] TCG Card Pass 2 Validation **#1358 SUCCESS** on exact head `56acfa6ca8c2e6930cea6a9c14a1de1feb0c7c8d`.
+- [ ] Next target: implement Hollowcrown / Hollow Command as a generic active Ability `control_condition_present` → `REPLACE_CONTROL_CONDITION` family through canonical Condition ownership.
+- [ ] Only after Hollowcrown is proven, reassess global capability status for `control_condition_present` and `REPLACE_CONTROL_CONDITION`.
+
