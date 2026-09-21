@@ -125,13 +125,10 @@ test('Arcade Lab routes structured attack choices to the match owner and keeps t
   assert.ok(arcade.includes("if(!structured&&String(d.id||'')==='volt-stormmane'"));
 });
 
-test('bounded Storm Break owner does not falsely claim generic RECORD_EVENT, IF, discard, condition or predicate parity', () => {
-  for (const op of ['RECORD_EVENT', 'IF', 'DISCARD_ATTACHED_ESSENCE', 'APPLY_CONDITION']) {
-    assert.ok(capabilities.operations.missing.includes(op), `${op} must remain missing generic parity`);
-  }
-  for (const predicate of ['event_attack_source_attached_essence_count_at_least', 'event_occurred', 'target_remains_in_play_after_damage']) {
-    assert.ok(capabilities.predicates.missing.includes(predicate), `${predicate} must remain missing generic parity`);
-  }
+test('bounded Storm Break owner remains narrow while shared IF parity is tracked globally', () => {
+  assert.ok(capabilities.operations.implemented.includes('IF'));
+  assert.ok(capabilities.predicates.implemented.includes('event_occurred'));
+  assert.ok(capabilities.predicates.implemented.includes('target_remains_in_play_after_damage'));
   assert.equal(capabilities.completion.runtime_interpreter_parity, false);
   assert.equal(capabilities.completion.zero_card_specific_runtime_branches, false);
 });
