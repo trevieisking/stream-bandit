@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "2761b757b5479446d4e1f5f7423368cb6a5db16d",
+        "entrypoint_git_blob_sha": "8ef42c2b256cade0a2e321157cf858771801bac5",
         "file_count": 105,
-        "closure_sha256": "4a48a1c2de811cef3303f0408baf513823737d33477e071313dcb025a847bfba",
+        "closure_sha256": "f733b778b2726621d65923cdcde45cb97b7d0caa3c137f29afe4a9b705c3f88c",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -142,7 +142,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-live-v0-2.ts",
-            "git_blob_sha": "0fb762ed2e00ca692fcfc14846635f1ee8efd554"
+            "git_blob_sha": "0fce2837ec3c0f65dc07ed3c32535e93c56504bc"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-opponent-creature-choice-v0-2.ts",
@@ -154,7 +154,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-selected-heal-v0-2.ts",
-            "git_blob_sha": "6626cc037786cdb0d0f329a76de43ea31dbfcb64"
+            "git_blob_sha": "f2b99e86d7b70c5d7ca9cf5157cc8ea09e70ee97"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-selected-modifier-v0-2.ts",
@@ -510,7 +510,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "2761b757b5479446d4e1f5f7423368cb6a5db16d"
+            "git_blob_sha": "8ef42c2b256cade0a2e321157cf858771801bac5"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
