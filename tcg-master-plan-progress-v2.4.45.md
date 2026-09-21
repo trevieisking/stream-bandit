@@ -2077,3 +2077,70 @@ Read-only preflight proves Damage owner #20 already:
 
 Therefore the operation itself is expected to be reconciliation-only. Shared `damage_packet_*` predicates will remain unpromoted until every frozen consumer, including Thorn Crown's after-damage listener family, is separately proved.
 
+## V2.4.89 — accepted Heatguard damage-packet modifier reconciliation
+
+V2.4.89 required **no runtime source repair**. Damage owner #20 already executes Ember Heatguard Bracer's frozen before-damage modifier generically.
+
+### Frozen operation inventory
+
+`MODIFY_CURRENT_DAMAGE_PACKET` has one frozen Release 1 consumer:
+- Ember / Heatguard Bracer.
+
+Its listener shape is:
+- event: `before_damage_packet`;
+- target: attached Creature;
+- classes: recoil OR Scorched condition damage;
+- turn-scoped attachment limit: once;
+- modifier: -10, minimum 0.
+
+### Existing canonical ownership proved
+
+**Damage Packet Listener owner**
+`supabase/functions/_shared/tcg-match-damage-packet-listener-v0-2.ts`
+already:
+- discovers structured before-damage listeners from attached sources;
+- evaluates target/class/condition packet requirements;
+- enforces the declared attachment turn limit;
+- validates `MODIFY_CURRENT_DAMAGE_PACKET`;
+- applies delta/minimum semantics against the current packet amount;
+- records exact modification evidence.
+
+**Damage Packet owner**
+`supabase/functions/_shared/tcg-match-damage-packet-v0-2.ts`
+already persists canonical before/after damage-packet evidence around the resolved packet.
+
+Existing deterministic coverage includes:
+- `Damage #20 generic packet owner also satisfies existing Heatguard recoil contract`;
+- `Damage #20 attachment packet modifier consumes once per turn`.
+
+No card-ID dispatch, helper or new owner family is required.
+
+### Capability reconciliation
+
+`MODIFY_CURRENT_DAMAGE_PACKET` is now classified **implemented**.
+
+The shared predicates
+`damage_packet_target_is_attached_creature`,
+`damage_packet_class_is`, and
+`damage_packet_condition_is`
+remain separately gated. They are not promoted from Heatguard-only evidence because some have other frozen consumers, including Thorn Crown's after-damage listener family.
+
+Capability-manifest fingerprint:
+`9f858522a544b1098fe7457f4472d122c91e8630`.
+
+TCG Card Pass 2 Validation **#1445 SUCCESS** on exact capability-reconciled head
+`46e44d58e0b4b57b9b5c2aff6d2b5cfd00f65680`.
+
+### Next exact runtime target — V2.4.90
+
+Gale / Highwind Spires:
+`before_voluntary_withdrawal_cost -> MODIFY_CURRENT_WITHDRAWAL_COST`.
+
+Frozen schema requires:
+- controller scope any;
+- `event_active_seat_is_controller`;
+- once per turn per event controller;
+- -1 current voluntary Withdrawal cost, minimum 0.
+
+First-pass exact-head audit found no matching listener execution in the current Withdrawal base-cost or Withdrawal transaction owners. V2.4.90 is therefore treated as a **real implementation target** until a canonical existing owner is proven otherwise. The fix must integrate with Withdrawal/Cost ownership and must not duplicate Payment or Atomic Switch.
+
