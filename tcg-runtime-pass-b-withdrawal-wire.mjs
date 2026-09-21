@@ -16,7 +16,7 @@ if (!next.includes(bridgeImport)) {
   next = next.replace(importAnchor, importAnchor + bridgeImport);
 }
 
-const lifecycleImport = 'import { runtimeV02ConsumeWithdrawalModifiers, runtimeV02ResolveWithdrawalModifierCost } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";\\n';
+const lifecycleImport = 'import { runtimeV02ConsumeWithdrawalModifiers, runtimeV02ResolveWithdrawalModifierCost } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";\n';
 const lifecycleFunction = 'function withdrawalCostPlan(cr:Cr,s:any,controllerSeat:1|2)';
 const lifecycleStructuredBase = 'const structured=structuredRuntimeWithdrawalBaseCost(s,cr,n,String(d?.element||""),crushed)';
 const lifecycleResolve = 'runtimeV02ResolveWithdrawalModifierCost(s,cr,controllerSeat,String(d?.element||""),n)';
