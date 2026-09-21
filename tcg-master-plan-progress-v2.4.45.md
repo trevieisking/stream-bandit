@@ -1428,3 +1428,37 @@ Frozen Set One IF inventory is now fully executable through structured generic o
 No remaining Release 1 IF decision requires printed-English or card-ID fallback.
 
 The next Master Plan runtime target is the capability reconciliation/audit: update `tcg-runtime-capabilities-v0.2.json` to reflect proven IF/predicate ownership, then continue the Release 1 operation/predicate audit until every used partial/missing capability is implemented or proven already owned.
+
+## V2.4.76 — accepted IF capability-manifest reconciliation
+
+The runtime capability inventory has been reconciled to the accepted V2.4.75 IF evidence.
+
+### Capability changes
+
+`tcg-runtime-capabilities-v0.2.json` now classifies:
+- operation `IF` as **implemented**;
+- all 20 predicate families actually consumed by the 29 accepted Release 1 IF instances as **implemented**.
+
+The three former partial predicate classifications
+`reserve_count_at_least`, `target_has_condition`, and
+`target_printed_hp_at_least` are now implemented, so the obsolete
+legacy-predicate-equivalent notes were removed.
+
+The old operation legacy note claiming only narrow IF branches was also removed.
+A machine-readable reconciliation evidence block binds the classification change
+to accepted runtime head
+`148bcc1164c05cd6c523b8fc3566f748705f5c15` / Card Pass #1319.
+
+Two older bounded-owner regression tests were updated so they continue to prove
+that Storm Break / Known Horizon stay narrow without incorrectly requiring the
+global capability ledger to remain stale.
+
+Release-control capability-manifest fingerprint was refreshed to blob
+`daf061a5e539e5880be428256c68d46060ac391e`.
+
+TCG Card Pass 2 Validation **#1326 SUCCESS** on exact head
+`5b1eedcee6eb6893e7c8395fd5ab3f814f52ab33`.
+
+Next audit target: reconcile stale Release 1 operation classifications against
+their actual generic owners, starting with operations already proven in the
+Event Listener / Tactic / bounded Attack paths before writing any new engine.
