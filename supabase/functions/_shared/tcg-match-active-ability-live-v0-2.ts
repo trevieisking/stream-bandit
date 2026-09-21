@@ -32,10 +32,16 @@ import {
 } from "./tcg-match-active-ability-supply-v0-2.ts";
 import {
   runtimeV02BuildActiveAbilitySelectedHealChoice,
+  runtimeV02BuildActiveAbilitySelectedHealEachChoice,
   runtimeV02PendingActiveAbilitySelectedHealChoiceView,
+  runtimeV02PendingActiveAbilitySelectedHealEachChoiceView,
   runtimeV02ResolveActiveAbilitySelectedHealChoice,
+  runtimeV02ResolveActiveAbilitySelectedHealEachChoice,
   structuredRuntimeActiveAbilitySelectedHeal,
+  structuredRuntimeActiveAbilitySelectedHealEach,
+  type RuntimeV02ActiveAbilitySelectedHealEachResolution,
   type RuntimeV02PendingActiveAbilitySelectedHealChoice,
+  type RuntimeV02PendingActiveAbilitySelectedHealEachChoice,
 } from "./tcg-match-active-ability-selected-heal-v0-2.ts";
 import {
   runtimeV02BuildActiveAbilitySelectedModifierChoice,
@@ -60,6 +66,7 @@ export type RuntimeV02PendingActiveAbilityLiveChoice =
   | RuntimeV02PendingActiveAbilityDeckReadingChoice
   | RuntimeV02PendingActiveAbilityChoice
   | RuntimeV02PendingActiveAbilitySelectedHealChoice
+  | RuntimeV02PendingActiveAbilitySelectedHealEachChoice
   | RuntimeV02PendingActiveAbilitySelectedModifierChoice;
 
 export type RuntimeV02ActiveAbilityLiveResolution =
@@ -79,6 +86,7 @@ export type RuntimeV02ActiveAbilityLiveResolution =
     actual_heal: number;
     emitted_packet_ids: string[];
   }
+  | RuntimeV02ActiveAbilitySelectedHealEachResolution
   | RuntimeV02ActiveAbilitySelectedModifierResolution;
 
 /**
@@ -172,6 +180,26 @@ export function runtimeV02CreateActiveAbilityLiveChoice(
     return pending;
   }
 
+  const selectedHealEachDescriptor = structuredRuntimeActiveAbilitySelectedHealEach(
+    state,
+    instance,
+  );
+  if (selectedHealEachDescriptor) {
+    const pending = runtimeV02BuildActiveAbilitySelectedHealEachChoice(
+      state,
+      controllerSeat,
+      selectedHealEachDescriptor,
+      source,
+      choiceId,
+    );
+    runtimeV02RecordActiveAbilityUse(
+      state,
+      controllerSeat,
+      selectedHealEachDescriptor.ability_id,
+    );
+    return pending;
+  }
+
   const selectedModifierDescriptor = structuredRuntimeActiveAbilitySelectedModifier(state, instance);
   if (!selectedModifierDescriptor) return null;
   const pending = runtimeV02BuildActiveAbilitySelectedModifierChoice(
@@ -209,6 +237,12 @@ export function runtimeV02PendingActiveAbilityLiveChoiceView(
   }
   if (choice.kind === "heal_one_damaged_friendly_creature") {
     return runtimeV02PendingActiveAbilitySelectedHealChoiceView(choice, viewerSeat);
+  }
+  if (choice.kind === "heal_each_selected_damaged_friendly_creature") {
+    return runtimeV02PendingActiveAbilitySelectedHealEachChoiceView(
+      choice,
+      viewerSeat,
+    );
   }
   if (choice.kind === "modify_one_friendly_creature") {
     return runtimeV02PendingActiveAbilitySelectedModifierChoiceView(choice, viewerSeat);
@@ -285,6 +319,15 @@ export function runtimeV02ResolveActiveAbilityLiveChoice(
       actual_heal: resolved.actual_heal,
       emitted_packet_ids: resolved.emitted_packet_ids,
     };
+  }
+  if (choice.kind === "heal_each_selected_damaged_friendly_creature") {
+    return runtimeV02ResolveActiveAbilitySelectedHealEachChoice(
+      choice,
+      controllerSeat,
+      choiceId,
+      choiceIds,
+      state,
+    );
   }
   if (choice.kind === "modify_one_friendly_creature") {
     return runtimeV02ResolveActiveAbilitySelectedModifierChoice(
