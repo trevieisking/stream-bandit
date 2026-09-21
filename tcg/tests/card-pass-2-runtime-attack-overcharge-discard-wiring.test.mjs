@@ -78,7 +78,8 @@ test('Stormmane Thunder Claw stays plain while Storm Break preserves its exact f
 
 test('live match owner captures declaration evidence then evaluates both Storm Break IF decisions after primary damage', () => {
   assert.ok(match.includes('tcg-match-attack-overcharge-discard-choice-v0-2.ts'));
-  assert.ok(match.includes('const structuredOverchargeDiscard=structuredRuntimeAfterDamageOverchargeDiscardCondition('));
+  assert.ok(match.includes('const structuredOverchargeDiscard=structuredAfterDamageFinishedProgram?null:structuredRuntimeAfterDamageOverchargeDiscardCondition('));
+  assert.ok(match.includes('const structuredAfterDamageFinishedProgram=structuredRuntimeAttackAfterDamageFinishedProgram('), 'mixed after-damage-finished owner must be resolved before ordinary after_damage owners');
   assert.ok(match.includes('const attackActionEvents=runtimeV02CollectAttackDeclarationEvents('));
   assert.ok(match.includes('const overchargeIfContext={source_creature:p.vanguard,attack_target:target'));
   assert.ok(match.includes('const structuredOverchargeTriggered=structuredOverchargeDiscard?runtimeV02AttackOverchargeTriggered(structuredOverchargeDiscard,overchargeIfContext):false;'));

@@ -26,7 +26,7 @@ test('forced KO promotion delegates battlefield mutation and preserves the exist
 });
 
 test('forced-promotion movement and heal private choices resume the same resolution queue', () => {
-  assert.match(live, /kind:"withdrawal"\|"attack"\|"play_creature"\|"evolve"\|"attach_essence"\|"play_realm"\|"forced_promotion"/);
+  assert.match(live, /kind:"withdrawal"\|"attack"\|"attack_program"\|"play_creature"\|"evolve"\|"attach_essence"\|"play_realm"\|"forced_promotion"/);
   assert.match(live, /if\(resume\.kind==="forced_promotion"\)\{/);
   assert.match(live, /runtimeV02BeginResolutionMovementHealListenerContinuation\(s,packetIds,resume\.seat\)/);
   assert.match(live, /resumeKind==="resume_resolution_queue"\)resolved=runtimeV02ResolveResolutionMovementHealListenerChoice/);
