@@ -1339,3 +1339,48 @@ The Setup digest independently matches #1291's CI-computed value. A post-repair 
 
 Ability IF source/accounting progress: **7 / 9**.
 Next exact target: Tide — Surgefin / Undertow Supply.
+
+## V2.4.74 — Surgefin / Undertow Supply active Ability IF source closeout
+
+The second remaining active Ability IF family is now implemented through generic active-Ability orchestration rather than a card branch.
+
+### Generic ownership
+
+- `tcg-match-active-ability-supply-v0-2.ts` recognizes the structured family:
+  `SELECT_CARDS(self discard, 0..1 filtered Basic Essence) -> SELECT_CREATURE(self reserve, exactly 1 filtered element) -> ATTACH_ESSENCE_FROM_ZONE -> IF(target_damaged) -> HEAL`.
+- The choice is server-owned and private. It exposes exactly one legal Reserve target plus optional eligible discard Essence options.
+- Physical attachment remains owned by the canonical Essence Attachment route; no effect adapter splices discard/attachment arrays.
+- Post-attachment IF evaluation remains owned by shared Active Ability IF.
+- Healing remains owned by canonical Heal packets.
+- A generic active-Ability continuation receipt preserves unfinished Ability work across nested Event -> Movement -> Heal listener choices.
+- The Heal Listener facade now has a distinct `resume_active_ability_effect` intent so nested listener healing returns to the unfinished Ability rather than prematurely restoring ordinary Play.
+
+### Undertow Supply semantics
+
+For the frozen Surgefin program:
+1. Requirements preflight confirms at least one eligible Basic Tide Essence exists in discard and at least one Reserve exists.
+2. Player chooses exactly one legal Tide Reserve target and may choose zero or one eligible discard Essence.
+3. If Essence is chosen, that exact instance attaches through the canonical Essence Attachment route.
+4. Any attachment-triggered Event/Movement/Heal listener continuation fully resolves first.
+5. Shared Active Ability IF evaluates `target_damaged($supply_target)` against authoritative post-listener field state.
+6. If true, canonical Ability Heal applies 10, including normal before-heal/listener processing.
+7. If false, no Heal packet is emitted.
+8. Public Match receipts expose counts/target slot and listener audit only; selected Essence identity is not published.
+
+### Evidence
+
+TCG Card Pass #1305 on pre-refresh head `2431fcd654c61366a3be7a8fd677ea8606ada538`:
+- deterministic runtime core: **SUCCESS**;
+- new Surgefin semantic-owner tests: discovered and passed;
+- new Match/source wiring tests: discovered and passed;
+- only failing gate: stale Match release-control count **98 != 96**.
+
+Release-control is refreshed on current exact head `c37660dd4c712055ca027caf18a036684de89e09`:
+- Setup: **8 files**, `92913c762cb3660fd92523ef0580e4afb5870588caae04ca6c48cefbffdec434`;
+- Match: **98 files**, `89dd8281cdd596083a2bc65ddc6760ac5cda4716fc25691e084962fd8a30fb63`;
+- Tactic: **40 files**, `b23e7d6c2c6142087d01fac47ad2ed03664ac5467a008a9553bd413ad9c4ba3a`.
+
+Exact-head Card Pass #1306 is in progress. Surgefin is therefore **source-complete / runtime-tested / exact-head acceptance pending**.
+
+Ability IF source/accounting progress: **8 / 9**.
+Final active Ability IF target: Tide — Marevault / Heart of Tides.
