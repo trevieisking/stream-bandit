@@ -975,3 +975,18 @@ After V2.4.96, the frozen 193-card scan contains exactly 13 `INSPECT_ZONE` uses,
 ## 335 — inspection authority is not downstream choice/move authority
 `INSPECT_ZONE` may own authoritative sample identity, visibility, ordering and private-view state. A following `CHOOSE_FROM_SET`, `MOVE_CARDS`, search, reward or zone mutation remains delegated to its own canonical owner.
 
+## 336 — INSPECT_ZONE belongs to existing owner #31
+Release 1 inspection parity is a closeout of Card Search / Filter / Inspection owner #31, not a new engine family. Specialized Attack/Ability/Reward/Event routes may orchestrate their declared families, but inspection identity/set semantics remain under owner #31 and no owner #41 is created.
+
+## 337 — inspection never implies physical movement
+An inspected card stays in its declared zone unless a later operation explicitly moves or reorders it. Later movement/order belongs to Card-Zone #30; Reward inspection ledger/privacy belongs to Reward #32; visibility belongs to Hidden Information #33.
+
+## 338 — effect-owned-set inspection binds exact provenance
+For a controller-private `effect_owned_set` inspection such as Seer Nyx, the server binds exact current card refs plus source zone/owner provenance. A later CHOOSE_FROM_SET may select from that set, but downstream mutation must rebind the exact current cards before Card-Zone movement.
+
+## 339 — Tactic INSPECT_ZONE is the only proven V2.4.97 execution gap
+Eleven of the thirteen frozen nodes already execute through bounded Attack, Ability, Reward or generic Event Listener ownership. The current Tactic interpreter has no INSPECT_ZONE branch, leaving only Parallax Window and Seer Nyx to close.
+
+## 340 — Reward and deck-top inspection use different privacy ledgers but one capability
+Reward inspection may reuse the existing Reward inspection ledger/private view. Deck-top inspection uses hidden-information/private inspection state. Capability parity is accepted only when both source-zone families obey the same declared selection/visibility/return-policy contract without leaking identities publicly.
+

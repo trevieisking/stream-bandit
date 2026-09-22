@@ -1012,3 +1012,22 @@
 - [x] Leave production/main/live unchanged.
 - [ ] V2.4.97: freeze and reconcile all **13** Release 1 `INSPECT_ZONE` uses through one authoritative inspection contract without absorbing later choice/move ownership.
 
+## V2.4.97 — INSPECT_ZONE all-surface closeout
+- [x] Freeze Release 1 `INSPECT_ZONE` inventory to exactly **13** nodes.
+- [x] Freeze source-zone split to deck_top ×8 / rewards ×5.
+- [x] Freeze visibility/return-policy families, including Cosmarch server-only and Seer Nyx effect-owned-set.
+- [x] Confirm owner #31 Card Search / Filter / Inspection remains canonical inspection authority.
+- [x] Confirm owner #33 owns private visibility and owner #30 owns later physical movement/order.
+- [x] Confirm existing structured coverage for Cosmarch, Nebulynx Attack, Noctivane active Ability, Nebulynx Reward Ability and Comettail Reward evolution.
+- [x] Confirm generic Event Listener coverage for Moonbit, Gloamkin, Wispbat, Graveglider and Veil Essence.
+- [x] Prove current Tactic interpreter has no `INSPECT_ZONE` execution branch.
+- [x] Identify the missing parity as exactly Parallax Window + Seer Nyx.
+- [ ] Add one generic Tactic INSPECT_ZONE route under owner #31 semantics.
+- [ ] Delegate Reward inspection identity/ledger to the existing Reward inspection owner.
+- [ ] Bind Seer Nyx's exact opponent top-3 as a private effect-owned set without moving it during inspection.
+- [ ] Revalidate bound inspection provenance before CHOOSE_FROM_SET / Card-Zone mutation.
+- [ ] Preserve player/controller-chosen ordering through existing Card-Zone routes.
+- [ ] Prove all 13 frozen INSPECT_ZONE nodes through canonical ownership.
+- [ ] Move `INSPECT_ZONE` from missing to implemented only after all 13 are green.
+- [ ] Refresh release-control closures/capability fingerprint and pass fresh exact-head Card Pass.
+

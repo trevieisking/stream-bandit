@@ -2802,3 +2802,72 @@ A fresh frozen 193-card scan after V2.4.96 finds **13** remaining `INSPECT_ZONE`
 
 V2.4.97 must begin read-only by freezing all 13 zones, viewers, counts, visibility/ordering semantics, bound variables and downstream consumers. Inspection owns authoritative sampling/view state only; later choose/move/search effects remain with their existing owners.
 
+## V2.4.97 — INSPECT_ZONE all-surface closeout (freeze)
+
+Read-only Release 1 inventory and ownership are frozen before source changes.
+
+### Frozen inventory — exactly 13 uses
+
+Only two source zones exist:
+- **deck_top ×8**;
+- **rewards ×5**.
+
+Visibility/return families:
+- controller-private + same-position;
+- one server-only + same-position (Cosmarch);
+- one controller-private + effect-owned-set (Seer Nyx).
+
+Exact consumers:
+1. Astral / Cosmarch — Attack, self deck-top 1, server-only, then card_matches IF / Card-Zone move-to-hand.
+2. Astral / Moonbit — triggered Ability/Event Listener, self Reward 1.
+3. Astral / Comettail — creature-evolved Reward inspection, self Reward 0..2 distinct.
+4. Astral / Nebulynx — active Ability, self Reward 1.
+5–6. Astral / Nebulynx — Attack Starfall Path, self deck-top 1 then self Reward 1.
+7. Astral / Parallax Window — Tactic, self Reward 1 then LOOK_TOP/order/draw.
+8. Shade / Gloamkin — triggered Ability/Event Listener, opponent deck-top 1.
+9. Shade / Noctivane — active Ability, opponent deck-top 1 then optional bottom move/schedule.
+10. Shade / Wispbat — triggered Ability/Event Listener, opponent deck-top 1.
+11. Shade / Graveglider — triggered Ability/Event Listener, opponent deck-top 2 then controller-chosen top order.
+12. Shade / Veil Essence — Event Listener, opponent deck-top 1.
+13. Shade / Seer Nyx — Tactic, opponent deck-top 3 as effect-owned set -> CHOOSE_FROM_SET 1 -> Card-Zone discard -> return remainder to deck top in controller-chosen order.
+
+### Existing accepted coverage — 11/13 nodes
+
+- Cosmarch uses the bounded server-only Attack top-deck owner.
+- Nebulynx Starfall Path uses the bounded ordered deck-top + Reward Attack inspection owner.
+- Noctivane uses the active Ability deck-reading owner.
+- Nebulynx active Reward inspection uses the active Ability Reward owner.
+- Comettail uses the evolution Reward inspection owner.
+- Moonbit, Gloamkin, Wispbat, Graveglider and Veil Essence route through the generic Event Listener INSPECT_ZONE implementation.
+- Event Listener already supports deck-top controller-private inspection, self Reward inspection, variable binding, CHOOSE_FROM_SET and ordered deck-top return.
+
+### Proven gap — exactly two Tactic INSPECT_ZONE nodes
+
+`tcg-tactic-actions/index.ts` contains no `INSPECT_ZONE` execution branch.
+
+Therefore the exact V2.4.97 repair target is:
+- Astral / Parallax Window;
+- Shade / Seer Nyx.
+
+### Canonical ownership
+
+Existing owner #31 — Card Search / Filter / Inspection Engine — owns inspection identity/sample/set semantics.
+Existing owner #33 — Hidden Information / Private Visibility — owns who may view inspected identities.
+Existing owner #32 — Reward Card Engine — owns Reward inspection ledger/private Reward view.
+Existing owner #30 — Card-Zone — owns any later physical card movement/order.
+
+V2.4.97 must not create owner #41.
+
+### Exact repair boundary
+
+The Tactic route must:
+1. recognize only the frozen `INSPECT_ZONE` grammar used by Parallax Window and Seer Nyx;
+2. use server-owned current zone identity and declared min/max/visibility/return policy;
+3. keep inspected identities private to the effect controller;
+4. for Reward inspection, delegate the inspection ledger/private Reward identity to the existing Reward inspection owner;
+5. for opponent deck-top effect-owned-set inspection, bind exact current top-card refs/provenance without physically moving them during inspection;
+6. allow later CHOOSE_FROM_SET to select from that bound set;
+7. delegate selected discard and final top ordering to Card-Zone;
+8. fail closed on stale deck/reward state before downstream mutation;
+9. add no card-ID/name dispatch.
+
