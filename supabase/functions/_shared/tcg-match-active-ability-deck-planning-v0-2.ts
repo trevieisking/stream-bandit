@@ -278,16 +278,16 @@ export function structuredRuntimeActiveAbilityDeckPlanning(
   const move = steps[2]!;
   const remainder = steps[3]!;
 
-  rejectFields(
-    look,
-    ["op", "player", "count", "as"],
-    `tcg_v0_2_active_ability_deck_planning_look_field_unsupported:${abilityId}`,
-  );
   if (
     look.op !== "LOOK_TOP" ||
     look.player !== "self" ||
     Number(look.count) !== 4
   ) return null;
+  rejectFields(
+    look,
+    ["op", "player", "count", "as"],
+    `tcg_v0_2_active_ability_deck_planning_look_field_unsupported:${abilityId}`,
+  );
   const lookedAs = requiredString(
     look.as,
     `tcg_v0_2_active_ability_deck_planning_look_var_required:${abilityId}`,
@@ -307,30 +307,30 @@ export function structuredRuntimeActiveAbilityDeckPlanning(
     Object.keys(choose.filters).length !== 0
   ) return null;
 
+  if (
+    move.op !== "MOVE_CARDS" ||
+    move.player !== "self" ||
+    move.cards !== `${choose.as}` ||
+    move.to !== "deck_bottom"
+  ) return null;
   rejectFields(
     move,
     ["op", "player", "cards", "to"],
     `tcg_v0_2_active_ability_deck_planning_move_field_unsupported:${abilityId}`,
   );
-  if (
-    move.op !== "MOVE_CARDS" ||
-    move.player !== "self" ||
-    move.cards !== `$${choose.as}` ||
-    move.to !== "deck_bottom"
-  ) return null;
 
+  if (
+    remainder.op !== "RETURN_REMAINDER_TO_DECK_TOP" ||
+    remainder.player !== "self" ||
+    remainder.source !== `${lookedAs}` ||
+    remainder.except !== `${choose.as}` ||
+    remainder.order !== "player_choice"
+  ) return null;
   rejectFields(
     remainder,
     ["op", "player", "source", "except", "order"],
     `tcg_v0_2_active_ability_deck_planning_remainder_field_unsupported:${abilityId}`,
   );
-  if (
-    remainder.op !== "RETURN_REMAINDER_TO_DECK_TOP" ||
-    remainder.player !== "self" ||
-    remainder.source !== `$${lookedAs}` ||
-    remainder.except !== `$${choose.as}` ||
-    remainder.order !== "player_choice"
-  ) return null;
 
   return {
     ability_id: abilityId,
