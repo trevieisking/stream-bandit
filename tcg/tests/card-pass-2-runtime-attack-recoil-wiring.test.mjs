@@ -76,7 +76,7 @@ test('the frozen Set One has exactly two attack-owned recoil after_damage progra
 test('primary attack damage packet listener is resolved before structured after-damage recoil', () => {
   assertInOrder([
     'const dmg=attackDamage(p.vanguard,target,s,declaredAttackDamage',
-    'const attackDamagePacketEvent=runtimeV02CreateResolvedAttackDamageEvent(',
+    'const attackDamagePacketEvent=s.runtime_registry_v0_2!=null?runtimeV02CreateResolvedAttackDamageEvent(',
     'const attackDamagePacketFlow=runtimeV02BeginEventListenerContinuation(s,[attackDamagePacketEvent])',
     'const structuredRecoilEffects=structuredRuntimeAfterDamageRecoilEffects(',
   ], 'attack damage packet event ordering changed');
