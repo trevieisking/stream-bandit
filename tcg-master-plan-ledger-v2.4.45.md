@@ -872,3 +872,19 @@ Frozen Release 1 has seven `SELECT_CARDS` consumers across Event Listener, Attac
 
 ## 301 — SELECT_CARDS selection authority is not Card-Zone mutation authority
 `SELECT_CARDS` owns server-private legal option generation, min/max validation, selected identity/zone revalidation and variable binding. Any later physical zone mutation remains with Card-Zone or the specialist owner invoked by the following operation.
+
+## 302 — active-Ability SELECT_CARDS may be a staged private continuation
+A sequential active Ability may pause first for a private card selection and then for a later Creature selection. Each stage must have its own current server choice identity so reconnect/stale submissions cannot reuse a prior stage. Browser code renders the server choice; it does not own legality or variable binding.
+
+## 303 — selected hidden card identity is server-private across continuation boundaries
+A `SELECT_CARDS` result may bind a hidden card instance for a later operation, but public match receipts may expose only structural outcome such as selected count and already-public field position. Selected hidden-zone UID/card ID and private anchor identities must stay inside server state/private views.
+
+## 304 — effect attachment state has one normalization owner
+When an Event Listener, Ability or later Tactic attaches Essence with effect-defined attachment disposition/lifecycle metadata, producers must delegate normalization to the shared attachment-state owner and physical attachment to the canonical Essence Attachment route/engine. Producer families must not invent parallel borrowed/temporary attachment semantics.
+
+## 305 — SELECT_CARDS capability cannot close on active-Ability evidence alone
+The V2.4.94 active-Ability sub-slice is accepted on exact head `d88af8f3a1047c38a8935974709c6a6389f43be4` with Card Pass #1496 SUCCESS, but `SELECT_CARDS` remains missing until the frozen Tactic consumers Forager Nia and Quickcharge Cell also have canonical private selection/resume ownership. Event Listener and Attack evidence remains preserved rather than reimplemented.
+
+## 306 — Tactic SELECT_CARDS owns selection and binding, not later mutation
+The remaining V2.4.94 Tactic route must own legal option construction, min/max choice validation, current-zone/card revalidation and variable binding. Any following `MOVE_CARDS`, `ATTACH_ESSENCE_FROM_ZONE` or other physical mutation remains delegated to its canonical engine/specialist. Completing selection transport must not create a second Card-Zone or Essence Attachment owner.
+

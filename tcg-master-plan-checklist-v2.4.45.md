@@ -906,3 +906,29 @@
 - [x] Card Pass **#1489 SUCCESS** on exact capability-reconciled head `fec2fb546a976ab67003acc4133d7fc3f5fe9a69`.
 - [x] Preserve canonical owner-family count 40 and leave main/live Supabase untouched.
 - [ ] V2.4.94: close `SELECT_CARDS` selection/resume ownership across all seven frozen consumer surfaces without duplicating Card-Zone ownership.
+
+## V2.4.94 — SELECT_CARDS all-surface closeout (in progress)
+- [x] Freeze the Release 1 `SELECT_CARDS` inventory to exactly seven consumers across Event Listener, Attack, active Ability and Tactic surfaces.
+- [x] Preserve Capscout and Tinkit on the existing generic triggered Event Listener selection owner.
+- [x] Preserve Myceliarch on the existing Attack Discard-Recycle specialist.
+- [x] Add one operation-shaped active-Ability sequential selection route for the Surgefin / Living Circuit family.
+- [x] Make the first Ability stage a private server-owned discard-card choice with exact min/max validation.
+- [x] Give the following Creature-target stage a fresh reconnect-safe private choice ID.
+- [x] Revalidate selected discard card identity + zone before any attachment mutation.
+- [x] Revalidate the current field target before any attachment mutation.
+- [x] Centralize effect attachment disposition/lifecycle normalization instead of duplicating producer state.
+- [x] Delegate physical Essence attachment to the canonical external Essence Attachment route/engine.
+- [x] Preserve nested Event Listener / Movement Listener continuation before the active Ability returns to play.
+- [x] Keep public Ability receipts structural only; expose no selected discard UID/card ID or private target anchor.
+- [x] Keep Surgefin / Living Circuit as data; add no card-ID/name runtime dispatch.
+- [x] Card Pass **#1495** proves deterministic runtime + all TypeScript checks green on source/runtime head `40607a749e3bd586a46cd12507d6ee3ace5c6782`; only release-control drift remained.
+- [x] Match Edge closure = 108 files / `26a48f4d98d62d22010bc1a79616c0dce7b12899e1f7ca93070fd2294ab7d286`.
+- [x] Tactic Edge closure = 44 files / `b2df5e5e605e9cdab570c55af6199e48a785c4ff2af456ecf015f27118b823f9`.
+- [x] Card Pass **#1496 SUCCESS** on exact active-Ability source/runtime + release-control head `d88af8f3a1047c38a8935974709c6a6389f43be4`.
+- [ ] Implement/reuse generic Tactic `SELECT_CARDS` private selection/resume for Forager Nia and Quickcharge Cell.
+- [ ] Preserve Tactic variable binding while delegating later card movement/attachment to canonical downstream owners.
+- [ ] Prove all seven frozen `SELECT_CARDS` consumers execute through their canonical surfaces.
+- [ ] Move `SELECT_CARDS` from missing to implemented only after all seven consumers are green.
+- [ ] Refresh the capability-manifest release-control fingerprint and pass a fresh exact-head Card Pass after capability reconciliation.
+- [ ] Close V2.4.94 and select the next master-plan target.
+

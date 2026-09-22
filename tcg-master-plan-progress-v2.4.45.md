@@ -2414,3 +2414,57 @@ V2.4.94 must therefore add/reuse one generic private card-selection transport fo
 Deferred rather than falsely promoted:
 - `ATTACH_ESSENCE_FROM_ZONE` remains partial because several consumers are still blocked by `SELECT_CARDS` and Magmagecko also requires missing `DIRECT_DAMAGE`;
 - `CHOOSE_FROM_SET` remains partial because at least Noctivane is upstream-blocked by missing `INSPECT_ZONE`.
+
+## V2.4.94 — SELECT_CARDS all-surface closeout (in progress)
+
+### Accepted active-Ability selection sub-slice
+
+The active-Ability half of the missing `SELECT_CARDS` surface is now source/runtime/release-control accepted without changing Card-Zone ownership.
+
+The generic sequential Ability route is operation-shaped rather than card-ID-shaped:
+
+`SELECT_CARDS self discard -> SELECT_CREATURE self field -> ATTACH_ESSENCE_FROM_ZONE`.
+
+For the frozen Release 1 family this covers the active-Ability selection transport needed by Tide / Surgefin and Volt / Stormcoil — Living Circuit.
+
+Ownership is split deliberately:
+- `SELECT_CARDS` owns the private legal card options, exact one-card choice, stale choice rejection, current-zone/card-identity revalidation and variable binding;
+- the following `SELECT_CREATURE` stage receives a fresh reconnect-safe server choice ID and revalidates the current field target;
+- physical Essence attachment still delegates to the canonical external Essence Attachment route/engine;
+- effect attachment disposition/lifecycle metadata is normalized by one shared attachment-state owner used by producers rather than duplicated in Ability/Event code;
+- nested Event Listener and Movement Listener continuations complete before the unfinished active Ability returns to ordinary play;
+- public receipts expose only structural outcome such as selected count and public field slot, never the selected discard card identity or private anchor UID.
+
+Existing owners remain authoritative:
+- Capscout and Tinkit stay on the generic triggered Event Listener `SELECT_CARDS` route;
+- Myceliarch stays on the existing Attack Discard-Recycle specialist;
+- no second Card-Zone engine and no card-ID/name dispatch was added.
+
+### Exact acceptance evidence
+
+Source/runtime proof head before closure refresh:
+- `40607a749e3bd586a46cd12507d6ee3ace5c6782`;
+- Card Pass **#1495** runtime job: deterministic runtime suite + Match/Tactic/setup/Withdrawal/Attack/Surge type-checks all **SUCCESS**;
+- its only remaining structure failure was the intentionally stale Edge dependency closure.
+
+Exact source/runtime + release-control accepted head:
+- `d88af8f3a1047c38a8935974709c6a6389f43be4`;
+- Card Pass **#1496 SUCCESS**;
+- Set One structure/effect grammar, guarded Runtime Pass B checks, deterministic runtime suite and all type-checks green.
+
+Exact Edge closures:
+- Match: **108 files** / `26a48f4d98d62d22010bc1a79616c0dce7b12899e1f7ca93070fd2294ab7d286`;
+- Tactic: **44 files** / `b2df5e5e605e9cdab570c55af6199e48a785c4ff2af456ecf015f27118b823f9`.
+
+`SELECT_CARDS` remains **not implemented in the capability manifest** because the frozen Tactic surface is still open. This is intentional truth preservation, not a failed acceptance of the active-Ability sub-slice.
+
+No database migration, Supabase Edge deployment, main merge or live promotion was performed. Canonical owner-family count remains **40**.
+
+### Next exact target inside V2.4.94
+
+Close the remaining Tactic `SELECT_CARDS` surface generically for:
+- Grove / Forager Nia;
+- Volt / Quickcharge Cell.
+
+The next pass must freeze both exact Tactic programs first, then reuse one server-private card-selection/resume transport. Selection may bind a variable for later program steps, but any physical move/attachment stays with the canonical downstream engine. Only after Event Listener + Attack + active Ability + Tactic cover all seven frozen consumers may `SELECT_CARDS` move from missing to implemented.
+
