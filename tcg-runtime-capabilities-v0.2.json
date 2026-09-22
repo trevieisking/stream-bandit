@@ -36,6 +36,7 @@
       "HEAL_EACH",
       "IF",
       "INCREMENT_SOURCE_COUNTER",
+      "INSPECT_ZONE",
       "LOOK_TOP",
       "MODIFY_CURRENT_ATTACK_DAMAGE",
       "MODIFY_CURRENT_DAMAGE_PACKET",
@@ -74,7 +75,6 @@
       "DEFEAT_EACH_MATCHING",
       "DEFEAT_TARGET_IF",
       "DIRECT_DAMAGE",
-      "INSPECT_ZONE",
       "MOVE_DAMAGE",
       "MOVE_ZONE_POSITION",
       "PERFORM_VOLUNTARY_WITHDRAWAL",
@@ -957,6 +957,56 @@
         }
       },
       "note": "OPTIONAL is accepted as a shared consent/resume operation across all 19 frozen consumers. The six ordinary Attack OPTIONAL switch programs now use the canonical server choice + Atomic Switch path. No owner #41."
+    },
+    "release1_inspect_zone_all_surface_v2_4_97": {
+      "accepted_head": "aae70b4fa61ce193301e9e4ca7a33e4351c52d69",
+      "card_pass_run": 1526,
+      "operation": "INSPECT_ZONE",
+      "frozen_node_count": 13,
+      "frozen_consumers": [
+        "astral-cosmarch",
+        "astral-moonbit",
+        "astral-comettail",
+        "astral-nebulynx",
+        "astral-parallax-window",
+        "shade-gloamkin",
+        "shade-noctivane",
+        "shade-wispbat",
+        "shade-graveglider",
+        "shade-veil-essence",
+        "shade-seer-nyx"
+      ],
+      "surface_counts": {
+        "attack": 3,
+        "event_listener": 6,
+        "active_ability": 2,
+        "tactic": 2
+      },
+      "owners": {
+        "inspection": "supabase/functions/_shared/tcg-match-inspection-v0-2.ts",
+        "reward": "supabase/functions/_shared/tcg-match-reward-inspection-v0-2.ts",
+        "hidden_information": "supabase/functions/_shared/tcg-match-hidden-information-v0-2.ts",
+        "card_zone": "supabase/functions/_shared/tcg-match-card-zone-engine-v0-2.ts"
+      },
+      "semantics": {
+        "reward_same_position": true,
+        "effect_owned_top_set": true,
+        "stale_revalidation": true,
+        "selected_discard_delegates_card_zone": true,
+        "remainder_reorder_delegates_card_zone": true,
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "release_closures": {
+        "match_actions": {
+          "file_count": 109,
+          "sha256": "8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6"
+        },
+        "tactic_actions": {
+          "file_count": 46,
+          "sha256": "5defbc3ccf666ee96191aea62b2f98bfda7800ed56f86c5e4e8e7501f1cef876"
+        }
+      }
     }
   }
 }
