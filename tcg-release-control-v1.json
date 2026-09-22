@@ -561,8 +561,8 @@
       "tcg-tactic-actions": {
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "603ce837fe2c2f4a0a212394b2a434a4977a5892",
-        "file_count": 51,
-        "closure_sha256": "c5e98199db9ffd4007ad929ae969a05356320b3d7d00b954fb01f5fb3a207c8c",
+        "file_count": 53,
+        "closure_sha256": "a2a0a22f135d77132a65da98a5a33f0cc58a6400dc6417cd9a30bf86d1df7d9d",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -605,6 +605,10 @@
             "git_blob_sha": "7c2b840581a06f87b65af760d41d9402f03c2272"
           },
           {
+            "path": "supabase/functions/_shared/tcg-match-damage-packet-context-v0-2.ts",
+            "git_blob_sha": "afaad6093314f9e4b9478a1b25cba7807706c2a9"
+          },
+          {
             "path": "supabase/functions/_shared/tcg-match-damage-packet-listener-v0-2.ts",
             "git_blob_sha": "7d0425e65c380d3ad050b98d42949702dbafbc51"
           },
@@ -619,6 +623,10 @@
           {
             "path": "supabase/functions/_shared/tcg-match-damage-program-v0-2.ts",
             "git_blob_sha": "cb49a58132659541adff7c3a0fef50eb23cf29a1"
+          },
+          {
+            "path": "supabase/functions/_shared/tcg-match-damage-protection-v0-2.ts",
+            "git_blob_sha": "06fcd20e1ff5935248c5d10a7b6a1440377d1f08"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-defeat-engine-v0-2.ts",
