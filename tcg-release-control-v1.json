@@ -92,9 +92,9 @@
       },
       "tcg-match-actions": {
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
-        "entrypoint_git_blob_sha": "6e45bcdfcdf2c1947d80d187ac68f3a09f5ebab8",
+        "entrypoint_git_blob_sha": "07dd35aee3599027af9d70b6c19473fe45fcb3f9",
         "file_count": 115,
-        "closure_sha256": "41ca71081799dd7f436187debc9ccf01538ee914fe9a70ad04140db5245775d9",
+        "closure_sha256": "f49e73b79d330abd4dfc4621e9a7c495849f702f9c37ecdcc1ad63d10a295c93",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -358,7 +358,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-direct-damage-v0-2.ts",
-            "git_blob_sha": "fb9efa32363201085e3a29385c12ce6181d56c89"
+            "git_blob_sha": "256ec6d56dd51ef230faaeb808ad0691f5506fe4"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",
@@ -550,7 +550,7 @@
           },
           {
             "path": "supabase/functions/tcg-match-actions/index.ts",
-            "git_blob_sha": "6e45bcdfcdf2c1947d80d187ac68f3a09f5ebab8"
+            "git_blob_sha": "07dd35aee3599027af9d70b6c19473fe45fcb3f9"
           },
           {
             "path": "supabase/functions/tcg-tactic-actions/runtime-v0-2-core.ts",
@@ -562,7 +562,7 @@
         "entrypoint": "supabase/functions/tcg-tactic-actions/index.ts",
         "entrypoint_git_blob_sha": "603ce837fe2c2f4a0a212394b2a434a4977a5892",
         "file_count": 53,
-        "closure_sha256": "a2a0a22f135d77132a65da98a5a33f0cc58a6400dc6417cd9a30bf86d1df7d9d",
+        "closure_sha256": "8c307eb4fbc435f14953b1dec4f15b9aa21e51dde0c910c3d432e95720afe7db",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-attack-eligibility-v0-2.ts",
@@ -638,7 +638,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-direct-damage-v0-2.ts",
-            "git_blob_sha": "fb9efa32363201085e3a29385c12ce6181d56c89"
+            "git_blob_sha": "256ec6d56dd51ef230faaeb808ad0691f5506fe4"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-essence-attachment-eligibility-v0-2.ts",

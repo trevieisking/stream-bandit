@@ -6,6 +6,7 @@ import {
   type RuntimeV02RecoilDamagePacketResult,
 } from "./tcg-match-damage-packet-v0-2.ts";
 import type { RuntimeV02DamageCreature } from "./tcg-match-damage-engine-v0-2.ts";
+import type { RuntimeV02EventListenerEvent } from "./tcg-match-event-listener-v0-2.ts";
 
 export type RuntimeV02DirectDamageClass = "effect" | "recoil";
 
@@ -21,7 +22,7 @@ export type RuntimeV02DirectDamageResult = {
   packet:
     | RuntimeV02EffectDamagePacketResult
     | RuntimeV02RecoilDamagePacketResult;
-  after_damage_event: Record<string, unknown>;
+  after_damage_event: RuntimeV02EventListenerEvent;
 };
 
 function objectRecord(value: unknown): Record<string, unknown> | null {
@@ -88,7 +89,7 @@ export function runtimeV02NormalizeDirectDamageStep(
 function afterDamageEvent(
   state: Record<string, unknown>,
   packetId: string,
-): Record<string, unknown> {
+): RuntimeV02EventListenerEvent {
   const events = state.effect_events;
   if (!Array.isArray(events)) {
     throw new Error("tcg_v0_2_direct_damage_event_stream_required");
@@ -101,7 +102,7 @@ function afterDamageEvent(
   if (!event || typeof event !== "object") {
     throw new Error("tcg_v0_2_direct_damage_after_event_missing");
   }
-  return structuredClone(event as Record<string, unknown>);
+  return structuredClone(event as RuntimeV02EventListenerEvent);
 }
 
 /**
