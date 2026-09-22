@@ -2662,3 +2662,76 @@ No database migration, Supabase Edge deployment, main merge or live promotion oc
 
 The frozen 193-card inventory currently contains exactly **19 Release 1 OPTIONAL uses**, the largest remaining used missing opcode. V2.4.96 must begin read-only by freezing every consumer surface, nested program shape, choice timing and downstream owner before any source change. OPTIONAL owns player consent/resume only; it must never absorb the semantics of the nested operation.
 
+## V2.4.96 — OPTIONAL all-surface closeout (freeze)
+
+Read-only Release 1 inventory is frozen before source changes.
+
+### Frozen inventory — exactly 19 uses
+
+**9 Event Listener OPTIONALs**
+- Astral / Celestial Observatory — optional top-deck to bottom move;
+- Ember / Bristleflare — optional self effect damage + draw;
+- Gale / Gustfox — optional self switch;
+- Gale / Zephyrhare — optional Gale Reserve selection + switch;
+- Gale / Draft Essence — optional voluntary Withdrawal;
+- Grove / Vinecoil — optional condition clear;
+- Tide / Moonlit Reef — optional draw then discard;
+- Volt / Circuit Essence — optional draw then discard;
+- Volt / Stormgrid City — optional resolving-card destination override.
+
+Event Listener already owns a generic server-private accept/decline choice, replaces the OPTIONAL node with the accepted nested steps, and then resumes the same canonical interpreter. Nested operations remain owned by their existing engines.
+
+**6 ordinary Attack after_damage OPTIONALs**
+- Ember / Sootwing;
+- Gale / Skyweaver;
+- Gale / Tempestalon;
+- Gale / Aeralith — Storm Shepherd;
+- Shade / Wispbat;
+- Tide / Mistmarten.
+
+All six are the same bounded family:
+`OPTIONAL self -> SELECT_CREATURE self reserve count 1 -> SWITCH_WITH_VANGUARD self`,
+with the frozen cards differing only in declared Reserve filters and optional `action_kind: attack`.
+
+Current exact-head audit proves these six are **not** claimed by the structured Attack switch specialist. That owner currently parses a different `IF reserve_count_at_least -> SELECT -> SWITCH` family. The six OPTIONAL cards can therefore fall toward legacy effect-text / caller-supplied `switch_reserve_index` handling instead of receiving a canonical server choice.
+
+This is the actual V2.4.96 repair target.
+
+**3 Tactic program OPTIONALs**
+- Gale / Cyclone Route — optional opponent Reserve selection + opponent switch;
+- Shade / False Memory — optional discard 1 -> draw 2, else draw 1;
+- Shade / Quiet Step — optional clear outgoing Vanguard control condition.
+
+Tactic already owns a generic private accept/decline choice and deterministic nested-step/else-step resume. Nested operations remain with their existing owners.
+
+**1 mixed after_damage_finished OPTIONAL**
+- Tide / Marevault — Heart of Tides.
+
+The mixed Attack owner already models this as a 0..1 Reserve switch stage after Movement and HEAL_EACH listener boundaries and delegates accepted mutation to Atomic Switch.
+
+### V2.4.96 ownership rule
+
+`OPTIONAL` owns **player consent + deterministic resume only**.
+
+It must not own:
+- Atomic Switch;
+- Card-Zone movement;
+- Damage;
+- Draw/discard;
+- Condition clearing;
+- voluntary Withdrawal;
+- resolving-card destination;
+- Creature selection legality beyond the nested operation's declared filters.
+
+### Exact repair boundary
+
+V2.4.96 must:
+1. preserve the existing 9 Event Listener, 3 Tactic and 1 Marevault OPTIONAL routes;
+2. extend the existing Attack Reserve-switch specialist to the six frozen OPTIONAL after_damage programs;
+3. represent decline as a legal zero-selection outcome;
+4. represent accept as one server-owned Reserve choice with current-source/current-turn/current-target rebinding;
+5. preserve declared Reserve filters, including Aeralith's Gale filter;
+6. delegate accepted mutation to Atomic Switch and preserve Movement/Heal listener continuation;
+7. remove the six structured cards from dependence on legacy effect-text / caller-supplied switch indexes without deleting legacy compatibility;
+8. add no card-ID/name dispatch and no owner #41.
+

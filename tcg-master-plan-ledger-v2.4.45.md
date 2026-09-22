@@ -936,3 +936,21 @@ V2.4.96 targets the 19 frozen Release 1 `OPTIONAL` uses. OPTIONAL may own whethe
 ## 322 — V2.4.95 release-control state
 Match closure is 109 / `0eab3c83084c2ee60230be602cf22e1e5b451b713ad9655838008b9300c105c0`; Tactic closure is 45 / `c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2`; owner-family count remains 40; no production deployment or main merge occurred.
 
+## 323 — OPTIONAL owns consent and resume only
+The Release 1 OPTIONAL operation owns whether the declared player accepts or declines and where the structured program resumes. It does not absorb the semantic owner of nested steps. Accepted Switch, Card-Zone, Damage, Draw/discard, Condition, Withdrawal and destination operations continue to use their existing owners.
+
+## 324 — ordinary Attack OPTIONAL switches must use server-owned choice state
+The six frozen ordinary Attack OPTIONAL switch programs must not depend on browser-supplied `switch_reserve_index` or effect-text parsing. The server creates the legal current Reserve options, records source/turn anchors and resolves accept/decline through the canonical pending Attack choice transport.
+
+## 325 — OPTIONAL decline is a first-class legal result
+For a bounded optional Attack switch, declining performs no Atomic Switch and emits no movement events. The Attack then completes through the same defeat/Aftermath continuation as any other resolved post-damage choice.
+
+## 326 — accepted OPTIONAL switch still belongs to Atomic Switch
+OPTIONAL/Attack-choice code may select and revalidate the Reserve target, but the battlefield mutation remains Atomic Switch. Movement Listener and any resulting Heal Listener work must finish before Attack completion.
+
+## 327 — OPTIONAL Attack filters remain data
+The generic Attack OPTIONAL switch route must honor the nested SELECT_CREATURE filters from frozen card data, including element filters such as Aeralith's Gale-only Reserve selection, without card-ID/name dispatch.
+
+## 328 — legacy Attack switch compatibility is not structured authority
+Legacy effect-text / caller-supplied switch-index handling may remain for legacy snapshots, but once a structured OPTIONAL switch program is claimed by the canonical Attack choice owner, that structured attack must not also execute the legacy switch path.
+

@@ -976,3 +976,22 @@
 - [x] Leave Supabase production, main and live promotion untouched.
 - [ ] V2.4.96: freeze and reconcile all **19** Release 1 `OPTIONAL` uses through a generic consent/resume contract without absorbing nested-operation ownership.
 
+## V2.4.96 — OPTIONAL all-surface closeout
+- [x] Freeze Release 1 `OPTIONAL` inventory to exactly **19** uses.
+- [x] Freeze surface split to **9 Event Listener / 6 ordinary Attack after_damage / 3 Tactic / 1 Marevault after_damage_finished**.
+- [x] Confirm Event Listener already owns generic private accept/decline + nested-step resume for its 9 consumers.
+- [x] Confirm Tactic already owns generic private accept/decline + nested/else resume for its 3 consumers.
+- [x] Confirm Marevault already owns its bounded 0..1 optional switch stage and delegates mutation to Atomic Switch.
+- [x] Identify the missing parity as exactly six ordinary Attack OPTIONAL Reserve-switch programs.
+- [x] Confirm current Attack switch specialist parses a different IF-based family and does not claim those six OPTIONAL programs.
+- [x] Confirm the six structured cards can otherwise fall toward legacy text / caller-supplied switch-index handling.
+- [ ] Extend the existing Attack Reserve-switch specialist with the exact frozen OPTIONAL grammar.
+- [ ] Preserve declared Reserve filters generically.
+- [ ] Allow decline without performing Atomic Switch.
+- [ ] On accept, rebind the current source/turn/selected Reserve anchor before Atomic Switch.
+- [ ] Preserve Movement Listener then Heal Listener continuation after accepted switch.
+- [ ] Keep legacy compatibility available only for legacy/unclaimed attacks.
+- [ ] Prove all 19 frozen OPTIONAL consumers through canonical ownership.
+- [ ] Move `OPTIONAL` from missing to implemented only after all 19 are green.
+- [ ] Refresh release-control closures/capability fingerprint as required and pass a fresh exact-head Card Pass.
+
