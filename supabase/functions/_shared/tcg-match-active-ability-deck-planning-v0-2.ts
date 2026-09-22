@@ -310,7 +310,7 @@ export function structuredRuntimeActiveAbilityDeckPlanning(
   if (
     move.op !== "MOVE_CARDS" ||
     move.player !== "self" ||
-    move.cards !== `${choose.as}` ||
+    move.cards !== "$" + choose.as ||
     move.to !== "deck_bottom"
   ) return null;
   rejectFields(
@@ -322,8 +322,8 @@ export function structuredRuntimeActiveAbilityDeckPlanning(
   if (
     remainder.op !== "RETURN_REMAINDER_TO_DECK_TOP" ||
     remainder.player !== "self" ||
-    remainder.source !== `${lookedAs}` ||
-    remainder.except !== `${choose.as}` ||
+    remainder.source !== "$" + lookedAs ||
+    remainder.except !== "$" + choose.as ||
     remainder.order !== "player_choice"
   ) return null;
   rejectFields(

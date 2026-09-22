@@ -94,7 +94,7 @@
         "entrypoint": "supabase/functions/tcg-match-actions/index.ts",
         "entrypoint_git_blob_sha": "c51ba1409390f90c0758d82fe4e3aacc6ac5e9bf",
         "file_count": 111,
-        "closure_sha256": "1108a27d07d2ceb68fd01c3b5728fbf730c995a004605df7c4ba0f135f19bcdb",
+        "closure_sha256": "b8dc05595f2a617adc940e38d92e1352a6aaacae38dc9d77ed60a3aef7daf389",
         "files": [
           {
             "path": "supabase/functions/_shared/tcg-match-action-cost-gate-v0-2.ts",
@@ -118,7 +118,7 @@
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-deck-planning-v0-2.ts",
-            "git_blob_sha": "061f6ccbf48a1cf366f4d7b8298d304d75c369e8"
+            "git_blob_sha": "4a27d22c7b5c5ffd722a96c7acdef68bcaec8621"
           },
           {
             "path": "supabase/functions/_shared/tcg-match-active-ability-deck-reading-v0-2.ts",
