@@ -11,6 +11,8 @@ import { runtimeV02InstallAttackEligibilityRule, runtimeV02NormalizeAttackEligib
 import { runtimeV02InstallWithdrawalModifier } from "../_shared/tcg-match-withdrawal-modifier-v0-2.ts";
 import { runtimeV02BeginMovementListenerContinuation, runtimeV02CreateEssenceMovedEvent, runtimeV02PendingMovementListenerChoiceView, runtimeV02PrivateMovementInspectionView, runtimeV02ResolveMovementListenerChoice, type RuntimeV02PendingMovementListenerChoice } from "../_shared/tcg-match-movement-listener-v0-2.ts";
 import { runtimeV02BeginExternalEssenceAttachmentRoute } from "../_shared/tcg-match-essence-attachment-route-v0-2.ts";
+import { runtimeV02NormalizeEffectAttachmentState } from "../_shared/tcg-match-essence-attachment-state-v0-2.ts";
+import { runtimeV02CardSelectionOptions, runtimeV02NormalizeSelectCardsStep, runtimeV02RebindSelectedCards, runtimeV02ResolveSelectCards, type RuntimeV02SelectCardsDescriptor, type RuntimeV02SelectedCardRef } from "../_shared/tcg-match-card-selection-v0-2.ts";
 import { runtimeV02Definition } from "../_shared/tcg-runtime-registry-v0-2.ts";
 import {
   evaluateRuntimeV02LegalCardAvailableRequirement,
@@ -231,6 +233,88 @@ function playerSeat(ownerSeat: number, token: unknown, vars: Record<string, unkn
 function resolveVar(vars: Record<string, unknown>, token: unknown) {
   return typeof token === "string" && token.startsWith("$") ? vars[token.slice(1)] : token;
 }
+function selectCardsDescriptorMap(vars: Record<string, unknown>) {
+  const current = vars.__select_cards_descriptors;
+  if (current && typeof current === "object" && !Array.isArray(current)) {
+    return current as Record<string, RuntimeV02SelectCardsDescriptor>;
+  }
+  const created: Record<string, RuntimeV02SelectCardsDescriptor> = {};
+  vars.__select_cards_descriptors = created;
+  return created;
+}
+function selectedCardRefs(value: unknown): RuntimeV02SelectedCardRef[] {
+  if (!Array.isArray(value)) throw new Error("tcg_v0_2_tactic_selected_cards_variable_invalid");
+  return value.map((raw, index) => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+      throw new Error(`tcg_v0_2_tactic_selected_card_ref_invalid:${index}`);
+    }
+    const row = raw as Record<string, unknown>;
+    return {
+      uid: String(row.uid || ""),
+      card_id: String(row.card_id || ""),
+      zone_owner_seat: Number(row.zone_owner_seat) as 1 | 2,
+      zone: String(row.zone || "") as RuntimeV02SelectedCardRef["zone"],
+    };
+  });
+}
+function selectedCardMoveDestination(player: any, destination: string) {
+  if (destination === "hand") return { zone: player.hand as Inst[], zone_name: "hand", position: "bottom" as const };
+  if (destination === "discard") return { zone: player.discard as Inst[], zone_name: "discard", position: "bottom" as const };
+  if (destination === "deck_bottom") return { zone: player.deck as Inst[], zone_name: "deck", position: "bottom" as const };
+  if (destination === "deck_top") return { zone: player.deck as Inst[], zone_name: "deck", position: "top" as const };
+  throw new Error(`unsupported_card_destination:${destination}`);
+}
+function commitSelectedCardMove(
+  state: any,
+  effect: EffectState,
+  refs: RuntimeV02SelectedCardRef[],
+  destinationSeat: number,
+  destination: string,
+) {
+  const rebound = runtimeV02RebindSelectedCards(state, refs);
+  if (!rebound.length) return;
+  const sourceSeat = rebound[0].zone_owner_seat;
+  const sourceZone = rebound[0].zone;
+  if (
+    rebound.some((ref) =>
+      ref.zone_owner_seat !== sourceSeat || ref.zone !== sourceZone
+    )
+  ) throw new Error("tcg_v0_2_tactic_selected_cards_mixed_source");
+  if (sourceSeat !== destinationSeat || sourceZone !== "discard") {
+    throw new Error("tcg_v0_2_tactic_selected_cards_move_source_unsupported");
+  }
+  const player = state.players[String(sourceSeat)];
+  const target = selectedCardMoveDestination(player, destination);
+  const preflight = runtimeV02PreflightCardZoneTransfer(
+    player.discard as Inst[],
+    target.zone,
+    {
+      cause: "effect",
+      action_kind: "tactic",
+      source_action_id: effect.id,
+      source_card_uid: effect.source_card.uid,
+      source: {
+        controller_seat: sourceSeat,
+        zone: "discard",
+        owner_card_uid: null,
+      },
+      destination: {
+        controller_seat: destinationSeat,
+        zone: target.zone_name,
+        owner_card_uid: null,
+      },
+      card_uids: rebound.map((ref) => ref.uid),
+      destination_position: target.position,
+    },
+  );
+  for (let index = 0; index < rebound.length; index += 1) {
+    if (
+      preflight.cards[index]?.uid !== rebound[index].uid ||
+      preflight.cards[index]?.card_id !== rebound[index].card_id
+    ) throw new Error("tcg_v0_2_tactic_selected_card_changed");
+  }
+  runtimeV02CommitCardZoneTransfer(player.discard as Inst[], target.zone, preflight);
+}
 function reserveCount(player: any) {
   return (player.reserve || []).filter(Boolean).length;
 }
@@ -333,7 +417,21 @@ function unsupportedOps(steps: any[]): string[] {
       }
       if (op === "SET_WITHDRAWAL_COST" && !["end_of_turn", "aftermath"].includes(String(step.expires || "end_of_turn"))) unsupported.add("SET_WITHDRAWAL_COST_EXPIRY");
       if (op === "ADD_CONDITION_IMMUNITY" && !["end_of_turn", "aftermath"].includes(String(step.expires || "aftermath"))) unsupported.add("ADD_CONDITION_IMMUNITY_EXPIRY");
-      if (op === "ATTACH_ESSENCE_FROM_ZONE" && String(step.from || "") !== "discard") unsupported.add("ATTACH_ESSENCE_FROM_ZONE_SOURCE");
+      if (op === "SELECT_CARDS") {
+        try { runtimeV02NormalizeSelectCardsStep(step); }
+        catch { unsupported.add("SELECT_CARDS_GRAMMAR"); }
+      }
+      if (op === "ATTACH_ESSENCE_FROM_ZONE") {
+        if (step.cards != null) {
+          if (String(step.zone || "") !== "discard" || step.manual_attachment !== false) {
+            unsupported.add("ATTACH_ESSENCE_FROM_ZONE_SELECTED_SOURCE");
+          }
+          try { runtimeV02NormalizeEffectAttachmentState(step.attachment_state); }
+          catch { unsupported.add("ATTACH_ESSENCE_FROM_ZONE_ATTACHMENT_STATE"); }
+        } else if (String(step.from || "") !== "discard") {
+          unsupported.add("ATTACH_ESSENCE_FROM_ZONE_SOURCE");
+        }
+      }
       if (Array.isArray(step?.steps)) walk(step.steps);
       if (Array.isArray(step?.else_steps)) walk(step.else_steps);
       if (Array.isArray(step?.then)) walk(step.then);
@@ -347,7 +445,11 @@ function requiredEffectResourcesAvailable(state: any, ownerSeat: number, steps: 
   let ok = true;
   const walk = (items: any[]) => {
     for (const step of items || []) {
-      if (String(step?.op || "") === "ATTACH_ESSENCE_FROM_ZONE" && String(step.from || "") === "discard") {
+      if (String(step?.op || "") === "SELECT_CARDS") {
+        const descriptor = runtimeV02NormalizeSelectCardsStep(step);
+        if (runtimeV02CardSelectionOptions(state, ownerSeat, descriptor).length < descriptor.min) ok = false;
+      }
+      if (String(step?.op || "") === "ATTACH_ESSENCE_FROM_ZONE" && step.cards == null && String(step.from || "") === "discard") {
         const seat = playerSeat(ownerSeat, step.player || "self", {});
         const zone = state.players[String(seat)]?.discard || [];
         const range = countRange(step.selection);
@@ -886,6 +988,35 @@ function executeUntilChoice(state: any) {
       effect.cursor++;
       continue;
     }
+    if (op === "SELECT_CARDS") {
+      const descriptor = runtimeV02NormalizeSelectCardsStep(step);
+      const options = runtimeV02CardSelectionOptions(state, ownerSeat, descriptor);
+      if (options.length < descriptor.min) throw new Error("required_effect_choice_unavailable");
+      selectCardsDescriptorMap(vars)[descriptor.as] = structuredClone(descriptor);
+      if (!options.length && descriptor.min === 0) {
+        vars[descriptor.as] = [];
+        effect.cursor++;
+        continue;
+      }
+      setPending(state, effect, {
+        seat: ownerSeat,
+        kind: "select_cards",
+        prompt: "Choose card",
+        min: descriptor.min,
+        max: Math.min(descriptor.max, options.length),
+        mode: "select",
+        options: options.map((option) => ({
+          id: option.id,
+          label: option.label,
+          data: { ref: option.ref },
+        })),
+        context: {
+          apply: "select_cards",
+          descriptor: structuredClone(descriptor),
+        },
+      });
+      return;
+    }
     if (op === "SELECT_CREATURE") {
       const options = creatureOptions(state, ownerSeat, step.controller || "self", step.zone, step.filters);
       const bounds = choiceBounds(step.count, options.length, false);
@@ -1038,6 +1169,52 @@ function executeUntilChoice(state: any) {
       const token = typeof step.cards === "string" && step.cards.startsWith("$")
         ? step.cards.slice(1)
         : "";
+      const selectDescriptor = token ? selectCardsDescriptorMap(vars)[token] : null;
+      if (selectDescriptor) {
+        const refs = selectedCardRefs(resolveVar(vars, step.cards));
+        const rebound = runtimeV02RebindSelectedCards(state, refs);
+        if (
+          rebound.some((ref) =>
+            ref.zone_owner_seat !== destinationSeat ||
+            ref.zone !== selectDescriptor.zone
+          )
+        ) throw new Error("tcg_v0_2_tactic_selected_cards_move_source_changed");
+        const order = String(step.order || "preserve");
+        if (order === "player_choice" && rebound.length > 1) {
+          setPending(state, effect, {
+            seat: ownerSeat,
+            kind: "order_selected_cards",
+            prompt: "Choose card order",
+            min: rebound.length,
+            max: rebound.length,
+            mode: "order",
+            options: rebound.map((ref) => ({
+              id: `card:${ref.uid}`,
+              label: cardName(state, { uid: ref.uid, card_id: ref.card_id }),
+              data: { ref },
+            })),
+            context: {
+              apply: "move_selected_cards",
+              source_token: token,
+              destination_seat: destinationSeat,
+              destination: String(step.to || "hand"),
+            },
+          });
+          return;
+        }
+        if (order !== "preserve" && order !== "player_choice") {
+          throw new Error(`tcg_v0_2_tactic_selected_cards_order_unsupported:${order}`);
+        }
+        commitSelectedCardMove(
+          state,
+          effect,
+          rebound,
+          destinationSeat,
+          String(step.to || "hand"),
+        );
+        effect.cursor++;
+        continue;
+      }
       const provenanceMap = (
         vars.__hidden_sample_sources && typeof vars.__hidden_sample_sources === "object"
           ? vars.__hidden_sample_sources
@@ -1449,6 +1626,91 @@ function executeUntilChoice(state: any) {
       effect.cursor++;
       continue;
     }
+    if (op === "ATTACH_ESSENCE_FROM_ZONE" && step.cards != null) {
+      if (step.manual_attachment !== false) throw new Error("tcg_v0_2_tactic_selected_attachment_manual_flag_required");
+      if (String(step.zone || "") !== "discard") throw new Error(`unsupported_essence_attachment_source:${step.zone}`);
+      const token = typeof step.cards === "string" && step.cards.startsWith("$")
+        ? step.cards.slice(1)
+        : "";
+      if (!token || !selectCardsDescriptorMap(vars)[token]) {
+        throw new Error("tcg_v0_2_tactic_selected_attachment_source_required");
+      }
+      const refs = runtimeV02RebindSelectedCards(
+        state,
+        selectedCardRefs(resolveVar(vars, step.cards)),
+      );
+      if (refs.length > 1) {
+        throw new Error("tcg_v0_2_tactic_selected_attachment_multiple_not_supported");
+      }
+      const targetRef = resolveVar(vars, step.target) as CreatureRef;
+      const target = findCreature(state, targetRef);
+      if (!target) throw new Error("essence_attachment_target_missing");
+      const sourceSeat = playerSeat(ownerSeat, step.player || "self", vars);
+      if (
+        refs.some((ref) =>
+          ref.zone_owner_seat !== sourceSeat || ref.zone !== "discard"
+        )
+      ) throw new Error("tcg_v0_2_tactic_selected_attachment_source_changed");
+      const attachment = runtimeV02NormalizeEffectAttachmentState(step.attachment_state);
+      effect.cursor++;
+      if (!refs.length) continue;
+      const targetTop = topInst(target.cr);
+      if (!targetTop) throw new Error("tcg_v0_2_tactic_attachment_target_top_required");
+      const ref = refs[0];
+      const routed = runtimeV02BeginExternalEssenceAttachmentRoute(
+        state,
+        Number(target.seat) as 1 | 2,
+        targetTop.uid,
+        ref.uid,
+        "discard",
+        effect.id,
+        {
+          ...attachment.transaction,
+          phase: "effect_resolution",
+          action_kind: "effect_driven",
+          destination_index: target.where === "reserve" ? target.index : null,
+          source_owner_seat: sourceSeat as 1 | 2,
+          source_card_id: ref.card_id,
+        },
+      );
+      if (routed.flow.status === "player_choice_required") {
+        throw new Error("tcg_v0_2_tactic_attachment_event_choice_not_yet_supported");
+      }
+      const movementFlow = routed.flow.emitted_movement_events.length
+        ? runtimeV02BeginMovementListenerContinuation(
+          state,
+          routed.flow.emitted_movement_events,
+        )
+        : {
+          status: "complete",
+          processed_listener_keys: [],
+          emitted_heal_packet_ids: [],
+          pending_choice: null,
+        };
+      if (movementFlow.status === "player_choice_required") {
+        if (routed.flow.emitted_heal_packet_ids.length) {
+          throw new Error("tcg_v0_2_tactic_attachment_movement_choice_with_prior_heal_not_yet_supported");
+        }
+        setTacticMovementResume(state, effect);
+        return;
+      }
+      const healPacketIds = [
+        ...routed.flow.emitted_heal_packet_ids,
+        ...movementFlow.emitted_heal_packet_ids,
+      ];
+      if (healPacketIds.length) {
+        const healFlow = runtimeV02BeginTacticHealListenerContinuation(
+          state,
+          healPacketIds,
+          effect.owner_seat as 1 | 2,
+        );
+        if (healFlow.status === "player_choice_required") {
+          setTacticHealResume(state, effect);
+          return;
+        }
+      }
+      continue;
+    }
     if (op === "ATTACH_ESSENCE_FROM_ZONE") {
       const target = resolveVar(vars, step.target) as CreatureRef;
       const found = findCreature(state, target);
@@ -1501,7 +1763,42 @@ function applyPendingChoice(state: any, selected: ChoiceOption[]) {
   let movementFlow: ReturnType<typeof runtimeV02BeginMovementListenerContinuation> | null = null;
   const attachmentHealPacketIds: string[] = [];
 
-  if (apply === "set_var") {
+  if (apply === "select_cards") {
+    const descriptor = context.descriptor as RuntimeV02SelectCardsDescriptor;
+    const refs = selected.map((option) => option.data.ref as RuntimeV02SelectedCardRef);
+    const rebound = runtimeV02ResolveSelectCards(
+      state,
+      effect.owner_seat,
+      descriptor,
+      refs,
+    );
+    vars[descriptor.as] = rebound;
+    selectCardsDescriptorMap(vars)[descriptor.as] = structuredClone(descriptor);
+  } else if (apply === "move_selected_cards") {
+    const token = String(context.source_token || "");
+    const source = selectedCardRefs(vars[token]);
+    const rebound = runtimeV02RebindSelectedCards(state, source);
+    const ordered = selected.map((option) => option.data.ref as RuntimeV02SelectedCardRef);
+    if (
+      ordered.length !== rebound.length ||
+      new Set(ordered.map((ref) => ref.uid)).size !== rebound.length ||
+      ordered.some((ref) =>
+        !rebound.some((current) =>
+          current.uid === ref.uid &&
+          current.card_id === ref.card_id &&
+          current.zone_owner_seat === ref.zone_owner_seat &&
+          current.zone === ref.zone
+        )
+      )
+    ) throw new Error("tcg_v0_2_tactic_selected_cards_order_stale");
+    commitSelectedCardMove(
+      state,
+      effect,
+      ordered,
+      Number(context.destination_seat),
+      String(context.destination || ""),
+    );
+  } else if (apply === "set_var") {
     const values = selected.map((option) => option.data as CreatureRef);
     vars[String(context.var_name)] = context.many ? values : (values[0] || null);
   } else if (apply === "set_var_cards") {
