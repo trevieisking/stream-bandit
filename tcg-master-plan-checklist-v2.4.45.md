@@ -1061,9 +1061,34 @@
 - [x] Preserve Noctivane active deck-reading specialist unchanged.
 - [x] Preserve Celestyr Dream Ray Attack specialist unchanged.
 - [x] Preserve Seer Nyx Tactic inspection-provenance route unchanged.
-- [ ] Add shared bound-set choice grammar for `source + min/max` and Scout Zeph `set + selection`.
-- [ ] Support frozen `filters.any` without weakening existing filter grammar.
-- [ ] Canonicalize Future Draw / Circuit Scanner / Scout Zeph deck-window movement/order through Card-Zone.
-- [ ] Add bounded Celestyr active deck-planning family with private staged choice and Card-Zone mutation.
-- [ ] Prove the four repaired consumers plus six preserved consumers = all 10.
+- [x] Add shared bound-set choice grammar for `source + min/max` and Scout Zeph `set + selection`.
+- [x] Support frozen `filters.any` without weakening existing filter grammar.
+- [x] Canonicalize Future Draw / Circuit Scanner / Scout Zeph deck-window movement/order through Card-Zone.
+- [x] Add bounded Celestyr active deck-planning family with private staged choice and Card-Zone mutation.
+- [x] Prove the four repaired consumers plus six preserved consumers = all 10.
+
+### V2.4.98 final acceptance
+- [x] Tactic bound-set owner supports both frozen grammar families and `filters.any`.
+- [x] Future Draw / Circuit Scanner / Scout Zeph delegate physical movement/reorder to Card-Zone #30.
+- [x] Celestyr deck-planning live route is operation-shaped, private and Card-Zone-owned for mutation.
+- [x] Preserve six previously accepted CHOOSE_FROM_SET routes.
+- [x] Match Edge closure = 111 / `e1035dbc68dae15d980843b8a7a3d8a11fc076ba9fab72100ccc4f78e7fe09bc`.
+- [x] Tactic Edge closure = 47 / `5fe799462c53855691f0901fba11740c79d99d691d40bc2173ee6c1a40ae70ac`.
+- [x] Card Pass **#1541 SUCCESS** on exact all-surface source/runtime + release-control head `4d3781c12c8b42f953de203eb4acdf14b09ee5e2`.
+- [x] Move `CHOOSE_FROM_SET` from partial to implemented.
+- [x] Capability fingerprint = `f6d4ba6118a60dc44d7b63794724295423f1b77e`.
+- [x] Card Pass **#1542 SUCCESS** on exact capability/control head `f4dc9db69e741718abe3f7ed136a824334037fb1`.
+- [x] Preserve owner-family count **40**; no owner #41.
+- [x] Leave Supabase production, main and live promotion untouched.
+
+## V2.4.99 — DIRECT_DAMAGE all-surface closeout
+- [x] Freeze Release 1 inventory to exactly **8** DIRECT_DAMAGE nodes.
+- [x] Freeze surface split to 3 Ability/effect / 2 Attack recoil / 1 Tactic program / 2 Tactic listeners.
+- [x] Freeze damage classes to `effect` and `recoil`, amounts to 10/20, and bound Creature targets only.
+- [ ] Audit all eight against canonical Damage Engine / Damage Packet ownership.
+- [ ] Preserve source/action/controller context for protection, history and listeners.
+- [ ] Repair only proven execution gaps; no duplicate damage mutation owner.
+- [ ] Prove all eight frozen consumers.
+- [ ] Move `DIRECT_DAMAGE` from missing to implemented only after all eight are green.
+- [ ] Refresh capability/release-control evidence and exact-head validation.
 

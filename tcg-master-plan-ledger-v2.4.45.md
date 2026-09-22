@@ -1020,3 +1020,27 @@ Owner #31 validates the already-bound set, filters options, enforces min/max, ke
 ## 350 — active deck planning is a bounded Ability family, not a generic interpreter
 Celestyr's active `LOOK_TOP -> CHOOSE_FROM_SET -> MOVE_CARDS -> RETURN_REMAINDER_TO_DECK_TOP` sequence may have a dedicated operation-shaped active-Ability route using shared owner-#31 choice semantics and owner-#30 mutation. It must remain card-ID-free and must not absorb unrelated active Abilities.
 
+## 351 — CHOOSE_FROM_SET Release 1 parity is accepted
+All 10 frozen nodes are covered across Event Listener, active Ability, Attack and Tactic surfaces. Owner #31 owns bound-set choice semantics; Hidden Information #33 owns visibility; Card-Zone #30 owns all later physical movement/reorder. `CHOOSE_FROM_SET` is implemented at capability blob `f6d4ba6118a60dc44d7b63794724295423f1b77e`. Card Pass #1542 is green at `f4dc9db69e741718abe3f7ed136a824334037fb1`.
+
+## 352 — two CHOOSE_FROM_SET grammars share one bound-set contract
+The nine `source + min/max` nodes and Scout Zeph's `set + selection` node normalize into one owner-#31 descriptor. Frozen `filters.any` is part of that same filter grammar, not a card-specific exception.
+
+## 353 — bound-set inspection stays authoritative until Card-Zone mutation
+LOOK_TOP/INSPECT_ZONE may bind exact top-window provenance without detaching cards. A later CHOOSE_FROM_SET only chooses refs. Transfer/reorder happens through Card-Zone and stale deck-top identity fails closed before mutation.
+
+## 354 — active deck planning is a bounded owner-#31/#30 composition
+Celestyr's active deck-planning family uses owner #31 for private bound-set choice and owner #30 for selected deck-bottom movement + remainder reorder. The route is operation-shaped and cannot become a generic active-Ability interpreter.
+
+## 355 — V2.4.98 exact release-control state
+Match closure is 111 / `e1035dbc68dae15d980843b8a7a3d8a11fc076ba9fab72100ccc4f78e7fe09bc`; Tactic closure is 47 / `5fe799462c53855691f0901fba11740c79d99d691d40bc2173ee6c1a40ae70ac`. Owner-family count remains 40 and production was not changed.
+
+## 356 — DIRECT_DAMAGE is the next largest used operation gap
+After V2.4.98 the frozen 193-card inventory contains exactly 8 DIRECT_DAMAGE nodes, ahead of 7 ATTACH_ESSENCE_FROM_ZONE nodes. V2.4.99 must audit all eight before source changes.
+
+## 357 — DIRECT_DAMAGE targets are already bound
+All eight frozen DIRECT_DAMAGE operations receive an already-bound Creature target. DIRECT_DAMAGE ownership therefore begins at damage request validation/context, not target selection. Selection belongs to the producer's existing owner.
+
+## 358 — DIRECT_DAMAGE must not bypass Damage Packet ownership
+Effect/recoil damage must preserve canonical protection/prevention, packet identity/history, after-damage listeners, defeat sequencing and source/action/controller context. Producers may request the damage; canonical Damage owners perform the mutation and packet lifecycle.
+

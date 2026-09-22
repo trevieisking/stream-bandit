@@ -2933,3 +2933,77 @@ Exact repair boundary:
 5. do not modify the six accepted routes unless a guard proves ownership drift;
 6. no card-ID/name dispatch and no owner #41.
 
+## V2.4.98 — CHOOSE_FROM_SET all-surface closeout — ACCEPTED
+
+All **10** frozen Release 1 `CHOOSE_FROM_SET` nodes now have canonical runtime coverage.
+
+### Preserved accepted routes — 6/10
+- Stardot, Star Essence and Orbit Ring remain on Event Listener private bound-set choice ownership.
+- Noctivane remains on the active deck-reading specialist.
+- Celestyr / Dream Ray remains on the bounded Attack top-deck choice specialist.
+- Seer Nyx remains on the V2.4.97 inspection-provenance Tactic route.
+
+### Repaired routes — 4/10
+- Future Draw — Tactic bound-set choice + Card-Zone mutation/order.
+- Circuit Scanner — same family plus frozen `filters.any`.
+- Scout Zeph — alternate `set + selection` grammar plus frozen destination/set/exclude aliases.
+- Celestyr — Dream Cartographer — bounded active-Ability deck-planning family:
+  `LOOK_TOP 4 -> CHOOSE_FROM_SET 0..1 -> selected to deck bottom -> controller-order remainder top`.
+
+### Canonical ownership
+Owner #31 owns:
+- bound-set identity;
+- both frozen CHOOSE grammars;
+- filters and `filters.any`;
+- min/max;
+- private choice state;
+- stale/current-set revalidation;
+- result binding.
+
+Owner #33 retains hidden-information visibility.
+Owner #30 alone performs later physical deck/hand transfer and reorder.
+
+The shared bound-set module is a submodule of existing owner #31. No owner #41 and no card-ID/name dispatch were added.
+
+### Exact evidence
+All-surface source/runtime + release-control:
+- head `4d3781c12c8b42f953de203eb4acdf14b09ee5e2`;
+- Card Pass **#1541 SUCCESS**;
+- Match closure **111** / `e1035dbc68dae15d980843b8a7a3d8a11fc076ba9fab72100ccc4f78e7fe09bc`;
+- Tactic closure **47** / `5fe799462c53855691f0901fba11740c79d99d691d40bc2173ee6c1a40ae70ac`.
+
+Capability/control:
+- head `f4dc9db69e741718abe3f7ed136a824334037fb1`;
+- `CHOOSE_FROM_SET` moved **partial -> implemented**;
+- capability blob `f6d4ba6118a60dc44d7b63794724295423f1b77e`;
+- Card Pass **#1542 SUCCESS**.
+
+Production/main/live remain unchanged. Promotion remains HOLD while remaining Release 1 capability debt is closed.
+
+## V2.4.99 — DIRECT_DAMAGE all-surface closeout (freeze)
+
+Fresh frozen 193-card inventory after V2.4.98 contains exactly **8** `DIRECT_DAMAGE` nodes, the largest remaining used missing opcode.
+
+Surface split:
+- **3 Ability/effect consumers**
+  - Ember / Bristleflare — Heat Up optional self 10 effect damage;
+  - Ember / Magmagecko — selected friendly Ember target 10 effect damage;
+  - Ember / Pyrohorn — Ash Crown — modifier-consume target 20 effect damage.
+- **2 Attack recoil consumers**
+  - Ember / Bristleflare — Reckless Rush self 10 recoil;
+  - Ember / Furnacefang — Meltline Charge self 20 recoil.
+- **1 ordinary Tactic program**
+  - Ember / Ashen Gamble — selected friendly Ember target 20 effect damage.
+- **2 triggered Tactic listeners**
+  - Ember / Volcanic Caldera — moved-to-reserve event subject 10 effect damage;
+  - Grove / Thorn Crown — damage-packet source Creature 10 effect damage.
+
+Frozen grammar:
+- targets are already-bound Creature refs;
+- amounts are fixed 10 or 20;
+- damage classes are only `effect` and `recoil`;
+- recoil nodes carry declared `source_attack_id`;
+- no DIRECT_DAMAGE node itself performs selection or target discovery.
+
+V2.4.99 must begin with a read-only execution audit against the existing Damage engine / Damage Packet ownership. Producers may sequence DIRECT_DAMAGE, but damage application, protection/prevention, packet history, defeat interaction and listener emission stay with the canonical Damage owners. No owner #41 and no card-ID/name dispatch.
+
