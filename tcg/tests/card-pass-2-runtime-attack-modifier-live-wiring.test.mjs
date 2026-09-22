@@ -20,7 +20,7 @@ test("Attack #14 live path consumes the canonical modifier owner only after lega
 });
 
 test("Attack modifier completion riders flush atomically at defeat-scan boundary through Damage owner", () => {
-  assert.ok(matchActions.includes("tcg-match-damage-engine-v0-2.ts"));
+  assert.ok(matchActions.includes("tcg-match-direct-damage-v0-2.ts"));
   const start = matchActions.indexOf("const flushAttackModifierRiders=");
   const end = matchActions.indexOf("const scanDefeats=", start);
   assert.ok(start > 0 && end > start, "missing bounded completion-rider helper");
@@ -28,7 +28,10 @@ test("Attack modifier completion riders flush atomically at defeat-scan boundary
   assert.ok(helper.includes('rider.timing!=="after_attack_effects_before_defeat_scan"'));
   assert.ok(helper.includes('step.op!=="DIRECT_DAMAGE"'));
   assert.ok(helper.includes('step.target!=="$modifier_target"'));
-  assert.ok(helper.includes("runtimeV02DealEffectDamage(plan.target,plan.amount)"));
+  assert.ok(helper.includes("runtimeV02ApplyDirectDamage(s,plan.target,plan.step"));
+  assert.ok(helper.includes("runtimeV02BeginEventListenerContinuation(s,[resolved.after_damage_event])"));
+  assert.ok(helper.includes('source_kind:"ability"'));
+  assert.ok(helper.includes('damage_class:"effect"'));
   assert.ok(helper.includes("delete s.pending_attack_modifier_riders"));
   for (const forbidden of ["ember-pyrohorn", "Ash Crown", "crownfire", "ashen-stampede"]) {
     assert.equal(helper.includes(forbidden), false, `completion rider wiring must remain card-ID/name-free: ${forbidden}`);
