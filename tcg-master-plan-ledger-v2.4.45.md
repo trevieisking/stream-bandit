@@ -921,3 +921,18 @@ Aeralith — Storm Shepherd applies Blinded to the current opposing Vanguard onl
 ## 317 — after-attack-finished specialists remain disjoint
 The Marevault four-step `after_damage_finished` specialist remains exact to its Essence-move / HEAL_EACH / optional-switch family. Aeralith condition timing requires a separate operation-shaped subroute under Attack owner #14, not a permissive widening of the Marevault parser.
 
+## 318 — structured condition producers must carry source identity when it exists
+Event Listener, Attack and Tactic structured producers now supply controller, target, active-seat and source-action context to Condition owner #19. The context exists to evaluate protection and provenance; it does not transfer condition-state ownership to the producer.
+
+## 319 — after_attack_finished Condition application targets live battlefield state
+Aeralith's Blinded effect resolves against the current opposing Vanguard after its optional switch sequence and all emitted Movement/Heal listener work has completed. The target is rebound at that declared timing boundary rather than captured early during primary damage.
+
+## 320 — APPLY_CONDITION Release 1 parity is accepted
+All 20 frozen uses are covered across 6 Event Listener, 12 Attack after_damage, 1 Attack after_attack_finished and 1 Tactic consumer. `APPLY_CONDITION` is implemented at capability blob `702e41f5f72ead9cc17abb4290bfec11f0aa664c`. Final exact-head Card Pass #1513 is green at `2b09549535ab7df9dd25a57e5e139400fd8dd48f`.
+
+## 321 — OPTIONAL is consent/resume ownership, not nested-effect ownership
+V2.4.96 targets the 19 frozen Release 1 `OPTIONAL` uses. OPTIONAL may own whether the player accepts/declines and the deterministic resume point. Every accepted nested step must still execute through its existing semantic owner (Switch, Card-Zone, Condition, Withdrawal, Movement, Tactic destination, or other relevant engine).
+
+## 322 — V2.4.95 release-control state
+Match closure is 109 / `0eab3c83084c2ee60230be602cf22e1e5b451b713ad9655838008b9300c105c0`; Tactic closure is 45 / `c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2`; owner-family count remains 40; no production deployment or main merge occurred.
+

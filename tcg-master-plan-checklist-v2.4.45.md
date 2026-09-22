@@ -944,7 +944,7 @@
 - [x] Card Pass **#1503 SUCCESS** on exact capability/control head `ff6af2fde6029158eb63c74df01b4232412f94e3`.
 - [x] Preserve canonical owner-family count **40**; no owner #41.
 - [x] Leave Supabase production, main and live promotion untouched.
-- [ ] V2.4.95: freeze and reconcile all **20** Release 1 `APPLY_CONDITION` uses through Condition owner #19 without card-specific dispatch.
+- [x] V2.4.95: freeze and reconcile all **20** Release 1 `APPLY_CONDITION` uses through Condition owner #19 without card-specific dispatch.
 
 ## V2.4.95 — APPLY_CONDITION all-surface closeout
 - [x] Freeze Release 1 `APPLY_CONDITION` inventory to exactly **20** operation uses.
@@ -954,12 +954,25 @@
 - [x] Confirm Condition owner #19 already owns names, slots, immunity, temporary protection and lifecycle state.
 - [x] Confirm the four Ability consumers are triggered Abilities and therefore Event Listener-owned, not Active Ability-owned.
 - [x] Confirm nested conditional Attack Condition programs already use source-aware Condition application.
-- [ ] Upgrade Event Listener APPLY_CONDITION producer path to source-aware Condition owner context.
-- [ ] Upgrade direct pure-condition Attack owner to source-aware Condition owner context.
-- [ ] Upgrade Tactic APPLY_CONDITION producer path to source-aware Condition owner context.
-- [ ] Add bounded Attack after-attack-finished Condition subroute for Aeralith timing without widening Marevault ownership.
-- [ ] Prove all 20 frozen consumers through their canonical surfaces.
-- [ ] Move `APPLY_CONDITION` from missing to implemented only after all 20 are green.
-- [ ] Refresh capability fingerprint + release-control closures as required.
-- [ ] Pass exact-head Card Pass and synchronize Master Plan / Checklist / Ledger acceptance.
+- [x] Upgrade Event Listener APPLY_CONDITION producer path to source-aware Condition owner context.
+- [x] Upgrade direct pure-condition Attack owner to source-aware Condition owner context.
+- [x] Upgrade Tactic APPLY_CONDITION producer path to source-aware Condition owner context.
+- [x] Add bounded Attack after-attack-finished Condition subroute for Aeralith timing without widening Marevault ownership.
+- [x] Prove all 20 frozen consumers through their canonical surfaces.
+- [x] Move `APPLY_CONDITION` from missing to implemented only after all 20 are green.
+- [x] Refresh capability fingerprint + release-control closures as required.
+- [x] Pass exact-head Card Pass and synchronize Master Plan / Checklist / Ledger acceptance.
+
+### V2.4.95 final acceptance
+- [x] Producer-context source slice accepted by Card Pass **#1509 SUCCESS**.
+- [x] Aeralith after-attack-finished Condition timing preserves optional switch plus Movement/Heal listener completion before Blinded application.
+- [x] Match closure = **109 files** / `0eab3c83084c2ee60230be602cf22e1e5b451b713ad9655838008b9300c105c0`.
+- [x] Tactic closure = **45 files** / `c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2`.
+- [x] Card Pass **#1511 SUCCESS** on exact source/runtime/release-control head `196b1901add715b259a3c5fbe37158508872d00e`.
+- [x] `APPLY_CONDITION` capability moved from missing to implemented.
+- [x] Capability fingerprint = `702e41f5f72ead9cc17abb4290bfec11f0aa664c`.
+- [x] Card Pass **#1513 SUCCESS** on final exact head `2b09549535ab7df9dd25a57e5e139400fd8dd48f`.
+- [x] Preserve canonical owner-family count **40**; no owner #41.
+- [x] Leave Supabase production, main and live promotion untouched.
+- [ ] V2.4.96: freeze and reconcile all **19** Release 1 `OPTIONAL` uses through a generic consent/resume contract without absorbing nested-operation ownership.
 

@@ -2617,3 +2617,48 @@ The repair must:
 5. keep card IDs/names out of runtime dispatch;
 6. prove all 20 frozen uses before moving APPLY_CONDITION from missing to implemented.
 
+## V2.4.95 — APPLY_CONDITION all-surface closeout — ACCEPTED
+
+V2.4.95 is complete across all **20** frozen Release 1 `APPLY_CONDITION` uses.
+
+### Accepted execution ownership
+
+- Event Listener: 6 uses now provide source/controller/target/action context to Condition owner #19.
+- Attack after_damage: 12 uses are covered across direct pure-condition and nested conditional Attack owners.
+- Attack after_attack_finished: Aeralith — Storm Shepherd resolves Blinded only after its optional switch plus emitted Movement/Heal listener continuations complete.
+- Tactic program: Blackout Pulse uses source-aware Condition owner context and preserves its later Device-play-lock step.
+- Condition owner #19 remains the sole state mutation authority.
+- No card-ID/name dispatch was introduced.
+- Canonical owner-family count remains **40**; no owner #41.
+
+### Exact acceptance evidence
+
+Source-context producer reconciliation:
+- `9f0d2eb1e9e236374a3aa35b6d15daec9289674a` — initial producer-context slice;
+- `45405aa64b62990a2c30e74c3c4d5488fecef264` — Card Pass **#1509 SUCCESS** after release-control closure refresh.
+
+After-attack-finished Condition timing:
+- `10dcfa6278eb7a683901c91fa203d0ab5dd064fb` — bounded Aeralith timing subroute;
+- `196b1901add715b259a3c5fbe37158508872d00e` — Card Pass **#1511 SUCCESS** after exact Match closure refresh.
+
+Capability reconciliation:
+- `4d65cbc55e1cde5cdc36c0f5bcd3873d76efb4fd`;
+- `APPLY_CONDITION` moved from **missing** to **implemented**;
+- capability blob `702e41f5f72ead9cc17abb4290bfec11f0aa664c`;
+- Match closure **109 files** / `0eab3c83084c2ee60230be602cf22e1e5b451b713ad9655838008b9300c105c0`;
+- Tactic closure **45 files** / `c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2`;
+- Card Pass **#1512** runtime/type job fully green; one structure test was stale because it still asserted APPLY_CONDITION was missing.
+
+Final exact-head acceptance:
+- `2b09549535ab7df9dd25a57e5e139400fd8dd48f`;
+- only change from the capability head is the stale switch-foundation test expectation;
+- Card Pass **#1513 SUCCESS** — both structure/effect-grammar and deterministic runtime/type jobs green.
+
+No database migration, Supabase Edge deployment, main merge or live promotion occurred. Production remains unchanged and promotion remains HOLD while the Release 1 capability closeout loop continues.
+
+### Next exact runtime target — V2.4.96
+
+`OPTIONAL` all-surface reconciliation.
+
+The frozen 193-card inventory currently contains exactly **19 Release 1 OPTIONAL uses**, the largest remaining used missing opcode. V2.4.96 must begin read-only by freezing every consumer surface, nested program shape, choice timing and downstream owner before any source change. OPTIONAL owns player consent/resume only; it must never absorb the semantics of the nested operation.
+
