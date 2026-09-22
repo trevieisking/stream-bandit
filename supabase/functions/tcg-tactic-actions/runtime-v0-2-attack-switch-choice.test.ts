@@ -121,6 +121,7 @@ Deno.test("Attack Reserve switch resolution rebinds anchors and delegates to Ato
     current,
   );
   equal(resolved.reserve_index, 1, "selected reserve index");
+  assert(resolved.switch_result, "required switch must return Atomic Switch result");
   const player = (current.players as any)["1"];
   equal(player.vanguard.stack[0].uid, "b-uid", "selected Reserve became Vanguard");
   equal(player.reserve[1].stack[0].uid, "source-uid", "old Vanguard moved to Reserve");
