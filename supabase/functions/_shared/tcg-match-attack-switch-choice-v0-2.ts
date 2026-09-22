@@ -11,16 +11,20 @@ type RuntimeInst = { uid: string; card_id: string };
 export type RuntimeV02AttackReserveSwitchDescriptor = {
   attack_id: string;
   phase: "after_damage";
-  when: {
+  consent?: "required" | "optional";
+  when?: {
     predicate: "reserve_count_at_least";
     controller: "self";
     count: number;
-  };
+  } | null;
   selection: {
     controller: "self";
     zone: "reserve";
     count: 1;
     as: string;
+    filters?: {
+      element?: string;
+    };
   };
   switch: {
     player: "self";
@@ -43,8 +47,9 @@ export type RuntimeV02PendingAttackReserveSwitchChoice = {
   kind: "select_friendly_reserve_to_switch";
   attack_id: string;
   prompt: string;
-  min: 1;
+  min: 0 | 1;
   max: 1;
+  optional: boolean;
   turn_seq: number;
   source_uid: string;
   source_card_id: string;
@@ -54,9 +59,10 @@ export type RuntimeV02PendingAttackReserveSwitchChoice = {
 export type RuntimeV02AttackReserveSwitchResolution = {
   attack_id: string;
   choice_id: string;
-  option_id: string;
-  reserve_index: number;
-  switch_result: RuntimeV02AtomicSwitchResult;
+  selected_count: 0 | 1;
+  option_id: string | null;
+  reserve_index: number | null;
+  switch_result: RuntimeV02AtomicSwitchResult | null;
 };
 
 function objectRecord(value: unknown): Record<string, unknown> | null {
@@ -147,6 +153,42 @@ function labelFor(state: Record<string, unknown>, inst: RuntimeInst): string {
   return name || inst.card_id || "Reserve Creature";
 }
 
+function reserveFilters(
+  raw: unknown,
+  attackId: string,
+): { element?: string } {
+  const filters = objectRecord(raw);
+  if (!filters) {
+    throw new Error(`tcg_v0_2_attack_switch_filters_invalid:${attackId}`);
+  }
+  const unsupported = Object.keys(filters).find((key) => key !== "element");
+  if (unsupported) {
+    throw new Error(
+      `tcg_v0_2_attack_switch_filter_unsupported:${attackId}:${unsupported}`,
+    );
+  }
+  const element = filters.element == null
+    ? undefined
+    : requiredString(
+      filters.element,
+      `tcg_v0_2_attack_switch_filter_element_invalid:${attackId}`,
+    );
+  return element ? { element } : {};
+}
+
+function reserveMatchesFilters(
+  state: Record<string, unknown>,
+  inst: RuntimeInst,
+  filters: { element?: string } | undefined,
+): boolean {
+  if (!filters?.element) return true;
+  const definition = runtimeV02Definition(state, inst);
+  if (!definition) {
+    throw new Error("tcg_v0_2_attack_switch_reserve_definition_missing");
+  }
+  return String(definition.element || "") === filters.element;
+}
+
 export function structuredRuntimeAfterDamageReserveSwitchChoice(
   state: Record<string, unknown>,
   instanceOrId: string | { card_id?: unknown } | null | undefined,
@@ -166,12 +208,73 @@ export function structuredRuntimeAfterDamageReserveSwitchChoice(
   }
   const attack = objectRecord(creature.attacks[attackSlot - 1]);
   if (!attack) throw new Error("tcg_v0_2_attack_switch_attack_invalid");
-  const attackId = requiredString(attack.id, "tcg_v0_2_attack_switch_attack_id_required");
+  const attackId = requiredString(
+    attack.id,
+    "tcg_v0_2_attack_switch_attack_id_required",
+  );
   const afterDamage = attack.after_damage;
   if (!Array.isArray(afterDamage) || afterDamage.length !== 1) return null;
 
   const outer = objectRecord(afterDamage[0]);
-  if (!outer || String(outer.op || "") !== "IF" || outer.else != null) return null;
+  if (!outer) return null;
+
+  if (String(outer.op || "") === "OPTIONAL") {
+    const unsupportedOuter = Object.keys(outer).find((key) =>
+      !["op", "player", "steps"].includes(key)
+    );
+    if (unsupportedOuter) {
+      throw new Error(
+        `tcg_v0_2_attack_switch_optional_field_unsupported:${attackId}:${unsupportedOuter}`,
+      );
+    }
+    if (String(outer.player || "") !== "self") return null;
+    const steps = outer.steps;
+    if (!Array.isArray(steps) || steps.length !== 2) return null;
+    const select = objectRecord(steps[0]);
+    const switchStep = objectRecord(steps[1]);
+    if (
+      !select ||
+      String(select.op || "") !== "SELECT_CREATURE" ||
+      String(select.controller || "") !== "self" ||
+      String(select.zone || "") !== "reserve" ||
+      Number(select.count) !== 1
+    ) return null;
+    const filters = reserveFilters(select.filters, attackId);
+    const as = requiredString(
+      select.as,
+      `tcg_v0_2_attack_switch_selection_var_required:${attackId}`,
+    );
+    if (
+      !switchStep ||
+      String(switchStep.op || "") !== "SWITCH_WITH_VANGUARD" ||
+      String(switchStep.player || "") !== "self" ||
+      String(switchStep.target || "") !== `$${as}`
+    ) return null;
+    const actionKind = switchStep.action_kind == null
+      ? "attack"
+      : String(switchStep.action_kind);
+    if (actionKind !== "attack") return null;
+    return {
+      attack_id: attackId,
+      phase: "after_damage",
+      consent: "optional",
+      when: null,
+      selection: {
+        controller: "self",
+        zone: "reserve",
+        count: 1,
+        as,
+        filters,
+      },
+      switch: {
+        player: "self",
+        target: `$${as}`,
+        action_kind: "attack",
+      },
+    };
+  }
+
+  if (String(outer.op || "") !== "IF" || outer.else != null) return null;
   const when = objectRecord(outer.when);
   if (
     !when ||
@@ -180,7 +283,9 @@ export function structuredRuntimeAfterDamageReserveSwitchChoice(
   ) return null;
   const threshold = Number(when.count);
   if (!Number.isInteger(threshold) || threshold < 1) {
-    throw new Error(`tcg_v0_2_attack_switch_reserve_threshold_invalid:${attackId}`);
+    throw new Error(
+      `tcg_v0_2_attack_switch_reserve_threshold_invalid:${attackId}`,
+    );
   }
 
   const then = outer.then;
@@ -196,7 +301,10 @@ export function structuredRuntimeAfterDamageReserveSwitchChoice(
   ) return null;
   const filters = objectRecord(select.filters);
   if (!filters || Object.keys(filters).length !== 0) return null;
-  const as = requiredString(select.as, `tcg_v0_2_attack_switch_selection_var_required:${attackId}`);
+  const as = requiredString(
+    select.as,
+    `tcg_v0_2_attack_switch_selection_var_required:${attackId}`,
+  );
   if (
     !switchStep ||
     String(switchStep.op || "") !== "SWITCH_WITH_VANGUARD" ||
@@ -208,6 +316,7 @@ export function structuredRuntimeAfterDamageReserveSwitchChoice(
   return {
     attack_id: attackId,
     phase: "after_damage",
+    consent: "required",
     when: {
       predicate: "reserve_count_at_least",
       controller: "self",
@@ -218,6 +327,7 @@ export function structuredRuntimeAfterDamageReserveSwitchChoice(
       zone: "reserve",
       count: 1,
       as,
+      filters: {},
     },
     switch: {
       player: "self",
@@ -255,22 +365,26 @@ export function runtimeV02CreateAttackReserveSwitchChoice(
     player.vanguard,
     "tcg_v0_2_attack_switch_source_creature_invalid",
   );
-  const predicateMatched = runtimeV02EvaluateAttackIf(descriptor.when, {
-    source_creature: sourceCreature,
-    attack_target: sourceCreature,
-    self_reserve: reserve,
-    opponent_reserve: [],
-    variables: {},
-    current_action_events: {},
-    target_remains_in_play_after_damage: true,
-    card_matches: () => false,
-  });
-  if (!predicateMatched) return null;
+  if (descriptor.when) {
+    const predicateMatched = runtimeV02EvaluateAttackIf(descriptor.when, {
+      source_creature: sourceCreature,
+      attack_target: sourceCreature,
+      self_reserve: reserve,
+      opponent_reserve: [],
+      variables: {},
+      current_action_events: {},
+      target_remains_in_play_after_damage: true,
+      card_matches: () => false,
+    });
+    if (!predicateMatched) return null;
+  }
 
+  const optional = descriptor.consent === "optional";
   const options: RuntimeV02AttackReserveSwitchChoiceOption[] = [];
   reserve.forEach((raw, reserveIndex) => {
     if (!raw) return;
     const inst = topInst(raw, reserveIndex);
+    if (!reserveMatchesFilters(state, inst, descriptor.selection.filters)) return;
     options.push({
       id: `reserve:${reserveIndex}:${inst.uid}`,
       label: labelFor(state, inst),
@@ -279,7 +393,7 @@ export function runtimeV02CreateAttackReserveSwitchChoice(
       card_id: inst.card_id,
     });
   });
-  if (!options.length) {
+  if (!options.length && !optional) {
     throw new Error("tcg_v0_2_attack_switch_choice_no_legal_reserve");
   }
 
@@ -288,9 +402,12 @@ export function runtimeV02CreateAttackReserveSwitchChoice(
     seat,
     kind: "select_friendly_reserve_to_switch",
     attack_id: descriptor.attack_id,
-    prompt: "Choose a Reserve Creature to become your Vanguard",
-    min: 1,
+    prompt: optional
+      ? "Optionally choose a Reserve Creature to become your Vanguard"
+      : "Choose a Reserve Creature to become your Vanguard",
+    min: optional ? 0 : 1,
     max: 1,
+    optional,
     turn_seq: turn,
     source_uid: source.uid,
     source_card_id: source.card_id,
@@ -312,8 +429,13 @@ export function runtimeV02ResolveAttackReserveSwitchChoice(
   if (!choiceId || choice.id !== choiceId) {
     throw new Error("tcg_v0_2_attack_switch_choice_stale_id");
   }
-  if (!Array.isArray(choiceIds) || choiceIds.length !== 1 || new Set(choiceIds).size !== 1) {
-    throw new Error("tcg_v0_2_attack_switch_choice_exactly_one_required");
+  if (
+    !Array.isArray(choiceIds) ||
+    choiceIds.length < choice.min ||
+    choiceIds.length > choice.max ||
+    new Set(choiceIds).size !== choiceIds.length
+  ) {
+    throw new Error("tcg_v0_2_attack_switch_choice_count_invalid");
   }
   if (currentTurn(state) !== choice.turn_seq) {
     throw new Error("tcg_v0_2_attack_switch_choice_turn_changed");
@@ -328,6 +450,17 @@ export function runtimeV02ResolveAttackReserveSwitchChoice(
     { uid: choice.source_uid, card_id: choice.source_card_id },
     "tcg_v0_2_attack_switch_choice_source_vanguard_changed",
   );
+
+  if (choiceIds.length === 0) {
+    return {
+      attack_id: choice.attack_id,
+      choice_id: choice.id,
+      selected_count: 0,
+      option_id: null,
+      reserve_index: null,
+      switch_result: null,
+    };
+  }
 
   const option = choice.options.find((candidate) => candidate.id === choiceIds[0]);
   if (!option) throw new Error("tcg_v0_2_attack_switch_choice_unknown_option");
@@ -355,6 +488,7 @@ export function runtimeV02ResolveAttackReserveSwitchChoice(
   return {
     attack_id: choice.attack_id,
     choice_id: choice.id,
+    selected_count: 1,
     option_id: option.id,
     reserve_index: option.reserve_index,
     switch_result: switchResult,
