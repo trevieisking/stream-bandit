@@ -17,6 +17,7 @@
       "ADD_INCOMING_ATTACK_DAMAGE_MODIFIER",
       "ADD_SHIELD",
       "ADD_SHIELD_EACH",
+      "APPLY_CONDITION",
       "CHECK_DECKOUT_AFTER_RESOLUTION",
       "CHOOSE_AND_CLEAR_CONDITION",
       "CHOOSE_AND_CLEAR_CONTROL_CONDITION",
@@ -67,7 +68,6 @@
       "CHOOSE_FROM_SET"
     ],
     "missing": [
-      "APPLY_CONDITION",
       "ATTACH_ESSENCE_FROM_SELECTION",
       "DEAL_EFFECT_DAMAGE",
       "DEFEAT_EACH_MATCHING",
@@ -831,6 +831,74 @@
         }
       },
       "note": "All seven frozen Release 1 SELECT_CARDS consumers now execute through canonical surface owners with one generic selection contract. Physical card movement and Essence attachment remain delegated to owner families #30 and #22. No owner #41."
+    },
+    "release1_apply_condition_all_surface_v2_4_95": {
+      "accepted_head": "196b1901add715b259a3c5fbe37158508872d00e",
+      "card_pass_run": 1511,
+      "operation": "APPLY_CONDITION",
+      "frozen_use_count": 20,
+      "surface_counts": {
+        "event_listener": 6,
+        "attack_after_damage": 12,
+        "attack_after_attack_finished": 1,
+        "tactic_program": 1
+      },
+      "condition_counts": {
+        "Scorched": 2,
+        "Blinded": 2,
+        "Venomed": 2,
+        "Rooted": 2,
+        "Silenced": 2,
+        "Dazed": 4,
+        "Crushed": 3,
+        "Drenched": 1,
+        "Stunned": 2
+      },
+      "modes": {
+        "apply_if_empty": 19,
+        "apply_if_empty_or_same": 1
+      },
+      "owners": {
+        "condition": "supabase/functions/_shared/tcg-match-condition-engine-v0-2.ts",
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "direct_attack": "supabase/functions/_shared/tcg-match-attack-effects-v0-2.ts",
+        "conditional_attack": "supabase/functions/_shared/tcg-match-attack-conditional-condition-v0-2.ts",
+        "overcharge_attack": "supabase/functions/_shared/tcg-match-attack-overcharge-discard-choice-v0-2.ts",
+        "after_attack_finished": "supabase/functions/_shared/tcg-match-attack-after-finished-condition-v0-2.ts",
+        "tactic": "supabase/functions/tcg-tactic-actions/index.ts",
+        "orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "state_owner": "Condition owner #19 remains sole condition-state mutation authority",
+        "source_context": "structured Event Listener, Attack and Tactic producers use source-aware condition application",
+        "protection": "opponent-card temporary condition protection is consumed before mutation where applicable",
+        "late_targeting": "after_attack_finished resolves the current opponent Vanguard after optional switch and nested Movement/Heal listener completion",
+        "bound_attack_target": "generic direct Attack route accepts $bound_attack_target without card-specific dispatch",
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-condition-engine.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-condition-protection-integration.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-condition-effects.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-conditional-condition.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-overcharge-discard-choice.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-after-finished-condition.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts",
+        "tcg/tests/card-pass-2-apply-condition-context.test.mjs",
+        "tcg/tests/card-pass-2-attack-after-finished-condition.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 109,
+          "sha256": "0eab3c83084c2ee60230be602cf22e1e5b451b713ad9655838008b9300c105c0"
+        },
+        "tactic_actions": {
+          "file_count": 45,
+          "sha256": "c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2"
+        }
+      },
+      "note": "All 20 frozen Release 1 APPLY_CONDITION uses now route through canonical Condition ownership. Aeralith's after-attack-finished Blinded timing is preserved across optional switch and listener pauses. No owner #41."
     }
   }
 }
