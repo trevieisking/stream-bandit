@@ -43,6 +43,7 @@
       "MODIFY_CURRENT_WITHDRAWAL_COST",
       "MOVE_ATTACHED_ESSENCE",
       "MOVE_CARDS",
+      "OPTIONAL",
       "PROMPT_CHOSEN_PLAYER_TO_SELECT_RESERVE",
       "PUT_REMAINDER_ON_DECK_BOTTOM",
       "RANDOM_SAMPLE_HIDDEN_ZONE",
@@ -76,7 +77,6 @@
       "INSPECT_ZONE",
       "MOVE_DAMAGE",
       "MOVE_ZONE_POSITION",
-      "OPTIONAL",
       "PERFORM_VOLUNTARY_WITHDRAWAL",
       "PLACE_DAMAGE",
       "PLACE_DAMAGE_MULTI",
@@ -899,6 +899,64 @@
         }
       },
       "note": "All 20 frozen Release 1 APPLY_CONDITION uses now route through canonical Condition ownership. Aeralith's after-attack-finished Blinded timing is preserved across optional switch and listener pauses. No owner #41."
+    },
+    "release1_optional_all_surface_v2_4_96": {
+      "accepted_head": "f3fc2343ee9c3484045f9c291ee2595e222c91ac",
+      "card_pass_run": 1518,
+      "operation": "OPTIONAL",
+      "frozen_inventory": {
+        "total": 19,
+        "surfaces": {
+          "event_listener": 9,
+          "ordinary_attack_after_damage": 6,
+          "tactic_program": 3,
+          "mixed_attack_after_damage_finished": 1
+        },
+        "ordinary_attack_consumers": [
+          "ember-sootwing",
+          "gale-skyweaver",
+          "gale-tempestalon",
+          "gale-aeralith-storm-shepherd",
+          "shade-wispbat",
+          "tide-mistmarten"
+        ]
+      },
+      "owners": {
+        "event_listener": "supabase/functions/_shared/tcg-match-event-listener-v0-2.ts",
+        "tactic_interpreter": "supabase/functions/tcg-tactic-actions/index.ts",
+        "attack_optional_switch": "supabase/functions/_shared/tcg-match-attack-switch-choice-v0-2.ts",
+        "mixed_attack_program": "supabase/functions/_shared/tcg-match-attack-after-damage-finished-v0-2.ts",
+        "switch_mutation": "supabase/functions/_shared/tcg-match-switch-context-v0-2.ts",
+        "match_orchestration": "supabase/functions/tcg-match-actions/index.ts"
+      },
+      "semantics": {
+        "consent_resume_only": true,
+        "decline": "zero selections; no Atomic Switch or movement events",
+        "accept": "server-owned Reserve choice, current turn/source/Reserve anchor revalidation, then Atomic Switch",
+        "reserve_filters": "operation-shaped; frozen element filter supported without card identity routing",
+        "nested_ownership": "OPTIONAL does not absorb Switch, Card-Zone, Damage, Draw/discard, Condition, Withdrawal or destination semantics",
+        "legacy_compatibility": "legacy effect-text / caller switch-index route remains compatibility-only when structured owner does not claim the attack",
+        "card_id_dispatch": false,
+        "owner_family_count": 40
+      },
+      "tests": [
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-switch-choice.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-attack-after-damage-finished.test.ts",
+        "supabase/functions/tcg-tactic-actions/runtime-v0-2-event-listener.test.ts",
+        "tcg/tests/card-pass-2-runtime-attack-optional-switch.test.mjs",
+        "tcg/tests/card-pass-2-runtime-attack-switch-choice.test.mjs"
+      ],
+      "release_closures": {
+        "match_actions": {
+          "file_count": 109,
+          "sha256": "8a29ec22c8b6db539c6f0bae4f4c2ce0301b0e411bee7d44c493e6cf804637b6"
+        },
+        "tactic_actions": {
+          "file_count": 45,
+          "sha256": "c8ffe22b77007b382e7ae2897dc9c01fb31d668489a700a5c0ceb97145cd8ed2"
+        }
+      },
+      "note": "OPTIONAL is accepted as a shared consent/resume operation across all 19 frozen consumers. The six ordinary Attack OPTIONAL switch programs now use the canonical server choice + Atomic Switch path. No owner #41."
     }
   }
 }
